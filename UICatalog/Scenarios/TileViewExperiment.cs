@@ -38,8 +38,16 @@ namespace UICatalog.Scenarios {
 
 			Application.Top.Add (frame);
 
-			var view1 = new FrameView () {
-				Title = "View 1",
+			};
+			frame2.Border.BorderStyle = BorderStyle.Single;
+
+			//ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
+
+			Application.Top.Add (frame1);
+			Application.Top.Add (frame2);
+
+			var view1 = new TextField () {
+				//Title = "View 1",
 				Text = "View1 30%/50% Single",
 				X = -1,
 				Y = -1,
@@ -49,7 +57,7 @@ namespace UICatalog.Scenarios {
 				Border = new Border () { BorderStyle = BorderStyle.Single }
 			};
 
-			frame.Add (view1);
+			frame1.Add (view1);
 
 			//var view12splitter = new SplitterEventArgs
 

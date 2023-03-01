@@ -101,7 +101,7 @@ namespace UICatalog.Scenarios {
 			SetMultilineStatusText ();
 			SetWrapStatusText ();
 
-			if (miMultiline.Checked) {
+			if (miMultiline.Checked == true) {
 				height = 10;
 			} else {
 				height = 1;
@@ -155,21 +155,21 @@ namespace UICatalog.Scenarios {
 		{
 			miMultiline.Checked = !miMultiline.Checked;
 			SetMultilineStatusText ();
-			textViewTopLeft.Multiline = miMultiline.Checked;
-			textViewTopRight.Multiline = miMultiline.Checked;
-			textViewBottomLeft.Multiline = miMultiline.Checked;
-			textViewBottomRight.Multiline = miMultiline.Checked;
-			textViewCentered.Multiline = miMultiline.Checked;
+			textViewTopLeft.Multiline = (bool)miMultiline.Checked;
+			textViewTopRight.Multiline = (bool)miMultiline.Checked;
+			textViewBottomLeft.Multiline = (bool)miMultiline.Checked;
+			textViewBottomRight.Multiline = (bool)miMultiline.Checked;
+			textViewCentered.Multiline = (bool)miMultiline.Checked;
 		}
 
 		private void WordWrap ()
 		{
 			miWrap.Checked = !miWrap.Checked;
-			textViewTopLeft.WordWrap = miWrap.Checked;
-			textViewTopRight.WordWrap = miWrap.Checked;
-			textViewBottomLeft.WordWrap = miWrap.Checked;
-			textViewBottomRight.WordWrap = miWrap.Checked;
-			textViewCentered.WordWrap = miWrap.Checked;
+			textViewTopLeft.WordWrap = (bool)miWrap.Checked;
+			textViewTopRight.WordWrap = (bool)miWrap.Checked;
+			textViewBottomLeft.WordWrap = (bool)miWrap.Checked;
+			textViewBottomRight.WordWrap = (bool)miWrap.Checked;
+			textViewCentered.WordWrap = (bool)miWrap.Checked;
 			miWrap.Checked = textViewTopLeft.WordWrap;
 			SetWrapStatusText ();
 		}

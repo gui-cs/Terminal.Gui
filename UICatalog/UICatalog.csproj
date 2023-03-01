@@ -19,6 +19,12 @@
     <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Resources\config.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\config.json" />
+  </ItemGroup>
+  <ItemGroup>
   <None Update="./Scenarios/Spinning_globe_dark_small.gif" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>

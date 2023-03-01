@@ -101,6 +101,7 @@ namespace UICatalog.Tests {
 			int stackSize = CreateInput ("");
 
 			Application.Init (new FakeDriver ());
+			Application.QuitKey = Key.CtrlMask | Key.Q; // Config manager may have set this to a different key
 
 			int iterations = 0;
 			Application.Iteration = () => {
@@ -304,7 +305,7 @@ namespace UICatalog.Tests {
 
 			_computedCheckBox.Toggled += (previousState) => {
 				if (_curView != null) {
-					_curView.LayoutStyle = previousState ? LayoutStyle.Absolute : LayoutStyle.Computed;
+					_curView.LayoutStyle = previousState == true ? LayoutStyle.Absolute : LayoutStyle.Computed;
 					_hostPane.LayoutSubviews ();
 				}
 			};

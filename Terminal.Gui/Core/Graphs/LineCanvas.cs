@@ -12,6 +12,7 @@ namespace Terminal.Gui.Graphs {
 	public class LineCanvas {
 
 
+
 		private List<StraightLine> lines = new List<StraightLine> ();
 
 		Dictionary<IntersectionRuneType, IntersectionRuneResolver> runeResolvers = new Dictionary<IntersectionRuneType, IntersectionRuneResolver> {
@@ -62,8 +63,8 @@ namespace Terminal.Gui.Graphs {
 			var map = new Dictionary<Point,Rune>();
 
 			// walk through each pixel of the bitmap
-			for (int y = inArea.Y; y < inArea.Height; y++) {
-				for (int x = inArea.X; x < inArea.Width; x++) {
+			for (int y = inArea.Y; y < inArea.Y + inArea.Height; y++) {
+				for (int x = inArea.X; x < inArea.X + inArea.Width; x++) {
 
 					var intersects = lines
 						.Select (l => l.Intersects (x, y))

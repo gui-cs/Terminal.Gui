@@ -37,7 +37,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets the global shortcut to invoke the action on the menu.
 		/// </summary>
-		public Key Shortcut { get; }
+		public Key Shortcut { get; set; }
 
 		/// <summary>
 		/// Gets or sets the title.

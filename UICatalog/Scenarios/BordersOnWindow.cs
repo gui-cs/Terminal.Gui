@@ -20,7 +20,6 @@ namespace UICatalog.Scenarios {
 
 			var smartView = new Window () {
 				X = Pos.Center (),
-				Y = Pos.Center () - 7,
 				Width = 40,
 				Height = 20,
 				Border = new Border () {
@@ -142,7 +141,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (paddingBottomEdit);
 
 			var replacePadding = new Button ("Replace all based on top") {
-				X = Pos.Center () - 35,
+				X = Pos.Left (paddingLeftEdit),
 				Y = 5
 			};
 			replacePadding.Clicked += () => {
@@ -236,7 +235,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (borderBottomEdit);
 
 			var replaceBorder = new Button ("Replace all based on top") {
-				X = Pos.Center () + 1,
+				X = Pos.Left (borderLeftEdit),
 				Y = 5
 			};
 			replaceBorder.Clicked += () => {
@@ -249,6 +248,8 @@ namespace UICatalog.Scenarios {
 			Win.Add (replaceBorder);
 
 			Win.Add (new Label ("BorderStyle:"));
+
+			smartView.Y = Pos.Bottom (replaceBorder) + 1;
 
 			var borderStyleEnum = Enum.GetValues (typeof (BorderStyle)).Cast<BorderStyle> ().ToList ();
 			var rbBorderStyle = new RadioGroup (borderStyleEnum.Select (
@@ -267,7 +268,7 @@ namespace UICatalog.Scenarios {
 			};
 			cbDrawMarginFrame.Toggled += (e) => {
 				try {
-					smartView.Border.DrawMarginFrame = cbDrawMarginFrame.Checked;
+					smartView.Border.DrawMarginFrame = (bool)cbDrawMarginFrame.Checked;
 					if (cbDrawMarginFrame.Checked != smartView.Border.DrawMarginFrame) {
 						cbDrawMarginFrame.Checked = smartView.Border.DrawMarginFrame;
 					}
@@ -343,7 +344,7 @@ namespace UICatalog.Scenarios {
 			cbEffect3D.Toggled += (e) => {
 				try {
 					smartView.Border.Effect3D = effect3DOffsetX.Enabled =
-						effect3DOffsetY.Enabled = cbEffect3D.Checked;
+						effect3DOffsetY.Enabled = (bool)cbEffect3D.Checked;
 				} catch { }
 			};
 

@@ -55,7 +55,7 @@ namespace UICatalog.Scenarios {
 		private void WordWrap ()
 		{
 			miWrap.Checked = !miWrap.Checked;
-			textView.WordWrap = miWrap.Checked;
+			textView.WordWrap = (bool)miWrap.Checked;
 		}
 
 		private void Quit ()

@@ -42,6 +42,7 @@ namespace UICatalog.Scenarios {
 			public bool hasSubMenu;
 			public MenuItemCheckStyle checkStyle;
 			public ustring shortcut;
+			public bool allowNullChecked;
 
 			public DynamicMenuItem () { }
 
@@ -51,7 +52,7 @@ namespace UICatalog.Scenarios {
 				this.hasSubMenu = hasSubMenu;
 			}
 
-			public DynamicMenuItem (ustring title, ustring help, ustring action, bool isTopLevel, bool hasSubMenu, MenuItemCheckStyle checkStyle = MenuItemCheckStyle.NoCheck, ustring shortcut = null)
+			public DynamicMenuItem (ustring title, ustring help, ustring action, bool isTopLevel, bool hasSubMenu, MenuItemCheckStyle checkStyle = MenuItemCheckStyle.NoCheck, ustring shortcut = null, bool allowNullChecked = false)
 			{
 				this.title = title;
 				this.help = help;
@@ -60,6 +61,7 @@ namespace UICatalog.Scenarios {
 				this.hasSubMenu = hasSubMenu;
 				this.checkStyle = checkStyle;
 				this.shortcut = shortcut;
+				this.allowNullChecked = allowNullChecked;
 			}
 		}
 
@@ -310,8 +312,8 @@ namespace UICatalog.Scenarios {
 					} else if (_currentEditMenuBarItem != null) {
 						var menuItem = new DynamicMenuItem (_frmMenuDetails._txtTitle.Text, _frmMenuDetails._txtHelp.Text,
 							_frmMenuDetails._txtAction.Text,
-							_frmMenuDetails._ckbIsTopLevel != null ? _frmMenuDetails._ckbIsTopLevel.Checked : false,
-							_frmMenuDetails._ckbSubMenu != null ? _frmMenuDetails._ckbSubMenu.Checked : false,
+							_frmMenuDetails._ckbIsTopLevel != null ? (bool)_frmMenuDetails._ckbIsTopLevel.Checked : false,
+							_frmMenuDetails._ckbSubMenu != null ? (bool)_frmMenuDetails._ckbSubMenu.Checked : false,
 							_frmMenuDetails._rbChkStyle.SelectedItem == 0 ? MenuItemCheckStyle.NoCheck :
 							_frmMenuDetails._rbChkStyle.SelectedItem == 1 ? MenuItemCheckStyle.Checked :
 							MenuItemCheckStyle.Radio,
@@ -564,6 +566,7 @@ namespace UICatalog.Scenarios {
 						newMenu.CheckType = item.checkStyle;
 						newMenu.Action = _frmMenuDetails.CreateAction (newMenu, item);
 						newMenu.Shortcut = ShortcutHelper.GetShortcutFromTag (item.shortcut);
+						newMenu.AllowNullChecked = item.allowNullChecked;
 					} else if (item.isTopLevel) {
 						newMenu = new MenuBarItem (item.title, item.help, null);
 						newMenu.Action = _frmMenuDetails.CreateAction (newMenu, item);
@@ -635,6 +638,7 @@ namespace UICatalog.Scenarios {
 			public TextView _txtAction;
 			public CheckBox _ckbIsTopLevel;
 			public CheckBox _ckbSubMenu;
+			public CheckBox _ckbNullCheck;
 			public RadioGroup _rbChkStyle;
 			public TextField _txtShortcut;
 
@@ -699,6 +703,12 @@ namespace UICatalog.Scenarios {
 					Checked = _menuItem == null ? !hasParent : HasSubMenus (_menuItem)
 				};
 				Add (_ckbSubMenu);
+
+				_ckbNullCheck = new CheckBox ("Allow null checked") {
+					X = Pos.Left (_lblTitle),
+					Y = Pos.Bottom (_ckbSubMenu)
+				};
+				Add (_ckbNullCheck);
 
 				var _rChkLabels = new ustring [] { "NoCheck", "Checked", "Radio" };
 				_rbChkStyle = new RadioGroup (_rChkLabels) {
@@ -780,18 +790,18 @@ namespace UICatalog.Scenarios {
 				Add (_btnShortcut);
 
 				_ckbIsTopLevel.Toggled += (e) => {
-					if ((_menuItem != null && _menuItem.Parent != null && _ckbIsTopLevel.Checked) ||
-						_menuItem == null && hasParent && _ckbIsTopLevel.Checked) {
+					if ((_menuItem != null && _menuItem.Parent != null && (bool)_ckbIsTopLevel.Checked) ||
+						_menuItem == null && hasParent && (bool)_ckbIsTopLevel.Checked) {
 						MessageBox.ErrorQuery ("Invalid IsTopLevel", "Only menu bar can have top level menu item!", "Ok");
 						_ckbIsTopLevel.Checked = false;
 						return;
 					}
-					if (_ckbIsTopLevel.Checked) {
+					if (_ckbIsTopLevel.Checked == true) {
 						_ckbSubMenu.Checked = false;
 						_ckbSubMenu.SetNeedsDisplay ();
 						_txtHelp.Enabled = true;
 						_txtAction.Enabled = true;
-						_txtShortcut.Enabled = !_ckbIsTopLevel.Checked && !_ckbSubMenu.Checked;
+						_txtShortcut.Enabled = _ckbIsTopLevel.Checked == false && _ckbSubMenu.Checked == false;
 					} else {
 						if (_menuItem == null && !hasParent || _menuItem.Parent == null) {
 							_ckbSubMenu.Checked = true;
@@ -805,7 +815,7 @@ namespace UICatalog.Scenarios {
 					}
 				};
 				_ckbSubMenu.Toggled += (e) => {
-					if (_ckbSubMenu.Checked) {
+					if ((bool)_ckbSubMenu.Checked) {
 						_ckbIsTopLevel.Checked = false;
 						_ckbIsTopLevel.SetNeedsDisplay ();
 						_txtHelp.Text = "";
@@ -822,7 +832,12 @@ namespace UICatalog.Scenarios {
 						}
 						_txtHelp.Enabled = true;
 						_txtAction.Enabled = true;
-						_txtShortcut.Enabled = !_ckbIsTopLevel.Checked && !_ckbSubMenu.Checked;
+						_txtShortcut.Enabled = _ckbIsTopLevel.Checked == false && _ckbSubMenu.Checked == false;
+					}
+				};
+				_ckbNullCheck.Toggled += (e) => {
+					if (_menuItem != null) {
+						_menuItem.AllowNullChecked = (bool)_ckbNullCheck.Checked;
 					}
 				};
 
@@ -842,6 +857,7 @@ namespace UICatalog.Scenarios {
 					_txtAction.Text = m.action;
 					_ckbIsTopLevel.Checked = false;
 					_ckbSubMenu.Checked = !hasParent;
+					_ckbNullCheck.Checked = false;
 					_txtHelp.Enabled = hasParent;
 					_txtAction.Enabled = hasParent;
 					_txtShortcut.Enabled = hasParent;
@@ -876,11 +892,11 @@ namespace UICatalog.Scenarios {
 
 				if (valid) {
 					return new DynamicMenuItem (_txtTitle.Text, _txtHelp.Text, _txtAction.Text,
-						_ckbIsTopLevel != null ? _ckbIsTopLevel.Checked : false,
-						_ckbSubMenu != null ? _ckbSubMenu.Checked : false,
+						_ckbIsTopLevel != null ? (bool)_ckbIsTopLevel.Checked : false,
+						_ckbSubMenu != null ? (bool)_ckbSubMenu.Checked : false,
 						_rbChkStyle.SelectedItem == 0 ? MenuItemCheckStyle.NoCheck :
 						_rbChkStyle.SelectedItem == 1 ? MenuItemCheckStyle.Checked : MenuItemCheckStyle.Radio,
-						_txtShortcut.Text);
+						_txtShortcut.Text, (bool)_ckbNullCheck.Checked);
 				} else {
 					return null;
 				}
@@ -903,11 +919,12 @@ namespace UICatalog.Scenarios {
 				_txtAction.Text = menuItem != null && menuItem.Action != null ? GetTargetAction (menuItem.Action) : ustring.Empty;
 				_ckbIsTopLevel.Checked = IsTopLevel (menuItem);
 				_ckbSubMenu.Checked = HasSubMenus (menuItem);
-				_txtHelp.Enabled = !_ckbSubMenu.Checked;
-				_txtAction.Enabled = !_ckbSubMenu.Checked;
+				_ckbNullCheck.Checked = menuItem.AllowNullChecked;
+				_txtHelp.Enabled = (bool)!_ckbSubMenu.Checked;
+				_txtAction.Enabled = (bool)!_ckbSubMenu.Checked;
 				_rbChkStyle.SelectedItem = (int)(menuItem?.CheckType ?? MenuItemCheckStyle.NoCheck);
 				_txtShortcut.Text = menuItem?.ShortcutTag ?? "";
-				_txtShortcut.Enabled = !_ckbIsTopLevel.Checked && !_ckbSubMenu.Checked;
+				_txtShortcut.Enabled = _ckbIsTopLevel.Checked == false && _ckbSubMenu.Checked == false;
 			}
 
 			void CleanEditMenuBarItem ()
@@ -963,7 +980,7 @@ namespace UICatalog.Scenarios {
 				case MenuItemCheckStyle.NoCheck:
 					return new Action (() => MessageBox.ErrorQuery (item.title, item.action, "Ok"));
 				case MenuItemCheckStyle.Checked:
-					return new Action (() => menuItem.Checked = !menuItem.Checked);
+					return new Action (menuItem.ToggleChecked);
 				case MenuItemCheckStyle.Radio:
 					break;
 				}

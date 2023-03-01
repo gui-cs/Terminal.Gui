@@ -106,8 +106,8 @@ namespace UICatalog.Scenarios {
 				foreach (var r in txtInput.Text.ToString ()) {
 					var ck = char.IsLetter (r)
 						? (ConsoleKey)char.ToUpper (r) : (ConsoleKey)r;
-					Application.Driver.SendKeys (r, ck, ckbShift.Checked,
-						ckbAlt.Checked, ckbControl.Checked);
+					Application.Driver.SendKeys (r, ck, (bool)ckbShift.Checked,
+						(bool)ckbAlt.Checked, (bool)ckbControl.Checked);
 				}
 				lblShippedKeys.Text = rKeys;
 				lblShippedControlKeys.Text = rControlKeys;

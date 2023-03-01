@@ -105,7 +105,7 @@ namespace UICatalog.Scenarios {
 				}
 				item.Action += () => {
 					var top = Application.MdiChildes.Find ((x) => x.Data.ToString () == "WorkerApp");
-					item.Checked = top.Visible = !item.Checked;
+					item.Checked = top.Visible = (bool)!item.Checked;
 					if (top.Visible) {
 						top.ShowChild ();
 					} else {

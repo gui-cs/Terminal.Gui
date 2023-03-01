@@ -50,7 +50,7 @@ namespace UICatalog.Scenarios {
 
 			label = new Label ("Label (CanFocus):") { X = Pos.X (label), Y = Pos.Bottom (label) + 1 };
 			Win.Add (label);
-			testlabel = new Label ("Стоял &он, дум великих полн") { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50), CanFocus = true, HotKeySpecifier = new System.Rune('&') };
+			testlabel = new Label ("Стоял &он, дум великих полн") { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50), CanFocus = true, HotKeySpecifier = new System.Rune ('&') };
 			Win.Add (testlabel);
 
 			label = new Label ("Button:") { X = Pos.X (label), Y = Pos.Bottom (label) + 1 };
@@ -61,7 +61,9 @@ namespace UICatalog.Scenarios {
 			label = new Label ("CheckBox:") { X = Pos.X (label), Y = Pos.Bottom (label) + 1 };
 			Win.Add (label);
 			var checkBox = new CheckBox (gitString) { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50) };
-			Win.Add (checkBox);
+			var ckbAllowNull = new CheckBox ("Allow null checked") { X = Pos.Right (checkBox) + 1, Y = Pos.Y (label) };
+			ckbAllowNull.Toggled += (e) => checkBox.AllowNullChecked = (bool)!e;
+			Win.Add (checkBox, ckbAllowNull);
 
 			label = new Label ("ComboBox:") { X = Pos.X (label), Y = Pos.Bottom (label) + 1 };
 			Win.Add (label);

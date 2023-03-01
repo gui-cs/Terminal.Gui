@@ -237,29 +237,29 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (scrollView) + 4,
 			};
 			hCheckBox.Toggled += (_) => {
-				if (!ahCheckBox.Checked) {
-					scrollView.ShowHorizontalScrollIndicator = hCheckBox.Checked;
+				if (ahCheckBox.Checked == false) {
+					scrollView.ShowHorizontalScrollIndicator = (bool)hCheckBox.Checked;
 				} else {
 					hCheckBox.Checked = true;
 					MessageBox.Query ("Message", "Disable Auto Hide Scrollbars first.", "Ok");
 				}
 			};
 			vCheckBox.Toggled += (_) => {
-				if (!ahCheckBox.Checked) {
-					scrollView.ShowVerticalScrollIndicator = vCheckBox.Checked;
+				if (ahCheckBox.Checked == false) {
+					scrollView.ShowVerticalScrollIndicator = (bool)vCheckBox.Checked;
 				} else {
 					vCheckBox.Checked = true;
 					MessageBox.Query ("Message", "Disable Auto Hide Scrollbars first.", "Ok");
 				}
 			};
 			ahCheckBox.Toggled += (_) => {
-				scrollView.AutoHideScrollBars = ahCheckBox.Checked;
+				scrollView.AutoHideScrollBars = (bool)ahCheckBox.Checked;
 				hCheckBox.Checked = true;
 				vCheckBox.Checked = true;
 			};
 			Win.Add (ahCheckBox);
 
-			keepCheckBox.Toggled += (_) => scrollView.KeepContentAlwaysInViewport = keepCheckBox.Checked;
+			keepCheckBox.Toggled += (_) => scrollView.KeepContentAlwaysInViewport = (bool)keepCheckBox.Checked;
 			Win.Add (keepCheckBox);
 
 			var scrollView2 = new ScrollView (new Rect (55, 2, 20, 8)) {

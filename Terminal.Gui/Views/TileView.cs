@@ -456,9 +456,9 @@ namespace Terminal.Gui {
 
 			Driver.SetAttribute (ColorScheme.Normal);
 			foreach (var p in lc.GenerateImage (bounds)) {
-				AddRune (p.Key.X, p.Key.Y, p.Value);
+				this.AddRune (p.Key.X, p.Key.Y, p.Value);
 			}
-
+			
 			// Redraw the lines so that focus/drag symbol renders
 			foreach (var line in allLines) {
 				line.DrawSplitterSymbol ();

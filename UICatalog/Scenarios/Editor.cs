@@ -514,7 +514,7 @@ namespace UICatalog.Scenarios {
 			item.Title = "Keep Content Always In Viewport";
 			item.CheckType |= MenuItemCheckStyle.Checked;
 			item.Checked = true;
-			item.Action += () => _scrollBar.KeepContentAlwaysInViewport = item.Checked = !item.Checked;
+			item.Action += () => _scrollBar.KeepContentAlwaysInViewport = (bool)(item.Checked = !item.Checked);
 
 			return new MenuItem [] { item };
 		}
@@ -527,7 +527,7 @@ namespace UICatalog.Scenarios {
 			item.CheckType |= MenuItemCheckStyle.Checked;
 			item.Checked = _textView.WordWrap;
 			item.Action += () => {
-				_textView.WordWrap = item.Checked = !item.Checked;
+				_textView.WordWrap = (bool)(item.Checked = !item.Checked);
 				if (_textView.WordWrap) {
 					_scrollBar.OtherScrollBarView.ShowScrollIndicator = false;
 					_textView.BottomOffset = 0;
@@ -546,7 +546,7 @@ namespace UICatalog.Scenarios {
 			auto.CheckType |= MenuItemCheckStyle.Checked;
 			auto.Checked = false;
 			auto.Action += () => {
-				if (auto.Checked = !auto.Checked) {
+				if ((bool)(auto.Checked = !auto.Checked)) {
 					// setup autocomplete with all words currently in the editor
 					_textView.Autocomplete.AllSuggestions =
 
@@ -570,7 +570,7 @@ namespace UICatalog.Scenarios {
 			item.CheckType |= MenuItemCheckStyle.Checked;
 			item.Checked = _textView.AllowsTab;
 			item.Action += () => {
-				_textView.AllowsTab = item.Checked = !item.Checked;
+				_textView.AllowsTab = (bool)(item.Checked = !item.Checked);
 			};
 
 			return item;
@@ -583,7 +583,7 @@ namespace UICatalog.Scenarios {
 			};
 			item.CheckType |= MenuItemCheckStyle.Checked;
 			item.Checked = _textView.ReadOnly;
-			item.Action += () => _textView.ReadOnly = item.Checked = !item.Checked;
+			item.Action += () => _textView.ReadOnly = (bool)(item.Checked = !item.Checked);
 
 			return item;
 		}
@@ -596,7 +596,7 @@ namespace UICatalog.Scenarios {
 			item.CheckType |= MenuItemCheckStyle.Checked;
 			item.Checked = _textView.CanFocus;
 			item.Action += () => {
-				_textView.CanFocus = item.Checked = !item.Checked;
+				_textView.CanFocus = (bool)(item.Checked = !item.Checked);
 				if (_textView.CanFocus) {
 					_textView.SetFocus ();
 				}
@@ -613,7 +613,7 @@ namespace UICatalog.Scenarios {
 			item.CheckType |= MenuItemCheckStyle.Checked;
 			item.Checked = _textView.Enabled;
 			item.Action += () => {
-				_textView.Enabled = item.Checked = !item.Checked;
+				_textView.Enabled = (bool)(item.Checked = !item.Checked);
 				if (_textView.Enabled) {
 					_textView.SetFocus ();
 				}
@@ -630,7 +630,7 @@ namespace UICatalog.Scenarios {
 			item.CheckType |= MenuItemCheckStyle.Checked;
 			item.Checked = _textView.Visible;
 			item.Action += () => {
-				_textView.Visible = item.Checked = !item.Checked;
+				_textView.Visible = (bool)(item.Checked = !item.Checked);
 				if (_textView.Visible) {
 					_textView.SetFocus ();
 				}
@@ -837,7 +837,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (txtToFind) + 2,
 				Checked = _matchCase
 			};
-			ckbMatchCase.Toggled += (e) => _matchCase = ckbMatchCase.Checked;
+			ckbMatchCase.Toggled += (e) => _matchCase = (bool)ckbMatchCase.Checked;
 			d.Add (ckbMatchCase);
 
 			var ckbMatchWholeWord = new CheckBox ("Match _whole word") {
@@ -845,7 +845,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (ckbMatchCase) + 1,
 				Checked = _matchWholeWord
 			};
-			ckbMatchWholeWord.Toggled += (e) => _matchWholeWord = ckbMatchWholeWord.Checked;
+			ckbMatchWholeWord.Toggled += (e) => _matchWholeWord = (bool)ckbMatchWholeWord.Checked;
 			d.Add (ckbMatchWholeWord);
 
 			d.Width = label.Width + txtToFind.Width + btnFindNext.Width + 2;
@@ -958,7 +958,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (txtToFind) + 2,
 				Checked = _matchCase
 			};
-			ckbMatchCase.Toggled += (e) => _matchCase = ckbMatchCase.Checked;
+			ckbMatchCase.Toggled += (e) => _matchCase = (bool)ckbMatchCase.Checked;
 			d.Add (ckbMatchCase);
 
 			var ckbMatchWholeWord = new CheckBox ("Match _whole word") {
@@ -966,7 +966,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (ckbMatchCase) + 1,
 				Checked = _matchWholeWord
 			};
-			ckbMatchWholeWord.Toggled += (e) => _matchWholeWord = ckbMatchWholeWord.Checked;
+			ckbMatchWholeWord.Toggled += (e) => _matchWholeWord = (bool)ckbMatchWholeWord.Checked;
 			d.Add (ckbMatchWholeWord);
 
 			d.Width = lblWidth + txtToFind.Width + btnFindNext.Width + 2;
