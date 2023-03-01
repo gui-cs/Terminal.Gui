@@ -743,8 +743,9 @@ namespace Terminal.Gui {
 
 
 			if (extendExistingSelection) {
+
 				// If we are extending current selection but there isn't one
-				if (MultiSelectedRegions.Count == 0) {
+				if (MultiSelectedRegions.Count == 0 || MultiSelectedRegions.All(m=>m.IsToggled)) {
 					// Create a new region between the old active cell and the new cell
 					var rect = CreateTableSelection (SelectedColumn, SelectedRow, col, row);
 					MultiSelectedRegions.Push (rect);

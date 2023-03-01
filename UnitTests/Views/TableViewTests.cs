@@ -1655,6 +1655,38 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal(1,tableView.GetAllSelectedCells().Count());
 		}
 
+
+
+		[Fact, AutoInitShutdown]
+		public void TestToggleCells_MultiSelectOn_Two_SquareSelects_BothToggled ()
+		{
+			// 6 row table
+			var tableView = GetABCDEFTableView (out var dt);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			tableView.MultiSelect = true;
+			tableView.AddKeyBinding(Key.Space,Command.ToggleChecked);
+
+			// Make first square selection (0,0 to 1,1)
+			tableView.ProcessKey (new KeyEvent { Key = Key.ShiftMask | Key.CursorDown});
+			tableView.ProcessKey (new KeyEvent { Key = Key.ShiftMask | Key.CursorRight});
+			tableView.ProcessKey (new KeyEvent { Key = Key.Space});
+			Assert.Equal(4,tableView.GetAllSelectedCells().Count());
+
+			// Make second square selection leaving 1 unselected line between them
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorLeft });
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorDown });
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorDown });
+			tableView.ProcessKey (new KeyEvent { Key = Key.ShiftMask | Key.CursorDown});
+			tableView.ProcessKey (new KeyEvent { Key = Key.ShiftMask | Key.CursorRight});
+			
+			// 2 square selections
+			Assert.Equal(8,tableView.GetAllSelectedCells().Count());
+		}
+
 		
 		[Theory, AutoInitShutdown]
 		[InlineData(new object[] { true,true })]
