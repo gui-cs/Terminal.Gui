@@ -321,6 +321,8 @@ namespace Terminal.Gui.ViewTests {
 				Bounds = new Rect (0, 0, 10, 5)
 			};
 
+			tableView.ChangeSelectionToEndOfTable(false);
+
 			// select the last row
 			tableView.MultiSelectedRegions.Clear ();
 			tableView.MultiSelectedRegions.Push (new TableView.TableSelection (new Point (0, 3), new Rect (0, 3, 4, 1)));
@@ -1505,6 +1507,78 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (tableView.IsSelected (3, 0));
 
 			Assert.DoesNotContain (new Point (1, 0), tableView.GetAllSelectedCells ());
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestToggleCells_MultiSelectOn ()
+		{
+			// 2 row table
+			var tableView = GetABCDEFTableView (out var dt);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+
+			tableView.MultiSelect = true;
+			tableView.AddKeyBinding(Key.Space,Command.ToggleChecked);
+
+			var selectedCell = tableView.GetAllSelectedCells().Single();
+			Assert.Equal(0,selectedCell.X);
+			Assert.Equal(0,selectedCell.Y);
+
+			// Go Right
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorRight });
+
+			selectedCell = tableView.GetAllSelectedCells().Single();
+			Assert.Equal(1,selectedCell.X);
+			Assert.Equal(0,selectedCell.Y);
+
+			// Toggle Select
+			tableView.ProcessKey (new KeyEvent { Key = Key.Space});
+			var m = tableView.MultiSelectedRegions.Single();
+			Assert.True(m.IsToggled);
+			Assert.Equal(1,m.Origin.X);
+			Assert.Equal(0,m.Origin.Y);
+			selectedCell = tableView.GetAllSelectedCells().Single();
+			Assert.Equal(1,selectedCell.X);
+			Assert.Equal(0,selectedCell.Y);
+
+			// Go Left
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorLeft });
+
+			// Both Toggled and Moved to should be selected
+			Assert.Equal(2,tableView.GetAllSelectedCells().Count());
+			var s1 = tableView.GetAllSelectedCells().ElementAt(0);
+			var s2 = tableView.GetAllSelectedCells().ElementAt(1);
+			Assert.Equal(1,s1.X);
+			Assert.Equal(0,s1.Y);
+			Assert.Equal(0,s2.X);
+			Assert.Equal(0,s2.Y);
+
+			// Go Down
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorDown });
+
+			// Both Toggled and Moved to should be selected but not 0,0
+			// which we moved down from
+			Assert.Equal(2,tableView.GetAllSelectedCells().Count());
+			s1 = tableView.GetAllSelectedCells().ElementAt(0);
+			s2 = tableView.GetAllSelectedCells().ElementAt(1);
+			Assert.Equal(1,s1.X);
+			Assert.Equal(0,s1.Y);
+			Assert.Equal(0,s2.X);
+			Assert.Equal(1,s2.Y);
+
+
+			// Go back to the toggled cell
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorRight});
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorUp});
+
+			// Toggle off 
+			tableView.ProcessKey (new KeyEvent { Key = Key.Space});
+
+			// Go Left
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorLeft});
+
+			selectedCell = tableView.GetAllSelectedCells().Single();
+			Assert.Equal(0,selectedCell.X);
+			Assert.Equal(0,selectedCell.Y);
 		}
 		
 		[Theory, AutoInitShutdown]

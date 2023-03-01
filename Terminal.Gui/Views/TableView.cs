@@ -910,18 +910,20 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Returns all cells in any <see cref="MultiSelectedRegions"/> (if <see cref="MultiSelect"/> is enabled) and the selected cell
 		/// </summary>
-		/// <remarks>Return value is not affected by <see cref="FullRowSelect"/> (i.e. returned <see cref="Point"/>s are not expanded to 
-		/// include all points on row).</remarks>
 		/// <returns></returns>
 		public IEnumerable<Point> GetAllSelectedCells ()
 		{
 			if (TableIsNullOrInvisible () || Table.Rows.Count == 0)
-				yield break;
+			{
+				yield break;				
+			}
 
 			EnsureValidSelection ();
 
 			// If there are one or more rectangular selections
 			if (MultiSelect && MultiSelectedRegions.Any ()) {
+
+				var toReturn = new HashSet<Point>();
 
 				// Quiz any cells for whether they are selected.  For performance we only need to check those between the top left and lower right vertex of selection regions
 				var yMin = MultiSelectedRegions.Min (r => r.Rect.Top);
@@ -933,10 +935,18 @@ namespace Terminal.Gui {
 				for (int y = yMin; y < yMax; y++) {
 					for (int x = xMin; x < xMax; x++) {
 						if (IsSelected (x, y)) {
-							yield return new Point (x, y);
+							toReturn.Add(new Point (x, y));
 						}
 					}
 				}
+
+				toReturn.Add(new Point(SelectedColumn,SelectedRow));
+
+				foreach(var p in toReturn)
+				{
+					yield return p;
+				}
+
 			} else {
 
 				// if there are no region selections then it is just the active cell
