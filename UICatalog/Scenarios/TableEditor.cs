@@ -148,6 +148,8 @@ namespace UICatalog.Scenarios {
 					}
 				}
 			};
+
+			tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
 		}
 
 		private void ShowAllColumns ()
