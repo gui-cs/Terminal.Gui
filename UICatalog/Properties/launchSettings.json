@@ -3,6 +3,12 @@
     "UICatalog": {
       "commandName": "Project"
     },
+    "WSL : UICatalog": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll",
+      "distributionName": ""
+    },
     "UICatalog -usc": {
       "commandName": "Project",
       "commandLineArgs": "-usc"
@@ -29,10 +35,6 @@
       "commandName": "Project",
       "commandLineArgs": "WizardAsView"
     },
-    "VkeyPacketSimulator": {
-      "commandName": "Project",
-      "commandLineArgs": "VkeyPacketSimulator"
-    },
     "CollectionNavigatorTester": {
       "commandName": "Project",
       "commandLineArgs": "\"Search Collection Nav\""
@@ -48,16 +50,6 @@
     "Windows & FrameViews": {
       "commandName": "Project",
       "commandLineArgs": "\"Windows & FrameViews\""
-    },
-    "WSL : UICatalog": {
-      "commandName": "Executable",
-      "executablePath": "wsl",
-      "commandLineArgs": "dotnet UICatalog.dll",
-      "distributionName": ""
-    },
-    "Tile View Experiments": {
-      "commandName": "Project",
-      "commandLineArgs": "\"Tile View Experiments\""
     }
   }
 }

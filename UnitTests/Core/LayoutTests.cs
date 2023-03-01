@@ -36,6 +36,53 @@ namespace Terminal.Gui.CoreTests {
 		}
 
 		[Fact]
+		public void TopologicalSort_Does_Never_Throws_If_Root_Is_Not_Null ()
+		{
+			var root = new View () { Id = "root", Width = 20, Height = 20 };
+			var sub1 = new View () {
+				Id = "sub1",
+				X = Pos.Left (root) + 1,
+				Y = Pos.Top (root) + 1,
+				Width = Dim.Width (root) - 2,
+				Height = Dim.Height (root) - 2
+			};
+			var sub2 = new View () {
+				Id = "sub2",
+				X = Pos.Left (root) + 1,
+				Y = Pos.Top (root) + 1,
+				Width = Dim.Width (root) - 2,
+				Height = Dim.Height (root) - 2
+			};
+			var sub3 = new View () {
+				Id = "sub3",
+				X = Pos.Left (root) + 1,
+				Y = Pos.Top (root) + 1,
+				Width = Dim.Width (root) - 2,
+				Height = Dim.Height (root) - 2
+			};
+			sub2.Add (sub3);
+			sub1.Add (sub2);
+			root.Add (sub1);
+
+			var exception = Record.Exception (root.LayoutSubviews);
+			Assert.Null (exception);
+			Assert.Equal (new Rect (0, 0, 20, 20), root.Frame);
+			Assert.Equal (new Rect (1, 1, 18, 18), sub1.Frame);
+			Assert.Equal (new Rect (1, 1, 18, 18), sub2.Frame);
+			Assert.Equal (new Rect (1, 1, 18, 18), sub3.Frame);
+
+			sub2.Width = Dim.Width (root);
+			exception = Record.Exception (root.LayoutSubviews);
+			Assert.Null (exception);
+			Assert.Equal (new Rect (1, 1, 20, 18), sub2.Frame);
+
+			sub3.Width = Dim.Width (root);
+			exception = Record.Exception (root.LayoutSubviews);
+			Assert.Null (exception);
+			Assert.Equal (new Rect (1, 1, 20, 18), sub3.Frame);
+		}
+
+		[Fact]
 		public void TopologicalSort_Recursive_Ref ()
 		{
 			var root = new View ();
@@ -1398,7 +1445,7 @@ Y
 
 			testView = new View () {
 				AutoSize = false,
-				X = Pos.Left(testView),
+				X = Pos.Left (testView),
 				Y = Pos.Left (testView),
 				Width = 1,
 				Height = 1

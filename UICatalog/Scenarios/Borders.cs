@@ -72,6 +72,8 @@ namespace UICatalog.Scenarios {
 			//};
 
 			var smartLabel = new Label () {
+				X = Pos.Center () + 16,
+				Y = Pos.Center () + 2,
 				Border = new Border () {
 					BorderStyle = borderStyle,
 					DrawMarginFrame = drawMarginFrame,
@@ -460,8 +462,6 @@ namespace UICatalog.Scenarios {
 			Win.Add (rbBorderBrush);
 
 			Win.Add (smartPanel);
-			smartLabel.X = Pos.Center () + 16;
-			smartLabel.Y = Pos.Center () + 2;
 			Win.Add (smartLabel);
 			Win.BringSubviewToFront (smartPanel);
 		}

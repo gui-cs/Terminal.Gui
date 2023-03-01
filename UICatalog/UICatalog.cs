@@ -192,6 +192,9 @@ namespace UICatalog {
 			// Run UI Catalog UI. When it exits, if _selectedScenario is != null then
 			// a Scenario was selected. Otherwise, the user wants to exit UI Catalog.
 			Application.Init ();
+			
+			Application.EnableConsoleScrolling = _enableConsoleScrolling;
+			
 			Application.Run<UICatalogTopLevel> ();
 			Application.Shutdown ();
 
@@ -213,6 +216,7 @@ namespace UICatalog {
 
 		static bool _useSystemConsole = false;
 		static ConsoleDriver.DiagnosticFlags _diagnosticFlags;
+		static bool _enableConsoleScrolling = false;
 		static bool _isFirstRunning = true;
 		static string _topLevelColorScheme;
 
@@ -225,7 +229,7 @@ namespace UICatalog {
 		/// </summary>
 		public class UICatalogTopLevel : Toplevel {
 			public MenuItem miIsMouseDisabled;
-			public MenuItem miHeightAsBuffer;
+			public MenuItem miEnableConsoleScrolling;
 
 			public TileView ContentPane;
 			public ListView CategoryListView;
@@ -349,6 +353,8 @@ namespace UICatalog {
 			{
 				ConfigChanged ();
 
+				miIsMouseDisabled.Checked = Application.IsMouseDisabled;
+				miEnableConsoleScrolling.Checked = Application.EnableConsoleScrolling;
 				DriverName.Title = $"Driver: {Driver.GetType ().Name}";
 				OS.Title = $"OS: {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem} {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion}";
 
@@ -403,13 +409,12 @@ namespace UICatalog {
 
 			List<MenuItem []> CreateDiagnosticMenuItems ()
 			{
-				List<MenuItem []> menuItems = new List<MenuItem []> {
-					CreateDiagnosticFlagsMenuItems (),
-					new MenuItem [] { null },
-					CreateHeightAsBufferMenuItems (),
-					CreateDisabledEnabledMouseItems (),
-					CreateKeybindingsMenuItems ()
-				};
+				List<MenuItem []> menuItems = new List<MenuItem []> ();
+				menuItems.Add (CreateDiagnosticFlagsMenuItems ());
+				menuItems.Add (new MenuItem [] { null });
+				menuItems.Add (CreateEnableConsoleScrollingMenuItems ());
+				menuItems.Add (CreateDisabledEnabledMouseItems ());
+				menuItems.Add (CreateKeybindingsMenuItems ());
 				return menuItems;
 			}
 
@@ -447,19 +452,18 @@ namespace UICatalog {
 				return menuItems.ToArray ();
 			}
 
-			MenuItem [] CreateHeightAsBufferMenuItems ()
+			MenuItem [] CreateEnableConsoleScrollingMenuItems ()
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
-				miHeightAsBuffer = new MenuItem {
-					Title = "_Height As Buffer"
+				miEnableConsoleScrolling = new MenuItem ();
+				miEnableConsoleScrolling.Title = "_Enable Console Scrolling";
+				miEnableConsoleScrolling.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miEnableConsoleScrolling.Title.ToString ().Substring (1, 1) [0];
+				miEnableConsoleScrolling.CheckType |= MenuItemCheckStyle.Checked;
+				miEnableConsoleScrolling.Action += () => {
+					miEnableConsoleScrolling.Checked = !miEnableConsoleScrolling.Checked;
+					Application.EnableConsoleScrolling = miEnableConsoleScrolling.Checked;
 				};
-				miHeightAsBuffer.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miHeightAsBuffer.Title.ToString ().Substring (1, 1) [0];
-				miHeightAsBuffer.CheckType |= MenuItemCheckStyle.Checked;
-				miHeightAsBuffer.Action += () => {
-					miHeightAsBuffer.Checked = !miHeightAsBuffer.Checked;
-					Application.HeightAsBuffer = (bool)miHeightAsBuffer.Checked;
-				};
-				menuItems.Add (miHeightAsBuffer);
+				menuItems.Add (miEnableConsoleScrolling);
 
 				return menuItems.ToArray ();
 			}
