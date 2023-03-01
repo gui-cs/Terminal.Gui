@@ -461,7 +461,7 @@ namespace UICatalog {
 				miEnableConsoleScrolling.CheckType |= MenuItemCheckStyle.Checked;
 				miEnableConsoleScrolling.Action += () => {
 					miEnableConsoleScrolling.Checked = !miEnableConsoleScrolling.Checked;
-					Application.EnableConsoleScrolling = miEnableConsoleScrolling.Checked;
+					Application.EnableConsoleScrolling = (bool)miEnableConsoleScrolling.Checked;
 				};
 				menuItems.Add (miEnableConsoleScrolling);
 
@@ -638,7 +638,7 @@ namespace UICatalog {
 				StatusBar.Items [0].Title = $"~{Application.QuitKey} to quit";
 
 				miIsMouseDisabled.Checked = Application.IsMouseDisabled;
-				miHeightAsBuffer.Checked = Application.HeightAsBuffer;
+				miEnableConsoleScrolling.Checked = Application.EnableConsoleScrolling;
 
 				var height = (UICatalogApp.ShowStatusBar ? 1 : 0);// + (MenuBar.Visible ? 1 : 0);
 				ContentPane.Height = Dim.Fill (height);

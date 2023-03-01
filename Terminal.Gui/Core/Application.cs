@@ -133,6 +133,7 @@ namespace Terminal.Gui {
 		/// </para>
 		/// This API was previously named 'HeightAsBuffer` but was renamed to make its purpose more clear.
 		/// </remarks>
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
 		public static bool EnableConsoleScrolling {
 			get {
 				if (Driver == null) {
@@ -149,21 +150,12 @@ namespace Terminal.Gui {
 			}
 		}
 
-		/// <summary>
-		/// This API is deprecated; use <see cref="EnableConsoleScrolling"/> instead.
-		/// </summary>
-		[Obsolete ("This API is deprecated; use EnableConsoleScrolling instead.", false)]
-		public static bool HeightAsBuffer {
-			get => EnableConsoleScrolling;
-			set => EnableConsoleScrolling = value;
-		}
-
 		static Key alternateForwardKey = Key.PageDown | Key.CtrlMask;
 
 		/// <summary>
 		/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof(SettingsScope)), JsonConverter(typeof(KeyJsonConverter))]
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
 		public static Key AlternateForwardKey {
 			get => alternateForwardKey;
 			set {
@@ -187,7 +179,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof(SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
 		public static Key AlternateBackwardKey {
 			get => alternateBackwardKey;
 			set {
@@ -211,7 +203,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the key to quit the application.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof(SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
 		public static Key QuitKey {
 			get => quitKey;
 			set {

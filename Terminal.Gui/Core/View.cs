@@ -1514,6 +1514,7 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
 			}
 
+			var boundsAdjustedForBorder = Bounds;
 			if (!IgnoreBorderPropertyOnRedraw && Border != null) {
 				Border.DrawContent (this);
 			} else if (ustring.IsNullOrEmpty (TextFormatter.Text) &&
