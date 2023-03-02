@@ -94,6 +94,9 @@ namespace UICatalog.Scenarios {
 			bool? border = cbBorder.Checked;
 			bool? startHorizontal = cbHorizontal.Checked;
 
+			foreach(var sub in workArea.Subviews) {
+				sub.Dispose ();
+			}
 			workArea.RemoveAll ();
 
 			if (numberOfViews <= 0) {
