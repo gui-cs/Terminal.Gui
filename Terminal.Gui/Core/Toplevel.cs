@@ -167,6 +167,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		virtual public void OnLoaded ()
 		{
+			IsLoaded = true;
 			foreach (Toplevel tl in Subviews.Where (v => v is Toplevel)) {
 				tl.OnLoaded ();
 			}
@@ -366,6 +367,13 @@ namespace Terminal.Gui {
 				return Application.MdiTop != null && Application.MdiTop != this && !Modal;
 			}
 		}
+
+		/// <summary>
+		/// <see langword="true"/> if was already loaded by the <see cref="Application.Begin(Toplevel)"/>
+		/// <see langword="false"/>, otherwise. This is used to avoid the <see cref="View.NeedDisplay"/>
+		/// having wrong values while this was not yet loaded.
+		/// </summary>
+		public bool IsLoaded { get; private set; }
 
 		///<inheritdoc/>
 		public override bool OnKeyDown (KeyEvent keyEvent)

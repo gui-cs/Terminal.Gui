@@ -2885,6 +2885,7 @@ At 0,0
 			frame.Height = 8;
 
 			var top = Application.Top;
+
 			top.Add (frame);
 
 			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
@@ -2896,6 +2897,39 @@ At 0,0
 				frame.Frame.Right, frame.Frame.Bottom));
 			Assert.Equal (new Rect (0, 0, 30, 1), label.Frame);
 			Assert.Equal (new Rect (0, 0, 13, 1), button.Frame);
+
+			Assert.Equal (new Rect (0, 0, 80, 25), top.NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 40, 8), frame.NeedDisplay);
+			Assert.Equal (Rect.Empty, frame.Subviews [0].NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 40, 8), new Rect (
+				frame.NeedDisplay.Left, frame.NeedDisplay.Top,
+				frame.NeedDisplay.Right, frame.NeedDisplay.Bottom));
+			Assert.Equal (new Rect (0, 0, 30, 1), label.NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 13, 1), button.NeedDisplay);
+
+			top.LayoutComplete += e => {
+				Assert.Equal (new Rect (0, 0, 80, 25), top.NeedDisplay);
+			};
+
+			frame.LayoutComplete += e => {
+				Assert.Equal (new Rect (0, 0, 40, 8), frame.NeedDisplay);
+			};
+
+			frame.Subviews [0].LayoutComplete += e => {
+				if (top.IsLoaded) {
+					Assert.Equal (new Rect (0, 0, 38, 6), frame.Subviews [0].NeedDisplay);
+				} else {
+					Assert.Equal (new Rect (1, 1, 38, 6), frame.Subviews [0].NeedDisplay);
+				}
+			};
+
+			label.LayoutComplete += e => {
+				Assert.Equal (new Rect (0, 0, 38, 1), label.NeedDisplay);
+			};
+
+			button.LayoutComplete += e => {
+				Assert.Equal (new Rect (0, 0, 13, 1), button.NeedDisplay);
+			};
 
 			Application.Begin (top);
 

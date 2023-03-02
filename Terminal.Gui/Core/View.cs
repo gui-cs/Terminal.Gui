@@ -829,6 +829,11 @@ namespace Terminal.Gui {
 
 		Rect GetMaxNeedDisplay (Rect oldFrame, Rect newFrame)
 		{
+			var topSuperView = GetTopSuperView ();
+			if (topSuperView == null || topSuperView is not Toplevel || ((Toplevel)topSuperView)?.IsLoaded == false) {
+				return newFrame;
+			}
+
 			var rect = new Rect () {
 				X = Math.Min (oldFrame.X, newFrame.X),
 				Y = Math.Min (oldFrame.Y, newFrame.Y),
