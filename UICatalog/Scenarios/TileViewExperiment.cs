@@ -32,7 +32,7 @@ namespace UICatalog.Scenarios {
 				Y = 1,
 				Width = 15, //Dim.Fill (),
 				Height = 15, //Dim.Fill (),
-				//IgnoreBorderPropertyOnRedraw = true
+					     //IgnoreBorderPropertyOnRedraw = true
 
 			};
 			frame1.Border.BorderStyle = BorderStyle.Double;
@@ -60,11 +60,11 @@ namespace UICatalog.Scenarios {
 				Width = 14, //Dim.Percent (30) - 5,
 				Height = 14, //Dim.Percent (50) - 5,
 				ColorScheme = Colors.ColorSchemes ["Dialog"],
-				Border = new Border () { 
-					BorderStyle = BorderStyle.Single, 
+				Border = new Border () {
+					BorderStyle = BorderStyle.Single,
 					//BorderThickness = new Thickness (1), 
 					DrawMarginFrame = true,
-					Padding = new Thickness(1),
+					Padding = new Thickness (1),
 					BorderBrush = Color.BrightMagenta,
 					Title = "Border Title"
 				}

@@ -310,7 +310,7 @@ namespace Terminal.Gui {
 				foreach (var p in lc.GenerateImage (bounds)) {
 					this.AddRune (p.Key.X, p.Key.Y, p.Value);
 				}
-				
+
 				// Redraw the lines so that focus/drag symbol renders
 				foreach (var subview in contentView.Subviews) {
 					//	line.DrawSplitterSymbol ();
