@@ -1068,8 +1068,9 @@ namespace Terminal.Gui {
 			var driver = Application.Driver;
 			if (DrawMarginFrame) {
 				driver.SetAttribute (new Attribute (BorderBrush, Background));
-				if (view.HasFocus)
+				if (view.HasFocus) {
 					driver.SetAttribute (new Attribute (Child.ColorScheme.HotNormal.Foreground, Background));
+				}
 				var padding = view.Border.GetSumThickness ();
 				Rect scrRect;
 				if (view == Child) {
