@@ -1409,23 +1409,32 @@ namespace Terminal.Gui {
 							break;
 						}
 
-						lock (oLockFound) {
-							Children = found.ToArray ();
-						}
+						UpdateChildrenToFound ();
+					}
 
-						Application.MainLoop.Invoke (() => {
-							Parent.tbPath.GenerateSuggestions (this);
-							Parent.WriteStateToTableView ();
-
-							Parent.spinnerLabel.Visible = true;
-							Parent.spinnerLabel.SetNeedsDisplay ();
-						});
+					if(finished && !cancel) {
+						UpdateChildrenToFound();
 					}
 
 					Application.MainLoop.Invoke (() => {
 						Parent.spinnerLabel.Visible = false;
 					});
 				}
+			}
+
+			private void UpdateChildrenToFound ()
+			{
+				lock (oLockFound) {
+					Children = found.ToArray ();
+				}
+
+				Application.MainLoop.Invoke (() => {
+					Parent.tbPath.GenerateSuggestions (this);
+					Parent.WriteStateToTableView ();
+
+					Parent.spinnerLabel.Visible = true;
+					Parent.spinnerLabel.SetNeedsDisplay ();
+				});
 			}
 
 			private void RecursiveFind (DirectoryInfo directory)
