@@ -195,9 +195,9 @@ namespace UICatalog {
 			// Run UI Catalog UI. When it exits, if _selectedScenario is != null then
 			// a Scenario was selected. Otherwise, the user wants to exit UI Catalog.
 			Application.Init ();
-			
-			//Application.EnableConsoleScrolling = _enableConsoleScrolling;
-			
+
+			Application.EnableConsoleScrolling = _enableConsoleScrolling;
+
 			Application.Run<UICatalogTopLevel> ();
 			Application.Shutdown ();
 
