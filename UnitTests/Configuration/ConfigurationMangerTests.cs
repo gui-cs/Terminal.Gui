@@ -182,12 +182,13 @@ namespace Terminal.Gui.ConfigurationTests {
 		/// Save the `config.json` file; this can be used to update the file in `Terminal.Gui.Resources.config.json'.
 		/// </summary>
 		/// <remarks>
-		/// IMPORTANT: For the file generated to be valid, this must be the ONLY test run. Conifg Properties
-		/// are all satic and thus can be overwritten by other tests.</remarks>
+		/// IMPORTANT: For the file generated to be valid, this must be the ONLY test run. Config Properties
+		/// are all static and thus can be overwritten by other tests.</remarks>
 		[Fact]
 		public void SaveDefaults ()
 		{
 			ConfigurationManager.Initialize ();
+			ConfigurationManager.Reset ();
 
 			// Get the hard coded settings
 			ConfigurationManager.GetHardCodedDefaults ();
@@ -316,12 +317,11 @@ namespace Terminal.Gui.ConfigurationTests {
 		[Fact, AutoInitShutdown]
 		public void TestConfigurationManagerToJson ()
 		{
+			ConfigurationManager.Reset ();
 			ConfigurationManager.GetHardCodedDefaults ();
 			var stream = ConfigurationManager.ToStream ();
-
 			
 			ConfigurationManager.Settings.Update (stream, "TestConfigurationManagerToJson");
-
 		}
 
 		[Fact, AutoInitShutdown (configLocation: ConfigLocations.None)]
