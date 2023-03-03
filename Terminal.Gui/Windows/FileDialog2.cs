@@ -4,6 +4,8 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using NStack;
 using Terminal.Gui.Trees;
 using static System.Environment;
@@ -76,7 +78,7 @@ namespace Terminal.Gui {
 		private CollectionNavigator collectionNavigator = new CollectionNavigator();
 
 		private CaptionedTextField tbFind;
-		private SpinnerButton btnCancelSearch;
+		private SpinnerLabel spinnerLabel;
 
 
 		/// <summary>
@@ -225,9 +227,11 @@ namespace Terminal.Gui {
 				Width = 16,
 				Y = Pos.AnchorEnd (1),
 			};
-			btnCancelSearch = new SpinnerButton () {
+			spinnerLabel = new SpinnerLabel() {
 				X = Pos.Right(tbFind) + 1,
 				Y = Pos.AnchorEnd (1),
+				Width = 1,
+				Height = 1,
 				Visible = false,
 			};
 
@@ -235,7 +239,7 @@ namespace Terminal.Gui {
 
 			lblFeedback = new Label {
 				Y = Pos.AnchorEnd (1),
-				X = Pos.Right (btnToggleSplitterCollapse) + 1,
+				X = Pos.Right (spinnerLabel) + 1,
 				ColorScheme = new ColorScheme {
 					Normal = new Attribute (Color.Red, this.ColorScheme.Normal.Background)
 				}
@@ -299,7 +303,7 @@ namespace Terminal.Gui {
 			// Determines tab order
 			this.Add (this.btnToggleSplitterCollapse);
 			this.Add (this.tbFind);
-			this.Add (this.btnCancelSearch);
+			this.Add (this.spinnerLabel);
 			this.Add (lblFeedback);
 			this.Add (this.btnOk);
 			this.Add (this.btnCancel);
@@ -321,10 +325,13 @@ namespace Terminal.Gui {
 				oldSearch.Cancel ();
 			}
 
+			// user is clearing search terms
 			if(tbFind.Text == null || tbFind.Text.Length == 0) {
+				PushState (state.Directory,false);
 				return;
 			}
 
+			// user is entering new search terms
 			PushState(new SearchState (state?.Directory, this, tbFind.Text.ToString()),true);
 		}
 
@@ -488,26 +495,32 @@ namespace Terminal.Gui {
 			else {
 				if(titleWidth +2 < bounds.Width) {
 					title = '╡' + this.Title.ToString () + '╞';
-				}				
-			}			
+				}
+				titleWidth += 2;
+			}
 
-			var padding = ((bounds.Width - title.Sum (c => Rune.ColumnWidth (c))) / 2) - 1;
+			var padLeft = ((bounds.Width - titleWidth) / 2) - 1;
 
-			padding = Math.Min (bounds.Width, padding);
-			padding = Math.Max (0, padding);
+			padLeft = Math.Min (bounds.Width, padLeft);
+			padLeft = Math.Max (0, padLeft);
+
+			var padRight = bounds.Width - (padLeft + titleWidth +2);
+			padRight = Math.Min (bounds.Width, padRight);
+			padRight = Math.Max (0, padRight);
 
 			Driver.SetAttribute (
 			    new Attribute (this.ColorScheme.Normal.Foreground, this.ColorScheme.Normal.Background));
 
-			Driver.AddStr (ustring.Make (Enumerable.Repeat (Driver.HDLine, padding)));
+			Driver.AddStr (ustring.Make (Enumerable.Repeat (Driver.HDLine, padLeft)));
 
 			Driver.SetAttribute (
 			    new Attribute (this.ColorScheme.Normal.Foreground, this.ColorScheme.Normal.Background));
 			Driver.AddStr (title);
 
 			Driver.SetAttribute (
-			    new Attribute (this.ColorScheme.Normal.Foreground, this.ColorScheme.Normal.Background));
-			Driver.AddStr (ustring.Make (Enumerable.Repeat (Driver.HDLine, padding)));
+			    new Attribute (this.ColorScheme.Normal.Foreground, this.ColorScheme.Normal.Background));	
+
+			Driver.AddStr (ustring.Make (Enumerable.Repeat (Driver.HDLine, padRight)));
 		}
 
 		/// <inheritdoc/>
@@ -956,6 +969,10 @@ namespace Terminal.Gui {
 		}
 		private void PushState (FileDialogState newState, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true)
 		{
+			if(state is SearchState search) {
+				search.Cancel ();
+			}
+
 			try {
 				this.pushingState = true;
 
@@ -1101,7 +1118,6 @@ namespace Terminal.Gui {
 			var path = this.tbPath.Text?.ToString ();
 
 			if (string.IsNullOrWhiteSpace (path)) {
-				this.SetupAsClear ();
 				return;
 			}
 
@@ -1130,16 +1146,6 @@ namespace Terminal.Gui {
 			return new DirectoryInfo (path);
 		}
 
-		private void SetupAsDirectory (DirectoryInfo dir)
-		{
-			// TODO: Scrap this method
-			this.PushState (dir, true);
-		}
-
-		private void SetupAsClear ()
-		{
-
-		}
 
 		/// <summary>
 		/// Describes a requirement on what <see cref="FileInfo"/> can be selected
@@ -1329,21 +1335,89 @@ namespace Terminal.Gui {
 		/// </summary>
 		internal class SearchState : FileDialogState {
 			readonly string searchTerms;
+			bool cancel = false;
+			bool finished = false;
 
 			// TODO: Add thread safe child adding
+			List<FileSystemInfoStats> found = new List<FileSystemInfoStats> ();
+			object oLockFound = new object();
+			CancellationTokenSource token = new CancellationTokenSource ();
 
 			public SearchState (DirectoryInfo dir, FileDialog2 parent, string searchTerms) : base (dir, parent)
 			{
 				this.searchTerms = searchTerms;
+				Children = new FileSystemInfoStats[0];
 				BeginSearch ();
 			}
 
 			private void BeginSearch ()
 			{
-				// TODO: Recurse subfolders with cancellation support
-				Children = GetChildren (Directory)
-					.Where (f => f.Name.Contains (searchTerms))
-					.ToArray ();
+				Task.Run (() => {
+					RecursiveFind (Directory);
+					finished = true;
+				});
+
+				Task.Run (() => {
+					UpdateChildren ();
+				});
+			}
+
+			private void UpdateChildren ()
+			{
+				while(!cancel && !finished) {
+
+					try {
+						Task.Delay (250).Wait (token.Token);
+					}
+					catch(OperationCanceledException) {
+						cancel = true;
+					}
+					
+
+					if(cancel || finished) {
+						break;
+					}
+
+					lock (oLockFound) {
+						Children = found.ToArray ();
+					}
+
+					Application.MainLoop.Invoke (() => {
+						Parent.tbPath.GenerateSuggestions (this);
+						Parent.WriteStateToTableView ();
+
+						Parent.spinnerLabel.Visible = true;
+						Parent.spinnerLabel.SetNeedsDisplay();
+					});
+				}
+
+				Application.MainLoop.Invoke (() => {
+					Parent.spinnerLabel.Visible = false;
+				});
+			}
+
+			private void RecursiveFind (DirectoryInfo directory)
+			{
+				foreach (var f in GetChildren (directory)) {
+					
+					if(cancel) {
+						return;
+					}
+						
+					if (f.IsParent) {
+						continue;
+					}	
+
+					if (f.Name.Contains (searchTerms)) {
+						lock(oLockFound){
+							found.Add (f);
+						}
+					}
+
+					if (f.FileSystemInfo is DirectoryInfo sub) {
+						RecursiveFind (sub);
+					}
+				}
 			}
 
 			internal override void RefreshChildren ()
@@ -1351,7 +1425,8 @@ namespace Terminal.Gui {
 			}
 			internal void Cancel ()
 			{
-				
+				cancel = true;
+				token.Cancel ();
 			}
 		}
 		internal class FileDialogState {
@@ -1459,7 +1534,7 @@ namespace Terminal.Gui {
 				
 			}
 		}
-		internal class SpinnerButton : Button
+		internal class SpinnerLabel : Label
 		{
 			private Rune [] runes = new Rune [] { '|', '/', '\u2500', '/', '\u2500', '\\' };
 			private int currentIdx = 0;
