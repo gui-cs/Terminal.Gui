@@ -67,6 +67,9 @@ namespace Terminal.Gui {
 			get => title;
 			set {
 				title = value;
+				if (Border != null) {
+					Border.Title = title;
+				}
 				SetNeedsDisplay ();
 			}
 		}
@@ -163,6 +166,9 @@ namespace Terminal.Gui {
 				};
 			} else {
 				Border = border;
+				if (ustring.IsNullOrEmpty (border.Title)) {
+					border.Title = title;
+				}
 			}
 			AdjustContentView (frame, views);
 		}

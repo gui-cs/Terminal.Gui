@@ -104,6 +104,8 @@ namespace UICatalog {
 			_aboutMessage.AppendLine (@"    | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | | ");
 			_aboutMessage.AppendLine (@"    |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_| ");
 			_aboutMessage.AppendLine (@"");
+			_aboutMessage.AppendLine (@"v2 - Work in Progress");
+			_aboutMessage.AppendLine (@"");
 			_aboutMessage.AppendLine (@"https://github.com/gui-cs/Terminal.Gui");
 
 			Scenario scenario;
@@ -193,6 +195,9 @@ namespace UICatalog {
 			// Run UI Catalog UI. When it exits, if _selectedScenario is != null then
 			// a Scenario was selected. Otherwise, the user wants to exit UI Catalog.
 			Application.Init ();
+			
+			//Application.EnableConsoleScrolling = _enableConsoleScrolling;
+			
 			Application.Run<UICatalogTopLevel> ();
 			Application.Shutdown ();
 
@@ -226,7 +231,7 @@ namespace UICatalog {
 		/// </summary>
 		public class UICatalogTopLevel : Toplevel {
 			public MenuItem miIsMouseDisabled;
-			public MenuItem miHeightAsBuffer;
+			public MenuItem miEnableConsoleScrolling;
 
 			public TileView ContentPane;
 			public ListView CategoryListView;
@@ -407,7 +412,7 @@ namespace UICatalog {
 				List<MenuItem []> menuItems = new List<MenuItem []> {
 					CreateDiagnosticFlagsMenuItems (),
 					new MenuItem [] { null },
-					CreateHeightAsBufferMenuItems (),
+					CreateEnableConsoleScrollingMenuItems (),
 					CreateDisabledEnabledMouseItems (),
 					CreateKeybindingsMenuItems ()
 				};
@@ -448,19 +453,18 @@ namespace UICatalog {
 				return menuItems.ToArray ();
 			}
 
-			MenuItem [] CreateHeightAsBufferMenuItems ()
+			MenuItem [] CreateEnableConsoleScrollingMenuItems ()
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
-				miHeightAsBuffer = new MenuItem {
-					Title = "_Height As Buffer"
+				miEnableConsoleScrolling = new MenuItem ();
+				miEnableConsoleScrolling.Title = "_Enable Console Scrolling";
+				miEnableConsoleScrolling.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miEnableConsoleScrolling.Title.ToString ().Substring (1, 1) [0];
+				miEnableConsoleScrolling.CheckType |= MenuItemCheckStyle.Checked;
+				miEnableConsoleScrolling.Action += () => {
+					miEnableConsoleScrolling.Checked = !miEnableConsoleScrolling.Checked;
+					Application.EnableConsoleScrolling = (bool)miEnableConsoleScrolling.Checked;
 				};
-				miHeightAsBuffer.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miHeightAsBuffer.Title.ToString ().Substring (1, 1) [0];
-				miHeightAsBuffer.CheckType |= MenuItemCheckStyle.Checked;
-				miHeightAsBuffer.Action += () => {
-					miHeightAsBuffer.Checked = !miHeightAsBuffer.Checked;
-					Application.HeightAsBuffer = (bool)miHeightAsBuffer.Checked;
-				};
-				menuItems.Add (miHeightAsBuffer);
+				menuItems.Add (miEnableConsoleScrolling);
 
 				return menuItems.ToArray ();
 			}
@@ -635,7 +639,7 @@ namespace UICatalog {
 				StatusBar.Items [0].Title = $"~{Application.QuitKey} to quit";
 
 				miIsMouseDisabled.Checked = Application.IsMouseDisabled;
-				miHeightAsBuffer.Checked = Application.HeightAsBuffer;
+				miEnableConsoleScrolling.Checked = Application.EnableConsoleScrolling;
 
 				var height = (UICatalogApp.ShowStatusBar ? 1 : 0);// + (MenuBar.Visible ? 1 : 0);
 				ContentPane.Height = Dim.Fill (height);
