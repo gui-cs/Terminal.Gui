@@ -8,10 +8,14 @@ We welcome contributions from the community. See [Issues](https://github.com/gui
 
 ## Forking and Submitting Changes
 
+*IMPORTANT*: v1.x of Terminal.Gui is now in maintenance mode. All new development is happening on the `v2_develop` branch. See the V2 discussion [here](https://github.com/gui-cs/Terminal.Gui/discussions/1940).
+
 Terminal.Gui uses the [GitFlow](https://nvie.com/posts/a-successful-git-branching-model/) branching model. 
 
 * The `main` branch is always stable, and always matches the most recently released Nuget package.
-* The `develop` branch is where new development and bug-fixes happen. It is the default branch.
+* The `develop` branch is where bug-fixes to v1.x happens. It is the default branch.
+* The `v2_develop` branch is where development on v2.x happens. 
+
 
 ### Forking Terminal.Gui
 
