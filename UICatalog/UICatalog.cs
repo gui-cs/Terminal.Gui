@@ -84,12 +84,13 @@ namespace UICatalog {
 				_selectedScenario = (Scenario)Activator.CreateInstance (_scenarios [item].GetType ());
 				Application.UseSystemConsole = _useSystemConsole;
 				Application.Init ();
-				_selectedScenario.Init (Colors.ColorSchemes [_topLevelColorScheme]);
+				_selectedScenario.Init (Colors.ColorSchemes [_topLevelColorScheme == null ? "Base" : _topLevelColorScheme]);
 				_selectedScenario.Setup ();
 				_selectedScenario.Run ();
 				_selectedScenario.Dispose ();
 				_selectedScenario = null;
 				Application.Shutdown ();
+				VerifyObjectsWereDisposed ();
 				return;
 			}
 
