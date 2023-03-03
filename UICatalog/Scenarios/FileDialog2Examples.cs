@@ -55,7 +55,7 @@ namespace UICatalog.Scenarios {
 				var fd = new FileDialog2 {
 					AllowsMultipleSelection = isMulti,
 					OpenMode = mode,
-					MustExist = cbMustExist.Checked
+					MustExist = cbMustExist.Checked ?? false
 				};
 
 				if (csv) {

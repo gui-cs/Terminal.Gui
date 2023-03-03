@@ -148,6 +148,7 @@ namespace Terminal.Gui {
 				Height = Dim.Fill (),
 				FullRowSelect = true,
 			};
+			this.tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
 			this.tableView.KeyPress += (k) => {
 				if (this.tableView.SelectedRow <= 0) {
 					this.NavigateIf (k, Key.CursorUp, this.tbPath);					
