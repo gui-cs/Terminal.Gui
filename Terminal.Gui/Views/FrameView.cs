@@ -162,7 +162,8 @@ namespace Terminal.Gui {
 			this.Title = title;
 			if (border == null) {
 				Border = new Border () {
-					BorderStyle = DefaultBorderStyle
+					BorderStyle = DefaultBorderStyle,
+					Title = title
 				};
 			} else {
 				Border = border;
@@ -284,13 +285,7 @@ namespace Terminal.Gui {
 
 			if (!IgnoreBorderPropertyOnRedraw) {
 				Driver.SetAttribute (GetNormalColor ());
-				//Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: false);
 				Border.DrawContent (this, false);
-				if (HasFocus)
-					Driver.SetAttribute (ColorScheme.HotNormal);
-				if (Border.DrawMarginFrame)
-					Driver.DrawWindowTitle (scrRect, Title, padding.Left, padding.Top, padding.Right, padding.Bottom);
-				Driver.SetAttribute (GetNormalColor ());
 			} else {
 				var lc = new LineCanvas ();
 
@@ -312,28 +307,28 @@ namespace Terminal.Gui {
 
 				//}
 
-				Driver.SetAttribute (ColorScheme.Normal);
-				foreach (var p in lc.GenerateImage (bounds)) {
-					this.AddRune (p.Key.X, p.Key.Y, p.Value);
-				}
+				//Driver.SetAttribute (ColorScheme.Normal);
+				//foreach (var p in lc.GenerateImage (bounds)) {
+				//	this.AddRune (p.Key.X, p.Key.Y, p.Value);
+				//}
 
-				// Redraw the lines so that focus/drag symbol renders
-				foreach (var subview in contentView.Subviews) {
-					//	line.DrawSplitterSymbol ();
-				}
+				//// Redraw the lines so that focus/drag symbol renders
+				//foreach (var subview in contentView.Subviews) {
+				//	//	line.DrawSplitterSymbol ();
+				//}
 
 
-				// Draw Titles over Border
-				foreach (var subview in contentView.Subviews) {
-					// TODO: Use reflection to see if subview has a Title property
-					if (subview is FrameView viewWithTite) {
-						var rect = viewWithTite.Frame;
-						rect.X = rect.X + 1;
-						rect.Y = rect.Y + 2;
-						// TODO: Do focus color correctly
-						Driver.DrawWindowTitle (rect, viewWithTite.Title, padding.Left, padding.Top, padding.Right, padding.Bottom);
-					}
-				}
+				//// Draw Titles over Border
+				//foreach (var subview in contentView.Subviews) {
+				//	// TODO: Use reflection to see if subview has a Title property
+				//	if (subview is FrameView viewWithTite) {
+				//		var rect = viewWithTite.Frame;
+				//		rect.X = rect.X + 1;
+				//		rect.Y = rect.Y + 2;
+				//		// TODO: Do focus color correctly
+				//		Driver.DrawWindowTitle (rect, viewWithTite.Title, padding.Left, padding.Top, padding.Right, padding.Bottom);
+				//	}
+				//}
 			}
 		}
 

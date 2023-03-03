@@ -50,16 +50,6 @@
     "Windows & FrameViews": {
       "commandName": "Project",
       "commandLineArgs": "\"Windows & FrameViews\""
-    },
-    "WSL : UICatalog": {
-      "commandName": "Executable",
-      "executablePath": "wsl",
-      "commandLineArgs": "dotnet UICatalog.dll",
-      "distributionName": ""
-    },
-    "Tile View Experiments": {
-      "commandName": "Project",
-      "commandLineArgs": "\"Tile View Experiments\""
     }
   }
 }

@@ -2857,5 +2857,104 @@ At 0,0
 222";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Frame_Set_After_Initialze_Update_NeededDisplay ()
+		{
+			var frame = new FrameView ();
+
+			var label = new Label ("This should be the first line.") {
+				TextAlignment = Terminal.Gui.TextAlignment.Centered,
+				ColorScheme = Colors.Menu,
+				Width = Dim.Fill (),
+				X = Pos.Center (),
+				Y = Pos.Center () - 2  // center minus 2 minus two lines top and bottom borders equal to zero (4-2-2=0)
+			};
+
+			var button = new Button ("Press me!") {
+				X = Pos.Center (),
+				Y = Pos.Center ()
+			};
+
+			frame.Add (label, button);
+
+			frame.X = Pos.Center ();
+			frame.Y = Pos.Center ();
+			frame.Width = 40;
+			frame.Height = 8;
+
+			var top = Application.Top;
+
+			top.Add (frame);
+
+			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
+			Assert.Equal (new Rect (0, 0, 40, 8), frame.Frame);
+			Assert.Equal (new Rect (1, 1, 0, 0), frame.Subviews [0].Frame);
+			Assert.Equal ("ContentView()({X=1,Y=1,Width=0,Height=0})", frame.Subviews [0].ToString ());
+			Assert.Equal (new Rect (0, 0, 40, 8), new Rect (
+				frame.Frame.Left, frame.Frame.Top,
+				frame.Frame.Right, frame.Frame.Bottom));
+			Assert.Equal (new Rect (0, 0, 30, 1), label.Frame);
+			Assert.Equal (new Rect (0, 0, 13, 1), button.Frame);
+
+			Assert.Equal (new Rect (0, 0, 80, 25), top.NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 40, 8), frame.NeedDisplay);
+			Assert.Equal (Rect.Empty, frame.Subviews [0].NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 40, 8), new Rect (
+				frame.NeedDisplay.Left, frame.NeedDisplay.Top,
+				frame.NeedDisplay.Right, frame.NeedDisplay.Bottom));
+			Assert.Equal (new Rect (0, 0, 30, 1), label.NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 13, 1), button.NeedDisplay);
+
+			top.LayoutComplete += e => {
+				Assert.Equal (new Rect (0, 0, 80, 25), top.NeedDisplay);
+			};
+
+			frame.LayoutComplete += e => {
+				Assert.Equal (new Rect (0, 0, 40, 8), frame.NeedDisplay);
+			};
+
+			frame.Subviews [0].LayoutComplete += e => {
+				if (top.IsLoaded) {
+					Assert.Equal (new Rect (0, 0, 38, 6), frame.Subviews [0].NeedDisplay);
+				} else {
+					Assert.Equal (new Rect (1, 1, 38, 6), frame.Subviews [0].NeedDisplay);
+				}
+			};
+
+			label.LayoutComplete += e => {
+				Assert.Equal (new Rect (0, 0, 38, 1), label.NeedDisplay);
+			};
+
+			button.LayoutComplete += e => {
+				Assert.Equal (new Rect (0, 0, 13, 1), button.NeedDisplay);
+			};
+
+			Application.Begin (top);
+
+			Assert.True (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
+			Assert.Equal (new Rect (20, 8, 40, 8), frame.Frame);
+			Assert.Equal (new Rect (1, 1, 38, 6), frame.Subviews [0].Frame);
+			Assert.Equal ("ContentView()({X=1,Y=1,Width=38,Height=6})", frame.Subviews [0].ToString ());
+			Assert.Equal (new Rect (20, 8, 60, 16), new Rect (
+				frame.Frame.Left, frame.Frame.Top,
+				frame.Frame.Right, frame.Frame.Bottom));
+			Assert.Equal (new Rect (0, 0, 38, 1), label.Frame);
+			Assert.Equal (new Rect (12, 2, 13, 1), button.Frame);
+			var expected = @"
+                    ┌──────────────────────────────────────┐
+                    │    This should be the first line.    │
+                    │                                      │
+                    │            [ Press me! ]             │
+                    │                                      │
+                    │                                      │
+                    │                                      │
+                    └──────────────────────────────────────┘
+";
+
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		}
 	}
 }

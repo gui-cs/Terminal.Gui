@@ -19,6 +19,8 @@ namespace UICatalog.Scenarios {
 			var effect3D = true;
 
 			var smartPanel = new PanelView () {
+				X = Pos.Center () - 20,
+				Y = Pos.Center () + 2,
 				Width = 24,
 				Height = 13,
 				Border = new Border () {
@@ -70,6 +72,8 @@ namespace UICatalog.Scenarios {
 			//};
 
 			var smartLabel = new Label () {
+				X = Pos.Center () + 16,
+				Y = Pos.Center () + 2,
 				Border = new Border () {
 					BorderStyle = borderStyle,
 					DrawMarginFrame = drawMarginFrame,
@@ -184,7 +188,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (paddingBottomEdit);
 
 			var replacePadding = new Button ("Replace all based on top") {
-				X = Pos.Left(paddingLeftEdit),
+				X = Pos.Left (paddingLeftEdit),
 				Y = 5
 			};
 			replacePadding.Clicked += () => {
@@ -303,7 +307,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (borderBottomEdit);
 
 			var replaceBorder = new Button ("Replace all based on top") {
-				X = Pos.Left(borderLeftEdit),
+				X = Pos.Left (borderLeftEdit),
 				Y = 5
 			};
 			replaceBorder.Clicked += () => {
@@ -457,14 +461,9 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (rbBorderBrush);
 
-			smartPanel.X = Pos.Left (paddingLeftEdit);
-			smartPanel.Y = Pos.Top (smartLabel);
 			Win.Add (smartPanel);
-			smartLabel.X = Pos.Left (borderLeftEdit);
-			smartLabel.Y = Pos.Bottom (cbUseUsePanelFrame) + 5;
 			Win.Add (smartLabel);
 			Win.BringSubviewToFront (smartPanel);
-
 		}
 	}
 }

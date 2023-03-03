@@ -829,6 +829,11 @@ namespace Terminal.Gui {
 
 		Rect GetMaxNeedDisplay (Rect oldFrame, Rect newFrame)
 		{
+			var topSuperView = GetTopSuperView ();
+			if (topSuperView == null || topSuperView is not Toplevel || ((Toplevel)topSuperView)?.IsLoaded == false) {
+				return newFrame;
+			}
+
 			var rect = new Rect () {
 				X = Math.Min (oldFrame.X, newFrame.X),
 				Y = Math.Min (oldFrame.Y, newFrame.Y),
@@ -1110,15 +1115,8 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public void Clear ()
 		{
-			Rect containerBounds = GetContainerBounds ();
-			Rect viewBounds = Bounds;
-			if (!containerBounds.IsEmpty) {
-				viewBounds.Width = Math.Min (viewBounds.Width, containerBounds.Width);
-				viewBounds.Height = Math.Min (viewBounds.Height, containerBounds.Height);
-			}
-
-			var h = viewBounds.Height;
-			var w = viewBounds.Width;
+			var h = Frame.Height;
+			var w = Frame.Width;
 			for (var line = 0; line < h; line++) {
 				Move (0, line);
 				for (var col = 0; col < w; col++)
@@ -1524,8 +1522,6 @@ namespace Terminal.Gui {
 			var boundsAdjustedForBorder = Bounds;
 			if (!IgnoreBorderPropertyOnRedraw && Border != null) {
 				Border.DrawContent (this);
-				boundsAdjustedForBorder = new Rect (bounds.X + 1, bounds.Y + 1, Math.Max (0, bounds.Width - 2), Math.Max(0, bounds.Height - 2));
-				boundsAdjustedForBorder = Bounds;// new Rect (bounds.X + 1, bounds.Y + 1, Math.Max (bounds.Width, bounds.Width - 2), Math.Max (bounds.Height, bounds.Height - 2));
 			} else if (ustring.IsNullOrEmpty (TextFormatter.Text) &&
 				(GetType ().IsNestedPublic && !IsOverridden (this, "Redraw") || GetType ().Name == "View") &&
 				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
@@ -1536,14 +1532,14 @@ namespace Terminal.Gui {
 
 			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
 				Rect containerBounds = GetContainerBounds ();
-				Clear (ViewToScreen (GetNeedDisplay (containerBounds)));
+				Clear (GetNeedDisplay (containerBounds));
 				SetChildNeedsDisplay ();
 				// Draw any Text
 				if (TextFormatter != null) {
 					TextFormatter.NeedsFormat = true;
 				}
-				TextFormatter?.Draw (ViewToScreen (boundsAdjustedForBorder), HasFocus ? ColorScheme.Focus : GetNormalColor (),
-				    HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled,
+				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
+				    HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
 				    containerBounds);
 			}
 
@@ -1553,7 +1549,7 @@ namespace Terminal.Gui {
 			if (subviews != null) {
 				foreach (var view in subviews) {
 					if (!view.NeedDisplay.IsEmpty || view.ChildNeedsDisplay || view.LayoutNeeded) {
-						if (view.Frame.IntersectsWith (clipRect) && (view.Frame.IntersectsWith (boundsAdjustedForBorder) || boundsAdjustedForBorder.X < 0 || bounds.Y < 0)) {
+						if (view.Frame.IntersectsWith (clipRect) && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
 							if (view.LayoutNeeded) {
 								view.LayoutSubviews ();
 							}
@@ -1582,7 +1578,7 @@ namespace Terminal.Gui {
 
 		Rect GetNeedDisplay (Rect containerBounds)
 		{
-			Rect rect = NeedDisplay;
+			Rect rect = ViewToScreen (NeedDisplay);
 			if (!containerBounds.IsEmpty) {
 				rect.Width = Math.Min (NeedDisplay.Width, containerBounds.Width);
 				rect.Height = Math.Min (NeedDisplay.Height, containerBounds.Height);
@@ -2223,8 +2219,7 @@ namespace Terminal.Gui {
 					newLocation = pos.Anchor (superviewDimension - newDimension);
 					break;
 
-				case Pos.PosCombine:
-					var combine = pos as Pos.PosCombine;
+				case Pos.PosCombine combine:
 					int left, right;
 					(left, newDimension) = GetNewLocationAndDimension (superviewLocation, superviewDimension, combine.left, dim, autosizeDimension);
 					(right, newDimension) = GetNewLocationAndDimension (superviewLocation, superviewDimension, combine.right, dim, autosizeDimension);
@@ -2251,7 +2246,7 @@ namespace Terminal.Gui {
 
 			// Recursively calculates the new dimension (width or height) of the given Dim given:
 			//   the current location (x or y)
-			//   the current dimennsion (width or height)
+			//   the current dimension (width or height)
 			int CalculateNewDimension (Dim d, int location, int dimension, int autosize)
 			{
 				int newDimension;
@@ -2269,12 +2264,12 @@ namespace Terminal.Gui {
 					}
 					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
 					break;
-					
+
 				case Dim.DimFactor factor when !factor.IsFromRemaining ():
 					newDimension = d.Anchor (dimension);
 					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
 					break;
-					
+
 				case Dim.DimFill:
 				default:
 					newDimension = Math.Max (d.Anchor (dimension - location), 0);
@@ -2286,11 +2281,11 @@ namespace Terminal.Gui {
 			}
 
 
-			// horiztonal
-			(newX, newW) = GetNewLocationAndDimension (superviewFrame.X, superviewFrame.Width, x, Width, autosize.Width);
+			// horizontal
+			(newX, newW) = GetNewLocationAndDimension (superviewFrame.X, superviewFrame.Width, x, width, autosize.Width);
 
 			// vertical
-			(newY, newH) = GetNewLocationAndDimension (superviewFrame.Y, superviewFrame.Height, y, Height, autosize.Height);
+			(newY, newH) = GetNewLocationAndDimension (superviewFrame.Y, superviewFrame.Height, y, height, autosize.Height);
 
 			var r = new Rect (newX, newY, newW, newH);
 			if (Frame != r) {
@@ -2438,7 +2433,7 @@ namespace Terminal.Gui {
 
 			if (edges.Any ()) {
 				(var from, var to) = edges.First ();
-				if (from != Application.Top) {
+				if (from != superView?.GetTopSuperView (to, from)) {
 					if (!ReferenceEquals (from, to)) {
 						throw new InvalidOperationException ($"TopologicalSort (for Pos/Dim) cannot find {from} linked with {to}. Did you forget to add it to {superView}?");
 					} else {
@@ -2449,8 +2444,8 @@ namespace Terminal.Gui {
 			// return L (a topologically sorted order)
 			return result;
 		} // TopologicalSort
-		
-		
+
+
 		/// <summary>
 		/// Invoked when a view starts executing or when the dimensions of the view have changed, for example in
 		/// response to the container view or terminal resizing.
@@ -2475,25 +2470,31 @@ namespace Terminal.Gui {
 			CollectAll (this, ref nodes, ref edges);
 			var ordered = View.TopologicalSort (SuperView, nodes, edges);
 			foreach (var v in ordered) {
-				if (v.LayoutStyle == LayoutStyle.Computed) {
-					v.SetRelativeLayout (Frame);
-				}
-
-				v.LayoutSubviews ();
-				v.LayoutNeeded = false;
+				LayoutSubview (v, Frame);
 			}
 
-			// If our SuperView is Application.Top and the layoutstyle is Computed it's a special-cass.
-			// Use SetRelativeaLayout with the Frame of the Application.Top
-			if (SuperView != null && SuperView == Application.Top && LayoutNeeded
-			    && ordered.Count == 0 && LayoutStyle == LayoutStyle.Computed) {
-				Debug.Assert (Application.Top.Frame.Location == Point.Empty);
-				SetRelativeLayout (Application.Top.Frame);
+			// If the 'to' is rooted to 'from' and the layoutstyle is Computed it's a special-case.
+			// Use LayoutSubview with the Frame of the 'from' 
+			if (SuperView != null && GetTopSuperView () != null && LayoutNeeded
+			    && ordered.Count == 0 && edges.Count > 0 && LayoutStyle == LayoutStyle.Computed) {
+
+				(var from, var to) = edges.First ();
+				LayoutSubview (to, from.Frame);
 			}
 
 			LayoutNeeded = false;
 
 			OnLayoutComplete (new LayoutEventArgs () { OldBounds = oldBounds });
+		}
+
+		private void LayoutSubview (View v, Rect hostFrame)
+		{
+			if (v.LayoutStyle == LayoutStyle.Computed) {
+				v.SetRelativeLayout (hostFrame);
+			}
+
+			v.LayoutSubviews ();
+			v.LayoutNeeded = false;
 		}
 
 		ustring text;
@@ -3165,11 +3166,14 @@ namespace Terminal.Gui {
 		/// Get the top superview of a given <see cref="View"/>.
 		/// </summary>
 		/// <returns>The superview view.</returns>
-		public View GetTopSuperView ()
+		public View GetTopSuperView (View view = null, View superview = null)
 		{
-			View top = Application.Top;
-			for (var v = this?.SuperView; v != null; v = v.SuperView) {
+			View top = superview ?? Application.Top;
+			for (var v = view?.SuperView ?? (this?.SuperView); v != null; v = v.SuperView) {
 				top = v;
+				if (top == superview) {
+					break;
+				}
 			}
 
 			return top;
