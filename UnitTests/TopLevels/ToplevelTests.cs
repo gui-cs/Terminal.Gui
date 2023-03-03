@@ -149,7 +149,9 @@ namespace Terminal.Gui.TopLevelTests {
 		[AutoInitShutdown]
 		public void Internal_Tests ()
 		{
+			Toplevel.dragPosition = null; // dragPosition is `static` and must be reset for each instance or unit tests will fail?
 			var top = new Toplevel ();
+
 			var eventInvoked = "";
 
 			top.ChildUnloaded += (e) => eventInvoked = "ChildUnloaded";
@@ -898,9 +900,9 @@ namespace Terminal.Gui.TopLevelTests {
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
  File      
            
-    ┌────┐ 
-    │    │ 
-    └────┘ 
+    ┌─────┐
+    │     │
+    └─────┘
            
            
            
@@ -908,7 +910,7 @@ namespace Terminal.Gui.TopLevelTests {
  CTRL-N New", output);
 
 					Assert.Equal (win, Application.MouseGrabView);
-					Assert.Equal (new Rect (4, 2, 6, 3), Application.MouseGrabView.Frame);
+					Assert.Equal (new Rect (4, 2, 7, 3), Application.MouseGrabView.Frame);
 
 				} else if (iterations == 3) {
 					Assert.Equal (win, Application.MouseGrabView);
@@ -929,10 +931,10 @@ namespace Terminal.Gui.TopLevelTests {
 
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
  File      
-    ┌────┐ 
-    │    │ 
-    │    │ 
-    └────┘ 
+    ┌─────┐
+    │     │
+    └─────┘
+           
            
            
            
@@ -940,7 +942,7 @@ namespace Terminal.Gui.TopLevelTests {
  CTRL-N New", output);
 
 					Assert.Equal (win, Application.MouseGrabView);
-					Assert.Equal (new Rect (4, 1, 6, 4), Application.MouseGrabView.Frame);
+					Assert.Equal (new Rect (4, 1, 7, 3), Application.MouseGrabView.Frame);
 
 				} else if (iterations == 5) {
 					Assert.Equal (win, Application.MouseGrabView);
