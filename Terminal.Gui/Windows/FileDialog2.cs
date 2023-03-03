@@ -343,25 +343,25 @@ namespace Terminal.Gui {
 		/// Sets a <see cref="ColorScheme"/> to use for directories rows of
 		/// the <see cref="TableView"/>.
 		/// </summary>
-		public static ColorScheme ColorSchemeDirectory { private get; set; }
+		public ColorScheme ColorSchemeDirectory { private get; set; }
 
 		/// <summary>
 		/// Sets a <see cref="ColorScheme"/> to use for regular file rows of
 		/// the <see cref="TableView"/>.  Defaults to White text on Black background.
 		/// </summary>
-		public static ColorScheme ColorSchemeDefault { private get; set; }
+		public ColorScheme ColorSchemeDefault { private get; set; }
 
 		/// <summary>
 		/// Sets a <see cref="ColorScheme"/> to use for file rows with an image extension
 		/// of the <see cref="TableView"/>.  Defaults to White text on Black background.
 		/// </summary>
-		public static ColorScheme ColorSchemeImage { private get; set; }
+		public ColorScheme ColorSchemeImage { private get; set; }
 
 		/// <summary>
 		/// Sets a <see cref="ColorScheme"/> to use for file rows with an executable extension
 		/// or that match <see cref="AllowedTypes"/> in the <see cref="TableView"/>.
 		/// </summary>
-		public static ColorScheme ColorSchemeExeOrRecommended { private get; set; }
+		public ColorScheme ColorSchemeExeOrRecommended { private get; set; }
 
 		/// <summary>
 		/// Gets or Sets which <see cref="System.IO.FileSystemInfo"/> type can be selected.
@@ -378,6 +378,13 @@ namespace Terminal.Gui {
 		public string Path { get => this.tbPath.Text.ToString (); set => this.tbPath.Text = value; }
 
 		/// <summary>
+		/// User defined delegate for picking which character(s)/unicode
+		/// symbol(s) to use as an 'icon' for files/folders.  Defaults to
+		/// null (i.e. no icons).
+		/// </summary>
+		public Func<FileSystemInfo,string> IconGetter {get;set;} = null;
+
+		/// <summary>
 		/// Gets or Sets a value indicating whether to allow selecting 
 		/// multiple existing files/directories.
 		/// </summary>
@@ -385,6 +392,12 @@ namespace Terminal.Gui {
 			get => this.tableView.MultiSelect;
 			set => this.tableView.MultiSelect = value;
 		}
+
+		/// <summary>
+		/// Gets or Sets a value indicating whether different colors
+		/// should be used for different file types/directories.
+		/// </summary>
+		public bool Monochrome {get;set;}
 
 		/// <summary>
 		/// Gets or Sets a collection of file types that the user can/must select.  Only applies
@@ -704,12 +717,12 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-
 		private void SetupColorSchemes ()
 		{
 			if (ColorSchemeDirectory != null) {
 				return;
 			}
+
 			ColorSchemeDirectory = new ColorScheme {
 				Normal = Driver.MakeAttribute (Color.Blue, Color.Black),
 				HotNormal = Driver.MakeAttribute (Color.Blue, Color.Black),
@@ -743,7 +756,24 @@ namespace Terminal.Gui {
 			this.dtFiles = new DataTable ();
 
 			var nameStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (HeaderFilename, typeof (int)));
-			nameStyle.RepresentationGetter = (i) => this.state?.Children [(int)i].Name ?? string.Empty;
+			nameStyle.RepresentationGetter = (i) => {
+
+				var stats = this.state?.Children [(int)i];
+				
+				if(stats == null)
+				{
+					return string.Empty;
+				}
+
+				var icon = stats.IsParent ? null : IconGetter?.Invoke(stats.FileSystemInfo);
+
+				if(icon != null)
+				{
+					return icon + " " + stats.Name; 
+				}
+				return stats.Name;
+			};
+
 			nameStyle.MinWidth = 50;
 
 			var sizeStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (HeaderSize, typeof (int)));
@@ -944,6 +974,11 @@ namespace Terminal.Gui {
 		private ColorScheme ColorGetter (TableView.RowColorGetterArgs args)
 		{
 			var stats = this.RowToStats (args.RowIndex);
+
+			if(Monochrome)
+			{
+				return ColorSchemeDefault;
+			}
 
 			if (stats.IsDir ()) {
 				return ColorSchemeDirectory;

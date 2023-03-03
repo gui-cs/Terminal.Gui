@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using Terminal.Gui;
 
@@ -7,6 +8,8 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Dialogs")]
 	public class FileDialog2Examples : Scenario {
 		private CheckBox cbMustExist;
+		private CheckBox cbIcons;
+		private CheckBox cbMonochrome;
 
 		public override void Setup ()
 		{
@@ -15,6 +18,14 @@ namespace UICatalog.Scenarios {
 
 			cbMustExist = new CheckBox ("Must Exist") { Checked = true };
 			Win.Add (cbMustExist);
+
+
+			cbIcons = new CheckBox ("Icons") { Checked = true , X = Pos.Right(cbMustExist)+1};
+			Win.Add (cbIcons);
+
+
+			cbMonochrome = new CheckBox ("Monochrome") { Checked = false , X = Pos.Right(cbIcons)+1};
+			Win.Add (cbMonochrome);
 
 			foreach(var multi in new bool [] {false, true }) {
 				foreach (OpenDialog.OpenMode openMode in Enum.GetValues (typeof (OpenDialog.OpenMode))) {
@@ -58,6 +69,13 @@ namespace UICatalog.Scenarios {
 					MustExist = cbMustExist.Checked ?? false
 				};
 
+				if(cbIcons.Checked ?? false)
+				{
+					fd.IconGetter = GetIcon;
+				}
+
+				fd.Monochrome = cbMonochrome.Checked ?? false;
+
 				if (csv) {
 					fd.AllowedTypes.Add (new FileDialog2.AllowedType ("Data File", ".csv",".tsv"));
 					fd.AllowedTypesIsStrict = strict;
@@ -84,6 +102,16 @@ namespace UICatalog.Scenarios {
 						"Ok");
 				}
 			};
+		}
+
+		private string GetIcon (FileSystemInfo arg)
+		{
+			if(arg is DirectoryInfo)
+			{
+				return "\ua909";
+			}
+
+			return "\u2630";
 		}
 	}
 }
