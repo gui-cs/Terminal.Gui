@@ -19,8 +19,8 @@ namespace Terminal.Gui.TopLevelTests {
 			var top = new Toplevel ();
 
 			Assert.Equal (Colors.TopLevel, top.ColorScheme);
-			Assert.Equal ("DimFill(0)", top.Width.ToString ());
-			Assert.Equal ("DimFill(0)", top.Height.ToString ());
+			Assert.Equal ("Fill(0)", top.Width.ToString ());
+			Assert.Equal ("Fill(0)", top.Height.ToString ());
 			Assert.False (top.Running);
 			Assert.False (top.Modal);
 			Assert.Null (top.MenuBar);
