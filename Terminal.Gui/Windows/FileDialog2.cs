@@ -75,6 +75,10 @@ namespace Terminal.Gui {
 
 		private CollectionNavigator collectionNavigator = new CollectionNavigator();
 
+		private CaptionedTextField tbFind;
+		private SpinnerButton btnCancelSearch;
+
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="FileDialog2"/> class.
 		/// </summary>
@@ -117,7 +121,9 @@ namespace Terminal.Gui {
 			this.lblForward.Clicked += () => this.history.Forward ();
 			this.tbPath = new TextFieldWithAppendAutocomplete {
 				X = Pos.Right (lblPath),
-				Width = Dim.Fill (1)
+				Width = Dim.Fill (1),
+				Caption = "Enter Path",
+				CaptionColor = Color.DarkGray,
 			};
 			this.tbPath.KeyPress += (k) => {
 				ClearFeedback ();
@@ -212,6 +218,19 @@ namespace Terminal.Gui {
 				this.btnToggleSplitterCollapse.Text = newState ? "<<" : ">>";
 			};
 
+
+			tbFind = new CaptionedTextField {
+				X = Pos.Right (this.btnToggleSplitterCollapse) + 1,
+				Caption = "Enter Search",
+				Width = 16,
+				Y = Pos.AnchorEnd (1),
+			};
+			btnCancelSearch = new SpinnerButton () {
+				X = Pos.Right(tbFind) + 1,
+				Y = Pos.AnchorEnd (1),
+				Visible = false,
+			};
+
 			lblFeedback = new Label {
 				Y = Pos.AnchorEnd (1),
 				X = Pos.Right (btnToggleSplitterCollapse) + 1,
@@ -277,6 +296,8 @@ namespace Terminal.Gui {
 
 			// Determines tab order
 			this.Add (this.btnToggleSplitterCollapse);
+			this.Add (this.tbFind);
+			this.Add (this.btnCancelSearch);
 			this.Add (lblFeedback);
 			this.Add (this.btnOk);
 			this.Add (this.btnCancel);
@@ -1343,7 +1364,59 @@ namespace Terminal.Gui {
 			}
 		}
 
-		internal class TextFieldWithAppendAutocomplete : TextField {
+		internal class CaptionedTextField : TextField
+		{
+			/// <summary>
+			/// A text prompt to display in the field when it does not
+			/// have focus and no text is yet entered.
+			/// </summary>
+			public ustring Caption { get; set; }
+
+			/// <summary>
+			/// The foreground color to use for the caption
+			/// </summary>
+			public Color CaptionColor { get; set; } = Color.Black;
+
+			public override void Redraw (Rect bounds)
+			{
+				base.Redraw (bounds);
+
+				if (HasFocus || Caption == null || Caption.Length == 0 
+					|| Text?.Length > 0) {
+					return;
+				}	
+
+				var color = new Attribute (CaptionColor, GetNormalColor ().Background);
+				Driver.SetAttribute (color);
+				
+				Move (0, 0);
+				var render = Caption;
+					
+				if(render.ConsoleWidth > Bounds.Width) {
+					render = render.RuneSubstring(0,Bounds.Width);
+				}
+
+				Driver.AddStr (render);
+				
+			}
+		}
+		internal class SpinnerButton : Button
+		{
+			private Rune [] runes = new Rune [] { '|', '/', '\u2500', '/', '\u2500', '\\' };
+			private int currentIdx = 0;
+			private DateTime lastRender = DateTime.MinValue;
+
+			public override void Redraw (Rect bounds)
+			{
+				if(DateTime.Now - lastRender > TimeSpan.FromMilliseconds(250)) {
+					currentIdx = (currentIdx + 1) % runes.Length;
+					Text = ""+runes [currentIdx];
+				}
+
+				base.Redraw (bounds);
+			}
+		}
+		internal class TextFieldWithAppendAutocomplete : CaptionedTextField {
 
 			private int? currentFragment = null;
 			private string [] validFragments = new string [0];
