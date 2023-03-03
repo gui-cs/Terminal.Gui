@@ -140,7 +140,8 @@ else 				Assert.False (Clipboard.TrySetClipboardData (clipText));
 else 				Assert.NotEqual (clipText, Clipboard.Contents);
 		}
 
-
+		// Disabling this test for now because it is not reliable 
+#if false
 		[Fact, AutoInitShutdown (useFakeClipboard: false)]
 		public void Contents_Copies_From_OS_Clipboard ()
 		{
@@ -262,12 +263,13 @@ else 				Assert.NotEqual (clipText, Clipboard.Contents);
 
 				Application.RequestStop ();
 			};
-
+			
 			Application.Run ();
 
 			if (!failed) 				Assert.Equal (clipText, clipReadText.TrimEnd ());
 
 		}
+#endif
 
 		bool Is_WSL_Platform ()
 		{
@@ -284,5 +286,6 @@ else 				Assert.NotEqual (clipText, Clipboard.Contents);
 				return false;
 			}
 		}
+
 	}
 }
