@@ -231,6 +231,8 @@ namespace Terminal.Gui {
 				Visible = false,
 			};
 
+			tbFind.TextChanged += (o)=>RestartSearch ();
+
 			lblFeedback = new Label {
 				Y = Pos.AnchorEnd (1),
 				X = Pos.Right (btnToggleSplitterCollapse) + 1,
@@ -307,6 +309,23 @@ namespace Terminal.Gui {
 			this.Add (lblPath);
 			this.Add (this.tbPath);
 			this.Add (this.splitContainer);
+		}
+
+		private void RestartSearch ()
+		{
+			if(state?.Directory == null ) {
+				return;
+			}
+
+			if(state is SearchState oldSearch) {
+				oldSearch.Cancel ();
+			}
+
+			if(tbFind.Text == null || tbFind.Text.Length == 0) {
+				return;
+			}
+
+			PushState(new SearchState (state?.Directory, this, tbFind.Text.ToString()),true);
 		}
 
 		private void ClearFeedback ()
@@ -721,7 +740,7 @@ namespace Terminal.Gui {
 			this.tbPath.ClearSuggestions ();
 
 			if (this.state != null) {
-				this.state.RefreshChildren (this);
+				this.state.RefreshChildren ();
 				this.WriteStateToTableView ();
 			}
 		}
@@ -933,6 +952,10 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			PushState (new FileDialogState (d, this), addCurrentStateToHistory, setPathText, clearForward);
+		}
+		private void PushState (FileDialogState newState, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true)
+		{
 			try {
 				this.pushingState = true;
 
@@ -944,11 +967,11 @@ namespace Terminal.Gui {
 				this.tbPath.ClearSuggestions ();
 
 				if (setPathText) {
-					this.tbPath.Text = d.FullName;
+					this.tbPath.Text = newState.Directory.FullName;
 					this.tbPath.MoveCursorToEnd ();
 				}
 
-				this.state = new FileDialogState (d, this);
+				this.state = newState;
 				this.tbPath.GenerateSuggestions (this.state);
 
 				this.WriteStateToTableView ();
@@ -1300,49 +1323,84 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// State representing a recursive search from <see cref="FileDialogState.Directory"/>
+		/// downwards.
+		/// </summary>
+		internal class SearchState : FileDialogState {
+			readonly string searchTerms;
+
+			// TODO: Add thread safe child adding
+
+			public SearchState (DirectoryInfo dir, FileDialog2 parent, string searchTerms) : base (dir, parent)
+			{
+				this.searchTerms = searchTerms;
+				BeginSearch ();
+			}
+
+			private void BeginSearch ()
+			{
+				// TODO: Recurse subfolders with cancellation support
+				Children = GetChildren (Directory)
+					.Where (f => f.Name.Contains (searchTerms))
+					.ToArray ();
+			}
+
+			internal override void RefreshChildren ()
+			{
+			}
+			internal void Cancel ()
+			{
+				
+			}
+		}
 		internal class FileDialogState {
 
 			public FileSystemInfoStats Selected { get; set; }
+			protected readonly FileDialog2 Parent;
 			public FileDialogState (DirectoryInfo dir, FileDialog2 parent)
 			{
 				this.Directory = dir;
+				Parent = parent;
 
-				this.RefreshChildren (parent);
+				this.RefreshChildren ();
 			}
 
 			public DirectoryInfo Directory { get; }
 
-			public FileSystemInfoStats [] Children { get; private set; }
+			public FileSystemInfoStats [] Children { get; protected set; }
 
-			internal void RefreshChildren (FileDialog2 parent)
+			internal virtual void RefreshChildren ()
 			{
 				var dir = this.Directory;
+				Children = GetChildren (dir).ToArray();
+			}
 
+			protected virtual IEnumerable<FileSystemInfoStats> GetChildren (DirectoryInfo dir)
+			{
 				try {
+
 					List<FileSystemInfoStats> children;
 
 					// if directories only
-					if (parent.OpenMode == OpenMode.Directory) {
+					if (Parent.OpenMode == OpenMode.Directory) {
 						children = dir.GetDirectories ().Select (e => new FileSystemInfoStats (e)).ToList ();
 					} else {
 						children = dir.GetFileSystemInfos ().Select (e => new FileSystemInfoStats (e)).ToList ();
 					}
 
 					// if only allowing specific file types
-					if (parent.AllowedTypes.Any () && parent.AllowedTypesIsStrict && parent.OpenMode == OpenMode.File) {
+					if (Parent.AllowedTypes.Any () && Parent.AllowedTypesIsStrict && Parent.OpenMode == OpenMode.File) {
 
 						children = children.Where (
 							c => c.IsDir () ||
-							(c.FileSystemInfo is FileInfo f && parent.IsCompatibleWithAllowedExtensions (f)))
+							(c.FileSystemInfo is FileInfo f && Parent.IsCompatibleWithAllowedExtensions (f)))
 							.ToList ();
 					}
 
 					// if theres a UI filter in place too
-					if (parent.currentFilter != null) {
-						children = children.Where (
-								c => c.IsDir () ||
-								(c.FileSystemInfo is FileInfo f && parent.currentFilter.Matches (f.Extension, true))
-								).ToList ();
+					if (Parent.currentFilter != null) {
+						children = children.Where (MatchesApiFilter).ToList ();
 					}
 
 
@@ -1351,16 +1409,17 @@ namespace Terminal.Gui {
 						children.Add (new FileSystemInfoStats (dir.Parent) { IsParent = true });
 					}
 
-					this.Children = children.ToArray ();
+					return children;
 				} catch (Exception) {
 					// Access permissions Exceptions, Dir not exists etc
-					this.Children = new FileSystemInfoStats [0];
+					return Enumerable.Empty<FileSystemInfoStats>();
 				}
 			}
 
-			internal void SetSelection (FileSystemInfoStats stats)
+			protected bool MatchesApiFilter (FileSystemInfoStats arg)
 			{
-
+				return arg.IsDir () ||
+				(arg.FileSystemInfo is FileInfo f && Parent.currentFilter.Matches (f.Extension, true));
 			}
 		}
 
