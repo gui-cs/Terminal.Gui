@@ -1,30 +1,6 @@
 //
 // WindowsDriver.cs: Windows specific driver
 //
-// Authors:
-//   Miguel de Icaza (miguel@gnome.org)
-//   Nick Van Dyck (vandyck.nick@outlook.com)
-//
-// Copyright (c) 2018
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-//
 using NStack;
 using System;
 using System.Collections.Generic;
@@ -646,7 +622,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-#if false      // Not needed on the constructor. Perhaps could be used on resizing. To study.
+#if false      // Not needed on the constructor. Perhaps could be used on resizing. To study.                                                                                     
 		[DllImport ("kernel32.dll", ExactSpelling = true)]
 		static extern IntPtr GetConsoleWindow ();
 
@@ -739,7 +715,12 @@ namespace Terminal.Gui {
 		public override int Rows => rows;
 		public override int Left => left;
 		public override int Top => top;
-		public override bool HeightAsBuffer { get; set; }
+		public override bool EnableConsoleScrolling { get; set; }
+		[Obsolete ("This API is deprecated; use EnableConsoleScrolling instead.", false)]
+		public override bool HeightAsBuffer {
+			get => EnableConsoleScrolling;
+			set => EnableConsoleScrolling = value;
+		}
 		public override IClipboard Clipboard => clipboard;
 		public override int [,,] Contents => contents;
 
@@ -774,7 +755,7 @@ namespace Terminal.Gui {
 
 		private void ChangeWin (Size e)
 		{
-			if (!HeightAsBuffer) {
+			if (!EnableConsoleScrolling) {
 				var w = e.Width;
 				if (w == cols - 3 && e.Height < rows) {
 					w += 3;
@@ -915,8 +896,12 @@ namespace Terminal.Gui {
 				left = pos.X;
 				top = pos.Y;
 				cols = inputEvent.WindowBufferSizeEvent.size.X;
-				rows = inputEvent.WindowBufferSizeEvent.size.Y;
-				//System.Diagnostics.Debug.WriteLine ($"{HeightAsBuffer},{cols},{rows}");
+				if (EnableConsoleScrolling) {
+					rows = Math.Max (inputEvent.WindowBufferSizeEvent.size.Y, rows);
+				} else {
+					rows = inputEvent.WindowBufferSizeEvent.size.Y;
+				}
+				//System.Diagnostics.Debug.WriteLine ($"{EnableConsoleScrolling},{cols},{rows}");
 				ResizeScreen ();
 				UpdateOffScreen ();
 				TerminalResized?.Invoke ();
@@ -1459,10 +1444,26 @@ namespace Terminal.Gui {
 			TerminalResized = terminalResized;
 
 			try {
+				// Needed for Windows Terminal
+				// ESC [ ? 1047 h  Activate xterm alternative buffer (no backscroll)
+				// ESC [ ? 1047 l  Restore xterm working buffer (with backscroll)
+				// ESC [ ? 1048 h  Save cursor position
+				// ESC [ ? 1048 l  Restore cursor position
+				// ESC [ ? 1049 h  Save cursor position and activate xterm alternative buffer (no backscroll)
+				// ESC [ ? 1049 l  Restore cursor position and restore xterm working buffer (with backscroll)
+				// Per Issue #2264 using the alterantive screen buffer is required for Windows Terminal to not 
+				// wipe out the backscroll buffer when the application exits.
+				Console.Out.Write ("\x1b[?1047h");
+
+				// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
+
 				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
 				cols = winSize.Width;
 				rows = winSize.Height;
 				WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
+
+				CurrentAttribute = MakeColor (Color.White, Color.Black);
+				InitalizeColorSchemes ();
 
 				CurrentAttribute = MakeColor (Color.White, Color.Black);
 				InitalizeColorSchemes ();
@@ -1485,8 +1486,15 @@ namespace Terminal.Gui {
 				Right = (short)Cols
 			};
 			WinConsole.ForceRefreshCursorVisibility ();
-			Console.Out.Write ("\x1b[3J");
-			Console.Out.Flush ();
+			if (!EnableConsoleScrolling) {
+				// ANSI ESC "[xJ" Clears part of the screen.
+				// If n is 0 (or missing), clear from cursor to end of screen.
+				// If n is 1, clear from cursor to beginning of the screen.
+				// If n is 2, clear entire screen (and moves cursor to upper left on DOS ANSI.SYS).
+				// If n is 3, clear entire screen and delete all lines saved in the scrollback buffer
+				// DO NOT USE 3J - even with the alternate screen buffer, it clears the entire scrollback buffer
+				Console.Out.Write ("\x1b[3J");
+			}
 		}
 
 		public override void UpdateOffScreen ()
@@ -1653,7 +1661,7 @@ namespace Terminal.Gui {
 			if (damageRegion.Left == -1)
 				return;
 
-			if (!HeightAsBuffer) {
+			if (!EnableConsoleScrolling) {
 				var windowSize = WinConsole.GetConsoleBufferWindow (out _);
 				if (!windowSize.IsEmpty && (windowSize.Width != Cols || windowSize.Height != Rows))
 					return;
@@ -1700,6 +1708,18 @@ namespace Terminal.Gui {
 		{
 			WinConsole.Cleanup ();
 			WinConsole = null;
+
+			// Needed for Windows Terminal
+			// Clear the alternative screen buffer from the cursor to the
+			// end of the screen.
+			// Note, [3J causes Windows Terminal to wipe out the entire NON ALTERNATIVE
+			// backbuffer! So we need to use [0J instead.
+			Console.Out.Write ("\x1b[0J");
+
+			// Disable alternative screen buffer.
+			Console.Out.Write ("\x1b[?1047l");
+
+			// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
 		}
 
 		/// <inheritdoc/>
@@ -1780,8 +1800,8 @@ namespace Terminal.Gui {
 			foreground = default;
 			background = default;
 			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-			      .OfType<ConsoleColor> ()
-			      .Select (s => (int)s);
+				.OfType<ConsoleColor> ()
+				.Select (s => (int)s);
 			if (values.Contains ((value >> 4) & 0xffff)) {
 				hasColor = true;
 				background = (Color)(ConsoleColor)((value >> 4) & 0xffff);
@@ -1897,9 +1917,9 @@ namespace Terminal.Gui {
 		{
 			while (true) {
 				Thread.Sleep (100);
-				if (!consoleDriver.HeightAsBuffer) {
+				if (!consoleDriver.EnableConsoleScrolling) {
 					windowSize = winConsole.GetConsoleBufferWindow (out _);
-					//System.Diagnostics.Debug.WriteLine ($"{consoleDriver.HeightAsBuffer},{windowSize.Width},{windowSize.Height}");
+					//System.Diagnostics.Debug.WriteLine ($"{consoleDriver.EnableConsoleScrolling},{windowSize.Width},{windowSize.Height}");
 					if (windowSize != Size.Empty && windowSize.Width != consoleDriver.Cols
 						|| windowSize.Height != consoleDriver.Rows) {
 						return;

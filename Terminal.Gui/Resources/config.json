@@ -23,7 +23,7 @@
       "Ctrl"
     ]
   },
-  "Application.HeightAsBuffer": false,
+  "Application.EnableConsoleScrolling": false,
   "Application.QuitKey": {
     "Key": "Q",
     "Modifiers": [

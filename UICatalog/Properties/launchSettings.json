@@ -3,6 +3,12 @@
     "UICatalog": {
       "commandName": "Project"
     },
+    "WSL : UICatalog": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll",
+      "distributionName": ""
+    },
     "UICatalog -usc": {
       "commandName": "Project",
       "commandLineArgs": "-usc"
@@ -28,10 +34,6 @@
     "WizardAsView": {
       "commandName": "Project",
       "commandLineArgs": "WizardAsView"
-    },
-    "VkeyPacketSimulator": {
-      "commandName": "Project",
-      "commandLineArgs": "VkeyPacketSimulator"
     },
     "CollectionNavigatorTester": {
       "commandName": "Project",
