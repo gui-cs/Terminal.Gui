@@ -264,7 +264,7 @@ namespace Terminal.Gui {
 
 			public override string ToString ()
 			{
-				return $"PosCombine({left.ToString ()}{(add ? '+' : '-')}{right.ToString ()})";
+				return $"PosCombine({left}{(add ? '+' : '-')}{right})";
 			}
 
 		}
@@ -345,7 +345,7 @@ namespace Terminal.Gui {
 				case 3: tside = "bottom"; break;
 				default: tside = "unknown"; break;
 				}
-				return $"PosView({tside},{Target.ToString()})";
+				return $"PosView({tside},{Target})";
 			}
 
 			public override int GetHashCode () => Target.GetHashCode ();
@@ -613,7 +613,7 @@ namespace Terminal.Gui {
 
 			public override string ToString ()
 			{
-				return $"DimCombine({left}{(add ? '+' : '-')}{right.ToString ()})";
+				return $"DimCombine({left}{(add ? '+' : '-')}{right})";
 			}
 
 		}
@@ -691,7 +691,7 @@ namespace Terminal.Gui {
 				case 1: tside = "Width"; break;
 				default: tside = "unknown"; break;
 				}
-				return $"DimView({tside},{Target.ToString ()})";
+				return $"DimView({tside},{Target})";
 			}
 
 			public override int GetHashCode () => Target.GetHashCode ();
