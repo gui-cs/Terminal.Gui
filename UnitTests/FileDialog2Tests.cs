@@ -66,7 +66,7 @@ namespace Terminal.Gui.Core {
 			Directory.CreateDirectory (expectedDest);
 
 			dlg.Path = openIn + Path.DirectorySeparatorChar;
-
+			
 			Send ("x");
 
 			// nothing selected yet
@@ -74,7 +74,7 @@ namespace Terminal.Gui.Core {
 			Assert.Equal ("x", Path.GetFileName (dlg.Path));
 
 			// complete auto typing
-			Send ('\n', ConsoleKey.Enter, false);
+			Send ('\t', ConsoleKey.Tab, false);
 
 			// but do not close dialog
 			Assert.True (dlg.Canceled);

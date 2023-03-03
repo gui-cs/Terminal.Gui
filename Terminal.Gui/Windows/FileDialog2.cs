@@ -315,7 +315,14 @@ namespace Terminal.Gui {
 			this.Add (this.tbPath);
 			this.Add (this.splitContainer);
 		}
+		public override bool ProcessHotKey (KeyEvent keyEvent)
+		{
+			if(this.NavigateIf (keyEvent, Key.CtrlMask | Key.F, this.tbFind)) {
+				return true;
+			}
 
+			return base.ProcessHotKey (keyEvent);
+		}
 		private void RestartSearch ()
 		{
 			if(disposed || state?.Directory == null ) {
@@ -437,7 +444,12 @@ namespace Terminal.Gui {
 		/// be used if <see cref="AllowsMultipleSelection"/> is off and <see cref="Canceled"/>
 		/// is true.
 		/// </summary>
-		public string Path { get => this.tbPath.Text.ToString (); set => this.tbPath.Text = value; }
+		public string Path { get => this.tbPath.Text.ToString ();
+			set { 
+				this.tbPath.Text = value;
+				this.tbPath.MoveCursorToEnd();
+			}
+		}
 
 		/// <summary>
 		/// User defined delegate for picking which character(s)/unicode
@@ -657,13 +669,6 @@ namespace Terminal.Gui {
 
 		private void Accept ()
 		{
-			// if an autocomplete is showing
-			if (this.tbPath.AcceptSelectionIfAny ()) {
-
-				// enter just accepts it
-				return;
-			}
-
 			if (!this.IsCompatibleWithOpenMode (this.tbPath.Text.ToString (), out string reason)) {
 				if(reason != null) {
 					lblFeedback.Text = reason;
@@ -678,15 +683,26 @@ namespace Terminal.Gui {
 
 		private void NavigateIf (KeyEventEventArgs keyEvent, Key isKey, View to)
 		{
-			if (!keyEvent.Handled && keyEvent.KeyEvent.Key == isKey) {
+			if (!keyEvent.Handled) {
+
+				if(NavigateIf (keyEvent.KeyEvent, isKey, to)) {
+					keyEvent.Handled = true;
+				}
+			}
+		}
+
+		private bool NavigateIf (KeyEvent keyEvent, Key isKey, View to)
+		{
+			if (keyEvent.Key == isKey) {
 
 				to.FocusFirst ();
-				if(to == tbPath) {
+				if (to == tbPath) {
 					tbPath.MoveCursorToEnd ();
 				}
-
-				keyEvent.Handled = true;
+				return true;
 			}
+
+			return false;
 		}
 
 		private void TreeView_SelectionChanged (object sender, SelectionChangedEventArgs<object> e)
@@ -1139,7 +1155,7 @@ namespace Terminal.Gui {
 			var dir = this.StringToDirectoryInfo (path);
 
 			if (dir.Exists) {
-				this.PushState (dir, true);
+				this.PushState (dir, true, false);
 			} else
 			if (dir.Parent?.Exists ?? false) {
 				this.PushState (dir.Parent, true, false);
