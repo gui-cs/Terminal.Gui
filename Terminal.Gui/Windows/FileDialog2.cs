@@ -767,6 +767,7 @@ namespace Terminal.Gui {
 			if (multi.Any ()) {
 				if (multi.All (m=>this.IsCompatibleWithOpenMode(m.FileSystemInfo.FullName,out reason))) {
 					this.Accept (multi);
+					return;
 				} else {
 					if(reason != null) {
 						lblFeedback.Text = reason;
