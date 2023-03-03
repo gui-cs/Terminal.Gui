@@ -8,10 +8,13 @@ We welcome contributions from the community. See [Issues](https://github.com/gui
 
 ## Forking and Submitting Changes
 
+*IMPORTANT*: v1.x of Terminal.Gui is now in maintenance mode. All new development is happening on the `v2_develop` branch. See the V2 discussion [here](https://github.com/gui-cs/Terminal.Gui/discussions/1940).
+
 Terminal.Gui uses the [GitFlow](https://nvie.com/posts/a-successful-git-branching-model/) branching model. 
 
 * The `main` branch is always stable, and always matches the most recently released Nuget package.
-* The `develop` branch is where new development and bug-fixes happen. It is the default branch.
+* The `develop` branch is where bug-fixes to v1.x happens. It is the default branch.
+* The `v2_develop` branch is where development on v2.x happens. 
 
 ### Forking Terminal.Gui
 
@@ -33,16 +36,23 @@ You now have your own fork and a local repo that references it as `origin`. Your
 
 ### Starting to Make a Change
 
-Ensure your local `develop` branch is up-to-date with `upstream` (`github.com/gui-cs/Terminal.Gui`):
+Figure out if your change will target v1 or v2. If you're not sure, ask in the [v2 disucssions here](https://github.com/gui-cs/Terminal.Gui/discussions/1940).
+
+For v1.x, use the `develop` branch. For v2.x, use the `v2_develop` branch.
+
+Prefix any local branches you create with `v1_` or `v2_` to indicate which version you're working on.
+
+Ensure your local branch is up-to-date with `upstream` (`github.com/gui-cs/Terminal.Gui`):
+
 ```powershell
 cd ./Terminal.Gui
-git checkout develop
-git pull upstream develop
+git checkout <develop/v2_develop>
+git pull upstream <develop/v2_develop>
 ```
 
 Create a new local branch:
 ```powershell
-git checkout -b my_new_branch
+git checkout -b <v1/v2>_my_new_branch
 ```
 
 #### Making Changes
@@ -89,6 +99,10 @@ remote:
 (in Windows Terminal, just CTRL-Click on the URL)
 
 Follow the template instructions found on Github.
+
+If you are targetting v2, set the project to the [v2 Project](https://github.com/orgs/gui-cs/projects/1).
+
+4. If your change is a bug fix, consider whether you should submit a separate PR to the v1 (`develop`) or v2 (`v2_develop`) branch as well.
 
 ## Terminal.Gui Coding Style
 
