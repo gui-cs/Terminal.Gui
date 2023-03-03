@@ -308,6 +308,7 @@ namespace Terminal.Gui {
 			ClearNeedsDisplay ();
 
 			Driver.SetAttribute (GetNormalColor ());
+			Border.Title = Title; //  not sure why Title is getting un-set
 			Border.DrawContent (this, false);
 		}
 

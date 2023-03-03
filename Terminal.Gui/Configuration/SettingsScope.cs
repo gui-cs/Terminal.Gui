@@ -34,6 +34,9 @@ namespace Terminal.Gui.Configuration {
 			[JsonInclude, JsonPropertyName ("$schema")]
 			public string Schema { get; set; } = "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json";
 
+			/// <summary>
+			/// The list of paths to the configuration files.
+			/// </summary>
 			public List<string> Sources = new List<string> ();
 
 			/// <summary>

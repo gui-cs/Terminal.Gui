@@ -230,7 +230,7 @@ namespace Terminal.Gui.CoreTests {
 					var rune = (Rune)driver.Contents [r, c, 0];
 					if (r == frame.Y - drawMarginFrame || r == frame.Bottom + drawMarginFrame - 1
 						|| c == frame.X - drawMarginFrame || c == frame.Right + drawMarginFrame - 1) {
-						Assert.Equal (Color.BrightGreen, color.Background);
+						Assert.Equal (Color.Black, color.Background);  // because of #2345 - Border: can't change border color in window by Border.BorderBrush. 
 					} else {
 						Assert.Equal (Color.Black, color.Background);
 					}
@@ -464,7 +464,7 @@ namespace Terminal.Gui.CoreTests {
 					var rune = (Rune)driver.Contents [r, c, 0];
 					if (r == frame.Y + sumThickness.Top || r == frame.Bottom - sumThickness.Bottom - 1
 						|| c == frame.X + sumThickness.Left || c == frame.Right - sumThickness.Right - 1) {
-						Assert.Equal (Color.BrightGreen, color.Background);
+						Assert.Equal (Color.Black, color.Background);  // because of #2345 - Border: can't change border color in window by Border.BorderBrush. 
 					} else {
 						Assert.Equal (Color.Black, color.Background);
 					}
