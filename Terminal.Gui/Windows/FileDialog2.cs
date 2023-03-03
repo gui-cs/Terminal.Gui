@@ -57,7 +57,8 @@ namespace Terminal.Gui {
 		private bool pushingState = false;
 
 		private FileDialogState state;
-
+		private object onlyOneSearchLock = new object ();
+		private bool disposed = false;
 		private TextFieldWithAppendAutocomplete tbPath;
 
 		private FileDialogSorter sorter;
@@ -317,7 +318,7 @@ namespace Terminal.Gui {
 
 		private void RestartSearch ()
 		{
-			if(state?.Directory == null ) {
+			if(disposed || state?.Directory == null ) {
 				return;
 			}
 
@@ -326,13 +327,27 @@ namespace Terminal.Gui {
 			}
 
 			// user is clearing search terms
-			if(tbFind.Text == null || tbFind.Text.Length == 0) {
-				PushState (state.Directory,false);
+			if (tbFind.Text == null || tbFind.Text.Length == 0) {
+				
+				// Wait for search cancellation (if any) to finish
+				// then push the current dir state
+				lock(onlyOneSearchLock){
+					PushState (new FileDialogState (state.Directory, this), false);
+				}
 				return;
 			}
+			
+			PushState (new SearchState (state?.Directory, this, tbFind.Text.ToString ()), true);
+		}
 
-			// user is entering new search terms
-			PushState(new SearchState (state?.Directory, this, tbFind.Text.ToString()),true);
+		protected override void Dispose (bool disposing)
+		{
+			disposed = true;
+			base.Dispose (disposing);
+
+			if (state is SearchState search) {
+				search.Cancel ();
+			}
 		}
 
 		private void ClearFeedback ()
@@ -1364,36 +1379,37 @@ namespace Terminal.Gui {
 
 			private void UpdateChildren ()
 			{
-				while(!cancel && !finished) {
+				lock(Parent.onlyOneSearchLock) {
+					while (!cancel && !finished) {
 
-					try {
-						Task.Delay (250).Wait (token.Token);
-					}
-					catch(OperationCanceledException) {
-						cancel = true;
-					}
-					
+						try {
+							Task.Delay (250).Wait (token.Token);
+						} catch (OperationCanceledException) {
+							cancel = true;
+						}
 
-					if(cancel || finished) {
-						break;
-					}
 
-					lock (oLockFound) {
-						Children = found.ToArray ();
+						if (cancel || finished) {
+							break;
+						}
+
+						lock (oLockFound) {
+							Children = found.ToArray ();
+						}
+
+						Application.MainLoop.Invoke (() => {
+							Parent.tbPath.GenerateSuggestions (this);
+							Parent.WriteStateToTableView ();
+
+							Parent.spinnerLabel.Visible = true;
+							Parent.spinnerLabel.SetNeedsDisplay ();
+						});
 					}
 
 					Application.MainLoop.Invoke (() => {
-						Parent.tbPath.GenerateSuggestions (this);
-						Parent.WriteStateToTableView ();
-
-						Parent.spinnerLabel.Visible = true;
-						Parent.spinnerLabel.SetNeedsDisplay();
+						Parent.spinnerLabel.Visible = false;
 					});
 				}
-
-				Application.MainLoop.Invoke (() => {
-					Parent.spinnerLabel.Visible = false;
-				});
 			}
 
 			private void RecursiveFind (DirectoryInfo directory)
