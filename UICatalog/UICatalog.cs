@@ -104,6 +104,8 @@ namespace UICatalog {
 			_aboutMessage.AppendLine (@"    | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | | ");
 			_aboutMessage.AppendLine (@"    |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_| ");
 			_aboutMessage.AppendLine (@"");
+			_aboutMessage.AppendLine (@"v2 - Work in Progress");
+			_aboutMessage.AppendLine (@"");
 			_aboutMessage.AppendLine (@"https://github.com/gui-cs/Terminal.Gui");
 
 			Scenario scenario;
