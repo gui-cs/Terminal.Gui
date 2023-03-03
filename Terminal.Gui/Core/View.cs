@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using NStack;
@@ -100,7 +101,7 @@ namespace Terminal.Gui {
 	///    frames for the vies that use <see cref="LayoutStyle.Computed"/>.
 	/// </para>
 	/// </remarks>
-	public partial class View : Responder, ISupportInitializeNotification {
+	public class View : Responder, ISupportInitializeNotification {
 
 		internal enum Direction {
 			Forward,
@@ -1109,8 +1110,15 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public void Clear ()
 		{
-			var h = Frame.Height;
-			var w = Frame.Width;
+			Rect containerBounds = GetContainerBounds ();
+			Rect viewBounds = Bounds;
+			if (!containerBounds.IsEmpty) {
+				viewBounds.Width = Math.Min (viewBounds.Width, containerBounds.Width);
+				viewBounds.Height = Math.Min (viewBounds.Height, containerBounds.Height);
+			}
+
+			var h = viewBounds.Height;
+			var w = viewBounds.Width;
 			for (var line = 0; line < h; line++) {
 				Move (0, line);
 				for (var col = 0; col < w; col++)
@@ -1515,6 +1523,8 @@ namespace Terminal.Gui {
 
 			if (!IgnoreBorderPropertyOnRedraw && Border != null) {
 				Border.DrawContent (this);
+				boundsAdjustedForBorder = new Rect (bounds.X + 1, bounds.Y + 1, Math.Max (0, bounds.Width - 2), Math.Max(0, bounds.Height - 2));
+				boundsAdjustedForBorder = Bounds;// new Rect (bounds.X + 1, bounds.Y + 1, Math.Max (bounds.Width, bounds.Width - 2), Math.Max (bounds.Height, bounds.Height - 2));
 			} else if (ustring.IsNullOrEmpty (TextFormatter.Text) &&
 				(GetType ().IsNestedPublic && !IsOverridden (this, "Redraw") || GetType ().Name == "View") &&
 				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
@@ -1531,8 +1541,8 @@ namespace Terminal.Gui {
 				if (TextFormatter != null) {
 					TextFormatter.NeedsFormat = true;
 				}
-				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
-				    HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
+				TextFormatter?.Draw (ViewToScreen (boundsAdjustedForBorder), HasFocus ? ColorScheme.Focus : GetNormalColor (),
+				    HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled,
 				    containerBounds);
 			}
 
@@ -1542,9 +1552,10 @@ namespace Terminal.Gui {
 			if (subviews != null) {
 				foreach (var view in subviews) {
 					if (!view.NeedDisplay.IsEmpty || view.ChildNeedsDisplay || view.LayoutNeeded) {
-						if (view.Frame.IntersectsWith (clipRect) && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
-							if (view.LayoutNeeded)
+						if (view.Frame.IntersectsWith (clipRect) && (view.Frame.IntersectsWith (boundsAdjustedForBorder) || boundsAdjustedForBorder.X < 0 || bounds.Y < 0)) {
+							if (view.LayoutNeeded) {
 								view.LayoutSubviews ();
+							}
 
 							// Draw the subview
 							// Use the view's bounds (view-relative; Location will always be (0,0)
@@ -2174,42 +2185,40 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Sets the View's <see cref="Frame"/> to the relative coordinates if its container, given the <see cref="Frame"/> for its container.
+		/// Sets the View's <see cref="Frame"/> to the frame-relative coordinates if its container. The
+		/// container size and location are specified by <paramref name="superviewFrame"/> and are relative to the
+		/// View's superview.
 		/// </summary>
-		/// <param name="hostFrame">The screen-relative frame for the host.</param>
-		/// <remarks>
-		/// Reminder: <see cref="Frame"/> is superview-relative; <see cref="Bounds"/> is view-relative.
-		/// </remarks>
-		internal void SetRelativeLayout (Rect hostFrame)
+		/// <param name="superviewFrame">The supserview-relative rectangle describing View's container (nominally the 
+		/// same as <c>this.SuperView.Frame</c>).</param>
+		internal void SetRelativeLayout (Rect superviewFrame)
 		{
-			int actW, actH, actX, actY;
-			var s = Size.Empty;
+			int newX, newW, newY, newH;
+			var autosize = Size.Empty;
 
 			if (AutoSize) {
-				s = GetAutoSize ();
+				// Note this is global to this function and used as such within the local functions defined
+				// below. In v2 AutoSize will be re-factored to not need to be dealt with in this function.
+				autosize = GetAutoSize ();
 			}
 
-			if (x is Pos.PosCenter) {
-				if (width == null) {
-					actW = AutoSize ? s.Width : hostFrame.Width;
-				} else {
-					actW = width.Anchor (hostFrame.Width);
-					actW = AutoSize && s.Width > actW ? s.Width : actW;
-				}
-				actX = x.Anchor (hostFrame.Width - actW);
-			} else {
-				actX = x?.Anchor (hostFrame.Width) ?? 0;
+			// Returns the new dimension (width or height) and location (x or y) for the View given
+			//   the superview's Frame.X or Frame.Y
+			//   the superview's width or height
+			//   the current Pos (View.X or View.Y)
+			//   the current Dim (View.Width or View.Height)
+			(int newLocation, int newDimension) GetNewLocationAndDimension (int superviewLocation, int superviewDimension, Pos pos, Dim dim, int autosizeDimension)
+			{
+				int newDimension, newLocation;
 
-				actW = Math.Max (CalculateActualWidth (width, hostFrame, actX, s), 0);
-			}
-
-			if (y is Pos.PosCenter) {
-				if (height == null) {
-					actH = AutoSize ? s.Height : hostFrame.Height;
-				} else {
-					actH = height.Anchor (hostFrame.Height);
-					actH = AutoSize && s.Height > actH ? s.Height : actH;
-				}
+				switch (pos) {
+				case Pos.PosCenter:
+					if (dim == null) {
+						newDimension = AutoSize ? autosizeDimension : superviewDimension;
+					} else {
+						newDimension = dim.Anchor (superviewDimension);
+						newDimension = AutoSize && autosizeDimension > newDimension ? autosizeDimension : newDimension;
+					}
 				actY = y.Anchor (hostFrame.Height - actH);
 			} else {
 				actY = y?.Anchor (hostFrame.Height) ?? 0;
@@ -2255,35 +2264,41 @@ namespace Terminal.Gui {
 			return actW;
 		}
 
-		private int CalculateActualHight (Dim height, Rect hostFrame, int actY, Size s)
-		{
-			int actH;
-			switch (height) {
-			case null:
-				actH = AutoSize ? s.Height : hostFrame.Height;
-				break;
-			case Dim.DimCombine combine:
-				int leftActH = CalculateActualHight (combine.left, hostFrame, actY, s);
-				int rightActH = CalculateActualHight (combine.right, hostFrame, actY, s);
-				if (combine.add) {
-					actH = leftActH + rightActH;
-				} else {
-					actH = leftActH - rightActH;
+			// Recursively calculates the new dimension (width or height) of the given Dim given:
+			//   the current location (x or y)
+			//   the current dimennsion (width or height)
+			int CalculateNewDimension (Dim d, int location, int dimension, int autosize)
+			{
+				int newDimension;
+				switch (d) {
+				case null:
+					newDimension = AutoSize ? autosize : dimension;
+					break;
+				case Dim.DimCombine combine:
+					int leftNewDim = CalculateNewDimension (combine.left, location, dimension, autosize);
+					int rightNewDim = CalculateNewDimension (combine.right, location, dimension, autosize);
+					if (combine.add) {
+						newDimension = leftNewDim + rightNewDim;
+					} else {
+						newDimension = leftNewDim - rightNewDim;
+					}
+					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
+					break;
+					
+				case Dim.DimFactor factor when !factor.IsFromRemaining ():
+					newDimension = d.Anchor (dimension);
+					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
+					break;
+					
+				case Dim.DimFill:
+				default:
+					newDimension = Math.Max (d.Anchor (dimension - location), 0);
+					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
+					break;
 				}
-				actH = AutoSize && s.Height > actH ? s.Height : actH;
-				break;
-			case Dim.DimFactor factor when !factor.IsFromRemaining ():
-				actH = height.Anchor (hostFrame.Height);
-				actH = AutoSize && s.Height > actH ? s.Height : actH;
-				break;
-			default:
-				actH = Math.Max (height.Anchor (hostFrame.Height - actY), 0);
-				actH = AutoSize && s.Height > actH ? s.Height : actH;
-				break;
-			}
 
-			return actH;
-		}
+				return newDimension;
+			}
 
 		// https://en.wikipedia.org/wiki/Topological_sorting
 		List<View> TopologicalSort (IEnumerable<View> nodes, ICollection<(View From, View To)> edges)
@@ -2381,68 +2396,45 @@ namespace Terminal.Gui {
 			LayoutComplete?.Invoke (args);
 		}
 
-		/// <summary>
-		/// Invoked when a view starts executing or when the dimensions of the view have changed, for example in
-		/// response to the container view or terminal resizing.
-		/// </summary>
-		/// <remarks>
-		/// Calls <see cref="OnLayoutComplete"/> (which raises the <see cref="LayoutComplete"/> event) before it returns.
-		/// </remarks>
-		public virtual void LayoutSubviews ()
+		internal void CollectPos (Pos pos, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
 		{
-			if (!LayoutNeeded) {
+			switch (pos) {
+			case Pos.PosView pv:
+				if (pv.Target != this) {
+					nEdges.Add ((pv.Target, from));
+				}
+				foreach (var v in from.InternalSubviews) {
+					CollectAll (v, ref nNodes, ref nEdges);
+				}
 				return;
-			}
-
-			var oldBounds = Bounds;
-			OnLayoutStarted (new LayoutEventArgs () { OldBounds = oldBounds });
-
-			TextFormatter.Size = GetBoundsTextFormatterSize ();
-
-
-			// Sort out the dependencies of the X, Y, Width, Height properties
-			var nodes = new HashSet<View> ();
-			var edges = new HashSet<(View, View)> ();
-
-			void CollectPos (Pos pos, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
-			{
-				switch (pos) {
-				case Pos.PosView pv:
-					if (pv.Target != this) {
-						nEdges.Add ((pv.Target, from));
-					}
-					foreach (var v in from.InternalSubviews) {
-						CollectAll (v, ref nNodes, ref nEdges);
-					}
-					return;
-				case Pos.PosCombine pc:
-					foreach (var v in from.InternalSubviews) {
-						CollectPos (pc.left, from, ref nNodes, ref nEdges);
-						CollectPos (pc.right, from, ref nNodes, ref nEdges);
-					}
-					break;
+			case Pos.PosCombine pc:
+				foreach (var v in from.InternalSubviews) {
+					CollectPos (pc.left, from, ref nNodes, ref nEdges);
+					CollectPos (pc.right, from, ref nNodes, ref nEdges);
 				}
+				break;
 			}
+		}
 
-			void CollectDim (Dim dim, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
-			{
-				switch (dim) {
-				case Dim.DimView dv:
-					if (dv.Target != this) {
-						nEdges.Add ((dv.Target, from));
-					}
-					foreach (var v in from.InternalSubviews) {
-						CollectAll (v, ref nNodes, ref nEdges);
-					}
-					return;
-				case Dim.DimCombine dc:
-					foreach (var v in from.InternalSubviews) {
-						CollectDim (dc.left, from, ref nNodes, ref nEdges);
-						CollectDim (dc.right, from, ref nNodes, ref nEdges);
-					}
-					break;
+		internal void CollectDim (Dim dim, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
+		{
+			switch (dim) {
+			case Dim.DimView dv:
+				if (dv.Target != this) {
+					nEdges.Add ((dv.Target, from));
 				}
+				foreach (var v in from.InternalSubviews) {
+					CollectAll (v, ref nNodes, ref nEdges);
+				}
+				return;
+			case Dim.DimCombine dc:
+				foreach (var v in from.InternalSubviews) {
+					CollectDim (dc.left, from, ref nNodes, ref nEdges);
+					CollectDim (dc.right, from, ref nNodes, ref nEdges);
+				}
+				break;
 			}
+		}
 
 			void CollectAll (View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
 			{
@@ -2460,8 +2452,13 @@ namespace Terminal.Gui {
 
 			CollectAll (this, ref nodes, ref edges);
 
-			var ordered = TopologicalSort (nodes, edges);
+			TextFormatter.Size = GetBoundsTextFormatterSize ();
 
+			// Sort out the dependencies of the X, Y, Width, Height properties
+			var nodes = new HashSet<View> ();
+			var edges = new HashSet<(View, View)> ();
+			CollectAll (this, ref nodes, ref edges);
+			var ordered = View.TopologicalSort (SuperView, nodes, edges);
 			foreach (var v in ordered) {
 				if (v.LayoutStyle == LayoutStyle.Computed) {
 					v.SetRelativeLayout (Frame);
@@ -2471,9 +2468,12 @@ namespace Terminal.Gui {
 				v.LayoutNeeded = false;
 			}
 
+			// If our SuperView is Application.Top and the layoutstyle is Computed it's a special-cass.
+			// Use SetRelativeaLayout with the Frame of the Application.Top
 			if (SuperView != null && SuperView == Application.Top && LayoutNeeded
 			    && ordered.Count == 0 && LayoutStyle == LayoutStyle.Computed) {
-				SetRelativeLayout (SuperView.Frame);
+				Debug.Assert (Application.Top.Frame.Location == Point.Empty);
+				SetRelativeLayout (Application.Top.Frame);
 			}
 
 			LayoutNeeded = false;
@@ -2756,9 +2756,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets the size to fit all text if <see cref="AutoSize"/> is true.
+		/// Gets the dimensions required to fit <see cref="Text"/> using the text <see cref="Direction"/> specified by the
+		/// <see cref="TextFormatter"/> property and accounting for any <see cref="HotKeySpecifier"/> characters.
+		/// .
 		/// </summary>
-		/// <returns>The <see cref="Size"/></returns>
+		/// <returns>The <see cref="Size"/> required to fit the text.</returns>
 		public Size GetAutoSize ()
 		{
 			var rect = TextFormatter.CalcRect (Bounds.X, Bounds.Y, TextFormatter.Text, TextFormatter.Direction);
@@ -2793,10 +2795,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Get the width or height of the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> length.
+		/// Gets the width or height of the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> characters in the <see cref="Text"/> property.
 		/// </summary>
-		/// <param name="isWidth"><see langword="true"/> if is the width (default) <see langword="false"/> if is the height.</param>
-		/// <returns>The length of the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/>.</returns>
+		/// <param name="isWidth">If <see langword="true"/> (the default) the width required for the hotkey specifier is returned. Otherwise the height is returned.</param>
+		/// <returns>The number of characters required for the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/>. If the text direction specified
+		/// by <see cref="TextDirection"/> does not match the <paramref name="isWidth"/> parameter, <c>0</c> is returned.</returns>
 		public int GetHotKeySpecifierLength (bool isWidth = true)
 		{
 			if (isWidth) {
@@ -2811,7 +2814,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets the bounds size from a <see cref="Terminal.Gui.TextFormatter.Size"/>.
+		/// Gets the <see cref="TextFormatter.Size"/> minus the size required for the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/>.
 		/// </summary>
 		/// <returns>The bounds size minus the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> length.</returns>
 		public Size GetTextFormatterBoundsSize ()

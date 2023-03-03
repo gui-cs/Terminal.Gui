@@ -20,6 +20,9 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using System.IO;
+using Terminal.Gui.Configuration;
+using System.Text.Json.Serialization;
+using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui {
 
@@ -116,21 +119,9 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The current <see cref="ConsoleDriver.EnableConsoleScrolling"/> used in the terminal.
 		/// </summary>
-		/// <remarks>
-		/// <para>
-		/// If <see langword="false"/> (the default) the height of the Terminal.Gui application (<see cref="ConsoleDriver.Rows"/>) 
-		/// tracks to the height of the visible console view when the console is resized. In this case 
-		/// scrolling in the console will be disabled and all <see cref="ConsoleDriver.Rows"/> will remain visible.
-		/// </para>
-		/// <para>
-		/// If <see langword="true"/> then height of the Terminal.Gui application <see cref="ConsoleDriver.Rows"/> only tracks 
-		/// the height of the visible console view when the console is made larger (the application will only grow in height, never shrink). 
-		/// In this case console scrolling is enabled and the contents (<see cref="ConsoleDriver.Rows"/> high) will scroll
-		/// as the console scrolls. 
-		/// </para>
-		/// This API was previously named 'HeightAsBuffer` but was renamed to make its purpose more clear.
-		/// </remarks>
-		public static bool EnableConsoleScrolling {
+		/// 
+		[SerializableConfigurationProperty (Scope = typeof(SettingsScope))]
+		public static bool HeightAsBuffer {
 			get {
 				if (Driver == null) {
 					return _enableConsoleScrolling.HasValue && _enableConsoleScrolling.Value;
@@ -160,6 +151,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
 		/// </summary>
+		[SerializableConfigurationProperty (Scope = typeof(SettingsScope)), JsonConverter(typeof(KeyJsonConverter))]
 		public static Key AlternateForwardKey {
 			get => alternateForwardKey;
 			set {
@@ -183,6 +175,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
 		/// </summary>
+		[SerializableConfigurationProperty (Scope = typeof(SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
 		public static Key AlternateBackwardKey {
 			get => alternateBackwardKey;
 			set {
@@ -206,6 +199,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the key to quit the application.
 		/// </summary>
+		[SerializableConfigurationProperty (Scope = typeof(SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
 		public static Key QuitKey {
 			get => quitKey;
 			set {
@@ -241,6 +235,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Disable or enable the mouse. The mouse is enabled by default.
 		/// </summary>
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
 		public static bool IsMouseDisabled { get; set; }
 
 		/// <summary>
@@ -334,6 +329,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// If <see langword="true"/>, forces the use of the System.Console-based (see <see cref="NetDriver"/>) driver. The default is <see langword="false"/>.
 		/// </summary>
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
 		public static bool UseSystemConsole { get; set; } = false;
 
 		// For Unit testing - ignores UseSystemConsole
@@ -412,6 +408,14 @@ namespace Terminal.Gui {
 				//}
 				Driver = driver;
 			}
+
+			// Start the process of configuration management.
+			// Note that we end up calling LoadConfigurationFromAllSources
+			// mulitlple times. We need to do this because some settings are only
+			// valid after a Driver is loaded. In this cases we need just 
+			// `Settings` so we can determine which driver to use.
+			ConfigurationManager.Load (true);
+			ConfigurationManager.Apply ();
 
 			if (Driver == null) {
 				var p = Environment.OSVersion.Platform;
@@ -800,9 +804,7 @@ namespace Terminal.Gui {
 			}
 
 			if (mouseGrabView != null) {
-				if (view == null) {
-					view = mouseGrabView;
-				}
+				view ??= mouseGrabView;
 
 				var newxy = mouseGrabView.ScreenToView (me.X, me.Y);
 				var nme = new MouseEvent () {
@@ -1091,6 +1093,8 @@ namespace Terminal.Gui {
 		public static void Shutdown ()
 		{
 			ResetState ();
+
+			ConfigurationManager.PrintJsonErrors ();
 		}
 
 		// Encapsulate all setting of initial state for Application; Having

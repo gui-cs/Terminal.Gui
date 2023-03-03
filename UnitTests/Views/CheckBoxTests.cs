@@ -21,6 +21,7 @@ namespace Terminal.Gui.ViewTests {
 			var ckb = new CheckBox ();
 			Assert.True (ckb.AutoSize);
 			Assert.False (ckb.Checked);
+			Assert.False (ckb.AllowNullChecked);
 			Assert.Equal (string.Empty, ckb.Text);
 			Assert.Equal ("╴ ", ckb.TextFormatter.Text);
 			Assert.True (ckb.CanFocus);
@@ -29,6 +30,7 @@ namespace Terminal.Gui.ViewTests {
 			ckb = new CheckBox ("Test", true);
 			Assert.True (ckb.AutoSize);
 			Assert.True (ckb.Checked);
+			Assert.False (ckb.AllowNullChecked);
 			Assert.Equal ("Test", ckb.Text);
 			Assert.Equal ("√ Test", ckb.TextFormatter.Text);
 			Assert.True (ckb.CanFocus);
@@ -37,6 +39,7 @@ namespace Terminal.Gui.ViewTests {
 			ckb = new CheckBox (1, 2, "Test");
 			Assert.True (ckb.AutoSize);
 			Assert.False (ckb.Checked);
+			Assert.False (ckb.AllowNullChecked);
 			Assert.Equal ("Test", ckb.Text);
 			Assert.Equal ("╴ Test", ckb.TextFormatter.Text);
 			Assert.True (ckb.CanFocus);
@@ -45,6 +48,7 @@ namespace Terminal.Gui.ViewTests {
 			ckb = new CheckBox (3, 4, "Test", true);
 			Assert.True (ckb.AutoSize);
 			Assert.True (ckb.Checked);
+			Assert.False (ckb.AllowNullChecked);
 			Assert.Equal ("Test", ckb.Text);
 			Assert.Equal ("√ Test", ckb.TextFormatter.Text);
 			Assert.True (ckb.CanFocus);
@@ -531,6 +535,37 @@ namespace Terminal.Gui.ViewTests {
 ";
 
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void AllowNullChecked_Get_Set ()
+		{
+			var checkBox = new CheckBox ("Check this out 你");
+			var top = Application.Top;
+			top.Add (checkBox);
+			Application.Begin (top);
+
+			Assert.False (checkBox.Checked);
+			Assert.True (checkBox.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ())));
+			Assert.True (checkBox.Checked);
+			Assert.True (checkBox.MouseEvent (new MouseEvent () { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
+			Assert.False (checkBox.Checked);
+
+			checkBox.AllowNullChecked = true;
+			Assert.True (checkBox.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ())));
+			Assert.Null (checkBox.Checked);
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+⍰ Check this out 你", output);
+			Assert.True (checkBox.MouseEvent (new MouseEvent () { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
+			Assert.True (checkBox.Checked);
+			Assert.True (checkBox.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ())));
+			Assert.False (checkBox.Checked);
+			Assert.True (checkBox.MouseEvent (new MouseEvent () { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
+			Assert.Null (checkBox.Checked);
+
+			checkBox.AllowNullChecked = false;
+			Assert.False (checkBox.Checked);
 		}
 	}
 }

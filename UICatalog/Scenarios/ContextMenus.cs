@@ -106,7 +106,7 @@ namespace UICatalog.Scenarios {
 						tfBottomRight.ContextMenu.ForceMinimumPosToZero = forceMinimumPosToZero;
 					}) { CheckType = MenuItemCheckStyle.Checked, Checked = forceMinimumPosToZero },
 					miUseSubMenusSingleFrame = new MenuItem ("Use_SubMenusSingleFrame", "",
-						() => contextMenu.UseSubMenusSingleFrame = miUseSubMenusSingleFrame.Checked = useSubMenusSingleFrame = !useSubMenusSingleFrame) {
+						() => contextMenu.UseSubMenusSingleFrame = (bool)(miUseSubMenusSingleFrame.Checked = useSubMenusSingleFrame = !useSubMenusSingleFrame)) {
 							CheckType = MenuItemCheckStyle.Checked, Checked = useSubMenusSingleFrame
 						},
 					null,

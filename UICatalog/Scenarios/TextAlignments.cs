@@ -60,12 +60,12 @@ namespace UICatalog.Scenarios {
 			var update = new Button ("_Update") {
 				X = Pos.Right (edit) + 1,
 				Y = Pos.Bottom (edit) - 1,
-				
+
 			};
 			update.Clicked += () => {
 				foreach (var alignment in alignments) {
-					singleLines [(int) alignment].Text = edit.Text;
-					multipleLines [(int) alignment].Text = edit.Text;
+					singleLines [(int)alignment].Text = edit.Text;
+					multipleLines [(int)alignment].Text = edit.Text;
 				}
 			};
 			Win.Add (update);
@@ -100,8 +100,8 @@ namespace UICatalog.Scenarios {
 
 			enableHotKeyCheckBox.Toggled += (previous) => {
 				foreach (var alignment in alignments) {
-					singleLines [(int)alignment].HotKeySpecifier = previous ? (Rune)0xffff : (Rune)'_';
-					multipleLines [(int)alignment].HotKeySpecifier = previous ? (Rune)0xffff : (Rune)'_';
+					singleLines [(int)alignment].HotKeySpecifier = previous == true ? (Rune)0xffff : (Rune)'_';
+					multipleLines [(int)alignment].HotKeySpecifier = previous == true ? (Rune)0xffff : (Rune)'_';
 				}
 				Win.SetNeedsDisplay ();
 				Win.LayoutSubviews ();

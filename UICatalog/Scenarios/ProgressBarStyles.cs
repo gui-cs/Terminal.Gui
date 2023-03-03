@@ -121,7 +121,7 @@ namespace UICatalog.Scenarios {
 			};
 
 			ckbBidirectional.Toggled += (e) => {
-				ckbBidirectional.Checked = marqueesBlocksPB.BidirectionalMarquee = marqueesContinuousPB.BidirectionalMarquee = !e;
+				ckbBidirectional.Checked = marqueesBlocksPB.BidirectionalMarquee = marqueesContinuousPB.BidirectionalMarquee = (bool)!e;
 			};
 
 			_pulseTimer = new Timer ((_) => {

@@ -52,7 +52,7 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Percent (50) - 1,
 				Height = Dim.Percent (30),
 			};
-			textView.Text = "TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!" ;
+			textView.Text = "TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!";
 			textView.DrawContent += TextView_DrawContent;
 
 			// This shows how to enable autocomplete in TextView.
@@ -84,17 +84,17 @@ namespace UICatalog.Scenarios {
 			// single-line mode.
 			var chxMultiline = new CheckBox ("Multiline") {
 				X = Pos.Left (textView),
-				Y = Pos.Bottom (textView), 
+				Y = Pos.Bottom (textView),
 				Checked = true
 			};
-			chxMultiline.Toggled += (b) => textView.Multiline = b;
+			chxMultiline.Toggled += (b) => textView.Multiline = (bool)b;
 			Win.Add (chxMultiline);
 
 			var chxWordWrap = new CheckBox ("Word Wrap") {
 				X = Pos.Right (chxMultiline) + 2,
 				Y = Pos.Top (chxMultiline)
 			};
-			chxWordWrap.Toggled += (b) => textView.WordWrap = b;
+			chxWordWrap.Toggled += (b) => textView.WordWrap = (bool)b;
 			Win.Add (chxWordWrap);
 
 			// TextView captures Tabs (so users can enter /t into text) by default;
@@ -108,15 +108,15 @@ namespace UICatalog.Scenarios {
 
 			Key keyTab = textView.GetKeyFromCommand (Command.Tab);
 			Key keyBackTab = textView.GetKeyFromCommand (Command.BackTab);
-			chxCaptureTabs.Toggled += (b) => { 
-				if (b) {
+			chxCaptureTabs.Toggled += (b) => {
+				if (b == true) {
 					textView.AddKeyBinding (keyTab, Command.Tab);
 					textView.AddKeyBinding (keyBackTab, Command.BackTab);
 				} else {
 					textView.ClearKeybinding (keyTab);
 					textView.ClearKeybinding (keyBackTab);
 				}
-				textView.WordWrap = b; 
+				textView.WordWrap = (bool)b;
 			};
 			Win.Add (chxCaptureTabs);
 
@@ -138,7 +138,7 @@ namespace UICatalog.Scenarios {
 			labelMirroringHexEditor.Text = Encoding.UTF8.GetString (array, 0, array.Length);
 			hexEditor.Edited += (kv) => {
 				hexEditor.ApplyEdits ();
-				var array = ((MemoryStream)hexEditor.Source).ToArray (); 
+				var array = ((MemoryStream)hexEditor.Source).ToArray ();
 				labelMirroringHexEditor.Text = Encoding.UTF8.GetString (array, 0, array.Length);
 			};
 			Win.Add (labelMirroringHexEditor);

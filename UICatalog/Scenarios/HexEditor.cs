@@ -72,7 +72,7 @@ namespace UICatalog.Scenarios {
 
 		private void ToggleAllowEdits ()
 		{
-			_hexView.AllowEdits = miAllowEdits.Checked = !miAllowEdits.Checked;
+			_hexView.AllowEdits = (bool)(miAllowEdits.Checked = !miAllowEdits.Checked);
 		}
 
 		private void _hexView_Edited (System.Collections.Generic.KeyValuePair<long, byte> obj)
@@ -171,7 +171,7 @@ namespace UICatalog.Scenarios {
 			sb.Append ("Hello world.\n");
 			sb.Append ("This is a test of the Emergency Broadcast System.\n");
 
-			byte [] buffer = Encoding.Unicode.GetBytes (sb.ToString());
+			byte [] buffer = Encoding.Unicode.GetBytes (sb.ToString ());
 			MemoryStream ms = new MemoryStream (buffer);
 			FileStream file = new FileStream (fileName, FileMode.Create, FileAccess.Write);
 			ms.WriteTo (file);
