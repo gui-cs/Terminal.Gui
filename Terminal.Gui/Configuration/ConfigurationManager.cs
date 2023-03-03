@@ -490,21 +490,20 @@ namespace Terminal.Gui.Configuration {
 		/// <summary>
 		/// Loads all settings found in the various configuraiton storage locations to 
 		/// the <see cref="ConfigurationManager"/>. Optionally,
-		/// resets all settings attributed with <see cref="SerializableConfigurationProperty"/> to the defaults 
-		/// defined in <see cref="LoadAppResources"/>.
+		/// resets all settings attributed with <see cref="SerializableConfigurationProperty"/> to the defaults.
 		/// </summary>
 		/// <remarks>
 		/// Use <see cref="Apply"/> to cause the loaded settings to be applied to the running application.
 		/// </remarks>
 		/// <param name="reset">If <see langword="true"/> the state of <see cref="ConfigurationManager"/> will
-		/// be reset to the defaults defined in <see cref="LoadAppResources"/>.</param>
+		/// be reset to the defaults.</param>
 		public static void Load (bool reset = false)
 		{
 			Debug.WriteLine ($"ConfigurationManager.Load()");
 
 			if (reset) Reset ();
 
-			// LibraryResoruces is always loaded by Reset
+			// LibraryResources is always loaded by Reset
 			if (Locations == ConfigLocations.All) {
 				var embeddedStylesResourceName = Assembly.GetEntryAssembly ()?
 					.GetManifestResourceNames ().FirstOrDefault (x => x.EndsWith (_configFilename));
