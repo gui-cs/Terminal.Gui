@@ -331,7 +331,6 @@ namespace Terminal.Gui {
 		private Point effect3DOffset = new Point (1, 1);
 		private Attribute? effect3DBrush;
 		private ustring title = ustring.Empty;
-		private View child;
 
 		/// <summary>
 		/// Specifies the <see cref="Gui.BorderStyle"/> for a view.
@@ -448,6 +447,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the single child element of a <see cref="View"/>.
 		/// </summary>
+		[JsonIgnore]
 		public View Child { get; set; }
 
 		/// <summary>
@@ -611,7 +611,7 @@ namespace Terminal.Gui {
 				Child.Clear (borderRect);
 			}
 
-			driver.SetAttribute (new Attribute (BorderBrush, Background));
+			driver.SetAttribute (savedAttribute);
 
 			// Draw margin frame
 			if (DrawMarginFrame) {
@@ -635,7 +635,6 @@ namespace Terminal.Gui {
 					driver.DrawWindowFrame (borderRect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill: true, this);
 				}
 			}
-			driver.SetAttribute (savedAttribute);
 		}
 
 		private void DrawChildBorder (Rect frame, bool fill = true)
@@ -732,7 +731,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			driver.SetAttribute (new Attribute (BorderBrush, Background));
+			driver.SetAttribute (savedAttribute);
 
 			// Draw the MarginFrame
 			if (DrawMarginFrame) {
@@ -906,7 +905,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			driver.SetAttribute (new Attribute (BorderBrush, Background));
+			driver.SetAttribute (savedAttribute);
 
 			// Draw the MarginFrame
 			if (DrawMarginFrame) {
@@ -988,9 +987,9 @@ namespace Terminal.Gui {
 		{
 			var driver = Application.Driver;
 			if (DrawMarginFrame) {
-				driver.SetAttribute (new Attribute (BorderBrush, Background));
-				if (view.HasFocus)
-					driver.SetAttribute (new Attribute (Child.ColorScheme.HotNormal.Foreground, Background));
+				driver.SetAttribute (Child.GetNormalColor ());
+				if (Child.HasFocus)
+					driver.SetAttribute (Child.ColorScheme.HotNormal);
 				var padding = view.Border.GetSumThickness ();
 				Rect scrRect;
 				if (view == Child) {
@@ -999,7 +998,7 @@ namespace Terminal.Gui {
 					driver.DrawWindowTitle (scrRect, Title, 0, 0, 0, 0);
 				} else {
 					scrRect = view.ViewToScreen (new Rect (0, 0, view.Frame.Width, view.Frame.Height));
-					driver.DrawWindowTitle (scrRect, Parent.Border.Title,
+					driver.DrawWindowTitle (scrRect, Title,
 						padding.Left, padding.Top, padding.Right, padding.Bottom);
 				}
 			}
@@ -1015,9 +1014,9 @@ namespace Terminal.Gui {
 		{
 			var driver = Application.Driver;
 			if (DrawMarginFrame) {
-				driver.SetAttribute (new Attribute (BorderBrush, Background));
+				driver.SetAttribute (view.GetNormalColor ());
 				if (view.HasFocus) {
-					driver.SetAttribute (new Attribute (view.ColorScheme.HotNormal.Foreground, Background));
+					driver.SetAttribute (view.ColorScheme.HotNormal);
 				}
 				var padding = Parent.Border.GetSumThickness ();
 				var scrRect = Parent.ViewToScreen (new Rect (0, 0, rect.Width, rect.Height));

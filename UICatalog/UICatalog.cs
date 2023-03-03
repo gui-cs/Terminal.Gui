@@ -193,9 +193,6 @@ namespace UICatalog {
 			// Run UI Catalog UI. When it exits, if _selectedScenario is != null then
 			// a Scenario was selected. Otherwise, the user wants to exit UI Catalog.
 			Application.Init ();
-			
-			Application.EnableConsoleScrolling = _enableConsoleScrolling;
-			
 			Application.Run<UICatalogTopLevel> ();
 			Application.Shutdown ();
 
@@ -229,7 +226,7 @@ namespace UICatalog {
 		/// </summary>
 		public class UICatalogTopLevel : Toplevel {
 			public MenuItem miIsMouseDisabled;
-			public MenuItem miEnableConsoleScrolling;
+			public MenuItem miHeightAsBuffer;
 
 			public TileView ContentPane;
 			public ListView CategoryListView;
@@ -451,7 +448,7 @@ namespace UICatalog {
 				return menuItems.ToArray ();
 			}
 
-			MenuItem [] CreateEnableConsoleScrollingMenuItems ()
+			MenuItem [] CreateHeightAsBufferMenuItems ()
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
 				miHeightAsBuffer = new MenuItem {
@@ -463,7 +460,7 @@ namespace UICatalog {
 					miHeightAsBuffer.Checked = !miHeightAsBuffer.Checked;
 					Application.HeightAsBuffer = (bool)miHeightAsBuffer.Checked;
 				};
-				menuItems.Add (miEnableConsoleScrolling);
+				menuItems.Add (miHeightAsBuffer);
 
 				return menuItems.ToArray ();
 			}

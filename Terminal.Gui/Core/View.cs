@@ -1521,6 +1521,7 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
 			}
 
+			var boundsAdjustedForBorder = Bounds;
 			if (!IgnoreBorderPropertyOnRedraw && Border != null) {
 				Border.DrawContent (this);
 				boundsAdjustedForBorder = new Rect (bounds.X + 1, bounds.Y + 1, Math.Max (0, bounds.Width - 2), Math.Max(0, bounds.Height - 2));
@@ -1547,7 +1548,7 @@ namespace Terminal.Gui {
 			}
 
 			// Invoke DrawContentEvent
-			OnDrawContent (bounds);
+			OnDrawContent (boundsAdjustedForBorder);
 
 			if (subviews != null) {
 				foreach (var view in subviews) {
@@ -1573,7 +1574,7 @@ namespace Terminal.Gui {
 			}
 
 			// Invoke DrawContentCompleteEvent
-			OnDrawContentComplete (bounds);
+			OnDrawContentComplete (boundsAdjustedForBorder);
 
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
@@ -2219,50 +2220,34 @@ namespace Terminal.Gui {
 						newDimension = dim.Anchor (superviewDimension);
 						newDimension = AutoSize && autosizeDimension > newDimension ? autosizeDimension : newDimension;
 					}
-				actY = y.Anchor (hostFrame.Height - actH);
-			} else {
-				actY = y?.Anchor (hostFrame.Height) ?? 0;
+					newLocation = pos.Anchor (superviewDimension - newDimension);
+					break;
 
-				actH = Math.Max (CalculateActualHight (height, hostFrame, actY, s), 0);
-			}
+				case Pos.PosCombine:
+					var combine = pos as Pos.PosCombine;
+					int left, right;
+					(left, newDimension) = GetNewLocationAndDimension (superviewLocation, superviewDimension, combine.left, dim, autosizeDimension);
+					(right, newDimension) = GetNewLocationAndDimension (superviewLocation, superviewDimension, combine.right, dim, autosizeDimension);
+					if (combine.add) {
+						newLocation = left + right;
+					} else {
+						newLocation = left - right;
+					}
+					newDimension = Math.Max (CalculateNewDimension (dim, newLocation, superviewDimension, autosizeDimension), 0);
+					break;
 
-			var r = new Rect (actX, actY, actW, actH);
-			if (Frame != r) {
-				Frame = r;
-				if (!SetMinWidthHeight ())
-					TextFormatter.Size = GetBoundsTextFormatterSize ();
-			}
-		}
-
-		private int CalculateActualWidth (Dim width, Rect hostFrame, int actX, Size s)
-		{
-			int actW;
-			switch (width) {
-			case null:
-				actW = AutoSize ? s.Width : hostFrame.Width;
-				break;
-			case Dim.DimCombine combine:
-				int leftActW = CalculateActualWidth (combine.left, hostFrame, actX, s);
-				int rightActW = CalculateActualWidth (combine.right, hostFrame, actX, s);
-				if (combine.add) {
-					actW = leftActW + rightActW;
-				} else {
-					actW = leftActW - rightActW;
+				case Pos.PosAbsolute:
+				case Pos.PosAnchorEnd:
+				case Pos.PosFactor:
+				case Pos.PosFunc:
+				case Pos.PosView:
+				default:
+					newLocation = pos?.Anchor (superviewDimension) ?? 0;
+					newDimension = Math.Max (CalculateNewDimension (dim, newLocation, superviewDimension, autosizeDimension), 0);
+					break;
 				}
-				actW = AutoSize && s.Width > actW ? s.Width : actW;
-				break;
-			case Dim.DimFactor factor when !factor.IsFromRemaining ():
-				actW = width.Anchor (hostFrame.Width);
-				actW = AutoSize && s.Width > actW ? s.Width : actW;
-				break;
-			default:
-				actW = Math.Max (width.Anchor (hostFrame.Width - actX), 0);
-				actW = AutoSize && s.Width > actW ? s.Width : actW;
-				break;
+				return (newLocation, newDimension);
 			}
-
-			return actW;
-		}
 
 			// Recursively calculates the new dimension (width or height) of the given Dim given:
 			//   the current location (x or y)
@@ -2300,51 +2285,20 @@ namespace Terminal.Gui {
 				return newDimension;
 			}
 
-		// https://en.wikipedia.org/wiki/Topological_sorting
-		List<View> TopologicalSort (IEnumerable<View> nodes, ICollection<(View From, View To)> edges)
-		{
-			var result = new List<View> ();
 
-			// Set of all nodes with no incoming edges
-			var noEdgeNodes = new HashSet<View> (nodes.Where (n => edges.All (e => !e.To.Equals (n))));
+			// horiztonal
+			(newX, newW) = GetNewLocationAndDimension (superviewFrame.X, superviewFrame.Width, x, Width, autosize.Width);
 
-			while (noEdgeNodes.Any ()) {
-				//  remove a node n from S
-				var n = noEdgeNodes.First ();
-				noEdgeNodes.Remove (n);
+			// vertical
+			(newY, newH) = GetNewLocationAndDimension (superviewFrame.Y, superviewFrame.Height, y, Height, autosize.Height);
 
-				// add n to tail of L
-				if (n != this?.SuperView)
-					result.Add (n);
-
-				// for each node m with an edge e from n to m do
-				foreach (var e in edges.Where (e => e.From.Equals (n)).ToArray ()) {
-					var m = e.To;
-
-					// remove edge e from the graph
-					edges.Remove (e);
-
-					// if m has no other incoming edges then
-					if (edges.All (me => !me.To.Equals (m)) && m != this?.SuperView) {
-						// insert m into S
-						noEdgeNodes.Add (m);
-					}
+			var r = new Rect (newX, newY, newW, newH);
+			if (Frame != r) {
+				Frame = r;
+				if (!SetMinWidthHeight ()) {
+					TextFormatter.Size = GetBoundsTextFormatterSize ();
 				}
 			}
-
-			if (edges.Any ()) {
-				(var from, var to) = edges.First ();
-				if (from != Application.Top) {
-					if (!ReferenceEquals (from, to)) {
-						throw new InvalidOperationException ($"TopologicalSort (for Pos/Dim) cannot find {from} linked with {to}. Did you forget to add it to {this}?");
-					} else {
-						throw new InvalidOperationException ("TopologicalSort encountered a recursive cycle in the relative Pos/Dim in the views of " + this);
-					}
-				}
-			}
-
-			// return L (a topologically sorted order)
-			return result;
 		}
 
 		/// <summary>
@@ -2436,21 +2390,82 @@ namespace Terminal.Gui {
 			}
 		}
 
-			void CollectAll (View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
-			{
-				foreach (var v in from.InternalSubviews) {
-					nNodes.Add (v);
-					if (v.layoutStyle != LayoutStyle.Computed) {
-						continue;
+		internal void CollectAll (View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
+		{
+			foreach (var v in from.InternalSubviews) {
+				nNodes.Add (v);
+				if (v.layoutStyle != LayoutStyle.Computed) {
+					continue;
+				}
+				CollectPos (v.X, v, ref nNodes, ref nEdges);
+				CollectPos (v.Y, v, ref nNodes, ref nEdges);
+				CollectDim (v.Width, v, ref nNodes, ref nEdges);
+				CollectDim (v.Height, v, ref nNodes, ref nEdges);
+			}
+		}
+
+		// https://en.wikipedia.org/wiki/Topological_sorting
+		internal static List<View> TopologicalSort (View superView, IEnumerable<View> nodes, ICollection<(View From, View To)> edges)
+		{
+			var result = new List<View> ();
+
+			// Set of all nodes with no incoming edges
+			var noEdgeNodes = new HashSet<View> (nodes.Where (n => edges.All (e => !e.To.Equals (n))));
+
+			while (noEdgeNodes.Any ()) {
+				//  remove a node n from S
+				var n = noEdgeNodes.First ();
+				noEdgeNodes.Remove (n);
+
+				// add n to tail of L
+				if (n != superView)
+					result.Add (n);
+
+				// for each node m with an edge e from n to m do
+				foreach (var e in edges.Where (e => e.From.Equals (n)).ToArray ()) {
+					var m = e.To;
+
+					// remove edge e from the graph
+					edges.Remove (e);
+
+					// if m has no other incoming edges then
+					if (edges.All (me => !me.To.Equals (m)) && m != superView) {
+						// insert m into S
+						noEdgeNodes.Add (m);
 					}
-					CollectPos (v.X, v, ref nNodes, ref nEdges);
-					CollectPos (v.Y, v, ref nNodes, ref nEdges);
-					CollectDim (v.Width, v, ref nNodes, ref nEdges);
-					CollectDim (v.Height, v, ref nNodes, ref nEdges);
 				}
 			}
 
-			CollectAll (this, ref nodes, ref edges);
+			if (edges.Any ()) {
+				(var from, var to) = edges.First ();
+				if (from != Application.Top) {
+					if (!ReferenceEquals (from, to)) {
+						throw new InvalidOperationException ($"TopologicalSort (for Pos/Dim) cannot find {from} linked with {to}. Did you forget to add it to {superView}?");
+					} else {
+						throw new InvalidOperationException ("TopologicalSort encountered a recursive cycle in the relative Pos/Dim in the views of " + superView);
+					}
+				}
+			}
+			// return L (a topologically sorted order)
+			return result;
+		} // TopologicalSort
+		
+		
+		/// <summary>
+		/// Invoked when a view starts executing or when the dimensions of the view have changed, for example in
+		/// response to the container view or terminal resizing.
+		/// </summary>
+		/// <remarks>
+		/// Calls <see cref="OnLayoutComplete"/> (which raises the <see cref="LayoutComplete"/> event) before it returns.
+		/// </remarks>
+		public virtual void LayoutSubviews ()
+		{
+			if (!LayoutNeeded) {
+				return;
+			}
+
+			var oldBounds = Bounds;
+			OnLayoutStarted (new LayoutEventArgs () { OldBounds = oldBounds });
 
 			TextFormatter.Size = GetBoundsTextFormatterSize ();
 

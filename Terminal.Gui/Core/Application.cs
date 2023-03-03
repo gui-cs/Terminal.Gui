@@ -114,36 +114,28 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static View WantContinuousButtonPressedView { get; private set; }
 
-		private static bool? _enableConsoleScrolling;
+		private static bool? _heightAsBuffer;
 
 		/// <summary>
-		/// The current <see cref="ConsoleDriver.EnableConsoleScrolling"/> used in the terminal.
+		/// The current <see cref="ConsoleDriver.HeightAsBuffer"/> used in the terminal.
 		/// </summary>
 		/// 
 		[SerializableConfigurationProperty (Scope = typeof(SettingsScope))]
 		public static bool HeightAsBuffer {
 			get {
 				if (Driver == null) {
-					return _enableConsoleScrolling.HasValue && _enableConsoleScrolling.Value;
+					return _heightAsBuffer.HasValue && _heightAsBuffer.Value;
 				}
-				return Driver.EnableConsoleScrolling;
+				return Driver.HeightAsBuffer;
 			}
 			set {
-				_enableConsoleScrolling = value;
+				_heightAsBuffer = value;
 				if (Driver == null) {
 					return;
 				}
-				Driver.EnableConsoleScrolling = value;
-			}
-		}
 
-		/// <summary>
-		/// This API is deprecated; use <see cref="EnableConsoleScrolling"/> instead.
-		/// </summary>
-		[Obsolete ("This API is deprecated; use EnableConsoleScrolling instead.", false)]
-		public static bool HeightAsBuffer {
-			get => EnableConsoleScrolling;
-			set => EnableConsoleScrolling = value;
+				Driver.HeightAsBuffer = _heightAsBuffer.Value;
+			}
 		}
 
 		static Key alternateForwardKey = Key.PageDown | Key.CtrlMask;
@@ -165,7 +157,7 @@ namespace Terminal.Gui {
 
 		static void OnAlternateForwardKeyChanged (Key oldKey)
 		{
-			foreach (var top in toplevels.ToArray ()) {
+			foreach (var top in toplevels.ToArray()) {
 				top.OnAlternateForwardKeyChanged (oldKey);
 			}
 		}
@@ -189,7 +181,7 @@ namespace Terminal.Gui {
 
 		static void OnAlternateBackwardKeyChanged (Key oldKey)
 		{
-			foreach (var top in toplevels.ToArray ()) {
+			foreach (var top in toplevels.ToArray()) {
 				top.OnAlternateBackwardKeyChanged (oldKey);
 			}
 		}
@@ -221,7 +213,7 @@ namespace Terminal.Gui {
 		static void OnQuitKeyChanged (Key oldKey)
 		{
 			// Duplicate the list so if it changes during enumeration we're safe
-			foreach (var top in toplevels.ToArray ()) {
+			foreach (var top in toplevels.ToArray()) {
 				top.OnQuitKeyChanged (oldKey);
 			}
 		}
@@ -453,7 +445,7 @@ namespace Terminal.Gui {
 			MainLoop = new MainLoop (mainLoopDriver);
 
 			try {
-				Driver.EnableConsoleScrolling = EnableConsoleScrolling;
+				Driver.HeightAsBuffer = HeightAsBuffer;
 				Driver.Init (TerminalResized);
 			} catch (InvalidOperationException ex) {
 				// This is a case where the driver is unable to initialize the console.
@@ -1129,7 +1121,6 @@ namespace Terminal.Gui {
 			NotifyStopRunState = null;
 			_initialized = false;
 			mouseGrabView = null;
-			_enableConsoleScrolling = false;
 
 			// Reset synchronization context to allow the user to run async/await,
 			// as the main loop has been ended, the synchronization context from 

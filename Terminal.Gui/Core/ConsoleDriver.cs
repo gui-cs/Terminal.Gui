@@ -89,7 +89,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Indicates the RGB for true colors.
+	/// 
 	/// </summary>
 	public class TrueColor {
 		/// <summary>
@@ -119,7 +119,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Converts true color to console color.
+		/// 
 		/// </summary>
 		/// <returns></returns>
 		public Color ToConsoleColor ()
@@ -504,7 +504,7 @@ namespace Terminal.Gui {
 			public bool Equals (string x, string y)
 			{
 				if (x != null && y != null) {
-					return string.Equals (x, y, StringComparison.InvariantCultureIgnoreCase);
+					return x.ToLowerInvariant () == y.ToLowerInvariant ();
 				}
 				return false;
 			}
@@ -659,7 +659,72 @@ namespace Terminal.Gui {
 		/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Block"/></remarks>
 		BoxFix = 0x02020164,
 	}
-	
+
+	///// <summary>
+	///// Special characters that can be drawn with 
+	///// </summary>
+	//public enum SpecialChar {
+	//	/// <summary>
+	//	/// Horizontal line character.
+	//	/// </summary>
+	//	HLine,
+
+	//	/// <summary>
+	//	/// Vertical line character.
+	//	/// </summary>
+	//	VLine,
+
+	//	/// <summary>
+	//	/// Stipple pattern
+	//	/// </summary>
+	//	Stipple,
+
+	//	/// <summary>
+	//	/// Diamond character
+	//	/// </summary>
+	//	Diamond,
+
+	//	/// <summary>
+	//	/// Upper left corner
+	//	/// </summary>
+	//	ULCorner,
+
+	//	/// <summary>
+	//	/// Lower left corner
+	//	/// </summary>
+	//	LLCorner,
+
+	//	/// <summary>
+	//	/// Upper right corner
+	//	/// </summary>
+	//	URCorner,
+
+	//	/// <summary>
+	//	/// Lower right corner
+	//	/// </summary>
+	//	LRCorner,
+
+	//	/// <summary>
+	//	/// Left tee
+	//	/// </summary>
+	//	LeftTee,
+
+	//	/// <summary>
+	//	/// Right tee
+	//	/// </summary>
+	//	RightTee,
+
+	//	/// <summary>
+	//	/// Top tee
+	//	/// </summary>
+	//	TopTee,
+
+	//	/// <summary>
+	//	/// The bottom tee.
+	//	/// </summary>
+	//	BottomTee,
+	//}
+
 	/// <summary>
 	/// ConsoleDriver is an abstract class that defines the requirements for a console driver.  
 	/// There are currently three implementations: <see cref="CursesDriver"/> (for Unix and Mac), <see cref="WindowsDriver"/>, and <see cref="NetDriver"/> that uses the .NET Console API.
@@ -696,27 +761,9 @@ namespace Terminal.Gui {
 		public abstract IClipboard Clipboard { get; }
 
 		/// <summary>
-		/// <para>
-		/// If <see langword="false"/> (the default) the height of the Terminal.Gui application (<see cref="Rows"/>) 
-		/// tracks to the height of the visible console view when the console is resized. In this case 
-		/// scrolling in the console will be disabled and all <see cref="Rows"/> will remain visible.
-		/// </para>
-		/// <para>
-		/// If <see langword="true"/> then height of the Terminal.Gui application <see cref="Rows"/> only tracks 
-		/// the height of the visible console view when the console is made larger (the application will only grow in height, never shrink). 
-		/// In this case console scrolling is enabled and the contents (<see cref="Rows"/> high) will scroll
-		/// as the console scrolls. 
-		/// </para>
+		/// If false height is measured by the window height and thus no scrolling.
+		/// If true then height is measured by the buffer height, enabling scrolling.
 		/// </summary>
-		/// <remarks>
-		/// NOTE: This functionaliy is currently broken on Windows Terminal.
-		/// </remarks>
-		public abstract bool EnableConsoleScrolling { get; set; }
-
-		/// <summary>
-		/// This API is deprecated; use <see cref="EnableConsoleScrolling"/> instead.
-		/// </summary>
-		[Obsolete ("This API is deprecated; use EnableConsoleScrolling instead.", false)]
 		public abstract bool HeightAsBuffer { get; set; }
 
 		/// <summary>

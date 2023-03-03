@@ -12,10 +12,9 @@ namespace UICatalog.Scenarios {
 			var borderStyle = BorderStyle.Double;
 			var drawMarginFrame = false;
 			var borderThickness = new Thickness (1, 2, 3, 4);
-			var borderBrush = Color.BrightMagenta;
-			;
+			var borderBrush = Colors.Base.HotFocus.Foreground;
 			var padding = new Thickness (1, 2, 3, 4);
-			var background = Color.Cyan;
+			var background = Colors.Base.HotNormal.Foreground;
 			var effect3D = true;
 
 			var win = new Window (new Rect (5, 5, 40, 20), "Test", 8,

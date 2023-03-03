@@ -749,7 +749,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		WheeledUp = unchecked((int)0x10000000),
 		/// <summary>
-		/// Vertical button wheeled down.
+		/// Vertical button wheeled up.
 		/// </summary>
 		WheeledDown = unchecked((int)0x20000000),
 		/// <summary>

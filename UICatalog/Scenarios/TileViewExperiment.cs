@@ -27,7 +27,7 @@ namespace UICatalog.Scenarios {
 
 			Application.Top.Add (menu);
 
-			var frame = new FrameView () {
+			var frame1 = new FrameView () {
 				X = 0,
 				Y = 1,
 				Width = 15, //Dim.Fill (),
@@ -35,16 +35,22 @@ namespace UICatalog.Scenarios {
 					     //IgnoreBorderPropertyOnRedraw = true
 
 			};
-			frame.Border.BorderStyle = BorderStyle.Double;
+			frame1.Border.BorderStyle = BorderStyle.Double;
 
-			Application.Top.Add (frame);
+			var frame2 = new FrameView () {
+				X = 0,
+				Y = Pos.Bottom (frame1) + 1,
+				Width = 15, //Dim.Fill (),
+				Height = 15, //Dim.Fill (),
+					     //IgnoreBorderPropertyOnRedraw = true
 
 			};
 			frame2.Border.BorderStyle = BorderStyle.Single;
 
-			ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
+			//ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
 
 			Application.Top.Add (frame1);
+			Application.Top.Add (frame2);
 
 			var view1 = new TextField () {
 				//Title = "View 1",
@@ -65,9 +71,8 @@ namespace UICatalog.Scenarios {
 			};
 
 			frame1.Add (view1);
-			frame2.Add (view1);
 
-			frame.Add (view3);
+			//var view12splitter = new SplitterEventArgs
 
 			//var view2 = new FrameView () {
 			//	Title = "View 2",
@@ -106,20 +111,20 @@ namespace UICatalog.Scenarios {
 			//	Border = new Border () { BorderStyle = BorderStyle.Single }
 			//};
 
-			frame.Add (view4);
+			//frame.Add (view4);
 
-			var view5 = new FrameView () {
-				Title = "View 5",
-				Text = "View5 below View4 view4.Width/5 Double",
-				X = Pos.Left (view2),
-				Y = Pos.Bottom (view4) - 1,
-				Width = view4.Width,
-				Height = 5,
-				ColorScheme = Colors.ColorSchemes ["TopLevel"],
-				Border = new Border () { BorderStyle = BorderStyle.Double }
-			};
+			//var view5 = new FrameView () {
+			//	Title = "View 5",
+			//	Text = "View5 below View4 view4.Width/5 Double",
+			//	X = Pos.Left (view2),
+			//	Y = Pos.Bottom (view4) - 1,
+			//	Width = view4.Width,
+			//	Height = 5,
+			//	ColorScheme = Colors.ColorSchemes ["TopLevel"],
+			//	Border = new Border () { BorderStyle = BorderStyle.Double }
+			//};
 
-			frame.Add (view5);
+			//frame.Add (view5);
 		}
 	}
 }
