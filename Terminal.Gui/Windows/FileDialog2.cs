@@ -24,7 +24,7 @@ namespace Terminal.Gui {
 		private const string HeaderSize = "Size";
 		private const string HeaderModified = "Modified";
 		private const string HeaderType = "Type";
-		
+
 		/// <summary>
 		/// True if the file/folder must exist already to be selected.
 		/// This prevents user from entering the name of something that
@@ -76,7 +76,7 @@ namespace Terminal.Gui {
 		private Label lblUp;
 		private Label lblFeedback;
 
-		private CollectionNavigator collectionNavigator = new CollectionNavigator();
+		private CollectionNavigator collectionNavigator = new CollectionNavigator ();
 
 		private CaptionedTextField tbFind;
 		private SpinnerLabel spinnerLabel;
@@ -92,7 +92,7 @@ namespace Terminal.Gui {
 
 			var lblPath = new Label (">");
 			this.btnOk = new Button ("Ok") {
-				Y = Pos.AnchorEnd(1),
+				Y = Pos.AnchorEnd (1),
 				X = Pos.AnchorEnd (okWidth)
 			};
 			this.btnOk.Clicked += this.Accept;
@@ -148,9 +148,9 @@ namespace Terminal.Gui {
 				Width = Dim.Fill (0),
 				Height = Dim.Fill (1),
 			};
-			this.splitContainer.SetSplitterPos(0,30);
+			this.splitContainer.SetSplitterPos (0, 30);
 			this.splitContainer.Border.BorderStyle = BorderStyle.None;
-			this.splitContainer.Tiles.ElementAt(0).ContentView.Visible = false;
+			this.splitContainer.Tiles.ElementAt (0).ContentView.Visible = false;
 
 			this.tableView = new TableView () {
 				Width = Dim.Fill (),
@@ -160,20 +160,17 @@ namespace Terminal.Gui {
 			this.tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
 			this.tableView.KeyPress += (k) => {
 				if (this.tableView.SelectedRow <= 0) {
-					this.NavigateIf (k, Key.CursorUp, this.tbPath);					
-				}
-				else
-				{
+					this.NavigateIf (k, Key.CursorUp, this.tbPath);
+				} else {
 					if (splitContainer.Tiles.First ().ContentView.Visible && tableView.SelectedColumn == 0) {
 						this.NavigateIf (k, Key.CursorLeft, this.treeView);
 					}
 
-					if (this.tableView.HasFocus && 
-					!k.KeyEvent.Key.HasFlag(Key.CtrlMask) &&
-					!k.KeyEvent.Key.HasFlag(Key.AltMask) &&
-					 char.IsLetterOrDigit((char)k.KeyEvent.KeyValue))
-					{
-						CycleToNextTableEntryBeginningWith(k);
+					if (this.tableView.HasFocus &&
+					!k.KeyEvent.Key.HasFlag (Key.CtrlMask) &&
+					!k.KeyEvent.Key.HasFlag (Key.AltMask) &&
+					 char.IsLetterOrDigit ((char)k.KeyEvent.KeyValue)) {
+						CycleToNextTableEntryBeginningWith (k);
 					}
 				}
 
@@ -207,14 +204,14 @@ namespace Terminal.Gui {
 
 			this.treeView.SelectionChanged += this.TreeView_SelectionChanged;
 
-			this.splitContainer.Tiles.ElementAt(0).ContentView.Add (this.treeView);
-			this.splitContainer.Tiles.ElementAt(1).ContentView.Add (this.tableView);
+			this.splitContainer.Tiles.ElementAt (0).ContentView.Add (this.treeView);
+			this.splitContainer.Tiles.ElementAt (1).ContentView.Add (this.tableView);
 
 			this.btnToggleSplitterCollapse = new Button (">>") {
 				Y = Pos.AnchorEnd (1),
 			};
 			this.btnToggleSplitterCollapse.Clicked += () => {
-				var tile = this.splitContainer.Tiles.ElementAt(0);
+				var tile = this.splitContainer.Tiles.ElementAt (0);
 
 				var newState = !tile.ContentView.Visible;
 				tile.ContentView.Visible = newState;
@@ -228,15 +225,15 @@ namespace Terminal.Gui {
 				Width = 16,
 				Y = Pos.AnchorEnd (1),
 			};
-			spinnerLabel = new SpinnerLabel() {
-				X = Pos.Right(tbFind) + 1,
+			spinnerLabel = new SpinnerLabel () {
+				X = Pos.Right (tbFind) + 1,
 				Y = Pos.AnchorEnd (1),
 				Width = 1,
 				Height = 1,
 				Visible = false,
 			};
 
-			tbFind.TextChanged += (o)=>RestartSearch ();
+			tbFind.TextChanged += (o) => RestartSearch ();
 
 			lblFeedback = new Label {
 				Y = Pos.AnchorEnd (1),
@@ -267,7 +264,7 @@ namespace Terminal.Gui {
 			this.tableView.KeyUp += (k) => k.Handled = this.TableView_KeyUp (k.KeyEvent);
 			this.tableView.SelectedCellChanged += this.TableView_SelectedCellChanged;
 			this.tableView.ColorScheme = ColorSchemeDefault;
-			
+
 			this.tableView.AddKeyBinding (Key.Home, Command.TopHome);
 			this.tableView.AddKeyBinding (Key.End, Command.BottomEnd);
 			this.tableView.AddKeyBinding (Key.Home | Key.ShiftMask, Command.TopHomeExtend);
@@ -279,11 +276,10 @@ namespace Terminal.Gui {
 
 
 				var selected = treeView.SelectedObject;
-				if(selected != null) {
-					if (!treeView.CanExpand (selected) || treeView.IsExpanded(selected)) {
+				if (selected != null) {
+					if (!treeView.CanExpand (selected) || treeView.IsExpanded (selected)) {
 						this.NavigateIf (k, Key.CursorRight, this.tableView);
-					}
-					else
+					} else
 					if (treeView.GetObjectRow (selected) == 0) {
 						this.NavigateIf (k, Key.CursorUp, this.tbPath);
 					}
@@ -295,7 +291,7 @@ namespace Terminal.Gui {
 
 				k.Handled = this.TreeView_KeyDown (k.KeyEvent);
 
-				};
+			};
 
 			this.AllowsMultipleSelection = false;
 
@@ -315,9 +311,10 @@ namespace Terminal.Gui {
 			this.Add (this.tbPath);
 			this.Add (this.splitContainer);
 		}
+		/// <inheritdoc/>
 		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
-			if(this.NavigateIf (keyEvent, Key.CtrlMask | Key.F, this.tbFind)) {
+			if (this.NavigateIf (keyEvent, Key.CtrlMask | Key.F, this.tbFind)) {
 				return true;
 			}
 
@@ -325,28 +322,29 @@ namespace Terminal.Gui {
 		}
 		private void RestartSearch ()
 		{
-			if(disposed || state?.Directory == null ) {
+			if (disposed || state?.Directory == null) {
 				return;
 			}
 
-			if(state is SearchState oldSearch) {
+			if (state is SearchState oldSearch) {
 				oldSearch.Cancel ();
 			}
 
 			// user is clearing search terms
 			if (tbFind.Text == null || tbFind.Text.Length == 0) {
-				
+
 				// Wait for search cancellation (if any) to finish
 				// then push the current dir state
-				lock(onlyOneSearchLock){
+				lock (onlyOneSearchLock) {
 					PushState (new FileDialogState (state.Directory, this), false);
 				}
 				return;
 			}
-			
+
 			PushState (new SearchState (state?.Directory, this, tbFind.Text.ToString ()), true);
 		}
 
+		/// <inheritdoc/>
 		protected override void Dispose (bool disposing)
 		{
 			disposed = true;
@@ -364,42 +362,39 @@ namespace Terminal.Gui {
 
 		private void CycleToNextTableEntryBeginningWith (KeyEventEventArgs keyEvent)
 		{
-			if(tableView.Table.Rows.Count == 0)
-			{
+			if (tableView.Table.Rows.Count == 0) {
 				return;
 			}
 
 			var row = tableView.SelectedRow;
 
 			// There is a multi select going on and not just for the current row
-			if(tableView.GetAllSelectedCells().Any(c=>c.Y != row))
-			{
+			if (tableView.GetAllSelectedCells ().Any (c => c.Y != row)) {
 				return;
 			}
 
-			int match = collectionNavigator.GetNextMatchingItem(row,(char)keyEvent.KeyEvent.KeyValue);
+			int match = collectionNavigator.GetNextMatchingItem (row, (char)keyEvent.KeyEvent.KeyValue);
 
-			if(match != -1)
-			{
+			if (match != -1) {
 				tableView.SelectedRow = match;
-				tableView.EnsureValidSelection();
-				tableView.EnsureSelectedCellIsVisible();
+				tableView.EnsureValidSelection ();
+				tableView.EnsureSelectedCellIsVisible ();
 				keyEvent.Handled = true;
 			}
 		}
 
 		private void UpdateCollectionNavigator ()
 		{
-			
+
 			var collection = tableView
 				.Table
 				.Rows
-				.Cast<DataRow>()
-				.Select((o,idx)=>RowToStats(idx))
-				.Select(s=>s.FileSystemInfo.Name)
-				.ToArray();
+				.Cast<DataRow> ()
+				.Select ((o, idx) => RowToStats (idx))
+				.Select (s => s.FileSystemInfo.Name)
+				.ToArray ();
 
-			collectionNavigator = new CollectionNavigator(collection);
+			collectionNavigator = new CollectionNavigator (collection);
 		}
 
 		/// <summary>
@@ -444,10 +439,11 @@ namespace Terminal.Gui {
 		/// be used if <see cref="AllowsMultipleSelection"/> is off and <see cref="Canceled"/>
 		/// is true.
 		/// </summary>
-		public string Path { get => this.tbPath.Text.ToString ();
-			set { 
+		public string Path {
+			get => this.tbPath.Text.ToString ();
+			set {
 				this.tbPath.Text = value;
-				this.tbPath.MoveCursorToEnd();
+				this.tbPath.MoveCursorToEnd ();
 			}
 		}
 
@@ -456,7 +452,7 @@ namespace Terminal.Gui {
 		/// symbol(s) to use as an 'icon' for files/folders.  Defaults to
 		/// null (i.e. no icons).
 		/// </summary>
-		public Func<FileSystemInfo,string> IconGetter {get;set;} = null;
+		public Func<FileSystemInfo, string> IconGetter { get; set; } = null;
 
 		/// <summary>
 		/// Gets or Sets a value indicating whether to allow selecting 
@@ -471,7 +467,7 @@ namespace Terminal.Gui {
 		/// Gets or Sets a value indicating whether different colors
 		/// should be used for different file types/directories.
 		/// </summary>
-		public bool Monochrome {get;set;}
+		public bool Monochrome { get; set; }
 
 		/// <summary>
 		/// Gets or Sets a collection of file types that the user can/must select.  Only applies
@@ -508,8 +504,8 @@ namespace Terminal.Gui {
 
 			this.Move (1, 0, false);
 
-			
-			if (ustring.IsNullOrEmpty(Title)) {
+
+			if (ustring.IsNullOrEmpty (Title)) {
 				return;
 			}
 
@@ -518,9 +514,8 @@ namespace Terminal.Gui {
 
 			if (titleWidth > bounds.Width) {
 				title = title.Substring (0, bounds.Width);
-			}
-			else {
-				if(titleWidth +2 < bounds.Width) {
+			} else {
+				if (titleWidth + 2 < bounds.Width) {
 					title = '╡' + this.Title.ToString () + '╞';
 				}
 				titleWidth += 2;
@@ -531,7 +526,7 @@ namespace Terminal.Gui {
 			padLeft = Math.Min (bounds.Width, padLeft);
 			padLeft = Math.Max (0, padLeft);
 
-			var padRight = bounds.Width - (padLeft + titleWidth +2);
+			var padRight = bounds.Width - (padLeft + titleWidth + 2);
 			padRight = Math.Min (bounds.Width, padRight);
 			padRight = Math.Max (0, padRight);
 
@@ -545,7 +540,7 @@ namespace Terminal.Gui {
 			Driver.AddStr (title);
 
 			Driver.SetAttribute (
-			    new Attribute (this.ColorScheme.Normal.Foreground, this.ColorScheme.Normal.Background));	
+			    new Attribute (this.ColorScheme.Normal.Foreground, this.ColorScheme.Normal.Background));
 
 			Driver.AddStr (ustring.Make (Enumerable.Repeat (Driver.HDLine, padRight)));
 		}
@@ -598,13 +593,13 @@ namespace Terminal.Gui {
 			if (ustring.IsNullOrEmpty (Title)) {
 				switch (OpenMode) {
 				case OpenMode.File:
-					this.Title = $"OPEN {(MustExist ? "EXISTING ":"")}FILE";
+					this.Title = $"OPEN {(MustExist ? "EXISTING " : "")}FILE";
 					break;
 				case OpenMode.Directory:
 					this.Title = $"OPEN {(MustExist ? "EXISTING " : "")}DIRECTORY";
 					break;
 				case OpenMode.Mixed:
-					this.Title = $"OPEN{(MustExist ? " EXISTING":"")}";
+					this.Title = $"OPEN{(MustExist ? " EXISTING" : "")}";
 					break;
 				}
 			}
@@ -661,7 +656,7 @@ namespace Terminal.Gui {
 			this.tbPath.Text = f.FullName;
 
 			if (AllowsMultipleSelection) {
-				this.MultiSelected = new List<string> { f.FullName}.AsReadOnly();
+				this.MultiSelected = new List<string> { f.FullName }.AsReadOnly ();
 			}
 			this.Canceled = false;
 			Application.RequestStop ();
@@ -670,7 +665,7 @@ namespace Terminal.Gui {
 		private void Accept ()
 		{
 			if (!this.IsCompatibleWithOpenMode (this.tbPath.Text.ToString (), out string reason)) {
-				if(reason != null) {
+				if (reason != null) {
 					lblFeedback.Text = reason;
 				}
 				return;
@@ -685,7 +680,7 @@ namespace Terminal.Gui {
 		{
 			if (!keyEvent.Handled) {
 
-				if(NavigateIf (keyEvent.KeyEvent, isKey, to)) {
+				if (NavigateIf (keyEvent.KeyEvent, isKey, to)) {
 					keyEvent.Handled = true;
 				}
 			}
@@ -755,7 +750,7 @@ namespace Terminal.Gui {
 			}
 			FileSystemInfo dest;
 
-			if(stats.IsParent) {
+			if (stats.IsParent) {
 				dest = state.Directory;
 			} else {
 				dest = stats.FileSystemInfo;
@@ -843,17 +838,15 @@ namespace Terminal.Gui {
 			nameStyle.RepresentationGetter = (i) => {
 
 				var stats = this.state?.Children [(int)i];
-				
-				if(stats == null)
-				{
+
+				if (stats == null) {
 					return string.Empty;
 				}
 
-				var icon = stats.IsParent ? null : IconGetter?.Invoke(stats.FileSystemInfo);
+				var icon = stats.IsParent ? null : IconGetter?.Invoke (stats.FileSystemInfo);
 
-				if(icon != null)
-				{
-					return icon + " " + stats.Name; 
+				if (icon != null) {
+					return icon + " " + stats.Name;
 				}
 				return stats.Name;
 			};
@@ -879,14 +872,14 @@ namespace Terminal.Gui {
 			var multi = this.MultiRowToStats ();
 			string reason = null;
 			if (multi.Any ()) {
-				if (multi.All (m=>this.IsCompatibleWithOpenMode(m.FileSystemInfo.FullName,out reason))) {
+				if (multi.All (m => this.IsCompatibleWithOpenMode (m.FileSystemInfo.FullName, out reason))) {
 					this.Accept (multi);
 					return;
 				} else {
-					if(reason != null) {
+					if (reason != null) {
 						lblFeedback.Text = reason;
 					}
-					
+
 					return;
 				}
 			}
@@ -954,13 +947,13 @@ namespace Terminal.Gui {
 			}
 
 			switch (this.OpenMode) {
-			case OpenMode.Directory: 
-				if(MustExist && !Directory.Exists(s)) {
+			case OpenMode.Directory:
+				if (MustExist && !Directory.Exists (s)) {
 					reason = "Must select an existing directory";
 					return false;
 				}
 
-				if(File.Exists (s)) {
+				if (File.Exists (s)) {
 					reason = "File already exists with that name";
 					return false;
 				}
@@ -1000,7 +993,7 @@ namespace Terminal.Gui {
 		}
 		private void PushState (FileDialogState newState, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true)
 		{
-			if(state is SearchState search) {
+			if (state is SearchState search) {
 				search.Cancel ();
 			}
 
@@ -1055,7 +1048,7 @@ namespace Terminal.Gui {
 
 			this.sorter.ApplySort ();
 			this.tableView.Update ();
-			UpdateCollectionNavigator();
+			UpdateCollectionNavigator ();
 		}
 
 		private void BuildRow (int idx)
@@ -1067,8 +1060,7 @@ namespace Terminal.Gui {
 		{
 			var stats = this.RowToStats (args.RowIndex);
 
-			if(Monochrome)
-			{
+			if (Monochrome) {
 				return ColorSchemeDefault;
 			}
 
@@ -1371,13 +1363,13 @@ namespace Terminal.Gui {
 
 			// TODO: Add thread safe child adding
 			List<FileSystemInfoStats> found = new List<FileSystemInfoStats> ();
-			object oLockFound = new object();
+			object oLockFound = new object ();
 			CancellationTokenSource token = new CancellationTokenSource ();
 
 			public SearchState (DirectoryInfo dir, FileDialog2 parent, string searchTerms) : base (dir, parent)
 			{
 				this.searchTerms = searchTerms;
-				Children = new FileSystemInfoStats[0];
+				Children = new FileSystemInfoStats [0];
 				BeginSearch ();
 			}
 
@@ -1395,7 +1387,7 @@ namespace Terminal.Gui {
 
 			private void UpdateChildren ()
 			{
-				lock(Parent.onlyOneSearchLock) {
+				lock (Parent.onlyOneSearchLock) {
 					while (!cancel && !finished) {
 
 						try {
@@ -1412,8 +1404,8 @@ namespace Terminal.Gui {
 						UpdateChildrenToFound ();
 					}
 
-					if(finished && !cancel) {
-						UpdateChildrenToFound();
+					if (finished && !cancel) {
+						UpdateChildrenToFound ();
 					}
 
 					Application.MainLoop.Invoke (() => {
@@ -1440,17 +1432,17 @@ namespace Terminal.Gui {
 			private void RecursiveFind (DirectoryInfo directory)
 			{
 				foreach (var f in GetChildren (directory)) {
-					
-					if(cancel) {
+
+					if (cancel) {
 						return;
 					}
-						
+
 					if (f.IsParent) {
 						continue;
-					}	
+					}
 
 					if (f.Name.Contains (searchTerms)) {
-						lock(oLockFound){
+						lock (oLockFound) {
 							found.Add (f);
 						}
 					}
@@ -1489,7 +1481,7 @@ namespace Terminal.Gui {
 			internal virtual void RefreshChildren ()
 			{
 				var dir = this.Directory;
-				Children = GetChildren (dir).ToArray();
+				Children = GetChildren (dir).ToArray ();
 			}
 
 			protected virtual IEnumerable<FileSystemInfoStats> GetChildren (DirectoryInfo dir)
@@ -1528,7 +1520,7 @@ namespace Terminal.Gui {
 					return children;
 				} catch (Exception) {
 					// Access permissions Exceptions, Dir not exists etc
-					return Enumerable.Empty<FileSystemInfoStats>();
+					return Enumerable.Empty<FileSystemInfoStats> ();
 				}
 			}
 
@@ -1539,8 +1531,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		internal class CaptionedTextField : TextField
-		{
+		internal class CaptionedTextField : TextField {
 			/// <summary>
 			/// A text prompt to display in the field when it does not
 			/// have focus and no text is yet entered.
@@ -1556,36 +1547,35 @@ namespace Terminal.Gui {
 			{
 				base.Redraw (bounds);
 
-				if (HasFocus || Caption == null || Caption.Length == 0 
+				if (HasFocus || Caption == null || Caption.Length == 0
 					|| Text?.Length > 0) {
 					return;
-				}	
+				}
 
 				var color = new Attribute (CaptionColor, GetNormalColor ().Background);
 				Driver.SetAttribute (color);
-				
+
 				Move (0, 0);
 				var render = Caption;
-					
-				if(render.ConsoleWidth > Bounds.Width) {
-					render = render.RuneSubstring(0,Bounds.Width);
+
+				if (render.ConsoleWidth > Bounds.Width) {
+					render = render.RuneSubstring (0, Bounds.Width);
 				}
 
 				Driver.AddStr (render);
-				
+
 			}
 		}
-		internal class SpinnerLabel : Label
-		{
+		internal class SpinnerLabel : Label {
 			private Rune [] runes = new Rune [] { '|', '/', '\u2500', '/', '\u2500', '\\' };
 			private int currentIdx = 0;
 			private DateTime lastRender = DateTime.MinValue;
 
 			public override void Redraw (Rect bounds)
 			{
-				if(DateTime.Now - lastRender > TimeSpan.FromMilliseconds(250)) {
+				if (DateTime.Now - lastRender > TimeSpan.FromMilliseconds (250)) {
 					currentIdx = (currentIdx + 1) % runes.Length;
-					Text = ""+runes [currentIdx];
+					Text = "" + runes [currentIdx];
 				}
 
 				base.Redraw (bounds);
@@ -1951,7 +1941,7 @@ namespace Terminal.Gui {
 				}
 
 				this.tableView.Update ();
-				dlg.UpdateCollectionNavigator();
+				dlg.UpdateCollectionNavigator ();
 			}
 
 			private static string TrimArrows (string columnName)

@@ -20,16 +20,16 @@ namespace UICatalog.Scenarios {
 			Win.Add (cbMustExist);
 
 
-			cbIcons = new CheckBox ("Icons") { Checked = true , X = Pos.Right(cbMustExist)+1};
+			cbIcons = new CheckBox ("Icons") { Checked = true, X = Pos.Right (cbMustExist) + 1 };
 			Win.Add (cbIcons);
 
 
-			cbMonochrome = new CheckBox ("Monochrome") { Checked = false , X = Pos.Right(cbIcons)+1};
+			cbMonochrome = new CheckBox ("Monochrome") { Checked = false, X = Pos.Right (cbIcons) + 1 };
 			Win.Add (cbMonochrome);
 
-			foreach(var multi in new bool [] {false, true }) {
+			foreach (var multi in new bool [] { false, true }) {
 				foreach (OpenDialog.OpenMode openMode in Enum.GetValues (typeof (OpenDialog.OpenMode))) {
-					var btn = new Button ($"Select {(multi?"Many": "One")} {openMode}") {
+					var btn = new Button ($"Select {(multi ? "Many" : "One")} {openMode}") {
 						X = x,
 						Y = y
 					};
@@ -47,7 +47,7 @@ namespace UICatalog.Scenarios {
 			foreach (var multi in new bool [] { false, true }) {
 				foreach (var strict in new bool [] { false, true }) {
 					{
-						var btn = new Button ($"Select {(multi ? "Many" : "One")} .csv ({(strict?"Strict":"Recommended")})") {
+						var btn = new Button ($"Select {(multi ? "Many" : "One")} .csv ({(strict ? "Strict" : "Recommended")})") {
 							X = x,
 							Y = y
 						};
@@ -62,22 +62,21 @@ namespace UICatalog.Scenarios {
 
 		private void SetupHandler (Button btn, OpenDialog.OpenMode mode, bool isMulti, bool csv = false, bool strict = false)
 		{
-			btn.Clicked += ()=>{
+			btn.Clicked += () => {
 				var fd = new FileDialog2 {
 					AllowsMultipleSelection = isMulti,
 					OpenMode = mode,
 					MustExist = cbMustExist.Checked ?? false
 				};
 
-				if(cbIcons.Checked ?? false)
-				{
+				if (cbIcons.Checked ?? false) {
 					fd.IconGetter = GetIcon;
 				}
 
 				fd.Monochrome = cbMonochrome.Checked ?? false;
 
 				if (csv) {
-					fd.AllowedTypes.Add (new FileDialog2.AllowedType ("Data File", ".csv",".tsv"));
+					fd.AllowedTypes.Add (new FileDialog2.AllowedType ("Data File", ".csv", ".tsv"));
 					fd.AllowedTypesIsStrict = strict;
 				}
 
@@ -94,8 +93,7 @@ namespace UICatalog.Scenarios {
 						"You chose:" + Environment.NewLine +
 						string.Join (Environment.NewLine, fd.MultiSelected.Select (m => m)),
 						"Ok");
-				}
-				else{
+				} else {
 					MessageBox.Query (
 						"Chosen!",
 						"You chose:" + Environment.NewLine + fd.Path,
@@ -106,8 +104,7 @@ namespace UICatalog.Scenarios {
 
 		private string GetIcon (FileSystemInfo arg)
 		{
-			if(arg is DirectoryInfo)
-			{
+			if (arg is DirectoryInfo) {
 				return "\ua909";
 			}
 
