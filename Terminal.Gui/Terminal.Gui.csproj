@@ -30,8 +30,7 @@
     <PackageReference Include="System.Text.Json" Version="7.0.1" />
     <PackageReference Include="System.Management" Version="7.0.0" />
     <InternalsVisibleTo Include="UnitTests" />
- 
-  </ItemGroup>
+   </ItemGroup>
   <!-- Uncomment the RestoreSources element to have dotnet restore pull NStack from a local dir for testing -->
   <PropertyGroup>
     <!-- See https://stackoverflow.com/a/44463578/297526 -->
@@ -61,7 +60,6 @@
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-
   <PropertyGroup>
     <TargetFrameworks>net472;netstandard2.0;net6.0</TargetFrameworks>
     <LangVersion>9</LangVersion>
