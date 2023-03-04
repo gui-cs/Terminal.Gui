@@ -26,6 +26,16 @@ namespace Terminal.Gui {
 		private const string HeaderType = "Type";
 
 		/// <summary>
+		/// The maximum number of results that will be collected
+		/// when searching before stopping.
+		/// </summary>
+		/// <remarks>
+		/// This prevents performance issues e.g. when searching
+		/// root of file system for a common letter (e.g. 'e').
+		/// </remarks>
+		public int MaxSearchResults {get;set;} = 10000;
+
+		/// <summary>
 		/// True if the file/folder must exist already to be selected.
 		/// This prevents user from entering the name of something that
 		/// doesn't exist.  Defaults to false.
@@ -1444,6 +1454,12 @@ namespace Terminal.Gui {
 					if (f.Name.Contains (searchTerms)) {
 						lock (oLockFound) {
 							found.Add (f);
+
+							if(found.Count >= Parent.MaxSearchResults)
+							{
+								finished = true;
+								return;
+							}
 						}
 					}
 
@@ -1567,7 +1583,7 @@ namespace Terminal.Gui {
 			}
 		}
 		internal class SpinnerLabel : Label {
-			private Rune [] runes = new Rune [] { '|', '/', '\u2500', '/', '\u2500', '\\' };
+			private Rune [] runes = new Rune [] { '|', '/', '\u2500', '\\'};
 			private int currentIdx = 0;
 			private DateTime lastRender = DateTime.MinValue;
 
