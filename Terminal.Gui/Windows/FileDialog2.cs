@@ -465,6 +465,13 @@ namespace Terminal.Gui {
 		public Func<FileSystemInfo, string> IconGetter { get; set; } = null;
 
 		/// <summary>
+		/// Defines how the dialog matches files/folders when using the search
+		// box. Provide a custom implementation if you want to tailor how matching
+		/// is performed.
+		/// </summary>
+		public ISearchMatcher SearchMatcher {get;set;} = new DefaultSearchMatcher();
+
+		/// <summary>
 		/// Gets or Sets a value indicating whether to allow selecting 
 		/// multiple existing files/directories.
 		/// </summary>
@@ -1242,6 +1249,41 @@ namespace Terminal.Gui {
 			}
 		}
 
+
+		/// <summary>
+		/// Defines whether a given file/directory matches a set of
+		/// search terms.
+		/// </summary>
+		public interface ISearchMatcher 
+		{
+			/// <summary>
+			/// Called once for each new search.  Defines the string
+			/// the user has provided as search terms.
+			/// </summary>
+			void Initialize(string terms);
+
+			/// <summary>
+			/// Return true if <paramref name="f"/> is a match to the
+			/// last provided search terms
+			/// </summary>
+			bool IsMatch(FileSystemInfo f);
+		}
+
+		class DefaultSearchMatcher : ISearchMatcher
+		{
+			string terms;
+
+			public void Initialize (string terms)
+			{
+				this.terms = terms;
+			}
+
+			public bool IsMatch (FileSystemInfo f)
+			{
+				return f.Name.Contains(terms);
+			}
+		}
+
 		/// <summary>
 		/// Wrapper for <see cref="FileSystemInfo"/> that contains additional information
 		/// (e.g. <see cref="IsParent"/>) and helper methods.
@@ -1367,7 +1409,7 @@ namespace Terminal.Gui {
 		/// downwards.
 		/// </summary>
 		internal class SearchState : FileDialogState {
-			readonly string searchTerms;
+			
 			bool cancel = false;
 			bool finished = false;
 
@@ -1378,7 +1420,7 @@ namespace Terminal.Gui {
 
 			public SearchState (DirectoryInfo dir, FileDialog2 parent, string searchTerms) : base (dir, parent)
 			{
-				this.searchTerms = searchTerms;
+				parent.SearchMatcher.Initialize(searchTerms);
 				Children = new FileSystemInfoStats [0];
 				BeginSearch ();
 			}
@@ -1451,7 +1493,7 @@ namespace Terminal.Gui {
 						continue;
 					}
 
-					if (f.Name.Contains (searchTerms)) {
+					if (Parent.SearchMatcher.IsMatch(f.FileSystemInfo)) {
 						lock (oLockFound) {
 							found.Add (f);
 
