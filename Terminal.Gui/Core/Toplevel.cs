@@ -749,15 +749,23 @@ namespace Terminal.Gui {
 					if (view.Frame.IntersectsWith (bounds) && !OutsideTopFrame (this)) {
 						view.SetNeedsLayout ();
 						view.SetNeedsDisplay (view.Bounds);
-						//view.Redraw (view.Bounds);
+						if (SuperView == null && view.Visible && view.Frame.Width > 0 && view.Frame.Height > 0) {
+							view.OnDrawContent (view.Bounds);
+							view.Redraw (view.Bounds);
+							view.OnDrawContentComplete (view.Bounds);
+						}
 					}
 				}
 
-				ClearLayoutNeeded ();
-				ClearNeedsDisplay ();
+				if (SuperView != null) {
+					ClearLayoutNeeded ();
+					ClearNeedsDisplay ();
+				}
 			}
 
-			base.Redraw (Bounds);
+			if (SuperView != null) {
+				base.Redraw (Bounds);
+			}
 		}
 
 		bool OutsideTopFrame (Toplevel top)
