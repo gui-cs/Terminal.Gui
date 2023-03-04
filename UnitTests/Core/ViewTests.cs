@@ -2353,21 +2353,7 @@ This is a tes
 				return true;
 			}
 
-			public void CorrectRedraw (Rect bounds)
-			{
-				// Clear the old and new frame area
-				Clear (NeedDisplay);
-				DrawText ();
-			}
-
-			public void IncorrectRedraw (Rect bounds)
-			{
-				// Clear only the new frame area
-				Clear ();
-				DrawText ();
-			}
-
-			private void DrawText ()
+			public override void Redraw (Rect bounds)
 			{
 				var idx = 0;
 				for (int r = 0; r < Frame.Height; r++) {
@@ -2501,7 +2487,7 @@ This is a tes
 		[InlineData (false)]
 		public void Clear_Does_Not_Spillover_Its_Parent (bool label)
 		{
-			var root = new View () { Width = 20, Height = 10 };
+			var root = new View () { Width = 20, Height = 10, ColorScheme = Colors.Base };
 
 			var v = label == true ?
 				new Label (new string ('c', 100)) {
@@ -2533,15 +2519,17 @@ cccccccccccccccccccc", output);
 
 			var attributes = new Attribute [] {
 				Colors.TopLevel.Normal,
-				Colors.TopLevel.Focus,
-
+				Colors.Base.Normal,
+				Colors.Base.Focus
 			};
 			if (label) {
 				TestHelpers.AssertDriverColorsAre (@"
-000000000000000000000", attributes);
+111111111111111111110
+111111111111111111110", attributes);
 			} else {
 				TestHelpers.AssertDriverColorsAre (@"
-111111111111111111110", attributes);
+222222222222222222220
+222222222222222222220", attributes);
 			}
 
 			if (label) {
@@ -2552,7 +2540,8 @@ cccccccccccccccccccc", output);
 				Assert.True (v.HasFocus);
 				Application.Refresh ();
 				TestHelpers.AssertDriverColorsAre (@"
-111111111111111111110", attributes);
+222222222222222222220
+222222222222222222220", attributes);
 			}
 		}
 
@@ -2571,7 +2560,7 @@ cccccccccccccccccccc", output);
 			top.Add (label, view);
 			Application.Begin (top);
 
-			view.CorrectRedraw (view.Bounds);
+			top.Redraw (top.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -2579,9 +2568,12 @@ At 0,0
    and also with two lines.  ", output);
 
 			view.Frame = new Rect (1, 1, 10, 1);
+			Assert.Equal (new Rect (1, 1, 10, 1), view.Frame);
+			Assert.Equal (LayoutStyle.Computed, view.LayoutStyle);
+			view.LayoutStyle = LayoutStyle.Absolute;
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (1, 1, 31, 3), view.NeedDisplay);
-			view.CorrectRedraw (view.Bounds);
+			Assert.Equal (new Rect (0, 0, 10, 1), view.NeedDisplay);
+			top.Redraw (top.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0     
  A text wit", output);
@@ -2602,7 +2594,7 @@ At 0,0
 			top.Add (label, view);
 			Application.Begin (top);
 
-			view.CorrectRedraw (view.Bounds);
+			top.Redraw (top.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -2615,8 +2607,8 @@ At 0,0
 			view.Height = 1;
 			Assert.Equal (new Rect (1, 1, 10, 1), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (1, 1, 31, 3), view.NeedDisplay);
-			view.CorrectRedraw (view.Bounds);
+			Assert.Equal (new Rect (0, 0, 30, 2), view.NeedDisplay);
+			top.Redraw (top.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0     
  A text wit", output);
@@ -2637,7 +2629,7 @@ At 0,0
 			top.Add (label, view);
 			Application.Begin (top);
 
-			view.IncorrectRedraw (view.Bounds);
+			view.Redraw (view.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -2645,9 +2637,12 @@ At 0,0
    and also with two lines.  ", output);
 
 			view.Frame = new Rect (1, 1, 10, 1);
+			Assert.Equal (new Rect (1, 1, 10, 1), view.Frame);
+			Assert.Equal (LayoutStyle.Computed, view.LayoutStyle);
+			view.LayoutStyle = LayoutStyle.Absolute;
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (1, 1, 31, 3), view.NeedDisplay);
-			view.IncorrectRedraw (view.Bounds);
+			Assert.Equal (new Rect (0, 0, 10, 1), view.NeedDisplay);
+			view.Redraw (view.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
  A text wit                  
@@ -2670,7 +2665,7 @@ At 0,0
 			top.Add (label, view);
 			Application.Begin (top);
 
-			view.IncorrectRedraw (view.Bounds);
+			view.Redraw (view.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -2683,8 +2678,8 @@ At 0,0
 			view.Height = 1;
 			Assert.Equal (new Rect (1, 1, 10, 1), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (1, 1, 31, 3), view.NeedDisplay);
-			view.IncorrectRedraw (view.Bounds);
+			Assert.Equal (new Rect (0, 0, 30, 2), view.NeedDisplay);
+			view.Redraw (view.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
  A text wit                  
@@ -2707,7 +2702,6 @@ At 0,0
 			top.Add (label, view);
 			Application.Begin (top);
 
-			view.CorrectRedraw (view.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -2715,9 +2709,12 @@ At 0,0
    and also with two lines.  ", output);
 
 			view.Frame = new Rect (3, 3, 10, 1);
+			Assert.Equal (new Rect (3, 3, 10, 1), view.Frame);
+			Assert.Equal (LayoutStyle.Computed, view.LayoutStyle);
+			view.LayoutStyle = LayoutStyle.Absolute;
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (2, 2, 30, 2), view.NeedDisplay);
-			view.CorrectRedraw (view.Bounds);
+			Assert.Equal (new Rect (0, 0, 10, 1), view.NeedDisplay);
+			top.Redraw (top.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0       
              
@@ -2740,7 +2737,7 @@ At 0,0
 			top.Add (label, view);
 			Application.Begin (top);
 
-			view.CorrectRedraw (view.Bounds);
+			top.Redraw (top.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -2753,8 +2750,8 @@ At 0,0
 			view.Height = 1;
 			Assert.Equal (new Rect (3, 3, 10, 1), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (2, 2, 30, 2), view.NeedDisplay);
-			view.CorrectRedraw (view.Bounds);
+			Assert.Equal (new Rect (0, 0, 30, 2), view.NeedDisplay);
+			top.Redraw (top.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0       
              
@@ -2777,7 +2774,7 @@ At 0,0
 			top.Add (label, view);
 			Application.Begin (top);
 
-			view.IncorrectRedraw (view.Bounds);
+			view.Redraw (view.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -2786,8 +2783,8 @@ At 0,0
 
 			view.Frame = new Rect (3, 3, 10, 1);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (2, 2, 30, 2), view.NeedDisplay);
-			view.IncorrectRedraw (view.Bounds);
+			Assert.Equal (new Rect (0, 0, 10, 1), view.NeedDisplay);
+			view.Redraw (view.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -2810,7 +2807,7 @@ At 0,0
 			top.Add (label, view);
 			Application.Begin (top);
 
-			view.IncorrectRedraw (view.Bounds);
+			view.Redraw (view.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -2823,8 +2820,8 @@ At 0,0
 			view.Height = 1;
 			Assert.Equal (new Rect (3, 3, 10, 1), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (2, 2, 30, 2), view.NeedDisplay);
-			view.IncorrectRedraw (view.Bounds);
+			Assert.Equal (new Rect (0, 0, 30, 2), view.NeedDisplay);
+			view.Redraw (view.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -2919,7 +2916,7 @@ At 0,0
 				if (top.IsLoaded) {
 					Assert.Equal (new Rect (0, 0, 38, 6), frame.Subviews [0].NeedDisplay);
 				} else {
-					Assert.Equal (new Rect (1, 1, 38, 6), frame.Subviews [0].NeedDisplay);
+					Assert.Equal (new Rect (0, 0, 38, 6), frame.Subviews [0].NeedDisplay);
 				}
 			};
 

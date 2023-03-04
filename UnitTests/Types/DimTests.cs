@@ -466,6 +466,7 @@ namespace Terminal.Gui.TypeTests {
 				Assert.Equal (18, v6.Frame.Height); // 89*20%=18
 
 				w.Width = 200;
+				Assert.True (t.LayoutNeeded);
 				w.Height = 200;
 				t.LayoutSubviews ();
 

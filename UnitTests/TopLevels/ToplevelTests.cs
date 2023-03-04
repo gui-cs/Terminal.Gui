@@ -900,9 +900,9 @@ namespace Terminal.Gui.TopLevelTests {
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
  File      
            
-    ┌─────┐
-    │     │
-    └─────┘
+    ┌────┐ 
+    │    │ 
+    └────┘ 
            
            
            
@@ -910,7 +910,7 @@ namespace Terminal.Gui.TopLevelTests {
  CTRL-N New", output);
 
 					Assert.Equal (win, Application.MouseGrabView);
-					Assert.Equal (new Rect (4, 2, 7, 3), Application.MouseGrabView.Frame);
+					Assert.Equal (new Rect (4, 2, 6, 3), Application.MouseGrabView.Frame);
 
 				} else if (iterations == 3) {
 					Assert.Equal (win, Application.MouseGrabView);
@@ -931,10 +931,10 @@ namespace Terminal.Gui.TopLevelTests {
 
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
  File      
-    ┌─────┐
-    │     │
-    └─────┘
-           
+    ┌────┐ 
+    │    │ 
+    │    │ 
+    └────┘ 
            
            
            
@@ -942,7 +942,7 @@ namespace Terminal.Gui.TopLevelTests {
  CTRL-N New", output);
 
 					Assert.Equal (win, Application.MouseGrabView);
-					Assert.Equal (new Rect (4, 1, 7, 3), Application.MouseGrabView.Frame);
+					Assert.Equal (new Rect (4, 1, 6, 4), Application.MouseGrabView.Frame);
 
 				} else if (iterations == 5) {
 					Assert.Equal (win, Application.MouseGrabView);
@@ -1074,12 +1074,12 @@ namespace Terminal.Gui.TopLevelTests {
 
 			view.Frame = new Rect (1, 3, 10, 5);
 			Assert.Equal (new Rect (1, 3, 10, 5), view.Frame);
-			Assert.Equal (new Rect (0, 0, 20, 10), view.NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 10, 5), view.NeedDisplay);
 
 			view.Redraw (view.Bounds);
 			view.Frame = new Rect (1, 3, 10, 5);
 			Assert.Equal (new Rect (1, 3, 10, 5), view.Frame);
-			Assert.Equal (new Rect (1, 3, 10, 5), view.NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 10, 5), view.NeedDisplay);
 		}
 	}
 }
