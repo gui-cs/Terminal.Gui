@@ -131,7 +131,11 @@ namespace Terminal.Gui.Configuration {
 							var readHelper = Activator.CreateInstance ((Type?)typeof (ReadHelper<>).MakeGenericType (typeof (scopeT), propertyType!)!, converter) as ReadHelper;
 							scope! [propertyName].PropertyValue = readHelper?.Read (ref reader, propertyType!, options);
 						} else {
-							scope! [propertyName].PropertyValue = JsonSerializer.Deserialize (ref reader, propertyType!, options);
+							try {
+								scope! [propertyName].PropertyValue = JsonSerializer.Deserialize (ref reader, propertyType!, options);
+							} catch (Exception ex) {
+								System.Diagnostics.Debug.WriteLine ($"scopeT Read: {ex}");
+							}
 						}
 					} else {
 						// It is not a config property. Maybe it's just a property on the Scope with [JsonInclude]
