@@ -448,6 +448,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the single child element of a <see cref="View"/>.
 		/// </summary>
+		[JsonIgnore]
 		public View Child {
 			get => child;
 			set {

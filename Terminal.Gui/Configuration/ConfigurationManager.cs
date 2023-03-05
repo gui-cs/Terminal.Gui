@@ -223,13 +223,13 @@ namespace Terminal.Gui.Configuration {
 		public static ThemeManager? Themes => ThemeManager.Instance;
 
 		/// <summary>
-		/// Aplication-specific configuration settings scope.
+		/// Application-specific configuration settings scope.
 		/// </summary>
 		[SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true), JsonPropertyName ("AppSettings")]
 		public static AppScope? AppSettings { get; set; }
 
 		/// <summary>
-		/// Initializes the internal state of ConfiguraitonManager. Nominally called once as part of application
+		/// Initializes the internal state of ConfigurationManager. Nominally called once as part of application
 		/// startup to initialize global state. Also called from some Unit Tests to ensure correctness (e.g. Reset()).
 		/// </summary>
 		internal static void Initialize ()

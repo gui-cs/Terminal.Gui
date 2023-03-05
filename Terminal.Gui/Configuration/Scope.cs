@@ -129,7 +129,11 @@ namespace Terminal.Gui.Configuration {
 								}
 							}
 							var readHelper = Activator.CreateInstance ((Type?)typeof (ReadHelper<>).MakeGenericType (typeof (scopeT), propertyType!)!, converter) as ReadHelper;
-							scope! [propertyName].PropertyValue = readHelper?.Read (ref reader, propertyType!, options);
+							try {
+								scope! [propertyName].PropertyValue = readHelper?.Read (ref reader, propertyType!, options);
+							} catch (NotSupportedException e) {
+								throw new JsonException ($"Error reading property \"{propertyName}\" of type \"{propertyType.Name}\".", e);
+							}
 						} else {
 							try {
 								scope! [propertyName].PropertyValue = JsonSerializer.Deserialize (ref reader, propertyType!, options);

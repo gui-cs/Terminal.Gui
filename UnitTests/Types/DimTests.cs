@@ -520,14 +520,14 @@ namespace Terminal.Gui.TypeTests {
 				v5.Text = "Button5";
 				Assert.Equal ("Combine(View(Width,Button()({X=2,Y=7,Width=97,Height=189}))-View(Width,Button()({X=0,Y=0,Width=19,Height=19})))", v5.Width.ToString ());
 				Assert.Equal ("Combine(View(Height,Button()({X=2,Y=7,Width=97,Height=189}))-View(Height,Button()({X=0,Y=0,Width=19,Height=19})))", v5.Height.ToString ());
-				Assert.Equal (78, v5.Frame.Width); // 97-19=78
+				Assert.Equal (78, v5.Frame.Width); // 97-9=78
 				Assert.Equal (170, v5.Frame.Height); // 189-19=170
 
 				v6.Text = "Button6";
 				Assert.Equal ("Factor(0.2,True)", v6.Width.ToString ());
 				Assert.Equal ("Factor(0.2,True)", v6.Height.ToString ());
 				Assert.Equal (19, v6.Frame.Width); // 99*20%=19
-				Assert.Equal (38, v6.Frame.Height); // 198-7*20=38
+				Assert.Equal (38, v6.Frame.Height); // 198-7*20=18
 			};
 
 			Application.Iteration += () => Application.RequestStop ();
