@@ -808,7 +808,6 @@ namespace Terminal.Gui {
 		{
 			var actX = x is Pos.PosAbsolute ? x.Anchor (0) : frame.X;
 			var actY = y is Pos.PosAbsolute ? y.Anchor (0) : frame.Y;
-			Rect oldFrame = frame;
 
 			if (AutoSize) {
 				var s = GetAutoSize ();
@@ -1359,10 +1358,10 @@ namespace Terminal.Gui {
 		public virtual void OnAdded (View view)
 		{
 			view.IsAdded = true;
-			view.x = view.x ?? view.frame.X;
-			view.y = view.y ?? view.frame.Y;
-			view.width = view.width ?? view.frame.Width;
-			view.height = view.height ?? view.frame.Height;
+			view.x ??= view.frame.X;
+			view.y ??= view.frame.Y;
+			view.width ??= view.frame.Width;
+			view.height ??= view.frame.Height;
 
 			view.Added?.Invoke (this);
 		}
