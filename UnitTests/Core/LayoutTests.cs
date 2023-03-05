@@ -328,14 +328,17 @@ namespace Terminal.Gui.CoreTests {
 			Application.Begin (Application.Top);
 
 			Assert.True (label.AutoSize);
+			// Here the AutoSize ensuring the right size with width 28 (Dim.Fill)
+			// and height 0 because wasn't set and the text is empty
 			Assert.Equal ("{X=0,Y=0,Width=28,Height=0}", label.Bounds.ToString ());
 
 			label.Text = "First line\nSecond line";
 			Application.Refresh ();
 
-			// Here the AutoSize ensuring the right size
+			// Here the AutoSize ensuring the right size with width 28 (Dim.Fill)
+			// and height 2 because wasn't set and the text has 2 lines
 			Assert.True (label.AutoSize);
-			Assert.Equal ("{X=0,Y=0,Width=11,Height=2}", label.Bounds.ToString ());
+			Assert.Equal ("{X=0,Y=0,Width=28,Height=2}", label.Bounds.ToString ());
 
 			label.AutoSize = false;
 			Application.Refresh ();
@@ -347,12 +350,16 @@ namespace Terminal.Gui.CoreTests {
 			label.Text = "First changed line\nSecond changed line\nNew line";
 			Application.Refresh ();
 
+			// Here the AutoSize is false and the width 28 (Dim.Fill) and
+			// height 1 because wasn't set and SetMinWidthHeight ensuring the minimum height
 			Assert.False (label.AutoSize);
 			Assert.Equal ("{X=0,Y=0,Width=28,Height=1}", label.Bounds.ToString ());
 
 			label.AutoSize = true;
 			Application.Refresh ();
 
+			// Here the AutoSize ensuring the right size with width 28 (Dim.Fill)
+			// and height 3 because wasn't set and the text has 3 lines
 			Assert.True (label.AutoSize);
 			Assert.Equal ("{X=0,Y=0,Width=28,Height=3}", label.Bounds.ToString ());
 		}
@@ -461,9 +468,13 @@ Y
 			Assert.Equal ("123 ", GetContents ());
 
 			lbl.Text = "12";
+			// Here the AutoSize ensuring the right size with width 3 (Dim.Absolute)
+			// that was set on the OnAdded method with the text length of 3
+			// and height 1 because wasn't set and the text has 1 line
 			Assert.Equal (new Rect (0, 0, 3, 1), lbl.Frame);
 			Assert.Equal (new Rect (0, 0, 3, 1), lbl.NeedDisplay);
-			Assert.Equal (new Rect (0, 0, 80, 25), lbl.SuperView.NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 0, 0), lbl.SuperView.NeedDisplay);
+			Assert.True (lbl.SuperView.LayoutNeeded);
 			lbl.SuperView.Redraw (lbl.SuperView.Bounds);
 			Assert.Equal ("12  ", GetContents ());
 

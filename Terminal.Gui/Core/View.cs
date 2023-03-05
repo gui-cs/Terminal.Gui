@@ -1511,15 +1511,17 @@ namespace Terminal.Gui {
 
 			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
 				Rect containerBounds = GetContainerBounds ();
-				Clear (GetNeedDisplay (containerBounds));
-				SetChildNeedsDisplay ();
-				// Draw any Text
-				if (TextFormatter != null) {
-					TextFormatter.NeedsFormat = true;
+				if (!containerBounds.IsEmpty) {
+					Clear (GetNeedDisplay (containerBounds));
+					SetChildNeedsDisplay ();
+					// Draw any Text
+					if (TextFormatter != null) {
+						TextFormatter.NeedsFormat = true;
+					}
+					TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
+					    HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
+					    containerBounds);
 				}
-				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
-				    HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
-				    containerBounds);
 			}
 
 			// Invoke DrawContentEvent
