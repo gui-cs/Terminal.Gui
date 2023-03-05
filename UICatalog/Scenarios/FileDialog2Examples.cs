@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using System.Linq;
 using Terminal.Gui;
@@ -10,10 +11,11 @@ namespace UICatalog.Scenarios {
 		private CheckBox cbMustExist;
 		private CheckBox cbIcons;
 		private CheckBox cbMonochrome;
+		private CheckBox cbCaseSensitive;
 
 		public override void Setup ()
 		{
-			var y = 1;
+			var y = 0;
 			var x = 1;
 
 			cbMustExist = new CheckBox ("Must Exist") { Checked = true };
@@ -27,6 +29,11 @@ namespace UICatalog.Scenarios {
 			cbMonochrome = new CheckBox ("Monochrome") { Checked = false, X = Pos.Right (cbIcons) + 1 };
 			Win.Add (cbMonochrome);
 
+			cbCaseSensitive = new CheckBox ("Case Sensitive Search") { Checked = false, X = 0 ,Y = ++y };
+			Win.Add (cbCaseSensitive);
+
+			y++;
+
 			foreach (var multi in new bool [] { false, true }) {
 				foreach (OpenDialog.OpenMode openMode in Enum.GetValues (typeof (OpenDialog.OpenMode))) {
 					var btn = new Button ($"Select {(multi ? "Many" : "One")} {openMode}") {
@@ -38,8 +45,9 @@ namespace UICatalog.Scenarios {
 					Win.Add (btn);
 				}
 			}
+			
+			y=2;
 
-			y = 1;
 			// SubViews[0] is ContentView
 			x = Win.Subviews [0].Subviews.OfType<Button> ().Max (b => b.Text.Length + 5);
 
@@ -73,6 +81,11 @@ namespace UICatalog.Scenarios {
 					fd.IconGetter = GetIcon;
 				}
 
+				if(cbCaseSensitive.Checked ?? false) {
+
+					fd.SearchMatcher = new CaseSensitiveSearchMatcher ();
+				}
+
 				fd.Monochrome = cbMonochrome.Checked ?? false;
 
 				if (csv) {
@@ -100,6 +113,20 @@ namespace UICatalog.Scenarios {
 						"Ok");
 				}
 			};
+		}
+
+		private class CaseSensitiveSearchMatcher : FileDialog2.ISearchMatcher {
+			private string terms;
+
+			public void Initialize (string terms)
+			{
+				this.terms = terms;
+			}
+
+			public bool IsMatch (FileSystemInfo f)
+			{
+				return f.Name.Contains (terms, StringComparison.CurrentCulture);
+			}
 		}
 
 		private string GetIcon (FileSystemInfo arg)

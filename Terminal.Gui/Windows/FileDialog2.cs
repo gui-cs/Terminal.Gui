@@ -466,7 +466,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Defines how the dialog matches files/folders when using the search
-		// box. Provide a custom implementation if you want to tailor how matching
+		/// box. Provide a custom implementation if you want to tailor how matching
 		/// is performed.
 		/// </summary>
 		public ISearchMatcher SearchMatcher {get;set;} = new DefaultSearchMatcher();
@@ -1280,7 +1280,11 @@ namespace Terminal.Gui {
 
 			public bool IsMatch (FileSystemInfo f)
 			{
-				return f.Name.Contains(terms);
+				//Contains overload with StringComparison is not available in (net472) or (netstandard2.0)
+				//return f.Name.Contains (terms, StringComparison.OrdinalIgnoreCase);
+
+				// This is the same
+				return f.Name.IndexOf (terms, StringComparison.OrdinalIgnoreCase) >= 0;
 			}
 		}
 
