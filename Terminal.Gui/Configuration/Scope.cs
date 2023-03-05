@@ -132,7 +132,7 @@ namespace Terminal.Gui.Configuration {
 							try {
 								scope! [propertyName].PropertyValue = readHelper?.Read (ref reader, propertyType!, options);
 							} catch (NotSupportedException e) {
-								throw new JsonException ($"Error reading property \"{propertyName}\" of type \"{propertyType.Name}\".", e);
+								throw new JsonException ($"Error reading property \"{propertyName}\" of type \"{propertyType?.Name}\".", e);
 							}
 						} else {
 							try {
