@@ -335,7 +335,7 @@ namespace Terminal.Gui.CoreTests {
 
 			// Here the AutoSize ensuring the right size
 			Assert.True (label.AutoSize);
-			Assert.Equal ("{X=0,Y=0,Width=28,Height=2}", label.Bounds.ToString ());
+			Assert.Equal ("{X=0,Y=0,Width=11,Height=2}", label.Bounds.ToString ());
 
 			label.AutoSize = false;
 			Application.Refresh ();
@@ -461,9 +461,10 @@ Y
 			Assert.Equal ("123 ", GetContents ());
 
 			lbl.Text = "12";
-
-			lbl.SuperView.Redraw (lbl.SuperView.NeedDisplay);
-
+			Assert.Equal (new Rect (0, 0, 3, 1), lbl.Frame);
+			Assert.Equal (new Rect (0, 0, 3, 1), lbl.NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 80, 25), lbl.SuperView.NeedDisplay);
+			lbl.SuperView.Redraw (lbl.SuperView.Bounds);
 			Assert.Equal ("12  ", GetContents ());
 
 			string GetContents ()

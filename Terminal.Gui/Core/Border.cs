@@ -332,7 +332,7 @@ namespace Terminal.Gui {
 		private Attribute? effect3DBrush;
 		private ustring title = ustring.Empty;
 		private View child;
-		
+
 		/// <summary>
 		/// Specifies the <see cref="Gui.BorderStyle"/> for a view.
 		/// </summary>
@@ -652,7 +652,7 @@ namespace Terminal.Gui {
 				Child.Clear (borderRect);
 			}
 
-			driver.SetAttribute (savedAttribute);
+			driver.SetAttribute (new Attribute (BorderBrush, Background));
 
 			// Draw margin frame
 			if (DrawMarginFrame) {
@@ -676,6 +676,7 @@ namespace Terminal.Gui {
 					driver.DrawWindowFrame (borderRect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill: true, this);
 				}
 			}
+			driver.SetAttribute (savedAttribute);
 		}
 
 		private void DrawChildBorder (Rect frame, bool fill = true)
@@ -788,7 +789,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			driver.SetAttribute (savedAttribute);
+			driver.SetAttribute (new Attribute (BorderBrush, Background));
 
 			// Draw the MarginFrame
 			if (DrawMarginFrame) {
@@ -985,7 +986,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			driver.SetAttribute (savedAttribute);
+			driver.SetAttribute (new Attribute (BorderBrush, Background));
 
 			// Draw the MarginFrame
 			if (DrawMarginFrame) {
@@ -1079,7 +1080,7 @@ namespace Terminal.Gui {
 					driver.DrawWindowTitle (scrRect, Title, 0, 0, 0, 0);
 				} else {
 					scrRect = view.ViewToScreen (new Rect (0, 0, view.Frame.Width, view.Frame.Height));
-					driver.DrawWindowTitle (scrRect, Title,
+					driver.DrawWindowTitle (scrRect, Parent.Border.Title,
 						padding.Left, padding.Top, padding.Right, padding.Bottom);
 				}
 			}
@@ -1095,9 +1096,9 @@ namespace Terminal.Gui {
 		{
 			var driver = Application.Driver;
 			if (DrawMarginFrame) {
-				driver.SetAttribute (view.GetNormalColor ());
+				driver.SetAttribute (new Attribute (BorderBrush, Background));
 				if (view.HasFocus) {
-					driver.SetAttribute (view.ColorScheme.HotNormal);
+					driver.SetAttribute (new Attribute (view.ColorScheme.HotNormal.Foreground, Background));
 				}
 				var padding = Parent.Border.GetSumThickness ();
 				var scrRect = Parent.ViewToScreen (new Rect (0, 0, rect.Width, rect.Height));
