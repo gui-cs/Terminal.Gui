@@ -14,7 +14,7 @@ using static Terminal.Gui.OpenDialog;
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// Modal dialog for selecting files/directories.  Has auto-complete and expandable
+	/// Modal dialog for selecting files/directories. Has auto-complete and expandable
 	/// navigation pane (Recent, Root drives etc).
 	/// </summary>
 	public class FileDialog2 : Dialog {
@@ -38,7 +38,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// True if the file/folder must exist already to be selected.
 		/// This prevents user from entering the name of something that
-		/// doesn't exist.  Defaults to false.
+		/// doesn't exist. Defaults to false.
 		/// </summary>
 		public bool MustExist { get; set; }
 
@@ -49,7 +49,7 @@ namespace Terminal.Gui {
 		};
 
 		/// <summary>
-		/// Characters to prevent entry into <see cref="tbPath"/>.  Note that this is not using
+		/// Characters to prevent entry into <see cref="tbPath"/>. Note that this is not using
 		/// <see cref="System.IO.Path.GetInvalidFileNameChars"/> because we do want to allow directory
 		/// separators, arrow keys etc.
 		/// </summary>
@@ -421,13 +421,13 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Sets a <see cref="ColorScheme"/> to use for regular file rows of
-		/// the <see cref="TableView"/>.  Defaults to White text on Black background.
+		/// the <see cref="TableView"/>. Defaults to White text on Black background.
 		/// </summary>
 		public ColorScheme ColorSchemeDefault { private get; set; }
 
 		/// <summary>
 		/// Sets a <see cref="ColorScheme"/> to use for file rows with an image extension
-		/// of the <see cref="TableView"/>.  Defaults to White text on Black background.
+		/// of the <see cref="TableView"/>. Defaults to White text on Black background.
 		/// </summary>
 		public ColorScheme ColorSchemeImage { private get; set; }
 
@@ -445,7 +445,7 @@ namespace Terminal.Gui {
 		public OpenMode OpenMode { get; set; } = OpenMode.Mixed;
 
 		/// <summary>
-		/// Gets or Sets the selected path in the dialog.  This is the result that should
+		/// Gets or Sets the selected path in the dialog. This is the result that should
 		/// be used if <see cref="AllowsMultipleSelection"/> is off and <see cref="Canceled"/>
 		/// is true.
 		/// </summary>
@@ -459,7 +459,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// User defined delegate for picking which character(s)/unicode
-		/// symbol(s) to use as an 'icon' for files/folders.  Defaults to
+		/// symbol(s) to use as an 'icon' for files/folders. Defaults to
 		/// null (i.e. no icons).
 		/// </summary>
 		public Func<FileSystemInfo, string> IconGetter { get; set; } = null;
@@ -487,8 +487,8 @@ namespace Terminal.Gui {
 		public bool Monochrome { get; set; }
 
 		/// <summary>
-		/// Gets or Sets a collection of file types that the user can/must select.  Only applies
-		/// when <see cref="OpenMode"/> is <see cref="OpenMode.File"/>.  See also
+		/// Gets or Sets a collection of file types that the user can/must select. Only applies
+		/// when <see cref="OpenMode"/> is <see cref="OpenMode.File"/>. See also
 		/// <see cref="AllowedTypesIsStrict"/> if you only want to highlight files.
 		/// </summary>
 		public List<AllowedType> AllowedTypes { get; set; } = new List<AllowedType> ();
@@ -1254,10 +1254,10 @@ namespace Terminal.Gui {
 		/// Defines whether a given file/directory matches a set of
 		/// search terms.
 		/// </summary>
-		public interface ISearchMatcher 
+		public interface ISearchMatcher
 		{
 			/// <summary>
-			/// Called once for each new search.  Defines the string
+			/// Called once for each new search. Defines the string
 			/// the user has provided as search terms.
 			/// </summary>
 			void Initialize(string terms);
