@@ -3,6 +3,7 @@
   "Application.QuitKey": {
     "Key": "Esc"
   },
+  "FileDialog2.MaxSearchResults" : 10000,
   "AppSettings": {
     "UICatalog.StatusBar": true,
     "ConfigurationEditor.EditorColorScheme": {

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using NStack;
 using Terminal.Gui.Trees;
 using static System.Environment;
+using static Terminal.Gui.Configuration.ConfigurationManager;
 using static Terminal.Gui.OpenDialog;
 
 namespace Terminal.Gui {
@@ -33,7 +34,8 @@ namespace Terminal.Gui {
 		/// This prevents performance issues e.g. when searching
 		/// root of file system for a common letter (e.g. 'e').
 		/// </remarks>
-		public int MaxSearchResults {get;set;} = 10000;
+		[SerializableConfigurationProperty (Scope = typeof(SettingsScope))]
+		public static int MaxSearchResults {get;set;} = 10000;
 
 		/// <summary>
 		/// True if the file/folder must exist already to be selected.
@@ -1497,15 +1499,17 @@ namespace Terminal.Gui {
 						continue;
 					}
 
+					lock (oLockFound) {
+						if(found.Count >= FileDialog2.MaxSearchResults)
+						{
+							finished = true;
+							return;
+						}
+					}
+
 					if (Parent.SearchMatcher.IsMatch(f.FileSystemInfo)) {
 						lock (oLockFound) {
 							found.Add (f);
-
-							if(found.Count >= Parent.MaxSearchResults)
-							{
-								finished = true;
-								return;
-							}
 						}
 					}
 
