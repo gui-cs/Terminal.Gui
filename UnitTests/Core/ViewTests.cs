@@ -1017,7 +1017,7 @@ namespace Terminal.Gui.CoreTests {
 			};
 
 			// Keyboard navigation with tab
-			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('\t', ConsoleKey.Tab, false, false, false));
+			Console.MockKeyPresses.Push (Key.Tab);
 
 			Application.Iteration += () => Application.RequestStop ();
 
@@ -1125,7 +1125,7 @@ namespace Terminal.Gui.CoreTests {
 		{
 			Application.Init (new FakeDriver ());
 
-			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('N', ConsoleKey.N, false, false, false));
+			Console.MockKeyPresses.Push (Key.N);
 
 			var top = Application.Top;
 
@@ -1138,7 +1138,7 @@ namespace Terminal.Gui.CoreTests {
 			top.Add (text);
 
 			Application.Iteration += () => {
-				Console.MockKeyPresses.Push (new ConsoleKeyInfo ('N', ConsoleKey.N, false, false, false));
+				Console.MockKeyPresses.Push (Key.N);
 				Assert.Equal ("", text.Text);
 
 				Application.RequestStop ();
@@ -1530,14 +1530,14 @@ namespace Terminal.Gui.CoreTests {
 			var tfQuiting = false;
 			var topQuiting = false;
 			var sb = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => sbQuiting = true )
+				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => sbQuiting = true )
 			});
 			var tf = new TextField ();
 			tf.KeyPress += Tf_KeyPress;
 
 			void Tf_KeyPress (View.KeyEventEventArgs obj)
 			{
-				if (obj.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
+				if (obj.KeyEvent.Key == Application.QuitKey) {
 					obj.Handled = tfQuiting = true;
 				}
 			}
@@ -1549,7 +1549,7 @@ namespace Terminal.Gui.CoreTests {
 
 			void Top_KeyPress (View.KeyEventEventArgs obj)
 			{
-				if (obj.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
+				if (obj.KeyEvent.Key == Application.QuitKey) {
 					obj.Handled = topQuiting = true;
 				}
 			}
@@ -1590,14 +1590,14 @@ namespace Terminal.Gui.CoreTests {
 			var sbQuiting = false;
 			var tfQuiting = false;
 			var sb = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => sbQuiting = true )
+				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => sbQuiting = true )
 			});
 			var tf = new TextField ();
 			tf.KeyPress += Tf_KeyPress;
 
 			void Tf_KeyPress (View.KeyEventEventArgs obj)
 			{
-				if (obj.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
+				if (obj.KeyEvent.Key == Application.QuitKey) {
 					obj.Handled = tfQuiting = true;
 				}
 			}
@@ -2307,7 +2307,7 @@ This is a tes
 
 			Application.Top.Add (view);
 
-			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('a', ConsoleKey.A, false, false, false));
+			Console.MockKeyPresses.Push (Key.a);
 
 			Application.Iteration += () => Application.RequestStop ();
 
@@ -2424,7 +2424,7 @@ This is a tes
 
 			Application.Top.Add (view);
 
-			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('\0', (ConsoleKey)'\0', shift, alt, control));
+			Console.MockKeyPresses.Push (default);
 
 			Application.Iteration += () => Application.RequestStop ();
 

@@ -16,7 +16,7 @@ namespace UICatalog.Scenarios {
 		private StatusItem lenStatusItem;
 
 		// Don't create a Window, just return the top-level view
-		public override void Init (ColorScheme colorScheme)
+		public override void Init (string theme = "Default", string colorScheme = "Base")
 		{
 			Application.Init ();
 			Application.Top.ColorScheme = Colors.Base;
@@ -55,7 +55,7 @@ namespace UICatalog.Scenarios {
 
 			lenStatusItem = new StatusItem (Key.CharMask, "Len: ", null);
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
+				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 
 				// These shortcut keys don't seem to work correctly in linux 
 				//new StatusItem(Key.CtrlMask | Key.N, "~^O~ Open", () => Open()),

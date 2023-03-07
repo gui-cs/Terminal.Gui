@@ -13,10 +13,10 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Top Level Windows")]
 	[ScenarioCategory ("Menus")]
 	public class DynamicMenuBar : Scenario {
-		public override void Init (ColorScheme colorScheme)
+		public override void Init (string theme = "Default", string colorScheme = "Base")
 		{
 			Application.Init ();
-			Application.Top.Add (new DynamicMenuBarSample ($"CTRL-Q to Close - Scenario: {GetName ()}"));
+			Application.Top.Add (new DynamicMenuBarSample ($"{Application.QuitKey} to Quit - Scenario: {GetName ()}"));
 		}
 
 		public class DynamicMenuItemList {

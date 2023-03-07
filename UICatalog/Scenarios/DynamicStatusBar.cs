@@ -12,10 +12,10 @@ namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Dynamic StatusBar", Description: "Demonstrates how to add and remove a StatusBar and change items dynamically.")]
 	[ScenarioCategory ("Top Level Windows")]
 	public class DynamicStatusBar : Scenario {
-		public override void Init (ColorScheme colorScheme)
+		public override void Init (string theme = "Default", string colorScheme = "Base")
 		{
 			Application.Init ();
-			Application.Top.Add (new DynamicStatusBarSample ($"CTRL-Q to Close - Scenario: {GetName ()}"));
+			Application.Top.Add (new DynamicStatusBarSample ($"{Application.QuitKey} to Quit - Scenario: {GetName ()}"));
 		}
 
 		public class DynamicStatusItemList {

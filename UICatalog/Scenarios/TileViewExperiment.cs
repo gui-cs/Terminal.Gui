@@ -10,7 +10,7 @@ namespace UICatalog.Scenarios {
 	public class TileViewExperiment : Scenario {
 
 
-		public override void Init (ColorScheme colorScheme)
+		public override void Init (string theme = "Default", string colorScheme = "Base")
 		{
 			Application.Init ();
 		}

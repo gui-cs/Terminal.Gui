@@ -18,7 +18,7 @@ public class ExampleWindow : Window {
 	
 	public ExampleWindow ()
 	{
-		Title = "Example App (Ctrl+Q to quit)";
+		Title = $"Example App ({Application.QuitKey} to quit)";
 
 		// Create input components and labels
 		var usernameLabel = new Label () { 

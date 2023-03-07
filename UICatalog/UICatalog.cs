@@ -14,6 +14,8 @@ using Terminal.Gui.Configuration;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 using System.Text.Json.Serialization;
 
+#nullable enable
+
 /// <summary>
 /// UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the catalog of scenarios.
 /// </summary>
@@ -84,7 +86,7 @@ namespace UICatalog {
 				_selectedScenario = (Scenario)Activator.CreateInstance (_scenarios [item].GetType ());
 				Application.UseSystemConsole = _useSystemConsole;
 				Application.Init ();
-				_selectedScenario.Init (Colors.ColorSchemes [_topLevelColorScheme == null ? "Base" : _topLevelColorScheme]);
+				_selectedScenario.Init ();
 				_selectedScenario.Setup ();
 				_selectedScenario.Run ();
 				_selectedScenario.Dispose ();
@@ -111,7 +113,9 @@ namespace UICatalog {
 			Scenario scenario;
 			while ((scenario = RunUICatalogTopLevel ()) != null) {
 				VerifyObjectsWereDisposed ();
-				scenario.Init (Colors.ColorSchemes [_topLevelColorScheme]);
+				ConfigurationManager.Themes.Theme = _cachedTheme;
+				ConfigurationManager.Apply ();
+				scenario.Init (_cachedTheme, _topLevelColorScheme);
 				scenario.Setup ();
 				scenario.Run ();
 				scenario.Dispose ();
@@ -193,11 +197,18 @@ namespace UICatalog {
 			Application.UseSystemConsole = _useSystemConsole;
 
 			// Run UI Catalog UI. When it exits, if _selectedScenario is != null then
-			// a Scenario was selected. Otherwise, the user wants to exit UI Catalog.
+			// a Scenario was selected. Otherwise, the user wants to quit UI Catalog.
 			Application.Init ();
-			
+
+			if (_cachedTheme is null) {
+				_cachedTheme = ConfigurationManager.Themes.Theme;
+			} else {
+				ConfigurationManager.Themes.Theme = _cachedTheme;
+				ConfigurationManager.Apply ();
+			}
+
 			//Application.EnableConsoleScrolling = _enableConsoleScrolling;
-			
+
 			Application.Run<UICatalogTopLevel> ();
 			Application.Shutdown ();
 
@@ -212,6 +223,8 @@ namespace UICatalog {
 		// main app UI can be restored to previous state
 		static int _cachedScenarioIndex = 0;
 		static int _cachedCategoryIndex = 0;
+		static string? _cachedTheme;
+		
 		static StringBuilder _aboutMessage;
 
 		// If set, holds the scenario the user selected
@@ -573,9 +586,9 @@ namespace UICatalog {
 						Shortcut = Key.AltMask + theme.Key [0]
 					};
 					item.CheckType |= MenuItemCheckStyle.Checked;
-					item.Checked = theme.Key == ConfigurationManager.Themes.Theme;
+					item.Checked = theme.Key == _cachedTheme; // ConfigurationManager.Themes.Theme;
 					item.Action += () => {
-						ConfigurationManager.Themes.Theme = theme.Key;
+						ConfigurationManager.Themes.Theme = _cachedTheme = theme.Key;
 						ConfigurationManager.Apply ();
 					};
 					menuItems.Add (item);

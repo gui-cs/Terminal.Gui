@@ -5,19 +5,19 @@ namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Generic", Description: "Generic sample - A template for creating new Scenarios")]
 	[ScenarioCategory ("Controls")]
 	public class MyScenario : Scenario {
-		public override void Init (ColorScheme colorScheme)
+		public override void Init (string theme = "Default", string colorScheme = "Base")
 		{
 			// The base `Scenario.Init` implementation:
 			//  - Calls `Application.Init ()`
 			//  - Adds a full-screen Window to Application.Top with a title
 			//    that reads "Press <hotkey> to Quit". Access this Window with `this.Win`.
-			//  - Sets the ColorScheme property of `this.Win` to `colorScheme`.
+			//  - Sets the Theme & the ColorScheme property of `this.Win` to `colorScheme`.
 			// To overrride this, implement an override of `Init`.
-			base.Init (colorScheme);
-
+			base.Init (theme, colorScheme);
+			Application.QuitKey = Key.CtrlMask | Key.P;
 			// A common, alternate, implementation where `this.Win` is not used:
 			//   Application.Init ();
-			//   Application.Top.ColorScheme = colorScheme;
+			//   Application.Top.ColorScheme = Colors.ColorSchemes [colorScheme];
 		}
 
 		public override void Setup ()

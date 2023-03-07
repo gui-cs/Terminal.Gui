@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Terminal.Gui;
 using UICatalog;
+using UICatalog.Scenarios;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -26,12 +27,12 @@ namespace UICatalog.Tests {
 		int CreateInput (string input)
 		{
 			// Put a control-q in at the end
-			FakeConsole.MockKeyPresses.Push (new ConsoleKeyInfo ('q', ConsoleKey.Q, shift: false, alt: false, control: true));
+			FakeConsole.MockKeyPresses.Push (Key.CtrlMask | Key.Q);
 			foreach (var c in input.Reverse ()) {
 				if (char.IsLetter (c)) {
-					FakeConsole.MockKeyPresses.Push (new ConsoleKeyInfo (char.ToLower (c), (ConsoleKey)char.ToUpper (c), shift: char.IsUpper (c), alt: false, control: false));
+					Console.MockKeyPresses.Push (((Key)char.ToUpper (c)) | (char.IsUpper (c) ? Key.ShiftMask : (Key)0));
 				} else {
-					FakeConsole.MockKeyPresses.Push (new ConsoleKeyInfo (c, (ConsoleKey)c, shift: false, alt: false, control: false));
+					Console.MockKeyPresses.Push ((Key)c);
 				}
 			}
 			return FakeConsole.MockKeyPresses.Count;
@@ -53,21 +54,38 @@ namespace UICatalog.Tests {
 			Assert.NotEmpty (scenarios);
 
 			foreach (var scenario in scenarios) {
-
-				output.WriteLine ($"Running Scenario '{scenario}'");
-
-				Func<MainLoop, bool> closeCallback = (MainLoop loop) => {
-					Application.RequestStop ();
-					return false;
-				};
+				output.WriteLine ($"Running Scenario '{scenario.GetName ()}'");
 
 				Application.Init (new FakeDriver ());
 
 				// Close after a short period of time
-				var token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), closeCallback);
+				Func<MainLoop, bool> closeCallback = (MainLoop loop) => {
+					// Prove the scenario is using Application.QuitKey correctly
+					FakeConsole.MockKeyPresses.Push (Application.QuitKey);
+					return false;
+				};
+				_ = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), closeCallback);
 
-				scenario.Init (Colors.Base);
+				Func<MainLoop, bool> forceCloseCallback = (MainLoop loop) => {
+					Assert.Equal (string.Empty, $"'{scenario.GetName ()}' failed to Quit");
+					return false;
+				};
+				// If the scenario doesn't close, this will force it
+				//_ = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (500), forceCloseCallback);
+
+				scenario.Init ();
 				scenario.Setup ();
+
+				Application.Top.KeyPress += (View.KeyEventEventArgs args) => {
+					Assert.Equal (Key.Esc, args.KeyEvent.Key);
+				};
+
+				Application.Iteration += () => {
+					if (FakeConsole.MockKeyPresses.Count == 0) {
+						//Application.RequestStop ();
+					}
+				};
+
 				scenario.Run ();
 
 				scenario.Dispose();
@@ -125,7 +143,7 @@ namespace UICatalog.Tests {
 				Assert.Equal (Key.CtrlMask | Key.Q, args.KeyEvent.Key);
 			};
 
-			generic.Init (Colors.Base);
+			generic.Init ();
 			generic.Setup ();
 			// There is no need to call Application.Begin because Init already creates the Application.Top
 			// If Application.RunState is used then the Application.RunLoop must also be used instead Application.Run.

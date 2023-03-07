@@ -40,7 +40,7 @@ namespace UICatalog.Scenarios {
 		TextField _hText;
 		int _hVal = 0;
 
-		public override void Init (ColorScheme colorScheme)
+		public override void Init (string theme = "Default", string colorScheme = "Base")
 		{
 			Application.Init ();
 			// Don't create a sub-win; just use Applicatiion.Top
@@ -49,7 +49,7 @@ namespace UICatalog.Scenarios {
 		public override void Setup ()
 		{
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
+				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 				new StatusItem(Key.F2, "~F2~ Toggle Frame Ruler", () => {
 					ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
 					Application.Top.SetNeedsDisplay ();

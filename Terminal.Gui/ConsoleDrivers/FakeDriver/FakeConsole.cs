@@ -808,19 +808,19 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// 
 		/// </summary>
-		public static ConsoleKeyInfo ReadKey (bool intercept)
+		public static Key ReadKey (bool intercept)
 		{
 			if (MockKeyPresses.Count > 0) {
 				return MockKeyPresses.Pop ();
 			} else {
-				return new ConsoleKeyInfo ('\0', (ConsoleKey)'\0', false, false, false);
+				return default;
 			}
 		}
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public static Stack<ConsoleKeyInfo> MockKeyPresses = new Stack<ConsoleKeyInfo> ();
+		public static Stack<Key> MockKeyPresses = new Stack<Key> ();
 
 		//
 		// Summary:

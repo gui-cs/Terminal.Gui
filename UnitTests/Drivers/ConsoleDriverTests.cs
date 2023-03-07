@@ -102,17 +102,16 @@ namespace Terminal.Gui.DriverTests {
 
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
-		public void FakeDriver_MockKeyPresses (Type driverType)
+		public void FakeDriver_MockKeyPresses_Letters (Type driverType)
 		{
 			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 
 			var text = "MockKeyPresses";
-			var mKeys = new Stack<ConsoleKeyInfo> ();
+			var mKeys = new Stack<Key> ();
 			foreach (var r in text.Reverse ()) {
-				var ck = char.IsLetter (r) ? (ConsoleKey)char.ToUpper (r) : (ConsoleKey)r;
-				var cki = new ConsoleKeyInfo (r, ck, false, false, false);
-				mKeys.Push (cki);
+				//var ck = char.IsLetter (r) ? (Key)r : Key.Null;
+				mKeys.Push ((Key)r);
 			}
 			Console.MockKeyPresses = mKeys;
 
@@ -142,6 +141,53 @@ namespace Terminal.Gui.DriverTests {
 			Application.Shutdown ();
 		}
 
+		[Theory]
+		[InlineData (typeof (FakeDriver))]
+		public void FakeDriver_MockKeyPresses_Modifiers (Type driverType)
+		{
+			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+			Application.Init (driver);
+
+			var expectedKeys = new Key [] {
+				(Key.F10),
+				(Key.T | Key.CtrlMask),
+				(Key.A | Key.AltMask),
+				(Key.Delete | Key.CtrlMask | Key.AltMask)
+			};
+
+			var mKeys = new Stack<Key> ();
+			foreach (var k in expectedKeys.Reverse ()) {
+				//var ck = char.IsLetter (r) ? (Key)r : Key.Null;
+				mKeys.Push (k);
+			}
+			Console.MockKeyPresses = mKeys;
+
+			var top = Application.Top;
+			var view = new View ();
+			var resultKeys = new List<Key> ();
+			var idx = 0;
+
+			view.KeyPress += (e) => {
+				Assert.Equal (expectedKeys [idx], e.KeyEvent.Key);
+				resultKeys.Add (e.KeyEvent.Key);
+				e.Handled = true;
+				idx++;
+			};
+			top.Add (view);
+
+			Application.Iteration += () => {
+				if (mKeys.Count == 0) Application.RequestStop ();
+			};
+
+			Application.Run ();
+
+			for (var i = 0; i < expectedKeys.Length; i++) {
+				Assert.Equal (expectedKeys [i], resultKeys [i]);
+			}
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
+		}
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
 		public void TerminalResized_Simulation (Type driverType)
@@ -319,7 +365,7 @@ namespace Terminal.Gui.DriverTests {
 
 			Application.Shutdown ();
 		}
-		
+
 		[Fact, AutoInitShutdown]
 		public void AddRune_On_Clip_Left_Or_Right_Replace_Previous_Or_Next_Wide_Rune_With_Space ()
 		{
@@ -441,7 +487,7 @@ namespace Terminal.Gui.DriverTests {
 		}
 
 		private static object packetLock = new object ();
-		
+
 		/// <summary>
 		/// Sometimes when using remote tools EventKeyRecord sends 'virtual keystrokes'.
 		/// These are indicated with the wVirtualKeyCode of 231. When we see this code

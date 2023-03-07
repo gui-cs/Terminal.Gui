@@ -5,7 +5,7 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Layout")]
 	[ScenarioCategory ("Borders")]
 	public class BordersComparisons : Scenario {
-		public override void Init (ColorScheme colorScheme)
+		public override void Init (string theme = "Default", string colorScheme = "Base")
 		{
 			Application.Init ();
 

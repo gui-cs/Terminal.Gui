@@ -456,15 +456,23 @@ namespace Terminal.Gui {
 		Action<KeyEvent> keyHandler;
 		Action<KeyEvent> keyUpHandler;
 		private CursorVisibility savedCursorVisibility;
-
+		
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			this.keyDownHandler = keyDownHandler;
 			this.keyHandler = keyHandler;
 			this.keyUpHandler = keyUpHandler;
-
+			
 			// Note: Net doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
-			(mainLoop.Driver as FakeMainLoop).KeyPressed += (consoleKey) => ProcessInput (consoleKey);
+			(mainLoop.Driver as FakeMainLoop).KeyPressed += (key) => {
+				uint outputChar;
+				uint scanCode;
+				ConsoleKey consoleKey = (ConsoleKey)ConsoleKeyMapping.GetConsoleKeyFromKey ((uint)key, 0, scanCode: out scanCode, outputChar: out outputChar);
+				char strippedKey = (char)(key & ~Key.CtrlMask & ~Key.ShiftMask & ~Key.AltMask);
+				var ck = new ConsoleKeyInfo (strippedKey, (ConsoleKey)strippedKey,
+					key.HasFlag(Key.ShiftMask), key.HasFlag (Key.AltMask), key.HasFlag (Key.CtrlMask));
+				ProcessInput (ck);
+			};
 		}
 
 		void ProcessInput (ConsoleKeyInfo consoleKey)

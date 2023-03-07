@@ -15,7 +15,7 @@ namespace UICatalog.Scenarios {
 	public class CollectionNavigatorTester : Scenario {
 
 		// Don't create a Window, just return the top-level view
-		public override void Init (ColorScheme colorScheme)
+		public override void Init (string theme = "Default", string colorScheme = "Base")
 		{
 			Application.Init ();
 			Application.Top.ColorScheme = Colors.Base;
@@ -97,9 +97,9 @@ namespace UICatalog.Scenarios {
 					allowMarking,
 					allowMultiSelection,
 					null,
-					new MenuItem ("_Quit", "", () => Quit(), null, null, Key.Q | Key.CtrlMask),
+					new MenuItem ("_Quit", $"{Application.QuitKey}", () => Quit(), null, null, Application.QuitKey),
 				}),
-				new MenuBarItem("_Quit", "CTRL-Q", () => Quit()),
+				new MenuBarItem("_Quit", $"{Application.QuitKey}", () => Quit()),
 			});
 
 			Application.Top.Add (menu);
