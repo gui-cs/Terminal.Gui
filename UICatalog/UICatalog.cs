@@ -195,9 +195,9 @@ namespace UICatalog {
 			// Run UI Catalog UI. When it exits, if _selectedScenario is != null then
 			// a Scenario was selected. Otherwise, the user wants to exit UI Catalog.
 			Application.Init ();
-			
-			//Application.EnableConsoleScrolling = _enableConsoleScrolling;
-			
+
+			Application.EnableConsoleScrolling = _enableConsoleScrolling;
+
 			Application.Run<UICatalogTopLevel> ();
 			Application.Shutdown ();
 
@@ -219,6 +219,7 @@ namespace UICatalog {
 
 		static bool _useSystemConsole = false;
 		static ConsoleDriver.DiagnosticFlags _diagnosticFlags;
+		static bool _enableConsoleScrolling = false;
 		static bool _isFirstRunning = true;
 		static string _topLevelColorScheme;
 
@@ -355,6 +356,8 @@ namespace UICatalog {
 			{
 				ConfigChanged ();
 
+				miIsMouseDisabled.Checked = Application.IsMouseDisabled;
+				miEnableConsoleScrolling.Checked = Application.EnableConsoleScrolling;
 				DriverName.Title = $"Driver: {Driver.GetType ().Name}";
 				OS.Title = $"OS: {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem} {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion}";
 
@@ -409,13 +412,12 @@ namespace UICatalog {
 
 			List<MenuItem []> CreateDiagnosticMenuItems ()
 			{
-				List<MenuItem []> menuItems = new List<MenuItem []> {
-					CreateDiagnosticFlagsMenuItems (),
-					new MenuItem [] { null },
-					CreateEnableConsoleScrollingMenuItems (),
-					CreateDisabledEnabledMouseItems (),
-					CreateKeybindingsMenuItems ()
-				};
+				List<MenuItem []> menuItems = new List<MenuItem []> ();
+				menuItems.Add (CreateDiagnosticFlagsMenuItems ());
+				menuItems.Add (new MenuItem [] { null });
+				menuItems.Add (CreateEnableConsoleScrollingMenuItems ());
+				menuItems.Add (CreateDisabledEnabledMouseItems ());
+				menuItems.Add (CreateKeybindingsMenuItems ());
 				return menuItems;
 			}
 

@@ -714,12 +714,6 @@ namespace Terminal.Gui {
 		public abstract bool EnableConsoleScrolling { get; set; }
 
 		/// <summary>
-		/// This API is deprecated; use <see cref="EnableConsoleScrolling"/> instead.
-		/// </summary>
-		[Obsolete ("This API is deprecated; use EnableConsoleScrolling instead.", false)]
-		public abstract bool HeightAsBuffer { get; set; }
-
-		/// <summary>
 		/// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
 		/// </summary>
 		public virtual int [,,] Contents { get; }
