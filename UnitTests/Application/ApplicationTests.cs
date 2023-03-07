@@ -560,16 +560,16 @@ namespace Terminal.Gui.ApplicationTests {
 			var input = "Tests";
 
 			// Put a control-q in at the end
-			Console.MockKeyPresses.Push (Key.CtrlMask | Key.Q); //new ConsoleKeyInfo ('q', ConsoleKey.Q, shift: false, alt: false, control: true));
+			FakeConsole.MockKeyPresses.Push (new ConsoleKeyInfo ('q', ConsoleKey.Q, shift: false, alt: false, control: true));
 			foreach (var c in input.Reverse ()) {
 				if (char.IsLetter (c)) {
-					Console.MockKeyPresses.Push (((Key)char.ToUpper (c)) | (char.IsUpper (c) ? Key.ShiftMask : (Key)0));
+					FakeConsole.MockKeyPresses.Push (new ConsoleKeyInfo (c, (ConsoleKey)char.ToUpper (c), shift: char.IsUpper (c), alt: false, control: false));
 				} else {
-					Console.MockKeyPresses.Push ((Key)c);
+					FakeConsole.MockKeyPresses.Push (new ConsoleKeyInfo (c, (ConsoleKey)c, shift: false, alt: false, control: false));
 				}
 			}
 
-			int stackSize = Console.MockKeyPresses.Count;
+			int stackSize = FakeConsole.MockKeyPresses.Count;
 
 			int iterations = 0;
 			Application.Iteration = () => {

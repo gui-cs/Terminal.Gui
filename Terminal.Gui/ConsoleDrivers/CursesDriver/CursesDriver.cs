@@ -21,11 +21,6 @@ namespace Terminal.Gui {
 		public override int Left => 0;
 		public override int Top => 0;
 		public override bool EnableConsoleScrolling { get; set; }
-		[Obsolete ("This API is deprecated; use EnableConsoleScrolling instead.", false)]
-		public override bool HeightAsBuffer {
-			get => EnableConsoleScrolling;
-			set => EnableConsoleScrolling = value;
-		}
 		public override IClipboard Clipboard { get => clipboard; }
 
 		CursorVisibility? initialCursorVisibility = null;

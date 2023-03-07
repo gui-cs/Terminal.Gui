@@ -1,6 +1,7 @@
 using NStack;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Terminal.Gui;
@@ -26,14 +27,17 @@ namespace UICatalog.Tests {
 
 		int CreateInput (string input)
 		{
-			// Put a control-q in at the end
-			FakeConsole.MockKeyPresses.Push (Key.CtrlMask | Key.Q);
+			FakeConsole.MockKeyPresses.Clear ();
+			// Put a QuitKey in at the end
+			FakeConsole.PushMockKeyPress (Application.QuitKey);
 			foreach (var c in input.Reverse ()) {
+				Key key = Key.Unknown;
 				if (char.IsLetter (c)) {
-					Console.MockKeyPresses.Push (((Key)char.ToUpper (c)) | (char.IsUpper (c) ? Key.ShiftMask : (Key)0));
+					key = (Key)char.ToUpper (c) | (char.IsUpper (c) ? Key.ShiftMask : (Key)0);
 				} else {
-					Console.MockKeyPresses.Push ((Key)c);
+					key = (Key)c;
 				}
+				FakeConsole.PushMockKeyPress (key);
 			}
 			return FakeConsole.MockKeyPresses.Count;
 		}
@@ -55,40 +59,46 @@ namespace UICatalog.Tests {
 
 			foreach (var scenario in scenarios) {
 				output.WriteLine ($"Running Scenario '{scenario.GetName ()}'");
-
+				
 				Application.Init (new FakeDriver ());
 
-				// Close after a short period of time
-				Func<MainLoop, bool> closeCallback = (MainLoop loop) => {
-					// Prove the scenario is using Application.QuitKey correctly
-					FakeConsole.MockKeyPresses.Push (Application.QuitKey);
-					return false;
-				};
-				_ = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), closeCallback);
+				// Press QuitKey 
+				Assert.Empty (FakeConsole.MockKeyPresses);
+				// BUGBUG: For some reason ReadKey is not returning the QuitKey for some Scenarios
+				// by adding this Space it seems to work.
+				FakeConsole.PushMockKeyPress (Key.Space);
+				FakeConsole.PushMockKeyPress (Application.QuitKey);
 
-				Func<MainLoop, bool> forceCloseCallback = (MainLoop loop) => {
-					Assert.Equal (string.Empty, $"'{scenario.GetName ()}' failed to Quit");
-					return false;
-				};
-				// If the scenario doesn't close, this will force it
-				//_ = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (500), forceCloseCallback);
-
-				scenario.Init ();
-				scenario.Setup ();
-
+				// The only key we care about is the QuitKey
 				Application.Top.KeyPress += (View.KeyEventEventArgs args) => {
-					Assert.Equal (Key.Esc, args.KeyEvent.Key);
+					output.WriteLine ($"  Keypress: {args.KeyEvent.Key}");
+					Assert.Equal (Application.QuitKey, args.KeyEvent.Key);
+					args.Handled = false;
 				};
 
+				uint abortTime = 500;
+				// If the scenario doesn't close within 500ms, this will force it to quit
+				Func<MainLoop, bool> forceCloseCallback = (MainLoop loop) => {
+					Application.RequestStop ();
+					Assert.Fail ($"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms. Force quit.");
+					return false;
+				};
+				//output.WriteLine ($"  Add timeout to force quit after {abortTime}ms");
+				_ = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
+
+				int iterations = 0;
 				Application.Iteration += () => {
+					//output.WriteLine ($"  iteration {++iterations}");
 					if (FakeConsole.MockKeyPresses.Count == 0) {
-						//Application.RequestStop ();
+						Application.RequestStop ();
+						//Assert.Fail ($"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey}. Force quit.");
 					}
 				};
 
+				scenario.Init ();
+				scenario.Setup ();
 				scenario.Run ();
-
-				scenario.Dispose();
+				scenario.Dispose ();
 
 				Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
@@ -114,51 +124,49 @@ namespace UICatalog.Tests {
 
 			var item = scenarios.FindIndex (s => s.GetName ().Equals ("Generic", StringComparison.OrdinalIgnoreCase));
 			var generic = scenarios [item];
-			// Setup some fake keypresses 
-			// Passing empty string will cause just a ctrl-q to be fired
-			int stackSize = CreateInput ("");
 
 			Application.Init (new FakeDriver ());
-			Application.QuitKey = Key.CtrlMask | Key.Q; // Config manager may have set this to a different key
+			// BUGBUG: For some reason ReadKey is not
+			// returning the QuitKey for some Scenarios
+			// by adding this Space it seems to work.
+			FakeConsole.PushMockKeyPress (Key.Space);
+			FakeConsole.PushMockKeyPress (Application.QuitKey);
 
 			int iterations = 0;
 			Application.Iteration = () => {
 				iterations++;
+				output.WriteLine ($"'Generic' iteration {iterations}");
 				// Stop if we run out of control...
 				if (iterations == 10) {
+					output.WriteLine ($"'Generic' had to be force quit!");
 					Application.RequestStop ();
 				}
 			};
 
-			var ms = 1000;
+			var ms = 100;
 			var abortCount = 0;
 			Func<MainLoop, bool> abortCallback = (MainLoop loop) => {
 				abortCount++;
+				output.WriteLine ($"'Generic' abortCount {abortCount}");
 				Application.RequestStop ();
 				return false;
 			};
 			var token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
 
 			Application.Top.KeyPress += (View.KeyEventEventArgs args) => {
-				Assert.Equal (Key.CtrlMask | Key.Q, args.KeyEvent.Key);
+				output.WriteLine ($"'Generic' KeyPress {args.KeyEvent.Key}");
+				Assert.Equal (Application.QuitKey, args.KeyEvent.Key);
 			};
 
 			generic.Init ();
 			generic.Setup ();
-			// There is no need to call Application.Begin because Init already creates the Application.Top
-			// If Application.RunState is used then the Application.RunLoop must also be used instead Application.Run.
-			//var rs = Application.Begin (Application.Top);
 			generic.Run ();
-
-			//Application.End (rs);
 
 			Assert.Equal (0, abortCount);
 			// # of key up events should match # of iterations
 			Assert.Equal (1, iterations);
-			// Using variable in the left side of Assert.Equal/NotEqual give error. Must be used literals values.
-			//Assert.Equal (stackSize, iterations);
 
-			generic.Dispose();
+			generic.Dispose ();
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();

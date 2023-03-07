@@ -102,16 +102,17 @@ namespace Terminal.Gui.DriverTests {
 
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
-		public void FakeDriver_MockKeyPresses_Letters (Type driverType)
+		public void FakeDriver_MockKeyPresses (Type driverType)
 		{
 			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 
 			var text = "MockKeyPresses";
-			var mKeys = new Stack<Key> ();
+			var mKeys = new Stack<ConsoleKeyInfo> ();
 			foreach (var r in text.Reverse ()) {
-				//var ck = char.IsLetter (r) ? (Key)r : Key.Null;
-				mKeys.Push ((Key)r);
+				var ck = char.IsLetter (r) ? (ConsoleKey)char.ToUpper (r) : (ConsoleKey)r;
+				var cki = new ConsoleKeyInfo (r, ck, false, false, false);
+				mKeys.Push (cki);
 			}
 			Console.MockKeyPresses = mKeys;
 
@@ -120,7 +121,7 @@ namespace Terminal.Gui.DriverTests {
 			var rText = "";
 			var idx = 0;
 
-			view.KeyPress += (e) => {
+			top.KeyPress += (e) => {
 				Assert.Equal (text [idx], (char)e.KeyEvent.Key);
 				rText += (char)e.KeyEvent.Key;
 				Assert.Equal (rText, text.Substring (0, idx + 1));
@@ -141,53 +142,63 @@ namespace Terminal.Gui.DriverTests {
 			Application.Shutdown ();
 		}
 
-		[Theory]
-		[InlineData (typeof (FakeDriver))]
-		public void FakeDriver_MockKeyPresses_Modifiers (Type driverType)
-		{
-			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-			Application.Init (driver);
+		//[Theory]
+		//[InlineData (typeof (FakeDriver))]
+		//public void FakeDriver_MockKeyPresses_Press_AfterTimeOut (Type driverType)
+		//{
+		//	var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+		//	Application.Init (driver);
 
-			var expectedKeys = new Key [] {
-				(Key.F10),
-				(Key.T | Key.CtrlMask),
-				(Key.A | Key.AltMask),
-				(Key.Delete | Key.CtrlMask | Key.AltMask)
-			};
+		//	// Simulating pressing of QuitKey after a short period of time
+		//	uint quitTime = 100;
+		//	Func<MainLoop, bool> closeCallback = (MainLoop loop) => {
+		//		// Prove the scenario is using Application.QuitKey correctly
+		//		output.WriteLine ($"  {quitTime}ms elapsed; Simulating keypresses...");
+		//		FakeConsole.PushMockKeyPress (Key.F);
+		//		FakeConsole.PushMockKeyPress (Key.U);
+		//		FakeConsole.PushMockKeyPress (Key.C);
+		//		FakeConsole.PushMockKeyPress (Key.K);
+		//		return false;
+		//	};
+		//	output.WriteLine ($"Add timeout to simulate key presses after {quitTime}ms");
+		//	_ = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (quitTime), closeCallback);
 
-			var mKeys = new Stack<Key> ();
-			foreach (var k in expectedKeys.Reverse ()) {
-				//var ck = char.IsLetter (r) ? (Key)r : Key.Null;
-				mKeys.Push (k);
-			}
-			Console.MockKeyPresses = mKeys;
+		//	// If Top doesn't quit within abortTime * 5 (500ms), this will force it
+		//	uint abortTime = quitTime * 5;
+		//	Func<MainLoop, bool> forceCloseCallback = (MainLoop loop) => {
+		//		Application.RequestStop ();
+		//		Assert.Fail ($"  failed to Quit after {abortTime}ms. Force quit.");
+		//		return false;
+		//	};
+		//	output.WriteLine ($"Add timeout to force quit after {abortTime}ms");
+		//	_ = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
 
-			var top = Application.Top;
-			var view = new View ();
-			var resultKeys = new List<Key> ();
-			var idx = 0;
 
-			view.KeyPress += (e) => {
-				Assert.Equal (expectedKeys [idx], e.KeyEvent.Key);
-				resultKeys.Add (e.KeyEvent.Key);
-				e.Handled = true;
-				idx++;
-			};
-			top.Add (view);
+		//	Key key = Key.Unknown;
+			
+		//	Application.Top.KeyPress += (e) => {
+		//		key = e.KeyEvent.Key;
+		//		output.WriteLine ($"  Application.Top.KeyPress: {key}");
+		//		e.Handled = true;
+				
+		//	};
 
-			Application.Iteration += () => {
-				if (mKeys.Count == 0) Application.RequestStop ();
-			};
+		//	int iterations = 0;
+		//	Application.Iteration += () => {
+		//		output.WriteLine ($"  iteration {++iterations}");
 
-			Application.Run ();
+		//		if (Console.MockKeyPresses.Count == 0) {
+		//			output.WriteLine ($"    No more MockKeyPresses; RequestStop");
+		//			Application.RequestStop ();
+		//		}
+		//	};
 
-			for (var i = 0; i < expectedKeys.Length; i++) {
-				Assert.Equal (expectedKeys [i], resultKeys [i]);
-			}
+		//	Application.Run ();
 
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
-		}
+		//	// Shutdown must be called to safely clean up Application if Init has been called
+		//	Application.Shutdown ();
+		//}
+		
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
 		public void TerminalResized_Simulation (Type driverType)

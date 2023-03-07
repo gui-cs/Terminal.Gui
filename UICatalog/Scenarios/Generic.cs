@@ -12,12 +12,11 @@ namespace UICatalog.Scenarios {
 			//  - Adds a full-screen Window to Application.Top with a title
 			//    that reads "Press <hotkey> to Quit". Access this Window with `this.Win`.
 			//  - Sets the Theme & the ColorScheme property of `this.Win` to `colorScheme`.
-			// To overrride this, implement an override of `Init`.
+			// To override this, implement an override of `Init`.
 			base.Init (theme, colorScheme);
-			Application.QuitKey = Key.CtrlMask | Key.P;
 			// A common, alternate, implementation where `this.Win` is not used:
-			//   Application.Init ();
-			//   Application.Top.ColorScheme = Colors.ColorSchemes [colorScheme];
+			//Application.Init ();
+			//Application.Top.ColorScheme = Colors.ColorSchemes [colorScheme];
 		}
 
 		public override void Setup ()

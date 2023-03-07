@@ -7,7 +7,7 @@
 //  - FrameView Does not support padding (but should)
 //  - FrameView Does not support mouse dragging
 //  - FrameView Does not support IEnumerable
-// Any udpates done here should probably be done in FrameView as well; TODO: Merge these classes
+// Any updates done here should probably be done in FrameView as well; TODO: Merge these classes
 
 using System;
 using System.Collections;
@@ -308,7 +308,6 @@ namespace Terminal.Gui {
 			ClearNeedsDisplay ();
 
 			Driver.SetAttribute (GetNormalColor ());
-			Border.Title = Title; //  not sure why Title is getting un-set
 			Border.DrawContent (this, false);
 		}
 
@@ -346,7 +345,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Event arguments for <see cref="Title"/> chane events.
+		/// Event arguments for <see cref="Title"/> change events.
 		/// </summary>
 		public class TitleEventArgs : EventArgs {
 			/// <summary>
@@ -360,7 +359,7 @@ namespace Terminal.Gui {
 			public ustring OldTitle { get; set; }
 
 			/// <summary>
-			/// Flag which allows cancelling the Title change.
+			/// Flag which allows canceling the Title change.
 			/// </summary>
 			public bool Cancel { get; set; }
 
@@ -380,7 +379,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="oldTitle">The <see cref="Window.Title"/> that is/has been replaced.</param>
 		/// <param name="newTitle">The new <see cref="Window.Title"/> to be replaced.</param>
-		/// <returns>`true` if an event handler cancelled the Title change.</returns>
+		/// <returns>`true` if an event handler canceled the Title change.</returns>
 		public virtual bool OnTitleChanging (ustring oldTitle, ustring newTitle)
 		{
 			var args = new TitleEventArgs (oldTitle, newTitle);

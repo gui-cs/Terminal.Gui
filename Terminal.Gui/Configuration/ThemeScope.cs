@@ -120,21 +120,21 @@ namespace Terminal.Gui.Configuration {
 			/// </summary>
 			public static ThemeManager Instance { get { return _instance; } }
 
-			private static string theme = string.Empty;
+			private static string _theme = string.Empty;
 
 			/// <summary>
 			/// The currently selected theme. This is the internal version; see <see cref="Theme"/>.
 			/// </summary>
 			[JsonInclude, SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true), JsonPropertyName ("Theme")]
 			internal static string SelectedTheme {
-				get => theme;
+				get => _theme;
 				set {
-					var oldTheme = theme;
-					theme = value;
-					if (oldTheme != theme &&
+					var oldTheme = _theme;
+					_theme = value;
+					if (oldTheme != _theme &&
 						ConfigurationManager.Settings! ["Themes"]?.PropertyValue is Dictionary<string, ThemeScope> themes &&
-						themes.ContainsKey (theme)) {
-						ConfigurationManager.Settings! ["Theme"].PropertyValue = theme;
+						themes.ContainsKey (_theme)) {
+						ConfigurationManager.Settings! ["Theme"].PropertyValue = _theme;
 						Instance.OnThemeChanged (oldTheme);
 					}
 				}

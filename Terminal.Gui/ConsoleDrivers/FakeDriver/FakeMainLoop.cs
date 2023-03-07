@@ -13,16 +13,14 @@ namespace Terminal.Gui {
 	public class FakeMainLoop : IMainLoopDriver {
 		AutoResetEvent keyReady = new AutoResetEvent (false);
 		AutoResetEvent waitForProbe = new AutoResetEvent (false);
-		Key? keyResult = null;
+		ConsoleKeyInfo? keyResult = null;
 		MainLoop mainLoop;
-		Func<Key> consoleKeyReaderFn = () => {
-			return FakeConsole.ReadKey (true);
-		};
+		//Func<ConsoleKeyInfo> consoleKeyReaderFn = () => ;
 
 		/// <summary>
 		/// Invoked when a Key is pressed.
 		/// </summary>
-		public Action<Key> KeyPressed;
+		public Action<ConsoleKeyInfo> KeyPressed;
 
 		/// <summary>
 		/// Creates an instance of the FakeMainLoop. <paramref name="consoleDriver"/> is not used.
@@ -33,11 +31,11 @@ namespace Terminal.Gui {
 			// consoleDriver is not needed/used in FakeConsole
 		}
 
-		void WindowsKeyReader ()
+		void MockKeyReader ()
 		{
 			while (true) {
 				waitForProbe.WaitOne ();
-				keyResult = FakeConsole.ReadKey (true); //consoleKeyReaderFn ();
+				keyResult = FakeConsole.ReadKey (true);
 				keyReady.Set ();
 			}
 		}
@@ -45,7 +43,7 @@ namespace Terminal.Gui {
 		void IMainLoopDriver.Setup (MainLoop mainLoop)
 		{
 			this.mainLoop = mainLoop;
-			Thread readThread = new Thread (WindowsKeyReader);
+			Thread readThread = new Thread (MockKeyReader);
 			readThread.Start ();
 		}
 

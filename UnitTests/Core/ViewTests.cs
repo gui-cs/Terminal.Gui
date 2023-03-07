@@ -1017,7 +1017,7 @@ namespace Terminal.Gui.CoreTests {
 			};
 
 			// Keyboard navigation with tab
-			Console.MockKeyPresses.Push (Key.Tab);
+			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('\t', ConsoleKey.Tab, false, false, false));
 
 			Application.Iteration += () => Application.RequestStop ();
 
@@ -1125,7 +1125,7 @@ namespace Terminal.Gui.CoreTests {
 		{
 			Application.Init (new FakeDriver ());
 
-			Console.MockKeyPresses.Push (Key.N);
+			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('N', ConsoleKey.N, false, false, false));
 
 			var top = Application.Top;
 
@@ -1138,7 +1138,7 @@ namespace Terminal.Gui.CoreTests {
 			top.Add (text);
 
 			Application.Iteration += () => {
-				Console.MockKeyPresses.Push (Key.N);
+				Console.MockKeyPresses.Push (new ConsoleKeyInfo ('N', ConsoleKey.N, false, false, false));
 				Assert.Equal ("", text.Text);
 
 				Application.RequestStop ();
@@ -1530,14 +1530,14 @@ namespace Terminal.Gui.CoreTests {
 			var tfQuiting = false;
 			var topQuiting = false;
 			var sb = new StatusBar (new StatusItem [] {
-				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => sbQuiting = true )
+				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => sbQuiting = true )
 			});
 			var tf = new TextField ();
 			tf.KeyPress += Tf_KeyPress;
 
 			void Tf_KeyPress (View.KeyEventEventArgs obj)
 			{
-				if (obj.KeyEvent.Key == Application.QuitKey) {
+				if (obj.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
 					obj.Handled = tfQuiting = true;
 				}
 			}
@@ -1549,7 +1549,7 @@ namespace Terminal.Gui.CoreTests {
 
 			void Top_KeyPress (View.KeyEventEventArgs obj)
 			{
-				if (obj.KeyEvent.Key == Application.QuitKey) {
+				if (obj.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
 					obj.Handled = topQuiting = true;
 				}
 			}
@@ -1590,14 +1590,14 @@ namespace Terminal.Gui.CoreTests {
 			var sbQuiting = false;
 			var tfQuiting = false;
 			var sb = new StatusBar (new StatusItem [] {
-				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => sbQuiting = true )
+				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => sbQuiting = true )
 			});
 			var tf = new TextField ();
 			tf.KeyPress += Tf_KeyPress;
 
 			void Tf_KeyPress (View.KeyEventEventArgs obj)
 			{
-				if (obj.KeyEvent.Key == Application.QuitKey) {
+				if (obj.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
 					obj.Handled = tfQuiting = true;
 				}
 			}
@@ -2307,7 +2307,7 @@ This is a tes
 
 			Application.Top.Add (view);
 
-			Console.MockKeyPresses.Push (Key.a);
+			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('a', ConsoleKey.A, false, false, false));
 
 			Application.Iteration += () => Application.RequestStop ();
 
@@ -2353,21 +2353,7 @@ This is a tes
 				return true;
 			}
 
-			public void CorrectRedraw (Rect bounds)
-			{
-				// Clear the old and new frame area
-				Clear (NeedDisplay);
-				DrawText ();
-			}
-
-			public void IncorrectRedraw (Rect bounds)
-			{
-				// Clear only the new frame area
-				Clear ();
-				DrawText ();
-			}
-
-			private void DrawText ()
+			public override void Redraw (Rect bounds)
 			{
 				var idx = 0;
 				for (int r = 0; r < Frame.Height; r++) {
@@ -2424,7 +2410,7 @@ This is a tes
 
 			Application.Top.Add (view);
 
-			Console.MockKeyPresses.Push (default);
+			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('\0', (ConsoleKey)'\0', shift, alt, control));
 
 			Application.Iteration += () => Application.RequestStop ();
 
@@ -2501,7 +2487,7 @@ This is a tes
 		[InlineData (false)]
 		public void Clear_Does_Not_Spillover_Its_Parent (bool label)
 		{
-			var root = new View () { Width = 20, Height = 10 };
+			var root = new View () { Width = 20, Height = 10, ColorScheme = Colors.Base };
 
 			var v = label == true ?
 				new Label (new string ('c', 100)) {
@@ -2533,15 +2519,17 @@ cccccccccccccccccccc", output);
 
 			var attributes = new Attribute [] {
 				Colors.TopLevel.Normal,
-				Colors.TopLevel.Focus,
-
+				Colors.Base.Normal,
+				Colors.Base.Focus
 			};
 			if (label) {
 				TestHelpers.AssertDriverColorsAre (@"
-000000000000000000000", attributes);
+111111111111111111110
+111111111111111111110", attributes);
 			} else {
 				TestHelpers.AssertDriverColorsAre (@"
-111111111111111111110", attributes);
+222222222222222222220
+222222222222222222220", attributes);
 			}
 
 			if (label) {
@@ -2552,7 +2540,8 @@ cccccccccccccccccccc", output);
 				Assert.True (v.HasFocus);
 				Application.Refresh ();
 				TestHelpers.AssertDriverColorsAre (@"
-111111111111111111110", attributes);
+222222222222222222220
+222222222222222222220", attributes);
 			}
 		}
 
@@ -2571,7 +2560,7 @@ cccccccccccccccccccc", output);
 			top.Add (label, view);
 			Application.Begin (top);
 
-			view.CorrectRedraw (view.Bounds);
+			top.Redraw (top.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -2579,9 +2568,12 @@ At 0,0
    and also with two lines.  ", output);
 
 			view.Frame = new Rect (1, 1, 10, 1);
+			Assert.Equal (new Rect (1, 1, 10, 1), view.Frame);
+			Assert.Equal (LayoutStyle.Computed, view.LayoutStyle);
+			view.LayoutStyle = LayoutStyle.Absolute;
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (1, 1, 31, 3), view.NeedDisplay);
-			view.CorrectRedraw (view.Bounds);
+			Assert.Equal (new Rect (0, 0, 10, 1), view.NeedDisplay);
+			top.Redraw (top.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0     
  A text wit", output);
@@ -2602,7 +2594,7 @@ At 0,0
 			top.Add (label, view);
 			Application.Begin (top);
 
-			view.CorrectRedraw (view.Bounds);
+			top.Redraw (top.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -2615,8 +2607,8 @@ At 0,0
 			view.Height = 1;
 			Assert.Equal (new Rect (1, 1, 10, 1), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (1, 1, 31, 3), view.NeedDisplay);
-			view.CorrectRedraw (view.Bounds);
+			Assert.Equal (new Rect (0, 0, 30, 2), view.NeedDisplay);
+			top.Redraw (top.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0     
  A text wit", output);
@@ -2637,7 +2629,7 @@ At 0,0
 			top.Add (label, view);
 			Application.Begin (top);
 
-			view.IncorrectRedraw (view.Bounds);
+			view.Redraw (view.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -2645,9 +2637,12 @@ At 0,0
    and also with two lines.  ", output);
 
 			view.Frame = new Rect (1, 1, 10, 1);
+			Assert.Equal (new Rect (1, 1, 10, 1), view.Frame);
+			Assert.Equal (LayoutStyle.Computed, view.LayoutStyle);
+			view.LayoutStyle = LayoutStyle.Absolute;
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (1, 1, 31, 3), view.NeedDisplay);
-			view.IncorrectRedraw (view.Bounds);
+			Assert.Equal (new Rect (0, 0, 10, 1), view.NeedDisplay);
+			view.Redraw (view.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
  A text wit                  
@@ -2670,7 +2665,7 @@ At 0,0
 			top.Add (label, view);
 			Application.Begin (top);
 
-			view.IncorrectRedraw (view.Bounds);
+			view.Redraw (view.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -2683,8 +2678,8 @@ At 0,0
 			view.Height = 1;
 			Assert.Equal (new Rect (1, 1, 10, 1), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (1, 1, 31, 3), view.NeedDisplay);
-			view.IncorrectRedraw (view.Bounds);
+			Assert.Equal (new Rect (0, 0, 30, 2), view.NeedDisplay);
+			view.Redraw (view.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
  A text wit                  
@@ -2707,7 +2702,6 @@ At 0,0
 			top.Add (label, view);
 			Application.Begin (top);
 
-			view.CorrectRedraw (view.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -2715,9 +2709,12 @@ At 0,0
    and also with two lines.  ", output);
 
 			view.Frame = new Rect (3, 3, 10, 1);
+			Assert.Equal (new Rect (3, 3, 10, 1), view.Frame);
+			Assert.Equal (LayoutStyle.Computed, view.LayoutStyle);
+			view.LayoutStyle = LayoutStyle.Absolute;
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (2, 2, 30, 2), view.NeedDisplay);
-			view.CorrectRedraw (view.Bounds);
+			Assert.Equal (new Rect (0, 0, 10, 1), view.NeedDisplay);
+			top.Redraw (top.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0       
              
@@ -2740,7 +2737,7 @@ At 0,0
 			top.Add (label, view);
 			Application.Begin (top);
 
-			view.CorrectRedraw (view.Bounds);
+			top.Redraw (top.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -2753,8 +2750,8 @@ At 0,0
 			view.Height = 1;
 			Assert.Equal (new Rect (3, 3, 10, 1), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (2, 2, 30, 2), view.NeedDisplay);
-			view.CorrectRedraw (view.Bounds);
+			Assert.Equal (new Rect (0, 0, 30, 2), view.NeedDisplay);
+			top.Redraw (top.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0       
              
@@ -2777,7 +2774,7 @@ At 0,0
 			top.Add (label, view);
 			Application.Begin (top);
 
-			view.IncorrectRedraw (view.Bounds);
+			view.Redraw (view.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -2786,8 +2783,8 @@ At 0,0
 
 			view.Frame = new Rect (3, 3, 10, 1);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (2, 2, 30, 2), view.NeedDisplay);
-			view.IncorrectRedraw (view.Bounds);
+			Assert.Equal (new Rect (0, 0, 10, 1), view.NeedDisplay);
+			view.Redraw (view.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -2810,7 +2807,7 @@ At 0,0
 			top.Add (label, view);
 			Application.Begin (top);
 
-			view.IncorrectRedraw (view.Bounds);
+			view.Redraw (view.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -2823,8 +2820,8 @@ At 0,0
 			view.Height = 1;
 			Assert.Equal (new Rect (3, 3, 10, 1), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (2, 2, 30, 2), view.NeedDisplay);
-			view.IncorrectRedraw (view.Bounds);
+			Assert.Equal (new Rect (0, 0, 30, 2), view.NeedDisplay);
+			view.Redraw (view.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -2856,6 +2853,105 @@ At 0,0
 ───────────
 222";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Frame_Set_After_Initialze_Update_NeededDisplay ()
+		{
+			var frame = new FrameView ();
+
+			var label = new Label ("This should be the first line.") {
+				TextAlignment = Terminal.Gui.TextAlignment.Centered,
+				ColorScheme = Colors.Menu,
+				Width = Dim.Fill (),
+				X = Pos.Center (),
+				Y = Pos.Center () - 2  // center minus 2 minus two lines top and bottom borders equal to zero (4-2-2=0)
+			};
+
+			var button = new Button ("Press me!") {
+				X = Pos.Center (),
+				Y = Pos.Center ()
+			};
+
+			frame.Add (label, button);
+
+			frame.X = Pos.Center ();
+			frame.Y = Pos.Center ();
+			frame.Width = 40;
+			frame.Height = 8;
+
+			var top = Application.Top;
+
+			top.Add (frame);
+
+			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
+			Assert.Equal (new Rect (0, 0, 40, 8), frame.Frame);
+			Assert.Equal (new Rect (1, 1, 0, 0), frame.Subviews [0].Frame);
+			Assert.Equal ("ContentView()({X=1,Y=1,Width=0,Height=0})", frame.Subviews [0].ToString ());
+			Assert.Equal (new Rect (0, 0, 40, 8), new Rect (
+				frame.Frame.Left, frame.Frame.Top,
+				frame.Frame.Right, frame.Frame.Bottom));
+			Assert.Equal (new Rect (0, 0, 30, 1), label.Frame);
+			Assert.Equal (new Rect (0, 0, 13, 1), button.Frame);
+
+			Assert.Equal (new Rect (0, 0, 80, 25), top.NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 40, 8), frame.NeedDisplay);
+			Assert.Equal (Rect.Empty, frame.Subviews [0].NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 40, 8), new Rect (
+				frame.NeedDisplay.Left, frame.NeedDisplay.Top,
+				frame.NeedDisplay.Right, frame.NeedDisplay.Bottom));
+			Assert.Equal (new Rect (0, 0, 30, 1), label.NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 13, 1), button.NeedDisplay);
+
+			top.LayoutComplete += e => {
+				Assert.Equal (new Rect (0, 0, 80, 25), top.NeedDisplay);
+			};
+
+			frame.LayoutComplete += e => {
+				Assert.Equal (new Rect (0, 0, 40, 8), frame.NeedDisplay);
+			};
+
+			frame.Subviews [0].LayoutComplete += e => {
+				if (top.IsLoaded) {
+					Assert.Equal (new Rect (0, 0, 38, 6), frame.Subviews [0].NeedDisplay);
+				} else {
+					Assert.Equal (new Rect (0, 0, 38, 6), frame.Subviews [0].NeedDisplay);
+				}
+			};
+
+			label.LayoutComplete += e => {
+				Assert.Equal (new Rect (0, 0, 38, 1), label.NeedDisplay);
+			};
+
+			button.LayoutComplete += e => {
+				Assert.Equal (new Rect (0, 0, 13, 1), button.NeedDisplay);
+			};
+
+			Application.Begin (top);
+
+			Assert.True (label.AutoSize);
+			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
+			Assert.Equal (new Rect (20, 8, 40, 8), frame.Frame);
+			Assert.Equal (new Rect (1, 1, 38, 6), frame.Subviews [0].Frame);
+			Assert.Equal ("ContentView()({X=1,Y=1,Width=38,Height=6})", frame.Subviews [0].ToString ());
+			Assert.Equal (new Rect (20, 8, 60, 16), new Rect (
+				frame.Frame.Left, frame.Frame.Top,
+				frame.Frame.Right, frame.Frame.Bottom));
+			Assert.Equal (new Rect (0, 0, 38, 1), label.Frame);
+			Assert.Equal (new Rect (12, 2, 13, 1), button.Frame);
+			var expected = @"
+                    ┌──────────────────────────────────────┐
+                    │    This should be the first line.    │
+                    │                                      │
+                    │            [ Press me! ]             │
+                    │                                      │
+                    │                                      │
+                    │                                      │
+                    └──────────────────────────────────────┘
+";
+
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 	}
 }

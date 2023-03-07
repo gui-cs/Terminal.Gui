@@ -1176,22 +1176,29 @@ namespace Terminal.Gui {
 			}
 
 			var isVertical = IsVerticalDirection (textDirection);
-			var savedClip = Application.Driver?.Clip;
 			var maxBounds = bounds;
 			if (Application.Driver != null) {
-				Application.Driver.Clip = maxBounds = containerBounds == default
+				maxBounds = containerBounds == default
 					? bounds
 					: new Rect (Math.Max (containerBounds.X, bounds.X),
 					Math.Max (containerBounds.Y, bounds.Y),
 					Math.Max (Math.Min (containerBounds.Width, containerBounds.Right - bounds.Left), 0),
 					Math.Max (Math.Min (containerBounds.Height, containerBounds.Bottom - bounds.Top), 0));
 			}
+			if (maxBounds.Width == 0 || maxBounds.Height == 0) {
+				return;
+			}
+			var savedClip = Application.Driver?.Clip;
+			if (Application.Driver != null) {
+				Application.Driver.Clip = maxBounds;
+			}
+			var lineOffset = !isVertical && bounds.Y < 0 ? Math.Abs (bounds.Y) : 0;
 
-			for (int line = 0; line < linesFormated.Count; line++) {
+			for (int line = lineOffset; line < linesFormated.Count; line++) {
 				if ((isVertical && line > bounds.Width) || (!isVertical && line > bounds.Height))
 					continue;
 				if ((isVertical && line >= maxBounds.Left + maxBounds.Width)
-					|| (!isVertical && line >= maxBounds.Top + maxBounds.Height))
+					|| (!isVertical && line >= maxBounds.Top + maxBounds.Height + lineOffset))
 
 					break;
 
@@ -1267,18 +1274,21 @@ namespace Terminal.Gui {
 					throw new ArgumentOutOfRangeException ();
 				}
 
+				var colOffset = bounds.X < 0 ? Math.Abs (bounds.X) : 0;
 				var start = isVertical ? bounds.Top : bounds.Left;
 				var size = isVertical ? bounds.Height : bounds.Width;
-				var current = start;
+				var current = start + colOffset;
 
-				for (var idx = (isVertical ? start - y : start - x); current < start + size; idx++) {
-					if (!fillRemaining && idx < 0) {
+				for (var idx = (isVertical ? start - y : start - x) + colOffset; current < start + size; idx++) {
+					if (idx < 0 || x + current + colOffset < 0) {
 						current++;
 						continue;
 					} else if (!fillRemaining && idx > runes.Length - 1) {
 						break;
 					}
-					if ((!isVertical && idx > maxBounds.Left + maxBounds.Width - bounds.X) || (isVertical && idx > maxBounds.Top + maxBounds.Height - bounds.Y))
+					if ((!isVertical && idx > maxBounds.Left + maxBounds.Width - bounds.X + colOffset)
+						|| (isVertical && idx > maxBounds.Top + maxBounds.Height - bounds.Y))
+
 						break;
 
 					var rune = (Rune)' ';
@@ -1316,8 +1326,9 @@ namespace Terminal.Gui {
 					}
 				}
 			}
-			if (Application.Driver != null)
+			if (Application.Driver != null) {
 				Application.Driver.Clip = (Rect)savedClip;
+			}
 		}
 	}
 }
