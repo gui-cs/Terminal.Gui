@@ -149,7 +149,9 @@ namespace Terminal.Gui.TopLevelTests {
 		[AutoInitShutdown]
 		public void Internal_Tests ()
 		{
+			Toplevel.dragPosition = null; // dragPosition is `static` and must be reset for each instance or unit tests will fail?
 			var top = new Toplevel ();
+
 			var eventInvoked = "";
 
 			top.ChildUnloaded += (e) => eventInvoked = "ChildUnloaded";
@@ -1030,6 +1032,54 @@ namespace Terminal.Gui.TopLevelTests {
 			Application.Refresh ();
 			Application.Driver.GetCursorVisibility (out cursor);
 			Assert.Equal (CursorVisibility.Invisible, cursor);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void IsLoaded_Application_Begin ()
+		{
+			var top = Application.Top;
+			Assert.False (top.IsLoaded);
+
+			Application.Begin (top);
+			Assert.True (top.IsLoaded);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void IsLoaded_With_Sub_Toplevel_Application_Begin_NeedDisplay ()
+		{
+			var top = Application.Top;
+			var subTop = new Toplevel ();
+			var view = new View (new Rect (0, 0, 20, 10));
+			subTop.Add (view);
+			top.Add (subTop);
+
+			Assert.False (top.IsLoaded);
+			Assert.False (subTop.IsLoaded);
+			Assert.Equal (new Rect (0, 0, 20, 10), view.Frame);
+			Assert.Equal (new Rect (0, 0, 20, 10), view.NeedDisplay);
+
+			view.LayoutStarted += view_LayoutStarted;
+
+			void view_LayoutStarted (View.LayoutEventArgs e)
+			{
+				Assert.Equal (new Rect (0, 0, 20, 10), view.NeedDisplay);
+				view.LayoutStarted -= view_LayoutStarted;
+			}
+
+			Application.Begin (top);
+
+			Assert.True (top.IsLoaded);
+			Assert.True (subTop.IsLoaded);
+			Assert.Equal (new Rect (0, 0, 20, 10), view.Frame);
+
+			view.Frame = new Rect (1, 3, 10, 5);
+			Assert.Equal (new Rect (1, 3, 10, 5), view.Frame);
+			Assert.Equal (new Rect (0, 0, 10, 5), view.NeedDisplay);
+
+			view.Redraw (view.Bounds);
+			view.Frame = new Rect (1, 3, 10, 5);
+			Assert.Equal (new Rect (1, 3, 10, 5), view.Frame);
+			Assert.Equal (new Rect (0, 0, 10, 5), view.NeedDisplay);
 		}
 	}
 }

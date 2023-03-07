@@ -29,7 +29,7 @@ namespace Terminal.Gui.TopLevelTests {
 					Application.RequestStop ();
 
 				} else if (iterations == 1) {
-					Application.Top.Redraw (Application.Top.Bounds);
+					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
                 ┌ Title ───────────────────────────────────────┐
                 │                   Message                    │
@@ -71,7 +71,7 @@ namespace Terminal.Gui.TopLevelTests {
 
 					Application.RequestStop ();
 				} else if (iterations == 1) {
-					Application.Top.Redraw (Application.Top.Bounds);
+					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
          ┌ About UI Catalog ──────────────────────────────────────────┐
          │             A comprehensive sample library for             │
@@ -110,7 +110,7 @@ namespace Terminal.Gui.TopLevelTests {
 
 					Application.RequestStop ();
 				} else if (iterations == 1) {
-					Application.Top.Redraw (Application.Top.Bounds);
+					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
                                     ┌─────┐
                                     │Messa│
@@ -140,7 +140,7 @@ namespace Terminal.Gui.TopLevelTests {
 
 					Application.RequestStop ();
 				} else if (iterations == 1) {
-					Application.Top.Redraw (Application.Top.Bounds);
+					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
                                   ┌ Title ──┐
                                   │ Message │
@@ -170,7 +170,7 @@ namespace Terminal.Gui.TopLevelTests {
 
 					Application.RequestStop ();
 				} else if (iterations == 1) {
-					Application.Top.Redraw (Application.Top.Bounds);
+					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌ mywindow ────────────────────────────────────────────────────────────────────┐
 │ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
@@ -224,7 +224,7 @@ namespace Terminal.Gui.TopLevelTests {
 
 					Application.RequestStop ();
 				} else if (iterations == 1) {
-					Application.Top.Redraw (Application.Top.Bounds);
+					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌ mywindow ────────────────────────────────────────────────────────────────────┐
 │ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │

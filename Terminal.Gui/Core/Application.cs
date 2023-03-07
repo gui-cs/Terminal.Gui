@@ -114,27 +114,39 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static View WantContinuousButtonPressedView { get; private set; }
 
-		private static bool? _heightAsBuffer;
+		private static bool? _enableConsoleScrolling;
 
 		/// <summary>
-		/// The current <see cref="ConsoleDriver.HeightAsBuffer"/> used in the terminal.
+		/// The current <see cref="ConsoleDriver.EnableConsoleScrolling"/> used in the terminal.
 		/// </summary>
-		/// 
-		[SerializableConfigurationProperty (Scope = typeof(SettingsScope))]
-		public static bool HeightAsBuffer {
+		/// <remarks>
+		/// <para>
+		/// If <see langword="false"/> (the default) the height of the Terminal.Gui application (<see cref="ConsoleDriver.Rows"/>) 
+		/// tracks to the height of the visible console view when the console is resized. In this case 
+		/// scrolling in the console will be disabled and all <see cref="ConsoleDriver.Rows"/> will remain visible.
+		/// </para>
+		/// <para>
+		/// If <see langword="true"/> then height of the Terminal.Gui application <see cref="ConsoleDriver.Rows"/> only tracks 
+		/// the height of the visible console view when the console is made larger (the application will only grow in height, never shrink). 
+		/// In this case console scrolling is enabled and the contents (<see cref="ConsoleDriver.Rows"/> high) will scroll
+		/// as the console scrolls. 
+		/// </para>
+		/// This API was previously named 'HeightAsBuffer` but was renamed to make its purpose more clear.
+		/// </remarks>
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+		public static bool EnableConsoleScrolling {
 			get {
 				if (Driver == null) {
-					return _heightAsBuffer.HasValue && _heightAsBuffer.Value;
+					return _enableConsoleScrolling.HasValue && _enableConsoleScrolling.Value;
 				}
-				return Driver.HeightAsBuffer;
+				return Driver.EnableConsoleScrolling;
 			}
 			set {
-				_heightAsBuffer = value;
+				_enableConsoleScrolling = value;
 				if (Driver == null) {
 					return;
 				}
-
-				Driver.HeightAsBuffer = _heightAsBuffer.Value;
+				Driver.EnableConsoleScrolling = value;
 			}
 		}
 
@@ -143,7 +155,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof(SettingsScope)), JsonConverter(typeof(KeyJsonConverter))]
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
 		public static Key AlternateForwardKey {
 			get => alternateForwardKey;
 			set {
@@ -157,7 +169,7 @@ namespace Terminal.Gui {
 
 		static void OnAlternateForwardKeyChanged (Key oldKey)
 		{
-			foreach (var top in toplevels.ToArray()) {
+			foreach (var top in toplevels.ToArray ()) {
 				top.OnAlternateForwardKeyChanged (oldKey);
 			}
 		}
@@ -167,7 +179,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof(SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
 		public static Key AlternateBackwardKey {
 			get => alternateBackwardKey;
 			set {
@@ -181,7 +193,7 @@ namespace Terminal.Gui {
 
 		static void OnAlternateBackwardKeyChanged (Key oldKey)
 		{
-			foreach (var top in toplevels.ToArray()) {
+			foreach (var top in toplevels.ToArray ()) {
 				top.OnAlternateBackwardKeyChanged (oldKey);
 			}
 		}
@@ -191,7 +203,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the key to quit the application.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof(SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
 		public static Key QuitKey {
 			get => quitKey;
 			set {
@@ -213,7 +225,7 @@ namespace Terminal.Gui {
 		static void OnQuitKeyChanged (Key oldKey)
 		{
 			// Duplicate the list so if it changes during enumeration we're safe
-			foreach (var top in toplevels.ToArray()) {
+			foreach (var top in toplevels.ToArray ()) {
 				top.OnQuitKeyChanged (oldKey);
 			}
 		}
@@ -445,7 +457,7 @@ namespace Terminal.Gui {
 			MainLoop = new MainLoop (mainLoopDriver);
 
 			try {
-				Driver.HeightAsBuffer = HeightAsBuffer;
+				Driver.EnableConsoleScrolling = EnableConsoleScrolling;
 				Driver.Init (TerminalResized);
 			} catch (InvalidOperationException ex) {
 				// This is a case where the driver is unable to initialize the console.
@@ -1121,6 +1133,7 @@ namespace Terminal.Gui {
 			NotifyStopRunState = null;
 			_initialized = false;
 			mouseGrabView = null;
+			_enableConsoleScrolling = false;
 
 			// Reset synchronization context to allow the user to run async/await,
 			// as the main loop has been ended, the synchronization context from 

@@ -7,7 +7,7 @@
 //  - FrameView Does not support padding (but should)
 //  - FrameView Does not support mouse dragging
 //  - FrameView Does not support IEnumerable
-// Any udpates done here should probably be done in FrameView as well; TODO: Merge these classes
+// Any updates done here should probably be done in FrameView as well; TODO: Merge these classes
 
 using System;
 using System.Collections;
@@ -108,7 +108,7 @@ namespace Terminal.Gui {
 				Border = new Border () {
 					BorderStyle = DefaultBorderStyle,
 					Padding = new Thickness (padding),
-					BorderBrush = ColorScheme.Normal.Background
+					//Title = title
 				};
 			} else {
 				Border = border;
@@ -136,10 +136,82 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 			base.Remove (view);
 			RemoveMenuStatusBar (view);
+
 		}
 
+		///// <inheritdoc/>
+		//public override void RemoveAll ()
+		//{
+		//	contentView.RemoveAll ();
+		//}
+
+		/////<inheritdoc/>
+		//public override void Redraw (Rect bounds)
+		//{
+		//	var padding = Border.GetSumThickness ();
+		//	var scrRect = ViewToScreen (new Rect (0, 0, Frame.Width, Frame.Height));
+
+		//	if (!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded) {
+		//		Driver.SetAttribute (GetNormalColor ());
+		//		Clear ();
+		//		contentView.SetNeedsDisplay ();
+		//	}
+		//	var savedClip = contentView.ClipToBounds ();
+
+		//	// Redraw our contentView
+		//	// DONE: smartly constrict contentView.Bounds to just be what intersects with the 'bounds' we were passed
+		//	contentView.Redraw (!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded ? contentView.Bounds : bounds);
+		//	Driver.Clip = savedClip;
+
+		//	ClearLayoutNeeded ();
+		//	ClearNeedsDisplay ();
+
+		//	Driver.SetAttribute (GetNormalColor ());
+		//	//Driver.DrawWindowFrame (scrRect, padding.Left + borderLength, padding.Top + borderLength, padding.Right + borderLength, padding.Bottom + borderLength,
+		//	//	Border.BorderStyle != BorderStyle.None, fill: true, Border.BorderStyle);
+		//	Border.DrawContent (this, false);
+		//	if (HasFocus)
+		//		Driver.SetAttribute (ColorScheme.HotNormal);
+		//	if (Border.DrawMarginFrame)
+		//		Driver.DrawWindowTitle (scrRect, Title, padding.Left, padding.Top, padding.Right, padding.Bottom);
+		//	Driver.SetAttribute (GetNormalColor ());
+		//}
+
+		///// <inheritdoc/>
+		//public override void OnCanFocusChanged ()
+		//{
+		//	if (contentView != null) {
+		//		contentView.CanFocus = CanFocus;
+		//	}
+		//	base.OnCanFocusChanged ();
+		//}
+
+		///// <summary>
+		/////   The text displayed by the <see cref="Label"/>.
+		///// </summary>
+		//public override ustring Text {
+		//	get => contentView?.Text;
+		//	set {
+		//		base.Text = value;
+		//		if (contentView != null) {
+		//			contentView.Text = value;
+		//		}
+		//	}
+		//}
+
+		///// <summary>
+		///// Controls the text-alignment property of the label, changing it will redisplay the <see cref="Label"/>.
+		///// </summary>
+		///// <value>The text alignment.</value>
+		//public override TextAlignment TextAlignment {
+		//	get => contentView.TextAlignment;
+		//	set {
+		//		base.TextAlignment = contentView.TextAlignment = value;
+		//	}
+		//}
+
 		/// <summary>
-		/// Event arguments for <see cref="Title"/> chane events.
+		/// Event arguments for <see cref="View.Title"/> change events.
 		/// </summary>
 		public class TitleEventArgs : EventArgs {
 			/// <summary>
@@ -153,15 +225,15 @@ namespace Terminal.Gui {
 			public ustring OldTitle { get; set; }
 
 			/// <summary>
-			/// Flag which allows cancelling the Title change.
+			/// Flag which allows canceling the Title change.
 			/// </summary>
 			public bool Cancel { get; set; }
 
 			/// <summary>
 			/// Initializes a new instance of <see cref="TitleEventArgs"/>
 			/// </summary>
-			/// <param name="oldTitle">The <see cref="Window.Title"/> that is/has been replaced.</param>
-			/// <param name="newTitle">The new <see cref="Window.Title"/> to be replaced.</param>
+			/// <param name="oldTitle">The <see cref="View.Title"/> that is/has been replaced.</param>
+			/// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
 			public TitleEventArgs (ustring oldTitle, ustring newTitle)
 			{
 				OldTitle = oldTitle;
@@ -169,11 +241,11 @@ namespace Terminal.Gui {
 			}
 		}
 		/// <summary>
-		/// Called before the <see cref="Window.Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can be cancelled.
+		/// Called before the <see cref="View.Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can be cancelled.
 		/// </summary>
-		/// <param name="oldTitle">The <see cref="Window.Title"/> that is/has been replaced.</param>
-		/// <param name="newTitle">The new <see cref="Window.Title"/> to be replaced.</param>
-		/// <returns>`true` if an event handler cancelled the Title change.</returns>
+		/// <param name="oldTitle">The <see cref="View.Title"/> that is/has been replaced.</param>
+		/// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
+		/// <returns>`true` if an event handler canceled the Title change.</returns>
 		public virtual bool OnTitleChanging (ustring oldTitle, ustring newTitle)
 		{
 			var args = new TitleEventArgs (oldTitle, newTitle);
@@ -182,16 +254,16 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Event fired when the <see cref="Window.Title"/> is changing. Set <see cref="TitleEventArgs.Cancel"/> to 
+		/// Event fired when the <see cref="View.Title"/> is changing. Set <see cref="TitleEventArgs.Cancel"/> to 
 		/// `true` to cancel the Title change.
 		/// </summary>
 		public event Action<TitleEventArgs> TitleChanging;
 
 		/// <summary>
-		/// Called when the <see cref="Window.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.
+		/// Called when the <see cref="View.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.
 		/// </summary>
-		/// <param name="oldTitle">The <see cref="Window.Title"/> that is/has been replaced.</param>
-		/// <param name="newTitle">The new <see cref="Window.Title"/> to be replaced.</param>
+		/// <param name="oldTitle">The <see cref="View.Title"/> that is/has been replaced.</param>
+		/// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
 		public virtual void OnTitleChanged (ustring oldTitle, ustring newTitle)
 		{
 			var args = new TitleEventArgs (oldTitle, newTitle);
@@ -199,7 +271,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Event fired after the <see cref="Window.Title"/> has been changed. 
+		/// Event fired after the <see cref="View.Title"/> has been changed. 
 		/// </summary>
 		public event Action<TitleEventArgs> TitleChanged;
 	}

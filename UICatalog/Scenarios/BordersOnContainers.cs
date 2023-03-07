@@ -4,11 +4,8 @@ using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Borders on Toplevel", Description: "Demonstrates Toplevel borders manipulation.")]
-	[ScenarioCategory ("Layout")]
-	[ScenarioCategory ("Borders")]
-	public class BordersOnToplevel : Scenario {
-		public override void Setup ()
+	public class BordersOnContainers : Window {
+		public BordersOnContainers (NStack.ustring title, string typeName, View smartView)
 		{
 			var borderStyle = BorderStyle.Double;
 			var drawMarginFrame = false;
@@ -18,23 +15,21 @@ namespace UICatalog.Scenarios {
 			var background = Colors.Base.HotNormal.Foreground;
 			var effect3D = true;
 
-			var smartView = new Window () {
-				X = Pos.Center (),
-				Y = 0, // Y is set below 
-				Width = 40,
-				Height = 20,
-				Border = new Border () {
-					BorderStyle = borderStyle,
-					DrawMarginFrame = drawMarginFrame,
-					BorderThickness = borderThickness,
-					BorderBrush = borderBrush,
-					Padding = padding,
-					Background = background,
-					Effect3D = effect3D,
-				},
-				Title = "Toplevel",
-				ColorScheme = Colors.TopLevel
+			smartView.X = Pos.Center ();
+			smartView.Y = 0;
+			smartView.Width = 40;
+			smartView.Height = 20;
+			smartView.Border = new Border () {
+				BorderStyle = borderStyle,
+				DrawMarginFrame = drawMarginFrame,
+				BorderThickness = borderThickness,
+				BorderBrush = borderBrush,
+				Padding = padding,
+				Background = background,
+				Effect3D = effect3D,
+				//Title = typeName
 			};
+			smartView.ColorScheme = Colors.TopLevel;
 
 			var tf1 = new TextField ("1234567890") { Width = 10 };
 
@@ -42,10 +37,10 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = Pos.Center (),
 			};
-			button.Clicked += () => MessageBox.Query (20, 7, "Hi", "I'm a Toplevel?", "Yes", "No");
-			var label = new Label ("I'm a Toplevel") {
+			button.Clicked += () => MessageBox.Query (20, 7, "Hi", $"I'm a {typeName}?", "Yes", "No");
+			var label = new Label ($"I'm a {typeName}") {
 				X = Pos.Center (),
-				Y = Pos.Center () - 3,
+				Y = Pos.Center () - 1,
 			};
 			var tf2 = new TextField ("1234567890") {
 				X = Pos.AnchorEnd (10),
@@ -60,7 +55,7 @@ namespace UICatalog.Scenarios {
 			};
 			smartView.Add (tf1, button, label, tf2, tv);
 
-			Win.Add (new Label ("Padding:") {
+			Add (new Label ("Padding:") {
 				X = Pos.Center () - 23,
 			});
 
@@ -82,7 +77,7 @@ namespace UICatalog.Scenarios {
 			};
 			paddingTopEdit.Text = $"{smartView.Border.Padding.Top}";
 
-			Win.Add (paddingTopEdit);
+			Add (paddingTopEdit);
 
 			var paddingLeftEdit = new TextField ("") {
 				X = Pos.Center () - 30,
@@ -101,7 +96,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 			paddingLeftEdit.Text = $"{smartView.Border.Padding.Left}";
-			Win.Add (paddingLeftEdit);
+			Add (paddingLeftEdit);
 
 			var paddingRightEdit = new TextField ("") {
 				X = Pos.Center () - 15,
@@ -120,7 +115,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 			paddingRightEdit.Text = $"{smartView.Border.Padding.Right}";
-			Win.Add (paddingRightEdit);
+			Add (paddingRightEdit);
 
 			var paddingBottomEdit = new TextField ("") {
 				X = Pos.Center () - 22,
@@ -139,10 +134,10 @@ namespace UICatalog.Scenarios {
 				}
 			};
 			paddingBottomEdit.Text = $"{smartView.Border.Padding.Bottom}";
-			Win.Add (paddingBottomEdit);
+			Add (paddingBottomEdit);
 
 			var replacePadding = new Button ("Replace all based on top") {
-				X = Pos.Left(paddingLeftEdit),
+				X = Pos.Left (paddingLeftEdit),
 				Y = 5
 			};
 			replacePadding.Clicked += () => {
@@ -152,9 +147,9 @@ namespace UICatalog.Scenarios {
 				}
 				paddingBottomEdit.Text = paddingLeftEdit.Text = paddingRightEdit.Text = paddingTopEdit.Text;
 			};
-			Win.Add (replacePadding);
+			Add (replacePadding);
 
-			Win.Add (new Label ("Border:") {
+			Add (new Label ("Border:") {
 				X = Pos.Center () + 11,
 			});
 
@@ -176,7 +171,7 @@ namespace UICatalog.Scenarios {
 			};
 			borderTopEdit.Text = $"{smartView.Border.BorderThickness.Top}";
 
-			Win.Add (borderTopEdit);
+			Add (borderTopEdit);
 
 			var borderLeftEdit = new TextField ("") {
 				X = Pos.Center () + 5,
@@ -195,7 +190,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 			borderLeftEdit.Text = $"{smartView.Border.BorderThickness.Left}";
-			Win.Add (borderLeftEdit);
+			Add (borderLeftEdit);
 
 			var borderRightEdit = new TextField ("") {
 				X = Pos.Center () + 19,
@@ -214,7 +209,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 			borderRightEdit.Text = $"{smartView.Border.BorderThickness.Right}";
-			Win.Add (borderRightEdit);
+			Add (borderRightEdit);
 
 			var borderBottomEdit = new TextField ("") {
 				X = Pos.Center () + 12,
@@ -233,10 +228,10 @@ namespace UICatalog.Scenarios {
 				}
 			};
 			borderBottomEdit.Text = $"{smartView.Border.BorderThickness.Bottom}";
-			Win.Add (borderBottomEdit);
+			Add (borderBottomEdit);
 
 			var replaceBorder = new Button ("Replace all based on top") {
-				X = Pos.Left(borderLeftEdit),
+				X = Pos.Left (borderLeftEdit),
 				Y = 5
 			};
 			replaceBorder.Clicked += () => {
@@ -246,11 +241,11 @@ namespace UICatalog.Scenarios {
 				}
 				borderBottomEdit.Text = borderLeftEdit.Text = borderRightEdit.Text = borderTopEdit.Text;
 			};
-			Win.Add (replaceBorder);
+			Add (replaceBorder);
 
-			smartView.Y = Pos.Bottom (replaceBorder) + 1;
+			smartView.Y = Pos.Center () + 4;
 
-			Win.Add (new Label ("BorderStyle:"));
+			Add (new Label ("BorderStyle:"));
 
 			var borderStyleEnum = Enum.GetValues (typeof (BorderStyle)).Cast<BorderStyle> ().ToList ();
 			var rbBorderStyle = new RadioGroup (borderStyleEnum.Select (
@@ -260,7 +255,7 @@ namespace UICatalog.Scenarios {
 				Y = 1,
 				SelectedItem = (int)smartView.Border.BorderStyle
 			};
-			Win.Add (rbBorderStyle);
+			Add (rbBorderStyle);
 
 			var cbDrawMarginFrame = new CheckBox ("Draw Margin Frame", smartView.Border.DrawMarginFrame) {
 				X = Pos.AnchorEnd (20),
@@ -275,7 +270,7 @@ namespace UICatalog.Scenarios {
 					}
 				} catch { }
 			};
-			Win.Add (cbDrawMarginFrame);
+			Add (cbDrawMarginFrame);
 
 			rbBorderStyle.SelectedItemChanged += (e) => {
 				smartView.Border.BorderStyle = (BorderStyle)e.SelectedItem;
@@ -290,13 +285,13 @@ namespace UICatalog.Scenarios {
 				Y = 1,
 				Width = 5
 			};
-			Win.Add (cbEffect3D);
+			Add (cbEffect3D);
 
-			Win.Add (new Label ("Effect3D Offset:") {
+			Add (new Label ("Effect3D Offset:") {
 				X = Pos.AnchorEnd (20),
 				Y = 2
 			});
-			Win.Add (new Label ("X:") {
+			Add (new Label ("X:") {
 				X = Pos.AnchorEnd (19),
 				Y = 3
 			});
@@ -317,9 +312,9 @@ namespace UICatalog.Scenarios {
 				}
 			};
 			effect3DOffsetX.Text = $"{smartView.Border.Effect3DOffset.X}";
-			Win.Add (effect3DOffsetX);
+			Add (effect3DOffsetX);
 
-			Win.Add (new Label ("Y:") {
+			Add (new Label ("Y:") {
 				X = Pos.AnchorEnd (10),
 				Y = 3
 			});
@@ -340,7 +335,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 			effect3DOffsetY.Text = $"{smartView.Border.Effect3DOffset.Y}";
-			Win.Add (effect3DOffsetY);
+			Add (effect3DOffsetY);
 
 			cbEffect3D.Toggled += (e) => {
 				try {
@@ -349,7 +344,7 @@ namespace UICatalog.Scenarios {
 				} catch { }
 			};
 
-			Win.Add (new Label ("Background:") {
+			Add (new Label ("Background:") {
 				Y = 5
 			});
 
@@ -364,9 +359,9 @@ namespace UICatalog.Scenarios {
 			rbBackground.SelectedItemChanged += (e) => {
 				smartView.Border.Background = (Color)e.SelectedItem;
 			};
-			Win.Add (rbBackground);
+			Add (rbBackground);
 
-			Win.Add (new Label ("BorderBrush:") {
+			Add (new Label ("BorderBrush:") {
 				X = Pos.AnchorEnd (20),
 				Y = 5
 			});
@@ -381,9 +376,11 @@ namespace UICatalog.Scenarios {
 			rbBorderBrush.SelectedItemChanged += (e) => {
 				smartView.Border.BorderBrush = (Color)e.SelectedItem;
 			};
-			Win.Add (rbBorderBrush);
+			Add (rbBorderBrush);
 
-			Win.Add (smartView);
+			Add (smartView);
+
+			Title = title;
 		}
 	}
 }

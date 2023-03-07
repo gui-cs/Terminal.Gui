@@ -321,6 +321,8 @@ namespace Terminal.Gui.ViewTests {
 				Bounds = new Rect (0, 0, 10, 5)
 			};
 
+			tableView.ChangeSelectionToEndOfTable(false);
+
 			// select the last row
 			tableView.MultiSelectedRegions.Clear ();
 			tableView.MultiSelectedRegions.Push (new TableView.TableSelection (new Point (0, 3), new Rect (0, 3, 4, 1)));
@@ -1506,6 +1508,185 @@ namespace Terminal.Gui.ViewTests {
 
 			Assert.DoesNotContain (new Point (1, 0), tableView.GetAllSelectedCells ());
 		}
+
+		[Fact, AutoInitShutdown]
+		public void TestToggleCells_MultiSelectOn ()
+		{
+			// 2 row table
+			var tableView = GetABCDEFTableView (out var dt);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+
+			tableView.MultiSelect = true;
+			tableView.AddKeyBinding(Key.Space,Command.ToggleChecked);
+
+			var selectedCell = tableView.GetAllSelectedCells().Single();
+			Assert.Equal(0,selectedCell.X);
+			Assert.Equal(0,selectedCell.Y);
+
+			// Go Right
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorRight });
+
+			selectedCell = tableView.GetAllSelectedCells().Single();
+			Assert.Equal(1,selectedCell.X);
+			Assert.Equal(0,selectedCell.Y);
+
+			// Toggle Select
+			tableView.ProcessKey (new KeyEvent { Key = Key.Space});
+			var m = tableView.MultiSelectedRegions.Single();
+			Assert.True(m.IsToggled);
+			Assert.Equal(1,m.Origin.X);
+			Assert.Equal(0,m.Origin.Y);
+			selectedCell = tableView.GetAllSelectedCells().Single();
+			Assert.Equal(1,selectedCell.X);
+			Assert.Equal(0,selectedCell.Y);
+
+			// Go Left
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorLeft });
+
+			// Both Toggled and Moved to should be selected
+			Assert.Equal(2,tableView.GetAllSelectedCells().Count());
+			var s1 = tableView.GetAllSelectedCells().ElementAt(0);
+			var s2 = tableView.GetAllSelectedCells().ElementAt(1);
+			Assert.Equal(1,s1.X);
+			Assert.Equal(0,s1.Y);
+			Assert.Equal(0,s2.X);
+			Assert.Equal(0,s2.Y);
+
+			// Go Down
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorDown });
+
+			// Both Toggled and Moved to should be selected but not 0,0
+			// which we moved down from
+			Assert.Equal(2,tableView.GetAllSelectedCells().Count());
+			s1 = tableView.GetAllSelectedCells().ElementAt(0);
+			s2 = tableView.GetAllSelectedCells().ElementAt(1);
+			Assert.Equal(1,s1.X);
+			Assert.Equal(0,s1.Y);
+			Assert.Equal(0,s2.X);
+			Assert.Equal(1,s2.Y);
+
+
+			// Go back to the toggled cell
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorRight});
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorUp});
+
+			// Toggle off 
+			tableView.ProcessKey (new KeyEvent { Key = Key.Space});
+
+			// Go Left
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorLeft});
+
+			selectedCell = tableView.GetAllSelectedCells().Single();
+			Assert.Equal(0,selectedCell.X);
+			Assert.Equal(0,selectedCell.Y);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestToggleCells_MultiSelectOn_FullRowSelect ()
+		{
+			// 2 row table
+			var tableView = GetABCDEFTableView (out var dt);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			tableView.FullRowSelect = true;
+			tableView.MultiSelect = true;
+			tableView.AddKeyBinding(Key.Space,Command.ToggleChecked);
+
+			// Toggle Select Cell 0,0
+			tableView.ProcessKey (new KeyEvent { Key = Key.Space});
+
+			// Go Down
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorDown });
+
+			var m = tableView.MultiSelectedRegions.Single();
+			Assert.True(m.IsToggled);
+			Assert.Equal(0,m.Origin.X);
+			Assert.Equal(0,m.Origin.Y);
+
+			//First row toggled and Second row active = 12 selected cells
+			Assert.Equal(12,tableView.GetAllSelectedCells().Count());
+
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorRight });
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorUp });
+			
+			Assert.Single(tableView.MultiSelectedRegions.Where(r=>r.IsToggled));
+
+			// Can untoggle at 1,0 even though 0,0 was initial toggle because FullRowSelect is on
+			tableView.ProcessKey (new KeyEvent { Key = Key.Space});
+
+			Assert.Empty(tableView.MultiSelectedRegions.Where(r=>r.IsToggled));
+
+		}
+
+
+		[Fact, AutoInitShutdown]
+		public void TestToggleCells_MultiSelectOn_SquareSelectToggled ()
+		{
+			// 3 row table
+			var tableView = GetABCDEFTableView (out var dt);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			tableView.MultiSelect = true;
+			tableView.AddKeyBinding(Key.Space,Command.ToggleChecked);
+
+			// Make a square selection
+			tableView.ProcessKey (new KeyEvent { Key = Key.ShiftMask | Key.CursorDown});
+			tableView.ProcessKey (new KeyEvent { Key = Key.ShiftMask | Key.CursorRight});
+
+			Assert.Equal(4,tableView.GetAllSelectedCells().Count());
+
+			// Toggle the square selected region on
+			tableView.ProcessKey (new KeyEvent { Key = Key.Space});
+
+			// Go Right
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorRight });
+
+			//Toggled on square + the active cell (x=2,y=1)
+			Assert.Equal(5,tableView.GetAllSelectedCells().Count());
+			Assert.Equal(2,tableView.SelectedColumn);
+			Assert.Equal(1,tableView.SelectedRow);
+
+			// Untoggle the rectangular region by hitting toggle in
+			// any cell in that rect
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorUp });
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorLeft });
+
+			Assert.Equal(4,tableView.GetAllSelectedCells().Count());
+			tableView.ProcessKey (new KeyEvent { Key = Key.Space });
+			Assert.Equal(1,tableView.GetAllSelectedCells().Count());
+		}
+
+
+
+		[Fact, AutoInitShutdown]
+		public void TestToggleCells_MultiSelectOn_Two_SquareSelects_BothToggled ()
+		{
+			// 6 row table
+			var tableView = GetABCDEFTableView (out var dt);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			tableView.MultiSelect = true;
+			tableView.AddKeyBinding(Key.Space,Command.ToggleChecked);
+
+			// Make first square selection (0,0 to 1,1)
+			tableView.ProcessKey (new KeyEvent { Key = Key.ShiftMask | Key.CursorDown});
+			tableView.ProcessKey (new KeyEvent { Key = Key.ShiftMask | Key.CursorRight});
+			tableView.ProcessKey (new KeyEvent { Key = Key.Space});
+			Assert.Equal(4,tableView.GetAllSelectedCells().Count());
+
+			// Make second square selection leaving 1 unselected line between them
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorLeft });
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorDown });
+			tableView.ProcessKey (new KeyEvent { Key = Key.CursorDown });
+			tableView.ProcessKey (new KeyEvent { Key = Key.ShiftMask | Key.CursorDown});
+			tableView.ProcessKey (new KeyEvent { Key = Key.ShiftMask | Key.CursorRight});
+			
+			// 2 square selections
+			Assert.Equal(8,tableView.GetAllSelectedCells().Count());
+		}
+
 		
 		[Theory, AutoInitShutdown]
 		[InlineData(new object[] { true,true })]

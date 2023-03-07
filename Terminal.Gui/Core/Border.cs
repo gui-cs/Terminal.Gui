@@ -513,6 +513,7 @@ namespace Terminal.Gui {
 		private Point effect3DOffset = new Point (1, 1);
 		private Attribute? effect3DBrush;
 		private ustring title = ustring.Empty;
+		//private View child;
 
 		/// <summary>
 		/// Specifies the <see cref="Gui.BorderStyle"/> for a view.
@@ -628,7 +629,47 @@ namespace Terminal.Gui {
 		///// Gets or sets the single child element of a <see cref="View"/>.
 		///// </summary>
 		//[JsonIgnore]
-		//public View Child { get; set; }
+		//public View Child {
+		//	get => child;
+		//	set {
+		//		child = value;
+		//		if (child != null && Parent != null) {
+		//			Parent.Initialized += Parent_Initialized;
+		//			Parent.Removed += Parent_Removed;
+		//		}
+		//	}
+		//}
+
+		//private void Parent_Removed (View obj)
+		//{
+		//	BorderBrush = default;
+		//	Background = default;
+		//	child.Removed -= Parent_Removed;
+		//}
+
+		//private void Parent_Initialized (object s, EventArgs e)
+		//{
+		//	SetMarginFrameTitleBrush ();
+		//	child.Initialized -= Parent_Initialized;
+		//}
+
+		//private void SetMarginFrameTitleBrush ()
+		//{
+		//	if (child != null) {
+		//		var view = Parent?.Border != null ? Parent : child;
+		//		if (view.ColorScheme != null) {
+		//			if (borderBrush == default) {
+		//				BorderBrush = view.GetNormalColor ().Foreground;
+		//			}
+		//			if (background == default) {
+		//				Background = view.GetNormalColor ().Background;
+		//			}
+		//			return;
+		//		}
+		//	}
+		//	BorderBrush = default;
+		//	Background = default;
+		//}
 
 		///// <summary>
 		///// Gets the parent <see cref="Child"/> parent if any.
@@ -791,7 +832,7 @@ namespace Terminal.Gui {
 		//		Child.Clear (borderRect);
 		//	}
 
-		//	driver.SetAttribute (savedAttribute);
+		//	driver.SetAttribute (new Attribute (BorderBrush, Background));
 
 		//	// Draw margin frame
 		//	if (DrawMarginFrame) {
@@ -815,6 +856,7 @@ namespace Terminal.Gui {
 		//			driver.DrawWindowFrame (borderRect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill: true, this);
 		//		}
 		//	}
+		//	driver.SetAttribute (savedAttribute);
 		//}
 
 		//private void DrawChildBorder (Rect frame, bool fill = true)
@@ -829,35 +871,47 @@ namespace Terminal.Gui {
 
 		//	driver.SetAttribute (new Attribute (BorderBrush));
 
-		//	// Draw the upper BorderThickness
+			// Draw the upper BorderThickness
 		//	for (int r = frame.Y - drawMarginFrame - sumThickness.Top;
 		//		r < frame.Y - drawMarginFrame - padding.Top; r++) {
+
+		//		if (r < 0) {
+		//			continue;
+		//		}
 		//		for (int c = frame.X - drawMarginFrame - sumThickness.Left;
 		//			c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right, driver.Cols); c++) {
 
-		//			AddRuneAt (driver, c, r, ' ');
-		//		}
-		//	}
+		////			AddRuneAt (driver, c, r, ' ');
+		////		}
+		////	}
 
 		//	// Draw the left BorderThickness
 		//	for (int r = frame.Y - drawMarginFrame - padding.Top;
 		//		r < Math.Min (frame.Bottom + drawMarginFrame + padding.Bottom, driver.Rows); r++) {
+
+		//		if (r < 0) {
+		//			continue;
+		//		}
 		//		for (int c = frame.X - drawMarginFrame - sumThickness.Left;
 		//			c < frame.X - drawMarginFrame - padding.Left; c++) {
 
-		//			AddRuneAt (driver, c, r, ' ');
-		//		}
-		//	}
+		////			AddRuneAt (driver, c, r, ' ');
+		////		}
+		////	}
 
 		//	// Draw the right BorderThickness
 		//	for (int r = frame.Y - drawMarginFrame - padding.Top;
 		//		r < Math.Min (frame.Bottom + drawMarginFrame + padding.Bottom, driver.Rows); r++) {
+
+		//		if (r < 0) {
+		//			continue;
+		//		}
 		//		for (int c = frame.Right + drawMarginFrame + padding.Right;
 		//			c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right, driver.Cols); c++) {
 
-		//			AddRuneAt (driver, c, r, ' ');
-		//		}
-		//	}
+		////			AddRuneAt (driver, c, r, ' ');
+		////		}
+		////	}
 
 		//	// Draw the lower BorderThickness
 		//	for (int r = frame.Bottom + drawMarginFrame + padding.Bottom;
@@ -865,21 +919,25 @@ namespace Terminal.Gui {
 		//		for (int c = frame.X - drawMarginFrame - sumThickness.Left;
 		//			c < Math.Min (frame.Right + drawMarginFrame + sumThickness.Right, driver.Cols); c++) {
 
-		//			AddRuneAt (driver, c, r, ' ');
-		//		}
-		//	}
+		////			AddRuneAt (driver, c, r, ' ');
+		////		}
+		////	}
 
-		//	driver.SetAttribute (new Attribute (Background));
+		////	driver.SetAttribute (new Attribute (Background));
 
 		//	// Draw the upper Padding
 		//	for (int r = frame.Y - drawMarginFrame - padding.Top;
 		//		r < frame.Y - drawMarginFrame; r++) {
+
+		//		if (r < 0) {
+		//			continue;
+		//		}
 		//		for (int c = frame.X - drawMarginFrame - padding.Left;
 		//			c < Math.Min (frame.Right + drawMarginFrame + padding.Right, driver.Cols); c++) {
 
-		//			AddRuneAt (driver, c, r, ' ');
-		//		}
-		//	}
+		////			AddRuneAt (driver, c, r, ' ');
+		////		}
+		////	}
 
 		//	// Draw the left Padding
 		//	for (int r = frame.Y - drawMarginFrame;
@@ -887,9 +945,9 @@ namespace Terminal.Gui {
 		//		for (int c = frame.X - drawMarginFrame - padding.Left;
 		//			c < frame.X - drawMarginFrame; c++) {
 
-		//			AddRuneAt (driver, c, r, ' ');
-		//		}
-		//	}
+		////			AddRuneAt (driver, c, r, ' ');
+		////		}
+		////	}
 
 		//	// Draw the right Padding
 		//	for (int r = frame.Y - drawMarginFrame;
@@ -897,9 +955,9 @@ namespace Terminal.Gui {
 		//		for (int c = frame.Right + drawMarginFrame;
 		//			c < Math.Min (frame.Right + drawMarginFrame + padding.Right, driver.Cols); c++) {
 
-		//			AddRuneAt (driver, c, r, ' ');
-		//		}
-		//	}
+		////			AddRuneAt (driver, c, r, ' ');
+		////		}
+		////	}
 
 		//	// Draw the lower Padding
 		//	for (int r = frame.Bottom + drawMarginFrame;
@@ -907,11 +965,11 @@ namespace Terminal.Gui {
 		//		for (int c = frame.X - drawMarginFrame - padding.Left;
 		//			c < Math.Min (frame.Right + drawMarginFrame + padding.Right, driver.Cols); c++) {
 
-		//			AddRuneAt (driver, c, r, ' ');
-		//		}
-		//	}
+		////			AddRuneAt (driver, c, r, ' ');
+		////		}
+		////	}
 
-		//	driver.SetAttribute (savedAttribute);
+		//	driver.SetAttribute (new Attribute (BorderBrush, Background));
 
 		//	// Draw the MarginFrame
 		//	if (DrawMarginFrame) {
@@ -1003,148 +1061,7 @@ namespace Terminal.Gui {
 
 		//	driver.SetAttribute (new Attribute (BorderBrush));
 
-		//	// Draw the upper BorderThickness
-		//	for (int r = frame.Y;
-		//		r < Math.Min (frame.Y + borderThickness.Top, frame.Bottom); r++) {
-		//		for (int c = frame.X;
-		//			c < Math.Min (frame.Right, driver.Cols); c++) {
-
-		//			AddRuneAt (driver, c, r, ' ');
-		//		}
-		//	}
-
-		//	// Draw the left BorderThickness
-		//	for (int r = Math.Min (frame.Y + borderThickness.Top, frame.Bottom);
-		//		r < Math.Min (frame.Bottom - borderThickness.Bottom, driver.Rows); r++) {
-		//		for (int c = frame.X;
-		//			c < Math.Min (frame.X + borderThickness.Left, frame.Right); c++) {
-
-		//			AddRuneAt (driver, c, r, ' ');
-		//		}
-		//	}
-
-		//	// Draw the right BorderThickness
-		//	for (int r = Math.Min (frame.Y + borderThickness.Top, frame.Bottom);
-		//		r < Math.Min (frame.Bottom - borderThickness.Bottom, driver.Rows); r++) {
-		//		for (int c = Math.Max (frame.Right - borderThickness.Right, frame.X);
-		//			c < Math.Min (frame.Right, driver.Cols); c++) {
-
-		//			AddRuneAt (driver, c, r, ' ');
-		//		}
-		//	}
-
-		//	// Draw the lower BorderThickness
-		//	for (int r = Math.Max (frame.Bottom - borderThickness.Bottom, frame.Y);
-		//		r < Math.Min (frame.Bottom, driver.Rows); r++) {
-		//		for (int c = frame.X;
-		//			c < Math.Min (frame.Right, driver.Cols); c++) {
-
-		//			AddRuneAt (driver, c, r, ' ');
-		//		}
-		//	}
-
-		//	driver.SetAttribute (new Attribute (Background));
-
-		//	// Draw the upper Padding
-		//	for (int r = frame.Y + borderThickness.Top;
-		//		r < Math.Min (frame.Y + sumThickness.Top, frame.Bottom - borderThickness.Bottom); r++) {
-		//		for (int c = frame.X + borderThickness.Left;
-		//			c < Math.Min (frame.Right - borderThickness.Right, driver.Cols); c++) {
-
-		//			AddRuneAt (driver, c, r, ' ');
-		//		}
-		//	}
-
-		//	// Draw the left Padding
-		//	for (int r = frame.Y + sumThickness.Top;
-		//		r < Math.Min (frame.Bottom - sumThickness.Bottom, driver.Rows); r++) {
-		//		for (int c = frame.X + borderThickness.Left;
-		//			c < Math.Min (frame.X + sumThickness.Left, frame.Right - borderThickness.Right); c++) {
-
-		//			AddRuneAt (driver, c, r, ' ');
-		//		}
-		//	}
-
-		//	// Draw the right Padding
-		//	for (int r = frame.Y + sumThickness.Top;
-		//		r < Math.Min (frame.Bottom - sumThickness.Bottom, driver.Rows); r++) {
-		//		for (int c = Math.Max (frame.Right - sumThickness.Right, frame.X + sumThickness.Left);
-		//			c < Math.Max (frame.Right - borderThickness.Right, frame.X + sumThickness.Left); c++) {
-
-		//			AddRuneAt (driver, c, r, ' ');
-		//		}
-		//	}
-
-		//	// Draw the lower Padding
-		//	for (int r = Math.Max (frame.Bottom - sumThickness.Bottom, frame.Y + borderThickness.Top);
-		//		r < Math.Min (frame.Bottom - borderThickness.Bottom, driver.Rows); r++) {
-		//		for (int c = frame.X + borderThickness.Left;
-		//			c < Math.Min (frame.Right - borderThickness.Right, driver.Cols); c++) {
-
-		//			AddRuneAt (driver, c, r, ' ');
-		//		}
-		//	}
-
-		//	driver.SetAttribute (savedAttribute);
-
-		//	// Draw the MarginFrame
-		//	if (DrawMarginFrame) {
-		//		var rect = new Rect () {
-		//			X = frame.X + sumThickness.Left,
-		//			Y = frame.Y + sumThickness.Top,
-		//			Width = Math.Max (frame.Width - sumThickness.Right - sumThickness.Left, 0),
-		//			Height = Math.Max (frame.Height - sumThickness.Bottom - sumThickness.Top, 0)
-		//		};
-		//		if (rect.Width > 0 && rect.Height > 0) {
-		//			driver.DrawWindowFrame (rect, 1, 1, 1, 1, BorderStyle != BorderStyle.None, fill, this);
-		//			DrawTitle (Parent);
-		//		}
-		//	}
-
-		//	if (Effect3D) {
-		//		driver.SetAttribute ((Attribute)Effect3DBrush);
-
-		//		// Draw the upper Effect3D
-		//		for (int r = Math.Max (frame.Y + effect3DOffset.Y, 0);
-		//			r < frame.Y; r++) {
-		//			for (int c = Math.Max (frame.X + effect3DOffset.X, 0);
-		//				c < Math.Min (frame.Right + effect3DOffset.X, driver.Cols); c++) {
-
-		//				AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
-		//			}
-		//		}
-
-		//		// Draw the left Effect3D
-		//		for (int r = Math.Max (frame.Y + effect3DOffset.Y, 0);
-		//			r < Math.Min (frame.Bottom + effect3DOffset.Y, driver.Rows); r++) {
-		//			for (int c = Math.Max (frame.X + effect3DOffset.X, 0);
-		//				c < frame.X; c++) {
-
-		//				AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
-		//			}
-		//		}
-
-		//		// Draw the right Effect3D
-		//		for (int r = Math.Max (frame.Y + effect3DOffset.Y, 0);
-		//			r < Math.Min (frame.Bottom + effect3DOffset.Y, driver.Rows); r++) {
-		//			for (int c = frame.Right;
-		//				c < Math.Min (frame.Right + effect3DOffset.X, driver.Cols); c++) {
-
-		//				AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
-		//			}
-		//		}
-
-		//		// Draw the lower Effect3D
-		//		for (int r = frame.Bottom;
-		//			r < Math.Min (frame.Bottom + effect3DOffset.Y, driver.Rows); r++) {
-		//			for (int c = Math.Max (frame.X + effect3DOffset.X, 0);
-		//				c < Math.Min (frame.Right + effect3DOffset.X, driver.Cols); c++) {
-
-		//				AddRuneAt (driver, c, r, (Rune)driver.Contents [r, c, 0]);
-		//			}
-		//		}
-		//	}
-		//	driver.SetAttribute (savedAttribute);
+			// Draw the upper BorderThickness
 		//}
 
 		//private void AddRuneAt (ConsoleDriver driver, int col, int row, Rune ch)
@@ -1167,9 +1084,10 @@ namespace Terminal.Gui {
 		//{
 		//	var driver = Application.Driver;
 		//	if (DrawMarginFrame) {
-		//		driver.SetAttribute (Child.GetNormalColor ());
-		//		if (Child.HasFocus)
-		//			driver.SetAttribute (Child.ColorScheme.HotNormal);
+		//		driver.SetAttribute (new Attribute (BorderBrush, Background));
+		//		if (view.HasFocus) {
+		//			driver.SetAttribute (new Attribute (Child.ColorScheme.HotNormal.Foreground, Background));
+		//		}
 		//		var padding = view.Border.GetSumThickness ();
 		//		Rect scrRect;
 		//		if (view == Child) {
@@ -1178,7 +1096,7 @@ namespace Terminal.Gui {
 		//			driver.DrawWindowTitle (scrRect, Title, 0, 0, 0, 0);
 		//		} else {
 		//			scrRect = view.ViewToScreen (new Rect (0, 0, view.Frame.Width, view.Frame.Height));
-		//			driver.DrawWindowTitle (scrRect, Title,
+		//			driver.DrawWindowTitle (scrRect, Parent.Border.Title,
 		//				padding.Left, padding.Top, padding.Right, padding.Bottom);
 		//		}
 		//	}
@@ -1194,9 +1112,9 @@ namespace Terminal.Gui {
 		//{
 		//	var driver = Application.Driver;
 		//	if (DrawMarginFrame) {
-		//		driver.SetAttribute (view.GetNormalColor ());
+		//		driver.SetAttribute (new Attribute (BorderBrush, Background));
 		//		if (view.HasFocus) {
-		//			driver.SetAttribute (view.ColorScheme.HotNormal);
+		//			driver.SetAttribute (new Attribute (view.ColorScheme.HotNormal.Foreground, Background));
 		//		}
 		//		var padding = Parent.Border.GetSumThickness ();
 		//		var scrRect = Parent.ViewToScreen (new Rect (0, 0, rect.Width, rect.Height));

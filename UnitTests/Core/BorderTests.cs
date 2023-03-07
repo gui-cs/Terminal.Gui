@@ -1,15 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection.Emit;
 using Xunit;
+using Xunit.Abstractions;
 using Rune = System.Rune;
 
 namespace Terminal.Gui.CoreTests {
 	public class BorderTests {
-		[Fact]
-		[AutoInitShutdown]
+		readonly ITestOutputHelper output;
+
+		public BorderTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
+
+		[Fact, AutoInitShutdown]
 		public void Constructor_Defaults ()
 		{
 			var b = new Border ();
@@ -40,15 +44,10 @@ namespace Terminal.Gui.CoreTests {
 			Assert.False (b.DrawMarginFrame);
 		}
 
-		//[Fact]
-		//[AutoInitShutdown]
-		//public void ActualWidth_ActualHeight ()
-		//{
-		//	var v = new View (new Rect (5, 10, 60, 20), "", new Border ());
-
-		//	Assert.Equal (60, v.Border.ActualWidth);
-		//	Assert.Equal (20, v.Border.ActualHeight);
-		//}
+		//[Fact, AutoInitShutdown]
+		// public void ActualWidth_ActualHeight ()
+		// {
+		// 	var v = new View (new Rect (5, 10, 60, 20), "", new Border ());
 
 		//[Fact]
 		//public void ToplevelContainer_LayoutStyle_Computed_Constuctor_ ()
@@ -83,23 +82,12 @@ namespace Terminal.Gui.CoreTests {
 		//	var top = Application.Top;
 		//	var driver = (FakeDriver)Application.Driver;
 
-		//	var label = new Label () {
-		//		X = Pos.Center (),
-		//		Y = Pos.Center (),
-		//		Border = new Border () {
-		//			BorderStyle = BorderStyle.Single,
-		//			Padding = new Thickness (2),
-		//			BorderThickness = new Thickness (2),
-		//			BorderBrush = Color.Red,
-		//			Background = Color.BrightGreen,
-		//			Effect3D = true,
-		//			Effect3DOffset = new Point (2, -3)
-		//		},
-		//		ColorScheme = Colors.TopLevel,
-		//		Text = "This is a test"
-		//	};
-		//	label.Border.Child = label;
-		//	top.Add (label);
+		// [Fact]
+		// [AutoInitShutdown]
+		// public void DrawContent_With_Child_Border ()
+		// {
+		// 	var top = Application.Top;
+		// 	var driver = (FakeDriver)Application.Driver;
 
 		//	top.LayoutSubviews ();
 		//	label.Redraw (label.Bounds);
@@ -243,11 +231,34 @@ namespace Terminal.Gui.CoreTests {
 		//	}
 		//	Assert.Equal ("This is a test", text.Trim ());
 
-		//	// Check the upper Effect3D
-		//	for (int r = frame.Y - drawMarginFrame - sumThickness.Top + effect3DOffset.Y;
-		//		r < frame.Y - drawMarginFrame - sumThickness.Top; r++) {
-		//		for (int c = frame.X - drawMarginFrame - sumThickness.Left + effect3DOffset.X;
-		//			c < frame.Right + drawMarginFrame + sumThickness.Right + effect3DOffset.X; c++) {
+			// 		var color = (Attribute)driver.Contents [r, c, 1];
+			// 		var rune = (Rune)driver.Contents [r, c, 0];
+			// 		if (r == frame.Y - drawMarginFrame || r == frame.Bottom + drawMarginFrame - 1
+			// 			|| c == frame.X - drawMarginFrame || c == frame.Right + drawMarginFrame - 1) {
+			// 			Assert.Equal (Color.BrightGreen, color.Background);
+			// 		} else {
+			// 			Assert.Equal (Color.Black, color.Background);
+			// 		}
+			// 		if (c == frame.X - drawMarginFrame && r == frame.Y - drawMarginFrame) {
+			// 			Assert.Equal (uLCorner, rune);
+			// 		} else if (c == frame.Right && r == frame.Y - drawMarginFrame) {
+			// 			Assert.Equal (uRCorner, rune);
+			// 		} else if (c == frame.X - drawMarginFrame && r == frame.Bottom) {
+			// 			Assert.Equal (lLCorner, rune);
+			// 		} else if (c == frame.Right && r == frame.Bottom) {
+			// 			Assert.Equal (lRCorner, rune);
+			// 		} else if (c >= frame.X && (r == frame.Y - drawMarginFrame
+			// 			|| r == frame.Bottom)) {
+			// 			Assert.Equal (hLine, rune);
+			// 		} else if ((c == frame.X - drawMarginFrame || c == frame.Right)
+			// 			&& r >= frame.Y && r <= frame.Bottom - drawMarginFrame) {
+			// 			Assert.Equal (vLine, rune);
+			// 		} else {
+			// 			text += rune.ToString ();
+			// 		}
+			// 	}
+			// }
+			// Assert.Equal ("This is a test", text.Trim ());
 
 		//			var color = (Attribute)driver.Contents [r, c, 1];
 		//			Assert.Equal (Color.DarkGray, color.Background);
@@ -305,27 +316,12 @@ namespace Terminal.Gui.CoreTests {
 		//	var top = Application.Top;
 		//	var driver = (FakeDriver)Application.Driver;
 
-		//	var frameView = new FrameView () {
-		//		X = Pos.Center (),
-		//		Y = Pos.Center (),
-		//		Width = 24,
-		//		Height = 13,
-		//		Border = new Border () {
-		//			BorderStyle = BorderStyle.Single,
-		//			Padding = new Thickness (2),
-		//			BorderThickness = new Thickness (2),
-		//			BorderBrush = Color.Red,
-		//			Background = Color.BrightGreen,
-		//			Effect3D = true,
-		//			Effect3DOffset = new Point (2, -3)
-		//		}
-		//	};
-		//	frameView.Add (new Label () {
-		//		ColorScheme = Colors.TopLevel,
-		//		Text = "This is a test"
-		//	});
-		//	//frameView.Border.Child = frameView;
-		//	top.Add (frameView);
+		// [Fact]
+		// [AutoInitShutdown]
+		// public void DrawContent_With_Parent_Border ()
+		// {
+		// 	var top = Application.Top;
+		// 	var driver = (FakeDriver)Application.Driver;
 
 		//	top.LayoutSubviews ();
 		//	frameView.Redraw (frameView.Bounds);
@@ -481,13 +477,40 @@ namespace Terminal.Gui.CoreTests {
 		//	//}
 		//	//Assert.Equal ("This is a test", text.Trim ());
 
-		//	// TODO: Re-enable 3deffect
-			
-		//	//// Check the upper Effect3D
-		//	//for (int r = frame.Y + effect3DOffset.Y;
-		//	//	r < frame.Y; r++) {
-		//	//	for (int c = frame.X + effect3DOffset.X;
-		//	//		c < frame.Right + effect3DOffset.X; c++) {
+			// 		var color = (Attribute)driver.Contents [r, c, 1];
+			// 		var rune = (Rune)driver.Contents [r, c, 0];
+			// 		Assert.Equal (Color.Black, color.Background);
+			// 		if (c == frame.X + sumThickness.Left && r == frame.Y + sumThickness.Top) {
+			// 			Assert.Equal (uLCorner, rune);
+			// 		} else if (c == frame.Right - drawMarginFrame - sumThickness.Right
+			// 			&& r == frame.Y + sumThickness.Top) {
+			// 			Assert.Equal (uRCorner, rune);
+			// 		} else if (c == frame.X + sumThickness.Left
+			// 			&& r == frame.Bottom - drawMarginFrame - sumThickness.Bottom) {
+			// 			Assert.Equal (lLCorner, rune);
+			// 		} else if (c == frame.Right - drawMarginFrame - sumThickness.Right
+			// 			&& r == frame.Bottom - drawMarginFrame - sumThickness.Bottom) {
+			// 			Assert.Equal (lRCorner, rune);
+			// 		} else if (c > frame.X + sumThickness.Left
+			// 			&& (r == frame.Y + sumThickness.Top
+			// 			|| r == frame.Bottom - drawMarginFrame - sumThickness.Bottom)) {
+			// 			Assert.Equal (hLine, rune);
+			// 		} else if ((c == frame.X + sumThickness.Left
+			// 			|| c == frame.Right - drawMarginFrame - sumThickness.Right)
+			// 			&& r >= frame.Y + drawMarginFrame + sumThickness.Top) {
+			// 			Assert.Equal (vLine, rune);
+			// 		} else {
+			// 			text += rune.ToString ();
+			// 		}
+			// 	}
+			// }
+			// Assert.Equal ("This is a test", text.Trim ());
+
+			// // Check the upper Effect3D
+			// for (int r = frame.Y + effect3DOffset.Y;
+			// 	r < frame.Y; r++) {
+			// 	for (int c = frame.X + effect3DOffset.X;
+			// 		c < frame.Right + effect3DOffset.X; c++) {
 
 		//	//		var color = (Attribute)driver.Contents [r, c, 1];
 		//	//		Assert.Equal (Color.DarkGray, color.Background);
@@ -540,8 +563,7 @@ namespace Terminal.Gui.CoreTests {
 		//	//}
 		//}
 
-		[Fact]
-		[AutoInitShutdown]
+		[Fact, AutoInitShutdown]
 		public void BorderOnControlWithNoChildren ()
 		{
 			var label = new TextField ("Loading...") {
@@ -556,6 +578,58 @@ namespace Terminal.Gui.CoreTests {
 			Application.Top.Add (label);
 
 			Assert.Null (Record.Exception (() => label.Redraw (label.Bounds)));
+		}
+
+		[Fact, AutoInitShutdown]
+		public void BorderStyle_And_DrawMarginFrame_Gets_Sets ()
+		{
+			var lblTop = new Label ("At 0,0");
+			var lblFrame = new Label ("Centered") { X = Pos.Center (), Y = Pos.Center () };
+			var frame = new FrameView () { Y = 1, Width = 20, Height = 3 };
+			var lblFill = new Label () { Width = Dim.Fill(),Height = Dim.Fill(), Visible = false };
+			var fillText = new System.Text.StringBuilder ();
+			for (int i = 0; i < frame.Bounds.Height; i++) {
+				if (i > 0) {
+					fillText.AppendLine ("");
+				}
+				for (int j = 0; j < frame.Bounds.Width; j++) {
+					fillText.Append ("█");
+				}
+			}
+			lblFill.Text = fillText.ToString ();
+			frame.Add (lblFill, lblFrame);
+			var lblBottom = new Label ("At 0,4") { Y = 4 };
+			Application.Top.Add (lblTop, frame, lblBottom);
+			Application.Begin (Application.Top);
+
+			Assert.Equal (BorderStyle.Single, frame.Border.BorderStyle);
+			Assert.True (frame.Border.DrawMarginFrame);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+At 0,0              
+┌──────────────────┐
+│     Centered     │
+└──────────────────┘
+At 0,4              ", output);
+
+			frame.Border.BorderStyle = BorderStyle.None;
+			Application.Refresh ();
+			Assert.True (frame.Border.DrawMarginFrame);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+At 0,0        
+              
+      Centered
+              
+At 0,4        ", output);
+
+			frame.Border.DrawMarginFrame = false;
+			lblFill.Visible = true;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+At 0,0              
+████████████████████
+██████Centered██████
+████████████████████
+At 0,4              ", output);
 		}
 	}
 }

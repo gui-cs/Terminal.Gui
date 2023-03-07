@@ -1,9 +1,6 @@
 ﻿//
 // FakeDriver.cs: A fake ConsoleDriver for unit tests. 
 //
-// Authors:
-//   Charlie Kindel (github.com/tig)
-//
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -48,7 +45,7 @@ namespace Terminal.Gui {
 		// Only handling left here because not all terminals has a horizontal scroll bar.
 		public override int Left => 0;
 		public override int Top => 0;
-		public override bool HeightAsBuffer { get; set; }
+		public override bool EnableConsoleScrolling { get; set; }
 		private IClipboard clipboard = null;
 		public override IClipboard Clipboard => clipboard;
 
@@ -245,8 +242,8 @@ namespace Terminal.Gui {
 		{
 			redrawColor = color;
 			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-			      .OfType<ConsoleColor> ()
-			      .Select (s => (int)s);
+				.OfType<ConsoleColor> ()
+				.Select (s => (int)s);
 			if (values.Contains (color & 0xffff)) {
 				FakeConsole.BackgroundColor = (ConsoleColor)(color & 0xffff);
 			}
@@ -535,7 +532,7 @@ namespace Terminal.Gui {
 			FakeConsole.SetBufferSize (width, height);
 			cols = width;
 			rows = height;
-			if (!HeightAsBuffer) {
+			if (!EnableConsoleScrolling) {
 				SetWindowSize (width, height);
 			}
 			ProcessResize ();
@@ -544,7 +541,7 @@ namespace Terminal.Gui {
 		public void SetWindowSize (int width, int height)
 		{
 			FakeConsole.SetWindowSize (width, height);
-			if (!HeightAsBuffer) {
+			if (!EnableConsoleScrolling) {
 				if (width != cols || height != rows) {
 					SetBufferSize (width, height);
 					cols = width;
@@ -556,7 +553,7 @@ namespace Terminal.Gui {
 
 		public void SetWindowPosition (int left, int top)
 		{
-			if (HeightAsBuffer) {
+			if (EnableConsoleScrolling) {
 				this.left = Math.Max (Math.Min (left, Cols - FakeConsole.WindowWidth), 0);
 				this.top = Math.Max (Math.Min (top, Rows - FakeConsole.WindowHeight), 0);
 			} else if (this.left > 0 || this.top > 0) {
@@ -575,7 +572,7 @@ namespace Terminal.Gui {
 
 		public override void ResizeScreen ()
 		{
-			if (!HeightAsBuffer) {
+			if (!EnableConsoleScrolling) {
 				if (FakeConsole.WindowHeight > 0) {
 					// Can raise an exception while is still resizing.
 					try {
@@ -629,8 +626,8 @@ namespace Terminal.Gui {
 			foreground = default;
 			background = default;
 			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-			      .OfType<ConsoleColor> ()
-			      .Select (s => (int)s);
+				.OfType<ConsoleColor> ()
+				.Select (s => (int)s);
 			if (values.Contains (value & 0xffff)) {
 				hasColor = true;
 				background = (Color)(ConsoleColor)(value & 0xffff);

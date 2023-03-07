@@ -14,6 +14,12 @@ namespace Terminal.Gui {
 		TileView parentTileView;
 
 		/// <summary>
+		/// The keyboard key that the user can press to toggle resizing
+		/// of splitter lines.  Mouse drag splitting is always enabled.
+		/// </summary>
+		public Key ToggleResizable { get; set; } = Key.CtrlMask | Key.F10;
+
+		/// <summary>
 		/// A single <see cref="ContentView"/> presented in a <see cref="TileView"/>. To create
 		/// new instances use <see cref="TileView.RebuildForTileCount(int)"/> 
 		/// or <see cref="TileView.InsertTile(int)"/>.
@@ -167,7 +173,6 @@ namespace Terminal.Gui {
 		/// <param name="tiles"></param>
 		public TileView (int tiles)
 		{
-			CanFocus = true;
 			RebuildForTileCount (tiles);
 			IgnoreBorderPropertyOnRedraw = true;
 			Border = new Border () {
@@ -403,15 +408,6 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		/// <inheritdoc/>
-		public override bool OnEnter (View view)
-		{
-			Driver.SetCursorVisibility (CursorVisibility.Invisible);
-			if (!Tiles.Where (t => t.ContentView.HasFocus).Any ()) {
-				Tiles.FirstOrDefault ()?.ContentView.SetFocus ();
-			}
-			return base.OnEnter (view);
-		}
 
 		/// <inheritdoc/>
 		public override void Redraw (Rect bounds)
@@ -548,6 +544,30 @@ namespace Terminal.Gui {
 
 			result = newContainer;
 			return true;
+		}
+
+		/// <inheritdoc/>
+		public override bool ProcessHotKey (KeyEvent keyEvent)
+		{
+			bool focusMoved = false;
+
+			if(keyEvent.Key == ToggleResizable) {
+				foreach(var l in splitterLines) {
+
+					var iniBefore = l.IsInitialized;
+					l.IsInitialized = false;
+					l.CanFocus = !l.CanFocus;
+					l.IsInitialized = iniBefore;
+
+					if (l.CanFocus && !focusMoved) {
+						l.SetFocus ();
+						focusMoved = true;
+					}
+				}
+				return true;
+			}
+
+			return base.ProcessHotKey (keyEvent);
 		}
 
 		private bool IsValidNewSplitterPos (int idx, Pos value, int fullSpace)
@@ -750,7 +770,7 @@ namespace Terminal.Gui {
 					tile.ContentView.Width = GetTileWidthOrHeight (i, Bounds.Width, visibleTiles, visibleSplitterLines);
 				} else {
 					tile.ContentView.X = bounds.X;
-					tile.ContentView.Y = i == 0 ? 0 : Pos.Bottom (visibleSplitterLines [i - 1]);
+					tile.ContentView.Y = i == 0 ? bounds.Y : Pos.Bottom (visibleSplitterLines [i - 1]);
 					tile.ContentView.Width = bounds.Width;
 					tile.ContentView.Height = GetTileWidthOrHeight (i, Bounds.Height, visibleTiles, visibleSplitterLines);
 				}
@@ -864,7 +884,7 @@ namespace Terminal.Gui {
 
 			public TileViewLineView (TileView parent, int idx)
 			{
-				CanFocus = true;
+				CanFocus = false;
 				TabStop = true;
 
 				this.Parent = parent;
@@ -929,7 +949,7 @@ namespace Terminal.Gui {
 
 			public void DrawSplitterSymbol ()
 			{
-				if (CanFocus && HasFocus) {
+				if (dragPosition != null || CanFocus) {
 					var location = moveRuneRenderLocation ??
 						new Point (Bounds.Width / 2, Bounds.Height / 2);
 
@@ -939,10 +959,6 @@ namespace Terminal.Gui {
 
 			public override bool MouseEvent (MouseEvent mouseEvent)
 			{
-				if (!CanFocus) {
-					return true;
-				}
-
 				if (!dragPosition.HasValue && (mouseEvent.Flags == MouseFlags.Button1Pressed)) {
 
 					// Start a Drag
