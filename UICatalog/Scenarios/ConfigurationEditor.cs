@@ -36,11 +36,12 @@ namespace UICatalog.Scenarios {
 		private static Action _editorColorSchemeChanged;
 
 		// Don't create a Window, just return the top-level view
-		public override void Init (string theme = "Default", string colorScheme = "Base")
+		public override void Init ()
 		{
 			Application.Init ();
-			ConfigurationManager.Themes.Theme = theme;
+			ConfigurationManager.Themes.Theme = Theme;
 			ConfigurationManager.Apply ();
+			Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
 		}
 
 		public override void Setup ()

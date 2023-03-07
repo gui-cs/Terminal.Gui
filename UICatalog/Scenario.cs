@@ -48,6 +48,9 @@ namespace UICatalog {
 	public class Scenario : IDisposable {
 		private bool _disposedValue;
 
+		public string Theme = "Default";
+		public string TopLevelColorScheme = "Base";
+
 		/// <summary>
 		/// The Window for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/> in most cases.
 		/// </summary>
@@ -59,7 +62,6 @@ namespace UICatalog {
 		/// the Scenario picker UI.
 		/// Override <see cref="Init"/> to provide any <see cref="Terminal.Gui.Toplevel"/> behavior needed.
 		/// </summary>
-		/// <param name="colorScheme">The colorscheme to use.</param>
 		/// <remarks>
 		/// <para>
 		/// The base implementation calls <see cref="Application.Init"/> and creates a <see cref="Window"/> for <see cref="Win"/> 
@@ -70,11 +72,11 @@ namespace UICatalog {
 		/// before creating any views or calling other Terminal.Gui APIs.
 		/// </para>
 		/// </remarks>
-		public virtual void Init (string theme = "Default", string colorScheme = "Base")
+		public virtual void Init ()
 		{
 			Application.Init ();
 			
-			ConfigurationManager.Themes.Theme = theme;
+			ConfigurationManager.Themes.Theme = Theme;
 			ConfigurationManager.Apply ();
 
 			Win = new Window ($"{Application.QuitKey} to Quit - Scenario: {GetName ()}") {
@@ -82,7 +84,7 @@ namespace UICatalog {
 				Y = 0,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
-				ColorScheme = Colors.ColorSchemes [colorScheme],
+				ColorScheme = Colors.ColorSchemes [TopLevelColorScheme],
 			};
 			Application.Top.Add (Win);
 		}

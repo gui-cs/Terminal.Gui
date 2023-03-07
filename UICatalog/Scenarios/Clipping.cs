@@ -7,7 +7,7 @@ namespace UICatalog.Scenarios {
 
 	public class Clipping : Scenario {
 
-		public override void Init (string theme = "Default", string colorScheme = "Base")
+		public override void Init ()
 		{
 			Application.Init ();
 			Application.Top.ColorScheme = Colors.Base;

@@ -16,7 +16,7 @@ namespace UICatalog.Scenarios {
 		private StatusItem lenStatusItem;
 
 		// Don't create a Window, just return the top-level view
-		public override void Init (string theme = "Default", string colorScheme = "Base")
+		public override void Init ()
 		{
 			Application.Init ();
 			Application.Top.ColorScheme = Colors.Base;

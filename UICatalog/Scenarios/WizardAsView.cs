@@ -10,7 +10,7 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Wizards")]
 	public class WizardAsView : Scenario {
 
-		public override void Init (string theme = "Default", string colorScheme = "Base")
+		public override void Init ()
 		{
 			Application.Init ();
 

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Terminal.Gui;
+using Terminal.Gui.Configuration;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "All Views Tester", Description: "Provides a test UI for all classes derived from View.")]
@@ -40,11 +41,15 @@ namespace UICatalog.Scenarios {
 		TextField _hText;
 		int _hVal = 0;
 
-		public override void Init (string theme = "Default", string colorScheme = "Base")
+		public override void Init ()
 		{
+			// Don't create a sub-win (Scenario.Win); just use Application.Top
 			Application.Init ();
-			// Don't create a sub-win; just use Applicatiion.Top
+			ConfigurationManager.Themes.Theme = Theme;
+			ConfigurationManager.Apply ();
+			Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
 		}
+
 
 		public override void Setup ()
 		{

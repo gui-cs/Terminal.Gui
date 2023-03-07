@@ -33,11 +33,11 @@ namespace UICatalog.Scenarios {
 		private bool _forceMinimumPosToZero = true;
 		private List<CultureInfo> _cultureInfos;
 
-		public override void Init (string theme = "Default", string colorScheme = "Base")
+		public override void Init ()
 		{
 			Application.Init ();
 			_cultureInfos = Application.SupportedCultures;
-			ConfigurationManager.Themes.Theme = theme;
+			ConfigurationManager.Themes.Theme = Theme;
 			ConfigurationManager.Apply ();
 			
 			Win = new Window (_fileName ?? "Untitled") {
@@ -45,7 +45,7 @@ namespace UICatalog.Scenarios {
 				Y = 1,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
-				ColorScheme = Colors.ColorSchemes [colorScheme],
+				ColorScheme = Colors.ColorSchemes [TopLevelColorScheme],
 			};
 			Application.Top.Add (Win);
 

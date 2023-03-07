@@ -86,6 +86,8 @@ namespace UICatalog {
 				_selectedScenario = (Scenario)Activator.CreateInstance (_scenarios [item].GetType ());
 				Application.UseSystemConsole = _useSystemConsole;
 				Application.Init ();
+				_selectedScenario.Theme = _cachedTheme;
+				_selectedScenario.TopLevelColorScheme = _topLevelColorScheme;
 				_selectedScenario.Init ();
 				_selectedScenario.Setup ();
 				_selectedScenario.Run ();
@@ -115,7 +117,9 @@ namespace UICatalog {
 				VerifyObjectsWereDisposed ();
 				ConfigurationManager.Themes.Theme = _cachedTheme;
 				ConfigurationManager.Apply ();
-				scenario.Init (_cachedTheme, _topLevelColorScheme);
+				scenario.Theme = _cachedTheme;
+				scenario.TopLevelColorScheme = _topLevelColorScheme;
+				scenario.Init ();
 				scenario.Setup ();
 				scenario.Run ();
 				scenario.Dispose ();

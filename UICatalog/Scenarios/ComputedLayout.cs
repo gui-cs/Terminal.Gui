@@ -18,11 +18,12 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Layout")]
 	public class ComputedLayout : Scenario {
 
-		public override void Init (string theme = "Default", string colorScheme = "Base")
+		public override void Init ()
 		{
 			Application.Init ();
-			ConfigurationManager.Themes.Theme = theme;
+			ConfigurationManager.Themes.Theme = Theme;
 			ConfigurationManager.Apply ();
+			Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
 		}
 
 		public override void Setup ()

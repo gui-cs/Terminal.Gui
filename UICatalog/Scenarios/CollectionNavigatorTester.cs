@@ -15,7 +15,7 @@ namespace UICatalog.Scenarios {
 	public class CollectionNavigatorTester : Scenario {
 
 		// Don't create a Window, just return the top-level view
-		public override void Init (string theme = "Default", string colorScheme = "Base")
+		public override void Init ()
 		{
 			Application.Init ();
 			Application.Top.ColorScheme = Colors.Base;

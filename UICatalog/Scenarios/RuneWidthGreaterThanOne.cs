@@ -16,7 +16,7 @@ namespace UICatalog.Scenarios {
 		private Window _win;
 		private string _lastRunesUsed;
 
-		public override void Init (string theme = "Default", string colorScheme = "Base")
+		public override void Init ()
 		{
 			Application.Init ();
 

@@ -49,10 +49,10 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
-		public override void Init (string theme = "Default", string colorScheme = "Base")
+		public override void Init ()
 		{
 			Application.Init ();
-			ConfigurationManager.Themes.Theme = theme;
+			ConfigurationManager.Themes.Theme = Theme;
 			ConfigurationManager.Apply ();
 			
 			Win = new TestWindow ($"{Application.QuitKey} to Quit - Scenario: {GetName ()}") {
@@ -60,7 +60,7 @@ namespace UICatalog.Scenarios {
 				Y = 0,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
-				ColorScheme = Colors.ColorSchemes [colorScheme],
+				ColorScheme = Colors.ColorSchemes [TopLevelColorScheme],
 			};
 			Application.Top.Add (Win);
 		}

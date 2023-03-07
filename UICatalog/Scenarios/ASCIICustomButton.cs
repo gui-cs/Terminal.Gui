@@ -11,7 +11,7 @@ namespace UICatalog.Scenarios {
 		private ScrollViewTestWindow scrollViewTestWindow;
 		private MenuItem miSmallerWindow;
 
-		public override void Init (string theme = "Default", string colorScheme = "Base")
+		public override void Init ()
 		{
 			Application.Init ();
 			scrollViewTestWindow = new ScrollViewTestWindow ();
