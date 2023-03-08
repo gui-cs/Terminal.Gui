@@ -98,7 +98,7 @@ namespace Terminal.Gui {
 		private Label lblForward;
 		private Label lblBack;
 		private Label lblUp;
-		private Label lblFeedback;
+		private string feedback;
 
 		private CollectionNavigator collectionNavigator = new CollectionNavigator ();
 
@@ -273,14 +273,6 @@ namespace Terminal.Gui {
 
 			tbFind.TextChanged += (o) => RestartSearch ();
 
-			lblFeedback = new Label {
-				Y = Pos.AnchorEnd (1),
-				X = Pos.Right (spinnerLabel) + 1,
-				ColorScheme = new ColorScheme {
-					Normal = new Attribute (Color.Red, this.ColorScheme.Normal.Background)
-				}
-			};
-
 			this.tableView.Style.ShowHorizontalHeaderOverline = false;
 			this.tableView.Style.ShowVerticalCellLines = false;
 			this.tableView.Style.ShowVerticalHeaderLines = false;
@@ -339,7 +331,6 @@ namespace Terminal.Gui {
 			this.Add (this.btnToggleSplitterCollapse);
 			this.Add (this.tbFind);
 			this.Add (this.spinnerLabel);
-			this.Add (lblFeedback);
 			this.Add (this.btnOk);
 			this.Add (this.btnCancel);
 			this.Add (this.lblUp);
@@ -355,6 +346,8 @@ namespace Terminal.Gui {
 			if (this.NavigateIf (keyEvent, Key.CtrlMask | Key.F, this.tbFind)) {
 				return true;
 			}
+
+			ClearFeedback();
 
 			return base.ProcessHotKey (keyEvent);
 		}
@@ -395,7 +388,7 @@ namespace Terminal.Gui {
 
 		private void ClearFeedback ()
 		{
-			lblFeedback.Text = string.Empty;
+			feedback = null;
 		}
 
 		private void CycleToNextTableEntryBeginningWith (KeyEventEventArgs keyEvent)
@@ -549,7 +542,7 @@ namespace Terminal.Gui {
 
 			this.Move (1, 0, false);
 
-
+			// TODO: Refactor this to some Title drawing options class
 			if (ustring.IsNullOrEmpty (Title)) {
 				return;
 			}
@@ -588,6 +581,26 @@ namespace Terminal.Gui {
 			    new Attribute (this.ColorScheme.Normal.Foreground, this.ColorScheme.Normal.Background));
 
 			Driver.AddStr (ustring.Make (Enumerable.Repeat (Driver.HDLine, padRight)));
+			
+			if(!string.IsNullOrWhiteSpace(feedback))
+			{
+				var feedbackWidth = feedback.Sum (c => Rune.ColumnWidth (c));
+				var feedbackPadLeft = ((bounds.Width - feedbackWidth) / 2) - 1;
+
+				feedbackPadLeft = Math.Min (bounds.Width, feedbackPadLeft);
+				feedbackPadLeft = Math.Max (0, feedbackPadLeft);
+
+				var feedbackPadRight = bounds.Width - (feedbackPadLeft + feedbackWidth + 2);
+				feedbackPadRight = Math.Min (bounds.Width, feedbackPadRight);
+				feedbackPadRight = Math.Max (0, feedbackPadRight);
+
+				Move(0,Bounds.Height/2);
+
+				Driver.SetAttribute( new Attribute (Color.Red, this.ColorScheme.Normal.Background));
+				Driver.AddStr (new string (' ', feedbackPadLeft));
+				Driver.AddStr (feedback);
+				Driver.AddStr(new string(' ',feedbackPadRight));
+			}			 
 		}
 
 		/// <inheritdoc/>
@@ -694,7 +707,8 @@ namespace Terminal.Gui {
 		private void Accept (FileInfo f)
 		{
 			if (!this.IsCompatibleWithOpenMode (f.FullName, out var reason)) {
-				lblFeedback.Text = reason;
+				feedback = reason;
+				SetNeedsDisplay();
 				return;
 			}
 
@@ -711,7 +725,8 @@ namespace Terminal.Gui {
 		{
 			if (!this.IsCompatibleWithOpenMode (this.tbPath.Text.ToString (), out string reason)) {
 				if (reason != null) {
-					lblFeedback.Text = reason;
+					feedback = reason;
+					SetNeedsDisplay();
 				}
 				return;
 			}
@@ -922,7 +937,8 @@ namespace Terminal.Gui {
 					return;
 				} else {
 					if (reason != null) {
-						lblFeedback.Text = reason;
+						feedback = reason;
+						SetNeedsDisplay();
 					}
 
 					return;
