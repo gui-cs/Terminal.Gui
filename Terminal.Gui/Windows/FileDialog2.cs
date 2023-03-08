@@ -1383,15 +1383,21 @@ namespace Terminal.Gui {
 						StringComparer.InvariantCultureIgnoreCase);
 			}
 
-			internal object GetOrderByValue (string columnName)
+			internal object GetOrderByValue (FileDialog2 dlg, string columnName)
 			{
-				switch (columnName) {
-				case HeaderFilename: return this.FileSystemInfo.Name;
-				case HeaderSize: return this.MachineReadableLength;
-				case HeaderModified: return this.DateModified;
-				case HeaderType: return this.Type;
-				default: throw new ArgumentOutOfRangeException (nameof (columnName));
-				}
+				if (dlg.Style.FilenameColumnName == columnName)
+					return this.FileSystemInfo.Name;
+
+				if (dlg.Style.SizeColumnName == columnName)
+					return this.MachineReadableLength;
+
+				if (dlg.Style.ModifiedColumnName == columnName)
+					return this.DateModified;
+
+				if (dlg.Style.TypeColumnName == columnName)
+					return this.Type;
+
+				throw new ArgumentOutOfRangeException ("Unknown column " + nameof (columnName));
 			}
 
 			internal object GetOrderByDefault ()
@@ -1989,7 +1995,7 @@ namespace Terminal.Gui {
 					sortAlgorithm = (v) => v.GetOrderByDefault ();
 					this.currentSortIsAsc = true;
 				} else {
-					sortAlgorithm = (v) => v.GetOrderByValue (colName);
+					sortAlgorithm = (v) => v.GetOrderByValue (dlg,colName);
 				}
 
 				var ordered =
