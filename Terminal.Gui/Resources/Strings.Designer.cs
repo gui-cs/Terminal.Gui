@@ -133,6 +133,24 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Directory already exists with that name.
+        /// </summary>
+        internal static string fdDirectoryAlreadyExistsFeedback {
+            get {
+                return ResourceManager.GetString("fdDirectoryAlreadyExistsFeedback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must select an existing directory.
+        /// </summary>
+        internal static string fdDirectoryMustExistFeedback {
+            get {
+                return ResourceManager.GetString("fdDirectoryMustExistFeedback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File.
         /// </summary>
         internal static string fdFile {
@@ -142,11 +160,65 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to File already exists with that name.
+        /// </summary>
+        internal static string fdFileAlreadyExistsFeedback {
+            get {
+                return ResourceManager.GetString("fdFileAlreadyExistsFeedback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must select an existing file.
+        /// </summary>
+        internal static string fdFileMustExistFeedback {
+            get {
+                return ResourceManager.GetString("fdFileMustExistFeedback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filename.
+        /// </summary>
+        internal static string fdFilename {
+            get {
+                return ResourceManager.GetString("fdFilename", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must select an existing file or directory.
+        /// </summary>
+        internal static string fdFileOrDirectoryMustExistFeedback {
+            get {
+                return ResourceManager.GetString("fdFileOrDirectoryMustExistFeedback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Modified.
+        /// </summary>
+        internal static string fdModified {
+            get {
+                return ResourceManager.GetString("fdModified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open.
         /// </summary>
         internal static string fdOpen {
             get {
                 return ResourceManager.GetString("fdOpen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter Path.
+        /// </summary>
+        internal static string fdPathCaption {
+            get {
+                return ResourceManager.GetString("fdPathCaption", resourceCulture);
             }
         }
         
@@ -169,6 +241,15 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enter Search.
+        /// </summary>
+        internal static string fdSearchCaption {
+            get {
+                return ResourceManager.GetString("fdSearchCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select folder.
         /// </summary>
         internal static string fdSelectFolder {
@@ -183,6 +264,33 @@ namespace Terminal.Gui.Resources {
         internal static string fdSelectMixed {
             get {
                 return ResourceManager.GetString("fdSelectMixed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Size.
+        /// </summary>
+        internal static string fdSize {
+            get {
+                return ResourceManager.GetString("fdSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type.
+        /// </summary>
+        internal static string fdType {
+            get {
+                return ResourceManager.GetString("fdType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong file type.
+        /// </summary>
+        internal static string fdWrongFileTypeFeedback {
+            get {
+                return ResourceManager.GetString("fdWrongFileTypeFeedback", resourceCulture);
             }
         }
         

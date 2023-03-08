@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using NStack;
+using Terminal.Gui.Resources;
 using Terminal.Gui.Trees;
 using static System.Environment;
 using static Terminal.Gui.OpenDialog;
@@ -19,11 +20,22 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class FileDialog2 : Dialog {
 
-		// TODO : expose these somehow for localization without compromising case/switch statements
-		private const string HeaderFilename = "Filename";
-		private const string HeaderSize = "Size";
-		private const string HeaderModified = "Modified";
-		private const string HeaderType = "Type";
+		public FileDialog2Style Style { get; set; } = new FileDialog2Style();
+		public class FileDialog2Style
+		{
+			public string FilenameColumnName { get; set; } = Strings.fdFilename;
+			public string SizeColumnName { get; set; } = Strings.fdSize;
+			public string ModifiedColumnName { get; set; } = Strings.fdModified;
+			public string TypeColumnName { get; set; } = Strings.fdType;
+			public string SearchCaption { get; internal set; } = Strings.fdSearchCaption;
+			public string PathCaption { get; internal set; } = Strings.fdPathCaption;
+			public string WrongFileTypeFeedback { get; internal set; } = Strings.fdWrongFileTypeFeedback;
+			public string DirectoryMustExistFeedback { get; internal set; } = Strings.fdDirectoryMustExistFeedback;
+			public string FileAlreadyExistsFeedback { get; internal set; } = Strings.fdFileAlreadyExistsFeedback;
+			public string FileMustExistFeedback { get; internal set; } = Strings.fdFileMustExistFeedback;
+			public string DirectoryAlreadyExistsFeedback { get; internal set; } = Strings.fdDirectoryAlreadyExistsFeedback;
+			public string FileOrDirectoryMustExistFeedback { get; internal set; } = Strings.fdFileOrDirectoryMustExistFeedback;
+		}
 
 		/// <summary>
 		/// The maximum number of results that will be collected
@@ -135,7 +147,7 @@ namespace Terminal.Gui {
 			this.tbPath = new TextFieldWithAppendAutocomplete {
 				X = Pos.Right (lblPath),
 				Width = Dim.Fill (1),
-				Caption = "Enter Path",
+				Caption = Style.PathCaption,
 				CaptionColor = Color.DarkGray,
 			};
 			this.tbPath.KeyPress += (k) => {
@@ -231,7 +243,7 @@ namespace Terminal.Gui {
 
 			tbFind = new CaptionedTextField {
 				X = Pos.Right (this.btnToggleSplitterCollapse) + 1,
-				Caption = "Enter Search",
+				Caption = Style.SearchCaption,
 				Width = 16,
 				Y = Pos.AnchorEnd (1),
 			};
@@ -851,7 +863,7 @@ namespace Terminal.Gui {
 		{
 			this.dtFiles = new DataTable ();
 
-			var nameStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (HeaderFilename, typeof (int)));
+			var nameStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (Style.FilenameColumnName, typeof (int)));
 			nameStyle.RepresentationGetter = (i) => {
 
 				var stats = this.state?.Children [(int)i];
@@ -870,15 +882,15 @@ namespace Terminal.Gui {
 
 			nameStyle.MinWidth = 50;
 
-			var sizeStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (HeaderSize, typeof (int)));
+			var sizeStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (Style.SizeColumnName, typeof (int)));
 			sizeStyle.RepresentationGetter = (i) => this.state?.Children [(int)i].HumanReadableLength ?? string.Empty;
 			nameStyle.MinWidth = 10;
 
-			var dateModifiedStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (HeaderModified, typeof (int)));
+			var dateModifiedStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (Style.ModifiedColumnName, typeof (int)));
 			dateModifiedStyle.RepresentationGetter = (i) => this.state?.Children [(int)i].DateModified?.ToString () ?? string.Empty;
 			dateModifiedStyle.MinWidth = 30;
 
-			var typeStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (HeaderType, typeof (int)));
+			var typeStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (Style.TypeColumnName, typeof (int)));
 			typeStyle.RepresentationGetter = (i) => this.state?.Children [(int)i].Type ?? string.Empty;
 			typeStyle.MinWidth = 6;
 			this.tableView.Style.RowColorGetter = this.ColorGetter;
@@ -959,36 +971,36 @@ namespace Terminal.Gui {
 			}
 
 			if (!this.IsCompatibleWithAllowedExtensions (s)) {
-				reason = "Wrong file type";
+				reason = Style.WrongFileTypeFeedback;
 				return false;
 			}
 
 			switch (this.OpenMode) {
 			case OpenMode.Directory:
 				if (MustExist && !Directory.Exists (s)) {
-					reason = "Must select an existing directory";
+					reason = Style.DirectoryMustExistFeedback;
 					return false;
 				}
 
 				if (File.Exists (s)) {
-					reason = "File already exists with that name";
+					reason = Style.FileAlreadyExistsFeedback;
 					return false;
 				}
 				return true;
 			case OpenMode.File:
 
 				if (MustExist && !File.Exists (s)) {
-					reason = "Must select an existing file";
+					reason = Style.FileMustExistFeedback;
 					return false;
 				}
 				if (Directory.Exists (s)) {
-					reason = "Directory already exists with that name";
+					reason = Style.DirectoryAlreadyExistsFeedback;
 					return false;
 				}
 				return true;
 			case OpenMode.Mixed:
 				if (MustExist && !File.Exists (s) && !Directory.Exists (s)) {
-					reason = "Must select an existing file or directory";
+					reason = Style.FileOrDirectoryMustExistFeedback;
 					return false;
 				}
 				return true;
