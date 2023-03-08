@@ -109,15 +109,22 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="FileDialog2"/> class.
 		/// </summary>
-		public FileDialog2 ()
+		public FileDialog2 () :this ("Ok")
 		{
-			const int okWidth = 6;
+
+		}
+		public FileDialog2 (string okCaption)
+		{
 			const int cancelWidth = 10;
 
 			var lblPath = new Label (">");
-			this.btnOk = new Button ("Ok") {
-				Y = Pos.AnchorEnd (1),
-				X = Pos.AnchorEnd (okWidth)
+			this.btnOk = new Button (okCaption) {
+				Y = Pos.AnchorEnd(1),
+				X = Pos.Function(()=>
+					this.Bounds.Width
+					-btnOk.Bounds.Width
+					// TODO: Fiddle factor, seems the Bounds are wrong for someone
+					-2)
 			};
 			this.btnOk.Clicked += this.Accept;
 			this.btnOk.KeyPress += (k) => {
@@ -127,7 +134,14 @@ namespace Terminal.Gui {
 
 			this.btnCancel = new Button ("Cancel") {
 				Y = Pos.AnchorEnd (1),
-				X = Pos.AnchorEnd (okWidth + cancelWidth),
+				X = Pos.Function(()=>
+					this.Bounds.Width
+					-btnOk.Bounds.Width
+					-btnCancel.Bounds.Width
+					-1
+					// TODO: Fiddle factor, seems the Bounds are wrong for someone
+					-2
+					)
 			};
 			this.btnCancel.KeyPress += (k) => {
 				this.NavigateIf (k, Key.CursorLeft, this.btnToggleSplitterCollapse);

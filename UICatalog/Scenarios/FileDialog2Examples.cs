@@ -13,26 +13,38 @@ namespace UICatalog.Scenarios {
 		private CheckBox cbMonochrome;
 		private CheckBox cbCaseSensitive;
 
+		private RadioGroup rgCaption;
+
 		public override void Setup ()
 		{
 			var y = 0;
 			var x = 1;
 
-			cbMustExist = new CheckBox ("Must Exist") { Checked = true };
+			cbMustExist = new CheckBox ("Must Exist") { Checked = true, X=x};
 			Win.Add (cbMustExist);
 
 
-			cbIcons = new CheckBox ("Icons") { Checked = true, X = Pos.Right (cbMustExist) + 1 };
+			cbIcons = new CheckBox ("Icons") { Checked = true, Y = y++, X=x };
 			Win.Add (cbIcons);
 
-
-			cbMonochrome = new CheckBox ("Monochrome") { Checked = false, X = Pos.Right (cbIcons) + 1 };
+			cbMonochrome = new CheckBox ("Monochrome") { Checked = false, Y = y++, X=x};
 			Win.Add (cbMonochrome);
 
-			cbCaseSensitive = new CheckBox ("Case Sensitive Search") { Checked = false, X = 0 ,Y = ++y };
+			cbCaseSensitive = new CheckBox ("Case Sensitive Search") { Checked = false, Y = y++, X=x };
 			Win.Add (cbCaseSensitive);
 
-			y++;
+			y = 0;
+			x = 24;
+
+			Win.Add(new Label("Open Caption"){X=x++,Y=y++});
+
+			rgCaption = new RadioGroup{X = x, Y=y};
+			rgCaption.RadioLabels = new NStack.ustring[]{"Ok","Open","Save"};
+			Win.Add(rgCaption);
+
+			
+			x = 1;
+			y = 5;
 
 			foreach (var multi in new bool [] { false, true }) {
 				foreach (OpenDialog.OpenMode openMode in Enum.GetValues (typeof (OpenDialog.OpenMode))) {
@@ -45,12 +57,11 @@ namespace UICatalog.Scenarios {
 					Win.Add (btn);
 				}
 			}
-			
-			y=2;
+
+			y = 5;
 
 			// SubViews[0] is ContentView
 			x = Win.Subviews [0].Subviews.OfType<Button> ().Max (b => b.Text.Length + 5);
-
 
 			foreach (var multi in new bool [] { false, true }) {
 				foreach (var strict in new bool [] { false, true }) {
@@ -71,7 +82,9 @@ namespace UICatalog.Scenarios {
 		private void SetupHandler (Button btn, OpenDialog.OpenMode mode, bool isMulti, bool csv = false, bool strict = false)
 		{
 			btn.Clicked += () => {
-				var fd = new FileDialog2 {
+				var fd = new FileDialog2(
+						rgCaption.RadioLabels[rgCaption.SelectedItem].ToString()
+					) {
 					AllowsMultipleSelection = isMulti,
 					OpenMode = mode,
 					MustExist = cbMustExist.Checked ?? false
