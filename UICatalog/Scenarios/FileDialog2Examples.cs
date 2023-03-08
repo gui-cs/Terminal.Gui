@@ -3,6 +3,8 @@ using System.Collections;
 using System.IO;
 using System.Linq;
 using Terminal.Gui;
+using Terminal.Gui.Graphs;
+using static Terminal.Gui.OpenDialog;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "FileDialog2", Description: "Demonstrates how to the FileDialog2 class")]
@@ -12,15 +14,18 @@ namespace UICatalog.Scenarios {
 		private CheckBox cbIcons;
 		private CheckBox cbMonochrome;
 		private CheckBox cbCaseSensitive;
+		private CheckBox cbAllowMultipleSelection;
 
 		private RadioGroup rgCaption;
+		private RadioGroup rgOpenMode;
+		private RadioGroup rgAllowedTypes;
 
 		public override void Setup ()
 		{
 			var y = 0;
 			var x = 1;
 
-			cbMustExist = new CheckBox ("Must Exist") { Checked = true, X=x};
+			cbMustExist = new CheckBox ("Must Exist") { Checked = true, Y = y++, X=x};
 			Win.Add (cbMustExist);
 
 
@@ -33,61 +38,71 @@ namespace UICatalog.Scenarios {
 			cbCaseSensitive = new CheckBox ("Case Sensitive Search") { Checked = false, Y = y++, X=x };
 			Win.Add (cbCaseSensitive);
 
+			cbAllowMultipleSelection = new CheckBox ("Multiple") { Checked = false, Y = y++, X=x };
+			Win.Add (cbAllowMultipleSelection);
+
 			y = 0;
 			x = 24;
 
-			Win.Add(new Label("Open Caption"){X=x++,Y=y++});
+			Win.Add(new LineView(Orientation.Vertical){
+				X = x++,
+				Y = 1,
+				Height = 4
+			});
+			Win.Add(new Label("Caption"){X=x++,Y=y++});
 
 			rgCaption = new RadioGroup{X = x, Y=y};
 			rgCaption.RadioLabels = new NStack.ustring[]{"Ok","Open","Save"};
 			Win.Add(rgCaption);
 
+			y = 0;
+			x = 37;
+
+			Win.Add(new LineView(Orientation.Vertical){
+				X = x++,
+				Y = 1,
+				Height = 4
+			});
+			Win.Add(new Label("OpenMode"){X=x++,Y=y++});
+
+			rgOpenMode = new RadioGroup{X = x, Y=y};
+			rgOpenMode.RadioLabels = new NStack.ustring[]{"File","Directory","Mixed"};
+			Win.Add(rgOpenMode);
 			
-			x = 1;
-			y = 5;
-
-			foreach (var multi in new bool [] { false, true }) {
-				foreach (OpenDialog.OpenMode openMode in Enum.GetValues (typeof (OpenDialog.OpenMode))) {
-					var btn = new Button ($"Select {(multi ? "Many" : "One")} {openMode}") {
-						X = x,
-						Y = y
-					};
-					SetupHandler (btn, openMode, multi);
-					y += 2;
-					Win.Add (btn);
-				}
-			}
 
 			y = 5;
+			x = 24;
 
-			// SubViews[0] is ContentView
-			x = Win.Subviews [0].Subviews.OfType<Button> ().Max (b => b.Text.Length + 5);
+			Win.Add(new LineView(Orientation.Vertical){
+				X = x++,
+				Y = y+1,
+				Height = 4
+			});
+			Win.Add(new Label("Allowed"){X=x++,Y=y++});
 
-			foreach (var multi in new bool [] { false, true }) {
-				foreach (var strict in new bool [] { false, true }) {
-					{
-						var btn = new Button ($"Select {(multi ? "Many" : "One")} .csv ({(strict ? "Strict" : "Recommended")})") {
-							X = x,
-							Y = y
-						};
+			rgAllowedTypes = new RadioGroup{X = x, Y=y};
+			rgAllowedTypes.RadioLabels = new NStack.ustring[]{"Any","Csv (Recommended)","Csv (Strict)"};
+			Win.Add(rgAllowedTypes);
 
-						SetupHandler (btn, OpenDialog.OpenMode.File, multi, true, strict);
-						y += 2;
-						Win.Add (btn);
-					}
-				};
-			}
+			var btn = new Button ($"Run Dialog") {
+				X = 1,
+				Y = 7
+			};
+
+			SetupHandler (btn);
+			Win.Add (btn);
 		}
 
-		private void SetupHandler (Button btn, OpenDialog.OpenMode mode, bool isMulti, bool csv = false, bool strict = false)
+		private void SetupHandler (Button btn)
 		{
 			btn.Clicked += () => {
 				var fd = new FileDialog2(
 						rgCaption.RadioLabels[rgCaption.SelectedItem].ToString()
 					) {
-					AllowsMultipleSelection = isMulti,
-					OpenMode = mode,
-					MustExist = cbMustExist.Checked ?? false
+					OpenMode = Enum.Parse<OpenMode>(
+						rgOpenMode.RadioLabels[rgOpenMode.SelectedItem].ToString()),
+					MustExist = cbMustExist.Checked ?? false,
+					AllowsMultipleSelection = cbAllowMultipleSelection.Checked ?? false,
 				};
 
 				if (cbIcons.Checked ?? false) {
@@ -101,9 +116,9 @@ namespace UICatalog.Scenarios {
 
 				fd.Monochrome = cbMonochrome.Checked ?? false;
 
-				if (csv) {
+				if (rgAllowedTypes.SelectedItem > 0) {
 					fd.AllowedTypes.Add (new FileDialog2.AllowedType ("Data File", ".csv", ".tsv"));
-					fd.AllowedTypesIsStrict = strict;
+					fd.AllowedTypesIsStrict = rgAllowedTypes.SelectedItem > 1;
 				}
 
 				Application.Run (fd);
@@ -113,7 +128,7 @@ namespace UICatalog.Scenarios {
 						"Canceled",
 						"You canceled navigation and did not pick anything",
 					"Ok");
-				} else if (isMulti) {
+				} else if (cbAllowMultipleSelection.Checked ?? false) {
 					MessageBox.Query (
 						"Chosen!",
 						"You chose:" + Environment.NewLine +
