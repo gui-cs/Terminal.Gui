@@ -106,7 +106,7 @@ namespace Terminal.Gui {
 			}
 
 			if (!Visible && popup != null) {
-				top.Remove (popup);
+				top?.Remove (popup);
 				popup.Dispose ();
 				popup = null;
 			}
@@ -323,6 +323,7 @@ namespace Terminal.Gui {
 		{
 			if (IsWordChar ((char)kb.Key)) {
 				Visible = true;
+				ManipulatePopup ();
 				closed = false;
 				return false;
 			}

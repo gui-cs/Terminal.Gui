@@ -2162,7 +2162,7 @@ namespace Terminal.Gui.TextTests {
 			var height = 8;
 			var wrappedLines = TextFormatter.WordWrap (text, width, true);
 			var breakLines = "";
-			foreach (var line in wrappedLines) 				breakLines += $"{line}{Environment.NewLine}";
+			foreach (var line in wrappedLines) breakLines += $"{line}{Environment.NewLine}";
 			var label = new Label (breakLines) { Width = Dim.Fill (), Height = Dim.Fill () };
 			var frame = new FrameView () { Width = Dim.Fill (), Height = Dim.Fill () };
 
@@ -2200,7 +2200,7 @@ namespace Terminal.Gui.TextTests {
 			var height = 3;
 			var wrappedLines = TextFormatter.WordWrap (text, height, true);
 			var breakLines = "";
-			for (int i = 0; i < wrappedLines.Count; i++) 				breakLines += $"{wrappedLines [i]}{(i < wrappedLines.Count - 1 ? Environment.NewLine : string.Empty)}";
+			for (int i = 0; i < wrappedLines.Count; i++) breakLines += $"{wrappedLines [i]}{(i < wrappedLines.Count - 1 ? Environment.NewLine : string.Empty)}";
 			var label = new Label (breakLines) {
 				TextDirection = TextDirection.TopBottom_LeftRight,
 				Width = Dim.Fill (),
@@ -2237,7 +2237,7 @@ namespace Terminal.Gui.TextTests {
 			var height = 8;
 			var wrappedLines = TextFormatter.WordWrap (text, width, true);
 			var breakLines = "";
-			foreach (var line in wrappedLines) 				breakLines += $"{line}{Environment.NewLine}";
+			foreach (var line in wrappedLines) breakLines += $"{line}{Environment.NewLine}";
 			var label = new Label (breakLines) { Width = Dim.Fill (), Height = Dim.Fill () };
 			var frame = new FrameView () { Width = Dim.Fill (), Height = Dim.Fill () };
 
@@ -2276,7 +2276,7 @@ namespace Terminal.Gui.TextTests {
 			var height = 4;
 			var wrappedLines = TextFormatter.WordWrap (text, width, true);
 			var breakLines = "";
-			for (int i = 0; i < wrappedLines.Count; i++) 				breakLines += $"{wrappedLines [i]}{(i < wrappedLines.Count - 1 ? Environment.NewLine : string.Empty)}";
+			for (int i = 0; i < wrappedLines.Count; i++) breakLines += $"{wrappedLines [i]}{(i < wrappedLines.Count - 1 ? Environment.NewLine : string.Empty)}";
 			var label = new Label (breakLines) {
 				TextDirection = TextDirection.TopBottom_LeftRight,
 				Width = Dim.Fill (),
@@ -2888,7 +2888,7 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal ("nd", list1 [10].ToString ());
 			Assert.Equal ("Line", list1 [11].ToString ());
 			Assert.Equal ("- 2.", list1 [^1].ToString ());
-			foreach (var txt in list1) 				wrappedText1 += txt;
+			foreach (var txt in list1) wrappedText1 += txt;
 			Assert.Equal (" Asentencehaswords.  This isthesecondLine- 2.", wrappedText1);
 
 			// With preserveTrailingSpaces = true.
@@ -2910,7 +2910,7 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal ("Line", list2 [13].ToString ());
 			Assert.Equal (" - ", list2 [14].ToString ());
 			Assert.Equal ("2. ", list2 [^1].ToString ());
-			foreach (var txt in list2) 				wrappedText2 += txt;
+			foreach (var txt in list2) wrappedText2 += txt;
 			Assert.Equal (" A sentence has words.  This is the second Line - 2. ", wrappedText2);
 		}
 
@@ -4287,6 +4287,184 @@ t     ", output);
 0
 0
 0", new Attribute [] { Colors.Base.Normal });
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Draw_Negative_Bounds_Horizontal_Without_New_Lines ()
+		{
+			var subView = new View () { Id = "subView", Y = 1, Width = 7, Text = "subView" };
+			var view = new View () { Id = "view", Width = 20, Height = 2, Text = "01234567890123456789" };
+			view.Add (subView);
+			var content = new View () { Id = "content", Width = 20, Height = 20 };
+			content.Add (view);
+			var container = new View () { Id = "container", X = 1, Y = 1, Width = 5, Height = 5 };
+			container.Add (content);
+			var top = Application.Top;
+			top.Add (container);
+			Application.Driver.Clip = container.Frame;
+			Application.Begin (top);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ 01234
+ subVi", output);
+
+			content.X = -1;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ 12345
+ ubVie", output);
+
+			content.Y = -1;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ ubVie", output);
+
+			content.Y = -2;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre ("", output);
+
+			content.X = -20;
+			content.Y = 0;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre ("", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Draw_Negative_Bounds_Horizontal_With_New_Lines ()
+		{
+			var subView = new View () { Id = "subView", X = 1, Width = 1, Height = 7, Text = "s\nu\nb\nV\ni\ne\nw" };
+			var view = new View () { Id = "view", Width = 2, Height = 20, Text = "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9" };
+			view.Add (subView);
+			var content = new View () { Id = "content", Width = 20, Height = 20 };
+			content.Add (view);
+			var container = new View () { Id = "container", X = 1, Y = 1, Width = 5, Height = 5 };
+			container.Add (content);
+			var top = Application.Top;
+			top.Add (container);
+			Application.Driver.Clip = container.Frame;
+			Application.Begin (top);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ 0s
+ 1u
+ 2b
+ 3V
+ 4i", output);
+
+			content.X = -1;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ s
+ u
+ b
+ V
+ i", output);
+
+			content.X = -2;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"", output);
+
+			content.X = 0;
+			content.Y = -1;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ 1u
+ 2b
+ 3V
+ 4i
+ 5e", output);
+
+			content.Y = -6;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ 6w
+ 7 
+ 8 
+ 9 
+ 0 ", output);
+
+			content.Y = -19;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ 9", output);
+
+			content.Y = -20;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre ("", output);
+
+			content.X = -2;
+			content.Y = 0;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre ("", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Draw_Negative_Bounds_Vertical ()
+		{
+			var subView = new View () { Id = "subView", X = 1, Width = 1, Height = 7, Text = "subView", TextDirection = TextDirection.TopBottom_LeftRight };
+			var view = new View () { Id = "view", Width = 2, Height = 20, Text = "01234567890123456789", TextDirection = TextDirection.TopBottom_LeftRight };
+			view.Add (subView);
+			var content = new View () { Id = "content", Width = 20, Height = 20 };
+			content.Add (view);
+			var container = new View () { Id = "container", X = 1, Y = 1, Width = 5, Height = 5 };
+			container.Add (content);
+			var top = Application.Top;
+			top.Add (container);
+			Application.Driver.Clip = container.Frame;
+			Application.Begin (top);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ 0s
+ 1u
+ 2b
+ 3V
+ 4i", output);
+
+			content.X = -1;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ s
+ u
+ b
+ V
+ i", output);
+
+			content.X = -2;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"", output);
+
+			content.X = 0;
+			content.Y = -1;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ 1u
+ 2b
+ 3V
+ 4i
+ 5e", output);
+
+			content.Y = -6;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ 6w
+ 7 
+ 8 
+ 9 
+ 0 ", output);
+
+			content.Y = -19;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ 9", output);
+
+			content.Y = -20;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre ("", output);
+
+			content.X = -2;
+			content.Y = 0;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre ("", output);
 		}
 	}
 }
