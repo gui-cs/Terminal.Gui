@@ -65,10 +65,10 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.ColorSchemes ["Dialog"],
 				Border = new Border () {
 					BorderStyle = BorderStyle.Single,
-					//BorderThickness = new Thickness (1), 
-					//DrawMarginFrame = true,
-					//Padding = new Thickness(1),
-					BorderBrush = Color.BrightMagenta,
+					BorderThickness = new Thickness (1), 
+					DrawMarginFrame = true,
+					Padding = new Thickness(1),
+					ForgroundColor = Color.BrightMagenta,
 				}
 			};
 

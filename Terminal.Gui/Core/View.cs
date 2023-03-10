@@ -27,7 +27,7 @@ namespace Terminal.Gui {
 
 	/// <summary>
 	/// View is the base class for all views on the screen and represents a visible element that can render itself and 
-	/// contains zero or more nested views.
+	/// contains zero or more nested views, called SubViews.
 	/// </summary>
 	/// <remarks>
 	/// <para>
@@ -109,7 +109,7 @@ namespace Terminal.Gui {
 		}
 
 		// container == SuperView
-		View container = null;
+		View _superView = null;
 		View focused = null;
 		Direction focusDirection;
 		bool autoSize;
@@ -458,15 +458,16 @@ namespace Terminal.Gui {
 		/// The Thickness that separates a View from other SubViews of the same SuperView. 
 		/// The Margin is not part of the View's content and is not clipped by the View's Clip Area. 
 		/// </summary>
-		public Frame Margin { get; set; }
+		public Frame Margin { get; internal set; }
 
+		// TODO: Rename BorderFrame to Border
 		/// <summary>
 		///  Thickness where a visual border (drawn using line-drawing glyphs) and the Title are drawn. 
 		///  The Border expands inward; in other words if `Border.Thickness.Top == 2` the border and 
 		///  title will take up the first row and the second row will be filled with spaces. 
 		///  The Border is not part of the View's content and is not clipped by the View's `ClipArea`.
 		/// </summary>
-		public Frame BorderFrame { get; set; }
+		public Frame BorderFrame { get; internal set; }
 
 		/// <summary>
 		/// Means the Thickness inside of an element that offsets the `Content` from the Border. 
@@ -475,45 +476,75 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// (NOTE: in v1 `Padding` is OUTSIDE of the `Border`). 
 		/// </remarks>
-		public Frame Padding { get; set; }
+		public Frame Padding { get; internal set; }
+
+		/// <summary>
+		/// Gets the rectangle that describes the location and size of the area within the View where
+		/// content and subviews are rendered. This is Bounds offset by all of the top/left thicknesses.
+		/// </summary>
+		public Rect ContentArea {
+			get {
+				// BUGBUG: 
+				if (Padding == null || BorderFrame == null || Margin == null) {
+					return Bounds;
+				}
+
+				return Padding.Thickness.GetInnerRect (BorderFrame.Thickness.GetInnerRect (Margin.Thickness.GetInnerRect (new Rect (default, Frame.Size))));
+			}
+		}
 
 		/// <summary>
 		/// Temporary API to support the new v2 API
 		/// </summary>
-		public void EnableFrames ()
+		public void InitializeFrames ()
 		{
-			IgnoreBorderPropertyOnRedraw = true;
 			Margin?.Dispose ();
-			Margin = new Frame () {
-				X = 0,
-				Y = 0,
-				Thickness = new Thickness (0),
-				ColorScheme = SuperView?.ColorScheme ?? ColorScheme,
-				// TODO: Create View.AddAdornment
-				Parent = this
-			};
+			Margin = new Frame () { Id = "Margin", Thickness = new Thickness (0) };
+			Margin.Parent = this;
 			//Margin.DiagnosticsLabel.Text = "Margin";
 
 			BorderFrame?.Dispose ();
-			BorderFrame = new Frame () {
-				X = 0,
-				Y = 0,
-				BorderStyle = BorderStyle.Single,
-				Thickness = new Thickness (0),
-				ColorScheme = ColorScheme,
-				// TODO: Create View.AddAdornment
-				Parent = this
-			};
+			// TODO: create default for borderstyle
+			BorderFrame = new Frame () { Id = "BorderFrame", Thickness = new Thickness (0), BorderStyle = BorderStyle.Single };
+			BorderFrame.Parent = this;
+			// TODO: Create View.AddAdornment
 
 			Padding?.Dispose ();
-			Padding = new Frame () {
-				X = 0,
-				Y = 0,
-				Thickness = new Thickness (0),
-				ColorScheme = ColorScheme,
-				// TODO: Create View.AddAdornment
-				Parent = this
-			};
+			Padding = new Frame () { Id = "Padding", Thickness = new Thickness (0) };
+			Padding.Parent = this;
+		}
+
+		public void LayoutFrames ()
+		{
+			if (Margin != null) {
+				Margin.X = 0;
+				Margin.Y = 0;
+				Margin.Width = Frame.Size.Width;
+				Margin.Height = Frame.Size.Height;
+				Margin.SetNeedsLayout ();
+				Margin.LayoutSubviews ();
+				Margin.SetNeedsDisplay ();
+			}
+			if (BorderFrame != null) {
+				var border = Margin?.Thickness.GetInnerRect (Margin.Frame) ?? Frame;
+				BorderFrame.X = border.Location.X;
+				BorderFrame.Y = border.Location.Y;
+				BorderFrame.Width = border.Size.Width;
+				BorderFrame.Height = border.Size.Height;
+				BorderFrame.SetNeedsLayout ();
+				BorderFrame.LayoutSubviews ();
+				BorderFrame.SetNeedsDisplay ();
+			}
+			if (Padding != null) {
+				var padding = BorderFrame?.Thickness.GetInnerRect (BorderFrame?.Frame ?? (Margin?.Thickness.GetInnerRect (Margin.Frame) ?? Frame)) ?? Margin?.Thickness.GetInnerRect (Margin.Frame) ?? Frame;
+				Padding.X = padding.Location.X;
+				Padding.Y = padding.Location.Y;
+				Padding.Width = padding.Size.Width;
+				Padding.Height = padding.Size.Height;
+				Padding.SetNeedsLayout ();
+				Padding.LayoutSubviews ();
+				Padding.SetNeedsDisplay ();
+			}
 		}
 
 		ustring title;
@@ -565,8 +596,21 @@ namespace Terminal.Gui {
 		/// </para>
 		/// </remarks>
 		public virtual Rect Bounds {
-			get => new Rect (Point.Empty, Frame.Size);
-			set => Frame = new Rect (frame.Location, value.Size);
+			get {
+				// BUGBUG: 
+				if (Padding == null || BorderFrame == null || Margin == null) {
+					return new Rect (default, Frame.Size);
+				}
+				var frameRelativeBounds = new Rect (default, Padding.Bounds.Size);
+				return frameRelativeBounds;
+			}
+			set {
+				throw new InvalidOperationException ("It makes no sense to explicitly set Bounds.");
+				Frame = new Rect (Frame.Location, value.Size
+					+ new Size (Margin.Thickness.Right, Margin.Thickness.Bottom)
+					+ new Size (BorderFrame.Thickness.Right, BorderFrame.Thickness.Bottom)
+					+ new Size (Padding.Thickness.Right, Padding.Thickness.Bottom));
+			}
 		}
 
 		Pos x, y;
@@ -738,7 +782,7 @@ namespace Terminal.Gui {
 		/// <value>The super view.</value>
 		public virtual View SuperView {
 			get {
-				return container;
+				return _superView;
 			}
 			set {
 				throw new NotImplementedException ();
@@ -947,7 +991,7 @@ namespace Terminal.Gui {
 				var h = Math.Max (NeedDisplay.Height, region.Height);
 				NeedDisplay = new Rect (x, y, w, h);
 			}
-			container?.SetChildNeedsDisplay ();
+			_superView?.SetChildNeedsDisplay ();
 
 			if (subviews == null)
 				return;
@@ -969,8 +1013,8 @@ namespace Terminal.Gui {
 		public void SetChildNeedsDisplay ()
 		{
 			ChildNeedsDisplay = true;
-			if (container != null)
-				container.SetChildNeedsDisplay ();
+			if (_superView != null)
+				_superView.SetChildNeedsDisplay ();
 		}
 
 		internal bool addingView;
@@ -994,7 +1038,7 @@ namespace Terminal.Gui {
 			}
 			subviews.Add (view);
 			tabIndexes.Add (view);
-			view.container = this;
+			view._superView = this;
 			if (view.CanFocus) {
 				addingView = true;
 				if (SuperView?.CanFocus == false) {
@@ -1061,7 +1105,7 @@ namespace Terminal.Gui {
 			var touched = view.Frame;
 			subviews.Remove (view);
 			tabIndexes.Remove (view);
-			view.container = null;
+			view._superView = null;
 			view.tabIndex = -1;
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
@@ -1201,14 +1245,29 @@ namespace Terminal.Gui {
 		public virtual void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
 		{
 			// Computes the real row, col relative to the screen.
-			rrow = row + Frame.Y;
-			rcol = col + Frame.X;
+			if (Padding == null || BorderFrame == null || Margin == null) {
+				rrow = row + Frame.Y;
+				rcol = col + Frame.X;
+			} else {
+				var inner = Padding.Thickness.GetInnerRect (BorderFrame.Thickness.GetInnerRect (Margin.Thickness.GetInnerRect (Frame)));
+				rrow = row + inner.Y;
+				rcol = col + inner.X;
+			}
 
-			var curContainer = container;
-			while (curContainer != null) {
-				rrow += curContainer.Frame.Y;
-				rcol += curContainer.Frame.X;
-				curContainer = curContainer.container;
+			var super = SuperView;
+			while (super != null) {
+				if (!(super.Padding == null || super.BorderFrame == null || super.Margin == null)) {
+					var inner = super.Padding.Thickness.GetInnerRect (super.BorderFrame.Thickness.GetInnerRect (super.Margin.Thickness.GetInnerRect (super.Frame)));
+
+					//rrow += inner.Y - curContainer.frame.Y;
+					//rcol += inner.X - curContainer.frame.X;
+					rrow += super.frame.Y;
+					rcol += super.frame.X;
+				} else {
+					rrow += super.frame.Y;
+					rcol += super.frame.X;
+				}
+				super = super.SuperView;
 			}
 
 			// The following ensures that the cursor is always in the screen boundaries.
@@ -1539,6 +1598,33 @@ namespace Terminal.Gui {
 			ChildNeedsDisplay = false;
 		}
 
+		// TODO: Make this cancelable
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool OnDrawFrames (Rect bounds)
+		{
+			Margin?.Redraw (Frame);
+			BorderFrame?.Redraw (Frame);
+			Padding?.Redraw (Frame);
+
+			//var margin = Margin.Thickness.GetInnerRect (frame);
+			//var padding = BorderFrame.Thickness.GetInnerRect (margin);
+			//var content = Padding.Thickness.GetInnerRect (padding);
+
+			//// Draw the diagnostics label on the bottom of the content
+			//var tf = new TextFormatter () {
+			//	Text = $"Content {Bounds}",
+			//	Alignment = TextAlignment.Centered,
+			//	VerticalAlignment = VerticalTextAlignment.Bottom
+			//};
+			//tf.Draw (Padding.Thickness.GetInnerRect(Padding.Bounds), ColorScheme.Normal, ColorScheme.Normal);
+
+
+			return true;
+		}
+
 		/// <summary>
 		/// Redraws this view and its subviews; only redraws the views that have been flagged for a re-display.
 		/// </summary>
@@ -1568,17 +1654,7 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
 			}
 
-			var boundsAdjustedForBorder = Bounds;
-			//if (!IgnoreBorderPropertyOnRedraw && Border != null) {
-			//	throw new InvalidOperationException("Don't use border!");
-			//} else 
-			if (ustring.IsNullOrEmpty (TextFormatter.Text) &&
-				(GetType ().IsNestedPublic && !IsOverridden (this, "Redraw") || GetType ().Name == "View") &&
-				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
-
-				Clear ();
-				SetChildNeedsDisplay ();
-			}
+			OnDrawFrames (Frame);
 
 			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
 				Rect containerBounds = GetContainerBounds ();
@@ -1596,7 +1672,7 @@ namespace Terminal.Gui {
 			}
 
 			// Invoke DrawContentEvent
-			OnDrawContent (boundsAdjustedForBorder);
+			OnDrawContent (bounds);
 
 			if (subviews != null) {
 				foreach (var view in subviews) {
@@ -1615,14 +1691,13 @@ namespace Terminal.Gui {
 								view.OnDrawContentComplete (rect);
 							}
 						}
-						view.NeedDisplay = Rect.Empty;
-						view.ChildNeedsDisplay = false;
+						view.ClearNeedsDisplay ();
 					}
 				}
 			}
 
 			// Invoke DrawContentCompleteEvent
-			OnDrawContentComplete (boundsAdjustedForBorder);
+			OnDrawContentComplete (bounds);
 
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
@@ -1726,7 +1801,7 @@ namespace Terminal.Gui {
 
 			// Make sure that this view is a subview
 			View c;
-			for (c = view.container; c != null; c = c.container)
+			for (c = view._superView; c != null; c = c._superView)
 				if (c == this)
 					break;
 			if (c == null)
@@ -2512,6 +2587,8 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			LayoutFrames ();
+
 			var oldBounds = Bounds;
 			OnLayoutStarted (new LayoutEventArgs () { OldBounds = oldBounds });
 
@@ -2523,7 +2600,7 @@ namespace Terminal.Gui {
 			CollectAll (this, ref nodes, ref edges);
 			var ordered = View.TopologicalSort (SuperView, nodes, edges);
 			foreach (var v in ordered) {
-				LayoutSubview (v, Frame);
+				LayoutSubview (v, ContentArea);
 			}
 
 			// If the 'to' is rooted to 'from' and the layoutstyle is Computed it's a special-case.
@@ -3020,6 +3097,13 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		protected override void Dispose (bool disposing)
 		{
+			Margin?.Dispose ();
+			Margin = null;
+			BorderFrame?.Dispose ();
+			Border = null;
+			Padding?.Dispose ();
+			Padding = null;
+
 			for (var i = InternalSubviews.Count - 1; i >= 0; i--) {
 				var subview = InternalSubviews [i];
 				Remove (subview);

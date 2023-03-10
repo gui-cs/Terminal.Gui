@@ -9,21 +9,20 @@ namespace Terminal.Gui {
 
 	/// <summary>
 	/// Frames are a special form of <see cref="View"/> that act as adornments; they appear outside of the <see cref="View.Bounds"/>
-	/// eanbling borders, menus, etc... 
+	/// enabling borders, menus, etc... 
 	/// </summary>
 	public class Frame : View {
 
 		/// <summary>
 		/// Frames are a special form of <see cref="View"/> that act as adornments; they appear outside of the <see cref="View.Bounds"/>
-		/// eanbling borders, menus, etc... 
+		/// enabling borders, menus, etc... 
 		/// </summary>
 		public Frame ()
 		{
-			IgnoreBorderPropertyOnRedraw = true;
 		}
 
 		/// <summary>
-		/// The Parent of this Frame (Adornment). 
+		/// The Parent of this Frame. 
 		/// </summary>
 		public View Parent { get; set; }
 
@@ -132,8 +131,8 @@ namespace Terminal.Gui {
 					Driver.AddRune (p.Value);
 				}
 
-				if (!ustring.IsNullOrEmpty (Title)) {
-					Driver.DrawWindowTitle (screenBounds, Title, 0, 0, 0, 0);
+				if (!ustring.IsNullOrEmpty (Parent?.Title)) {
+					Driver.DrawWindowTitle (screenBounds, Parent?.Title, 0, 0, 0, 0);
 				}
 			}
 		}
@@ -148,7 +147,7 @@ namespace Terminal.Gui {
 		public BorderStyle BorderStyle { get; set; } = BorderStyle.None;
 
 		/// <summary>
-		/// 
+		/// Defines the rectangle that the <see cref="Frame"/> will use to draw its content. 
 		/// </summary>
 		public Thickness Thickness { get; set; }
 
@@ -170,41 +169,5 @@ namespace Terminal.Gui {
 				throw new InvalidOperationException ("It makes no sense to explicitly set Bounds.");
 			}
 		}
-
-		//public override void OnDrawContent (Rect viewport)
-		//{
-		//	// do nothing
-		//}
-
-		//public override void Redraw (Rect bounds)
-		//{
-
-		//	if (ColorScheme != null) {
-		//		Driver.SetAttribute (HasFocus ? ColorScheme.Focus : ColorScheme.Normal);
-		//	}
-
-		//	//if (Text != null) {
-		//	//	Thickness?.Draw (Frame, $"{Text} {DiagnosticsLabel?.Text}");
-		//	//}
-		//	if (BorderStyle != BorderStyle.None) {
-		//		var lc = new LineCanvas ();
-		//		lc.AddLine (Frame.Location, Frame.Width - 1, Orientation.Horizontal, BorderStyle);
-		//		lc.AddLine (Frame.Location, Frame.Height - 1, Orientation.Vertical, BorderStyle);
-
-		//		lc.AddLine (new Point (Frame.X, Frame.Y + Frame.Height - 1), Frame.Width - 1, Orientation.Horizontal, BorderStyle);
-		//		lc.AddLine (new Point (Frame.X + Frame.Width - 1, Frame.Y), Frame.Height - 1, Orientation.Vertical, BorderStyle);
-		//		foreach (var p in lc.GenerateImage (Frame)) {
-		//			Driver.Move (p.Key.X, p.Key.Y);
-		//			Driver.AddRune (p.Value);
-		//		}
-
-		//		if (!ustring.IsNullOrEmpty (Title)) {
-		//			Driver.DrawWindowTitle (Frame, Title, 0, 0, 0, 0);
-		//		}
-		//	}
-
-		//	base.Redraw (bounds);
-		//}
 	}
-
 }

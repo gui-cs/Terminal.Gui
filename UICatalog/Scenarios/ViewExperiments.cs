@@ -1,9 +1,9 @@
 ﻿using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "View2Experiment", Description: "View2 Experiment")]
+	[ScenarioMetadata (Name: "_ View Experiments", Description: "v2 View Experiments")]
 	[ScenarioCategory ("Controls")]
-	public class View2Experiment : Scenario {
+	public class ViewExperiments : Scenario {
 		public override void Init (ColorScheme colorScheme)
 		{
 			Application.Init ();
@@ -19,30 +19,30 @@ namespace UICatalog.Scenarios {
 			};
 			Application.Top.Add (containerLabel);
 
-			var view2 = new View () {
+			var view = new View () {
 				X = 2,
-				Y = 2,
+				Y = 3,
 				Height = Dim.Fill (2),
 				Width = Dim.Fill (2),
-				Title = "View2"
+				Title = "View"
 			};
-			Application.Top.Add (view2);
+			Application.Top.Add (view);
 
-			view2.EnableFrames ();
-			view2.Margin.Thickness = new Thickness (2);
-			view2.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
-			view2.Margin.Data = "Margin";
-			view2.BorderFrame.Thickness = new Thickness (2);
-			view2.BorderFrame.BorderStyle = BorderStyle.Single;
-			//view2.BorderFrame.ColorScheme = view2.ColorScheme;
-			view2.BorderFrame.Data = "BorderFrame";
-			view2.Padding.Thickness = new Thickness (2);
-			view2.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
-			view2.Padding.Data = "Padding";
+			view.InitializeFrames ();
+			view.Margin.Thickness = new Thickness (2);
+			view.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
+			view.Margin.Data = "Margin";
+			view.BorderFrame.Thickness = new Thickness (2);
+			view.BorderFrame.BorderStyle = BorderStyle.Single;
+			view.BorderFrame.ColorScheme = view.ColorScheme;
+			view.BorderFrame.Data = "BorderFrame";
+			view.Padding.Thickness = new Thickness (2);
+			view.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
+			view.Padding.Data = "Padding";
 
 
 			containerLabel.LayoutComplete += (a) => {
-				containerLabel.Text = $"Container.Frame: {Application.Top.Frame} .Bounds: {Application.Top.Bounds}\nView2.Frame: {view2.Frame} .Bounds: {view2.Bounds}";
+				containerLabel.Text = $"Container.Frame: {Application.Top.Frame} .Bounds: {Application.Top.Bounds}\nView.Frame: {view.Frame} .Bounds: {view.Bounds}\nView.ContentArea: {view.ContentArea}";
 
 			};
 
@@ -54,7 +54,7 @@ namespace UICatalog.Scenarios {
 				Y = 1,
 
 			};
-			view2.Add (label);
+			view.Add (label);
 
 			var edit = new TextField () {
 				Text = "Right (label)",
@@ -63,7 +63,7 @@ namespace UICatalog.Scenarios {
 				Width = 15,
 				Height = 1
 			};
-			view2.Add (edit);
+			view.Add (edit);
 
 			edit = new TextField () {
 				Text = "Right (edit) + 1",
@@ -72,7 +72,7 @@ namespace UICatalog.Scenarios {
 				Width = 20	,
 				Height = 1
 			};
-			view2.Add (edit);
+			view.Add (edit);
 
 			edit = new TextField () {
 				Text = "Center();50%",
@@ -81,7 +81,7 @@ namespace UICatalog.Scenarios {
 				Width = 30,
 				Height = 1
 			};
-			view2.Add (edit);
+			view.Add (edit);
 
 			edit = new TextField () {
 				Text = "Center() - 1;60%",
@@ -90,7 +90,7 @@ namespace UICatalog.Scenarios {
 				Width = 30,
 				Height = 1
 			};
-			view2.Add (edit);
+			view.Add (edit);
 
 			edit = new TextField () {
 				Text = "0 + Percent(50);70%",
@@ -99,7 +99,7 @@ namespace UICatalog.Scenarios {
 				Width = 30,
 				Height = 1
 			};
-			view2.Add (edit);
+			view.Add (edit);
 
 			edit = new TextField () {
 				Text = "AnchorEnd[Right];AnchorEnd (1)",
@@ -108,7 +108,7 @@ namespace UICatalog.Scenarios {
 				Height = 1
 			};
 			edit.X = Pos.AnchorEnd () - (Pos.Right (edit) - Pos.Left (edit));
-			view2.Add (edit);
+			view.Add (edit);
 
 			edit = new TextField () {
 				Text = "Left;AnchorEnd (2)",
@@ -117,7 +117,7 @@ namespace UICatalog.Scenarios {
 				Height = 1
 			};
 			edit.X = 0;
-			view2.Add (edit);
+			view.Add (edit);
 		}
 	}
 }

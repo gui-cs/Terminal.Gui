@@ -23,11 +23,12 @@ namespace UICatalog.Scenarios {
 					BorderStyle = borderStyle,
 					DrawMarginFrame = drawMarginFrame,
 					BorderThickness = borderThickness,
-					BorderBrush = borderBrush,
+					ForgroundColor = borderBrush,
 					Padding = padding,
-					Background = background,
+					BackgroundColor = background,
 					Effect3D = effect3D
-				});
+				}) {
+			};
 
 			var tf1 = new TextField ("1234567890") { Width = 10 };
 
@@ -59,9 +60,9 @@ namespace UICatalog.Scenarios {
 					BorderStyle = borderStyle,
 					DrawMarginFrame = drawMarginFrame,
 					BorderThickness = borderThickness,
-					BorderBrush = borderBrush,
+					ForgroundColor = borderBrush,
 					Padding = padding,
-					Background = background,
+					BackgroundColor = background,
 					Effect3D = effect3D,
 					//Title = "Test2"
 				}) {
@@ -98,9 +99,9 @@ namespace UICatalog.Scenarios {
 					BorderStyle = borderStyle,
 					DrawMarginFrame = drawMarginFrame,
 					BorderThickness = borderThickness,
-					BorderBrush = borderBrush,
+					ForgroundColor = borderBrush,
 					Padding = padding,
-					Background = background,
+					BackgroundColor = background,
 					Effect3D = effect3D
 				}) { ColorScheme = Colors.Base };
 

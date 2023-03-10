@@ -849,8 +849,8 @@ namespace Terminal.Gui {
 				if (base.Modal) {
 					ColorScheme = Colors.Dialog;
 					Border.BorderStyle = BorderStyle.Rounded;
-					Border.Effect3D = true;
-					Border.DrawMarginFrame = true;
+//					Border.Effect3D = true;
+//					Border.DrawMarginFrame = true;
 				} else {
 					if (SuperView != null) {
 						ColorScheme = SuperView.ColorScheme;
@@ -858,9 +858,9 @@ namespace Terminal.Gui {
 						ColorScheme = Colors.Base;
 					}
 					CanFocus = true;
-					Border.Effect3D = false;
+//					Border.Effect3D = false;
 					Border.BorderStyle = BorderStyle.None;
-					Border.DrawMarginFrame = false;
+//					Border.DrawMarginFrame = false;
 				}
 			}
 		}

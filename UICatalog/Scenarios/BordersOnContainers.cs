@@ -23,9 +23,9 @@ namespace UICatalog.Scenarios {
 				BorderStyle = borderStyle,
 				DrawMarginFrame = drawMarginFrame,
 				BorderThickness = borderThickness,
-				BorderBrush = borderBrush,
+				ForgroundColor = borderBrush,
 				Padding = padding,
-				Background = background,
+				BackgroundColor = background,
 				Effect3D = effect3D,
 				//Title = typeName
 			};
@@ -354,10 +354,10 @@ namespace UICatalog.Scenarios {
 
 				X = 2,
 				Y = 6,
-				SelectedItem = (int)smartView.Border.Background
+				SelectedItem = (int)smartView.Border.BackgroundColor
 			};
 			rbBackground.SelectedItemChanged += (e) => {
-				smartView.Border.Background = (Color)e.SelectedItem;
+				smartView.Border.BackgroundColor = (Color)e.SelectedItem;
 			};
 			Add (rbBackground);
 
@@ -371,10 +371,10 @@ namespace UICatalog.Scenarios {
 
 				X = Pos.AnchorEnd (18),
 				Y = 6,
-				SelectedItem = (int)smartView.Border.BorderBrush
+				SelectedItem = (int)smartView.Border.ForgroundColor
 			};
 			rbBorderBrush.SelectedItemChanged += (e) => {
-				smartView.Border.BorderBrush = (Color)e.SelectedItem;
+				smartView.Border.ForgroundColor = (Color)e.SelectedItem;
 			};
 			Add (rbBorderBrush);
 
