@@ -143,18 +143,6 @@ namespace UICatalog.Scenarios {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
 			};
-			styleRadioGroup.SelectedItemChanged += e => {
-				switch (e.SelectedItem) {
-				case 0:
-					border.BorderBrush = Colors.Dialog.Normal.Foreground;
-					border.Background = Colors.Dialog.Normal.Background;
-					break;
-				case 1:
-					border.BorderBrush = Colors.Error.Normal.Foreground;
-					border.Background = Colors.Error.Normal.Background;
-					break;
-				}
-			};
 			frame.Add (styleRadioGroup);
 
 			var ckbEffect3D = new CheckBox ("Effect3D", true) {
