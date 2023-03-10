@@ -151,11 +151,16 @@ namespace UICatalog.Scenarios {
 				border.Effect3D = (bool)!e;
 			};
 			frame.Add (ckbEffect3D);
+			var ckbWrapMessage = new CheckBox ("Wrap Message", true) {
+				X = Pos.Right (label) + 1,
+				Y = Pos.Top (label) + 3
+			};
+			frame.Add (ckbWrapMessage);
 
 			void Top_Loaded ()
 			{
 				frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit) + Dim.Height (messageEdit)
-				+ Dim.Height (numButtonsEdit) + Dim.Height (defaultButtonEdit) + Dim.Height (styleRadioGroup) + 2 + Dim.Height (ckbEffect3D);
+				+ Dim.Height (numButtonsEdit) + Dim.Height (defaultButtonEdit) + Dim.Height (styleRadioGroup) + 2 + Dim.Height (ckbEffect3D) + Dim.Height (ckbWrapMessage);
 				Application.Top.Loaded -= Top_Loaded;
 			}
 			Application.Top.Loaded += Top_Loaded;
@@ -196,9 +201,9 @@ namespace UICatalog.Scenarios {
 						btns.Add (NumberToWords.Convert (i));
 					}
 					if (styleRadioGroup.SelectedItem == 0) {
-						buttonPressedLabel.Text = $"{MessageBox.Query (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), defaultButton, border, btns.ToArray ())}";
+						buttonPressedLabel.Text = $"{MessageBox.Query (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), defaultButton, border, (bool)ckbWrapMessage.Checked, btns.ToArray ())}";
 					} else {
-						buttonPressedLabel.Text = $"{MessageBox.ErrorQuery (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), defaultButton, border, btns.ToArray ())}";
+						buttonPressedLabel.Text = $"{MessageBox.ErrorQuery (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), defaultButton, border, (bool)ckbWrapMessage.Checked, btns.ToArray ())}";
 					}
 				} catch (FormatException) {
 					buttonPressedLabel.Text = "Invalid Options";
