@@ -135,6 +135,7 @@ namespace Terminal.Gui {
 		/// <param name="message">Message to display, might contain multiple lines.</param>
 		/// <param name="defaultButton">Index of the default button.</param>
 		/// <param name="border">The border settings.</param>
+		/// <param name="wrapMessagge">If wrap the message or not.</param>
 		/// <param name="buttons">Array of buttons to add.</param>
 		/// <remarks>
 		/// Use <see cref="Query(ustring, ustring, ustring[])"/> instead; it automatically sizes the MessageBox based on the contents.
@@ -152,6 +153,7 @@ namespace Terminal.Gui {
 		/// <param name="message">Message to display, might contain multiple lines.</param>
 		/// <param name="defaultButton">Index of the default button.</param>
 		/// <param name="border">The border settings.</param>
+		/// <param name="wrapMessagge">If wrap the message or not.</param>
 		/// <param name="buttons">Array of buttons to add.</param>
 		/// <remarks>
 		/// The message box will be vertically and horizontally centered in the container and the size will be automatically determined
@@ -208,6 +210,7 @@ namespace Terminal.Gui {
 		/// <param name="message">Message to display, might contain multiple lines.</param>
 		/// <param name="defaultButton">Index of the default button.</param>
 		/// <param name="border">The border settings.</param>
+		/// <param name="wrapMessagge">If wrap the message or not.</param>
 		/// <param name="buttons">Array of buttons to add.</param>
 		/// <remarks>
 		/// Use <see cref="ErrorQuery(ustring, ustring, ustring[])"/> instead; it automatically sizes the MessageBox based on the contents.
@@ -225,6 +228,7 @@ namespace Terminal.Gui {
 		/// <param name="message">Message to display, might contain multiple lines.</param>
 		/// <param name="defaultButton">Index of the default button.</param>
 		/// <param name="border">The border settings.</param>
+		/// <param name="wrapMessagge">If wrap the message or not.</param>
 		/// <param name="buttons">Array of buttons to add.</param>
 		/// <remarks>
 		/// The message box will be vertically and horizontally centered in the container and the size will be automatically determined
