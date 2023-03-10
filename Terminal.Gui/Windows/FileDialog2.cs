@@ -79,6 +79,7 @@ namespace Terminal.Gui {
 		private AllowedType currentFilter;
 
 		private bool pushingState = false;
+		private bool loaded = false;
 
 		private FileDialogState state;
 		private object onlyOneSearchLock = new object ();
@@ -104,6 +105,8 @@ namespace Terminal.Gui {
 
 		private CaptionedTextField tbFind;
 		private SpinnerLabel spinnerLabel;
+		private MenuBarItem allowedTypeMenu;
+		private MenuItem [] allowedTypeMenuItems;
 
 
 		/// <summary>
@@ -607,33 +610,49 @@ namespace Terminal.Gui {
 		public override void OnLoaded ()
 		{
 			base.OnLoaded ();
+			if(loaded) {
+				return;
+			}
+			loaded = true;
 
 			// if filtering on file type is configured then create the ComboBox and establish
 			// initial filtering by extension(s)
 			if (this.AllowedTypes.Any ()) {
 
 				this.currentFilter = this.AllowedTypes [0];
-				var allowed = this.AllowedTypes.ToList ();
 
 				if (!this.AllowedTypesIsStrict) {
-					allowed.Insert (0, AllowedType.Any);
+					AllowedTypes.Insert (0, AllowedType.Any);
 				}
 
-				// +2 to allow space for dropdown arrow
-				var width = this.AllowedTypes.Max (a => a.ToString ().Length) + 2;
+				// Fiddle factor
+				var width = this.AllowedTypes.Max (a => a.ToString ().Length) + 6;
 
-				var combo = new ComboBox (allowed) {
-					Width = width,
-					ReadOnly = true,
+				// TODO: Put a max on this
+
+				// TODO: Add a hint that the user should use F9 to open this menu
+
+				allowedTypeMenu = new MenuBarItem ("<placeholder>",
+					allowedTypeMenuItems = AllowedTypes.Select (
+						(a,i) => new MenuItem (a.ToString (), null, () => {
+							AllowedTypeMenuClicked (i);
+						}))
+					.ToArray ());
+
+				var dropdownMenu = new MenuBar (new [] { allowedTypeMenu }){
+					// Fiddle factor
+					Width = width-2,
 					Y = 1,
 					X = Pos.AnchorEnd (width),
-					Height = allowed.Count + 1,
-					SelectedItem = this.AllowedTypesIsStrict ? 0 : 1
+
+					// TODO: Does not work, if this worked then we could tab to it instead
+					// of having to hit F9
+					CanFocus = true,
+					TabStop = true
 				};
+				AllowedTypeMenuClicked (this.AllowedTypesIsStrict ? 0 : 1);
 
-				combo.SelectedItemChanged += (e) => this.Combo_SelectedItemChanged (combo, e);
-
-				this.Add (combo);
+				this.Add (dropdownMenu);
 				this.LayoutSubviews ();
 			}
 
@@ -660,6 +679,26 @@ namespace Terminal.Gui {
 					this.Title = $"OPEN{(MustExist ? " EXISTING" : "")}";
 					break;
 				}
+			}
+		}
+
+		private void AllowedTypeMenuClicked (int idx)
+		{
+			
+			var allow = AllowedTypes [idx];
+			for (int i = 0; i < AllowedTypes.Count; i++) {
+				allowedTypeMenuItems [i].Checked = i == idx;
+			}
+			allowedTypeMenu.Title = allow.ToString ();
+
+			this.currentFilter = allow == null || allow.IsAny ? null : allow;
+
+			this.tbPath.ClearAllSelection ();
+			this.tbPath.ClearSuggestions ();
+
+			if (this.state != null) {
+				this.state.RefreshChildren ();
+				this.WriteStateToTableView ();
 			}
 		}
 
@@ -829,20 +868,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-
-		private void Combo_SelectedItemChanged (ComboBox combo, ListViewItemEventArgs obj)
-		{
-			var allow = combo.Source.ToList () [obj.Item] as AllowedType;
-			this.currentFilter = allow == null || allow.IsAny ? null : allow;
-
-			this.tbPath.ClearAllSelection ();
-			this.tbPath.ClearSuggestions ();
-
-			if (this.state != null) {
-				this.state.RefreshChildren ();
-				this.WriteStateToTableView ();
-			}
-		}
 
 		private bool TableView_KeyUp (KeyEvent keyEvent)
 		{
