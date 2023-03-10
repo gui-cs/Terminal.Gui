@@ -319,5 +319,38 @@ ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 
 			Application.Run ();
 		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData ("", true)]
+		[InlineData ("", false)]
+		[InlineData ("\n", true)]
+		[InlineData ("\n", false)]
+		public void MessageBox_With_A_Empty_Message_Or_A_NewLline_WrapMessagge_True_Or_False (string message, bool wrapMessage)
+		{
+			var iterations = -1;
+			Application.Begin (Application.Top);
+
+			Application.Iteration += () => {
+				iterations++;
+
+				if (iterations == 0) {
+					MessageBox.Query ("mywindow", message, 0, null, wrapMessage, "ok");
+
+					Application.RequestStop ();
+				} else if (iterations == 1) {
+					Application.Refresh ();
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
+                ┌ mywindow ────────────────────────────────────┐
+                │                                              │
+                │                                              │
+                │                   [◦ ok ◦]                   │
+                └──────────────────────────────────────────────┘", output);
+
+					Application.RequestStop ();
+				}
+			};
+
+			Application.Run ();
+		}
 	}
 }

@@ -281,15 +281,11 @@ namespace Terminal.Gui {
 			// Create Dialog (retain backwards compat by supporting specifying height/width)
 			Dialog d;
 			if (width == 0 & height == 0) {
-				d = new Dialog (title, buttonList.ToArray ()) {
+				d = new Dialog (title, border, buttonList.ToArray ()) {
 					Height = msgboxHeight
 				};
 			} else {
-				d = new Dialog (title, width, Math.Max (height, 4), buttonList.ToArray ());
-			}
-
-			if (border != null) {
-				d.Border = border;
+				d = new Dialog (title, width, Math.Max (height, 4), border, buttonList.ToArray ());
 			}
 
 			if (useErrorColors) {
