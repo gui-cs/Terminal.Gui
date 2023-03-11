@@ -393,7 +393,7 @@ namespace UICatalog.Scenarios {
 
 		private void Open ()
 		{
-			var ofd = new FileDialog ("Select File", "Open", "File", "Select a CSV file to open (does not support newlines, escaping etc)") {
+			var ofd = new FileDialog ("Select File", "Open", "File", "Select a CSV file to open") {
 				AllowedFileTypes = new string [] { ".csv" }
 			};
 
@@ -410,9 +410,10 @@ namespace UICatalog.Scenarios {
 			int lineNumber = 0;
 			currentFile = null;
 
-			using var reader = new CsvReader (File.OpenText (filename), CultureInfo.InvariantCulture);
 
 			try {
+				using var reader = new CsvReader (File.OpenText (filename), CultureInfo.InvariantCulture);
+
 				var dt = new DataTable ();
 
 				reader.Read ();
