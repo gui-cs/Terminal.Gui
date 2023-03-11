@@ -145,7 +145,7 @@ namespace Terminal.Gui {
 			menuBar.OpenMenu ();
 		}
 
-		private void Container_Resized (Size obj)
+		private void Container_Resized (object sender, SizeChangedEventArgs e)
 		{
 			if (IsShow) {
 				Show ();
