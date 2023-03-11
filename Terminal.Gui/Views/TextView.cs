@@ -2513,7 +2513,7 @@ namespace Terminal.Gui {
 				InsertText (new KeyEvent () { Key = key });
 			}
 
-			if (NeedDisplay.IsEmpty) {
+			if (_needsDisplay.IsEmpty) {
 				PositionCursor ();
 			} else {
 				Adjust ();
@@ -2668,7 +2668,7 @@ namespace Terminal.Gui {
 		{
 			var offB = OffSetBackground ();
 			var line = GetCurrentLine ();
-			bool need = !NeedDisplay.IsEmpty || wrapNeeded;
+			bool need = !_needsDisplay.IsEmpty || wrapNeeded;
 			var tSize = TextModel.DisplaySize (line, -1, -1, false, TabWidth);
 			var dSize = TextModel.DisplaySize (line, leftColumn, currentColumn, true, TabWidth);
 			if (!wordWrap && currentColumn < leftColumn) {
@@ -3775,7 +3775,7 @@ namespace Terminal.Gui {
 
 		void DoNeededAction ()
 		{
-			if (NeedDisplay.IsEmpty) {
+			if (_needsDisplay.IsEmpty) {
 				PositionCursor ();
 			} else {
 				Adjust ();

@@ -1223,7 +1223,7 @@ namespace Terminal.Gui {
 			firstIteration = false;
 
 			if (state.Toplevel != Top
-				&& (!Top.NeedDisplay.IsEmpty || Top.ChildNeedsDisplay || Top.LayoutNeeded)) {
+				&& (!Top._needsDisplay.IsEmpty || Top.ChildNeedsDisplay || Top.LayoutNeeded)) {
 				Top.Redraw (Top.Bounds);
 				foreach (var top in toplevels.Reverse ()) {
 					if (top != Top && top != state.Toplevel) {
@@ -1233,7 +1233,7 @@ namespace Terminal.Gui {
 				}
 				state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
 			}
-			if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.ChildNeedsDisplay || state.Toplevel.LayoutNeeded
+			if (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel.ChildNeedsDisplay || state.Toplevel.LayoutNeeded
 				|| MdiChildNeedsDisplay ()) {
 				state.Toplevel.Redraw (state.Toplevel.Bounds);
 				if (DebugDrawBounds) {
@@ -1245,7 +1245,7 @@ namespace Terminal.Gui {
 				Driver.UpdateCursor ();
 			}
 			if (state.Toplevel != Top && !state.Toplevel.Modal
-				&& (!Top.NeedDisplay.IsEmpty || Top.ChildNeedsDisplay || Top.LayoutNeeded)) {
+				&& (!Top._needsDisplay.IsEmpty || Top.ChildNeedsDisplay || Top.LayoutNeeded)) {
 				Top.Redraw (Top.Bounds);
 			}
 		}
@@ -1274,7 +1274,7 @@ namespace Terminal.Gui {
 			}
 
 			foreach (var top in toplevels) {
-				if (top != Current && top.Visible && (!top.NeedDisplay.IsEmpty || top.ChildNeedsDisplay || top.LayoutNeeded)) {
+				if (top != Current && top.Visible && (!top._needsDisplay.IsEmpty || top.ChildNeedsDisplay || top.LayoutNeeded)) {
 					MdiTop.SetChildNeedsDisplay ();
 					return true;
 				}

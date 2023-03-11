@@ -167,6 +167,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		virtual public void OnLoaded ()
 		{
+			IsLoaded = true;
 			foreach (Toplevel tl in Subviews.Where (v => v is Toplevel)) {
 				tl.OnLoaded ();
 			}
@@ -219,6 +220,10 @@ namespace Terminal.Gui {
 		void Initialize ()
 		{
 			ColorScheme = Colors.TopLevel;
+
+			// TODO: v2 - ALL Views (Responders??!?!) should support the commands related to 
+			//    - Focus
+			//  Move the appropriate AddCommand calls to `Responder`
 
 			// Things this view knows how to do
 			AddCommand (Command.QuitToplevel, () => { QuitToplevel (); return true; });
@@ -366,6 +371,13 @@ namespace Terminal.Gui {
 				return Application.MdiTop != null && Application.MdiTop != this && !Modal;
 			}
 		}
+
+		/// <summary>
+		/// <see langword="true"/> if was already loaded by the <see cref="Application.Begin(Toplevel)"/>
+		/// <see langword="false"/>, otherwise. This is used to avoid the <see cref="View._needsDisplay"/>
+		/// having wrong values while this was not yet loaded.
+		/// </summary>
+		public bool IsLoaded { get; private set; }
 
 		///<inheritdoc/>
 		public override bool OnKeyDown (KeyEvent keyEvent)
@@ -599,61 +611,75 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		///  Ensures the new position of the provided <see cref="Toplevel"/> is within this View's Bounds (e.g. for dragging a Window).
+		///  The `out` parameters are the new X and Y coordinates.
+		/// </summary>
+		/// <param name="top">The Toplevel that is to be moved.</param>
+		/// <param name="x">The target x location.</param>
+		/// <param name="y">The target y location.</param>
+		/// <param name="nx">The x location after ensuring <paramref name="top"/> will remain visible.</param>
+		/// <param name="ny">The y location after ensuring <paramref name="top"/> will remain visible.</param>
+		/// <param name="menuBar">The new top most MenuBar (THIS MAKES NO SENSE - Why!?!?)</param>
+		/// <param name="statusBar">The new top most StatusBar(THIS MAKES NO SENSE - Why!?!?)</param>
+		/// <returns>The <see cref="Toplevel"/> that is Application.Top. I CAN FIND NO CODE WHERE THE RETURN IS NOT Application.Top!</returns>
 		internal View EnsureVisibleBounds (Toplevel top, int x, int y,
-			out int nx, out int ny, out View mb, out View sb)
+			out int nx, out int ny, out MenuBar menuBar, out StatusBar statusBar)
 		{
-			int l;
+			int maxWidth;
 			View superView;
-			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
-				l = Driver.Cols;
+			var isTopTop = top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top;
+			if (isTopTop) {
+				maxWidth = Driver.Cols;
 				superView = Application.Top;
 			} else {
-				l = top.SuperView.Frame.Width;
+				maxWidth = top.SuperView.Frame.Width;
+				// BUGBUG: v2 - No code ever uses the return of this function if `top` is not Application.Top
 				superView = top.SuperView;
 			}
 			nx = Math.Max (x, 0);
-			nx = nx + top.Frame.Width > l ? Math.Max (l - top.Frame.Width, 0) : nx;
+			nx = nx + top.Frame.Width > maxWidth ? Math.Max (maxWidth - top.Frame.Width, 0) : nx;
 			var mfLength = top.Border?.DrawMarginFrame == true ? 2 : 1;
 			if (nx + mfLength > top.Frame.X + top.Frame.Width) {
 				nx = Math.Max (top.Frame.Right - mfLength, 0);
 			}
 			//System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
-			bool m, s;
-			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
-				m = Application.Top.MenuBar?.Visible == true;
-				mb = Application.Top.MenuBar;
+			bool isMenuBarVisible, isStatusBarVisible;
+			if (isTopTop) {
+				isMenuBarVisible = Application.Top.MenuBar?.Visible == true;
+				menuBar = Application.Top.MenuBar;
 			} else {
 				var t = top.SuperView;
 				while (!(t is Toplevel)) {
 					t = t.SuperView;
 				}
-				m = ((Toplevel)t).MenuBar?.Visible == true;
-				mb = ((Toplevel)t).MenuBar;
+				isMenuBarVisible = ((Toplevel)t).MenuBar?.Visible == true;
+				menuBar = ((Toplevel)t).MenuBar;
 			}
-			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
-				l = m ? 1 : 0;
+			if (isTopTop) {
+				maxWidth = isMenuBarVisible ? 1 : 0;
 			} else {
-				l = 0;
+				maxWidth = 0;
 			}
-			ny = Math.Max (y, l);
-			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
-				s = Application.Top.StatusBar?.Visible == true;
-				sb = Application.Top.StatusBar;
+			ny = Math.Max (y, maxWidth);
+			if (isTopTop) {
+				isStatusBarVisible = Application.Top.StatusBar?.Visible == true;
+				statusBar = Application.Top.StatusBar;
 			} else {
 				var t = top.SuperView;
 				while (!(t is Toplevel)) {
 					t = t.SuperView;
 				}
-				s = ((Toplevel)t).StatusBar?.Visible == true;
-				sb = ((Toplevel)t).StatusBar;
+				isStatusBarVisible = ((Toplevel)t).StatusBar?.Visible == true;
+				statusBar = ((Toplevel)t).StatusBar;
 			}
-			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
-				l = s ? Driver.Rows - 1 : Driver.Rows;
+			if (isTopTop) {
+				maxWidth = isStatusBarVisible ? Driver.Rows - 1 : Driver.Rows;
 			} else {
-				l = s ? top.SuperView.Frame.Height - 1 : top.SuperView.Frame.Height;
+				maxWidth = isStatusBarVisible ? top.SuperView.Frame.Height - 1 : top.SuperView.Frame.Height;
 			}
-			ny = Math.Min (ny, l);
-			ny = ny + top.Frame.Height >= l ? Math.Max (l - top.Frame.Height, m ? 1 : 0) : ny;
+			ny = Math.Min (ny, maxWidth);
+			ny = ny + top.Frame.Height >= maxWidth ? Math.Max (maxWidth - top.Frame.Height, isMenuBarVisible ? 1 : 0) : ny;
 			if (ny + mfLength > top.Frame.Y + top.Frame.Height) {
 				ny = Math.Max (top.Frame.Bottom - mfLength, 0);
 			}
@@ -662,6 +688,7 @@ namespace Terminal.Gui {
 			return superView;
 		}
 
+		// TODO: v2 - Not sure this is needed anymore.
 		internal void PositionToplevels ()
 		{
 			PositionToplevel (this);
@@ -673,13 +700,14 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Adjusts the location and size of <paramref name="top"/> within this Toplevel.
 		/// Virtual method enabling implementation of specific positions for inherited <see cref="Toplevel"/> views.
 		/// </summary>
-		/// <param name="top">The toplevel.</param>
+		/// <param name="top">The Toplevel to adjust.</param>
 		public virtual void PositionToplevel (Toplevel top)
 		{
 			var superView = EnsureVisibleBounds (top, top.Frame.X, top.Frame.Y,
-				out int nx, out int ny, out _, out View sb);
+				out int nx, out int ny, out _, out StatusBar sb);
 			bool layoutSubviews = false;
 			if ((top?.SuperView != null || (top != Application.Top && top.Modal)
 				|| (top?.SuperView == null && top.IsMdiChild))
@@ -695,6 +723,7 @@ namespace Terminal.Gui {
 				}
 			}
 
+			// TODO: v2 - This is a hack to get the StatusBar to be positioned correctly.
 			if (sb != null && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0)
 				&& top.Height is Dim.DimFill && -top.Height.Anchor (0) < 1) {
 
@@ -714,7 +743,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			if (!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded) {
+			if (!_needsDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded) {
 				Driver.SetAttribute (GetNormalColor ());
 
 				// This is the Application.Top. Clear just the region we're being asked to redraw 
@@ -741,12 +770,10 @@ namespace Terminal.Gui {
 					if (view.Frame.IntersectsWith (bounds) && !OutsideTopFrame (this)) {
 						view.SetNeedsLayout ();
 						view.SetNeedsDisplay (view.Bounds);
-						//view.Redraw (view.Bounds);
 					}
 				}
 
-				ClearLayoutNeeded ();
-				ClearNeedsDisplay ();
+				// BUGBUG: shouldn't we just return here? the call to base.Redraw below is redundant
 			}
 
 			base.Redraw (Bounds);

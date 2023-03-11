@@ -234,7 +234,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			if (!NeedDisplay.IsEmpty) {
+			if (!_needsDisplay.IsEmpty) {
 				Driver.SetAttribute (Child.GetNormalColor ());
 				Clear ();
 				Child.Border.DrawContent (Border.Child);

@@ -281,7 +281,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			if (!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded) {
+			if (!_needsDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded) {
 				Driver.SetAttribute (GetNormalColor ());
 				Clear ();
 				contentView.SetNeedsDisplay ();
@@ -289,7 +289,7 @@ namespace Terminal.Gui {
 			var savedClip = contentView.ClipToBounds ();
 
 			// Redraw our contentView
-			contentView.Redraw (!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded ? contentView.Bounds : bounds);
+			contentView.Redraw (!_needsDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded ? contentView.Bounds : bounds);
 			Driver.Clip = savedClip;
 
 			ClearLayoutNeeded ();

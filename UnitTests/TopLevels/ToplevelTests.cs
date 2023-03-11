@@ -19,8 +19,8 @@ namespace Terminal.Gui.TopLevelTests {
 			var top = new Toplevel ();
 
 			Assert.Equal (Colors.TopLevel, top.ColorScheme);
-			Assert.Equal ("Dim.Fill(margin=0)", top.Width.ToString ());
-			Assert.Equal ("Dim.Fill(margin=0)", top.Height.ToString ());
+			Assert.Equal ("Fill(0)", top.Width.ToString ());
+			Assert.Equal ("Fill(0)", top.Height.ToString ());
 			Assert.False (top.Running);
 			Assert.False (top.Modal);
 			Assert.Null (top.MenuBar);
@@ -149,7 +149,9 @@ namespace Terminal.Gui.TopLevelTests {
 		[AutoInitShutdown]
 		public void Internal_Tests ()
 		{
+			Toplevel.dragPosition = null; // dragPosition is `static` and must be reset for each instance or unit tests will fail?
 			var top = new Toplevel ();
+
 			var eventInvoked = "";
 
 			top.ChildUnloaded += (e) => eventInvoked = "ChildUnloaded";
@@ -199,7 +201,7 @@ namespace Terminal.Gui.TopLevelTests {
 			Assert.Equal (top, Application.Top);
 
 			// top is Application.Top without menu and status bar.
-			var supView = top.EnsureVisibleBounds (top, 2, 2, out int nx, out int ny, out View mb, out View sb);
+			var supView = top.EnsureVisibleBounds (top, 2, 2, out int nx, out int ny, out MenuBar mb, out StatusBar sb);
 			Assert.Equal (Application.Top, supView);
 			Assert.Equal (0, nx);
 			Assert.Equal (0, ny);
@@ -1030,6 +1032,54 @@ namespace Terminal.Gui.TopLevelTests {
 			Application.Refresh ();
 			Application.Driver.GetCursorVisibility (out cursor);
 			Assert.Equal (CursorVisibility.Invisible, cursor);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void IsLoaded_Application_Begin ()
+		{
+			var top = Application.Top;
+			Assert.False (top.IsLoaded);
+
+			Application.Begin (top);
+			Assert.True (top.IsLoaded);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void IsLoaded_With_Sub_Toplevel_Application_Begin_NeedDisplay ()
+		{
+			var top = Application.Top;
+			var subTop = new Toplevel ();
+			var view = new View (new Rect (0, 0, 20, 10));
+			subTop.Add (view);
+			top.Add (subTop);
+
+			Assert.False (top.IsLoaded);
+			Assert.False (subTop.IsLoaded);
+			Assert.Equal (new Rect (0, 0, 20, 10), view.Frame);
+			Assert.Equal (new Rect (0, 0, 20, 10), view._needsDisplay);
+
+			view.LayoutStarted += view_LayoutStarted;
+
+			void view_LayoutStarted (View.LayoutEventArgs e)
+			{
+				Assert.Equal (new Rect (0, 0, 20, 10), view._needsDisplay);
+				view.LayoutStarted -= view_LayoutStarted;
+			}
+
+			Application.Begin (top);
+
+			Assert.True (top.IsLoaded);
+			Assert.True (subTop.IsLoaded);
+			Assert.Equal (new Rect (0, 0, 20, 10), view.Frame);
+
+			view.Frame = new Rect (1, 3, 10, 5);
+			Assert.Equal (new Rect (1, 3, 10, 5), view.Frame);
+			Assert.Equal (new Rect (0, 0, 10, 5), view._needsDisplay);
+
+			view.Redraw (view.Bounds);
+			view.Frame = new Rect (1, 3, 10, 5);
+			Assert.Equal (new Rect (1, 3, 10, 5), view.Frame);
+			Assert.Equal (new Rect (0, 0, 10, 5), view._needsDisplay);
 		}
 	}
 }

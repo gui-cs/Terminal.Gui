@@ -402,10 +402,10 @@ namespace Terminal.Gui {
 			}
 		}
 
-		internal Rect NeedDisplay { get; private set; } = Rect.Empty;
+		internal Rect _needsDisplay { get; private set; } = Rect.Empty;
 
 		// The frame for the object. Superview relative.
-		Rect frame;
+		Rect _frame;
 
 		/// <summary>
 		/// Gets or sets an identifier for the view;
@@ -444,10 +444,10 @@ namespace Terminal.Gui {
 		/// </para>
 		/// </remarks>
 		public virtual Rect Frame {
-			get => frame;
+			get => _frame;
 			set {
-				var rect = GetMaxNeedDisplay (frame, value);
-				frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
+				var rect = GetMaxNeedsDisplay (_frame, value);
+				_frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
 				TextFormatter.Size = GetBoundsTextFormatterSize ();
 				SetNeedsLayout ();
 				SetNeedsDisplay (rect);
@@ -500,7 +500,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public Rect Bounds {
 			get => new Rect (Point.Empty, Frame.Size);
-			set => Frame = new Rect (frame.Location, value.Size);
+			set => Frame = new Rect (_frame.Location, value.Size);
 		}
 
 		Pos x, y;
@@ -630,14 +630,14 @@ namespace Terminal.Gui {
 				switch (TextFormatter.IsVerticalDirection (TextDirection)) {
 				case true:
 					var colWidth = TextFormatter.GetSumMaxCharWidth (new List<ustring> { TextFormatter.Text }, 0, 1);
-					if (frame.Width < colWidth && (Width == null || (Bounds.Width >= 0 && Width is Dim.DimAbsolute
+					if (_frame.Width < colWidth && (Width == null || (Bounds.Width >= 0 && Width is Dim.DimAbsolute
 						&& Width.Anchor (0) >= 0 && Width.Anchor (0) < colWidth))) {
 						size = new Size (colWidth, Bounds.Height);
 						return true;
 					}
 					break;
 				default:
-					if (frame.Height < 1 && (Height == null || (Height is Dim.DimAbsolute && Height.Anchor (0) == 0))) {
+					if (_frame.Height < 1 && (Height == null || (Height is Dim.DimAbsolute && Height.Anchor (0) == 0))) {
 						size = new Size (Bounds.Width, 1);
 						return true;
 					}
@@ -806,27 +806,27 @@ namespace Terminal.Gui {
 		/// </summary>
 		protected virtual void ProcessResizeView ()
 		{
-			var actX = x is Pos.PosAbsolute ? x.Anchor (0) : frame.X;
-			var actY = y is Pos.PosAbsolute ? y.Anchor (0) : frame.Y;
-			Rect oldFrame = frame;
+			var actX = x is Pos.PosAbsolute ? x.Anchor (0) : _frame.X;
+			var actY = y is Pos.PosAbsolute ? y.Anchor (0) : _frame.Y;
+			Rect oldFrame = _frame;
 
 			if (AutoSize) {
 				var s = GetAutoSize ();
 				var w = width is Dim.DimAbsolute && width.Anchor (0) > s.Width ? width.Anchor (0) : s.Width;
 				var h = height is Dim.DimAbsolute && height.Anchor (0) > s.Height ? height.Anchor (0) : s.Height;
-				frame = new Rect (new Point (actX, actY), new Size (w, h));
+				_frame = new Rect (new Point (actX, actY), new Size (w, h));
 			} else {
-				var w = width is Dim.DimAbsolute ? width.Anchor (0) : frame.Width;
-				var h = height is Dim.DimAbsolute ? height.Anchor (0) : frame.Height;
-				frame = new Rect (new Point (actX, actY), new Size (w, h));
+				var w = width is Dim.DimAbsolute ? width.Anchor (0) : _frame.Width;
+				var h = height is Dim.DimAbsolute ? height.Anchor (0) : _frame.Height;
+				_frame = new Rect (new Point (actX, actY), new Size (w, h));
 				SetMinWidthHeight ();
 			}
 			TextFormatter.Size = GetBoundsTextFormatterSize ();
 			SetNeedsLayout ();
-			SetNeedsDisplay (GetMaxNeedDisplay (oldFrame, frame));
+			SetNeedsDisplay (GetMaxNeedsDisplay (oldFrame, _frame));
 		}
 
-		Rect GetMaxNeedDisplay (Rect oldFrame, Rect newFrame)
+		Rect GetMaxNeedsDisplay (Rect oldFrame, Rect newFrame)
 		{
 			var rect = new Rect () {
 				X = Math.Min (oldFrame.X, newFrame.X),
@@ -883,14 +883,14 @@ namespace Terminal.Gui {
 		/// <param name="region">The view-relative region that must be flagged for repaint.</param>
 		public void SetNeedsDisplay (Rect region)
 		{
-			if (NeedDisplay.IsEmpty)
-				NeedDisplay = region;
+			if (_needsDisplay.IsEmpty)
+				_needsDisplay = region;
 			else {
-				var x = Math.Min (NeedDisplay.X, region.X);
-				var y = Math.Min (NeedDisplay.Y, region.Y);
-				var w = Math.Max (NeedDisplay.Width, region.Width);
-				var h = Math.Max (NeedDisplay.Height, region.Height);
-				NeedDisplay = new Rect (x, y, w, h);
+				var x = Math.Min (_needsDisplay.X, region.X);
+				var y = Math.Min (_needsDisplay.Y, region.Y);
+				var w = Math.Max (_needsDisplay.Width, region.Width);
+				var h = Math.Max (_needsDisplay.Height, region.Height);
+				_needsDisplay = new Rect (x, y, w, h);
 			}
 			container?.SetChildNeedsDisplay ();
 
@@ -909,7 +909,7 @@ namespace Terminal.Gui {
 		internal bool ChildNeedsDisplay { get; private set; }
 
 		/// <summary>
-		/// Indicates that any child views (in the <see cref="Subviews"/> list) need to be repainted.
+		/// Indicates that any SubViews (in the <see cref="Subviews"/> list) need to be repainted.
 		/// </summary>
 		public void SetChildNeedsDisplay ()
 		{
@@ -1146,13 +1146,13 @@ namespace Terminal.Gui {
 		internal void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
 		{
 			// Computes the real row, col relative to the screen.
-			rrow = row + frame.Y;
-			rcol = col + frame.X;
+			rrow = row + _frame.Y;
+			rcol = col + _frame.X;
 
 			var curContainer = container;
 			while (curContainer != null) {
-				rrow += curContainer.frame.Y;
-				rcol += curContainer.frame.X;
+				rrow += curContainer._frame.Y;
+				rcol += curContainer._frame.X;
 				curContainer = curContainer.container;
 			}
 
@@ -1172,10 +1172,10 @@ namespace Terminal.Gui {
 		public Point ScreenToView (int x, int y)
 		{
 			if (SuperView == null) {
-				return new Point (x - Frame.X, y - frame.Y);
+				return new Point (x - Frame.X, y - _frame.Y);
 			} else {
 				var parent = SuperView.ScreenToView (x, y);
-				return new Point (parent.X - frame.X, parent.Y - frame.Y);
+				return new Point (parent.X - _frame.X, parent.Y - _frame.Y);
 			}
 		}
 
@@ -1316,7 +1316,7 @@ namespace Terminal.Gui {
 			} else if (CanFocus && HasFocus && Visible && Frame.Width > 0 && Frame.Height > 0) {
 				Move (TextFormatter.HotKeyPos == -1 ? 0 : TextFormatter.CursorPosition, 0);
 			} else {
-				Move (frame.X, frame.Y);
+				Move (_frame.X, _frame.Y);
 			}
 		}
 
@@ -1373,10 +1373,10 @@ namespace Terminal.Gui {
 		public virtual void OnAdded (View view)
 		{
 			view.IsAdded = true;
-			view.x = view.x ?? view.frame.X;
-			view.y = view.y ?? view.frame.Y;
-			view.width = view.width ?? view.frame.Width;
-			view.height = view.height ?? view.frame.Height;
+			view.x = view.x ?? view._frame.X;
+			view.y = view.y ?? view._frame.Y;
+			view.width = view.width ?? view._frame.Width;
+			view.height = view.height ?? view._frame.Height;
 
 			view.Added?.Invoke (this);
 		}
@@ -1469,7 +1469,7 @@ namespace Terminal.Gui {
 		{
 			if (row < 0 || col < 0)
 				return;
-			if (row > frame.Height - 1 || col > frame.Width - 1)
+			if (row > _frame.Height - 1 || col > _frame.Width - 1)
 				return;
 			Move (col, row);
 			Driver.AddRune (ch);
@@ -1480,7 +1480,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		protected void ClearNeedsDisplay ()
 		{
-			NeedDisplay = Rect.Empty;
+			_needsDisplay = Rect.Empty;
 			ChildNeedsDisplay = false;
 		}
 
@@ -1507,7 +1507,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var clipRect = new Rect (Point.Empty, frame.Size);
+			var clipRect = new Rect (Point.Empty, _frame.Size);
 
 			if (ColorScheme != null) {
 				Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
@@ -1517,7 +1517,7 @@ namespace Terminal.Gui {
 				Border.DrawContent (this);
 			} else if (ustring.IsNullOrEmpty (TextFormatter.Text) &&
 				(GetType ().IsNestedPublic && !IsOverridden (this, "Redraw") || GetType ().Name == "View") &&
-				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
+				(!_needsDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
 
 				Clear ();
 				SetChildNeedsDisplay ();
@@ -1525,7 +1525,7 @@ namespace Terminal.Gui {
 
 			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
 				Rect containerBounds = GetContainerBounds ();
-				Clear (ViewToScreen (GetNeedDisplay (containerBounds)));
+				Clear (ViewToScreen (GetNeedsDisplay (containerBounds)));
 				SetChildNeedsDisplay ();
 				// Draw any Text
 				if (TextFormatter != null) {
@@ -1541,7 +1541,7 @@ namespace Terminal.Gui {
 
 			if (subviews != null) {
 				foreach (var view in subviews) {
-					if (!view.NeedDisplay.IsEmpty || view.ChildNeedsDisplay || view.LayoutNeeded) {
+					if (!view._needsDisplay.IsEmpty || view.ChildNeedsDisplay || view.LayoutNeeded) {
 						if (view.Frame.IntersectsWith (clipRect) && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
 							if (view.LayoutNeeded)
 								view.LayoutSubviews ();
@@ -1555,7 +1555,7 @@ namespace Terminal.Gui {
 								view.OnDrawContentComplete (rect);
 							}
 						}
-						view.NeedDisplay = Rect.Empty;
+						view._needsDisplay = Rect.Empty;
 						view.ChildNeedsDisplay = false;
 					}
 				}
@@ -1568,12 +1568,12 @@ namespace Terminal.Gui {
 			ClearNeedsDisplay ();
 		}
 
-		Rect GetNeedDisplay (Rect containerBounds)
+		Rect GetNeedsDisplay (Rect containerBounds)
 		{
-			Rect rect = NeedDisplay;
+			Rect rect = _needsDisplay;
 			if (!containerBounds.IsEmpty) {
-				rect.Width = Math.Min (NeedDisplay.Width, containerBounds.Width);
-				rect.Height = Math.Min (NeedDisplay.Height, containerBounds.Height);
+				rect.Width = Math.Min (_needsDisplay.Width, containerBounds.Width);
+				rect.Height = Math.Min (_needsDisplay.Height, containerBounds.Height);
 			}
 
 			return rect;
@@ -2768,17 +2768,17 @@ namespace Terminal.Gui {
 
 		bool IsValidAutoSize (out Size autoSize)
 		{
-			var rect = TextFormatter.CalcRect (frame.X, frame.Y, TextFormatter.Text, TextDirection);
+			var rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
 			autoSize = new Size (rect.Size.Width - GetHotKeySpecifierLength (),
 			    rect.Size.Height - GetHotKeySpecifierLength (false));
 			return !(ForceValidatePosDim && (!(Width is Dim.DimAbsolute) || !(Height is Dim.DimAbsolute))
-			    || frame.Size.Width != rect.Size.Width - GetHotKeySpecifierLength ()
-			    || frame.Size.Height != rect.Size.Height - GetHotKeySpecifierLength (false));
+			    || _frame.Size.Width != rect.Size.Width - GetHotKeySpecifierLength ()
+			    || _frame.Size.Height != rect.Size.Height - GetHotKeySpecifierLength (false));
 		}
 
 		bool IsValidAutoSizeWidth (Dim width)
 		{
-			var rect = TextFormatter.CalcRect (frame.X, frame.Y, TextFormatter.Text, TextDirection);
+			var rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
 			var dimValue = width.Anchor (0);
 			return !(ForceValidatePosDim && (!(width is Dim.DimAbsolute)) || dimValue != rect.Size.Width
 			    - GetHotKeySpecifierLength ());
@@ -2786,7 +2786,7 @@ namespace Terminal.Gui {
 
 		bool IsValidAutoSizeHeight (Dim height)
 		{
-			var rect = TextFormatter.CalcRect (frame.X, frame.Y, TextFormatter.Text, TextDirection);
+			var rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
 			var dimValue = height.Anchor (0);
 			return !(ForceValidatePosDim && (!(height is Dim.DimAbsolute)) || dimValue != rect.Size.Height
 			    - GetHotKeySpecifierLength (false));
@@ -2829,8 +2829,8 @@ namespace Terminal.Gui {
 			if (ustring.IsNullOrEmpty (TextFormatter.Text))
 				return Bounds.Size;
 
-			return new Size (frame.Size.Width + GetHotKeySpecifierLength (),
-			    frame.Size.Height + GetHotKeySpecifierLength (false));
+			return new Size (_frame.Size.Width + GetHotKeySpecifierLength (),
+			    _frame.Size.Height + GetHotKeySpecifierLength (false));
 		}
 
 		/// <summary>
@@ -3091,8 +3091,8 @@ namespace Terminal.Gui {
 		/// <returns><see langword="true"/> if the width can be directly assigned, <see langword="false"/> otherwise.</returns>
 		public bool GetCurrentWidth (out int currentWidth)
 		{
-			SetRelativeLayout (SuperView?.frame ?? frame);
-			currentWidth = frame.Width;
+			SetRelativeLayout (SuperView?._frame ?? _frame);
+			currentWidth = _frame.Width;
 
 			return CanSetWidth (0, out _);
 		}
@@ -3104,8 +3104,8 @@ namespace Terminal.Gui {
 		/// <returns><see langword="true"/> if the height can be directly assigned, <see langword="false"/> otherwise.</returns>
 		public bool GetCurrentHeight (out int currentHeight)
 		{
-			SetRelativeLayout (SuperView?.frame ?? frame);
-			currentHeight = frame.Height;
+			SetRelativeLayout (SuperView?._frame ?? _frame);
+			currentHeight = _frame.Height;
 
 			return CanSetHeight (0, out _);
 		}
