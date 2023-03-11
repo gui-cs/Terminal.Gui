@@ -589,9 +589,9 @@ namespace Terminal.Gui.TopLevelTests {
 
 			void View_Added (View obj)
 			{
-				Assert.Throws<NullReferenceException> (() => Application.Top.AlternateForwardKeyChanged += (e) => alternateForwardKey = e);
-				Assert.Throws<NullReferenceException> (() => Application.Top.AlternateBackwardKeyChanged += (e) => alternateBackwardKey = e);
-				Assert.Throws<NullReferenceException> (() => Application.Top.QuitKeyChanged += (e) => quitKey = e);
+				Assert.Throws<NullReferenceException> (() => Application.Top.AlternateForwardKeyChanged += (s,e) => alternateForwardKey = e.OldKey);
+				Assert.Throws<NullReferenceException> (() => Application.Top.AlternateBackwardKeyChanged += (s,e) => alternateBackwardKey = e.OldKey);
+				Assert.Throws<NullReferenceException> (() => Application.Top.QuitKeyChanged += (s,e) => quitKey = e.OldKey);
 				Assert.False (wasAdded);
 				wasAdded = true;
 				view.Added -= View_Added;
@@ -621,9 +621,9 @@ namespace Terminal.Gui.TopLevelTests {
 
 			void View_Initialized (object sender, EventArgs e)
 			{
-				Application.Top.AlternateForwardKeyChanged += (e) => alternateForwardKey = e;
-				Application.Top.AlternateBackwardKeyChanged += (e) => alternateBackwardKey = e;
-				Application.Top.QuitKeyChanged += (e) => quitKey = e;
+				Application.Top.AlternateForwardKeyChanged += (s,e) => alternateForwardKey = e.OldKey;
+				Application.Top.AlternateBackwardKeyChanged += (s, e) => alternateBackwardKey = e.OldKey;
+				Application.Top.QuitKeyChanged += (s, e) => quitKey = e.OldKey;
 			}
 
 			var win = new Window ();

@@ -259,46 +259,46 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when the <see cref="Application.AlternateForwardKey"/> is changed.
 		/// </summary>
-		public event Action<Key> AlternateForwardKeyChanged;
+		public event EventHandler<KeyChangedEventArgs> AlternateForwardKeyChanged;
 
 		/// <summary>
 		/// Virtual method to invoke the <see cref="AlternateForwardKeyChanged"/> event.
 		/// </summary>
-		/// <param name="oldKey"></param>
-		public virtual void OnAlternateForwardKeyChanged (Key oldKey)
+		/// <param name="e"></param>
+		public virtual void OnAlternateForwardKeyChanged (KeyChangedEventArgs e)
 		{
-			ReplaceKeyBinding (oldKey, Application.AlternateForwardKey);
-			AlternateForwardKeyChanged?.Invoke (oldKey);
+			ReplaceKeyBinding (e.OldKey, e.NewKey);
+			AlternateForwardKeyChanged?.Invoke (this, e);
 		}
 
 		/// <summary>
 		/// Invoked when the <see cref="Application.AlternateBackwardKey"/> is changed.
 		/// </summary>
-		public event Action<Key> AlternateBackwardKeyChanged;
+		public event EventHandler<KeyChangedEventArgs> AlternateBackwardKeyChanged;
 
 		/// <summary>
 		/// Virtual method to invoke the <see cref="AlternateBackwardKeyChanged"/> event.
 		/// </summary>
-		/// <param name="oldKey"></param>
-		public virtual void OnAlternateBackwardKeyChanged (Key oldKey)
+		/// <param name="e"></param>
+		public virtual void OnAlternateBackwardKeyChanged (KeyChangedEventArgs e)
 		{
-			ReplaceKeyBinding (oldKey, Application.AlternateBackwardKey);
-			AlternateBackwardKeyChanged?.Invoke (oldKey);
+			ReplaceKeyBinding (e.OldKey, e.NewKey);
+			AlternateBackwardKeyChanged?.Invoke (this, e);
 		}
 
 		/// <summary>
 		/// Invoked when the <see cref="Application.QuitKey"/> is changed.
 		/// </summary>
-		public event Action<Key> QuitKeyChanged;
+		public event EventHandler<KeyChangedEventArgs> QuitKeyChanged;
 
 		/// <summary>
 		/// Virtual method to invoke the <see cref="QuitKeyChanged"/> event.
 		/// </summary>
-		/// <param name="oldKey"></param>
-		public virtual void OnQuitKeyChanged (Key oldKey)
+		/// <param name="e"></param>
+		public virtual void OnQuitKeyChanged (KeyChangedEventArgs e)
 		{
-			ReplaceKeyBinding (oldKey, Application.QuitKey);
-			QuitKeyChanged?.Invoke (oldKey);
+			ReplaceKeyBinding (e.OldKey, e.NewKey);
+			QuitKeyChanged?.Invoke (this, e);
 		}
 
 		/// <summary>

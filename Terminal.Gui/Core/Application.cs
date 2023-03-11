@@ -162,15 +162,15 @@ namespace Terminal.Gui {
 				if (alternateForwardKey != value) {
 					var oldKey = alternateForwardKey;
 					alternateForwardKey = value;
-					OnAlternateForwardKeyChanged (oldKey);
+					OnAlternateForwardKeyChanged (new KeyChangedEventArgs(oldKey,value));
 				}
 			}
 		}
 
-		static void OnAlternateForwardKeyChanged (Key oldKey)
+		static void OnAlternateForwardKeyChanged (KeyChangedEventArgs e)
 		{
 			foreach (var top in toplevels.ToArray ()) {
-				top.OnAlternateForwardKeyChanged (oldKey);
+				top.OnAlternateForwardKeyChanged (e);
 			}
 		}
 
@@ -186,12 +186,12 @@ namespace Terminal.Gui {
 				if (alternateBackwardKey != value) {
 					var oldKey = alternateBackwardKey;
 					alternateBackwardKey = value;
-					OnAlternateBackwardKeyChanged (oldKey);
+					OnAlternateBackwardKeyChanged (new KeyChangedEventArgs(oldKey,value));
 				}
 			}
 		}
 
-		static void OnAlternateBackwardKeyChanged (Key oldKey)
+		static void OnAlternateBackwardKeyChanged (KeyChangedEventArgs oldKey)
 		{
 			foreach (var top in toplevels.ToArray ()) {
 				top.OnAlternateBackwardKeyChanged (oldKey);
@@ -210,7 +210,7 @@ namespace Terminal.Gui {
 				if (quitKey != value) {
 					var oldKey = quitKey;
 					quitKey = value;
-					OnQuitKeyChanged (oldKey);
+					OnQuitKeyChanged (new KeyChangedEventArgs(oldKey,value));
 				}
 			}
 		}
@@ -222,11 +222,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static List<CultureInfo> SupportedCultures => supportedCultures;
 
-		static void OnQuitKeyChanged (Key oldKey)
+		static void OnQuitKeyChanged (KeyChangedEventArgs e)
 		{
 			// Duplicate the list so if it changes during enumeration we're safe
 			foreach (var top in toplevels.ToArray ()) {
-				top.OnQuitKeyChanged (oldKey);
+				top.OnQuitKeyChanged (e);
 			}
 		}
 
