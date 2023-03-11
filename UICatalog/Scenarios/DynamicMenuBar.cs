@@ -729,7 +729,7 @@ namespace UICatalog.Scenarios {
 					Width = Dim.Fill (),
 					ReadOnly = true
 				};
-				_txtShortcut.KeyDown += (e) => {
+				_txtShortcut.KeyDown += (s, e) => {
 					if (!ProcessKey (e.KeyEvent)) {
 						return;
 					}
@@ -772,7 +772,7 @@ namespace UICatalog.Scenarios {
 					return true;
 				}
 
-				_txtShortcut.KeyUp += (e) => {
+				_txtShortcut.KeyUp += (s, e) => {
 					var k = ShortcutHelper.GetModifiersKey (e.KeyEvent);
 					if (CheckShortcut (k, false)) {
 						e.Handled = true;

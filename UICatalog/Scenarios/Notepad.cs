@@ -352,7 +352,7 @@ namespace UICatalog.Scenarios {
 			{
 				var textView = (TextView)View;
 				// when user makes changes rename tab to indicate unsaved
-				textView.KeyUp += (k) => {
+				textView.KeyUp += (s, k) => {
 
 					// if current text doesn't match saved text
 					var areDiff = this.UnsavedChanges;

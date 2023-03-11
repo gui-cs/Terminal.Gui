@@ -345,7 +345,7 @@ namespace UICatalog.Scenarios {
 
 		}
 
-		private void TableViewKeyPress (View.KeyEventEventArgs e)
+		private void TableViewKeyPress (object sender, View.KeyEventEventArgs e)
 		{
 			if (e.KeyEvent.Key == Key.DeleteChar) {
 

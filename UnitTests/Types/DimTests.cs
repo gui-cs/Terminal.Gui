@@ -629,7 +629,7 @@ namespace Terminal.Gui.TypeTests {
 			var field = new TextField () { X = 0, Y = Pos.Bottom (view), Width = 20 };
 			var count = 0;
 
-			field.KeyDown += (k) => {
+			field.KeyDown += (s, k) => {
 				if (k.KeyEvent.Key == Key.Enter) {
 					field.Text = $"Label {count}";
 					var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 20 };
@@ -996,7 +996,7 @@ namespace Terminal.Gui.TypeTests {
 			var count = 0;
 			var listLabels = new List<Label> ();
 
-			field.KeyDown += (k) => {
+			field.KeyDown += (s, k) => {
 				if (k.KeyEvent.Key == Key.Enter) {
 					((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
 					var pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], output);
@@ -1075,7 +1075,7 @@ namespace Terminal.Gui.TypeTests {
 				Assert.Equal ($"Absolute({i + 1})", view.Height.ToString ());
 			}
 
-			field.KeyDown += (k) => {
+			field.KeyDown += (s, k) => {
 				if (k.KeyEvent.Key == Key.Enter) {
 					Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
 					view.Remove (listLabels [count - 1]);
@@ -1140,7 +1140,7 @@ namespace Terminal.Gui.TypeTests {
 				}
 			}
 
-			field.KeyDown += (k) => {
+			field.KeyDown += (s, k) => {
 				if (k.KeyEvent.Key == Key.Enter) {
 					((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
 					var pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], output);

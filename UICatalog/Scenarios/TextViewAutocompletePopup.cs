@@ -94,7 +94,7 @@ namespace UICatalog.Scenarios {
 			Win.LayoutStarted += Win_LayoutStarted;
 		}
 
-		private void Win_LayoutStarted (View.LayoutEventArgs obj)
+		private void Win_LayoutStarted (object sender, View.LayoutEventArgs obj)
 		{
 			miMultiline.Checked = textViewTopLeft.Multiline;
 			miWrap.Checked = textViewTopLeft.WordWrap;

@@ -651,7 +651,7 @@ namespace UICatalog {
 				Application.Top.SetNeedsDisplay ();
 			}
 
-			void KeyDownHandler (View.KeyEventEventArgs a)
+			void KeyDownHandler (object sender, View.KeyEventEventArgs a)
 			{
 				if (a.KeyEvent.IsCapslock) {
 					Capslock.Title = "Caps: On";

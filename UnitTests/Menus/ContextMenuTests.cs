@@ -175,7 +175,7 @@ namespace Terminal.Gui.MenuTests {
 
 			var cm = new ContextMenu ();
 
-			lbl.KeyPress += (e) => {
+			lbl.KeyPress += (s, e) => {
 				if (e.KeyEvent.Key == cm.Key) {
 					lbl.Text = "Replaced";
 					e.Handled = true;

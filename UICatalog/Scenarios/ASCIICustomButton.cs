@@ -230,7 +230,7 @@ namespace UICatalog.Scenarios {
 				}
 			}
 
-			private void Button_KeyPress (KeyEventEventArgs obj)
+			private void Button_KeyPress (object sender, KeyEventEventArgs obj)
 			{
 				switch (obj.KeyEvent.Key) {
 				case Key.End:

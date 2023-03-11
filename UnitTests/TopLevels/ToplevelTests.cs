@@ -1060,7 +1060,7 @@ namespace Terminal.Gui.TopLevelTests {
 
 			view.LayoutStarted += view_LayoutStarted;
 
-			void view_LayoutStarted (View.LayoutEventArgs e)
+			void view_LayoutStarted (object sender, View.LayoutEventArgs e)
 			{
 				Assert.Equal (new Rect (0, 0, 20, 10), view.NeedDisplay);
 				view.LayoutStarted -= view_LayoutStarted;

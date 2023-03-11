@@ -1134,7 +1134,7 @@ namespace Terminal.Gui.CoreTests {
 			var top = Application.Top;
 
 			var text = new TextField ("");
-			text.KeyPress += (e) => {
+			text.KeyPress += (s, e) => {
 				e.Handled = true;
 				Assert.True (e.Handled);
 				Assert.Equal (Key.N, e.KeyEvent.Key);
@@ -1232,10 +1232,10 @@ namespace Terminal.Gui.CoreTests {
 			Assert.Equal (80, view.Bounds.Width);
 			Assert.Equal (25, view.Bounds.Height);
 			bool layoutStarted = false;
-			view.LayoutStarted += (_) => layoutStarted = true;
+			view.LayoutStarted += (s,e) => layoutStarted = true;
 			view.OnLayoutStarted (null);
 			Assert.True (layoutStarted);
-			view.LayoutComplete += (_) => layoutStarted = false;
+			view.LayoutComplete += (s,e) => layoutStarted = false;
 			view.OnLayoutComplete (null);
 			Assert.False (layoutStarted);
 			view.X = Pos.Center () - 41;
@@ -1539,7 +1539,7 @@ namespace Terminal.Gui.CoreTests {
 			var tf = new TextField ();
 			tf.KeyPress += Tf_KeyPress;
 
-			void Tf_KeyPress (View.KeyEventEventArgs obj)
+			void Tf_KeyPress (object sender, View.KeyEventEventArgs obj)
 			{
 				if (obj.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
 					obj.Handled = tfQuiting = true;
@@ -1551,7 +1551,7 @@ namespace Terminal.Gui.CoreTests {
 			var top = Application.Top;
 			top.KeyPress += Top_KeyPress;
 
-			void Top_KeyPress (View.KeyEventEventArgs obj)
+			void Top_KeyPress (object sender, View.KeyEventEventArgs obj)
 			{
 				if (obj.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
 					obj.Handled = topQuiting = true;
@@ -1599,7 +1599,7 @@ namespace Terminal.Gui.CoreTests {
 			var tf = new TextField ();
 			tf.KeyPress += Tf_KeyPress;
 
-			void Tf_KeyPress (View.KeyEventEventArgs obj)
+			void Tf_KeyPress (object sender, View.KeyEventEventArgs obj)
 			{
 				if (obj.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
 					obj.Handled = tfQuiting = true;
@@ -2287,21 +2287,21 @@ This is a tes
 			var keyUp = false;
 
 			var view = new DerivedView ();
-			view.KeyDown += (e) => {
+			view.KeyDown += (s, e) => {
 				Assert.Equal (Key.a, e.KeyEvent.Key);
 				Assert.False (keyDown);
 				Assert.False (view.IsKeyDown);
 				e.Handled = true;
 				keyDown = true;
 			};
-			view.KeyPress += (e) => {
+			view.KeyPress += (s,e) => {
 				Assert.Equal (Key.a, e.KeyEvent.Key);
 				Assert.False (keyPress);
 				Assert.False (view.IsKeyPress);
 				e.Handled = true;
 				keyPress = true;
 			};
-			view.KeyUp += (e) => {
+			view.KeyUp += (s, e) => {
 				Assert.Equal (Key.a, e.KeyEvent.Key);
 				Assert.False (keyUp);
 				Assert.False (view.IsKeyUp);
@@ -2390,7 +2390,7 @@ This is a tes
 			var keyUp = false;
 
 			var view = new DerivedView ();
-			view.KeyDown += (e) => {
+			view.KeyDown += (s,e) => {
 				Assert.Equal (-1, e.KeyEvent.KeyValue);
 				Assert.Equal (shift, e.KeyEvent.IsShift);
 				Assert.Equal (alt, e.KeyEvent.IsAlt);
@@ -2399,10 +2399,10 @@ This is a tes
 				Assert.False (view.IsKeyDown);
 				keyDown = true;
 			};
-			view.KeyPress += (e) => {
+			view.KeyPress += (s, e) => {
 				keyPress = true;
 			};
-			view.KeyUp += (e) => {
+			view.KeyUp += (s, e) => {
 				Assert.Equal (-1, e.KeyEvent.KeyValue);
 				Assert.Equal (shift, e.KeyEvent.IsShift);
 				Assert.Equal (alt, e.KeyEvent.IsAlt);
@@ -2908,15 +2908,15 @@ At 0,0
 			Assert.Equal (new Rect (0, 0, 30, 1), label.NeedDisplay);
 			Assert.Equal (new Rect (0, 0, 13, 1), button.NeedDisplay);
 
-			top.LayoutComplete += e => {
+			top.LayoutComplete += (s,e) => {
 				Assert.Equal (new Rect (0, 0, 80, 25), top.NeedDisplay);
 			};
 
-			frame.LayoutComplete += e => {
+			frame.LayoutComplete += (s, e) => {
 				Assert.Equal (new Rect (0, 0, 40, 8), frame.NeedDisplay);
 			};
 
-			frame.Subviews [0].LayoutComplete += e => {
+			frame.Subviews [0].LayoutComplete += (s, e) => {
 				if (top.IsLoaded) {
 					Assert.Equal (new Rect (0, 0, 38, 6), frame.Subviews [0].NeedDisplay);
 				} else {
@@ -2924,11 +2924,11 @@ At 0,0
 				}
 			};
 
-			label.LayoutComplete += e => {
+			label.LayoutComplete += (s, e) => {
 				Assert.Equal (new Rect (0, 0, 38, 1), label.NeedDisplay);
 			};
 
-			button.LayoutComplete += e => {
+			button.LayoutComplete += (s, e) => {
 				Assert.Equal (new Rect (0, 0, 13, 1), button.NeedDisplay);
 			};
 

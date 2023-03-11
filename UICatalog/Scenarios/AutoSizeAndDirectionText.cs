@@ -90,7 +90,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (ckbWideText);
 
-			Win.KeyUp += (_) =>
+			Win.KeyUp += (s,e) =>
 				labelH.Text = labelV.Text = text = editText.Text.ToString ();
 		}
 	}

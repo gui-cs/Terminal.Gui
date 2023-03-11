@@ -338,13 +338,13 @@ namespace UICatalog.Scenarios {
 				close.Clicked += OnReportClosed;
 				Add (close);
 
-				KeyPress += (e) => {
+				KeyPress += (s, e) => {
 					if (e.KeyEvent.Key == Key.Esc) {
 						OnReportClosed ();
 					}
 				};
 
-				LayoutStarted += (_) => {
+				LayoutStarted += (s,e) => {
 					var btnsWidth = start.Bounds.Width + close.Bounds.Width + 2 - 1;
 					var shiftLeft = Math.Max ((Bounds.Width - btnsWidth) / 2 - 2, 0);
 

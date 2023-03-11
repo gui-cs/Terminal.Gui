@@ -118,7 +118,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			Win.KeyUp += (m) => {
+			Win.KeyUp += (s, m) => {
 				foreach (var v in txts) {
 					v.Text = editText.Text;
 				}

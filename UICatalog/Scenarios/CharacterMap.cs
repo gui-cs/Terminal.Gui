@@ -157,7 +157,7 @@ namespace UICatalog.Scenarios {
 			ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePointVal / 16 + 1));
 			ShowVerticalScrollIndicator = true;
 			ShowHorizontalScrollIndicator = false;
-			LayoutComplete += (args) => {
+			LayoutComplete += (s, args) => {
 				if (Bounds.Width < RowWidth) {
 					ShowHorizontalScrollIndicator = true;
 				} else {

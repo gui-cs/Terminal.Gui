@@ -424,7 +424,7 @@ namespace UICatalog.Scenarios {
 			return view;
 		}
 
-		void LayoutCompleteHandler (View.LayoutEventArgs args)
+		void LayoutCompleteHandler (object sender, View.LayoutEventArgs args)
 		{
 			UpdateTitle (_curView);
 		}

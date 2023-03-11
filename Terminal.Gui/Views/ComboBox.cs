@@ -299,7 +299,7 @@ namespace Terminal.Gui {
 			this.Add (search, listview);
 
 			// On resize
-			LayoutComplete += (LayoutEventArgs a) => {
+			LayoutComplete += (object sender, LayoutEventArgs a) => {
 				if ((!autoHide && Bounds.Width > 0 && search.Frame.Width != Bounds.Width) ||
 					(autoHide && Bounds.Width > 0 && search.Frame.Width != Bounds.Width - 1)) {
 					search.Width = listview.Width = autoHide ? Bounds.Width - 1 : Bounds.Width;

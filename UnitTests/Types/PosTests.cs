@@ -875,7 +875,7 @@ namespace Terminal.Gui.TypeTests {
 			var field = new TextField () { X = 0, Y = 0, Width = 20 };
 			var count = 0;
 
-			field.KeyDown += (k) => {
+			field.KeyDown += (s, k) => {
 				if (k.KeyEvent.Key == Key.Enter) {
 					field.Text = $"Label {count}";
 					var label = new Label (field.Text) { X = 0, Y = field.Y, Width = 20 };
@@ -936,7 +936,7 @@ namespace Terminal.Gui.TypeTests {
 				Assert.Equal ($"Absolute({i + 1})", field.Y.ToString ());
 			}
 
-			field.KeyDown += (k) => {
+			field.KeyDown += (s, k) => {
 				if (k.KeyEvent.Key == Key.Enter) {
 					Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
 					view.Remove (listLabels [count - 1]);

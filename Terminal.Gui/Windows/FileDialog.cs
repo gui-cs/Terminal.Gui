@@ -745,7 +745,7 @@ namespace Terminal.Gui {
 			// On success, we will set this to false.
 			canceled = true;
 
-			KeyPress += (e) => {
+			KeyPress += (s, e) => {
 				if (e.KeyEvent.Key == Key.Esc) {
 					Cancel ();
 					e.Handled = true;
