@@ -47,7 +47,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Event arguments for the <see cref="CollectionNavigator.SearchStringChanged"/> event.
 		/// </summary>
-		public class KeystrokeNavigatorEventArgs {
+		public class KeystrokeNavigatorEventArgs : EventArgs{
 			/// <summary>
 			/// he current <see cref="SearchString"/>.
 			/// </summary>
@@ -66,7 +66,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// This event is invoked when <see cref="SearchString"/>  changes. Useful for debugging.
 		/// </summary>
-		public event Action<KeystrokeNavigatorEventArgs> SearchStringChanged;
+		public event EventHandler<KeystrokeNavigatorEventArgs> SearchStringChanged;
 
 		private string _searchString = "";
 		/// <summary>
@@ -87,7 +87,7 @@ namespace Terminal.Gui {
 		/// <param name="e"></param>
 		public virtual void OnSearchStringChanged (KeystrokeNavigatorEventArgs e)
 		{
-			SearchStringChanged?.Invoke (e);
+			SearchStringChanged?.Invoke (this, e);
 		}
 
 		/// <summary>
