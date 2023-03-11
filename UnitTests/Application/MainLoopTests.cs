@@ -264,6 +264,35 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.False (ml.RemoveTimeout (token));
 		}
 
+		// Timeout Handler Tests
+		[Fact]
+		public void AddTimer_EventFired ()
+		{
+			var ml = new MainLoop (new FakeMainLoop ());
+			var ms = 100;
+			
+			var originTicks = DateTime.UtcNow.Ticks;
+
+			var callbackCount = 0;
+			Func<MainLoop, bool> callback = (loop) => {
+				callbackCount++;
+				return true;
+			};
+
+			object sender = null;
+			TimeoutEventArgs args = null;
+			ml.TimeoutAdded += (s, e) => {
+				sender = s;
+				args = e;
+			};
+
+			var token = ml.AddTimeout (TimeSpan.FromMilliseconds (ms), callback);
+
+			Assert.Same (ml,sender);
+			Assert.NotNull (args.Timeout);
+			Assert.True (args.Ticks - originTicks >= 100 * TimeSpan.TicksPerMillisecond);
+
+		}
 		[Fact]
 		public void AddTimer_Run_Called ()
 		{
