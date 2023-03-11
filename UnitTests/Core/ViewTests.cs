@@ -1204,9 +1204,9 @@ namespace Terminal.Gui.CoreTests {
 			view.FocusDirection = View.Direction.Backward;
 			Assert.Equal (View.Direction.Backward, view.FocusDirection);
 			Assert.Empty (view.InternalSubviews);
-			Assert.Equal (new Rect (new Point (0, 0), rect.Size), view.NeedDisplay);
+			Assert.Equal (new Rect (new Point (0, 0), rect.Size), view._needsDisplay);
 			Assert.True (view.LayoutNeeded);
-			Assert.False (view.ChildNeedsDisplay);
+			Assert.False (view._childNeedsDisplay);
 			Assert.False (view.addingView);
 			view.addingView = true;
 			Assert.True (view.addingView);
@@ -2572,7 +2572,7 @@ At 0,0
 			Assert.Equal (LayoutStyle.Computed, view.LayoutStyle);
 			view.LayoutStyle = LayoutStyle.Absolute;
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (0, 0, 10, 1), view.NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplay);
 			top.Redraw (top.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0     
@@ -2607,7 +2607,7 @@ At 0,0
 			view.Height = 1;
 			Assert.Equal (new Rect (1, 1, 10, 1), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (0, 0, 30, 2), view.NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 30, 2), view._needsDisplay);
 			top.Redraw (top.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0     
@@ -2641,7 +2641,7 @@ At 0,0
 			Assert.Equal (LayoutStyle.Computed, view.LayoutStyle);
 			view.LayoutStyle = LayoutStyle.Absolute;
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (0, 0, 10, 1), view.NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplay);
 			view.Redraw (view.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
@@ -2678,7 +2678,7 @@ At 0,0
 			view.Height = 1;
 			Assert.Equal (new Rect (1, 1, 10, 1), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (0, 0, 30, 2), view.NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 30, 2), view._needsDisplay);
 			view.Redraw (view.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
@@ -2713,7 +2713,7 @@ At 0,0
 			Assert.Equal (LayoutStyle.Computed, view.LayoutStyle);
 			view.LayoutStyle = LayoutStyle.Absolute;
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (0, 0, 10, 1), view.NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplay);
 			top.Redraw (top.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0       
@@ -2750,7 +2750,7 @@ At 0,0
 			view.Height = 1;
 			Assert.Equal (new Rect (3, 3, 10, 1), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (0, 0, 30, 2), view.NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 30, 2), view._needsDisplay);
 			top.Redraw (top.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0       
@@ -2783,7 +2783,7 @@ At 0,0
 
 			view.Frame = new Rect (3, 3, 10, 1);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (0, 0, 10, 1), view.NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplay);
 			view.Redraw (view.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
@@ -2820,7 +2820,7 @@ At 0,0
 			view.Height = 1;
 			Assert.Equal (new Rect (3, 3, 10, 1), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (0, 0, 30, 2), view.NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 30, 2), view._needsDisplay);
 			view.Redraw (view.Bounds);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
@@ -2895,37 +2895,37 @@ At 0,0
 			Assert.Equal (new Rect (0, 0, 30, 1), label.Frame);
 			Assert.Equal (new Rect (0, 0, 13, 1), button.Frame);
 
-			Assert.Equal (new Rect (0, 0, 80, 25), top.NeedDisplay);
-			Assert.Equal (new Rect (0, 0, 40, 8), frame.NeedDisplay);
-			Assert.Equal (Rect.Empty, frame.Subviews [0].NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 80, 25), top._needsDisplay);
+			Assert.Equal (new Rect (0, 0, 40, 8), frame._needsDisplay);
+			Assert.Equal (Rect.Empty, frame.Subviews [0]._needsDisplay);
 			Assert.Equal (new Rect (0, 0, 40, 8), new Rect (
-				frame.NeedDisplay.Left, frame.NeedDisplay.Top,
-				frame.NeedDisplay.Right, frame.NeedDisplay.Bottom));
-			Assert.Equal (new Rect (0, 0, 30, 1), label.NeedDisplay);
-			Assert.Equal (new Rect (0, 0, 13, 1), button.NeedDisplay);
+				frame._needsDisplay.Left, frame._needsDisplay.Top,
+				frame._needsDisplay.Right, frame._needsDisplay.Bottom));
+			Assert.Equal (new Rect (0, 0, 30, 1), label._needsDisplay);
+			Assert.Equal (new Rect (0, 0, 13, 1), button._needsDisplay);
 
 			top.LayoutComplete += e => {
-				Assert.Equal (new Rect (0, 0, 80, 25), top.NeedDisplay);
+				Assert.Equal (new Rect (0, 0, 80, 25), top._needsDisplay);
 			};
 
 			frame.LayoutComplete += e => {
-				Assert.Equal (new Rect (0, 0, 40, 8), frame.NeedDisplay);
+				Assert.Equal (new Rect (0, 0, 40, 8), frame._needsDisplay);
 			};
 
 			frame.Subviews [0].LayoutComplete += e => {
 				if (top.IsLoaded) {
-					Assert.Equal (new Rect (0, 0, 38, 6), frame.Subviews [0].NeedDisplay);
+					Assert.Equal (new Rect (0, 0, 38, 6), frame.Subviews [0]._needsDisplay);
 				} else {
-					Assert.Equal (new Rect (0, 0, 38, 6), frame.Subviews [0].NeedDisplay);
+					Assert.Equal (new Rect (0, 0, 38, 6), frame.Subviews [0]._needsDisplay);
 				}
 			};
 
 			label.LayoutComplete += e => {
-				Assert.Equal (new Rect (0, 0, 38, 1), label.NeedDisplay);
+				Assert.Equal (new Rect (0, 0, 38, 1), label._needsDisplay);
 			};
 
 			button.LayoutComplete += e => {
-				Assert.Equal (new Rect (0, 0, 13, 1), button.NeedDisplay);
+				Assert.Equal (new Rect (0, 0, 13, 1), button._needsDisplay);
 			};
 
 			Application.Begin (top);

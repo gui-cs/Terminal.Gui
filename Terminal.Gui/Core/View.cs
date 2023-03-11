@@ -403,8 +403,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		internal Rect NeedDisplay { get; private set; } = Rect.Empty;
-
 		// The frame for the object. Superview relative.
 		Rect frame;
 
@@ -601,7 +599,7 @@ namespace Terminal.Gui {
 				if (Padding == null || BorderFrame == null || Margin == null) {
 					return new Rect (default, Frame.Size);
 				}
-				var frameRelativeBounds = new Rect (default, Padding.Bounds.Size);
+				var frameRelativeBounds = Padding.Thickness.GetInnerRect (Padding.Frame);
 				return frameRelativeBounds;
 			}
 			set {
@@ -944,14 +942,6 @@ namespace Terminal.Gui {
 			HotKeyChanged?.Invoke (obj);
 		}
 
-		/// <summary>
-		/// Sets a flag indicating this view needs to be redisplayed because its state has changed.
-		/// </summary>
-		public void SetNeedsDisplay ()
-		{
-			SetNeedsDisplay (Bounds);
-		}
-
 		internal bool LayoutNeeded { get; private set; } = true;
 
 		internal void SetNeedsLayout ()
@@ -976,22 +966,33 @@ namespace Terminal.Gui {
 			LayoutNeeded = false;
 		}
 
+		// The view-relative region that needs to be redrawn
+		internal Rect _needsDisplay { get; private set; } = Rect.Empty;
+
 		/// <summary>
-		/// Flags the view-relative region on this View as needing to be repainted.
+		/// Sets a flag indicating this view needs to be redisplayed because its state has changed.
 		/// </summary>
-		/// <param name="region">The view-relative region that must be flagged for repaint.</param>
+		public void SetNeedsDisplay ()
+		{
+			SetNeedsDisplay (Bounds);
+		}
+
+		/// <summary>
+		/// Flags the view-relative region on this View as needing to be redrawn.
+		/// </summary>
+		/// <param name="region">The view-relative region that needs to be redrawn.</param>
 		public void SetNeedsDisplay (Rect region)
 		{
-			if (NeedDisplay.IsEmpty)
-				NeedDisplay = region;
+			if (_needsDisplay.IsEmpty)
+				_needsDisplay = region;
 			else {
-				var x = Math.Min (NeedDisplay.X, region.X);
-				var y = Math.Min (NeedDisplay.Y, region.Y);
-				var w = Math.Max (NeedDisplay.Width, region.Width);
-				var h = Math.Max (NeedDisplay.Height, region.Height);
-				NeedDisplay = new Rect (x, y, w, h);
+				var x = Math.Min (_needsDisplay.X, region.X);
+				var y = Math.Min (_needsDisplay.Y, region.Y);
+				var w = Math.Max (_needsDisplay.Width, region.Width);
+				var h = Math.Max (_needsDisplay.Height, region.Height);
+				_needsDisplay = new Rect (x, y, w, h);
 			}
-			_superView?.SetChildNeedsDisplay ();
+			_superView?.SetSubViewNeedsDisplay ();
 
 			if (subviews == null)
 				return;
@@ -1005,16 +1006,28 @@ namespace Terminal.Gui {
 				}
 		}
 
-		internal bool ChildNeedsDisplay { get; private set; }
+		private Rect GetNeedsDisplayRectScreen (Rect containerBounds)
+		{
+			Rect rect = ViewToScreen (_needsDisplay);
+			if (!containerBounds.IsEmpty) {
+				rect.Width = Math.Min (_needsDisplay.Width, containerBounds.Width);
+				rect.Height = Math.Min (_needsDisplay.Height, containerBounds.Height);
+			}
+
+			return rect;
+		}
+
+
+		internal bool _childNeedsDisplay { get; private set; }
 
 		/// <summary>
-		/// Indicates that any child views (in the <see cref="Subviews"/> list) need to be repainted.
+		/// Indicates that any Subviews (in the <see cref="Subviews"/> list) need to be repainted.
 		/// </summary>
-		public void SetChildNeedsDisplay ()
+		public void SetSubViewNeedsDisplay ()
 		{
-			ChildNeedsDisplay = true;
+			_childNeedsDisplay = true;
 			if (_superView != null)
-				_superView.SetChildNeedsDisplay ();
+				_superView.SetSubViewNeedsDisplay ();
 		}
 
 		internal bool addingView;
@@ -1217,6 +1230,9 @@ namespace Terminal.Gui {
 			}
 		}
 
+
+		// BUGBUG: Stupid that this takes screen-relative. We should have a tenet that says 
+		// "View APIs only deal with View-relative coords". 
 		/// <summary>
 		///   Clears the specified region with the current color. 
 		/// </summary>
@@ -1231,49 +1247,6 @@ namespace Terminal.Gui {
 				Driver.Move (regionScreen.X, line);
 				for (var col = 0; col < w; col++)
 					Driver.AddRune (' ');
-			}
-		}
-
-		/// <summary>
-		/// Converts a view-relative (col,row) position to a screen-relative position (col,row). The values are optionally clamped to the screen dimensions.
-		/// </summary>
-		/// <param name="col">View-relative column.</param>
-		/// <param name="row">View-relative row.</param>
-		/// <param name="rcol">Absolute column; screen-relative.</param>
-		/// <param name="rrow">Absolute row; screen-relative.</param>
-		/// <param name="clipped">Whether to clip the result of the ViewToScreen method, if set to <see langword="true"/>, the rcol, rrow values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</param>
-		public virtual void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
-		{
-			// Computes the real row, col relative to the screen.
-			if (Padding == null || BorderFrame == null || Margin == null) {
-				rrow = row + Frame.Y;
-				rcol = col + Frame.X;
-			} else {
-				var inner = Padding.Thickness.GetInnerRect (BorderFrame.Thickness.GetInnerRect (Margin.Thickness.GetInnerRect (Frame)));
-				rrow = row + inner.Y;
-				rcol = col + inner.X;
-			}
-
-			var super = SuperView;
-			while (super != null) {
-				if (!(super.Padding == null || super.BorderFrame == null || super.Margin == null)) {
-					var inner = super.Padding.Thickness.GetInnerRect (super.BorderFrame.Thickness.GetInnerRect (super.Margin.Thickness.GetInnerRect (super.Frame)));
-
-					//rrow += inner.Y - curContainer.frame.Y;
-					//rcol += inner.X - curContainer.frame.X;
-					rrow += super.frame.Y;
-					rcol += super.frame.X;
-				} else {
-					rrow += super.frame.Y;
-					rcol += super.frame.X;
-				}
-				super = super.SuperView;
-			}
-
-			// The following ensures that the cursor is always in the screen boundaries.
-			if (clipped) {
-				rrow = Math.Min (rrow, Driver.Rows - 1);
-				rcol = Math.Min (rcol, Driver.Cols - 1);
 			}
 		}
 
@@ -1294,11 +1267,53 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Converts a view-relative location to a screen-relative location (col,row). The output is optionally clamped to the screen dimensions.
+		/// </summary>
+		/// <param name="col">View-relative column.</param>
+		/// <param name="row">View-relative row.</param>
+		/// <param name="rcol">Absolute column; screen-relative.</param>
+		/// <param name="rrow">Absolute row; screen-relative.</param>
+		/// <param name="clamped">If <see langword="true"/>, <paramref name="rcol"/> and <paramref name="rrow"/> will be clamped to the 
+		/// screen dimensions (they never be negative and will always be less than to <see cref="ConsoleDriver.Cols"/> and
+		/// <see cref="ConsoleDriver.Rows"/>, respectively.</param>
+		public virtual void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clamped = true)
+		{
+			// Computes the real row, col relative to the screen.
+			if (Padding == null || BorderFrame == null || Margin == null) {
+				rrow = row + Frame.Y;
+				rcol = col + Frame.X;
+			} else {
+				var inner = Padding.Thickness.GetInnerRect (BorderFrame.Thickness.GetInnerRect (Margin.Thickness.GetInnerRect (Frame)));
+				rrow = row + inner.Y;
+				rcol = col + inner.X;
+			}
+
+			var super = SuperView;
+			while (super != null) {
+				if (!(super.Padding == null || super.BorderFrame == null || super.Margin == null)) {
+					var inner = super.Padding.Thickness.GetInnerRect (super.BorderFrame.Thickness.GetInnerRect (super.Margin.Thickness.GetInnerRect (super.Frame)));
+					rrow += super.Frame.Y;
+					rcol += super.Frame.X;
+				} else {
+					rrow += super.Frame.Y;
+					rcol += super.Frame.X;
+				}
+				super = super.SuperView;
+			}
+
+			// The following ensures that the cursor is always in the screen boundaries.
+			if (clamped) {
+				rrow = Math.Min (rrow, Driver.Rows - 1);
+				rcol = Math.Min (rcol, Driver.Cols - 1);
+			}
+		}
+
+		/// <summary>
 		/// Converts a region in view-relative coordinates to screen-relative coordinates.
 		/// </summary>
 		internal Rect ViewToScreen (Rect region)
 		{
-			ViewToScreen (region.X, region.Y, out var x, out var y, clipped: false);
+			ViewToScreen (region.X, region.Y, out var x, out var y, clamped: false);
 			return new Rect (x, y, region.Width, region.Height);
 		}
 
@@ -1314,11 +1329,16 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Sets the <see cref="ConsoleDriver"/>'s clip region to the current View's <see cref="Bounds"/>.
+		/// Sets the <see cref="ConsoleDriver"/>'s clip region to <see cref="Bounds"/>.
 		/// </summary>
-		/// <returns>The existing driver's clip region, which can be then re-applied by setting <c><see cref="Driver"/>.Clip</c> (<see cref="ConsoleDriver.Clip"/>).</returns>
+		/// <returns>The current screen-relative clip region, which can be then re-applied by setting <see cref="ConsoleDriver.Clip"/>.</returns>
 		/// <remarks>
+		/// <para>
 		/// <see cref="Bounds"/> is View-relative.
+		/// </para>
+		/// <para>
+		/// If <see cref="ConsoleDriver.Clip"/> and <see cref="Bounds"/> do not intersect, the clip region will be set to <see cref="Rect.Empty"/>.
+		/// </para>
 		/// </remarks>
 		public Rect ClipToBounds ()
 		{
@@ -1328,8 +1348,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Sets the clip region to the specified view-relative region.
 		/// </summary>
-		/// <returns>The previous screen-relative clip region.</returns>
+		/// <returns>The current screen-relative clip region, which can be then re-applied by setting <see cref="ConsoleDriver.Clip"/>.</returns>
 		/// <param name="region">View-relative clip region.</param>
+		/// <remarks>
+		/// If <see cref="ConsoleDriver.Clip"/> and <paramref name="region"/> do not intersect, the clip region will be set to <see cref="Rect.Empty"/>.
+		/// </remarks>
 		public Rect SetClip (Rect region)
 		{
 			var previous = Driver.Clip;
@@ -1337,6 +1360,7 @@ namespace Terminal.Gui {
 			return previous;
 		}
 
+		// TODO: v2 - Deprecate this API - callers should use LineCanvas instead
 		/// <summary>
 		/// Draws a frame in the current view, clipped by the boundary of this view
 		/// </summary>
@@ -1393,10 +1417,10 @@ namespace Terminal.Gui {
 		/// This moves the cursor to the specified column and row in the view.
 		/// </summary>
 		/// <returns>The move.</returns>
-		/// <param name="col">Col.</param>
-		/// <param name="row">Row.</param>
+		/// <param name="col">The column to move to, in view-relative coordinates.</param>
+		/// <param name="row">the row to move to, in view-relative coordinates.</param>
 		/// <param name="clipped">Whether to clip the result of the ViewToScreen method,
-		///  if set to <see langword="true"/>, the col, row values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</param>
+		///  If  <see langword="true"/>, the <paramref name="col"/> and <paramref name="row"/> values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</param>
 		public void Move (int col, int row, bool clipped = true)
 		{
 			if (Driver.Rows == 0) {
@@ -1421,6 +1445,8 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			// BUGBUG: v2 - This needs to support children of Frames too
+
 			if (focused == null && SuperView != null) {
 				SuperView.EnsureFocus ();
 			} else if (focused?.Visible == true && focused?.Enabled == true && focused?.Frame.Width > 0 && focused.Frame.Height > 0) {
@@ -1434,15 +1460,16 @@ namespace Terminal.Gui {
 			}
 		}
 
-		bool hasFocus;
+		// BUGBUG: v2 - Seems weird that this is in View and not Responder.
+		bool _hasFocus;
 
 		/// <inheritdoc/>
-		public override bool HasFocus => hasFocus;
+		public override bool HasFocus => _hasFocus;
 
 		void SetHasFocus (bool value, View view, bool force = false)
 		{
-			if (hasFocus != value || force) {
-				hasFocus = value;
+			if (_hasFocus != value || force) {
+				_hasFocus = value;
 				if (value) {
 					OnEnter (view);
 				} else {
@@ -1590,12 +1617,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Removes the <see cref="SetNeedsDisplay()"/> and the <see cref="ChildNeedsDisplay"/> setting on this view.
+		/// Removes the <see cref="SetNeedsDisplay()"/> and the <see cref="_childNeedsDisplay"/> setting on this view.
 		/// </summary>
 		protected void ClearNeedsDisplay ()
 		{
-			NeedDisplay = Rect.Empty;
-			ChildNeedsDisplay = false;
+			_needsDisplay = Rect.Empty;
+			_childNeedsDisplay = false;
 		}
 
 		// TODO: Make this cancelable
@@ -1605,9 +1632,9 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual bool OnDrawFrames (Rect bounds)
 		{
-			Margin?.Redraw (Frame);
-			BorderFrame?.Redraw (Frame);
-			Padding?.Redraw (Frame);
+			Margin?.Redraw (Margin.Frame);
+			BorderFrame?.Redraw (BorderFrame.Frame);
+			Padding?.Redraw (Padding.Frame);
 
 			//var margin = Margin.Thickness.GetInnerRect (frame);
 			//var padding = BorderFrame.Thickness.GetInnerRect (margin);
@@ -1648,7 +1675,8 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var clipRect = new Rect (Point.Empty, frame.Size);
+			var prevClip = Driver.Clip;
+			Driver.Clip = ViewToScreen (Bounds);
 
 			if (ColorScheme != null) {
 				Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
@@ -1656,28 +1684,33 @@ namespace Terminal.Gui {
 
 			OnDrawFrames (Frame);
 
-			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
-				Rect containerBounds = GetContainerBounds ();
-				if (!containerBounds.IsEmpty) {
-					Clear (GetNeedDisplay (containerBounds));
-					SetChildNeedsDisplay ();
-					// Draw any Text
-					if (TextFormatter != null) {
-						TextFormatter.NeedsFormat = true;
-					}
-					TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
-					    HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
-					    containerBounds);
-				}
-			}
+			// TODO: Implement complete event
+			// OnDrawFramesComplete (Frame)
+			
+			//if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
+			//	Rect containerBounds = GetContainerBounds ();
+			//	if (!containerBounds.IsEmpty) {
+			//		Clear (GetNeedDisplay (containerBounds));
+			//		SetChildNeedsDisplay ();
+			//		// Draw any Text
+			//		if (TextFormatter != null) {
+			//			TextFormatter.NeedsFormat = true;
+			//		}
+			//		TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
+			//		    HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
+			//		    containerBounds);
+			//	}
+			//}
 
 			// Invoke DrawContentEvent
 			OnDrawContent (bounds);
 
+			// Draw subviews
+			// TODO: Implement OnDrawSubviews (cancelable);		
 			if (subviews != null) {
 				foreach (var view in subviews) {
-					if (!view.NeedDisplay.IsEmpty || view.ChildNeedsDisplay || view.LayoutNeeded) {
-						if (view.Frame.IntersectsWith (clipRect) && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
+					if (!view._needsDisplay.IsEmpty || view._childNeedsDisplay || view.LayoutNeeded) {
+						if (view.Frame.IntersectsWith (bounds)) { // && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
 							if (view.LayoutNeeded) {
 								view.LayoutSubviews ();
 							}
@@ -1699,24 +1732,18 @@ namespace Terminal.Gui {
 			// Invoke DrawContentCompleteEvent
 			OnDrawContentComplete (bounds);
 
+			Driver.Clip = prevClip;
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
 		}
 
-		Rect GetNeedDisplay (Rect containerBounds)
-		{
-			Rect rect = ViewToScreen (NeedDisplay);
-			if (!containerBounds.IsEmpty) {
-				rect.Width = Math.Min (NeedDisplay.Width, containerBounds.Width);
-				rect.Height = Math.Min (NeedDisplay.Height, containerBounds.Height);
-			}
-
-			return rect;
-		}
-
+		// Gets the screen relative rectangle describing the larger of our Superview's bounds or the Driver.Cliprect.
 		internal Rect GetContainerBounds ()
 		{
+			// Get the screen-relative rectangle describing our superview's Bounds
 			var containerBounds = SuperView == null ? default : SuperView.ViewToScreen (SuperView.Bounds);
+
+			// Ensure if clip is larger, we grow
 			var driverClip = Driver == null ? Rect.Empty : Driver.Clip;
 			containerBounds.X = Math.Max (containerBounds.X, driverClip.X);
 			containerBounds.Y = Math.Max (containerBounds.Y, driverClip.Y);
@@ -1755,9 +1782,40 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// This method will be called before any subviews added with <see cref="Add(View)"/> have been drawn. 
 		/// </remarks>
-		public virtual void OnDrawContent (Rect viewport)
+		public virtual void OnDrawContent (Rect contentArea)
 		{
-			DrawContent?.Invoke (viewport);
+			// TODO: Make DrawContent a cancelable event
+			// if (!DrawContent?.Invoke(viewport)) {
+			DrawContent?.Invoke (contentArea);
+
+			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
+				Rect containerBounds = GetContainerBounds ();
+				if (!containerBounds.IsEmpty) {
+					Clear (GetNeedsDisplayRectScreen (containerBounds));
+					SetSubViewNeedsDisplay ();
+					// Draw any Text
+					if (TextFormatter != null) {
+						TextFormatter.NeedsFormat = true;
+					}
+					TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
+					    HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
+					    containerBounds);
+				}
+			}
+
+			
+			//if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
+			//	//Rect containerBounds = GetContainerBounds ();
+			//	//Clear (ViewToScreen (GetNeedDisplay (containerBounds)));
+			//	SetChildNeedsDisplay ();
+			//	// Draw any Text
+			//	if (TextFormatter != null) {
+			//		TextFormatter.NeedsFormat = true;
+			//	}
+			//	TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : GetNormalColor (),
+			//	    HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled,
+			//	    contentArea, false);
+			//}
 		}
 
 		/// <summary>
@@ -1796,7 +1854,7 @@ namespace Terminal.Gui {
 			//Console.WriteLine ($"Request to focus {view}");
 			if (!view.CanFocus || !view.Visible || !view.Enabled)
 				return;
-			if (focused?.hasFocus == true && focused == view)
+			if (focused?._hasFocus == true && focused == view)
 				return;
 
 			// Make sure that this view is a subview

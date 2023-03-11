@@ -51,6 +51,13 @@ This covers my thinking on how we will refactor `View` and the classes in the `V
   * *Window* - A View that, by default, has a `Border` and a `Title`. 
     * QUESTION: Why can't this just be a property on `View` (e.g. `View.Border = true`)? Why do we need a `Window` class at all in v2?
 
+
+## Focus
+
+* Focus is a concept that is used to describe which Responder is currently receiving user input.
+* QUESTION: Since `Frame`s are `Views` in v2, the `Frame` is a `Responder` that receives user input. This raises the quesiton of how a user can use the keyboard to navigate between `Frame`s and `View`s within a `Frame` (and the `Frame`'s `Parent`'s subviews).
+
+
 ### View classes to be nuked
 * PanelView (done)
 * FrameView (almost done)

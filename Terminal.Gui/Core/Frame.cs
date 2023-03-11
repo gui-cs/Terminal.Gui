@@ -13,6 +13,9 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class Frame : View {
 
+		// TODO: v2 - If a Frame has focus, navigation keys (e.g Command.NextView) should cycle through SubViews of the Frame
+		// QUESTION: How does a user navigate out of a Frame to another Frame, or back into the Parent's SubViews?
+
 		/// <summary>
 		/// Frames are a special form of <see cref="View"/> that act as adornments; they appear outside of the <see cref="View.Bounds"/>
 		/// enabling borders, menus, etc... 
@@ -42,17 +45,16 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
 		{
-			// Frames are children of a View, not SubViews. Thus ViewToScreen will not work.
+			// Frames are *Children* of a View, not SubViews. Thus View.ViewToScreen will not work.
 			// To get the screen-relative coordinates of a Frame, we need to know who
 			// the Parent is
+			var parentFrame = Parent?.Frame ?? Frame;
+			rrow = row + parentFrame.Y;
+			rcol = col + parentFrame.X;
 
-			// Computes the real row, col relative to the screen.
-			var inner = Parent?.Bounds ?? Bounds;
-			rrow = row - inner.Y;
-			rcol = col - inner.X;
-
-			Parent?.ViewToScreen (rcol, rrow, out rcol, out rrow, clipped);
-
+			// We now have rcol/rrow in coordinates relative to our SuperView. If our SuperView has
+			// a SuperView, keep going...
+			Parent?.SuperView?.SuperView?.ViewToScreen (rcol, rrow, out rcol, out rrow, clipped);
 		}
 
 		/// <summary>
@@ -87,7 +89,7 @@ namespace Terminal.Gui {
 		{
 			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
 				Clear (viewport);
-				SetChildNeedsDisplay ();
+				SetSubViewNeedsDisplay ();
 				// Draw any Text
 				if (TextFormatter != null) {
 					TextFormatter.NeedsFormat = true;

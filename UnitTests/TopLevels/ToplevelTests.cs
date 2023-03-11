@@ -201,7 +201,7 @@ namespace Terminal.Gui.TopLevelTests {
 			Assert.Equal (top, Application.Top);
 
 			// top is Application.Top without menu and status bar.
-			var supView = top.EnsureVisibleBounds (top, 2, 2, out int nx, out int ny, out View mb, out View sb);
+			var supView = top.EnsureVisibleBounds (top, 2, 2, out int nx, out int ny, out MenuBar mb, out StatusBar sb);
 			Assert.Equal (Application.Top, supView);
 			Assert.Equal (0, nx);
 			Assert.Equal (0, ny);
@@ -1056,13 +1056,13 @@ namespace Terminal.Gui.TopLevelTests {
 			Assert.False (top.IsLoaded);
 			Assert.False (subTop.IsLoaded);
 			Assert.Equal (new Rect (0, 0, 20, 10), view.Frame);
-			Assert.Equal (new Rect (0, 0, 20, 10), view.NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 20, 10), view._needsDisplay);
 
 			view.LayoutStarted += view_LayoutStarted;
 
 			void view_LayoutStarted (View.LayoutEventArgs e)
 			{
-				Assert.Equal (new Rect (0, 0, 20, 10), view.NeedDisplay);
+				Assert.Equal (new Rect (0, 0, 20, 10), view._needsDisplay);
 				view.LayoutStarted -= view_LayoutStarted;
 			}
 
@@ -1074,12 +1074,12 @@ namespace Terminal.Gui.TopLevelTests {
 
 			view.Frame = new Rect (1, 3, 10, 5);
 			Assert.Equal (new Rect (1, 3, 10, 5), view.Frame);
-			Assert.Equal (new Rect (0, 0, 10, 5), view.NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 10, 5), view._needsDisplay);
 
 			view.Redraw (view.Bounds);
 			view.Frame = new Rect (1, 3, 10, 5);
 			Assert.Equal (new Rect (1, 3, 10, 5), view.Frame);
-			Assert.Equal (new Rect (0, 0, 10, 5), view.NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 10, 5), view._needsDisplay);
 		}
 	}
 }
