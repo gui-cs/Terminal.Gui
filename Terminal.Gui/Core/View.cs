@@ -129,42 +129,42 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Event fired when the view gets focus.
 		/// </summary>
-		public event Action<FocusEventArgs> Enter;
+		public event EventHandler<FocusEventArgs> Enter;
 
 		/// <summary>
 		/// Event fired when the view looses focus.
 		/// </summary>
-		public event Action<FocusEventArgs> Leave;
+		public event EventHandler<FocusEventArgs> Leave;
 
 		/// <summary>
 		/// Event fired when the view receives the mouse event for the first time.
 		/// </summary>
-		public event Action<MouseEventArgs> MouseEnter;
+		public event EventHandler<MouseEventArgs> MouseEnter;
 
 		/// <summary>
 		/// Event fired when the view receives a mouse event for the last time.
 		/// </summary>
-		public event Action<MouseEventArgs> MouseLeave;
+		public event EventHandler<MouseEventArgs> MouseLeave;
 
 		/// <summary>
 		/// Event fired when a mouse event is generated.
 		/// </summary>
-		public event Action<MouseEventArgs> MouseClick;
+		public event EventHandler<MouseEventArgs> MouseClick;
 
 		/// <summary>
 		/// Event fired when the <see cref="CanFocus"/> value is being changed.
 		/// </summary>
-		public event Action CanFocusChanged;
+		public event EventHandler CanFocusChanged;
 
 		/// <summary>
 		/// Event fired when the <see cref="Enabled"/> value is being changed.
 		/// </summary>
-		public event Action EnabledChanged;
+		public event EventHandler EnabledChanged;
 
 		/// <summary>
 		/// Event fired when the <see cref="Visible"/> value is being changed.
 		/// </summary>
-		public event Action VisibleChanged;
+		public event EventHandler VisibleChanged;
 
 		/// <summary>
 		/// Event invoked when the <see cref="HotKey"/> is changed.
@@ -1382,7 +1382,7 @@ namespace Terminal.Gui {
 		public override bool OnEnter (View view)
 		{
 			var args = new FocusEventArgs (view);
-			Enter?.Invoke (args);
+			Enter?.Invoke (this, args);
 			if (args.Handled)
 				return true;
 			if (base.OnEnter (view))
@@ -1395,7 +1395,7 @@ namespace Terminal.Gui {
 		public override bool OnLeave (View view)
 		{
 			var args = new FocusEventArgs (view);
-			Leave?.Invoke (args);
+			Leave?.Invoke (this, args);
 			if (args.Handled)
 				return true;
 			if (base.OnLeave (view))
@@ -2875,7 +2875,7 @@ namespace Terminal.Gui {
 			}
 
 			var args = new MouseEventArgs (mouseEvent);
-			MouseEnter?.Invoke (args);
+			MouseEnter?.Invoke (this, args);
 
 			return args.Handled || base.OnMouseEnter (mouseEvent);
 		}
@@ -2892,7 +2892,7 @@ namespace Terminal.Gui {
 			}
 
 			var args = new MouseEventArgs (mouseEvent);
-			MouseLeave?.Invoke (args);
+			MouseLeave?.Invoke (this, args);
 
 			return args.Handled || base.OnMouseLeave (mouseEvent);
 		}
@@ -2938,18 +2938,18 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			MouseClick?.Invoke (args);
+			MouseClick?.Invoke (this, args);
 			return args.Handled;
 		}
 
 		/// <inheritdoc/>
-		public override void OnCanFocusChanged () => CanFocusChanged?.Invoke ();
+		public override void OnCanFocusChanged () => CanFocusChanged?.Invoke (this, EventArgs.Empty);
 
 		/// <inheritdoc/>
-		public override void OnEnabledChanged () => EnabledChanged?.Invoke ();
+		public override void OnEnabledChanged () => EnabledChanged?.Invoke (this, EventArgs.Empty);
 
 		/// <inheritdoc/>
-		public override void OnVisibleChanged () => VisibleChanged?.Invoke ();
+		public override void OnVisibleChanged () => VisibleChanged?.Invoke (this, EventArgs.Empty);
 
 		/// <inheritdoc/>
 		protected override void Dispose (bool disposing)

@@ -144,7 +144,7 @@ namespace UICatalog.Scenarios {
 				_textView.SetNeedsDisplay ();
 			};
 
-			_scrollBar.VisibleChanged += () => {
+			_scrollBar.VisibleChanged += (s,e) => {
 				if (_scrollBar.Visible && _textView.RightOffset == 0) {
 					_textView.RightOffset = 1;
 				} else if (!_scrollBar.Visible && _textView.RightOffset == 1) {
@@ -152,7 +152,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			_scrollBar.OtherScrollBarView.VisibleChanged += () => {
+			_scrollBar.OtherScrollBarView.VisibleChanged += (s,e) => {
 				if (_scrollBar.OtherScrollBarView.Visible && _textView.BottomOffset == 0) {
 					_textView.BottomOffset = 1;
 				} else if (!_scrollBar.OtherScrollBarView.Visible && _textView.BottomOffset == 1) {
@@ -787,7 +787,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (label),
 				Width = 20
 			};
-			txtToFind.Enter += (_) => txtToFind.Text = _textToFind;
+			txtToFind.Enter += (s, e) => txtToFind.Text = _textToFind;
 			d.Add (txtToFind);
 
 			var btnFindNext = new Button ("Find _Next") {
@@ -879,7 +879,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (label),
 				Width = 20
 			};
-			txtToFind.Enter += (_) => txtToFind.Text = _textToFind;
+			txtToFind.Enter += (s, e) => txtToFind.Text = _textToFind;
 			d.Add (txtToFind);
 
 			var btnFindNext = new Button ("Replace _Next") {

@@ -245,7 +245,7 @@ namespace UICatalog.Scenarios {
 						someText.SetNeedsDisplay ();
 					};
 
-					scrollBar.VisibleChanged += () => {
+					scrollBar.VisibleChanged += (s, e) => {
 						if (scrollBar.Visible && someText.RightOffset == 0) {
 							someText.RightOffset = 1;
 						} else if (!scrollBar.Visible && someText.RightOffset == 1) {

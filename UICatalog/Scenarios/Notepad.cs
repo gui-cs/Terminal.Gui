@@ -67,7 +67,7 @@ namespace UICatalog.Scenarios {
 			});
 			focusedTabView = tabView;
 			tabView.SelectedTabChanged += TabView_SelectedTabChanged;
-			tabView.Enter += (e) => focusedTabView = tabView;
+			tabView.Enter += (s, e) => focusedTabView = tabView;
 
 			Application.Top.Add (statusBar);
 
@@ -174,7 +174,7 @@ namespace UICatalog.Scenarios {
 
 			tv.TabClicked += TabView_TabClicked;
 			tv.SelectedTabChanged += TabView_SelectedTabChanged;
-			tv.Enter += (e) => focusedTabView = tv;
+			tv.Enter += (s, e) => focusedTabView = tv;
 			return tv;
 		}
 

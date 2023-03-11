@@ -369,7 +369,7 @@ namespace UICatalog {
 					ScenarioListView.SetFocus ();
 				}
 
-				StatusBar.VisibleChanged += () => {
+				StatusBar.VisibleChanged += (s, e) => {
 					UICatalogApp.ShowStatusBar = StatusBar.Visible;
 
 					var height = (StatusBar.Visible ? 1 : 0);// + (MenuBar.Visible ? 1 : 0);

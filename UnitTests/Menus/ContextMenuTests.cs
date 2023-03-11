@@ -202,7 +202,7 @@ namespace Terminal.Gui.MenuTests {
 
 			var cm = new ContextMenu ();
 
-			lbl.MouseClick += (e) => {
+			lbl.MouseClick += (s, e) => {
 				if (e.MouseEvent.Flags == cm.MouseFlags) {
 					lbl.Text = "Replaced";
 					e.Handled = true;

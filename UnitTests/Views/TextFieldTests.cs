@@ -1235,7 +1235,7 @@ namespace Terminal.Gui.ViewTests {
 
 			var tf = new TextField () { Width = 10 };
 			int clickCounter = 0;
-			tf.MouseClick += (m) => { clickCounter++; };
+			tf.MouseClick += (s, m) => { clickCounter++; };
 
 			Application.Top.Add (tf);
 			Application.Begin (Application.Top);

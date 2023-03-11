@@ -109,7 +109,7 @@ namespace UICatalog.Scenarios {
 				Text = txt
 			};
 
-			editText.MouseClick += (m) => {
+			editText.MouseClick += (s, m) => {
 				foreach (var v in txts) {
 					v.Text = editText.Text;
 				}

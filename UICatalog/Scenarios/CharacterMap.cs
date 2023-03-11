@@ -280,7 +280,7 @@ namespace UICatalog.Scenarios {
 		}
 
 		ContextMenu _contextMenu = new ContextMenu ();
-		void Handle_MouseClick (MouseEventArgs args)
+		void Handle_MouseClick (object sender, MouseEventArgs args)
 		{
 			var me = args.MouseEvent;
 			if (me.Flags == MouseFlags.ReportMousePosition || (me.Flags != MouseFlags.Button1Clicked &&

@@ -404,7 +404,7 @@ namespace UICatalog.Scenarios {
 					SetFrameDetails (menuBarItem);
 				};
 
-				_lstMenus.Enter += (_) => {
+				_lstMenus.Enter += (s, e) => {
 					var menuBarItem = DataContext.Menus.Count > 0 ? DataContext.Menus [_lstMenus.SelectedItem].MenuItem : null;
 					SetFrameDetails (menuBarItem);
 				};
@@ -423,7 +423,7 @@ namespace UICatalog.Scenarios {
 					SelectCurrentMenuBarItem ();
 				};
 
-				_lblMenuBar.Enter += (e) => {
+				_lblMenuBar.Enter += (s, e) => {
 					if (_menuBar?.Menus != null) {
 						_currentMenuBarItem = _menuBar.Menus [_currentSelectedMenuBar];
 						SetFrameDetails (_menuBar.Menus [_currentSelectedMenuBar]);

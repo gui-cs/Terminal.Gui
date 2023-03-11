@@ -165,7 +165,7 @@ namespace UICatalog.Scenarios {
 
 				textView.Read ();
 
-				textView.Enter += (a) => {
+				textView.Enter += (s,e) => {
 					_lenStatusItem.Title = $"Len:{textView.Text.Length}";
 				};
 

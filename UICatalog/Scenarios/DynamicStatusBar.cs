@@ -240,7 +240,7 @@ namespace UICatalog.Scenarios {
 					}
 				};
 
-				_lstItems.Enter += (_) => {
+				_lstItems.Enter += (s, e) => {
 					var statusItem = DataContext.Items.Count > 0 ? DataContext.Items [_lstItems.SelectedItem].StatusItem : null;
 					SetFrameDetails (statusItem);
 				};

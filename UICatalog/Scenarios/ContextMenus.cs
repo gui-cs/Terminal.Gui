@@ -65,7 +65,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			Win.MouseClick += (e) => {
+			Win.MouseClick += (s, e) => {
 				if (e.MouseEvent.Flags == contextMenu.MouseFlags) {
 					ShowContextMenu (e.MouseEvent.X, e.MouseEvent.Y);
 					e.Handled = true;

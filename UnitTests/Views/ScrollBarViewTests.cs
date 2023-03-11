@@ -668,7 +668,7 @@ namespace Terminal.Gui.ViewTests {
 				textView.SetNeedsDisplay ();
 			};
 
-			scrollBar.VisibleChanged += () => {
+			scrollBar.VisibleChanged += (s,e) => {
 				if (scrollBar.Visible && textView.RightOffset == 0) {
 					textView.RightOffset = 1;
 				} else if (!scrollBar.Visible && textView.RightOffset == 1) {
@@ -676,7 +676,7 @@ namespace Terminal.Gui.ViewTests {
 				}
 			};
 
-			scrollBar.OtherScrollBarView.VisibleChanged += () => {
+			scrollBar.OtherScrollBarView.VisibleChanged += (s,e) => {
 				if (scrollBar.OtherScrollBarView.Visible && textView.BottomOffset == 0) {
 					textView.BottomOffset = 1;
 				} else if (!scrollBar.OtherScrollBarView.Visible && textView.BottomOffset == 1) {

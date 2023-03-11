@@ -983,8 +983,8 @@ namespace Terminal.Gui.TopLevelTests {
 			var isEnter = false;
 			var isLeave = false;
 			var v = new View ();
-			v.Enter += (_) => isEnter = true;
-			v.Leave += (_) => isLeave = true;
+			v.Enter += (s, _) => isEnter = true;
+			v.Leave += (s, _) => isLeave = true;
 			var top = Application.Top;
 			top.Add (v);
 

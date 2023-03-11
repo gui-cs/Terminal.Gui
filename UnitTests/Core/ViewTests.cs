@@ -2441,15 +2441,15 @@ This is a tes
 			var view1 = new View { CanFocus = true };
 			var subView1 = new View { CanFocus = true };
 			var subView1subView1 = new View { CanFocus = true };
-			view1.Leave += (e) => {
+			view1.Leave += (s,e) => {
 				view1Leave = true;
 			};
-			subView1.Leave += (e) => {
+			subView1.Leave += (s,e) => {
 				subView1.Remove (subView1subView1);
 				subView1Leave = true;
 			};
 			view1.Add (subView1);
-			subView1subView1.Leave += (e) => {
+			subView1subView1.Leave += (s,e) => {
 				// This is never invoked
 				subView1subView1Leave = true;
 			};
