@@ -899,7 +899,7 @@ namespace Terminal.Gui.CoreTests {
 			w.Add (f);
 			t.Add (w);
 
-			t.Ready += () => {
+			t.Ready += (s, e) => {
 				Assert.True (t.CanFocus);
 				Assert.True (w.CanFocus);
 				Assert.True (f.CanFocus);
@@ -943,7 +943,7 @@ namespace Terminal.Gui.CoreTests {
 			w.Add (f);
 			t.Add (w);
 
-			t.Ready += () => {
+			t.Ready += (s, e) => {
 				Assert.True (t.CanFocus);
 				Assert.True (w.CanFocus);
 				Assert.True (f.CanFocus);
@@ -978,7 +978,7 @@ namespace Terminal.Gui.CoreTests {
 			w.Add (f);
 			t.Add (w);
 
-			t.Ready += () => {
+			t.Ready += (s, e) => {
 				Assert.True (t.CanFocus);
 				Assert.True (w.CanFocus);
 				Assert.True (f.CanFocus);
@@ -1012,7 +1012,7 @@ namespace Terminal.Gui.CoreTests {
 
 			Application.Init (new FakeDriver ());
 
-			Application.Top.Ready += () => {
+			Application.Top.Ready += (s, e) => {
 				Assert.Null (Application.Top.Focused);
 			};
 
@@ -1072,10 +1072,10 @@ namespace Terminal.Gui.CoreTests {
 
 			t.Ready += FirstDialogToplevel;
 
-			void FirstDialogToplevel ()
+			void FirstDialogToplevel (object sender, EventArgs args)
 			{
 				var od = new OpenDialog ();
-				od.Ready += SecoundDialogToplevel;
+				od.Ready += SecondDialogToplevel;
 
 				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
 					count1++;
@@ -1096,7 +1096,7 @@ namespace Terminal.Gui.CoreTests {
 				Application.Run (od);
 			}
 
-			void SecoundDialogToplevel ()
+			void SecondDialogToplevel (object sender, EventArgs args)
 			{
 				var d = new Dialog ();
 

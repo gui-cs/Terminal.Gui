@@ -152,7 +152,7 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (ckbEffect3D);
 
-			void Top_Loaded ()
+			void Top_Loaded (object sender, EventArgs args)
 			{
 				frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit) + Dim.Height (messageEdit)
 				+ Dim.Height (numButtonsEdit) + Dim.Height (defaultButtonEdit) + Dim.Height (styleRadioGroup) + 2 + Dim.Height (ckbEffect3D);

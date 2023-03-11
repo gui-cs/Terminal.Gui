@@ -93,7 +93,7 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (_itemsList, _btnActionCancel, _logJob, text, _btnAction, _btnLambda, _btnHandler, _btnSync, _btnMethod, _btnClearData, _btnQuit);
 
-			void Top_Loaded ()
+			void Top_Loaded (object sender, EventArgs args)
 			{
 				_btnActionCancel.SetFocus ();
 				Application.Top.Loaded -= Top_Loaded;

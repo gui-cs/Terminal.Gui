@@ -420,9 +420,9 @@ namespace Terminal.Gui.ApplicationTests {
 			Init ();
 			var top = Application.Top;
 			var count = 0;
-			top.Loaded += () => count++;
-			top.Ready += () => count++;
-			top.Unloaded += () => count++;
+			top.Loaded += (s,e) => count++;
+			top.Ready += (s,e) => count++;
+			top.Unloaded += (s,e) => count++;
 			Application.Iteration = () => Application.RequestStop ();
 			Application.Run ();
 			Application.Shutdown ();
@@ -473,23 +473,23 @@ namespace Terminal.Gui.ApplicationTests {
 			// t1, t2, t3, d, t4
 			var iterations = 5;
 
-			t1.Ready += () => {
+			t1.Ready += (s,e) => {
 				Assert.Equal (t1, Application.Top);
 				Application.Run (t2);
 			};
-			t2.Ready += () => {
+			t2.Ready += (s,e) => {
 				Assert.Equal (t2, Application.Top);
 				Application.Run (t3);
 			};
-			t3.Ready += () => {
+			t3.Ready += (s,e) => {
 				Assert.Equal (t3, Application.Top);
 				Application.Run (d);
 			};
-			d.Ready += () => {
+			d.Ready += (s, e) => {
 				Assert.Equal (t3, Application.Top);
 				Application.Run (t4);
 			};
-			t4.Ready += () => {
+			t4.Ready += (s, e) => {
 				Assert.Equal (t4, Application.Top);
 				t4.RequestStop ();
 				d.RequestStop ();

@@ -73,7 +73,7 @@ namespace UICatalog.Scenarios {
 				Win.Add (colorLabel);
 				x += colorLabel.Text.Length + 2;
 			}
-			Application.Top.Ready += () => Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Ready += (s,e) => Application.Top.Redraw (Application.Top.Bounds);
 
 			Label Label;
 			Win.Add (Label = new Label ("A super long _Label that will probably expose a bug in clipping or wrapping of text. Will it?") {
@@ -306,7 +306,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			Application.Top.Ready += () => radioGroup.Refresh ();
+			Application.Top.Ready += (s,e) => radioGroup.Refresh ();
 		}
 	}
 }

@@ -716,7 +716,7 @@ namespace Terminal.Gui.TypeTests {
 			w.Add (v);
 			t.Add (w);
 
-			t.Ready += () => {
+			t.Ready += (s, e) => {
 				Assert.Equal (2, w.X = 2);
 				Assert.Equal (2, w.Y = 2);
 				Assert.Throws<ArgumentException> (() => v.X = 2);
@@ -739,7 +739,7 @@ namespace Terminal.Gui.TypeTests {
 			var w = new Window (new Rect (1, 2, 4, 5), "w");
 			t.Add (w);
 
-			t.Ready += () => {
+			t.Ready += (s, e) => {
 				Assert.Equal (2, w.X = 2);
 				Assert.Equal (2, w.Y = 2);
 			};
@@ -770,7 +770,7 @@ namespace Terminal.Gui.TypeTests {
 			w.Add (v);
 			t.Add (w);
 
-			t.Ready += () => {
+			t.Ready += (s, e) => {
 				v.LayoutStyle = LayoutStyle.Absolute;
 				Assert.Equal (2, v.X = 2);
 				Assert.Equal (2, v.Y = 2);
@@ -812,7 +812,7 @@ namespace Terminal.Gui.TypeTests {
 			f.X = Pos.X (t) + Pos.X (v2) - Pos.X (v1);
 			f.Y = Pos.Y (t) + Pos.Y (v2) - Pos.Y (v1);
 
-			t.Ready += () => {
+			t.Ready += (s, e) => {
 				Assert.Equal (0, t.Frame.X);
 				Assert.Equal (0, t.Frame.Y);
 				Assert.Equal (2, w.Frame.X);

@@ -133,7 +133,7 @@ namespace UICatalog.Scenarios {
 
 			Application.Top.Unloaded += Top_Unloaded;
 
-			void Top_Unloaded ()
+			void Top_Unloaded (object sender, EventArgs args)
 			{
 				if (_fractionTimer != null) {
 					_fractionTimer.Dispose ();

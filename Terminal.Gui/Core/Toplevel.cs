@@ -48,7 +48,7 @@ namespace Terminal.Gui {
 		/// A Loaded event handler is a good place to finalize initialization before calling 
 		/// <see cref="Application.RunLoop(Application.RunState, bool)"/>.
 		/// </summary>
-		public event Action Loaded;
+		public event EventHandler Loaded;
 
 		/// <summary>
 		/// Invoked when the Toplevel <see cref="MainLoop"/> has started it's first iteration.
@@ -57,13 +57,13 @@ namespace Terminal.Gui {
 		/// <para>A Ready event handler is a good place to finalize initialization after calling 
 		/// <see cref="Application.Run(Func{Exception, bool})"/> on this Toplevel.</para>
 		/// </summary>
-		public event Action Ready;
+		public event EventHandler Ready;
 
 		/// <summary>
 		/// Invoked when the Toplevel <see cref="Application.RunState"/> has been unloaded.
 		/// A Unloaded event handler is a good place to dispose objects after calling <see cref="Application.End(Application.RunState)"/>.
 		/// </summary>
-		public event Action Unloaded;
+		public event EventHandler Unloaded;
 
 		/// <summary>
 		/// Invoked when the Toplevel <see cref="Application.RunState"/> becomes the <see cref="Application.Current"/> Toplevel.
@@ -85,7 +85,7 @@ namespace Terminal.Gui {
 		/// Invoked when the last child of the Toplevel <see cref="Application.RunState"/> is closed from 
 		/// by <see cref="Application.End(Application.RunState)"/>.
 		/// </summary>
-		public event Action AllChildClosed;
+		public event EventHandler AllChildClosed;
 
 		/// <summary>
 		/// Invoked when the Toplevel's <see cref="Application.RunState"/> is being closed by  
@@ -141,7 +141,7 @@ namespace Terminal.Gui {
 
 		internal virtual void OnAllChildClosed ()
 		{
-			AllChildClosed?.Invoke ();
+			AllChildClosed?.Invoke (this, EventArgs.Empty);
 		}
 
 		internal virtual void OnChildClosed (Toplevel top)
@@ -171,7 +171,7 @@ namespace Terminal.Gui {
 			foreach (Toplevel tl in Subviews.Where (v => v is Toplevel)) {
 				tl.OnLoaded ();
 			}
-			Loaded?.Invoke ();
+			Loaded?.Invoke (this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -183,7 +183,7 @@ namespace Terminal.Gui {
 			foreach (Toplevel tl in Subviews.Where (v => v is Toplevel)) {
 				tl.OnReady ();
 			}
-			Ready?.Invoke ();
+			Ready?.Invoke (this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -194,7 +194,7 @@ namespace Terminal.Gui {
 			foreach (Toplevel tl in Subviews.Where (v => v is Toplevel)) {
 				tl.OnUnloaded ();
 			}
-			Unloaded?.Invoke ();
+			Unloaded?.Invoke (this, EventArgs.Empty);
 		}
 
 		/// <summary>

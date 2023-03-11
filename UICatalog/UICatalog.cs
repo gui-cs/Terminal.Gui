@@ -352,7 +352,7 @@ namespace UICatalog {
 				ConfigurationManager.Applied += ConfigAppliedHandler;
 			}
  
-			void LoadedHandler ()
+			void LoadedHandler (object sender, EventArgs args)
 			{
 				ConfigChanged ();
 
@@ -381,7 +381,7 @@ namespace UICatalog {
 				Loaded -= LoadedHandler;
 			}
 
-			private void UnloadedHandler ()
+			private void UnloadedHandler (object sender, EventArgs args)
 			{
 				ConfigurationManager.Applied -= ConfigAppliedHandler;
 				Unloaded -= UnloadedHandler;

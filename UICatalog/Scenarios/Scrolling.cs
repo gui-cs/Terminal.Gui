@@ -151,7 +151,7 @@ namespace UICatalog.Scenarios {
 			};
 			scrollView.Add (verticalRuler);
 
-			void Top_Loaded ()
+			void Top_Loaded (object sender, EventArgs args)
 			{
 				horizontalRuler.Text = rule.Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)] +
 					"\n" + "|         ".Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)];
@@ -310,7 +310,7 @@ namespace UICatalog.Scenarios {
 			}
 			Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
 
-			void Top_Unloaded ()
+			void Top_Unloaded (object sender, EventArgs args)
 			{
 				pulsing = false;
 				Application.Top.Unloaded -= Top_Unloaded;

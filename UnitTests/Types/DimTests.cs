@@ -268,7 +268,7 @@ namespace Terminal.Gui.TypeTests {
 			w.Add (v);
 			t.Add (w);
 
-			t.Ready += () => {
+			t.Ready += (s, e) => {
 				Assert.Equal (2, w.Width = 2);
 				Assert.Equal (2, w.Height = 2);
 				Assert.Throws<ArgumentException> (() => v.Width = 2);
@@ -298,7 +298,7 @@ namespace Terminal.Gui.TypeTests {
 			var w = new Window (new Rect (1, 2, 4, 5), "w");
 			t.Add (w);
 
-			t.Ready += () => {
+			t.Ready += (s, e) => {
 				Assert.Equal (3, w.Width = 3);
 				Assert.Equal (4, w.Height = 4);
 			};
@@ -328,7 +328,7 @@ namespace Terminal.Gui.TypeTests {
 			w.Add (v);
 			t.Add (w);
 
-			t.Ready += () => {
+			t.Ready += (s, e) => {
 				v.LayoutStyle = LayoutStyle.Absolute;
 				Assert.Equal (2, v.Width = 2);
 				Assert.Equal (2, v.Height = 2);
@@ -419,7 +419,7 @@ namespace Terminal.Gui.TypeTests {
 			w.Add (f1, f2, v1, v2, v3, v4, v5, v6);
 			t.Add (w);
 
-			t.Ready += () => {
+			t.Ready += (s, e) => {
 				Assert.Equal ("Absolute(100)", w.Width.ToString ());
 				Assert.Equal ("Absolute(100)", w.Height.ToString ());
 				Assert.Equal (100, w.Frame.Width);
@@ -565,7 +565,7 @@ namespace Terminal.Gui.TypeTests {
 			f.Width = Dim.Width (t) - Dim.Width (v2);
 			f.Height = Dim.Height (t) - Dim.Height (v2);
 
-			t.Ready += () => {
+			t.Ready += (s, e) => {
 				Assert.Equal (80, t.Frame.Width);
 				Assert.Equal (25, t.Frame.Height);
 				Assert.Equal (78, w.Frame.Width);

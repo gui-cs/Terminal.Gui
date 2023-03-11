@@ -70,7 +70,7 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (titleEdit);
 
-			void Top_Loaded ()
+			void Top_Loaded (object sender, EventArgs args)
 			{
 				frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit) + 2;
 				Application.Top.Loaded -= Top_Loaded;

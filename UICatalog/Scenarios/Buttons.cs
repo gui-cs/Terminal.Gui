@@ -272,7 +272,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			Application.Top.Ready += () => radioGroup.Refresh ();
+			Application.Top.Ready += (s,e) => radioGroup.Refresh ();
 		}
 	}
 }

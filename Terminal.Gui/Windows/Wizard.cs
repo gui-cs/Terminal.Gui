@@ -385,7 +385,7 @@ namespace Terminal.Gui {
 
 		}
 
-		private void Wizard_Loaded ()
+		private void Wizard_Loaded (object sender, EventArgs args)
 		{
 			CurrentStep = GetFirstStep (); // gets the first step if CurrentStep == null
 		}

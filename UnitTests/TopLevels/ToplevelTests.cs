@@ -166,7 +166,7 @@ namespace Terminal.Gui.TopLevelTests {
 			top.Closing += (e) => eventInvoked = "Closing";
 			top.OnClosing (new ToplevelClosingEventArgs (top));
 			Assert.Equal ("Closing", eventInvoked);
-			top.AllChildClosed += () => eventInvoked = "AllChildClosed";
+			top.AllChildClosed += (s, e) => eventInvoked = "AllChildClosed";
 			top.OnAllChildClosed ();
 			Assert.Equal ("AllChildClosed", eventInvoked);
 			top.ChildClosed += (e) => eventInvoked = "ChildClosed";
@@ -178,13 +178,13 @@ namespace Terminal.Gui.TopLevelTests {
 			top.Activate += (e) => eventInvoked = "Activate";
 			top.OnActivate (top);
 			Assert.Equal ("Activate", eventInvoked);
-			top.Loaded += () => eventInvoked = "Loaded";
+			top.Loaded += (s, e) => eventInvoked = "Loaded";
 			top.OnLoaded ();
 			Assert.Equal ("Loaded", eventInvoked);
-			top.Ready += () => eventInvoked = "Ready";
+			top.Ready += (s, e) => eventInvoked = "Ready";
 			top.OnReady ();
 			Assert.Equal ("Ready", eventInvoked);
-			top.Unloaded += () => eventInvoked = "Unloaded";
+			top.Unloaded += (s, e) => eventInvoked = "Unloaded";
 			top.OnUnloaded ();
 			Assert.Equal ("Unloaded", eventInvoked);
 
@@ -355,7 +355,7 @@ namespace Terminal.Gui.TopLevelTests {
 
 			var top = Application.Top;
 			top.Add (win1, win2);
-			top.Loaded += () => isRunning = true;
+			top.Loaded += (s, e) => isRunning = true;
 			top.Closing += (_) => isRunning = false;
 			Application.Begin (top);
 			top.Running = true;
@@ -668,7 +668,7 @@ namespace Terminal.Gui.TopLevelTests {
 		{
 			for (int i = 0; i < 8; i++) {
 				var fd = new FileDialog ();
-				fd.Ready += () => Application.RequestStop ();
+				fd.Ready += (s, e) => Application.RequestStop ();
 				Application.Run (fd);
 			}
 		}

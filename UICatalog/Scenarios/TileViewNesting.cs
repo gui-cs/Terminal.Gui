@@ -83,7 +83,7 @@ namespace UICatalog.Scenarios {
 
 			Application.Top.Add (menu);
 
-			Win.Loaded += () => loaded = true;
+			Win.Loaded += (s,e) => loaded = true;
 		}
 
 		private void SetupTileView ()

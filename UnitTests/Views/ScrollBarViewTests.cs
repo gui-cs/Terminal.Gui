@@ -495,7 +495,7 @@ namespace Terminal.Gui.ViewTests {
 					newScrollBarView.Refresh ();
 				};
 
-				top.Ready += () => {
+				top.Ready += (s, e) => {
 					newScrollBarView.Position = 45;
 					Assert.Equal (newScrollBarView.Position, newScrollBarView.Size - listView.TopItem + (listView.TopItem - listView.Bounds.Height));
 					Assert.Equal (newScrollBarView.Position, listView.TopItem);
@@ -570,7 +570,7 @@ namespace Terminal.Gui.ViewTests {
 					newScrollBarView.Refresh ();
 				};
 
-				top.Ready += () => {
+				top.Ready += (s, e) => {
 					newScrollBarView.Position = 100;
 					Assert.Equal (newScrollBarView.Position, newScrollBarView.Size - listView.LeftItem + (listView.LeftItem - listView.Bounds.Width));
 					Assert.Equal (newScrollBarView.Position, listView.LeftItem);
