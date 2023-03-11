@@ -169,7 +169,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Event invoked when the <see cref="HotKey"/> is changed.
 		/// </summary>
-		public event Action<Key> HotKeyChanged;
+		public event EventHandler<KeyChangedEventArgs> HotKeyChanged;
 
 		Key hotKey = Key.Null;
 
@@ -825,9 +825,9 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 		}
 
-		void TextFormatter_HotKeyChanged (Key obj)
+		void TextFormatter_HotKeyChanged (object sender, KeyChangedEventArgs e)
 		{
-			HotKeyChanged?.Invoke (obj);
+			HotKeyChanged?.Invoke (this,e);
 		}
 
 		/// <summary>

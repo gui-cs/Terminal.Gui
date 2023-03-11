@@ -584,5 +584,45 @@ namespace Terminal.Gui.ViewTests {
 
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
+		[Fact, AutoInitShutdown]
+		public void Button_HotKeyChanged_EventFires ()
+		{
+			var btn = new Button ("Yar");
+
+			object sender = null;
+			KeyChangedEventArgs args = null;
+
+			btn.HotKeyChanged += (s, e) =>{
+				sender = s;
+				args = e;
+
+			};
+			
+			btn.HotKey = Key.r;
+			Assert.Same (btn, sender);
+			Assert.Equal (Key.Y, args.OldKey);
+			Assert.Equal (Key.r, args.NewKey);
+
+		}
+		[Fact, AutoInitShutdown]
+		public void Button_HotKeyChanged_EventFires_WithNone ()
+		{
+			var btn = new Button ();
+
+			object sender = null;
+			KeyChangedEventArgs args = null;
+
+			btn.HotKeyChanged += (s, e) => {
+				sender = s;
+				args = e;
+
+			};
+
+			btn.HotKey = Key.r;
+			Assert.Same (btn, sender);
+			Assert.Equal (Key.Null, args.OldKey);
+			Assert.Equal (Key.r, args.NewKey);
+
+		}
 	}
 }
