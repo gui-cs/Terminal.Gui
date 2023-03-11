@@ -21,9 +21,8 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class FileDialog2 : Dialog {
 
-		public FileDialog2Style Style { get; set; } = new FileDialog2Style();
-		public class FileDialog2Style
-		{
+		public FileDialog2Style Style { get; set; } = new FileDialog2Style ();
+		public class FileDialog2Style {
 			public string FilenameColumnName { get; set; } = Strings.fdFilename;
 			public string SizeColumnName { get; set; } = Strings.fdSize;
 			public string ModifiedColumnName { get; set; } = Strings.fdModified;
@@ -46,8 +45,8 @@ namespace Terminal.Gui {
 		/// This prevents performance issues e.g. when searching
 		/// root of file system for a common letter (e.g. 'e').
 		/// </remarks>
-		[SerializableConfigurationProperty (Scope = typeof(SettingsScope))]
-		public static int MaxSearchResults {get;set;} = 10000;
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+		public static int MaxSearchResults { get; set; } = 10000;
 
 		/// <summary>
 		/// True if the file/folder must exist already to be selected.
@@ -105,6 +104,7 @@ namespace Terminal.Gui {
 
 		private CaptionedTextField tbFind;
 		private SpinnerLabel spinnerLabel;
+		private MenuBar allowedTypeMenuBar;
 		private MenuBarItem allowedTypeMenu;
 		private MenuItem [] allowedTypeMenuItems;
 
@@ -112,7 +112,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="FileDialog2"/> class.
 		/// </summary>
-		public FileDialog2 () :this ("Ok")
+		public FileDialog2 () : this ("Ok")
 		{
 
 		}
@@ -122,12 +122,12 @@ namespace Terminal.Gui {
 
 			var lblPath = new Label (">");
 			this.btnOk = new Button (okCaption) {
-				Y = Pos.AnchorEnd(1),
-				X = Pos.Function(()=>
+				Y = Pos.AnchorEnd (1),
+				X = Pos.Function (() =>
 					this.Bounds.Width
-					-btnOk.Bounds.Width
+					- btnOk.Bounds.Width
 					// TODO: Fiddle factor, seems the Bounds are wrong for someone
-					-2)
+					- 2)
 			};
 			this.btnOk.Clicked += this.Accept;
 			this.btnOk.KeyPress += (k) => {
@@ -137,13 +137,13 @@ namespace Terminal.Gui {
 
 			this.btnCancel = new Button ("Cancel") {
 				Y = Pos.AnchorEnd (1),
-				X = Pos.Function(()=>
+				X = Pos.Function (() =>
 					this.Bounds.Width
-					-btnOk.Bounds.Width
-					-btnCancel.Bounds.Width
-					-1
+					- btnOk.Bounds.Width
+					- btnCancel.Bounds.Width
+					- 1
 					// TODO: Fiddle factor, seems the Bounds are wrong for someone
-					-2
+					- 2
 					)
 			};
 			this.btnCancel.KeyPress += (k) => {
@@ -350,7 +350,13 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			ClearFeedback();
+			ClearFeedback ();
+
+			if (allowedTypeMenuBar != null &&
+				keyEvent.Key == Key.Tab &&
+				allowedTypeMenuBar.IsMenuOpen) {
+				allowedTypeMenuBar.CloseMenu (false, false, false);
+			}
 
 			return base.ProcessHotKey (keyEvent);
 		}
@@ -493,7 +499,7 @@ namespace Terminal.Gui {
 		/// box. Provide a custom implementation if you want to tailor how matching
 		/// is performed.
 		/// </summary>
-		public ISearchMatcher SearchMatcher {get;set;} = new DefaultSearchMatcher();
+		public ISearchMatcher SearchMatcher { get; set; } = new DefaultSearchMatcher ();
 
 		/// <summary>
 		/// Gets or Sets a value indicating whether to allow selecting 
@@ -584,9 +590,8 @@ namespace Terminal.Gui {
 			    new Attribute (this.ColorScheme.Normal.Foreground, this.ColorScheme.Normal.Background));
 
 			Driver.AddStr (ustring.Make (Enumerable.Repeat (Driver.HDLine, padRight)));
-			
-			if(!string.IsNullOrWhiteSpace(feedback))
-			{
+
+			if (!string.IsNullOrWhiteSpace (feedback)) {
 				var feedbackWidth = feedback.Sum (c => Rune.ColumnWidth (c));
 				var feedbackPadLeft = ((bounds.Width - feedbackWidth) / 2) - 1;
 
@@ -597,20 +602,20 @@ namespace Terminal.Gui {
 				feedbackPadRight = Math.Min (bounds.Width, feedbackPadRight);
 				feedbackPadRight = Math.Max (0, feedbackPadRight);
 
-				Move(0,Bounds.Height/2);
+				Move (0, Bounds.Height / 2);
 
-				Driver.SetAttribute( new Attribute (Color.Red, this.ColorScheme.Normal.Background));
+				Driver.SetAttribute (new Attribute (Color.Red, this.ColorScheme.Normal.Background));
 				Driver.AddStr (new string (' ', feedbackPadLeft));
 				Driver.AddStr (feedback);
-				Driver.AddStr(new string(' ',feedbackPadRight));
-			}			 
+				Driver.AddStr (new string (' ', feedbackPadRight));
+			}
 		}
 
 		/// <inheritdoc/>
 		public override void OnLoaded ()
 		{
 			base.OnLoaded ();
-			if(loaded) {
+			if (loaded) {
 				return;
 			}
 			loaded = true;
@@ -634,14 +639,14 @@ namespace Terminal.Gui {
 
 				allowedTypeMenu = new MenuBarItem ("<placeholder>",
 					allowedTypeMenuItems = AllowedTypes.Select (
-						(a,i) => new MenuItem (a.ToString (), null, () => {
+						(a, i) => new MenuItem (a.ToString (), null, () => {
 							AllowedTypeMenuClicked (i);
 						}))
 					.ToArray ());
 
-				var dropdownMenu = new MenuBar (new [] { allowedTypeMenu }){
+				allowedTypeMenuBar = new MenuBar (new [] { allowedTypeMenu }) {
 					// Fiddle factor
-					Width = width-2,
+					Width = width - 2,
 					Y = 1,
 					X = Pos.AnchorEnd (width),
 
@@ -652,7 +657,11 @@ namespace Terminal.Gui {
 				};
 				AllowedTypeMenuClicked (this.AllowedTypesIsStrict ? 0 : 1);
 
-				this.Add (dropdownMenu);
+				allowedTypeMenuBar.Enter += (e) => {
+					allowedTypeMenuBar.OpenMenu (0);
+				};
+
+				this.Add (allowedTypeMenuBar);
 				this.LayoutSubviews ();
 			}
 
@@ -684,7 +693,7 @@ namespace Terminal.Gui {
 
 		private void AllowedTypeMenuClicked (int idx)
 		{
-			
+
 			var allow = AllowedTypes [idx];
 			for (int i = 0; i < AllowedTypes.Count; i++) {
 				allowedTypeMenuItems [i].Checked = i == idx;
@@ -747,7 +756,7 @@ namespace Terminal.Gui {
 		{
 			if (!this.IsCompatibleWithOpenMode (f.FullName, out var reason)) {
 				feedback = reason;
-				SetNeedsDisplay();
+				SetNeedsDisplay ();
 				return;
 			}
 
@@ -765,7 +774,7 @@ namespace Terminal.Gui {
 			if (!this.IsCompatibleWithOpenMode (this.tbPath.Text.ToString (), out string reason)) {
 				if (reason != null) {
 					feedback = reason;
-					SetNeedsDisplay();
+					SetNeedsDisplay ();
 				}
 				return;
 			}
@@ -963,7 +972,7 @@ namespace Terminal.Gui {
 				} else {
 					if (reason != null) {
 						feedback = reason;
-						SetNeedsDisplay();
+						SetNeedsDisplay ();
 					}
 
 					return;
@@ -1323,23 +1332,21 @@ namespace Terminal.Gui {
 		/// Defines whether a given file/directory matches a set of
 		/// search terms.
 		/// </summary>
-		public interface ISearchMatcher
-		{
+		public interface ISearchMatcher {
 			/// <summary>
 			/// Called once for each new search. Defines the string
 			/// the user has provided as search terms.
 			/// </summary>
-			void Initialize(string terms);
+			void Initialize (string terms);
 
 			/// <summary>
 			/// Return true if <paramref name="f"/> is a match to the
 			/// last provided search terms
 			/// </summary>
-			bool IsMatch(FileSystemInfo f);
+			bool IsMatch (FileSystemInfo f);
 		}
 
-		class DefaultSearchMatcher : ISearchMatcher
-		{
+		class DefaultSearchMatcher : ISearchMatcher {
 			string terms;
 
 			public void Initialize (string terms)
@@ -1488,7 +1495,7 @@ namespace Terminal.Gui {
 		/// downwards.
 		/// </summary>
 		internal class SearchState : FileDialogState {
-			
+
 			bool cancel = false;
 			bool finished = false;
 
@@ -1499,7 +1506,7 @@ namespace Terminal.Gui {
 
 			public SearchState (DirectoryInfo dir, FileDialog2 parent, string searchTerms) : base (dir, parent)
 			{
-				parent.SearchMatcher.Initialize(searchTerms);
+				parent.SearchMatcher.Initialize (searchTerms);
 				Children = new FileSystemInfoStats [0];
 				BeginSearch ();
 			}
@@ -1573,14 +1580,13 @@ namespace Terminal.Gui {
 					}
 
 					lock (oLockFound) {
-						if(found.Count >= FileDialog2.MaxSearchResults)
-						{
+						if (found.Count >= FileDialog2.MaxSearchResults) {
 							finished = true;
 							return;
 						}
 					}
 
-					if (Parent.SearchMatcher.IsMatch(f.FileSystemInfo)) {
+					if (Parent.SearchMatcher.IsMatch (f.FileSystemInfo)) {
 						lock (oLockFound) {
 							found.Add (f);
 						}
@@ -1706,7 +1712,7 @@ namespace Terminal.Gui {
 			}
 		}
 		internal class SpinnerLabel : Label {
-			private Rune [] runes = new Rune [] { '|', '/', '\u2500', '\\'};
+			private Rune [] runes = new Rune [] { '|', '/', '\u2500', '\\' };
 			private int currentIdx = 0;
 			private DateTime lastRender = DateTime.MinValue;
 
@@ -2050,7 +2056,7 @@ namespace Terminal.Gui {
 					sortAlgorithm = (v) => v.GetOrderByDefault ();
 					this.currentSortIsAsc = true;
 				} else {
-					sortAlgorithm = (v) => v.GetOrderByValue (dlg,colName);
+					sortAlgorithm = (v) => v.GetOrderByValue (dlg, colName);
 				}
 
 				var ordered =
