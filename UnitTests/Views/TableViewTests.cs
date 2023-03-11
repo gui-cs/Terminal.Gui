@@ -1652,7 +1652,7 @@ namespace Terminal.Gui.ViewTests {
 
 			Assert.Equal(4,tableView.GetAllSelectedCells().Count());
 			tableView.ProcessKey (new KeyEvent { Key = Key.Space });
-			Assert.Equal(1,tableView.GetAllSelectedCells().Count());
+			Assert.Single(tableView.GetAllSelectedCells());
 		}
 
 

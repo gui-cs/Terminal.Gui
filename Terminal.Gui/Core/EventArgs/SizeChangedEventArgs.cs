@@ -1,17 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Terminal.Gui{
+namespace Terminal.Gui {
+
+	/// <summary>
+	/// Args for events about about Size (e.g. Resized)
+	/// </summary>
 	public class SizeChangedEventArgs : EventArgs {
 
+		/// <summary>
+		/// Creates a new instance of the <see cref="SizeChangedEventArgs"/> class.
+		/// </summary>
+		/// <param name="size"></param>
 		public SizeChangedEventArgs (Size size)
 		{
 			Size = size;
 		}
 
+		/// <summary>
+		/// Gets the size the event describes.  This should
+		/// reflect the new/current size after the event
+		/// resolved.
+		/// </summary>
 		public Size Size { get; }
 	}
 }

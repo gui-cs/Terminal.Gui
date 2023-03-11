@@ -20,6 +20,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Key NewKey { get; }
 
+		/// <summary>
+		/// Creates a new instance of the <see cref="KeyChangedEventArgs"/> class
+		/// </summary>
+		/// <param name="oldKey"></param>
+		/// <param name="newKey"></param>
 		public KeyChangedEventArgs (Key oldKey, Key newKey)
 		{
 			this.OldKey = oldKey;

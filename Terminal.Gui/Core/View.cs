@@ -1370,7 +1370,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Method invoked when a subview is being removed from this view.
 		/// </summary>
-		/// <param name="view">The subview being removed.</param>
+		/// <param name="e">Event args describing the subview being removed.</param>
 		public virtual void OnRemoved (ViewEventArgs e)
 		{
 			var view = e.View;
