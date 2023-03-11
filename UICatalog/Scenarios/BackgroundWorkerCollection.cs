@@ -63,7 +63,7 @@ namespace UICatalog.Scenarios {
 				};
 			}
 
-			private void MdiMain_Closed (Toplevel obj)
+			private void MdiMain_Closed (object sender, ToplevelEventArgs e)
 			{
 				workerApp.Dispose ();
 				Dispose ();
@@ -82,14 +82,14 @@ namespace UICatalog.Scenarios {
 				}
 			}
 
-			private void MdiMain_Deactivate (Toplevel top)
+			private void MdiMain_Deactivate (object sender, ToplevelEventArgs top)
 			{
-				workerApp.WriteLog ($"{top.Data} deactivate.");
+				workerApp.WriteLog ($"{top.Toplevel.Data} deactivate.");
 			}
 
-			private void MdiMain_Activate (Toplevel top)
+			private void MdiMain_Activate (object sender, ToplevelEventArgs top)
 			{
-				workerApp.WriteLog ($"{top.Data} activate.");
+				workerApp.WriteLog ($"{top.Toplevel.Data} activate.");
 			}
 
 			private MenuBarItem View ()

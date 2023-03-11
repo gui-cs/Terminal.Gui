@@ -196,7 +196,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			Application.Top.Closed += (_) => Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
+			Application.Top.Closed += (s,e) => Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
 		}
 
 		private void DisposeWinDialog ()

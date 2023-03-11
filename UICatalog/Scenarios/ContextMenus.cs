@@ -81,7 +81,7 @@ namespace UICatalog.Scenarios {
 
 			Win.WantMousePositionReports = true;
 
-			Application.Top.Closed += (_) => {
+			Application.Top.Closed += (s,e) => {
 				Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
 				Application.RootMouseEvent -= Application_RootMouseEvent;
 			};

@@ -68,18 +68,18 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when the Toplevel <see cref="Application.RunState"/> becomes the <see cref="Application.Current"/> Toplevel.
 		/// </summary>
-		public event Action<Toplevel> Activate;
+		public event EventHandler<ToplevelEventArgs> Activate;
 
 		/// <summary>
 		/// Invoked when the Toplevel<see cref="Application.RunState"/> ceases to be the <see cref="Application.Current"/> Toplevel.
 		/// </summary>
-		public event Action<Toplevel> Deactivate;
+		public event EventHandler<ToplevelEventArgs> Deactivate;
 
 		/// <summary>
 		/// Invoked when a child of the Toplevel <see cref="Application.RunState"/> is closed by  
 		/// <see cref="Application.End(Application.RunState)"/>.
 		/// </summary>
-		public event Action<Toplevel> ChildClosed;
+		public event EventHandler<ToplevelEventArgs> ChildClosed;
 
 		/// <summary>
 		/// Invoked when the last child of the Toplevel <see cref="Application.RunState"/> is closed from 
@@ -96,17 +96,17 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when the Toplevel's <see cref="Application.RunState"/> is closed by <see cref="Application.End(Application.RunState)"/>.
 		/// </summary>
-		public event Action<Toplevel> Closed;
+		public event EventHandler<ToplevelEventArgs> Closed;
 
 		/// <summary>
 		/// Invoked when a child Toplevel's <see cref="Application.RunState"/> has been loaded.
 		/// </summary>
-		public event Action<Toplevel> ChildLoaded;
+		public event EventHandler<ToplevelEventArgs> ChildLoaded;
 
 		/// <summary>
 		/// Invoked when a cjhild Toplevel's <see cref="Application.RunState"/> has been unloaded.
 		/// </summary>
-		public event Action<Toplevel> ChildUnloaded;
+		public event EventHandler<ToplevelEventArgs> ChildUnloaded;
 
 		/// <summary>
 		/// Invoked when the terminal has been resized. The new <see cref="Size"/> of the terminal is provided.
@@ -120,17 +120,17 @@ namespace Terminal.Gui {
 
 		internal virtual void OnChildUnloaded (Toplevel top)
 		{
-			ChildUnloaded?.Invoke (top);
+			ChildUnloaded?.Invoke (this, new ToplevelEventArgs(top));
 		}
 
 		internal virtual void OnChildLoaded (Toplevel top)
 		{
-			ChildLoaded?.Invoke (top);
+			ChildLoaded?.Invoke (this, new ToplevelEventArgs (top));
 		}
 
 		internal virtual void OnClosed (Toplevel top)
 		{
-			Closed?.Invoke (top);
+			Closed?.Invoke (this, new ToplevelEventArgs (top));
 		}
 
 		internal virtual bool OnClosing (ToplevelClosingEventArgs ev)
@@ -149,17 +149,17 @@ namespace Terminal.Gui {
 			if (IsMdiContainer) {
 				SetChildNeedsDisplay ();
 			}
-			ChildClosed?.Invoke (top);
+			ChildClosed?.Invoke (this, new ToplevelEventArgs (top));
 		}
 
 		internal virtual void OnDeactivate (Toplevel activated)
 		{
-			Deactivate?.Invoke (activated);
+			Deactivate?.Invoke (this, new ToplevelEventArgs (activated));
 		}
 
 		internal virtual void OnActivate (Toplevel deactivated)
 		{
-			Activate?.Invoke (deactivated);
+			Activate?.Invoke (this, new ToplevelEventArgs(deactivated));
 		}
 
 		/// <summary>

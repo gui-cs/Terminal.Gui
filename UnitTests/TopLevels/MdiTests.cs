@@ -91,7 +91,7 @@ namespace Terminal.Gui.TopLevelTests {
 				Assert.True (Application.Current == d);
 			};
 
-			d.Closed += (e) => Application.RequestStop (top1);
+			d.Closed += (s,e) => Application.RequestStop (top1);
 
 			Application.Iteration += () => {
 				Assert.Null (Application.MdiChildes);
@@ -155,7 +155,7 @@ else 					Assert.True (Application.Current == top1);
 			};
 
 			// Now this will close the MdiContainer propagating through the MdiChildes.
-			d.Closed += (e) => {
+			d.Closed += (s,e) => {
 				mdi.RequestStop ();
 			};
 
@@ -215,7 +215,7 @@ else 					Assert.True (Application.Current == top1);
 			};
 
 			// Now this will close the MdiContainer propagating through the MdiChildes.
-			d.Closed += (e) => Application.RequestStop (mdi);
+			d.Closed += (s,e) => Application.RequestStop (mdi);
 
 			Application.Iteration += () => {
 				if (iterations == 4) {
@@ -273,7 +273,7 @@ else 					Assert.True (Application.Current == top1);
 			};
 
 			// Now this will close the MdiContainer propagating through the MdiChildes.
-			d.Closed += (e) => Application.RequestStop (mdi);
+			d.Closed += (s, e) => Application.RequestStop (mdi);
 
 			Application.Iteration += () => {
 				if (iterations == 4) {
@@ -361,7 +361,7 @@ else 					Assert.True (Application.Current == top1);
 			};
 
 			// Now this will close the MdiContainer propagating through the MdiChildes.
-			d1.Closed += (e) => {
+			d1.Closed += (s, e) => {
 				Assert.True (Application.Current == d1);
 				Assert.False (Application.Current.Running);
 				mdi.RequestStop ();
@@ -434,7 +434,7 @@ else 					Assert.True (Application.Current == top1);
 			};
 
 			// Now this will close the MdiContainer propagating through the MdiChildes.
-			d1.Closed += (e) => {
+			d1.Closed += (s, e) => {
 				mdi.RequestStop ();
 			};
 
@@ -489,7 +489,7 @@ else 					Assert.True (Application.Current == top1);
 				c1.RequestStop ();
 			};
 			// Now this will close the MdiContainer propagating through the MdiChildes.
-			c1.Closed += (e) => {
+			c1.Closed += (s, e) => {
 				mdi.RequestStop ();
 			};
 			Application.Iteration += () => {
@@ -570,7 +570,7 @@ else 					Assert.True (Application.Current == top1);
 						stage.RequestStop ();
 					};
 
-					stage.Closed += (_) => {
+					stage.Closed += (_, _) => {
 						if (iterations == 11) 							allStageClosed = true;
 						Assert.Equal (iterations, Application.MdiChildes.Count);
 						if (running) {

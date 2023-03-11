@@ -226,7 +226,7 @@ namespace UICatalog.Scenarios {
 						}
 						dialog.LayoutSubviews ();
 					};
-					dialog.Closed += (args) => {
+					dialog.Closed += (s,e) => {
 						buttonPressedLabel.Text = $"{clicked}";
 					};
 					dialog.Add (addChar);

@@ -497,7 +497,7 @@ namespace Terminal.Gui.ApplicationTests {
 				t2.RequestStop ();
 			};
 			// Now this will close the MdiContainer when all MdiChildes was closed
-			t2.Closed += (_) => {
+			t2.Closed += (s,_) => {
 				t1.RequestStop ();
 			};
 			Application.Iteration += () => {

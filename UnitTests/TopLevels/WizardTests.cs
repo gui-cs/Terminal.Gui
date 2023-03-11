@@ -523,7 +523,7 @@ namespace Terminal.Gui.TopLevelTests {
 			};
 
 			var closedFired = false;
-			wizard.Closed += (args) => {
+			wizard.Closed += (s, e) => {
 				closedFired = true;
 			};
 
@@ -553,7 +553,7 @@ namespace Terminal.Gui.TopLevelTests {
 			};
 
 			closedFired = false;
-			wizard.Closed += (args) => {
+			wizard.Closed += (s,e) => {
 				closedFired = true;
 			};
 
@@ -591,7 +591,7 @@ namespace Terminal.Gui.TopLevelTests {
 			};
 
 			closedFired = false;
-			wizard.Closed += (args) => {
+			wizard.Closed += (s,e) => {
 				closedFired = true;
 			};
 

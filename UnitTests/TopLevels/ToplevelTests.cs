@@ -154,13 +154,13 @@ namespace Terminal.Gui.TopLevelTests {
 
 			var eventInvoked = "";
 
-			top.ChildUnloaded += (e) => eventInvoked = "ChildUnloaded";
+			top.ChildUnloaded += (s,e) => eventInvoked = "ChildUnloaded";
 			top.OnChildUnloaded (top);
 			Assert.Equal ("ChildUnloaded", eventInvoked);
-			top.ChildLoaded += (e) => eventInvoked = "ChildLoaded";
+			top.ChildLoaded += (s,e) => eventInvoked = "ChildLoaded";
 			top.OnChildLoaded (top);
 			Assert.Equal ("ChildLoaded", eventInvoked);
-			top.Closed += (e) => eventInvoked = "Closed";
+			top.Closed += (s, e) => eventInvoked = "Closed";
 			top.OnClosed (top);
 			Assert.Equal ("Closed", eventInvoked);
 			top.Closing += (e) => eventInvoked = "Closing";
@@ -169,13 +169,13 @@ namespace Terminal.Gui.TopLevelTests {
 			top.AllChildClosed += (s, e) => eventInvoked = "AllChildClosed";
 			top.OnAllChildClosed ();
 			Assert.Equal ("AllChildClosed", eventInvoked);
-			top.ChildClosed += (e) => eventInvoked = "ChildClosed";
+			top.ChildClosed += (s,e) => eventInvoked = "ChildClosed";
 			top.OnChildClosed (top);
 			Assert.Equal ("ChildClosed", eventInvoked);
-			top.Deactivate += (e) => eventInvoked = "Deactivate";
+			top.Deactivate += (s,e) => eventInvoked = "Deactivate";
 			top.OnDeactivate (top);
 			Assert.Equal ("Deactivate", eventInvoked);
-			top.Activate += (e) => eventInvoked = "Activate";
+			top.Activate += (s,e) => eventInvoked = "Activate";
 			top.OnActivate (top);
 			Assert.Equal ("Activate", eventInvoked);
 			top.Loaded += (s, e) => eventInvoked = "Loaded";
