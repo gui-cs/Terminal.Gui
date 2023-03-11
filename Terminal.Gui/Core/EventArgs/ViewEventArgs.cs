@@ -4,8 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Terminal.Gui{
-
+namespace Terminal.Gui {
 	/// <summary>
 	/// Args for events that relate to specific <see cref="View"/>
 	/// </summary>

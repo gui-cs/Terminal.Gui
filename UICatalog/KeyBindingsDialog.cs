@@ -60,8 +60,11 @@ namespace UICatalog {
 				foreach (var sub in view.Subviews) {
 					RecordView (sub);
 				}
+				// TODO: BUG: Based on my new understanding of Added event I think this is wrong
+				// (and always was wrong). Parents don't get to be told when new views are added
+				// to them
 
-				view.Added += (s,e)=>RecordView(e.View);
+				view.Added += (s,e)=>RecordView(e.Child);
 			}
 
 			internal static void Initialize ()

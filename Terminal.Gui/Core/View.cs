@@ -117,14 +117,14 @@ namespace Terminal.Gui {
 		ShortcutHelper shortcutHelper;
 
 		/// <summary>
-		/// Event fired when a subview is being added to this view.
+		/// Event fired when this view is added to another.
 		/// </summary>
-		public event EventHandler<ViewEventArgs> Added;
+		public event EventHandler<SuperViewChangedEventArgs> Added;
 
 		/// <summary>
-		/// Event fired when a subview is being removed from this view.
+		/// Event fired when this view is removed from another.
 		/// </summary>
-		public event EventHandler<ViewEventArgs> Removed;
+		public event EventHandler<SuperViewChangedEventArgs> Removed;
 
 		/// <summary>
 		/// Event fired when the view gets focus.
@@ -942,7 +942,7 @@ namespace Terminal.Gui {
 			}
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
-			OnAdded (new ViewEventArgs(view));
+			OnAdded (new SuperViewChangedEventArgs (this,view));
 			if (IsInitialized) {
 				view.BeginInit ();
 				view.EndInit ();
@@ -1002,7 +1002,7 @@ namespace Terminal.Gui {
 				if (v.Frame.IntersectsWith (touched))
 					view.SetNeedsDisplay ();
 			}
-			OnRemoved (new ViewEventArgs(view));
+			OnRemoved (new SuperViewChangedEventArgs (this, view));
 			if (focused == view) {
 				focused = null;
 			}
@@ -1355,9 +1355,9 @@ namespace Terminal.Gui {
 		/// Method invoked when a subview is being added to this view.
 		/// </summary>
 		/// <param name="e">Event where <see cref="ViewEventArgs.View"/> is the subview being added.</param>
-		public virtual void OnAdded (ViewEventArgs e)
+		public virtual void OnAdded (SuperViewChangedEventArgs e)
 		{
-			var view = e.View;
+			var view = e.Child;
 			view.IsAdded = true;
 			view.x ??= view.frame.X;
 			view.y ??= view.frame.Y;
@@ -1371,9 +1371,9 @@ namespace Terminal.Gui {
 		/// Method invoked when a subview is being removed from this view.
 		/// </summary>
 		/// <param name="e">Event args describing the subview being removed.</param>
-		public virtual void OnRemoved (ViewEventArgs e)
+		public virtual void OnRemoved (SuperViewChangedEventArgs e)
 		{
-			var view = e.View;
+			var view = e.Child;
 			view.IsAdded = false;
 			view.Removed?.Invoke (this, e);
 		}
