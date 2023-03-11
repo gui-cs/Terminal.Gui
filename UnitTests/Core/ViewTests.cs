@@ -238,11 +238,11 @@ namespace Terminal.Gui.CoreTests {
 			var v = new View (new Rect (0, 0, 10, 24));
 			var t = new View ();
 
-			v.Added += (View e) => {
-				Assert.True (v.SuperView == e);
+			v.Added += (s,e) => {
+				Assert.True (v.SuperView == e.View);
 			};
 
-			v.Removed += (View e) => {
+			v.Removed += (s, e) => {
 				Assert.True (v.SuperView == null);
 			};
 
@@ -654,21 +654,21 @@ namespace Terminal.Gui.CoreTests {
 
 			int tc = 0, wc = 0, v1c = 0, v2c = 0, sv1c = 0;
 
-			w.Added += (e) => {
-				Assert.Equal (e.Frame.Width, w.Frame.Width);
-				Assert.Equal (e.Frame.Height, w.Frame.Height);
+			w.Added += (s,e) => {
+				Assert.Equal (e.View.Frame.Width, w.Frame.Width);
+				Assert.Equal (e.View.Frame.Height, w.Frame.Height);
 			};
-			v1.Added += (e) => {
-				Assert.Equal (e.Frame.Width, v1.Frame.Width);
-				Assert.Equal (e.Frame.Height, v1.Frame.Height);
+			v1.Added += (s, e) => {
+				Assert.Equal (e.View.Frame.Width, v1.Frame.Width);
+				Assert.Equal (e.View.Frame.Height, v1.Frame.Height);
 			};
-			v2.Added += (e) => {
-				Assert.Equal (e.Frame.Width, v2.Frame.Width);
-				Assert.Equal (e.Frame.Height, v2.Frame.Height);
+			v2.Added += (s, e) => {
+				Assert.Equal (e.View.Frame.Width, v2.Frame.Width);
+				Assert.Equal (e.View.Frame.Height, v2.Frame.Height);
 			};
-			sv1.Added += (e) => {
-				Assert.Equal (e.Frame.Width, sv1.Frame.Width);
-				Assert.Equal (e.Frame.Height, sv1.Frame.Height);
+			sv1.Added += (s, e) => {
+				Assert.Equal (e.View.Frame.Width, sv1.Frame.Width);
+				Assert.Equal (e.View.Frame.Height, sv1.Frame.Height);
 			};
 
 			t.Initialized += (s, e) => {

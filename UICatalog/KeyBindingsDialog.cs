@@ -61,7 +61,7 @@ namespace UICatalog {
 					RecordView (sub);
 				}
 
-				view.Added += RecordView;
+				view.Added += (s,e)=>RecordView(e.View);
 			}
 
 			internal static void Initialize ()

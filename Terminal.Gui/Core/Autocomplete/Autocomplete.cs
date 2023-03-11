@@ -74,7 +74,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void Top_Removed (View obj)
+		private void Top_Removed (object sender, ViewEventArgs e)
 		{
 			Visible = false;
 			ManipulatePopup ();

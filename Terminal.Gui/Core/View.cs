@@ -119,12 +119,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Event fired when a subview is being added to this view.
 		/// </summary>
-		public event Action<View> Added;
+		public event EventHandler<ViewEventArgs> Added;
 
 		/// <summary>
 		/// Event fired when a subview is being removed from this view.
 		/// </summary>
-		public event Action<View> Removed;
+		public event EventHandler<ViewEventArgs> Removed;
 
 		/// <summary>
 		/// Event fired when the view gets focus.
@@ -942,7 +942,7 @@ namespace Terminal.Gui {
 			}
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
-			OnAdded (view);
+			OnAdded (new ViewEventArgs(view));
 			if (IsInitialized) {
 				view.BeginInit ();
 				view.EndInit ();
@@ -1002,7 +1002,7 @@ namespace Terminal.Gui {
 				if (v.Frame.IntersectsWith (touched))
 					view.SetNeedsDisplay ();
 			}
-			OnRemoved (view);
+			OnRemoved (new ViewEventArgs(view));
 			if (focused == view) {
 				focused = null;
 			}
@@ -1354,26 +1354,28 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Method invoked when a subview is being added to this view.
 		/// </summary>
-		/// <param name="view">The subview being added.</param>
-		public virtual void OnAdded (View view)
+		/// <param name="e">Event where <see cref="ViewEventArgs.View"/> is the subview being added.</param>
+		public virtual void OnAdded (ViewEventArgs e)
 		{
+			var view = e.View;
 			view.IsAdded = true;
 			view.x ??= view.frame.X;
 			view.y ??= view.frame.Y;
 			view.width ??= view.frame.Width;
 			view.height ??= view.frame.Height;
 
-			view.Added?.Invoke (this);
+			view.Added?.Invoke (this,e);
 		}
 
 		/// <summary>
 		/// Method invoked when a subview is being removed from this view.
 		/// </summary>
 		/// <param name="view">The subview being removed.</param>
-		public virtual void OnRemoved (View view)
+		public virtual void OnRemoved (ViewEventArgs e)
 		{
+			var view = e.View;
 			view.IsAdded = false;
-			view.Removed?.Invoke (this);
+			view.Removed?.Invoke (this, e);
 		}
 
 		/// <inheritdoc/>

@@ -163,7 +163,7 @@ namespace Terminal.Gui.TopLevelTests {
 			top.Closed += (s, e) => eventInvoked = "Closed";
 			top.OnClosed (top);
 			Assert.Equal ("Closed", eventInvoked);
-			top.Closing += (e) => eventInvoked = "Closing";
+			top.Closing += (s,e) => eventInvoked = "Closing";
 			top.OnClosing (new ToplevelClosingEventArgs (top));
 			Assert.Equal ("Closing", eventInvoked);
 			top.AllChildClosed += (s, e) => eventInvoked = "AllChildClosed";
@@ -356,7 +356,7 @@ namespace Terminal.Gui.TopLevelTests {
 			var top = Application.Top;
 			top.Add (win1, win2);
 			top.Loaded += (s, e) => isRunning = true;
-			top.Closing += (_) => isRunning = false;
+			top.Closing += (s,e) => isRunning = false;
 			Application.Begin (top);
 			top.Running = true;
 
@@ -465,7 +465,7 @@ namespace Terminal.Gui.TopLevelTests {
 			var tf2W2 = new TextField ("Text2 on Win2") { X = Pos.Left (tf1W2), Width = Dim.Fill () };
 			win2.Add (lblTf1W2, tf1W2, lblTvW2, tvW2, lblTf2W2, tf2W2);
 
-			win1.Closing += (_) => isRunning = false;
+			win1.Closing += (s, e) => isRunning = false;
 			Assert.Null (top.Focused);
 			Assert.Equal (top, Application.Current);
 			Assert.True (top.IsCurrentTop);
@@ -587,7 +587,7 @@ namespace Terminal.Gui.TopLevelTests {
 			var view = new View ();
 			view.Added += View_Added;
 
-			void View_Added (View obj)
+			void View_Added (object sender, ViewEventArgs e)
 			{
 				Assert.Throws<NullReferenceException> (() => Application.Top.AlternateForwardKeyChanged += (s,e) => alternateForwardKey = e.OldKey);
 				Assert.Throws<NullReferenceException> (() => Application.Top.AlternateBackwardKeyChanged += (s,e) => alternateBackwardKey = e.OldKey);

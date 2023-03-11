@@ -152,7 +152,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void Container_Closing (ToplevelClosingEventArgs obj)
+		private void Container_Closing (object sender, ToplevelClosingEventArgs obj)
 		{
 			Hide ();
 		}

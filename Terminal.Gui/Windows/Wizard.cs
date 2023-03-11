@@ -392,7 +392,7 @@ namespace Terminal.Gui {
 
 		private bool finishedPressed = false;
 
-		private void Wizard_Closing (ToplevelClosingEventArgs obj)
+		private void Wizard_Closing (object sender, ToplevelClosingEventArgs obj)
 		{
 			if (!finishedPressed) {
 				var args = new WizardButtonEventArgs ();

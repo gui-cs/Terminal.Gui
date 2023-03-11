@@ -91,7 +91,7 @@ namespace Terminal.Gui {
 		/// Invoked when the Toplevel's <see cref="Application.RunState"/> is being closed by  
 		/// <see cref="Application.RequestStop(Toplevel)"/>.
 		/// </summary>
-		public event Action<ToplevelClosingEventArgs> Closing;
+		public event EventHandler<ToplevelClosingEventArgs> Closing;
 
 		/// <summary>
 		/// Invoked when the Toplevel's <see cref="Application.RunState"/> is closed by <see cref="Application.End(Application.RunState)"/>.
@@ -135,7 +135,7 @@ namespace Terminal.Gui {
 
 		internal virtual bool OnClosing (ToplevelClosingEventArgs ev)
 		{
-			Closing?.Invoke (ev);
+			Closing?.Invoke (this, ev);
 			return ev.Cancel;
 		}
 

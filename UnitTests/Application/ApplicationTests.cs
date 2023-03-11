@@ -143,9 +143,9 @@ namespace Terminal.Gui.ApplicationTests {
 			};
 
 			Application.RunState runstate = null;
-			Action<Application.RunState> NewRunStateFn = (rs) => {
-				Assert.NotNull (rs);
-				runstate = rs;
+			EventHandler<RunStateEventArgs> NewRunStateFn = (s, e) => {
+				Assert.NotNull (e.State);
+				runstate = e.State;
 			};
 			Application.NotifyNewRunState += NewRunStateFn;
 
@@ -188,9 +188,9 @@ namespace Terminal.Gui.ApplicationTests {
 			Application.InternalInit (() => topLevel = new TestToplevel (), new FakeDriver ());
 
 			Application.RunState runstate = null;
-			Action<Application.RunState> NewRunStateFn = (rs) => {
-				Assert.NotNull (rs);
-				runstate = rs;
+			EventHandler<RunStateEventArgs> NewRunStateFn = (s, e) => {
+				Assert.NotNull (e.State);
+				runstate = e.State;
 			};
 			Application.NotifyNewRunState += NewRunStateFn;
 
@@ -730,7 +730,7 @@ namespace Terminal.Gui.ApplicationTests {
 			var top = Application.Top;
 			var isQuiting = false;
 
-			top.Closing += (e) => {
+			top.Closing += (s,e) => {
 				isQuiting = true;
 				e.Cancel = true;
 			};

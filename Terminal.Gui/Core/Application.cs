@@ -257,7 +257,7 @@ namespace Terminal.Gui {
 		///	<see cref="Begin(Toplevel)"/> must also subscribe to <see cref="NotifyStopRunState"/>
 		///	and manually dispose of the <see cref="RunState"/> token when the application is done.
 		/// </remarks>
-		public static event Action<RunState> NotifyNewRunState;
+		public static event EventHandler<RunStateEventArgs> NotifyNewRunState;
 
 		/// <summary>
 		/// Notify that a existent <see cref="RunState"/> is stopping (<see cref="End(RunState)"/> was called).
@@ -1029,7 +1029,7 @@ namespace Terminal.Gui {
 				Driver.Refresh ();
 			}
 
-			NotifyNewRunState?.Invoke (rs);
+			NotifyNewRunState?.Invoke (toplevel, new RunStateEventArgs(rs));
 			return rs;
 		}
 

@@ -460,7 +460,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void Parent_Removed (View obj)
+		private void Parent_Removed (object sender, ViewEventArgs e)
 		{
 			BorderBrush = default;
 			Background = default;

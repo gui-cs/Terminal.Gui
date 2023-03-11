@@ -316,7 +316,7 @@ namespace Terminal.Gui {
 				}
 			};
 
-			Added += (View v) => {
+			Added += (s,  e) => {
 
 				// Determine if this view is hosted inside a dialog and is the only control
 				for (View view = this.SuperView; view != null; view = view.SuperView) {

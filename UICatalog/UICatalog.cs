@@ -387,7 +387,7 @@ namespace UICatalog {
 				Unloaded -= UnloadedHandler;
 			}
 			
-			void ConfigAppliedHandler (ConfigurationManagerEventArgs a)
+			void ConfigAppliedHandler (object sender, ConfigurationManagerEventArgs a)
 			{
 				ConfigChanged ();
 			}
