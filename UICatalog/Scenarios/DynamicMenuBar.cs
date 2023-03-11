@@ -789,7 +789,7 @@ namespace UICatalog.Scenarios {
 				};
 				Add (_btnShortcut);
 
-				_ckbIsTopLevel.Toggled += (e) => {
+				_ckbIsTopLevel.Toggled += (s, e) => {
 					if ((_menuItem != null && _menuItem.Parent != null && (bool)_ckbIsTopLevel.Checked) ||
 						_menuItem == null && hasParent && (bool)_ckbIsTopLevel.Checked) {
 						MessageBox.ErrorQuery ("Invalid IsTopLevel", "Only menu bar can have top level menu item!", "Ok");
@@ -814,7 +814,7 @@ namespace UICatalog.Scenarios {
 						_txtAction.Enabled = false;
 					}
 				};
-				_ckbSubMenu.Toggled += (e) => {
+				_ckbSubMenu.Toggled += (s, e) => {
 					if ((bool)_ckbSubMenu.Checked) {
 						_ckbIsTopLevel.Checked = false;
 						_ckbIsTopLevel.SetNeedsDisplay ();
@@ -835,7 +835,7 @@ namespace UICatalog.Scenarios {
 						_txtShortcut.Enabled = _ckbIsTopLevel.Checked == false && _ckbSubMenu.Checked == false;
 					}
 				};
-				_ckbNullCheck.Toggled += (e) => {
+				_ckbNullCheck.Toggled += (s,e) => {
 					if (_menuItem != null) {
 						_menuItem.AllowNullChecked = (bool)_ckbNullCheck.Checked;
 					}

@@ -87,14 +87,14 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (textView),
 				Checked = true
 			};
-			chxMultiline.Toggled += (b) => textView.Multiline = (bool)b;
+			chxMultiline.Toggled += (s,e) => textView.Multiline = (bool)e.OldValue;
 			Win.Add (chxMultiline);
 
 			var chxWordWrap = new CheckBox ("Word Wrap") {
 				X = Pos.Right (chxMultiline) + 2,
 				Y = Pos.Top (chxMultiline)
 			};
-			chxWordWrap.Toggled += (b) => textView.WordWrap = (bool)b;
+			chxWordWrap.Toggled += (s,e) => textView.WordWrap = (bool)e.OldValue;
 			Win.Add (chxWordWrap);
 
 			// TextView captures Tabs (so users can enter /t into text) by default;
@@ -108,15 +108,15 @@ namespace UICatalog.Scenarios {
 
 			Key keyTab = textView.GetKeyFromCommand (Command.Tab);
 			Key keyBackTab = textView.GetKeyFromCommand (Command.BackTab);
-			chxCaptureTabs.Toggled += (b) => {
-				if (b == true) {
+			chxCaptureTabs.Toggled += (s,e) => {
+				if (e.OldValue == true) {
 					textView.AddKeyBinding (keyTab, Command.Tab);
 					textView.AddKeyBinding (keyBackTab, Command.BackTab);
 				} else {
 					textView.ClearKeybinding (keyTab);
 					textView.ClearKeybinding (keyBackTab);
 				}
-				textView.WordWrap = (bool)b;
+				textView.WordWrap = (bool)e.OldValue;
 			};
 			Win.Add (chxCaptureTabs);
 

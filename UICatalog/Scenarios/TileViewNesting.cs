@@ -42,22 +42,22 @@ namespace UICatalog.Scenarios {
 			cbHorizontal = new CheckBox ("Horizontal") {
 				X = Pos.Right (textField) + 1
 			};
-			cbHorizontal.Toggled += (s) => SetupTileView ();
+			cbHorizontal.Toggled += (s, e) => SetupTileView ();
 
 			cbBorder = new CheckBox ("Border") {
 				X = Pos.Right (cbHorizontal) + 1
 			};
-			cbBorder.Toggled += (s) => SetupTileView ();
+			cbBorder.Toggled += (s, e) => SetupTileView ();
 
 			cbTitles = new CheckBox ("Titles") {
 				X = Pos.Right (cbBorder) + 1
 			};
-			cbTitles.Toggled += (s) => SetupTileView ();
+			cbTitles.Toggled += (s,e) => SetupTileView ();
 
 			cbUseLabels = new CheckBox ("Use Labels") {
 				X = Pos.Right (cbTitles) + 1
 			};
-			cbUseLabels.Toggled += (s) => SetupTileView ();
+			cbUseLabels.Toggled += (s, e) => SetupTileView ();
 
 			workArea = new View {
 				X = 0,

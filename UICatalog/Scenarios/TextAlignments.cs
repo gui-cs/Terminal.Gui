@@ -98,10 +98,10 @@ namespace UICatalog.Scenarios {
 				label = multipleLines [(int)alignment];
 			}
 
-			enableHotKeyCheckBox.Toggled += (previous) => {
+			enableHotKeyCheckBox.Toggled += (s,e) => {
 				foreach (var alignment in alignments) {
-					singleLines [(int)alignment].HotKeySpecifier = previous == true ? (Rune)0xffff : (Rune)'_';
-					multipleLines [(int)alignment].HotKeySpecifier = previous == true ? (Rune)0xffff : (Rune)'_';
+					singleLines [(int)alignment].HotKeySpecifier = e.OldValue == true ? (Rune)0xffff : (Rune)'_';
+					multipleLines [(int)alignment].HotKeySpecifier = e.OldValue == true ? (Rune)0xffff : (Rune)'_';
 				}
 				Win.SetNeedsDisplay ();
 				Win.LayoutSubviews ();

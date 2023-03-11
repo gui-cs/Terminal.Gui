@@ -202,7 +202,7 @@ namespace UICatalog.Scenarios {
 					};
 					thirdStep.Add (progLbl, progressBar);
 					thirdStep.Enabled = (bool)thirdStepEnabledCeckBox.Checked;
-					thirdStepEnabledCeckBox.Toggled += (args) => {
+					thirdStepEnabledCeckBox.Toggled += (s, e) => {
 						thirdStep.Enabled = (bool)thirdStepEnabledCeckBox.Checked;
 					};
 
@@ -277,7 +277,7 @@ namespace UICatalog.Scenarios {
 					wizard.AddStep (finalFinalStep);
 					finalFinalStep.HelpText = "This step only shows if it was enabled on the other last step.";
 					finalFinalStep.Enabled = (bool)thirdStepEnabledCeckBox.Checked;
-					finalFinalStepEnabledCeckBox.Toggled += (args) => {
+					finalFinalStepEnabledCeckBox.Toggled += (s, e) => {
 						finalFinalStep.Enabled = (bool)finalFinalStepEnabledCeckBox.Checked;
 					};
 

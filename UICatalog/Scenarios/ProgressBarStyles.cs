@@ -120,8 +120,8 @@ namespace UICatalog.Scenarios {
 				marqueesContinuousPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
 			};
 
-			ckbBidirectional.Toggled += (e) => {
-				ckbBidirectional.Checked = marqueesBlocksPB.BidirectionalMarquee = marqueesContinuousPB.BidirectionalMarquee = (bool)!e;
+			ckbBidirectional.Toggled += (s,e) => {
+				ckbBidirectional.Checked = marqueesBlocksPB.BidirectionalMarquee = marqueesContinuousPB.BidirectionalMarquee = (bool)!e.OldValue;
 			};
 
 			_pulseTimer = new Timer ((_) => {

@@ -837,7 +837,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (txtToFind) + 2,
 				Checked = _matchCase
 			};
-			ckbMatchCase.Toggled += (e) => _matchCase = (bool)ckbMatchCase.Checked;
+			ckbMatchCase.Toggled += (s, e) => _matchCase = (bool)ckbMatchCase.Checked;
 			d.Add (ckbMatchCase);
 
 			var ckbMatchWholeWord = new CheckBox ("Match _whole word") {
@@ -845,7 +845,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (ckbMatchCase) + 1,
 				Checked = _matchWholeWord
 			};
-			ckbMatchWholeWord.Toggled += (e) => _matchWholeWord = (bool)ckbMatchWholeWord.Checked;
+			ckbMatchWholeWord.Toggled += (s, e) => _matchWholeWord = (bool)ckbMatchWholeWord.Checked;
 			d.Add (ckbMatchWholeWord);
 
 			d.Width = label.Width + txtToFind.Width + btnFindNext.Width + 2;
@@ -958,7 +958,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (txtToFind) + 2,
 				Checked = _matchCase
 			};
-			ckbMatchCase.Toggled += (e) => _matchCase = (bool)ckbMatchCase.Checked;
+			ckbMatchCase.Toggled += (s, e) => _matchCase = (bool)ckbMatchCase.Checked;
 			d.Add (ckbMatchCase);
 
 			var ckbMatchWholeWord = new CheckBox ("Match _whole word") {
@@ -966,7 +966,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (ckbMatchCase) + 1,
 				Checked = _matchWholeWord
 			};
-			ckbMatchWholeWord.Toggled += (e) => _matchWholeWord = (bool)ckbMatchWholeWord.Checked;
+			ckbMatchWholeWord.Toggled += (s, e) => _matchWholeWord = (bool)ckbMatchWholeWord.Checked;
 			d.Add (ckbMatchWholeWord);
 
 			d.Width = lblWidth + txtToFind.Width + btnFindNext.Width + 2;
