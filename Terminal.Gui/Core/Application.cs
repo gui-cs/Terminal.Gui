@@ -267,7 +267,7 @@ namespace Terminal.Gui {
 		///	<see cref="Begin(Toplevel)"/> must also subscribe to <see cref="NotifyStopRunState"/>
 		///	and manually dispose of the <see cref="RunState"/> token when the application is done.
 		/// </remarks>
-		public static event Action<Toplevel> NotifyStopRunState;
+		public static event EventHandler<ToplevelEventArgs> NotifyStopRunState;
 
 		/// <summary>
 		///   This event is raised on each iteration of the <see cref="MainLoop"/>. 
@@ -723,12 +723,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Event to be invoked when a view grab the mouse.
 		/// </summary>
-		public static event Action<View> GrabbedMouse;
+		public static event EventHandler<ViewEventArgs> GrabbedMouse;
 
 		/// <summary>
 		/// Event to be invoked when a view ungrab the mouse.
 		/// </summary>
-		public static event Action<View> UnGrabbedMouse;
+		public static event EventHandler<ViewEventArgs> UnGrabbedMouse;
 
 		/// <summary>
 		/// Grabs the mouse, forcing all mouse events to be routed to the specified view until UngrabMouse is called.
@@ -760,14 +760,14 @@ namespace Terminal.Gui {
 		{
 			if (view == null)
 				return;
-			GrabbedMouse?.Invoke (view);
+			GrabbedMouse?.Invoke (view, new ViewEventArgs(view));
 		}
 
 		static void OnUnGrabbedMouse (View view)
 		{
 			if (view == null)
 				return;
-			UnGrabbedMouse?.Invoke (view);
+			UnGrabbedMouse?.Invoke (view, new ViewEventArgs (view));
 		}
 
 		/// <summary>
@@ -1497,7 +1497,7 @@ namespace Terminal.Gui {
 		static void OnNotifyStopRunState (Toplevel top)
 		{
 			if (ExitRunLoopAfterFirstIteration) {
-				NotifyStopRunState?.Invoke (top);
+				NotifyStopRunState?.Invoke (top, new ToplevelEventArgs(top));
 			}
 		}
 

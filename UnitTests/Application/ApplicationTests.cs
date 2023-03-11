@@ -978,27 +978,27 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.Equal (grabView, view2);
 			Assert.Null (Application.MouseGrabView);
 
-			void Application_GrabbedMouse (View obj)
+			void Application_GrabbedMouse (object sender, ViewEventArgs e)
 			{
 				if (count == 0) {
-					Assert.Equal (view1, obj);
+					Assert.Equal (view1, e.View);
 					grabView = view1;
 				} else {
-					Assert.Equal (view2, obj);
+					Assert.Equal (view2, e.View);
 					grabView = view2;
 				}
 
 				Application.GrabbedMouse -= Application_GrabbedMouse;
 			}
 
-			void Application_UnGrabbedMouse (View obj)
+			void Application_UnGrabbedMouse (object sender, ViewEventArgs e)
 			{
 				if (count == 0) {
-					Assert.Equal (view1, obj);
-					Assert.Equal (grabView, obj);
+					Assert.Equal (view1, e.View);
+					Assert.Equal (grabView, e.View);
 				} else {
-					Assert.Equal (view2, obj);
-					Assert.Equal (grabView, obj);
+					Assert.Equal (view2, e.View);
+					Assert.Equal (grabView, e.View);
 				}
 				count++;
 

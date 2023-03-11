@@ -176,14 +176,14 @@ namespace Terminal.Gui.Configuration {
 			internal void OnThemeChanged (string theme)
 			{
 				Debug.WriteLine ($"Themes.OnThemeChanged({theme}) -> {Theme}");
-				ThemeChanged?.Invoke (new ThemeManagerEventArgs (theme));
+				ThemeChanged?.Invoke (this, new ThemeManagerEventArgs (theme));
 			}
 
 			/// <summary>
 			/// Event fired he selected theme has changed.
 			/// application.
 			/// </summary>
-			public event Action<ThemeManagerEventArgs>? ThemeChanged;
+			public event EventHandler<ThemeManagerEventArgs>? ThemeChanged;
 
 			/// <summary>
 			/// Holds the <see cref="ThemeScope"/> definitions. 
