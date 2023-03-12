@@ -235,7 +235,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (moveUnicodeHotKeyBtn);
 
-			radioGroup.SelectedItemChanged += (args) => {
+			radioGroup.SelectedItemChanged += (s, args) => {
 				switch (args.SelectedItem) {
 				case 0:
 					moveBtn.TextAlignment = TextAlignment.Left;

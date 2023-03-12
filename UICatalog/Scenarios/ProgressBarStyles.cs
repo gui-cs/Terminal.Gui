@@ -113,7 +113,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (marqueesContinuousPB);
 
-			rbPBFormat.SelectedItemChanged += (e) => {
+			rbPBFormat.SelectedItemChanged += (s,e) => {
 				blocksPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
 				continuousPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
 				marqueesBlocksPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;

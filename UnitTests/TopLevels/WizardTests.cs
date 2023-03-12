@@ -518,7 +518,7 @@ namespace Terminal.Gui.TopLevelTests {
 			wizard.AddStep (step1);
 
 			var finishedFired = false;
-			wizard.Finished += (args) => {
+			wizard.Finished += (s, args) => {
 				finishedFired = true;
 			};
 
@@ -548,7 +548,7 @@ namespace Terminal.Gui.TopLevelTests {
 			wizard.AddStep (step2);
 
 			finishedFired = false;
-			wizard.Finished += (args) => {
+			wizard.Finished += (s, args) => {
 				finishedFired = true;
 			};
 
@@ -586,7 +586,7 @@ namespace Terminal.Gui.TopLevelTests {
 			step1.Enabled = false;
 
 			finishedFired = false;
-			wizard.Finished += (args) => {
+			wizard.Finished += (s, args) => {
 				finishedFired = true;
 			};
 

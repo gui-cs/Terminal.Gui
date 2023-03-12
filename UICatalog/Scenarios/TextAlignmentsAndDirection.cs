@@ -175,7 +175,7 @@ namespace UICatalog.Scenarios {
 				HotKeySpecifier = '\xffff'
 			};
 
-			directionOptions.SelectedItemChanged += (ev) => {
+			directionOptions.SelectedItemChanged += (s, ev) => {
 				foreach (var v in mtxts) {
 					v.TextDirection = (TextDirection)ev.SelectedItem;
 				}

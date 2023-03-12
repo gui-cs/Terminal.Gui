@@ -38,7 +38,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		///   The passed event arguments containing the old value, new value, and format string.
 		/// </remarks>
-		public event Action<DateTimeEventArgs<DateTime>> DateChanged;
+		public event EventHandler<DateTimeEventArgs<DateTime>> DateChanged;
 
 		/// <summary>
 		///    Initializes a new instance of <see cref="DateField"/> using <see cref="LayoutStyle.Absolute"/> layout.
@@ -418,7 +418,7 @@ namespace Terminal.Gui {
 		/// <param name="args">Event arguments</param>
 		public virtual void OnDateChanged (DateTimeEventArgs<DateTime> args)
 		{
-			DateChanged?.Invoke (args);
+			DateChanged?.Invoke (this,args);
 		}
 	}
 

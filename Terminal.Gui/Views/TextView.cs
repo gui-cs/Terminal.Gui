@@ -1156,7 +1156,7 @@ namespace Terminal.Gui {
 		/// set, not as the user types. To be notified as the user changes the contents of the TextView
 		/// see <see cref="IsDirty"/>.
 		/// </remarks>
-		public event Action TextChanged;
+		public event EventHandler TextChanged;
 
 		/// <summary>
 		///  Raised when the contents of the <see cref="TextView"/> are changed. 
@@ -1165,7 +1165,7 @@ namespace Terminal.Gui {
 		/// Unlike the <see cref="TextChanged"/> event, this event is raised whenever the user types or
 		/// otherwise changes the contents of the <see cref="TextView"/>.
 		/// </remarks>
-		public event Action<ContentsChangedEventArgs> ContentsChanged;
+		public event EventHandler<ContentsChangedEventArgs> ContentsChanged;
 
 		/// <summary>
 		/// Invoked with the unwrapped <see cref="CursorPosition"/>.
@@ -1492,7 +1492,7 @@ namespace Terminal.Gui {
 					wrapManager = new WordWrapManager (model);
 					model = wrapManager.WrapModel (frameWidth, out _, out _, out _, out _);
 				}
-				TextChanged?.Invoke ();
+				TextChanged?.Invoke (this, EventArgs.Empty);
 				SetNeedsDisplay ();
 
 				historyText.Clear (Text);
@@ -2742,7 +2742,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual void OnContentsChanged ()
 		{
-			ContentsChanged?.Invoke (new ContentsChangedEventArgs (CurrentRow, CurrentColumn));
+			ContentsChanged?.Invoke (this, new ContentsChangedEventArgs (CurrentRow, CurrentColumn));
 		}
 
 		(int width, int height) OffSetBackground ()

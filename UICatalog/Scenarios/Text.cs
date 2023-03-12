@@ -26,7 +26,7 @@ namespace UICatalog.Scenarios {
 			};
 			textField.TextChanging += TextField_TextChanging;
 
-			void TextField_TextChanging (TextChangingEventArgs e)
+			void TextField_TextChanging (object sender, TextChangingEventArgs e)
 			{
 				textField.Autocomplete.AllSuggestions = Regex.Matches (e.NewText.ToString (), "\\w+")
 					.Select (s => s.Value)
@@ -75,7 +75,7 @@ namespace UICatalog.Scenarios {
 			// Use ContentChanged to detect if the user has typed something in a TextView.
 			// The TextChanged property is only fired if the TextView.Text property is
 			// explicitly set
-			textView.ContentsChanged += (a) => {
+			textView.ContentsChanged += (s,a) => {
 				labelMirroringTextView.Enabled = !labelMirroringTextView.Enabled;
 				labelMirroringTextView.Text = textView.Text;
 			};
@@ -218,7 +218,7 @@ namespace UICatalog.Scenarios {
 		TimeField _timeField;
 		Label _labelMirroringTimeField;
 
-		private void TimeChanged (DateTimeEventArgs<TimeSpan> e)
+		private void TimeChanged (object sender, DateTimeEventArgs<TimeSpan> e)
 		{
 			_labelMirroringTimeField.Text = _timeField.Text;
 		}

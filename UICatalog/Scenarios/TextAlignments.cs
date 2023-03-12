@@ -40,7 +40,7 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.TopLevel,
 				Text = txt,
 			};
-			edit.TextChanged += () => {
+			edit.TextChanged += (s,e) => {
 				foreach (var alignment in alignments) {
 					singleLines [(int)alignment].Text = edit.Text;
 					multipleLines [(int)alignment].Text = edit.Text;

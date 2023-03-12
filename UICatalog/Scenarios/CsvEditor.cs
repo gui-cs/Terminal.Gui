@@ -114,7 +114,7 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
-		private void OnSelectedCellChanged (TableView.SelectedCellChangedEventArgs e)
+		private void OnSelectedCellChanged (object sender, TableView.SelectedCellChangedEventArgs e)
 		{
 			// only update the text box if the user is not manually editing it
 			if (!selectedCellLabel.HasFocus)
@@ -446,7 +446,7 @@ namespace UICatalog.Scenarios {
 		{
 			var _scrollBar = new ScrollBarView (tableView, true);
 
-			_scrollBar.ChangedPosition += () => {
+			_scrollBar.ChangedPosition += (s,e) => {
 				tableView.RowOffset = _scrollBar.Position;
 				if (tableView.RowOffset != _scrollBar.Position) {
 					_scrollBar.Position = tableView.RowOffset;
@@ -454,7 +454,7 @@ namespace UICatalog.Scenarios {
 				tableView.SetNeedsDisplay ();
 			};
 			/*
-			_scrollBar.OtherScrollBarView.ChangedPosition += () => {
+			_scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
 				_listView.LeftItem = _scrollBar.OtherScrollBarView.Position;
 				if (_listView.LeftItem != _scrollBar.OtherScrollBarView.Position) {
 					_scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
@@ -540,7 +540,7 @@ namespace UICatalog.Scenarios {
 			enteredText = okPressed ? tf.Text.ToString () : null;
 			return okPressed;
 		}
-		private void EditCurrentCell (TableView.CellActivatedEventArgs e)
+		private void EditCurrentCell (object sender, TableView.CellActivatedEventArgs e)
 		{
 			if (e.Table == null)
 				return;

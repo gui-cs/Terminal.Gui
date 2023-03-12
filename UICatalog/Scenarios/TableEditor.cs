@@ -103,7 +103,7 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (selectedCellLabel);
 
-			tableView.SelectedCellChanged += (e) => { selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}"; };
+			tableView.SelectedCellChanged += (s, e) => { selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}"; };
 			tableView.CellActivated += EditCurrentCell;
 			tableView.KeyPress += TableViewKeyPress;
 
@@ -319,7 +319,7 @@ namespace UICatalog.Scenarios {
 		{
 			var _scrollBar = new ScrollBarView (tableView, true);
 
-			_scrollBar.ChangedPosition += () => {
+			_scrollBar.ChangedPosition += (s,e) => {
 				tableView.RowOffset = _scrollBar.Position;
 				if (tableView.RowOffset != _scrollBar.Position) {
 					_scrollBar.Position = tableView.RowOffset;
@@ -327,7 +327,7 @@ namespace UICatalog.Scenarios {
 				tableView.SetNeedsDisplay ();
 			};
 			/*
-			_scrollBar.OtherScrollBarView.ChangedPosition += () => {
+			_scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
 				_listView.LeftItem = _scrollBar.OtherScrollBarView.Position;
 				if (_listView.LeftItem != _scrollBar.OtherScrollBarView.Position) {
 					_scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
@@ -748,7 +748,7 @@ namespace UICatalog.Scenarios {
 			tableView.Table = BuildSimpleDataTable (big ? 30 : 5, big ? 1000 : 5);
 		}
 
-		private void EditCurrentCell (TableView.CellActivatedEventArgs e)
+		private void EditCurrentCell (object sender, TableView.CellActivatedEventArgs e)
 		{
 			if (e.Table == null)
 				return;

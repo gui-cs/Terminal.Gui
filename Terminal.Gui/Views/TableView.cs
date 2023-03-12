@@ -171,12 +171,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// This event is raised when the selected cell in the table changes.
 		/// </summary>
-		public event Action<SelectedCellChangedEventArgs> SelectedCellChanged;
+		public event EventHandler<SelectedCellChangedEventArgs> SelectedCellChanged;
 
 		/// <summary>
 		/// This event is raised when a cell is activated e.g. by double clicking or pressing <see cref="CellActivationKey"/>
 		/// </summary>
-		public event Action<CellActivatedEventArgs> CellActivated;
+		public event EventHandler<CellActivatedEventArgs> CellActivated;
 
 		/// <summary>
 		/// The key which when pressed should trigger <see cref="CellActivated"/> event.  Defaults to Enter.
@@ -1510,7 +1510,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		protected virtual void OnSelectedCellChanged (SelectedCellChangedEventArgs args)
 		{
-			SelectedCellChanged?.Invoke (args);
+			SelectedCellChanged?.Invoke (this,args);
 		}
 
 		/// <summary>
@@ -1519,7 +1519,7 @@ namespace Terminal.Gui {
 		/// <param name="args"></param>
 		protected virtual void OnCellActivated (CellActivatedEventArgs args)
 		{
-			CellActivated?.Invoke (args);
+			CellActivated?.Invoke (this, args);
 		}
 
 		/// <summary>

@@ -42,7 +42,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Changing event, raised before the <see cref="Text"/> changes and can be canceled or changing the new text.
 		/// </summary>
-		public event Action<TextChangingEventArgs> TextChanging;
+		public event EventHandler<TextChangingEventArgs> TextChanging;
 
 		/// <summary>
 		///   Changed event, raised when the text has changed.
@@ -1249,7 +1249,7 @@ namespace Terminal.Gui {
 		public virtual TextChangingEventArgs OnTextChanging (ustring newText)
 		{
 			var ev = new TextChangingEventArgs (newText);
-			TextChanging?.Invoke (ev);
+			TextChanging?.Invoke (this, ev);
 			return ev;
 		}
 

@@ -41,7 +41,7 @@ namespace UICatalog.Scenarios {
 
 			var _scrollBar = new ScrollBarView (listview, true);
 
-			_scrollBar.ChangedPosition += () => {
+			_scrollBar.ChangedPosition += (s,e) => {
 				listview.TopItem = _scrollBar.Position;
 				if (listview.TopItem != _scrollBar.Position) {
 					_scrollBar.Position = listview.TopItem;
@@ -49,7 +49,7 @@ namespace UICatalog.Scenarios {
 				listview.SetNeedsDisplay ();
 			};
 
-			_scrollBar.OtherScrollBarView.ChangedPosition += () => {
+			_scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
 				listview.LeftItem = _scrollBar.OtherScrollBarView.Position;
 				if (listview.LeftItem != _scrollBar.OtherScrollBarView.Position) {
 					_scrollBar.OtherScrollBarView.Position = listview.LeftItem;
@@ -85,7 +85,7 @@ namespace UICatalog.Scenarios {
 
 			var scrollBarCbx = new ScrollBarView (comboBox.Subviews [1], true);
 
-			scrollBarCbx.ChangedPosition += () => {
+			scrollBarCbx.ChangedPosition += (s,e) => {
 				((ListView)comboBox.Subviews [1]).TopItem = scrollBarCbx.Position;
 				if (((ListView)comboBox.Subviews [1]).TopItem != scrollBarCbx.Position) {
 					scrollBarCbx.Position = ((ListView)comboBox.Subviews [1]).TopItem;
@@ -93,7 +93,7 @@ namespace UICatalog.Scenarios {
 				comboBox.SetNeedsDisplay ();
 			};
 
-			scrollBarCbx.OtherScrollBarView.ChangedPosition += () => {
+			scrollBarCbx.OtherScrollBarView.ChangedPosition += (s,e) => {
 				((ListView)comboBox.Subviews [1]).LeftItem = scrollBarCbx.OtherScrollBarView.Position;
 				if (((ListView)comboBox.Subviews [1]).LeftItem != scrollBarCbx.OtherScrollBarView.Position) {
 					scrollBarCbx.OtherScrollBarView.Position = ((ListView)comboBox.Subviews [1]).LeftItem;

@@ -310,7 +310,7 @@ namespace UICatalog.Tests {
 				}
 			};
 
-			_xRadioGroup.SelectedItemChanged += (selected) => DimPosChanged (_curView);
+			_xRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 
 			_xText.TextChanged += (args) => {
 				try {
@@ -330,9 +330,9 @@ namespace UICatalog.Tests {
 				}
 			};
 
-			_yRadioGroup.SelectedItemChanged += (selected) => DimPosChanged (_curView);
+			_yRadioGroup.SelectedItemChanged += (s,selected) => DimPosChanged (_curView);
 
-			_wRadioGroup.SelectedItemChanged += (selected) => DimPosChanged (_curView);
+			_wRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 
 			_wText.TextChanged += (args) => {
 				try {
@@ -352,7 +352,7 @@ namespace UICatalog.Tests {
 				}
 			};
 
-			_hRadioGroup.SelectedItemChanged += (selected) => DimPosChanged (_curView);
+			_hRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 
 			Top.Add (_leftPane, _settingsPane, _hostPane);
 

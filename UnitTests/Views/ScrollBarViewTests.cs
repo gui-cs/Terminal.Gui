@@ -85,7 +85,7 @@ namespace Terminal.Gui.ViewTests {
 			_scrollBar.Refresh ();
 		}
 
-		private void _scrollBar_ChangedPosition ()
+		private void _scrollBar_ChangedPosition (object sender, EventArgs e)
 		{
 			_hostView.Top = _scrollBar.Position;
 			if (_hostView.Top != _scrollBar.Position) {
@@ -94,7 +94,7 @@ namespace Terminal.Gui.ViewTests {
 			_hostView.SetNeedsDisplay ();
 		}
 
-		private void _scrollBar_OtherScrollBarView_ChangedPosition ()
+		private void _scrollBar_OtherScrollBarView_ChangedPosition (object sender, EventArgs e)
 		{
 			_hostView.Left = _scrollBar.OtherScrollBarView.Position;
 			if (_hostView.Left != _scrollBar.OtherScrollBarView.Position) {
@@ -478,7 +478,7 @@ namespace Terminal.Gui.ViewTests {
 				};
 				win.Add (newScrollBarView);
 
-				newScrollBarView.ChangedPosition += () => {
+				newScrollBarView.ChangedPosition += (s,e) => {
 					listView.TopItem = newScrollBarView.Position;
 					if (listView.TopItem != newScrollBarView.Position) {
 						newScrollBarView.Position = listView.TopItem;
@@ -553,7 +553,7 @@ namespace Terminal.Gui.ViewTests {
 				};
 				win.Add (newScrollBarView);
 
-				newScrollBarView.ChangedPosition += () => {
+				newScrollBarView.ChangedPosition += (s,e) => {
 					listView.LeftItem = newScrollBarView.Position;
 					if (listView.LeftItem != newScrollBarView.Position) {
 						newScrollBarView.Position = listView.LeftItem;
@@ -652,7 +652,7 @@ namespace Terminal.Gui.ViewTests {
 
 			var scrollBar = new ScrollBarView (textView, true);
 
-			scrollBar.ChangedPosition += () => {
+			scrollBar.ChangedPosition += (s,e) => {
 				textView.TopRow = scrollBar.Position;
 				if (textView.TopRow != scrollBar.Position) {
 					scrollBar.Position = textView.TopRow;
@@ -660,7 +660,7 @@ namespace Terminal.Gui.ViewTests {
 				textView.SetNeedsDisplay ();
 			};
 
-			scrollBar.OtherScrollBarView.ChangedPosition += () => {
+			scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
 				textView.LeftColumn = scrollBar.OtherScrollBarView.Position;
 				if (textView.LeftColumn != scrollBar.OtherScrollBarView.Position) {
 					scrollBar.OtherScrollBarView.Position = textView.LeftColumn;

@@ -265,7 +265,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when the selected radio label has changed.
 		/// </summary>
-		public event Action<SelectedItemChangedArgs> SelectedItemChanged;
+		public event EventHandler<SelectedItemChangedArgs> SelectedItemChanged;
 
 		/// <summary>
 		/// The currently selected item from the list of radio labels
@@ -296,7 +296,7 @@ namespace Terminal.Gui {
 		public virtual void OnSelectedItemChanged (int selectedItem, int previousSelectedItem)
 		{
 			selected = selectedItem;
-			SelectedItemChanged?.Invoke (new SelectedItemChangedArgs (selectedItem, previousSelectedItem));
+			SelectedItemChanged?.Invoke (this, new SelectedItemChangedArgs (selectedItem, previousSelectedItem));
 		}
 
 		///<inheritdoc/>

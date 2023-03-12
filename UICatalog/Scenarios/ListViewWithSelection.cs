@@ -62,7 +62,7 @@ namespace UICatalog.Scenarios {
 
 			var _scrollBar = new ScrollBarView (_listView, true);
 
-			_scrollBar.ChangedPosition += () => {
+			_scrollBar.ChangedPosition += (s,e) => {
 				_listView.TopItem = _scrollBar.Position;
 				if (_listView.TopItem != _scrollBar.Position) {
 					_scrollBar.Position = _listView.TopItem;
@@ -70,7 +70,7 @@ namespace UICatalog.Scenarios {
 				_listView.SetNeedsDisplay ();
 			};
 
-			_scrollBar.OtherScrollBarView.ChangedPosition += () => {
+			_scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
 				_listView.LeftItem = _scrollBar.OtherScrollBarView.Position;
 				if (_listView.LeftItem != _scrollBar.OtherScrollBarView.Position) {
 					_scrollBar.OtherScrollBarView.Position = _listView.LeftItem;

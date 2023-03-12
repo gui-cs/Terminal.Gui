@@ -99,7 +99,7 @@ namespace UICatalog.Scenarios {
 				Y = 1,
 				Width = 5
 			};
-			paddingTopEdit.TextChanging += (e) => {
+			paddingTopEdit.TextChanging += (s, e) => {
 				try {
 					smartPanel.Child.Border.Padding = new Thickness (smartPanel.Child.Border.Padding.Left,
 						int.Parse (e.NewText.ToString ()), smartPanel.Child.Border.Padding.Right,
@@ -123,7 +123,7 @@ namespace UICatalog.Scenarios {
 				Y = 2,
 				Width = 5
 			};
-			paddingLeftEdit.TextChanging += (e) => {
+			paddingLeftEdit.TextChanging += (s, e) => {
 				try {
 					smartPanel.Child.Border.Padding = new Thickness (int.Parse (e.NewText.ToString ()),
 						smartPanel.Child.Border.Padding.Top, smartPanel.Child.Border.Padding.Right,
@@ -146,7 +146,7 @@ namespace UICatalog.Scenarios {
 				Y = 2,
 				Width = 5
 			};
-			paddingRightEdit.TextChanging += (e) => {
+			paddingRightEdit.TextChanging += (s, e) => {
 				try {
 					smartPanel.Child.Border.Padding = new Thickness (smartPanel.Child.Border.Padding.Left,
 						smartPanel.Child.Border.Padding.Top, int.Parse (e.NewText.ToString ()),
@@ -169,7 +169,7 @@ namespace UICatalog.Scenarios {
 				Y = 3,
 				Width = 5
 			};
-			paddingBottomEdit.TextChanging += (e) => {
+			paddingBottomEdit.TextChanging += (s, e) => {
 				try {
 					smartPanel.Child.Border.Padding = new Thickness (smartPanel.Child.Border.Padding.Left,
 						smartPanel.Child.Border.Padding.Top, smartPanel.Child.Border.Padding.Right,
@@ -218,7 +218,7 @@ namespace UICatalog.Scenarios {
 				Y = 1,
 				Width = 5
 			};
-			borderTopEdit.TextChanging += (e) => {
+			borderTopEdit.TextChanging += (s, e) => {
 				try {
 					smartPanel.Child.Border.BorderThickness = new Thickness (smartPanel.Child.Border.BorderThickness.Left,
 						int.Parse (e.NewText.ToString ()), smartPanel.Child.Border.BorderThickness.Right,
@@ -242,7 +242,7 @@ namespace UICatalog.Scenarios {
 				Y = 2,
 				Width = 5
 			};
-			borderLeftEdit.TextChanging += (e) => {
+			borderLeftEdit.TextChanging += (s, e) => {
 				try {
 					smartPanel.Child.Border.BorderThickness = new Thickness (int.Parse (e.NewText.ToString ()),
 						smartPanel.Child.Border.BorderThickness.Top, smartPanel.Child.Border.BorderThickness.Right,
@@ -265,7 +265,7 @@ namespace UICatalog.Scenarios {
 				Y = 2,
 				Width = 5
 			};
-			borderRightEdit.TextChanging += (e) => {
+			borderRightEdit.TextChanging += (s, e) => {
 				try {
 					smartPanel.Child.Border.BorderThickness = new Thickness (smartPanel.Child.Border.BorderThickness.Left,
 						smartPanel.Child.Border.BorderThickness.Top, int.Parse (e.NewText.ToString ()),
@@ -288,7 +288,7 @@ namespace UICatalog.Scenarios {
 				Y = 3,
 				Width = 5
 			};
-			borderBottomEdit.TextChanging += (e) => {
+			borderBottomEdit.TextChanging += (s, e) => {
 				try {
 					smartPanel.Child.Border.BorderThickness = new Thickness (smartPanel.Child.Border.BorderThickness.Left,
 						smartPanel.Child.Border.BorderThickness.Top, smartPanel.Child.Border.BorderThickness.Right,
@@ -348,7 +348,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (cbDrawMarginFrame);
 
-			rbBorderStyle.SelectedItemChanged += (e) => {
+			rbBorderStyle.SelectedItemChanged += (s,e) => {
 				smartPanel.Child.Border.BorderStyle = (BorderStyle)e.SelectedItem;
 				smartLabel.Border.BorderStyle = (BorderStyle)e.SelectedItem;
 				smartLabel.SetNeedsDisplay ();
@@ -378,7 +378,7 @@ namespace UICatalog.Scenarios {
 				Y = 3,
 				Width = 5
 			};
-			effect3DOffsetX.TextChanging += (e) => {
+			effect3DOffsetX.TextChanging += (s, e) => {
 				try {
 					smartPanel.Child.Border.Effect3DOffset = new Point (int.Parse (e.NewText.ToString ()),
 						smartPanel.Child.Border.Effect3DOffset.Y);
@@ -404,7 +404,7 @@ namespace UICatalog.Scenarios {
 				Y = 3,
 				Width = 5
 			};
-			effect3DOffsetY.TextChanging += (e) => {
+			effect3DOffsetY.TextChanging += (s, e) => {
 				try {
 					smartPanel.Child.Border.Effect3DOffset = new Point (smartPanel.Child.Border.Effect3DOffset.X,
 						int.Parse (e.NewText.ToString ()));
@@ -439,7 +439,7 @@ namespace UICatalog.Scenarios {
 				Y = 6,
 				SelectedItem = (int)smartLabel.Border.Background
 			};
-			rbBackground.SelectedItemChanged += (e) => {
+			rbBackground.SelectedItemChanged += (s,e) => {
 				smartPanel.Child.Border.Background = smartLabel.Border.Background = (Color)e.SelectedItem;
 			};
 			Win.Add (rbBackground);
@@ -456,7 +456,7 @@ namespace UICatalog.Scenarios {
 				Y = 6,
 				SelectedItem = (int)smartLabel.Border.BorderBrush
 			};
-			rbBorderBrush.SelectedItemChanged += (e) => {
+			rbBorderBrush.SelectedItemChanged += (s,e) => {
 				smartPanel.Child.Border.BorderBrush = smartLabel.Border.BorderBrush = (Color)e.SelectedItem;
 			};
 			Win.Add (rbBorderBrush);

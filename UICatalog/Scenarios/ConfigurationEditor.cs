@@ -82,7 +82,7 @@ namespace UICatalog.Scenarios {
 
 			internal ConfigTextView ()
 			{
-				ContentsChanged += (obj) => {
+				ContentsChanged += (s,obj) => {
 					if (IsDirty) {
 						if (!Tile.Title.EndsWith ('*')) {
 							Tile.Title += '*';

@@ -101,7 +101,7 @@ namespace Terminal.Gui {
 			public virtual bool OnTitleChanging (ustring oldTitle, ustring newTitle)
 			{
 				var args = new TitleEventArgs (oldTitle, newTitle);
-				TitleChanging?.Invoke (args);
+				TitleChanging?.Invoke (this, args);
 				return args.Cancel;
 			}
 
@@ -109,7 +109,7 @@ namespace Terminal.Gui {
 			/// Event fired when the <see cref="Title"/> is changing. Set <see cref="TitleEventArgs.Cancel"/> to 
 			/// <c>true</c> to cancel the Title change.
 			/// </summary>
-			public event Action<TitleEventArgs> TitleChanging;
+			public event EventHandler<TitleEventArgs> TitleChanging;
 
 			/// <summary>
 			/// Called when the <see cref="Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.
@@ -119,13 +119,13 @@ namespace Terminal.Gui {
 			public virtual void OnTitleChanged (ustring oldTitle, ustring newTitle)
 			{
 				var args = new TitleEventArgs (oldTitle, newTitle);
-				TitleChanged?.Invoke (args);
+				TitleChanged?.Invoke (this, args);
 			}
 
 			/// <summary>
 			/// Event fired after the <see cref="Title"/> has been changed. 
 			/// </summary>
-			public event Action<TitleEventArgs> TitleChanged;
+			public event EventHandler<TitleEventArgs> TitleChanged;
 
 			/// <summary>
 			/// Creates a new instance of the <see cref="Tile"/> class.
@@ -233,7 +233,7 @@ namespace Terminal.Gui {
 				var tile = new Tile ();
 				tiles.Add (tile);
 				Add (tile.ContentView);
-				tile.TitleChanged += (e) => SetNeedsDisplay ();
+				tile.TitleChanged += (s,e) => SetNeedsDisplay ();
 			}
 
 			LayoutSubviews ();

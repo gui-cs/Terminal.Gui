@@ -199,7 +199,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// This event is raised when the position on the scrollbar has changed.
 		/// </summary>
-		public event Action ChangedPosition;
+		public event EventHandler ChangedPosition;
 
 		/// <summary>
 		/// The position, relative to <see cref="Size"/>, to set the scrollbar at.
@@ -312,7 +312,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual void OnChangedPosition ()
 		{
-			ChangedPosition?.Invoke ();
+			ChangedPosition?.Invoke (this, EventArgs.Empty);
 		}
 
 		/// <summary>

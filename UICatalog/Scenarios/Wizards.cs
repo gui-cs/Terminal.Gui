@@ -116,22 +116,22 @@ namespace UICatalog.Scenarios {
 						Height = height
 					};
 
-					wizard.MovingBack += (args) => {
+					wizard.MovingBack += (s, args) => {
 						//args.Cancel = true;
 						actionLabel.Text = "Moving Back";
 					};
 
-					wizard.MovingNext += (args) => {
+					wizard.MovingNext += (s, args) => {
 						//args.Cancel = true;
 						actionLabel.Text = "Moving Next";
 					};
 
-					wizard.Finished += (args) => {
+					wizard.Finished += (s, args) => {
 						//args.Cancel = true;
 						actionLabel.Text = "Finished";
 					};
 
-					wizard.Cancelled += (args) => {
+					wizard.Cancelled += (s, args) => {
 						//args.Cancel = true;
 						actionLabel.Text = "Cancelled";
 					};
@@ -176,7 +176,7 @@ namespace UICatalog.Scenarios {
 					};
 					frame.Add (new TextField ("This is a TextField inside of the frame."));
 					secondStep.Add (frame);
-					wizard.StepChanging += (args) => {
+					wizard.StepChanging += (s, args) => {
 						if (args.OldStep == secondStep && firstNameField.Text.IsEmpty) {
 							args.Cancel = true;
 							var btn = MessageBox.ErrorQuery ("Second Step", "You must enter a First Name to continue", "Ok");
@@ -237,7 +237,7 @@ namespace UICatalog.Scenarios {
 					fourthStep.NextButtonText = "Go To Last Step";
 					var scrollBar = new ScrollBarView (someText, true);
 
-					scrollBar.ChangedPosition += () => {
+					scrollBar.ChangedPosition += (s,e) => {
 						someText.TopRow = scrollBar.Position;
 						if (someText.TopRow != scrollBar.Position) {
 							scrollBar.Position = someText.TopRow;
