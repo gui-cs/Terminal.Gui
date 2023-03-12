@@ -78,7 +78,7 @@ namespace UICatalog.Scenarios {
 				_listView.SetNeedsDisplay ();
 			};
 
-			_listView.DrawContent += (e) => {
+			_listView.DrawContent += (s,e) => {
 				_scrollBar.Size = _listView.Source.Count - 1;
 				_scrollBar.Position = _listView.TopItem;
 				_scrollBar.OtherScrollBarView.Size = _listView.Maxlength - 1;

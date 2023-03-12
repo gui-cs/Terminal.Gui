@@ -56,7 +56,7 @@ namespace UICatalog.Scenarios {
 			textView.DrawContent += TextView_DrawContent;
 
 			// This shows how to enable autocomplete in TextView.
-			void TextView_DrawContent (Rect e)
+			void TextView_DrawContent (object sender, DrawEventArgs e)
 			{
 				textView.Autocomplete.AllSuggestions = Regex.Matches (textView.Text.ToString (), "\\w+")
 					.Select (s => s.Value)

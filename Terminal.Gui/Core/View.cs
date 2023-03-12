@@ -1602,7 +1602,7 @@ namespace Terminal.Gui {
 		/// Rect provides the view-relative rectangle describing the currently visible viewport into the <see cref="View"/>.
 		/// </para>
 		/// </remarks>
-		public event Action<Rect> DrawContent;
+		public event EventHandler<DrawEventArgs> DrawContent;
 
 		/// <summary>
 		/// Enables overrides to draw infinitely scrolled content and/or a background behind added controls. 
@@ -1613,7 +1613,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public virtual void OnDrawContent (Rect viewport)
 		{
-			DrawContent?.Invoke (viewport);
+			DrawContent?.Invoke (this, new DrawEventArgs(viewport));
 		}
 
 		/// <summary>
@@ -1627,7 +1627,7 @@ namespace Terminal.Gui {
 		/// Rect provides the view-relative rectangle describing the currently visible viewport into the <see cref="View"/>.
 		/// </para>
 		/// </remarks>
-		public event Action<Rect> DrawContentComplete;
+		public event EventHandler<DrawEventArgs> DrawContentComplete;
 
 		/// <summary>
 		/// Enables overrides after completed drawing infinitely scrolled content and/or a background behind removed controls.
@@ -1638,7 +1638,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public virtual void OnDrawContentComplete (Rect viewport)
 		{
-			DrawContentComplete?.Invoke (viewport);
+			DrawContentComplete?.Invoke (this, new DrawEventArgs (viewport));
 		}
 
 		/// <summary>

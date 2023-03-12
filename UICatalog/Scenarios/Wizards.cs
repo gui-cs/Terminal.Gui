@@ -253,7 +253,7 @@ namespace UICatalog.Scenarios {
 						}
 					};
 
-					someText.DrawContent += (e) => {
+					someText.DrawContent += (s,e) => {
 						scrollBar.Size = someText.Lines;
 						scrollBar.Position = someText.TopRow;
 						if (scrollBar.OtherScrollBarView != null) {

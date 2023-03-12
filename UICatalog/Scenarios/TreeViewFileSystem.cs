@@ -220,7 +220,7 @@ namespace UICatalog.Scenarios {
 				treeViewFiles.SetNeedsDisplay ();
 			};
 
-			treeViewFiles.DrawContent += (e) => {
+			treeViewFiles.DrawContent += (s,e) => {
 				_scrollBar.Size = treeViewFiles.ContentHeight;
 				_scrollBar.Position = treeViewFiles.ScrollOffsetVertical;
 				_scrollBar.OtherScrollBarView.Size = treeViewFiles.GetContentWidth (true);

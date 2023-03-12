@@ -76,7 +76,7 @@ namespace Terminal.Gui.ViewTests {
 			_added = false;
 		}
 
-		private void _hostView_DrawContent (Rect obj)
+		private void _hostView_DrawContent (object sender, DrawEventArgs e)
 		{
 			_scrollBar.Size = _hostView.Lines;
 			_scrollBar.Position = _hostView.Top;
@@ -487,7 +487,7 @@ namespace Terminal.Gui.ViewTests {
 					listView.SetNeedsDisplay ();
 				};
 
-				listView.DrawContent += (e) => {
+				listView.DrawContent += (s,e) => {
 					newScrollBarView.Size = listView.Source.Count;
 					Assert.Equal (newScrollBarView.Size, listView.Source.Count);
 					newScrollBarView.Position = listView.TopItem;
@@ -562,7 +562,7 @@ namespace Terminal.Gui.ViewTests {
 					listView.SetNeedsDisplay ();
 				};
 
-				listView.DrawContent += (e) => {
+				listView.DrawContent += (s,e) => {
 					newScrollBarView.Size = listView.Maxlength;
 					Assert.Equal (newScrollBarView.Size, listView.Maxlength);
 					newScrollBarView.Position = listView.LeftItem;
@@ -684,7 +684,7 @@ namespace Terminal.Gui.ViewTests {
 				}
 			};
 
-			textView.DrawContent += (e) => {
+			textView.DrawContent += (s,e) => {
 				scrollBar.Size = textView.Lines;
 				scrollBar.Position = textView.TopRow;
 				if (scrollBar.OtherScrollBarView != null) {

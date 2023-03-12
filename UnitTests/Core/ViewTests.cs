@@ -1655,7 +1655,7 @@ namespace Terminal.Gui.CoreTests {
 		{
 			var view = new View (new Rect (0, 0, 8, 4));
 
-			view.DrawContent += (_) => view.DrawFrame (view.Bounds, 0, true);
+			view.DrawContent += (s, e) => view.DrawFrame (view.Bounds, 0, true);
 
 			Assert.Equal (Point.Empty, new Point (view.Frame.X, view.Frame.Y));
 			Assert.Equal (new Size (8, 4), new Size (view.Frame.Width, view.Frame.Height));
@@ -1679,7 +1679,7 @@ namespace Terminal.Gui.CoreTests {
 		{
 			var view = new View (new Rect (0, 0, 2, 2));
 
-			view.DrawContent += (_) => view.DrawFrame (view.Bounds, 0, true);
+			view.DrawContent += (s, e) => view.DrawFrame (view.Bounds, 0, true);
 
 			Assert.Equal (Point.Empty, new Point (view.Frame.X, view.Frame.Y));
 			Assert.Equal (new Size (2, 2), new Size (view.Frame.Width, view.Frame.Height));
@@ -1701,7 +1701,7 @@ namespace Terminal.Gui.CoreTests {
 		{
 			var view = new View (new Rect (-1, 0, 8, 4));
 
-			view.DrawContent += (_) => view.DrawFrame (view.Bounds, 0, true);
+			view.DrawContent += (s, e) => view.DrawFrame (view.Bounds, 0, true);
 
 			Assert.Equal (new Point (-1, 0), new Point (view.Frame.X, view.Frame.Y));
 			Assert.Equal (new Size (8, 4), new Size (view.Frame.Width, view.Frame.Height));
@@ -2025,7 +2025,7 @@ namespace Terminal.Gui.CoreTests {
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			};
-			view.DrawContent += e => {
+			view.DrawContent += (s,e) => {
 				view.DrawFrame (view.Bounds);
 				var savedClip = Application.Driver.Clip;
 				Application.Driver.Clip = new Rect (1, 1, view.Bounds.Width - 2, view.Bounds.Height - 2);
@@ -2073,7 +2073,7 @@ namespace Terminal.Gui.CoreTests {
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			};
-			view.DrawContent += e => {
+			view.DrawContent += (s,e) => {
 				view.DrawFrame (view.Bounds);
 				var savedClip = Application.Driver.Clip;
 				Application.Driver.Clip = new Rect (1, 1, view.Bounds.Width - 2, view.Bounds.Height - 2);
@@ -2268,9 +2268,9 @@ This is a tes
 			var tvCalled = false;
 
 			var view = new View ("View") { Width = 10, Height = 10 };
-			view.DrawContentComplete += (e) => viewCalled = true;
+			view.DrawContentComplete += (s,e) => viewCalled = true;
 			var tv = new TextView () { Y = 11, Width = 10, Height = 10 };
-			tv.DrawContentComplete += (e) => tvCalled = true;
+			tv.DrawContentComplete += (s, e) => tvCalled = true;
 
 			Application.Top.Add (view, tv);
 			Application.Begin (Application.Top);

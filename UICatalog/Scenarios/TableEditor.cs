@@ -335,7 +335,7 @@ namespace UICatalog.Scenarios {
 				_listView.SetNeedsDisplay ();
 			};*/
 
-			tableView.DrawContent += (e) => {
+			tableView.DrawContent += (s,e) => {
 				_scrollBar.Size = tableView.Table?.Rows?.Count ?? 0;
 				_scrollBar.Position = tableView.RowOffset;
 				//	_scrollBar.OtherScrollBarView.Size = _listView.Maxlength - 1;

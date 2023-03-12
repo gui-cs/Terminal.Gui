@@ -243,7 +243,7 @@ namespace Terminal.Gui {
 					}
 				};
 
-				helpTextView.DrawContent += (e) => {
+				helpTextView.DrawContent += (s,e) => {
 					scrollBar.Size = helpTextView.Lines;
 					scrollBar.Position = helpTextView.TopRow;
 					if (scrollBar.OtherScrollBarView != null) {

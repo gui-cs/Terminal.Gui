@@ -160,7 +160,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			_textView.DrawContent += (e) => {
+			_textView.DrawContent += (s,e) => {
 				_scrollBar.Size = _textView.Lines;
 				_scrollBar.Position = _textView.TopRow;
 				if (_scrollBar.OtherScrollBarView != null) {
@@ -765,7 +765,7 @@ namespace UICatalog.Scenarios {
 		private View FindTab ()
 		{
 			var d = new View ();
-			d.DrawContent += (e) => {
+			d.DrawContent += (s,e) => {
 				foreach (var v in d.Subviews) {
 					v.SetNeedsDisplay ();
 				}
@@ -857,7 +857,7 @@ namespace UICatalog.Scenarios {
 		private View ReplaceTab ()
 		{
 			var d = new View ();
-			d.DrawContent += (e) => {
+			d.DrawContent += (s,e) => {
 				foreach (var v in d.Subviews) {
 					v.SetNeedsDisplay ();
 				}

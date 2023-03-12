@@ -126,27 +126,27 @@ namespace UICatalog.Scenarios {
 				.Distinct ().ToList ();
 		}
 
-		private void TextViewCentered_DrawContent (Rect obj)
+		private void TextViewCentered_DrawContent (object sender, DrawEventArgs e)
 		{
 			SetAllSuggestions (textViewCentered);
 		}
 
-		private void TextViewBottomRight_DrawContent (Rect obj)
+		private void TextViewBottomRight_DrawContent (object sender, DrawEventArgs e)
 		{
 			SetAllSuggestions (textViewBottomRight);
 		}
 
-		private void TextViewBottomLeft_DrawContent (Rect obj)
+		private void TextViewBottomLeft_DrawContent (object sender, DrawEventArgs e)
 		{
 			SetAllSuggestions (textViewBottomLeft);
 		}
 
-		private void TextViewTopRight_DrawContent (Rect obj)
+		private void TextViewTopRight_DrawContent (object sender, DrawEventArgs e)
 		{
 			SetAllSuggestions (textViewTopRight);
 		}
 
-		private void TextViewTopLeft_DrawContent (Rect obj)
+		private void TextViewTopLeft_DrawContent (object sender, DrawEventArgs e)
 		{
 			SetAllSuggestions (textViewTopLeft);
 		}

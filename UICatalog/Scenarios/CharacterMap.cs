@@ -226,8 +226,10 @@ namespace UICatalog.Scenarios {
 			Clipboard.Contents = $"{new Rune (SelectedGlyph)}";
 		}
 
-		private void CharMap_DrawContent (Rect viewport)
+		private void CharMap_DrawContent (object sender, DrawEventArgs e)
 		{
+			Rect viewport = e.Rect;
+
 			var oldClip = Driver.Clip;
 			Driver.Clip = Frame;
 			// Redraw doesn't know about the scroll indicators, so if off, add one to height

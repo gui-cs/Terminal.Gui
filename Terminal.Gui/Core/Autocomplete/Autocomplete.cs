@@ -80,12 +80,12 @@ namespace Terminal.Gui {
 			ManipulatePopup ();
 		}
 
-		private void Top_DrawContentComplete (Rect obj)
+		private void Top_DrawContentComplete (object sender, DrawEventArgs e)
 		{
 			ManipulatePopup ();
 		}
 
-		private void Top_DrawContent (Rect obj)
+		private void Top_DrawContent (object sender, DrawEventArgs e)
 		{
 			if (!closed) {
 				ReopenSuggestions ();
