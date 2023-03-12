@@ -41,7 +41,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (labelMirroringTextField);
 
-			textField.TextChanged += (prev) => {
+			textField.TextChanged += (s, prev) => {
 				labelMirroringTextField.Text = textField.Text;
 			};
 
@@ -159,7 +159,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (labelMirroringDateField);
 
-			dateField.TextChanged += (prev) => {
+			dateField.TextChanged += (s, prev) => {
 				labelMirroringDateField.Text = dateField.Text;
 			};
 

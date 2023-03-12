@@ -312,7 +312,7 @@ namespace UICatalog.Tests {
 
 			_xRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 
-			_xText.TextChanged += (args) => {
+			_xText.TextChanged += (s,args) => {
 				try {
 					_xVal = int.Parse (_xText.Text.ToString ());
 					DimPosChanged (_curView);
@@ -321,7 +321,7 @@ namespace UICatalog.Tests {
 				}
 			};
 
-			_yText.TextChanged += (args) => {
+			_yText.TextChanged += (s, args) => {
 				try {
 					_yVal = int.Parse (_yText.Text.ToString ());
 					DimPosChanged (_curView);
@@ -334,7 +334,7 @@ namespace UICatalog.Tests {
 
 			_wRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 
-			_wText.TextChanged += (args) => {
+			_wText.TextChanged += (s, args) => {
 				try {
 					_wVal = int.Parse (_wText.Text.ToString ());
 					DimPosChanged (_curView);
@@ -343,7 +343,7 @@ namespace UICatalog.Tests {
 				}
 			};
 
-			_hText.TextChanged += (args) => {
+			_hText.TextChanged += (s, args) => {
 				try {
 					_hVal = int.Parse (_hText.Text.ToString ());
 					DimPosChanged (_curView);

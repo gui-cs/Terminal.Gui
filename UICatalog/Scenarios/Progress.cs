@@ -167,7 +167,7 @@ namespace UICatalog.Scenarios {
 				systemTimerDemo.PulseProgressBar.Fraction = 1F;
 			};
 			systemTimerDemo.Speed.Text = $"{_systemTimerTick}";
-			systemTimerDemo.Speed.TextChanged += (a) => {
+			systemTimerDemo.Speed.TextChanged += (s, a) => {
 				uint result;
 				if (uint.TryParse (systemTimerDemo.Speed.Text.ToString(), out result)) {
 					_systemTimerTick = result;
@@ -210,7 +210,7 @@ namespace UICatalog.Scenarios {
 			};
 
 			mainLoopTimeoutDemo.Speed.Text = $"{_mainLooopTimeoutTick}";
-			mainLoopTimeoutDemo.Speed.TextChanged += (a) => {
+			mainLoopTimeoutDemo.Speed.TextChanged += (s, a) => {
 				uint result;
 				if (uint.TryParse (mainLoopTimeoutDemo.Speed.Text.ToString (), out result)) {
 					_mainLooopTimeoutTick = result;

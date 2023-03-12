@@ -106,13 +106,13 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.F | Key.CtrlMask, Command.Right);
 		}
 
-		void TextField_TextChanged (ustring e)
+		void TextField_TextChanged (object sender, TextChangedEventArgs e)
 		{
 			try {
-				if (!TimeSpan.TryParseExact (Text.ToString ().Trim (), format.Trim (), CultureInfo.CurrentCulture, TimeSpanStyles.None, out TimeSpan result))
-					Text = e;
+				if (!TimeSpan.TryParseExact (e.NewValue.ToString ().Trim (), format.Trim (), CultureInfo.CurrentCulture, TimeSpanStyles.None, out TimeSpan result))
+					Text = e.OldValue;
 			} catch (Exception) {
-				Text = e;
+				Text = e.OldValue;
 			}
 		}
 
