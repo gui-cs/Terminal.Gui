@@ -174,7 +174,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Event invoked when the <see cref="ContextMenu.MouseFlags"/> is changed.
 		/// </summary>
-		public event Action<MouseFlags> MouseFlagsChanged;
+		public event EventHandler<MouseFlagsChangedEventArgs> MouseFlagsChanged;
 
 		/// <summary>
 		/// Gets or sets the menu position.
@@ -206,7 +206,7 @@ namespace Terminal.Gui {
 			set {
 				var oldFlags = mouseFlags;
 				mouseFlags = value;
-				MouseFlagsChanged?.Invoke (oldFlags);
+				MouseFlagsChanged?.Invoke (this, new MouseFlagsChangedEventArgs(oldFlags,value));
 			}
 		}
 

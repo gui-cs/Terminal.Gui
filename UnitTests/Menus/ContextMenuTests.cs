@@ -241,7 +241,7 @@ namespace Terminal.Gui.MenuTests {
 			var oldMouseFlags = new MouseFlags ();
 			var cm = new ContextMenu ();
 
-			cm.MouseFlagsChanged += (e) => oldMouseFlags = e;
+			cm.MouseFlagsChanged += (s,e) => oldMouseFlags = e.OldValue;
 
 			cm.MouseFlags = MouseFlags.Button2Clicked;
 			Assert.Equal (MouseFlags.Button2Clicked, cm.MouseFlags);
