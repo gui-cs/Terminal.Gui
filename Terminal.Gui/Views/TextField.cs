@@ -233,7 +233,7 @@ namespace Terminal.Gui {
 			ReplaceKeyBinding (e.OldKey, e.NewKey);
 		}
 
-		private void HistoryText_ChangeText (HistoryText.HistoryTextItem obj)
+		private void HistoryText_ChangeText (object sender, HistoryText.HistoryTextItem obj)
 		{
 			if (obj == null)
 				return;

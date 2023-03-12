@@ -523,7 +523,7 @@ namespace Terminal.Gui {
 			Added
 		}
 
-		public class HistoryTextItem {
+		public class HistoryTextItem : EventArgs{
 			public List<List<Rune>> Lines;
 			public Point CursorPosition;
 			public LineStatus LineStatus;
@@ -559,7 +559,7 @@ namespace Terminal.Gui {
 
 		public bool HasHistoryChanges => idxHistoryText > -1;
 
-		public event Action<HistoryTextItem> ChangeText;
+		public event EventHandler<HistoryTextItem> ChangeText;
 
 		public void Add (List<List<Rune>> lines, Point curPos, LineStatus lineStatus = LineStatus.Original)
 		{
@@ -711,7 +711,7 @@ namespace Terminal.Gui {
 
 		void OnChangeText (HistoryTextItem lines)
 		{
-			ChangeText?.Invoke (lines);
+			ChangeText?.Invoke (this, lines);
 		}
 
 		public void Clear (ustring text)
@@ -1393,7 +1393,7 @@ namespace Terminal.Gui {
 			//historyText.Clear (Text);
 		}
 
-		private void HistoryText_ChangeText (HistoryText.HistoryTextItem obj)
+		private void HistoryText_ChangeText (object sender, HistoryText.HistoryTextItem obj)
 		{
 			SetWrapModel ();
 
