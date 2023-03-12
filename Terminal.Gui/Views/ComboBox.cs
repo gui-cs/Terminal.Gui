@@ -805,11 +805,8 @@ namespace Terminal.Gui {
 				searchset.Add (item);
 			}
 		}
+
 		private void Search_Changed (ustring text)
-		{
-			Search_Changed (this, new TextChangedEventArgs (text, text));
-		}
-		private void Search_Changed (object sender, TextChangedEventArgs args)
 		{
 			if (source == null) { // Object initialization		
 				return;

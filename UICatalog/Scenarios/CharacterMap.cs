@@ -39,7 +39,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (jumpEdit);
 			var unicodeLabel = new Label ("") { X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap) };
 			Win.Add (unicodeLabel);
-			jumpEdit.TextChanged += (s,e) => {
+			jumpEdit.TextChanged += (s) => {
 				uint result = 0;
 				if (jumpEdit.Text.Length == 0) return;
 				try {

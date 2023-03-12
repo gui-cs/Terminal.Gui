@@ -106,13 +106,13 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.F | Key.CtrlMask, Command.Right);
 		}
 
-		void DateField_Changed (object sender, TextChangedEventArgs e)
+		void DateField_Changed (ustring e)
 		{
 			try {
-				if (!DateTime.TryParseExact (GetDate (e.NewValue).ToString (), GetInvarianteFormat (), CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result))
-					Text = e.OldValue;
+				if (!DateTime.TryParseExact (GetDate (Text).ToString (), GetInvarianteFormat (), CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result))
+					Text = e;
 			} catch (Exception) {
-				Text = e.OldValue;
+				Text = e;
 			}
 		}
 

@@ -813,7 +813,7 @@ namespace UICatalog.Scenarios {
 			btnFindPrevious.Clicked += (s,e) => FindPrevious ();
 			d.Add (btnFindPrevious);
 
-			txtToFind.TextChanged += (s,e) => {
+			txtToFind.TextChanged += (e) => {
 				_textToFind = txtToFind.Text.ToString ();
 				_textView.FindTextChanged ();
 				btnFindNext.Enabled = !txtToFind.Text.IsEmpty;
@@ -908,7 +908,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (label),
 				Width = 20
 			};
-			txtToReplace.TextChanged += (s,e) => _textToReplace = txtToReplace.Text.ToString ();
+			txtToReplace.TextChanged += (e) => _textToReplace = txtToReplace.Text.ToString ();
 			d.Add (txtToReplace);
 
 			var btnFindPrevious = new Button ("Replace _Previous") {
@@ -933,7 +933,7 @@ namespace UICatalog.Scenarios {
 			btnReplaceAll.Clicked += (s,e) => ReplaceAll ();
 			d.Add (btnReplaceAll);
 
-			txtToFind.TextChanged += (s, e) => {
+			txtToFind.TextChanged += (e) => {
 				_textToFind = txtToFind.Text.ToString ();
 				_textView.FindTextChanged ();
 				btnFindNext.Enabled = !txtToFind.Text.IsEmpty;

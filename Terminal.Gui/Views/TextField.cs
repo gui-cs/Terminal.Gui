@@ -53,7 +53,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		///   The passed <see cref="EventArgs"/> is a <see cref="NStack.ustring"/> containing the old value. 
 		/// </remarks>
-		public event EventHandler<TextChangedEventArgs> TextChanged;
+		public event Action<ustring> TextChanged;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Computed"/> positioning.
@@ -308,7 +308,7 @@ namespace Terminal.Gui {
 						, HistoryText.LineStatus.Replaced);
 				}
 
-				TextChanged?.Invoke (this, new TextChangedEventArgs(oldText, newText.NewText));
+				TextChanged?.Invoke (oldText);
 
 				if (point > text.Count) {
 					point = Math.Max (TextModel.DisplaySize (text, 0).size - 1, 0);

@@ -36,7 +36,7 @@ namespace UICatalog.Scenarios {
 				Text = "2",
 			};
 
-			textField.TextChanged += (s, e) => SetupTileView ();
+			textField.TextChanged += (s) => SetupTileView ();
 
 
 			cbHorizontal = new CheckBox ("Horizontal") {

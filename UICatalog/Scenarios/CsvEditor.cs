@@ -99,7 +99,7 @@ namespace UICatalog.Scenarios {
 			SetupScrollBar ();
 		}
 
-		private void SelectedCellLabel_TextChanged (object sender, TextChangedEventArgs args)
+		private void SelectedCellLabel_TextChanged (ustring last)
 		{
 			// if user is in the text control and editing the selected cell
 			if (!selectedCellLabel.HasFocus)
