@@ -97,7 +97,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (keepCheckBox);
 		}
 
-		private void ListView_RowRender (ListViewRowEventArgs obj)
+		private void ListView_RowRender (object sender, ListViewRowEventArgs obj)
 		{
 			if (obj.Row == _listView.SelectedItem) {
 				return;

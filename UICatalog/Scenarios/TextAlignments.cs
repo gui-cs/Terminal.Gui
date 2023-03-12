@@ -52,7 +52,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Right (edit) + 1,
 				Y = 0,
 			};
-			unicodeSample.Clicked += () => {
+			unicodeSample.Clicked += (s,e) => {
 				edit.Text = unicodeSampleText;
 			};
 			Win.Add (unicodeSample);
@@ -62,7 +62,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (edit) - 1,
 
 			};
-			update.Clicked += () => {
+			update.Clicked += (s,e) => {
 				foreach (var alignment in alignments) {
 					singleLines [(int)alignment].Text = edit.Text;
 					multipleLines [(int)alignment].Text = edit.Text;

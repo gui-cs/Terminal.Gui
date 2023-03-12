@@ -400,7 +400,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void NextfinishBtn_Clicked ()
+		private void NextfinishBtn_Clicked (object sender, EventArgs e)
 		{
 			if (CurrentStep == GetLastStep ()) {
 				var args = new WizardButtonEventArgs ();
@@ -486,7 +486,7 @@ namespace Terminal.Gui {
 			return null;
 		}
 
-		private void BackBtn_Clicked ()
+		private void BackBtn_Clicked (object sender, EventArgs e)
 		{
 			var args = new WizardButtonEventArgs ();
 			MovingBack?.Invoke (args);

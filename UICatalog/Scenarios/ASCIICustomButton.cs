@@ -271,7 +271,7 @@ namespace UICatalog.Scenarios {
 				}
 			}
 
-			private void Button_Clicked ()
+			private void Button_Clicked (object sender, EventArgs e)
 			{
 				MessageBox.Query ("Button clicked.", $"'{selected.Text}' clicked!", "Ok");
 				if (selected.Text == "Close") {

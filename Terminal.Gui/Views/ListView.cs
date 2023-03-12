@@ -395,17 +395,17 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// This event is raised when the selected item in the <see cref="ListView"/> has changed.
 		/// </summary>
-		public event Action<ListViewItemEventArgs> SelectedItemChanged;
+		public event EventHandler<ListViewItemEventArgs> SelectedItemChanged;
 
 		/// <summary>
 		/// This event is raised when the user Double Clicks on an item or presses ENTER to open the selected item.
 		/// </summary>
-		public event Action<ListViewItemEventArgs> OpenSelectedItem;
+		public event EventHandler<ListViewItemEventArgs> OpenSelectedItem;
 
 		/// <summary>
 		/// This event is invoked when this <see cref="ListView"/> is being drawn before rendering.
 		/// </summary>
-		public event Action<ListViewRowEventArgs> RowRender;
+		public event EventHandler<ListViewRowEventArgs> RowRender;
 
 		/// <summary>
 		/// Gets the <see cref="CollectionNavigator"/> that searches the <see cref="ListView.Source"/> collection as
@@ -685,7 +685,7 @@ namespace Terminal.Gui {
 		{
 			if (selected != lastSelectedItem) {
 				var value = source?.Count > 0 ? source.ToList () [selected] : null;
-				SelectedItemChanged?.Invoke (new ListViewItemEventArgs (selected, value));
+				SelectedItemChanged?.Invoke (this, new ListViewItemEventArgs (selected, value));
 				if (HasFocus) {
 					lastSelectedItem = selected;
 				}
@@ -707,7 +707,7 @@ namespace Terminal.Gui {
 
 			var value = source.ToList () [selected];
 
-			OpenSelectedItem?.Invoke (new ListViewItemEventArgs (selected, value));
+			OpenSelectedItem?.Invoke (this, new ListViewItemEventArgs (selected, value));
 
 			return true;
 		}
@@ -718,7 +718,7 @@ namespace Terminal.Gui {
 		/// <param name="rowEventArgs"></param>
 		public virtual void OnRowRender (ListViewRowEventArgs rowEventArgs)
 		{
-			RowRender?.Invoke (rowEventArgs);
+			RowRender?.Invoke (this, rowEventArgs);
 		}
 
 		///<inheritdoc/>

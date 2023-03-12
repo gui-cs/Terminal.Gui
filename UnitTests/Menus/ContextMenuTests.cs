@@ -228,7 +228,7 @@ namespace Terminal.Gui.MenuTests {
 			var oldKey = Key.Null;
 			var cm = new ContextMenu ();
 
-			cm.KeyChanged += (e) => oldKey = e;
+			cm.KeyChanged += (s,e) => oldKey = e.OldKey;
 
 			cm.Key = Key.Space | Key.CtrlMask;
 			Assert.Equal (Key.Space | Key.CtrlMask, cm.Key);

@@ -183,7 +183,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (frame) + 2,
 				IsDefault = true,
 			};
-			showMessageBoxButton.Clicked += () => {
+			showMessageBoxButton.Clicked += (s,e) => {
 				try {
 					int width = int.Parse (widthEdit.Text.ToString ());
 					int height = int.Parse (heightEdit.Text.ToString ());

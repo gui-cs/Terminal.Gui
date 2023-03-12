@@ -37,7 +37,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = Pos.Center (),
 			};
-			button.Clicked += () => MessageBox.Query (20, 7, "Hi", $"I'm a {typeName}?", "Yes", "No");
+			button.Clicked += (s,e) => MessageBox.Query (20, 7, "Hi", $"I'm a {typeName}?", "Yes", "No");
 			var label = new Label ($"I'm a {typeName}") {
 				X = Pos.Center (),
 				Y = Pos.Center () - 1,
@@ -140,7 +140,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Left (paddingLeftEdit),
 				Y = 5
 			};
-			replacePadding.Clicked += () => {
+			replacePadding.Clicked += (s,e) => {
 				smartView.Border.Padding = new Thickness (smartView.Border.Padding.Top);
 				if (paddingTopEdit.Text.IsEmpty) {
 					paddingTopEdit.Text = "0";
@@ -234,7 +234,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Left (borderLeftEdit),
 				Y = 5
 			};
-			replaceBorder.Clicked += () => {
+			replaceBorder.Clicked += (s,e) => {
 				smartView.Border.BorderThickness = new Thickness (smartView.Border.BorderThickness.Top);
 				if (borderTopEdit.Text.IsEmpty) {
 					borderTopEdit.Text = "0";

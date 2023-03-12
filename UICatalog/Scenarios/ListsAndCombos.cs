@@ -36,7 +36,7 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill(2),
 				Width = Dim.Percent (40)
 			};
-			listview.SelectedItemChanged += (ListViewItemEventArgs e) => lbListView.Text = items [listview.SelectedItem];
+			listview.SelectedItemChanged += (object s, ListViewItemEventArgs e) => lbListView.Text = items [listview.SelectedItem];
 			Win.Add (lbListView, listview);
 
 			var _scrollBar = new ScrollBarView (listview, true);
@@ -80,7 +80,7 @@ namespace UICatalog.Scenarios {
 			};
 			comboBox.SetSource (items);
 
-			comboBox.SelectedItemChanged += (ListViewItemEventArgs text) => lbComboBox.Text = text.Value.ToString ();
+			comboBox.SelectedItemChanged += (object s, ListViewItemEventArgs text) => lbComboBox.Text = text.Value.ToString ();
 			Win.Add (lbComboBox, comboBox);
 
 			var scrollBarCbx = new ScrollBarView (comboBox.Subviews [1], true);
@@ -114,7 +114,7 @@ namespace UICatalog.Scenarios {
 				X = 1,
 				Y = Pos.Bottom(lbListView),
 			};
-			btnMoveUp.Clicked += () => {
+			btnMoveUp.Clicked += (s,e) => {
 				listview.MoveUp ();
 			};
 
@@ -122,7 +122,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Right (btnMoveUp) + 1,
 				Y = Pos.Bottom (lbListView),
 			};
-			btnMoveDown.Clicked += () => {
+			btnMoveDown.Clicked += (s,e) => {
 				listview.MoveDown ();
 			};
 

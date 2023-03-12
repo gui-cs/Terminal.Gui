@@ -102,7 +102,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = Pos.Bottom (Win) - 5,
 			};
-			swapButton.Clicked += () => {
+			swapButton.Clicked += (s,e) => {
 				longTime.ReadOnly = !longTime.ReadOnly;
 				shortTime.ReadOnly = !shortTime.ReadOnly;
 

@@ -636,7 +636,7 @@ namespace Terminal.Gui.ApplicationTests {
 
 			var btnLaunch = new Button ("Open Window");
 
-			btnLaunch.Clicked += () => action ();
+			btnLaunch.Clicked += (s,e) => action ();
 
 			Application.Top.Add (btnLaunch);
 
@@ -700,7 +700,7 @@ namespace Terminal.Gui.ApplicationTests {
 				Text = "total"
 			};
 
-			totalbtn.Clicked += () => {
+			totalbtn.Clicked += (s,e) => {
 				MessageBox.Query ("Count", $"Count is {total}", "Ok");
 			};
 
@@ -715,7 +715,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Application.RequestStop ();
 		}
 
-		private static async void RunAsyncTest ()
+		private static async void RunAsyncTest (object sender, EventArgs e)
 		{
 			Assert.Equal (clickMe, btn.Text);
 			Assert.Equal (zero, total);

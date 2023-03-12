@@ -678,7 +678,7 @@ namespace Terminal.Gui {
 				HideDropdownListOnClick = true
 			};
 			cmbAllowedTypes.SetSource (allowedTypes ?? new List<string> ());
-			cmbAllowedTypes.OpenSelectedItem += (e) => {
+			cmbAllowedTypes.OpenSelectedItem += (s, e) => {
 				dirListView.AllowedFileTypes = cmbAllowedTypes.Text.ToString ().Split (';');
 				dirListView.Reload ();
 			};
@@ -698,7 +698,7 @@ namespace Terminal.Gui {
 			dirListView.FileChanged = (file) => nameEntry.Text = file == ".." ? "" : file;
 			dirListView.SelectedChanged = (file) => nameEntry.Text = file.Item1 == ".." ? "" : file.Item1;
 			this.cancel = new Button ("Cancel");
-			this.cancel.Clicked += () => {
+			this.cancel.Clicked += (s,e) => {
 				Cancel ();
 			};
 			AddButton (cancel);
@@ -707,7 +707,7 @@ namespace Terminal.Gui {
 				IsDefault = true,
 				Enabled = nameEntry.Text.IsEmpty ? false : true
 			};
-			this.prompt.Clicked += () => {
+			this.prompt.Clicked += (s,e) => {
 				if (this is OpenDialog) {
 					if (!dirListView.GetValidFilesName (nameEntry.Text.ToString (), out string res)) {
 						nameEntry.Text = res;

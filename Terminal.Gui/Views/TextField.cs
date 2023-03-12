@@ -228,9 +228,9 @@ namespace Terminal.Gui {
 				});
 		}
 
-		private void ContextMenu_KeyChanged (Key obj)
+		private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e)
 		{
-			ReplaceKeyBinding (obj, ContextMenu.Key);
+			ReplaceKeyBinding (e.OldKey, e.NewKey);
 		}
 
 		private void HistoryText_ChangeText (HistoryText.HistoryTextItem obj)

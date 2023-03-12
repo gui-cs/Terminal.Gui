@@ -154,14 +154,14 @@ namespace UICatalog {
 			btnChange.Clicked += RemapKey;
 
 			var close = new Button ("Ok");
-			close.Clicked += () => {
+			close.Clicked += (s,e) => {
 				Application.RequestStop ();
 				ViewTracker.Instance.StartUsingNewKeyMap (CurrentBindings);
 			};
 			AddButton (close);
 
 			var cancel = new Button ("Cancel");
-			cancel.Clicked += ()=>Application.RequestStop();
+			cancel.Clicked += (s,e)=>Application.RequestStop();
 			AddButton (cancel);
 
 			// Register event handler as the last thing in constructor to prevent early calls
@@ -172,7 +172,7 @@ namespace UICatalog {
 			SetTextBoxToShowBinding (commands.First());
 		}
 
-		private void RemapKey ()
+		private void RemapKey (object sender, EventArgs e)
 		{
 			var cmd = commands [commandsListView.SelectedItem];
 			Key? key = null;
@@ -201,7 +201,7 @@ namespace UICatalog {
 			SetNeedsDisplay ();
 		}
 
-		private void CommandsListView_SelectedItemChanged (ListViewItemEventArgs obj)
+		private void CommandsListView_SelectedItemChanged (object sender, ListViewItemEventArgs obj)
 		{
 			SetTextBoxToShowBinding ((Command)obj.Value);
 		}

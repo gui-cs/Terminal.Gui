@@ -109,7 +109,7 @@ namespace Terminal.Gui.MenuTests {
 					new MenuItem ("_New", "Creates new file.", New)
 				})
 			});
-			menu.MenuOpening += (e) => {
+			menu.MenuOpening += (s,e) => {
 				Assert.Equal ("_File", e.CurrentMenu.Title);
 				Assert.Equal ("_New", e.CurrentMenu.Children [0].Title);
 				Assert.Equal ("Creates new file.", e.CurrentMenu.Children [0].Help);
@@ -378,7 +378,7 @@ Edit
 				}),
 				new MenuBarItem ("_About", "Top-Level", () => miAction ="About")
 			});
-			menu.MenuOpening += (e) => mbiCurrent = e.CurrentMenu;
+			menu.MenuOpening += (s,e) => mbiCurrent = e.CurrentMenu;
 			menu.MenuOpened += (e) => {
 				miCurrent = e;
 				mCurrent = menu.openCurrentMenu;

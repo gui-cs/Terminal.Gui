@@ -76,7 +76,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Right (buttonLbl),
 				Y = Pos.Top (buttonLbl)
 			};
-			button.Clicked += () => {
+			button.Clicked += (s,e) => {
 				secondStep.Title = "2nd Step";
 				MessageBox.Query ("Wizard Scenario", "This Wizard Step's title was changed to '2nd Step'", "Ok");
 			};

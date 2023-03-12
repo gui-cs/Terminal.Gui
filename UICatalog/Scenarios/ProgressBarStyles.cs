@@ -64,7 +64,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = Pos.Bottom (continuousPB) + 1
 			};
-			button.Clicked += () => {
+			button.Clicked += (s,e) => {
 				if (_fractionTimer == null) {
 					button.Enabled = false;
 					blocksPB.Fraction = 0;

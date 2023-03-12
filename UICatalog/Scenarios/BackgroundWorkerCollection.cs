@@ -69,7 +69,7 @@ namespace UICatalog.Scenarios {
 				Dispose ();
 			}
 
-			private void Menu_MenuOpening (MenuOpeningEventArgs menu)
+			private void Menu_MenuOpening (object sender, MenuOpeningEventArgs menu)
 			{
 				if (!canOpenWorkerApp) {
 					canOpenWorkerApp = true;
@@ -328,7 +328,7 @@ namespace UICatalog.Scenarios {
 				Add (listView);
 
 				start = new Button ("Start") { IsDefault = true };
-				start.Clicked += () => {
+				start.Clicked += (s,e) => {
 					Staging = new Staging (DateTime.Now);
 					RequestStop ();
 				};
@@ -340,7 +340,7 @@ namespace UICatalog.Scenarios {
 
 				KeyPress += (s, e) => {
 					if (e.KeyEvent.Key == Key.Esc) {
-						OnReportClosed ();
+						OnReportClosed (this, EventArgs.Empty);
 					}
 				};
 
@@ -358,7 +358,7 @@ namespace UICatalog.Scenarios {
 				};
 			}
 
-			private void OnReportClosed ()
+			private void OnReportClosed (object sender, EventArgs e)
 			{
 				if (Staging?.StartStaging != null) {
 					ReportClosed?.Invoke (this);

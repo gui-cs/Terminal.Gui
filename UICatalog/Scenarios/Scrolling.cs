@@ -164,7 +164,7 @@ namespace UICatalog.Scenarios {
 				X = 3,
 				Y = 3,
 			};
-			pressMeButton.Clicked += () => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
+			pressMeButton.Clicked += (s,e) => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
 			scrollView.Add (pressMeButton);
 
 			var aLongButton = new Button ("A very long button. Should be wide enough to demo clipping!") {
@@ -172,7 +172,7 @@ namespace UICatalog.Scenarios {
 				Y = 4,
 				Width = Dim.Fill (3),
 			};
-			aLongButton.Clicked += () => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
+			aLongButton.Clicked += (s,e) => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
 			scrollView.Add (aLongButton);
 
 			scrollView.Add (new TextField ("This is a test of...") {
@@ -202,7 +202,7 @@ namespace UICatalog.Scenarios {
 			};
 			// TODO: Use Pos.Width instead of (Right-Left) when implemented (#502)
 			anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
-			anchorButton.Clicked += () => {
+			anchorButton.Clicked += (s,e) => {
 				// Ths demonstrates how to have a dynamically sized button
 				// Each time the button is clicked the button's text gets longer
 				// The call to Win.LayoutSubviews causes the Computed layout to

@@ -1196,7 +1196,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Raised as a menu is opening.
 		/// </summary>
-		public event Action<MenuOpeningEventArgs> MenuOpening;
+		public event EventHandler<MenuOpeningEventArgs> MenuOpening;
 
 		/// <summary>
 		/// Raised when a menu is opened.
@@ -1244,7 +1244,7 @@ namespace Terminal.Gui {
 		public virtual MenuOpeningEventArgs OnMenuOpening (MenuBarItem currentMenu)
 		{
 			var ev = new MenuOpeningEventArgs (currentMenu);
-			MenuOpening?.Invoke (ev);
+			MenuOpening?.Invoke (this, ev);
 			return ev;
 		}
 

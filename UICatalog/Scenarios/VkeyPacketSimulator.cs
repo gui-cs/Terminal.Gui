@@ -207,13 +207,13 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			btnInput.Clicked += () => {
+			btnInput.Clicked += (s,e) => {
 				if (!tvInput.HasFocus && _keyboardStrokes.Count == 0) {
 					tvInput.SetFocus ();
 				}
 			};
 
-			btnOutput.Clicked += () => {
+			btnOutput.Clicked += (s,e) => {
 				if (!tvOutput.HasFocus && _keyboardStrokes.Count == 0) {
 					tvOutput.SetFocus ();
 				}

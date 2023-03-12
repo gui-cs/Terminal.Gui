@@ -144,7 +144,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (frame) + 2,
 				IsDefault = true,
 			};
-			showDialogButton.Clicked += () => {
+			showDialogButton.Clicked += (s,e) => {
 				try {
 					Dialog dialog = null;
 
@@ -168,7 +168,7 @@ namespace UICatalog.Scenarios {
 							button = new Button (NumberToWords.Convert (buttonId),
 							       is_default: buttonId == 0);
 						}
-						button.Clicked += () => {
+						button.Clicked += (s,e) => {
 							clicked = buttonId;
 							Application.RequestStop ();
 						};
@@ -193,7 +193,7 @@ namespace UICatalog.Scenarios {
 						X = Pos.Center (),
 						Y = Pos.Center ()
 					};
-					add.Clicked += () => {
+					add.Clicked += (s,e) => {
 						var buttonId = buttons.Count;
 						Button button;
 						if (glyphsNotWords.Checked == true) {
@@ -203,7 +203,7 @@ namespace UICatalog.Scenarios {
 							button = new Button (NumberToWords.Convert (buttonId),
 								is_default: buttonId == 0);
 						}
-						button.Clicked += () => {
+						button.Clicked += (s,e) => {
 							clicked = buttonId;
 							Application.RequestStop ();
 
@@ -220,7 +220,7 @@ namespace UICatalog.Scenarios {
 						X = Pos.Center (),
 						Y = Pos.Center () + 1
 					};
-					addChar.Clicked += () => {
+					addChar.Clicked += (s,e) => {
 						foreach (var button in buttons) {
 							button.Text += Char.ConvertFromUtf32 (CODE_POINT);
 						}

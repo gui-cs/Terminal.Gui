@@ -169,7 +169,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Event invoked when the <see cref="ContextMenu.Key"/> is changed.
 		/// </summary>
-		public event Action<Key> KeyChanged;
+		public event EventHandler<KeyChangedEventArgs> KeyChanged;
 
 		/// <summary>
 		/// Event invoked when the <see cref="ContextMenu.MouseFlags"/> is changed.
@@ -194,7 +194,7 @@ namespace Terminal.Gui {
 			set {
 				var oldKey = key;
 				key = value;
-				KeyChanged?.Invoke (oldKey);
+				KeyChanged?.Invoke (this, new KeyChangedEventArgs(oldKey,key));
 			}
 		}
 

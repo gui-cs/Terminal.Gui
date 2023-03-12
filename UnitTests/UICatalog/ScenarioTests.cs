@@ -295,10 +295,10 @@ namespace UICatalog.Tests {
 				ColorScheme = Colors.Dialog,
 			};
 
-			_classListView.OpenSelectedItem += (a) => {
+			_classListView.OpenSelectedItem += (s, a) => {
 				_settingsPane.SetFocus ();
 			};
-			_classListView.SelectedItemChanged += (args) => {
+			_classListView.SelectedItemChanged += (s, args) => {
 				ClearClass (_curView);
 				_curView = CreateClass (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
 			};

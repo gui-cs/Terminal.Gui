@@ -97,7 +97,7 @@ namespace UICatalog.Scenarios {
 				IsDefault = true,
 			};
 
-			showWizardButton.Clicked += () => {
+			showWizardButton.Clicked += (s,e) => {
 				try {
 					int width = 0;
 					int.TryParse (widthEdit.Text.ToString (), out width);
@@ -153,7 +153,7 @@ namespace UICatalog.Scenarios {
 						X = Pos.Right (buttonLbl),
 						Y = Pos.Top (buttonLbl)
 					};
-					button.Clicked += () => {
+					button.Clicked += (s,e) => {
 						secondStep.Title = "2nd Step";
 						MessageBox.Query ("Wizard Scenario", "This Wizard Step's title was changed to '2nd Step'");
 					};
@@ -226,7 +226,7 @@ namespace UICatalog.Scenarios {
 						X = Pos.Center (),
 						Y = Pos.AnchorEnd (1)
 					};
-					hideHelpBtn.Clicked += () => {
+					hideHelpBtn.Clicked += (s,e) => {
 						if (fourthStep.HelpText.Length > 0) {
 							fourthStep.HelpText = ustring.Empty;
 						} else {

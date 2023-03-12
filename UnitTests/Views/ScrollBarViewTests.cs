@@ -909,7 +909,7 @@ This is a test
 			var text = "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
 			var label = new Label (text) { Width = 14, Height = 5 };
 			var btn = new Button (14, 0, "Click Me!");
-			btn.Clicked += () => clicked = true;
+			btn.Clicked += (s,e) => clicked = true;
 			Application.Top.Add (label, btn);
 
 			var sbv = new ScrollBarView (label, true, false) {

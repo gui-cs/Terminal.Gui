@@ -63,7 +63,7 @@ namespace UICatalog.Scenarios {
 				worker = new BackgroundWorker () { WorkerSupportsCancellation = true };
 
 				var cancel = new Button ("Cancel Worker");
-				cancel.Clicked += () => {
+				cancel.Clicked += (s,e) => {
 					if (worker == null) {
 						log.Add ($"Worker is not running at {DateTime.Now}!");
 						listLog.SetNeedsDisplay ();

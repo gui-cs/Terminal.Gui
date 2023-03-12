@@ -799,7 +799,7 @@ namespace UICatalog.Scenarios {
 				IsDefault = true,
 				AutoSize = false
 			};
-			btnFindNext.Clicked += () => FindNext ();
+			btnFindNext.Clicked += (s,e) => FindNext ();
 			d.Add (btnFindNext);
 
 			var btnFindPrevious = new Button ("Find _Previous") {
@@ -810,7 +810,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = TextAlignment.Centered,
 				AutoSize = false
 			};
-			btnFindPrevious.Clicked += () => FindPrevious ();
+			btnFindPrevious.Clicked += (s,e) => FindPrevious ();
 			d.Add (btnFindPrevious);
 
 			txtToFind.TextChanged += (e) => {
@@ -827,7 +827,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = TextAlignment.Centered,
 				AutoSize = false
 			};
-			btnCancel.Clicked += () => {
+			btnCancel.Clicked += (s,e) => {
 				DisposeWinDialog ();
 			};
 			d.Add (btnCancel);
@@ -891,7 +891,7 @@ namespace UICatalog.Scenarios {
 				IsDefault = true,
 				AutoSize = false
 			};
-			btnFindNext.Clicked += () => ReplaceNext ();
+			btnFindNext.Clicked += (s,e) => ReplaceNext ();
 			d.Add (btnFindNext);
 
 			label = new Label ("Replace:") {
@@ -919,7 +919,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = TextAlignment.Centered,
 				AutoSize = false
 			};
-			btnFindPrevious.Clicked += () => ReplacePrevious ();
+			btnFindPrevious.Clicked += (s,e) => ReplacePrevious ();
 			d.Add (btnFindPrevious);
 
 			var btnReplaceAll = new Button ("Replace _All") {
@@ -930,7 +930,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = TextAlignment.Centered,
 				AutoSize = false
 			};
-			btnReplaceAll.Clicked += () => ReplaceAll ();
+			btnReplaceAll.Clicked += (s,e) => ReplaceAll ();
 			d.Add (btnReplaceAll);
 
 			txtToFind.TextChanged += (e) => {
@@ -948,7 +948,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = TextAlignment.Centered,
 				AutoSize = false
 			};
-			btnCancel.Clicked += () => {
+			btnCancel.Clicked += (s,e) => {
 				DisposeWinDialog ();
 			};
 			d.Add (btnCancel);

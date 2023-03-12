@@ -58,7 +58,7 @@ namespace UICatalog.Scenarios {
 			};
 
 			var testButton = new Button (2, 2, "click me");
-			testButton.Clicked += () => {
+			testButton.Clicked += (s,e) => {
 				MessageBox.Query (10, 5, "Test", "test message", "Ok");
 			};
 			embedded3.Add (testButton);
