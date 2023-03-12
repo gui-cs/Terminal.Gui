@@ -255,7 +255,7 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var hv = new HexView (LoadStream ()) { Width = Dim.Fill (), Height = Dim.Fill () };
 			HexView.HexViewEventArgs hexViewEventArgs = null;
-			hv.PositionChanged += (e) => hexViewEventArgs = e;
+			hv.PositionChanged += (s, e) => hexViewEventArgs = e;
 			Application.Top.Add (hv);
 			Application.Begin (Application.Top);
 

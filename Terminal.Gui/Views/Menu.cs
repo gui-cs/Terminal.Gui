@@ -1206,12 +1206,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Raised when a menu is closing passing <see cref="MenuClosingEventArgs"/>.
 		/// </summary>
-		public event Action<MenuClosingEventArgs> MenuClosing;
+		public event EventHandler<MenuClosingEventArgs> MenuClosing;
 
 		/// <summary>
 		/// Raised when all the menu is closed.
 		/// </summary>
-		public event Action MenuAllClosed;
+		public event EventHandler MenuAllClosed;
 
 		internal Menu openMenu;
 		Menu ocm;
@@ -1275,7 +1275,7 @@ namespace Terminal.Gui {
 		public virtual MenuClosingEventArgs OnMenuClosing (MenuBarItem currentMenu, bool reopen, bool isSubMenu)
 		{
 			var ev = new MenuClosingEventArgs (currentMenu, reopen, isSubMenu);
-			MenuClosing?.Invoke (ev);
+			MenuClosing?.Invoke (this, ev);
 			return ev;
 		}
 
@@ -1284,7 +1284,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual void OnMenuAllClosed ()
 		{
-			MenuAllClosed?.Invoke ();
+			MenuAllClosed?.Invoke (this, EventArgs.Empty);
 		}
 
 		View lastFocused;

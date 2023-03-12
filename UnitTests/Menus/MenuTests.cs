@@ -128,7 +128,7 @@ namespace Terminal.Gui.MenuTests {
 				e.Action ();
 				Assert.Equal ("Copy", miAction);
 			};
-			menu.MenuClosing += (e) => {
+			menu.MenuClosing += (s,e) => {
 				Assert.False (isMenuClosed);
 				if (cancelClosing) {
 					e.Cancel = true;
@@ -383,7 +383,7 @@ Edit
 				miCurrent = e;
 				mCurrent = menu.openCurrentMenu;
 			};
-			menu.MenuClosing += (_) => {
+			menu.MenuClosing += (s,e) => {
 				mbiCurrent = null;
 				miCurrent = null;
 				mCurrent = null;

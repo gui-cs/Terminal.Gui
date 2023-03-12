@@ -61,7 +61,7 @@ namespace Terminal.Gui {
 			Position = new Point (x, y);
 		}
 
-		private void MenuBar_MenuAllClosed ()
+		private void MenuBar_MenuAllClosed (object sender, EventArgs e)
 		{
 			Dispose ();
 		}

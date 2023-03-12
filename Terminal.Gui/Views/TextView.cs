@@ -16,7 +16,7 @@ namespace Terminal.Gui {
 	class TextModel {
 		List<List<Rune>> lines = new List<List<Rune>> ();
 
-		public event Action LinesLoaded;
+		public event EventHandler LinesLoaded;
 
 		public bool LoadFile (string file)
 		{
@@ -120,7 +120,7 @@ namespace Terminal.Gui {
 
 		void OnLinesLoaded ()
 		{
-			LinesLoaded?.Invoke ();
+			LinesLoaded?.Invoke (this, EventArgs.Empty);
 		}
 
 		public override string ToString ()
@@ -1383,7 +1383,7 @@ namespace Terminal.Gui {
 			ReplaceKeyBinding (e.OldKey, e.NewKey);
 		}
 
-		private void Model_LinesLoaded ()
+		private void Model_LinesLoaded (object sender, EventArgs e)
 		{
 			// This call is not needed. Model_LinesLoaded gets invoked when
 			// model.LoadString (value) is called. LoadString is called from one place
