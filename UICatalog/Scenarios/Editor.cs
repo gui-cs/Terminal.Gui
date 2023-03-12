@@ -59,8 +59,8 @@ namespace UICatalog.Scenarios {
 
 			var siCursorPosition = new StatusItem (Key.Null, "", null);
 
-			_textView.UnwrappedCursorPosition += (e) => {
-				siCursorPosition.Title = $"Ln {e.Y + 1}, Col {e.X + 1}";
+			_textView.UnwrappedCursorPosition += (s,e) => {
+				siCursorPosition.Title = $"Ln {e.Point.Y + 1}, Col {e.Point.X + 1}";
 			};
 
 			LoadFile ();

@@ -6001,8 +6001,8 @@ line.
 				Height = Dim.Fill (),
 				Text = "This is the first line.\nThis is the second line.\n"
 			};
-			tv.UnwrappedCursorPosition += (e) => {
-				cp = e;
+			tv.UnwrappedCursorPosition += (s,e) => {
+				cp = e.Point;
 			};
 			Application.Top.Add (tv);
 			Application.Begin (Application.Top);

@@ -1170,7 +1170,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked with the unwrapped <see cref="CursorPosition"/>.
 		/// </summary>
-		public event Action<Point> UnwrappedCursorPosition;
+		public event EventHandler<PointEventArgs> UnwrappedCursorPosition;
 
 		/// <summary>
 		/// Provides autocomplete context menu based on suggestions at the current cursor
@@ -2364,7 +2364,7 @@ namespace Terminal.Gui {
 				row = wrapManager.GetModelLineFromWrappedLines (currentRow);
 				col = wrapManager.GetModelColFromWrappedLines (currentRow, currentColumn);
 			}
-			UnwrappedCursorPosition?.Invoke (new Point ((int)col, (int)row));
+			UnwrappedCursorPosition?.Invoke (this, new PointEventArgs(new Point ((int)col, (int)row)));
 		}
 
 		ustring GetSelectedRegion ()
