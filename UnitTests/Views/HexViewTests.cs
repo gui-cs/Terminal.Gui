@@ -106,7 +106,7 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var hv = new HexView (LoadStream (true)) { Width = 20, Height = 20 };
 			KeyValuePair<long, byte> keyValuePair = default;
-			hv.Edited += (e) => keyValuePair = e;
+			hv.Edited += (s,e) => keyValuePair = new KeyValuePair<long, byte>(e.Position,e.NewValue);
 
 			Assert.True (hv.ProcessKey (new KeyEvent (Key.D4, new KeyModifiers ())));
 			Assert.True (hv.ProcessKey (new KeyEvent (Key.D6, new KeyModifiers ())));

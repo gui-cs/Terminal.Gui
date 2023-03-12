@@ -75,7 +75,7 @@ namespace UICatalog.Scenarios {
 			_hexView.AllowEdits = (bool)(miAllowEdits.Checked = !miAllowEdits.Checked);
 		}
 
-		private void _hexView_Edited (System.Collections.Generic.KeyValuePair<long, byte> obj)
+		private void _hexView_Edited (object sender, HexView.HexViewEditEventArgs e)
 		{
 			_saved = false;
 		}

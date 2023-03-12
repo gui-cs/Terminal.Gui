@@ -103,7 +103,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Event to be invoked when an edit is made on the <see cref="Stream"/>.
 		/// </summary>
-		public event Action<KeyValuePair<long, byte>> Edited;
+		public event EventHandler<HexViewEditEventArgs> Edited;
 
 		/// <summary>
 		/// Event to be invoked when the position and cursor position changes.
@@ -458,11 +458,11 @@ namespace Terminal.Gui {
 					firstNibble = false;
 					b = (byte)(b & 0xf | (value << bsize));
 					edits [position] = b;
-					OnEdited (new KeyValuePair<long, byte> (position, edits [position]));
+					OnEdited (new HexViewEditEventArgs (position, edits [position]));
 				} else {
 					b = (byte)(b & 0xf0 | value);
 					edits [position] = b;
-					OnEdited (new KeyValuePair<long, byte> (position, edits [position]));
+					OnEdited (new HexViewEditEventArgs (position, edits [position]));
 					MoveRight ();
 				}
 				return true;
@@ -473,10 +473,10 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Method used to invoke the <see cref="Edited"/> event passing the <see cref="KeyValuePair{TKey, TValue}"/>.
 		/// </summary>
-		/// <param name="keyValuePair">The key value pair.</param>
-		public virtual void OnEdited (KeyValuePair<long, byte> keyValuePair)
+		/// <param name="e">The key value pair.</param>
+		public virtual void OnEdited (HexViewEditEventArgs e)
 		{
-			Edited?.Invoke (keyValuePair);
+			Edited?.Invoke (this, e);
 		}
 
 		/// <summary>
@@ -632,6 +632,32 @@ namespace Terminal.Gui {
 			return base.OnEnter (view);
 		}
 
+		/// <summary>
+		/// Defines the event arguments for <see cref="Edited"/> event.
+		/// </summary>
+		public class HexViewEditEventArgs : EventArgs {
+
+			/// <summary>
+			/// Creates a new instance of the <see cref="HexViewEditEventArgs"/> class.
+			/// </summary>
+			/// <param name="position"></param>
+			/// <param name="newValue"></param>
+			public HexViewEditEventArgs (long position, byte newValue)
+			{
+				Position = position;
+				NewValue = newValue;
+			}
+
+			/// <summary>
+			/// Gets the location of the edit.
+			/// </summary>
+			public long Position { get; }
+
+			/// <summary>
+			/// Gets the new value for that <see cref="Position"/>.
+			/// </summary>
+			public byte NewValue { get; }
+		}
 		/// <summary>
 		/// Defines the event arguments for <see cref="PositionChanged"/> event.
 		/// </summary>
