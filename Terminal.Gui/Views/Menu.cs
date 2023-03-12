@@ -1201,7 +1201,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Raised when a menu is opened.
 		/// </summary>
-		public event Action<MenuItem> MenuOpened;
+		public event EventHandler<MenuOpenedEventArgs> MenuOpened;
 
 		/// <summary>
 		/// Raised when a menu is closing passing <see cref="MenuClosingEventArgs"/>.
@@ -1254,16 +1254,20 @@ namespace Terminal.Gui {
 		public virtual void OnMenuOpened ()
 		{
 			MenuItem mi = null;
+			MenuBarItem parent;
+
 			if (openCurrentMenu.barItems.Children != null && openCurrentMenu.barItems.Children.Length > 0
 				&& openCurrentMenu?.current > -1) {
-
-				mi = openCurrentMenu.barItems.Children [openCurrentMenu.current];
+				parent = openCurrentMenu.barItems;
+				mi = parent.Children [openCurrentMenu.current];
 			} else if (openCurrentMenu.barItems.IsTopLevel) {
+				parent = null;
 				mi = openCurrentMenu.barItems;
 			} else {
-				mi = openMenu.barItems.Children [openMenu.current];
+				parent = openMenu.barItems;
+				mi = parent.Children [openMenu.current];
 			}
-			MenuOpened?.Invoke (mi);
+			MenuOpened?.Invoke (this, new MenuOpenedEventArgs(parent, mi));
 		}
 
 		/// <summary>
