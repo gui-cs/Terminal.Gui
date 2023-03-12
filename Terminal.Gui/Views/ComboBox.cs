@@ -188,7 +188,7 @@ namespace Terminal.Gui {
 				if (SuperView != null && SuperView.Subviews.Contains (this)) {
 					SelectedItem = -1;
 					search.Text = "";
-					Search_Changed ("");
+					Search_Changed (this, new TextChangedEventArgs(""));
 					SetNeedsDisplay ();
 				}
 			}
@@ -328,7 +328,7 @@ namespace Terminal.Gui {
 
 				SetNeedsLayout ();
 				SetNeedsDisplay ();
-				Search_Changed (Text);
+				Search_Changed (this, new TextChangedEventArgs( Text));
 			};
 
 			// Things this view knows how to do
@@ -750,7 +750,7 @@ namespace Terminal.Gui {
 
 			SetValue (searchset [listview.SelectedItem]);
 			search.CursorPosition = search.Text.ConsoleWidth;
-			Search_Changed (search.Text);
+			Search_Changed (this, new TextChangedEventArgs(search.Text));
 			OnOpenSelectedItem ();
 			Reset (keepSearchText: true);
 			HideList ();
@@ -806,15 +806,15 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void Search_Changed (ustring text)
+		private void Search_Changed (object sender, TextChangedEventArgs e)
 		{
 			if (source == null) { // Object initialization		
 				return;
 			}
 
-			if (ustring.IsNullOrEmpty (search.Text) && ustring.IsNullOrEmpty (text)) {
+			if (ustring.IsNullOrEmpty (search.Text) && ustring.IsNullOrEmpty (e.OldValue)) {
 				ResetSearchSet ();
-			} else if (search.Text != text) {
+			} else if (search.Text != e.OldValue) {
 				isShow = true;
 				ResetSearchSet (noCopy: true);
 

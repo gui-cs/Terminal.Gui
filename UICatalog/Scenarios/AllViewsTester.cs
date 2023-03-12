@@ -126,7 +126,7 @@ namespace UICatalog.Scenarios {
 			};
 			_xRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 			_xText = new TextField ($"{_xVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
-			_xText.TextChanged += (args) => {
+			_xText.TextChanged += (s, args) => {
 				try {
 					_xVal = int.Parse (_xText.Text.ToString ());
 					DimPosChanged (_curView);
@@ -142,7 +142,7 @@ namespace UICatalog.Scenarios {
 			label = new Label ("y:") { X = Pos.Right (_xRadioGroup) + 1, Y = 0 };
 			_locationFrame.Add (label);
 			_yText = new TextField ($"{_yVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
-			_yText.TextChanged += (args) => {
+			_yText.TextChanged += (s,args) => {
 				try {
 					_yVal = int.Parse (_yText.Text.ToString ());
 					DimPosChanged (_curView);
@@ -174,7 +174,7 @@ namespace UICatalog.Scenarios {
 			};
 			_wRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 			_wText = new TextField ($"{_wVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
-			_wText.TextChanged += (args) => {
+			_wText.TextChanged += (s,args) => {
 				try {
 					switch (_wRadioGroup.SelectedItem) {
 					case 0:
@@ -197,7 +197,7 @@ namespace UICatalog.Scenarios {
 			label = new Label ("height:") { X = Pos.Right (_wRadioGroup) + 1, Y = 0 };
 			_sizeFrame.Add (label);
 			_hText = new TextField ($"{_hVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
-			_hText.TextChanged += (args) => {
+			_hText.TextChanged += (s, args) => {
 				try {
 					switch (_hRadioGroup.SelectedItem) {
 					case 0:

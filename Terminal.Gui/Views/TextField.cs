@@ -53,7 +53,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		///   The passed <see cref="EventArgs"/> is a <see cref="NStack.ustring"/> containing the old value. 
 		/// </remarks>
-		public event Action<ustring> TextChanged;
+		public event EventHandler<TextChangedEventArgs> TextChanged;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Computed"/> positioning.
@@ -308,7 +308,7 @@ namespace Terminal.Gui {
 						, HistoryText.LineStatus.Replaced);
 				}
 
-				TextChanged?.Invoke (oldText);
+				TextChanged?.Invoke (this, new TextChangedEventArgs(oldText));
 
 				if (point > text.Count) {
 					point = Math.Max (TextModel.DisplaySize (text, 0).size - 1, 0);
@@ -1331,7 +1331,25 @@ namespace Terminal.Gui {
 			NewText = newText;
 		}
 	}
+	/// <summary>
+	/// Event args for the <see cref="TextField.TextChanged"/> event
+	/// </summary>
+	public class TextChangedEventArgs : EventArgs {
 
+		/// <summary>
+		/// Creates a new instance of the <see cref="TextChangedEventArgs"/> class
+		/// </summary>
+		/// <param name="oldValue"></param>
+		public TextChangedEventArgs (ustring oldValue)
+		{
+			OldValue = oldValue;
+		}
+
+		/// <summary>
+		/// The old value before the text changed
+		/// </summary>
+		public ustring OldValue { get; }
+	}
 	/// <summary>
 	/// Renders an overlay on another view at a given point that allows selecting
 	/// from a range of 'autocomplete' options.
