@@ -37,7 +37,8 @@ namespace UICatalog.Scenarios {
 				Y = 3,
 				Width = Dim.Fill (3),
 				Height = Dim.Fill (3),
-				ColorScheme = Colors.Dialog
+				ColorScheme = Colors.Dialog,
+				Id = "1"
 			};
 
 			var embedded2 = new Window ("2") {
@@ -45,7 +46,8 @@ namespace UICatalog.Scenarios {
 				Y = 3,
 				Width = Dim.Fill (3),
 				Height = Dim.Fill (3),
-				ColorScheme = Colors.Error
+				ColorScheme = Colors.Error,
+				Id = "2"
 			};
 			embedded1.Add (embedded2);
 
@@ -54,7 +56,8 @@ namespace UICatalog.Scenarios {
 				Y = 3,
 				Width = Dim.Fill (3),
 				Height = Dim.Fill (3),
-				ColorScheme = Colors.TopLevel
+				ColorScheme = Colors.TopLevel,
+				Id = "3"
 			};
 
 			var testButton = new Button (2, 2, "click me");

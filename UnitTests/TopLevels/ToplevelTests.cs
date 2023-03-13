@@ -154,28 +154,28 @@ namespace Terminal.Gui.TopLevelTests {
 
 			var eventInvoked = "";
 
-			top.ChildUnloaded += (s,e) => eventInvoked = "ChildUnloaded";
+			top.ChildUnloaded += (s, e) => eventInvoked = "ChildUnloaded";
 			top.OnChildUnloaded (top);
 			Assert.Equal ("ChildUnloaded", eventInvoked);
-			top.ChildLoaded += (s,e) => eventInvoked = "ChildLoaded";
+			top.ChildLoaded += (s, e) => eventInvoked = "ChildLoaded";
 			top.OnChildLoaded (top);
 			Assert.Equal ("ChildLoaded", eventInvoked);
 			top.Closed += (s, e) => eventInvoked = "Closed";
 			top.OnClosed (top);
 			Assert.Equal ("Closed", eventInvoked);
-			top.Closing += (s,e) => eventInvoked = "Closing";
+			top.Closing += (s, e) => eventInvoked = "Closing";
 			top.OnClosing (new ToplevelClosingEventArgs (top));
 			Assert.Equal ("Closing", eventInvoked);
 			top.AllChildClosed += (s, e) => eventInvoked = "AllChildClosed";
 			top.OnAllChildClosed ();
 			Assert.Equal ("AllChildClosed", eventInvoked);
-			top.ChildClosed += (s,e) => eventInvoked = "ChildClosed";
+			top.ChildClosed += (s, e) => eventInvoked = "ChildClosed";
 			top.OnChildClosed (top);
 			Assert.Equal ("ChildClosed", eventInvoked);
-			top.Deactivate += (s,e) => eventInvoked = "Deactivate";
+			top.Deactivate += (s, e) => eventInvoked = "Deactivate";
 			top.OnDeactivate (top);
 			Assert.Equal ("Deactivate", eventInvoked);
-			top.Activate += (s,e) => eventInvoked = "Activate";
+			top.Activate += (s, e) => eventInvoked = "Activate";
 			top.OnActivate (top);
 			Assert.Equal ("Activate", eventInvoked);
 			top.Loaded += (s, e) => eventInvoked = "Loaded";
@@ -356,7 +356,7 @@ namespace Terminal.Gui.TopLevelTests {
 			var top = Application.Top;
 			top.Add (win1, win2);
 			top.Loaded += (s, e) => isRunning = true;
-			top.Closing += (s,e) => isRunning = false;
+			top.Closing += (s, e) => isRunning = false;
 			Application.Begin (top);
 			top.Running = true;
 
@@ -589,9 +589,9 @@ namespace Terminal.Gui.TopLevelTests {
 
 			void View_Added (object sender, SuperViewChangedEventArgs e)
 			{
-				Assert.Throws<NullReferenceException> (() => Application.Top.AlternateForwardKeyChanged += (s,e) => alternateForwardKey = e.OldKey);
-				Assert.Throws<NullReferenceException> (() => Application.Top.AlternateBackwardKeyChanged += (s,e) => alternateBackwardKey = e.OldKey);
-				Assert.Throws<NullReferenceException> (() => Application.Top.QuitKeyChanged += (s,e) => quitKey = e.OldKey);
+				Assert.Throws<NullReferenceException> (() => Application.Top.AlternateForwardKeyChanged += (s, e) => alternateForwardKey = e.OldKey);
+				Assert.Throws<NullReferenceException> (() => Application.Top.AlternateBackwardKeyChanged += (s, e) => alternateBackwardKey = e.OldKey);
+				Assert.Throws<NullReferenceException> (() => Application.Top.QuitKeyChanged += (s, e) => quitKey = e.OldKey);
 				Assert.False (wasAdded);
 				wasAdded = true;
 				view.Added -= View_Added;
@@ -621,7 +621,7 @@ namespace Terminal.Gui.TopLevelTests {
 
 			void View_Initialized (object sender, EventArgs e)
 			{
-				Application.Top.AlternateForwardKeyChanged += (s,e) => alternateForwardKey = e.OldKey;
+				Application.Top.AlternateForwardKeyChanged += (s, e) => alternateForwardKey = e.OldKey;
 				Application.Top.AlternateBackwardKeyChanged += (s, e) => alternateBackwardKey = e.OldKey;
 				Application.Top.QuitKeyChanged += (s, e) => quitKey = e.OldKey;
 			}
@@ -1080,6 +1080,138 @@ namespace Terminal.Gui.TopLevelTests {
 			view.Frame = new Rect (1, 3, 10, 5);
 			Assert.Equal (new Rect (1, 3, 10, 5), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 5), view.NeedDisplay);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Toplevel_Inside_ScrollView_MouseGrabView ()
+		{
+			var scrollView = new ScrollView () {
+				X = 3,
+				Y = 3,
+				Width = 40,
+				Height = 16,
+				ContentSize = new Size (200, 100)
+			};
+			var win = new Window ("Window") { X = 3, Y = 3, Width = Dim.Fill (3), Height = Dim.Fill (3) };
+			scrollView.Add (win);
+			var top = Application.Top;
+			top.Add (scrollView);
+			Application.Begin (top);
+
+			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
+			Assert.Equal (new Rect (3, 3, 40, 16), scrollView.Frame);
+			Assert.Equal (new Rect (0, 0, 200, 100), scrollView.Subviews [0].Frame);
+			Assert.Equal (new Rect (3, 3, 194, 94), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+                                          ▲
+                                          ┬
+                                          │
+      ┌ Window ───────────────────────────┴
+      │                                   ░
+      │                                   ░
+      │                                   ░
+      │                                   ░
+      │                                   ░
+      │                                   ░
+      │                                   ░
+      │                                   ░
+      │                                   ░
+      │                                   ░
+      │                                   ▼
+   ◄├──────┤░░░░░░░░░░░░░░░░░░░░░░░░░░░░░► ", output);
+
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessMouseEvent",
+				new MouseEvent () {
+					X = 6,
+					Y = 6,
+					Flags = MouseFlags.Button1Pressed
+				});
+			Assert.Equal (win, Application.MouseGrabView);
+			Assert.Equal (new Rect (3, 3, 194, 94), win.Frame);
+
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessMouseEvent",
+				new MouseEvent () {
+					X = 9,
+					Y = 9,
+					Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+				});
+			Assert.Equal (win, Application.MouseGrabView);
+			top.SetNeedsLayout ();
+			top.LayoutSubviews ();
+			Assert.Equal (new Rect (6, 6, 191, 91), win.Frame);
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+                                          ▲
+                                          ┬
+                                          │
+                                          ┴
+                                          ░
+                                          ░
+         ┌ Window ────────────────────────░
+         │                                ░
+         │                                ░
+         │                                ░
+         │                                ░
+         │                                ░
+         │                                ░
+         │                                ░
+         │                                ▼
+   ◄├──────┤░░░░░░░░░░░░░░░░░░░░░░░░░░░░░► ", output);
+
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessMouseEvent",
+				new MouseEvent () {
+					X = 5,
+					Y = 5,
+					Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+				});
+			Assert.Equal (win, Application.MouseGrabView);
+			top.SetNeedsLayout ();
+			top.LayoutSubviews ();
+			Assert.Equal (new Rect (2, 2, 195, 95), win.Frame);
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+                                          ▲
+                                          ┬
+     ┌ Window ────────────────────────────│
+     │                                    ┴
+     │                                    ░
+     │                                    ░
+     │                                    ░
+     │                                    ░
+     │                                    ░
+     │                                    ░
+     │                                    ░
+     │                                    ░
+     │                                    ░
+     │                                    ░
+     │                                    ▼
+   ◄├──────┤░░░░░░░░░░░░░░░░░░░░░░░░░░░░░► ", output);
+
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessMouseEvent",
+				new MouseEvent () {
+					X = 5,
+					Y = 5,
+					Flags = MouseFlags.Button1Released
+				});
+			Assert.Null (Application.MouseGrabView);
+
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessMouseEvent",
+				new MouseEvent () {
+					X = 4,
+					Y = 4,
+					Flags = MouseFlags.ReportMousePosition
+				});
+			Assert.Equal (scrollView, Application.MouseGrabView);
 		}
 	}
 }
