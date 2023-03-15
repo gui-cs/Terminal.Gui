@@ -327,7 +327,7 @@ namespace UICatalog.Scenarios {
 				};
 				Add (listView);
 
-				start = new Button ("Start") { IsDefault = true };
+				start = new Button ("Start") { IsDefault = true, ClearOnVisibleFalse = false };
 				start.Clicked += () => {
 					Staging = new Staging (DateTime.Now);
 					RequestStop ();
