@@ -1523,7 +1523,6 @@ namespace Terminal.Gui {
 		static void TerminalResized ()
 		{
 			var full = new Rect (0, 0, Driver.Cols, Driver.Rows);
-			SetToplevelsSize (full);
 			Resized?.Invoke (new ResizedEventArgs () { Cols = full.Width, Rows = full.Height });
 			Driver.Clip = full;
 			foreach (var t in toplevels) {
@@ -1533,23 +1532,6 @@ namespace Terminal.Gui {
 				t.OnResized (full.Size);
 			}
 			Refresh ();
-		}
-
-		static void SetToplevelsSize (Rect full)
-		{
-			if (MdiTop == null) {
-				foreach (var t in toplevels) {
-					if (t?.SuperView == null && !t.Modal) {
-						t.Frame = full;
-						t.Width = full.Width;
-						t.Height = full.Height;
-					}
-				}
-			} else {
-				Top.Frame = full;
-				Top.Width = full.Width;
-				Top.Height = full.Height;
-			}
 		}
 
 		static bool SetCurrentAsTop ()
