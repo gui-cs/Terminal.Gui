@@ -1241,6 +1241,14 @@ namespace Terminal.Gui {
 				}
 				state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
 			}
+			if (toplevels.Count == 1 && state.Toplevel == Top
+				&& (Driver.Cols != state.Toplevel.Frame.Width || Driver.Rows != state.Toplevel.Frame.Height)
+				&& (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.ChildNeedsDisplay || state.Toplevel.LayoutNeeded)) {
+
+				Driver.SetAttribute (Colors.TopLevel.Normal);
+				state.Toplevel.Clear (new Rect (0, 0, Driver.Cols, Driver.Rows));
+
+			}
 			if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.ChildNeedsDisplay || state.Toplevel.LayoutNeeded
 				|| MdiChildNeedsDisplay ()) {
 				state.Toplevel.Redraw (state.Toplevel.Bounds);
