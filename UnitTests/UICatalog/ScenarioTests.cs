@@ -121,7 +121,7 @@ namespace UICatalog.Tests {
 			};
 			var token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
 
-			Application.Top.KeyPress += (object sender, View.KeyEventEventArgs args) => {
+			Application.Top.KeyPress += (object sender, KeyEventEventArgs args) => {
 				Assert.Equal (Key.CtrlMask | Key.Q, args.KeyEvent.Key);
 			};
 

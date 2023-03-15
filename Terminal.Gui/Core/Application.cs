@@ -59,7 +59,7 @@ namespace Terminal.Gui {
 	///     to the mainloop, allowing user code to use async/await.
 	///   </para>
 	/// </remarks>
-	public static class Application {
+	public static partial class Application {
 		static readonly Stack<Toplevel> toplevels = new Stack<Toplevel> ();
 
 		/// <summary>
@@ -1499,20 +1499,6 @@ namespace Terminal.Gui {
 			if (ExitRunLoopAfterFirstIteration) {
 				NotifyStopRunState?.Invoke (top, new ToplevelEventArgs(top));
 			}
-		}
-
-		/// <summary>
-		/// Event arguments for the <see cref="Application.Resized"/> event.
-		/// </summary>
-		public class ResizedEventArgs : EventArgs {
-			/// <summary>
-			/// The number of rows in the resized terminal.
-			/// </summary>
-			public int Rows { get; set; }
-			/// <summary>
-			/// The number of columns in the resized terminal.
-			/// </summary>
-			public int Cols { get; set; }
 		}
 
 		/// <summary>

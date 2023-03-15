@@ -254,7 +254,7 @@ namespace Terminal.Gui.ViewTests {
 		public void PositionChanged_Event ()
 		{
 			var hv = new HexView (LoadStream ()) { Width = Dim.Fill (), Height = Dim.Fill () };
-			HexView.HexViewEventArgs hexViewEventArgs = null;
+			HexViewEventArgs hexViewEventArgs = null;
 			hv.PositionChanged += (s, e) => hexViewEventArgs = e;
 			Application.Top.Add (hv);
 			Application.Begin (Application.Top);

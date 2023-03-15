@@ -302,19 +302,6 @@ namespace Terminal.Gui.Configuration {
 		}
 
 		/// <summary>
-		/// Event arguments for the <see cref="ConfigurationManager"/> events.
-		/// </summary>
-		public class ConfigurationManagerEventArgs : EventArgs {
-
-			/// <summary>
-			/// Initializes a new instance of <see cref="ConfigurationManagerEventArgs"/>
-			/// </summary>
-			public ConfigurationManagerEventArgs ()
-			{
-			}
-		}
-
-		/// <summary>
 		/// Gets or sets whether the <see cref="ConfigurationManager"/> should throw an exception if it encounters 
 		/// an error on deserialization. If <see langword="false"/> (the default), the error is logged and printed to the 
 		/// console when <see cref="Application.Shutdown"/> is called. 

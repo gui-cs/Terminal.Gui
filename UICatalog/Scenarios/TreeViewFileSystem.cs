@@ -106,7 +106,7 @@ namespace UICatalog.Scenarios {
 			ShowPropertiesOf (e.NewValue);
 		}
 
-		private void TreeViewFiles_KeyPress (object sender, View.KeyEventEventArgs obj)
+		private void TreeViewFiles_KeyPress (object sender, KeyEventEventArgs obj)
 		{
 			if (obj.KeyEvent.Key == (Key.R | Key.CtrlMask)) {
 

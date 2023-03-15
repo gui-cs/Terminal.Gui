@@ -74,12 +74,12 @@ namespace UICatalog.Scenarios {
 			New ();
 		}
 
-		private void TabView_SelectedTabChanged (object sender, TabView.TabChangedEventArgs e)
+		private void TabView_SelectedTabChanged (object sender, TabChangedEventArgs e)
 		{
 			lenStatusItem.Title = $"Len:{e.NewTab?.View?.Text?.Length ?? 0}";
 		}
 
-		private void TabView_TabClicked (object sender, TabView.TabMouseEventArgs e)
+		private void TabView_TabClicked (object sender, TabMouseEventArgs e)
 		{
 			// we are only interested in right clicks
 			if(!e.MouseEvent.Flags.HasFlag(MouseFlags.Button3Clicked)) {

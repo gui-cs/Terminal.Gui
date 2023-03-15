@@ -582,7 +582,7 @@ namespace Terminal.Gui.ApplicationTests {
 
 			int keyUps = 0;
 			var output = string.Empty;
-			Application.Top.KeyUp += (object sender, View.KeyEventEventArgs args) => {
+			Application.Top.KeyUp += (object sender, KeyEventEventArgs args) => {
 				if (args.KeyEvent.Key != (Key.CtrlMask | Key.Q)) {
 					output += (char)args.KeyEvent.KeyValue;
 				}

@@ -515,40 +515,12 @@ namespace Terminal.Gui {
 		}
 	}
 
-	class HistoryText {
+	partial class HistoryText {
 		public enum LineStatus {
 			Original,
 			Replaced,
 			Removed,
 			Added
-		}
-
-		public class HistoryTextItem : EventArgs{
-			public List<List<Rune>> Lines;
-			public Point CursorPosition;
-			public LineStatus LineStatus;
-			public bool IsUndoing;
-			public Point FinalCursorPosition;
-			public HistoryTextItem RemovedOnAdded;
-
-			public HistoryTextItem (List<List<Rune>> lines, Point curPos, LineStatus linesStatus)
-			{
-				Lines = lines;
-				CursorPosition = curPos;
-				LineStatus = linesStatus;
-			}
-
-			public HistoryTextItem (HistoryTextItem historyTextItem)
-			{
-				Lines = new List<List<Rune>> (historyTextItem.Lines);
-				CursorPosition = new Point (historyTextItem.CursorPosition.X, historyTextItem.CursorPosition.Y);
-				LineStatus = historyTextItem.LineStatus;
-			}
-
-			public override string ToString ()
-			{
-				return $"(Count: {Lines.Count}, Cursor: {CursorPosition}, Status: {LineStatus})";
-			}
 		}
 
 		List<HistoryTextItem> historyTextItems = new List<HistoryTextItem> ();
@@ -1129,7 +1101,7 @@ namespace Terminal.Gui {
 	///   </item>
 	///  </list>
 	/// </remarks>
-	public class TextView : View {
+	public partial class TextView : View {
 		TextModel model = new TextModel ();
 		int topRow;
 		int leftColumn;
@@ -2707,33 +2679,6 @@ namespace Terminal.Gui {
 			}
 
 			OnUnwrappedCursorPosition ();
-		}
-
-		/// <summary>
-		/// Event arguments for events for when the contents of the TextView change. E.g. the <see cref="ContentsChanged"/> event.
-		/// </summary>
-		public class ContentsChangedEventArgs : EventArgs {
-			/// <summary>
-			/// Creates a new <see cref="ContentsChanged"/> instance.
-			/// </summary>
-			/// <param name="currentRow">Contains the row where the change occurred.</param>
-			/// <param name="currentColumn">Contains the column where the change occured.</param>
-			public ContentsChangedEventArgs (int currentRow, int currentColumn)
-			{
-				Row = currentRow;
-				Col = currentColumn;
-			}
-
-			/// <summary>
-			/// 
-			/// Contains the row where the change occurred.
-			/// </summary>
-			public int Row { get; private set; }
-
-			/// <summary>
-			/// Contains the column where the change occurred.
-			/// </summary>
-			public int Col { get; private set; }
 		}
 
 		/// <summary>

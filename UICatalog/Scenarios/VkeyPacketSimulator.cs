@@ -122,7 +122,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			View.KeyEventEventArgs unknownChar = null;
+			KeyEventEventArgs unknownChar = null;
 
 			tvInput.KeyPress += (s, e) => {
 				if (e.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
@@ -229,7 +229,7 @@ namespace UICatalog.Scenarios {
 			};
 		}
 
-		private void AddKeyboardStrokes (View.KeyEventEventArgs e)
+		private void AddKeyboardStrokes (KeyEventEventArgs e)
 		{
 			var ke = e.KeyEvent;
 			var km = new KeyModifiers ();

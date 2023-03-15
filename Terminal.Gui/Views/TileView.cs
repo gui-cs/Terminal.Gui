@@ -10,7 +10,7 @@ namespace Terminal.Gui {
 	/// A <see cref="View"/> consisting of a moveable bar that divides
 	/// the display area into resizeable <see cref="Tiles"/>.
 	/// </summary>
-	public class TileView : View {
+	public partial class TileView : View {
 		TileView parentTileView;
 
 		/// <summary>
@@ -24,7 +24,7 @@ namespace Terminal.Gui {
 		/// new instances use <see cref="TileView.RebuildForTileCount(int)"/> 
 		/// or <see cref="TileView.InsertTile(int)"/>.
 		/// </summary>
-		public class Tile {
+		public partial class Tile {
 			/// <summary>
 			/// The <see cref="ContentView"/> that is contained in this <see cref="TileView"/>.
 			/// Add new child views to this member for multiple 
@@ -60,37 +60,6 @@ namespace Terminal.Gui {
 			}
 
 			private string _title = string.Empty;
-
-			/// <summary>
-			/// An <see cref="EventArgs"/> which allows passing a cancelable new <see cref="Title"/> value event.
-			/// </summary>
-			public class TitleEventArgs : EventArgs {
-				/// <summary>
-				/// The new Window Title.
-				/// </summary>
-				public ustring NewTitle { get; set; }
-
-				/// <summary>
-				/// The old Window Title.
-				/// </summary>
-				public ustring OldTitle { get; set; }
-
-				/// <summary>
-				/// Flag which allows cancelling the Title change.
-				/// </summary>
-				public bool Cancel { get; set; }
-
-				/// <summary>
-				/// Initializes a new instance of <see cref="TitleEventArgs"/>
-				/// </summary>
-				/// <param name="oldTitle">The <see cref="Title"/> that is/has been replaced.</param>
-				/// <param name="newTitle">The new <see cref="Title"/> to be replaced.</param>
-				public TitleEventArgs (ustring oldTitle, ustring newTitle)
-				{
-					OldTitle = oldTitle;
-					NewTitle = newTitle;
-				}
-			}
 
 			/// <summary>
 			/// Called before the <see cref="Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can be cancelled.
@@ -1105,41 +1074,6 @@ namespace Terminal.Gui {
 			base.Dispose (disposing);
 		}
 
-	}
-
-	/// <summary>
-	/// Provides data for <see cref="TileView"/> events.
-	/// </summary>
-	public class SplitterEventArgs : EventArgs {
-
-		/// <summary>
-		/// Creates a new instance of the <see cref="SplitterEventArgs"/> class.
-		/// </summary>
-		/// <param name="tileView"><see cref="TileView"/> in which splitter is being moved.</param>
-		/// <param name="idx">Index of the splitter being moved in <see cref="TileView.SplitterDistances"/>.</param>
-		/// <param name="splitterDistance">The new <see cref="Pos"/> of the splitter line.</param>
-		public SplitterEventArgs (TileView tileView, int idx, Pos splitterDistance)
-		{
-			SplitterDistance = splitterDistance;
-			TileView = tileView;
-			Idx = idx;
-		}
-
-		/// <summary>
-		/// New position of the splitter line (see <see cref="TileView.SplitterDistances"/>).
-		/// </summary>
-		public Pos SplitterDistance { get; }
-
-		/// <summary>
-		/// Container (sender) of the event.
-		/// </summary>
-		public TileView TileView { get; }
-
-		/// <summary>
-		/// Gets the index of the splitter that is being moved. This can be
-		/// used to index <see cref="TileView.SplitterDistances"/>
-		/// </summary>
-		public int Idx { get; }
 	}
 
 	/// <summary>

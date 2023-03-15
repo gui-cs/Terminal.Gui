@@ -110,7 +110,7 @@ namespace Terminal.Gui.Configuration {
 		/// 		}
 		/// 	}
 		/// </code></example> 
-		public class ThemeManager : IDictionary<string, ThemeScope> {
+		public partial class ThemeManager : IDictionary<string, ThemeScope> {
 			private static readonly ThemeManager _instance = new ThemeManager ();
 			static ThemeManager () { } // Make sure it's truly lazy
 			private ThemeManager () { } // Prevent instantiation outside
@@ -149,24 +149,6 @@ namespace Terminal.Gui.Configuration {
 				get => ThemeManager.SelectedTheme;
 				set {
 					ThemeManager.SelectedTheme = value;
-				}
-			}
-
-			/// <summary>
-			/// Event arguments for the <see cref="ThemeManager"/> events.
-			/// </summary>
-			public class ThemeManagerEventArgs : EventArgs {
-				/// <summary>
-				/// The name of the new active theme..
-				/// </summary>
-				public string NewTheme { get; set; } = string.Empty;
-
-				/// <summary>
-				/// Initializes a new instance of <see cref="ThemeManagerEventArgs"/>
-				/// </summary>
-				public ThemeManagerEventArgs (string newTheme)
-				{
-					NewTheme = newTheme;
 				}
 			}
 

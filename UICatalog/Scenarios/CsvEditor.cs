@@ -114,7 +114,7 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
-		private void OnSelectedCellChanged (object sender, TableView.SelectedCellChangedEventArgs e)
+		private void OnSelectedCellChanged (object sender, SelectedCellChangedEventArgs e)
 		{
 			// only update the text box if the user is not manually editing it
 			if (!selectedCellLabel.HasFocus)
@@ -472,7 +472,7 @@ namespace UICatalog.Scenarios {
 
 		}
 
-		private void TableViewKeyPress (object sender, View.KeyEventEventArgs e)
+		private void TableViewKeyPress (object sender, KeyEventEventArgs e)
 		{
 			if (e.KeyEvent.Key == Key.DeleteChar) {
 
@@ -540,7 +540,7 @@ namespace UICatalog.Scenarios {
 			enteredText = okPressed ? tf.Text.ToString () : null;
 			return okPressed;
 		}
-		private void EditCurrentCell (object sender, TableView.CellActivatedEventArgs e)
+		private void EditCurrentCell (object sender, CellActivatedEventArgs e)
 		{
 			if (e.Table == null)
 				return;

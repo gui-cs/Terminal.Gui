@@ -15,7 +15,7 @@ namespace Terminal.Gui {
 	/// If the user pauses keystrokes for a short time (see <see cref="TypingDelay"/>), the search string is cleared.
 	/// </para>
 	/// </summary>
-	public class CollectionNavigator {
+	public partial class CollectionNavigator {
 		/// <summary>
 		/// Constructs a new CollectionNavigator.
 		/// </summary>
@@ -43,25 +43,6 @@ namespace Terminal.Gui {
 		/// The collection of objects to search. <see cref="object.ToString()"/> is used to search the collection.
 		/// </summary>
 		public IEnumerable<object> Collection { get; set; }
-
-		/// <summary>
-		/// Event arguments for the <see cref="CollectionNavigator.SearchStringChanged"/> event.
-		/// </summary>
-		public class KeystrokeNavigatorEventArgs : EventArgs{
-			/// <summary>
-			/// he current <see cref="SearchString"/>.
-			/// </summary>
-			public string SearchString { get; }
-
-			/// <summary>
-			/// Initializes a new instance of <see cref="KeystrokeNavigatorEventArgs"/>
-			/// </summary>
-			/// <param name="searchString">The current <see cref="SearchString"/>.</param>
-			public KeystrokeNavigatorEventArgs (string searchString)
-			{
-				SearchString = searchString;
-			}
-		}
 
 		/// <summary>
 		/// This event is invoked when <see cref="SearchString"/>  changes. Useful for debugging.

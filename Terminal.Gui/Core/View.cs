@@ -101,7 +101,7 @@ namespace Terminal.Gui {
 	///    frames for the vies that use <see cref="LayoutStyle.Computed"/>.
 	/// </para>
 	/// </remarks>
-	public class View : Responder, ISupportInitializeNotification {
+	public partial class View : Responder, ISupportInitializeNotification {
 
 		internal enum Direction {
 			Forward,
@@ -1332,26 +1332,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Defines the event arguments for <see cref="SetFocus(View)"/>
-		/// </summary>
-		public class FocusEventArgs : EventArgs {
-			/// <summary>
-			/// Constructs.
-			/// </summary>
-			/// <param name="view">The view that gets or loses focus.</param>
-			public FocusEventArgs (View view) { View = view; }
-			/// <summary>
-			/// Indicates if the current focus event has already been processed and the driver should stop notifying any other event subscriber.
-			/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
-			/// </summary>
-			public bool Handled { get; set; }
-			/// <summary>
-			/// Indicates the current view that gets or loses focus.
-			/// </summary>
-			public View View { get; set; }
-		}
-
-		/// <summary>
 		/// Method invoked when a subview is being added to this view.
 		/// </summary>
 		/// <param name="e">Event where <see cref="ViewEventArgs.View"/> is the subview being added.</param>
@@ -1688,26 +1668,6 @@ namespace Terminal.Gui {
 			}
 
 			SuperView?.SetFocus (this);
-		}
-
-		/// <summary>
-		/// Defines the event arguments for <see cref="KeyEvent"/>
-		/// </summary>
-		public class KeyEventEventArgs : EventArgs {
-			/// <summary>
-			/// Constructs.
-			/// </summary>
-			/// <param name="ke"></param>
-			public KeyEventEventArgs (KeyEvent ke) => KeyEvent = ke;
-			/// <summary>
-			/// The <see cref="KeyEvent"/> for the event.
-			/// </summary>
-			public KeyEvent KeyEvent { get; set; }
-			/// <summary>
-			/// Indicates if the current Key event has already been processed and the driver should stop notifying any other event subscriber.
-			/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
-			/// </summary>
-			public bool Handled { get; set; } = false;
 		}
 
 		/// <summary>

@@ -1308,48 +1308,6 @@ namespace Terminal.Gui {
 			historyText.Clear (Text);
 		}
 	}
-
-	/// <summary>
-	/// An <see cref="EventArgs"/> which allows passing a cancelable new text value event.
-	/// </summary>
-	public class TextChangingEventArgs : EventArgs {
-		/// <summary>
-		/// The new text to be replaced.
-		/// </summary>
-		public ustring NewText { get; set; }
-		/// <summary>
-		/// Flag which allows to cancel the new text value.
-		/// </summary>
-		public bool Cancel { get; set; }
-
-		/// <summary>
-		/// Initializes a new instance of <see cref="TextChangingEventArgs"/>
-		/// </summary>
-		/// <param name="newText">The new <see cref="TextField.Text"/> to be replaced.</param>
-		public TextChangingEventArgs (ustring newText)
-		{
-			NewText = newText;
-		}
-	}
-	/// <summary>
-	/// Event args for the <see cref="TextField.TextChanged"/> event
-	/// </summary>
-	public class TextChangedEventArgs : EventArgs {
-
-		/// <summary>
-		/// Creates a new instance of the <see cref="TextChangedEventArgs"/> class
-		/// </summary>
-		/// <param name="oldValue"></param>
-		public TextChangedEventArgs (ustring oldValue)
-		{
-			OldValue = oldValue;
-		}
-
-		/// <summary>
-		/// The old value before the text changed
-		/// </summary>
-		public ustring OldValue { get; }
-	}
 	/// <summary>
 	/// Renders an overlay on another view at a given point that allows selecting
 	/// from a range of 'autocomplete' options.

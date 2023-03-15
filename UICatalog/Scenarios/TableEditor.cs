@@ -345,7 +345,7 @@ namespace UICatalog.Scenarios {
 
 		}
 
-		private void TableViewKeyPress (object sender, View.KeyEventEventArgs e)
+		private void TableViewKeyPress (object sender, KeyEventEventArgs e)
 		{
 			if (e.KeyEvent.Key == Key.DeleteChar) {
 
@@ -748,7 +748,7 @@ namespace UICatalog.Scenarios {
 			tableView.Table = BuildSimpleDataTable (big ? 30 : 5, big ? 1000 : 5);
 		}
 
-		private void EditCurrentCell (object sender, TableView.CellActivatedEventArgs e)
+		private void EditCurrentCell (object sender, CellActivatedEventArgs e)
 		{
 			if (e.Table == null)
 				return;
