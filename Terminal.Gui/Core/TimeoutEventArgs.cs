@@ -1,5 +1,4 @@
 ﻿using System;
-using Terminal.Gui;
 using static Terminal.Gui.MainLoop;
 
 namespace Terminal.Gui {
@@ -26,8 +25,8 @@ namespace Terminal.Gui {
 		/// <param name="ticks"></param>
 		public TimeoutEventArgs (Timeout timeout, long ticks)
 		{
-			this.Timeout = timeout;
-			this.Ticks = ticks;
+			Timeout = timeout;
+			Ticks = ticks;
 		}
 	}
 }

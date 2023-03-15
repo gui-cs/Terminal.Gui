@@ -162,7 +162,7 @@ namespace Terminal.Gui {
 				if (alternateForwardKey != value) {
 					var oldKey = alternateForwardKey;
 					alternateForwardKey = value;
-					OnAlternateForwardKeyChanged (new KeyChangedEventArgs (oldKey, value));
+					OnAlternateForwardKeyChanged (new KeyChangedEventArgs(oldKey,value));
 				}
 			}
 		}
@@ -186,7 +186,7 @@ namespace Terminal.Gui {
 				if (alternateBackwardKey != value) {
 					var oldKey = alternateBackwardKey;
 					alternateBackwardKey = value;
-					OnAlternateBackwardKeyChanged (new KeyChangedEventArgs (oldKey, value));
+					OnAlternateBackwardKeyChanged (new KeyChangedEventArgs(oldKey,value));
 				}
 			}
 		}
@@ -210,7 +210,7 @@ namespace Terminal.Gui {
 				if (quitKey != value) {
 					var oldKey = quitKey;
 					quitKey = value;
-					OnQuitKeyChanged (new KeyChangedEventArgs (oldKey, value));
+					OnQuitKeyChanged (new KeyChangedEventArgs(oldKey,value));
 				}
 			}
 		}
@@ -721,16 +721,6 @@ namespace Terminal.Gui {
 		public static View MouseGrabView => mouseGrabView;
 
 		/// <summary>
-		/// Event to be invoked when a view want grab the mouse which can be canceled.
-		/// </summary>
-		public static event EventHandler<GrabMouseEventArgs> GrabbingMouse;
-
-		/// <summary>
-		/// Event to be invoked when a view want ungrab the mouse which can be canceled.
-		/// </summary>
-		public static event EventHandler<GrabMouseEventArgs> UnGrabbingMouse;
-
-		/// <summary>
 		/// Event to be invoked when a view grab the mouse.
 		/// </summary>
 		public static event EventHandler<ViewEventArgs> GrabbedMouse;
@@ -749,11 +739,9 @@ namespace Terminal.Gui {
 		{
 			if (view == null)
 				return;
-			if (!OnGrabbingMouse (view)) {
-				OnGrabbedMouse (view);
-				mouseGrabView = view;
-				Driver.UncookMouse ();
-			}
+			OnGrabbedMouse (view);
+			mouseGrabView = view;
+			Driver.UncookMouse ();
 		}
 
 		/// <summary>
@@ -763,36 +751,16 @@ namespace Terminal.Gui {
 		{
 			if (mouseGrabView == null)
 				return;
-			if (!OnUnGrabbingMouse (mouseGrabView)) {
-				OnUnGrabbedMouse (mouseGrabView);
-				mouseGrabView = null;
-				Driver.CookMouse ();
-			}
-		}
-
-		static bool OnGrabbingMouse (View view)
-		{
-			if (view == null)
-				return false;
-			var evArgs = new GrabMouseEventArgs (view);
-			GrabbingMouse?.Invoke (view, evArgs);
-			return evArgs.Cancel;
-		}
-
-		static bool OnUnGrabbingMouse (View view)
-		{
-			if (view == null)
-				return false;
-			var evArgs = new GrabMouseEventArgs (view);
-			UnGrabbingMouse?.Invoke (view, evArgs);
-			return evArgs.Cancel;
+			OnUnGrabbedMouse (mouseGrabView);
+			mouseGrabView = null;
+			Driver.CookMouse ();
 		}
 
 		static void OnGrabbedMouse (View view)
 		{
 			if (view == null)
 				return;
-			GrabbedMouse?.Invoke (view, new ViewEventArgs (view));
+			GrabbedMouse?.Invoke (view, new ViewEventArgs(view));
 		}
 
 		static void OnUnGrabbedMouse (View view)
@@ -1061,7 +1029,7 @@ namespace Terminal.Gui {
 				Driver.Refresh ();
 			}
 
-			NotifyNewRunState?.Invoke (toplevel, new RunStateEventArgs (rs));
+			NotifyNewRunState?.Invoke (toplevel, new RunStateEventArgs(rs));
 			return rs;
 		}
 
@@ -1529,7 +1497,7 @@ namespace Terminal.Gui {
 		static void OnNotifyStopRunState (Toplevel top)
 		{
 			if (ExitRunLoopAfterFirstIteration) {
-				NotifyStopRunState?.Invoke (top, new ToplevelEventArgs (top));
+				NotifyStopRunState?.Invoke (top, new ToplevelEventArgs(top));
 			}
 		}
 
@@ -1548,7 +1516,7 @@ namespace Terminal.Gui {
 				t.SetRelativeLayout (full);
 				t.LayoutSubviews ();
 				t.PositionToplevels ();
-				t.OnResized (new SizeChangedEventArgs (full.Size));
+				t.OnResized (new SizeChangedEventArgs(full.Size));
 			}
 			Refresh ();
 		}

@@ -4,7 +4,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Args for events that relate to a specific <see cref="Toplevel"/>.
 	/// </summary>
-	public class ToplevelEventArgs : EventArgs{
+	public class ToplevelEventArgs : EventArgs {
 
 		/// <summary>
 		/// Creates a new instance of the <see cref="ToplevelClosingEventArgs"/> class.

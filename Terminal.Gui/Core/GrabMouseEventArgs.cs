@@ -4,7 +4,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Args for events that relate to specific <see cref="Application.MouseGrabView"/>
 	/// </summary>
-	public class GrabMouseEventArgs : EventArgs{
+	public class GrabMouseEventArgs : EventArgs {
 
 		/// <summary>
 		/// Creates a new instance of the <see cref="GrabMouseEventArgs"/> class.
