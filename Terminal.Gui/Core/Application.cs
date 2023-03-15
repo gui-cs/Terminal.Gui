@@ -1134,6 +1134,7 @@ namespace Terminal.Gui {
 			_initialized = false;
 			mouseGrabView = null;
 			_enableConsoleScrolling = false;
+			lastMouseOwnerView = null;
 
 			// Reset synchronization context to allow the user to run async/await,
 			// as the main loop has been ended, the synchronization context from 

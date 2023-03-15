@@ -1163,6 +1163,8 @@ namespace Terminal.Gui.TopLevelTests {
                     │           this.            │
                     │                            │
                     └────────────────────────────┘", output);
+
+			Application.End (rs);
 		}
 	}
 }

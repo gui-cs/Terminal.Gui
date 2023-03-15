@@ -984,6 +984,13 @@ namespace Terminal.Gui {
 		{
 			return MostFocused?.OnLeave (view) ?? base.OnLeave (view);
 		}
+
+		///<inheritdoc/>
+		protected override void Dispose (bool disposing)
+		{
+			dragPosition = null;
+			base.Dispose (disposing);
+		}
 	}
 
 	/// <summary>
