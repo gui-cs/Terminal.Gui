@@ -251,10 +251,11 @@ namespace UICatalog {
 		/// </summary>
 		public static List<Scenario> GetScenarios ()
 		{
+			var factory = new ScenarioFactory ();
+
 			List<Scenario> objects = new List<Scenario> ();
-			foreach (Type type in typeof (Scenario).Assembly.ExportedTypes
-			 .Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf (typeof (Scenario)))) {
-				var scenario = (Scenario)Activator.CreateInstance (type);
+			foreach (Type type in factory.GetScenarioTypes()) {
+				var scenario = factory.Create(type);
 				objects.Add (scenario);
 				_maxScenarioNameLen = Math.Max (_maxScenarioNameLen, scenario.GetName ().Length + 1);
 			}
