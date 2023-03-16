@@ -106,7 +106,7 @@ namespace Terminal.Gui.TopLevelTests {
 
 				var statusBar = new StatusBar (new [] {
 					new StatusItem(Key.CtrlMask | Key.R, "~^R~ Run Top2", () => Application.Run (Top2 ())),
-					new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Application.RequestStop())
+					new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Application.RequestStop())
 				});
 				top.Add (statusBar);
 
