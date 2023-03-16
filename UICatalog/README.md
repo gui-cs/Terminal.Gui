@@ -12,7 +12,7 @@ said concepts & features.
 ## Motivation
 
 The original `demo.cs` sample app for Terminal.Gui is neither good to showcase, nor does it explain different concepts. In addition, because it is built on a single source file, it has proven to cause friction when multiple contributors are simultaneously working on different aspects of Terminal.Gui. 
-See [Issue #368](https://github.com/giu-cs/Terminal.Gui/issues/368) for more background.
+See [Issue #368](https://github.com/gui-cs/Terminal.Gui/issues/368) for more background.
 
 # API Reference
 
