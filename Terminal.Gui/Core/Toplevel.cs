@@ -613,8 +613,9 @@ namespace Terminal.Gui {
 			}
 			nx = Math.Max (x, 0);
 			nx = nx + top.Frame.Width > l ? Math.Max (l - top.Frame.Width, 0) : nx;
-			if (nx + (top.Border != null && top.Border.DrawMarginFrame ? 2 : 1) > top.Frame.X + top.Frame.Width) {
-				nx = Math.Max (top.Frame.Right - (top.Border.DrawMarginFrame ? 2 : 1), 0);
+			var mfLength = top.Border?.DrawMarginFrame == true ? 2 : 1;
+			if (nx + mfLength > top.Frame.X + top.Frame.Width) {
+				nx = Math.Max (top.Frame.Right - mfLength, 0);
 			}
 			//System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
 			bool m, s;
@@ -653,8 +654,8 @@ namespace Terminal.Gui {
 			}
 			ny = Math.Min (ny, l);
 			ny = ny + top.Frame.Height >= l ? Math.Max (l - top.Frame.Height, m ? 1 : 0) : ny;
-			if (ny + (top.Border != null && top.Border.DrawMarginFrame ? 2 : 1) > top.Frame.Y + top.Frame.Height) {
-				ny = Math.Max (top.Frame.Bottom - (top.Border.DrawMarginFrame ? 2 : 1), 0);
+			if (ny + mfLength > top.Frame.Y + top.Frame.Height) {
+				ny = Math.Max (top.Frame.Bottom - mfLength, 0);
 			}
 			//System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
 
@@ -820,7 +821,6 @@ namespace Terminal.Gui {
 
 			if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released) && dragPosition.HasValue) {
 				Application.UngrabMouse ();
-				Driver.UncookMouse ();
 				dragPosition = null;
 			}
 
@@ -908,6 +908,12 @@ namespace Terminal.Gui {
 		{
 			if (!IsMdiContainer) {
 				base.PositionCursor ();
+				if (Focused == null) {
+					EnsureFocus ();
+					if (Focused == null) {
+						Driver.SetCursorVisibility (CursorVisibility.Invisible);
+					}
+				}
 				return;
 			}
 
@@ -920,6 +926,9 @@ namespace Terminal.Gui {
 				}
 			}
 			base.PositionCursor ();
+			if (Focused == null) {
+				Driver.SetCursorVisibility (CursorVisibility.Invisible);
+			}
 		}
 
 		/// <summary>
@@ -958,6 +967,18 @@ namespace Terminal.Gui {
 				return Application.ShowChild (top == null ? this : top);
 			}
 			return false;
+		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			return MostFocused?.OnEnter (view) ?? base.OnEnter (view);
+		}
+
+		///<inheritdoc/>
+		public override bool OnLeave (View view)
+		{
+			return MostFocused?.OnLeave (view) ?? base.OnLeave (view);
 		}
 	}
 

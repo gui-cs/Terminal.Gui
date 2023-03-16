@@ -1,9 +1,6 @@
 ﻿//
 // FakeDriver.cs: A fake ConsoleDriver for unit tests. 
 //
-// Authors:
-//   Charlie Kindel (github.com/tig)
-//
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -33,7 +30,7 @@ namespace Terminal.Gui {
 				UseFakeClipboard = useFakeClipboard;
 				FakeClipboardAlwaysThrowsNotSupportedException = fakeClipboardAlwaysThrowsNotSupportedException;
 				FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
-				
+
 				// double check usage is correct
 				Debug.Assert (useFakeClipboard == false && fakeClipboardAlwaysThrowsNotSupportedException == false);
 				Debug.Assert (useFakeClipboard == false && fakeClipboardIsSupportedAlwaysTrue == false);
@@ -48,7 +45,12 @@ namespace Terminal.Gui {
 		// Only handling left here because not all terminals has a horizontal scroll bar.
 		public override int Left => 0;
 		public override int Top => 0;
-		public override bool HeightAsBuffer { get; set; }
+		public override bool EnableConsoleScrolling { get; set; }
+		[Obsolete ("This API is deprecated; use EnableConsoleScrolling instead.", false)]
+		public override bool HeightAsBuffer {
+			get => EnableConsoleScrolling;
+			set => EnableConsoleScrolling = value;
+		}
 		private IClipboard clipboard = null;
 		public override IClipboard Clipboard => clipboard;
 
@@ -131,34 +133,54 @@ namespace Terminal.Gui {
 					//MockConsole.CursorTop = crow;
 					needMove = false;
 				}
-				if (runeWidth < 2 && ccol > 0
+				if (runeWidth == 0 && ccol > 0) {
+					var r = contents [crow, ccol - 1, 0];
+					var s = new string (new char [] { (char)r, (char)rune });
+					string sn;
+					if (!s.IsNormalized ()) {
+						sn = s.Normalize ();
+					} else {
+						sn = s;
+					}
+					var c = sn [0];
+					contents [crow, ccol - 1, 0] = c;
+					contents [crow, ccol - 1, 1] = CurrentAttribute;
+					contents [crow, ccol - 1, 2] = 1;
+
+				} else {
+					if (runeWidth < 2 && ccol > 0
 					&& Rune.ColumnWidth ((Rune)contents [crow, ccol - 1, 0]) > 1) {
 
-					contents [crow, ccol - 1, 0] = (int)(uint)' ';
+						contents [crow, ccol - 1, 0] = (int)(uint)' ';
 
-				} else if (runeWidth < 2 && ccol <= Clip.Right - 1
-					&& Rune.ColumnWidth ((Rune)contents [crow, ccol, 0]) > 1) {
+					} else if (runeWidth < 2 && ccol <= Clip.Right - 1
+						&& Rune.ColumnWidth ((Rune)contents [crow, ccol, 0]) > 1) {
 
-					contents [crow, ccol + 1, 0] = (int)(uint)' ';
-					contents [crow, ccol + 1, 2] = 1;
+						contents [crow, ccol + 1, 0] = (int)(uint)' ';
+						contents [crow, ccol + 1, 2] = 1;
 
+					}
+					if (runeWidth > 1 && ccol == Clip.Right - 1) {
+						contents [crow, ccol, 0] = (int)(uint)' ';
+					} else {
+						contents [crow, ccol, 0] = (int)(uint)rune;
+					}
+					contents [crow, ccol, 1] = CurrentAttribute;
+					contents [crow, ccol, 2] = 1;
+
+					dirtyLine [crow] = true;
 				}
-				if (runeWidth > 1 && ccol == Clip.Right - 1) {
-					contents [crow, ccol, 0] = (int)(uint)' ';
-				} else {
-					contents [crow, ccol, 0] = (int)(uint)rune;
-				}
-				contents [crow, ccol, 1] = currentAttribute;
-				contents [crow, ccol, 2] = 1;
-
-				dirtyLine [crow] = true;
-			} else
+			} else {
 				needMove = true;
+			}
 
-			ccol++;
+			if (runeWidth < 0 || runeWidth > 0) {
+				ccol++;
+			}
+
 			if (runeWidth > 1) {
 				if (validClip && ccol < Clip.Right) {
-					contents [crow, ccol, 1] = currentAttribute;
+					contents [crow, ccol, 1] = CurrentAttribute;
 					contents [crow, ccol, 2] = 0;
 				}
 				ccol++;
@@ -169,8 +191,9 @@ namespace Terminal.Gui {
 			//	if (crow + 1 < Rows)
 			//		crow++;
 			//}
-			if (sync)
+			if (sync) {
 				UpdateScreen ();
+			}
 		}
 
 		public override void AddStr (ustring str)
@@ -208,11 +231,10 @@ namespace Terminal.Gui {
 			rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
 			FakeConsole.Clear ();
 			ResizeScreen ();
+			// Call InitalizeColorSchemes before UpdateOffScreen as it references Colors
+			CurrentAttribute = MakeColor (Color.White, Color.Black);
+			InitalizeColorSchemes ();
 			UpdateOffScreen ();
-
-			CreateColors ();
-
-			//MockConsole.Clear ();
 		}
 
 		public override Attribute MakeAttribute (Color fore, Color back)
@@ -225,8 +247,8 @@ namespace Terminal.Gui {
 		{
 			redrawColor = color;
 			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-			      .OfType<ConsoleColor> ()
-			      .Select (s => (int)s);
+				.OfType<ConsoleColor> ()
+				.Select (s => (int)s);
 			if (values.Contains (color & 0xffff)) {
 				FakeConsole.BackgroundColor = (ConsoleColor)(color & 0xffff);
 			}
@@ -283,10 +305,9 @@ namespace Terminal.Gui {
 			UpdateCursor ();
 		}
 
-		Attribute currentAttribute;
 		public override void SetAttribute (Attribute c)
 		{
-			currentAttribute = c;
+			base.SetAttribute (c);
 		}
 
 		public ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
@@ -475,11 +496,6 @@ namespace Terminal.Gui {
 			keyUpHandler (new KeyEvent (map, keyModifiers));
 		}
 
-		public override Attribute GetAttribute ()
-		{
-			return currentAttribute;
-		}
-
 		/// <inheritdoc/>
 		public override bool GetCursorVisibility (out CursorVisibility visibility)
 		{
@@ -521,7 +537,7 @@ namespace Terminal.Gui {
 			FakeConsole.SetBufferSize (width, height);
 			cols = width;
 			rows = height;
-			if (!HeightAsBuffer) {
+			if (!EnableConsoleScrolling) {
 				SetWindowSize (width, height);
 			}
 			ProcessResize ();
@@ -530,7 +546,7 @@ namespace Terminal.Gui {
 		public void SetWindowSize (int width, int height)
 		{
 			FakeConsole.SetWindowSize (width, height);
-			if (!HeightAsBuffer) {
+			if (!EnableConsoleScrolling) {
 				if (width != cols || height != rows) {
 					SetBufferSize (width, height);
 					cols = width;
@@ -542,7 +558,7 @@ namespace Terminal.Gui {
 
 		public void SetWindowPosition (int left, int top)
 		{
-			if (HeightAsBuffer) {
+			if (EnableConsoleScrolling) {
 				this.left = Math.Max (Math.Min (left, Cols - FakeConsole.WindowWidth), 0);
 				this.top = Math.Max (Math.Min (top, Rows - FakeConsole.WindowHeight), 0);
 			} else if (this.left > 0 || this.top > 0) {
@@ -561,7 +577,7 @@ namespace Terminal.Gui {
 
 		public override void ResizeScreen ()
 		{
-			if (!HeightAsBuffer) {
+			if (!EnableConsoleScrolling) {
 				if (FakeConsole.WindowHeight > 0) {
 					// Can raise an exception while is still resizing.
 					try {
@@ -615,8 +631,8 @@ namespace Terminal.Gui {
 			foreground = default;
 			background = default;
 			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-			      .OfType<ConsoleColor> ()
-			      .Select (s => (int)s);
+				.OfType<ConsoleColor> ()
+				.Select (s => (int)s);
 			if (values.Contains (value & 0xffff)) {
 				hasColor = true;
 				background = (Color)(ConsoleColor)(value & 0xffff);

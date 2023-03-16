@@ -1190,7 +1190,9 @@ namespace Terminal.Gui {
 			for (int line = 0; line < linesFormated.Count; line++) {
 				if ((isVertical && line > bounds.Width) || (!isVertical && line > bounds.Height))
 					continue;
-				if ((isVertical && line > maxBounds.Left + maxBounds.Width - bounds.X) || (!isVertical && line > maxBounds.Top + maxBounds.Height - bounds.Y))
+				if ((isVertical && line >= maxBounds.Left + maxBounds.Width)
+					|| (!isVertical && line >= maxBounds.Top + maxBounds.Height))
+
 					break;
 
 				var runes = lines [line].ToRunes ();
@@ -1212,11 +1214,11 @@ namespace Terminal.Gui {
 					if (isVertical) {
 						var runesWidth = GetSumMaxCharWidth (Lines, line);
 						x = bounds.Right - runesWidth;
-						CursorPosition = bounds.Width - runesWidth + hotKeyPos;
+						CursorPosition = bounds.Width - runesWidth + (hotKeyPos > -1 ? hotKeyPos : 0);
 					} else {
 						var runesWidth = GetTextWidth (ustring.Make (runes));
 						x = bounds.Right - runesWidth;
-						CursorPosition = bounds.Width - runesWidth + hotKeyPos;
+						CursorPosition = bounds.Width - runesWidth + (hotKeyPos > -1 ? hotKeyPos : 0);
 					}
 				} else if (textAlignment == TextAlignment.Left || textAlignment == TextAlignment.Justified) {
 					if (isVertical) {
@@ -1225,16 +1227,16 @@ namespace Terminal.Gui {
 					} else {
 						x = bounds.Left;
 					}
-					CursorPosition = hotKeyPos;
+					CursorPosition = hotKeyPos > -1 ? hotKeyPos : 0;
 				} else if (textAlignment == TextAlignment.Centered) {
 					if (isVertical) {
 						var runesWidth = GetSumMaxCharWidth (Lines, line);
 						x = bounds.Left + line + ((bounds.Width - runesWidth) / 2);
-						CursorPosition = (bounds.Width - runesWidth) / 2 + hotKeyPos;
+						CursorPosition = (bounds.Width - runesWidth) / 2 + (hotKeyPos > -1 ? hotKeyPos : 0);
 					} else {
 						var runesWidth = GetTextWidth (ustring.Make (runes));
 						x = bounds.Left + (bounds.Width - runesWidth) / 2;
-						CursorPosition = (bounds.Width - runesWidth) / 2 + hotKeyPos;
+						CursorPosition = (bounds.Width - runesWidth) / 2 + (hotKeyPos > -1 ? hotKeyPos : 0);
 					}
 				} else {
 					throw new ArgumentOutOfRangeException ();
@@ -1291,7 +1293,7 @@ namespace Terminal.Gui {
 							rune = runes [idx];
 						}
 					}
-					if (idx == HotKeyPos) {
+					if (HotKeyPos > -1 && idx == HotKeyPos) {
 						if ((isVertical && textVerticalAlignment == VerticalTextAlignment.Justified) ||
 						(!isVertical && textAlignment == TextAlignment.Justified)) {
 							CursorPosition = idx - start;

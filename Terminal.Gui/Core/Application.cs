@@ -57,7 +57,7 @@ namespace Terminal.Gui {
 	///   </para>
 	/// </remarks>
 	public static class Application {
-		static Stack<Toplevel> toplevels = new Stack<Toplevel> ();
+		static readonly Stack<Toplevel> toplevels = new Stack<Toplevel> ();
 
 		/// <summary>
 		/// The current <see cref="ConsoleDriver"/> in use.
@@ -111,28 +111,54 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static View WantContinuousButtonPressedView { get; private set; }
 
+		private static bool? _enableConsoleScrolling;
+
 		/// <summary>
-		/// The current <see cref="ConsoleDriver.HeightAsBuffer"/> used in the terminal.
+		/// The current <see cref="ConsoleDriver.EnableConsoleScrolling"/> used in the terminal.
 		/// </summary>
-		public static bool HeightAsBuffer {
+		/// <remarks>
+		/// <para>
+		/// If <see langword="false"/> (the default) the height of the Terminal.Gui application (<see cref="ConsoleDriver.Rows"/>) 
+		/// tracks to the height of the visible console view when the console is resized. In this case 
+		/// scrolling in the console will be disabled and all <see cref="ConsoleDriver.Rows"/> will remain visible.
+		/// </para>
+		/// <para>
+		/// If <see langword="true"/> then height of the Terminal.Gui application <see cref="ConsoleDriver.Rows"/> only tracks 
+		/// the height of the visible console view when the console is made larger (the application will only grow in height, never shrink). 
+		/// In this case console scrolling is enabled and the contents (<see cref="ConsoleDriver.Rows"/> high) will scroll
+		/// as the console scrolls. 
+		/// </para>
+		/// This API was previously named 'HeightAsBuffer` but was renamed to make its purpose more clear.
+		/// </remarks>
+		public static bool EnableConsoleScrolling {
 			get {
 				if (Driver == null) {
-					throw new ArgumentNullException ("The driver must be initialized first.");
+					return _enableConsoleScrolling.HasValue && _enableConsoleScrolling.Value;
 				}
-				return Driver.HeightAsBuffer;
+				return Driver.EnableConsoleScrolling;
 			}
 			set {
+				_enableConsoleScrolling = value;
 				if (Driver == null) {
-					throw new ArgumentNullException ("The driver must be initialized first.");
+					return;
 				}
-				Driver.HeightAsBuffer = value;
+				Driver.EnableConsoleScrolling = value;
 			}
+		}
+
+		/// <summary>
+		/// This API is deprecated; use <see cref="EnableConsoleScrolling"/> instead.
+		/// </summary>
+		[Obsolete ("This API is deprecated; use EnableConsoleScrolling instead.", false)]
+		public static bool HeightAsBuffer {
+			get => EnableConsoleScrolling;
+			set => EnableConsoleScrolling = value;
 		}
 
 		static Key alternateForwardKey = Key.PageDown | Key.CtrlMask;
 
 		/// <summary>
-		/// Alternative key to navigate forwards through all views. Ctrl+Tab is always used.
+		/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
 		/// </summary>
 		public static Key AlternateForwardKey {
 			get => alternateForwardKey;
@@ -147,7 +173,7 @@ namespace Terminal.Gui {
 
 		static void OnAlternateForwardKeyChanged (Key oldKey)
 		{
-			foreach (var top in toplevels) {
+			foreach (var top in toplevels.ToArray ()) {
 				top.OnAlternateForwardKeyChanged (oldKey);
 			}
 		}
@@ -155,7 +181,7 @@ namespace Terminal.Gui {
 		static Key alternateBackwardKey = Key.PageUp | Key.CtrlMask;
 
 		/// <summary>
-		/// Alternative key to navigate backwards through all views. Shift+Ctrl+Tab is always used.
+		/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
 		/// </summary>
 		public static Key AlternateBackwardKey {
 			get => alternateBackwardKey;
@@ -170,7 +196,7 @@ namespace Terminal.Gui {
 
 		static void OnAlternateBackwardKeyChanged (Key oldKey)
 		{
-			foreach (var top in toplevels) {
+			foreach (var top in toplevels.ToArray ()) {
 				top.OnAlternateBackwardKeyChanged (oldKey);
 			}
 		}
@@ -200,7 +226,8 @@ namespace Terminal.Gui {
 
 		static void OnQuitKeyChanged (Key oldKey)
 		{
-			foreach (var top in toplevels) {
+			// Duplicate the list so if it changes during enumeration we're safe
+			foreach (var top in toplevels.ToArray ()) {
 				top.OnQuitKeyChanged (oldKey);
 			}
 		}
@@ -212,7 +239,7 @@ namespace Terminal.Gui {
 		public static MainLoop MainLoop { get; private set; }
 
 		/// <summary>
-		/// Disable or enable the mouse in this <see cref="Application"/>
+		/// Disable or enable the mouse. The mouse is enabled by default.
 		/// </summary>
 		public static bool IsMouseDisabled { get; set; }
 
@@ -266,7 +293,7 @@ namespace Terminal.Gui {
 		// users use async/await on their code
 		//
 		class MainLoopSyncContext : SynchronizationContext {
-			MainLoop mainLoop;
+			readonly MainLoop mainLoop;
 
 			public MainLoopSyncContext (MainLoop mainLoop)
 			{
@@ -305,9 +332,9 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// If set, it forces the use of the System.Console-based driver.
+		/// If <see langword="true"/>, forces the use of the System.Console-based (see <see cref="NetDriver"/>) driver. The default is <see langword="false"/>.
 		/// </summary>
-		public static bool UseSystemConsole;
+		public static bool UseSystemConsole { get; set; } = false;
 
 		// For Unit testing - ignores UseSystemConsole
 		internal static bool ForceFakeConsole;
@@ -422,6 +449,7 @@ namespace Terminal.Gui {
 			MainLoop = new MainLoop (mainLoopDriver);
 
 			try {
+				Driver.EnableConsoleScrolling = EnableConsoleScrolling;
 				Driver.Init (TerminalResized);
 			} catch (InvalidOperationException ex) {
 				// This is a case where the driver is unable to initialize the console.
@@ -933,6 +961,8 @@ namespace Terminal.Gui {
 				if (Top != null && toplevel != Top && !toplevels.Contains (Top)) {
 					Top.Dispose ();
 					Top = null;
+				} else if (Top != null && toplevel != Top && toplevels.Contains (Top)) {
+					Top.OnLeave (toplevel);
 				}
 				if (string.IsNullOrEmpty (toplevel.Id.ToString ())) {
 					var count = 1;
@@ -986,9 +1016,7 @@ namespace Terminal.Gui {
 			toplevel.PositionToplevels ();
 			toplevel.WillPresent ();
 			if (refreshDriver) {
-				if (MdiTop != null) {
-					MdiTop.OnChildLoaded (toplevel);
-				}
+				MdiTop?.OnChildLoaded (toplevel);
 				toplevel.OnLoaded ();
 				Redraw (toplevel);
 				toplevel.PositionCursor ();
@@ -1043,6 +1071,7 @@ namespace Terminal.Gui {
 					MdiTop.OnAllChildClosed ();
 				} else {
 					SetCurrentAsTop ();
+					Current.OnEnter (Current);
 				}
 				Refresh ();
 			}
@@ -1096,6 +1125,7 @@ namespace Terminal.Gui {
 			NotifyStopRunState = null;
 			_initialized = false;
 			mouseGrabView = null;
+			_enableConsoleScrolling = false;
 
 			// Reset synchronization context to allow the user to run async/await,
 			// as the main loop has been ended, the synchronization context from 
@@ -1106,12 +1136,6 @@ namespace Terminal.Gui {
 
 
 		static void Redraw (View view)
-		{
-			view.Redraw (view.Bounds);
-			Driver.Refresh ();
-		}
-
-		static void Refresh (View view)
 		{
 			view.Redraw (view.Bounds);
 			Driver.Refresh ();
