@@ -578,19 +578,15 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The bounds represent the View-relative rectangle used for this view; the area inside of the view.
+		/// The View-relative rectangle where View content is displayed. SubViews are positioned relative to 
+		/// Bounds.<see cref="Rect.Location">Location</see> (which is always (0, 0)) and <see cref="Redraw(Rect)"/> clips drawing to 
+		/// Bounds.<see cref="Rect.Size">Size</see>.
 		/// </summary>
 		/// <value>The bounds.</value>
 		/// <remarks>
 		/// <para>
-		/// Updates to the Bounds update the <see cref="Frame"/>,
-		/// and has the same side effects as updating the <see cref="Frame"/>.
-		/// </para>
-		/// <para>
-		/// Because <see cref="Bounds"/> coordinates are relative to the upper-left corner of the <see cref="View"/>, 
-		/// the coordinates of the upper-left corner of the rectangle returned by this property are (0,0). 
-		/// Use this property to obtain the size and coordinates of the client area of the 
-		/// control for tasks such as drawing on the surface of the control.
+		/// The <see cref="Rect.Location"/> of Bounds is always (0, 0). 
+		/// To obtain the Frame-relative location of the content area use <see cref="ContentArea"/>.
 		/// </para>
 		/// </remarks>
 		public virtual Rect Bounds {
@@ -600,7 +596,7 @@ namespace Terminal.Gui {
 					return new Rect (default, Frame.Size);
 				}
 				var frameRelativeBounds = Padding.Thickness.GetInnerRect (Padding.Frame);
-				return frameRelativeBounds;
+				return new Rect (default, frameRelativeBounds.Size);
 			}
 			set {
 				throw new InvalidOperationException ("It makes no sense to explicitly set Bounds.");
@@ -1292,8 +1288,8 @@ namespace Terminal.Gui {
 			while (super != null) {
 				if (!(super.Padding == null || super.BorderFrame == null || super.Margin == null)) {
 					var inner = super.Padding.Thickness.GetInnerRect (super.BorderFrame.Thickness.GetInnerRect (super.Margin.Thickness.GetInnerRect (super.Frame)));
-					rrow += super.Frame.Y;
-					rcol += super.Frame.X;
+					rrow += inner.Y;
+					rcol += inner.X;
 				} else {
 					rrow += super.Frame.Y;
 					rcol += super.Frame.X;
@@ -1342,9 +1338,13 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public Rect ClipToBounds ()
 		{
-			return SetClip (Bounds);
+			var clip = Bounds ;
+
+
+			return SetClip (clip);
 		}
 
+		// BUGBUG: v2 - SetClip should return VIEW-relative so that it can be used to reset it; using Driver.Clip directly should not be necessary. 
 		/// <summary>
 		/// Sets the clip region to the specified view-relative region.
 		/// </summary>
@@ -1360,13 +1360,13 @@ namespace Terminal.Gui {
 			return previous;
 		}
 
-		// TODO: v2 - Deprecate this API - callers should use LineCanvas instead
 		/// <summary>
 		/// Draws a frame in the current view, clipped by the boundary of this view
 		/// </summary>
 		/// <param name="region">View-relative region for the frame to be drawn.</param>
 		/// <param name="padding">The padding to add around the outside of the drawn frame.</param>
 		/// <param name="fill">If set to <see langword="true"/> it fill will the contents.</param>
+		[ObsoleteAttribute("This method is obsolete in v2. Use use LineCanvas or Frame instead instead.", false)]
 		public void DrawFrame (Rect region, int padding = 0, bool fill = false)
 		{
 			var scrRect = ViewToScreen (region);
@@ -1632,9 +1632,16 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual bool OnDrawFrames (Rect bounds)
 		{
+			var prevClip = Driver.Clip;
+			if (SuperView != null) {
+				Driver.Clip = SuperView.ClipToBounds ();
+			}
+
 			Margin?.Redraw (Margin.Frame);
 			BorderFrame?.Redraw (BorderFrame.Frame);
 			Padding?.Redraw (Padding.Frame);
+
+			Driver.Clip = prevClip;
 
 			//var margin = Margin.Thickness.GetInnerRect (frame);
 			//var padding = BorderFrame.Thickness.GetInnerRect (margin);
@@ -1675,32 +1682,20 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var prevClip = Driver.Clip;
-			Driver.Clip = ViewToScreen (Bounds);
-
-			if (ColorScheme != null) {
-				Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
-			}
 
 			OnDrawFrames (Frame);
 
+			var prevClip = ClipToBounds ();
+
 			// TODO: Implement complete event
 			// OnDrawFramesComplete (Frame)
-			
-			//if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
-			//	Rect containerBounds = GetContainerBounds ();
-			//	if (!containerBounds.IsEmpty) {
-			//		Clear (GetNeedDisplay (containerBounds));
-			//		SetChildNeedsDisplay ();
-			//		// Draw any Text
-			//		if (TextFormatter != null) {
-			//			TextFormatter.NeedsFormat = true;
-			//		}
-			//		TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
-			//		    HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
-			//		    containerBounds);
-			//	}
-			//}
+
+			if (ColorScheme != null) {
+				//Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
+				Driver.SetAttribute (GetNormalColor ());
+			}
+
+			Clear (ViewToScreen(bounds));
 
 			// Invoke DrawContentEvent
 			OnDrawContent (bounds);
@@ -1709,20 +1704,17 @@ namespace Terminal.Gui {
 			// TODO: Implement OnDrawSubviews (cancelable);		
 			if (subviews != null) {
 				foreach (var view in subviews) {
-					if (!view._needsDisplay.IsEmpty || view._childNeedsDisplay || view.LayoutNeeded) {
-						if (view.Frame.IntersectsWith (bounds)) { // && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
+					if (true) { //!view._needsDisplay.IsEmpty || view._childNeedsDisplay || view.LayoutNeeded) {
+						if (true) { //view.Frame.IntersectsWith (bounds)) { // && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
 							if (view.LayoutNeeded) {
 								view.LayoutSubviews ();
 							}
 
 							// Draw the subview
 							// Use the view's bounds (view-relative; Location will always be (0,0)
-							if (view.Visible && view.Frame.Width > 0 && view.Frame.Height > 0) {
-								var rect = view.Bounds;
-								view.OnDrawContent (rect);
-								view.Redraw (rect);
-								view.OnDrawContentComplete (rect);
-							}
+							//if (view.Visible && view.Frame.Width > 0 && view.Frame.Height > 0) {
+								view.Redraw (view.Bounds);
+							//}
 						}
 						view.ClearNeedsDisplay ();
 					}
@@ -1732,35 +1724,36 @@ namespace Terminal.Gui {
 			// Invoke DrawContentCompleteEvent
 			OnDrawContentComplete (bounds);
 
+			// BUGBUG: v2 - We should be able to use View.SetClip here and not have to resort to knowing Driver details.
 			Driver.Clip = prevClip;
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
 		}
 
-		// Gets the screen relative rectangle describing the larger of our Superview's bounds or the Driver.Cliprect.
-		internal Rect GetContainerBounds ()
-		{
-			// Get the screen-relative rectangle describing our superview's Bounds
-			var containerBounds = SuperView == null ? default : SuperView.ViewToScreen (SuperView.Bounds);
+		//// Gets the screen relative rectangle describing the larger of our Superview's bounds or the Driver.Cliprect.
+		//internal Rect GetContainerBounds ()
+		//{
+		//	// Get the screen-relative rectangle describing our superview's Bounds
+		//	var containerBounds = SuperView == null ? default : SuperView.ViewToScreen (SuperView.Bounds);
 
-			// Ensure if clip is larger, we grow
-			var driverClip = Driver == null ? Rect.Empty : Driver.Clip;
-			containerBounds.X = Math.Max (containerBounds.X, driverClip.X);
-			containerBounds.Y = Math.Max (containerBounds.Y, driverClip.Y);
-			var lenOffset = (driverClip.X + driverClip.Width) - (containerBounds.X + containerBounds.Width);
-			if (containerBounds.X + containerBounds.Width > driverClip.X + driverClip.Width) {
-				containerBounds.Width = Math.Max (containerBounds.Width + lenOffset, 0);
-			} else {
-				containerBounds.Width = Math.Min (containerBounds.Width, driverClip.Width);
-			}
-			lenOffset = (driverClip.Y + driverClip.Height) - (containerBounds.Y + containerBounds.Height);
-			if (containerBounds.Y + containerBounds.Height > driverClip.Y + driverClip.Height) {
-				containerBounds.Height = Math.Max (containerBounds.Height + lenOffset, 0);
-			} else {
-				containerBounds.Height = Math.Min (containerBounds.Height, driverClip.Height);
-			}
-			return containerBounds;
-		}
+		//	// Ensure if clip is larger, we grow
+		//	var driverClip = Driver == null ? Rect.Empty : Driver.Clip;
+		//	containerBounds.X = Math.Max (containerBounds.X, driverClip.X);
+		//	containerBounds.Y = Math.Max (containerBounds.Y, driverClip.Y);
+		//	var lenOffset = (driverClip.X + driverClip.Width) - (containerBounds.X + containerBounds.Width);
+		//	if (containerBounds.X + containerBounds.Width > driverClip.X + driverClip.Width) {
+		//		containerBounds.Width = Math.Max (containerBounds.Width + lenOffset, 0);
+		//	} else {
+		//		containerBounds.Width = Math.Min (containerBounds.Width, driverClip.Width);
+		//	}
+		//	lenOffset = (driverClip.Y + driverClip.Height) - (containerBounds.Y + containerBounds.Height);
+		//	if (containerBounds.Y + containerBounds.Height > driverClip.Y + driverClip.Height) {
+		//		containerBounds.Height = Math.Max (containerBounds.Height + lenOffset, 0);
+		//	} else {
+		//		containerBounds.Height = Math.Min (containerBounds.Height, driverClip.Height);
+		//	}
+		//	return containerBounds;
+		//}
 
 		/// <summary>
 		/// Event invoked when the content area of the View is to be drawn.
@@ -1789,33 +1782,14 @@ namespace Terminal.Gui {
 			DrawContent?.Invoke (contentArea);
 
 			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
-				Rect containerBounds = GetContainerBounds ();
-				if (!containerBounds.IsEmpty) {
-					Clear (GetNeedsDisplayRectScreen (containerBounds));
-					SetSubViewNeedsDisplay ();
-					// Draw any Text
-					if (TextFormatter != null) {
-						TextFormatter.NeedsFormat = true;
-					}
-					TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
-					    HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
-					    containerBounds);
+				if (TextFormatter != null) {
+					TextFormatter.NeedsFormat = true;
 				}
+				TextFormatter?.Draw (ViewToScreen (contentArea), HasFocus ? GetFocusColor () : GetNormalColor (),
+				    HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
+				    new Rect (ViewToScreen (contentArea).Location, Bounds.Size), true);
+				SetSubViewNeedsDisplay ();
 			}
-
-			
-			//if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
-			//	//Rect containerBounds = GetContainerBounds ();
-			//	//Clear (ViewToScreen (GetNeedDisplay (containerBounds)));
-			//	SetChildNeedsDisplay ();
-			//	// Draw any Text
-			//	if (TextFormatter != null) {
-			//		TextFormatter.NeedsFormat = true;
-			//	}
-			//	TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? ColorScheme.Focus : GetNormalColor (),
-			//	    HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled,
-			//	    contentArea, false);
-			//}
 		}
 
 		/// <summary>
@@ -2926,7 +2900,8 @@ namespace Terminal.Gui {
 				if (ForceValidatePosDim) {
 					aSize = SetWidthHeight (nBoundsSize);
 				} else {
-					Bounds = new Rect (Bounds.X, Bounds.Y, nBoundsSize.Width, nBoundsSize.Height);
+					Height = nBoundsSize.Height;
+					Width = nBoundsSize.Width; // = new Rect (Bounds.X, Bounds.Y, nBoundsSize.Width, nBoundsSize.Height);
 				}
 			}
 			TextFormatter.Size = GetBoundsTextFormatterSize ();

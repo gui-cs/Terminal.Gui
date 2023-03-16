@@ -54,7 +54,7 @@ namespace Terminal.Gui {
 
 			// We now have rcol/rrow in coordinates relative to our SuperView. If our SuperView has
 			// a SuperView, keep going...
-			Parent?.SuperView?.SuperView?.ViewToScreen (rcol, rrow, out rcol, out rrow, clipped);
+			Parent?.SuperView?.ViewToScreen (rcol, rrow, out rcol, out rrow, clipped);
 		}
 
 		/// <summary>
@@ -83,23 +83,6 @@ namespace Terminal.Gui {
 			//	}
 
 		}
-		
-		/// <inheritdoc/>
-		public override void OnDrawContent (Rect viewport)
-		{
-			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
-				Clear (viewport);
-				SetSubViewNeedsDisplay ();
-				// Draw any Text
-				if (TextFormatter != null) {
-					TextFormatter.NeedsFormat = true;
-					Rect containerBounds = GetContainerBounds ();
-					TextFormatter?.Draw (ViewToScreen (viewport), HasFocus ? ColorScheme.Focus : GetNormalColor (),
-					    HasFocus ? ColorScheme.HotFocus : Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled,
-					    containerBounds);
-				}
-			}
-		}
 
 		/// <summary>
 		/// Redraws the Frames that comprise the <see cref="Frame"/>.
@@ -115,6 +98,8 @@ namespace Terminal.Gui {
 			if (ColorScheme != null) {
 				Driver.SetAttribute (ColorScheme.Normal);
 			}
+
+			var prevClip = SetClip (Frame);
 
 			var screenBounds = ViewToScreen (Frame);
 			Thickness.Draw (screenBounds, (string)Data);
@@ -134,9 +119,12 @@ namespace Terminal.Gui {
 				}
 
 				if (!ustring.IsNullOrEmpty (Parent?.Title)) {
+					Driver.SetAttribute (Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetNormalColor ());
 					Driver.DrawWindowTitle (screenBounds, Parent?.Title, 0, 0, 0, 0);
 				}
 			}
+
+			Driver.Clip = prevClip;
 		}
 
 		//public Label DiagnosticsLabel { get; set; }

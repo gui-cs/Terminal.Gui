@@ -121,6 +121,9 @@ namespace Terminal.Gui {
 				rightChar = 'R';
 				topChar = 'T';
 				bottomChar = 'B';
+				if (!string.IsNullOrEmpty (label)) {
+					leftChar = rightChar = bottomChar = topChar = label [0];
+				}
 			}
 
 			ustring hrule = ustring.Empty;

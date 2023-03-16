@@ -737,47 +737,47 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
-		{
-			if (!Visible) {
-				return;
-			}
+		//public override void Redraw (Rect bounds)
+		//{
+		//	if (!Visible) {
+		//		return;
+		//	}
 
-			if (!_needsDisplay.IsEmpty || _childNeedsDisplay || LayoutNeeded) {
-				Driver.SetAttribute (GetNormalColor ());
+		//	if (!_needsDisplay.IsEmpty || _childNeedsDisplay || LayoutNeeded) {
+		//		Driver.SetAttribute (GetNormalColor ());
 
-				// This is the Application.Top. Clear just the region we're being asked to redraw 
-				// (the bounds passed to us).
-				Clear ();
-				Driver.SetAttribute (Enabled ? Colors.Base.Normal : Colors.Base.Disabled);
+		//		// This is the Application.Top. Clear just the region we're being asked to redraw 
+		//		// (the bounds passed to us).
+		//		Clear ();
+		//		Driver.SetAttribute (Enabled ? Colors.Base.Normal : Colors.Base.Disabled);
 
-				LayoutSubviews ();
-				PositionToplevels ();
+		//		LayoutSubviews ();
+		//		PositionToplevels ();
 
-				if (this == Application.MdiTop) {
-					foreach (var top in Application.MdiChildes.AsEnumerable ().Reverse ()) {
-						if (top.Frame.IntersectsWith (bounds)) {
-							if (top != this && !top.IsCurrentTop && !OutsideTopFrame (top) && top.Visible) {
-								top.SetNeedsLayout ();
-								top.SetNeedsDisplay (top.Bounds);
-								top.Redraw (top.Bounds);
-							}
-						}
-					}
-				}
+		//		if (this == Application.MdiTop) {
+		//			foreach (var top in Application.MdiChildes.AsEnumerable ().Reverse ()) {
+		//				if (top.Frame.IntersectsWith (bounds)) {
+		//					if (top != this && !top.IsCurrentTop && !OutsideTopFrame (top) && top.Visible) {
+		//						top.SetNeedsLayout ();
+		//						top.SetNeedsDisplay (top.Bounds);
+		//						top.Redraw (top.Bounds);
+		//					}
+		//				}
+		//			}
+		//		}
 
-				foreach (var view in Subviews) {
-					if (view.Frame.IntersectsWith (bounds) && !OutsideTopFrame (this)) {
-						view.SetNeedsLayout ();
-						view.SetNeedsDisplay (view.Bounds);
-					}
-				}
+		//		foreach (var view in Subviews) {
+		//			if (view.Frame.IntersectsWith (bounds) && !OutsideTopFrame (this)) {
+		//				view.SetNeedsLayout ();
+		//				view.SetNeedsDisplay (view.Bounds);
+		//			}
+		//		}
 
-				// BUGBUG: shouldn't we just return here? the call to base.Redraw below is redundant
-			}
+		//		// BUGBUG: shouldn't we just return here? the call to base.Redraw below is redundant
+		//	}
 
-			base.Redraw (Bounds);
-		}
+		//	base.Redraw (Bounds);
+		//}
 
 		bool OutsideTopFrame (Toplevel top)
 		{
