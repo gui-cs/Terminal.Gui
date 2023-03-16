@@ -141,7 +141,7 @@ namespace UICatalog {
 		{
 			// Setup a file system watcher for `./.tui/`
 			_currentDirWatcher.NotifyFilter = NotifyFilters.LastWrite;
-			var f = new FileInfo (Assembly.GetExecutingAssembly ().Location);
+			var f = new FileInfo (System.AppContext.BaseDirectory);
 			var tuiDir = Path.Combine (f.Directory.FullName, ".tui");
 
 			if (!Directory.Exists (tuiDir)) {
