@@ -1,6 +1,7 @@
 ﻿using NStack;
 using System.Collections.Generic;
 using Terminal.Gui;
+using Terminal.Gui.Configuration;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Keys", Description: "Shows how to handle keyboard input")]
@@ -48,16 +49,18 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
-		public override void Init (ColorScheme colorScheme)
+		public override void Init ()
 		{
 			Application.Init ();
+			ConfigurationManager.Themes.Theme = Theme;
+			ConfigurationManager.Apply ();
 			
-			Win = new TestWindow ($"CTRL-Q to Close - Scenario: {GetName ()}") {
+			Win = new TestWindow ($"{Application.QuitKey} to Quit - Scenario: {GetName ()}") {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
-				ColorScheme = colorScheme,
+				ColorScheme = Colors.ColorSchemes [TopLevelColorScheme],
 			};
 			Application.Top.Add (Win);
 		}
