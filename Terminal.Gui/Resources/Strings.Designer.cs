@@ -124,6 +124,15 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Any Files.
+        /// </summary>
+        internal static string fdAnyFiles {
+            get {
+                return ResourceManager.GetString("fdAnyFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Directory.
         /// </summary>
         internal static string fdDirectory {

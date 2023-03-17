@@ -207,4 +207,8 @@
     <value>Wrong file type</value>
     <comment>When trying to open/save a file that does not match the provided filter (e.g. csv)</comment>
   </data>
+  <data name="fdAnyFiles" xml:space="preserve">
+    <value>Any Files</value>
+    <comment>Describes an AllowedType that matches anything</comment>
+  </data>
 </root>

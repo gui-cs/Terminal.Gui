@@ -2,6 +2,7 @@
 using System.Data;
 using System.IO;
 using System.Linq;
+using Terminal.Gui.Resources;
 
 namespace Terminal.Gui {
 
@@ -29,7 +30,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets a value of <see cref="AllowedType"/> that matches any file.
 		/// </summary>
-		public static AllowedType Any { get; } = new AllowedType ("Any Files", ".*");
+		public static AllowedType Any { get; } = new AllowedType (Strings.fdAnyFiles, ".*");
 
 		/// <summary>
 		/// Gets or Sets the human readable description for the file type
