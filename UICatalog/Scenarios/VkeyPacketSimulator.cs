@@ -125,7 +125,7 @@ namespace UICatalog.Scenarios {
 			View.KeyEventEventArgs unknownChar = null;
 
 			tvInput.KeyPress += (e) => {
-				if (e.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
+				if (e.KeyEvent.Key == Application.QuitKey) {
 					Application.RequestStop ();
 					return;
 				}
