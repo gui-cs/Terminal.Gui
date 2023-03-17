@@ -120,7 +120,7 @@ namespace Terminal.Gui {
 
 		internal virtual void OnChildUnloaded (Toplevel top)
 		{
-			ChildUnloaded?.Invoke (this, new ToplevelEventArgs(top));
+			ChildUnloaded?.Invoke (this, new ToplevelEventArgs (top));
 		}
 
 		internal virtual void OnChildLoaded (Toplevel top)
@@ -159,7 +159,7 @@ namespace Terminal.Gui {
 
 		internal virtual void OnActivate (Toplevel deactivated)
 		{
-			Activate?.Invoke (this, new ToplevelEventArgs(deactivated));
+			Activate?.Invoke (this, new ToplevelEventArgs (deactivated));
 		}
 
 		/// <summary>
@@ -221,6 +221,9 @@ namespace Terminal.Gui {
 		{
 			ColorScheme = Colors.TopLevel;
 
+			Application.GrabbingMouse += Application_GrabbingMouse;
+			Application.UnGrabbingMouse += Application_UnGrabbingMouse;
+
 			// Things this view knows how to do
 			AddCommand (Command.QuitToplevel, () => { QuitToplevel (); return true; });
 			AddCommand (Command.Suspend, () => { Driver.Suspend (); ; return true; });
@@ -254,6 +257,20 @@ namespace Terminal.Gui {
 			AddKeyBinding (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
 
 			AddKeyBinding (Key.L | Key.CtrlMask, Command.Refresh);
+		}
+
+		private void Application_UnGrabbingMouse (object sender, GrabMouseEventArgs e)
+		{
+			if (Application.MouseGrabView == this && dragPosition.HasValue) {
+				e.Cancel = true;
+			}
+		}
+
+		private void Application_GrabbingMouse (object sender, GrabMouseEventArgs e)
+		{
+			if (Application.MouseGrabView == this && dragPosition.HasValue) {
+				e.Cancel = true;
+			}
 		}
 
 		/// <summary>
@@ -824,8 +841,8 @@ namespace Terminal.Gui {
 			}
 
 			if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released) && dragPosition.HasValue) {
-				Application.UngrabMouse ();
 				dragPosition = null;
+				Application.UngrabMouse ();
 			}
 
 			//System.Diagnostics.Debug.WriteLine ($"dragPosition after: {dragPosition.HasValue}");

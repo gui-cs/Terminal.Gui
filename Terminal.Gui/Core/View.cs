@@ -139,17 +139,17 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Event fired when the view receives the mouse event for the first time.
 		/// </summary>
-		public event EventHandler<MouseEventArgs> MouseEnter;
+		public event EventHandler<MouseEventEventArgs> MouseEnter;
 
 		/// <summary>
 		/// Event fired when the view receives a mouse event for the last time.
 		/// </summary>
-		public event EventHandler<MouseEventArgs> MouseLeave;
+		public event EventHandler<MouseEventEventArgs> MouseLeave;
 
 		/// <summary>
 		/// Event fired when a mouse event is generated.
 		/// </summary>
-		public event EventHandler<MouseEventArgs> MouseClick;
+		public event EventHandler<MouseEventEventArgs> MouseClick;
 
 		/// <summary>
 		/// Event fired when the <see cref="CanFocus"/> value is being changed.
@@ -827,7 +827,7 @@ namespace Terminal.Gui {
 
 		void TextFormatter_HotKeyChanged (object sender, KeyChangedEventArgs e)
 		{
-			HotKeyChanged?.Invoke (this,e);
+			HotKeyChanged?.Invoke (this, e);
 		}
 
 		/// <summary>
@@ -942,7 +942,7 @@ namespace Terminal.Gui {
 			}
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
-			OnAdded (new SuperViewChangedEventArgs (this,view));
+			OnAdded (new SuperViewChangedEventArgs (this, view));
 			if (IsInitialized) {
 				view.BeginInit ();
 				view.EndInit ();
@@ -1344,7 +1344,7 @@ namespace Terminal.Gui {
 			view.width ??= view.frame.Width;
 			view.height ??= view.frame.Height;
 
-			view.Added?.Invoke (this,e);
+			view.Added?.Invoke (this, e);
 		}
 
 		/// <summary>
@@ -1593,7 +1593,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public virtual void OnDrawContent (Rect viewport)
 		{
-			DrawContent?.Invoke (this, new DrawEventArgs(viewport));
+			DrawContent?.Invoke (this, new DrawEventArgs (viewport));
 		}
 
 		/// <summary>
@@ -2240,16 +2240,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Event arguments for the <see cref="LayoutComplete"/> event.
-		/// </summary>
-		public class LayoutEventArgs : EventArgs {
-			/// <summary>
-			/// The view-relative bounds of the <see cref="View"/> before it was laid out.
-			/// </summary>
-			public Rect OldBounds { get; set; }
-		}
-
-		/// <summary>
 		/// Fired after the View's <see cref="LayoutSubviews"/> method has completed. 
 		/// </summary>
 		/// <remarks>
@@ -2795,34 +2785,6 @@ namespace Terminal.Gui {
 			    frame.Size.Height + GetHotKeySpecifierLength (false));
 		}
 
-		/// <summary>
-		/// Specifies the event arguments for <see cref="MouseEvent"/>. This is a higher-level construct
-		/// than the wrapped <see cref="MouseEvent"/> class and is used for the events defined on <see cref="View"/>
-		/// and subclasses of View (e.g. <see cref="View.MouseEnter"/> and <see cref="View.MouseClick"/>).
-		/// </summary>
-		public class MouseEventArgs : EventArgs {
-			/// <summary>
-			/// Constructs.
-			/// </summary>
-			/// <param name="me"></param>
-			public MouseEventArgs (MouseEvent me) => MouseEvent = me;
-			/// <summary>
-			/// The <see cref="MouseEvent"/> for the event.
-			/// </summary>
-			public MouseEvent MouseEvent { get; set; }
-
-			/// <summary>
-			/// Indicates if the current mouse event has already been processed and the driver should stop notifying any other event subscriber.
-			/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
-			/// </summary>
-			/// <remarks>This property forwards to the <see cref="MouseEvent.Handled"/> property and is provided as a convenience and for
-			/// backwards compatibility</remarks>
-			public bool Handled {
-				get => MouseEvent.Handled;
-				set => MouseEvent.Handled = value;
-			}
-		}
-
 		/// <inheritdoc/>
 		public override bool OnMouseEnter (MouseEvent mouseEvent)
 		{
@@ -2834,7 +2796,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var args = new MouseEventArgs (mouseEvent);
+			var args = new MouseEventEventArgs (mouseEvent);
 			MouseEnter?.Invoke (this, args);
 
 			return args.Handled || base.OnMouseEnter (mouseEvent);
@@ -2851,7 +2813,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var args = new MouseEventArgs (mouseEvent);
+			var args = new MouseEventEventArgs (mouseEvent);
 			MouseLeave?.Invoke (this, args);
 
 			return args.Handled || base.OnMouseLeave (mouseEvent);
@@ -2872,7 +2834,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var args = new MouseEventArgs (mouseEvent);
+			var args = new MouseEventEventArgs (mouseEvent);
 			if (OnMouseClick (args))
 				return true;
 			if (MouseEvent (mouseEvent))
@@ -2892,7 +2854,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invokes the MouseClick event.
 		/// </summary>
-		protected bool OnMouseClick (MouseEventArgs args)
+		protected bool OnMouseClick (MouseEventEventArgs args)
 		{
 			if (!Enabled) {
 				return true;

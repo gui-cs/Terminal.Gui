@@ -85,7 +85,7 @@ namespace UICatalog.Scenarios {
 			miWrap.Checked = textViewTopLeft.WordWrap;
 
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
+				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 				siMultiline = new StatusItem(Key.Null, "", null),
 				siWrap = new StatusItem(Key.Null, "", null)
 			});
@@ -94,7 +94,7 @@ namespace UICatalog.Scenarios {
 			Win.LayoutStarted += Win_LayoutStarted;
 		}
 
-		private void Win_LayoutStarted (object sender, View.LayoutEventArgs obj)
+		private void Win_LayoutStarted (object sender, LayoutEventArgs obj)
 		{
 			miMultiline.Checked = textViewTopLeft.Multiline;
 			miWrap.Checked = textViewTopLeft.WordWrap;

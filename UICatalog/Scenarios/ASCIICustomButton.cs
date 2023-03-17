@@ -11,7 +11,7 @@ namespace UICatalog.Scenarios {
 		private ScrollViewTestWindow scrollViewTestWindow;
 		private MenuItem miSmallerWindow;
 
-		public override void Init (ColorScheme colorScheme)
+		public override void Init ()
 		{
 			Application.Init ();
 			scrollViewTestWindow = new ScrollViewTestWindow ();
@@ -21,7 +21,7 @@ namespace UICatalog.Scenarios {
 						CheckType = MenuItemCheckStyle.Checked
 					},
 					null,
-					new MenuItem("Quit", "",() => Application.RequestStop(),null,null, Key.Q | Key.CtrlMask)
+					new MenuItem("Quit", "",() => Application.RequestStop(),null,null, Application.QuitKey)
 				})
 			});
 			Application.Top.Add (menu, scrollViewTestWindow);
@@ -106,7 +106,7 @@ namespace UICatalog.Scenarios {
 				Add (border, fill, title);
 			}
 
-			private void This_MouseClick (object sender, MouseEventArgs obj)
+			private void This_MouseClick (object sender, MouseEventEventArgs obj)
 			{
 				OnMouseEvent (obj.MouseEvent);
 			}
@@ -258,7 +258,7 @@ namespace UICatalog.Scenarios {
 				}
 			}
 
-			private void Button_MouseClick (object sender, MouseEventArgs obj)
+			private void Button_MouseClick (object sender, MouseEventEventArgs obj)
 			{
 				if (obj.MouseEvent.Flags == MouseFlags.WheeledDown) {
 					scrollView.ContentOffset = new Point (scrollView.ContentOffset.X,

@@ -5,7 +5,7 @@ using Rune = System.Rune;
 
 namespace Terminal.Gui {
 	partial class HistoryText {
-		public class HistoryTextItem : EventArgs{
+		public class HistoryTextItem : EventArgs {
 			public List<List<Rune>> Lines;
 			public Point CursorPosition;
 			public LineStatus LineStatus;

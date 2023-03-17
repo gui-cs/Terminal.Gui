@@ -40,7 +40,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (treeView);
 
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
+				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 				new StatusItem(Key.CtrlMask | Key.C, "~^C~ Add Child", () => AddChildNode()),
 				new StatusItem(Key.CtrlMask | Key.T, "~^T~ Add Root", () => AddRootNode()),
 				new StatusItem(Key.CtrlMask | Key.R, "~^R~ Rename Node", () => RenameNode()),

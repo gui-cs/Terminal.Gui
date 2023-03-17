@@ -54,7 +54,7 @@ namespace Terminal.Gui {
 	/// Application.Shutdown ();
 	/// </code>
 	/// </example>
-	public partial class Wizard : Dialog {
+	public class Wizard : Dialog {
 		/// <summary>
 		/// Represents a basic step that is displayed in a <see cref="Wizard"/>. The <see cref="WizardStep"/> view is divided horizontally in two. On the left is the
 		/// content view where <see cref="View"/>s can be added,  On the right is the help for the step.

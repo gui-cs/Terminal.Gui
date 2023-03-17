@@ -86,7 +86,7 @@ namespace UICatalog.Scenarios {
 				new StatusItem(Key.F2, "~F2~ OpenExample", () => OpenExample(true)),
 				new StatusItem(Key.F3, "~F3~ CloseExample", () => CloseExample()),
 				new StatusItem(Key.F4, "~F4~ OpenSimple", () => OpenSimple(true)),
-				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
+				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 			});
 			Application.Top.Add (statusBar);
 
@@ -217,7 +217,7 @@ namespace UICatalog.Scenarios {
 			return sort;
 		}
 
-		private void ShowHeaderContextMenu (DataColumn clickedCol, View.MouseEventArgs e)
+		private void ShowHeaderContextMenu (DataColumn clickedCol, MouseEventEventArgs e)
 		{
 			var sort = GetProposedNewSortOrder (clickedCol, out var isAsc);
 

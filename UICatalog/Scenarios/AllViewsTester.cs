@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Terminal.Gui;
+using Terminal.Gui.Configuration;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "All Views Tester", Description: "Provides a test UI for all classes derived from View.")]
@@ -40,16 +41,20 @@ namespace UICatalog.Scenarios {
 		TextField _hText;
 		int _hVal = 0;
 
-		public override void Init (ColorScheme colorScheme)
+		public override void Init ()
 		{
+			// Don't create a sub-win (Scenario.Win); just use Application.Top
 			Application.Init ();
-			// Don't create a sub-win; just use Applicatiion.Top
+			ConfigurationManager.Themes.Theme = Theme;
+			ConfigurationManager.Apply ();
+			Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
 		}
+
 
 		public override void Setup ()
 		{
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
+				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 				new StatusItem(Key.F2, "~F2~ Toggle Frame Ruler", () => {
 					ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
 					Application.Top.SetNeedsDisplay ();
@@ -424,7 +429,7 @@ namespace UICatalog.Scenarios {
 			return view;
 		}
 
-		void LayoutCompleteHandler (object sender, View.LayoutEventArgs args)
+		void LayoutCompleteHandler (object sender, LayoutEventArgs args)
 		{
 			UpdateTitle (_curView);
 		}

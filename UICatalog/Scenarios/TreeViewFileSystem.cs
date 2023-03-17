@@ -41,7 +41,7 @@ namespace UICatalog.Scenarios {
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_Quit", "CTRL-Q", () => Quit()),
+					new MenuItem ("_Quit", $"{Application.QuitKey}", () => Quit()),
 				}),
 				new MenuBarItem ("_View", new MenuItem [] {
 					miFullPaths = new MenuItem ("_Full Paths", "", () => SetFullName()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
@@ -129,7 +129,7 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
-		private void TreeViewFiles_MouseClick (object sender, View.MouseEventArgs obj)
+		private void TreeViewFiles_MouseClick (object sender, MouseEventEventArgs obj)
 		{
 			// if user right clicks
 			if (obj.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {

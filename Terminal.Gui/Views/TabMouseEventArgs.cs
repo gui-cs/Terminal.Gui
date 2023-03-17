@@ -32,5 +32,4 @@ namespace Terminal.Gui {
 			MouseEvent = mouseEvent;
 		}
 	}
-
 }

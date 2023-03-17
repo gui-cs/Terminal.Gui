@@ -142,6 +142,63 @@ namespace Terminal.Gui.DriverTests {
 			Application.Shutdown ();
 		}
 
+		//[Theory]
+		//[InlineData (typeof (FakeDriver))]
+		//public void FakeDriver_MockKeyPresses_Press_AfterTimeOut (Type driverType)
+		//{
+		//	var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+		//	Application.Init (driver);
+
+		//	// Simulating pressing of QuitKey after a short period of time
+		//	uint quitTime = 100;
+		//	Func<MainLoop, bool> closeCallback = (MainLoop loop) => {
+		//		// Prove the scenario is using Application.QuitKey correctly
+		//		output.WriteLine ($"  {quitTime}ms elapsed; Simulating keypresses...");
+		//		FakeConsole.PushMockKeyPress (Key.F);
+		//		FakeConsole.PushMockKeyPress (Key.U);
+		//		FakeConsole.PushMockKeyPress (Key.C);
+		//		FakeConsole.PushMockKeyPress (Key.K);
+		//		return false;
+		//	};
+		//	output.WriteLine ($"Add timeout to simulate key presses after {quitTime}ms");
+		//	_ = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (quitTime), closeCallback);
+
+		//	// If Top doesn't quit within abortTime * 5 (500ms), this will force it
+		//	uint abortTime = quitTime * 5;
+		//	Func<MainLoop, bool> forceCloseCallback = (MainLoop loop) => {
+		//		Application.RequestStop ();
+		//		Assert.Fail ($"  failed to Quit after {abortTime}ms. Force quit.");
+		//		return false;
+		//	};
+		//	output.WriteLine ($"Add timeout to force quit after {abortTime}ms");
+		//	_ = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
+
+
+		//	Key key = Key.Unknown;
+			
+		//	Application.Top.KeyPress += (e) => {
+		//		key = e.KeyEvent.Key;
+		//		output.WriteLine ($"  Application.Top.KeyPress: {key}");
+		//		e.Handled = true;
+				
+		//	};
+
+		//	int iterations = 0;
+		//	Application.Iteration += () => {
+		//		output.WriteLine ($"  iteration {++iterations}");
+
+		//		if (Console.MockKeyPresses.Count == 0) {
+		//			output.WriteLine ($"    No more MockKeyPresses; RequestStop");
+		//			Application.RequestStop ();
+		//		}
+		//	};
+
+		//	Application.Run ();
+
+		//	// Shutdown must be called to safely clean up Application if Init has been called
+		//	Application.Shutdown ();
+		//}
+		
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
 		public void TerminalResized_Simulation (Type driverType)
@@ -319,7 +376,7 @@ namespace Terminal.Gui.DriverTests {
 
 			Application.Shutdown ();
 		}
-		
+
 		[Fact, AutoInitShutdown]
 		public void AddRune_On_Clip_Left_Or_Right_Replace_Previous_Or_Next_Wide_Rune_With_Space ()
 		{
@@ -441,7 +498,7 @@ namespace Terminal.Gui.DriverTests {
 		}
 
 		private static object packetLock = new object ();
-		
+
 		/// <summary>
 		/// Sometimes when using remote tools EventKeyRecord sends 'virtual keystrokes'.
 		/// These are indicated with the wVirtualKeyCode of 231. When we see this code
