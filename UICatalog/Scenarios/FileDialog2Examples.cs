@@ -104,14 +104,14 @@ namespace UICatalog.Scenarios {
 		private void SetupHandler (Button btn)
 		{
 			btn.Clicked += () => {
-				var fd = new FileDialog2(
-						rgCaption.RadioLabels[rgCaption.SelectedItem].ToString()
-					) {
+				var fd = new FileDialog2() {
 					OpenMode = Enum.Parse<OpenMode>(
 						rgOpenMode.RadioLabels[rgOpenMode.SelectedItem].ToString()),
 					MustExist = cbMustExist.Checked ?? false,
 					AllowsMultipleSelection = cbAllowMultipleSelection.Checked ?? false,
 				};
+
+				fd.Style.OkButtonText = rgCaption.RadioLabels [rgCaption.SelectedItem].ToString ();
 
 				if (cbIcons.Checked ?? false) {
 					fd.IconGetter = GetIcon;

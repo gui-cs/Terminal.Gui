@@ -22,8 +22,18 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class FileDialog2 : Dialog {
 
-		public FileDialog2Style Style { get; set; } = new FileDialog2Style ();
+		/// <summary>
+		/// Gets settings for controlling how visual elements behave.  Style changes should
+		/// be made before the <see cref="Dialog"/> is loaded and shown to the user for the
+		/// first time.
+		/// </summary>
+		public FileDialog2Style Style { get; } = new FileDialog2Style ();
+
+		/// <summary>
+		/// Stores style settings for <see cref="FileDialog2"/>.
+		/// </summary>
 		public class FileDialog2Style {
+
 			public string FilenameColumnName { get; set; } = Strings.fdFilename;
 			public string SizeColumnName { get; set; } = Strings.fdSize;
 			public string ModifiedColumnName { get; set; } = Strings.fdModified;
@@ -36,6 +46,8 @@ namespace Terminal.Gui {
 			public string FileMustExistFeedback { get; internal set; } = Strings.fdFileMustExistFeedback;
 			public string DirectoryAlreadyExistsFeedback { get; internal set; } = Strings.fdDirectoryAlreadyExistsFeedback;
 			public string FileOrDirectoryMustExistFeedback { get; internal set; } = Strings.fdFileOrDirectoryMustExistFeedback;
+
+			public string OkButtonText { get; set; } = "Ok";
 
 			/// <summary>
 			/// Gets the style settings for the table of files (in currently selected directory).
@@ -123,16 +135,10 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="FileDialog2"/> class.
 		/// </summary>
-		public FileDialog2 () : this ("Ok")
+		public FileDialog2 ()
 		{
-
-		}
-		public FileDialog2 (string okCaption)
-		{
-			const int cancelWidth = 10;
-
 			var lblPath = new Label (">");
-			this.btnOk = new Button (okCaption) {
+			this.btnOk = new Button (Style.OkButtonText) {
 				Y = Pos.AnchorEnd (1),
 				X = Pos.Function (() =>
 					this.Bounds.Width
@@ -633,6 +639,9 @@ namespace Terminal.Gui {
 			}
 			loaded = true;
 
+			// May have been updated after instance was constructed
+			this.btnOk.Text = Style.OkButtonText;
+
 			// if filtering on file type is configured then create the ComboBox and establish
 			// initial filtering by extension(s)
 			if (this.AllowedTypes.Any ()) {
@@ -675,7 +684,6 @@ namespace Terminal.Gui {
 				};
 
 				this.Add (allowedTypeMenuBar);
-				this.LayoutSubviews ();
 			}
 
 			// if no path has been provided
@@ -702,6 +710,7 @@ namespace Terminal.Gui {
 					break;
 				}
 			}
+			this.LayoutSubviews ();
 		}
 
 		private void AllowedTypeMenuClicked (int idx)
