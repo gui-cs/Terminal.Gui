@@ -808,7 +808,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			host?.openMenu.SetNeedsDisplay ();
+			host?.openMenu?.SetNeedsDisplay ();
 			host.SetNeedsDisplay ();
 		}
 
@@ -1025,6 +1025,8 @@ namespace Terminal.Gui {
 			WantMousePositionReports = true;
 			IsMenuOpen = false;
 
+			Added += MenuBar_Added;
+
 			// Things this view knows how to do
 			AddCommand (Command.Left, () => { MoveLeft (); return true; });
 			AddCommand (Command.Right, () => { MoveRight (); return true; });
@@ -1040,6 +1042,14 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.Enter, Command.Accept);
 		}
 
+		bool _initialCanFocus;
+
+		private void MenuBar_Added (View obj)
+		{
+			_initialCanFocus = CanFocus;
+			Added -= MenuBar_Added;
+		}
+
 		bool openedByAltKey;
 
 		bool isCleaning;
@@ -1049,9 +1059,8 @@ namespace Terminal.Gui {
 		{
 			if ((!(view is MenuBar) && !(view is Menu) || !(view is MenuBar) && !(view is Menu) && openMenu != null) && !isCleaning && !reopen) {
 				CleanUp ();
-				return true;
 			}
-			return false;
+			return base.OnLeave (view);
 		}
 
 		///<inheritdoc/>
@@ -1112,7 +1121,7 @@ namespace Terminal.Gui {
 			openedByAltKey = false;
 			IsMenuOpen = false;
 			selected = -1;
-			CanFocus = false;
+			CanFocus = _initialCanFocus;
 			if (lastFocused != null) {
 				lastFocused.SetFocus ();
 			}
@@ -1513,6 +1522,8 @@ namespace Terminal.Gui {
 						selected = -1;
 					}
 					LastFocused.SetFocus ();
+				} else if (openSubMenu == null || openSubMenu.Count == 0) {
+					CloseAllMenus ();
 				} else {
 					SetFocus ();
 					PositionCursor ();
