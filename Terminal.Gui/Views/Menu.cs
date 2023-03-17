@@ -1044,7 +1044,7 @@ namespace Terminal.Gui {
 
 		bool _initialCanFocus;
 
-		private void MenuBar_Added (View obj)
+		private void MenuBar_Added (object sender, SuperViewChangedEventArgs e)
 		{
 			_initialCanFocus = CanFocus;
 			Added -= MenuBar_Added;
@@ -1276,7 +1276,7 @@ namespace Terminal.Gui {
 				parent = openMenu.barItems;
 				mi = parent.Children [openMenu.current];
 			}
-			MenuOpened?.Invoke (this, new MenuOpenedEventArgs(parent, mi));
+			MenuOpened?.Invoke (this, new MenuOpenedEventArgs (parent, mi));
 		}
 
 		/// <summary>
