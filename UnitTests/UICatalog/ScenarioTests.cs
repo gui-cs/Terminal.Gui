@@ -59,7 +59,7 @@ namespace UICatalog.Tests {
 
 			foreach (var scenario in scenarios) {
 				output.WriteLine ($"Running Scenario '{scenario.GetName ()}'");
-				
+
 				Application.Init (new FakeDriver ());
 
 				// Press QuitKey 
@@ -86,7 +86,6 @@ namespace UICatalog.Tests {
 				//output.WriteLine ($"  Add timeout to force quit after {abortTime}ms");
 				_ = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
 
-				int iterations = 0;
 				Application.Iteration += () => {
 					//output.WriteLine ($"  iteration {++iterations}");
 					if (FakeConsole.MockKeyPresses.Count == 0) {
@@ -328,7 +327,7 @@ namespace UICatalog.Tests {
 				_curView = CreateClass (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
 			};
 
-			_computedCheckBox.Toggled += (s,e) => {
+			_computedCheckBox.Toggled += (s, e) => {
 				if (_curView != null) {
 					_curView.LayoutStyle = e.OldValue == true ? LayoutStyle.Absolute : LayoutStyle.Computed;
 					_hostPane.LayoutSubviews ();
@@ -346,7 +345,7 @@ namespace UICatalog.Tests {
 				}
 			};
 
-			_yText.TextChanged += (s,e) => {
+			_yText.TextChanged += (s, e) => {
 				try {
 					_yVal = int.Parse (_yText.Text.ToString ());
 					DimPosChanged (_curView);
@@ -355,7 +354,7 @@ namespace UICatalog.Tests {
 				}
 			};
 
-			_yRadioGroup.SelectedItemChanged += (s,selected) => DimPosChanged (_curView);
+			_yRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 
 			_wRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 
@@ -588,7 +587,7 @@ namespace UICatalog.Tests {
 				return view;
 			}
 
-			void LayoutCompleteHandler (object sender, View.LayoutEventArgs args)
+			void LayoutCompleteHandler (object sender, LayoutEventArgs args)
 			{
 				UpdateTitle (_curView);
 			}
