@@ -1047,6 +1047,7 @@ namespace Terminal.Gui {
 		private void MenuBar_Added (View obj)
 		{
 			_initialCanFocus = CanFocus;
+			Added -= MenuBar_Added;
 		}
 
 		bool openedByAltKey;
