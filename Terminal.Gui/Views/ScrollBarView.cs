@@ -149,7 +149,7 @@ namespace Terminal.Gui {
 		//	}
 		//}
 
-		void ContentBottomRightCorner_MouseClick (object sender, MouseEventArgs me)
+		void ContentBottomRightCorner_MouseClick (object sender, MouseEventEventArgs me)
 		{
 			if (me.MouseEvent.Flags == MouseFlags.WheeledDown || me.MouseEvent.Flags == MouseFlags.WheeledUp
 				|| me.MouseEvent.Flags == MouseFlags.WheeledRight || me.MouseEvent.Flags == MouseFlags.WheeledLeft) {
