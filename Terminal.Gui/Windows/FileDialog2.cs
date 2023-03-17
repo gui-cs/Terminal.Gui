@@ -35,6 +35,16 @@ namespace Terminal.Gui {
 			public string FileMustExistFeedback { get; internal set; } = Strings.fdFileMustExistFeedback;
 			public string DirectoryAlreadyExistsFeedback { get; internal set; } = Strings.fdDirectoryAlreadyExistsFeedback;
 			public string FileOrDirectoryMustExistFeedback { get; internal set; } = Strings.fdFileOrDirectoryMustExistFeedback;
+
+			/// <summary>
+			/// Gets the style settings for the table of files (in currently selected directory).
+			/// </summary>
+			public TableView.TableStyle TableStyle { get; internal set; }
+
+			/// <summary>
+			/// Gets the style settings for the collapse-able directory/places tree
+			/// </summary>
+			public TreeStyle TreeStyle { get; internal set; }
 		}
 
 		/// <summary>
@@ -199,6 +209,7 @@ namespace Terminal.Gui {
 				FullRowSelect = true,
 			};
 			this.tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
+			Style.TableStyle = tableView.Style;
 			this.tableView.KeyPress += (k) => {
 				if (this.tableView.SelectedRow <= 0) {
 					this.NavigateIf (k, Key.CursorUp, this.tbPath);
@@ -224,7 +235,7 @@ namespace Terminal.Gui {
 
 			this.treeView.TreeBuilder = new FileDialogTreeBuilder ();
 			this.treeView.AspectGetter = (m) => m is DirectoryInfo d ? d.Name : m.ToString ();
-
+			this.Style.TreeStyle = treeView.Style;
 
 			try {
 				this.treeView.AddObjects (
@@ -512,9 +523,10 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Gets or Sets a value indicating whether different colors
-		/// should be used for different file types/directories.
+		/// should be used for different file types/directories.  Defaults
+		/// to false.
 		/// </summary>
-		public bool Monochrome { get; set; }
+		public bool UseColors { get; set; }
 
 		/// <summary>
 		/// Gets or Sets a collection of file types that the user can/must select. Only applies
@@ -940,7 +952,7 @@ namespace Terminal.Gui {
 				var icon = stats.IsParent ? null : IconGetter?.Invoke (stats.FileSystemInfo);
 
 				if (icon != null) {
-					return icon + " " + stats.Name;
+					return icon + stats.Name;
 				}
 				return stats.Name;
 			};
@@ -1155,7 +1167,7 @@ namespace Terminal.Gui {
 		{
 			var stats = this.RowToStats (args.RowIndex);
 
-			if (Monochrome) {
+			if (!UseColors) {
 				return ColorSchemeDefault;
 			}
 

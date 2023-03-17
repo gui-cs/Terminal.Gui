@@ -2,6 +2,7 @@
 using System.Collections;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Terminal.Gui;
 using Terminal.Gui.Graphs;
 using static Terminal.Gui.OpenDialog;
@@ -12,7 +13,7 @@ namespace UICatalog.Scenarios {
 	public class FileDialog2Examples : Scenario {
 		private CheckBox cbMustExist;
 		private CheckBox cbIcons;
-		private CheckBox cbMonochrome;
+		private CheckBox cbUseColors;
 		private CheckBox cbCaseSensitive;
 		private CheckBox cbAllowMultipleSelection;
 
@@ -32,8 +33,8 @@ namespace UICatalog.Scenarios {
 			cbIcons = new CheckBox ("Icons") { Checked = true, Y = y++, X=x };
 			Win.Add (cbIcons);
 
-			cbMonochrome = new CheckBox ("Monochrome") { Checked = false, Y = y++, X=x};
-			Win.Add (cbMonochrome);
+			cbUseColors = new CheckBox ("Use Colors") { Checked = false, Y = y++, X=x};
+			Win.Add (cbUseColors);
 
 			cbCaseSensitive = new CheckBox ("Case Sensitive Search") { Checked = false, Y = y++, X=x };
 			Win.Add (cbCaseSensitive);
@@ -114,7 +115,7 @@ namespace UICatalog.Scenarios {
 					fd.SearchMatcher = new CaseSensitiveSearchMatcher ();
 				}
 
-				fd.Monochrome = cbMonochrome.Checked ?? false;
+				fd.UseColors = cbUseColors.Checked ?? false;
 
 				if (rgAllowedTypes.SelectedItem > 0) {
 					fd.AllowedTypes.Add (new FileDialog2.AllowedType ("Data File", ".csv", ".tsv"));
@@ -159,11 +160,17 @@ namespace UICatalog.Scenarios {
 
 		private string GetIcon (FileSystemInfo arg)
 		{
-			if (arg is DirectoryInfo) {
-				return "\ua909";
+			// Typically most windows terminals will not have these unicode characters installed
+			// so for the demo lets not bother having any icons on windows
+			if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
+				return arg is DirectoryInfo ? "\\" : null;
 			}
 
-			return "\u2630";
+			if (arg is DirectoryInfo) {
+				return "\ua909 ";
+			}
+
+			return "\u2630 ";
 		}
 	}
 }
