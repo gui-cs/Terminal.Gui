@@ -34,7 +34,7 @@ namespace Terminal.Gui {
 	/// // A simple Terminal.Gui app that creates a window with a frame and title with 
 	/// // 5 rows/columns of padding.
 	/// Application.Init();
-	/// var win = new Window ("Hello World - CTRL-Q to quit") {
+	/// var win = new Window ($"Example App ({Application.QuitKey} to quit)") {
 	///     X = 5,
 	///     Y = 5,
 	///     Width = Dim.Fill (5),

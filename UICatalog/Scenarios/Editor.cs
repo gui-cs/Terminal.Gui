@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Globalization;
+using Terminal.Gui.Configuration;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Editor", Description: "A Text Editor using the TextView control.")]
@@ -32,17 +33,19 @@ namespace UICatalog.Scenarios {
 		private bool _forceMinimumPosToZero = true;
 		private List<CultureInfo> _cultureInfos;
 
-		public override void Init (ColorScheme colorScheme)
+		public override void Init ()
 		{
 			Application.Init ();
 			_cultureInfos = Application.SupportedCultures;
-
+			ConfigurationManager.Themes.Theme = Theme;
+			ConfigurationManager.Apply ();
+			
 			Win = new Window (_fileName ?? "Untitled") {
 				X = 0,
 				Y = 1,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
-				ColorScheme = colorScheme,
+				ColorScheme = Colors.ColorSchemes [TopLevelColorScheme],
 			};
 			Application.Top.Add (Win);
 
@@ -121,7 +124,7 @@ namespace UICatalog.Scenarios {
 				new StatusItem(Key.F2, "~F2~ Open", () => Open()),
 				new StatusItem(Key.F3, "~F3~ Save", () => Save()),
 				new StatusItem(Key.F4, "~F4~ Save As", () => SaveAs()),
-				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
+				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 				new StatusItem(Key.Null, $"OS Clipboard IsSupported : {Clipboard.IsSupported}", null)
 			});
 			Application.Top.Add (statusBar);
@@ -174,9 +177,9 @@ namespace UICatalog.Scenarios {
 			Win.KeyPress += (s, e) => {
 				var keys = ShortcutHelper.GetModifiersKey (e.KeyEvent);
 				if (_winDialog != null && (e.KeyEvent.Key == Key.Esc
-					|| e.KeyEvent.Key == (Key.Q | Key.CtrlMask))) {
+					|| e.KeyEvent.Key == Application.QuitKey)) {
 					DisposeWinDialog ();
-				} else if (e.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
+				} else if (e.KeyEvent.Key == Application.QuitKey) {
 					Quit ();
 					e.Handled = true;
 				} else if (_winDialog != null && keys == (Key.Tab | Key.CtrlMask)) {

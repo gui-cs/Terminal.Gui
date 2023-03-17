@@ -36,16 +36,16 @@ namespace UICatalog.Scenarios {
 						new MenuItem ("_Run Worker", "", () => workerApp.RunWorker(), null, null, Key.CtrlMask | Key.R),
 						new MenuItem ("_Cancel Worker", "", () => workerApp.CancelWorker(), null, null, Key.CtrlMask | Key.C),
 						null,
-						new MenuItem ("_Quit", "", () => Quit(), null, null, Key.CtrlMask | Key.Q)
+						new MenuItem ("_Quit", "", () => Quit(), null, null, Application.QuitKey)
 					}),
 					new MenuBarItem ("_View", new MenuItem [] { }),
 					new MenuBarItem ("_Window", new MenuItem [] { })
-				});
+				}); ;
 				menu.MenuOpening += Menu_MenuOpening;
 				Add (menu);
 
 				var statusBar = new StatusBar (new [] {
-					new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Exit", () => Quit()),
+					new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 					new StatusItem(Key.CtrlMask | Key.R, "~^R~ Run Worker", () => workerApp.RunWorker()),
 					new StatusItem(Key.CtrlMask | Key.C, "~^C~ Cancel Worker", () => workerApp.CancelWorker())
 				});
@@ -312,7 +312,7 @@ namespace UICatalog.Scenarios {
 
 				Title = "Run Worker";
 
-				label = new Label ("Press start to do the work or close to exit.") {
+				label = new Label ("Press start to do the work or close to quit.") {
 					X = Pos.Center (),
 					Y = 1,
 					ColorScheme = Colors.Dialog

@@ -36,7 +36,7 @@ namespace UICatalog.Scenarios {
 				Add (menu);
 
 				var statusBar = new StatusBar (new [] {
-					new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Exit", () => Application.RequestStop()),
+					new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Application.RequestStop()),
 					new StatusItem(Key.CtrlMask | Key.P, "~^R~ Run Worker", () => RunWorker())
 				});
 				Add (statusBar);
@@ -136,7 +136,7 @@ namespace UICatalog.Scenarios {
 				top.KeyPress += (s,e) => {
 					// Prevents Ctrl+Q from closing this.
 					// Only Ctrl+C is allowed.
-					if (e.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
+					if (e.KeyEvent.Key == Application.QuitKey) {
 						e.Handled = true;
 					}
 				};
