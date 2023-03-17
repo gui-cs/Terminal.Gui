@@ -21,5 +21,4 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool Handled { get; set; } = false;
 	}
-
 }

@@ -3,7 +3,7 @@
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// Args for events about about Size (e.g. Resized)
+	/// Args for events about Size (e.g. Resized)
 	/// </summary>
 	public class SizeChangedEventArgs : EventArgs {
 

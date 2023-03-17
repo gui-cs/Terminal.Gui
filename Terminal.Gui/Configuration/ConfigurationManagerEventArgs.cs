@@ -14,5 +14,5 @@ namespace Terminal.Gui.Configuration {
 		public ConfigurationManagerEventArgs ()
 		{
 		}
-	}	
+	}
 }
