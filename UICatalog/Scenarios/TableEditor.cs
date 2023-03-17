@@ -217,7 +217,7 @@ namespace UICatalog.Scenarios {
 			return sort;
 		}
 
-		private void ShowHeaderContextMenu (DataColumn clickedCol, View.MouseEventArgs e)
+		private void ShowHeaderContextMenu (DataColumn clickedCol, MouseEventEventArgs e)
 		{
 			var sort = GetProposedNewSortOrder (clickedCol, out var isAsc);
 
