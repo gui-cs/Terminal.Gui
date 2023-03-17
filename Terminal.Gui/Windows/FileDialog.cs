@@ -20,19 +20,19 @@ namespace Terminal.Gui {
 	/// Modal dialog for selecting files/directories. Has auto-complete and expandable
 	/// navigation pane (Recent, Root drives etc).
 	/// </summary>
-	public partial class FileDialog2 : Dialog {
+	public partial class FileDialog : Dialog {
 
 		/// <summary>
 		/// Gets settings for controlling how visual elements behave.  Style changes should
 		/// be made before the <see cref="Dialog"/> is loaded and shown to the user for the
 		/// first time.
 		/// </summary>
-		public FileDialog2Style Style { get; } = new FileDialog2Style ();
+		public FileDialogStyle Style { get; } = new FileDialogStyle ();
 
 		/// <summary>
-		/// Stores style settings for <see cref="FileDialog2"/>.
+		/// Stores style settings for <see cref="FileDialog"/>.
 		/// </summary>
-		public class FileDialog2Style {
+		public class FileDialogStyle {
 
 			/// <summary>
 			/// Gets or sets the header text displayed in the Filename column of the files table.
@@ -190,9 +190,9 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="FileDialog2"/> class.
+		/// Initializes a new instance of the <see cref="FileDialog"/> class.
 		/// </summary>
-		public FileDialog2 ()
+		public FileDialog ()
 		{
 			var lblPath = new Label (">");
 			this.btnOk = new Button (Style.OkButtonText) {
@@ -1415,7 +1415,7 @@ namespace Terminal.Gui {
 				if (fsi is FileInfo fi) {
 					this.MachineReadableLength = fi.Length;
 					this.HumanReadableLength = GetHumanReadableFileSize (this.MachineReadableLength);
-					this.DateModified = FileDialog2.UseUtcDates ? File.GetLastWriteTimeUtc (fi.FullName) : File.GetLastWriteTime (fi.FullName);
+					this.DateModified = FileDialog.UseUtcDates ? File.GetLastWriteTimeUtc (fi.FullName) : File.GetLastWriteTime (fi.FullName);
 					this.Type = fi.Extension;
 				} else {
 					this.HumanReadableLength = string.Empty;
@@ -1461,7 +1461,7 @@ namespace Terminal.Gui {
 						StringComparer.InvariantCultureIgnoreCase);
 			}
 
-			internal object GetOrderByValue (FileDialog2 dlg, string columnName)
+			internal object GetOrderByValue (FileDialog dlg, string columnName)
 			{
 				if (dlg.Style.FilenameColumnName == columnName)
 					return this.FileSystemInfo.Name;
@@ -1520,7 +1520,7 @@ namespace Terminal.Gui {
 			object oLockFound = new object ();
 			CancellationTokenSource token = new CancellationTokenSource ();
 
-			public SearchState (DirectoryInfo dir, FileDialog2 parent, string searchTerms) : base (dir, parent)
+			public SearchState (DirectoryInfo dir, FileDialog parent, string searchTerms) : base (dir, parent)
 			{
 				parent.SearchMatcher.Initialize (searchTerms);
 				Children = new FileSystemInfoStats [0];
@@ -1596,7 +1596,7 @@ namespace Terminal.Gui {
 					}
 
 					lock (oLockFound) {
-						if (found.Count >= FileDialog2.MaxSearchResults) {
+						if (found.Count >= FileDialog.MaxSearchResults) {
 							finished = true;
 							return;
 						}
@@ -1626,8 +1626,8 @@ namespace Terminal.Gui {
 		internal class FileDialogState {
 
 			public FileSystemInfoStats Selected { get; set; }
-			protected readonly FileDialog2 Parent;
-			public FileDialogState (DirectoryInfo dir, FileDialog2 parent)
+			protected readonly FileDialog Parent;
+			public FileDialogState (DirectoryInfo dir, FileDialog parent)
 			{
 				this.Directory = dir;
 				Parent = parent;
@@ -1816,7 +1816,7 @@ namespace Terminal.Gui {
 				}
 
 				var path = this.Text.ToString ();
-				var last = path.LastIndexOfAny (FileDialog2.separators);
+				var last = path.LastIndexOfAny (FileDialog.separators);
 
 				if (last == -1 || suggestions.Length == 0 || last >= path.Length - 1) {
 					this.currentFragment = null;
@@ -1917,9 +1917,9 @@ namespace Terminal.Gui {
 		internal class FileDialogHistory {
 			private Stack<FileDialogState> back = new Stack<FileDialogState> ();
 			private Stack<FileDialogState> forward = new Stack<FileDialogState> ();
-			private FileDialog2 dlg;
+			private FileDialog dlg;
 
-			public FileDialogHistory (FileDialog2 dlg)
+			public FileDialogHistory (FileDialog dlg)
 			{
 				this.dlg = dlg;
 			}
@@ -2026,13 +2026,13 @@ namespace Terminal.Gui {
 		}
 
 		private class FileDialogSorter {
-			private readonly FileDialog2 dlg;
+			private readonly FileDialog dlg;
 			private TableView tableView;
 
 			private DataColumn currentSort = null;
 			private bool currentSortIsAsc = true;
 
-			public FileDialogSorter (FileDialog2 dlg, TableView tableView)
+			public FileDialogSorter (FileDialog dlg, TableView tableView)
 			{
 				this.dlg = dlg;
 				this.tableView = tableView;

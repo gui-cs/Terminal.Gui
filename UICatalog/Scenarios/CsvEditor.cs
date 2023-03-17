@@ -393,7 +393,7 @@ namespace UICatalog.Scenarios {
 
 		private void Open ()
 		{
-			var ofd = new FileDialog2 () {
+			var ofd = new FileDialog () {
 				AllowedTypes = new List<AllowedType> { new AllowedType("Comma Separated Values (.csv)", ".csv") }
 			};
 			ofd.Style.OkButtonText = "Open";

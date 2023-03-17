@@ -55,7 +55,7 @@ namespace Terminal.Gui {
 	/// To select more than one file, users can use the spacebar, or control-t.
 	/// </para>
 	/// </remarks>
-	public class OpenDialog : FileDialog2 {		
+	public class OpenDialog : FileDialog {		
 
 		/// <summary>
 		/// Initializes a new <see cref="OpenDialog"/>.

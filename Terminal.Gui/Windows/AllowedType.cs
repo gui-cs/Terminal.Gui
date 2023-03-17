@@ -8,7 +8,7 @@ namespace Terminal.Gui {
 
 	/// <summary>
 	/// Describes a requirement on what <see cref="FileInfo"/> can be selected
-	/// in a <see cref="FileDialog2"/>.
+	/// in a <see cref="FileDialog"/>.
 	/// </summary>
 	public class AllowedType {
 

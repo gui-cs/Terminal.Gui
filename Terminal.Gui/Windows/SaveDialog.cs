@@ -27,7 +27,7 @@ namespace Terminal.Gui {
 	///   null if the user canceled. 
 	/// </para>
 	/// </remarks>
-	public class SaveDialog : FileDialog2 {
+	public class SaveDialog : FileDialog {
 		/// <summary>
 		/// Initializes a new <see cref="SaveDialog"/>.
 		/// </summary>

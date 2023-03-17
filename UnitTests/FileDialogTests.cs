@@ -6,7 +6,7 @@ using Xunit;
 
 
 namespace Terminal.Gui.Core {
-	public class FileDialog2Tests {
+	public class FileDialogTests {
 
 		[Fact, AutoInitShutdown]
 		public void OnLoad_TextBoxIsFocused ()
@@ -14,14 +14,14 @@ namespace Terminal.Gui.Core {
 			var dlg = GetInitializedFileDialog ();
 			// First focused is ContentView :(
 			Assert.NotNull (dlg.Focused.Focused);
-			Assert.IsType<FileDialog2.TextFieldWithAppendAutocomplete> (dlg.Focused.Focused);
+			Assert.IsType<FileDialog.TextFieldWithAppendAutocomplete> (dlg.Focused.Focused);
 		}
 
 		[Fact, AutoInitShutdown]
 		public void DirectTyping_Allowed ()
 		{
 			var dlg = GetInitializedFileDialog ();
-			var tf = dlg.Subviews [0].Subviews.OfType<FileDialog2.TextFieldWithAppendAutocomplete> ().Single ();
+			var tf = dlg.Subviews [0].Subviews.OfType<FileDialog.TextFieldWithAppendAutocomplete> ().Single ();
 			tf.ClearAllSelection ();
 			tf.CursorPosition = tf.Text.Length;
 			Assert.True (tf.HasFocus);
@@ -101,7 +101,7 @@ namespace Terminal.Gui.Core {
 		[Fact, AutoInitShutdown]
 		public void Autocomplete_NoSuggestion_WhenTextMatchesExactly ()
 		{
-			var tb = new FileDialog2.TextFieldWithAppendAutocomplete ();
+			var tb = new FileDialog.TextFieldWithAppendAutocomplete ();
 			ForceFocus (tb);
 
 			tb.Text = "/bob/fish";
@@ -117,7 +117,7 @@ namespace Terminal.Gui.Core {
 		[Fact, AutoInitShutdown]
 		public void Autocomplete_AcceptSuggstion ()
 		{
-			var tb = new FileDialog2.TextFieldWithAppendAutocomplete ();
+			var tb = new FileDialog.TextFieldWithAppendAutocomplete ();
 			ForceFocus (tb);
 
 			tb.Text = @"/bob/fi";
@@ -136,19 +136,19 @@ namespace Terminal.Gui.Core {
 			hasFocus.SetValue (v, true);
 		}
 
-		private FileDialog2.TextFieldWithAppendAutocomplete GetTextField (FileDialog2 dlg = null)
+		private FileDialog.TextFieldWithAppendAutocomplete GetTextField (FileDialog dlg = null)
 		{
 			if (dlg == null) {
 				dlg = GetInitializedFileDialog ();
 			}
 
 			// First view of a Dialog is ContentView
-			return dlg.Subviews [0].Subviews.OfType<FileDialog2.TextFieldWithAppendAutocomplete> ().Single ();
+			return dlg.Subviews [0].Subviews.OfType<FileDialog.TextFieldWithAppendAutocomplete> ().Single ();
 		}
 
-		private FileDialog2 GetInitializedFileDialog ()
+		private FileDialog GetInitializedFileDialog ()
 		{
-			var dlg = new FileDialog2 ();
+			var dlg = new FileDialog ();
 			dlg.BeginInit ();
 			dlg.EndInit ();
 			Application.Begin (dlg);

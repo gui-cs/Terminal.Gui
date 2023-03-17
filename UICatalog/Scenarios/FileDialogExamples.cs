@@ -8,9 +8,9 @@ using Terminal.Gui.Graphs;
 using static Terminal.Gui.OpenDialog;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "FileDialog2", Description: "Demonstrates how to the FileDialog2 class")]
+	[ScenarioMetadata (Name: "FileDialog", Description: "Demonstrates how to the FileDialog class")]
 	[ScenarioCategory ("Dialogs")]
-	public class FileDialog2Examples : Scenario {
+	public class FileDialogExamples : Scenario {
 		private CheckBox cbMustExist;
 		private CheckBox cbIcons;
 		private CheckBox cbUseColors;
@@ -104,7 +104,7 @@ namespace UICatalog.Scenarios {
 		private void SetupHandler (Button btn)
 		{
 			btn.Clicked += () => {
-				var fd = new FileDialog2() {
+				var fd = new FileDialog() {
 					OpenMode = Enum.Parse<OpenMode>(
 						rgOpenMode.RadioLabels[rgOpenMode.SelectedItem].ToString()),
 					MustExist = cbMustExist.Checked ?? false,
@@ -154,7 +154,7 @@ namespace UICatalog.Scenarios {
 			};
 		}
 
-		private class CaseSensitiveSearchMatcher : FileDialog2.ISearchMatcher {
+		private class CaseSensitiveSearchMatcher : FileDialog.ISearchMatcher {
 			private string terms;
 
 			public void Initialize (string terms)
