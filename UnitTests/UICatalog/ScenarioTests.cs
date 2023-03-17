@@ -70,7 +70,7 @@ namespace UICatalog.Tests {
 				FakeConsole.PushMockKeyPress (Application.QuitKey);
 
 				// The only key we care about is the QuitKey
-				Application.Top.KeyPress += (View.KeyEventEventArgs args) => {
+				Application.Top.KeyPress += (object sender, KeyEventEventArgs args) => {
 					output.WriteLine ($"  Keypress: {args.KeyEvent.Key}");
 					Assert.Equal (Application.QuitKey, args.KeyEvent.Key);
 					args.Handled = false;
