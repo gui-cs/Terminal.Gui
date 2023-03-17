@@ -220,6 +220,8 @@ namespace Terminal.Gui {
 
 		public override void Init (Action terminalResized)
 		{
+			FakeConsole.MockKeyPresses.Clear ();
+
 			TerminalResized = terminalResized;
 
 			cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;

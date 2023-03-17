@@ -62,7 +62,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// Use the constructor that does not take a <c>width</c> and <c>height</c> instead.
 		/// </remarks>
-		public Dialog (ustring title, int width, int height, params Button [] buttons) : base (title, padding: padding)
+		public Dialog (ustring title, int width, int height, params Button [] buttons) : base (title: title, padding: padding)
 		{
 			X = Pos.Center ();
 			Y = Pos.Center ();
@@ -118,6 +118,42 @@ namespace Terminal.Gui {
 		/// After initialization use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> to override this with a location or size.
 		/// </remarks>
 		public Dialog (ustring title, params Button [] buttons) : this (title: title, width: 0, height: 0, buttons: buttons) { }
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Computed"/> positioning, 
+		/// with a <see cref="Border"/> and with an optional set of <see cref="Button"/>s to display
+		/// </summary>
+		/// <param name="title">Title for the dialog.</param>
+		/// <param name="border">The border.</param>
+		/// <param name="buttons">Optional buttons to lay out at the bottom of the dialog.</param>
+		public Dialog (ustring title, Border border, params Button [] buttons)
+			: this (title: title, width: 0, height: 0, buttons: buttons)
+		{
+			Initialize (title, border);
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Computed"/> positioning, 
+		/// with a <see cref="Border"/> and with an optional set of <see cref="Button"/>s to display
+		/// </summary>
+		/// <param name="title">Title for the dialog.</param>
+		/// <param name="width">Width for the dialog.</param>
+		/// <param name="height">Height for the dialog.</param>
+		/// <param name="border">The border.</param>
+		/// <param name="buttons">Optional buttons to lay out at the bottom of the dialog.</param>
+		public Dialog (ustring title, int width, int height, Border border, params Button [] buttons)
+			: this (title: title, width: width, height: height, buttons: buttons)
+		{
+			Initialize (title, border);
+		}
+
+		void Initialize (ustring title, Border border)
+		{
+			if (border != null) {
+				Border = border;
+				Border.Title = title;
+			}
+		}
 
 		/// <summary>
 		/// Adds a <see cref="Button"/> to the <see cref="Dialog"/>, its layout will be controlled by the <see cref="Dialog"/>

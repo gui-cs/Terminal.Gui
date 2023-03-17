@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Terminal.Gui;
+using Terminal.Gui.Configuration;
 
 namespace UICatalog.Scenarios {
 	/// <summary>
@@ -17,10 +18,12 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Layout")]
 	public class ComputedLayout : Scenario {
 
-		public override void Init (ColorScheme colorScheme)
+		public override void Init ()
 		{
 			Application.Init ();
-			Application.Top.ColorScheme = colorScheme;
+			ConfigurationManager.Themes.Theme = Theme;
+			ConfigurationManager.Apply ();
+			Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
 		}
 
 		public override void Setup ()
