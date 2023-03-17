@@ -75,7 +75,7 @@ namespace UICatalog.Scenarios {
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Key.CtrlMask | Key.O, "~^O~ Open", () => Open()),
 				new StatusItem(Key.CtrlMask | Key.S, "~^S~ Save", () => Save()),
-				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
+				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 			});
 			Application.Top.Add (statusBar);
 

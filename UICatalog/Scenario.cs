@@ -20,7 +20,7 @@ namespace UICatalog {
 	/// </para>
 	/// <para>
 	/// The UI Catalog program uses reflection to find all scenarios and adds them to the
-	/// ListViews. Press ENTER to run the selected scenario. Press CTRL-Q to exit it.	/
+	/// ListViews. Press ENTER to run the selected scenario. Press the default quit key to quit.	/
 	/// </para>
 	/// </summary>
 	/// <example>
@@ -48,6 +48,9 @@ namespace UICatalog {
 	public class Scenario : IDisposable {
 		private bool _disposedValue;
 
+		public string Theme = "Default";
+		public string TopLevelColorScheme = "Base";
+
 		/// <summary>
 		/// The Window for the <see cref="Scenario"/>. This should be set to <see cref="Terminal.Gui.Application.Top"/> in most cases.
 		/// </summary>
@@ -59,7 +62,6 @@ namespace UICatalog {
 		/// the Scenario picker UI.
 		/// Override <see cref="Init"/> to provide any <see cref="Terminal.Gui.Toplevel"/> behavior needed.
 		/// </summary>
-		/// <param name="colorScheme">The colorscheme to use.</param>
 		/// <remarks>
 		/// <para>
 		/// The base implementation calls <see cref="Application.Init"/> and creates a <see cref="Window"/> for <see cref="Win"/> 
@@ -70,34 +72,19 @@ namespace UICatalog {
 		/// before creating any views or calling other Terminal.Gui APIs.
 		/// </para>
 		/// </remarks>
-		public virtual void Init (ColorScheme colorScheme)
+		public virtual void Init ()
 		{
-			//ConfigurationManager.Applied += (a) => {
-			//	if (Application.Top == null) {
-			//		return;
-			//	}
-
-			//	//// Apply changes that apply to either UICatalogTopLevel or a Scenario
-			//	//if (Application.Top.MenuBar != null) {
-			//	//	Application.Top.MenuBar.ColorScheme = Colors.ColorSchemes ["Menu"];
-			//	//	Application.Top.MenuBar.SetNeedsDisplay ();
-			//	//}
-
-			//	//if (Application.Top.StatusBar != null) {
-			//	//	Application.Top.StatusBar.ColorScheme = Colors.ColorSchemes ["Menu"];
-			//	//	Application.Top.StatusBar.SetNeedsDisplay ();
-			//	//}
-			//	//Application.Top.SetNeedsDisplay ();
-			//};
-			
 			Application.Init ();
+			
+			ConfigurationManager.Themes.Theme = Theme;
+			ConfigurationManager.Apply ();
 
-			Win = new Window ($"{Application.QuitKey} to Close - Scenario: {GetName ()}") {
+			Win = new Window ($"{Application.QuitKey} to Quit - Scenario: {GetName ()}") {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
-				ColorScheme = colorScheme,
+				ColorScheme = Colors.ColorSchemes [TopLevelColorScheme],
 			};
 			Application.Top.Add (Win);
 		}

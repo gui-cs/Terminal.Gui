@@ -14,11 +14,11 @@ namespace Terminal.Gui.ViewTests {
 		[Fact]
 		public void StatusItem_Constructor ()
 		{
-			var si = new StatusItem (Key.CtrlMask | Key.Q, "~^Q~ Quit", null);
+			var si = new StatusItem (Application.QuitKey, $"{Application.QuitKey} to Quit", null);
 			Assert.Equal (Key.CtrlMask | Key.Q, si.Shortcut);
-			Assert.Equal ("~^Q~ Quit", si.Title);
+			Assert.Equal ($"{Application.QuitKey} to Quit", si.Title);
 			Assert.Null (si.Action);
-			si = new StatusItem (Key.CtrlMask | Key.Q, "~^Q~ Quit", () => { });
+			si = new StatusItem (Application.QuitKey, $"{Application.QuitKey} to Quit", () => { });
 			Assert.NotNull (si.Action);
 		}
 
@@ -72,7 +72,7 @@ namespace Terminal.Gui.ViewTests {
 		public void Run_Action_With_Key_And_Mouse ()
 		{
 			var msg = "";
-			var sb = new StatusBar (new StatusItem [] { new StatusItem (Key.CtrlMask | Key.Q, "~^Q~ Quit", () => msg = "Quiting...") });
+			var sb = new StatusBar (new StatusItem [] { new StatusItem (Application.QuitKey, $"{Application.QuitKey} to Quit", () => msg = "Quiting...") });
 			Application.Top.Add (sb);
 
 			var iteration = 0;
@@ -101,26 +101,31 @@ namespace Terminal.Gui.ViewTests {
 		public void Redraw_Output ()
 		{
 			var sb = new StatusBar (new StatusItem [] {
-				new StatusItem (Key.CtrlMask | Key.Q, "~^O~ Open", null),
-				new StatusItem (Key.CtrlMask | Key.Q, "~^Q~ Quit", null)
+				new StatusItem (Key.CtrlMask | Key.O, "~^O~ Open", null),
+				new StatusItem (Application.QuitKey, $"{Application.QuitKey} to Quit!", null)
 			});
 			Application.Top.Add (sb);
 
 			sb.Redraw (sb.Bounds);
 
 			string expected = @$"
-^O Open {Application.Driver.VLine} ^Q Quit
+^O Open {Application.Driver.VLine} Q, CtrlMask to Quit!
 ";
-
 			TestHelpers.AssertDriverContentsAre (expected, output);
-
-			sb = new StatusBar (new StatusItem [] {
-				new StatusItem (Key.CtrlMask | Key.Q, "~CTRL-O~ Open", null),
+		}
+		
+		[Fact]
+		[AutoInitShutdown]
+		public void Redraw_Output_CTRLQ ()
+		{
+			var sb = new StatusBar (new StatusItem [] {
+				new StatusItem (Key.CtrlMask | Key.O, "~CTRL-O~ Open", null),
 				new StatusItem (Key.CtrlMask | Key.Q, "~CTRL-Q~ Quit", null)
 			});
+			Application.Top.Add (sb);
 			sb.Redraw (sb.Bounds);
 
-			expected = @$"
+			string expected = @$"
 CTRL-O Open {Application.Driver.VLine} CTRL-Q Quit
 ";
 

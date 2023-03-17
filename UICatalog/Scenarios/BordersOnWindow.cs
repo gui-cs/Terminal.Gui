@@ -5,12 +5,12 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Layout")]
 	[ScenarioCategory ("Borders")]
 	public class BordersOnWindow : Scenario {
-		public override void Init (ColorScheme colorScheme)
+		public override void Init ()
 		{
 			Application.Init ();
 
 			var boc = new BordersOnContainers (
-				$"CTRL-Q to Close - Scenario: {GetName ()}",
+				$"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
 				"Window",
 				new Window ());
 
