@@ -640,8 +640,8 @@ namespace Terminal.Gui.MenuTests {
 			win.Add (label, tf);
 
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.F1, "~F1~ Help", null),
-				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", null)
+				new StatusItem (Key.F1, "~F1~ Help", null),
+				new StatusItem (Key.CtrlMask | Key.Q, "~^Q~ Quit", null)
 			});
 
 			Application.Top.Add (menu, win, statusBar);
