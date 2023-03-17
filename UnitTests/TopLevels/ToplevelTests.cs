@@ -667,7 +667,7 @@ namespace Terminal.Gui.TopLevelTests {
 		public void FileDialog_FileSystemWatcher ()
 		{
 			for (int i = 0; i < 8; i++) {
-				var fd = new FileDialog ();
+				var fd = new FileDialog2 ();
 				fd.Ready += () => Application.RequestStop ();
 				Application.Run (fd);
 			}

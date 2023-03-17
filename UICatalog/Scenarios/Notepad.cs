@@ -254,7 +254,7 @@ namespace UICatalog.Scenarios {
 
 		private void Open ()
 		{
-			var open = new OpenDialog ("Open", "Open a file") { AllowsMultipleSelection = true };
+			var open = new OpenDialog ("Open") { AllowsMultipleSelection = true };
 
 			Application.Run (open);
 
@@ -313,7 +313,7 @@ namespace UICatalog.Scenarios {
 			var fd = new SaveDialog ();
 			Application.Run (fd);
 
-			if (string.IsNullOrWhiteSpace (fd.FilePath?.ToString ())) {
+			if (string.IsNullOrWhiteSpace (fd.Path?.ToString ())) {
 				return false;
 			}
 			
@@ -321,7 +321,7 @@ namespace UICatalog.Scenarios {
 				return false;
 			}
 
-			tab.File = new FileInfo (fd.FilePath.ToString ());
+			tab.File = new FileInfo (fd.Path.ToString ());
 			tab.Text = fd.FileName.ToString ();
 			tab.Save ();
 

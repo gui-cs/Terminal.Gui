@@ -128,7 +128,7 @@ namespace UICatalog.Scenarios {
 				fd.Style.TableStyle.AlwaysShowHeaders = cbAlwaysTableShowHeaders.Checked ?? false;
 
 				if (rgAllowedTypes.SelectedItem > 0) {
-					fd.AllowedTypes.Add (new FileDialog2.AllowedType ("Data File", ".csv", ".tsv"));
+					fd.AllowedTypes.Add (new AllowedType ("Data File", ".csv", ".tsv"));
 					fd.AllowedTypesIsStrict = rgAllowedTypes.SelectedItem > 1;
 				}
 

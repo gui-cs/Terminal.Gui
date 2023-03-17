@@ -393,14 +393,15 @@ namespace UICatalog.Scenarios {
 
 		private void Open ()
 		{
-			var ofd = new FileDialog ("Select File", "Open", "File", "Select a CSV file to open") {
-				AllowedFileTypes = new string [] { ".csv" }
+			var ofd = new FileDialog2 () {
+				AllowedTypes = new List<AllowedType> { new AllowedType("Comma Separated Values (.csv)", ".csv") }
 			};
+			ofd.Style.OkButtonText = "Open";
 
 			Application.Run (ofd);
 
-			if (!ofd.Canceled && !string.IsNullOrWhiteSpace (ofd.FilePath?.ToString ())) {
-				Open (ofd.FilePath.ToString ());
+			if (!ofd.Canceled && !string.IsNullOrWhiteSpace (ofd.Path?.ToString ())) {
+				Open (ofd.Path.ToString ());
 			}
 		}
 
