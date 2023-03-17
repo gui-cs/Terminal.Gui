@@ -16,6 +16,8 @@ namespace UICatalog.Scenarios {
 		private CheckBox cbUseColors;
 		private CheckBox cbCaseSensitive;
 		private CheckBox cbAllowMultipleSelection;
+		private CheckBox cbShowTreeBranchLines;
+		private CheckBox cbAlwaysTableShowHeaders;
 
 		private RadioGroup rgCaption;
 		private RadioGroup rgOpenMode;
@@ -41,6 +43,12 @@ namespace UICatalog.Scenarios {
 
 			cbAllowMultipleSelection = new CheckBox ("Multiple") { Checked = false, Y = y++, X=x };
 			Win.Add (cbAllowMultipleSelection);
+
+			cbShowTreeBranchLines = new CheckBox ("Tree Branch Lines") { Checked = true, Y = y++, X=x };
+			Win.Add (cbShowTreeBranchLines);
+
+			cbAlwaysTableShowHeaders = new CheckBox ("Always Show Headers") { Checked = true, Y = y++, X=x };
+			Win.Add (cbAlwaysTableShowHeaders);
 
 			y = 0;
 			x = 24;
@@ -70,7 +78,6 @@ namespace UICatalog.Scenarios {
 			rgOpenMode.RadioLabels = new NStack.ustring[]{"File","Directory","Mixed"};
 			Win.Add(rgOpenMode);
 			
-
 			y = 5;
 			x = 24;
 
@@ -87,7 +94,7 @@ namespace UICatalog.Scenarios {
 
 			var btn = new Button ($"Run Dialog") {
 				X = 1,
-				Y = 7
+				Y = 8
 			};
 
 			SetupHandler (btn);
@@ -116,6 +123,9 @@ namespace UICatalog.Scenarios {
 				}
 
 				fd.UseColors = cbUseColors.Checked ?? false;
+				
+				fd.Style.TreeStyle.ShowBranchLines = cbShowTreeBranchLines.Checked ?? false;
+				fd.Style.TableStyle.AlwaysShowHeaders = cbAlwaysTableShowHeaders.Checked ?? false;
 
 				if (rgAllowedTypes.SelectedItem > 0) {
 					fd.AllowedTypes.Add (new FileDialog2.AllowedType ("Data File", ".csv", ".tsv"));

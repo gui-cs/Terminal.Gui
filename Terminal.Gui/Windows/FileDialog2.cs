@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -1826,9 +1827,12 @@ namespace Terminal.Gui {
 					return;
 				}
 
-				// TODO: Be case insensitive on Windows
+				bool isWindows = RuntimeInformation.IsOSPlatform (OSPlatform.Windows);
+
 				var validSuggestions = suggestions
-					.Where (s => s.StartsWith (term))
+					.Where (s => s.StartsWith (term, isWindows ?
+						StringComparison.InvariantCultureIgnoreCase :
+						StringComparison.InvariantCulture))
 					.OrderBy (m => m.Length)
 					.ToArray ();
 
