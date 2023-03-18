@@ -134,7 +134,7 @@ namespace Terminal.Gui {
 		internal virtual void OnChildClosed (Toplevel top)
 		{
 			if (IsMdiContainer) {
-				SetChildNeedsDisplay ();
+				SetSubViewNeedsDisplay ();
 			}
 			ChildClosed?.Invoke (top);
 		}
@@ -207,6 +207,10 @@ namespace Terminal.Gui {
 		void Initialize ()
 		{
 			ColorScheme = Colors.TopLevel;
+
+			// TODO: v2 - ALL Views (Responders??!?!) should support the commands related to 
+			//    - Focus
+			//  Move the appropriate AddCommand calls to `Responder`
 
 			// Things this view knows how to do
 			AddCommand (Command.QuitToplevel, () => { QuitToplevel (); return true; });
@@ -357,7 +361,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// <see langword="true"/> if was already loaded by the <see cref="Application.Begin(Toplevel)"/>
-		/// <see langword="false"/>, otherwise. This is used to avoid the <see cref="View.NeedDisplay"/>
+		/// <see langword="false"/>, otherwise. This is used to avoid the <see cref="View._needsDisplay"/>
 		/// having wrong values while this was not yet loaded.
 		/// </summary>
 		public bool IsLoaded { get; private set; }
@@ -595,7 +599,7 @@ namespace Terminal.Gui {
 		}
 
 		internal View EnsureVisibleBounds (Toplevel top, int x, int y,
-			out int nx, out int ny, out View mb, out View sb)
+			out int nx, out int ny, out MenuBar mb, out StatusBar sb)
 		{
 			int l;
 			View superView;
@@ -668,13 +672,14 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Adjusts the location and size of <paramref name="top"/> within this Toplevel.
 		/// Virtual method enabling implementation of specific positions for inherited <see cref="Toplevel"/> views.
 		/// </summary>
-		/// <param name="top">The toplevel.</param>
+		/// <param name="top">The Toplevel to adjust.</param>
 		public virtual void PositionToplevel (Toplevel top)
 		{
 			var superView = EnsureVisibleBounds (top, top.Frame.X, top.Frame.Y,
-				out int nx, out int ny, out _, out View sb);
+				out int nx, out int ny, out _, out StatusBar sb);
 			bool layoutSubviews = false;
 			if ((top?.SuperView != null || (top != Application.Top && top.Modal)
 				|| (top?.SuperView == null && top.IsMdiChild))
@@ -690,6 +695,7 @@ namespace Terminal.Gui {
 				}
 			}
 
+			// TODO: v2 - This is a hack to get the StatusBar to be positioned correctly.
 			if (sb != null && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0)
 				&& top.Height is Dim.DimFill && -top.Height.Anchor (0) < 1) {
 

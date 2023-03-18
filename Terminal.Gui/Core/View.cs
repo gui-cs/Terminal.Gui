@@ -918,7 +918,7 @@ namespace Terminal.Gui {
 				var h = Math.Max (NeedDisplay.Height, region.Height);
 				NeedDisplay = new Rect (x, y, w, h);
 			}
-			container?.SetChildNeedsDisplay ();
+			container?.SetSubViewNeedsDisplay ();
 
 			if (subviews == null)
 				return;
@@ -937,11 +937,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Indicates that any child views (in the <see cref="Subviews"/> list) need to be repainted.
 		/// </summary>
-		public void SetChildNeedsDisplay ()
+		public void SetSubViewNeedsDisplay ()
 		{
 			ChildNeedsDisplay = true;
 			if (container != null)
-				container.SetChildNeedsDisplay ();
+				container.SetSubViewNeedsDisplay ();
 		}
 
 		internal bool addingView;
@@ -1547,14 +1547,14 @@ namespace Terminal.Gui {
 				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
 
 				Clear ();
-				SetChildNeedsDisplay ();
+				SetSubViewNeedsDisplay ();
 			}
 
 			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
 				Rect containerBounds = GetContainerBounds ();
 				if (!containerBounds.IsEmpty) {
 					Clear (GetNeedDisplay (containerBounds));
-					SetChildNeedsDisplay ();
+					SetSubViewNeedsDisplay ();
 					// Draw any Text
 					if (TextFormatter != null) {
 						TextFormatter.NeedsFormat = true;
