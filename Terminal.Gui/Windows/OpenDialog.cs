@@ -68,7 +68,7 @@ namespace Terminal.Gui {
 		/// <param name="title">The title.</param>
 		/// <param name="allowedTypes">The allowed types.</param>
 		/// <param name="openMode">The open mode.</param>
-		public OpenDialog (ustring title, List<AllowedType> allowedTypes = null, OpenMode openMode = OpenMode.File)
+		public OpenDialog (ustring title, List<IAllowedType> allowedTypes = null, OpenMode openMode = OpenMode.File)
 		{
 			this.OpenMode = openMode;
 			Title = title;

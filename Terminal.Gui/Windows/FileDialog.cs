@@ -153,9 +153,9 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		/// The UI selected <see cref="AllowedType"/> from combo box. May be null.
+		/// The UI selected <see cref="IAllowedType"/> from combo box. May be null.
 		/// </summary>
-		private AllowedType currentFilter;
+		private IAllowedType currentFilter;
 
 		private bool pushingState = false;
 		private bool loaded = false;
@@ -597,7 +597,7 @@ namespace Terminal.Gui {
 		/// when <see cref="OpenMode"/> is <see cref="OpenMode.File"/>. See also
 		/// <see cref="AllowedTypesIsStrict"/> if you only want to highlight files.
 		/// </summary>
-		public List<AllowedType> AllowedTypes { get; set; } = new List<AllowedType> ();
+		public List<IAllowedType> AllowedTypes { get; set; } = new List<IAllowedType> ();
 
 		/// <summary>
 		/// Gets or sets a value indicating whether <see cref="AllowedTypes"/> is a strict
@@ -779,7 +779,7 @@ namespace Terminal.Gui {
 			}
 			allowedTypeMenu.Title = allow.ToString ();
 
-			this.currentFilter = allow == null || allow.IsAny ? null : allow;
+			this.currentFilter = allow == null || allow == AllowedType.Any? null : allow;
 
 			this.tbPath.ClearAllSelection ();
 			this.tbPath.ClearSuggestions ();
@@ -1088,14 +1088,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			var extension = System.IO.Path.GetExtension (path);
-
-			// There is a requirement to have a particular extension and we have none
-			if (string.IsNullOrEmpty (extension)) {
-				return false;
-			}
-
-			return this.AllowedTypes.Any (t => t.Matches (extension, false));
+			return this.AllowedTypes.Any (t => t.IsAllowed (path));
 		}
 
 		/// <summary>
@@ -1106,7 +1099,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private bool MatchesAllowedTypes (FileInfo file)
 		{
-			return this.AllowedTypes.Any (t => t.Matches (file.Extension, true));
+			return this.AllowedTypes.Any (t => t.IsAllowed (file.FullName));
 		}
 		private bool IsCompatibleWithOpenMode (string s, out string reason)
 		{
@@ -1688,7 +1681,7 @@ namespace Terminal.Gui {
 			protected bool MatchesApiFilter (FileSystemInfoStats arg)
 			{
 				return arg.IsDir () ||
-				(arg.FileSystemInfo is FileInfo f && Parent.currentFilter.Matches (f.Extension, true));
+				(arg.FileSystemInfo is FileInfo f && Parent.currentFilter.IsAllowed (f.FullName));
 			}
 		}
 

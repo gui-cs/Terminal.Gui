@@ -368,7 +368,7 @@ namespace UICatalog.Scenarios {
 			if (!CanCloseFile ()) {
 				return;
 			}
-			var aTypes = new List<AllowedType> () { new AllowedType("Text",".txt;.bin;.xml;.json", ".txt", ".bin", ".xml", ".json") };
+			var aTypes = new List<IAllowedType> () { new AllowedType("Text",".txt;.bin;.xml;.json", ".txt", ".bin", ".xml", ".json") };
 			var d = new OpenDialog ("Open", aTypes) { AllowsMultipleSelection = false, AllowedTypesIsStrict = false };
 			Application.Run (d);
 
@@ -391,7 +391,7 @@ namespace UICatalog.Scenarios {
 
 		private bool SaveAs ()
 		{
-			var aTypes = new List<AllowedType> () { new AllowedType("Text Files", ".txt", ".bin", ".xml") };
+			var aTypes = new List<IAllowedType> () { new AllowedType("Text Files", ".txt", ".bin", ".xml") };
 			var sd = new SaveDialog ("Save file", aTypes) {
 				AllowedTypesIsStrict = false
 			};

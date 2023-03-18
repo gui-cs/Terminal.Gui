@@ -7,10 +7,24 @@ using Terminal.Gui.Resources;
 namespace Terminal.Gui {
 
 	/// <summary>
+	/// Interface for <see cref="FileDialog"/> restrictions on which file type(s) the
+	/// user is allowed to select/enter.
+	/// </summary>
+	public interface IAllowedType
+	{
+		/// <summary>
+		/// Returns true if the file at <paramref name="path"/> is compatible with this
+		/// allow option.  Note that the file may not exist (e.g. in the case of saving).
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns></returns>
+		bool IsAllowed (string path);
+	}
+	/// <summary>
 	/// Describes a requirement on what <see cref="FileInfo"/> can be selected
 	/// in a <see cref="FileDialog"/>.
 	/// </summary>
-	public class AllowedType {
+	public class AllowedType : IAllowedType {
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AllowedType"/> class.
@@ -43,12 +57,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		public string [] Extensions { get; set; }
 
-		/// <summary>
-		/// Gets a value indicating whether this instance is the
-		/// static <see cref="Any"/> value which indicates matching
-		/// any files.
-		/// </summary>
-		public bool IsAny => this == Any;
 
 		/// <summary>
 		/// Returns <see cref="Description"/> plus all <see cref="Extensions"/> separated by semicolons.
@@ -58,11 +66,20 @@ namespace Terminal.Gui {
 			return $"{this.Description} ({string.Join (";", this.Extensions.Select (e => '*' + e).ToArray ())})";
 		}
 
-		internal bool Matches (string extension, bool strict)
+		/// <inheritdoc/>
+		public bool IsAllowed(string path)
 		{
-			if (this.IsAny) {
-				return !strict;
+			if (this == Any) {
+				return true;
 			}
+
+			var extension = Path.GetExtension (path);
+
+			// There is a requirement to have a particular extension and we have none
+			if (string.IsNullOrEmpty (extension)) {
+				return false;
+			}
+
 
 			return this.Extensions.Any (e => e.Equals (extension));
 		}

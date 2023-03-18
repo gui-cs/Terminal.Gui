@@ -38,7 +38,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="title">The title.</param>
 		/// <param name="allowedTypes">The allowed types.</param>
-		public SaveDialog (ustring title, List<AllowedType> allowedTypes = null)
+		public SaveDialog (ustring title, List<IAllowedType> allowedTypes = null)
 		{
 			//: base (title, prompt: Strings.fdSave, nameFieldLabel: $"{Strings.fdSaveAs}:", message: message, allowedTypes) { }
 			Title = title;
