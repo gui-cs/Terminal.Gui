@@ -535,7 +535,7 @@ namespace Terminal.Gui {
 
 				x = value;
 
-				ProcessResizeView ();
+				OnResizeNeeded ();
 			}
 		}
 
@@ -555,7 +555,7 @@ namespace Terminal.Gui {
 
 				y = value;
 
-				ProcessResizeView ();
+				OnResizeNeeded ();
 			}
 		}
 		Dim width, height;
@@ -583,7 +583,7 @@ namespace Terminal.Gui {
 						throw new InvalidOperationException ("Must set AutoSize to false before set the Width.");
 					}
 				}
-				ProcessResizeView ();
+				OnResizeNeeded ();
 			}
 		}
 
@@ -608,7 +608,7 @@ namespace Terminal.Gui {
 						throw new InvalidOperationException ("Must set AutoSize to false before set the Height.");
 					}
 				}
-				ProcessResizeView ();
+				OnResizeNeeded ();
 			}
 		}
 
@@ -827,7 +827,7 @@ namespace Terminal.Gui {
 
 			Text = text;
 
-			ProcessResizeView ();
+			OnResizeNeeded ();
 		}
 
 		/// <summary>
@@ -844,7 +844,7 @@ namespace Terminal.Gui {
 		/// Can be overridden if the view resize behavior is
 		///  different than the default.
 		/// </summary>
-		protected virtual void ProcessResizeView ()
+		protected virtual void OnResizeNeeded ()
 		{
 			var actX = x is Pos.PosAbsolute ? x.Anchor (0) : frame.X;
 			var actY = y is Pos.PosAbsolute ? y.Anchor (0) : frame.Y;
@@ -2546,7 +2546,7 @@ namespace Terminal.Gui {
 				text = value;
 				SetHotKey ();
 				UpdateTextFormatterText ();
-				ProcessResizeView ();
+				OnResizeNeeded ();
 			}
 		}
 
@@ -2572,7 +2572,7 @@ namespace Terminal.Gui {
 					autoSize = v;
 					TextFormatter.NeedsFormat = true;
 					UpdateTextFormatterText ();
-					ProcessResizeView ();
+					OnResizeNeeded ();
 				}
 			}
 		}
@@ -2603,7 +2603,7 @@ namespace Terminal.Gui {
 			set {
 				TextFormatter.Alignment = value;
 				UpdateTextFormatterText ();
-				ProcessResizeView ();
+				OnResizeNeeded ();
 			}
 		}
 
@@ -2636,7 +2636,7 @@ namespace Terminal.Gui {
 
 					if ((!ForceValidatePosDim && directionChanged && AutoSize)
 					    || (ForceValidatePosDim && directionChanged && AutoSize && isValidOldAutSize)) {
-						ProcessResizeView ();
+						OnResizeNeeded ();
 					} else if (directionChanged && IsAdded) {
 						SetWidthHeight (Bounds.Size);
 						SetMinWidthHeight ();
@@ -3053,7 +3053,9 @@ namespace Terminal.Gui {
 				oldTabIndex = tabIndex;
 
 				//UpdateTextFormatterText ();
-				//ProcessResizeView ();
+				// TODO: Figure out why ScrollView and other tests fail if this call is put here 
+				// instead of the constructor.
+				// OnSizeChanged ();
 
 			} else {
 				//throw new InvalidOperationException ("The view is already initialized.");

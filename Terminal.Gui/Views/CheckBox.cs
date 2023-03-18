@@ -92,7 +92,7 @@ namespace Terminal.Gui {
 			AutoSize = true;
 			Text = s;
 			
-			ProcessResizeView ();
+			OnResizeNeeded ();
 
 			// Things this view knows how to do
 			AddCommand (Command.ToggleChecked, () => ToggleChecked ());
@@ -145,7 +145,7 @@ namespace Terminal.Gui {
 				}
 				@checked = value;
 				UpdateTextFormatterText ();
-				ProcessResizeView ();
+				OnResizeNeeded ();
 			}
 		}
 

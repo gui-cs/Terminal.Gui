@@ -117,7 +117,7 @@ namespace Terminal.Gui {
 			this.is_default = is_default;
 			Text = text ?? string.Empty;
 
-			ProcessResizeView ();
+			OnResizeNeeded ();
 
 			// Things this view knows how to do
 			AddCommand (Command.Accept, () => AcceptKey ());
@@ -139,7 +139,7 @@ namespace Terminal.Gui {
 			set {
 				is_default = value;
 				UpdateTextFormatterText ();
-				ProcessResizeView ();
+				OnResizeNeeded ();
 			}
 		}
 
