@@ -951,13 +951,10 @@ namespace Terminal.Gui {
 
 			var rs = new RunState (toplevel);
 
-			if (toplevel is ISupportInitializeNotification initializableNotification &&
-			    !initializableNotification.IsInitialized) {
-				initializableNotification.BeginInit ();
-				initializableNotification.EndInit ();
-			} else if (toplevel is ISupportInitialize initializable) {
-				initializable.BeginInit ();
-				initializable.EndInit ();
+			// View implements ISupportInitializeNotification which is derived from ISupportInitialize
+			if (!toplevel.IsInitialized) {
+				toplevel.BeginInit ();
+				toplevel.EndInit ();
 			}
 
 			lock (toplevels) {

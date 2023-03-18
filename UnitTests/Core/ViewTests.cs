@@ -2111,7 +2111,7 @@ namespace Terminal.Gui.CoreTests {
 		}
 
 		[Fact]
-		public void GetTextFormatterBoundsSize_GetBoundsTextFormatterSize_HotKeySpecifier ()
+		public void GetTextFormatterBoundsSize_GetSizeNeededForText_HotKeySpecifier ()
 		{
 			var text = "Say Hello 你";
 			var horizontalView = new View () { Text = text, AutoSize = true, HotKeySpecifier = '_' };
@@ -2124,17 +2124,17 @@ namespace Terminal.Gui.CoreTests {
 
 			Assert.True (horizontalView.AutoSize);
 			Assert.Equal (new Rect (0, 0, 12, 1), horizontalView.Frame);
-			Assert.Equal (new Size (12, 1), horizontalView.GetTextFormatterBoundsSize ());
-			Assert.Equal (new Size (12, 1), horizontalView.GetBoundsTextFormatterSize ());
-			Assert.Equal (horizontalView.TextFormatter.Size, horizontalView.GetBoundsTextFormatterSize ());
-			Assert.Equal (horizontalView.Frame.Size, horizontalView.GetTextFormatterBoundsSize ());
+			Assert.Equal (new Size (12, 1), horizontalView.GetSizeNeededForTextWithoutHotKey ());
+			Assert.Equal (new Size (12, 1), horizontalView.GetSizeNeededForTextAndHotKey ());
+			Assert.Equal (horizontalView.TextFormatter.Size, horizontalView.GetSizeNeededForTextAndHotKey ());
+			Assert.Equal (horizontalView.Frame.Size, horizontalView.GetSizeNeededForTextWithoutHotKey ());
 
 			Assert.True (verticalView.AutoSize);
 			Assert.Equal (new Rect (0, 0, 2, 11), verticalView.Frame);
-			Assert.Equal (new Size (2, 11), verticalView.GetTextFormatterBoundsSize ());
-			Assert.Equal (new Size (2, 11), verticalView.GetBoundsTextFormatterSize ());
-			Assert.Equal (verticalView.TextFormatter.Size, verticalView.GetBoundsTextFormatterSize ());
-			Assert.Equal (verticalView.Frame.Size, verticalView.GetTextFormatterBoundsSize ());
+			Assert.Equal (new Size (2, 11), verticalView.GetSizeNeededForTextWithoutHotKey ());
+			Assert.Equal (new Size (2, 11), verticalView.GetSizeNeededForTextAndHotKey ());
+			Assert.Equal (verticalView.TextFormatter.Size, verticalView.GetSizeNeededForTextAndHotKey ());
+			Assert.Equal (verticalView.Frame.Size, verticalView.GetSizeNeededForTextWithoutHotKey ());
 
 			text = "Say He_llo 你";
 			horizontalView.Text = text;
@@ -2142,17 +2142,17 @@ namespace Terminal.Gui.CoreTests {
 
 			Assert.True (horizontalView.AutoSize);
 			Assert.Equal (new Rect (0, 0, 12, 1), horizontalView.Frame);
-			Assert.Equal (new Size (12, 1), horizontalView.GetTextFormatterBoundsSize ());
-			Assert.Equal (new Size (13, 1), horizontalView.GetBoundsTextFormatterSize ());
-			Assert.Equal (horizontalView.TextFormatter.Size, horizontalView.GetBoundsTextFormatterSize ());
-			Assert.Equal (horizontalView.Frame.Size, horizontalView.GetTextFormatterBoundsSize ());
+			Assert.Equal (new Size (12, 1), horizontalView.GetSizeNeededForTextWithoutHotKey ());
+			Assert.Equal (new Size (13, 1), horizontalView.GetSizeNeededForTextAndHotKey ());
+			Assert.Equal (horizontalView.TextFormatter.Size, horizontalView.GetSizeNeededForTextAndHotKey ());
+			Assert.Equal (horizontalView.Frame.Size, horizontalView.GetSizeNeededForTextWithoutHotKey ());
 
 			Assert.True (verticalView.AutoSize);
 			Assert.Equal (new Rect (0, 0, 2, 11), verticalView.Frame);
-			Assert.Equal (new Size (2, 11), verticalView.GetTextFormatterBoundsSize ());
-			Assert.Equal (new Size (2, 12), verticalView.GetBoundsTextFormatterSize ());
-			Assert.Equal (verticalView.TextFormatter.Size, verticalView.GetBoundsTextFormatterSize ());
-			Assert.Equal (verticalView.Frame.Size, verticalView.GetTextFormatterBoundsSize ());
+			Assert.Equal (new Size (2, 11), verticalView.GetSizeNeededForTextWithoutHotKey ());
+			Assert.Equal (new Size (2, 12), verticalView.GetSizeNeededForTextAndHotKey ());
+			Assert.Equal (verticalView.TextFormatter.Size, verticalView.GetSizeNeededForTextAndHotKey ());
+			Assert.Equal (verticalView.Frame.Size, verticalView.GetSizeNeededForTextWithoutHotKey ());
 		}
 
 		[Fact]
