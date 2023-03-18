@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -20,9 +21,30 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		bool IsAllowed (string path);
 	}
+
+
 	/// <summary>
-	/// Describes a requirement on what <see cref="FileInfo"/> can be selected
-	/// in a <see cref="FileDialog"/>.
+	/// <see cref="IAllowedType"/> that allows selection of any types (*.*).
+	/// </summary>
+	public class AllowedTypeAny : IAllowedType {
+
+		/// <inheritdoc/>
+		public bool IsAllowed (string path)
+		{
+			return true;
+		}
+
+		/// <inheritdoc/>
+		public override string ToString ()
+		{
+			return Strings.fdAnyFiles + "(*.*)";
+		}
+	}
+
+	/// <summary>
+	/// Describes a requirement on what <see cref="FileInfo"/> can be selected.
+	/// This can be combined with other <see cref="IAllowedType"/> in a <see cref="FileDialog"/>
+	/// to for example show only .csv files but let user change to open any if they want.
 	/// </summary>
 	public class AllowedType : IAllowedType {
 
@@ -40,11 +62,6 @@ namespace Terminal.Gui {
 			this.Description = description;
 			this.Extensions = extensions;
 		}
-
-		/// <summary>
-		/// Gets a value of <see cref="AllowedType"/> that matches any file.
-		/// </summary>
-		public static AllowedType Any { get; } = new AllowedType (Strings.fdAnyFiles, ".*");
 
 		/// <summary>
 		/// Gets or Sets the human readable description for the file type
@@ -69,10 +86,6 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public bool IsAllowed(string path)
 		{
-			if (this == Any) {
-				return true;
-			}
-
 			var extension = Path.GetExtension (path);
 
 			// There is a requirement to have a particular extension and we have none

@@ -72,7 +72,6 @@ namespace Terminal.Gui {
 
 			/// <summary>
 			/// Gets or sets error message when user attempts to select a file type that is not one of <see cref="AllowedTypes"/>
-			/// when <see cref="AllowedTypesIsStrict"/> is true.
 			/// </summary>
 			public string WrongFileTypeFeedback { get; internal set; } = Strings.fdWrongFileTypeFeedback;
 
@@ -594,17 +593,11 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Gets or Sets a collection of file types that the user can/must select. Only applies
-		/// when <see cref="OpenMode"/> is <see cref="OpenMode.File"/>. See also
-		/// <see cref="AllowedTypesIsStrict"/> if you only want to highlight files.
+		/// when <see cref="OpenMode"/> is <see cref="OpenMode.File"/> or <see cref="OpenMode.Mixed"/>.
 		/// </summary>
+		/// <remarks><see cref="AllowedTypeAny"/> adds the option to select any type (*.*). If this
+		/// collection is empty then any type is supported and no Types drop-down is shown.</remarks> 
 		public List<IAllowedType> AllowedTypes { get; set; } = new List<IAllowedType> ();
-
-		/// <summary>
-		/// Gets or sets a value indicating whether <see cref="AllowedTypes"/> is a strict
-		/// requirement or simply a recommendation. Defaults to <see langword="true"/> (i.e.
-		/// strict).
-		/// </summary>
-		public bool AllowedTypesIsStrict { get; set; }
 
 		/// <summary>
 		/// Gets a value indicating whether the <see cref="FileDialog"/> was closed
@@ -705,10 +698,6 @@ namespace Terminal.Gui {
 
 				this.currentFilter = this.AllowedTypes [0];
 
-				if (!this.AllowedTypesIsStrict) {
-					AllowedTypes.Insert (0, AllowedType.Any);
-				}
-
 				// Fiddle factor
 				var width = this.AllowedTypes.Max (a => a.ToString ().Length) + 6;
 
@@ -724,8 +713,7 @@ namespace Terminal.Gui {
 					.ToArray ());
 
 				allowedTypeMenuBar = new MenuBar (new [] { allowedTypeMenu }) {
-					// Fiddle factor
-					Width = width - 2,
+					Width = width,
 					Y = 1,
 					X = Pos.AnchorEnd (width),
 
@@ -734,7 +722,7 @@ namespace Terminal.Gui {
 					CanFocus = true,
 					TabStop = true
 				};
-				AllowedTypeMenuClicked (this.AllowedTypesIsStrict ? 0 : 1);
+				AllowedTypeMenuClicked (0);
 
 				allowedTypeMenuBar.Enter += (e) => {
 					allowedTypeMenuBar.OpenMenu (0);
@@ -779,7 +767,7 @@ namespace Terminal.Gui {
 			}
 			allowedTypeMenu.Title = allow.ToString ();
 
-			this.currentFilter = allow == null || allow == AllowedType.Any? null : allow;
+			this.currentFilter = allow;
 
 			this.tbPath.ClearAllSelection ();
 			this.tbPath.ClearSuggestions ();
@@ -1075,7 +1063,7 @@ namespace Terminal.Gui {
 		private bool IsCompatibleWithAllowedExtensions (FileInfo file)
 		{
 			// no restrictions
-			if (!this.AllowedTypes.Any () || !this.AllowedTypesIsStrict) {
+			if (!this.AllowedTypes.Any ()) {
 				return true;
 			}
 			return this.MatchesAllowedTypes (file);
@@ -1084,7 +1072,7 @@ namespace Terminal.Gui {
 		private bool IsCompatibleWithAllowedExtensions (string path)
 		{
 			// no restrictions
-			if (!this.AllowedTypes.Any () || !this.AllowedTypesIsStrict) {
+			if (!this.AllowedTypes.Any ()) {
 				return true;
 			}
 
@@ -1092,8 +1080,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Returns true if any <see cref="AllowedTypes"/> matches <paramref name="file"/>
-		/// regardless of <see cref="AllowedTypesIsStrict"/> status.
+		/// Returns true if any <see cref="AllowedTypes"/> matches <paramref name="file"/>.
 		/// </summary>
 		/// <param name="file"></param>
 		/// <returns></returns>
@@ -1652,7 +1639,7 @@ namespace Terminal.Gui {
 					}
 
 					// if only allowing specific file types
-					if (Parent.AllowedTypes.Any () && Parent.AllowedTypesIsStrict && Parent.OpenMode == OpenMode.File) {
+					if (Parent.AllowedTypes.Any () && Parent.OpenMode == OpenMode.File) {
 
 						children = children.Where (
 							c => c.IsDir () ||

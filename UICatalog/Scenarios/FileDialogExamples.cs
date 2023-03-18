@@ -129,7 +129,11 @@ namespace UICatalog.Scenarios {
 
 				if (rgAllowedTypes.SelectedItem > 0) {
 					fd.AllowedTypes.Add (new AllowedType ("Data File", ".csv", ".tsv"));
-					fd.AllowedTypesIsStrict = rgAllowedTypes.SelectedItem > 1;
+					
+					if(rgAllowedTypes.SelectedItem == 1) {
+						fd.AllowedTypes.Insert(1,new AllowedTypeAny());
+					}
+					
 				}
 
 				Application.Run (fd);
