@@ -56,7 +56,7 @@ namespace Terminal.Gui {
 		/// <param name="border">The <see cref="Border"/>.</param>
 		public FrameView (Rect frame, ustring title = null, View [] views = null, Border border = null) : base (frame)
 		{
-			Initialize (frame, title, views, border);
+			SetInitialProperties (frame, title, views, border);
 		}
 
 		/// <summary>
@@ -66,7 +66,7 @@ namespace Terminal.Gui {
 		/// <param name="border">The <see cref="Border"/>.</param>
 		public FrameView (ustring title, Border border = null)
 		{
-			Initialize (Rect.Empty, title, null, border);
+			SetInitialProperties (Rect.Empty, title, null, border);
 		}
 
 		/// <summary>
@@ -83,7 +83,7 @@ namespace Terminal.Gui {
 		[SerializableConfigurationProperty (Scope = typeof (ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
 		public static BorderStyle DefaultBorderStyle { get; set; } = BorderStyle.Single;
 
-		void Initialize (Rect frame, ustring title, View [] views = null, Border border = null)
+		void SetInitialProperties (Rect frame, ustring title, View [] views = null, Border border = null)
 		{
 			this.Title = title;
 			if (border == null) {
@@ -99,13 +99,15 @@ namespace Terminal.Gui {
 			}
 		}
 
-		
-
-		void DrawFrame ()
+		public override void BeginInit ()
 		{
-			DrawFrame (new Rect (0, 0, Frame.Width, Frame.Height), 0, fill: true);
-		}
+			base.BeginInit ();
+			BorderFrame.Thickness = new Thickness (2);
+			BorderFrame.BorderStyle = Border.BorderStyle;
+			BorderFrame.ColorScheme = ColorScheme;
+			BorderFrame.Data = "BorderFrame";
 
+		}
 
 		///<inheritdoc/>
 		public override bool OnEnter (View view)

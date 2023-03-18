@@ -70,7 +70,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public Window (Rect frame, ustring title = null, int padding = 0, Border border = null) : base (frame)
 		{
-			Initialize (title, frame, padding, border);
+			SetInitialProperties (title, frame, padding, border);
 		}
 
 		/// <summary>
@@ -86,7 +86,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public Window (ustring title = null, int padding = 0, Border border = null) : base ()
 		{
-			Initialize (title, Rect.Empty, padding, border);
+			SetInitialProperties (title, Rect.Empty, padding, border);
 		}
 
 		/// <summary>
@@ -98,21 +98,33 @@ namespace Terminal.Gui {
 		///[SerializableConfigurationProperty (Scope = typeof (ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
 		public static BorderStyle DefaultBorderStyle { get; set; } = BorderStyle.Single;
 
-		void Initialize (ustring title, Rect frame, int padding = 0, Border border = null)
+		void SetInitialProperties (ustring title, Rect frame, int padding = 0, Border border = null)
 		{
 			CanFocus = true;
 			ColorScheme = Colors.Base;
 			if (title == null) title = ustring.Empty;
 			Title = title;
+			
 			if (border == null) {
+				// TODO: v2 this is a hack until Border gets refactored
 				Border = new Border () {
 					BorderStyle = DefaultBorderStyle,
 					Padding = new Thickness (padding),
-					//Title = title
 				};
 			} else {
 				Border = border;
 			}
+		}
+
+		public override void BeginInit ()
+		{
+			base.BeginInit ();
+			BorderFrame.Thickness = new Thickness (2);
+			BorderFrame.BorderStyle = Border.BorderStyle;
+			BorderFrame.ColorScheme = ColorScheme;
+			BorderFrame.Data = "BorderFrame";
+
+			Padding.Thickness = Border.Padding;
 		}
 
 		/// <inheritdoc/>
@@ -138,77 +150,6 @@ namespace Terminal.Gui {
 			RemoveMenuStatusBar (view);
 
 		}
-
-		///// <inheritdoc/>
-		//public override void RemoveAll ()
-		//{
-		//	contentView.RemoveAll ();
-		//}
-
-		/////<inheritdoc/>
-		//public override void Redraw (Rect bounds)
-		//{
-		//	var padding = Border.GetSumThickness ();
-		//	var scrRect = ViewToScreen (new Rect (0, 0, Frame.Width, Frame.Height));
-
-		//	if (!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded) {
-		//		Driver.SetAttribute (GetNormalColor ());
-		//		Clear ();
-		//		contentView.SetNeedsDisplay ();
-		//	}
-		//	var savedClip = contentView.ClipToBounds ();
-
-		//	// Redraw our contentView
-		//	// DONE: smartly constrict contentView.Bounds to just be what intersects with the 'bounds' we were passed
-		//	contentView.Redraw (!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded ? contentView.Bounds : bounds);
-		//	Driver.Clip = savedClip;
-
-		//	ClearLayoutNeeded ();
-		//	ClearNeedsDisplay ();
-
-		//	Driver.SetAttribute (GetNormalColor ());
-		//	//Driver.DrawWindowFrame (scrRect, padding.Left + borderLength, padding.Top + borderLength, padding.Right + borderLength, padding.Bottom + borderLength,
-		//	//	Border.BorderStyle != BorderStyle.None, fill: true, Border.BorderStyle);
-		//	Border.DrawContent (this, false);
-		//	if (HasFocus)
-		//		Driver.SetAttribute (ColorScheme.HotNormal);
-		//	if (Border.DrawMarginFrame)
-		//		Driver.DrawWindowTitle (scrRect, Title, padding.Left, padding.Top, padding.Right, padding.Bottom);
-		//	Driver.SetAttribute (GetNormalColor ());
-		//}
-
-		///// <inheritdoc/>
-		//public override void OnCanFocusChanged ()
-		//{
-		//	if (contentView != null) {
-		//		contentView.CanFocus = CanFocus;
-		//	}
-		//	base.OnCanFocusChanged ();
-		//}
-
-		///// <summary>
-		/////   The text displayed by the <see cref="Label"/>.
-		///// </summary>
-		//public override ustring Text {
-		//	get => contentView?.Text;
-		//	set {
-		//		base.Text = value;
-		//		if (contentView != null) {
-		//			contentView.Text = value;
-		//		}
-		//	}
-		//}
-
-		///// <summary>
-		///// Controls the text-alignment property of the label, changing it will redisplay the <see cref="Label"/>.
-		///// </summary>
-		///// <value>The text alignment.</value>
-		//public override TextAlignment TextAlignment {
-		//	get => contentView.TextAlignment;
-		//	set {
-		//		base.TextAlignment = contentView.TextAlignment = value;
-		//	}
-		//}
 
 		/// <summary>
 		/// Event arguments for <see cref="View.Title"/> change events.

@@ -102,7 +102,7 @@ namespace Terminal.Gui {
 			var prevClip = SetClip (Frame);
 
 			var screenBounds = ViewToScreen (Frame);
-			Thickness.Draw (screenBounds, (string)Data);
+			Thickness.Draw (screenBounds, (string)(Data != null ? Data : string.Empty));
 
 			//OnDrawContent (bounds); 
 

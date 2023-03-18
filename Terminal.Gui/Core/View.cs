@@ -620,7 +620,6 @@ namespace Terminal.Gui {
 				return new Rect (default, frameRelativeBounds.Size);
 			}
 			set {
-				throw new InvalidOperationException ("It makes no sense to explicitly set Bounds.");
 				Frame = new Rect (Frame.Location, value.Size
 					+ new Size (Margin.Thickness.Right, Margin.Thickness.Bottom)
 					+ new Size (BorderFrame.Thickness.Right, BorderFrame.Thickness.Bottom)
@@ -792,7 +791,7 @@ namespace Terminal.Gui {
 		/// will not fit.</returns>
 		public bool SetMinWidthHeight ()
 		{
-			if (GetMinimumBounds (out Size size)) {
+			if (IsInitialized && GetMinimumBounds (out Size size)) {
 				Bounds = new Rect (Bounds.Location, size);
 				return true;
 			}
@@ -932,7 +931,6 @@ namespace Terminal.Gui {
 			TabIndex = -1;
 			TabStop = false;
 			LayoutStyle = layoutStyle;
-			// BUGBUG: CalcRect doesn't account for line wrapping
 
 			Border = border;
 			Text = text;
@@ -3259,6 +3257,7 @@ namespace Terminal.Gui {
 				// TODO: Figure out why ScrollView and other tests fail if this call is put here 
 				// instead of the constructor.
 				// OnSizeChanged ();
+				InitializeFrames ();
 
 			} else {
 				//throw new InvalidOperationException ("The view is already initialized.");
