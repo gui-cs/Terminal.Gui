@@ -100,6 +100,20 @@ namespace Terminal.Gui {
 	///    for views that use the <see cref="LayoutStyle.Absolute"/>, and will recompute the
 	///    frames for the vies that use <see cref="LayoutStyle.Computed"/>.
 	/// </para>
+	/// <para>
+	///     Views can also opt-in to more sophisticated initialization
+	///     by implementing overrides to <see cref="ISupportInitialize.BeginInit"/> and
+	///     <see cref="ISupportInitialize.EndInit"/> which will be called
+	///     when the view is added to a <see cref="SuperView"/>. 
+	/// </para>
+	/// <para>
+	///     If first-run-only initialization is preferred, overrides to <see cref="ISupportInitializeNotification"/>
+	///     can be implemented, in which case the <see cref="ISupportInitialize"/>
+	///     methods will only be called if <see cref="ISupportInitializeNotification.IsInitialized"/>
+	///     is <see langword="false"/>. This allows proper <see cref="View"/> inheritance hierarchies
+	///     to override base class layout code optimally by doing so only on first run,
+	///     instead of on every run.
+	///   </para>
 	/// </remarks>
 	public class View : Responder, ISupportInitializeNotification {
 
@@ -446,7 +460,7 @@ namespace Terminal.Gui {
 			get => frame;
 			set {
 				frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
-				TextFormatter.Size = GetBoundsTextFormatterSize ();
+				TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
 				SetNeedsLayout ();
 				SetNeedsDisplay ();
 			}
@@ -625,7 +639,7 @@ namespace Terminal.Gui {
 
 				x = value;
 
-				ProcessResizeView ();
+				OnResizeNeeded ();
 			}
 		}
 
@@ -645,7 +659,7 @@ namespace Terminal.Gui {
 
 				y = value;
 
-				ProcessResizeView ();
+				OnResizeNeeded ();
 			}
 		}
 		Dim width, height;
@@ -673,7 +687,7 @@ namespace Terminal.Gui {
 						throw new InvalidOperationException ("Must set AutoSize to false before set the Width.");
 					}
 				}
-				ProcessResizeView ();
+				OnResizeNeeded ();
 			}
 		}
 
@@ -698,7 +712,7 @@ namespace Terminal.Gui {
 						throw new InvalidOperationException ("Must set AutoSize to false before set the Height.");
 					}
 				}
-				ProcessResizeView ();
+				OnResizeNeeded ();
 			}
 		}
 
@@ -722,11 +736,16 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Verifies if the minimum width or height can be sets in the view.
+		/// Gets the minimum dimensions required to fit the View's <see cref="Text"/>, factoring in <see cref="TextDirection"/>.
 		/// </summary>
-		/// <param name="size">The size.</param>
-		/// <returns><see langword="true"/> if the size can be set, <see langword="false"/> otherwise.</returns>
-		public bool GetMinWidthHeight (out Size size)
+		/// <param name="size">The minimum dimensions required.</param>
+		/// <returns><see langword="true"/> if the dimensions fit within the View's <see cref="Bounds"/>, <see langword="false"/> otherwise.</returns>
+		/// <remarks>
+		/// Always returns <see langword="false"/> if <see cref="AutoSize"/> is <see langword="true"/> or
+		/// if <see cref="Height"/> (Horizontal) or <see cref="Width"/> (Vertical) are not not set or zero.
+		/// Does not take into account word wrapping.
+		/// </remarks>
+		public bool GetMinimumBounds (out Size size)
 		{
 			size = Size.Empty;
 
@@ -734,14 +753,22 @@ namespace Terminal.Gui {
 				switch (TextFormatter.IsVerticalDirection (TextDirection)) {
 				case true:
 					var colWidth = TextFormatter.GetSumMaxCharWidth (new List<ustring> { TextFormatter.Text }, 0, 1);
-					if (frame.Width < colWidth && (Width == null || (Bounds.Width >= 0 && Width is Dim.DimAbsolute
-						&& Width.Anchor (0) >= 0 && Width.Anchor (0) < colWidth))) {
+					// TODO: v2 - This uses frame.Width; it should only use Bounds
+					if (frame.Width < colWidth &&
+						(Width == null ||
+							(Bounds.Width >= 0 &&
+								Width is Dim.DimAbsolute &&
+								Width.Anchor (0) >= 0 &&
+								Width.Anchor (0) < colWidth))) {
 						size = new Size (colWidth, Bounds.Height);
 						return true;
 					}
 					break;
 				default:
-					if (frame.Height < 1 && (Height == null || (Height is Dim.DimAbsolute && Height.Anchor (0) == 0))) {
+					if (frame.Height < 1 &&
+						(Height == null ||
+							(Height is Dim.DimAbsolute &&
+								Height.Anchor (0) == 0))) {
 						size = new Size (Bounds.Width, 1);
 						return true;
 					}
@@ -752,14 +779,14 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Sets the minimum width or height if the view can be resized.
+		/// Sets the size of the View to the minimum width or height required to fit <see cref="Text"/> (see <see cref="GetMinimumBounds(out Size)"/>.
 		/// </summary>
-		/// <returns><see langword="true"/> if the size can be set, <see langword="false"/> otherwise.</returns>
+		/// <returns><see langword="true"/> if the size was changed, <see langword="false"/> if <see cref="Text"/>
+		/// will not fit.</returns>
 		public bool SetMinWidthHeight ()
 		{
-			if (GetMinWidthHeight (out Size size)) {
+			if (GetMinimumBounds (out Size size)) {
 				Bounds = new Rect (Bounds.Location, size);
-				TextFormatter.Size = GetBoundsTextFormatterSize ();
 				return true;
 			}
 			return false;
@@ -794,7 +821,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public View (Rect frame)
 		{
-			Initialize (ustring.Empty, frame, LayoutStyle.Absolute, TextDirection.LeftRight_TopBottom);
+			SetInitialProperties (ustring.Empty, frame, LayoutStyle.Absolute, TextDirection.LeftRight_TopBottom);
 		}
 
 		/// <summary>
@@ -853,7 +880,7 @@ namespace Terminal.Gui {
 		/// <param name="border">The <see cref="Border"/>.</param>
 		public View (Rect rect, ustring text, Border border = null)
 		{
-			Initialize (text, rect, LayoutStyle.Absolute, TextDirection.LeftRight_TopBottom, border);
+			SetInitialProperties (text, rect, LayoutStyle.Absolute, TextDirection.LeftRight_TopBottom, border);
 		}
 
 		/// <summary>
@@ -874,16 +901,25 @@ namespace Terminal.Gui {
 		/// <param name="border">The <see cref="Border"/>.</param>
 		public View (ustring text, TextDirection direction = TextDirection.LeftRight_TopBottom, Border border = null)
 		{
-			Initialize (text, Rect.Empty, LayoutStyle.Computed, direction, border);
+			SetInitialProperties (text, Rect.Empty, LayoutStyle.Computed, direction, border);
 		}
 
-		void Initialize (ustring text, Rect rect, LayoutStyle layoutStyle = LayoutStyle.Computed,
+		// TODO: v2 - Remove constructors with parameters
+		/// <summary>
+		/// Private helper to set the initial properties of the View that were provided via constructors.
+		/// </summary>
+		/// <param name="text"></param>
+		/// <param name="rect"></param>
+		/// <param name="layoutStyle"></param>
+		/// <param name="direction"></param>
+		/// <param name="border"></param>
+		void SetInitialProperties (ustring text, Rect rect, LayoutStyle layoutStyle = LayoutStyle.Computed,
 		    TextDirection direction = TextDirection.LeftRight_TopBottom, Border border = null)
 		{
+
 			TextFormatter = new TextFormatter ();
 			TextFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
 			TextDirection = direction;
-			Border = border;
 			shortcutHelper = new ShortcutHelper ();
 			CanFocus = false;
 			TabIndex = -1;
@@ -891,12 +927,18 @@ namespace Terminal.Gui {
 			LayoutStyle = layoutStyle;
 			// BUGBUG: CalcRect doesn't account for line wrapping
 
+			// TODO: Remove this once v2's new Frames is ready
+			Border = border;
+			if (Border != null) {
+				Border.Child = this;
+			}
+
 			var r = rect.IsEmpty ? TextFormatter.CalcRect (0, 0, text, direction) : rect;
 			Frame = r;
 
 			Text = text;
-			UpdateTextFormatterText ();
-			ProcessResizeView ();
+
+			OnResizeNeeded ();
 		}
 
 		/// <summary>
@@ -909,10 +951,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Called whenever the view needs to be resized. 
 		/// Can be overridden if the view resize behavior is
 		///  different than the default.
 		/// </summary>
-		protected virtual void ProcessResizeView ()
+		protected virtual void OnResizeNeeded ()
 		{
 			var actX = x is Pos.PosAbsolute ? x.Anchor (0) : frame.X;
 			var actY = y is Pos.PosAbsolute ? y.Anchor (0) : frame.Y;
@@ -928,7 +971,8 @@ namespace Terminal.Gui {
 				frame = new Rect (new Point (actX, actY), new Size (w, h));
 				SetMinWidthHeight ();
 			}
-			TextFormatter.Size = GetBoundsTextFormatterSize ();
+			// BUGBUG: I think these calls are redundant or should be moved into just the AutoSize case
+			TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
 		}
@@ -1066,7 +1110,7 @@ namespace Terminal.Gui {
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
 			OnAdded (view);
-			if (IsInitialized) {
+			if (IsInitialized && !view.IsInitialized) {
 				view.BeginInit ();
 				view.EndInit ();
 			}
@@ -2449,8 +2493,9 @@ namespace Terminal.Gui {
 			var r = new Rect (newX, newY, newW, newH);
 			if (Frame != r) {
 				Frame = r;
+				// BUGBUG: Why is this AFTER setting Frame? Seems duplicative.
 				if (!SetMinWidthHeight ()) {
-					TextFormatter.Size = GetBoundsTextFormatterSize ();
+					TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
 				}
 			}
 		}
@@ -2624,7 +2669,7 @@ namespace Terminal.Gui {
 			var oldBounds = Bounds;
 			OnLayoutStarted (new LayoutEventArgs () { OldBounds = oldBounds });
 
-			TextFormatter.Size = GetBoundsTextFormatterSize ();
+			TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
 
 			// Sort out the dependencies of the X, Y, Width, Height properties
 			var nodes = new HashSet<View> ();
@@ -2685,17 +2730,22 @@ namespace Terminal.Gui {
 				text = value;
 				SetHotKey ();
 				UpdateTextFormatterText ();
-				ProcessResizeView ();
+				OnResizeNeeded ();
 			}
 		}
 
 		/// <summary>
-		/// Gets or sets a flag that determines whether the View will be automatically resized to fit the <see cref="Text"/>.
-		/// The default is <see langword="false"/>. Set to <see langword="true"/> to turn on AutoSize. If <see cref="AutoSize"/> is <see langword="true"/> the <see cref="Width"/>
-		/// and <see cref="Height"/> will always be used if the text size is lower. If the text size is higher the bounds will
-		/// be resized to fit it.
+		/// Gets or sets a flag that determines whether the View will be automatically resized to fit the <see cref="Text"/> 
+		/// within <see cref="Bounds"/>
+		/// <para>
+		/// The default is <see langword="false"/>. Set to <see langword="true"/> to turn on AutoSize. If <see langword="true"/> then
+		/// <see cref="Width"/> and <see cref="Height"/> will be used if <see cref="Text"/> can fit; 
+		/// if <see cref="Text"/> won't fit the view will be resized as needed.
+		/// </para>
+		/// <para>
 		/// In addition, if <see cref="ForceValidatePosDim"/> is <see langword="true"/> the new values of <see cref="Width"/> and
 		/// <see cref="Height"/> must be of the same types of the existing one to avoid breaking the <see cref="Dim"/> settings.
+		/// </para>
 		/// </summary>
 		public virtual bool AutoSize {
 			get => autoSize;
@@ -2706,7 +2756,7 @@ namespace Terminal.Gui {
 					autoSize = v;
 					TextFormatter.NeedsFormat = true;
 					UpdateTextFormatterText ();
-					ProcessResizeView ();
+					OnResizeNeeded ();
 				}
 			}
 		}
@@ -2737,7 +2787,7 @@ namespace Terminal.Gui {
 			set {
 				TextFormatter.Alignment = value;
 				UpdateTextFormatterText ();
-				ProcessResizeView ();
+				OnResizeNeeded ();
 			}
 		}
 
@@ -2770,23 +2820,31 @@ namespace Terminal.Gui {
 
 					if ((!ForceValidatePosDim && directionChanged && AutoSize)
 					    || (ForceValidatePosDim && directionChanged && AutoSize && isValidOldAutSize)) {
-						ProcessResizeView ();
+						OnResizeNeeded ();
 					} else if (directionChanged && IsAdded) {
 						SetWidthHeight (Bounds.Size);
 						SetMinWidthHeight ();
 					} else {
 						SetMinWidthHeight ();
 					}
-					TextFormatter.Size = GetBoundsTextFormatterSize ();
+					TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
 					SetNeedsDisplay ();
 				}
 			}
 		}
 
 		/// <summary>
-		/// Get or sets if  the <see cref="View"/> was already initialized.
-		/// This derived from <see cref="ISupportInitializeNotification"/> to allow notify all the views that are being initialized.
+		/// Get or sets if  the <see cref="View"/> has been initialized (via <see cref="ISupportInitialize.BeginInit"/> 
+		/// and <see cref="ISupportInitialize.EndInit"/>).
 		/// </summary>
+		/// <para>
+		///     If first-run-only initialization is preferred, overrides to <see cref="ISupportInitializeNotification.IsInitialized"/>
+		///     can be implemented, in which case the <see cref="ISupportInitialize"/>
+		///     methods will only be called if <see cref="ISupportInitializeNotification.IsInitialized"/>
+		///     is <see langword="false"/>. This allows proper <see cref="View"/> inheritance hierarchies
+		///     to override base class layout code optimally by doing so only on first run,
+		///     instead of on every run.
+		///   </para>
 		public virtual bool IsInitialized { get; set; }
 
 		/// <summary>
@@ -2904,15 +2962,21 @@ namespace Terminal.Gui {
 					Width = nBoundsSize.Width; // = new Rect (Bounds.X, Bounds.Y, nBoundsSize.Width, nBoundsSize.Height);
 				}
 			}
-			TextFormatter.Size = GetBoundsTextFormatterSize ();
+			// BUGBUG: This call may be redundant
+			TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
 			return aSize;
 		}
 
+		/// <summary>
+		/// Resizes the View to fit the specified <see cref="Bounds"/> size.
+		/// </summary>
+		/// <param name="nBounds"></param>
+		/// <returns></returns>
 		bool SetWidthHeight (Size nBounds)
 		{
 			var aSize = false;
-			var canSizeW = SetWidth (nBounds.Width - GetHotKeySpecifierLength (), out var rW);
-			var canSizeH = SetHeight (nBounds.Height - GetHotKeySpecifierLength (false), out var rH);
+			var canSizeW = TrySetWidth (nBounds.Width - GetHotKeySpecifierLength (), out var rW);
+			var canSizeH = TrySetHeight (nBounds.Height - GetHotKeySpecifierLength (false), out var rH);
 			if (canSizeW) {
 				aSize = true;
 				width = rW;
@@ -2923,7 +2987,6 @@ namespace Terminal.Gui {
 			}
 			if (aSize) {
 				Bounds = new Rect (Bounds.X, Bounds.Y, canSizeW ? rW : Bounds.Width, canSizeH ? rH : Bounds.Height);
-				TextFormatter.Size = GetBoundsTextFormatterSize ();
 			}
 
 			return aSize;
@@ -2969,8 +3032,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets the width or height of the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> characters in the <see cref="Text"/> property.
+		/// Gets the width or height of the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> characters 
+		/// in the <see cref="Text"/> property.
 		/// </summary>
+		/// <remarks>
+		/// Only the first hotkey specifier found in <see cref="Text"/> is supported.
+		/// </remarks>
 		/// <param name="isWidth">If <see langword="true"/> (the default) the width required for the hotkey specifier is returned. Otherwise the height is returned.</param>
 		/// <returns>The number of characters required for the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/>. If the text direction specified
 		/// by <see cref="TextDirection"/> does not match the <paramref name="isWidth"/> parameter, <c>0</c> is returned.</returns>
@@ -2988,25 +3055,27 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets the <see cref="TextFormatter.Size"/> minus the size required for the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/>.
-		/// </summary>
-		/// <returns>The bounds size minus the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> length.</returns>
-		public Size GetTextFormatterBoundsSize ()
+		/// Gets the dimensions required for <see cref="Text"/> ignoring a <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/>.
+		/// /// <summary/>
+		/// <returns></returns>
+		public Size GetSizeNeededForTextWithoutHotKey ()
 		{
 			return new Size (TextFormatter.Size.Width - GetHotKeySpecifierLength (),
 			    TextFormatter.Size.Height - GetHotKeySpecifierLength (false));
 		}
 
 		/// <summary>
-		/// Gets the text formatter size from a <see cref="Bounds"/> size.
-		/// </summary>
-		/// <returns>The text formatter size more the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> length.</returns>
-		public Size GetBoundsTextFormatterSize ()
+		/// Gets the dimensions required for <see cref="Text"/> accounting for a <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> .
+		/// <summary/>
+		/// <returns></returns>
+		public Size GetSizeNeededForTextAndHotKey ()
 		{
 			if (ustring.IsNullOrEmpty (TextFormatter.Text)) {
 				return Bounds.Size;
 			}
 
+			// BUGBUG: This IGNORES what Text is set to, using on only the current View size. This doesn't seem to make sense.
+			// BUGBUG: This uses Frame; in v2 it should be Bounds
 			return new Size (frame.Size.Width + GetHotKeySpecifierLength (),
 			    frame.Size.Height + GetHotKeySpecifierLength (false));
 		}
@@ -3146,14 +3215,39 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// This derived from <see cref="ISupportInitializeNotification"/> to allow notify all the views that are beginning initialized.
+		///  Signals the View that initialization is starting. See <see cref="ISupportInitialize"/>.
 		/// </summary>
-		public void BeginInit ()
+		/// <remarks>
+		/// <para>
+		///     Views can opt-in to more sophisticated initialization
+		///     by implementing overrides to <see cref="ISupportInitialize.BeginInit"/> and
+		///     <see cref="ISupportInitialize.EndInit"/> which will be called
+		///     when the view is added to a <see cref="SuperView"/>. 
+		/// </para>
+		/// <para>
+		///     If first-run-only initialization is preferred, overrides to <see cref="ISupportInitializeNotification"/>
+		///     can be implemented too, in which case the <see cref="ISupportInitialize"/>
+		///     methods will only be called if <see cref="ISupportInitializeNotification.IsInitialized"/>
+		///     is <see langword="false"/>. This allows proper <see cref="View"/> inheritance hierarchies
+		///     to override base class layout code optimally by doing so only on first run,
+		///     instead of on every run.
+		///   </para>
+		/// </remarks>
+		public virtual void BeginInit ()
 		{
 			if (!IsInitialized) {
 				oldCanFocus = CanFocus;
 				oldTabIndex = tabIndex;
+
+				//UpdateTextFormatterText ();
+				// TODO: Figure out why ScrollView and other tests fail if this call is put here 
+				// instead of the constructor.
+				// OnSizeChanged ();
+
+			} else {
+				//throw new InvalidOperationException ("The view is already initialized.");
 			}
+
 			if (subviews?.Count > 0) {
 				foreach (var view in subviews) {
 					if (!view.IsInitialized) {
@@ -3164,12 +3258,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// This derived from <see cref="ISupportInitializeNotification"/> to allow notify all the views that are ending initialized.
+		///  Signals the View that initialization is ending. See <see cref="ISupportInitialize"/>.
 		/// </summary>
 		public void EndInit ()
 		{
 			IsInitialized = true;
-			if (subviews?.Count > 0) {
+			if (subviews != null) {
 				foreach (var view in subviews) {
 					if (!view.IsInitialized) {
 						view.EndInit ();
@@ -3193,7 +3287,13 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		bool CanSetWidth (int desiredWidth, out int resultWidth)
+		/// <summary>
+		/// Determines if the View's <see cref="Width"/> can be set to a new value.
+		/// </summary>
+		/// <param name="desiredWidth"></param>
+		/// <param name="resultWidth">Contains the width that would result if <see cref="Width"/> were set to <paramref name="desiredWidth"/>"/> </param>
+		/// <returns><see langword="true"/> if the View's <see cref="Width"/> can be changed to the specified value. False otherwise.</returns>
+		internal bool TrySetWidth (int desiredWidth, out int resultWidth)
 		{
 			var w = desiredWidth;
 			bool canSetWidth;
@@ -3217,7 +3317,13 @@ namespace Terminal.Gui {
 			return canSetWidth;
 		}
 
-		bool CanSetHeight (int desiredHeight, out int resultHeight)
+		/// <summary>
+		/// Determines if the View's <see cref="Height"/> can be set to a new value.
+		/// </summary>
+		/// <param name="desiredHeight"></param>
+		/// <param name="resultHeight">Contains the width that would result if <see cref="Height"/> were set to <paramref name="desiredHeight"/>"/> </param>
+		/// <returns><see langword="true"/> if the View's <see cref="Height"/> can be changed to the specified value. False otherwise.</returns>
+		internal bool TrySetHeight (int desiredHeight, out int resultHeight)
 		{
 			var h = desiredHeight;
 			bool canSetHeight;
@@ -3245,54 +3351,6 @@ namespace Terminal.Gui {
 			resultHeight = h;
 
 			return canSetHeight;
-		}
-
-		/// <summary>
-		/// Calculate the width based on the <see cref="Width"/> settings.
-		/// </summary>
-		/// <param name="desiredWidth">The desired width.</param>
-		/// <param name="resultWidth">The real result width.</param>
-		/// <returns><see langword="true"/> if the width can be directly assigned, <see langword="false"/> otherwise.</returns>
-		public bool SetWidth (int desiredWidth, out int resultWidth)
-		{
-			return CanSetWidth (desiredWidth, out resultWidth);
-		}
-
-		/// <summary>
-		/// Calculate the height based on the <see cref="Height"/> settings.
-		/// </summary>
-		/// <param name="desiredHeight">The desired height.</param>
-		/// <param name="resultHeight">The real result height.</param>
-		/// <returns><see langword="true"/> if the height can be directly assigned, <see langword="false"/> otherwise.</returns>
-		public bool SetHeight (int desiredHeight, out int resultHeight)
-		{
-			return CanSetHeight (desiredHeight, out resultHeight);
-		}
-
-		/// <summary>
-		/// Gets the current width based on the <see cref="Width"/> settings.
-		/// </summary>
-		/// <param name="currentWidth">The real current width.</param>
-		/// <returns><see langword="true"/> if the width can be directly assigned, <see langword="false"/> otherwise.</returns>
-		public bool GetCurrentWidth (out int currentWidth)
-		{
-			SetRelativeLayout (SuperView?.frame ?? frame);
-			currentWidth = frame.Width;
-
-			return CanSetWidth (0, out _);
-		}
-
-		/// <summary>
-		/// Calculate the height based on the <see cref="Height"/> settings.
-		/// </summary>
-		/// <param name="currentHeight">The real current height.</param>
-		/// <returns><see langword="true"/> if the height can be directly assigned, <see langword="false"/> otherwise.</returns>
-		public bool GetCurrentHeight (out int currentHeight)
-		{
-			SetRelativeLayout (SuperView?.frame ?? frame);
-			currentHeight = frame.Height;
-
-			return CanSetHeight (0, out _);
 		}
 
 		/// <summary>

@@ -20,19 +20,6 @@ namespace Terminal.Gui {
 	///     and run (e.g. <see cref="Dialog"/>s. To run a Toplevel, create the <see cref="Toplevel"/> and 
 	///     call <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>.
 	///   </para>
-	///   <para>
-	///     Toplevels can also opt-in to more sophisticated initialization
-	///     by implementing <see cref="ISupportInitialize"/>. When they do
-	///     so, the <see cref="ISupportInitialize.BeginInit"/> and
-	///     <see cref="ISupportInitialize.EndInit"/> methods will be called
-	///     before running the view.
-	///     If first-run-only initialization is preferred, the <see cref="ISupportInitializeNotification"/>
-	///     can be implemented too, in which case the <see cref="ISupportInitialize"/>
-	///     methods will only be called if <see cref="ISupportInitializeNotification.IsInitialized"/>
-	///     is <see langword="false"/>. This allows proper <see cref="View"/> inheritance hierarchies
-	///     to override base class layout code optimally by doing so only on first run,
-	///     instead of on every run.
-	///   </para>
 	/// </remarks>
 	public class Toplevel : View {
 		/// <summary>

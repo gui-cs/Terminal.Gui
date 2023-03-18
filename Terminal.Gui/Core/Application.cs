@@ -951,13 +951,10 @@ namespace Terminal.Gui {
 
 			var rs = new RunState (toplevel);
 
-			if (toplevel is ISupportInitializeNotification initializableNotification &&
-			    !initializableNotification.IsInitialized) {
-				initializableNotification.BeginInit ();
-				initializableNotification.EndInit ();
-			} else if (toplevel is ISupportInitialize initializable) {
-				initializable.BeginInit ();
-				initializable.EndInit ();
+			// View implements ISupportInitializeNotification which is derived from ISupportInitialize
+			if (!toplevel.IsInitialized) {
+				toplevel.BeginInit ();
+				toplevel.EndInit ();
 			}
 
 			lock (toplevels) {
@@ -1282,7 +1279,7 @@ namespace Terminal.Gui {
 			}
 
 			foreach (var top in toplevels) {
-				if (top != Current && top.Visible && (!top._needsDisplay.IsEmpty || top._childNeedsDisplay || top.LayoutNeeded)) {
+				if (top != Current && top.Visible && (!top.NeedDisplay.IsEmpty || top.ChildNeedsDisplay || top.LayoutNeeded)) {
 					MdiTop.SetSubViewNeedsDisplay ();
 					return true;
 				}
