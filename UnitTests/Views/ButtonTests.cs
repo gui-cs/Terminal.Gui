@@ -30,8 +30,8 @@ namespace Terminal.Gui.ViewTests {
 [  ]
 ";
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-
 			Application.End (rs);
+			
 			btn = new Button ("ARGS", true) { Text = "Test" };
 			Assert.Equal ("Test", btn.Text);
 			Application.Top.Add (btn);
@@ -48,8 +48,8 @@ namespace Terminal.Gui.ViewTests {
 [◦ Test ◦]
 ";
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-
 			Application.End (rs);
+			
 			btn = new Button (3, 4, "Test", true);
 			Assert.Equal ("Test", btn.Text);
 			Application.Top.Add (btn);

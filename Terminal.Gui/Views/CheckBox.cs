@@ -49,7 +49,7 @@ namespace Terminal.Gui {
 		/// <param name="is_checked">If set to <c>true</c> is checked.</param>
 		public CheckBox (ustring s, bool is_checked = false) : base ()
 		{
-			Initialize (s, is_checked);
+			SetInitialProperties (s, is_checked);
 		}
 
 		/// <summary>
@@ -72,10 +72,16 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public CheckBox (int x, int y, ustring s, bool is_checked) : base (new Rect (x, y, s.Length, 1))
 		{
-			Initialize (s, is_checked);
+			SetInitialProperties (s, is_checked);
 		}
 
-		void Initialize (ustring s, bool is_checked)
+		// TODO: v2 - Remove constructors with parameters
+		/// <summary>
+		/// Private helper to set the initial properties of the View that were provided via constructors.
+		/// </summary>
+		/// <param name="s"></param>
+		/// <param name="is_checked"></param>
+		void SetInitialProperties (ustring s, bool is_checked)
 		{
 			charNullChecked = new Rune (Driver != null ? Driver.NullChecked : '?');
 			charChecked = new Rune (Driver != null ? Driver.Checked : '√');
@@ -85,7 +91,7 @@ namespace Terminal.Gui {
 			CanFocus = true;
 			AutoSize = true;
 			Text = s;
-			UpdateTextFormatterText ();
+			
 			ProcessResizeView ();
 
 			// Things this view knows how to do
