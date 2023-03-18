@@ -149,10 +149,7 @@ namespace Terminal.Gui {
 
 		void Initialize (ustring title, Border border)
 		{
-			if (border != null) {
-				Border = border;
-				Border.Title = title;
-			}
+			Title = title;
 		}
 
 		/// <summary>

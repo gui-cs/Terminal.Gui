@@ -106,30 +106,6 @@ namespace Terminal.Gui {
 			DrawFrame (new Rect (0, 0, Frame.Width, Frame.Height), 0, fill: true);
 		}
 
-		/// <summary>
-		/// Add the specified <see cref="View"/> to this container.
-		/// </summary>
-		/// <param name="view"><see cref="View"/> to add to this container</param>
-		public override void Add (View view)
-		{
-			if (view.CanFocus)
-				CanFocus = true;
-		}
-
-
-		/// <summary>
-		///   Removes a <see cref="View"/> from this container.
-		/// </summary>
-		/// <remarks>
-		/// </remarks>
-		public override void Remove (View view)
-		{
-			if (view == null)
-				return;
-
-			SetNeedsDisplay ();
-		}
-
 
 		///<inheritdoc/>
 		public override bool OnEnter (View view)

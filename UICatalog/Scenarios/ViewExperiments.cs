@@ -4,10 +4,13 @@ namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "_ View Experiments", Description: "v2 View Experiments")]
 	[ScenarioCategory ("Controls")]
 	public class ViewExperiments : Scenario {
-		public override void Init (ColorScheme colorScheme)
+		public override void Init ()
 		{
 			Application.Init ();
-			Application.Top.ColorScheme = colorScheme;
+			//Application.Init ();
+			//ConfigurationManager.Themes.Theme = Theme;
+			//ConfigurationManager.Apply ();
+			//Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
 
 		}
 
@@ -119,8 +122,8 @@ namespace UICatalog.Scenarios {
 			var view5 = new View () {
 				X = Pos.Right (view4) + 1,
 				Y = 3,
-				Height = Dim.Fill(2),
-				Width = Dim.Fill(),
+				Height = Dim.Fill (2),
+				Width = Dim.Fill (),
 				Title = "View5",
 				Text = "View #5 (Right(view4)+1 Fill",
 				TextAlignment = TextAlignment.Centered

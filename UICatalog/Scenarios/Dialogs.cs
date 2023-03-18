@@ -10,10 +10,10 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Dialogs")]
 	public class Dialogs : Scenario {
 		static int CODE_POINT = '你'; // We know this is a wide char
-		public override void Init (ColorScheme colorScheme)
+		public override void Init ()
 		{
 			Application.Init ();
-			Application.Top.ColorScheme = colorScheme;
+			//Application.Top.ColorScheme = colorScheme;
 		}
 
 		public override void Setup ()

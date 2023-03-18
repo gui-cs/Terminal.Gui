@@ -1279,7 +1279,7 @@ namespace Terminal.Gui {
 			}
 
 			foreach (var top in toplevels) {
-				if (top != Current && top.Visible && (!top.NeedDisplay.IsEmpty || top.ChildNeedsDisplay || top.LayoutNeeded)) {
+				if (top != Current && top.Visible && (!top._needsDisplay.IsEmpty || top._childNeedsDisplay || top.LayoutNeeded)) {
 					MdiTop.SetSubViewNeedsDisplay ();
 					return true;
 				}

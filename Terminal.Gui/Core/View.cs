@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using NStack;
 
+
 namespace Terminal.Gui {
 	/// <summary>
 	/// Determines the LayoutStyle for a <see cref="View"/>, if Absolute, during <see cref="View.LayoutSubviews"/>, the
@@ -203,7 +204,13 @@ namespace Terminal.Gui {
 		/// Gets or sets the specifier character for the hotkey (e.g. '_'). Set to '\xffff' to disable hotkey support for this View instance. The default is '\xffff'. 
 		/// </summary>
 		public virtual Rune HotKeySpecifier {
-			get => TextFormatter.HotKeySpecifier;
+			get {
+				if (TextFormatter != null) {
+					return TextFormatter.HotKeySpecifier;
+				} else {
+					return new Rune ('\xFFFF');
+				}
+			}
 			set {
 				TextFormatter.HotKeySpecifier = value;
 				SetHotKey ();
@@ -795,7 +802,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the <see cref="Terminal.Gui.TextFormatter"/> which can be handled differently by any derived class.
 		/// </summary>
-		public TextFormatter TextFormatter { get; set; }
+		public TextFormatter? TextFormatter { get; set; }
 
 		/// <summary>
 		/// Returns the container for this view, or null if this view has not been added to a container.
@@ -916,10 +923,10 @@ namespace Terminal.Gui {
 		void SetInitialProperties (ustring text, Rect rect, LayoutStyle layoutStyle = LayoutStyle.Computed,
 		    TextDirection direction = TextDirection.LeftRight_TopBottom, Border border = null)
 		{
-
 			TextFormatter = new TextFormatter ();
 			TextFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
 			TextDirection = direction;
+
 			shortcutHelper = new ShortcutHelper ();
 			CanFocus = false;
 			TabIndex = -1;
@@ -927,17 +934,11 @@ namespace Terminal.Gui {
 			LayoutStyle = layoutStyle;
 			// BUGBUG: CalcRect doesn't account for line wrapping
 
-			// TODO: Remove this once v2's new Frames is ready
 			Border = border;
-			if (Border != null) {
-				Border.Child = this;
-			}
-
+			Text = text;
+			LayoutStyle = layoutStyle;
 			var r = rect.IsEmpty ? TextFormatter.CalcRect (0, 0, text, direction) : rect;
 			Frame = r;
-
-			Text = text;
-
 			OnResizeNeeded ();
 		}
 
@@ -947,7 +948,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		protected virtual void UpdateTextFormatterText ()
 		{
-			TextFormatter.Text = text;
+			if (TextFormatter != null) {
+				TextFormatter.Text = text;
+			}
 		}
 
 		/// <summary>
@@ -1081,8 +1084,9 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public virtual void Add (View view)
 		{
-			if (view == null)
+			if (view == null) {
 				return;
+			}
 			if (subviews == null) {
 				subviews = new List<View> ();
 			}
@@ -1126,10 +1130,12 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public void Add (params View [] views)
 		{
-			if (views == null)
+			if (views == null) {
 				return;
-			foreach (var view in views)
+			}
+			foreach (var view in views) {
 				Add (view);
+			}
 		}
 
 		/// <summary>
@@ -1137,8 +1143,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual void RemoveAll ()
 		{
-			if (subviews == null)
+			if (subviews == null) {
 				return;
+			}
 
 			while (subviews.Count > 0) {
 				Remove (subviews [0]);
@@ -1152,8 +1159,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public virtual void Remove (View view)
 		{
-			if (view == null || subviews == null)
-				return;
+			if (view == null || subviews == null) return;
 
 			var touched = view.Frame;
 			subviews.Remove (view);
@@ -1162,17 +1168,15 @@ namespace Terminal.Gui {
 			view.tabIndex = -1;
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
-			if (subviews.Count < 1) {
-				CanFocus = false;
-			}
+
+			if (subviews.Count < 1) CanFocus = false;
+
 			foreach (var v in subviews) {
 				if (v.Frame.IntersectsWith (touched))
 					view.SetNeedsDisplay ();
 			}
 			OnRemoved (view);
-			if (focused == view) {
-				focused = null;
-			}
+			if (focused == view) focused = null;
 		}
 
 		void PerformActionForSubview (View subview, Action<View> action)
@@ -1382,7 +1386,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public Rect ClipToBounds ()
 		{
-			var clip = Bounds ;
+			var clip = Bounds;
 
 
 			return SetClip (clip);
@@ -1410,7 +1414,7 @@ namespace Terminal.Gui {
 		/// <param name="region">View-relative region for the frame to be drawn.</param>
 		/// <param name="padding">The padding to add around the outside of the drawn frame.</param>
 		/// <param name="fill">If set to <see langword="true"/> it fill will the contents.</param>
-		[ObsoleteAttribute("This method is obsolete in v2. Use use LineCanvas or Frame instead instead.", false)]
+		[ObsoleteAttribute ("This method is obsolete in v2. Use use LineCanvas or Frame instead instead.", false)]
 		public void DrawFrame (Rect region, int padding = 0, bool fill = false)
 		{
 			var scrRect = ViewToScreen (region);
@@ -1739,7 +1743,7 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (GetNormalColor ());
 			}
 
-			Clear (ViewToScreen(bounds));
+			Clear (ViewToScreen (bounds));
 
 			// Invoke DrawContentEvent
 			OnDrawContent (bounds);
@@ -1757,7 +1761,7 @@ namespace Terminal.Gui {
 							// Draw the subview
 							// Use the view's bounds (view-relative; Location will always be (0,0)
 							//if (view.Visible && view.Frame.Width > 0 && view.Frame.Height > 0) {
-								view.Redraw (view.Bounds);
+							view.Redraw (view.Bounds);
 							//}
 						}
 						view.ClearNeedsDisplay ();
@@ -2728,9 +2732,11 @@ namespace Terminal.Gui {
 			get => text;
 			set {
 				text = value;
-				SetHotKey ();
-				UpdateTextFormatterText ();
-				OnResizeNeeded ();
+				if (IsInitialized) {
+					SetHotKey ();
+					UpdateTextFormatterText ();
+					OnResizeNeeded ();
+				}
 			}
 		}
 
@@ -2810,7 +2816,7 @@ namespace Terminal.Gui {
 		public virtual TextDirection TextDirection {
 			get => TextFormatter.Direction;
 			set {
-				if (TextFormatter.Direction != value) {
+				if (IsInitialized && TextFormatter.Direction != value) {
 					var isValidOldAutSize = autoSize && IsValidAutoSize (out var _);
 					var directionChanged = TextFormatter.IsHorizontalDirection (TextFormatter.Direction)
 					    != TextFormatter.IsHorizontalDirection (value);
@@ -2919,7 +2925,14 @@ namespace Terminal.Gui {
 			get => border;
 			set {
 				if (border != value) {
+
+					//InitializeFrames ();
+					//BorderFrame.Thickness = new Thickness (2);
+					//BorderFrame.BorderStyle = value?.BorderStyle ?? BorderStyle.Single;
+					//BorderFrame.ColorScheme = ColorScheme;
+
 					border = value;
+
 					SetNeedsDisplay ();
 				}
 			}
@@ -2940,6 +2953,9 @@ namespace Terminal.Gui {
 
 		void SetHotKey ()
 		{
+			if (TextFormatter == null) {
+				return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
+			}
 			TextFormatter.FindHotKey (text, HotKeySpecifier, true, out _, out var hk);
 			if (hotKey != hk) {
 				HotKey = hk;
@@ -3056,7 +3072,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Gets the dimensions required for <see cref="Text"/> ignoring a <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/>.
-		/// /// <summary/>
+		/// </summary>
 		/// <returns></returns>
 		public Size GetSizeNeededForTextWithoutHotKey ()
 		{
@@ -3066,7 +3082,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Gets the dimensions required for <see cref="Text"/> accounting for a <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> .
-		/// <summary/>
+		/// </summary>
 		/// <returns></returns>
 		public Size GetSizeNeededForTextAndHotKey ()
 		{
@@ -3239,13 +3255,14 @@ namespace Terminal.Gui {
 				oldCanFocus = CanFocus;
 				oldTabIndex = tabIndex;
 
-				//UpdateTextFormatterText ();
+				UpdateTextFormatterText ();
 				// TODO: Figure out why ScrollView and other tests fail if this call is put here 
 				// instead of the constructor.
 				// OnSizeChanged ();
 
 			} else {
 				//throw new InvalidOperationException ("The view is already initialized.");
+
 			}
 
 			if (subviews?.Count > 0) {

@@ -290,12 +290,12 @@ namespace Terminal.Gui {
 
 			if (useErrorColors) {
 				d.ColorScheme = Colors.Error;
-				d.Border.BorderBrush = Colors.Error.Normal.Foreground;
-				d.Border.Background = Colors.Error.Normal.Background;
+				d.Border.ForgroundColor = Colors.Error.Normal.Foreground;
+				d.Border.BackgroundColor = Colors.Error.Normal.Background;
 			} else {
 				d.ColorScheme = Colors.Dialog;
-				d.Border.BorderBrush = Colors.Dialog.Normal.Foreground;
-				d.Border.Background = Colors.Dialog.Normal.Background;
+				d.Border.ForgroundColor = Colors.Dialog.Normal.Foreground;
+				d.Border.BackgroundColor = Colors.Dialog.Normal.Background;
 			}
 
 			if (!ustring.IsNullOrEmpty (message)) {

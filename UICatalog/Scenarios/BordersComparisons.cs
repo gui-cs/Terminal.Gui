@@ -13,7 +13,7 @@ namespace UICatalog.Scenarios {
 			var drawMarginFrame = false;
 			var borderThickness = new Thickness (1, 2, 3, 4);
 			var borderBrush = Color.BrightMagenta;
-			;
+
 			var padding = new Thickness (1, 2, 3, 4);
 			var background = Color.Cyan;
 			var effect3D = true;

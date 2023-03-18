@@ -311,6 +311,7 @@ namespace UICatalog {
 				};
 
 				ContentPane = new TileView () {
+					Id = "ContentPane",
 					X = 0,
 					Y = 1, // for menu
 					Width = Dim.Fill (),

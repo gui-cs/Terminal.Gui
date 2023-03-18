@@ -95,9 +95,8 @@ namespace UICatalog.Scenarios {
 			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
 			subWin.Add (labelList.ToArray ());
 
-			// #522 repro?
 			var frameView = new FrameView () {
-				X = 2, //Pos.Center (),
+				X = 2, 
 				Y = Pos.Bottom (subWin),
 				Width = 30,
 				Height = 7
