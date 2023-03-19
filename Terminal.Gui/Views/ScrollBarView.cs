@@ -225,6 +225,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+		// BUGBUG: v2 - for consistency this should be named "Parent" not "Host"
 		/// <summary>
 		/// Get or sets the view that host this <see cref="View"/>
 		/// </summary>

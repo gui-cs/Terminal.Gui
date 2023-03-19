@@ -97,6 +97,7 @@ namespace Terminal.Gui {
 		/// <param name="clipRect"></param>
 		public override void Redraw (Rect clipRect)
 		{
+			if (Thickness == Thickness.Empty) return;
 
 			//OnDrawContent (bounds);
 			//OnDrawSubViews (bounds);

@@ -329,10 +329,10 @@ namespace Terminal.Gui {
 			//Clear ();
 
 			var savedClip = ClipToBounds ();
+			contentView.Redraw (contentView.Frame);
 			OnDrawContent (new Rect (ContentOffset,
 				new Size (Math.Max (Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
 					Math.Max (Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0))));
-			contentView.Redraw (contentView.Frame);
 			Driver.Clip = savedClip;
 
 			if (autoHideScrollBars) {

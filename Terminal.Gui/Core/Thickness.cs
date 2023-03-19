@@ -70,6 +70,11 @@ namespace Terminal.Gui {
 			Right = right;
 			Bottom = bottom;
 		}
+		
+		///// <summary>
+		///// <see langword="true"/> if all dimensions are 0.
+		///// </summary>
+		//public bool Empty => Left == 0 && Top == 0 && Right == 0 && Bottom == 0;
 
 		/// <summary>
 		/// Returns a rectangle describing the location and size of the inner area of <paramref name="rect"/>
