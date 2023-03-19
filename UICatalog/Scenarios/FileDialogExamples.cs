@@ -19,6 +19,7 @@ namespace UICatalog.Scenarios {
 		private CheckBox cbAllowMultipleSelection;
 		private CheckBox cbShowTreeBranchLines;
 		private CheckBox cbAlwaysTableShowHeaders;
+		private CheckBox cbDrivesOnlyInTree;
 
 		private RadioGroup rgCaption;
 		private RadioGroup rgOpenMode;
@@ -29,73 +30,76 @@ namespace UICatalog.Scenarios {
 			var y = 0;
 			var x = 1;
 
-			cbMustExist = new CheckBox ("Must Exist") { Checked = true, Y = y++, X=x};
+			cbMustExist = new CheckBox ("Must Exist") { Checked = true, Y = y++, X = x };
 			Win.Add (cbMustExist);
 
 
-			cbIcons = new CheckBox ("Icons") { Checked = true, Y = y++, X=x };
+			cbIcons = new CheckBox ("Icons") { Checked = true, Y = y++, X = x };
 			Win.Add (cbIcons);
 
-			cbUseColors = new CheckBox ("Use Colors") { Checked = false, Y = y++, X=x};
+			cbUseColors = new CheckBox ("Use Colors") { Checked = false, Y = y++, X = x };
 			Win.Add (cbUseColors);
 
-			cbCaseSensitive = new CheckBox ("Case Sensitive Search") { Checked = false, Y = y++, X=x };
+			cbCaseSensitive = new CheckBox ("Case Sensitive Search") { Checked = false, Y = y++, X = x };
 			Win.Add (cbCaseSensitive);
 
-			cbAllowMultipleSelection = new CheckBox ("Multiple") { Checked = false, Y = y++, X=x };
+			cbAllowMultipleSelection = new CheckBox ("Multiple") { Checked = false, Y = y++, X = x };
 			Win.Add (cbAllowMultipleSelection);
 
-			cbShowTreeBranchLines = new CheckBox ("Tree Branch Lines") { Checked = true, Y = y++, X=x };
+			cbShowTreeBranchLines = new CheckBox ("Tree Branch Lines") { Checked = true, Y = y++, X = x };
 			Win.Add (cbShowTreeBranchLines);
 
-			cbAlwaysTableShowHeaders = new CheckBox ("Always Show Headers") { Checked = true, Y = y++, X=x };
+			cbAlwaysTableShowHeaders = new CheckBox ("Always Show Headers") { Checked = true, Y = y++, X = x };
 			Win.Add (cbAlwaysTableShowHeaders);
+
+			cbDrivesOnlyInTree = new CheckBox ("Only Show Drives") { Checked = false, Y = y++, X = x };
+			Win.Add (cbDrivesOnlyInTree);
 
 			y = 0;
 			x = 24;
 
-			Win.Add(new LineView(Orientation.Vertical){
+			Win.Add (new LineView (Orientation.Vertical) {
 				X = x++,
 				Y = 1,
 				Height = 4
 			});
-			Win.Add(new Label("Caption"){X=x++,Y=y++});
+			Win.Add (new Label ("Caption") { X = x++, Y = y++ });
 
-			rgCaption = new RadioGroup{X = x, Y=y};
-			rgCaption.RadioLabels = new NStack.ustring[]{"Ok","Open","Save"};
-			Win.Add(rgCaption);
+			rgCaption = new RadioGroup { X = x, Y = y };
+			rgCaption.RadioLabels = new NStack.ustring [] { "Ok", "Open", "Save" };
+			Win.Add (rgCaption);
 
 			y = 0;
 			x = 37;
 
-			Win.Add(new LineView(Orientation.Vertical){
+			Win.Add (new LineView (Orientation.Vertical) {
 				X = x++,
 				Y = 1,
 				Height = 4
 			});
-			Win.Add(new Label("OpenMode"){X=x++,Y=y++});
+			Win.Add (new Label ("OpenMode") { X = x++, Y = y++ });
 
-			rgOpenMode = new RadioGroup{X = x, Y=y};
-			rgOpenMode.RadioLabels = new NStack.ustring[]{"File","Directory","Mixed"};
-			Win.Add(rgOpenMode);
-			
+			rgOpenMode = new RadioGroup { X = x, Y = y };
+			rgOpenMode.RadioLabels = new NStack.ustring [] { "File", "Directory", "Mixed" };
+			Win.Add (rgOpenMode);
+
 			y = 5;
 			x = 24;
 
-			Win.Add(new LineView(Orientation.Vertical){
+			Win.Add (new LineView (Orientation.Vertical) {
 				X = x++,
-				Y = y+1,
+				Y = y + 1,
 				Height = 4
 			});
-			Win.Add(new Label("Allowed"){X=x++,Y=y++});
+			Win.Add (new Label ("Allowed") { X = x++, Y = y++ });
 
-			rgAllowedTypes = new RadioGroup{X = x, Y=y};
-			rgAllowedTypes.RadioLabels = new NStack.ustring[]{"Any","Csv (Recommended)","Csv (Strict)"};
-			Win.Add(rgAllowedTypes);
+			rgAllowedTypes = new RadioGroup { X = x, Y = y };
+			rgAllowedTypes.RadioLabels = new NStack.ustring [] { "Any", "Csv (Recommended)", "Csv (Strict)" };
+			Win.Add (rgAllowedTypes);
 
 			var btn = new Button ($"Run Dialog") {
 				X = 1,
-				Y = 8
+				Y = 9
 			};
 
 			SetupHandler (btn);
@@ -105,9 +109,9 @@ namespace UICatalog.Scenarios {
 		private void SetupHandler (Button btn)
 		{
 			btn.Clicked += () => {
-				var fd = new FileDialog() {
-					OpenMode = Enum.Parse<OpenMode>(
-						rgOpenMode.RadioLabels[rgOpenMode.SelectedItem].ToString()),
+				var fd = new FileDialog () {
+					OpenMode = Enum.Parse<OpenMode> (
+						rgOpenMode.RadioLabels [rgOpenMode.SelectedItem].ToString ()),
 					MustExist = cbMustExist.Checked ?? false,
 					AllowsMultipleSelection = cbAllowMultipleSelection.Checked ?? false,
 				};
@@ -118,23 +122,30 @@ namespace UICatalog.Scenarios {
 					fd.IconGetter = GetIcon;
 				}
 
-				if(cbCaseSensitive.Checked ?? false) {
+				if (cbCaseSensitive.Checked ?? false) {
 
 					fd.SearchMatcher = new CaseSensitiveSearchMatcher ();
 				}
 
 				fd.UseColors = cbUseColors.Checked ?? false;
-				
+
 				fd.Style.TreeStyle.ShowBranchLines = cbShowTreeBranchLines.Checked ?? false;
 				fd.Style.TableStyle.AlwaysShowHeaders = cbAlwaysTableShowHeaders.Checked ?? false;
 
+				if (cbDrivesOnlyInTree.Checked ?? false) {
+					fd.Style.TreeRootGetter = () => {
+						return System.Environment.GetLogicalDrives ()
+						.Select (d => new FileDialogRootTreeNode (d, new DirectoryInfo (d)));
+					};
+				}
+
 				if (rgAllowedTypes.SelectedItem > 0) {
 					fd.AllowedTypes.Add (new AllowedType ("Data File", ".csv", ".tsv"));
-					
-					if(rgAllowedTypes.SelectedItem == 1) {
-						fd.AllowedTypes.Insert(1,new AllowedTypeAny());
+
+					if (rgAllowedTypes.SelectedItem == 1) {
+						fd.AllowedTypes.Insert (1, new AllowedTypeAny ());
 					}
-					
+
 				}
 
 				Application.Run (fd);

@@ -114,6 +114,53 @@ namespace Terminal.Gui {
 			/// Gets the style settings for the collapse-able directory/places tree
 			/// </summary>
 			public TreeStyle TreeStyle { get; internal set; }
+
+			/// <summary>
+			/// Gets or Sets the method for getting the root tree objects that are displayed in
+			/// the collapse-able tree in the <see cref="FileDialog"/>.  Defaults to all accessible
+			/// <see cref="System.Environment.GetLogicalDrives"/> and unique
+			/// <see cref="Environment.SpecialFolder"/>.
+			/// </summary>
+			/// <remarks>Must be configured before showing the dialog.</remarks>
+			public FileDialogTreeRootGetter TreeRootGetter { get; set; } = DefaultTreeRootGetter;
+
+			private static IEnumerable<FileDialogRootTreeNode> DefaultTreeRootGetter ()
+			{
+				var roots = new List<FileDialogRootTreeNode> ();
+				try {
+					foreach (var d in Environment.GetLogicalDrives ()) {
+						roots.Add (new FileDialogRootTreeNode (d, new DirectoryInfo (d)));
+					}
+
+				} catch (Exception) {
+					// Cannot get the system disks thats fine
+				}
+
+
+				try {
+					foreach (var special in Enum.GetValues (typeof (Environment.SpecialFolder)).Cast<SpecialFolder> ()) {
+						try {
+							var path = Environment.GetFolderPath (special);
+							if (
+								!string.IsNullOrWhiteSpace (path)
+								&& Directory.Exists (path)
+								&& !roots.Any (r => string.Equals (r.Path.FullName, path))) {
+
+								roots.Add (new FileDialogRootTreeNode (
+								special.ToString (),
+								new DirectoryInfo (Environment.GetFolderPath (special))));
+							}
+						} catch (Exception) {
+							// Special file exists but contents are unreadable (permissions?)
+							// skip it anyway
+						}
+					}
+				} catch (Exception) {
+					// Cannot get the special files for this OS oh well
+				}
+
+				return roots;
+			}
 		}
 
 		/// <summary>
@@ -299,23 +346,6 @@ namespace Terminal.Gui {
 			this.treeView.TreeBuilder = new FileDialogTreeBuilder ();
 			this.treeView.AspectGetter = (m) => m is DirectoryInfo d ? d.Name : m.ToString ();
 			this.Style.TreeStyle = treeView.Style;
-
-			try {
-				this.treeView.AddObjects (
-					Environment.GetLogicalDrives ()
-					.Select (d =>
-						new FileDialogRootTreeNode (d, new DirectoryInfo (d))));
-
-			} catch (Exception) {
-				// Cannot get the system disks thats fine
-			}
-
-
-			this.treeView.AddObjects (
-				Enum.GetValues (typeof (SpecialFolder))
-				.Cast<SpecialFolder> ()
-				.Where (this.IsValidSpecialFolder)
-				.Select (this.GetTreeNode));
 
 			this.treeView.SelectionChanged += this.TreeView_SelectionChanged;
 
@@ -698,6 +728,8 @@ namespace Terminal.Gui {
 			// May have been updated after instance was constructed
 			this.btnOk.Text = Style.OkButtonText;
 
+			treeView.AddObjects(Style.TreeRootGetter ());
+
 			// if filtering on file type is configured then create the ComboBox and establish
 			// initial filtering by extension(s)
 			if (this.AllowedTypes.Any ()) {
@@ -884,23 +916,6 @@ namespace Terminal.Gui {
 			}
 
 			this.tbPath.Text = FileDialogTreeBuilder.NodeToDirectory (e.NewValue).FullName;
-		}
-
-		private bool IsValidSpecialFolder (SpecialFolder arg)
-		{
-			try {
-				var path = Environment.GetFolderPath (arg);
-				return !string.IsNullOrWhiteSpace (path) && Directory.Exists (path);
-			} catch (Exception) {
-
-				return false;
-			}
-		}
-		private FileDialogRootTreeNode GetTreeNode (SpecialFolder arg)
-		{
-			return new FileDialogRootTreeNode (
-				arg.ToString (),
-				new DirectoryInfo (Environment.GetFolderPath (arg)));
 		}
 
 		private void UpdateNavigationVisibility ()
@@ -2149,23 +2164,6 @@ namespace Terminal.Gui {
 				var style = this.tableView.Style.GetOrCreateColumnStyle (clickedCol);
 				style.Visible = false;
 				this.tableView.Update ();
-			}
-		}
-
-
-		private class FileDialogRootTreeNode {
-			public FileDialogRootTreeNode (string displayName, DirectoryInfo path)
-			{
-				this.DisplayName = displayName;
-				this.Path = path;
-			}
-
-			public string DisplayName { get; set; }
-			public DirectoryInfo Path { get; set; }
-
-			public override string ToString ()
-			{
-				return this.DisplayName;
 			}
 		}
 
