@@ -1,4 +1,5 @@
 ﻿using Terminal.Gui;
+using Terminal.Gui.Configuration;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "_ View Experiments", Description: "v2 View Experiments")]
@@ -8,32 +9,35 @@ namespace UICatalog.Scenarios {
 		{
 			Application.Init ();
 			//Application.Init ();
-			//ConfigurationManager.Themes.Theme = Theme;
-			//ConfigurationManager.Apply ();
-			//Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
+			ConfigurationManager.Themes.Theme = Theme;
+			ConfigurationManager.Apply ();
+			Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
 
 		}
 
 		public override void Setup ()
 		{
-			ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FramePadding;
+			//ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FramePadding;
 			var containerLabel = new Label () {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
+				Height = 3,
 			};
 			Application.Top.Add (containerLabel);
 
 			var view = new View () {
 				X = 2,
-				Y = 3,
+				Y = Pos.Bottom(containerLabel),
 				Height = Dim.Fill (2),
 				Width = Dim.Fill (2),
 				Title = "View with 2xMargin, 2xBorder, & 2xPadding",
 				ColorScheme = Colors.ColorSchemes ["Base"],
 			};
 
-			view.InitializeFrames ();
+			Application.Top.Add (view);
+
+			//view.InitializeFrames ();
 			view.Margin.Thickness = new Thickness (2, 2, 2, 2);
 			view.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
 			view.Margin.Data = "Margin";
@@ -45,8 +49,6 @@ namespace UICatalog.Scenarios {
 			view.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
 			view.Padding.Data = "Padding";
 
-			Application.Top.Add (view);
-
 			var view2 = new View () {
 				X = 2,
 				Y = 3,
@@ -57,7 +59,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = TextAlignment.Centered
 			};
 
-			view2.InitializeFrames ();
+			//view2.InitializeFrames ();
 			view2.Margin.Thickness = new Thickness (1);
 			view2.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
 			view2.Margin.Data = "Margin";
@@ -81,7 +83,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = TextAlignment.Centered
 			};
 
-			view3.InitializeFrames ();
+			//view3.InitializeFrames ();
 			view3.Margin.Thickness = new Thickness (1, 1, 0, 0);
 			view3.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
 			view3.Margin.Data = "Margin";
@@ -105,7 +107,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = TextAlignment.Centered
 			};
 
-			view4.InitializeFrames ();
+			//view4.InitializeFrames ();
 			view4.Margin.Thickness = new Thickness (0, 0, 1, 1);
 			view4.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
 			view4.Margin.Data = "Margin";
@@ -128,7 +130,7 @@ namespace UICatalog.Scenarios {
 				Text = "View #5 (Right(view4)+1 Fill",
 				TextAlignment = TextAlignment.Centered
 			};
-			view5.InitializeFrames ();
+			//view5.InitializeFrames ();
 			view5.Margin.Thickness = new Thickness (0, 0, 0, 0);
 			view5.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
 			view5.Margin.Data = "Margin";
@@ -216,7 +218,6 @@ namespace UICatalog.Scenarios {
 
 			containerLabel.LayoutComplete += (a) => {
 				containerLabel.Text = $"Container.Frame: {Application.Top.Frame} .Bounds: {Application.Top.Bounds}\nView.Frame: {view.Frame} .Bounds: {view.Bounds}\nView.ContentArea: {view.ContentArea}";
-
 			};
 
 		}

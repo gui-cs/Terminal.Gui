@@ -43,7 +43,7 @@ namespace Terminal.Gui {
 		//[Configuration.ConfigProperty]
 		//internal static FrameViewConfig Config { get; set; } = new FrameViewConfig ();
 
-		
+
 
 
 

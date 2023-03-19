@@ -20,9 +20,16 @@ namespace Terminal.Gui {
 		/// Frames are a special form of <see cref="View"/> that act as adornments; they appear outside of the <see cref="View.Bounds"/>
 		/// enabling borders, menus, etc... 
 		/// </summary>
-		public Frame ()
+		//public Frame ()
+		//{
+		//}
+
+		
+		internal override void CreateFrames ()
 		{
+			// Do nothing - Frame
 		}
+
 
 		/// <summary>
 		/// The Parent of this Frame. 

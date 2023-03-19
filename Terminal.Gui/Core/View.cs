@@ -513,9 +513,10 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Temporary API to support the new v2 API
+		/// Creates the view's <see cref="Frame"/> objects. This internal method is overridden by Frame to do nothing
+		/// to prevent recursion during View construction.
 		/// </summary>
-		public void InitializeFrames ()
+		internal virtual void CreateFrames ()
 		{
 			Margin?.Dispose ();
 			Margin = new Frame () { Id = "Margin", Thickness = new Thickness (0) };
@@ -533,6 +534,10 @@ namespace Terminal.Gui {
 			Padding.Parent = this;
 		}
 
+		/// <summary>
+		/// Lays out the views <see cref="Frame"/>s objects (<see cref="Margin"/>, <see cref="BorderFrame"/>, and <see cref="Padding"/> 
+		/// as needed. Causes each Frame to Layout it's subviews.
+		/// </summary>
 		public void LayoutFrames ()
 		{
 			if (Margin != null) {
@@ -555,7 +560,9 @@ namespace Terminal.Gui {
 				BorderFrame.SetNeedsDisplay ();
 			}
 			if (Padding != null) {
-				var padding = BorderFrame?.Thickness.GetInnerRect (BorderFrame?.Frame ?? (Margin?.Thickness.GetInnerRect (Margin.Frame) ?? Frame)) ?? Margin?.Thickness.GetInnerRect (Margin.Frame) ?? Frame;
+				var padding = BorderFrame?.Thickness.GetInnerRect (BorderFrame?.Frame ?? 
+					(Margin?.Thickness.GetInnerRect (Margin.Frame) ?? Frame)) ?? 
+						Margin?.Thickness.GetInnerRect (Margin.Frame) ?? Frame;
 				Padding.X = padding.Location.X;
 				Padding.Y = padding.Location.Y;
 				Padding.Width = padding.Size.Width;
@@ -825,10 +832,7 @@ namespace Terminal.Gui {
 		/// This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="Terminal.Gui.LayoutStyle.Absolute"/>.
 		/// Use <see cref="View"/> to initialize a View with  <see cref="LayoutStyle"/> of <see cref="Terminal.Gui.LayoutStyle.Computed"/> 
 		/// </remarks>
-		public View (Rect frame)
-		{
-			SetInitialProperties (ustring.Empty, frame, LayoutStyle.Absolute, TextDirection.LeftRight_TopBottom);
-		}
+		public View (Rect frame) : this (frame, null, null) {}
 
 		/// <summary>
 		///   Initializes a new instance of <see cref="View"/> using <see cref="Terminal.Gui.LayoutStyle.Computed"/> layout.
@@ -938,6 +942,8 @@ namespace Terminal.Gui {
 			var r = rect.IsEmpty ? TextFormatter.CalcRect (0, 0, text, direction) : rect;
 			Frame = r;
 			OnResizeNeeded ();
+
+			CreateFrames ();
 		}
 
 		/// <summary>
@@ -3261,7 +3267,7 @@ namespace Terminal.Gui {
 				// TODO: Figure out why ScrollView and other tests fail if this call is put here 
 				// instead of the constructor.
 				// OnSizeChanged ();
-				InitializeFrames ();
+				//InitializeFrames ();
 
 			} else {
 				//throw new InvalidOperationException ("The view is already initialized.");
