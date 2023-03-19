@@ -2642,9 +2642,13 @@ namespace Terminal.Gui {
 				(var from, var to) = edges.First ();
 				if (from != superView?.GetTopSuperView (to, from)) {
 					if (!ReferenceEquals (from, to)) {
-						throw new InvalidOperationException ($"TopologicalSort (for Pos/Dim) cannot find {from} linked with {to}. Did you forget to add it to {superView}?");
+						if (ReferenceEquals (from.SuperView, to)) {
+							throw new InvalidOperationException ($"ComputedLayout for \"{superView}\": \"{to}\" references a SubView (\"{from}\").");
+						} else {
+							throw new InvalidOperationException ($"ComputedLayout for \"{superView}\": \"{from}\" linked with \"{to}\" was not found. Did you forget to add it to {superView}?");
+						}
 					} else {
-						throw new InvalidOperationException ("TopologicalSort encountered a recursive cycle in the relative Pos/Dim in the views of " + superView);
+						throw new InvalidOperationException ($"ComputedLayout for \"{superView}\": A recursive cycle was found in the relative Pos/Dim of the SubViews.");
 					}
 				}
 			}
