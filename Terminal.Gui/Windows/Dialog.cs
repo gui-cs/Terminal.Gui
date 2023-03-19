@@ -173,7 +173,7 @@ namespace Terminal.Gui {
 			if (buttons.Count == 0) {
 				return 0;
 			}
-			return buttons.Select (b => b.Bounds.Width).Sum ();
+			return buttons.Select (b => b.Frame.Width).Sum ();
 		}
 
 		/// <summary>
