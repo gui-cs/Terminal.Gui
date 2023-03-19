@@ -1655,8 +1655,6 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal(1,tableView.GetAllSelectedCells().Count());
 		}
 
-
-
 		[Fact, AutoInitShutdown]
 		public void TestToggleCells_MultiSelectOn_Two_SquareSelects_BothToggled ()
 		{
