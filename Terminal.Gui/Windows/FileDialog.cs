@@ -349,6 +349,12 @@ namespace Terminal.Gui {
 			};
 
 			tbFind.TextChanged += (o) => RestartSearch ();
+			tbFind.KeyPress += (o) => {
+				if (o.KeyEvent.Key == Key.Enter) {
+					RestartSearch ();
+					o.Handled = true;
+				}
+			};
 
 			this.tableView.Style.ShowHorizontalHeaderOverline = false;
 			this.tableView.Style.ShowVerticalCellLines = false;

@@ -86,9 +86,41 @@ namespace Terminal.Gui.Core {
 			Assert.EndsWith ("xx" + Path.DirectorySeparatorChar, dlg.Path);
 		}
 
-		private void Send (char ch, ConsoleKey ck, bool shift = false)
+		[Fact, AutoInitShutdown]
+		public void DoNotConfirmSelectionWhenFindFocused ()
 		{
-			Application.Driver.SendKeys (ch, ck, shift, false, false);
+			var dlg = GetInitializedFileDialog ();
+			var openIn = Path.Combine (Environment.CurrentDirectory, "zz");
+			Directory.CreateDirectory (openIn);
+			dlg.Path = openIn + Path.DirectorySeparatorChar;
+
+			Send ('f',ConsoleKey.F,false,false,true);
+
+			Assert.IsType<FileDialog.CaptionedTextField> (dlg.MostFocused);
+			var tf = (FileDialog.CaptionedTextField) dlg.MostFocused;
+			Assert.Equal ("Enter Search", tf.Caption);
+
+			// Dialog has not yet been confirmed with a choice
+			Assert.True (dlg.Canceled);
+
+			//pressing enter while search focused should not confirm path
+			Send ('\n', ConsoleKey.Enter, false);
+
+			Assert.True (dlg.Canceled);
+
+			// tabbing out of search 
+			Send ('\t', ConsoleKey.Tab, false);
+
+			//should allow enter to confirm path
+			Send ('\n', ConsoleKey.Enter, false);
+
+			// Dialog has not yet been confirmed with a choice
+			Assert.False(dlg.Canceled);
+		}
+
+		private void Send (char ch, ConsoleKey ck, bool shift = false, bool alt = false, bool control=false)
+		{
+			Application.Driver.SendKeys (ch, ck, shift, alt, control);
 		}
 		private void Send (string chars)
 		{
