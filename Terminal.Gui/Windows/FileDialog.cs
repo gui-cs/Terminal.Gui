@@ -234,6 +234,12 @@ namespace Terminal.Gui {
 		private MenuBarItem allowedTypeMenu;
 		private MenuItem [] allowedTypeMenuItems;
 
+		/// <summary>
+		/// Event fired when user attempts to confirm a selection (or multi selection).
+		/// Allows you to cancel the selection or undertake alternative behavior e.g.
+		/// open a dialog "File already exists, Overwrite? yes/no".
+		/// </summary>
+		public event EventHandler<FilesSelectedEventArgs> FilesSelected;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="FileDialog"/> class.
@@ -850,9 +856,11 @@ namespace Terminal.Gui {
 
 			this.MultiSelected = toMultiAccept.Select (s => s.FileSystemInfo.FullName).ToList ().AsReadOnly ();
 			this.tbPath.Text = this.MultiSelected.Count == 1 ? this.MultiSelected [0] : string.Empty;
-			this.Canceled = false;
-			Application.RequestStop ();
+
+			FinishAccept ();
 		}
+
+
 		private void Accept (FileInfo f)
 		{
 			if (!this.IsCompatibleWithOpenMode (f.FullName, out var reason)) {
@@ -866,8 +874,8 @@ namespace Terminal.Gui {
 			if (AllowsMultipleSelection) {
 				this.MultiSelected = new List<string> { f.FullName }.AsReadOnly ();
 			}
-			this.Canceled = false;
-			Application.RequestStop ();
+
+			FinishAccept ();
 		}
 
 		private void Accept ()
@@ -880,6 +888,18 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			FinishAccept ();
+		}
+
+		private void FinishAccept ()
+		{
+			var e = new FilesSelectedEventArgs (this);
+
+			this.FilesSelected?.Invoke (this, e);
+			
+			if(e.Cancel) {
+				return;
+			}
 
 			this.Canceled = false;
 			Application.RequestStop ();

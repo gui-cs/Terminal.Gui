@@ -118,6 +118,25 @@ namespace Terminal.Gui.Core {
 			Assert.False(dlg.Canceled);
 		}
 
+		[Theory, AutoInitShutdown]
+		[InlineData(true)]
+		[InlineData (false)]
+		public void CancelSelection (bool cancel)
+		{
+			var dlg = GetInitializedFileDialog ();
+			var openIn = Path.Combine (Environment.CurrentDirectory, "zz");
+			Directory.CreateDirectory (openIn);
+			dlg.Path = openIn + Path.DirectorySeparatorChar;
+
+			dlg.FilesSelected += (s, e) => e.Cancel = cancel;
+
+			//pressing enter will complete the current selection
+			// unless the event cancels the confirm
+			Send ('\n', ConsoleKey.Enter, false);
+			
+			Assert.Equal(cancel,dlg.Canceled);
+		}
+
 		private void Send (char ch, ConsoleKey ck, bool shift = false, bool alt = false, bool control=false)
 		{
 			Application.Driver.SendKeys (ch, ck, shift, alt, control);

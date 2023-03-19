@@ -118,6 +118,11 @@ namespace UICatalog.Scenarios {
 
 				fd.Style.OkButtonText = rgCaption.RadioLabels [rgCaption.SelectedItem].ToString ();
 
+				// If Save style dialog then give them an overwrite prompt
+				if(rgCaption.SelectedItem == 2) {
+					fd.FilesSelected += ConfirmOverwrite;
+				}
+
 				if (cbIcons.Checked ?? false) {
 					fd.IconGetter = GetIcon;
 				}
@@ -168,6 +173,16 @@ namespace UICatalog.Scenarios {
 						"Ok");
 				}
 			};
+		}
+
+		private void ConfirmOverwrite (object sender, FilesSelectedEventArgs e)
+		{
+			if (!string.IsNullOrWhiteSpace (e.Dialog.Path)) {
+				if(File.Exists(e.Dialog.Path)) {
+					int result = MessageBox.Query ("Overwrite?", "File already exists", "Yes", "No");
+					e.Cancel = result == 1;
+				}
+			}
 		}
 
 		private class CaseSensitiveSearchMatcher : FileDialog.ISearchMatcher {
