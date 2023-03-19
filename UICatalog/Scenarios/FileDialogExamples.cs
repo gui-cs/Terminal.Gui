@@ -10,6 +10,7 @@ using static Terminal.Gui.OpenDialog;
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "FileDialog", Description: "Demonstrates how to the FileDialog class")]
 	[ScenarioCategory ("Dialogs")]
+	[ScenarioCategory ("Files and IO")]
 	public class FileDialogExamples : Scenario {
 		private CheckBox cbMustExist;
 		private CheckBox cbIcons;

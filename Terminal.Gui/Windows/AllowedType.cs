@@ -80,7 +80,14 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override string ToString ()
 		{
-			return $"{this.Description} ({string.Join (";", this.Extensions.Select (e => '*' + e).ToArray ())})";
+			const int maxLength = 30;
+
+			var desc = $"{this.Description} ({string.Join (";", this.Extensions.Select (e => '*' + e).ToArray ())})";
+
+			if(desc.Length > maxLength) {
+				return desc.Substring (0, maxLength-2) + "…";
+			}
+			return desc;
 		}
 
 		/// <inheritdoc/>

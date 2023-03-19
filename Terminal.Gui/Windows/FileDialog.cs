@@ -701,10 +701,6 @@ namespace Terminal.Gui {
 				// Fiddle factor
 				var width = this.AllowedTypes.Max (a => a.ToString ().Length) + 6;
 
-				// TODO: Put a max on this
-
-				// TODO: Add a hint that the user should use F9 to open this menu
-
 				allowedTypeMenu = new MenuBarItem ("<placeholder>",
 					allowedTypeMenuItems = AllowedTypes.Select (
 						(a, i) => new MenuItem (a.ToString (), null, () => {
