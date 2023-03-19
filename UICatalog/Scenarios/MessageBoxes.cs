@@ -174,22 +174,6 @@ namespace UICatalog.Scenarios {
 					2 +
 					ckbEffect3D.Frame.Height +
 					ckbWrapMessage.Frame.Height;
-
-				// BUGBUG: this only worked because the subviews are actually added
-				// to FrameView.ContentView, not FrameView itself. In v2 this breaks because FrameView
-				// does not have a ContentView.
-				// 
-				//Dim.Height (widthEdit) +
-				//Dim.Height (heightEdit);
-				//+
-				//Dim.Height (titleEdit) +
-				//Dim.Height (messageEdit) +
-				//Dim.Height (numButtonsEdit) +
-				//Dim.Height (defaultButtonEdit) +
-				//Dim.Height (styleRadioGroup) +
-				//2 +
-				//Dim.Height (ckbEffect3D) +
-				//Dim.Height (ckbWrapMessage);
 				Application.Top.Loaded -= Top_Loaded;
 			}
 			Application.Top.Loaded += Top_Loaded;
