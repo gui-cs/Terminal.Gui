@@ -6,12 +6,12 @@ namespace Terminal.Gui {
 	/// than the wrapped <see cref="MouseEvent"/> class and is used for the events defined on <see cref="View"/>
 	/// and subclasses of View (e.g. <see cref="View.MouseEnter"/> and <see cref="View.MouseClick"/>).
 	/// </summary>
-	public class MouseEventEventArgs : EventArgs {
+	public class MouseEventArgs : EventArgs {
 		/// <summary>
 		/// Constructs.
 		/// </summary>
 		/// <param name="me">The mouse event.</param>
-		public MouseEventEventArgs (MouseEvent me) => MouseEvent = me;
+		public MouseEventArgs (MouseEvent me) => MouseEvent = me;
 		/// <summary>
 		/// The <see cref="Terminal.Gui.MouseEvent"/> for the event.
 		/// </summary>
@@ -29,3 +29,4 @@ namespace Terminal.Gui {
 		}
 	}
 }
+
