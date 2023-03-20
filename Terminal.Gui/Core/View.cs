@@ -432,7 +432,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>The identifier.</value>
 		/// <remarks>The id should be unique across all Views that share a SuperView.</remarks>
-		public ustring Id { get; set; } = "";
+		public string Id { get; set; } = "";
 
 		/// <summary>
 		/// Returns a value indicating if this View is currently on Top (Active)
@@ -577,8 +577,8 @@ namespace Terminal.Gui {
 				BorderFrame.SetNeedsDisplay ();
 			}
 			if (Padding != null) {
-				var padding = BorderFrame?.Thickness.GetInnerRect (BorderFrame?.Frame ?? 
-					(Margin?.Thickness.GetInnerRect (Margin.Frame) ?? Frame)) ?? 
+				var padding = BorderFrame?.Thickness.GetInnerRect (BorderFrame?.Frame ??
+					(Margin?.Thickness.GetInnerRect (Margin.Frame) ?? Frame)) ??
 						Margin?.Thickness.GetInnerRect (Margin.Frame) ?? Frame;
 				Padding.X = padding.Location.X;
 				Padding.Y = padding.Location.Y;
@@ -602,10 +602,15 @@ namespace Terminal.Gui {
 			set {
 				title = value;
 				SetNeedsDisplay ();
+#if DEBUG
+				if (title != null && string.IsNullOrEmpty (Id)) {
+					Id = title.ToString ();
+				}
+#endif
 			}
 		}
 
-		LayoutStyle layoutStyle;
+		LayoutStyle _layoutStyle;
 
 		/// <summary>
 		/// Controls how the View's <see cref="Frame"/> is computed during the LayoutSubviews method, if the style is set to
@@ -616,9 +621,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>The layout style.</value>
 		public LayoutStyle LayoutStyle {
-			get => layoutStyle;
+			get => _layoutStyle;
 			set {
-				layoutStyle = value;
+				_layoutStyle = value;
 				SetNeedsLayout ();
 			}
 		}
@@ -755,10 +760,10 @@ namespace Terminal.Gui {
 
 		bool ValidatePosDim (object oldValue, object newValue)
 		{
-			if (!IsInitialized || layoutStyle == LayoutStyle.Absolute || oldValue == null || oldValue.GetType () == newValue.GetType () || this is Toplevel) {
+			if (!IsInitialized || _layoutStyle == LayoutStyle.Absolute || oldValue == null || oldValue.GetType () == newValue.GetType () || this is Toplevel) {
 				return true;
 			}
-			if (layoutStyle == LayoutStyle.Computed) {
+			if (_layoutStyle == LayoutStyle.Computed) {
 				if (oldValue.GetType () != newValue.GetType () && !(newValue is Pos.PosAbsolute || newValue is Dim.DimAbsolute)) {
 					return true;
 				}
@@ -850,7 +855,7 @@ namespace Terminal.Gui {
 		/// This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="Terminal.Gui.LayoutStyle.Absolute"/>.
 		/// Use <see cref="View"/> to initialize a View with  <see cref="LayoutStyle"/> of <see cref="Terminal.Gui.LayoutStyle.Computed"/> 
 		/// </remarks>
-		public View (Rect frame) : this (frame, null, null) {}
+		public View (Rect frame) : this (frame, null, null) { }
 
 		/// <summary>
 		///   Initializes a new instance of <see cref="View"/> using <see cref="Terminal.Gui.LayoutStyle.Computed"/> layout.
@@ -1729,7 +1734,7 @@ namespace Terminal.Gui {
 			Padding?.Redraw (Padding.Frame);
 
 			Driver.Clip = prevClip;
-				
+
 			return true;
 		}
 
@@ -2597,7 +2602,7 @@ namespace Terminal.Gui {
 		{
 			foreach (var v in from.InternalSubviews) {
 				nNodes.Add (v);
-				if (v.layoutStyle != LayoutStyle.Computed) {
+				if (v._layoutStyle != LayoutStyle.Computed) {
 					continue;
 				}
 				CollectPos (v.X, v, ref nNodes, ref nEdges);
@@ -2741,6 +2746,11 @@ namespace Terminal.Gui {
 					UpdateTextFormatterText ();
 					OnResizeNeeded ();
 				}
+#if DEBUG
+				if (text != null && string.IsNullOrEmpty (Id)) {
+					Id = text.ToString ();
+				}
+#endif
 			}
 		}
 

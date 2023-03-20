@@ -463,11 +463,11 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			Driver.SetAttribute (Host.HasFocus ? ColorScheme.Focus : GetNormalColor ());
-
-			if ((vertical && Bounds.Height == 0) || (!vertical && Bounds.Width == 0)) {
+			if (Size == 0 || (vertical && Bounds.Height == 0) || (!vertical && Bounds.Width == 0)) {
 				return;
 			}
+
+			Driver.SetAttribute (Host.HasFocus ? ColorScheme.Focus : GetNormalColor ());
 
 			if (vertical) {
 				if (region.Right < Bounds.Width - 1) {
