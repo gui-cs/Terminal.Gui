@@ -311,7 +311,62 @@ namespace Terminal.Gui.CoreTests {
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
+		[Fact, AutoInitShutdown]
+		public void TestLineCanvas_ClipArea_Intersections ()
+		{
+			// Draw at 1,1 within client area of View (i.e. leave a top and left margin of 1)
+			var v = GetCanvas (out var lc);
+			v.Width = 10;
+			v.Height = 1;
+			v.Bounds = new Rect (0, 0, 10, 1);
 
+			// ╔╡ Title ╞═════╗
+			// Add a short horiz line for ╔╡
+			lc.AddLine (new Point (0, 0), 1, Orientation.Horizontal, BorderStyle.Double);
+			//LHS line down
+			lc.AddLine (new Point (0, 0), 5, Orientation.Vertical, BorderStyle.Double);
+
+			//Vertical line before Title (must cover 3 squares so it results in a ╡ intersection
+			lc.AddLine (new Point (1, -1), 3, Orientation.Vertical, BorderStyle.Single);
+			//Vertical line after Title (must cover 3 squares so it results in a ╞ intersection
+			lc.AddLine (new Point (6, -1), 3, Orientation.Vertical, BorderStyle.Single);
+
+			// remainder of title
+			lc.AddLine (new Point (6, 0), 3, Orientation.Horizontal, BorderStyle.Double);
+			//RHS line down
+			lc.AddLine (new Point (9, 0), 5, Orientation.Vertical, BorderStyle.Double);
+
+			v.Redraw (v.Bounds);
+
+			string looksLike =
+		@"
+╔╡    ╞══╗
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+		}
+
+
+		[Fact, AutoInitShutdown]
+		public void TestLineCanvas_CreateT_With_1Length_Plus_0Length ()
+		{
+			// Draw at 1,1 within client area of View (i.e. leave a top and left margin of 1)
+			var v = GetCanvas (out var lc);
+			v.Width = 10;
+			v.Height = 1;
+			v.Bounds = new Rect (0, 0, 10, 1);
+
+			// Create ═╡ with:
+			// A 1 width horizontal
+			lc.AddLine (new Point (0, 0), 1, Orientation.Horizontal, BorderStyle.Double);
+			// And a 0 length vertical 
+			lc.AddLine (new Point (1, 0), 0, Orientation.Vertical, BorderStyle.Single);
+
+			v.Redraw (v.Bounds);
+
+			string looksLike =
+		@"═╡";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+		}
 
 		/// <summary>
 		/// Creates a new <see cref="View"/> into which a <see cref="LineCanvas"/> is rendered

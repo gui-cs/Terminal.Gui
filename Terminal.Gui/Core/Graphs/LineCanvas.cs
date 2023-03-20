@@ -487,14 +487,6 @@ namespace Terminal.Gui.Graphs {
 
 			internal IntersectionDefinition Intersects (int x, int y)
 			{
-				if (IsDot ()) {
-					if (StartsAt (x, y)) {
-						return new IntersectionDefinition (Start, IntersectionType.Dot, this);
-					} else {
-						return null;
-					}
-				}
-
 				switch (Orientation) {
 				case Orientation.Horizontal: return IntersectsHorizontally (x, y);
 				case Orientation.Vertical: return IntersectsVertically (x, y);
@@ -552,7 +544,7 @@ namespace Terminal.Gui.Graphs {
 
 						return new IntersectionDefinition (
 							Start,
-							Length < 0 ? IntersectionType.StartUp : IntersectionType.StartDown,
+							GetTypeByLength(IntersectionType.StartUp, IntersectionType.PassOverVertical, IntersectionType.StartDown),
 							this
 							);
 
@@ -581,6 +573,15 @@ namespace Terminal.Gui.Graphs {
 
 					return null;
 				}
+			}
+
+			private IntersectionType GetTypeByLength (IntersectionType typeWhenNegative, IntersectionType typeWhenZero, IntersectionType typeWhenPositive)
+			{
+				if (Length == 0) {
+					return typeWhenZero;
+				} 
+
+				return Length < 0 ? typeWhenNegative : typeWhenPositive;
 			}
 
 			private bool EndsAt (int x, int y)
