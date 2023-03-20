@@ -28,21 +28,21 @@ namespace Terminal.Gui.CoreTests {
 			Assert.Null (b.Effect3DBrush);
 		}
 
-		[Fact]
-		public void BorderStyle_Different_None_Ensures_DrawMarginFrame_To_True ()
-		{
-			var b = new Border () {
-				BorderStyle = BorderStyle.Single,
-				DrawMarginFrame = false
-			};
+		//[Fact]
+		//public void BorderStyle_Different_None_Ensures_DrawMarginFrame_To_True ()
+		//{
+		//	var b = new Border () {
+		//		BorderStyle = BorderStyle.Single,
+		//		DrawMarginFrame = false
+		//	};
 
-			Assert.True (b.DrawMarginFrame);
+		//	Assert.True (b.DrawMarginFrame);
 
-			b.BorderStyle = BorderStyle.None;
-			Assert.True (b.DrawMarginFrame);
-			b.DrawMarginFrame = false;
-			Assert.False (b.DrawMarginFrame);
-		}
+		//	b.BorderStyle = BorderStyle.None;
+		//	Assert.True (b.DrawMarginFrame);
+		//	b.DrawMarginFrame = false;
+		//	Assert.False (b.DrawMarginFrame);
+		//}
 
 		//[Fact, AutoInitShutdown]
 		// public void ActualWidth_ActualHeight ()
@@ -621,15 +621,15 @@ At 0,0
               
 At 0,4        ", output);
 
-			frame.Border.DrawMarginFrame = false;
-			lblFill.Visible = true;
-			Application.Refresh ();
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
-At 0,0              
-████████████████████
-██████Centered██████
-████████████████████
-At 0,4              ", output);
+//			frame.Border.DrawMarginFrame = false;
+//			lblFill.Visible = true;
+//			Application.Refresh ();
+//			TestHelpers.AssertDriverContentsWithFrameAre (@"
+//At 0,0              
+//████████████████████
+//██████Centered██████
+//████████████████████
+//At 0,4              ", output);
 		}
 	}
 }

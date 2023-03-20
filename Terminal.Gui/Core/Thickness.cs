@@ -73,6 +73,9 @@ namespace Terminal.Gui {
 			Bottom = bottom;
 		}
 
+		/// <summary>
+		/// Gets the total width of the left and right sides of the rectangle. Sets the height of the left and right sides of the rectangle to half the specified value.
+		/// </summary>
 		public int Vertical {
 			get {
 				return Top + Bottom;
@@ -82,6 +85,9 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Gets the total width of the top and bottom sides of the rectangle. Sets the width of the top and bottom sides of the rectangle to half the specified value.
+		/// </summary>
 		public int Horizontal {
 			get {
 				return Left + Right;
@@ -111,16 +117,6 @@ namespace Terminal.Gui {
 			return new Rect (new Point (rect.X + Left, rect.Y + Top), size);
 		}
 
-		private void FillRect (Rect rect, System.Rune rune = default)
-		{
-			for (var r = rect.Y; r < rect.Y + rect.Height; r++) {
-				for (var c = rect.X; c < rect.X + rect.Width; c++) {
-					Application.Driver.Move (c, r);
-					Application.Driver.AddRune (rune == default ? ' ' : rune);
-				}
-			}
-		}
-
 		/// <summary>
 		/// Draws the <see cref="Thickness"/> rectangle with an optional diagnostics label.
 		/// </summary>
@@ -136,6 +132,10 @@ namespace Terminal.Gui {
 		/// <returns>The inner rectangle remaining to be drawn.</returns>
 		public Rect Draw (Rect rect, string label = null)
 		{
+			if (rect.Size.Width < 1 || rect.Size.Height < 1) {
+				return Rect.Empty;
+			}
+
 			System.Rune clearChar = ' ';
 			System.Rune leftChar = clearChar;
 			System.Rune rightChar = clearChar;
@@ -163,16 +163,24 @@ namespace Terminal.Gui {
 			};
 
 			// Draw the Top side
-			FillRect (new Rect (rect.X, rect.Y, rect.Width, Math.Min (rect.Height, Top)), topChar);
+			if (Top > 0) {
+				Application.Driver.FillRect (new Rect (rect.X, rect.Y, rect.Width, Math.Min (rect.Height, Top)), topChar);
+			}
 
 			// Draw the Left side
-			FillRect (new Rect (rect.X, rect.Y, Math.Min (rect.Width, Left), rect.Height), leftChar);
+			if (Left > 0) {
+				Application.Driver.FillRect (new Rect (rect.X, rect.Y, Math.Min (rect.Width, Left), rect.Height), leftChar);
+			}
 
 			// Draw the Right side			
-			FillRect (new Rect (Math.Max (0, rect.X + rect.Width - Right), rect.Y, Math.Min (rect.Width, Right), rect.Height), rightChar);
+			if (Right > 0) {
+				Application.Driver.FillRect (new Rect (Math.Max (0, rect.X + rect.Width - Right), rect.Y, Math.Min (rect.Width, Right), rect.Height), rightChar);
+			}
 
 			// Draw the Bottom side
-			FillRect (new Rect (rect.X, rect.Y + Math.Max (0, rect.Height - Bottom), rect.Width, Bottom), bottomChar);
+			if (Bottom > 0) {
+				Application.Driver.FillRect (new Rect (rect.X, rect.Y + Math.Max (0, rect.Height - Bottom), rect.Width, Bottom), bottomChar);
+			}
 
 			// TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
 			if ((ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler) {
@@ -207,6 +215,7 @@ namespace Terminal.Gui {
 			return GetInnerRect (rect);
 
 		}
+
 		// TODO: add operator overloads
 		/// <summary>
 		/// Gets an empty thickness.

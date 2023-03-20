@@ -903,6 +903,21 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Fills the specified rectangle with the specified rune.
+		/// </summary>
+		/// <param name="rect"></param>
+		/// <param name="rune"></param>
+		public virtual void FillRect (Rect rect, System.Rune rune = default)
+		{
+			for (var r = rect.Y; r < rect.Y + rect.Height; r++) {
+				for (var c = rect.X; c < rect.X + rect.Width; c++) {
+					Application.Driver.Move (c, r);
+					Application.Driver.AddRune (rune == default ? ' ' : rune);
+				}
+			}
+		}
+
+		/// <summary>
 		/// Draws the title for a Window-style view incorporating padding. 
 		/// </summary>
 		/// <param name="region">Screen relative region where the frame will be drawn.</param>

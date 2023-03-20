@@ -73,10 +73,7 @@ namespace Terminal.Gui {
 		/// Initializes a new instance of the <see cref="Gui.FrameView"/> class using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
 		public FrameView () : this (title: string.Empty) {
-			BorderFrame.Thickness = new Thickness (1);
-			BorderFrame.BorderStyle = Border.BorderStyle;
-			//BorderFrame.ColorScheme = ColorScheme;
-			BorderFrame.Data = "BorderFrame";
+
 		}
 
 		/// <summary>
@@ -94,6 +91,7 @@ namespace Terminal.Gui {
 			if (border == null) {
 				Border = new Border () {
 					BorderStyle = DefaultBorderStyle,
+					DrawMarginFrame = true
 					//Title = title
 				};
 			} else {
@@ -102,6 +100,10 @@ namespace Terminal.Gui {
 				//	border.Title = title;
 				//}
 			}
+			BorderFrame.Thickness = new Thickness (1);
+			BorderFrame.BorderStyle = Border.BorderStyle;
+			//BorderFrame.ColorScheme = ColorScheme;
+			BorderFrame.Data = "BorderFrame";
 		}
 
 		public override void BeginInit ()

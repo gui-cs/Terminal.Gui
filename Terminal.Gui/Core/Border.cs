@@ -86,11 +86,11 @@ namespace Terminal.Gui {
 
 		// TODO: These are all temporary to keep code compiling
 		public bool DrawMarginFrame { get; set; }
-		public Point Effect3DOffset { get; set; }
+		public Point Effect3DOffset { get; set; } = new Point (1, 1);
 		public bool Effect3D { get; set; }
-		public Thickness BorderThickness { get; set; }
+		public Thickness BorderThickness { get; set; } = new Thickness (0);
 		public object Effect3DBrush { get; set; }
-		public Thickness PaddingThickness { get; set; }
+		public Thickness PaddingThickness { get; set; } = new Thickness (0);
 
 		/// <summary>
 		/// Invoke the <see cref="BorderChanged"/> event.

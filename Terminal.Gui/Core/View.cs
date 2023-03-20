@@ -960,6 +960,10 @@ namespace Terminal.Gui {
 			LayoutStyle = layoutStyle;
 
 			Border = border;
+
+			// TODO: v2 - Hack for now
+			if (Border != null) Border.BorderChanged += Border_BorderChanged;
+
 			Text = text;
 			LayoutStyle = layoutStyle;
 			var r = rect.IsEmpty ? TextFormatter.CalcRect (0, 0, text, direction) : rect;
@@ -967,6 +971,13 @@ namespace Terminal.Gui {
 			OnResizeNeeded ();
 
 			CreateFrames ();
+		}
+
+		private void Border_BorderChanged (Border border)
+		{
+			BorderFrame.Thickness = border.BorderThickness;
+			BorderFrame.BorderStyle = border.BorderStyle;
+			if (!border.DrawMarginFrame) BorderFrame.BorderStyle = BorderStyle.None;
 		}
 
 		/// <summary>
@@ -2940,15 +2951,12 @@ namespace Terminal.Gui {
 			get => border;
 			set {
 				if (border != value) {
-
-					//InitializeFrames ();
-					//BorderFrame.Thickness = new Thickness (2);
-					//BorderFrame.BorderStyle = value?.BorderStyle ?? BorderStyle.Single;
-					//BorderFrame.ColorScheme = ColorScheme;
-
 					border = value;
 
 					SetNeedsDisplay ();
+
+					if (border != null) border.BorderChanged += Border_BorderChanged;
+
 				}
 			}
 		}
