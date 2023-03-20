@@ -201,7 +201,7 @@ namespace Terminal.Gui.TopLevelTests {
 			Assert.Equal (top, Application.Top);
 
 			// top is Application.Top without menu and status bar.
-			var supView = top.EnsureVisibleBounds (top, 2, 2, out int nx, out int ny, out View mb, out View sb);
+			var supView = top.EnsureVisibleBounds (top, 2, 2, out int nx, out int ny, out MenuBar mb, out StatusBar sb);
 			Assert.Equal (Application.Top, supView);
 			Assert.Equal (0, nx);
 			Assert.Equal (0, ny);

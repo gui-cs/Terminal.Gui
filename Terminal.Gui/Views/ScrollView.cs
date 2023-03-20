@@ -45,7 +45,7 @@ namespace Terminal.Gui {
 		/// <param name="frame"></param>
 		public ScrollView (Rect frame) : base (frame)
 		{
-			Initialize (frame);
+			SetInitialProperties (frame);
 		}
 
 
@@ -54,10 +54,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public ScrollView () : base ()
 		{
-			Initialize (Rect.Empty);
+			SetInitialProperties (Rect.Empty);
 		}
 
-		void Initialize (Rect frame)
+		void SetInitialProperties (Rect frame)
 		{
 			contentView = new ContentView (frame);
 			vertical = new ScrollBarView (1, 0, isVertical: true) {

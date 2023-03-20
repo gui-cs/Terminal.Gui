@@ -983,13 +983,10 @@ namespace Terminal.Gui {
 
 			var rs = new RunState (toplevel);
 
-			if (toplevel is ISupportInitializeNotification initializableNotification &&
-			    !initializableNotification.IsInitialized) {
-				initializableNotification.BeginInit ();
-				initializableNotification.EndInit ();
-			} else if (toplevel is ISupportInitialize initializable) {
-				initializable.BeginInit ();
-				initializable.EndInit ();
+			// View implements ISupportInitializeNotification which is derived from ISupportInitialize
+			if (!toplevel.IsInitialized) {
+				toplevel.BeginInit ();
+				toplevel.EndInit ();
 			}
 
 			lock (toplevels) {
@@ -1251,7 +1248,7 @@ namespace Terminal.Gui {
 					MdiTop?.OnDeactivate (state.Toplevel);
 					state.Toplevel = Current;
 					MdiTop?.OnActivate (state.Toplevel);
-					Top.SetChildNeedsDisplay ();
+					Top.SetSubViewNeedsDisplay ();
 					Refresh ();
 				}
 				if (Driver.EnsureCursorVisibility ()) {
@@ -1315,7 +1312,7 @@ namespace Terminal.Gui {
 
 			foreach (var top in toplevels) {
 				if (top != Current && top.Visible && (!top.NeedDisplay.IsEmpty || top.ChildNeedsDisplay || top.LayoutNeeded)) {
-					MdiTop.SetChildNeedsDisplay ();
+					MdiTop.SetSubViewNeedsDisplay ();
 					return true;
 				}
 			}

@@ -304,7 +304,7 @@ namespace UICatalog {
 						StatusBar.Visible = !StatusBar.Visible;
 						ContentPane.Height = Dim.Fill(StatusBar.Visible ? 1 : 0);
 						LayoutSubviews();
-						SetChildNeedsDisplay();
+						SetSubViewNeedsDisplay();
 					}),
 					DriverName,
 					OS
@@ -393,7 +393,7 @@ namespace UICatalog {
 					var height = (StatusBar.Visible ? 1 : 0);// + (MenuBar.Visible ? 1 : 0);
 					ContentPane.Height = Dim.Fill (height);
 					LayoutSubviews ();
-					SetChildNeedsDisplay ();
+					SetSubViewNeedsDisplay ();
 				};
 
 				Loaded -= LoadedHandler;
