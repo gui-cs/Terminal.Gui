@@ -1711,20 +1711,7 @@ namespace Terminal.Gui {
 			Padding?.Redraw (Padding.Frame);
 
 			Driver.Clip = prevClip;
-
-			//var margin = Margin.Thickness.GetInnerRect (frame);
-			//var padding = BorderFrame.Thickness.GetInnerRect (margin);
-			//var content = Padding.Thickness.GetInnerRect (padding);
-
-			//// Draw the diagnostics label on the bottom of the content
-			//var tf = new TextFormatter () {
-			//	Text = $"Content {Bounds}",
-			//	Alignment = TextAlignment.Centered,
-			//	VerticalAlignment = VerticalTextAlignment.Bottom
-			//};
-			//tf.Draw (Padding.Thickness.GetInnerRect(Padding.Bounds), ColorScheme.Normal, ColorScheme.Normal);
-
-
+				
 			return true;
 		}
 
@@ -1751,7 +1738,6 @@ namespace Terminal.Gui {
 				return;
 			}
 
-
 			OnDrawFrames (Frame);
 
 			var prevClip = ClipToBounds ();
@@ -1770,7 +1756,7 @@ namespace Terminal.Gui {
 			OnDrawContent (bounds);
 
 			// Draw subviews
-			// TODO: Implement OnDrawSubviews (cancelable);		
+			// TODO: Implement OnDrawSubviews (cancelable);
 			if (subviews != null) {
 				foreach (var view in subviews) {
 					if (true) { //!view._needsDisplay.IsEmpty || view._childNeedsDisplay || view.LayoutNeeded) {
@@ -1798,31 +1784,6 @@ namespace Terminal.Gui {
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
 		}
-
-		//// Gets the screen relative rectangle describing the larger of our Superview's bounds or the Driver.Cliprect.
-		//internal Rect GetContainerBounds ()
-		//{
-		//	// Get the screen-relative rectangle describing our superview's Bounds
-		//	var containerBounds = SuperView == null ? default : SuperView.ViewToScreen (SuperView.Bounds);
-
-		//	// Ensure if clip is larger, we grow
-		//	var driverClip = Driver == null ? Rect.Empty : Driver.Clip;
-		//	containerBounds.X = Math.Max (containerBounds.X, driverClip.X);
-		//	containerBounds.Y = Math.Max (containerBounds.Y, driverClip.Y);
-		//	var lenOffset = (driverClip.X + driverClip.Width) - (containerBounds.X + containerBounds.Width);
-		//	if (containerBounds.X + containerBounds.Width > driverClip.X + driverClip.Width) {
-		//		containerBounds.Width = Math.Max (containerBounds.Width + lenOffset, 0);
-		//	} else {
-		//		containerBounds.Width = Math.Min (containerBounds.Width, driverClip.Width);
-		//	}
-		//	lenOffset = (driverClip.Y + driverClip.Height) - (containerBounds.Y + containerBounds.Height);
-		//	if (containerBounds.Y + containerBounds.Height > driverClip.Y + driverClip.Height) {
-		//		containerBounds.Height = Math.Max (containerBounds.Height + lenOffset, 0);
-		//	} else {
-		//		containerBounds.Height = Math.Min (containerBounds.Height, driverClip.Height);
-		//	}
-		//	return containerBounds;
-		//}
 
 		/// <summary>
 		/// Event invoked when the content area of the View is to be drawn.
