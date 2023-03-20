@@ -107,7 +107,7 @@ namespace UICatalog.Scenarios {
 				Add (border, fill, title);
 			}
 
-			private void This_MouseClick (MouseEventArgs obj)
+			private void This_MouseClick (object sender, MouseEventEventArgs obj)
 			{
 				OnMouseEvent (obj.MouseEvent);
 			}
@@ -231,7 +231,7 @@ namespace UICatalog.Scenarios {
 				}
 			}
 
-			private void Button_KeyPress (KeyEventEventArgs obj)
+			private void Button_KeyPress (object sender, KeyEventEventArgs obj)
 			{
 				switch (obj.KeyEvent.Key) {
 				case Key.End:
@@ -259,7 +259,7 @@ namespace UICatalog.Scenarios {
 				}
 			}
 
-			private void Button_MouseClick (MouseEventArgs obj)
+			private void Button_MouseClick (object sender, MouseEventEventArgs obj)
 			{
 				if (obj.MouseEvent.Flags == MouseFlags.WheeledDown) {
 					scrollView.ContentOffset = new Point (scrollView.ContentOffset.X,
@@ -272,7 +272,7 @@ namespace UICatalog.Scenarios {
 				}
 			}
 
-			private void Button_Clicked ()
+			private void Button_Clicked (object sender, EventArgs e)
 			{
 				MessageBox.Query ("Button clicked.", $"'{selected.Text}' clicked!", "Ok");
 				if (selected.Text == "Close") {

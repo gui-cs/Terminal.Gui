@@ -39,7 +39,7 @@ namespace UICatalog.Scenarios {
 					Y = 0,
 					Width = 5
 				};
-				topEdit.TextChanging += (e) => {
+				topEdit.TextChanging += (s, e) => {
 					try {
 						Thickness = new Thickness (Thickness.Left,
 							int.Parse (e.NewText.ToString ()), Thickness.Right,
@@ -59,7 +59,7 @@ namespace UICatalog.Scenarios {
 					Y = Pos.Bottom (topEdit),
 					Width = 5
 				};
-				leftEdit.TextChanging += (e) => {
+				leftEdit.TextChanging += (s, e) => {
 					try {
 						Thickness = new Thickness (int.Parse (e.NewText.ToString ()),
 							Thickness.Top, Thickness.Right,
@@ -78,7 +78,7 @@ namespace UICatalog.Scenarios {
 					Y = Pos.Bottom (topEdit),
 					Width = 5
 				};
-				rightEdit.TextChanging += (e) => {
+				rightEdit.TextChanging += (s, e) => {
 					try {
 						Thickness = new Thickness (Thickness.Left,
 							Thickness.Top, int.Parse (e.NewText.ToString ()),
@@ -97,7 +97,7 @@ namespace UICatalog.Scenarios {
 					Y = Pos.Bottom (leftEdit),
 					Width = 5
 				};
-				bottomEdit.TextChanging += (e) => {
+				bottomEdit.TextChanging += (s, e) => {
 					try {
 						Thickness = new Thickness (Thickness.Left,
 							Thickness.Top, Thickness.Right,
@@ -115,7 +115,7 @@ namespace UICatalog.Scenarios {
 					X = Pos.Center (),
 					Y = Pos.AnchorEnd (1)
 				};
-				copyTop.Clicked += () => {
+				copyTop.Clicked += (s, e) => {
 					Thickness = new Thickness (Thickness.Top);
 					if (topEdit.Text.IsEmpty) {
 						topEdit.Text = "0";
@@ -183,7 +183,7 @@ namespace UICatalog.Scenarios {
 				};
 				Add (rbBorderStyle);
 
-				rbBorderStyle.SelectedItemChanged += (e) => {
+				rbBorderStyle.SelectedItemChanged += (s, e) => {
 					viewToEdit.BorderFrame.BorderStyle = (BorderStyle)e.SelectedItem;
 					viewToEdit.SetNeedsDisplay ();
 				};
@@ -200,7 +200,7 @@ namespace UICatalog.Scenarios {
 				//	Y = 6,
 				//	SelectedItem = (int)viewToEdit.Border.BackgroundColor
 				//};
-				//rbBackground.SelectedItemChanged += (e) => {
+				//rbBackground.SelectedItemChanged += (s, e) => {
 				//	if (viewToEdit.Border != null) {
 				//		viewToEdit.Border.BackgroundColor = (Color)e.SelectedItem;
 				//	}
@@ -219,7 +219,7 @@ namespace UICatalog.Scenarios {
 				//	Y = 6,
 				//	SelectedItem = (int)viewToEdit.Border.ForgroundColor
 				//};
-				//rbBorderBrush.SelectedItemChanged += (e) => {
+				//rbBorderBrush.SelectedItemChanged += (s, e) => {
 				//	if (viewToEdit.Border != null) {
 				//		viewToEdit.Border.ForgroundColor = (Color)e.SelectedItem;
 				//	}
@@ -252,7 +252,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = Pos.Center (),
 			};
-			button.Clicked += () => MessageBox.Query (20, 7, "Hi", $"I'm a {view.GetType().Name}?", "Yes", "No");
+			button.Clicked += (s, e) => MessageBox.Query (20, 7, "Hi", $"I'm a {view.GetType().Name}?", "Yes", "No");
 			var label = new Label ($"I'm a {view.GetType ().Name}") {
 				X = Pos.Center (),
 				Y = Pos.Center () - 1,
@@ -273,7 +273,7 @@ namespace UICatalog.Scenarios {
 			view.Margin.ColorScheme = Colors.ColorSchemes ["Dialog"];
 
 			view.Add (tf1, button, label, tf2, tv);
-			view.LayoutComplete += (a) => view.Title = view.ToString ();
+			view.LayoutComplete += (s, e) => view.Title = view.ToString ();
 
 			var editor = new FramesEditor (
 				$"{Application.QuitKey} to Quit - Scenario: {GetName ()}",

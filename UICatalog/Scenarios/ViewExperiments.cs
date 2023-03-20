@@ -36,7 +36,7 @@ namespace UICatalog.Scenarios {
 					Y = 0,
 					Width = 5
 				};
-				topEdit.TextChanging += (e) => {
+				topEdit.TextChanging += (s, e) => {
 					try {
 						Thickness = new Thickness (Thickness.Left,
 							int.Parse (e.NewText.ToString ()), Thickness.Right,
@@ -56,7 +56,7 @@ namespace UICatalog.Scenarios {
 					Y = Pos.Bottom (topEdit),
 					Width = 5
 				};
-				leftEdit.TextChanging += (e) => {
+				leftEdit.TextChanging += (s, e) => {
 					try {
 						Thickness = new Thickness (int.Parse (e.NewText.ToString ()),
 							Thickness.Top, Thickness.Right,
@@ -75,7 +75,7 @@ namespace UICatalog.Scenarios {
 					Y = Pos.Bottom (topEdit),
 					Width = 5
 				};
-				rightEdit.TextChanging += (e) => {
+				rightEdit.TextChanging += (s, e) => {
 					try {
 						Thickness = new Thickness (Thickness.Left,
 							Thickness.Top, int.Parse (e.NewText.ToString ()),
@@ -94,7 +94,7 @@ namespace UICatalog.Scenarios {
 					Y = Pos.Bottom (leftEdit),
 					Width = 5
 				};
-				bottomEdit.TextChanging += (e) => {
+				bottomEdit.TextChanging += (s, e) => {
 					try {
 						Thickness = new Thickness (Thickness.Left,
 							Thickness.Top, Thickness.Right,
@@ -112,7 +112,7 @@ namespace UICatalog.Scenarios {
 					X = Pos.Center (),
 					Y = Pos.AnchorEnd (1)
 				};
-				copyTop.Clicked += () => {
+				copyTop.Clicked += (s, e) => {
 					Thickness = new Thickness (Thickness.Top);
 					if (topEdit.Text.IsEmpty) {
 						topEdit.Text = "0";
@@ -170,7 +170,7 @@ namespace UICatalog.Scenarios {
 					SelectedItem = (int)viewToEdit.BorderFrame.BorderStyle
 				};
 
-				rbBorderStyle.SelectedItemChanged += (e) => {
+				rbBorderStyle.SelectedItemChanged += (s, e) => {
 					viewToEdit.BorderFrame.BorderStyle = (BorderStyle)e.SelectedItem;
 					viewToEdit.SetNeedsDisplay ();
 				};
@@ -451,7 +451,7 @@ namespace UICatalog.Scenarios {
 			};
 			view.Add (edit);
 
-			containerLabel.LayoutComplete += (a) => {
+			containerLabel.LayoutComplete += (s, e) => {
 				containerLabel.Text = $"Container.Frame: {Application.Top.Frame} .Bounds: {Application.Top.Bounds}\nView.Frame: {view.Frame} .Bounds: {view.Bounds}\nView.ContentArea: {view.ContentArea}";
 			};
 

@@ -1,15 +1,4 @@
-﻿//
-// Authors:
-//   Miguel de Icaza (miguel@gnome.org)
-//
-// NOTE: Window is functionally identical to FrameView with the following exceptions. 
-//  - Window is a Toplevel
-//  - FrameView Does not support padding (but should)
-//  - FrameView Does not support mouse dragging
-//  - FrameView Does not support IEnumerable
-// Any updates done here should probably be done in FrameView as well; TODO: Merge these classes
-
-using System;
+﻿using System;
 using System.Collections;
 using System.Text.Json.Serialization;
 using NStack;
@@ -129,12 +118,6 @@ namespace Terminal.Gui {
 			Frame = frame;
 		}
 
-		public override void BeginInit ()
-		{
-			base.BeginInit ();
-
-		}
-
 		/// <inheritdoc/>
 		public override void Add (View view)
 		{
@@ -198,7 +181,7 @@ namespace Terminal.Gui {
 		public virtual bool OnTitleChanging (ustring oldTitle, ustring newTitle)
 		{
 			var args = new TitleEventArgs (oldTitle, newTitle);
-			TitleChanging?.Invoke (args);
+			TitleChanging?.Invoke (this, args);
 			return args.Cancel;
 		}
 
@@ -206,7 +189,7 @@ namespace Terminal.Gui {
 		/// Event fired when the <see cref="View.Title"/> is changing. Set <see cref="TitleEventArgs.Cancel"/> to 
 		/// `true` to cancel the Title change.
 		/// </summary>
-		public event Action<TitleEventArgs> TitleChanging;
+		public event EventHandler<TitleEventArgs> TitleChanging;
 
 		/// <summary>
 		/// Called when the <see cref="View.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.
@@ -216,12 +199,12 @@ namespace Terminal.Gui {
 		public virtual void OnTitleChanged (ustring oldTitle, ustring newTitle)
 		{
 			var args = new TitleEventArgs (oldTitle, newTitle);
-			TitleChanged?.Invoke (args);
+			TitleChanged?.Invoke (this, args);
 		}
 
 		/// <summary>
 		/// Event fired after the <see cref="View.Title"/> has been changed. 
 		/// </summary>
-		public event Action<TitleEventArgs> TitleChanged;
+		public event EventHandler<TitleEventArgs> TitleChanged;
 	}
 }

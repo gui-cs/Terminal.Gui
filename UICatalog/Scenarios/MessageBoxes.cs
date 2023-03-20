@@ -149,8 +149,8 @@ namespace UICatalog.Scenarios {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label) + 2
 			};
-			ckbEffect3D.Toggled += (e) => {
-				border.Effect3D = (bool)!e;
+			ckbEffect3D.Toggled += (s,e) => {
+				border.Effect3D = (bool)!e.OldValue;
 			};
 			frame.Add (ckbEffect3D);
 			var ckbWrapMessage = new CheckBox ("Wrap Message", true) {
@@ -159,9 +159,8 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (ckbWrapMessage);
 
-			frame.ForceValidatePosDim = true;
-
-			void Top_Loaded ()
+      frame.ForceValidatePosDim = true;
+			void Top_Loaded (object sender, EventArgs args)
 			{
 				frame.Height =
 					widthEdit.Frame.Height +
@@ -201,7 +200,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (frame) + 2,
 				IsDefault = true,
 			};
-			showMessageBoxButton.Clicked += () => {
+			showMessageBoxButton.Clicked += (s,e) => {
 				try {
 					int width = int.Parse (widthEdit.Text.ToString ());
 					int height = int.Parse (heightEdit.Text.ToString ());
