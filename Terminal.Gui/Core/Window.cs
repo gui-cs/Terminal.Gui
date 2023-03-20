@@ -114,11 +114,6 @@ namespace Terminal.Gui {
 			} else {
 				Border = border;
 			}
-		}
-
-		public override void BeginInit ()
-		{
-			base.BeginInit ();
 			BorderFrame.Thickness = new Thickness (1);
 			BorderFrame.BorderStyle = Border.BorderStyle;
 			BorderFrame.ColorScheme = ColorScheme;
@@ -126,6 +121,12 @@ namespace Terminal.Gui {
 
 			// TODO: Hack until Border is refactored
 			Padding.Thickness = Border.PaddingThickness ?? Padding.Thickness;
+		}
+
+		public override void BeginInit ()
+		{
+			base.BeginInit ();
+
 		}
 
 		/// <inheritdoc/>

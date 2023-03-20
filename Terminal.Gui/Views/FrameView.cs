@@ -72,7 +72,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Gui.FrameView"/> class using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
-		public FrameView () : this (title: string.Empty) { }
+		public FrameView () : this (title: string.Empty) {
+			BorderFrame.Thickness = new Thickness (1);
+			BorderFrame.BorderStyle = Border.BorderStyle;
+			BorderFrame.ColorScheme = ColorScheme;
+			BorderFrame.Data = "BorderFrame";
+		}
 
 		/// <summary>
 		/// The default <see cref="BorderStyle"/> for <see cref="FrameView"/>. The default is <see cref="BorderStyle.Single"/>.
@@ -102,10 +107,7 @@ namespace Terminal.Gui {
 		public override void BeginInit ()
 		{
 			base.BeginInit ();
-			BorderFrame.Thickness = new Thickness (1);
-			BorderFrame.BorderStyle = Border.BorderStyle;
-			BorderFrame.ColorScheme = ColorScheme;
-			BorderFrame.Data = "BorderFrame";
+
 
 		}
 

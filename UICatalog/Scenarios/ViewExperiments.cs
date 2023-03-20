@@ -1,10 +1,233 @@
-﻿using Terminal.Gui;
+﻿using System;
+using System.Linq;
+using Terminal.Gui;
 using Terminal.Gui.Configuration;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "_ View Experiments", Description: "v2 View Experiments")]
 	[ScenarioCategory ("Controls")]
 	public class ViewExperiments : Scenario {
+
+		public class ThicknessEditor : View {
+			private Thickness thickness;
+
+			public Thickness Thickness {
+				get => thickness;
+				set {
+					thickness = value;
+					ThicknessChanged?.Invoke (this, new ThicknessEventArgs () { Thickness = Thickness });
+				}
+			}
+
+			public event EventHandler<ThicknessEventArgs> ThicknessChanged;
+
+			public ThicknessEditor ()
+			{
+				Margin.Thickness = new Thickness (1);
+				BorderFrame.Thickness = new Thickness (1);
+			}
+
+			public override void BeginInit ()
+			{
+				base.BeginInit ();
+
+				var topEdit = new TextField ("") {
+					X = Pos.Center (),
+					Y = 0,
+					Width = 5
+				};
+				topEdit.TextChanging += (e) => {
+					try {
+						Thickness = new Thickness (Thickness.Left,
+							int.Parse (e.NewText.ToString ()), Thickness.Right,
+							Thickness.Bottom);
+					} catch {
+						if (!e.NewText.IsEmpty) {
+							e.Cancel = true;
+						}
+					}
+				};
+				topEdit.Text = $"{Thickness.Top}";
+
+				Add (topEdit);
+
+				var leftEdit = new TextField ("") {
+					X = 0,
+					Y = Pos.Bottom (topEdit),
+					Width = 5
+				};
+				leftEdit.TextChanging += (e) => {
+					try {
+						Thickness = new Thickness (int.Parse (e.NewText.ToString ()),
+							Thickness.Top, Thickness.Right,
+							Thickness.Bottom);
+					} catch {
+						if (!e.NewText.IsEmpty) {
+							e.Cancel = true;
+						}
+					}
+				};
+				leftEdit.Text = $"{Thickness.Left}";
+				Add (leftEdit);
+
+				var rightEdit = new TextField ("") {
+					X = Pos.Right (topEdit) + 1,
+					Y = Pos.Bottom (topEdit),
+					Width = 5
+				};
+				rightEdit.TextChanging += (e) => {
+					try {
+						Thickness = new Thickness (Thickness.Left,
+							Thickness.Top, int.Parse (e.NewText.ToString ()),
+							Thickness.Bottom);
+					} catch {
+						if (!e.NewText.IsEmpty) {
+							e.Cancel = true;
+						}
+					}
+				};
+				rightEdit.Text = $"{Thickness.Right}";
+				Add (rightEdit);
+
+				var bottomEdit = new TextField ("") {
+					X = Pos.Center (),
+					Y = Pos.Bottom (leftEdit),
+					Width = 5
+				};
+				bottomEdit.TextChanging += (e) => {
+					try {
+						Thickness = new Thickness (Thickness.Left,
+							Thickness.Top, Thickness.Right,
+							int.Parse (e.NewText.ToString ()));
+					} catch {
+						if (!e.NewText.IsEmpty) {
+							e.Cancel = true;
+						}
+					}
+				};
+				bottomEdit.Text = $"{Thickness.Bottom}";
+				Add (bottomEdit);
+
+				var copyTop = new Button ("Copy Top") {
+					X = Pos.Center (),
+					Y = Pos.AnchorEnd (1)
+				};
+				copyTop.Clicked += () => {
+					Thickness = new Thickness (Thickness.Top);
+					if (topEdit.Text.IsEmpty) {
+						topEdit.Text = "0";
+					}
+					bottomEdit.Text = leftEdit.Text = rightEdit.Text = topEdit.Text;
+				};
+				Add (copyTop);
+
+				LayoutSubviews ();
+				Height = Margin.Thickness.Vertical + BorderFrame.Thickness.Vertical + Padding.Thickness.Vertical + 4;
+				Width = 20;
+			}
+		}
+
+		public class FramesEditor : Window {
+			public FramesEditor (NStack.ustring title, View viewToEdit)
+			{
+				viewToEdit.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
+				var marginEditor = new ThicknessEditor () {
+					X = 20,
+					Y = 0,
+					Title = "Margin",
+					Thickness = viewToEdit.Margin.Thickness,
+				};
+				marginEditor.ThicknessChanged += (s, a) => {
+					viewToEdit.Margin.Thickness = a.Thickness;
+				};
+				Add (marginEditor);
+
+				viewToEdit.BorderFrame.ColorScheme = Colors.ColorSchemes ["Base"];
+				var borderEditor = new ThicknessEditor () {
+					X = Pos.Right (marginEditor),
+					Y = 0,
+					Title = "Border",
+					Thickness = viewToEdit.BorderFrame.Thickness,
+				};
+				borderEditor.ThicknessChanged += (s, a) => {
+					viewToEdit.BorderFrame.Thickness = a.Thickness;
+				};
+				Add (borderEditor);
+
+				viewToEdit.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
+				var paddingEditor = new ThicknessEditor () {
+					X = Pos.Right (borderEditor),
+					Y = 0,
+					Title = "Padding",
+					Thickness = viewToEdit.Padding.Thickness,
+				};
+				paddingEditor.ThicknessChanged += (s, a) => {
+					viewToEdit.Padding.Thickness = a.Thickness;
+				};
+				Add (paddingEditor);
+
+				viewToEdit.Y = Pos.Center () + 4;
+
+				Add (new Label ("BorderStyle:"));
+
+				var borderStyleEnum = Enum.GetValues (typeof (BorderStyle)).Cast<BorderStyle> ().ToList ();
+				var rbBorderStyle = new RadioGroup (borderStyleEnum.Select (
+					e => NStack.ustring.Make (e.ToString ())).ToArray ()) {
+
+					X = 2,
+					Y = 1,
+					SelectedItem = (int)viewToEdit.BorderFrame.BorderStyle
+				};
+				Add (rbBorderStyle);
+
+				//rbBorderStyle.SelectedItemChanged += (e) => {
+				//	viewToEdit.BorderFrame.BorderStyle = (BorderStyle)e.SelectedItem;
+				//	viewToEdit.SetNeedsDisplay ();
+				//};
+
+				//Add (new Label ("Background:") {
+				//	Y = 5
+				//});
+
+				//var colorEnum = Enum.GetValues (typeof (Color)).Cast<Color> ().ToList ();
+				//var rbBackground = new RadioGroup (colorEnum.Select (
+				//	e => NStack.ustring.Make (e.ToString ())).ToArray ()) {
+
+				//	X = 2,
+				//	Y = 6,
+				//	SelectedItem = (int)viewToEdit.Border.BackgroundColor
+				//};
+				//rbBackground.SelectedItemChanged += (e) => {
+				//	if (viewToEdit.Border != null) {
+				//		viewToEdit.Border.BackgroundColor = (Color)e.SelectedItem;
+				//	}
+				//};
+				//Add (rbBackground);
+
+				//Add (new Label ("BorderBrush:") {
+				//	X = Pos.AnchorEnd (20),
+				//	Y = 5
+				//});
+
+				//var rbBorderBrush = new RadioGroup (colorEnum.Select (
+				//	e => NStack.ustring.Make (e.ToString ())).ToArray ()) {
+
+				//	X = Pos.AnchorEnd (18),
+				//	Y = 6,
+				//	SelectedItem = (int)viewToEdit.Border.ForgroundColor
+				//};
+				//rbBorderBrush.SelectedItemChanged += (e) => {
+				//	if (viewToEdit.Border != null) {
+				//		viewToEdit.Border.ForgroundColor = (Color)e.SelectedItem;
+				//	}
+				//};
+				//Add (rbBorderBrush);
+
+				Height = 9; 
+				Title = title;
+			}
+		}
+
 		public override void Init ()
 		{
 			Application.Init ();
@@ -28,14 +251,14 @@ namespace UICatalog.Scenarios {
 
 			var view = new View () {
 				X = 2,
-				Y = Pos.Bottom(containerLabel),
+				Y = Pos.Bottom (containerLabel),
 				Height = Dim.Fill (2),
 				Width = Dim.Fill (2),
 				Title = "View with 2xMargin, 2xBorder, & 2xPadding",
 				ColorScheme = Colors.ColorSchemes ["Base"],
 			};
 
-			Application.Top.Add (view);
+			//Application.Top.Add (view);
 
 			//view.InitializeFrames ();
 			view.Margin.Thickness = new Thickness (2, 2, 2, 2);
@@ -220,6 +443,20 @@ namespace UICatalog.Scenarios {
 				containerLabel.Text = $"Container.Frame: {Application.Top.Frame} .Bounds: {Application.Top.Bounds}\nView.Frame: {view.Frame} .Bounds: {view.Bounds}\nView.ContentArea: {view.ContentArea}";
 			};
 
+			view.X = Pos.Center ();
+
+			var editor = new FramesEditor ($"Frame Editor", view) {
+				X = 0,
+				Y = Pos.Bottom (containerLabel),
+				Width = Dim.Fill (),
+			};
+
+			Application.Top.Add (editor);
+
+			view.Y = Pos.Bottom (editor);
+			view.Width = Dim.Fill ();
+			view.Height = Dim.Fill ();
+			Application.Top.Add (view);
 		}
 	}
 }

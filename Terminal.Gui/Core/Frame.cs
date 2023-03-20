@@ -7,32 +7,21 @@ using Terminal.Gui.Graphs;
 
 namespace Terminal.Gui {
 
+	// TODO: v2 - Missing 3D effect - 3D effects will be drawn by a mechanism separate from Frames
+	// TODO: v2 - If a Frame has focus, navigation keys (e.g Command.NextView) should cycle through SubViews of the Frame
+	// QUESTION: How does a user navigate out of a Frame to another Frame, or back into the Parent's SubViews?
+
 	/// <summary>
 	/// Frames are a special form of <see cref="View"/> that act as adornments; they appear outside of the <see cref="View.Bounds"/>
 	/// enabling borders, menus, etc... 
 	/// </summary>
 	public class Frame : View {
+		private Thickness _thickness;
 
-		// TODO: v2 - If a Frame has focus, navigation keys (e.g Command.NextView) should cycle through SubViews of the Frame
-		// QUESTION: How does a user navigate out of a Frame to another Frame, or back into the Parent's SubViews?
-
-		/// <summary>
-		/// Frames are a special form of <see cref="View"/> that act as adornments; they appear outside of the <see cref="View.Bounds"/>
-		/// enabling borders, menus, etc... 
-		/// </summary>
-		//public Frame ()
-		//{
-		//}
-
-		
-		internal override void CreateFrames ()
-		{
-			// Do nothing - Frame
-		}
-
+		internal override void CreateFrames (){ /* Do nothing - Frames do not have Frames */ }
 
 		/// <summary>
-		/// The Parent of this Frame. 
+		/// The Parent of this Frame (the View that this Frame surrounds).
 		/// </summary>
 		public View Parent { get; set; }
 
@@ -70,6 +59,7 @@ namespace Terminal.Gui {
 		/// <param name="clipRect"></param>
 		public virtual void OnDrawSubViews (Rect clipRect)
 		{
+			// TODO: Enable subviews of Frames (adornments).
 			//	if (Subviews == null) {
 			//		return;
 			//	}
@@ -135,10 +125,7 @@ namespace Terminal.Gui {
 			Driver.Clip = prevClip;
 		}
 
-		//public Label DiagnosticsLabel { get; set; }
-		// TODO: v2 = This is teporary; need to also enable (or not) simple way of setting 
-		// other border properties
-		// TOOD: v2 - Missing 3D effect
+		// TODO: v2 - Frame.BorderStyle is temporary - Eventually the border will be drawn by a "BorderView" that is a subview of the Frame.
 		/// <summary>
 		/// 
 		/// </summary>
@@ -147,24 +134,40 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Defines the rectangle that the <see cref="Frame"/> will use to draw its content. 
 		/// </summary>
-		public Thickness Thickness { get; set; }
+		public Thickness Thickness {
+			get { return _thickness; }
+			set {
+				var prev = _thickness;
+				_thickness = value;
+				if (prev != _thickness) {
+					OnThicknessChanged ();
+				}
+				
+			}
+		}
 
-		// TODO: v2 - This is confusing. It is a read-only property and actually only returns a size, so 
-		// should not be a Rect. However, it may make sense to keep it a Rect and support negative Location
-		// for scrolling. Still noodling this.
 		/// <summary>
-		/// Gets the rectangle that describes the inner area of the frame. The Location is always 0, 0.
+		/// Called whenever the <see cref="Thickness"/> property changes.
+		/// </summary>
+		public virtual void OnThicknessChanged ()
+		{
+			ThicknessChanged?.Invoke (this, new ThicknessEventArgs () { Thickness = Thickness });
+		}
+
+		/// <summary>
+		/// Fired whenever the <see cref="Thickness"/> property changes.
+		/// </summary>
+		public event EventHandler<ThicknessEventArgs> ThicknessChanged;
+
+		/// <summary>
+		/// Gets the rectangle that describes the inner area of the frame. The Location is always (0,0).
 		/// </summary>
 		public override Rect Bounds {
 			get {
-				if (Thickness == null) {
-					return new Rect (Point.Empty, Frame.Size);
-				}
-				// Return the frame-relative bounds 
-				return Thickness.GetInnerRect (new Rect (Point.Empty, Frame.Size));
+				return Thickness?.GetInnerRect (new Rect (Point.Empty, Frame.Size)) ?? new Rect (Point.Empty, Frame.Size);
 			}
 			set {
-				throw new InvalidOperationException ("It makes no sense to explicitly set Bounds.");
+				throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
 			}
 		}
 	}

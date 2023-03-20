@@ -477,7 +477,7 @@ namespace Terminal.Gui {
 		/// The Thickness that separates a View from other SubViews of the same SuperView. 
 		/// The Margin is not part of the View's content and is not clipped by the View's Clip Area. 
 		/// </summary>
-		public Frame Margin { get; internal set; }
+		public Frame Margin { get; private set; }
 
 		// TODO: Rename BorderFrame to Border
 		/// <summary>
@@ -486,7 +486,7 @@ namespace Terminal.Gui {
 		///  title will take up the first row and the second row will be filled with spaces. 
 		///  The Border is not part of the View's content and is not clipped by the View's `ClipArea`.
 		/// </summary>
-		public Frame BorderFrame { get; internal set; }
+		public Frame BorderFrame { get; private set; }
 
 		/// <summary>
 		/// Means the Thickness inside of an element that offsets the `Content` from the Border. 
@@ -495,7 +495,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// (NOTE: in v1 `Padding` is OUTSIDE of the `Border`). 
 		/// </remarks>
-		public Frame Padding { get; internal set; }
+		public Frame Padding { get; private set; }
 
 		/// <summary>
 		/// Gets the rectangle that describes the location and size of the area within the View where
@@ -518,19 +518,36 @@ namespace Terminal.Gui {
 		/// </summary>
 		internal virtual void CreateFrames ()
 		{
-			Margin?.Dispose ();
+			void ThicknessChangedHandler (object sender, EventArgs e)
+			{
+				SetNeedsLayout ();
+			}
+
+			if (Margin != null) {
+				Margin.ThicknessChanged -= ThicknessChangedHandler;
+				Margin.Dispose ();
+			}
 			Margin = new Frame () { Id = "Margin", Thickness = new Thickness (0) };
+			Margin.ThicknessChanged += ThicknessChangedHandler;
 			Margin.Parent = this;
 			//Margin.DiagnosticsLabel.Text = "Margin";
 
-			BorderFrame?.Dispose ();
+			if (BorderFrame != null) {
+				BorderFrame.ThicknessChanged -= ThicknessChangedHandler;
+				BorderFrame.Dispose ();
+			}
 			// TODO: create default for borderstyle
 			BorderFrame = new Frame () { Id = "BorderFrame", Thickness = new Thickness (0), BorderStyle = BorderStyle.Single };
+			BorderFrame.ThicknessChanged += ThicknessChangedHandler;
 			BorderFrame.Parent = this;
 			// TODO: Create View.AddAdornment
 
-			Padding?.Dispose ();
+			if (Padding != null) {
+				Padding.ThicknessChanged -= ThicknessChangedHandler;
+				Padding.Dispose ();
+			}
 			Padding = new Frame () { Id = "Padding", Thickness = new Thickness (0) };
+			Padding.ThicknessChanged += ThicknessChangedHandler;
 			Padding.Parent = this;
 		}
 

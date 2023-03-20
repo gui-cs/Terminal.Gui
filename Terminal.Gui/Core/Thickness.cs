@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
+using Terminal.Gui.Configuration;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -19,24 +20,25 @@ namespace Terminal.Gui {
 			}
 			return width;
 		}
+
 		/// <summary>
 		/// Gets or sets the width of the left side of the rectangle.
 		/// </summary>
 		[JsonInclude]
 		public int Left;
-		
+
 		/// <summary>
 		/// Gets or sets the width of the upper side of the rectangle.
 		/// </summary>
 		[JsonInclude]
 		public int Top;
-		
+
 		/// <summary>
 		/// Gets or sets the width of the right side of the rectangle.
 		/// </summary>
 		[JsonInclude]
 		public int Right;
-		
+
 		/// <summary>
 		/// Gets or sets the width of the lower side of the rectangle.
 		/// </summary>
@@ -70,11 +72,30 @@ namespace Terminal.Gui {
 			Right = right;
 			Bottom = bottom;
 		}
-		
-		///// <summary>
-		///// <see langword="true"/> if all dimensions are 0.
-		///// </summary>
-		//public bool Empty => Left == 0 && Top == 0 && Right == 0 && Bottom == 0;
+
+		public int Vertical {
+			get {
+				return Top + Bottom;
+			}
+			set {
+				Top = Bottom = value / 2;
+			}
+		}
+
+		public int Horizontal {
+			get {
+				return Left + Right;
+			}
+			set {
+				Left = Right = value / 2;
+			}
+		}
+
+		//public virtual void OnChanged()
+		//{
+		//	Changed?.Invoke (this, new ThicknessEventArgs () { Thickness = this });
+		//}
+		//public event EventHandler<ThicknessEventArgs> Changed;
 
 		/// <summary>
 		/// Returns a rectangle describing the location and size of the inner area of <paramref name="rect"/>
@@ -173,13 +194,15 @@ namespace Terminal.Gui {
 				}
 			}
 
-			// Draw the diagnostics label on the bottom
-			var tf = new TextFormatter () {
-				Text = label == null ? string.Empty : $"{label} {this}",
-				Alignment = TextAlignment.Centered,
-				VerticalAlignment = VerticalTextAlignment.Bottom
-			};
-			tf.Draw (rect, Application.Driver.CurrentAttribute, Application.Driver.CurrentAttribute, rect, false);
+			if ((ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FramePadding) == ConsoleDriver.DiagnosticFlags.FramePadding) {
+				// Draw the diagnostics label on the bottom
+				var tf = new TextFormatter () {
+					Text = label == null ? string.Empty : $"{label} {this}",
+					Alignment = TextAlignment.Centered,
+					VerticalAlignment = VerticalTextAlignment.Bottom
+				};
+				tf.Draw (rect, Application.Driver.CurrentAttribute, Application.Driver.CurrentAttribute, rect, false);
+			}
 
 			return GetInnerRect (rect);
 
@@ -218,7 +241,7 @@ namespace Terminal.Gui {
 			       Top == other.Top &&
 			       Bottom == other.Bottom;
 		}
-		
+
 		/// <inheritdoc/>
 		public override int GetHashCode ()
 		{
@@ -242,7 +265,7 @@ namespace Terminal.Gui {
 			return !(left == right);
 		}
 	}
-	
+
 	internal static class StringExtensions {
 		public static string Repeat (this string instr, int n)
 		{
