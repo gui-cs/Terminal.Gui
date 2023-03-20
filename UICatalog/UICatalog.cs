@@ -330,7 +330,7 @@ namespace UICatalog {
 					AllowsMarking = false,
 					CanFocus = true,
 				};
-				CategoryListView.OpenSelectedItem += (a) => {
+				CategoryListView.OpenSelectedItem += (s,a) => {
 					ScenarioListView.SetFocus ();
 				};
 				CategoryListView.SelectedItemChanged += CategoryListView_SelectedChanged;
@@ -369,8 +369,8 @@ namespace UICatalog {
 
 				ConfigurationManager.Applied += ConfigAppliedHandler;
 			}
-
-			void LoadedHandler ()
+      
+			void LoadedHandler (object sender, EventArgs args)
 			{
 				ConfigChanged ();
 
@@ -387,7 +387,7 @@ namespace UICatalog {
 					ScenarioListView.SetFocus ();
 				}
 
-				StatusBar.VisibleChanged += () => {
+				StatusBar.VisibleChanged += (s, e) => {
 					UICatalogApp.ShowStatusBar = StatusBar.Visible;
 
 					var height = (StatusBar.Visible ? 1 : 0);// + (MenuBar.Visible ? 1 : 0);
@@ -399,13 +399,13 @@ namespace UICatalog {
 				Loaded -= LoadedHandler;
 			}
 
-			private void UnloadedHandler ()
+			private void UnloadedHandler (object sender, EventArgs args)
 			{
 				ConfigurationManager.Applied -= ConfigAppliedHandler;
 				Unloaded -= UnloadedHandler;
 			}
-
-			void ConfigAppliedHandler (ConfigurationManagerEventArgs a)
+      
+			void ConfigAppliedHandler (object sender, ConfigurationManagerEventArgs a)
 			{
 				ConfigChanged ();
 			}
@@ -414,7 +414,7 @@ namespace UICatalog {
 			/// Launches the selected scenario, setting the global _selectedScenario
 			/// </summary>
 			/// <param name="e"></param>
-			void ScenarioListView_OpenSelectedItem (EventArgs e)
+			void ScenarioListView_OpenSelectedItem (object sender, EventArgs e)
 			{
 				if (_selectedScenario is null) {
 					// Save selected item state
@@ -669,7 +669,7 @@ namespace UICatalog {
 				Application.Top.SetNeedsDisplay ();
 			}
 
-			void KeyDownHandler (View.KeyEventEventArgs a)
+			void KeyDownHandler (object sender, KeyEventEventArgs a)
 			{
 				if (a.KeyEvent.IsCapslock) {
 					Capslock.Title = "Caps: On";
@@ -696,7 +696,7 @@ namespace UICatalog {
 				}
 			}
 
-			void CategoryListView_SelectedChanged (ListViewItemEventArgs e)
+			void CategoryListView_SelectedChanged (object sender, ListViewItemEventArgs e)
 			{
 				var item = _categories [e.Item];
 				List<Scenario> newlist;

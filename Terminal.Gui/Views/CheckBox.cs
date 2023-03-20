@@ -27,14 +27,14 @@ namespace Terminal.Gui {
 		///   raised when the <see cref="CheckBox"/> is activated either with
 		///   the mouse or the keyboard. The passed <c>bool</c> contains the previous state. 
 		/// </remarks>
-		public event Action<bool?> Toggled;
+		public event EventHandler<ToggleEventArgs> Toggled;
 
 		/// <summary>
 		/// Called when the <see cref="Checked"/> property changes. Invokes the <see cref="Toggled"/> event.
 		/// </summary>
-		public virtual void OnToggled (bool? previousChecked)
+		public virtual void OnToggled (ToggleEventArgs e)
 		{
-			Toggled?.Invoke (previousChecked);
+			Toggled?.Invoke (this, e);
 		}
 
 		/// <summary>
@@ -209,7 +209,8 @@ namespace Terminal.Gui {
 			} else {
 				Checked = !Checked;
 			}
-			OnToggled (previousChecked);
+			
+			OnToggled (new ToggleEventArgs (previousChecked, Checked));
 			SetNeedsDisplay ();
 			return true;
 		}

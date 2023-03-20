@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text.Json.Serialization;
 using NStack;
 using Terminal.Gui.Graphs;
@@ -85,7 +86,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		void Border_BorderChanged (Border border)
+		void Border_BorderChanged (object sender, EventArgs e)
 		{
 			Rect frame;
 			if (contentView != null && (contentView.Width is Dim || contentView.Height is Dim)) {
