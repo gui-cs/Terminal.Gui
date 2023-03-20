@@ -56,6 +56,7 @@ namespace Terminal.Gui {
 
 		void SetInitialProperties (bool autosize = true)
 		{
+			Height = 1;
 			AutoSize = autosize;
 		}
 

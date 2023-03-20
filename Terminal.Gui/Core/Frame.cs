@@ -16,7 +16,7 @@ namespace Terminal.Gui {
 	/// enabling borders, menus, etc... 
 	/// </summary>
 	public class Frame : View {
-		private Thickness _thickness;
+		private Thickness _thickness = Thickness.Empty;
 
 		internal override void CreateFrames () { /* Do nothing - Frames do not have Frames */ }
 

@@ -121,6 +121,12 @@ namespace Terminal.Gui {
 
 			// TODO: Hack until Border is refactored
 			Padding.Thickness = Border.PaddingThickness ?? Padding.Thickness;
+
+			if (frame.IsEmpty) {
+				// Make it bigger to fit the margin, border, & padding
+				frame = new Rect (frame.Location, new Size (Margin.Thickness.Horizontal + BorderFrame.Thickness.Horizontal + Padding.Thickness.Horizontal + 1, Margin.Thickness.Vertical + BorderFrame.Thickness.Vertical + Padding.Thickness.Vertical + 1));
+			}
+			Frame = frame;
 		}
 
 		public override void BeginInit ()
