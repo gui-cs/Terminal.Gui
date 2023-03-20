@@ -1332,6 +1332,23 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Converts a point from screen-relative coordinates to bounds-relative coordinates.
+		/// </summary>
+		/// <returns>The mapped point.</returns>
+		/// <param name="x">X screen-coordinate point.</param>
+		/// <param name="y">Y screen-coordinate point.</param>
+		public Point ScreenToBounds (int x, int y)
+		{
+			if (SuperView == null) {
+				var inner = Padding.Thickness.GetInnerRect (BorderFrame.Thickness.GetInnerRect (Margin.Thickness.GetInnerRect (Frame)));
+				return new Point (x - inner.X, y - inner.Y);
+			} else {
+				var parent = SuperView.ScreenToView (x, y);
+				return new Point (parent.X - frame.X, parent.Y - frame.Y);
+			}
+		}
+
+		/// <summary>
 		/// Converts a view-relative location to a screen-relative location (col,row). The output is optionally clamped to the screen dimensions.
 		/// </summary>
 		/// <param name="col">View-relative column.</param>
@@ -2904,6 +2921,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+		// TODO: v2 Nuke teh Border property (rename BorderFrame to Border)
 		Border border;
 
 		/// <inheritdoc/>
@@ -2924,6 +2942,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+		// TODO: v2 nuke This
 		/// <summary>
 		/// </summary>
 		public virtual bool IgnoreBorderPropertyOnRedraw { get; set; }

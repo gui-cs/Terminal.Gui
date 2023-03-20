@@ -21,7 +21,7 @@ namespace Terminal.Gui {
 		internal override void CreateFrames (){ /* Do nothing - Frames do not have Frames */ }
 
 		/// <summary>
-		/// The Parent of this Frame (the View that this Frame surrounds).
+		/// The Parent of this Frame (the View this Frame surrounds).
 		/// </summary>
 		public View Parent { get; set; }
 
@@ -89,10 +89,6 @@ namespace Terminal.Gui {
 		{
 			if (Thickness == Thickness.Empty) return;
 
-			//OnDrawContent (bounds);
-			//OnDrawSubViews (bounds);
-			//OnDrawContentComplete (bounds);
-
 			if (ColorScheme != null) {
 				Driver.SetAttribute (ColorScheme.Normal);
 			}
@@ -102,7 +98,7 @@ namespace Terminal.Gui {
 			var screenBounds = ViewToScreen (Frame);
 			Thickness.Draw (screenBounds, (string)(Data != null ? Data : string.Empty));
 
-			//OnDrawContent (bounds); 
+			//OnDrawSubviews (bounds); 
 
 			if (BorderStyle != BorderStyle.None) {
 				var lc = new LineCanvas ();

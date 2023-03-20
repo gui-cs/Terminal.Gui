@@ -671,6 +671,15 @@ namespace Terminal.Gui {
 			return start;
 		}
 
+		/// <summary>
+		/// Finds the deepest view at the specified coordinates.
+		/// </summary>
+		/// <param name="start"></param>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <param name="resx"></param>
+		/// <param name="resy"></param>
+		/// <returns></returns>
 		static View FindDeepestView (View start, int x, int y, out int resx, out int resy)
 		{
 			var startFrame = start.Frame;
@@ -681,6 +690,7 @@ namespace Terminal.Gui {
 				return null;
 			}
 
+			startFrame = start.Padding.Thickness.GetInnerRect (start.BorderFrame.Thickness.GetInnerRect (start.Margin.Thickness.GetInnerRect (startFrame)));
 			if (start.InternalSubviews != null) {
 				int count = start.InternalSubviews.Count;
 				if (count > 0) {
@@ -810,7 +820,7 @@ namespace Terminal.Gui {
 			if (mouseGrabView != null) {
 				view ??= mouseGrabView;
 
-				var newxy = mouseGrabView.ScreenToView (me.X, me.Y);
+				var newxy = mouseGrabView.ScreenToBounds (me.X, me.Y);
 				var nme = new MouseEvent () {
 					X = newxy.X,
 					Y = newxy.Y,
