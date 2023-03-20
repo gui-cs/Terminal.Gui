@@ -75,7 +75,7 @@ namespace Terminal.Gui {
 		public FrameView () : this (title: string.Empty) {
 			BorderFrame.Thickness = new Thickness (1);
 			BorderFrame.BorderStyle = Border.BorderStyle;
-			BorderFrame.ColorScheme = ColorScheme;
+			//BorderFrame.ColorScheme = ColorScheme;
 			BorderFrame.Data = "BorderFrame";
 		}
 

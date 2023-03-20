@@ -530,7 +530,6 @@ namespace Terminal.Gui {
 			Margin = new Frame () { Id = "Margin", Thickness = new Thickness (0) };
 			Margin.ThicknessChanged += ThicknessChangedHandler;
 			Margin.Parent = this;
-			//Margin.DiagnosticsLabel.Text = "Margin";
 
 			if (BorderFrame != null) {
 				BorderFrame.ThicknessChanged -= ThicknessChangedHandler;
@@ -540,6 +539,7 @@ namespace Terminal.Gui {
 			BorderFrame = new Frame () { Id = "BorderFrame", Thickness = new Thickness (0), BorderStyle = BorderStyle.Single };
 			BorderFrame.ThicknessChanged += ThicknessChangedHandler;
 			BorderFrame.Parent = this;
+
 			// TODO: Create View.AddAdornment
 
 			if (Padding != null) {
@@ -552,8 +552,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Lays out the views <see cref="Frame"/>s objects (<see cref="Margin"/>, <see cref="BorderFrame"/>, and <see cref="Padding"/> 
-		/// as needed. Causes each Frame to Layout it's subviews.
+		/// Lays out the view's <see cref="Frame"/> objects (<see cref="Margin"/>, <see cref="BorderFrame"/>, and <see cref="Padding"/> 
+		/// as needed. Causes each Frame to Layout its SubViews.
 		/// </summary>
 		public void LayoutFrames ()
 		{
@@ -593,7 +593,8 @@ namespace Terminal.Gui {
 		ustring title;
 
 		/// <summary>
-		/// The title to be displayed for this <see cref="View"/>.
+		/// The title to be displayed for this <see cref="View"/>. The title will be displayed if <see cref="BorderFrame"/>.<see cref="Thickness.Top"/>
+		/// is greater than 0.
 		/// </summary>
 		/// <value>The title.</value>
 		public ustring Title {

@@ -116,7 +116,7 @@ namespace Terminal.Gui {
 			}
 			BorderFrame.Thickness = new Thickness (1);
 			BorderFrame.BorderStyle = Border.BorderStyle;
-			BorderFrame.ColorScheme = ColorScheme;
+			//BorderFrame.ColorScheme = ColorScheme;
 			BorderFrame.Data = "BorderFrame";
 
 			// TODO: Hack until Border is refactored

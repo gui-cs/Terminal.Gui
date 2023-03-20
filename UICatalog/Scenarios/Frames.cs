@@ -74,7 +74,7 @@ namespace UICatalog.Scenarios {
 				Add (leftEdit);
 
 				var rightEdit = new TextField ("") {
-					X = Pos.Right (topEdit) + 1,
+					X = Pos.Right (topEdit),
 					Y = Pos.Bottom (topEdit),
 					Width = 5
 				};
@@ -183,10 +183,10 @@ namespace UICatalog.Scenarios {
 				};
 				Add (rbBorderStyle);
 
-				//rbBorderStyle.SelectedItemChanged += (e) => {
-				//	viewToEdit.BorderFrame.BorderStyle = (BorderStyle)e.SelectedItem;
-				//	viewToEdit.SetNeedsDisplay ();
-				//};
+				rbBorderStyle.SelectedItemChanged += (e) => {
+					viewToEdit.BorderFrame.BorderStyle = (BorderStyle)e.SelectedItem;
+					viewToEdit.SetNeedsDisplay ();
+				};
 
 				//Add (new Label ("Background:") {
 				//	Y = 5

@@ -23,7 +23,7 @@ namespace UICatalog.Scenarios {
 
 			public ThicknessEditor ()
 			{
-				Margin.Thickness = new Thickness (1);
+				Margin.Thickness = new Thickness (0);
 				BorderFrame.Thickness = new Thickness (1);
 			}
 
@@ -71,7 +71,7 @@ namespace UICatalog.Scenarios {
 				Add (leftEdit);
 
 				var rightEdit = new TextField ("") {
-					X = Pos.Right (topEdit) + 1,
+					X = Pos.Right (topEdit),
 					Y = Pos.Bottom (topEdit),
 					Width = 5
 				};
@@ -132,11 +132,12 @@ namespace UICatalog.Scenarios {
 			{
 				viewToEdit.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
 				var marginEditor = new ThicknessEditor () {
-					X = 20,
+					X = 0,
 					Y = 0,
 					Title = "Margin",
 					Thickness = viewToEdit.Margin.Thickness,
 				};
+				marginEditor.Margin.Thickness = new Thickness (0, 0, 1, 0);
 				marginEditor.ThicknessChanged += (s, a) => {
 					viewToEdit.Margin.Thickness = a.Thickness;
 				};
@@ -149,14 +150,35 @@ namespace UICatalog.Scenarios {
 					Title = "Border",
 					Thickness = viewToEdit.BorderFrame.Thickness,
 				};
+				borderEditor.Margin.Thickness = new Thickness (0, 0, 1, 0);
 				borderEditor.ThicknessChanged += (s, a) => {
 					viewToEdit.BorderFrame.Thickness = a.Thickness;
 				};
 				Add (borderEditor);
 
+				var styleLabel = new Label ("BorderStyle: ") {
+					X = Pos.Right (borderEditor),
+					Y = 0
+				};
+				Add (styleLabel);
+
+				var borderStyleEnum = Enum.GetValues (typeof (BorderStyle)).Cast<BorderStyle> ().ToList ();
+				var rbBorderStyle = new RadioGroup (borderStyleEnum.Select (
+					e => NStack.ustring.Make (e.ToString ())).ToArray ()) {
+					X = Pos.Left (styleLabel),
+					Y = Pos.Bottom (styleLabel),
+					SelectedItem = (int)viewToEdit.BorderFrame.BorderStyle
+				};
+
+				rbBorderStyle.SelectedItemChanged += (e) => {
+					viewToEdit.BorderFrame.BorderStyle = (BorderStyle)e.SelectedItem;
+					viewToEdit.SetNeedsDisplay ();
+				};
+				Add (rbBorderStyle);
+
 				viewToEdit.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
 				var paddingEditor = new ThicknessEditor () {
-					X = Pos.Right (borderEditor),
+					X = Pos.Right (styleLabel),
 					Y = 0,
 					Title = "Padding",
 					Thickness = viewToEdit.Padding.Thickness,
@@ -168,17 +190,7 @@ namespace UICatalog.Scenarios {
 
 				viewToEdit.Y = Pos.Center () + 4;
 
-				Add (new Label ("BorderStyle:"));
 
-				var borderStyleEnum = Enum.GetValues (typeof (BorderStyle)).Cast<BorderStyle> ().ToList ();
-				var rbBorderStyle = new RadioGroup (borderStyleEnum.Select (
-					e => NStack.ustring.Make (e.ToString ())).ToArray ()) {
-
-					X = 2,
-					Y = 1,
-					SelectedItem = (int)viewToEdit.BorderFrame.BorderStyle
-				};
-				Add (rbBorderStyle);
 
 				//rbBorderStyle.SelectedItemChanged += (e) => {
 				//	viewToEdit.BorderFrame.BorderStyle = (BorderStyle)e.SelectedItem;
@@ -223,7 +235,7 @@ namespace UICatalog.Scenarios {
 				//};
 				//Add (rbBorderBrush);
 
-				Height = 9; 
+				Height = 8; 
 				Title = title;
 			}
 		}

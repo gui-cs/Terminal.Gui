@@ -18,7 +18,7 @@ namespace Terminal.Gui {
 	public class Frame : View {
 		private Thickness _thickness;
 
-		internal override void CreateFrames (){ /* Do nothing - Frames do not have Frames */ }
+		internal override void CreateFrames () { /* Do nothing - Frames do not have Frames */ }
 
 		/// <summary>
 		/// The Parent of this Frame (the View this Frame surrounds).
@@ -91,6 +91,8 @@ namespace Terminal.Gui {
 
 			if (ColorScheme != null) {
 				Driver.SetAttribute (ColorScheme.Normal);
+			} else {
+				Driver.SetAttribute (Parent.GetNormalColor ());
 			}
 
 			var prevClip = SetClip (Frame);
@@ -100,22 +102,45 @@ namespace Terminal.Gui {
 
 			//OnDrawSubviews (bounds); 
 
-			if (BorderStyle != BorderStyle.None) {
+			// TODO: v2 - this will eventually be two controls: "BorderView" and "Label" (for the title)
+			if (Id == "BorderFrame" && BorderStyle != BorderStyle.None) {
 				var lc = new LineCanvas ();
-				lc.AddLine (screenBounds.Location, Frame.Width - 1, Orientation.Horizontal, BorderStyle);
-				lc.AddLine (screenBounds.Location, Frame.Height - 1, Orientation.Vertical, BorderStyle);
+				if (Thickness.Top > 0) {
+					if (ustring.IsNullOrEmpty (Parent?.Title)) {
+						lc.AddLine (screenBounds.Location, Frame.Width - 1, Orientation.Horizontal, BorderStyle);
+					} else {
 
-				lc.AddLine (new Point (screenBounds.X, screenBounds.Y + screenBounds.Height - 1), screenBounds.Width - 1, Orientation.Horizontal, BorderStyle);
-				lc.AddLine (new Point (screenBounds.X + screenBounds.Width - 1, screenBounds.Y), screenBounds.Height - 1, Orientation.Vertical, BorderStyle);
+						lc.AddLine (screenBounds.Location, Frame.Width - 1, Orientation.Horizontal, BorderStyle);
+
+						//// ╔╡ Title ╞═════╗
+						//// Add a short horiz line for ╔╡
+						//lc.AddLine (screenBounds.Location, 1, Orientation.Horizontal, BorderStyle);
+						//// Add a short vert line for ╔╡
+						//lc.AddLine (new Point (screenBounds.X + 1, screenBounds.Location.Y - 1), 1, Orientation.Vertical, BorderStyle.Single);
+						//// Add a short vert line for ╞
+						//lc.AddLine (new Point (screenBounds.X + (Parent.Title.Length + 3), screenBounds.Location.Y - 1), 1, Orientation.Vertical, BorderStyle.Single);
+						//// Add the right hand line for ╞═════╗
+						//lc.AddLine (new Point (screenBounds.X + (Parent.Title.Length + 3), screenBounds.Location.Y), Frame.Width - 1 - (Parent.Title.Length + 2), Orientation.Horizontal, BorderStyle);
+					}
+				}
+				if (Thickness.Left > 0) {
+					lc.AddLine (screenBounds.Location, Frame.Height - 1, Orientation.Vertical, BorderStyle);
+				}
+				if (Thickness.Bottom > 0) {
+					lc.AddLine (new Point (screenBounds.X, screenBounds.Y + screenBounds.Height - 1), screenBounds.Width - 1, Orientation.Horizontal, BorderStyle);
+				}
+				if (Thickness.Right > 0) {
+					lc.AddLine (new Point (screenBounds.X + screenBounds.Width - 1, screenBounds.Y), screenBounds.Height - 1, Orientation.Vertical, BorderStyle);
+				}
 				foreach (var p in lc.GenerateImage (screenBounds)) {
 					Driver.Move (p.Key.X, p.Key.Y);
 					Driver.AddRune (p.Value);
 				}
+			}
+			if (Id == "BorderFrame" && Thickness.Top > 0 && !ustring.IsNullOrEmpty (Parent?.Title)) {
 
-				if (!ustring.IsNullOrEmpty (Parent?.Title)) {
-					Driver.SetAttribute (Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetNormalColor ());
-					Driver.DrawWindowTitle (screenBounds, Parent?.Title, 0, 0, 0, 0);
-				}
+				Driver.SetAttribute (Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetNormalColor ());
+				Driver.DrawWindowTitle (screenBounds, Parent?.Title, 0, 0, 0, 0);
 			}
 
 			Driver.Clip = prevClip;
@@ -138,7 +163,7 @@ namespace Terminal.Gui {
 				if (prev != _thickness) {
 					OnThicknessChanged ();
 				}
-				
+
 			}
 		}
 
