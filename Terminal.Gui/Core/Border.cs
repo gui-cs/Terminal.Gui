@@ -90,7 +90,7 @@ namespace Terminal.Gui {
 		public bool Effect3D { get; set; }
 		public Thickness BorderThickness { get; set; }
 		public object Effect3DBrush { get; set; }
-		public Thickness Padding { get; set; }
+		public Thickness PaddingThickness { get; set; }
 
 		/// <summary>
 		/// Invoke the <see cref="BorderChanged"/> event.

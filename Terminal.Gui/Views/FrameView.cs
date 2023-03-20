@@ -102,7 +102,7 @@ namespace Terminal.Gui {
 		public override void BeginInit ()
 		{
 			base.BeginInit ();
-			BorderFrame.Thickness = new Thickness (2);
+			BorderFrame.Thickness = new Thickness (1);
 			BorderFrame.BorderStyle = Border.BorderStyle;
 			BorderFrame.ColorScheme = ColorScheme;
 			BorderFrame.Data = "BorderFrame";

@@ -22,7 +22,7 @@ namespace Terminal.Gui.CoreTests {
 			Assert.Equal (Thickness.Empty, b.BorderThickness);
 			Assert.Equal (Color.Black, b.ForgroundColor);
 			Assert.Equal (Color.Black, b.BackgroundColor);
-			Assert.Equal (Thickness.Empty, b.Padding);
+			Assert.Equal (Thickness.Empty, b.PaddingThickness);
 			Assert.False (b.Effect3D);
 			Assert.Equal (new Point (1, 1), b.Effect3DOffset);
 			Assert.Null (b.Effect3DBrush);
@@ -570,7 +570,7 @@ namespace Terminal.Gui.CoreTests {
 				Border = new Border () {
 					BorderStyle = BorderStyle.Single,
 					DrawMarginFrame = true,
-					Padding = new Thickness (1),
+					PaddingThickness = new Thickness (1),
 					ForgroundColor = Color.White
 				}
 			};

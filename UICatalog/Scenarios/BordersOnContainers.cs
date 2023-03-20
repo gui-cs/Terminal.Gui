@@ -24,7 +24,7 @@ namespace UICatalog.Scenarios {
 				DrawMarginFrame = drawMarginFrame,
 				BorderThickness = borderThickness,
 				ForgroundColor = borderBrush,
-				Padding = padding,
+				PaddingThickness = padding,
 				BackgroundColor = background,
 				Effect3D = effect3D,
 				//Title = typeName
@@ -66,16 +66,16 @@ namespace UICatalog.Scenarios {
 			};
 			paddingTopEdit.TextChanging += (e) => {
 				try {
-					smartView.Border.Padding = new Thickness (smartView.Border.Padding.Left,
-						int.Parse (e.NewText.ToString ()), smartView.Border.Padding.Right,
-						smartView.Border.Padding.Bottom);
+					smartView.Border.PaddingThickness = new Thickness (smartView.Border.PaddingThickness.Left,
+						int.Parse (e.NewText.ToString ()), smartView.Border.PaddingThickness.Right,
+						smartView.Border.PaddingThickness.Bottom);
 				} catch {
 					if (!e.NewText.IsEmpty) {
 						e.Cancel = true;
 					}
 				}
 			};
-			paddingTopEdit.Text = $"{smartView.Border.Padding.Top}";
+			paddingTopEdit.Text = $"{smartView.Border.PaddingThickness.Top}";
 
 			Add (paddingTopEdit);
 
@@ -86,16 +86,16 @@ namespace UICatalog.Scenarios {
 			};
 			paddingLeftEdit.TextChanging += (e) => {
 				try {
-					smartView.Border.Padding = new Thickness (int.Parse (e.NewText.ToString ()),
-						smartView.Border.Padding.Top, smartView.Border.Padding.Right,
-						smartView.Border.Padding.Bottom);
+					smartView.Border.PaddingThickness = new Thickness (int.Parse (e.NewText.ToString ()),
+						smartView.Border.PaddingThickness.Top, smartView.Border.PaddingThickness.Right,
+						smartView.Border.PaddingThickness.Bottom);
 				} catch {
 					if (!e.NewText.IsEmpty) {
 						e.Cancel = true;
 					}
 				}
 			};
-			paddingLeftEdit.Text = $"{smartView.Border.Padding.Left}";
+			paddingLeftEdit.Text = $"{smartView.Border.PaddingThickness.Left}";
 			Add (paddingLeftEdit);
 
 			var paddingRightEdit = new TextField ("") {
@@ -105,16 +105,16 @@ namespace UICatalog.Scenarios {
 			};
 			paddingRightEdit.TextChanging += (e) => {
 				try {
-					smartView.Border.Padding = new Thickness (smartView.Border.Padding.Left,
-						smartView.Border.Padding.Top, int.Parse (e.NewText.ToString ()),
-						smartView.Border.Padding.Bottom);
+					smartView.Border.PaddingThickness = new Thickness (smartView.Border.PaddingThickness.Left,
+						smartView.Border.PaddingThickness.Top, int.Parse (e.NewText.ToString ()),
+						smartView.Border.PaddingThickness.Bottom);
 				} catch {
 					if (!e.NewText.IsEmpty) {
 						e.Cancel = true;
 					}
 				}
 			};
-			paddingRightEdit.Text = $"{smartView.Border.Padding.Right}";
+			paddingRightEdit.Text = $"{smartView.Border.PaddingThickness.Right}";
 			Add (paddingRightEdit);
 
 			var paddingBottomEdit = new TextField ("") {
@@ -124,8 +124,8 @@ namespace UICatalog.Scenarios {
 			};
 			paddingBottomEdit.TextChanging += (e) => {
 				try {
-					smartView.Border.Padding = new Thickness (smartView.Border.Padding.Left,
-						smartView.Border.Padding.Top, smartView.Border.Padding.Right,
+					smartView.Border.PaddingThickness = new Thickness (smartView.Border.PaddingThickness.Left,
+						smartView.Border.PaddingThickness.Top, smartView.Border.PaddingThickness.Right,
 						int.Parse (e.NewText.ToString ()));
 				} catch {
 					if (!e.NewText.IsEmpty) {
@@ -133,7 +133,7 @@ namespace UICatalog.Scenarios {
 					}
 				}
 			};
-			paddingBottomEdit.Text = $"{smartView.Border.Padding.Bottom}";
+			paddingBottomEdit.Text = $"{smartView.Border.PaddingThickness.Bottom}";
 			Add (paddingBottomEdit);
 
 			var replacePadding = new Button ("Replace all based on top") {
@@ -141,7 +141,7 @@ namespace UICatalog.Scenarios {
 				Y = 5
 			};
 			replacePadding.Clicked += () => {
-				smartView.Border.Padding = new Thickness (smartView.Border.Padding.Top);
+				smartView.Border.PaddingThickness = new Thickness (smartView.Border.PaddingThickness.Top);
 				if (paddingTopEdit.Text.IsEmpty) {
 					paddingTopEdit.Text = "0";
 				}

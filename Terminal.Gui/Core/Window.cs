@@ -109,7 +109,7 @@ namespace Terminal.Gui {
 				// TODO: v2 this is a hack until Border gets refactored
 				Border = new Border () {
 					BorderStyle = DefaultBorderStyle,
-					Padding = new Thickness (padding),
+					PaddingThickness = new Thickness (padding),
 				};
 			} else {
 				Border = border;
@@ -124,7 +124,8 @@ namespace Terminal.Gui {
 			BorderFrame.ColorScheme = ColorScheme;
 			BorderFrame.Data = "BorderFrame";
 
-			Padding.Thickness = Border.Padding;
+			// TODO: Hack until Border is refactored
+			Padding.Thickness = Border.PaddingThickness ?? Padding.Thickness;
 		}
 
 		/// <inheritdoc/>

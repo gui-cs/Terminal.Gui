@@ -356,7 +356,7 @@ namespace Terminal.Gui {
 			// the left and right edge
 			ButtonAlignment = ButtonAlignments.Justify;
 			this.Border.BorderStyle = BorderStyle.Double;
-			this.Border.Padding = new Thickness (0);
+			this.Border.PaddingThickness = new Thickness (0);
 
 			//// Add a horiz separator
 			//var separator = new LineView (Graphs.Orientation.Horizontal) {
