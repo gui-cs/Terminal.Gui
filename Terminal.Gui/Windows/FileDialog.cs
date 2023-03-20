@@ -2162,7 +2162,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			private void ShowHeaderContextMenu (DataColumn clickedCol, MouseEventEventArgs e)
+			private void ShowHeaderContextMenu (DataColumn clickedCol, MouseEventArgs e)
 			{
 				var sort = this.GetProposedNewSortOrder (clickedCol, out var isAsc);
 
