@@ -236,7 +236,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual void OnClicked ()
 		{
-			Clicked?.Invoke ();
+			Clicked?.Invoke (this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -248,7 +248,7 @@ namespace Terminal.Gui {
 		///   raised when the button is activated either with
 		///   the mouse or the keyboard.
 		/// </remarks>
-		public event Action Clicked;
+		public event EventHandler Clicked;
 
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)

@@ -115,7 +115,7 @@ namespace Terminal.Gui {
 	///     instead of on every run.
 	///   </para>
 	/// </remarks>
-	public class View : Responder, ISupportInitializeNotification {
+	public partial class View : Responder, ISupportInitializeNotification {
 
 		internal enum Direction {
 			Forward,
@@ -131,59 +131,59 @@ namespace Terminal.Gui {
 		ShortcutHelper shortcutHelper;
 
 		/// <summary>
-		/// Event fired when a subview is being added to this view.
+		/// Event fired when this view is added to another.
 		/// </summary>
-		public event Action<View> Added;
+		public event EventHandler<SuperViewChangedEventArgs> Added;
 
 		/// <summary>
-		/// Event fired when a subview is being removed from this view.
+		/// Event fired when this view is removed from another.
 		/// </summary>
-		public event Action<View> Removed;
+		public event EventHandler<SuperViewChangedEventArgs> Removed;
 
 		/// <summary>
 		/// Event fired when the view gets focus.
 		/// </summary>
-		public event Action<FocusEventArgs> Enter;
+		public event EventHandler<FocusEventArgs> Enter;
 
 		/// <summary>
 		/// Event fired when the view looses focus.
 		/// </summary>
-		public event Action<FocusEventArgs> Leave;
+		public event EventHandler<FocusEventArgs> Leave;
 
 		/// <summary>
 		/// Event fired when the view receives the mouse event for the first time.
 		/// </summary>
-		public event Action<MouseEventArgs> MouseEnter;
+		public event EventHandler<MouseEventEventArgs> MouseEnter;
 
 		/// <summary>
 		/// Event fired when the view receives a mouse event for the last time.
 		/// </summary>
-		public event Action<MouseEventArgs> MouseLeave;
+		public event EventHandler<MouseEventEventArgs> MouseLeave;
 
 		/// <summary>
 		/// Event fired when a mouse event is generated.
 		/// </summary>
-		public event Action<MouseEventArgs> MouseClick;
+		public event EventHandler<MouseEventEventArgs> MouseClick;
 
 		/// <summary>
 		/// Event fired when the <see cref="CanFocus"/> value is being changed.
 		/// </summary>
-		public event Action CanFocusChanged;
+		public event EventHandler CanFocusChanged;
 
 		/// <summary>
 		/// Event fired when the <see cref="Enabled"/> value is being changed.
 		/// </summary>
-		public event Action EnabledChanged;
+		public event EventHandler EnabledChanged;
 
 		/// <summary>
 		/// Event fired when the <see cref="Visible"/> value is being changed.
 		/// </summary>
-		public event Action VisibleChanged;
+		public event EventHandler VisibleChanged;
 
 		/// <summary>
 		/// Event invoked when the <see cref="HotKey"/> is changed.
 		/// </summary>
-		public event Action<Key> HotKeyChanged;
+		public event EventHandler<KeyChangedEventArgs> HotKeyChanged;
 
 		Key hotKey = Key.Null;
 
@@ -866,9 +866,9 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 		}
 
-		void TextFormatter_HotKeyChanged (Key obj)
+		void TextFormatter_HotKeyChanged (object sender, KeyChangedEventArgs e)
 		{
-			HotKeyChanged?.Invoke (obj);
+			HotKeyChanged?.Invoke (this, e);
 		}
 
 		/// <summary>
@@ -983,7 +983,8 @@ namespace Terminal.Gui {
 			}
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
-			OnAdded (view);
+      
+			OnAdded (new SuperViewChangedEventArgs (this, view));
 			if (IsInitialized && !view.IsInitialized) {
 				view.BeginInit ();
 				view.EndInit ();
@@ -1043,7 +1044,7 @@ namespace Terminal.Gui {
 				if (v.Frame.IntersectsWith (touched))
 					view.SetNeedsDisplay ();
 			}
-			OnRemoved (view);
+			OnRemoved (new SuperViewChangedEventArgs (this, view));
 			if (focused == view) {
 				focused = null;
 			}
@@ -1373,55 +1374,37 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Defines the event arguments for <see cref="SetFocus(View)"/>
-		/// </summary>
-		public class FocusEventArgs : EventArgs {
-			/// <summary>
-			/// Constructs.
-			/// </summary>
-			/// <param name="view">The view that gets or loses focus.</param>
-			public FocusEventArgs (View view) { View = view; }
-			/// <summary>
-			/// Indicates if the current focus event has already been processed and the driver should stop notifying any other event subscriber.
-			/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
-			/// </summary>
-			public bool Handled { get; set; }
-			/// <summary>
-			/// Indicates the current view that gets or loses focus.
-			/// </summary>
-			public View View { get; set; }
-		}
-
-		/// <summary>
 		/// Method invoked when a subview is being added to this view.
 		/// </summary>
-		/// <param name="view">The subview being added.</param>
-		public virtual void OnAdded (View view)
+		/// <param name="e">Event where <see cref="ViewEventArgs.View"/> is the subview being added.</param>
+		public virtual void OnAdded (SuperViewChangedEventArgs e)
 		{
+			var view = e.Child;
 			view.IsAdded = true;
 			view.x ??= view.frame.X;
 			view.y ??= view.frame.Y;
 			view.width ??= view.frame.Width;
 			view.height ??= view.frame.Height;
 
-			view.Added?.Invoke (this);
+			view.Added?.Invoke (this, e);
 		}
 
 		/// <summary>
 		/// Method invoked when a subview is being removed from this view.
 		/// </summary>
-		/// <param name="view">The subview being removed.</param>
-		public virtual void OnRemoved (View view)
+		/// <param name="e">Event args describing the subview being removed.</param>
+		public virtual void OnRemoved (SuperViewChangedEventArgs e)
 		{
+			var view = e.Child;
 			view.IsAdded = false;
-			view.Removed?.Invoke (this);
+			view.Removed?.Invoke (this, e);
 		}
 
 		/// <inheritdoc/>
 		public override bool OnEnter (View view)
 		{
 			var args = new FocusEventArgs (view);
-			Enter?.Invoke (args);
+			Enter?.Invoke (this, args);
 			if (args.Handled)
 				return true;
 			if (base.OnEnter (view))
@@ -1434,7 +1417,7 @@ namespace Terminal.Gui {
 		public override bool OnLeave (View view)
 		{
 			var args = new FocusEventArgs (view);
-			Leave?.Invoke (args);
+			Leave?.Invoke (this, args);
 			if (args.Handled)
 				return true;
 			if (base.OnLeave (view))
@@ -1641,7 +1624,7 @@ namespace Terminal.Gui {
 		/// Rect provides the view-relative rectangle describing the currently visible viewport into the <see cref="View"/>.
 		/// </para>
 		/// </remarks>
-		public event Action<Rect> DrawContent;
+		public event EventHandler<DrawEventArgs> DrawContent;
 
 		/// <summary>
 		/// Enables overrides to draw infinitely scrolled content and/or a background behind added controls. 
@@ -1652,7 +1635,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public virtual void OnDrawContent (Rect viewport)
 		{
-			DrawContent?.Invoke (viewport);
+			DrawContent?.Invoke (this, new DrawEventArgs (viewport));
 		}
 
 		/// <summary>
@@ -1666,7 +1649,7 @@ namespace Terminal.Gui {
 		/// Rect provides the view-relative rectangle describing the currently visible viewport into the <see cref="View"/>.
 		/// </para>
 		/// </remarks>
-		public event Action<Rect> DrawContentComplete;
+		public event EventHandler<DrawEventArgs> DrawContentComplete;
 
 		/// <summary>
 		/// Enables overrides after completed drawing infinitely scrolled content and/or a background behind removed controls.
@@ -1677,7 +1660,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public virtual void OnDrawContentComplete (Rect viewport)
 		{
-			DrawContentComplete?.Invoke (viewport);
+			DrawContentComplete?.Invoke (this, new DrawEventArgs (viewport));
 		}
 
 		/// <summary>
@@ -1730,29 +1713,9 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Defines the event arguments for <see cref="KeyEvent"/>
-		/// </summary>
-		public class KeyEventEventArgs : EventArgs {
-			/// <summary>
-			/// Constructs.
-			/// </summary>
-			/// <param name="ke"></param>
-			public KeyEventEventArgs (KeyEvent ke) => KeyEvent = ke;
-			/// <summary>
-			/// The <see cref="KeyEvent"/> for the event.
-			/// </summary>
-			public KeyEvent KeyEvent { get; set; }
-			/// <summary>
-			/// Indicates if the current Key event has already been processed and the driver should stop notifying any other event subscriber.
-			/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
-			/// </summary>
-			public bool Handled { get; set; } = false;
-		}
-
-		/// <summary>
 		/// Invoked when a character key is pressed and occurs after the key up event.
 		/// </summary>
-		public event Action<KeyEventEventArgs> KeyPress;
+		public event EventHandler<KeyEventEventArgs> KeyPress;
 
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
@@ -1762,11 +1725,11 @@ namespace Terminal.Gui {
 			}
 
 			var args = new KeyEventEventArgs (keyEvent);
-			KeyPress?.Invoke (args);
+			KeyPress?.Invoke (this, args);
 			if (args.Handled)
 				return true;
 			if (Focused?.Enabled == true) {
-				Focused?.KeyPress?.Invoke (args);
+				Focused?.KeyPress?.Invoke (this, args);
 				if (args.Handled)
 					return true;
 			}
@@ -1938,7 +1901,7 @@ namespace Terminal.Gui {
 
 			var args = new KeyEventEventArgs (keyEvent);
 			if (MostFocused?.Enabled == true) {
-				MostFocused?.KeyPress?.Invoke (args);
+				MostFocused?.KeyPress?.Invoke (this, args);
 				if (args.Handled)
 					return true;
 			}
@@ -1961,11 +1924,11 @@ namespace Terminal.Gui {
 			}
 
 			var args = new KeyEventEventArgs (keyEvent);
-			KeyPress?.Invoke (args);
+			KeyPress?.Invoke (this, args);
 			if (args.Handled)
 				return true;
 			if (MostFocused?.Enabled == true) {
-				MostFocused?.KeyPress?.Invoke (args);
+				MostFocused?.KeyPress?.Invoke (this, args);
 				if (args.Handled)
 					return true;
 			}
@@ -1983,7 +1946,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when a key is pressed.
 		/// </summary>
-		public event Action<KeyEventEventArgs> KeyDown;
+		public event EventHandler<KeyEventEventArgs> KeyDown;
 
 		/// <inheritdoc/>
 		public override bool OnKeyDown (KeyEvent keyEvent)
@@ -1993,12 +1956,12 @@ namespace Terminal.Gui {
 			}
 
 			var args = new KeyEventEventArgs (keyEvent);
-			KeyDown?.Invoke (args);
+			KeyDown?.Invoke (this, args);
 			if (args.Handled) {
 				return true;
 			}
 			if (Focused?.Enabled == true) {
-				Focused.KeyDown?.Invoke (args);
+				Focused.KeyDown?.Invoke (this, args);
 				if (args.Handled) {
 					return true;
 				}
@@ -2013,7 +1976,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when a key is released.
 		/// </summary>
-		public event Action<KeyEventEventArgs> KeyUp;
+		public event EventHandler<KeyEventEventArgs> KeyUp;
 
 		/// <inheritdoc/>
 		public override bool OnKeyUp (KeyEvent keyEvent)
@@ -2023,12 +1986,12 @@ namespace Terminal.Gui {
 			}
 
 			var args = new KeyEventEventArgs (keyEvent);
-			KeyUp?.Invoke (args);
+			KeyUp?.Invoke (this, args);
 			if (args.Handled) {
 				return true;
 			}
 			if (Focused?.Enabled == true) {
-				Focused.KeyUp?.Invoke (args);
+				Focused.KeyUp?.Invoke (this, args);
 				if (args.Handled) {
 					return true;
 				}
@@ -2320,29 +2283,19 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Event arguments for the <see cref="LayoutComplete"/> event.
-		/// </summary>
-		public class LayoutEventArgs : EventArgs {
-			/// <summary>
-			/// The view-relative bounds of the <see cref="View"/> before it was laid out.
-			/// </summary>
-			public Rect OldBounds { get; set; }
-		}
-
-		/// <summary>
 		/// Fired after the View's <see cref="LayoutSubviews"/> method has completed. 
 		/// </summary>
 		/// <remarks>
 		/// Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has otherwise changed.
 		/// </remarks>
-		public event Action<LayoutEventArgs> LayoutStarted;
+		public event EventHandler<LayoutEventArgs> LayoutStarted;
 
 		/// <summary>
 		/// Raises the <see cref="LayoutStarted"/> event. Called from  <see cref="LayoutSubviews"/> before any subviews have been laid out.
 		/// </summary>
 		internal virtual void OnLayoutStarted (LayoutEventArgs args)
 		{
-			LayoutStarted?.Invoke (args);
+			LayoutStarted?.Invoke (this, args);
 		}
 
 		/// <summary>
@@ -2351,7 +2304,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has otherwise changed.
 		/// </remarks>
-		public event Action<LayoutEventArgs> LayoutComplete;
+		public event EventHandler<LayoutEventArgs> LayoutComplete;
 
 		/// <summary>
 		/// Event called only once when the <see cref="View"/> is being initialized for the first time.
@@ -2365,7 +2318,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		internal virtual void OnLayoutComplete (LayoutEventArgs args)
 		{
-			LayoutComplete?.Invoke (args);
+			LayoutComplete?.Invoke (this, args);
 		}
 
 		internal void CollectPos (Pos pos, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
@@ -2458,9 +2411,13 @@ namespace Terminal.Gui {
 				(var from, var to) = edges.First ();
 				if (from != superView?.GetTopSuperView (to, from)) {
 					if (!ReferenceEquals (from, to)) {
-						throw new InvalidOperationException ($"TopologicalSort (for Pos/Dim) cannot find {from} linked with {to}. Did you forget to add it to {superView}?");
+						if (ReferenceEquals (from.SuperView, to)) {
+							throw new InvalidOperationException ($"ComputedLayout for \"{superView}\": \"{to}\" references a SubView (\"{from}\").");
+						} else {
+							throw new InvalidOperationException ($"ComputedLayout for \"{superView}\": \"{from}\" linked with \"{to}\" was not found. Did you forget to add it to {superView}?");
+						}
 					} else {
-						throw new InvalidOperationException ("TopologicalSort encountered a recursive cycle in the relative Pos/Dim in the views of " + superView);
+						throw new InvalidOperationException ($"ComputedLayout for \"{superView}\": A recursive cycle was found in the relative Pos/Dim of the SubViews.");
 					}
 				}
 			}
@@ -2876,7 +2833,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Gets the dimensions required for <see cref="Text"/> ignoring a <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/>.
-		/// /// <summary/>
+		/// </summary>
 		/// <returns></returns>
 		public Size GetSizeNeededForTextWithoutHotKey ()
 		{
@@ -2886,7 +2843,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Gets the dimensions required for <see cref="Text"/> accounting for a <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> .
-		/// <summary/>
+		/// </summary>
 		/// <returns></returns>
 		public Size GetSizeNeededForTextAndHotKey ()
 		{
@@ -2900,34 +2857,6 @@ namespace Terminal.Gui {
 			    frame.Size.Height + GetHotKeySpecifierLength (false));
 		}
 
-		/// <summary>
-		/// Specifies the event arguments for <see cref="MouseEvent"/>. This is a higher-level construct
-		/// than the wrapped <see cref="MouseEvent"/> class and is used for the events defined on <see cref="View"/>
-		/// and subclasses of View (e.g. <see cref="View.MouseEnter"/> and <see cref="View.MouseClick"/>).
-		/// </summary>
-		public class MouseEventArgs : EventArgs {
-			/// <summary>
-			/// Constructs.
-			/// </summary>
-			/// <param name="me"></param>
-			public MouseEventArgs (MouseEvent me) => MouseEvent = me;
-			/// <summary>
-			/// The <see cref="MouseEvent"/> for the event.
-			/// </summary>
-			public MouseEvent MouseEvent { get; set; }
-
-			/// <summary>
-			/// Indicates if the current mouse event has already been processed and the driver should stop notifying any other event subscriber.
-			/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
-			/// </summary>
-			/// <remarks>This property forwards to the <see cref="MouseEvent.Handled"/> property and is provided as a convenience and for
-			/// backwards compatibility</remarks>
-			public bool Handled {
-				get => MouseEvent.Handled;
-				set => MouseEvent.Handled = value;
-			}
-		}
-
 		/// <inheritdoc/>
 		public override bool OnMouseEnter (MouseEvent mouseEvent)
 		{
@@ -2939,8 +2868,8 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var args = new MouseEventArgs (mouseEvent);
-			MouseEnter?.Invoke (args);
+			var args = new MouseEventEventArgs (mouseEvent);
+			MouseEnter?.Invoke (this, args);
 
 			return args.Handled || base.OnMouseEnter (mouseEvent);
 		}
@@ -2956,8 +2885,8 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var args = new MouseEventArgs (mouseEvent);
-			MouseLeave?.Invoke (args);
+			var args = new MouseEventEventArgs (mouseEvent);
+			MouseLeave?.Invoke (this, args);
 
 			return args.Handled || base.OnMouseLeave (mouseEvent);
 		}
@@ -2977,7 +2906,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var args = new MouseEventArgs (mouseEvent);
+			var args = new MouseEventEventArgs (mouseEvent);
 			if (OnMouseClick (args))
 				return true;
 			if (MouseEvent (mouseEvent))
@@ -2997,24 +2926,24 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invokes the MouseClick event.
 		/// </summary>
-		protected bool OnMouseClick (MouseEventArgs args)
+		protected bool OnMouseClick (MouseEventEventArgs args)
 		{
 			if (!Enabled) {
 				return true;
 			}
 
-			MouseClick?.Invoke (args);
+			MouseClick?.Invoke (this, args);
 			return args.Handled;
 		}
 
 		/// <inheritdoc/>
-		public override void OnCanFocusChanged () => CanFocusChanged?.Invoke ();
+		public override void OnCanFocusChanged () => CanFocusChanged?.Invoke (this, EventArgs.Empty);
 
 		/// <inheritdoc/>
-		public override void OnEnabledChanged () => EnabledChanged?.Invoke ();
+		public override void OnEnabledChanged () => EnabledChanged?.Invoke (this, EventArgs.Empty);
 
 		/// <inheritdoc/>
-		public override void OnVisibleChanged () => VisibleChanged?.Invoke ();
+		public override void OnVisibleChanged () => VisibleChanged?.Invoke (this, EventArgs.Empty);
 
 		/// <inheritdoc/>
 		protected override void Dispose (bool disposing)

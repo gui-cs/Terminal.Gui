@@ -734,7 +734,7 @@ namespace Terminal.Gui {
 			// May have been updated after instance was constructed
 			this.btnOk.Text = Style.OkButtonText;
 
-			treeView.AddObjects(Style.TreeRootGetter ());
+			treeView.AddObjects (Style.TreeRootGetter ());
 
 			// if filtering on file type is configured then create the ComboBox and establish
 			// initial filtering by extension(s)
@@ -896,8 +896,8 @@ namespace Terminal.Gui {
 			var e = new FilesSelectedEventArgs (this);
 
 			this.FilesSelected?.Invoke (this, e);
-			
-			if(e.Cancel) {
+
+			if (e.Cancel) {
 				return;
 			}
 

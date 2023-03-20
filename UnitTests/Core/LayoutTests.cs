@@ -47,6 +47,56 @@ namespace Terminal.Gui.CoreTests {
 			Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
 		}
 
+		[Fact]
+		public void LayoutSubviews_No_SuperView ()
+		{
+			var root = new View ();
+			var first = new View () { Id = "first", X = 1, Y = 2, Height = 3, Width = 4 };
+			root.Add (first);
+
+			var second = new View () { Id = "second" };
+			root.Add (second);
+
+			second.X = Pos.Right (first) + 1;
+
+			root.LayoutSubviews ();
+			
+			Assert.Equal (6, second.Frame.X);
+		}
+
+		[Fact]
+		public void LayoutSubviews_RootHas_SuperView ()
+		{
+			var top = new View ();
+			var root = new View ();
+			top.Add (root);
+
+			var first = new View () { Id = "first", X = 1, Y = 2, Height = 3, Width = 4 };
+			root.Add (first);
+
+			var second = new View () { Id = "second" };
+			root.Add (second);
+
+			second.X = Pos.Right (first) + 1;
+
+			root.LayoutSubviews ();
+
+			Assert.Equal (6, second.Frame.X);
+		}
+
+
+		[Fact]
+		public void LayoutSubviews_ViewThatRefsSuperView_Throws ()
+		{
+			var root = new View ();
+			var super = new View ();
+			root.Add (super);
+			var sub = new View ();
+			super.Add (sub);
+			super.Width = Dim.Width (sub);
+			Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
+		}
+
 		[Fact, AutoInitShutdown]
 		public void TrySetWidth_ForceValidatePosDim ()
 		{
