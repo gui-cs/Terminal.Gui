@@ -2833,7 +2833,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Gets the dimensions required for <see cref="Text"/> ignoring a <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/>.
-		/// /// <summary/>
+		/// </summary>
 		/// <returns></returns>
 		public Size GetSizeNeededForTextWithoutHotKey ()
 		{
@@ -2843,7 +2843,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Gets the dimensions required for <see cref="Text"/> accounting for a <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> .
-		/// <summary/>
+		/// </summary>
 		/// <returns></returns>
 		public Size GetSizeNeededForTextAndHotKey ()
 		{
