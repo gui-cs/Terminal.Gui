@@ -108,7 +108,7 @@ namespace UICatalog.Scenarios {
 
 		private void SetupHandler (Button btn)
 		{
-			btn.Clicked += () => {
+			btn.Clicked += (s,e) => {
 				var fd = new FileDialog () {
 					OpenMode = Enum.Parse<OpenMode> (
 						rgOpenMode.RadioLabels [rgOpenMode.SelectedItem].ToString ()),

@@ -255,8 +255,8 @@ namespace Terminal.Gui {
 					// TODO: Fiddle factor, seems the Bounds are wrong for someone
 					- 2)
 			};
-			this.btnOk.Clicked += this.Accept;
-			this.btnOk.KeyPress += (k) => {
+			this.btnOk.Clicked += (s,e)=> this.Accept();
+			this.btnOk.KeyPress += (s,k) => {
 				this.NavigateIf (k, Key.CursorLeft, this.btnCancel);
 				this.NavigateIf (k, Key.CursorUp, this.tableView);
 			};
@@ -272,30 +272,30 @@ namespace Terminal.Gui {
 					- 2
 					)
 			};
-			this.btnCancel.KeyPress += (k) => {
+			this.btnCancel.KeyPress += (s, k) => {
 				this.NavigateIf (k, Key.CursorLeft, this.btnToggleSplitterCollapse);
 				this.NavigateIf (k, Key.CursorUp, this.tableView);
 				this.NavigateIf (k, Key.CursorRight, this.btnOk);
 			};
-			this.btnCancel.Clicked += () => {
+			this.btnCancel.Clicked += (s,e) => {
 				Application.RequestStop ();
 			};
 
 			this.lblUp = new Label (Driver.UpArrow.ToString ()) { X = 0, Y = 1 };
-			this.lblUp.Clicked += () => this.history.Up ();
+			this.lblUp.Clicked += (s, e) => this.history.Up ();
 
 			this.lblBack = new Label (Driver.LeftArrow.ToString ()) { X = 2, Y = 1 };
-			this.lblBack.Clicked += () => this.history.Back ();
+			this.lblBack.Clicked += (s, e) => this.history.Back ();
 
 			this.lblForward = new Label (Driver.RightArrow.ToString ()) { X = 3, Y = 1 };
-			this.lblForward.Clicked += () => this.history.Forward ();
+			this.lblForward.Clicked += (s, e) => this.history.Forward ();
 			this.tbPath = new TextFieldWithAppendAutocomplete {
 				X = Pos.Right (lblPath),
 				Width = Dim.Fill (1),
 				Caption = Style.PathCaption,
 				CaptionColor = Color.DarkGray,
 			};
-			this.tbPath.KeyPress += (k) => {
+			this.tbPath.KeyPress += (s, k) => {
 				ClearFeedback ();
 
 				this.NavigateIf (k, Key.CursorDown, this.tableView);
@@ -326,7 +326,7 @@ namespace Terminal.Gui {
 			};
 			this.tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
 			Style.TableStyle = tableView.Style;
-			this.tableView.KeyPress += (k) => {
+			this.tableView.KeyPress += (s, k) => {
 				if (this.tableView.SelectedRow <= 0) {
 					this.NavigateIf (k, Key.CursorUp, this.tbPath);
 				} else {
@@ -361,7 +361,7 @@ namespace Terminal.Gui {
 			this.btnToggleSplitterCollapse = new Button (">>") {
 				Y = Pos.AnchorEnd (1),
 			};
-			this.btnToggleSplitterCollapse.Clicked += () => {
+			this.btnToggleSplitterCollapse.Clicked += (s, e) => {
 				var tile = this.splitContainer.Tiles.ElementAt (0);
 
 				var newState = !tile.ContentView.Visible;
@@ -384,8 +384,8 @@ namespace Terminal.Gui {
 				Visible = false,
 			};
 
-			tbFind.TextChanged += (o) => RestartSearch ();
-			tbFind.KeyPress += (o) => {
+			tbFind.TextChanged += (s, o) => RestartSearch ();
+			tbFind.KeyPress += (s, o) => {
 				if (o.KeyEvent.Key == Key.Enter) {
 					RestartSearch ();
 					o.Handled = true;
@@ -407,10 +407,10 @@ namespace Terminal.Gui {
 
 			this.tableView.Table = this.dtFiles;
 
-			this.tbPath.TextChanged += (s) => this.PathChanged ();
+			this.tbPath.TextChanged += (s,e) => this.PathChanged ();
 
 			this.tableView.CellActivated += this.CellActivate;
-			this.tableView.KeyUp += (k) => k.Handled = this.TableView_KeyUp (k.KeyEvent);
+			this.tableView.KeyUp += (s, k) => k.Handled = this.TableView_KeyUp (k.KeyEvent);
 			this.tableView.SelectedCellChanged += this.TableView_SelectedCellChanged;
 			this.tableView.ColorScheme = ColorSchemeDefault;
 
@@ -421,7 +421,7 @@ namespace Terminal.Gui {
 
 
 			this.treeView.ColorScheme = ColorSchemeDefault;
-			this.treeView.KeyDown += (k) => {
+			this.treeView.KeyDown += (s, k) => {
 
 
 				var selected = treeView.SelectedObject;
@@ -764,7 +764,7 @@ namespace Terminal.Gui {
 				};
 				AllowedTypeMenuClicked (0);
 
-				allowedTypeMenuBar.Enter += (e) => {
+				allowedTypeMenuBar.Enter += (s, e) => {
 					allowedTypeMenuBar.OpenMenu (0);
 				};
 
@@ -945,7 +945,7 @@ namespace Terminal.Gui {
 			this.lblUp.Visible = this.history.CanUp ();
 		}
 
-		private void TableView_SelectedCellChanged (TableView.SelectedCellChangedEventArgs obj)
+		private void TableView_SelectedCellChanged (object sender, SelectedCellChangedEventArgs obj)
 		{
 			if (!this.tableView.HasFocus || obj.NewRow == -1 || obj.Table.Rows.Count == 0) {
 				return;
@@ -1065,7 +1065,7 @@ namespace Terminal.Gui {
 			this.tableView.Style.RowColorGetter = this.ColorGetter;
 		}
 
-		private void CellActivate (TableView.CellActivatedEventArgs obj)
+		private void CellActivate (object sender, CellActivatedEventArgs obj)
 		{
 			var multi = this.MultiRowToStats ();
 			string reason = null;
@@ -1766,7 +1766,7 @@ namespace Terminal.Gui {
 
 			public TextFieldWithAppendAutocomplete ()
 			{
-				this.KeyPress += (k) => {
+				this.KeyPress += (s, k) => {
 					var key = k.KeyEvent.Key;
 					if (key == Key.Tab) {
 						k.Handled = this.AcceptSelectionIfAny ();
@@ -2055,7 +2055,7 @@ namespace Terminal.Gui {
 				this.tableView = tableView;
 
 				// if user clicks the mouse in TableView
-				this.tableView.MouseClick += e => {
+				this.tableView.MouseClick += (s,e) => {
 
 					this.tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out DataColumn clickedCol);
 
@@ -2162,7 +2162,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			private void ShowHeaderContextMenu (DataColumn clickedCol, View.MouseEventArgs e)
+			private void ShowHeaderContextMenu (DataColumn clickedCol, MouseEventEventArgs e)
 			{
 				var sort = this.GetProposedNewSortOrder (clickedCol, out var isAsc);
 
