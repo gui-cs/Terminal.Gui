@@ -5,7 +5,7 @@ IMPORTANT: I am critical of the existing codebase below. Do not take any of this
 ALSO IMPORTANT: I've written this to encourage and drive DEBATE. My style is to "Have strong opinions, weakly held." If you read something here you don't understand or don't agree with, SAY SO. Tell me why. Take a stand. 
 
 This covers my thinking on how we will refactor `View` and the classes in the `View` hierarchy (including `Responder`). It does not cover Text formatting which will be covered in another spec. 
-  * TrueColor support which will be covered separately.
+  * TrueColor support will be covered separately.
   * ConsoleDriver refactor.
 
 ## Goals
@@ -30,6 +30,7 @@ This covers my thinking on how we will refactor `View` and the classes in the `V
   * *Thickness* - A class describing a rectangle where each of the four sides can have a width. Valid width values are >= 0. The inner area of a Thickness is the sum of the widths of the four sides minus the size of the rectangle. The `Thickness` class has a `Draw` method that clears the rectangle. 
   * *Frame Class* - A `Frame` is a special form of `View` that appears outside of a normal `View`'s content area. Examples of `Frame`s are `Margin`, `Border`, and `Padding`. The `Frame` class is derived from `View` and uses a `Thickness` to hold the rectangle. 
   * *Frame* - The `Rect` that defines the location and size of the `View` including all of the margin, border, adornments, padding, and content area. The coordinates are relative to the SuperView of the View (or, in the case of `Application.Top`, `ConsoleDriver.Row == 0; ConsoleDriver.Col == 0`). The Frame's location and size are controlled by either `Absolute` or `Computed` positioning via the `.X`, `.Y`, `.Height`, and `.Width` properties of the View. 
+     * In v2, `View.Frame.Size` is the size of the `View`'s `ContentArea` plus the `Thickness` of the `View`'s `Margin`, `Border`, and `Padding`.
   * *Margin* - The `Frame` that separates a View from other SubViews of the same SuperView. The Margin is not part of the View's content and is not clipped by the View's `ClipArea`. By default `Margin` is `{0,0,0,0}`. `Margin` can be used instead of (or with) `Dim.Pos` to position a View relative to another View. 
       Eg. 
       ```cs
@@ -59,19 +60,19 @@ This covers my thinking on how we will refactor `View` and the classes in the `V
   * *ContentArea* - (NOT IMPLEMENTED YET; currently `Bounds`) The `Rect` that describes the location and size of the View's content, relative to `VisibleArea`. If `ContentArea.Location` is negative, anything drawn there will be clipped and any subview positioned in the negative area will cause (optional) scrollbars to appear (making the Thickness of Padding thicker on the appropriate sides). If `ContentArea.Size` is changed such that the dimensions fall outside of `Frame.Size shrunk by Margin + Border + `Padding`, drawing will be clipped and (optional) scrollbars will appear.
     * QUESTION: Can we just have one `ContentArea` property that is the `Rect` that describes the location and size of the View's content, relative to `Frame`? If so, we can remove `VisibleArea` and `Bounds` and just have `ContentArea` and `Frame`? The key to answering this is all wrapped up in scrolling and clipping.
   * *Bounds* - Synomous with *VisibleArea*. (Debate: Do we rename `Bounds` to `VisbleArea` in v2?)
-  * *ClipArea* - The currently vislble portion of the *Content*. This is defined as a`Rect` in coordinates relative to *ContentArea* (NOT *VisibleArea*) (e.g. `ClipArea {X = 0, Y = 0} == ContentArea {X = 0, Y = 0}`). In v2 we will NOT pass this `Rect` is passed `View.Redraw` and instead just have `Redraw` use `Bounds`. 
+  * *ClipArea* - The currently visible portion of the *Content*. This is defined as a`Rect` in coordinates relative to *ContentArea* (NOT *VisibleArea*) (e.g. `ClipArea {X = 0, Y = 0} == ContentArea {X = 0, Y = 0}`). In v2 we will NOT pass this `Rect` is passed `View.Redraw` and instead just have `Redraw` use `Bounds`. 
     * QUESTION: Do we need `ClipArea` at all? Can we just have `Redraw` use `Bounds`?
   * *Modal* - The term used when describing a View that was created using the `Application.Run(view)` or `Application.Run<T>` APIs. When a View is running as a modal, user input is restricted to just that View until `Application.Run` exits. A `Modal` View has its own `RunState`. 
   * *TopLevel* - The v1 term used to describe a view that is both Modal and can have a MenuBar and/or StatusBar. I propose in v2 we deprecate the term `TopLevel` and instead use `Modal` to describe the same thing. We can completely get rid of the `TopLevel` class! I do not think `Modal` should be a class, but a property of `View` that can be set to `true` or `false`.
   * *Window* - A View that, by default, has a `Border` and a `Title`. 
     * QUESTION: Why can't this just be a property on `View` (e.g. `View.Border = true`)? Why do we need a `Window` class at all in v2?
-  * *Tile*, *Tiled*, *Tiling* - Refer to a form of `ComputedLayout` where SubViews of a `View` are visually arranged such that they abut each other and do not overlap. In a Tiled view arrangement, there is no Z-ordering. Borders that are drawn between the SubViews can optionally support resizing the SubViews (negating the need for `TileView`).
-  * *Overlap*, *Overlapped*, *Overlapping* - Refers to a form of `ComputedLayout` where SubViews of a View are visually arranged such that their Frames overlap. In Overlap view arrangements there is a Z-axis (Z-order) in addition to the X and Y dimension. The Z-order indicates which Views are shown above other views.
+  * *Tile*, *Tiled*, *Tiling* (NOT IMPLEMENTED YET) - Refer to a form of `ComputedLayout` where SubViews of a `View` are visually arranged such that they abut each other and do not overlap. In a Tiled view arrangement, there is no Z-ordering. Borders that are drawn between the SubViews can optionally support resizing the SubViews (negating the need for `TileView`).
+  * *Overlap*, *Overlapped*, *Overlapping* (NOT IMPLEMENTED YET) - Refers to a form of `ComputedLayout` where SubViews of a View are visually arranged such that their Frames overlap. In Overlap view arrangements there is a Z-axis (Z-order) in addition to the X and Y dimension. The Z-order indicates which Views are shown above other views.
 
 ## Focus
 
 * Focus is a concept that is used to describe which Responder is currently receiving user input.
-* QUESTION: Since `Frame`s are `Views` in v2, the `Frame` is a `Responder` that receives user input. This raises the quesiton of how a user can use the keyboard to navigate between `Frame`s and `View`s within a `Frame` (and the `Frame`'s `Parent`'s subviews).
+* QUESTION: Since `Frame`s are `Views` in v2, the `Frame` is a `Responder` that receives user input. This raises the question of how a user can use the keyboard to navigate between `Frame`s and `View`s within a `Frame` (and the `Frame`'s `Parent`'s subviews).
 
 
 ## View classes to be nuked
@@ -82,15 +83,15 @@ This covers my thinking on how we will refactor `View` and the classes in the `V
 * Window?
 * `LineView` can be reimplemented using `LineCanvas`?
 * `Button` and `Label` can be merged. 
-* `StatusBar` and `MenuBar` could be combined. If not, then at least made more consistent (e.g. in how hotkeys are specified).
+* `StatusBar` and `MenuBar` could be combined. If not, then at least made consistent (e.g. in how hotkeys are specified).
 * `ComboBox` can be replaced by `MenuBar`
 
 ## What's wrong with the View and the View-class hierarchy in v1?
 
 * `Frame`, `Bounds`, and `ClipRect` are confusing and not consistently applied...
-  * `Bounds` is `Rect` but is used to describe a `Size` (e.g. `Bounds.Size` is the size of the `View`'s content area). It literaly is implemented as a property that returns `new Rect(0, 0, Width, Height)`. Throughtout the codebase `bounds` is used for things that have non-zero `Size` (and actually descibe either the cliprect or the Frame).
+  * `Bounds` is `Rect` but is used to describe a `Size` (e.g. `Bounds.Size` is the size of the `View`'s content area). It literally is implemented as a property that returns `new Rect(0, 0, Width, Height)`. Throughtout the codebase `bounds` is used for things that have non-zero `Size` (and actually descibe either the cliprect or the Frame).
   * The restrictive nature of how `Bounds` is defined led to the hacky `FrameView` and `Window` classes with an embedded `ContentView` in order to draw a border around the content. 
-    * The only reason FrameView exists is because the original architecture didn't support offsetting `View.Bounds`  such that a border could be drawn and the interior content would clip correctly. Thus Miguel (or someone) built
+    * The only reason FrameView exists is because the original architecture didn't support offsetting `View.Bounds` such that a border could be drawn and the interior content would clip correctly. Thus Miguel (or someone) built
   FrameView with nested `ContentView` that was at `new Rect(+1, +1, -2, -2)`. 
     * `Border` was added later, but couldn't be retrofitted into `View` such that if `View.Border ~= null` just worked like `FrameView`.
     * Thus devs are forced to use the clunky `FrameView` instead of just setting `View.Border`.
@@ -98,12 +99,11 @@ This covers my thinking on how we will refactor `View` and the classes in the `V
     * `Margin` on the web means the space between elements - `Border` doesn't have a margin property, but does has the confusing `DrawMarginFrame` property.
     * `Border` on the web means the space where a border is drawn. The current implementaiton confuses the term `Frame` and `Border`. `BorderThickness` is provided. 
     * `Padding` on the web means the padding inside of an element between the `Border` and `Content`. In the current implementation `Padding` is actually OUTSIDE of the `Border`. This means it's not possible for a view to offset internally by simply changing `Bounds`. 
-    * `Content` on the web means the area inside of the Margin + Border + Padding. `View` does not currently have a concept of this (but `FrameView` and `Window` do via the embeded `ContentView`s.
-    * `Border` has a `Title` property. So does `Window` and `FrameView`. This is unneeded duplicate code.
-    * It is not possilble for a class drived from View to orverride the drawing of the "Border" (frame, title, padding, etc...). Multiple devs have asked to be able to have the border frame to be drawn with a different color than `View.ColorScheme`. The API should explicitly enable devs to override the drawing of `Border` independently of the `View.Draw` method. See how `WM_NCDRAW` works in wWindows (Draw non-client). It should be easy to do this from within a `View` sub-class (e.g. override `OnDrawBorder`) and externally (e.g. `DrawBorder += () => ...`. 
+    * `Content` on the web means the area inside of the Margin + Border + Padding. `View` does not currently have a concept of this (but `FrameView` and `Window` do via the embedded `ContentView`s.
+    * `Border` has a `Title` property. So does `Window` and `FrameView`. This is duplicate code.
+    * It is not possible for a class derived from View to override the drawing of the "Border" (frame, title, padding, etc...). Multiple devs have asked to be able to have the border frame to be drawn with a different color than `View.ColorScheme`. The API should explicitly enable devs to override the drawing of `Border` independently of the `View.Draw` method. See how `WM_NCDRAW` works in Windows (Draw non-client). It should be easy to do this from within a `View` sub-class (e.g. override `OnDrawBorder`) and externally (e.g. `DrawBorder += () => ...`. 
 
-* `AutoSize` mostly works, but only because of heroic special-casing logic all over the place by @bdisp. This should be massively simplified.
-* `FrameView` is superlufous and should be removed from the heirarchy (instead devs should just be able to manipulate `View.Border` (or similar) to achieve what `FrameView` provides). The internal `FrameView.ContentView` is a bug-farm and un-needed if `View.Border` worked correctly. 
+* `AutoSize` mostly works, but only because of heroic special-casing logic all over the place by @bdisp. This should be massively simplified.`FrameView` is superfluous and should be removed from the hierarchy (instead devs should just be able to manipulate `View.Border` (or similar) to achieve what `FrameView` provides). The internal `FrameView.ContentView` is a bug-farm and un-needed if `View.Border` worked correctly. 
 * `TopLevel` is currently built around several concepts that are muddled:
   * Views that host a Menu and StatusBar. It is not clear why this is and if it's needed as a concept. 
   * Views that can be run via `Application.Run<TopLevel>` (need a separate `RunState`). It is not clear why ANY VIEW can't be run this way, but it seems to be a limitation of the current implementation.
@@ -114,21 +114,21 @@ This covers my thinking on how we will refactor `View` and the classes in the `V
 * `DrawFrame` and `DrawTitle` are implemented in `ConsoleDriver` and can be replaced by a combination of `LineCanvas` and `Border`.
 * Colors - 
   * As noted above each of Margin, Border, Padding, and Content should support independent colors.
-  * Many View sub-classes bastardize the exiting ColorSchemes to get look/feel that works (e.g. `TextView` and `Wizard`). Separately we should revamp ColorSchemes to enable more scenarios. 
+  * Many View sub-classes bastardize the existing ColorSchemes to get look/feel that works (e.g. `TextView` and `Wizard`). Separately we should revamp ColorSchemes to enable more scenarios. 
   * TrueColor support is needed and should be the default.
 * `Responder` is supposed to be where all common, non-visual-related, code goes. We should ensure this is the case.
-* `View` should have default support for scroll bars. e.g. assume in the new world `View.ContentBounds` is the clip area (defined by `VIew.Frame` minus `Margin` + `Border` + `Padding`) then if any view is added with `View.Add` that has Frame coordinates outside of `ContentBounds` the appropriate scroll bars show up automatgically (optioally of course). Without any code, scrolling just works. 
-* We have many requests to support non-full-screen apps. We need to ensure the `View` class heirachy suppports this in a simple, understandable way. In a world with non-full-screen (where screen is defined as the visible terminal view) apps, the idea that `Frame` is "screen relative" is broken. Although we COULD just define "screen" as "the area that bounds the Terminal.GUI app.".  
+* `View` should have default support for scroll bars. e.g. assume in the new world `View.ContentBounds` is the clip area (defined by `VIew.Frame` minus `Margin` + `Border` + `Padding`) then if any view is added with `View.Add` that has Frame coordinates outside of `ContentBounds` the appropriate scroll bars show up automatgically (optionally of course). Without any code, scrolling just works. 
+* We have many requests to support non-full-screen apps. We need to ensure the `View` class hierarchy supports this in a simple, understandable way. In a world with non-full-screen (where screen is defined as the visible terminal view) apps, the idea that `Frame` is "screen relative" is broken. Although we COULD just define "screen" as "the area that bounds the Terminal.GUI app.".  
 
 
 ## Design
 
 * `Responder`("Responder base class implemented by objects that want to participate on keyboard and mouse input.") remains mostly unchanged, with minor changes:
-   * Methods that take `View` parametsrs (e.g. `OnEnter`) change to take `Responder` (bad OO design).
+   * Methods that take `View` parameters (e.g. `OnEnter`) change to take `Responder` (bad OO design).
    * Nuke `IsOverriden` (bad OO design)
    * Move `View.Data` to `Responder` (primitive)
    * Move `Command` and `KeyBinding` stuff from `View`.
-   * Move generic mouse and keyboard stuff from `View` (e.g. `WantMousePositionReports`)
+   * Move the generic mouse and keyboard stuff from `View` (e.g. `WantMousePositionReports`)
 
 
 ## Example of creating Adornments
