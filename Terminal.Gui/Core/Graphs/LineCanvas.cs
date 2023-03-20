@@ -199,8 +199,8 @@ namespace Terminal.Gui.Graphs {
 			}
 
 			// TODO: Remove these two once we have all of the below ported to IntersectionRuneResolvers
-			var useDouble = intersects.Any (i => i.Line.Style == BorderStyle.Double && i.Line.Length != 0);
-			var useRounded = intersects.Any (i => i.Line.Style == BorderStyle.Rounded && i.Line.Length != 0);
+			var useDouble = intersects.Any (i => i.Line.Style == BorderStyle.Double);
+			var useRounded = intersects.Any (i => i.Line.Style == BorderStyle.Rounded);
 
 			// TODO: maybe make these resolvers to for simplicity?
 			// or for dotted lines later on or that kind of thing?
@@ -220,13 +220,6 @@ namespace Terminal.Gui.Graphs {
 
 		private IntersectionRuneType GetRuneTypeForIntersects (IntersectionDefinition [] intersects)
 		{
-			if (intersects.All (i => i.Line.Length == 0)) {
-				return IntersectionRuneType.Dot;
-			}
-
-			// ignore dots
-			intersects = intersects.Where (i => i.Type != IntersectionType.Dot).ToArray ();
-
 			var set = new HashSet<IntersectionType> (intersects.Select (i => i.Type));
 
 			#region Crosshair Conditions
@@ -504,7 +497,7 @@ namespace Terminal.Gui.Graphs {
 
 						return new IntersectionDefinition (
 							Start,
-							Length < 0 ? IntersectionType.StartLeft : IntersectionType.StartRight,
+							GetTypeByLength(IntersectionType.StartLeft, IntersectionType.PassOverHorizontal,IntersectionType.StartRight),
 							this
 							);
 
@@ -596,11 +589,6 @@ namespace Terminal.Gui.Graphs {
 			private bool StartsAt (int x, int y)
 			{
 				return Start.X == x && Start.Y == y;
-			}
-
-			private bool IsDot ()
-			{
-				return Length == 0;
 			}
 		}
 	}
