@@ -153,17 +153,17 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Event fired when the view receives the mouse event for the first time.
 		/// </summary>
-		public event EventHandler<MouseEventEventArgs> MouseEnter;
+		public event EventHandler<MouseEventArgs> MouseEnter;
 
 		/// <summary>
 		/// Event fired when the view receives a mouse event for the last time.
 		/// </summary>
-		public event EventHandler<MouseEventEventArgs> MouseLeave;
+		public event EventHandler<MouseEventArgs> MouseLeave;
 
 		/// <summary>
 		/// Event fired when a mouse event is generated.
 		/// </summary>
-		public event EventHandler<MouseEventEventArgs> MouseClick;
+		public event EventHandler<MouseEventArgs> MouseClick;
 
 		/// <summary>
 		/// Event fired when the <see cref="CanFocus"/> value is being changed.
@@ -2868,7 +2868,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var args = new MouseEventEventArgs (mouseEvent);
+			var args = new MouseEventArgs (mouseEvent);
 			MouseEnter?.Invoke (this, args);
 
 			return args.Handled || base.OnMouseEnter (mouseEvent);
@@ -2885,7 +2885,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var args = new MouseEventEventArgs (mouseEvent);
+			var args = new MouseEventArgs (mouseEvent);
 			MouseLeave?.Invoke (this, args);
 
 			return args.Handled || base.OnMouseLeave (mouseEvent);
@@ -2906,7 +2906,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var args = new MouseEventEventArgs (mouseEvent);
+			var args = new MouseEventArgs (mouseEvent);
 			if (OnMouseClick (args))
 				return true;
 			if (MouseEvent (mouseEvent))
@@ -2926,7 +2926,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invokes the MouseClick event.
 		/// </summary>
-		protected bool OnMouseClick (MouseEventEventArgs args)
+		protected bool OnMouseClick (MouseEventArgs args)
 		{
 			if (!Enabled) {
 				return true;

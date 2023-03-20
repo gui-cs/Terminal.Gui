@@ -106,7 +106,7 @@ namespace UICatalog.Scenarios {
 				Add (border, fill, title);
 			}
 
-			private void This_MouseClick (object sender, MouseEventEventArgs obj)
+			private void This_MouseClick (object sender, MouseEventArgs obj)
 			{
 				OnMouseEvent (obj.MouseEvent);
 			}
@@ -258,7 +258,7 @@ namespace UICatalog.Scenarios {
 				}
 			}
 
-			private void Button_MouseClick (object sender, MouseEventEventArgs obj)
+			private void Button_MouseClick (object sender, MouseEventArgs obj)
 			{
 				if (obj.MouseEvent.Flags == MouseFlags.WheeledDown) {
 					scrollView.ContentOffset = new Point (scrollView.ContentOffset.X,
