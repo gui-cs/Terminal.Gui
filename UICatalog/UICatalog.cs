@@ -54,7 +54,7 @@ namespace UICatalog {
 		//[SerializableConfigurationProperty (Scope = typeof (AppScope), OmitClassName = true), JsonPropertyName ("UICatalog.StatusBar")]
 		//public static bool ShowStatusBar { get; set; } = true;
 
-		[SerializableConfigurationProperty (Scope = typeof (AppScope), OmitClassName = true), JsonPropertyName("UICatalog.StatusBar")]
+		[SerializableConfigurationProperty (Scope = typeof (AppScope), OmitClassName = true), JsonPropertyName ("UICatalog.StatusBar")]
 		public static bool ShowStatusBar { get; set; } = true;
 
 		static readonly FileSystemWatcher _currentDirWatcher = new FileSystemWatcher ();
@@ -135,7 +135,8 @@ namespace UICatalog {
 			VerifyObjectsWereDisposed ();
 		}
 
-		private static void StopConfigFileWatcher() {
+		private static void StopConfigFileWatcher ()
+		{
 			_currentDirWatcher.EnableRaisingEvents = false;
 			_currentDirWatcher.Changed -= ConfigFileChanged;
 			_currentDirWatcher.Created -= ConfigFileChanged;
@@ -145,7 +146,7 @@ namespace UICatalog {
 			_homeDirWatcher.Created -= ConfigFileChanged;
 		}
 
-		private static void StartConfigFileWatcher()
+		private static void StartConfigFileWatcher ()
 		{
 			// Setup a file system watcher for `./.tui/`
 			_currentDirWatcher.NotifyFilter = NotifyFilters.LastWrite;
@@ -275,7 +276,7 @@ namespace UICatalog {
 						new MenuItem ("_gui.cs API Overview", "", () => OpenUrl ("https://gui-cs.github.io/Terminal.Gui/articles/overview.html"), null, null, Key.F1),
 						new MenuItem ("gui.cs _README", "", () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"), null, null, Key.F2),
 						new MenuItem ("_About...",
-							"About UI Catalog", () =>  MessageBox.Query ("About UI Catalog", _aboutMessage.ToString(), "_Ok"), null, null, Key.CtrlMask | Key.A),
+							"About UI Catalog", () =>  MessageBox.Query ("About UI Catalog", _aboutMessage.ToString(), 0, null, false, "_Ok"), null, null, Key.CtrlMask | Key.A),
 					}),
 				});
 
@@ -286,7 +287,7 @@ namespace UICatalog {
 				OS = new StatusItem (Key.CharMask, "OS:", null);
 
 				StatusBar = new StatusBar () {
-					Visible = UICatalogApp.ShowStatusBar					
+					Visible = UICatalogApp.ShowStatusBar
 				};
 
 				StatusBar.Items = new StatusItem [] {
@@ -303,7 +304,7 @@ namespace UICatalog {
 						StatusBar.Visible = !StatusBar.Visible;
 						ContentPane.Height = Dim.Fill(StatusBar.Visible ? 1 : 0);
 						LayoutSubviews();
-						SetChildNeedsDisplay();
+						SetSubViewNeedsDisplay();
 					}),
 					DriverName,
 					OS
@@ -320,7 +321,7 @@ namespace UICatalog {
 				ContentPane.Border.BorderStyle = BorderStyle.Single;
 				ContentPane.SetSplitterPos (0, 25);
 				ContentPane.ShortcutAction = () => ContentPane.SetFocus ();
-					
+
 				CategoryListView = new ListView (_categories) {
 					X = 0,
 					Y = 0,
@@ -329,7 +330,7 @@ namespace UICatalog {
 					AllowsMarking = false,
 					CanFocus = true,
 				};
-				CategoryListView.OpenSelectedItem += (a) => {
+				CategoryListView.OpenSelectedItem += (s,a) => {
 					ScenarioListView.SetFocus ();
 				};
 				CategoryListView.SelectedItemChanged += CategoryListView_SelectedChanged;
@@ -368,8 +369,8 @@ namespace UICatalog {
 
 				ConfigurationManager.Applied += ConfigAppliedHandler;
 			}
- 
-			void LoadedHandler ()
+      
+			void LoadedHandler (object sender, EventArgs args)
 			{
 				ConfigChanged ();
 
@@ -386,25 +387,25 @@ namespace UICatalog {
 					ScenarioListView.SetFocus ();
 				}
 
-				StatusBar.VisibleChanged += () => {
+				StatusBar.VisibleChanged += (s, e) => {
 					UICatalogApp.ShowStatusBar = StatusBar.Visible;
 
 					var height = (StatusBar.Visible ? 1 : 0);// + (MenuBar.Visible ? 1 : 0);
 					ContentPane.Height = Dim.Fill (height);
 					LayoutSubviews ();
-					SetChildNeedsDisplay ();
+					SetSubViewNeedsDisplay ();
 				};
 
 				Loaded -= LoadedHandler;
 			}
 
-			private void UnloadedHandler ()
+			private void UnloadedHandler (object sender, EventArgs args)
 			{
 				ConfigurationManager.Applied -= ConfigAppliedHandler;
 				Unloaded -= UnloadedHandler;
 			}
-			
-			void ConfigAppliedHandler (ConfigurationManagerEventArgs a)
+      
+			void ConfigAppliedHandler (object sender, ConfigurationManagerEventArgs a)
 			{
 				ConfigChanged ();
 			}
@@ -413,7 +414,7 @@ namespace UICatalog {
 			/// Launches the selected scenario, setting the global _selectedScenario
 			/// </summary>
 			/// <param name="e"></param>
-			void ScenarioListView_OpenSelectedItem (EventArgs e)
+			void ScenarioListView_OpenSelectedItem (object sender, EventArgs e)
 			{
 				if (_selectedScenario is null) {
 					// Save selected item state
@@ -631,7 +632,7 @@ namespace UICatalog {
 				if (_topLevelColorScheme == null || !Colors.ColorSchemes.ContainsKey (_topLevelColorScheme)) {
 					_topLevelColorScheme = "Base";
 				}
-				
+
 				_themeMenuItems = ((UICatalogTopLevel)Application.Top).CreateThemeMenuItems ();
 				_themeMenuBarItem.Children = _themeMenuItems;
 
@@ -668,7 +669,7 @@ namespace UICatalog {
 				Application.Top.SetNeedsDisplay ();
 			}
 
-			void KeyDownHandler (View.KeyEventEventArgs a)
+			void KeyDownHandler (object sender, KeyEventEventArgs a)
 			{
 				if (a.KeyEvent.IsCapslock) {
 					Capslock.Title = "Caps: On";
@@ -695,7 +696,7 @@ namespace UICatalog {
 				}
 			}
 
-			void CategoryListView_SelectedChanged (ListViewItemEventArgs e)
+			void CategoryListView_SelectedChanged (object sender, ListViewItemEventArgs e)
 			{
 				var item = _categories [e.Item];
 				List<Scenario> newlist;
@@ -717,7 +718,7 @@ namespace UICatalog {
 			// after a scenario was selected to run. This proves the main UI Catalog
 			// 'app' closed cleanly.
 			foreach (var inst in Responder.Instances) {
-				
+
 				Debug.Assert (inst.WasDisposed);
 			}
 			Responder.Instances.Clear ();
