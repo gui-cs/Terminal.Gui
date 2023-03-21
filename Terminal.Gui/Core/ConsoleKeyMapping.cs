@@ -65,8 +65,28 @@ namespace Terminal.Gui {
 				}
 				return sCode;
 			}
-
+			
 			return null;
+		}
+
+		/// <summary>
+		/// Gets the <see cref="ConsoleKey"/> from the provided <see cref="Key"/>.
+		/// </summary>
+		/// <param name="key"></param>
+		/// <returns></returns>
+		public static ConsoleKey GetConsoleKeyFromKey (Key key)
+		{
+			ConsoleModifiers mod = new ConsoleModifiers ();
+			if (key.HasFlag (Key.ShiftMask)) {
+				mod |= ConsoleModifiers.Shift;
+			}
+			if (key.HasFlag (Key.AltMask)) {
+				mod |= ConsoleModifiers.Alt;
+			}
+			if (key.HasFlag (Key.CtrlMask)) {
+				mod |= ConsoleModifiers.Control;
+			}
+			return (ConsoleKey)ConsoleKeyMapping.GetConsoleKeyFromKey ((uint)(key & ~Key.CtrlMask & ~Key.ShiftMask & ~Key.AltMask), mod, out _, out _);
 		}
 
 		/// <summary>

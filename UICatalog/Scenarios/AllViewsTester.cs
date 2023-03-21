@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Terminal.Gui;
+using Terminal.Gui.Configuration;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "All Views Tester", Description: "Provides a test UI for all classes derived from View.")]
@@ -40,16 +41,20 @@ namespace UICatalog.Scenarios {
 		TextField _hText;
 		int _hVal = 0;
 
-		public override void Init (ColorScheme colorScheme)
+		public override void Init ()
 		{
+			// Don't create a sub-win (Scenario.Win); just use Application.Top
 			Application.Init ();
-			// Don't create a sub-win; just use Applicatiion.Top
+			ConfigurationManager.Themes.Theme = Theme;
+			ConfigurationManager.Apply ();
+			Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
 		}
+
 
 		public override void Setup ()
 		{
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
+				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 				new StatusItem(Key.F2, "~F2~ Toggle Frame Ruler", () => {
 					ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
 					Application.Top.SetNeedsDisplay ();
@@ -83,10 +88,10 @@ namespace UICatalog.Scenarios {
 				AllowsMarking = false,
 				ColorScheme = Colors.TopLevel,
 			};
-			_classListView.OpenSelectedItem += (a) => {
+			_classListView.OpenSelectedItem += (s, a) => {
 				_settingsPane.SetFocus ();
 			};
-			_classListView.SelectedItemChanged += (args) => {
+			_classListView.SelectedItemChanged += (s,args) => {
 				ClearClass (_curView);
 				_curView = CreateClass (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
 			};
@@ -101,9 +106,9 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.TopLevel,
 			};
 			_computedCheckBox = new CheckBox ("Computed Layout", true) { X = 0, Y = 0 };
-			_computedCheckBox.Toggled += (previousState) => {
+			_computedCheckBox.Toggled += (s,e) => {
 				if (_curView != null) {
-					_curView.LayoutStyle = previousState == true ? LayoutStyle.Absolute : LayoutStyle.Computed;
+					_curView.LayoutStyle = e.OldValue == true ? LayoutStyle.Absolute : LayoutStyle.Computed;
 					_hostPane.LayoutSubviews ();
 				}
 			};
@@ -124,9 +129,9 @@ namespace UICatalog.Scenarios {
 				X = 0,
 				Y = Pos.Bottom (label),
 			};
-			_xRadioGroup.SelectedItemChanged += (selected) => DimPosChanged (_curView);
+			_xRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 			_xText = new TextField ($"{_xVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
-			_xText.TextChanged += (args) => {
+			_xText.TextChanged += (s, args) => {
 				try {
 					_xVal = int.Parse (_xText.Text.ToString ());
 					DimPosChanged (_curView);
@@ -142,7 +147,7 @@ namespace UICatalog.Scenarios {
 			label = new Label ("y:") { X = Pos.Right (_xRadioGroup) + 1, Y = 0 };
 			_locationFrame.Add (label);
 			_yText = new TextField ($"{_yVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
-			_yText.TextChanged += (args) => {
+			_yText.TextChanged += (s,args) => {
 				try {
 					_yVal = int.Parse (_yText.Text.ToString ());
 					DimPosChanged (_curView);
@@ -155,7 +160,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.X (label),
 				Y = Pos.Bottom (label),
 			};
-			_yRadioGroup.SelectedItemChanged += (selected) => DimPosChanged (_curView);
+			_yRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 			_locationFrame.Add (_yRadioGroup);
 
 			_sizeFrame = new FrameView ("Size (Dim)") {
@@ -172,9 +177,9 @@ namespace UICatalog.Scenarios {
 				X = 0,
 				Y = Pos.Bottom (label),
 			};
-			_wRadioGroup.SelectedItemChanged += (selected) => DimPosChanged (_curView);
+			_wRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 			_wText = new TextField ($"{_wVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
-			_wText.TextChanged += (args) => {
+			_wText.TextChanged += (s,args) => {
 				try {
 					switch (_wRadioGroup.SelectedItem) {
 					case 0:
@@ -197,7 +202,7 @@ namespace UICatalog.Scenarios {
 			label = new Label ("height:") { X = Pos.Right (_wRadioGroup) + 1, Y = 0 };
 			_sizeFrame.Add (label);
 			_hText = new TextField ($"{_hVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
-			_hText.TextChanged += (args) => {
+			_hText.TextChanged += (s, args) => {
 				try {
 					switch (_hRadioGroup.SelectedItem) {
 					case 0:
@@ -219,7 +224,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.X (label),
 				Y = Pos.Bottom (label),
 			};
-			_hRadioGroup.SelectedItemChanged += (selected) => DimPosChanged (_curView);
+			_hRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 			_sizeFrame.Add (_hRadioGroup);
 
 			_settingsPane.Add (_sizeFrame);
@@ -424,7 +429,7 @@ namespace UICatalog.Scenarios {
 			return view;
 		}
 
-		void LayoutCompleteHandler (View.LayoutEventArgs args)
+		void LayoutCompleteHandler (object sender, LayoutEventArgs args)
 		{
 			UpdateTitle (_curView);
 		}

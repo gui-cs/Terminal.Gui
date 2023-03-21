@@ -36,16 +36,16 @@ namespace UICatalog.Scenarios {
 						new MenuItem ("_Run Worker", "", () => workerApp.RunWorker(), null, null, Key.CtrlMask | Key.R),
 						new MenuItem ("_Cancel Worker", "", () => workerApp.CancelWorker(), null, null, Key.CtrlMask | Key.C),
 						null,
-						new MenuItem ("_Quit", "", () => Quit(), null, null, Key.CtrlMask | Key.Q)
+						new MenuItem ("_Quit", "", () => Quit(), null, null, Application.QuitKey)
 					}),
 					new MenuBarItem ("_View", new MenuItem [] { }),
 					new MenuBarItem ("_Window", new MenuItem [] { })
-				});
+				}); ;
 				menu.MenuOpening += Menu_MenuOpening;
 				Add (menu);
 
 				var statusBar = new StatusBar (new [] {
-					new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Exit", () => Quit()),
+					new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 					new StatusItem(Key.CtrlMask | Key.R, "~^R~ Run Worker", () => workerApp.RunWorker()),
 					new StatusItem(Key.CtrlMask | Key.C, "~^C~ Cancel Worker", () => workerApp.CancelWorker())
 				});
@@ -63,13 +63,13 @@ namespace UICatalog.Scenarios {
 				};
 			}
 
-			private void MdiMain_Closed (Toplevel obj)
+			private void MdiMain_Closed (object sender, ToplevelEventArgs e)
 			{
 				workerApp.Dispose ();
 				Dispose ();
 			}
 
-			private void Menu_MenuOpening (MenuOpeningEventArgs menu)
+			private void Menu_MenuOpening (object sender, MenuOpeningEventArgs menu)
 			{
 				if (!canOpenWorkerApp) {
 					canOpenWorkerApp = true;
@@ -82,14 +82,14 @@ namespace UICatalog.Scenarios {
 				}
 			}
 
-			private void MdiMain_Deactivate (Toplevel top)
+			private void MdiMain_Deactivate (object sender, ToplevelEventArgs top)
 			{
-				workerApp.WriteLog ($"{top.Data} deactivate.");
+				workerApp.WriteLog ($"{top.Toplevel.Data} deactivate.");
 			}
 
-			private void MdiMain_Activate (Toplevel top)
+			private void MdiMain_Activate (object sender, ToplevelEventArgs top)
 			{
-				workerApp.WriteLog ($"{top.Data} activate.");
+				workerApp.WriteLog ($"{top.Toplevel.Data} activate.");
 			}
 
 			private MenuBarItem View ()
@@ -312,7 +312,7 @@ namespace UICatalog.Scenarios {
 
 				Title = "Run Worker";
 
-				label = new Label ("Press start to do the work or close to exit.") {
+				label = new Label ("Press start to do the work or close to quit.") {
 					X = Pos.Center (),
 					Y = 1,
 					ColorScheme = Colors.Dialog
@@ -328,7 +328,7 @@ namespace UICatalog.Scenarios {
 				Add (listView);
 
 				start = new Button ("Start") { IsDefault = true, ClearOnVisibleFalse = false };
-				start.Clicked += () => {
+				start.Clicked += (s, e) => {
 					Staging = new Staging (DateTime.Now);
 					RequestStop ();
 				};
@@ -338,13 +338,13 @@ namespace UICatalog.Scenarios {
 				close.Clicked += OnReportClosed;
 				Add (close);
 
-				KeyPress += (e) => {
+				KeyPress += (s, e) => {
 					if (e.KeyEvent.Key == Key.Esc) {
-						OnReportClosed ();
+						OnReportClosed (this, EventArgs.Empty);
 					}
 				};
 
-				LayoutStarted += (_) => {
+				LayoutStarted += (s,e) => {
 					var btnsWidth = start.Bounds.Width + close.Bounds.Width + 2 - 1;
 					var shiftLeft = Math.Max ((Bounds.Width - btnsWidth) / 2 - 2, 0);
 
@@ -358,7 +358,7 @@ namespace UICatalog.Scenarios {
 				};
 			}
 
-			private void OnReportClosed ()
+			private void OnReportClosed (object sender, EventArgs e)
 			{
 				if (Staging?.StartStaging != null) {
 					ReportClosed?.Invoke (this);

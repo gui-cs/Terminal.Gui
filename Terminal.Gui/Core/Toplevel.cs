@@ -20,19 +20,6 @@ namespace Terminal.Gui {
 	///     and run (e.g. <see cref="Dialog"/>s. To run a Toplevel, create the <see cref="Toplevel"/> and 
 	///     call <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>.
 	///   </para>
-	///   <para>
-	///     Toplevels can also opt-in to more sophisticated initialization
-	///     by implementing <see cref="ISupportInitialize"/>. When they do
-	///     so, the <see cref="ISupportInitialize.BeginInit"/> and
-	///     <see cref="ISupportInitialize.EndInit"/> methods will be called
-	///     before running the view.
-	///     If first-run-only initialization is preferred, the <see cref="ISupportInitializeNotification"/>
-	///     can be implemented too, in which case the <see cref="ISupportInitialize"/>
-	///     methods will only be called if <see cref="ISupportInitializeNotification.IsInitialized"/>
-	///     is <see langword="false"/>. This allows proper <see cref="View"/> inheritance hierarchies
-	///     to override base class layout code optimally by doing so only on first run,
-	///     instead of on every run.
-	///   </para>
 	/// </remarks>
 	public class Toplevel : View {
 		/// <summary>
@@ -48,7 +35,7 @@ namespace Terminal.Gui {
 		/// A Loaded event handler is a good place to finalize initialization before calling 
 		/// <see cref="Application.RunLoop(Application.RunState, bool)"/>.
 		/// </summary>
-		public event Action Loaded;
+		public event EventHandler Loaded;
 
 		/// <summary>
 		/// Invoked when the Toplevel <see cref="MainLoop"/> has started it's first iteration.
@@ -57,109 +44,109 @@ namespace Terminal.Gui {
 		/// <para>A Ready event handler is a good place to finalize initialization after calling 
 		/// <see cref="Application.Run(Func{Exception, bool})"/> on this Toplevel.</para>
 		/// </summary>
-		public event Action Ready;
+		public event EventHandler Ready;
 
 		/// <summary>
 		/// Invoked when the Toplevel <see cref="Application.RunState"/> has been unloaded.
 		/// A Unloaded event handler is a good place to dispose objects after calling <see cref="Application.End(Application.RunState)"/>.
 		/// </summary>
-		public event Action Unloaded;
+		public event EventHandler Unloaded;
 
 		/// <summary>
 		/// Invoked when the Toplevel <see cref="Application.RunState"/> becomes the <see cref="Application.Current"/> Toplevel.
 		/// </summary>
-		public event Action<Toplevel> Activate;
+		public event EventHandler<ToplevelEventArgs> Activate;
 
 		/// <summary>
 		/// Invoked when the Toplevel<see cref="Application.RunState"/> ceases to be the <see cref="Application.Current"/> Toplevel.
 		/// </summary>
-		public event Action<Toplevel> Deactivate;
+		public event EventHandler<ToplevelEventArgs> Deactivate;
 
 		/// <summary>
 		/// Invoked when a child of the Toplevel <see cref="Application.RunState"/> is closed by  
 		/// <see cref="Application.End(Application.RunState)"/>.
 		/// </summary>
-		public event Action<Toplevel> ChildClosed;
+		public event EventHandler<ToplevelEventArgs> ChildClosed;
 
 		/// <summary>
 		/// Invoked when the last child of the Toplevel <see cref="Application.RunState"/> is closed from 
 		/// by <see cref="Application.End(Application.RunState)"/>.
 		/// </summary>
-		public event Action AllChildClosed;
+		public event EventHandler AllChildClosed;
 
 		/// <summary>
 		/// Invoked when the Toplevel's <see cref="Application.RunState"/> is being closed by  
 		/// <see cref="Application.RequestStop(Toplevel)"/>.
 		/// </summary>
-		public event Action<ToplevelClosingEventArgs> Closing;
+		public event EventHandler<ToplevelClosingEventArgs> Closing;
 
 		/// <summary>
 		/// Invoked when the Toplevel's <see cref="Application.RunState"/> is closed by <see cref="Application.End(Application.RunState)"/>.
 		/// </summary>
-		public event Action<Toplevel> Closed;
+		public event EventHandler<ToplevelEventArgs> Closed;
 
 		/// <summary>
 		/// Invoked when a child Toplevel's <see cref="Application.RunState"/> has been loaded.
 		/// </summary>
-		public event Action<Toplevel> ChildLoaded;
+		public event EventHandler<ToplevelEventArgs> ChildLoaded;
 
 		/// <summary>
 		/// Invoked when a cjhild Toplevel's <see cref="Application.RunState"/> has been unloaded.
 		/// </summary>
-		public event Action<Toplevel> ChildUnloaded;
+		public event EventHandler<ToplevelEventArgs> ChildUnloaded;
 
 		/// <summary>
 		/// Invoked when the terminal has been resized. The new <see cref="Size"/> of the terminal is provided.
 		/// </summary>
-		public event Action<Size> Resized;
+		public event EventHandler<SizeChangedEventArgs> Resized;
 
-		internal virtual void OnResized (Size size)
+		internal virtual void OnResized (SizeChangedEventArgs size)
 		{
-			Resized?.Invoke (size);
+			Resized?.Invoke (this, size);
 		}
 
 		internal virtual void OnChildUnloaded (Toplevel top)
 		{
-			ChildUnloaded?.Invoke (top);
+			ChildUnloaded?.Invoke (this, new ToplevelEventArgs (top));
 		}
 
 		internal virtual void OnChildLoaded (Toplevel top)
 		{
-			ChildLoaded?.Invoke (top);
+			ChildLoaded?.Invoke (this, new ToplevelEventArgs (top));
 		}
 
 		internal virtual void OnClosed (Toplevel top)
 		{
-			Closed?.Invoke (top);
+			Closed?.Invoke (this, new ToplevelEventArgs (top));
 		}
 
 		internal virtual bool OnClosing (ToplevelClosingEventArgs ev)
 		{
-			Closing?.Invoke (ev);
+			Closing?.Invoke (this, ev);
 			return ev.Cancel;
 		}
 
 		internal virtual void OnAllChildClosed ()
 		{
-			AllChildClosed?.Invoke ();
+			AllChildClosed?.Invoke (this, EventArgs.Empty);
 		}
 
 		internal virtual void OnChildClosed (Toplevel top)
 		{
 			if (IsMdiContainer) {
-				SetChildNeedsDisplay ();
+				SetSubViewNeedsDisplay ();
 			}
-			ChildClosed?.Invoke (top);
+			ChildClosed?.Invoke (this, new ToplevelEventArgs (top));
 		}
 
 		internal virtual void OnDeactivate (Toplevel activated)
 		{
-			Deactivate?.Invoke (activated);
+			Deactivate?.Invoke (this, new ToplevelEventArgs (activated));
 		}
 
 		internal virtual void OnActivate (Toplevel deactivated)
 		{
-			Activate?.Invoke (deactivated);
+			Activate?.Invoke (this, new ToplevelEventArgs (deactivated));
 		}
 
 		/// <summary>
@@ -171,7 +158,7 @@ namespace Terminal.Gui {
 			foreach (Toplevel tl in Subviews.Where (v => v is Toplevel)) {
 				tl.OnLoaded ();
 			}
-			Loaded?.Invoke ();
+			Loaded?.Invoke (this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -183,7 +170,7 @@ namespace Terminal.Gui {
 			foreach (Toplevel tl in Subviews.Where (v => v is Toplevel)) {
 				tl.OnReady ();
 			}
-			Ready?.Invoke ();
+			Ready?.Invoke (this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -194,7 +181,7 @@ namespace Terminal.Gui {
 			foreach (Toplevel tl in Subviews.Where (v => v is Toplevel)) {
 				tl.OnUnloaded ();
 			}
-			Unloaded?.Invoke ();
+			Unloaded?.Invoke (this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -220,6 +207,13 @@ namespace Terminal.Gui {
 		void Initialize ()
 		{
 			ColorScheme = Colors.TopLevel;
+
+			Application.GrabbingMouse += Application_GrabbingMouse;
+			Application.UnGrabbingMouse += Application_UnGrabbingMouse;
+
+			// TODO: v2 - ALL Views (Responders??!?!) should support the commands related to 
+			//    - Focus
+			//  Move the appropriate AddCommand calls to `Responder`
 
 			// Things this view knows how to do
 			AddCommand (Command.QuitToplevel, () => { QuitToplevel (); return true; });
@@ -256,49 +250,63 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.L | Key.CtrlMask, Command.Refresh);
 		}
 
+		private void Application_UnGrabbingMouse (object sender, GrabMouseEventArgs e)
+		{
+			if (Application.MouseGrabView == this && dragPosition.HasValue) {
+				e.Cancel = true;
+			}
+		}
+
+		private void Application_GrabbingMouse (object sender, GrabMouseEventArgs e)
+		{
+			if (Application.MouseGrabView == this && dragPosition.HasValue) {
+				e.Cancel = true;
+			}
+		}
+
 		/// <summary>
 		/// Invoked when the <see cref="Application.AlternateForwardKey"/> is changed.
 		/// </summary>
-		public event Action<Key> AlternateForwardKeyChanged;
+		public event EventHandler<KeyChangedEventArgs> AlternateForwardKeyChanged;
 
 		/// <summary>
 		/// Virtual method to invoke the <see cref="AlternateForwardKeyChanged"/> event.
 		/// </summary>
-		/// <param name="oldKey"></param>
-		public virtual void OnAlternateForwardKeyChanged (Key oldKey)
+		/// <param name="e"></param>
+		public virtual void OnAlternateForwardKeyChanged (KeyChangedEventArgs e)
 		{
-			ReplaceKeyBinding (oldKey, Application.AlternateForwardKey);
-			AlternateForwardKeyChanged?.Invoke (oldKey);
+			ReplaceKeyBinding (e.OldKey, e.NewKey);
+			AlternateForwardKeyChanged?.Invoke (this, e);
 		}
 
 		/// <summary>
 		/// Invoked when the <see cref="Application.AlternateBackwardKey"/> is changed.
 		/// </summary>
-		public event Action<Key> AlternateBackwardKeyChanged;
+		public event EventHandler<KeyChangedEventArgs> AlternateBackwardKeyChanged;
 
 		/// <summary>
 		/// Virtual method to invoke the <see cref="AlternateBackwardKeyChanged"/> event.
 		/// </summary>
-		/// <param name="oldKey"></param>
-		public virtual void OnAlternateBackwardKeyChanged (Key oldKey)
+		/// <param name="e"></param>
+		public virtual void OnAlternateBackwardKeyChanged (KeyChangedEventArgs e)
 		{
-			ReplaceKeyBinding (oldKey, Application.AlternateBackwardKey);
-			AlternateBackwardKeyChanged?.Invoke (oldKey);
+			ReplaceKeyBinding (e.OldKey, e.NewKey);
+			AlternateBackwardKeyChanged?.Invoke (this, e);
 		}
 
 		/// <summary>
 		/// Invoked when the <see cref="Application.QuitKey"/> is changed.
 		/// </summary>
-		public event Action<Key> QuitKeyChanged;
+		public event EventHandler<KeyChangedEventArgs> QuitKeyChanged;
 
 		/// <summary>
 		/// Virtual method to invoke the <see cref="QuitKeyChanged"/> event.
 		/// </summary>
-		/// <param name="oldKey"></param>
-		public virtual void OnQuitKeyChanged (Key oldKey)
+		/// <param name="e"></param>
+		public virtual void OnQuitKeyChanged (KeyChangedEventArgs e)
 		{
-			ReplaceKeyBinding (oldKey, Application.QuitKey);
-			QuitKeyChanged?.Invoke (oldKey);
+			ReplaceKeyBinding (e.OldKey, e.NewKey);
+			QuitKeyChanged?.Invoke (this, e);
 		}
 
 		/// <summary>
@@ -370,8 +378,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// <see langword="true"/> if was already loaded by the <see cref="Application.Begin(Toplevel)"/>
-		/// <see langword="false"/>, otherwise. This is used to avoid the <see cref="View.NeedDisplay"/>
-		/// having wrong values while this was not yet loaded.
+		/// <see langword="false"/>, otherwise.
 		/// </summary>
 		public bool IsLoaded { get; private set; }
 
@@ -608,7 +615,7 @@ namespace Terminal.Gui {
 		}
 
 		internal View EnsureVisibleBounds (Toplevel top, int x, int y,
-			out int nx, out int ny, out View mb, out View sb)
+			out int nx, out int ny, out MenuBar mb, out StatusBar sb)
 		{
 			int l;
 			View superView;
@@ -619,11 +626,15 @@ namespace Terminal.Gui {
 				l = top.SuperView.Frame.Width;
 				superView = top.SuperView;
 			}
-			nx = Math.Max (x, 0);
-			nx = nx + top.Frame.Width > l ? Math.Max (l - top.Frame.Width, 0) : nx;
 			var mfLength = top.Border?.DrawMarginFrame == true ? 2 : 1;
-			if (nx + mfLength > top.Frame.X + top.Frame.Width) {
-				nx = Math.Max (top.Frame.Right - mfLength, 0);
+			if (top.Frame.Width <= l) {
+				nx = Math.Max (x, 0);
+				nx = nx + top.Frame.Width > l ? Math.Max (l - top.Frame.Width, 0) : nx;
+				if (nx + mfLength > top.Frame.X + top.Frame.Width) {
+					nx = Math.Max (top.Frame.Right - mfLength, 0);
+				}
+			} else {
+				nx = x;
 			}
 			//System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
 			bool m, s;
@@ -632,7 +643,7 @@ namespace Terminal.Gui {
 				mb = Application.Top.MenuBar;
 			} else {
 				var t = top.SuperView;
-				while (!(t is Toplevel)) {
+				while (t is not Toplevel) {
 					t = t.SuperView;
 				}
 				m = ((Toplevel)t).MenuBar?.Visible == true;
@@ -649,7 +660,7 @@ namespace Terminal.Gui {
 				sb = Application.Top.StatusBar;
 			} else {
 				var t = top.SuperView;
-				while (!(t is Toplevel)) {
+				while (t is not Toplevel) {
 					t = t.SuperView;
 				}
 				s = ((Toplevel)t).StatusBar?.Visible == true;
@@ -661,9 +672,11 @@ namespace Terminal.Gui {
 				l = s ? top.SuperView.Frame.Height - 1 : top.SuperView.Frame.Height;
 			}
 			ny = Math.Min (ny, l);
-			ny = ny + top.Frame.Height >= l ? Math.Max (l - top.Frame.Height, m ? 1 : 0) : ny;
-			if (ny + mfLength > top.Frame.Y + top.Frame.Height) {
-				ny = Math.Max (top.Frame.Bottom - mfLength, 0);
+			if (top.Frame.Height <= l) {
+				ny = ny + top.Frame.Height >= l ? Math.Max (l - top.Frame.Height, m ? 1 : 0) : ny;
+				if (ny + mfLength > top.Frame.Y + top.Frame.Height) {
+					ny = Math.Max (top.Frame.Bottom - mfLength, 0);
+				}
 			}
 			//System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
 
@@ -681,28 +694,30 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Adjusts the location and size of <paramref name="top"/> within this Toplevel.
 		/// Virtual method enabling implementation of specific positions for inherited <see cref="Toplevel"/> views.
 		/// </summary>
-		/// <param name="top">The toplevel.</param>
+		/// <param name="top">The Toplevel to adjust.</param>
 		public virtual void PositionToplevel (Toplevel top)
 		{
 			var superView = EnsureVisibleBounds (top, top.Frame.X, top.Frame.Y,
-				out int nx, out int ny, out _, out View sb);
+				out int nx, out int ny, out _, out StatusBar sb);
 			bool layoutSubviews = false;
-			if ((top?.SuperView != null || (top != Application.Top && top.Modal)
+			if ((superView != top || top?.SuperView != null || (top != Application.Top && top.Modal)
 				|| (top?.SuperView == null && top.IsMdiChild))
-				&& (nx > top.Frame.X || ny > top.Frame.Y) && top.LayoutStyle == LayoutStyle.Computed) {
+				&& (top.Frame.X + top.Frame.Width > Driver.Cols || ny > top.Frame.Y) && top.LayoutStyle == LayoutStyle.Computed) {
 
-				if ((top.X == null || top.X is Pos.PosAbsolute) && top.Bounds.X != nx) {
+				if ((top.X == null || top.X is Pos.PosAbsolute) && top.Frame.X != nx) {
 					top.X = nx;
 					layoutSubviews = true;
 				}
-				if ((top.Y == null || top.Y is Pos.PosAbsolute) && top.Bounds.Y != ny) {
+				if ((top.Y == null || top.Y is Pos.PosAbsolute) && top.Frame.Y != ny) {
 					top.Y = ny;
 					layoutSubviews = true;
 				}
 			}
 
+			// TODO: v2 - This is a hack to get the StatusBar to be positioned correctly.
 			if (sb != null && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0)
 				&& top.Height is Dim.DimFill && -top.Height.Anchor (0) < 1) {
 
@@ -824,8 +839,8 @@ namespace Terminal.Gui {
 			}
 
 			if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released) && dragPosition.HasValue) {
-				Application.UngrabMouse ();
 				dragPosition = null;
+				Application.UngrabMouse ();
 			}
 
 			//System.Diagnostics.Debug.WriteLine ($"dragPosition after: {dragPosition.HasValue}");
@@ -984,6 +999,13 @@ namespace Terminal.Gui {
 		{
 			return MostFocused?.OnLeave (view) ?? base.OnLeave (view);
 		}
+
+		///<inheritdoc/>
+		protected override void Dispose (bool disposing)
+		{
+			dragPosition = null;
+			base.Dispose (disposing);
+		}
 	}
 
 	/// <summary>
@@ -1048,28 +1070,6 @@ namespace Terminal.Gui {
 				return 1;
 			else
 				return string.Compare (x.Id.ToString (), y.Id.ToString ());
-		}
-	}
-	/// <summary>
-	/// <see cref="EventArgs"/> implementation for the <see cref="Toplevel.Closing"/> event.
-	/// </summary>
-	public class ToplevelClosingEventArgs : EventArgs {
-		/// <summary>
-		/// The toplevel requesting stop.
-		/// </summary>
-		public View RequestingTop { get; }
-		/// <summary>
-		/// Provides an event cancellation option.
-		/// </summary>
-		public bool Cancel { get; set; }
-
-		/// <summary>
-		/// Initializes the event arguments with the requesting toplevel.
-		/// </summary>
-		/// <param name="requestingTop">The <see cref="RequestingTop"/>.</param>
-		public ToplevelClosingEventArgs (Toplevel requestingTop)
-		{
-			RequestingTop = requestingTop;
 		}
 	}
 }

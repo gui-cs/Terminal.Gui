@@ -18,7 +18,7 @@ NOTE: This is the WORK IN PROGRESS `v2.x` branch. The `main` branch is the stabl
 
 Paste these commands into your favorite terminal on Windows, Mac, or Linux. This will install the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates), create a new "Hello World" TUI app, and run it.
 
-(Press `CTRL-Q` to exit the app)
+(Press `CTRL-Q` to quit the app)
 
 ```powershell
 dotnet new --install Terminal.Gui.templates
@@ -82,7 +82,7 @@ public class ExampleWindow : Window {
 	
 	public ExampleWindow ()
 	{
-		Title = "Example App (Ctrl+Q to quit)";
+		Title = $"Example App ({Application.QuitKey} to quit)";
 
 		// Create input components and labels
 		var usernameLabel = new Label () { 
@@ -121,7 +121,7 @@ public class ExampleWindow : Window {
 		};
 
 		// When login button is clicked display a message popup
-		btnLogin.Clicked += () => {
+		btnLogin.Clicked += (s,e) => {
 			if (usernameText.Text == "admin" && passwordText.Text == "password") {
 				MessageBox.Query ("Logging In", "Login Successful", "Ok");
 				Application.RequestStop ();

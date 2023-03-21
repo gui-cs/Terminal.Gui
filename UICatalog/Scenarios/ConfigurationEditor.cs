@@ -36,10 +36,12 @@ namespace UICatalog.Scenarios {
 		private static Action _editorColorSchemeChanged;
 
 		// Don't create a Window, just return the top-level view
-		public override void Init (ColorScheme colorScheme)
+		public override void Init ()
 		{
 			Application.Init ();
-			Application.Top.ColorScheme = colorScheme;
+			ConfigurationManager.Themes.Theme = Theme;
+			ConfigurationManager.Apply ();
+			Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
 		}
 
 		public override void Setup ()
@@ -82,7 +84,7 @@ namespace UICatalog.Scenarios {
 
 			internal ConfigTextView ()
 			{
-				ContentsChanged += (obj) => {
+				ContentsChanged += (s,obj) => {
 					if (IsDirty) {
 						if (!Tile.Title.EndsWith ('*')) {
 							Tile.Title += '*';
@@ -165,7 +167,7 @@ namespace UICatalog.Scenarios {
 
 				textView.Read ();
 
-				textView.Enter += (a) => {
+				textView.Enter += (s,e) => {
 					_lenStatusItem.Title = $"Len:{textView.Text.Length}";
 				};
 
