@@ -930,14 +930,14 @@ namespace Terminal.Gui {
 		/// <remarks></remarks>
 		public virtual void DrawWindowTitle (Rect region, ustring title, int paddingLeft, int paddingTop, int paddingRight, int paddingBottom, TextAlignment textAlignment = TextAlignment.Left)
 		{
-			var width = region.Width - (paddingLeft + 2) * 2;
-			if (!ustring.IsNullOrEmpty (title) && width > 4 && region.Y + paddingTop <= region.Y + paddingBottom) {
-				Move (region.X + 1 + paddingLeft, region.Y + paddingTop);
-				AddRune (' ');
+			var width = region.Width - (paddingLeft + 1) * 2;
+			if (!ustring.IsNullOrEmpty (title) && width > 2 && region.Y + paddingTop <= region.Y + paddingBottom) {
+				Move (region.X + 2 + paddingLeft, region.Y + paddingTop);
+				//AddRune (' ');
 				var str = title.Sum (r => Math.Max (Rune.ColumnWidth (r), 1)) >= width
 					? TextFormatter.Format (title, width - 2, false, false) [0] : title;
 				AddStr (str);
-				AddRune (' ');
+				//AddRune (' ');
 			}
 		}
 
