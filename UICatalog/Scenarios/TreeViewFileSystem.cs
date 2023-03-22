@@ -129,7 +129,7 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
-		private void TreeViewFiles_MouseClick (object sender, MouseEventArgs obj)
+		private void TreeViewFiles_MouseClick (object sender, MouseEventEventArgs obj)
 		{
 			// if user right clicks
 			if (obj.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
