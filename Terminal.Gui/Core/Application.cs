@@ -1283,7 +1283,7 @@ namespace Terminal.Gui {
 			}
 			if (toplevels.Count == 1 && state.Toplevel == Top
 				&& (Driver.Cols != state.Toplevel.Frame.Width || Driver.Rows != state.Toplevel.Frame.Height)
-				&& (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.ChildNeedsDisplay || state.Toplevel.LayoutNeeded)) {
+				&& (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._childNeedsDisplay || state.Toplevel.LayoutNeeded)) {
 
 				Driver.SetAttribute (Colors.TopLevel.Normal);
 				state.Toplevel.Clear (new Rect (0, 0, Driver.Cols, Driver.Rows));
