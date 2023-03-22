@@ -431,10 +431,6 @@ namespace Terminal.Gui {
 
 			this.tbPath.TextChanged += (s,e) => this.PathChanged ();
 
-			this.AddCommand (Command.DeleteCharLeft, Delete);
-			this.AddKeyBinding (Key.Delete, Command.DeleteCharLeft);
-			
-
 			this.tableView.CellActivated += this.CellActivate;
 			this.tableView.KeyUp += (s, k) => k.Handled = this.TableView_KeyUp (k.KeyEvent);
 			this.tableView.SelectedCellChanged += this.TableView_SelectedCellChanged;
@@ -486,10 +482,10 @@ namespace Terminal.Gui {
 			this.Add (this.splitContainer);
 		}
 
-		private bool? Delete ()
+		private bool Delete ()
 		{
 			if(!tableView.HasFocus || !tableView.CanFocus || DeleteHandler == null) {
-				return null;
+				return false;
 			}
 
 			tableView.EnsureValidSelection ();
@@ -1070,6 +1066,10 @@ namespace Terminal.Gui {
 			}
 			if (keyEvent.Key == (Key.ShiftMask | Key.Backspace)) {
 				return this.history.Forward ();
+			}
+
+			if (keyEvent.Key == Key.DeleteChar) {
+				return Delete();
 			}
 
 			return false;
@@ -2243,7 +2243,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			private void ShowHeaderContextMenu (DataColumn clickedCol, MouseEventArgs e)
+			private void ShowHeaderContextMenu (DataColumn clickedCol, MouseEventEventArgs e)
 			{
 				var sort = this.GetProposedNewSortOrder (clickedCol, out var isAsc);
 
