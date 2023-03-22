@@ -473,20 +473,17 @@ namespace Terminal.Gui {
 			this.Add (this.splitContainer);
 		}
 
-		private bool Delete ()
+		private void Delete ()
 		{
 			var toDelete = GetFocusedFiles();
 			
 			if(toDelete != null && FileOperationsHandler.Delete (toDelete))
 			{	
 				RefreshState();
-				return true;
 			}
-
-			return false;
 		}
 
-		private bool Rename ()
+		private void Rename ()
 		{
 			var toRename = GetFocusedFiles();
 
@@ -495,26 +492,15 @@ namespace Terminal.Gui {
 				if(FileOperationsHandler.Rename (toRename.Single()))
 				{
 					RefreshState();
-					return true;
 				}
 			}
-
-			return false;
 		}
-		private bool New()
+		private void New()
 		{
-			if(state == null)
-			{
-				return false;
-			}
-			
-			if(FileOperationsHandler.Rename (state.Directory))
+			if(state != null && FileOperationsHandler.Rename (state.Directory))
 			{
 				RefreshState();
-				return true;
 			}
-
-			return false;
 		}
 		private FileSystemInfo[] GetFocusedFiles()
 		{
@@ -1073,15 +1059,19 @@ namespace Terminal.Gui {
 			}
 
 			if (keyEvent.Key == Key.DeleteChar) {
-				return Delete();
+				
+				Delete();
+				return true;
 			}
 
 			if (keyEvent.Key == (Key.CtrlMask | Key.R)) {
-				return Rename();
+				Rename();
+				return true;
 			}
 
 			if (keyEvent.Key == (Key.CtrlMask | Key.N)) {
-				return New();
+				New();
+				return true;
 			}
 
 			return false;
