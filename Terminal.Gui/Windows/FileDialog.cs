@@ -497,7 +497,7 @@ namespace Terminal.Gui {
 		}
 		private void New()
 		{
-			if(state != null && FileOperationsHandler.Rename (state.Directory))
+			if(state != null && FileOperationsHandler.New (state.Directory))
 			{
 				RefreshState();
 			}
@@ -1065,6 +1065,7 @@ namespace Terminal.Gui {
 			}
 
 			if (keyEvent.Key == (Key.CtrlMask | Key.R)) {
+
 				Rename();
 				return true;
 			}

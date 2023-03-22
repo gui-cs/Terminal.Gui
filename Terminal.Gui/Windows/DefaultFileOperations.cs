@@ -41,15 +41,98 @@ namespace Terminal.Gui {
             return false;
 		}
 
+        private bool Prompt(string title,string defaultText, out string result)
+        {
+
+            bool confirm = false;
+            var btnOk = new Button("Ok"){
+                IsDefault = true,
+            };
+            btnOk.Clicked+=(s,e)=>{
+                confirm = true;
+                Application.RequestStop();
+            };
+            var btnCancel = new Button("Cancel");
+            btnCancel.Clicked+=(s,e)=>{
+                confirm = false;
+                Application.RequestStop();
+            };
+
+            var lbl = new Label("Name:");
+            var tf = new TextField(defaultText){
+                X = Pos.Right(lbl),
+                Width = Dim.Fill(),
+            };
+            tf.SelectAll();
+
+            var dlg = new Dialog(title){
+                Width = Dim.Percent(50),
+                Height = 4
+            };
+            dlg.Add(lbl);
+            dlg.Add(tf);
+
+            // Add buttons last so tab order is friendly
+            // and TextField gets focus
+            dlg.AddButton(btnOk);
+            dlg.AddButton(btnCancel);
+
+            Application.Run(dlg);
+
+            result = tf.Text?.ToString();
+
+            return confirm;
+        }
+
 		/// <inheritdoc/>
 		public bool Rename (FileSystemInfo toRename)
 		{
+            // Dont allow renaming C: or D: or / (on linux) etc
+            if(toRename is DirectoryInfo dir && dir.Parent == null)
+            {
+                return false;
+            }
+            
+            if(Prompt("Rename",toRename.Name,out var newName))
+            {
+                if(!string.IsNullOrWhiteSpace(newName))
+                {
+                    try {
+
+                            if (toRename is FileInfo f) {
+                                
+                                f.MoveTo(Path.Combine(f.Directory.FullName,newName));
+
+                            } else {
+                                var d = ((DirectoryInfo)toRename);
+                                d.MoveTo(Path.Combine(d.Parent.FullName,newName));
+                            }
+
+                            return true;
+                    } catch (Exception ex) {
+                        MessageBox.ErrorQuery ("Rename Failed", ex.Message, "Ok");
+                    }
+
+                }
+            }
 			return false;
 		}
 
 		/// <inheritdoc/>
 		public bool New (DirectoryInfo inDirectory)
 		{
+            if(Prompt("New Folder","",out var named))
+            {
+                if(!string.IsNullOrWhiteSpace(named))
+                {
+                    try {
+                        Directory.CreateDirectory(Path.Combine(inDirectory.FullName,named));
+                        return true;
+                    } catch (Exception ex) {
+                        MessageBox.ErrorQuery ("Rename Failed", ex.Message, "Ok");
+                    }
+                }
+            }
 			return false;
 		}
 	}
