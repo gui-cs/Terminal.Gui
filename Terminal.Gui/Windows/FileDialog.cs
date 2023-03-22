@@ -16,15 +16,6 @@ using static Terminal.Gui.Configuration.ConfigurationManager;
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// Delegate for specifying how to handle file/directory deletion attempts
-	/// in <see cref="FileDialog"/>.
-	/// </summary>
-	/// <param name="toDelete"></param>
-	/// <remarks>Ensure you use a try/catch block with appropriate
-	/// error handling (e.g. showing a <see cref="MessageBox"/></remarks>
-	public delegate void DeleteFileHandler(IEnumerable<FileSystemInfo> toDelete);
-
-	/// <summary>
 	/// Modal dialog for selecting files/directories. Has auto-complete and expandable
 	/// navigation pane (Recent, Root drives etc).
 	/// </summary>
@@ -255,7 +246,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>Ensure you use a try/catch block with appropriate
 		/// error handling (e.g. showing a <see cref="MessageBox"/></remarks>
-		public DeleteFileHandler DeleteHandler { get; set; } = DefaultDelete;
+		public IFileOperations FileOperationsHandler { get; set; } = new DefaultFileOperations();
 
 
 		/// <summary>
@@ -484,57 +475,70 @@ namespace Terminal.Gui {
 
 		private bool Delete ()
 		{
-			if(!tableView.HasFocus || !tableView.CanFocus || DeleteHandler == null) {
+			var toDelete = GetFocusedFiles();
+			
+			if(toDelete != null && FileOperationsHandler.Delete (toDelete))
+			{	
+				RefreshState();
+				return true;
+			}
+
+			return false;
+		}
+
+		private bool Rename ()
+		{
+			var toRename = GetFocusedFiles();
+
+			if(toRename?.Length == 1)
+			{
+				if(FileOperationsHandler.Rename (toRename.Single()))
+				{
+					RefreshState();
+					return true;
+				}
+			}
+
+			return false;
+		}
+		private bool New()
+		{
+			if(state == null)
+			{
 				return false;
+			}
+			
+			if(FileOperationsHandler.Rename (state.Directory))
+			{
+				RefreshState();
+				return true;
+			}
+
+			return false;
+		}
+		private FileSystemInfo[] GetFocusedFiles()
+		{
+
+			if(!tableView.HasFocus || !tableView.CanFocus || FileOperationsHandler == null) {
+				return null;
 			}
 
 			tableView.EnsureValidSelection ();
 
 			if (tableView.SelectedRow < 0) {
-				return false;
+				return null;
 			}
 
-			IEnumerable<FileSystemInfoStats> toDelete = tableView.GetAllSelectedCells ()
+			return tableView.GetAllSelectedCells ()
 				.Select (c => c.Y)
 				.Distinct ()
 				.Select (RowToStats)
 				.Where (s => !s.IsParent)
+				.Select(d=>d.FileSystemInfo)
 				.ToArray();
-
-			if (!toDelete.Any()) {
-				return false;
-			}
-
-			DeleteHandler.Invoke (toDelete.Select(d=>d.FileSystemInfo));
-			return true;
 		}
 
-		private static void DefaultDelete (IEnumerable<FileSystemInfo> toDelete)
-		{
-			// Default implementation does not allow deleting multiple files
-			if (toDelete.Count () != 1) {
-				return;
-			}
-			var d = toDelete.Single ();
-			var adjective =  d is FileInfo ? "File" : "Directory";
 
-			int result = MessageBox.Query (
-				string.Format ("Delete {0}", adjective),
-				string.Format ("Are you sure you want to delete the selected {0}? This operation is permanent", adjective),
-				"Yes", "No");
-
-			try {
-				if (result == 0) {
-					if (d is FileInfo) {
-						d.Delete ();
-					} else {
-						((DirectoryInfo)d).Delete (true);
-					}
-				}
-			} catch (Exception ex) {
-				MessageBox.ErrorQuery ("Delete Failed", ex.Message, "Ok");
-			}
-		}
 
 		/// <inheritdoc/>
 		public override bool ProcessHotKey (KeyEvent keyEvent)
@@ -1072,6 +1076,14 @@ namespace Terminal.Gui {
 				return Delete();
 			}
 
+			if (keyEvent.Key == (Key.CtrlMask | Key.R)) {
+				return Rename();
+			}
+
+			if (keyEvent.Key == (Key.CtrlMask | Key.N)) {
+				return New();
+			}
+
 			return false;
 		}
 
@@ -1263,6 +1275,13 @@ namespace Terminal.Gui {
 
 			PushState (new FileDialogState (d, this), addCurrentStateToHistory, setPathText, clearForward);
 		}
+		
+		private void RefreshState()
+		{
+			state.RefreshChildren();
+			PushState (state,false,false,false);
+		}
+
 		private void PushState (FileDialogState newState, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true)
 		{
 			if (state is SearchState search) {
