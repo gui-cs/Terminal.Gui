@@ -12,9 +12,17 @@ using Terminal.Gui.Resources;
 using Terminal.Gui.Trees;
 using static System.Environment;
 using static Terminal.Gui.Configuration.ConfigurationManager;
-using static Terminal.Gui.OpenDialog;
 
 namespace Terminal.Gui {
+
+	/// <summary>
+	/// Delegate for specifying how to handle file/directory deletion attempts
+	/// in <see cref="FileDialog"/>.
+	/// </summary>
+	/// <param name="toDelete"></param>
+	/// <remarks>Ensure you use a try/catch block with appropriate
+	/// error handling (e.g. showing a <see cref="MessageBox"/></remarks>
+	public delegate void DeleteFileHandler(IEnumerable<FileSystemInfo> toDelete);
 
 	/// <summary>
 	/// Modal dialog for selecting files/directories. Has auto-complete and expandable
@@ -242,6 +250,15 @@ namespace Terminal.Gui {
 		public event EventHandler<FilesSelectedEventArgs> FilesSelected;
 
 		/// <summary>
+		/// Gets or sets behavior of the <see cref="FileDialog"/> when the user attempts
+		/// to delete a selected file(s).  Set to null to prevent deleting.
+		/// </summary>
+		/// <remarks>Ensure you use a try/catch block with appropriate
+		/// error handling (e.g. showing a <see cref="MessageBox"/></remarks>
+		public DeleteFileHandler DeleteHandler { get; set; } = DefaultDelete;
+
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="FileDialog"/> class.
 		/// </summary>
 		public FileDialog ()
@@ -329,18 +346,23 @@ namespace Terminal.Gui {
 			this.tableView.KeyPress += (s, k) => {
 				if (this.tableView.SelectedRow <= 0) {
 					this.NavigateIf (k, Key.CursorUp, this.tbPath);
-				} else {
-					if (splitContainer.Tiles.First ().ContentView.Visible && tableView.SelectedColumn == 0) {
-						this.NavigateIf (k, Key.CursorLeft, this.treeView);
-					}
+				} 
 
-					if (this.tableView.HasFocus &&
-					!k.KeyEvent.Key.HasFlag (Key.CtrlMask) &&
-					!k.KeyEvent.Key.HasFlag (Key.AltMask) &&
-					 char.IsLetterOrDigit ((char)k.KeyEvent.KeyValue)) {
-						CycleToNextTableEntryBeginningWith (k);
-					}
+				if (splitContainer.Tiles.First ().ContentView.Visible && tableView.SelectedColumn == 0) {
+					this.NavigateIf (k, Key.CursorLeft, this.treeView);
 				}
+
+				if(k.Handled) {
+					return;
+				}
+
+				if (this.tableView.HasFocus &&
+				!k.KeyEvent.Key.HasFlag (Key.CtrlMask) &&
+				!k.KeyEvent.Key.HasFlag (Key.AltMask) &&
+					char.IsLetterOrDigit ((char)k.KeyEvent.KeyValue)) {
+					CycleToNextTableEntryBeginningWith (k);
+				}
+				
 
 			};
 
@@ -409,6 +431,10 @@ namespace Terminal.Gui {
 
 			this.tbPath.TextChanged += (s,e) => this.PathChanged ();
 
+			this.AddCommand (Command.DeleteCharLeft, Delete);
+			this.AddKeyBinding (Key.Delete, Command.DeleteCharLeft);
+			
+
 			this.tableView.CellActivated += this.CellActivate;
 			this.tableView.KeyUp += (s, k) => k.Handled = this.TableView_KeyUp (k.KeyEvent);
 			this.tableView.SelectedCellChanged += this.TableView_SelectedCellChanged;
@@ -459,6 +485,61 @@ namespace Terminal.Gui {
 			this.Add (this.tbPath);
 			this.Add (this.splitContainer);
 		}
+
+		private bool? Delete ()
+		{
+			if(!tableView.HasFocus || !tableView.CanFocus || DeleteHandler == null) {
+				return null;
+			}
+
+			tableView.EnsureValidSelection ();
+
+			if (tableView.SelectedRow < 0) {
+				return false;
+			}
+
+			IEnumerable<FileSystemInfoStats> toDelete = tableView.GetAllSelectedCells ()
+				.Select (c => c.Y)
+				.Distinct ()
+				.Select (RowToStats)
+				.Where (s => !s.IsParent)
+				.ToArray();
+
+			if (!toDelete.Any()) {
+				return false;
+			}
+
+			DeleteHandler.Invoke (toDelete.Select(d=>d.FileSystemInfo));
+			return true;
+		}
+
+		private static void DefaultDelete (IEnumerable<FileSystemInfo> toDelete)
+		{
+			// Default implementation does not allow deleting multiple files
+			if (toDelete.Count () != 1) {
+				return;
+			}
+			var d = toDelete.Single ();
+			var adjective =  d is FileInfo ? "File" : "Directory";
+
+			int result = MessageBox.Query (
+				string.Format ("Delete {0}", adjective),
+				string.Format ("Are you sure you want to delete the selected {0}? This operation is permanent", adjective),
+				"Yes", "No");
+
+			try {
+				if (result == 0) {
+					if (d is FileInfo) {
+						d.Delete ();
+					} else {
+						((DirectoryInfo)d).Delete (true);
+					}
+				}
+			} catch (Exception ex) {
+				MessageBox.ErrorQuery ("Delete Failed", ex.Message, "Ok");
+			}
+		}
+
 		/// <inheritdoc/>
 		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
