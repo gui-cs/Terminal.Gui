@@ -115,8 +115,16 @@ namespace Terminal.Gui {
 				// Make it bigger to fit the margin, border, & padding
 				frame = new Rect (frame.Location, new Size (Margin.Thickness.Horizontal + BorderFrame.Thickness.Horizontal + Padding.Thickness.Horizontal + 1, Margin.Thickness.Vertical + BorderFrame.Thickness.Vertical + Padding.Thickness.Vertical + 1));
 			}
-			Frame = frame;
 		}
+
+		///// <summary>
+		///// Enumerates the various <see cref="View"/>s in the embedded <see cref="ContentView"/>.
+		///// </summary>
+		///// <returns>The enumerator.</returns>
+		//public new IEnumerator GetEnumerator ()
+		//{
+		//	return contentView.GetEnumerator ();
+		//}
 
 		/// <inheritdoc/>
 		public override void Add (View view)
