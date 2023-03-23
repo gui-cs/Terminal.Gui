@@ -132,7 +132,7 @@ namespace UICatalog.Scenarios {
 					fd.SearchMatcher = new CaseSensitiveSearchMatcher ();
 				}
 
-				fd.UseColors = cbUseColors.Checked ?? false;
+				fd.Style.UseColors = cbUseColors.Checked ?? false;
 
 				fd.Style.TreeStyle.ShowBranchLines = cbShowTreeBranchLines.Checked ?? false;
 				fd.Style.TableStyle.AlwaysShowHeaders = cbAlwaysTableShowHeaders.Checked ?? false;
@@ -185,7 +185,7 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
-		private class CaseSensitiveSearchMatcher : FileDialog.ISearchMatcher {
+		private class CaseSensitiveSearchMatcher : ISearchMatcher {
 			private string terms;
 
 			public void Initialize (string terms)

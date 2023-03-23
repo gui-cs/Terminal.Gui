@@ -15,6 +15,43 @@ namespace Terminal.Gui {
 	public class FileDialogStyle {
 
 		/// <summary>
+		/// Gets or Sets a value indicating whether different colors
+		/// should be used for different file types/directories.  Defaults
+		/// to false.
+		/// </summary>
+		public bool UseColors { get; set; }
+		/// <summary>
+		/// Gets or sets a value indicating whether to use Utc dates for date modified.
+		/// Defaults to <see langword="false"/>.
+		/// </summary>
+		public static bool UseUtcDates { get; set; } = false;
+
+		/// <summary>
+		/// Sets a <see cref="ColorScheme"/> to use for directories rows of
+		/// the <see cref="TableView"/>.
+		/// </summary>
+		public ColorScheme ColorSchemeDirectory { get; set; }
+
+		/// <summary>
+		/// Sets a <see cref="ColorScheme"/> to use for regular file rows of
+		/// the <see cref="TableView"/>. Defaults to White text on Black background.
+		/// </summary>
+		public ColorScheme ColorSchemeDefault { get; set; }
+
+		/// <summary>
+		/// Sets a <see cref="ColorScheme"/> to use for file rows with an image extension
+		/// of the <see cref="TableView"/>. Defaults to White text on Black background.
+		/// </summary>
+		public ColorScheme ColorSchemeImage { get; set; }
+
+		/// <summary>
+		/// Sets a <see cref="ColorScheme"/> to use for file rows with an executable extension
+		/// or that match <see cref="FileDialog.AllowedTypes"/> in the <see cref="TableView"/>.
+		/// </summary>
+		public ColorScheme ColorSchemeExeOrRecommended { get; set; }
+
+
+		/// <summary>
 		/// Gets or sets the header text displayed in the Filename column of the files table.
 		/// </summary>
 		public string FilenameColumnName { get; set; } = Strings.fdFilename;
@@ -51,13 +88,13 @@ namespace Terminal.Gui {
 		public string OkButtonText { get; set; } = "Ok";
 
 		/// <summary>
-		/// Gets or sets error message when user attempts to select a file type that is not one of <see cref="AllowedTypes"/>
+		/// Gets or sets error message when user attempts to select a file type that is not one of <see cref="FileDialog.AllowedTypes"/>
 		/// </summary>
 		public string WrongFileTypeFeedback { get; internal set; } = Strings.fdWrongFileTypeFeedback;
 
 		/// <summary>
 		/// Gets or sets error message when user selects a directory that does not exist and
-		/// <see cref="OpenMode"/> is <see cref="OpenMode.Directory"/> and <see cref="MustExist"/> is <see langword="true"/>.
+		/// <see cref="OpenMode"/> is <see cref="OpenMode.Directory"/> and <see cref="FileDialog.MustExist"/> is <see langword="true"/>.
 		/// </summary>
 		public string DirectoryMustExistFeedback { get; internal set; } = Strings.fdDirectoryMustExistFeedback;
 
@@ -69,7 +106,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Gets or sets error message when user selects a file that does not exist and
-		/// <see cref="OpenMode"/> is <see cref="OpenMode.File"/> and <see cref="MustExist"/> is <see langword="true"/>.
+		/// <see cref="OpenMode"/> is <see cref="OpenMode.File"/> and <see cref="FileDialog.MustExist"/> is <see langword="true"/>.
 		/// </summary>
 		public string FileMustExistFeedback { get; internal set; } = Strings.fdFileMustExistFeedback;
 
@@ -81,7 +118,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Gets or sets error message when user selects a file/dir that does not exist and
-		/// <see cref="OpenMode"/> is <see cref="OpenMode.Mixed"/> and <see cref="MustExist"/> is <see langword="true"/>.
+		/// <see cref="OpenMode"/> is <see cref="OpenMode.Mixed"/> and <see cref="FileDialog.MustExist"/> is <see langword="true"/>.
 		/// </summary>
 		public string FileOrDirectoryMustExistFeedback { get; internal set; } = Strings.fdFileOrDirectoryMustExistFeedback;
 
@@ -103,6 +140,39 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>Must be configured before showing the dialog.</remarks>
 		public FileDialogTreeRootGetter TreeRootGetter { get; set; } = DefaultTreeRootGetter;
+
+
+		public FileDialogStyle ()
+		{
+
+			ColorSchemeDirectory = new ColorScheme {
+				Normal = Application.Driver.MakeAttribute (Color.Blue, Color.Black),
+				HotNormal = Application.Driver.MakeAttribute (Color.Blue, Color.Black),
+				Focus = Application.Driver.MakeAttribute (Color.Black, Color.Blue),
+				HotFocus = Application.Driver.MakeAttribute (Color.Black, Color.Blue),
+
+			};
+
+			ColorSchemeDefault = new ColorScheme {
+				Normal = Application.Driver.MakeAttribute (Color.White, Color.Black),
+				HotNormal = Application.Driver.MakeAttribute (Color.White, Color.Black),
+				Focus = Application.Driver.MakeAttribute (Color.Black, Color.White),
+				HotFocus = Application.Driver.MakeAttribute (Color.Black, Color.White),
+			};
+			ColorSchemeImage = new ColorScheme {
+				Normal = Application.Driver.MakeAttribute (Color.Magenta, Color.Black),
+				HotNormal = Application.Driver.MakeAttribute (Color.Magenta, Color.Black),
+				Focus = Application.Driver.MakeAttribute (Color.Black, Color.Magenta),
+				HotFocus = Application.Driver.MakeAttribute (Color.Black, Color.Magenta),
+			};
+			ColorSchemeExeOrRecommended = new ColorScheme {
+				Normal = Application.Driver.MakeAttribute (Color.Green, Color.Black),
+				HotNormal = Application.Driver.MakeAttribute (Color.Green, Color.Black),
+				Focus = Application.Driver.MakeAttribute (Color.Black, Color.Green),
+				HotFocus = Application.Driver.MakeAttribute (Color.Black, Color.Green),
+			};
+			
+		}
 
 		private static IEnumerable<FileDialogRootTreeNode> DefaultTreeRootGetter ()
 		{

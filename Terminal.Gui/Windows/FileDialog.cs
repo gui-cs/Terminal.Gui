@@ -276,9 +276,6 @@ namespace Terminal.Gui {
 			this.tableView.Style.ShowVerticalHeaderLines = false;
 			this.tableView.Style.AlwaysShowHeaders = true;
 
-
-			this.SetupColorSchemes ();
-
 			this.SetupTableColumns ();
 
 			this.sorter = new FileDialogSorter (this, this.tableView);
@@ -291,7 +288,7 @@ namespace Terminal.Gui {
 			this.tableView.CellActivated += this.CellActivate;
 			this.tableView.KeyUp += (s, k) => k.Handled = this.TableView_KeyUp (k.KeyEvent);
 			this.tableView.SelectedCellChanged += this.TableView_SelectedCellChanged;
-			this.tableView.ColorScheme = ColorSchemeDefault;
+			this.tableView.ColorScheme = Style.ColorSchemeDefault;
 
 			this.tableView.AddKeyBinding (Key.Home, Command.TopHome);
 			this.tableView.AddKeyBinding (Key.End, Command.BottomEnd);
@@ -299,7 +296,7 @@ namespace Terminal.Gui {
 			this.tableView.AddKeyBinding (Key.End | Key.ShiftMask, Command.BottomEndExtend);
 
 
-			this.treeView.ColorScheme = ColorSchemeDefault;
+			this.treeView.ColorScheme = Style.ColorSchemeDefault;
 			this.treeView.KeyDown += (s, k) => {
 
 
@@ -495,36 +492,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets a value indicating whether to use Utc dates for date modified.
-		/// Defaults to <see langword="false"/>.
-		/// </summary>
-		public static bool UseUtcDates { get; set; } = false;
-
-		/// <summary>
-		/// Sets a <see cref="ColorScheme"/> to use for directories rows of
-		/// the <see cref="TableView"/>.
-		/// </summary>
-		public ColorScheme ColorSchemeDirectory { private get; set; }
-
-		/// <summary>
-		/// Sets a <see cref="ColorScheme"/> to use for regular file rows of
-		/// the <see cref="TableView"/>. Defaults to White text on Black background.
-		/// </summary>
-		public ColorScheme ColorSchemeDefault { private get; set; }
-
-		/// <summary>
-		/// Sets a <see cref="ColorScheme"/> to use for file rows with an image extension
-		/// of the <see cref="TableView"/>. Defaults to White text on Black background.
-		/// </summary>
-		public ColorScheme ColorSchemeImage { private get; set; }
-
-		/// <summary>
-		/// Sets a <see cref="ColorScheme"/> to use for file rows with an executable extension
-		/// or that match <see cref="AllowedTypes"/> in the <see cref="TableView"/>.
-		/// </summary>
-		public ColorScheme ColorSchemeExeOrRecommended { private get; set; }
-
-		/// <summary>
 		/// Gets or Sets which <see cref="System.IO.FileSystemInfo"/> type can be selected.
 		/// Defaults to <see cref="OpenMode.Mixed"/> (i.e. <see cref="DirectoryInfo"/> or
 		/// <see cref="FileInfo"/>).
@@ -567,12 +534,6 @@ namespace Terminal.Gui {
 			set => this.tableView.MultiSelect = value;
 		}
 
-		/// <summary>
-		/// Gets or Sets a value indicating whether different colors
-		/// should be used for different file types/directories.  Defaults
-		/// to false.
-		/// </summary>
-		public bool UseColors { get; set; }
 
 		/// <summary>
 		/// Gets or Sets a collection of file types that the user can/must select. Only applies
@@ -952,39 +913,6 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		private void SetupColorSchemes ()
-		{
-			if (ColorSchemeDirectory != null) {
-				return;
-			}
-
-			ColorSchemeDirectory = new ColorScheme {
-				Normal = Driver.MakeAttribute (Color.Blue, Color.Black),
-				HotNormal = Driver.MakeAttribute (Color.Blue, Color.Black),
-				Focus = Driver.MakeAttribute (Color.Black, Color.Blue),
-				HotFocus = Driver.MakeAttribute (Color.Black, Color.Blue),
-
-			};
-
-			ColorSchemeDefault = new ColorScheme {
-				Normal = Driver.MakeAttribute (Color.White, Color.Black),
-				HotNormal = Driver.MakeAttribute (Color.White, Color.Black),
-				Focus = Driver.MakeAttribute (Color.Black, Color.White),
-				HotFocus = Driver.MakeAttribute (Color.Black, Color.White),
-			};
-			ColorSchemeImage = new ColorScheme {
-				Normal = Driver.MakeAttribute (Color.Magenta, Color.Black),
-				HotNormal = Driver.MakeAttribute (Color.Magenta, Color.Black),
-				Focus = Driver.MakeAttribute (Color.Black, Color.Magenta),
-				HotFocus = Driver.MakeAttribute (Color.Black, Color.Magenta),
-			};
-			ColorSchemeExeOrRecommended = new ColorScheme {
-				Normal = Driver.MakeAttribute (Color.Green, Color.Black),
-				HotNormal = Driver.MakeAttribute (Color.Green, Color.Black),
-				Focus = Driver.MakeAttribute (Color.Black, Color.Green),
-				HotFocus = Driver.MakeAttribute (Color.Black, Color.Green),
-			};
-		}
 
 		private void SetupTableColumns ()
 		{
@@ -1216,24 +1144,24 @@ namespace Terminal.Gui {
 		{
 			var stats = this.RowToStats (args.RowIndex);
 
-			if (!UseColors) {
-				return ColorSchemeDefault;
+			if (!Style.UseColors) {
+				return Style.ColorSchemeDefault;
 			}
 
 			if (stats.IsDir ()) {
-				return ColorSchemeDirectory;
+				return Style.ColorSchemeDirectory;
 			}
 			if (stats.IsImage ()) {
-				return ColorSchemeImage;
+				return Style.ColorSchemeImage;
 			}
 			if (stats.IsExecutable ()) {
-				return ColorSchemeExeOrRecommended;
+				return Style.ColorSchemeExeOrRecommended;
 			}
 			if (stats.FileSystemInfo is FileInfo f && this.MatchesAllowedTypes (f)) {
-				return ColorSchemeExeOrRecommended;
+				return Style.ColorSchemeExeOrRecommended;
 			}
 
-			return ColorSchemeDefault;
+			return Style.ColorSchemeDefault;
 		}
 
 		/// <summary>
@@ -1361,7 +1289,7 @@ namespace Terminal.Gui {
 				if (fsi is FileInfo fi) {
 					this.MachineReadableLength = fi.Length;
 					this.HumanReadableLength = GetHumanReadableFileSize (this.MachineReadableLength);
-					this.DateModified = FileDialog.UseUtcDates ? File.GetLastWriteTimeUtc (fi.FullName) : File.GetLastWriteTime (fi.FullName);
+					this.DateModified = FileDialogStyle.UseUtcDates ? File.GetLastWriteTimeUtc (fi.FullName) : File.GetLastWriteTime (fi.FullName);
 					this.Type = fi.Extension;
 				} else {
 					this.HumanReadableLength = string.Empty;
