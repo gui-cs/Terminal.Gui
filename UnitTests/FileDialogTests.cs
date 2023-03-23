@@ -187,16 +187,6 @@ namespace Terminal.Gui.Core {
 			hasFocus.SetValue (v, true);
 		}
 
-		private FileDialog.TextFieldWithAppendAutocomplete GetTextField (FileDialog dlg = null)
-		{
-			if (dlg == null) {
-				dlg = GetInitializedFileDialog ();
-			}
-
-			// First view of a Dialog is ContentView
-			return dlg.Subviews [0].Subviews.OfType<FileDialog.TextFieldWithAppendAutocomplete> ().Single ();
-		}
-
 		private FileDialog GetInitializedFileDialog ()
 		{
 			var dlg = new FileDialog ();
