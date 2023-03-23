@@ -211,4 +211,34 @@
     <value>Any Files</value>
     <comment>Describes an AllowedType that matches anything</comment>
   </data>
+  <data name="fdDeleteBody" xml:space="preserve">
+    <value>Are you sure you want to delete '{0}'? This operation is permanent</value>
+  </data>
+  <data name="fdDeleteFailedTitle" xml:space="preserve">
+    <value>Delete Failed</value>
+  </data>
+  <data name="fdDeleteTitle" xml:space="preserve">
+    <value>Delete {0}</value>
+  </data>
+  <data name="fdNewFailed" xml:space="preserve">
+    <value>New Failed</value>
+  </data>
+  <data name="fdNewTitle" xml:space="preserve">
+    <value>New Folder</value>
+  </data>
+  <data name="fdNo" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="fdRenameFailedTitle" xml:space="preserve">
+    <value>Rename Failed</value>
+  </data>
+  <data name="fdRenamePrompt" xml:space="preserve">
+    <value>Name:</value>
+  </data>
+  <data name="fdRenameTitle" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="fdYes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
 </root>

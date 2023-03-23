@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Terminal.Gui.Resources;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -17,12 +18,12 @@ namespace Terminal.Gui {
 				return false;
 			}
 			var d = toDelete.Single ();
-			var adjective =  d is FileInfo ? "File" : "Directory";
+			var adjective =  d.Name;
 
 			int result = MessageBox.Query (
-				string.Format ("Delete {0}", adjective),
-				string.Format ("Are you sure you want to delete the selected {0}? This operation is permanent", adjective),
-				"Yes", "No");
+				string.Format (Strings.fdDeleteTitle, adjective),
+				string.Format (Strings.fdDeleteBody, adjective),
+				Strings.fdYes, Strings.fdNo);
 
 			try {
 				if (result == 0) {
@@ -35,7 +36,7 @@ namespace Terminal.Gui {
                     return true;
 				}
 			} catch (Exception ex) {
-				MessageBox.ErrorQuery ("Delete Failed", ex.Message, "Ok");
+				MessageBox.ErrorQuery (Strings.fdDeleteFailedTitle, ex.Message, "Ok");
 			}
 
             return false;
@@ -58,7 +59,7 @@ namespace Terminal.Gui {
                 Application.RequestStop();
             };
 
-            var lbl = new Label("Name:");
+            var lbl = new Label(Strings.fdRenamePrompt);
             var tf = new TextField(defaultText){
                 X = Pos.Right(lbl),
                 Width = Dim.Fill(),
@@ -93,7 +94,7 @@ namespace Terminal.Gui {
                 return null;
             }
             
-            if(Prompt("Rename",toRename.Name,out var newName))
+            if(Prompt(Strings.fdRenameTitle,toRename.Name,out var newName))
             {
                 if(!string.IsNullOrWhiteSpace(newName))
                 {
@@ -113,7 +114,7 @@ namespace Terminal.Gui {
                                 return newLocation;
                             }
                     } catch (Exception ex) {
-                        MessageBox.ErrorQuery ("Rename Failed", ex.Message, "Ok");
+                        MessageBox.ErrorQuery (Strings.fdRenameFailedTitle, ex.Message, "Ok");
                     }
 
                 }
@@ -124,7 +125,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public FileSystemInfo New (DirectoryInfo inDirectory)
 		{
-            if(Prompt("New Folder","",out var named))
+            if(Prompt(Strings.fdNewTitle,"",out var named))
             {
                 if(!string.IsNullOrWhiteSpace(named))
                 {
@@ -133,7 +134,7 @@ namespace Terminal.Gui {
                         newDir.Create();
                         return newDir;
                     } catch (Exception ex) {
-                        MessageBox.ErrorQuery ("Rename Failed", ex.Message, "Ok");
+                        MessageBox.ErrorQuery (Strings.fdNewFailed, ex.Message, "Ok");
                     }
                 }
             }

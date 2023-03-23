@@ -133,6 +133,33 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to delete &apos;{0}&apos;? This operation is permanent.
+        /// </summary>
+        internal static string fdDeleteBody {
+            get {
+                return ResourceManager.GetString("fdDeleteBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete Failed.
+        /// </summary>
+        internal static string fdDeleteFailedTitle {
+            get {
+                return ResourceManager.GetString("fdDeleteFailedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete {0}.
+        /// </summary>
+        internal static string fdDeleteTitle {
+            get {
+                return ResourceManager.GetString("fdDeleteTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Directory.
         /// </summary>
         internal static string fdDirectory {
@@ -214,6 +241,33 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New Failed.
+        /// </summary>
+        internal static string fdNewFailed {
+            get {
+                return ResourceManager.GetString("fdNewFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New Folder.
+        /// </summary>
+        internal static string fdNewTitle {
+            get {
+                return ResourceManager.GetString("fdNewTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No.
+        /// </summary>
+        internal static string fdNo {
+            get {
+                return ResourceManager.GetString("fdNo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open.
         /// </summary>
         internal static string fdOpen {
@@ -228,6 +282,33 @@ namespace Terminal.Gui.Resources {
         internal static string fdPathCaption {
             get {
                 return ResourceManager.GetString("fdPathCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rename Failed.
+        /// </summary>
+        internal static string fdRenameFailedTitle {
+            get {
+                return ResourceManager.GetString("fdRenameFailedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name:.
+        /// </summary>
+        internal static string fdRenamePrompt {
+            get {
+                return ResourceManager.GetString("fdRenamePrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rename.
+        /// </summary>
+        internal static string fdRenameTitle {
+            get {
+                return ResourceManager.GetString("fdRenameTitle", resourceCulture);
             }
         }
         
@@ -300,6 +381,15 @@ namespace Terminal.Gui.Resources {
         internal static string fdWrongFileTypeFeedback {
             get {
                 return ResourceManager.GetString("fdWrongFileTypeFeedback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yes.
+        /// </summary>
+        internal static string fdYes {
+            get {
+                return ResourceManager.GetString("fdYes", resourceCulture);
             }
         }
         
