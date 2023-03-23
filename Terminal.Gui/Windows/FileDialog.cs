@@ -2148,7 +2148,7 @@ namespace Terminal.Gui {
 				// if user clicks the mouse in TableView
 				this.tableView.MouseClick += (s,e) => {
 
-					this.tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out DataColumn clickedCol);
+					var clickedCell = this.tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out DataColumn clickedCol);
 
 					if (clickedCol != null) {
 						if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
@@ -2161,6 +2161,16 @@ namespace Terminal.Gui {
 							this.ShowHeaderContextMenu (clickedCol, e);
 						}
 					}
+					else
+					{
+						if(clickedCell != null && e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
+						{
+
+							// right click in rest of table
+							this.ShowCellContextMenu (clickedCell, e);
+						}
+					}
+
 				};
 
 			}
@@ -2266,6 +2276,29 @@ namespace Terminal.Gui {
 						new MenuItem($"Sort {StripArrows(sort)}",string.Empty, ()=> this.SortColumn(clickedCol,isAsc)),
 					})
 				);
+
+				contextMenu.Show ();
+			}
+
+			private void ShowCellContextMenu (Point? clickedCell, MouseEventEventArgs e)
+			{
+				if(clickedCell == null)
+				{
+					return;
+				}
+
+				var contextMenu = new ContextMenu (
+					e.MouseEvent.X + 1,
+					e.MouseEvent.Y + 1,
+					new MenuBarItem (new MenuItem []
+					{
+						new MenuItem($"New", string.Empty, () => dlg.New()),
+						new MenuItem($"Rename",string.Empty, ()=>  dlg.Rename()),
+						new MenuItem($"Delete",string.Empty, ()=>  dlg.Delete()),
+					})
+				);
+
+				dlg.tableView.SetSelection(clickedCell.Value.X,clickedCell.Value.Y,false);
 
 				contextMenu.Show ();
 			}
