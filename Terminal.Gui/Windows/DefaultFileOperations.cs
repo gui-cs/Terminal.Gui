@@ -85,12 +85,12 @@ namespace Terminal.Gui {
         }
 
 		/// <inheritdoc/>
-		public bool Rename (FileSystemInfo toRename)
+		public FileSystemInfo Rename (FileSystemInfo toRename)
 		{
             // Dont allow renaming C: or D: or / (on linux) etc
             if(toRename is DirectoryInfo dir && dir.Parent == null)
             {
-                return false;
+                return null;
             }
             
             if(Prompt("Rename",toRename.Name,out var newName))
@@ -101,39 +101,43 @@ namespace Terminal.Gui {
 
                             if (toRename is FileInfo f) {
                                 
-                                f.MoveTo(Path.Combine(f.Directory.FullName,newName));
+                                var newLocation = new FileInfo(Path.Combine(f.Directory.FullName,newName));
+                                f.MoveTo(newLocation.FullName);
+                                return newLocation;
 
                             } else {
                                 var d = ((DirectoryInfo)toRename);
-                                d.MoveTo(Path.Combine(d.Parent.FullName,newName));
-                            }
 
-                            return true;
+                                var newLocation = new DirectoryInfo(Path.Combine(d.Parent.FullName,newName));
+                                d.MoveTo(newLocation.FullName);
+                                return newLocation;
+                            }
                     } catch (Exception ex) {
                         MessageBox.ErrorQuery ("Rename Failed", ex.Message, "Ok");
                     }
 
                 }
             }
-			return false;
+			return null;
 		}
 
 		/// <inheritdoc/>
-		public bool New (DirectoryInfo inDirectory)
+		public FileSystemInfo New (DirectoryInfo inDirectory)
 		{
             if(Prompt("New Folder","",out var named))
             {
                 if(!string.IsNullOrWhiteSpace(named))
                 {
                     try {
-                        Directory.CreateDirectory(Path.Combine(inDirectory.FullName,named));
-                        return true;
+                        var newDir = new DirectoryInfo(Path.Combine(inDirectory.FullName,named));
+                        newDir.Create();
+                        return newDir;
                     } catch (Exception ex) {
                         MessageBox.ErrorQuery ("Rename Failed", ex.Message, "Ok");
                     }
                 }
             }
-			return false;
+			return null;
 		}
 	}
 }

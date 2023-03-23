@@ -489,17 +489,25 @@ namespace Terminal.Gui {
 
 			if(toRename?.Length == 1)
 			{
-				if(FileOperationsHandler.Rename (toRename.Single()))
+				var newNamed = FileOperationsHandler.Rename (toRename.Single());
+				
+				if(newNamed != null)
 				{
 					RefreshState();
+					RestoreSelection(newNamed);
 				}
 			}
 		}
 		private void New()
 		{
-			if(state != null && FileOperationsHandler.New (state.Directory))
+			if(state != null)
 			{
-				RefreshState();
+				var created = FileOperationsHandler.New (state.Directory);
+				if(created != null)
+				{
+					RefreshState();
+					RestoreSelection(created);
+				}
 			}
 		}
 		private FileSystemInfo[] GetFocusedFiles()
@@ -1389,10 +1397,10 @@ namespace Terminal.Gui {
 		{
 			return this.state?.Children [(int)this.tableView.Table.Rows [rowIndex] [0]];
 		}
-		private int? StatsToRow (FileSystemInfoStats stats)
+		private int? StatsToRow (FileSystemInfo fileSystemInfo)
 		{
 			// find array index of the current state for the stats
-			var idx = state?.Children.IndexOf ((f) => f.FileSystemInfo.FullName == stats.FileSystemInfo.FullName);
+			var idx = state?.Children.IndexOf ((f) => f.FileSystemInfo.FullName == fileSystemInfo.FullName);
 
 			if (idx != -1 && idx != null) {
 
@@ -2056,7 +2064,7 @@ namespace Terminal.Gui {
 				this.dlg.PushState (goTo, false, true, false);
 
 				if (restoreSelection != null) {
-					this.dlg.RestoreSelection (restoreSelection);
+					this.dlg.RestoreSelection (restoreSelection.FileSystemInfo);
 				}
 
 				return true;
@@ -2124,7 +2132,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void RestoreSelection (FileSystemInfoStats toRestore)
+		private void RestoreSelection (FileSystemInfo toRestore)
 		{
 			var toReselect = StatsToRow (toRestore);
 
