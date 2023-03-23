@@ -555,6 +555,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>If selecting only a single file/directory then you should use <see cref="Path"/> instead.</remarks>
 		public IReadOnlyList<string> MultiSelected { get; private set; }
+			= Enumerable.Empty<string> ().ToList ().AsReadOnly ();
 
 
 		/// <inheritdoc/>
@@ -801,6 +802,15 @@ namespace Terminal.Gui {
 
 			if (e.Cancel) {
 				return;
+			}
+
+			// if user uses Path selection mode (e.g. Enter in text box)
+			// then also copy to MultiSelected
+			if(AllowsMultipleSelection && (!MultiSelected.Any())) {
+
+				MultiSelected = string.IsNullOrWhiteSpace (Path) ?
+						Enumerable.Empty<string> ().ToList ().AsReadOnly ():
+						new List<string> () { Path }.AsReadOnly ();
 			}
 
 			this.Canceled = false;
