@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace Terminal.Gui {
+namespace Terminal.Gui.FileServices {
 	/// <summary>
 	/// Event args for the <see cref="FileDialog.FilesSelected"/> event
 	/// </summary>
-	public class FilesSelectedEventArgs : EventArgs
-	{
+	public class FilesSelectedEventArgs : EventArgs {
 		/// <summary>
 		/// Set to true if you want to prevent the selection
 		/// going ahead (this will leave the <see cref="FileDialog"/>

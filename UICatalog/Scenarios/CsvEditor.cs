@@ -10,6 +10,7 @@ using System.Text;
 using NStack;
 using System.Text.RegularExpressions;
 using CsvHelper;
+using Terminal.Gui.FileServices;
 
 namespace UICatalog.Scenarios {
 

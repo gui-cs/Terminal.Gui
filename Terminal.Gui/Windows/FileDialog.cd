@@ -8,34 +8,9 @@
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <NestedTypes>
-      <Class Name="Terminal.Gui.FileDialog.SearchState" Collapsed="true">
+      <Class Name="Terminal.Gui.FileDialog.SpinnerLabel" Collapsed="true">
         <TypeIdentifier>
-          <NewMemberFileName>Windows\FileDialog.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-      <Class Name="Terminal.Gui.FileDialog.CaptionedTextField" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Windows\FileDialog.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-      <Class Name="Terminal.Gui.FileDialog.FileDialogHistory" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Windows\FileDialog.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-      <Class Name="Terminal.Gui.FileDialog.FileDialogState" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Windows\FileDialog.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-      <Class Name="Terminal.Gui.FileDialog.TextFieldWithAppendAutocomplete" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Windows\FileDialog.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-      <Class Name="Terminal.Gui.FileDialog.FileSystemInfoStats" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Windows\FileDialog.cs</NewMemberFileName>
+          <NewMemberFileName>Windows\SpinnerLabel.cs</NewMemberFileName>
         </TypeIdentifier>
       </Class>
       <Class Name="Terminal.Gui.FileDialog.FileDialogSorter" Collapsed="true">
@@ -43,60 +18,20 @@
           <NewMemberFileName>Windows\FileDialog.cs</NewMemberFileName>
         </TypeIdentifier>
       </Class>
-      <Class Name="Terminal.Gui.FileDialog.SpinnerLabel" Collapsed="true">
+      <Class Name="Terminal.Gui.FileDialog.SearchState" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>Windows\FileDialog.cs</NewMemberFileName>
         </TypeIdentifier>
-      </Class>
-      <Class Name="Terminal.Gui.FileDialog.FileDialogTreeBuilder" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Windows\FileDialog.cs</NewMemberFileName>
-        </TypeIdentifier>
-        <Lollipop Position="0.2" />
       </Class>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AoYYDAElECIZIHMByFAikQTFQIUUpc1EBodAERCQwgQ=</HashCode>
+      <HashCode>AoYYDAElECIZAHMByFAikQTFQIUUpchABoZAFRCQwgQ=</HashCode>
       <FileName>Windows\FileDialog.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
-      <Property Name="FileOperationsHandler" />
-      <Property Name="SearchMatcher" />
-      <Property Name="Style" />
       <Property Name="OpenMode" />
     </ShowAsAssociation>
-    <ShowAsCollectionAssociation>
-      <Property Name="AllowedTypes" />
-    </ShowAsCollectionAssociation>
   </Class>
-  <Class Name="Terminal.Gui.FileDialogStyle">
-    <Position X="15.25" Y="4" Width="3.5" />
-    <TypeIdentifier>
-      <HashCode>GAAAAAFEAAAAmAAAAAAAEAAABAAACBEAAAAYACCAAAA=</HashCode>
-      <FileName>Windows\FileDialogStyle.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Interface Name="Terminal.Gui.IAllowedType">
-    <Position X="16.25" Y="1.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAA=</HashCode>
-      <FileName>Windows\AllowedType.cs</FileName>
-    </TypeIdentifier>
-  </Interface>
-  <Interface Name="Terminal.Gui.IFileOperations">
-    <Position X="18.5" Y="1.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAACAAAAAAAAAAAAEAAAAAAAAAAAAAgAA=</HashCode>
-      <FileName>Windows\IFileOperations.cs</FileName>
-    </TypeIdentifier>
-  </Interface>
-  <Interface Name="Terminal.Gui.ISearchMatcher">
-    <Position X="20.5" Y="3" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAACAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Windows\ISearchMatcher.cs</FileName>
-    </TypeIdentifier>
-  </Interface>
   <Enum Name="Terminal.Gui.OpenMode">
     <Position X="20.75" Y="4.5" Width="1.5" />
     <TypeIdentifier>

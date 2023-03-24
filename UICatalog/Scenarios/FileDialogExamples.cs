@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Terminal.Gui;
+using Terminal.Gui.FileServices;
 using Terminal.Gui.Graphs;
 using static Terminal.Gui.OpenDialog;
 

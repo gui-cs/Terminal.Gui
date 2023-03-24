@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Terminal.Gui.FileServices;
 using Xunit;
 
 
@@ -14,14 +15,14 @@ namespace Terminal.Gui.Core {
 			var dlg = GetInitializedFileDialog ();
 			// First focused is ContentView :(
 			Assert.NotNull (dlg.Focused.Focused);
-			Assert.IsType<FileDialog.TextFieldWithAppendAutocomplete> (dlg.Focused.Focused);
+			Assert.IsType<TextFieldWithAppendAutocomplete> (dlg.Focused.Focused);
 		}
 
 		[Fact, AutoInitShutdown]
 		public void DirectTyping_Allowed ()
 		{
 			var dlg = GetInitializedFileDialog ();
-			var tf = dlg.Subviews [0].Subviews.OfType<FileDialog.TextFieldWithAppendAutocomplete> ().Single ();
+			var tf = dlg.Subviews [0].Subviews.OfType<TextFieldWithAppendAutocomplete> ().Single ();
 			tf.ClearAllSelection ();
 			tf.CursorPosition = tf.Text.Length;
 			Assert.True (tf.HasFocus);
@@ -96,8 +97,8 @@ namespace Terminal.Gui.Core {
 
 			Send ('f',ConsoleKey.F,false,false,true);
 
-			Assert.IsType<FileDialog.CaptionedTextField> (dlg.MostFocused);
-			var tf = (FileDialog.CaptionedTextField) dlg.MostFocused;
+			Assert.IsType<CaptionedTextField> (dlg.MostFocused);
+			var tf = (CaptionedTextField) dlg.MostFocused;
 			Assert.Equal ("Enter Search", tf.Caption);
 
 			// Dialog has not yet been confirmed with a choice
@@ -152,7 +153,7 @@ namespace Terminal.Gui.Core {
 		[Fact, AutoInitShutdown]
 		public void Autocomplete_NoSuggestion_WhenTextMatchesExactly ()
 		{
-			var tb = new FileDialog.TextFieldWithAppendAutocomplete ();
+			var tb = new TextFieldWithAppendAutocomplete ();
 			ForceFocus (tb);
 
 			tb.Text = "/bob/fish";
@@ -168,7 +169,7 @@ namespace Terminal.Gui.Core {
 		[Fact, AutoInitShutdown]
 		public void Autocomplete_AcceptSuggstion ()
 		{
-			var tb = new FileDialog.TextFieldWithAppendAutocomplete ();
+			var tb = new TextFieldWithAppendAutocomplete ();
 			ForceFocus (tb);
 
 			tb.Text = @"/bob/fi";

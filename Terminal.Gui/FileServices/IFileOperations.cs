@@ -1,23 +1,22 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Terminal.Gui {
+namespace Terminal.Gui.FileServices {
 	/// <summary>
 	/// Interface for defining how to handle file/directory 
 	/// deletion, rename and newing attempts in <see cref="FileDialog"/>.
 	/// </summary>
-	public interface IFileOperations
-	{
+	public interface IFileOperations {
 		/// <summary>
 		/// Specifies how to handle file/directory deletion attempts
 		/// in <see cref="FileDialog"/>.
 		/// </summary>
 		/// <param name="toDelete"></param>
-        /// <returns><see langword="true"/> if operation was completed or 
-        /// <see langword="false"/> if cancelled</returns>
+		/// <returns><see langword="true"/> if operation was completed or 
+		/// <see langword="false"/> if cancelled</returns>
 		/// <remarks>Ensure you use a try/catch block with appropriate
 		/// error handling (e.g. showing a <see cref="MessageBox"/></remarks>
-		bool Delete(IEnumerable<FileSystemInfo> toDelete);
+		bool Delete (IEnumerable<FileSystemInfo> toDelete);
 
 
 		/// <summary>
@@ -25,10 +24,10 @@ namespace Terminal.Gui {
 		/// in <see cref="FileDialog"/>.
 		/// </summary>
 		/// <param name="toRename"></param>
-        /// <returns>The new name for the file or null if cancelled</returns>
+		/// <returns>The new name for the file or null if cancelled</returns>
 		/// <remarks>Ensure you use a try/catch block with appropriate
 		/// error handling (e.g. showing a <see cref="MessageBox"/></remarks>
-		FileSystemInfo Rename(FileSystemInfo toRename);
+		FileSystemInfo Rename (FileSystemInfo toRename);
 
 
 		/// <summary>
@@ -37,9 +36,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="inDirectory">The parent directory in which the new
 		/// directory should be created</param>
-        /// <returns>The newly created directory or null if cancelled.</returns>
+		/// <returns>The newly created directory or null if cancelled.</returns>
 		/// <remarks>Ensure you use a try/catch block with appropriate
 		/// error handling (e.g. showing a <see cref="MessageBox"/></remarks>
-		FileSystemInfo New(DirectoryInfo inDirectory);
+		FileSystemInfo New (DirectoryInfo inDirectory);
 	}
 }

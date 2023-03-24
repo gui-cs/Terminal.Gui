@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using NStack;
+using Terminal.Gui.FileServices;
 using Terminal.Gui.Resources;
 using Terminal.Gui.Trees;
 using static System.Environment;
@@ -46,7 +47,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool MustExist { get; set; }
 
-		private static char [] separators = new []
+		/// <summary>
+		/// Gets the Path separators for the operating system
+		/// </summary>
+		internal static char [] Separators = new []
 		{
 			System.IO.Path.AltDirectorySeparatorChar,
 			System.IO.Path.DirectorySeparatorChar,
@@ -66,13 +70,21 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The UI selected <see cref="IAllowedType"/> from combo box. May be null.
 		/// </summary>
-		private IAllowedType currentFilter;
+		public IAllowedType CurrentFilter { get; private set; }
 
 		private bool pushingState = false;
 		private bool loaded = false;
 
-		private FileDialogState state;
-		private object onlyOneSearchLock = new object ();
+		/// <summary>
+		/// Gets the currently open directory and known children presented in the dialog.
+		/// </summary>
+		internal FileDialogState State { get; private set; }
+
+		/// <summary>
+		/// Locking object for ensuring only a single <see cref="SearchState"/> executes at once.
+		/// </summary>
+		internal object onlyOneSearchLock = new object ();
+
 		private bool disposed = false;
 		private TextFieldWithAppendAutocomplete tbPath;
 
@@ -112,7 +124,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>Ensure you use a try/catch block with appropriate
 		/// error handling (e.g. showing a <see cref="MessageBox"/></remarks>
-		public IFileOperations FileOperationsHandler { get; set; } = new DefaultFileOperations();
+		public IFileOperations FileOperationsHandler { get; set; } = new DefaultFileOperations ();
 
 
 		/// <summary>
@@ -129,8 +141,8 @@ namespace Terminal.Gui {
 					// TODO: Fiddle factor, seems the Bounds are wrong for someone
 					- 2)
 			};
-			this.btnOk.Clicked += (s,e)=> this.Accept();
-			this.btnOk.KeyPress += (s,k) => {
+			this.btnOk.Clicked += (s, e) => this.Accept ();
+			this.btnOk.KeyPress += (s, k) => {
 				this.NavigateIf (k, Key.CursorLeft, this.btnCancel);
 				this.NavigateIf (k, Key.CursorUp, this.tableView);
 			};
@@ -151,7 +163,7 @@ namespace Terminal.Gui {
 				this.NavigateIf (k, Key.CursorUp, this.tableView);
 				this.NavigateIf (k, Key.CursorRight, this.btnOk);
 			};
-			this.btnCancel.Clicked += (s,e) => {
+			this.btnCancel.Clicked += (s, e) => {
 				Application.RequestStop ();
 			};
 
@@ -203,13 +215,13 @@ namespace Terminal.Gui {
 			this.tableView.KeyPress += (s, k) => {
 				if (this.tableView.SelectedRow <= 0) {
 					this.NavigateIf (k, Key.CursorUp, this.tbPath);
-				} 
+				}
 
 				if (splitContainer.Tiles.First ().ContentView.Visible && tableView.SelectedColumn == 0) {
 					this.NavigateIf (k, Key.CursorLeft, this.treeView);
 				}
 
-				if(k.Handled) {
+				if (k.Handled) {
 					return;
 				}
 
@@ -219,7 +231,7 @@ namespace Terminal.Gui {
 					char.IsLetterOrDigit ((char)k.KeyEvent.KeyValue)) {
 					CycleToNextTableEntryBeginningWith (k);
 				}
-				
+
 
 			};
 
@@ -283,7 +295,7 @@ namespace Terminal.Gui {
 
 			this.tableView.Table = this.dtFiles;
 
-			this.tbPath.TextChanged += (s,e) => this.PathChanged ();
+			this.tbPath.TextChanged += (s, e) => this.PathChanged ();
 
 			this.tableView.CellActivated += this.CellActivate;
 			this.tableView.KeyUp += (s, k) => k.Handled = this.TableView_KeyUp (k.KeyEvent);
@@ -338,45 +350,40 @@ namespace Terminal.Gui {
 
 		private void Delete ()
 		{
-			var toDelete = GetFocusedFiles();
-			
-			if(toDelete != null && FileOperationsHandler.Delete (toDelete))
-			{	
-				RefreshState();
+			var toDelete = GetFocusedFiles ();
+
+			if (toDelete != null && FileOperationsHandler.Delete (toDelete)) {
+				RefreshState ();
 			}
 		}
 
 		private void Rename ()
 		{
-			var toRename = GetFocusedFiles();
+			var toRename = GetFocusedFiles ();
 
-			if(toRename?.Length == 1)
-			{
-				var newNamed = FileOperationsHandler.Rename (toRename.Single());
-				
-				if(newNamed != null)
-				{
-					RefreshState();
-					RestoreSelection(newNamed);
+			if (toRename?.Length == 1) {
+				var newNamed = FileOperationsHandler.Rename (toRename.Single ());
+
+				if (newNamed != null) {
+					RefreshState ();
+					RestoreSelection (newNamed);
 				}
 			}
 		}
-		private void New()
+		private void New ()
 		{
-			if(state != null)
-			{
-				var created = FileOperationsHandler.New (state.Directory);
-				if(created != null)
-				{
-					RefreshState();
-					RestoreSelection(created);
+			if (State != null) {
+				var created = FileOperationsHandler.New (State.Directory);
+				if (created != null) {
+					RefreshState ();
+					RestoreSelection (created);
 				}
 			}
 		}
-		private FileSystemInfo[] GetFocusedFiles()
+		private FileSystemInfo [] GetFocusedFiles ()
 		{
 
-			if(!tableView.HasFocus || !tableView.CanFocus || FileOperationsHandler == null) {
+			if (!tableView.HasFocus || !tableView.CanFocus || FileOperationsHandler == null) {
 				return null;
 			}
 
@@ -391,8 +398,8 @@ namespace Terminal.Gui {
 				.Distinct ()
 				.Select (RowToStats)
 				.Where (s => !s.IsParent)
-				.Select(d=>d.FileSystemInfo)
-				.ToArray();
+				.Select (d => d.FileSystemInfo)
+				.ToArray ();
 		}
 
 
@@ -416,11 +423,11 @@ namespace Terminal.Gui {
 		}
 		private void RestartSearch ()
 		{
-			if (disposed || state?.Directory == null) {
+			if (disposed || State?.Directory == null) {
 				return;
 			}
 
-			if (state is SearchState oldSearch) {
+			if (State is SearchState oldSearch) {
 				oldSearch.Cancel ();
 			}
 
@@ -430,12 +437,12 @@ namespace Terminal.Gui {
 				// Wait for search cancellation (if any) to finish
 				// then push the current dir state
 				lock (onlyOneSearchLock) {
-					PushState (new FileDialogState (state.Directory, this), false);
+					PushState (new FileDialogState (State.Directory, this), false);
 				}
 				return;
 			}
 
-			PushState (new SearchState (state?.Directory, this, tbFind.Text.ToString ()), true);
+			PushState (new SearchState (State?.Directory, this, tbFind.Text.ToString ()), true);
 		}
 
 		/// <inheritdoc/>
@@ -444,7 +451,7 @@ namespace Terminal.Gui {
 			disposed = true;
 			base.Dispose (disposing);
 
-			if (state is SearchState search) {
+			if (State is SearchState search) {
 				search.Cancel ();
 			}
 		}
@@ -643,7 +650,7 @@ namespace Terminal.Gui {
 			// initial filtering by extension(s)
 			if (this.AllowedTypes.Any ()) {
 
-				this.currentFilter = this.AllowedTypes [0];
+				this.CurrentFilter = this.AllowedTypes [0];
 
 				// Fiddle factor
 				var width = this.AllowedTypes.Max (a => a.ToString ().Length) + 6;
@@ -710,13 +717,13 @@ namespace Terminal.Gui {
 			}
 			allowedTypeMenu.Title = allow.ToString ();
 
-			this.currentFilter = allow;
+			this.CurrentFilter = allow;
 
 			this.tbPath.ClearAllSelection ();
 			this.tbPath.ClearSuggestions ();
 
-			if (this.state != null) {
-				this.state.RefreshChildren ();
+			if (this.State != null) {
+				this.State.RefreshChildren ();
 				this.WriteStateToTableView ();
 			}
 		}
@@ -733,7 +740,7 @@ namespace Terminal.Gui {
 
 		private bool TreeView_KeyDown (KeyEvent keyEvent)
 		{
-			if (this.treeView.HasFocus && separators.Contains ((char)keyEvent.KeyValue)) {
+			if (this.treeView.HasFocus && Separators.Contains ((char)keyEvent.KeyValue)) {
 				this.tbPath.FocusFirst ();
 
 				// let that keystroke go through on the tbPath instead
@@ -806,10 +813,10 @@ namespace Terminal.Gui {
 
 			// if user uses Path selection mode (e.g. Enter in text box)
 			// then also copy to MultiSelected
-			if(AllowsMultipleSelection && (!MultiSelected.Any())) {
+			if (AllowsMultipleSelection && (!MultiSelected.Any ())) {
 
 				MultiSelected = string.IsNullOrWhiteSpace (Path) ?
-						Enumerable.Empty<string> ().ToList ().AsReadOnly ():
+						Enumerable.Empty<string> ().ToList ().AsReadOnly () :
 						new List<string> () { Path }.AsReadOnly ();
 			}
 
@@ -875,7 +882,7 @@ namespace Terminal.Gui {
 			FileSystemInfo dest;
 
 			if (stats.IsParent) {
-				dest = state.Directory;
+				dest = State.Directory;
 			} else {
 				dest = stats.FileSystemInfo;
 			}
@@ -884,7 +891,7 @@ namespace Terminal.Gui {
 				this.pushingState = true;
 
 				this.tbPath.SetTextTo (dest);
-				this.state.Selected = stats;
+				this.State.Selected = stats;
 				this.tbPath.ClearSuggestions ();
 
 			} finally {
@@ -904,19 +911,19 @@ namespace Terminal.Gui {
 			}
 
 			if (keyEvent.Key == Key.DeleteChar) {
-				
-				Delete();
+
+				Delete ();
 				return true;
 			}
 
 			if (keyEvent.Key == (Key.CtrlMask | Key.R)) {
 
-				Rename();
+				Rename ();
 				return true;
 			}
 
 			if (keyEvent.Key == (Key.CtrlMask | Key.N)) {
-				New();
+				New ();
 				return true;
 			}
 
@@ -931,7 +938,7 @@ namespace Terminal.Gui {
 			var nameStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (Style.FilenameColumnName, typeof (int)));
 			nameStyle.RepresentationGetter = (i) => {
 
-				var stats = this.state?.Children [(int)i];
+				var stats = this.State?.Children [(int)i];
 
 				if (stats == null) {
 					return string.Empty;
@@ -948,15 +955,15 @@ namespace Terminal.Gui {
 			nameStyle.MinWidth = 50;
 
 			var sizeStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (Style.SizeColumnName, typeof (int)));
-			sizeStyle.RepresentationGetter = (i) => this.state?.Children [(int)i].HumanReadableLength ?? string.Empty;
+			sizeStyle.RepresentationGetter = (i) => this.State?.Children [(int)i].HumanReadableLength ?? string.Empty;
 			nameStyle.MinWidth = 10;
 
 			var dateModifiedStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (Style.ModifiedColumnName, typeof (int)));
-			dateModifiedStyle.RepresentationGetter = (i) => this.state?.Children [(int)i].DateModified?.ToString () ?? string.Empty;
+			dateModifiedStyle.RepresentationGetter = (i) => this.State?.Children [(int)i].DateModified?.ToString () ?? string.Empty;
 			dateModifiedStyle.MinWidth = 30;
 
 			var typeStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (Style.TypeColumnName, typeof (int)));
-			typeStyle.RepresentationGetter = (i) => this.state?.Children [(int)i].Type ?? string.Empty;
+			typeStyle.RepresentationGetter = (i) => this.State?.Children [(int)i].Type ?? string.Empty;
 			typeStyle.MinWidth = 6;
 			this.tableView.Style.RowColorGetter = this.ColorGetter;
 		}
@@ -993,7 +1000,13 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private bool IsCompatibleWithAllowedExtensions (FileInfo file)
+		/// <summary>
+		/// Returns true if there are no <see cref="AllowedTypes"/> or one of them agrees
+		/// that <paramref name="file"/> <see cref="IAllowedType.IsAllowed(string)"/>.
+		/// </summary>
+		/// <param name="file"></param>
+		/// <returns></returns>
+		public bool IsCompatibleWithAllowedExtensions (FileInfo file)
 		{
 			// no restrictions
 			if (!this.AllowedTypes.Any ()) {
@@ -1066,28 +1079,35 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void PushState (DirectoryInfo d, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true)
+		/// <summary>
+		/// Changes the dialog such that <paramref name="d"/> is being explored.
+		/// </summary>
+		/// <param name="d"></param>
+		/// <param name="addCurrentStateToHistory"></param>
+		/// <param name="setPathText"></param>
+		/// <param name="clearForward"></param>
+		internal void PushState (DirectoryInfo d, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true)
 		{
 			// no change of state
-			if (d == this.state?.Directory) {
+			if (d == this.State?.Directory) {
 				return;
 			}
-			if (d.FullName == this.state?.Directory.FullName) {
+			if (d.FullName == this.State?.Directory.FullName) {
 				return;
 			}
 
 			PushState (new FileDialogState (d, this), addCurrentStateToHistory, setPathText, clearForward);
 		}
-		
-		private void RefreshState()
+
+		private void RefreshState ()
 		{
-			state.RefreshChildren();
-			PushState (state,false,false,false);
+			State.RefreshChildren ();
+			PushState (State, false, false, false);
 		}
 
 		private void PushState (FileDialogState newState, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true)
 		{
-			if (state is SearchState search) {
+			if (State is SearchState search) {
 				search.Cancel ();
 			}
 
@@ -1096,7 +1116,7 @@ namespace Terminal.Gui {
 
 				// push the old state to history
 				if (addCurrentStateToHistory) {
-					this.history.Push (this.state, clearForward);
+					this.history.Push (this.State, clearForward);
 				}
 
 				this.tbPath.ClearSuggestions ();
@@ -1106,8 +1126,8 @@ namespace Terminal.Gui {
 					this.tbPath.MoveCursorToEnd ();
 				}
 
-				this.state = newState;
-				this.tbPath.GenerateSuggestions (this.state);
+				this.State = newState;
+				this.tbPath.GenerateSuggestions (this.State);
 
 				this.WriteStateToTableView ();
 
@@ -1130,13 +1150,13 @@ namespace Terminal.Gui {
 
 		private void WriteStateToTableView ()
 		{
-			if (this.state == null) {
+			if (this.State == null) {
 				return;
 			}
 
 			this.dtFiles.Rows.Clear ();
 
-			for (int i = 0; i < this.state.Children.Length; i++) {
+			for (int i = 0; i < this.State.Children.Length; i++) {
 				this.BuildRow (i);
 			}
 
@@ -1188,7 +1208,7 @@ namespace Terminal.Gui {
 
 				foreach (var p in this.tableView.GetAllSelectedCells ()) {
 
-					var add = this.state?.Children [(int)this.tableView.Table.Rows [p.Y] [0]];
+					var add = this.State?.Children [(int)this.tableView.Table.Rows [p.Y] [0]];
 					if (add != null) {
 						toReturn.Add (add);
 					}
@@ -1199,12 +1219,12 @@ namespace Terminal.Gui {
 		}
 		private FileSystemInfoStats RowToStats (int rowIndex)
 		{
-			return this.state?.Children [(int)this.tableView.Table.Rows [rowIndex] [0]];
+			return this.State?.Children [(int)this.tableView.Table.Rows [rowIndex] [0]];
 		}
 		private int? StatsToRow (FileSystemInfo fileSystemInfo)
 		{
 			// find array index of the current state for the stats
-			var idx = state?.Children.IndexOf ((f) => f.FileSystemInfo.FullName == fileSystemInfo.FullName);
+			var idx = State?.Children.IndexOf ((f) => f.FileSystemInfo.FullName == fileSystemInfo.FullName);
 
 			if (idx != -1 && idx != null) {
 
@@ -1247,7 +1267,7 @@ namespace Terminal.Gui {
 				this.PushState (dir.Parent, true, false);
 			}
 
-			tbPath.GenerateSuggestions (state);
+			tbPath.GenerateSuggestions (State);
 		}
 
 		private DirectoryInfo StringToDirectoryInfo (string path)
@@ -1263,133 +1283,192 @@ namespace Terminal.Gui {
 			return new DirectoryInfo (path);
 		}
 
-		
 		/// <summary>
-		/// Wrapper for <see cref="FileSystemInfo"/> that contains additional information
-		/// (e.g. <see cref="IsParent"/>) and helper methods.
+		/// Select <paramref name="toRestore"/> in the table view (if present)
 		/// </summary>
-		internal class FileSystemInfoStats {
+		/// <param name="toRestore"></param>
+		internal void RestoreSelection (FileSystemInfo toRestore)
+		{
+			var toReselect = StatsToRow (toRestore);
 
-
-			/* ---- Colors used by the ls command line tool ----
-			 *
-			* Blue: Directory
-			* Green: Executable or recognized data file
-			* Cyan (Sky Blue): Symbolic link file
-			* Yellow with black background: Device
-			* Magenta (Pink): Graphic image file
-			* Red: Archive file
-			* Red with black background: Broken link
-			*/
-
-			private const long ByteConversion = 1024;
-
-			private static readonly string [] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
-			private static readonly List<string> ImageExtensions = new List<string> { ".JPG", ".JPEG", ".JPE", ".BMP", ".GIF", ".PNG" };
-			private static readonly List<string> ExecutableExtensions = new List<string> { ".EXE", ".BAT" };
-
-			/// <summary>
-			/// Initializes a new instance of the <see cref="FileSystemInfoStats"/> class.
-			/// </summary>
-			/// <param name="fsi">The directory of path to wrap.</param>
-			public FileSystemInfoStats (FileSystemInfo fsi)
-			{
-				this.FileSystemInfo = fsi;
-
-				if (fsi is FileInfo fi) {
-					this.MachineReadableLength = fi.Length;
-					this.HumanReadableLength = GetHumanReadableFileSize (this.MachineReadableLength);
-					this.DateModified = FileDialogStyle.UseUtcDates ? File.GetLastWriteTimeUtc (fi.FullName) : File.GetLastWriteTime (fi.FullName);
-					this.Type = fi.Extension;
-				} else {
-					this.HumanReadableLength = string.Empty;
-					this.Type = "dir";
-				}
-			}
-
-			/// <summary>
-			/// Gets the wrapped <see cref="FileSystemInfo"/> (directory or file).
-			/// </summary>
-			public FileSystemInfo FileSystemInfo { get; }
-			public string HumanReadableLength { get; }
-			public long MachineReadableLength { get; }
-			public DateTime? DateModified { get; }
-			public string Type { get; }
-
-			/// <summary>
-			/// Gets or Sets a value indicating whether this instance represents
-			/// the parent of the current state (i.e. "..").
-			/// </summary>
-			public bool IsParent { get; internal set; }
-			public string Name => this.IsParent ? ".." : this.FileSystemInfo.Name;
-
-			public bool IsDir ()
-			{
-				return this.Type == "dir";
-			}
-
-			public bool IsImage ()
-			{
-				return this.FileSystemInfo is FileSystemInfo f &&
-					ImageExtensions.Contains (
-						f.Extension,
-						StringComparer.InvariantCultureIgnoreCase);
-			}
-
-			public bool IsExecutable ()
-			{
-				// TODO: handle linux executable status
-				return this.FileSystemInfo is FileSystemInfo f &&
-					ExecutableExtensions.Contains (
-						f.Extension,
-						StringComparer.InvariantCultureIgnoreCase);
-			}
-
-			internal object GetOrderByValue (FileDialog dlg, string columnName)
-			{
-				if (dlg.Style.FilenameColumnName == columnName)
-					return this.FileSystemInfo.Name;
-
-				if (dlg.Style.SizeColumnName == columnName)
-					return this.MachineReadableLength;
-
-				if (dlg.Style.ModifiedColumnName == columnName)
-					return this.DateModified;
-
-				if (dlg.Style.TypeColumnName == columnName)
-					return this.Type;
-
-				throw new ArgumentOutOfRangeException ("Unknown column " + nameof (columnName));
-			}
-
-			internal object GetOrderByDefault ()
-			{
-				if (this.IsDir ()) {
-					return -1;
-				}
-
-				return 100;
-			}
-
-			private static string GetHumanReadableFileSize (long value)
-			{
-
-				if (value < 0) {
-					return "-" + GetHumanReadableFileSize (-value);
-				}
-
-				if (value == 0) {
-					return "0.0 bytes";
-				}
-
-				int mag = (int)Math.Log (value, ByteConversion);
-				double adjustedSize = value / Math.Pow (1000, mag);
-
-
-				return string.Format ("{0:n2} {1}", adjustedSize, SizeSuffixes [mag]);
+			if (toReselect.HasValue) {
+				tableView.SelectedRow = toReselect.Value;
+				tableView.EnsureSelectedCellIsVisible ();
 			}
 		}
+		private class FileDialogSorter {
+			private readonly FileDialog dlg;
+			private TableView tableView;
 
+			private DataColumn currentSort = null;
+			private bool currentSortIsAsc = true;
+
+			public FileDialogSorter (FileDialog dlg, TableView tableView)
+			{
+				this.dlg = dlg;
+				this.tableView = tableView;
+
+				// if user clicks the mouse in TableView
+				this.tableView.MouseClick += (s, e) => {
+
+					var clickedCell = this.tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out DataColumn clickedCol);
+
+					if (clickedCol != null) {
+						if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
+
+							// left click in a header
+							this.SortColumn (clickedCol);
+						} else if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
+
+							// right click in a header
+							this.ShowHeaderContextMenu (clickedCol, e);
+						}
+					} else {
+						if (clickedCell != null && e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
+
+							// right click in rest of table
+							this.ShowCellContextMenu (clickedCell, e);
+						}
+					}
+
+				};
+
+			}
+
+			internal void ApplySort ()
+			{
+				var col = this.currentSort;
+
+				// TODO: Consider preserving selection
+				this.tableView.Table.Rows.Clear ();
+
+				var colName = col == null ? null : StripArrows (col.ColumnName);
+
+				var stats = this.dlg.State?.Children ?? new FileSystemInfoStats [0];
+
+				// Do we sort on a column or just use the default sort order?
+				Func<FileSystemInfoStats, object> sortAlgorithm;
+
+				if (colName == null) {
+					sortAlgorithm = (v) => v.GetOrderByDefault ();
+					this.currentSortIsAsc = true;
+				} else {
+					sortAlgorithm = (v) => v.GetOrderByValue (dlg, colName);
+				}
+
+				var ordered =
+					this.currentSortIsAsc ?
+					    stats.Select ((v, i) => new { v, i })
+						.OrderByDescending (f => f.v.IsParent)
+						.ThenBy (f => sortAlgorithm (f.v))
+						.ToArray () :
+					    stats.Select ((v, i) => new { v, i })
+						.OrderByDescending (f => f.v.IsParent)
+						.ThenByDescending (f => sortAlgorithm (f.v))
+						.ToArray ();
+
+				foreach (var o in ordered) {
+					this.dlg.BuildRow (o.i);
+				}
+
+				foreach (DataColumn c in this.tableView.Table.Columns) {
+
+					// remove any lingering sort indicator
+					c.ColumnName = TrimArrows (c.ColumnName);
+
+					// add a new one if this the one that is being sorted
+					if (c == col) {
+						c.ColumnName += this.currentSortIsAsc ? '▲' : '▼';
+					}
+				}
+
+				this.tableView.Update ();
+				dlg.UpdateCollectionNavigator ();
+			}
+
+			private static string TrimArrows (string columnName)
+			{
+				return columnName.TrimEnd ('▼', '▲');
+			}
+
+			private static string StripArrows (string columnName)
+			{
+				return columnName.Replace ("▼", string.Empty).Replace ("▲", string.Empty);
+			}
+
+			private void SortColumn (DataColumn clickedCol)
+			{
+				this.GetProposedNewSortOrder (clickedCol, out var isAsc);
+				this.SortColumn (clickedCol, isAsc);
+			}
+
+			private void SortColumn (DataColumn col, bool isAsc)
+			{
+				// set a sort order
+				this.currentSort = col;
+				this.currentSortIsAsc = isAsc;
+
+				this.ApplySort ();
+			}
+
+			private string GetProposedNewSortOrder (DataColumn clickedCol, out bool isAsc)
+			{
+				// work out new sort order
+				if (this.currentSort == clickedCol && this.currentSortIsAsc) {
+					isAsc = false;
+					return $"{clickedCol.ColumnName} DESC";
+				} else {
+					isAsc = true;
+					return $"{clickedCol.ColumnName} ASC";
+				}
+			}
+
+			private void ShowHeaderContextMenu (DataColumn clickedCol, MouseEventEventArgs e)
+			{
+				var sort = this.GetProposedNewSortOrder (clickedCol, out var isAsc);
+
+				var contextMenu = new ContextMenu (
+					e.MouseEvent.X + 1,
+					e.MouseEvent.Y + 1,
+					new MenuBarItem (new MenuItem []
+					{
+						new MenuItem($"Hide {TrimArrows(clickedCol.ColumnName)}", string.Empty, () => this.HideColumn(clickedCol)),
+						new MenuItem($"Sort {StripArrows(sort)}",string.Empty, ()=> this.SortColumn(clickedCol,isAsc)),
+					})
+				);
+
+				contextMenu.Show ();
+			}
+
+			private void ShowCellContextMenu (Point? clickedCell, MouseEventEventArgs e)
+			{
+				if (clickedCell == null) {
+					return;
+				}
+
+				var contextMenu = new ContextMenu (
+					e.MouseEvent.X + 1,
+					e.MouseEvent.Y + 1,
+					new MenuBarItem (new MenuItem []
+					{
+						new MenuItem($"New", string.Empty, () => dlg.New()),
+						new MenuItem($"Rename",string.Empty, ()=>  dlg.Rename()),
+						new MenuItem($"Delete",string.Empty, ()=>  dlg.Delete()),
+					})
+				);
+
+				dlg.tableView.SetSelection (clickedCell.Value.X, clickedCell.Value.Y, false);
+
+				contextMenu.Show ();
+			}
+
+			private void HideColumn (DataColumn clickedCol)
+			{
+				var style = this.tableView.Style.GetOrCreateColumnStyle (clickedCol);
+				style.Visible = false;
+				this.tableView.Update ();
+			}
+		}
 		/// <summary>
 		/// State representing a recursive search from <see cref="FileDialogState.Directory"/>
 		/// downwards.
@@ -1506,615 +1585,6 @@ namespace Terminal.Gui {
 				cancel = true;
 				token.Cancel ();
 			}
-		}
-		internal class FileDialogState {
-
-			public FileSystemInfoStats Selected { get; set; }
-			protected readonly FileDialog Parent;
-			public FileDialogState (DirectoryInfo dir, FileDialog parent)
-			{
-				this.Directory = dir;
-				Parent = parent;
-
-				this.RefreshChildren ();
-			}
-
-			public DirectoryInfo Directory { get; }
-
-			public FileSystemInfoStats [] Children { get; protected set; }
-
-			internal virtual void RefreshChildren ()
-			{
-				var dir = this.Directory;
-				Children = GetChildren (dir).ToArray ();
-			}
-
-			protected virtual IEnumerable<FileSystemInfoStats> GetChildren (DirectoryInfo dir)
-			{
-				try {
-
-					List<FileSystemInfoStats> children;
-
-					// if directories only
-					if (Parent.OpenMode == OpenMode.Directory) {
-						children = dir.GetDirectories ().Select (e => new FileSystemInfoStats (e)).ToList ();
-					} else {
-						children = dir.GetFileSystemInfos ().Select (e => new FileSystemInfoStats (e)).ToList ();
-					}
-
-					// if only allowing specific file types
-					if (Parent.AllowedTypes.Any () && Parent.OpenMode == OpenMode.File) {
-
-						children = children.Where (
-							c => c.IsDir () ||
-							(c.FileSystemInfo is FileInfo f && Parent.IsCompatibleWithAllowedExtensions (f)))
-							.ToList ();
-					}
-
-					// if theres a UI filter in place too
-					if (Parent.currentFilter != null) {
-						children = children.Where (MatchesApiFilter).ToList ();
-					}
-
-
-					// allow navigating up as '..'
-					if (dir.Parent != null) {
-						children.Add (new FileSystemInfoStats (dir.Parent) { IsParent = true });
-					}
-
-					return children;
-				} catch (Exception) {
-					// Access permissions Exceptions, Dir not exists etc
-					return Enumerable.Empty<FileSystemInfoStats> ();
-				}
-			}
-
-			protected bool MatchesApiFilter (FileSystemInfoStats arg)
-			{
-				return arg.IsDir () ||
-				(arg.FileSystemInfo is FileInfo f && Parent.currentFilter.IsAllowed (f.FullName));
-			}
-		}
-
-		internal class CaptionedTextField : TextField {
-			/// <summary>
-			/// A text prompt to display in the field when it does not
-			/// have focus and no text is yet entered.
-			/// </summary>
-			public ustring Caption { get; set; }
-
-			/// <summary>
-			/// The foreground color to use for the caption
-			/// </summary>
-			public Color CaptionColor { get; set; } = Color.Black;
-
-			public override void Redraw (Rect bounds)
-			{
-				base.Redraw (bounds);
-
-				if (HasFocus || Caption == null || Caption.Length == 0
-					|| Text?.Length > 0) {
-					return;
-				}
-
-				var color = new Attribute (CaptionColor, GetNormalColor ().Background);
-				Driver.SetAttribute (color);
-
-				Move (0, 0);
-				var render = Caption;
-
-				if (render.ConsoleWidth > Bounds.Width) {
-					render = render.RuneSubstring (0, Bounds.Width);
-				}
-
-				Driver.AddStr (render);
-
-			}
-		}
-		internal class SpinnerLabel : Label {
-			private Rune [] runes = new Rune [] { '|', '/', '\u2500', '\\' };
-			private int currentIdx = 0;
-			private DateTime lastRender = DateTime.MinValue;
-
-			public override void Redraw (Rect bounds)
-			{
-				if (DateTime.Now - lastRender > TimeSpan.FromMilliseconds (250)) {
-					currentIdx = (currentIdx + 1) % runes.Length;
-					Text = "" + runes [currentIdx];
-				}
-
-				base.Redraw (bounds);
-			}
-		}
-		internal class TextFieldWithAppendAutocomplete : CaptionedTextField {
-
-			private int? currentFragment = null;
-			private string [] validFragments = new string [0];
-
-			public TextFieldWithAppendAutocomplete ()
-			{
-				this.KeyPress += (s, k) => {
-					var key = k.KeyEvent.Key;
-					if (key == Key.Tab) {
-						k.Handled = this.AcceptSelectionIfAny ();
-					} else
-					if (key == Key.CursorUp) {
-						k.Handled = this.CycleSuggestion (1);
-					} else
-					if (key == Key.CursorDown) {
-						k.Handled = this.CycleSuggestion (-1);
-					}
-				};
-
-				this.ColorScheme = new ColorScheme {
-					Normal = new Attribute (Color.White, Color.Black),
-					HotNormal = new Attribute (Color.White, Color.Black),
-					Focus = new Attribute (Color.White, Color.Black),
-					HotFocus = new Attribute (Color.White, Color.Black),
-				};
-			}
-
-			public override void Redraw (Rect bounds)
-			{
-				base.Redraw (bounds);
-
-				if (!this.MakingSuggestion ()) {
-					return;
-				}
-
-				// draw it like its selected even though its not
-				Driver.SetAttribute (new Attribute (Color.DarkGray, Color.Black));
-				this.Move (this.Text.Length, 0);
-				Driver.AddStr (this.validFragments [this.currentFragment.Value]);
-			}
-
-			/// <summary>
-			/// Accepts the current autocomplete suggestion displaying in the text box.
-			/// Returns true if a valid suggestion was being rendered and acceptable or
-			/// false if no suggestion was showing.
-			/// </summary>
-			/// <returns></returns>
-			internal bool AcceptSelectionIfAny ()
-			{
-				if (this.MakingSuggestion ()) {
-					this.Text += this.validFragments [this.currentFragment.Value];
-					this.MoveCursorToEnd ();
-
-					this.ClearSuggestions ();
-					return true;
-				}
-
-				return false;
-			}
-
-			internal void MoveCursorToEnd ()
-			{
-				this.ClearAllSelection ();
-				this.CursorPosition = this.Text.Length;
-			}
-
-			internal void GenerateSuggestions (FileDialogState state, params string [] suggestions)
-			{
-				if (!this.CursorIsAtEnd ()) {
-					return;
-				}
-
-				var path = this.Text.ToString ();
-				var last = path.LastIndexOfAny (FileDialog.separators);
-
-				if (last == -1 || suggestions.Length == 0 || last >= path.Length - 1) {
-					this.currentFragment = null;
-					return;
-				}
-
-				var term = path.Substring (last + 1);
-
-				if (term.Equals (state?.Directory?.Name)) {
-					this.ClearSuggestions ();
-					return;
-				}
-
-				bool isWindows = RuntimeInformation.IsOSPlatform (OSPlatform.Windows);
-
-				var validSuggestions = suggestions
-					.Where (s => s.StartsWith (term, isWindows ?
-						StringComparison.InvariantCultureIgnoreCase :
-						StringComparison.InvariantCulture))
-					.OrderBy (m => m.Length)
-					.ToArray ();
-
-
-				// nothing to suggest
-				if (validSuggestions.Length == 0 || validSuggestions [0].Length == term.Length) {
-					this.ClearSuggestions ();
-					return;
-				}
-
-				this.validFragments = validSuggestions.Select (f => f.Substring (term.Length)).ToArray ();
-				this.currentFragment = 0;
-			}
-
-			internal void ClearSuggestions ()
-			{
-				this.currentFragment = null;
-				this.validFragments = new string [0];
-				this.SetNeedsDisplay ();
-			}
-
-			internal void GenerateSuggestions (FileDialogState state)
-			{
-				if (state == null) {
-					return;
-				}
-
-				var suggestions = state.Children.Select (
-					e => e.FileSystemInfo is DirectoryInfo d
-						? d.Name + System.IO.Path.DirectorySeparatorChar
-						: e.FileSystemInfo.Name)
-					.ToArray ();
-
-				this.GenerateSuggestions (state, suggestions);
-			}
-
-			internal void SetTextTo (FileSystemInfo fileSystemInfo)
-			{
-				var newText = fileSystemInfo.FullName;
-				if (fileSystemInfo is DirectoryInfo) {
-					newText += System.IO.Path.DirectorySeparatorChar;
-				}
-				this.Text = newText;
-				this.MoveCursorToEnd ();
-			}
-
-			internal bool CursorIsAtEnd ()
-			{
-				return this.CursorPosition == this.Text.Length;
-			}
-
-			/// <summary>
-			/// Returns true if there is a suggestion that can be made and the control
-			/// is in a state where user would expect to see auto-complete (i.e. focused and
-			/// cursor in right place).
-			/// </summary>
-			/// <returns></returns>
-			private bool MakingSuggestion ()
-			{
-				return this.currentFragment != null && this.HasFocus && this.CursorIsAtEnd ();
-			}
-
-			private bool CycleSuggestion (int direction)
-			{
-				if (this.currentFragment == null || this.validFragments.Length <= 1) {
-					return false;
-				}
-
-				this.currentFragment = (this.currentFragment + direction) % this.validFragments.Length;
-
-				if (this.currentFragment < 0) {
-					this.currentFragment = this.validFragments.Length - 1;
-				}
-				this.SetNeedsDisplay ();
-				return true;
-			}
-		}
-
-		internal class FileDialogHistory {
-			private Stack<FileDialogState> back = new Stack<FileDialogState> ();
-			private Stack<FileDialogState> forward = new Stack<FileDialogState> ();
-			private FileDialog dlg;
-
-			public FileDialogHistory (FileDialog dlg)
-			{
-				this.dlg = dlg;
-			}
-
-			public bool Back ()
-			{
-
-				DirectoryInfo goTo = null;
-				FileSystemInfoStats restoreSelection = null;
-
-				if (this.CanBack ()) {
-
-					var backTo = this.back.Pop ();
-					goTo = backTo.Directory;
-					restoreSelection = backTo.Selected;
-				} else if (this.CanUp ()) {
-					goTo = this.dlg.state?.Directory.Parent;
-				}
-
-				// nowhere to go
-				if (goTo == null) {
-					return false;
-				}
-
-				this.forward.Push (this.dlg.state);
-				this.dlg.PushState (goTo, false, true, false);
-
-				if (restoreSelection != null) {
-					this.dlg.RestoreSelection (restoreSelection.FileSystemInfo);
-				}
-
-				return true;
-			}
-
-			internal bool CanBack ()
-			{
-				return this.back.Count > 0;
-			}
-
-			internal bool Forward ()
-			{
-				if (this.forward.Count > 0) {
-
-					this.dlg.PushState (this.forward.Pop ().Directory, true, true, false);
-					return true;
-				}
-
-				return false;
-			}
-
-			internal bool Up ()
-			{
-				var parent = this.dlg.state?.Directory.Parent;
-				if (parent != null) {
-
-					this.back.Push (new FileDialogState (parent, this.dlg));
-					this.dlg.PushState (parent, false);
-					return true;
-				}
-
-				return false;
-			}
-
-			internal bool CanUp ()
-			{
-				return this.dlg.state?.Directory.Parent != null;
-			}
-
-
-			internal void Push (FileDialogState state, bool clearForward)
-			{
-				if (state == null) {
-					return;
-				}
-
-				// if changing to a new directory push onto the Back history
-				if (this.back.Count == 0 || this.back.Peek ().Directory.FullName != state.Directory.FullName) {
-
-					this.back.Push (state);
-					if (clearForward) {
-						this.ClearForward ();
-					}
-				}
-			}
-
-			internal bool CanForward ()
-			{
-				return this.forward.Count > 0;
-			}
-
-			internal void ClearForward ()
-			{
-				this.forward.Clear ();
-			}
-		}
-
-		private void RestoreSelection (FileSystemInfo toRestore)
-		{
-			var toReselect = StatsToRow (toRestore);
-
-			if (toReselect.HasValue) {
-				tableView.SelectedRow = toReselect.Value;
-			}
-		}
-
-		private class FileDialogSorter {
-			private readonly FileDialog dlg;
-			private TableView tableView;
-
-			private DataColumn currentSort = null;
-			private bool currentSortIsAsc = true;
-
-			public FileDialogSorter (FileDialog dlg, TableView tableView)
-			{
-				this.dlg = dlg;
-				this.tableView = tableView;
-
-				// if user clicks the mouse in TableView
-				this.tableView.MouseClick += (s,e) => {
-
-					var clickedCell = this.tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out DataColumn clickedCol);
-
-					if (clickedCol != null) {
-						if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
-
-							// left click in a header
-							this.SortColumn (clickedCol);
-						} else if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
-
-							// right click in a header
-							this.ShowHeaderContextMenu (clickedCol, e);
-						}
-					}
-					else
-					{
-						if(clickedCell != null && e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
-						{
-
-							// right click in rest of table
-							this.ShowCellContextMenu (clickedCell, e);
-						}
-					}
-
-				};
-
-			}
-
-			internal void ApplySort ()
-			{
-				var col = this.currentSort;
-
-				// TODO: Consider preserving selection
-				this.tableView.Table.Rows.Clear ();
-
-				var colName = col == null ? null : StripArrows (col.ColumnName);
-
-				var stats = this.dlg.state?.Children ?? new FileSystemInfoStats [0];
-
-				// Do we sort on a column or just use the default sort order?
-				Func<FileSystemInfoStats, object> sortAlgorithm;
-
-				if (colName == null) {
-					sortAlgorithm = (v) => v.GetOrderByDefault ();
-					this.currentSortIsAsc = true;
-				} else {
-					sortAlgorithm = (v) => v.GetOrderByValue (dlg, colName);
-				}
-
-				var ordered =
-					this.currentSortIsAsc ?
-					    stats.Select ((v, i) => new { v, i })
-						.OrderByDescending (f => f.v.IsParent)
-						.ThenBy (f => sortAlgorithm (f.v))
-						.ToArray () :
-					    stats.Select ((v, i) => new { v, i })
-						.OrderByDescending (f => f.v.IsParent)
-						.ThenByDescending (f => sortAlgorithm (f.v))
-						.ToArray ();
-
-				foreach (var o in ordered) {
-					this.dlg.BuildRow (o.i);
-				}
-
-				foreach (DataColumn c in this.tableView.Table.Columns) {
-
-					// remove any lingering sort indicator
-					c.ColumnName = TrimArrows (c.ColumnName);
-
-					// add a new one if this the one that is being sorted
-					if (c == col) {
-						c.ColumnName += this.currentSortIsAsc ? '▲' : '▼';
-					}
-				}
-
-				this.tableView.Update ();
-				dlg.UpdateCollectionNavigator ();
-			}
-
-			private static string TrimArrows (string columnName)
-			{
-				return columnName.TrimEnd ('▼', '▲');
-			}
-
-			private static string StripArrows (string columnName)
-			{
-				return columnName.Replace ("▼", string.Empty).Replace ("▲", string.Empty);
-			}
-
-			private void SortColumn (DataColumn clickedCol)
-			{
-				this.GetProposedNewSortOrder (clickedCol, out var isAsc);
-				this.SortColumn (clickedCol, isAsc);
-			}
-
-			private void SortColumn (DataColumn col, bool isAsc)
-			{
-				// set a sort order
-				this.currentSort = col;
-				this.currentSortIsAsc = isAsc;
-
-				this.ApplySort ();
-			}
-
-			private string GetProposedNewSortOrder (DataColumn clickedCol, out bool isAsc)
-			{
-				// work out new sort order
-				if (this.currentSort == clickedCol && this.currentSortIsAsc) {
-					isAsc = false;
-					return $"{clickedCol.ColumnName} DESC";
-				} else {
-					isAsc = true;
-					return $"{clickedCol.ColumnName} ASC";
-				}
-			}
-
-			private void ShowHeaderContextMenu (DataColumn clickedCol, MouseEventEventArgs e)
-			{
-				var sort = this.GetProposedNewSortOrder (clickedCol, out var isAsc);
-
-				var contextMenu = new ContextMenu (
-					e.MouseEvent.X + 1,
-					e.MouseEvent.Y + 1,
-					new MenuBarItem (new MenuItem []
-					{
-						new MenuItem($"Hide {TrimArrows(clickedCol.ColumnName)}", string.Empty, () => this.HideColumn(clickedCol)),
-						new MenuItem($"Sort {StripArrows(sort)}",string.Empty, ()=> this.SortColumn(clickedCol,isAsc)),
-					})
-				);
-
-				contextMenu.Show ();
-			}
-
-			private void ShowCellContextMenu (Point? clickedCell, MouseEventEventArgs e)
-			{
-				if(clickedCell == null)
-				{
-					return;
-				}
-
-				var contextMenu = new ContextMenu (
-					e.MouseEvent.X + 1,
-					e.MouseEvent.Y + 1,
-					new MenuBarItem (new MenuItem []
-					{
-						new MenuItem($"New", string.Empty, () => dlg.New()),
-						new MenuItem($"Rename",string.Empty, ()=>  dlg.Rename()),
-						new MenuItem($"Delete",string.Empty, ()=>  dlg.Delete()),
-					})
-				);
-
-				dlg.tableView.SetSelection(clickedCell.Value.X,clickedCell.Value.Y,false);
-
-				contextMenu.Show ();
-			}
-
-			private void HideColumn (DataColumn clickedCol)
-			{
-				var style = this.tableView.Style.GetOrCreateColumnStyle (clickedCol);
-				style.Visible = false;
-				this.tableView.Update ();
-			}
-		}
-
-		private class FileDialogTreeBuilder : ITreeBuilder<object> {
-			public bool SupportsCanExpand => true;
-
-			public bool CanExpand (object toExpand)
-			{
-				return this.TryGetDirectories (NodeToDirectory (toExpand)).Any ();
-			}
-
-			public IEnumerable<object> GetChildren (object forObject)
-			{
-				return this.TryGetDirectories (NodeToDirectory (forObject));
-			}
-
-			internal static DirectoryInfo NodeToDirectory (object toExpand)
-			{
-				return toExpand is FileDialogRootTreeNode f ? f.Path : (DirectoryInfo)toExpand;
-			}
-
-			private IEnumerable<DirectoryInfo> TryGetDirectories (DirectoryInfo directoryInfo)
-			{
-				try {
-					return directoryInfo.EnumerateDirectories ();
-				} catch (Exception) {
-
-					return Enumerable.Empty<DirectoryInfo> ();
-				}
-			}
-
 		}
 	}
 }

@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using Terminal.Gui.Resources;
 using System.Collections.ObjectModel;
+using Terminal.Gui.FileServices;
 
 namespace Terminal.Gui {
 

@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Globalization;
 using Terminal.Gui.Configuration;
+using Terminal.Gui.FileServices;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Editor", Description: "A Text Editor using the TextView control.")]

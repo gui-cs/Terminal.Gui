@@ -7,7 +7,7 @@ using Terminal.Gui.Resources;
 using Terminal.Gui.Trees;
 using static System.Environment;
 
-namespace Terminal.Gui {
+namespace Terminal.Gui.FileServices {
 
 	/// <summary>
 	/// Stores style settings for <see cref="FileDialog"/>.
@@ -141,7 +141,9 @@ namespace Terminal.Gui {
 		/// <remarks>Must be configured before showing the dialog.</remarks>
 		public FileDialogTreeRootGetter TreeRootGetter { get; set; } = DefaultTreeRootGetter;
 
-
+		/// <summary>
+		/// Creates a new instance of the <see cref="FileDialogStyle"/> class.
+		/// </summary>
 		public FileDialogStyle ()
 		{
 
