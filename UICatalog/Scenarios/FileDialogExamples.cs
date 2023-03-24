@@ -110,6 +110,21 @@ namespace UICatalog.Scenarios {
 		private void SetupHandler (Button btn)
 		{
 			btn.Clicked += (s,e) => {
+				try
+				{
+					CreateDialog();
+				}	
+				catch(Exception ex)
+				{
+					MessageBox.ErrorQuery("Error",ex.ToString(),"Ok");
+
+				}
+			};
+		}
+
+		private void CreateDialog ()
+		{
+			
 				var fd = new FileDialog () {
 					OpenMode = Enum.Parse<OpenMode> (
 						rgOpenMode.RadioLabels [rgOpenMode.SelectedItem].ToString ()),
@@ -173,7 +188,6 @@ namespace UICatalog.Scenarios {
 						"You chose:" + Environment.NewLine + fd.Path,
 						"Ok");
 				}
-			};
 		}
 
 		private void ConfirmOverwrite (object sender, FilesSelectedEventArgs e)
