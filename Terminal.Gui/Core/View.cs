@@ -508,7 +508,7 @@ namespace Terminal.Gui {
 					return Bounds;
 				}
 
-				return Padding.Thickness.GetInnerRect (BorderFrame.Thickness.GetInnerRect (Margin.Thickness.GetInnerRect (new Rect (default, Frame.Size))));
+				return Padding.Thickness.GetInside (BorderFrame.Thickness.GetInside (Margin.Thickness.GetInside (new Rect (default, Frame.Size))));
 			}
 		}
 
@@ -567,7 +567,7 @@ namespace Terminal.Gui {
 				Margin.SetNeedsDisplay ();
 			}
 			if (BorderFrame != null) {
-				var border = Margin?.Thickness.GetInnerRect (Margin.Frame) ?? Frame;
+				var border = Margin?.Thickness.GetInside (Margin.Frame) ?? Frame;
 				BorderFrame.X = border.Location.X;
 				BorderFrame.Y = border.Location.Y;
 				BorderFrame.Width = border.Size.Width;
@@ -577,9 +577,9 @@ namespace Terminal.Gui {
 				BorderFrame.SetNeedsDisplay ();
 			}
 			if (Padding != null) {
-				var padding = BorderFrame?.Thickness.GetInnerRect (BorderFrame?.Frame ??
-					(Margin?.Thickness.GetInnerRect (Margin.Frame) ?? Frame)) ??
-						Margin?.Thickness.GetInnerRect (Margin.Frame) ?? Frame;
+				var padding = BorderFrame?.Thickness.GetInside (BorderFrame?.Frame ??
+					(Margin?.Thickness.GetInside (Margin.Frame) ?? Frame)) ??
+						Margin?.Thickness.GetInside (Margin.Frame) ?? Frame;
 				Padding.X = padding.Location.X;
 				Padding.Y = padding.Location.Y;
 				Padding.Width = padding.Size.Width;
@@ -646,7 +646,7 @@ namespace Terminal.Gui {
 				if (Padding == null || BorderFrame == null || Margin == null) {
 					return new Rect (default, Frame.Size);
 				}
-				var frameRelativeBounds = Padding.Thickness.GetInnerRect (Padding.Frame);
+				var frameRelativeBounds = Padding.Thickness.GetInside (Padding.Frame);
 				return new Rect (default, frameRelativeBounds.Size);
 			}
 			set {
@@ -1360,7 +1360,7 @@ namespace Terminal.Gui {
 		public Point ScreenToBounds (int x, int y)
 		{
 			if (SuperView == null) {
-				var inner = Padding.Thickness.GetInnerRect (BorderFrame.Thickness.GetInnerRect (Margin.Thickness.GetInnerRect (Frame)));
+				var inner = Padding.Thickness.GetInside (BorderFrame.Thickness.GetInside (Margin.Thickness.GetInside (Frame)));
 				return new Point (x - inner.X, y - inner.Y);
 			} else {
 				var parent = SuperView.ScreenToView (x, y);
@@ -1385,7 +1385,7 @@ namespace Terminal.Gui {
 				rrow = row + Frame.Y;
 				rcol = col + Frame.X;
 			} else {
-				var inner = Padding.Thickness.GetInnerRect (BorderFrame.Thickness.GetInnerRect (Margin.Thickness.GetInnerRect (Frame)));
+				var inner = Padding.Thickness.GetInside (BorderFrame.Thickness.GetInside (Margin.Thickness.GetInside (Frame)));
 				rrow = row + inner.Y;
 				rcol = col + inner.X;
 			}
@@ -1393,7 +1393,7 @@ namespace Terminal.Gui {
 			var super = SuperView;
 			while (super != null) {
 				if (!(super.Padding == null || super.BorderFrame == null || super.Margin == null)) {
-					var inner = super.Padding.Thickness.GetInnerRect (super.BorderFrame.Thickness.GetInnerRect (super.Margin.Thickness.GetInnerRect (super.Frame)));
+					var inner = super.Padding.Thickness.GetInside (super.BorderFrame.Thickness.GetInside (super.Margin.Thickness.GetInside (super.Frame)));
 					rrow += inner.Y;
 					rcol += inner.X;
 				} else {

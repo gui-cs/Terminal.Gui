@@ -155,11 +155,11 @@ namespace Terminal.Gui.CoreTests {
 
 
 		[Fact ()]
-		public void GetInnerRectTest ()
+		public void GetInsideTest ()
 		{
 			var t = new Thickness (1, 2, 3, 4);
 			var r = new Rect (10, 20, 30, 40);
-			var r2 = t.GetInnerRect (r);
+			var r2 = t.GetInside (r);
 			Assert.Equal (11, r2.X);
 			Assert.Equal (22, r2.Y);
 			Assert.Equal (26, r2.Width);

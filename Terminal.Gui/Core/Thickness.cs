@@ -109,7 +109,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="rect">The source rectangle</param>
 		/// <returns></returns>
-		public Rect GetInnerRect (Rect rect)
+		public Rect GetInside (Rect rect)
 		{
 			var width = rect.Size.Width - (Left + Right);
 			var height = rect.Size.Height - (Top + Bottom);
@@ -212,7 +212,7 @@ namespace Terminal.Gui {
 				tf.Draw (rect, Application.Driver.CurrentAttribute, Application.Driver.CurrentAttribute, rect, false);
 			}
 
-			return GetInnerRect (rect);
+			return GetInside (rect);
 
 		}
 

@@ -189,7 +189,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override Rect Bounds {
 			get {
-				return Thickness?.GetInnerRect (new Rect (Point.Empty, Frame.Size)) ?? new Rect (Point.Empty, Frame.Size);
+				return Thickness?.GetInside (new Rect (Point.Empty, Frame.Size)) ?? new Rect (Point.Empty, Frame.Size);
 			}
 			set {
 				throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");

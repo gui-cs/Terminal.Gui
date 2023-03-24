@@ -690,7 +690,7 @@ namespace Terminal.Gui {
 				return null;
 			}
 
-			startFrame = start.Padding.Thickness.GetInnerRect (start.BorderFrame.Thickness.GetInnerRect (start.Margin.Thickness.GetInnerRect (startFrame)));
+			startFrame = start.Padding.Thickness.GetInside (start.BorderFrame.Thickness.GetInside (start.Margin.Thickness.GetInside (startFrame)));
 			if (start.InternalSubviews != null) {
 				int count = start.InternalSubviews.Count;
 				if (count > 0) {
