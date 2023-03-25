@@ -38,29 +38,29 @@ namespace Terminal.Gui {
 
 		ContentView contentView;
 		ScrollBarView vertical, horizontal;
+		int scrollLines, scrollCols;
 
 		/// <summary>
 		///  Initializes a new instance of the <see cref="Gui.ScrollView"/> class using <see cref="LayoutStyle.Absolute"/> positioning.
 		/// </summary>
 		/// <param name="frame"></param>
-		public ScrollView (Rect frame) : base (frame)
+		/// <param name="scrollLines">Scroll amount for vertical scrolling</param>
+		/// <param name="scrollCols">Scroll amount for horizontal scrolling</param>
+		public ScrollView (Rect frame, int scrollLines = 1, int scrollCols = 1) : base (frame)
 		{
-			Initialize (frame);
+			Initialize (frame, scrollLines, scrollCols);
 		}
 
 
 		/// <summary>
 		///  Initializes a new instance of the <see cref="Gui.ScrollView"/> class using <see cref="LayoutStyle.Computed"/> positioning.
 		/// </summary>
-		public ScrollView () : base ()
-		{
-			Initialize (Rect.Empty);
-		}
+		public ScrollView () : this (Rect.Empty, 1, 1) { }
 
-		void Initialize (Rect frame)
+		void Initialize (Rect frame, int scrollLines = 1, int scrollCols = 1)
 		{
 			contentView = new ContentView (frame);
-			vertical = new ScrollBarView (1, 0, isVertical: true) {
+			vertical = new ScrollBarView (1, 0, isVertical: true, scrollAmount: scrollLines) {
 				X = Pos.AnchorEnd (1),
 				Y = 0,
 				Width = 1,
@@ -70,7 +70,7 @@ namespace Terminal.Gui {
 				ContentOffset = new Point (ContentOffset.X, vertical.Position);
 			};
 			vertical.Host = this;
-			horizontal = new ScrollBarView (1, 0, isVertical: false) {
+			horizontal = new ScrollBarView (1, 0, isVertical: false, scrollAmount: scrollCols) {
 				X = 0,
 				Y = Pos.AnchorEnd (1),
 				Width = Dim.Fill (showVerticalScrollIndicator ? 1 : 0),
@@ -91,10 +91,10 @@ namespace Terminal.Gui {
 			contentView.MouseLeave += View_MouseLeave;
 
 			// Things this view knows how to do
-			AddCommand (Command.ScrollUp, () => ScrollUp (1));
-			AddCommand (Command.ScrollDown, () => ScrollDown (1));
-			AddCommand (Command.ScrollLeft, () => ScrollLeft (1));
-			AddCommand (Command.ScrollRight, () => ScrollRight (1));
+			AddCommand (Command.ScrollUp, () => ScrollUp (vertical.ScrollAmount));
+			AddCommand (Command.ScrollDown, () => ScrollDown (vertical.ScrollAmount));
+			AddCommand (Command.ScrollLeft, () => ScrollLeft (horizontal.ScrollAmount));
+			AddCommand (Command.ScrollRight, () => ScrollRight (horizontal.ScrollAmount));
 			AddCommand (Command.PageUp, () => ScrollUp (Bounds.Height));
 			AddCommand (Command.PageDown, () => ScrollDown (Bounds.Height));
 			AddCommand (Command.PageLeft, () => ScrollLeft (Bounds.Width));
@@ -173,6 +173,28 @@ namespace Terminal.Gui {
 					}
 					SetNeedsDisplay ();
 				}
+			}
+		}
+
+		/// <summary>
+		/// Sets how many lines will be scrolled when scrolling vertically.
+		/// </summary>
+		public int ScrollLines {
+			get => scrollLines;
+			set {
+				scrollLines = value;
+				SetNeedsDisplay ();
+			}
+		}
+
+		/// <summary>
+		/// Sets how many lines will be scrolled when scrolling horizontally.
+		/// </summary>
+		public int ScrollCols{
+			get => scrollCols;
+			set {
+				scrollCols = value;
+				SetNeedsDisplay ();
 			}
 		}
 
@@ -437,7 +459,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Scrolls the view up.
 		/// </summary>
-		/// <returns><c>true</c>, if left was scrolled, <c>false</c> otherwise.</returns>
+		/// <returns><c>true</c>, if up was scrolled, <c>false</c> otherwise.</returns>
 		/// <param name="lines">Number of lines to scroll.</param>
 		public bool ScrollUp (int lines)
 		{
@@ -465,12 +487,13 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Scrolls the view down.
 		/// </summary>
-		/// <returns><c>true</c>, if left was scrolled, <c>false</c> otherwise.</returns>
+		/// <returns><c>true</c>, if down was scrolled, <c>false</c> otherwise.</returns>
 		/// <param name="lines">Number of lines to scroll.</param>
 		public bool ScrollDown (int lines)
 		{
-			if (vertical.CanScroll (lines, out _, true)) {
-				ContentOffset = new Point (contentOffset.X, contentOffset.Y - lines);
+			var maxOffset = vertical.GetBarsize (true) - vertical.Size;
+			if (contentOffset.Y > maxOffset) {
+				ContentOffset = new Point (contentOffset.X, Math.Max (contentOffset.Y - lines, maxOffset));
 				return true;
 			}
 			return false;
@@ -483,8 +506,9 @@ namespace Terminal.Gui {
 		/// <param name="cols">Number of columns to scroll by.</param>
 		public bool ScrollRight (int cols)
 		{
-			if (horizontal.CanScroll (cols, out _)) {
-				ContentOffset = new Point (contentOffset.X - cols, contentOffset.Y);
+			var maxOffset = horizontal.GetBarsize (false) - horizontal.Size;
+			if (contentOffset.X > maxOffset) {
+				ContentOffset = new Point (Math.Max (contentOffset.X - cols, maxOffset), contentOffset.Y);
 				return true;
 			}
 			return false;
@@ -514,13 +538,13 @@ namespace Terminal.Gui {
 			}
 
 			if (me.Flags == MouseFlags.WheeledDown && ShowVerticalScrollIndicator) {
-				ScrollDown (1);
+				ScrollDown (vertical.ScrollAmount);
 			} else if (me.Flags == MouseFlags.WheeledUp && ShowVerticalScrollIndicator) {
-				ScrollUp (1);
+				ScrollUp (vertical.ScrollAmount);
 			} else if (me.Flags == MouseFlags.WheeledRight && showHorizontalScrollIndicator) {
-				ScrollRight (1);
+				ScrollRight (horizontal.ScrollAmount);
 			} else if (me.Flags == MouseFlags.WheeledLeft && ShowVerticalScrollIndicator) {
-				ScrollLeft (1);
+				ScrollLeft (horizontal.ScrollAmount);
 			} else if (me.X == vertical.Frame.X && ShowVerticalScrollIndicator) {
 				vertical.MouseEvent (me);
 			} else if (me.Y == horizontal.Frame.Y && ShowHorizontalScrollIndicator) {
