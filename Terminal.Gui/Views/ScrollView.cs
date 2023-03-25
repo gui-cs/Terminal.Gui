@@ -55,7 +55,10 @@ namespace Terminal.Gui {
 		/// <summary>
 		///  Initializes a new instance of the <see cref="Gui.ScrollView"/> class using <see cref="LayoutStyle.Computed"/> positioning.
 		/// </summary>
-		public ScrollView () : this (Rect.Empty, 1, 1) { }
+		public ScrollView () : base() 
+		{
+			Initialize (Rect.Empty, 1, 1);
+		}
 
 		void Initialize (Rect frame, int scrollLines = 1, int scrollCols = 1)
 		{
