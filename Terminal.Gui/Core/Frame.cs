@@ -19,6 +19,7 @@ namespace Terminal.Gui {
 		private Thickness _thickness = Thickness.Empty;
 
 		internal override void CreateFrames () { /* Do nothing - Frames do not have Frames */ }
+		internal override void LayoutFrames () { /* Do nothing - Frames do not have Frames */ }
 
 		/// <summary>
 		/// The Parent of this Frame (the View this Frame surrounds).

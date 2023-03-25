@@ -9,9 +9,17 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Describes the thickness of a frame around a rectangle. Four <see cref="int"/> values describe
 	///  the <see cref="Left"/>, <see cref="Top"/>, <see cref="Right"/>, and <see cref="Bottom"/> sides
-	///  of the rectangle, respectively. Provides a helper API (<see cref="Draw(Rect, string)"/> for
-	///  drawing a frame with the specified thickness.
+	///  of the rectangle, respectively.
 	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// Use the helper API (<see cref="GetInside(Rect)"/> to get the rectangle describing the insides of the frame,
+	/// with the thickness widths subtracted.
+	/// </para>
+	/// <para>
+	/// Use the helper API (<see cref="Draw(Rect, string)"/> to draw the frame with the specified thickness.
+	/// </para>
+	/// </remarks>
 	public class Thickness : IEquatable<Thickness> {
 		private int validate (int width)
 		{
@@ -44,6 +52,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		[JsonInclude]
 		public int Bottom;
+		private Rect inside;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Thickness"/> class with all widths
@@ -97,24 +106,23 @@ namespace Terminal.Gui {
 			}
 		}
 
-		//public virtual void OnChanged()
-		//{
-		//	Changed?.Invoke (this, new ThicknessEventArgs () { Thickness = this });
-		//}
-		//public event EventHandler<ThicknessEventArgs> Changed;
-
 		/// <summary>
-		/// Returns a rectangle describing the location and size of the inner area of <paramref name="rect"/>
-		/// with the thickness widths subracted. The height and width of the retunred rect may be zero.
+		/// Returns a rectangle describing the location and size of the inside area of <paramref name="rect"/>
+		/// with the thickness widths subtracted. The height and width of the returned rectangle will
+		/// never be less than 0.
 		/// </summary>
+		/// <remarks>If a thickness width is negative, the inside rectangle will be larger than <paramref name="rect"/>. e.g.
+		/// a <c>Thickness (-1, -1, -1, -1) will result in a rectangle skewed -1 in the X and Y directions and 
+		/// with a Size increased by 1.</c></remarks>
 		/// <param name="rect">The source rectangle</param>
 		/// <returns></returns>
 		public Rect GetInside (Rect rect)
 		{
-			var width = rect.Size.Width - (Left + Right);
-			var height = rect.Size.Height - (Top + Bottom);
-			var size = new Size (Math.Max (0, width), Math.Max (0, height));
-			return new Rect (new Point (rect.X + Left, rect.Y + Top), size);
+			var x = rect.X + Left;
+			var y = rect.Y + Top;
+			var width = Math.Max (0, rect.Size.Width - Horizontal);
+			var height = Math.Max (0, rect.Size.Height - Vertical);
+			return new Rect (new Point (x, y), new Size (width, height));
 		}
 
 		/// <summary>

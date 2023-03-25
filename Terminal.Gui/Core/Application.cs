@@ -672,7 +672,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Finds the deepest view at the specified coordinates.
+		/// Finds the deepest view at the specified coordinates, specified relative to <paramref name="start"/>'s superview.
 		/// </summary>
 		/// <param name="start"></param>
 		/// <param name="x"></param>
@@ -682,22 +682,25 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		static View FindDeepestView (View start, int x, int y, out int resx, out int resy)
 		{
-			var startFrame = start.Frame;
+			//var startFrame = start.Frame;
 
-			if (!startFrame.Contains (x, y)) {
+			var startRect = new Rect (start.Frame.X + start.GetBoundsOffset().X, start.Frame.Y + start.GetBoundsOffset ().Y, start.Bounds.Width, start.Bounds.Height);
+
+			if (!startRect.Contains (x, y)) {
 				resx = 0;
 				resy = 0;
 				return null;
 			}
 
-			startFrame = start.Padding.Thickness.GetInside (start.BorderFrame.Thickness.GetInside (start.Margin.Thickness.GetInside (startFrame)));
+			//startFrame = start.Padding.Thickness.GetInside (start.BorderFrame.Thickness.GetInside (start.Margin.Thickness.GetInside (startFrame)));
 			if (start.InternalSubviews != null) {
 				int count = start.InternalSubviews.Count;
 				if (count > 0) {
-					var rx = x - startFrame.X;
-					var ry = y - startFrame.Y;
+					var rx = x - startRect.X;
+					var ry = y - startRect.Y;
 					for (int i = count - 1; i >= 0; i--) {
 						View v = start.InternalSubviews [i];
+						// BUGBUG: v2 - I think it's a bug that we use v.Frame.Contains here vs. Frame + v.GetBoundsOffset
 						if (v.Visible && v.Frame.Contains (rx, ry)) {
 							var deep = FindDeepestView (v, rx, ry, out resx, out resy);
 							if (deep == null)
@@ -707,8 +710,8 @@ namespace Terminal.Gui {
 					}
 				}
 			}
-			resx = x - startFrame.X;
-			resy = y - startFrame.Y;
+			resx = x - startRect.X;
+			resy = y - startRect.Y;
 			return start;
 		}
 

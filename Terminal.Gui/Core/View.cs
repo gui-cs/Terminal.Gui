@@ -498,19 +498,10 @@ namespace Terminal.Gui {
 		public Frame Padding { get; private set; }
 
 		/// <summary>
-		/// Gets the rectangle that describes the location and size of the area within the View where
-		/// content and subviews are rendered. This is Bounds offset by all of the top/left thicknesses.
+		/// Helper to get the X and Y offset of the Bounds from the Frame. This is the sum of the Left and Top properties of
+		/// <see cref="Margin"/>, <see cref="BorderFrame"/> and <see cref="Padding"/>.
 		/// </summary>
-		public Rect ContentArea {
-			get {
-				// BUGBUG: 
-				if (Padding == null || BorderFrame == null || Margin == null) {
-					return Bounds;
-				}
-
-				return Padding.Thickness.GetInside (BorderFrame.Thickness.GetInside (Margin.Thickness.GetInside (new Rect (default, Frame.Size))));
-			}
-		}
+		public Point GetBoundsOffset () => new Point (Padding?.Thickness.GetInside (Padding.Frame).X ?? 0, Padding?.Thickness.GetInside (Padding.Frame).Y ?? 0);
 
 		/// <summary>
 		/// Creates the view's <see cref="Frame"/> objects. This internal method is overridden by Frame to do nothing
@@ -549,45 +540,6 @@ namespace Terminal.Gui {
 			Padding = new Frame () { Id = "Padding", Thickness = new Thickness (0) };
 			Padding.ThicknessChanged += ThicknessChangedHandler;
 			Padding.Parent = this;
-		}
-
-		/// <summary>
-		/// Lays out the view's <see cref="Frame"/> objects (<see cref="Margin"/>, <see cref="BorderFrame"/>, and <see cref="Padding"/> 
-		/// as needed. Causes each Frame to Layout its SubViews.
-		/// </summary>
-		public void LayoutFrames ()
-		{
-			if (Margin != null) {
-				Margin.X = 0;
-				Margin.Y = 0;
-				Margin.Width = Frame.Size.Width;
-				Margin.Height = Frame.Size.Height;
-				Margin.SetNeedsLayout ();
-				Margin.LayoutSubviews ();
-				Margin.SetNeedsDisplay ();
-			}
-			if (BorderFrame != null) {
-				var border = Margin?.Thickness.GetInside (Margin.Frame) ?? Frame;
-				BorderFrame.X = border.Location.X;
-				BorderFrame.Y = border.Location.Y;
-				BorderFrame.Width = border.Size.Width;
-				BorderFrame.Height = border.Size.Height;
-				BorderFrame.SetNeedsLayout ();
-				BorderFrame.LayoutSubviews ();
-				BorderFrame.SetNeedsDisplay ();
-			}
-			if (Padding != null) {
-				var padding = BorderFrame?.Thickness.GetInside (BorderFrame?.Frame ??
-					(Margin?.Thickness.GetInside (Margin.Frame) ?? Frame)) ??
-						Margin?.Thickness.GetInside (Margin.Frame) ?? Frame;
-				Padding.X = padding.Location.X;
-				Padding.Y = padding.Location.Y;
-				Padding.Width = padding.Size.Width;
-				Padding.Height = padding.Size.Height;
-				Padding.SetNeedsLayout ();
-				Padding.LayoutSubviews ();
-				Padding.SetNeedsDisplay ();
-			}
 		}
 
 		ustring title;
@@ -636,20 +588,20 @@ namespace Terminal.Gui {
 		/// <value>The bounds.</value>
 		/// <remarks>
 		/// <para>
-		/// The <see cref="Rect.Location"/> of Bounds is always (0, 0). 
-		/// To obtain the Frame-relative location of the content area use <see cref="ContentArea"/>.
+		/// The <see cref="Rect.Location"/> of Bounds is always (0, 0). To obtain the offset of the Bounds from the Frame use 
+		/// <see cref="GetBoundsOffset"/>.
+		/// </para>
+		/// <para>
+		/// To obtain the SuperView-relative location of the content area use <see cref="ContentArea"/>.
 		/// </para>
 		/// </remarks>
 		public virtual Rect Bounds {
 			get {
-				// BUGBUG: 
-				if (Padding == null || BorderFrame == null || Margin == null) {
-					return new Rect (default, Frame.Size);
-				}
-				var frameRelativeBounds = Padding.Thickness.GetInside (Padding.Frame);
+				var frameRelativeBounds = Padding?.Thickness.GetInside (Padding.Frame) ?? new Rect (default, Frame.Size);
 				return new Rect (default, frameRelativeBounds.Size);
 			}
 			set {
+				// BUGBUG: Margin etc.. can be null (if typeof(Frame))
 				Frame = new Rect (Frame.Location, value.Size
 					+ new Size (Margin.Thickness.Right, Margin.Thickness.Bottom)
 					+ new Size (BorderFrame.Thickness.Right, BorderFrame.Thickness.Bottom)
@@ -1151,7 +1103,7 @@ namespace Terminal.Gui {
 			}
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
-      
+
 			OnAdded (new SuperViewChangedEventArgs (this, view));
 			if (IsInitialized && !view.IsInitialized) {
 				view.BeginInit ();
@@ -1360,8 +1312,7 @@ namespace Terminal.Gui {
 		public Point ScreenToBounds (int x, int y)
 		{
 			if (SuperView == null) {
-				var inner = Padding.Thickness.GetInside (BorderFrame.Thickness.GetInside (Margin.Thickness.GetInside (Frame)));
-				return new Point (x - inner.X, y - inner.Y);
+				return new Point (x - Frame.X + GetBoundsOffset ().X, y - Frame.Y + GetBoundsOffset ().Y);
 			} else {
 				var parent = SuperView.ScreenToView (x, y);
 				return new Point (parent.X - frame.X, parent.Y - frame.Y);
@@ -1380,26 +1331,13 @@ namespace Terminal.Gui {
 		/// <see cref="ConsoleDriver.Rows"/>, respectively.</param>
 		public virtual void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clamped = true)
 		{
-			// Computes the real row, col relative to the screen.
-			if (Padding == null || BorderFrame == null || Margin == null) {
-				rrow = row + Frame.Y;
-				rcol = col + Frame.X;
-			} else {
-				var inner = Padding.Thickness.GetInside (BorderFrame.Thickness.GetInside (Margin.Thickness.GetInside (Frame)));
-				rrow = row + inner.Y;
-				rcol = col + inner.X;
-			}
+			rcol = col + Frame.X + GetBoundsOffset ().X;
+			rrow = row + Frame.Y + GetBoundsOffset ().Y;
 
 			var super = SuperView;
 			while (super != null) {
-				if (!(super.Padding == null || super.BorderFrame == null || super.Margin == null)) {
-					var inner = super.Padding.Thickness.GetInside (super.BorderFrame.Thickness.GetInside (super.Margin.Thickness.GetInside (super.Frame)));
-					rrow += inner.Y;
-					rcol += inner.X;
-				} else {
-					rrow += super.Frame.Y;
-					rcol += super.Frame.X;
-				}
+				rcol += super.Frame.X + super.GetBoundsOffset ().X;
+				rrow += super.Frame.Y + super.GetBoundsOffset ().Y;
 				super = super.SuperView;
 			}
 
@@ -2629,6 +2567,37 @@ namespace Terminal.Gui {
 			return result;
 		} // TopologicalSort
 
+		/// <summary>
+		/// Overriden by <see cref="Frame"/> to do nothing, as the <see cref="Frame"/> does not have frames.
+		/// </summary>
+		internal virtual void LayoutFrames ()
+		{
+			Margin.X = 0;
+			Margin.Y = 0;
+			Margin.Width = Frame.Size.Width;
+			Margin.Height = Frame.Size.Height;
+			Margin.SetNeedsLayout ();
+			Margin.LayoutSubviews ();
+			Margin.SetNeedsDisplay ();
+
+			var border = Margin.Thickness.GetInside (Margin.Frame);
+			BorderFrame.X = border.Location.X;
+			BorderFrame.Y = border.Location.Y;
+			BorderFrame.Width = border.Size.Width;
+			BorderFrame.Height = border.Size.Height;
+			BorderFrame.SetNeedsLayout ();
+			BorderFrame.LayoutSubviews ();
+			BorderFrame.SetNeedsDisplay ();
+
+			var padding = BorderFrame.Thickness.GetInside (BorderFrame.Frame);
+			Padding.X = padding.Location.X;
+			Padding.Y = padding.Location.Y;
+			Padding.Width = padding.Size.Width;
+			Padding.Height = padding.Size.Height;
+			Padding.SetNeedsLayout ();
+			Padding.LayoutSubviews ();
+			Padding.SetNeedsDisplay ();
+		}
 
 		/// <summary>
 		/// Invoked when a view starts executing or when the dimensions of the view have changed, for example in
@@ -2656,7 +2625,7 @@ namespace Terminal.Gui {
 			CollectAll (this, ref nodes, ref edges);
 			var ordered = View.TopologicalSort (SuperView, nodes, edges);
 			foreach (var v in ordered) {
-				LayoutSubview (v, ContentArea);
+				LayoutSubview (v, new Rect (GetBoundsOffset (), Bounds.Size));
 			}
 
 			// If the 'to' is rooted to 'from' and the layoutstyle is Computed it's a special-case.
@@ -2673,10 +2642,10 @@ namespace Terminal.Gui {
 			OnLayoutComplete (new LayoutEventArgs () { OldBounds = oldBounds });
 		}
 
-		private void LayoutSubview (View v, Rect hostFrame)
+		private void LayoutSubview (View v, Rect contentArea)
 		{
 			if (v.LayoutStyle == LayoutStyle.Computed) {
-				v.SetRelativeLayout (hostFrame);
+				v.SetRelativeLayout (contentArea);
 			}
 
 			v.LayoutSubviews ();

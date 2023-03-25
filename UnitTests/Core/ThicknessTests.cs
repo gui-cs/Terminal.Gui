@@ -153,17 +153,250 @@ namespace Terminal.Gui.CoreTests {
 
 		}
 
+		[Fact ()]
+		public void GetInsideTests_Zero_Thickness ()
+		{
+			var t = new Thickness (0, 0, 0, 0);
+			var r = Rect.Empty;
+			var inside = t.GetInside (r);
+			Assert.Equal (0, inside.X);
+			Assert.Equal (0, inside.Y);
+			Assert.Equal (0, inside.Width);
+			Assert.Equal (0, inside.Height);
+
+			t = new Thickness (0, 0, 0, 0);
+			r = new Rect (0, 0, 1, 1);
+			inside = t.GetInside (r);
+			Assert.Equal (0, inside.X);
+			Assert.Equal (0, inside.Y);
+			Assert.Equal (1, inside.Width);
+			Assert.Equal (1, inside.Height);
+
+			t = new Thickness (0, 0, 0, 0);
+			r = new Rect (1, 1, 1, 1);
+			inside = t.GetInside (r);
+			Assert.Equal (1, inside.X);
+			Assert.Equal (1, inside.Y);
+			Assert.Equal (1, inside.Width);
+			Assert.Equal (1, inside.Height);
+
+			t = new Thickness (0, 0, 0, 0);
+			r = new Rect (0, 0, 1, 0);
+			inside = t.GetInside (r);
+			Assert.Equal (0, inside.X);
+			Assert.Equal (0, inside.Y);
+			Assert.Equal (1, inside.Width);
+			Assert.Equal (0, inside.Height);
+
+			t = new Thickness (0, 0, 0, 0);
+			r = new Rect (0, 0, 0, 1);
+			inside = t.GetInside (r);
+			Assert.Equal (0, inside.X);
+			Assert.Equal (0, inside.Y);
+			Assert.Equal (0, inside.Width);
+			Assert.Equal (1, inside.Height);
+
+			t = new Thickness (0, 0, 0, 0);
+			r = new Rect (-1, -1, 0, 1);
+			inside = t.GetInside (r);
+			Assert.Equal (-1, inside.X);
+			Assert.Equal (-1, inside.Y);
+			Assert.Equal (0, inside.Width);
+			Assert.Equal (1, inside.Height);
+		}
 
 		[Fact ()]
-		public void GetInsideTest ()
+		public void GetInsideTests_Positive_Thickness_Too_Small_Rect_Means_Empty_Size ()
 		{
-			var t = new Thickness (1, 2, 3, 4);
-			var r = new Rect (10, 20, 30, 40);
-			var r2 = t.GetInside (r);
-			Assert.Equal (11, r2.X);
-			Assert.Equal (22, r2.Y);
-			Assert.Equal (26, r2.Width);
-			Assert.Equal (34, r2.Height);
+			var t = new Thickness (1, 1, 1, 1);
+			var r = Rect.Empty;
+			var inside = t.GetInside (r);
+			Assert.Equal (1, inside.X);
+			Assert.Equal (1, inside.Y);
+			Assert.Equal (0, inside.Width);
+			Assert.Equal (0, inside.Height);
+
+			t = new Thickness (1, 1, 1, 1);
+			r = new Rect (0, 0, 1, 1);
+			inside = t.GetInside (r);
+			Assert.Equal (1, inside.X);
+			Assert.Equal (1, inside.Y);
+			Assert.Equal (0, inside.Width);
+			Assert.Equal (0, inside.Height);
+
+			t = new Thickness (1, 1, 1, 1);
+			r = new Rect (1, 1, 1, 1);
+			inside = t.GetInside (r);
+			Assert.Equal (2, inside.X);
+			Assert.Equal (2, inside.Y);
+			Assert.Equal (0, inside.Width);
+			Assert.Equal (0, inside.Height);
+
+			t = new Thickness (1, 1, 1, 1);
+			r = new Rect (0, 0, 1, 0);
+			inside = t.GetInside (r);
+			Assert.Equal (1, inside.X);
+			Assert.Equal (1, inside.Y);
+			Assert.Equal (0, inside.Width);
+			Assert.Equal (0, inside.Height);
+
+			t = new Thickness (1, 1, 1, 1);
+			r = new Rect (0, 0, 0, 1);
+			inside = t.GetInside (r);
+			Assert.Equal (1, inside.X);
+			Assert.Equal (1, inside.Y);
+			Assert.Equal (0, inside.Width);
+			Assert.Equal (0, inside.Height);
+
+			t = new Thickness (1, 1, 1, 1);
+			r = new Rect (-1, -1, 0, 1);
+			inside = t.GetInside (r);
+			Assert.Equal (0, inside.X);
+			Assert.Equal (0, inside.Y);
+			Assert.Equal (0, inside.Width);
+			Assert.Equal (0, inside.Height);
+
+			t = new Thickness (1, 1, 1, 1);
+			r = new Rect (0, 0, 2, 2);
+			inside = t.GetInside (r);
+			Assert.Equal (1, inside.X);
+			Assert.Equal (1, inside.Y);
+			Assert.Equal (0, inside.Width);
+			Assert.Equal (0, inside.Height);
+
+			t = new Thickness (1, 1, 1, 1);
+			r = new Rect (-1, -1, 2, 2);
+			inside = t.GetInside (r);
+			Assert.Equal (0, inside.X);
+			Assert.Equal (0, inside.Y);
+			Assert.Equal (0, inside.Width);
+			Assert.Equal (0, inside.Height);
+
+			t = new Thickness (1, 1, 1, 1);
+			r = new Rect (1, 1, 2, 2);
+			inside = t.GetInside (r);
+			Assert.Equal (2, inside.X);
+			Assert.Equal (2, inside.Y);
+			Assert.Equal (0, inside.Width);
+			Assert.Equal (0, inside.Height);
+
+			t = new Thickness (1, 2, 3, 4);
+			r = new Rect (-1, 0, 4, 6);
+			inside = t.GetInside (r);
+			Assert.Equal (0, inside.X);
+			Assert.Equal (2, inside.Y);
+			Assert.Equal (0, inside.Width);
+			Assert.Equal (0, inside.Height);
+		}
+
+		[Fact ()]
+		public void GetInsideTests_Positive_Thickness_Non_Empty_Size()
+		{
+
+			var t = new Thickness (1, 1, 1, 1);
+			var r = new Rect (0, 0, 3, 3);
+			var inside = t.GetInside (r);
+			Assert.Equal (1, inside.X);
+			Assert.Equal (1, inside.Y);
+			Assert.Equal (1, inside.Width);
+			Assert.Equal (1, inside.Height);
+
+			t = new Thickness (1, 1, 1, 1);
+			r = new Rect (-1, -1, 3, 3);
+			inside = t.GetInside (r);
+			Assert.Equal (0, inside.X);
+			Assert.Equal (0, inside.Y);
+			Assert.Equal (1, inside.Width);
+			Assert.Equal (1, inside.Height);
+
+			t = new Thickness (1, 1, 1, 1);
+			r = new Rect (1, 1, 3, 3);
+			inside = t.GetInside (r);
+			Assert.Equal (2, inside.X);
+			Assert.Equal (2, inside.Y);
+			Assert.Equal (1, inside.Width);
+			Assert.Equal (1, inside.Height);
+
+			t = new Thickness (1, 2, 3, 4);
+			r = new Rect (-1, 0, 50, 60);
+			inside = t.GetInside (r);
+			Assert.Equal (0, inside.X);
+			Assert.Equal (2, inside.Y);
+			Assert.Equal (46, inside.Width);
+			Assert.Equal (54, inside.Height);
+		}
+
+		[Fact ()]
+		public void GetInsideTests_Negative_Thickness_Non_Empty_Size ()
+		{
+			var t = new Thickness (-1, -1, -1, -1);
+			var r = new Rect (0, 0, 3, 3);
+			var inside = t.GetInside (r);
+			Assert.Equal (-1, inside.X);
+			Assert.Equal (-1, inside.Y);
+			Assert.Equal (5, inside.Width);
+			Assert.Equal (5, inside.Height);
+
+			t = new Thickness (-1, -1, -1, -1);
+			r = new Rect (-1, -1, 3, 3);
+			inside = t.GetInside (r);
+			Assert.Equal (-2, inside.X);
+			Assert.Equal (-2, inside.Y);
+			Assert.Equal (5, inside.Width);
+			Assert.Equal (5, inside.Height);
+
+			t = new Thickness (-1, -1, -1, -1);
+			r = new Rect (1, 1, 3, 3);
+			inside = t.GetInside (r);
+			Assert.Equal (0, inside.X);
+			Assert.Equal (0, inside.Y);
+			Assert.Equal (5, inside.Width);
+			Assert.Equal (5, inside.Height);
+
+			t = new Thickness (-1, -2, -3, -4);
+			r = new Rect (-1, 0, 50, 60);
+			inside = t.GetInside (r);
+			Assert.Equal (-2, inside.X);
+			Assert.Equal (-2, inside.Y);
+			Assert.Equal (54, inside.Width);
+			Assert.Equal (66, inside.Height);
+		}
+
+
+		[Fact ()]
+		public void GetInsideTests_Mixed_Pos_Neg_Thickness_Non_Empty_Size ()
+		{
+			var t = new Thickness (-1, 1, -1, 1);
+			var r = new Rect (0, 0, 3, 3);
+			var inside = t.GetInside (r);
+			Assert.Equal (-1, inside.X);
+			Assert.Equal (1, inside.Y);
+			Assert.Equal (5, inside.Width);
+			Assert.Equal (1, inside.Height);
+
+			t = new Thickness (-1, 1, -1, 1);
+			r = new Rect (-1, -1, 3, 3);
+			inside = t.GetInside (r);
+			Assert.Equal (-2, inside.X);
+			Assert.Equal (0, inside.Y);
+			Assert.Equal (5, inside.Width);
+			Assert.Equal (1, inside.Height);
+
+			t = new Thickness (-1, 1, -1, 1);
+			r = new Rect (1, 1, 3, 3);
+			inside = t.GetInside (r);
+			Assert.Equal (0, inside.X);
+			Assert.Equal (2, inside.Y);
+			Assert.Equal (5, inside.Width);
+			Assert.Equal (1, inside.Height);
+
+			t = new Thickness (-2, -1, 0, 1);
+			r = new Rect (-1, 0, 50, 60);
+			inside = t.GetInside (r);
+			Assert.Equal (-3, inside.X);
+			Assert.Equal (-1, inside.Y);
+			Assert.Equal (52, inside.Width);
+			Assert.Equal (60, inside.Height);
 		}
 
 		[Fact (), AutoInitShutdown]
@@ -202,11 +435,11 @@ namespace Terminal.Gui.CoreTests {
      T                                      T
      T                                      T
      TTTest (Left=1,Top=1,Right=1,Bottom=1)TT", output);
-			
+
 			t = new Thickness (1, 2, 3, 4);
 			r = new Rect (5, 5, 40, 15);
 			ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FramePadding;
-			Application.Driver.FillRect (new Rect (0,0, Application.Driver.Cols, Application.Driver.Rows), ' ');
+			Application.Driver.FillRect (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), ' ');
 			t.Draw (r, "Test");
 			ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
 			TestHelpers.AssertDriverContentsWithFrameAre (@"

@@ -268,6 +268,7 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Fill (2),
 				Title = "View with 2xMargin, 2xBorder, & 2xPadding",
 				ColorScheme = Colors.ColorSchemes ["Base"],
+				Id = "DaView"
 			};
 
 			//Application.Top.Add (view);
@@ -451,8 +452,8 @@ namespace UICatalog.Scenarios {
 			};
 			view.Add (edit);
 
-			containerLabel.LayoutComplete += (s, e) => {
-				containerLabel.Text = $"Container.Frame: {Application.Top.Frame} .Bounds: {Application.Top.Bounds}\nView.Frame: {view.Frame} .Bounds: {view.Bounds}\nView.ContentArea: {view.ContentArea}";
+			view.LayoutComplete += (s, e) => {
+				containerLabel.Text = $"Container.Frame: {Application.Top.Frame} .Bounds: {Application.Top.Bounds}\nView.Frame: {view.Frame} .Bounds: {view.Bounds} .BoundsOffset: {view.GetBoundsOffset ()}\n .Padding.Frame: {view.Padding.Frame} .Padding.Bounds: {view.Padding.Bounds}";
 			};
 
 			view.X = Pos.Center ();
