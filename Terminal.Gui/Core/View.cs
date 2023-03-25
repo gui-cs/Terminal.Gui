@@ -15,13 +15,14 @@ namespace Terminal.Gui {
 	/// </summary>
 	public enum LayoutStyle {
 		/// <summary>
-		/// The position and size of the view are based on the Frame value.
+		/// The position and size of the view are based <see cref="View.Frame"/>. 
 		/// </summary>
 		Absolute,
 
 		/// <summary>
-		/// The position and size of the view will be computed based on the
-		/// X, Y, Width and Height properties and set on the Frame.
+		/// The position and size of the view will be computed based on 
+		/// <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/>. <see cref="View.Frame"/> will
+		/// provide the absolute computed values.
 		/// </summary>
 		Computed
 	}
