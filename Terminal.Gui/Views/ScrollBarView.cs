@@ -752,21 +752,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Wrapper for GetScrollbarSize.
-		/// </summary>
-		/// <param name="isVertical">Indicates whether the scroll bar is vertical.</param>
-		/// <returns>Size of the scroll bar.</returns>
-		public int GetBarsize (bool isVertical)
-		{
-			return GetScrollbarSize (isVertical);
-		}
-
-		/// <summary>
 		/// Returns the size of the scroll bar.
 		/// </summary>
 		/// <param name="isVertical">Indicates whether the scroll bar is vertical.</param>
 		/// <returns>Size of the scroll bar.</returns>
-		int GetScrollbarSize (bool isVertical)
+		int GetBarsize (bool isVertical)
 		{
 			if (Host?.Bounds.IsEmpty != false) {
 				return 0;

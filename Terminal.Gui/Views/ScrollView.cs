@@ -494,9 +494,8 @@ namespace Terminal.Gui {
 		/// <param name="lines">Number of lines to scroll.</param>
 		public bool ScrollDown (int lines)
 		{
-			var maxOffset = vertical.GetBarsize (true) - vertical.Size;
-			if (contentOffset.Y > maxOffset) {
-				ContentOffset = new Point (contentOffset.X, Math.Max (contentOffset.Y - lines, maxOffset));
+			if (vertical.CanScroll (lines, out _, true)) {
+				ContentOffset = new Point (contentOffset.X, contentOffset.Y - lines);
 				return true;
 			}
 			return false;
@@ -509,9 +508,8 @@ namespace Terminal.Gui {
 		/// <param name="cols">Number of columns to scroll by.</param>
 		public bool ScrollRight (int cols)
 		{
-			var maxOffset = horizontal.GetBarsize (false) - horizontal.Size;
-			if (contentOffset.X > maxOffset) {
-				ContentOffset = new Point (Math.Max (contentOffset.X - cols, maxOffset), contentOffset.Y);
+			if (horizontal.CanScroll (cols, out _)) {
+				ContentOffset = new Point (contentOffset.X - cols, contentOffset.Y);
 				return true;
 			}
 			return false;
