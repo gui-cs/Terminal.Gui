@@ -3,6 +3,7 @@ using System;
 using System.Threading;
 using Terminal.Gui;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace UICatalog.Scenarios {
 	// 
@@ -20,6 +21,7 @@ namespace UICatalog.Scenarios {
 			internal TextField Speed { get; private set; }
 			internal ProgressBar ActivityProgressBar { get; private set; }
 			internal ProgressBar PulseProgressBar { get; private set; }
+			internal SpinnerView Spinner { get; private set; }
 			internal Action StartBtnClick;
 			internal Action StopBtnClick;
 			internal Action PulseBtnClick = null;
@@ -77,12 +79,18 @@ namespace UICatalog.Scenarios {
 				ActivityProgressBar = new ProgressBar () {
 					X = Pos.Right (LeftFrame) + 1,
 					Y = Pos.Bottom (startButton) + 1,
-					Width = Dim.Fill (),
+					Width = Dim.Fill (1),
 					Height = 1,
 					Fraction = 0.25F,
 					ColorScheme = Colors.Error
 				};
 				Add (ActivityProgressBar);
+
+				Spinner = new SpinnerView {
+					X = Pos.Right (ActivityProgressBar),
+					Y = ActivityProgressBar.Y
+				};
+				Add (Spinner);
 
 				PulseProgressBar = new ProgressBar () {
 					X = Pos.Right (LeftFrame) + 1,
@@ -129,6 +137,7 @@ namespace UICatalog.Scenarios {
 						ActivityProgressBar.Fraction += 0.01F;
 					}
 					PulseProgressBar.Pulse ();
+					Spinner.SetNeedsDisplay ();
 				}
 			}
 		}
@@ -196,6 +205,7 @@ namespace UICatalog.Scenarios {
 
 				_mainLoopTimeout = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (_mainLooopTimeoutTick), (loop) => {
 					mainLoopTimeoutDemo.Pulse ();
+					
 					return true;
 				});
 			};
