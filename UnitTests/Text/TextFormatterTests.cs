@@ -4242,7 +4242,7 @@ This TextFormatter (tf2) is rewritten.
 			};
 
 			TestHelpers.AssertDriverColorsAre (@"
-0222200000
+0022000000
 0000000000
 0111000000
 0000000000", expectedColors);

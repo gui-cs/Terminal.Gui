@@ -106,9 +106,10 @@ namespace Terminal.Gui {
 			// TODO: v2 - this will eventually be two controls: "BorderView" and "Label" (for the title)
 
 			if (Id == "BorderFrame" && Thickness.Top > 0 && !ustring.IsNullOrEmpty (Parent?.Title)) {
-
+				var prevAttr = Driver.GetAttribute ();
 				Driver.SetAttribute (Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetNormalColor ());
 				Driver.DrawWindowTitle (screenBounds, Parent?.Title, 0, 0, 0, 0);
+				Driver.SetAttribute (prevAttr);
 			}
 
 			if (Id == "BorderFrame" && BorderStyle != BorderStyle.None) {
