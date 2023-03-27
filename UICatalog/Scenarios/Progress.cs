@@ -79,7 +79,7 @@ namespace UICatalog.Scenarios {
 				ActivityProgressBar = new ProgressBar () {
 					X = Pos.Right (LeftFrame) + 1,
 					Y = Pos.Bottom (startButton) + 1,
-					Width = Dim.Fill (1),
+					Width = Dim.Fill (),
 					Height = 1,
 					Fraction = 0.25F,
 					ColorScheme = Colors.Error
@@ -88,7 +88,9 @@ namespace UICatalog.Scenarios {
 
 				Spinner = new SpinnerView {
 					X = Pos.Right (ActivityProgressBar),
-					Y = ActivityProgressBar.Y
+					Y = ActivityProgressBar.Y,
+					Visible = false,
+
 				};
 				Add (Spinner);
 
@@ -118,12 +120,23 @@ namespace UICatalog.Scenarios {
 			{
 				Started = true;
 				StartBtnClick?.Invoke ();
+				Application.MainLoop.Invoke(()=>{
+					Spinner.Visible = true;
+					ActivityProgressBar.Width = Dim.Fill(1);
+					this.LayoutSubviews();
+				});
 			}
 
 			internal void Stop ()
 			{
 				Started = false;
 				StopBtnClick?.Invoke ();
+
+				Application.MainLoop.Invoke(()=>{
+					Spinner.Visible = false;
+					ActivityProgressBar.Width = Dim.Fill();
+					this.LayoutSubviews();
+				});
 			}
 
 			internal void Pulse ()
