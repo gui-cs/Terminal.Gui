@@ -373,8 +373,16 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		/// <summary>
+		/// BUGBUG: v2 Temporary for now
+		/// </summary>
 		public BorderStyle BorderStyle { get; set; } = BorderStyle.None;
 
+		/// <summary>
+		/// Overriden so no Frames get drawn (BUGBUG: v2 fix this hack)
+		/// </summary>
+		/// <param name="bounds"></param>
+		/// <returns></returns>
 		public override bool OnDrawFrames (Rect bounds)
 		{
 			return false;

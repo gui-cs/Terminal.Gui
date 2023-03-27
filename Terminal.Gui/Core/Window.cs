@@ -6,7 +6,7 @@ using Terminal.Gui.Configuration;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui {
-	
+
 	/// <summary>
 	/// A <see cref="Toplevel"/> <see cref="View"/> that draws a border around its <see cref="View.Frame"/> with a Title at the top.
 	/// </summary>
@@ -93,7 +93,7 @@ namespace Terminal.Gui {
 			ColorScheme = Colors.Base;
 			if (title == null) title = ustring.Empty;
 			Title = title;
-			
+
 			if (border == null) {
 				// TODO: v2 this is a hack until Border gets refactored
 				Border = new Border () {
@@ -149,70 +149,5 @@ namespace Terminal.Gui {
 			RemoveMenuStatusBar (view);
 
 		}
-
-		/// <summary>
-		/// Event arguments for <see cref="View.Title"/> change events.
-		/// </summary>
-		public class TitleEventArgs : EventArgs {
-			/// <summary>
-			/// The new Window Title.
-			/// </summary>
-			public ustring NewTitle { get; set; }
-
-			/// <summary>
-			/// The old Window Title.
-			/// </summary>
-			public ustring OldTitle { get; set; }
-
-			/// <summary>
-			/// Flag which allows canceling the Title change.
-			/// </summary>
-			public bool Cancel { get; set; }
-
-			/// <summary>
-			/// Initializes a new instance of <see cref="TitleEventArgs"/>
-			/// </summary>
-			/// <param name="oldTitle">The <see cref="View.Title"/> that is/has been replaced.</param>
-			/// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
-			public TitleEventArgs (ustring oldTitle, ustring newTitle)
-			{
-				OldTitle = oldTitle;
-				NewTitle = newTitle;
-			}
-		}
-		/// <summary>
-		/// Called before the <see cref="View.Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can be cancelled.
-		/// </summary>
-		/// <param name="oldTitle">The <see cref="View.Title"/> that is/has been replaced.</param>
-		/// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
-		/// <returns>`true` if an event handler canceled the Title change.</returns>
-		public virtual bool OnTitleChanging (ustring oldTitle, ustring newTitle)
-		{
-			var args = new TitleEventArgs (oldTitle, newTitle);
-			TitleChanging?.Invoke (this, args);
-			return args.Cancel;
-		}
-
-		/// <summary>
-		/// Event fired when the <see cref="View.Title"/> is changing. Set <see cref="TitleEventArgs.Cancel"/> to 
-		/// `true` to cancel the Title change.
-		/// </summary>
-		public event EventHandler<TitleEventArgs> TitleChanging;
-
-		/// <summary>
-		/// Called when the <see cref="View.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.
-		/// </summary>
-		/// <param name="oldTitle">The <see cref="View.Title"/> that is/has been replaced.</param>
-		/// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
-		public virtual void OnTitleChanged (ustring oldTitle, ustring newTitle)
-		{
-			var args = new TitleEventArgs (oldTitle, newTitle);
-			TitleChanged?.Invoke (this, args);
-		}
-
-		/// <summary>
-		/// Event fired after the <see cref="View.Title"/> has been changed. 
-		/// </summary>
-		public event EventHandler<TitleEventArgs> TitleChanged;
 	}
 }

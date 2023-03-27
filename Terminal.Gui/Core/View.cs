@@ -21,7 +21,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// The position and size of the view will be computed based on 
-		/// <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/>. <see cref="View.Frame"/> will
+		/// <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and <see cref="View.Height"/>. <see cref="View.Frame"/> will
 		/// provide the absolute computed values.
 		/// </summary>
 		Computed
@@ -564,6 +564,42 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Called before the <see cref="View.Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can be cancelled.
+		/// </summary>
+		/// <param name="oldTitle">The <see cref="View.Title"/> that is/has been replaced.</param>
+		/// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
+		/// <returns>`true` if an event handler canceled the Title change.</returns>
+		public virtual bool OnTitleChanging (ustring oldTitle, ustring newTitle)
+		{
+			var args = new TitleEventArgs (oldTitle, newTitle);
+			TitleChanging?.Invoke (this, args);
+			return args.Cancel;
+		}
+
+		/// <summary>
+		/// Event fired when the <see cref="View.Title"/> is changing. Set <see cref="TitleEventArgs.Cancel"/> to 
+		/// `true` to cancel the Title change.
+		/// </summary>
+		public event EventHandler<TitleEventArgs> TitleChanging;
+
+		/// <summary>
+		/// Called when the <see cref="View.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.
+		/// </summary>
+		/// <param name="oldTitle">The <see cref="View.Title"/> that is/has been replaced.</param>
+		/// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
+		public virtual void OnTitleChanged (ustring oldTitle, ustring newTitle)
+		{
+			var args = new TitleEventArgs (oldTitle, newTitle);
+			TitleChanged?.Invoke (this, args);
+		}
+
+		/// <summary>
+		/// Event fired after the <see cref="View.Title"/> has been changed. 
+		/// </summary>
+		public event EventHandler<TitleEventArgs> TitleChanged;
+
+
 		LayoutStyle _layoutStyle;
 
 		/// <summary>
@@ -593,9 +629,6 @@ namespace Terminal.Gui {
 		/// The <see cref="Rect.Location"/> of Bounds is always (0, 0). To obtain the offset of the Bounds from the Frame use 
 		/// <see cref="GetBoundsOffset"/>.
 		/// </para>
-		/// <para>
-		/// To obtain the SuperView-relative location of the content area use <see cref="ContentArea"/>.
-		/// </para>
 		/// </remarks>
 		public virtual Rect Bounds {
 			get {
@@ -609,13 +642,13 @@ namespace Terminal.Gui {
 			}
 			set {
 				// BUGBUG: Margin etc.. can be null (if typeof(Frame))
-				Frame = new Rect (Frame.Location, 
+				Frame = new Rect (Frame.Location,
 					new Size (
 						value.Size.Width + Margin.Thickness.Horizontal + BorderFrame.Thickness.Horizontal + Padding.Thickness.Horizontal,
 						value.Size.Height + Margin.Thickness.Vertical + BorderFrame.Thickness.Vertical + Padding.Thickness.Vertical
 						)
 					);
-;
+				;
 			}
 		}
 

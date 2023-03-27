@@ -52,7 +52,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		[JsonInclude]
 		public int Bottom;
-		private Rect inside;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Thickness"/> class with all widths

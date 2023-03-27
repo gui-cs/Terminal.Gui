@@ -4,7 +4,7 @@
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// Event arguments for the <see cref="ConfigurationManager"/> events.
+	/// Event arguments for the <see cref="Thickness"/> events.
 	/// </summary>
 	public class ThicknessEventArgs : EventArgs {
 

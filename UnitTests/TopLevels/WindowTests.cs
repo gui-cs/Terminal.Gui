@@ -38,7 +38,6 @@ namespace Terminal.Gui.TopLevelTests {
 			Assert.Null (r.Y);
 			Assert.False (r.IsCurrentTop);
 			Assert.Empty (r.Id);
-			Assert.NotEmpty (r.Subviews);
 			Assert.False (r.WantContinuousButtonPressed);
 			Assert.False (r.WantMousePositionReports);
 			Assert.Null (r.SuperView);
@@ -50,7 +49,7 @@ namespace Terminal.Gui.TopLevelTests {
 			Assert.NotNull (r);
 			Assert.Equal ("title", r.Title);
 			Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
-			Assert.Equal ("Window()({X=0,Y=0,Width=0,Height=0})", r.ToString ());
+			Assert.Equal ("Window(title)({X=0,Y=0,Width=0,Height=0})", r.ToString ());
 			Assert.True (r.CanFocus);
 			Assert.False (r.HasFocus);
 			Assert.Equal (new Rect (0, 0, 0, 0), r.Bounds);
@@ -62,8 +61,7 @@ namespace Terminal.Gui.TopLevelTests {
 			Assert.Null (r.X);           // All view Pos are initialized now in the IsAdded setter,
 			Assert.Null (r.Y);           // avoiding Pos errors.
 			Assert.False (r.IsCurrentTop);
-			Assert.Empty (r.Id);
-			Assert.NotEmpty (r.Subviews);
+			Assert.Equal (r.Title, r.Id);
 			Assert.False (r.WantContinuousButtonPressed);
 			Assert.False (r.WantMousePositionReports);
 			Assert.Null (r.SuperView);
@@ -75,7 +73,7 @@ namespace Terminal.Gui.TopLevelTests {
 			Assert.Equal ("title", r.Title);
 			Assert.NotNull (r);
 			Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
-			Assert.Equal ("Window()({X=1,Y=2,Width=3,Height=4})", r.ToString ());
+			Assert.Equal ("Window(title)({X=1,Y=2,Width=3,Height=4})", r.ToString ());
 			Assert.True (r.CanFocus);
 			Assert.False (r.HasFocus);
 			Assert.Equal (new Rect (0, 0, 3, 4), r.Bounds);
@@ -87,8 +85,7 @@ namespace Terminal.Gui.TopLevelTests {
 			Assert.Null (r.X);
 			Assert.Null (r.Y);
 			Assert.False (r.IsCurrentTop);
-			Assert.Empty (r.Id);
-			Assert.NotEmpty (r.Subviews);
+			Assert.Equal (r.Title, r.Id);
 			Assert.False (r.WantContinuousButtonPressed);
 			Assert.False (r.WantMousePositionReports);
 			Assert.Null (r.SuperView);

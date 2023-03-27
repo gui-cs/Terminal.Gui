@@ -85,11 +85,29 @@ namespace Terminal.Gui {
 		}
 
 		// TODO: These are all temporary to keep code compiling
+		/// <summary>
+		/// 
+		/// </summary>
 		public bool DrawMarginFrame { get; set; }
+		/// <summary>
+		/// 
+		/// </summary>
 		public Point Effect3DOffset { get; set; } = new Point (1, 1);
+		/// <summary>
+		/// 
+		/// </summary>
 		public bool Effect3D { get; set; }
+		/// <summary>
+		/// 
+		/// </summary>
 		public Thickness BorderThickness { get; set; } = new Thickness (0);
+		/// <summary>
+		/// 
+		/// </summary>
 		public object Effect3DBrush { get; set; }
+		/// <summary>
+		/// 
+		/// </summary>
 		public Thickness PaddingThickness { get; set; } = new Thickness (0);
 
 		/// <summary>

@@ -623,8 +623,8 @@ namespace Terminal.Gui {
 		/// <param name="y">The target y location.</param>
 		/// <param name="nx">The x location after ensuring <paramref name="top"/> will remain visible.</param>
 		/// <param name="ny">The y location after ensuring <paramref name="top"/> will remain visible.</param>
-		/// <param name="menuBar">The new top most menuBar</param>
-		/// <param name="statusBar">The new top most statusBar</param>
+		/// <param name="mb">The new top most menuBar</param>
+		/// <param name="sb">The new top most statusBar</param>
 		/// <returns>The <see cref="Toplevel"/> that is Application.Top</returns>
 		internal View EnsureVisibleBounds (Toplevel top, int x, int y,
 					out int nx, out int ny, out MenuBar mb, out StatusBar sb)
