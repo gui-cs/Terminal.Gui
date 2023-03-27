@@ -62,11 +62,19 @@ This covers my thinking on how we will refactor `View` and the classes in the `V
   * *Bounds* - Synomous with *VisibleArea*. (Debate: Do we rename `Bounds` to `VisbleArea` in v2?)
   * *ClipArea* - The currently visible portion of the *Content*. This is defined as a`Rect` in coordinates relative to *ContentArea* (NOT *VisibleArea*) (e.g. `ClipArea {X = 0, Y = 0} == ContentArea {X = 0, Y = 0}`). In v2 we will NOT pass this `Rect` is passed `View.Redraw` and instead just have `Redraw` use `Bounds`. 
     * QUESTION: Do we need `ClipArea` at all? Can we just have `Redraw` use `Bounds`?
-  * *Modal* - The term used when describing a View that was created using the `Application.Run(view)` or `Application.Run<T>` APIs. When a View is running as a modal, user input is restricted to just that View until `Application.Run` exits. A `Modal` View has its own `RunState`. 
-  * *TopLevel* - The v1 term used to describe a view that is both Modal and can have a MenuBar and/or StatusBar. I propose in v2 we deprecate the term `TopLevel` and instead use `Modal` to describe the same thing. We can completely get rid of the `TopLevel` class! I do not think `Modal` should be a class, but a property of `View` that can be set to `true` or `false`.
+
+  * *Modal* - *Modal* - The term used when describing a `View` that was created using the `Application.Run(view)` or `Application.Run<T>` APIs. When a View is running as a modal, user input is restricted to just that View until `Application.Run` exits. A `Modal` View has its own `RunState`. 
+    * In v1, classes derived from `Dialog` were originally thought to only work modally. However, `Wizard` proved that a `Dialog`-based class can also work non-modally. 
+    * In v2, we will simplify the `Dialog` class, and let any class be run via `Applicaiton.Run`. The `Modal` property will be set by `Application.Run` so the class can detect it is running modally if it needs to. 
+
+  * *TopLevel* - The v1 term used to describe a view that can have a MenuBar and/or StatusBar. In v2, we will delete the `TopLevel` class and ensure ANY View can have a menu bar and/or status bar (via `Adornments`).
+    * NOTE: There will still be an `Application.Top` which is the `View` that is the root of the `Application`'s view hierarchy.
+
   * *Window* - A View that, by default, has a `Border` and a `Title`. 
     * QUESTION: Why can't this just be a property on `View` (e.g. `View.Border = true`)? Why do we need a `Window` class at all in v2?
+    
   * *Tile*, *Tiled*, *Tiling* (NOT IMPLEMENTED YET) - Refer to a form of `ComputedLayout` where SubViews of a `View` are visually arranged such that they abut each other and do not overlap. In a Tiled view arrangement, Z-ordering only comes into play when a developer intentionally causes views to be aligned such that they overlap. Borders that are drawn between the SubViews can optionally support resizing the SubViews (negating the need for `TileView`).
+
   * *Overlap*, *Overlapped*, *Overlapping* (NOT IMPLEMENTED YET) - Refers to a form of `ComputedLayout` where SubViews of a View are visually arranged such that their Frames overlap. In Overlap view arrangements there is a Z-axis (Z-order) in addition to the X and Y dimension. The Z-order indicates which Views are shown above other views.
 
 ## Focus

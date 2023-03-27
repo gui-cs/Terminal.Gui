@@ -598,6 +598,11 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public virtual Rect Bounds {
 			get {
+#if DEBUG
+				if (LayoutStyle == LayoutStyle.Computed && !IsInitialized) {
+					Debug.WriteLine ($"WARNING: Bounds is being accessed before the View has been initialized. This is likely a bug. View: {this}");
+				}
+#endif // DEBUG
 				var frameRelativeBounds = Padding?.Thickness.GetInside (Padding.Frame) ?? new Rect (default, Frame.Size);
 				return new Rect (default, frameRelativeBounds.Size);
 			}
@@ -610,6 +615,28 @@ namespace Terminal.Gui {
 			}
 		}
 
+		// Diagnostics to highlight when X or Y is read before the view has been initialized
+		private Pos VerifyIsIntialized (Pos pos)
+		{
+#if DEBUG
+			if (LayoutStyle == LayoutStyle.Computed && (!IsInitialized)) {
+				Debug.WriteLine ($"WARNING: \"{this}\" has not been initialized; position is indeterminate {pos}. This is likely a bug.");
+			}
+#endif // DEBUG
+			return pos;
+		}
+
+		// Diagnostics to highlight when Width or Height is read before the view has been initialized
+		private Dim VerifyIsIntialized (Dim dim)
+		{
+#if DEBUG
+			if (LayoutStyle == LayoutStyle.Computed && (!IsInitialized)) {
+				Debug.WriteLine ($"WARNING: \"{this}\" has not been initialized; dimension is indeterminate: {dim}. This is likely a bug.");
+			}
+#endif // DEBUG		
+			return dim;
+		}
+
 		Pos x, y;
 
 		/// <summary>
@@ -620,7 +647,7 @@ namespace Terminal.Gui {
 		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		/// </remarks>
 		public Pos X {
-			get => x;
+			get => VerifyIsIntialized (x);
 			set {
 				if (ForceValidatePosDim && !ValidatePosDim (x, value)) {
 					throw new ArgumentException ();
@@ -640,7 +667,7 @@ namespace Terminal.Gui {
 		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		/// </remarks>
 		public Pos Y {
-			get => y;
+			get => VerifyIsIntialized (y);
 			set {
 				if (ForceValidatePosDim && !ValidatePosDim (y, value)) {
 					throw new ArgumentException ();
@@ -661,7 +688,7 @@ namespace Terminal.Gui {
 		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		/// </remarks>
 		public Dim Width {
-			get => width;
+			get => VerifyIsIntialized (width);
 			set {
 				if (ForceValidatePosDim && !ValidatePosDim (width, value)) {
 					throw new ArgumentException ("ForceValidatePosDim is enabled", nameof (Width));
@@ -686,7 +713,7 @@ namespace Terminal.Gui {
 		/// <value>The height.</value>
 		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		public Dim Height {
-			get => height;
+			get => VerifyIsIntialized (height);
 			set {
 				if (ForceValidatePosDim && !ValidatePosDim (height, value)) {
 					throw new ArgumentException ("ForceValidatePosDim is enabled", nameof (Height));
@@ -724,6 +751,8 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		// BUGBUG: This API is broken - It should be renamed to `GetMinimumBoundsForFrame and 
+		// should not assume Frame.Height == Bounds.Height
 		/// <summary>
 		/// Gets the minimum dimensions required to fit the View's <see cref="Text"/>, factoring in <see cref="TextDirection"/>.
 		/// </summary>
@@ -736,7 +765,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public bool GetMinimumBounds (out Size size)
 		{
-			size = Size.Empty;
+			size = Bounds.Size;
 
 			if (!AutoSize && !ustring.IsNullOrEmpty (TextFormatter.Text)) {
 				switch (TextFormatter.IsVerticalDirection (TextDirection)) {
@@ -767,6 +796,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		// BUGBUG - v2 - Should be renamed "SetBoundsToFitFrame"
 		/// <summary>
 		/// Sets the size of the View to the minimum width or height required to fit <see cref="Text"/> (see <see cref="GetMinimumBounds(out Size)"/>.
 		/// </summary>
@@ -2682,6 +2712,11 @@ namespace Terminal.Gui {
 					UpdateTextFormatterText ();
 					OnResizeNeeded ();
 				}
+
+				// BUGBUG: v2 - This is here as a HACK until we fix the unit tests to not check a view's dims until
+				// after it's been initialized. See #2450
+				UpdateTextFormatterText ();
+
 #if DEBUG
 				if (text != null && string.IsNullOrEmpty (Id)) {
 					Id = text.ToString ();
@@ -2766,27 +2801,33 @@ namespace Terminal.Gui {
 		public virtual TextDirection TextDirection {
 			get => TextFormatter.Direction;
 			set {
-				if (IsInitialized && TextFormatter.Direction != value) {
-					var isValidOldAutSize = autoSize && IsValidAutoSize (out var _);
-					var directionChanged = TextFormatter.IsHorizontalDirection (TextFormatter.Direction)
-					    != TextFormatter.IsHorizontalDirection (value);
-
-					TextFormatter.Direction = value;
-					UpdateTextFormatterText ();
-
-					if ((!ForceValidatePosDim && directionChanged && AutoSize)
-					    || (ForceValidatePosDim && directionChanged && AutoSize && isValidOldAutSize)) {
-						OnResizeNeeded ();
-					} else if (directionChanged && IsAdded) {
-						SetWidthHeight (Bounds.Size);
-						SetMinWidthHeight ();
-					} else {
-						SetMinWidthHeight ();
-					}
-					TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
-					SetNeedsDisplay ();
-				}
+				UpdateTextDirection (value);
 			}
+		}
+
+		private void UpdateTextDirection (TextDirection newDirection)
+		{
+			var directionChanged = TextFormatter.IsHorizontalDirection (TextFormatter.Direction)
+			    != TextFormatter.IsHorizontalDirection (newDirection);
+			TextFormatter.Direction = newDirection;
+			
+			if (!IsInitialized) return;
+
+			var isValidOldAutoSize = autoSize && IsValidAutoSize (out var _);
+
+			UpdateTextFormatterText ();
+
+			if ((!ForceValidatePosDim && directionChanged && AutoSize)
+			    || (ForceValidatePosDim && directionChanged && AutoSize && isValidOldAutoSize)) {
+				OnResizeNeeded ();
+			} else if (directionChanged && IsAdded) {
+				SetWidthHeight (Bounds.Size);
+				SetMinWidthHeight ();
+			} else {
+				SetMinWidthHeight ();
+			}
+			TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
+			SetNeedsDisplay ();
 		}
 
 		/// <summary>
@@ -3176,10 +3217,11 @@ namespace Terminal.Gui {
 				oldCanFocus = CanFocus;
 				oldTabIndex = tabIndex;
 
+				UpdateTextDirection (TextDirection);
 				UpdateTextFormatterText ();
 				// TODO: Figure out why ScrollView and other tests fail if this call is put here 
 				// instead of the constructor.
-				// OnSizeChanged ();
+				OnResizeNeeded ();
 				//InitializeFrames ();
 
 			} else {
