@@ -13,13 +13,13 @@ namespace UnitTests.Views {
 		}
 
 
-		[Fact,AutoInitShutdown]
-		public void TestSpinnerView_ThrottlesAnimation()
+		[Fact, AutoInitShutdown]
+		public void TestSpinnerView_ThrottlesAnimation ()
 		{
 			var view = GetSpinnerView ();
 
 			view.Redraw (view.Bounds);
-			
+
 			var expected = "/";
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
@@ -36,7 +36,7 @@ namespace UnitTests.Views {
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 		[Fact, AutoInitShutdown]
-		public void TestSpinnerView_NoThrottle()
+		public void TestSpinnerView_NoThrottle ()
 		{
 			var view = GetSpinnerView ();
 			view.SpinDelayInMilliseconds = 0;
@@ -57,8 +57,8 @@ namespace UnitTests.Views {
 
 		private SpinnerView GetSpinnerView ()
 		{
-			var view = new SpinnerView (); 
-			
+			var view = new SpinnerView ();
+
 			Application.Top.Add (view);
 			Application.Begin (Application.Top);
 
