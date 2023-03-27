@@ -118,7 +118,7 @@ namespace Terminal.Gui.TopLevelTests {
 			var btnNextText = "Finish";
 			var btnNext = $"{d.LeftBracket}{d.LeftDefaultIndicator} {btnNextText} {d.RightDefaultIndicator}{d.RightBracket}";
 
-			var topRow = $"{d.ULDCorner} {title}{stepTitle} {new string (d.HDLine.ToString () [0], width - title.Length - stepTitle.Length - 4)}{d.URDCorner}";
+			var topRow = $"{d.ULDCorner}╡{title}{stepTitle}╞{new string (d.HDLine.ToString () [0], width - title.Length - stepTitle.Length - 4)}{d.URDCorner}";
 			var row2 = $"{d.VDLine}{new string (' ', width - 2)}{d.VDLine}";
 			var row3 = row2;
 			var separatorRow = $"{d.VDLine}{new string (' ', width - 2)}{d.VDLine}";
@@ -149,7 +149,7 @@ namespace Terminal.Gui.TopLevelTests {
 			var btnNextText = "Finish"; // "Next";
 			var btnNext = $"{d.LeftBracket}{d.LeftDefaultIndicator} {btnNextText} {d.RightDefaultIndicator}{d.RightBracket}";
 
-			var topRow = $"{d.ULDCorner} {title} - {stepTitle} {new string (d.HDLine.ToString () [0], width - title.Length - stepTitle.Length - 7)}{d.URDCorner}";
+			var topRow = $"{d.ULDCorner}╡{title} - {stepTitle}╞{new string (d.HDLine.ToString () [0], width - title.Length - stepTitle.Length - 7)}{d.URDCorner}";
 			var row2 = $"{d.VDLine}{new string (' ', width - 2)}{d.VDLine}";
 			var row3 = row2;
 			var row4 = row3;
@@ -219,7 +219,7 @@ namespace Terminal.Gui.TopLevelTests {
 			var btnNextText = "Finish";
 			var btnNext = $"{d.LeftBracket}{d.LeftDefaultIndicator} {btnNextText} {d.RightDefaultIndicator}{d.RightBracket}";
 
-			var topRow = $"{d.ULDCorner} {title}{stepTitle} {new string (d.HDLine.ToString () [0], width - title.Length - stepTitle.Length - 4)}{d.URDCorner}";
+			var topRow = $"{d.ULDCorner}╡{title}{stepTitle}╞{new string (d.HDLine.ToString () [0], width - title.Length - stepTitle.Length - 4)}{d.URDCorner}";
 			var separatorRow = $"{d.VDLine}{new string (d.HLine.ToString () [0], width - 2)}{d.VDLine}";
 
 			// Once this is fixed, revert to commented out line: https://github.com/gui-cs/Terminal.Gui/issues/1791
