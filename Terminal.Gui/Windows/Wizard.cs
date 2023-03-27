@@ -78,6 +78,7 @@ namespace Terminal.Gui {
 			/// </summary>
 			/// <remarks>The Title is only displayed when the <see cref="Wizard"/> is used as a modal pop-up (see <see cref="Wizard.Modal"/>.</remarks>
 			public new ustring Title {
+				// BUGBUG: v2 - No need for this as View now has Title w/ notifications.
 				get => title;
 				set {
 					if (!OnTitleChanging (title, value)) {

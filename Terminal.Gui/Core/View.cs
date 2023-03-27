@@ -554,13 +554,17 @@ namespace Terminal.Gui {
 		public ustring Title {
 			get => title;
 			set {
-				title = value;
-				SetNeedsDisplay ();
+				if (!OnTitleChanging (title, value)) {
+					var old = title;
+					title = value;
+					SetNeedsDisplay ();
 #if DEBUG
-				if (title != null && string.IsNullOrEmpty (Id)) {
-					Id = title.ToString ();
+					if (title != null && string.IsNullOrEmpty (Id)) {
+						Id = title.ToString ();
+					}
+#endif // DEBUG
+					OnTitleChanged (old, title);
 				}
-#endif
 			}
 		}
 
