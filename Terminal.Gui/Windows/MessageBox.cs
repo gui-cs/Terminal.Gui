@@ -247,9 +247,6 @@ namespace Terminal.Gui {
 		[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
 		public static Border DefaultBorder { get; set; } = new Border () {
 			BorderStyle = BorderStyle.Single,
-			DrawMarginFrame = false,
-			Effect3D = true,
-			Effect3DOffset = new Point (1, 1),
 		};
 
 		static int QueryFull (bool useErrorColors, int width, int height, ustring title, ustring message,

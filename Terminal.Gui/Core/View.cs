@@ -962,11 +962,14 @@ namespace Terminal.Gui {
 			LayoutFrames ();
 		}
 
+		// TODO: v2 - Hack for now
 		private void Border_BorderChanged (Border border)
 		{
-			BorderFrame.Thickness = border.BorderThickness;
 			BorderFrame.BorderStyle = border.BorderStyle;
 			if (!border.DrawMarginFrame) BorderFrame.BorderStyle = BorderStyle.None;
+			if (BorderFrame.BorderStyle != BorderStyle.None) {
+				BorderFrame.Thickness = new Thickness (1);
+			}
 		}
 
 		/// <summary>

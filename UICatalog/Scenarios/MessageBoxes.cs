@@ -125,11 +125,6 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (defaultButtonEdit);
 
-			var border = new Border () {
-				Effect3D = true,
-				BorderStyle = BorderStyle.Single
-			};
-
 			label = new Label ("Style:") {
 				X = 0,
 				Y = Pos.Bottom (label),
@@ -145,14 +140,6 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (styleRadioGroup);
 
-			var ckbEffect3D = new CheckBox ("Effect3D", true) {
-				X = Pos.Right (label) + 1,
-				Y = Pos.Top (label) + 2
-			};
-			ckbEffect3D.Toggled += (s,e) => {
-				border.Effect3D = (bool)!e.OldValue;
-			};
-			frame.Add (ckbEffect3D);
 			var ckbWrapMessage = new CheckBox ("Wrap Message", true) {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label) + 3
@@ -171,7 +158,6 @@ namespace UICatalog.Scenarios {
 					defaultButtonEdit.Frame.Height +
 					styleRadioGroup.Frame.Height +
 					2 +
-					ckbEffect3D.Frame.Height +
 					ckbWrapMessage.Frame.Height;
 				Application.Top.Loaded -= Top_Loaded;
 			}
@@ -213,9 +199,9 @@ namespace UICatalog.Scenarios {
 						btns.Add (NumberToWords.Convert (i));
 					}
 					if (styleRadioGroup.SelectedItem == 0) {
-						buttonPressedLabel.Text = $"{MessageBox.Query (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), defaultButton, border, (bool)ckbWrapMessage.Checked, btns.ToArray ())}";
+						buttonPressedLabel.Text = $"{MessageBox.Query (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), defaultButton, null, (bool)ckbWrapMessage.Checked, btns.ToArray ())}";
 					} else {
-						buttonPressedLabel.Text = $"{MessageBox.ErrorQuery (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), defaultButton, border, (bool)ckbWrapMessage.Checked, btns.ToArray ())}";
+						buttonPressedLabel.Text = $"{MessageBox.ErrorQuery (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), defaultButton, null, (bool)ckbWrapMessage.Checked, btns.ToArray ())}";
 					}
 				} catch (FormatException) {
 					buttonPressedLabel.Text = "Invalid Options";

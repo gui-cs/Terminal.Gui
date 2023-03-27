@@ -1407,7 +1407,8 @@ namespace Terminal.Gui.TopLevelTests {
 				});
 
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration); Assert.Equal (dialog, Application.MouseGrabView);
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration); 
+			Assert.Equal (dialog, Application.MouseGrabView);
 
 			Assert.Equal (new Rect (25, 7, 30, 10), dialog.Frame);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"

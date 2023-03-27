@@ -38,13 +38,9 @@ namespace Terminal.Gui {
 		[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
 		public static Border DefaultBorder { get; set; } = new Border () {
 			BorderStyle = BorderStyle.Single,
-			DrawMarginFrame = false,
-			Effect3D = true,
-			Effect3DOffset = new Point (1, 1),
 		};
 
 		internal List<Button> buttons = new List<Button> ();
-		const int padding = 0;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Computed"/> positioning 
@@ -62,7 +58,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// Use the constructor that does not take a <c>width</c> and <c>height</c> instead.
 		/// </remarks>
-		public Dialog (ustring title, int width, int height, params Button [] buttons) : base (title: title, padding: padding)
+		public Dialog (ustring title, int width, int height, params Button [] buttons) : base (title: title, padding: 0, border: DefaultBorder)
 		{
 			X = Pos.Center ();
 			Y = Pos.Center ();
@@ -130,7 +126,6 @@ namespace Terminal.Gui {
 		public Dialog (ustring title, Border border, params Button [] buttons)
 			: this (title: title, width: 0, height: 0, buttons: buttons)
 		{
-			Initialize (title, border);
 		}
 
 		/// <summary>
@@ -145,13 +140,8 @@ namespace Terminal.Gui {
 		public Dialog (ustring title, int width, int height, Border border, params Button [] buttons)
 			: this (title: title, width: width, height: height, buttons: buttons)
 		{
-			Initialize (title, border);
 		}
 
-		void Initialize (ustring title, Border border)
-		{
-			Title = title;
-		}
 
 		/// <summary>
 		/// Adds a <see cref="Button"/> to the <see cref="Dialog"/>, its layout will be controlled by the <see cref="Dialog"/>
@@ -226,7 +216,7 @@ namespace Terminal.Gui {
 					if (shiftLeft > -1) {
 						button.X = Pos.AnchorEnd (shiftLeft);
 					} else {
-						button.X = Frame.Width - shiftLeft;
+						button.X = Bounds.Width - shiftLeft;
 					}
 					button.Y = Pos.AnchorEnd (1);
 				}
@@ -236,7 +226,7 @@ namespace Terminal.Gui {
 				// Justify Buttons
 				// leftmost and rightmost buttons are hard against edges. The rest are evenly spaced.
 
-				var spacing = (int)Math.Ceiling ((double)(Bounds.Width - buttonsWidth - (Border.DrawMarginFrame ? 2 : 0)) / (buttons.Count - 1));
+				var spacing = (int)Math.Ceiling ((double)(Bounds.Width - buttonsWidth) / (buttons.Count - 1));
 				for (int i = buttons.Count - 1; i >= 0; i--) {
 					Button button = buttons [i];
 					if (i == buttons.Count - 1) {
@@ -245,7 +235,7 @@ namespace Terminal.Gui {
 					} else {
 						if (i == 0) {
 							// first (leftmost) button - always hard flush left
-							var left = Bounds.Width - ((Border.DrawMarginFrame ? 2 : 0) + Border.BorderThickness.Left + Border.BorderThickness.Right);
+							var left = Bounds.Width + Border.BorderThickness.Horizontal;
 							button.X = Pos.AnchorEnd (left);
 						} else {
 							shiftLeft += button.Frame.Width + (spacing);
