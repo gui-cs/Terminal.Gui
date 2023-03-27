@@ -611,7 +611,7 @@ namespace Terminal.Gui.TopLevelTests {
 					Assert.True (btn1.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
 				} else if (iterations == 1) {
 					expected = @"
-      ┌ Hey ─────────────────────────────────────────────────────────────┐
+      ┌┤Hey├─────────────────────────────────────────────────────────────┐
       │                                                                  │
       │                                                                  │
       │                                                                  │
@@ -637,7 +637,7 @@ namespace Terminal.Gui.TopLevelTests {
 					Assert.True (btn2.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
 				} else if (iterations == 2) {
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
-      ┌ Hey ─────────────────────────────────────────────────────────────┐
+      ┌┤Hey├─────────────────────────────────────────────────────────────┐
       │                                                                  │
       │                                                                  │
       │                                                                  │
@@ -645,7 +645,7 @@ namespace Terminal.Gui.TopLevelTests {
       │                                                                  │
       │                                                                  │
       │                                                                  │
-      │         ┌ hey ─────────────────────────────────────────┐         │
+      │         ┌┤hey├─────────────────────────────────────────┐         │
       │         │                      ya                      │         │
       │         │                                              │         │
       │         │                   [◦ ok ◦]                   │         │

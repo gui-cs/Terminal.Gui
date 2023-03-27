@@ -706,7 +706,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (0, scrollBar.Position);
 			Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
 			var expected = @"
-┌ Test ─────────────────────────────────────┐
+┌┤Test├─────────────────────────────────────┐
 │This is the help text for the Second Step. │
 │                                           │
 │Press the button to see a message box.     │
@@ -743,7 +743,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (0, scrollBar.Position);
 			Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
 			expected = @"
-┌ Test ──────────────────┐
+┌┤Test├──────────────────┐
 │This is the help text   │
 │for the Second Step.    │
 │                        │
@@ -779,7 +779,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (0, scrollBar.Position);
 			Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
 			expected = @"
-┌ Test ──┐
+┌┤Test├──┐
 │This   ▲│
 │is the ┬│
 │help   ││

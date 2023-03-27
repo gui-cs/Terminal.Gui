@@ -431,7 +431,7 @@ namespace Terminal.Gui.ViewTests {
             ▲          
             ┬          
             ┴          
-      ┌ 1 ──░          
+      ┌┤1├──░          
       │     ░          
       │     ░          
       │     ░          

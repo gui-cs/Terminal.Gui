@@ -403,10 +403,10 @@ namespace Terminal.Gui.DriverTests {
 			((FakeDriver)Application.Driver).SetBufferSize (30, 10);
 
 			var expected = @"
-┌ ワイドルーン ──────────────┐
+┌┤ワイドルーン├──────────────┐
 │これは広いルーンラインです。│
 │これは広いルーンラインです。│
-│これは ┌ テスト ────┐ です。│
+│これは ┌┤テスト├────┐ です。│
 │これは │ワイドルーン│ です。│
 │これは │  [ 選ぶ ]  │ です。│
 │これは └────────────┘ です。│
@@ -436,7 +436,7 @@ namespace Terminal.Gui.DriverTests {
 
 					var expected = @"
 ┌──────────────────┐
-│┌ Test ─────────┐ │
+│┌┤Test├─────────┐ │
 ││  Hello World  │ │
 ││               │ │
 ││               │ │
@@ -453,7 +453,7 @@ namespace Terminal.Gui.DriverTests {
 
 					expected = @"
 ┌──────────────────┐
-│┌ Test ─────────┐ │
+│┌┤Test├─────────┐ │
 ││  Hello World  │ │
 ││               │ │
 ││               │ │

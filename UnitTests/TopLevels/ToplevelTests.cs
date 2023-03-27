@@ -705,11 +705,11 @@ namespace Terminal.Gui.TopLevelTests {
 
 				} else if (iterations == 1) TestHelpers.AssertDriverContentsWithFrameAre (@"
  File                                   
-┌ Window ──────────────────────────────┐
+┌┤Window├──────────────────────────────┐
 │                                      │
 │                                      │
 │                                      │
-│       ┌ About ───────────────┐       │
+│       ┌┤About├───────────────┐       │
 │       │      Hello Word      │       │
 │       │                      │       │
 │       │       [◦ Ok ◦]       │       │
@@ -754,11 +754,11 @@ namespace Terminal.Gui.TopLevelTests {
 
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
  File                                   
-┌ Window ──────────────────────────────┐
+┌┤Window├──────────────────────────────┐
 │                                      │
 │                                      │
 │                                      │
-│      ┌ About ───────────────┐        │
+│      ┌┤About├───────────────┐        │
 │      │      Hello Word      │        │
 │      │                      │        │
 │      │       [◦ Ok ◦]       │        │
@@ -790,10 +790,10 @@ namespace Terminal.Gui.TopLevelTests {
 
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
  File                                   
-┌ Window ──────────────────────────────┐
+┌┤Window├──────────────────────────────┐
 │                                      │
 │                                      │
-│      ┌ About ───────────────┐        │
+│      ┌┤About├───────────────┐        │
 │      │      Hello Word      │        │
 │      │                      │        │
 │      │       [◦ Ok ◦]       │        │
@@ -1111,7 +1111,7 @@ namespace Terminal.Gui.TopLevelTests {
                                           ▲
                                           ┬
                                           │
-      ┌ Window ───────────────────────────┴
+      ┌┤Window├───────────────────────────┴
       │                                   ░
       │                                   ░
       │                                   ░
@@ -1156,7 +1156,7 @@ namespace Terminal.Gui.TopLevelTests {
                                           ┴
                                           ░
                                           ░
-         ┌ Window ────────────────────────░
+         ┌┤Window├────────────────────────░
          │                                ░
          │                                ░
          │                                ░
@@ -1183,7 +1183,7 @@ namespace Terminal.Gui.TopLevelTests {
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
                                           ▲
                                           ┬
-     ┌ Window ────────────────────────────│
+     ┌┤Window├────────────────────────────│
      │                                    ┴
      │                                    ░
      │                                    ░
@@ -1244,7 +1244,7 @@ namespace Terminal.Gui.TopLevelTests {
  File                         
                               
                               
-          ┌ Dialog ──────────┐
+          ┌┤Dialog├──────────┐
           │      [ Ok ]      │
           └──────────────────┘
                               
@@ -1279,7 +1279,7 @@ namespace Terminal.Gui.TopLevelTests {
 			Assert.Equal (new Rect (0, 1, 20, 3), dialog.Frame);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
  File               
-┌ Dialog ──────────┐
+┌┤Dialog├──────────┐
 │      [ Ok ]      │
 └──────────────────┘
                     
@@ -1305,7 +1305,7 @@ namespace Terminal.Gui.TopLevelTests {
 			Assert.Equal (new Rect (0, 1, 20, 3), dialog.Frame);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
  File               
-┌ Dialog ──────────┐
+┌┤Dialog├──────────┐
 │      [ Ok ]      │
 └──────────────────┘
  CTRL-N New         ", output);
@@ -1386,7 +1386,7 @@ namespace Terminal.Gui.TopLevelTests {
 			Assert.Null (Application.MouseGrabView);
 			Assert.Equal (new Rect (25, 7, 30, 10), dialog.Frame);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
-                         ┌ Single smaller Dialog ─────┐
+                         ┌┤Single smaller Dialog├─────┐
                          │ How should I've to react.  │
                          │Cleaning all chunk trails or│
                          │   setting the 'Cols' and   │
@@ -1411,7 +1411,7 @@ namespace Terminal.Gui.TopLevelTests {
 
 			Assert.Equal (new Rect (25, 7, 30, 10), dialog.Frame);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
-                         ┌ Single smaller Dialog ─────┐
+                         ┌┤Single smaller Dialog├─────┐
                          │ How should I've to react.  │
                          │Cleaning all chunk trails or│
                          │   setting the 'Cols' and   │
@@ -1436,7 +1436,7 @@ namespace Terminal.Gui.TopLevelTests {
 			Assert.Equal (dialog, Application.MouseGrabView);
 			Assert.Equal (new Rect (20, 10, 30, 10), dialog.Frame);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
-                    ┌ Single smaller Dialog ─────┐
+                    ┌┤Single smaller Dialog├─────┐
                     │ How should I've to react.  │
                     │Cleaning all chunk trails or│
                     │   setting the 'Cols' and   │

@@ -2358,7 +2358,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDrawContent (Rect contentArea)
 		{
 			SetNormalColor ();
 
@@ -2399,7 +2399,7 @@ namespace Terminal.Gui {
 					} else {
 						AddRune (col, row, rune);
 					}
-					if (!TextModel.SetCol (ref col, bounds.Right, cols)) {
+					if (!TextModel.SetCol (ref col, contentArea.Right, cols)) {
 						break;
 					}
 					if (idxCol + 1 < lineRuneCount && col + Rune.ColumnWidth (line [idxCol + 1]) > right) {
@@ -2414,7 +2414,7 @@ namespace Terminal.Gui {
 			}
 			if (row < bottom) {
 				SetNormalColor ();
-				ClearRegion (bounds.Left, row, right, bottom);
+				ClearRegion (contentArea.Left, row, right, bottom);
 			}
 
 			PositionCursor ();

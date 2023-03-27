@@ -469,6 +469,7 @@ namespace Terminal.Gui {
 			set {
 				frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
 				TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
+				LayoutFrames ();
 				SetNeedsLayout ();
 				SetNeedsDisplay ();
 			}
@@ -608,10 +609,13 @@ namespace Terminal.Gui {
 			}
 			set {
 				// BUGBUG: Margin etc.. can be null (if typeof(Frame))
-				Frame = new Rect (Frame.Location, value.Size
-					+ new Size (Margin.Thickness.Right, Margin.Thickness.Bottom)
-					+ new Size (BorderFrame.Thickness.Right, BorderFrame.Thickness.Bottom)
-					+ new Size (Padding.Thickness.Right, Padding.Thickness.Bottom));
+				Frame = new Rect (Frame.Location, 
+					new Size (
+						value.Size.Width + Margin.Thickness.Horizontal + BorderFrame.Thickness.Horizontal + Padding.Thickness.Horizontal,
+						value.Size.Height + Margin.Thickness.Vertical + BorderFrame.Thickness.Vertical + Padding.Thickness.Vertical
+						)
+					);
+;
 			}
 		}
 
@@ -947,13 +951,15 @@ namespace Terminal.Gui {
 			// TODO: v2 - Hack for now
 			if (Border != null) Border.BorderChanged += Border_BorderChanged;
 
-			Text = text;
+			Text = text == null ? ustring.Empty : text;
 			LayoutStyle = layoutStyle;
 			var r = rect.IsEmpty ? TextFormatter.CalcRect (0, 0, text, direction) : rect;
 			Frame = r;
 			OnResizeNeeded ();
 
 			CreateFrames ();
+
+			LayoutFrames ();
 		}
 
 		private void Border_BorderChanged (Border border)
@@ -988,11 +994,11 @@ namespace Terminal.Gui {
 				var s = GetAutoSize ();
 				var w = width is Dim.DimAbsolute && width.Anchor (0) > s.Width ? width.Anchor (0) : s.Width;
 				var h = height is Dim.DimAbsolute && height.Anchor (0) > s.Height ? height.Anchor (0) : s.Height;
-				frame = new Rect (new Point (actX, actY), new Size (w, h));
+				Frame = new Rect (new Point (actX, actY), new Size (w, h));
 			} else {
 				var w = width is Dim.DimAbsolute ? width.Anchor (0) : frame.Width;
 				var h = height is Dim.DimAbsolute ? height.Anchor (0) : frame.Height;
-				frame = new Rect (new Point (actX, actY), new Size (w, h));
+				Frame = new Rect (new Point (actX, actY), new Size (w, h));
 				SetMinWidthHeight ();
 			}
 			// BUGBUG: I think these calls are redundant or should be moved into just the AutoSize case
@@ -2603,6 +2609,8 @@ namespace Terminal.Gui {
 		/// </summary>
 		internal virtual void LayoutFrames ()
 		{
+			if (Margin == null) return; // CreateFrames() has not been called yet
+
 			Margin.X = 0;
 			Margin.Y = 0;
 			Margin.Width = Frame.Size.Width;
@@ -2801,7 +2809,11 @@ namespace Terminal.Gui {
 		public virtual TextDirection TextDirection {
 			get => TextFormatter.Direction;
 			set {
-				UpdateTextDirection (value);
+				if (!IsInitialized) {
+					TextFormatter.Direction = value;
+				} else {
+					UpdateTextDirection (value);
+				}
 			}
 		}
 
@@ -2810,8 +2822,6 @@ namespace Terminal.Gui {
 			var directionChanged = TextFormatter.IsHorizontalDirection (TextFormatter.Direction)
 			    != TextFormatter.IsHorizontalDirection (newDirection);
 			TextFormatter.Direction = newDirection;
-			
-			if (!IsInitialized) return;
 
 			var isValidOldAutoSize = autoSize && IsValidAutoSize (out var _);
 
@@ -3219,6 +3229,8 @@ namespace Terminal.Gui {
 
 				UpdateTextDirection (TextDirection);
 				UpdateTextFormatterText ();
+				SetHotKey ();
+
 				// TODO: Figure out why ScrollView and other tests fail if this call is put here 
 				// instead of the constructor.
 				OnResizeNeeded ();

@@ -697,9 +697,9 @@ namespace Terminal.Gui {
 
 			return root;
 		}
-		private void Setup (Rect bounds)
+		private void Setup (Rect contentArea)
 		{
-			if (bounds.IsEmpty || bounds.Height <= 0 || bounds.Width <= 0) {
+			if (contentArea.IsEmpty || contentArea.Height <= 0 || contentArea.Width <= 0) {
 				return;
 			}
 
@@ -733,14 +733,14 @@ namespace Terminal.Gui {
 				var tile = visibleTiles [i];
 
 				if (Orientation == Orientation.Vertical) {
-					tile.ContentView.X = i == 0 ? bounds.X : Pos.Right (visibleSplitterLines [i - 1]);
-					tile.ContentView.Y = bounds.Y;
-					tile.ContentView.Height = bounds.Height;
+					tile.ContentView.X = i == 0 ? contentArea.X : Pos.Right (visibleSplitterLines [i - 1]);
+					tile.ContentView.Y = contentArea.Y;
+					tile.ContentView.Height = contentArea.Height;
 					tile.ContentView.Width = GetTileWidthOrHeight (i, Bounds.Width, visibleTiles, visibleSplitterLines);
 				} else {
-					tile.ContentView.X = bounds.X;
-					tile.ContentView.Y = i == 0 ? bounds.Y : Pos.Bottom (visibleSplitterLines [i - 1]);
-					tile.ContentView.Width = bounds.Width;
+					tile.ContentView.X = contentArea.X;
+					tile.ContentView.Y = i == 0 ? contentArea.Y : Pos.Bottom (visibleSplitterLines [i - 1]);
+					tile.ContentView.Width = contentArea.Width;
 					tile.ContentView.Height = GetTileWidthOrHeight (i, Bounds.Height, visibleTiles, visibleSplitterLines);
 				}
 			}

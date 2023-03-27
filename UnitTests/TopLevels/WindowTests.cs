@@ -189,7 +189,7 @@ namespace Terminal.Gui.TopLevelTests {
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
 │ File  Edit       │
-│┌ Frame View ────┐│
+│┌┤Frame View├────┐│
 ││                ││
 ││                ││
 ││                ││
@@ -203,7 +203,7 @@ namespace Terminal.Gui.TopLevelTests {
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
-│┌ Frame View ────────────────────────┐│
+│┌┤Frame View├────────────────────────┐│
 ││                                    ││
 ││                                    ││
 ││                                    ││
@@ -227,7 +227,7 @@ namespace Terminal.Gui.TopLevelTests {
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
 │ File  Edit       │
-│┌ Frame View ────┐│
+│┌┤Frame View├────┐│
 ││                ││
 ││                ││
 ││                ││

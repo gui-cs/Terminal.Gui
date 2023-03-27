@@ -31,7 +31,7 @@ namespace Terminal.Gui.TopLevelTests {
 				} else if (iterations == 1) {
 					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
-                ┌ Title ───────────────────────────────────────┐
+                ┌┤Title├───────────────────────────────────────┐
                 │                   Message                    │
                 │                                              │
                 │                                              │
@@ -73,7 +73,7 @@ namespace Terminal.Gui.TopLevelTests {
 				} else if (iterations == 1) {
 					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
-         ┌ About UI Catalog ──────────────────────────────────────────┐
+         ┌┤About UI Catalog├──────────────────────────────────────────┐
          │             A comprehensive sample library for             │
          │                                                            │
          │  _______                  _             _   _____       _  │
@@ -142,7 +142,7 @@ namespace Terminal.Gui.TopLevelTests {
 				} else if (iterations == 1) {
 					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
-                                  ┌ Title ──┐
+                                  ┌┤Title├──┐
                                   │ Message │
                                   │         │
                                   │[◦ Ok ◦] │
@@ -172,7 +172,7 @@ namespace Terminal.Gui.TopLevelTests {
 				} else if (iterations == 1) {
 					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
-┌ mywindow ────────────────────────────────────────────────────────────────────┐
+┌┤mywindow├────────────────────────────────────────────────────────────────────┐
 │ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
 │ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
 │ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
@@ -225,7 +225,7 @@ namespace Terminal.Gui.TopLevelTests {
 				} else if (iterations == 1) {
 					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
-┌ mywindow ────────────────────────────────────────────────────────────────────┐
+┌┤mywindow├────────────────────────────────────────────────────────────────────┐
 │ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
 │ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
 │ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
@@ -340,7 +340,7 @@ ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 				} else if (iterations == 1) {
 					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
-                ┌ mywindow ────────────────────────────────────┐
+                ┌┤mywindow├────────────────────────────────────┐
                 │                                              │
                 │                                              │
                 │                   [◦ ok ◦]                   │

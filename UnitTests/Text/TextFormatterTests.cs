@@ -3484,7 +3484,7 @@ This TextFormatter (tf2) is rewritten.
 			Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 4), Application.Top.Frame);
 			var expected = @"
-┌ Wind ──┐
+┌┤Wind├──┐
 │Vie     │
 │        │
 └────────┘
@@ -3502,7 +3502,7 @@ This TextFormatter (tf2) is rewritten.
 			Assert.Equal (new Size (0, 1), view.TextFormatter.Size);
 			Assert.Equal (new List<ustring> () { ustring.Empty }, view.TextFormatter.Lines);
 			expected = @"
-┌ Wind ──┐
+┌┤Wind├──┐
 │        │
 │        │
 └────────┘
@@ -3537,7 +3537,7 @@ This TextFormatter (tf2) is rewritten.
 			Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 4), Application.Top.Frame);
 			var expected = @"
-┌ Wind ──┐
+┌┤Wind├──┐
 │Vie     │
 │        │
 └────────┘
@@ -3556,7 +3556,7 @@ This TextFormatter (tf2) is rewritten.
 			var exception = Record.Exception (() => Assert.Equal (new List<ustring> () { ustring.Empty }, view.TextFormatter.Lines));
 			Assert.Null (exception);
 			expected = @"
-┌ Wind ──┐
+┌┤Wind├──┐
 │        │
 │        │
 └────────┘
@@ -3592,7 +3592,7 @@ This TextFormatter (tf2) is rewritten.
 			Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 4), Application.Top.Frame);
 			var expected = @"
-┌ Wind ──┐
+┌┤Wind├──┐
 │Label   │
 │        │
 └────────┘
@@ -3611,7 +3611,7 @@ This TextFormatter (tf2) is rewritten.
 			Assert.Equal (new Size (5, 1), label.TextFormatter.Size);
 			Assert.Single (label.TextFormatter.Lines);
 			expected = @"
-┌ Wind ──┐
+┌┤Wind├──┐
 │Label   │
 │        │
 └────────┘
@@ -3648,7 +3648,7 @@ This TextFormatter (tf2) is rewritten.
 			Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 4), Application.Top.Frame);
 			var expected = @"
-┌ Wind ──┐
+┌┤Wind├──┐
 │Lab     │
 │        │
 └────────┘
@@ -3667,7 +3667,7 @@ This TextFormatter (tf2) is rewritten.
 			Assert.Equal (new Size (0, 1), label.TextFormatter.Size);
 			Assert.Equal (new List<ustring> { ustring.Empty }, label.TextFormatter.Lines);
 			expected = @"
-┌ Wind ──┐
+┌┤Wind├──┐
 │        │
 │        │
 └────────┘
@@ -3702,7 +3702,7 @@ This TextFormatter (tf2) is rewritten.
 			Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 4), Application.Top.Frame);
 			var expected = @"
-┌ Wind ──┐
+┌┤Wind├──┐
 │Label   │
 │        │
 └────────┘
@@ -3721,7 +3721,7 @@ This TextFormatter (tf2) is rewritten.
 			var exception = Record.Exception (() => Assert.Single (label.TextFormatter.Lines));
 			Assert.Null (exception);
 			expected = @"
-┌ Wind ──┐
+┌┤Wind├──┐
 │Label   │
 │        │
 └────────┘
@@ -3757,7 +3757,7 @@ This TextFormatter (tf2) is rewritten.
 			Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 4), Application.Top.Frame);
 			var expected = @"
-┌ Wind ──┐
+┌┤Wind├──┐
 │Lab     │
 │        │
 └────────┘
@@ -3776,7 +3776,7 @@ This TextFormatter (tf2) is rewritten.
 			var exception = Record.Exception (() => Assert.Equal (new List<ustring> () { ustring.Empty }, label.TextFormatter.Lines));
 			Assert.Null (exception);
 			expected = @"
-┌ Wind ──┐
+┌┤Wind├──┐
 │        │
 │        │
 └────────┘
@@ -4224,7 +4224,7 @@ This TextFormatter (tf2) is rewritten.
 			((FakeDriver)Application.Driver).SetBufferSize (10, 4);
 
 			var expected = @"
-┌ 豈 ────┐
+┌┤豈├────┐
 │豈      │
 │豈      │
 └────────┘";
