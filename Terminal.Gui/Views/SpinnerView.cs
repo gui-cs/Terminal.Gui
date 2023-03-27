@@ -66,6 +66,7 @@ namespace Terminal.Gui {
 		{
 			if (_timeout != null) {
 				Application.MainLoop.RemoveTimeout (_timeout);
+				_timeout = null;
 			}
 
 			base.Dispose (disposing);
