@@ -11,6 +11,7 @@ using NStack;
 using Terminal.Gui.FileServices;
 using Terminal.Gui.Resources;
 using Terminal.Gui.Trees;
+using Terminal.Gui.Views;
 using static System.Environment;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 
