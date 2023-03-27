@@ -41,7 +41,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = Pos.Center (),
 			};
-			Win.Add (button);
+			Application.Top.Add (button);
 
 		}
 	}

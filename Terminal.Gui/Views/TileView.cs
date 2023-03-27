@@ -44,7 +44,7 @@ namespace Terminal.Gui {
 			/// </summary>
 			/// <remarks>
 			/// Title are not rendered for root level tiles 
-			/// <see cref="Border.BorderStyle"/> is <see cref="BorderStyle.None"/>.
+			/// <see cref="BorderStyle"/> is <see cref="BorderStyle.None"/>.
 			///</remarks>
 			public string Title {
 				get => _title;
@@ -143,10 +143,6 @@ namespace Terminal.Gui {
 		public TileView (int tiles)
 		{
 			RebuildForTileCount (tiles);
-			IgnoreBorderPropertyOnRedraw = true;
-			Border = new Border () {
-				BorderStyle = BorderStyle.None
-			};
 		}
 
 		/// <summary>
@@ -377,6 +373,12 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		public BorderStyle BorderStyle { get; set; } = BorderStyle.None;
+
+		public override bool OnDrawFrames (Rect bounds)
+		{
+			return false;
+		}
 
 		/// <inheritdoc/>
 		public override void Redraw (Rect bounds)
@@ -394,11 +396,11 @@ namespace Terminal.Gui {
 			if (IsRootTileView ()) {
 				if (HasBorder ()) {
 
-					lc.AddLine (new Point (0, 0), bounds.Width - 1, Orientation.Horizontal, Border.BorderStyle);
-					lc.AddLine (new Point (0, 0), bounds.Height - 1, Orientation.Vertical, Border.BorderStyle);
+					lc.AddLine (new Point (0, 0), bounds.Width - 1, Orientation.Horizontal, BorderStyle);
+					lc.AddLine (new Point (0, 0), bounds.Height - 1, Orientation.Vertical, BorderStyle);
 
-					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Width + 1, Orientation.Horizontal, Border.BorderStyle);
-					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Height + 1, Orientation.Vertical, Border.BorderStyle);
+					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Width + 1, Orientation.Horizontal, BorderStyle);
+					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Height + 1, Orientation.Vertical, BorderStyle);
 				}
 
 				foreach (var line in allLines) {
@@ -419,7 +421,7 @@ namespace Terminal.Gui {
 						length += 2;
 					}
 
-					lc.AddLine (origin, length, line.Orientation, Border.BorderStyle);
+					lc.AddLine (origin, length, line.Orientation, BorderStyle);
 				}
 			}
 
@@ -1061,7 +1063,7 @@ namespace Terminal.Gui {
 
 		private bool HasBorder ()
 		{
-			return Border?.BorderStyle != BorderStyle.None;
+			return BorderStyle != BorderStyle.None;
 		}
 
 		/// <inheritdoc/>

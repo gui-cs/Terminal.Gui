@@ -54,7 +54,7 @@ namespace Terminal.Gui {
 			if (border == null) {
 				Border = new Border () {
 					BorderStyle = DefaultBorderStyle,
-					DrawMarginFrame = true
+					//DrawMarginFrame = true
 					//Title = title
 				};
 			} else {

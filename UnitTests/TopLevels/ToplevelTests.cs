@@ -34,6 +34,8 @@ namespace Terminal.Gui.TopLevelTests {
 		public void Create_Toplevel ()
 		{
 			var top = Toplevel.Create ();
+			top.BeginInit ();
+			top.EndInit ();
 			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), top.Bounds);
 		}
 

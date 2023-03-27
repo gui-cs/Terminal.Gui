@@ -4,29 +4,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Terminal.Gui;
+using Terminal.Gui.Configuration;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Dialogs", Description: "Demonstrates how to the Dialog class")]
 	[ScenarioCategory ("Dialogs")]
 	public class Dialogs : Scenario {
 		static int CODE_POINT = '你'; // We know this is a wide char
-		public override void Init ()
-		{
-			Application.Init ();
-			//Application.Top.ColorScheme = colorScheme;
-		}
+
 
 		public override void Setup ()
 		{
 			var frame = new FrameView ("Dialog Options") {
 				X = Pos.Center (),
-				Y = 0,
+				Y = 1,
 				Width = Dim.Percent (75),
-				Height = 12
 			};
-			Application.Top.Add (frame);
 
-			var label = new Label ("width:") {
+			var label = new Label ("Width:") {
 				X = 0,
 				Y = 0,
 				Width = 15,
@@ -43,7 +38,7 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (widthEdit);
 
-			label = new Label ("height:") {
+			label = new Label ("Height:") {
 				X = 0,
 				Y = Pos.Bottom (label),
 				Width = Dim.Width (label),
@@ -88,7 +83,7 @@ namespace UICatalog.Scenarios {
 
 			label = new Label ("Num Buttons:") {
 				X = 0,
-				Y = Pos.Bottom (titleEdit),
+				Y = Pos.Bottom (label),  // BUGBUG: if this is Pos.Bottom (titleEdit) the initial LayoutSubviews does not work correctly?!?!
 				Width = Dim.Width (label),
 				Height = 1,
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
@@ -123,14 +118,22 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (styleRadioGroup);
 
+
+			frame.ForceValidatePosDim = true;
 			void Top_Loaded (object sender, EventArgs args)
 			{
-				// BUGBUG: This breaks with v2 ; causes TopologicalSort issue. Not sure why
-				//frame.Height = Dim.Height (widthEdit) + Dim.Height (heightEdit) + Dim.Height (titleEdit)
-				//	+ Dim.Height (numButtonsEdit) + Dim.Height (styleRadioGroup) + Dim.Height (glyphsNotWords) + 2;
+				frame.Height =
+					widthEdit.Frame.Height +
+					heightEdit.Frame.Height +
+					titleEdit.Frame.Height +
+					numButtonsEdit.Frame.Height +
+					glyphsNotWords.Frame.Height +
+					styleRadioGroup.Frame.Height;
 				Application.Top.Loaded -= Top_Loaded;
 			}
 			Application.Top.Loaded += Top_Loaded;
+
+			Win.Add (frame);
 
 			label = new Label ("Button Pressed:") {
 				X = Pos.Center (),
@@ -138,7 +141,7 @@ namespace UICatalog.Scenarios {
 				Height = 1,
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
-			Application.Top.Add (label);
+			Win.Add (label);
 
 			var buttonPressedLabel = new Label (" ") {
 				X = Pos.Center (),
@@ -157,7 +160,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (frame) + 2,
 				IsDefault = true,
 			};
-			showDialogButton.Clicked += (s,e) => {
+			showDialogButton.Clicked += (s, e) => {
 				try {
 					Dialog dialog = null;
 
@@ -181,7 +184,7 @@ namespace UICatalog.Scenarios {
 							button = new Button (NumberToWords.Convert (buttonId),
 							       is_default: buttonId == 0);
 						}
-						button.Clicked += (s,e) => {
+						button.Clicked += (s, e) => {
 							clicked = buttonId;
 							Application.RequestStop ();
 						};
@@ -206,7 +209,7 @@ namespace UICatalog.Scenarios {
 						X = Pos.Center (),
 						Y = Pos.Center ()
 					};
-					add.Clicked += (s,e) => {
+					add.Clicked += (s, e) => {
 						var buttonId = buttons.Count;
 						Button button;
 						if (glyphsNotWords.Checked == true) {
@@ -216,7 +219,7 @@ namespace UICatalog.Scenarios {
 							button = new Button (NumberToWords.Convert (buttonId),
 								is_default: buttonId == 0);
 						}
-						button.Clicked += (s,e) => {
+						button.Clicked += (s, e) => {
 							clicked = buttonId;
 							Application.RequestStop ();
 
@@ -233,13 +236,13 @@ namespace UICatalog.Scenarios {
 						X = Pos.Center (),
 						Y = Pos.Center () + 1
 					};
-					addChar.Clicked += (s,e) => {
+					addChar.Clicked += (s, e) => {
 						foreach (var button in buttons) {
 							button.Text += Char.ConvertFromUtf32 (CODE_POINT);
 						}
 						dialog.LayoutSubviews ();
 					};
-					dialog.Closed += (s,e) => {
+					dialog.Closed += (s, e) => {
 						buttonPressedLabel.Text = $"{clicked}";
 					};
 					dialog.Add (addChar);
@@ -250,9 +253,9 @@ namespace UICatalog.Scenarios {
 					buttonPressedLabel.Text = "Invalid Options";
 				}
 			};
-			Application.Top.Add (showDialogButton);
+			Win.Add (showDialogButton);
 
-			Application.Top.Add (buttonPressedLabel);
+			Win.Add (buttonPressedLabel);
 		}
 	}
 }

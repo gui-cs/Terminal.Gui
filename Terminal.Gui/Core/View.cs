@@ -948,9 +948,6 @@ namespace Terminal.Gui {
 
 			Border = border;
 
-			// TODO: v2 - Hack for now
-			if (Border != null) Border.BorderChanged += Border_BorderChanged;
-
 			Text = text == null ? ustring.Empty : text;
 			LayoutStyle = layoutStyle;
 			var r = rect.IsEmpty ? TextFormatter.CalcRect (0, 0, text, direction) : rect;
@@ -965,11 +962,9 @@ namespace Terminal.Gui {
 		// TODO: v2 - Hack for now
 		private void Border_BorderChanged (Border border)
 		{
+			//if (!border.DrawMarginFrame) BorderFrame.BorderStyle = BorderStyle.None;
 			BorderFrame.BorderStyle = border.BorderStyle;
-			if (!border.DrawMarginFrame) BorderFrame.BorderStyle = BorderStyle.None;
-			if (BorderFrame.BorderStyle != BorderStyle.None) {
-				BorderFrame.Thickness = new Thickness (1);
-			}
+			BorderFrame.Thickness = new Thickness (BorderFrame.BorderStyle == BorderStyle.None ? 0 : 1);
 		}
 
 		/// <summary>
@@ -997,11 +992,11 @@ namespace Terminal.Gui {
 				var s = GetAutoSize ();
 				var w = width is Dim.DimAbsolute && width.Anchor (0) > s.Width ? width.Anchor (0) : s.Width;
 				var h = height is Dim.DimAbsolute && height.Anchor (0) > s.Height ? height.Anchor (0) : s.Height;
-				Frame = new Rect (new Point (actX, actY), new Size (w, h));
+				frame = new Rect (new Point (actX, actY), new Size (w, h));
 			} else {
 				var w = width is Dim.DimAbsolute ? width.Anchor (0) : frame.Width;
 				var h = height is Dim.DimAbsolute ? height.Anchor (0) : frame.Height;
-				Frame = new Rect (new Point (actX, actY), new Size (w, h));
+				frame = new Rect (new Point (actX, actY), new Size (w, h));
 				SetMinWidthHeight ();
 			}
 			// BUGBUG: I think these calls are redundant or should be moved into just the AutoSize case
@@ -2934,7 +2929,10 @@ namespace Terminal.Gui {
 
 					SetNeedsDisplay ();
 
-					if (border != null) border.BorderChanged += Border_BorderChanged;
+					if (border != null) {
+						Border_BorderChanged (border);
+						border.BorderChanged += Border_BorderChanged;
+					}
 
 				}
 			}

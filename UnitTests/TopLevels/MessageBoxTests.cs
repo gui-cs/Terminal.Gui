@@ -268,7 +268,7 @@ namespace Terminal.Gui.TopLevelTests {
 				iterations++;
 
 				if (iterations == 0) {
-					MessageBox.Query ("mywindow", new string ('f', 2000), 0, null, false, "ok");
+					MessageBox.Query ("mywindow", new string ('f', 2000), 0,  false, "ok");
 
 					Application.RequestStop ();
 				} else if (iterations == 1) {
@@ -301,7 +301,7 @@ ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 					for (int i = 0; i < 1000; i++)
 						sb.Append ("ff ");
 
-					MessageBox.Query ("mywindow", sb.ToString (), 0, null, false, "ok");
+					MessageBox.Query ("mywindow", sb.ToString (), 0,  false, "ok");
 
 					Application.RequestStop ();
 				} else if (iterations == 1) {
@@ -334,7 +334,7 @@ ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 				iterations++;
 
 				if (iterations == 0) {
-					MessageBox.Query ("mywindow", message, 0, null, wrapMessage, "ok");
+					MessageBox.Query ("mywindow", message, 0, wrapMessage, "ok");
 
 					Application.RequestStop ();
 				} else if (iterations == 1) {

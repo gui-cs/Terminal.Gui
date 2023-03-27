@@ -638,7 +638,8 @@ namespace Terminal.Gui {
 				l = top.SuperView.Frame.Width;
 				superView = top.SuperView;
 			}
-			var mfLength = top.Border?.DrawMarginFrame == true ? 2 : 1;
+			// BUGBUG: v2 hack for now
+			var mfLength = top.BorderFrame.Thickness.Top > 0 ? 2 : 1;
 			if (top.Frame.Width <= l) {
 				nx = Math.Max (x, 0);
 				nx = nx + top.Frame.Width > l ? Math.Max (l - top.Frame.Width, 0) : nx;

@@ -15,11 +15,11 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = 1,
 				Width = Dim.Percent (75),
-				Height = 10
+				Height = 12
 			};
 			Win.Add (frame);
 
-			var label = new Label ("width:") {
+			var label = new Label ("Width:") {
 				X = 0,
 				Y = 0,
 				Width = 15,
@@ -35,7 +35,7 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (widthEdit);
 
-			label = new Label ("height:") {
+			label = new Label ("Height:") {
 				X = 0,
 				Y = Pos.Bottom (label),
 				Width = Dim.Width (label),
@@ -68,6 +68,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
+
 			var titleEdit = new TextField ("Title") {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
@@ -146,7 +147,7 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (ckbWrapMessage);
 
-      frame.ForceValidatePosDim = true;
+			frame.ForceValidatePosDim = true;
 			void Top_Loaded (object sender, EventArgs args)
 			{
 				frame.Height =
@@ -161,7 +162,7 @@ namespace UICatalog.Scenarios {
 					ckbWrapMessage.Frame.Height;
 				Application.Top.Loaded -= Top_Loaded;
 			}
-			Application.Top.Loaded += Top_Loaded;
+			//Application.Top.Loaded += Top_Loaded;
 
 			label = new Label ("Button Pressed:") {
 				X = Pos.Center (),
@@ -199,9 +200,9 @@ namespace UICatalog.Scenarios {
 						btns.Add (NumberToWords.Convert (i));
 					}
 					if (styleRadioGroup.SelectedItem == 0) {
-						buttonPressedLabel.Text = $"{MessageBox.Query (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), defaultButton, null, (bool)ckbWrapMessage.Checked, btns.ToArray ())}";
+						buttonPressedLabel.Text = $"{MessageBox.Query (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), defaultButton, (bool)ckbWrapMessage.Checked, btns.ToArray ())}";
 					} else {
-						buttonPressedLabel.Text = $"{MessageBox.ErrorQuery (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), defaultButton, null, (bool)ckbWrapMessage.Checked, btns.ToArray ())}";
+						buttonPressedLabel.Text = $"{MessageBox.ErrorQuery (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), defaultButton, (bool)ckbWrapMessage.Checked, btns.ToArray ())}";
 					}
 				} catch (FormatException) {
 					buttonPressedLabel.Text = "Invalid Options";
