@@ -11,9 +11,9 @@ namespace Terminal.Gui {
 	/// Use <see cref="AutoSpin"/> to make the automate calls to <see cref="View.SetNeedsDisplay()"/>.
 	/// </remarks>
 	public class SpinnerView : Label {
-		private Rune [] runes = new Rune [] { '|', '/', '\u2500', '\\' };
-		private int currentIdx = 0;
-		private DateTime lastRender = DateTime.MinValue;
+		private Rune [] _runes = new Rune [] { '|', '/', '\u2500', '\\' };
+		private int _currentIdx = 0;
+		private DateTime _lastRender = DateTime.MinValue;
 		private object _timeout;
 
 		/// <summary>
@@ -36,10 +36,10 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			if (DateTime.Now - lastRender > TimeSpan.FromMilliseconds (SpinDelayInMilliseconds)) {
-				currentIdx = (currentIdx + 1) % runes.Length;
-				Text = "" + runes [currentIdx];
-				lastRender = DateTime.Now;
+			if (DateTime.Now - _lastRender > TimeSpan.FromMilliseconds (SpinDelayInMilliseconds)) {
+				_currentIdx = (_currentIdx + 1) % _runes.Length;
+				Text = "" + _runes [_currentIdx];
+				_lastRender = DateTime.Now;
 			}
 
 			base.Redraw (bounds);
@@ -48,9 +48,9 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Automates spinning
 		/// </summary>
-		public void AutoSpin()
+		public void AutoSpin ()
 		{
-			if(_timeout != null) {
+			if (_timeout != null) {
 				return;
 			}
 
