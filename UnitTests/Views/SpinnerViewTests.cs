@@ -1,4 +1,5 @@
-﻿using Terminal.Gui;
+﻿using System.Threading.Tasks;
+using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -12,6 +13,27 @@ namespace UnitTests.Views {
 			this.output = output;
 		}
 
+		[Fact, AutoInitShutdown]
+		public void TestSpinnerView_AutoSpin()
+		{
+			var view = GetSpinnerView ();
+
+			Assert.Empty (Application.MainLoop.timeouts);
+			view.AutoSpin ();
+			Assert.NotEmpty (Application.MainLoop.timeouts);
+
+			//More calls to AutoSpin do not add more timeouts
+			Assert.Equal (1,Application.MainLoop.timeouts.Count);
+			view.AutoSpin ();
+			view.AutoSpin ();
+			view.AutoSpin ();
+			Assert.Equal (1, Application.MainLoop.timeouts.Count);
+
+			// Dispose clears timeout
+			Assert.NotEmpty (Application.MainLoop.timeouts);
+			view.Dispose ();
+			Assert.Empty (Application.MainLoop.timeouts);
+		}
 
 		[Fact, AutoInitShutdown]
 		public void TestSpinnerView_ThrottlesAnimation ()
@@ -33,6 +55,14 @@ namespace UnitTests.Views {
 			view.Redraw (view.Bounds);
 
 			expected = "/";
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+
+			Task.Delay (400).Wait();
+
+			view.SetNeedsDisplay ();
+			view.Redraw (view.Bounds);
+
+			expected = "─";
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 		[Fact, AutoInitShutdown]
