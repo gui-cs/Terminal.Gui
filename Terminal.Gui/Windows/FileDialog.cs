@@ -99,9 +99,9 @@ namespace Terminal.Gui {
 		private Button btnOk;
 		private Button btnCancel;
 		private Button btnToggleSplitterCollapse;
-		private Label lblForward;
-		private Label lblBack;
-		private Label lblUp;
+		private Button btnForward;
+		private Button btnBack;
+		private Button btnUp;
 		private string feedback;
 
 		private CollectionNavigator collectionNavigator = new CollectionNavigator ();
@@ -133,7 +133,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		public FileDialog ()
 		{
-			var lblPath = new Label (">");
 			this.btnOk = new Button (Style.OkButtonText) {
 				Y = Pos.AnchorEnd (1),
 				X = Pos.Function (() =>
@@ -168,16 +167,22 @@ namespace Terminal.Gui {
 				Application.RequestStop ();
 			};
 
-			this.lblUp = new Label (Driver.UpArrow.ToString ()) { X = 0, Y = 1 };
-			this.lblUp.Clicked += (s, e) => this.history.Up ();
+			this.btnUp = new Button () 
+				{ X = 0, Y = 1, NoPadding=true };
+			btnUp.Text = "◭";
+			this.btnUp.Clicked += (s, e) => this.history.Up ();
 
-			this.lblBack = new Label (Driver.LeftArrow.ToString ()) { X = 2, Y = 1 };
-			this.lblBack.Clicked += (s, e) => this.history.Back ();
+			this.btnBack = new Button () 
+				{ X = Pos.Right(btnUp)+1, Y = 1, NoPadding = true };
+			btnBack.Text = "◀-";
+			this.btnBack.Clicked += (s, e) => this.history.Back ();
 
-			this.lblForward = new Label (Driver.RightArrow.ToString ()) { X = 3, Y = 1 };
-			this.lblForward.Clicked += (s, e) => this.history.Forward ();
+			this.btnForward = new Button ()
+				{ X = Pos.Right(btnBack)+1, Y = 1, NoPadding = true};
+			btnForward.Text = "-▶";
+			this.btnForward.Clicked += (s, e) => this.history.Forward ();
+
 			this.tbPath = new TextFieldWithAppendAutocomplete {
-				X = Pos.Right (lblPath),
 				Width = Dim.Fill (1),
 				Caption = Style.PathCaption,
 				CaptionColor = Color.DarkGray,
@@ -341,10 +346,9 @@ namespace Terminal.Gui {
 			this.Add (this.spinnerLabel);
 			this.Add (this.btnOk);
 			this.Add (this.btnCancel);
-			this.Add (this.lblUp);
-			this.Add (this.lblBack);
-			this.Add (this.lblForward);
-			this.Add (lblPath);
+			this.Add (this.btnUp);
+			this.Add (this.btnBack);
+			this.Add (this.btnForward);
 			this.Add (this.tbPath);
 			this.Add (this.splitContainer);
 		}
@@ -860,9 +864,9 @@ namespace Terminal.Gui {
 
 		private void UpdateNavigationVisibility ()
 		{
-			this.lblBack.Visible = this.history.CanBack ();
-			this.lblForward.Visible = this.history.CanForward ();
-			this.lblUp.Visible = this.history.CanUp ();
+			this.btnBack.Visible = this.history.CanBack ();
+			this.btnForward.Visible = this.history.CanForward ();
+			this.btnUp.Visible = this.history.CanUp ();
 		}
 
 		private void TableView_SelectedCellChanged (object sender, SelectedCellChangedEventArgs obj)
