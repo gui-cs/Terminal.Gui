@@ -1067,7 +1067,7 @@ namespace Terminal.Gui.ViewTests {
 				Text = "hey!",
 				ScreenPosition = new Point (3, 1)
 			});
-
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 
 			var expected =
@@ -1112,6 +1112,7 @@ namespace Terminal.Gui.ViewTests {
 				GraphPosition = new PointF (2, 2)
 			});
 
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 
 			var expected =
@@ -1156,6 +1157,7 @@ namespace Terminal.Gui.ViewTests {
 				GraphPosition = new PointF (2, 2)
 			});
 
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 
 			// long text should get truncated
@@ -1188,6 +1190,7 @@ namespace Terminal.Gui.ViewTests {
 				GraphPosition = new PointF (9, 2)
 			});
 
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 
 			// Text is off the screen (graph x axis runs to 8 not 9)
@@ -1223,7 +1226,7 @@ namespace Terminal.Gui.ViewTests {
 			var points = new ScatterSeries ();
 			points.Points.Add (new PointF (7, 2));
 			gv.Series.Add (points);
-
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 
 			var expected =

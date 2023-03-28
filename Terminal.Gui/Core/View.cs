@@ -1040,7 +1040,7 @@ namespace Terminal.Gui {
 			}
 			//// BUGBUG: I think these calls are redundant or should be moved into just the AutoSize case
 			//TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
-			//SetNeedsLayout ();
+			SetNeedsLayout ();
 			//SetNeedsDisplay ();
 		}
 
