@@ -893,7 +893,7 @@ namespace Terminal.Gui.ViewTests {
 		public void TestHAxisLocation_NoMargin ()
 		{
 			var gv = GetGraph (out FakeHAxis axis);
-
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 
 			Assert.DoesNotContain (new Point (-1, 29), axis.DrawAxisLinePoints);
@@ -917,6 +917,7 @@ namespace Terminal.Gui.ViewTests {
 			var gv = GetGraph (out FakeHAxis axis);
 
 			gv.MarginBottom = 10;
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 
 			Assert.DoesNotContain (new Point (-1, 19), axis.DrawAxisLinePoints);
@@ -940,6 +941,7 @@ namespace Terminal.Gui.ViewTests {
 			var gv = GetGraph (out FakeHAxis axis);
 
 			gv.MarginLeft = 5;
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 
 			Assert.DoesNotContain (new Point (4, 29), axis.DrawAxisLinePoints);
@@ -972,6 +974,7 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var gv = GetGraph (out FakeVAxis axis);
 
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 
 			Assert.DoesNotContain (new Point (0, -1), axis.DrawAxisLinePoints);
@@ -995,6 +998,7 @@ namespace Terminal.Gui.ViewTests {
 			var gv = GetGraph (out FakeVAxis axis);
 
 			gv.MarginBottom = 10;
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 
 			Assert.DoesNotContain (new Point (0, -1), axis.DrawAxisLinePoints);
@@ -1019,6 +1023,7 @@ namespace Terminal.Gui.ViewTests {
 			var gv = GetGraph (out FakeVAxis axis);
 
 			gv.MarginLeft = 5;
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 
 			Assert.DoesNotContain (new Point (5, -1), axis.DrawAxisLinePoints);
