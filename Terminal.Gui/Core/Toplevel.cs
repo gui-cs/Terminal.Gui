@@ -190,7 +190,7 @@ namespace Terminal.Gui {
 		/// <param name="frame">A superview-relative rectangle specifying the location and size for the new Toplevel</param>
 		public Toplevel (Rect frame) : base (frame)
 		{
-			Initialize ();
+			SetInitialProperties ();
 		}
 
 		/// <summary>
@@ -199,12 +199,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Toplevel () : base ()
 		{
-			Initialize ();
+			SetInitialProperties ();
 			Width = Dim.Fill ();
 			Height = Dim.Fill ();
 		}
 
-		void Initialize ()
+		void SetInitialProperties ()
 		{
 			ColorScheme = Colors.TopLevel;
 

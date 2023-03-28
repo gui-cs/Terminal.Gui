@@ -468,10 +468,12 @@ namespace Terminal.Gui {
 			get => frame;
 			set {
 				frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
-				TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
-				LayoutFrames ();
-				SetNeedsLayout ();
-				SetNeedsDisplay ();
+				if (IsInitialized) {
+					TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
+					LayoutFrames ();
+					SetNeedsLayout ();
+					SetNeedsDisplay ();
+				}
 			}
 		}
 
@@ -1036,10 +1038,10 @@ namespace Terminal.Gui {
 				Frame = new Rect (new Point (actX, actY), new Size (w, h));
 				SetMinWidthHeight ();
 			}
-			// BUGBUG: I think these calls are redundant or should be moved into just the AutoSize case
-			TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
-			SetNeedsLayout ();
-			SetNeedsDisplay ();
+			//// BUGBUG: I think these calls are redundant or should be moved into just the AutoSize case
+			//TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
+			//SetNeedsLayout ();
+			//SetNeedsDisplay ();
 		}
 
 		void TextFormatter_HotKeyChanged (object sender, KeyChangedEventArgs e)
@@ -1079,6 +1081,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void SetNeedsDisplay ()
 		{
+			if (!IsInitialized) return;
 			SetNeedsDisplay (Bounds);
 		}
 
@@ -2538,6 +2541,10 @@ namespace Terminal.Gui {
 		{
 			switch (pos) {
 			case Pos.PosView pv:
+				// See #2461
+				//if (!from.InternalSubviews.Contains (pv.Target)) {
+				//	throw new InvalidOperationException ($"View {pv.Target} is not a subview of {from}");
+				//}
 				if (pv.Target != this) {
 					nEdges.Add ((pv.Target, from));
 				}
@@ -2558,6 +2565,10 @@ namespace Terminal.Gui {
 		{
 			switch (dim) {
 			case Dim.DimView dv:
+				// See #2461
+				//if (!from.InternalSubviews.Contains (dv.Target)) {
+				//	throw new InvalidOperationException ($"View {dv.Target} is not a subview of {from}");
+				//}
 				if (dv.Target != this) {
 					nEdges.Add ((dv.Target, from));
 				}
@@ -3125,13 +3136,16 @@ namespace Terminal.Gui {
 		public Size GetSizeNeededForTextAndHotKey ()
 		{
 			if (ustring.IsNullOrEmpty (TextFormatter.Text)) {
+
+				if (!IsInitialized) return Size.Empty;
+
 				return Bounds.Size;
 			}
 
 			// BUGBUG: This IGNORES what Text is set to, using on only the current View size. This doesn't seem to make sense.
 			// BUGBUG: This uses Frame; in v2 it should be Bounds
 			return new Size (frame.Size.Width + GetHotKeySpecifierLength (),
-			    frame.Size.Height + GetHotKeySpecifierLength (false));
+					 frame.Size.Height + GetHotKeySpecifierLength (false));
 		}
 
 		/// <inheritdoc/>
