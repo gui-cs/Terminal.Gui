@@ -213,6 +213,20 @@ namespace UICatalog.Scenarios {
 			};
 
 			Win.Add (regexProviderField);
+
+			var labelAppendAutocomplete = new Label ("Append Autocomplete:") {
+				Y = Pos.Y (regexProviderField) + 2,
+				X = 1
+			};
+			var appendAutocompleteTextField = new TextField () {
+				X = Pos.Right(labelAppendAutocomplete),
+				Y = labelAppendAutocomplete.Y,
+				Width = 30
+			};
+			appendAutocompleteTextField.Autocomplete = new AppendAutocomplete (appendAutocompleteTextField);
+						
+			Win.Add (labelAppendAutocomplete);
+			Win.Add (appendAutocompleteTextField);
 		}
 
 		TimeField _timeField;

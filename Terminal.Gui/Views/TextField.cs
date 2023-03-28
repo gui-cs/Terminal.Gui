@@ -274,7 +274,7 @@ namespace Terminal.Gui {
 		/// Provides autocomplete context menu based on suggestions at the current cursor
 		/// position. Populate <see cref="Autocomplete.AllSuggestions"/> to enable this feature.
 		/// </summary>
-		public IAutocomplete Autocomplete { get; protected set; } = new TextFieldAutocomplete ();
+		public IAutocomplete Autocomplete { get; set; } = new TextFieldAutocomplete ();
 
 		///<inheritdoc/>
 		public override Rect Frame {
