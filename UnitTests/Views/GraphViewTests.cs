@@ -1324,6 +1324,7 @@ namespace Terminal.Gui.ViewTests {
 			path.Points.Add (new PointF (1, 1));
 
 			gv.Annotations.Add (path);
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 
 			var expected =
@@ -1362,6 +1363,7 @@ namespace Terminal.Gui.ViewTests {
 			gv.MarginBottom = 3;
 			gv.MarginLeft = 1;
 
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 
 			var expected =
@@ -1400,7 +1402,8 @@ namespace Terminal.Gui.ViewTests {
 			// reserve 3 cells of the left for the margin
 			gv.MarginLeft = 3;
 			gv.MarginBottom = 1;
-
+			
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 
 			var expected =
@@ -1433,7 +1436,7 @@ namespace Terminal.Gui.ViewTests {
 				Points = { new PointF (1, 1), new PointF (5, 0) }
 			});
 
-
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 
 			var expected =
@@ -1458,7 +1461,7 @@ namespace Terminal.Gui.ViewTests {
 				Points = { new PointF (1, 1), new PointF (5, 0) }
 			});
 
-
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 
 			var expected =
@@ -1488,6 +1491,8 @@ namespace Terminal.Gui.ViewTests {
 			path.Points.Add (new PointF (1, 2));
 
 			gv.Annotations.Add (path);
+
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 
 			var expected =
