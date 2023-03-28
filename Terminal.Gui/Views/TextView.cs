@@ -1412,9 +1412,10 @@ namespace Terminal.Gui {
 		void TextView_Initialized (object sender, EventArgs e)
 		{
 			Autocomplete.HostControl = this;
-
-			Application.Top.AlternateForwardKeyChanged += Top_AlternateForwardKeyChanged;
-			Application.Top.AlternateBackwardKeyChanged += Top_AlternateBackwardKeyChanged;
+			if (Application.Top != null) {
+				Application.Top.AlternateForwardKeyChanged += Top_AlternateForwardKeyChanged;
+				Application.Top.AlternateBackwardKeyChanged += Top_AlternateBackwardKeyChanged;
+			}
 			OnContentsChanged ();
 		}
 
@@ -1476,8 +1477,10 @@ namespace Terminal.Gui {
 			get => base.Frame;
 			set {
 				base.Frame = value;
-				WrapTextModel ();
-				Adjust ();
+				if (IsInitialized) {
+					WrapTextModel ();
+					Adjust ();
+				}
 			}
 		}
 
@@ -1855,7 +1858,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void PositionCursor ()
 		{
-			if (!CanFocus || !Enabled) {
+			if (!CanFocus || !Enabled || Application.Driver == null) {
 				return;
 			}
 
