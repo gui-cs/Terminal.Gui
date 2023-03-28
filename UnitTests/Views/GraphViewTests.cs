@@ -408,7 +408,7 @@ namespace Terminal.Gui.ViewTests {
 			var series = new FakeSeries ((v, s, g) => { graphScreenBounds = s; fullGraphBounds = g; });
 			gv.Series.Add (series);
 
-
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 			Assert.Equal (new RectangleF (0, 0, 50, 30), fullGraphBounds);
 			Assert.Equal (new Rect (0, 0, 50, 30), graphScreenBounds);
@@ -421,6 +421,7 @@ namespace Terminal.Gui.ViewTests {
 
 			// Even with a margin the graph should be drawn from 
 			// the origin, we just get less visible width/height
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 			Assert.Equal (new RectangleF (0, 0, 45, 28), fullGraphBounds);
 
@@ -457,6 +458,7 @@ namespace Terminal.Gui.ViewTests {
 
 			gv.Series.Add (series);
 
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 			// Since each cell of the console is 2x5 of graph space the graph
 			// bounds to be rendered are larger
@@ -470,6 +472,7 @@ namespace Terminal.Gui.ViewTests {
 
 			// Even with a margin the graph should be drawn from 
 			// the origin, we just get less visible width/height
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 			Assert.Equal (new RectangleF (0, 0, 90, 140), fullGraphBounds);
 
@@ -614,6 +617,7 @@ namespace Terminal.Gui.ViewTests {
 			gv.AxisX = fakeXAxis = new FakeHAxis () { Increment = 0 };
 			gv.AxisY = new FakeVAxis () { Increment = 0 };
 
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 
 			// Since bar series has no bars yet no labels should be displayed
@@ -621,6 +625,7 @@ namespace Terminal.Gui.ViewTests {
 
 			multibarSeries.AddBars ("hey", 'M', 0.5001f, 0.5001f);
 			fakeXAxis.LabelPoints.Clear ();
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 
 			Assert.Equal (4, fakeXAxis.LabelPoints.Single ());
@@ -628,6 +633,7 @@ namespace Terminal.Gui.ViewTests {
 			multibarSeries.AddBars ("there", 'M', 0.24999f, 0.74999f);
 			multibarSeries.AddBars ("bob", 'M', 1, 2);
 			fakeXAxis.LabelPoints.Clear ();
+			gv.LayoutSubviews ();
 			gv.Redraw (gv.Bounds);
 
 			Assert.Equal (3, fakeXAxis.LabelPoints.Count);
