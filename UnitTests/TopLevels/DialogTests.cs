@@ -91,6 +91,37 @@ namespace Terminal.Gui.TopLevelTests {
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Left, new Button (btnText));
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 			Application.End (runstate);
+
+			// Wider
+			buttonRow = $"{d.VLine}   {d.LeftBracket} {btnText} {d.RightBracket}   {d.VLine}";
+			width = buttonRow.Length;
+
+			d.SetBufferSize (width, 1);
+
+			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Center, new Button (btnText));
+			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
+			Application.End (runstate);
+
+			// Justify
+			buttonRow = $"{d.VLine}      {d.LeftBracket} {btnText} {d.RightBracket}{d.VLine}";
+			Assert.Equal (width, buttonRow.Length);
+			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Justify, new Button (btnText));
+			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
+			Application.End (runstate);
+
+			// Right
+			buttonRow = $"{d.VLine}      {d.LeftBracket} {btnText} {d.RightBracket}{d.VLine}";
+			Assert.Equal (width, buttonRow.Length);
+			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Right, new Button (btnText));
+			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
+			Application.End (runstate);
+
+			// Left
+			buttonRow = $"{d.VLine}{d.LeftBracket} {btnText} {d.RightBracket}      {d.VLine}";
+			Assert.Equal (width, buttonRow.Length);
+			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Left, new Button (btnText));
+			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
+			Application.End (runstate);
 		}
 
 		[Fact]
@@ -685,5 +716,75 @@ namespace Terminal.Gui.TopLevelTests {
 
 			Assert.Equal (4, iterations);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void Dialog_In_Window_With_Size_One_Button_Aligns ()
+		{
+			((FakeDriver)Application.Driver).SetBufferSize (20, 5);
+
+			var win = new Window ();
+
+			int iterations = 0;
+			Application.Iteration += () => {
+				if (++iterations > 2) {
+					Application.RequestStop ();
+				}
+			};
+			
+			win.Loaded += (s, a) => {
+				var dlg = new Dialog ("Test", 18, 3, new Button ("Ok"));
+
+				dlg.Loaded += (s, a) => {
+					Application.Refresh ();
+					var expected = @"
+┌──────────────────┐
+│┌┤Test├──────────┐│
+││     [ Ok ]     ││
+│└────────────────┘│
+└──────────────────┘";
+					_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+				};
+
+				Application.Run (dlg);
+			};
+			Application.Run (win);
+		}
+		
+//		[Theory, AutoInitShutdown]
+//		[InlineData (5)]
+//		//[InlineData (6)]
+//		//[InlineData (7)]
+//		//[InlineData (8)]
+//		//[InlineData (9)]
+//		public void Dialog_In_Window_Without_Size_One_Button_Aligns (int height)
+//		{
+//			((FakeDriver)Application.Driver).SetBufferSize (20, height);
+//			var win = new Window ();
+
+//			Application.Iteration += () => {
+//				var dlg = new Dialog ("Test", new Button ("Ok"));
+
+//				dlg.LayoutComplete += (s, a) => {
+//					Application.Refresh ();
+//					// BUGBUG: This seems wrong; is it a bug in Dim.Percent(85)??
+//					var expected = @"
+//┌┌┤Test├─────────┐─┐
+//││               │ │
+//││     [ Ok ]    │ │
+//│└───────────────┘ │
+//└──────────────────┘";
+//					_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+
+//					dlg.RequestStop ();
+//					win.RequestStop ();
+//				};
+
+//				Application.Run (dlg);
+//			};
+
+//			Application.Run (win);
+//			Application.Shutdown ();
+//		}
 	}
+
 }

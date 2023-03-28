@@ -148,6 +148,12 @@ namespace Terminal.Gui.CoreTests {
 				Width = 3,
 				Height = 4
 			};
+			var super = new View (new Rect (0, 0, 10, 10));
+			super.Add (view);
+			super.BeginInit ();
+			super.EndInit ();
+			super.LayoutSubviews ();
+
 			Assert.Equal (1, view.X);
 			Assert.Equal (2, view.Y);
 			Assert.Equal (3, view.Width);
@@ -190,6 +196,11 @@ namespace Terminal.Gui.CoreTests {
 			view.Y = 2;
 			view.Width = 3;
 			view.Height = 4;
+			super = new View (new Rect (0, 0, 10, 10));
+			super.Add (view);
+			super.BeginInit ();
+			super.EndInit ();
+			super.LayoutSubviews ();
 			Assert.Equal (1, view.X);
 			Assert.Equal (2, view.Y);
 			Assert.Equal (3, view.Width);

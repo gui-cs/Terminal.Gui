@@ -1247,7 +1247,6 @@ namespace Terminal.Gui.TypeTests {
 		[InlineData (0, false)]
 		[InlineData (50, true)]
 		[InlineData (50, false)]
-
 		public void DimPercentPlusOne (int startingDistance, bool testHorizontal)
 		{
 			var container = new View {

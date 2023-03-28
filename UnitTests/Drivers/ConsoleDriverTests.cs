@@ -440,7 +440,7 @@ namespace Terminal.Gui.DriverTests {
 ││  Hello World  │ │
 ││               │ │
 ││               │ │
-││    [ Ok ]     │ │
+││     [ Ok ]    │ │
 │└───────────────┘ │
 └──────────────────┘
 ";
@@ -457,7 +457,7 @@ namespace Terminal.Gui.DriverTests {
 ││  Hello World  │ │
 ││               │ │
 ││               │ │
-││    [ Ok ]     │ │
+││     [ Ok ]    │ │
 │└───────────────┘ │
 └──────────────────┘
 ";

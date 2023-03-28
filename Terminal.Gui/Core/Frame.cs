@@ -105,7 +105,7 @@ namespace Terminal.Gui {
 
 			// TODO: v2 - this will eventually be two controls: "BorderView" and "Label" (for the title)
 
-			if (Id == "BorderFrame" && Thickness.Top > 0 && !ustring.IsNullOrEmpty (Parent?.Title)) {
+			if (Id == "BorderFrame" && Thickness.Top > 0 && Frame.Width > 1 && !ustring.IsNullOrEmpty (Parent?.Title)) {
 				var prevAttr = Driver.GetAttribute ();
 				Driver.SetAttribute (Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetNormalColor ());
 				Driver.DrawWindowTitle (screenBounds, Parent?.Title, 0, 0, 0, 0);
@@ -114,15 +114,15 @@ namespace Terminal.Gui {
 
 			if (Id == "BorderFrame" && BorderStyle != BorderStyle.None) {
 				var lc = new LineCanvas ();
-				if (Thickness.Top > 0) {
-					// ╔╡ Title ╞═════╗
-					// ╔╡  ╞═════╗
-					if (Frame.Width < 6 || ustring.IsNullOrEmpty (Parent?.Title)) {
+				if (Thickness.Top > 0 && Frame.Width > 1 && Frame.Height > 1) {
+					// ╔╡Title╞═════╗
+					// ╔╡╞═════╗
+					if (Frame.Width < 4 || ustring.IsNullOrEmpty (Parent?.Title)) {
 						// ╔╡╞╗ should be ╔══╗
 						lc.AddLine (screenBounds.Location, Frame.Width - 1, Orientation.Horizontal, BorderStyle);
 					} else {
-						var titleWidth = Math.Min (Parent.Title.ConsoleWidth, Frame.Width - 6);
-						// ╔╡ Title ╞═════╗
+						var titleWidth = Math.Min (Parent.Title.ConsoleWidth, Frame.Width - 4);
+						// ╔╡Title╞═════╗
 						// Add a short horiz line for ╔╡
 						lc.AddLine (screenBounds.Location, 1, Orientation.Horizontal, BorderStyle);
 						// Add a short vert line for ╔╡
@@ -133,13 +133,13 @@ namespace Terminal.Gui {
 						lc.AddLine (new Point (screenBounds.X + 1 + (titleWidth + 1), screenBounds.Location.Y), Frame.Width - (titleWidth + 3), Orientation.Horizontal, BorderStyle);
 					}
 				}
-				if (Thickness.Left > 0) {
+				if (Thickness.Left > 0 && (Frame.Height > 1 || Thickness.Top == 0)) {
 					lc.AddLine (screenBounds.Location, Frame.Height - 1, Orientation.Vertical, BorderStyle);
 				}
-				if (Thickness.Bottom > 0) {
+				if (Thickness.Bottom > 0 && Frame.Width > 1) {
 					lc.AddLine (new Point (screenBounds.X, screenBounds.Y + screenBounds.Height - 1), screenBounds.Width - 1, Orientation.Horizontal, BorderStyle);
 				}
-				if (Thickness.Right > 0) {
+				if (Thickness.Right > 0 && (Frame.Height > 1 || Thickness.Top == 0)) {
 					lc.AddLine (new Point (screenBounds.X + screenBounds.Width - 1, screenBounds.Y), screenBounds.Height - 1, Orientation.Vertical, BorderStyle);
 				}
 				foreach (var p in lc.GenerateImage (screenBounds)) {

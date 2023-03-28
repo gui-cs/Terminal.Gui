@@ -544,7 +544,7 @@ namespace Terminal.Gui {
 			Padding.Parent = this;
 		}
 
-		ustring title;
+		ustring title = ustring.Empty;
 
 		/// <summary>
 		/// The title to be displayed for this <see cref="View"/>. The title will be displayed if <see cref="BorderFrame"/>.<see cref="Thickness.Top"/>
@@ -1029,11 +1029,11 @@ namespace Terminal.Gui {
 				var s = GetAutoSize ();
 				var w = width is Dim.DimAbsolute && width.Anchor (0) > s.Width ? width.Anchor (0) : s.Width;
 				var h = height is Dim.DimAbsolute && height.Anchor (0) > s.Height ? height.Anchor (0) : s.Height;
-				frame = new Rect (new Point (actX, actY), new Size (w, h));
+				Frame = new Rect (new Point (actX, actY), new Size (w, h));
 			} else {
 				var w = width is Dim.DimAbsolute ? width.Anchor (0) : frame.Width;
 				var h = height is Dim.DimAbsolute ? height.Anchor (0) : frame.Height;
-				frame = new Rect (new Point (actX, actY), new Size (w, h));
+				Frame = new Rect (new Point (actX, actY), new Size (w, h));
 				SetMinWidthHeight ();
 			}
 			// BUGBUG: I think these calls are redundant or should be moved into just the AutoSize case

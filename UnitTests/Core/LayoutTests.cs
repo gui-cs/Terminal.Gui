@@ -60,7 +60,7 @@ namespace Terminal.Gui.CoreTests {
 			second.X = Pos.Right (first) + 1;
 
 			root.LayoutSubviews ();
-			
+
 			Assert.Equal (6, second.Frame.X);
 		}
 
@@ -1492,7 +1492,7 @@ Y
 
 			testView = new View () {
 				AutoSize = false,
-				X = Pos.Left(testView),
+				X = Pos.Left (testView),
 				Y = Pos.Left (testView),
 				Width = 1,
 				Height = 1
@@ -1513,6 +1513,298 @@ Y
 			testView.SetRelativeLayout (superView.Frame);
 			Assert.Equal (6, testView.Frame.X);
 			Assert.Equal (6, testView.Frame.Y);
+		}
+
+
+		[Theory, AutoInitShutdown]
+		[InlineData (1)]
+		[InlineData (2)]
+		[InlineData (3)]
+		[InlineData (4)]
+		[InlineData (5)]
+		[InlineData (6)]
+		[InlineData (7)]
+		[InlineData (8)]
+		[InlineData (9)]
+		[InlineData (10)]
+		public void Dim_CenteredSubView_85_Percent_Height (int height)
+		{
+			var win = new Window () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+
+			var subview = new Window () {
+				X = Pos.Center (),
+				Y = Pos.Center (),
+				Width = Dim.Percent (85),
+				Height = Dim.Percent (85)
+			};
+
+			win.Add (subview);
+
+			var rs = Application.Begin (win);
+			bool firstIteration = false;
+
+
+
+			((FakeDriver)Application.Driver).SetBufferSize (20, height);
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			var expected = string.Empty;
+
+			switch (height) {
+			case 1:
+				//Assert.Equal (new Rect (0, 0, 17, 0), subview.Frame);
+				expected = @"
+────────────────────";
+				break;
+			case 2:
+				//Assert.Equal (new Rect (0, 0, 17, 1), subview.Frame);
+				expected = @"
+┌──────────────────┐
+└──────────────────┘
+";
+				break;
+			case 3:
+				//Assert.Equal (new Rect (0, 0, 17, 2), subview.Frame);
+				expected = @"
+┌──────────────────┐
+│                  │
+└──────────────────┘
+";
+				break;
+			case 4:
+				//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+				expected = @"
+┌──────────────────┐
+│ ───────────────  │
+│                  │
+└──────────────────┘";
+				break;
+			case 5:
+				//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+				expected = @"
+┌──────────────────┐
+│ ┌─────────────┐  │
+│ └─────────────┘  │
+│                  │
+└──────────────────┘";
+				break;
+			case 6:
+				//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+				expected = @"
+┌──────────────────┐
+│ ┌─────────────┐  │
+│ │             │  │
+│ └─────────────┘  │
+│                  │
+└──────────────────┘";
+				break;
+			case 7:
+				//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+				expected = @"
+┌──────────────────┐
+│ ┌─────────────┐  │
+│ │             │  │
+│ │             │  │
+│ └─────────────┘  │
+│                  │
+└──────────────────┘";
+				break;
+			case 8:
+				//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+				expected = @"
+┌──────────────────┐
+│ ┌─────────────┐  │
+│ │             │  │
+│ │             │  │
+│ │             │  │
+│ └─────────────┘  │
+│                  │
+└──────────────────┘";
+				break;
+			case 9:
+				//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+				expected = @"
+┌──────────────────┐
+│                  │
+│ ┌─────────────┐  │
+│ │             │  │
+│ │             │  │
+│ │             │  │
+│ └─────────────┘  │
+│                  │
+└──────────────────┘";
+				break;
+			case 10:
+				//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+				expected = @"
+┌──────────────────┐
+│                  │
+│ ┌─────────────┐  │
+│ │             │  │
+│ │             │  │
+│ │             │  │
+│ │             │  │
+│ └─────────────┘  │
+│                  │
+└──────────────────┘";
+				break;
+			}
+			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+
+		}
+		[Theory, AutoInitShutdown]
+		[InlineData (1)]
+		[InlineData (2)]
+		[InlineData (3)]
+		[InlineData (4)]
+		[InlineData (5)]
+		[InlineData (6)]
+		[InlineData (7)]
+		[InlineData (8)]
+		[InlineData (9)]
+		[InlineData (10)]
+		public void Dim_CenteredSubView_85_Percent_Width (int width)
+		{
+			var win = new Window () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+
+			var subview = new Window () {
+				X = Pos.Center (),
+				Y = Pos.Center (),
+				Width = Dim.Percent (85),
+				Height = Dim.Percent (85)
+			};
+
+			win.Add (subview);
+
+			var rs = Application.Begin (win);
+			bool firstIteration = false;
+
+
+
+			((FakeDriver)Application.Driver).SetBufferSize (width, 7);
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			var expected = string.Empty;
+
+			switch (width) {
+			case 1:
+				//Assert.Equal (new Rect (0, 0, 17, 0), subview.Frame);
+				expected = @"
+│
+│
+│
+│
+│
+│
+│";
+				break;
+			case 2:
+				//Assert.Equal (new Rect (0, 0, 17, 1), subview.Frame);
+				expected = @"
+┌┐
+││
+││
+││
+││
+││
+└┘";
+				break;
+			case 3:
+				//Assert.Equal (new Rect (0, 0, 17, 2), subview.Frame);
+				expected = @"
+┌─┐
+│ │
+│ │
+│ │
+│ │
+│ │
+└─┘
+";
+				break;
+			case 4:
+				//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+				expected = @"
+┌──┐
+││ │
+││ │
+││ │
+││ │
+│  │
+└──┘";
+				break;
+			case 5:
+				//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+				expected = @"
+┌───┐
+│┌┐ │
+│││ │
+│││ │
+│└┘ │
+│   │
+└───┘";
+				break;
+			case 6:
+				//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+				expected = @"
+┌────┐
+│┌─┐ │
+││ │ │
+││ │ │
+│└─┘ │
+│    │
+└────┘";
+				break;
+			case 7:
+				//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+				expected = @"
+┌─────┐
+│┌──┐ │
+││  │ │
+││  │ │
+│└──┘ │
+│     │
+└─────┘";
+				break;
+			case 8:
+				//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+				expected = @"
+┌──────┐
+│┌───┐ │
+││   │ │
+││   │ │
+│└───┘ │
+│      │
+└──────┘";
+				break;
+			case 9:
+				//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+				expected = @"
+┌───────┐
+│ ┌───┐ │
+│ │   │ │
+│ │   │ │
+│ └───┘ │
+│       │
+└───────┘";
+				break;
+			case 10:
+				//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+				expected = @"
+┌────────┐
+│ ┌────┐ │
+│ │    │ │
+│ │    │ │
+│ └────┘ │
+│        │
+└────────┘";
+				break;
+			}
+			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+
 		}
 	}
 }

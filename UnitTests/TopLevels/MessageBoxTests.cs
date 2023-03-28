@@ -97,7 +97,7 @@ namespace Terminal.Gui.TopLevelTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void MessageBox_With_A_Lower_Fixed_Size ()
+		public void MessageBox_With_A_Smaller_Fixed_Size ()
 		{
 			var iterations = -1;
 			Application.Begin (Application.Top);
@@ -112,7 +112,7 @@ namespace Terminal.Gui.TopLevelTests {
 				} else if (iterations == 1) {
 					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
-                                    ┌─────┐
+                                    ┌┤T├──┐
                                     │Messa│
                                     │ ge  │
                                     │ Ok ◦│
