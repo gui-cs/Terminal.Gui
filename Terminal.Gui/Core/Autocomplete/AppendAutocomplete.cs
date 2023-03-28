@@ -20,7 +20,7 @@ namespace Terminal.Gui {
 		public int MaxHeight { get; set; }
 		public bool Visible { get; set; }
 		public ReadOnlyCollection<string> Suggestions { get; set; }
-		public List<string> AllSuggestions { get; set; }
+		public List<string> AllSuggestions { get; set; } 
 		public int SelectedIdx { get; set; }
 		public ColorScheme ColorScheme { get; set; }
 		public Key SelectionKey { get; set; } = Key.Tab;
@@ -67,7 +67,7 @@ namespace Terminal.Gui {
 			}
 
 			// draw it like its selected even though its not
-			Application.Driver.SetAttribute (new Attribute (Color.DarkGray, Color.Black));
+			Application.Driver.SetAttribute (new Attribute (Color.DarkGray, textField.ColorScheme.Focus.Background));
 			textField.Move (textField.Text.Length, 0);
 			Application.Driver.AddStr (this.validFragments [this.currentFragment.Value]);
 		}
