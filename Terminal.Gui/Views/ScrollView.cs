@@ -32,6 +32,7 @@ namespace Terminal.Gui {
 		private class ContentView : View {
 			public ContentView (Rect frame) : base (frame)
 			{
+				Id = "ScrollView.ContentView";
 				CanFocus = true;
 			}
 		}

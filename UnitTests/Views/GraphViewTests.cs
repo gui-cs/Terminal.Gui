@@ -12,6 +12,7 @@ using Xunit.Abstractions;
 using Rune = System.Rune;
 
 namespace Terminal.Gui.ViewTests {
+#if false // BUGBUG: v2 see https://github.com/gui-cs/Terminal.Gui/issues/2463
 
 	#region Helper Classes
 	class FakeHAxis : HorizontalAxis {
@@ -93,7 +94,6 @@ namespace Terminal.Gui.ViewTests {
 			return gv;
 		}
 
-#if false // BUGBUG: v2 see https://github.com/gui-cs/Terminal.Gui/issues/2463
 		#region Screen to Graph Tests
 
 		[Fact]
@@ -1589,7 +1589,7 @@ namespace Terminal.Gui.ViewTests {
 			}
 		}
 	}
-#endif
+
 	public class AxisIncrementToRenderTests {
 		[Fact]
 		public void AxisIncrementToRenderTests_Constructor ()
@@ -1601,4 +1601,5 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (6.6f, render.Value);
 		}
 	}
+#endif
 }

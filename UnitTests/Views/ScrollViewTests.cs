@@ -423,6 +423,7 @@ namespace Terminal.Gui.ViewTests {
 00000000000000000000000", attributes);
 
 			sv.Add (new Window ("1") { X = 3, Y = 3, Width = 20, Height = 20 });
+			
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
                At 15,0 
