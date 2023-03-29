@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 
 namespace Terminal.Gui {
 
@@ -10,8 +11,6 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class AppendAutocomplete : AutocompleteBase {
 
-		private int? currentFragment = null;
-		private string [] validFragments = new string [0];
 		private TextField textField;
 
 		public override View HostControl { get => textField; set => textField = (TextField)value; }
@@ -19,14 +18,16 @@ namespace Terminal.Gui {
 
 		public override void ClearSuggestions ()
 		{
-			this.currentFragment = null;
-			this.validFragments = new string [0];
+			base.ClearSuggestions();
 			textField.SetNeedsDisplay ();
 		}
 
 		public override void GenerateSuggestions (int columnOffset = 0)
 		{
-			validFragments = new string []{ "fish", "flipper", "fun" };
+			// TODO: testing only
+			AllSuggestions = new List<string> { "fish", "flipper", "fun" };
+
+			base.GenerateSuggestions();
 		}
 
 		public override bool MouseEvent (MouseEvent me, bool fromHost = false)
@@ -59,7 +60,8 @@ namespace Terminal.Gui {
 			// draw it like its selected even though its not
 			Application.Driver.SetAttribute (new Attribute (Color.DarkGray, textField.ColorScheme.Focus.Background));
 			textField.Move (textField.Text.Length, 0);
-			Application.Driver.AddStr (this.validFragments [this.currentFragment.Value]);
+			
+			Application.Driver.AddStr (this.Suggestions.ElementAt(this.SelectedIdx));
 		}
 
 		public AppendAutocomplete (TextField textField)
@@ -76,7 +78,7 @@ namespace Terminal.Gui {
 		internal bool AcceptSelectionIfAny ()
 		{
 			if (this.MakingSuggestion ()) {
-				textField.Text += this.validFragments [this.currentFragment.Value];
+				textField.Text += this.Suggestions.ElementAt(this.SelectedIdx);
 				this.MoveCursorToEnd ();
 
 				this.ClearSuggestions ();
@@ -115,19 +117,19 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private bool MakingSuggestion ()
 		{
-			return this.currentFragment != null && textField.HasFocus && this.CursorIsAtEnd ();
+			return Suggestions.Any() && this.SelectedIdx != -1 && textField.HasFocus && this.CursorIsAtEnd ();
 		}
 
 		private bool CycleSuggestion (int direction)
 		{
-			if (this.currentFragment == null || this.validFragments.Length <= 1) {
+			if (this.Suggestions.Count <= 1) {
 				return false;
 			}
 
-			this.currentFragment = (this.currentFragment + direction) % this.validFragments.Length;
+			this.SelectedIdx = (this.SelectedIdx + direction) % this.Suggestions.Count;
 
-			if (this.currentFragment < 0) {
-				this.currentFragment = this.validFragments.Length - 1;
+			if (this.SelectedIdx < 0) {
+				this.SelectedIdx = this.Suggestions.Count() - 1;
 			}
 			textField.SetNeedsDisplay ();
 			return true;
@@ -135,7 +137,8 @@ namespace Terminal.Gui {
 
 		protected override string GetCurrentWord (int columnOffset = 0)
 		{
-			throw new System.NotImplementedException ();
+			// TODO: Make real
+			return textField.Text.ToString();
 		}
 	}
 }
