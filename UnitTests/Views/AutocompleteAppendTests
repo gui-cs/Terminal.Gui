@@ -1,0 +1,24 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Xunit;
+using Xunit.Abstractions;
+
+namespace Terminal.Gui.ViewTests {
+	public class AutocomplteAppendTests {
+		readonly ITestOutputHelper output;
+
+		public AutocomplteAppendTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
+
+        [Fact]
+        public void TestRender()
+        {
+            
+        }
+    }
+}

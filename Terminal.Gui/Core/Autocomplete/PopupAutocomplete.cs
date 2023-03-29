@@ -272,7 +272,7 @@ namespace Terminal.Gui {
 		/// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
 		public override bool ProcessKey (KeyEvent kb)
 		{
-			if (IsWordChar ((char)kb.Key)) {
+			if (SuggestionGenerator.IsWordChar ((char)kb.Key)) {
 				Visible = true;
 				ManipulatePopup ();
 				closed = false;
@@ -301,7 +301,8 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if (kb.Key == Key.CursorLeft || kb.Key == Key.CursorRight) {
+			// TODO : Revisit this
+			/*if (kb.Key == Key.CursorLeft || kb.Key == Key.CursorRight) {
 				GenerateSuggestions (kb.Key == Key.CursorLeft ? -1 : 1);
 				if (Suggestions.Count == 0) {
 					Visible = false;
@@ -310,7 +311,7 @@ namespace Terminal.Gui {
 					}
 				}
 				return false;
-			}
+			}*/
 
 			if (kb.Key == SelectionKey) {
 				return Select ();
@@ -338,7 +339,10 @@ namespace Terminal.Gui {
 				if (!Visible) {
 					return false;
 				}
-				GenerateSuggestions ();
+				
+				// TODO: Revisit this
+				//GenerateSuggestions ();
+
 				if (Visible && Suggestions.Count == 0) {
 					Visible = false;
 					HostControl?.SetNeedsDisplay ();
@@ -430,7 +434,8 @@ namespace Terminal.Gui {
 		/// <returns>True if the insertion was possible otherwise false</returns>
 		protected virtual bool InsertSelection (string accepted)
 		{
-			var typedSoFar = GetCurrentWord () ?? "";
+			// TODO: Revisit this
+			/*var typedSoFar = GetCurrentWord () ?? "";
 
 			if (typedSoFar.Length < accepted.Length) {
 
@@ -438,12 +443,13 @@ namespace Terminal.Gui {
 				for (int i = 0; i < typedSoFar.Length; i++) {
 					DeleteTextBackwards ();
 				}
+				*/
 
 				InsertText (accepted);
 				return true;
-			}
+			//}
 
-			return false;
+			//return false;
 		}
 
 
@@ -502,7 +508,9 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		protected bool ReopenSuggestions ()
 		{
-			GenerateSuggestions ();
+			// TODO: Revisit
+			//GenerateSuggestions ();
+
 			if (Suggestions.Count > 0) {
 				Visible = true;
 				closed = false;

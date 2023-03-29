@@ -22,14 +22,6 @@ namespace Terminal.Gui {
 			textField.SetNeedsDisplay ();
 		}
 
-		public override void GenerateSuggestions (int columnOffset = 0)
-		{
-			// TODO: testing only
-			AllSuggestions = new List<string> { "fish", "flipper", "fun" };
-
-			base.GenerateSuggestions();
-		}
-
 		public override bool MouseEvent (MouseEvent me, bool fromHost = false)
 		{
 			return false;
@@ -133,12 +125,6 @@ namespace Terminal.Gui {
 			}
 			textField.SetNeedsDisplay ();
 			return true;
-		}
-
-		protected override string GetCurrentWord (int columnOffset = 0)
-		{
-			// TODO: Make real
-			return textField.Text.ToString();
 		}
 	}
 }

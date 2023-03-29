@@ -6,109 +6,47 @@ using System.Text;
 using Rune = System.Rune;
 
 namespace Terminal.Gui {
-	public abstract class AutocompleteBase : IAutocomplete
+
+	public interface ISuggestionGenerator
 	{
-		public abstract View HostControl { get; set; }
-		public bool PopupInsideContainer { get; set; }
 
 		/// <summary>
-		/// The maximum width of the autocomplete dropdown
+		/// Populates <see cref="Suggestions"/> with all strings in <see cref="AllSuggestions"/> that
+		/// match with the current cursor position/text in the <see cref="HostControl"/>.
 		/// </summary>
-		public virtual int MaxWidth { get; set; } = 10;
+		/// <param name="columnOffset">The column offset. Current (zero - default), left (negative), right (positive).</param>
+		IEnumerable<string> GenerateSuggestions (List<Rune> currentLine, int idx);
 
-		/// <summary>
-		/// The maximum number of visible rows in the autocomplete dropdown to render
-		/// </summary>
-		public virtual int MaxHeight { get; set; } = 6;
+		bool IsWordChar (Rune rune);
 
-		/// <inheritdoc/>
+	}
 
-
-		/// <summary>
-		/// True if the autocomplete should be considered open and visible
-		/// </summary>
-		public virtual bool Visible { get; set; }
-
-		/// <summary>
-		/// The strings that form the current list of suggestions to render
-		/// based on what the user has typed so far.
-		/// </summary>
-		public virtual ReadOnlyCollection<string> Suggestions { get; set; } = new ReadOnlyCollection<string> (new string [0]);
-
+	public class SingleWordSuggestionGenerator : ISuggestionGenerator
+	{
 		/// <summary>
 		/// The full set of all strings that can be suggested.
 		/// </summary>
 		/// <returns></returns>
 		public virtual List<string> AllSuggestions { get; set; } = new List<string> ();
 
-		/// <summary>
-		/// The currently selected index into <see cref="Suggestions"/> that the user has highlighted
-		/// </summary>
-		public virtual int SelectedIdx { get; set; }
-
-
-		/// <inheritdoc/>
-		public abstract ColorScheme ColorScheme { get; set; }
-
-		/// <inheritdoc/>
-		public virtual Key SelectionKey { get; set; } = Key.Enter;
-
-		/// <inheritdoc/>
-		public virtual Key CloseKey { get; set; } = Key.Esc;
-
-		/// <inheritdoc/>
-		public virtual Key Reopen { get; set; } = Key.Space | Key.CtrlMask | Key.AltMask;
-
-		/// <inheritdoc/>
-		public abstract bool MouseEvent (MouseEvent me, bool fromHost = false);
-
-		/// <inheritdoc/>
-		public abstract bool ProcessKey (KeyEvent kb);
-		/// <inheritdoc/>
-		public abstract void RenderOverlay (Point renderAt);
-
-		/// <summary>
-		/// Clears <see cref="Suggestions"/>
-		/// </summary>
-		public virtual void ClearSuggestions ()
-		{
-			Suggestions = Enumerable.Empty<string> ().ToList ().AsReadOnly ();
-		}
-
-
-		/// <summary>
-		/// Populates <see cref="Suggestions"/> with all strings in <see cref="AllSuggestions"/> that
-		/// match with the current cursor position/text in the <see cref="HostControl"/>
-		/// </summary>
-		/// <param name="columnOffset">The column offset.</param>
-		public virtual void GenerateSuggestions (int columnOffset = 0)
+		public IEnumerable<string> GenerateSuggestions (List<Rune> currentLine, int idx)
 		{
 			// if there is nothing to pick from
 			if (AllSuggestions.Count == 0) {
-				ClearSuggestions ();
-				return;
+				return Enumerable.Empty<string>();
 			}
 
-			var currentWord = GetCurrentWord (columnOffset);
+			var currentWord = IdxToWord (currentLine, idx);
 
 			if (string.IsNullOrWhiteSpace (currentWord)) {
-				ClearSuggestions ();
+				return Enumerable.Empty<string>();
 			} else {
-				Suggestions = AllSuggestions.Where (o =>
+				return AllSuggestions.Where (o =>
 				o.StartsWith (currentWord, StringComparison.CurrentCultureIgnoreCase) &&
 				!o.Equals (currentWord, StringComparison.CurrentCultureIgnoreCase)
 				).ToList ().AsReadOnly ();
 
-				EnsureSelectedIdxIsValid ();
 			}
-		}
-
-		/// <summary>
-		/// Updates <see cref="SelectedIdx"/> to be a valid index within <see cref="Suggestions"/>
-		/// </summary>
-		public virtual void EnsureSelectedIdxIsValid ()
-		{
-			SelectedIdx = Math.Max (0, Math.Min (Suggestions.Count - 1, SelectedIdx));
 		}
 
 		/// <summary>
@@ -122,16 +60,6 @@ namespace Terminal.Gui {
 			return Char.IsLetterOrDigit ((char)rune);
 		}
 
-
-		/// <summary>
-		/// Returns the currently selected word from the <see cref="HostControl"/>.
-		/// <para>
-		/// When overriding this method views can make use of <see cref="IdxToWord(List{Rune}, int, int)"/>
-		/// </para>
-		/// </summary>
-		/// <param name="columnOffset">The column offset.</param>
-		/// <returns></returns>
-		protected abstract string GetCurrentWord (int columnOffset = 0);
 
 		/// <summary>
 		/// <para>
@@ -178,6 +106,94 @@ namespace Terminal.Gui {
 				}
 			}
 			return sb.ToString ();
+		}
+	}
+
+	public abstract class AutocompleteBase : IAutocomplete {
+		public abstract View HostControl { get; set; }
+		public bool PopupInsideContainer { get; set; }
+		
+		public ISuggestionGenerator SuggestionGenerator {get;set;} = new SingleWordSuggestionGenerator();
+
+		/// <summary>
+		/// The maximum width of the autocomplete dropdown
+		/// </summary>
+		public virtual int MaxWidth { get; set; } = 10;
+
+		/// <summary>
+		/// The maximum number of visible rows in the autocomplete dropdown to render
+		/// </summary>
+		public virtual int MaxHeight { get; set; } = 6;
+
+		/// <inheritdoc/>
+
+
+		/// <summary>
+		/// True if the autocomplete should be considered open and visible
+		/// </summary>
+		public virtual bool Visible { get; set; }
+
+		/// <summary>
+		/// The strings that form the current list of suggestions to render
+		/// based on what the user has typed so far.
+		/// </summary>
+		public virtual ReadOnlyCollection<string> Suggestions { get; set; } = new ReadOnlyCollection<string> (new string [0]);
+
+
+
+		/// <summary>
+		/// The currently selected index into <see cref="Suggestions"/> that the user has highlighted
+		/// </summary>
+		public virtual int SelectedIdx { get; set; }
+
+
+		/// <inheritdoc/>
+		public abstract ColorScheme ColorScheme { get; set; }
+
+		/// <inheritdoc/>
+		public virtual Key SelectionKey { get; set; } = Key.Enter;
+
+		/// <inheritdoc/>
+		public virtual Key CloseKey { get; set; } = Key.Esc;
+
+		/// <inheritdoc/>
+		public virtual Key Reopen { get; set; } = Key.Space | Key.CtrlMask | Key.AltMask;
+
+		/// <inheritdoc/>
+		public abstract bool MouseEvent (MouseEvent me, bool fromHost = false);
+
+		/// <inheritdoc/>
+		public abstract bool ProcessKey (KeyEvent kb);
+		/// <inheritdoc/>
+		public abstract void RenderOverlay (Point renderAt);
+
+		/// <summary>
+		/// Clears <see cref="Suggestions"/>
+		/// </summary>
+		public virtual void ClearSuggestions ()
+		{
+			Suggestions = Enumerable.Empty<string> ().ToList ().AsReadOnly ();
+		}
+
+
+		/// <summary>
+		/// Populates <see cref="Suggestions"/> with all strings in <see cref="AllSuggestions"/> that
+		/// match with the current cursor position/text in the <see cref="HostControl"/>
+		/// </summary>
+		/// <param name="columnOffset">The column offset.</param>
+		public virtual void GenerateSuggestions (List<Rune> currentLine, int idx)
+		{
+			Suggestions = SuggestionGenerator.GenerateSuggestions(currentLine, idx).ToList().AsReadOnly();
+
+			EnsureSelectedIdxIsValid ();
+		}
+
+		/// <summary>
+		/// Updates <see cref="SelectedIdx"/> to be a valid index within <see cref="Suggestions"/>
+		/// </summary>
+		public virtual void EnsureSelectedIdxIsValid ()
+		{
+			SelectedIdx = Math.Max (0, Math.Min (Suggestions.Count - 1, SelectedIdx));
 		}
 	}
 }

@@ -471,13 +471,22 @@ namespace Terminal.Gui {
 			if (SelectedLength > 0)
 				return;
 
+
 			// draw autocomplete
-			Autocomplete.GenerateSuggestions ();
+			GenerateSuggestions ();
 
 			var renderAt = new Point (
 				CursorPosition - ScrollOffset, 0);
 
 			Autocomplete.RenderOverlay (renderAt);
+		}
+
+		private void GenerateSuggestions ()
+		{
+			var currentLine = Text.ToRuneList ();
+			var cursorPosition = Math.Min (this.CursorPosition, currentLine.Count);
+
+			Autocomplete.GenerateSuggestions(currentLine,cursorPosition);
 		}
 
 		/// <inheritdoc/>
@@ -1321,15 +1330,6 @@ namespace Terminal.Gui {
 		protected override void DeleteTextBackwards ()
 		{
 			((TextField)HostControl).DeleteCharLeft (false);
-		}
-
-		/// <inheritdoc/>
-		protected override string GetCurrentWord (int columnOffset = 0)
-		{
-			var host = (TextField)HostControl;
-			var currentLine = host.Text.ToRuneList ();
-			var cursorPosition = Math.Min (host.CursorPosition + columnOffset, currentLine.Count);
-			return IdxToWord (currentLine, cursorPosition, columnOffset);
 		}
 
 		/// <inheritdoc/>

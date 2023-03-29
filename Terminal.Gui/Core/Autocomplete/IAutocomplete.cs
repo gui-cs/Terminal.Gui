@@ -43,11 +43,6 @@ namespace Terminal.Gui {
 		ReadOnlyCollection<string> Suggestions { get; set; }
 
 		/// <summary>
-		/// The full set of all strings that can be suggested.
-		/// </summary>
-		List<string> AllSuggestions { get; set; }
-
-		/// <summary>
 		/// The currently selected index into <see cref="Suggestions"/> that the user has highlighted
 		/// </summary>
 		int SelectedIdx { get; set; }
@@ -105,11 +100,8 @@ namespace Terminal.Gui {
 		/// </summary>
 		void ClearSuggestions ();
 
-		/// <summary>
-		/// Populates <see cref="Suggestions"/> with all strings in <see cref="AllSuggestions"/> that
-		/// match with the current cursor position/text in the <see cref="HostControl"/>.
-		/// </summary>
-		/// <param name="columnOffset">The column offset. Current (zero - default), left (negative), right (positive).</param>
-		void GenerateSuggestions (int columnOffset = 0);
+		ISuggestionGenerator SuggestionGenerator {get;set;}
+
+		void GenerateSuggestions (List<Rune> currentLine, int idx);
 	}
 }

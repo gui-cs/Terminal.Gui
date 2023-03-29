@@ -2425,7 +2425,7 @@ namespace Terminal.Gui {
 				return;
 
 			// draw autocomplete
-			Autocomplete.GenerateSuggestions ();
+			GenerateSuggestions ();
 
 			var renderAt = new Point (
 				CursorPosition.X - LeftColumn,
@@ -2434,6 +2434,13 @@ namespace Terminal.Gui {
 					: 0);
 
 			Autocomplete.RenderOverlay (renderAt);
+		}
+
+		private void GenerateSuggestions ()
+		{
+			var currentLine = this.GetCurrentLine ();
+			var cursorPosition = Math.Min (this.CurrentColumn, currentLine.Count);
+			Autocomplete.GenerateSuggestions(currentLine,cursorPosition);
 		}
 
 		/// <inheritdoc/>
@@ -4424,15 +4431,6 @@ namespace Terminal.Gui {
 	/// An implementation on a TextView.
 	/// </summary>
 	public class TextViewAutocomplete : PopupAutocomplete {
-
-		///<inheritdoc/>
-		protected override string GetCurrentWord (int columnOffset = 0)
-		{
-			var host = (TextView)HostControl;
-			var currentLine = host.GetCurrentLine ();
-			var cursorPosition = Math.Min (host.CurrentColumn + columnOffset, currentLine.Count);
-			return IdxToWord (currentLine, cursorPosition, columnOffset);
-		}
 
 		/// <inheritdoc/>
 		protected override void DeleteTextBackwards ()
