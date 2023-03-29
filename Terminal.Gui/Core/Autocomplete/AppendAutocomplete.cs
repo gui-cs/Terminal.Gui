@@ -8,43 +8,33 @@ namespace Terminal.Gui {
 	/// Autocomplete for a <see cref="TextField"/> which shows suggestions within the box.
 	/// Displayed suggestions can be completed using the tab key.
 	/// </summary>
-	public class AppendAutocomplete : IAutocomplete {
+	public class AppendAutocomplete : AutocompleteBase {
 
 		private int? currentFragment = null;
 		private string [] validFragments = new string [0];
 		private TextField textField;
 
-		public View HostControl { get => textField; set => textField = (TextField)value; }
-		public bool PopupInsideContainer { get; set; }
-		public int MaxWidth { get; set; }
-		public int MaxHeight { get; set; }
-		public bool Visible { get; set; }
-		public ReadOnlyCollection<string> Suggestions { get; set; }
-		public List<string> AllSuggestions { get; set; } 
-		public int SelectedIdx { get; set; }
-		public ColorScheme ColorScheme { get; set; }
-		public Key SelectionKey { get; set; } = Key.Tab;
-		public Key CloseKey { get; set; }
-		public Key Reopen { get; set; }
+		public override View HostControl { get => textField; set => textField = (TextField)value; }
+		public override ColorScheme ColorScheme { get; set; }
 
-		public void ClearSuggestions ()
+		public override void ClearSuggestions ()
 		{
 			this.currentFragment = null;
 			this.validFragments = new string [0];
 			textField.SetNeedsDisplay ();
 		}
 
-		public void GenerateSuggestions (int columnOffset = 0)
+		public override void GenerateSuggestions (int columnOffset = 0)
 		{
 			validFragments = new string []{ "fish", "flipper", "fun" };
 		}
 
-		public bool MouseEvent (MouseEvent me, bool fromHost = false)
+		public override bool MouseEvent (MouseEvent me, bool fromHost = false)
 		{
 			return false;
 		}
 
-		public bool ProcessKey (KeyEvent kb)
+		public override bool ProcessKey (KeyEvent kb)
 		{
 			var key = kb.Key;
 			if (key == SelectionKey) {
@@ -60,7 +50,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		public void RenderOverlay (Point renderAt)
+		public override void RenderOverlay (Point renderAt)
 		{
 			if (!this.MakingSuggestion ()) {
 				return;
@@ -141,6 +131,11 @@ namespace Terminal.Gui {
 			}
 			textField.SetNeedsDisplay ();
 			return true;
+		}
+
+		protected override string GetCurrentWord (int columnOffset = 0)
+		{
+			throw new System.NotImplementedException ();
 		}
 	}
 }

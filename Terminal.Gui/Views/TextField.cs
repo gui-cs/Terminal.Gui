@@ -1315,7 +1315,7 @@ namespace Terminal.Gui {
 	/// from a range of 'autocomplete' options.
 	/// An implementation on a TextField.
 	/// </summary>
-	public class TextFieldAutocomplete : Autocomplete {
+	public class TextFieldAutocomplete : PopupAutocomplete {
 
 		/// <inheritdoc/>
 		protected override void DeleteTextBackwards ()

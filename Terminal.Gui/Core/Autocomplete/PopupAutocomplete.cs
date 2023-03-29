@@ -11,12 +11,12 @@ namespace Terminal.Gui {
 	/// Renders an overlay on another view at a given point that allows selecting
 	/// from a range of 'autocomplete' options.
 	/// </summary>
-	public abstract class Autocomplete : IAutocomplete {
+	public abstract class PopupAutocomplete : AutocompleteBase {
 
 		private class Popup : View {
-			Autocomplete autocomplete;
+			PopupAutocomplete autocomplete;
 
-			public Popup (Autocomplete autocomplete)
+			public Popup (PopupAutocomplete autocomplete)
 			{
 				this.autocomplete = autocomplete;
 				CanFocus = true;
@@ -61,7 +61,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The host control to handle.
 		/// </summary>
-		public virtual View HostControl {
+		public override View HostControl {
 			get => hostControl;
 			set {
 				hostControl = value;
@@ -72,6 +72,11 @@ namespace Terminal.Gui {
 					top.Removed += Top_Removed;
 				}
 			}
+		}
+
+		public PopupAutocomplete ()
+		{
+			PopupInsideContainer = true;
 		}
 
 		private void Top_Removed (object sender, SuperViewChangedEventArgs e)
@@ -112,42 +117,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		/// <summary>
-		/// Gets or sets If the popup is displayed inside or outside the host limits.
-		/// </summary>
-		public bool PopupInsideContainer { get; set; } = true;
-
-		/// <summary>
-		/// The maximum width of the autocomplete dropdown
-		/// </summary>
-		public virtual int MaxWidth { get; set; } = 10;
-
-		/// <summary>
-		/// The maximum number of visible rows in the autocomplete dropdown to render
-		/// </summary>
-		public virtual int MaxHeight { get; set; } = 6;
-
-		/// <summary>
-		/// True if the autocomplete should be considered open and visible
-		/// </summary>
-		public virtual bool Visible { get; set; }
-
-		/// <summary>
-		/// The strings that form the current list of suggestions to render
-		/// based on what the user has typed so far.
-		/// </summary>
-		public virtual ReadOnlyCollection<string> Suggestions { get; set; } = new ReadOnlyCollection<string> (new string [0]);
-
-		/// <summary>
-		/// The full set of all strings that can be suggested.
-		/// </summary>
-		/// <returns></returns>
-		public virtual List<string> AllSuggestions { get; set; } = new List<string> ();
-
-		/// <summary>
-		/// The currently selected index into <see cref="Suggestions"/> that the user has highlighted
-		/// </summary>
-		public virtual int SelectedIdx { get; set; }
 
 		/// <summary>
 		/// When more suggestions are available than can be rendered the user
@@ -160,7 +129,7 @@ namespace Terminal.Gui {
 		/// The colors to use to render the overlay.  Accessing this property before
 		/// the Application has been initialized will cause an error
 		/// </summary>
-		public virtual ColorScheme ColorScheme {
+		public override ColorScheme ColorScheme {
 			get {
 				if (colorScheme == null) {
 					colorScheme = Colors.Menu;
@@ -173,26 +142,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The key that the user must press to accept the currently selected autocomplete suggestion
-		/// </summary>
-		public virtual Key SelectionKey { get; set; } = Key.Enter;
-
-		/// <summary>
-		/// The key that the user can press to close the currently popped autocomplete menu
-		/// </summary>
-		public virtual Key CloseKey { get; set; } = Key.Esc;
-
-		/// <summary>
-		/// The key that the user can press to reopen the currently popped autocomplete menu
-		/// </summary>
-		public virtual Key Reopen { get; set; } = Key.Space | Key.CtrlMask | Key.AltMask;
-
-		/// <summary>
 		/// Renders the autocomplete dialog inside or outside the given <see cref="HostControl"/> at the
 		/// given point.
 		/// </summary>
 		/// <param name="renderAt"></param>
-		public virtual void RenderOverlay (Point renderAt)
+		public override void RenderOverlay (Point renderAt)
 		{
 			if (!Visible || HostControl?.HasFocus == false || Suggestions.Count == 0) {
 				LastPopupPos = null;
@@ -294,12 +248,10 @@ namespace Terminal.Gui {
 			}
 		}
 
-		/// <summary>
-		/// Updates <see cref="SelectedIdx"/> to be a valid index within <see cref="Suggestions"/>
-		/// </summary>
-		public virtual void EnsureSelectedIdxIsValid ()
+		public override void EnsureSelectedIdxIsValid ()
 		{
-			SelectedIdx = Math.Max (0, Math.Min (Suggestions.Count - 1, SelectedIdx));
+			base.EnsureSelectedIdxIsValid ();
+
 
 			// if user moved selection up off top of current scroll window
 			if (SelectedIdx < ScrollOffset) {
@@ -311,7 +263,6 @@ namespace Terminal.Gui {
 				ScrollOffset++;
 			}
 		}
-
 		/// <summary>
 		/// Handle key events before <see cref="HostControl"/> e.g. to make key events like
 		/// up/down apply to the autocomplete control instead of changing the cursor position in
@@ -319,7 +270,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="kb">The key event.</param>
 		/// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
-		public virtual bool ProcessKey (KeyEvent kb)
+		public override bool ProcessKey (KeyEvent kb)
 		{
 			if (IsWordChar ((char)kb.Key)) {
 				Visible = true;
@@ -381,7 +332,7 @@ namespace Terminal.Gui {
 		/// <param name="me">The mouse event.</param>
 		/// <param name="fromHost">If was called from the popup or from the host.</param>
 		/// <returns><c>true</c>if the mouse can be handled <c>false</c>otherwise.</returns>
-		public virtual bool MouseEvent (MouseEvent me, bool fromHost = false)
+		public override bool MouseEvent (MouseEvent me, bool fromHost = false)
 		{
 			if (fromHost) {
 				if (!Visible) {
@@ -450,53 +401,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		/// <summary>
-		/// Clears <see cref="Suggestions"/>
-		/// </summary>
-		public virtual void ClearSuggestions ()
-		{
-			Suggestions = Enumerable.Empty<string> ().ToList ().AsReadOnly ();
-		}
-
-
-		/// <summary>
-		/// Populates <see cref="Suggestions"/> with all strings in <see cref="AllSuggestions"/> that
-		/// match with the current cursor position/text in the <see cref="HostControl"/>
-		/// </summary>
-		/// <param name="columnOffset">The column offset.</param>
-		public virtual void GenerateSuggestions (int columnOffset = 0)
-		{
-			// if there is nothing to pick from
-			if (AllSuggestions.Count == 0) {
-				ClearSuggestions ();
-				return;
-			}
-
-			var currentWord = GetCurrentWord (columnOffset);
-
-			if (string.IsNullOrWhiteSpace (currentWord)) {
-				ClearSuggestions ();
-			} else {
-				Suggestions = AllSuggestions.Where (o =>
-				o.StartsWith (currentWord, StringComparison.CurrentCultureIgnoreCase) &&
-				!o.Equals (currentWord, StringComparison.CurrentCultureIgnoreCase)
-				).ToList ().AsReadOnly ();
-
-				EnsureSelectedIdxIsValid ();
-			}
-		}
-
-
-		/// <summary>
-		/// Return true if the given symbol should be considered part of a word
-		/// and can be contained in matches.  Base behavior is to use <see cref="char.IsLetterOrDigit(char)"/>
-		/// </summary>
-		/// <param name="rune"></param>
-		/// <returns></returns>
-		public virtual bool IsWordChar (Rune rune)
-		{
-			return Char.IsLetterOrDigit ((char)rune);
-		}
+		
 
 		/// <summary>
 		/// Completes the autocomplete selection process.  Called when user hits the <see cref="SelectionKey"/>.
@@ -541,62 +446,6 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		/// <summary>
-		/// Returns the currently selected word from the <see cref="HostControl"/>.
-		/// <para>
-		/// When overriding this method views can make use of <see cref="IdxToWord(List{Rune}, int, int)"/>
-		/// </para>
-		/// </summary>
-		/// <param name="columnOffset">The column offset.</param>
-		/// <returns></returns>
-		protected abstract string GetCurrentWord (int columnOffset = 0);
-
-		/// <summary>
-		/// <para>
-		/// Given a <paramref name="line"/> of characters, returns the word which ends at <paramref name="idx"/> 
-		/// or null.  Also returns null if the <paramref name="idx"/> is positioned in the middle of a word.
-		/// </para>
-		/// 
-		/// <para>
-		/// Use this method to determine whether autocomplete should be shown when the cursor is at
-		/// a given point in a line and to get the word from which suggestions should be generated.
-		/// Use the <paramref name="columnOffset"/> to indicate if search the word at left (negative),
-		/// at right (positive) or at the current column (zero) which is the default.
-		/// </para>
-		/// </summary>
-		/// <param name="line"></param>
-		/// <param name="idx"></param>
-		/// <param name="columnOffset"></param>
-		/// <returns></returns>
-		protected virtual string IdxToWord (List<Rune> line, int idx, int columnOffset = 0)
-		{
-			StringBuilder sb = new StringBuilder ();
-			var endIdx = idx;
-
-			// get the ending word index
-			while (endIdx < line.Count) {
-				if (IsWordChar (line [endIdx])) {
-					endIdx++;
-				} else {
-					break;
-				}
-			}
-
-			// It isn't a word char then there is no way to autocomplete that word
-			if (endIdx == idx && columnOffset != 0) {
-				return null;
-			}
-
-			// we are at the end of a word.  Work out what has been typed so far
-			while (endIdx-- > 0) {
-				if (IsWordChar (line [endIdx])) {
-					sb.Insert (0, (char)line [endIdx]);
-				} else {
-					break;
-				}
-			}
-			return sb.ToString ();
-		}
 
 		/// <summary>
 		/// Deletes the text backwards before insert the selected text in the <see cref="HostControl"/>.
@@ -664,3 +513,4 @@ namespace Terminal.Gui {
 		}
 	}
 }
+

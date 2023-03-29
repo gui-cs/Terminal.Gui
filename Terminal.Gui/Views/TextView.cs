@@ -1146,7 +1146,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Provides autocomplete context menu based on suggestions at the current cursor
-		/// position. Populate <see cref="Autocomplete.AllSuggestions"/> to enable this feature
+		/// position. Populate <see cref="IAutocomplete.AllSuggestions"/> to enable this feature
 		/// </summary>
 		public IAutocomplete Autocomplete { get; protected set; } = new TextViewAutocomplete ();
 
@@ -1734,7 +1734,6 @@ namespace Terminal.Gui {
 					}
 					Height = 1;
 					LayoutStyle = lyout;
-					Autocomplete.PopupInsideContainer = false;
 					SetNeedsDisplay ();
 				} else if (multiline && savedHeight != null) {
 					var lyout = LayoutStyle;
@@ -1743,7 +1742,6 @@ namespace Terminal.Gui {
 					}
 					Height = savedHeight;
 					LayoutStyle = lyout;
-					Autocomplete.PopupInsideContainer = true;
 					SetNeedsDisplay ();
 				}
 			}
@@ -4425,7 +4423,7 @@ namespace Terminal.Gui {
 	/// from a range of 'autocomplete' options.
 	/// An implementation on a TextView.
 	/// </summary>
-	public class TextViewAutocomplete : Autocomplete {
+	public class TextViewAutocomplete : PopupAutocomplete {
 
 		///<inheritdoc/>
 		protected override string GetCurrentWord (int columnOffset = 0)
