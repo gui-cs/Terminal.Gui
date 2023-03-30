@@ -5,8 +5,7 @@ using System.Text;
 using Rune = System.Rune;
 
 namespace Terminal.Gui {
-	public class SingleWordSuggestionGenerator : ISuggestionGenerator
-	{
+	public class SingleWordSuggestionGenerator : ISuggestionGenerator {
 		/// <summary>
 		/// The full set of all strings that can be suggested.
 		/// </summary>
@@ -17,18 +16,18 @@ namespace Terminal.Gui {
 		{
 			// if there is nothing to pick from
 			if (AllSuggestions.Count == 0) {
-				return Enumerable.Empty<Suggestion>();
+				return Enumerable.Empty<Suggestion> ();
 			}
 
 			var currentWord = IdxToWord (currentLine, idx);
 
 			if (string.IsNullOrWhiteSpace (currentWord)) {
-				return Enumerable.Empty<Suggestion>();
+				return Enumerable.Empty<Suggestion> ();
 			} else {
 				return AllSuggestions.Where (o =>
 				o.StartsWith (currentWord, StringComparison.CurrentCultureIgnoreCase) &&
 				!o.Equals (currentWord, StringComparison.CurrentCultureIgnoreCase)
-				).Select(o=>new Suggestion(currentWord.Length,o))
+				).Select (o => new Suggestion (currentWord.Length, o))
 					.ToList ().AsReadOnly ();
 
 			}

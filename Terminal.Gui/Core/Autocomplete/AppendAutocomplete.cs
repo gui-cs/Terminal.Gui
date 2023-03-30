@@ -18,7 +18,7 @@ namespace Terminal.Gui {
 
 		public override void ClearSuggestions ()
 		{
-			base.ClearSuggestions();
+			base.ClearSuggestions ();
 			textField.SetNeedsDisplay ();
 		}
 
@@ -76,7 +76,7 @@ namespace Terminal.Gui {
 
 				var insert = this.Suggestions.ElementAt (this.SelectedIdx);
 				var newText = textField.Text.ToString ();
-				newText = newText.Substring(0,newText.Length - insert.Remove);
+				newText = newText.Substring (0, newText.Length - insert.Remove);
 				newText += insert.Replacement;
 				textField.Text = newText;
 
@@ -118,7 +118,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private bool MakingSuggestion ()
 		{
-			return Suggestions.Any() && this.SelectedIdx != -1 && textField.HasFocus && this.CursorIsAtEnd ();
+			return Suggestions.Any () && this.SelectedIdx != -1 && textField.HasFocus && this.CursorIsAtEnd ();
 		}
 
 		private bool CycleSuggestion (int direction)
@@ -130,7 +130,7 @@ namespace Terminal.Gui {
 			this.SelectedIdx = (this.SelectedIdx + direction) % this.Suggestions.Count;
 
 			if (this.SelectedIdx < 0) {
-				this.SelectedIdx = this.Suggestions.Count() - 1;
+				this.SelectedIdx = this.Suggestions.Count () - 1;
 			}
 			textField.SetNeedsDisplay ();
 			return true;

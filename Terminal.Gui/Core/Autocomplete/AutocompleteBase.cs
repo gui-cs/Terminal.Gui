@@ -8,13 +8,13 @@ using Rune = System.Rune;
 namespace Terminal.Gui {
 
 	public abstract class AutocompleteBase : IAutocomplete {
-		
+
 		/// <inheritdoc/>
 		public abstract View HostControl { get; set; }
 		/// <inheritdoc/>
 		public bool PopupInsideContainer { get; set; }
-		
-		public ISuggestionGenerator SuggestionGenerator {get;set;} = new SingleWordSuggestionGenerator();
+
+		public ISuggestionGenerator SuggestionGenerator { get; set; } = new SingleWordSuggestionGenerator ();
 
 		/// <inheritdoc/>
 		public virtual int MaxWidth { get; set; } = 10;
@@ -67,7 +67,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public virtual void GenerateSuggestions (List<Rune> currentLine, int idx)
 		{
-			Suggestions = SuggestionGenerator.GenerateSuggestions(currentLine, idx).ToList().AsReadOnly();
+			Suggestions = SuggestionGenerator.GenerateSuggestions (currentLine, idx).ToList ().AsReadOnly ();
 
 			EnsureSelectedIdxIsValid ();
 		}

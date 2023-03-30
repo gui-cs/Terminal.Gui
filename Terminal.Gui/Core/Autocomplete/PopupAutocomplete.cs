@@ -408,7 +408,7 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		/// Completes the autocomplete selection process.  Called when user hits the <see cref="SelectionKey"/>.
+		/// Completes the autocomplete selection process.  Called when user hits the <see cref="IAutocomplete.SelectionKey"/>.
 		/// </summary>
 		/// <returns></returns>
 		protected bool Select ()
@@ -456,7 +456,7 @@ namespace Terminal.Gui {
 		protected abstract void InsertText (string accepted);
 
 		/// <summary>
-		/// Closes the Autocomplete context menu if it is showing and <see cref="ClearSuggestions"/>
+		/// Closes the Autocomplete context menu if it is showing and <see cref="IAutocomplete.ClearSuggestions"/>
 		/// </summary>
 		protected void Close ()
 		{

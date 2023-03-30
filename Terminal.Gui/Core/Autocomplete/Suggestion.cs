@@ -14,7 +14,7 @@
 		/// this would be the same as <see cref="Replacement"/> but may vary in advanced
 		/// use cases (e.g. Title= "ctor", Replacement = "MyClass()\n{\n}")
 		/// </summary>
-		public string Title {get;}
+		public string Title { get; }
 
 		/// <summary>
 		/// The replacement text that will be added

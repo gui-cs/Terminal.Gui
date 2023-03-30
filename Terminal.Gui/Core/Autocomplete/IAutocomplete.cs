@@ -100,7 +100,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		void ClearSuggestions ();
 
-		ISuggestionGenerator SuggestionGenerator {get;set;}
+		ISuggestionGenerator SuggestionGenerator { get; set; }
 
 
 		/// <summary>

@@ -1146,7 +1146,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Provides autocomplete context menu based on suggestions at the current cursor
-		/// position. Populate <see cref="IAutocomplete.AllSuggestions"/> to enable this feature
+		/// position. Configure <see cref="IAutocomplete.SuggestionGenerator"/> to enable this feature
 		/// </summary>
 		public IAutocomplete Autocomplete { get; protected set; } = new TextViewAutocomplete ();
 
