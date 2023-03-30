@@ -225,7 +225,7 @@ namespace UICatalog.Scenarios {
 			var appendAutocompleteTextField = new TextField () {
 				X = Pos.Right(labelAppendAutocomplete),
 				Y = labelAppendAutocomplete.Y,
-				Width = 30
+				Width = Dim.Fill()
 			};
 			appendAutocompleteTextField.Autocomplete = new AppendAutocomplete (appendAutocompleteTextField);
 			appendAutocompleteTextField.Autocomplete.SuggestionGenerator = new SingleWordSuggestionGenerator {
