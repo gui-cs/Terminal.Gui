@@ -96,13 +96,14 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal (string.Empty, cb.Text);
 			var opened = false;
-			cb.OpenSelectedItem += (s,_) => opened = true;
+			cb.OpenSelectedItem += (s, _) => opened = true;
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
 			Assert.False (opened);
 			cb.Text = "Tw";
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
 			Assert.True (opened);
-			Assert.Equal ("Two", cb.Text);
+			Assert.Equal ("", cb.Text);
+			Assert.False (cb.IsShow);
 			cb.SetSource (null);
 			Assert.False (cb.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.F4, new KeyModifiers ()))); // with no source also expand empty
@@ -261,11 +262,11 @@ Three
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
 			Assert.False (cb.IsShow);
 			Assert.Equal (2, cb.Source.Count);
-			Assert.Equal (1, cb.SelectedItem);
-			Assert.Equal ("Two", cb.Text);
+			Assert.Equal (-1, cb.SelectedItem);
+			Assert.Equal ("", cb.Text);
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.Esc, new KeyModifiers ())));
 			Assert.False (cb.IsShow);
-			Assert.Equal (1, cb.SelectedItem); // retains last accept selected item
+			Assert.Equal (-1, cb.SelectedItem); // retains last accept selected item
 			Assert.Equal ("", cb.Text); // clear text
 			cb.SetSource (new List<string> ());
 			Assert.Equal (0, cb.Source.Count);
@@ -282,7 +283,7 @@ Three
 				Width = 5
 			};
 			cb.SetSource (new List<string> { "One", "Two", "Three" });
-			cb.OpenSelectedItem += (s,e) => selected = e.Value.ToString ();
+			cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
 			Application.Top.Add (cb);
 			Application.Begin (Application.Top);
 
@@ -377,7 +378,7 @@ Three
 				HideDropdownListOnClick = true
 			};
 			cb.SetSource (new List<string> { "One", "Two", "Three" });
-			cb.OpenSelectedItem += (s,e) => selected = e.Value.ToString ();
+			cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
 			Application.Top.Add (cb);
 			Application.Begin (Application.Top);
 
@@ -439,7 +440,7 @@ Three
 				HideDropdownListOnClick = true
 			};
 			cb.SetSource (new List<string> { "One", "Two", "Three" });
-			cb.OpenSelectedItem += (s,e) => selected = e.Value.ToString ();
+			cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
 			Application.Top.Add (cb);
 			Application.Begin (Application.Top);
 
@@ -559,7 +560,7 @@ Three
 				ReadOnly = true
 			};
 			cb.SetSource (new List<string> { "One", "Two", "Three" });
-			cb.OpenSelectedItem += (s,e) => selected = e.Value.ToString ();
+			cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
 			Application.Top.Add (cb);
 			Application.Begin (Application.Top);
 
@@ -619,7 +620,7 @@ Three
 				HideDropdownListOnClick = true
 			};
 			cb.SetSource (new List<string> { "One", "Two", "Three" });
-			cb.OpenSelectedItem += (s,e) => selected = e.Value.ToString ();
+			cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
 			Application.Top.Add (cb);
 			Application.Begin (Application.Top);
 
@@ -656,7 +657,7 @@ Three
 				HideDropdownListOnClick = false
 			};
 			cb.SetSource (new List<string> { "One", "Two", "Three" });
-			cb.OpenSelectedItem += (s,e) => selected = e.Value.ToString ();
+			cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
 			Application.Top.Add (cb);
 			Application.Begin (Application.Top);
 
@@ -693,7 +694,7 @@ Three
 				HideDropdownListOnClick = true
 			};
 			cb.SetSource (new List<string> { "One", "Two", "Three" });
-			cb.OpenSelectedItem += (s,e) => selected = e.Value.ToString ();
+			cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
 			Application.Top.Add (cb);
 			Application.Begin (Application.Top);
 
@@ -798,7 +799,7 @@ Three
 				HideDropdownListOnClick = true,
 			};
 			cb.SetSource (new List<string> { "One", "Two", "Three" });
-			cb.OpenSelectedItem += (s,e) => selected = e.Value.ToString ();
+			cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
 			Application.Top.Add (cb);
 			Application.Begin (Application.Top);
 
@@ -920,8 +921,8 @@ Three ", output);
 			};
 			var list = new List<string> { "One", "Two", "Three" };
 
-			cb.Expanded += (s,e) => cb.SetSource (list);
-			cb.Collapsed += (s,e) => cb.Source = null;
+			cb.Expanded += (s, e) => cb.SetSource (list);
+			cb.Collapsed += (s, e) => cb.Source = null;
 
 			Application.Top.Add (cb);
 			Application.Begin (Application.Top);
