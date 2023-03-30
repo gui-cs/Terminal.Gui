@@ -15,7 +15,7 @@ namespace Terminal.Gui {
 		/// match with the current cursor position/text in the <see cref="HostControl"/>.
 		/// </summary>
 		/// <param name="columnOffset">The column offset. Current (zero - default), left (negative), right (positive).</param>
-		IEnumerable<string> GenerateSuggestions (List<Rune> currentLine, int idx);
+		IEnumerable<Suggestion> GenerateSuggestions (List<Rune> currentLine, int idx);
 
 		bool IsWordChar (Rune rune);
 
@@ -29,22 +29,23 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual List<string> AllSuggestions { get; set; } = new List<string> ();
 
-		public IEnumerable<string> GenerateSuggestions (List<Rune> currentLine, int idx)
+		public IEnumerable<Suggestion> GenerateSuggestions (List<Rune> currentLine, int idx)
 		{
 			// if there is nothing to pick from
 			if (AllSuggestions.Count == 0) {
-				return Enumerable.Empty<string>();
+				return Enumerable.Empty<Suggestion>();
 			}
 
 			var currentWord = IdxToWord (currentLine, idx);
 
 			if (string.IsNullOrWhiteSpace (currentWord)) {
-				return Enumerable.Empty<string>();
+				return Enumerable.Empty<Suggestion>();
 			} else {
 				return AllSuggestions.Where (o =>
 				o.StartsWith (currentWord, StringComparison.CurrentCultureIgnoreCase) &&
 				!o.Equals (currentWord, StringComparison.CurrentCultureIgnoreCase)
-				).ToList ().AsReadOnly ();
+				).Select(o=>new Suggestion(currentWord.Length,o))
+					.ToList ().AsReadOnly ();
 
 			}
 		}
@@ -110,40 +111,32 @@ namespace Terminal.Gui {
 	}
 
 	public abstract class AutocompleteBase : IAutocomplete {
+		
+		/// <inheritdoc/>
 		public abstract View HostControl { get; set; }
+		/// <inheritdoc/>
 		public bool PopupInsideContainer { get; set; }
 		
 		public ISuggestionGenerator SuggestionGenerator {get;set;} = new SingleWordSuggestionGenerator();
 
-		/// <summary>
-		/// The maximum width of the autocomplete dropdown
-		/// </summary>
+		/// <inheritdoc/>
 		public virtual int MaxWidth { get; set; } = 10;
 
-		/// <summary>
-		/// The maximum number of visible rows in the autocomplete dropdown to render
-		/// </summary>
+		/// <inheritdoc/>
 		public virtual int MaxHeight { get; set; } = 6;
 
 		/// <inheritdoc/>
 
 
-		/// <summary>
-		/// True if the autocomplete should be considered open and visible
-		/// </summary>
+		/// <inheritdoc/>
 		public virtual bool Visible { get; set; }
 
-		/// <summary>
-		/// The strings that form the current list of suggestions to render
-		/// based on what the user has typed so far.
-		/// </summary>
-		public virtual ReadOnlyCollection<string> Suggestions { get; set; } = new ReadOnlyCollection<string> (new string [0]);
+		/// <inheritdoc/>
+		public virtual ReadOnlyCollection<Suggestion> Suggestions { get; set; } = new ReadOnlyCollection<Suggestion> (new Suggestion [0]);
 
 
 
-		/// <summary>
-		/// The currently selected index into <see cref="Suggestions"/> that the user has highlighted
-		/// </summary>
+		/// <inheritdoc/>
 		public virtual int SelectedIdx { get; set; }
 
 
@@ -167,20 +160,14 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public abstract void RenderOverlay (Point renderAt);
 
-		/// <summary>
-		/// Clears <see cref="Suggestions"/>
-		/// </summary>
+		/// <inheritdoc/>>
 		public virtual void ClearSuggestions ()
 		{
-			Suggestions = Enumerable.Empty<string> ().ToList ().AsReadOnly ();
+			Suggestions = Enumerable.Empty<Suggestion> ().ToList ().AsReadOnly ();
 		}
 
 
-		/// <summary>
-		/// Populates <see cref="Suggestions"/> with all strings in <see cref="AllSuggestions"/> that
-		/// match with the current cursor position/text in the <see cref="HostControl"/>
-		/// </summary>
-		/// <param name="columnOffset">The column offset.</param>
+		/// <inheritdoc/>
 		public virtual void GenerateSuggestions (List<Rune> currentLine, int idx)
 		{
 			Suggestions = SuggestionGenerator.GenerateSuggestions(currentLine, idx).ToList().AsReadOnly();

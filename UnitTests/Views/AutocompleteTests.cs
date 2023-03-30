@@ -21,17 +21,20 @@ namespace Terminal.Gui.ViewTests {
 		public void Test_GenerateSuggestions_Simple ()
 		{
 			var ac = new TextViewAutocomplete ();
-			ac.AllSuggestions = new List<string> { "fish", "const", "Cobble" };
+			((SingleWordSuggestionGenerator)ac.SuggestionGenerator).AllSuggestions = new List<string> {
+				"fish",
+				"const",
+				"Cobble" };
 
 			var tv = new TextView ();
 			tv.InsertText ("co");
 
 			ac.HostControl = tv;
-			ac.GenerateSuggestions ();
+			ac.GenerateSuggestions (tv.Text.ToRuneList(),2);
 
 			Assert.Equal (2, ac.Suggestions.Count);
-			Assert.Equal ("const", ac.Suggestions [0]);
-			Assert.Equal ("Cobble", ac.Suggestions [1]);
+			Assert.Equal ("const", ac.Suggestions [0].Title);
+			Assert.Equal ("Cobble", ac.Suggestions [1].Title);
 		}
 
 		[Fact]

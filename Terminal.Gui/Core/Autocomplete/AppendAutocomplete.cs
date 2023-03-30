@@ -52,8 +52,10 @@ namespace Terminal.Gui {
 			// draw it like its selected even though its not
 			Application.Driver.SetAttribute (new Attribute (Color.DarkGray, textField.ColorScheme.Focus.Background));
 			textField.Move (textField.Text.Length, 0);
-			
-			Application.Driver.AddStr (this.Suggestions.ElementAt(this.SelectedIdx));
+
+			var suggestion = this.Suggestions.ElementAt (this.SelectedIdx);
+			var fragment = suggestion.Replacement.Substring (suggestion.Remove);
+			Application.Driver.AddStr (fragment);
 		}
 
 		public AppendAutocomplete (TextField textField)
@@ -70,7 +72,13 @@ namespace Terminal.Gui {
 		internal bool AcceptSelectionIfAny ()
 		{
 			if (this.MakingSuggestion ()) {
-				textField.Text += this.Suggestions.ElementAt(this.SelectedIdx);
+
+				var insert = this.Suggestions.ElementAt (this.SelectedIdx);
+				var newText = textField.Text.ToString ();
+				newText = newText.Substring(0,newText.Length - insert.Remove);
+				newText += insert.Replacement;
+				textField.Text = newText;
+
 				this.MoveCursorToEnd ();
 
 				this.ClearSuggestions ();

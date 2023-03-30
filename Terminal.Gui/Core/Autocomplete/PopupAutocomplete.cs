@@ -194,7 +194,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			width = Math.Min (MaxWidth, toRender.Max (s => s.Length));
+			width = Math.Min (MaxWidth, toRender.Max (s => s.Title.Length));
 
 			if (PopupInsideContainer) {
 				// don't overspill horizontally, let's see if can be displayed on the left
@@ -242,7 +242,7 @@ namespace Terminal.Gui {
 
 				popup.Move (0, i);
 
-				var text = TextFormatter.ClipOrPad (toRender [i], width);
+				var text = TextFormatter.ClipOrPad (toRender [i].Title, width);
 
 				Application.Driver.AddStr (text);
 			}
@@ -339,7 +339,7 @@ namespace Terminal.Gui {
 				if (!Visible) {
 					return false;
 				}
-				
+
 				// TODO: Revisit this
 				//GenerateSuggestions ();
 
@@ -405,7 +405,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		
+
 
 		/// <summary>
 		/// Completes the autocomplete selection process.  Called when user hits the <see cref="SelectionKey"/>.
@@ -432,24 +432,15 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="accepted"></param>
 		/// <returns>True if the insertion was possible otherwise false</returns>
-		protected virtual bool InsertSelection (string accepted)
+		protected virtual bool InsertSelection (Suggestion accepted)
 		{
-			// TODO: Revisit this
-			/*var typedSoFar = GetCurrentWord () ?? "";
+			// delete the text
+			for (int i = 0; i < accepted.Remove; i++) {
+				DeleteTextBackwards ();
+			}
 
-			if (typedSoFar.Length < accepted.Length) {
-
-				// delete the text
-				for (int i = 0; i < typedSoFar.Length; i++) {
-					DeleteTextBackwards ();
-				}
-				*/
-
-				InsertText (accepted);
-				return true;
-			//}
-
-			//return false;
+			InsertText (accepted.Replacement);
+			return true;
 		}
 
 
@@ -459,7 +450,7 @@ namespace Terminal.Gui {
 		protected abstract void DeleteTextBackwards ();
 
 		/// <summary>
-		/// Inser the selected text in the <see cref="HostControl"/>.
+		/// Insert the selected text in the <see cref="HostControl"/>.
 		/// </summary>
 		/// <param name="accepted"></param>
 		protected abstract void InsertText (string accepted);
