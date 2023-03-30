@@ -61,6 +61,7 @@ namespace Terminal.Gui {
 		public AppendAutocomplete (TextField textField)
 		{
 			this.textField = textField;
+			SelectionKey = Key.Tab;
 		}
 
 		/// <summary>

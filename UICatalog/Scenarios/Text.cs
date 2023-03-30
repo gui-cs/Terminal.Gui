@@ -228,7 +228,13 @@ namespace UICatalog.Scenarios {
 				Width = 30
 			};
 			appendAutocompleteTextField.Autocomplete = new AppendAutocomplete (appendAutocompleteTextField);
-						
+			appendAutocompleteTextField.Autocomplete.SuggestionGenerator = new SingleWordSuggestionGenerator {
+				AllSuggestions = new System.Collections.Generic.List<string>{
+					"fish", "flipper", "fin","fun","the","at","there","some","my","of","be","use","her","than","and","this","an","would","first","have","each","make","water","to","from","which","like","been","in","or","she","him","call","is","one","do","into","who","you","had","how","time","oil","that","by","their","has","its","it","word","if","look","now","he","but","will","two","find","was","not","up","more","long","for","what","other","write","down","on","all","about","go","day","are","were","out","see","did","as","we","many","number","get","with","when","then","no","come","his","your","them","way","made","they","can","these","could","may","said","so","people","part"
+				}
+			};
+
+
 			Win.Add (labelAppendAutocomplete);
 			Win.Add (appendAutocompleteTextField);
 		}
