@@ -188,7 +188,7 @@ namespace Terminal.Gui {
 				if (SuperView != null && SuperView.Subviews.Contains (this)) {
 					SelectedItem = -1;
 					search.Text = "";
-					Search_Changed (this, new TextChangedEventArgs(""));
+					Search_Changed (this, new TextChangedEventArgs (""));
 					SetNeedsDisplay ();
 				}
 			}
@@ -316,7 +316,7 @@ namespace Terminal.Gui {
 				}
 			};
 
-			Added += (s,  e) => {
+			Added += (s, e) => {
 
 				// Determine if this view is hosted inside a dialog and is the only control
 				for (View view = this.SuperView; view != null; view = view.SuperView) {
@@ -328,7 +328,7 @@ namespace Terminal.Gui {
 
 				SetNeedsLayout ();
 				SetNeedsDisplay ();
-				Search_Changed (this, new TextChangedEventArgs( Text));
+				Search_Changed (this, new TextChangedEventArgs (Text));
 			};
 
 			// Things this view knows how to do
@@ -745,15 +745,17 @@ namespace Terminal.Gui {
 			if (listview.Source.Count == 0 || (searchset?.Count ?? 0) == 0) {
 				text = "";
 				HideList ();
+				isShow = false;
 				return;
 			}
 
-			SetValue (searchset [listview.SelectedItem]);
+			SetValue (listview.SelectedItem > -1 ? searchset [listview.SelectedItem] : text);
 			search.CursorPosition = search.Text.ConsoleWidth;
-			Search_Changed (this, new TextChangedEventArgs(search.Text));
+			Search_Changed (this, new TextChangedEventArgs (search.Text));
 			OnOpenSelectedItem ();
 			Reset (keepSearchText: true);
 			HideList ();
+			isShow = false;
 		}
 
 		private int GetSelectedItemFromSource (ustring value)
