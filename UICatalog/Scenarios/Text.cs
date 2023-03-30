@@ -5,9 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Terminal.Gui;
-using Terminal.Gui.TextValidateProviders;
-
-
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Text Input Controls", Description: "Tests all text input controls")]

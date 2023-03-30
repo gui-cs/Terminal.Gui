@@ -1,11 +1,4 @@
-﻿//
-// HexView.cs: A hexadecimal viewer
-//
-// TODO:
-// - Support searching and highlighting of the search result
-// - Bug showing the last line
-// 
-using System;
+﻿using System;
 using System.IO;
 
 namespace Terminal.Gui {

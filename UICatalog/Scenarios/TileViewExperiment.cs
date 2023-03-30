@@ -1,6 +1,5 @@
 ﻿using System;
 using Terminal.Gui;
-using Terminal.Gui.Graphs;
 using System.Linq;
 
 namespace UICatalog.Scenarios {

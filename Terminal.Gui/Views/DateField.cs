@@ -418,7 +418,7 @@ namespace Terminal.Gui {
 		/// <param name="args">Event arguments</param>
 		public virtual void OnDateChanged (DateTimeEventArgs<DateTime> args)
 		{
-			DateChanged?.Invoke (this,args);
+			DateChanged?.Invoke (this, args);
 		}
 	}
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using Terminal.Gui;
-using Terminal.Gui.Graphs;
 using System.Linq;
 
 namespace UICatalog.Scenarios {
@@ -104,8 +103,8 @@ namespace UICatalog.Scenarios {
 			}
 
 			var root = CreateTileView (1, (bool)startHorizontal ?
-					Terminal.Gui.Graphs.Orientation.Horizontal :
-					Terminal.Gui.Graphs.Orientation.Vertical);
+					Orientation.Horizontal :
+					Orientation.Vertical);
 
 			root.Tiles.ElementAt (0).ContentView.Add (CreateContentControl (1));
 			root.Tiles.ElementAt (0).Title = (bool)cbTitles.Checked ? $"View 1" : string.Empty;

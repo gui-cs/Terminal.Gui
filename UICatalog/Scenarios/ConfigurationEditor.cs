@@ -6,8 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Terminal.Gui;
-using Terminal.Gui.Configuration;
-using static Terminal.Gui.Configuration.ConfigurationManager;
+using static Terminal.Gui.ConfigurationManager;
 using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios {
@@ -49,7 +48,7 @@ namespace UICatalog.Scenarios {
 			_tileView = new TileView (0) {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (1),
-				Orientation = Terminal.Gui.Graphs.Orientation.Vertical,
+				Orientation = Terminal.Gui.Orientation.Vertical,
 				Border = new Border () { BorderStyle = BorderStyle.Single }
 			};
 
@@ -84,7 +83,7 @@ namespace UICatalog.Scenarios {
 
 			internal ConfigTextView ()
 			{
-				ContentsChanged += (s,obj) => {
+				ContentsChanged += (s, obj) => {
 					if (IsDirty) {
 						if (!Tile.Title.EndsWith ('*')) {
 							Tile.Title += '*';
@@ -167,7 +166,7 @@ namespace UICatalog.Scenarios {
 
 				textView.Read ();
 
-				textView.Enter += (s,e) => {
+				textView.Enter += (s, e) => {
 					_lenStatusItem.Title = $"Len:{textView.Text.Length}";
 				};
 

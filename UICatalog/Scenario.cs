@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
-using Terminal.Gui.Configuration;
 
 namespace UICatalog {
 	/// <summary>
@@ -57,10 +56,10 @@ namespace UICatalog {
 		public Window Win { get; set; }
 
 		/// <summary>
-		/// Helper that provides the default <see cref="Terminal.Gui.Window"/> implementation with a frame and 
+		/// Helper that provides the default <see cref="Terminal.Gui.Views.Window"/> implementation with a frame and 
 		/// label showing the name of the <see cref="Scenario"/> and logic to exit back to 
 		/// the Scenario picker UI.
-		/// Override <see cref="Init"/> to provide any <see cref="Terminal.Gui.Toplevel"/> behavior needed.
+		/// Override <see cref="Init"/> to provide any <see cref="Terminal.Gui.Views.Toplevel"/> behavior needed.
 		/// </summary>
 		/// <remarks>
 		/// <para>

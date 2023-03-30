@@ -2,8 +2,7 @@
 using System.Linq;
 using System.Text.Json.Serialization;
 using NStack;
-using Terminal.Gui.Graphs;
-using static Terminal.Gui.Configuration.ConfigurationManager;
+using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui {
 

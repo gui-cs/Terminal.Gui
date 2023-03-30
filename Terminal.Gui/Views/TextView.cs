@@ -7,10 +7,10 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
-using NStack;
-using Terminal.Gui.Resources;
-using static Terminal.Gui.Graphs.PathAnnotation;
 using Rune = System.Rune;
+using NStack;
+using static Terminal.Gui.PathAnnotation;
+using Terminal.Gui.Resources;
 
 namespace Terminal.Gui {
 	class TextModel {

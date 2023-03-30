@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Terminal.Gui;
-using Terminal.Gui.Configuration;
 
 namespace UICatalog.Scenarios {
 	/// <summary>
@@ -88,10 +87,10 @@ namespace UICatalog.Scenarios {
 			string txt = "Resize the terminal to see computed layout in action.";
 			var labelList = new List<Label> ();
 			labelList.Add (new Label ($"The lines below show different TextAlignments"));
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Left, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Right, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Centered, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = TextAlignment.Left, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = TextAlignment.Right, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = TextAlignment.Centered, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = TextAlignment.Justified, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
 			subWin.Add (labelList.ToArray ());
 
 			// #522 repro?
@@ -105,10 +104,10 @@ namespace UICatalog.Scenarios {
 			i = 1;
 			labelList = new List<Label> ();
 			labelList.Add (new Label ($"The lines below show different TextAlignments"));
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Left, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Right, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Centered, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = TextAlignment.Left, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = TextAlignment.Right, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = TextAlignment.Centered, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = TextAlignment.Justified, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
 			frameView.Add (labelList.ToArray ());
 			Application.Top.Add (frameView);
 
@@ -223,7 +222,7 @@ namespace UICatalog.Scenarios {
 			// Demonstrate AnchorEnd(n) 
 			// This is intentionally convoluted to illustrate potential bugs.
 			var anchorEndLabel1 = new Label ("This Label should be the 2nd to last line (AnchorEnd (2)).") {
-				TextAlignment = Terminal.Gui.TextAlignment.Centered,
+				TextAlignment = TextAlignment.Centered,
 				ColorScheme = Colors.Menu,
 				Width = Dim.Fill (5),
 				X = 5,
@@ -234,7 +233,7 @@ namespace UICatalog.Scenarios {
 			// Demonstrate DimCombine (via AnchorEnd(n) - 1)
 			// This is intentionally convoluted to illustrate potential bugs.
 			var anchorEndLabel2 = new TextField ("This TextField should be the 3rd to last line (AnchorEnd (2) - 1).") {
-				TextAlignment = Terminal.Gui.TextAlignment.Left,
+				TextAlignment = TextAlignment.Left,
 				ColorScheme = Colors.Menu,
 				Width = Dim.Fill (5),
 				X = 5,

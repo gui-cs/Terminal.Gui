@@ -5,14 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit.Abstractions;
 using Xunit;
-using Terminal.Gui;
 using Rune = System.Rune;
-using Attribute = Terminal.Gui.Attribute;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using System.Diagnostics;
-using Terminal.Gui.Configuration;
-
+using Terminal.Gui;
+using Attribute = Terminal.Gui.Attribute;
 
 // This class enables test functions annotated with the [AutoInitShutdown] attribute to 
 // automatically call Application.Init at start of the test and Application.Shutdown after the

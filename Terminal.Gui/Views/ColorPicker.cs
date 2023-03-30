@@ -107,7 +107,7 @@ namespace Terminal.Gui {
 			Initialize ();
 		}
 
-		private void Initialize()
+		private void Initialize ()
 		{
 			CanFocus = true;
 			Width = colorsPerLine * horizontalZoom;

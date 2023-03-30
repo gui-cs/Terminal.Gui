@@ -4,7 +4,6 @@
 // Authors:
 //   Miguel de Icaza (miguel@gnome.org)
 //
-
 using System;
 using NStack;
 

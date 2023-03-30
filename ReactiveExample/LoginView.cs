@@ -2,8 +2,8 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using NStack;
 using ReactiveUI;
-using Terminal.Gui;
 using ReactiveMarbles.ObservableEvents;
+using Terminal.Gui;
 
 namespace ReactiveExample {
 	public class LoginView : Window, IViewFor<LoginViewModel> {

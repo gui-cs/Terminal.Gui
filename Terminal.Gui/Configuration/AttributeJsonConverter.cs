@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Terminal.Gui;
 
-namespace Terminal.Gui.Configuration {
+namespace Terminal.Gui {
 	/// <summary>
 	/// Json converter fro the <see cref="Attribute"/> class.
 	/// </summary>

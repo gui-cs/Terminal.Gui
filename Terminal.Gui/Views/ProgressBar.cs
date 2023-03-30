@@ -1,5 +1,6 @@
 ﻿using NStack;
 using System;
+
 namespace Terminal.Gui {
 	/// <summary>
 	/// Specifies the style that a <see cref="ProgressBar"/> uses to indicate the progress of an operation.

@@ -91,7 +91,7 @@ namespace Terminal.Gui {
 			CanFocus = true;
 			AutoSize = true;
 			Text = s;
-			
+
 			OnResizeNeeded ();
 
 			// Things this view knows how to do
@@ -209,7 +209,7 @@ namespace Terminal.Gui {
 			} else {
 				Checked = !Checked;
 			}
-			
+
 			OnToggled (new ToggleEventArgs (previousChecked, Checked));
 			SetNeedsDisplay ();
 			return true;

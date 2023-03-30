@@ -11,354 +11,352 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Terminal.Gui.TextValidateProviders;
 
 namespace Terminal.Gui {
 
-	namespace TextValidateProviders {
+	/// <summary>
+	/// TextValidateField Providers Interface.
+	/// All TextValidateField are created with a ITextValidateProvider.
+	/// </summary>
+	public interface ITextValidateProvider {
 		/// <summary>
-		/// TextValidateField Providers Interface.
-		/// All TextValidateField are created with a ITextValidateProvider.
+		/// Set that this provider uses a fixed width.
+		/// e.g. Masked ones are fixed.
 		/// </summary>
-		public interface ITextValidateProvider {
-			/// <summary>
-			/// Set that this provider uses a fixed width.
-			/// e.g. Masked ones are fixed.
-			/// </summary>
-			bool Fixed { get; }
+		bool Fixed { get; }
 
-			/// <summary>
-			/// Set Cursor position to <paramref name="pos"/>.
-			/// </summary>
-			/// <param name="pos"></param>
-			/// <returns>Return first valid position.</returns>
-			int Cursor (int pos);
+		/// <summary>
+		/// Set Cursor position to <paramref name="pos"/>.
+		/// </summary>
+		/// <param name="pos"></param>
+		/// <returns>Return first valid position.</returns>
+		int Cursor (int pos);
 
-			/// <summary>
-			/// First valid position before <paramref name="pos"/>.
-			/// </summary>
-			/// <param name="pos"></param>
-			/// <returns>New cursor position if any, otherwise returns <paramref name="pos"/></returns>
-			int CursorLeft (int pos);
+		/// <summary>
+		/// First valid position before <paramref name="pos"/>.
+		/// </summary>
+		/// <param name="pos"></param>
+		/// <returns>New cursor position if any, otherwise returns <paramref name="pos"/></returns>
+		int CursorLeft (int pos);
 
-			/// <summary>
-			/// First valid position after <paramref name="pos"/>.
-			/// </summary>
-			/// <param name="pos">Current position.</param>
-			/// <returns>New cursor position if any, otherwise returns <paramref name="pos"/></returns>
-			int CursorRight (int pos);
+		/// <summary>
+		/// First valid position after <paramref name="pos"/>.
+		/// </summary>
+		/// <param name="pos">Current position.</param>
+		/// <returns>New cursor position if any, otherwise returns <paramref name="pos"/></returns>
+		int CursorRight (int pos);
 
-			/// <summary>
-			/// Find the first valid character position.
-			/// </summary>
-			/// <returns>New cursor position.</returns>
-			int CursorStart ();
+		/// <summary>
+		/// Find the first valid character position.
+		/// </summary>
+		/// <returns>New cursor position.</returns>
+		int CursorStart ();
 
-			/// <summary>
-			/// Find the last valid character position.
-			/// </summary>
-			/// <returns>New cursor position.</returns>
-			int CursorEnd ();
+		/// <summary>
+		/// Find the last valid character position.
+		/// </summary>
+		/// <returns>New cursor position.</returns>
+		int CursorEnd ();
 
-			/// <summary>
-			/// Deletes the current character in <paramref name="pos"/>.
-			/// </summary>
-			/// <param name="pos"></param>
-			/// <returns>true if the character was successfully removed, otherwise false.</returns>
-			bool Delete (int pos);
+		/// <summary>
+		/// Deletes the current character in <paramref name="pos"/>.
+		/// </summary>
+		/// <param name="pos"></param>
+		/// <returns>true if the character was successfully removed, otherwise false.</returns>
+		bool Delete (int pos);
 
-			/// <summary>
-			/// Insert character <paramref name="ch"/> in position <paramref name="pos"/>.
-			/// </summary>
-			/// <param name="ch"></param>
-			/// <param name="pos"></param>
-			/// <returns>true if the character was successfully inserted, otherwise false.</returns>
-			bool InsertAt (char ch, int pos);
+		/// <summary>
+		/// Insert character <paramref name="ch"/> in position <paramref name="pos"/>.
+		/// </summary>
+		/// <param name="ch"></param>
+		/// <param name="pos"></param>
+		/// <returns>true if the character was successfully inserted, otherwise false.</returns>
+		bool InsertAt (char ch, int pos);
 
-			/// <summary>
-			/// True if the input is valid, otherwise false.
-			/// </summary>
-			bool IsValid { get; }
+		/// <summary>
+		/// True if the input is valid, otherwise false.
+		/// </summary>
+		bool IsValid { get; }
 
-			/// <summary>
-			/// Set the input text and get the current value.
-			/// </summary>
-			ustring Text { get; set; }
+		/// <summary>
+		/// Set the input text and get the current value.
+		/// </summary>
+		ustring Text { get; set; }
 
-			/// <summary>
-			/// Gets the formatted string for display.
-			/// </summary>
-			ustring DisplayText { get; }
+		/// <summary>
+		/// Gets the formatted string for display.
+		/// </summary>
+		ustring DisplayText { get; }
+	}
+
+	//////////////////////////////////////////////////////////////////////////////
+	// PROVIDERS
+	//////////////////////////////////////////////////////////////////////////////
+
+	#region NetMaskedTextProvider
+
+	/// <summary>
+	/// .Net MaskedTextProvider Provider for TextValidateField.
+	/// <para></para>
+	/// <para><a href="https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.maskedtextprovider?view=net-5.0">Wrapper around MaskedTextProvider</a></para>
+	/// <para><a href="https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.maskedtextbox.mask?view=net-5.0">Masking elements</a></para>
+	/// </summary>
+	public class NetMaskedTextProvider : ITextValidateProvider {
+		MaskedTextProvider provider;
+
+		/// <summary>
+		/// Empty Constructor
+		/// </summary>
+		public NetMaskedTextProvider (string mask)
+		{
+			Mask = mask;
 		}
 
-		//////////////////////////////////////////////////////////////////////////////
-		// PROVIDERS
-		//////////////////////////////////////////////////////////////////////////////
-
-		#region NetMaskedTextProvider
-
 		/// <summary>
-		/// .Net MaskedTextProvider Provider for TextValidateField.
-		/// <para></para>
-		/// <para><a href="https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.maskedtextprovider?view=net-5.0">Wrapper around MaskedTextProvider</a></para>
-		/// <para><a href="https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.maskedtextbox.mask?view=net-5.0">Masking elements</a></para>
+		/// Mask property
 		/// </summary>
-		public class NetMaskedTextProvider : ITextValidateProvider {
-			MaskedTextProvider provider;
-
-			/// <summary>
-			/// Empty Constructor
-			/// </summary>
-			public NetMaskedTextProvider (string mask)
-			{
-				Mask = mask;
+		public ustring Mask {
+			get {
+				return provider?.Mask;
 			}
-
-			/// <summary>
-			/// Mask property
-			/// </summary>
-			public ustring Mask {
-				get {
-					return provider?.Mask;
+			set {
+				var current = provider != null ? provider.ToString (false, false) : string.Empty;
+				provider = new MaskedTextProvider (value == ustring.Empty ? "&&&&&&" : value.ToString ());
+				if (string.IsNullOrEmpty (current) == false) {
+					provider.Set (current);
 				}
-				set {
-					var current = provider != null ? provider.ToString (false, false) : string.Empty;
-					provider = new MaskedTextProvider (value == ustring.Empty ? "&&&&&&" : value.ToString ());
-					if (string.IsNullOrEmpty (current) == false) {
-						provider.Set (current);
-					}
-				}
-			}
-
-			///<inheritdoc/>
-			public ustring Text {
-				get {
-					return provider.ToString ();
-				}
-				set {
-					provider.Set (value.ToString ());
-				}
-			}
-
-			///<inheritdoc/>
-			public bool IsValid => provider.MaskCompleted;
-
-			///<inheritdoc/>
-			public bool Fixed => true;
-
-			///<inheritdoc/>
-			public ustring DisplayText => provider.ToDisplayString ();
-
-			///<inheritdoc/>
-			public int Cursor (int pos)
-			{
-				if (pos < 0) {
-					return CursorStart ();
-				} else if (pos > provider.Length) {
-					return CursorEnd ();
-				} else {
-					var p = provider.FindEditPositionFrom (pos, false);
-					if (p == -1) p = provider.FindEditPositionFrom (pos, true);
-					return p;
-				}
-			}
-
-			///<inheritdoc/>
-			public int CursorStart ()
-			{
-				return
-					provider.IsEditPosition (0)
-					? 0
-					: provider.FindEditPositionFrom (0, true);
-			}
-
-			///<inheritdoc/>
-			public int CursorEnd ()
-			{
-				return
-					provider.IsEditPosition (provider.Length - 1)
-					? provider.Length - 1
-					: provider.FindEditPositionFrom (provider.Length, false);
-			}
-
-			///<inheritdoc/>
-			public int CursorLeft (int pos)
-			{
-				var c = provider.FindEditPositionFrom (pos - 1, false);
-				return c == -1 ? pos : c;
-			}
-
-			///<inheritdoc/>
-			public int CursorRight (int pos)
-			{
-				var c = provider.FindEditPositionFrom (pos + 1, true);
-				return c == -1 ? pos : c;
-			}
-
-			///<inheritdoc/>
-			public bool Delete (int pos)
-			{
-				return provider.Replace (' ', pos);// .RemoveAt (pos);
-			}
-
-			///<inheritdoc/>
-			public bool InsertAt (char ch, int pos)
-			{
-				return provider.Replace (ch, pos);
 			}
 		}
-		#endregion
 
-		#region TextRegexProvider
+		///<inheritdoc/>
+		public ustring Text {
+			get {
+				return provider.ToString ();
+			}
+			set {
+				provider.Set (value.ToString ());
+			}
+		}
+
+		///<inheritdoc/>
+		public bool IsValid => provider.MaskCompleted;
+
+		///<inheritdoc/>
+		public bool Fixed => true;
+
+		///<inheritdoc/>
+		public ustring DisplayText => provider.ToDisplayString ();
+
+		///<inheritdoc/>
+		public int Cursor (int pos)
+		{
+			if (pos < 0) {
+				return CursorStart ();
+			} else if (pos > provider.Length) {
+				return CursorEnd ();
+			} else {
+				var p = provider.FindEditPositionFrom (pos, false);
+				if (p == -1) p = provider.FindEditPositionFrom (pos, true);
+				return p;
+			}
+		}
+
+		///<inheritdoc/>
+		public int CursorStart ()
+		{
+			return
+				provider.IsEditPosition (0)
+				? 0
+				: provider.FindEditPositionFrom (0, true);
+		}
+
+		///<inheritdoc/>
+		public int CursorEnd ()
+		{
+			return
+				provider.IsEditPosition (provider.Length - 1)
+				? provider.Length - 1
+				: provider.FindEditPositionFrom (provider.Length, false);
+		}
+
+		///<inheritdoc/>
+		public int CursorLeft (int pos)
+		{
+			var c = provider.FindEditPositionFrom (pos - 1, false);
+			return c == -1 ? pos : c;
+		}
+
+		///<inheritdoc/>
+		public int CursorRight (int pos)
+		{
+			var c = provider.FindEditPositionFrom (pos + 1, true);
+			return c == -1 ? pos : c;
+		}
+
+		///<inheritdoc/>
+		public bool Delete (int pos)
+		{
+			return provider.Replace (' ', pos);// .RemoveAt (pos);
+		}
+
+		///<inheritdoc/>
+		public bool InsertAt (char ch, int pos)
+		{
+			return provider.Replace (ch, pos);
+		}
+	}
+	#endregion
+
+	#region TextRegexProvider
+
+	/// <summary>
+	/// Regex Provider for TextValidateField.
+	/// </summary>
+	public class TextRegexProvider : ITextValidateProvider {
+		Regex regex;
+		List<Rune> text;
+		List<Rune> pattern;
 
 		/// <summary>
-		/// Regex Provider for TextValidateField.
+		/// Empty Constructor.
 		/// </summary>
-		public class TextRegexProvider : ITextValidateProvider {
-			Regex regex;
-			List<Rune> text;
-			List<Rune> pattern;
+		public TextRegexProvider (string pattern)
+		{
+			Pattern = pattern;
+		}
 
-			/// <summary>
-			/// Empty Constructor.
-			/// </summary>
-			public TextRegexProvider (string pattern)
-			{
-				Pattern = pattern;
+		/// <summary>
+		/// Regex pattern property.
+		/// </summary>
+		public ustring Pattern {
+			get {
+				return ustring.Make (pattern);
 			}
-
-			/// <summary>
-			/// Regex pattern property.
-			/// </summary>
-			public ustring Pattern {
-				get {
-					return ustring.Make (pattern);
-				}
-				set {
-					pattern = value.ToRuneList ();
-					CompileMask ();
-					SetupText ();
-				}
+			set {
+				pattern = value.ToRuneList ();
+				CompileMask ();
+				SetupText ();
 			}
+		}
 
-			///<inheritdoc/>
-			public ustring Text {
-				get {
-					return ustring.Make (text);
-				}
-				set {
-					text = value != ustring.Empty ? value.ToRuneList () : null;
-					SetupText ();
-				}
+		///<inheritdoc/>
+		public ustring Text {
+			get {
+				return ustring.Make (text);
 			}
-
-			///<inheritdoc/>
-			public ustring DisplayText => Text;
-
-			///<inheritdoc/>
-			public bool IsValid {
-				get {
-					return Validate (text);
-				}
+			set {
+				text = value != ustring.Empty ? value.ToRuneList () : null;
+				SetupText ();
 			}
+		}
 
-			///<inheritdoc/>
-			public bool Fixed => false;
+		///<inheritdoc/>
+		public ustring DisplayText => Text;
 
-			/// <summary>
-			/// When true, validates with the regex pattern on each input, preventing the input if it's not valid.
-			/// </summary>
-			public bool ValidateOnInput { get; set; } = true;
-
-
-			bool Validate (List<Rune> text)
-			{
-				var match = regex.Match (ustring.Make (text).ToString ());
-				return match.Success;
+		///<inheritdoc/>
+		public bool IsValid {
+			get {
+				return Validate (text);
 			}
+		}
 
-			///<inheritdoc/>
-			public int Cursor (int pos)
-			{
-				if (pos < 0) {
-					return CursorStart ();
-				} else if (pos >= text.Count) {
-					return CursorEnd ();
-				} else {
-					return pos;
-				}
-			}
+		///<inheritdoc/>
+		public bool Fixed => false;
 
-			///<inheritdoc/>
-			public int CursorStart ()
-			{
-				return 0;
-			}
+		/// <summary>
+		/// When true, validates with the regex pattern on each input, preventing the input if it's not valid.
+		/// </summary>
+		public bool ValidateOnInput { get; set; } = true;
 
-			///<inheritdoc/>
-			public int CursorEnd ()
-			{
-				return text.Count;
-			}
 
-			///<inheritdoc/>
-			public int CursorLeft (int pos)
-			{
-				if (pos > 0) {
-					return pos - 1;
-				}
+		bool Validate (List<Rune> text)
+		{
+			var match = regex.Match (ustring.Make (text).ToString ());
+			return match.Success;
+		}
+
+		///<inheritdoc/>
+		public int Cursor (int pos)
+		{
+			if (pos < 0) {
+				return CursorStart ();
+			} else if (pos >= text.Count) {
+				return CursorEnd ();
+			} else {
 				return pos;
 			}
+		}
 
-			///<inheritdoc/>
-			public int CursorRight (int pos)
-			{
-				if (pos < text.Count) {
-					return pos + 1;
-				}
-				return pos;
+		///<inheritdoc/>
+		public int CursorStart ()
+		{
+			return 0;
+		}
+
+		///<inheritdoc/>
+		public int CursorEnd ()
+		{
+			return text.Count;
+		}
+
+		///<inheritdoc/>
+		public int CursorLeft (int pos)
+		{
+			if (pos > 0) {
+				return pos - 1;
 			}
+			return pos;
+		}
 
-			///<inheritdoc/>
-			public bool Delete (int pos)
-			{
-				if (text.Count > 0 && pos < text.Count) {
-					text.RemoveAt (pos);
-				}
+		///<inheritdoc/>
+		public int CursorRight (int pos)
+		{
+			if (pos < text.Count) {
+				return pos + 1;
+			}
+			return pos;
+		}
+
+		///<inheritdoc/>
+		public bool Delete (int pos)
+		{
+			if (text.Count > 0 && pos < text.Count) {
+				text.RemoveAt (pos);
+			}
+			return true;
+		}
+
+		///<inheritdoc/>
+		public bool InsertAt (char ch, int pos)
+		{
+			var aux = text.ToList ();
+			aux.Insert (pos, ch);
+			if (Validate (aux) || ValidateOnInput == false) {
+				text.Insert (pos, ch);
 				return true;
 			}
-
-			///<inheritdoc/>
-			public bool InsertAt (char ch, int pos)
-			{
-				var aux = text.ToList ();
-				aux.Insert (pos, ch);
-				if (Validate (aux) || ValidateOnInput == false) {
-					text.Insert (pos, ch);
-					return true;
-				}
-				return false;
-			}
-
-			void SetupText ()
-			{
-				if (text != null && IsValid) {
-					return;
-				}
-
-				text = new List<Rune> ();
-			}
-
-			/// <summary>
-			/// Compiles the regex pattern for validation./>
-			/// </summary>
-			private void CompileMask ()
-			{
-				regex = new Regex (ustring.Make (pattern).ToString (), RegexOptions.Compiled);
-			}
+			return false;
 		}
-		#endregion
+
+		void SetupText ()
+		{
+			if (text != null && IsValid) {
+				return;
+			}
+
+			text = new List<Rune> ();
+		}
+
+		/// <summary>
+		/// Compiles the regex pattern for validation./>
+		/// </summary>
+		private void CompileMask ()
+		{
+			regex = new Regex (ustring.Make (pattern).ToString (), RegexOptions.Compiled);
+		}
 	}
+	#endregion
+
 
 	/// <summary>
 	/// Text field that validates input through a  <see cref="ITextValidateProvider"/>

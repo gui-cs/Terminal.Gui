@@ -328,6 +328,7 @@ namespace Unix.Terminal {
 		static public int set_escdelay (int size) => methods.set_escdelay (size);
 	}
 
+#pragma warning disable CS8981 // The type name only contains lower-cased ascii characters.
 #pragma warning disable RCS1102 // Make class static.
 	internal class Delegates {
 #pragma warning restore RCS1102 // Make class static.
