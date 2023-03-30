@@ -12,14 +12,14 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual List<string> AllSuggestions { get; set; } = new List<string> ();
 
-		public IEnumerable<Suggestion> GenerateSuggestions (List<Rune> currentLine, int idx)
+		public IEnumerable<Suggestion> GenerateSuggestions (AutocompleteContext context)
 		{
 			// if there is nothing to pick from
 			if (AllSuggestions.Count == 0) {
 				return Enumerable.Empty<Suggestion> ();
 			}
 
-			var currentWord = IdxToWord (currentLine, idx);
+			var currentWord = IdxToWord (context.CurrentLine, context.Idx);
 
 			if (string.IsNullOrWhiteSpace (currentWord)) {
 				return Enumerable.Empty<Suggestion> ();

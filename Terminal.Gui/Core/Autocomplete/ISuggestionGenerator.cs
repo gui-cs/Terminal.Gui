@@ -8,10 +8,9 @@ namespace Terminal.Gui {
 	public interface ISuggestionGenerator {
 
 		/// <summary>
-		/// Generates autocomplete <see cref="Suggestion"/> based on a given cursor location <paramref name="idx"/>
-		/// within a <paramref name="currentLine"/>
+		/// Generates autocomplete <see cref="Suggestion"/> based on a given <paramref name="context"/>
 		/// </summary>
-		IEnumerable<Suggestion> GenerateSuggestions (List<Rune> currentLine, int idx);
+		IEnumerable<Suggestion> GenerateSuggestions (AutocompleteContext context);
 
 		bool IsWordChar (Rune rune);
 

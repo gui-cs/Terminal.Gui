@@ -30,7 +30,9 @@ namespace Terminal.Gui.ViewTests {
 			tv.InsertText ("co");
 
 			ac.HostControl = tv;
-			ac.GenerateSuggestions (tv.Text.ToRuneList(),2);
+			ac.GenerateSuggestions (
+				new AutocompleteContext(
+				tv.Text.ToRuneList(),2));
 
 			Assert.Equal (2, ac.Suggestions.Count);
 			Assert.Equal ("const", ac.Suggestions [0].Title);

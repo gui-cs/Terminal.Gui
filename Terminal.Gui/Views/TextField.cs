@@ -486,7 +486,9 @@ namespace Terminal.Gui {
 			var currentLine = Text.ToRuneList ();
 			var cursorPosition = Math.Min (this.CursorPosition, currentLine.Count);
 
-			Autocomplete.GenerateSuggestions(currentLine,cursorPosition);
+			Autocomplete.GenerateSuggestions(
+				new AutocompleteContext(currentLine,cursorPosition)
+				);
 		}
 
 		/// <inheritdoc/>

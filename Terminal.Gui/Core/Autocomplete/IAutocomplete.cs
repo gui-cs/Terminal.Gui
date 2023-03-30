@@ -105,9 +105,9 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Populates <see cref="Suggestions"/> with all <see cref="Suggestion"/> 
-		/// proposed by <see cref="SuggestionGenerator"/> at the given <paramref name="idx"/>
-		/// of <paramref name="currentLine"/>
+		/// proposed by <see cref="SuggestionGenerator"/> at the given <paramref name="context"/>
+		/// (cursor position)
 		/// </summary>
-		void GenerateSuggestions (List<Rune> currentLine, int idx);
+		void GenerateSuggestions (AutocompleteContext context);
 	}
 }

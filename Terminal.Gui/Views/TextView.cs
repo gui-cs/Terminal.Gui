@@ -2440,7 +2440,9 @@ namespace Terminal.Gui {
 		{
 			var currentLine = this.GetCurrentLine ();
 			var cursorPosition = Math.Min (this.CurrentColumn, currentLine.Count);
-			Autocomplete.GenerateSuggestions(currentLine,cursorPosition);
+			Autocomplete.GenerateSuggestions(
+				new AutocompleteContext(currentLine,cursorPosition)
+				);
 		}
 
 		/// <inheritdoc/>

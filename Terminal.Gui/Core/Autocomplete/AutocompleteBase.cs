@@ -6,6 +6,17 @@ using System.Text;
 using Rune = System.Rune;
 
 namespace Terminal.Gui {
+	public class AutocompleteContext
+	{
+		public List<Rune> CurrentLine { get; set; }
+		public int Idx { get; set; }
+
+		public AutocompleteContext (List<Rune> currentLine, int idx)
+		{
+			CurrentLine = currentLine;
+			Idx = idx;
+		}
+	}
 
 	public abstract class AutocompleteBase : IAutocomplete {
 
@@ -65,9 +76,9 @@ namespace Terminal.Gui {
 
 
 		/// <inheritdoc/>
-		public virtual void GenerateSuggestions (List<Rune> currentLine, int idx)
+		public virtual void GenerateSuggestions (AutocompleteContext context)
 		{
-			Suggestions = SuggestionGenerator.GenerateSuggestions (currentLine, idx).ToList ().AsReadOnly ();
+			Suggestions = SuggestionGenerator.GenerateSuggestions (context).ToList ().AsReadOnly ();
 
 			EnsureSelectedIdxIsValid ();
 		}
