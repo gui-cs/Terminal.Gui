@@ -1263,6 +1263,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (view.CanFocus);
 			Assert.True (view.HasFocus);
 
+			wasClicked = false;
 			view.Enabled = false;
 			view.ProcessKey (new KeyEvent (Key.Enter, null));
 			Assert.False (wasClicked);
