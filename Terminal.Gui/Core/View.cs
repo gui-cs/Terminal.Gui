@@ -468,7 +468,7 @@ namespace Terminal.Gui {
 			get => frame;
 			set {
 				frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
-				if (IsInitialized) {
+				if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
 					TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
 					LayoutFrames ();
 					SetNeedsLayout ();
