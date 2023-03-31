@@ -16,10 +16,9 @@ namespace Terminal.Gui.ViewTests {
 		}
 
         [Fact, AutoInitShutdown]
-        public void TestAutocomplete_ShowThenAccept_MatchCase()
+        public void TestAutoAppend_ShowThenAccept_MatchCase()
         {
 			var tf = GetTextFieldsInView();
-
 
 			tf.Autocomplete = new AppendAutocomplete(tf);
 			var generator = (SingleWordSuggestionGenerator)tf.Autocomplete.SuggestionGenerator;
@@ -48,6 +47,52 @@ namespace Terminal.Gui.ViewTests {
 			Application.Driver.SendKeys('\t',ConsoleKey.Tab,false,false,false);
 			Assert.NotSame(tf,Application.Top.Focused);
         }
+
+		        [Fact, AutoInitShutdown]
+        public void TestAutoAppend_AfterCloseKey_NoAutocomplete()
+        {
+			var tf = GetTextFieldsInViewSuggestingFish();
+
+			// f is typed and suggestion is "fish"
+			tf.Redraw(tf.Bounds);
+			TestHelpers.AssertDriverContentsAre("fish",output);
+			Assert.Equal("f",tf.Text.ToString());
+
+			// When cancelling autocomplete
+			Application.Driver.SendKeys('e',ConsoleKey.Escape,false,false,false);
+
+			// Suggestion should disapear
+			tf.Redraw(tf.Bounds);
+			TestHelpers.AssertDriverContentsAre("f",output);
+			Assert.Equal("f",tf.Text.ToString());
+
+			// Still has focus though
+			Assert.Same(tf,Application.Top.Focused);
+
+			// But can tab away
+			Application.Driver.SendKeys('\t',ConsoleKey.Tab,false,false,false);
+			Assert.NotSame(tf,Application.Top.Focused);
+        }
+
+		private TextField GetTextFieldsInViewSuggestingFish ()
+		{
+			var tf = GetTextFieldsInView();
+			
+			tf.Autocomplete = new AppendAutocomplete(tf);
+			var generator = (SingleWordSuggestionGenerator)tf.Autocomplete.SuggestionGenerator;
+			generator.AllSuggestions = new List<string>{"fish"};
+
+			tf.Redraw(tf.Bounds);
+			TestHelpers.AssertDriverContentsAre("",output);
+
+			tf.ProcessKey(new KeyEvent(Key.f,new KeyModifiers()));
+
+			tf.Redraw(tf.Bounds);
+			TestHelpers.AssertDriverContentsAre("fish",output);
+			Assert.Equal("f",tf.Text.ToString());
+
+			return tf;
+		}
 
 		private TextField GetTextFieldsInView ()
 		{

@@ -39,8 +39,28 @@ namespace Terminal.Gui {
 			if (key == Key.CursorDown) {
 				return this.CycleSuggestion (-1);
 			}
+			else if(key == CloseKey && Suggestions.Any())
+			{
+				ClearSuggestions();
+				_suspendSuggestions = true;
+				return true;
+			}
+
+			if(char.IsLetterOrDigit((char)kb.KeyValue))
+			{
+				_suspendSuggestions = false;
+			}
 
 			return false;
+		}
+		bool _suspendSuggestions = false;
+		public override void GenerateSuggestions (AutocompleteContext context)
+		{
+			if(_suspendSuggestions)
+			{
+				return;
+			}
+			base.GenerateSuggestions (context);
 		}
 
 		public override void RenderOverlay (Point renderAt)
