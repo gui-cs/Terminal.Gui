@@ -1,15 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection.Emit;
 using Xunit;
+using Xunit.Abstractions;
 using Rune = System.Rune;
 
 namespace Terminal.Gui.CoreTests {
 	public class BorderTests {
-		[Fact]
-		[AutoInitShutdown]
+		readonly ITestOutputHelper output;
+
+		public BorderTests (ITestOutputHelper output)
+		{
+			this.output = output;
+		}
+
+		[Fact, AutoInitShutdown]
 		public void Constructor_Defaults ()
 		{
 			var b = new Border ();
@@ -45,8 +49,7 @@ namespace Terminal.Gui.CoreTests {
 			Assert.False (b.DrawMarginFrame);
 		}
 
-		[Fact]
-		[AutoInitShutdown]
+		[Fact, AutoInitShutdown]
 		public void ActualWidth_ActualHeight ()
 		{
 			var v = new View (new Rect (5, 10, 60, 20), "", new Border ());
@@ -81,8 +84,7 @@ namespace Terminal.Gui.CoreTests {
 			Assert.Equal (new Thickness (5, 5, 5, 5), b.GetSumThickness ());
 		}
 
-		[Fact]
-		[AutoInitShutdown]
+		[Fact, AutoInitShutdown]
 		public void DrawContent_With_Child_Border ()
 		{
 			var top = Application.Top;
@@ -226,7 +228,12 @@ namespace Terminal.Gui.CoreTests {
 
 					var color = (Attribute)driver.Contents [r, c, 1];
 					var rune = (Rune)driver.Contents [r, c, 0];
-					Assert.Equal (Color.Black, color.Background);
+					if (r == frame.Y - drawMarginFrame || r == frame.Bottom + drawMarginFrame - 1
+						|| c == frame.X - drawMarginFrame || c == frame.Right + drawMarginFrame - 1) {
+						Assert.Equal (Color.BrightGreen, color.Background);
+					} else {
+						Assert.Equal (Color.Black, color.Background);
+					}
 					if (c == frame.X - drawMarginFrame && r == frame.Y - drawMarginFrame) {
 						Assert.Equal (uLCorner, rune);
 					} else if (c == frame.Right && r == frame.Y - drawMarginFrame) {
@@ -303,8 +310,7 @@ namespace Terminal.Gui.CoreTests {
 			}
 		}
 
-		[Fact]
-		[AutoInitShutdown]
+		[Fact, AutoInitShutdown]
 		public void DrawContent_With_Parent_Border ()
 		{
 			var top = Application.Top;
@@ -456,7 +462,12 @@ namespace Terminal.Gui.CoreTests {
 
 					var color = (Attribute)driver.Contents [r, c, 1];
 					var rune = (Rune)driver.Contents [r, c, 0];
-					Assert.Equal (Color.Black, color.Background);
+					if (r == frame.Y + sumThickness.Top || r == frame.Bottom - sumThickness.Bottom - 1
+						|| c == frame.X + sumThickness.Left || c == frame.Right - sumThickness.Right - 1) {
+						Assert.Equal (Color.BrightGreen, color.Background);
+					} else {
+						Assert.Equal (Color.Black, color.Background);
+					}
 					if (c == frame.X + sumThickness.Left && r == frame.Y + sumThickness.Top) {
 						Assert.Equal (uLCorner, rune);
 					} else if (c == frame.Right - drawMarginFrame - sumThickness.Right
@@ -540,8 +551,7 @@ namespace Terminal.Gui.CoreTests {
 			}
 		}
 
-		[Fact]
-		[AutoInitShutdown]
+		[Fact, AutoInitShutdown]
 		public void BorderOnControlWithNoChildren ()
 		{
 			var label = new TextField ("Loading...") {
@@ -556,6 +566,58 @@ namespace Terminal.Gui.CoreTests {
 			Application.Top.Add (label);
 
 			Assert.Null (Record.Exception (() => label.Redraw (label.Bounds)));
+		}
+
+		[Fact, AutoInitShutdown]
+		public void BorderStyle_And_DrawMarginFrame_Gets_Sets ()
+		{
+			var lblTop = new Label ("At 0,0");
+			var lblFrame = new Label ("Centered") { X = Pos.Center (), Y = Pos.Center () };
+			var frame = new FrameView () { Y = 1, Width = 20, Height = 3 };
+			var lblFill = new Label () { Width = Dim.Fill(),Height = Dim.Fill(), Visible = false };
+			var fillText = new System.Text.StringBuilder ();
+			for (int i = 0; i < frame.Bounds.Height; i++) {
+				if (i > 0) {
+					fillText.AppendLine ("");
+				}
+				for (int j = 0; j < frame.Bounds.Width; j++) {
+					fillText.Append ("█");
+				}
+			}
+			lblFill.Text = fillText.ToString ();
+			frame.Add (lblFill, lblFrame);
+			var lblBottom = new Label ("At 0,4") { Y = 4 };
+			Application.Top.Add (lblTop, frame, lblBottom);
+			Application.Begin (Application.Top);
+
+			Assert.Equal (BorderStyle.Single, frame.Border.BorderStyle);
+			Assert.True (frame.Border.DrawMarginFrame);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+At 0,0              
+┌──────────────────┐
+│     Centered     │
+└──────────────────┘
+At 0,4              ", output);
+
+			frame.Border.BorderStyle = BorderStyle.None;
+			Application.Refresh ();
+			Assert.True (frame.Border.DrawMarginFrame);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+At 0,0        
+              
+      Centered
+              
+At 0,4        ", output);
+
+			frame.Border.DrawMarginFrame = false;
+			lblFill.Visible = true;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+At 0,0              
+████████████████████
+██████Centered██████
+████████████████████
+At 0,4              ", output);
 		}
 	}
 }

@@ -83,11 +83,11 @@ namespace Terminal.Gui.TypeTests {
 			var testVal = Rect.Empty;
 			testVal = Rect.Empty;
 			dim = Dim.Width (new View (testVal));
-			Assert.Equal ($"DimView(Width,View()({{X={testVal.X},Y={testVal.Y},Width={testVal.Width},Height={testVal.Height}}}))", dim.ToString ());
+			Assert.Equal ($"View(Width,View()({{X={testVal.X},Y={testVal.Y},Width={testVal.Width},Height={testVal.Height}}}))", dim.ToString ());
 
 			testVal = new Rect (1, 2, 3, 4);
 			dim = Dim.Width (new View (testVal));
-			Assert.Equal ($"DimView(Width,View()({{X={testVal.X},Y={testVal.Y},Width={testVal.Width},Height={testVal.Height}}}))", dim.ToString ());
+			Assert.Equal ($"View(Width,View()({{X={testVal.X},Y={testVal.Y},Width={testVal.Width},Height={testVal.Height}}}))", dim.ToString ());
 		}
 
 		[Fact]
@@ -141,11 +141,11 @@ namespace Terminal.Gui.TypeTests {
 			var testVal = Rect.Empty;
 			testVal = Rect.Empty;
 			dim = Dim.Height (new View (testVal));
-			Assert.Equal ($"DimView(Height,View()({{X={testVal.X},Y={testVal.Y},Width={testVal.Width},Height={testVal.Height}}}))", dim.ToString ());
+			Assert.Equal ($"View(Height,View()({{X={testVal.X},Y={testVal.Y},Width={testVal.Width},Height={testVal.Height}}}))", dim.ToString ());
 
 			testVal = new Rect (1, 2, 3, 4);
 			dim = Dim.Height (new View (testVal));
-			Assert.Equal ($"DimView(Height,View()({{X={testVal.X},Y={testVal.Y},Width={testVal.Width},Height={testVal.Height}}}))", dim.ToString ());
+			Assert.Equal ($"View(Height,View()({{X={testVal.X},Y={testVal.Y},Width={testVal.Width},Height={testVal.Height}}}))", dim.ToString ());
 		}
 
 		// TODO: Other Dim.Height tests (e.g. Equal?)
@@ -268,7 +268,7 @@ namespace Terminal.Gui.TypeTests {
 			w.Add (v);
 			t.Add (w);
 
-			t.Ready += () => {
+			t.Ready += (s, e) => {
 				Assert.Equal (2, w.Width = 2);
 				Assert.Equal (2, w.Height = 2);
 				Assert.Throws<ArgumentException> (() => v.Width = 2);
@@ -298,7 +298,7 @@ namespace Terminal.Gui.TypeTests {
 			var w = new Window (new Rect (1, 2, 4, 5), "w");
 			t.Add (w);
 
-			t.Ready += () => {
+			t.Ready += (s, e) => {
 				Assert.Equal (3, w.Width = 3);
 				Assert.Equal (4, w.Height = 4);
 			};
@@ -328,7 +328,7 @@ namespace Terminal.Gui.TypeTests {
 			w.Add (v);
 			t.Add (w);
 
-			t.Ready += () => {
+			t.Ready += (s, e) => {
 				v.LayoutStyle = LayoutStyle.Absolute;
 				Assert.Equal (2, v.Width = 2);
 				Assert.Equal (2, v.Height = 2);
@@ -419,7 +419,7 @@ namespace Terminal.Gui.TypeTests {
 			w.Add (f1, f2, v1, v2, v3, v4, v5, v6);
 			t.Add (w);
 
-			t.Ready += () => {
+			t.Ready += (s, e) => {
 				Assert.Equal ("Absolute(100)", w.Width.ToString ());
 				Assert.Equal ("Absolute(100)", w.Height.ToString ());
 				Assert.Equal (100, w.Frame.Width);
@@ -435,12 +435,12 @@ namespace Terminal.Gui.TypeTests {
 				Assert.Equal (49, f2.Frame.Width); // 50-1=49
 				Assert.Equal (5, f2.Frame.Height);
 	
-				Assert.Equal ("Combine(DimView(Width,FrameView()({X=0,Y=0,Width=49,Height=5}))-Absolute(2))", v1.Width.ToString ());
+				Assert.Equal ("Combine(View(Width,FrameView()({X=0,Y=0,Width=49,Height=5}))-Absolute(2))", v1.Width.ToString ());
 				Assert.Equal ("Combine(Fill(0)-Absolute(2))", v1.Height.ToString ());
 				Assert.Equal (47, v1.Frame.Width); // 49-2=47
 				Assert.Equal (89, v1.Frame.Height); // 98-5-2-2=89
 
-				Assert.Equal ("Combine(DimView(Width,FrameView()({X=49,Y=0,Width=49,Height=5}))-Absolute(2))", v2.Width.ToString ());
+				Assert.Equal ("Combine(View(Width,FrameView()({X=49,Y=0,Width=49,Height=5}))-Absolute(2))", v2.Width.ToString ());
 				Assert.Equal ("Combine(Fill(0)-Absolute(2))", v2.Height.ToString ());
 				Assert.Equal (47, v2.Frame.Width); // 49-2=47
 				Assert.Equal (89, v2.Frame.Height); // 98-5-2-2=89
@@ -455,8 +455,8 @@ namespace Terminal.Gui.TypeTests {
 				Assert.Equal (50, v4.Frame.Width);
 				Assert.Equal (50, v4.Frame.Height);
 
-				Assert.Equal ("Combine(DimView(Width,Button()({X=2,Y=7,Width=47,Height=89}))-DimView(Width,Button()({X=0,Y=0,Width=9,Height=9})))", v5.Width.ToString ());
-				Assert.Equal ("Combine(DimView(Height,Button()({X=2,Y=7,Width=47,Height=89}))-DimView(Height,Button()({X=0,Y=0,Width=9,Height=9})))", v5.Height.ToString ());
+				Assert.Equal ("Combine(View(Width,Button()({X=2,Y=7,Width=47,Height=89}))-View(Width,Button()({X=0,Y=0,Width=9,Height=9})))", v5.Width.ToString ());
+				Assert.Equal ("Combine(View(Height,Button()({X=2,Y=7,Width=47,Height=89}))-View(Height,Button()({X=0,Y=0,Width=9,Height=9})))", v5.Height.ToString ());
 				Assert.Equal (38, v5.Frame.Width); // 47-9=38
 				Assert.Equal (80, v5.Frame.Height); // 89-9=80
 
@@ -466,6 +466,7 @@ namespace Terminal.Gui.TypeTests {
 				Assert.Equal (18, v6.Frame.Height); // 89*20%=18
 
 				w.Width = 200;
+				Assert.True (t.LayoutNeeded);
 				w.Height = 200;
 				t.LayoutSubviews ();
 
@@ -487,13 +488,13 @@ namespace Terminal.Gui.TypeTests {
 				Assert.Equal (5, f2.Frame.Height);
 
 				v1.Text = "Button1";
-				Assert.Equal ("Combine(DimView(Width,FrameView()({X=0,Y=0,Width=99,Height=5}))-Absolute(2))", v1.Width.ToString ());
+				Assert.Equal ("Combine(View(Width,FrameView()({X=0,Y=0,Width=99,Height=5}))-Absolute(2))", v1.Width.ToString ());
 				Assert.Equal ("Combine(Fill(0)-Absolute(2))", v1.Height.ToString ());
 				Assert.Equal (97, v1.Frame.Width); // 99-2=97
 				Assert.Equal (189, v1.Frame.Height); // 198-2-7=189
 
 				v2.Text = "Button2";
-				Assert.Equal ("Combine(DimView(Width,FrameView()({X=99,Y=0,Width=99,Height=5}))-Absolute(2))", v2.Width.ToString ());
+				Assert.Equal ("Combine(View(Width,FrameView()({X=99,Y=0,Width=99,Height=5}))-Absolute(2))", v2.Width.ToString ());
 				Assert.Equal ("Combine(Fill(0)-Absolute(2))", v2.Height.ToString ());
 				Assert.Equal (97, v2.Frame.Width); // 99-2=97
 				Assert.Equal (189, v2.Frame.Height); // 198-2-7=189
@@ -517,16 +518,16 @@ namespace Terminal.Gui.TypeTests {
 				Assert.Equal (1, v4.Frame.Height); // 1 because is Dim.DimAbsolute
 
 				v5.Text = "Button5";
-				Assert.Equal ("Combine(DimView(Width,Button()({X=2,Y=7,Width=97,Height=189}))-DimView(Width,Button()({X=0,Y=0,Width=19,Height=19})))", v5.Width.ToString ());
-				Assert.Equal ("Combine(DimView(Height,Button()({X=2,Y=7,Width=97,Height=189}))-DimView(Height,Button()({X=0,Y=0,Width=19,Height=19})))", v5.Height.ToString ());
-				Assert.Equal (78, v5.Frame.Width); // 97-19=78
+				Assert.Equal ("Combine(View(Width,Button()({X=2,Y=7,Width=97,Height=189}))-View(Width,Button()({X=0,Y=0,Width=19,Height=19})))", v5.Width.ToString ());
+				Assert.Equal ("Combine(View(Height,Button()({X=2,Y=7,Width=97,Height=189}))-View(Height,Button()({X=0,Y=0,Width=19,Height=19})))", v5.Height.ToString ());
+				Assert.Equal (78, v5.Frame.Width); // 97-9=78
 				Assert.Equal (170, v5.Frame.Height); // 189-19=170
 
 				v6.Text = "Button6";
 				Assert.Equal ("Factor(0.2,True)", v6.Width.ToString ());
 				Assert.Equal ("Factor(0.2,True)", v6.Height.ToString ());
 				Assert.Equal (19, v6.Frame.Width); // 99*20%=19
-				Assert.Equal (38, v6.Frame.Height); // 198-7*20=38
+				Assert.Equal (38, v6.Frame.Height); // 198-7*20=18
 			};
 
 			Application.Iteration += () => Application.RequestStop ();
@@ -564,7 +565,7 @@ namespace Terminal.Gui.TypeTests {
 			f.Width = Dim.Width (t) - Dim.Width (v2);
 			f.Height = Dim.Height (t) - Dim.Height (v2);
 
-			t.Ready += () => {
+			t.Ready += (s, e) => {
 				Assert.Equal (80, t.Frame.Width);
 				Assert.Equal (25, t.Frame.Height);
 				Assert.Equal (78, w.Frame.Width);
@@ -628,7 +629,7 @@ namespace Terminal.Gui.TypeTests {
 			var field = new TextField () { X = 0, Y = Pos.Bottom (view), Width = 20 };
 			var count = 0;
 
-			field.KeyDown += (k) => {
+			field.KeyDown += (s, k) => {
 				if (k.KeyEvent.Key == Key.Enter) {
 					field.Text = $"Label {count}";
 					var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 20 };
@@ -995,7 +996,7 @@ namespace Terminal.Gui.TypeTests {
 			var count = 0;
 			var listLabels = new List<Label> ();
 
-			field.KeyDown += (k) => {
+			field.KeyDown += (s, k) => {
 				if (k.KeyEvent.Key == Key.Enter) {
 					((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
 					var pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], output);
@@ -1074,7 +1075,7 @@ namespace Terminal.Gui.TypeTests {
 				Assert.Equal ($"Absolute({i + 1})", view.Height.ToString ());
 			}
 
-			field.KeyDown += (k) => {
+			field.KeyDown += (s, k) => {
 				if (k.KeyEvent.Key == Key.Enter) {
 					Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
 					view.Remove (listLabels [count - 1]);
@@ -1139,7 +1140,7 @@ namespace Terminal.Gui.TypeTests {
 				}
 			}
 
-			field.KeyDown += (k) => {
+			field.KeyDown += (s, k) => {
 				if (k.KeyEvent.Key == Key.Enter) {
 					((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
 					var pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], output);

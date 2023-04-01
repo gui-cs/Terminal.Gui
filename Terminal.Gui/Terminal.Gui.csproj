@@ -10,10 +10,10 @@
     <!-- Version numbers are automatically updated by gitversion when a release is released -->
     <!-- In the source tree the version will always be 1.0 for all projects. -->
     <!-- Do not modify these. Do NOT commit after manually running `dotnet-gitversion /updateprojectfiles` -->
-    <AssemblyVersion>1.0</AssemblyVersion>
-    <FileVersion>1.0</FileVersion>
-    <Version>1.0</Version>
-    <InformationalVersion>1.0</InformationalVersion>
+    <AssemblyVersion>2.0</AssemblyVersion>
+    <FileVersion>2.0</FileVersion>
+    <Version>2.0</Version>
+    <InformationalVersion>2.0</InformationalVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Resources\config.json" />
@@ -22,11 +22,15 @@
     <EmbeddedResource Include="Resources\config.json" />
   </ItemGroup>
   <ItemGroup>
+    <!-- Enable Nuget Source Link for github -->
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
     <PackageReference Include="NStack.Core" Version="1.0.7" />
+    <PackageReference Include="System.Text.Json" Version="7.0.1" />
+    <PackageReference Include="System.Management" Version="7.0.0" />
     <InternalsVisibleTo Include="UnitTests" />
-  </ItemGroup>
+   </ItemGroup>
   <!-- Uncomment the RestoreSources element to have dotnet restore pull NStack from a local dir for testing -->
   <PropertyGroup>
     <!-- See https://stackoverflow.com/a/44463578/297526 -->
@@ -55,11 +59,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-  <!-- Enable Nuget Source Link for github -->
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-    <PackageReference Include="System.Text.Json" Version="7.0.1" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFrameworks>net472;netstandard2.0;net6.0</TargetFrameworks>

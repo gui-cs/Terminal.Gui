@@ -82,7 +82,7 @@ namespace Terminal.Gui.DriverTests {
 			var count = 0;
 			var wasKeyPressed = false;
 
-			view.KeyPress += (e) => {
+			view.KeyPress += (s, e) => {
 				wasKeyPressed = true;
 			};
 			top.Add (view);
@@ -121,7 +121,7 @@ namespace Terminal.Gui.DriverTests {
 			var rText = "";
 			var idx = 0;
 
-			view.KeyPress += (e) => {
+			view.KeyPress += (s, e) => {
 				Assert.Equal (text [idx], (char)e.KeyEvent.Key);
 				rText += (char)e.KeyEvent.Key;
 				Assert.Equal (rText, text.Substring (0, idx + 1));
@@ -142,6 +142,63 @@ namespace Terminal.Gui.DriverTests {
 			Application.Shutdown ();
 		}
 
+		//[Theory]
+		//[InlineData (typeof (FakeDriver))]
+		//public void FakeDriver_MockKeyPresses_Press_AfterTimeOut (Type driverType)
+		//{
+		//	var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+		//	Application.Init (driver);
+
+		//	// Simulating pressing of QuitKey after a short period of time
+		//	uint quitTime = 100;
+		//	Func<MainLoop, bool> closeCallback = (MainLoop loop) => {
+		//		// Prove the scenario is using Application.QuitKey correctly
+		//		output.WriteLine ($"  {quitTime}ms elapsed; Simulating keypresses...");
+		//		FakeConsole.PushMockKeyPress (Key.F);
+		//		FakeConsole.PushMockKeyPress (Key.U);
+		//		FakeConsole.PushMockKeyPress (Key.C);
+		//		FakeConsole.PushMockKeyPress (Key.K);
+		//		return false;
+		//	};
+		//	output.WriteLine ($"Add timeout to simulate key presses after {quitTime}ms");
+		//	_ = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (quitTime), closeCallback);
+
+		//	// If Top doesn't quit within abortTime * 5 (500ms), this will force it
+		//	uint abortTime = quitTime * 5;
+		//	Func<MainLoop, bool> forceCloseCallback = (MainLoop loop) => {
+		//		Application.RequestStop ();
+		//		Assert.Fail ($"  failed to Quit after {abortTime}ms. Force quit.");
+		//		return false;
+		//	};
+		//	output.WriteLine ($"Add timeout to force quit after {abortTime}ms");
+		//	_ = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
+
+
+		//	Key key = Key.Unknown;
+			
+		//	Application.Top.KeyPress += (e) => {
+		//		key = e.KeyEvent.Key;
+		//		output.WriteLine ($"  Application.Top.KeyPress: {key}");
+		//		e.Handled = true;
+				
+		//	};
+
+		//	int iterations = 0;
+		//	Application.Iteration += () => {
+		//		output.WriteLine ($"  iteration {++iterations}");
+
+		//		if (Console.MockKeyPresses.Count == 0) {
+		//			output.WriteLine ($"    No more MockKeyPresses; RequestStop");
+		//			Application.RequestStop ();
+		//		}
+		//	};
+
+		//	Application.Run ();
+
+		//	// Shutdown must be called to safely clean up Application if Init has been called
+		//	Application.Shutdown ();
+		//}
+		
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
 		public void TerminalResized_Simulation (Type driverType)
@@ -171,7 +228,7 @@ namespace Terminal.Gui.DriverTests {
 
 			// MockDriver will still be 120x40
 			wasTerminalResized = false;
-			Application.HeightAsBuffer = true;
+			Application.EnableConsoleScrolling = true;
 			driver.SetWindowSize (40, 20);
 			Assert.Equal (120, Application.Driver.Cols);
 			Assert.Equal (40, Application.Driver.Rows);
@@ -186,12 +243,12 @@ namespace Terminal.Gui.DriverTests {
 
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
-		public void HeightAsBuffer_Is_False_Left_And_Top_Is_Always_Zero (Type driverType)
+		public void EnableConsoleScrolling_Is_False_Left_And_Top_Is_Always_Zero (Type driverType)
 		{
 			var driver = (FakeDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 
-			Assert.False (Application.HeightAsBuffer);
+			Assert.False (Application.EnableConsoleScrolling);
 			Assert.Equal (0, Console.WindowLeft);
 			Assert.Equal (0, Console.WindowTop);
 
@@ -204,13 +261,13 @@ namespace Terminal.Gui.DriverTests {
 
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
-		public void HeightAsBuffer_Is_True_Left_Cannot_Be_Greater_Than_WindowWidth (Type driverType)
+		public void EnableConsoleScrolling_Is_True_Left_Cannot_Be_Greater_Than_WindowWidth (Type driverType)
 		{
 			var driver = (FakeDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 
-			Application.HeightAsBuffer = true;
-			Assert.True (Application.HeightAsBuffer);
+			Application.EnableConsoleScrolling = true;
+			Assert.True (Application.EnableConsoleScrolling);
 
 			driver.SetWindowPosition (81, 25);
 			Assert.Equal (0, Console.WindowLeft);
@@ -221,13 +278,13 @@ namespace Terminal.Gui.DriverTests {
 
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
-		public void HeightAsBuffer_Is_True_Left_Cannot_Be_Greater_Than_BufferWidth_Minus_WindowWidth (Type driverType)
+		public void EnableConsoleScrolling_Is_True_Left_Cannot_Be_Greater_Than_BufferWidth_Minus_WindowWidth (Type driverType)
 		{
 			var driver = (FakeDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 
-			Application.HeightAsBuffer = true;
-			Assert.True (Application.HeightAsBuffer);
+			Application.EnableConsoleScrolling = true;
+			Assert.True (Application.EnableConsoleScrolling);
 
 			driver.SetWindowPosition (81, 25);
 			Assert.Equal (0, Console.WindowLeft);
@@ -261,13 +318,13 @@ namespace Terminal.Gui.DriverTests {
 
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
-		public void HeightAsBuffer_Is_True_Top_Cannot_Be_Greater_Than_WindowHeight (Type driverType)
+		public void EnableConsoleScrolling_Is_True_Top_Cannot_Be_Greater_Than_WindowHeight (Type driverType)
 		{
 			var driver = (FakeDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 
-			Application.HeightAsBuffer = true;
-			Assert.True (Application.HeightAsBuffer);
+			Application.EnableConsoleScrolling = true;
+			Assert.True (Application.EnableConsoleScrolling);
 
 			driver.SetWindowPosition (80, 26);
 			Assert.Equal (0, Console.WindowLeft);
@@ -278,13 +335,13 @@ namespace Terminal.Gui.DriverTests {
 
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
-		public void HeightAsBuffer_Is_True_Top_Cannot_Be_Greater_Than_BufferHeight_Minus_WindowHeight (Type driverType)
+		public void EnableConsoleScrolling_Is_True_Top_Cannot_Be_Greater_Than_BufferHeight_Minus_WindowHeight (Type driverType)
 		{
 			var driver = (FakeDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 
-			Application.HeightAsBuffer = true;
-			Assert.True (Application.HeightAsBuffer);
+			Application.EnableConsoleScrolling = true;
+			Assert.True (Application.EnableConsoleScrolling);
 
 			driver.SetWindowPosition (80, 26);
 			Assert.Equal (0, Console.WindowLeft);
@@ -319,7 +376,7 @@ namespace Terminal.Gui.DriverTests {
 
 			Application.Shutdown ();
 		}
-		
+
 		[Fact, AutoInitShutdown]
 		public void AddRune_On_Clip_Left_Or_Right_Replace_Previous_Or_Next_Wide_Rune_With_Space ()
 		{
@@ -441,7 +498,7 @@ namespace Terminal.Gui.DriverTests {
 		}
 
 		private static object packetLock = new object ();
-		
+
 		/// <summary>
 		/// Sometimes when using remote tools EventKeyRecord sends 'virtual keystrokes'.
 		/// These are indicated with the wVirtualKeyCode of 231. When we see this code
@@ -473,7 +530,7 @@ namespace Terminal.Gui.DriverTests {
 
 			var top = Application.Top;
 
-			top.KeyPress += (e) => {
+			top.KeyPress += (s, e) => {
 				var after = ShortcutHelper.GetModifiersKey (e.KeyEvent);
 				Assert.Equal (expectedRemapping, after);
 				e.Handled = true;

@@ -65,8 +65,28 @@ namespace Terminal.Gui {
 				}
 				return sCode;
 			}
-
+			
 			return null;
+		}
+
+		/// <summary>
+		/// Gets the <see cref="ConsoleKey"/> from the provided <see cref="Key"/>.
+		/// </summary>
+		/// <param name="key"></param>
+		/// <returns></returns>
+		public static ConsoleKey GetConsoleKeyFromKey (Key key)
+		{
+			ConsoleModifiers mod = new ConsoleModifiers ();
+			if (key.HasFlag (Key.ShiftMask)) {
+				mod |= ConsoleModifiers.Shift;
+			}
+			if (key.HasFlag (Key.AltMask)) {
+				mod |= ConsoleModifiers.Alt;
+			}
+			if (key.HasFlag (Key.CtrlMask)) {
+				mod |= ConsoleModifiers.Control;
+			}
+			return (ConsoleKey)ConsoleKeyMapping.GetConsoleKeyFromKey ((uint)(key & ~Key.CtrlMask & ~Key.ShiftMask & ~Key.AltMask), mod, out _, out _);
 		}
 
 		/// <summary>
@@ -332,6 +352,25 @@ namespace Terminal.Gui {
 			isMappable = true;
 
 			return (Key)consoleKey;
+		}
+
+		/// <summary>
+		/// Maps a <see cref="ConsoleKeyInfo"/> to a <see cref="Key"/>.
+		/// </summary>
+		/// <param name="keyInfo">The console key info.</param>
+		/// <param name="key">The key.</param>
+		/// <returns>The <see cref="Key"/> with <see cref="ConsoleModifiers"/> or the <paramref name="key"/></returns>
+		public static Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
+		{
+			Key keyMod = new Key ();
+			if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0)
+				keyMod = Key.ShiftMask;
+			if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0)
+				keyMod |= Key.CtrlMask;
+			if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0)
+				keyMod |= Key.AltMask;
+
+			return keyMod != Key.Null ? keyMod | key : key;
 		}
 
 		private static HashSet<ScanCodeMapping> scanCodes = new HashSet<ScanCodeMapping> {

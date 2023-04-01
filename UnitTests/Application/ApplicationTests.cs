@@ -24,8 +24,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.Null (Application.Driver);
 			Assert.Null (Application.Top);
 			Assert.Null (Application.Current);
-			// removed below as HeightAsBuffer now works without a driver loaded
-			//Assert.Throws<ArgumentNullException> (() => Application.HeightAsBuffer == true);
+			Assert.False (Application.EnableConsoleScrolling);
 			Assert.Null (Application.MainLoop);
 			Assert.Null (Application.Iteration);
 			Assert.Null (Application.RootMouseEvent);
@@ -37,7 +36,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.NotNull (Application.Driver);
 			Assert.NotNull (Application.Top);
 			Assert.NotNull (Application.Current);
-			Assert.False (Application.HeightAsBuffer);
+			Assert.False (Application.EnableConsoleScrolling);
 			Assert.NotNull (Application.MainLoop);
 			Assert.Null (Application.Iteration);
 			Assert.Null (Application.RootMouseEvent);
@@ -144,9 +143,9 @@ namespace Terminal.Gui.ApplicationTests {
 			};
 
 			Application.RunState runstate = null;
-			Action<Application.RunState> NewRunStateFn = (rs) => {
-				Assert.NotNull (rs);
-				runstate = rs;
+			EventHandler<RunStateEventArgs> NewRunStateFn = (s, e) => {
+				Assert.NotNull (e.State);
+				runstate = e.State;
 			};
 			Application.NotifyNewRunState += NewRunStateFn;
 
@@ -189,9 +188,9 @@ namespace Terminal.Gui.ApplicationTests {
 			Application.InternalInit (() => topLevel = new TestToplevel (), new FakeDriver ());
 
 			Application.RunState runstate = null;
-			Action<Application.RunState> NewRunStateFn = (rs) => {
-				Assert.NotNull (rs);
-				runstate = rs;
+			EventHandler<RunStateEventArgs> NewRunStateFn = (s, e) => {
+				Assert.NotNull (e.State);
+				runstate = e.State;
 			};
 			Application.NotifyNewRunState += NewRunStateFn;
 
@@ -314,7 +313,7 @@ namespace Terminal.Gui.ApplicationTests {
 		public void Run_T_Init_Driver_Cleared_with_TestTopLevel_Throws ()
 		{
 			Init ();
-			
+
 			Application.Driver = null;
 
 			Application.Iteration = () => {
@@ -334,8 +333,8 @@ namespace Terminal.Gui.ApplicationTests {
 		[Fact]
 		public void Run_T_NoInit_DoesNotThrow ()
 		{
-			Application.ForceFakeConsole = true; 
-			
+			Application.ForceFakeConsole = true;
+
 			Application.Iteration = () => {
 				Application.RequestStop ();
 			};
@@ -421,9 +420,9 @@ namespace Terminal.Gui.ApplicationTests {
 			Init ();
 			var top = Application.Top;
 			var count = 0;
-			top.Loaded += () => count++;
-			top.Ready += () => count++;
-			top.Unloaded += () => count++;
+			top.Loaded += (s,e) => count++;
+			top.Ready += (s,e) => count++;
+			top.Unloaded += (s,e) => count++;
 			Application.Iteration = () => Application.RequestStop ();
 			Application.Run ();
 			Application.Shutdown ();
@@ -431,7 +430,7 @@ namespace Terminal.Gui.ApplicationTests {
 		}
 
 		// TODO: Add tests for Run that test errorHandler
-		
+
 		#endregion
 
 		#region ShutdownTests
@@ -474,23 +473,23 @@ namespace Terminal.Gui.ApplicationTests {
 			// t1, t2, t3, d, t4
 			var iterations = 5;
 
-			t1.Ready += () => {
+			t1.Ready += (s,e) => {
 				Assert.Equal (t1, Application.Top);
 				Application.Run (t2);
 			};
-			t2.Ready += () => {
+			t2.Ready += (s,e) => {
 				Assert.Equal (t2, Application.Top);
 				Application.Run (t3);
 			};
-			t3.Ready += () => {
+			t3.Ready += (s,e) => {
 				Assert.Equal (t3, Application.Top);
 				Application.Run (d);
 			};
-			d.Ready += () => {
+			d.Ready += (s, e) => {
 				Assert.Equal (t3, Application.Top);
 				Application.Run (t4);
 			};
-			t4.Ready += () => {
+			t4.Ready += (s, e) => {
 				Assert.Equal (t4, Application.Top);
 				t4.RequestStop ();
 				d.RequestStop ();
@@ -498,7 +497,7 @@ namespace Terminal.Gui.ApplicationTests {
 				t2.RequestStop ();
 			};
 			// Now this will close the MdiContainer when all MdiChildes was closed
-			t2.Closed += (_) => {
+			t2.Closed += (s,_) => {
 				t1.RequestStop ();
 			};
 			Application.Iteration += () => {
@@ -561,16 +560,16 @@ namespace Terminal.Gui.ApplicationTests {
 			var input = "Tests";
 
 			// Put a control-q in at the end
-			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('q', ConsoleKey.Q, shift: false, alt: false, control: true));
+			FakeConsole.MockKeyPresses.Push (new ConsoleKeyInfo ('q', ConsoleKey.Q, shift: false, alt: false, control: true));
 			foreach (var c in input.Reverse ()) {
 				if (char.IsLetter (c)) {
-					Console.MockKeyPresses.Push (new ConsoleKeyInfo (c, (ConsoleKey)char.ToUpper (c), shift: char.IsUpper (c), alt: false, control: false));
+					FakeConsole.MockKeyPresses.Push (new ConsoleKeyInfo (c, (ConsoleKey)char.ToUpper (c), shift: char.IsUpper (c), alt: false, control: false));
 				} else {
-					Console.MockKeyPresses.Push (new ConsoleKeyInfo (c, (ConsoleKey)c, shift: false, alt: false, control: false));
+					FakeConsole.MockKeyPresses.Push (new ConsoleKeyInfo (c, (ConsoleKey)c, shift: false, alt: false, control: false));
 				}
 			}
 
-			int stackSize = Console.MockKeyPresses.Count;
+			int stackSize = FakeConsole.MockKeyPresses.Count;
 
 			int iterations = 0;
 			Application.Iteration = () => {
@@ -583,7 +582,7 @@ namespace Terminal.Gui.ApplicationTests {
 
 			int keyUps = 0;
 			var output = string.Empty;
-			Application.Top.KeyUp += (View.KeyEventEventArgs args) => {
+			Application.Top.KeyUp += (object sender, KeyEventEventArgs args) => {
 				if (args.KeyEvent.Key != (Key.CtrlMask | Key.Q)) {
 					output += (char)args.KeyEvent.KeyValue;
 				}
@@ -731,7 +730,7 @@ namespace Terminal.Gui.ApplicationTests {
 			var top = Application.Top;
 			var isQuiting = false;
 
-			top.Closing += (e) => {
+			top.Closing += (s,e) => {
 				isQuiting = true;
 				e.Cancel = true;
 			};
@@ -979,27 +978,27 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.Equal (grabView, view2);
 			Assert.Null (Application.MouseGrabView);
 
-			void Application_GrabbedMouse (View obj)
+			void Application_GrabbedMouse (object sender, ViewEventArgs e)
 			{
 				if (count == 0) {
-					Assert.Equal (view1, obj);
+					Assert.Equal (view1, e.View);
 					grabView = view1;
 				} else {
-					Assert.Equal (view2, obj);
+					Assert.Equal (view2, e.View);
 					grabView = view2;
 				}
 
 				Application.GrabbedMouse -= Application_GrabbedMouse;
 			}
 
-			void Application_UnGrabbedMouse (View obj)
+			void Application_UnGrabbedMouse (object sender, ViewEventArgs e)
 			{
 				if (count == 0) {
-					Assert.Equal (view1, obj);
-					Assert.Equal (grabView, obj);
+					Assert.Equal (view1, e.View);
+					Assert.Equal (grabView, e.View);
 				} else {
-					Assert.Equal (view2, obj);
-					Assert.Equal (grabView, obj);
+					Assert.Equal (view2, e.View);
+					Assert.Equal (grabView, e.View);
 				}
 				count++;
 

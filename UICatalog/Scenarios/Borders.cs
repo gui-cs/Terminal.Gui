@@ -19,6 +19,8 @@ namespace UICatalog.Scenarios {
 			var effect3D = true;
 
 			var smartPanel = new PanelView () {
+				X = Pos.Center () - 20,
+				Y = Pos.Center () + 2,
 				Width = 24,
 				Height = 13,
 				Border = new Border () {
@@ -70,6 +72,8 @@ namespace UICatalog.Scenarios {
 			//};
 
 			var smartLabel = new Label () {
+				X = Pos.Center () + 16,
+				Y = Pos.Center () + 2,
 				Border = new Border () {
 					BorderStyle = borderStyle,
 					DrawMarginFrame = drawMarginFrame,
@@ -95,7 +99,7 @@ namespace UICatalog.Scenarios {
 				Y = 1,
 				Width = 5
 			};
-			paddingTopEdit.TextChanging += (e) => {
+			paddingTopEdit.TextChanging += (s, e) => {
 				try {
 					smartPanel.Child.Border.Padding = new Thickness (smartPanel.Child.Border.Padding.Left,
 						int.Parse (e.NewText.ToString ()), smartPanel.Child.Border.Padding.Right,
@@ -119,7 +123,7 @@ namespace UICatalog.Scenarios {
 				Y = 2,
 				Width = 5
 			};
-			paddingLeftEdit.TextChanging += (e) => {
+			paddingLeftEdit.TextChanging += (s, e) => {
 				try {
 					smartPanel.Child.Border.Padding = new Thickness (int.Parse (e.NewText.ToString ()),
 						smartPanel.Child.Border.Padding.Top, smartPanel.Child.Border.Padding.Right,
@@ -142,7 +146,7 @@ namespace UICatalog.Scenarios {
 				Y = 2,
 				Width = 5
 			};
-			paddingRightEdit.TextChanging += (e) => {
+			paddingRightEdit.TextChanging += (s, e) => {
 				try {
 					smartPanel.Child.Border.Padding = new Thickness (smartPanel.Child.Border.Padding.Left,
 						smartPanel.Child.Border.Padding.Top, int.Parse (e.NewText.ToString ()),
@@ -165,7 +169,7 @@ namespace UICatalog.Scenarios {
 				Y = 3,
 				Width = 5
 			};
-			paddingBottomEdit.TextChanging += (e) => {
+			paddingBottomEdit.TextChanging += (s, e) => {
 				try {
 					smartPanel.Child.Border.Padding = new Thickness (smartPanel.Child.Border.Padding.Left,
 						smartPanel.Child.Border.Padding.Top, smartPanel.Child.Border.Padding.Right,
@@ -184,10 +188,10 @@ namespace UICatalog.Scenarios {
 			Win.Add (paddingBottomEdit);
 
 			var replacePadding = new Button ("Replace all based on top") {
-				X = Pos.Left(paddingLeftEdit),
+				X = Pos.Left (paddingLeftEdit),
 				Y = 5
 			};
-			replacePadding.Clicked += () => {
+			replacePadding.Clicked += (s,e) => {
 				smartPanel.Child.Border.Padding = new Thickness (smartPanel.Child.Border.Padding.Top);
 				smartLabel.Border.Padding = new Thickness (smartLabel.Border.Padding.Top);
 				if (paddingTopEdit.Text.IsEmpty) {
@@ -202,7 +206,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Y (replacePadding) + 1,
 				Checked = smartPanel.UsePanelFrame
 			};
-			cbUseUsePanelFrame.Toggled += (e) => smartPanel.UsePanelFrame = (bool)!e;
+			cbUseUsePanelFrame.Toggled += (s,e) => smartPanel.UsePanelFrame = (bool)!e.OldValue;
 			Win.Add (cbUseUsePanelFrame);
 
 			Win.Add (new Label ("Border:") {
@@ -214,7 +218,7 @@ namespace UICatalog.Scenarios {
 				Y = 1,
 				Width = 5
 			};
-			borderTopEdit.TextChanging += (e) => {
+			borderTopEdit.TextChanging += (s, e) => {
 				try {
 					smartPanel.Child.Border.BorderThickness = new Thickness (smartPanel.Child.Border.BorderThickness.Left,
 						int.Parse (e.NewText.ToString ()), smartPanel.Child.Border.BorderThickness.Right,
@@ -238,7 +242,7 @@ namespace UICatalog.Scenarios {
 				Y = 2,
 				Width = 5
 			};
-			borderLeftEdit.TextChanging += (e) => {
+			borderLeftEdit.TextChanging += (s, e) => {
 				try {
 					smartPanel.Child.Border.BorderThickness = new Thickness (int.Parse (e.NewText.ToString ()),
 						smartPanel.Child.Border.BorderThickness.Top, smartPanel.Child.Border.BorderThickness.Right,
@@ -261,7 +265,7 @@ namespace UICatalog.Scenarios {
 				Y = 2,
 				Width = 5
 			};
-			borderRightEdit.TextChanging += (e) => {
+			borderRightEdit.TextChanging += (s, e) => {
 				try {
 					smartPanel.Child.Border.BorderThickness = new Thickness (smartPanel.Child.Border.BorderThickness.Left,
 						smartPanel.Child.Border.BorderThickness.Top, int.Parse (e.NewText.ToString ()),
@@ -284,7 +288,7 @@ namespace UICatalog.Scenarios {
 				Y = 3,
 				Width = 5
 			};
-			borderBottomEdit.TextChanging += (e) => {
+			borderBottomEdit.TextChanging += (s, e) => {
 				try {
 					smartPanel.Child.Border.BorderThickness = new Thickness (smartPanel.Child.Border.BorderThickness.Left,
 						smartPanel.Child.Border.BorderThickness.Top, smartPanel.Child.Border.BorderThickness.Right,
@@ -303,10 +307,10 @@ namespace UICatalog.Scenarios {
 			Win.Add (borderBottomEdit);
 
 			var replaceBorder = new Button ("Replace all based on top") {
-				X = Pos.Left(borderLeftEdit),
+				X = Pos.Left (borderLeftEdit),
 				Y = 5
 			};
-			replaceBorder.Clicked += () => {
+			replaceBorder.Clicked += (s,e) => {
 				smartPanel.Child.Border.BorderThickness = new Thickness (smartPanel.Child.Border.BorderThickness.Top);
 				smartLabel.Border.BorderThickness = new Thickness (smartLabel.Border.BorderThickness.Top);
 				if (borderTopEdit.Text.IsEmpty) {
@@ -333,7 +337,7 @@ namespace UICatalog.Scenarios {
 				Y = 0,
 				Width = 5
 			};
-			cbDrawMarginFrame.Toggled += (e) => {
+			cbDrawMarginFrame.Toggled += (s,e) => {
 				try {
 					smartPanel.Child.Border.DrawMarginFrame = cbDrawMarginFrame.Checked == true;
 					smartLabel.Border.DrawMarginFrame = cbDrawMarginFrame.Checked == true;
@@ -344,7 +348,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (cbDrawMarginFrame);
 
-			rbBorderStyle.SelectedItemChanged += (e) => {
+			rbBorderStyle.SelectedItemChanged += (s,e) => {
 				smartPanel.Child.Border.BorderStyle = (BorderStyle)e.SelectedItem;
 				smartLabel.Border.BorderStyle = (BorderStyle)e.SelectedItem;
 				smartLabel.SetNeedsDisplay ();
@@ -374,7 +378,7 @@ namespace UICatalog.Scenarios {
 				Y = 3,
 				Width = 5
 			};
-			effect3DOffsetX.TextChanging += (e) => {
+			effect3DOffsetX.TextChanging += (s, e) => {
 				try {
 					smartPanel.Child.Border.Effect3DOffset = new Point (int.Parse (e.NewText.ToString ()),
 						smartPanel.Child.Border.Effect3DOffset.Y);
@@ -400,7 +404,7 @@ namespace UICatalog.Scenarios {
 				Y = 3,
 				Width = 5
 			};
-			effect3DOffsetY.TextChanging += (e) => {
+			effect3DOffsetY.TextChanging += (s, e) => {
 				try {
 					smartPanel.Child.Border.Effect3DOffset = new Point (smartPanel.Child.Border.Effect3DOffset.X,
 						int.Parse (e.NewText.ToString ()));
@@ -416,7 +420,7 @@ namespace UICatalog.Scenarios {
 			effect3DOffsetY.Text = $"{smartLabel.Border.Effect3DOffset.Y}";
 			Win.Add (effect3DOffsetY);
 
-			cbEffect3D.Toggled += (e) => {
+			cbEffect3D.Toggled += (s,e) => {
 				try {
 					smartPanel.Child.Border.Effect3D = smartLabel.Border.Effect3D = effect3DOffsetX.Enabled =
 						effect3DOffsetY.Enabled = cbEffect3D.Checked == true;
@@ -435,7 +439,7 @@ namespace UICatalog.Scenarios {
 				Y = 6,
 				SelectedItem = (int)smartLabel.Border.Background
 			};
-			rbBackground.SelectedItemChanged += (e) => {
+			rbBackground.SelectedItemChanged += (s,e) => {
 				smartPanel.Child.Border.Background = smartLabel.Border.Background = (Color)e.SelectedItem;
 			};
 			Win.Add (rbBackground);
@@ -452,19 +456,14 @@ namespace UICatalog.Scenarios {
 				Y = 6,
 				SelectedItem = (int)smartLabel.Border.BorderBrush
 			};
-			rbBorderBrush.SelectedItemChanged += (e) => {
+			rbBorderBrush.SelectedItemChanged += (s,e) => {
 				smartPanel.Child.Border.BorderBrush = smartLabel.Border.BorderBrush = (Color)e.SelectedItem;
 			};
 			Win.Add (rbBorderBrush);
 
-			smartPanel.X = Pos.Left (paddingLeftEdit);
-			smartPanel.Y = Pos.Top (smartLabel);
 			Win.Add (smartPanel);
-			smartLabel.X = Pos.Left (borderLeftEdit);
-			smartLabel.Y = Pos.Bottom (cbUseUsePanelFrame) + 5;
 			Win.Add (smartLabel);
 			Win.BringSubviewToFront (smartPanel);
-
 		}
 	}
 }

@@ -96,7 +96,7 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public class ListView : View {
 		int top, left;
-		int selected;
+		int selected = -1;
 
 		IListDataSource source;
 		/// <summary>
@@ -112,7 +112,7 @@ namespace Terminal.Gui {
 				source = value;
 				KeystrokeNavigator.Collection = source?.ToList ()?.Cast<object> ();
 				top = 0;
-				selected = 0;
+				selected = -1;
 				lastSelectedItem = -1;
 				SetNeedsDisplay ();
 			}
@@ -207,7 +207,7 @@ namespace Terminal.Gui {
 
 				if (value < 0 || (source.Count > 0 && value >= source.Count))
 					throw new ArgumentException ("value");
-				top = value;
+				top = Math.Max (value, 0);
 				SetNeedsDisplay ();
 			}
 		}
@@ -244,7 +244,7 @@ namespace Terminal.Gui {
 				if (source == null || source.Count == 0) {
 					return;
 				}
-				if (value < 0 || value >= source.Count) {
+				if (value < -1 || value >= source.Count) {
 					throw new ArgumentException ("value");
 				}
 				selected = value;
@@ -395,17 +395,17 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// This event is raised when the selected item in the <see cref="ListView"/> has changed.
 		/// </summary>
-		public event Action<ListViewItemEventArgs> SelectedItemChanged;
+		public event EventHandler<ListViewItemEventArgs> SelectedItemChanged;
 
 		/// <summary>
 		/// This event is raised when the user Double Clicks on an item or presses ENTER to open the selected item.
 		/// </summary>
-		public event Action<ListViewItemEventArgs> OpenSelectedItem;
+		public event EventHandler<ListViewItemEventArgs> OpenSelectedItem;
 
 		/// <summary>
 		/// This event is invoked when this <see cref="ListView"/> is being drawn before rendering.
 		/// </summary>
-		public event Action<ListViewRowEventArgs> RowRender;
+		public event EventHandler<ListViewRowEventArgs> RowRender;
 
 		/// <summary>
 		/// Gets the <see cref="CollectionNavigator"/> that searches the <see cref="ListView.Source"/> collection as
@@ -485,7 +485,7 @@ namespace Terminal.Gui {
 				n = 0;
 			if (n != selected) {
 				selected = n;
-				top = selected;
+				top = Math.Max (selected, 0);
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
 			}
@@ -506,7 +506,7 @@ namespace Terminal.Gui {
 			if (n != selected) {
 				selected = n;
 				if (source.Count >= Frame.Height)
-					top = selected;
+					top = Math.Max (selected, 0);
 				else
 					top = 0;
 				OnSelectedChanged ();
@@ -540,9 +540,7 @@ namespace Terminal.Gui {
 				if (selected >= top + Frame.Height) {
 					top++;
 				} else if (selected < top) {
-					top = selected;
-				} else if (selected < top) {
-					top = selected;
+					top = Math.Max (selected, 0);
 				}
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
@@ -550,7 +548,7 @@ namespace Terminal.Gui {
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
 			} else if (selected >= top + Frame.Height) {
-				top = source.Count - Frame.Height;
+				top = Math.Max (source.Count - Frame.Height, 0);
 				SetNeedsDisplay ();
 			}
 
@@ -581,14 +579,14 @@ namespace Terminal.Gui {
 					selected = Source.Count - 1;
 				}
 				if (selected < top) {
-					top = selected;
+					top = Math.Max (selected, 0);
 				} else if (selected > top + Frame.Height) {
 					top = Math.Max (selected - Frame.Height + 1, 0);
 				}
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
 			} else if (selected < top) {
-				top = selected;
+				top = Math.Max (selected, 0);
 				SetNeedsDisplay ();
 			}
 			return true;
@@ -604,7 +602,7 @@ namespace Terminal.Gui {
 			if (source.Count > 0 && selected != source.Count - 1) {
 				selected = source.Count - 1;
 				if (top + selected > Frame.Height - 1) {
-					top = selected;
+					top = Math.Max (selected, 0);
 				}
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
@@ -622,7 +620,7 @@ namespace Terminal.Gui {
 		{
 			if (selected != 0) {
 				selected = 0;
-				top = selected;
+				top = Math.Max (selected, 0);
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
 			}
@@ -685,10 +683,9 @@ namespace Terminal.Gui {
 		{
 			if (selected != lastSelectedItem) {
 				var value = source?.Count > 0 ? source.ToList () [selected] : null;
-				SelectedItemChanged?.Invoke (new ListViewItemEventArgs (selected, value));
-				if (HasFocus) {
-					lastSelectedItem = selected;
-				}
+				SelectedItemChanged?.Invoke (this, new ListViewItemEventArgs (selected, value));
+				lastSelectedItem = selected;
+				EnsureSelectedItemVisible ();
 				return true;
 			}
 
@@ -707,7 +704,7 @@ namespace Terminal.Gui {
 
 			var value = source.ToList () [selected];
 
-			OpenSelectedItem?.Invoke (new ListViewItemEventArgs (selected, value));
+			OpenSelectedItem?.Invoke (this, new ListViewItemEventArgs (selected, value));
 
 			return true;
 		}
@@ -718,29 +715,20 @@ namespace Terminal.Gui {
 		/// <param name="rowEventArgs"></param>
 		public virtual void OnRowRender (ListViewRowEventArgs rowEventArgs)
 		{
-			RowRender?.Invoke (rowEventArgs);
+			RowRender?.Invoke (this, rowEventArgs);
 		}
 
 		///<inheritdoc/>
 		public override bool OnEnter (View view)
 		{
-			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-
-			if (lastSelectedItem == -1) {
+			if (IsInitialized) {
+				Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+			}
+			if (lastSelectedItem != selected) {
 				EnsureSelectedItemVisible ();
 			}
 
 			return base.OnEnter (view);
-		}
-
-		///<inheritdoc/>
-		public override bool OnLeave (View view)
-		{
-			if (lastSelectedItem > -1) {
-				lastSelectedItem = -1;
-			}
-
-			return base.OnLeave (view);
 		}
 
 		/// <summary>
@@ -750,7 +738,7 @@ namespace Terminal.Gui {
 		{
 			SuperView?.LayoutSubviews ();
 			if (selected < top) {
-				top = selected;
+				top = Math.Max (selected, 0);
 			} else if (Frame.Height > 0 && selected >= top + Frame.Height) {
 				top = Math.Max (selected - Frame.Height + 1, 0);
 			}
@@ -936,55 +924,6 @@ namespace Terminal.Gui {
 				}
 			}
 			return -1;
-		}
-	}
-
-	/// <summary>
-	/// <see cref="EventArgs"/> for <see cref="ListView"/> events.
-	/// </summary>
-	public class ListViewItemEventArgs : EventArgs {
-		/// <summary>
-		/// The index of the <see cref="ListView"/> item.
-		/// </summary>
-		public int Item { get; }
-		/// <summary>
-		/// The <see cref="ListView"/> item.
-		/// </summary>
-		public object Value { get; }
-
-		/// <summary>
-		/// Initializes a new instance of <see cref="ListViewItemEventArgs"/>
-		/// </summary>
-		/// <param name="item">The index of the <see cref="ListView"/> item.</param>
-		/// <param name="value">The <see cref="ListView"/> item</param>
-		public ListViewItemEventArgs (int item, object value)
-		{
-			Item = item;
-			Value = value;
-		}
-	}
-
-	/// <summary>
-	/// <see cref="EventArgs"/> used by the <see cref="ListView.RowRender"/> event.
-	/// </summary>
-	public class ListViewRowEventArgs : EventArgs {
-		/// <summary>
-		/// The current row being rendered.
-		/// </summary>
-		public int Row { get; }
-		/// <summary>
-		/// The <see cref="Attribute"/> used by current row or
-		/// null to maintain the current attribute.
-		/// </summary>
-		public Attribute? RowAttribute { get; set; }
-
-		/// <summary>
-		/// Initializes with the current row.
-		/// </summary>
-		/// <param name="row"></param>
-		public ListViewRowEventArgs (int row)
-		{
-			Row = row;
 		}
 	}
 }

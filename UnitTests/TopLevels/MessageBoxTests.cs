@@ -29,7 +29,7 @@ namespace Terminal.Gui.TopLevelTests {
 					Application.RequestStop ();
 
 				} else if (iterations == 1) {
-					Application.Top.Redraw (Application.Top.Bounds);
+					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
                 ┌ Title ───────────────────────────────────────┐
                 │                   Message                    │
@@ -71,7 +71,7 @@ namespace Terminal.Gui.TopLevelTests {
 
 					Application.RequestStop ();
 				} else if (iterations == 1) {
-					Application.Top.Redraw (Application.Top.Bounds);
+					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
          ┌ About UI Catalog ──────────────────────────────────────────┐
          │             A comprehensive sample library for             │
@@ -110,7 +110,7 @@ namespace Terminal.Gui.TopLevelTests {
 
 					Application.RequestStop ();
 				} else if (iterations == 1) {
-					Application.Top.Redraw (Application.Top.Bounds);
+					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
                                     ┌─────┐
                                     │Messa│
@@ -140,7 +140,7 @@ namespace Terminal.Gui.TopLevelTests {
 
 					Application.RequestStop ();
 				} else if (iterations == 1) {
-					Application.Top.Redraw (Application.Top.Bounds);
+					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
                                   ┌ Title ──┐
                                   │ Message │
@@ -157,7 +157,7 @@ namespace Terminal.Gui.TopLevelTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void MessageBox_With_A_Label_Without_Spaces ()
+		public void MessageBox_With_A_Label_Without_Spaces_WrapMessagge_True ()
 		{
 			var iterations = -1;
 			Application.Begin (Application.Top);
@@ -170,7 +170,7 @@ namespace Terminal.Gui.TopLevelTests {
 
 					Application.RequestStop ();
 				} else if (iterations == 1) {
-					Application.Top.Redraw (Application.Top.Bounds);
+					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌ mywindow ────────────────────────────────────────────────────────────────────┐
 │ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
@@ -196,8 +196,7 @@ namespace Terminal.Gui.TopLevelTests {
 │ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
 │ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff│
 │                                   [◦ ok ◦]                                   │
-└──────────────────────────────────────────────────────────────────────────────┘
-", output);
+└──────────────────────────────────────────────────────────────────────────────┘", output);
 
 					Application.RequestStop ();
 				}
@@ -207,7 +206,7 @@ namespace Terminal.Gui.TopLevelTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void MessageBox_With_A_Label_With_Spaces ()
+		public void MessageBox_With_A_Label_With_Spaces_WrapMessagge_True ()
 		{
 			var iterations = -1;
 			Application.Begin (Application.Top);
@@ -224,7 +223,7 @@ namespace Terminal.Gui.TopLevelTests {
 
 					Application.RequestStop ();
 				} else if (iterations == 1) {
-					Application.Top.Redraw (Application.Top.Bounds);
+					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌ mywindow ────────────────────────────────────────────────────────────────────┐
 │ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
@@ -250,8 +249,102 @@ namespace Terminal.Gui.TopLevelTests {
 │ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
 │ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
 │                                   [◦ ok ◦]                                   │
-└──────────────────────────────────────────────────────────────────────────────┘
-", output);
+└──────────────────────────────────────────────────────────────────────────────┘", output);
+
+					Application.RequestStop ();
+				}
+			};
+
+			Application.Run ();
+		}
+
+		[Fact, AutoInitShutdown]
+		public void MessageBox_With_A_Label_Without_Spaces_WrapMessagge_False ()
+		{
+			var iterations = -1;
+			Application.Begin (Application.Top);
+
+			Application.Iteration += () => {
+				iterations++;
+
+				if (iterations == 0) {
+					MessageBox.Query ("mywindow", new string ('f', 2000), 0, null, false, "ok");
+
+					Application.RequestStop ();
+				} else if (iterations == 1) {
+					Application.Refresh ();
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
+────────────────────────────────────────────────────────────────────────────────
+ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+                                                                                
+                                    [◦ ok ◦]                                    
+────────────────────────────────────────────────────────────────────────────────", output);
+
+					Application.RequestStop ();
+				}
+			};
+
+			Application.Run ();
+		}
+
+		[Fact, AutoInitShutdown]
+		public void MessageBox_With_A_Label_With_Spaces_WrapMessagge_False ()
+		{
+			var iterations = -1;
+			Application.Begin (Application.Top);
+
+			Application.Iteration += () => {
+				iterations++;
+
+				if (iterations == 0) {
+					var sb = new StringBuilder ();
+					for (int i = 0; i < 1000; i++)
+						sb.Append ("ff ");
+
+					MessageBox.Query ("mywindow", sb.ToString (), 0, null, false, "ok");
+
+					Application.RequestStop ();
+				} else if (iterations == 1) {
+					Application.Refresh ();
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
+────────────────────────────────────────────────────────────────────────────────
+ ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff f
+                                                                                
+                                    [◦ ok ◦]                                    
+────────────────────────────────────────────────────────────────────────────────", output);
+
+					Application.RequestStop ();
+				}
+			};
+
+			Application.Run ();
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData ("", true)]
+		[InlineData ("", false)]
+		[InlineData ("\n", true)]
+		[InlineData ("\n", false)]
+		public void MessageBox_With_A_Empty_Message_Or_A_NewLline_WrapMessagge_True_Or_False (string message, bool wrapMessage)
+		{
+			var iterations = -1;
+			Application.Begin (Application.Top);
+
+			Application.Iteration += () => {
+				iterations++;
+
+				if (iterations == 0) {
+					MessageBox.Query ("mywindow", message, 0, null, wrapMessage, "ok");
+
+					Application.RequestStop ();
+				} else if (iterations == 1) {
+					Application.Refresh ();
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
+                ┌ mywindow ────────────────────────────────────┐
+                │                                              │
+                │                                              │
+                │                   [◦ ok ◦]                   │
+                └──────────────────────────────────────────────┘", output);
 
 					Application.RequestStop ();
 				}

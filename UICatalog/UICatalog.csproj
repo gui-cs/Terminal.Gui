@@ -7,10 +7,10 @@
     <!-- Version numbers are automatically updated by gitversion when a release is released -->
     <!-- In the source tree the version will always be 2.0 for all projects. -->
     <!-- Do not modify these. -->
-    <AssemblyVersion>1.0</AssemblyVersion>
-    <FileVersion>1.0</FileVersion>
-    <Version>1.0</Version>
-    <InformationalVersion>1.0</InformationalVersion>
+    <AssemblyVersion>2.0</AssemblyVersion>
+    <FileVersion>2.0</FileVersion>
+    <Version>2.0</Version>
+    <InformationalVersion>2.0</InformationalVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DefineConstants>TRACE</DefineConstants>
@@ -28,7 +28,7 @@
   <None Update="./Scenarios/Spinning_globe_dark_small.gif" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.3" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.0.0" />
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
   </ItemGroup>

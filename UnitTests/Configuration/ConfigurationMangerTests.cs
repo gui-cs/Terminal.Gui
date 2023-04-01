@@ -182,12 +182,13 @@ namespace Terminal.Gui.ConfigurationTests {
 		/// Save the `config.json` file; this can be used to update the file in `Terminal.Gui.Resources.config.json'.
 		/// </summary>
 		/// <remarks>
-		/// IMPORTANT: For the file generated to be valid, this must be the ONLY test run. Conifg Properties
-		/// are all satic and thus can be overwritten by other tests.</remarks>
+		/// IMPORTANT: For the file generated to be valid, this must be the ONLY test run. Config Properties
+		/// are all static and thus can be overwritten by other tests.</remarks>
 		[Fact]
 		public void SaveDefaults ()
 		{
 			ConfigurationManager.Initialize ();
+			ConfigurationManager.Reset ();
 
 			// Get the hard coded settings
 			ConfigurationManager.GetHardCodedDefaults ();
@@ -226,7 +227,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
 			ConfigurationManager.Settings ["Application.UseSystemConsole"].PropertyValue = true;
 			ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue = true;
-			ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue = true;
+			ConfigurationManager.Settings ["Application.EnableConsoleScrolling"].PropertyValue = true;
 			ConfigurationManager.Settings.Apply ();
 
 			// assert apply worked
@@ -235,7 +236,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Key.B, Application.AlternateBackwardKey);
 			Assert.True (Application.UseSystemConsole);
 			Assert.True (Application.IsMouseDisabled);
-			Assert.True (Application.HeightAsBuffer);
+			Assert.True (Application.EnableConsoleScrolling);
 
 			//act
 			ConfigurationManager.Reset ();
@@ -248,7 +249,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Key.PageUp | Key.CtrlMask, Application.AlternateBackwardKey);
 			Assert.False (Application.UseSystemConsole);
 			Assert.False (Application.IsMouseDisabled);
-			Assert.False (Application.HeightAsBuffer);
+			Assert.False (Application.EnableConsoleScrolling);
 
 			// arrange
 			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = Key.Q;
@@ -256,7 +257,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
 			ConfigurationManager.Settings ["Application.UseSystemConsole"].PropertyValue = true;
 			ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue = true;
-			ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue = true;
+			ConfigurationManager.Settings ["Application.EnableConsoleScrolling"].PropertyValue = true;
 			ConfigurationManager.Settings.Apply ();
 
 
@@ -274,7 +275,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Key.PageUp | Key.CtrlMask, Application.AlternateBackwardKey);
 			Assert.False (Application.UseSystemConsole);
 			Assert.False (Application.IsMouseDisabled);
-			Assert.False (Application.HeightAsBuffer);
+			Assert.False (Application.EnableConsoleScrolling);
 
 		}
 
@@ -316,12 +317,11 @@ namespace Terminal.Gui.ConfigurationTests {
 		[Fact, AutoInitShutdown]
 		public void TestConfigurationManagerToJson ()
 		{
+			ConfigurationManager.Reset ();
 			ConfigurationManager.GetHardCodedDefaults ();
 			var stream = ConfigurationManager.ToStream ();
-
 			
 			ConfigurationManager.Settings.Update (stream, "TestConfigurationManagerToJson");
-
 		}
 
 		[Fact, AutoInitShutdown (configLocation: ConfigLocations.None)]
@@ -771,11 +771,11 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
 			ConfigurationManager.Settings ["Application.UseSystemConsole"].PropertyValue = true;
 			ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue = true;
-			ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue = true;
+			ConfigurationManager.Settings ["Application.EnableConsoleScrolling"].PropertyValue = true;
 
 			ConfigurationManager.Updated += ConfigurationManager_Updated;
 			bool fired = false;
-			void ConfigurationManager_Updated (ConfigurationManager.ConfigurationManagerEventArgs obj)
+			void ConfigurationManager_Updated (object sender, ConfigurationManagerEventArgs obj)
 			{
 				fired = true;
 				// assert
@@ -784,7 +784,7 @@ namespace Terminal.Gui.ConfigurationTests {
 				Assert.Equal (Key.PageUp | Key.CtrlMask, ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue);
 				Assert.False ((bool)ConfigurationManager.Settings ["Application.UseSystemConsole"].PropertyValue);
 				Assert.False ((bool)ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue);
-				Assert.False ((bool)ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue);
+				Assert.False ((bool)ConfigurationManager.Settings ["Application.EnableConsoleScrolling"].PropertyValue);
 			}
 
 			ConfigurationManager.Load (true);
@@ -801,7 +801,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.Reset ();
 			ConfigurationManager.Applied += ConfigurationManager_Applied;
 			bool fired = false;
-			void ConfigurationManager_Applied (ConfigurationManager.ConfigurationManagerEventArgs obj)
+			void ConfigurationManager_Applied (object sender, ConfigurationManagerEventArgs obj)
 			{
 				fired = true;
 				// assert
@@ -810,7 +810,7 @@ namespace Terminal.Gui.ConfigurationTests {
 				Assert.Equal (Key.B, Application.AlternateBackwardKey);
 				Assert.True (Application.UseSystemConsole);
 				Assert.True (Application.IsMouseDisabled);
-				Assert.True (Application.HeightAsBuffer);
+				Assert.True (Application.EnableConsoleScrolling);
 			}
 
 			// act
@@ -819,7 +819,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
 			ConfigurationManager.Settings ["Application.UseSystemConsole"].PropertyValue = true;
 			ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue = true;
-			ConfigurationManager.Settings ["Application.HeightAsBuffer"].PropertyValue = true;
+			ConfigurationManager.Settings ["Application.EnableConsoleScrolling"].PropertyValue = true;
 
 			ConfigurationManager.Apply ();
 

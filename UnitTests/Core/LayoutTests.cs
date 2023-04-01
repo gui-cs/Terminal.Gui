@@ -47,8 +47,58 @@ namespace Terminal.Gui.CoreTests {
 			Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
 		}
 
+		[Fact]
+		public void LayoutSubviews_No_SuperView ()
+		{
+			var root = new View ();
+			var first = new View () { Id = "first", X = 1, Y = 2, Height = 3, Width = 4 };
+			root.Add (first);
+
+			var second = new View () { Id = "second" };
+			root.Add (second);
+
+			second.X = Pos.Right (first) + 1;
+
+			root.LayoutSubviews ();
+			
+			Assert.Equal (6, second.Frame.X);
+		}
+
+		[Fact]
+		public void LayoutSubviews_RootHas_SuperView ()
+		{
+			var top = new View ();
+			var root = new View ();
+			top.Add (root);
+
+			var first = new View () { Id = "first", X = 1, Y = 2, Height = 3, Width = 4 };
+			root.Add (first);
+
+			var second = new View () { Id = "second" };
+			root.Add (second);
+
+			second.X = Pos.Right (first) + 1;
+
+			root.LayoutSubviews ();
+
+			Assert.Equal (6, second.Frame.X);
+		}
+
+
+		[Fact]
+		public void LayoutSubviews_ViewThatRefsSuperView_Throws ()
+		{
+			var root = new View ();
+			var super = new View ();
+			root.Add (super);
+			var sub = new View ();
+			super.Add (sub);
+			super.Width = Dim.Width (sub);
+			Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
+		}
+
 		[Fact, AutoInitShutdown]
-		public void SetWidth_CanSetWidth_ForceValidatePosDim ()
+		public void TrySetWidth_ForceValidatePosDim ()
 		{
 			var top = new View () {
 				X = 0,
@@ -62,15 +112,15 @@ namespace Terminal.Gui.CoreTests {
 			};
 			top.Add (v);
 
-			Assert.False (v.SetWidth (70, out int rWidth));
+			Assert.False (v.TrySetWidth (70, out int rWidth));
 			Assert.Equal (70, rWidth);
 
 			v.Width = Dim.Fill (1);
-			Assert.False (v.SetWidth (70, out rWidth));
+			Assert.False (v.TrySetWidth (70, out rWidth));
 			Assert.Equal (69, rWidth);
 
 			v.Width = null;
-			Assert.True (v.SetWidth (70, out rWidth));
+			Assert.True (v.TrySetWidth (70, out rWidth));
 			Assert.Equal (70, rWidth);
 			Assert.False (v.IsInitialized);
 
@@ -82,12 +132,12 @@ namespace Terminal.Gui.CoreTests {
 			Assert.Throws<ArgumentException> (() => v.Width = 75);
 			v.LayoutStyle = LayoutStyle.Absolute;
 			v.Width = 75;
-			Assert.True (v.SetWidth (60, out rWidth));
+			Assert.True (v.TrySetWidth (60, out rWidth));
 			Assert.Equal (60, rWidth);
 		}
 
 		[Fact, AutoInitShutdown]
-		public void SetHeight_CanSetHeight_ForceValidatePosDim ()
+		public void TrySetHeight_ForceValidatePosDim ()
 		{
 			var top = new View () {
 				X = 0,
@@ -101,15 +151,15 @@ namespace Terminal.Gui.CoreTests {
 			};
 			top.Add (v);
 
-			Assert.False (v.SetHeight (10, out int rHeight));
+			Assert.False (v.TrySetHeight (10, out int rHeight));
 			Assert.Equal (10, rHeight);
 
 			v.Height = Dim.Fill (1);
-			Assert.False (v.SetHeight (10, out rHeight));
+			Assert.False (v.TrySetHeight (10, out rHeight));
 			Assert.Equal (9, rHeight);
 
 			v.Height = null;
-			Assert.True (v.SetHeight (10, out rHeight));
+			Assert.True (v.TrySetHeight (10, out rHeight));
 			Assert.Equal (10, rHeight);
 			Assert.False (v.IsInitialized);
 
@@ -122,12 +172,12 @@ namespace Terminal.Gui.CoreTests {
 			Assert.Throws<ArgumentException> (() => v.Height = 15);
 			v.LayoutStyle = LayoutStyle.Absolute;
 			v.Height = 15;
-			Assert.True (v.SetHeight (5, out rHeight));
+			Assert.True (v.TrySetHeight (5, out rHeight));
 			Assert.Equal (5, rHeight);
 		}
 
 		[Fact]
-		public void GetCurrentWidth_CanSetWidth ()
+		public void GetCurrentWidth_TrySetWidth ()
 		{
 			var top = new View () {
 				X = 0,
@@ -139,23 +189,27 @@ namespace Terminal.Gui.CoreTests {
 				Width = Dim.Fill ()
 			};
 			top.Add (v);
+			top.LayoutSubviews ();
 
 			Assert.False (v.AutoSize);
-			Assert.True (v.GetCurrentWidth (out int cWidth));
-			Assert.Equal (80, cWidth);
+			Assert.True (v.TrySetWidth (0, out _));
+			Assert.Equal (80, v.Frame.Width);
 
 			v.Width = Dim.Fill (1);
-			Assert.True (v.GetCurrentWidth (out cWidth));
-			Assert.Equal (79, cWidth);
+			top.LayoutSubviews ();
+
+			Assert.True (v.TrySetWidth (0, out _));
+			Assert.Equal (79, v.Frame.Width);
 
 			v.AutoSize = true;
+			top.LayoutSubviews ();
 
-			Assert.True (v.GetCurrentWidth (out cWidth));
-			Assert.Equal (79, cWidth);
+			Assert.True (v.TrySetWidth (0, out _));
+			Assert.Equal (79, v.Frame.Width);
 		}
 
 		[Fact]
-		public void GetCurrentHeight_CanSetHeight ()
+		public void GetCurrentHeight_TrySetHeight ()
 		{
 			var top = new View () {
 				X = 0,
@@ -167,19 +221,23 @@ namespace Terminal.Gui.CoreTests {
 				Height = Dim.Fill ()
 			};
 			top.Add (v);
+			top.LayoutSubviews ();
 
 			Assert.False (v.AutoSize);
-			Assert.True (v.GetCurrentHeight (out int cHeight));
-			Assert.Equal (20, cHeight);
+			Assert.True (v.TrySetHeight (0, out _));
+			Assert.Equal (20, v.Frame.Height);
 
 			v.Height = Dim.Fill (1);
-			Assert.True (v.GetCurrentHeight (out cHeight));
-			Assert.Equal (19, cHeight);
+			top.LayoutSubviews ();
+
+			Assert.True (v.TrySetHeight (0, out _));
+			Assert.Equal (19, v.Frame.Height);
 
 			v.AutoSize = true;
+			top.LayoutSubviews ();
 
-			Assert.True (v.GetCurrentHeight (out cHeight));
-			Assert.Equal (19, cHeight);
+			Assert.True (v.TrySetHeight (0, out _));
+			Assert.Equal (19, v.Frame.Height);
 		}
 
 		[Fact]
@@ -328,12 +386,15 @@ namespace Terminal.Gui.CoreTests {
 			Application.Begin (Application.Top);
 
 			Assert.True (label.AutoSize);
+			// Here the AutoSize ensuring the right size with width 28 (Dim.Fill)
+			// and height 0 because wasn't set and the text is empty
 			Assert.Equal ("{X=0,Y=0,Width=28,Height=0}", label.Bounds.ToString ());
 
 			label.Text = "First line\nSecond line";
 			Application.Refresh ();
 
-			// Here the AutoSize ensuring the right size
+			// Here the AutoSize ensuring the right size with width 28 (Dim.Fill)
+			// and height 2 because wasn't set and the text has 2 lines
 			Assert.True (label.AutoSize);
 			Assert.Equal ("{X=0,Y=0,Width=28,Height=2}", label.Bounds.ToString ());
 
@@ -347,12 +408,16 @@ namespace Terminal.Gui.CoreTests {
 			label.Text = "First changed line\nSecond changed line\nNew line";
 			Application.Refresh ();
 
+			// Here the AutoSize is false and the width 28 (Dim.Fill) and
+			// height 1 because wasn't set and SetMinWidthHeight ensuring the minimum height
 			Assert.False (label.AutoSize);
 			Assert.Equal ("{X=0,Y=0,Width=28,Height=1}", label.Bounds.ToString ());
 
 			label.AutoSize = true;
 			Application.Refresh ();
 
+			// Here the AutoSize ensuring the right size with width 28 (Dim.Fill)
+			// and height 3 because wasn't set and the text has 3 lines
 			Assert.True (label.AutoSize);
 			Assert.Equal ("{X=0,Y=0,Width=28,Height=3}", label.Bounds.ToString ());
 		}
@@ -461,9 +526,14 @@ Y
 			Assert.Equal ("123 ", GetContents ());
 
 			lbl.Text = "12";
-
-			lbl.SuperView.Redraw (lbl.SuperView.NeedDisplay);
-
+			// Here the AutoSize ensuring the right size with width 3 (Dim.Absolute)
+			// that was set on the OnAdded method with the text length of 3
+			// and height 1 because wasn't set and the text has 1 line
+			Assert.Equal (new Rect (0, 0, 3, 1), lbl.Frame);
+			Assert.Equal (new Rect (0, 0, 3, 1), lbl.NeedDisplay);
+			Assert.Equal (new Rect (0, 0, 0, 0), lbl.SuperView.NeedDisplay);
+			Assert.True (lbl.SuperView.LayoutNeeded);
+			lbl.SuperView.Redraw (lbl.SuperView.Bounds);
 			Assert.Equal ("12  ", GetContents ());
 
 			string GetContents ()
