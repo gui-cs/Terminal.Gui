@@ -48,12 +48,13 @@ namespace Terminal.Gui.ViewTests {
 			Assert.NotSame(tf,Application.Top.Focused);
         }
 
-		        [Fact, AutoInitShutdown]
+		[Fact, AutoInitShutdown]
         public void TestAutoAppend_AfterCloseKey_NoAutocomplete()
         {
-			var tf = GetTextFieldsInViewSuggestingFish();
+			var tf = GetTextFieldsInViewSuggesting("fish");
 
 			// f is typed and suggestion is "fish"
+			Application.Driver.SendKeys('f',ConsoleKey.F,false,false,false);
 			tf.Redraw(tf.Bounds);
 			TestHelpers.AssertDriverContentsAre("fish",output);
 			Assert.Equal("f",tf.Text.ToString());
@@ -74,23 +75,71 @@ namespace Terminal.Gui.ViewTests {
 			Assert.NotSame(tf,Application.Top.Focused);
         }
 
-		private TextField GetTextFieldsInViewSuggestingFish ()
+		[Fact, AutoInitShutdown]
+        public void TestAutoAppend_AfterCloseKey_ReapearsOnLetter()
+        {
+			var tf = GetTextFieldsInViewSuggesting("fish");
+
+			// f is typed and suggestion is "fish"
+			Application.Driver.SendKeys('f',ConsoleKey.F,false,false,false);
+			tf.Redraw(tf.Bounds);
+			TestHelpers.AssertDriverContentsAre("fish",output);
+			Assert.Equal("f",tf.Text.ToString());
+
+			// When cancelling autocomplete
+			Application.Driver.SendKeys('e',ConsoleKey.Escape,false,false,false);
+
+			// Suggestion should disapear
+			tf.Redraw(tf.Bounds);
+			TestHelpers.AssertDriverContentsAre("f",output);
+			Assert.Equal("f",tf.Text.ToString());
+
+			// Should reapear when you press next letter
+			Application.Driver.SendKeys('i',ConsoleKey.I,false,false,false);
+			tf.Redraw(tf.Bounds);
+			TestHelpers.AssertDriverContentsAre("fish",output);
+			Assert.Equal("fi",tf.Text.ToString());
+        }
+
+
+		[Theory, AutoInitShutdown]
+		[InlineData(ConsoleKey.UpArrow)]
+		[InlineData(ConsoleKey.DownArrow)]
+        public void TestAutoAppend_CycleSelections(ConsoleKey cycleKey)
+        {
+			var tf = GetTextFieldsInViewSuggesting("fish","friend");
+
+			// f is typed and suggestion is "fish"
+			Application.Driver.SendKeys('f',ConsoleKey.F,false,false,false);
+			tf.Redraw(tf.Bounds);
+			TestHelpers.AssertDriverContentsAre("fish",output);
+			Assert.Equal("f",tf.Text.ToString());
+
+			// When cycling autocomplete
+			Application.Driver.SendKeys(' ',cycleKey,false,false,false);
+
+			tf.Redraw(tf.Bounds);
+			TestHelpers.AssertDriverContentsAre("friend",output);
+			Assert.Equal("f",tf.Text.ToString());
+
+			// Should be able to cycle in circles endlessly
+			Application.Driver.SendKeys(' ',cycleKey,false,false,false);
+			tf.Redraw(tf.Bounds);
+			TestHelpers.AssertDriverContentsAre("fish",output);
+			Assert.Equal("f",tf.Text.ToString());
+        }
+
+		private TextField GetTextFieldsInViewSuggesting (params string[] suggestions)
 		{
 			var tf = GetTextFieldsInView();
 			
 			tf.Autocomplete = new AppendAutocomplete(tf);
 			var generator = (SingleWordSuggestionGenerator)tf.Autocomplete.SuggestionGenerator;
-			generator.AllSuggestions = new List<string>{"fish"};
+			generator.AllSuggestions = suggestions.ToList();
 
 			tf.Redraw(tf.Bounds);
 			TestHelpers.AssertDriverContentsAre("",output);
-
-			tf.ProcessKey(new KeyEvent(Key.f,new KeyModifiers()));
-
-			tf.Redraw(tf.Bounds);
-			TestHelpers.AssertDriverContentsAre("fish",output);
-			Assert.Equal("f",tf.Text.ToString());
-
+			
 			return tf;
 		}
 
