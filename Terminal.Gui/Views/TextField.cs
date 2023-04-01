@@ -30,6 +30,19 @@ namespace Terminal.Gui {
 		CultureInfo currentCulture;
 
 		/// <summary>
+		/// Gets or sets the text to render in control when no value has 
+		/// been entered yet and the <see cref="View"/> does not yet have
+		/// input focus.
+		/// </summary>
+		public ustring Caption {get;set;}
+
+		/// <summary>
+		/// Gets or sets the foreground <see cref="Color"/> to use when 
+		/// rendering <see cref="Caption"/>.
+		/// </summary>
+		public Color CaptionColor {get;set;} = Color.DarkGray;
+
+		/// <summary>
 		/// Tracks whether the text field should be considered "used", that is, that the user has moved in the entry, so new input should be appended at the cursor position, rather than clearing the entry
 		/// </summary>
 		public bool Used { get; set; }
@@ -468,6 +481,8 @@ namespace Terminal.Gui {
 
 			PositionCursor ();
 
+			RenderCaption();
+			
 			if (SelectedLength > 0)
 				return;
 
@@ -479,6 +494,27 @@ namespace Terminal.Gui {
 				CursorPosition - ScrollOffset, 0);
 
 			Autocomplete.RenderOverlay (renderAt);
+		}
+
+		private void RenderCaption ()
+		{
+			
+			if (HasFocus || Caption == null || Caption.Length == 0
+				|| Text?.Length > 0) {
+				return;
+			}
+
+			var color = new Attribute (CaptionColor, GetNormalColor ().Background);
+			Driver.SetAttribute (color);
+
+			Move (0, 0);
+			var render = Caption;
+
+			if (render.ConsoleWidth > Bounds.Width) {
+				render = render.RuneSubstring (0, Bounds.Width);
+			}
+
+			Driver.AddStr (render);
 		}
 
 		private void GenerateSuggestions ()

@@ -35,7 +35,7 @@ namespace UICatalog.Scenarios {
 
 			var jumpLabel = new Label ("Jump To Glyph:") { X = Pos.Right (_charMap) + 1, Y = Pos.Y (_charMap) };
 			Win.Add (jumpLabel);
-			var jumpEdit = new TextField () { X = Pos.Right (jumpLabel) + 1, Y = Pos.Y (_charMap), Width = 10, };
+			var jumpEdit = new TextField () { X = Pos.Right (jumpLabel) + 1, Y = Pos.Y (_charMap), Width = 10, Caption = "e.g. 01BE3"};
 			Win.Add (jumpEdit);
 			var unicodeLabel = new Label ("") { X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap) };
 			Win.Add (unicodeLabel);
