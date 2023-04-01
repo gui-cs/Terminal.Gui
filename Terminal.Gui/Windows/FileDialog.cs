@@ -11,7 +11,6 @@ using NStack;
 using Terminal.Gui.FileServices;
 using Terminal.Gui.Resources;
 using Terminal.Gui.Trees;
-using Terminal.Gui.Views;
 using static System.Environment;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 
@@ -87,7 +86,7 @@ namespace Terminal.Gui {
 		internal object onlyOneSearchLock = new object ();
 
 		private bool disposed = false;
-		private TextFieldWithAppendAutocomplete tbPath;
+		private TextField tbPath;
 
 		private FileDialogSorter sorter;
 		private FileDialogHistory history;
@@ -106,8 +105,8 @@ namespace Terminal.Gui {
 
 		private CollectionNavigator collectionNavigator = new CollectionNavigator ();
 
-		private CaptionedTextField tbFind;
-		private SpinnerLabel spinnerLabel;
+		private TextField tbFind;
+		private SpinnerView spinnerView;
 		private MenuBar allowedTypeMenuBar;
 		private MenuBarItem allowedTypeMenu;
 		private MenuItem [] allowedTypeMenuItems;
@@ -182,7 +181,7 @@ namespace Terminal.Gui {
 			btnForward.Text = "-▶";
 			this.btnForward.Clicked += (s, e) => this.history.Forward ();
 
-			this.tbPath = new TextFieldWithAppendAutocomplete {
+			this.tbPath = new TextField {
 				Width = Dim.Fill (1),
 				Caption = Style.PathCaption,
 				CaptionColor = Color.DarkGray,
@@ -191,10 +190,6 @@ namespace Terminal.Gui {
 				ClearFeedback ();
 
 				this.NavigateIf (k, Key.CursorDown, this.tableView);
-
-				if (this.tbPath.CursorIsAtEnd ()) {
-					this.NavigateIf (k, Key.CursorRight, this.btnOk);
-				}
 
 				this.AcceptIf (k, Key.Enter);
 
@@ -267,17 +262,15 @@ namespace Terminal.Gui {
 			};
 
 
-			tbFind = new CaptionedTextField {
+			tbFind = new TextField {
 				X = Pos.Right (this.btnToggleSplitterCollapse) + 1,
 				Caption = Style.SearchCaption,
 				Width = 16,
 				Y = Pos.AnchorEnd (1),
 			};
-			spinnerLabel = new SpinnerLabel () {
+			spinnerView = new SpinnerView () {
 				X = Pos.Right (tbFind) + 1,
 				Y = Pos.AnchorEnd (1),
-				Width = 1,
-				Height = 1,
 				Visible = false,
 			};
 
@@ -343,7 +336,7 @@ namespace Terminal.Gui {
 			// Determines tab order
 			this.Add (this.btnToggleSplitterCollapse);
 			this.Add (this.tbFind);
-			this.Add (this.spinnerLabel);
+			this.Add (this.spinnerView);
 			this.Add (this.btnOk);
 			this.Add (this.btnCancel);
 			this.Add (this.btnUp);
@@ -519,7 +512,7 @@ namespace Terminal.Gui {
 			get => this.tbPath.Text.ToString ();
 			set {
 				this.tbPath.Text = value;
-				this.tbPath.MoveCursorToEnd ();
+				this.tbPath.MoveEnd ();
 			}
 		}
 
@@ -725,7 +718,7 @@ namespace Terminal.Gui {
 			this.CurrentFilter = allow;
 
 			this.tbPath.ClearAllSelection ();
-			this.tbPath.ClearSuggestions ();
+			this.tbPath.Autocomplete.ClearSuggestions ();
 
 			if (this.State != null) {
 				this.State.RefreshChildren ();
@@ -845,7 +838,7 @@ namespace Terminal.Gui {
 
 				to.FocusFirst ();
 				if (to == tbPath) {
-					tbPath.MoveCursorToEnd ();
+					tbPath.MoveEnd ();
 				}
 				return true;
 			}
@@ -895,9 +888,9 @@ namespace Terminal.Gui {
 			try {
 				this.pushingState = true;
 
-				this.tbPath.SetTextTo (dest);
+				this.tbPath.Text = dest.FullName;
 				this.State.Selected = stats;
-				this.tbPath.ClearSuggestions ();
+				this.tbPath.Autocomplete.ClearSuggestions ();
 
 			} finally {
 
@@ -1124,15 +1117,16 @@ namespace Terminal.Gui {
 					this.history.Push (this.State, clearForward);
 				}
 
-				this.tbPath.ClearSuggestions ();
+				this.tbPath.Autocomplete.ClearSuggestions ();
 
 				if (setPathText) {
 					this.tbPath.Text = newState.Directory.FullName;
-					this.tbPath.MoveCursorToEnd ();
+					this.tbPath.MoveEnd ();
 				}
 
 				this.State = newState;
-				this.tbPath.GenerateSuggestions (this.State);
+				this.tbPath.Autocomplete.GenerateSuggestions (
+					new AutocompleteFilepathContext(this.State));
 
 				this.WriteStateToTableView ();
 
@@ -1272,7 +1266,7 @@ namespace Terminal.Gui {
 				this.PushState (dir.Parent, true, false);
 			}
 
-			tbPath.GenerateSuggestions (State);
+			tbPath.Autocomplete.GenerateSuggestions (new AutocompleteFilepathContext(State));
 		}
 
 		private DirectoryInfo StringToDirectoryInfo (string path)
@@ -1531,7 +1525,7 @@ namespace Terminal.Gui {
 					}
 
 					Application.MainLoop.Invoke (() => {
-						Parent.spinnerLabel.Visible = false;
+						Parent.spinnerView.Visible = false;
 					});
 				}
 			}
@@ -1543,11 +1537,13 @@ namespace Terminal.Gui {
 				}
 
 				Application.MainLoop.Invoke (() => {
-					Parent.tbPath.GenerateSuggestions (this);
+					Parent.tbPath.Autocomplete.GenerateSuggestions (
+						new AutocompleteFilepathContext(this)
+						);
 					Parent.WriteStateToTableView ();
 
-					Parent.spinnerLabel.Visible = true;
-					Parent.spinnerLabel.SetNeedsDisplay ();
+					Parent.spinnerView.Visible = true;
+					Parent.spinnerView.SetNeedsDisplay ();
 				});
 			}
 

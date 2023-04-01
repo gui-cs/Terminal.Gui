@@ -787,7 +787,10 @@ namespace Terminal.Gui {
 			Adjust ();
 		}
 
-		void MoveEnd ()
+		/// <summary>
+		/// Moves cursor to the end of the typed text.
+		/// </summary>
+		public void MoveEnd ()
 		{
 			ClearAllSelection ();
 			point = text.Count;

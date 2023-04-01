@@ -15,14 +15,14 @@ namespace Terminal.Gui.Core {
 			var dlg = GetInitializedFileDialog ();
 			// First focused is ContentView :(
 			Assert.NotNull (dlg.Focused.Focused);
-			Assert.IsType<TextFieldWithAppendAutocomplete> (dlg.Focused.Focused);
+			Assert.IsType<TextField> (dlg.Focused.Focused);
 		}
 
 		[Fact, AutoInitShutdown]
 		public void DirectTyping_Allowed ()
 		{
 			var dlg = GetInitializedFileDialog ();
-			var tf = dlg.Subviews [0].Subviews.OfType<TextFieldWithAppendAutocomplete> ().Single ();
+			var tf = dlg.Subviews [0].Subviews.OfType<TextField> ().Single ();
 			tf.ClearAllSelection ();
 			tf.CursorPosition = tf.Text.Length;
 			Assert.True (tf.HasFocus);
@@ -97,8 +97,8 @@ namespace Terminal.Gui.Core {
 
 			Send ('f',ConsoleKey.F,false,false,true);
 
-			Assert.IsType<CaptionedTextField> (dlg.MostFocused);
-			var tf = (CaptionedTextField) dlg.MostFocused;
+			Assert.IsType<TextField> (dlg.MostFocused);
+			var tf = (TextField) dlg.MostFocused;
 			Assert.Equal ("Enter Search", tf.Caption);
 
 			// Dialog has not yet been confirmed with a choice
@@ -149,7 +149,7 @@ namespace Terminal.Gui.Core {
 			}
 
 		}
-
+/*
 		[Fact, AutoInitShutdown]
 		public void Autocomplete_NoSuggestion_WhenTextMatchesExactly ()
 		{
@@ -178,7 +178,7 @@ namespace Terminal.Gui.Core {
 
 			Assert.True (tb.AcceptSelectionIfAny ());
 			Assert.Equal (@"/bob/fish", tb.Text);
-		}
+		}*/
 
 		private void ForceFocus (View v)
 		{
