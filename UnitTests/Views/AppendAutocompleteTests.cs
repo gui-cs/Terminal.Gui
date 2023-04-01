@@ -104,7 +104,8 @@ namespace Terminal.Gui.ViewTests {
 
 		[Theory, AutoInitShutdown]
 		[InlineData("ffffffffffffffffffffffffff","ffffffffff")]
-		[InlineData("fffffffffff","ffffffffff")]
+		[InlineData("f234567890","f234567890")]
+		[InlineData("fisérables","fisérables")]
         public void TestAutoAppendRendering_ShouldNotOverspill(string overspillUsing,string expectRender)
         {
 			var tf = GetTextFieldsInViewSuggesting(overspillUsing);
@@ -143,6 +144,47 @@ namespace Terminal.Gui.ViewTests {
 			TestHelpers.AssertDriverContentsAre("fish",output);
 			Assert.Equal("f",tf.Text.ToString());
         }
+
+		[Fact, AutoInitShutdown]
+        public void TestAutoAppend_NoRender_WhenNoMatch()
+        {
+			var tf = GetTextFieldsInViewSuggesting("fish");
+
+			// f is typed and suggestion is "fish"
+			Application.Driver.SendKeys('f',ConsoleKey.F,false,false,false);
+			tf.Redraw(tf.Bounds);
+			TestHelpers.AssertDriverContentsAre("fish",output);
+			Assert.Equal("f",tf.Text.ToString());
+
+			// x is typed and suggestion should disapear
+			Application.Driver.SendKeys('x',ConsoleKey.F,false,false,false);
+			tf.Redraw(tf.Bounds);
+			TestHelpers.AssertDriverContentsAre("fx",output);
+			Assert.Equal("fx",tf.Text.ToString());
+        }
+
+
+		[Fact, AutoInitShutdown]
+        public void TestAutoAppend_NoRender_WhenCursorNotAtEnd()
+        {
+			var tf = GetTextFieldsInViewSuggesting("fish");
+
+			// f is typed and suggestion is "fish"
+			Application.Driver.SendKeys('f',ConsoleKey.F,false,false,false);
+			tf.Redraw(tf.Bounds);
+			TestHelpers.AssertDriverContentsAre("fish",output);
+			Assert.Equal("f",tf.Text.ToString());
+
+			// add a space then go back 1
+			Application.Driver.SendKeys(' ',ConsoleKey.Spacebar,false,false,false);
+			Application.Driver.SendKeys('<',ConsoleKey.LeftArrow,false,false,false);
+
+			tf.Redraw(tf.Bounds);
+			TestHelpers.AssertDriverContentsAre("f",output);
+			Assert.Equal("f ",tf.Text.ToString());
+        }
+
+
 
 		private TextField GetTextFieldsInViewSuggesting (params string[] suggestions)
 		{
