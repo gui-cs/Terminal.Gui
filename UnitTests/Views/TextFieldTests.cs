@@ -1541,7 +1541,7 @@ Les Miśerables", output);
 			Assert.Same(tf,top.Focused);
 
 			return tf;
-    }
+    	}
 
 		[Fact]
 		public void OnEnter_Does_Not_Throw_If_Not_IsInitialized_SetCursorVisibility ()
