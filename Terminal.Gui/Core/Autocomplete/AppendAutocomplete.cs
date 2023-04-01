@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -75,6 +76,18 @@ namespace Terminal.Gui {
 
 			var suggestion = this.Suggestions.ElementAt (this.SelectedIdx);
 			var fragment = suggestion.Replacement.Substring (suggestion.Remove);
+
+			int spaceAvailable = textField.Bounds.Width - textField.Text.ConsoleWidth;
+			int spaceRequired = fragment.Sum(c=>Rune.ColumnWidth(c));
+
+			if(spaceAvailable < spaceRequired)
+			{
+				fragment = new string(
+					fragment.TakeWhile(c=> (spaceAvailable -= Rune.ColumnWidth(c)) >= 0)
+					.ToArray()
+				);
+			}
+
 			Application.Driver.AddStr (fragment);
 		}
 

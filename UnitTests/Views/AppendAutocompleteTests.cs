@@ -103,6 +103,21 @@ namespace Terminal.Gui.ViewTests {
 
 
 		[Theory, AutoInitShutdown]
+		[InlineData("ffffffffffffffffffffffffff","ffffffffff")]
+		[InlineData("fffffffffff","ffffffffff")]
+        public void TestAutoAppendRendering_ShouldNotOverspill(string overspillUsing,string expectRender)
+        {
+			var tf = GetTextFieldsInViewSuggesting(overspillUsing);
+
+			// f is typed we should only see 'f' up to size of View (10)
+			Application.Driver.SendKeys('f',ConsoleKey.F,false,false,false);
+			tf.Redraw(tf.Bounds);
+			TestHelpers.AssertDriverContentsAre(expectRender,output);
+			Assert.Equal("f",tf.Text.ToString());
+        }
+
+
+		[Theory, AutoInitShutdown]
 		[InlineData(ConsoleKey.UpArrow)]
 		[InlineData(ConsoleKey.DownArrow)]
         public void TestAutoAppend_CycleSelections(ConsoleKey cycleKey)
