@@ -12,6 +12,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		IEnumerable<Suggestion> GenerateSuggestions (AutocompleteContext context);
 
+
+		/// <summary>
+		/// Returns <see langword="true"/> if <paramref name="rune"/> is a character that
+		/// would continue autocomplete suggesting. Returns <see langword="false"/> if it
+		/// is a 'breaking' character (i.e. terminating current word boundary)
+		/// </summary>
 		bool IsWordChar (Rune rune);
 
 	}

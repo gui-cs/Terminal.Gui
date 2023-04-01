@@ -1,23 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using Rune = System.Rune;
 
 namespace Terminal.Gui {
-	public class AutocompleteContext
-	{
-		public List<Rune> CurrentLine { get; set; }
-		public int Idx { get; set; }
 
-		public AutocompleteContext (List<Rune> currentLine, int idx)
-		{
-			CurrentLine = currentLine;
-			Idx = idx;
-		}
-	}
-
+	/// <summary>
+	/// Abstract implementation of <see cref="IAutocomplete"/> allows
+	/// for tailoring how autocomplete is rendered/interacted with.
+	/// </summary>
 	public abstract class AutocompleteBase : IAutocomplete {
 
 		/// <inheritdoc/>
@@ -25,6 +15,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public bool PopupInsideContainer { get; set; }
 
+		/// <inheritdoc/>
 		public ISuggestionGenerator SuggestionGenerator { get; set; } = new SingleWordSuggestionGenerator ();
 
 		/// <inheritdoc/>

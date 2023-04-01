@@ -48,7 +48,7 @@ namespace Terminal.Gui {
 		int SelectedIdx { get; set; }
 
 		/// <summary>
-		/// The colors to use to render the overlay.  Accessing this property before
+		/// The colors to use to render the overlay. Accessing this property before
 		/// the Application has been initialized will cause an error
 		/// </summary>
 		ColorScheme ColorScheme { get; set; }
@@ -100,6 +100,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		void ClearSuggestions ();
 
+
+		/// <summary>
+		/// Gets or Sets the class responsible for generating <see cref="Suggestions"/>
+		/// based on a given <see cref="AutocompleteContext"/> of the <see cref="HostControl"/>.
+		/// </summary>
 		ISuggestionGenerator SuggestionGenerator { get; set; }
 
 

@@ -10,7 +10,7 @@
 		public int Remove { get; }
 
 		/// <summary>
-		/// The user visible description for the <see cref="Replacement"/>.  Typically
+		/// The user visible description for the <see cref="Replacement"/>. Typically
 		/// this would be the same as <see cref="Replacement"/> but may vary in advanced
 		/// use cases (e.g. Title= "ctor", Replacement = "MyClass()\n{\n}")
 		/// </summary>

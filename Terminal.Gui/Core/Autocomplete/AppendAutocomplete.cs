@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 
@@ -14,20 +12,48 @@ namespace Terminal.Gui {
 
 		private TextField textField;
 
+		/// <inheritdoc/>
 		public override View HostControl { get => textField; set => textField = (TextField)value; }
+
+		/// <summary>
+		/// The color used for rendering the appended text. Note that only
+		/// <see cref="ColorScheme.Normal"/> is used and then only <see cref="Attribute.Foreground"/>
+		/// (Background comes from <see cref="HostControl"/>).
+		/// </summary>
 		public override ColorScheme ColorScheme { get; set; }
 
+		/// <summary>
+		///	Creates a new instance of the <see cref="AppendAutocomplete"/> class.
+		/// </summary>
+		public AppendAutocomplete (TextField textField)
+		{
+			this.textField = textField;
+			SelectionKey = Key.Tab;
+
+
+			ColorScheme = new ColorScheme{
+				Normal = new Attribute(Color.DarkGray,0),
+				Focus = new Attribute(Color.DarkGray,0),
+				HotNormal = new Attribute(Color.DarkGray,0),
+				HotFocus = new Attribute(Color.DarkGray,0),
+				Disabled = new Attribute(Color.DarkGray,0),
+			};
+		}
+
+		/// <inheritdoc/>
 		public override void ClearSuggestions ()
 		{
 			base.ClearSuggestions ();
 			textField.SetNeedsDisplay ();
 		}
 
+		/// <inheritdoc/>
 		public override bool MouseEvent (MouseEvent me, bool fromHost = false)
 		{
 			return false;
 		}
 
+		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent kb)
 		{
 			var key = kb.Key;
@@ -55,6 +81,8 @@ namespace Terminal.Gui {
 			return false;
 		}
 		bool _suspendSuggestions = false;
+
+		/// <inheritdoc/>
 		public override void GenerateSuggestions (AutocompleteContext context)
 		{
 			if(_suspendSuggestions)
@@ -64,6 +92,9 @@ namespace Terminal.Gui {
 			base.GenerateSuggestions (context);
 		}
 
+		/// <summary>
+		/// Renders the current suggestion into the <see cref="TextField"/>
+		/// </summary>
 		public override void RenderOverlay (Point renderAt)
 		{
 			if (!this.MakingSuggestion ()) {
@@ -71,7 +102,7 @@ namespace Terminal.Gui {
 			}
 
 			// draw it like its selected even though its not
-			Application.Driver.SetAttribute (new Attribute (Color.DarkGray, textField.ColorScheme.Focus.Background));
+			Application.Driver.SetAttribute (new Attribute (ColorScheme.Normal.Foreground, textField.ColorScheme.Focus.Background));
 			textField.Move (textField.Text.Length, 0);
 
 			var suggestion = this.Suggestions.ElementAt (this.SelectedIdx);
@@ -89,12 +120,6 @@ namespace Terminal.Gui {
 			}
 
 			Application.Driver.AddStr (fragment);
-		}
-
-		public AppendAutocomplete (TextField textField)
-		{
-			this.textField = textField;
-			SelectionKey = Key.Tab;
 		}
 
 		/// <summary>

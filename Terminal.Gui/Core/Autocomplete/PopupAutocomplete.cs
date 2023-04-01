@@ -74,6 +74,9 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Creates a new instance of the <see cref="PopupAutocomplete"/> class.
+		/// </summary>
 		public PopupAutocomplete ()
 		{
 			PopupInsideContainer = true;
@@ -120,13 +123,13 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// When more suggestions are available than can be rendered the user
-		/// can scroll down the dropdown list.  This indicates how far down they
+		/// can scroll down the dropdown list. This indicates how far down they
 		/// have gone
 		/// </summary>
 		public virtual int ScrollOffset { get; set; }
 
 		/// <summary>
-		/// The colors to use to render the overlay.  Accessing this property before
+		/// The colors to use to render the overlay. Accessing this property before
 		/// the Application has been initialized will cause an error
 		/// </summary>
 		public override ColorScheme ColorScheme {
@@ -248,6 +251,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <inheritdoc/>
 		public override void EnsureSelectedIdxIsValid ()
 		{
 			base.EnsureSelectedIdxIsValid ();
@@ -408,7 +412,7 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		/// Completes the autocomplete selection process.  Called when user hits the <see cref="IAutocomplete.SelectionKey"/>.
+		/// Completes the autocomplete selection process. Called when user hits the <see cref="IAutocomplete.SelectionKey"/>.
 		/// </summary>
 		/// <returns></returns>
 		protected bool Select ()
@@ -425,8 +429,8 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Called when the user confirms a selection at the current cursor location in
-		/// the <see cref="HostControl"/>.  The <paramref name="accepted"/> string
-		/// is the full autocomplete word to be inserted.  Typically a host will have to
+		/// the <see cref="HostControl"/>. The <paramref name="accepted"/> string
+		/// is the full autocomplete word to be inserted. Typically a host will have to
 		/// remove some characters such that the <paramref name="accepted"/> string 
 		/// completes the word instead of simply being appended.
 		/// </summary>

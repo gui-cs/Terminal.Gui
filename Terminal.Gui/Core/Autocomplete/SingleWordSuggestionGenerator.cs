@@ -5,13 +5,22 @@ using System.Text;
 using Rune = System.Rune;
 
 namespace Terminal.Gui {
+	
+	/// <summary>
+	/// <see cref="ISuggestionGenerator"/> which suggests from a collection
+	/// of words those that match the <see cref="AutocompleteContext"/>. You
+	/// can update <see cref="AllSuggestions"/> at any time to change candidates
+	/// considered for autocomplete.
+	/// </summary>
 	public class SingleWordSuggestionGenerator : ISuggestionGenerator {
+
 		/// <summary>
 		/// The full set of all strings that can be suggested.
 		/// </summary>
 		/// <returns></returns>
 		public virtual List<string> AllSuggestions { get; set; } = new List<string> ();
 
+		/// <inheritdoc/>
 		public IEnumerable<Suggestion> GenerateSuggestions (AutocompleteContext context)
 		{
 			// if there is nothing to pick from
@@ -19,7 +28,7 @@ namespace Terminal.Gui {
 				return Enumerable.Empty<Suggestion> ();
 			}
 
-			var currentWord = IdxToWord (context.CurrentLine, context.Idx);
+			var currentWord = IdxToWord (context.CurrentLine, context.CursorPosition);
 
 			if (string.IsNullOrWhiteSpace (currentWord)) {
 				return Enumerable.Empty<Suggestion> ();
@@ -35,7 +44,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Return true if the given symbol should be considered part of a word
-		/// and can be contained in matches.  Base behavior is to use <see cref="char.IsLetterOrDigit(char)"/>
+		/// and can be contained in matches. Base behavior is to use <see cref="char.IsLetterOrDigit(char)"/>
 		/// </summary>
 		/// <param name="rune"></param>
 		/// <returns></returns>
@@ -48,7 +57,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// <para>
 		/// Given a <paramref name="line"/> of characters, returns the word which ends at <paramref name="idx"/> 
-		/// or null.  Also returns null if the <paramref name="idx"/> is positioned in the middle of a word.
+		/// or null. Also returns null if the <paramref name="idx"/> is positioned in the middle of a word.
 		/// </para>
 		/// 
 		/// <para>
@@ -81,7 +90,7 @@ namespace Terminal.Gui {
 				return null;
 			}
 
-			// we are at the end of a word.  Work out what has been typed so far
+			// we are at the end of a word. Work out what has been typed so far
 			while (endIdx-- > 0) {
 				if (IsWordChar (line [endIdx])) {
 					sb.Insert (0, (char)line [endIdx]);
