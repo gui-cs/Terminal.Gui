@@ -22,7 +22,7 @@ namespace Terminal.Gui.Core {
 		public void DirectTyping_Allowed ()
 		{
 			var dlg = GetInitializedFileDialog ();
-			var tf = dlg.Subviews [0].Subviews.OfType<TextField> ().Single ();
+			var tf = dlg.Subviews [0].Subviews.OfType<TextField> ().First (t=>t.HasFocus);
 			tf.ClearAllSelection ();
 			tf.CursorPosition = tf.Text.Length;
 			Assert.True (tf.HasFocus);
