@@ -1388,7 +1388,7 @@ namespace Terminal.Gui {
 					}
 					openCurrentMenu.previousSubFocused = last.previousSubFocused;
 					openSubMenu.Add (openCurrentMenu);
-					Application.Current.Add (openCurrentMenu);
+					Application.Top.Add (openCurrentMenu);
 				}
 				selectedSub = openSubMenu.Count - 1;
 				if (selectedSub > -1 && SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current)) {
