@@ -196,6 +196,9 @@ namespace Terminal.Gui {
 				this.SuppressIfBadChar (k);
 			};
 
+			tbPath.Autocomplete = new AppendAutocomplete (tbPath);
+			tbPath.Autocomplete.SuggestionGenerator = new FilepathSuggestionGenerator ();
+
 			this.splitContainer = new TileView () {
 				X = 0,
 				Y = 2,
