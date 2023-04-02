@@ -10,8 +10,8 @@ namespace Terminal.Gui {
 	internal class AutocompleteFilepathContext : AutocompleteContext {
 		public FileDialogState State { get; set; }
 
-		public AutocompleteFilepathContext (FileDialogState state)
-            : base(new System.Collections.Generic.List<System.Rune>(),0)
+		public AutocompleteFilepathContext (ustring currentLine, int cursorPosition, FileDialogState state)
+			: base(currentLine.ToRuneList(), cursorPosition)
 		{
 			this.State = state;
 		}

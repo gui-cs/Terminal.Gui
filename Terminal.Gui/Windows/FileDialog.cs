@@ -1129,7 +1129,7 @@ namespace Terminal.Gui {
 
 				this.State = newState;
 				this.tbPath.Autocomplete.GenerateSuggestions (
-					new AutocompleteFilepathContext(this.State));
+					new AutocompleteFilepathContext(tbPath.Text,tbPath.CursorPosition,this.State));
 
 				this.WriteStateToTableView ();
 
@@ -1269,7 +1269,7 @@ namespace Terminal.Gui {
 				this.PushState (dir.Parent, true, false);
 			}
 
-			tbPath.Autocomplete.GenerateSuggestions (new AutocompleteFilepathContext(State));
+			tbPath.Autocomplete.GenerateSuggestions (new AutocompleteFilepathContext(tbPath.Text,tbPath.CursorPosition,State));
 		}
 
 		private DirectoryInfo StringToDirectoryInfo (string path)
@@ -1541,7 +1541,7 @@ namespace Terminal.Gui {
 
 				Application.MainLoop.Invoke (() => {
 					Parent.tbPath.Autocomplete.GenerateSuggestions (
-						new AutocompleteFilepathContext(this)
+						new AutocompleteFilepathContext(Parent.tbPath.Text, Parent.tbPath.CursorPosition, this)
 						);
 					Parent.WriteStateToTableView ();
 

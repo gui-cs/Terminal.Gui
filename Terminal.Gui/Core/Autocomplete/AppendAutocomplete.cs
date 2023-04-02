@@ -101,8 +101,10 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			// TODO: Not Cyan!
+
 			// draw it like its selected even though its not
-			Application.Driver.SetAttribute (new Attribute (ColorScheme.Normal.Foreground, textField.ColorScheme.Focus.Background));
+			Application.Driver.SetAttribute (new Attribute (Color.Cyan, textField.ColorScheme.Focus.Background));
 			textField.Move (textField.Text.Length, 0);
 
 			var suggestion = this.Suggestions.ElementAt (this.SelectedIdx);
