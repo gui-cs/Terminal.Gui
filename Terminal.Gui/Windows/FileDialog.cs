@@ -184,7 +184,7 @@ namespace Terminal.Gui {
 			this.tbPath = new TextField {
 				Width = Dim.Fill (1),
 				Caption = Style.PathCaption,
-				CaptionColor = Color.DarkGray,
+				CaptionColor = Color.Black
 			};
 			this.tbPath.KeyPress += (s, k) => {
 				ClearFeedback ();
@@ -268,7 +268,8 @@ namespace Terminal.Gui {
 			tbFind = new TextField {
 				X = Pos.Right (this.btnToggleSplitterCollapse) + 1,
 				Caption = Style.SearchCaption,
-				Width = 16,
+				CaptionColor = Color.Black,
+				Width = 30,
 				Y = Pos.AnchorEnd (1),
 			};
 			spinnerView = new SpinnerView () {
