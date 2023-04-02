@@ -33,12 +33,6 @@ namespace Terminal.Gui.FileServices {
 		public ColorScheme ColorSchemeDirectory { get; set; }
 
 		/// <summary>
-		/// Sets a <see cref="ColorScheme"/> to use for regular file rows of
-		/// the <see cref="TableView"/>. Defaults to White text on Black background.
-		/// </summary>
-		public ColorScheme ColorSchemeDefault { get; set; }
-
-		/// <summary>
 		/// Sets a <see cref="ColorScheme"/> to use for file rows with an image extension
 		/// of the <see cref="TableView"/>. Defaults to White text on Black background.
 		/// </summary>
@@ -140,12 +134,27 @@ namespace Terminal.Gui.FileServices {
 		/// </summary>
 		/// <remarks>Must be configured before showing the dialog.</remarks>
 		public FileDialogTreeRootGetter TreeRootGetter { get; set; } = DefaultTreeRootGetter;
+		
+		/// <summary>
+		/// Gets or sets whether to use advanced unicode characters which might not be installed
+		/// on all users computers.
+		/// </summary>
+		public bool UseUnicodeCharacters { get; set; } = false;
+
+
+		/// <summary>
+		/// User defined delegate for picking which character(s)/unicode
+		/// symbol(s) to use as an 'icon' for files/folders. 
+		/// </summary>
+		public Func<FileSystemInfo, string> IconGetter { get; set; }
+
 
 		/// <summary>
 		/// Creates a new instance of the <see cref="FileDialogStyle"/> class.
 		/// </summary>
 		public FileDialogStyle ()
 		{
+			IconGetter = DefaultIconGetter;
 
 			ColorSchemeDirectory = new ColorScheme {
 				Normal = Application.Driver.MakeAttribute (Color.Blue, Color.Black),
@@ -155,12 +164,6 @@ namespace Terminal.Gui.FileServices {
 
 			};
 
-			ColorSchemeDefault = new ColorScheme {
-				Normal = Application.Driver.MakeAttribute (Color.White, Color.Black),
-				HotNormal = Application.Driver.MakeAttribute (Color.White, Color.Black),
-				Focus = Application.Driver.MakeAttribute (Color.Black, Color.White),
-				HotFocus = Application.Driver.MakeAttribute (Color.Black, Color.White),
-			};
 			ColorSchemeImage = new ColorScheme {
 				Normal = Application.Driver.MakeAttribute (Color.Magenta, Color.Black),
 				HotNormal = Application.Driver.MakeAttribute (Color.Magenta, Color.Black),
@@ -174,6 +177,16 @@ namespace Terminal.Gui.FileServices {
 				HotFocus = Application.Driver.MakeAttribute (Color.Black, Color.Green),
 			};
 			
+		}
+
+		private string DefaultIconGetter (FileSystemInfo arg)
+		{
+			if (arg is DirectoryInfo) {
+				return UseUnicodeCharacters ? "\ua909 " : "\\";
+			}
+
+			return UseUnicodeCharacters ? "\u2630 " : "";
+
 		}
 
 		private static IEnumerable<FileDialogRootTreeNode> DefaultTreeRootGetter ()

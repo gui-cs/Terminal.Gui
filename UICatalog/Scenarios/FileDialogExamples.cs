@@ -14,7 +14,7 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Files and IO")]
 	public class FileDialogExamples : Scenario {
 		private CheckBox cbMustExist;
-		private CheckBox cbIcons;
+		private CheckBox cbUnicode;
 		private CheckBox cbUseColors;
 		private CheckBox cbCaseSensitive;
 		private CheckBox cbAllowMultipleSelection;
@@ -35,8 +35,8 @@ namespace UICatalog.Scenarios {
 			Win.Add (cbMustExist);
 
 
-			cbIcons = new CheckBox ("Icons") { Checked = true, Y = y++, X = x };
-			Win.Add (cbIcons);
+			cbUnicode = new CheckBox ("UseUnicode") { Checked = true, Y = y++, X = x };
+			Win.Add (cbUnicode);
 
 			cbUseColors = new CheckBox ("Use Colors") { Checked = false, Y = y++, X = x };
 			Win.Add (cbUseColors);
@@ -139,9 +139,7 @@ namespace UICatalog.Scenarios {
 					fd.FilesSelected += ConfirmOverwrite;
 				}
 
-				if (cbIcons.Checked ?? false) {
-					fd.IconGetter = GetIcon;
-				}
+				fd.Style.UseUnicodeCharacters = cbUnicode.Checked ?? false;
 
 				if (cbCaseSensitive.Checked ?? false) {
 
@@ -212,21 +210,6 @@ namespace UICatalog.Scenarios {
 			{
 				return f.Name.Contains (terms, StringComparison.CurrentCulture);
 			}
-		}
-
-		private string GetIcon (FileSystemInfo arg)
-		{
-			// Typically most windows terminals will not have these unicode characters installed
-			// so for the demo lets not bother having any icons on windows
-			if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
-				return arg is DirectoryInfo ? "\\" : null;
-			}
-
-			if (arg is DirectoryInfo) {
-				return "\ua909 ";
-			}
-
-			return "\u2630 ";
 		}
 	}
 }

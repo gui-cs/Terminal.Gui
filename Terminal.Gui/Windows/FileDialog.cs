@@ -168,7 +168,7 @@ namespace Terminal.Gui {
 
 			this.btnUp = new Button () 
 				{ X = 0, Y = 1, NoPadding=true };
-			btnUp.Text = "◭";
+			btnUp.Text = Style.UseUnicodeCharacters ? "◭" : "▲";
 			this.btnUp.Clicked += (s, e) => this.history.Up ();
 
 			this.btnBack = new Button () 
@@ -253,7 +253,7 @@ namespace Terminal.Gui {
 			this.splitContainer.Tiles.ElementAt (0).ContentView.Add (this.treeView);
 			this.splitContainer.Tiles.ElementAt (1).ContentView.Add (this.tableView);
 
-			this.btnToggleSplitterCollapse = new Button (">>") {
+			this.btnToggleSplitterCollapse = new Button ("▶▶") {
 				Y = Pos.AnchorEnd (1),
 			};
 			this.btnToggleSplitterCollapse.Clicked += (s, e) => {
@@ -261,7 +261,7 @@ namespace Terminal.Gui {
 
 				var newState = !tile.ContentView.Visible;
 				tile.ContentView.Visible = newState;
-				this.btnToggleSplitterCollapse.Text = newState ? "<<" : ">>";
+				this.btnToggleSplitterCollapse.Text = newState ? "◀◀" : "▶▶";
 			};
 
 
@@ -302,15 +302,12 @@ namespace Terminal.Gui {
 			this.tableView.CellActivated += this.CellActivate;
 			this.tableView.KeyUp += (s, k) => k.Handled = this.TableView_KeyUp (k.KeyEvent);
 			this.tableView.SelectedCellChanged += this.TableView_SelectedCellChanged;
-			this.tableView.ColorScheme = Style.ColorSchemeDefault;
 
 			this.tableView.AddKeyBinding (Key.Home, Command.TopHome);
 			this.tableView.AddKeyBinding (Key.End, Command.BottomEnd);
 			this.tableView.AddKeyBinding (Key.Home | Key.ShiftMask, Command.TopHomeExtend);
 			this.tableView.AddKeyBinding (Key.End | Key.ShiftMask, Command.BottomEndExtend);
 
-
-			this.treeView.ColorScheme = Style.ColorSchemeDefault;
 			this.treeView.KeyDown += (s, k) => {
 
 
@@ -520,13 +517,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// User defined delegate for picking which character(s)/unicode
-		/// symbol(s) to use as an 'icon' for files/folders. Defaults to
-		/// null (i.e. no icons).
-		/// </summary>
-		public Func<FileSystemInfo, string> IconGetter { get; set; } = null;
-
-		/// <summary>
 		/// Defines how the dialog matches files/folders when using the search
 		/// box. Provide a custom implementation if you want to tailor how matching
 		/// is performed.
@@ -644,6 +634,8 @@ namespace Terminal.Gui {
 
 			// May have been updated after instance was constructed
 			this.btnOk.Text = Style.OkButtonText;
+
+			tbPath.Autocomplete.ColorScheme.Normal = Attribute.Make (Color.Gray, tbPath.ColorScheme.Normal.Background);
 
 			treeView.AddObjects (Style.TreeRootGetter ());
 
@@ -945,7 +937,7 @@ namespace Terminal.Gui {
 					return string.Empty;
 				}
 
-				var icon = stats.IsParent ? null : IconGetter?.Invoke (stats.FileSystemInfo);
+				var icon = stats.IsParent ? null : Style.IconGetter?.Invoke (stats.FileSystemInfo);
 
 				if (icon != null) {
 					return icon + stats.Name;
@@ -1177,7 +1169,7 @@ namespace Terminal.Gui {
 			var stats = this.RowToStats (args.RowIndex);
 
 			if (!Style.UseColors) {
-				return Style.ColorSchemeDefault;
+				return tableView.ColorScheme;
 			}
 
 			if (stats.IsDir ()) {
@@ -1193,7 +1185,7 @@ namespace Terminal.Gui {
 				return Style.ColorSchemeExeOrRecommended;
 			}
 
-			return Style.ColorSchemeDefault;
+			return tableView.ColorScheme;
 		}
 
 		/// <summary>
