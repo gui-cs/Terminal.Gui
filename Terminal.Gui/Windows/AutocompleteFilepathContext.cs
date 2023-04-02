@@ -20,22 +20,26 @@ namespace Terminal.Gui {
 
 	internal class FilepathSuggestionGenerator : ISuggestionGenerator {
 
-		List<Suggestion> cachedSuggestions = new List<Suggestion>();
-
+        FileDialogState state;
 		public IEnumerable<Suggestion> GenerateSuggestions (AutocompleteContext context)
 		{
-			if(context is not AutocompleteFilepathContext fileState) {
-				return cachedSuggestions;
+			if(context is AutocompleteFilepathContext fileState) {
+				this.state = fileState.State;
 			}
-			var state = fileState.State;
-			var path = ustring.Make (fileState.CurrentLine).ToString();
+            
+            if(state == null)
+            {
+                return Enumerable.Empty<Suggestion>();
+            }
+
+			var path = ustring.Make (context.CurrentLine).ToString();
 			var last = path.LastIndexOfAny (FileDialog.Separators);
 
 			var term = path.Substring (last + 1);
 
 			if (term.Equals (state?.Directory?.Name)) {
 				// Clear suggestions
-				return cachedSuggestions = new List<Suggestion> ();
+				return Enumerable.Empty<Suggestion>();
 			}
 
 			bool isWindows = RuntimeInformation.IsOSPlatform (OSPlatform.Windows);
@@ -56,10 +60,10 @@ namespace Terminal.Gui {
 
 			// nothing to suggest
 			if (validSuggestions.Length == 0 || validSuggestions [0].Length == term.Length) {
-				return cachedSuggestions = new List<Suggestion> ();
+				return Enumerable.Empty<Suggestion>();
 			}
 
-			return cachedSuggestions = validSuggestions.Select (f => new Suggestion(0,f.Substring (term.Length),f)).ToList ();
+			return validSuggestions.Select (f => new Suggestion(0,f.Substring (term.Length),f)).ToList ();
 		}
 
 		public bool IsWordChar (Rune rune)
