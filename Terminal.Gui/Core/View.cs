@@ -3160,14 +3160,17 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Finds which view that belong to the <paramref name="start"/> at the provided location.
+		/// Finds which view that belong to the <paramref name="start"/> superview at the provided location.
 		/// </summary>
-		/// <param name="start">The view where to look for.</param>
-		/// <param name="x">The column location.</param>
-		/// <param name="y">The row location.</param>
-		/// <param name="resx">The found view column location.</param>
-		/// <param name="resy">The found view row location.</param>
-		/// <returns>The view that belong to the provided location.</returns>
+		/// <param name="start">The superview where to look for.</param>
+		/// <param name="x">The column location in the superview.</param>
+		/// <param name="y">The row location in the superview.</param>
+		/// <param name="resx">The found view screen relative column location.</param>
+		/// <param name="resy">The found view screen relative row location.</param>
+		/// <returns>
+		///  The view that was found at the <praramref name="x"/> and <praramref name="y"/> coordinates.
+		///  <see langword="null"/> if no view was found.
+		/// </returns>
 		public static View FindDeepestView (View start, int x, int y, out int resx, out int resy)
 		{
 			var startFrame = start.Frame;
