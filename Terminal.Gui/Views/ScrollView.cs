@@ -151,6 +151,12 @@ namespace Terminal.Gui {
 			}
 		}
 
+		public override void BeginInit ()
+		{
+			base.BeginInit ();
+			
+		}
+
 		/// <summary>
 		/// Represents the top left corner coordinate that is displayed by the scrollview
 		/// </summary>
