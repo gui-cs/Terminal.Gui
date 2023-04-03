@@ -343,6 +343,9 @@ namespace Terminal.Gui {
 			this.Add (this.btnForward);
 			this.Add (this.tbPath);
 			this.Add (this.splitContainer);
+
+			// Default sort order is by name
+			sorter.SortColumn(this.dtFiles.Columns[Style.FilenameColumnName],true);
 		}
 
 		private string GetForwardButtonText ()
@@ -659,7 +662,7 @@ namespace Terminal.Gui {
 			this.btnBack.Text = this.GetBackButtonText();
 			this.btnForward.Text = this.GetForwardButtonText();
 			this.btnToggleSplitterCollapse.Text = this.GetToggleSplitterText(false);
-
+			
 			tbPath.Autocomplete.ColorScheme.Normal = Attribute.Make (Color.Black, tbPath.ColorScheme.Normal.Background);
 
 			treeView.AddObjects (Style.TreeRootGetter ());
@@ -1375,16 +1378,16 @@ namespace Terminal.Gui {
 					sortAlgorithm = (v) => v.GetOrderByValue (dlg, colName);
 				}
 
-				var ordered =
+				// This portion is never reordered (aways .. at top then folders)
+				var forcedOrder = stats.Select ((v, i) => new { v, i })
+						.OrderByDescending (f => f.v.IsParent)
+						.ThenBy (f => f.v.IsDir() ? -1:100);
+
+				// This portion is flexible based on the column clicked (e.g. alphabetical)
+				var ordered = 
 					this.currentSortIsAsc ?
-					    stats.Select ((v, i) => new { v, i })
-						.OrderByDescending (f => f.v.IsParent)
-						.ThenBy (f => sortAlgorithm (f.v))
-						.ToArray () :
-					    stats.Select ((v, i) => new { v, i })
-						.OrderByDescending (f => f.v.IsParent)
-						.ThenByDescending (f => sortAlgorithm (f.v))
-						.ToArray ();
+					    forcedOrder.ThenBy (f => sortAlgorithm (f.v)):
+						forcedOrder.ThenByDescending (f => sortAlgorithm (f.v));
 
 				foreach (var o in ordered) {
 					this.dlg.BuildRow (o.i);
@@ -1416,7 +1419,7 @@ namespace Terminal.Gui {
 				this.SortColumn (clickedCol, isAsc);
 			}
 
-			private void SortColumn (DataColumn col, bool isAsc)
+			internal void SortColumn (DataColumn col, bool isAsc)
 			{
 				// set a sort order
 				this.currentSort = col;
