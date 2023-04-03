@@ -181,9 +181,8 @@ namespace Terminal.Gui {
 				CaptionColor = Color.Black
 			};
 			this.tbPath.KeyPress += (s, k) => {
-				ClearFeedback ();
 
-				this.NavigateIf (k, Key.CursorDown, this.tableView);
+				ClearFeedback ();
 
 				this.AcceptIf (k, Key.Enter);
 
@@ -661,7 +660,7 @@ namespace Terminal.Gui {
 			this.btnForward.Text = this.GetForwardButtonText();
 			this.btnToggleSplitterCollapse.Text = this.GetToggleSplitterText(false);
 
-			tbPath.Autocomplete.ColorScheme.Normal = Attribute.Make (Color.Gray, tbPath.ColorScheme.Normal.Background);
+			tbPath.Autocomplete.ColorScheme.Normal = Attribute.Make (Color.Black, tbPath.ColorScheme.Normal.Background);
 
 			treeView.AddObjects (Style.TreeRootGetter ());
 
