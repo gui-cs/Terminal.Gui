@@ -1393,11 +1393,11 @@ namespace Terminal.Gui {
 				foreach (DataColumn c in this.tableView.Table.Columns) {
 
 					// remove any lingering sort indicator
-					c.ColumnName = TrimArrows (c.ColumnName);
+					c.ColumnName = StripArrows (c.ColumnName);
 
 					// add a new one if this the one that is being sorted
 					if (c == col) {
-						c.ColumnName += this.currentSortIsAsc ? '▲' : '▼';
+						c.ColumnName += this.currentSortIsAsc ? " (▲)" : " (▼)";
 					}
 				}
 
@@ -1405,14 +1405,9 @@ namespace Terminal.Gui {
 				dlg.UpdateCollectionNavigator ();
 			}
 
-			private static string TrimArrows (string columnName)
-			{
-				return columnName.TrimEnd ('▼', '▲');
-			}
-
 			private static string StripArrows (string columnName)
 			{
-				return columnName.Replace ("▼", string.Empty).Replace ("▲", string.Empty);
+				return columnName.Replace (" (▼)", string.Empty).Replace (" (▲)", string.Empty);
 			}
 
 			private void SortColumn (DataColumn clickedCol)
@@ -1451,7 +1446,7 @@ namespace Terminal.Gui {
 					e.MouseEvent.Y + 1,
 					new MenuBarItem (new MenuItem []
 					{
-						new MenuItem($"Hide {TrimArrows(clickedCol.ColumnName)}", string.Empty, () => this.HideColumn(clickedCol)),
+						new MenuItem($"Hide {StripArrows(clickedCol.ColumnName)}", string.Empty, () => this.HideColumn(clickedCol)),
 						new MenuItem($"Sort {StripArrows(sort)}",string.Empty, ()=> this.SortColumn(clickedCol,isAsc)),
 					})
 				);
