@@ -350,12 +350,12 @@ namespace Terminal.Gui {
 
 		private string GetForwardButtonText ()
 		{
-			return Style.UseUnicodeCharacters ? "-▶" : "->";
+			return "-" + Driver.RightArrow;
 		}
 
 		private string GetBackButtonText ()
 		{
-			return Style.UseUnicodeCharacters ? "◀-" : "<-";
+			return Driver.LeftArrow + "-";
 		}
 
 		private string GetUpButtonText ()
@@ -365,9 +365,9 @@ namespace Terminal.Gui {
 
 		private string GetToggleSplitterText (bool isExpanded)
 		{
-			return isExpanded ?
-				       Style.UseUnicodeCharacters ? new string ((char)Driver.LeftArrow, 2) : "<<" :
-				       Style.UseUnicodeCharacters ? new string ((char)Driver.RightArrow, 2) : ">>";
+			return isExpanded ? 
+				new string ((char)Driver.LeftArrow, 2) :
+				new string ((char)Driver.RightArrow, 2);
 		}
 
 		private void Delete ()
