@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using NStack;
 using Terminal.Gui.FileServices;
-using Terminal.Gui.Resources;
 using Terminal.Gui.Trees;
-using static System.Environment;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace Terminal.Gui {
@@ -167,15 +164,15 @@ namespace Terminal.Gui {
 			};
 
 			this.btnUp = new Button () { X = 0, Y = 1, NoPadding = true };
-			btnUp.Text = Style.UseUnicodeCharacters ? "◭" : "▲";
+			btnUp.Text = GetUpButtonText ();
 			this.btnUp.Clicked += (s, e) => this.history.Up ();
 
 			this.btnBack = new Button () { X = Pos.Right (btnUp) + 1, Y = 1, NoPadding = true };
-			btnBack.Text = Style.UseUnicodeCharacters ? "◀-" : "<-";
+			btnBack.Text = GetBackButtonText ();
 			this.btnBack.Clicked += (s, e) => this.history.Back ();
 
 			this.btnForward = new Button () { X = Pos.Right (btnBack) + 1, Y = 1, NoPadding = true };
-			btnForward.Text = Style.UseUnicodeCharacters ? "-▶" : "->";
+			btnForward.Text = GetForwardButtonText();
 			this.btnForward.Clicked += (s, e) => this.history.Forward ();
 
 			this.tbPath = new TextField {
@@ -213,6 +210,8 @@ namespace Terminal.Gui {
 			};
 			this.tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
 			Style.TableStyle = tableView.Style;
+			Style.TableStyle.ShowHorizontalScrollIndicators = true;
+
 			this.tableView.KeyPress += (s, k) => {
 				if (this.tableView.SelectedRow <= 0) {
 					this.NavigateIf (k, Key.CursorUp, this.tbPath);
@@ -250,7 +249,7 @@ namespace Terminal.Gui {
 			this.splitContainer.Tiles.ElementAt (0).ContentView.Add (this.treeView);
 			this.splitContainer.Tiles.ElementAt (1).ContentView.Add (this.tableView);
 
-			this.btnToggleSplitterCollapse = new Button (Style.UseUnicodeCharacters ? "▶▶" : ">>") {
+			this.btnToggleSplitterCollapse = new Button (GetToggleSplitterText (false)) {
 				Y = Pos.AnchorEnd (1),
 			};
 			this.btnToggleSplitterCollapse.Clicked += (s, e) => {
@@ -258,9 +257,7 @@ namespace Terminal.Gui {
 
 				var newState = !tile.ContentView.Visible;
 				tile.ContentView.Visible = newState;
-				this.btnToggleSplitterCollapse.Text = newState ?
-					Style.UseUnicodeCharacters ? "◀◀" : "<<" :
-					Style.UseUnicodeCharacters ? "▶▶" : ">>";
+				this.btnToggleSplitterCollapse.Text = GetToggleSplitterText (newState);
 			};
 
 
@@ -344,6 +341,28 @@ namespace Terminal.Gui {
 			this.Add (this.btnForward);
 			this.Add (this.tbPath);
 			this.Add (this.splitContainer);
+		}
+
+		private string GetForwardButtonText ()
+		{
+			return Style.UseUnicodeCharacters ? "-▶" : "->";
+		}
+
+		private string GetBackButtonText ()
+		{
+			return Style.UseUnicodeCharacters ? "◀-" : "<-";
+		}
+
+		private string GetUpButtonText ()
+		{
+			return Style.UseUnicodeCharacters ? "◭" : "▲";
+		}
+
+		private string GetToggleSplitterText (bool isExpanded)
+		{
+			return isExpanded ?
+				       Style.UseUnicodeCharacters ? new string ((char)Driver.LeftArrow, 2) : "<<" :
+				       Style.UseUnicodeCharacters ? new string ((char)Driver.RightArrow, 2) : ">>";
 		}
 
 		private void Delete ()
@@ -634,6 +653,10 @@ namespace Terminal.Gui {
 
 			// May have been updated after instance was constructed
 			this.btnOk.Text = Style.OkButtonText;
+			this.btnUp.Text = this.GetUpButtonText();
+			this.btnBack.Text = this.GetBackButtonText();
+			this.btnForward.Text = this.GetForwardButtonText();
+			this.btnToggleSplitterCollapse.Text = this.GetToggleSplitterText(false);
 
 			tbPath.Autocomplete.ColorScheme.Normal = Attribute.Make (Color.Gray, tbPath.ColorScheme.Normal.Background);
 
