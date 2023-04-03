@@ -166,19 +166,16 @@ namespace Terminal.Gui {
 				Application.RequestStop ();
 			};
 
-			this.btnUp = new Button () 
-				{ X = 0, Y = 1, NoPadding=true };
+			this.btnUp = new Button () { X = 0, Y = 1, NoPadding = true };
 			btnUp.Text = Style.UseUnicodeCharacters ? "◭" : "▲";
 			this.btnUp.Clicked += (s, e) => this.history.Up ();
 
-			this.btnBack = new Button () 
-				{ X = Pos.Right(btnUp)+1, Y = 1, NoPadding = true };
-			btnBack.Text = "◀-";
+			this.btnBack = new Button () { X = Pos.Right (btnUp) + 1, Y = 1, NoPadding = true };
+			btnBack.Text = Style.UseUnicodeCharacters ? "◀-" : "<-";
 			this.btnBack.Clicked += (s, e) => this.history.Back ();
 
-			this.btnForward = new Button ()
-				{ X = Pos.Right(btnBack)+1, Y = 1, NoPadding = true};
-			btnForward.Text = "-▶";
+			this.btnForward = new Button () { X = Pos.Right (btnBack) + 1, Y = 1, NoPadding = true };
+			btnForward.Text = Style.UseUnicodeCharacters ? "-▶" : "->";
 			this.btnForward.Clicked += (s, e) => this.history.Forward ();
 
 			this.tbPath = new TextField {
@@ -253,7 +250,7 @@ namespace Terminal.Gui {
 			this.splitContainer.Tiles.ElementAt (0).ContentView.Add (this.treeView);
 			this.splitContainer.Tiles.ElementAt (1).ContentView.Add (this.tableView);
 
-			this.btnToggleSplitterCollapse = new Button ("▶▶") {
+			this.btnToggleSplitterCollapse = new Button (Style.UseUnicodeCharacters ? "▶▶" : ">>") {
 				Y = Pos.AnchorEnd (1),
 			};
 			this.btnToggleSplitterCollapse.Clicked += (s, e) => {
@@ -261,7 +258,9 @@ namespace Terminal.Gui {
 
 				var newState = !tile.ContentView.Visible;
 				tile.ContentView.Visible = newState;
-				this.btnToggleSplitterCollapse.Text = newState ? "◀◀" : "▶▶";
+				this.btnToggleSplitterCollapse.Text = newState ?
+					Style.UseUnicodeCharacters ? "◀◀" : "<<" :
+					Style.UseUnicodeCharacters ? "▶▶" : ">>";
 			};
 
 
@@ -1122,7 +1121,7 @@ namespace Terminal.Gui {
 
 				this.State = newState;
 				this.tbPath.Autocomplete.GenerateSuggestions (
-					new AutocompleteFilepathContext(tbPath.Text,tbPath.CursorPosition,this.State));
+					new AutocompleteFilepathContext (tbPath.Text, tbPath.CursorPosition, this.State));
 
 				this.WriteStateToTableView ();
 
@@ -1262,7 +1261,7 @@ namespace Terminal.Gui {
 				this.PushState (dir.Parent, true, false);
 			}
 
-			tbPath.Autocomplete.GenerateSuggestions (new AutocompleteFilepathContext(tbPath.Text,tbPath.CursorPosition,State));
+			tbPath.Autocomplete.GenerateSuggestions (new AutocompleteFilepathContext (tbPath.Text, tbPath.CursorPosition, State));
 		}
 
 		private DirectoryInfo StringToDirectoryInfo (string path)
@@ -1534,7 +1533,7 @@ namespace Terminal.Gui {
 
 				Application.MainLoop.Invoke (() => {
 					Parent.tbPath.Autocomplete.GenerateSuggestions (
-						new AutocompleteFilepathContext(Parent.tbPath.Text, Parent.tbPath.CursorPosition, this)
+						new AutocompleteFilepathContext (Parent.tbPath.Text, Parent.tbPath.CursorPosition, this)
 						);
 					Parent.WriteStateToTableView ();
 

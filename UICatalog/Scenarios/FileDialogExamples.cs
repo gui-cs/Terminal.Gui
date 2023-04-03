@@ -35,7 +35,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (cbMustExist);
 
 
-			cbUnicode = new CheckBox ("UseUnicode") { Checked = true, Y = y++, X = x };
+			cbUnicode = new CheckBox ("UseUnicode") { Checked = false, Y = y++, X = x };
 			Win.Add (cbUnicode);
 
 			cbUseColors = new CheckBox ("Use Colors") { Checked = false, Y = y++, X = x };
