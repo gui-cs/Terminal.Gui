@@ -809,8 +809,6 @@ namespace Terminal.Gui {
 			}
 
 			if (mouseGrabView != null) {
-				view ??= mouseGrabView;
-
 				var newxy = mouseGrabView.ScreenToView (me.X, me.Y);
 				var nme = new MouseEvent () {
 					X = newxy.X,
