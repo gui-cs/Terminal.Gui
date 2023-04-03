@@ -26,6 +26,8 @@ namespace UICatalog.Scenarios {
 			var width = 20;
 			var text = " jamp jemp jimp jomp jump";
 
+
+
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
 					miMultiline =  new MenuItem ("_Multiline", "", () => Multiline()){CheckType = MenuItemCheckStyle.Checked},
@@ -85,7 +87,7 @@ namespace UICatalog.Scenarios {
 			miWrap.Checked = textViewTopLeft.WordWrap;
 
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
+				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 				siMultiline = new StatusItem(Key.Null, "", null),
 				siWrap = new StatusItem(Key.Null, "", null)
 			});
@@ -94,7 +96,7 @@ namespace UICatalog.Scenarios {
 			Win.LayoutStarted += Win_LayoutStarted;
 		}
 
-		private void Win_LayoutStarted (View.LayoutEventArgs obj)
+		private void Win_LayoutStarted (object sender, LayoutEventArgs obj)
 		{
 			miMultiline.Checked = textViewTopLeft.Multiline;
 			miWrap.Checked = textViewTopLeft.WordWrap;
@@ -121,32 +123,32 @@ namespace UICatalog.Scenarios {
 
 		private void SetAllSuggestions (TextView view)
 		{
-			view.Autocomplete.AllSuggestions = Regex.Matches (view.Text.ToString (), "\\w+")
+			((SingleWordSuggestionGenerator)view.Autocomplete.SuggestionGenerator).AllSuggestions = Regex.Matches (view.Text.ToString (), "\\w+")
 				.Select (s => s.Value)
 				.Distinct ().ToList ();
 		}
 
-		private void TextViewCentered_DrawContent (Rect obj)
+		private void TextViewCentered_DrawContent (object sender, DrawEventArgs e)
 		{
 			SetAllSuggestions (textViewCentered);
 		}
 
-		private void TextViewBottomRight_DrawContent (Rect obj)
+		private void TextViewBottomRight_DrawContent (object sender, DrawEventArgs e)
 		{
 			SetAllSuggestions (textViewBottomRight);
 		}
 
-		private void TextViewBottomLeft_DrawContent (Rect obj)
+		private void TextViewBottomLeft_DrawContent (object sender, DrawEventArgs e)
 		{
 			SetAllSuggestions (textViewBottomLeft);
 		}
 
-		private void TextViewTopRight_DrawContent (Rect obj)
+		private void TextViewTopRight_DrawContent (object sender, DrawEventArgs e)
 		{
 			SetAllSuggestions (textViewTopRight);
 		}
 
-		private void TextViewTopLeft_DrawContent (Rect obj)
+		private void TextViewTopLeft_DrawContent (object sender, DrawEventArgs e)
 		{
 			SetAllSuggestions (textViewTopLeft);
 		}

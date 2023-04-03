@@ -949,7 +949,7 @@ namespace Terminal.Gui.ViewTests {
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
 					Assert.Equal ("This is the second line.", _textView.Text.ToString ());
-					Assert.Equal ($"This is the first line.{Environment.NewLine}", Clipboard.Contents.ToString());
+					Assert.Equal ($"This is the first line.{Environment.NewLine}", Clipboard.Contents.ToString ());
 					break;
 				case 2:
 					_textView.ProcessKey (new KeyEvent (Key.K | Key.CtrlMask, new KeyModifiers ()));
@@ -985,7 +985,7 @@ namespace Terminal.Gui.ViewTests {
 					_textView.ProcessKey (new KeyEvent (Key.K | Key.AltMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (1, _textView.CursorPosition.Y);
-					Assert.Equal ($"This is the first line.{Environment.NewLine}", _textView.Text.ToString());
+					Assert.Equal ($"This is the first line.{Environment.NewLine}", _textView.Text.ToString ());
 					Assert.Equal ($"This is the second line.", Clipboard.Contents.ToString ());
 					break;
 				case 1:
@@ -1380,7 +1380,7 @@ namespace Terminal.Gui.ViewTests {
 		[TextViewTestsAutoInitShutdown]
 		public void TextChanged_Event ()
 		{
-			_textView.TextChanged += () => {
+			_textView.TextChanged += (s, e) => {
 				if (_textView.Text == "changing") {
 					Assert.Equal ("changing", _textView.Text);
 					_textView.Text = "changed";
@@ -1396,7 +1396,7 @@ namespace Terminal.Gui.ViewTests {
 		public void TextChanged_Event_NoFires_OnTyping ()
 		{
 			var eventcount = 0;
-			_textView.TextChanged += () => {
+			_textView.TextChanged += (s, e) => {
 				eventcount++;
 			};
 
@@ -2497,6 +2497,8 @@ line.
 			Assert.False (tv.ReadOnly);
 			Assert.True (tv.CanFocus);
 
+			var g = (SingleWordSuggestionGenerator)tv.Autocomplete.SuggestionGenerator;
+
 			tv.CanFocus = false;
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
 			tv.CanFocus = true;
@@ -2510,7 +2512,7 @@ line.
 			Assert.Equal (new Point (23, 2), tv.CursorPosition);
 			Assert.False (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
 			Assert.NotNull (tv.Autocomplete);
-			Assert.Empty (tv.Autocomplete.AllSuggestions);
+			Assert.Empty (g.AllSuggestions);
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.F, new KeyModifiers ())));
 			tv.Redraw (tv.Bounds);
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F", tv.Text);
@@ -2529,31 +2531,31 @@ line.
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (new Point (23, 2), tv.CursorPosition);
-			tv.Autocomplete.AllSuggestions = Regex.Matches (tv.Text.ToString (), "\\w+")
+			g.AllSuggestions = Regex.Matches (tv.Text.ToString (), "\\w+")
 				.Select (s => s.Value)
 				.Distinct ().ToList ();
-			Assert.Equal (7, tv.Autocomplete.AllSuggestions.Count);
-			Assert.Equal ("This", tv.Autocomplete.AllSuggestions [0]);
-			Assert.Equal ("is", tv.Autocomplete.AllSuggestions [1]);
-			Assert.Equal ("the", tv.Autocomplete.AllSuggestions [2]);
-			Assert.Equal ("first", tv.Autocomplete.AllSuggestions [3]);
-			Assert.Equal ("line", tv.Autocomplete.AllSuggestions [4]);
-			Assert.Equal ("second", tv.Autocomplete.AllSuggestions [5]);
-			Assert.Equal ("third", tv.Autocomplete.AllSuggestions [^1]);
+			Assert.Equal (7, g.AllSuggestions.Count);
+			Assert.Equal ("This", g.AllSuggestions [0]);
+			Assert.Equal ("is", g.AllSuggestions [1]);
+			Assert.Equal ("the", g.AllSuggestions [2]);
+			Assert.Equal ("first", g.AllSuggestions [3]);
+			Assert.Equal ("line", g.AllSuggestions [4]);
+			Assert.Equal ("second", g.AllSuggestions [5]);
+			Assert.Equal ("third", g.AllSuggestions [^1]);
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.F, new KeyModifiers ())));
 			tv.Redraw (tv.Bounds);
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F", tv.Text);
 			Assert.Equal (new Point (24, 2), tv.CursorPosition);
 			Assert.Single (tv.Autocomplete.Suggestions);
-			Assert.Equal ("first", tv.Autocomplete.Suggestions [0]);
+			Assert.Equal ("first", tv.Autocomplete.Suggestions[0].Replacement);
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (28, 2), tv.CursorPosition);
 			Assert.Single (tv.Autocomplete.Suggestions);
-			Assert.Equal ("first", tv.Autocomplete.Suggestions [0]);
-			tv.Autocomplete.AllSuggestions = new List<string> ();
+			Assert.Equal ("first", tv.Autocomplete.Suggestions[0].Replacement);
+			g.AllSuggestions = new List<string> ();
 			tv.Autocomplete.ClearSuggestions ();
-			Assert.Empty (tv.Autocomplete.AllSuggestions);
+			Assert.Empty (g.AllSuggestions);
 			Assert.Empty (tv.Autocomplete.Suggestions);
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.PageUp, new KeyModifiers ())));
 			Assert.Equal (24, tv.GetCurrentLine ().Count);
@@ -6001,8 +6003,8 @@ line.
 				Height = Dim.Fill (),
 				Text = "This is the first line.\nThis is the second line.\n"
 			};
-			tv.UnwrappedCursorPosition += (e) => {
-				cp = e;
+			tv.UnwrappedCursorPosition += (s, e) => {
+				cp = e.Point;
 			};
 			Application.Top.Add (tv);
 			Application.Begin (Application.Top);
@@ -6477,7 +6479,7 @@ This is the second line.
 				Height = 10,
 			};
 
-			tv.ContentsChanged += (e) => {
+			tv.ContentsChanged += (s, e) => {
 				eventcount++;
 			};
 			Assert.Equal (0, eventcount);
@@ -6498,7 +6500,7 @@ This is the second line.
 			};
 			tv.CursorPosition = new Point (0, 0);
 
-			tv.ContentsChanged += (e) => {
+			tv.ContentsChanged += (s, e) => {
 				eventcount++;
 			};
 
@@ -6536,7 +6538,7 @@ This is the second line.
 				Width = 50,
 				Height = 10,
 			};
-			tv.ContentsChanged += (e) => {
+			tv.ContentsChanged += (s, e) => {
 				eventcount++;
 				Assert.Equal (expectedRow, e.Row);
 				Assert.Equal (expectedCol, e.Col);
@@ -6565,7 +6567,7 @@ This is the second line.
 				// row/col = 0 when you set Text
 				Text = "abc",
 			};
-			tv.ContentsChanged += (e) => {
+			tv.ContentsChanged += (s, e) => {
 				eventcount++;
 				Assert.Equal (expectedRow, e.Row);
 				Assert.Equal (expectedCol, e.Col);
@@ -6597,7 +6599,7 @@ This is the second line.
 				Width = 50,
 				Height = 10,
 			};
-			tv.ContentsChanged += (e) => {
+			tv.ContentsChanged += (s, e) => {
 				eventcount++;
 				Assert.Equal (expectedRow, e.Row);
 				Assert.Equal (expectedCol, e.Col);
@@ -6622,7 +6624,7 @@ This is the second line.
 		{
 			var eventcount = 0;
 
-			_textView.ContentsChanged += (e) => {
+			_textView.ContentsChanged += (s, e) => {
 				eventcount++;
 			};
 
@@ -6649,7 +6651,7 @@ This is the second line.
 		{
 			var eventcount = 0;
 
-			_textView.ContentsChanged += (e) => {
+			_textView.ContentsChanged += (s, e) => {
 				eventcount++;
 			};
 
@@ -6715,7 +6717,7 @@ This is the second line.
 			var eventcount = 0;
 			var expectedEventCount = 0;
 
-			_textView.ContentsChanged += (e) => {
+			_textView.ContentsChanged += (s, e) => {
 				eventcount++;
 			};
 
@@ -6759,7 +6761,7 @@ This is the second line.
 				Height = 10,
 				Text = text,
 			};
-			tv.ContentsChanged += (e) => {
+			tv.ContentsChanged += (s, e) => {
 				eventcount++;
 			};
 
@@ -6784,7 +6786,7 @@ This is the second line.
 				Width = 50,
 				Height = 10,
 			};
-			tv.ContentsChanged += (e) => {
+			tv.ContentsChanged += (s, e) => {
 				eventcount++;
 			};
 
@@ -6804,7 +6806,7 @@ This is the second line.
 				Width = 50,
 				Height = 10,
 			};
-			tv.ContentsChanged += (e) => {
+			tv.ContentsChanged += (s, e) => {
 				eventcount++;
 			};
 
@@ -6814,6 +6816,18 @@ This is the second line.
 			tv.LoadFile (fileName);
 			Assert.Equal (1, eventcount);
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
+		}
+
+		[Fact]
+		public void ReplaceAllText_Does_Not_Throw_Exception ()
+		{
+			var textToFind = "hello! hello!";
+			var textToReplace = "hello!";
+			var tv = new TextView () { Width = 20, Height = 3, Text = textToFind };
+
+			var exception = Record.Exception (() => tv.ReplaceAllText (textToFind, false, false, textToReplace));
+			Assert.Null (exception);
+			Assert.Equal (textToReplace, tv.Text);
 		}
 	}
 }

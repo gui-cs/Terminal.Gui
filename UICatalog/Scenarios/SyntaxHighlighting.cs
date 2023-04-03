@@ -45,7 +45,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (textView);
 
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
+				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 			});
 
 
@@ -138,7 +138,9 @@ namespace UICatalog.Scenarios {
 				keywords.Add ("union");
 				keywords.Add ("exists");
 
-				Autocomplete.AllSuggestions = keywords.ToList ();
+				Autocomplete.SuggestionGenerator = new SingleWordSuggestionGenerator () {
+					AllSuggestions = keywords.ToList ()
+				};
 
 				magenta = Driver.MakeAttribute (Color.Magenta, Color.Black);
 				blue = Driver.MakeAttribute (Color.Cyan, Color.Black);

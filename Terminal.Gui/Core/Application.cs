@@ -34,7 +34,7 @@ namespace Terminal.Gui {
 	/// // A simple Terminal.Gui app that creates a window with a frame and title with 
 	/// // 5 rows/columns of padding.
 	/// Application.Init();
-	/// var win = new Window ("Hello World - CTRL-Q to quit") {
+	/// var win = new Window ($"Example App ({Application.QuitKey} to quit)") {
 	///     X = 5,
 	///     Y = 5,
 	///     Width = Dim.Fill (5),
@@ -59,7 +59,7 @@ namespace Terminal.Gui {
 	///     to the mainloop, allowing user code to use async/await.
 	///   </para>
 	/// </remarks>
-	public static class Application {
+	public static partial class Application {
 		static readonly Stack<Toplevel> toplevels = new Stack<Toplevel> ();
 
 		/// <summary>
@@ -162,15 +162,15 @@ namespace Terminal.Gui {
 				if (alternateForwardKey != value) {
 					var oldKey = alternateForwardKey;
 					alternateForwardKey = value;
-					OnAlternateForwardKeyChanged (oldKey);
+					OnAlternateForwardKeyChanged (new KeyChangedEventArgs (oldKey, value));
 				}
 			}
 		}
 
-		static void OnAlternateForwardKeyChanged (Key oldKey)
+		static void OnAlternateForwardKeyChanged (KeyChangedEventArgs e)
 		{
 			foreach (var top in toplevels.ToArray ()) {
-				top.OnAlternateForwardKeyChanged (oldKey);
+				top.OnAlternateForwardKeyChanged (e);
 			}
 		}
 
@@ -186,12 +186,12 @@ namespace Terminal.Gui {
 				if (alternateBackwardKey != value) {
 					var oldKey = alternateBackwardKey;
 					alternateBackwardKey = value;
-					OnAlternateBackwardKeyChanged (oldKey);
+					OnAlternateBackwardKeyChanged (new KeyChangedEventArgs (oldKey, value));
 				}
 			}
 		}
 
-		static void OnAlternateBackwardKeyChanged (Key oldKey)
+		static void OnAlternateBackwardKeyChanged (KeyChangedEventArgs oldKey)
 		{
 			foreach (var top in toplevels.ToArray ()) {
 				top.OnAlternateBackwardKeyChanged (oldKey);
@@ -210,7 +210,7 @@ namespace Terminal.Gui {
 				if (quitKey != value) {
 					var oldKey = quitKey;
 					quitKey = value;
-					OnQuitKeyChanged (oldKey);
+					OnQuitKeyChanged (new KeyChangedEventArgs (oldKey, value));
 				}
 			}
 		}
@@ -222,11 +222,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static List<CultureInfo> SupportedCultures => supportedCultures;
 
-		static void OnQuitKeyChanged (Key oldKey)
+		static void OnQuitKeyChanged (KeyChangedEventArgs e)
 		{
 			// Duplicate the list so if it changes during enumeration we're safe
 			foreach (var top in toplevels.ToArray ()) {
-				top.OnQuitKeyChanged (oldKey);
+				top.OnQuitKeyChanged (e);
 			}
 		}
 
@@ -257,7 +257,7 @@ namespace Terminal.Gui {
 		///	<see cref="Begin(Toplevel)"/> must also subscribe to <see cref="NotifyStopRunState"/>
 		///	and manually dispose of the <see cref="RunState"/> token when the application is done.
 		/// </remarks>
-		public static event Action<RunState> NotifyNewRunState;
+		public static event EventHandler<RunStateEventArgs> NotifyNewRunState;
 
 		/// <summary>
 		/// Notify that a existent <see cref="RunState"/> is stopping (<see cref="End(RunState)"/> was called).
@@ -267,7 +267,7 @@ namespace Terminal.Gui {
 		///	<see cref="Begin(Toplevel)"/> must also subscribe to <see cref="NotifyStopRunState"/>
 		///	and manually dispose of the <see cref="RunState"/> token when the application is done.
 		/// </remarks>
-		public static event Action<Toplevel> NotifyStopRunState;
+		public static event EventHandler<ToplevelEventArgs> NotifyStopRunState;
 
 		/// <summary>
 		///   This event is raised on each iteration of the <see cref="MainLoop"/>. 
@@ -721,14 +721,24 @@ namespace Terminal.Gui {
 		public static View MouseGrabView => mouseGrabView;
 
 		/// <summary>
+		/// Event to be invoked when a view want grab the mouse which can be canceled.
+		/// </summary>
+		public static event EventHandler<GrabMouseEventArgs> GrabbingMouse;
+
+		/// <summary>
+		/// Event to be invoked when a view want ungrab the mouse which can be canceled.
+		/// </summary>
+		public static event EventHandler<GrabMouseEventArgs> UnGrabbingMouse;
+
+		/// <summary>
 		/// Event to be invoked when a view grab the mouse.
 		/// </summary>
-		public static event Action<View> GrabbedMouse;
+		public static event EventHandler<ViewEventArgs> GrabbedMouse;
 
 		/// <summary>
 		/// Event to be invoked when a view ungrab the mouse.
 		/// </summary>
-		public static event Action<View> UnGrabbedMouse;
+		public static event EventHandler<ViewEventArgs> UnGrabbedMouse;
 
 		/// <summary>
 		/// Grabs the mouse, forcing all mouse events to be routed to the specified view until UngrabMouse is called.
@@ -739,9 +749,11 @@ namespace Terminal.Gui {
 		{
 			if (view == null)
 				return;
-			OnGrabbedMouse (view);
-			mouseGrabView = view;
-			Driver.UncookMouse ();
+			if (!OnGrabbingMouse (view)) {
+				OnGrabbedMouse (view);
+				mouseGrabView = view;
+				Driver.UncookMouse ();
+			}
 		}
 
 		/// <summary>
@@ -751,23 +763,43 @@ namespace Terminal.Gui {
 		{
 			if (mouseGrabView == null)
 				return;
-			OnUnGrabbedMouse (mouseGrabView);
-			mouseGrabView = null;
-			Driver.CookMouse ();
+			if (!OnUnGrabbingMouse (mouseGrabView)) {
+				OnUnGrabbedMouse (mouseGrabView);
+				mouseGrabView = null;
+				Driver.CookMouse ();
+			}
+		}
+
+		static bool OnGrabbingMouse (View view)
+		{
+			if (view == null)
+				return false;
+			var evArgs = new GrabMouseEventArgs (view);
+			GrabbingMouse?.Invoke (view, evArgs);
+			return evArgs.Cancel;
+		}
+
+		static bool OnUnGrabbingMouse (View view)
+		{
+			if (view == null)
+				return false;
+			var evArgs = new GrabMouseEventArgs (view);
+			UnGrabbingMouse?.Invoke (view, evArgs);
+			return evArgs.Cancel;
 		}
 
 		static void OnGrabbedMouse (View view)
 		{
 			if (view == null)
 				return;
-			GrabbedMouse?.Invoke (view);
+			GrabbedMouse?.Invoke (view, new ViewEventArgs (view));
 		}
 
 		static void OnUnGrabbedMouse (View view)
 		{
 			if (view == null)
 				return;
-			UnGrabbedMouse?.Invoke (view);
+			UnGrabbedMouse?.Invoke (view, new ViewEventArgs (view));
 		}
 
 		/// <summary>
@@ -951,13 +983,10 @@ namespace Terminal.Gui {
 
 			var rs = new RunState (toplevel);
 
-			if (toplevel is ISupportInitializeNotification initializableNotification &&
-			    !initializableNotification.IsInitialized) {
-				initializableNotification.BeginInit ();
-				initializableNotification.EndInit ();
-			} else if (toplevel is ISupportInitialize initializable) {
-				initializable.BeginInit ();
-				initializable.EndInit ();
+			// View implements ISupportInitializeNotification which is derived from ISupportInitialize
+			if (!toplevel.IsInitialized) {
+				toplevel.BeginInit ();
+				toplevel.EndInit ();
 			}
 
 			lock (toplevels) {
@@ -1029,7 +1058,7 @@ namespace Terminal.Gui {
 				Driver.Refresh ();
 			}
 
-			NotifyNewRunState?.Invoke (rs);
+			NotifyNewRunState?.Invoke (toplevel, new RunStateEventArgs (rs));
 			return rs;
 		}
 
@@ -1134,6 +1163,7 @@ namespace Terminal.Gui {
 			_initialized = false;
 			mouseGrabView = null;
 			_enableConsoleScrolling = false;
+			lastMouseOwnerView = null;
 
 			// Reset synchronization context to allow the user to run async/await,
 			// as the main loop has been ended, the synchronization context from 
@@ -1219,7 +1249,7 @@ namespace Terminal.Gui {
 					MdiTop?.OnDeactivate (state.Toplevel);
 					state.Toplevel = Current;
 					MdiTop?.OnActivate (state.Toplevel);
-					Top.SetChildNeedsDisplay ();
+					Top.SetSubViewNeedsDisplay ();
 					Refresh ();
 				}
 				if (Driver.EnsureCursorVisibility ()) {
@@ -1240,6 +1270,14 @@ namespace Terminal.Gui {
 					}
 				}
 				state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
+			}
+			if (toplevels.Count == 1 && state.Toplevel == Top
+				&& (Driver.Cols != state.Toplevel.Frame.Width || Driver.Rows != state.Toplevel.Frame.Height)
+				&& (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.ChildNeedsDisplay || state.Toplevel.LayoutNeeded)) {
+
+				Driver.SetAttribute (Colors.TopLevel.Normal);
+				state.Toplevel.Clear (new Rect (0, 0, Driver.Cols, Driver.Rows));
+
 			}
 			if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.ChildNeedsDisplay || state.Toplevel.LayoutNeeded
 				|| MdiChildNeedsDisplay ()) {
@@ -1283,7 +1321,7 @@ namespace Terminal.Gui {
 
 			foreach (var top in toplevels) {
 				if (top != Current && top.Visible && (!top.NeedDisplay.IsEmpty || top.ChildNeedsDisplay || top.LayoutNeeded)) {
-					MdiTop.SetChildNeedsDisplay ();
+					MdiTop.SetSubViewNeedsDisplay ();
 					return true;
 				}
 			}
@@ -1497,22 +1535,8 @@ namespace Terminal.Gui {
 		static void OnNotifyStopRunState (Toplevel top)
 		{
 			if (ExitRunLoopAfterFirstIteration) {
-				NotifyStopRunState?.Invoke (top);
+				NotifyStopRunState?.Invoke (top, new ToplevelEventArgs (top));
 			}
-		}
-
-		/// <summary>
-		/// Event arguments for the <see cref="Application.Resized"/> event.
-		/// </summary>
-		public class ResizedEventArgs : EventArgs {
-			/// <summary>
-			/// The number of rows in the resized terminal.
-			/// </summary>
-			public int Rows { get; set; }
-			/// <summary>
-			/// The number of columns in the resized terminal.
-			/// </summary>
-			public int Cols { get; set; }
 		}
 
 		/// <summary>
@@ -1529,7 +1553,7 @@ namespace Terminal.Gui {
 				t.SetRelativeLayout (full);
 				t.LayoutSubviews ();
 				t.PositionToplevels ();
-				t.OnResized (full.Size);
+				t.OnResized (new SizeChangedEventArgs (full.Size));
 			}
 			Refresh ();
 		}

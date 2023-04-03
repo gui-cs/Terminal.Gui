@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Globalization;
+using Terminal.Gui.Configuration;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Editor", Description: "A Text Editor using the TextView control.")]
@@ -32,17 +33,19 @@ namespace UICatalog.Scenarios {
 		private bool _forceMinimumPosToZero = true;
 		private List<CultureInfo> _cultureInfos;
 
-		public override void Init (ColorScheme colorScheme)
+		public override void Init ()
 		{
 			Application.Init ();
 			_cultureInfos = Application.SupportedCultures;
-
+			ConfigurationManager.Themes.Theme = Theme;
+			ConfigurationManager.Apply ();
+			
 			Win = new Window (_fileName ?? "Untitled") {
 				X = 0,
 				Y = 1,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
-				ColorScheme = colorScheme,
+				ColorScheme = Colors.ColorSchemes [TopLevelColorScheme],
 			};
 			Application.Top.Add (Win);
 
@@ -59,8 +62,8 @@ namespace UICatalog.Scenarios {
 
 			var siCursorPosition = new StatusItem (Key.Null, "", null);
 
-			_textView.UnwrappedCursorPosition += (e) => {
-				siCursorPosition.Title = $"Ln {e.Y + 1}, Col {e.X + 1}";
+			_textView.UnwrappedCursorPosition += (s,e) => {
+				siCursorPosition.Title = $"Ln {e.Point.Y + 1}, Col {e.Point.X + 1}";
 			};
 
 			LoadFile ();
@@ -121,14 +124,14 @@ namespace UICatalog.Scenarios {
 				new StatusItem(Key.F2, "~F2~ Open", () => Open()),
 				new StatusItem(Key.F3, "~F3~ Save", () => Save()),
 				new StatusItem(Key.F4, "~F4~ Save As", () => SaveAs()),
-				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => Quit()),
+				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 				new StatusItem(Key.Null, $"OS Clipboard IsSupported : {Clipboard.IsSupported}", null)
 			});
 			Application.Top.Add (statusBar);
 
 			_scrollBar = new ScrollBarView (_textView, true);
 
-			_scrollBar.ChangedPosition += () => {
+			_scrollBar.ChangedPosition += (s,e) => {
 				_textView.TopRow = _scrollBar.Position;
 				if (_textView.TopRow != _scrollBar.Position) {
 					_scrollBar.Position = _textView.TopRow;
@@ -136,7 +139,7 @@ namespace UICatalog.Scenarios {
 				_textView.SetNeedsDisplay ();
 			};
 
-			_scrollBar.OtherScrollBarView.ChangedPosition += () => {
+			_scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
 				_textView.LeftColumn = _scrollBar.OtherScrollBarView.Position;
 				if (_textView.LeftColumn != _scrollBar.OtherScrollBarView.Position) {
 					_scrollBar.OtherScrollBarView.Position = _textView.LeftColumn;
@@ -144,7 +147,7 @@ namespace UICatalog.Scenarios {
 				_textView.SetNeedsDisplay ();
 			};
 
-			_scrollBar.VisibleChanged += () => {
+			_scrollBar.VisibleChanged += (s,e) => {
 				if (_scrollBar.Visible && _textView.RightOffset == 0) {
 					_textView.RightOffset = 1;
 				} else if (!_scrollBar.Visible && _textView.RightOffset == 1) {
@@ -152,7 +155,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			_scrollBar.OtherScrollBarView.VisibleChanged += () => {
+			_scrollBar.OtherScrollBarView.VisibleChanged += (s,e) => {
 				if (_scrollBar.OtherScrollBarView.Visible && _textView.BottomOffset == 0) {
 					_textView.BottomOffset = 1;
 				} else if (!_scrollBar.OtherScrollBarView.Visible && _textView.BottomOffset == 1) {
@@ -160,7 +163,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			_textView.DrawContent += (e) => {
+			_textView.DrawContent += (s,e) => {
 				_scrollBar.Size = _textView.Lines;
 				_scrollBar.Position = _textView.TopRow;
 				if (_scrollBar.OtherScrollBarView != null) {
@@ -171,12 +174,12 @@ namespace UICatalog.Scenarios {
 				_scrollBar.Refresh ();
 			};
 
-			Win.KeyPress += (e) => {
+			Win.KeyPress += (s, e) => {
 				var keys = ShortcutHelper.GetModifiersKey (e.KeyEvent);
 				if (_winDialog != null && (e.KeyEvent.Key == Key.Esc
-					|| e.KeyEvent.Key == (Key.Q | Key.CtrlMask))) {
+					|| e.KeyEvent.Key == Application.QuitKey)) {
 					DisposeWinDialog ();
-				} else if (e.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
+				} else if (e.KeyEvent.Key == Application.QuitKey) {
 					Quit ();
 					e.Handled = true;
 				} else if (_winDialog != null && keys == (Key.Tab | Key.CtrlMask)) {
@@ -196,7 +199,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			Application.Top.Closed += (_) => Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
+			Application.Top.Closed += (s,e) => Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
 		}
 
 		private void DisposeWinDialog ()
@@ -541,6 +544,9 @@ namespace UICatalog.Scenarios {
 
 		private MenuItem CreateAutocomplete ()
 		{
+			var singleWordGenerator = new SingleWordSuggestionGenerator ();
+			_textView.Autocomplete.SuggestionGenerator = singleWordGenerator;
+
 			var auto = new MenuItem ();
 			auto.Title = "Autocomplete";
 			auto.CheckType |= MenuItemCheckStyle.Checked;
@@ -548,13 +554,13 @@ namespace UICatalog.Scenarios {
 			auto.Action += () => {
 				if ((bool)(auto.Checked = !auto.Checked)) {
 					// setup autocomplete with all words currently in the editor
-					_textView.Autocomplete.AllSuggestions =
+					singleWordGenerator.AllSuggestions =
 
 					Regex.Matches (_textView.Text.ToString (), "\\w+")
 					.Select (s => s.Value)
 					.Distinct ().ToList ();
 				} else {
-					_textView.Autocomplete.AllSuggestions.Clear ();
+					singleWordGenerator.AllSuggestions.Clear ();
 
 				}
 			};
@@ -765,7 +771,7 @@ namespace UICatalog.Scenarios {
 		private View FindTab ()
 		{
 			var d = new View ();
-			d.DrawContent += (e) => {
+			d.DrawContent += (s,e) => {
 				foreach (var v in d.Subviews) {
 					v.SetNeedsDisplay ();
 				}
@@ -787,7 +793,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (label),
 				Width = 20
 			};
-			txtToFind.Enter += (_) => txtToFind.Text = _textToFind;
+			txtToFind.Enter += (s, e) => txtToFind.Text = _textToFind;
 			d.Add (txtToFind);
 
 			var btnFindNext = new Button ("Find _Next") {
@@ -799,7 +805,7 @@ namespace UICatalog.Scenarios {
 				IsDefault = true,
 				AutoSize = false
 			};
-			btnFindNext.Clicked += () => FindNext ();
+			btnFindNext.Clicked += (s,e) => FindNext ();
 			d.Add (btnFindNext);
 
 			var btnFindPrevious = new Button ("Find _Previous") {
@@ -810,10 +816,10 @@ namespace UICatalog.Scenarios {
 				TextAlignment = TextAlignment.Centered,
 				AutoSize = false
 			};
-			btnFindPrevious.Clicked += () => FindPrevious ();
+			btnFindPrevious.Clicked += (s,e) => FindPrevious ();
 			d.Add (btnFindPrevious);
 
-			txtToFind.TextChanged += (e) => {
+			txtToFind.TextChanged += (s, e) => {
 				_textToFind = txtToFind.Text.ToString ();
 				_textView.FindTextChanged ();
 				btnFindNext.Enabled = !txtToFind.Text.IsEmpty;
@@ -827,7 +833,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = TextAlignment.Centered,
 				AutoSize = false
 			};
-			btnCancel.Clicked += () => {
+			btnCancel.Clicked += (s,e) => {
 				DisposeWinDialog ();
 			};
 			d.Add (btnCancel);
@@ -837,7 +843,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (txtToFind) + 2,
 				Checked = _matchCase
 			};
-			ckbMatchCase.Toggled += (e) => _matchCase = (bool)ckbMatchCase.Checked;
+			ckbMatchCase.Toggled += (s, e) => _matchCase = (bool)ckbMatchCase.Checked;
 			d.Add (ckbMatchCase);
 
 			var ckbMatchWholeWord = new CheckBox ("Match _whole word") {
@@ -845,7 +851,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (ckbMatchCase) + 1,
 				Checked = _matchWholeWord
 			};
-			ckbMatchWholeWord.Toggled += (e) => _matchWholeWord = (bool)ckbMatchWholeWord.Checked;
+			ckbMatchWholeWord.Toggled += (s, e) => _matchWholeWord = (bool)ckbMatchWholeWord.Checked;
 			d.Add (ckbMatchWholeWord);
 
 			d.Width = label.Width + txtToFind.Width + btnFindNext.Width + 2;
@@ -857,7 +863,7 @@ namespace UICatalog.Scenarios {
 		private View ReplaceTab ()
 		{
 			var d = new View ();
-			d.DrawContent += (e) => {
+			d.DrawContent += (s,e) => {
 				foreach (var v in d.Subviews) {
 					v.SetNeedsDisplay ();
 				}
@@ -879,7 +885,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (label),
 				Width = 20
 			};
-			txtToFind.Enter += (_) => txtToFind.Text = _textToFind;
+			txtToFind.Enter += (s, e) => txtToFind.Text = _textToFind;
 			d.Add (txtToFind);
 
 			var btnFindNext = new Button ("Replace _Next") {
@@ -891,7 +897,7 @@ namespace UICatalog.Scenarios {
 				IsDefault = true,
 				AutoSize = false
 			};
-			btnFindNext.Clicked += () => ReplaceNext ();
+			btnFindNext.Clicked += (s,e) => ReplaceNext ();
 			d.Add (btnFindNext);
 
 			label = new Label ("Replace:") {
@@ -908,7 +914,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (label),
 				Width = 20
 			};
-			txtToReplace.TextChanged += (e) => _textToReplace = txtToReplace.Text.ToString ();
+			txtToReplace.TextChanged += (s, e) => _textToReplace = txtToReplace.Text.ToString ();
 			d.Add (txtToReplace);
 
 			var btnFindPrevious = new Button ("Replace _Previous") {
@@ -919,7 +925,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = TextAlignment.Centered,
 				AutoSize = false
 			};
-			btnFindPrevious.Clicked += () => ReplacePrevious ();
+			btnFindPrevious.Clicked += (s,e) => ReplacePrevious ();
 			d.Add (btnFindPrevious);
 
 			var btnReplaceAll = new Button ("Replace _All") {
@@ -930,10 +936,10 @@ namespace UICatalog.Scenarios {
 				TextAlignment = TextAlignment.Centered,
 				AutoSize = false
 			};
-			btnReplaceAll.Clicked += () => ReplaceAll ();
+			btnReplaceAll.Clicked += (s,e) => ReplaceAll ();
 			d.Add (btnReplaceAll);
 
-			txtToFind.TextChanged += (e) => {
+			txtToFind.TextChanged += (s, e) => {
 				_textToFind = txtToFind.Text.ToString ();
 				_textView.FindTextChanged ();
 				btnFindNext.Enabled = !txtToFind.Text.IsEmpty;
@@ -948,7 +954,7 @@ namespace UICatalog.Scenarios {
 				TextAlignment = TextAlignment.Centered,
 				AutoSize = false
 			};
-			btnCancel.Clicked += () => {
+			btnCancel.Clicked += (s,e) => {
 				DisposeWinDialog ();
 			};
 			d.Add (btnCancel);
@@ -958,7 +964,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (txtToFind) + 2,
 				Checked = _matchCase
 			};
-			ckbMatchCase.Toggled += (e) => _matchCase = (bool)ckbMatchCase.Checked;
+			ckbMatchCase.Toggled += (s, e) => _matchCase = (bool)ckbMatchCase.Checked;
 			d.Add (ckbMatchCase);
 
 			var ckbMatchWholeWord = new CheckBox ("Match _whole word") {
@@ -966,7 +972,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (ckbMatchCase) + 1,
 				Checked = _matchWholeWord
 			};
-			ckbMatchWholeWord.Toggled += (e) => _matchWholeWord = (bool)ckbMatchWholeWord.Checked;
+			ckbMatchWholeWord.Toggled += (s, e) => _matchWholeWord = (bool)ckbMatchWholeWord.Checked;
 			d.Add (ckbMatchWholeWord);
 
 			d.Width = lblWidth + txtToFind.Width + btnFindNext.Width + 2;

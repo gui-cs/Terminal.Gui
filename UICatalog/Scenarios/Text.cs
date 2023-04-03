@@ -24,11 +24,15 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Percent (50) - 1,
 				Height = 2
 			};
+
+			var singleWordGenerator = new SingleWordSuggestionGenerator ();
+			textField.Autocomplete.SuggestionGenerator = singleWordGenerator;
+
 			textField.TextChanging += TextField_TextChanging;
 
-			void TextField_TextChanging (TextChangingEventArgs e)
+			void TextField_TextChanging (object sender, TextChangingEventArgs e)
 			{
-				textField.Autocomplete.AllSuggestions = Regex.Matches (e.NewText.ToString (), "\\w+")
+				singleWordGenerator.AllSuggestions = Regex.Matches (e.NewText.ToString (), "\\w+")
 					.Select (s => s.Value)
 					.Distinct ().ToList ();
 			}
@@ -41,7 +45,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (labelMirroringTextField);
 
-			textField.TextChanged += (prev) => {
+			textField.TextChanged += (s, prev) => {
 				labelMirroringTextField.Text = textField.Text;
 			};
 
@@ -56,9 +60,9 @@ namespace UICatalog.Scenarios {
 			textView.DrawContent += TextView_DrawContent;
 
 			// This shows how to enable autocomplete in TextView.
-			void TextView_DrawContent (Rect e)
+			void TextView_DrawContent (object sender, DrawEventArgs e)
 			{
-				textView.Autocomplete.AllSuggestions = Regex.Matches (textView.Text.ToString (), "\\w+")
+				singleWordGenerator.AllSuggestions = Regex.Matches (textView.Text.ToString (), "\\w+")
 					.Select (s => s.Value)
 					.Distinct ().ToList ();
 			}
@@ -75,7 +79,7 @@ namespace UICatalog.Scenarios {
 			// Use ContentChanged to detect if the user has typed something in a TextView.
 			// The TextChanged property is only fired if the TextView.Text property is
 			// explicitly set
-			textView.ContentsChanged += (a) => {
+			textView.ContentsChanged += (s,a) => {
 				labelMirroringTextView.Enabled = !labelMirroringTextView.Enabled;
 				labelMirroringTextView.Text = textView.Text;
 			};
@@ -87,14 +91,14 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (textView),
 				Checked = true
 			};
-			chxMultiline.Toggled += (b) => textView.Multiline = (bool)b;
+			chxMultiline.Toggled += (s,e) => textView.Multiline = (bool)e.OldValue;
 			Win.Add (chxMultiline);
 
 			var chxWordWrap = new CheckBox ("Word Wrap") {
 				X = Pos.Right (chxMultiline) + 2,
 				Y = Pos.Top (chxMultiline)
 			};
-			chxWordWrap.Toggled += (b) => textView.WordWrap = (bool)b;
+			chxWordWrap.Toggled += (s,e) => textView.WordWrap = (bool)e.OldValue;
 			Win.Add (chxWordWrap);
 
 			// TextView captures Tabs (so users can enter /t into text) by default;
@@ -108,15 +112,15 @@ namespace UICatalog.Scenarios {
 
 			Key keyTab = textView.GetKeyFromCommand (Command.Tab);
 			Key keyBackTab = textView.GetKeyFromCommand (Command.BackTab);
-			chxCaptureTabs.Toggled += (b) => {
-				if (b == true) {
+			chxCaptureTabs.Toggled += (s,e) => {
+				if (e.OldValue == true) {
 					textView.AddKeyBinding (keyTab, Command.Tab);
 					textView.AddKeyBinding (keyBackTab, Command.BackTab);
 				} else {
 					textView.ClearKeybinding (keyTab);
 					textView.ClearKeybinding (keyBackTab);
 				}
-				textView.WordWrap = (bool)b;
+				textView.WordWrap = (bool)e.OldValue;
 			};
 			Win.Add (chxCaptureTabs);
 
@@ -136,7 +140,7 @@ namespace UICatalog.Scenarios {
 			};
 			var array = ((MemoryStream)hexEditor.Source).ToArray ();
 			labelMirroringHexEditor.Text = Encoding.UTF8.GetString (array, 0, array.Length);
-			hexEditor.Edited += (kv) => {
+			hexEditor.Edited += (s,kv) => {
 				hexEditor.ApplyEdits ();
 				var array = ((MemoryStream)hexEditor.Source).ToArray ();
 				labelMirroringHexEditor.Text = Encoding.UTF8.GetString (array, 0, array.Length);
@@ -159,7 +163,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (labelMirroringDateField);
 
-			dateField.TextChanged += (prev) => {
+			dateField.TextChanged += (s, prev) => {
 				labelMirroringDateField.Text = dateField.Text;
 			};
 
@@ -213,12 +217,32 @@ namespace UICatalog.Scenarios {
 			};
 
 			Win.Add (regexProviderField);
+
+			var labelAppendAutocomplete = new Label ("Append Autocomplete:") {
+				Y = Pos.Y (regexProviderField) + 2,
+				X = 1
+			};
+			var appendAutocompleteTextField = new TextField () {
+				X = Pos.Right(labelAppendAutocomplete),
+				Y = labelAppendAutocomplete.Y,
+				Width = Dim.Fill()
+			};
+			appendAutocompleteTextField.Autocomplete = new AppendAutocomplete (appendAutocompleteTextField);
+			appendAutocompleteTextField.Autocomplete.SuggestionGenerator = new SingleWordSuggestionGenerator {
+				AllSuggestions = new System.Collections.Generic.List<string>{
+					"fish", "flipper", "fin","fun","the","at","there","some","my","of","be","use","her","than","and","this","an","would","first","have","each","make","water","to","from","which","like","been","in","or","she","him","call","is","one","do","into","who","you","had","how","time","oil","that","by","their","has","its","it","word","if","look","now","he","but","will","two","find","was","not","up","more","long","for","what","other","write","down","on","all","about","go","day","are","were","out","see","did","as","we","many","number","get","with","when","then","no","come","his","your","them","way","made","they","can","these","could","may","said","so","people","part"
+				}
+			};
+
+
+			Win.Add (labelAppendAutocomplete);
+			Win.Add (appendAutocompleteTextField);
 		}
 
 		TimeField _timeField;
 		Label _labelMirroringTimeField;
 
-		private void TimeChanged (DateTimeEventArgs<TimeSpan> e)
+		private void TimeChanged (object sender, DateTimeEventArgs<TimeSpan> e)
 		{
 			_labelMirroringTimeField.Text = _timeField.Text;
 		}

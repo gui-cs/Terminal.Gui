@@ -123,7 +123,7 @@ namespace Terminal.Gui.DriverTests {
 			Assert.Equal ("Y, CtrlMask", key.ToString ());
 
 			// This will be well compared, because the Key.CtrlMask have a high value.
-			Assert.False (key == (Key.Q | Key.CtrlMask));
+			Assert.False (key == Application.QuitKey);
 			switch (key) {
 			case Key.Q | Key.CtrlMask:
 				// Never goes here.
