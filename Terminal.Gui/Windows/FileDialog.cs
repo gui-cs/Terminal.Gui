@@ -208,9 +208,9 @@ namespace Terminal.Gui {
 				Height = Dim.Fill (),
 				FullRowSelect = true,
 			};
+
 			this.tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
 			Style.TableStyle = tableView.Style;
-			Style.TableStyle.ShowHorizontalScrollIndicators = true;
 
 			this.tableView.KeyPress += (s, k) => {
 				if (this.tableView.SelectedRow <= 0) {
@@ -283,9 +283,12 @@ namespace Terminal.Gui {
 			};
 
 			this.tableView.Style.ShowHorizontalHeaderOverline = false;
-			this.tableView.Style.ShowVerticalCellLines = false;
-			this.tableView.Style.ShowVerticalHeaderLines = false;
+			this.tableView.Style.ShowVerticalCellLines = true;
+			this.tableView.Style.ShowVerticalHeaderLines = true;
 			this.tableView.Style.AlwaysShowHeaders = true;
+			this.tableView.Style.ShowHorizontalHeaderUnderline = true;
+			this.tableView.Style.ShowHorizontalScrollIndicators = true;
+
 
 			this.SetupTableColumns ();
 
