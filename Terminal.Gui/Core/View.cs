@@ -983,7 +983,7 @@ namespace Terminal.Gui {
 			}
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
-      
+
 			OnAdded (new SuperViewChangedEventArgs (this, view));
 			if (IsInitialized && !view.IsInitialized) {
 				view.BeginInit ();
@@ -1037,9 +1037,6 @@ namespace Terminal.Gui {
 			view.tabIndex = -1;
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
-			if (subviews.Count < 1) {
-				CanFocus = false;
-			}
 			foreach (var v in subviews) {
 				if (v.Frame.IntersectsWith (touched))
 					view.SetNeedsDisplay ();
@@ -1676,7 +1673,14 @@ namespace Terminal.Gui {
 				return;
 			if (focused?.hasFocus == true && focused == view)
 				return;
+			if ((focused?.hasFocus == true && focused?.SuperView == view)
+				|| view == this) {
 
+				if (!view.hasFocus) {
+					view.hasFocus = true;
+				}
+				return;
+			}
 			// Make sure that this view is a subview
 			View c;
 			for (c = view.container; c != null; c = c.container)
@@ -1694,7 +1698,11 @@ namespace Terminal.Gui {
 			focused.EnsureFocus ();
 
 			// Send focus upwards
-			SuperView?.SetFocus (this);
+			if (SuperView != null) {
+				SuperView.SetFocus (this);
+			} else {
+				SetFocus (this);
+			}
 		}
 
 		/// <summary>
@@ -1709,7 +1717,11 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			SuperView?.SetFocus (this);
+			if (SuperView != null) {
+				SuperView.SetFocus (this);
+			} else {
+				SetFocus (this);
+			}
 		}
 
 		/// <summary>
@@ -2129,9 +2141,8 @@ namespace Terminal.Gui {
 				FocusFirst ();
 				return focused != null;
 			}
-			var n = tabIndexes.Count;
 			var focusedIdx = -1;
-			for (var i = 0; i < n; i++) {
+			for (var i = 0; i < tabIndexes.Count; i++) {
 				var w = tabIndexes [i];
 
 				if (w.HasFocus) {

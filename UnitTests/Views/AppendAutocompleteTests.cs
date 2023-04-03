@@ -48,6 +48,36 @@ namespace Terminal.Gui.ViewTests {
 			Assert.NotSame(tf,Application.Top.Focused);
         }
 
+        [Fact, AutoInitShutdown]
+        public void TestAutoAppend_ShowThenAccept_CasesDiffer()
+        {
+			var tf = GetTextFieldsInView();
+
+			tf.Autocomplete = new AppendAutocomplete(tf);
+			var generator = (SingleWordSuggestionGenerator)tf.Autocomplete.SuggestionGenerator;
+			generator.AllSuggestions = new List<string>{"FISH"};
+
+
+			tf.Redraw(tf.Bounds);
+			TestHelpers.AssertDriverContentsAre("",output);
+			tf.ProcessKey(new KeyEvent(Key.m,new KeyModifiers()));
+			tf.ProcessKey(new KeyEvent(Key.y,new KeyModifiers()));
+			tf.ProcessKey(new KeyEvent(Key.Space,new KeyModifiers()));
+			tf.ProcessKey(new KeyEvent(Key.f,new KeyModifiers()));
+
+			// Even though there is no match on case we should still get the suggestion
+			tf.Redraw(tf.Bounds);
+			TestHelpers.AssertDriverContentsAre("my fISH",output);
+			Assert.Equal("my f",tf.Text.ToString());
+
+			// When tab completing the case of the whole suggestion should be applied
+			Application.Driver.SendKeys('\t',ConsoleKey.Tab,false,false,false);
+			tf.Redraw(tf.Bounds);
+			TestHelpers.AssertDriverContentsAre("my FISH",output);
+			Assert.Equal("my FISH",tf.Text.ToString());
+        }
+
+
 		[Fact, AutoInitShutdown]
         public void TestAutoAppend_AfterCloseKey_NoAutocomplete()
         {
