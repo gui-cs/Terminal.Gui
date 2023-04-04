@@ -1038,7 +1038,7 @@ namespace Terminal.Gui {
 				// BUGBUG: v2 - ? - If layoutstyle is absolute, this overwrites the current frame h/w with 0. Hmmm...
 				frame = new Rect (new Point (actX, actY), new Size (w, h)); // Set frame, not Frame!
 
-	
+
 			}
 			//// BUGBUG: I think these calls are redundant or should be moved into just the AutoSize case
 			if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
@@ -1047,7 +1047,7 @@ namespace Terminal.Gui {
 				SetMinWidthHeight ();
 				SetNeedsLayout ();
 				SetNeedsDisplay ();
-			}               
+			}
 		}
 
 		void TextFormatter_HotKeyChanged (object sender, KeyChangedEventArgs e)
@@ -1139,12 +1139,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void SetSubViewNeedsDisplay ()
 		{
-			if (ChildNeedsDisplay) {
+			if (_childNeedsDisplay) {
 				return;
 			}
-			ChildNeedsDisplay = true;
-			if (container != null && !container.ChildNeedsDisplay)
-				container.SetSubViewNeedsDisplay ();
+			_childNeedsDisplay = true;
+			if (_superView != null && !_superView._childNeedsDisplay)
+				_superView.SetSubViewNeedsDisplay ();
 		}
 
 		internal bool addingView;
@@ -1493,7 +1493,7 @@ namespace Terminal.Gui {
 		/// <param name="region">View-relative region for the frame to be drawn.</param>
 		/// <param name="padding">The padding to add around the outside of the drawn frame.</param>
 		/// <param name="fill">If set to <see langword="true"/> it fill will the contents.</param>
-		[ObsoleteAttribute ("This method is obsolete in v2. Use use LineCanvas or Frame instead instead.", false)]
+		[ObsoleteAttribute ("This method is obsolete in v2. Use use LineCanvas or Frame instead.", false)]
 		public void DrawFrame (Rect region, int padding = 0, bool fill = false)
 		{
 			var scrRect = ViewToScreen (region);
@@ -1726,7 +1726,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Removes the <see cref="NeedDisplay"/> and the <see cref="ChildNeedsDisplay"/> setting on this view.
+		/// Removes the <see cref="_needsDisplay"/> and the <see cref="_childNeedsDisplay"/> setting on this view.
 		/// </summary>
 		protected void ClearNeedsDisplay ()
 		{
@@ -3505,12 +3505,11 @@ namespace Terminal.Gui {
 				resy = 0;
 				return null;
 			}
-
 			if (start.InternalSubviews != null) {
 				int count = start.InternalSubviews.Count;
 				if (count > 0) {
-					var rx = x - startFrame.X;
-					var ry = y - startFrame.Y;
+					var rx = x - (startFrame.X + start.GetBoundsOffset ().X);
+					var ry = y - (startFrame.Y + start.GetBoundsOffset ().Y);
 					for (int i = count - 1; i >= 0; i--) {
 						View v = start.InternalSubviews [i];
 						if (v.Visible && v.Frame.Contains (rx, ry)) {
