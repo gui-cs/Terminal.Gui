@@ -1,5 +1,4 @@
-﻿using Terminal.Gui.Graphs;
-using Xunit;
+﻿using Xunit;
 
 namespace Terminal.Gui.ViewTests {
 	public class LineViewTests {

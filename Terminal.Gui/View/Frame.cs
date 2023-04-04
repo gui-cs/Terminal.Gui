@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Linq;
-using Terminal.Gui.Graphs;
 
 namespace Terminal.Gui {
 

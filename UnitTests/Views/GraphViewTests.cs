@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
 using Xunit;
-using Terminal.Gui.Graphs;
 using Point = Terminal.Gui.Point;
 using Attribute = Terminal.Gui.Attribute;
 using System.Text;

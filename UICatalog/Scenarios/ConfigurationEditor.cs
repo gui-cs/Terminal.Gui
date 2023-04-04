@@ -49,7 +49,7 @@ namespace UICatalog.Scenarios {
 			_tileView = new TileView (0) {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (1),
-				Orientation = Terminal.Gui.Graphs.Orientation.Vertical,
+				Orientation = Orientation.Vertical,
 				Border = new Border () { BorderStyle = BorderStyle.Single }
 			};
 

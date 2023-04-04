@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
-using Terminal.Gui.Graphs;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -189,7 +188,7 @@ namespace Terminal.Gui.ViewTests {
 		public void TestTileView_Horizontal ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			tileView.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
+			tileView.Orientation = Orientation.Horizontal;
 			tileView.Redraw (tileView.Bounds);
 
 			string looksLike =
@@ -440,7 +439,7 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var tileView = Get11By3TileView (out var line);
 
-			tileView.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
+			tileView.Orientation = Orientation.Horizontal;
 			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 
 			Assert.True (line.HasFocus);
@@ -485,7 +484,7 @@ namespace Terminal.Gui.ViewTests {
 			var tileView = Get11By3TileView (out var line);
 			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
 
-			tileView.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
+			tileView.Orientation = Orientation.Horizontal;
 			tileView.Tiles.ElementAt (0).MinSize = 1;
 
 			// 0 should not be allowed because it brings us below minimum size of View1
@@ -2231,7 +2230,7 @@ namespace Terminal.Gui.ViewTests {
 			var container = GetTileView (20, 10, withBorder);
 			Assert.True (container.TrySplitTile (0, 2, out var newContainer));
 
-			newContainer.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
+			newContainer.Orientation = Orientation.Horizontal;
 			newContainer.ColorScheme = new ColorScheme ();
 			container.ColorScheme = new ColorScheme ();
 
@@ -2255,7 +2254,7 @@ namespace Terminal.Gui.ViewTests {
 
 			Assert.True (container.TrySplitTile (split, 2, out var newContainer));
 
-			newContainer.Orientation = Terminal.Gui.Graphs.Orientation.Horizontal;
+			newContainer.Orientation = Orientation.Horizontal;
 
 			int i = 0;
 			foreach (var tile in container.Tiles.Union (newContainer.Tiles)) {
