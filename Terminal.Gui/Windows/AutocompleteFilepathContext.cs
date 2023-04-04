@@ -47,7 +47,7 @@ namespace Terminal.Gui {
 
 			bool isWindows = RuntimeInformation.IsOSPlatform (OSPlatform.Windows);
 
-			var suggestions = state.Children.Select (
+			var suggestions = state.Children.Where(d=> !d.IsParent).Select (
 				e => e.FileSystemInfo is DirectoryInfo d
 					? d.Name + System.IO.Path.DirectorySeparatorChar
 					: e.FileSystemInfo.Name)

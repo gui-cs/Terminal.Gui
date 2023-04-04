@@ -280,6 +280,12 @@ namespace Terminal.Gui {
 					RestartSearch ();
 					o.Handled = true;
 				}
+
+				if(o.KeyEvent.Key == Key.Esc) {
+					if(CancelSearch()) {
+						o.Handled = true;
+					}
+				}
 			};
 
 			this.tableView.Style.ShowHorizontalHeaderOverline = false;
@@ -474,9 +480,16 @@ namespace Terminal.Gui {
 			disposed = true;
 			base.Dispose (disposing);
 
+			CancelSearch ();
+		}
+
+		private bool CancelSearch ()
+		{
 			if (State is SearchState search) {
-				search.Cancel ();
+				return search.Cancel ();
 			}
+
+			return false;
 		}
 
 		private void ClearFeedback ()
@@ -1602,10 +1615,20 @@ namespace Terminal.Gui {
 			internal override void RefreshChildren ()
 			{
 			}
-			internal void Cancel ()
+
+			/// <summary>
+			/// Cancels the current search (if any).  Returns true if a search
+			/// was running and cancellation was successfully set.
+			/// </summary>
+			/// <returns></returns>
+			internal bool Cancel ()
 			{
+				var alreadyCancelled = token.IsCancellationRequested || cancel; 
+
 				cancel = true;
 				token.Cancel ();
+
+				return !alreadyCancelled;
 			}
 		}
 	}
