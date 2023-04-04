@@ -10,10 +10,8 @@ using Terminal.Gui;
 using System.IO;
 using System.Reflection;
 using System.Threading;
-using Terminal.Gui;
 using static Terminal.Gui.ConfigurationManager;
 using System.Text.Json.Serialization;
-using System.ComponentModel.DataAnnotations;
 
 #nullable enable
 
@@ -243,7 +241,7 @@ namespace UICatalog {
 
 		static MenuItem []? _themeMenuItems;
 		static MenuBarItem? _themeMenuBarItem;
-		
+
 		/// <summary>
 		/// This is the main UI Catalog app view. It is run fresh when the app loads (if a Scenario has not been passed on 
 		/// the command line) and each time a Scenario ends.
@@ -331,7 +329,7 @@ namespace UICatalog {
 					AllowsMarking = false,
 					CanFocus = true,
 				};
-				CategoryListView.OpenSelectedItem += (s,a) => {
+				CategoryListView.OpenSelectedItem += (s, a) => {
 					ScenarioListView!.SetFocus ();
 				};
 				CategoryListView.SelectedItemChanged += CategoryListView_SelectedChanged;
@@ -370,7 +368,7 @@ namespace UICatalog {
 
 				ConfigurationManager.Applied += ConfigAppliedHandler;
 			}
-      
+
 			void LoadedHandler (object? sender, EventArgs? args)
 			{
 				ConfigChanged ();
@@ -405,7 +403,7 @@ namespace UICatalog {
 				ConfigurationManager.Applied -= ConfigAppliedHandler;
 				Unloaded -= UnloadedHandler;
 			}
-      
+
 			void ConfigAppliedHandler (object? sender, ConfigurationManagerEventArgs? a)
 			{
 				ConfigChanged ();

@@ -1024,7 +1024,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Style.GetOrCreateColumnStyle (colB).MaxWidth = 1;
 			tv.Style.GetOrCreateColumnStyle (colB).MaxWidth = 1;
 
-			ViewTests.GraphViewTests.InitFakeDriver ();
+			ViewsTests.GraphViewTests.InitFakeDriver ();
 			tv.ColorScheme = Colors.Base;
 			return tv;
 		}
