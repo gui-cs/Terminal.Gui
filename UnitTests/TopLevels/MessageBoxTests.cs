@@ -112,7 +112,7 @@ namespace Terminal.Gui.TopLevelTests {
 				} else if (iterations == 1) {
 					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
-                                    ┌┤T├──┐
+                                    ┌┤Tit├┐
                                     │Messa│
                                     │ ge  │
                                     │ Ok ◦│

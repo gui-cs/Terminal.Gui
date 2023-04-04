@@ -1234,13 +1234,14 @@ namespace Terminal.Gui.CoreTests {
 			Assert.Equal (rect, view.ViewToScreen (view.Bounds));
 			Assert.Equal (top.Bounds, view.ScreenClip (top.Bounds));
 			Assert.True (view.LayoutStyle == LayoutStyle.Absolute);
+
+			Application.Begin (top);
+
 			view.Width = Dim.Fill ();
 			view.Height = Dim.Fill ();
-			// BUGBUG: v2 - Setting layout style should be automatic
-			view.LayoutStyle = LayoutStyle.Computed;
-			Assert.True (view.LayoutStyle == LayoutStyle.Computed);
 			Assert.Equal (10, view.Bounds.Width);
 			Assert.Equal (1, view.Bounds.Height);
+			view.LayoutStyle = LayoutStyle.Computed;
 			view.SetRelativeLayout (top.Bounds);
 			top.LayoutSubviews (); // BUGBUG: v2 - ??
 			Assert.Equal (1, view.Frame.X);
@@ -1251,11 +1252,13 @@ namespace Terminal.Gui.CoreTests {
 			Assert.Equal (0, view.Bounds.Y);
 			Assert.Equal (79, view.Bounds.Width);
 			Assert.Equal (24, view.Bounds.Height);
+
+
 			view.X = 0;
 			view.Y = 0;
 			Assert.Equal ("Absolute(0)", view.X.ToString ());
 			Assert.Equal ("Fill(0)", view.Width.ToString ());
-			//view.SetRelativeLayout (top.Bounds);
+			view.SetRelativeLayout (top.Bounds);
 			top.LayoutSubviews (); // BUGBUG: v2 - ??
 			Assert.Equal (0, view.Frame.X);
 			Assert.Equal (0, view.Frame.Y);

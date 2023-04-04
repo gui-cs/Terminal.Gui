@@ -8,6 +8,7 @@ using Xunit;
 using System.Globalization;
 using Xunit.Abstractions;
 using NStack;
+using static Terminal.Gui.Application;
 
 namespace Terminal.Gui.TopLevelTests {
 
@@ -126,8 +127,9 @@ namespace Terminal.Gui.TopLevelTests {
 			var bottomRow = $"{d.LLDCorner}{new string (d.HDLine.ToString () [0], width - 2)}{d.LRDCorner}";
 
 			var wizard = new Wizard (title) { Width = width, Height = height };
-			Application.End (Application.Begin (wizard));
+			var runstate = Application.Begin (wizard);
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{topRow}\n{row2}\n{row3}\n{separatorRow}\n{buttonRow}\n{bottomRow}", output);
+			Application.End (runstate);
 		}
 
 		[Fact, AutoInitShutdown]
