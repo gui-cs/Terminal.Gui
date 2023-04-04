@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Terminal.Gui.Trees {
+namespace Terminal.Gui {
 	/// <summary>
 	/// Interface for supplying data to a <see cref="TreeView{T}"/> on demand as root level nodes
 	/// are expanded by the user

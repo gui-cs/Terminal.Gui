@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Terminal.Gui;
-using Terminal.Gui.Trees;
+using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Tree View", Description: "Simple tree view examples.")]

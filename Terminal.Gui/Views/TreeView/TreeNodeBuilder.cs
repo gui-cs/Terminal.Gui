@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Terminal.Gui.Trees {
+namespace Terminal.Gui {
 	/// <summary>
 	/// <see cref="ITreeBuilder{T}"/> implementation for <see cref="ITreeNode"/> objects
 	/// </summary>

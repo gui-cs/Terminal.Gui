@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Terminal.Gui.Trees {
+namespace Terminal.Gui {
 	/// <summary>
 	/// Implementation of <see cref="ITreeBuilder{T}"/> that uses user defined functions
 	/// </summary>

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Terminal.Gui;
-using Terminal.Gui.Trees;
+using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
 

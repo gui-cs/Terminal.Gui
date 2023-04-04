@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Terminal.Gui.Trees {
+namespace Terminal.Gui {
 	class Branch<T> where T : class {
 		/// <summary>
 		/// True if the branch is expanded to reveal child branches.
