@@ -10,7 +10,7 @@ using System.Text.Json;
 using static Terminal.Gui.ConfigurationManager;
 using Attribute = Terminal.Gui.Attribute;
 
-namespace Terminal.GuiTests {
+namespace Terminal.Gui.ConfigurationTests {
 	public class ThemeTests {
 		public static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions () {
 			Converters = {

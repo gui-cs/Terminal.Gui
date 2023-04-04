@@ -10,7 +10,7 @@ using Xunit;
 using static Terminal.Gui.ConfigurationManager;
 using Attribute = Terminal.Gui.Attribute;
 
-namespace Terminal.GuiTests {
+namespace Terminal.Gui.ConfigurationTests {
 	public class ConfigurationManagerTests {
 
 		public static readonly JsonSerializerOptions _jsonOptions = new() {

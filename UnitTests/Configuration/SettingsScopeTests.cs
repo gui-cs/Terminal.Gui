@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static Terminal.Gui.ConfigurationManager;
 
-namespace Terminal.GuiTests {
+namespace Terminal.Gui.ConfigurationTests {
 	public class SettingsScopeTests {
 
 		[Fact]

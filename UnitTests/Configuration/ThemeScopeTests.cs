@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using static Terminal.Gui.ConfigurationManager;
 
-namespace Terminal.GuiTests {
+namespace Terminal.Gui.ConfigurationTests {
 	public class ThemeScopeTests {
 		public static readonly JsonSerializerOptions _jsonOptions = new() {
 			Converters = {

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using Attribute = Terminal.Gui.Attribute;
 
-namespace Terminal.GuiTests {
+namespace Terminal.Gui.ConfigurationTests {
 	public class ColorJsonConverterTests {
 
 		[Theory]
