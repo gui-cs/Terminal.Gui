@@ -8,11 +8,11 @@ using Xunit;
 using System.Globalization;
 using Xunit.Abstractions;
 using System.Reflection;
+using Terminal.Gui.ViewTests;
 
 namespace Terminal.Gui.ViewsTests {
 
 	public class TableViewTests {
-#if false // BUGBUG: v2 - Table scenarios are working fine; Will fix these unit test later
 		readonly ITestOutputHelper output;
 
 		public TableViewTests (ITestOutputHelper output)
@@ -267,6 +267,8 @@ namespace Terminal.Gui.ViewsTests {
 
 			// ensure that TableView has the input focus
 			Application.Top.Add (tableView);
+			Application.Begin (Application.Top);
+
 			Application.Top.FocusFirst ();
 			Assert.True (tableView.HasFocus);
 
@@ -294,6 +296,7 @@ namespace Terminal.Gui.ViewsTests {
 				MultiSelect = true,
 				Bounds = new Rect (0, 0, 10, 5)
 			};
+			tableView.BeginInit (); tableView.EndInit ();
 
 			tableView.SelectAll ();
 			Assert.Equal (16, tableView.GetAllSelectedCells ().Count ());
@@ -321,6 +324,7 @@ namespace Terminal.Gui.ViewsTests {
 				MultiSelect = true,
 				Bounds = new Rect (0, 0, 10, 5)
 			};
+			tableView.BeginInit (); tableView.EndInit ();
 
 			tableView.ChangeSelectionToEndOfTable (false);
 
@@ -349,6 +353,7 @@ namespace Terminal.Gui.ViewsTests {
 				MultiSelect = multiSelect,
 				Bounds = new Rect (0, 0, 10, 5)
 			};
+			tableView.BeginInit (); tableView.EndInit ();
 
 			tableView.SetSelection (1, 1, false);
 
@@ -365,6 +370,7 @@ namespace Terminal.Gui.ViewsTests {
 				MultiSelect = true,
 				Bounds = new Rect (0, 0, 10, 5)
 			};
+			tableView.BeginInit (); tableView.EndInit ();
 
 			// move cursor to 1,1
 			tableView.SetSelection (1, 1, false);
@@ -390,6 +396,7 @@ namespace Terminal.Gui.ViewsTests {
 				FullRowSelect = true,
 				Bounds = new Rect (0, 0, 10, 5)
 			};
+			tableView.BeginInit (); tableView.EndInit ();
 
 			// move cursor to 1,1
 			tableView.SetSelection (1, 1, false);
@@ -416,6 +423,7 @@ namespace Terminal.Gui.ViewsTests {
 				MultiSelect = true,
 				Bounds = new Rect (0, 0, 10, 5)
 			};
+			tableView.BeginInit (); tableView.EndInit ();
 
 			/*  
 				Sets up disconnected selections like:
@@ -1002,7 +1010,7 @@ namespace Terminal.Gui.ViewsTests {
 		private TableView SetUpMiniTable ()
 		{
 			var tv = new TableView ();
-			tv.LayoutSubviews ();
+			tv.BeginInit (); tv.EndInit ();
 			tv.Bounds = new Rect (0, 0, 10, 4);
 
 			var dt = new DataTable ();
@@ -1016,7 +1024,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Style.GetOrCreateColumnStyle (colB).MaxWidth = 1;
 			tv.Style.GetOrCreateColumnStyle (colB).MaxWidth = 1;
 
-			GraphViewTests.InitFakeDriver ();
+			ViewTests.GraphViewTests.InitFakeDriver ();
 			tv.ColorScheme = Colors.Base;
 			return tv;
 		}
@@ -1026,10 +1034,10 @@ namespace Terminal.Gui.ViewsTests {
 		public void ScrollDown_OneLineAtATime ()
 		{
 			var tableView = new TableView ();
+			tableView.BeginInit (); tableView.EndInit ();
 
 			// Set big table
 			tableView.Table = BuildTable (25, 50);
-			tableView.LayoutSubviews ();
 
 			// 1 header + 4 rows visible
 			tableView.Bounds = new Rect (0, 0, 25, 5);
@@ -1054,6 +1062,8 @@ namespace Terminal.Gui.ViewsTests {
 			GraphViewTests.InitFakeDriver ();
 
 			var tableView = new TableView ();
+			tableView.BeginInit (); tableView.EndInit ();
+
 			tableView.ColorScheme = Colors.TopLevel;
 			tableView.LayoutSubviews ();
 
@@ -1120,7 +1130,7 @@ namespace Terminal.Gui.ViewsTests {
 			GraphViewTests.InitFakeDriver ();
 
 			var tableView = new TableView ();
-			tableView.LayoutSubviews ();
+			tableView.BeginInit (); tableView.EndInit ();
 			tableView.ColorScheme = Colors.TopLevel;
 
 			// 3 columns are visibile
@@ -1183,7 +1193,8 @@ namespace Terminal.Gui.ViewsTests {
 		private TableView GetABCDEFTableView (out DataTable dt)
 		{
 			var tableView = new TableView ();
-			tableView.LayoutSubviews ();
+			tableView.BeginInit (); tableView.EndInit ();
+
 			tableView.ColorScheme = Colors.TopLevel;
 
 			// 3 columns are visible
@@ -1742,7 +1753,8 @@ namespace Terminal.Gui.ViewsTests {
 			GraphViewTests.InitFakeDriver ();
 
 			var tableView = new TableView ();
-			tableView.LayoutSubviews ();
+			tableView.BeginInit (); tableView.EndInit ();
+
 			tableView.ColorScheme = Colors.TopLevel;
 
 			// 25 characters can be printed into table
@@ -1884,6 +1896,8 @@ namespace Terminal.Gui.ViewsTests {
 			GraphViewTests.InitFakeDriver ();
 
 			var tableView = new TableView ();
+			tableView.BeginInit (); tableView.EndInit ();
+
 			tableView.ColorScheme = Colors.TopLevel;
 
 			// 3 columns are visibile
@@ -1987,6 +2001,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void Test_ScreenToCell ()
 		{
 			var tableView = GetTwoRowSixColumnTable ();
+			tableView.BeginInit (); tableView.EndInit ();
 			tableView.LayoutSubviews ();
 
 			tableView.Redraw (tableView.Bounds);
@@ -2162,6 +2177,5 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.Table = dt;
 			return tableView;
 		}
-#endif 
 	}
 }

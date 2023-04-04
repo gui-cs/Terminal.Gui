@@ -23,11 +23,11 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.NotEmpty (Application.MainLoop.timeouts);
 
 			//More calls to AutoSpin do not add more timeouts
-			Assert.Equal (1,Application.MainLoop.timeouts.Count);
+			Assert.Single (Application.MainLoop.timeouts);
 			view.AutoSpin ();
 			view.AutoSpin ();
 			view.AutoSpin ();
-			Assert.Equal (1, Application.MainLoop.timeouts.Count);
+			Assert.Single (Application.MainLoop.timeouts);
 
 			// Dispose clears timeout
 			Assert.NotEmpty (Application.MainLoop.timeouts);

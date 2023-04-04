@@ -10,8 +10,7 @@ using System.Text.RegularExpressions;
 using Xunit.Abstractions;
 using Rune = System.Rune;
 
-namespace Terminal.Gui.ViewsTests {
-#if false // BUGBUG: v2 see https://github.com/gui-cs/Terminal.Gui/issues/2463
+namespace Terminal.Gui.ViewTests {
 
 	#region Helper Classes
 	class FakeHAxis : HorizontalAxis {
@@ -85,6 +84,8 @@ namespace Terminal.Gui.ViewsTests {
 			GraphViewTests.InitFakeDriver ();
 
 			var gv = new GraphView ();
+			gv.BeginInit (); gv.EndInit ();
+
 			gv.ColorScheme = new ColorScheme ();
 			gv.MarginBottom = 1;
 			gv.MarginLeft = 1;
@@ -99,6 +100,8 @@ namespace Terminal.Gui.ViewsTests {
 		public void ScreenToGraphSpace_DefaultCellSize ()
 		{
 			var gv = new GraphView ();
+			gv.BeginInit (); gv.EndInit ();
+
 			gv.Bounds = new Rect (0, 0, 20, 10);
 
 			// origin should be bottom left
@@ -118,7 +121,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void ScreenToGraphSpace_DefaultCellSize_WithMargin ()
 		{
 			var gv = new GraphView ();
-			gv.LayoutSubviews ();
+			gv.BeginInit (); gv.EndInit ();
 
 			gv.Bounds = new Rect (0, 0, 20, 10);
 
@@ -154,7 +157,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void ScreenToGraphSpace_CustomCellSize ()
 		{
 			var gv = new GraphView ();
-			gv.LayoutSubviews ();
+			gv.BeginInit (); gv.EndInit ();
 
 			gv.Bounds = new Rect (0, 0, 20, 10);
 
@@ -185,7 +188,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void GraphSpaceToScreen_DefaultCellSize ()
 		{
 			var gv = new GraphView ();
-			gv.LayoutSubviews ();
+			gv.BeginInit (); gv.EndInit ();
 
 			gv.Bounds = new Rect (0, 0, 20, 10);
 
@@ -204,7 +207,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void GraphSpaceToScreen_DefaultCellSize_WithMargin ()
 		{
 			var gv = new GraphView ();
-			gv.LayoutSubviews ();
+			gv.BeginInit (); gv.EndInit ();
 
 			gv.Bounds = new Rect (0, 0, 20, 10);
 
@@ -233,7 +236,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void GraphSpaceToScreen_ScrollOffset ()
 		{
 			var gv = new GraphView ();
-			gv.LayoutSubviews ();
+			gv.BeginInit (); gv.EndInit ();
 
 			gv.Bounds = new Rect (0, 0, 20, 10);
 
@@ -254,7 +257,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void GraphSpaceToScreen_CustomCellSize ()
 		{
 			var gv = new GraphView ();
-			gv.LayoutSubviews ();
+			gv.BeginInit (); gv.EndInit ();
 			
 			gv.Bounds = new Rect (0, 0, 20, 10);
 
@@ -294,7 +297,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void GraphSpaceToScreen_CustomCellSize_WithScrollOffset ()
 		{
 			var gv = new GraphView ();
-			gv.LayoutSubviews ();
+			gv.BeginInit (); gv.EndInit ();
 
 			gv.Bounds = new Rect (0, 0, 20, 10);
 
@@ -339,6 +342,8 @@ namespace Terminal.Gui.ViewsTests {
 			InitFakeDriver ();
 
 			var gv = new GraphView ();
+			gv.BeginInit (); gv.EndInit ();
+
 			gv.ColorScheme = new ColorScheme ();
 			gv.Bounds = new Rect (0, 0, 50, 30);
 			gv.Series.Add (new ScatterSeries () { Points = new List<PointF> { new PointF (1, 1) } });
@@ -362,6 +367,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestReversing_ScreenToGraphSpace ()
 		{
 			var gv = new GraphView ();
+			gv.BeginInit (); gv.EndInit ();
 			gv.Bounds = new Rect (0, 0, 50, 30);
 
 			// How much graph space each cell of the console depicts
@@ -413,6 +419,7 @@ namespace Terminal.Gui.ViewsTests {
 			GraphViewTests.InitFakeDriver ();
 
 			var gv = new GraphView ();
+			gv.BeginInit (); gv.EndInit ();
 			gv.ColorScheme = new ColorScheme ();
 			gv.Bounds = new Rect (0, 0, 50, 30);
 
@@ -459,6 +466,7 @@ namespace Terminal.Gui.ViewsTests {
 			GraphViewTests.InitFakeDriver ();
 
 			var gv = new GraphView ();
+			gv.BeginInit (); gv.EndInit ();
 			gv.ColorScheme = new ColorScheme ();
 			gv.Bounds = new Rect (0, 0, 50, 30);
 
@@ -682,6 +690,7 @@ namespace Terminal.Gui.ViewsTests {
 			GraphViewTests.InitFakeDriver ();
 
 			var gv = new GraphView ();
+			gv.BeginInit (); gv.EndInit ();
 			gv.ColorScheme = new ColorScheme ();
 
 			// y axis goes from 0.1 to 1 across 10 console rows
@@ -1600,5 +1609,5 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (6.6f, render.Value);
 		}
 	}
-#endif
+
 }
