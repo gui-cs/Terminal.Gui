@@ -10,8 +10,8 @@ using Terminal.Gui;
 using System.IO;
 using System.Reflection;
 using System.Threading;
-using Terminal.Gui.Configuration;
-using static Terminal.Gui.Configuration.ConfigurationManager;
+using Terminal.Gui;
+using static Terminal.Gui.ConfigurationManager;
 using System.Text.Json.Serialization;
 
 #nullable enable

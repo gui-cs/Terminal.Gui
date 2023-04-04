@@ -62,7 +62,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the <see cref="Color"/> that draws the outer border color.
 		/// </summary>
-		[JsonInclude, JsonConverter (typeof (Configuration.ColorJsonConverter))]
+		[JsonInclude, JsonConverter (typeof (ColorJsonConverter))]
 		public Color ForgroundColor {
 			get => _forgroundColor;
 			set {
@@ -74,7 +74,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the <see cref="Color"/> that fills the area between the bounds of a <see cref="Border"/>.
 		/// </summary>
-		[JsonInclude, JsonConverter (typeof (Configuration.ColorJsonConverter))]
+		[JsonInclude, JsonConverter (typeof (ColorJsonConverter))]
 		public Color BackgroundColor {
 			get => _backgroundColor;
 			set {

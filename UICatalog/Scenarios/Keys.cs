@@ -1,7 +1,7 @@
 ﻿using NStack;
 using System.Collections.Generic;
 using Terminal.Gui;
-using Terminal.Gui.Configuration;
+using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Keys", Description: "Shows how to handle keyboard input")]

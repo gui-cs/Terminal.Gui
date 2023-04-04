@@ -9,11 +9,11 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using static Terminal.Gui.Configuration.ConfigurationManager;
+using static Terminal.Gui.ConfigurationManager;
 
 #nullable enable
 
-namespace Terminal.Gui.Configuration {
+namespace Terminal.Gui {
 	/// <summary>
 	/// Provides settings and configuration management for Terminal.Gui applications. 
 	/// <para>

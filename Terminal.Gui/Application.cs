@@ -20,9 +20,9 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using System.IO;
-using Terminal.Gui.Configuration;
+using Terminal.Gui;
 using System.Text.Json.Serialization;
-using static Terminal.Gui.Configuration.ConfigurationManager;
+using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui {
 

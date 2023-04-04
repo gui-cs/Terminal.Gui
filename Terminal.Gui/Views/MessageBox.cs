@@ -1,8 +1,8 @@
 ﻿using NStack;
 using System;
 using System.Collections.Generic;
-using Terminal.Gui.Configuration;
-using static Terminal.Gui.Configuration.ConfigurationManager;
+using Terminal.Gui;
+using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui {
 	/// <summary>

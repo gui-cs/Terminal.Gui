@@ -2,7 +2,7 @@ using NStack;
 using System;
 using System.Reflection.Emit;
 using Terminal.Gui;
-using Terminal.Gui.Configuration;
+using Terminal.Gui;
 using Label = Terminal.Gui.Label;
 
 namespace UICatalog.Scenarios {

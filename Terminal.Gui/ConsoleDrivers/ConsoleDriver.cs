@@ -10,8 +10,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Terminal.Gui.Configuration;
-using static Terminal.Gui.Configuration.ConfigurationManager;
+using Terminal.Gui;
+using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -187,13 +187,13 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The foreground color.
 		/// </summary>
-		[JsonConverter (typeof (Configuration.ColorJsonConverter))]
+		[JsonConverter (typeof (ColorJsonConverter))]
 		public Color Foreground { get; }
 
 		/// <summary>
 		/// The background color.
 		/// </summary>
-		[JsonConverter (typeof (Configuration.ColorJsonConverter))]
+		[JsonConverter (typeof (ColorJsonConverter))]
 		public Color Background { get; }
 
 		/// <summary>

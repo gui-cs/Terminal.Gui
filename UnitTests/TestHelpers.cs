@@ -11,7 +11,7 @@ using Attribute = Terminal.Gui.Attribute;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using System.Diagnostics;
-using Terminal.Gui.Configuration;
+using Terminal.Gui;
 
 
 // This class enables test functions annotated with the [AutoInitShutdown] attribute to 
