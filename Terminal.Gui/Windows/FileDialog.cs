@@ -107,6 +107,7 @@ namespace Terminal.Gui {
 		private MenuBar allowedTypeMenuBar;
 		private MenuBarItem allowedTypeMenu;
 		private MenuItem [] allowedTypeMenuItems;
+		private DataColumn filenameColumn;
 
 		/// <summary>
 		/// Event fired when user attempts to confirm a selection (or multi selection).
@@ -345,7 +346,7 @@ namespace Terminal.Gui {
 			this.Add (this.splitContainer);
 
 			// Default sort order is by name
-			sorter.SortColumn(this.dtFiles.Columns[Style.FilenameColumnName],true);
+			sorter.SortColumn(this.filenameColumn,true);
 		}
 
 		private string GetForwardButtonText ()
@@ -956,7 +957,9 @@ namespace Terminal.Gui {
 		{
 			this.dtFiles = new DataTable ();
 
-			var nameStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (Style.FilenameColumnName, typeof (int)));
+			var nameStyle = this.tableView.Style.GetOrCreateColumnStyle (
+				filenameColumn = this.dtFiles.Columns.Add (Style.FilenameColumnName, typeof (int))
+				);
 			nameStyle.RepresentationGetter = (i) => {
 
 				var stats = this.State?.Children [(int)i];

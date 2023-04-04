@@ -11,7 +11,7 @@ namespace Terminal.Gui {
 		public FileDialogState State { get; set; }
 
 		public AutocompleteFilepathContext (ustring currentLine, int cursorPosition, FileDialogState state)
-			: base(currentLine.ToRuneList(), cursorPosition)
+			: base (currentLine.ToRuneList (), cursorPosition)
 		{
 			this.State = state;
 		}
@@ -20,26 +20,29 @@ namespace Terminal.Gui {
 
 	internal class FilepathSuggestionGenerator : ISuggestionGenerator {
 
-        FileDialogState state;
+		FileDialogState state;
 		public IEnumerable<Suggestion> GenerateSuggestions (AutocompleteContext context)
 		{
-			if(context is AutocompleteFilepathContext fileState) {
+			if (context is AutocompleteFilepathContext fileState) {
 				this.state = fileState.State;
 			}
-            
-            if(state == null)
-            {
-                return Enumerable.Empty<Suggestion>();
-            }
 
-			var path = ustring.Make (context.CurrentLine).ToString();
+			if (state == null) {
+				return Enumerable.Empty<Suggestion> ();
+			}
+
+			var path = ustring.Make (context.CurrentLine).ToString ();
 			var last = path.LastIndexOfAny (FileDialog.Separators);
+			
+			if(string.IsNullOrWhiteSpace(path) || !Path.IsPathRooted(path)) {
+				return Enumerable.Empty<Suggestion> ();
+			}
 
 			var term = path.Substring (last + 1);
 
 			if (term.Equals (state?.Directory?.Name)) {
 				// Clear suggestions
-				return Enumerable.Empty<Suggestion>();
+				return Enumerable.Empty<Suggestion> ();
 			}
 
 			bool isWindows = RuntimeInformation.IsOSPlatform (OSPlatform.Windows);
@@ -60,15 +63,16 @@ namespace Terminal.Gui {
 
 			// nothing to suggest
 			if (validSuggestions.Length == 0 || validSuggestions [0].Length == term.Length) {
-				return Enumerable.Empty<Suggestion>();
+				return Enumerable.Empty<Suggestion> ();
 			}
 
-			return validSuggestions.Select (f => new Suggestion(0,f.Substring (term.Length),f)).ToList ();
+			return validSuggestions.Select (
+				f => new Suggestion (term.Length, f, f)).ToList ();
 		}
 
 		public bool IsWordChar (Rune rune)
 		{
-			if(rune == '\n') {
+			if (rune == '\n') {
 				return false;
 			}
 
