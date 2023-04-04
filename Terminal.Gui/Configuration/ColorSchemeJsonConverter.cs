@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui {
+namespace Terminal.Gui.Configuration {
 	/// <summary>
 	/// Implements a JSON converter for <see cref="ColorScheme"/>. 
 	/// </summary>

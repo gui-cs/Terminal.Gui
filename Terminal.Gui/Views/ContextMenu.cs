@@ -194,7 +194,7 @@ namespace Terminal.Gui {
 			set {
 				var oldKey = key;
 				key = value;
-				KeyChanged?.Invoke (this, new KeyChangedEventArgs (oldKey, key));
+				KeyChanged?.Invoke (this, new KeyChangedEventArgs(oldKey,key));
 			}
 		}
 
@@ -206,7 +206,7 @@ namespace Terminal.Gui {
 			set {
 				var oldFlags = mouseFlags;
 				mouseFlags = value;
-				MouseFlagsChanged?.Invoke (this, new MouseFlagsChangedEventArgs (oldFlags, value));
+				MouseFlagsChanged?.Invoke (this, new MouseFlagsChangedEventArgs(oldFlags,value));
 			}
 		}
 

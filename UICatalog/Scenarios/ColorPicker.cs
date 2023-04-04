@@ -1,5 +1,5 @@
-﻿using System;
-using Terminal.Gui;
+﻿using Terminal.Gui;
+using System;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Color Picker", Description: "Color Picker.")]

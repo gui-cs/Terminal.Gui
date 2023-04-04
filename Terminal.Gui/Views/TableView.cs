@@ -5,12 +5,14 @@ using System.Data;
 using System.Linq;
 
 namespace Terminal.Gui {
+
+
+
 	/// <summary>
 	/// View for tabular data based on a <see cref="DataTable"/>.
-	/// </summary>
-	/// <remarks>	
+	/// 
 	/// <a href="https://gui-cs.github.io/Terminal.Gui/articles/tableview.html">See TableView Deep Dive for more information</a>.
-	/// </remarks>
+	/// </summary>
 	public partial class TableView : View {
 
 		private int columnOffset;
@@ -706,7 +708,7 @@ namespace Terminal.Gui {
 			if (extendExistingSelection) {
 
 				// If we are extending current selection but there isn't one
-				if (MultiSelectedRegions.Count == 0 || MultiSelectedRegions.All (m => m.IsToggled)) {
+				if (MultiSelectedRegions.Count == 0 || MultiSelectedRegions.All(m=>m.IsToggled)) {
 					// Create a new region between the old active cell and the new cell
 					var rect = CreateTableSelection (SelectedColumn, SelectedRow, col, row);
 					MultiSelectedRegions.Push (rect);
@@ -875,13 +877,14 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public IEnumerable<Point> GetAllSelectedCells ()
 		{
-			if (TableIsNullOrInvisible () || Table.Rows.Count == 0) {
-				return Enumerable.Empty<Point> ();
+			if (TableIsNullOrInvisible () || Table.Rows.Count == 0)
+			{
+				return Enumerable.Empty<Point>();				
 			}
 
 			EnsureValidSelection ();
 
-			var toReturn = new HashSet<Point> ();
+			var toReturn = new HashSet<Point>();
 
 			// If there are one or more rectangular selections
 			if (MultiSelect && MultiSelectedRegions.Any ()) {
@@ -896,11 +899,11 @@ namespace Terminal.Gui {
 				for (int y = yMin; y < yMax; y++) {
 					for (int x = xMin; x < xMax; x++) {
 						if (IsSelected (x, y)) {
-							toReturn.Add (new Point (x, y));
+							toReturn.Add(new Point (x, y));
 						}
 					}
 				}
-			}
+			} 
 
 
 			// if there are no region selections then it is just the active cell
@@ -909,14 +912,14 @@ namespace Terminal.Gui {
 			if (FullRowSelect) {
 				// all cells in active row are selected
 				for (int x = 0; x < Table.Columns.Count; x++) {
-					toReturn.Add (new Point (x, SelectedRow));
+					toReturn.Add(new Point (x, SelectedRow));
 				}
 			} else {
 				// Not full row select and no multi selections
-				toReturn.Add (new Point (SelectedColumn, SelectedRow));
+				toReturn.Add(new Point (SelectedColumn, SelectedRow));
 			}
 
-			return toReturn;
+			return toReturn;		
 		}
 
 		/// <summary>
@@ -948,8 +951,8 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var regions = GetMultiSelectedRegionsContaining (selectedColumn, selectedRow).ToArray ();
-			var toggles = regions.Where (s => s.IsToggled).ToArray ();
+			var regions = GetMultiSelectedRegionsContaining(selectedColumn, selectedRow).ToArray();
+			var toggles = regions.Where(s=>s.IsToggled).ToArray ();
 
 			// Toggle it off
 			if (toggles.Any ()) {
@@ -962,14 +965,17 @@ namespace Terminal.Gui {
 						MultiSelectedRegions.Push (region);
 				}
 			} else {
-
+				
 				// user is toggling selection within a rectangular
 				// select.  So toggle the full region
-				if (regions.Any ()) {
-					foreach (var r in regions) {
+				if(regions.Any())
+				{
+					foreach(var r in regions)
+					{
 						r.IsToggled = true;
 					}
-				} else {
+				}
+				else{
 					// Toggle on a single cell selection
 					MultiSelectedRegions.Push (
 					CreateTableSelection (selectedColumn, SelectedRow, selectedColumn, selectedRow, true)
@@ -1004,7 +1010,8 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (GetMultiSelectedRegionsContaining (col, row).Any ()) {
+			if(GetMultiSelectedRegionsContaining(col,row).Any())
+			{
 				return true;
 			}
 
@@ -1012,15 +1019,19 @@ namespace Terminal.Gui {
 					(col == SelectedColumn || FullRowSelect);
 		}
 
-		private IEnumerable<TableSelection> GetMultiSelectedRegionsContaining (int col, int row)
+		private IEnumerable<TableSelection> GetMultiSelectedRegionsContaining(int col, int row)
 		{
-			if (!MultiSelect) {
-				return Enumerable.Empty<TableSelection> ();
+			if(!MultiSelect)
+			{
+				return Enumerable.Empty<TableSelection>();
 			}
-
-			if (FullRowSelect) {
+		
+			if(FullRowSelect)
+			{
 				return MultiSelectedRegions.Where (r => r.Rect.Bottom > row && r.Rect.Top <= row);
-			} else {
+			}
+			else
+			{
 				return MultiSelectedRegions.Where (r => r.Rect.Contains (col, row));
 			}
 		}
@@ -1462,7 +1473,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		protected virtual void OnSelectedCellChanged (SelectedCellChangedEventArgs args)
 		{
-			SelectedCellChanged?.Invoke (this, args);
+			SelectedCellChanged?.Invoke (this,args);
 		}
 
 		/// <summary>

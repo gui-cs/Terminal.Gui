@@ -1,12 +1,14 @@
 ﻿#define DRAW_CONTENT
 //#define BASE_DRAW_CONTENT
 
+using Microsoft.VisualBasic;
 using NStack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Terminal.Gui;
+using Terminal.Gui.Resources;
 using Rune = System.Rune;
 
 namespace UICatalog.Scenarios {

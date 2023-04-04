@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection.PortableExecutable;
 using Terminal.Gui;
+using Terminal.Gui.Trees;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "File System Explorer", Description: "Hierarchical file system explorer demonstrating TreeView.")]

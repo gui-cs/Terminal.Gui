@@ -6,13 +6,13 @@ using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using Terminal.Gui;
 using System.IO;
 using System.Reflection;
 using System.Threading;
+using Terminal.Gui.Configuration;
+using static Terminal.Gui.Configuration.ConfigurationManager;
 using System.Text.Json.Serialization;
-using Terminal.Gui;
-using static Terminal.Gui.ConfigurationManager;
-
 
 #nullable enable
 

@@ -3,6 +3,13 @@
 //
 // Authors:
 //   Miguel de Icaza (miguel@gnome.org)
+//
+//
+// TODO:
+// - focus in scrollview
+// - focus handling in scrollview to auto scroll to focused view
+// - Raise events
+// - Perhaps allow an option to not display the scrollbar arrow indicators?
 
 using System;
 using System.Linq;
@@ -501,7 +508,7 @@ namespace Terminal.Gui {
 		{
 			if (me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp &&
 				me.Flags != MouseFlags.WheeledRight && me.Flags != MouseFlags.WheeledLeft &&
-				//				me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1Clicked &&
+//				me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1Clicked &&
 				!me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
 				return false;
 			}

@@ -24,7 +24,7 @@ namespace UICatalog.Scenarios {
 				Y = 0,
 				Width = 15,
 				Height = 1,
-				TextAlignment = TextAlignment.Right,
+				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
 			var widthEdit = new TextField ("0") {
@@ -40,7 +40,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (label),
 				Width = Dim.Width (label),
 				Height = 1,
-				TextAlignment = TextAlignment.Right,
+				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
 			var heightEdit = new TextField ("0") {
@@ -65,7 +65,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (label),
 				Width = Dim.Width (label),
 				Height = 1,
-				TextAlignment = TextAlignment.Right,
+				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
 			var titleEdit = new TextField ("Title") {
@@ -81,7 +81,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (label),
 				Width = Dim.Width (label),
 				Height = 1,
-				TextAlignment = TextAlignment.Right,
+				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
 			var messageEdit = new TextView () {
@@ -98,7 +98,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (messageEdit),
 				Width = Dim.Width (label),
 				Height = 1,
-				TextAlignment = TextAlignment.Right,
+				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
 			var numButtonsEdit = new TextField ("3") {
@@ -114,7 +114,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (label),
 				Width = Dim.Width (label),
 				Height = 1,
-				TextAlignment = TextAlignment.Right,
+				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
 			var defaultButtonEdit = new TextField ("0") {
@@ -135,7 +135,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (label),
 				Width = Dim.Width (label),
 				Height = 1,
-				TextAlignment = TextAlignment.Right,
+				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
 
@@ -181,7 +181,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = Pos.Bottom (frame) + 4,
 				Height = 1,
-				TextAlignment = TextAlignment.Right,
+				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			Win.Add (label);
 			var buttonPressedLabel = new Label (" ") {
@@ -190,7 +190,7 @@ namespace UICatalog.Scenarios {
 				Width = 25,
 				Height = 1,
 				ColorScheme = Colors.Error,
-				TextAlignment = TextAlignment.Centered
+				TextAlignment = Terminal.Gui.TextAlignment.Centered
 			};
 
 			//var btnText = new [] { "_Zero", "_One", "T_wo", "_Three", "_Four", "Fi_ve", "Si_x", "_Seven", "_Eight", "_Nine" };

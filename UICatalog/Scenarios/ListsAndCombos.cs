@@ -2,8 +2,8 @@
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
-using NStack;
 using Terminal.Gui;
+using NStack;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "ListView & ComboBox", Description: "Demonstrates a ListView populating a ComboBox that acts as a filter.")]

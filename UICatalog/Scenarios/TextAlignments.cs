@@ -15,7 +15,7 @@ namespace UICatalog.Scenarios {
 			string txt = "Hello world, how are you today? Pretty neat!";
 			string unicodeSampleText = "A Unicode sentence (Ð¿ÑÐ Ð²ÐµÑ) has words.";
 
-			var alignments = Enum.GetValues (typeof (TextAlignment)).Cast<TextAlignment> ().ToList ();
+			var alignments = Enum.GetValues (typeof (Terminal.Gui.TextAlignment)).Cast<Terminal.Gui.TextAlignment> ().ToList ();
 			var singleLines = new Label [alignments.Count];
 			var multipleLines = new Label [alignments.Count];
 

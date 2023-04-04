@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Terminal.Gui;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Globalization;
-using Terminal.Gui;
+using Terminal.Gui.Configuration;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Editor", Description: "A Text Editor using the TextView control.")]

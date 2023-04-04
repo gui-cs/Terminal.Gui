@@ -1,7 +1,8 @@
 ﻿using System;
+using Terminal.Gui.Graphs;
 
 namespace Terminal.Gui {
-
+	
 	/// <summary>
 	/// A straight line control either horizontal or vertical
 	/// </summary>
@@ -33,7 +34,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Creates a horizontal line
 		/// </summary>
-		public LineView () : this (Orientation.Horizontal)
+		public LineView () : this(Orientation.Horizontal)
 		{
 
 		}
@@ -70,7 +71,7 @@ namespace Terminal.Gui {
 		public override void Redraw (Rect bounds)
 		{
 			base.Redraw (bounds);
-
+			
 			Move (0, 0);
 			Driver.SetAttribute (GetNormalColor ());
 
@@ -81,15 +82,22 @@ namespace Terminal.Gui {
 				bounds.Height;
 
 			for (int d = 0; d < dEnd; d += hLineWidth) {
-
-				if (Orientation == Orientation.Horizontal) 					Move (d, 0);
-else 					Move (0, d);
+				
+				if(Orientation == Orientation.Horizontal) {
+					Move (d, 0);
+				}
+				else {
+					Move (0,d);
+				}
 
 				Rune rune = LineRune;
 
-				if (d == 0) 					rune = StartingAnchor ?? LineRune;
-else
-				if (d == dEnd - 1) 					rune = EndingAnchor ?? LineRune;
+				if(d == 0) {
+					rune = StartingAnchor ?? LineRune;
+				} else
+				if (d == dEnd - 1) {
+					rune = EndingAnchor ?? LineRune;
+				}
 
 				Driver.AddRune (rune);
 			}

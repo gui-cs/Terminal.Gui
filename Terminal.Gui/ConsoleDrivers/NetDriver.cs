@@ -12,7 +12,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using NStack;
-using Terminal.Gui;
 
 namespace Terminal.Gui {
 	internal class NetWinVTConsole {

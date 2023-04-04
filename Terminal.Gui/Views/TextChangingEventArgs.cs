@@ -1,4 +1,11 @@
-﻿using System;
+﻿//
+// TextField.cs: single-line text editor with Emacs keybindings
+//
+// Authors:
+//   Miguel de Icaza (miguel@gnome.org)
+//
+
+using System;
 using NStack;
 
 namespace Terminal.Gui {

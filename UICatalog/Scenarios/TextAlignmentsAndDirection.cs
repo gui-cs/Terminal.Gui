@@ -165,7 +165,7 @@ namespace UICatalog.Scenarios {
 
 			// Direction Options
 
-			var directionsEnum = Enum.GetValues (typeof (TextDirection)).Cast<TextDirection> ().ToList ();
+			var directionsEnum = Enum.GetValues (typeof (Terminal.Gui.TextDirection)).Cast<Terminal.Gui.TextDirection> ().ToList ();
 
 			var directionOptions = new RadioGroup (directionsEnum.Select (e => NStack.ustring.Make (e.ToString ())).ToArray ()) {
 				X = Pos.Right (container) + 1,

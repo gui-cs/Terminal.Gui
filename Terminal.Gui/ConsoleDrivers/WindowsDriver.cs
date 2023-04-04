@@ -9,7 +9,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Terminal.Gui;
 
 namespace Terminal.Gui {
 
@@ -102,7 +101,7 @@ namespace Terminal.Gui {
 				if (err != 0) {
 					throw new System.ComponentModel.Win32Exception (err);
 				}
-				visibility = CursorVisibility.Default;
+				visibility = Gui.CursorVisibility.Default;
 
 				return false;
 			}

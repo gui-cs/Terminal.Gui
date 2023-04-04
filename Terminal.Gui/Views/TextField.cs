@@ -11,8 +11,8 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using NStack;
-using Rune = System.Rune;
 using Terminal.Gui.Resources;
+using Rune = System.Rune;
 
 namespace Terminal.Gui {
 	/// <summary>

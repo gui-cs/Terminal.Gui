@@ -49,7 +49,7 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (unicodeCheckBox);
 
-			var alignments = Enum.GetValues (typeof (TextAlignment)).Cast<TextAlignment> ().ToList ();
+			var alignments = Enum.GetValues (typeof (Terminal.Gui.TextAlignment)).Cast<Terminal.Gui.TextAlignment> ().ToList ();
 			var singleLines = new Label [alignments.Count];
 			var multipleLines = new Label [alignments.Count];
 

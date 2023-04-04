@@ -2,6 +2,8 @@
 using System.Data;
 
 namespace Terminal.Gui {
+
+
 	/// <summary>
 	///  Defines the event arguments for <see cref="TableView.CellActivated"/> event
 	/// </summary>

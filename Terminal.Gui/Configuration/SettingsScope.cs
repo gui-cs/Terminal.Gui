@@ -9,7 +9,7 @@ using System.Text.Json.Serialization;
 
 #nullable enable
 
-namespace Terminal.Gui {
+namespace Terminal.Gui.Configuration {
 	public static partial class ConfigurationManager {
 		/// <summary>
 		/// The root object of Terminal.Gui configuration settings / JSON schema. Contains only properties 

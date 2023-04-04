@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Terminal.Gui;
+using Terminal.Gui.Graphs;
 using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios {
