@@ -657,7 +657,7 @@ namespace Terminal.Gui.MenuTests {
 			Application.Top.Redraw (Application.Top.Bounds);
 			var expected = @"
  File  Edit                                 
-┌ Window ──────────────────────────────────┐
+┌┤Window├──────────────────────────────────┐
 │                                          │
 │                                          │
 │                                          │
