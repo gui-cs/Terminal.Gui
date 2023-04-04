@@ -3497,7 +3497,7 @@ This TextFormatter (tf2) is rewritten.
 			Assert.Equal (new Size (0, 1), view.TextFormatter.Size);
 			Assert.Equal (new List<ustring> () { ustring.Empty }, view.TextFormatter.Lines);
 			expected = @"
-┌┤Wind├──┐
+┌────────┐
 │        │
 │        │
 └────────┘

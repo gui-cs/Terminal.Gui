@@ -2997,62 +2997,100 @@ At 0,0
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 
-		[Fact]
-		public void Set_Title_Fires_TitleChanging ()
+		[Fact, AutoInitShutdown]
+		public void Remove_Does_Not_Change_Focus ()
 		{
-			var r = new View ();
-			Assert.Equal (ustring.Empty, r.Title);
+			Assert.True (Application.Top.CanFocus);
+			Assert.False (Application.Top.HasFocus);
 
-			string expectedOld = null;
-			string expectedDuring = null;
-			string expectedAfter = null;
-			bool cancel = false;
-			r.TitleChanging += (s, args) => {
-				Assert.Equal (expectedOld, args.OldTitle);
-				Assert.Equal (expectedDuring, args.NewTitle);
-				args.Cancel = cancel;
-			};
+			var container = new View () { Width = 10, Height = 10 };
+			var leave = false;
+			container.Leave += (s, e) => leave = true;
+			Assert.False (container.CanFocus);
+			var child = new View () { Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = true };
+			container.Add (child);
 
-			expectedOld = string.Empty;
-			r.Title = expectedDuring = expectedAfter = "title";
-			Assert.Equal (expectedAfter, r.Title.ToString ());
+			Assert.True (container.CanFocus);
+			Assert.False (container.HasFocus);
+			Assert.True (child.CanFocus);
+			Assert.False (child.HasFocus);
 
-			expectedOld = r.Title.ToString ();
-			r.Title = expectedDuring = expectedAfter = "a different title";
-			Assert.Equal (expectedAfter, r.Title.ToString ());
+			Application.Top.Add (container);
+			Application.Begin (Application.Top);
 
-			// Now setup cancelling the change and change it back to "title"
-			cancel = true;
-			expectedOld = r.Title.ToString ();
-			r.Title = expectedDuring = "title";
-			Assert.Equal (expectedAfter, r.Title.ToString ());
-			r.Dispose ();
+			Assert.True (Application.Top.CanFocus);
+			Assert.True (Application.Top.HasFocus);
+			Assert.True (container.CanFocus);
+			Assert.True (container.HasFocus);
+			Assert.True (child.CanFocus);
+			Assert.True (child.HasFocus);
 
+			container.Remove (child);
+			child.Dispose ();
+			child = null;
+			Assert.True (Application.Top.HasFocus);
+			Assert.True (container.CanFocus);
+			Assert.True (container.HasFocus);
+			Assert.Null (child);
+			Assert.False (leave);
 		}
 
-		[Fact]
-		public void Set_Title_Fires_TitleChanged ()
+		[Fact, AutoInitShutdown]
+		public void SetFocus_View_With_Null_Superview_Does_Not_Throw_Exception ()
 		{
-			var r = new View ();
-			Assert.Equal (ustring.Empty, r.Title);
+			Assert.True (Application.Top.CanFocus);
+			Assert.False (Application.Top.HasFocus);
 
-			string expectedOld = null;
-			string expected = null;
-			r.TitleChanged += (s, args) => {
-				Assert.Equal (expectedOld, args.OldTitle);
-				Assert.Equal (r.Title, args.NewTitle);
+			var exception = Record.Exception (Application.Top.SetFocus);
+			Assert.Null (exception);
+			Assert.True (Application.Top.CanFocus);
+			Assert.True (Application.Top.HasFocus);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void FocusNext_Does_Not_Throws_If_A_View_Was_Removed_From_The_Collection ()
+		{
+			var top1 = Application.Top;
+			var view1 = new View () { Id = "view1", Width = 10, Height = 5, CanFocus = true };
+			var top2 = new Toplevel () { Id = "top2", Y = 1, Width = 10, Height = 5 };
+			var view2 = new View () { Id = "view2", Y = 1, Width = 10, Height = 5, CanFocus = true };
+			View view3 = null;
+			var removed = false;
+			view2.Enter += (s, e) => {
+				if (!removed) {
+					removed = true;
+					view3 = new View () { Id = "view3", Y = 1, Width = 10, Height = 5 };
+					Application.Current.Add (view3);
+					Application.Current.BringSubviewToFront (view3);
+					Assert.False (view3.HasFocus);
+				}
 			};
+			view2.Leave += (s, e) => {
+				Application.Current.Remove (view3);
+				view3.Dispose ();
+				view3 = null;
+			};
+			top2.Add (view2);
+			top1.Add (view1, top2);
+			Application.Begin (top1);
 
-			expected = "title";
-			expectedOld = r.Title.ToString ();
-			r.Title = expected;
-			Assert.Equal (expected, r.Title.ToString ());
+			Assert.True (top1.HasFocus);
+			Assert.True (view1.HasFocus);
+			Assert.False (view2.HasFocus);
+			Assert.False (removed);
+			Assert.Null (view3);
 
-			expected = "another title";
-			expectedOld = r.Title.ToString ();
-			r.Title = expected;
-			Assert.Equal (expected, r.Title.ToString ());
-			r.Dispose ();
+			Assert.True (top1.ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers { Ctrl = true })));
+			Assert.True (top1.HasFocus);
+			Assert.False (view1.HasFocus);
+			Assert.True (view2.HasFocus);
+			Assert.True (removed);
+			Assert.NotNull (view3);
+
+			var exception = Record.Exception (() => top1.ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers { Ctrl = true })));
+			Assert.Null (exception);
+			Assert.True (removed);
+			Assert.Null (view3);
 		}
 	}
 }

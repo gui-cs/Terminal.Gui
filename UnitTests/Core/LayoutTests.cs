@@ -189,6 +189,8 @@ namespace Terminal.Gui.CoreTests {
 				Width = Dim.Fill ()
 			};
 			top.Add (v);
+			top.BeginInit ();
+			top.EndInit ();
 			top.LayoutSubviews ();
 
 			Assert.False (v.AutoSize);

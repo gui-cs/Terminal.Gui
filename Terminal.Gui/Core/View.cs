@@ -1031,18 +1031,23 @@ namespace Terminal.Gui {
 				var s = GetAutoSize ();
 				var w = width is Dim.DimAbsolute && width.Anchor (0) > s.Width ? width.Anchor (0) : s.Width;
 				var h = height is Dim.DimAbsolute && height.Anchor (0) > s.Height ? height.Anchor (0) : s.Height;
-				Frame = new Rect (new Point (actX, actY), new Size (w, h));
+				frame = new Rect (new Point (actX, actY), new Size (w, h)); // Set frame, not Frame!
 			} else {
 				var w = width is Dim.DimAbsolute ? width.Anchor (0) : frame.Width;
 				var h = height is Dim.DimAbsolute ? height.Anchor (0) : frame.Height;
 				// BUGBUG: v2 - ? - If layoutstyle is absolute, this overwrites the current frame h/w with 0. Hmmm...
-				Frame = new Rect (new Point (actX, actY), new Size (w, h));
-				SetMinWidthHeight ();
+				frame = new Rect (new Point (actX, actY), new Size (w, h)); // Set frame, not Frame!
+
+	
 			}
 			//// BUGBUG: I think these calls are redundant or should be moved into just the AutoSize case
-			//TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
-			SetNeedsLayout ();
-			//SetNeedsDisplay ();
+			if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
+				TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
+				LayoutFrames ();
+				SetMinWidthHeight ();
+				SetNeedsLayout ();
+				SetNeedsDisplay ();
+			}               
 		}
 
 		void TextFormatter_HotKeyChanged (object sender, KeyChangedEventArgs e)
@@ -1180,6 +1185,7 @@ namespace Terminal.Gui {
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
 
+
 			OnAdded (new SuperViewChangedEventArgs (this, view));
 			if (IsInitialized && !view.IsInitialized) {
 				view.BeginInit ();
@@ -1235,8 +1241,6 @@ namespace Terminal.Gui {
 			view.tabIndex = -1;
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
-
-			if (subviews.Count < 1) CanFocus = false;
 
 			foreach (var v in subviews) {
 				if (v.Frame.IntersectsWith (touched))
@@ -1792,7 +1796,7 @@ namespace Terminal.Gui {
 			// TODO: Implement OnDrawSubviews (cancelable);
 			if (subviews != null) {
 				foreach (var view in subviews) {
-					if (true) { //!view._needsDisplay.IsEmpty || view._childNeedsDisplay || view.LayoutNeeded) {
+					if (view.Visible) { //!view._needsDisplay.IsEmpty || view._childNeedsDisplay || view.LayoutNeeded) {
 						if (true) { //view.Frame.IntersectsWith (bounds)) { // && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
 							if (view.LayoutNeeded) {
 								view.LayoutSubviews ();
@@ -1886,14 +1890,23 @@ namespace Terminal.Gui {
 		/// <param name="view">View.</param>
 		void SetFocus (View view)
 		{
-			if (view == null)
+			if (view == null) {
 				return;
+			}
 			//Console.WriteLine ($"Request to focus {view}");
-			if (!view.CanFocus || !view.Visible || !view.Enabled)
+			if (!view.CanFocus || !view.Visible || !view.Enabled) {
 				return;
-			if (focused?._hasFocus == true && focused == view)
+			}
+			if (focused?._hasFocus == true && focused == view) {
 				return;
+			}
+			if ((focused?._hasFocus == true && focused?.SuperView == view) || view == this) {
 
+				if (!view._hasFocus) {
+					view._hasFocus = true;
+				}
+				return;
+			}
 			// Make sure that this view is a subview
 			View c;
 			for (c = view._superView; c != null; c = c._superView)
@@ -1911,7 +1924,11 @@ namespace Terminal.Gui {
 			focused.EnsureFocus ();
 
 			// Send focus upwards
-			SuperView?.SetFocus (this);
+			if (SuperView != null) {
+				SuperView.SetFocus (this);
+			} else {
+				SetFocus (this);
+			}
 		}
 
 		/// <summary>
@@ -1926,7 +1943,11 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			SuperView?.SetFocus (this);
+			if (SuperView != null) {
+				SuperView.SetFocus (this);
+			} else {
+				SetFocus (this);
+			}
 		}
 
 		/// <summary>
@@ -2346,9 +2367,8 @@ namespace Terminal.Gui {
 				FocusFirst ();
 				return focused != null;
 			}
-			var n = tabIndexes.Count;
 			var focusedIdx = -1;
-			for (var i = 0; i < n; i++) {
+			for (var i = 0; i < tabIndexes.Count; i++) {
 				var w = tabIndexes [i];
 
 				if (w.HasFocus) {
@@ -2658,31 +2678,37 @@ namespace Terminal.Gui {
 		{
 			if (Margin == null) return; // CreateFrames() has not been called yet
 
-			Margin.X = 0;
-			Margin.Y = 0;
-			Margin.Width = Frame.Size.Width;
-			Margin.Height = Frame.Size.Height;
-			Margin.SetNeedsLayout ();
-			Margin.LayoutSubviews ();
-			Margin.SetNeedsDisplay ();
+			if (Margin.Frame.Size != Frame.Size) {
+				Margin.X = 0;
+				Margin.Y = 0;
+				Margin.Width = Frame.Size.Width;
+				Margin.Height = Frame.Size.Height;
+				Margin.SetNeedsLayout ();
+				Margin.LayoutSubviews ();
+				Margin.SetNeedsDisplay ();
+			}
 
 			var border = Margin.Thickness.GetInside (Margin.Frame);
-			BorderFrame.X = border.Location.X;
-			BorderFrame.Y = border.Location.Y;
-			BorderFrame.Width = border.Size.Width;
-			BorderFrame.Height = border.Size.Height;
-			BorderFrame.SetNeedsLayout ();
-			BorderFrame.LayoutSubviews ();
-			BorderFrame.SetNeedsDisplay ();
+			if (border != BorderFrame.Frame) {
+				BorderFrame.X = border.Location.X;
+				BorderFrame.Y = border.Location.Y;
+				BorderFrame.Width = border.Size.Width;
+				BorderFrame.Height = border.Size.Height;
+				BorderFrame.SetNeedsLayout ();
+				BorderFrame.LayoutSubviews ();
+				BorderFrame.SetNeedsDisplay ();
+			}
 
 			var padding = BorderFrame.Thickness.GetInside (BorderFrame.Frame);
-			Padding.X = padding.Location.X;
-			Padding.Y = padding.Location.Y;
-			Padding.Width = padding.Size.Width;
-			Padding.Height = padding.Size.Height;
-			Padding.SetNeedsLayout ();
-			Padding.LayoutSubviews ();
-			Padding.SetNeedsDisplay ();
+			if (padding != Padding.Frame) {
+				Padding.X = padding.Location.X;
+				Padding.Y = padding.Location.Y;
+				Padding.Width = padding.Size.Width;
+				Padding.Height = padding.Size.Height;
+				Padding.SetNeedsLayout ();
+				Padding.LayoutSubviews ();
+				Padding.SetNeedsDisplay ();
+			}
 		}
 
 		/// <summary>
@@ -3343,20 +3369,26 @@ namespace Terminal.Gui {
 		{
 			var w = desiredWidth;
 			bool canSetWidth;
-			if (Width is Dim.DimCombine || Width is Dim.DimView || Width is Dim.DimFill) {
-				// It's a Dim.DimCombine and so can't be assigned. Let it have it's width anchored.
+			switch (Width) {
+			case Dim.DimCombine _:
+			case Dim.DimView _:
+			case Dim.DimFill _:
+				// It's a Dim.DimCombine and so can't be assigned. Let it have it's Width anchored.
 				w = Width.Anchor (w);
 				canSetWidth = !ForceValidatePosDim;
-			} else if (Width is Dim.DimFactor factor) {
-				// Tries to get the SuperView width otherwise the view width.
+				break;
+			case Dim.DimFactor factor:
+				// Tries to get the SuperView Width otherwise the view Width.
 				var sw = SuperView != null ? SuperView.Frame.Width : w;
 				if (factor.IsFromRemaining ()) {
 					sw -= Frame.X;
 				}
 				w = Width.Anchor (sw);
 				canSetWidth = !ForceValidatePosDim;
-			} else {
+				break;
+			default:
 				canSetWidth = true;
+				break;
 			}
 			resultWidth = w;
 

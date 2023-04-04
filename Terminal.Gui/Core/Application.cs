@@ -1054,8 +1054,9 @@ namespace Terminal.Gui {
 			}
 
 			Driver.PrepareToRun (MainLoop, ProcessKeyEvent, ProcessKeyDownEvent, ProcessKeyUpEvent, ProcessMouseEvent);
-			if (toplevel.LayoutStyle == LayoutStyle.Computed)
+			if (toplevel.LayoutStyle == LayoutStyle.Computed) {
 				toplevel.SetRelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
+			}
 			toplevel.LayoutSubviews ();
 			toplevel.PositionToplevels ();
 			toplevel.WillPresent ();
@@ -1557,7 +1558,6 @@ namespace Terminal.Gui {
 		static void TerminalResized ()
 		{
 			var full = new Rect (0, 0, Driver.Cols, Driver.Rows);
-			SetToplevelsSize (full);
 			Resized?.Invoke (new ResizedEventArgs () { Cols = full.Width, Rows = full.Height });
 			Driver.Clip = full;
 			foreach (var t in toplevels) {
@@ -1567,23 +1567,6 @@ namespace Terminal.Gui {
 				t.OnResized (new SizeChangedEventArgs (full.Size));
 			}
 			Refresh ();
-		}
-
-		static void SetToplevelsSize (Rect full)
-		{
-			if (MdiTop == null) {
-				foreach (var t in toplevels) {
-					if (t?.SuperView == null && !t.Modal) {
-						t.Frame = full;
-						t.Width = full.Width;
-						t.Height = full.Height;
-					}
-				}
-			} else {
-				Top.Frame = full;
-				Top.Width = full.Width;
-				Top.Height = full.Height;
-			}
 		}
 
 		static bool SetCurrentAsTop ()

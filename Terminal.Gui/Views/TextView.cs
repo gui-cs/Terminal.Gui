@@ -1146,7 +1146,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Provides autocomplete context menu based on suggestions at the current cursor
-		/// position. Populate <see cref="Autocomplete.AllSuggestions"/> to enable this feature
+		/// position. Configure <see cref="IAutocomplete.SuggestionGenerator"/> to enable this feature
 		/// </summary>
 		public IAutocomplete Autocomplete { get; protected set; } = new TextViewAutocomplete ();
 
@@ -1737,7 +1737,6 @@ namespace Terminal.Gui {
 					}
 					Height = 1;
 					LayoutStyle = lyout;
-					Autocomplete.PopupInsideContainer = false;
 					SetNeedsDisplay ();
 				} else if (multiline && savedHeight != null) {
 					var lyout = LayoutStyle;
@@ -1746,7 +1745,6 @@ namespace Terminal.Gui {
 					}
 					Height = savedHeight;
 					LayoutStyle = lyout;
-					Autocomplete.PopupInsideContainer = true;
 					SetNeedsDisplay ();
 				}
 			}
@@ -2430,7 +2428,7 @@ namespace Terminal.Gui {
 				return;
 
 			// draw autocomplete
-			Autocomplete.GenerateSuggestions ();
+			GenerateSuggestions ();
 
 			var renderAt = new Point (
 				CursorPosition.X - LeftColumn,
@@ -2439,6 +2437,15 @@ namespace Terminal.Gui {
 					: 0);
 
 			Autocomplete.RenderOverlay (renderAt);
+		}
+
+		private void GenerateSuggestions ()
+		{
+			var currentLine = this.GetCurrentLine ();
+			var cursorPosition = Math.Min (this.CurrentColumn, currentLine.Count);
+			Autocomplete.GenerateSuggestions(
+				new AutocompleteContext(currentLine,cursorPosition)
+				);
 		}
 
 		/// <inheritdoc/>
@@ -4428,16 +4435,7 @@ namespace Terminal.Gui {
 	/// from a range of 'autocomplete' options.
 	/// An implementation on a TextView.
 	/// </summary>
-	public class TextViewAutocomplete : Autocomplete {
-
-		///<inheritdoc/>
-		protected override string GetCurrentWord (int columnOffset = 0)
-		{
-			var host = (TextView)HostControl;
-			var currentLine = host.GetCurrentLine ();
-			var cursorPosition = Math.Min (host.CurrentColumn + columnOffset, currentLine.Count);
-			return IdxToWord (currentLine, cursorPosition, columnOffset);
-		}
+	public class TextViewAutocomplete : PopupAutocomplete {
 
 		/// <inheritdoc/>
 		protected override void DeleteTextBackwards ()
