@@ -32,30 +32,33 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Attribute Attribute { get; set; }
 
-		/// <summary>
-		/// Gets or sets the ruler template. This will be repeated in the ruler. The default is "0123456789".
-		/// </summary>
-		public string Template { get; set; } = "0123456789";
+		string _hTemplate { get; set; } = "|123456789";
+		string _vTemplate { get; set; } = "-123456789";
 
 
 		/// <summary>
 		/// Draws the <see cref="Ruler"/>. 
 		/// </summary>
 		/// <param name="location">The location to start drawing the ruler, in screen-relative coordinates.</param>
-		public void Draw (Point location)
+		/// <param name="start">The start value of the ruler.</param>
+		public void Draw (Point location, int start = 0)
 		{
+			if (start < 0) {
+				throw new ArgumentException ("start must be greater than or equal to 0");
+			}
+			
 			if (Length < 1) {
 				return;
 			}
-
+			
 			if (Orientation == Orientation.Horizontal) {
-				var hrule = Template.Repeat ((int)Math.Ceiling ((double)Length / (double)Template.Length)) [0..Length];
+				var hrule = _hTemplate.Repeat ((int)Math.Ceiling ((double)Length / (double)_hTemplate.Length)) [start..(Length + start)];
 				// Top
 				Application.Driver.Move (location.X, location.Y);
 				Application.Driver.AddStr (hrule);
 
 			} else {
-				var vrule = Template.Repeat ((int)Math.Ceiling ((double)(Length * 2) / (double)Template.Length)) [0..(Length * 2)];
+				var vrule = _vTemplate.Repeat ((int)Math.Ceiling ((double)(Length) / (double)_vTemplate.Length)) [start..(Length + start)];
 				for (var r = location.Y; r < location.Y + Length; r++) {
 					Application.Driver.Move (location.X, r);
 					Application.Driver.AddRune (vrule [r - location.Y]);

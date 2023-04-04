@@ -26,7 +26,6 @@ namespace Terminal.Gui.DrawingTests {
 		{
 			var r = new Ruler ();
 			Assert.Equal (0, r.Length);
-			Assert.Equal ("0123456789", r.Template);
 			Assert.Equal (Orientation.Horizontal, r.Orientation);
 			Assert.Equal (default, r.Attribute);
 		}
@@ -40,7 +39,7 @@ namespace Terminal.Gui.DrawingTests {
 			r.Orientation = Orientation.Vertical;
 			Assert.Equal (Orientation.Vertical, r.Orientation);
 		}
-		
+
 		[Fact ()]
 		public void Length_set ()
 		{
@@ -48,17 +47,6 @@ namespace Terminal.Gui.DrawingTests {
 			Assert.Equal (0, r.Length);
 			r.Length = 42;
 			Assert.Equal (42, r.Length);
-		}
-
-		[Fact ()]
-		public void Template_set ()
-		{
-			var newTemplate = "|123456789";
-
-			var r = new Ruler ();
-			Assert.Equal ("0123456789", r.Template);
-			r.Template = newTemplate;
-			Assert.Equal (newTemplate, r.Template);
 		}
 
 		[Fact ()]
@@ -98,14 +86,14 @@ namespace Terminal.Gui.DrawingTests {
 			Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (len + 5, 5);
 			Assert.Equal (new Rect (0, 0, len + 5, 5), f.Frame);
-			
+
 			var r = new Ruler ();
 			Assert.Equal (Orientation.Horizontal, r.Orientation);
 
 			r.Length = len;
-			r.Draw (new Point(0,0));
+			r.Draw (new Point (0, 0));
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
-012345678901234────┐
+|123456789|1234────┐
 │                  │
 │                  │
 │                  │
@@ -116,7 +104,7 @@ namespace Terminal.Gui.DrawingTests {
 			r.Draw (new Point (1, 1));
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
-│012345678901234   │
+│|123456789|1234   │
 │                  │
 │                  │
 └──────────────────┘", output);
@@ -126,7 +114,7 @@ namespace Terminal.Gui.DrawingTests {
 			r.Draw (new Point (-1, 1));
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
-12345678901234     │
+123456789|1234     │
 │                  │
 │                  │
 └──────────────────┘", output);
@@ -136,14 +124,14 @@ namespace Terminal.Gui.DrawingTests {
 			r.Draw (new Point (10, 1));
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
-│         0123456789
+│         |123456789
 │                  │
 │                  │
 └──────────────────┘", output);
 		}
 
 		[Fact (), AutoInitShutdown]
-		public void Draw_Horizontal_Template ()
+		public void Draw_Horizontal_Start ()
 		{
 			var len = 15;
 
@@ -154,22 +142,28 @@ namespace Terminal.Gui.DrawingTests {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 			};
-
-		
 			Application.Top.Add (f);
 			Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (len + 5, 5);
 			Assert.Equal (new Rect (0, 0, len + 5, 5), f.Frame);
 
 			var r = new Ruler ();
+			Assert.Equal (Orientation.Horizontal, r.Orientation);
+
 			r.Length = len;
-
-			var newTemplate = "|123456789";
-			r.Template = newTemplate;
-
-			r.Draw (new Point (0, 0));
+			r.Draw (new Point (0, 0), 1);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
-|123456789|1234────┐
+123456789|12345────┐
+│                  │
+│                  │
+│                  │
+└──────────────────┘", output);
+
+			Application.Refresh ();
+			r.Length = len;
+			r.Draw (new Point (1, 0), 1);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌123456789|12345───┐
 │                  │
 │                  │
 │                  │
@@ -200,7 +194,7 @@ namespace Terminal.Gui.DrawingTests {
 			r.Length = len;
 			r.Draw (new Point (0, 0));
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
-0───┐
+-───┐
 1   │
 2   │
 3   │
@@ -210,7 +204,7 @@ namespace Terminal.Gui.DrawingTests {
 7   │
 8   │
 9   │
-0   │
+-   │
 1   │
 2   │
 3   │
@@ -226,7 +220,7 @@ namespace Terminal.Gui.DrawingTests {
 			r.Draw (new Point (1, 1));
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌───┐
-│0  │
+│-  │
 │1  │
 │2  │
 │3  │
@@ -236,7 +230,7 @@ namespace Terminal.Gui.DrawingTests {
 │7  │
 │8  │
 │9  │
-│0  │
+│-  │
 │1  │
 │2  │
 │3  │
@@ -259,7 +253,7 @@ namespace Terminal.Gui.DrawingTests {
 │7  │
 │8  │
 │9  │
-│0  │
+│-  │
 │1  │
 │2  │
 │3  │
@@ -285,7 +279,7 @@ namespace Terminal.Gui.DrawingTests {
 │   │
 │   │
 │   │
-│0  │
+│-  │
 │1  │
 │2  │
 │3  │
@@ -298,7 +292,7 @@ namespace Terminal.Gui.DrawingTests {
 		}
 
 		[Fact (), AutoInitShutdown]
-		public void Draw_Vertical_Template ()
+		public void Draw_Vertical_Start ()
 		{
 			var len = 15;
 
@@ -319,33 +313,55 @@ namespace Terminal.Gui.DrawingTests {
 			var r = new Ruler ();
 			r.Orientation = Orientation.Vertical;
 			r.Length = len;
-
-			var newTemplate = ")!@#$$%^&*(";
-			r.Template = newTemplate;
-
-			r.Draw (new Point (0, 0));
+			r.Draw (new Point (0, 0), 1);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
-)───┐
-!   │
-@   │
-#   │
-$   │
-$   │
-%   │
-^   │
-&   │
-*   │
-(   │
-)   │
-!   │
-@   │
-#   │
+1───┐
+2   │
+3   │
+4   │
+5   │
+6   │
+7   │
+8   │
+9   │
+-   │
+1   │
+2   │
+3   │
+4   │
+5   │
 │   │
 │   │
 │   │
 │   │
 └───┘", output);
-		}		
+
+			Application.Refresh ();
+			r.Length = len;
+			r.Draw (new Point (0, 1), 1);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌───┐
+1   │
+2   │
+3   │
+4   │
+5   │
+6   │
+7   │
+8   │
+9   │
+-   │
+1   │
+2   │
+3   │
+4   │
+5   │
+│   │
+│   │
+│   │
+└───┘", output);
+
+		}
 	}
 }
 
