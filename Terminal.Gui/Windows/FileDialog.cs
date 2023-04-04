@@ -177,7 +177,7 @@ namespace Terminal.Gui {
 			this.btnForward.Clicked += (s, e) => this.history.Forward ();
 
 			this.tbPath = new TextField {
-				Width = Dim.Fill (1),
+				Width = Dim.Fill (0),
 				Caption = Style.PathCaption,
 				CaptionColor = Color.Black
 			};
@@ -215,6 +215,9 @@ namespace Terminal.Gui {
 			this.tableView.KeyPress += (s, k) => {
 				if (this.tableView.SelectedRow <= 0) {
 					this.NavigateIf (k, Key.CursorUp, this.tbPath);
+				}
+				if (this.tableView.SelectedRow == this.tableView.Table.Rows.Count-1) {
+					this.NavigateIf (k, Key.CursorDown, this.btnToggleSplitterCollapse);
 				}
 
 				if (splitContainer.Tiles.First ().ContentView.Visible && tableView.SelectedColumn == 0) {
@@ -289,9 +292,12 @@ namespace Terminal.Gui {
 				if(tbFind.CursorIsAtEnd()) {
 					NavigateIf (o, Key.CursorRight, btnCancel);
 				}
+				if (tbFind.CursorIsAtStart ()) {
+					NavigateIf (o, Key.CursorLeft, btnToggleSplitterCollapse);
+				}
 			};
 
-			this.tableView.Style.ShowHorizontalHeaderOverline = false;
+			this.tableView.Style.ShowHorizontalHeaderOverline = true;
 			this.tableView.Style.ShowVerticalCellLines = true;
 			this.tableView.Style.ShowVerticalHeaderLines = true;
 			this.tableView.Style.AlwaysShowHeaders = true;
@@ -714,6 +720,13 @@ namespace Terminal.Gui {
 
 				allowedTypeMenuBar.Enter += (s, e) => {
 					allowedTypeMenuBar.OpenMenu (0);
+				};
+
+				allowedTypeMenuBar.DrawContentComplete += (s, e) => {
+					
+					allowedTypeMenuBar.Move (e.Rect.Width - 1, 0);
+					Driver.AddRune (Driver.DownArrow);
+
 				};
 
 				this.Add (allowedTypeMenuBar);

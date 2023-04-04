@@ -1369,6 +1369,16 @@ namespace Terminal.Gui {
 		{
 			return CursorPosition == Text.Length;
 		}
+
+		/// <summary>
+		/// Returns <see langword="true"/> if the current cursor position is
+		/// at the start of the <see cref="TextField"/>.
+		/// </summary>
+		/// <returns></returns>
+		internal bool CursorIsAtStart()
+		{
+			return CursorPosition <= 0;
+		}
 	}
 	/// <summary>
 	/// Renders an overlay on another view at a given point that allows selecting
