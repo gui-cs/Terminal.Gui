@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Terminal.Gui.ViewTests {
+namespace Terminal.Gui.ViewsTests {
 	public class FrameViewTests {
 		[Fact]
 		public void Constuctors_Defaults ()

@@ -4,7 +4,7 @@ using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.CoreTests {
+namespace Terminal.Gui.DrawingTests {
 	public class LineCanvasTests {
 
 		readonly ITestOutputHelper output;

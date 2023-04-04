@@ -10,7 +10,7 @@ using Xunit.Abstractions;
 using NStack;
 using static Terminal.Gui.Application;
 
-namespace Terminal.Gui.TopLevelTests {
+namespace Terminal.Gui.DialogTests {
 
 	public class DialogTests {
 		readonly ITestOutputHelper output;

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
 //using static Terminal.Gui.ViewTests.MenuTests;
 
-namespace Terminal.Gui.MenuTests {
+namespace Terminal.Gui.ViewsTests {
 	public class MenuTests {
 		readonly ITestOutputHelper output;
 
@@ -109,7 +110,7 @@ namespace Terminal.Gui.MenuTests {
 					new MenuItem ("_New", "Creates new file.", New)
 				})
 			});
-			menu.MenuOpening += (s,e) => {
+			menu.MenuOpening += (s, e) => {
 				Assert.Equal ("_File", e.CurrentMenu.Title);
 				Assert.Equal ("_New", e.CurrentMenu.Children [0].Title);
 				Assert.Equal ("Creates new file.", e.CurrentMenu.Children [0].Help);
@@ -130,14 +131,12 @@ namespace Terminal.Gui.MenuTests {
 				mi.Action ();
 				Assert.Equal ("Copy", miAction);
 			};
-			menu.MenuClosing += (s,e) => {
+			menu.MenuClosing += (s, e) => {
 				Assert.False (isMenuClosed);
 				if (cancelClosing) {
 					e.Cancel = true;
 					isMenuClosed = false;
-				} else {
-					isMenuClosed = true;
-				}
+				} else 					isMenuClosed = true;
 			};
 			Application.Top.Add (menu);
 
@@ -196,7 +195,7 @@ Edit
 					new MenuItem ("_Save", "Saves the file.", null, null)
 				})
 			});
-			menu.MenuOpened += (s,e) => {
+			menu.MenuOpened += (s, e) => {
 				miCurrent = e.MenuItem;
 				mCurrent = menu.openMenu;
 			};
@@ -319,21 +318,18 @@ Edit
 			Assert.Equal ("_Paste", miCurrent.Title);
 
 			for (int i = 2; i >= -1; i--) {
-				if (i == -1) {
-					Assert.False (mCurrent.MouseEvent (new MouseEvent () {
+				if (i == -1) 					Assert.False (mCurrent.MouseEvent (new MouseEvent () {
 						X = 10,
 						Y = i,
 						Flags = MouseFlags.ReportMousePosition,
 						View = menu
 					}));
-				} else {
-					Assert.True (mCurrent.MouseEvent (new MouseEvent () {
+else 					Assert.True (mCurrent.MouseEvent (new MouseEvent () {
 						X = 10,
 						Y = i,
 						Flags = MouseFlags.ReportMousePosition,
 						View = mCurrent
 					}));
-				}
 				Assert.True (menu.IsMenuOpen);
 				if (i == 2) {
 					Assert.Equal ("_Edit", miCurrent.Parent.Title);
@@ -380,12 +376,12 @@ Edit
 				}),
 				new MenuBarItem ("_About", "Top-Level", () => miAction ="About")
 			});
-			menu.MenuOpening += (s,e) => mbiCurrent = e.CurrentMenu;
+			menu.MenuOpening += (s, e) => mbiCurrent = e.CurrentMenu;
 			menu.MenuOpened += (s, e) => {
 				miCurrent = e.MenuItem;
 				mCurrent = menu.openCurrentMenu;
 			};
-			menu.MenuClosing += (s,e) => {
+			menu.MenuClosing += (s, e) => {
 				mbiCurrent = null;
 				miCurrent = null;
 				mCurrent = null;
@@ -1112,17 +1108,15 @@ Edit
 		// File  Edit
 		//  New    Copy
 		public class ExpectedMenuBar : MenuBar {
-			FakeDriver d = ((FakeDriver)Application.Driver);
+			FakeDriver d = (FakeDriver)Application.Driver;
 
 			// Each MenuBar title has a 1 space pad on each side
 			// See `static int leftPadding` and `static int rightPadding` on line 1037 of Menu.cs
 			public string MenuBarText {
 				get {
 					string txt = string.Empty;
-					foreach (var m in Menus) {
-
+					foreach (var m in Menus) 
 						txt += " " + m.Title.ToString () + " ";
-					}
 					return txt;
 				}
 			}
@@ -1149,10 +1143,10 @@ Edit
 			// 
 			// The width of the Frame is determined in Menu.cs line 144, where `Width` is calculated
 			//   1 space before the Title and 2 spaces after the Title/Check/Help
-			public string expectedTopRow (int i) => $"{d.ULCorner}{new String (d.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{d.URCorner}  \n";
+			public string expectedTopRow (int i) => $"{d.ULCorner}{new string (d.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{d.URCorner}  \n";
 			// The 3 spaces at end are a result of Menu.cs line 1062 where `pos` is calculated (` + spacesAfterTitle`)
 			public string expectedMenuItemRow (int i) => $"{d.VLine} {Menus [i].Children [0].Title}  {d.VLine}   \n";
-			public string expectedBottomRow (int i) => $"{d.LLCorner}{new String (d.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{d.LRCorner}  \n";
+			public string expectedBottomRow (int i) => $"{d.LLCorner}{new string (d.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{d.LRCorner}  \n";
 
 			// The fulll expected string for an open sub menu
 			public string expectedSubMenuOpen (int i) => ClosedMenuText +
@@ -1196,12 +1190,10 @@ Edit
 				})
 			});
 
-			MenuBarItem [] items = new MenuBarItem [expectedMenu.Menus.Length];
-			for (var i = 0; i < expectedMenu.Menus.Length; i++) {
-				items [i] = new MenuBarItem (expectedMenu.Menus [i].Title, new MenuItem [] {
+			var items = new MenuBarItem [expectedMenu.Menus.Length];
+			for (var i = 0; i < expectedMenu.Menus.Length; i++) 				items [i] = new MenuBarItem (expectedMenu.Menus [i].Title, new MenuItem [] {
 					new MenuItem (expectedMenu.Menus [i].Children [0].Title, "", null)
 				});
-			}
 			var menu = new MenuBar (items);
 
 			Application.Top.Add (menu);
@@ -1481,14 +1473,12 @@ Edit
 				})
 			});
 
-			MenuBarItem [] items = new MenuBarItem [expectedMenu.Menus.Length];
-			for (var i = 0; i < expectedMenu.Menus.Length; i++) {
-				items [i] = new MenuBarItem (expectedMenu.Menus [i].Title, expectedMenu.Menus [i].Children.Length > 0
+			var items = new MenuBarItem [expectedMenu.Menus.Length];
+			for (var i = 0; i < expectedMenu.Menus.Length; i++) 				items [i] = new MenuBarItem (expectedMenu.Menus [i].Title, expectedMenu.Menus [i].Children.Length > 0
 					? new MenuItem [] {
 						new MenuItem (expectedMenu.Menus [i].Children [0].Title, "", null),
 					}
 					: Array.Empty<MenuItem> ());
-			}
 			var menu = new MenuBar (items);
 
 			var tf = new TextField () { Y = 2, Width = 10 };
@@ -1740,7 +1730,7 @@ Edit
 		[Fact, AutoInitShutdown]
 		public void AllowNullChecked_Get_Set ()
 		{
-			MenuItem mi = new MenuItem ("Check this out 你", "", null) {
+			var mi = new MenuItem ("Check this out 你", "", null) {
 				CheckType = MenuItemCheckStyle.Checked
 			};
 			mi.Action = mi.ToggleChecked;

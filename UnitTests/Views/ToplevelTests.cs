@@ -3,7 +3,7 @@ using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.TopLevelTests {
+namespace Terminal.Gui.ViewsTests {
 	public class ToplevelTests {
 		readonly ITestOutputHelper output;
 

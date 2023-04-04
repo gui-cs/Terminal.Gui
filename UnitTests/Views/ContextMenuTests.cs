@@ -1,10 +1,11 @@
 ﻿using System.Globalization;
 using System.Threading;
+using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
 //using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
 
-namespace Terminal.Gui.MenuTests {
+namespace Terminal.Gui.ViewsTests {
 	public class ContextMenuTests {
 		readonly ITestOutputHelper output;
 
@@ -228,7 +229,7 @@ namespace Terminal.Gui.MenuTests {
 			var oldKey = Key.Null;
 			var cm = new ContextMenu ();
 
-			cm.KeyChanged += (s,e) => oldKey = e.OldKey;
+			cm.KeyChanged += (s, e) => oldKey = e.OldKey;
 
 			cm.Key = Key.Space | Key.CtrlMask;
 			Assert.Equal (Key.Space | Key.CtrlMask, cm.Key);
@@ -241,7 +242,7 @@ namespace Terminal.Gui.MenuTests {
 			var oldMouseFlags = new MouseFlags ();
 			var cm = new ContextMenu ();
 
-			cm.MouseFlagsChanged += (s,e) => oldMouseFlags = e.OldValue;
+			cm.MouseFlagsChanged += (s, e) => oldMouseFlags = e.OldValue;
 
 			cm.MouseFlags = MouseFlags.Button2Clicked;
 			Assert.Equal (MouseFlags.Button2Clicked, cm.MouseFlags);

@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 using Xunit.Abstractions;
 using Rune = System.Rune;
 
-namespace Terminal.Gui.ViewTests {
+namespace Terminal.Gui.ViewsTests {
 #if false // BUGBUG: v2 see https://github.com/gui-cs/Terminal.Gui/issues/2463
 
 	#region Helper Classes

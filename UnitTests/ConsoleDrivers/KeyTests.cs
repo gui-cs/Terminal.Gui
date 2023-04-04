@@ -2,7 +2,7 @@
 using Terminal.Gui;
 using Xunit;
 
-namespace Terminal.Gui.DriverTests {
+namespace Terminal.Gui.InputTests {
 	public class KeyTests {
 		enum SimpleEnum { Zero, One, Two, Three, Four, Five }
 

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Terminal.Gui.CoreTests {
+namespace Terminal.Gui.InputTests {
 	public class EscSeqReqTests {
 		[Fact]
 		public void Constructor_Defaults ()

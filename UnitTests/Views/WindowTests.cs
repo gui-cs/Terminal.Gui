@@ -8,7 +8,7 @@ using Console = Terminal.Gui.FakeConsole;
 using NStack;
 using Terminal.Gui;
 
-namespace Terminal.Gui.TopLevelTests {
+namespace Terminal.Gui.ViewsTests {
 	public class WindowTests {
 		readonly ITestOutputHelper output;
 

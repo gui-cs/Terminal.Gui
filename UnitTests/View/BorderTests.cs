@@ -4,7 +4,7 @@ using Xunit;
 using Xunit.Abstractions;
 using Rune = System.Rune;
 
-namespace Terminal.Gui.CoreTests {
+namespace Terminal.Gui.ViewTests {
 	public class BorderTests {
 		readonly ITestOutputHelper output;
 

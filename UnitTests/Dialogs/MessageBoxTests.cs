@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 using System.Text;
 using Terminal.Gui;
 
-namespace Terminal.Gui.TopLevelTests {
+namespace Terminal.Gui.DialogTests {
 
 	public class MessageBoxTests {
 		readonly ITestOutputHelper output;

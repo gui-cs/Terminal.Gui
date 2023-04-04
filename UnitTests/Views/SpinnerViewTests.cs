@@ -3,7 +3,7 @@ using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace UnitTests.Views {
+namespace Terminal.Gui.ViewsTests {
 	public class SpinnerViewTests {
 
 		readonly ITestOutputHelper output;

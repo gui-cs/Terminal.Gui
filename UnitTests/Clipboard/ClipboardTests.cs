@@ -6,7 +6,7 @@ using Xunit;
 using Xunit.Abstractions;
 using static AutoInitShutdownAttribute;
 
-namespace Terminal.Gui.DriverTests {
+namespace Terminal.Gui.ClipboardTests {
 	public class ClipboardTests {
 		readonly ITestOutputHelper output;
 

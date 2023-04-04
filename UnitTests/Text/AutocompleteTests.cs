@@ -8,7 +8,7 @@ using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests {
+namespace Terminal.Gui.TextTests {
 	public class AutocompleteTests {
 		readonly ITestOutputHelper output;
 

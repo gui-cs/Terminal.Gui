@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Xunit;
 
-namespace Terminal.Gui.CoreTests {
+namespace Terminal.Gui.InputTests {
 	public class EscSeqUtilsTests {
 		[Fact]
 		public void Defaults_Values ()

@@ -9,7 +9,7 @@ using System.Globalization;
 using Xunit.Abstractions;
 using System.Reflection;
 
-namespace Terminal.Gui.ViewTests {
+namespace Terminal.Gui.ViewsTests {
 
 	public class TableViewTests {
 #if false // BUGBUG: v2 - Table scenarios are working fine; Will fix these unit test later

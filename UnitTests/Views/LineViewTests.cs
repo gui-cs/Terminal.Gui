@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace Terminal.Gui.ViewTests {
+namespace Terminal.Gui.ViewsTests {
 	public class LineViewTests {
 
 		[Fact]
