@@ -44,6 +44,11 @@ namespace Terminal.Gui.FileServices {
 		/// </summary>
 		public ColorScheme ColorSchemeExeOrRecommended { get; set; }
 
+		/// <summary>
+		/// Colors to use when <see cref="UseColors"/> is true but file does not match any other
+		/// classification (<see cref="ColorSchemeDirectory"/>, <see cref="ColorSchemeImage"/> etc).
+		/// </summary>
+		public ColorScheme ColorSchemeOther { get; set; }
 
 		/// <summary>
 		/// Gets or sets the header text displayed in the Filename column of the files table.
@@ -134,7 +139,7 @@ namespace Terminal.Gui.FileServices {
 		/// </summary>
 		/// <remarks>Must be configured before showing the dialog.</remarks>
 		public FileDialogTreeRootGetter TreeRootGetter { get; set; } = DefaultTreeRootGetter;
-		
+
 		/// <summary>
 		/// Gets or sets whether to use advanced unicode characters which might not be installed
 		/// on all users computers.
@@ -176,7 +181,13 @@ namespace Terminal.Gui.FileServices {
 				Focus = Application.Driver.MakeAttribute (Color.Black, Color.Green),
 				HotFocus = Application.Driver.MakeAttribute (Color.Black, Color.Green),
 			};
-			
+			ColorSchemeOther = new ColorScheme {
+				Normal = Application.Driver.MakeAttribute (Color.White, Color.Black),
+				HotNormal = Application.Driver.MakeAttribute (Color.White, Color.Black),
+				Focus = Application.Driver.MakeAttribute (Color.Black, Color.White),
+				HotFocus = Application.Driver.MakeAttribute (Color.Black, Color.White),
+			};
+
 		}
 
 		private string DefaultIconGetter (FileSystemInfo arg)

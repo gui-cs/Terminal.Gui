@@ -1018,7 +1018,11 @@ namespace Terminal.Gui {
 			var typeStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (Style.TypeColumnName, typeof (int)));
 			typeStyle.RepresentationGetter = (i) => this.State?.Children [(int)i].Type ?? string.Empty;
 			typeStyle.MinWidth = 6;
-			this.tableView.Style.RowColorGetter = this.ColorGetter;
+
+			foreach(var colStyle in Style.TableStyle.ColumnStyles) {
+				colStyle.Value.ColorGetter = this.ColorGetter;
+			}
+			
 		}
 
 		private void CellActivate (object sender, CellActivatedEventArgs obj)
@@ -1224,7 +1228,7 @@ namespace Terminal.Gui {
 			this.tableView.Table.Rows.Add (idx, idx, idx, idx);
 		}
 
-		private ColorScheme ColorGetter (TableView.RowColorGetterArgs args)
+		private ColorScheme ColorGetter (TableView.CellColorGetterArgs args)
 		{
 			var stats = this.RowToStats (args.RowIndex);
 
@@ -1245,7 +1249,7 @@ namespace Terminal.Gui {
 				return Style.ColorSchemeExeOrRecommended;
 			}
 
-			return tableView.ColorScheme;
+			return Style.ColorSchemeOther;
 		}
 
 		/// <summary>
