@@ -46,19 +46,19 @@ namespace Terminal.Gui {
 			if (start < 0) {
 				throw new ArgumentException ("start must be greater than or equal to 0");
 			}
-			
+
 			if (Length < 1) {
 				return;
 			}
-			
+
 			if (Orientation == Orientation.Horizontal) {
-				var hrule = _hTemplate.Repeat ((int)Math.Ceiling ((double)Length / (double)_hTemplate.Length)) [start..(Length + start)];
+				var hrule = _hTemplate.Repeat ((int)Math.Ceiling ((double)Length + 2 / (double)_hTemplate.Length)) [start..(Length + start)];
 				// Top
 				Application.Driver.Move (location.X, location.Y);
 				Application.Driver.AddStr (hrule);
 
 			} else {
-				var vrule = _vTemplate.Repeat ((int)Math.Ceiling ((double)(Length) / (double)_vTemplate.Length)) [start..(Length + start)];
+				var vrule = _vTemplate.Repeat ((int)Math.Ceiling ((double)(Length + 2) / (double)_vTemplate.Length)) [start..(Length + start)];
 				for (var r = location.Y; r < location.Y + Length; r++) {
 					Application.Driver.Move (location.X, r);
 					Application.Driver.AddRune (vrule [r - location.Y]);
