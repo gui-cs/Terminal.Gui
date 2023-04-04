@@ -2424,30 +2424,19 @@ namespace Terminal.Gui {
 			get => base.Enabled;
 			set {
 				if (base.Enabled != value) {
-					if (value) {
-						if (SuperView == null || SuperView?.Enabled == true) {
-							base.Enabled = value;
-						}
-					} else {
-						base.Enabled = value;
-					}
-					if (!value && HasFocus) {
-						SetHasFocus (false, this);
-					}
+					if (value) if (SuperView == null || SuperView?.Enabled == true) base.Enabled = value;
+						else base.Enabled = value;
+					if (!value && HasFocus) SetHasFocus (false, this);
 					OnEnabledChanged ();
 					SetNeedsDisplay ();
 
-					if (subviews != null) {
-						foreach (var view in subviews) {
-							if (!value) {
+					if (subviews != null) foreach (var view in subviews) if (!value) {
 								view.oldEnabled = view.Enabled;
 								view.Enabled = false;
 							} else {
 								view.Enabled = view.oldEnabled;
 								view.addingView = false;
 							}
-						}
-					}
 				}
 			}
 		}
