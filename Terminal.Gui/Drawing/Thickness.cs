@@ -159,16 +159,6 @@ namespace Terminal.Gui {
 				}
 			}
 
-			ustring hrule = ustring.Empty;
-			ustring vrule = ustring.Empty;
-			if ((ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler) {
-
-				string h = "0123456789";
-				hrule = h.Repeat ((int)Math.Ceiling ((double)(rect.Width) / (double)h.Length)) [0..(rect.Width)];
-				string v = "0123456789";
-				vrule = v.Repeat ((int)Math.Ceiling ((double)(rect.Height * 2) / (double)v.Length)) [0..(rect.Height * 2)];
-			};
-
 			// Draw the Top side
 			if (Top > 0) {
 				Application.Driver.FillRect (new Rect (rect.X, rect.Y, rect.Width, Math.Min (rect.Height, Top)), topChar);
@@ -192,20 +182,25 @@ namespace Terminal.Gui {
 			// TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
 			if ((ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler) {
 				// Top
-				Application.Driver.Move (rect.X, rect.Y);
-				Application.Driver.AddStr (hrule);
-				//Left
-				for (var r = rect.Y; r < rect.Y + rect.Height; r++) {
-					Application.Driver.Move (rect.X, r);
-					Application.Driver.AddRune (vrule [r - rect.Y]);
+				var hruler = new Ruler () { Length = rect.Width, Orientation = Orientation.Horizontal };
+				if (Top > 0) {
+					hruler.Draw (new Point (rect.X, rect.Y));
 				}
+
+				//Left
+				var vruler = new Ruler () { Length = rect.Height - 2, Orientation = Orientation.Vertical };
+				if (Left > 0) {
+					vruler.Draw (new Point (rect.X, rect.Y + 1), 1);
+				}
+
 				// Bottom
-				Application.Driver.Move (rect.X, rect.Y + rect.Height - Bottom + 1);
-				Application.Driver.AddStr (hrule);
+				if (Bottom > 0) {
+					hruler.Draw (new Point (rect.X, rect.Y + rect.Height - 1));
+				}
+
 				// Right
-				for (var r = rect.Y + 1; r < rect.Y + rect.Height; r++) {
-					Application.Driver.Move (rect.X + rect.Width - Right + 1, r);
-					Application.Driver.AddRune (vrule [r - rect.Y]);
+				if (Right > 0) {
+					vruler.Draw (new Point (rect.X + rect.Width - 1, rect.Y + 1), 1);
 				}
 			}
 
@@ -279,23 +274,6 @@ namespace Terminal.Gui {
 		public static bool operator != (Thickness left, Thickness right)
 		{
 			return !(left == right);
-		}
-	}
-
-	internal static class StringExtensions {
-		public static string Repeat (this string instr, int n)
-		{
-			if (n <= 0) {
-				return null;
-			}
-
-			if (string.IsNullOrEmpty (instr) || n == 1) {
-				return instr;
-			}
-
-			return new StringBuilder (instr.Length * n)
-				.Insert (0, instr, n)
-				.ToString ();
 		}
 	}
 }

@@ -39,7 +39,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), top.Bounds);
 		}
 
-
 		[Fact]
 		[AutoInitShutdown]
 		public void Application_Top_EnsureVisibleBounds_To_Driver_Rows_And_Cols ()

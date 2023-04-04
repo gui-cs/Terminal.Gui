@@ -484,6 +484,137 @@ namespace Terminal.Gui.DrawingTests {
 
 		}
 
+		[Fact (), AutoInitShutdown]
+		public void DrawTests_Ruler ()
+		{
+			// Add a frame so we can see the ruler
+			var f = new FrameView () {
+				X = 0,
+				Y = 0,
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+			};
+
+
+			Application.Top.Add (f);
+			Application.Begin (Application.Top);
+			
+			((FakeDriver)Application.Driver).SetBufferSize (45, 20);
+			var t = new Thickness (0, 0, 0, 0);
+			var r = new Rect (2, 2, 40, 15);
+			Application.Refresh ();
+			ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FrameRuler;
+			t.Draw (r, "Test");
+			ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+			TestHelpers.AssertDriverContentsAre (@"
+┌───────────────────────────────────────────┐
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+└───────────────────────────────────────────┘", output);
+
+
+			t = new Thickness (1, 1, 1, 1);
+			r = new Rect (1, 1, 40, 15);
+			Application.Refresh ();
+			ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FrameRuler;
+			t.Draw (r, "Test");
+			ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+			TestHelpers.AssertDriverContentsAre (@"
+┌───────────────────────────────────────────┐
+│|123456789|123456789|123456789|123456789   │
+│1                                      1   │
+│2                                      2   │
+│3                                      3   │
+│4                                      4   │
+│5                                      5   │
+│6                                      6   │
+│7                                      7   │
+│8                                      8   │
+│9                                      9   │
+│-                                      -   │
+│1                                      1   │
+│2                                      2   │
+│3                                      3   │
+│|123456789|123456789|123456789|123456789   │
+│                                           │
+│                                           │
+│                                           │
+└───────────────────────────────────────────┘", output);
+
+			t = new Thickness (1, 2, 3, 4);
+			r = new Rect (2, 2, 40, 15);
+			Application.Refresh ();
+			ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FrameRuler;
+			t.Draw (r, "Test");
+			ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌───────────────────────────────────────────┐
+│                                           │
+│ |123456789|123456789|123456789|123456789  │
+│ 1                                      1  │
+│ 2                                      2  │
+│ 3                                      3  │
+│ 4                                      4  │
+│ 5                                      5  │
+│ 6                                      6  │
+│ 7                                      7  │
+│ 8                                      8  │
+│ 9                                      9  │
+│ -                                      -  │
+│ 1                                      1  │
+│ 2                                      2  │
+│ 3                                      3  │
+│ |123456789|123456789|123456789|123456789  │
+│                                           │
+│                                           │
+└───────────────────────────────────────────┘", output);
+
+
+			t = new Thickness (-1, 1, 1, 1);
+			r = new Rect (5, 5, 40, 15);
+			Application.Refresh ();
+			ConsoleDriver.Diagnostics |= ConsoleDriver.DiagnosticFlags.FrameRuler;
+			t.Draw (r, "Test");
+			ConsoleDriver.Diagnostics = ConsoleDriver.DiagnosticFlags.Off;
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌───────────────────────────────────────────┐
+│                                           │
+│                                           │
+│                                           │
+│                                           │
+│    |123456789|123456789|123456789|123456789
+│                                           1
+│                                           2
+│                                           3
+│                                           4
+│                                           5
+│                                           6
+│                                           7
+│                                           8
+│                                           9
+│                                           -
+│                                           1
+│                                           2
+│                                           3
+└────|123456789|123456789|123456789|123456789", output);
+
+		}
 		[Fact ()]
 		public void EqualsTest ()
 		{

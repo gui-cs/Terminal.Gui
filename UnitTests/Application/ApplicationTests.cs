@@ -461,6 +461,19 @@ namespace Terminal.Gui.ApplicationTests {
 		}
 		#endregion
 
+		[Fact, AutoInitShutdown]
+		public void Begin_Sets_Application_Top_To_Console_Size()
+		{
+			Assert.Equal (new Rect (0, 0, 80, 25), Application.Top.Frame);
+
+			((FakeDriver)Application.Driver).SetBufferSize (5, 5);
+			Application.Begin (Application.Top);
+			// BUGBUG: v2 - 
+			Assert.Equal (new Rect (0, 0, 80, 25), Application.Top.Frame);
+			((FakeDriver)Application.Driver).SetBufferSize (5, 5);
+			Assert.Equal (new Rect (0, 0, 5, 5), Application.Top.Frame);
+		}
+
 		[Fact]
 		[AutoInitShutdown]
 		public void SetCurrentAsTop_Run_A_Not_Modal_Toplevel_Make_It_The_Current_Application_Top ()
