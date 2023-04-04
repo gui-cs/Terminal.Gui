@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Terminal.Gui.Graphs {
+namespace Terminal.Gui {
 
 	/// <summary>
 	/// Renders a continuous line with grid line ticks and labels
