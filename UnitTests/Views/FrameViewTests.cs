@@ -14,22 +14,18 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (string.Empty, fv.Title);
 			Assert.Equal (string.Empty, fv.Text);
 			Assert.NotNull (fv.Border);
-			Assert.Single (fv.InternalSubviews);
-			Assert.Single (fv.Subviews);
 
 			fv = new FrameView ("Test");
 			Assert.Equal ("Test", fv.Title);
 			Assert.Equal (string.Empty, fv.Text);
 			Assert.NotNull (fv.Border);
-			Assert.Single (fv.InternalSubviews);
-			Assert.Single (fv.Subviews);
 
 			fv = new FrameView (new Rect (1, 2, 10, 20), "Test");
 			Assert.Equal ("Test", fv.Title);
 			Assert.Equal (string.Empty, fv.Text);
 			Assert.NotNull (fv.Border);
-			Assert.Single (fv.InternalSubviews);
-			Assert.Single (fv.Subviews);
+			fv.BeginInit ();
+			fv.EndInit ();
 			Assert.Equal (new Rect (1, 2, 10, 20), fv.Frame);
 		}
 	}

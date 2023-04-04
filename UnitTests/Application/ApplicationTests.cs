@@ -93,7 +93,8 @@ namespace Terminal.Gui.ApplicationTests {
 			Application.Shutdown ();
 
 #if DEBUG_IDISPOSABLE
-			Assert.Single (Responder.Instances);
+			// 4 for Application.Top and it's 3 Frames
+			Assert.Equal (4, Responder.Instances.Count);
 			Assert.True (Responder.Instances [0].WasDisposed);
 #endif
 		}

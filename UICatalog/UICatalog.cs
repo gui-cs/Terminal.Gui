@@ -237,7 +237,7 @@ namespace UICatalog {
 
 		static bool _useSystemConsole = false;
 		static ConsoleDriver.DiagnosticFlags _diagnosticFlags;
-		static bool _enableConsoleScrolling = false;
+		//static bool _enableConsoleScrolling = false;
 		static bool _isFirstRunning = true;
 		static string _topLevelColorScheme;
 
@@ -276,7 +276,7 @@ namespace UICatalog {
 						new MenuItem ("_gui.cs API Overview", "", () => OpenUrl ("https://gui-cs.github.io/Terminal.Gui/articles/overview.html"), null, null, Key.F1),
 						new MenuItem ("gui.cs _README", "", () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"), null, null, Key.F2),
 						new MenuItem ("_About...",
-							"About UI Catalog", () =>  MessageBox.Query ("About UI Catalog", _aboutMessage.ToString(), 0, null, false, "_Ok"), null, null, Key.CtrlMask | Key.A),
+							"About UI Catalog", () =>  MessageBox.Query ("About UI Catalog", _aboutMessage.ToString(), 0, false, "_Ok"), null, null, Key.CtrlMask | Key.A),
 					}),
 				});
 
@@ -311,6 +311,7 @@ namespace UICatalog {
 				};
 
 				ContentPane = new TileView () {
+					Id = "ContentPane",
 					X = 0,
 					Y = 1, // for menu
 					Width = Dim.Fill (),
@@ -318,7 +319,7 @@ namespace UICatalog {
 					CanFocus = true,
 					Shortcut = Key.CtrlMask | Key.C,
 				};
-				ContentPane.Border.BorderStyle = BorderStyle.Single;
+				ContentPane.BorderStyle = BorderStyle.Single;
 				ContentPane.SetSplitterPos (0, 25);
 				ContentPane.ShortcutAction = () => ContentPane.SetFocus ();
 
@@ -652,7 +653,7 @@ namespace UICatalog {
 
 				ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
 
-				ContentPane.Border.BorderStyle = FrameView.DefaultBorderStyle;
+				ContentPane.BorderStyle = FrameView.DefaultBorderStyle;
 
 				MenuBar.Menus [0].Children [0].Shortcut = Application.QuitKey;
 				StatusBar.Items [0].Shortcut = Application.QuitKey;
