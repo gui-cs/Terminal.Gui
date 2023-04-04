@@ -158,10 +158,6 @@ namespace Terminal.Gui {
 			textField.MoveEnd ();
 		}
 
-		internal bool CursorIsAtEnd ()
-		{
-			return textField.CursorPosition == textField.Text.Length;
-		}
 
 		/// <summary>
 		/// Returns true if there is a suggestion that can be made and the control
@@ -171,7 +167,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private bool MakingSuggestion ()
 		{
-			return Suggestions.Any () && this.SelectedIdx != -1 && textField.HasFocus && this.CursorIsAtEnd ();
+			return Suggestions.Any () && this.SelectedIdx != -1 && textField.HasFocus && textField.CursorIsAtEnd ();
 		}
 
 		private bool CycleSuggestion (int direction)

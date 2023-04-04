@@ -1359,6 +1359,16 @@ namespace Terminal.Gui {
 		{
 			historyText.Clear (Text);
 		}
+
+		/// <summary>
+		/// Returns <see langword="true"/> if the current cursor position is
+		/// at the end of the <see cref="Text"/>. This includes when it is empty.
+		/// </summary>
+		/// <returns></returns>
+		internal bool CursorIsAtEnd ()
+		{
+			return CursorPosition == Text.Length;
+		}
 	}
 	/// <summary>
 	/// Renders an overlay on another view at a given point that allows selecting

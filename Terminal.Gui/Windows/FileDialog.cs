@@ -286,6 +286,9 @@ namespace Terminal.Gui {
 						o.Handled = true;
 					}
 				}
+				if(tbFind.CursorIsAtEnd()) {
+					NavigateIf (o, Key.CursorRight, btnCancel);
+				}
 			};
 
 			this.tableView.Style.ShowHorizontalHeaderOverline = false;
