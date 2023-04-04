@@ -128,7 +128,7 @@ namespace UICatalog.Scenarios {
 			};
 			label.Text = $"{scrollView}\nContentSize: {scrollView.ContentSize}\nContentOffset: {scrollView.ContentOffset}";
 
-			const string rule = "0123456789";
+			//const string rule = "0123456789";
 
 			var horizontalRuler = new Label () {
 				X = 0,
@@ -140,7 +140,7 @@ namespace UICatalog.Scenarios {
 			};
 			scrollView.Add (horizontalRuler);
 
-			const string vrule = "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
+			//const string vrule = "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
 
 			var verticalRuler = new Label () {
 				X = 0,

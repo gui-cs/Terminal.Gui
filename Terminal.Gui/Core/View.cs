@@ -857,7 +857,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the <see cref="Terminal.Gui.TextFormatter"/> which can be handled differently by any derived class.
 		/// </summary>
-		public TextFormatter? TextFormatter { get; set; }
+		public TextFormatter TextFormatter { get; set; }
 
 		/// <summary>
 		/// Returns the container for this view, or null if this view has not been added to a container.
