@@ -1146,7 +1146,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Provides autocomplete context menu based on suggestions at the current cursor
-		/// position. Populate <see cref="Autocomplete.AllSuggestions"/> to enable this feature
+		/// position. Configure <see cref="IAutocomplete.SuggestionGenerator"/> to enable this feature
 		/// </summary>
 		public IAutocomplete Autocomplete { get; protected set; } = new TextViewAutocomplete ();
 
@@ -1412,9 +1412,10 @@ namespace Terminal.Gui {
 		void TextView_Initialized (object sender, EventArgs e)
 		{
 			Autocomplete.HostControl = this;
-
-			Application.Top.AlternateForwardKeyChanged += Top_AlternateForwardKeyChanged;
-			Application.Top.AlternateBackwardKeyChanged += Top_AlternateBackwardKeyChanged;
+			if (Application.Top != null) {
+				Application.Top.AlternateForwardKeyChanged += Top_AlternateForwardKeyChanged;
+				Application.Top.AlternateBackwardKeyChanged += Top_AlternateBackwardKeyChanged;
+			}
 			OnContentsChanged ();
 		}
 
@@ -1476,8 +1477,10 @@ namespace Terminal.Gui {
 			get => base.Frame;
 			set {
 				base.Frame = value;
-				WrapTextModel ();
-				Adjust ();
+				if (IsInitialized) {
+					WrapTextModel ();
+					Adjust ();
+				}
 			}
 		}
 
@@ -1734,7 +1737,6 @@ namespace Terminal.Gui {
 					}
 					Height = 1;
 					LayoutStyle = lyout;
-					Autocomplete.PopupInsideContainer = false;
 					SetNeedsDisplay ();
 				} else if (multiline && savedHeight != null) {
 					var lyout = LayoutStyle;
@@ -1743,7 +1745,6 @@ namespace Terminal.Gui {
 					}
 					Height = savedHeight;
 					LayoutStyle = lyout;
-					Autocomplete.PopupInsideContainer = true;
 					SetNeedsDisplay ();
 				}
 			}
@@ -1855,7 +1856,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void PositionCursor ()
 		{
-			if (!CanFocus || !Enabled) {
+			if (!CanFocus || !Enabled || Application.Driver == null) {
 				return;
 			}
 
@@ -2358,7 +2359,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDrawContent (Rect contentArea)
 		{
 			SetNormalColor ();
 
@@ -2399,7 +2400,7 @@ namespace Terminal.Gui {
 					} else {
 						AddRune (col, row, rune);
 					}
-					if (!TextModel.SetCol (ref col, bounds.Right, cols)) {
+					if (!TextModel.SetCol (ref col, contentArea.Right, cols)) {
 						break;
 					}
 					if (idxCol + 1 < lineRuneCount && col + Rune.ColumnWidth (line [idxCol + 1]) > right) {
@@ -2414,7 +2415,7 @@ namespace Terminal.Gui {
 			}
 			if (row < bottom) {
 				SetNormalColor ();
-				ClearRegion (bounds.Left, row, right, bottom);
+				ClearRegion (contentArea.Left, row, right, bottom);
 			}
 
 			PositionCursor ();
@@ -2427,7 +2428,7 @@ namespace Terminal.Gui {
 				return;
 
 			// draw autocomplete
-			Autocomplete.GenerateSuggestions ();
+			GenerateSuggestions ();
 
 			var renderAt = new Point (
 				CursorPosition.X - LeftColumn,
@@ -2436,6 +2437,15 @@ namespace Terminal.Gui {
 					: 0);
 
 			Autocomplete.RenderOverlay (renderAt);
+		}
+
+		private void GenerateSuggestions ()
+		{
+			var currentLine = this.GetCurrentLine ();
+			var cursorPosition = Math.Min (this.CurrentColumn, currentLine.Count);
+			Autocomplete.GenerateSuggestions(
+				new AutocompleteContext(currentLine,cursorPosition)
+				);
 		}
 
 		/// <inheritdoc/>
@@ -2485,7 +2495,7 @@ namespace Terminal.Gui {
 				InsertText (new KeyEvent () { Key = key });
 			}
 
-			if (NeedDisplay.IsEmpty) {
+			if (_needsDisplay.IsEmpty) {
 				PositionCursor ();
 			} else {
 				Adjust ();
@@ -2640,7 +2650,7 @@ namespace Terminal.Gui {
 		{
 			var offB = OffSetBackground ();
 			var line = GetCurrentLine ();
-			bool need = !NeedDisplay.IsEmpty || wrapNeeded;
+			bool need = !_needsDisplay.IsEmpty || wrapNeeded;
 			var tSize = TextModel.DisplaySize (line, -1, -1, false, TabWidth);
 			var dSize = TextModel.DisplaySize (line, leftColumn, currentColumn, true, TabWidth);
 			if (!wordWrap && currentColumn < leftColumn) {
@@ -2736,7 +2746,7 @@ namespace Terminal.Gui {
 			}
 
 			// Give autocomplete first opportunity to respond to key presses
-			if (SelectedLength == 0 && Autocomplete.ProcessKey (kb)) {
+			if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (kb)) {
 				return true;
 			}
 
@@ -3720,7 +3730,7 @@ namespace Terminal.Gui {
 
 		void DoNeededAction ()
 		{
-			if (NeedDisplay.IsEmpty) {
+			if (_needsDisplay.IsEmpty) {
 				PositionCursor ();
 			} else {
 				Adjust ();
@@ -4425,16 +4435,7 @@ namespace Terminal.Gui {
 	/// from a range of 'autocomplete' options.
 	/// An implementation on a TextView.
 	/// </summary>
-	public class TextViewAutocomplete : Autocomplete {
-
-		///<inheritdoc/>
-		protected override string GetCurrentWord (int columnOffset = 0)
-		{
-			var host = (TextView)HostControl;
-			var currentLine = host.GetCurrentLine ();
-			var cursorPosition = Math.Min (host.CurrentColumn + columnOffset, currentLine.Count);
-			return IdxToWord (currentLine, cursorPosition, columnOffset);
-		}
+	public class TextViewAutocomplete : PopupAutocomplete {
 
 		/// <inheritdoc/>
 		protected override void DeleteTextBackwards ()
