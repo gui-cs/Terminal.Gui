@@ -580,7 +580,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (25, t.Frame.Height);
 			Assert.Equal (78, w.Frame.Width);
 			Assert.Equal (23, w.Frame.Height);
-			// BUGBUG: v2 - this no longer works 
+			// BUGBUG: v2 - this no longer works - see above
 			//Assert.Equal (6, f.Frame.Width);
 			//Assert.Equal (6, f.Frame.Height);
 			Assert.Equal (76, v1.Frame.Width);

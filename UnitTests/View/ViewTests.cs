@@ -585,7 +585,6 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (1, view.Bounds.Height);
 			view.LayoutStyle = LayoutStyle.Computed;
 			view.SetRelativeLayout (top.Bounds);
-			top.LayoutSubviews (); // BUGBUG: v2 - ??
 			Assert.Equal (1, view.Frame.X);
 			Assert.Equal (1, view.Frame.Y);
 			Assert.Equal (79, view.Frame.Width);
@@ -601,7 +600,6 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal ("Absolute(0)", view.X.ToString ());
 			Assert.Equal ("Fill(0)", view.Width.ToString ());
 			view.SetRelativeLayout (top.Bounds);
-			top.LayoutSubviews (); // BUGBUG: v2 - ??
 			Assert.Equal (0, view.Frame.X);
 			Assert.Equal (0, view.Frame.Y);
 			Assert.Equal (80, view.Frame.Width);
@@ -1507,41 +1505,24 @@ At 0,0
 			var top = Application.Top;
 
 			top.Add (frame);
-
-			// BUGBUG: v2 - these tests are bogus because Layout hasn't happened yet
-			//Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
-			//Assert.Equal (new Rect (0, 0, 40, 8), frame.Frame);
-			//Assert.Equal (new Rect (0, 0, 40, 8), new Rect (
-			//	frame.Frame.Left, frame.Frame.Top,
-			//	frame.Frame.Right, frame.Frame.Bottom));
-			//Assert.Equal (new Rect (0, 0, 30, 1), label.Frame);
-			//Assert.Equal (new Rect (0, 0, 13, 1), button.Frame);
-
-			//Assert.Equal (new Rect (0, 0, 80, 25), top._needsDisplay);
-			//Assert.Equal (new Rect (0, 0, 40, 8), frame._needsDisplay);
-			//Assert.Equal (new Rect (0, 0, 40, 8), new Rect (
-			//	frame._needsDisplay.Left, frame._needsDisplay.Top,
-			//	frame._needsDisplay.Right, frame._needsDisplay.Bottom));
-			//Assert.Equal (new Rect (0, 0, 30, 1), label._needsDisplay);
-			//Assert.Equal (new Rect (0, 0, 13, 1), button._needsDisplay);
-
-			//top.LayoutComplete += (s, e) => {
-			//	Assert.Equal (new Rect (0, 0, 80, 25), top._needsDisplay);
-			//};
-
-			//frame.LayoutComplete += (s, e) => {
-			//	Assert.Equal (new Rect (0, 0, 40, 8), frame._needsDisplay);
-			//};
-
-			//label.LayoutComplete += (s, e) => {
-			//	Assert.Equal (new Rect (0, 0, 38, 1), label._needsDisplay);
-			//};
-
-			//button.LayoutComplete += (s, e) => {
-			//	Assert.Equal (new Rect (0, 0, 13, 1), button._needsDisplay);
-			//};
-
+	
 			Application.Begin (top);
+
+			top.LayoutComplete += (s, e) => {
+				Assert.Equal (new Rect (0, 0, 80, 25), top._needsDisplay);
+			};
+
+			frame.LayoutComplete += (s, e) => {
+				Assert.Equal (new Rect (0, 0, 40, 8), frame._needsDisplay);
+			};
+
+			label.LayoutComplete += (s, e) => {
+				Assert.Equal (new Rect (0, 0, 38, 1), label._needsDisplay);
+			};
+
+			button.LayoutComplete += (s, e) => {
+				Assert.Equal (new Rect (0, 0, 13, 1), button._needsDisplay);
+			};
 
 			Assert.True (label.AutoSize);
 			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);

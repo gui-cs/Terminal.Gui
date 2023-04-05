@@ -6808,7 +6808,6 @@ This is the second line.
 				Width = 50,
 				Height = 10,
 			};
-			// BUGBUG: v2 - views must be initialzed before doing things. 
 			tv.BeginInit (); tv.EndInit ();
 			
 			tv.ContentsChanged += (s, e) => {

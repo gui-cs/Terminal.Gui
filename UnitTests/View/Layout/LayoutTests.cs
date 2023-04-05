@@ -1227,7 +1227,7 @@ Y
 		}
 
 		[Fact, AutoInitShutdown]
-		public void AutoSize_True_Equal_Before_And_After_IsInitialized_With_Differents_Orders ()
+		public void AutoSize_True_Equal_Before_And_After_IsInitialized_With_Different_Orders ()
 		{
 			var view1 = new View () { Text = "Say Hello view1 你", AutoSize = true, Width = 10, Height = 5 };
 			var view2 = new View () { Text = "Say Hello view2 你", Width = 10, Height = 5, AutoSize = true };

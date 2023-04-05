@@ -17,8 +17,6 @@ namespace Terminal.Gui.ViewsTests {
 			this.output = output;
 		}
 
-		// BUGBUG: v2 - move Title related tests from here to `ViewTests.cs` or to a new `TitleTests.cs`
-
 		[Fact]
 		public void New_Initializes ()
 		{
@@ -94,58 +92,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Null (r.MostFocused);
 			Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
 			r.Dispose ();
-		}
-
-		[Fact]
-		public void Set_Title_Fires_TitleChanging ()
-		{
-			var r = new Window ();
-			Assert.Equal (ustring.Empty, r.Title);
-
-			string expectedOld = null;
-			string expectedDuring = null;
-			string expectedAfter = null;
-			bool cancel = false;
-			r.TitleChanging += (s, args) => {
-				Assert.Equal (expectedOld, args.OldTitle);
-				Assert.Equal (expectedDuring, args.NewTitle);
-				args.Cancel = cancel;
-			};
-
-			expectedOld = string.Empty;
-			r.Title = expectedDuring = expectedAfter = "title";
-			Assert.Equal (expectedAfter, r.Title.ToString ());
-
-			expectedOld = r.Title.ToString ();
-			r.Title = expectedDuring = expectedAfter = "a different title";
-			Assert.Equal (expectedAfter, r.Title.ToString ());
-
-			// Now setup cancelling the change and change it back to "title"
-			cancel = true;
-			expectedOld = r.Title.ToString ();
-			r.Title = expectedDuring = "title";
-			Assert.Equal (expectedAfter, r.Title.ToString ());
-			r.Dispose ();
-
-		}
-
-		[Fact]
-		public void Set_Title_Fires_TitleChanged ()
-		{
-			var r = new Window ();
-			Assert.Equal (ustring.Empty, r.Title);
-
-			string expectedOld = null;
-			string expected = null;
-			r.TitleChanged += (s, args) => {
-				Assert.Equal (expectedOld, args.OldTitle);
-				Assert.Equal (r.Title, args.NewTitle);
-			};
-
-			expected = "title";
-			expectedOld = r.Title.ToString ();
-			r.Title = expected;
-			Assert.Equal (expected, r.Title.ToString ());
 		}
 
 		[Fact, AutoInitShutdown]

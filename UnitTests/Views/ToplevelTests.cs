@@ -1017,8 +1017,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (top.IsLoaded);
 			Assert.False (subTop.IsLoaded);
 			Assert.Equal (new Rect (0, 0, 20, 10), view.Frame);
-			// BUGBUG: v2 - SetNeedsDisplay is all goofed up. Disabling test for now
-			//Assert.Equal (new Rect (0, 0, 20, 10), view._needsDisplay);
 
 			view.LayoutStarted += view_LayoutStarted;
 

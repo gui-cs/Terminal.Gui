@@ -19,9 +19,6 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var width = 40;
 			var height = 3;
-			((FakeDriver)Application.Driver).SetBufferSize (width, height);
-			// BUGBUG: Application.Top only gets resized to Console size if it is set to computed?!?
-			Application.Top.LayoutStyle = LayoutStyle.Computed;
 
 			var super = new Window () { Id = "super", Width = Dim.Fill (), Height = Dim.Fill () };
 			Application.Top.Add (super);
@@ -35,6 +32,7 @@ namespace Terminal.Gui.ViewsTests {
 			};
 			super.Add (sbv);
 			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (width, height);
 
 			var expected = @"
 ┌──────────────────────────────────────┐
@@ -49,9 +47,6 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var width = 3;
 			var height = 40;
-			((FakeDriver)Application.Driver).SetBufferSize (width, height);
-			// BUGBUG: Application.Top only gets resized to Console size if it is set to computed?!?
-			Application.Top.LayoutStyle = LayoutStyle.Computed;
 
 			var super = new Window () { Id = "super", Width = Dim.Fill (), Height = Dim.Fill () };
 			Application.Top.Add (super);
@@ -67,6 +62,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			super.Add (sbv);
 			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (width, height);
 
 			var expected = @"
 ┌─┐
@@ -118,9 +114,6 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var width = 3;
 			var height = 40;
-			((FakeDriver)Application.Driver).SetBufferSize (width, height);
-			// BUGBUG: Application.Top only gets resized to Console size if it is set to computed?!?
-			Application.Top.LayoutStyle = LayoutStyle.Computed;
 
 			var super = new Window () { Id = "super", Width = Dim.Fill (), Height = Dim.Fill () };
 			Application.Top.Add (super);
@@ -146,6 +139,7 @@ namespace Terminal.Gui.ViewsTests {
 			super.Add (vert);
 
 			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (width, height);
 
 			var expected = @"
 ┌─┐
@@ -569,8 +563,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (_scrollBar.OtherScrollBarView.Visible);
 			Assert.Equal ("View(Width,HostView()({X=0,Y=0,Width=80,Height=25}))",
 				_scrollBar.OtherScrollBarView.Width.ToString ());
-			// BUGBUG: v2 - Tig broke this test; not sure why. @bdisp?
-			//Assert.Equal (80, _scrollBar.OtherScrollBarView.Bounds.Width);
+			Assert.Equal (80, _scrollBar.OtherScrollBarView.Bounds.Width);
 			Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
 			Assert.Equal (1, _scrollBar.OtherScrollBarView.Bounds.Height);
 
@@ -587,8 +580,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (_scrollBar.OtherScrollBarView.Visible);
 			Assert.Equal ("View(Width,HostView()({X=0,Y=0,Width=80,Height=25}))",
 				_scrollBar.OtherScrollBarView.Width.ToString ());
-			// BUGBUG: v2 - Tig broke this test; not sure why. @bdisp?
-			//Assert.Equal (80, _scrollBar.OtherScrollBarView.Bounds.Width);
+			Assert.Equal (80, _scrollBar.OtherScrollBarView.Bounds.Width);
 			Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
 			Assert.Equal (1, _scrollBar.OtherScrollBarView.Bounds.Height);
 
@@ -600,14 +592,12 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (1, _scrollBar.Bounds.Width);
 			Assert.Equal ("View(Height,HostView()({X=0,Y=0,Width=80,Height=25}))",
 				_scrollBar.Height.ToString ());
-			// BUGBUG: v2 - Tig broke this test; not sure why. @bdisp?
-			//Assert.Equal (25, _scrollBar.Bounds.Height);
+			Assert.Equal (25, _scrollBar.Bounds.Height);
 			Assert.False (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
 			Assert.False (_scrollBar.OtherScrollBarView.Visible);
 			Assert.Equal ("View(Width,HostView()({X=0,Y=0,Width=80,Height=25}))",
 				_scrollBar.OtherScrollBarView.Width.ToString ());
-			// BUGBUG: v2 - Tig broke this test; not sure why. @bdisp?
-			//Assert.Equal (80, _scrollBar.OtherScrollBarView.Bounds.Width);
+			Assert.Equal (80, _scrollBar.OtherScrollBarView.Bounds.Width);
 			Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
 			Assert.Equal (1, _scrollBar.OtherScrollBarView.Bounds.Height);
 
@@ -798,7 +788,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (sbv.OtherScrollBarView.CanScroll (10, out max, sbv.OtherScrollBarView.IsVertical));
 			Assert.Equal (0, max);
 
-			// BUGBUG: v2 - bounds etc... are not valid until after BeginInit
 			Application.Begin (top);
 
 			// They aren't visible so they aren't drawn.
@@ -876,7 +865,6 @@ namespace Terminal.Gui.ViewsTests {
 				}
 			};
 
-			// BUGBUG: v2 - Don't mix layout and redraw! Redraw should not change layout. It's ok for Layout to cause redraw.
 			textView.LayoutComplete += (s, e) => {
 				scrollBar.Size = textView.Lines;
 				scrollBar.Position = textView.TopRow;

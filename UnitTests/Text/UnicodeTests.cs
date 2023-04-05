@@ -17,6 +17,30 @@ namespace Terminal.Gui.TextTests {
 		{
 			this.output = output;
 		}
+
+		[Theory]
+		[InlineData (0x0000001F, 0x241F)]
+		[InlineData (0x0000007F, 0x247F)]
+		[InlineData (0x0000009F, 0x249F)]
+		[InlineData (0x0001001A, 0x1001A)]
+		public void MakePrintable_Converts_Control_Chars_To_Proper_Unicode (uint code, uint expected)
+		{
+			var actual = ConsoleDriver.MakePrintable (code);
+
+			Assert.Equal (expected, actual.Value);
+		}
+
+		[Theory]
+		[InlineData (0x20)]
+		[InlineData (0x7E)]
+		[InlineData (0xA0)]
+		[InlineData (0x010020)]
+		public void MakePrintable_Does_Not_Convert_Ansi_Chars_To_Unicode (uint code)
+		{
+			var actual = ConsoleDriver.MakePrintable (code);
+
+			Assert.Equal (code, actual.Value);
+		}
 		
 		[Fact, AutoInitShutdown]
 		public void AddRune_On_Clip_Left_Or_Right_Replace_Previous_Or_Next_Wide_Rune_With_Space ()
