@@ -1266,5 +1266,49 @@ namespace Terminal.Gui.TypeTests {
 				Assert.Equal (51, label.Frame.Height);
 			}
 		}
+
+		[Fact]
+		public void Dim_Referencing_SuperView_Throws ()
+		{
+			var super = new View ("super") {
+				Width = 10,
+				Height = 10
+			};
+			var view = new View ("view") {
+				Width = Dim.Width (super),      // this is allowed
+				Height = Dim.Height (super),    // this is allowed
+			};
+
+			super.Add (view);
+			super.BeginInit ();
+			super.EndInit ();
+
+			var exception = Record.Exception (super.LayoutSubviews);
+			Assert.Null (exception);
+		}
+
+		[Fact]
+		public void Dim_SyperView_Referencing_SubView_Does_Not_Throws ()
+		{
+			var super = new View ("super") {
+				Width = 10,
+				Height = 10
+			};
+			var view2 = new View ("view2") {
+				Width = 10,
+				Height = 10,
+			};
+			var view = new View ("view") {
+				Width = Dim.Width (view2),      // this is not allowed
+				Height = Dim.Height (view2),    // this is not allowed
+			};
+
+			view.Add (view2);
+			super.Add (view);
+			super.BeginInit ();
+			super.EndInit ();
+
+			Assert.Throws<InvalidOperationException> (super.LayoutSubviews);
+		}
 	}
 }

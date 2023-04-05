@@ -44,7 +44,9 @@ namespace Terminal.Gui.CoreTests {
 			var sub2 = new View ();
 			root.Add (sub2);
 			sub2.Width = Dim.Width (sub2);
-			Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
+
+			var exception = Record.Exception (root.LayoutSubviews);
+			Assert.Null (exception);
 		}
 
 		[Fact]
@@ -1694,7 +1696,7 @@ Y
 
 			switch (width) {
 			case 1:
-				//Assert.Equal (new Rect (0, 0, 17, 0), subview.Frame);
+				Assert.Equal (new Rect (0, 0, 0, 4), subview.Frame);
 				expected = @"
 │
 │
@@ -1705,7 +1707,7 @@ Y
 │";
 				break;
 			case 2:
-				//Assert.Equal (new Rect (0, 0, 17, 1), subview.Frame);
+				Assert.Equal (new Rect (0, 0, 0, 4), subview.Frame);
 				expected = @"
 ┌┐
 ││
@@ -1716,7 +1718,7 @@ Y
 └┘";
 				break;
 			case 3:
-				//Assert.Equal (new Rect (0, 0, 17, 2), subview.Frame);
+				Assert.Equal (new Rect (0, 0, 0, 4), subview.Frame);
 				expected = @"
 ┌─┐
 │ │
@@ -1728,7 +1730,7 @@ Y
 ";
 				break;
 			case 4:
-				//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+				Assert.Equal (new Rect (0, 0, 1, 4), subview.Frame);
 				expected = @"
 ┌──┐
 ││ │
@@ -1739,7 +1741,7 @@ Y
 └──┘";
 				break;
 			case 5:
-				//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+				Assert.Equal (new Rect (0, 0, 2, 4), subview.Frame);
 				expected = @"
 ┌───┐
 │┌┐ │
@@ -1750,7 +1752,7 @@ Y
 └───┘";
 				break;
 			case 6:
-				//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+				Assert.Equal (new Rect (0, 0, 3, 4), subview.Frame);
 				expected = @"
 ┌────┐
 │┌─┐ │
@@ -1761,7 +1763,7 @@ Y
 └────┘";
 				break;
 			case 7:
-				//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+				Assert.Equal (new Rect (0, 0, 4, 4), subview.Frame);
 				expected = @"
 ┌─────┐
 │┌──┐ │
@@ -1772,7 +1774,7 @@ Y
 └─────┘";
 				break;
 			case 8:
-				//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+				Assert.Equal (new Rect (0, 0, 5, 4), subview.Frame);
 				expected = @"
 ┌──────┐
 │┌───┐ │
@@ -1783,7 +1785,7 @@ Y
 └──────┘";
 				break;
 			case 9:
-				//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+				Assert.Equal (new Rect (1, 0, 5, 4), subview.Frame);
 				expected = @"
 ┌───────┐
 │ ┌───┐ │
@@ -1794,7 +1796,7 @@ Y
 └───────┘";
 				break;
 			case 10:
-				//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+				Assert.Equal (new Rect (1, 0, 6, 4), subview.Frame);
 				expected = @"
 ┌────────┐
 │ ┌────┐ │
@@ -1806,7 +1808,57 @@ Y
 				break;
 			}
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		}
 
+		[Fact, AutoInitShutdown]
+		public void PosConbine_DimCombine_View_With_SubViews ()
+		{
+			var clicked = false;
+			var top = Application.Top;
+			var win1 = new Window () { Id = "win1", Width = 20, Height = 10 };
+			var btn = new Button ("ok");
+			var win2 = new Window () { Id = "win2", Y = Pos.Bottom (btn) + 1, Width = 10, Height = 3 };
+			var view1 = new View () { Id = "view1", Width = Dim.Fill (), Height = 1, CanFocus = true };
+			view1.MouseClick += (sender, e) => clicked = true;
+			var view2 = new View () { Id = "view2", Width = Dim.Fill (1), Height = 1, CanFocus = true };
+
+			view1.Add (view2);
+			win2.Add (view1);
+			win1.Add (btn, win2);
+			top.Add (win1);
+
+			var rs = Application.Begin (top);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────┐
+│[ ok ]            │
+│                  │
+│┌────────┐        │
+││        │        │
+│└────────┘        │
+│                  │
+│                  │
+│                  │
+└──────────────────┘", output);
+			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
+			Assert.Equal (new Rect (0, 0, 6, 1), btn.Frame);
+			Assert.Equal (new Rect (0, 0, 20, 10), win1.Frame);
+			Assert.Equal (new Rect (0, 2, 10, 3), win2.Frame);
+			Assert.Equal (new Rect (0, 0, 8, 1), view1.Frame);
+			Assert.Equal (new Rect (0, 0, 7, 1), view2.Frame);
+			var foundView = View.FindDeepestView (top, 9, 4, out int rx, out int ry);
+			Assert.Equal (foundView, view1);
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessMouseEvent",
+				new MouseEvent () {
+					X = 9,
+					Y = 4,
+					Flags = MouseFlags.Button1Clicked
+				});
+			Assert.True (clicked);
+
+			Application.End (rs);
 		}
 	}
 }
