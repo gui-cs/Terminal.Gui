@@ -508,37 +508,6 @@ namespace Terminal.Gui.ViewTests {
 			Application.Shutdown ();
 		}
 
-		[Fact]
-		public void KeyPress_Handled_To_True_Prevents_Changes ()
-		{
-			Application.Init (new FakeDriver ());
-
-			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('N', ConsoleKey.N, false, false, false));
-
-			var top = Application.Top;
-
-			var text = new TextField ("");
-			text.KeyPress += (s, e) => {
-				e.Handled = true;
-				Assert.True (e.Handled);
-				Assert.Equal (Key.N, e.KeyEvent.Key);
-			};
-			top.Add (text);
-
-			Application.Iteration += () => {
-				Console.MockKeyPresses.Push (new ConsoleKeyInfo ('N', ConsoleKey.N, false, false, false));
-				Assert.Equal ("", text.Text);
-
-				Application.RequestStop ();
-			};
-
-			Application.Run ();
-
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
-		}
-
-
 		[Theory]
 		[InlineData (1)]
 		[InlineData (2)]
@@ -1043,68 +1012,7 @@ namespace Terminal.Gui.ViewTests {
 └────────────────────────────┘
 ", output);
 		}
-
-		[Fact, AutoInitShutdown]
-		public void ClearOnVisibleFalse_Gets_Sets ()
-		{
-			
-			var text = "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
-			var label = new Label (text);
-			Application.Top.Add (label);
-
-			var sbv = new ScrollBarView (label, true, false) {
-				Size = 100,
-				ClearOnVisibleFalse = false
-			};
-			Application.Begin (Application.Top);
-
-			Assert.True (sbv.Visible);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
-This is a tes▲
-This is a tes┬
-This is a tes┴
-This is a tes░
-This is a tes░
-This is a tes▼
-", output);
-
-			sbv.Visible = false;
-			Assert.False (sbv.Visible);
-			Application.Top.Redraw (Application.Top.Bounds);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
-This is a test
-This is a test
-This is a test
-This is a test
-This is a test
-This is a test
-", output);
-
-			sbv.Visible = true;
-			Assert.True (sbv.Visible);
-			Application.Top.Redraw (Application.Top.Bounds);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
-This is a tes▲
-This is a tes┬
-This is a tes┴
-This is a tes░
-This is a tes░
-This is a tes▼
-", output);
-
-			sbv.ClearOnVisibleFalse = true;
-			sbv.Visible = false;
-			Assert.False (sbv.Visible);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
-This is a tes
-This is a tes
-This is a tes
-This is a tes
-This is a tes
-This is a tes
-", output);
-		}
-
+		
 		[Fact, AutoInitShutdown]
 		public void DrawContentComplete_Event_Is_Always_Called ()
 		{
@@ -1122,160 +1030,7 @@ This is a tes
 			Assert.True (viewCalled);
 			Assert.True (tvCalled);
 		}
-
-		[Fact, AutoInitShutdown]
-		public void KeyDown_And_KeyUp_Events_Must_Called_Before_OnKeyDown_And_OnKeyUp ()
-		{
-			var keyDown = false;
-			var keyPress = false;
-			var keyUp = false;
-
-			var view = new DerivedView ();
-			view.KeyDown += (s, e) => {
-				Assert.Equal (Key.a, e.KeyEvent.Key);
-				Assert.False (keyDown);
-				Assert.False (view.IsKeyDown);
-				e.Handled = true;
-				keyDown = true;
-			};
-			view.KeyPress += (s, e) => {
-				Assert.Equal (Key.a, e.KeyEvent.Key);
-				Assert.False (keyPress);
-				Assert.False (view.IsKeyPress);
-				e.Handled = true;
-				keyPress = true;
-			};
-			view.KeyUp += (s, e) => {
-				Assert.Equal (Key.a, e.KeyEvent.Key);
-				Assert.False (keyUp);
-				Assert.False (view.IsKeyUp);
-				e.Handled = true;
-				keyUp = true;
-			};
-
-			Application.Top.Add (view);
-
-			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('a', ConsoleKey.A, false, false, false));
-
-			Application.Iteration += () => Application.RequestStop ();
-
-			Assert.True (view.CanFocus);
-
-			Application.Run ();
-			Application.Shutdown ();
-
-			Assert.True (keyDown);
-			Assert.True (keyPress);
-			Assert.True (keyUp);
-			Assert.False (view.IsKeyDown);
-			Assert.False (view.IsKeyPress);
-			Assert.False (view.IsKeyUp);
-		}
-
-		public class DerivedView : View {
-			public DerivedView ()
-			{
-				CanFocus = true;
-			}
-
-			public bool IsKeyDown { get; set; }
-			public bool IsKeyPress { get; set; }
-			public bool IsKeyUp { get; set; }
-			public override ustring Text { get; set; }
-
-			public override bool OnKeyDown (KeyEvent keyEvent)
-			{
-				IsKeyDown = true;
-				return true;
-			}
-
-			public override bool ProcessKey (KeyEvent keyEvent)
-			{
-				IsKeyPress = true;
-				return true;
-			}
-
-			public override bool OnKeyUp (KeyEvent keyEvent)
-			{
-				IsKeyUp = true;
-				return true;
-			}
-
-			public override void Redraw (Rect bounds)
-			{
-				var idx = 0;
-				// BUGBUG: v2 - this should use Boudns, not Frame
-				for (int r = 0; r < Frame.Height; r++) {
-					for (int c = 0; c < Frame.Width; c++) {
-						if (idx < Text.Length) {
-							var rune = Text [idx];
-							if (rune != '\n') {
-								AddRune (c, r, Text [idx]);
-							}
-							idx++;
-							if (rune == '\n') {
-								break;
-							}
-						}
-					}
-				}
-				ClearLayoutNeeded ();
-				ClearNeedsDisplay ();
-			}
-		}
-
-		[Theory, AutoInitShutdown]
-		[InlineData (true, false, false)]
-		[InlineData (true, true, false)]
-		[InlineData (true, true, true)]
-		public void KeyDown_And_KeyUp_Events_With_Only_Key_Modifiers (bool shift, bool alt, bool control)
-		{
-			var keyDown = false;
-			var keyPress = false;
-			var keyUp = false;
-
-			var view = new DerivedView ();
-			view.KeyDown += (s, e) => {
-				Assert.Equal (-1, e.KeyEvent.KeyValue);
-				Assert.Equal (shift, e.KeyEvent.IsShift);
-				Assert.Equal (alt, e.KeyEvent.IsAlt);
-				Assert.Equal (control, e.KeyEvent.IsCtrl);
-				Assert.False (keyDown);
-				Assert.False (view.IsKeyDown);
-				keyDown = true;
-			};
-			view.KeyPress += (s, e) => {
-				keyPress = true;
-			};
-			view.KeyUp += (s, e) => {
-				Assert.Equal (-1, e.KeyEvent.KeyValue);
-				Assert.Equal (shift, e.KeyEvent.IsShift);
-				Assert.Equal (alt, e.KeyEvent.IsAlt);
-				Assert.Equal (control, e.KeyEvent.IsCtrl);
-				Assert.False (keyUp);
-				Assert.False (view.IsKeyUp);
-				keyUp = true;
-			};
-
-			Application.Top.Add (view);
-
-			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('\0', (ConsoleKey)'\0', shift, alt, control));
-
-			Application.Iteration += () => Application.RequestStop ();
-
-			Assert.True (view.CanFocus);
-
-			Application.Run ();
-			Application.Shutdown ();
-
-			Assert.True (keyDown);
-			Assert.False (keyPress);
-			Assert.True (keyUp);
-			Assert.True (view.IsKeyDown);
-			Assert.False (view.IsKeyPress);
-			Assert.True (view.IsKeyUp);
-		}
-
+		
 		[Fact, AutoInitShutdown]
 		public void GetNormalColor_ColorScheme ()
 		{
@@ -1358,6 +1113,58 @@ cccccccccccccccccccc", output);
 				TestHelpers.AssertDriverColorsAre (@"
 222222222222222222220
 111111111111111111110", attributes);
+			}
+		}
+
+		public class DerivedView : View {
+			public DerivedView ()
+			{
+				CanFocus = true;
+			}
+
+			public bool IsKeyDown { get; set; }
+			public bool IsKeyPress { get; set; }
+			public bool IsKeyUp { get; set; }
+			public override ustring Text { get; set; }
+
+			public override bool OnKeyDown (KeyEvent keyEvent)
+			{
+				IsKeyDown = true;
+				return true;
+			}
+
+			public override bool ProcessKey (KeyEvent keyEvent)
+			{
+				IsKeyPress = true;
+				return true;
+			}
+
+			public override bool OnKeyUp (KeyEvent keyEvent)
+			{
+				IsKeyUp = true;
+				return true;
+			}
+
+			public override void Redraw (Rect bounds)
+			{
+				var idx = 0;
+				// BUGBUG: v2 - this should use Boudns, not Frame
+				for (int r = 0; r < Frame.Height; r++) {
+					for (int c = 0; c < Frame.Width; c++) {
+						if (idx < Text.Length) {
+							var rune = Text [idx];
+							if (rune != '\n') {
+								AddRune (c, r, Text [idx]);
+							}
+							idx++;
+							if (rune == '\n') {
+								break;
+							}
+						}
+					}
+				}
+				ClearLayoutNeeded ();
+				ClearNeedsDisplay ();
 			}
 		}
 

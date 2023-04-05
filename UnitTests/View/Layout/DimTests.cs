@@ -12,11 +12,11 @@ using Xunit.Abstractions;
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui.LayoutTests {
-	public class DimTests {
+namespace Terminal.Gui.ViewTests {
+	public class LayoutTests_DimTests {
 		readonly ITestOutputHelper output;
 
-		public DimTests (ITestOutputHelper output)
+		public LayoutTests_DimTests (ITestOutputHelper output)
 		{
 			this.output = output;
 			Console.OutputEncoding = System.Text.Encoding.Default;

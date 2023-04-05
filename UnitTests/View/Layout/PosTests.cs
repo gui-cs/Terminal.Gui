@@ -11,11 +11,11 @@ using Xunit.Abstractions;
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui.LayoutTests {
-	public class PosTests {
+namespace Terminal.Gui.ViewTests {
+	public class LayoutTests_PosTests {
 		readonly ITestOutputHelper output;
 
-		public PosTests (ITestOutputHelper output)
+		public LayoutTests_PosTests (ITestOutputHelper output)
 		{
 			this.output = output;
 		}

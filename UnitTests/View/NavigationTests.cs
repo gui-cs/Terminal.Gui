@@ -6,7 +6,7 @@ using NStack;
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui.NavigationTests {
+namespace Terminal.Gui.ViewTests {
 	public class NavigationTests {
 		readonly ITestOutputHelper output;
 
