@@ -1792,9 +1792,9 @@ namespace Terminal.Gui.ViewTests {
 			tableView.Redraw (tableView.Bounds);
 			expected =
 				@"
-│A│B│Very Long          │
+│A│B│Very Long Column   │
 ├─┼─┼───────────────────┤
-│1│2│aaaaaaaaaa         │
+│1│2│aaaaaaaaaaaaaaaaaaa│
 │1│2│aaa                │
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output);
