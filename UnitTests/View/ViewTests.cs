@@ -1787,9 +1787,6 @@ namespace Terminal.Gui.ViewTests {
 		[Fact, AutoInitShutdown]
 		public void DrawTextFormatter_Respects_The_Clip_Bounds ()
 		{
-			// BUGBUG: v2 - scrollview is broken. Disabling test for now
-			return;
-
 			var view = new View (new Rect (0, 0, 20, 20));
 			view.Add (new Label ("0123456789abcdefghij"));
 			view.Add (new Label (0, 1, "1\n2\n3\n4\n5\n6\n7\n8\n9\n0"));
