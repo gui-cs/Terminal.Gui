@@ -85,8 +85,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Redraws the Frames that comprise the <see cref="Frame"/>.
 		/// </summary>
-		/// <param name="clipRect"></param>
-		public override void Redraw (Rect clipRect)
+		/// <param name="bounds"></param>
+		public override void Redraw (Rect bounds)
 		{
 			if (Thickness == Thickness.Empty) return;
 
@@ -114,7 +114,13 @@ namespace Terminal.Gui {
 
 			if (Id == "BorderFrame" && BorderStyle != BorderStyle.None) {
 				var lc = new LineCanvas ();
-				if (Thickness.Top > 0 && Frame.Width > 1 && Frame.Height > 1) {
+				
+				var drawTop = Thickness.Top > 0 && Frame.Width > 1 && Frame.Height > 1;
+				var drawLeft = Thickness.Left > 0 && (Frame.Height > 1 || Thickness.Top == 0);
+				var drawBottom = Thickness.Bottom > 0 && Frame.Width > 1;
+				var drawRight = Thickness.Right > 0 && (Frame.Height > 1 || Thickness.Top == 0);
+
+				if (drawTop) {
 					// ╔╡Title╞═════╗
 					// ╔╡╞═════╗
 					if (Frame.Width < 4 || ustring.IsNullOrEmpty (Parent?.Title)) {
@@ -133,18 +139,52 @@ namespace Terminal.Gui {
 						lc.AddLine (new Point (screenBounds.X + 1 + (titleWidth + 1), screenBounds.Location.Y), Frame.Width - (titleWidth + 3), Orientation.Horizontal, BorderStyle);
 					}
 				}
-				if (Thickness.Left > 0 && (Frame.Height > 1 || Thickness.Top == 0)) {
+				if (drawLeft) {
 					lc.AddLine (screenBounds.Location, Frame.Height - 1, Orientation.Vertical, BorderStyle);
 				}
-				if (Thickness.Bottom > 0 && Frame.Width > 1) {
+				if (drawBottom) {
 					lc.AddLine (new Point (screenBounds.X, screenBounds.Y + screenBounds.Height - 1), screenBounds.Width - 1, Orientation.Horizontal, BorderStyle);
 				}
-				if (Thickness.Right > 0 && (Frame.Height > 1 || Thickness.Top == 0)) {
+				if (drawRight) {
 					lc.AddLine (new Point (screenBounds.X + screenBounds.Width - 1, screenBounds.Y), screenBounds.Height - 1, Orientation.Vertical, BorderStyle);
 				}
 				foreach (var p in lc.GenerateImage (screenBounds)) {
 					Driver.Move (p.Key.X, p.Key.Y);
 					Driver.AddRune (p.Value);
+				}
+
+				// TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
+				if ((ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler) {
+					// Top
+					var hruler = new Ruler () { Length = screenBounds.Width, Orientation = Orientation.Horizontal };
+					if (drawTop) {
+						hruler.Draw (new Point (screenBounds.X, screenBounds.Y));
+					}
+
+					// Redraw title 
+					if (drawTop && Id == "BorderFrame" && !ustring.IsNullOrEmpty (Parent?.Title)) {
+						var prevAttr = Driver.GetAttribute ();
+						Driver.SetAttribute (Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetNormalColor ());
+						Driver.DrawWindowTitle (screenBounds, Parent?.Title, 0, 0, 0, 0);
+						Driver.SetAttribute (prevAttr);
+					}
+
+					//Left
+					var vruler = new Ruler () { Length = screenBounds.Height - 2, Orientation = Orientation.Vertical };
+					if (drawLeft) {
+						vruler.Draw (new Point (screenBounds.X, screenBounds.Y + 1), 1);
+					}
+
+					// Bottom
+					if (drawBottom) {
+						hruler.Draw (new Point (screenBounds.X, screenBounds.Y + screenBounds.Height - 1));
+					}
+
+					// Right
+					if (drawRight) {
+						vruler.Draw (new Point (screenBounds.X + screenBounds.Width - 1, screenBounds.Y + 1), 1);
+					}
+
 				}
 			}
 

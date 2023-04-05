@@ -857,7 +857,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the <see cref="Terminal.Gui.TextFormatter"/> which can be handled differently by any derived class.
 		/// </summary>
-		public TextFormatter? TextFormatter { get; set; }
+		public TextFormatter TextFormatter { get; set; }
 
 		/// <summary>
 		/// Returns the container for this view, or null if this view has not been added to a container.
@@ -1038,7 +1038,7 @@ namespace Terminal.Gui {
 				// BUGBUG: v2 - ? - If layoutstyle is absolute, this overwrites the current frame h/w with 0. Hmmm...
 				frame = new Rect (new Point (actX, actY), new Size (w, h)); // Set frame, not Frame!
 
-	
+
 			}
 			//// BUGBUG: I think these calls are redundant or should be moved into just the AutoSize case
 			if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
@@ -1047,7 +1047,7 @@ namespace Terminal.Gui {
 				SetMinWidthHeight ();
 				SetNeedsLayout ();
 				SetNeedsDisplay ();
-			}               
+			}
 		}
 
 		void TextFormatter_HotKeyChanged (object sender, KeyChangedEventArgs e)
@@ -1139,8 +1139,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void SetSubViewNeedsDisplay ()
 		{
+			if (_childNeedsDisplay) {
+				return;
+			}
 			_childNeedsDisplay = true;
-			if (_superView != null)
+			if (_superView != null && !_superView._childNeedsDisplay)
 				_superView.SetSubViewNeedsDisplay ();
 		}
 
@@ -1490,7 +1493,7 @@ namespace Terminal.Gui {
 		/// <param name="region">View-relative region for the frame to be drawn.</param>
 		/// <param name="padding">The padding to add around the outside of the drawn frame.</param>
 		/// <param name="fill">If set to <see langword="true"/> it fill will the contents.</param>
-		[ObsoleteAttribute ("This method is obsolete in v2. Use use LineCanvas or Frame instead instead.", false)]
+		[ObsoleteAttribute ("This method is obsolete in v2. Use use LineCanvas or Frame instead.", false)]
 		public void DrawFrame (Rect region, int padding = 0, bool fill = false)
 		{
 			var scrRect = ViewToScreen (region);
@@ -1723,7 +1726,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Removes the <see cref="SetNeedsDisplay()"/> and the <see cref="_childNeedsDisplay"/> setting on this view.
+		/// Removes the <see cref="_needsDisplay"/> and the <see cref="_childNeedsDisplay"/> setting on this view.
 		/// </summary>
 		protected void ClearNeedsDisplay ()
 		{
@@ -3479,6 +3482,48 @@ namespace Terminal.Gui {
 			}
 
 			return top;
+		}
+
+		/// <summary>
+		/// Finds which view that belong to the <paramref name="start"/> superview at the provided location.
+		/// </summary>
+		/// <param name="start">The superview where to look for.</param>
+		/// <param name="x">The column location in the superview.</param>
+		/// <param name="y">The row location in the superview.</param>
+		/// <param name="resx">The found view screen relative column location.</param>
+		/// <param name="resy">The found view screen relative row location.</param>
+		/// <returns>
+		///  The view that was found at the <praramref name="x"/> and <praramref name="y"/> coordinates.
+		///  <see langword="null"/> if no view was found.
+		/// </returns>
+		public static View FindDeepestView (View start, int x, int y, out int resx, out int resy)
+		{
+			var startFrame = start.Frame;
+
+			if (!startFrame.Contains (x, y)) {
+				resx = 0;
+				resy = 0;
+				return null;
+			}
+			if (start.InternalSubviews != null) {
+				int count = start.InternalSubviews.Count;
+				if (count > 0) {
+					var rx = x - (startFrame.X + start.GetBoundsOffset ().X);
+					var ry = y - (startFrame.Y + start.GetBoundsOffset ().Y);
+					for (int i = count - 1; i >= 0; i--) {
+						View v = start.InternalSubviews [i];
+						if (v.Visible && v.Frame.Contains (rx, ry)) {
+							var deep = FindDeepestView (v, rx, ry, out resx, out resy);
+							if (deep == null)
+								return v;
+							return deep;
+						}
+					}
+				}
+			}
+			resx = x - startFrame.X;
+			resy = y - startFrame.Y;
+			return start;
 		}
 	}
 }
