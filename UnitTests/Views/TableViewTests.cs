@@ -1742,11 +1742,14 @@ namespace Terminal.Gui.ViewTests {
 			tableView.EnsureSelectedCellIsVisible ();
 			Assert.Equal (smooth ? 1 : 3, tableView.ColumnOffset);
 		}
+		
 		[Fact, AutoInitShutdown]
 		public void LongColumnTest ()
 		{
 			var tableView = new TableView ();
-			tableView.BeginInit (); tableView.EndInit ();
+
+			Application.Top.Add(tableView);
+			Application.Begin(Application.Top);
 
 			tableView.ColorScheme = Colors.TopLevel;
 
@@ -1785,7 +1788,7 @@ namespace Terminal.Gui.ViewTests {
 			var style = tableView.Style.GetOrCreateColumnStyle (dt.Columns [2]);
 
 			// one way the API user can fix this for long columns
-			// is to specify a max width for the column
+			// is to specify a MinAcceptableWidth for the column
 			style.MaxWidth = 10;
 
 			tableView.LayoutSubviews ();
@@ -1848,7 +1851,9 @@ namespace Terminal.Gui.ViewTests {
 
 			// Now test making the width too small for the MinAcceptableWidth
 			// the Column won't fit so should not be rendered
-			Application.Shutdown ();
+			var driver = ((FakeDriver)Application.Driver);
+			driver.UpdateOffScreen();
+			
 
 			tableView.Bounds = new Rect (0, 0, 9, 5);
 			tableView.LayoutSubviews ();
