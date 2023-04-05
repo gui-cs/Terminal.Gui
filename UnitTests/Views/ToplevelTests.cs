@@ -1379,5 +1379,130 @@ namespace Terminal.Gui.ViewsTests {
 
 			Application.End (rs);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void Draw_A_Top_Subview_On_A_Dialog ()
+		{
+			var top = Application.Top;
+			var win = new Window ();
+			top.Add (win);
+			Application.Begin (top);
+			((FakeDriver)Application.Driver).SetBufferSize (20, 20);
+
+			Assert.Equal (new Rect (0, 0, 20, 20), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────┐
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+└──────────────────┘", output);
+
+			var btnPopup = new Button ("Popup");
+			btnPopup.Clicked += (s, e) => {
+				var viewToScreen = btnPopup.ViewToScreen (top.Frame);
+				var view = new View () {
+					X = 1,
+					Y = viewToScreen.Y + 1,
+					Width = 18,
+					Height = 5,
+					Border = new Border () { BorderStyle = BorderStyle.Single }
+				};
+				Application.Current.DrawContentComplete += Current_DrawContentComplete;
+				top.Add (view);
+
+				void Current_DrawContentComplete (object sender, DrawEventArgs e)
+				{
+					Assert.Equal (new Rect (1, 14, 18, 5), view.Frame);
+
+					var savedClip = Application.Driver.Clip;
+					Application.Driver.Clip = top.Frame;
+					view.Redraw (view.Bounds);
+					top.Move (2, 15);
+					View.Driver.AddStr ("One");
+					top.Move (2, 16);
+					View.Driver.AddStr ("Two");
+					top.Move (2, 17);
+					View.Driver.AddStr ("Three");
+					Application.Driver.Clip = savedClip;
+
+					Application.Current.DrawContentComplete -= Current_DrawContentComplete;
+				}
+			};
+			var dialog = new Dialog ("", 15, 10, btnPopup);
+			var rs = Application.Begin (dialog);
+
+			Assert.Equal (new Rect (2, 5, 15, 10), dialog.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────┐
+│                  │
+│                  │
+│                  │
+│                  │
+│ ┌─────────────┐  │
+│ │             │  │
+│ │             │  │
+│ │             │  │
+│ │             │  │
+│ │             │  │
+│ │             │  │
+│ │             │  │
+│ │  [ Popup ]  │  │
+│ └─────────────┘  │
+│                  │
+│                  │
+│                  │
+│                  │
+└──────────────────┘", output);
+
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessMouseEvent",
+				new MouseEvent () {
+					X = 9,
+					Y = 13,
+					Flags = MouseFlags.Button1Clicked
+				});
+
+			var firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────┐
+│                  │
+│                  │
+│                  │
+│                  │
+│ ┌─────────────┐  │
+│ │             │  │
+│ │             │  │
+│ │             │  │
+│ │             │  │
+│ │             │  │
+│ │             │  │
+│ │             │  │
+│ │  [ Popup ]  │  │
+│┌────────────────┐│
+││One             ││
+││Two             ││
+││Three           ││
+│└────────────────┘│
+└──────────────────┘", output);
+
+			Application.End (rs);
+		}
 	}
 }

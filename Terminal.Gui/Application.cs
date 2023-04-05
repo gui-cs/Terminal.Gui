@@ -658,50 +658,11 @@ namespace Terminal.Gui {
 					var rx = x - startFrame.X;
 					var ry = y - startFrame.Y;
 					if (top.Visible && top.Frame.Contains (rx, ry)) {
-						var deep = FindDeepestView (top, rx, ry, out resx, out resy);
+						var deep = View.FindDeepestView (top, rx, ry, out resx, out resy);
 						if (deep == null)
 							return FindDeepestMdiView (top, rx, ry, out resx, out resy);
 						if (deep != MdiTop)
 							return deep;
-					}
-				}
-			}
-			resx = x - startFrame.X;
-			resy = y - startFrame.Y;
-			return start;
-		}
-
-		/// <summary>
-		/// Finds the deepest view at the specified coordinates, specified relative to <paramref name="start"/>'s superview.
-		/// </summary>
-		/// <param name="start"></param>
-		/// <param name="x"></param>
-		/// <param name="y"></param>
-		/// <param name="resx"></param>
-		/// <param name="resy"></param>
-		/// <returns></returns>
-		static View FindDeepestView (View start, int x, int y, out int resx, out int resy)
-		{
-			var startFrame = start.Frame;
-
-			if (!startFrame.Contains (x, y)) {
-				resx = 0;
-				resy = 0;
-				return null;
-			}
-			if (start.InternalSubviews != null) {
-				int count = start.InternalSubviews.Count;
-				if (count > 0) {
-					var rx = x - (startFrame.X + start.GetBoundsOffset ().X);
-					var ry = y - (startFrame.Y + start.GetBoundsOffset ().Y);
-					for (int i = count - 1; i >= 0; i--) {
-						View v = start.InternalSubviews [i];
-						if (v.Visible && v.Frame.Contains (rx, ry)) {
-							var deep = FindDeepestView (v, rx, ry, out resx, out resy);
-							if (deep == null)
-								return v;
-							return deep;
-						}
 					}
 				}
 			}
@@ -832,7 +793,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var view = FindDeepestView (Current, me.X, me.Y, out int rx, out int ry);
+			var view = View.FindDeepestView (Current, me.X, me.Y, out int rx, out int ry);
 
 			if (view != null && view.WantContinuousButtonPressed) {
 				WantContinuousButtonPressedView = view;
@@ -849,9 +810,7 @@ namespace Terminal.Gui {
 			}
 
 			if (mouseGrabView != null) {
-				view ??= mouseGrabView;
-
-				var newxy = mouseGrabView.ScreenToBounds (me.X, me.Y);
+				var newxy = mouseGrabView.ScreenToView (me.X, me.Y);
 				var nme = new MouseEvent () {
 					X = newxy.X,
 					Y = newxy.Y,
@@ -873,7 +832,7 @@ namespace Terminal.Gui {
 				&& me.Flags != MouseFlags.ReportMousePosition && me.Flags != 0) {
 
 				var top = FindDeepestTop (Top, me.X, me.Y, out _, out _);
-				view = FindDeepestView (top, me.X, me.Y, out rx, out ry);
+				view = View.FindDeepestView (top, me.X, me.Y, out rx, out ry);
 
 				if (view != null && view != MdiTop && top != Current) {
 					MoveCurrent ((Toplevel)top);
@@ -1272,6 +1231,7 @@ namespace Terminal.Gui {
 
 			if (state.Toplevel != Top
 				&& (!Top._needsDisplay.IsEmpty || Top._childNeedsDisplay || Top.LayoutNeeded)) {
+				state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
 				Top.Redraw (Top.Bounds);
 				foreach (var top in toplevels.Reverse ()) {
 					if (top != Top && top != state.Toplevel) {
@@ -1279,7 +1239,6 @@ namespace Terminal.Gui {
 						top.Redraw (top.Bounds);
 					}
 				}
-				state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
 			}
 			if (toplevels.Count == 1 && state.Toplevel == Top
 				&& (Driver.Cols != state.Toplevel.Frame.Width || Driver.Rows != state.Toplevel.Frame.Height)
