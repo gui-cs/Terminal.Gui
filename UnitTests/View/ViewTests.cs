@@ -1,8 +1,7 @@
-﻿using NStack;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using Xunit;
 using Xunit.Abstractions;
+using NStack;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
@@ -2253,8 +2252,6 @@ namespace Terminal.Gui.ViewTests {
 		[Fact, AutoInitShutdown]
 		public void ClearOnVisibleFalse_Gets_Sets ()
 		{
-			// BUGBUG: v2 - scrollview is broken. Disabling test for now
-			return;
 			
 			var text = "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
 			var label = new Label (text);

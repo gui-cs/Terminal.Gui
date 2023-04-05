@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Terminal.Gui;
-using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "_ View Experiments", Description: "v2 View Experiments")]

@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Terminal.Gui;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {

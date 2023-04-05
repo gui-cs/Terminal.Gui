@@ -1,8 +1,5 @@
-﻿using System.Globalization;
-using System;
-using Terminal.Gui;
+﻿using System;
 using System.Linq;
-using NStack;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {

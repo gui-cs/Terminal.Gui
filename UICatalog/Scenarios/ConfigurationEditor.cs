@@ -1,11 +1,7 @@
-﻿using NStack;
-using System;
-using System.Diagnostics.Metrics;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text.Json.Serialization;
-using Terminal.Gui;
 using Terminal.Gui;
 using static Terminal.Gui.ConfigurationManager;
 using Attribute = Terminal.Gui.Attribute;
