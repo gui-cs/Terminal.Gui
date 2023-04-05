@@ -1395,7 +1395,8 @@ namespace Terminal.Gui {
 		public Point ScreenToBounds (int x, int y)
 		{
 			if (SuperView == null) {
-				return new Point (x - Frame.X + GetBoundsOffset ().X, y - Frame.Y + GetBoundsOffset ().Y);
+				var boundsOffset = GetBoundsOffset ();
+				return new Point (x - Frame.X + boundsOffset.X, y - Frame.Y + boundsOffset.Y);
 			} else {
 				var parent = SuperView.ScreenToView (x, y);
 				return new Point (parent.X - frame.X, parent.Y - frame.Y);
@@ -1414,13 +1415,15 @@ namespace Terminal.Gui {
 		/// <see cref="ConsoleDriver.Rows"/>, respectively.</param>
 		public virtual void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clamped = true)
 		{
-			rcol = col + Frame.X + GetBoundsOffset ().X;
-			rrow = row + Frame.Y + GetBoundsOffset ().Y;
+			var boundsOffset = GetBoundsOffset ();
+			rcol = col + Frame.X + boundsOffset.X;
+			rrow = row + Frame.Y + boundsOffset.Y;
 
 			var super = SuperView;
 			while (super != null) {
-				rcol += super.Frame.X + super.GetBoundsOffset ().X;
-				rrow += super.Frame.Y + super.GetBoundsOffset ().Y;
+				boundsOffset = super.GetBoundsOffset ();
+				rcol += super.Frame.X + boundsOffset.X;
+				rrow += super.Frame.Y + boundsOffset.Y;
 				super = super.SuperView;
 			}
 
@@ -2577,10 +2580,8 @@ namespace Terminal.Gui {
 				}
 				return;
 			case Pos.PosCombine pc:
-				foreach (var v in from.InternalSubviews) {
-					CollectPos (pc.left, from, ref nNodes, ref nEdges);
-					CollectPos (pc.right, from, ref nNodes, ref nEdges);
-				}
+				CollectPos (pc.left, from, ref nNodes, ref nEdges);
+				CollectPos (pc.right, from, ref nNodes, ref nEdges);
 				break;
 			}
 		}
@@ -2601,10 +2602,8 @@ namespace Terminal.Gui {
 				}
 				return;
 			case Dim.DimCombine dc:
-				foreach (var v in from.InternalSubviews) {
-					CollectDim (dc.left, from, ref nNodes, ref nEdges);
-					CollectDim (dc.right, from, ref nNodes, ref nEdges);
-				}
+				CollectDim (dc.left, from, ref nNodes, ref nEdges);
+				CollectDim (dc.right, from, ref nNodes, ref nEdges);
 				break;
 			}
 		}
@@ -2658,15 +2657,11 @@ namespace Terminal.Gui {
 
 			if (edges.Any ()) {
 				(var from, var to) = edges.First ();
-				if (from != superView?.GetTopSuperView (to, from)) {
-					if (!ReferenceEquals (from, to)) {
-						if (ReferenceEquals (from.SuperView, to)) {
-							throw new InvalidOperationException ($"ComputedLayout for \"{superView}\": \"{to}\" references a SubView (\"{from}\").");
-						} else {
-							throw new InvalidOperationException ($"ComputedLayout for \"{superView}\": \"{from}\" linked with \"{to}\" was not found. Did you forget to add it to {superView}?");
-						}
+				if (from != superView?.GetTopSuperView (to, from) && !ReferenceEquals (from, to)) {
+					if (ReferenceEquals (from.SuperView, to)) {
+						throw new InvalidOperationException ($"ComputedLayout for \"{superView}\": \"{to}\" references a SubView (\"{from}\").");
 					} else {
-						throw new InvalidOperationException ($"ComputedLayout for \"{superView}\": A recursive cycle was found in the relative Pos/Dim of the SubViews.");
+						throw new InvalidOperationException ($"ComputedLayout for \"{superView}\": \"{from}\" linked with \"{to}\" was not found. Did you forget to add it to {superView}?");
 					}
 				}
 			}
@@ -3508,8 +3503,9 @@ namespace Terminal.Gui {
 			if (start.InternalSubviews != null) {
 				int count = start.InternalSubviews.Count;
 				if (count > 0) {
-					var rx = x - (startFrame.X + start.GetBoundsOffset ().X);
-					var ry = y - (startFrame.Y + start.GetBoundsOffset ().Y);
+					var boundsOffset = start.GetBoundsOffset ();
+					var rx = x - (startFrame.X + boundsOffset.X);
+					var ry = y - (startFrame.Y + boundsOffset.Y);
 					for (int i = count - 1; i >= 0; i--) {
 						View v = start.InternalSubviews [i];
 						if (v.Visible && v.Frame.Contains (rx, ry)) {
