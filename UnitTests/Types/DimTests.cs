@@ -1268,7 +1268,7 @@ namespace Terminal.Gui.TypeTests {
 		}
 
 		[Fact]
-		public void Dim_Referencing_SuperView_Throws ()
+		public void Dim_Referencing_SuperView_Does_Not_Throws ()
 		{
 			var super = new View ("super") {
 				Width = 10,
@@ -1288,7 +1288,7 @@ namespace Terminal.Gui.TypeTests {
 		}
 
 		[Fact]
-		public void Dim_SyperView_Referencing_SubView_Does_Not_Throws ()
+		public void Dim_SyperView_Referencing_SubView_Throws ()
 		{
 			var super = new View ("super") {
 				Width = 10,
