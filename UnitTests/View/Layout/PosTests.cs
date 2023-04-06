@@ -1039,5 +1039,33 @@ namespace Terminal.Gui.ViewTests {
 				Assert.Equal (61, label.Frame.Y);
 			}
 		}
+
+		[Fact]
+		public void PosCombine_Referencing_Same_View ()
+		{
+			var super = new View ("super") {
+				Width = 10,
+				Height = 10
+			};
+			var view1 = new View ("view1") {
+				Width = 2,
+				Height = 2,
+			};
+			var view2 = new View ("view2") {
+				Width = 2,
+				Height = 2,
+			};
+			view2.X = Pos.AnchorEnd () - (Pos.Right (view2) - Pos.Left (view2));
+
+			super.Add (view1, view2);
+			super.BeginInit ();
+			super.EndInit ();
+
+			var exception = Record.Exception (super.LayoutSubviews);
+			Assert.Null (exception);
+			Assert.Equal (new Rect (0, 0, 10, 10), super.Frame);
+			Assert.Equal (new Rect (0, 0, 2, 2), view1.Frame);
+			Assert.Equal (new Rect (8, 0, 2, 2), view2.Frame);
+		}
 	}
 }

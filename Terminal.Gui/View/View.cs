@@ -2656,12 +2656,21 @@ namespace Terminal.Gui {
 			}
 
 			if (edges.Any ()) {
-				(var from, var to) = edges.First ();
-				if (from != superView?.GetTopSuperView (to, from) && !ReferenceEquals (from, to)) {
-					if (ReferenceEquals (from.SuperView, to)) {
-						throw new InvalidOperationException ($"ComputedLayout for \"{superView}\": \"{to}\" references a SubView (\"{from}\").");
-					} else {
-						throw new InvalidOperationException ($"ComputedLayout for \"{superView}\": \"{from}\" linked with \"{to}\" was not found. Did you forget to add it to {superView}?");
+				foreach ((var from, var to) in edges) {
+					if (from == to || from?.SuperView == to?.SuperView) {
+						// if not yet added to the result, add it and remove from edge
+						if (result.Find (v => v == from) == null) {
+							result.Add (from);
+						} else if (result.Find (v => v == to) == null) {
+							result.Add (to);
+						}
+						edges.Remove ((from, to));
+					} else if (from != superView?.GetTopSuperView (to, from) && !ReferenceEquals (from, to)) {
+						if (ReferenceEquals (from.SuperView, to)) {
+							throw new InvalidOperationException ($"ComputedLayout for \"{superView}\": \"{to}\" references a SubView (\"{from}\").");
+						} else {
+							throw new InvalidOperationException ($"ComputedLayout for \"{superView}\": \"{from}\" linked with \"{to}\" was not found. Did you forget to add it to {superView}?");
+						}
 					}
 				}
 			}
@@ -2740,11 +2749,10 @@ namespace Terminal.Gui {
 
 			// If the 'to' is rooted to 'from' and the layoutstyle is Computed it's a special-case.
 			// Use LayoutSubview with the Frame of the 'from' 
-			if (SuperView != null && GetTopSuperView () != null && LayoutNeeded
-			    && ordered.Count == 0 && edges.Count > 0 && LayoutStyle == LayoutStyle.Computed) {
-
-				(var from, var to) = edges.First ();
-				LayoutSubview (to, from.Frame);
+			if (SuperView != null && GetTopSuperView () != null && LayoutNeeded && edges.Count > 0) {
+				foreach ((var from, var to) in edges) {
+					LayoutSubview (to, from.Frame);
+				}
 			}
 
 			LayoutNeeded = false;
