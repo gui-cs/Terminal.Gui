@@ -608,48 +608,6 @@ namespace Terminal.Gui {
 		{
 			base.Redraw (bounds);
 
-			this.Move (1, 0, false);
-
-			// TODO: Refactor this to some Title drawing options class
-			if (ustring.IsNullOrEmpty (Title)) {
-				return;
-			}
-
-			var title = this.Title.ToString ();
-			var titleWidth = title.Sum (c => Rune.ColumnWidth (c));
-
-			if (titleWidth > bounds.Width) {
-				title = title.Substring (0, bounds.Width);
-			} else {
-				if (titleWidth + 2 < bounds.Width) {
-					title = '╡' + this.Title.ToString () + '╞';
-				}
-				titleWidth += 2;
-			}
-
-			var padLeft = ((bounds.Width - titleWidth) / 2) - 1;
-
-			padLeft = Math.Min (bounds.Width, padLeft);
-			padLeft = Math.Max (0, padLeft);
-
-			var padRight = bounds.Width - (padLeft + titleWidth + 2);
-			padRight = Math.Min (bounds.Width, padRight);
-			padRight = Math.Max (0, padRight);
-
-			Driver.SetAttribute (
-			    new Attribute (this.ColorScheme.Normal.Foreground, this.ColorScheme.Normal.Background));
-
-			Driver.AddStr (ustring.Make (Enumerable.Repeat (Driver.HDLine, padLeft)));
-
-			Driver.SetAttribute (
-			    new Attribute (this.ColorScheme.Normal.Foreground, this.ColorScheme.Normal.Background));
-			Driver.AddStr (title);
-
-			Driver.SetAttribute (
-			    new Attribute (this.ColorScheme.Normal.Foreground, this.ColorScheme.Normal.Background));
-
-			Driver.AddStr (ustring.Make (Enumerable.Repeat (Driver.HDLine, padRight)));
-
 			if (!string.IsNullOrWhiteSpace (feedback)) {
 				var feedbackWidth = feedback.Sum (c => Rune.ColumnWidth (c));
 				var feedbackPadLeft = ((bounds.Width - feedbackWidth) / 2) - 1;
