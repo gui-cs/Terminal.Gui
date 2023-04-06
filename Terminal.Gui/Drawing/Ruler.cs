@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using System.Text.Json.Serialization;
-using Terminal.Gui.Configuration;
-using Terminal.Gui.Graphs;
 
 namespace Terminal.Gui {
 	/// <summary>

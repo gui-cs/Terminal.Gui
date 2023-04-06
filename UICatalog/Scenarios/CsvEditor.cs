@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using Terminal.Gui;
-using Terminal.Gui.Trees;
 using System.Linq;
 using System.Globalization;
 using System.IO;
-using System.Text;
-using NStack;
 using System.Text.RegularExpressions;
+using NStack;
+using Terminal.Gui;
 using CsvHelper;
 
 namespace UICatalog.Scenarios {

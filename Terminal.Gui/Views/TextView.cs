@@ -9,7 +9,6 @@ using System.Text;
 using System.Threading;
 using NStack;
 using Terminal.Gui.Resources;
-using static Terminal.Gui.Graphs.PathAnnotation;
 using Rune = System.Rune;
 
 namespace Terminal.Gui {
