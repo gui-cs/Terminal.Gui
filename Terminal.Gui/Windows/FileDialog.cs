@@ -200,7 +200,7 @@ namespace Terminal.Gui {
 				Height = Dim.Fill (1),
 			};
 			this.splitContainer.SetSplitterPos (0, 30);
-			this.splitContainer.Border.BorderStyle = BorderStyle.None;
+//			this.splitContainer.Border.BorderStyle = BorderStyle.None;
 			this.splitContainer.Tiles.ElementAt (0).ContentView.Visible = false;
 
 			this.tableView = new TableView () {

@@ -13,16 +13,17 @@ namespace Terminal.Gui.Core {
 		public void OnLoad_TextBoxIsFocused ()
 		{
 			var dlg = GetInitializedFileDialog ();
-			// First focused is ContentView :(
-			Assert.NotNull (dlg.Focused.Focused);
-			Assert.IsType<TextField> (dlg.Focused.Focused);
+
+			var tf = dlg.Subviews.FirstOrDefault (t => t.HasFocus);
+			Assert.NotNull (tf);
+			Assert.IsType<TextField> (tf);
 		}
 
 		[Fact, AutoInitShutdown]
 		public void DirectTyping_Allowed ()
 		{
 			var dlg = GetInitializedFileDialog ();
-			var tf = dlg.Subviews [0].Subviews.OfType<TextField> ().First (t=>t.HasFocus);
+			var tf = dlg.Subviews.OfType<TextField> ().First (t=>t.HasFocus);
 			tf.ClearAllSelection ();
 			tf.CursorPosition = tf.Text.Length;
 			Assert.True (tf.HasFocus);
@@ -180,13 +181,6 @@ namespace Terminal.Gui.Core {
 			Assert.Equal (@"/bob/fish", tb.Text);
 		}*/
 
-		private void ForceFocus (View v)
-		{
-			var hasFocus = typeof (View).GetField ("hasFocus", BindingFlags.Instance | BindingFlags.NonPublic)
-				?? throw new Exception ("Could not find expected private member hasFocus");
-
-			hasFocus.SetValue (v, true);
-		}
 
 		private FileDialog GetInitializedFileDialog ()
 		{
