@@ -640,7 +640,7 @@ namespace Terminal.Gui {
 		private string TruncateOrPad (object originalCellValue, string representation, int availableHorizontalSpace, ColumnStyle colStyle)
 		{
 			if (string.IsNullOrEmpty (representation))
-				return representation;
+				return new string(' ',availableHorizontalSpace);
 
 			// if value is not wide enough
 			if (representation.Sum (c => Rune.ColumnWidth (c)) < availableHorizontalSpace) {
@@ -1493,9 +1493,11 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private IEnumerable<ColumnToRender> CalculateViewport (Rect bounds, int padding = 1)
 		{
-			if (TableIsNullOrInvisible ())
-				yield break;
+			if (TableIsNullOrInvisible ()) {
+				return Enumerable.Empty<ColumnToRender> ();
+			}	
 
+			var toReturn = new List<ColumnToRender> ();
 			int usedSpace = 0;
 
 			//if horizontal space is required at the start of the line (before the first header)
@@ -1557,13 +1559,22 @@ namespace Terminal.Gui {
 
 				usedSpace += colWidth;
 
+				// required for if we end up here because first == true i.e. we have a single massive width (overspilling bounds) column to present
+				colWidth = Math.Min (availableHorizontalSpace, colWidth);
+				var isVeryLast = lastColumn == col;
+
 				// there is space
-				yield return new ColumnToRender (col, startingIdxForCurrentHeader,
-					// required for if we end up here because first == true i.e. we have a single massive width (overspilling bounds) column to present
-					Math.Min (availableHorizontalSpace, colWidth),
-					lastColumn == col);
+				toReturn.Add(new ColumnToRender (col, startingIdxForCurrentHeader, colWidth, isVeryLast));
 				first = false;
 			}
+
+			if(Style.ExpandLastColumn)
+			{
+				var last = toReturn.Last ();
+				last.Width = Math.Max (last.Width, availableHorizontalSpace - last.X);
+			}
+
+			return toReturn;
 		}
 
 		private bool ShouldRenderHeaders ()
@@ -1876,7 +1887,7 @@ namespace Terminal.Gui {
 			/// The width that the column should occupy as calculated by <see cref="CalculateViewport(Rect, int)"/>.  Note that this includes
 			/// space for padding i.e. the separator between columns.
 			/// </summary>
-			public int Width { get; }
+			public int Width { get; internal set; }
 
 			/// <summary>
 			/// True if this column is the very last column in the <see cref="Table"/> (not just the last visible column)
