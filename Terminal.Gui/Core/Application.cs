@@ -658,42 +658,11 @@ namespace Terminal.Gui {
 					var rx = x - startFrame.X;
 					var ry = y - startFrame.Y;
 					if (top.Visible && top.Frame.Contains (rx, ry)) {
-						var deep = FindDeepestView (top, rx, ry, out resx, out resy);
+						var deep = View.FindDeepestView (top, rx, ry, out resx, out resy);
 						if (deep == null)
 							return FindDeepestMdiView (top, rx, ry, out resx, out resy);
 						if (deep != MdiTop)
 							return deep;
-					}
-				}
-			}
-			resx = x - startFrame.X;
-			resy = y - startFrame.Y;
-			return start;
-		}
-
-		static View FindDeepestView (View start, int x, int y, out int resx, out int resy)
-		{
-			var startFrame = start.Frame;
-
-			if (!startFrame.Contains (x, y)) {
-				resx = 0;
-				resy = 0;
-				return null;
-			}
-
-			if (start.InternalSubviews != null) {
-				int count = start.InternalSubviews.Count;
-				if (count > 0) {
-					var rx = x - startFrame.X;
-					var ry = y - startFrame.Y;
-					for (int i = count - 1; i >= 0; i--) {
-						View v = start.InternalSubviews [i];
-						if (v.Visible && v.Frame.Contains (rx, ry)) {
-							var deep = FindDeepestView (v, rx, ry, out resx, out resy);
-							if (deep == null)
-								return v;
-							return deep;
-						}
 					}
 				}
 			}
@@ -824,12 +793,13 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var view = FindDeepestView (Current, me.X, me.Y, out int rx, out int ry);
+			var view = View.FindDeepestView (Current, me.X, me.Y, out int rx, out int ry);
 
-			if (view != null && view.WantContinuousButtonPressed)
+			if (view != null && view.WantContinuousButtonPressed) {
 				WantContinuousButtonPressedView = view;
-			else
+			} else {
 				WantContinuousButtonPressedView = null;
+			}
 			if (view != null) {
 				me.View = view;
 			}
@@ -840,8 +810,6 @@ namespace Terminal.Gui {
 			}
 
 			if (mouseGrabView != null) {
-				view ??= mouseGrabView;
-
 				var newxy = mouseGrabView.ScreenToView (me.X, me.Y);
 				var nme = new MouseEvent () {
 					X = newxy.X,
@@ -864,7 +832,7 @@ namespace Terminal.Gui {
 				&& me.Flags != MouseFlags.ReportMousePosition && me.Flags != 0) {
 
 				var top = FindDeepestTop (Top, me.X, me.Y, out _, out _);
-				view = FindDeepestView (top, me.X, me.Y, out rx, out ry);
+				view = View.FindDeepestView (top, me.X, me.Y, out rx, out ry);
 
 				if (view != null && view != MdiTop && top != Current) {
 					MoveCurrent ((Toplevel)top);
@@ -1045,8 +1013,9 @@ namespace Terminal.Gui {
 			}
 
 			Driver.PrepareToRun (MainLoop, ProcessKeyEvent, ProcessKeyDownEvent, ProcessKeyUpEvent, ProcessMouseEvent);
-			if (toplevel.LayoutStyle == LayoutStyle.Computed)
+			if (toplevel.LayoutStyle == LayoutStyle.Computed) {
 				toplevel.SetRelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
+			}
 			toplevel.LayoutSubviews ();
 			toplevel.PositionToplevels ();
 			toplevel.WillPresent ();
@@ -1261,7 +1230,8 @@ namespace Terminal.Gui {
 			firstIteration = false;
 
 			if (state.Toplevel != Top
-				&& (!Top.NeedDisplay.IsEmpty || Top.ChildNeedsDisplay || Top.LayoutNeeded)) {
+				&& (!Top._needsDisplay.IsEmpty || Top._childNeedsDisplay || Top.LayoutNeeded)) {
+				state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
 				Top.Redraw (Top.Bounds);
 				foreach (var top in toplevels.Reverse ()) {
 					if (top != Top && top != state.Toplevel) {
@@ -1269,17 +1239,17 @@ namespace Terminal.Gui {
 						top.Redraw (top.Bounds);
 					}
 				}
-				state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
 			}
 			if (toplevels.Count == 1 && state.Toplevel == Top
 				&& (Driver.Cols != state.Toplevel.Frame.Width || Driver.Rows != state.Toplevel.Frame.Height)
-				&& (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.ChildNeedsDisplay || state.Toplevel.LayoutNeeded)) {
+				&& (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._childNeedsDisplay || state.Toplevel.LayoutNeeded)) {
 
 				Driver.SetAttribute (Colors.TopLevel.Normal);
 				state.Toplevel.Clear (new Rect (0, 0, Driver.Cols, Driver.Rows));
 
 			}
-			if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.ChildNeedsDisplay || state.Toplevel.LayoutNeeded
+
+			if (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._childNeedsDisplay || state.Toplevel.LayoutNeeded
 				|| MdiChildNeedsDisplay ()) {
 				state.Toplevel.Redraw (state.Toplevel.Bounds);
 				if (DebugDrawBounds) {
@@ -1291,7 +1261,7 @@ namespace Terminal.Gui {
 				Driver.UpdateCursor ();
 			}
 			if (state.Toplevel != Top && !state.Toplevel.Modal
-				&& (!Top.NeedDisplay.IsEmpty || Top.ChildNeedsDisplay || Top.LayoutNeeded)) {
+				&& (!Top._needsDisplay.IsEmpty || Top._childNeedsDisplay || Top.LayoutNeeded)) {
 				Top.Redraw (Top.Bounds);
 			}
 		}
@@ -1320,7 +1290,7 @@ namespace Terminal.Gui {
 			}
 
 			foreach (var top in toplevels) {
-				if (top != Current && top.Visible && (!top.NeedDisplay.IsEmpty || top.ChildNeedsDisplay || top.LayoutNeeded)) {
+				if (top != Current && top.Visible && (!top._needsDisplay.IsEmpty || top._childNeedsDisplay || top.LayoutNeeded)) {
 					MdiTop.SetSubViewNeedsDisplay ();
 					return true;
 				}

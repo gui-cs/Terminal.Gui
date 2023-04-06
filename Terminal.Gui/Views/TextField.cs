@@ -1,4 +1,4 @@
-﻿//
+//
 // TextField.cs: single-line text editor with Emacs keybindings
 //
 // Authors:
@@ -516,7 +516,7 @@ namespace Terminal.Gui {
 
 			Driver.AddStr (render);
 		}
-
+    
 		private void GenerateSuggestions ()
 		{
 			var currentLine = Text.ToRuneList ();
@@ -618,7 +618,7 @@ namespace Terminal.Gui {
 			oldCursorPos = point;
 
 			// Give autocomplete first opportunity to respond to key presses
-			if (SelectedLength == 0 && Autocomplete.ProcessKey (kb)) {
+			if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (kb)) {
 				return true;
 			}
 

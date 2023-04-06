@@ -1,4 +1,4 @@
-﻿using NStack;
+using NStack;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -1568,8 +1568,11 @@ namespace Terminal.Gui {
 				first = false;
 			}
 
-			var last = toReturn.Last ();
-			last.Width = Math.Max (last.Width, availableHorizontalSpace - last.X);
+			if(Style.ExpandLastColumn)
+			{
+				var last = toReturn.Last ();
+				last.Width = Math.Max (last.Width, availableHorizontalSpace - last.X);
+			}
 
 			return toReturn;
 		}
