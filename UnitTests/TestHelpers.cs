@@ -2,16 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Xunit.Abstractions;
 using Xunit;
 using Terminal.Gui;
-using Rune = System.Rune;
-using Attribute = Terminal.Gui.Attribute;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using System.Diagnostics;
-using Terminal.Gui.Configuration;
+using Rune = System.Rune;
+using Attribute = Terminal.Gui.Attribute;
 
 
 // This class enables test functions annotated with the [AutoInitShutdown] attribute to 

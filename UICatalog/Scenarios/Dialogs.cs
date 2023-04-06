@@ -1,10 +1,7 @@
 ﻿using NStack;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Terminal.Gui;
-using Terminal.Gui.Configuration;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Dialogs", Description: "Demonstrates how to the Dialog class")]

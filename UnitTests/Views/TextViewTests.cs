@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests {
+namespace Terminal.Gui.ViewsTests {
 	public class TextViewTests {
 		private static TextView _textView;
 		readonly ITestOutputHelper output;
@@ -6808,7 +6808,6 @@ This is the second line.
 				Width = 50,
 				Height = 10,
 			};
-			// BUGBUG: v2 - views must be initialzed before doing things. 
 			tv.BeginInit (); tv.EndInit ();
 			
 			tv.ContentsChanged += (s, e) => {
