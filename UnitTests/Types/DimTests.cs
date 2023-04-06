@@ -544,12 +544,11 @@ namespace Terminal.Gui.TypeTests {
 		//	Assert.Throws<InvalidOperationException> (() => super.LayoutSubviews ());
 		//}
 
-
 		/// <summary>
 		/// This is an intentionally obtuse test. See https://github.com/gui-cs/Terminal.Gui/issues/2461
 		/// </summary>
 		[Fact]
-		public void DimCombine_ObtuseScenario_Does_Not_Throw ()
+		public void DimCombine_ObtuseScenario_Throw ()
 		{
 			var t = new View ("top") { Width = 80, Height = 25 };
 
@@ -571,11 +570,12 @@ namespace Terminal.Gui.TypeTests {
 			w.Add (f);
 			t.Add (w);
 
-			// BUGBUG: v2 - f references t here; t is f's super-superview. This is not supported!
+			// BUGBUG: v2 - f references t here; t is f's super-superview. This is supported!
+			// BUGBUG: v2 - f references v2 here; v2 is f's subview. This is not supported!
 			f.Width = Dim.Width (t) - Dim.Width (v2);      // 80 - 74 = 6
 			f.Height = Dim.Height (t) - Dim.Height (v2);   // 25 - 19 = 6
 
-			t.LayoutSubviews ();
+			Assert.Throws<InvalidOperationException> (t.LayoutSubviews);
 			Assert.Equal (80, t.Frame.Width);
 			Assert.Equal (25, t.Frame.Height);
 			Assert.Equal (78, w.Frame.Width);
@@ -583,10 +583,10 @@ namespace Terminal.Gui.TypeTests {
 			// BUGBUG: v2 - this no longer works 
 			//Assert.Equal (6, f.Frame.Width);
 			//Assert.Equal (6, f.Frame.Height);
-			Assert.Equal (76, v1.Frame.Width);
-			Assert.Equal (21, v1.Frame.Height);
-			Assert.Equal (74, v2.Frame.Width);
-			Assert.Equal (19, v2.Frame.Height);
+			//Assert.Equal (76, v1.Frame.Width);
+			//Assert.Equal (21, v1.Frame.Height);
+			//Assert.Equal (74, v2.Frame.Width);
+			//Assert.Equal (19, v2.Frame.Height);
 		}
 
 		[Fact]
