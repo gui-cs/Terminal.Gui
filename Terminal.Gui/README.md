@@ -77,7 +77,7 @@ The PR title should be of the form "Release v2.3.4"
 ```powershell
 git checkout develop
 git pull upstream develop
-git checkout -b v_2_3_4
+git checkout -b v2_3_4
 git add .
 git commit -m "Release v2.3.4"
 git push
