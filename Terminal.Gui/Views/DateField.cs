@@ -83,7 +83,7 @@ namespace Terminal.Gui {
 			AddCommand (Command.DeleteCharLeft, () => { DeleteCharLeft (); return true; });
 			AddCommand (Command.LeftHome, () => MoveHome ());
 			AddCommand (Command.Left, () => MoveLeft ());
-			AddCommand (Command.RightEnd, () => MoveEnd ());
+			AddCommand (Command.RightEnd, () => { MoveEnd (); return true; });
 			AddCommand (Command.Right, () => MoveRight ());
 
 			// Default keybindings for this view
@@ -354,11 +354,6 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		bool MoveEnd ()
-		{
-			CursorPosition = fieldLen;
-			return true;
-		}
 
 		bool MoveLeft ()
 		{
