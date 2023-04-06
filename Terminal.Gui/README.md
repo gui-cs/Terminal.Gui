@@ -49,6 +49,16 @@ Doing so will update the `.csproj` files in your branch with version info, which
 
 ## Publishing a Release of Terminal.Gui
 
+First, use the [Semantic Versioning](https://semver.org/) rules.to determine the new verison number. 
+
+Given a version number MAJOR.MINOR.PATCH, increment the:
+
+* MAJOR version when you make incompatible API changes
+* MINOR version when you add functionality in a backwards compatible manner
+* PATCH version when you make backwards compatible bug fixes
+
+Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
+
 To release a new version (e.g. with a higher `major`, `minor`, or `patch` value) tag a commit using `git tag` and then push that tag directly to the `main` branch on `github.com/gui-cs/Terminal.Gui` (`upstream`).
 
 The `tag` must be of the form `v<major>.<minor>.<patch>`, e.g. `v2.3.4`.
@@ -67,7 +77,7 @@ The PR title should be of the form "Release v2.3.4"
 ```powershell
 git checkout develop
 git pull upstream develop
-git checkout -b v_2_3_4
+git checkout -b v2_3_4
 git add .
 git commit -m "Release v2.3.4"
 git push
@@ -117,13 +127,8 @@ https://www.nuget.org/packages/Terminal.Gui
 
 ### 10) Add a new Release in Github: https://github.com/gui-cs/Terminal.Gui/releases
 
-Generate release notes with the list of PRs since the last release 
+Generate release notes with the list of PRs since the last release.
 
-Use `gh` to get a list with just titles to make it easy to paste into release notes: 
-
-```powershell
-gh pr list --limit 500 --search "is:pr is:closed is:merged closed:>=2021-05-18"
-```
 ### 11) Update the `develop` branch with the new version
 
 ```powershell

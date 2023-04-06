@@ -949,7 +949,7 @@ namespace Terminal.Gui.ViewTests {
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
 					Assert.Equal ("This is the second line.", _textView.Text.ToString ());
-					Assert.Equal ($"This is the first line.{Environment.NewLine}", Clipboard.Contents.ToString());
+					Assert.Equal ($"This is the first line.{Environment.NewLine}", Clipboard.Contents.ToString ());
 					break;
 				case 2:
 					_textView.ProcessKey (new KeyEvent (Key.K | Key.CtrlMask, new KeyModifiers ()));
@@ -985,7 +985,7 @@ namespace Terminal.Gui.ViewTests {
 					_textView.ProcessKey (new KeyEvent (Key.K | Key.AltMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (1, _textView.CursorPosition.Y);
-					Assert.Equal ($"This is the first line.{Environment.NewLine}", _textView.Text.ToString());
+					Assert.Equal ($"This is the first line.{Environment.NewLine}", _textView.Text.ToString ());
 					Assert.Equal ($"This is the second line.", Clipboard.Contents.ToString ());
 					break;
 				case 1:
@@ -6814,6 +6814,18 @@ This is the second line.
 			tv.LoadFile (fileName);
 			Assert.Equal (1, eventcount);
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
+		}
+
+		[Fact]
+		public void ReplaceAllText_Does_Not_Throw_Exception ()
+		{
+			var textToFind = "hello! hello!";
+			var textToReplace = "hello!";
+			var tv = new TextView () { Width = 20, Height = 3, Text = textToFind };
+
+			var exception = Record.Exception (() => tv.ReplaceAllText (textToFind, false, false, textToReplace));
+			Assert.Null (exception);
+			Assert.Equal (textToReplace, tv.Text);
 		}
 	}
 }

@@ -387,7 +387,7 @@ namespace Terminal.Gui {
 						pos = new Point (col, i);
 						col += (textToReplace.Length - matchText.Length);
 					}
-					if (col + 1 > txt.Length) {
+					if (col < 0 || col + 1 > txt.Length) {
 						break;
 					}
 					col = txt.IndexOf (matchText, col + 1);
