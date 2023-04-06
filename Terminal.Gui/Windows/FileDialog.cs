@@ -914,7 +914,7 @@ namespace Terminal.Gui {
 		/// <param name="message">The message.</param>
 		/// <param name="allowedTypes">The allowed types.</param>
 		public SaveDialog (ustring title, ustring message, List<string> allowedTypes = null)
-			: base (title, prompt: Strings.fdSave, nameFieldLabel: $"{Strings.fdSaveAs}:", message: message, allowedTypes) { }
+			: base (title, prompt: Strings.fdSave, nameFieldLabel: $"{Strings.fdSaveAs}", message: message, allowedTypes) { }
 
 		/// <summary>
 		/// Gets the name of the file the user selected for saving, or null
