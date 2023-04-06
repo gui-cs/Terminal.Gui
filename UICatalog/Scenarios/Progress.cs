@@ -11,7 +11,7 @@ namespace UICatalog.Scenarios {
 	//
 	[ScenarioMetadata (Name: "Progress", Description: "Shows off ProgressBar and Threading.")]
 	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("Threading"), ScenarioCategory ("ProgressBar")]
+	[ScenarioCategory ("Threading"), ScenarioCategory ("Progress")]
 	public class Progress : Scenario {
 
 		class ProgressDemo : FrameView {
@@ -79,25 +79,30 @@ namespace UICatalog.Scenarios {
 				ActivityProgressBar = new ProgressBar () {
 					X = Pos.Right (LeftFrame) + 1,
 					Y = Pos.Bottom (startButton) + 1,
-					Width = Dim.Fill (),
+					Width = Dim.Fill () - 1,
 					Height = 1,
 					Fraction = 0.25F,
 					ColorScheme = Colors.Error
 				};
 				Add (ActivityProgressBar);
 
-				Spinner = new SpinnerView {
+				Spinner = new SpinnerView (SpinnerStyle.Line) {
+					//SpinReverse = true,
+					//SpinBounce = true,
 					X = Pos.Right (ActivityProgressBar),
 					Y = ActivityProgressBar.Y,
 					Visible = false,
 
 				};
+				Spinner.X = Pos.Right (ActivityProgressBar) - Spinner.SpinnerWidth + 1;
+				ActivityProgressBar.Width = Dim.Fill () - Spinner.SpinnerWidth;
+
 				Add (Spinner);
 
 				PulseProgressBar = new ProgressBar () {
 					X = Pos.Right (LeftFrame) + 1,
 					Y = Pos.Bottom (ActivityProgressBar) + 1,
-					Width = Dim.Fill (),
+					Width = Dim.Fill () - Spinner.SpinnerWidth,
 					Height = 1,
 					ColorScheme = Colors.Error
 				};
@@ -134,7 +139,7 @@ namespace UICatalog.Scenarios {
 
 				Application.MainLoop.Invoke(()=>{
 					Spinner.Visible = false;
-					ActivityProgressBar.Width = Dim.Fill();
+					ActivityProgressBar.Width = Dim.Fill() - Spinner.SpinnerWidth;
 					this.LayoutSubviews();
 				});
 			}
