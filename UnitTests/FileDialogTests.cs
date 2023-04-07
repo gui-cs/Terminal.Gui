@@ -167,11 +167,6 @@ namespace Terminal.Gui.Core {
 └──────────────────────────────────────────────────────────────────┘
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output, true);
-
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
-
-
 		}
 
 		[Theory, AutoInitShutdown]
