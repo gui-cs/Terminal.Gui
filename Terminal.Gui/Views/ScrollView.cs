@@ -385,6 +385,7 @@ namespace Terminal.Gui {
 
 			// Fill in the bottom left corner
 			// BUGBUG: ScrollBarView should be responsible for this via contentBottomRightCorner
+			// this is only true if this is hosted by the ScrollBarView and it isn't
 			if (ShowVerticalScrollIndicator && ShowHorizontalScrollIndicator) {
 				AddRune (Bounds.Width - 1, Bounds.Height - 1, ' ');
 			}

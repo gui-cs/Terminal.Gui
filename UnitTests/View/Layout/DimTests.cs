@@ -548,7 +548,7 @@ namespace Terminal.Gui.ViewTests {
 		/// This is an intentionally obtuse test. See https://github.com/gui-cs/Terminal.Gui/issues/2461
 		/// </summary>
 		[Fact]
-		public void DimCombine_ObtuseScenario_Throw ()
+		public void DimCombine_ObtuseScenario_Throw_If_SuperView_Refs_SubView ()
 		{
 			var t = new View ("top") { Width = 80, Height = 25 };
 
@@ -587,6 +587,47 @@ namespace Terminal.Gui.ViewTests {
 			//Assert.Equal (21, v1.Frame.Height);
 			//Assert.Equal (74, v2.Frame.Width);
 			//Assert.Equal (19, v2.Frame.Height);
+		}
+
+		[Fact]
+		public void DimCombine_ObtuseScenario_Does_Not_Throw_If_Two_SubViews_Refs_The_Same_SuperView ()
+		{
+			var t = new View ("top") { Width = 80, Height = 25 };
+
+			var w = new Window ("w") {
+				Width = Dim.Width (t) - 2,    // 78
+				Height = Dim.Height (t) - 2   // 23
+			};
+			var f = new FrameView ("f");
+			var v1 = new View ("v1") {
+				Width = Dim.Width (w) - 2,    // 76
+				Height = Dim.Height (w) - 2   // 21
+			};
+			var v2 = new View ("v2") {
+				Width = Dim.Width (v1) - 2,   // 74
+				Height = Dim.Height (v1) - 2  // 19
+			};
+
+			f.Add (v1, v2);
+			w.Add (f);
+			t.Add (w);
+
+			f.Width = Dim.Width (t) - Dim.Width (w) + 4;      // 80 - 74 = 6
+			f.Height = Dim.Height (t) - Dim.Height (w) + 4;   // 25 - 19 = 6
+
+			// BUGBUG: v2 - f references t and w here; t is f's super-superview and w is f's superview. This is supported!
+			var exception = Record.Exception (t.LayoutSubviews);
+			Assert.Null (exception);
+			Assert.Equal (80, t.Frame.Width);
+			Assert.Equal (25, t.Frame.Height);
+			Assert.Equal (78, w.Frame.Width);
+			Assert.Equal (23, w.Frame.Height);
+			Assert.Equal (6, f.Frame.Width);
+			Assert.Equal (6, f.Frame.Height);
+			Assert.Equal (76, v1.Frame.Width);
+			Assert.Equal (21, v1.Frame.Height);
+			Assert.Equal (74, v2.Frame.Width);
+			Assert.Equal (19, v2.Frame.Height);
 		}
 
 		[Fact]
