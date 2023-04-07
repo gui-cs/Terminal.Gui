@@ -394,25 +394,13 @@ namespace Terminal.Gui.TextTests {
 				}
 			}
 
-			// test Capslock
+			// test Capslock, Numlock and Scrolllock
 			Assert.True (CollectionNavigator.IsCompatibleKey (new KeyEvent (Key.Null, new KeyModifiers () {
 				Alt = false,
 				Ctrl = false,
 				Shift = false,
 				Capslock = true,
-			})));
-			// test Numlock
-			Assert.True (CollectionNavigator.IsCompatibleKey (new KeyEvent (Key.Null, new KeyModifiers () {
-				Alt = false,
-				Ctrl = false,
-				Shift = false,
 				Numlock = true,
-			})));
-			// test Scrolllock
-			Assert.True (CollectionNavigator.IsCompatibleKey (new KeyEvent (Key.Null, new KeyModifiers () {
-				Alt = false,
-				Ctrl = false,
-				Shift = false,
 				Scrolllock = true,
 			})));
 		}
