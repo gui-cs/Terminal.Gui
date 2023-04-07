@@ -129,7 +129,7 @@ namespace Terminal.Gui.Core {
 			Assert.False(dlg.Canceled);
 		}
 
-		[Fact]
+		[Fact, AutoInitShutdown]
 		public void DoStuff()
 		{
 			// Arrange
@@ -140,19 +140,33 @@ namespace Terminal.Gui.Core {
 				{ @"c:\demo\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) }
 			});
 
-			var fd = new FileDialog(fileSystem);
+			var fd = new FileDialog(fileSystem){
+				Height = 15
+			};
 			fd.Path = @"c:\demo\";
 			Begin(fd);
 
 			fd.Redraw(fd.Bounds);
 
-			string expected = @"
-┌─┬──────┐
-│A│B     │
-├─┼──────┤
-│1│2     │
+			string expected = 
+			@"
+┌┤OPEN├────────────────────────────────────────────────────────────┐
+│c:\demo\                                                          │
+│                                                                  │
+│┌─────────────────┬───────────┬──────────────────────────────────┐│
+││Filename (▲)     │Size       │Modified                          ││
+│├─────────────────┼───────────┼──────────────────────────────────►│
+││\temp            │           │                                  ││
+││c:\demo\image.gif│4.00 bytes │31/12/1600 23:59:00               ││
+││c:\demo\jQuery.js│7.00 bytes │31/12/1600 23:59:00               ││
+││c:\myfile.txt    │15.00 bytes│31/12/1600 23:59:00               ││
+│                                                                  │
+│                                                                  │
+│                                                                  │
+│[ ►► ] Enter Search                            [ Cancel ] [ Ok ]  │
+└──────────────────────────────────────────────────────────────────┘
 ";
-			TestHelpers.AssertDriverContentsAre (expected, output);
+			TestHelpers.AssertDriverContentsAre (expected, output, true);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
