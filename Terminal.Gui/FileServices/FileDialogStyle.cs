@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
@@ -20,11 +21,6 @@ namespace Terminal.Gui.FileServices {
 		/// to false.
 		/// </summary>
 		public bool UseColors { get; set; }
-		/// <summary>
-		/// Gets or sets a value indicating whether to use Utc dates for date modified.
-		/// Defaults to <see langword="false"/>.
-		/// </summary>
-		public static bool UseUtcDates { get; set; } = false;
 
 		/// <summary>
 		/// Sets a <see cref="ColorScheme"/> to use for directories rows of
@@ -155,11 +151,20 @@ namespace Terminal.Gui.FileServices {
 
 
 		/// <summary>
+		/// Gets or sets the format to use for date/times in the Modified column.
+		/// Defaults to <see cref="DateTimeFormatInfo.SortableDateTimePattern"/> 
+		/// of the <see cref="CultureInfo.CurrentCulture"/>
+		/// </summary>
+		public string DateFormat { get; set; }
+
+
+		/// <summary>
 		/// Creates a new instance of the <see cref="FileDialogStyle"/> class.
 		/// </summary>
 		public FileDialogStyle ()
 		{
 			IconGetter = DefaultIconGetter;
+			DateFormat = CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern;
 
 			ColorSchemeDirectory = new ColorScheme {
 				Normal = Application.Driver.MakeAttribute (Color.Blue, Color.Black),

@@ -983,7 +983,16 @@ namespace Terminal.Gui {
 			nameStyle.MinWidth = 10;
 
 			var dateModifiedStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (Style.ModifiedColumnName, typeof (int)));
-			dateModifiedStyle.RepresentationGetter = (i) => this.State?.Children [(int)i].DateModified?.ToString () ?? string.Empty;
+			dateModifiedStyle.RepresentationGetter = (i) => 
+			{
+				var s = this.State?.Children [(int)i];
+				if(s == null || s.IsParent || s.LastWriteTime == null)
+				{
+					return string.Empty;
+				}
+				return s.LastWriteTime.Value.ToString (Style.DateFormat);
+			};
+
 			dateModifiedStyle.MinWidth = 30;
 
 			var typeStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (Style.TypeColumnName, typeof (int)));

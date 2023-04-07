@@ -37,11 +37,11 @@ namespace Terminal.Gui.FileServices {
 		public FileSystemInfoStats (IFileSystemInfo fsi)
 		{
 			this.FileSystemInfo = fsi;
+			this.LastWriteTime = fsi.LastWriteTime;
 
 			if (fsi is IFileInfo fi) {
 				this.MachineReadableLength = fi.Length;
-				this.HumanReadableLength = GetHumanReadableFileSize (this.MachineReadableLength);
-				this.DateModified = FileDialogStyle.UseUtcDates ? File.GetLastWriteTimeUtc (fi.FullName) : File.GetLastWriteTime (fi.FullName);
+				this.HumanReadableLength = GetHumanReadableFileSize (this.MachineReadableLength);				
 				this.Type = fi.Extension;
 			} else {
 				this.HumanReadableLength = string.Empty;
@@ -55,7 +55,7 @@ namespace Terminal.Gui.FileServices {
 		public IFileSystemInfo FileSystemInfo { get; }
 		public string HumanReadableLength { get; }
 		public long MachineReadableLength { get; }
-		public DateTime? DateModified { get; }
+		public DateTime? LastWriteTime { get; }
 		public string Type { get; }
 
 		/// <summary>
@@ -96,7 +96,7 @@ namespace Terminal.Gui.FileServices {
 				return this.MachineReadableLength;
 
 			if (dlg.Style.ModifiedColumnName == columnName)
-				return this.DateModified;
+				return this.LastWriteTime;
 
 			if (dlg.Style.TypeColumnName == columnName)
 				return this.Type;

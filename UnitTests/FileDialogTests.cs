@@ -130,15 +130,81 @@ namespace Terminal.Gui.Core {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void DoStuff()
+		public void TestDirectoryContents_Linux()
 		{
+			if(System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+			{
+				// Cannot run test except on linux :( 
+				// See: https://github.com/TestableIO/System.IO.Abstractions/issues/800
+				return;
+			}
+
+			// Arrange
+			var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>(),"/");
+			fileSystem.MockTime(()=>new DateTime(2010,01,01,11,12,43));
+
+			fileSystem.AddFile( @"/myfile.txt", new MockFileData("Testing is meh."){LastWriteTime = new DateTime(2001,01,01,11,12,11)});
+			fileSystem.AddFile( @"/demo/jQuery.js", new MockFileData("some js"){LastWriteTime = new DateTime(2001,01,01,11,44,42)});
+			fileSystem.AddFile( @"/demo/image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }){LastWriteTime = new DateTime(2002,01,01,22,42,10)});
+			
+			var m = (MockDirectoryInfo)fileSystem.DirectoryInfo.New(@"/demo/subfolder");
+			m.Create();
+			m.LastWriteTime = new DateTime(2002,01,01,22,42,10);
+			
+			fileSystem.AddFile( @"/demo/subfolder/image2.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }){LastWriteTime = new DateTime(2002,01,01,22,42,10)});
+
+			var fd = new FileDialog(fileSystem){
+				Height = 15
+			};
+			fd.Path = @"/demo/";
+			Begin(fd);
+
+			fd.Redraw(fd.Bounds);
+
+			fd.Style.DateFormat = "yyyy-MM-dd hh:mm:ss";
+
+			string expected = 
+			@"
+ ┌┤OPEN├────────────────────────────────────────────────────────────┐
+ │/demo/                                                            │
+ │[▲]                                                               │
+ │┌────────────┬──────────┬──────────────────────────────┬─────────┐│
+ ││Filename (▲)│Size      │Modified                      │Type     ││
+ │├────────────┼──────────┼──────────────────────────────┼─────────┤│
+ ││..          │          │                              │dir      ││
+ ││\subfolder  │          │2002-01-01T22:42:10           │dir      ││
+ ││image.gif   │4.00 bytes│2002-01-01T22:42:10           │.gif     ││
+ ││jQuery.js   │7.00 bytes│2001-01-01T11:44:42           │.js      ││
+ │                                                                  │
+ │                                                                  │
+ │                                                                  │
+ │[ ►► ] Enter Search                            [ Cancel ] [ Ok ]  │
+ └──────────────────────────────────────────────────────────────────┘
+";
+			TestHelpers.AssertDriverContentsAre (expected, output, true);
+		}
+
+
+		[Fact, AutoInitShutdown]
+		public void TestDirectoryContents_Windows()
+		{
+			if(!System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+			{
+				// Can only run this test on windows :( 
+				// See: https://github.com/TestableIO/System.IO.Abstractions/issues/800
+				return;
+			}
+
 			// Arrange
 			var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
 			{
-				{ @"c:\myfile.txt", new MockFileData("Testing is meh.") },
-				{ @"c:\demo\jQuery.js", new MockFileData("some js") },
-				{ @"c:\demo\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) }
+				{ @"c:\myfile.txt", new MockFileData("Testing is meh."){LastWriteTime = new DateTime(2001,01,01,11,12,11)} },
+				{ @"c:\demo\jQuery.js", new MockFileData("some js"){LastWriteTime = new DateTime(2001,01,01,11,44,42)} },
+				{ @"c:\demo\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }){LastWriteTime = new DateTime(2002,01,01,22,42,10)} },
+				{ @"c:\demo\subfolder\image2.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }){LastWriteTime = new DateTime(2002,01,01,22,42,10)} }
 			});
+
+			fileSystem.MockTime(()=>new DateTime(2010,01,01,11,12,43));
 
 			var fd = new FileDialog(fileSystem){
 				Height = 15
@@ -147,6 +213,8 @@ namespace Terminal.Gui.Core {
 			Begin(fd);
 
 			fd.Redraw(fd.Bounds);
+
+			fd.Style.DateFormat = "yyyy-MM-dd hh:mm:ss";
 
 			string expected = 
 			@"
