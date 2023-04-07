@@ -8,8 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NStack;
 using Terminal.Gui.FileServices;
-using Terminal.Gui.Trees;
-using static Terminal.Gui.Configuration.ConfigurationManager;
+using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui {
 

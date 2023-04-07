@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Terminal.Gui.FileServices;
-using Terminal.Gui.Trees;
 
 namespace Terminal.Gui.FileServices {
 

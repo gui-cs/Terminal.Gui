@@ -4,7 +4,6 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using Terminal.Gui.Resources;
-using Terminal.Gui.Trees;
 using static System.Environment;
 
 namespace Terminal.Gui.FileServices {
