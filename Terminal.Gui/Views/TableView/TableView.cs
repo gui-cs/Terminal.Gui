@@ -315,13 +315,16 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private int GetHeaderHeight ()
 		{
-			int heightRequired = 1;
-
-			if (Style.ShowHorizontalHeaderOverline)
+			int heightRequired = 0;
+			if (!Style.HideHeaders) {
 				heightRequired++;
 
-			if (Style.ShowHorizontalHeaderUnderline)
-				heightRequired++;
+				if (Style.ShowHorizontalHeaderOverline)
+					heightRequired++;
+
+				if (Style.ShowHorizontalHeaderUnderline)
+					heightRequired++;
+			}
 
 			return heightRequired;
 		}
@@ -1579,7 +1582,7 @@ namespace Terminal.Gui {
 
 		private bool ShouldRenderHeaders ()
 		{
-			if (TableIsNullOrInvisible ())
+			if (TableIsNullOrInvisible () || Style.HideHeaders)
 				return false;
 
 			return Style.AlwaysShowHeaders || rowOffset == 0;
@@ -1771,6 +1774,11 @@ namespace Terminal.Gui {
 			/// When scrolling down always lock the column headers in place as the first row of the table
 			/// </summary>
 			public bool AlwaysShowHeaders { get; set; } = false;
+
+			/// <summary>
+			/// Hide header
+			/// </summary>
+			public bool HideHeaders { get; set; } = false;
 
 			/// <summary>
 			/// True to render a solid line above the headers
