@@ -273,6 +273,7 @@ namespace Terminal.Gui {
 				var newState = !tile.ContentView.Visible;
 				tile.ContentView.Visible = newState;
 				this.btnToggleSplitterCollapse.Text = GetToggleSplitterText (newState);
+				this.LayoutSubviews();
 			};
 
 
