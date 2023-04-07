@@ -299,11 +299,11 @@ namespace Terminal.Gui {
 
 			if (useErrorColors) {
 				d.ColorScheme = Colors.Error;
-				//d.Border.ForgroundColor = Colors.Error.Normal.Foreground;
+				//d.Border.ForegroundColor = Colors.Error.Normal.Foreground;
 				//d.Border.BackgroundColor = Colors.Error.Normal.Background;
 			} else {
 				d.ColorScheme = Colors.Dialog;
-				//d.Border.ForgroundColor = Colors.Dialog.Normal.Foreground;
+				//d.Border.ForegroundColor = Colors.Dialog.Normal.Foreground;
 				//d.Border.BackgroundColor = Colors.Dialog.Normal.Background;
 			}
 

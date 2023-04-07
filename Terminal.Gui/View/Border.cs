@@ -44,7 +44,7 @@ namespace Terminal.Gui {
 		public event Action<Border> BorderChanged;
 
 		private BorderStyle _style;
-		private Color _forgroundColor;
+		private Color _foregroundColor;
 		private Color _backgroundColor;
 
 		/// <summary>
@@ -63,10 +63,10 @@ namespace Terminal.Gui {
 		/// Gets or sets the <see cref="Color"/> that draws the outer border color.
 		/// </summary>
 		[JsonInclude, JsonConverter (typeof (ColorJsonConverter))]
-		public Color ForgroundColor {
-			get => _forgroundColor;
+		public Color ForegroundColor {
+			get => _foregroundColor;
 			set {
-				_forgroundColor = value;
+				_foregroundColor = value;
 				OnBorderChanged ();
 			}
 		}
