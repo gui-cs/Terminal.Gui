@@ -2575,9 +2575,6 @@ namespace Terminal.Gui {
 				if (pv.Target != this) {
 					nEdges.Add ((pv.Target, from));
 				}
-				foreach (var v in from.InternalSubviews) {
-					CollectAll (v, ref nNodes, ref nEdges);
-				}
 				return;
 			case Pos.PosCombine pc:
 				CollectPos (pc.left, from, ref nNodes, ref nEdges);
@@ -2596,9 +2593,6 @@ namespace Terminal.Gui {
 				//}
 				if (dv.Target != this) {
 					nEdges.Add ((dv.Target, from));
-				}
-				foreach (var v in from.InternalSubviews) {
-					CollectAll (v, ref nNodes, ref nEdges);
 				}
 				return;
 			case Dim.DimCombine dc:
@@ -2657,11 +2651,17 @@ namespace Terminal.Gui {
 
 			if (edges.Any ()) {
 				foreach ((var from, var to) in edges) {
-					if (from == to || from?.SuperView == to?.SuperView) {
+					if (from == to) {
 						// if not yet added to the result, add it and remove from edge
 						if (result.Find (v => v == from) == null) {
 							result.Add (from);
-						} else if (result.Find (v => v == to) == null) {
+						}
+						edges.Remove ((from, to));
+					} else if (from.SuperView == to.SuperView) {
+						if (result.Find (v => v == from) == null) {
+							result.Add (from);
+						}
+						if (result.Find (v => v == to) == null) {
 							result.Add (to);
 						}
 						edges.Remove ((from, to));

@@ -87,7 +87,7 @@ namespace Terminal.Gui.ViewTests {
 
 
 		[Fact]
-		public void LayoutSubviews_ViewThatRefsSuperView_Throws ()
+		public void LayoutSubviews_ViewThatRefsSubView_Throws ()
 		{
 			var root = new View ();
 			var super = new View ();
