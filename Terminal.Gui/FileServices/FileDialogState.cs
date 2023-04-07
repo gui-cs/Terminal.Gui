@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 
 namespace Terminal.Gui.FileServices {
@@ -9,7 +10,7 @@ namespace Terminal.Gui.FileServices {
 
 		public FileSystemInfoStats Selected { get; set; }
 		protected readonly FileDialog Parent;
-		public FileDialogState (DirectoryInfo dir, FileDialog parent)
+		public FileDialogState (IDirectoryInfo dir, FileDialog parent)
 		{
 			this.Directory = dir;
 			Parent = parent;
@@ -17,7 +18,7 @@ namespace Terminal.Gui.FileServices {
 			this.RefreshChildren ();
 		}
 
-		public DirectoryInfo Directory { get; }
+		public IDirectoryInfo Directory { get; }
 
 		public FileSystemInfoStats [] Children { get; protected set; }
 
@@ -27,7 +28,7 @@ namespace Terminal.Gui.FileServices {
 			Children = GetChildren (dir).ToArray ();
 		}
 
-		protected virtual IEnumerable<FileSystemInfoStats> GetChildren (DirectoryInfo dir)
+		protected virtual IEnumerable<FileSystemInfoStats> GetChildren (IDirectoryInfo dir)
 		{
 			try {
 
@@ -45,7 +46,7 @@ namespace Terminal.Gui.FileServices {
 
 					children = children.Where (
 						c => c.IsDir () ||
-						(c.FileSystemInfo is FileInfo f && Parent.IsCompatibleWithAllowedExtensions (f)))
+						(c.FileSystemInfo is IFileInfo f && Parent.IsCompatibleWithAllowedExtensions (f)))
 						.ToList ();
 				}
 
@@ -70,7 +71,7 @@ namespace Terminal.Gui.FileServices {
 		protected bool MatchesApiFilter (FileSystemInfoStats arg)
 		{
 			return arg.IsDir () ||
-			(arg.FileSystemInfo is FileInfo f && Parent.CurrentFilter.IsAllowed (f.FullName));
+			(arg.FileSystemInfo is IFileInfo f && Parent.CurrentFilter.IsAllowed (f.FullName));
 		}
 	}
 }

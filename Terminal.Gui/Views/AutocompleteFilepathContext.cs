@@ -2,6 +2,7 @@ using NStack;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Terminal.Gui.FileServices;
@@ -48,7 +49,7 @@ namespace Terminal.Gui {
 			bool isWindows = RuntimeInformation.IsOSPlatform (OSPlatform.Windows);
 
 			var suggestions = state.Children.Where(d=> !d.IsParent).Select (
-				e => e.FileSystemInfo is DirectoryInfo d
+				e => e.FileSystemInfo is IDirectoryInfo d
 					? d.Name + System.IO.Path.DirectorySeparatorChar
 					: e.FileSystemInfo.Name)
 				.ToArray ();

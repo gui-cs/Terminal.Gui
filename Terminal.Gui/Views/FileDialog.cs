@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -82,6 +83,7 @@ namespace Terminal.Gui {
 		internal object onlyOneSearchLock = new object ();
 
 		private bool disposed = false;
+		private IFileSystem fileSystem;
 		private TextField tbPath;
 
 		private FileDialogSorter sorter;
@@ -127,8 +129,19 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="FileDialog"/> class.
 		/// </summary>
-		public FileDialog ()
+		public FileDialog () : this(new FileSystem())
 		{
+
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="FileDialog"/> class with
+		/// a custom <see cref="IFileSystem"/>.
+		/// </summary>
+		/// <remarks>This overload is mainly useful for testing.</remarks>
+		public FileDialog (IFileSystem fileSystem)
+		{
+			this.fileSystem = fileSystem;
 			this.btnOk = new Button (Style.OkButtonText) {
 				Y = Pos.AnchorEnd (1),
 				X = Pos.Function (() =>
@@ -243,7 +256,7 @@ namespace Terminal.Gui {
 			};
 
 			this.treeView.TreeBuilder = new FileDialogTreeBuilder ();
-			this.treeView.AspectGetter = (m) => m is DirectoryInfo d ? d.Name : m.ToString ();
+			this.treeView.AspectGetter = (m) => m is IDirectoryInfo d ? d.Name : m.ToString ();
 			this.Style.TreeStyle = treeView.Style;
 
 			this.treeView.SelectionChanged += this.TreeView_SelectionChanged;
@@ -399,7 +412,7 @@ namespace Terminal.Gui {
 			var toRename = GetFocusedFiles ();
 
 			if (toRename?.Length == 1) {
-				var newNamed = FileOperationsHandler.Rename (toRename.Single ());
+				var newNamed = FileOperationsHandler.Rename (this.fileSystem, toRename.Single ());
 
 				if (newNamed != null) {
 					RefreshState ();
@@ -410,14 +423,14 @@ namespace Terminal.Gui {
 		private void New ()
 		{
 			if (State != null) {
-				var created = FileOperationsHandler.New (State.Directory);
+				var created = FileOperationsHandler.New (this.fileSystem, State.Directory);
 				if (created != null) {
 					RefreshState ();
 					RestoreSelection (created);
 				}
 			}
 		}
-		private FileSystemInfo [] GetFocusedFiles ()
+		private IFileSystemInfo [] GetFocusedFiles ()
 		{
 
 			if (!tableView.HasFocus || !tableView.CanFocus || FileOperationsHandler == null) {
@@ -779,7 +792,7 @@ namespace Terminal.Gui {
 		}
 
 
-		private void Accept (FileInfo f)
+		private void Accept (IFileInfo f)
 		{
 			if (!this.IsCompatibleWithOpenMode (f.FullName, out var reason)) {
 				feedback = reason;
@@ -887,7 +900,7 @@ namespace Terminal.Gui {
 			if (stats == null) {
 				return;
 			}
-			FileSystemInfo dest;
+			IFileSystemInfo dest;
 
 			if (stats.IsParent) {
 				dest = State.Directory;
@@ -1004,12 +1017,12 @@ namespace Terminal.Gui {
 			var stats = this.RowToStats (obj.Row);
 
 
-			if (stats.FileSystemInfo is DirectoryInfo d) {
+			if (stats.FileSystemInfo is IDirectoryInfo d) {
 				this.PushState (d, true);
 				return;
 			}
 
-			if (stats.FileSystemInfo is FileInfo f) {
+			if (stats.FileSystemInfo is IFileInfo f) {
 				this.Accept (f);
 			}
 		}
@@ -1020,7 +1033,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="file"></param>
 		/// <returns></returns>
-		public bool IsCompatibleWithAllowedExtensions (FileInfo file)
+		public bool IsCompatibleWithAllowedExtensions (IFileInfo file)
 		{
 			// no restrictions
 			if (!this.AllowedTypes.Any ()) {
@@ -1044,7 +1057,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="file"></param>
 		/// <returns></returns>
-		private bool MatchesAllowedTypes (FileInfo file)
+		private bool MatchesAllowedTypes (IFileInfo file)
 		{
 			return this.AllowedTypes.Any (t => t.IsAllowed (file.FullName));
 		}
@@ -1100,7 +1113,7 @@ namespace Terminal.Gui {
 		/// <param name="addCurrentStateToHistory"></param>
 		/// <param name="setPathText"></param>
 		/// <param name="clearForward"></param>
-		internal void PushState (DirectoryInfo d, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true)
+		internal void PushState (IDirectoryInfo d, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true)
 		{
 			// no change of state
 			if (d == this.State?.Directory) {
@@ -1202,7 +1215,7 @@ namespace Terminal.Gui {
 			if (stats.IsExecutable ()) {
 				return Style.ColorSchemeExeOrRecommended;
 			}
-			if (stats.FileSystemInfo is FileInfo f && this.MatchesAllowedTypes (f)) {
+			if (stats.FileSystemInfo is IFileInfo f && this.MatchesAllowedTypes (f)) {
 				return Style.ColorSchemeExeOrRecommended;
 			}
 
@@ -1236,7 +1249,7 @@ namespace Terminal.Gui {
 		{
 			return this.State?.Children [(int)this.tableView.Table.Rows [rowIndex] [0]];
 		}
-		private int? StatsToRow (FileSystemInfo fileSystemInfo)
+		private int? StatsToRow (IFileSystemInfo fileSystemInfo)
 		{
 			// find array index of the current state for the stats
 			var idx = State?.Children.IndexOf ((f) => f.FileSystemInfo.FullName == fileSystemInfo.FullName);
@@ -1285,24 +1298,23 @@ namespace Terminal.Gui {
 			tbPath.Autocomplete.GenerateSuggestions (new AutocompleteFilepathContext (tbPath.Text, tbPath.CursorPosition, State));
 		}
 
-		private DirectoryInfo StringToDirectoryInfo (string path)
+		private IDirectoryInfo StringToDirectoryInfo (string path)
 		{
 			// if you pass new DirectoryInfo("C:") you get a weird object
 			// where the FullName is in fact the current working directory.
 			// really not what most users would expect
-
 			if (Regex.IsMatch (path, "^\\w:$")) {
-				return new DirectoryInfo (path + System.IO.Path.DirectorySeparatorChar);
+				return fileSystem.DirectoryInfo.New(path + System.IO.Path.DirectorySeparatorChar);
 			}
 
-			return new DirectoryInfo (path);
+			return fileSystem.DirectoryInfo.New(path);
 		}
 
 		/// <summary>
 		/// Select <paramref name="toRestore"/> in the table view (if present)
 		/// </summary>
 		/// <param name="toRestore"></param>
-		internal void RestoreSelection (FileSystemInfo toRestore)
+		internal void RestoreSelection (IFileSystemInfo toRestore)
 		{
 			var toReselect = StatsToRow (toRestore);
 
@@ -1493,7 +1505,7 @@ namespace Terminal.Gui {
 			object oLockFound = new object ();
 			CancellationTokenSource token = new CancellationTokenSource ();
 
-			public SearchState (DirectoryInfo dir, FileDialog parent, string searchTerms) : base (dir, parent)
+			public SearchState (IDirectoryInfo dir, FileDialog parent, string searchTerms) : base (dir, parent)
 			{
 				parent.SearchMatcher.Initialize (searchTerms);
 				Children = new FileSystemInfoStats [0];
@@ -1558,7 +1570,7 @@ namespace Terminal.Gui {
 				});
 			}
 
-			private void RecursiveFind (DirectoryInfo directory)
+			private void RecursiveFind (IDirectoryInfo directory)
 			{
 				foreach (var f in GetChildren (directory)) {
 
@@ -1583,7 +1595,7 @@ namespace Terminal.Gui {
 						}
 					}
 
-					if (f.FileSystemInfo is DirectoryInfo sub) {
+					if (f.FileSystemInfo is IDirectoryInfo sub) {
 						RecursiveFind (sub);
 					}
 				}

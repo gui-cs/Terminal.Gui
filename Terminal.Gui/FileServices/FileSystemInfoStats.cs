@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 
 namespace Terminal.Gui.FileServices {
@@ -33,11 +34,11 @@ namespace Terminal.Gui.FileServices {
 		/// Initializes a new instance of the <see cref="FileSystemInfoStats"/> class.
 		/// </summary>
 		/// <param name="fsi">The directory of path to wrap.</param>
-		public FileSystemInfoStats (FileSystemInfo fsi)
+		public FileSystemInfoStats (IFileSystemInfo fsi)
 		{
 			this.FileSystemInfo = fsi;
 
-			if (fsi is FileInfo fi) {
+			if (fsi is IFileInfo fi) {
 				this.MachineReadableLength = fi.Length;
 				this.HumanReadableLength = GetHumanReadableFileSize (this.MachineReadableLength);
 				this.DateModified = FileDialogStyle.UseUtcDates ? File.GetLastWriteTimeUtc (fi.FullName) : File.GetLastWriteTime (fi.FullName);
@@ -51,7 +52,7 @@ namespace Terminal.Gui.FileServices {
 		/// <summary>
 		/// Gets the wrapped <see cref="FileSystemInfo"/> (directory or file).
 		/// </summary>
-		public FileSystemInfo FileSystemInfo { get; }
+		public IFileSystemInfo FileSystemInfo { get; }
 		public string HumanReadableLength { get; }
 		public long MachineReadableLength { get; }
 		public DateTime? DateModified { get; }

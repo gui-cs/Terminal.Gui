@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using Terminal.Gui.Resources;
 
@@ -11,7 +12,7 @@ namespace Terminal.Gui.FileServices {
 	public class DefaultFileOperations : IFileOperations {
 
 		/// <inheritdoc/>
-		public bool Delete (IEnumerable<FileSystemInfo> toDelete)
+		public bool Delete (IEnumerable<IFileSystemInfo> toDelete)
 		{
 			// Default implementation does not allow deleting multiple files
 			if (toDelete.Count () != 1) 				return false;
@@ -25,8 +26,14 @@ namespace Terminal.Gui.FileServices {
 
 			try {
 				if (result == 0) {
-					if (d is FileInfo) 						d.Delete ();
-else 						((DirectoryInfo)d).Delete (true);
+					if (d is IFileInfo)
+					{
+						d.Delete ();
+					} 			
+					else 
+					{
+						((IDirectoryInfo)d).Delete (true);
+					}
 
 					return true;
 				}
@@ -81,23 +88,23 @@ else 						((DirectoryInfo)d).Delete (true);
 		}
 
 		/// <inheritdoc/>
-		public FileSystemInfo Rename (FileSystemInfo toRename)
+		public IFileSystemInfo Rename (IFileSystem fileSystem, IFileSystemInfo toRename)
 		{
 			// Dont allow renaming C: or D: or / (on linux) etc
-			if (toRename is DirectoryInfo dir && dir.Parent == null) 				return null;
+			if (toRename is IDirectoryInfo dir && dir.Parent == null) 				return null;
 
 			if (Prompt (Strings.fdRenameTitle, toRename.Name, out var newName)) 				if (!string.IsNullOrWhiteSpace (newName)) 					try {
 
-						if (toRename is FileInfo f) {
+						if (toRename is IFileInfo f) {
 
-							var newLocation = new FileInfo (Path.Combine (f.Directory.FullName, newName));
+							var newLocation = fileSystem.FileInfo.New (Path.Combine (f.Directory.FullName, newName));
 							f.MoveTo (newLocation.FullName);
 							return newLocation;
 
 						} else {
-							var d = (DirectoryInfo)toRename;
+							var d = (IDirectoryInfo)toRename;
 
-							var newLocation = new DirectoryInfo (Path.Combine (d.Parent.FullName, newName));
+							var newLocation = fileSystem.DirectoryInfo.New (Path.Combine (d.Parent.FullName, newName));
 							d.MoveTo (newLocation.FullName);
 							return newLocation;
 						}
@@ -108,10 +115,10 @@ else 						((DirectoryInfo)d).Delete (true);
 		}
 
 		/// <inheritdoc/>
-		public FileSystemInfo New (DirectoryInfo inDirectory)
+		public IFileSystemInfo New (IFileSystem fileSystem, IDirectoryInfo inDirectory)
 		{
 			if (Prompt (Strings.fdNewTitle, "", out var named)) 				if (!string.IsNullOrWhiteSpace (named)) 					try {
-						var newDir = new DirectoryInfo (Path.Combine (inDirectory.FullName, named));
+						var newDir = fileSystem.DirectoryInfo.New (Path.Combine (inDirectory.FullName, named));
 						newDir.Create ();
 						return newDir;
 					} catch (Exception ex) {

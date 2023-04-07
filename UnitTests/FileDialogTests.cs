@@ -1,13 +1,22 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using System.Reflection;
 using Terminal.Gui.FileServices;
 using Xunit;
-
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.Core {
 	public class FileDialogTests {
+
+		readonly ITestOutputHelper output;
+
+		public FileDialogTests(ITestOutputHelper output)
+		{
+			this.output = output;
+		}
 
 		[Fact, AutoInitShutdown]
 		public void OnLoad_TextBoxIsFocused ()
@@ -120,6 +129,37 @@ namespace Terminal.Gui.Core {
 			Assert.False(dlg.Canceled);
 		}
 
+		[Fact]
+		public void DoStuff()
+		{
+			// Arrange
+			var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+			{
+				{ @"c:\myfile.txt", new MockFileData("Testing is meh.") },
+				{ @"c:\demo\jQuery.js", new MockFileData("some js") },
+				{ @"c:\demo\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) }
+			});
+
+			var fd = new FileDialog(fileSystem);
+			fd.Path = @"c:\demo\";
+			Begin(fd);
+
+			fd.Redraw(fd.Bounds);
+
+			string expected = @"
+┌─┬──────┐
+│A│B     │
+├─┼──────┤
+│1│2     │
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
+
+
+		}
+
 		[Theory, AutoInitShutdown]
 		[InlineData(true)]
 		[InlineData (false)]
@@ -185,11 +225,15 @@ namespace Terminal.Gui.Core {
 		private FileDialog GetInitializedFileDialog ()
 		{
 			var dlg = new FileDialog ();
+			Begin(dlg);
+
+			return dlg;
+		}
+		private void Begin(FileDialog dlg)
+		{
 			dlg.BeginInit ();
 			dlg.EndInit ();
 			Application.Begin (dlg);
-
-			return dlg;
 		}
 	}
 }

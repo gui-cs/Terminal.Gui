@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 
 namespace Terminal.Gui.FileServices {
@@ -11,7 +12,7 @@ namespace Terminal.Gui.FileServices {
 			this.terms = terms.Split (new string [] { " " }, StringSplitOptions.RemoveEmptyEntries);
 		}
 
-		public bool IsMatch (FileSystemInfo f)
+		public bool IsMatch (IFileSystemInfo f)
 		{
 			//Contains overload with StringComparison is not available in (net472) or (netstandard2.0)
 			//return f.Name.Contains (terms, StringComparison.OrdinalIgnoreCase);

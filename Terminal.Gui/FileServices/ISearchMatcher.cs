@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.IO.Abstractions;
 
 namespace Terminal.Gui.FileServices {
 
@@ -17,6 +18,6 @@ namespace Terminal.Gui.FileServices {
 		/// Return true if <paramref name="f"/> is a match to the
 		/// last provided search terms
 		/// </summary>
-		bool IsMatch (FileSystemInfo f);
+		bool IsMatch (IFileSystemInfo f);
 	}
 }

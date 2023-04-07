@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using Terminal.Gui.Resources;
 using static System.Environment;
@@ -150,7 +151,7 @@ namespace Terminal.Gui.FileServices {
 		/// User defined delegate for picking which character(s)/unicode
 		/// symbol(s) to use as an 'icon' for files/folders. 
 		/// </summary>
-		public Func<FileSystemInfo, string> IconGetter { get; set; }
+		public Func<IFileSystemInfo, string> IconGetter { get; set; }
 
 
 		/// <summary>
@@ -189,9 +190,9 @@ namespace Terminal.Gui.FileServices {
 
 		}
 
-		private string DefaultIconGetter (FileSystemInfo arg)
+		private string DefaultIconGetter (IFileSystemInfo arg)
 		{
-			if (arg is DirectoryInfo) {
+			if (arg is IDirectoryInfo) {
 				return UseUnicodeCharacters ? "\ua909 " : "\\";
 			}
 

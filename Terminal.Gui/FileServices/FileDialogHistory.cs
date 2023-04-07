@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions;
 
 namespace Terminal.Gui.FileServices {
 
@@ -16,7 +17,7 @@ namespace Terminal.Gui.FileServices {
 		public bool Back ()
 		{
 
-			DirectoryInfo goTo = null;
+			IDirectoryInfo goTo = null;
 			FileSystemInfoStats restoreSelection = null;
 
 			if (this.CanBack ()) {

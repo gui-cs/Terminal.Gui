@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Terminal.Gui;
@@ -205,7 +206,7 @@ namespace UICatalog.Scenarios {
 				this.terms = terms;
 			}
 
-			public bool IsMatch (FileSystemInfo f)
+			public bool IsMatch (IFileSystemInfo f)
 			{
 				return f.Name.Contains (terms, StringComparison.CurrentCulture);
 			}
