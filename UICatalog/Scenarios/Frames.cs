@@ -1,9 +1,6 @@
-﻿using System.Globalization;
-using System;
-using Terminal.Gui;
+﻿using System;
 using System.Linq;
-using NStack;
-using Terminal.Gui.Configuration;
+using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Frames Demo", Description: "Demonstrates Margin, Border, and Padding on Views.")]

@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text.Json.Serialization;
 using NStack;
-using static Terminal.Gui.Configuration.ConfigurationManager;
+using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui {
 	/// <summary>

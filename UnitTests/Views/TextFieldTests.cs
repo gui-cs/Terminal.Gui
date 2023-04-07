@@ -6,7 +6,7 @@ using System.Reflection;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests {
+namespace Terminal.Gui.ViewsTests {
 	public class TextFieldTests {
 		readonly ITestOutputHelper output;
 

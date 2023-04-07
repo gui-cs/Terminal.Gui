@@ -468,7 +468,6 @@ namespace Terminal.Gui.ApplicationTests {
 
 			((FakeDriver)Application.Driver).SetBufferSize (5, 5);
 			Application.Begin (Application.Top);
-			// BUGBUG: v2 - 
 			Assert.Equal (new Rect (0, 0, 80, 25), Application.Top.Frame);
 			((FakeDriver)Application.Driver).SetBufferSize (5, 5);
 			Assert.Equal (new Rect (0, 0, 5, 5), Application.Top.Frame);

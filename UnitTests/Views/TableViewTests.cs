@@ -8,8 +8,9 @@ using Xunit;
 using System.Globalization;
 using Xunit.Abstractions;
 using System.Reflection;
+using Terminal.Gui.ViewTests;
 
-namespace Terminal.Gui.ViewTests {
+namespace Terminal.Gui.ViewsTests {
 
 	public class TableViewTests {
 		readonly ITestOutputHelper output;
@@ -267,6 +268,7 @@ namespace Terminal.Gui.ViewTests {
 			// ensure that TableView has the input focus
 			Application.Top.Add (tableView);
 			Application.Begin (Application.Top);
+
 
 			Application.Top.FocusFirst ();
 			Assert.True (tableView.HasFocus);
