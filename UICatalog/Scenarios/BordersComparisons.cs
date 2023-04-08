@@ -9,7 +9,7 @@ namespace UICatalog.Scenarios {
 		{
 			Application.Init ();
 
-			var borderStyle = BorderStyle.Double;
+			var borderStyle = LineStyle.Double;
 			var borderThickness = new Thickness (1, 2, 3, 4);
 			var padding = 1;
 
@@ -18,7 +18,7 @@ namespace UICatalog.Scenarios {
 			var win = new Window (new Rect (5, 5, 40, 20), "Window",
 				padding: padding,
 				border: new Border () {
-					BorderStyle = borderStyle,
+					LineStyle = borderStyle,
 					BorderThickness = borderThickness
 				});
 
@@ -79,7 +79,7 @@ namespace UICatalog.Scenarios {
 
 			var frameView = new FrameView (new Rect (95, 5, 40, 20), "FrameView", null,
 				border: new Border () {
-					BorderStyle = borderStyle,
+					LineStyle = borderStyle,
 					BorderThickness = borderThickness
 				}
 			);

@@ -530,8 +530,8 @@ namespace Terminal.Gui {
 				BorderFrame.ThicknessChanged -= ThicknessChangedHandler;
 				BorderFrame.Dispose ();
 			}
-			// TODO: create default for borderstyle
-			BorderFrame = new Frame () { Id = "BorderFrame", Thickness = new Thickness (0), BorderStyle = BorderStyle.Single };
+			// TODO: create default for LineStyle
+			BorderFrame = new Frame () { Id = "BorderFrame", Thickness = new Thickness (0), BorderStyle = LineStyle.Single };
 			BorderFrame.ThicknessChanged += ThicknessChangedHandler;
 			BorderFrame.Parent = this;
 
@@ -1001,9 +1001,9 @@ namespace Terminal.Gui {
 		// TODO: v2 - Hack for now
 		private void Border_BorderChanged (Border border)
 		{
-			//if (!border.DrawMarginFrame) BorderFrame.BorderStyle = BorderStyle.None;
-			BorderFrame.BorderStyle = border.BorderStyle;
-			BorderFrame.Thickness = new Thickness (BorderFrame.BorderStyle == BorderStyle.None ? 0 : 1);
+			//if (!border.DrawMarginFrame) BorderFrame.BorderStyle = LineStyle.None;
+			BorderFrame.BorderStyle = border.LineStyle;
+			BorderFrame.Thickness = new Thickness (BorderFrame.BorderStyle == LineStyle.None ? 0 : 1);
 		}
 
 		/// <summary>
@@ -2992,6 +2992,41 @@ namespace Terminal.Gui {
 					OnVisibleChanged ();
 					SetNeedsDisplay ();
 				}
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets whether the view has a one row/col thick border.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// This is a helper for manipulating the view's <see cref="BorderFrame"/>. Setting this property to any value other than
+		/// <see cref="LineStyle.None"/> is equivalent to setting <see cref="BorderFrame"/>'s <see cref="Frame.Thickness"/> 
+		/// to `1` and <see cref="BorderStyle"/> to the value. 
+		/// </para>
+		/// <para>
+		/// Setting this property to <see cref="LineStyle.None"/> is equivalent to setting <see cref="BorderFrame"/>'s <see cref="Frame.Thickness"/> 
+		/// to `0` and <see cref="BorderStyle"/> to <see cref="LineStyle.None"/>. 
+		/// </para>
+		/// <para>
+		/// For more advanced customization of the view's border, manipulate see <see cref="BorderFrame"/> directly.
+		/// </para>
+		/// </remarks>
+		public LineStyle BorderStyle {
+			get {
+				return BorderFrame?.BorderStyle ?? LineStyle.None;
+			}
+			set {
+				if (BorderFrame == null) {
+					throw new InvalidOperationException ("BorderFrame is null; this is likely a bug.");
+				}
+				if (value != LineStyle.None) {
+					BorderFrame.Thickness = new Thickness (1);
+				} else {
+					BorderFrame.Thickness = new Thickness (0);
+				}
+				BorderFrame.BorderStyle = value;
+				LayoutFrames ();
 			}
 		}
 

@@ -79,13 +79,13 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The default <see cref="BorderStyle"/> for <see cref="FrameView"/>. The default is <see cref="BorderStyle.Single"/>.
+		/// The default <see cref="LineStyle"/> for <see cref="FrameView"/>. The default is <see cref="LineStyle.Single"/>.
 		/// </summary>
 		/// <remarks>
-		/// This property can be set in a Theme to change the default <see cref="BorderStyle"/> for all <see cref="Window"/>s. 
+		/// This property can be set in a Theme to change the default <see cref="LineStyle"/> for all <see cref="Window"/>s. 
 		/// </remarks>
 		///[SerializableConfigurationProperty (Scope = typeof (ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
-		public static BorderStyle DefaultBorderStyle { get; set; } = BorderStyle.Single;
+		public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
 
 		void SetInitialProperties (ustring title, Rect frame, int padding = 0, Border border = null)
 		{
@@ -97,14 +97,14 @@ namespace Terminal.Gui {
 			if (border == null) {
 				// TODO: v2 this is a hack until Border gets refactored
 				Border = new Border () {
-					BorderStyle = DefaultBorderStyle,
+					LineStyle = DefaultBorderStyle,
 					PaddingThickness = new Thickness (padding),
 				};
 			} else {
 				Border = border;
 			}
 			BorderFrame.Thickness = new Thickness (1);
-			BorderFrame.BorderStyle = Border.BorderStyle;
+			BorderFrame.BorderStyle = Border.LineStyle;
 			//BorderFrame.ColorScheme = ColorScheme;
 			BorderFrame.Data = "BorderFrame";
 

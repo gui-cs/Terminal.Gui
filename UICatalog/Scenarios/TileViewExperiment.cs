@@ -35,7 +35,7 @@ namespace UICatalog.Scenarios {
 					     //IgnoreBorderPropertyOnRedraw = true
 
 			};
-			frame1.Border.BorderStyle = BorderStyle.Double;
+			frame1.Border.LineStyle = LineStyle.Double;
 
 			//var frame2 = new FrameView () {
 			//	Title = "frame2",
@@ -63,7 +63,7 @@ namespace UICatalog.Scenarios {
 				Height = 10, //Dim.Percent (50) - 5,
 				ColorScheme = Colors.ColorSchemes ["Dialog"],
 				Border = new Border () {
-					BorderStyle = BorderStyle.Single,
+					LineStyle = LineStyle.Single,
 					BorderThickness = new Thickness (1), 
 					DrawMarginFrame = true,
 					PaddingThickness = new Thickness(1),
@@ -83,7 +83,7 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Percent (30),
 				Height = Dim.Percent (70),
 				ColorScheme = Colors.ColorSchemes ["Error"],
-				Border = new Border () { BorderStyle = BorderStyle.Single }
+				Border = new Border () { LineStyle = LineStyle.Single }
 			};
 
 			frame1.Add (view2);

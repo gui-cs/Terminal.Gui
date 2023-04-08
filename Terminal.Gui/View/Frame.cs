@@ -10,6 +10,7 @@ namespace Terminal.Gui {
 	// TODO: v2 - If a Frame has focus, navigation keys (e.g Command.NextView) should cycle through SubViews of the Frame
 	// QUESTION: How does a user navigate out of a Frame to another Frame, or back into the Parent's SubViews?
 
+	
 	/// <summary>
 	/// Frames are a special form of <see cref="View"/> that act as adornments; they appear outside of the <see cref="View.Bounds"/>
 	/// enabling borders, menus, etc... 
@@ -111,7 +112,7 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (prevAttr);
 			}
 
-			if (Id == "BorderFrame" && BorderStyle != BorderStyle.None) {
+			if (Id == "BorderFrame" && BorderStyle != LineStyle.None) {
 				var lc = new LineCanvas ();
 				
 				var drawTop = Thickness.Top > 0 && Frame.Width > 1 && Frame.Height > 1;
@@ -131,9 +132,9 @@ namespace Terminal.Gui {
 						// Add a short horiz line for ╔╡
 						lc.AddLine (screenBounds.Location, 1, Orientation.Horizontal, BorderStyle);
 						// Add a short vert line for ╔╡
-						lc.AddLine (new Point (screenBounds.X + 1, screenBounds.Location.Y), 0, Orientation.Vertical, BorderStyle.Single);
+						lc.AddLine (new Point (screenBounds.X + 1, screenBounds.Location.Y), 0, Orientation.Vertical, LineStyle.Single);
 						// Add a short vert line for ╞
-						lc.AddLine (new Point (screenBounds.X + 1 + (titleWidth + 1), screenBounds.Location.Y), 0, Orientation.Vertical, BorderStyle.Single);
+						lc.AddLine (new Point (screenBounds.X + 1 + (titleWidth + 1), screenBounds.Location.Y), 0, Orientation.Vertical, LineStyle.Single);
 						// Add the right hand line for ╞═════╗
 						lc.AddLine (new Point (screenBounds.X + 1 + (titleWidth + 1), screenBounds.Location.Y), Frame.Width - (titleWidth + 3), Orientation.Horizontal, BorderStyle);
 					}
@@ -195,7 +196,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// 
 		/// </summary>
-		public BorderStyle BorderStyle { get; set; } = BorderStyle.None;
+		public LineStyle BorderStyle { get; set; } = LineStyle.None;
 
 		/// <summary>
 		/// Defines the rectangle that the <see cref="Frame"/> will use to draw its content. 

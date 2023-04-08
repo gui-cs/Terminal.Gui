@@ -14,10 +14,10 @@ namespace Terminal.Gui.DrawingTests {
 			this.output = output;
 		}
 
-		[InlineData (BorderStyle.Single)]
-		[InlineData (BorderStyle.Rounded)]
+		[InlineData (LineStyle.Single)]
+		[InlineData (LineStyle.Rounded)]
 		[Theory, AutoInitShutdown]
-		public void TestLineCanvas_Horizontal (BorderStyle style)
+		public void TestLineCanvas_Horizontal (LineStyle style)
 		{
 			var v = GetCanvas (out var canvas);
 			canvas.AddLine (new Point (0, 0), 1, Orientation.Horizontal, style);
@@ -34,7 +34,7 @@ namespace Terminal.Gui.DrawingTests {
 		public void TestLineCanvas_Horizontal_Double ()
 		{
 			var v = GetCanvas (out var canvas);
-			canvas.AddLine (new Point (0, 0), 1, Orientation.Horizontal, BorderStyle.Double);
+			canvas.AddLine (new Point (0, 0), 1, Orientation.Horizontal, LineStyle.Double);
 
 			v.Redraw (v.Bounds);
 
@@ -44,10 +44,10 @@ namespace Terminal.Gui.DrawingTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
 
-		[InlineData (BorderStyle.Single)]
-		[InlineData (BorderStyle.Rounded)]
+		[InlineData (LineStyle.Single)]
+		[InlineData (LineStyle.Rounded)]
 		[Theory, AutoInitShutdown]
-		public void TestLineCanvas_Vertical (BorderStyle style)
+		public void TestLineCanvas_Vertical (LineStyle style)
 		{
 			var v = GetCanvas (out var canvas);
 			canvas.AddLine (new Point (0, 0), 1, Orientation.Vertical, style);
@@ -65,7 +65,7 @@ namespace Terminal.Gui.DrawingTests {
 		public void TestLineCanvas_Vertical_Double ()
 		{
 			var v = GetCanvas (out var canvas);
-			canvas.AddLine (new Point (0, 0), 1, Orientation.Vertical, BorderStyle.Double);
+			canvas.AddLine (new Point (0, 0), 1, Orientation.Vertical, LineStyle.Double);
 
 			v.Redraw (v.Bounds);
 
@@ -84,8 +84,8 @@ namespace Terminal.Gui.DrawingTests {
 		public void TestLineCanvas_Corner_NoOverlap ()
 		{
 			var v = GetCanvas (out var canvas);
-			canvas.AddLine (new Point (0, 0), 1, Orientation.Horizontal, BorderStyle.Single);
-			canvas.AddLine (new Point (0, 1), 1, Orientation.Vertical, BorderStyle.Single);
+			canvas.AddLine (new Point (0, 0), 1, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (0, 1), 1, Orientation.Vertical, LineStyle.Single);
 
 			v.Redraw (v.Bounds);
 
@@ -104,8 +104,8 @@ namespace Terminal.Gui.DrawingTests {
 		public void TestLineCanvas_Corner_Correct ()
 		{
 			var v = GetCanvas (out var canvas);
-			canvas.AddLine (new Point (0, 0), 1, Orientation.Horizontal, BorderStyle.Single);
-			canvas.AddLine (new Point (0, 0), 2, Orientation.Vertical, BorderStyle.Single);
+			canvas.AddLine (new Point (0, 0), 1, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (0, 0), 2, Orientation.Vertical, LineStyle.Single);
 
 			v.Redraw (v.Bounds);
 
@@ -124,14 +124,14 @@ namespace Terminal.Gui.DrawingTests {
 			var v = GetCanvas (out var canvas);
 
 			// outer box
-			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, BorderStyle.Single);
-			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, BorderStyle.Single);
-			canvas.AddLine (new Point (9, 4), -9, Orientation.Horizontal, BorderStyle.Single);
-			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical, BorderStyle.Single);
+			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, LineStyle.Single);
+			canvas.AddLine (new Point (9, 4), -9, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical, LineStyle.Single);
 
 
-			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical, BorderStyle.Single);
-			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, BorderStyle.Single);
+			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical, LineStyle.Single);
+			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, LineStyle.Single);
 
 			v.Redraw (v.Bounds);
 
@@ -146,7 +146,7 @@ namespace Terminal.Gui.DrawingTests {
 		}
 
 		/// <summary>
-		/// Demonstrates when <see cref="BorderStyle.Rounded"/> corners are used. Notice how
+		/// Demonstrates when <see cref="LineStyle.Rounded"/> corners are used. Notice how
 		/// not all lines declare rounded.  If there are 1+ lines intersecting and a corner is
 		/// to be used then if any of them are rounded a rounded corner is used.
 		/// </summary>
@@ -156,17 +156,17 @@ namespace Terminal.Gui.DrawingTests {
 			var v = GetCanvas (out var canvas);
 
 			// outer box
-			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, BorderStyle.Rounded);
+			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, LineStyle.Rounded);
 
 			// BorderStyle.Single is ignored because corner overlaps with the above line which is Rounded
 			// this results in a rounded corner being used.
-			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, BorderStyle.Single);
-			canvas.AddLine (new Point (9, 4), -9, Orientation.Horizontal, BorderStyle.Rounded);
-			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical, BorderStyle.Single);
+			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, LineStyle.Single);
+			canvas.AddLine (new Point (9, 4), -9, Orientation.Horizontal, LineStyle.Rounded);
+			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical, LineStyle.Single);
 
 			// These lines say rounded but they will result in the T sections which are never rounded.
-			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical, BorderStyle.Rounded);
-			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, BorderStyle.Rounded);
+			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical, LineStyle.Rounded);
+			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, LineStyle.Rounded);
 
 			v.Redraw (v.Bounds);
 
@@ -186,14 +186,14 @@ namespace Terminal.Gui.DrawingTests {
 			var v = GetCanvas (out var canvas);
 
 			// outer box
-			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, BorderStyle.Double);
-			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, BorderStyle.Double);
-			canvas.AddLine (new Point (9, 4), -9, Orientation.Horizontal, BorderStyle.Double);
-			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical, BorderStyle.Double);
+			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, LineStyle.Double);
+			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, LineStyle.Double);
+			canvas.AddLine (new Point (9, 4), -9, Orientation.Horizontal, LineStyle.Double);
+			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical, LineStyle.Double);
 
 
-			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical, BorderStyle.Double);
-			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, BorderStyle.Double);
+			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical, LineStyle.Double);
+			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, LineStyle.Double);
 
 			v.Redraw (v.Bounds);
 
@@ -209,21 +209,21 @@ namespace Terminal.Gui.DrawingTests {
 
 
 		[Theory, AutoInitShutdown]
-		[InlineData (BorderStyle.Single)]
-		[InlineData (BorderStyle.Rounded)]
-		public void TestLineCanvas_Window_DoubleTop_SingleSides (BorderStyle thinStyle)
+		[InlineData (LineStyle.Single)]
+		[InlineData (LineStyle.Rounded)]
+		public void TestLineCanvas_Window_DoubleTop_SingleSides (LineStyle thinStyle)
 		{
 			var v = GetCanvas (out var canvas);
 
 			// outer box
-			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, BorderStyle.Double);
+			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, LineStyle.Double);
 			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, thinStyle);
-			canvas.AddLine (new Point (9, 4), -9, Orientation.Horizontal, BorderStyle.Double);
+			canvas.AddLine (new Point (9, 4), -9, Orientation.Horizontal, LineStyle.Double);
 			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical, thinStyle);
 
 
 			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical, thinStyle);
-			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, BorderStyle.Double);
+			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, LineStyle.Double);
 
 			v.Redraw (v.Bounds);
 
@@ -239,20 +239,20 @@ namespace Terminal.Gui.DrawingTests {
 		}
 
 		[Theory, AutoInitShutdown]
-		[InlineData (BorderStyle.Single)]
-		[InlineData (BorderStyle.Rounded)]
-		public void TestLineCanvas_Window_SingleTop_DoubleSides (BorderStyle thinStyle)
+		[InlineData (LineStyle.Single)]
+		[InlineData (LineStyle.Rounded)]
+		public void TestLineCanvas_Window_SingleTop_DoubleSides (LineStyle thinStyle)
 		{
 			var v = GetCanvas (out var canvas);
 
 			// outer box
 			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, thinStyle);
-			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, BorderStyle.Double);
+			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, LineStyle.Double);
 			canvas.AddLine (new Point (9, 4), -9, Orientation.Horizontal, thinStyle);
-			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical, BorderStyle.Double);
+			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical, LineStyle.Double);
 
 
-			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical, BorderStyle.Double);
+			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical, LineStyle.Double);
 			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, thinStyle);
 
 			v.Redraw (v.Bounds);
@@ -276,14 +276,14 @@ namespace Terminal.Gui.DrawingTests {
 			var v = GetCanvas (out var canvas, 1, 1);
 
 			// outer box
-			canvas.AddLine (new Point (0, 0), 8, Orientation.Horizontal, BorderStyle.Single);
-			canvas.AddLine (new Point (8, 0), 3, Orientation.Vertical, BorderStyle.Single);
-			canvas.AddLine (new Point (8, 3), -8, Orientation.Horizontal, BorderStyle.Single);
-			canvas.AddLine (new Point (0, 3), -3, Orientation.Vertical, BorderStyle.Single);
+			canvas.AddLine (new Point (0, 0), 8, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (8, 0), 3, Orientation.Vertical, LineStyle.Single);
+			canvas.AddLine (new Point (8, 3), -8, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (0, 3), -3, Orientation.Vertical, LineStyle.Single);
 
 
-			canvas.AddLine (new Point (5, 0), 3, Orientation.Vertical, BorderStyle.Single);
-			canvas.AddLine (new Point (0, 2), 8, Orientation.Horizontal, BorderStyle.Single);
+			canvas.AddLine (new Point (5, 0), 3, Orientation.Vertical, LineStyle.Single);
+			canvas.AddLine (new Point (0, 2), 8, Orientation.Horizontal, LineStyle.Single);
 
 			v.Redraw (v.Bounds);
 
@@ -307,19 +307,19 @@ namespace Terminal.Gui.DrawingTests {
 
 			// ╔╡ Title ╞═════╗
 			// Add a short horiz line for ╔╡
-			lc.AddLine (new Point (0, 0), 1, Orientation.Horizontal, BorderStyle.Double);
+			lc.AddLine (new Point (0, 0), 1, Orientation.Horizontal, LineStyle.Double);
 			//LHS line down
-			lc.AddLine (new Point (0, 0), 5, Orientation.Vertical, BorderStyle.Double);
+			lc.AddLine (new Point (0, 0), 5, Orientation.Vertical, LineStyle.Double);
 
 			//Vertical line before Title, results in a ╡
-			lc.AddLine (new Point (1, 0), 0, Orientation.Vertical, BorderStyle.Single);
+			lc.AddLine (new Point (1, 0), 0, Orientation.Vertical, LineStyle.Single);
 			//Vertical line after Title, results in a ╞
-			lc.AddLine (new Point (6, 0), 0, Orientation.Vertical, BorderStyle.Single);
+			lc.AddLine (new Point (6, 0), 0, Orientation.Vertical, LineStyle.Single);
 
 			// remainder of title
-			lc.AddLine (new Point (6, 0), 3, Orientation.Horizontal, BorderStyle.Double);
+			lc.AddLine (new Point (6, 0), 3, Orientation.Horizontal, LineStyle.Double);
 			//RHS line down
-			lc.AddLine (new Point (9, 0), 5, Orientation.Vertical, BorderStyle.Double);
+			lc.AddLine (new Point (9, 0), 5, Orientation.Vertical, LineStyle.Double);
 
 			v.Redraw (v.Bounds);
 
@@ -330,13 +330,13 @@ namespace Terminal.Gui.DrawingTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
 
-		[InlineData(0,0,0, Orientation.Horizontal,BorderStyle.Double,"═")]
-		[InlineData(0,0,0, Orientation.Vertical,BorderStyle.Double,"║")]
-		[InlineData(0,0,0, Orientation.Horizontal,BorderStyle.Single,"─")]
-		[InlineData(0,0,0, Orientation.Vertical,BorderStyle.Single,"│")]
+		[InlineData(0,0,0, Orientation.Horizontal,LineStyle.Double,"═")]
+		[InlineData(0,0,0, Orientation.Vertical,LineStyle.Double,"║")]
+		[InlineData(0,0,0, Orientation.Horizontal,LineStyle.Single,"─")]
+		[InlineData(0,0,0, Orientation.Vertical,LineStyle.Single,"│")]
 		[AutoInitShutdown, Theory]
 		public void TestLineCanvas_1LineTests(
-			int x1, int y1,int l1, Orientation o1, BorderStyle s1,
+			int x1, int y1,int l1, Orientation o1, LineStyle s1,
 			string expected
 		)
 		{
@@ -355,44 +355,44 @@ namespace Terminal.Gui.DrawingTests {
 
 		[Theory, AutoInitShutdown]
 		[InlineData(
-			0,0,1,Orientation.Horizontal,BorderStyle.Double,
-			1,0,0, Orientation.Vertical,BorderStyle.Single, "═╡"
+			0,0,1,Orientation.Horizontal,LineStyle.Double,
+			1,0,0, Orientation.Vertical,LineStyle.Single, "═╡"
 		)]
 		[InlineData(
-			0,0,0, Orientation.Vertical,BorderStyle.Single,
-			0,0,1,Orientation.Horizontal,BorderStyle.Double,
+			0,0,0, Orientation.Vertical,LineStyle.Single,
+			0,0,1,Orientation.Horizontal,LineStyle.Double,
 			 "╞═"
 		)]
 		[InlineData(
-			0,0,1, Orientation.Vertical,BorderStyle.Single,
-			0,0,0,Orientation.Horizontal,BorderStyle.Double,
+			0,0,1, Orientation.Vertical,LineStyle.Single,
+			0,0,0,Orientation.Horizontal,LineStyle.Double,
 @"
 ╤
 │"
 		)]
 		[InlineData(
-			0,0,1, Orientation.Vertical,BorderStyle.Single,
-			0,1,0,Orientation.Horizontal,BorderStyle.Double,
+			0,0,1, Orientation.Vertical,LineStyle.Single,
+			0,1,0,Orientation.Horizontal,LineStyle.Double,
 			@"
 │
 ╧
 "
 		)]
 		[InlineData(
-			0,0,0, Orientation.Vertical,BorderStyle.Single,
-			0,0,0,Orientation.Horizontal,BorderStyle.Single,
+			0,0,0, Orientation.Vertical,LineStyle.Single,
+			0,0,0,Orientation.Horizontal,LineStyle.Single,
 			@"┼
 "
 		)]
 		[InlineData(
-			0,0,0, Orientation.Vertical,BorderStyle.Double,
-			0,0,0,Orientation.Horizontal,BorderStyle.Double,
+			0,0,0, Orientation.Vertical,LineStyle.Double,
+			0,0,0,Orientation.Horizontal,LineStyle.Double,
 			@"╬
 "
 		)]
 		public void TestLineCanvas_2LineTests(
-			int x1, int y1,int l1, Orientation o1, BorderStyle s1,
-			int x2, int y2, int l2, Orientation o2, BorderStyle s2,
+			int x1, int y1,int l1, Orientation o1, LineStyle s1,
+			int x2, int y2, int l2, Orientation o2, LineStyle s2,
 			string expected
 		)
 		{

@@ -6,32 +6,7 @@ using System.Text;
 using System.Collections.Generic;
 
 namespace Terminal.Gui {
-	/// <summary>
-	/// Specifies the border style for a <see cref="View"/> and to be used by the <see cref="Border"/> class.
-	/// </summary>
-	public enum BorderStyle {
-		/// <summary>
-		/// No border is drawn.
-		/// </summary>
-		None,
-		/// <summary>
-		/// The border is drawn using single-width line glyphs.
-		/// </summary>
-		Single,
-		/// <summary>
-		/// The border is drawn using double-width line glyphs.
-		/// </summary>
-		Double,
-		/// <summary>
-		/// The border is drawn using single-width line glyphs with rounded corners.
-		/// </summary>
-		Rounded,
-		// TODO: Support Ruler
-		///// <summary> 
-		///// The border is drawn as a diagnostic ruler ("|123456789...").
-		///// </summary>
-		//Ruler
-	}
+
 
 	/// <summary>
 	/// Defines the visual border for a <see cref="Frame"/>. Also provides helper APIS for rendering the border.
@@ -43,15 +18,15 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event Action<Border> BorderChanged;
 
-		private BorderStyle _style;
+		private LineStyle _style;
 		private Color _forgroundColor;
 		private Color _backgroundColor;
 
 		/// <summary>
-		/// Specifies the <see cref="Gui.BorderStyle"/> for a view.
+		/// Specifies the <see cref="Gui.LineStyle"/> for a view.
 		/// </summary>
 		[JsonInclude, JsonConverter (typeof (JsonStringEnumConverter))]
-		public BorderStyle BorderStyle {
+		public LineStyle LineStyle {
 			get => _style;
 			set {
 				_style = value;

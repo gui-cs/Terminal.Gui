@@ -317,7 +317,7 @@ namespace UICatalog {
 					CanFocus = true,
 					Shortcut = Key.CtrlMask | Key.C,
 				};
-				ContentPane.BorderStyle = BorderStyle.Single;
+				ContentPane.BorderStyle = LineStyle.Single;
 				ContentPane.SetSplitterPos (0, 25);
 				ContentPane.ShortcutAction = () => ContentPane.SetFocus ();
 

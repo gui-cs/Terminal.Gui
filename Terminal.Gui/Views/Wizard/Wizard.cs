@@ -134,7 +134,7 @@ namespace Terminal.Gui {
 			public WizardStep (ustring title)
 			{
 				this.Title = title; // this.Title holds just the "Wizard Title"; base.Title holds "Wizard Title - Step Title"
-				this.Border.BorderStyle = BorderStyle.Rounded;
+				this.Border.LineStyle = LineStyle.Rounded;
 				base.Add (contentView);
 
 				helpTextView.ReadOnly = true;
@@ -292,7 +292,7 @@ namespace Terminal.Gui {
 			// Using Justify causes the Back and Next buttons to be hard justified against
 			// the left and right edge
 			ButtonAlignment = ButtonAlignments.Justify;
-			this.Border.BorderStyle = BorderStyle.Double;
+			this.Border.LineStyle = LineStyle.Double;
 			this.Border.PaddingThickness = new Thickness (0);
 
 			//// Add a horiz separator
@@ -736,7 +736,7 @@ namespace Terminal.Gui {
 				}
 				if (base.Modal) {
 					ColorScheme = Colors.Dialog;
-					Border.BorderStyle = BorderStyle.Rounded;
+					Border.LineStyle = LineStyle.Rounded;
 //					Border.Effect3D = true;
 //					Border.DrawMarginFrame = true;
 				} else {
@@ -747,7 +747,7 @@ namespace Terminal.Gui {
 					}
 					CanFocus = true;
 //					Border.Effect3D = false;
-					Border.BorderStyle = BorderStyle.None;
+					Border.LineStyle = LineStyle.None;
 //					Border.DrawMarginFrame = false;
 				}
 			}

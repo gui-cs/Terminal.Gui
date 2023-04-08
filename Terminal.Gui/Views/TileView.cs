@@ -43,7 +43,7 @@ namespace Terminal.Gui {
 			/// </summary>
 			/// <remarks>
 			/// Title are not rendered for root level tiles 
-			/// <see cref="BorderStyle"/> is <see cref="BorderStyle.None"/>.
+			/// <see cref="BorderStyle"/> is <see cref="LineStyle.None"/>.
 			///</remarks>
 			public string Title {
 				get => _title;
@@ -375,7 +375,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// BUGBUG: v2 Temporary for now
 		/// </summary>
-		public BorderStyle BorderStyle { get; set; } = BorderStyle.None;
+		public LineStyle BorderStyle { get; set; } = LineStyle.None;
 
 		/// <summary>
 		/// Overriden so no Frames get drawn (BUGBUG: v2 fix this hack)
@@ -1070,7 +1070,7 @@ namespace Terminal.Gui {
 
 		private bool HasBorder ()
 		{
-			return BorderStyle != BorderStyle.None;
+			return BorderStyle != LineStyle.None;
 		}
 
 		/// <inheritdoc/>

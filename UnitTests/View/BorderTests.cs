@@ -17,7 +17,7 @@ namespace Terminal.Gui.ViewTests {
 		public void Constructor_Defaults ()
 		{
 			var b = new Border ();
-			Assert.Equal (BorderStyle.None, b.BorderStyle);
+			Assert.Equal (LineStyle.None, b.LineStyle);
 			Assert.False (b.DrawMarginFrame);
 			Assert.Equal (Thickness.Empty, b.BorderThickness);
 			Assert.Equal (Color.Black, b.ForgroundColor);
@@ -568,7 +568,7 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var label = new TextField ("Loading...") {
 				Border = new Border () {
-					BorderStyle = BorderStyle.Single,
+					LineStyle = LineStyle.Single,
 					DrawMarginFrame = true,
 					PaddingThickness = new Thickness (1),
 					ForgroundColor = Color.White

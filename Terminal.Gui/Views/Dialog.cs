@@ -37,7 +37,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
 		public static Border DefaultBorder { get; set; } = new Border () {
-			BorderStyle = BorderStyle.Single,
+			LineStyle = LineStyle.Single,
 		};
 
 		internal List<Button> buttons = new List<Button> ();

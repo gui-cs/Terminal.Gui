@@ -1019,16 +1019,16 @@ namespace Terminal.Gui {
 			// fbottom is location of bottom frame line
 			int fbottom = ftop + fheight + 1;
 
-			var borderStyle = borderContent == null ? BorderStyle.Single : borderContent.BorderStyle;
+			var borderStyle = borderContent == null ? LineStyle.Single : borderContent.LineStyle;
 
 			Rune hLine = default, vLine = default,
 				uRCorner = default, uLCorner = default, lLCorner = default, lRCorner = default;
 
 			if (border) {
 				switch (borderStyle) {
-				case BorderStyle.None:
+				case LineStyle.None:
 					break;
-				case BorderStyle.Single:
+				case LineStyle.Single:
 					hLine = HLine;
 					vLine = VLine;
 					uRCorner = URCorner;
@@ -1036,7 +1036,7 @@ namespace Terminal.Gui {
 					lLCorner = LLCorner;
 					lRCorner = LRCorner;
 					break;
-				case BorderStyle.Double:
+				case LineStyle.Double:
 					hLine = HDLine;
 					vLine = VDLine;
 					uRCorner = URDCorner;
@@ -1044,7 +1044,7 @@ namespace Terminal.Gui {
 					lLCorner = LLDCorner;
 					lRCorner = LRDCorner;
 					break;
-				case BorderStyle.Rounded:
+				case LineStyle.Rounded:
 					hLine = HRLine;
 					vLine = VRLine;
 					uRCorner = URRCorner;

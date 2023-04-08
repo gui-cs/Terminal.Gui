@@ -162,14 +162,14 @@ namespace UICatalog.Scenarios {
 
 		private void WithoutDrawMargin ()
 		{
-			_win.Border.BorderStyle = BorderStyle.None;
+			_win.Border.LineStyle = LineStyle.None;
 			_win.Border.DrawMarginFrame = false;
 		}
 
 		private void WithDrawMargin ()
 		{
 			_win.Border.DrawMarginFrame = true;
-			_win.Border.BorderStyle = BorderStyle.Single;
+			_win.Border.LineStyle = LineStyle.Single;
 		}
 
 		private void WithoutMargin ()

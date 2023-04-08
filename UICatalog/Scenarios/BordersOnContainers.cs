@@ -7,7 +7,7 @@ namespace UICatalog.Scenarios {
 	public class BordersOnContainers : Window {
 		public BordersOnContainers (NStack.ustring title, string typeName, View smartView)
 		{
-			var borderStyle = BorderStyle.Double;
+			var borderStyle = LineStyle.Double;
 			var drawMarginFrame = false;
 			var borderThickness = new Thickness (1, 2, 3, 4);
 			var borderBrush = Colors.Base.HotFocus.Foreground;
@@ -20,7 +20,7 @@ namespace UICatalog.Scenarios {
 			smartView.Width = 40;
 			smartView.Height = 20;
 			smartView.Border = new Border () {
-				BorderStyle = borderStyle,
+				LineStyle = borderStyle,
 				DrawMarginFrame = drawMarginFrame,
 				BorderThickness = borderThickness,
 				ForgroundColor = borderBrush,
@@ -247,13 +247,13 @@ namespace UICatalog.Scenarios {
 
 			Add (new Label ("BorderStyle:"));
 
-			var borderStyleEnum = Enum.GetValues (typeof (BorderStyle)).Cast<BorderStyle> ().ToList ();
+			var borderStyleEnum = Enum.GetValues (typeof (LineStyle)).Cast<LineStyle> ().ToList ();
 			var rbBorderStyle = new RadioGroup (borderStyleEnum.Select (
 				e => NStack.ustring.Make (e.ToString ())).ToArray ()) {
 
 				X = 2,
 				Y = 1,
-				SelectedItem = (int)smartView.Border.BorderStyle
+				SelectedItem = (int)smartView.Border.LineStyle
 			};
 			Add (rbBorderStyle);
 
@@ -273,7 +273,7 @@ namespace UICatalog.Scenarios {
 			Add (cbDrawMarginFrame);
 
 			rbBorderStyle.SelectedItemChanged += (s, e) => {
-				smartView.Border.BorderStyle = (BorderStyle)e.SelectedItem;
+				smartView.Border.LineStyle = (LineStyle)e.SelectedItem;
 				smartView.SetNeedsDisplay ();
 				if (cbDrawMarginFrame.Checked != smartView.Border.DrawMarginFrame) {
 					cbDrawMarginFrame.Checked = smartView.Border.DrawMarginFrame;
@@ -357,7 +357,14 @@ namespace UICatalog.Scenarios {
 				SelectedItem = (int)smartView.Border.BackgroundColor
 			};
 			rbBackground.SelectedItemChanged += (s, e) => {
-				smartView.Border.BackgroundColor = (Color)e.SelectedItem;
+//				smartView.Border.BackgroundColor = (Color)e.SelectedItem;
+				smartView.BorderFrame.ColorScheme = new ColorScheme() { 
+					Normal = new Terminal.Gui.Attribute(Color.Red, Color.White),
+					HotNormal = new Terminal.Gui.Attribute (Color.Magenta, Color.White),
+					Disabled = new Terminal.Gui.Attribute (Color.Gray, Color.White),
+					Focus = new Terminal.Gui.Attribute (Color.Blue, Color.White),
+					HotFocus = new Terminal.Gui.Attribute (Color.BrightBlue, Color.White),	
+				};
 			};
 			Add (rbBackground);
 
