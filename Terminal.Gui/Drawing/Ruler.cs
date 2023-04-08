@@ -21,17 +21,17 @@ namespace Terminal.Gui {
 		public Orientation Orientation { get; set; }
 
 		/// <summary>
-		/// Gets or sets the lenght of the ruler. The default is 0.
+		/// Gets or sets the length of the ruler. The default is 0.
 		/// </summary>
 		public int Length { get; set; }
 
 		/// <summary>
-		/// Gets or sets the foreground and backgrond color to use.
+		/// Gets or sets the foreground and background color to use.
 		/// </summary>
 		public Attribute Attribute { get; set; }
 
-		string _hTemplate { get; set; } = "|123456789";
-		string _vTemplate { get; set; } = "-123456789";
+		string _hTemplate { get; } = "|123456789";
+		string _vTemplate { get; } = "-123456789";
 
 
 		/// <summary>
