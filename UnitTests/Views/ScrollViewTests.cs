@@ -617,13 +617,13 @@ namespace Terminal.Gui.ViewsTests {
 				ShowVerticalScrollIndicator = true
 			};
 			scrollView.Add (view);
-			var win = new Window (new Rect (1, 1, 20, 14), "Test");
+			var win = new Window (new Rect (1, 1, 20, 14), "");
 			win.Add (scrollView);
 			Application.Top.Add (win);
 			Application.Begin (Application.Top);
 
 			var expected = @"
- ┌┤Test├────────────┐
+ ┌──────────────────┐
  │                  │
  │ 01234567890123▲  │
  │ 1[ Press me! ]┬  │
@@ -647,7 +647,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Redraw (Application.Top.Bounds);
 
 			expected = @"
- ┌┤Test├────────────┐
+ ┌──────────────────┐
  │                  │
  │ 12345678901234▲  │
  │ [ Press me! ] ┬  │
@@ -671,7 +671,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Redraw (Application.Top.Bounds);
 
 			expected = @"
- ┌┤Test├────────────┐
+ ┌──────────────────┐
  │                  │
  │ 23456789012345▲  │
  │  Press me! ]  ┬  │
@@ -695,7 +695,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Redraw (Application.Top.Bounds);
 
 			expected = @"
- ┌┤Test├────────────┐
+ ┌──────────────────┐
  │                  │
  │ 34567890123456▲  │
  │ Press me! ]   ┬  │
@@ -719,7 +719,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Redraw (Application.Top.Bounds);
 
 			expected = @"
- ┌┤Test├────────────┐
+ ┌──────────────────┐
  │                  │
  │ 45678901234567▲  │
  │ ress me! ]    ┬  │
@@ -743,7 +743,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Redraw (Application.Top.Bounds);
 
 			expected = @"
- ┌┤Test├────────────┐
+ ┌──────────────────┐
  │                  │
  │ 56789012345678▲  │
  │ ess me! ]     ┬  │
@@ -767,7 +767,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Redraw (Application.Top.Bounds);
 
 			expected = @"
- ┌┤Test├────────────┐
+ ┌──────────────────┐
  │                  │
  │ 67890123456789▲  │
  │ ss me! ]      ┬  │
@@ -791,7 +791,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Redraw (Application.Top.Bounds);
 
 			expected = @"
- ┌┤Test├────────────┐
+ ┌──────────────────┐
  │                  │
  │ 78901234567890▲  │
  │ s me! ]       ┬  │
@@ -814,7 +814,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Redraw (Application.Top.Bounds);
 
 			expected = @"
- ┌┤Test├────────────┐
+ ┌──────────────────┐
  │                  │
  │ 67890123456789▲  │
  │               ┬  │
@@ -838,7 +838,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Redraw (Application.Top.Bounds);
 
 			expected = @"
- ┌┤Test├────────────┐
+ ┌──────────────────┐
  │                  │
  │ 1[ Press me! ]▲  │
  │ 2             ┬  │
@@ -861,7 +861,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Redraw (Application.Top.Bounds);
 
 			expected = @"
- ┌┤Test├────────────┐
+ ┌──────────────────┐
  │                  │
  │ 2             ▲  │
  │ 3             ┬  │
@@ -884,7 +884,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Redraw (Application.Top.Bounds);
 
 			expected = @"
- ┌┤Test├────────────┐
+ ┌──────────────────┐
  │                  │
  │ 3             ▲  │
  │ 4             ┬  │
@@ -907,7 +907,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Redraw (Application.Top.Bounds);
 
 			expected = @"
- ┌┤Test├────────────┐
+ ┌──────────────────┐
  │                  │
  │ 1             ▲  │
  │ 2             ░  │
