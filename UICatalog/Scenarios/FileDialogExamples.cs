@@ -35,10 +35,10 @@ namespace UICatalog.Scenarios {
 			Win.Add (cbMustExist);
 
 
-			cbUnicode = new CheckBox ("UseUnicode") { Checked = false, Y = y++, X = x };
+			cbUnicode = new CheckBox ("UseUnicode") { Checked = FileDialogStyle.DefaultUseUnicodeCharacters, Y = y++, X = x };
 			Win.Add (cbUnicode);
 
-			cbUseColors = new CheckBox ("Use Colors") { Checked = false, Y = y++, X = x };
+			cbUseColors = new CheckBox ("Use Colors") { Checked = FileDialogStyle.DefaultUseColors, Y = y++, X = x };
 			Win.Add (cbUseColors);
 
 			cbCaseSensitive = new CheckBox ("Case Sensitive Search") { Checked = false, Y = y++, X = x };

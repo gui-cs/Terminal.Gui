@@ -7,6 +7,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using Terminal.Gui.Resources;
 using static System.Environment;
+using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui.FileServices {
 
@@ -14,6 +15,21 @@ namespace Terminal.Gui.FileServices {
 	/// Stores style settings for <see cref="FileDialog"/>.
 	/// </summary>
 	public class FileDialogStyle {
+
+		/// <summary>
+		/// Gets or sets the default value to use for <see cref="UseColors"/>.
+		/// This can be populated from .tui config files via <see cref="ConfigurationManager"/>
+		/// </summary>
+		[SerializableConfigurationProperty(Scope = typeof (SettingsScope))]
+		public static bool DefaultUseColors { get; set; }
+
+
+		/// <summary>
+		/// Gets or sets the default value to use for <see cref="UseUnicodeCharacters"/>.
+		/// This can be populated from .tui config files via <see cref="ConfigurationManager"/>
+		/// </summary>
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+		public static bool DefaultUseUnicodeCharacters { get; set; }
 
 		/// <summary>
 		/// Gets or Sets a value indicating whether different colors
@@ -140,7 +156,7 @@ namespace Terminal.Gui.FileServices {
 		/// Gets or sets whether to use advanced unicode characters which might not be installed
 		/// on all users computers.
 		/// </summary>
-		public bool UseUnicodeCharacters { get; set; } = false;
+		public bool UseUnicodeCharacters { get; set; } = DefaultUseUnicodeCharacters;
 
 
 		/// <summary>
