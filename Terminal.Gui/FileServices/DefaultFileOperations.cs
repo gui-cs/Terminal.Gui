@@ -15,7 +15,9 @@ namespace Terminal.Gui.FileServices {
 		public bool Delete (IEnumerable<IFileSystemInfo> toDelete)
 		{
 			// Default implementation does not allow deleting multiple files
-			if (toDelete.Count () != 1) 				return false;
+			if (toDelete.Count () != 1) {
+				return false;
+			}
 			var d = toDelete.Single ();
 			var adjective = d.Name;
 
@@ -26,12 +28,9 @@ namespace Terminal.Gui.FileServices {
 
 			try {
 				if (result == 0) {
-					if (d is IFileInfo)
-					{
+					if (d is IFileInfo) {
 						d.Delete ();
-					} 			
-					else 
-					{
+					} else {
 						((IDirectoryInfo)d).Delete (true);
 					}
 
@@ -90,11 +89,14 @@ namespace Terminal.Gui.FileServices {
 		/// <inheritdoc/>
 		public IFileSystemInfo Rename (IFileSystem fileSystem, IFileSystemInfo toRename)
 		{
-			// Dont allow renaming C: or D: or / (on linux) etc
-			if (toRename is IDirectoryInfo dir && dir.Parent == null) 				return null;
+			// Don't allow renaming C: or D: or / (on linux) etc
+			if (toRename is IDirectoryInfo dir && dir.Parent == null) {
+				return null;
+			}
 
-			if (Prompt (Strings.fdRenameTitle, toRename.Name, out var newName)) 				if (!string.IsNullOrWhiteSpace (newName)) 					try {
-
+			if (Prompt (Strings.fdRenameTitle, toRename.Name, out var newName)) {
+				if (!string.IsNullOrWhiteSpace (newName)) {
+					try {
 						if (toRename is IFileInfo f) {
 
 							var newLocation = fileSystem.FileInfo.New (Path.Combine (f.Directory.FullName, newName));
@@ -111,19 +113,26 @@ namespace Terminal.Gui.FileServices {
 					} catch (Exception ex) {
 						MessageBox.ErrorQuery (Strings.fdRenameFailedTitle, ex.Message, "Ok");
 					}
+				}
+			}
+
 			return null;
 		}
 
 		/// <inheritdoc/>
 		public IFileSystemInfo New (IFileSystem fileSystem, IDirectoryInfo inDirectory)
 		{
-			if (Prompt (Strings.fdNewTitle, "", out var named)) 				if (!string.IsNullOrWhiteSpace (named)) 					try {
+			if (Prompt (Strings.fdNewTitle, "", out var named)) {
+				if (!string.IsNullOrWhiteSpace (named)) {
+					try {
 						var newDir = fileSystem.DirectoryInfo.New (Path.Combine (inDirectory.FullName, named));
 						newDir.Create ();
 						return newDir;
 					} catch (Exception ex) {
 						MessageBox.ErrorQuery (Strings.fdNewFailed, ex.Message, "Ok");
 					}
+				}
+			}
 			return null;
 		}
 	}
