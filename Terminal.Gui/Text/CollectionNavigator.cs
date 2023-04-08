@@ -212,7 +212,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Returns true if <paramref name="kb"/> is a searchable key
-		/// (e.g. letters, numbers etc) that is valid to pass to this
+		/// (e.g. letters, numbers, etc) that are valid to pass to this
 		/// class for search filtering.
 		/// </summary>
 		/// <param name="kb"></param>

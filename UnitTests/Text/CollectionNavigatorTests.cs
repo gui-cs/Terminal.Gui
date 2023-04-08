@@ -378,7 +378,7 @@ namespace Terminal.Gui.TextTests {
 		}
 
 		[Fact]
-		public void IsCompatibleKey_Does_Not_Allows_Alt_And_Ctrl_Keys ()
+		public void IsCompatibleKey_Does_Not_Allow_Alt_And_Ctrl_Keys ()
 		{
 			// test all Keys
 			foreach (Key key in Enum.GetValues (typeof (Key))) {
