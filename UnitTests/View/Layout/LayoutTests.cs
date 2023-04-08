@@ -1810,7 +1810,7 @@ Y
 		}
 
 		[Fact, AutoInitShutdown]
-		public void PosConbine_DimCombine_View_With_SubViews ()
+		public void PosCombine_DimCombine_View_With_SubViews ()
 		{
 			var clicked = false;
 			var top = Application.Top;

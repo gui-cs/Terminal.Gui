@@ -1309,7 +1309,7 @@ namespace Terminal.Gui.ViewTests {
 		}
 
 		[Fact]
-		public void Dim_Referencing_SuperView_Does_Not_Throws ()
+		public void Dim_Referencing_SuperView_Does_Not_Throw ()
 		{
 			var super = new View ("super") {
 				Width = 10,
