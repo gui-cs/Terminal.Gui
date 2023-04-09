@@ -25,8 +25,8 @@
     </TypeIdentifier>
     <ShowAsAssociation>
       <Field Name="history" />
-      <Property Name="OpenMode" />
       <Property Name="Style" />
+      <Property Name="OpenMode" />
     </ShowAsAssociation>
     <ShowAsCollectionAssociation>
       <Property Name="AllowedTypes" />
@@ -62,7 +62,7 @@
       <HashCode>AAACAAAAAAgAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>FileServices\DefaultSearchMatcher.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="Terminal.Gui.FileDialogHistory">
     <Position X="9.25" Y="0.5" Width="1.5" />
@@ -104,10 +104,13 @@
       <HashCode>EAAAAAAAAAAAAAAAQAAAAAAAAAAAQAAAAAAAAAQACAA=</HashCode>
       <FileName>FileServices\FileDialogTreeBuilder.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
+    <Lollipop Position="0.2" />
   </Class>
-  <Class Name="Terminal.Gui.FilesSelectedEventArgs" Collapsed="true">
-    <Position X="6.75" Y="0.5" Width="2" />
+  <Class Name="Terminal.Gui.FilesSelectedEventArgs">
+    <Position X="6.5" Y="0.5" Width="2" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
       <HashCode>AAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAA=</HashCode>
       <FileName>FileServices\FilesSelectedEventArgs.cs</FileName>
@@ -142,7 +145,7 @@
     </TypeIdentifier>
   </Interface>
   <Enum Name="Terminal.Gui.OpenMode">
-    <Position X="7.5" Y="2" Width="1.5" />
+    <Position X="7.5" Y="2.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAABAAAAAAACAAAAAAAAAAAAAEAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Views\OpenDialog.cs</FileName>

@@ -156,6 +156,7 @@ namespace Terminal.Gui.FileServicesTests {
 			};
 			fd.Path = @"/demo/";
 			Begin (fd);
+			fd.Title = string.Empty;
 
 			fd.Redraw (fd.Bounds);
 
@@ -163,7 +164,7 @@ namespace Terminal.Gui.FileServicesTests {
 
 			string expected =
 			@"
- ┌┤OPEN├────────────────────────────────────────────────────────────┐
+ ┌──────────────────────────────────────────────────────────────────┐
  │/demo/                                                            │
  │[▲]                                                               │
  │┌────────────┬──────────┬──────────────────────────────┬─────────┐│
@@ -210,6 +211,7 @@ namespace Terminal.Gui.FileServicesTests {
 			};
 			fd.Path = @"c:\demo\";
 			Begin (fd);
+			fd.Title = string.Empty;
 
 			fd.Redraw (fd.Bounds);
 
@@ -217,7 +219,7 @@ namespace Terminal.Gui.FileServicesTests {
 
 			string expected =
 			@"
-┌┤OPEN├────────────────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────────────────────┐
 │c:\demo\                                                          │
 │[▲]                                                               │
 │┌────────────┬──────────┬──────────────────────────────┬─────────┐│
