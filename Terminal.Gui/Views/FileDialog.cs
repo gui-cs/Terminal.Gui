@@ -723,7 +723,7 @@ namespace Terminal.Gui {
 					this.Title = $"{Strings.fdOpen} {(MustExist ? Strings.fdExisting + " " : "")}{Strings.fdDirectory}";
 					break;
 				case OpenMode.Mixed:
-					this.Title = $"{Strings.fdOpen} {(MustExist ? Strings.fdExisting + " " : "")}";
+					this.Title = $"{Strings.fdOpen} {(MustExist ? Strings.fdExisting : "")}";
 					break;
 				}
 			}
