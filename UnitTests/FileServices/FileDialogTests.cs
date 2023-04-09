@@ -129,41 +129,41 @@ namespace Terminal.Gui.FileServicesTests {
 		}
 
 		[Theory, AutoInitShutdown]
-		[InlineData(true)]
-		[InlineData(false)]
-		public void PickDirectory_DirectTyping_Linux (bool openModeMixed)
+		[InlineData(true,true)]
+		[InlineData(true,false)]
+		[InlineData(false,true)]
+		[InlineData(false,false)]
+		public void PickDirectory_DirectTyping (bool openModeMixed, bool multiple)
 		{
-			if(IsWindows())
-			{
-				return;
-			}
-
-			var dlg = GetLinuxTestDialog();
-			dlg.Path = "/demo/";
+			var dlg = GetDialog();
 			dlg.OpenMode = openModeMixed ? OpenMode.Mixed : OpenMode.Directory;
+			dlg.AllowsMultipleSelection = multiple;
+
+			// whe first opening the text field will have select all on
+			// so to add to current path user must press End or right
+			Send ('>', ConsoleKey.RightArrow, false);
 
 			Send("subfolder");
-			Assert.True(dlg.Canceled);
-			Send ('\n', ConsoleKey.Enter, false);
-			Assert.False(dlg.Canceled);
 
 			// Dialog has not yet been confirmed with a choice
-			Assert.Equal ("/demo/subfolder",dlg.Path);
+			Assert.True(dlg.Canceled);
+
+			// Now it has
+			Send ('\n', ConsoleKey.Enter, false);
+			Assert.False(dlg.Canceled);
+			AssertIsTheSubfolder(dlg.Path);
 		}
 
 		[Theory, AutoInitShutdown]
-		[InlineData(true)]
-		[InlineData(false)]
-		public void PickDirectory_ArrowNavigation_Linux (bool openModeMixed)
+		[InlineData(true,true)]
+		[InlineData(true,false)]
+		[InlineData(false,true)]
+		[InlineData(false,false)]
+		public void PickDirectory_ArrowNavigation (bool openModeMixed, bool multiple)
 		{
-			if(IsWindows())
-			{
-				return;
-			}
-			
-			var dlg = GetLinuxTestDialog();
-			dlg.Path = "/demo/";
+			var dlg = GetDialog();
 			dlg.OpenMode = openModeMixed ? OpenMode.Mixed : OpenMode.Directory;
+			dlg.AllowsMultipleSelection = multiple;
 
 			Assert.IsType<TextField>(dlg.MostFocused);
 			Send ('v', ConsoleKey.DownArrow, false);
@@ -178,37 +178,20 @@ namespace Terminal.Gui.FileServicesTests {
 			Send ('o', ConsoleKey.O, false,true);
 			Assert.False(dlg.Canceled);
 
-			// Dialog has not yet been confirmed with a choice
-			Assert.Equal ("/demo/subfolder",dlg.Path);
+			AssertIsTheSubfolder(dlg.Path);
 		}
 
-		private bool IsWindows()
+		private void AssertIsTheSubfolder (string path)
 		{
-			return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform (System.Runtime.InteropServices.OSPlatform.Windows);
-		}
-
-		private FileDialog GetLinuxTestDialog()
-		{
-			// Arrange
-			var fileSystem = new MockFileSystem (new Dictionary<string, MockFileData> (), "/");
-			fileSystem.MockTime (() => new DateTime (2010, 01, 01, 11, 12, 43));
-
-			fileSystem.AddFile (@"/myfile.txt", new MockFileData ("Testing is meh.") { LastWriteTime = new DateTime (2001, 01, 01, 11, 12, 11) });
-			fileSystem.AddFile (@"/demo/jQuery.js", new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) });
-			fileSystem.AddFile (@"/demo/image.gif", new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 }) { LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10) });
-
-			var m = (MockDirectoryInfo)fileSystem.DirectoryInfo.New (@"/demo/subfolder");
-			m.Create ();
-			m.LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10);
-
-			fileSystem.AddFile (@"/demo/subfolder/image2.gif", new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 }) { LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10) });
-
-			var fd = new FileDialog (fileSystem) {
-				Height = 15
-			};
-			fd.Path = @"/demo/";
-			Begin (fd);
-			return fd;
+			if(IsWindows())
+			{
+				Assert.Equal (@"c:\demo\subfolder",path);
+			}
+			else
+			{
+				// Dialog has not yet been confirmed with a choice
+				Assert.Equal ("/demo/subfolder",path);
+			}
 		}
 
 		[Fact, AutoInitShutdown]
@@ -217,7 +200,7 @@ namespace Terminal.Gui.FileServicesTests {
 			if (IsWindows()) {
 				return;
 			}
-			var fd = GetLinuxTestDialog();
+			var fd = GetLinuxDialog();
 			fd.Title = string.Empty;
 
 			fd.Redraw (fd.Bounds);
@@ -249,30 +232,11 @@ namespace Terminal.Gui.FileServicesTests {
 		[Fact, AutoInitShutdown]
 		public void TestDirectoryContents_Windows ()
 		{
-			if (!System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform (System.Runtime.InteropServices.OSPlatform.Windows)) {
-				// Can only run this test on windows :( 
-				// See: https://github.com/TestableIO/System.IO.Abstractions/issues/800
+			if (!IsWindows()) {
 				return;
 			}
-			// Arrange
-			var fileSystem = new MockFileSystem (new Dictionary<string, MockFileData> (), @"c:\");
-			fileSystem.MockTime (() => new DateTime (2010, 01, 01, 11, 12, 43));
 
-			fileSystem.AddFile (@"c:\myfile.txt", new MockFileData ("Testing is meh.") { LastWriteTime = new DateTime (2001, 01, 01, 11, 12, 11) });
-			fileSystem.AddFile (@"c:\demo\jQuery.js", new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) });
-			fileSystem.AddFile (@"c:\demo\image.gif", new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 }) { LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10) });
-
-			var m = (MockDirectoryInfo)fileSystem.DirectoryInfo.New (@"c:\demo\subfolder");
-			m.Create ();
-			m.LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10);
-
-			fileSystem.AddFile (@"c:\demo\subfolder\image2.gif", new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 }) { LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10) });
-
-			var fd = new FileDialog (fileSystem) {
-				Height = 15
-			};
-			fd.Path = @"c:\demo\";
-			Begin (fd);
+			var fd = GetWindowsDialog();
 			fd.Title = string.Empty;
 
 			fd.Redraw (fd.Bounds);
@@ -328,7 +292,6 @@ namespace Terminal.Gui.FileServicesTests {
 			foreach (var ch in chars) {
 				Application.Driver.SendKeys (ch, ConsoleKey.NoName, false, false, false);
 			}
-
 		}
 		/*
 				[Fact, AutoInitShutdown]
@@ -361,7 +324,63 @@ namespace Terminal.Gui.FileServicesTests {
 					Assert.Equal (@"/bob/fish", tb.Text);
 				}*/
 
+		private bool IsWindows()
+		{
+			return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform (System.Runtime.InteropServices.OSPlatform.Windows);
+		}
 
+		private FileDialog GetDialog()
+		{
+			return IsWindows() ? GetWindowsDialog() : GetLinuxDialog();			
+		}
+
+		private FileDialog GetWindowsDialog()
+		{
+			// Arrange
+			var fileSystem = new MockFileSystem (new Dictionary<string, MockFileData> (), @"c:\");
+			fileSystem.MockTime (() => new DateTime (2010, 01, 01, 11, 12, 43));
+
+			fileSystem.AddFile (@"c:\myfile.txt", new MockFileData ("Testing is meh.") { LastWriteTime = new DateTime (2001, 01, 01, 11, 12, 11) });
+			fileSystem.AddFile (@"c:\demo\jQuery.js", new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) });
+			fileSystem.AddFile (@"c:\demo\image.gif", new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 }) { LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10) });
+
+			var m = (MockDirectoryInfo)fileSystem.DirectoryInfo.New (@"c:\demo\subfolder");
+			m.Create ();
+			m.LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10);
+
+			fileSystem.AddFile (@"c:\demo\subfolder\image2.gif", new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 }) { LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10) });
+
+			var fd = new FileDialog (fileSystem) {
+				Height = 15
+			};
+			fd.Path = @"c:\demo\";
+			Begin (fd);
+			return fd;
+		}
+
+		private FileDialog GetLinuxDialog()
+		{
+			// Arrange
+			var fileSystem = new MockFileSystem (new Dictionary<string, MockFileData> (), "/");
+			fileSystem.MockTime (() => new DateTime (2010, 01, 01, 11, 12, 43));
+
+			fileSystem.AddFile (@"/myfile.txt", new MockFileData ("Testing is meh.") { LastWriteTime = new DateTime (2001, 01, 01, 11, 12, 11) });
+			fileSystem.AddFile (@"/demo/jQuery.js", new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) });
+			fileSystem.AddFile (@"/demo/image.gif", new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 }) { LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10) });
+
+			var m = (MockDirectoryInfo)fileSystem.DirectoryInfo.New (@"/demo/subfolder");
+			m.Create ();
+			m.LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10);
+
+			fileSystem.AddFile (@"/demo/subfolder/image2.gif", new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 }) { LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10) });
+
+			var fd = new FileDialog (fileSystem) {
+				Height = 15
+			};
+			fd.Path = @"/demo/";
+			Begin (fd);
+			return fd;
+		}
 		private FileDialog GetInitializedFileDialog ()
 		{
 			var dlg = new FileDialog ();
