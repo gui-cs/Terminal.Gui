@@ -40,6 +40,12 @@ namespace Terminal.Gui {
 			}
 
 			var term = path.Substring (last + 1);
+			
+			// If path is /tmp/ then don't just list everything in it
+			if(string.IsNullOrWhiteSpace(term))
+			{
+				return Enumerable.Empty<Suggestion> ();
+			}
 
 			if (term.Equals (state?.Directory?.Name)) {
 				// Clear suggestions
