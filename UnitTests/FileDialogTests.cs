@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
-using System.Reflection;
-using Terminal.Gui.FileServices;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.Core {
+namespace Terminal.Gui {
 	public class FileDialogTests {
 
 		readonly ITestOutputHelper output;
