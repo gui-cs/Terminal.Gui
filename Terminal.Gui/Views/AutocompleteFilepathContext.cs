@@ -5,7 +5,6 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.InteropServices;
-using Terminal.Gui.FileServices;
 
 namespace Terminal.Gui {
 	internal class AutocompleteFilepathContext : AutocompleteContext {

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 
-namespace Terminal.Gui.FileServices {
+namespace Terminal.Gui {
 	/// <summary>
 	/// Interface for defining how to handle file/directory 
 	/// deletion, rename and newing attempts in <see cref="FileDialog"/>.

@@ -732,7 +732,7 @@ namespace Terminal.Gui {
 			}
 
 			// TODO: v2 - This is a hack to get the StatusBar to be positioned correctly.
-			if (sb != null && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0)
+			if (sb != null && !top.Subviews.Contains (sb) && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0)
 				&& top.Height is Dim.DimFill && -top.Height.Anchor (0) < 1) {
 
 				top.Height = Dim.Fill (sb.Visible ? 1 : 0);

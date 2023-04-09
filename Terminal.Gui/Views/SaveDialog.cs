@@ -12,7 +12,6 @@
 using System;
 using System.Collections.Generic;
 using NStack;
-using Terminal.Gui.FileServices;
 using Terminal.Gui.Resources;
 
 namespace Terminal.Gui {
