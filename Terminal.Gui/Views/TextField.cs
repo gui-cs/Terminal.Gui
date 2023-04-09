@@ -516,6 +516,7 @@ namespace Terminal.Gui {
 
 			Driver.AddStr (render);
 		}
+    
 		private void GenerateSuggestions ()
 		{
 			var currentLine = Text.ToRuneList ();
@@ -786,7 +787,10 @@ namespace Terminal.Gui {
 			Adjust ();
 		}
 
-		void MoveEnd ()
+		/// <summary>
+		/// Moves cursor to the end of the typed text.
+		/// </summary>
+		public void MoveEnd ()
 		{
 			ClearAllSelection ();
 			point = text.Count;
@@ -1354,6 +1358,26 @@ namespace Terminal.Gui {
 		public void ClearHistoryChanges ()
 		{
 			historyText.Clear (Text);
+		}
+
+		/// <summary>
+		/// Returns <see langword="true"/> if the current cursor position is
+		/// at the end of the <see cref="Text"/>. This includes when it is empty.
+		/// </summary>
+		/// <returns></returns>
+		internal bool CursorIsAtEnd ()
+		{
+			return CursorPosition == Text.Length;
+		}
+
+		/// <summary>
+		/// Returns <see langword="true"/> if the current cursor position is
+		/// at the start of the <see cref="TextField"/>.
+		/// </summary>
+		/// <returns></returns>
+		internal bool CursorIsAtStart()
+		{
+			return CursorPosition <= 0;
 		}
 	}
 	/// <summary>
