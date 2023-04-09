@@ -306,6 +306,10 @@ namespace Terminal.Gui {
 		{
 			Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
 
+			if (SelectedObject == null && Objects.Any ()) {
+				SelectedObject = Objects.First ();
+			}
+
 			return base.OnEnter (view);
 		}
 
@@ -545,7 +549,7 @@ namespace Terminal.Gui {
 			}
 
 			cachedLineMap = new ReadOnlyCollection<Branch<T>> (toReturn);
-			
+
 			// Update the collection used for search-typing
 			KeystrokeNavigator.Collection = cachedLineMap.Select (b => AspectGetter (b.Model)).ToArray ();
 			return cachedLineMap;
@@ -712,7 +716,7 @@ namespace Terminal.Gui {
 		/// <param name="e"></param>
 		protected virtual void OnObjectActivated (ObjectActivatedEventArgs<T> e)
 		{
-			ObjectActivated?.Invoke (this,e);
+			ObjectActivated?.Invoke (this, e);
 		}
 
 		/// <summary>

@@ -138,7 +138,7 @@ namespace Terminal.Gui {
 				newText += insert.Replacement;
 				textField.Text = newText;
 
-				this.MoveCursorToEnd ();
+				this.textField.MoveEnd();
 
 				this.ClearSuggestions ();
 				return true;
@@ -147,11 +147,6 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		internal void MoveCursorToEnd ()
-		{
-			textField.ClearAllSelection ();
-			textField.CursorPosition = textField.Text.Length;
-		}
 
 		internal void SetTextTo (FileSystemInfo fileSystemInfo)
 		{
@@ -160,13 +155,9 @@ namespace Terminal.Gui {
 				newText += System.IO.Path.DirectorySeparatorChar;
 			}
 			textField.Text = newText;
-			this.MoveCursorToEnd ();
+			textField.MoveEnd ();
 		}
 
-		internal bool CursorIsAtEnd ()
-		{
-			return textField.CursorPosition == textField.Text.Length;
-		}
 
 		/// <summary>
 		/// Returns true if there is a suggestion that can be made and the control
@@ -176,7 +167,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private bool MakingSuggestion ()
 		{
-			return Suggestions.Any () && this.SelectedIdx != -1 && textField.HasFocus && this.CursorIsAtEnd ();
+			return Suggestions.Any () && this.SelectedIdx != -1 && textField.HasFocus && textField.CursorIsAtEnd ();
 		}
 
 		private bool CycleSuggestion (int direction)
