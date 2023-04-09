@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Terminal.Gui.FileServices {
+namespace Terminal.Gui {
 	/// <summary>
 	/// Event args for the <see cref="FileDialog.FilesSelected"/> event
 	/// </summary>

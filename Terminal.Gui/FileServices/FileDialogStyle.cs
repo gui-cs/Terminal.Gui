@@ -9,7 +9,7 @@ using Terminal.Gui.Resources;
 using static System.Environment;
 using static Terminal.Gui.ConfigurationManager;
 
-namespace Terminal.Gui.FileServices {
+namespace Terminal.Gui {
 
 	/// <summary>
 	/// Stores style settings for <see cref="FileDialog"/>.

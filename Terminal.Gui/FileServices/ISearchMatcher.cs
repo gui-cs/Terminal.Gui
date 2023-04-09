@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.IO.Abstractions;
 
-namespace Terminal.Gui.FileServices {
+namespace Terminal.Gui {
 
 	/// <summary>
 	/// Defines whether a given file/directory matches a set of

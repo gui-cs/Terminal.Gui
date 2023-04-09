@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Terminal.Gui.FileServices;
 
-namespace Terminal.Gui.FileServices {
+
+namespace Terminal.Gui {
 
 	class FileDialogTreeBuilder : ITreeBuilder<object> {
 		public bool SupportsCanExpand => true;

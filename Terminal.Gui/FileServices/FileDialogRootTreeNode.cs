@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace Terminal.Gui.FileServices {
+namespace Terminal.Gui {
 
 	/// <summary>
 	/// Delegate for providing an implementation that returns all <see cref="FileDialogRootTreeNode"/>

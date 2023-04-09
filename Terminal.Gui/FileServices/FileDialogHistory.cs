@@ -2,7 +2,7 @@
 using System.IO;
 using System.IO.Abstractions;
 
-namespace Terminal.Gui.FileServices {
+namespace Terminal.Gui {
 
 	internal class FileDialogHistory {
 		private Stack<FileDialogState> back = new Stack<FileDialogState> ();

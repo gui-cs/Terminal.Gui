@@ -4,7 +4,7 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 
-namespace Terminal.Gui.FileServices {
+namespace Terminal.Gui {
 
 	internal class FileDialogState {
 

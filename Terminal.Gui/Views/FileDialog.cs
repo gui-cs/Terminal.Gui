@@ -8,7 +8,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using NStack;
-using Terminal.Gui.FileServices;
 using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui {

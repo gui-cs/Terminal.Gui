@@ -5,7 +5,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using Terminal.Gui.Resources;
 
-namespace Terminal.Gui.FileServices {
+namespace Terminal.Gui {
 	/// <summary>
 	/// Default file operation handlers using modal dialogs.
 	/// </summary>

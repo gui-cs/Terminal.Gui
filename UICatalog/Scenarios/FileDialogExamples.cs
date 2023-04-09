@@ -5,7 +5,6 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Terminal.Gui;
-using Terminal.Gui.FileServices;
 using static Terminal.Gui.OpenDialog;
 
 namespace UICatalog.Scenarios {

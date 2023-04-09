@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
+using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
 

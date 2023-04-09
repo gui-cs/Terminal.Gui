@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using Terminal.Gui.Resources;
 
-namespace Terminal.Gui.FileServices {
+namespace Terminal.Gui {
 
 	/// <summary>
 	/// Interface for <see cref="FileDialog"/> restrictions on which file type(s) the
