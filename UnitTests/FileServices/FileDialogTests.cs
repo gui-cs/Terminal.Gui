@@ -128,15 +128,67 @@ namespace Terminal.Gui.FileServicesTests {
 			Assert.False (dlg.Canceled);
 		}
 
-		[Fact, AutoInitShutdown]
-		public void TestDirectoryContents_Linux ()
+		[Theory, AutoInitShutdown]
+		[InlineData(true)]
+		[InlineData(false)]
+		public void PickDirectory_DirectTyping_Linux (bool openModeMixed)
 		{
-			if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform (System.Runtime.InteropServices.OSPlatform.Windows)) {
-				// Cannot run test except on linux :( 
-				// See: https://github.com/TestableIO/System.IO.Abstractions/issues/800
+			if(IsWindows())
+			{
 				return;
 			}
 
+			var dlg = GetLinuxTestDialog();
+			dlg.Path = "/demo/";
+			dlg.OpenMode = openModeMixed ? OpenMode.Mixed : OpenMode.Directory;
+
+			Send("subfolder");
+			Assert.True(dlg.Canceled);
+			Send ('\n', ConsoleKey.Enter, false);
+			Assert.False(dlg.Canceled);
+
+			// Dialog has not yet been confirmed with a choice
+			Assert.Equal ("/demo/subfolder",dlg.Path);
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData(true)]
+		[InlineData(false)]
+		public void PickDirectory_ArrowNavigation_Linux (bool openModeMixed)
+		{
+			if(IsWindows())
+			{
+				return;
+			}
+			
+			var dlg = GetLinuxTestDialog();
+			dlg.Path = "/demo/";
+			dlg.OpenMode = openModeMixed ? OpenMode.Mixed : OpenMode.Directory;
+
+			Assert.IsType<TextField>(dlg.MostFocused);
+			Send ('v', ConsoleKey.DownArrow, false);
+			Assert.IsType<TableView>(dlg.MostFocused);
+
+			// Should be selecting ..
+			Send ('v', ConsoleKey.DownArrow, false);
+
+			// Down to the directory
+			Assert.True(dlg.Canceled);
+			// Alt+O to open (enter would just navigate into the child dir)
+			Send ('o', ConsoleKey.O, false,true);
+			Assert.False(dlg.Canceled);
+
+			// Dialog has not yet been confirmed with a choice
+			Assert.Equal ("/demo/subfolder",dlg.Path);
+		}
+
+		private bool IsWindows()
+		{
+			return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform (System.Runtime.InteropServices.OSPlatform.Windows);
+		}
+
+		private FileDialog GetLinuxTestDialog()
+		{
 			// Arrange
 			var fileSystem = new MockFileSystem (new Dictionary<string, MockFileData> (), "/");
 			fileSystem.MockTime (() => new DateTime (2010, 01, 01, 11, 12, 43));
@@ -156,6 +208,16 @@ namespace Terminal.Gui.FileServicesTests {
 			};
 			fd.Path = @"/demo/";
 			Begin (fd);
+			return fd;
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestDirectoryContents_Linux ()
+		{
+			if (IsWindows()) {
+				return;
+			}
+			var fd = GetLinuxTestDialog();
 			fd.Title = string.Empty;
 
 			fd.Redraw (fd.Bounds);
