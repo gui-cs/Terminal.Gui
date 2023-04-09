@@ -222,7 +222,8 @@ namespace UICatalog.Tests {
 				.Select (t => new KeyValuePair<string, Type> (t.Name, t))
 				.ToDictionary (t => t.Key, t => t.Value);
 
-			_leftPane = new Window ("Classes") {
+			_leftPane = new Window () {
+				Title = "Classes",
 				X = 0,
 				Y = 0,
 				Width = 15,

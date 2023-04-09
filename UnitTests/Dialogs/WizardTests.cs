@@ -22,7 +22,7 @@ namespace Terminal.Gui.DialogTests {
 
 		private void RunButtonTestWizard (string title, int width, int height)
 		{
-			var wizard = new Wizard (title) { Width = width, Height = height };
+			var wizard = new Wizard () { Title = title, Width = width, Height = height };
 			Application.End (Application.Begin (wizard));
 		}
 
@@ -126,7 +126,7 @@ namespace Terminal.Gui.DialogTests {
 			var buttonRow = $"{d.VDLine}{btnBack}{new string (' ', width - btnBack.Length - btnNext.Length - 2)}{btnNext}{d.VDLine}";
 			var bottomRow = $"{d.LLDCorner}{new string (d.HDLine.ToString () [0], width - 2)}{d.LRDCorner}";
 
-			var wizard = new Wizard (title) { Width = width, Height = height };
+			var wizard = new Wizard () { Title = title, Width = width, Height = height };
 			var runstate = Application.Begin (wizard);
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{topRow}\n{row2}\n{row3}\n{separatorRow}\n{buttonRow}\n{bottomRow}", output);
 			Application.End (runstate);
@@ -159,7 +159,7 @@ namespace Terminal.Gui.DialogTests {
 			var buttonRow = $"{d.VDLine}{btnBack}{new string (' ', width - btnBack.Length - btnNext.Length - 2)}{btnNext}{d.VDLine}";
 			var bottomRow = $"{d.LLDCorner}{new string (d.HDLine.ToString () [0], width - 2)}{d.LRDCorner}";
 
-			var wizard = new Wizard (title) { Width = width, Height = height };
+			var wizard = new Wizard () { Title = title, Width = width, Height = height };
 			wizard.AddStep (new Wizard.WizardStep (stepTitle));
 			//wizard.LayoutSubviews ();
 			var firstIteration = false;
@@ -229,7 +229,7 @@ namespace Terminal.Gui.DialogTests {
 			//var buttonRow = $"{d.VDLine}{new String (' ', width - btnNext.Length - 2)}{btnNext}{d.VDLine}";
 			var bottomRow = $"{d.LLDCorner}{new string (d.HDLine.ToString () [0], width - 2)}{d.LRDCorner}";
 
-			var wizard = new Wizard (title) { Width = width, Height = height };
+			var wizard = new Wizard () { Title = title, Width = width, Height = height };
 			wizard.AddStep (new Wizard.WizardStep ("ABCD"));
 
 			Application.End (Application.Begin (wizard));

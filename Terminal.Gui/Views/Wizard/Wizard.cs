@@ -274,26 +274,12 @@ namespace Terminal.Gui {
 		/// The Wizard will be vertically and horizontally centered in the container.
 		/// After initialization use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> change size and position.
 		/// </remarks>
-		public Wizard () : this (ustring.Empty)
-		{
-		}
+		public Wizard () : base () { 
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Wizard"/> class using <see cref="LayoutStyle.Computed"/> positioning.
-		/// </summary>
-		/// <param name="title">Sets the <see cref="Title"/> for the Wizard.</param>
-		/// <remarks>
-		/// The Wizard will be vertically and horizontally centered in the container.
-		/// After initialization use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> change size and position.
-		/// </remarks>
-		public Wizard (ustring title) : base (title)
-		{
-			wizardTitle = title;
 			// Using Justify causes the Back and Next buttons to be hard justified against
 			// the left and right edge
 			ButtonAlignment = ButtonAlignments.Justify;
-			this.Border.LineStyle = LineStyle.Double;
-			this.Border.PaddingThickness = new Thickness (0);
+			BorderStyle = LineStyle.Double;
 
 			//// Add a horiz separator
 			//var separator = new LineView (Graphs.Orientation.Horizontal) {

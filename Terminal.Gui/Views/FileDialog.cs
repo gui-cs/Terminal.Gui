@@ -591,33 +591,13 @@ namespace Terminal.Gui {
 		internal DirListView dirListView;
 		ComboBox cmbAllowedTypes;
 
-		/// <summary>
-		/// Initializes a new <see cref="FileDialog"/>.
-		/// </summary>
-		public FileDialog () : this (title: string.Empty, prompt: string.Empty,
-			nameFieldLabel: string.Empty, message: string.Empty)
-		{ }
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="FileDialog"/>
 		/// </summary>
-		/// <param name="title">The title.</param>
-		/// <param name="prompt">The prompt.</param>
-		/// <param name="nameFieldLabel">The name of the file field label..</param>
-		/// <param name="message">The message.</param>
-		/// <param name="allowedTypes">The allowed types.</param>
-		public FileDialog (ustring title, ustring prompt, ustring nameFieldLabel, ustring message, List<string> allowedTypes = null)
-			: this (title, prompt, ustring.Empty, nameFieldLabel, message, allowedTypes) { }
-
-		/// <summary>
-		/// Initializes a new instance of <see cref="FileDialog"/>
-		/// </summary>
-		/// <param name="title">The title.</param>
-		/// <param name="prompt">The prompt.</param>
-		/// <param name="message">The message.</param>
-		/// <param name="allowedTypes">The allowed types.</param>
-		public FileDialog (ustring title, ustring prompt, ustring message, List<string> allowedTypes)
-			: this (title, prompt, ustring.Empty, message, allowedTypes) { }
+		/// <remarks>
+		/// </remarks>
+		public FileDialog () : this (null, null, null, null, null, null) { }
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="FileDialog"/>
@@ -629,8 +609,9 @@ namespace Terminal.Gui {
 		/// <param name="message">The message.</param>
 		/// <param name="allowedTypes">The allowed types.</param>
 		public FileDialog (ustring title, ustring prompt, ustring nameDirLabel, ustring nameFieldLabel, ustring message,
-			List<string> allowedTypes = null) : base (title)//, Driver.Cols - 20, Driver.Rows - 5, null)
+			List<string> allowedTypes = null) : base ()
 		{
+			Title = title;
 			this.message = new Label (message) {
 				X = 1,
 				Y = 0,
@@ -638,7 +619,7 @@ namespace Terminal.Gui {
 			Add (this.message);
 			var msgLines = TextFormatter.MaxLines (message, Driver.Cols - 20);
 
-			this.nameDirLabel = new Label (nameDirLabel.IsEmpty ? $"{Strings.fdDirectory}: " : $"{nameDirLabel}: ") {
+			this.nameDirLabel = new Label (ustring.IsNullOrEmpty(nameDirLabel) ? $"{Strings.fdDirectory}: " : $"{nameDirLabel}: ") {
 				X = 1,
 				Y = 1 + msgLines,
 				AutoSize = true
@@ -655,7 +636,7 @@ namespace Terminal.Gui {
 			};
 			Add (this.nameDirLabel, dirEntry);
 
-			this.nameFieldLabel = new Label (nameFieldLabel.IsEmpty ? $"{Strings.fdFile}: " : $"{nameFieldLabel}: ") {
+			this.nameFieldLabel = new Label (ustring.IsNullOrEmpty (nameFieldLabel) ? $"{Strings.fdFile}: " : $"{nameFieldLabel}: ") {
 				X = 1,
 				Y = 3 + msgLines,
 				AutoSize = true
@@ -703,7 +684,7 @@ namespace Terminal.Gui {
 			};
 			AddButton (cancel);
 
-			this.prompt = new Button (prompt.IsEmpty ? "Ok" : prompt) {
+			this.prompt = new Button (ustring.IsNullOrEmpty (prompt) ? "Ok" : prompt) {
 				IsDefault = true,
 				Enabled = nameEntry.Text.IsEmpty ? false : true
 			};
@@ -906,7 +887,7 @@ namespace Terminal.Gui {
 		/// Initializes a new <see cref="SaveDialog"/>.
 		/// </summary>
 		public SaveDialog () : this (title: string.Empty, message: string.Empty) { }
-
+		
 		/// <summary>
 		/// Initializes a new <see cref="SaveDialog"/>.
 		/// </summary>
@@ -914,7 +895,7 @@ namespace Terminal.Gui {
 		/// <param name="message">The message.</param>
 		/// <param name="allowedTypes">The allowed types.</param>
 		public SaveDialog (ustring title, ustring message, List<string> allowedTypes = null)
-			: base (title, prompt: Strings.fdSave, nameFieldLabel: $"{Strings.fdSaveAs}:", message: message, allowedTypes) { }
+			: base (title: title, prompt: Strings.fdSave, nameDirLabel: string.Empty, nameFieldLabel: string.Empty, message: message, allowedTypes) { }
 
 		/// <summary>
 		/// Gets the name of the file the user selected for saving, or null
@@ -981,9 +962,11 @@ namespace Terminal.Gui {
 		/// <param name="message">The message.</param>
 		/// <param name="allowedTypes">The allowed types.</param>
 		/// <param name="openMode">The open mode.</param>
-		public OpenDialog (ustring title, ustring message, List<string> allowedTypes = null, OpenMode openMode = OpenMode.File) : base (title,
-			prompt: openMode == OpenMode.File ? Strings.fdOpen : openMode == OpenMode.Directory ? Strings.fdSelectFolder : Strings.fdSelectMixed,
-			nameFieldLabel: Strings.fdOpen, message: message, allowedTypes)
+		public OpenDialog (ustring title, ustring message, List<string> allowedTypes = null, OpenMode openMode = OpenMode.File) :
+			base (title: title,
+				prompt: openMode == OpenMode.File ? Strings.fdOpen : openMode == OpenMode.Directory ? Strings.fdSelectFolder : Strings.fdSelectMixed,
+				nameDirLabel: string.Empty,
+				nameFieldLabel: Strings.fdOpen, message: message, allowedTypes)
 		{
 			this.openMode = openMode;
 			switch (openMode) {

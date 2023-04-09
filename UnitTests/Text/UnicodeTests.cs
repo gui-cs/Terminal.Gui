@@ -57,21 +57,21 @@ namespace Terminal.Gui.TextTests {
 これは広いルーンラインです。
 これは広いルーンラインです。"
 			};
-			var win = new Window ("ワイドルーン") { Width = Dim.Fill (), Height = Dim.Fill () };
+			var win = new Window () { Width = Dim.Fill (), Height = Dim.Fill () };
 			win.Add (tv);
 			Application.Top.Add (win);
 			var lbl = new Label ("ワイドルーン。");
-			var dg = new Dialog ("テスト", 14, 4, new Button ("選ぶ"));
+			var dg = new Dialog (new Button ("選ぶ")) { Width = 14, Height = 4 };
 			dg.Add (lbl);
 			Application.Begin (Application.Top);
 			Application.Begin (dg);
 			((FakeDriver)Application.Driver).SetBufferSize (30, 10);
 
 			var expected = @"
-┌┤ワイドルーン├──────────────┐
+┌────────────────────────────┐
 │これは広いルーンラインです。│
 │これは広いルーンラインです。│
-│これは ┌┤テスト├────┐ です。│
+│これは ┌────────────┐ です。│
 │これは │ワイドルーン│ です。│
 │これは │  [ 選ぶ ]  │ です。│
 │これは └────────────┘ です。│

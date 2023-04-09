@@ -739,7 +739,7 @@ namespace Terminal.Gui {
 				layoutSubviews = true;
 			}
 
-			if (layoutSubviews) {
+			if (superView.LayoutNeeded || layoutSubviews) {
 				superView.LayoutSubviews ();
 			}
 		}

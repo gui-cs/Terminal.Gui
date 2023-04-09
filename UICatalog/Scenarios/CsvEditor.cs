@@ -387,10 +387,10 @@ namespace UICatalog.Scenarios {
 			}
 
 		}
-
+		
 		private void Open ()
 		{
-			var ofd = new FileDialog ("Select File", "Open", "File", "Select a CSV file to open (does not support newlines, escaping etc)") {
+			var ofd = new FileDialog (title: "Select File", prompt: "Open", nameDirLabel: "File", nameFieldLabel: string.Empty, message: "Select a CSV file to open (does not support newlines, escaping etc)") {
 				AllowedFileTypes = new string [] { ".csv" }
 			};
 
@@ -433,7 +433,7 @@ namespace UICatalog.Scenarios {
 
 				// Only set the current filename if we successfully loaded the entire file
 				currentFile = filename;
-				Win.Title = $"{this.GetName ()} - {Path.GetFileName(currentFile)}";
+				Win.Title = $"{this.GetName ()} - {Path.GetFileName (currentFile)}";
 
 			} catch (Exception ex) {
 				MessageBox.ErrorQuery ("Open Failed", $"Error on line {lineNumber}{Environment.NewLine}{ex.Message}", "Ok");
@@ -443,7 +443,7 @@ namespace UICatalog.Scenarios {
 		{
 			var _scrollBar = new ScrollBarView (tableView, true);
 
-			_scrollBar.ChangedPosition += (s,e) => {
+			_scrollBar.ChangedPosition += (s, e) => {
 				tableView.RowOffset = _scrollBar.Position;
 				if (tableView.RowOffset != _scrollBar.Position) {
 					_scrollBar.Position = tableView.RowOffset;
@@ -459,7 +459,7 @@ namespace UICatalog.Scenarios {
 				_listView.SetNeedsDisplay ();
 			};*/
 
-			tableView.DrawContent += (s,e) => {
+			tableView.DrawContent += (s, e) => {
 				_scrollBar.Size = tableView.Table?.Rows?.Count ?? 0;
 				_scrollBar.Position = tableView.RowOffset;
 				//	_scrollBar.OtherScrollBarView.Size = _listView.Maxlength - 1;
@@ -511,10 +511,10 @@ namespace UICatalog.Scenarios {
 			bool okPressed = false;
 
 			var ok = new Button ("Ok", is_default: true);
-			ok.Clicked += (s,e) => { okPressed = true; Application.RequestStop (); };
+			ok.Clicked += (s, e) => { okPressed = true; Application.RequestStop (); };
 			var cancel = new Button ("Cancel");
-			cancel.Clicked += (s,e) => { Application.RequestStop (); };
-			var d = new Dialog (title, 60, 20, ok, cancel);
+			cancel.Clicked += (s, e) => { Application.RequestStop (); };
+			var d = new Dialog (ok, cancel) { Title = title };
 
 			var lbl = new Label () {
 				X = 0,

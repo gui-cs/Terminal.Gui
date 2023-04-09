@@ -130,8 +130,6 @@ namespace UICatalog.Scenarios {
 
 			Point? currentLineStart = null;
 
-			public LineStyle BorderStyle { get; internal set; }
-
 			public DrawingArea ()
 			{
 				AddCanvas (Color.White);

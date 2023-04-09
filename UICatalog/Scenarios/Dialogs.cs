@@ -197,8 +197,8 @@ namespace UICatalog.Scenarios {
 
 					// This tests dynamically adding buttons; ensuring the dialog resizes if needed and 
 					// the buttons are laid out correctly
-					dialog = new Dialog (titleEdit.Text, width, height,
-						buttons.ToArray ()) {
+					dialog = new Dialog (buttons.ToArray ()) {
+						Title = titleEdit.Text,
 						ButtonAlignment = (Dialog.ButtonAlignments)styleRadioGroup.SelectedItem
 					};
 

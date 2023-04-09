@@ -39,7 +39,8 @@ namespace UICatalog.Scenarios {
 			ConfigurationManager.Themes.Theme = Theme;
 			ConfigurationManager.Apply ();
 			
-			Win = new Window (_fileName ?? "Untitled") {
+			Win = new Window () {
+				Title = _fileName ?? "Untitled",
 				X = 0,
 				Y = 1,
 				Width = Dim.Fill (),
@@ -729,12 +730,12 @@ namespace UICatalog.Scenarios {
 				return;
 			}
 
-			_winDialog = new Window (isFind ? "Find" : "Replace") {
+			_winDialog = new Window () {
+				Title = isFind ? "Find" : "Replace",
 				X = Win.Bounds.Width / 2 - 30,
 				Y = Win.Bounds.Height / 2 - 10,
 				ColorScheme = Colors.TopLevel
 			};
-			_winDialog.Border.Effect3D = true;
 
 			_tabView = new TabView () {
 				X = 0,

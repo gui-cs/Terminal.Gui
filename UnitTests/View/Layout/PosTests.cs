@@ -531,7 +531,7 @@ namespace Terminal.Gui.ViewTests {
 				Application.Iteration = () => {
 					Application.RequestStop ();
 				};
-				var win = new Window ("window") {
+				var win = new Window () {
 					X = 0,
 					Y = 0,
 					Width = Dim.Fill (),
@@ -676,11 +676,11 @@ namespace Terminal.Gui.ViewTests {
 
 			var t = Application.Top;
 
-			var w = new Window ("w") {
+			var w = new Window () {
 				X = Pos.Left (t) + 2,
 				Y = Pos.At (2)
 			};
-			var v = new View ("v") {
+			var v = new View () {
 				X = Pos.Center (),
 				Y = Pos.Percent (10),
 				ForceValidatePosDim = true
@@ -709,7 +709,7 @@ namespace Terminal.Gui.ViewTests {
 
 			var t = Application.Top;
 
-			var w = new Window (new Rect (1, 2, 4, 5), "w");
+			var w = new Window (new Rect (1, 2, 4, 5));
 			t.Add (w);
 
 			t.Ready += (s, e) => {
@@ -731,11 +731,11 @@ namespace Terminal.Gui.ViewTests {
 
 			var t = Application.Top;
 
-			var w = new Window ("w") {
+			var w = new Window () {
 				X = Pos.Left (t) + 2,
 				Y = Pos.At (2)
 			};
-			var v = new View ("v") {
+			var v = new View () {
 				X = Pos.Center (),
 				Y = Pos.Percent (10)
 			};
@@ -763,16 +763,16 @@ namespace Terminal.Gui.ViewTests {
 		//{
 		//	Application.Init (new FakeDriver ());
 
-		//	var w = new Window ("w") {
+		//	var w = new Window () {
 		//		X = Pos.Left (Application.Top) + 2,
 		//		Y = Pos.Top (Application.Top) + 2
 		//	};
-		//	var f = new FrameView ("f");
-		//	var v1 = new View ("v1") {
+		//	var f = new FrameView ();
+		//	var v1 = new View () {
 		//		X = Pos.Left (w) + 2,
 		//		Y = Pos.Top (w) + 2
 		//	};
-		//	var v2 = new View ("v2") {
+		//	var v2 = new View () {
 		//		X = Pos.Left (v1) + 2,
 		//		Y = Pos.Top (v1) + 2
 		//	};
@@ -810,16 +810,16 @@ namespace Terminal.Gui.ViewTests {
 
 			var t = Application.Top;
 
-			var w = new Window ("w") {
+			var w = new Window () {
 				X = Pos.Left (t) + 2,
 				Y = Pos.Top (t) + 2
 			};
-			var f = new FrameView ("f");
-			var v1 = new View ("v1") {
+			var f = new FrameView ();
+			var v1 = new View () {
 				X = Pos.Left (w) + 2,
 				Y = Pos.Top (w) + 2
 			};
-			var v2 = new View ("v2") {
+			var v2 = new View () {
 				X = Pos.Left (v1) + 2,
 				Y = Pos.Top (v1) + 2
 			};

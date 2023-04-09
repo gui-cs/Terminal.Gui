@@ -252,13 +252,13 @@ namespace Terminal.Gui.DriverTests {
 				System.Threading.Tasks.Task.Delay (500).Wait ();
 				Application.MainLoop.Invoke (() => {
 					var lbl = new Label ("Hello World") { X = Pos.Center () };
-					var dlg = new Dialog ("Test", new Button ("Ok"));
+					var dlg = new Dialog (new Button ("Ok"));
 					dlg.Add (lbl);
 					Application.Begin (dlg);
 
 					var expected = @"
 ┌──────────────────┐
-│┌┤Test├─────────┐ │
+│┌───────────────┐ │
 ││  Hello World  │ │
 ││               │ │
 ││               │ │
@@ -275,7 +275,7 @@ namespace Terminal.Gui.DriverTests {
 
 					expected = @"
 ┌──────────────────┐
-│┌┤Test├─────────┐ │
+│┌───────────────┐ │
 ││  Hello World  │ │
 ││               │ │
 ││               │ │

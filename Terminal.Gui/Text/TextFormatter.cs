@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using NStack;
+using Rune = System.Rune;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -113,253 +115,8 @@ namespace Terminal.Gui {
 	/// Provides text formatting capabilities for console apps. Supports, hotkeys, horizontal alignment, multiple lines, and word-based line wrap.
 	/// </summary>
 	public class TextFormatter {
-		List<ustring> lines = new List<ustring> ();
-		ustring text;
-		TextAlignment textAlignment;
-		VerticalTextAlignment textVerticalAlignment;
-		TextDirection textDirection;
-		Attribute textColor = -1;
-		bool needsFormat;
-		Key hotKey;
-		Size size;
 
-		/// <summary>
-		/// Event invoked when the <see cref="HotKey"/> is changed.
-		/// </summary>
-		public event EventHandler<KeyChangedEventArgs> HotKeyChanged;
-
-		/// <summary>
-		///   The text to be displayed. This text is never modified.
-		/// </summary>
-		public virtual ustring Text {
-			get => text;
-			set {
-				text = value;
-
-				if (text != null && text.RuneCount > 0 && (Size.Width == 0 || Size.Height == 0 || Size.Width != text.ConsoleWidth)) {
-					// Provide a default size (width = length of longest line, height = 1)
-					// TODO: It might makes more sense for the default to be width = length of first line?
-					Size = new Size (TextFormatter.MaxWidth (Text, int.MaxValue), 1);
-				}
-
-				NeedsFormat = true;
-			}
-		}
-
-		/// <summary>
-		/// Used by <see cref="Text"/> to resize the view's <see cref="View.Bounds"/> with the <see cref="Size"/>.
-		/// Setting <see cref="AutoSize"/> to true only work if the <see cref="View.Width"/> and <see cref="View.Height"/> are null or
-		///   <see cref="LayoutStyle.Absolute"/> values and doesn't work with <see cref="LayoutStyle.Computed"/> layout,
-		///   to avoid breaking the <see cref="Pos"/> and <see cref="Dim"/> settings.
-		/// </summary>
-		public bool AutoSize { get; set; }
-
-		/// <summary>
-		/// Gets or sets a flag that determines whether <see cref="Text"/> will have trailing spaces preserved
-		/// or not when <see cref="WordWrap"/> is enabled. If `true` any trailing spaces will be trimmed when
-		/// either the <see cref="Text"/> property is changed or when <see cref="WordWrap"/> is set to `true`.
-		/// The default is `false`.
-		/// </summary>
-		public bool PreserveTrailingSpaces { get; set; }
-
-		/// <summary>
-		/// Controls the horizontal text-alignment property.
-		/// </summary>
-		/// <value>The text alignment.</value>
-		public TextAlignment Alignment {
-			get => textAlignment;
-			set {
-				textAlignment = value;
-				NeedsFormat = true;
-			}
-		}
-
-		/// <summary>
-		/// Controls the vertical text-alignment property. 
-		/// </summary>
-		/// <value>The text vertical alignment.</value>
-		public VerticalTextAlignment VerticalAlignment {
-			get => textVerticalAlignment;
-			set {
-				textVerticalAlignment = value;
-				NeedsFormat = true;
-			}
-		}
-
-		/// <summary>
-		/// Controls the text-direction property. 
-		/// </summary>
-		/// <value>The text vertical alignment.</value>
-		public TextDirection Direction {
-			get => textDirection;
-			set {
-				textDirection = value;
-				NeedsFormat = true;
-			}
-		}
-
-		/// <summary>
-		/// Check if it is a horizontal direction
-		/// </summary>
-		public static bool IsHorizontalDirection (TextDirection textDirection)
-		{
-			switch (textDirection) {
-			case TextDirection.LeftRight_TopBottom:
-			case TextDirection.LeftRight_BottomTop:
-			case TextDirection.RightLeft_TopBottom:
-			case TextDirection.RightLeft_BottomTop:
-				return true;
-			default:
-				return false;
-			}
-		}
-
-		/// <summary>
-		/// Check if it is a vertical direction
-		/// </summary>
-		public static bool IsVerticalDirection (TextDirection textDirection)
-		{
-			switch (textDirection) {
-			case TextDirection.TopBottom_LeftRight:
-			case TextDirection.TopBottom_RightLeft:
-			case TextDirection.BottomTop_LeftRight:
-			case TextDirection.BottomTop_RightLeft:
-				return true;
-			default:
-				return false;
-			}
-		}
-
-		/// <summary>
-		/// Check if it is Left to Right direction
-		/// </summary>
-		public static bool IsLeftToRight (TextDirection textDirection)
-		{
-			switch (textDirection) {
-			case TextDirection.LeftRight_TopBottom:
-			case TextDirection.LeftRight_BottomTop:
-				return true;
-			default:
-				return false;
-			}
-		}
-
-		/// <summary>
-		/// Check if it is Top to Bottom direction
-		/// </summary>
-		public static bool IsTopToBottom (TextDirection textDirection)
-		{
-			switch (textDirection) {
-			case TextDirection.TopBottom_LeftRight:
-			case TextDirection.TopBottom_RightLeft:
-				return true;
-			default:
-				return false;
-			}
-		}
-
-		/// <summary>
-		///  Gets or sets the size of the area the text will be constrained to when formatted.
-		/// </summary>
-		public Size Size {
-			get => size;
-			set {
-				size = value;
-				NeedsFormat = true;
-			}
-		}
-
-		/// <summary>
-		/// The specifier character for the hotkey (e.g. '_'). Set to '\xffff' to disable hotkey support for this View instance. The default is '\xffff'.
-		/// </summary>
-		public Rune HotKeySpecifier { get; set; } = (Rune)0xFFFF;
-
-		/// <summary>
-		/// The position in the text of the hotkey. The hotkey will be rendered using the hot color.
-		/// </summary>
-		public int HotKeyPos { get => hotKeyPos; set => hotKeyPos = value; }
-
-		/// <summary>
-		/// Gets the hotkey. Will be an upper case letter or digit.
-		/// </summary>
-		public Key HotKey {
-			get => hotKey;
-			internal set {
-				if (hotKey != value) {
-					var oldKey = hotKey;
-					hotKey = value;
-					HotKeyChanged?.Invoke (this, new KeyChangedEventArgs(oldKey,value));
-				}
-			}
-		}
-
-		/// <summary>
-		/// Gets the cursor position from <see cref="HotKey"/>. If the <see cref="HotKey"/> is defined, the cursor will be positioned over it.
-		/// </summary>
-		public int CursorPosition { get; set; }
-
-		/// <summary>
-		/// Gets the formatted lines.
-		/// </summary>
-		/// <remarks>
-		/// <para>
-		/// Upon a 'get' of this property, if the text needs to be formatted (if <see cref="NeedsFormat"/> is <c>true</c>)
-		/// <see cref="Format(ustring, int, bool, bool, bool, int, TextDirection)"/> will be called internally. 
-		/// </para>
-		/// </remarks>
-		public List<ustring> Lines {
-			get {
-				// With this check, we protect against subclasses with overrides of Text
-				if (ustring.IsNullOrEmpty (Text) || Size.IsEmpty) {
-					lines = new List<ustring> {
-						ustring.Empty
-					};
-					NeedsFormat = false;
-					return lines;
-				}
-
-				if (NeedsFormat) {
-					var shown_text = text;
-					if (FindHotKey (text, HotKeySpecifier, true, out hotKeyPos, out Key newHotKey)) {
-						HotKey = newHotKey;
-						shown_text = RemoveHotKeySpecifier (Text, hotKeyPos, HotKeySpecifier);
-						shown_text = ReplaceHotKeyWithTag (shown_text, hotKeyPos);
-					}
-
-					if (IsVerticalDirection (textDirection)) {
-						var colsWidth = GetSumMaxCharWidth (shown_text, 0, 1);
-						lines = Format (shown_text, Size.Height, textVerticalAlignment == VerticalTextAlignment.Justified, Size.Width > colsWidth,
-							PreserveTrailingSpaces, 0, textDirection);
-						if (!AutoSize) {
-							colsWidth = GetMaxColsForWidth (lines, Size.Width);
-							if (lines.Count > colsWidth) {
-								lines.RemoveRange (colsWidth, lines.Count - colsWidth);
-							}
-						}
-					} else {
-						lines = Format (shown_text, Size.Width, textAlignment == TextAlignment.Justified, Size.Height > 1,
-							PreserveTrailingSpaces, 0, textDirection);
-						if (!AutoSize && lines.Count > Size.Height) {
-							lines.RemoveRange (Size.Height, lines.Count - Size.Height);
-						}
-					}
-
-					NeedsFormat = false;
-				}
-				return lines;
-			}
-		}
-
-		/// <summary>
-		/// Gets or sets whether the <see cref="TextFormatter"/> needs to format the text when <see cref="Draw(Rect, Attribute, Attribute, Rect, bool)"/> is called.
-		/// If it is <c>false</c> when Draw is called, the Draw call will be faster.
-		/// </summary>
-		/// <remarks>
-		/// <para>
-		/// This is set to true when the properties of <see cref="TextFormatter"/> are set.
-		/// </para>
-		/// </remarks>
-		public bool NeedsFormat { get => needsFormat; set => needsFormat = value; }
+		#region Static Members
 
 		static ustring StripCRLF (ustring str, bool keepNewLine = false)
 		{
@@ -501,7 +258,7 @@ namespace Terminal.Gui {
 		/// This method strips Newline ('\n' and '\r\n') sequences before processing.
 		/// </para>
 		/// </remarks>
-		public static List<ustring> WordWrap (ustring text, int width, bool preserveTrailingSpaces = false, int tabWidth = 0,
+		public static List<ustring> WordWrapText (ustring text, int width, bool preserveTrailingSpaces = false, int tabWidth = 0,
 			TextDirection textDirection = TextDirection.LeftRight_TopBottom)
 		{
 			if (width < 0) {
@@ -711,7 +468,6 @@ namespace Terminal.Gui {
 		}
 
 		static char [] whitespace = new char [] { ' ', '\t' };
-		private int hotKeyPos = -1;
 
 		/// <summary>
 		/// Reformats text into lines, applying text alignment and optionally wrapping text to new lines on word boundaries.
@@ -787,7 +543,7 @@ namespace Terminal.Gui {
 			for (int i = 0; i < runeCount; i++) {
 				Rune c = runes [i];
 				if (c == '\n') {
-					var wrappedLines = WordWrap (ustring.Make (runes.GetRange (lp, i - lp)), width, preserveTrailingSpaces, tabWidth, textDirection);
+					var wrappedLines = WordWrapText (ustring.Make (runes.GetRange (lp, i - lp)), width, preserveTrailingSpaces, tabWidth, textDirection);
 					foreach (var line in wrappedLines) {
 						lineResult.Add (ClipAndJustify (line, width, justify, textDirection));
 					}
@@ -797,7 +553,7 @@ namespace Terminal.Gui {
 					lp = i + 1;
 				}
 			}
-			foreach (var line in WordWrap (ustring.Make (runes.GetRange (lp, runeCount - lp)), width, preserveTrailingSpaces, tabWidth, textDirection)) {
+			foreach (var line in WordWrapText (ustring.Make (runes.GetRange (lp, runeCount - lp)), width, preserveTrailingSpaces, tabWidth, textDirection)) {
 				lineResult.Add (ClipAndJustify (line, width, justify, textDirection));
 			}
 
@@ -817,14 +573,15 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Computes the maximum width needed to render the text (single line or multiple lines) given a minimum width.
+		/// Computes the maximum width needed to render the text (single line or multiple lines, word wrapped) given 
+		/// a number of columns to constrain the text to.
 		/// </summary>
-		/// <returns>Max width of lines.</returns>
+		/// <returns>Width of the longest line after formatting the text constrained by <paramref name="maxColumns"/>.</returns>
 		/// <param name="text">Text, may contain newlines.</param>
-		/// <param name="width">The minimum width for the text.</param>
-		public static int MaxWidth (ustring text, int width)
+		/// <param name="maxColumns">The number of columns to constrain the text to for formatting.</param>
+		public static int MaxWidth (ustring text, int maxColumns)
 		{
-			var result = TextFormatter.Format (text, width, false, true);
+			var result = TextFormatter.Format (text: text, width: maxColumns, justify: false, wordWrap: true);
 			var max = 0;
 			result.ForEach (s => {
 				var m = 0;
@@ -837,11 +594,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Determines the line with the highest width in the 
+		/// Returns the width of the widest line in the text, accounting for wide-glyphs (uses <see cref="ustring.ConsoleWidth"/>).
 		/// <paramref name="text"/> if it contains newlines.
 		/// </summary>
 		/// <param name="text">Text, may contain newlines.</param>
-		/// <returns>The highest line width.</returns>
+		/// <returns>The length of the longest line.</returns>
 		public static int MaxWidthLine (ustring text)
 		{
 			var result = TextFormatter.SplitNewLine (text);
@@ -849,7 +606,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets the total width of the passed text.
+		/// Gets the number of columns the passed text will use, ignoring newlines and accounting for wide-glyphs (uses <see cref="ustring.ConsoleWidth"/>).
 		/// </summary>
 		/// <param name="text"></param>
 		/// <returns>The text width.</returns>
@@ -959,7 +716,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///  Calculates the rectangle required to hold text, assuming no word wrapping.
+		///  Calculates the rectangle required to hold text, assuming no word wrapping or justification.
 		/// </summary>
 		/// <param name="x">The x location of the rectangle</param>
 		/// <param name="y">The y location of the rectangle</param>
@@ -1145,6 +902,291 @@ namespace Terminal.Gui {
 			}
 			return start;
 		}
+		#endregion // Static Members
+
+		List<ustring> _lines = new List<ustring> ();
+		ustring _text;
+		TextAlignment _textAlignment;
+		VerticalTextAlignment _textVerticalAlignment;
+		TextDirection _textDirection;
+		Attribute _textColor = -1;
+		Key _hotKey;
+		int _hotKeyPos = -1;
+		Size _size;
+
+		/// <summary>
+		/// Event invoked when the <see cref="HotKey"/> is changed.
+		/// </summary>
+		public event EventHandler<KeyChangedEventArgs> HotKeyChanged;
+
+		/// <summary>
+		///   The text to be displayed. This text is never modified.
+		/// </summary>
+		public virtual ustring Text {
+			get => _text;
+			set {
+				_text = value;
+
+				if (_text != null && _text.RuneCount > 0 && (Size.Width == 0 || Size.Height == 0 || Size.Width != _text.ConsoleWidth)) {
+					// Provide a default size (width = length of longest line, height = 1)
+					// TODO: It might makes more sense for the default to be width = length of first line?
+					Size = new Size (TextFormatter.MaxWidth (Text, int.MaxValue), 1);
+				}
+
+				NeedsFormat = true;
+			}
+		}
+
+		/// <summary>
+		/// Used by <see cref="Text"/> to resize the view's <see cref="View.Bounds"/> with the <see cref="Size"/>.
+		/// Setting <see cref="AutoSize"/> to true only work if the <see cref="View.Width"/> and <see cref="View.Height"/> are null or
+		///   <see cref="LayoutStyle.Absolute"/> values and doesn't work with <see cref="LayoutStyle.Computed"/> layout,
+		///   to avoid breaking the <see cref="Pos"/> and <see cref="Dim"/> settings.
+		/// </summary>
+		public bool AutoSize { get; set; }
+
+		/// <summary>
+		/// Gets or sets a flag that determines whether <see cref="Text"/> will have trailing spaces preserved
+		/// or not when <see cref="WordWrap"/> is enabled. If `true` any trailing spaces will be trimmed when
+		/// either the <see cref="Text"/> property is changed or when <see cref="WordWrap"/> is set to `true`.
+		/// The default is `false`.
+		/// </summary>
+		public bool PreserveTrailingSpaces { get; set; }
+
+		/// <summary>
+		/// Controls the horizontal text-alignment property.
+		/// </summary>
+		/// <value>The text alignment.</value>
+		public TextAlignment Alignment {
+			get => _textAlignment;
+			set {
+				_textAlignment = value;
+				NeedsFormat = true;
+			}
+		}
+
+		/// <summary>
+		/// Controls the vertical text-alignment property. 
+		/// </summary>
+		/// <value>The text vertical alignment.</value>
+		public VerticalTextAlignment VerticalAlignment {
+			get => _textVerticalAlignment;
+			set {
+				_textVerticalAlignment = value;
+				NeedsFormat = true;
+			}
+		}
+
+		/// <summary>
+		/// Controls the text-direction property. 
+		/// </summary>
+		/// <value>The text vertical alignment.</value>
+		public TextDirection Direction {
+			get => _textDirection;
+			set {
+				_textDirection = value;
+				NeedsFormat = true;
+			}
+		}
+
+		/// <summary>
+		/// Check if it is a horizontal direction
+		/// </summary>
+		public static bool IsHorizontalDirection (TextDirection textDirection)
+		{
+			switch (textDirection) {
+			case TextDirection.LeftRight_TopBottom:
+			case TextDirection.LeftRight_BottomTop:
+			case TextDirection.RightLeft_TopBottom:
+			case TextDirection.RightLeft_BottomTop:
+				return true;
+			default:
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Check if it is a vertical direction
+		/// </summary>
+		public static bool IsVerticalDirection (TextDirection textDirection)
+		{
+			switch (textDirection) {
+			case TextDirection.TopBottom_LeftRight:
+			case TextDirection.TopBottom_RightLeft:
+			case TextDirection.BottomTop_LeftRight:
+			case TextDirection.BottomTop_RightLeft:
+				return true;
+			default:
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Check if it is Left to Right direction
+		/// </summary>
+		public static bool IsLeftToRight (TextDirection textDirection)
+		{
+			switch (textDirection) {
+			case TextDirection.LeftRight_TopBottom:
+			case TextDirection.LeftRight_BottomTop:
+				return true;
+			default:
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Check if it is Top to Bottom direction
+		/// </summary>
+		public static bool IsTopToBottom (TextDirection textDirection)
+		{
+			switch (textDirection) {
+			case TextDirection.TopBottom_LeftRight:
+			case TextDirection.TopBottom_RightLeft:
+				return true;
+			default:
+				return false;
+			}
+		}
+
+		// TODO: Add - public bool WordWrap { get; set; } = false;
+
+		/// <summary>
+		/// Gets or sets the size of the area the text will be constrained to when formatted.
+		/// </summary>
+		/// <remarks>
+		/// Does not return the size the formatted text; just the value that was set.
+		/// </remarks>
+		public Size Size {
+			get {
+				return _size;
+			}
+			set {
+				_size = value;
+				NeedsFormat = true;
+			}
+		}
+
+		/// <summary>
+		/// The specifier character for the hotkey (e.g. '_'). Set to '\xffff' to disable hotkey support for this View instance. The default is '\xffff'.
+		/// </summary>
+		public Rune HotKeySpecifier { get; set; } = (Rune)0xFFFF;
+
+		/// <summary>
+		/// The position in the text of the hotkey. The hotkey will be rendered using the hot color.
+		/// </summary>
+		public int HotKeyPos { get => _hotKeyPos; set => _hotKeyPos = value; }
+
+		/// <summary>
+		/// Gets the hotkey. Will be an upper case letter or digit.
+		/// </summary>
+		public Key HotKey {
+			get => _hotKey;
+			internal set {
+				if (_hotKey != value) {
+					var oldKey = _hotKey;
+					_hotKey = value;
+					HotKeyChanged?.Invoke (this, new KeyChangedEventArgs (oldKey, value));
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets the cursor position from <see cref="HotKey"/>. If the <see cref="HotKey"/> is defined, the cursor will be positioned over it.
+		/// </summary>
+		public int CursorPosition { get; set; }
+
+		/// <summary>
+		/// Gets the size reqruied to hold the formatted text, given the constraints placed by <see cref="Size"/>.
+		/// </summary>
+		/// <remarks>
+		/// Causes a format, resetting <see cref="NeedsFormat"/>.
+		/// </remarks>
+		/// <returns></returns>
+		public Size GetFormattedSize ()
+		{
+			var lines = Lines;
+			var width = Lines.Max (line => TextFormatter.GetTextWidth (line));
+			var height = Lines.Count;
+			return new Size (width, height);
+		}
+
+		/// <summary>
+		/// Gets the formatted lines.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// Upon a 'get' of this property, if the text needs to be formatted (if <see cref="NeedsFormat"/> is <c>true</c>)
+		/// <see cref="Format(ustring, int, bool, bool, bool, int, TextDirection)"/> will be called internally. 
+		/// </para>
+		/// </remarks>
+		public List<ustring> Lines {
+			get {
+				// With this check, we protect against subclasses with overrides of Text
+				if (ustring.IsNullOrEmpty (Text) || Size.IsEmpty) {
+					_lines = new List<ustring> {
+						ustring.Empty
+					};
+					NeedsFormat = false;
+					return _lines;
+				}
+
+				if (NeedsFormat) {
+					var shown_text = _text;
+					if (FindHotKey (_text, HotKeySpecifier, true, out _hotKeyPos, out Key newHotKey)) {
+						HotKey = newHotKey;
+						shown_text = RemoveHotKeySpecifier (Text, _hotKeyPos, HotKeySpecifier);
+						shown_text = ReplaceHotKeyWithTag (shown_text, _hotKeyPos);
+					}
+
+					if (IsVerticalDirection (_textDirection)) {
+						var colsWidth = GetSumMaxCharWidth (shown_text, 0, 1);
+						_lines = Format (shown_text, Size.Height, _textVerticalAlignment == VerticalTextAlignment.Justified, Size.Width > colsWidth,
+							PreserveTrailingSpaces, 0, _textDirection);
+						if (!AutoSize) {
+							colsWidth = GetMaxColsForWidth (_lines, Size.Width);
+							if (_lines.Count > colsWidth) {
+								_lines.RemoveRange (colsWidth, _lines.Count - colsWidth);
+							}
+						}
+					} else {
+						_lines = Format (shown_text, Size.Width, _textAlignment == TextAlignment.Justified, Size.Height > 1,
+							PreserveTrailingSpaces, 0, _textDirection);
+						if (!AutoSize && _lines.Count > Size.Height) {
+							_lines.RemoveRange (Size.Height, _lines.Count - Size.Height);
+						}
+					}
+
+					NeedsFormat = false;
+				}
+				return _lines;
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets whether the <see cref="TextFormatter"/> needs to format the text when <see cref="Draw(Rect, Attribute, Attribute, Rect, bool)"/> is called.
+		/// If it is <c>false</c> when Draw is called, the Draw call will be faster.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// This is set to true when the properties of <see cref="TextFormatter"/> are set.
+		/// </para>
+		/// </remarks>
+		public bool NeedsFormat { get; set; }
+
+		/// <summary>
+		/// Causes the <see cref="TextFormatter"/> to reformat the text. 
+		/// </summary>
+		/// <returns>The formatted text.</returns>
+		public string Format ()
+		{
+			var sb = new StringBuilder ();
+			// Lines_get causes a Format
+			foreach (var line in Lines) {
+				sb.AppendLine (line.ToString());
+			}
+			return sb.ToString ();
+		}
 
 		/// <summary>
 		/// Draws the text held by <see cref="TextFormatter"/> to <see cref="Application.Driver"/> using the colors specified.
@@ -1157,7 +1199,7 @@ namespace Terminal.Gui {
 		public void Draw (Rect bounds, Attribute normalColor, Attribute hotColor, Rect containerBounds = default, bool fillRemaining = true)
 		{
 			// With this check, we protect against subclasses with overrides of Text (like Button)
-			if (ustring.IsNullOrEmpty (text)) {
+			if (ustring.IsNullOrEmpty (_text)) {
 				return;
 			}
 
@@ -1166,7 +1208,7 @@ namespace Terminal.Gui {
 			// Use "Lines" to ensure a Format (don't use "lines"))
 
 			var linesFormated = Lines;
-			switch (textDirection) {
+			switch (_textDirection) {
 			case TextDirection.TopBottom_RightLeft:
 			case TextDirection.LeftRight_BottomTop:
 			case TextDirection.RightLeft_BottomTop:
@@ -1175,7 +1217,7 @@ namespace Terminal.Gui {
 				break;
 			}
 
-			var isVertical = IsVerticalDirection (textDirection);
+			var isVertical = IsVerticalDirection (_textDirection);
 			var maxBounds = bounds;
 			if (Application.Driver != null) {
 				maxBounds = containerBounds == default
@@ -1205,9 +1247,9 @@ namespace Terminal.Gui {
 
 					break;
 
-				var runes = lines [line].ToRunes ();
+				var runes = _lines [line].ToRunes ();
 
-				switch (textDirection) {
+				switch (_textDirection) {
 				case TextDirection.RightLeft_BottomTop:
 				case TextDirection.RightLeft_TopBottom:
 				case TextDirection.BottomTop_LeftRight:
@@ -1220,52 +1262,52 @@ namespace Terminal.Gui {
 
 				int x, y;
 				// Horizontal Alignment
-				if (textAlignment == TextAlignment.Right || (textAlignment == TextAlignment.Justified && !IsLeftToRight (textDirection))) {
+				if (_textAlignment == TextAlignment.Right || (_textAlignment == TextAlignment.Justified && !IsLeftToRight (_textDirection))) {
 					if (isVertical) {
 						var runesWidth = GetSumMaxCharWidth (Lines, line);
 						x = bounds.Right - runesWidth;
-						CursorPosition = bounds.Width - runesWidth + (hotKeyPos > -1 ? hotKeyPos : 0);
+						CursorPosition = bounds.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
 					} else {
 						var runesWidth = GetTextWidth (ustring.Make (runes));
 						x = bounds.Right - runesWidth;
-						CursorPosition = bounds.Width - runesWidth + (hotKeyPos > -1 ? hotKeyPos : 0);
+						CursorPosition = bounds.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
 					}
-				} else if (textAlignment == TextAlignment.Left || textAlignment == TextAlignment.Justified) {
+				} else if (_textAlignment == TextAlignment.Left || _textAlignment == TextAlignment.Justified) {
 					if (isVertical) {
 						var runesWidth = line > 0 ? GetSumMaxCharWidth (Lines, 0, line) : 0;
 						x = bounds.Left + runesWidth;
 					} else {
 						x = bounds.Left;
 					}
-					CursorPosition = hotKeyPos > -1 ? hotKeyPos : 0;
-				} else if (textAlignment == TextAlignment.Centered) {
+					CursorPosition = _hotKeyPos > -1 ? _hotKeyPos : 0;
+				} else if (_textAlignment == TextAlignment.Centered) {
 					if (isVertical) {
 						var runesWidth = GetSumMaxCharWidth (Lines, line);
 						x = bounds.Left + line + ((bounds.Width - runesWidth) / 2);
-						CursorPosition = (bounds.Width - runesWidth) / 2 + (hotKeyPos > -1 ? hotKeyPos : 0);
+						CursorPosition = (bounds.Width - runesWidth) / 2 + (_hotKeyPos > -1 ? _hotKeyPos : 0);
 					} else {
 						var runesWidth = GetTextWidth (ustring.Make (runes));
 						x = bounds.Left + (bounds.Width - runesWidth) / 2;
-						CursorPosition = (bounds.Width - runesWidth) / 2 + (hotKeyPos > -1 ? hotKeyPos : 0);
+						CursorPosition = (bounds.Width - runesWidth) / 2 + (_hotKeyPos > -1 ? _hotKeyPos : 0);
 					}
 				} else {
 					throw new ArgumentOutOfRangeException ();
 				}
 
 				// Vertical Alignment
-				if (textVerticalAlignment == VerticalTextAlignment.Bottom || (textVerticalAlignment == VerticalTextAlignment.Justified && !IsTopToBottom (textDirection))) {
+				if (_textVerticalAlignment == VerticalTextAlignment.Bottom || (_textVerticalAlignment == VerticalTextAlignment.Justified && !IsTopToBottom (_textDirection))) {
 					if (isVertical) {
 						y = bounds.Bottom - runes.Length;
 					} else {
 						y = bounds.Bottom - Lines.Count + line;
 					}
-				} else if (textVerticalAlignment == VerticalTextAlignment.Top || textVerticalAlignment == VerticalTextAlignment.Justified) {
+				} else if (_textVerticalAlignment == VerticalTextAlignment.Top || _textVerticalAlignment == VerticalTextAlignment.Justified) {
 					if (isVertical) {
 						y = bounds.Top;
 					} else {
 						y = bounds.Top + line;
 					}
-				} else if (textVerticalAlignment == VerticalTextAlignment.Middle) {
+				} else if (_textVerticalAlignment == VerticalTextAlignment.Middle) {
 					if (isVertical) {
 						var s = (bounds.Height - runes.Length) / 2;
 						y = bounds.Top + s;
@@ -1307,8 +1349,8 @@ namespace Terminal.Gui {
 						}
 					}
 					if (HotKeyPos > -1 && idx == HotKeyPos) {
-						if ((isVertical && textVerticalAlignment == VerticalTextAlignment.Justified) ||
-						(!isVertical && textAlignment == TextAlignment.Justified)) {
+						if ((isVertical && _textVerticalAlignment == VerticalTextAlignment.Justified) ||
+						(!isVertical && _textAlignment == TextAlignment.Justified)) {
 							CursorPosition = idx - start;
 						}
 						Application.Driver?.SetAttribute (hotColor);

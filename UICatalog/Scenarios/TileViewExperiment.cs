@@ -65,7 +65,6 @@ namespace UICatalog.Scenarios {
 				Border = new Border () {
 					LineStyle = LineStyle.Single,
 					BorderThickness = new Thickness (1), 
-					DrawMarginFrame = true,
 					PaddingThickness = new Thickness(1),
 					ForgroundColor = Color.BrightMagenta,
 				}

@@ -40,7 +40,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The default <see cref="LineStyle"/> for <see cref="FrameView"/>. The default is <see cref="LineStyle.Single"/>.
+		/// The default <see cref="LineStyle"/> for <see cref="FrameView"/>'s border. The default is <see cref="LineStyle.Single"/>.
 		/// </summary>
 		/// <remarks>
 		/// This property can be set in a Theme to change the default <see cref="LineStyle"/> for all <see cref="FrameView"/>s. 

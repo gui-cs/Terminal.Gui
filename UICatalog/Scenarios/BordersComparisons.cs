@@ -15,12 +15,7 @@ namespace UICatalog.Scenarios {
 
 			Application.Top.Text = $"Border Thickness: {borderThickness}\nPadding: {padding}";
 
-			var win = new Window (new Rect (5, 5, 40, 20), "Window",
-				padding: padding,
-				border: new Border () {
-					LineStyle = borderStyle,
-					BorderThickness = borderThickness
-				});
+			var win = new Window (new Rect (5, 5, 40, 20)) { Title = "Window" };
 
 			var tf1 = new TextField ("1234567890") { Width = 10 };
 

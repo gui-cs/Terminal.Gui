@@ -45,7 +45,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
 
 			// Empty Rect
-			r = new Window (Rect.Empty, "title");
+			r = new Window (Rect.Empty) { Title = "title" };
 			Assert.NotNull (r);
 			Assert.Equal ("title", r.Title);
 			Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
@@ -69,14 +69,14 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
 
 			// Rect with values
-			r = new Window (new Rect (1, 2, 3, 4), "title");
+			r = new Window (new Rect (1, 2, 3, 4)) { Title = "title" };
 			Assert.Equal ("title", r.Title);
 			Assert.NotNull (r);
 			Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
 			Assert.Equal ("Window(title)({X=1,Y=2,Width=3,Height=4})", r.ToString ());
 			Assert.True (r.CanFocus);
 			Assert.False (r.HasFocus);
-			Assert.Equal (new Rect (0, 0, 3, 4), r.Bounds);
+			Assert.Equal (new Rect (0, 0, 1, 2), r.Bounds);
 			Assert.Equal (new Rect (1, 2, 3, 4), r.Frame);
 			Assert.Null (r.Focused);
 			Assert.NotNull (r.ColorScheme);

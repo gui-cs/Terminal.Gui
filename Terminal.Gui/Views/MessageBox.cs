@@ -246,29 +246,30 @@ namespace Terminal.Gui {
 		};
 
 		static int QueryFull (bool useErrorColors, int width, int height, ustring title, ustring message,
-			int defaultButton = 0, bool wrapMessagge = true, params ustring [] buttons)
+			int defaultButton = 0, bool wrapMessage = true, params ustring [] buttons)
 		{
-			int defaultWidth = 50;
-			if (defaultWidth > Application.Driver.Cols / 2) {
-				defaultWidth = (int)(Application.Driver.Cols * 0.60f);
-			}
-			int maxWidthLine = TextFormatter.MaxWidthLine (message);
-			if (wrapMessagge && maxWidthLine > Application.Driver.Cols) {
-				maxWidthLine = Application.Driver.Cols;
-			}
-			if (width == 0) {
-				maxWidthLine = Math.Max (maxWidthLine, defaultWidth);
-			} else {
-				maxWidthLine = width;
-			}
-			int textWidth = TextFormatter.MaxWidth (message, maxWidthLine);
-			int textHeight = TextFormatter.MaxLines (message, textWidth); // message.Count (ustring.Make ('\n')) + 1;
-			int msgboxHeight = Math.Max (1, textHeight) + 4; // textHeight + (top + top padding + buttons + bottom)
+			//int defaultWidth = 50;
+			//if (defaultWidth > Application.Driver.Cols / 2) {
+			//	defaultWidth = (int)(Application.Driver.Cols * 0.60f);
+			//}
+			//int maxWidthLine = TextFormatter.MaxWidthLine (message);
+			//if (wrapMessagge && maxWidthLine > Application.Driver.Cols) {
+			//	maxWidthLine = Application.Driver.Cols;
+			//}
+			//if (width == 0) {
+			//	maxWidthLine = Math.Max (maxWidthLine, defaultWidth);
+			//} else {
+			//	maxWidthLine = width;
+			//}
+			//int textWidth = TextFormatter.MaxWidth (message, maxWidthLine);
+			//int textHeight = TextFormatter.MaxLines (message, textWidth); // message.Count (ustring.Make ('\n')) + 1;
+			//int msgboxHeight = Math.Max (1, textHeight) + 4; // textHeight + (top + top padding + buttons + bottom)
 
-			if (wrapMessagge) {
-				textWidth = Math.Min (textWidth, Application.Driver.Cols);
-				msgboxHeight = Math.Min (msgboxHeight, Application.Driver.Rows);
+			if (wrapMessage) {
+				//textWidth = Math.Min (textWidth, Application.Driver.Cols);
+				//msgboxHeight = Math.Min (msgboxHeight, Application.Driver.Rows);
 			}
+			
 			// Create button array for Dialog
 			int count = 0;
 			List<Button> buttonList = new List<Button> ();
@@ -284,51 +285,54 @@ namespace Terminal.Gui {
 				count++;
 			}
 
-			// Create Dialog (retain backwards compat by supporting specifying height/width)
 			Dialog d;
-			if (width == 0 & height == 0) {
-				d = new Dialog (title, buttonList.ToArray ()) {
-					Height = msgboxHeight,
-					Border = DefaultBorder
-				};
-			} else {
-				d = new Dialog (title, width, Math.Max (height, 4), buttonList.ToArray ()) {
-					Border = DefaultBorder
-				};
-			}
+			d = new Dialog (buttonList.ToArray ()) {
+				Title = title,
+				Border = DefaultBorder,
+				Width = Dim.Percent (60),
+				Height = 5 // Border + one line of text + vspace + buttons
+			};
 
+			if (width != 0) {
+				d.Width = width;
+			} 
+			
+			if (height != 0) {
+				d.Height = height;
+			}
+		
 			if (useErrorColors) {
 				d.ColorScheme = Colors.Error;
-				//d.Border.ForgroundColor = Colors.Error.Normal.Foreground;
-				//d.Border.BackgroundColor = Colors.Error.Normal.Background;
 			} else {
 				d.ColorScheme = Colors.Dialog;
-				//d.Border.ForgroundColor = Colors.Dialog.Normal.Foreground;
-				//d.Border.BackgroundColor = Colors.Dialog.Normal.Background;
 			}
 
-			if (!ustring.IsNullOrEmpty (message)) {
-				var l = new Label (message) {
-					LayoutStyle = LayoutStyle.Computed,
-					TextAlignment = TextAlignment.Centered,
-					X = Pos.Center (),
-					Y = Pos.Center (),
-					Width = Dim.Fill (),
-					Height = Dim.Fill (1),
-					AutoSize = false
-				};
-				d.Add (l);
-			}
+			var l = new Label () {
+				AutoSize = false,
+				Text = message,
+				TextAlignment = TextAlignment.Centered,
+				X = 0,
+				Y = 0,
+				Width = Dim.Fill (0),
+				Height = Dim.Fill (1)
+			};
+			//l.TextFormatter.WordWrap = wrapMessage,
+			d.Add (l);
+			
+			d.LayoutStarted += (s, e) => {
+				// TODO: replace with Dim.Fit when implemented
+				var messageWidth = TextFormatter.MaxWidth (l.Text, Application.Driver.Cols - d.GetFramesThickness ().Horizontal);
+				var messageHeight = TextFormatter.MaxLines (l.Text, l.TextFormatter.Size.Width);
 
-			if (width == 0 & height == 0) {
-				// Dynamically size Width
-				var dWidth = Math.Max (maxWidthLine, Math.Max (title.ConsoleWidth, Math.Max (textWidth + 2, d.GetButtonsWidth () + d.buttons.Count + 2))); // textWidth + (left + padding + padding + right)
-				if (wrapMessagge) {
-					d.Width = Math.Min (dWidth, Application.Driver.Cols);
-				} else {
-					d.Width = dWidth;
+				// Ensure the width fits the text + buttons
+				var newWidth = Math.Max (width, Math.Max (messageWidth + d.GetFramesThickness ().Horizontal,
+								d.GetButtonsWidth () + d.buttons.Count + d.GetFramesThickness ().Horizontal));
+				if (newWidth > d.Frame.Width) {
+					d.Width = newWidth;
 				}
-			}
+				// Ensure height fits the text + vspace + buttons
+				d.Height = Math.Max (height, messageHeight + 2 + d.GetFramesThickness ().Vertical);
+			};
 
 			// Setup actions
 			Clicked = -1;

@@ -18,6 +18,31 @@ namespace Terminal.Gui.ViewTests {
 			this.output = output;
 		}
 
+		[Fact]
+		public void GetFramesThickness ()
+		{
+			var view = new View ();
+			Assert.Equal (Thickness.Empty, view.GetFramesThickness ());
+
+			view.Margin.Thickness = new Thickness (1);
+			Assert.Equal (new Thickness (1), view.GetFramesThickness ());
+
+			view.BorderFrame.Thickness = new Thickness (1);
+			Assert.Equal (new Thickness (2), view.GetFramesThickness ());
+
+			view.Padding.Thickness = new Thickness (1);
+			Assert.Equal (new Thickness (3), view.GetFramesThickness ());
+
+			view.Padding.Thickness = new Thickness (2);
+			Assert.Equal (new Thickness (4), view.GetFramesThickness ());
+
+			view.Padding.Thickness = new Thickness (1, 2, 3, 4);
+			Assert.Equal (new Thickness (3, 4, 5, 6), view.GetFramesThickness ());
+
+			view.Margin.Thickness = new Thickness (1, 2, 3, 4);
+			Assert.Equal (new Thickness (3, 5, 7, 9), view.GetFramesThickness ());
+		}
+
 		[Theory, AutoInitShutdown]
 		[InlineData (0)]
 		[InlineData (1)]
@@ -25,7 +50,8 @@ namespace Terminal.Gui.ViewTests {
 		[InlineData (3)]
 		public void BorderFrame_With_Title_Size_Height (int height)
 		{
-			var win = new Window ("1234") {
+			var win = new Window () { 
+				Title = "1234",
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			};
@@ -82,7 +108,8 @@ namespace Terminal.Gui.ViewTests {
 		[InlineData (10)]
 		public void BorderFrame_With_Title_Size_Width (int width)
 		{
-			var win = new Window ("1234") {
+			var win = new Window () {
+				Title = "1234",
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			};

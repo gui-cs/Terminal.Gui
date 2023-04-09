@@ -196,7 +196,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// 
 		/// </summary>
-		public LineStyle BorderStyle { get; set; } = LineStyle.None;
+		public new LineStyle BorderStyle { get; set; } = LineStyle.None;
 
 		/// <summary>
 		/// Defines the rectangle that the <see cref="Frame"/> will use to draw its content. 

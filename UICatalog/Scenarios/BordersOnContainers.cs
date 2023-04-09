@@ -8,12 +8,10 @@ namespace UICatalog.Scenarios {
 		public BordersOnContainers (NStack.ustring title, string typeName, View smartView)
 		{
 			var borderStyle = LineStyle.Double;
-			var drawMarginFrame = false;
 			var borderThickness = new Thickness (1, 2, 3, 4);
 			var borderBrush = Colors.Base.HotFocus.Foreground;
 			var padding = new Thickness (1, 2, 3, 4);
 			var background = Colors.Base.HotNormal.Foreground;
-			var effect3D = true;
 
 			smartView.X = Pos.Center ();
 			smartView.Y = 0;
@@ -21,13 +19,10 @@ namespace UICatalog.Scenarios {
 			smartView.Height = 20;
 			smartView.Border = new Border () {
 				LineStyle = borderStyle,
-				DrawMarginFrame = drawMarginFrame,
 				BorderThickness = borderThickness,
 				ForgroundColor = borderBrush,
 				PaddingThickness = padding,
 				BackgroundColor = background,
-				Effect3D = effect3D,
-				//Title = typeName
 			};
 			smartView.ColorScheme = Colors.TopLevel;
 
@@ -257,91 +252,9 @@ namespace UICatalog.Scenarios {
 			};
 			Add (rbBorderStyle);
 
-			var cbDrawMarginFrame = new CheckBox ("Draw Margin Frame", smartView.Border.DrawMarginFrame) {
-				X = Pos.AnchorEnd (20),
-				Y = 0,
-				Width = 5
-			};
-			cbDrawMarginFrame.Toggled += (s, e) => {
-				try {
-					smartView.Border.DrawMarginFrame = (bool)cbDrawMarginFrame.Checked;
-					if (cbDrawMarginFrame.Checked != smartView.Border.DrawMarginFrame) {
-						cbDrawMarginFrame.Checked = smartView.Border.DrawMarginFrame;
-					}
-				} catch { }
-			};
-			Add (cbDrawMarginFrame);
-
 			rbBorderStyle.SelectedItemChanged += (s, e) => {
 				smartView.Border.LineStyle = (LineStyle)e.SelectedItem;
 				smartView.SetNeedsDisplay ();
-				if (cbDrawMarginFrame.Checked != smartView.Border.DrawMarginFrame) {
-					cbDrawMarginFrame.Checked = smartView.Border.DrawMarginFrame;
-				}
-			};
-
-			var cbEffect3D = new CheckBox ("Draw 3D effects", smartView.Border.Effect3D) {
-				X = Pos.AnchorEnd (20),
-				Y = 1,
-				Width = 5
-			};
-			Add (cbEffect3D);
-
-			Add (new Label ("Effect3D Offset:") {
-				X = Pos.AnchorEnd (20),
-				Y = 2
-			});
-			Add (new Label ("X:") {
-				X = Pos.AnchorEnd (19),
-				Y = 3
-			});
-
-			var effect3DOffsetX = new TextField ("") {
-				X = Pos.AnchorEnd (16),
-				Y = 3,
-				Width = 5
-			};
-			effect3DOffsetX.TextChanging += (s, e) => {
-				try {
-					smartView.Border.Effect3DOffset = new Point (int.Parse (e.NewText.ToString ()),
-						smartView.Border.Effect3DOffset.Y);
-				} catch {
-					if (!e.NewText.IsEmpty && e.NewText != CultureInfo.CurrentCulture.NumberFormat.NegativeSign) {
-						e.Cancel = true;
-					}
-				}
-			};
-			effect3DOffsetX.Text = $"{smartView.Border.Effect3DOffset.X}";
-			Add (effect3DOffsetX);
-
-			Add (new Label ("Y:") {
-				X = Pos.AnchorEnd (10),
-				Y = 3
-			});
-
-			var effect3DOffsetY = new TextField ("") {
-				X = Pos.AnchorEnd (7),
-				Y = 3,
-				Width = 5
-			};
-			effect3DOffsetY.TextChanging += (s, e) => {
-				try {
-					smartView.Border.Effect3DOffset = new Point (smartView.Border.Effect3DOffset.X,
-						int.Parse (e.NewText.ToString ()));
-				} catch {
-					if (!e.NewText.IsEmpty && e.NewText != CultureInfo.CurrentCulture.NumberFormat.NegativeSign) {
-						e.Cancel = true;
-					}
-				}
-			};
-			effect3DOffsetY.Text = $"{smartView.Border.Effect3DOffset.Y}";
-			Add (effect3DOffsetY);
-
-			cbEffect3D.Toggled += (s, e) => {
-				try {
-					smartView.Border.Effect3D = effect3DOffsetX.Enabled =
-						effect3DOffsetY.Enabled = (bool)cbEffect3D.Checked;
-				} catch { }
 			};
 
 			Add (new Label ("Background:") {

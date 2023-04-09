@@ -323,7 +323,7 @@ namespace Terminal.Gui.ViewTests {
 		[Fact, AutoInitShutdown]
 		public void AutoSize_False_ResizeView_With_Dim_Fill_After_IsInitialized ()
 		{
-			var win = new Window (new Rect (0, 0, 30, 80), "");
+			var win = new Window (new Rect (0, 0, 30, 80));
 			var label = new Label () { AutoSize = false, Width = Dim.Fill (), Height = Dim.Fill () };
 			win.Add (label);
 			Application.Top.Add (win);
@@ -348,7 +348,7 @@ namespace Terminal.Gui.ViewTests {
 		[Fact, AutoInitShutdown]
 		public void AutoSize_False_SetWidthHeight_With_Dim_Fill_And_Dim_Absolute_After_IsAdded_And_IsInitialized ()
 		{
-			var win = new Window (new Rect (0, 0, 30, 80), "win");
+			var win = new Window (new Rect (0, 0, 30, 80));
 			var label = new Label () { Width = Dim.Fill () };
 			win.Add (label);
 			Application.Top.Add (win);
@@ -384,7 +384,7 @@ namespace Terminal.Gui.ViewTests {
 		[Fact, AutoInitShutdown]
 		public void AutoSize_False_SetWidthHeight_With_Dim_Fill_And_Dim_Absolute_With_Initialization ()
 		{
-			var win = new Window (new Rect (0, 0, 30, 80), "");
+			var win = new Window (new Rect (0, 0, 30, 80));
 			var label = new Label () { Width = Dim.Fill () };
 			win.Add (label);
 			Application.Top.Add (win);

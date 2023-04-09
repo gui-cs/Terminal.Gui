@@ -371,14 +371,9 @@ namespace Terminal.Gui {
 			OnSplitterMoved (idx);
 			return true;
 		}
-
+		
 		/// <summary>
-		/// BUGBUG: v2 Temporary for now
-		/// </summary>
-		public LineStyle BorderStyle { get; set; } = LineStyle.None;
-
-		/// <summary>
-		/// Overriden so no Frames get drawn (BUGBUG: v2 fix this hack)
+		/// Overridden so no Frames get drawn (BUGBUG: v2 fix this hack)
 		/// </summary>
 		/// <param name="bounds"></param>
 		/// <returns></returns>
