@@ -2658,12 +2658,15 @@ namespace Terminal.Gui {
 						}
 						edges.Remove ((from, to));
 					} else if (from.SuperView == to.SuperView) {
+						// if 'from' is not yet added to the result, add it
 						if (result.Find (v => v == from) == null) {
 							result.Add (from);
 						}
+						// if 'to' is not yet added to the result, add it
 						if (result.Find (v => v == to) == null) {
 							result.Add (to);
 						}
+						// remove from edge
 						edges.Remove ((from, to));
 					} else if (from != superView?.GetTopSuperView (to, from) && !ReferenceEquals (from, to)) {
 						if (ReferenceEquals (from.SuperView, to)) {
