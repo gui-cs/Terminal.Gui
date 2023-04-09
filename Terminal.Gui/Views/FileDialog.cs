@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using NStack;
+using Terminal.Gui.Resources;
 using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui {
@@ -716,13 +717,13 @@ namespace Terminal.Gui {
 			if (ustring.IsNullOrEmpty (Title)) {
 				switch (OpenMode) {
 				case OpenMode.File:
-					this.Title = $"OPEN {(MustExist ? "EXISTING " : "")}FILE";
+					this.Title = $"{Strings.fdOpen} {(MustExist ? Strings.fdExisting + " " : "")}{Strings.fdFile}";
 					break;
 				case OpenMode.Directory:
-					this.Title = $"OPEN {(MustExist ? "EXISTING " : "")}DIRECTORY";
+					this.Title = $"{Strings.fdOpen} {(MustExist ? Strings.fdExisting + " " : "")}{Strings.fdDirectory}";
 					break;
 				case OpenMode.Mixed:
-					this.Title = $"OPEN{(MustExist ? " EXISTING" : "")}";
+					this.Title = $"{Strings.fdOpen} {(MustExist ? Strings.fdExisting + " " : "")}";
 					break;
 				}
 			}
