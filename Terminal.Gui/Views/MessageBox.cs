@@ -246,28 +246,6 @@ namespace Terminal.Gui {
 		static int QueryFull (bool useErrorColors, int width, int height, ustring title, ustring message,
 			int defaultButton = 0, bool wrapMessage = true, params ustring [] buttons)
 		{
-			//int defaultWidth = 50;
-			//if (defaultWidth > Application.Driver.Cols / 2) {
-			//	defaultWidth = (int)(Application.Driver.Cols * 0.60f);
-			//}
-			//int maxWidthLine = TextFormatter.MaxWidthLine (message);
-			//if (wrapMessagge && maxWidthLine > Application.Driver.Cols) {
-			//	maxWidthLine = Application.Driver.Cols;
-			//}
-			//if (width == 0) {
-			//	maxWidthLine = Math.Max (maxWidthLine, defaultWidth);
-			//} else {
-			//	maxWidthLine = width;
-			//}
-			//int textWidth = TextFormatter.MaxWidth (message, maxWidthLine);
-			//int textHeight = TextFormatter.MaxLines (message, textWidth); // message.Count (ustring.Make ('\n')) + 1;
-			//int msgboxHeight = Math.Max (1, textHeight) + 4; // textHeight + (top + top padding + buttons + bottom)
-
-			if (wrapMessage) {
-				//textWidth = Math.Min (textWidth, Application.Driver.Cols);
-				//msgboxHeight = Math.Min (msgboxHeight, Application.Driver.Rows);
-			}
-			
 			// Create button array for Dialog
 			int count = 0;
 			List<Button> buttonList = new List<Button> ();
@@ -317,7 +295,7 @@ namespace Terminal.Gui {
 				Width = Dim.Fill (0),
 				Height = Dim.Fill (1)
 			};
-			messageLabel.TextFormatter.WordWrap = wrapMessage; // BUGBUG: This does nothing
+			messageLabel.TextFormatter.WordWrap = wrapMessage; // BUGBUG: This does nothing as it's not implemented by TextFormatter!
 			d.Add (messageLabel);
 			
 			d.Loaded += (s, e) => {
