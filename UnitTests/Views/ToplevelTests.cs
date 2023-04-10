@@ -815,8 +815,8 @@ namespace Terminal.Gui.ViewsTests {
 			var win = new Window () {
 				X = 3,
 				Y = 2,
-				Width = Dim.Fill (10),
-				Height = Dim.Fill (5)
+				Width = 10,
+				Height = 5
 			};
 			var top = Application.Top;
 			top.Add (win);
@@ -831,7 +831,9 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Iteration = () => {
 				iterations++;
 				if (iterations == 0) {
-					((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+					((FakeDriver)Application.Driver).SetBufferSize (30, 10);
+				} else if (iterations == 1) {
+					location = win.Frame;
 
 					Assert.Null (Application.MouseGrabView);
 					// Grab the mouse
@@ -846,8 +848,7 @@ namespace Terminal.Gui.ViewsTests {
 
 					Assert.Equal (win, Application.MouseGrabView);
 					Assert.Equal (location, Application.MouseGrabView.Frame);
-
-				} else if (iterations == 1) {
+				} else if (iterations == 2) {
 					Assert.Equal (win, Application.MouseGrabView);
 					// Drag to left
 					movex = 1;
@@ -863,14 +864,14 @@ namespace Terminal.Gui.ViewsTests {
 
 					Assert.Equal (win, Application.MouseGrabView);
 
-				} else if (iterations == 2) {
+				} else if (iterations == 3) {
 					// we should have moved +1, +0
 					Assert.Equal (win, Application.MouseGrabView);
 					Assert.Equal (win, Application.MouseGrabView);
 					location.Offset (movex, movey);
 					Assert.Equal (location, Application.MouseGrabView.Frame);
 
-				} else if (iterations == 3) {
+				} else if (iterations == 4) {
 					Assert.Equal (win, Application.MouseGrabView);
 					// Drag up
 					movex = 0;
@@ -886,13 +887,13 @@ namespace Terminal.Gui.ViewsTests {
 
 					Assert.Equal (win, Application.MouseGrabView);
 
-				} else if (iterations == 4) {
+				} else if (iterations == 5) {
 					// we should have moved +0, -1
 					Assert.Equal (win, Application.MouseGrabView);
 					location.Offset (movex, movey);
 					Assert.Equal (location, Application.MouseGrabView.Frame);
 
-				} else if (iterations == 5) {
+				} else if (iterations == 6) {
 					Assert.Equal (win, Application.MouseGrabView);
 					// Ungrab the mouse
 					movex = 0;
@@ -907,7 +908,7 @@ namespace Terminal.Gui.ViewsTests {
 						});
 
 					Assert.Null (Application.MouseGrabView);
-				} else if (iterations == 8) {
+				} else if (iterations == 7) {
 					Application.RequestStop ();
 				}
 			};

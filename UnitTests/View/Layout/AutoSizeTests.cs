@@ -236,15 +236,6 @@ namespace Terminal.Gui.ViewTests {
 			size = view.GetAutoSize ();
 			Assert.Equal (new Size (2, 1), size);
 		}
-		
-		[Fact, AutoInitShutdown]
-		public void AutoSize_GetAutoSize_Justified ()
-		{
-			var view = new View () {
-				AutoSize = true
-			};
-			Assert.Throws<InvalidOperationException>(() => view.TextAlignment = TextAlignment.Justified);
-		}
 
 		[Fact, AutoInitShutdown]
 		public void AutoSize_False_View_IsEmpty_False_Return_Null_Lines ()

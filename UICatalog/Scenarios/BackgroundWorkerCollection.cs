@@ -345,14 +345,14 @@ namespace UICatalog.Scenarios {
 				};
 
 				LayoutStarted += (s,e) => {
-					var btnsWidth = start.Bounds.Width + close.Bounds.Width + 2 - 1;
+					var btnsWidth = start.Frame.Width + close.Frame.Width + 2 - 1;
 					var shiftLeft = Math.Max ((Bounds.Width - btnsWidth) / 2 - 2, 0);
 
-					shiftLeft += close.Bounds.Width + 1;
+					shiftLeft += close.Frame.Width + 1;
 					close.X = Pos.AnchorEnd (shiftLeft);
 					close.Y = Pos.AnchorEnd (1);
 
-					shiftLeft += start.Bounds.Width + 1;
+					shiftLeft += start.Frame.Width + 1;
 					start.X = Pos.AnchorEnd (shiftLeft);
 					start.Y = Pos.AnchorEnd (1);
 				};
