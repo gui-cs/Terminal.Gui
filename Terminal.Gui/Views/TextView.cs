@@ -576,43 +576,88 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		enum RuneType {
+			IsSymbol,
+			IsWhiteSpace,
+			IsLetterOrDigit,
+			IsPunctuation,
+			IsUnknow
+		}
+
+		RuneType GetRuneType (Rune rune)
+		{
+			if (Rune.IsSymbol (rune)) {
+				return RuneType.IsSymbol;
+			} else if (Rune.IsWhiteSpace (rune)) {
+				return RuneType.IsWhiteSpace;
+			} else if (Rune.IsLetterOrDigit (rune)) {
+				return RuneType.IsLetterOrDigit;
+			} else if (Rune.IsPunctuation (rune)) {
+				return RuneType.IsPunctuation;
+			}
+			return RuneType.IsUnknow;
+		}
+
+		bool IsSameRuneType (Rune newRune, RuneType runeType)
+		{
+			var rt = GetRuneType (newRune);
+			return rt == runeType;
+		}
+
 		public (int col, int row)? WordForward (int fromCol, int fromRow)
 		{
+			if (fromRow == lines.Count - 1 && fromCol == GetLine (lines.Count - 1).Count)
+				return null;
+
 			var col = fromCol;
 			var row = fromRow;
 			try {
 				var rune = RuneAt (col, row);
+				var runeType = GetRuneType (rune);
+				int lastValidCol = IsSameRuneType (rune, runeType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune)) ? col : -1;
 
 				void ProcMoveNext (ref int nCol, ref int nRow, Rune nRune)
 				{
-					if (Rune.IsSymbol (nRune) || Rune.IsWhiteSpace (nRune)) {
+					if (Rune.IsWhiteSpace (nRune)) {
 						while (MoveNext (ref nCol, ref nRow, out nRune)) {
-							if (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune))
+							if (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)) {
+								lastValidCol = nCol;
 								return;
+							}
 						}
-						if (nRow != fromRow && (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune))) {
+						if (nRow != fromRow && (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune))) {
+							if (lastValidCol > -1) {
+								nCol = lastValidCol;
+							}
 							return;
 						}
 						while (MoveNext (ref nCol, ref nRow, out nRune)) {
-							if (!Rune.IsLetterOrDigit (nRune) && !Rune.IsPunctuation (nRune))
+							if (!Rune.IsLetterOrDigit (nRune) && !Rune.IsPunctuation (nRune) && !Rune.IsSymbol (nRune))
 								break;
+							if (nRow != fromRow) {
+								break;
+							}
+							lastValidCol = IsSameRuneType (nRune, runeType) && Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune) ? nCol : lastValidCol;
+						}
+						if (lastValidCol > -1) {
+							nCol = lastValidCol;
+							nRow = fromRow;
 						}
 					} else {
 						if (!MoveNext (ref nCol, ref nRow, out nRune)) {
 							return;
 						}
-
-						var line = GetLine (fromRow);
-						if ((nRow != fromRow && fromCol < line.Count)
-							|| (nRow == fromRow && nCol == line.Count - 1)) {
-							nCol = line.Count;
-							nRow = fromRow;
+						if (!IsSameRuneType (nRune, runeType) && !Rune.IsWhiteSpace (nRune)) {
 							return;
-						} else if (nRow != fromRow && fromCol == line.Count) {
-							line = GetLine (nRow);
-							if (Rune.IsLetterOrDigit (line [nCol]) || Rune.IsPunctuation (line [nCol])) {
-								return;
-							}
+						}
+						var line = GetLine (nRow);
+						if (nCol == line.Count && nRow == fromRow && (Rune.IsLetterOrDigit (line [0]) || Rune.IsPunctuation (line [0]) || Rune.IsSymbol (line [0]))) {
+							return;
+						}
+						lastValidCol = IsSameRuneType (nRune, runeType) && Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune) ? nCol : lastValidCol;
+						if (fromRow != nRow) {
+							nCol = 0;
+							return;
 						}
 						ProcMoveNext (ref nCol, ref nRow, nRune);
 					}
@@ -637,30 +682,34 @@ namespace Terminal.Gui {
 			var row = fromRow;
 			try {
 				var rune = RuneAt (col, row);
-				int lastValidCol = Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) ? col : -1;
+				var runeType = GetRuneType (rune);
+				int lastValidCol = IsSameRuneType (rune, runeType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune)) ? col : -1;
 
 				void ProcMovePrev (ref int nCol, ref int nRow, Rune nRune)
 				{
-					if (Rune.IsSymbol (nRune) || Rune.IsWhiteSpace (nRune)) {
+					if (Rune.IsWhiteSpace (nRune)) {
 						while (MovePrev (ref nCol, ref nRow, out nRune)) {
-							if (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune)) {
+							if (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)) {
 								lastValidCol = nCol;
+								if (runeType == RuneType.IsWhiteSpace || runeType == RuneType.IsUnknow) {
+									runeType = GetRuneType (nRune);
+								}
 								break;
 							}
 						}
-						if (nRow != fromRow && (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune))) {
+						if (nRow != fromRow && (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune))) {
 							if (lastValidCol > -1) {
 								nCol = lastValidCol;
 							}
 							return;
 						}
 						while (MovePrev (ref nCol, ref nRow, out nRune)) {
-							if (!Rune.IsLetterOrDigit (nRune) && !Rune.IsPunctuation (nRune))
+							if (!Rune.IsLetterOrDigit (nRune) && !Rune.IsPunctuation (nRune) && !Rune.IsSymbol (nRune))
 								break;
 							if (nRow != fromRow) {
 								break;
 							}
-							lastValidCol = nCol;
+							lastValidCol = IsSameRuneType (nRune, runeType) && Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune) ? nCol : lastValidCol;
 						}
 						if (lastValidCol > -1) {
 							nCol = lastValidCol;
@@ -672,11 +721,11 @@ namespace Terminal.Gui {
 						}
 
 						var line = GetLine (nRow);
-						if (nCol == 0 && nRow == fromRow && (Rune.IsLetterOrDigit (line [0]) || Rune.IsPunctuation (line [0]))) {
+						if (nCol == 0 && nRow == fromRow && (Rune.IsLetterOrDigit (line [0]) || Rune.IsPunctuation (line [0]) || Rune.IsSymbol (line [0]))) {
 							return;
 						}
-						lastValidCol = Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) ? nCol : lastValidCol;
-						if (lastValidCol > -1 && (Rune.IsSymbol (nRune) || Rune.IsWhiteSpace (nRune))) {
+						lastValidCol = IsSameRuneType (nRune, runeType) && Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune) ? nCol : lastValidCol;
+						if (lastValidCol > -1 && Rune.IsWhiteSpace (nRune)) {
 							nCol = lastValidCol;
 							return;
 						}

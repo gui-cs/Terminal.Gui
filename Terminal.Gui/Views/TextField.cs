@@ -689,6 +689,7 @@ namespace Terminal.Gui {
 		{
 			ClearAllSelection ();
 			var newPos = GetModel ().WordBackward (point, 0);
+			if (newPos == null) return;
 			if (newPos.Value.col != -1) {
 				SetText (text.GetRange (0, newPos.Value.col).Concat (text.GetRange (point, text.Count - point)));
 				point = newPos.Value.col;
@@ -703,6 +704,7 @@ namespace Terminal.Gui {
 		{
 			ClearAllSelection ();
 			var newPos = GetModel ().WordForward (point, 0);
+			if (newPos == null) return;
 			if (newPos.Value.col != -1) {
 				SetText (text.GetRange (0, point).Concat (text.GetRange (newPos.Value.col, text.Count - newPos.Value.col)));
 			}
@@ -713,6 +715,7 @@ namespace Terminal.Gui {
 		{
 			ClearAllSelection ();
 			var newPos = GetModel ().WordForward (point, 0);
+			if (newPos == null) return;
 			if (newPos.Value.col != -1)
 				point = newPos.Value.col;
 			Adjust ();
@@ -722,6 +725,7 @@ namespace Terminal.Gui {
 		{
 			ClearAllSelection ();
 			var newPos = GetModel ().WordBackward (point, 0);
+			if (newPos == null) return;
 			if (newPos.Value.col != -1)
 				point = newPos.Value.col;
 			Adjust ();
@@ -818,6 +822,7 @@ namespace Terminal.Gui {
 			if (point < text.Count) {
 				int x = start > -1 && start > point ? start : point;
 				var newPos = GetModel ().WordForward (x, 0);
+				if (newPos == null) return;
 				if (newPos.Value.col != -1)
 					point = newPos.Value.col;
 				PrepareSelection (x, newPos.Value.col - x);
@@ -830,6 +835,7 @@ namespace Terminal.Gui {
 				int x = Math.Min (start > -1 && start > point ? start : point, text.Count);
 				if (x > 0) {
 					var newPos = GetModel ().WordBackward (x, 0);
+					if (newPos == null) return;
 					if (newPos.Value.col != -1)
 						point = newPos.Value.col;
 					PrepareSelection (x, newPos.Value.col - x);
