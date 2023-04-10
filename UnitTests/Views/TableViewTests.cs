@@ -456,6 +456,71 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Fact, AutoInitShutdown]
+		public void TableView_HideHeaders_True_ExactBounds ()
+		{
+			var tv = SetUpMiniTable ();
+
+			// the thing we are testing
+			tv.Style.HideHeaders = true;
+			tv.Style.ShowHorizontalHeaderOverline = false;
+			// width exactly matches the max col widths
+			tv.Bounds = new Rect (0, 0, 5, 1);
+
+			tv.Redraw (tv.Bounds);
+
+			string expected = @"
+│1│2│
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// test borders without headers
+			tv.Style.ShowHorizontalHeaderUnderline = false;
+			tv.Style.ShowHorizontalHeaderOverline = true;
+			// width exactly matches the max col widths
+			tv.Bounds = new Rect (0, 0, 5, 2);
+
+			tv.Redraw (tv.Bounds);
+
+			expected = @"
+┌─┬─┐
+│1│2│
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// test underline is ignored when set to true
+			tv.Style.ShowHorizontalHeaderUnderline = true;
+			// width exactly matches the max col widths
+			tv.Bounds = new Rect (0, 0, 5, 2);
+
+			tv.Redraw (tv.Bounds);
+
+			expected = @"
+┌─┬─┐
+│1│2│
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// test HideHeaders disabling brings back header row
+			tv.Style.HideHeaders = false;
+			tv.Style.ShowHorizontalHeaderUnderline = false;
+			// width exactly matches the max col widths
+			tv.Bounds = new Rect (0, 0, 5, 3);
+
+			tv.Redraw (tv.Bounds);
+
+			expected = @"
+┌─┬─┐
+│A│B│
+│1│2│
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
+		}
+
+
+		[Fact, AutoInitShutdown]
 		public void TableView_ExpandLastColumn_True ()
 		{
 			var tv = SetUpMiniTable ();
