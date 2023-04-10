@@ -1262,10 +1262,9 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// If <see cref="TableView.MultiSelect"/> is on and multiple rows are selected
-		/// this returns a union of all <see cref="FileSystemInfoStats"/> in the selection.
+		/// If <see cref="TableView.MultiSelect"/> is this returns a union of all
+		/// <see cref="FileSystemInfoStats"/> in the selection.
 		/// </summary>
-		/// <remarks>Returns an empty collection if there are not at least 2 rows in the selection</remarks>
 		/// <returns></returns>
 		private IEnumerable<FileSystemInfoStats> MultiRowToStats ()
 		{
@@ -1282,7 +1281,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			return toReturn.Count > 1 ? toReturn : Enumerable.Empty<FileSystemInfoStats> ();
+			return toReturn;
 		}
 		private FileSystemInfoStats RowToStats (int rowIndex)
 		{

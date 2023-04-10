@@ -205,7 +205,86 @@ namespace Terminal.Gui.FileServicesTests {
 			// Toggle subfolder
 			Send (' ', ConsoleKey.Spacebar, false);
 
-			// Down to the directory
+			Assert.True(dlg.Canceled);
+
+			if(acceptWithEnter)
+			{
+				Send ('\n', ConsoleKey.Enter);
+			}
+			else
+			{
+				Send ('o', ConsoleKey.O,false,true);
+			}
+			Assert.False(dlg.Canceled);
+
+			Assert.Multiple(
+				()=>{
+					// Only the subfolder should be selected
+					Assert.Equal(1,dlg.MultiSelected.Count);
+					AssertIsTheSubfolder(dlg.Path);
+					AssertIsTheSubfolder(dlg.MultiSelected.Single());
+				},
+				()=>{
+					// Event should also agree with the final state
+					Assert.NotNull(eventMultiSelected);
+					Assert.Equal(1,eventMultiSelected.Count);
+					AssertIsTheSubfolder(eventMultiSelected.Single());
+				}
+			);
+		}
+
+
+		[Fact, AutoInitShutdown]
+		public void MultiSelectDirectory_EnterOpensFolder ()
+		{
+			var dlg = GetDialog();
+			dlg.OpenMode = OpenMode.Directory;
+			dlg.AllowsMultipleSelection = true;
+			IReadOnlyCollection<string> eventMultiSelected = null;
+			dlg.FilesSelected += (s,e)=>
+			{
+				eventMultiSelected  = e.Dialog.MultiSelected;
+			};
+
+			Assert.IsType<TextField>(dlg.MostFocused);
+			Send ('v', ConsoleKey.DownArrow, false);
+			Assert.IsType<TableView>(dlg.MostFocused);
+			// Move selection to subfolder
+			Send ('v', ConsoleKey.DownArrow, false);
+
+			Send ('\n', ConsoleKey.Enter);
+
+			// Path should update to the newly opened folder
+			AssertIsTheSubfolder(dlg.Path);
+
+			// No selection will have been confirmed
+			Assert.True(dlg.Canceled);
+			Assert.Empty(dlg.MultiSelected);
+			Assert.Null(eventMultiSelected);
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData(true)]
+		[InlineData(false)]
+		public void MultiSelectDirectory_CanToggleThenAccept (bool acceptWithEnter)
+		{
+			var dlg = GetDialog();
+			dlg.OpenMode = OpenMode.Directory;
+			dlg.AllowsMultipleSelection = true;
+			IReadOnlyCollection<string> eventMultiSelected = null;
+			dlg.FilesSelected += (s,e)=>
+			{
+				eventMultiSelected  = e.Dialog.MultiSelected;
+			};
+
+			Assert.IsType<TextField>(dlg.MostFocused);
+			Send ('v', ConsoleKey.DownArrow, false);
+			Assert.IsType<TableView>(dlg.MostFocused);
+			// Move selection to subfolder
+			Send ('v', ConsoleKey.DownArrow, false);
+			// Toggle subfolder
+			Send (' ', ConsoleKey.Spacebar, false);
+
 			Assert.True(dlg.Canceled);
 
 			if(acceptWithEnter)
