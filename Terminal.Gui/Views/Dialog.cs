@@ -116,8 +116,8 @@ namespace Terminal.Gui {
 			if (buttons.Count == 0) {
 				return 0;
 			}
-			var widths = buttons.Select (b => b.TextFormatter.GetFormattedSize ().Width + b.BorderFrame.Thickness.Horizontal + b.Padding.Thickness.Horizontal);
-
+			//var widths = buttons.Select (b => b.TextFormatter.GetFormattedSize ().Width + b.BorderFrame.Thickness.Horizontal + b.Padding.Thickness.Horizontal);
+			var widths = buttons.Select (b => b.Frame.Width);
 			return widths.Sum ();
 		}
 
@@ -155,27 +155,24 @@ namespace Terminal.Gui {
 
 		void LayoutButtons ()
 		{
-			if (buttons.Count == 0 || !IsInitialized) {
-				return;
-			}
+			if (buttons.Count == 0 || !IsInitialized) return;
 
 			int shiftLeft = 0;
 
 			int buttonsWidth = GetButtonsWidth ();
-			int margin = 0;
-
 			switch (ButtonAlignment) {
 			case ButtonAlignments.Center:
 				// Center Buttons
-				margin = (int)Math.Ceiling ((double)(Bounds.Width - buttonsWidth) / buttons.Count / 2);
+				shiftLeft = (Bounds.Width - buttonsWidth - buttons.Count - 1) / 2 + 1;
 				for (int i = buttons.Count - 1; i >= 0; i--) {
-					buttons [i].Margin.Thickness = new Thickness (margin, 0, 0, 0);
-					if (i == 0) {
-						buttons [i].X = 0;
+					Button button = buttons [i];
+					shiftLeft += button.Frame.Width + (i == buttons.Count - 1 ? 0 : 1);
+					if (shiftLeft > -1) {
+						button.X = Pos.AnchorEnd (shiftLeft);
 					} else {
-						buttons [i].X = Pos.Right (buttons [i - 1]);
+						button.X = Bounds.Width - shiftLeft;
 					}
-					buttons [i].Y = Pos.AnchorEnd (1);
+					button.Y = Pos.AnchorEnd (1);
 				}
 				break;
 
@@ -183,21 +180,23 @@ namespace Terminal.Gui {
 				// Justify Buttons
 				// leftmost and rightmost buttons are hard against edges. The rest are evenly spaced.
 
-				if (buttons.Count == 1) {
-					buttons [0].X = Pos.Center ();
-					buttons [0].Y = Pos.AnchorEnd (1);
-				} else if (buttons.Count >= 2) {
-					margin = (int)Math.Floor ((double)(Bounds.Width - buttonsWidth) / (buttons.Count - 1));
-					buttons [0].Margin.Thickness = new Thickness (0, 0, 0, 0);
-					buttons [0].X = 0;
-					buttons [0].Y = Pos.AnchorEnd (1);
-
-					for (int i = 1; i < buttons.Count; i++) {
-						buttons [i].Margin.Thickness = new Thickness (margin, 0, 0, 0);
-						buttons [i].X = Pos.Right (buttons [i - 1]);
-						buttons [i].Y = Pos.AnchorEnd (1);
+				var spacing = (int)Math.Ceiling ((double)(Bounds.Width - buttonsWidth) / (buttons.Count - 1));
+				for (int i = buttons.Count - 1; i >= 0; i--) {
+					Button button = buttons [i];
+					if (i == buttons.Count - 1) {
+						shiftLeft += button.Frame.Width;
+						button.X = Pos.AnchorEnd (shiftLeft);
+					} else {
+						if (i == 0) {
+							// first (leftmost) button 
+							var left = Bounds.Width;
+							button.X = Pos.AnchorEnd (left);
+						} else {
+							shiftLeft += button.Frame.Width + (spacing);
+							button.X = Pos.AnchorEnd (shiftLeft);
+						}
 					}
-
+					button.Y = Pos.AnchorEnd (1);
 				}
 				break;
 
@@ -227,8 +226,6 @@ namespace Terminal.Gui {
 				}
 				break;
 			}
-
-			SetNeedsLayout ();
 		}
 
 		///<inheritdoc/>

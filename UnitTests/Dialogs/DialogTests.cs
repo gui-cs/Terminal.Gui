@@ -46,7 +46,7 @@ namespace Terminal.Gui.DialogTests {
 		{
 			var dlg = new Dialog (btns) {
 				Title = title,
-				X = 0, 
+				X = 0,
 				Y = 0,
 				Width = width,
 				Height = 1,
@@ -55,6 +55,66 @@ namespace Terminal.Gui.DialogTests {
 			// Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
 			dlg.BorderFrame.Thickness = new Thickness (1, 0, 1, 0);
 			return (Application.Begin (dlg), dlg);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Size_Default ()
+		{
+			var d = new Dialog () {
+			};
+			Application.Begin (d);
+			((FakeDriver)Application.Driver).SetBufferSize (100, 100);
+
+			// Default size is Percent(85) 
+			Assert.Equal (new Size ((int)(100 * .85), (int)(100 * .85)), d.Frame.Size);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Location_Default ()
+		{
+			var d = new Dialog () {
+			};
+			Application.Begin (d);
+			((FakeDriver)Application.Driver).SetBufferSize (100, 100);
+
+			// Default location is centered, so 100 / 2 - 85 / 2 = 7
+			var expected = 7;
+			Assert.Equal (new Point (expected, expected), d.Frame.Location);
+		}
+
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Size_Not_Default ()
+		{
+			var d = new Dialog () {
+				Width = 50,
+				Height = 50,
+			};
+
+			Application.Begin (d);
+			((FakeDriver)Application.Driver).SetBufferSize (100, 100);
+
+			// Default size is Percent(85) 
+			Assert.Equal (new Size (50, 50), d.Frame.Size);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Location_Not_Default ()
+		{
+			var d = new Dialog () {
+				X = 1,
+				Y = 1,
+			};
+			Application.Begin (d);
+			((FakeDriver)Application.Driver).SetBufferSize (100, 100);
+
+			// Default location is centered, so 100 / 2 - 85 / 2 = 7
+			var expected = 1;
+			Assert.Equal (new Point (expected, expected), d.Frame.Location);
 		}
 
 		[Fact]
@@ -77,8 +137,8 @@ namespace Terminal.Gui.DialogTests {
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 			Application.End (runstate);
 
-			// Justify - Single button is treated as center
-			buttonRow = $"{buttonRow}";
+			// Justify 
+			buttonRow = $"{d.VLine}    {d.LeftBracket} {btnText} {d.RightBracket}{d.VLine}";
 			Assert.Equal (width, buttonRow.Length);
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Justify, new Button (btnText));
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
@@ -112,7 +172,7 @@ namespace Terminal.Gui.DialogTests {
 			buttonRow = $"{d.VLine}      {d.LeftBracket} {btnText} {d.RightBracket}{d.VLine}";
 			Assert.Equal (width, buttonRow.Length);
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Justify, new Button (btnText));
-			TestHelpers.AssertDriverContentsWithFrameAre ($"{d.VLine}   {d.LeftBracket} {btnText} {d.RightBracket}   {d.VLine}", output);
+			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 			Application.End (runstate);
 
 			// Right
@@ -148,7 +208,7 @@ namespace Terminal.Gui.DialogTests {
 			var buttonRow = $@"{d.VLine} {btn1} {btn2} {d.VLine}";
 			var width = buttonRow.Length;
 
-			d.SetBufferSize (width, 3);
+			d.SetBufferSize (buttonRow.Length, 3);
 
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Center, new Button (btn1Text), new Button (btn2Text));
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
@@ -344,7 +404,7 @@ namespace Terminal.Gui.DialogTests {
 
 		[Fact]
 		[AutoInitShutdown]
-		public void ButtonAlignment_Four_On_Smaller_Width ()
+		public void ButtonAlignment_Four_On_Too_Small_Width ()
 		{
 			Application.RunState runstate = null;
 
@@ -361,33 +421,30 @@ namespace Terminal.Gui.DialogTests {
 			var btn3 = $"{d.LeftBracket} {btn3Text} {d.RightBracket}";
 			var btn4Text = "never";
 			var btn4 = $"{d.LeftBracket} {btn4Text} {d.RightBracket}";
-
-			var buttonRow = $"{d.VLine} {btn1} {btn2} {btn3} {btn4} {d.VLine}";
-			var width = buttonRow.Length;
-			d.SetBufferSize (30, 1);
-
+			var buttonRow = string.Empty;
+			
+			var width = 30;
+			d.SetBufferSize (width, 1);
+			
 			// Default - Center
-			buttonRow = $"yes ] {btn2} {btn3} [ never";
-			Assert.NotEqual (width, buttonRow.Length);
-			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Center, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
+			buttonRow = $"{d.VLine}es ] {btn2} {btn3} [ neve{d.VLine}";
+			(runstate, var dlg) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Center, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
+			Assert.Equal (new Size (width, 1), dlg.Frame.Size);
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 			Application.End (runstate);
 
 			// Justify
-			buttonRow = $"es ] {btn2}  {btn3}  [ neve";
-			Assert.NotEqual (width, buttonRow.Length);
+			buttonRow = $"{d.VLine}[ yes [ no [ maybe [ never ]{d.VLine}";
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Justify, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output); Application.End (runstate);
 
 			// Right
-			buttonRow = $" yes ] {btn2} {btn3} [ neve";
-			Assert.NotEqual (width, buttonRow.Length);
+			buttonRow = $"{d.VLine}] {btn2} {btn3} {btn4}{d.VLine}";
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Right, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output); Application.End (runstate);
 
 			// Left
-			buttonRow = $"es ] {btn2} {btn3} [ never";
-			Assert.NotEqual (width, buttonRow.Length);
+			buttonRow = $"{d.VLine}{btn1} {btn2} {btn3} [ n{d.VLine}";
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Left, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output); Application.End (runstate);
 		}
