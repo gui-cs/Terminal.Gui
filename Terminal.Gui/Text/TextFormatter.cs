@@ -1153,7 +1153,7 @@ namespace Terminal.Gui {
 		public int CursorPosition { get; set; }
 
 		/// <summary>
-		/// Gets the size reqruied to hold the formatted text, given the constraints placed by <see cref="Size"/>.
+		/// Gets the size required to hold the formatted text, given the constraints placed by <see cref="Size"/>.
 		/// </summary>
 		/// <remarks>
 		/// Causes a format, resetting <see cref="NeedsFormat"/>.

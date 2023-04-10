@@ -153,15 +153,15 @@ namespace Terminal.Gui {
 		/// <param name="title">Title for the query.</param>
 		/// <param name="message">Message to display, might contain multiple lines.</param>
 		/// <param name="defaultButton">Index of the default button.</param>
-		/// <param name="wrapMessagge">If wrap the message or not.</param>
+		/// <param name="wrapMessage">If wrap the message or not.</param>
 		/// <param name="buttons">Array of buttons to add.</param>
 		/// <remarks>
 		/// The message box will be vertically and horizontally centered in the container and the size will be automatically determined
 		/// from the size of the message and buttons.
 		/// </remarks>
-		public static int Query (ustring title, ustring message, int defaultButton = 0, bool wrapMessagge = true, params ustring [] buttons)
+		public static int Query (ustring title, ustring message, int defaultButton = 0, bool wrapMessage = true, params ustring [] buttons)
 		{
-			return QueryFull (false, 0, 0, title, message, defaultButton, wrapMessagge, buttons);
+			return QueryFull (false, 0, 0, title, message, defaultButton, wrapMessage, buttons);
 		}
 
 
@@ -271,18 +271,21 @@ namespace Terminal.Gui {
 			// Create button array for Dialog
 			int count = 0;
 			List<Button> buttonList = new List<Button> ();
-			if (buttons != null && defaultButton > buttons.Length - 1) {
-				defaultButton = buttons.Length - 1;
-			}
-			foreach (var s in buttons) {
-				var b = new Button (s);
-				if (count == defaultButton) {
-					b.IsDefault = true;
+			if (buttons != null) {
+				if (defaultButton > buttons.Length - 1) {
+					defaultButton = buttons.Length - 1;
 				}
-				buttonList.Add (b);
-				count++;
-			}
+				foreach (var s in buttons) {
+					var b = new Button (s);
+					if (count == defaultButton) {
+						b.IsDefault = true;
+					}
+					buttonList.Add (b);
+					count++;
+				}
 
+			}
+			
 			Dialog d;
 			d = new Dialog (buttonList.ToArray ()) {
 				Title = title,
@@ -305,7 +308,7 @@ namespace Terminal.Gui {
 				d.ColorScheme = Colors.Dialog;
 			}
 
-			var l = new Label () {
+			var messageLabel = new Label () {
 				AutoSize = false,
 				Text = message,
 				TextAlignment = TextAlignment.Centered,
@@ -314,22 +317,29 @@ namespace Terminal.Gui {
 				Width = Dim.Fill (0),
 				Height = Dim.Fill (1)
 			};
-			//l.TextFormatter.WordWrap = wrapMessage,
-			d.Add (l);
+			messageLabel.TextFormatter.WordWrap = wrapMessage; // BUGBUG: This does nothing
+			d.Add (messageLabel);
 			
-			d.LayoutStarted += (s, e) => {
+			d.Loaded += (s, e) => {
+				if (width != 0 || height != 0) {
+					return;
+				}
 				// TODO: replace with Dim.Fit when implemented
-				var messageWidth = TextFormatter.MaxWidth (l.Text, Application.Driver.Cols - d.GetFramesThickness ().Horizontal);
-				var messageHeight = TextFormatter.MaxLines (l.Text, l.TextFormatter.Size.Width);
+				var maxBounds = d.SuperView?.Bounds ?? Application.Top.Bounds;
+				maxBounds = Rect.Inflate (maxBounds, -d.GetFramesThickness ().Horizontal, -d.GetFramesThickness ().Vertical);
+				messageLabel.TextFormatter.Size = maxBounds.Size;
+				var msg = messageLabel.TextFormatter.Format ();
+				var messageSize = messageLabel.TextFormatter.GetFormattedSize ();
 
 				// Ensure the width fits the text + buttons
-				var newWidth = Math.Max (width, Math.Max (messageWidth + d.GetFramesThickness ().Horizontal,
+				var newWidth = Math.Max (width, Math.Max (messageSize.Width + d.GetFramesThickness ().Horizontal,
 								d.GetButtonsWidth () + d.buttons.Count + d.GetFramesThickness ().Horizontal));
 				if (newWidth > d.Frame.Width) {
 					d.Width = newWidth;
 				}
 				// Ensure height fits the text + vspace + buttons
-				d.Height = Math.Max (height, messageHeight + 2 + d.GetFramesThickness ().Vertical);
+				d.Height = Math.Max (height, messageSize.Height + 2 + d.GetFramesThickness ().Vertical);
+				d.SetRelativeLayout (d.SuperView?.Frame ?? Application.Top.Frame);
 			};
 
 			// Setup actions

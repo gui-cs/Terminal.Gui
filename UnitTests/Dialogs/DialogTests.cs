@@ -117,6 +117,95 @@ namespace Terminal.Gui.DialogTests {
 			Assert.Equal (new Point (expected, expected), d.Frame.Location);
 		}
 
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Location_When_Application_Top_Not_Default ()
+		{
+			var expected = 5;
+			var d = new Dialog () {
+				X = expected,
+				Y = expected,
+				Height = 5,
+				Width = 5
+			};
+			Application.Begin (d);
+			((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+
+			// Default location is centered, so 100 / 2 - 85 / 2 = 7
+			Assert.Equal (new Point (expected, expected), d.Frame.Location);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+     ┌───┐
+     │   │
+     │   │
+     │   │
+     └───┘", output);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Location_When_Not_Application_Top_Not_Default ()
+		{
+			Application.Top.BorderStyle = LineStyle.Double;
+
+			var iterations = -1;
+			Application.Iteration += () => {
+				iterations++;
+				
+				if (iterations == 0) {
+					var d = new Dialog () {
+						X = 5,
+						Y = 5,
+						Height = 3,
+						Width = 5
+					};
+					Application.Begin (d);
+
+					Assert.Equal (new Point (5, 5), d.Frame.Location);
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
+╔══════════════════╗
+║                  ║
+║                  ║
+║                  ║
+║                  ║
+║    ┌───┐         ║
+║    │   │         ║
+║    └───┘         ║
+║                  ║
+╚══════════════════╝", output);
+
+					d = new Dialog () {
+						X = 5,
+						Y = 5,
+					};
+					Application.Begin (d);
+
+					// This is because of PostionTopLevels and EnsureVisibleBounds
+					Assert.Equal (new Point (3, 2), d.Frame.Location);
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
+╔══════════════════╗
+║                  ║
+║  ┌───────────────┐
+║  │               │
+║  │               │
+║  │               │
+║  │               │
+║  │               │
+║  │               │
+╚══└───────────────┘", output);
+
+
+				} else if (iterations > 0) {
+					Application.RequestStop ();
+				}
+			};
+			
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+			Application.Run ();
+		}
+		
 		[Fact]
 		[AutoInitShutdown]
 		public void ButtonAlignment_One ()

@@ -41,7 +41,7 @@ namespace Terminal.Gui.ViewsTests {
 
 		[Fact]
 		[AutoInitShutdown]
-		public void Application_Top_EnsureVisibleBounds_To_Driver_Rows_And_Cols ()
+		public void Application_Top_GetLocationThatFits_To_Driver_Rows_And_Cols ()
 		{
 			var iterations = 0;
 
@@ -201,7 +201,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (top, Application.Top);
 
 			// Application.Top without menu and status bar.
-			var supView = top.EnsureVisibleBounds (top, 2, 2, out int nx, out int ny, out MenuBar mb, out StatusBar sb);
+			var supView = top.GetLocationThatFits (top, 2, 2, out int nx, out int ny, out MenuBar mb, out StatusBar sb);
 			Assert.Equal (Application.Top, supView);
 			Assert.Equal (0, nx);
 			Assert.Equal (0, ny);
@@ -212,7 +212,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.NotNull (top.MenuBar);
 
 			// Application.Top with a menu and without status bar.
-			top.EnsureVisibleBounds (top, 2, 2, out nx, out ny, out mb, out sb);
+			top.GetLocationThatFits (top, 2, 2, out nx, out ny, out mb, out sb);
 			Assert.Equal (0, nx);
 			Assert.Equal (1, ny);
 			Assert.NotNull (mb);
@@ -222,7 +222,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.NotNull (top.StatusBar);
 
 			// Application.Top with a menu and status bar.
-			top.EnsureVisibleBounds (top, 2, 2, out nx, out ny, out mb, out sb);
+			top.GetLocationThatFits (top, 2, 2, out nx, out ny, out mb, out sb);
 			Assert.Equal (0, nx);
 			// The available height is lower than the Application.Top height minus
 			// the menu bar and status bar, then the top can go beyond the bottom
@@ -234,7 +234,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Null (top.MenuBar);
 
 			// Application.Top without a menu and with a status bar.
-			top.EnsureVisibleBounds (top, 2, 2, out nx, out ny, out mb, out sb);
+			top.GetLocationThatFits (top, 2, 2, out nx, out ny, out mb, out sb);
 			Assert.Equal (0, nx);
 			// The available height is lower than the Application.Top height minus
 			// the status bar, then the top can go beyond the bottom
@@ -251,13 +251,13 @@ namespace Terminal.Gui.ViewsTests {
 			top.LayoutSubviews ();
 
 			// The SuperView is always the same regardless of the caller.
-			supView = top.EnsureVisibleBounds (win, 0, 0, out nx, out ny, out mb, out sb);
+			supView = top.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);
 			Assert.Equal (Application.Top, supView);
-			supView = win.EnsureVisibleBounds (win, 0, 0, out nx, out ny, out mb, out sb);
+			supView = win.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);
 			Assert.Equal (Application.Top, supView);
 
 			// Application.Top without menu and status bar.
-			top.EnsureVisibleBounds (win, 0, 0, out nx, out ny, out mb, out sb);
+			top.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);
 			Assert.Equal (0, nx);
 			Assert.Equal (0, ny);
 			Assert.Null (mb);
@@ -267,7 +267,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.NotNull (top.MenuBar);
 
 			// Application.Top with a menu and without status bar.
-			top.EnsureVisibleBounds (win, 2, 2, out nx, out ny, out mb, out sb);
+			top.GetLocationThatFits (win, 2, 2, out nx, out ny, out mb, out sb);
 			Assert.Equal (0, nx);
 			Assert.Equal (1, ny);
 			Assert.NotNull (mb);
@@ -277,7 +277,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.NotNull (top.StatusBar);
 
 			// Application.Top with a menu and status bar.
-			top.EnsureVisibleBounds (win, 30, 20, out nx, out ny, out mb, out sb);
+			top.GetLocationThatFits (win, 30, 20, out nx, out ny, out mb, out sb);
 			Assert.Equal (0, nx);
 			// The available height is lower than the Application.Top height minus
 			// the menu bar and status bar, then the top can go beyond the bottom
@@ -296,7 +296,7 @@ namespace Terminal.Gui.ViewsTests {
 			top.Add (win);
 
 			// Application.Top without menu and status bar.
-			top.EnsureVisibleBounds (win, 0, 0, out nx, out ny, out mb, out sb);
+			top.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);
 			Assert.Equal (0, nx);
 			Assert.Equal (0, ny);
 			Assert.Null (mb);
@@ -306,7 +306,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.NotNull (top.MenuBar);
 
 			// Application.Top with a menu and without status bar.
-			top.EnsureVisibleBounds (win, 2, 2, out nx, out ny, out mb, out sb);
+			top.GetLocationThatFits (win, 2, 2, out nx, out ny, out mb, out sb);
 			Assert.Equal (2, nx);
 			Assert.Equal (2, ny);
 			Assert.NotNull (mb);
@@ -316,7 +316,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.NotNull (top.StatusBar);
 
 			// Application.Top with a menu and status bar.
-			top.EnsureVisibleBounds (win, 30, 20, out nx, out ny, out mb, out sb);
+			top.GetLocationThatFits (win, 30, 20, out nx, out ny, out mb, out sb);
 			Assert.Equal (20, nx); // 20+60=80
 			Assert.Equal (9, ny); // 9+15+1(mb)=25
 			Assert.NotNull (mb);
@@ -916,7 +916,7 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void EnsureVisibleBounds_With_Border_Null_Not_Throws ()
+		public void GetLocationThatFits_With_Border_Null_Not_Throws ()
 		{
 			var top = new Toplevel ();
 			Application.Begin (top);
