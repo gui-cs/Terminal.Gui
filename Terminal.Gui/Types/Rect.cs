@@ -494,6 +494,5 @@ namespace Terminal.Gui
 			return String.Format ("{{X={0},Y={1},Width={2},Height={3}}}",
 						 X, Y, Width, Height);
 		}
-
 	}
 }

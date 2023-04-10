@@ -15,7 +15,7 @@ namespace Terminal.Gui.DialogTests {
 			this.output = output;
 		}
 
-				[Fact]
+		[Fact]
 		[AutoInitShutdown]
 		public void Size_Default ()
 		{
@@ -36,7 +36,7 @@ namespace Terminal.Gui.DialogTests {
 					Assert.IsType<Dialog> (Application.Current);
 					// Default size is Percent(60) 
 					Assert.Equal (new Size ((int)(100 * .60), 5), Application.Current.Frame.Size);
-					
+
 					Application.RequestStop ();
 				}
 			};
@@ -174,7 +174,7 @@ namespace Terminal.Gui.DialogTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void With_Empty_Size_Without_Buttons ()
+		public void Size_None_No_Buttons ()
 		{
 			var iterations = -1;
 			Application.Begin (Application.Top);
@@ -205,7 +205,7 @@ namespace Terminal.Gui.DialogTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void With_Empty_Size_With_Button ()
+		public void Size_No_With_Button ()
 		{
 			Application.Top.BorderStyle = LineStyle.Double;
 			var iterations = -1;
@@ -216,7 +216,7 @@ namespace Terminal.Gui.DialogTests {
 			aboutMessage.AppendLine (@"https://github.com/gui-cs/Terminal.Gui");
 			var message = aboutMessage.ToString ();
 
-			((FakeDriver)Application.Driver).SetBufferSize (40 + 4, 10);
+			((FakeDriver)Application.Driver).SetBufferSize (40 + 4, 8);
 
 			Application.Iteration += () => {
 				iterations++;
@@ -235,8 +235,6 @@ namespace Terminal.Gui.DialogTests {
 ║│0123456789012345678901234567890123456789│║
 ║│ https://github.com/gui-cs/Terminal.Gui │║
 ║│                                        │║
-║│                                        │║
-║│                                        │║
 ║│                [◦ Ok ◦]                │║
 ║└────────────────────────────────────────┘║
 ╚══════════════════════════════════════════╝
@@ -250,7 +248,7 @@ namespace Terminal.Gui.DialogTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void With_A_Smaller_Fixed_Size ()
+		public void Size_Tiny_Fixed_Size ()
 		{
 			var iterations = -1;
 			Application.Begin (Application.Top);
@@ -283,7 +281,7 @@ namespace Terminal.Gui.DialogTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void With_A_Enough_Fixed_Size ()
+		public void Size_JustBigEnough_Fixed_Size ()
 		{
 			var iterations = -1;
 			Application.Begin (Application.Top);
@@ -313,37 +311,53 @@ namespace Terminal.Gui.DialogTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void LongMessage_Without_Spaces_WrapMessage_True ()
+		public void Message_Long_Without_Spaces_WrapMessage_True ()
 		{
 			var iterations = -1;
 			Application.Begin (Application.Top);
 			Application.Top.BorderStyle = LineStyle.Double;
-			((FakeDriver)Application.Driver).SetBufferSize (20, 12);
-			
+			((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+
 			Application.Iteration += () => {
 				iterations++;
-				
+
 				if (iterations == 0) {
-					// 100 characters should make the height of the wrapped text 6
-					MessageBox.Query (string.Empty, new string ('f', 100), defaultButton: 0, wrapMessage: true, null);
+					// 50 characters should make the height of the wrapped text 7
+					MessageBox.Query (string.Empty, new string ('f', 50), defaultButton: 0, wrapMessage: true, "btn");
 
 					Application.RequestStop ();
 				} else if (iterations == 1) {
 					Application.Refresh ();
-				
-					TestHelpers.AssertDriverContentsWithFrameAre (@"
-┌──────────────────┐
-│ffffffffffffffffff│
-│ffffffffffffffffff│
-│ffffffffffffffffff│
-│ffffffffffffffffff│
-│ffffffffffffffffff│
-│ffffffffffffffffff│
-│ffffffffffffffffff│
-│ffffffffffffffffff│
-└──────────────────┘", output);
-					Assert.Equal (new Size (20, 5), Application.Current.Frame.Size);
 
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
+╔══════════════════╗
+║┌────────────────┐║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│       ff       │║
+║│                │║
+║│    [◦ btn ◦]   │║
+║└────────────────┘║
+╚══════════════════╝", output);
+					Assert.Equal (new Size (20 - 2, 10 - 2), Application.Current.Frame.Size);
+					Application.RequestStop ();
+
+					// Really long text
+					MessageBox.Query (string.Empty, new string ('f', 500), defaultButton: 0, wrapMessage: true, "btn");
+				} else if (iterations == 2) {
+					Application.Refresh ();
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
+╔┌────────────────┐╗
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│    [◦ btn ◦]   │║
+╚└────────────────┘╝", output);
 					Application.RequestStop ();
 				}
 			};
@@ -352,51 +366,54 @@ namespace Terminal.Gui.DialogTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void With_A_Label_With_Spaces_WrapMessagge_True ()
+		public void Message_With_Spaces_WrapMessage_True ()
 		{
 			var iterations = -1;
 			Application.Begin (Application.Top);
+			Application.Top.BorderStyle = LineStyle.Double;
+			((FakeDriver)Application.Driver).SetBufferSize (20, 10);
 
 			Application.Iteration += () => {
 				iterations++;
 
 				if (iterations == 0) {
 					var sb = new StringBuilder ();
-					for (int i = 0; i < 1000; i++)
+					for (int i = 0; i < 17; i++)
 						sb.Append ("ff ");
 
-					MessageBox.Query ("mywindow", sb.ToString (), "ok");
+					MessageBox.Query (string.Empty, sb.ToString (), defaultButton: 0, wrapMessage: true, "btn");
 
 					Application.RequestStop ();
 				} else if (iterations == 1) {
 					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
-┌┤mywindow├────────────────────────────────────────────────────────────────────┐
-│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
-│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
-│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
-│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
-│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
-│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
-│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
-│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
-│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
-│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
-│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
-│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
-│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
-│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
-│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
-│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
-│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
-│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
-│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
-│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
-│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
-│ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff │
-│                                   [◦ ok ◦]                                   │
-└──────────────────────────────────────────────────────────────────────────────┘", output);
+╔══════════════════╗
+║ ┌──────────────┐ ║
+║ │ff ff ff ff ff│ ║
+║ │ff ff ff ff ff│ ║
+║ │ff ff ff ff ff│ ║
+║ │    ff ff     │ ║
+║ │              │ ║
+║ │   [◦ btn ◦]  │ ║
+║ └──────────────┘ ║
+╚══════════════════╝", output);
+					Application.RequestStop ();
 
+					// Really long text
+					MessageBox.Query (string.Empty, new string ('f', 500), defaultButton: 0, wrapMessage: true, "btn");
+				} else if (iterations == 2) {
+					Application.Refresh ();
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
+╔┌────────────────┐╗
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│    [◦ btn ◦]   │║
+╚└────────────────┘╝", output);
 					Application.RequestStop ();
 				}
 			};
@@ -405,26 +422,51 @@ namespace Terminal.Gui.DialogTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void With_A_Label_Without_Spaces_WrapMessagge_False ()
+		public void Message_Without_Spaces_WrapMessage_False ()
 		{
 			var iterations = -1;
 			Application.Begin (Application.Top);
+			Application.Top.BorderStyle = LineStyle.Double;
+			((FakeDriver)Application.Driver).SetBufferSize (20, 10);
 
 			Application.Iteration += () => {
 				iterations++;
 
 				if (iterations == 0) {
-					MessageBox.Query ("mywindow", new string ('f', 2000), 0,  false, "ok");
+					MessageBox.Query (string.Empty, new string ('f', 50), defaultButton: 0, wrapMessage: true, "btn");
 
 					Application.RequestStop ();
 				} else if (iterations == 1) {
 					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
-────────────────────────────────────────────────────────────────────────────────
-ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-                                                                                
-                                    [◦ ok ◦]                                    
-────────────────────────────────────────────────────────────────────────────────", output);
+╔══════════════════╗
+║┌────────────────┐║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│       ff       │║
+║│                │║
+║│    [◦ btn ◦]   │║
+║└────────────────┘║
+╚══════════════════╝", output);
+
+					Application.RequestStop ();
+
+					// Really long text
+					MessageBox.Query (string.Empty, new string ('f', 500), defaultButton: 0, wrapMessage: true, "btn");
+				} else if (iterations == 2) {
+					Application.Refresh ();
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
+╔┌────────────────┐╗
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│    [◦ btn ◦]   │║
+╚└────────────────┘╝", output);
 
 					Application.RequestStop ();
 				}
@@ -434,31 +476,54 @@ ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 		}
 
 		[Fact, AutoInitShutdown]
-		public void With_A_Label_With_Spaces_WrapMessagge_False ()
+		public void Message_With_Spaces_WrapMessage_False ()
 		{
 			var iterations = -1;
 			Application.Begin (Application.Top);
+			Application.Top.BorderStyle = LineStyle.Double;
+			((FakeDriver)Application.Driver).SetBufferSize (20, 10);
 
 			Application.Iteration += () => {
 				iterations++;
 
 				if (iterations == 0) {
 					var sb = new StringBuilder ();
-					for (int i = 0; i < 1000; i++)
+					for (int i = 0; i < 17; i++)
 						sb.Append ("ff ");
 
-					MessageBox.Query ("mywindow", sb.ToString (), 0,  false, "ok");
+					MessageBox.Query (string.Empty, sb.ToString (), defaultButton: 0, wrapMessage: false, "btn");
 
 					Application.RequestStop ();
 				} else if (iterations == 1) {
 					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
-────────────────────────────────────────────────────────────────────────────────
- ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff f
-                                                                                
-                                    [◦ ok ◦]                                    
-────────────────────────────────────────────────────────────────────────────────", output);
+╔══════════════════╗
+║ ┌──────────────┐ ║
+║ │ff ff ff ff ff│ ║
+║ │ff ff ff ff ff│ ║
+║ │ff ff ff ff ff│ ║
+║ │    ff ff     │ ║
+║ │              │ ║
+║ │   [◦ btn ◦]  │ ║
+║ └──────────────┘ ║
+╚══════════════════╝", output);
+					Application.RequestStop ();
 
+					// Really long text
+					MessageBox.Query (string.Empty, new string ('f', 500), defaultButton: 0, wrapMessage: false, "btn");
+				} else if (iterations == 2) {
+					Application.Refresh ();
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
+╔┌────────────────┐╗
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│ffffffffffffffff│║
+║│    [◦ btn ◦]   │║
+╚└────────────────┘╝", output);
 					Application.RequestStop ();
 				}
 			};
@@ -467,11 +532,15 @@ ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 		}
 
 		[Theory, AutoInitShutdown]
+		[InlineData (" ", true)]
+		[InlineData (" ", false)]
 		[InlineData ("", true)]
 		[InlineData ("", false)]
 		[InlineData ("\n", true)]
 		[InlineData ("\n", false)]
-		public void With_A_Empty_Message_Or_A_NewLline_WrapMessagge_True_Or_False (string message, bool wrapMessage)
+		[InlineData (" \n", true)]
+		[InlineData (" \n", false)]
+		public void Message_Empty_Or_A_NewLline_WrapMessagge_True_Or_False (string message, bool wrapMessage)
 		{
 			var iterations = -1;
 			Application.Begin (Application.Top);
@@ -480,13 +549,13 @@ ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 				iterations++;
 
 				if (iterations == 0) {
-					MessageBox.Query ("mywindow", message, 0, wrapMessage, "ok");
+					MessageBox.Query (string.Empty, message, 0, wrapMessage, "ok");
 
 					Application.RequestStop ();
 				} else if (iterations == 1) {
 					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
-                ┌┤mywindow├────────────────────────────────────┐
+                ┌──────────────────────────────────────────────┐
                 │                                              │
                 │                                              │
                 │                   [◦ ok ◦]                   │

@@ -326,8 +326,7 @@ namespace Terminal.Gui {
 				}
 				// TODO: replace with Dim.Fit when implemented
 				var maxBounds = d.SuperView?.Bounds ?? Application.Top.Bounds;
-				maxBounds = Rect.Inflate (maxBounds, -d.GetFramesThickness ().Horizontal, -d.GetFramesThickness ().Vertical);
-				messageLabel.TextFormatter.Size = maxBounds.Size;
+				messageLabel.TextFormatter.Size = new Size (maxBounds.Size.Width - d.GetFramesThickness ().Horizontal, maxBounds.Size.Height - d.GetFramesThickness ().Vertical);
 				var msg = messageLabel.TextFormatter.Format ();
 				var messageSize = messageLabel.TextFormatter.GetFormattedSize ();
 
