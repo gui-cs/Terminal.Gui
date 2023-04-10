@@ -32,14 +32,14 @@ namespace Terminal.Gui {
 		}
 
 		// TODO: enable this
-		/// <summary>
-		/// The default <see cref="LineStyle"/> for <see cref="Window"/>'s border. The default is <see cref="LineStyle.Single"/>.
-		/// </summary>
-		/// <remarks>
-		/// This property can be set in a Theme to change the default <see cref="LineStyle"/> for all <see cref="Window"/>s. 
-		/// </remarks>
-		///[SerializableConfigurationProperty (Scope = typeof (ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
-		//public static ColorScheme DefaultColorScheme { get; set; } = Colors.Base;
+		///// <summary>
+		///// The default <see cref="LineStyle"/> for <see cref="Window"/>'s border. The default is <see cref="LineStyle.Single"/>.
+		///// </summary>
+		///// <remarks>
+		///// This property can be set in a Theme to change the default <see cref="LineStyle"/> for all <see cref="Window"/>s. 
+		///// </remarks>
+		/////[SerializableConfigurationProperty (Scope = typeof (ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
+		////public static ColorScheme DefaultColorScheme { get; set; } = Colors.Base;
 
 		/// <summary>
 		/// The default <see cref="LineStyle"/> for <see cref="Window"/>'s border. The default is <see cref="LineStyle.Single"/>.

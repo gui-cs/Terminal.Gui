@@ -560,7 +560,6 @@ namespace Terminal.Gui {
 		/// <param name="text"></param>
 		/// <param name="width">The number of columns to constrain the text to for word wrapping and clipping.</param>
 		/// <param name="justify">Specifies whether the text should be justified.</param>
-		/// <param name="talign">Specifies how the text will be aligned horizontally.</param>
 		/// <param name="wordWrap">If <see langword="true"/>, the text will be wrapped to new lines no longer than <paramref name="width"/>.	
 		/// If <see langword="false"/>, forces text to fit a single line. Line breaks are converted to spaces. The text will be clipped to <paramref name="width"/>.</param>
 		/// <param name="preserveTrailingSpaces">If <see langword="true"/> trailing spaces at the end of wrapped lines will be preserved.
@@ -999,7 +998,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Gets or sets whether trailing spaces at the end of word-wrapped lines are preserved
-		/// or not when <see cref="Terminal.Gui.TextFormatter.WordWrap"/> is enabled. 
+		/// or not when <see cref="TextFormatter.WordWrap"/> is enabled. 
 		/// If <see langword="true"/> trailing spaces at the end of wrapped lines will be removed when 
 		/// <see cref="Text"/> is formatted for display. The default is <see langword="false"/>.
 		/// </summary>
@@ -1101,7 +1100,12 @@ namespace Terminal.Gui {
 			}
 		}
 
-		// TODO: Add - public bool WordWrap { get; set; } = false;
+		// TODO: This is not implemented!
+		/// <summary>
+		/// 
+		/// </summary>
+		public bool WordWrap { get; set; } = false;
+
 
 		/// <summary>
 		/// Gets or sets the size of the area the text will be constrained to when formatted.

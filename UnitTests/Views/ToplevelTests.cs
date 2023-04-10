@@ -1408,7 +1408,7 @@ namespace Terminal.Gui.ViewsTests {
 					Y = viewToScreen.Y + 1,
 					Width = 18,
 					Height = 5,
-					Border = new Border () { LineStyle = LineStyle.Single }
+					BorderStyle = LineStyle.Single 
 				};
 				Application.Current.DrawContentComplete += Current_DrawContentComplete;
 				top.Add (view);

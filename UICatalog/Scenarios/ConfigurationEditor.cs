@@ -46,7 +46,7 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (1),
 				Orientation = Orientation.Vertical,
-				Border = new Border () { LineStyle = LineStyle.Single }
+				LineStyle = LineStyle.Single
 			};
 
 			Application.Top.Add (_tileView);

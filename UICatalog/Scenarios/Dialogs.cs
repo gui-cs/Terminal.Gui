@@ -201,6 +201,10 @@ namespace UICatalog.Scenarios {
 						Title = titleEdit.Text,
 						ButtonAlignment = (Dialog.ButtonAlignments)styleRadioGroup.SelectedItem
 					};
+					if (height != 0 || width != 0) {
+						dialog.Height = height;
+						dialog.Width = width;
+					}
 
 					var add = new Button ("Add a button") {
 						X = Pos.Center (),

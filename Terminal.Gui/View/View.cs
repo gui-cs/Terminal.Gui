@@ -478,12 +478,11 @@ namespace Terminal.Gui {
 			get => frame;
 			set {
 				frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
-				if (IsInitialized) {
+				if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
+					TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
 					LayoutFrames ();
-					if (LayoutStyle == LayoutStyle.Absolute) {
-						SetNeedsLayout ();
-						SetNeedsDisplay ();
-					}
+					SetNeedsLayout ();
+					SetNeedsDisplay ();
 				}
 			}
 		}
@@ -766,9 +765,9 @@ namespace Terminal.Gui {
 				width = value;
 
 				if (ForceValidatePosDim) {
-					var isValidNewAutSize = _autoSize && IsValidAutoSizeWidth (width);
+					var isValidNewAutSize = AutoSize && IsValidAutoSizeWidth (width);
 
-					if (IsAdded && _autoSize && !isValidNewAutSize) {
+					if (IsAdded && AutoSize && !isValidNewAutSize) {
 						throw new InvalidOperationException ("Must set AutoSize to false before set the Width.");
 					}
 				}
@@ -791,9 +790,9 @@ namespace Terminal.Gui {
 				height = value;
 
 				if (ForceValidatePosDim) {
-					var isValidNewAutSize = _autoSize && IsValidAutoSizeHeight (height);
+					var isValidNewAutSize = AutoSize && IsValidAutoSizeHeight (height);
 
-					if (IsAdded && _autoSize && !isValidNewAutSize) {
+					if (IsAdded && AutoSize && !isValidNewAutSize) {
 						throw new InvalidOperationException ("Must set AutoSize to false before set the Height.");
 					}
 				}
@@ -831,68 +830,53 @@ namespace Terminal.Gui {
 		/// Always returns <see langword="false"/> if <see cref="AutoSize"/> is <see langword="true"/> or
 		/// if <see cref="Height"/> (Horizontal) or <see cref="Width"/> (Vertical) are not not set or zero.
 		/// Does not take into account word wrapping.
-		///// </remarks>
-		//public bool GetMinimumBounds (out Size size)
-		//{
-		//	size = Bounds.Size;
+		/// </remarks>
+		public bool GetMinimumBounds (out Size size)
+		{
+			size = Bounds.Size;
 
-		//	if (!AutoSize && !ustring.IsNullOrEmpty (TextFormatter.Text)) {
-		//		switch (TextFormatter.IsVerticalDirection (TextDirection)) {
-		//		case true:
-		//			var colWidth = TextFormatter.GetSumMaxCharWidth (new List<ustring> { TextFormatter.Text }, 0, 1);
-		//			// TODO: v2 - This uses frame.Width; it should only use Bounds
-		//			if (frame.Width < colWidth &&
-		//				(Width == null ||
-		//					(Bounds.Width >= 0 &&
-		//						Width is Dim.DimAbsolute &&
-		//						Width.Anchor (0) >= 0 &&
-		//						Width.Anchor (0) < colWidth))) {
-		//				size = new Size (colWidth, Bounds.Height);
-		//				return true;
-		//			}
-		//			break;
-		//		default:
-		//			if (frame.Height < 1 &&
-		//				(Height == null ||
-		//					(Height is Dim.DimAbsolute &&
-		//						Height.Anchor (0) == 0))) {
-		//				size = new Size (Bounds.Width, 1);
-		//				return true;
-		//			}
-		//			break;
-		//		}
-		//	}
-		//	return false;
-		//}
+			if (!AutoSize && !ustring.IsNullOrEmpty (TextFormatter.Text)) {
+				switch (TextFormatter.IsVerticalDirection (TextDirection)) {
+				case true:
+					var colWidth = TextFormatter.GetSumMaxCharWidth (new List<ustring> { TextFormatter.Text }, 0, 1);
+					// TODO: v2 - This uses frame.Width; it should only use Bounds
+					if (frame.Width < colWidth &&
+						(Width == null ||
+							(Bounds.Width >= 0 &&
+								Width is Dim.DimAbsolute &&
+								Width.Anchor (0) >= 0 &&
+								Width.Anchor (0) < colWidth))) {
+						size = new Size (colWidth, Bounds.Height);
+						return true;
+					}
+					break;
+				default:
+					if (frame.Height < 1 &&
+						(Height == null ||
+							(Height is Dim.DimAbsolute &&
+								Height.Anchor (0) == 0))) {
+						size = new Size (Bounds.Width, 1);
+						return true;
+					}
+					break;
+				}
+			}
+			return false;
+		}
 
+		// BUGBUG - v2 - Should be renamed "SetBoundsToFitFrame"
 		/// <summary>
-		/// Sets the size of the View to the minimum width or height required to fit <see cref="Text"/>.
+		/// Sets the size of the View to the minimum width or height required to fit <see cref="Text"/> (see <see cref="GetMinimumBounds(out Size)"/>.
 		/// </summary>
-		/// <remarks>
-		/// Uses the current <see cref="TextFormatter.Size"/> (ignoring Height), <see cref="TextFormatter.Alignment"/>, <see cref="TextFormatter.Direction"/>, and <see cref="TextFormatter.WordWrap"/> settings.
-		/// </remarks>
-		/// <remarks>
-		/// <para>
-		/// This API is called when:
-		/// </para>
-		/// <para>
-		///    <see cref="AutoSize"/> is <see langword="true"/> and the view's size changes.
-		/// </para>
-		/// <para>
-		///    <see cref="AutoSize"/> is <see langword="true"/> and <see cref="TextAlignment"/> changes.
-		/// </para>
-		/// <para>
-		///    <see cref="AutoSize"/> is <see langword="true"/> and <see cref="TextDirection"/> changes.
-		/// </para>
-		/// </remarks>
 		/// <returns><see langword="true"/> if the size was changed, <see langword="false"/> if <see cref="Text"/>
 		/// will not fit.</returns>
-		public void SetSizeToFitText ()
+		public bool SetMinWidthHeight ()
 		{
-			if (IsInitialized) {
-				var newSize = GetAutoSize ();
-				Bounds = new Rect (Bounds.Location, newSize);
+			if (IsInitialized && GetMinimumBounds (out Size size)) {
+				Bounds = new Rect (Bounds.Location, size);
+				return true;
 			}
+			return false;
 		}
 
 		/// <summary>
@@ -922,7 +906,7 @@ namespace Terminal.Gui {
 		/// This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="Terminal.Gui.LayoutStyle.Absolute"/>.
 		/// Use <see cref="View"/> to initialize a View with  <see cref="LayoutStyle"/> of <see cref="Terminal.Gui.LayoutStyle.Computed"/> 
 		/// </remarks>
-		public View (Rect frame) : this (frame, null, null) { }
+		public View (Rect frame) : this (frame, null) { }
 
 		/// <summary>
 		///   Initializes a new instance of <see cref="View"/> using <see cref="Terminal.Gui.LayoutStyle.Computed"/> layout.
@@ -977,10 +961,9 @@ namespace Terminal.Gui {
 		/// </remarks>
 		/// <param name="rect">Location.</param>
 		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
-		/// <param name="border">The <see cref="Border"/>.</param>
-		public View (Rect rect, ustring text, Border border = null)
+		public View (Rect rect, ustring text)
 		{
-			SetInitialProperties (text, rect, LayoutStyle.Absolute, TextDirection.LeftRight_TopBottom, border);
+			SetInitialProperties (text, rect, LayoutStyle.Absolute, TextDirection.LeftRight_TopBottom);
 		}
 
 		/// <summary>
@@ -998,10 +981,9 @@ namespace Terminal.Gui {
 		/// </remarks>
 		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
 		/// <param name="direction">The text direction.</param>
-		/// <param name="border">The <see cref="Border"/>.</param>
-		public View (ustring text, TextDirection direction = TextDirection.LeftRight_TopBottom, Border border = null)
+		public View (ustring text, TextDirection direction = TextDirection.LeftRight_TopBottom)
 		{
-			SetInitialProperties (text, Rect.Empty, LayoutStyle.Computed, direction, border);
+			SetInitialProperties (text, Rect.Empty, LayoutStyle.Computed, direction);
 		}
 
 		// TODO: v2 - Remove constructors with parameters
@@ -1012,9 +994,8 @@ namespace Terminal.Gui {
 		/// <param name="rect"></param>
 		/// <param name="layoutStyle"></param>
 		/// <param name="direction"></param>
-		/// <param name="border"></param>
 		void SetInitialProperties (ustring text, Rect rect, LayoutStyle layoutStyle = LayoutStyle.Computed,
-		    TextDirection direction = TextDirection.LeftRight_TopBottom, Border border = null)
+		    TextDirection direction = TextDirection.LeftRight_TopBottom)
 		{
 			TextFormatter = new TextFormatter ();
 			TextFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
@@ -1026,9 +1007,6 @@ namespace Terminal.Gui {
 			TabStop = false;
 			LayoutStyle = layoutStyle;
 
-			// TODO: Nuke
-			Border = border;
-
 			Text = text == null ? ustring.Empty : text;
 			LayoutStyle = layoutStyle;
 			var r = rect.IsEmpty ? TextFormatter.CalcRect (0, 0, text, direction) : rect;
@@ -1038,14 +1016,6 @@ namespace Terminal.Gui {
 			CreateFrames ();
 
 			LayoutFrames ();
-		}
-
-		// TODO: v2 - Hack for now
-		private void Border_BorderChanged (Border border)
-		{
-			//if (!border.DrawMarginFrame) BorderFrame.BorderStyle = LineStyle.None;
-			BorderFrame.BorderStyle = border.LineStyle;
-			BorderFrame.Thickness = new Thickness (BorderFrame.BorderStyle == LineStyle.None ? 0 : 1);
 		}
 
 		/// <summary>
@@ -1072,9 +1042,9 @@ namespace Terminal.Gui {
 			var actY = y is Pos.PosAbsolute ? y.Anchor (0) : frame.Y;
 
 			if (AutoSize) {
-				if (TextAlignment == TextAlignment.Justified) {
-					throw new InvalidOperationException ("TextAlignment.Justified cannot be used with AutoSize");
-				}
+				//if (TextAlignment == TextAlignment.Justified) {
+				//	throw new InvalidOperationException ("TextAlignment.Justified cannot be used with AutoSize");
+				//}
 				var s = GetAutoSize ();
 				var w = width is Dim.DimAbsolute && width.Anchor (0) > s.Width ? width.Anchor (0) : s.Width;
 				var h = height is Dim.DimAbsolute && height.Anchor (0) > s.Height ? height.Anchor (0) : s.Height;
@@ -1087,7 +1057,11 @@ namespace Terminal.Gui {
 
 
 			}
-			if (IsInitialized) { // || LayoutStyle == LayoutStyle.Absolute) {
+			//// BUGBUG: I think these calls are redundant or should be moved into just the AutoSize case
+			if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
+				TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
+				LayoutFrames ();
+				SetMinWidthHeight ();
 				SetNeedsLayout ();
 				SetNeedsDisplay ();
 			}
@@ -1867,7 +1841,7 @@ namespace Terminal.Gui {
 
 			// BUGBUG: v2 - We should be able to use View.SetClip here and not have to resort to knowing Driver details.
 			Driver.Clip = prevClip;
-			//ClearLayoutNeeded ();
+			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
 		}
 
@@ -2561,8 +2535,10 @@ namespace Terminal.Gui {
 			var r = new Rect (newX, newY, newW, newH);
 			if (Frame != r) {
 				Frame = r;
-				// Reformat Text
-				//TextFormatter.Size = Bounds.Size;
+				// BUGBUG: Why is this AFTER setting Frame? Seems duplicative.
+				if (!SetMinWidthHeight ()) {
+					TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
+				}
 			}
 		}
 
@@ -2780,6 +2756,8 @@ namespace Terminal.Gui {
 			var oldBounds = Bounds;
 			OnLayoutStarted (new LayoutEventArgs () { OldBounds = oldBounds });
 
+			TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
+
 			// Sort out the dependencies of the X, Y, Width, Height properties
 			var nodes = new HashSet<View> ();
 			var edges = new HashSet<(View, View)> ();
@@ -2841,7 +2819,7 @@ namespace Terminal.Gui {
 				if (IsInitialized) {
 					SetHotKey ();
 					UpdateTextFormatterText ();
-					TextFormatter.Format ();
+					//TextFormatter.Format ();
 					OnResizeNeeded ();
 				}
 
@@ -2873,22 +2851,20 @@ namespace Terminal.Gui {
 		public virtual bool AutoSize {
 			get => _autoSize;
 			set {
-				_autoSize = value;
-				UpdateTextFormatterText ();
-				if (AutoSize) {
-					// Get the natural size of the formatted text; the view will be sized to fit it
-					TextFormatter.Size = GetAutoSize ();
-				} else {
-					// Force to width; any extra will draw off bottom
-					TextFormatter.Size = new Size (Bounds.Width, int.MaxValue);
+				var v = ResizeView (value);
+				TextFormatter.AutoSize = v;
+				if (_autoSize != v) {
+					_autoSize = v;
+					TextFormatter.NeedsFormat = true;
+					UpdateTextFormatterText ();
+					OnResizeNeeded ();
 				}
-				OnResizeNeeded ();
 			}
 		}
 
 		/// <summary>
 		/// Gets or sets whether trailing spaces at the end of word-wrapped lines are preserved
-		/// or not when <see cref="Terminal.Gui.TextFormatter.WordWrap"/> is enabled. 
+		/// or not when <see cref="TextFormatter.WordWrap"/> is enabled. 
 		/// If <see langword="true"/> trailing spaces at the end of wrapped lines will be removed when 
 		/// <see cref="Text"/> is formatted for display. The default is <see langword="false"/>.
 		/// </summary>
@@ -2910,15 +2886,7 @@ namespace Terminal.Gui {
 			get => TextFormatter.Alignment;
 			set {
 				TextFormatter.Alignment = value;
-
-				if (AutoSize) {
-					// Get the natural size of the formatted text; the view will be sized to fit it
-					TextFormatter.Size = GetAutoSize ();
-				} else {
-					// Force to width; any extra will draw off bottom
-					TextFormatter.Size = new Size (Bounds.Width, int.MaxValue);
-				}
-
+				UpdateTextFormatterText ();
 				OnResizeNeeded ();
 			}
 		}
@@ -2956,31 +2924,21 @@ namespace Terminal.Gui {
 			    != TextFormatter.IsHorizontalDirection (newDirection);
 			TextFormatter.Direction = newDirection;
 
-			var isValidOldAutoSize = _autoSize && IsValidAutoSize (out var _);
+			var isValidOldAutoSize = AutoSize && IsValidAutoSize (out var _);
 
 			UpdateTextFormatterText ();
 
-			if (AutoSize) {
-				// Get the natural size of the formatted text; the view will be sized to fit it
-				TextFormatter.Size = GetAutoSize ();
+			if ((!ForceValidatePosDim && directionChanged && AutoSize)
+			    || (ForceValidatePosDim && directionChanged && AutoSize && isValidOldAutoSize)) {
+				OnResizeNeeded ();
+			} else if (directionChanged && IsAdded) {
+				SetWidthHeight (Bounds.Size);
+				SetMinWidthHeight ();
 			} else {
-				// Force to width; any extra will draw off bottom
-				TextFormatter.Size = new Size (Bounds.Width, int.MaxValue);
+				SetMinWidthHeight ();
 			}
-
-			OnResizeNeeded ();
-
-			//if ((!ForceValidatePosDim && directionChanged && AutoSize)
-			//    || (ForceValidatePosDim && directionChanged && AutoSize && isValidOldAutoSize)) {
-			//	OnResizeNeeded ();
-			//} else if (directionChanged && IsAdded) {
-			//	SetWidthHeight (Bounds.Size);
-			//	SetSizeToFitText ();
-			//} else {
-			//	SetSizeToFitText ();
-			//}
-			//TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
-			//SetNeedsDisplay ();
+			TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
+			SetNeedsDisplay ();
 		}
 
 		/// <summary>
@@ -3094,34 +3052,9 @@ namespace Terminal.Gui {
 				}
 				BorderFrame.BorderStyle = value;
 				LayoutFrames ();
+				SetNeedsLayout ();
 			}
 		}
-
-		// TODO: v2 Nuke teh Border property (rename BorderFrame to Border)
-		Border border;
-
-		/// <inheritdoc/>
-		public virtual Border Border {
-			get => border;
-			set {
-				if (border != value) {
-					border = value;
-
-					SetNeedsDisplay ();
-
-					if (border != null) {
-						Border_BorderChanged (border);
-						border.BorderChanged += Border_BorderChanged;
-					}
-
-				}
-			}
-		}
-
-		// TODO: v2 nuke This
-		/// <summary>
-		/// </summary>
-		public virtual bool IgnoreBorderPropertyOnRedraw { get; set; }
 
 		/// <summary>
 		/// Pretty prints the View
@@ -3141,6 +3074,27 @@ namespace Terminal.Gui {
 			if (_hotKey != hk) {
 				HotKey = hk;
 			}
+		}
+
+		bool ResizeView (bool autoSize)
+		{
+			if (!autoSize) {
+				return false;
+			}
+
+			var aSize = true;
+			var nBoundsSize = GetAutoSize ();
+			if (nBoundsSize != Bounds.Size) {
+				if (ForceValidatePosDim) {
+					aSize = SetWidthHeight (nBoundsSize);
+				} else {
+					Height = nBoundsSize.Height;
+					Width = nBoundsSize.Width; // = new Rect (Bounds.X, Bounds.Y, nBoundsSize.Width, nBoundsSize.Height);
+				}
+			}
+			// BUGBUG: This call may be redundant
+			TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
+			return aSize;
 		}
 
 		/// <summary>
@@ -3175,17 +3129,17 @@ namespace Terminal.Gui {
 		/// <returns>The <see cref="Size"/> required to fit the text.</returns>
 		public Size GetAutoSize ()
 		{
-			TextFormatter.Size = new Size (Driver.Cols * 4, int.MaxValue);
-			var formattedSize = TextFormatter.GetFormattedSize ();
-			//var rect = TextFormatter.CalcRect (Bounds.X, Bounds.Y, TextFormatter.Text, TextFormatter.Direction);
-			return new Size (formattedSize.Width - GetHotKeySpecifierLength () + GetFramesThickness ().Horizontal,
-			    formattedSize.Height - GetHotKeySpecifierLength (false) + GetFramesThickness ().Vertical);
+			var rect = TextFormatter.CalcRect (Bounds.X, Bounds.Y, TextFormatter.Text, TextFormatter.Direction);
+			var newWidth = rect.Size.Width - GetHotKeySpecifierLength () + Margin.Thickness.Horizontal + BorderFrame.Thickness.Horizontal + Padding.Thickness.Horizontal;
+			var newHeight = rect.Size.Height - GetHotKeySpecifierLength (false) + Margin.Thickness.Vertical + BorderFrame.Thickness.Vertical + Padding.Thickness.Vertical;
+			return new Size (newWidth, newHeight);
 		}
 
 		bool IsValidAutoSize (out Size autoSize)
 		{
-			var rect = TextFormatter.CalcRect (Bounds.X, Bounds.Y, TextFormatter.Text, TextDirection);
-			autoSize = GetAutoSize ();
+			var rect = TextFormatter.CalcRect (frame.X, frame.Y, TextFormatter.Text, TextDirection);
+			autoSize = new Size (rect.Size.Width - GetHotKeySpecifierLength (),
+			    rect.Size.Height - GetHotKeySpecifierLength (false));
 			return !(ForceValidatePosDim && (!(Width is Dim.DimAbsolute) || !(Height is Dim.DimAbsolute))
 			    || frame.Size.Width != rect.Size.Width - GetHotKeySpecifierLength ()
 			    || frame.Size.Height != rect.Size.Height - GetHotKeySpecifierLength (false));
@@ -3193,7 +3147,7 @@ namespace Terminal.Gui {
 
 		bool IsValidAutoSizeWidth (Dim width)
 		{
-			var rect = TextFormatter.CalcRect (Bounds.X, Bounds.Y, TextFormatter.Text, TextDirection);
+			var rect = TextFormatter.CalcRect (frame.X, frame.Y, TextFormatter.Text, TextDirection);
 			var dimValue = width.Anchor (0);
 			return !(ForceValidatePosDim && (!(width is Dim.DimAbsolute)) || dimValue != rect.Size.Width
 			    - GetHotKeySpecifierLength ());
@@ -3201,7 +3155,7 @@ namespace Terminal.Gui {
 
 		bool IsValidAutoSizeHeight (Dim height)
 		{
-			var rect = TextFormatter.CalcRect (Bounds.X, Bounds.Y, TextFormatter.Text, TextDirection);
+			var rect = TextFormatter.CalcRect (frame.X, frame.Y, TextFormatter.Text, TextDirection);
 			var dimValue = height.Anchor (0);
 			return !(ForceValidatePosDim && (!(height is Dim.DimAbsolute)) || dimValue != rect.Size.Height
 			    - GetHotKeySpecifierLength (false));
@@ -3240,24 +3194,24 @@ namespace Terminal.Gui {
 			    TextFormatter.Size.Height - GetHotKeySpecifierLength (false));
 		}
 
-		///// <summary>
-		///// Gets the dimensions required for the current Bounds to fit the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> .
-		///// </summary>
-		///// <returns></returns>
-		//public Size GetBoundsRequiredToFitHotKeySpecifier ()
-		//{
-		//	if (ustring.IsNullOrEmpty (TextFormatter.Text)) {
+		/// <summary>
+		/// Gets the dimensions required for <see cref="Text"/> accounting for a <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> .
+		/// </summary>
+		/// <returns></returns>
+		public Size GetSizeNeededForTextAndHotKey ()
+		{
+			if (ustring.IsNullOrEmpty (TextFormatter.Text)) {
 
-		//		if (!IsInitialized) return Size.Empty;
+				if (!IsInitialized) return Size.Empty;
 
-		//		return Bounds.Size;
-		//	}
+				return Bounds.Size;
+			}
 
-		//	// BUGBUG: This IGNORES what Text is set to, using on only the current View size. This doesn't seem to make sense.
-		//	// BUGBUG: This uses Frame; in v2 it should be Bounds
-		//	return new Size (Bounds.Size.Width + GetHotKeySpecifierLength (),
-		//			 Bounds.Size.Height + GetHotKeySpecifierLength (false));
-		//}
+			// BUGBUG: This IGNORES what Text is set to, using on only the current View size. This doesn't seem to make sense.
+			// BUGBUG: This uses Frame; in v2 it should be Bounds
+			return new Size (frame.Size.Width + GetHotKeySpecifierLength (),
+					 frame.Size.Height + GetHotKeySpecifierLength (false));
+		}
 
 		/// <inheritdoc/>
 		public override bool OnMouseEnter (MouseEvent mouseEvent)
@@ -3353,7 +3307,6 @@ namespace Terminal.Gui {
 			Margin?.Dispose ();
 			Margin = null;
 			BorderFrame?.Dispose ();
-			Border = null;
 			Padding?.Dispose ();
 			Padding = null;
 
@@ -3393,15 +3346,6 @@ namespace Terminal.Gui {
 				UpdateTextDirection (TextDirection);
 				UpdateTextFormatterText ();
 				SetHotKey ();
-
-				if (AutoSize) {
-					// Get the natural size of the formatted text; the view will be sized to fit it
-					TextFormatter.Size = GetAutoSize ();
-				} else {
-					// Force to width; any extra will draw off bottom
-					TextFormatter.Size = new Size (Bounds.Width, int.MaxValue);
-				}
-				TextFormatter.Format ();
 
 				// TODO: Figure out why ScrollView and other tests fail if this call is put here 
 				// instead of the constructor.

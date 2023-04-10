@@ -241,9 +241,7 @@ namespace Terminal.Gui {
 		/// Defines the default border styling for <see cref="Dialog"/>. Can be configured via <see cref="ConfigurationManager"/>.
 		/// </summary>
 		[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-		public static Border DefaultBorder { get; set; } = new Border () {
-			LineStyle = LineStyle.Single,
-		};
+		public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
 
 		static int QueryFull (bool useErrorColors, int width, int height, ustring title, ustring message,
 			int defaultButton = 0, bool wrapMessage = true, params ustring [] buttons)
@@ -288,7 +286,7 @@ namespace Terminal.Gui {
 			Dialog d;
 			d = new Dialog (buttonList.ToArray ()) {
 				Title = title,
-				Border = DefaultBorder,
+				BorderStyle = DefaultBorderStyle,
 				Width = Dim.Percent (60),
 				Height = 5 // Border + one line of text + vspace + buttons
 			};

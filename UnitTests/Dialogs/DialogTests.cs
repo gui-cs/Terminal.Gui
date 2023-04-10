@@ -46,6 +46,8 @@ namespace Terminal.Gui.DialogTests {
 		{
 			var dlg = new Dialog (btns) {
 				Title = title,
+				X = 0, 
+				Y = 0,
 				Width = width,
 				Height = 1,
 				ButtonAlignment = align,
@@ -75,8 +77,8 @@ namespace Terminal.Gui.DialogTests {
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 			Application.End (runstate);
 
-			// Justify
-			buttonRow = $"{d.VLine}    {d.LeftBracket} {btnText} {d.RightBracket}{d.VLine}";
+			// Justify - Single button is treated as center
+			buttonRow = $"{buttonRow}";
 			Assert.Equal (width, buttonRow.Length);
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Justify, new Button (btnText));
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
@@ -110,7 +112,7 @@ namespace Terminal.Gui.DialogTests {
 			buttonRow = $"{d.VLine}      {d.LeftBracket} {btnText} {d.RightBracket}{d.VLine}";
 			Assert.Equal (width, buttonRow.Length);
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Justify, new Button (btnText));
-			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
+			TestHelpers.AssertDriverContentsWithFrameAre ($"{d.VLine}   {d.LeftBracket} {btnText} {d.RightBracket}   {d.VLine}", output);
 			Application.End (runstate);
 
 			// Right
@@ -146,7 +148,7 @@ namespace Terminal.Gui.DialogTests {
 			var buttonRow = $@"{d.VLine} {btn1} {btn2} {d.VLine}";
 			var width = buttonRow.Length;
 
-			d.SetBufferSize (buttonRow.Length, 3);
+			d.SetBufferSize (width, 3);
 
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Center, new Button (btn1Text), new Button (btn2Text));
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);

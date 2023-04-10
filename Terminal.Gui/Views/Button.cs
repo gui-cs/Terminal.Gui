@@ -163,7 +163,14 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public bool NoDecorations {get;set;}
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public bool NoPadding {get;set;}
 
 		/// <inheritdoc/>

@@ -134,7 +134,7 @@ namespace Terminal.Gui {
 			public WizardStep (ustring title)
 			{
 				this.Title = title; // this.Title holds just the "Wizard Title"; base.Title holds "Wizard Title - Step Title"
-				this.Border.LineStyle = LineStyle.Rounded;
+				this.BorderStyle = LineStyle.Rounded;
 				base.Add (contentView);
 
 				helpTextView.ReadOnly = true;
@@ -722,9 +722,7 @@ namespace Terminal.Gui {
 				}
 				if (base.Modal) {
 					ColorScheme = Colors.Dialog;
-					Border.LineStyle = LineStyle.Rounded;
-//					Border.Effect3D = true;
-//					Border.DrawMarginFrame = true;
+					BorderStyle = LineStyle.Rounded;
 				} else {
 					if (SuperView != null) {
 						ColorScheme = SuperView.ColorScheme;
@@ -732,9 +730,7 @@ namespace Terminal.Gui {
 						ColorScheme = Colors.Base;
 					}
 					CanFocus = true;
-//					Border.Effect3D = false;
-					Border.LineStyle = LineStyle.None;
-//					Border.DrawMarginFrame = false;
+					BorderStyle = LineStyle.None;
 				}
 			}
 		}

@@ -207,6 +207,8 @@ namespace Terminal.Gui {
 				var prev = _thickness;
 				_thickness = value;
 				if (prev != _thickness) {
+
+					Parent?.LayoutFrames ();
 					OnThicknessChanged ();
 				}
 

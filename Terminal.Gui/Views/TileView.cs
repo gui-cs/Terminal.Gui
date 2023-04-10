@@ -9,7 +9,7 @@ namespace Terminal.Gui {
 	/// A <see cref="View"/> consisting of a moveable bar that divides
 	/// the display area into resizeable <see cref="Tiles"/>.
 	/// </summary>
-	public partial class TileView : View {
+	public class TileView : View {
 		TileView parentTileView;
 
 		/// <summary>
@@ -23,7 +23,7 @@ namespace Terminal.Gui {
 		/// new instances use <see cref="TileView.RebuildForTileCount(int)"/> 
 		/// or <see cref="TileView.InsertTile(int)"/>.
 		/// </summary>
-		public partial class Tile {
+		public class Tile {
 			/// <summary>
 			/// The <see cref="ContentView"/> that is contained in this <see cref="TileView"/>.
 			/// Add new child views to this member for multiple 
@@ -43,7 +43,7 @@ namespace Terminal.Gui {
 			/// </summary>
 			/// <remarks>
 			/// Title are not rendered for root level tiles 
-			/// <see cref="BorderStyle"/> is <see cref="LineStyle.None"/>.
+			/// <see cref="Gui.LineStyle"/> is <see cref="LineStyle.None"/>.
 			///</remarks>
 			public string Title {
 				get => _title;
@@ -371,7 +371,12 @@ namespace Terminal.Gui {
 			OnSplitterMoved (idx);
 			return true;
 		}
-		
+
+		/// <summary>
+		/// The line style to use when drawing the splitter lines.
+		/// </summary>
+		public LineStyle LineStyle { get; set; } = LineStyle.None;
+
 		/// <summary>
 		/// Overridden so no Frames get drawn (BUGBUG: v2 fix this hack)
 		/// </summary>
@@ -398,11 +403,11 @@ namespace Terminal.Gui {
 			if (IsRootTileView ()) {
 				if (HasBorder ()) {
 
-					lc.AddLine (new Point (0, 0), bounds.Width - 1, Orientation.Horizontal, BorderStyle);
-					lc.AddLine (new Point (0, 0), bounds.Height - 1, Orientation.Vertical, BorderStyle);
+					lc.AddLine (new Point (0, 0), bounds.Width - 1, Orientation.Horizontal, LineStyle);
+					lc.AddLine (new Point (0, 0), bounds.Height - 1, Orientation.Vertical, LineStyle);
 
-					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Width + 1, Orientation.Horizontal, BorderStyle);
-					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Height + 1, Orientation.Vertical, BorderStyle);
+					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Width + 1, Orientation.Horizontal, LineStyle);
+					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Height + 1, Orientation.Vertical, LineStyle);
 				}
 
 				foreach (var line in allLines) {
@@ -423,7 +428,7 @@ namespace Terminal.Gui {
 						length += 2;
 					}
 
-					lc.AddLine (origin, length, line.Orientation, BorderStyle);
+					lc.AddLine (origin, length, line.Orientation, LineStyle);
 				}
 			}
 
@@ -1065,7 +1070,7 @@ namespace Terminal.Gui {
 
 		private bool HasBorder ()
 		{
-			return BorderStyle != LineStyle.None;
+			return LineStyle != LineStyle.None;
 		}
 
 		/// <inheritdoc/>

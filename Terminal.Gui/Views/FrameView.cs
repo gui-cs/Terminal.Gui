@@ -16,20 +16,18 @@ namespace Terminal.Gui {
 		/// <param name="frame">Frame.</param>
 		/// <param name="title">Title.</param>
 		/// <param name="views">Views.</param>
-		/// <param name="border">The <see cref="Border"/>.</param>
-		public FrameView (Rect frame, ustring title = null, View [] views = null, Border border = null) : base (frame)
+		public FrameView (Rect frame, ustring title = null, View [] views = null) : base (frame)
 		{
-			SetInitialProperties (frame, title, views, border);
+			SetInitialProperties (frame, title, views);
 		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Gui.FrameView"/> class using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
 		/// <param name="title">Title.</param>
-		/// <param name="border">The <see cref="Border"/>.</param>
-		public FrameView (ustring title, Border border = null)
+		public FrameView (ustring title)
 		{
-			SetInitialProperties (Rect.Empty, title, null, border);
+			SetInitialProperties (Rect.Empty, title, null);
 		}
 
 		/// <summary>
@@ -48,23 +46,11 @@ namespace Terminal.Gui {
 		[SerializableConfigurationProperty (Scope = typeof (ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
 		public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
 
-		void SetInitialProperties (Rect frame, ustring title, View [] views = null, Border border = null)
+		void SetInitialProperties (Rect frame, ustring title, View [] views = null)
 		{
 			this.Title = title;
-			if (border == null) {
-				Border = new Border () {
-					LineStyle = DefaultBorderStyle,
-					//DrawMarginFrame = true
-					//Title = title
-				};
-			} else {
-				Border = border;
-				//if (ustring.IsNullOrEmpty (border.Title)) {
-				//	border.Title = title;
-				//}
-			}
 			BorderFrame.Thickness = new Thickness (1);
-			BorderFrame.BorderStyle = Border.LineStyle;
+			BorderFrame.BorderStyle = DefaultBorderStyle;
 			//BorderFrame.ColorScheme = ColorScheme;
 			BorderFrame.Data = "BorderFrame";
 		}

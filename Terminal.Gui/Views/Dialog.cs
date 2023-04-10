@@ -48,7 +48,7 @@ namespace Terminal.Gui {
 		/// with no <see cref="Button"/>s.
 		/// </summary>
 		/// <remarks>
-		/// By default, <see cref="X"/> and <see cref="Y"/> are set to <c>Pos.Center ()</c> and <see cref="Width"/> and <see cref="Height"/> are set 
+		/// By default, <see cref="View.X"/> and <see cref="View.Y"/> are set to <c>Pos.Center ()</c> and <see cref="View.Width"/> and <see cref="View.Height"/> are set 
 		/// to <c>Width = Dim.Percent (85)</c>, centering the Dialog vertically and horizontally. 
 		/// </remarks>
 		public Dialog () : this (null) { }
@@ -59,7 +59,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="buttons">Optional buttons to lay out at the bottom of the dialog.</param>
 		/// <remarks>
-		/// By default, <see cref="X"/> and <see cref="Y"/> are set to <c>Pos.Center ()</c> and <see cref="Width"/> and <see cref="Height"/> are set 
+		/// By default, <see cref="View.X"/> and <see cref="View.Y"/> are set to <c>Pos.Center ()</c> and <see cref="View.Width"/> and <see cref="View.Height"/> are set 
 		/// to <c>Width = Dim.Percent (85)</c>, centering the Dialog vertically and horizontally. 
 		/// </remarks>
 		public Dialog (params Button [] buttons) : base ()
@@ -87,8 +87,10 @@ namespace Terminal.Gui {
 			}
 
 			LayoutComplete += (s, args) => {
-				LayoutStartedHandler ();
+				LayoutButtons ();
 			};
+
+
 		}
 
 		/// <summary>
@@ -114,7 +116,9 @@ namespace Terminal.Gui {
 			if (buttons.Count == 0) {
 				return 0;
 			}
-			return buttons.Select (b => b.GetSizeNeededForTextWithoutHotKey ().Width + b.BorderFrame.Thickness.Horizontal + b.Padding.Thickness.Horizontal).Sum ();
+			var widths = buttons.Select (b => b.TextFormatter.GetFormattedSize ().Width + b.BorderFrame.Thickness.Horizontal + b.Padding.Thickness.Horizontal);
+
+			return widths.Sum ();
 		}
 
 		/// <summary>
@@ -149,28 +153,28 @@ namespace Terminal.Gui {
 		/// </summary>
 		public ButtonAlignments ButtonAlignment { get; set; }
 
-		void LayoutStartedHandler ()
+		void LayoutButtons ()
 		{
-			if (buttons.Count == 0 || !IsInitialized) return;
+			if (buttons.Count == 0 || !IsInitialized) {
+				return;
+			}
 
 			int shiftLeft = 0;
 
 			int buttonsWidth = GetButtonsWidth ();
-			var spacing = (int)Math.Ceiling ((double)(Bounds.Width - buttonsWidth) / (buttons.Count)) / 2;
+			int margin = 0;
 
 			switch (ButtonAlignment) {
 			case ButtonAlignments.Center:
 				// Center Buttons
-
+				margin = (int)Math.Ceiling ((double)(Bounds.Width - buttonsWidth) / buttons.Count / 2);
 				for (int i = buttons.Count - 1; i >= 0; i--) {
-					buttons [i].Margin.Thickness = new Thickness (spacing, 0, spacing, 0);
-
+					buttons [i].Margin.Thickness = new Thickness (margin, 0, 0, 0);
 					if (i == 0) {
 						buttons [i].X = 0;
 					} else {
 						buttons [i].X = Pos.Right (buttons [i - 1]);
 					}
-
 					buttons [i].Y = Pos.AnchorEnd (1);
 				}
 				break;
@@ -180,39 +184,21 @@ namespace Terminal.Gui {
 				// leftmost and rightmost buttons are hard against edges. The rest are evenly spaced.
 
 				if (buttons.Count == 1) {
-					buttons [0].X = Pos.AnchorEnd (1);
+					buttons [0].X = Pos.Center ();
 					buttons [0].Y = Pos.AnchorEnd (1);
-				}
-
-				if (buttons.Count == 2) {
+				} else if (buttons.Count >= 2) {
+					margin = (int)Math.Floor ((double)(Bounds.Width - buttonsWidth) / (buttons.Count - 1));
+					buttons [0].Margin.Thickness = new Thickness (0, 0, 0, 0);
 					buttons [0].X = 0;
 					buttons [0].Y = Pos.AnchorEnd (1);
-					buttons [1].X = Pos.AnchorEnd (0);
-					buttons [1].Y = Pos.AnchorEnd (1);
-				}
 
-				for (int i = 2; i < buttons.Count; i++) {
-					buttons [i].Margin.Thickness = new Thickness (spacing, 0, 0, 0);
-					buttons [i].X = Pos.Right (buttons [i - 1]);
-					buttons [i].Y = Pos.AnchorEnd (1);
-				}
+					for (int i = 1; i < buttons.Count; i++) {
+						buttons [i].Margin.Thickness = new Thickness (margin, 0, 0, 0);
+						buttons [i].X = Pos.Right (buttons [i - 1]);
+						buttons [i].Y = Pos.AnchorEnd (1);
+					}
 
-				//for (int i = buttons.Count - 1; i >= 0; i--) {
-				//	Button button = buttons [i];
-				//	if (i == buttons.Count - 1) {
-				//		shiftLeft += button.Frame.Width;
-				//		button.X = Pos.AnchorEnd (shiftLeft);
-				//	} else {
-				//		if (i == 0) {
-				//			// first (leftmost) button - always hard flush left
-				//			button.X = Pos.AnchorEnd (0);
-				//		} else {
-				//			shiftLeft += button.Frame.Width + (spacing);
-				//			button.X = Pos.AnchorEnd (shiftLeft);
-				//		}
-				//	}
-				//	button.Y = Pos.AnchorEnd (1);
-				//}
+				}
 				break;
 
 			case ButtonAlignments.Left:
@@ -241,7 +227,7 @@ namespace Terminal.Gui {
 				}
 				break;
 			}
-			
+
 			SetNeedsLayout ();
 		}
 

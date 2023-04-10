@@ -72,14 +72,9 @@ namespace UICatalog.Scenarios {
 			topLevel.Add (tf3, button2, label2, tv2, tf4);
 			Application.Top.Add (topLevel);
 
-			var frameView = new FrameView (new Rect (95, 5, 40, 20), "FrameView", null,
-				border: new Border () {
-					LineStyle = borderStyle,
-					BorderThickness = borderThickness
-				}
-			);
-			//frameView.BorderFrame.Thickness = borderThickness;
-			//frameView.BorderFrame.BorderStyle = borderStyle;
+			var frameView = new FrameView (new Rect (95, 5, 40, 20), "FrameView", null);
+			frameView.BorderFrame.Thickness = borderThickness;
+			frameView.BorderFrame.BorderStyle = borderStyle;
 			//frameView.Padding.Thickness = paddingThickness;
 
 			var tf5 = new TextField ("1234567890") { Width = 10 };
