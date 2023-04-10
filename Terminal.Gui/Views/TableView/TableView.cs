@@ -262,12 +262,14 @@ namespace Terminal.Gui {
 					line++;
 				}
 
-				RenderHeaderMidline (line, columnsToRender);
-				line++;
-
-				if (Style.ShowHorizontalHeaderUnderline) {
-					RenderHeaderUnderline (line, bounds.Width, columnsToRender);
+				if (!Style.HideHeaders) {
+					RenderHeaderMidline (line, columnsToRender);
 					line++;
+
+					if (Style.ShowHorizontalHeaderUnderline) {
+						RenderHeaderUnderline (line, bounds.Width, columnsToRender);
+						line++;
+					}
 				}
 			}
 
@@ -316,8 +318,11 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private int GetHeaderHeight ()
 		{
-			if (Style.HideHeaders)
+			if (Style.HideHeaders) {
+				if (Style.ShowHorizontalHeaderOverline)
+					return 1;
 				return 0;
+			}
 
 			int heightRequired = 1;
 
@@ -1583,7 +1588,7 @@ namespace Terminal.Gui {
 
 		private bool ShouldRenderHeaders ()
 		{
-			if (TableIsNullOrInvisible () || Style.HideHeaders)
+			if (TableIsNullOrInvisible ())
 				return false;
 
 			return Style.AlwaysShowHeaders || rowOffset == 0;
@@ -1773,7 +1778,8 @@ namespace Terminal.Gui {
 
 			/// <summary>
 			/// Gets or sets a flag indicating whether to suppress rendering headers of a <see cref="TableView"/>.
-			/// Defaults to false.
+			/// Defaults to false.  ShowHorizontalHeaderOverline may still be used, and AlwaysShowHeaders will
+			/// always show it.
 			/// </summary>
 			public bool HideHeaders { get; set; } = false;
 
