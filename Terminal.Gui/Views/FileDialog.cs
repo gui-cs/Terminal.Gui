@@ -150,7 +150,7 @@ namespace Terminal.Gui {
 					// TODO: Fiddle factor, seems the Bounds are wrong for someone
 					- 2)
 			};
-			this.btnOk.Clicked += (s, e) => this.Accept ();
+			this.btnOk.Clicked += (s, e) => this.Accept (true);
 			this.btnOk.KeyPress += (s, k) => {
 				this.NavigateIf (k, Key.CursorLeft, this.btnCancel);
 				this.NavigateIf (k, Key.CursorUp, this.tableView);
@@ -776,7 +776,11 @@ namespace Terminal.Gui {
 		{
 			if (!keyEvent.Handled && keyEvent.KeyEvent.Key == isKey) {
 				keyEvent.Handled = true;
-				this.Accept ();
+
+				// User hit Enter in text box so probably wants the
+				// contents of the text box as their selection not
+				// whatever lingering selection is in TableView
+				this.Accept (false);
 			}
 		}
 
@@ -786,7 +790,12 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			this.MultiSelected = toMultiAccept.Select (s => s.FileSystemInfo.FullName).ToList ().AsReadOnly ();
+			// Don't include ".." (IsParent) in multiselections
+			this.MultiSelected = toMultiAccept
+				.Where(s=>!s.IsParent)
+				.Select (s => s.FileSystemInfo.FullName)
+				.ToList ().AsReadOnly ();
+
 			this.tbPath.Text = this.MultiSelected.Count == 1 ? this.MultiSelected [0] : string.Empty;
 
 			FinishAccept ();
@@ -810,8 +819,13 @@ namespace Terminal.Gui {
 			FinishAccept ();
 		}
 
-		private void Accept ()
+		private void Accept (bool allowMulti)
 		{
+			if(allowMulti && TryAcceptMulti())
+			{
+				return;
+			}
+
 			if (!this.IsCompatibleWithOpenMode (this.tbPath.Text.ToString (), out string reason)) {
 				if (reason != null) {
 					feedback = reason;
@@ -1007,22 +1021,10 @@ namespace Terminal.Gui {
 
 		private void CellActivate (object sender, CellActivatedEventArgs obj)
 		{
-			var multi = this.MultiRowToStats ();
-			string reason = null;
-			if (multi.Any ()) {
-				if (multi.All (m => this.IsCompatibleWithOpenMode (m.FileSystemInfo.FullName, out reason))) {
-					this.Accept (multi);
-					return;
-				} else {
-					if (reason != null) {
-						feedback = reason;
-						SetNeedsDisplay ();
-					}
-
-					return;
-				}
+			if(TryAcceptMulti())
+			{
+				return;
 			}
-
 
 			var stats = this.RowToStats (obj.Row);
 
@@ -1034,6 +1036,33 @@ namespace Terminal.Gui {
 
 			if (stats.FileSystemInfo is IFileInfo f) {
 				this.Accept (f);
+			}
+		}
+
+		private bool TryAcceptMulti ()
+		{
+			var multi = this.MultiRowToStats ();
+			string reason = null;
+			
+			if (!multi.Any ())
+			{
+				return false;
+			}
+			
+			if (multi.All (m => this.IsCompatibleWithOpenMode (
+				m.FileSystemInfo.FullName, out reason)))
+			{
+				this.Accept (multi);
+				return true;
+			} 
+			else 
+			{
+				if (reason != null) {
+					feedback = reason;
+					SetNeedsDisplay ();
+				}
+
+				return false;
 			}
 		}
 

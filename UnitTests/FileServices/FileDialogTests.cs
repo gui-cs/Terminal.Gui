@@ -181,6 +181,60 @@ namespace Terminal.Gui.FileServicesTests {
 			AssertIsTheSubfolder(dlg.Path);
 		}
 
+		[Theory, AutoInitShutdown]
+		[InlineData(true)]
+		[InlineData(false)]
+		public void MultiSelectDirectory_CannotToggleDotDot (bool acceptWithEnter)
+		{
+			var dlg = GetDialog();
+			dlg.OpenMode = OpenMode.Directory;
+			dlg.AllowsMultipleSelection = true;
+			IReadOnlyCollection<string> eventMultiSelected = null;
+			dlg.FilesSelected += (s,e)=>
+			{
+				eventMultiSelected  = e.Dialog.MultiSelected;
+			};
+
+			Assert.IsType<TextField>(dlg.MostFocused);
+			Send ('v', ConsoleKey.DownArrow, false);
+			Assert.IsType<TableView>(dlg.MostFocused);
+
+			// Try to toggle '..'
+			Send (' ', ConsoleKey.Spacebar, false);
+			Send ('v', ConsoleKey.DownArrow, false);
+			// Toggle subfolder
+			Send (' ', ConsoleKey.Spacebar, false);
+
+			// Down to the directory
+			Assert.True(dlg.Canceled);
+
+			if(acceptWithEnter)
+			{
+				Send ('\n', ConsoleKey.Enter);
+			}
+			else
+			{
+				Send ('o', ConsoleKey.O,false,true);
+			}
+			Assert.False(dlg.Canceled);
+
+			Assert.Multiple(
+				()=>{
+					// Only the subfolder should be selected
+					Assert.Equal(1,dlg.MultiSelected.Count);
+					AssertIsTheSubfolder(dlg.Path);
+					AssertIsTheSubfolder(dlg.MultiSelected.Single());
+				},
+				()=>{
+					// Event should also agree with the final state
+					Assert.NotNull(eventMultiSelected);
+					Assert.Equal(1,eventMultiSelected.Count);
+					AssertIsTheSubfolder(eventMultiSelected.Single());
+				}
+			);
+		}
+
+
 		private void AssertIsTheSubfolder (string path)
 		{
 			if(IsWindows())
