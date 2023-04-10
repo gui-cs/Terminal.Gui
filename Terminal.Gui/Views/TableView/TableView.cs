@@ -1,5 +1,6 @@
 ﻿using NStack;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -315,16 +316,16 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private int GetHeaderHeight ()
 		{
-			int heightRequired = 0;
-			if (!Style.HideHeaders) {
+			if (Style.HideHeaders)
+				return 0;
+
+			int heightRequired = 1;
+
+			if (Style.ShowHorizontalHeaderOverline)
 				heightRequired++;
 
-				if (Style.ShowHorizontalHeaderOverline)
-					heightRequired++;
-
-				if (Style.ShowHorizontalHeaderUnderline)
-					heightRequired++;
-			}
+			if (Style.ShowHorizontalHeaderUnderline)
+				heightRequired++;
 
 			return heightRequired;
 		}
@@ -1771,14 +1772,15 @@ namespace Terminal.Gui {
 		public class TableStyle {
 
 			/// <summary>
+			/// Gets or sets a flag indicating whether to suppress rendering headers of a <see cref="TableView"/>.
+			/// Defaults to false.
+			/// </summary>
+			public bool HideHeaders { get; set; } = false;
+
+			/// <summary>
 			/// When scrolling down always lock the column headers in place as the first row of the table
 			/// </summary>
 			public bool AlwaysShowHeaders { get; set; } = false;
-
-			/// <summary>
-			/// Hide header
-			/// </summary>
-			public bool HideHeaders { get; set; } = false;
 
 			/// <summary>
 			/// True to render a solid line above the headers

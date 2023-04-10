@@ -16,6 +16,7 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Top Level Windows")]
 	public class TableEditor : Scenario {
 		TableView tableView;
+		private MenuItem miHideHeaders;
 		private MenuItem miAlwaysShowHeaders;
 		private MenuItem miHeaderOverline;
 		private MenuItem miHeaderMidline;
@@ -55,7 +56,8 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
 				new MenuBarItem ("_View", new MenuItem [] {
-					miAlwaysShowHeaders = new MenuItem ("_AlwaysShowHeaders", "", () => ToggleAlwaysShowHeader()){Checked = tableView.Style.AlwaysShowHeaders, CheckType = MenuItemCheckStyle.Checked },
+					miHideHeaders = new MenuItem ("_HideHeaders", "", () => ToggleHideHeaders()){Checked = tableView.Style.HideHeaders, CheckType = MenuItemCheckStyle.Checked },
+					miAlwaysShowHeaders = new MenuItem ("_AlwaysShowHeaders", "", () => ToggleAlwaysShowHeaders()){Checked = tableView.Style.AlwaysShowHeaders, CheckType = MenuItemCheckStyle.Checked },
 					miHeaderOverline = new MenuItem ("_HeaderOverLine", "", () => ToggleOverline()){Checked = tableView.Style.ShowHorizontalHeaderOverline, CheckType = MenuItemCheckStyle.Checked },
 					miHeaderMidline = new MenuItem ("_HeaderMidLine", "", () => ToggleHeaderMidline()){Checked = tableView.Style.ShowVerticalHeaderLines, CheckType = MenuItemCheckStyle.Checked },
 					miHeaderUnderline = new MenuItem ("_HeaderUnderLine", "", () => ToggleUnderline()){Checked = tableView.Style.ShowHorizontalHeaderUnderline, CheckType = MenuItemCheckStyle.Checked },
@@ -374,7 +376,14 @@ namespace UICatalog.Scenarios {
 			tableView.Update ();
 		}
 
-		private void ToggleAlwaysShowHeader ()
+		private void ToggleHideHeaders ()
+		{
+			miHideHeaders.Checked = !miHideHeaders.Checked;
+			tableView.Style.HideHeaders = (bool)miHideHeaders.Checked;
+			tableView.Update ();
+		}
+
+		private void ToggleAlwaysShowHeaders ()
 		{
 			miAlwaysShowHeaders.Checked = !miAlwaysShowHeaders.Checked;
 			tableView.Style.AlwaysShowHeaders = (bool)miAlwaysShowHeaders.Checked;
