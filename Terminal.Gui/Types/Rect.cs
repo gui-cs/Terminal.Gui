@@ -1,5 +1,5 @@
 //
-// System.Drawing.Rectangle.cs
+// Derived from System.Drawing.Rectangle.cs
 //
 // Author:
 //   Mike Kestner (mkestner@speakeasy.net)
@@ -9,8 +9,6 @@
 //
 
 using System;
-using System.Drawing;
-
 namespace Terminal.Gui
 {
 	/// <summary>
