@@ -794,7 +794,7 @@ namespace Terminal.Gui.ViewsTests {
 					Assert.Equal (0, _textView.CursorPosition.Y);
 					Assert.Equal (24, _textView.SelectionStartColumn);
 					Assert.Equal (1, _textView.SelectionStartRow);
-					Assert.Equal (27, _textView.SelectedLength);
+					Assert.Equal (25 + Environment.NewLine.Length, _textView.SelectedLength);
 					Assert.Equal ($".{Environment.NewLine}This is the second line.", _textView.SelectedText);
 					break;
 				case 8:
