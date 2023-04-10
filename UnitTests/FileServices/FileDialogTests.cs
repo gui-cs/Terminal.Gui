@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
@@ -397,10 +398,11 @@ namespace Terminal.Gui.FileServicesTests {
 			var fd = GetLinuxDialog();
 			fd.Title = string.Empty;
 
+			fd.Style.Culture = new CultureInfo("en-US");
+			fd.Style.DateFormat = "yyyy-MM-dd hh:mm:ss";			
+
 			fd.Redraw (fd.Bounds);
-
-			fd.Style.DateFormat = "yyyy-MM-dd hh:mm:ss";
-
+			
 			string expected =
 			@"
  ┌──────────────────────────────────────────────────────────────────┐
@@ -433,9 +435,11 @@ namespace Terminal.Gui.FileServicesTests {
 			var fd = GetWindowsDialog();
 			fd.Title = string.Empty;
 
+			fd.Style.DateFormat = "yyyy-MM-dd hh:mm:ss";
+			fd.Style.Culture = new CultureInfo("en-US");
+			
 			fd.Redraw (fd.Bounds);
 
-			fd.Style.DateFormat = "yyyy-MM-dd hh:mm:ss";
 
 			string expected =
 			@"

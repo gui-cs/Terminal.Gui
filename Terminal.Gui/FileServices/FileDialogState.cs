@@ -44,9 +44,9 @@ namespace Terminal.Gui {
 
 				// if directories only
 				if (Parent.OpenMode == OpenMode.Directory) {
-					children = dir.GetDirectories ().Select (e => new FileSystemInfoStats (e)).ToList ();
+					children = dir.GetDirectories ().Select (e => new FileSystemInfoStats (e, Parent.Style.Culture)).ToList ();
 				} else {
-					children = dir.GetFileSystemInfos ().Select (e => new FileSystemInfoStats (e)).ToList ();
+					children = dir.GetFileSystemInfos ().Select (e => new FileSystemInfoStats (e, Parent.Style.Culture)).ToList ();
 				}
 
 				// if only allowing specific file types
@@ -66,7 +66,7 @@ namespace Terminal.Gui {
 
 				// allow navigating up as '..'
 				if (dir.Parent != null) {
-					children.Add (new FileSystemInfoStats (dir.Parent) { IsParent = true });
+					children.Add (new FileSystemInfoStats (dir.Parent, Parent.Style.Culture) { IsParent = true });
 				}
 
 				return children;
