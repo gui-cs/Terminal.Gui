@@ -291,7 +291,7 @@ namespace Terminal.Gui.ApplicationTests {
 		[Fact]
 		public void Run_T_After_InitNullDriver_with_TestTopLevel_Throws ()
 		{
-			Application.ForceFakeConsole = true;
+			Application._forceFakeConsole = true;
 
 			Application.Init (null, null);
 			Assert.Equal (typeof (FakeDriver), Application.Driver.GetType ());
@@ -334,7 +334,7 @@ namespace Terminal.Gui.ApplicationTests {
 		[Fact]
 		public void Run_T_NoInit_DoesNotThrow ()
 		{
-			Application.ForceFakeConsole = true;
+			Application._forceFakeConsole = true;
 
 			Application.Iteration = () => {
 				Application.RequestStop ();
@@ -558,7 +558,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.Equal (Application.Top, rs.Toplevel);
 			Assert.Null (Application.MouseGrabView);  // public
 			Assert.Null (Application.WantContinuousButtonPressedView); // public
-			Assert.False (Application.DebugDrawBounds);
+			Assert.False (Application._debugDrawBounds);
 			Assert.False (Application.ShowChild (Application.Top));
 		}
 

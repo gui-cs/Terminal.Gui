@@ -770,7 +770,7 @@ namespace Terminal.Gui {
 				PositionToplevels ();
 
 				if (this == Application.MdiTop) {
-					foreach (var top in Application.MdiChildes.AsEnumerable ().Reverse ()) {
+					foreach (var top in Application.MdiChildren.AsEnumerable ().Reverse ()) {
 						if (top.Frame.IntersectsWith (bounds)) {
 							if (top != this && !top.IsCurrentTop && !OutsideTopFrame (top) && top.Visible) {
 								top.SetNeedsLayout ();
@@ -904,7 +904,7 @@ namespace Terminal.Gui {
 				|| Application.Current?.Modal == false
 				|| Application.Current?.Modal == true && Application.Current?.Running == false)) {
 
-				foreach (var child in Application.MdiChildes) {
+				foreach (var child in Application.MdiChildren) {
 					var ev = new ToplevelClosingEventArgs (this);
 					if (child.OnClosing (ev)) {
 						return;
@@ -957,7 +957,7 @@ namespace Terminal.Gui {
 			}
 
 			if (Focused == null) {
-				foreach (var top in Application.MdiChildes) {
+				foreach (var top in Application.MdiChildren) {
 					if (top != this && top.Visible) {
 						top.SetFocus ();
 						return;
@@ -982,7 +982,7 @@ namespace Terminal.Gui {
 				return null;
 			}
 
-			foreach (var top in Application.MdiChildes) {
+			foreach (var top in Application.MdiChildren) {
 				if (type != null && top.GetType () == type
 					&& exclude?.Contains (top.Data.ToString ()) == false) {
 					return top;
@@ -1070,7 +1070,7 @@ namespace Terminal.Gui {
 
 	/// <summary>
 	/// Implements the <see cref="IComparer{T}"/> to sort the <see cref="Toplevel"/> 
-	/// from the <see cref="Application.MdiChildes"/> if needed.
+	/// from the <see cref="Application.MdiChildren"/> if needed.
 	/// </summary>
 	public sealed class ToplevelComparer : IComparer<Toplevel> {
 		/// <summary>Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.</summary>

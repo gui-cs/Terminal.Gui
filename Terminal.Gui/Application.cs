@@ -1,33 +1,16 @@
-//
-// Core.cs: The core engine for gui.cs
-//
-// Authors:
-//   Miguel de Icaza (miguel@gnome.org)
-//
-// Pending:
-//   - Check for NeedDisplay on the hierarchy and repaint
-//   - Layout support
-//   - "Colors" type or "Attributes" type?
-//   - What to surface as "BackgroundCOlor" when clearing a window, an attribute or colors?
-//
-// Optimizations
-//   - Add rendering limitation to the exposed area
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
-using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using System.IO;
-using Terminal.Gui;
 using System.Text.Json.Serialization;
 using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui {
-
 	/// <summary>
-	/// A static, singleton class providing the main application driver for Terminal.Gui apps. 
+	/// A static, singleton class representing the application. This class is the entry point for the application.
 	/// </summary>
 	/// <example>
 	/// <code>
@@ -51,16 +34,15 @@ namespace Terminal.Gui {
 	///     other sources of data. It is accessible via the <see cref="MainLoop"/> property.
 	///   </para>
 	///   <para>
-	///     You can hook up to the <see cref="Iteration"/> event to have your method
-	///     invoked on each iteration of the <see cref="Terminal.Gui.MainLoop"/>.
+	///     The <see cref="Iteration"/> event is invoked on each iteration of the <see cref="Terminal.Gui.MainLoop"/>.
 	///   </para>
 	///   <para>
-	///     When invoked sets the SynchronizationContext to one that is tied
-	///     to the mainloop, allowing user code to use async/await.
+	///     When invoked it sets the <see cref="SynchronizationContext"/> to one that is tied
+	///     to the <see cref="MainLoop"/>, allowing user code to use async/await.
 	///   </para>
 	/// </remarks>
 	public static partial class Application {
-		static readonly Stack<Toplevel> toplevels = new Stack<Toplevel> ();
+		static readonly Stack<Toplevel> _toplevels = new Stack<Toplevel> ();
 
 		/// <summary>
 		/// The current <see cref="ConsoleDriver"/> in use.
@@ -70,16 +52,16 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets all the Mdi childes which represent all the not modal <see cref="Toplevel"/> from the <see cref="MdiTop"/>.
 		/// </summary>
-		public static List<Toplevel> MdiChildes {
+		public static List<Toplevel> MdiChildren {
 			get {
 				if (MdiTop != null) {
-					List<Toplevel> mdiChildes = new List<Toplevel> ();
-					foreach (var top in toplevels) {
+					List<Toplevel> _mdiChildren = new List<Toplevel> ();
+					foreach (var top in _toplevels) {
 						if (top != MdiTop && !top.Modal) {
-							mdiChildes.Add (top);
+							_mdiChildren.Add (top);
 						}
 					}
-					return mdiChildes;
+					return _mdiChildren;
 				}
 				return null;
 			}
@@ -150,18 +132,18 @@ namespace Terminal.Gui {
 			}
 		}
 
-		static Key alternateForwardKey = Key.PageDown | Key.CtrlMask;
+		static Key _alternateForwardKey = Key.PageDown | Key.CtrlMask;
 
 		/// <summary>
 		/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
 		/// </summary>
 		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
 		public static Key AlternateForwardKey {
-			get => alternateForwardKey;
+			get => _alternateForwardKey;
 			set {
-				if (alternateForwardKey != value) {
-					var oldKey = alternateForwardKey;
-					alternateForwardKey = value;
+				if (_alternateForwardKey != value) {
+					var oldKey = _alternateForwardKey;
+					_alternateForwardKey = value;
 					OnAlternateForwardKeyChanged (new KeyChangedEventArgs (oldKey, value));
 				}
 			}
@@ -169,23 +151,23 @@ namespace Terminal.Gui {
 
 		static void OnAlternateForwardKeyChanged (KeyChangedEventArgs e)
 		{
-			foreach (var top in toplevels.ToArray ()) {
+			foreach (var top in _toplevels.ToArray ()) {
 				top.OnAlternateForwardKeyChanged (e);
 			}
 		}
 
-		static Key alternateBackwardKey = Key.PageUp | Key.CtrlMask;
+		static Key _alternateBackwardKey = Key.PageUp | Key.CtrlMask;
 
 		/// <summary>
 		/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
 		/// </summary>
 		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
 		public static Key AlternateBackwardKey {
-			get => alternateBackwardKey;
+			get => _alternateBackwardKey;
 			set {
-				if (alternateBackwardKey != value) {
-					var oldKey = alternateBackwardKey;
-					alternateBackwardKey = value;
+				if (_alternateBackwardKey != value) {
+					var oldKey = _alternateBackwardKey;
+					_alternateBackwardKey = value;
 					OnAlternateBackwardKeyChanged (new KeyChangedEventArgs (oldKey, value));
 				}
 			}
@@ -193,39 +175,39 @@ namespace Terminal.Gui {
 
 		static void OnAlternateBackwardKeyChanged (KeyChangedEventArgs oldKey)
 		{
-			foreach (var top in toplevels.ToArray ()) {
+			foreach (var top in _toplevels.ToArray ()) {
 				top.OnAlternateBackwardKeyChanged (oldKey);
 			}
 		}
 
-		static Key quitKey = Key.Q | Key.CtrlMask;
+		static Key _quitKey = Key.Q | Key.CtrlMask;
 
 		/// <summary>
 		/// Gets or sets the key to quit the application.
 		/// </summary>
 		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
 		public static Key QuitKey {
-			get => quitKey;
+			get => _quitKey;
 			set {
-				if (quitKey != value) {
-					var oldKey = quitKey;
-					quitKey = value;
+				if (_quitKey != value) {
+					var oldKey = _quitKey;
+					_quitKey = value;
 					OnQuitKeyChanged (new KeyChangedEventArgs (oldKey, value));
 				}
 			}
 		}
 
-		private static List<CultureInfo> supportedCultures;
+		private static List<CultureInfo> _supportedCultures;
 
 		/// <summary>
 		/// Gets all supported cultures by the application without the invariant language.
 		/// </summary>
-		public static List<CultureInfo> SupportedCultures => supportedCultures;
+		public static List<CultureInfo> SupportedCultures => _supportedCultures;
 
 		static void OnQuitKeyChanged (KeyChangedEventArgs e)
 		{
 			// Duplicate the list so if it changes during enumeration we're safe
-			foreach (var top in toplevels.ToArray ()) {
+			foreach (var top in _toplevels.ToArray ()) {
 				top.OnQuitKeyChanged (e);
 			}
 		}
@@ -337,7 +319,7 @@ namespace Terminal.Gui {
 		public static bool UseSystemConsole { get; set; } = false;
 
 		// For Unit testing - ignores UseSystemConsole
-		internal static bool ForceFakeConsole;
+		internal static bool _forceFakeConsole;
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="Terminal.Gui"/> Application. 
@@ -415,7 +397,7 @@ namespace Terminal.Gui {
 
 			// Start the process of configuration management.
 			// Note that we end up calling LoadConfigurationFromAllSources
-			// mulitlple times. We need to do this because some settings are only
+			// multiple times. We need to do this because some settings are only
 			// valid after a Driver is loaded. In this cases we need just 
 			// `Settings` so we can determine which driver to use.
 			ConfigurationManager.Load (true);
@@ -423,7 +405,7 @@ namespace Terminal.Gui {
 
 			if (Driver == null) {
 				var p = Environment.OSVersion.Platform;
-				if (ForceFakeConsole) {
+				if (_forceFakeConsole) {
 					// For Unit Testing only
 					Driver = new FakeDriver ();
 				} else if (UseSystemConsole) {
@@ -471,7 +453,7 @@ namespace Terminal.Gui {
 
 			Top = topLevelFactory ();
 			Current = Top;
-			supportedCultures = GetSupportedCultures ();
+			_supportedCultures = GetSupportedCultures ();
 			_mainThreadId = Thread.CurrentThread.ManagedThreadId;
 			_initialized = true;
 		}
@@ -544,10 +526,6 @@ namespace Terminal.Gui {
 			{
 				if (Toplevel != null && disposing) {
 					throw new InvalidOperationException ("You must clean up (Dispose) the Toplevel before calling Application.RunState.Dispose");
-					// BUGBUG: It's insidious that we call EndFirstTopLevel here so I moved it to End.
-					//EndFirstTopLevel (Toplevel);
-					//Toplevel.Dispose ();
-					//Toplevel = null;
 				}
 			}
 		}
@@ -558,7 +536,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var chain = toplevels.ToList ();
+			var chain = _toplevels.ToList ();
 			foreach (var topLevel in chain) {
 				if (topLevel.ProcessHotKey (ke))
 					return;
@@ -584,7 +562,7 @@ namespace Terminal.Gui {
 
 		static void ProcessKeyDownEvent (KeyEvent ke)
 		{
-			var chain = toplevels.ToList ();
+			var chain = _toplevels.ToList ();
 			foreach (var topLevel in chain) {
 				if (topLevel.OnKeyDown (ke))
 					return;
@@ -596,7 +574,7 @@ namespace Terminal.Gui {
 
 		static void ProcessKeyUpEvent (KeyEvent ke)
 		{
-			var chain = toplevels.ToList ();
+			var chain = _toplevels.ToList ();
 			foreach (var topLevel in chain) {
 				if (topLevel.OnKeyUp (ke))
 					return;
@@ -615,12 +593,12 @@ namespace Terminal.Gui {
 				return null;
 			}
 
-			if (toplevels != null) {
-				int count = toplevels.Count;
+			if (_toplevels != null) {
+				int count = _toplevels.Count;
 				if (count > 0) {
 					var rx = x - startFrame.X;
 					var ry = y - startFrame.Y;
-					foreach (var t in toplevels) {
+					foreach (var t in _toplevels) {
 						if (t != Current) {
 							if (t != start && t.Visible && t.Frame.Contains (rx, ry)) {
 								start = t;
@@ -652,9 +630,9 @@ namespace Terminal.Gui {
 				return null;
 			}
 
-			int count = toplevels.Count;
+			int count = _toplevels.Count;
 			for (int i = count - 1; i >= 0; i--) {
-				foreach (var top in toplevels) {
+				foreach (var top in _toplevels) {
 					var rx = x - startFrame.X;
 					var ry = y - startFrame.Y;
 					if (top.Visible && top.Frame.Contains (rx, ry)) {
@@ -682,12 +660,12 @@ namespace Terminal.Gui {
 			return top;
 		}
 
-		static View mouseGrabView;
+		static View _mouseGrabView;
 
 		/// <summary>
 		/// The view that grabbed the mouse, to where will be routed all the mouse events.
 		/// </summary>
-		public static View MouseGrabView => mouseGrabView;
+		public static View MouseGrabView => _mouseGrabView;
 
 		/// <summary>
 		/// Event to be invoked when a view want grab the mouse which can be canceled.
@@ -720,7 +698,7 @@ namespace Terminal.Gui {
 				return;
 			if (!OnGrabbingMouse (view)) {
 				OnGrabbedMouse (view);
-				mouseGrabView = view;
+				_mouseGrabView = view;
 				Driver.UncookMouse ();
 			}
 		}
@@ -730,11 +708,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static void UngrabMouse ()
 		{
-			if (mouseGrabView == null)
+			if (_mouseGrabView == null)
 				return;
-			if (!OnUnGrabbingMouse (mouseGrabView)) {
-				OnUnGrabbedMouse (mouseGrabView);
-				mouseGrabView = null;
+			if (!OnUnGrabbingMouse (_mouseGrabView)) {
+				OnUnGrabbedMouse (_mouseGrabView);
+				_mouseGrabView = null;
 				Driver.CookMouse ();
 			}
 		}
@@ -809,8 +787,8 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			if (mouseGrabView != null) {
-				var newxy = mouseGrabView.ScreenToView (me.X, me.Y);
+			if (_mouseGrabView != null) {
+				var newxy = _mouseGrabView.ScreenToView (me.X, me.Y);
 				var nme = new MouseEvent () {
 					X = newxy.X,
 					Y = newxy.Y,
@@ -819,11 +797,11 @@ namespace Terminal.Gui {
 					OfY = me.Y - newxy.Y,
 					View = view
 				};
-				if (OutsideFrame (new Point (nme.X, nme.Y), mouseGrabView.Frame)) {
+				if (OutsideFrame (new Point (nme.X, nme.Y), _mouseGrabView.Frame)) {
 					lastMouseOwnerView?.OnMouseLeave (me);
 				}
 				//System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
-				if (mouseGrabView?.OnMouseEvent (nme) == true) {
+				if (_mouseGrabView?.OnMouseEvent (nme) == true) {
 					return;
 				}
 			}
@@ -878,16 +856,16 @@ namespace Terminal.Gui {
 		{
 			// The Current is modal and the top is not modal toplevel then
 			// the Current must be moved above the first not modal toplevel.
-			if (MdiTop != null && top != MdiTop && top != Current && Current?.Modal == true && !toplevels.Peek ().Modal) {
-				lock (toplevels) {
-					toplevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
+			if (MdiTop != null && top != MdiTop && top != Current && Current?.Modal == true && !_toplevels.Peek ().Modal) {
+				lock (_toplevels) {
+					_toplevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
 				}
 				var index = 0;
-				var savedToplevels = toplevels.ToArray ();
+				var savedToplevels = _toplevels.ToArray ();
 				foreach (var t in savedToplevels) {
 					if (!t.Modal && t != Current && t != top && t != savedToplevels [index]) {
-						lock (toplevels) {
-							toplevels.MoveTo (top, index, new ToplevelEqualityComparer ());
+						lock (_toplevels) {
+							_toplevels.MoveTo (top, index, new ToplevelEqualityComparer ());
 						}
 					}
 					index++;
@@ -897,26 +875,26 @@ namespace Terminal.Gui {
 			// The Current and the top are both not running toplevel then
 			// the top must be moved above the first not running toplevel.
 			if (MdiTop != null && top != MdiTop && top != Current && Current?.Running == false && !top.Running) {
-				lock (toplevels) {
-					toplevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
+				lock (_toplevels) {
+					_toplevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
 				}
 				var index = 0;
-				foreach (var t in toplevels.ToArray ()) {
+				foreach (var t in _toplevels.ToArray ()) {
 					if (!t.Running && t != Current && index > 0) {
-						lock (toplevels) {
-							toplevels.MoveTo (top, index - 1, new ToplevelEqualityComparer ());
+						lock (_toplevels) {
+							_toplevels.MoveTo (top, index - 1, new ToplevelEqualityComparer ());
 						}
 					}
 					index++;
 				}
 				return false;
 			}
-			if ((MdiTop != null && top?.Modal == true && toplevels.Peek () != top)
+			if ((MdiTop != null && top?.Modal == true && _toplevels.Peek () != top)
 				|| (MdiTop != null && Current != MdiTop && Current?.Modal == false && top == MdiTop)
 				|| (MdiTop != null && Current?.Modal == false && top != Current)
 				|| (MdiTop != null && Current?.Modal == true && top == MdiTop)) {
-				lock (toplevels) {
-					toplevels.MoveTo (top, 0, new ToplevelEqualityComparer ());
+				lock (_toplevels) {
+					_toplevels.MoveTo (top, 0, new ToplevelEqualityComparer ());
 					Current = top;
 				}
 			}
@@ -957,38 +935,37 @@ namespace Terminal.Gui {
 				toplevel.EndInit ();
 			}
 
-			lock (toplevels) {
+			lock (_toplevels) {
 				// If Top was already initialized with Init, and Begin has never been called
 				// Top was not added to the toplevels Stack. It will thus never get disposed.
 				// Clean it up here:
-				if (Top != null && toplevel != Top && !toplevels.Contains (Top)) {
+				if (Top != null && toplevel != Top && !_toplevels.Contains (Top)) {
 					Top.Dispose ();
 					Top = null;
-				} else if (Top != null && toplevel != Top && toplevels.Contains (Top)) {
+				} else if (Top != null && toplevel != Top && _toplevels.Contains (Top)) {
 					Top.OnLeave (toplevel);
 				}
 				if (string.IsNullOrEmpty (toplevel.Id.ToString ())) {
 					var count = 1;
-					var id = (toplevels.Count + count).ToString ();
-					while (toplevels.Count > 0 && toplevels.FirstOrDefault (x => x.Id.ToString () == id) != null) {
+					var id = (_toplevels.Count + count).ToString ();
+					while (_toplevels.Count > 0 && _toplevels.FirstOrDefault (x => x.Id.ToString () == id) != null) {
 						count++;
-						id = (toplevels.Count + count).ToString ();
+						id = (_toplevels.Count + count).ToString ();
 					}
-					toplevel.Id = (toplevels.Count + count).ToString ();
+					toplevel.Id = (_toplevels.Count + count).ToString ();
 
-					toplevels.Push (toplevel);
+					_toplevels.Push (toplevel);
 				} else {
-					var dup = toplevels.FirstOrDefault (x => x.Id.ToString () == toplevel.Id);
+					var dup = _toplevels.FirstOrDefault (x => x.Id.ToString () == toplevel.Id);
 					if (dup == null) {
-						toplevels.Push (toplevel);
+						_toplevels.Push (toplevel);
 					}
 				}
 
-				if (toplevels.FindDuplicates (new ToplevelEqualityComparer ()).Count > 0) {
+				if (_toplevels.FindDuplicates (new ToplevelEqualityComparer ()).Count > 0) {
 					throw new ArgumentException ("There are duplicates toplevels Id's");
 				}
 			}
-			// Fix $520 - Set Top = toplevel if Top == null
 			if (Top == null || toplevel.IsMdiContainer) {
 				Top = toplevel;
 			}
@@ -1003,7 +980,7 @@ namespace Terminal.Gui {
 				} else {
 					refreshDriver = false;
 				}
-			} else if ((MdiTop != null && toplevel != MdiTop && Current?.Modal == true && !toplevels.Peek ().Modal)
+			} else if ((MdiTop != null && toplevel != MdiTop && Current?.Modal == true && !_toplevels.Peek ().Modal)
 				|| (MdiTop != null && toplevel != MdiTop && Current?.Running == false)) {
 				refreshDriver = false;
 				MoveCurrent (toplevel);
@@ -1048,13 +1025,13 @@ namespace Terminal.Gui {
 
 			// End the RunState.Toplevel 
 			// First, take it off the toplevel Stack
-			if (toplevels.Count > 0) {
-				if (toplevels.Peek () != runState.Toplevel) {
+			if (_toplevels.Count > 0) {
+				if (_toplevels.Peek () != runState.Toplevel) {
 					// If there the top of the stack is not the RunState.Toplevel then
 					// this call to End is not balanced with the call to Begin that started the RunState
 					throw new ArgumentException ("End must be balanced with calls to Begin");
 				}
-				toplevels.Pop ();
+				_toplevels.Pop ();
 			}
 
 			// Notify that it is closing
@@ -1067,11 +1044,11 @@ namespace Terminal.Gui {
 			}
 
 			// Set Current and Top to the next TopLevel on the stack
-			if (toplevels.Count == 0) {
+			if (_toplevels.Count == 0) {
 				Current = null;
 			} else {
-				Current = toplevels.Peek ();
-				if (toplevels.Count == 1 && Current == MdiTop) {
+				Current = _toplevels.Peek ();
+				if (_toplevels.Count == 1 && Current == MdiTop) {
 					MdiTop.OnAllChildClosed ();
 				} else {
 					SetCurrentAsTop ();
@@ -1108,11 +1085,11 @@ namespace Terminal.Gui {
 			// Shutdown is the bookend for Init. As such it needs to clean up all resources
 			// Init created. Apps that do any threading will need to code defensively for this.
 			// e.g. see Issue #537
-			foreach (var t in toplevels) {
+			foreach (var t in _toplevels) {
 				t.Running = false;
 				t.Dispose ();
 			}
-			toplevels.Clear ();
+			_toplevels.Clear ();
 			Current = null;
 			Top?.Dispose ();
 			Top = null;
@@ -1130,7 +1107,7 @@ namespace Terminal.Gui {
 			NotifyNewRunState = null;
 			NotifyStopRunState = null;
 			_initialized = false;
-			mouseGrabView = null;
+			_mouseGrabView = null;
 			_enableConsoleScrolling = false;
 			lastMouseOwnerView = null;
 
@@ -1155,7 +1132,7 @@ namespace Terminal.Gui {
 		{
 			Driver.UpdateOffScreen ();
 			View last = null;
-			foreach (var v in toplevels.Reverse ()) {
+			foreach (var v in _toplevels.Reverse ()) {
 				if (v.Visible) {
 					v.SetNeedsDisplay ();
 					v.Redraw (v.Bounds);
@@ -1233,14 +1210,14 @@ namespace Terminal.Gui {
 				&& (!Top._needsDisplay.IsEmpty || Top._childNeedsDisplay || Top.LayoutNeeded)) {
 				state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
 				Top.Redraw (Top.Bounds);
-				foreach (var top in toplevels.Reverse ()) {
+				foreach (var top in _toplevels.Reverse ()) {
 					if (top != Top && top != state.Toplevel) {
 						top.SetNeedsDisplay ();
 						top.Redraw (top.Bounds);
 					}
 				}
 			}
-			if (toplevels.Count == 1 && state.Toplevel == Top
+			if (_toplevels.Count == 1 && state.Toplevel == Top
 				&& (Driver.Cols != state.Toplevel.Frame.Width || Driver.Rows != state.Toplevel.Frame.Height)
 				&& (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._childNeedsDisplay || state.Toplevel.LayoutNeeded)) {
 
@@ -1252,7 +1229,7 @@ namespace Terminal.Gui {
 			if (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._childNeedsDisplay || state.Toplevel.LayoutNeeded
 				|| MdiChildNeedsDisplay ()) {
 				state.Toplevel.Redraw (state.Toplevel.Bounds);
-				if (DebugDrawBounds) {
+				if (_debugDrawBounds) {
 					DrawBounds (state.Toplevel);
 				}
 				state.Toplevel.PositionCursor ();
@@ -1268,11 +1245,11 @@ namespace Terminal.Gui {
 
 		static void EnsureModalOrVisibleAlwaysOnTop (Toplevel toplevel)
 		{
-			if (!toplevel.Running || (toplevel == Current && toplevel.Visible) || MdiTop == null || toplevels.Peek ().Modal) {
+			if (!toplevel.Running || (toplevel == Current && toplevel.Visible) || MdiTop == null || _toplevels.Peek ().Modal) {
 				return;
 			}
 
-			foreach (var top in toplevels.Reverse ()) {
+			foreach (var top in _toplevels.Reverse ()) {
 				if (top.Modal && top != Current) {
 					MoveCurrent (top);
 					return;
@@ -1289,7 +1266,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			foreach (var top in toplevels) {
+			foreach (var top in _toplevels) {
 				if (top != Current && top.Visible && (!top._needsDisplay.IsEmpty || top._childNeedsDisplay || top.LayoutNeeded)) {
 					MdiTop.SetSubViewNeedsDisplay ();
 					return true;
@@ -1298,7 +1275,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		internal static bool DebugDrawBounds = false;
+		internal static bool _debugDrawBounds = false;
 
 		// Need to look into why this does not work properly.
 		static void DrawBounds (View v)
@@ -1468,7 +1445,7 @@ namespace Terminal.Gui {
 			} else if ((MdiTop != null && top != MdiTop && top != Current && Current?.Modal == false
 				&& Current?.Running == true && !top.Running)
 				|| (MdiTop != null && top != MdiTop && top != Current && Current?.Modal == false
-				&& Current?.Running == false && !top.Running && toplevels.ToArray () [1].Running)) {
+				&& Current?.Running == false && !top.Running && _toplevels.ToArray () [1].Running)) {
 
 				MoveCurrent (top);
 			} else if (MdiTop != null && Current != top && Current?.Running == true && !top.Running
@@ -1519,7 +1496,7 @@ namespace Terminal.Gui {
 			var full = new Rect (0, 0, Driver.Cols, Driver.Rows);
 			Resized?.Invoke (new ResizedEventArgs () { Cols = full.Width, Rows = full.Height });
 			Driver.Clip = full;
-			foreach (var t in toplevels) {
+			foreach (var t in _toplevels) {
 				t.SetRelativeLayout (full);
 				t.LayoutSubviews ();
 				t.PositionToplevels ();
@@ -1546,19 +1523,19 @@ namespace Terminal.Gui {
 		public static void MoveNext ()
 		{
 			if (MdiTop != null && !Current.Modal) {
-				lock (toplevels) {
-					toplevels.MoveNext ();
+				lock (_toplevels) {
+					_toplevels.MoveNext ();
 					var isMdi = false;
-					while (toplevels.Peek () == MdiTop || !toplevels.Peek ().Visible) {
-						if (!isMdi && toplevels.Peek () == MdiTop) {
+					while (_toplevels.Peek () == MdiTop || !_toplevels.Peek ().Visible) {
+						if (!isMdi && _toplevels.Peek () == MdiTop) {
 							isMdi = true;
-						} else if (isMdi && toplevels.Peek () == MdiTop) {
+						} else if (isMdi && _toplevels.Peek () == MdiTop) {
 							MoveCurrent (Top);
 							break;
 						}
-						toplevels.MoveNext ();
+						_toplevels.MoveNext ();
 					}
-					Current = toplevels.Peek ();
+					Current = _toplevels.Peek ();
 				}
 			}
 		}
@@ -1569,19 +1546,19 @@ namespace Terminal.Gui {
 		public static void MovePrevious ()
 		{
 			if (MdiTop != null && !Current.Modal) {
-				lock (toplevels) {
-					toplevels.MovePrevious ();
+				lock (_toplevels) {
+					_toplevels.MovePrevious ();
 					var isMdi = false;
-					while (toplevels.Peek () == MdiTop || !toplevels.Peek ().Visible) {
-						if (!isMdi && toplevels.Peek () == MdiTop) {
+					while (_toplevels.Peek () == MdiTop || !_toplevels.Peek ().Visible) {
+						if (!isMdi && _toplevels.Peek () == MdiTop) {
 							isMdi = true;
-						} else if (isMdi && toplevels.Peek () == MdiTop) {
+						} else if (isMdi && _toplevels.Peek () == MdiTop) {
 							MoveCurrent (Top);
 							break;
 						}
-						toplevels.MovePrevious ();
+						_toplevels.MovePrevious ();
 					}
-					Current = toplevels.Peek ();
+					Current = _toplevels.Peek ();
 				}
 			}
 		}
@@ -1589,8 +1566,8 @@ namespace Terminal.Gui {
 		internal static bool ShowChild (Toplevel top)
 		{
 			if (top.Visible && MdiTop != null && Current?.Modal == false) {
-				lock (toplevels) {
-					toplevels.MoveTo (top, 0, new ToplevelEqualityComparer ());
+				lock (_toplevels) {
+					_toplevels.MoveTo (top, 0, new ToplevelEqualityComparer ());
 					Current = top;
 				}
 				return true;
