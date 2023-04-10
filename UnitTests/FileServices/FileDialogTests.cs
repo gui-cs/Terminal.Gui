@@ -399,7 +399,6 @@ namespace Terminal.Gui.FileServicesTests {
 			fd.Title = string.Empty;
 
 			fd.Style.Culture = new CultureInfo("en-US");
-			fd.Style.DateFormat = "yyyy-MM-dd hh:mm:ss";			
 
 			fd.Redraw (fd.Bounds);
 			
@@ -435,9 +434,8 @@ namespace Terminal.Gui.FileServicesTests {
 			var fd = GetWindowsDialog();
 			fd.Title = string.Empty;
 
-			fd.Style.DateFormat = "yyyy-MM-dd hh:mm:ss";
 			fd.Style.Culture = new CultureInfo("en-US");
-			
+
 			fd.Redraw (fd.Bounds);
 
 
