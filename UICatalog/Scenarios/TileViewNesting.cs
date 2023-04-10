@@ -112,7 +112,7 @@ namespace UICatalog.Scenarios {
 			root.Tiles.ElementAt (1).Title = (bool)cbTitles.Checked ? $"View 2" : string.Empty;
 
 
-			root.BorderStyle = (bool)border ? BorderStyle.Rounded : BorderStyle.None;
+			root.LineStyle = (bool)border ? LineStyle.Rounded : LineStyle.None;
 
 
 			workArea.Add (root);

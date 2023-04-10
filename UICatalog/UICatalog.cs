@@ -317,7 +317,7 @@ namespace UICatalog {
 					CanFocus = true,
 					Shortcut = Key.CtrlMask | Key.C,
 				};
-				ContentPane.BorderStyle = BorderStyle.Single;
+				ContentPane.LineStyle = LineStyle.Single;
 				ContentPane.SetSplitterPos (0, 25);
 				ContentPane.ShortcutAction = () => ContentPane.SetFocus ();
 
@@ -655,7 +655,7 @@ namespace UICatalog {
 
 				ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
 
-				ContentPane.BorderStyle = FrameView.DefaultBorderStyle;
+				ContentPane.LineStyle = FrameView.DefaultBorderStyle;
 
 				MenuBar.Menus [0].Children [0].Shortcut = Application.QuitKey;
 				StatusBar.Items [0].Shortcut = Application.QuitKey;

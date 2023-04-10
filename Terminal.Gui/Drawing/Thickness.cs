@@ -179,7 +179,7 @@ namespace Terminal.Gui {
 				Application.Driver.FillRect (new Rect (rect.X, rect.Y + Math.Max (0, rect.Height - Bottom), rect.Width, Bottom), bottomChar);
 			}
 
-			// TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
+			// TODO: This should be moved to LineCanvas as a new LineStyle.Ruler
 			if ((ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler) {
 				// Top
 				var hruler = new Ruler () { Length = rect.Width, Orientation = Orientation.Horizontal };

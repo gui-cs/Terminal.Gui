@@ -44,7 +44,12 @@ namespace Terminal.Gui.DialogTests {
 
 		private (Application.RunState, Dialog) RunButtonTestDialog (string title, int width, Dialog.ButtonAlignments align, params Button [] btns)
 		{
-			var dlg = new Dialog (title, width, 1, btns) {
+			var dlg = new Dialog (btns) {
+				Title = title,
+				X = 0,
+				Y = 0,
+				Width = width,
+				Height = 1,
 				ButtonAlignment = align,
 			};
 			// Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
@@ -52,6 +57,155 @@ namespace Terminal.Gui.DialogTests {
 			return (Application.Begin (dlg), dlg);
 		}
 
+		[Fact]
+		[AutoInitShutdown]
+		public void Size_Default ()
+		{
+			var d = new Dialog () {
+			};
+			Application.Begin (d);
+			((FakeDriver)Application.Driver).SetBufferSize (100, 100);
+
+			// Default size is Percent(85) 
+			Assert.Equal (new Size ((int)(100 * .85), (int)(100 * .85)), d.Frame.Size);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Location_Default ()
+		{
+			var d = new Dialog () {
+			};
+			Application.Begin (d);
+			((FakeDriver)Application.Driver).SetBufferSize (100, 100);
+
+			// Default location is centered, so 100 / 2 - 85 / 2 = 7
+			var expected = 7;
+			Assert.Equal (new Point (expected, expected), d.Frame.Location);
+		}
+
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Size_Not_Default ()
+		{
+			var d = new Dialog () {
+				Width = 50,
+				Height = 50,
+			};
+
+			Application.Begin (d);
+			((FakeDriver)Application.Driver).SetBufferSize (100, 100);
+
+			// Default size is Percent(85) 
+			Assert.Equal (new Size (50, 50), d.Frame.Size);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Location_Not_Default ()
+		{
+			var d = new Dialog () {
+				X = 1,
+				Y = 1,
+			};
+			Application.Begin (d);
+			((FakeDriver)Application.Driver).SetBufferSize (100, 100);
+
+			// Default location is centered, so 100 / 2 - 85 / 2 = 7
+			var expected = 1;
+			Assert.Equal (new Point (expected, expected), d.Frame.Location);
+		}
+
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Location_When_Application_Top_Not_Default ()
+		{
+			var expected = 5;
+			var d = new Dialog () {
+				X = expected,
+				Y = expected,
+				Height = 5,
+				Width = 5
+			};
+			Application.Begin (d);
+			((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+
+			// Default location is centered, so 100 / 2 - 85 / 2 = 7
+			Assert.Equal (new Point (expected, expected), d.Frame.Location);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+     ┌───┐
+     │   │
+     │   │
+     │   │
+     └───┘", output);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Location_When_Not_Application_Top_Not_Default ()
+		{
+			Application.Top.BorderStyle = LineStyle.Double;
+
+			var iterations = -1;
+			Application.Iteration += () => {
+				iterations++;
+				
+				if (iterations == 0) {
+					var d = new Dialog () {
+						X = 5,
+						Y = 5,
+						Height = 3,
+						Width = 5
+					};
+					Application.Begin (d);
+
+					Assert.Equal (new Point (5, 5), d.Frame.Location);
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
+╔══════════════════╗
+║                  ║
+║                  ║
+║                  ║
+║                  ║
+║    ┌───┐         ║
+║    │   │         ║
+║    └───┘         ║
+║                  ║
+╚══════════════════╝", output);
+
+					d = new Dialog () {
+						X = 5,
+						Y = 5,
+					};
+					Application.Begin (d);
+
+					// This is because of PostionTopLevels and EnsureVisibleBounds
+					Assert.Equal (new Point (3, 2), d.Frame.Location);
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
+╔══════════════════╗
+║                  ║
+║  ┌───────────────┐
+║  │               │
+║  │               │
+║  │               │
+║  │               │
+║  │               │
+║  │               │
+╚══└───────────────┘", output);
+
+
+				} else if (iterations > 0) {
+					Application.RequestStop ();
+				}
+			};
+			
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+			Application.Run ();
+		}
+		
 		[Fact]
 		[AutoInitShutdown]
 		public void ButtonAlignment_One ()
@@ -68,10 +222,11 @@ namespace Terminal.Gui.DialogTests {
 			d.SetBufferSize (width, 1);
 
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Center, new Button (btnText));
+			// Center
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 			Application.End (runstate);
 
-			// Justify
+			// Justify 
 			buttonRow = $"{d.VLine}    {d.LeftBracket} {btnText} {d.RightBracket}{d.VLine}";
 			Assert.Equal (width, buttonRow.Length);
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Justify, new Button (btnText));
@@ -338,7 +493,7 @@ namespace Terminal.Gui.DialogTests {
 
 		[Fact]
 		[AutoInitShutdown]
-		public void ButtonAlignment_Four_On_Smaller_Width ()
+		public void ButtonAlignment_Four_On_Too_Small_Width ()
 		{
 			Application.RunState runstate = null;
 
@@ -355,33 +510,30 @@ namespace Terminal.Gui.DialogTests {
 			var btn3 = $"{d.LeftBracket} {btn3Text} {d.RightBracket}";
 			var btn4Text = "never";
 			var btn4 = $"{d.LeftBracket} {btn4Text} {d.RightBracket}";
-
-			var buttonRow = $"{d.VLine} {btn1} {btn2} {btn3} {btn4} {d.VLine}";
-			var width = buttonRow.Length;
-			d.SetBufferSize (30, 1);
-
+			var buttonRow = string.Empty;
+			
+			var width = 30;
+			d.SetBufferSize (width, 1);
+			
 			// Default - Center
-			buttonRow = $"yes ] {btn2} {btn3} [ never";
-			Assert.NotEqual (width, buttonRow.Length);
-			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Center, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
+			buttonRow = $"{d.VLine}es ] {btn2} {btn3} [ neve{d.VLine}";
+			(runstate, var dlg) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Center, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
+			Assert.Equal (new Size (width, 1), dlg.Frame.Size);
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 			Application.End (runstate);
 
 			// Justify
-			buttonRow = $"es ] {btn2}  {btn3}  [ neve";
-			Assert.NotEqual (width, buttonRow.Length);
+			buttonRow = $"{d.VLine}[ yes [ no [ maybe [ never ]{d.VLine}";
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Justify, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output); Application.End (runstate);
 
 			// Right
-			buttonRow = $" yes ] {btn2} {btn3} [ neve";
-			Assert.NotEqual (width, buttonRow.Length);
+			buttonRow = $"{d.VLine}] {btn2} {btn3} {btn4}{d.VLine}";
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Right, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output); Application.End (runstate);
 
 			// Left
-			buttonRow = $"es ] {btn2} {btn3} [ never";
-			Assert.NotEqual (width, buttonRow.Length);
+			buttonRow = $"{d.VLine}{btn1} {btn2} {btn3} [ n{d.VLine}";
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Left, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output); Application.End (runstate);
 		}
@@ -468,7 +620,7 @@ namespace Terminal.Gui.DialogTests {
 
 			// Default - Center
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Center, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
-			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output); 
+			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 			Application.End (runstate);
 
 			// Justify
@@ -552,7 +704,7 @@ namespace Terminal.Gui.DialogTests {
 			d.SetBufferSize (width, 1);
 
 			// Default (center)
-			var dlg = new Dialog (title, width, 1, new Button (btn1Text)) { ButtonAlignment = Dialog.ButtonAlignments.Center };
+			var dlg = new Dialog (new Button (btn1Text)) { Title = title, Width = width, Height = 1, ButtonAlignment = Dialog.ButtonAlignments.Center };
 			// Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
 			dlg.BorderFrame.Thickness = new Thickness (1, 0, 1, 0);
 			runstate = Application.Begin (dlg);
@@ -568,7 +720,7 @@ namespace Terminal.Gui.DialogTests {
 			Application.End (runstate);
 
 			// Justify
-			dlg = new Dialog (title, width, 1, new Button (btn1Text)) { ButtonAlignment = Dialog.ButtonAlignments.Justify };
+			dlg = new Dialog (new Button (btn1Text)) { Title = title, Width = width, Height = 1, ButtonAlignment = Dialog.ButtonAlignments.Justify };
 			// Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
 			dlg.BorderFrame.Thickness = new Thickness (1, 0, 1, 0);
 			runstate = Application.Begin (dlg);
@@ -584,7 +736,7 @@ namespace Terminal.Gui.DialogTests {
 			Application.End (runstate);
 
 			// Right
-			dlg = new Dialog (title, width, 1, new Button (btn1Text)) { ButtonAlignment = Dialog.ButtonAlignments.Right };
+			dlg = new Dialog (new Button (btn1Text)) { Title = title, Width = width, Height = 1, ButtonAlignment = Dialog.ButtonAlignments.Right };
 			// Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
 			dlg.BorderFrame.Thickness = new Thickness (1, 0, 1, 0);
 			runstate = Application.Begin (dlg);
@@ -600,7 +752,7 @@ namespace Terminal.Gui.DialogTests {
 			Application.End (runstate);
 
 			// Left
-			dlg = new Dialog (title, width, 1, new Button (btn1Text)) { ButtonAlignment = Dialog.ButtonAlignments.Left };
+			dlg = new Dialog (new Button (btn1Text)) { Title = title, Width = width, Height = 1, ButtonAlignment = Dialog.ButtonAlignments.Left };
 			// Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
 			dlg.BorderFrame.Thickness = new Thickness (1, 0, 1, 0);
 			runstate = Application.Begin (dlg);
@@ -638,8 +790,8 @@ namespace Terminal.Gui.DialogTests {
 				btn2 = new Button ("Show Sub");
 				btn3 = new Button ("Close");
 				btn3.Clicked += (s, e) => Application.RequestStop ();
-				btn2.Clicked += (s, e) => { MessageBox.Query ("hey", "ya", "ok"); };
-				var dlg = new Dialog ("Hey", btn2, btn3);
+				btn2.Clicked += (s, e) => { MessageBox.Query (string.Empty, "ya", "ok"); };
+				var dlg = new Dialog (btn2, btn3);
 
 				Application.Run (dlg);
 			};
@@ -651,7 +803,7 @@ namespace Terminal.Gui.DialogTests {
 					Assert.True (btn1.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
 				} else if (iterations == 1) {
 					expected = @"
-      ┌┤Hey├─────────────────────────────────────────────────────────────┐
+      ┌──────────────────────────────────────────────────────────────────┐
       │                                                                  │
       │                                                                  │
       │                                                                  │
@@ -677,7 +829,7 @@ namespace Terminal.Gui.DialogTests {
 					Assert.True (btn2.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
 				} else if (iterations == 2) {
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
-      ┌┤Hey├─────────────────────────────────────────────────────────────┐
+      ┌──────────────────────────────────────────────────────────────────┐
       │                                                                  │
       │                                                                  │
       │                                                                  │
@@ -685,7 +837,7 @@ namespace Terminal.Gui.DialogTests {
       │                                                                  │
       │                                                                  │
       │                                                                  │
-      │         ┌┤hey├─────────────────────────────────────────┐         │
+      │         ┌──────────────────────────────────────────────┐         │
       │         │                      ya                      │         │
       │         │                                              │         │
       │         │                   [◦ ok ◦]                   │         │
@@ -730,15 +882,15 @@ namespace Terminal.Gui.DialogTests {
 					Application.RequestStop ();
 				}
 			};
-			
+
 			win.Loaded += (s, a) => {
-				var dlg = new Dialog ("Test", 18, 3, new Button ("Ok"));
+				var dlg = new Dialog (new Button ("Ok")) { Width = 18, Height = 3 };
 
 				dlg.Loaded += (s, a) => {
 					Application.Refresh ();
 					var expected = @"
 ┌──────────────────┐
-│┌┤Test├──────────┐│
+│┌────────────────┐│
 ││     [ Ok ]     ││
 │└────────────────┘│
 └──────────────────┘";
@@ -749,42 +901,42 @@ namespace Terminal.Gui.DialogTests {
 			};
 			Application.Run (win);
 		}
-		
-//		[Theory, AutoInitShutdown]
-//		[InlineData (5)]
-//		//[InlineData (6)]
-//		//[InlineData (7)]
-//		//[InlineData (8)]
-//		//[InlineData (9)]
-//		public void Dialog_In_Window_Without_Size_One_Button_Aligns (int height)
-//		{
-//			((FakeDriver)Application.Driver).SetBufferSize (20, height);
-//			var win = new Window ();
 
-//			Application.Iteration += () => {
-//				var dlg = new Dialog ("Test", new Button ("Ok"));
+		//		[Theory, AutoInitShutdown]
+		//		[InlineData (5)]
+		//		//[InlineData (6)]
+		//		//[InlineData (7)]
+		//		//[InlineData (8)]
+		//		//[InlineData (9)]
+		//		public void Dialog_In_Window_Without_Size_One_Button_Aligns (int height)
+		//		{
+		//			((FakeDriver)Application.Driver).SetBufferSize (20, height);
+		//			var win = new Window ();
 
-//				dlg.LayoutComplete += (s, a) => {
-//					Application.Refresh ();
-//					// BUGBUG: This seems wrong; is it a bug in Dim.Percent(85)??
-//					var expected = @"
-//┌┌┤Test├─────────┐─┐
-//││               │ │
-//││     [ Ok ]    │ │
-//│└───────────────┘ │
-//└──────────────────┘";
-//					_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		//			Application.Iteration += () => {
+		//				var dlg = new Dialog ("Test", new Button ("Ok"));
 
-//					dlg.RequestStop ();
-//					win.RequestStop ();
-//				};
+		//				dlg.LayoutComplete += (s, a) => {
+		//					Application.Refresh ();
+		//					// BUGBUG: This seems wrong; is it a bug in Dim.Percent(85)??
+		//					var expected = @"
+		//┌┌┤Test├─────────┐─┐
+		//││               │ │
+		//││     [ Ok ]    │ │
+		//│└───────────────┘ │
+		//└──────────────────┘";
+		//					_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-//				Application.Run (dlg);
-//			};
+		//					dlg.RequestStop ();
+		//					win.RequestStop ();
+		//				};
 
-//			Application.Run (win);
-//			Application.Shutdown ();
-//		}
+		//				Application.Run (dlg);
+		//			};
+
+		//			Application.Run (win);
+		//			Application.Shutdown ();
+		//		}
 	}
 
 }

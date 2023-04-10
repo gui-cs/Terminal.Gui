@@ -472,9 +472,9 @@ namespace Terminal.Gui.ViewTests {
 
 			var t = Application.Top;
 
-			var w = new Window ("w");
-			var f = new FrameView ("f");
-			var v = new View ("v") { CanFocus = true };
+			var w = new Window ();
+			var f = new FrameView ();
+			var v = new View () { CanFocus = true };
 			f.Add (v);
 			w.Add (f);
 			t.Add (w);
@@ -509,9 +509,9 @@ namespace Terminal.Gui.ViewTests {
 
 			var t = Application.Top;
 
-			var w = new Window ("w");
-			var f = new FrameView ("f");
-			var v = new View ("v") { CanFocus = true };
+			var w = new Window ();
+			var f = new FrameView ();
+			var v = new View () { CanFocus = true };
 			f.Add (v);
 			w.Add (f);
 			t.Add (w);
@@ -552,10 +552,10 @@ namespace Terminal.Gui.ViewTests {
 
 			var t = Application.Top;
 
-			var w = new Window ("w");
-			var f = new FrameView ("f");
-			var v1 = new View ("v1") { CanFocus = true };
-			var v2 = new View ("v2") { CanFocus = true };
+			var w = new Window ();
+			var f = new FrameView ();
+			var v1 = new View () { CanFocus = true };
+			var v2 = new View () { CanFocus = true };
 			f.Add (v1, v2);
 			w.Add (f);
 			t.Add (w);
@@ -587,10 +587,10 @@ namespace Terminal.Gui.ViewTests {
 
 			var t = Application.Top;
 
-			var w = new Window ("w");
-			var f = new FrameView ("f");
-			var v1 = new View ("v1");
-			var v2 = new View ("v2") { CanFocus = true };
+			var w = new Window ();
+			var f = new FrameView ();
+			var v1 = new View ();
+			var v2 = new View () { CanFocus = true };
 			f.Add (v1, v2);
 			w.Add (f);
 			t.Add (w);

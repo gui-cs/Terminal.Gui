@@ -524,7 +524,7 @@ namespace Terminal.Gui.ViewsTests {
 00000000000000000000000
 00000000000000000000000", attributes);
 
-			sv.Add (new Window ("1") { X = 3, Y = 3, Width = 20, Height = 20 });
+			sv.Add (new Window { X = 3, Y = 3, Width = 20, Height = 20 });
 
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -534,7 +534,7 @@ namespace Terminal.Gui.ViewsTests {
             ▲          
             ┬          
             ┴          
-      ┌┤1├──░          
+      ┌─────░          
       │     ░          
       │     ░          
       │     ░          
@@ -617,7 +617,7 @@ namespace Terminal.Gui.ViewsTests {
 				ShowVerticalScrollIndicator = true
 			};
 			scrollView.Add (view);
-			var win = new Window (new Rect (1, 1, 20, 14), "");
+			var win = new Window (new Rect (1, 1, 20, 14));
 			win.Add (scrollView);
 			Application.Top.Add (win);
 			Application.Begin (Application.Top);

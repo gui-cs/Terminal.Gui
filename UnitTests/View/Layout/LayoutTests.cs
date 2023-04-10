@@ -1,10 +1,6 @@
-﻿using NStack;
-using System;
-using System.Collections.Generic;
-using System.Xml.Linq;
+﻿using System;
 using Xunit;
 using Xunit.Abstractions;
-//using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
@@ -325,7 +321,7 @@ namespace Terminal.Gui.ViewTests {
 		[Fact, AutoInitShutdown]
 		public void AutoSize_False_ResizeView_With_Dim_Fill_After_IsInitialized ()
 		{
-			var win = new Window (new Rect (0, 0, 30, 80), "");
+			var win = new Window (new Rect (0, 0, 30, 80));
 			var label = new Label () { AutoSize = false, Width = Dim.Fill (), Height = Dim.Fill () };
 			win.Add (label);
 			Application.Top.Add (win);
@@ -350,7 +346,7 @@ namespace Terminal.Gui.ViewTests {
 		[Fact, AutoInitShutdown]
 		public void AutoSize_False_SetWidthHeight_With_Dim_Fill_And_Dim_Absolute_After_IsAdded_And_IsInitialized ()
 		{
-			var win = new Window (new Rect (0, 0, 30, 80), "win");
+			var win = new Window (new Rect (0, 0, 30, 80));
 			var label = new Label () { Width = Dim.Fill () };
 			win.Add (label);
 			Application.Top.Add (win);
@@ -386,7 +382,7 @@ namespace Terminal.Gui.ViewTests {
 		[Fact, AutoInitShutdown]
 		public void AutoSize_False_SetWidthHeight_With_Dim_Fill_And_Dim_Absolute_With_Initialization ()
 		{
-			var win = new Window (new Rect (0, 0, 30, 80), "");
+			var win = new Window (new Rect (0, 0, 30, 80));
 			var label = new Label () { Width = Dim.Fill () };
 			win.Add (label);
 			Application.Top.Add (win);
@@ -1858,6 +1854,65 @@ Y
 			Assert.True (clicked);
 
 			Application.End (rs);
+		}
+
+
+		[Fact]
+		public void Draw_Vertical_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
+		{
+			Application.Init (new FakeDriver ());
+
+			var top = Application.Top;
+
+			var view = new View ("view") {
+				Y = -2,
+				Height = 10,
+				TextDirection = TextDirection.TopBottom_LeftRight
+			};
+			top.Add (view);
+
+			Application.Iteration += () => {
+				Assert.Equal (-2, view.Y);
+
+				Application.RequestStop ();
+			};
+
+			try {
+				Application.Run ();
+			} catch (IndexOutOfRangeException ex) {
+				// After the fix this exception will not be caught.
+				Assert.IsType<IndexOutOfRangeException> (ex);
+			}
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
+		}
+
+		[Fact]
+		public void Draw_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
+		{
+			Application.Init (new FakeDriver ());
+
+			var top = Application.Top;
+
+			var view = new View ("view") { X = -2 };
+			top.Add (view);
+
+			Application.Iteration += () => {
+				Assert.Equal (-2, view.X);
+
+				Application.RequestStop ();
+			};
+
+			try {
+				Application.Run ();
+			} catch (IndexOutOfRangeException ex) {
+				// After the fix this exception will not be caught.
+				Assert.IsType<IndexOutOfRangeException> (ex);
+			}
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 	}
 }

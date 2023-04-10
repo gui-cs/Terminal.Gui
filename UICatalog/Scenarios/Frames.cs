@@ -170,7 +170,7 @@ namespace UICatalog.Scenarios {
 
 				Add (new Label ("BorderStyle:"));
 
-				var borderStyleEnum = Enum.GetValues (typeof (BorderStyle)).Cast<BorderStyle> ().ToList ();
+				var borderStyleEnum = Enum.GetValues (typeof (LineStyle)).Cast<LineStyle> ().ToList ();
 				var rbBorderStyle = new RadioGroup (borderStyleEnum.Select (
 					e => NStack.ustring.Make (e.ToString ())).ToArray ()) {
 
@@ -181,7 +181,7 @@ namespace UICatalog.Scenarios {
 				Add (rbBorderStyle);
 
 				rbBorderStyle.SelectedItemChanged += (s, e) => {
-					viewToEdit.BorderFrame.BorderStyle = (BorderStyle)e.SelectedItem;
+					viewToEdit.BorderFrame.BorderStyle = (LineStyle)e.SelectedItem;
 					viewToEdit.SetNeedsDisplay ();
 				};
 

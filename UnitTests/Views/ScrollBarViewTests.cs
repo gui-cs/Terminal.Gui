@@ -825,7 +825,7 @@ namespace Terminal.Gui.ViewsTests {
 				Height = Dim.Fill (),
 				Text = "This is the help text for the Second Step.\n\nPress the button to see a message box.\n\nEnter name too."
 			};
-			var win = new Window ("Test") {
+			var win = new Window () {
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			};
@@ -889,7 +889,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (0, scrollBar.Position);
 			Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
 			var expected = @"
-┌┤Test├─────────────────────────────────────┐
+┌───────────────────────────────────────────┐
 │This is the help text for the Second Step. │
 │                                           │
 │Press the button to see a message box.     │
@@ -926,7 +926,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (0, scrollBar.Position);
 			Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
 			expected = @"
-┌┤Test├──────────────────┐
+┌────────────────────────┐
 │This is the help text   │
 │for the Second Step.    │
 │                        │
@@ -962,7 +962,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (0, scrollBar.Position);
 			Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
 			expected = @"
-┌┤Test├──┐
+┌────────┐
 │This   ▲│
 │is the ┬│
 │help   ││

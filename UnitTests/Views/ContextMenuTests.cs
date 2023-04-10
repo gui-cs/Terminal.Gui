@@ -637,7 +637,7 @@ namespace Terminal.Gui.ViewsTests {
 				Width = 20
 			};
 
-			var win = new Window ("Window");
+			var win = new Window ();
 			win.Add (label, tf);
 
 			var statusBar = new StatusBar (new StatusItem [] {
@@ -658,7 +658,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Redraw (Application.Top.Bounds);
 			var expected = @"
  File  Edit                                 
-┌┤Window├──────────────────────────────────┐
+┌──────────────────────────────────────────┐
 │                                          │
 │                                          │
 │                                          │

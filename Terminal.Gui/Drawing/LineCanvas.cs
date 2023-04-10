@@ -4,15 +4,38 @@ using System.Linq;
 
 namespace Terminal.Gui {
 
+	/// <summary>
+	/// Defines the style of lines for a <see cref="LineCanvas"/>.
+	/// </summary>
+	public enum LineStyle {
+		/// <summary>
+		/// No border is drawn.
+		/// </summary>
+		None,
+		/// <summary>
+		/// The border is drawn using single-width line glyphs.
+		/// </summary>
+		Single,
+		/// <summary>
+		/// The border is drawn using double-width line glyphs.
+		/// </summary>
+		Double,
+		/// <summary>
+		/// The border is drawn using single-width line glyphs with rounded corners.
+		/// </summary>
+		Rounded,
+		// TODO: Support Ruler
+		///// <summary> 
+		///// The border is drawn as a diagnostic ruler ("|123456789...").
+		///// </summary>
+		//Ruler
+	}
 
 	/// <summary>
 	/// Facilitates box drawing and line intersection detection
 	/// and rendering.  Does not support diagonal lines.
 	/// </summary>
 	public class LineCanvas {
-
-
-
 		private List<StraightLine> lines = new List<StraightLine> ();
 
 		Dictionary<IntersectionRuneType, IntersectionRuneResolver> runeResolvers = new Dictionary<IntersectionRuneType, IntersectionRuneResolver> {
@@ -43,7 +66,7 @@ namespace Terminal.Gui {
 		/// Positive for Down/Right.  Negative for Up/Left.</param>
 		/// <param name="orientation">Direction of the line.</param>
 		/// <param name="style">The style of line to use</param>
-		public void AddLine (Point from, int length, Orientation orientation, BorderStyle style)
+		public void AddLine (Point from, int length, Orientation orientation, LineStyle style)
 		{
 			lines.Add (new StraightLine (from, length, orientation, style));
 		}
@@ -102,10 +125,10 @@ namespace Terminal.Gui {
 
 			public Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
 			{
-				var useRounded = intersects.Any (i => i.Line.Style == BorderStyle.Rounded && i.Line.Length != 0);
+				var useRounded = intersects.Any (i => i.Line.Style == LineStyle.Rounded && i.Line.Length != 0);
 
-				bool doubleHorizontal = intersects.Any (l => l.Line.Orientation == Orientation.Horizontal && l.Line.Style == BorderStyle.Double);
-				bool doubleVertical = intersects.Any (l => l.Line.Orientation == Orientation.Vertical && l.Line.Style == BorderStyle.Double);
+				bool doubleHorizontal = intersects.Any (l => l.Line.Orientation == Orientation.Horizontal && l.Line.Style == LineStyle.Double);
+				bool doubleVertical = intersects.Any (l => l.Line.Orientation == Orientation.Vertical && l.Line.Style == LineStyle.Double);
 
 
 				if (doubleHorizontal) {
@@ -199,10 +222,10 @@ namespace Terminal.Gui {
 			}
 
 			// TODO: Remove these two once we have all of the below ported to IntersectionRuneResolvers
-			var useDouble = intersects.Any (i => i.Line.Style == BorderStyle.Double);
-			var useRounded = intersects.Any (i => i.Line.Style == BorderStyle.Rounded);
+			var useDouble = intersects.Any (i => i.Line.Style == LineStyle.Double);
+			var useRounded = intersects.Any (i => i.Line.Style == LineStyle.Rounded);
 			// TODO: Support ruler
-			//var useRuler = intersects.Any (i => i.Line.Style == BorderStyle.Ruler && i.Line.Length != 0);
+			//var useRuler = intersects.Any (i => i.Line.Style == LineStyle.Ruler && i.Line.Length != 0);
 
 			// TODO: maybe make these resolvers to for simplicity?
 			// or for dotted lines later on or that kind of thing?
@@ -470,9 +493,9 @@ namespace Terminal.Gui {
 			public Point Start { get; }
 			public int Length { get; }
 			public Orientation Orientation { get; }
-			public BorderStyle Style { get; }
+			public LineStyle Style { get; }
 
-			public StraightLine (Point start, int length, Orientation orientation, BorderStyle style)
+			public StraightLine (Point start, int length, Orientation orientation, LineStyle style)
 			{
 				this.Start = start;
 				this.Length = length;
