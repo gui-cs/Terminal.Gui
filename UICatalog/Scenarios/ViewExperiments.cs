@@ -120,7 +120,7 @@ namespace UICatalog.Scenarios {
 				};
 				Add (copyTop);
 
-				LayoutSubviews ();
+				//LayoutSubviews ();
 				Height = Margin.Thickness.Vertical + BorderFrame.Thickness.Vertical + Padding.Thickness.Vertical + 4;
 				Width = 20;
 			}
@@ -234,7 +234,7 @@ namespace UICatalog.Scenarios {
 				//};
 				//Add (rbBorderBrush);
 
-				Height = 8; 
+				Height = 8;
 				Title = title;
 			}
 		}
@@ -242,7 +242,6 @@ namespace UICatalog.Scenarios {
 		public override void Init ()
 		{
 			Application.Init ();
-			//Application.Init ();
 			ConfigurationManager.Themes.Theme = Theme;
 			ConfigurationManager.Apply ();
 			Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];

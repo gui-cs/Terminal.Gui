@@ -187,16 +187,26 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event EventHandler<KeyChangedEventArgs> HotKeyChanged;
 
-		Key hotKey = Key.Null;
+		Key _hotKey = Key.Null;
 
 		/// <summary>
 		/// Gets or sets the HotKey defined for this view. A user pressing HotKey on the keyboard while this view has focus will cause the Clicked event to fire.
 		/// </summary>
 		public virtual Key HotKey {
-			get => hotKey;
+			get => _hotKey;
 			set {
-				if (hotKey != value) {
-					hotKey = TextFormatter.HotKey = (value == Key.Unknown ? Key.Null : value);
+				if (_hotKey != value) {
+					var v = value == Key.Unknown ? Key.Null : value;
+					if (_hotKey != Key.Null && ContainsKeyBinding (Key.Space | _hotKey)) {
+						if (v == Key.Null) {
+							ClearKeybinding (Key.Space | _hotKey);
+						} else {
+							ReplaceKeyBinding (Key.Space | _hotKey, Key.Space | v);
+						}
+					} else if (v != Key.Null) {
+						AddKeyBinding (Key.Space | v, Command.Accept);
+					}
+					_hotKey = TextFormatter.HotKey = v;
 				}
 			}
 		}
@@ -1062,6 +1072,9 @@ namespace Terminal.Gui {
 			var actY = y is Pos.PosAbsolute ? y.Anchor (0) : frame.Y;
 
 			if (AutoSize) {
+				if (TextAlignment == TextAlignment.Justified) {
+					throw new InvalidOperationException ("TextAlignment.Justified cannot be used with AutoSize");
+				}
 				var s = GetAutoSize ();
 				var w = width is Dim.DimAbsolute && width.Anchor (0) > s.Width ? width.Anchor (0) : s.Width;
 				var h = height is Dim.DimAbsolute && height.Anchor (0) > s.Height ? height.Anchor (0) : s.Height;
@@ -1425,7 +1438,8 @@ namespace Terminal.Gui {
 		public Point ScreenToBounds (int x, int y)
 		{
 			if (SuperView == null) {
-				return new Point (x - Frame.X + GetBoundsOffset ().X, y - Frame.Y + GetBoundsOffset ().Y);
+				var boundsOffset = GetBoundsOffset ();
+				return new Point (x - Frame.X + boundsOffset.X, y - Frame.Y + boundsOffset.Y);
 			} else {
 				var parent = SuperView.ScreenToView (x, y);
 				return new Point (parent.X - frame.X, parent.Y - frame.Y);
@@ -1444,13 +1458,15 @@ namespace Terminal.Gui {
 		/// <see cref="ConsoleDriver.Rows"/>, respectively.</param>
 		public virtual void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clamped = true)
 		{
-			rcol = col + Frame.X + GetBoundsOffset ().X;
-			rrow = row + Frame.Y + GetBoundsOffset ().Y;
+			var boundsOffset = GetBoundsOffset ();
+			rcol = col + Frame.X + boundsOffset.X;
+			rrow = row + Frame.Y + boundsOffset.Y;
 
 			var super = SuperView;
 			while (super != null) {
-				rcol += super.Frame.X + super.GetBoundsOffset ().X;
-				rrow += super.Frame.Y + super.GetBoundsOffset ().Y;
+				boundsOffset = super.GetBoundsOffset ();
+				rcol += super.Frame.X + boundsOffset.X;
+				rrow += super.Frame.Y + boundsOffset.Y;
 				super = super.SuperView;
 			}
 
@@ -2600,15 +2616,10 @@ namespace Terminal.Gui {
 				if (pv.Target != this) {
 					nEdges.Add ((pv.Target, from));
 				}
-				foreach (var v in from.InternalSubviews) {
-					CollectAll (v, ref nNodes, ref nEdges);
-				}
 				return;
 			case Pos.PosCombine pc:
-				foreach (var v in from.InternalSubviews) {
-					CollectPos (pc.left, from, ref nNodes, ref nEdges);
-					CollectPos (pc.right, from, ref nNodes, ref nEdges);
-				}
+				CollectPos (pc.left, from, ref nNodes, ref nEdges);
+				CollectPos (pc.right, from, ref nNodes, ref nEdges);
 				break;
 			}
 		}
@@ -2624,15 +2635,10 @@ namespace Terminal.Gui {
 				if (dv.Target != this) {
 					nEdges.Add ((dv.Target, from));
 				}
-				foreach (var v in from.InternalSubviews) {
-					CollectAll (v, ref nNodes, ref nEdges);
-				}
 				return;
 			case Dim.DimCombine dc:
-				foreach (var v in from.InternalSubviews) {
-					CollectDim (dc.left, from, ref nNodes, ref nEdges);
-					CollectDim (dc.right, from, ref nNodes, ref nEdges);
-				}
+				CollectDim (dc.left, from, ref nNodes, ref nEdges);
+				CollectDim (dc.right, from, ref nNodes, ref nEdges);
 				break;
 			}
 		}
@@ -2685,16 +2691,30 @@ namespace Terminal.Gui {
 			}
 
 			if (edges.Any ()) {
-				(var from, var to) = edges.First ();
-				if (from != superView?.GetTopSuperView (to, from)) {
-					if (!ReferenceEquals (from, to)) {
+				foreach ((var from, var to) in edges) {
+					if (from == to) {
+						// if not yet added to the result, add it and remove from edge
+						if (result.Find (v => v == from) == null) {
+							result.Add (from);
+						}
+						edges.Remove ((from, to));
+					} else if (from.SuperView == to.SuperView) {
+						// if 'from' is not yet added to the result, add it
+						if (result.Find (v => v == from) == null) {
+							result.Add (from);
+						}
+						// if 'to' is not yet added to the result, add it
+						if (result.Find (v => v == to) == null) {
+							result.Add (to);
+						}
+						// remove from edge
+						edges.Remove ((from, to));
+					} else if (from != superView?.GetTopSuperView (to, from) && !ReferenceEquals (from, to)) {
 						if (ReferenceEquals (from.SuperView, to)) {
 							throw new InvalidOperationException ($"ComputedLayout for \"{superView}\": \"{to}\" references a SubView (\"{from}\").");
 						} else {
 							throw new InvalidOperationException ($"ComputedLayout for \"{superView}\": \"{from}\" linked with \"{to}\" was not found. Did you forget to add it to {superView}?");
 						}
-					} else {
-						throw new InvalidOperationException ($"ComputedLayout for \"{superView}\": A recursive cycle was found in the relative Pos/Dim of the SubViews.");
 					}
 				}
 			}
@@ -2771,11 +2791,10 @@ namespace Terminal.Gui {
 
 			// If the 'to' is rooted to 'from' and the layoutstyle is Computed it's a special-case.
 			// Use LayoutSubview with the Frame of the 'from' 
-			if (SuperView != null && GetTopSuperView () != null && LayoutNeeded
-			    && ordered.Count == 0 && edges.Count > 0 && LayoutStyle == LayoutStyle.Computed) {
-
-				(var from, var to) = edges.First ();
-				LayoutSubview (to, from.Frame);
+			if (SuperView != null && GetTopSuperView () != null && LayoutNeeded && edges.Count > 0) {
+				foreach ((var from, var to) in edges) {
+					LayoutSubview (to, from.Frame);
+				}
 			}
 
 			LayoutNeeded = false;
@@ -2868,11 +2887,10 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets a flag that determines whether <see cref="Terminal.Gui.TextFormatter.Text"/> will have trailing spaces preserved
-		/// or not when <see cref="Terminal.Gui.TextFormatter.WordWrap"/> is enabled. If <see langword="true"/> 
-		/// any trailing spaces will be trimmed when either the <see cref="Text"/> property is changed or 
-		/// when <see cref="Terminal.Gui.TextFormatter.WordWrap"/> is set to <see langword="true"/>.
-		/// The default is <see langword="false"/>.
+		/// Gets or sets whether trailing spaces at the end of word-wrapped lines are preserved
+		/// or not when <see cref="Terminal.Gui.TextFormatter.WordWrap"/> is enabled. 
+		/// If <see langword="true"/> trailing spaces at the end of wrapped lines will be removed when 
+		/// <see cref="Text"/> is formatted for display. The default is <see langword="false"/>.
 		/// </summary>
 		public virtual bool PreserveTrailingSpaces {
 			get => TextFormatter.PreserveTrailingSpaces;
@@ -3120,7 +3138,7 @@ namespace Terminal.Gui {
 				return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
 			}
 			TextFormatter.FindHotKey (text, HotKeySpecifier, true, out _, out var hk);
-			if (hotKey != hk) {
+			if (_hotKey != hk) {
 				HotKey = hk;
 			}
 		}
@@ -3580,8 +3598,9 @@ namespace Terminal.Gui {
 			if (start.InternalSubviews != null) {
 				int count = start.InternalSubviews.Count;
 				if (count > 0) {
-					var rx = x - (startFrame.X + start.GetBoundsOffset ().X);
-					var ry = y - (startFrame.Y + start.GetBoundsOffset ().Y);
+					var boundsOffset = start.GetBoundsOffset ();
+					var rx = x - (startFrame.X + boundsOffset.X);
+					var ry = y - (startFrame.Y + boundsOffset.Y);
 					for (int i = count - 1; i >= 0; i--) {
 						View v = start.InternalSubviews [i];
 						if (v.Visible && v.Frame.Contains (rx, ry)) {

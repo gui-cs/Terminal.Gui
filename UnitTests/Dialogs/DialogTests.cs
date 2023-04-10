@@ -625,7 +625,7 @@ namespace Terminal.Gui.DialogTests {
 		public void FileDialog_FileSystemWatcher ()
 		{
 			for (int i = 0; i < 8; i++) {
-				var fd = new FileDialog (string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+				var fd = new FileDialog ();
 				fd.Ready += (s, e) => Application.RequestStop ();
 				Application.Run (fd);
 			}

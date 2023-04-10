@@ -244,18 +244,21 @@ namespace Terminal.Gui {
 		/// Formats the provided text to fit within the width provided using word wrapping.
 		/// </summary>
 		/// <param name="text">The text to word wrap</param>
-		/// <param name="width">The width to contain the text to</param>
-		/// <param name="preserveTrailingSpaces">If <c>true</c>, the wrapped text will keep the trailing spaces.
-		///  If <c>false</c>, the trailing spaces will be trimmed.</param>
-		/// <param name="tabWidth">The tab width.</param>
+		/// <param name="width">The number of columns to constrain the text to</param>
+		/// <param name="preserveTrailingSpaces">If <see langword="true"/> trailing spaces at the end of wrapped lines will be preserved.
+		///  If <see langword="false"/>, trailing spaces at the end of wrapped lines will be trimmed.</param>
+		/// <param name="tabWidth">The number of columns used for a tab.</param>
 		/// <param name="textDirection">The text direction.</param>
-		/// <returns>Returns a list of word wrapped lines.</returns>
+		/// <returns>A list of word wrapped lines.</returns>
 		/// <remarks>
 		/// <para>
 		/// This method does not do any justification.
 		/// </para>
 		/// <para>
 		/// This method strips Newline ('\n' and '\r\n') sequences before processing.
+		/// </para>
+		/// <para>
+		/// If <paramref name="preserveTrailingSpaces"/> is <see langword="false"/> at most one space will be preserved at the end of the last line.
 		/// </para>
 		/// </remarks>
 		public static List<ustring> WordWrapText (ustring text, int width, bool preserveTrailingSpaces = false, int tabWidth = 0,
@@ -273,33 +276,7 @@ namespace Terminal.Gui {
 			}
 
 			var runes = StripCRLF (text).ToRuneList ();
-			if (!preserveTrailingSpaces) {
-				if (IsHorizontalDirection (textDirection)) {
-					while ((end = start + Math.Max (GetMaxLengthForWidth (runes.GetRange (start, runes.Count - start), width), 1)) < runes.Count) {
-						while (runes [end] != ' ' && end > start)
-							end--;
-						if (end == start)
-							end = start + GetMaxLengthForWidth (runes.GetRange (end, runes.Count - end), width);
-						lines.Add (ustring.Make (runes.GetRange (start, end - start)));
-						start = end;
-						if (runes [end] == ' ') {
-							start++;
-						}
-					}
-				} else {
-					while ((end = start + width) < runes.Count) {
-						while (runes [end] != ' ' && end > start)
-							end--;
-						if (end == start)
-							end = start + width;
-						lines.Add (ustring.Make (runes.GetRange (start, end - start)));
-						start = end;
-						if (runes [end] == ' ') {
-							start++;
-						}
-					}
-				}
-			} else {
+			if (preserveTrailingSpaces) {
 				while ((end = start) < runes.Count) {
 					end = GetNextWhiteSpace (start, width, out bool incomplete);
 					if (end == 0 && incomplete) {
@@ -311,6 +288,85 @@ namespace Terminal.Gui {
 					if (incomplete) {
 						start = text.RuneCount;
 						break;
+					}
+				}
+			} else {
+				if (IsHorizontalDirection (textDirection)) {
+					//if (GetLengthThatFits (runes.GetRange (start, runes.Count - start), width) > 0) {
+					//	// while there's still runes left and end is not past end...
+					//	while (start < runes.Count &&
+					//		(end = start + Math.Max (GetLengthThatFits (runes.GetRange (start, runes.Count - start), width) - 1, 0)) < runes.Count) {
+					//		// end now points to start + LengthThatFits
+					//		// Walk back over trailing spaces
+					//		while (runes [end] == ' ' && end > start) {
+					//			end--;
+					//		}
+					//		// end now points to start + LengthThatFits - any trailing spaces; start saving new line
+					//		var line = runes.GetRange (start, end - start + 1);
+
+					//		if (end == start && width > 1) {
+					//			// it was all trailing spaces; now walk forward to next non-space
+					//			do {
+					//				start++;
+					//			} while (start < runes.Count && runes [start] == ' ');
+
+					//			// start now points to first non-space we haven't seen yet or we're done
+					//			if (start < runes.Count) {
+					//				// we're not done. we have remaining = width - line.Count columns left; 
+					//				var remaining = width - line.Count;
+					//				if (remaining > 1) {
+					//					// add a space for all the spaces we walked over 
+					//					line.Add (' ');
+					//				}
+					//				var count = GetLengthThatFits (runes.GetRange (start, runes.Count - start), width - line.Count);
+
+					//				// [start..count] now has rest of line
+					//				line.AddRange (runes.GetRange (start, count));
+					//				start += count;
+					//			}
+					//		} else {
+					//			start += line.Count;
+					//		}
+
+					//		//// if the previous line was just a ' ' and the new line is just a ' '
+					//		//// don't add new line
+					//		//if (line [0] == ' ' && (lines.Count > 0 && lines [lines.Count - 1] [0] == ' ')) {
+					//		//} else {
+					//		//}
+					//		lines.Add (ustring.Make (line));
+
+					//		// move forward to next non-space
+					//		while (width > 1 && start < runes.Count && runes [start] == ' ') {
+					//			start++;
+					//		}
+					//	}
+					//}
+
+					while ((end = start + Math.Max (GetLengthThatFits (runes.GetRange (start, runes.Count - start), width), 1)) < runes.Count) {
+						while (runes [end] != ' ' && end > start)
+							end--;
+						if (end == start)
+							end = start + GetLengthThatFits (runes.GetRange (end, runes.Count - end), width);
+						lines.Add (ustring.Make (runes.GetRange (start, end - start)));
+						start = end;
+						if (runes [end] == ' ') {
+							start++;
+						}
+					}
+					
+				} else {
+					while ((end = start + width) < runes.Count) {
+						while (runes [end] != ' ' && end > start) {
+							end--;
+						}
+						if (end == start) {
+							end = start + width;
+						}
+						lines.Add (ustring.Make (runes.GetRange (start, end - start)));
+						start = end;
+						if (runes [end] == ' ') {
+							start++;
+						}
 					}
 				}
 			}
@@ -375,7 +431,7 @@ namespace Terminal.Gui {
 		/// Justifies text within a specified width. 
 		/// </summary>
 		/// <param name="text">The text to justify.</param>
-		/// <param name="width">If the text length is greater that <c>width</c> it will be clipped.</param>
+		/// <param name="width">The number of columns to clip the text to. Text longer than <paramref name="width"/> will be clipped.</param>
 		/// <param name="talign">Alignment.</param>
 		/// <param name="textDirection">The text direction.</param>
 		/// <returns>Justified and clipped text.</returns>
@@ -388,7 +444,7 @@ namespace Terminal.Gui {
 		/// Justifies text within a specified width. 
 		/// </summary>
 		/// <param name="text">The text to justify.</param>
-		/// <param name="width">If the text length is greater that <c>width</c> it will be clipped.</param>
+		/// <param name="width">The number of columns to clip the text to. Text longer than <paramref name="width"/> will be clipped.</param>
 		/// <param name="justify">Justify.</param>
 		/// <param name="textDirection">The text direction.</param>
 		/// <returns>Justified and clipped text.</returns>
@@ -405,7 +461,7 @@ namespace Terminal.Gui {
 			int slen = runes.Count;
 			if (slen > width) {
 				if (IsHorizontalDirection (textDirection)) {
-					return ustring.Make (runes.GetRange (0, GetMaxLengthForWidth (text, width)));
+					return ustring.Make (runes.GetRange (0, GetLengthThatFits (text, width)));
 				} else {
 					return ustring.Make (runes.GetRange (0, width));
 				}
@@ -413,7 +469,7 @@ namespace Terminal.Gui {
 				if (justify) {
 					return Justify (text, width, ' ', textDirection);
 				} else if (IsHorizontalDirection (textDirection) && GetTextWidth (text) > width) {
-					return ustring.Make (runes.GetRange (0, GetMaxLengthForWidth (text, width)));
+					return ustring.Make (runes.GetRange (0, GetLengthThatFits (text, width)));
 				}
 				return text;
 			}
@@ -473,22 +529,24 @@ namespace Terminal.Gui {
 		/// Reformats text into lines, applying text alignment and optionally wrapping text to new lines on word boundaries.
 		/// </summary>
 		/// <param name="text"></param>
-		/// <param name="width">The width to bound the text to for word wrapping and clipping.</param>
+		/// <param name="width">The number of columns to constrain the text to for word wrapping and clipping.</param>
 		/// <param name="talign">Specifies how the text will be aligned horizontally.</param>
-		/// <param name="wordWrap">If <c>true</c>, the text will be wrapped to new lines as need. If <c>false</c>, forces text to fit a single line. Line breaks are converted to spaces. The text will be clipped to <c>width</c></param>
-		/// <param name="preserveTrailingSpaces">If <c>true</c> and 'wordWrap' also true, the wrapped text will keep the trailing spaces. If <c>false</c>, the trailing spaces will be trimmed.</param>
-		/// <param name="tabWidth">The tab width.</param>
+		/// <param name="wordWrap">If <see langword="true"/>, the text will be wrapped to new lines no longer than <paramref name="width"/>.	
+		/// If <see langword="false"/>, forces text to fit a single line. Line breaks are converted to spaces. The text will be clipped to <paramref name="width"/>.</param>
+		/// <param name="preserveTrailingSpaces">If <see langword="true"/> trailing spaces at the end of wrapped lines will be preserved.
+		///  If <see langword="false"/>, trailing spaces at the end of wrapped lines will be trimmed.</param>
+		/// <param name="tabWidth">The number of columns used for a tab.</param>
 		/// <param name="textDirection">The text direction.</param>
 		/// <returns>A list of word wrapped lines.</returns>
 		/// <remarks>
 		/// <para>
-		/// An empty <c>text</c> string will result in one empty line.
+		/// An empty <paramref name="text"/> string will result in one empty line.
 		/// </para>
 		/// <para>
-		/// If <c>width</c> is 0, a single, empty line will be returned.
+		/// If <paramref name="width"/> is 0, a single, empty line will be returned.
 		/// </para>
 		/// <para>
-		/// If <c>width</c> is int.MaxValue, the text will be formatted to the maximum width possible. 
+		/// If <paramref name="width"/> is int.MaxValue, the text will be formatted to the maximum width possible. 
 		/// </para>
 		/// </remarks>
 		public static List<ustring> Format (ustring text, int width, TextAlignment talign, bool wordWrap, bool preserveTrailingSpaces = false, int tabWidth = 0, TextDirection textDirection = TextDirection.LeftRight_TopBottom)
@@ -500,22 +558,25 @@ namespace Terminal.Gui {
 		/// Reformats text into lines, applying text alignment and optionally wrapping text to new lines on word boundaries.
 		/// </summary>
 		/// <param name="text"></param>
-		/// <param name="width">The width to bound the text to for word wrapping and clipping.</param>
+		/// <param name="width">The number of columns to constrain the text to for word wrapping and clipping.</param>
 		/// <param name="justify">Specifies whether the text should be justified.</param>
-		/// <param name="wordWrap">If <c>true</c>, the text will be wrapped to new lines as need. If <c>false</c>, forces text to fit a single line. Line breaks are converted to spaces. The text will be clipped to <c>width</c></param>
-		/// <param name="preserveTrailingSpaces">If <c>true</c> and 'wordWrap' also true, the wrapped text will keep the trailing spaces. If <c>false</c>, the trailing spaces will be trimmed.</param>
-		/// <param name="tabWidth">The tab width.</param>
+		/// <param name="talign">Specifies how the text will be aligned horizontally.</param>
+		/// <param name="wordWrap">If <see langword="true"/>, the text will be wrapped to new lines no longer than <paramref name="width"/>.	
+		/// If <see langword="false"/>, forces text to fit a single line. Line breaks are converted to spaces. The text will be clipped to <paramref name="width"/>.</param>
+		/// <param name="preserveTrailingSpaces">If <see langword="true"/> trailing spaces at the end of wrapped lines will be preserved.
+		///  If <see langword="false"/>, trailing spaces at the end of wrapped lines will be trimmed.</param>
+		/// <param name="tabWidth">The number of columns used for a tab.</param>
 		/// <param name="textDirection">The text direction.</param>
 		/// <returns>A list of word wrapped lines.</returns>
 		/// <remarks>
 		/// <para>
-		/// An empty <c>text</c> string will result in one empty line.
+		/// An empty <paramref name="text"/> string will result in one empty line.
 		/// </para>
 		/// <para>
-		/// If <c>width</c> is 0, a single, empty line will be returned.
+		/// If <paramref name="width"/> is 0, a single, empty line will be returned.
 		/// </para>
 		/// <para>
-		/// If <c>width</c> is int.MaxValue, the text will be formatted to the maximum width possible. 
+		/// If <paramref name="width"/> is int.MaxValue, the text will be formatted to the maximum width possible. 
 		/// </para>
 		/// </remarks>
 		public static List<ustring> Format (ustring text, int width, bool justify, bool wordWrap,
@@ -653,39 +714,30 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets the index position from the text based on the <paramref name="width"/>.
+		/// Gets the number of the Runes in a <see cref="ustring"/> that will fit in <paramref name="columns"/>.
 		/// </summary>
 		/// <param name="text">The text.</param>
-		/// <param name="width">The width.</param>
+		/// <param name="columns">The width.</param>
 		/// <returns>The index of the text that fit the width.</returns>
-		public static int GetMaxLengthForWidth (ustring text, int width)
-		{
-			var runes = text.ToRuneList ();
-			var runesLength = 0;
-			var runeIdx = 0;
-			for (; runeIdx < runes.Count; runeIdx++) {
-				var runeWidth = Math.Max (Rune.ColumnWidth (runes [runeIdx]), 1);
-				if (runesLength + runeWidth > width) {
-					break;
-				}
-				runesLength += runeWidth;
-			}
-			return runeIdx;
-		}
+		public static int GetLengthThatFits (ustring text, int columns) => GetLengthThatFits (text?.ToRuneList (), columns);
 
 		/// <summary>
-		/// Gets the index position from the list based on the <paramref name="width"/>.
+		/// Gets the number of the Runes in a list of Runes that will fit in <paramref name="columns"/>.
 		/// </summary>
-		/// <param name="runes">The runes.</param>
-		/// <param name="width">The width.</param>
-		/// <returns>The index of the list that fit the width.</returns>
-		public static int GetMaxLengthForWidth (List<Rune> runes, int width)
+		/// <param name="runes">The list of runes.</param>
+		/// <param name="columns">The width.</param>
+		/// <returns>The index of the last Rune in <paramref name="runes"/> that fit in <paramref name="columns"/>.</returns>
+		public static int GetLengthThatFits (List<Rune> runes, int columns)
 		{
+			if (runes == null || runes.Count == 0) {
+				return 0;
+			}
+
 			var runesLength = 0;
 			var runeIdx = 0;
 			for (; runeIdx < runes.Count; runeIdx++) {
 				var runeWidth = Math.Max (Rune.ColumnWidth (runes [runeIdx]), 1);
-				if (runesLength + runeWidth > width) {
+				if (runesLength + runeWidth > columns) {
 					break;
 				}
 				runesLength += runeWidth;
@@ -946,10 +998,10 @@ namespace Terminal.Gui {
 		public bool AutoSize { get; set; }
 
 		/// <summary>
-		/// Gets or sets a flag that determines whether <see cref="Text"/> will have trailing spaces preserved
-		/// or not when <see cref="WordWrap"/> is enabled. If `true` any trailing spaces will be trimmed when
-		/// either the <see cref="Text"/> property is changed or when <see cref="WordWrap"/> is set to `true`.
-		/// The default is `false`.
+		/// Gets or sets whether trailing spaces at the end of word-wrapped lines are preserved
+		/// or not when <see cref="Terminal.Gui.TextFormatter.WordWrap"/> is enabled. 
+		/// If <see langword="true"/> trailing spaces at the end of wrapped lines will be removed when 
+		/// <see cref="Text"/> is formatted for display. The default is <see langword="false"/>.
 		/// </summary>
 		public bool PreserveTrailingSpaces { get; set; }
 
@@ -1183,7 +1235,7 @@ namespace Terminal.Gui {
 			var sb = new StringBuilder ();
 			// Lines_get causes a Format
 			foreach (var line in Lines) {
-				sb.AppendLine (line.ToString());
+				sb.AppendLine (line.ToString ());
 			}
 			return sb.ToString ();
 		}

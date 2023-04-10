@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using NStack;
 using Terminal.Gui;
 using CsvHelper;
+using System.Collections.Generic;
 
 namespace UICatalog.Scenarios {
 
@@ -390,14 +391,15 @@ namespace UICatalog.Scenarios {
 		
 		private void Open ()
 		{
-			var ofd = new FileDialog (title: "Select File", prompt: "Open", nameDirLabel: "File", nameFieldLabel: string.Empty, message: "Select a CSV file to open (does not support newlines, escaping etc)") {
-				AllowedFileTypes = new string [] { ".csv" }
+			var ofd = new FileDialog () {
+				AllowedTypes = new List<IAllowedType> { new AllowedType("Comma Separated Values", ".csv") }
 			};
+			ofd.Style.OkButtonText = "Open";
 
 			Application.Run (ofd);
 
-			if (!ofd.Canceled && !string.IsNullOrWhiteSpace (ofd.FilePath?.ToString ())) {
-				Open (ofd.FilePath.ToString ());
+			if (!ofd.Canceled && !string.IsNullOrWhiteSpace (ofd.Path?.ToString ())) {
+				Open (ofd.Path.ToString ());
 			}
 		}
 
@@ -407,9 +409,10 @@ namespace UICatalog.Scenarios {
 			int lineNumber = 0;
 			currentFile = null;
 
-			using var reader = new CsvReader (File.OpenText (filename), CultureInfo.InvariantCulture);
 
 			try {
+				using var reader = new CsvReader (File.OpenText (filename), CultureInfo.InvariantCulture);
+
 				var dt = new DataTable ();
 
 				reader.Read ();

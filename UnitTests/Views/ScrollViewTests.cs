@@ -602,16 +602,17 @@ namespace Terminal.Gui.ViewsTests {
 00000000000000000000000", attributes);
 		}
 
-
 		[Fact, AutoInitShutdown]
 		public void DrawTextFormatter_Respects_The_Clip_Bounds ()
 		{
-			var view = new View (new Rect (0, 0, 20, 20));
-			view.Add (new Label ("0123456789abcdefghij"));
-			view.Add (new Label (0, 1, "1\n2\n3\n4\n5\n6\n7\n8\n9\n0"));
+			var rule = "0123456789";
+			var size = new Size (40, 40);
+			var view = new View (new Rect (Point.Empty, size));
+			view.Add (new Label (rule.Repeat (size.Width / rule.Length)) { AutoSize = false, Width = Dim.Fill () });
+			view.Add (new Label (rule.Repeat (size.Height / rule.Length), TextDirection.TopBottom_LeftRight) { Height = Dim.Fill (), AutoSize = false });
 			view.Add (new Button (1, 1, "Press me!"));
 			var scrollView = new ScrollView (new Rect (1, 1, 15, 10)) {
-				ContentSize = new Size (40, 40),
+				ContentSize = size,
 				ShowHorizontalScrollIndicator = true,
 				ShowVerticalScrollIndicator = true
 			};
@@ -624,7 +625,7 @@ namespace Terminal.Gui.ViewsTests {
 			var expected = @"
  ┌──────────────────┐
  │                  │
- │ 0123456789abcd▲  │
+ │ 01234567890123▲  │
  │ 1[ Press me! ]┬  │
  │ 2             │  │
  │ 3             ┴  │
@@ -648,7 +649,7 @@ namespace Terminal.Gui.ViewsTests {
 			expected = @"
  ┌──────────────────┐
  │                  │
- │ 123456789abcde▲  │
+ │ 12345678901234▲  │
  │ [ Press me! ] ┬  │
  │               │  │
  │               ┴  │
@@ -672,7 +673,7 @@ namespace Terminal.Gui.ViewsTests {
 			expected = @"
  ┌──────────────────┐
  │                  │
- │ 23456789abcdef▲  │
+ │ 23456789012345▲  │
  │  Press me! ]  ┬  │
  │               │  │
  │               ┴  │
@@ -696,7 +697,7 @@ namespace Terminal.Gui.ViewsTests {
 			expected = @"
  ┌──────────────────┐
  │                  │
- │ 3456789abcdefg▲  │
+ │ 34567890123456▲  │
  │ Press me! ]   ┬  │
  │               │  │
  │               ┴  │
@@ -720,7 +721,7 @@ namespace Terminal.Gui.ViewsTests {
 			expected = @"
  ┌──────────────────┐
  │                  │
- │ 456789abcdefgh▲  │
+ │ 45678901234567▲  │
  │ ress me! ]    ┬  │
  │               │  │
  │               ┴  │
@@ -744,7 +745,7 @@ namespace Terminal.Gui.ViewsTests {
 			expected = @"
  ┌──────────────────┐
  │                  │
- │ 56789abcdefghi▲  │
+ │ 56789012345678▲  │
  │ ess me! ]     ┬  │
  │               │  │
  │               ┴  │
@@ -768,7 +769,7 @@ namespace Terminal.Gui.ViewsTests {
 			expected = @"
  ┌──────────────────┐
  │                  │
- │ 6789abcdefghij▲  │
+ │ 67890123456789▲  │
  │ ss me! ]      ┬  │
  │               │  │
  │               ┴  │
@@ -792,7 +793,7 @@ namespace Terminal.Gui.ViewsTests {
 			expected = @"
  ┌──────────────────┐
  │                  │
- │ 789abcdefghij ▲  │
+ │ 78901234567890▲  │
  │ s me! ]       ┬  │
  │               │  │
  │               ┴  │
@@ -802,6 +803,29 @@ namespace Terminal.Gui.ViewsTests {
  │               ░  │
  │               ▼  │
  │ ◄░░├───┤░░░░░►   │
+ │                  │
+ └──────────────────┘
+";
+
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (1, 1, 21, 14), pos);
+
+			Assert.True (scrollView.ProcessKey (new KeyEvent (Key.CtrlMask | Key.End, new KeyModifiers ())));
+			Application.Top.Redraw (Application.Top.Bounds);
+
+			expected = @"
+ ┌──────────────────┐
+ │                  │
+ │ 67890123456789▲  │
+ │               ┬  │
+ │               │  │
+ │               ┴  │
+ │               ░  │
+ │               ░  │
+ │               ░  │
+ │               ░  │
+ │               ▼  │
+ │ ◄░░░░░░░├───┤►   │
  │                  │
  └──────────────────┘
 ";
@@ -870,7 +894,30 @@ namespace Terminal.Gui.ViewsTests {
  │ 8             ░  │
  │ 9             ░  │
  │ 0             ░  │
- │               ▼  │
+ │ 1             ▼  │
+ │ ◄├───┤░░░░░░░►   │
+ │                  │
+ └──────────────────┘
+";
+
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (1, 1, 21, 14), pos);
+
+			Assert.True (scrollView.ProcessKey (new KeyEvent (Key.End, new KeyModifiers ())));
+			Application.Top.Redraw (Application.Top.Bounds);
+
+			expected = @"
+ ┌──────────────────┐
+ │                  │
+ │ 1             ▲  │
+ │ 2             ░  │
+ │ 3             ░  │
+ │ 4             ░  │
+ │ 5             ░  │
+ │ 6             ░  │
+ │ 7             ┬  │
+ │ 8             ┴  │
+ │ 9             ▼  │
  │ ◄├───┤░░░░░░░►   │
  │                  │
  └──────────────────┘
@@ -879,6 +926,5 @@ namespace Terminal.Gui.ViewsTests {
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 1, 21, 14), pos);
 		}
-
 	}
 }
