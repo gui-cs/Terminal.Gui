@@ -232,7 +232,46 @@ namespace Terminal.Gui.FileServicesTests {
 				}
 			);
 		}
+		
+		[Fact, AutoInitShutdown]
+		public void DotDot_MovesToRoot_ThenPressBack ()
+		{
+			var dlg = GetDialog();
+			dlg.OpenMode = OpenMode.Directory;
+			dlg.AllowsMultipleSelection = true;
+			bool selected = false;
+			dlg.FilesSelected += (s,e)=>
+			{
+				selected = true;
+			};
 
+			AssertIsTheStartingDirectory(dlg.Path);
+
+			Assert.IsType<TextField>(dlg.MostFocused);
+			Send ('v', ConsoleKey.DownArrow, false);
+			Assert.IsType<TableView>(dlg.MostFocused);
+			
+			// ".." should be the first thing selected
+			// ".." should not mess with the displayed path
+			AssertIsTheStartingDirectory(dlg.Path);
+
+			// Accept navigation up a directory
+			Send ('\n', ConsoleKey.Enter);
+
+			AssertIsTheRootDirectory(dlg.Path);
+			
+			Assert.True(dlg.Canceled);
+			Assert.False(selected);
+
+			// Now press the back button (in table view)
+			Send ('<', ConsoleKey.Backspace);
+
+			// Should move us back to the root
+			AssertIsTheStartingDirectory(dlg.Path);
+
+			Assert.True(dlg.Canceled);
+			Assert.False(selected);
+		}
 
 		[Fact, AutoInitShutdown]
 		public void MultiSelectDirectory_EnterOpensFolder ()
@@ -313,6 +352,29 @@ namespace Terminal.Gui.FileServicesTests {
 			);
 		}
 
+		private void AssertIsTheStartingDirectory (string path)
+		{
+			if(IsWindows())
+			{
+				Assert.Equal (@"c:\demo\",path);
+			}
+			else
+			{
+				Assert.Equal ("/demo/",path);
+			}
+		}
+
+		private void AssertIsTheRootDirectory (string path)
+		{
+			if(IsWindows())
+			{
+				Assert.Equal (@"c:\",path);
+			}
+			else
+			{
+				Assert.Equal ("/",path);
+			}
+		}
 
 		private void AssertIsTheSubfolder (string path)
 		{
@@ -322,7 +384,6 @@ namespace Terminal.Gui.FileServicesTests {
 			}
 			else
 			{
-				// Dialog has not yet been confirmed with a choice
 				Assert.Equal ("/demo/subfolder",path);
 			}
 		}

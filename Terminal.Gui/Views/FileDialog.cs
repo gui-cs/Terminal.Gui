@@ -1152,7 +1152,8 @@ namespace Terminal.Gui {
 		/// <param name="addCurrentStateToHistory"></param>
 		/// <param name="setPathText"></param>
 		/// <param name="clearForward"></param>
-		internal void PushState (IDirectoryInfo d, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true)
+		/// <param name="pathText">Optional alternate string to set path to.</param>
+		internal void PushState (IDirectoryInfo d, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true, string pathText = null)
 		{
 			// no change of state
 			if (d == this.State?.Directory) {
@@ -1162,7 +1163,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			PushState (new FileDialogState (d, this), addCurrentStateToHistory, setPathText, clearForward);
+			PushState (new FileDialogState (d, this), addCurrentStateToHistory, setPathText, clearForward, pathText);
 		}
 
 		private void RefreshState ()
@@ -1171,7 +1172,7 @@ namespace Terminal.Gui {
 			PushState (State, false, false, false);
 		}
 
-		private void PushState (FileDialogState newState, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true)
+		private void PushState (FileDialogState newState, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true, string pathText = null)
 		{
 			if (State is SearchState search) {
 				search.Cancel ();
@@ -1187,6 +1188,12 @@ namespace Terminal.Gui {
 
 				this.tbPath.Autocomplete.ClearSuggestions ();
 
+				if(pathText != null)
+				{
+					this.tbPath.Text = pathText;
+					this.tbPath.MoveEnd ();
+				}
+				else
 				if (setPathText) {
 					this.tbPath.Text = newState.Directory.FullName;
 					this.tbPath.MoveEnd ();

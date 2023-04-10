@@ -10,10 +10,18 @@ namespace Terminal.Gui {
 
 		public FileSystemInfoStats Selected { get; set; }
 		protected readonly FileDialog Parent;
+
+		/// <summary>
+		/// Gets what was entered in the path text box of the dialog
+		/// when the state was active.
+		/// </summary>
+		public string Path { get; }
+		
 		public FileDialogState (IDirectoryInfo dir, FileDialog parent)
 		{
 			this.Directory = dir;
 			Parent = parent;
+			Path = parent.Path;
 
 			this.RefreshChildren ();
 		}
