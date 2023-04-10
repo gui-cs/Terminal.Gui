@@ -567,9 +567,9 @@ namespace Terminal.Gui.ViewTests {
 			//Assert.Equal (new Rect (new Point (0, 0), rect.Size), view._needsDisplay);
 			Assert.True (view.LayoutNeeded);
 			Assert.False (view._childNeedsDisplay);
-			Assert.False (view.addingView);
-			view.addingView = true;
-			Assert.True (view.addingView);
+			Assert.False (view._addingView);
+			view._addingView = true;
+			Assert.True (view._addingView);
 			view.ViewToScreen (0, 0, out int rcol, out int rrow);
 			Assert.Equal (1, rcol);
 			Assert.Equal (1, rrow);
