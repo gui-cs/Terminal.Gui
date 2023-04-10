@@ -951,12 +951,12 @@ namespace Terminal.Gui {
 			/// </summary>
 			Off = 0b_0000_0000,
 			/// <summary>
-			/// When enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool, Border)"/> will draw a 
+			/// When enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool, LineStyle)"/> will draw a 
 			/// ruler in the frame for any side with a padding value greater than 0.
 			/// </summary>
 			FrameRuler = 0b_0000_0001,
 			/// <summary>
-			/// When Enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool, Border)"/> will use
+			/// When Enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool, LineStyle)"/> will use
 			/// 'L', 'R', 'T', and 'B' for padding instead of ' '.
 			/// </summary>
 			FramePadding = 0b_0000_0010,
@@ -977,9 +977,10 @@ namespace Terminal.Gui {
 		/// <param name="paddingBottom">Number of rows to pad on the bottom (if 0 the border will not appear on the bottom).</param>
 		/// <param name="border">If set to <c>true</c> and any padding dimension is > 0 the border will be drawn.</param>
 		/// <param name="fill">If set to <c>true</c> it will clear the content area (the area inside the padding) with the current color, otherwise the content area will be left untouched.</param>
-		/// <param name="borderContent">The <see cref="Border"/> to be used if defined.</param>
+		/// <param name="lineStyle">The line style to be used.</param>
+		[ObsoleteAttribute ("This method is obsolete in v2. Use use LineCanvas or Frame instead.", false)]
 		public virtual void DrawWindowFrame (Rect region, int paddingLeft = 0, int paddingTop = 0, int paddingRight = 0,
-			int paddingBottom = 0, bool border = true, bool fill = false, Border borderContent = null)
+			int paddingBottom = 0, bool border = true, bool fill = false, LineStyle lineStyle = LineStyle.Single)
 		{
 			char clearChar = ' ';
 			char leftChar = clearChar;
@@ -1019,16 +1020,16 @@ namespace Terminal.Gui {
 			// fbottom is location of bottom frame line
 			int fbottom = ftop + fheight + 1;
 
-			var borderStyle = borderContent == null ? BorderStyle.Single : borderContent.BorderStyle;
+			var borderStyle = lineStyle;
 
 			Rune hLine = default, vLine = default,
 				uRCorner = default, uLCorner = default, lLCorner = default, lRCorner = default;
 
 			if (border) {
 				switch (borderStyle) {
-				case BorderStyle.None:
+				case LineStyle.None:
 					break;
-				case BorderStyle.Single:
+				case LineStyle.Single:
 					hLine = HLine;
 					vLine = VLine;
 					uRCorner = URCorner;
@@ -1036,7 +1037,7 @@ namespace Terminal.Gui {
 					lLCorner = LLCorner;
 					lRCorner = LRCorner;
 					break;
-				case BorderStyle.Double:
+				case LineStyle.Double:
 					hLine = HDLine;
 					vLine = VDLine;
 					uRCorner = URDCorner;
@@ -1044,7 +1045,7 @@ namespace Terminal.Gui {
 					lLCorner = LLDCorner;
 					lRCorner = LRDCorner;
 					break;
-				case BorderStyle.Rounded:
+				case LineStyle.Rounded:
 					hLine = HRLine;
 					vLine = VRLine;
 					uRCorner = URRCorner;

@@ -259,7 +259,7 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var t = Application.Top;
 
-			var w = new Window ("w") {
+			var w = new Window () {
 				Width = Dim.Fill (0),
 				Height = Dim.Sized (10)
 			};
@@ -296,7 +296,7 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var t = new View ("top") { Width = 80, Height = 25 };
 
-			var w = new Window (new Rect (1, 2, 4, 5), "w");
+			var w = new Window (new Rect (1, 2, 4, 5)) { Title = "w" };
 			t.Add (w);
 			t.LayoutSubviews ();
 
@@ -310,7 +310,7 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var t = new View ("top") { Width = 80, Height = 25 };
 
-			var w = new Window ("w") {
+			var w = new Window () {
 				Width = Dim.Fill (0),
 				Height = Dim.Sized (10)
 			};
@@ -339,7 +339,7 @@ namespace Terminal.Gui.ViewTests {
 			// Testing with the Button because it properly handles the Dim class.
 			var t = Application.Top;
 
-			var w = new Window ("w") {
+			var w = new Window () {
 				Width = 100,
 				Height = 100
 			};
@@ -550,18 +550,18 @@ namespace Terminal.Gui.ViewTests {
 		[Fact]
 		public void DimCombine_ObtuseScenario_Throw_If_SuperView_Refs_SubView ()
 		{
-			var t = new View ("top") { Width = 80, Height = 25 };
+			var t = new View () { Width = 80, Height = 25 };
 
-			var w = new Window ("w") {
+			var w = new Window () {
 				Width = Dim.Width (t) - 2,    // 78
 				Height = Dim.Height (t) - 2   // 23
 			};
-			var f = new FrameView ("f");
-			var v1 = new View ("v1") {
+			var f = new FrameView ();
+			var v1 = new View () {
 				Width = Dim.Width (w) - 2,    // 76
 				Height = Dim.Height (w) - 2   // 21
 			};
-			var v2 = new View ("v2") {
+			var v2 = new View () {
 				Width = Dim.Width (v1) - 2,   // 74
 				Height = Dim.Height (v1) - 2  // 19
 			};
@@ -594,16 +594,16 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var t = new View ("top") { Width = 80, Height = 25 };
 
-			var w = new Window ("w") {
+			var w = new Window () {
 				Width = Dim.Width (t) - 2,    // 78
 				Height = Dim.Height (t) - 2   // 23
 			};
-			var f = new FrameView ("f");
-			var v1 = new View ("v1") {
+			var f = new FrameView ();
+			var v1 = new View () {
 				Width = Dim.Width (w) - 2,    // 76
 				Height = Dim.Height (w) - 2   // 21
 			};
-			var v2 = new View ("v2") {
+			var v2 = new View () {
 				Width = Dim.Width (v1) - 2,   // 74
 				Height = Dim.Height (v1) - 2  // 19
 			};
@@ -633,23 +633,23 @@ namespace Terminal.Gui.ViewTests {
 		[Fact]
 		public void PosCombine_View_Not_Added_Throws ()
 		{
-			var t = new View ("t") { Width = 80, Height = 50 };
+			var t = new View () { Width = 80, Height = 50 };
 
 			// BUGBUG: v2 - super should not reference it's superview (t)
-			var super = new View ("super") {
+			var super = new View () {
 				Width = Dim.Width (t) - 2,
 				Height = Dim.Height (t) - 2
 			};
 			t.Add (super);
 
-			var sub = new View ("sub");
+			var sub = new View ();
 			super.Add (sub);
 
-			var v1 = new View ("v1") {
+			var v1 = new View () {
 				Width = Dim.Width (super) - 2,
 				Height = Dim.Height (super) - 2
 			};
-			var v2 = new View ("v2") {
+			var v2 = new View () {
 				Width = Dim.Width (v1) - 2,
 				Height = Dim.Height (v1) - 2
 			};

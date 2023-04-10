@@ -153,15 +153,15 @@ namespace Terminal.Gui {
 		/// <param name="title">Title for the query.</param>
 		/// <param name="message">Message to display, might contain multiple lines.</param>
 		/// <param name="defaultButton">Index of the default button.</param>
-		/// <param name="wrapMessagge">If wrap the message or not.</param>
+		/// <param name="wrapMessage">If wrap the message or not.</param>
 		/// <param name="buttons">Array of buttons to add.</param>
 		/// <remarks>
 		/// The message box will be vertically and horizontally centered in the container and the size will be automatically determined
 		/// from the size of the message and buttons.
 		/// </remarks>
-		public static int Query (ustring title, ustring message, int defaultButton = 0, bool wrapMessagge = true, params ustring [] buttons)
+		public static int Query (ustring title, ustring message, int defaultButton = 0, bool wrapMessage = true, params ustring [] buttons)
 		{
-			return QueryFull (false, 0, 0, title, message, defaultButton, wrapMessagge, buttons);
+			return QueryFull (false, 0, 0, title, message, defaultButton, wrapMessage, buttons);
 		}
 
 
@@ -241,94 +241,83 @@ namespace Terminal.Gui {
 		/// Defines the default border styling for <see cref="Dialog"/>. Can be configured via <see cref="ConfigurationManager"/>.
 		/// </summary>
 		[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-		public static Border DefaultBorder { get; set; } = new Border () {
-			BorderStyle = BorderStyle.Single,
-		};
+		public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
 
 		static int QueryFull (bool useErrorColors, int width, int height, ustring title, ustring message,
-			int defaultButton = 0, bool wrapMessagge = true, params ustring [] buttons)
+			int defaultButton = 0, bool wrapMessage = true, params ustring [] buttons)
 		{
-			int defaultWidth = 50;
-			if (defaultWidth > Application.Driver.Cols / 2) {
-				defaultWidth = (int)(Application.Driver.Cols * 0.60f);
-			}
-			int maxWidthLine = TextFormatter.MaxWidthLine (message);
-			if (wrapMessagge && maxWidthLine > Application.Driver.Cols) {
-				maxWidthLine = Application.Driver.Cols;
-			}
-			if (width == 0) {
-				maxWidthLine = Math.Max (maxWidthLine, defaultWidth);
-			} else {
-				maxWidthLine = width;
-			}
-			int textWidth = TextFormatter.MaxWidth (message, maxWidthLine);
-			int textHeight = TextFormatter.MaxLines (message, textWidth); // message.Count (ustring.Make ('\n')) + 1;
-			int msgboxHeight = Math.Max (1, textHeight) + 4; // textHeight + (top + top padding + buttons + bottom)
-
-			if (wrapMessagge) {
-				textWidth = Math.Min (textWidth, Application.Driver.Cols);
-				msgboxHeight = Math.Min (msgboxHeight, Application.Driver.Rows);
-			}
 			// Create button array for Dialog
 			int count = 0;
 			List<Button> buttonList = new List<Button> ();
-			if (buttons != null && defaultButton > buttons.Length - 1) {
-				defaultButton = buttons.Length - 1;
-			}
-			foreach (var s in buttons) {
-				var b = new Button (s);
-				if (count == defaultButton) {
-					b.IsDefault = true;
+			if (buttons != null) {
+				if (defaultButton > buttons.Length - 1) {
+					defaultButton = buttons.Length - 1;
 				}
-				buttonList.Add (b);
-				count++;
-			}
+				foreach (var s in buttons) {
+					var b = new Button (s);
+					if (count == defaultButton) {
+						b.IsDefault = true;
+					}
+					buttonList.Add (b);
+					count++;
+				}
 
-			// Create Dialog (retain backwards compat by supporting specifying height/width)
+			}
+			
 			Dialog d;
-			if (width == 0 & height == 0) {
-				d = new Dialog (title, buttonList.ToArray ()) {
-					Height = msgboxHeight,
-					Border = DefaultBorder
-				};
-			} else {
-				d = new Dialog (title, width, Math.Max (height, 4), buttonList.ToArray ()) {
-					Border = DefaultBorder
-				};
-			}
+			d = new Dialog (buttonList.ToArray ()) {
+				Title = title,
+				BorderStyle = DefaultBorderStyle,
+				Width = Dim.Percent (60),
+				Height = 5 // Border + one line of text + vspace + buttons
+			};
 
+			if (width != 0) {
+				d.Width = width;
+			} 
+			
+			if (height != 0) {
+				d.Height = height;
+			}
+		
 			if (useErrorColors) {
 				d.ColorScheme = Colors.Error;
-				//d.Border.ForgroundColor = Colors.Error.Normal.Foreground;
-				//d.Border.BackgroundColor = Colors.Error.Normal.Background;
 			} else {
 				d.ColorScheme = Colors.Dialog;
-				//d.Border.ForgroundColor = Colors.Dialog.Normal.Foreground;
-				//d.Border.BackgroundColor = Colors.Dialog.Normal.Background;
 			}
 
-			if (!ustring.IsNullOrEmpty (message)) {
-				var l = new Label (message) {
-					LayoutStyle = LayoutStyle.Computed,
-					TextAlignment = TextAlignment.Centered,
-					X = Pos.Center (),
-					Y = Pos.Center (),
-					Width = Dim.Fill (),
-					Height = Dim.Fill (1),
-					AutoSize = false
-				};
-				d.Add (l);
-			}
-
-			if (width == 0 & height == 0) {
-				// Dynamically size Width
-				var dWidth = Math.Max (maxWidthLine, Math.Max (title.ConsoleWidth, Math.Max (textWidth + 2, d.GetButtonsWidth () + d.buttons.Count + 2))); // textWidth + (left + padding + padding + right)
-				if (wrapMessagge) {
-					d.Width = Math.Min (dWidth, Application.Driver.Cols);
-				} else {
-					d.Width = dWidth;
+			var messageLabel = new Label () {
+				AutoSize = false,
+				Text = message,
+				TextAlignment = TextAlignment.Centered,
+				X = 0,
+				Y = 0,
+				Width = Dim.Fill (0),
+				Height = Dim.Fill (1)
+			};
+			messageLabel.TextFormatter.WordWrap = wrapMessage; // BUGBUG: This does nothing as it's not implemented by TextFormatter!
+			d.Add (messageLabel);
+			
+			d.Loaded += (s, e) => {
+				if (width != 0 || height != 0) {
+					return;
 				}
-			}
+				// TODO: replace with Dim.Fit when implemented
+				var maxBounds = d.SuperView?.Bounds ?? Application.Top.Bounds;
+				messageLabel.TextFormatter.Size = new Size (maxBounds.Size.Width - d.GetFramesThickness ().Horizontal, maxBounds.Size.Height - d.GetFramesThickness ().Vertical);
+				var msg = messageLabel.TextFormatter.Format ();
+				var messageSize = messageLabel.TextFormatter.GetFormattedSize ();
+
+				// Ensure the width fits the text + buttons
+				var newWidth = Math.Max (width, Math.Max (messageSize.Width + d.GetFramesThickness ().Horizontal,
+								d.GetButtonsWidth () + d.buttons.Count + d.GetFramesThickness ().Horizontal));
+				if (newWidth > d.Frame.Width) {
+					d.Width = newWidth;
+				}
+				// Ensure height fits the text + vspace + buttons
+				d.Height = Math.Max (height, messageSize.Height + 2 + d.GetFramesThickness ().Vertical);
+				d.SetRelativeLayout (d.SuperView?.Frame ?? Application.Top.Frame);
+			};
 
 			// Setup actions
 			Clicked = -1;

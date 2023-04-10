@@ -1691,7 +1691,7 @@ else 					Assert.True (mCurrent.MouseEvent (new MouseEvent () {
 └──────────────────────────────────────┘", output);
 
 			Assert.True (menu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
-			top.Redraw (top.Bounds);
+			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │

@@ -67,7 +67,8 @@ namespace Terminal.Gui {
 			};
 			tf.SelectAll ();
 
-			var dlg = new Dialog (title) {
+			var dlg = new Dialog () {
+				Title = title,
 				Width = Dim.Percent (50),
 				Height = 4
 			};

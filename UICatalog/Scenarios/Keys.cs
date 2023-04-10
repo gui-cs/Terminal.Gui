@@ -12,22 +12,6 @@ namespace UICatalog.Scenarios {
 			public List<string> _processHotKeyList = new List<string> ();
 			public List<string> _processColdKeyList = new List<string> ();
 
-			public TestWindow (ustring title = null) : base (title)
-			{
-			}
-
-			public TestWindow (Rect frame, ustring title = null) : base (frame, title)
-			{
-			}
-
-			public TestWindow (ustring title = null, int padding = 0) : base (title, padding)
-			{
-			}
-
-			public TestWindow (Rect frame, ustring title = null, int padding = 0) : base (frame, title, padding)
-			{
-			}
-
 			public override bool ProcessKey (KeyEvent keyEvent)
 			{
 				_processKeyList.Add (keyEvent.ToString ());
@@ -54,7 +38,8 @@ namespace UICatalog.Scenarios {
 			ConfigurationManager.Themes.Theme = Theme;
 			ConfigurationManager.Apply ();
 			
-			Win = new TestWindow ($"{Application.QuitKey} to Quit - Scenario: {GetName ()}") {
+			Win = new TestWindow () {
+				Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),

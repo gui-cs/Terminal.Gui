@@ -615,78 +615,88 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///  Ensures the new position of the <see cref="Toplevel"/> is within the bounds of the screen (e.g. for dragging a Window).
+		///  Gets a new location of the <see cref="Toplevel"/> that is within the Bounds of the <paramref name="top"/>'s 
+		///  <see cref="View.SuperView"/> (e.g. for dragging a Window).
 		///  The `out` parameters are the new X and Y coordinates.
 		/// </summary>
+		/// <remarks>
+		/// If <paramref name="top"/> does not have a <see cref="View.SuperView"/> or it's SuperView is not <see cref="Application.Top"/>
+		/// the position will be bound by the <see cref="ConsoleDriver.Cols"/> and <see cref="ConsoleDriver.Rows"/>.
+		/// </remarks>
 		/// <param name="top">The Toplevel that is to be moved.</param>
-		/// <param name="x">The target x location.</param>
-		/// <param name="y">The target y location.</param>
-		/// <param name="nx">The x location after ensuring <paramref name="top"/> will remain visible.</param>
-		/// <param name="ny">The y location after ensuring <paramref name="top"/> will remain visible.</param>
-		/// <param name="mb">The new top most menuBar</param>
-		/// <param name="sb">The new top most statusBar</param>
-		/// <returns>The <see cref="Toplevel"/> that is Application.Top</returns>
-		internal View EnsureVisibleBounds (Toplevel top, int x, int y,
-					out int nx, out int ny, out MenuBar mb, out StatusBar sb)
+		/// <param name="targetX">The target x location.</param>
+		/// <param name="targetY">The target y location.</param>
+		/// <param name="nx">The x location that will ensure <paramref name="top"/> will be visible.</param>
+		/// <param name="ny">The y location that will ensure <paramref name="top"/> will be visible.</param>
+		/// <param name="menuBar">The new top most menuBar</param>
+		/// <param name="statusBar">The new top most statusBar</param>
+		/// <returns>
+		///  Either <see cref="Application.Top"/> (if <paramref name="top"/> does not have a Super View) or
+		///  <paramref name="top"/>'s SuperView. This can be used to ensure LayoutSubviews is called on the correct View.
+		///  </returns>
+		internal View GetLocationThatFits (Toplevel top, int targetX, int targetY,
+					out int nx, out int ny, out MenuBar menuBar, out StatusBar statusBar)
 		{
-			int l;
+			int maxWidth;
 			View superView;
 			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
-				l = Driver.Cols;
+				maxWidth = Driver.Cols;
 				superView = Application.Top;
 			} else {
-				l = top.SuperView.Frame.Width;
+				// Use the SuperView's Bounds, not Frame
+				maxWidth = top.SuperView.Bounds.Width;
 				superView = top.SuperView;
 			}
+
 			// BUGBUG: v2 hack for now
 			var mfLength = top.BorderFrame.Thickness.Top > 0 ? 2 : 1;
-			if (top.Frame.Width <= l) {
-				nx = Math.Max (x, 0);
-				nx = nx + top.Frame.Width > l ? Math.Max (l - top.Frame.Width, 0) : nx;
+			if (top.Frame.Width <= maxWidth) {
+				nx = Math.Max (targetX, 0);
+				nx = nx + top.Frame.Width > maxWidth ? Math.Max (maxWidth - top.Frame.Width, 0) : nx;
 				if (nx + mfLength > top.Frame.X + top.Frame.Width) {
 					nx = Math.Max (top.Frame.Right - mfLength, 0);
 				}
 			} else {
-				nx = x;
+				nx = targetX;
 			}
 			//System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
-			bool m, s;
+			bool menuVisible, statusVisible;
 			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
-				m = Application.Top.MenuBar?.Visible == true;
-				mb = Application.Top.MenuBar;
+				menuVisible = Application.Top.MenuBar?.Visible == true;
+				menuBar = Application.Top.MenuBar;
 			} else {
 				var t = top.SuperView;
 				while (t is not Toplevel) {
 					t = t.SuperView;
 				}
-				m = ((Toplevel)t).MenuBar?.Visible == true;
-				mb = ((Toplevel)t).MenuBar;
+				menuVisible = ((Toplevel)t).MenuBar?.Visible == true;
+				menuBar = ((Toplevel)t).MenuBar;
 			}
 			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
-				l = m ? 1 : 0;
+				maxWidth = menuVisible ? 1 : 0;
 			} else {
-				l = 0;
+				maxWidth = 0;
 			}
-			ny = Math.Max (y, l);
+			ny = Math.Max (targetY, maxWidth);
 			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
-				s = Application.Top.StatusBar?.Visible == true;
-				sb = Application.Top.StatusBar;
+				statusVisible = Application.Top.StatusBar?.Visible == true;
+				statusBar = Application.Top.StatusBar;
 			} else {
 				var t = top.SuperView;
 				while (t is not Toplevel) {
 					t = t.SuperView;
 				}
-				s = ((Toplevel)t).StatusBar?.Visible == true;
-				sb = ((Toplevel)t).StatusBar;
+				statusVisible = ((Toplevel)t).StatusBar?.Visible == true;
+				statusBar = ((Toplevel)t).StatusBar;
 			}
 			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
-				l = s ? Driver.Rows - 1 : Driver.Rows;
+				maxWidth = statusVisible ? Driver.Rows - 1 : Driver.Rows;
 			} else {
-				l = s ? top.SuperView.Frame.Height - 1 : top.SuperView.Frame.Height;
+				maxWidth = statusVisible ? top.SuperView.Frame.Height - 1 : top.SuperView.Frame.Height;
 			}
-			ny = Math.Min (ny, l);
-			if (top.Frame.Height <= l) {
-				ny = ny + top.Frame.Height >= l ? Math.Max (l - top.Frame.Height, m ? 1 : 0) : ny;
+			ny = Math.Min (ny, maxWidth);
+			if (top.Frame.Height <= maxWidth) {
+				ny = ny + top.Frame.Height >= maxWidth ? Math.Max (maxWidth - top.Frame.Height, menuVisible ? 1 : 0) : ny;
 				if (ny + mfLength > top.Frame.Y + top.Frame.Height) {
 					ny = Math.Max (top.Frame.Bottom - mfLength, 0);
 				}
@@ -714,7 +724,7 @@ namespace Terminal.Gui {
 		/// <param name="top">The Toplevel to adjust.</param>
 		public virtual void PositionToplevel (Toplevel top)
 		{
-			var superView = EnsureVisibleBounds (top, top.Frame.X, top.Frame.Y,
+			var superView = GetLocationThatFits (top, top.Frame.X, top.Frame.Y,
 				out int nx, out int ny, out _, out StatusBar sb);
 			bool layoutSubviews = false;
 			if ((superView != top || top?.SuperView != null || (top != Application.Top && top.Modal)
@@ -739,53 +749,47 @@ namespace Terminal.Gui {
 				layoutSubviews = true;
 			}
 
-			if (layoutSubviews) {
+			if (superView.LayoutNeeded || layoutSubviews) {
 				superView.LayoutSubviews ();
+			}
+			if (LayoutNeeded) {
+				LayoutSubviews ();
 			}
 		}
 
 		///<inheritdoc/>
-		//public override void Redraw (Rect bounds)
-		//{
-		//	if (!Visible) {
-		//		return;
-		//	}
+		public override void Redraw (Rect bounds)
+		{
+			if (!Visible) {
+				return;
+			}
 
-		//	if (!_needsDisplay.IsEmpty || _childNeedsDisplay || LayoutNeeded) {
-		//		Driver.SetAttribute (GetNormalColor ());
+			if (!_needsDisplay.IsEmpty || _childNeedsDisplay || LayoutNeeded) {
+				Driver.SetAttribute (Enabled ? Colors.Base.Normal : Colors.Base.Disabled);
+				LayoutSubviews ();
+				PositionToplevels ();
 
-		//		// This is the Application.Top. Clear just the region we're being asked to redraw 
-		//		// (the bounds passed to us).
-		//		Clear ();
-		//		Driver.SetAttribute (Enabled ? Colors.Base.Normal : Colors.Base.Disabled);
+				if (this == Application.MdiTop) {
+					foreach (var top in Application.MdiChildes.AsEnumerable ().Reverse ()) {
+						if (top.Frame.IntersectsWith (bounds)) {
+							if (top != this && !top.IsCurrentTop && !OutsideTopFrame (top) && top.Visible) {
+								top.SetNeedsLayout ();
+								top.SetNeedsDisplay (top.Bounds);
+								top.Redraw (top.Bounds);
+							}
+						}
+					}
+				}
 
-		//		LayoutSubviews ();
-		//		PositionToplevels ();
-
-		//		if (this == Application.MdiTop) {
-		//			foreach (var top in Application.MdiChildes.AsEnumerable ().Reverse ()) {
-		//				if (top.Frame.IntersectsWith (bounds)) {
-		//					if (top != this && !top.IsCurrentTop && !OutsideTopFrame (top) && top.Visible) {
-		//						top.SetNeedsLayout ();
-		//						top.SetNeedsDisplay (top.Bounds);
-		//						top.Redraw (top.Bounds);
-		//					}
-		//				}
-		//			}
-		//		}
-
-		//		foreach (var view in Subviews) {
-		//			if (view.Frame.IntersectsWith (bounds) && !OutsideTopFrame (this)) {
-		//				view.SetNeedsLayout ();
-		//				view.SetNeedsDisplay (view.Bounds);
-		//			}
-		//		}
-
-		//		// BUGBUG: shouldn't we just return here? the call to base.Redraw below is redundant
-		//	}
-
-		//	base.Redraw (Bounds);
-		//}
+				foreach (var view in Subviews) {
+					if (view.Frame.IntersectsWith (bounds) && !OutsideTopFrame (this)) {
+						view.SetNeedsLayout ();
+						view.SetNeedsDisplay (view.Bounds);
+					}
+				}
+			}
+			base.Redraw (Bounds);
+		}
 
 		bool OutsideTopFrame (Toplevel top)
 		{
@@ -840,7 +844,7 @@ namespace Terminal.Gui {
 					} else {
 						SuperView.SetNeedsDisplay ();
 					}
-					EnsureVisibleBounds (this, mouseEvent.X + (SuperView == null ? mouseEvent.OfX - start.X : Frame.X - start.X),
+					GetLocationThatFits (this, mouseEvent.X + (SuperView == null ? mouseEvent.OfX - start.X : Frame.X - start.X),
 						mouseEvent.Y + (SuperView == null ? mouseEvent.OfY - start.Y : Frame.Y - start.Y),
 						out nx, out ny, out _, out _);
 
