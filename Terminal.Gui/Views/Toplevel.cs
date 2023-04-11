@@ -787,8 +787,9 @@ namespace Terminal.Gui {
 						view.SetNeedsDisplay (view.Bounds);
 					}
 				}
+
+				base.Redraw (Bounds);
 			}
-			base.Redraw (Bounds);
 		}
 
 		bool OutsideTopFrame (Toplevel top)
