@@ -765,7 +765,8 @@ namespace Terminal.Gui {
 			}
 
 			if (!_needsDisplay.IsEmpty || _childNeedsDisplay || LayoutNeeded) {
-				Driver.SetAttribute (Enabled ? Colors.Base.Normal : Colors.Base.Disabled);
+				Driver.SetAttribute (GetNormalColor ());
+				Clear (ViewToScreen (bounds));
 				LayoutSubviews ();
 				PositionToplevels ();
 
