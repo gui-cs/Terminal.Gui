@@ -113,7 +113,7 @@ namespace Terminal.Gui {
 			}
 
 			if (Id == "BorderFrame" && BorderStyle != LineStyle.None) {
-				var lc = new LineCanvas ();
+				var lc = Parent?.SuperView?.LineCanvas ?? LineCanvas; // new LineCanvas ();
 				
 				var drawTop = Thickness.Top > 0 && Frame.Width > 1 && Frame.Height > 1;
 				var drawLeft = Thickness.Left > 0 && (Frame.Height > 1 || Thickness.Top == 0);
@@ -148,10 +148,10 @@ namespace Terminal.Gui {
 				if (drawRight) {
 					lc.AddLine (new Point (screenBounds.X + screenBounds.Width - 1, screenBounds.Y), screenBounds.Height - 1, Orientation.Vertical, BorderStyle);
 				}
-				foreach (var p in lc.GenerateImage (screenBounds)) {
-					Driver.Move (p.Key.X, p.Key.Y);
-					Driver.AddRune (p.Value);
-				}
+				//foreach (var p in lc.GenerateImage (screenBounds)) {
+				//	Driver.Move (p.Key.X, p.Key.Y);
+				//	Driver.AddRune (p.Value);
+				//}
 
 				// TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
 				if ((ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler) {

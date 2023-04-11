@@ -3,10 +3,9 @@ using Terminal.Gui;
 using System.Linq;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Tile View Experiments", Description: "Experiments with Tile View")]
-	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("LineView")]
-	public class TileViewExperiment : Scenario {
+	[ScenarioMetadata (Name: "LineCanvas Experiments", Description: "Experiments with LineCanvas")]
+	[ScenarioCategory ("LineCanvas")]
+	public class LineCanvasExperiment : Scenario {
 
 
 		public override void Init ()
@@ -53,7 +52,7 @@ namespace UICatalog.Scenarios {
 			Application.Top.Add (frame1);
 			//Application.Top.Add (frame2);
 
-			var view1 = new View () {
+			var view1 = new Window () {
 				AutoSize = false,
 				Title = "view1",
 				Text = "View1 30%/50% Single",
@@ -70,7 +69,7 @@ namespace UICatalog.Scenarios {
 
 			//var view12splitter = new SplitterEventArgs
 
-			var view2 = new FrameView () {
+			var view2 = new Window () {
 				Title = "view2",
 				Text = "View2 right of view1, 30%/70% Single.",
 				X = Pos.Right (view1) - 1,
@@ -120,6 +119,15 @@ namespace UICatalog.Scenarios {
 			//};
 
 			//frame.Add (view5);
+
+			var line = new Line () {
+				X = 1,
+				Y = 1,
+				Width = 10,
+				Height = 1,
+				Orientation = Orientation.Horizontal
+			};
+			frame1.Add (line);
 		}
 	}
 }

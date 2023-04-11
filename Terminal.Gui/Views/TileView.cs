@@ -382,7 +382,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="bounds"></param>
 		/// <returns></returns>
-		public override bool OnDrawFrames (Rect bounds)
+		public override bool OnDrawFrames ()
 		{
 			return false;
 		}

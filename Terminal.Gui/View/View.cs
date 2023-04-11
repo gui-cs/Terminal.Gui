@@ -1751,12 +1751,14 @@ namespace Terminal.Gui {
 			_childNeedsDisplay = false;
 		}
 
+		public LineCanvas LineCanvas = new LineCanvas ();
+		
 		// TODO: Make this cancelable
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <returns></returns>
-		public virtual bool OnDrawFrames (Rect bounds)
+		public virtual bool OnDrawFrames ()
 		{
 			var prevClip = Driver.Clip;
 			if (SuperView != null) {
@@ -1795,7 +1797,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			OnDrawFrames (Frame);
+			OnDrawFrames ();
 
 			var prevClip = ClipToBounds ();
 
@@ -1835,6 +1837,14 @@ namespace Terminal.Gui {
 
 			// Invoke DrawContentCompleteEvent
 			OnDrawContentComplete (bounds);
+
+			var screenBounds = ViewToScreen (Bounds);
+			Driver.SetAttribute (GetNormalColor ());
+			foreach (var p in LineCanvas.GenerateImage (screenBounds)) {
+				Driver.Move (p.Key.X, p.Key.Y);
+				Driver.AddRune (p.Value);
+			}
+			LineCanvas.Clear ();
 
 			// BUGBUG: v2 - We should be able to use View.SetClip here and not have to resort to knowing Driver details.
 			Driver.Clip = prevClip;

@@ -36,7 +36,7 @@ namespace Terminal.Gui {
 	/// and rendering.  Does not support diagonal lines.
 	/// </summary>
 	public class LineCanvas {
-		private List<StraightLine> lines = new List<StraightLine> ();
+		private List<StraightLine> _lines = new List<StraightLine> ();
 
 		Dictionary<IntersectionRuneType, IntersectionRuneResolver> runeResolvers = new Dictionary<IntersectionRuneType, IntersectionRuneResolver> {
 			{IntersectionRuneType.ULCorner,new ULIntersectionRuneResolver()},
@@ -68,8 +68,17 @@ namespace Terminal.Gui {
 		/// <param name="style">The style of line to use</param>
 		public void AddLine (Point from, int length, Orientation orientation, LineStyle style)
 		{
-			lines.Add (new StraightLine (from, length, orientation, style));
+			_lines.Add (new StraightLine (from, length, orientation, style));
 		}
+
+		/// <summary>
+		/// Clears all lines from the LineCanvas.
+		/// </summary>
+		public void Clear ()
+		{
+			_lines.Clear (); 
+		}
+
 		/// <summary>
 		/// Evaluate all currently defined lines that lie within 
 		/// <paramref name="inArea"/> and map that
@@ -89,7 +98,7 @@ namespace Terminal.Gui {
 			for (int y = inArea.Y; y < inArea.Y + inArea.Height; y++) {
 				for (int x = inArea.X; x < inArea.X + inArea.Width; x++) {
 
-					var intersects = lines
+					var intersects = _lines
 						.Select (l => l.Intersects (x, y))
 						.Where (i => i != null)
 						.ToArray ();
