@@ -1513,9 +1513,56 @@ namespace Terminal.Gui {
 		[ObsoleteAttribute ("This method is obsolete in v2. Use use LineCanvas or Frame instead.", false)]
 		public void DrawFrame (Rect region, int padding = 0, bool fill = false)
 		{
-			var scrRect = ViewToScreen (region);
 			var savedClip = ClipToBounds ();
-			Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: fill);
+			var screenBounds = ViewToScreen (region);
+			var lc = new LineCanvas ();
+			var drawTop = region.Width > 1 && region.Height > 1;
+			var drawLeft = region.Width > 1 && region.Height > 1;
+			var drawBottom = region.Width > 1 && region.Height > 1;
+			var drawRight = region.Width > 1 && region.Height > 1;
+
+			if (drawTop) {
+				lc.AddLine (screenBounds.Location, Frame.Width - 1, Orientation.Horizontal, BorderStyle);
+			}
+			if (drawLeft) {
+				lc.AddLine (screenBounds.Location, Frame.Height - 1, Orientation.Vertical, BorderStyle);
+			}
+			if (drawBottom) {
+				lc.AddLine (new Point (screenBounds.X, screenBounds.Y + screenBounds.Height - 1), screenBounds.Width - 1, Orientation.Horizontal, BorderStyle);
+			}
+			if (drawRight) {
+				lc.AddLine (new Point (screenBounds.X + screenBounds.Width - 1, screenBounds.Y), screenBounds.Height - 1, Orientation.Vertical, BorderStyle);
+			}
+			foreach (var p in lc.GenerateImage (screenBounds)) {
+				Driver.Move (p.Key.X, p.Key.Y);
+				Driver.AddRune (p.Value);
+			}
+
+			// TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
+			if ((ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler) {
+				// Top
+				var hruler = new Ruler () { Length = screenBounds.Width, Orientation = Orientation.Horizontal };
+				if (drawTop) {
+					hruler.Draw (new Point (screenBounds.X, screenBounds.Y));
+				}
+
+				//Left
+				var vruler = new Ruler () { Length = screenBounds.Height - 2, Orientation = Orientation.Vertical };
+				if (drawLeft) {
+					vruler.Draw (new Point (screenBounds.X, screenBounds.Y + 1), 1);
+				}
+
+				// Bottom
+				if (drawBottom) {
+					hruler.Draw (new Point (screenBounds.X, screenBounds.Y + screenBounds.Height - 1));
+				}
+
+				// Right
+				if (drawRight) {
+					vruler.Draw (new Point (screenBounds.X + screenBounds.Width - 1, screenBounds.Y + 1), 1);
+				}
+			}
+
 			Driver.Clip = savedClip;
 		}
 
@@ -1752,7 +1799,7 @@ namespace Terminal.Gui {
 		}
 
 		public LineCanvas LineCanvas = new LineCanvas ();
-		
+
 		// TODO: Make this cancelable
 		/// <summary>
 		/// 
