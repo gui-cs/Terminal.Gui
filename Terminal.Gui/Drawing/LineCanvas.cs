@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -53,22 +54,28 @@ namespace Terminal.Gui {
 			{IntersectionRuneType.Crosshair,new CrosshairIntersectionRuneResolver()},
 			// TODO: Add other resolvers
 		};
+		private Rect canvas;
 
 		/// <summary>
-		/// Add a new line to the canvas starting at <paramref name="from"/>.
-		/// Use positive <paramref name="length"/> for Right and negative for Left
+		/// <para>
+		/// Adds a new <paramref name="length"/> long line to the canvas starting at <paramref name="start"/>.
+		/// </para>
+		/// <para>
+		/// Use positive <paramref name="length"/> for the line to extend Right and negative for Left
 		/// when <see cref="Orientation"/> is <see cref="Orientation.Horizontal"/>.
-		/// Use positive <paramref name="length"/> for Down and negative for Up
+		/// </para>
+		/// <para>
+		/// Use positive <paramref name="length"/> for the line to extend Down and negative for Up
 		/// when <see cref="Orientation"/> is <see cref="Orientation.Vertical"/>.
+		/// </para>
 		/// </summary>
-		/// <param name="from">Starting point.</param>
-		/// <param name="length">Length of line.  0 for a dot.  
-		/// Positive for Down/Right.  Negative for Up/Left.</param>
-		/// <param name="orientation">Direction of the line.</param>
+		/// <param name="start">Starting point.</param>
+		/// <param name="length">The length of line. 0 for an intersection (cross or T). Positive for Down/Right. Negative for Up/Left.</param>
+		/// <param name="orientation">The direction of the line.</param>
 		/// <param name="style">The style of line to use</param>
-		public void AddLine (Point from, int length, Orientation orientation, LineStyle style)
+		public void AddLine (Point start, int length, Orientation orientation, LineStyle style)
 		{
-			_lines.Add (new StraightLine (from, length, orientation, style));
+			_lines.Add (new StraightLine (start, length, orientation, style));
 		}
 
 		/// <summary>
@@ -80,17 +87,41 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Evaluate all currently defined lines that lie within 
-		/// <paramref name="inArea"/> and map that
-		/// shows what characters (if any) should be rendered at each
-		/// point so that all lines connect up correctly with appropriate
-		/// intersection symbols.
-		/// <returns></returns>
+		/// Gets the rectangle that describes the bounds of the canvas. Location is the coordinates of the 
+		/// line that is furthest left/top and Size is defined by the line that extends the furthest
+		/// right/bottom.
 		/// </summary>
-		/// <param name="inArea"></param>
-		/// <returns>Mapping of all the points within <paramref name="inArea"/> to
-		/// line or intersection runes which should be drawn there.</returns>
-		public Dictionary<Point,Rune> GenerateImage (Rect inArea)
+		public Rect Canvas {
+			get {
+				if (_lines.Count == 0) {
+					return Rect.Empty;
+				}
+				var origin = new Point(_lines.Select (l => l.Start.X).Min (), _lines.Select (l => l.Start.Y).Min ());
+				var maxX = 0;
+				var maxY = 0;
+
+				foreach (var line in _lines) {
+					if (line.Orientation == Orientation.Horizontal) {
+						maxX = Math.Max (maxX, line.Start.X + line.Length);
+					} else {
+						maxY = Math.Max (maxY, line.Start.Y + line.Length);
+					}
+				}
+
+				var size = new Size (Math.Max (1, maxX - origin.X), Math.Max (1, maxY - origin.Y));
+
+				return new Rect(origin, size);
+			}
+		}
+
+		/// <summary>
+		/// Evaluates the lines that have been added to the canvas and returns a map containing
+		/// the glyphs and their locations. The glyphs are the characters that should be rendered
+		/// so that all lines connect up with the appropriate intersection symbols. 
+		/// </summary>
+		/// <param name="inArea">A rectangle to constrain the search by.</param>
+		/// <returns>A map of the points within the canvas that intersect with <paramref name="inArea"/>.</returns>
+		public Dictionary<Point,Rune> GetMap (Rect inArea)
 		{
 			var map = new Dictionary<Point,Rune>();
 
@@ -103,7 +134,6 @@ namespace Terminal.Gui {
 						.Where (i => i != null)
 						.ToArray ();
 
-					// TODO: use Driver and LineStyle to map
 					var rune = GetRuneForIntersects (Application.Driver, intersects);
 
 					if(rune != null)
@@ -115,6 +145,14 @@ namespace Terminal.Gui {
 
 			return map;
 		}
+
+		/// <summary>
+		/// Evaluates the lines that have been added to the canvas and returns a map containing
+		/// the glyphs and their locations. The glyphs are the characters that should be rendered
+		/// so that all lines connect up with the appropriate intersection symbols. 
+		/// </summary>
+		/// <returns>A map of all the points within the canvas.</returns>
+		public Dictionary<Point, Rune> GetMap () => GetMap (Canvas);
 
 		private abstract class IntersectionRuneResolver {
 			readonly Rune round;
@@ -613,11 +651,12 @@ namespace Terminal.Gui {
 
 			private bool EndsAt (int x, int y)
 			{
+				var sub = (Length == 0) ? 0 : 1;
 				if (Orientation == Orientation.Horizontal) {
-					return Start.X + Length == x && Start.Y == y;
+					return Start.X + Length - sub == x && Start.Y == y;
 				}
 
-				return Start.X == x && Start.Y + Length == y;
+				return Start.X == x && Start.Y + Length - sub == y;
 			}
 
 			private bool StartsAt (int x, int y)

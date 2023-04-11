@@ -1229,9 +1229,6 @@ namespace Terminal.Gui {
 			if (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._childNeedsDisplay || state.Toplevel.LayoutNeeded
 				|| MdiChildNeedsDisplay ()) {
 				state.Toplevel.Redraw (state.Toplevel.Bounds);
-				if (_debugDrawBounds) {
-					DrawBounds (state.Toplevel);
-				}
 				state.Toplevel.PositionCursor ();
 				Driver.Refresh ();
 			} else {
@@ -1273,17 +1270,6 @@ namespace Terminal.Gui {
 				}
 			}
 			return false;
-		}
-
-		internal static bool _debugDrawBounds = false;
-
-		// Need to look into why this does not work properly.
-		static void DrawBounds (View v)
-		{
-			v.DrawFrame (v.Frame, padding: 0, fill: false);
-			if (v.InternalSubviews != null && v.InternalSubviews.Count > 0)
-				foreach (var sub in v.InternalSubviews)
-					DrawBounds (sub);
 		}
 
 		/// <summary>

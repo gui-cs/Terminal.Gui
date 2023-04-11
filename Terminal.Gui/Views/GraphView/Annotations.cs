@@ -157,7 +157,7 @@ namespace Terminal.Gui {
 		public void Render (GraphView graph)
 		{
 			if (Border) {
-				graph.DrawFrame (Bounds, 0, true);
+				graph.DrawFrame (Bounds, true);
 			}
 
 			// start the legend at

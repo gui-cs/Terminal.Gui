@@ -673,12 +673,12 @@ namespace Terminal.Gui.DialogTests {
 
 			var d = (FakeDriver)Application.Driver;
 
-			var title = "1234";
+			var title = "";
 			var btnText = "ok";
 			var buttonRow = $"{d.VLine}   {d.LeftBracket} {btnText} {d.RightBracket}   {d.VLine}";
 
 			var width = buttonRow.Length;
-			d.SetBufferSize (buttonRow.Length, 3);
+			d.SetBufferSize (buttonRow.Length, 10);
 
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Center, new Button (btnText));
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);

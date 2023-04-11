@@ -546,7 +546,7 @@ namespace Terminal.Gui {
 			Application.Driver.Clip = Application.Top.Frame;
 
 			Driver.SetAttribute (GetNormalColor ());
-			DrawFrame (Bounds, padding: 0, fill: true);
+			DrawFrame (Bounds, clear: true);
 
 			for (int i = Bounds.Y; i < barItems.Children.Length; i++) {
 				if (i < 0)

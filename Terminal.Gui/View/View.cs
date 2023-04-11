@@ -1503,18 +1503,22 @@ namespace Terminal.Gui {
 			Driver.Clip = Rect.Intersect (previous, ViewToScreen (region));
 			return previous;
 		}
-
+		
 		/// <summary>
 		/// Draws a frame in the current view, clipped by the boundary of this view
 		/// </summary>
 		/// <param name="region">View-relative region for the frame to be drawn.</param>
-		/// <param name="padding">The padding to add around the outside of the drawn frame.</param>
-		/// <param name="fill">If set to <see langword="true"/> it fill will the contents.</param>
+		/// <param name="clear">If set to <see langword="true"/> it clear the region.</param>
 		[ObsoleteAttribute ("This method is obsolete in v2. Use use LineCanvas or Frame instead.", false)]
-		public void DrawFrame (Rect region, int padding = 0, bool fill = false)
+		public void DrawFrame (Rect region, bool clear)
 		{
 			var savedClip = ClipToBounds ();
 			var screenBounds = ViewToScreen (region);
+
+			if (clear) {
+				Driver.FillRect (region);
+			}
+			
 			var lc = new LineCanvas ();
 			var drawTop = region.Width > 1 && region.Height > 1;
 			var drawLeft = region.Width > 1 && region.Height > 1;
@@ -1522,18 +1526,18 @@ namespace Terminal.Gui {
 			var drawRight = region.Width > 1 && region.Height > 1;
 
 			if (drawTop) {
-				lc.AddLine (screenBounds.Location, Frame.Width - 1, Orientation.Horizontal, BorderStyle);
+				lc.AddLine (screenBounds.Location, Frame.Width, Orientation.Horizontal, BorderStyle);
 			}
 			if (drawLeft) {
-				lc.AddLine (screenBounds.Location, Frame.Height - 1, Orientation.Vertical, BorderStyle);
+				lc.AddLine (screenBounds.Location, Frame.Height, Orientation.Vertical, BorderStyle);
 			}
 			if (drawBottom) {
-				lc.AddLine (new Point (screenBounds.X, screenBounds.Y + screenBounds.Height - 1), screenBounds.Width - 1, Orientation.Horizontal, BorderStyle);
+				lc.AddLine (new Point (screenBounds.X, screenBounds.Y + screenBounds.Height - 1), screenBounds.Width, Orientation.Horizontal, BorderStyle);
 			}
 			if (drawRight) {
-				lc.AddLine (new Point (screenBounds.X + screenBounds.Width - 1, screenBounds.Y), screenBounds.Height - 1, Orientation.Vertical, BorderStyle);
+				lc.AddLine (new Point (screenBounds.X + screenBounds.Width - 1, screenBounds.Y), screenBounds.Height, Orientation.Vertical, BorderStyle);
 			}
-			foreach (var p in lc.GenerateImage (screenBounds)) {
+			foreach (var p in lc.GetMap ()) {
 				Driver.Move (p.Key.X, p.Key.Y);
 				Driver.AddRune (p.Value);
 			}
@@ -1807,14 +1811,33 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual bool OnDrawFrames ()
 		{
-			var prevClip = Driver.Clip;
-			if (SuperView != null) {
-				Driver.Clip = SuperView.ClipToBounds ();
+			if (!IsInitialized) {
+				return false;
 			}
 
+			var prevClip = Driver.Clip;
+			var screenBounds = ViewToScreen (Frame);
+			//if (SuperView != null) {
+			Driver.Clip = new Rect (0, 0, Driver.Cols, Driver.Rows);// screenBounds;// SuperView.ClipToBounds ();
+			//}
+			
+			// Each of these renders to either this View's LineCanvas or
+			// this View's SuperView.LineCanvas depending on if this View has
+			// a SuperView or not
 			Margin?.Redraw (Margin.Frame);
 			BorderFrame?.Redraw (BorderFrame.Frame);
 			Padding?.Redraw (Padding.Frame);
+
+			//Driver.SetAttribute (new Attribute(Color.White, Color.Black));
+
+			// If we have a SuperView, it'll draw render our frames.
+			if (LineCanvas.Canvas != Rect.Empty) {
+				foreach (var p in LineCanvas.GetMap ()) { // Get the entire map
+					Driver.Move (p.Key.X, p.Key.Y);
+					Driver.AddRune (p.Value);
+				}
+				LineCanvas.Clear ();
+			}
 
 			Driver.Clip = prevClip;
 
@@ -1843,8 +1866,6 @@ namespace Terminal.Gui {
 			if (!CanBeVisible (this)) {
 				return;
 			}
-
-			OnDrawFrames ();
 
 			var prevClip = ClipToBounds ();
 
@@ -1885,13 +1906,7 @@ namespace Terminal.Gui {
 			// Invoke DrawContentCompleteEvent
 			OnDrawContentComplete (bounds);
 
-			var screenBounds = ViewToScreen (Bounds);
-			Driver.SetAttribute (GetNormalColor ());
-			foreach (var p in LineCanvas.GenerateImage (screenBounds)) {
-				Driver.Move (p.Key.X, p.Key.Y);
-				Driver.AddRune (p.Value);
-			}
-			LineCanvas.Clear ();
+			OnDrawFrames ();
 
 			// BUGBUG: v2 - We should be able to use View.SetClip here and not have to resort to knowing Driver details.
 			Driver.Clip = prevClip;

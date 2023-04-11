@@ -197,5 +197,79 @@ namespace Terminal.Gui.ViewTests {
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
 		}
+
+		[Fact, AutoInitShutdown]
+		public void NoSuperView ()
+		{
+			var win = new Window () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+
+			var rs = Application.Begin (win);
+			bool firstIteration = false;
+
+			((FakeDriver)Application.Driver).SetBufferSize (3, 3);
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			var expected = @"
+┌─┐
+│ │
+└─┘";
+
+			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void HasSuperView ()
+		{
+			Application.Top.BorderStyle = LineStyle.Double;
+
+			var frame = new FrameView () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+
+			Application.Top.Add (frame);
+			var rs = Application.Begin (Application.Top);
+			bool firstIteration = false;
+
+			((FakeDriver)Application.Driver).SetBufferSize (5, 5);
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			var expected = @"
+╔═══╗
+║┌─┐║
+║│ │║
+║└─┘║
+╚═══╝";
+
+			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		}
+
+
+		[Fact, AutoInitShutdown]
+		public void HasSuperView_Title ()
+		{
+			Application.Top.BorderStyle = LineStyle.Double;
+
+			var frame = new FrameView () {
+				Title = "1234",
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+
+			Application.Top.Add (frame);
+			var rs = Application.Begin (Application.Top);
+			bool firstIteration = false;
+
+			((FakeDriver)Application.Driver).SetBufferSize (10, 4);
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			var expected = @"
+╔════════╗
+║┌┤1234├┐║
+║└──────┘║
+╚════════╝";
+
+			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		}
 	}
 }

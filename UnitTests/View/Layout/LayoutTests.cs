@@ -1716,10 +1716,10 @@ Y
 				Assert.Equal (new Rect (0, 0, 0, 4), subview.Frame);
 				expected = @"
 ┌─┐
-│ │
-│ │
-│ │
-│ │
+│││
+│││
+│││
+│││
 │ │
 └─┘
 ";

@@ -23,8 +23,8 @@ namespace UICatalog.Scenarios {
 
 			public ThicknessEditor ()
 			{
-				Margin.Thickness = new Thickness (1);
-				BorderFrame.Thickness = new Thickness (1);
+				Margin.Thickness = new Thickness (0);
+				BorderStyle = LineStyle.Single;
 			}
 
 			public override void BeginInit ()
@@ -144,7 +144,7 @@ namespace UICatalog.Scenarios {
 
 				viewToEdit.BorderFrame.ColorScheme = Colors.ColorSchemes ["Base"];
 				var borderEditor = new ThicknessEditor () {
-					X = Pos.Right(marginEditor),
+					X = Pos.Right(marginEditor) - 1,
 					Y = 0,
 					Title = "Border",
 					Thickness = viewToEdit.BorderFrame.Thickness,
@@ -156,7 +156,7 @@ namespace UICatalog.Scenarios {
 
 				viewToEdit.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
 				var paddingEditor = new ThicknessEditor () {
-					X = Pos.Right (borderEditor),
+					X = Pos.Right (borderEditor) - 1,
 					Y = 0,
 					Title = "Padding",
 					Thickness = viewToEdit.Padding.Thickness,

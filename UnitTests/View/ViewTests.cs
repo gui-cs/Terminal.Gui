@@ -233,7 +233,7 @@ namespace Terminal.Gui.ViewTests {
 			t.Remove (v);
 			Assert.True (t.Subviews.Count == 0);
 		}
-		
+
 		[Fact]
 		public void Initialized_Event_Comparing_With_Added_Event ()
 		{
@@ -558,7 +558,7 @@ namespace Terminal.Gui.ViewTests {
 			var view = new View (rect);
 			var top = Application.Top;
 			top.Add (view);
-			
+
 			Assert.Equal (View.Direction.Forward, view.FocusDirection);
 			view.FocusDirection = View.Direction.Backward;
 			Assert.Equal (View.Direction.Backward, view.FocusDirection);
@@ -623,7 +623,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (-41, rcol);
 			Assert.Equal (-13, rrow);
 		}
-		
+
 		[Fact]
 		[AutoInitShutdown]
 		public void Visible_Sets_Also_Sets_Subviews ()
@@ -718,14 +718,14 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (top1, v1.GetTopSuperView ());
 			Assert.Equal (top2, v2.GetTopSuperView ());
 		}
-		
+
 
 		[Fact, AutoInitShutdown]
 		public void DrawFrame_With_Positive_Positions ()
 		{
 			var view = new View (new Rect (0, 0, 8, 4));
 
-			view.DrawContent += (s, e) => view.DrawFrame (view.Bounds, 0, true);
+			view.DrawContent += (s, e) => view.DrawFrame (view.Bounds, true);
 
 			Assert.Equal (Point.Empty, new Point (view.Frame.X, view.Frame.Y));
 			Assert.Equal (new Size (8, 4), new Size (view.Frame.Width, view.Frame.Height));
@@ -749,7 +749,7 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var view = new View (new Rect (0, 0, 2, 2));
 
-			view.DrawContent += (s, e) => view.DrawFrame (view.Bounds, 0, true);
+			view.DrawContent += (s, e) => view.DrawFrame (view.Bounds, true);
 
 			Assert.Equal (Point.Empty, new Point (view.Frame.X, view.Frame.Y));
 			Assert.Equal (new Size (2, 2), new Size (view.Frame.Width, view.Frame.Height));
@@ -771,7 +771,7 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var view = new View (new Rect (-1, 0, 8, 4));
 
-			view.DrawContent += (s, e) => view.DrawFrame (view.Bounds, 0, true);
+			view.DrawContent += (s, e) => view.DrawFrame (view.Bounds, true);
 
 			Assert.Equal (new Point (-1, 0), new Point (view.Frame.X, view.Frame.Y));
 			Assert.Equal (new Size (8, 4), new Size (view.Frame.Width, view.Frame.Height));
@@ -827,7 +827,7 @@ namespace Terminal.Gui.ViewTests {
 				Height = Dim.Fill ()
 			};
 			view.DrawContent += (s, e) => {
-				view.DrawFrame (view.Bounds);
+				view.DrawFrame (view.Bounds, true);
 				var savedClip = Application.Driver.Clip;
 				Application.Driver.Clip = new Rect (1, 1, view.Bounds.Width - 2, view.Bounds.Height - 2);
 				for (int row = 0; row < view.Bounds.Height - 2; row++) {
@@ -875,7 +875,7 @@ namespace Terminal.Gui.ViewTests {
 				Height = Dim.Fill ()
 			};
 			view.DrawContent += (s, e) => {
-				view.DrawFrame (view.Bounds);
+				view.DrawFrame (view.Bounds, true);
 				var savedClip = Application.Driver.Clip;
 				Application.Driver.Clip = new Rect (1, 1, view.Bounds.Width - 2, view.Bounds.Height - 2);
 				for (int row = 0; row < view.Bounds.Height - 2; row++) {
@@ -919,11 +919,12 @@ namespace Terminal.Gui.ViewTests {
 		public void GetTextFormatterBoundsSize_GetSizeNeededForText_HotKeySpecifier ()
 		{
 			var text = "Say Hello 你";
-			var horizontalView = new View () { 
-				Text = text, 
-				AutoSize = true, 
-				HotKeySpecifier = '_' };
-			
+			var horizontalView = new View () {
+				Text = text,
+				AutoSize = true,
+				HotKeySpecifier = '_'
+			};
+
 			var verticalView = new View () {
 				Text = text,
 				AutoSize = true,
@@ -1010,7 +1011,7 @@ namespace Terminal.Gui.ViewTests {
 └────────────────────────────┘
 ", output);
 		}
-		
+
 		[Fact, AutoInitShutdown]
 		public void DrawContentComplete_Event_Is_Always_Called ()
 		{
@@ -1028,7 +1029,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (viewCalled);
 			Assert.True (tvCalled);
 		}
-		
+
 		[Fact, AutoInitShutdown]
 		public void GetNormalColor_ColorScheme ()
 		{
@@ -1505,7 +1506,7 @@ At 0,0
 			var top = Application.Top;
 
 			top.Add (frame);
-	
+
 			Application.Begin (top);
 
 			top.LayoutComplete += (s, e) => {
@@ -1545,6 +1546,6 @@ At 0,0
 
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
-	
+
 	}
 }
