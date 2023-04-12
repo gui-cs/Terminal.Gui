@@ -1020,13 +1020,11 @@ namespace Terminal.Gui {
 			// fbottom is location of bottom frame line
 			int fbottom = ftop + fheight + 1;
 
-			var borderStyle = lineStyle;
-
 			Rune hLine = default, vLine = default,
 				uRCorner = default, uLCorner = default, lLCorner = default, lRCorner = default;
 
 			if (border) {
-				switch (borderStyle) {
+				switch (lineStyle) {
 				case LineStyle.None:
 					break;
 				case LineStyle.Single:
@@ -1038,20 +1036,76 @@ namespace Terminal.Gui {
 					lRCorner = LRCorner;
 					break;
 				case LineStyle.Double:
-					hLine = HDLine;
-					vLine = VDLine;
-					uRCorner = URDCorner;
-					uLCorner = ULDCorner;
-					lLCorner = LLDCorner;
-					lRCorner = LRDCorner;
+					hLine = HDbLine;
+					vLine = VDbLine;
+					uRCorner = URDbCorner;
+					uLCorner = ULDbCorner;
+					lLCorner = LLDbCorner;
+					lRCorner = LRDbCorner;
+					break;
+				case LineStyle.Dashed:
+					hLine = HDsLine;
+					vLine = VDsLine;
+					uRCorner = URCorner;
+					uLCorner = ULCorner;
+					lLCorner = LLCorner;
+					lRCorner = LRCorner;
+					break;
+				case LineStyle.Dotted:
+					hLine = HDtLine;
+					vLine = VDtLine;
+					uRCorner = URCorner;
+					uLCorner = ULCorner;
+					lLCorner = LLCorner;
+					lRCorner = LRCorner;
 					break;
 				case LineStyle.Rounded:
-					hLine = HRLine;
-					vLine = VRLine;
+					hLine = HLine;
+					vLine = VLine;
 					uRCorner = URRCorner;
 					uLCorner = ULRCorner;
 					lLCorner = LLRCorner;
 					lRCorner = LRRCorner;
+					break;
+				case LineStyle.RoundedDashed:
+					hLine = HDsLine;
+					vLine = VDsLine;
+					uRCorner = URRCorner;
+					uLCorner = ULRCorner;
+					lLCorner = LLRCorner;
+					lRCorner = LRRCorner;
+					break;
+				case LineStyle.RoundedDotted:
+					hLine = HDtLine;
+					vLine = VDtLine;
+					uRCorner = URRCorner;
+					uLCorner = ULRCorner;
+					lLCorner = LLRCorner;
+					lRCorner = LRRCorner;
+					break;
+				case LineStyle.Thick:
+					hLine = HThLine;
+					vLine = VThLine;
+					uRCorner = URThCorner;
+					uLCorner = ULThCorner;
+					lLCorner = LLThCorner;
+					lRCorner = LRThCorner;
+					break;
+				case LineStyle.ThickDashed:
+					hLine = HThDsLine;
+					vLine = VThDsLine;
+					uRCorner = URThCorner;
+					uLCorner = ULThCorner;
+					lLCorner = LLThCorner;
+					lRCorner = LRThCorner;
+					break;
+				case LineStyle.ThickDotted:
+					hLine = HThDtLine;
+					vLine = VThDtLine;
+					uRCorner = URThCorner;
+					uLCorner = ULThCorner;
+					lLCorner = LLThCorner;
+					lRCorner = LRThCorner;
 					break;
 				}
 			} else {
@@ -1336,42 +1390,32 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Horizontal double line character.
 		/// </summary>
-		public Rune HDLine = '\u2550';
+		public Rune HDbLine = '\u2550';
 
 		/// <summary>
 		/// Vertical double line character.
 		/// </summary>
-		public Rune VDLine = '\u2551';
+		public Rune VDbLine = '\u2551';
 
 		/// <summary>
 		/// Upper left double corner
 		/// </summary>
-		public Rune ULDCorner = '\u2554';
+		public Rune ULDbCorner = '\u2554';
 
 		/// <summary>
 		/// Lower left double corner
 		/// </summary>
-		public Rune LLDCorner = '\u255a';
+		public Rune LLDbCorner = '\u255a';
 
 		/// <summary>
 		/// Upper right double corner
 		/// </summary>
-		public Rune URDCorner = '\u2557';
+		public Rune URDbCorner = '\u2557';
 
 		/// <summary>
 		/// Lower right double corner
 		/// </summary>
-		public Rune LRDCorner = '\u255d';
-
-		/// <summary>
-		/// Horizontal line character for rounded corners.
-		/// </summary>
-		public Rune HRLine = '\u2500';
-
-		/// <summary>
-		/// Vertical line character for rounded corners.
-		/// </summary>
-		public Rune VRLine = '\u2502';
+		public Rune LRDbCorner = '\u255d';
 
 		/// <summary>
 		/// Upper left rounded corner
@@ -1392,6 +1436,77 @@ namespace Terminal.Gui {
 		/// Lower right rounded corner
 		/// </summary>
 		public Rune LRRCorner = '\u256f';
+
+		/// <summary>
+		/// Horizontal double dashed line character.
+		/// </summary>
+		public Rune HDsLine = '\u254c';
+
+		/// <summary>
+		/// Vertical triple dashed line character.
+		/// </summary>
+		public Rune VDsLine = '\u2506';
+
+		/// <summary>
+		/// Horizontal triple dashed line character.
+		/// </summary>
+		public Rune HDtLine = '\u2504';
+
+		/// <summary>
+		/// Vertical quadruple dashed line character.
+		/// </summary>
+		public Rune VDtLine = '\u250a';
+
+		/// <summary>
+		/// Horizontal heavy line character.
+		/// </summary>
+		public Rune HThLine = '\u2501';
+
+		/// <summary>
+		/// Vertical heavy line character.
+		/// </summary>
+		public Rune VThLine = '\u2503';
+
+		/// <summary>
+		/// Upper left heavy corner
+		/// </summary>
+		public Rune ULThCorner = '\u250f';
+
+		/// <summary>
+		/// Lower left heavy corner
+		/// </summary>
+		public Rune LLThCorner = '\u2517';
+
+		/// <summary>
+		/// Upper right heavy corner
+		/// </summary>
+		public Rune URThCorner = '\u2513';
+
+		/// <summary>
+		/// Lower right heavy corner
+		/// </summary>
+		public Rune LRThCorner = '\u251b';
+
+		/// <summary>
+		/// Horizontal heavy double dashed line character.
+		/// </summary>
+		public Rune HThDsLine = '\u254d';
+
+		/// <summary>
+		/// Vertical heavy triple dashed line character.
+		/// </summary>
+		public Rune VThDsLine = '\u2507';
+
+		/// <summary>
+		/// Horizontal heavy triple dashed line character.
+		/// </summary>
+		public Rune HThDtLine = '\u2505';
+
+		/// <summary>
+		/// Vertical heavy quadruple dashed line character.
+		/// </summary>
+		public Rune VThDtLine = '\u250b';
+
 		private Attribute currentAttribute;
 
 		/// <summary>
