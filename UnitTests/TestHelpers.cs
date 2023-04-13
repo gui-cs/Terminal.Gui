@@ -142,14 +142,13 @@ class TestHelpers {
 
 			// ignore trailing whitespace on each line
 			var trailingWhitespace = new Regex (@"\s+$", RegexOptions.Multiline);
-			var leadingWhitespace = new Regex(@"^\s+",RegexOptions.Multiline);
+			var leadingWhitespace = new Regex (@"^\s+", RegexOptions.Multiline);
 
 			// get rid of trailing whitespace on each line (and leading/trailing whitespace of start/end of full string)
 			expectedLook = trailingWhitespace.Replace (expectedLook, "").Trim ();
 			actualLook = trailingWhitespace.Replace (actualLook, "").Trim ();
 
-			if(ignoreLeadingWhitespace)
-			{
+			if (ignoreLeadingWhitespace) {
 				expectedLook = leadingWhitespace.Replace (expectedLook, "").Trim ();
 				actualLook = leadingWhitespace.Replace (actualLook, "").Trim ();
 			}
@@ -327,8 +326,8 @@ class TestHelpers {
 	public static void AssertEqual (ITestOutputHelper output, string expectedLook, string actualLook)
 	{
 		// Convert newlines to platform-specific newlines
-		expectedLook = expectedLook.Replace ("\r\n", Environment.NewLine);
-		
+		expectedLook = ReplaceNewLinesToPlatformSpecific (expectedLook);
+
 		// If test is about to fail show user what things looked like
 		if (!string.Equals (expectedLook, actualLook)) {
 			output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
@@ -349,10 +348,10 @@ class TestHelpers {
 	public static void AssertEqual (ITestOutputHelper output, string expectedLook, ustring actualLook)
 	{
 		// Convert newlines to platform-specific newlines
-		expectedLook = expectedLook.Replace ("\r\n", Environment.NewLine);
+		expectedLook = ReplaceNewLinesToPlatformSpecific (expectedLook);
 
 		// If test is about to fail show user what things looked like
-		if (!string.Equals (expectedLook, actualLook)) {
+		if (!string.Equals (expectedLook, actualLook.ToString ())) {
 			output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
 			output?.WriteLine ("But Was:" + Environment.NewLine + actualLook.ToString ());
 		}
@@ -360,4 +359,17 @@ class TestHelpers {
 		Assert.Equal (expectedLook, actualLook);
 	}
 #pragma warning restore xUnit1013 // Public method should be marked as test
+
+	private static string ReplaceNewLinesToPlatformSpecific (string toReplace)
+	{
+		var replaced = toReplace;
+
+		if (Environment.NewLine.Length == 2 && !replaced.Contains ("\r\n")) {
+			replaced = replaced.Replace ("\n", Environment.NewLine);
+		} else if (Environment.NewLine.Length == 1) {
+			replaced = replaced.Replace ("\r\n", Environment.NewLine);
+		}
+
+		return replaced;
+	}
 }

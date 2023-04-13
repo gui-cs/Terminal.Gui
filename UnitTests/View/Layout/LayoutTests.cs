@@ -677,6 +677,10 @@ Y
 			Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (22, 22);
 
+			Assert.Equal (new Rect (0, 0, 22, 22), win.Frame);
+			Assert.Equal (new Rect (0, 0, 22, 22), win.Margin.Frame);
+			Assert.Equal (new Rect (0, 0, 22, 22), win.Border.Frame);
+			Assert.Equal (new Rect (1, 1, 20, 20), win.Padding.Frame);
 			Assert.False (view.AutoSize);
 			Assert.Equal (TextDirection.LeftRight_TopBottom, view.TextDirection);
 			Assert.Equal (Rect.Empty, view.Frame);
@@ -1010,15 +1014,15 @@ Y
 			Assert.Equal (new Rect (0, 0, 9, 1), horizontalView.Frame);
 			Assert.Equal ("Absolute(0)", horizontalView.X.ToString ());
 			Assert.Equal ("Absolute(0)", horizontalView.Y.ToString ());
-			// BUGBUG - v2 - With v1 AutoSize = true Width/Height should always match Frame.Width/Height, 
+			// BUGBUG - v2 - With v1 AutoSize = true Width/Height should always grow or keep initial value, 
 			// but in v2, autosize will be replaced by Dim.Fit. Disabling test for now.
-			//Assert.Equal ("Absolute(9)", horizontalView.Width.ToString ());
-			//Assert.Equal ("Absolute(1)", horizontalView.Height.ToString ());
-			//Assert.Equal (new Rect (0, 3, 2, 8), verticalView.Frame);
+			Assert.Equal ("Absolute(9)", horizontalView.Width.ToString ());
+			Assert.Equal ("Absolute(1)", horizontalView.Height.ToString ());
+			Assert.Equal (new Rect (0, 3, 2, 8), verticalView.Frame);
 			Assert.Equal ("Absolute(0)", verticalView.X.ToString ());
 			Assert.Equal ("Absolute(3)", verticalView.Y.ToString ());
-			//Assert.Equal ("Absolute(2)", verticalView.Width.ToString ());
-			//Assert.Equal ("Absolute(8)", verticalView.Height.ToString ());
+			Assert.Equal ("Absolute(2)", verticalView.Width.ToString ());
+			Assert.Equal ("Absolute(8)", verticalView.Height.ToString ());
 			var expected = @"
 ┌────────────────────┐
 │Finish 終           │
@@ -1051,12 +1055,12 @@ Y
 			Application.Top.Redraw (Application.Top.Bounds);
 			Assert.True (horizontalView.AutoSize);
 			Assert.True (verticalView.AutoSize);
-			// height was initialized with 8 and is kept as minimum
-			Assert.Equal (new Rect (0, 3, 2, 7), verticalView.Frame);
+			// height was initialized with 8 and can only grow or keep initial value
+			Assert.Equal (new Rect (0, 3, 2, 8), verticalView.Frame);
 			Assert.Equal ("Absolute(0)", verticalView.X.ToString ());
 			Assert.Equal ("Absolute(3)", verticalView.Y.ToString ());
-			//Assert.Equal ("Absolute(2)", verticalView.Width.ToString ());
-			//Assert.Equal ("Absolute(8)", verticalView.Height.ToString ());
+			Assert.Equal ("Absolute(2)", verticalView.Width.ToString ());
+			Assert.Equal ("Absolute(8)", verticalView.Height.ToString ());
 			expected = @"
 ┌────────────────────┐
 │Finish 終           │
