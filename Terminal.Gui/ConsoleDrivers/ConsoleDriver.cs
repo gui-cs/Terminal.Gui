@@ -918,30 +918,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Draws the title for a Window-style view incorporating padding. 
-		/// </summary>
-		/// <param name="region">Screen relative region where the frame will be drawn.</param>
-		/// <param name="title">The title for the window. The title will only be drawn if <c>title</c> is not null or empty and paddingTop is greater than 0.</param>
-		/// <param name="paddingLeft">Number of columns to pad on the left (if 0 the border will not appear on the left).</param>
-		/// <param name="paddingTop">Number of rows to pad on the top (if 0 the border and title will not appear on the top).</param>
-		/// <param name="paddingRight">Number of columns to pad on the right (if 0 the border will not appear on the right).</param>
-		/// <param name="paddingBottom">Number of rows to pad on the bottom (if 0 the border will not appear on the bottom).</param>
-		/// <param name="textAlignment">Not yet implemented.</param>
-		/// <remarks></remarks>
-		public virtual void DrawWindowTitle (Rect region, ustring title, int paddingLeft, int paddingTop, int paddingRight, int paddingBottom, TextAlignment textAlignment = TextAlignment.Left)
-		{
-			var width = region.Width - (paddingLeft + 1) * 2;
-			if (!ustring.IsNullOrEmpty (title) && width > 2 && region.Y + paddingTop <= region.Y + paddingBottom) {
-				Move (region.X + 2 + paddingLeft, region.Y + paddingTop);
-				//AddRune (' ');
-				var str = title.Sum (r => Math.Max (Rune.ColumnWidth (r), 1)) >= width
-					? TextFormatter.Format (title, width - 2, false, false) [0] : title;
-				AddStr (str);
-				//AddRune (' ');
-			}
-		}
-
-		/// <summary>
 		/// Enables diagnostic functions
 		/// </summary>
 		[Flags]

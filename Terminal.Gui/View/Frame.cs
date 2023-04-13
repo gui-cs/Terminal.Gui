@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace Terminal.Gui {
@@ -141,7 +142,7 @@ namespace Terminal.Gui {
 			if (Id == "BorderFrame" && Thickness.Top > 0 && Frame.Width > 1 && !ustring.IsNullOrEmpty (Parent?.Title)) {
 				var prevAttr = Driver.GetAttribute ();
 				Driver.SetAttribute (Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetNormalColor ());
-				Driver.DrawWindowTitle (screenBounds, Parent?.Title, 0, 0, 0, 0);
+				DrawTitle (screenBounds, Parent?.Title);
 				Driver.SetAttribute (prevAttr);
 			}
 
@@ -208,7 +209,7 @@ namespace Terminal.Gui {
 					if (drawTop && Id == "BorderFrame" && !ustring.IsNullOrEmpty (Parent?.Title)) {
 						var prevAttr = Driver.GetAttribute ();
 						Driver.SetAttribute (Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetNormalColor ());
-						Driver.DrawWindowTitle (screenBounds, Parent?.Title, 0, 0, 0, 0);
+						DrawTitle (screenBounds, Parent?.Title);
 						Driver.SetAttribute (prevAttr);
 					}
 
@@ -280,6 +281,23 @@ namespace Terminal.Gui {
 			}
 			set {
 				throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
+			}
+		}
+
+		/// <summary>
+		/// Draws the title for a Window-style view.
+		/// </summary>
+		/// <param name="region">Screen relative region where the title will be drawn.</param>
+		/// <param name="title">The title.</param>
+		public void DrawTitle (Rect region, ustring title)
+		{
+			var width = region.Width;
+			if (!ustring.IsNullOrEmpty (title) && width > 2) {
+				Driver.Move (region.X + 2, region.Y);
+				//Driver.AddRune (' ');
+				var str = title.Sum (r => Math.Max (Rune.ColumnWidth (r), 1)) >= width
+					? TextFormatter.Format (title, width - 2, false, false) [0] : title;
+				Driver.AddStr (str);
 			}
 		}
 	}
