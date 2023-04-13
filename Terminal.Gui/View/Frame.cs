@@ -78,9 +78,9 @@ namespace Terminal.Gui {
 		/// Frames only render to their Parent or Parent's SuperView's LineCanvas,
 		/// so this always throws an <see cref="InvalidOperationException"/>.
 		/// </summary>
-		public override bool UseSuperViewLineCanvas {
+		public override bool SuperViewRendersLineCanvas {
 			get {
-				throw new NotImplementedException (); 
+				throw new NotImplementedException ();
 			}
 			set {
 				throw new NotImplementedException ();
@@ -129,6 +129,8 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (Parent.GetNormalColor ());
 			}
 
+			//Driver.SetAttribute (Colors.Error.Normal);
+
 			var prevClip = SetClip (Frame);
 
 			var screenBounds = ViewToScreen (Frame);
@@ -139,10 +141,16 @@ namespace Terminal.Gui {
 
 			// TODO: v2 - this will eventually be two controls: "BorderView" and "Label" (for the title)
 
+			var borderBounds = new Rect (
+				screenBounds.X + Thickness.Left - 1,
+				screenBounds.Y + Thickness.Top - 1,
+				screenBounds.Width - Thickness.Horizontal + 2,
+				screenBounds.Height - Thickness.Vertical + 2);
+
 			if (Id == "Border" && Thickness.Top > 0 && Frame.Width > 1 && !ustring.IsNullOrEmpty (Parent?.Title)) {
 				var prevAttr = Driver.GetAttribute ();
 				Driver.SetAttribute (Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetNormalColor ());
-				DrawTitle (screenBounds, Parent?.Title);
+				DrawTitle (borderBounds, Parent?.Title);
 				Driver.SetAttribute (prevAttr);
 			}
 
@@ -150,9 +158,9 @@ namespace Terminal.Gui {
 				// If View's parent has a SuperView, the border will be rendered with all our View's peers
 				// If not, then it will be rendered just for our View.
 				LineCanvas lc = Parent?.LineCanvas;
-				if (Parent?.UseSuperViewLineCanvas == true) {
-					lc = Parent?.SuperView?.LineCanvas;
-				}
+				//if (Parent?.SuperViewRendersLineCanvas == true) {
+				//	lc = Parent?.SuperView?.LineCanvas;
+				//}
 
 				var drawTop = Thickness.Top > 0 && Frame.Width > 1 && Frame.Height > 1;
 				var drawLeft = Thickness.Left > 0 && (Frame.Height > 1 || Thickness.Top == 0);
@@ -164,38 +172,42 @@ namespace Terminal.Gui {
 					// ╔╡╞═════╗
 					if (Frame.Width < 4 || ustring.IsNullOrEmpty (Parent?.Title)) {
 						// ╔╡╞╗ should be ╔══╗
-						lc.AddLine (screenBounds.Location, Frame.Width, Orientation.Horizontal, BorderStyle);
+						lc.AddLine (borderBounds.Location, Frame.Width, Orientation.Horizontal, BorderStyle);
 					} else {
 						var titleWidth = Math.Min (Parent.Title.ConsoleWidth, Frame.Width - 4);
 
+						if (Thickness.Top > 1) {
+							lc.AddLine (new Point (borderBounds.X + 1, borderBounds.Location.Y - 1), (titleWidth + 2), Orientation.Horizontal, BorderStyle);
+						}
+
 						// ╔╡Title╞═════╗
 						// Add a short horiz line for ╔╡
-						lc.AddLine (screenBounds.Location, 2, Orientation.Horizontal, BorderStyle);
+						lc.AddLine (borderBounds.Location, 2, Orientation.Horizontal, BorderStyle);
 						// Add a zero length vert line for ╔╡
-						lc.AddLine (new Point (screenBounds.X + 1, screenBounds.Location.Y), 0, Orientation.Vertical, LineStyle.Single);
+						lc.AddLine (new Point (borderBounds.X + 1, borderBounds.Location.Y), Thickness.Top > 1 ? -2 : 0, Orientation.Vertical, LineStyle.Single);
 						// Add a zero length line for ╞
-						lc.AddLine (new Point (screenBounds.X + 1 + (titleWidth + 1), screenBounds.Location.Y), 0, Orientation.Vertical, LineStyle.Single);
+						lc.AddLine (new Point (borderBounds.X + 1 + (titleWidth + 1), borderBounds.Location.Y), Thickness.Top > 1 ? -2 : 0, Orientation.Vertical, LineStyle.Single);
 						// Add the right hand line for ╞═════╗
-						lc.AddLine (new Point (screenBounds.X + 1 + (titleWidth + 1), screenBounds.Location.Y), Frame.Width - (titleWidth + 2), Orientation.Horizontal, BorderStyle);
+						lc.AddLine (new Point (borderBounds.X + 1 + (titleWidth + 1), borderBounds.Location.Y), Frame.Width - (titleWidth + 2), Orientation.Horizontal, BorderStyle);
 					}
 				}
 				if (drawLeft) {
-					lc.AddLine (screenBounds.Location, Frame.Height, Orientation.Vertical, BorderStyle);
+					lc.AddLine (borderBounds.Location, borderBounds.Height, Orientation.Vertical, BorderStyle);
 				}
 				if (drawBottom) {
-					lc.AddLine (new Point (screenBounds.X, screenBounds.Y + screenBounds.Height - 1), screenBounds.Width, Orientation.Horizontal, BorderStyle);
+					lc.AddLine (new Point (borderBounds.X, borderBounds.Y + borderBounds.Height - 1), borderBounds.Width, Orientation.Horizontal, BorderStyle);
 				}
 				if (drawRight) {
-					lc.AddLine (new Point (screenBounds.X + screenBounds.Width - 1, screenBounds.Y), screenBounds.Height, Orientation.Vertical, BorderStyle);
+					lc.AddLine (new Point (borderBounds.X + borderBounds.Width - 1, borderBounds.Y), borderBounds.Height, Orientation.Vertical, BorderStyle);
 				}
 
-				if (Parent?.UseSuperViewLineCanvas == false) {
-					foreach (var p in lc.GetMap ()) {
-						Driver.Move (p.Key.X, p.Key.Y);
-						Driver.AddRune (p.Value);
-					}
-					lc.Clear ();
-				}
+				//if (Parent?.SuperViewRendersLineCanvas == false) {
+					//foreach (var p in lc.GetMap ()) {
+					//	Driver.Move (p.Key.X, p.Key.Y);
+					//	Driver.AddRune (p.Value);
+					//}
+					//lc.Clear ();
+				//}
 
 				// TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
 				if ((ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler) {

@@ -74,10 +74,17 @@ namespace Terminal.Gui {
 		/// <param name="length">The length of line. 0 for an intersection (cross or T). Positive for Down/Right. Negative for Up/Left.</param>
 		/// <param name="orientation">The direction of the line.</param>
 		/// <param name="style">The style of line to use</param>
-		public void AddLine (Point start, int length, Orientation orientation, LineStyle style)
+		/// <param name="attribute"></param>
+		public void AddLine (Point start, int length, Orientation orientation, LineStyle style, Attribute? attribute = default)
 		{
 			_cachedBounds = Rect.Empty;
-			_lines.Add (new StraightLine (start, length, orientation, style));
+			_lines.Add (new StraightLine (start, length, orientation, style, attribute));
+		}
+
+		private void AddLine (StraightLine line)
+		{
+			_cachedBounds = Rect.Empty;
+			_lines.Add (line);
 		}
 
 		/// <summary>
@@ -149,6 +156,37 @@ namespace Terminal.Gui {
 
 					if (rune != null) {
 						map.Add (new Point (x, y), rune.Value);
+					}
+				}
+			}
+
+			return map;
+		}
+
+		/// <summary>
+		/// Evaluates the lines that have been added to the canvas and returns a map containing
+		/// the glyphs and their locations. The glyphs are the characters that should be rendered
+		/// so that all lines connect up with the appropriate intersection symbols. 
+		/// </summary>
+		/// <param name="inArea">A rectangle to constrain the search by.</param>
+		/// <returns>A map of the points within the canvas that intersect with <paramref name="inArea"/>.</returns>
+		public Dictionary<Point, Cell> GetCellMap ()
+		{
+			var map = new Dictionary<Point, Cell> ();
+
+			// walk through each pixel of the bitmap
+			for (int y = Bounds.Y; y < Bounds.Y + Bounds.Height; y++) {
+				for (int x = Bounds.X; x < Bounds.X + Bounds.Width; x++) {
+
+					var intersects = _lines
+						.Select (l => l.Intersects (x, y))
+						.Where (i => i != null)
+						.ToArray ();
+
+					var cell = GetCellForIntersects (Application.Driver, intersects);
+
+					if (cell != null) {
+						map.Add (new Point (x, y), cell);
 					}
 				}
 			}
@@ -311,8 +349,9 @@ namespace Terminal.Gui {
 
 		private Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
 		{
-			if (!intersects.Any ())
+			if (!intersects.Any ()) {
 				return null;
+			}
 
 			var runeType = GetRuneTypeForIntersects (intersects);
 
@@ -339,6 +378,42 @@ namespace Terminal.Gui {
 				return useDouble ? driver.VDLine : driver.VLine;
 			default: throw new Exception ("Could not find resolver or switch case for " + nameof (runeType) + ":" + runeType);
 			}
+		}
+
+		private Attribute? GetAttributeForIntersects (IntersectionDefinition [] intersects)
+		{
+			var set = new List<IntersectionDefinition> (intersects.Where (i => i.Line.Attribute?.HasValidColors ?? false));
+
+			if (set.Count == 0) {
+				return null;
+			}
+
+			return set [0].Line.Attribute;
+
+		}
+
+		public class Cell
+		{
+			public Cell ()
+			{
+
+			}
+
+			public Rune? Rune { get; set; }
+			public Attribute? Attribute { get; set; }
+
+		}
+
+		private Cell? GetCellForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
+		{
+			if (!intersects.Any ()) {
+				return null;
+			}
+
+			var cell = new Cell ();
+			cell.Rune = GetRuneForIntersects (driver, intersects);
+			cell.Attribute = GetAttributeForIntersects (intersects);
+			return cell;
 		}
 
 
@@ -499,6 +574,17 @@ namespace Terminal.Gui {
 			return intersects.SetEquals (types);
 		}
 
+		/// <summary>
+		/// Merges one line canvas into this one.
+		/// </summary>
+		/// <param name="lineCanvas"></param>
+		public void Merge (LineCanvas lineCanvas)
+		{
+			foreach (var line in lineCanvas._lines) {
+				AddLine (line);
+			}
+		}
+
 		internal class IntersectionDefinition {
 			/// <summary>
 			/// The point at which the intersection happens
@@ -594,13 +680,15 @@ namespace Terminal.Gui {
 			public int Length { get; }
 			public Orientation Orientation { get; }
 			public LineStyle Style { get; }
+			public Attribute? Attribute { get; set; }
 
-			internal StraightLine (Point start, int length, Orientation orientation, LineStyle style)
+			internal StraightLine (Point start, int length, Orientation orientation, LineStyle style, Attribute? attribute = default)
 			{
 				this.Start = start;
 				this.Length = length;
 				this.Orientation = orientation;
 				this.Style = style;
+				this.Attribute = attribute;
 			}
 
 			internal IntersectionDefinition Intersects (int x, int y)

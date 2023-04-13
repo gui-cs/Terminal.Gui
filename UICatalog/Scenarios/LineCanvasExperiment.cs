@@ -49,7 +49,7 @@ namespace UICatalog.Scenarios {
 				Height = 10, //Dim.Percent (50) - 5,
 				//ColorScheme = Colors.ColorSchemes ["Base"],
 				BorderStyle = LineStyle.Double,
-				UseSuperViewLineCanvas = true
+				SuperViewRendersLineCanvas = true
 			};
 			win1.Padding.Thickness = new Thickness (1);
 
@@ -63,7 +63,7 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Percent (30),
 				Height = Dim.Percent (70),
 				//ColorScheme = Colors.ColorSchemes ["Error"],
-				UseSuperViewLineCanvas = true
+				SuperViewRendersLineCanvas = true
 			};
 
 			frame1.Add (win2);
@@ -75,7 +75,7 @@ namespace UICatalog.Scenarios {
 				Y = 0,
 				Width = Dim.Fill (-1),
 				Height = Dim.Fill (-1),
-				UseSuperViewLineCanvas = true,
+				SuperViewRendersLineCanvas = true,
 				//ColorScheme = Colors.ColorSchemes ["Menu"],
 			};
 
@@ -88,7 +88,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (win2) - 1,
 				Width = win2.Width,
 				Height = 5,
-				UseSuperViewLineCanvas = true,
+				SuperViewRendersLineCanvas = true,
 				//ColorScheme = Colors.ColorSchemes ["TopLevel"],
 			};
 
@@ -102,7 +102,7 @@ namespace UICatalog.Scenarios {
 				Width = view4.Width,
 				Height = 5,
 				//ColorScheme = Colors.ColorSchemes ["TopLevel"],
-				UseSuperViewLineCanvas = true,
+				SuperViewRendersLineCanvas = true,
 				BorderStyle = LineStyle.Double 
 			};
 
@@ -114,7 +114,7 @@ namespace UICatalog.Scenarios {
 				Width = 10,
 				Height = 1,
 				Orientation = Orientation.Horizontal,
-				UseSuperViewLineCanvas = true
+				SuperViewRendersLineCanvas = true
 			};
 			frame1.Add (line);
 
@@ -125,10 +125,11 @@ namespace UICatalog.Scenarios {
 				Width = 25,
 				Height = 10,
 				//ColorScheme = Colors.Error,
-				UseSuperViewLineCanvas = true
+				SuperViewRendersLineCanvas = true
 			};
 			marginWindow.Margin.ColorScheme = Colors.Dialog;
 			marginWindow.Margin.Thickness = new Thickness (1);
+			marginWindow.Border.Thickness = new Thickness (1,2,1,1);
 
 			frame1.Add (marginWindow);
 		}

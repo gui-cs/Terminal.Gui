@@ -1219,6 +1219,11 @@ namespace Terminal.Gui {
 			}
 
 		}
+
+		internal void SetAttribute (object attribute)
+		{
+			throw new NotImplementedException ();
+		}
 	}
 
 	/// <summary>

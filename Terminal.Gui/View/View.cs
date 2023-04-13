@@ -1748,7 +1748,7 @@ namespace Terminal.Gui {
 		/// by this Frame will be done by it's parent's SuperView. If <see langword="false"/> (the default)
 		/// this View's <see cref="OnDrawFrames()"/> method will be called to render the borders.
 		/// </summary>
-		public virtual bool UseSuperViewLineCanvas { get; set; } = false;
+		public virtual bool SuperViewRendersLineCanvas { get; set; } = false;
 
 		// TODO: Make this cancelable
 		/// <summary>
@@ -1763,7 +1763,10 @@ namespace Terminal.Gui {
 
 			var prevClip = Driver.Clip;
 			var screenBounds = ViewToScreen (Frame);
+
+			// TODO: Figure out what we should do if we have no superview
 			//if (SuperView != null) {
+			// TODO: Clipping is disabled for now to ensure we see errors
 			Driver.Clip = new Rect (0, 0, Driver.Cols, Driver.Rows);// screenBounds;// SuperView.ClipToBounds ();
 										//}
 
@@ -1777,14 +1780,23 @@ namespace Terminal.Gui {
 			//Driver.SetAttribute (new Attribute(Color.White, Color.Black));
 
 			// If we have a SuperView, it'll draw render our frames.
-			if (UseSuperViewLineCanvas && LineCanvas.Bounds != Rect.Empty) {
-				foreach (var p in LineCanvas.GetMap ()) { // Get the entire map
+			if (!SuperViewRendersLineCanvas && LineCanvas.Bounds != Rect.Empty) {
+			}
+
+			if (Subviews.Select (s => s.SuperViewRendersLineCanvas).Count () > 0) {
+				foreach (var subview in Subviews.Where (s => s.SuperViewRendersLineCanvas)) {
+					// Combine the LineCavas'
+					LineCanvas.Merge (subview.LineCanvas);
+					subview.LineCanvas.Clear ();
+				}
+
+				foreach (var p in LineCanvas.GetCellMap ()) { // Get the entire map
+					Driver.SetAttribute (p.Value.Attribute?.Value ?? ColorScheme.Normal);
 					Driver.Move (p.Key.X, p.Key.Y);
-					Driver.AddRune (p.Value);
+					Driver.AddRune (p.Value.Rune.Value);
 				}
 				LineCanvas.Clear ();
 			}
-
 			Driver.Clip = prevClip;
 
 			return true;
