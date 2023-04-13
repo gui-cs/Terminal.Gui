@@ -999,7 +999,8 @@ namespace Terminal.Gui {
 			if (refreshDriver) {
 				MdiTop?.OnChildLoaded (toplevel);
 				toplevel.OnLoaded ();
-				Redraw (toplevel);
+				toplevel.SetNeedsDisplay ();
+				toplevel.Redraw (toplevel.Bounds);
 				toplevel.PositionCursor ();
 				Driver.Refresh ();
 			}
@@ -1116,13 +1117,6 @@ namespace Terminal.Gui {
 			// gui.cs does no longer process any callbacks. See #1084 for more details:
 			// (https://github.com/gui-cs/Terminal.Gui/issues/1084).
 			SynchronizationContext.SetSynchronizationContext (syncContext: null);
-		}
-
-
-		static void Redraw (View view)
-		{
-			view.Redraw (view.Bounds);
-			Driver.Refresh ();
 		}
 
 		/// <summary>

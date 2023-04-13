@@ -136,7 +136,7 @@ namespace Terminal.Gui.ViewsTests {
 				if (cancelClosing) {
 					e.Cancel = true;
 					isMenuClosed = false;
-				} else 					isMenuClosed = true;
+				} else isMenuClosed = true;
 			};
 			Application.Top.Add (menu);
 
@@ -318,18 +318,18 @@ Edit
 			Assert.Equal ("_Paste", miCurrent.Title);
 
 			for (int i = 2; i >= -1; i--) {
-				if (i == -1) 					Assert.False (mCurrent.MouseEvent (new MouseEvent () {
-						X = 10,
-						Y = i,
-						Flags = MouseFlags.ReportMousePosition,
-						View = menu
-					}));
-else 					Assert.True (mCurrent.MouseEvent (new MouseEvent () {
-						X = 10,
-						Y = i,
-						Flags = MouseFlags.ReportMousePosition,
-						View = mCurrent
-					}));
+				if (i == -1) Assert.False (mCurrent.MouseEvent (new MouseEvent () {
+					X = 10,
+					Y = i,
+					Flags = MouseFlags.ReportMousePosition,
+					View = menu
+				}));
+				else Assert.True (mCurrent.MouseEvent (new MouseEvent () {
+					X = 10,
+					Y = i,
+					Flags = MouseFlags.ReportMousePosition,
+					View = mCurrent
+				}));
 				Assert.True (menu.IsMenuOpen);
 				if (i == 2) {
 					Assert.Equal ("_Edit", miCurrent.Parent.Title);
@@ -1060,6 +1060,7 @@ else 					Assert.True (mCurrent.MouseEvent (new MouseEvent () {
 			});
 
 			Application.Top.Add (menu);
+			Application.Begin (Application.Top);
 
 			Assert.False (newAction);
 			Assert.False (copyAction);
@@ -1115,7 +1116,7 @@ else 					Assert.True (mCurrent.MouseEvent (new MouseEvent () {
 			public string MenuBarText {
 				get {
 					string txt = string.Empty;
-					foreach (var m in Menus) 
+					foreach (var m in Menus)
 						txt += " " + m.Title.ToString () + " ";
 					return txt;
 				}
@@ -1191,7 +1192,7 @@ else 					Assert.True (mCurrent.MouseEvent (new MouseEvent () {
 			});
 
 			var items = new MenuBarItem [expectedMenu.Menus.Length];
-			for (var i = 0; i < expectedMenu.Menus.Length; i++) 				items [i] = new MenuBarItem (expectedMenu.Menus [i].Title, new MenuItem [] {
+			for (var i = 0; i < expectedMenu.Menus.Length; i++) items [i] = new MenuBarItem (expectedMenu.Menus [i].Title, new MenuItem [] {
 					new MenuItem (expectedMenu.Menus [i].Children [0].Title, "", null)
 				});
 			var menu = new MenuBar (items);
@@ -1474,7 +1475,7 @@ else 					Assert.True (mCurrent.MouseEvent (new MouseEvent () {
 			});
 
 			var items = new MenuBarItem [expectedMenu.Menus.Length];
-			for (var i = 0; i < expectedMenu.Menus.Length; i++) 				items [i] = new MenuBarItem (expectedMenu.Menus [i].Title, expectedMenu.Menus [i].Children.Length > 0
+			for (var i = 0; i < expectedMenu.Menus.Length; i++) items [i] = new MenuBarItem (expectedMenu.Menus [i].Title, expectedMenu.Menus [i].Children.Length > 0
 					? new MenuItem [] {
 						new MenuItem (expectedMenu.Menus [i].Children [0].Title, "", null),
 					}

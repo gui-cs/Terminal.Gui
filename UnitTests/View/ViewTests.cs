@@ -233,7 +233,7 @@ namespace Terminal.Gui.ViewTests {
 			t.Remove (v);
 			Assert.True (t.Subviews.Count == 0);
 		}
-		
+
 		[Fact]
 		public void Initialized_Event_Comparing_With_Added_Event ()
 		{
@@ -533,8 +533,7 @@ namespace Terminal.Gui.ViewTests {
 					lbl = new Label (text);
 				}
 				Application.Top.Add (lbl);
-				Application.Top.LayoutSubviews ();
-				Application.Top.Redraw (Application.Top.Bounds);
+				Application.Begin (Application.Top);
 
 				// should have the initial text
 				Assert.Equal ('t', driver.Contents [0, 0, 0]);
@@ -558,7 +557,7 @@ namespace Terminal.Gui.ViewTests {
 			var view = new View (rect);
 			var top = Application.Top;
 			top.Add (view);
-			
+
 			Assert.Equal (View.Direction.Forward, view.FocusDirection);
 			view.FocusDirection = View.Direction.Backward;
 			Assert.Equal (View.Direction.Backward, view.FocusDirection);
@@ -623,7 +622,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (-41, rcol);
 			Assert.Equal (-13, rrow);
 		}
-		
+
 		[Fact]
 		[AutoInitShutdown]
 		public void Visible_Sets_Also_Sets_Subviews ()
@@ -718,7 +717,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (top1, v1.GetTopSuperView ());
 			Assert.Equal (top2, v2.GetTopSuperView ());
 		}
-		
+
 
 		[Fact, AutoInitShutdown]
 		public void DrawFrame_With_Positive_Positions ()
@@ -919,11 +918,12 @@ namespace Terminal.Gui.ViewTests {
 		public void GetTextFormatterBoundsSize_GetSizeNeededForText_HotKeySpecifier ()
 		{
 			var text = "Say Hello 你";
-			var horizontalView = new View () { 
-				Text = text, 
-				AutoSize = true, 
-				HotKeySpecifier = '_' };
-			
+			var horizontalView = new View () {
+				Text = text,
+				AutoSize = true,
+				HotKeySpecifier = '_'
+			};
+
 			var verticalView = new View () {
 				Text = text,
 				AutoSize = true,
@@ -1010,7 +1010,7 @@ namespace Terminal.Gui.ViewTests {
 └────────────────────────────┘
 ", output);
 		}
-		
+
 		[Fact, AutoInitShutdown]
 		public void DrawContentComplete_Event_Is_Always_Called ()
 		{
@@ -1028,7 +1028,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (viewCalled);
 			Assert.True (tvCalled);
 		}
-		
+
 		[Fact, AutoInitShutdown]
 		public void GetNormalColor_ColorScheme ()
 		{
@@ -1505,7 +1505,7 @@ At 0,0
 			var top = Application.Top;
 
 			top.Add (frame);
-	
+
 			Application.Begin (top);
 
 			top.LayoutComplete += (s, e) => {
@@ -1545,6 +1545,6 @@ At 0,0
 
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
-	
+
 	}
 }
