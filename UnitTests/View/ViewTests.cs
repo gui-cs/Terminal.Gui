@@ -1451,12 +1451,12 @@ At 0,0
 		{
 			var view = new View ();
 			Assert.NotNull (view.Margin);
-			Assert.NotNull (view.BorderFrame);
+			Assert.NotNull (view.Border);
 			Assert.NotNull (view.Padding);
 
 			view.Dispose ();
 			Assert.Null (view.Margin);
-			Assert.Null (view.BorderFrame);
+			Assert.Null (view.Border);
 			Assert.Null (view.Padding);
 		}
 	}

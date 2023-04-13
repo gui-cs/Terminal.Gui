@@ -679,7 +679,7 @@ Y
 
 			Assert.Equal (new Rect (0, 0, 22, 22), win.Frame);
 			Assert.Equal (new Rect (0, 0, 22, 22), win.Margin.Frame);
-			Assert.Equal (new Rect (0, 0, 22, 22), win.BorderFrame.Frame);
+			Assert.Equal (new Rect (0, 0, 22, 22), win.Border.Frame);
 			Assert.Equal (new Rect (1, 1, 20, 20), win.Padding.Frame);
 			Assert.False (view.AutoSize);
 			Assert.Equal (TextDirection.LeftRight_TopBottom, view.TextDirection);

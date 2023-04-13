@@ -2732,15 +2732,15 @@ namespace Terminal.Gui {
 			}
 
 			var border = Margin.Thickness.GetInside (Margin.Frame);
-			if (border != BorderFrame.Frame) {
-				BorderFrame._frame = new Rect (new Point (border.Location.X, border.Location.Y), border.Size);
-				BorderFrame.X = border.Location.X;
-				BorderFrame.Y = border.Location.Y;
-				BorderFrame.Width = border.Size.Width;
-				BorderFrame.Height = border.Size.Height;
-				BorderFrame.SetNeedsLayout ();
-				BorderFrame.LayoutSubviews ();
-				BorderFrame.SetNeedsDisplay ();
+			if (border != Border.Frame) {
+				Border._frame = new Rect (new Point (border.Location.X, border.Location.Y), border.Size);
+				Border.X = border.Location.X;
+				Border.Y = border.Location.Y;
+				Border.Width = border.Size.Width;
+				Border.Height = border.Size.Height;
+				Border.SetNeedsLayout ();
+				Border.LayoutSubviews ();
+				Border.SetNeedsDisplay ();
 			}
 
 			var padding = Border.Thickness.GetInside (Border.Frame);
@@ -3315,8 +3315,8 @@ namespace Terminal.Gui {
 		{
 			Margin?.Dispose ();
 			Margin = null;
-			BorderFrame?.Dispose ();
-			BorderFrame = null;
+			Border?.Dispose ();
+			Border = null;
 			Padding?.Dispose ();
 			Padding = null;
 
