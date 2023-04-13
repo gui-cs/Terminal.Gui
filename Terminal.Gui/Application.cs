@@ -1223,6 +1223,11 @@ namespace Terminal.Gui {
 			if (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._childNeedsDisplay || state.Toplevel.LayoutNeeded
 				|| MdiChildNeedsDisplay ()) {
 				state.Toplevel.Redraw (state.Toplevel.Bounds);
+				//if (state.Toplevel.SuperView != null) {
+				//	state.Toplevel.SuperView?.OnRenderLineCanvas ();
+				//} else {
+				//	state.Toplevel.OnRenderLineCanvas ();
+				//}
 				state.Toplevel.PositionCursor ();
 				Driver.Refresh ();
 			} else {

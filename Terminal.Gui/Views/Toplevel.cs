@@ -777,6 +777,7 @@ namespace Terminal.Gui {
 								top.SetNeedsLayout ();
 								top.SetNeedsDisplay (top.Bounds);
 								top.Redraw (top.Bounds);
+								top.OnRenderLineCanvas ();
 							}
 						}
 					}
@@ -788,8 +789,12 @@ namespace Terminal.Gui {
 						view.SetNeedsDisplay (view.Bounds);
 					}
 				}
-
 				base.Redraw (Bounds);
+
+				if (this.MenuBar != null && this.MenuBar.IsMenuOpen && this.MenuBar.openMenu != null) {
+					// TODO: Hack until we can get compositing working right.
+					this.MenuBar.openMenu.Redraw (this.MenuBar.openMenu.Bounds);
+				}
 			}
 		}
 

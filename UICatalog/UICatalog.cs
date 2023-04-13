@@ -365,7 +365,6 @@ namespace UICatalog {
 				Add (CategoryListView);
 				Add (ScenarioListView);
 
-
 				Add (MenuBar);
 				Add (StatusBar);
 

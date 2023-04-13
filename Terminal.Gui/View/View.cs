@@ -1761,7 +1761,7 @@ namespace Terminal.Gui {
 			}
 
 			var prevClip = Driver.Clip;
-			var screenBounds = ViewToScreen (Frame);
+			Driver.Clip = ViewToScreen (Frame);
 
 			// TODO: Figure out what we should do if we have no superview
 			//if (SuperView != null) {
@@ -1803,12 +1803,9 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var prevClip = ClipToBounds ();
-
 			OnDrawFrames ();
 
-			// TODO: Implement complete event
-			// OnDrawFramesComplete (Frame)
+			var prevClip = ClipToBounds ();
 
 			if (ColorScheme != null) {
 				//Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
@@ -1848,16 +1845,13 @@ namespace Terminal.Gui {
 			Driver.Clip = prevClip;
 
 			OnRenderLineCanvas ();
-
-
-
-
+			
 			// BUGBUG: v2 - We should be able to use View.SetClip here and not have to resort to knowing Driver details.
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
 		}
 
-		private void OnRenderLineCanvas ()
+		internal void OnRenderLineCanvas ()
 		{
 			//Driver.SetAttribute (new Attribute(Color.White, Color.Black));
 
