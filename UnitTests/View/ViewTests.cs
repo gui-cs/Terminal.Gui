@@ -1446,5 +1446,18 @@ At 0,0
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 
+		[Fact]
+		public void Dispose_View ()
+		{
+			var view = new View ();
+			Assert.NotNull (view.Margin);
+			Assert.NotNull (view.BorderFrame);
+			Assert.NotNull (view.Padding);
+
+			view.Dispose ();
+			Assert.Null (view.Margin);
+			Assert.Null (view.BorderFrame);
+			Assert.Null (view.Padding);
+		}
 	}
 }
