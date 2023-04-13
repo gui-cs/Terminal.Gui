@@ -39,23 +39,23 @@ namespace Terminal.Gui.DrawingTests {
 
 			Assert.Equal (new Rect (expectedX, expectedY, expectedWidth, expectedHeight), canvas.Bounds);
 		}
-		
-		[InlineData (0, 0, 0, 
+
+		[InlineData (0, 0, 0,
 					0, 0, 1, 1)]
-		[InlineData (0, 0, 1, 
+		[InlineData (0, 0, 1,
 					0, 0, 1, 1)]
-		[InlineData (0, 0, 2, 
+		[InlineData (0, 0, 2,
 					0, 0, 2, 2)]
-		[InlineData (0, 0, 3, 
+		[InlineData (0, 0, 3,
 					0, 0, 3, 3)]
-		[InlineData (0, 0, -1, 
+		[InlineData (0, 0, -1,
 					0, 0, 1, 1)]
-		[InlineData (0, 0, -2, 
+		[InlineData (0, 0, -2,
 					-1, -1, 2, 2)]
-		[InlineData (0, 0, -3, 
+		[InlineData (0, 0, -3,
 					-2, -2, 3, 3)]
 		[Theory, SetupFakeDriver]
-		public void Bounds_H_And_V_Lines_Both_Positive (int x, int y, int length, 
+		public void Bounds_H_And_V_Lines_Both_Positive (int x, int y, int length,
 			int expectedX, int expectedY, int expectedWidth, int expectedHeight)
 		{
 			var canvas = new LineCanvas ();
@@ -123,6 +123,52 @@ namespace Terminal.Gui.DrawingTests {
 ╔╡╞╗
 ║  ║",
 			$"{Environment.NewLine}{lc}");
+		}
+
+		[Fact, SetupFakeDriver]
+		public void Bounds_Specific_With_Ustring ()
+		{
+			// Draw at 1,1 within client area of View (i.e. leave a top and left margin of 1)
+			// This proves we aren't drawing excess above
+			int x = 1;
+			int y = 2;
+			int width = 3;
+			int height = 2;
+
+			var lc = new LineCanvas ();
+
+			// 01230
+			// ╔╡╞╗1
+			// ║  ║2
+
+			// Add a short horiz line for ╔╡
+			lc.AddLine (new Point (x, y), 2, Orientation.Horizontal, LineStyle.Double);
+			Assert.Equal (new Rect (x, y, 2, 1), lc.Bounds);
+
+			//LHS line down
+			lc.AddLine (new Point (x, y), height, Orientation.Vertical, LineStyle.Double);
+			Assert.Equal (new Rect (x, y, 2, 2), lc.Bounds);
+
+			//Vertical line before Title, results in a ╡
+			lc.AddLine (new Point (x + 1, y), 0, Orientation.Vertical, LineStyle.Single);
+			Assert.Equal (new Rect (x, y, 2, 2), lc.Bounds);
+
+			//Vertical line after Title, results in a ╞
+			lc.AddLine (new Point (x + 2, y), 0, Orientation.Vertical, LineStyle.Single);
+			Assert.Equal (new Rect (x, y, 3, 2), lc.Bounds);
+
+			// remainder of top line
+			lc.AddLine (new Point (x + 2, y), width - 1, Orientation.Horizontal, LineStyle.Double);
+			Assert.Equal (new Rect (x, y, 4, 2), lc.Bounds);
+
+			//RHS line down
+			lc.AddLine (new Point (x + width, y), height, Orientation.Vertical, LineStyle.Double);
+			Assert.Equal (new Rect (x, y, 4, 2), lc.Bounds);
+
+			TestHelpers.AssertEqual (output, @"
+╔╡╞╗
+║  ║",
+			ustring.Make ($"{Environment.NewLine}{lc}"));
 		}
 
 		[Fact, SetupFakeDriver]
@@ -356,7 +402,7 @@ namespace Terminal.Gui.DrawingTests {
 
 			//RHS line down
 			lc.AddLine (new Point (x + width, y), height, Orientation.Vertical, LineStyle.Double);
-			
+
 			string looksLike = @"
 ╔╡╞══╗
 ║    ║";
@@ -491,7 +537,7 @@ namespace Terminal.Gui.DrawingTests {
 
 			var map = canvas.GetMap ();
 			Assert.Equal (2, map.Count);
-			
+
 			TestHelpers.AssertEqual (output, @"
 ─ 
  ─",
@@ -502,7 +548,7 @@ namespace Terminal.Gui.DrawingTests {
 		public void Window ()
 		{
 			var canvas = new LineCanvas ();
-			
+
 			// Frame
 			canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Single);
 			canvas.AddLine (new Point (9, 0), 5, Orientation.Vertical, LineStyle.Single);
@@ -512,7 +558,7 @@ namespace Terminal.Gui.DrawingTests {
 			// Cross
 			canvas.AddLine (new Point (5, 0), 5, Orientation.Vertical, LineStyle.Single);
 			canvas.AddLine (new Point (0, 2), 10, Orientation.Horizontal, LineStyle.Single);
-			
+
 			string looksLike =
 @"
 ┌────┬───┐
@@ -678,31 +724,31 @@ namespace Terminal.Gui.DrawingTests {
 │ ";
 			TestHelpers.AssertEqual (output, looksLike, $"{Environment.NewLine}{canvas}");
 		}
-		
-//		[Fact, SetupFakeDriver]
-//		public void LeaveMargin_Top1_Left1 ()
-//		{
-//			var canvas = new LineCanvas ();
 
-//			// Upper box
-//			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, LineStyle.Single);
-//			canvas.AddLine (new Point (8, 0), 3, Orientation.Vertical, LineStyle.Single);
-//			canvas.AddLine (new Point (8, 3), -9, Orientation.Horizontal, LineStyle.Single);
-//			canvas.AddLine (new Point (0, 2), -3, Orientation.Vertical, LineStyle.Single);
+		//		[Fact, SetupFakeDriver]
+		//		public void LeaveMargin_Top1_Left1 ()
+		//		{
+		//			var canvas = new LineCanvas ();
 
-//			// Lower Box
-//			canvas.AddLine (new Point (5, 0), 2, Orientation.Vertical, LineStyle.Single);
-//			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, LineStyle.Single);
+		//			// Upper box
+		//			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, LineStyle.Single);
+		//			canvas.AddLine (new Point (8, 0), 3, Orientation.Vertical, LineStyle.Single);
+		//			canvas.AddLine (new Point (8, 3), -9, Orientation.Horizontal, LineStyle.Single);
+		//			canvas.AddLine (new Point (0, 2), -3, Orientation.Vertical, LineStyle.Single);
 
-//			string looksLike =
-//@"
-//┌────┬──┐
-//│    │  │
-//├────┼──┤
-//└────┴──┘
-//";
-//			Assert.Equal (looksLike, $"{Environment.NewLine}{canvas}");
-//		}
+		//			// Lower Box
+		//			canvas.AddLine (new Point (5, 0), 2, Orientation.Vertical, LineStyle.Single);
+		//			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, LineStyle.Single);
+
+		//			string looksLike =
+		//@"
+		//┌────┬──┐
+		//│    │  │
+		//├────┼──┤
+		//└────┴──┘
+		//";
+		//			Assert.Equal (looksLike, $"{Environment.NewLine}{canvas}");
+		//		}
 
 		[InlineData (0, 0, 0, Orientation.Horizontal, LineStyle.Double, "═")]
 		[InlineData (0, 0, 0, Orientation.Vertical, LineStyle.Double, "║")]
