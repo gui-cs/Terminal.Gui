@@ -138,7 +138,12 @@ namespace UICatalog.Scenarios {
 					Thickness = viewToEdit.Margin.Thickness,
 				};
 				marginEditor.ThicknessChanged += (s, a) => {
-					viewToEdit.Margin.Thickness = a.Thickness;
+					try {
+						viewToEdit.Margin.Thickness = a.Thickness;
+					} catch {
+
+						viewToEdit.Margin.Thickness = a.PreviousThickness;
+					}
 				};
 				Add (marginEditor);
 
@@ -150,7 +155,11 @@ namespace UICatalog.Scenarios {
 					Thickness = viewToEdit.Border.Thickness,
 				};
 				borderEditor.ThicknessChanged += (s, a) => {
-					viewToEdit.Border.Thickness = a.Thickness;
+					try {
+						viewToEdit.Border.Thickness = a.Thickness;
+					} catch {
+						viewToEdit.Border.Thickness = a.PreviousThickness;
+					}
 				};
 				Add (borderEditor);
 
@@ -162,7 +171,11 @@ namespace UICatalog.Scenarios {
 					Thickness = viewToEdit.Padding.Thickness,
 				};
 				paddingEditor.ThicknessChanged += (s, a) => {
-					viewToEdit.Padding.Thickness = a.Thickness;
+					try {
+						viewToEdit.Padding.Thickness = a.Thickness;
+					} catch {
+						viewToEdit.Padding.Thickness = a.PreviousThickness;
+					}
 				};
 				Add (paddingEditor);
 

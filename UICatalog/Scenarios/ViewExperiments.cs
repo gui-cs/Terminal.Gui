@@ -283,61 +283,60 @@ namespace UICatalog.Scenarios {
 			view.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
 			view.Padding.Data = "Padding";
 
-			var view2 = new View () {
+			var window1 = new Window () {
 				X = 2,
 				Y = 3,
 				Height = 7,
 				Width = 17,
-				Title = "View2",
-				Text = "View #2",
+				Title = "Window 1",
+				Text = "Window #2",
 				TextAlignment = TextAlignment.Centered
 			};
 
-			//view2.InitializeFrames ();
-			view2.Margin.Thickness = new Thickness (1);
-			view2.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
-			view2.Margin.Data = "Margin";
-			view2.Border.Thickness = new Thickness (1);
-			view2.Border.BorderStyle = LineStyle.Single;
-			view2.Border.ColorScheme = view.ColorScheme;
-			view2.Border.Data = "Border";
-			view2.Padding.Thickness = new Thickness (1);
-			view2.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
-			view2.Padding.Data = "Padding";
+			window1.Margin.Thickness = new Thickness (0);
+			window1.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
+			window1.Margin.Data = "Margin";
+			window1.Border.Thickness = new Thickness (1);
+			window1.Border.BorderStyle = LineStyle.Single;
+			window1.Border.ColorScheme = view.ColorScheme;
+			window1.Border.Data = "Border";
+			window1.Padding.Thickness = new Thickness (0);
+			window1.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
+			window1.Padding.Data = "Padding";
 
-			view.Add (view2);
+			view.Add (window1);
 
-			var view3 = new View () {
-				X = Pos.Right (view2) + 1,
+			var window2 = new Window () {
+				X = Pos.Right (window1) + 1,
 				Y = 3,
 				Height = 5,
 				Width = 37,
-				Title = "View3",
-				Text = "View #3 (Right(view2)+1",
+				Title = "Window2",
+				Text = "Window #2 (Right(window1)+1",
 				TextAlignment = TextAlignment.Centered
 			};
 
 			//view3.InitializeFrames ();
-			view3.Margin.Thickness = new Thickness (1, 1, 0, 0);
-			view3.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
-			view3.Margin.Data = "Margin";
-			view3.Border.Thickness = new Thickness (1, 1, 1, 1);
-			view3.Border.BorderStyle = LineStyle.Single;
-			view3.Border.ColorScheme = view.ColorScheme;
-			view3.Border.Data = "Border";
-			view3.Padding.Thickness = new Thickness (1, 1, 0, 0);
-			view3.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
-			view3.Padding.Data = "Padding";
+			window2.Margin.Thickness = new Thickness (1, 1, 0, 0);
+			window2.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
+			window2.Margin.Data = "Margin";
+			window2.Border.Thickness = new Thickness (1, 1, 1, 1);
+			window2.Border.BorderStyle = LineStyle.Single;
+			window2.Border.ColorScheme = view.ColorScheme;
+			window2.Border.Data = "Border";
+			window2.Padding.Thickness = new Thickness (1, 1, 0, 0);
+			window2.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
+			window2.Padding.Data = "Padding";
 
-			view.Add (view3);
+			view.Add (window2);
 
 			var view4 = new View () {
-				X = Pos.Right (view3) + 1,
+				X = Pos.Right (window2) + 1,
 				Y = 3,
 				Height = 5,
 				Width = 37,
 				Title = "View4",
-				Text = "View #4 (Right(view3)+1",
+				Text = "View #4 (Right(window2)+1",
 				TextAlignment = TextAlignment.Centered
 			};
 

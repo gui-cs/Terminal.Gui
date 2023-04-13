@@ -537,6 +537,7 @@ namespace Terminal.Gui {
 		{
 			void ThicknessChangedHandler (object sender, EventArgs e)
 			{
+				LayoutFrames ();
 				SetNeedsLayout ();
 				SetNeedsDisplay ();
 			}
@@ -1768,33 +1769,12 @@ namespace Terminal.Gui {
 			Driver.Clip = new Rect (0, 0, Driver.Cols, Driver.Rows);// screenBounds;// SuperView.ClipToBounds ();
 										//}
 
-			// Each of these renders to either this View's LineCanvas or
-			// this View's SuperView.LineCanvas depending on if this View has
-			// a SuperView or not
+			// Each of these renders lines to either this View's LineCanvas 
+			// Those lines will be finally rendered in OnRenderLineCanvas
 			Margin?.Redraw (Margin.Frame);
 			Border?.Redraw (Border.Frame);
 			Padding?.Redraw (Padding.Frame);
 
-			//Driver.SetAttribute (new Attribute(Color.White, Color.Black));
-
-			// If we have a SuperView, it'll draw render our frames.
-			if (!SuperViewRendersLineCanvas && LineCanvas.Bounds != Rect.Empty) {
-			}
-
-			if (Subviews.Select (s => s.SuperViewRendersLineCanvas).Count () > 0) {
-				foreach (var subview in Subviews.Where (s => s.SuperViewRendersLineCanvas)) {
-					// Combine the LineCavas'
-					LineCanvas.Merge (subview.LineCanvas);
-					subview.LineCanvas.Clear ();
-				}
-
-				foreach (var p in LineCanvas.GetCellMap ()) { // Get the entire map
-					Driver.SetAttribute (p.Value.Attribute?.Value ?? ColorScheme.Normal);
-					Driver.Move (p.Key.X, p.Key.Y);
-					Driver.AddRune (p.Value.Rune.Value);
-				}
-				LineCanvas.Clear ();
-			}
 			Driver.Clip = prevClip;
 
 			return true;
@@ -1824,6 +1804,8 @@ namespace Terminal.Gui {
 			}
 
 			var prevClip = ClipToBounds ();
+
+			OnDrawFrames ();
 
 			// TODO: Implement complete event
 			// OnDrawFramesComplete (Frame)
@@ -1863,13 +1845,46 @@ namespace Terminal.Gui {
 
 			// Invoke DrawContentCompleteEvent
 			OnDrawContentComplete (bounds);
+			Driver.Clip = prevClip;
 
-			OnDrawFrames ();
+			OnRenderLineCanvas ();
+
+
+
 
 			// BUGBUG: v2 - We should be able to use View.SetClip here and not have to resort to knowing Driver details.
-			Driver.Clip = prevClip;
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
+		}
+
+		private void OnRenderLineCanvas ()
+		{
+			//Driver.SetAttribute (new Attribute(Color.White, Color.Black));
+
+			// If we have a SuperView, it'll render our frames.
+			if (!SuperViewRendersLineCanvas && LineCanvas.Bounds != Rect.Empty) {
+				foreach (var p in LineCanvas.GetCellMap ()) { // Get the entire map
+					Driver.SetAttribute (p.Value.Attribute?.Value ?? ColorScheme.Normal);
+					Driver.Move (p.Key.X, p.Key.Y);
+					Driver.AddRune (p.Value.Rune.Value);
+				}
+				LineCanvas.Clear ();
+			}
+
+			if (Subviews.Select (s => s.SuperViewRendersLineCanvas).Count () > 0) {
+				foreach (var subview in Subviews.Where (s => s.SuperViewRendersLineCanvas)) {
+					// Combine the LineCavas'
+					LineCanvas.Merge (subview.LineCanvas);
+					subview.LineCanvas.Clear ();
+				}
+
+				foreach (var p in LineCanvas.GetCellMap ()) { // Get the entire map
+					Driver.SetAttribute (p.Value.Attribute?.Value ?? ColorScheme.Normal);
+					Driver.Move (p.Key.X, p.Key.Y);
+					Driver.AddRune (p.Value.Rune.Value);
+				}
+				LineCanvas.Clear ();
+			}
 		}
 
 		/// <summary>
@@ -1902,9 +1917,10 @@ namespace Terminal.Gui {
 				if (TextFormatter != null) {
 					TextFormatter.NeedsFormat = true;
 				}
+				// This should NOT clear 
 				TextFormatter?.Draw (ViewToScreen (contentArea), HasFocus ? GetFocusColor () : GetNormalColor (),
 				    HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
-				    new Rect (ViewToScreen (contentArea).Location, Bounds.Size), true);
+				    Rect.Empty, false);
 				SetSubViewNeedsDisplay ();
 			}
 		}

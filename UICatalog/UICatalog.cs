@@ -80,6 +80,8 @@ namespace UICatalog {
 			// If a Scenario name has been provided on the commandline
 			// run it and exit when done.
 			if (args.Length > 0) {
+				_topLevelColorScheme = "Base";
+
 				var item = _scenarios.FindIndex (s => s.GetName ().Equals (args [0], StringComparison.OrdinalIgnoreCase));
 				_selectedScenario = (Scenario)Activator.CreateInstance (_scenarios [item].GetType ())!;
 				Application.UseSystemConsole = _useSystemConsole;
