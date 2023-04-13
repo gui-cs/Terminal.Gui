@@ -477,8 +477,8 @@ namespace Terminal.Gui {
 				WantMousePositionReports = host.WantMousePositionReports;
 			}
 
-			BorderFrame.Thickness = new Thickness (1);
-			BorderFrame.BorderStyle = LineStyle.Single;
+			Border.Thickness = new Thickness (1);
+			Border.BorderStyle = LineStyle.Single;
 
 			if (Application.Current != null) {
 				Application.Current.DrawContentComplete += Current_DrawContentComplete;
@@ -537,6 +537,7 @@ namespace Terminal.Gui {
 
 		public override void Redraw (Rect bounds)
 		{
+		
 			if (barItems.Children == null) {
 				return;
 			}
@@ -544,7 +545,8 @@ namespace Terminal.Gui {
 			Application.Driver.Clip = Application.Top.Frame;
 
 			Driver.SetAttribute (GetNormalColor ());
-			OnDrawFrames (Frame);
+
+			OnDrawFrames ();
 
 			for (int i = Bounds.Y; i < barItems.Children.Length; i++) {
 				if (i < 0)
@@ -644,6 +646,7 @@ namespace Terminal.Gui {
 			}
 			Driver.Clip = savedClip;
 
+			OnRenderLineCanvas ();
 			PositionCursor ();
 		}
 
@@ -1268,6 +1271,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event EventHandler MenuAllClosed;
 
+		// BUGBUG: Hack
 		internal Menu openMenu;
 		Menu ocm;
 		internal Menu openCurrentMenu {

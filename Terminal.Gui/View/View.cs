@@ -476,8 +476,8 @@ namespace Terminal.Gui {
 			set {
 				_frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
 				if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
-					TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
 					LayoutFrames ();
+					TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
 					SetNeedsLayout ();
 					SetNeedsDisplay ();
 				}
@@ -490,7 +490,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Frame Margin { get; private set; }
 
-		// TODO: Rename BorderFrame to Border
 		/// <summary>
 		///  Thickness where a visual border (drawn using line-drawing glyphs) and the Title are drawn. 
 		///  The Border expands inward; in other words if `Border.Thickness.Top == 2` the border and 
@@ -500,7 +499,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// <see cref="BorderStyle"/> provides a simple helper for turning a simple border frame on or off.
 		/// </remarks>
-		public Frame BorderFrame { get; private set; }
+		public Frame Border { get; private set; }
 
 		/// <summary>
 		/// Means the Thickness inside of an element that offsets the `Content` from the Border. 
@@ -512,21 +511,21 @@ namespace Terminal.Gui {
 		public Frame Padding { get; private set; }
 
 		/// <summary>
-		/// Helper to get the total thickness of the <see cref="Margin"/>, <see cref="BorderFrame"/>, and <see cref="Padding"/>. 
+		/// Helper to get the total thickness of the <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>. 
 		/// </summary>
 		/// <returns>A thickness that describes the sum of the Frames' thicknesses.</returns>
 		public Thickness GetFramesThickness ()
 		{
-			var left = Margin.Thickness.Left + BorderFrame.Thickness.Left + Padding.Thickness.Left;
-			var top = Margin.Thickness.Top + BorderFrame.Thickness.Top + Padding.Thickness.Top;
-			var right = Margin.Thickness.Right + BorderFrame.Thickness.Right + Padding.Thickness.Right;
-			var bottom = Margin.Thickness.Bottom + BorderFrame.Thickness.Bottom + Padding.Thickness.Bottom;
+			var left = Margin.Thickness.Left + Border.Thickness.Left + Padding.Thickness.Left;
+			var top = Margin.Thickness.Top + Border.Thickness.Top + Padding.Thickness.Top;
+			var right = Margin.Thickness.Right + Border.Thickness.Right + Padding.Thickness.Right;
+			var bottom = Margin.Thickness.Bottom + Border.Thickness.Bottom + Padding.Thickness.Bottom;
 			return new Thickness (left, top, right, bottom);
 		}
 
 		/// <summary>
 		/// Helper to get the X and Y offset of the Bounds from the Frame. This is the sum of the Left and Top properties of
-		/// <see cref="Margin"/>, <see cref="BorderFrame"/> and <see cref="Padding"/>.
+		/// <see cref="Margin"/>, <see cref="Border"/> and <see cref="Padding"/>.
 		/// </summary>
 		public Point GetBoundsOffset () => new Point (Padding?.Thickness.GetInside (Padding.Frame).X ?? 0, Padding?.Thickness.GetInside (Padding.Frame).Y ?? 0);
 
@@ -538,7 +537,9 @@ namespace Terminal.Gui {
 		{
 			void ThicknessChangedHandler (object sender, EventArgs e)
 			{
+				LayoutFrames ();
 				SetNeedsLayout ();
+				SetNeedsDisplay ();
 			}
 
 			if (Margin != null) {
@@ -549,13 +550,13 @@ namespace Terminal.Gui {
 			Margin.ThicknessChanged += ThicknessChangedHandler;
 			Margin.Parent = this;
 
-			if (BorderFrame != null) {
-				BorderFrame.ThicknessChanged -= ThicknessChangedHandler;
-				BorderFrame.Dispose ();
+			if (Border != null) {
+				Border.ThicknessChanged -= ThicknessChangedHandler;
+				Border.Dispose ();
 			}
-			BorderFrame = new Frame () { Id = "BorderFrame", Thickness = new Thickness (0) };
-			BorderFrame.ThicknessChanged += ThicknessChangedHandler;
-			BorderFrame.Parent = this;
+			Border = new Frame () { Id = "Border", Thickness = new Thickness (0) };
+			Border.ThicknessChanged += ThicknessChangedHandler;
+			Border.Parent = this;
 
 			// TODO: Create View.AddAdornment
 
@@ -571,7 +572,7 @@ namespace Terminal.Gui {
 		ustring _title = ustring.Empty;
 
 		/// <summary>
-		/// The title to be displayed for this <see cref="View"/>. The title will be displayed if <see cref="BorderFrame"/>.<see cref="Thickness.Top"/>
+		/// The title to be displayed for this <see cref="View"/>. The title will be displayed if <see cref="Border"/>.<see cref="Thickness.Top"/>
 		/// is greater than 0.
 		/// </summary>
 		/// <value>The title.</value>
@@ -672,11 +673,10 @@ namespace Terminal.Gui {
 				// BUGBUG: Margin etc.. can be null (if typeof(Frame))
 				Frame = new Rect (Frame.Location,
 					new Size (
-						value.Size.Width + Margin.Thickness.Horizontal + BorderFrame.Thickness.Horizontal + Padding.Thickness.Horizontal,
-						value.Size.Height + Margin.Thickness.Vertical + BorderFrame.Thickness.Vertical + Padding.Thickness.Vertical
+						value.Size.Width + Margin.Thickness.Horizontal + Border.Thickness.Horizontal + Padding.Thickness.Horizontal,
+						value.Size.Height + Margin.Thickness.Vertical + Border.Thickness.Vertical + Padding.Thickness.Vertical
 						)
 					);
-				;
 			}
 		}
 
@@ -869,8 +869,8 @@ namespace Terminal.Gui {
 		/// will not fit.</returns>
 		public bool SetMinWidthHeight ()
 		{
-			if (IsInitialized && GetMinimumBounds (out Size size)) {
-				Bounds = new Rect (Bounds.Location, size);
+			if (GetMinimumBounds (out Size size)) {
+				_frame = new Rect (_frame.Location, size);
 				return true;
 			}
 			return false;
@@ -1006,8 +1006,7 @@ namespace Terminal.Gui {
 
 			Text = text == null ? ustring.Empty : text;
 			LayoutStyle = layoutStyle;
-			var r = rect.IsEmpty ? TextFormatter.CalcRect (0, 0, text, direction) : rect;
-			Frame = r;
+			Frame = rect.IsEmpty ? TextFormatter.CalcRect (0, 0, text, direction) : rect;
 			OnResizeNeeded ();
 
 			CreateFrames ();
@@ -1050,15 +1049,14 @@ namespace Terminal.Gui {
 				var w = _width is Dim.DimAbsolute ? _width.Anchor (0) : _frame.Width;
 				var h = _height is Dim.DimAbsolute ? _height.Anchor (0) : _frame.Height;
 				// BUGBUG: v2 - ? - If layoutstyle is absolute, this overwrites the current frame h/w with 0. Hmmm...
+				// This is needed for DimAbsolute values by setting the frame before LayoutSubViews.
 				_frame = new Rect (new Point (actX, actY), new Size (w, h)); // Set frame, not Frame!
-
-
 			}
 			//// BUGBUG: I think these calls are redundant or should be moved into just the AutoSize case
 			if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
-				TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
-				LayoutFrames ();
 				SetMinWidthHeight ();
+				LayoutFrames ();
+				TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
 				SetNeedsLayout ();
 				SetNeedsDisplay ();
 			}
@@ -1505,21 +1503,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Draws a frame in the current view, clipped by the boundary of this view
-		/// </summary>
-		/// <param name="region">View-relative region for the frame to be drawn.</param>
-		/// <param name="padding">The padding to add around the outside of the drawn frame.</param>
-		/// <param name="fill">If set to <see langword="true"/> it fill will the contents.</param>
-		[ObsoleteAttribute ("This method is obsolete in v2. Use use LineCanvas or Frame instead.", false)]
-		public void DrawFrame (Rect region, int padding = 0, bool fill = false)
-		{
-			var scrRect = ViewToScreen (region);
-			var savedClip = ClipToBounds ();
-			Driver.DrawWindowFrame (scrRect, padding + 1, padding + 1, padding + 1, padding + 1, border: true, fill: fill);
-			Driver.Clip = savedClip;
-		}
-
-		/// <summary>
 		/// Utility function to draw strings that contain a hotkey.
 		/// </summary>
 		/// <param name="text">String to display, the hotkey specifier before a letter flags the next letter as the hotkey.</param>
@@ -1639,6 +1622,7 @@ namespace Terminal.Gui {
 		{
 			var view = e.Child;
 			view.IsAdded = true;
+			view.OnResizeNeeded ();
 			view._x ??= view._frame.X;
 			view._y ??= view._frame.Y;
 			view._width ??= view._frame.Width;
@@ -1751,20 +1735,44 @@ namespace Terminal.Gui {
 			_childNeedsDisplay = false;
 		}
 
+		/// <summary>
+		/// The canvas that any line drawing that is to be shared by subviews of this view should add lines to.
+		/// </summary>
+		/// <remarks><see cref="Border"/> adds border lines to this LineCanvas.</remarks>
+		public virtual LineCanvas LineCanvas { get; set; } = new LineCanvas ();
+
+		/// <summary>
+		/// Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for
+		/// rendering any border lines. If <see langword="true"/> the rendering of any borders drawn
+		/// by this Frame will be done by it's parent's SuperView. If <see langword="false"/> (the default)
+		/// this View's <see cref="OnDrawFrames()"/> method will be called to render the borders.
+		/// </summary>
+		public virtual bool SuperViewRendersLineCanvas { get; set; } = false;
+
 		// TODO: Make this cancelable
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <returns></returns>
-		public virtual bool OnDrawFrames (Rect bounds)
+		public virtual bool OnDrawFrames ()
 		{
-			var prevClip = Driver.Clip;
-			if (SuperView != null) {
-				Driver.Clip = SuperView.ClipToBounds ();
+			if (!IsInitialized) {
+				return false;
 			}
 
+			var prevClip = Driver.Clip;
+			Driver.Clip = ViewToScreen (Frame);
+
+			// TODO: Figure out what we should do if we have no superview
+			//if (SuperView != null) {
+			// TODO: Clipping is disabled for now to ensure we see errors
+			Driver.Clip = new Rect (0, 0, Driver.Cols, Driver.Rows);// screenBounds;// SuperView.ClipToBounds ();
+										//}
+
+			// Each of these renders lines to either this View's LineCanvas 
+			// Those lines will be finally rendered in OnRenderLineCanvas
 			Margin?.Redraw (Margin.Frame);
-			BorderFrame?.Redraw (BorderFrame.Frame);
+			Border?.Redraw (Border.Frame);
 			Padding?.Redraw (Padding.Frame);
 
 			Driver.Clip = prevClip;
@@ -1795,12 +1803,9 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			OnDrawFrames (Frame);
+			OnDrawFrames ();
 
 			var prevClip = ClipToBounds ();
-
-			// TODO: Implement complete event
-			// OnDrawFramesComplete (Frame)
 
 			if (ColorScheme != null) {
 				//Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
@@ -1837,11 +1842,43 @@ namespace Terminal.Gui {
 
 			// Invoke DrawContentCompleteEvent
 			OnDrawContentComplete (bounds);
-
-			// BUGBUG: v2 - We should be able to use View.SetClip here and not have to resort to knowing Driver details.
 			Driver.Clip = prevClip;
+
+			OnRenderLineCanvas ();
+			
+			// BUGBUG: v2 - We should be able to use View.SetClip here and not have to resort to knowing Driver details.
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
+		}
+
+		internal void OnRenderLineCanvas ()
+		{
+			//Driver.SetAttribute (new Attribute(Color.White, Color.Black));
+
+			// If we have a SuperView, it'll render our frames.
+			if (!SuperViewRendersLineCanvas && LineCanvas.Bounds != Rect.Empty) {
+				foreach (var p in LineCanvas.GetCellMap ()) { // Get the entire map
+					Driver.SetAttribute (p.Value.Attribute?.Value ?? ColorScheme.Normal);
+					Driver.Move (p.Key.X, p.Key.Y);
+					Driver.AddRune (p.Value.Rune.Value);
+				}
+				LineCanvas.Clear ();
+			}
+
+			if (Subviews.Select (s => s.SuperViewRendersLineCanvas).Count () > 0) {
+				foreach (var subview in Subviews.Where (s => s.SuperViewRendersLineCanvas)) {
+					// Combine the LineCavas'
+					LineCanvas.Merge (subview.LineCanvas);
+					subview.LineCanvas.Clear ();
+				}
+
+				foreach (var p in LineCanvas.GetCellMap ()) { // Get the entire map
+					Driver.SetAttribute (p.Value.Attribute?.Value ?? ColorScheme.Normal);
+					Driver.Move (p.Key.X, p.Key.Y);
+					Driver.AddRune (p.Value.Rune.Value);
+				}
+				LineCanvas.Clear ();
+			}
 		}
 
 		/// <summary>
@@ -1874,9 +1911,10 @@ namespace Terminal.Gui {
 				if (TextFormatter != null) {
 					TextFormatter.NeedsFormat = true;
 				}
+				// This should NOT clear 
 				TextFormatter?.Draw (ViewToScreen (contentArea), HasFocus ? GetFocusColor () : GetNormalColor (),
 				    HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
-				    new Rect (ViewToScreen (contentArea).Location, Bounds.Size), true);
+				    Rect.Empty, false);
 				SetSubViewNeedsDisplay ();
 			}
 		}
@@ -2705,6 +2743,7 @@ namespace Terminal.Gui {
 			if (Margin == null) return; // CreateFrames() has not been called yet
 
 			if (Margin.Frame.Size != Frame.Size) {
+				Margin._frame = new Rect (Point.Empty, Frame.Size);
 				Margin.X = 0;
 				Margin.Y = 0;
 				Margin.Width = Frame.Size.Width;
@@ -2715,18 +2754,20 @@ namespace Terminal.Gui {
 			}
 
 			var border = Margin.Thickness.GetInside (Margin.Frame);
-			if (border != BorderFrame.Frame) {
-				BorderFrame.X = border.Location.X;
-				BorderFrame.Y = border.Location.Y;
-				BorderFrame.Width = border.Size.Width;
-				BorderFrame.Height = border.Size.Height;
-				BorderFrame.SetNeedsLayout ();
-				BorderFrame.LayoutSubviews ();
-				BorderFrame.SetNeedsDisplay ();
+			if (border != Border.Frame) {
+				Border._frame = new Rect (new Point (border.Location.X, border.Location.Y), border.Size);
+				Border.X = border.Location.X;
+				Border.Y = border.Location.Y;
+				Border.Width = border.Size.Width;
+				Border.Height = border.Size.Height;
+				Border.SetNeedsLayout ();
+				Border.LayoutSubviews ();
+				Border.SetNeedsDisplay ();
 			}
 
-			var padding = BorderFrame.Thickness.GetInside (BorderFrame.Frame);
+			var padding = Border.Thickness.GetInside (Border.Frame);
 			if (padding != Padding.Frame) {
+				Padding._frame = new Rect (new Point (padding.Location.X, padding.Location.Y), padding.Size);
 				Padding.X = padding.Location.X;
 				Padding.Y = padding.Location.Y;
 				Padding.Width = padding.Size.Width;
@@ -2815,16 +2856,10 @@ namespace Terminal.Gui {
 			get => _text;
 			set {
 				_text = value;
-				if (IsInitialized) {
-					SetHotKey ();
-					UpdateTextFormatterText ();
-					//TextFormatter.Format ();
-					OnResizeNeeded ();
-				}
-
-				// BUGBUG: v2 - This is here as a HACK until we fix the unit tests to not check a view's dims until
-				// after it's been initialized. See #2450
+				SetHotKey ();
 				UpdateTextFormatterText ();
+				//TextFormatter.Format ();
+				OnResizeNeeded ();
 
 #if DEBUG
 				if (_text != null && string.IsNullOrEmpty (Id)) {
@@ -2909,11 +2944,8 @@ namespace Terminal.Gui {
 		public virtual TextDirection TextDirection {
 			get => TextFormatter.Direction;
 			set {
-				if (!IsInitialized) {
-					TextFormatter.Direction = value;
-				} else {
-					UpdateTextDirection (value);
-				}
+				UpdateTextDirection (value);
+				TextFormatter.Direction = value;
 			}
 		}
 
@@ -3024,32 +3056,32 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>
 		/// <para>
-		/// This is a helper for manipulating the view's <see cref="BorderFrame"/>. Setting this property to any value other than
-		/// <see cref="LineStyle.None"/> is equivalent to setting <see cref="BorderFrame"/>'s <see cref="Frame.Thickness"/> 
+		/// This is a helper for manipulating the view's <see cref="Border"/>. Setting this property to any value other than
+		/// <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s <see cref="Frame.Thickness"/> 
 		/// to `1` and <see cref="BorderStyle"/> to the value. 
 		/// </para>
 		/// <para>
-		/// Setting this property to <see cref="LineStyle.None"/> is equivalent to setting <see cref="BorderFrame"/>'s <see cref="Frame.Thickness"/> 
+		/// Setting this property to <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s <see cref="Frame.Thickness"/> 
 		/// to `0` and <see cref="BorderStyle"/> to <see cref="LineStyle.None"/>. 
 		/// </para>
 		/// <para>
-		/// For more advanced customization of the view's border, manipulate see <see cref="BorderFrame"/> directly.
+		/// For more advanced customization of the view's border, manipulate see <see cref="Border"/> directly.
 		/// </para>
 		/// </remarks>
 		public LineStyle BorderStyle {
 			get {
-				return BorderFrame?.BorderStyle ?? LineStyle.None;
+				return Border?.BorderStyle ?? LineStyle.None;
 			}
 			set {
-				if (BorderFrame == null) {
-					throw new InvalidOperationException ("BorderFrame is null; this is likely a bug.");
+				if (Border == null) {
+					throw new InvalidOperationException ("Border is null; this is likely a bug.");
 				}
 				if (value != LineStyle.None) {
-					BorderFrame.Thickness = new Thickness (1);
+					Border.Thickness = new Thickness (1);
 				} else {
-					BorderFrame.Thickness = new Thickness (0);
+					Border.Thickness = new Thickness (0);
 				}
-				BorderFrame.BorderStyle = value;
+				Border.BorderStyle = value;
 				LayoutFrames ();
 				SetNeedsLayout ();
 			}
@@ -3129,8 +3161,8 @@ namespace Terminal.Gui {
 		public Size GetAutoSize ()
 		{
 			var rect = TextFormatter.CalcRect (Bounds.X, Bounds.Y, TextFormatter.Text, TextFormatter.Direction);
-			var newWidth = rect.Size.Width - GetHotKeySpecifierLength () + Margin.Thickness.Horizontal + BorderFrame.Thickness.Horizontal + Padding.Thickness.Horizontal;
-			var newHeight = rect.Size.Height - GetHotKeySpecifierLength (false) + Margin.Thickness.Vertical + BorderFrame.Thickness.Vertical + Padding.Thickness.Vertical;
+			var newWidth = rect.Size.Width - GetHotKeySpecifierLength () + Margin.Thickness.Horizontal + Border.Thickness.Horizontal + Padding.Thickness.Horizontal;
+			var newHeight = rect.Size.Height - GetHotKeySpecifierLength (false) + Margin.Thickness.Vertical + Border.Thickness.Vertical + Padding.Thickness.Vertical;
 			return new Size (newWidth, newHeight);
 		}
 
@@ -3305,7 +3337,8 @@ namespace Terminal.Gui {
 		{
 			Margin?.Dispose ();
 			Margin = null;
-			BorderFrame?.Dispose ();
+			Border?.Dispose ();
+			Border = null;
 			Padding?.Dispose ();
 			Padding = null;
 
@@ -3348,7 +3381,6 @@ namespace Terminal.Gui {
 
 				// TODO: Figure out why ScrollView and other tests fail if this call is put here 
 				// instead of the constructor.
-				OnResizeNeeded ();
 				//InitializeFrames ();
 
 			} else {
@@ -3371,6 +3403,7 @@ namespace Terminal.Gui {
 		public void EndInit ()
 		{
 			IsInitialized = true;
+			OnResizeNeeded ();
 			if (_subviews != null) {
 				foreach (var view in _subviews) {
 					if (!view.IsInitialized) {
