@@ -225,8 +225,8 @@ namespace UICatalog.Scenarios {
 
 				viewToEdit.X = Pos.Center ();
 				viewToEdit.Y = Pos.Bottom (marginEditor);
-				viewToEdit.Width = 50;
-				viewToEdit.Height = 20;
+				viewToEdit.Width = 60;
+				viewToEdit.Height = 25;
 				Add (viewToEdit);
 
 				LayoutSubviews ();

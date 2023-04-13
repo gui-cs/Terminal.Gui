@@ -161,6 +161,7 @@ namespace UICatalog.Scenarios {
 						p.Key.Y,
 						p.Value);
 				}
+				canvas.Clear ();
 			};
 
 

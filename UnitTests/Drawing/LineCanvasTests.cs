@@ -866,6 +866,7 @@ namespace Terminal.Gui.DrawingTests {
 						offsetY + p.Key.Y,
 						p.Value);
 				}
+				canvasCopy.Clear ();
 			};
 
 			return v;

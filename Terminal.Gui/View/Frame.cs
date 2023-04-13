@@ -55,6 +55,19 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Frames only render to their Parent or Parent's SuperView's LineCanvas,
+		/// so this always throws an <see cref="InvalidOperationException"/>.
+		/// </summary>
+		public virtual LineCanvas LineCanvas {
+			get {
+				throw new NotImplementedException ();
+			}
+			set {
+				throw new NotImplementedException ();
+			}
+		}
+
+		/// <summary>
 		/// Does nothing for Frame
 		/// </summary>
 		/// <returns></returns>
@@ -115,7 +128,7 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (Parent.GetNormalColor ());
 			}
 
-			//var prevClip = SetClip (Frame);
+			var prevClip = SetClip (Frame);
 
 			var screenBounds = ViewToScreen (Frame);
 			// TODO: Figure out if we should be clearing the Bounds here, like this
@@ -180,6 +193,7 @@ namespace Terminal.Gui {
 						Driver.Move (p.Key.X, p.Key.Y);
 						Driver.AddRune (p.Value);
 					}
+					lc.Clear ();
 				}
 
 				// TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
@@ -218,7 +232,7 @@ namespace Terminal.Gui {
 			}
 
 
-			//Driver.Clip = prevClip;
+			Driver.Clip = prevClip;
 		}
 
 		// TODO: v2 - Frame.BorderStyle is temporary - Eventually the border will be drawn by a "BorderView" that is a subview of the Frame.

@@ -539,6 +539,7 @@ namespace Terminal.Gui {
 			void ThicknessChangedHandler (object sender, EventArgs e)
 			{
 				SetNeedsLayout ();
+				SetNeedsDisplay ();
 			}
 
 			if (Margin != null) {
@@ -1541,6 +1542,7 @@ namespace Terminal.Gui {
 				Driver.Move (p.Key.X, p.Key.Y);
 				Driver.AddRune (p.Value);
 			}
+			lc.Clear ();
 
 			// TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
 			if ((ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler) {
@@ -1802,7 +1804,7 @@ namespace Terminal.Gui {
 			_childNeedsDisplay = false;
 		}
 
-		public LineCanvas LineCanvas = new LineCanvas ();
+		public virtual LineCanvas LineCanvas { get; set; } = new LineCanvas ();
 
 		/// <summary>
 		/// Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for
@@ -1839,7 +1841,7 @@ namespace Terminal.Gui {
 			//Driver.SetAttribute (new Attribute(Color.White, Color.Black));
 
 			// If we have a SuperView, it'll draw render our frames.
-			if (!UseSuperViewLineCanvas && LineCanvas.Bounds != Rect.Empty) {
+			if (UseSuperViewLineCanvas && LineCanvas.Bounds != Rect.Empty) {
 				foreach (var p in LineCanvas.GetMap ()) { // Get the entire map
 					Driver.Move (p.Key.X, p.Key.Y);
 					Driver.AddRune (p.Value);
