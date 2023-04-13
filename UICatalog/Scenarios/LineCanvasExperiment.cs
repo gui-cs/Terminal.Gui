@@ -29,8 +29,8 @@ namespace UICatalog.Scenarios {
 				Title = "frame1",
 				X = 0,
 				Y = 0,
-				Width = 70, //Dim.Fill (),
-				Height = 15, //Dim.Fill (),
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
 					     //IgnoreBorderPropertyOnRedraw = true
 
 			};
@@ -56,7 +56,7 @@ namespace UICatalog.Scenarios {
 				AutoSize = false,
 				Title = "view1",
 				Text = "View1 30%/50% Single",
-				X = 0,
+				X = 20,
 				Y = 0,
 				Width = 30, //Dim.Percent (30) - 5,
 				Height = 10, //Dim.Percent (50) - 5,
@@ -128,6 +128,44 @@ namespace UICatalog.Scenarios {
 				Orientation = Orientation.Horizontal
 			};
 			frame1.Add (line);
+
+			var testView = new View () {
+				X = 1,
+				Y = 2,
+				Width = 15,
+				Height = 10,
+				ColorScheme = Colors.Error
+			};
+
+
+			var canvas = new LineCanvas ();
+			// Top
+			canvas.AddLine (new Point (0, 1), 10, Orientation.Horizontal, LineStyle.Double);
+
+			// Bottom
+			canvas.AddLine (new Point (9, 3), -10, Orientation.Horizontal, LineStyle.Double);
+
+			//// Right down
+			//testView.LineCanvas.AddLine (new Point (9, 0), 3, Orientation.Vertical, LineStyle.Single);
+
+			//// Bottom
+			//testView.LineCanvas.AddLine (new Point (9, 3), -10, Orientation.Horizontal, LineStyle.Single);
+
+			//// Left Up
+			//testView.LineCanvas.AddLine (new Point (0, 3), -3, Orientation.Vertical, LineStyle.Single);
+			testView.DrawContentComplete += (s, e) => {
+				testView.Clear ();
+				foreach (var p in canvas.GetMap ()) {
+					testView.AddRune (
+						p.Key.X,
+						p.Key.Y,
+						p.Value);
+				}
+			};
+
+
+
+			frame1.Add (testView);
 		}
 	}
 }

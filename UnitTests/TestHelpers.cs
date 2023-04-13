@@ -10,6 +10,8 @@ using System.Reflection;
 using System.Diagnostics;
 using Rune = System.Rune;
 using Attribute = Terminal.Gui.Attribute;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+using NStack;
 
 
 // This class enables test functions annotated with the [AutoInitShutdown] attribute to 
@@ -79,6 +81,31 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 			Application.Shutdown ();
 			_init = false;
 		}
+	}
+}
+
+
+[AttributeUsage (AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+public class SetupFakeDriverAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
+	/// <summary>
+	/// Enables test functions annotated with the [SetupFakeDriver] attribute to 
+	/// set Application.Driver to new FakeDriver(). 
+	/// </summary>
+	public SetupFakeDriverAttribute ()
+	{
+	}
+
+	public override void Before (MethodInfo methodUnderTest)
+	{
+		Debug.WriteLine ($"Before: {methodUnderTest.Name}");
+		Assert.Null (Application.Driver);
+		Application.Driver = new FakeDriver ();
+	}
+
+	public override void After (MethodInfo methodUnderTest)
+	{
+		Debug.WriteLine ($"After: {methodUnderTest.Name}");
+		Application.Driver = null;
 	}
 }
 
@@ -286,4 +313,42 @@ class TestHelpers {
 		var a = new Attribute (userExpected);
 		return $"{a.Foreground},{a.Background}";
 	}
+
+#pragma warning disable xUnit1013 // Public method should be marked as test
+	/// <summary>
+	/// Verifies two strings are equivalent. If the assert fails, output will be generated to standard 
+	/// output showing the expected and actual look.
+	/// </summary>
+	/// <param name="output"></param>
+	/// <param name="expectedLook"></param>
+	/// <param name="actualLook"></param>
+	public static void AssertEqual (ITestOutputHelper output, string expectedLook, string actualLook)
+	{
+		// If test is about to fail show user what things looked like
+		if (!string.Equals (expectedLook, actualLook)) {
+			output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
+			output?.WriteLine ("But Was:" + Environment.NewLine + actualLook);
+		}
+
+		Assert.Equal (expectedLook, actualLook);
+	}
+
+	/// <summary>
+	/// Verifies two strings are equivalent. If the assert fails, output will be generated to standard 
+	/// output showing the expected and actual look. 
+	/// </summary>
+	/// <param name="output">Uses <see cref="ustring.ToString()"/> on <paramref name="actualLook"/>.</param>
+	/// <param name="expectedLook"></param>
+	/// <param name="actualLook"></param>
+	public static void AssertEqual (ITestOutputHelper output, string expectedLook, ustring actualLook)
+	{
+		// If test is about to fail show user what things looked like
+		if (!string.Equals (expectedLook, actualLook)) {
+			output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
+			output?.WriteLine ("But Was:" + Environment.NewLine + actualLook.ToString ());
+		}
+
+		Assert.Equal (expectedLook, actualLook);
+	}
+#pragma warning restore xUnit1013 // Public method should be marked as test
 }

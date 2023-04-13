@@ -22,7 +22,7 @@ namespace Terminal.Gui.ViewTests {
 			var r = new View ();
 			Assert.NotNull (r);
 			Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);
-			Assert.Equal ("View()({X=0,Y=0,Width=0,Height=0})", r.ToString ());
+			Assert.Equal ("View()((0,0,0,0))", r.ToString ());
 			Assert.False (r.CanFocus);
 			Assert.False (r.HasFocus);
 			Assert.Equal (new Rect (0, 0, 0, 0), r.Bounds);
@@ -46,7 +46,7 @@ namespace Terminal.Gui.ViewTests {
 			r = new View (Rect.Empty);
 			Assert.NotNull (r);
 			Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
-			Assert.Equal ("View()({X=0,Y=0,Width=0,Height=0})", r.ToString ());
+			Assert.Equal ("View()((0,0,0,0))", r.ToString ());
 			Assert.False (r.CanFocus);
 			Assert.False (r.HasFocus);
 			Assert.Equal (new Rect (0, 0, 0, 0), r.Bounds);
@@ -70,7 +70,7 @@ namespace Terminal.Gui.ViewTests {
 			r = new View (new Rect (1, 2, 3, 4));
 			Assert.NotNull (r);
 			Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
-			Assert.Equal ("View()({X=1,Y=2,Width=3,Height=4})", r.ToString ());
+			Assert.Equal ("View()((1,2,3,4))", r.ToString ());
 			Assert.False (r.CanFocus);
 			Assert.False (r.HasFocus);
 			Assert.Equal (new Rect (0, 0, 3, 4), r.Bounds);
@@ -94,7 +94,7 @@ namespace Terminal.Gui.ViewTests {
 			r = new View ("Vertical View", TextDirection.TopBottom_LeftRight);
 			Assert.NotNull (r);
 			Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);
-			Assert.Equal ("View(Vertical View)({X=0,Y=0,Width=1,Height=13})", r.ToString ());
+			Assert.Equal ("View(Vertical View)((0,0,1,13))", r.ToString ());
 			Assert.False (r.CanFocus);
 			Assert.False (r.HasFocus);
 			Assert.Equal (new Rect (0, 0, 1, 13), r.Bounds);

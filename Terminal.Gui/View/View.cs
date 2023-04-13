@@ -1503,7 +1503,7 @@ namespace Terminal.Gui {
 			Driver.Clip = Rect.Intersect (previous, ViewToScreen (region));
 			return previous;
 		}
-		
+
 		/// <summary>
 		/// Draws a frame in the current view, clipped by the boundary of this view
 		/// </summary>
@@ -1518,7 +1518,7 @@ namespace Terminal.Gui {
 			if (clear) {
 				Driver.FillRect (region);
 			}
-			
+
 			var lc = new LineCanvas ();
 			var drawTop = region.Width > 1 && region.Height > 1;
 			var drawLeft = region.Width > 1 && region.Height > 1;
@@ -1526,10 +1526,10 @@ namespace Terminal.Gui {
 			var drawRight = region.Width > 1 && region.Height > 1;
 
 			if (drawTop) {
-				lc.AddLine (screenBounds.Location, Frame.Width, Orientation.Horizontal, BorderStyle);
+				lc.AddLine (screenBounds.Location, screenBounds.Width, Orientation.Horizontal, BorderStyle);
 			}
 			if (drawLeft) {
-				lc.AddLine (screenBounds.Location, Frame.Height, Orientation.Vertical, BorderStyle);
+				lc.AddLine (screenBounds.Location, screenBounds.Height, Orientation.Vertical, BorderStyle);
 			}
 			if (drawBottom) {
 				lc.AddLine (new Point (screenBounds.X, screenBounds.Y + screenBounds.Height - 1), screenBounds.Width, Orientation.Horizontal, BorderStyle);
@@ -1804,6 +1804,14 @@ namespace Terminal.Gui {
 
 		public LineCanvas LineCanvas = new LineCanvas ();
 
+		/// <summary>
+		/// Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for
+		/// rendering any border lines. If <see langword="true"/> the rendering of any borders drawn
+		/// by this Frame will be done by it's parent's SuperView. If <see langword="false"/> (the default)
+		/// this View's <see cref="OnDrawFrames()"/> method will be called to render the borders.
+		/// </summary>
+		public virtual bool UseSuperViewLineCanvas { get; set; } = false;
+
 		// TODO: Make this cancelable
 		/// <summary>
 		/// 
@@ -1819,8 +1827,8 @@ namespace Terminal.Gui {
 			var screenBounds = ViewToScreen (Frame);
 			//if (SuperView != null) {
 			Driver.Clip = new Rect (0, 0, Driver.Cols, Driver.Rows);// screenBounds;// SuperView.ClipToBounds ();
-			//}
-			
+										//}
+
 			// Each of these renders to either this View's LineCanvas or
 			// this View's SuperView.LineCanvas depending on if this View has
 			// a SuperView or not
@@ -1831,7 +1839,7 @@ namespace Terminal.Gui {
 			//Driver.SetAttribute (new Attribute(Color.White, Color.Black));
 
 			// If we have a SuperView, it'll draw render our frames.
-			if (LineCanvas.Canvas != Rect.Empty) {
+			if (!UseSuperViewLineCanvas && LineCanvas.Bounds != Rect.Empty) {
 				foreach (var p in LineCanvas.GetMap ()) { // Get the entire map
 					Driver.Move (p.Key.X, p.Key.Y);
 					Driver.AddRune (p.Value);

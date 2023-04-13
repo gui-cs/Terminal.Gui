@@ -10,7 +10,7 @@ namespace Terminal.Gui {
 	// TODO: v2 - If a Frame has focus, navigation keys (e.g Command.NextView) should cycle through SubViews of the Frame
 	// QUESTION: How does a user navigate out of a Frame to another Frame, or back into the Parent's SubViews?
 
-	
+
 	/// <summary>
 	/// Frames are a special form of <see cref="View"/> that act as adornments; they appear outside of the <see cref="View.Bounds"/>
 	/// enabling borders, menus, etc... 
@@ -58,7 +58,20 @@ namespace Terminal.Gui {
 		/// Does nothing for Frame
 		/// </summary>
 		/// <returns></returns>
-		public override bool OnDrawFrames () => false;  
+		public override bool OnDrawFrames () => false;
+
+		/// <summary>
+		/// Frames only render to their Parent or Parent's SuperView's LineCanvas,
+		/// so this always throws an <see cref="InvalidOperationException"/>.
+		/// </summary>
+		public override bool UseSuperViewLineCanvas {
+			get {
+				throw new NotImplementedException (); 
+			}
+			set {
+				throw new NotImplementedException ();
+			}
+		}
 
 		/// <summary>
 		/// 
@@ -122,8 +135,11 @@ namespace Terminal.Gui {
 			if (Id == "BorderFrame" && BorderStyle != LineStyle.None) {
 				// If View's parent has a SuperView, the border will be rendered with all our View's peers
 				// If not, then it will be rendered just for our View.
-				var lc = Parent?.SuperView?.LineCanvas ?? Parent?.LineCanvas ?? LineCanvas;
-				
+				LineCanvas lc = Parent?.LineCanvas;
+				if (Parent?.UseSuperViewLineCanvas == true) {
+					lc = Parent?.SuperView?.LineCanvas;
+				}
+
 				var drawTop = Thickness.Top > 0 && Frame.Width > 1 && Frame.Height > 1;
 				var drawLeft = Thickness.Left > 0 && (Frame.Height > 1 || Thickness.Top == 0);
 				var drawBottom = Thickness.Bottom > 0 && Frame.Width > 1;
@@ -158,10 +174,13 @@ namespace Terminal.Gui {
 				if (drawRight) {
 					lc.AddLine (new Point (screenBounds.X + screenBounds.Width - 1, screenBounds.Y), screenBounds.Height, Orientation.Vertical, BorderStyle);
 				}
-				//foreach (var p in lc.GenerateImage (screenBounds)) {
-				//	Driver.Move (p.Key.X, p.Key.Y);
-				//	Driver.AddRune (p.Value);
-				//}
+
+				if (Parent?.UseSuperViewLineCanvas == false) {
+					foreach (var p in lc.GetMap ()) {
+						Driver.Move (p.Key.X, p.Key.Y);
+						Driver.AddRune (p.Value);
+					}
+				}
 
 				// TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
 				if ((ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler) {

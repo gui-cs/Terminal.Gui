@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using Rune = System.Rune;
 
 namespace Terminal.Gui {
 
@@ -54,7 +56,6 @@ namespace Terminal.Gui {
 			{IntersectionRuneType.Crosshair,new CrosshairIntersectionRuneResolver()},
 			// TODO: Add other resolvers
 		};
-		private Rect canvas;
 
 		/// <summary>
 		/// <para>
@@ -75,6 +76,7 @@ namespace Terminal.Gui {
 		/// <param name="style">The style of line to use</param>
 		public void AddLine (Point start, int length, Orientation orientation, LineStyle style)
 		{
+			_cachedBounds = Rect.Empty;
 			_lines.Add (new StraightLine (start, length, orientation, style));
 		}
 
@@ -83,34 +85,91 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void Clear ()
 		{
-			_lines.Clear (); 
+			_cachedBounds = Rect.Empty;
+			_lines.Clear ();
 		}
+
+		//private class CustomRectangle {
+		//	public int X { get; set; }
+		//	public int Y { get; set; }
+		//	public int Width { get; set; }
+		//	public int Height { get; set; }
+
+		//	public int Left => Math.Min (X, X + Width);
+		//	public int Right => Math.Max (X, X + Width);
+		//	public int Top => Math.Min (Y, Y + Height);
+		//	public int Bottom => Math.Max (Y, Y + Height);
+
+		//	public CustomRectangle (int x, int y, int width, int height)
+		//	{
+		//		X = x;
+		//		Y = y;
+		//		Width = width;
+		//		Height = height;
+		//	}
+
+		//	public static CustomRectangle Union (CustomRectangle rect1, CustomRectangle rect2)
+		//	{
+		//		int left = Math.Min (rect1.Left, rect2.Left);
+		//		int top = Math.Min (rect1.Top, rect2.Top);
+		//		int right = Math.Max (rect1.Right, rect2.Right);
+		//		int bottom = Math.Max (rect1.Bottom, rect2.Bottom);
+
+		//		return new CustomRectangle (left, top, right - left, bottom - top);
+		//	}
+
+		//	public static Rect Union (Rect rect1, Rect rect2)
+		//	{
+		//		int left = Math.Min (rect1.Left, rect2.Left);
+		//		int top = Math.Min (rect1.Top, rect2.Top);
+		//		int right = Math.Max (rect1.Right, rect2.Right);
+		//		int bottom = Math.Max (rect1.Bottom, rect2.Bottom);
+
+		//		return new Rect (left, top, right - left, bottom - top);
+		//	}
+
+		//	/// <summary>
+		//	///	Formats the Rectangle as a string in (x,y,w,h) notation.
+		//	/// </summary>
+		//	public override string ToString ()
+		//	{
+		//		return $"({X},{Y},{Width},{Height})";
+		//	}
+		//}
+
+		private Rect _cachedBounds;
 
 		/// <summary>
 		/// Gets the rectangle that describes the bounds of the canvas. Location is the coordinates of the 
 		/// line that is furthest left/top and Size is defined by the line that extends the furthest
 		/// right/bottom.
 		/// </summary>
-		public Rect Canvas {
+		public Rect Bounds {
 			get {
-				if (_lines.Count == 0) {
-					return Rect.Empty;
-				}
-				var origin = new Point(_lines.Select (l => l.Start.X).Min (), _lines.Select (l => l.Start.Y).Min ());
-				var maxX = 0;
-				var maxY = 0;
-
-				foreach (var line in _lines) {
-					if (line.Orientation == Orientation.Horizontal) {
-						maxX = Math.Max (maxX, line.Start.X + line.Length);
-					} else {
-						maxY = Math.Max (maxY, line.Start.Y + line.Length);
+				if (_cachedBounds.IsEmpty) {
+					if (_lines.Count == 0) {
+						return _cachedBounds;
 					}
+
+					Rect bounds = _lines [0].Bounds;
+
+					for (var i = 1; i < _lines.Count; i++) {
+						var line = _lines [i];
+						var lineBounds = line.Bounds;
+						bounds = Rect.Union (bounds, lineBounds);
+					}
+
+					if (bounds.Width == 0) {
+						bounds.Width = 1;
+					}
+
+					if (bounds.Height == 0) {
+						bounds.Height = 1;
+					}
+					_cachedBounds = new Rect (bounds.X, bounds.Y, bounds.Width, bounds.Height);
 				}
 
-				var size = new Size (Math.Max (1, maxX - origin.X), Math.Max (1, maxY - origin.Y));
-
-				return new Rect(origin, size);
+				return _cachedBounds;
 			}
 		}
 
@@ -121,9 +180,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="inArea">A rectangle to constrain the search by.</param>
 		/// <returns>A map of the points within the canvas that intersect with <paramref name="inArea"/>.</returns>
-		public Dictionary<Point,Rune> GetMap (Rect inArea)
+		public Dictionary<Point, Rune> GetMap (Rect inArea)
 		{
-			var map = new Dictionary<Point,Rune>();
+			var map = new Dictionary<Point, Rune> ();
 
 			// walk through each pixel of the bitmap
 			for (int y = inArea.Y; y < inArea.Y + inArea.Height; y++) {
@@ -136,9 +195,8 @@ namespace Terminal.Gui {
 
 					var rune = GetRuneForIntersects (Application.Driver, intersects);
 
-					if(rune != null)
-					{
-						map.Add(new Point(x,y),rune.Value);
+					if (rune != null) {
+						map.Add (new Point (x, y), rune.Value);
 					}
 				}
 			}
@@ -152,7 +210,49 @@ namespace Terminal.Gui {
 		/// so that all lines connect up with the appropriate intersection symbols. 
 		/// </summary>
 		/// <returns>A map of all the points within the canvas.</returns>
-		public Dictionary<Point, Rune> GetMap () => GetMap (Canvas);
+		public Dictionary<Point, Rune> GetMap () => GetMap (Bounds);
+
+		/// <summary>
+		/// Returns the contents of the line canvas rendered to a string. The string
+		/// will include all columns and rows, even if <see cref="Bounds"/> has negative coordinates. 
+		/// For example, if the canvas contains a single line that starts at (-1,-1) with a length of 2, the
+		/// rendered string will have a length of 2.
+		/// </summary>
+		/// <returns>The canvas rendered to a string.</returns>
+		public override string ToString ()
+		{
+			if (Bounds.IsEmpty) {
+				return string.Empty;
+			}
+
+			// Generate the rune map for the entire canvas
+			var runeMap = GetMap ();
+
+			// Create the rune canvas
+			Rune [,] canvas = new Rune [Bounds.Height, Bounds.Width];
+
+			// Copy the rune map to the canvas, adjusting for any negative coordinates
+			foreach (var kvp in runeMap) {
+				int x = kvp.Key.X - Bounds.X;
+				int y = kvp.Key.Y - Bounds.Y;
+				canvas [y, x] = kvp.Value;
+			}
+			
+			// Convert the canvas to a string
+			StringBuilder sb = new StringBuilder ();
+			for (int y = 0; y < canvas.GetLength (0); y++) {
+				for (int x = 0; x < canvas.GetLength (1); x++) {
+					Rune r = canvas [y, x];
+					sb.Append (r.Value == 0 ? ' ' : r.ToString ());
+				}
+				if (y < canvas.GetLength (0) - 1) {
+					sb.AppendLine ();
+				}
+			}
+
+			return sb.ToString ();
+		}
+
 
 		private abstract class IntersectionRuneResolver {
 			readonly Rune round;
@@ -447,24 +547,24 @@ namespace Terminal.Gui {
 			return intersects.SetEquals (types);
 		}
 
-		class IntersectionDefinition {
+		internal class IntersectionDefinition {
 			/// <summary>
 			/// The point at which the intersection happens
 			/// </summary>
-			public Point Point { get; }
+			internal Point Point { get; }
 
 			/// <summary>
 			/// Defines how <see cref="Line"/> position relates
 			/// to <see cref="Point"/>.
 			/// </summary>
-			public IntersectionType Type { get; }
+			internal IntersectionType Type { get; }
 
 			/// <summary>
 			/// The line that intersects <see cref="Point"/>
 			/// </summary>
-			public StraightLine Line { get; }
+			internal StraightLine Line { get; }
 
-			public IntersectionDefinition (Point point, IntersectionType type, StraightLine line)
+			internal IntersectionDefinition (Point point, IntersectionType type, StraightLine line)
 			{
 				Point = point;
 				Type = type;
@@ -476,7 +576,7 @@ namespace Terminal.Gui {
 		/// The type of Rune that we will use before considering
 		/// double width, curved borders etc
 		/// </summary>
-		enum IntersectionRuneType {
+		internal enum IntersectionRuneType {
 			None,
 			Dot,
 			ULCorner,
@@ -492,7 +592,7 @@ namespace Terminal.Gui {
 			VLine,
 		}
 
-		enum IntersectionType {
+		internal enum IntersectionType {
 			/// <summary>
 			/// There is no intersection
 			/// </summary>
@@ -536,7 +636,8 @@ namespace Terminal.Gui {
 			Dot
 		}
 
-		class StraightLine {
+		// TODO: Add events that notify when StraightLine changes to enable dynamic layout
+		internal class StraightLine {
 			public Point Start { get; }
 			public int Length { get; }
 			public Orientation Orientation { get; }
@@ -569,7 +670,7 @@ namespace Terminal.Gui {
 
 						return new IntersectionDefinition (
 							Start,
-							GetTypeByLength(IntersectionType.StartLeft, IntersectionType.PassOverHorizontal,IntersectionType.StartRight),
+							GetTypeByLength (IntersectionType.StartLeft, IntersectionType.PassOverHorizontal, IntersectionType.StartRight),
 							this
 							);
 
@@ -609,7 +710,7 @@ namespace Terminal.Gui {
 
 						return new IntersectionDefinition (
 							Start,
-							GetTypeByLength(IntersectionType.StartUp, IntersectionType.PassOverVertical, IntersectionType.StartDown),
+							GetTypeByLength (IntersectionType.StartUp, IntersectionType.PassOverVertical, IntersectionType.StartDown),
 							this
 							);
 
@@ -644,14 +745,14 @@ namespace Terminal.Gui {
 			{
 				if (Length == 0) {
 					return typeWhenZero;
-				} 
+				}
 
 				return Length < 0 ? typeWhenNegative : typeWhenPositive;
 			}
 
 			private bool EndsAt (int x, int y)
 			{
-				var sub = (Length == 0) ? 0 : 1;
+				var sub = (Length == 0) ? 0 : (Length > 0) ? 1 : -1;
 				if (Orientation == Orientation.Horizontal) {
 					return Start.X + Length - sub == x && Start.Y == y;
 				}
@@ -663,6 +764,37 @@ namespace Terminal.Gui {
 			{
 				return Start.X == x && Start.Y == y;
 			}
+
+			/// <summary>
+			/// Gets the rectangle that describes the bounds of the canvas. Location is the coordinates of the 
+			/// line that is furthest left/top and Size is defined by the line that extends the furthest
+			/// right/bottom.
+			/// </summary>
+			internal Rect Bounds {
+				get {
+
+					// 0 and 1/-1 Length means a size (width or height) of 1
+					var size = Math.Max (1, Math.Abs (Length));
+
+					// How much to offset x or y to get the start of the line
+					var offset = Math.Abs (Length < 0 ? Length + 1 : 0);
+					var x = Start.X - (Orientation == Orientation.Horizontal ? offset : 0);
+					var y = Start.Y - (Orientation == Orientation.Vertical ? offset : 0);
+					var width = Orientation == Orientation.Horizontal ? size : 1;
+					var height = Orientation == Orientation.Vertical ? size : 1;
+
+					return new Rect (x, y, width, height);
+				}
+			}
+
+			/// <summary>
+			/// Formats the Line as a string in (Start.X,Start.Y,Length,Orientation) notation.
+			/// </summary>
+			public override string ToString ()
+			{
+				return $"({Start.X},{Start.Y},{Length},{Orientation})";
+			}
+
 		}
 	}
 }

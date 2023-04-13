@@ -536,6 +536,7 @@ namespace Terminal.Gui {
 		{
 		}
 
+		// BUGBUG: Why not use Redraw??
 		// Draws the Menu, within the Frame
 		private void Current_DrawContentComplete (object sender, DrawEventArgs e)
 		{
@@ -692,7 +693,7 @@ namespace Terminal.Gui {
 		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
 			// To ncurses simulate a AltMask key pressing Alt+Space because
-			// it can�t detect an alone special key down was pressed.
+			// it can't detect an alone special key down was pressed.
 			if (keyEvent.IsAlt && keyEvent.Key == Key.AltMask) {
 				OnKeyDown (keyEvent);
 				return true;
