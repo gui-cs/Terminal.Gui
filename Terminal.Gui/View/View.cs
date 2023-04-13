@@ -476,8 +476,8 @@ namespace Terminal.Gui {
 			set {
 				_frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
 				if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
-					TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
 					LayoutFrames ();
+					TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
 					SetNeedsLayout ();
 					SetNeedsDisplay ();
 				}
@@ -676,7 +676,6 @@ namespace Terminal.Gui {
 						value.Size.Height + Margin.Thickness.Vertical + BorderFrame.Thickness.Vertical + Padding.Thickness.Vertical
 						)
 					);
-				;
 			}
 		}
 
@@ -869,8 +868,8 @@ namespace Terminal.Gui {
 		/// will not fit.</returns>
 		public bool SetMinWidthHeight ()
 		{
-			if (IsInitialized && GetMinimumBounds (out Size size)) {
-				Bounds = new Rect (Bounds.Location, size);
+			if (GetMinimumBounds (out Size size)) {
+				_frame = new Rect (_frame.Location, size);
 				return true;
 			}
 			return false;
@@ -1006,8 +1005,7 @@ namespace Terminal.Gui {
 
 			Text = text == null ? ustring.Empty : text;
 			LayoutStyle = layoutStyle;
-			var r = rect.IsEmpty ? TextFormatter.CalcRect (0, 0, text, direction) : rect;
-			Frame = r;
+			Frame = rect.IsEmpty ? TextFormatter.CalcRect (0, 0, text, direction) : rect;
 			OnResizeNeeded ();
 
 			CreateFrames ();
@@ -1050,15 +1048,14 @@ namespace Terminal.Gui {
 				var w = _width is Dim.DimAbsolute ? _width.Anchor (0) : _frame.Width;
 				var h = _height is Dim.DimAbsolute ? _height.Anchor (0) : _frame.Height;
 				// BUGBUG: v2 - ? - If layoutstyle is absolute, this overwrites the current frame h/w with 0. Hmmm...
+				// This is needed for DimAbsolute values by setting the frame before LayoutSubViews.
 				_frame = new Rect (new Point (actX, actY), new Size (w, h)); // Set frame, not Frame!
-
-
 			}
 			//// BUGBUG: I think these calls are redundant or should be moved into just the AutoSize case
 			if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
-				TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
-				LayoutFrames ();
 				SetMinWidthHeight ();
+				LayoutFrames ();
+				TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
 				SetNeedsLayout ();
 				SetNeedsDisplay ();
 			}
@@ -1639,6 +1636,7 @@ namespace Terminal.Gui {
 		{
 			var view = e.Child;
 			view.IsAdded = true;
+			view.OnResizeNeeded ();
 			view._x ??= view._frame.X;
 			view._y ??= view._frame.Y;
 			view._width ??= view._frame.Width;
@@ -2705,6 +2703,7 @@ namespace Terminal.Gui {
 			if (Margin == null) return; // CreateFrames() has not been called yet
 
 			if (Margin.Frame.Size != Frame.Size) {
+				Margin._frame = new Rect (Point.Empty, Frame.Size);
 				Margin.X = 0;
 				Margin.Y = 0;
 				Margin.Width = Frame.Size.Width;
@@ -2716,6 +2715,7 @@ namespace Terminal.Gui {
 
 			var border = Margin.Thickness.GetInside (Margin.Frame);
 			if (border != BorderFrame.Frame) {
+				BorderFrame._frame = new Rect (new Point (border.Location.X, border.Location.Y), border.Size);
 				BorderFrame.X = border.Location.X;
 				BorderFrame.Y = border.Location.Y;
 				BorderFrame.Width = border.Size.Width;
@@ -2727,6 +2727,7 @@ namespace Terminal.Gui {
 
 			var padding = BorderFrame.Thickness.GetInside (BorderFrame.Frame);
 			if (padding != Padding.Frame) {
+				Padding._frame = new Rect (new Point (padding.Location.X, padding.Location.Y), padding.Size);
 				Padding.X = padding.Location.X;
 				Padding.Y = padding.Location.Y;
 				Padding.Width = padding.Size.Width;
@@ -2815,16 +2816,10 @@ namespace Terminal.Gui {
 			get => _text;
 			set {
 				_text = value;
-				if (IsInitialized) {
-					SetHotKey ();
-					UpdateTextFormatterText ();
-					//TextFormatter.Format ();
-					OnResizeNeeded ();
-				}
-
-				// BUGBUG: v2 - This is here as a HACK until we fix the unit tests to not check a view's dims until
-				// after it's been initialized. See #2450
+				SetHotKey ();
 				UpdateTextFormatterText ();
+				//TextFormatter.Format ();
+				OnResizeNeeded ();
 
 #if DEBUG
 				if (_text != null && string.IsNullOrEmpty (Id)) {
@@ -2909,11 +2904,8 @@ namespace Terminal.Gui {
 		public virtual TextDirection TextDirection {
 			get => TextFormatter.Direction;
 			set {
-				if (!IsInitialized) {
-					TextFormatter.Direction = value;
-				} else {
-					UpdateTextDirection (value);
-				}
+				UpdateTextDirection (value);
+				TextFormatter.Direction = value;
 			}
 		}
 
@@ -3306,6 +3298,7 @@ namespace Terminal.Gui {
 			Margin?.Dispose ();
 			Margin = null;
 			BorderFrame?.Dispose ();
+			BorderFrame = null;
 			Padding?.Dispose ();
 			Padding = null;
 
@@ -3348,7 +3341,6 @@ namespace Terminal.Gui {
 
 				// TODO: Figure out why ScrollView and other tests fail if this call is put here 
 				// instead of the constructor.
-				OnResizeNeeded ();
 				//InitializeFrames ();
 
 			} else {
@@ -3371,6 +3363,7 @@ namespace Terminal.Gui {
 		public void EndInit ()
 		{
 			IsInitialized = true;
+			OnResizeNeeded ();
 			if (_subviews != null) {
 				foreach (var view in _subviews) {
 					if (!view.IsInitialized) {
