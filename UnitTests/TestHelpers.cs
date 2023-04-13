@@ -12,6 +12,7 @@ using Rune = System.Rune;
 using Attribute = Terminal.Gui.Attribute;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using NStack;
+using Xunit.Sdk;
 
 
 // This class enables test functions annotated with the [AutoInitShutdown] attribute to 
@@ -320,10 +321,14 @@ class TestHelpers {
 	/// output showing the expected and actual look.
 	/// </summary>
 	/// <param name="output"></param>
-	/// <param name="expectedLook"></param>
+	/// <param name="expectedLook">A string containing the expected look. Newlines should be specified as "\r\n" as
+	/// they will be converted to <see cref="Environment.NewLine"/> to make tests platform independent.</param>
 	/// <param name="actualLook"></param>
 	public static void AssertEqual (ITestOutputHelper output, string expectedLook, string actualLook)
 	{
+		// Convert newlines to platform-specific newlines
+		expectedLook = expectedLook.Replace ("\r\n", Environment.NewLine);
+		
 		// If test is about to fail show user what things looked like
 		if (!string.Equals (expectedLook, actualLook)) {
 			output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
@@ -338,10 +343,14 @@ class TestHelpers {
 	/// output showing the expected and actual look. 
 	/// </summary>
 	/// <param name="output">Uses <see cref="ustring.ToString()"/> on <paramref name="actualLook"/>.</param>
-	/// <param name="expectedLook"></param>
+	/// <param name="expectedLook">A string containing the expected look. Newlines should be specified as "\r\n" as
+	/// they will be converted to <see cref="Environment.NewLine"/> to make tests platform independent.</param>
 	/// <param name="actualLook"></param>
 	public static void AssertEqual (ITestOutputHelper output, string expectedLook, ustring actualLook)
 	{
+		// Convert newlines to platform-specific newlines
+		expectedLook = expectedLook.Replace ("\r\n", Environment.NewLine);
+
 		// If test is about to fail show user what things looked like
 		if (!string.Equals (expectedLook, actualLook)) {
 			output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);

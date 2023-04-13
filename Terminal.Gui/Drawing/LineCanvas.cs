@@ -595,7 +595,7 @@ namespace Terminal.Gui {
 			public Orientation Orientation { get; }
 			public LineStyle Style { get; }
 
-			public StraightLine (Point start, int length, Orientation orientation, LineStyle style)
+			internal StraightLine (Point start, int length, Orientation orientation, LineStyle style)
 			{
 				this.Start = start;
 				this.Length = length;

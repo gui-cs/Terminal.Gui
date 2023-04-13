@@ -158,7 +158,7 @@ namespace Terminal.Gui.DrawingTests {
 		[InlineData (1, 0, 4, 0, "══════")]
 		[InlineData (1, 0, 5, 0, "═══ ═══")]
 
-		[InlineData (0, 0, 0, 1, "═══\r\n═══")]
+		[InlineData (0, 0, 0, 1, $"═══\r\n═══")]
 		[InlineData (0, 0, 1, 1, "═══ \r\n ═══")]
 		[InlineData (0, 0, 2, 1, "═══  \r\n  ═══")]
 
@@ -251,7 +251,7 @@ namespace Terminal.Gui.DrawingTests {
 		{
 			var canvas = new LineCanvas ();
 			// Add a line at 5, 5 that's has length of 1
-			canvas.AddLine (new Point (5, 5), 1, orientation, LineStyle.Single);
+			canvas.AddLine (new Point (x, y), 1, orientation, LineStyle.Single);
 			TestHelpers.AssertEqual (output, $"{expected}", $"{canvas}");
 		}
 
@@ -660,7 +660,7 @@ namespace Terminal.Gui.DrawingTests {
 @"
 ┌─
 │ ";
-			Assert.Equal (looksLike, $"{Environment.NewLine}{canvas}");
+			TestHelpers.AssertEqual (output, looksLike, $"{Environment.NewLine}{canvas}");
 		}
 
 		[Fact, SetupFakeDriver]
@@ -676,7 +676,7 @@ namespace Terminal.Gui.DrawingTests {
 @"
 ┌─
 │ ";
-			Assert.Equal (looksLike, $"{Environment.NewLine}{canvas}");
+			TestHelpers.AssertEqual (output, looksLike, $"{Environment.NewLine}{canvas}");
 		}
 		
 //		[Fact, SetupFakeDriver]
