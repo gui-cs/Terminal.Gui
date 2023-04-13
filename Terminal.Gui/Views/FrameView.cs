@@ -49,10 +49,10 @@ namespace Terminal.Gui {
 		void SetInitialProperties (Rect frame, ustring title, View [] views = null)
 		{
 			this.Title = title;
-			BorderFrame.Thickness = new Thickness (1);
-			BorderFrame.BorderStyle = DefaultBorderStyle;
-			//BorderFrame.ColorScheme = ColorScheme;
-			BorderFrame.Data = "BorderFrame";
+			Border.Thickness = new Thickness (1);
+			Border.BorderStyle = DefaultBorderStyle;
+			//Border.ColorScheme = ColorScheme;
+			Border.Data = "Border";
 		}
 
 

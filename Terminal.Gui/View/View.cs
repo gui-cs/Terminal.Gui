@@ -490,7 +490,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Frame Margin { get; private set; }
 
-		// TODO: Rename BorderFrame to Border
 		/// <summary>
 		///  Thickness where a visual border (drawn using line-drawing glyphs) and the Title are drawn. 
 		///  The Border expands inward; in other words if `Border.Thickness.Top == 2` the border and 
@@ -500,7 +499,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// <see cref="BorderStyle"/> provides a simple helper for turning a simple border frame on or off.
 		/// </remarks>
-		public Frame BorderFrame { get; private set; }
+		public Frame Border { get; private set; }
 
 		/// <summary>
 		/// Means the Thickness inside of an element that offsets the `Content` from the Border. 
@@ -512,21 +511,21 @@ namespace Terminal.Gui {
 		public Frame Padding { get; private set; }
 
 		/// <summary>
-		/// Helper to get the total thickness of the <see cref="Margin"/>, <see cref="BorderFrame"/>, and <see cref="Padding"/>. 
+		/// Helper to get the total thickness of the <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>. 
 		/// </summary>
 		/// <returns>A thickness that describes the sum of the Frames' thicknesses.</returns>
 		public Thickness GetFramesThickness ()
 		{
-			var left = Margin.Thickness.Left + BorderFrame.Thickness.Left + Padding.Thickness.Left;
-			var top = Margin.Thickness.Top + BorderFrame.Thickness.Top + Padding.Thickness.Top;
-			var right = Margin.Thickness.Right + BorderFrame.Thickness.Right + Padding.Thickness.Right;
-			var bottom = Margin.Thickness.Bottom + BorderFrame.Thickness.Bottom + Padding.Thickness.Bottom;
+			var left = Margin.Thickness.Left + Border.Thickness.Left + Padding.Thickness.Left;
+			var top = Margin.Thickness.Top + Border.Thickness.Top + Padding.Thickness.Top;
+			var right = Margin.Thickness.Right + Border.Thickness.Right + Padding.Thickness.Right;
+			var bottom = Margin.Thickness.Bottom + Border.Thickness.Bottom + Padding.Thickness.Bottom;
 			return new Thickness (left, top, right, bottom);
 		}
 
 		/// <summary>
 		/// Helper to get the X and Y offset of the Bounds from the Frame. This is the sum of the Left and Top properties of
-		/// <see cref="Margin"/>, <see cref="BorderFrame"/> and <see cref="Padding"/>.
+		/// <see cref="Margin"/>, <see cref="Border"/> and <see cref="Padding"/>.
 		/// </summary>
 		public Point GetBoundsOffset () => new Point (Padding?.Thickness.GetInside (Padding.Frame).X ?? 0, Padding?.Thickness.GetInside (Padding.Frame).Y ?? 0);
 
@@ -550,13 +549,13 @@ namespace Terminal.Gui {
 			Margin.ThicknessChanged += ThicknessChangedHandler;
 			Margin.Parent = this;
 
-			if (BorderFrame != null) {
-				BorderFrame.ThicknessChanged -= ThicknessChangedHandler;
-				BorderFrame.Dispose ();
+			if (Border != null) {
+				Border.ThicknessChanged -= ThicknessChangedHandler;
+				Border.Dispose ();
 			}
-			BorderFrame = new Frame () { Id = "BorderFrame", Thickness = new Thickness (0) };
-			BorderFrame.ThicknessChanged += ThicknessChangedHandler;
-			BorderFrame.Parent = this;
+			Border = new Frame () { Id = "Border", Thickness = new Thickness (0) };
+			Border.ThicknessChanged += ThicknessChangedHandler;
+			Border.Parent = this;
 
 			// TODO: Create View.AddAdornment
 
@@ -572,7 +571,7 @@ namespace Terminal.Gui {
 		ustring _title = ustring.Empty;
 
 		/// <summary>
-		/// The title to be displayed for this <see cref="View"/>. The title will be displayed if <see cref="BorderFrame"/>.<see cref="Thickness.Top"/>
+		/// The title to be displayed for this <see cref="View"/>. The title will be displayed if <see cref="Border"/>.<see cref="Thickness.Top"/>
 		/// is greater than 0.
 		/// </summary>
 		/// <value>The title.</value>
@@ -673,8 +672,8 @@ namespace Terminal.Gui {
 				// BUGBUG: Margin etc.. can be null (if typeof(Frame))
 				Frame = new Rect (Frame.Location,
 					new Size (
-						value.Size.Width + Margin.Thickness.Horizontal + BorderFrame.Thickness.Horizontal + Padding.Thickness.Horizontal,
-						value.Size.Height + Margin.Thickness.Vertical + BorderFrame.Thickness.Vertical + Padding.Thickness.Vertical
+						value.Size.Width + Margin.Thickness.Horizontal + Border.Thickness.Horizontal + Padding.Thickness.Horizontal,
+						value.Size.Height + Margin.Thickness.Vertical + Border.Thickness.Vertical + Padding.Thickness.Vertical
 						)
 					);
 				;
@@ -1506,73 +1505,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Draws a frame in the current view, clipped by the boundary of this view
-		/// </summary>
-		/// <param name="region">View-relative region for the frame to be drawn.</param>
-		/// <param name="clear">If set to <see langword="true"/> it clear the region.</param>
-		[ObsoleteAttribute ("This method is obsolete in v2. Use use LineCanvas or Frame instead.", false)]
-		public void DrawFrame (Rect region, bool clear)
-		{
-			var savedClip = ClipToBounds ();
-			var screenBounds = ViewToScreen (region);
-
-			if (clear) {
-				Driver.FillRect (region);
-			}
-
-			var lc = new LineCanvas ();
-			var drawTop = region.Width > 1 && region.Height > 1;
-			var drawLeft = region.Width > 1 && region.Height > 1;
-			var drawBottom = region.Width > 1 && region.Height > 1;
-			var drawRight = region.Width > 1 && region.Height > 1;
-
-			if (drawTop) {
-				lc.AddLine (screenBounds.Location, screenBounds.Width, Orientation.Horizontal, BorderStyle);
-			}
-			if (drawLeft) {
-				lc.AddLine (screenBounds.Location, screenBounds.Height, Orientation.Vertical, BorderStyle);
-			}
-			if (drawBottom) {
-				lc.AddLine (new Point (screenBounds.X, screenBounds.Y + screenBounds.Height - 1), screenBounds.Width, Orientation.Horizontal, BorderStyle);
-			}
-			if (drawRight) {
-				lc.AddLine (new Point (screenBounds.X + screenBounds.Width - 1, screenBounds.Y), screenBounds.Height, Orientation.Vertical, BorderStyle);
-			}
-			foreach (var p in lc.GetMap ()) {
-				Driver.Move (p.Key.X, p.Key.Y);
-				Driver.AddRune (p.Value);
-			}
-			lc.Clear ();
-
-			// TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
-			if ((ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler) {
-				// Top
-				var hruler = new Ruler () { Length = screenBounds.Width, Orientation = Orientation.Horizontal };
-				if (drawTop) {
-					hruler.Draw (new Point (screenBounds.X, screenBounds.Y));
-				}
-
-				//Left
-				var vruler = new Ruler () { Length = screenBounds.Height - 2, Orientation = Orientation.Vertical };
-				if (drawLeft) {
-					vruler.Draw (new Point (screenBounds.X, screenBounds.Y + 1), 1);
-				}
-
-				// Bottom
-				if (drawBottom) {
-					hruler.Draw (new Point (screenBounds.X, screenBounds.Y + screenBounds.Height - 1));
-				}
-
-				// Right
-				if (drawRight) {
-					vruler.Draw (new Point (screenBounds.X + screenBounds.Width - 1, screenBounds.Y + 1), 1);
-				}
-			}
-
-			Driver.Clip = savedClip;
-		}
-
-		/// <summary>
 		/// Utility function to draw strings that contain a hotkey.
 		/// </summary>
 		/// <param name="text">String to display, the hotkey specifier before a letter flags the next letter as the hotkey.</param>
@@ -1804,6 +1736,10 @@ namespace Terminal.Gui {
 			_childNeedsDisplay = false;
 		}
 
+		/// <summary>
+		/// The canvas that any line drawing that is to be shared by subviews of this view should add lines to.
+		/// </summary>
+		/// <remarks><see cref="Border"/> adds border lines to this LineCanvas.</remarks>
 		public virtual LineCanvas LineCanvas { get; set; } = new LineCanvas ();
 
 		/// <summary>
@@ -1835,7 +1771,7 @@ namespace Terminal.Gui {
 			// this View's SuperView.LineCanvas depending on if this View has
 			// a SuperView or not
 			Margin?.Redraw (Margin.Frame);
-			BorderFrame?.Redraw (BorderFrame.Frame);
+			Border?.Redraw (Border.Frame);
 			Padding?.Redraw (Padding.Frame);
 
 			//Driver.SetAttribute (new Attribute(Color.White, Color.Black));
@@ -2797,17 +2733,17 @@ namespace Terminal.Gui {
 			}
 
 			var border = Margin.Thickness.GetInside (Margin.Frame);
-			if (border != BorderFrame.Frame) {
-				BorderFrame.X = border.Location.X;
-				BorderFrame.Y = border.Location.Y;
-				BorderFrame.Width = border.Size.Width;
-				BorderFrame.Height = border.Size.Height;
-				BorderFrame.SetNeedsLayout ();
-				BorderFrame.LayoutSubviews ();
-				BorderFrame.SetNeedsDisplay ();
+			if (border != Border.Frame) {
+				Border.X = border.Location.X;
+				Border.Y = border.Location.Y;
+				Border.Width = border.Size.Width;
+				Border.Height = border.Size.Height;
+				Border.SetNeedsLayout ();
+				Border.LayoutSubviews ();
+				Border.SetNeedsDisplay ();
 			}
 
-			var padding = BorderFrame.Thickness.GetInside (BorderFrame.Frame);
+			var padding = Border.Thickness.GetInside (Border.Frame);
 			if (padding != Padding.Frame) {
 				Padding.X = padding.Location.X;
 				Padding.Y = padding.Location.Y;
@@ -3106,32 +3042,32 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>
 		/// <para>
-		/// This is a helper for manipulating the view's <see cref="BorderFrame"/>. Setting this property to any value other than
-		/// <see cref="LineStyle.None"/> is equivalent to setting <see cref="BorderFrame"/>'s <see cref="Frame.Thickness"/> 
+		/// This is a helper for manipulating the view's <see cref="Border"/>. Setting this property to any value other than
+		/// <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s <see cref="Frame.Thickness"/> 
 		/// to `1` and <see cref="BorderStyle"/> to the value. 
 		/// </para>
 		/// <para>
-		/// Setting this property to <see cref="LineStyle.None"/> is equivalent to setting <see cref="BorderFrame"/>'s <see cref="Frame.Thickness"/> 
+		/// Setting this property to <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s <see cref="Frame.Thickness"/> 
 		/// to `0` and <see cref="BorderStyle"/> to <see cref="LineStyle.None"/>. 
 		/// </para>
 		/// <para>
-		/// For more advanced customization of the view's border, manipulate see <see cref="BorderFrame"/> directly.
+		/// For more advanced customization of the view's border, manipulate see <see cref="Border"/> directly.
 		/// </para>
 		/// </remarks>
 		public LineStyle BorderStyle {
 			get {
-				return BorderFrame?.BorderStyle ?? LineStyle.None;
+				return Border?.BorderStyle ?? LineStyle.None;
 			}
 			set {
-				if (BorderFrame == null) {
-					throw new InvalidOperationException ("BorderFrame is null; this is likely a bug.");
+				if (Border == null) {
+					throw new InvalidOperationException ("Border is null; this is likely a bug.");
 				}
 				if (value != LineStyle.None) {
-					BorderFrame.Thickness = new Thickness (1);
+					Border.Thickness = new Thickness (1);
 				} else {
-					BorderFrame.Thickness = new Thickness (0);
+					Border.Thickness = new Thickness (0);
 				}
-				BorderFrame.BorderStyle = value;
+				Border.BorderStyle = value;
 				LayoutFrames ();
 				SetNeedsLayout ();
 			}
@@ -3211,8 +3147,8 @@ namespace Terminal.Gui {
 		public Size GetAutoSize ()
 		{
 			var rect = TextFormatter.CalcRect (Bounds.X, Bounds.Y, TextFormatter.Text, TextFormatter.Direction);
-			var newWidth = rect.Size.Width - GetHotKeySpecifierLength () + Margin.Thickness.Horizontal + BorderFrame.Thickness.Horizontal + Padding.Thickness.Horizontal;
-			var newHeight = rect.Size.Height - GetHotKeySpecifierLength (false) + Margin.Thickness.Vertical + BorderFrame.Thickness.Vertical + Padding.Thickness.Vertical;
+			var newWidth = rect.Size.Width - GetHotKeySpecifierLength () + Margin.Thickness.Horizontal + Border.Thickness.Horizontal + Padding.Thickness.Horizontal;
+			var newHeight = rect.Size.Height - GetHotKeySpecifierLength (false) + Margin.Thickness.Vertical + Border.Thickness.Vertical + Padding.Thickness.Vertical;
 			return new Size (newWidth, newHeight);
 		}
 
@@ -3387,7 +3323,7 @@ namespace Terminal.Gui {
 		{
 			Margin?.Dispose ();
 			Margin = null;
-			BorderFrame?.Dispose ();
+			Border?.Dispose ();
 			Padding?.Dispose ();
 			Padding = null;
 

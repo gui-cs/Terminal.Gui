@@ -718,120 +718,21 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (top2, v2.GetTopSuperView ());
 		}
 
-
-		[Fact, AutoInitShutdown]
-		public void DrawFrame_With_Positive_Positions ()
-		{
-			var view = new View (new Rect (0, 0, 8, 4));
-
-			view.DrawContent += (s, e) => view.DrawFrame (view.Bounds, true);
-
-			Assert.Equal (Point.Empty, new Point (view.Frame.X, view.Frame.Y));
-			Assert.Equal (new Size (8, 4), new Size (view.Frame.Width, view.Frame.Height));
-
-			Application.Top.Add (view);
-			Application.Begin (Application.Top);
-
-			var expected = @"
-┌──────┐
-│      │
-│      │
-└──────┘
-";
-
-			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (0, 0, 8, 4), pos);
-		}
-
-		[Fact, AutoInitShutdown]
-		public void DrawFrame_With_Minimum_Size ()
-		{
-			var view = new View (new Rect (0, 0, 2, 2));
-
-			view.DrawContent += (s, e) => view.DrawFrame (view.Bounds, true);
-
-			Assert.Equal (Point.Empty, new Point (view.Frame.X, view.Frame.Y));
-			Assert.Equal (new Size (2, 2), new Size (view.Frame.Width, view.Frame.Height));
-
-			Application.Top.Add (view);
-			Application.Begin (Application.Top);
-
-			var expected = @"
-┌┐
-└┘
-";
-
-			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (0, 0, 2, 2), pos);
-		}
-
-		[Fact, AutoInitShutdown]
-		public void DrawFrame_With_Negative_Positions ()
-		{
-			var view = new View (new Rect (-1, 0, 8, 4));
-
-			view.DrawContent += (s, e) => view.DrawFrame (view.Bounds, true);
-
-			Assert.Equal (new Point (-1, 0), new Point (view.Frame.X, view.Frame.Y));
-			Assert.Equal (new Size (8, 4), new Size (view.Frame.Width, view.Frame.Height));
-
-			Application.Top.Add (view);
-			Application.Begin (Application.Top);
-
-			var expected = @"
-──────┐
-      │
-      │
-──────┘
-";
-
-			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (0, 0, 7, 4), pos);
-
-			view.Frame = new Rect (-1, -1, 8, 4);
-			Application.Refresh ();
-
-			expected = @"
-      │
-      │
-──────┘
-";
-
-			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (6, 0, 7, 3), pos);
-
-			view.Frame = new Rect (0, 0, 8, 4);
-			((FakeDriver)Application.Driver).SetBufferSize (7, 4);
-
-			expected = @"
-┌──────
-│      
-│      
-└──────
-";
-
-			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (0, 0, 7, 4), pos);
-
-			view.Frame = new Rect (0, 0, 8, 4);
-			((FakeDriver)Application.Driver).SetBufferSize (7, 3);
-		}
-
+		
 
 		[Fact, AutoInitShutdown]
 		public void Clear_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
 		{
-			var view = new View () {
+			var view = new FrameView () {
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			};
 			view.DrawContent += (s, e) => {
-				view.DrawFrame (view.Bounds, true);
 				var savedClip = Application.Driver.Clip;
-				Application.Driver.Clip = new Rect (1, 1, view.Bounds.Width - 2, view.Bounds.Height - 2);
-				for (int row = 0; row < view.Bounds.Height - 2; row++) {
+				Application.Driver.Clip = new Rect (1, 1, view.Bounds.Width, view.Bounds.Height);
+				for (int row = 0; row < view.Bounds.Height; row++) {
 					Application.Driver.Move (1, row + 1);
-					for (int col = 0; col < view.Bounds.Width - 2; col++) {
+					for (int col = 0; col < view.Bounds.Width; col++) {
 						Application.Driver.AddStr ($"{col}");
 					}
 				}
@@ -857,7 +758,7 @@ namespace Terminal.Gui.ViewTests {
 			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 20, 10), pos);
 
-			view.Clear ();
+			view.Clear (view.Frame);
 
 			expected = @"
 ";
@@ -869,17 +770,16 @@ namespace Terminal.Gui.ViewTests {
 		[Fact, AutoInitShutdown]
 		public void Clear_Bounds_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
 		{
-			var view = new View () {
+			var view = new FrameView () {
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			};
 			view.DrawContent += (s, e) => {
-				view.DrawFrame (view.Bounds, true);
 				var savedClip = Application.Driver.Clip;
-				Application.Driver.Clip = new Rect (1, 1, view.Bounds.Width - 2, view.Bounds.Height - 2);
-				for (int row = 0; row < view.Bounds.Height - 2; row++) {
+				Application.Driver.Clip = new Rect (1, 1, view.Bounds.Width, view.Bounds.Height);
+				for (int row = 0; row < view.Bounds.Height; row++) {
 					Application.Driver.Move (1, row + 1);
-					for (int col = 0; col < view.Bounds.Width - 2; col++) {
+					for (int col = 0; col < view.Bounds.Width; col++) {
 						Application.Driver.AddStr ($"{col}");
 					}
 				}
@@ -905,7 +805,7 @@ namespace Terminal.Gui.ViewTests {
 			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 20, 10), pos);
 
-			view.Clear (view.Bounds);
+			view.Clear (view.Frame);
 
 			expected = @"
 ";

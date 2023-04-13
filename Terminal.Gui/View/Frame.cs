@@ -59,7 +59,7 @@ namespace Terminal.Gui {
 		/// Frames only render to their Parent or Parent's SuperView's LineCanvas,
 		/// so this always throws an <see cref="InvalidOperationException"/>.
 		/// </summary>
-		public virtual LineCanvas LineCanvas {
+		public override LineCanvas LineCanvas {
 			get {
 				throw new NotImplementedException ();
 			}
@@ -139,14 +139,14 @@ namespace Terminal.Gui {
 
 			// TODO: v2 - this will eventually be two controls: "BorderView" and "Label" (for the title)
 
-			if (Id == "BorderFrame" && Thickness.Top > 0 && Frame.Width > 1 && !ustring.IsNullOrEmpty (Parent?.Title)) {
+			if (Id == "Border" && Thickness.Top > 0 && Frame.Width > 1 && !ustring.IsNullOrEmpty (Parent?.Title)) {
 				var prevAttr = Driver.GetAttribute ();
 				Driver.SetAttribute (Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetNormalColor ());
 				DrawTitle (screenBounds, Parent?.Title);
 				Driver.SetAttribute (prevAttr);
 			}
 
-			if (Id == "BorderFrame" && BorderStyle != LineStyle.None) {
+			if (Id == "Border" && BorderStyle != LineStyle.None) {
 				// If View's parent has a SuperView, the border will be rendered with all our View's peers
 				// If not, then it will be rendered just for our View.
 				LineCanvas lc = Parent?.LineCanvas;
@@ -206,7 +206,7 @@ namespace Terminal.Gui {
 					}
 
 					// Redraw title 
-					if (drawTop && Id == "BorderFrame" && !ustring.IsNullOrEmpty (Parent?.Title)) {
+					if (drawTop && Id == "Border" && !ustring.IsNullOrEmpty (Parent?.Title)) {
 						var prevAttr = Driver.GetAttribute ();
 						Driver.SetAttribute (Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetNormalColor ());
 						DrawTitle (screenBounds, Parent?.Title);
@@ -300,5 +300,73 @@ namespace Terminal.Gui {
 				Driver.AddStr (str);
 			}
 		}
+
+		/// <summary>
+		/// Draws a frame in the current view, clipped by the boundary of this view
+		/// </summary>
+		/// <param name="region">View-relative region for the frame to be drawn.</param>
+		/// <param name="clear">If set to <see langword="true"/> it clear the region.</param>
+		[ObsoleteAttribute ("This method is obsolete in v2. Use use LineCanvas or Frame instead.", false)]
+		public void DrawFrame (Rect region, bool clear)
+		{
+			var savedClip = ClipToBounds ();
+			var screenBounds = ViewToScreen (region);
+
+			if (clear) {
+				Driver.FillRect (region);
+			}
+
+			var lc = new LineCanvas ();
+			var drawTop = region.Width > 1 && region.Height > 1;
+			var drawLeft = region.Width > 1 && region.Height > 1;
+			var drawBottom = region.Width > 1 && region.Height > 1;
+			var drawRight = region.Width > 1 && region.Height > 1;
+
+			if (drawTop) {
+				lc.AddLine (screenBounds.Location, screenBounds.Width, Orientation.Horizontal, BorderStyle);
+			}
+			if (drawLeft) {
+				lc.AddLine (screenBounds.Location, screenBounds.Height, Orientation.Vertical, BorderStyle);
+			}
+			if (drawBottom) {
+				lc.AddLine (new Point (screenBounds.X, screenBounds.Y + screenBounds.Height - 1), screenBounds.Width, Orientation.Horizontal, BorderStyle);
+			}
+			if (drawRight) {
+				lc.AddLine (new Point (screenBounds.X + screenBounds.Width - 1, screenBounds.Y), screenBounds.Height, Orientation.Vertical, BorderStyle);
+			}
+			foreach (var p in lc.GetMap ()) {
+				Driver.Move (p.Key.X, p.Key.Y);
+				Driver.AddRune (p.Value);
+			}
+			lc.Clear ();
+
+			// TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
+			if ((ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FrameRuler) == ConsoleDriver.DiagnosticFlags.FrameRuler) {
+				// Top
+				var hruler = new Ruler () { Length = screenBounds.Width, Orientation = Orientation.Horizontal };
+				if (drawTop) {
+					hruler.Draw (new Point (screenBounds.X, screenBounds.Y));
+				}
+
+				//Left
+				var vruler = new Ruler () { Length = screenBounds.Height - 2, Orientation = Orientation.Vertical };
+				if (drawLeft) {
+					vruler.Draw (new Point (screenBounds.X, screenBounds.Y + 1), 1);
+				}
+
+				// Bottom
+				if (drawBottom) {
+					hruler.Draw (new Point (screenBounds.X, screenBounds.Y + screenBounds.Height - 1));
+				}
+
+				// Right
+				if (drawRight) {
+					vruler.Draw (new Point (screenBounds.X + screenBounds.Width - 1, screenBounds.Y + 1), 1);
+				}
+			}
+
+			Driver.Clip = savedClip;
+		}
+
 	}
 }

@@ -927,13 +927,13 @@ namespace Terminal.Gui {
 			/// </summary>
 			Off = 0b_0000_0000,
 			/// <summary>
-			/// When enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool, LineStyle)"/> will draw a 
+			/// When enabled, <see cref="Frame.OnDrawFrames"/> will draw a 
 			/// ruler in the frame for any side with a padding value greater than 0.
 			/// </summary>
 			FrameRuler = 0b_0000_0001,
 			/// <summary>
-			/// When Enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool, LineStyle)"/> will use
-			/// 'L', 'R', 'T', and 'B' for padding instead of ' '.
+			/// When enabled, <see cref="Frame.OnDrawFrames"/> will draw a 
+			/// 'L', 'R', 'T', and 'B' when clearing <see cref="Thickness"/>'s instead of ' '.
 			/// </summary>
 			FramePadding = 0b_0000_0010,
 		}

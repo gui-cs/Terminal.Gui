@@ -122,7 +122,7 @@ namespace UICatalog.Scenarios {
 				Add (copyTop);
 
 				LayoutSubviews ();
-				Height = Margin.Thickness.Vertical + BorderFrame.Thickness.Vertical + Padding.Thickness.Vertical + 4;
+				Height = Margin.Thickness.Vertical + Border.Thickness.Vertical + Padding.Thickness.Vertical + 4;
 				Width = 20;
 			}
 		}
@@ -142,15 +142,15 @@ namespace UICatalog.Scenarios {
 				};
 				Add (marginEditor);
 
-				viewToEdit.BorderFrame.ColorScheme = Colors.ColorSchemes ["Base"];
+				viewToEdit.Border.ColorScheme = Colors.ColorSchemes ["Base"];
 				var borderEditor = new ThicknessEditor () {
 					X = Pos.Right(marginEditor) - 1,
 					Y = 0,
 					Title = "Border",
-					Thickness = viewToEdit.BorderFrame.Thickness,
+					Thickness = viewToEdit.Border.Thickness,
 				};
 				borderEditor.ThicknessChanged += (s, a) => {
-					viewToEdit.BorderFrame.Thickness = a.Thickness;
+					viewToEdit.Border.Thickness = a.Thickness;
 				};
 				Add (borderEditor);
 
@@ -176,12 +176,12 @@ namespace UICatalog.Scenarios {
 
 					X = 2,
 					Y = 1,
-					SelectedItem = (int)viewToEdit.BorderFrame.BorderStyle
+					SelectedItem = (int)viewToEdit.Border.BorderStyle
 				};
 				Add (rbBorderStyle);
 
 				rbBorderStyle.SelectedItemChanged += (s, e) => {
-					viewToEdit.BorderFrame.BorderStyle = (LineStyle)e.SelectedItem;
+					viewToEdit.Border.BorderStyle = (LineStyle)e.SelectedItem;
 					viewToEdit.SetNeedsDisplay ();
 				};
 

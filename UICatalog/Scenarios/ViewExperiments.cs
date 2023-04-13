@@ -23,7 +23,7 @@ namespace UICatalog.Scenarios {
 			public ThicknessEditor ()
 			{
 				Margin.Thickness = new Thickness (0);
-				BorderFrame.Thickness = new Thickness (1);
+				Border.Thickness = new Thickness (1);
 			}
 
 			public override void BeginInit ()
@@ -121,7 +121,7 @@ namespace UICatalog.Scenarios {
 				Add (copyTop);
 
 				//LayoutSubviews ();
-				Height = Margin.Thickness.Vertical + BorderFrame.Thickness.Vertical + Padding.Thickness.Vertical + 4;
+				Height = Margin.Thickness.Vertical + Border.Thickness.Vertical + Padding.Thickness.Vertical + 4;
 				Width = 20;
 			}
 		}
@@ -142,16 +142,16 @@ namespace UICatalog.Scenarios {
 				};
 				Add (marginEditor);
 
-				viewToEdit.BorderFrame.ColorScheme = Colors.ColorSchemes ["Base"];
+				viewToEdit.Border.ColorScheme = Colors.ColorSchemes ["Base"];
 				var borderEditor = new ThicknessEditor () {
 					X = Pos.Right (marginEditor),
 					Y = 0,
 					Title = "Border",
-					Thickness = viewToEdit.BorderFrame.Thickness,
+					Thickness = viewToEdit.Border.Thickness,
 				};
 				borderEditor.Margin.Thickness = new Thickness (0, 0, 1, 0);
 				borderEditor.ThicknessChanged += (s, a) => {
-					viewToEdit.BorderFrame.Thickness = a.Thickness;
+					viewToEdit.Border.Thickness = a.Thickness;
 				};
 				Add (borderEditor);
 
@@ -166,11 +166,11 @@ namespace UICatalog.Scenarios {
 					e => NStack.ustring.Make (e.ToString ())).ToArray ()) {
 					X = Pos.Left (styleLabel),
 					Y = Pos.Bottom (styleLabel),
-					SelectedItem = (int)viewToEdit.BorderFrame.BorderStyle
+					SelectedItem = (int)viewToEdit.Border.BorderStyle
 				};
 
 				rbBorderStyle.SelectedItemChanged += (s, e) => {
-					viewToEdit.BorderFrame.BorderStyle = (LineStyle)e.SelectedItem;
+					viewToEdit.Border.BorderStyle = (LineStyle)e.SelectedItem;
 					viewToEdit.SetNeedsDisplay ();
 				};
 				Add (rbBorderStyle);
@@ -192,7 +192,7 @@ namespace UICatalog.Scenarios {
 
 
 				//rbBorderStyle.SelectedItemChanged += (e) => {
-				//	viewToEdit.BorderFrame.BorderStyle = (BorderStyle)e.SelectedItem;
+				//	viewToEdit.Border.BorderStyle = (BorderStyle)e.SelectedItem;
 				//	viewToEdit.SetNeedsDisplay ();
 				//};
 
@@ -275,10 +275,10 @@ namespace UICatalog.Scenarios {
 			view.Margin.Thickness = new Thickness (2, 2, 2, 2);
 			view.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
 			view.Margin.Data = "Margin";
-			view.BorderFrame.Thickness = new Thickness (2);
-			view.BorderFrame.BorderStyle = LineStyle.Single;
-			view.BorderFrame.ColorScheme = view.ColorScheme;
-			view.BorderFrame.Data = "BorderFrame";
+			view.Border.Thickness = new Thickness (2);
+			view.Border.BorderStyle = LineStyle.Single;
+			view.Border.ColorScheme = view.ColorScheme;
+			view.Border.Data = "Border";
 			view.Padding.Thickness = new Thickness (2);
 			view.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
 			view.Padding.Data = "Padding";
@@ -297,10 +297,10 @@ namespace UICatalog.Scenarios {
 			view2.Margin.Thickness = new Thickness (1);
 			view2.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
 			view2.Margin.Data = "Margin";
-			view2.BorderFrame.Thickness = new Thickness (1);
-			view2.BorderFrame.BorderStyle = LineStyle.Single;
-			view2.BorderFrame.ColorScheme = view.ColorScheme;
-			view2.BorderFrame.Data = "BorderFrame";
+			view2.Border.Thickness = new Thickness (1);
+			view2.Border.BorderStyle = LineStyle.Single;
+			view2.Border.ColorScheme = view.ColorScheme;
+			view2.Border.Data = "Border";
 			view2.Padding.Thickness = new Thickness (1);
 			view2.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
 			view2.Padding.Data = "Padding";
@@ -321,10 +321,10 @@ namespace UICatalog.Scenarios {
 			view3.Margin.Thickness = new Thickness (1, 1, 0, 0);
 			view3.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
 			view3.Margin.Data = "Margin";
-			view3.BorderFrame.Thickness = new Thickness (1, 1, 1, 1);
-			view3.BorderFrame.BorderStyle = LineStyle.Single;
-			view3.BorderFrame.ColorScheme = view.ColorScheme;
-			view3.BorderFrame.Data = "BorderFrame";
+			view3.Border.Thickness = new Thickness (1, 1, 1, 1);
+			view3.Border.BorderStyle = LineStyle.Single;
+			view3.Border.ColorScheme = view.ColorScheme;
+			view3.Border.Data = "Border";
 			view3.Padding.Thickness = new Thickness (1, 1, 0, 0);
 			view3.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
 			view3.Padding.Data = "Padding";
@@ -345,10 +345,10 @@ namespace UICatalog.Scenarios {
 			view4.Margin.Thickness = new Thickness (0, 0, 1, 1);
 			view4.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
 			view4.Margin.Data = "Margin";
-			view4.BorderFrame.Thickness = new Thickness (1, 1, 1, 1);
-			view4.BorderFrame.BorderStyle = LineStyle.Single;
-			view4.BorderFrame.ColorScheme = view.ColorScheme;
-			view4.BorderFrame.Data = "BorderFrame";
+			view4.Border.Thickness = new Thickness (1, 1, 1, 1);
+			view4.Border.BorderStyle = LineStyle.Single;
+			view4.Border.ColorScheme = view.ColorScheme;
+			view4.Border.Data = "Border";
 			view4.Padding.Thickness = new Thickness (0, 0, 1, 1);
 			view4.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
 			view4.Padding.Data = "Padding";
@@ -368,10 +368,10 @@ namespace UICatalog.Scenarios {
 			view5.Margin.Thickness = new Thickness (0, 0, 0, 0);
 			view5.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
 			view5.Margin.Data = "Margin";
-			view5.BorderFrame.Thickness = new Thickness (1, 1, 1, 1);
-			view5.BorderFrame.BorderStyle = LineStyle.Single;
-			view5.BorderFrame.ColorScheme = view.ColorScheme;
-			view5.BorderFrame.Data = "BorderFrame";
+			view5.Border.Thickness = new Thickness (1, 1, 1, 1);
+			view5.Border.BorderStyle = LineStyle.Single;
+			view5.Border.ColorScheme = view.ColorScheme;
+			view5.Border.Data = "Border";
 			view5.Padding.Thickness = new Thickness (0, 0, 0, 0);
 			view5.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
 			view5.Padding.Data = "Padding";

@@ -352,12 +352,12 @@ namespace Terminal.Gui {
 			case ProgressBarFormat.Framed:
 			case ProgressBarFormat.FramedPlusPercentage:
 				padding = 1;
-				base.DrawFrame (Bounds, false);
+				Border.DrawFrame (Bounds, false);
 				break;
 			case ProgressBarFormat.FramedProgressPadded:
 				padding = 2;
-				base.DrawFrame (Bounds, false);
-				base.DrawFrame (new Rect (Bounds.X + padding/2, Bounds.Y + padding/2, Bounds.Width - (padding), Bounds.Height - padding - 1), false);
+				Border.DrawFrame (Bounds, false);
+				Border.DrawFrame (new Rect (Bounds.X + padding/2, Bounds.Y + padding/2, Bounds.Width - (padding), Bounds.Height - padding - 1), false);
 				break;
 			}
 		}

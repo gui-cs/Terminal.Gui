@@ -53,7 +53,7 @@ namespace Terminal.Gui.DialogTests {
 				ButtonAlignment = align,
 			};
 			// Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
-			dlg.BorderFrame.Thickness = new Thickness (1, 0, 1, 0);
+			dlg.Border.Thickness = new Thickness (1, 0, 1, 0);
 			return (Application.Begin (dlg), dlg);
 		}
 
@@ -706,7 +706,7 @@ namespace Terminal.Gui.DialogTests {
 			// Default (center)
 			var dlg = new Dialog (new Button (btn1Text)) { Title = title, Width = width, Height = 1, ButtonAlignment = Dialog.ButtonAlignments.Center };
 			// Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
-			dlg.BorderFrame.Thickness = new Thickness (1, 0, 1, 0);
+			dlg.Border.Thickness = new Thickness (1, 0, 1, 0);
 			runstate = Application.Begin (dlg);
 			var buttonRow = $"{d.VLine}     {btn1}    {d.VLine}";
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
@@ -722,7 +722,7 @@ namespace Terminal.Gui.DialogTests {
 			// Justify
 			dlg = new Dialog (new Button (btn1Text)) { Title = title, Width = width, Height = 1, ButtonAlignment = Dialog.ButtonAlignments.Justify };
 			// Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
-			dlg.BorderFrame.Thickness = new Thickness (1, 0, 1, 0);
+			dlg.Border.Thickness = new Thickness (1, 0, 1, 0);
 			runstate = Application.Begin (dlg);
 			buttonRow = $"{d.VLine}         {btn1}{d.VLine}";
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
@@ -738,7 +738,7 @@ namespace Terminal.Gui.DialogTests {
 			// Right
 			dlg = new Dialog (new Button (btn1Text)) { Title = title, Width = width, Height = 1, ButtonAlignment = Dialog.ButtonAlignments.Right };
 			// Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
-			dlg.BorderFrame.Thickness = new Thickness (1, 0, 1, 0);
+			dlg.Border.Thickness = new Thickness (1, 0, 1, 0);
 			runstate = Application.Begin (dlg);
 			buttonRow = $"{d.VLine}{new string (' ', width - btn1.Length - 2)}{btn1}{d.VLine}";
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
@@ -754,7 +754,7 @@ namespace Terminal.Gui.DialogTests {
 			// Left
 			dlg = new Dialog (new Button (btn1Text)) { Title = title, Width = width, Height = 1, ButtonAlignment = Dialog.ButtonAlignments.Left };
 			// Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
-			dlg.BorderFrame.Thickness = new Thickness (1, 0, 1, 0);
+			dlg.Border.Thickness = new Thickness (1, 0, 1, 0);
 			runstate = Application.Begin (dlg);
 			buttonRow = $"{d.VLine}{btn1}{new string (' ', width - btn1.Length - 2)}{d.VLine}";
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
