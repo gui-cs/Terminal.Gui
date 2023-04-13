@@ -89,54 +89,6 @@ namespace Terminal.Gui {
 			_lines.Clear ();
 		}
 
-		//private class CustomRectangle {
-		//	public int X { get; set; }
-		//	public int Y { get; set; }
-		//	public int Width { get; set; }
-		//	public int Height { get; set; }
-
-		//	public int Left => Math.Min (X, X + Width);
-		//	public int Right => Math.Max (X, X + Width);
-		//	public int Top => Math.Min (Y, Y + Height);
-		//	public int Bottom => Math.Max (Y, Y + Height);
-
-		//	public CustomRectangle (int x, int y, int width, int height)
-		//	{
-		//		X = x;
-		//		Y = y;
-		//		Width = width;
-		//		Height = height;
-		//	}
-
-		//	public static CustomRectangle Union (CustomRectangle rect1, CustomRectangle rect2)
-		//	{
-		//		int left = Math.Min (rect1.Left, rect2.Left);
-		//		int top = Math.Min (rect1.Top, rect2.Top);
-		//		int right = Math.Max (rect1.Right, rect2.Right);
-		//		int bottom = Math.Max (rect1.Bottom, rect2.Bottom);
-
-		//		return new CustomRectangle (left, top, right - left, bottom - top);
-		//	}
-
-		//	public static Rect Union (Rect rect1, Rect rect2)
-		//	{
-		//		int left = Math.Min (rect1.Left, rect2.Left);
-		//		int top = Math.Min (rect1.Top, rect2.Top);
-		//		int right = Math.Max (rect1.Right, rect2.Right);
-		//		int bottom = Math.Max (rect1.Bottom, rect2.Bottom);
-
-		//		return new Rect (left, top, right - left, bottom - top);
-		//	}
-
-		//	/// <summary>
-		//	///	Formats the Rectangle as a string in (x,y,w,h) notation.
-		//	/// </summary>
-		//	public override string ToString ()
-		//	{
-		//		return $"({X},{Y},{Width},{Height})";
-		//	}
-		//}
-
 		private Rect _cachedBounds;
 
 		/// <summary>
@@ -237,7 +189,7 @@ namespace Terminal.Gui {
 				int y = kvp.Key.Y - Bounds.Y;
 				canvas [y, x] = kvp.Value;
 			}
-			
+
 			// Convert the canvas to a string
 			StringBuilder sb = new StringBuilder ();
 			for (int y = 0; y < canvas.GetLength (0); y++) {
@@ -794,7 +746,6 @@ namespace Terminal.Gui {
 			{
 				return $"({Start.X},{Start.Y},{Length},{Orientation})";
 			}
-
 		}
 	}
 }
