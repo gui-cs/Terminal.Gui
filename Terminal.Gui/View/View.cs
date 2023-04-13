@@ -1887,7 +1887,9 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (GetNormalColor ());
 			}
 
-			Clear (ViewToScreen (bounds));
+			if (SuperView != null) {
+				Clear (ViewToScreen (bounds));
+			}
 
 			// Invoke DrawContentEvent
 			OnDrawContent (bounds);

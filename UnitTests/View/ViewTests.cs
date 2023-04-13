@@ -533,8 +533,7 @@ namespace Terminal.Gui.ViewTests {
 					lbl = new Label (text);
 				}
 				Application.Top.Add (lbl);
-				Application.Top.LayoutSubviews ();
-				Application.Top.Redraw (Application.Top.Bounds);
+				Application.Begin (Application.Top);
 
 				// should have the initial text
 				Assert.Equal ('t', driver.Contents [0, 0, 0]);
