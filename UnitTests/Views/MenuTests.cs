@@ -1818,5 +1818,31 @@ Edit
 			mi.CheckType = MenuItemCheckStyle.Radio;
 			Assert.Throws<InvalidOperationException> (mi.ToggleChecked);
 		}
+
+
+		[Fact, AutoInitShutdown]
+		public void Menu_With_Separator ()
+		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem("File",new MenuItem [] {
+					new MenuItem("_Open", "Open a file", () => { }, null, null, Key.CtrlMask | Key.O),
+					null,
+					new MenuItem("_Quit","",null)
+				})
+			});
+
+			Application.Top.Add (menu);
+			Application.Begin (Application.Top);
+
+			menu.OpenMenu ();
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ File                         
+┌────────────────────────────┐
+│ Open   Open a file  Ctrl+O │
+├────────────────────────────┤
+│ Quit                       │
+└────────────────────────────┘", output);
+		}
 	}
 }
