@@ -384,11 +384,12 @@ namespace Terminal.Gui {
 				}
 			}
 
-			// Invoke DrawContentCompleteEvent
-			OnDrawContentComplete (bounds);
 			Driver.Clip = prevClip;
 
 			OnRenderLineCanvas ();
+
+			// Invoke DrawContentCompleteEvent
+			OnDrawContentComplete (bounds);
 
 			// BUGBUG: v2 - We should be able to use View.SetClip here and not have to resort to knowing Driver details.
 			ClearLayoutNeeded ();
