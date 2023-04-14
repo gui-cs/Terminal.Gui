@@ -1483,7 +1483,7 @@ namespace Terminal.Gui {
 				t.SetRelativeLayout (full);
 				t.LayoutSubviews ();
 				t.PositionToplevels ();
-				t.OnResized (new SizeChangedEventArgs (full.Size));
+				t.OnTerminalResized (new SizeChangedEventArgs (full.Size));
 			}
 			Refresh ();
 		}
