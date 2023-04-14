@@ -31,18 +31,18 @@ namespace Terminal.Gui {
 		public bool Running { get; set; }
 
 		/// <summary>
-		/// Invoked when the Toplevel <see cref="Application.RunState"/> has begun to be loaded.
+		/// Invoked when the <see cref="Toplevel"/> <see cref="Application.RunState"/> has begun to be loaded.
 		/// A Loaded event handler is a good place to finalize initialization before calling 
 		/// <see cref="Application.RunLoop(Application.RunState, bool)"/>.
 		/// </summary>
 		public event EventHandler Loaded;
 
 		/// <summary>
-		/// Invoked when the Toplevel <see cref="MainLoop"/> has started it's first iteration.
+		/// Invoked when the <see cref="Toplevel"/> <see cref="MainLoop"/> has started it's first iteration.
 		/// Subscribe to this event to perform tasks when the <see cref="Toplevel"/> has been laid out and focus has been set.
 		/// changes. 
 		/// <para>A Ready event handler is a good place to finalize initialization after calling 
-		/// <see cref="Application.Run(Func{Exception, bool})"/> on this Toplevel.</para>
+		/// <see cref="Application.Run(Func{Exception, bool})"/> on this <see cref="Toplevel"/>.</para>
 		/// </summary>
 		public event EventHandler Ready;
 
@@ -187,7 +187,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Toplevel"/> class with the specified <see cref="LayoutStyle.Absolute"/> layout.
 		/// </summary>
-		/// <param name="frame">A superview-relative rectangle specifying the location and size for the new Toplevel</param>
+		/// <param name="frame">A Superview-relative rectangle specifying the location and size for the new Toplevel</param>
 		public Toplevel (Rect frame) : base (frame)
 		{
 			SetInitialProperties ();
@@ -859,15 +859,6 @@ namespace Terminal.Gui {
 			//System.Diagnostics.Debug.WriteLine ($"dragPosition after: {dragPosition.HasValue}");
 			//System.Diagnostics.Debug.WriteLine ($"Toplevel: {mouseEvent}");
 			return false;
-		}
-
-		/// <summary>
-		/// Invoked by <see cref="Application.Begin"/> as part of  <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> 
-		/// after the views have been laid out, and before the views are drawn for the first time.
-		/// </summary>
-		public virtual void WillPresent ()
-		{
-			FocusFirst ();
 		}
 
 		/// <summary>
