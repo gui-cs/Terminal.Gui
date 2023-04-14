@@ -104,7 +104,7 @@ namespace Terminal.Gui {
 
 		private void SetDelay (int delay)
 		{
-			if (delay > 0) {
+			if (delay > -1) {
 				_delay = delay;
 			}
 		}
