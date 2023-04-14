@@ -1057,7 +1057,7 @@ namespace Terminal.Gui {
 		public MenuBar () : this (new MenuBarItem [] { }) { }
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="MenuBar"/> class with the specified set of toplevel menu items.
+		/// Initializes a new instance of the <see cref="MenuBar"/> class with the specified set of Toplevel menu items.
 		/// </summary>
 		/// <param name="menus">Individual menu items; a null item will result in a separator being drawn.</param>
 		public MenuBar (MenuBarItem [] menus) : base ()

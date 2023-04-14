@@ -80,7 +80,6 @@ namespace Terminal.Gui {
 			{IntersectionRuneType.RightTee,new RightTeeIntersectionRuneResolver()},
 			{IntersectionRuneType.BottomTee,new BottomTeeIntersectionRuneResolver()},
 
-
 			{IntersectionRuneType.Crosshair,new CrosshairIntersectionRuneResolver()},
 			// TODO: Add other resolvers
 		};
@@ -160,6 +159,8 @@ namespace Terminal.Gui {
 			}
 		}
 
+		// TODO: Unless there's an obvious use case for this API we should delete it in favor of the
+		// simpler version that doensn't take an area.
 		/// <summary>
 		/// Evaluates the lines that have been added to the canvas and returns a map containing
 		/// the glyphs and their locations. The glyphs are the characters that should be rendered
@@ -196,8 +197,7 @@ namespace Terminal.Gui {
 		/// the glyphs and their locations. The glyphs are the characters that should be rendered
 		/// so that all lines connect up with the appropriate intersection symbols. 
 		/// </summary>
-		/// <param name="inArea">A rectangle to constrain the search by.</param>
-		/// <returns>A map of the points within the canvas that intersect with <paramref name="inArea"/>.</returns>
+		/// <returns>A map of all the points within the canvas.</returns>
 		public Dictionary<Point, Cell> GetCellMap ()
 		{
 			var map = new Dictionary<Point, Cell> ();
@@ -270,7 +270,6 @@ namespace Terminal.Gui {
 
 			return sb.ToString ();
 		}
-
 
 		private abstract class IntersectionRuneResolver {
 			readonly Rune round;
@@ -462,19 +461,24 @@ namespace Terminal.Gui {
 
 		}
 
+		/// <summary>
+		/// Represents a single row/column within the <see cref="LineCanvas"/>. Includes the glyph and the foreground/background colors.
+		/// </summary>
 		public class Cell
 		{
-			public Cell ()
-			{
-
-			}
-
+			/// <summary>
+			/// The glyph to draw.
+			/// </summary>
 			public Rune? Rune { get; set; }
+
+			/// <summary>
+			/// The foreground color to draw the glyph with.
+			/// </summary>
 			public Attribute? Attribute { get; set; }
 
 		}
 
-		private Cell? GetCellForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
+		private Cell GetCellForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
 		{
 			if (!intersects.Any ()) {
 				return null;
@@ -485,7 +489,6 @@ namespace Terminal.Gui {
 			cell.Attribute = GetAttributeForIntersects (intersects);
 			return cell;
 		}
-
 
 		private IntersectionRuneType GetRuneTypeForIntersects (IntersectionDefinition [] intersects)
 		{
@@ -515,7 +518,6 @@ namespace Terminal.Gui {
 				return IntersectionRuneType.Crosshair;
 			}
 
-
 			if (Has (set,
 				IntersectionType.StartLeft,
 				IntersectionType.StartRight,
@@ -524,7 +526,6 @@ namespace Terminal.Gui {
 				return IntersectionRuneType.Crosshair;
 			}
 			#endregion
-
 
 			#region Corner Conditions
 			if (Exactly (set,
@@ -577,7 +578,6 @@ namespace Terminal.Gui {
 				return IntersectionRuneType.BottomTee;
 			}
 
-
 			if (Has (set,
 				IntersectionType.PassOverVertical,
 				IntersectionType.StartRight)) {
@@ -589,7 +589,6 @@ namespace Terminal.Gui {
 				IntersectionType.StartUp)) {
 				return IntersectionRuneType.LeftTee;
 			}
-
 
 			if (Has (set,
 				IntersectionType.PassOverVertical,

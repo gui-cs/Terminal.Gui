@@ -512,7 +512,6 @@ namespace Terminal.Gui.DrawingTests {
 
 		}
 
-
 		[Fact, SetupFakeDriver]
 		public void Top_With_1Down ()
 		{
@@ -615,7 +614,6 @@ namespace Terminal.Gui.DrawingTests {
 			canvas.AddLine (new Point (9, 4), -10, Orientation.Horizontal, LineStyle.Double);
 			canvas.AddLine (new Point (0, 4), -5, Orientation.Vertical, LineStyle.Double);
 
-
 			canvas.AddLine (new Point (5, 0), 5, Orientation.Vertical, LineStyle.Double);
 			canvas.AddLine (new Point (0, 2), 10, Orientation.Horizontal, LineStyle.Double);
 
@@ -631,7 +629,6 @@ namespace Terminal.Gui.DrawingTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
 
-
 		[Theory, AutoInitShutdown]
 		[InlineData (LineStyle.Single)]
 		[InlineData (LineStyle.Rounded)]
@@ -644,7 +641,6 @@ namespace Terminal.Gui.DrawingTests {
 			canvas.AddLine (new Point (9, 0), 5, Orientation.Vertical, thinStyle);
 			canvas.AddLine (new Point (9, 4), -10, Orientation.Horizontal, LineStyle.Double);
 			canvas.AddLine (new Point (0, 4), -5, Orientation.Vertical, thinStyle);
-
 
 			canvas.AddLine (new Point (5, 0), 5, Orientation.Vertical, thinStyle);
 			canvas.AddLine (new Point (0, 2), 10, Orientation.Horizontal, LineStyle.Double);
@@ -674,7 +670,6 @@ namespace Terminal.Gui.DrawingTests {
 			canvas.AddLine (new Point (9, 0), 5, Orientation.Vertical, LineStyle.Double);
 			canvas.AddLine (new Point (9, 4), -10, Orientation.Horizontal, thinStyle);
 			canvas.AddLine (new Point (0, 4), -5, Orientation.Vertical, LineStyle.Double);
-
 
 			canvas.AddLine (new Point (5, 0), 5, Orientation.Vertical, LineStyle.Double);
 			canvas.AddLine (new Point (0, 2), 10, Orientation.Horizontal, thinStyle);
@@ -867,7 +862,6 @@ namespace Terminal.Gui.DrawingTests {
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 		}
-
 
 		[Theory, AutoInitShutdown]
 		// Horizontal lines with a vertical zero-length

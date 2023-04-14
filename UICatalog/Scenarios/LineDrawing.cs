@@ -27,13 +27,7 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Fill ()
 			};
 
-			tools.ColorChanged += (c) => {
-				canvas.SetColor (c);
-				canvas.Border.ColorScheme = new ColorScheme () {
-					Normal = new Terminal.Gui.Attribute (c, canvas.ColorScheme.Normal.Background)
-				};
-				Win.Redraw (Win.Bounds);
-			};
+			tools.ColorChanged += (c) => canvas.SetColor (c);
 			tools.SetStyle += (b) => canvas.BorderStyle = b;
 
 			Win.Add (canvas);
@@ -233,7 +227,6 @@ namespace UICatalog.Scenarios {
 							orientation = Orientation.Horizontal;
 							length = end.X - start.X;
 						}
-
 
 						canvases [currentColor].AddLine (
 							start,

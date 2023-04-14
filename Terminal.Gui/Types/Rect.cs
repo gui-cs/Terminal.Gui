@@ -261,7 +261,6 @@ namespace Terminal.Gui
 		}
 
 
-
 		/// <summary>
 		///	Bottom Property
 		/// </summary>
