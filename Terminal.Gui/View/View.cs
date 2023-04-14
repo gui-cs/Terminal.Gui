@@ -1756,15 +1756,18 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual bool OnDrawFrames ()
 		{
-			//if (!IsInitialized) {
-			//	return false;
-			//}
+			if (!IsInitialized) {
+				return false;
+			}
 
 			var prevClip = Driver.Clip;
+			Driver.Clip = ViewToScreen (Frame);
 
-			if (SuperView != null) {
-				Driver.Clip = SuperView.ClipToBounds ();
-			}
+			// TODO: Figure out what we should do if we have no superview
+			//if (SuperView != null) {
+			// TODO: Clipping is disabled for now to ensure we see errors
+			Driver.Clip = new Rect (0, 0, Driver.Cols, Driver.Rows);// screenBounds;// SuperView.ClipToBounds ();
+										//}
 
 			// Each of these renders lines to either this View's LineCanvas 
 			// Those lines will be finally rendered in OnRenderLineCanvas
@@ -1802,8 +1805,6 @@ namespace Terminal.Gui {
 
 			OnDrawFrames ();
 
-			OnRenderLineCanvas ();
-
 			var prevClip = ClipToBounds ();
 
 			if (ColorScheme != null) {
@@ -1839,9 +1840,12 @@ namespace Terminal.Gui {
 				}
 			}
 
+			Driver.Clip = prevClip;
+
+			OnRenderLineCanvas ();
+
 			// Invoke DrawContentCompleteEvent
 			OnDrawContentComplete (bounds);
-			Driver.Clip = prevClip;
 
 			// BUGBUG: v2 - We should be able to use View.SetClip here and not have to resort to knowing Driver details.
 			ClearLayoutNeeded ();
