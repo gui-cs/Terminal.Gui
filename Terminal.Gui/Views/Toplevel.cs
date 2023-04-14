@@ -649,7 +649,7 @@ namespace Terminal.Gui {
 			}
 
 			// BUGBUG: v2 hack for now
-			var mfLength = top.BorderFrame.Thickness.Top > 0 ? 2 : 1;
+			var mfLength = top.Border?.Thickness.Top > 0 ? 2 : 1;
 			if (top.Frame.Width <= maxWidth) {
 				nx = Math.Max (targetX, 0);
 				nx = nx + top.Frame.Width > maxWidth ? Math.Max (maxWidth - top.Frame.Width, 0) : nx;
@@ -765,17 +765,19 @@ namespace Terminal.Gui {
 			}
 
 			if (!_needsDisplay.IsEmpty || _childNeedsDisplay || LayoutNeeded) {
-				Driver.SetAttribute (Enabled ? Colors.Base.Normal : Colors.Base.Disabled);
+				Driver.SetAttribute (GetNormalColor ());
+				Clear (ViewToScreen (bounds));
 				LayoutSubviews ();
 				PositionToplevels ();
 
 				if (this == Application.MdiTop) {
-					foreach (var top in Application.MdiChildes.AsEnumerable ().Reverse ()) {
+					foreach (var top in Application.MdiChildren.AsEnumerable ().Reverse ()) {
 						if (top.Frame.IntersectsWith (bounds)) {
 							if (top != this && !top.IsCurrentTop && !OutsideTopFrame (top) && top.Visible) {
 								top.SetNeedsLayout ();
 								top.SetNeedsDisplay (top.Bounds);
 								top.Redraw (top.Bounds);
+								top.OnRenderLineCanvas ();
 							}
 						}
 					}
@@ -787,8 +789,13 @@ namespace Terminal.Gui {
 						view.SetNeedsDisplay (view.Bounds);
 					}
 				}
+				base.Redraw (Bounds);
+
+				if (this.MenuBar != null && this.MenuBar.IsMenuOpen && this.MenuBar.openMenu != null) {
+					// TODO: Hack until we can get compositing working right.
+					this.MenuBar.openMenu.Redraw (this.MenuBar.openMenu.Bounds);
+				}
 			}
-			base.Redraw (Bounds);
 		}
 
 		bool OutsideTopFrame (Toplevel top)
@@ -904,7 +911,7 @@ namespace Terminal.Gui {
 				|| Application.Current?.Modal == false
 				|| Application.Current?.Modal == true && Application.Current?.Running == false)) {
 
-				foreach (var child in Application.MdiChildes) {
+				foreach (var child in Application.MdiChildren) {
 					var ev = new ToplevelClosingEventArgs (this);
 					if (child.OnClosing (ev)) {
 						return;
@@ -957,7 +964,7 @@ namespace Terminal.Gui {
 			}
 
 			if (Focused == null) {
-				foreach (var top in Application.MdiChildes) {
+				foreach (var top in Application.MdiChildren) {
 					if (top != this && top.Visible) {
 						top.SetFocus ();
 						return;
@@ -982,7 +989,7 @@ namespace Terminal.Gui {
 				return null;
 			}
 
-			foreach (var top in Application.MdiChildes) {
+			foreach (var top in Application.MdiChildren) {
 				if (type != null && top.GetType () == type
 					&& exclude?.Contains (top.Data.ToString ()) == false) {
 					return top;
@@ -1070,7 +1077,7 @@ namespace Terminal.Gui {
 
 	/// <summary>
 	/// Implements the <see cref="IComparer{T}"/> to sort the <see cref="Toplevel"/> 
-	/// from the <see cref="Application.MdiChildes"/> if needed.
+	/// from the <see cref="Application.MdiChildren"/> if needed.
 	/// </summary>
 	public sealed class ToplevelComparer : IComparer<Toplevel> {
 		/// <summary>Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.</summary>

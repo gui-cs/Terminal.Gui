@@ -68,24 +68,24 @@ namespace Terminal.Gui.ViewsTests {
 			var iterations = 4;
 
 			top1.Ready += (s, e) => {
-				Assert.Null (Application.MdiChildes);
+				Assert.Null (Application.MdiChildren);
 				Application.Run (top2);
 			};
 			top2.Ready += (s, e) => {
-				Assert.Null (Application.MdiChildes);
+				Assert.Null (Application.MdiChildren);
 				Application.Run (top3);
 			};
 			top3.Ready += (s, e) => {
-				Assert.Null (Application.MdiChildes);
+				Assert.Null (Application.MdiChildren);
 				Application.Run (top4);
 			};
 			top4.Ready += (s, e) => {
-				Assert.Null (Application.MdiChildes);
+				Assert.Null (Application.MdiChildren);
 				Application.Run (d);
 			};
 
 			d.Ready += (s, e) => {
-				Assert.Null (Application.MdiChildes);
+				Assert.Null (Application.MdiChildren);
 				// This will close the d because on a not MdiContainer the Application.Current it always used.
 				Application.RequestStop (top1);
 				Assert.True (Application.Current == d);
@@ -94,7 +94,7 @@ namespace Terminal.Gui.ViewsTests {
 			d.Closed += (s,e) => Application.RequestStop (top1);
 
 			Application.Iteration += () => {
-				Assert.Null (Application.MdiChildes);
+				Assert.Null (Application.MdiChildren);
 				if (iterations == 4) 					Assert.True (Application.Current == d);
 else if (iterations == 3) 					Assert.True (Application.Current == top4);
 else if (iterations == 2) 					Assert.True (Application.Current == top3);
@@ -106,7 +106,7 @@ else 					Assert.True (Application.Current == top1);
 
 			Application.Run (top1);
 
-			Assert.Null (Application.MdiChildes);
+			Assert.Null (Application.MdiChildren);
 		}
 
 		class Mdi : Toplevel {
@@ -131,25 +131,25 @@ else 					Assert.True (Application.Current == top1);
 			var iterations = 4;
 
 			mdi.Ready += (s, e) => {
-				Assert.Empty (Application.MdiChildes);
+				Assert.Empty (Application.MdiChildren);
 				Application.Run (c1);
 			};
 			c1.Ready += (s, e) => {
-				Assert.Single (Application.MdiChildes);
+				Assert.Single (Application.MdiChildren);
 				Application.Run (c2);
 			};
 			c2.Ready += (s, e) => {
-				Assert.Equal (2, Application.MdiChildes.Count);
+				Assert.Equal (2, Application.MdiChildren.Count);
 				Application.Run (c3);
 			};
 			c3.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.MdiChildren.Count);
 				Application.Run (d);
 			};
 
 			// More easy because the Mdi Container handles all at once
 			d.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.MdiChildren.Count);
 				// This will not close the MdiContainer because d is a modal toplevel and will be closed.
 				mdi.RequestStop ();
 			};
@@ -165,15 +165,15 @@ else 					Assert.True (Application.Current == top1);
 					Assert.True (Application.Current == d);
 					Assert.False (d.Running);
 				} else {
-					Assert.Equal (iterations, Application.MdiChildes.Count);
-					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + 1).ToString (), Application.MdiChildes [i].Id);
+					Assert.Equal (iterations, Application.MdiChildren.Count);
+					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + 1).ToString (), Application.MdiChildren [i].Id);
 				}
 				iterations--;
 			};
 
 			Application.Run (mdi);
 
-			Assert.Empty (Application.MdiChildes);
+			Assert.Empty (Application.MdiChildren);
 		}
 
 		[Fact]
@@ -191,25 +191,25 @@ else 					Assert.True (Application.Current == top1);
 			var iterations = 4;
 
 			mdi.Ready += (s, e) => {
-				Assert.Empty (Application.MdiChildes);
+				Assert.Empty (Application.MdiChildren);
 				Application.Run (c1);
 			};
 			c1.Ready += (s, e) => {
-				Assert.Single (Application.MdiChildes);
+				Assert.Single (Application.MdiChildren);
 				Application.Run (c2);
 			};
 			c2.Ready += (s, e) => {
-				Assert.Equal (2, Application.MdiChildes.Count);
+				Assert.Equal (2, Application.MdiChildren.Count);
 				Application.Run (c3);
 			};
 			c3.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.MdiChildren.Count);
 				Application.Run (d);
 			};
 
 			// Also easy because the Mdi Container handles all at once
 			d.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.MdiChildren.Count);
 				// This will not close the MdiContainer because d is a modal toplevel
 				Application.RequestStop (mdi);
 			};
@@ -223,15 +223,15 @@ else 					Assert.True (Application.Current == top1);
 					Assert.True (Application.Current == d);
 					Assert.False (d.Running);
 				} else {
-					Assert.Equal (iterations, Application.MdiChildes.Count);
-					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + 1).ToString (), Application.MdiChildes [i].Id);
+					Assert.Equal (iterations, Application.MdiChildren.Count);
+					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + 1).ToString (), Application.MdiChildren [i].Id);
 				}
 				iterations--;
 			};
 
 			Application.Run (mdi);
 
-			Assert.Empty (Application.MdiChildes);
+			Assert.Empty (Application.MdiChildren);
 		}
 
 		[Fact]
@@ -249,25 +249,25 @@ else 					Assert.True (Application.Current == top1);
 			var iterations = 4;
 
 			mdi.Ready += (s, e) => {
-				Assert.Empty (Application.MdiChildes);
+				Assert.Empty (Application.MdiChildren);
 				Application.Run (c1);
 			};
 			c1.Ready += (s, e) => {
-				Assert.Single (Application.MdiChildes);
+				Assert.Single (Application.MdiChildren);
 				Application.Run (c2);
 			};
 			c2.Ready += (s, e) => {
-				Assert.Equal (2, Application.MdiChildes.Count);
+				Assert.Equal (2, Application.MdiChildren.Count);
 				Application.Run (c3);
 			};
 			c3.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.MdiChildren.Count);
 				Application.Run (d);
 			};
 
 			//More harder because it's sequential.
 			d.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.MdiChildren.Count);
 				// Close the Dialog
 				Application.RequestStop ();
 			};
@@ -282,15 +282,15 @@ else 					Assert.True (Application.Current == top1);
 					Assert.True (Application.Current == d);
 					Assert.False (d.Running);
 				} else {
-					Assert.Equal (iterations, Application.MdiChildes.Count);
-					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + 1).ToString (), Application.MdiChildes [i].Id);
+					Assert.Equal (iterations, Application.MdiChildren.Count);
+					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + 1).ToString (), Application.MdiChildren [i].Id);
 				}
 				iterations--;
 			};
 
 			Application.Run (mdi);
 
-			Assert.Empty (Application.MdiChildes);
+			Assert.Empty (Application.MdiChildren);
 		}
 
 		[Fact]
@@ -332,28 +332,28 @@ else 					Assert.True (Application.Current == top1);
 			var iterations = 5;
 
 			mdi.Ready += (s, e) => {
-				Assert.Empty (Application.MdiChildes);
+				Assert.Empty (Application.MdiChildren);
 				Application.Run (c1);
 			};
 			c1.Ready += (s, e) => {
-				Assert.Single (Application.MdiChildes);
+				Assert.Single (Application.MdiChildren);
 				Application.Run (c2);
 			};
 			c2.Ready += (s, e) => {
-				Assert.Equal (2, Application.MdiChildes.Count);
+				Assert.Equal (2, Application.MdiChildren.Count);
 				Application.Run (c3);
 			};
 			c3.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.MdiChildren.Count);
 				Application.Run (d1);
 			};
 			d1.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.MdiChildren.Count);
 				Application.Run (d2);
 			};
 
 			d2.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.MdiChildren.Count);
 				Assert.True (Application.Current == d2);
 				Assert.True (Application.Current.Running);
 				// Trying to close the Dialog1
@@ -380,15 +380,15 @@ else 					Assert.True (Application.Current == top1);
 					Assert.True (Application.Current == d1);
 					Assert.False (Application.Current.Running);
 				} else {
-					Assert.Equal (iterations, Application.MdiChildes.Count);
-					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + 1).ToString (), Application.MdiChildes [i].Id);
+					Assert.Equal (iterations, Application.MdiChildren.Count);
+					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + 1).ToString (), Application.MdiChildren [i].Id);
 				}
 				iterations--;
 			};
 
 			Application.Run (mdi);
 
-			Assert.Empty (Application.MdiChildes);
+			Assert.Empty (Application.MdiChildren);
 		}
 
 		[Fact]
@@ -407,28 +407,28 @@ else 					Assert.True (Application.Current == top1);
 			var iterations = 5;
 
 			mdi.Ready += (s, e) => {
-				Assert.Empty (Application.MdiChildes);
+				Assert.Empty (Application.MdiChildren);
 				Application.Run (c1);
 			};
 			c1.Ready += (s, e) => {
-				Assert.Single (Application.MdiChildes);
+				Assert.Single (Application.MdiChildren);
 				Application.Run (c2);
 			};
 			c2.Ready += (s, e) => {
-				Assert.Equal (2, Application.MdiChildes.Count);
+				Assert.Equal (2, Application.MdiChildren.Count);
 				Application.Run (c3);
 			};
 			c3.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.MdiChildren.Count);
 				Application.Run (d1);
 			};
 			d1.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.MdiChildren.Count);
 				Application.Run (c4);
 			};
 
 			c4.Ready += (s, e) => {
-				Assert.Equal (4, Application.MdiChildes.Count);
+				Assert.Equal (4, Application.MdiChildren.Count);
 				// Trying to close the Dialog1
 				d1.RequestStop ();
 			};
@@ -447,16 +447,16 @@ else 					Assert.True (Application.Current == top1);
 					Assert.False (Application.Current.Running);
 					Assert.True (c4.Running);
 				} else {
-					Assert.Equal (iterations, Application.MdiChildes.Count);
+					Assert.Equal (iterations, Application.MdiChildren.Count);
 					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + (iterations == 4 && i == 0 ? 2 : 1)).ToString (),
-							Application.MdiChildes [i].Id);
+							Application.MdiChildren [i].Id);
 				}
 				iterations--;
 			};
 
 			Application.Run (mdi);
 
-			Assert.Empty (Application.MdiChildes);
+			Assert.Empty (Application.MdiChildren);
 		}
 
 		[Fact]
@@ -472,19 +472,19 @@ else 					Assert.True (Application.Current == top1);
 			var iterations = 3;
 
 			mdi.Ready += (s, e) => {
-				Assert.Empty (Application.MdiChildes);
+				Assert.Empty (Application.MdiChildren);
 				Application.Run (c1);
 			};
 			c1.Ready += (s, e) => {
-				Assert.Single (Application.MdiChildes);
+				Assert.Single (Application.MdiChildren);
 				Application.Run (c2);
 			};
 			c2.Ready += (s, e) => {
-				Assert.Equal (2, Application.MdiChildes.Count);
+				Assert.Equal (2, Application.MdiChildren.Count);
 				Application.Run (c3);
 			};
 			c3.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.MdiChildren.Count);
 				c3.RequestStop ();
 				c1.RequestStop ();
 			};
@@ -498,31 +498,31 @@ else 					Assert.True (Application.Current == top1);
 					Assert.True (Application.Current == c3);
 					Assert.False (Application.Current.Running);
 					// But the childes order were reorder by Running = false
-					Assert.True (Application.MdiChildes [0] == c3);
-					Assert.True (Application.MdiChildes [1] == c1);
-					Assert.True (Application.MdiChildes [^1] == c2);
+					Assert.True (Application.MdiChildren [0] == c3);
+					Assert.True (Application.MdiChildren [1] == c1);
+					Assert.True (Application.MdiChildren [^1] == c2);
 				} else if (iterations == 2) {
 					// The Current is c1 and Current.Running is false.
 					Assert.True (Application.Current == c1);
 					Assert.False (Application.Current.Running);
-					Assert.True (Application.MdiChildes [0] == c1);
-					Assert.True (Application.MdiChildes [^1] == c2);
+					Assert.True (Application.MdiChildren [0] == c1);
+					Assert.True (Application.MdiChildren [^1] == c2);
 				} else if (iterations == 1) {
 					// The Current is c2 and Current.Running is false.
 					Assert.True (Application.Current == c2);
 					Assert.False (Application.Current.Running);
-					Assert.True (Application.MdiChildes [^1] == c2);
+					Assert.True (Application.MdiChildren [^1] == c2);
 				} else {
 					// The Current is mdi.
 					Assert.True (Application.Current == mdi);
-					Assert.Empty (Application.MdiChildes);
+					Assert.Empty (Application.MdiChildren);
 				}
 				iterations--;
 			};
 
 			Application.Run (mdi);
 
-			Assert.Empty (Application.MdiChildes);
+			Assert.Empty (Application.MdiChildren);
 		}
 
 		[Fact]
@@ -554,11 +554,11 @@ else 					Assert.True (Application.Current == top1);
 			var mdiRequestStop = false;
 
 			mdi.Ready += (s, e) => {
-				Assert.Empty (Application.MdiChildes);
+				Assert.Empty (Application.MdiChildren);
 				Application.Run (logger);
 			};
 
-			logger.Ready += (s, e) => Assert.Single (Application.MdiChildes);
+			logger.Ready += (s, e) => Assert.Single (Application.MdiChildren);
 
 			Application.Iteration += () => {
 				if (stageCompleted && running) {
@@ -566,13 +566,13 @@ else 					Assert.True (Application.Current == top1);
 					var stage = new Window () { Modal = true };
 
 					stage.Ready += (s, e) => {
-						Assert.Equal (iterations, Application.MdiChildes.Count);
+						Assert.Equal (iterations, Application.MdiChildren.Count);
 						stage.RequestStop ();
 					};
 
 					stage.Closed += (_, _) => {
 						if (iterations == 11) 							allStageClosed = true;
-						Assert.Equal (iterations, Application.MdiChildes.Count);
+						Assert.Equal (iterations, Application.MdiChildren.Count);
 						if (running) {
 							stageCompleted = true;
 
@@ -580,7 +580,7 @@ else 					Assert.True (Application.Current == top1);
 
 							rpt.Ready += (s, e) => {
 								iterations++;
-								Assert.Equal (iterations, Application.MdiChildes.Count);
+								Assert.Equal (iterations, Application.MdiChildren.Count);
 							};
 
 							Application.Run (rpt);
@@ -591,19 +591,19 @@ else 					Assert.True (Application.Current == top1);
 
 				} else if (iterations == 11 && running) {
 					running = false;
-					Assert.Equal (iterations, Application.MdiChildes.Count);
+					Assert.Equal (iterations, Application.MdiChildren.Count);
 
-				} else if (!mdiRequestStop && running && !allStageClosed) 					Assert.Equal (iterations, Application.MdiChildes.Count);
+				} else if (!mdiRequestStop && running && !allStageClosed) 					Assert.Equal (iterations, Application.MdiChildren.Count);
 else if (!mdiRequestStop && !running && allStageClosed) {
-					Assert.Equal (iterations, Application.MdiChildes.Count);
+					Assert.Equal (iterations, Application.MdiChildren.Count);
 					mdiRequestStop = true;
 					mdi.RequestStop ();
-				} else 					Assert.Empty (Application.MdiChildes);
+				} else 					Assert.Empty (Application.MdiChildren);
 			};
 
 			Application.Run (mdi);
 
-			Assert.Empty (Application.MdiChildes);
+			Assert.Empty (Application.MdiChildren);
 		}
 
 		[Fact]
@@ -619,19 +619,19 @@ else if (!mdiRequestStop && !running && allStageClosed) {
 			var iterations = 3;
 
 			mdi.Ready += (s, e) => {
-				Assert.Empty (Application.MdiChildes);
+				Assert.Empty (Application.MdiChildren);
 				Application.Run (c1);
 			};
 			c1.Ready += (s, e) => {
-				Assert.Single (Application.MdiChildes);
+				Assert.Single (Application.MdiChildren);
 				Application.Run (c2);
 			};
 			c2.Ready += (s, e) => {
-				Assert.Equal (2, Application.MdiChildes.Count);
+				Assert.Equal (2, Application.MdiChildren.Count);
 				Application.Run (c3);
 			};
 			c3.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.MdiChildren.Count);
 				c3.RequestStop ();
 				c2.RequestStop ();
 				c1.RequestStop ();
@@ -646,32 +646,32 @@ else if (!mdiRequestStop && !running && allStageClosed) {
 					Assert.True (Application.Current == c3);
 					Assert.False (Application.Current.Running);
 					// But the childes order were reorder by Running = false
-					Assert.True (Application.MdiChildes [0] == c3);
-					Assert.True (Application.MdiChildes [1] == c2);
-					Assert.True (Application.MdiChildes [^1] == c1);
+					Assert.True (Application.MdiChildren [0] == c3);
+					Assert.True (Application.MdiChildren [1] == c2);
+					Assert.True (Application.MdiChildren [^1] == c1);
 				} else if (iterations == 2) {
 					// The Current is c2 and Current.Running is false.
 					Assert.True (Application.Current == c2);
 					Assert.False (Application.Current.Running);
-					Assert.True (Application.MdiChildes [0] == c2);
-					Assert.True (Application.MdiChildes [^1] == c1);
+					Assert.True (Application.MdiChildren [0] == c2);
+					Assert.True (Application.MdiChildren [^1] == c1);
 				} else if (iterations == 1) {
 					// The Current is c1 and Current.Running is false.
 					Assert.True (Application.Current == c1);
 					Assert.False (Application.Current.Running);
-					Assert.True (Application.MdiChildes [^1] == c1);
+					Assert.True (Application.MdiChildren [^1] == c1);
 				} else {
 					// The Current is mdi.
 					Assert.True (Application.Current == mdi);
 					Assert.False (Application.Current.Running);
-					Assert.Empty (Application.MdiChildes);
+					Assert.Empty (Application.MdiChildren);
 				}
 				iterations--;
 			};
 
 			Application.Run (mdi);
 
-			Assert.Empty (Application.MdiChildes);
+			Assert.Empty (Application.MdiChildren);
 		}
 	}
 }

@@ -111,7 +111,7 @@ namespace UICatalog.Scenarios {
 
 				}
 
-				foreach(var p in canvas.GenerateImage (bounds)) {
+				foreach(var p in canvas.GetMap (bounds)) {
 					AddRune (p.Key.X, p.Key.Y, p.Value);
 				}
 

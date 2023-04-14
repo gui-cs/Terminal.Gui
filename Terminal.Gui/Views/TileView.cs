@@ -382,7 +382,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="bounds"></param>
 		/// <returns></returns>
-		public override bool OnDrawFrames (Rect bounds)
+		public override bool OnDrawFrames ()
 		{
 			return false;
 		}
@@ -433,7 +433,7 @@ namespace Terminal.Gui {
 			}
 
 			Driver.SetAttribute (ColorScheme.Normal);
-			foreach (var p in lc.GenerateImage (bounds)) {
+			foreach (var p in lc.GetMap (bounds)) {
 				this.AddRune (p.Key.X, p.Key.Y, p.Value);
 			}
 			

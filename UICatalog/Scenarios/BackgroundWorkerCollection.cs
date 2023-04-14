@@ -99,12 +99,12 @@ namespace UICatalog.Scenarios {
 					Title = "WorkerApp",
 					CheckType = MenuItemCheckStyle.Checked
 				};
-				var top = Application.MdiChildes?.Find ((x) => x.Data.ToString () == "WorkerApp");
+				var top = Application.MdiChildren?.Find ((x) => x.Data.ToString () == "WorkerApp");
 				if (top != null) {
 					item.Checked = top.Visible;
 				}
 				item.Action += () => {
-					var top = Application.MdiChildes.Find ((x) => x.Data.ToString () == "WorkerApp");
+					var top = Application.MdiChildren.Find ((x) => x.Data.ToString () == "WorkerApp");
 					item.Checked = top.Visible = (bool)!item.Checked;
 					if (top.Visible) {
 						top.ShowChild ();
@@ -121,7 +121,7 @@ namespace UICatalog.Scenarios {
 			{
 				var index = 1;
 				List<MenuItem> menuItems = new List<MenuItem> ();
-				var sortedChildes = Application.MdiChildes;
+				var sortedChildes = Application.MdiChildren;
 				sortedChildes.Sort (new ToplevelComparer ());
 				foreach (var top in sortedChildes) {
 					if (top.Data.ToString () == "WorkerApp" && !top.Visible) {

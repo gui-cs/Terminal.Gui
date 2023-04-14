@@ -122,7 +122,7 @@ namespace Terminal.Gui.DialogTests {
 			var topRow = $"{d.ULDCorner}╡{title}{stepTitle}╞{new string (d.HDLine.ToString () [0], width - title.Length - stepTitle.Length - 4)}{d.URDCorner}";
 			var row2 = $"{d.VDLine}{new string (' ', width - 2)}{d.VDLine}";
 			var row3 = row2;
-			var separatorRow = $"{d.VDLine}{new string (' ', width - 2)}{d.VDLine}";
+			var separatorRow = $"{d.VDLine}{new string (d.HLine.ToString () [0], width - 2)}{d.VDLine}";
 			var buttonRow = $"{d.VDLine}{btnBack}{new string (' ', width - btnBack.Length - btnNext.Length - 2)}{btnNext}{d.VDLine}";
 			var bottomRow = $"{d.LLDCorner}{new string (d.HDLine.ToString () [0], width - 2)}{d.LRDCorner}";
 
@@ -160,7 +160,7 @@ namespace Terminal.Gui.DialogTests {
 			var bottomRow = $"{d.LLDCorner}{new string (d.HDLine.ToString () [0], width - 2)}{d.LRDCorner}";
 
 			var wizard = new Wizard () { Title = title, Width = width, Height = height };
-			wizard.AddStep (new Wizard.WizardStep (stepTitle));
+			wizard.AddStep (new Wizard.WizardStep () { Title = stepTitle });
 			//wizard.LayoutSubviews ();
 			var firstIteration = false;
 			var runstate = Application.Begin (wizard);
@@ -230,7 +230,7 @@ namespace Terminal.Gui.DialogTests {
 			var bottomRow = $"{d.LLDCorner}{new string (d.HDLine.ToString () [0], width - 2)}{d.LRDCorner}";
 
 			var wizard = new Wizard () { Title = title, Width = width, Height = height };
-			wizard.AddStep (new Wizard.WizardStep ("ABCD"));
+			wizard.AddStep (new Wizard.WizardStep () { Title = "ABCD" });
 
 			Application.End (Application.Begin (wizard));
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{topRow}\n{separatorRow}\n{buttonRow}\n{bottomRow}", output);
@@ -244,7 +244,7 @@ namespace Terminal.Gui.DialogTests {
 			// If no steps should be null
 			Assert.Null (wizard.GetPreviousStep ());
 
-			var step1 = new Wizard.WizardStep ("step1");
+			var step1 = new Wizard.WizardStep () { Title = "step1" };
 			wizard.AddStep (step1);
 
 			// If no current step, should be last step
@@ -259,7 +259,7 @@ namespace Terminal.Gui.DialogTests {
 			Assert.Null (wizard.GetPreviousStep ());
 
 			// If two steps and at 2 and step 1 is `Enabled = true`should be step1
-			var step2 = new Wizard.WizardStep ("step2");
+			var step2 = new Wizard.WizardStep () { Title = "step2" };
 			wizard.AddStep (step2);
 			wizard.CurrentStep = step2;
 			step1.Enabled = true;
@@ -273,7 +273,7 @@ namespace Terminal.Gui.DialogTests {
 			//   At step 1 should be null
 			//   At step 2 should be step 1
 			//   At step 3 should be step 2
-			var step3 = new Wizard.WizardStep ("step3");
+			var step3 = new Wizard.WizardStep () { Title = "step3" };
 			wizard.AddStep (step3);
 			step1.Enabled = true;
 			wizard.CurrentStep = step1;
@@ -335,7 +335,7 @@ namespace Terminal.Gui.DialogTests {
 			// If no steps should be null
 			Assert.Null (wizard.GetNextStep ());
 
-			var step1 = new Wizard.WizardStep ("step1");
+			var step1 = new Wizard.WizardStep () { Title = "step1" };
 			wizard.AddStep (step1);
 
 			// If no current step, should be first step
@@ -350,7 +350,7 @@ namespace Terminal.Gui.DialogTests {
 			Assert.Null (wizard.GetNextStep ());
 
 			// If two steps and at 1 and step 2 is `Enabled = true`should be step 2
-			var step2 = new Wizard.WizardStep ("step2");
+			var step2 = new Wizard.WizardStep () { Title = "step2" };
 			wizard.AddStep (step2);
 			Assert.Equal (step2.Title.ToString (), wizard.GetNextStep ().Title.ToString ());
 
@@ -364,7 +364,7 @@ namespace Terminal.Gui.DialogTests {
 			//   At step 1 should be step 2
 			//   At step 2 should be step 3
 			//   At step 3 should be null
-			var step3 = new Wizard.WizardStep ("step3");
+			var step3 = new Wizard.WizardStep () { Title = "step3" };
 			wizard.AddStep (step3);
 			step1.Enabled = true;
 			wizard.CurrentStep = step1;
@@ -458,15 +458,15 @@ namespace Terminal.Gui.DialogTests {
 
 			Assert.Null (wizard.GetFirstStep ());
 
-			var step1 = new Wizard.WizardStep ("step1");
+			var step1 = new Wizard.WizardStep () { Title = "step1" };
 			wizard.AddStep (step1);
 			Assert.Equal (step1.Title.ToString (), wizard.GetFirstStep ().Title.ToString ());
 
-			var step2 = new Wizard.WizardStep ("step2");
+			var step2 = new Wizard.WizardStep () { Title = "step2" };
 			wizard.AddStep (step2);
 			Assert.Equal (step1.Title.ToString (), wizard.GetFirstStep ().Title.ToString ());
 
-			var step3 = new Wizard.WizardStep ("step3");
+			var step3 = new Wizard.WizardStep () { Title = "step3" };
 			wizard.AddStep (step3);
 			Assert.Equal (step1.Title.ToString (), wizard.GetFirstStep ().Title.ToString ());
 
@@ -488,15 +488,15 @@ namespace Terminal.Gui.DialogTests {
 
 			Assert.Null (wizard.GetLastStep ());
 
-			var step1 = new Wizard.WizardStep ("step1");
+			var step1 = new Wizard.WizardStep () { Title = "step1" };
 			wizard.AddStep (step1);
 			Assert.Equal (step1.Title.ToString (), wizard.GetLastStep ().Title.ToString ());
 
-			var step2 = new Wizard.WizardStep ("step2");
+			var step2 = new Wizard.WizardStep () { Title = "step2" };
 			wizard.AddStep (step2);
 			Assert.Equal (step2.Title.ToString (), wizard.GetLastStep ().Title.ToString ());
 
-			var step3 = new Wizard.WizardStep ("step3");
+			var step3 = new Wizard.WizardStep () { Title = "step3" };
 			wizard.AddStep (step3);
 			Assert.Equal (step3.Title.ToString (), wizard.GetLastStep ().Title.ToString ());
 
@@ -516,7 +516,7 @@ namespace Terminal.Gui.DialogTests {
 		{
 			// https://github.com/gui-cs/Terminal.Gui/issues/1833
 			var wizard = new Wizard ();
-			var step1 = new Wizard.WizardStep ("step1") { };
+			var step1 = new Wizard.WizardStep () { Title = "step1" };
 			wizard.AddStep (step1);
 
 			var finishedFired = false;
@@ -544,9 +544,9 @@ namespace Terminal.Gui.DialogTests {
 			// Same test, but with two steps
 			wizard = new Wizard ();
 			firstIteration = false;
-			step1 = new Wizard.WizardStep ("step1") { };
+			step1 = new Wizard.WizardStep () { Title = "step1" };
 			wizard.AddStep (step1);
-			var step2 = new Wizard.WizardStep ("step2") { };
+			var step2 = new Wizard.WizardStep () { Title = "step2" };
 			wizard.AddStep (step2);
 
 			finishedFired = false;
@@ -581,9 +581,9 @@ namespace Terminal.Gui.DialogTests {
 			// Same test, but with two steps but the 1st one disabled
 			wizard = new Wizard ();
 			firstIteration = false;
-			step1 = new Wizard.WizardStep ("step1") { };
+			step1 = new Wizard.WizardStep () { Title = "step1" };
 			wizard.AddStep (step1);
-			step2 = new Wizard.WizardStep ("step2") { };
+			step2 = new Wizard.WizardStep () { Title = "step2" };
 			wizard.AddStep (step2);
 			step1.Enabled = false;
 
