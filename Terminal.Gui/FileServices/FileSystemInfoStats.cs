@@ -12,7 +12,6 @@ namespace Terminal.Gui {
 	/// </summary>
 	internal class FileSystemInfoStats {
 
-
 		/* ---- Colors used by the ls command line tool ----
 		 *
 		* Blue: Directory
@@ -126,7 +125,6 @@ namespace Terminal.Gui {
 
 			int mag = (int)Math.Log (value, ByteConversion);
 			double adjustedSize = value / Math.Pow (1000, mag);
-
 
 			return string.Format ("{0:n2} {1}", adjustedSize, SizeSuffixes [mag]);
 		}

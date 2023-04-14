@@ -22,6 +22,7 @@ namespace Terminal.Gui {
 
 		}
 		
+		/// <inheritdoc/>
 		public override bool OnDrawFrames()
 		{
 			var screenBounds = ViewToScreen (Bounds);
@@ -39,6 +40,7 @@ namespace Terminal.Gui {
 
 		//}
 
+		/// <inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
 			OnDrawFrames ();

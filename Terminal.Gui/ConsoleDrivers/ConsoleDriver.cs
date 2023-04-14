@@ -534,7 +534,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The application toplevel color scheme, for the default toplevel views.
+		/// The application Toplevel color scheme, for the default Toplevel views.
 		/// </summary>
 		/// <remarks>
 		/// <para>
@@ -544,7 +544,7 @@ namespace Terminal.Gui {
 		public static ColorScheme TopLevel { get => GetColorScheme (); set => SetColorScheme (value); }
 
 		/// <summary>
-		/// The base color scheme, for the default toplevel views.
+		/// The base color scheme, for the default Toplevel views.
 		/// </summary>
 		/// <remarks>
 		/// <para>

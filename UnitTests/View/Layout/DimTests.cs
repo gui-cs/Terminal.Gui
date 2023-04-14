@@ -134,7 +134,6 @@ namespace Terminal.Gui.ViewTests {
 			Assert.NotEqual (dim1, dim2);
 		}
 
-
 		[Fact]
 		public void Height_Set_To_Null_Throws ()
 		{
@@ -171,7 +170,6 @@ namespace Terminal.Gui.ViewTests {
 			dim = Dim.Fill (testMargin);
 			Assert.Equal ($"Fill({testMargin})", dim.ToString ());
 		}
-
 
 		[Fact]
 		public void Fill_Equal ()
@@ -660,7 +658,6 @@ namespace Terminal.Gui.ViewTests {
 
 			Assert.Throws<InvalidOperationException> (() => t.LayoutSubviews ());
 		}
-
 
 		[Fact, AutoInitShutdown]
 		public void Dim_Add_Operator ()

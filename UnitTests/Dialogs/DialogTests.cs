@@ -84,7 +84,6 @@ namespace Terminal.Gui.DialogTests {
 			Assert.Equal (new Point (expected, expected), d.Frame.Location);
 		}
 
-
 		[Fact]
 		[AutoInitShutdown]
 		public void Size_Not_Default ()
@@ -116,7 +115,6 @@ namespace Terminal.Gui.DialogTests {
 			var expected = 1;
 			Assert.Equal (new Point (expected, expected), d.Frame.Location);
 		}
-
 
 		[Fact]
 		[AutoInitShutdown]
@@ -194,7 +192,6 @@ namespace Terminal.Gui.DialogTests {
 ║  │               │
 ║  │               │
 ╚══└───────────────┘", output);
-
 
 				} else if (iterations > 0) {
 					Application.RequestStop ();

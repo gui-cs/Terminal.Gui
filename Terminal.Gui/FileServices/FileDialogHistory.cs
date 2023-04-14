@@ -78,7 +78,6 @@ namespace Terminal.Gui {
 			return this.dlg.State?.Directory.Parent != null;
 		}
 
-
 		internal void Push (FileDialogState state, bool clearForward)
 		{
 			if (state == null) {
