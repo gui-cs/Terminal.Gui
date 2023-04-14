@@ -380,7 +380,6 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Overridden so no Frames get drawn (BUGBUG: v2 fix this hack)
 		/// </summary>
-		/// <param name="bounds"></param>
 		/// <returns></returns>
 		public override bool OnDrawFrames ()
 		{
