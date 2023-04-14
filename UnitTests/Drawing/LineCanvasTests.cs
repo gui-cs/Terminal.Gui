@@ -783,10 +783,6 @@ namespace Terminal.Gui.DrawingTests {
 
 		[Fact, AutoInitShutdown]
 		public void TestLineCanvas_LeaveMargin_Top1_Left1 ()
-
-		[Fact, SetupFakeDriver]
-		public void Top_Left_From_TopRigth_TopDown ()
-
 		{
 			var canvas = new LineCanvas ();
 
@@ -802,7 +798,7 @@ namespace Terminal.Gui.DrawingTests {
 		}
 
 		[Fact, SetupFakeDriver]
-		public void Top_Left_From_TopRigth_LeftUp ()
+		public void Top_Left_From_TopRight_LeftUp ()
 		{
 			var canvas = new LineCanvas ();
 
