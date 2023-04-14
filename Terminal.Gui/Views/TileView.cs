@@ -938,7 +938,7 @@ namespace Terminal.Gui {
 
 					// Start a Drag
 					SetFocus ();
-					Application.EnsuresTopOnFront ();
+					Application.BringOverlappedTopToFront ();
 
 					if (mouseEvent.Flags == MouseFlags.Button1Pressed) {
 						dragPosition = new Point (mouseEvent.X, mouseEvent.Y);

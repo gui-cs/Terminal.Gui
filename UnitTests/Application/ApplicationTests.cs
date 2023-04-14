@@ -28,7 +28,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.Null (Application.MainLoop);
 			Assert.Null (Application.Iteration);
 			Assert.Null (Application.RootMouseEvent);
-			Assert.Null (Application.Resized);
+			Assert.Null (Application.TerminalResized);
 		}
 
 		void Post_Init_State ()
@@ -40,7 +40,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.NotNull (Application.MainLoop);
 			Assert.Null (Application.Iteration);
 			Assert.Null (Application.RootMouseEvent);
-			Assert.Null (Application.Resized);
+			Assert.Null (Application.TerminalResized);
 		}
 
 		void Init ()
@@ -127,7 +127,7 @@ namespace Terminal.Gui.ApplicationTests {
 		class TestToplevel : Toplevel {
 			public TestToplevel ()
 			{
-				IsMdiContainer = false;
+				IsOverlappedContainer = false;
 			}
 		}
 
@@ -508,7 +508,7 @@ namespace Terminal.Gui.ApplicationTests {
 				t3.RequestStop ();
 				t2.RequestStop ();
 			};
-			// Now this will close the MdiContainer when all MdiChildes was closed
+			// Now this will close the OverlappedContainer when all OverlappedChildren was closed
 			t2.Closed += (s,_) => {
 				t1.RequestStop ();
 			};
@@ -557,7 +557,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.Equal (Application.Top, rs.Toplevel);
 			Assert.Null (Application.MouseGrabView);  // public
 			Assert.Null (Application.WantContinuousButtonPressedView); // public
-			Assert.False (Application.ShowChild (Application.Top));
+			Assert.False (Application.MoveToOverlappedChild (Application.Top));
 		}
 
 		#region KeyboardTests
@@ -864,12 +864,6 @@ namespace Terminal.Gui.ApplicationTests {
 
 		#endregion
 
-		[Fact, AutoInitShutdown]
-		public void GetSupportedCultures_Method ()
-		{
-			var cultures = Application.GetSupportedCultures ();
-			Assert.Equal (cultures.Count, Application.SupportedCultures.Count);
-		}
 
 		#region mousegrabtests
 		[Fact, AutoInitShutdown]

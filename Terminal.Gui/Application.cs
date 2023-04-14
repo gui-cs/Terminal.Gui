@@ -18,10 +18,10 @@ namespace Terminal.Gui {
 	/// // 5 rows/columns of padding.
 	/// Application.Init();
 	/// var win = new Window ($"Example App ({Application.QuitKey} to quit)") {
-	///     X = 5,
-	///     Y = 5,
-	///     Width = Dim.Fill (5),
-	///     Height = Dim.Fill (5)
+	///   X = 5,
+	///   Y = 5,
+	///   Width = Dim.Fill (5),
+	///   Height = Dim.Fill (5)
 	/// };
 	/// Application.Top.Add(win);
 	/// Application.Run();
@@ -29,20 +29,19 @@ namespace Terminal.Gui {
 	/// </code>
 	/// </example>
 	/// <remarks>
-	///   <para>
-	///     Creates a instance of <see cref="Terminal.Gui.MainLoop"/> to process input events, handle timers and
-	///     other sources of data. It is accessible via the <see cref="MainLoop"/> property.
-	///   </para>
-	///   <para>
-	///     The <see cref="Iteration"/> event is invoked on each iteration of the <see cref="Terminal.Gui.MainLoop"/>.
-	///   </para>
-	///   <para>
-	///     When invoked it sets the <see cref="SynchronizationContext"/> to one that is tied
-	///     to the <see cref="MainLoop"/>, allowing user code to use async/await.
-	///   </para>
+	///  <para>
+	///   Creates a instance of <see cref="Terminal.Gui.MainLoop"/> to process input events, handle timers and
+	///   other sources of data. It is accessible via the <see cref="MainLoop"/> property.
+	///  </para>
+	///  <para>
+	///   The <see cref="Iteration"/> event is invoked on each iteration of the <see cref="Terminal.Gui.MainLoop"/>.
+	///  </para>
+	///  <para>
+	///   When invoked it sets the <see cref="SynchronizationContext"/> to one that is tied
+	///   to the <see cref="MainLoop"/>, allowing user code to use async/await.
+	///  </para>
 	/// </remarks>
 	public static partial class Application {
-		static readonly Stack<Toplevel> _toplevels = new Stack<Toplevel> ();
 
 		/// <summary>
 		/// The current <see cref="ConsoleDriver"/> in use.
@@ -50,54 +49,15 @@ namespace Terminal.Gui {
 		public static ConsoleDriver Driver;
 
 		/// <summary>
-		/// Gets all the Mdi childes which represent all the not modal <see cref="Toplevel"/> from the <see cref="MdiTop"/>.
+		/// If <see langword="true"/>, forces the use of the System.Console-based (see <see cref="NetDriver"/>) driver. The default is <see langword="false"/>.
 		/// </summary>
-		public static List<Toplevel> MdiChildren {
-			get {
-				if (MdiTop != null) {
-					List<Toplevel> _mdiChildren = new List<Toplevel> ();
-					foreach (var top in _toplevels) {
-						if (top != MdiTop && !top.Modal) {
-							_mdiChildren.Add (top);
-						}
-					}
-					return _mdiChildren;
-				}
-				return null;
-			}
-		}
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+		public static bool UseSystemConsole { get; set; } = false;
 
-		/// <summary>
-		/// The <see cref="Toplevel"/> object used for the application on startup which <see cref="Toplevel.IsMdiContainer"/> is true.
-		/// </summary>
-		public static Toplevel MdiTop {
-			get {
-				if (Top.IsMdiContainer) {
-					return Top;
-				}
-				return null;
-			}
-		}
-
-		/// <summary>
-		/// The <see cref="Toplevel"/> object used for the application on startup (<seealso cref="Application.Top"/>)
-		/// </summary>
-		/// <value>The top.</value>
-		public static Toplevel Top { get; private set; }
-
-		/// <summary>
-		/// The current <see cref="Toplevel"/> object. This is updated when <see cref="Application.Run(Func{Exception, bool})"/> enters and leaves to point to the current <see cref="Toplevel"/> .
-		/// </summary>
-		/// <value>The current.</value>
-		public static Toplevel Current { get; private set; }
-
-		/// <summary>
-		/// The current <see cref="View"/> object that wants continuous mouse button pressed events.
-		/// </summary>
-		public static View WantContinuousButtonPressedView { get; private set; }
-
+		// For Unit testing - ignores UseSystemConsole
+		internal static bool _forceFakeConsole;
+		
 		private static bool? _enableConsoleScrolling;
-
 		/// <summary>
 		/// The current <see cref="ConsoleDriver.EnableConsoleScrolling"/> used in the terminal.
 		/// </summary>
@@ -132,194 +92,35 @@ namespace Terminal.Gui {
 			}
 		}
 
-		static Key _alternateForwardKey = Key.PageDown | Key.CtrlMask;
+		private static List<CultureInfo> _cachedSupportedCultures;
 
 		/// <summary>
-		/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
+		/// Gets all cultures supported by the application without the invariant language.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
-		public static Key AlternateForwardKey {
-			get => _alternateForwardKey;
-			set {
-				if (_alternateForwardKey != value) {
-					var oldKey = _alternateForwardKey;
-					_alternateForwardKey = value;
-					OnAlternateForwardKeyChanged (new KeyChangedEventArgs (oldKey, value));
-				}
-			}
-		}
+		public static List<CultureInfo> SupportedCultures => _cachedSupportedCultures;
 
-		static void OnAlternateForwardKeyChanged (KeyChangedEventArgs e)
+		private static List<CultureInfo> GetSupportedCultures ()
 		{
-			foreach (var top in _toplevels.ToArray ()) {
-				top.OnAlternateForwardKeyChanged (e);
-			}
+			CultureInfo [] culture = CultureInfo.GetCultures (CultureTypes.AllCultures);
+
+			// Get the assembly
+			Assembly assembly = Assembly.GetExecutingAssembly ();
+
+			//Find the location of the assembly
+			string assemblyLocation = AppDomain.CurrentDomain.BaseDirectory;
+
+			// Find the resource file name of the assembly
+			string resourceFilename = $"{Path.GetFileNameWithoutExtension (assembly.Location)}.resources.dll";
+
+			// Return all culture for which satellite folder found with culture code.
+			return culture.Where (cultureInfo =>
+			   assemblyLocation != null &&
+			   Directory.Exists (Path.Combine (assemblyLocation, cultureInfo.Name)) &&
+			   File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
+			).ToList ();
 		}
-
-		static Key _alternateBackwardKey = Key.PageUp | Key.CtrlMask;
-
-		/// <summary>
-		/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
-		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
-		public static Key AlternateBackwardKey {
-			get => _alternateBackwardKey;
-			set {
-				if (_alternateBackwardKey != value) {
-					var oldKey = _alternateBackwardKey;
-					_alternateBackwardKey = value;
-					OnAlternateBackwardKeyChanged (new KeyChangedEventArgs (oldKey, value));
-				}
-			}
-		}
-
-		static void OnAlternateBackwardKeyChanged (KeyChangedEventArgs oldKey)
-		{
-			foreach (var top in _toplevels.ToArray ()) {
-				top.OnAlternateBackwardKeyChanged (oldKey);
-			}
-		}
-
-		static Key _quitKey = Key.Q | Key.CtrlMask;
-
-		/// <summary>
-		/// Gets or sets the key to quit the application.
-		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
-		public static Key QuitKey {
-			get => _quitKey;
-			set {
-				if (_quitKey != value) {
-					var oldKey = _quitKey;
-					_quitKey = value;
-					OnQuitKeyChanged (new KeyChangedEventArgs (oldKey, value));
-				}
-			}
-		}
-
-		private static List<CultureInfo> _supportedCultures;
-
-		/// <summary>
-		/// Gets all supported cultures by the application without the invariant language.
-		/// </summary>
-		public static List<CultureInfo> SupportedCultures => _supportedCultures;
-
-		static void OnQuitKeyChanged (KeyChangedEventArgs e)
-		{
-			// Duplicate the list so if it changes during enumeration we're safe
-			foreach (var top in _toplevels.ToArray ()) {
-				top.OnQuitKeyChanged (e);
-			}
-		}
-
-		/// <summary>
-		/// The <see cref="MainLoop"/>  driver for the application
-		/// </summary>
-		/// <value>The main loop.</value>
-		public static MainLoop MainLoop { get; private set; }
-
-		/// <summary>
-		/// Disable or enable the mouse. The mouse is enabled by default.
-		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-		public static bool IsMouseDisabled { get; set; }
-
-		/// <summary>
-		/// Set to true to cause the RunLoop method to exit after the first iterations.
-		/// Set to false (the default) to cause the RunLoop to continue running until Application.RequestStop() is called.
-		/// </summary>
-		public static bool ExitRunLoopAfterFirstIteration { get; set; } = false;
-
-		/// <summary>
-		/// Notify that a new <see cref="RunState"/> was created (<see cref="Begin(Toplevel)"/> was called). The token is created in 
-		/// <see cref="Begin(Toplevel)"/> and this event will be fired before that function exits.
-		/// </summary>
-		/// <remarks>
-		///	If <see cref="ExitRunLoopAfterFirstIteration"/> is <see langword="true"/> callers to
-		///	<see cref="Begin(Toplevel)"/> must also subscribe to <see cref="NotifyStopRunState"/>
-		///	and manually dispose of the <see cref="RunState"/> token when the application is done.
-		/// </remarks>
-		public static event EventHandler<RunStateEventArgs> NotifyNewRunState;
-
-		/// <summary>
-		/// Notify that a existent <see cref="RunState"/> is stopping (<see cref="End(RunState)"/> was called).
-		/// </summary>
-		/// <remarks>
-		///	If <see cref="ExitRunLoopAfterFirstIteration"/> is <see langword="true"/> callers to
-		///	<see cref="Begin(Toplevel)"/> must also subscribe to <see cref="NotifyStopRunState"/>
-		///	and manually dispose of the <see cref="RunState"/> token when the application is done.
-		/// </remarks>
-		public static event EventHandler<ToplevelEventArgs> NotifyStopRunState;
-
-		/// <summary>
-		///   This event is raised on each iteration of the <see cref="MainLoop"/>. 
-		/// </summary>
-		/// <remarks>
-		///   See also <see cref="Timeout"/>
-		/// </remarks>
-		public static Action Iteration;
-
-		/// <summary>
-		/// Returns a rectangle that is centered in the screen for the provided size.
-		/// </summary>
-		/// <returns>The centered rect.</returns>
-		/// <param name="size">Size for the rectangle.</param>
-		public static Rect MakeCenteredRect (Size size)
-		{
-			return new Rect (new Point ((Driver.Cols - size.Width) / 2, (Driver.Rows - size.Height) / 2), size);
-		}
-
-		//
-		// provides the sync context set while executing code in Terminal.Gui, to let
-		// users use async/await on their code
-		//
-		class MainLoopSyncContext : SynchronizationContext {
-			readonly MainLoop mainLoop;
-
-			public MainLoopSyncContext (MainLoop mainLoop)
-			{
-				this.mainLoop = mainLoop;
-			}
-
-			public override SynchronizationContext CreateCopy ()
-			{
-				return new MainLoopSyncContext (MainLoop);
-			}
-
-			public override void Post (SendOrPostCallback d, object state)
-			{
-				mainLoop.AddIdle (() => {
-					d (state);
-					return false;
-				});
-				//mainLoop.Driver.Wakeup ();
-			}
-
-			public override void Send (SendOrPostCallback d, object state)
-			{
-				if (Thread.CurrentThread.ManagedThreadId == _mainThreadId) {
-					d (state);
-				} else {
-					var wasExecuted = false;
-					mainLoop.Invoke (() => {
-						d (state);
-						wasExecuted = true;
-					});
-					while (!wasExecuted) {
-						Thread.Sleep (15);
-					}
-				}
-			}
-		}
-
-		/// <summary>
-		/// If <see langword="true"/>, forces the use of the System.Console-based (see <see cref="NetDriver"/>) driver. The default is <see langword="false"/>.
-		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-		public static bool UseSystemConsole { get; set; } = false;
-
-		// For Unit testing - ignores UseSystemConsole
-		internal static bool _forceFakeConsole;
+		
+		#region Initialization (Init/Shutdown)
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="Terminal.Gui"/> Application. 
@@ -370,15 +171,6 @@ namespace Terminal.Gui {
 				throw new InvalidOperationException ("Init has already been called and must be bracketed by Shutdown.");
 			}
 
-			// Note in this case, we don't verify the type of the Toplevel created by new T(). 
-			// Used only for start debugging on Unix.
-			//#if DEBUG
-			//			while (!System.Diagnostics.Debugger.IsAttached) {
-			//				System.Threading.Thread.Sleep (100);
-			//			}
-			//			System.Diagnostics.Debugger.Break ();
-			//#endif
-
 			if (!calledViaRunT) {
 				// Reset all class variables (Application is a singleton).
 				ResetState ();
@@ -386,12 +178,6 @@ namespace Terminal.Gui {
 
 			// For UnitTests
 			if (driver != null) {
-				//if (mainLoopDriver == null) {
-				//	throw new ArgumentNullException ("InternalInit mainLoopDriver cannot be null if driver is provided.");
-				//}
-				//if (!(driver is FakeDriver)) {
-				//	throw new InvalidOperationException ("InternalInit can only be called with FakeDriver.");
-				//}
 				Driver = driver;
 			}
 
@@ -440,7 +226,7 @@ namespace Terminal.Gui {
 
 			try {
 				Driver.EnableConsoleScrolling = EnableConsoleScrolling;
-				Driver.Init (TerminalResized);
+				Driver.Init (OnTerminalResized);
 			} catch (InvalidOperationException ex) {
 				// This is a case where the driver is unable to initialize the console.
 				// This can happen if the console is already in use by another process or
@@ -453,13 +239,94 @@ namespace Terminal.Gui {
 
 			Top = topLevelFactory ();
 			Current = Top;
-			_supportedCultures = GetSupportedCultures ();
+			_cachedSupportedCultures = GetSupportedCultures ();
 			_mainThreadId = Thread.CurrentThread.ManagedThreadId;
 			_initialized = true;
 		}
 
+
 		/// <summary>
-		/// Captures the execution state for the provided <see cref="Toplevel"/> view.
+		/// Shutdown an application initialized with <see cref="Init(ConsoleDriver, IMainLoopDriver)"/>.
+		/// </summary>
+		/// <remarks>
+		/// Shutdown must be called for every call to <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> or <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>
+		/// to ensure all resources are cleaned up (Disposed) and terminal settings are restored.
+		/// </remarks>
+		public static void Shutdown ()
+		{
+			ResetState ();
+			ConfigurationManager.PrintJsonErrors ();
+		}
+
+		// Encapsulate all setting of initial state for Application; Having
+		// this in a function like this ensures we don't make mistakes in
+		// guaranteeing that the state of this singleton is deterministic when Init
+		// starts running and after Shutdown returns.
+		static void ResetState ()
+		{
+			// Shutdown is the bookend for Init. As such it needs to clean up all resources
+			// Init created. Apps that do any threading will need to code defensively for this.
+			// e.g. see Issue #537
+			foreach (var t in _Toplevels) {
+				t.Running = false;
+				t.Dispose ();
+			}
+			_Toplevels.Clear ();
+			Current = null;
+			Top?.Dispose ();
+			Top = null;
+
+			// BUGBUG: OverlappedTop is not cleared here, but it should be?
+
+			MainLoop = null;
+			Driver?.End ();
+			Driver = null;
+			Iteration = null;
+			RootMouseEvent = null;
+			RootKeyEvent = null;
+			TerminalResized = null;
+			_mainThreadId = -1;
+			NotifyNewRunState = null;
+			NotifyStopRunState = null;
+			_initialized = false;
+			_mouseGrabView = null;
+			_enableConsoleScrolling = false;
+			lastMouseOwnerView = null;
+
+			// Reset synchronization context to allow the user to run async/await,
+			// as the main loop has been ended, the synchronization context from 
+			// gui.cs does no longer process any callbacks. See #1084 for more details:
+			// (https://github.com/gui-cs/Terminal.Gui/issues/1084).
+			SynchronizationContext.SetSynchronizationContext (syncContext: null);
+		}
+
+		#endregion Initialization (Init/Shutdown)
+
+		#region Run (Begin, Run, End)
+
+		/// <summary>
+		/// Notify that a new <see cref="RunState"/> was created (<see cref="Begin(Toplevel)"/> was called). The token is created in 
+		/// <see cref="Begin(Toplevel)"/> and this event will be fired before that function exits.
+		/// </summary>
+		/// <remarks>
+		///	If <see cref="ExitRunLoopAfterFirstIteration"/> is <see langword="true"/> callers to
+		///	<see cref="Begin(Toplevel)"/> must also subscribe to <see cref="NotifyStopRunState"/>
+		///	and manually dispose of the <see cref="RunState"/> token when the application is done.
+		/// </remarks>
+		public static event EventHandler<RunStateEventArgs> NotifyNewRunState;
+
+		/// <summary>
+		/// Notify that a existent <see cref="RunState"/> is stopping (<see cref="End(RunState)"/> was called).
+		/// </summary>
+		/// <remarks>
+		///	If <see cref="ExitRunLoopAfterFirstIteration"/> is <see langword="true"/> callers to
+		///	<see cref="Begin(Toplevel)"/> must also subscribe to <see cref="NotifyStopRunState"/>
+		///	and manually dispose of the <see cref="RunState"/> token when the application is done.
+		/// </remarks>
+		public static event EventHandler<ToplevelEventArgs> NotifyStopRunState;
+
+		/// <summary>
+		/// The execution state for a <see cref="Toplevel"/> view.
 		/// </summary>
 		public class RunState : IDisposable {
 			/// <summary>
@@ -471,25 +338,28 @@ namespace Terminal.Gui {
 				Toplevel = view;
 			}
 			/// <summary>
-			/// The <see cref="Toplevel"/> belong to this <see cref="RunState"/>.
+			/// The <see cref="Toplevel"/> belonging to this <see cref="RunState"/>.
 			/// </summary>
 			public Toplevel Toplevel { get; internal set; }
 
 #if DEBUG_IDISPOSABLE
 			/// <summary>
-			/// For debug purposes to verify objects are being disposed properly
+			/// For debug (see DEBUG_IDISPOSABLE define) purposes to verify objects are being disposed properly
 			/// </summary>
 			public bool WasDisposed = false;
+
 			/// <summary>
-			/// For debug purposes to verify objects are being disposed properly
+			/// For debug (see DEBUG_IDISPOSABLE define) purposes to verify objects are being disposed properly
 			/// </summary>
 			public int DisposedCount = 0;
+
 			/// <summary>
-			/// For debug purposes
+			/// For debug (see DEBUG_IDISPOSABLE define) purposes; the runstate instances that have been created
 			/// </summary>
 			public static List<RunState> Instances = new List<RunState> ();
+			
 			/// <summary>
-			/// For debug purposes
+			/// Creates a new RunState object.
 			/// </summary>
 			public RunState ()
 			{
@@ -530,55 +400,585 @@ namespace Terminal.Gui {
 			}
 		}
 
-		static void ProcessKeyEvent (KeyEvent ke)
+		/// <summary>
+		/// Building block API: Prepares the provided <see cref="Toplevel"/> for execution.
+		/// </summary>
+		/// <returns>The <see cref="RunState"/> handle that needs to be passed to the <see cref="End(RunState)"/> method upon completion.</returns>
+		/// <param name="Toplevel">The <see cref="Toplevel"/> to prepare execution for.</param>
+		/// <remarks>
+		/// This method prepares the provided <see cref="Toplevel"/> for running with the focus,
+		/// it adds this to the list of <see cref="Toplevel"/>s, sets up the <see cref="MainLoop"/> to process the
+		/// event, lays out the Subviews, focuses the first element, and draws the
+		/// <see cref="Toplevel"/> in the screen. This is usually followed by executing
+		/// the <see cref="RunLoop"/> method, and then the <see cref="End(RunState)"/> method upon termination which will
+		///  undo these changes.
+		/// </remarks>
+		public static RunState Begin (Toplevel Toplevel)
 		{
-			if (RootKeyEvent?.Invoke (ke) ?? false) {
+			if (Toplevel == null) {
+				throw new ArgumentNullException (nameof (Toplevel));
+			} else if (Toplevel.IsOverlappedContainer && OverlappedTop != Toplevel && OverlappedTop != null) {
+				throw new InvalidOperationException ("Only one Overlapped Container is allowed.");
+			}
+
+			var rs = new RunState (Toplevel);
+
+			// View implements ISupportInitializeNotification which is derived from ISupportInitialize
+			if (!Toplevel.IsInitialized) {
+				Toplevel.BeginInit ();
+				Toplevel.EndInit ();
+			}
+
+			lock (_Toplevels) {
+				// If Top was already initialized with Init, and Begin has never been called
+				// Top was not added to the Toplevels Stack. It will thus never get disposed.
+				// Clean it up here:
+				if (Top != null && Toplevel != Top && !_Toplevels.Contains (Top)) {
+					Top.Dispose ();
+					Top = null;
+				} else if (Top != null && Toplevel != Top && _Toplevels.Contains (Top)) {
+					Top.OnLeave (Toplevel);
+				}
+				if (string.IsNullOrEmpty (Toplevel.Id.ToString ())) {
+					var count = 1;
+					var id = (_Toplevels.Count + count).ToString ();
+					while (_Toplevels.Count > 0 && _Toplevels.FirstOrDefault (x => x.Id.ToString () == id) != null) {
+						count++;
+						id = (_Toplevels.Count + count).ToString ();
+					}
+					Toplevel.Id = (_Toplevels.Count + count).ToString ();
+
+					_Toplevels.Push (Toplevel);
+				} else {
+					var dup = _Toplevels.FirstOrDefault (x => x.Id.ToString () == Toplevel.Id);
+					if (dup == null) {
+						_Toplevels.Push (Toplevel);
+					}
+				}
+
+				if (_Toplevels.FindDuplicates (new ToplevelEqualityComparer ()).Count > 0) {
+					throw new ArgumentException ("There are duplicates Toplevels Id's");
+				}
+			}
+			if (Top == null || Toplevel.IsOverlappedContainer) {
+				Top = Toplevel;
+			}
+
+			var refreshDriver = true;
+			if (OverlappedTop == null || Toplevel.IsOverlappedContainer || (Current?.Modal == false && Toplevel.Modal)
+				|| (Current?.Modal == false && !Toplevel.Modal) || (Current?.Modal == true && Toplevel.Modal)) {
+
+				if (Toplevel.Visible) {
+					Current = Toplevel;
+					SetCurrentOverlappedAsTop ();
+				} else {
+					refreshDriver = false;
+				}
+			} else if ((OverlappedTop != null && Toplevel != OverlappedTop && Current?.Modal == true && !_Toplevels.Peek ().Modal)
+				|| (OverlappedTop != null && Toplevel != OverlappedTop && Current?.Running == false)) {
+				refreshDriver = false;
+				MoveCurrent (Toplevel);
+			} else {
+				refreshDriver = false;
+				MoveCurrent (Current);
+			}
+
+			Driver.PrepareToRun (MainLoop, ProcessKeyEvent, ProcessKeyDownEvent, ProcessKeyUpEvent, ProcessMouseEvent);
+			if (Toplevel.LayoutStyle == LayoutStyle.Computed) {
+				Toplevel.SetRelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
+			}
+			Toplevel.LayoutSubviews ();
+			Toplevel.PositionToplevels ();
+			Toplevel.WillPresent ();
+			if (refreshDriver) {
+				OverlappedTop?.OnChildLoaded (Toplevel);
+				Toplevel.OnLoaded ();
+				Toplevel.SetNeedsDisplay ();
+				Toplevel.Redraw (Toplevel.Bounds);
+				Toplevel.PositionCursor ();
+				Driver.Refresh ();
+			}
+
+			NotifyNewRunState?.Invoke (Toplevel, new RunStateEventArgs (rs));
+			return rs;
+		}
+
+		/// <summary>
+		/// Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool})"/> with the value of <see cref="Top"/>.
+		/// </summary>
+		/// <remarks>
+		/// See <see cref="Run(Toplevel, Func{Exception, bool})"/> for more details.
+		/// </remarks>
+		public static void Run (Func<Exception, bool> errorHandler = null)
+		{
+			Run (Top, errorHandler);
+		}
+
+		/// <summary>
+		/// Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool})"/> 
+		/// with a new instance of the specified <see cref="Toplevel"/>-derived class.
+		/// <para>
+		/// Calling <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> first is not needed as this function will initialize the application.
+		/// </para>
+		/// <para>
+		/// <see cref="Shutdown"/> must be called when the application is closing (typically after Run> has 
+		/// returned) to ensure resources are cleaned up and terminal settings restored.
+		/// </para>
+		/// </summary>
+		/// <remarks>
+		/// See <see cref="Run(Toplevel, Func{Exception, bool})"/> for more details.
+		/// </remarks>
+		/// <param name="errorHandler"></param>
+		/// <param name="driver">The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the
+		/// platform will be used (<see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>).
+		/// Must be <see langword="null"/> if <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> has already been called. 
+		/// </param>
+		/// <param name="mainLoopDriver">Specifies the <see cref="MainLoop"/> to use.</param>
+		public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null) where T : Toplevel, new()
+		{
+			if (_initialized) {
+				if (Driver != null) {
+					// Init() has been called and we have a driver, so just run the app.
+					var top = new T ();
+					var type = top.GetType ().BaseType;
+					while (type != typeof (Toplevel) && type != typeof (object)) {
+						type = type.BaseType;
+					}
+					if (type != typeof (Toplevel)) {
+						throw new ArgumentException ($"{top.GetType ().Name} must be derived from TopLevel");
+					}
+					Run (top, errorHandler);
+				} else {
+					// This codepath should be impossible because Init(null, null) will select the platform default driver
+					throw new InvalidOperationException ("Init() completed without a driver being set (this should be impossible); Run<T>() cannot be called.");
+				}
+			} else {
+				// Init() has NOT been called.
+				InternalInit (() => new T (), driver, mainLoopDriver, calledViaRunT: true);
+				Run (Top, errorHandler);
+			}
+		}
+
+		/// <summary>
+		///  Runs the main loop on the given <see cref="Toplevel"/> container.
+		/// </summary>
+		/// <remarks>
+		///  <para>
+		///   This method is used to start processing events
+		///   for the main application, but it is also used to
+		///   run other modal <see cref="View"/>s such as <see cref="Dialog"/> boxes.
+		///  </para>
+		///  <para>
+		///   To make a <see cref="Run(Toplevel, Func{Exception, bool})"/> stop execution, call <see cref="Application.RequestStop"/>.
+		///  </para>
+		///  <para>
+		///   Calling <see cref="Run(Toplevel, Func{Exception, bool})"/> is equivalent to calling <see cref="Begin(Toplevel)"/>, followed by <see cref="RunLoop(RunState, bool)"/>,
+		///   and then calling <see cref="End(RunState)"/>.
+		///  </para>
+		///  <para>
+		///   Alternatively, to have a program control the main loop and 
+		///   process events manually, call <see cref="Begin(Toplevel)"/> to set things up manually and then
+		///   repeatedly call <see cref="RunLoop(RunState, bool)"/> with the wait parameter set to false. By doing this
+		///   the <see cref="RunLoop(RunState, bool)"/> method will only process any pending events, timers, idle handlers and
+		///   then return control immediately.
+		///  </para>
+		///  <para>
+		///   RELEASE builds only: When <paramref name="errorHandler"/> is <see langword="null"/> any exeptions will be rethrown. 
+		///   Otherwise, if <paramref name="errorHandler"/> will be called. If <paramref name="errorHandler"/> 
+		///   returns <see langword="true"/> the <see cref="RunLoop(RunState, bool)"/> will resume; otherwise 
+		///   this method will exit.
+		///  </para>
+		/// </remarks>
+		/// <param name="view">The <see cref="Toplevel"/> to run modally.</param>
+		/// <param name="errorHandler">RELEASE builds only: Handler for any unhandled exceptions (resumes when returns true, rethrows when null).</param>
+		public static void Run (Toplevel view, Func<Exception, bool> errorHandler = null)
+		{
+			var resume = true;
+			while (resume) {
+#if !DEBUG
+				try {
+#endif
+				resume = false;
+				var runToken = Begin (view);
+				// If ExitRunLoopAfterFirstIteration is true then the user must dispose of the runToken
+				// by using NotifyStopRunState event.
+				RunLoop (runToken);
+				if (!ExitRunLoopAfterFirstIteration) {
+					End (runToken);
+				}
+#if !DEBUG
+				}
+				catch (Exception error)
+				{
+					if (errorHandler == null)
+					{
+						throw;
+					}
+					resume = errorHandler(error);
+				}
+#endif
+			}
+		}		
+
+		/// <summary>
+		/// Triggers a refresh of the entire display.
+		/// </summary>
+		public static void Refresh ()
+		{
+			Driver.UpdateOffScreen ();
+			View last = null;
+			foreach (var v in _Toplevels.Reverse ()) {
+				if (v.Visible) {
+					v.SetNeedsDisplay ();
+					v.Redraw (v.Bounds);
+				}
+				last = v;
+			}
+			last?.PositionCursor ();
+			Driver.Refresh ();
+		}
+
+		/// <summary>
+		///  This event is raised on each iteration of the <see cref="MainLoop"/>. 
+		/// </summary>
+		/// <remarks>
+		///  See also <see cref="Timeout"/>
+		/// </remarks>
+		public static Action Iteration;
+
+		/// <summary>
+		/// The <see cref="MainLoop"/> driver for the application
+		/// </summary>
+		/// <value>The main loop.</value>
+		public static MainLoop MainLoop { get; private set; }
+
+		/// <summary>
+		/// Set to true to cause the RunLoop method to exit after the first iterations.
+		/// Set to false (the default) to cause the RunLoop to continue running until Application.RequestStop() is called.
+		/// </summary>
+		public static bool ExitRunLoopAfterFirstIteration { get; set; } = false;
+
+		//
+		// provides the sync context set while executing code in Terminal.Gui, to let
+		// users use async/await on their code
+		//
+		class MainLoopSyncContext : SynchronizationContext {
+			readonly MainLoop mainLoop;
+
+			public MainLoopSyncContext (MainLoop mainLoop)
+			{
+				this.mainLoop = mainLoop;
+			}
+
+			public override SynchronizationContext CreateCopy ()
+			{
+				return new MainLoopSyncContext (MainLoop);
+			}
+
+			public override void Post (SendOrPostCallback d, object state)
+			{
+				mainLoop.AddIdle (() => {
+					d (state);
+					return false;
+				});
+				//mainLoop.Driver.Wakeup ();
+			}
+
+			public override void Send (SendOrPostCallback d, object state)
+			{
+				if (Thread.CurrentThread.ManagedThreadId == _mainThreadId) {
+					d (state);
+				} else {
+					var wasExecuted = false;
+					mainLoop.Invoke (() => {
+						d (state);
+						wasExecuted = true;
+					});
+					while (!wasExecuted) {
+						Thread.Sleep (15);
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		///  Building block API: Runs the <see cref="MainLoop"/> for the created <see cref="Toplevel"/>.
+		/// </summary>
+		/// <remarks>
+		///  Use the <paramref name="wait"/> parameter to control whether this is a blocking or non-blocking call.
+		/// </remarks>
+		/// <param name="state">The state returned by the <see cref="Begin(Toplevel)"/> method.</param>
+		/// <param name="wait">By default this is <see langword="true"/> which will execute the loop waiting for events, 
+		/// if set to <see langword="false"/>, a single iteration will execute.</param>
+		public static void RunLoop (RunState state, bool wait = true)
+		{
+			if (state == null)
+				throw new ArgumentNullException (nameof (state));
+			if (state.Toplevel == null)
+				throw new ObjectDisposedException ("state");
+
+			bool firstIteration = true;
+			for (state.Toplevel.Running = true; state.Toplevel.Running;) {
+				if (ExitRunLoopAfterFirstIteration && !firstIteration) {
+					return;
+				}
+				RunMainLoopIteration (ref state, wait, ref firstIteration);
+			}
+		}
+
+		/// <summary>
+		/// Run one iteration of the <see cref="MainLoop"/>.
+		/// </summary>
+		/// <param name="state">The state returned by <see cref="Begin(Toplevel)"/>.</param>
+		/// <param name="wait">If <see langword="true"/> will execute the <see cref="MainLoop"/> waiting for events. If <see langword="true"/>
+		/// will return after a single iteration.</param>
+		/// <param name="firstIteration">Set to <see langword="true"/> if this is the first run loop iteration. Upon return,
+		/// it will be set to <see langword="false"/> if at least one iteration happened.</param>
+		public static void RunMainLoopIteration (ref RunState state, bool wait, ref bool firstIteration)
+		{
+			if (MainLoop.EventsPending (wait)) {
+				// Notify Toplevel it's ready
+				if (firstIteration) {
+					state.Toplevel.OnReady ();
+				}
+
+				MainLoop.MainIteration ();
+				Iteration?.Invoke ();
+
+				EnsureModalOrVisibleAlwaysOnTop (state.Toplevel);
+				if ((state.Toplevel != Current && Current?.Modal == true)
+					|| (state.Toplevel != Current && Current?.Modal == false)) {
+					OverlappedTop?.OnDeactivate (state.Toplevel);
+					state.Toplevel = Current;
+					OverlappedTop?.OnActivate (state.Toplevel);
+					Top.SetSubViewNeedsDisplay ();
+					Refresh ();
+				}
+				if (Driver.EnsureCursorVisibility ()) {
+					state.Toplevel.SetNeedsDisplay ();
+				}
+			} else if (!wait) {
+				return;
+			}
+			firstIteration = false;
+
+			if (state.Toplevel != Top
+				&& (!Top._needsDisplay.IsEmpty || Top._childNeedsDisplay || Top.LayoutNeeded)) {
+				state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
+				Top.Redraw (Top.Bounds);
+				foreach (var top in _Toplevels.Reverse ()) {
+					if (top != Top && top != state.Toplevel) {
+						top.SetNeedsDisplay ();
+						top.Redraw (top.Bounds);
+					}
+				}
+			}
+			if (_Toplevels.Count == 1 && state.Toplevel == Top
+				&& (Driver.Cols != state.Toplevel.Frame.Width || Driver.Rows != state.Toplevel.Frame.Height)
+				&& (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._childNeedsDisplay || state.Toplevel.LayoutNeeded)) {
+
+				Driver.SetAttribute (Colors.TopLevel.Normal);
+				state.Toplevel.Clear (new Rect (0, 0, Driver.Cols, Driver.Rows));
+
+			}
+
+			if (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._childNeedsDisplay || state.Toplevel.LayoutNeeded
+				|| OverlappedChildNeedsDisplay ()) {
+				state.Toplevel.Redraw (state.Toplevel.Bounds);
+				//if (state.Toplevel.SuperView != null) {
+				//	state.Toplevel.SuperView?.OnRenderLineCanvas ();
+				//} else {
+				//	state.Toplevel.OnRenderLineCanvas ();
+				//}
+				state.Toplevel.PositionCursor ();
+				Driver.Refresh ();
+			} else {
+				Driver.UpdateCursor ();
+			}
+			if (state.Toplevel != Top && !state.Toplevel.Modal
+				&& (!Top._needsDisplay.IsEmpty || Top._childNeedsDisplay || Top.LayoutNeeded)) {
+				Top.Redraw (Top.Bounds);
+			}
+		}
+
+		/// <summary>
+		/// Wakes up the <see cref="MainLoop"/> that might be waiting on input; must be thread safe.
+		/// </summary>
+		public static void DoEvents ()
+		{
+			MainLoop.Driver.Wakeup ();
+		}
+
+		/// <summary>
+		/// Stops running the most recent <see cref="Toplevel"/> or the <paramref name="top"/> if provided.
+		/// </summary>
+		/// <param name="top">The <see cref="Toplevel"/> to stop.</param>
+		/// <remarks>
+		///  <para>
+		///  This will cause <see cref="Application.Run(Func{Exception, bool})"/> to return.
+		///  </para>
+		///  <para>
+		///   Calling <see cref="Application.RequestStop"/> is equivalent to setting the <see cref="Toplevel.Running"/> property 
+		///   on the currently running <see cref="Toplevel"/> to false.
+		///  </para>
+		/// </remarks>
+		public static void RequestStop (Toplevel top = null)
+		{
+			if (OverlappedTop == null || top == null || (OverlappedTop == null && top != null)) {
+				top = Current;
+			}
+
+			if (OverlappedTop != null && top.IsOverlappedContainer && top?.Running == true
+				&& (Current?.Modal == false || (Current?.Modal == true && Current?.Running == false))) {
+
+				OverlappedTop.RequestStop ();
+			} else if (OverlappedTop != null && top != Current && Current?.Running == true && Current?.Modal == true
+				&& top.Modal && top.Running) {
+
+				var ev = new ToplevelClosingEventArgs (Current);
+				Current.OnClosing (ev);
+				if (ev.Cancel) {
+					return;
+				}
+				ev = new ToplevelClosingEventArgs (top);
+				top.OnClosing (ev);
+				if (ev.Cancel) {
+					return;
+				}
+				Current.Running = false;
+				OnNotifyStopRunState (Current);
+				top.Running = false;
+				OnNotifyStopRunState (top);
+			} else if ((OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Modal == false
+				&& Current?.Running == true && !top.Running)
+				|| (OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Modal == false
+				&& Current?.Running == false && !top.Running && _Toplevels.ToArray () [1].Running)) {
+
+				MoveCurrent (top);
+			} else if (OverlappedTop != null && Current != top && Current?.Running == true && !top.Running
+				&& Current?.Modal == true && top.Modal) {
+				// The Current and the top are both modal so needed to set the Current.Running to false too.
+				Current.Running = false;
+				OnNotifyStopRunState (Current);
+			} else if (OverlappedTop != null && Current == top && OverlappedTop?.Running == true && Current?.Running == true && top.Running
+				&& Current?.Modal == true && top.Modal) {
+				// The OverlappedTop was requested to stop inside a modal Toplevel which is the Current and top,
+				// both are the same, so needed to set the Current.Running to false too.
+				Current.Running = false;
+				OnNotifyStopRunState (Current);
+			} else {
+				Toplevel currentTop;
+				if (top == Current || (Current?.Modal == true && !top.Modal)) {
+					currentTop = Current;
+				} else {
+					currentTop = top;
+				}
+				if (!currentTop.Running) {
+					return;
+				}
+				var ev = new ToplevelClosingEventArgs (currentTop);
+				currentTop.OnClosing (ev);
+				if (ev.Cancel) {
+					return;
+				}
+				currentTop.Running = false;
+				OnNotifyStopRunState (currentTop);
+			}
+		}
+
+		static void OnNotifyStopRunState (Toplevel top)
+		{
+			if (ExitRunLoopAfterFirstIteration) {
+				NotifyStopRunState?.Invoke (top, new ToplevelEventArgs (top));
+			}
+		}
+		
+		/// <summary>
+		/// Building block API: completes the execution of a <see cref="Toplevel"/> that was started with <see cref="Begin(Toplevel)"/> .
+		/// </summary>
+		/// <param name="runState">The <see cref="RunState"/> returned by the <see cref="Begin(Toplevel)"/> method.</param>
+		public static void End (RunState runState)
+		{
+			if (runState == null)
+				throw new ArgumentNullException (nameof (runState));
+
+			if (OverlappedTop != null) {
+				OverlappedTop.OnChildUnloaded (runState.Toplevel);
+			} else {
+				runState.Toplevel.OnUnloaded ();
+			}
+
+			// End the RunState.Toplevel 
+			// First, take it off the Toplevel Stack
+			if (_Toplevels.Count > 0) {
+				if (_Toplevels.Peek () != runState.Toplevel) {
+					// If there the top of the stack is not the RunState.Toplevel then
+					// this call to End is not balanced with the call to Begin that started the RunState
+					throw new ArgumentException ("End must be balanced with calls to Begin");
+				}
+				_Toplevels.Pop ();
+			}
+
+			// Notify that it is closing
+			runState.Toplevel?.OnClosed (runState.Toplevel);
+
+			// If there is a OverlappedTop that is not the RunState.Toplevel then runstate.TopLevel 
+			// is a child of MidTop and we should notify the OverlappedTop that it is closing
+			if (OverlappedTop != null && !(runState.Toplevel).Modal && runState.Toplevel != OverlappedTop) {
+				OverlappedTop.OnChildClosed (runState.Toplevel);
+			}
+
+			// Set Current and Top to the next TopLevel on the stack
+			if (_Toplevels.Count == 0) {
+				Current = null;
+			} else {
+				Current = _Toplevels.Peek ();
+				if (_Toplevels.Count == 1 && Current == OverlappedTop) {
+					OverlappedTop.OnAllChildClosed ();
+				} else {
+					SetCurrentOverlappedAsTop ();
+					Current.OnEnter (Current);
+				}
+				Refresh ();
+			}
+
+			runState.Toplevel?.Dispose ();
+			runState.Toplevel = null;
+			runState.Dispose ();
+		}
+
+		#endregion Run (Begin, Run, End)
+
+		#region Toplevel handling
+		static readonly Stack<Toplevel> _Toplevels = new Stack<Toplevel> ();
+
+		/// <summary>
+		/// The <see cref="Toplevel"/> object used for the application on startup (<seealso cref="Application.Top"/>)
+		/// </summary>
+		/// <value>The top.</value>
+		public static Toplevel Top { get; private set; }
+
+		/// <summary>
+		/// The current <see cref="Toplevel"/> object. This is updated when <see cref="Application.Run(Func{Exception, bool})"/> 
+		/// enters and leaves to point to the current <see cref="Toplevel"/> .
+		/// </summary>
+		/// <value>The current.</value>
+		public static Toplevel Current { get; private set; }
+
+		static void EnsureModalOrVisibleAlwaysOnTop (Toplevel Toplevel)
+		{
+			if (!Toplevel.Running || (Toplevel == Current && Toplevel.Visible) || OverlappedTop == null || _Toplevels.Peek ().Modal) {
 				return;
 			}
 
-			var chain = _toplevels.ToList ();
-			foreach (var topLevel in chain) {
-				if (topLevel.ProcessHotKey (ke))
+			foreach (var top in _Toplevels.Reverse ()) {
+				if (top.Modal && top != Current) {
+					MoveCurrent (top);
 					return;
-				if (topLevel.Modal)
-					break;
+				}
 			}
-
-			foreach (var topLevel in chain) {
-				if (topLevel.ProcessKey (ke))
-					return;
-				if (topLevel.Modal)
-					break;
-			}
-
-			foreach (var topLevel in chain) {
-				// Process the key normally
-				if (topLevel.ProcessColdKey (ke))
-					return;
-				if (topLevel.Modal)
-					break;
-			}
-		}
-
-		static void ProcessKeyDownEvent (KeyEvent ke)
-		{
-			var chain = _toplevels.ToList ();
-			foreach (var topLevel in chain) {
-				if (topLevel.OnKeyDown (ke))
-					return;
-				if (topLevel.Modal)
-					break;
-			}
-		}
-
-		static void ProcessKeyUpEvent (KeyEvent ke)
-		{
-			var chain = _toplevels.ToList ();
-			foreach (var topLevel in chain) {
-				if (topLevel.OnKeyUp (ke))
-					return;
-				if (topLevel.Modal)
-					break;
+			if (!Toplevel.Visible && Toplevel == Current) {
+				OverlappedMoveNext ();
 			}
 		}
 
@@ -592,54 +992,18 @@ namespace Terminal.Gui {
 				return null;
 			}
 
-			if (_toplevels != null) {
-				int count = _toplevels.Count;
+			if (_Toplevels != null) {
+				int count = _Toplevels.Count;
 				if (count > 0) {
 					var rx = x - startFrame.X;
 					var ry = y - startFrame.Y;
-					foreach (var t in _toplevels) {
+					foreach (var t in _Toplevels) {
 						if (t != Current) {
 							if (t != start && t.Visible && t.Frame.Contains (rx, ry)) {
 								start = t;
 								break;
 							}
 						}
-					}
-				}
-			}
-			resx = x - startFrame.X;
-			resy = y - startFrame.Y;
-			return start;
-		}
-
-		static View FindDeepestMdiView (View start, int x, int y, out int resx, out int resy)
-		{
-			if (start.GetType ().BaseType != typeof (Toplevel)
-				&& !((Toplevel)start).IsMdiContainer) {
-				resx = 0;
-				resy = 0;
-				return null;
-			}
-
-			var startFrame = start.Frame;
-
-			if (!startFrame.Contains (x, y)) {
-				resx = 0;
-				resy = 0;
-				return null;
-			}
-
-			int count = _toplevels.Count;
-			for (int i = count - 1; i >= 0; i--) {
-				foreach (var top in _toplevels) {
-					var rx = x - startFrame.X;
-					var ry = y - startFrame.Y;
-					if (top.Visible && top.Frame.Contains (rx, ry)) {
-						var deep = View.FindDeepestView (top, rx, ry, out resx, out resy);
-						if (deep == null)
-							return FindDeepestMdiView (top, rx, ry, out resx, out resy);
-						if (deep != MdiTop)
-							return deep;
 					}
 				}
 			}
@@ -659,38 +1023,120 @@ namespace Terminal.Gui {
 			return top;
 		}
 
+		// Only return true if the Current has changed.
+		static bool MoveCurrent (Toplevel top)
+		{
+			// The Current is modal and the top is not modal Toplevel then
+			// the Current must be moved above the first not modal Toplevel.
+			if (OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Modal == true && !_Toplevels.Peek ().Modal) {
+				lock (_Toplevels) {
+					_Toplevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
+				}
+				var index = 0;
+				var savedToplevels = _Toplevels.ToArray ();
+				foreach (var t in savedToplevels) {
+					if (!t.Modal && t != Current && t != top && t != savedToplevels [index]) {
+						lock (_Toplevels) {
+							_Toplevels.MoveTo (top, index, new ToplevelEqualityComparer ());
+						}
+					}
+					index++;
+				}
+				return false;
+			}
+			// The Current and the top are both not running Toplevel then
+			// the top must be moved above the first not running Toplevel.
+			if (OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Running == false && !top.Running) {
+				lock (_Toplevels) {
+					_Toplevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
+				}
+				var index = 0;
+				foreach (var t in _Toplevels.ToArray ()) {
+					if (!t.Running && t != Current && index > 0) {
+						lock (_Toplevels) {
+							_Toplevels.MoveTo (top, index - 1, new ToplevelEqualityComparer ());
+						}
+					}
+					index++;
+				}
+				return false;
+			}
+			if ((OverlappedTop != null && top?.Modal == true && _Toplevels.Peek () != top)
+				|| (OverlappedTop != null && Current != OverlappedTop && Current?.Modal == false && top == OverlappedTop)
+				|| (OverlappedTop != null && Current?.Modal == false && top != Current)
+				|| (OverlappedTop != null && Current?.Modal == true && top == OverlappedTop)) {
+				lock (_Toplevels) {
+					_Toplevels.MoveTo (top, 0, new ToplevelEqualityComparer ());
+					Current = top;
+				}
+			}
+			return true;
+		}
+
+		/// <summary>
+		/// Invoked when the terminal was resized. The new size of the terminal is provided.
+		/// </summary>
+		public static Action<ResizedEventArgs> TerminalResized;
+
+		static void OnTerminalResized ()
+		{
+			var full = new Rect (0, 0, Driver.Cols, Driver.Rows);
+			TerminalResized?.Invoke (new ResizedEventArgs () { Cols = full.Width, Rows = full.Height });
+			Driver.Clip = full;
+			foreach (var t in _Toplevels) {
+				t.SetRelativeLayout (full);
+				t.LayoutSubviews ();
+				t.PositionToplevels ();
+				t.OnTerminalResized (new SizeChangedEventArgs (full.Size));
+			}
+			Refresh ();
+		}
+
+		#endregion Toplevel handling
+
+		#region Mouse handling
+		/// <summary>
+		/// Disable or enable the mouse. The mouse is enabled by default.
+		/// </summary>
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+		public static bool IsMouseDisabled { get; set; }
+
+		/// <summary>
+		/// The current <see cref="View"/> object that wants continuous mouse button pressed events.
+		/// </summary>
+		public static View WantContinuousButtonPressedView { get; private set; }
+
 		static View _mouseGrabView;
 
 		/// <summary>
-		/// The view that grabbed the mouse, to where will be routed all the mouse events.
+		/// The view that grabbed the mouse, to where mouse events will be routed to.
 		/// </summary>
 		public static View MouseGrabView => _mouseGrabView;
 
 		/// <summary>
-		/// Event to be invoked when a view want grab the mouse which can be canceled.
+		/// Invoked when a view wants to grab the mouse; can be canceled.
 		/// </summary>
 		public static event EventHandler<GrabMouseEventArgs> GrabbingMouse;
 
 		/// <summary>
-		/// Event to be invoked when a view want ungrab the mouse which can be canceled.
+		/// Invoked when a view wants ungrab the mouse; can be canceled.
 		/// </summary>
 		public static event EventHandler<GrabMouseEventArgs> UnGrabbingMouse;
 
 		/// <summary>
-		/// Event to be invoked when a view grab the mouse.
+		/// Invoked after a view has grabbed the mouse.
 		/// </summary>
 		public static event EventHandler<ViewEventArgs> GrabbedMouse;
 
 		/// <summary>
-		/// Event to be invoked when a view ungrab the mouse.
+		/// Invoked after a view has ungrabbed the mouse.
 		/// </summary>
 		public static event EventHandler<ViewEventArgs> UnGrabbedMouse;
 
 		/// <summary>
-		/// Grabs the mouse, forcing all mouse events to be routed to the specified view until UngrabMouse is called.
+		/// Grabs the mouse, forcing all mouse events to be routed to the specified view until <see cref="UngrabMouse"/> is called.
 		/// </summary>
-		/// <returns>The grab.</returns>
-		/// <param name="view">View that will receive all mouse events until UngrabMouse is invoked.</param>
+		/// <param name="view">View that will receive all mouse events until <see cref="UngrabMouse"/> is invoked.</param>
 		public static void GrabMouse (View view)
 		{
 			if (view == null)
@@ -753,19 +1199,15 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static Action<MouseEvent> RootMouseEvent;
 
-		/// <summary>
-		/// <para>
-		/// Called for new KeyPress events before any processing is performed or
-		/// views evaluate.  Use for global key handling and/or debugging.
-		/// </para>
-		/// <para>Return true to suppress the KeyPress event</para>
-		/// </summary>
-		public static Func<KeyEvent, bool> RootKeyEvent;
-
 		static View lastMouseOwnerView;
 
 		static void ProcessMouseEvent (MouseEvent me)
 		{
+			bool OutsideFrame (Point p, Rect r)
+			{
+				return p.X < 0 || p.X > r.Width - 1 || p.Y < 0 || p.Y > r.Height - 1;
+			}
+
 			if (IsMouseDisabled) {
 				return;
 			}
@@ -805,13 +1247,13 @@ namespace Terminal.Gui {
 				}
 			}
 
-			if ((view == null || view == MdiTop) && !Current.Modal && MdiTop != null
+			if ((view == null || view == OverlappedTop) && !Current.Modal && OverlappedTop != null
 				&& me.Flags != MouseFlags.ReportMousePosition && me.Flags != 0) {
 
 				var top = FindDeepestTop (Top, me.X, me.Y, out _, out _);
 				view = View.FindDeepestView (top, me.X, me.Y, out rx, out ry);
 
-				if (view != null && view != MdiTop && top != Current) {
+				if (view != null && view != OverlappedTop && top != Current) {
 					MoveCurrent ((Toplevel)top);
 				}
 			}
@@ -846,759 +1288,147 @@ namespace Terminal.Gui {
 				// Should we bubbled up the event, if it is not handled?
 				view.OnMouseEvent (nme);
 
-				EnsuresTopOnFront ();
+				BringOverlappedTopToFront ();
 			}
 		}
+		#endregion Mouse handling
 
-		// Only return true if the Current has changed.
-		static bool MoveCurrent (Toplevel top)
-		{
-			// The Current is modal and the top is not modal toplevel then
-			// the Current must be moved above the first not modal toplevel.
-			if (MdiTop != null && top != MdiTop && top != Current && Current?.Modal == true && !_toplevels.Peek ().Modal) {
-				lock (_toplevels) {
-					_toplevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
-				}
-				var index = 0;
-				var savedToplevels = _toplevels.ToArray ();
-				foreach (var t in savedToplevels) {
-					if (!t.Modal && t != Current && t != top && t != savedToplevels [index]) {
-						lock (_toplevels) {
-							_toplevels.MoveTo (top, index, new ToplevelEqualityComparer ());
-						}
-					}
-					index++;
-				}
-				return false;
-			}
-			// The Current and the top are both not running toplevel then
-			// the top must be moved above the first not running toplevel.
-			if (MdiTop != null && top != MdiTop && top != Current && Current?.Running == false && !top.Running) {
-				lock (_toplevels) {
-					_toplevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
-				}
-				var index = 0;
-				foreach (var t in _toplevels.ToArray ()) {
-					if (!t.Running && t != Current && index > 0) {
-						lock (_toplevels) {
-							_toplevels.MoveTo (top, index - 1, new ToplevelEqualityComparer ());
-						}
-					}
-					index++;
-				}
-				return false;
-			}
-			if ((MdiTop != null && top?.Modal == true && _toplevels.Peek () != top)
-				|| (MdiTop != null && Current != MdiTop && Current?.Modal == false && top == MdiTop)
-				|| (MdiTop != null && Current?.Modal == false && top != Current)
-				|| (MdiTop != null && Current?.Modal == true && top == MdiTop)) {
-				lock (_toplevels) {
-					_toplevels.MoveTo (top, 0, new ToplevelEqualityComparer ());
-					Current = top;
-				}
-			}
-			return true;
-		}
+		#region Keyboard handling
 
-		static bool OutsideFrame (Point p, Rect r)
-		{
-			return p.X < 0 || p.X > r.Width - 1 || p.Y < 0 || p.Y > r.Height - 1;
-		}
+
+		static Key _alternateForwardKey = Key.PageDown | Key.CtrlMask;
 
 		/// <summary>
-		/// Building block API: Prepares the provided <see cref="Toplevel"/>  for execution.
+		/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
 		/// </summary>
-		/// <returns>The <see cref="RunState"/> handle that needs to be passed to the <see cref="End(RunState)"/> method upon completion.</returns>
-		/// <param name="toplevel">The <see cref="Toplevel"/> to prepare execution for.</param>
-		/// <remarks>
-		///  This method prepares the provided toplevel for running with the focus,
-		///  it adds this to the list of toplevels, sets up the mainloop to process the
-		///  event, lays out the subviews, focuses the first element, and draws the
-		///  toplevel in the screen. This is usually followed by executing
-		///  the <see cref="RunLoop"/> method, and then the <see cref="End(RunState)"/> method upon termination which will
-		///   undo these changes.
-		/// </remarks>
-		public static RunState Begin (Toplevel toplevel)
-		{
-			if (toplevel == null) {
-				throw new ArgumentNullException (nameof (toplevel));
-			} else if (toplevel.IsMdiContainer && MdiTop != toplevel && MdiTop != null) {
-				throw new InvalidOperationException ("Only one Mdi Container is allowed.");
-			}
-
-			var rs = new RunState (toplevel);
-
-			// View implements ISupportInitializeNotification which is derived from ISupportInitialize
-			if (!toplevel.IsInitialized) {
-				toplevel.BeginInit ();
-				toplevel.EndInit ();
-			}
-
-			lock (_toplevels) {
-				// If Top was already initialized with Init, and Begin has never been called
-				// Top was not added to the toplevels Stack. It will thus never get disposed.
-				// Clean it up here:
-				if (Top != null && toplevel != Top && !_toplevels.Contains (Top)) {
-					Top.Dispose ();
-					Top = null;
-				} else if (Top != null && toplevel != Top && _toplevels.Contains (Top)) {
-					Top.OnLeave (toplevel);
-				}
-				if (string.IsNullOrEmpty (toplevel.Id.ToString ())) {
-					var count = 1;
-					var id = (_toplevels.Count + count).ToString ();
-					while (_toplevels.Count > 0 && _toplevels.FirstOrDefault (x => x.Id.ToString () == id) != null) {
-						count++;
-						id = (_toplevels.Count + count).ToString ();
-					}
-					toplevel.Id = (_toplevels.Count + count).ToString ();
-
-					_toplevels.Push (toplevel);
-				} else {
-					var dup = _toplevels.FirstOrDefault (x => x.Id.ToString () == toplevel.Id);
-					if (dup == null) {
-						_toplevels.Push (toplevel);
-					}
-				}
-
-				if (_toplevels.FindDuplicates (new ToplevelEqualityComparer ()).Count > 0) {
-					throw new ArgumentException ("There are duplicates toplevels Id's");
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
+		public static Key AlternateForwardKey {
+			get => _alternateForwardKey;
+			set {
+				if (_alternateForwardKey != value) {
+					var oldKey = _alternateForwardKey;
+					_alternateForwardKey = value;
+					OnAlternateForwardKeyChanged (new KeyChangedEventArgs (oldKey, value));
 				}
 			}
-			if (Top == null || toplevel.IsMdiContainer) {
-				Top = toplevel;
-			}
-
-			var refreshDriver = true;
-			if (MdiTop == null || toplevel.IsMdiContainer || (Current?.Modal == false && toplevel.Modal)
-				|| (Current?.Modal == false && !toplevel.Modal) || (Current?.Modal == true && toplevel.Modal)) {
-
-				if (toplevel.Visible) {
-					Current = toplevel;
-					SetCurrentAsTop ();
-				} else {
-					refreshDriver = false;
-				}
-			} else if ((MdiTop != null && toplevel != MdiTop && Current?.Modal == true && !_toplevels.Peek ().Modal)
-				|| (MdiTop != null && toplevel != MdiTop && Current?.Running == false)) {
-				refreshDriver = false;
-				MoveCurrent (toplevel);
-			} else {
-				refreshDriver = false;
-				MoveCurrent (Current);
-			}
-
-			Driver.PrepareToRun (MainLoop, ProcessKeyEvent, ProcessKeyDownEvent, ProcessKeyUpEvent, ProcessMouseEvent);
-			if (toplevel.LayoutStyle == LayoutStyle.Computed) {
-				toplevel.SetRelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
-			}
-			toplevel.LayoutSubviews ();
-			toplevel.PositionToplevels ();
-			toplevel.WillPresent ();
-			if (refreshDriver) {
-				MdiTop?.OnChildLoaded (toplevel);
-				toplevel.OnLoaded ();
-				toplevel.SetNeedsDisplay ();
-				toplevel.Redraw (toplevel.Bounds);
-				toplevel.PositionCursor ();
-				Driver.Refresh ();
-			}
-
-			NotifyNewRunState?.Invoke (toplevel, new RunStateEventArgs (rs));
-			return rs;
 		}
+
+		static void OnAlternateForwardKeyChanged (KeyChangedEventArgs e)
+		{
+			foreach (var top in _Toplevels.ToArray ()) {
+				top.OnAlternateForwardKeyChanged (e);
+			}
+		}
+
+		static Key _alternateBackwardKey = Key.PageUp | Key.CtrlMask;
 
 		/// <summary>
-		/// Building block API: completes the execution of a <see cref="Toplevel"/> that was started with <see cref="Begin(Toplevel)"/> .
+		/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
 		/// </summary>
-		/// <param name="runState">The <see cref="RunState"/> returned by the <see cref="Begin(Toplevel)"/> method.</param>
-		public static void End (RunState runState)
-		{
-			if (runState == null)
-				throw new ArgumentNullException (nameof (runState));
-
-			if (MdiTop != null) {
-				MdiTop.OnChildUnloaded (runState.Toplevel);
-			} else {
-				runState.Toplevel.OnUnloaded ();
-			}
-
-			// End the RunState.Toplevel 
-			// First, take it off the toplevel Stack
-			if (_toplevels.Count > 0) {
-				if (_toplevels.Peek () != runState.Toplevel) {
-					// If there the top of the stack is not the RunState.Toplevel then
-					// this call to End is not balanced with the call to Begin that started the RunState
-					throw new ArgumentException ("End must be balanced with calls to Begin");
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
+		public static Key AlternateBackwardKey {
+			get => _alternateBackwardKey;
+			set {
+				if (_alternateBackwardKey != value) {
+					var oldKey = _alternateBackwardKey;
+					_alternateBackwardKey = value;
+					OnAlternateBackwardKeyChanged (new KeyChangedEventArgs (oldKey, value));
 				}
-				_toplevels.Pop ();
 			}
-
-			// Notify that it is closing
-			runState.Toplevel?.OnClosed (runState.Toplevel);
-
-			// If there is a MdiTop that is not the RunState.Toplevel then runstate.TopLevel 
-			// is a child of MidTop and we should notify the MdiTop that it is closing
-			if (MdiTop != null && !(runState.Toplevel).Modal && runState.Toplevel != MdiTop) {
-				MdiTop.OnChildClosed (runState.Toplevel);
-			}
-
-			// Set Current and Top to the next TopLevel on the stack
-			if (_toplevels.Count == 0) {
-				Current = null;
-			} else {
-				Current = _toplevels.Peek ();
-				if (_toplevels.Count == 1 && Current == MdiTop) {
-					MdiTop.OnAllChildClosed ();
-				} else {
-					SetCurrentAsTop ();
-					Current.OnEnter (Current);
-				}
-				Refresh ();
-			}
-
-			runState.Toplevel?.Dispose ();
-			runState.Toplevel = null;
-			runState.Dispose ();
 		}
+
+		static void OnAlternateBackwardKeyChanged (KeyChangedEventArgs oldKey)
+		{
+			foreach (var top in _Toplevels.ToArray ()) {
+				top.OnAlternateBackwardKeyChanged (oldKey);
+			}
+		}
+
+		static Key _quitKey = Key.Q | Key.CtrlMask;
 
 		/// <summary>
-		/// Shutdown an application initialized with <see cref="Init(ConsoleDriver, IMainLoopDriver)"/>.
+		/// Gets or sets the key to quit the application.
 		/// </summary>
-		/// <remarks>
-		/// Shutdown must be called for every call to <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> or <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>
-		/// to ensure all resources are cleaned up (Disposed) and terminal settings are restored.
-		/// </remarks>
-		public static void Shutdown ()
-		{
-			ResetState ();
-
-			ConfigurationManager.PrintJsonErrors ();
-		}
-
-		// Encapsulate all setting of initial state for Application; Having
-		// this in a function like this ensures we don't make mistakes in
-		// guaranteeing that the state of this singleton is deterministic when Init
-		// starts running and after Shutdown returns.
-		static void ResetState ()
-		{
-			// Shutdown is the bookend for Init. As such it needs to clean up all resources
-			// Init created. Apps that do any threading will need to code defensively for this.
-			// e.g. see Issue #537
-			foreach (var t in _toplevels) {
-				t.Running = false;
-				t.Dispose ();
-			}
-			_toplevels.Clear ();
-			Current = null;
-			Top?.Dispose ();
-			Top = null;
-
-			// BUGBUG: MdiTop is not cleared here, but it should be?
-
-			MainLoop = null;
-			Driver?.End ();
-			Driver = null;
-			Iteration = null;
-			RootMouseEvent = null;
-			RootKeyEvent = null;
-			Resized = null;
-			_mainThreadId = -1;
-			NotifyNewRunState = null;
-			NotifyStopRunState = null;
-			_initialized = false;
-			_mouseGrabView = null;
-			_enableConsoleScrolling = false;
-			lastMouseOwnerView = null;
-
-			// Reset synchronization context to allow the user to run async/await,
-			// as the main loop has been ended, the synchronization context from 
-			// gui.cs does no longer process any callbacks. See #1084 for more details:
-			// (https://github.com/gui-cs/Terminal.Gui/issues/1084).
-			SynchronizationContext.SetSynchronizationContext (syncContext: null);
-		}
-
-		/// <summary>
-		/// Triggers a refresh of the entire display.
-		/// </summary>
-		public static void Refresh ()
-		{
-			Driver.UpdateOffScreen ();
-			View last = null;
-			foreach (var v in _toplevels.Reverse ()) {
-				if (v.Visible) {
-					v.SetNeedsDisplay ();
-					v.Redraw (v.Bounds);
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
+		public static Key QuitKey {
+			get => _quitKey;
+			set {
+				if (_quitKey != value) {
+					var oldKey = _quitKey;
+					_quitKey = value;
+					OnQuitKeyChanged (new KeyChangedEventArgs (oldKey, value));
 				}
-				last = v;
 			}
-			last?.PositionCursor ();
-			Driver.Refresh ();
 		}
-
-
-		/// <summary>
-		///   Building block API: Runs the <see cref="MainLoop"/> for the created <see cref="Toplevel"/>.
-		/// </summary>
-		/// <remarks>
-		///   Use the <paramref name="wait"/> parameter to control whether this is a blocking or non-blocking call.
-		/// </remarks>
-		/// <param name="state">The state returned by the <see cref="Begin(Toplevel)"/> method.</param>
-		/// <param name="wait">By default this is <see langword="true"/> which will execute the runloop waiting for events, 
-		/// if set to <see langword="false"/>, a single iteration will execute.</param>
-		public static void RunLoop (RunState state, bool wait = true)
+		static void OnQuitKeyChanged (KeyChangedEventArgs e)
 		{
-			if (state == null)
-				throw new ArgumentNullException (nameof (state));
-			if (state.Toplevel == null)
-				throw new ObjectDisposedException ("state");
-
-			bool firstIteration = true;
-			for (state.Toplevel.Running = true; state.Toplevel.Running;) {
-				if (ExitRunLoopAfterFirstIteration && !firstIteration) {
-					return;
-				}
-				RunMainLoopIteration (ref state, wait, ref firstIteration);
+			// Duplicate the list so if it changes during enumeration we're safe
+			foreach (var top in _Toplevels.ToArray ()) {
+				top.OnQuitKeyChanged (e);
 			}
 		}
 
-		/// <summary>
-		/// Run one iteration of the <see cref="MainLoop"/>.
-		/// </summary>
-		/// <param name="state">The state returned by <see cref="Begin(Toplevel)"/>.</param>
-		/// <param name="wait">If <see langword="true"/> will execute the runloop waiting for events. If <see langword="true"/>
-		/// will return after a single iteration.</param>
-		/// <param name="firstIteration">Set to <see langword="true"/> if this is the first run loop iteration. Upon return,
-		/// it will be set to <see langword="false"/> if at least one iteration happened.</param>
-		public static void RunMainLoopIteration (ref RunState state, bool wait, ref bool firstIteration)
+		static void ProcessKeyEvent (KeyEvent ke)
 		{
-			if (MainLoop.EventsPending (wait)) {
-				// Notify Toplevel it's ready
-				if (firstIteration) {
-					state.Toplevel.OnReady ();
-				}
-
-				MainLoop.MainIteration ();
-				Iteration?.Invoke ();
-
-				EnsureModalOrVisibleAlwaysOnTop (state.Toplevel);
-				if ((state.Toplevel != Current && Current?.Modal == true)
-					|| (state.Toplevel != Current && Current?.Modal == false)) {
-					MdiTop?.OnDeactivate (state.Toplevel);
-					state.Toplevel = Current;
-					MdiTop?.OnActivate (state.Toplevel);
-					Top.SetSubViewNeedsDisplay ();
-					Refresh ();
-				}
-				if (Driver.EnsureCursorVisibility ()) {
-					state.Toplevel.SetNeedsDisplay ();
-				}
-			} else if (!wait) {
-				return;
-			}
-			firstIteration = false;
-
-			if (state.Toplevel != Top
-				&& (!Top._needsDisplay.IsEmpty || Top._childNeedsDisplay || Top.LayoutNeeded)) {
-				state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
-				Top.Redraw (Top.Bounds);
-				foreach (var top in _toplevels.Reverse ()) {
-					if (top != Top && top != state.Toplevel) {
-						top.SetNeedsDisplay ();
-						top.Redraw (top.Bounds);
-					}
-				}
-			}
-			if (_toplevels.Count == 1 && state.Toplevel == Top
-				&& (Driver.Cols != state.Toplevel.Frame.Width || Driver.Rows != state.Toplevel.Frame.Height)
-				&& (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._childNeedsDisplay || state.Toplevel.LayoutNeeded)) {
-
-				Driver.SetAttribute (Colors.TopLevel.Normal);
-				state.Toplevel.Clear (new Rect (0, 0, Driver.Cols, Driver.Rows));
-
-			}
-
-			if (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._childNeedsDisplay || state.Toplevel.LayoutNeeded
-				|| MdiChildNeedsDisplay ()) {
-				state.Toplevel.Redraw (state.Toplevel.Bounds);
-				//if (state.Toplevel.SuperView != null) {
-				//	state.Toplevel.SuperView?.OnRenderLineCanvas ();
-				//} else {
-				//	state.Toplevel.OnRenderLineCanvas ();
-				//}
-				state.Toplevel.PositionCursor ();
-				Driver.Refresh ();
-			} else {
-				Driver.UpdateCursor ();
-			}
-			if (state.Toplevel != Top && !state.Toplevel.Modal
-				&& (!Top._needsDisplay.IsEmpty || Top._childNeedsDisplay || Top.LayoutNeeded)) {
-				Top.Redraw (Top.Bounds);
-			}
-		}
-
-		static void EnsureModalOrVisibleAlwaysOnTop (Toplevel toplevel)
-		{
-			if (!toplevel.Running || (toplevel == Current && toplevel.Visible) || MdiTop == null || _toplevels.Peek ().Modal) {
+			if (RootKeyEvent?.Invoke (ke) ?? false) {
 				return;
 			}
 
-			foreach (var top in _toplevels.Reverse ()) {
-				if (top.Modal && top != Current) {
-					MoveCurrent (top);
+			var chain = _Toplevels.ToList ();
+			foreach (var topLevel in chain) {
+				if (topLevel.ProcessHotKey (ke))
 					return;
-				}
+				if (topLevel.Modal)
+					break;
 			}
-			if (!toplevel.Visible && toplevel == Current) {
-				MoveNext ();
+
+			foreach (var topLevel in chain) {
+				if (topLevel.ProcessKey (ke))
+					return;
+				if (topLevel.Modal)
+					break;
+			}
+
+			foreach (var topLevel in chain) {
+				// Process the key normally
+				if (topLevel.ProcessColdKey (ke))
+					return;
+				if (topLevel.Modal)
+					break;
 			}
 		}
 
-		static bool MdiChildNeedsDisplay ()
+		static void ProcessKeyDownEvent (KeyEvent ke)
 		{
-			if (MdiTop == null) {
-				return false;
+			var chain = _Toplevels.ToList ();
+			foreach (var topLevel in chain) {
+				if (topLevel.OnKeyDown (ke))
+					return;
+				if (topLevel.Modal)
+					break;
 			}
+		}
 
-			foreach (var top in _toplevels) {
-				if (top != Current && top.Visible && (!top._needsDisplay.IsEmpty || top._childNeedsDisplay || top.LayoutNeeded)) {
-					MdiTop.SetSubViewNeedsDisplay ();
-					return true;
-				}
+		static void ProcessKeyUpEvent (KeyEvent ke)
+		{
+			var chain = _Toplevels.ToList ();
+			foreach (var topLevel in chain) {
+				if (topLevel.OnKeyUp (ke))
+					return;
+				if (topLevel.Modal)
+					break;
 			}
-			return false;
 		}
 
 		/// <summary>
-		/// Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool})"/> with the value of <see cref="Top"/>.
-		/// </summary>
-		/// <remarks>
-		/// See <see cref="Run(Toplevel, Func{Exception, bool})"/> for more details.
-		/// </remarks>
-		public static void Run (Func<Exception, bool> errorHandler = null)
-		{
-			Run (Top, errorHandler);
-		}
-
-		/// <summary>
-		/// Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool})"/> 
-		/// with a new instance of the specified <see cref="Toplevel"/>-derived class.
 		/// <para>
-		/// Calling <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> first is not needed as this function will initialze the application.
+		/// Called for new KeyPress events before any processing is performed or
+		/// views evaluate. Use for global key handling and/or debugging.
 		/// </para>
-		/// <para>
-		/// <see cref="Shutdown"/> must be called when the application is closing (typically after Run> has 
-		/// returned) to ensure resources are cleaned up and terminal settings restored.
-		/// </para>
+		/// <para>Return true to suppress the KeyPress event</para>
 		/// </summary>
-		/// <remarks>
-		/// See <see cref="Run(Toplevel, Func{Exception, bool})"/> for more details.
-		/// </remarks>
-		/// <param name="errorHandler"></param>
-		/// <param name="driver">The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the
-		/// platform will be used (<see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>).
-		/// This parameteter must be <see langword="null"/> if <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> has already been called. 
-		/// </param>
-		/// <param name="mainLoopDriver">Specifies the <see cref="MainLoop"/> to use.</param>
-		public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null) where T : Toplevel, new()
-		{
-			if (_initialized) {
-				if (Driver != null) {
-					// Init() has been called and we have a driver, so just run the app.
-					var top = new T ();
-					var type = top.GetType ().BaseType;
-					while (type != typeof (Toplevel) && type != typeof (object)) {
-						type = type.BaseType;
-					}
-					if (type != typeof (Toplevel)) {
-						throw new ArgumentException ($"{top.GetType ().Name} must be derived from TopLevel");
-					}
-					Run (top, errorHandler);
-				} else {
-					// This codepath should be impossible because Init(null, null) will select the platform default driver
-					throw new InvalidOperationException ("Init() completed without a driver being set (this should be impossible); Run<T>() cannot be called.");
-				}
-			} else {
-				// Init() has NOT been called.
-				InternalInit (() => new T (), driver, mainLoopDriver, calledViaRunT: true);
-				Run (Top, errorHandler);
-			}
-		}
+		public static Func<KeyEvent, bool> RootKeyEvent;
 
-		/// <summary>
-		///   Runs the main loop on the given <see cref="Toplevel"/> container.
-		/// </summary>
-		/// <remarks>
-		///   <para>
-		///     This method is used to start processing events
-		///     for the main application, but it is also used to
-		///     run other modal <see cref="View"/>s such as <see cref="Dialog"/> boxes.
-		///   </para>
-		///   <para>
-		///     To make a <see cref="Run(Toplevel, Func{Exception, bool})"/> stop execution, call <see cref="Application.RequestStop"/>.
-		///   </para>
-		///   <para>
-		///     Calling <see cref="Run(Toplevel, Func{Exception, bool})"/> is equivalent to calling <see cref="Begin(Toplevel)"/>, followed by <see cref="RunLoop(RunState, bool)"/>,
-		///     and then calling <see cref="End(RunState)"/>.
-		///   </para>
-		///   <para>
-		///     Alternatively, to have a program control the main loop and 
-		///     process events manually, call <see cref="Begin(Toplevel)"/> to set things up manually and then
-		///     repeatedly call <see cref="RunLoop(RunState, bool)"/> with the wait parameter set to false. By doing this
-		///     the <see cref="RunLoop(RunState, bool)"/> method will only process any pending events, timers, idle handlers and
-		///     then return control immediately.
-		///   </para>
-		///   <para>
-		///     RELEASE builds only: When <paramref name="errorHandler"/> is <see langword="null"/> any exeptions will be rethrown.  
-		///     Otheriwse, if <paramref name="errorHandler"/> will be called. If <paramref name="errorHandler"/> 
-		///     returns <see langword="true"/> the <see cref="RunLoop(RunState, bool)"/> will resume; otherwise 
-		///     this method will exit.
-		///   </para>
-		/// </remarks>
-		/// <param name="view">The <see cref="Toplevel"/> to run modally.</param>
-		/// <param name="errorHandler">RELEASE builds only: Handler for any unhandled exceptions (resumes when returns true, rethrows when null).</param>
-		public static void Run (Toplevel view, Func<Exception, bool> errorHandler = null)
-		{
-			var resume = true;
-			while (resume) {
-#if !DEBUG
-				try {
-#endif
-				resume = false;
-				var runToken = Begin (view);
-				// If ExitRunLoopAfterFirstIteration is true then the user must dispose of the runToken
-				// by using NotifyStopRunState event.
-				RunLoop (runToken);
-				if (!ExitRunLoopAfterFirstIteration) {
-					End (runToken);
-				}
-#if !DEBUG
-				}
-				catch (Exception error)
-				{
-					if (errorHandler == null)
-					{
-						throw;
-					}
-					resume = errorHandler(error);
-				}
-#endif
-			}
-		}
-
-		/// <summary>
-		/// Stops running the most recent <see cref="Toplevel"/> or the <paramref name="top"/> if provided.
-		/// </summary>
-		/// <param name="top">The toplevel to request stop.</param>
-		/// <remarks>
-		///   <para>
-		///   This will cause <see cref="Application.Run(Func{Exception, bool})"/> to return.
-		///   </para>
-		///   <para>
-		///     Calling <see cref="Application.RequestStop"/> is equivalent to setting the <see cref="Toplevel.Running"/> property on the currently running <see cref="Toplevel"/> to false.
-		///   </para>
-		/// </remarks>
-		public static void RequestStop (Toplevel top = null)
-		{
-			if (MdiTop == null || top == null || (MdiTop == null && top != null)) {
-				top = Current;
-			}
-
-			if (MdiTop != null && top.IsMdiContainer && top?.Running == true
-				&& (Current?.Modal == false || (Current?.Modal == true && Current?.Running == false))) {
-
-				MdiTop.RequestStop ();
-			} else if (MdiTop != null && top != Current && Current?.Running == true && Current?.Modal == true
-				&& top.Modal && top.Running) {
-
-				var ev = new ToplevelClosingEventArgs (Current);
-				Current.OnClosing (ev);
-				if (ev.Cancel) {
-					return;
-				}
-				ev = new ToplevelClosingEventArgs (top);
-				top.OnClosing (ev);
-				if (ev.Cancel) {
-					return;
-				}
-				Current.Running = false;
-				OnNotifyStopRunState (Current);
-				top.Running = false;
-				OnNotifyStopRunState (top);
-			} else if ((MdiTop != null && top != MdiTop && top != Current && Current?.Modal == false
-				&& Current?.Running == true && !top.Running)
-				|| (MdiTop != null && top != MdiTop && top != Current && Current?.Modal == false
-				&& Current?.Running == false && !top.Running && _toplevels.ToArray () [1].Running)) {
-
-				MoveCurrent (top);
-			} else if (MdiTop != null && Current != top && Current?.Running == true && !top.Running
-				&& Current?.Modal == true && top.Modal) {
-				// The Current and the top are both modal so needed to set the Current.Running to false too.
-				Current.Running = false;
-				OnNotifyStopRunState (Current);
-			} else if (MdiTop != null && Current == top && MdiTop?.Running == true && Current?.Running == true && top.Running
-				&& Current?.Modal == true && top.Modal) {
-				// The MdiTop was requested to stop inside a modal toplevel which is the Current and top,
-				// both are the same, so needed to set the Current.Running to false too.
-				Current.Running = false;
-				OnNotifyStopRunState (Current);
-			} else {
-				Toplevel currentTop;
-				if (top == Current || (Current?.Modal == true && !top.Modal)) {
-					currentTop = Current;
-				} else {
-					currentTop = top;
-				}
-				if (!currentTop.Running) {
-					return;
-				}
-				var ev = new ToplevelClosingEventArgs (currentTop);
-				currentTop.OnClosing (ev);
-				if (ev.Cancel) {
-					return;
-				}
-				currentTop.Running = false;
-				OnNotifyStopRunState (currentTop);
-			}
-		}
-
-		static void OnNotifyStopRunState (Toplevel top)
-		{
-			if (ExitRunLoopAfterFirstIteration) {
-				NotifyStopRunState?.Invoke (top, new ToplevelEventArgs (top));
-			}
-		}
-
-		/// <summary>
-		/// Invoked when the terminal was resized. The new size of the terminal is provided.
-		/// </summary>
-		public static Action<ResizedEventArgs> Resized;
-
-		static void TerminalResized ()
-		{
-			var full = new Rect (0, 0, Driver.Cols, Driver.Rows);
-			Resized?.Invoke (new ResizedEventArgs () { Cols = full.Width, Rows = full.Height });
-			Driver.Clip = full;
-			foreach (var t in _toplevels) {
-				t.SetRelativeLayout (full);
-				t.LayoutSubviews ();
-				t.PositionToplevels ();
-				t.OnTerminalResized (new SizeChangedEventArgs (full.Size));
-			}
-			Refresh ();
-		}
-
-		static bool SetCurrentAsTop ()
-		{
-			if (MdiTop == null && Current != Top && Current?.SuperView == null && Current?.Modal == false) {
-				if (Current.Frame != new Rect (0, 0, Driver.Cols, Driver.Rows)) {
-					Current.Frame = new Rect (0, 0, Driver.Cols, Driver.Rows);
-				}
-				Top = Current;
-				return true;
-			}
-			return false;
-		}
-
-		/// <summary>
-		/// Move to the next Mdi child from the <see cref="MdiTop"/>.
-		/// </summary>
-		public static void MoveNext ()
-		{
-			if (MdiTop != null && !Current.Modal) {
-				lock (_toplevels) {
-					_toplevels.MoveNext ();
-					var isMdi = false;
-					while (_toplevels.Peek () == MdiTop || !_toplevels.Peek ().Visible) {
-						if (!isMdi && _toplevels.Peek () == MdiTop) {
-							isMdi = true;
-						} else if (isMdi && _toplevels.Peek () == MdiTop) {
-							MoveCurrent (Top);
-							break;
-						}
-						_toplevels.MoveNext ();
-					}
-					Current = _toplevels.Peek ();
-				}
-			}
-		}
-
-		/// <summary>
-		/// Move to the previous Mdi child from the <see cref="MdiTop"/>.
-		/// </summary>
-		public static void MovePrevious ()
-		{
-			if (MdiTop != null && !Current.Modal) {
-				lock (_toplevels) {
-					_toplevels.MovePrevious ();
-					var isMdi = false;
-					while (_toplevels.Peek () == MdiTop || !_toplevels.Peek ().Visible) {
-						if (!isMdi && _toplevels.Peek () == MdiTop) {
-							isMdi = true;
-						} else if (isMdi && _toplevels.Peek () == MdiTop) {
-							MoveCurrent (Top);
-							break;
-						}
-						_toplevels.MovePrevious ();
-					}
-					Current = _toplevels.Peek ();
-				}
-			}
-		}
-
-		internal static bool ShowChild (Toplevel top)
-		{
-			if (top.Visible && MdiTop != null && Current?.Modal == false) {
-				lock (_toplevels) {
-					_toplevels.MoveTo (top, 0, new ToplevelEqualityComparer ());
-					Current = top;
-				}
-				return true;
-			}
-			return false;
-		}
-
-		/// <summary>
-		/// Wakes up the mainloop that might be waiting on input, must be thread safe.
-		/// </summary>
-		public static void DoEvents ()
-		{
-			MainLoop.Driver.Wakeup ();
-		}
-
-		/// <summary>
-		/// Ensures that the superview of the most focused view is on front.
-		/// </summary>
-		public static void EnsuresTopOnFront ()
-		{
-			if (MdiTop != null) {
-				return;
-			}
-			var top = FindTopFromView (Top?.MostFocused);
-			if (top != null && Top.Subviews.Count > 1 && Top.Subviews [Top.Subviews.Count - 1] != top) {
-				Top.BringSubviewToFront (top);
-			}
-		}
-
-		internal static List<CultureInfo> GetSupportedCultures ()
-		{
-			CultureInfo [] culture = CultureInfo.GetCultures (CultureTypes.AllCultures);
-
-			// Get the assembly
-			Assembly assembly = Assembly.GetExecutingAssembly ();
-
-			//Find the location of the assembly
-			string assemblyLocation = AppDomain.CurrentDomain.BaseDirectory;
-
-			// Find the resource file name of the assembly
-			string resourceFilename = $"{Path.GetFileNameWithoutExtension (assembly.Location)}.resources.dll";
-
-			// Return all culture for which satellite folder found with culture code.
-			return culture.Where (cultureInfo =>
-			     assemblyLocation != null &&
-			     Directory.Exists (Path.Combine (assemblyLocation, cultureInfo.Name)) &&
-			     File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
-			).ToList ();
-		}
+		#endregion Keyboard handling
 	}
 }

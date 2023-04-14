@@ -1544,7 +1544,7 @@ namespace Terminal.Gui.ViewsTests {
 				//put label into view
 				mount.Add (lbl1);
 
-				//putting mount into toplevel since changing size
+				//putting mount into Toplevel since changing size
 				//also change AutoSize to false
 				Application.Top.Add (mount);
 				Application.Begin (Application.Top);

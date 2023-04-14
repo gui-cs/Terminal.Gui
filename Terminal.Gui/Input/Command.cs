@@ -355,12 +355,12 @@ namespace Terminal.Gui {
 		PreviousView,
 
 		/// <summary>
-		/// Moves focus to the next view or toplevel (case of MDI).
+		/// Moves focus to the next view or Toplevel (case of Overlapped).
 		/// </summary>
 		NextViewOrTop,
 
 		/// <summary>
-		/// Moves focus to the next previous or toplevel (case of MDI).
+		/// Moves focus to the next previous or Toplevel (case of Overlapped).
 		/// </summary>
 		PreviousViewOrTop,
 

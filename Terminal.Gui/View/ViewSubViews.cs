@@ -386,7 +386,7 @@ namespace Terminal.Gui {
 							if (SuperView.Focused == null) {
 								Application.Current.FocusNext ();
 							}
-							Application.EnsuresTopOnFront ();
+							Application.BringOverlappedTopToFront ();
 						}
 					}
 					if (_subviews != null && IsInitialized) {

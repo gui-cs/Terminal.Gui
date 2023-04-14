@@ -1887,7 +1887,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Gets or sets a value indicating whether pressing ENTER in a <see cref="TextView"/>
-		/// creates a new line of text in the view or activates the default button for the toplevel.
+		/// creates a new line of text in the view or activates the default button for the Toplevel.
 		/// </summary>
 		public bool AllowsReturn {
 			get => allowsReturn;
@@ -3301,7 +3301,7 @@ namespace Terminal.Gui {
 
 		bool MovePreviousView ()
 		{
-			if (Application.MdiTop != null) {
+			if (Application.OverlappedTop != null) {
 				return SuperView?.FocusPrev () == true;
 			}
 
@@ -3310,7 +3310,7 @@ namespace Terminal.Gui {
 
 		bool MoveNextView ()
 		{
-			if (Application.MdiTop != null) {
+			if (Application.OverlappedTop != null) {
 				return SuperView?.FocusNext () == true;
 			}
 

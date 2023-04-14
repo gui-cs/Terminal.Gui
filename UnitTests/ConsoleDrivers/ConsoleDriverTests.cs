@@ -205,7 +205,7 @@ namespace Terminal.Gui.DriverTests {
 			var driver = (FakeDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 			var wasTerminalResized = false;
-			Application.Resized = (e) => {
+			Application.TerminalResized = (e) => {
 				wasTerminalResized = true;
 				Assert.Equal (120, e.Cols);
 				Assert.Equal (40, e.Rows);
