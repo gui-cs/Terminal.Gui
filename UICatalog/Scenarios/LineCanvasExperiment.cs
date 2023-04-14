@@ -7,7 +7,6 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("LineCanvas")]
 	public class LineCanvasExperiment : Scenario {
 
-
 		public override void Init ()
 		{
 			Application.Init ();

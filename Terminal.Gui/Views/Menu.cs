@@ -537,7 +537,6 @@ namespace Terminal.Gui {
 
 		public override void Redraw (Rect bounds)
 		{
-		
 			if (barItems.Children == null) {
 				return;
 			}
@@ -547,6 +546,7 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (GetNormalColor ());
 
 			OnDrawFrames ();
+			OnRenderLineCanvas ();
 
 			for (int i = Bounds.Y; i < barItems.Children.Length; i++) {
 				if (i < 0)
@@ -646,7 +646,6 @@ namespace Terminal.Gui {
 			}
 			Driver.Clip = savedClip;
 
-			OnRenderLineCanvas ();
 			PositionCursor ();
 		}
 
@@ -1057,7 +1056,7 @@ namespace Terminal.Gui {
 		public MenuBar () : this (new MenuBarItem [] { }) { }
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="MenuBar"/> class with the specified set of toplevel menu items.
+		/// Initializes a new instance of the <see cref="MenuBar"/> class with the specified set of Toplevel menu items.
 		/// </summary>
 		/// <param name="menus">Individual menu items; a null item will result in a separator being drawn.</param>
 		public MenuBar (MenuBarItem [] menus) : base ()

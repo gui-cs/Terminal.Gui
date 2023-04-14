@@ -14,7 +14,6 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 using NStack;
 using Xunit.Sdk;
 
-
 // This class enables test functions annotated with the [AutoInitShutdown] attribute to 
 // automatically call Application.Init at start of the test and Application.Shutdown after the
 // test exits. 
@@ -84,7 +83,6 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 		}
 	}
 }
-
 
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
 public class SetupFakeDriverAttribute : Xunit.Sdk.BeforeAfterTestAttribute {

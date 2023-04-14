@@ -611,7 +611,6 @@ namespace Terminal.Gui {
 					spaceForLast--;
 				}
 
-
 				// don't shrink if it would take us below min size of left panel
 				if (spaceForLast < tiles [idx].MinSize) {
 					return false;
@@ -780,7 +779,6 @@ namespace Terminal.Gui {
 						splitterLines [Math.Min (i, splitterLines.Count - 1)].Visible = false;
 					}
 
-
 				}
 			}
 		}
@@ -940,7 +938,7 @@ namespace Terminal.Gui {
 
 					// Start a Drag
 					SetFocus ();
-					Application.EnsuresTopOnFront ();
+					Application.BringOverlappedTopToFront ();
 
 					if (mouseEvent.Flags == MouseFlags.Button1Pressed) {
 						dragPosition = new Point (mouseEvent.X, mouseEvent.Y);

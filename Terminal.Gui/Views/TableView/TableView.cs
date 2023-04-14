@@ -7,7 +7,6 @@ using System.Linq;
 namespace Terminal.Gui {
 
 
-
 	/// <summary>
 	/// View for tabular data based on a <see cref="DataTable"/>.
 	/// 
@@ -30,7 +29,6 @@ namespace Terminal.Gui {
 		/// The default maximum cell width for <see cref="TableView.MaxCellWidth"/> and <see cref="ColumnStyle.MaxWidth"/>
 		/// </summary>
 		public const int DefaultMaxCellWidth = 100;
-
 
 		/// <summary>
 		/// The default minimum cell width for <see cref="ColumnStyle.MinAcceptableWidth"/>
@@ -228,7 +226,6 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.A | Key.CtrlMask, Command.SelectAll);
 			AddKeyBinding (CellActivationKey, Command.Accept);
 		}
-
 
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
@@ -704,7 +701,6 @@ namespace Terminal.Gui {
 				ClearMultiSelectedRegions (true);
 			}
 
-
 			if (extendExistingSelection) {
 
 				// If we are extending current selection but there isn't one
@@ -776,7 +772,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-
 		/// <summary>
 		/// Moves the <see cref="SelectedRow"/> and <see cref="SelectedColumn"/> by the provided offsets. Optionally starting a box selection (see <see cref="MultiSelect"/>)
 		/// </summary>
@@ -834,7 +829,6 @@ namespace Terminal.Gui {
 			SetSelection (FullRowSelect ? SelectedColumn : finalColumn, Table.Rows.Count - 1, extend);
 			Update ();
 		}
-
 
 		/// <summary>
 		/// Moves or extends the selection to the last cell in the current row
@@ -904,7 +898,6 @@ namespace Terminal.Gui {
 					}
 				}
 			} 
-
 
 			// if there are no region selections then it is just the active cell
 
@@ -1194,7 +1187,6 @@ namespace Terminal.Gui {
 				return null;
 			}
 
-
 			var rowIdx = RowOffset - headerHeight + clientY;
 
 			// if click is off bottom of the rows don't give an
@@ -1274,7 +1266,6 @@ namespace Terminal.Gui {
 			ColumnOffset = Math.Max (Math.Min (ColumnOffset, Table.Columns.Count - 1), 0);
 			RowOffset = Math.Max (Math.Min (RowOffset, Table.Rows.Count - 1), 0);
 		}
-
 
 		/// <summary>
 		/// Updates <see cref="SelectedColumn"/>, <see cref="SelectedRow"/> and <see cref="MultiSelectedRegions"/> where they are outside the bounds of the table (by adjusting them to the nearest existing cell).  Has no effect if <see cref="Table"/> has not been set.
@@ -1600,7 +1591,6 @@ namespace Terminal.Gui {
 			if (RowOffset < 0)
 				return spaceRequired;
 
-
 			for (int i = RowOffset; i < RowOffset + rowsToRender && i < Table.Rows.Count; i++) {
 
 				//expand required space if cell is bigger than the last biggest cell or header
@@ -1624,7 +1614,6 @@ namespace Terminal.Gui {
 			// enforce maximum cell width based on global table style
 			if (spaceRequired > MaxCellWidth)
 				spaceRequired = MaxCellWidth;
-
 
 			return spaceRequired;
 		}
@@ -1726,7 +1715,6 @@ namespace Terminal.Gui {
 			/// <remarks>If <see cref="MaxWidth"/> is 0 then <see cref="Visible"/> will always return false.</remarks>
 			public bool Visible { get => MaxWidth >= 0 && visible; set => visible = value; }
 
-
 			/// <summary>
 			/// Returns the alignment for the cell based on <paramref name="cellValue"/> and <see cref="AlignmentGetter"/>/<see cref="Alignment"/>
 			/// </summary>
@@ -1752,7 +1740,6 @@ namespace Terminal.Gui {
 					if (value is IFormattable f)
 						return f.ToString (Format, null);
 				}
-
 
 				if (RepresentationGetter != null)
 					return RepresentationGetter (value);

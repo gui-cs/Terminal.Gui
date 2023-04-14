@@ -26,7 +26,6 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Fill ()
 			};
 
-
 			tools.ColorChanged += (c) => canvas.SetColor (c);
 			tools.SetStyle += (b) => canvas.BorderStyle = b;
 
@@ -182,7 +181,6 @@ namespace UICatalog.Scenarios {
 							orientation = Orientation.Horizontal;
 							length = end.X - start.X;
 						}
-
 
 						canvases [currentColor].AddLine (
 							start,
