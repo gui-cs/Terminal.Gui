@@ -127,7 +127,6 @@ namespace Terminal.Gui {
 			/// <summary>
 			/// Initializes a new instance of the <see cref="Wizard"/> class using <see cref="LayoutStyle.Computed"/> positioning.
 			/// </summary>
-			/// </remarks>
 			public WizardStep ()
 			{
 				BorderStyle = LineStyle.None;
@@ -700,7 +699,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Determines whether the <see cref="Wizard"/> is displayed as modal pop-up or not.
 		/// 
-		/// The default is <c>true</c>. The Wizard will be shown with a frame with <see cref="Title"/> and will behave like
+		/// The default is <see langword="true"/>. The Wizard will be shown with a frame and title and will behave like
 		/// any <see cref="Toplevel"/> window.
 		/// 
 		/// If set to <c>false</c> the Wizard will have no frame and will behave like any embedded <see cref="View"/>.

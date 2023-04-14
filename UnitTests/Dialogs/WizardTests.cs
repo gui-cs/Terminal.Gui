@@ -38,7 +38,6 @@ namespace Terminal.Gui.DialogTests {
 			// Verify set actually changes buttons for the current step
 		}
 
-
 		[Fact]
 		public void WizardStep_Set_Title_Fires_TitleChanging ()
 		{

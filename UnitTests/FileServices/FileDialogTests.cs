@@ -183,7 +183,6 @@ namespace Terminal.Gui.FileServicesTests {
 			TestHelpers.AssertDriverContentsAre (expected, output, true);
 		}
 
-
 		[Fact, AutoInitShutdown]
 		public void TestDirectoryContents_Windows ()
 		{
@@ -284,7 +283,6 @@ namespace Terminal.Gui.FileServicesTests {
 					Assert.False (tb.AcceptSelectionIfAny ());
 				}
 
-
 				[Fact, AutoInitShutdown]
 				public void Autocomplete_AcceptSuggstion ()
 				{
@@ -298,7 +296,6 @@ namespace Terminal.Gui.FileServicesTests {
 					Assert.True (tb.AcceptSelectionIfAny ());
 					Assert.Equal (@"/bob/fish", tb.Text);
 				}*/
-
 
 		private FileDialog GetInitializedFileDialog ()
 		{

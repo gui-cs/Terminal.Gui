@@ -486,7 +486,6 @@ namespace Terminal.Gui {
 			if (SelectedLength > 0)
 				return;
 
-
 			// draw autocomplete
 			GenerateSuggestions ();
 

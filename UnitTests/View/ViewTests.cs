@@ -135,7 +135,6 @@ namespace Terminal.Gui.ViewTests {
 			// TODO: Add more
 		}
 
-
 		[Fact]
 		public void View_With_No_Difference_Between_An_Object_Initializer_And_A_Constructor ()
 		{
@@ -412,7 +411,6 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (v2.CanFocus);
 		}
 
-
 		[Fact]
 		public void Multi_Thread_Toplevels ()
 		{
@@ -592,7 +590,6 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (0, view.Bounds.Y);
 			Assert.Equal (79, view.Bounds.Width);
 			Assert.Equal (24, view.Bounds.Height);
-
 
 			view.X = 0;
 			view.Y = 0;
@@ -1366,7 +1363,6 @@ At 0,0
 
 			v.LayoutSubviews ();
 			v.Redraw (v.Bounds);
-
 
 			string looksLike =
 @"    

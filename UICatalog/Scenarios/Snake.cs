@@ -25,7 +25,6 @@ namespace UICatalog.Scenarios {
 				Height = state.Height
 			};
 
-
 			Win.Add (snakeView);
 
 			Stopwatch sw = new Stopwatch ();
@@ -114,7 +113,6 @@ namespace UICatalog.Scenarios {
 				foreach(var p in canvas.GetMap (bounds)) {
 					AddRune (p.Key.X, p.Key.Y, p.Value);
 				}
-
 
 				Driver.SetAttribute (red);
 				AddRune (State.Apple.X, State.Apple.Y, 'A');

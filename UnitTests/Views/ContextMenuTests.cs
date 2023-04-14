@@ -153,7 +153,6 @@ namespace Terminal.Gui.ViewsTests {
 				new MenuItem ("Third", "", null)
 			});
 
-
 			cm.Show ();
 			Application.Refresh ();
 
