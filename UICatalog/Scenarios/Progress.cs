@@ -3,7 +3,6 @@ using System;
 using System.Threading;
 using Terminal.Gui;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace UICatalog.Scenarios {
 	// 
@@ -86,23 +85,22 @@ namespace UICatalog.Scenarios {
 				};
 				Add (ActivityProgressBar);
 
-				Spinner = new SpinnerView (SpinnerStyle.Line) {
-					//SpinReverse = true,
-					//SpinBounce = true,
-					X = Pos.Right (ActivityProgressBar),
+				Spinner = new SpinnerView () {
+					Style = new SpinnerStyle.Dots2 (),
+					SpinReverse = true,
 					Y = ActivityProgressBar.Y,
-					Visible = false,
-
+					Visible = false
 				};
-				Spinner.X = Pos.Right (ActivityProgressBar) - Spinner.SpinnerWidth + 1;
-				ActivityProgressBar.Width = Dim.Fill () - Spinner.SpinnerWidth;
+				ActivityProgressBar.Width = Dim.Fill () - Spinner.Width;
+				Spinner.X = Pos.Right (ActivityProgressBar);
+
 
 				Add (Spinner);
 
 				PulseProgressBar = new ProgressBar () {
 					X = Pos.Right (LeftFrame) + 1,
 					Y = Pos.Bottom (ActivityProgressBar) + 1,
-					Width = Dim.Fill () - Spinner.SpinnerWidth,
+					Width = Dim.Fill () - Spinner.Width,
 					Height = 1,
 					ColorScheme = Colors.Error
 				};
@@ -127,7 +125,7 @@ namespace UICatalog.Scenarios {
 				StartBtnClick?.Invoke ();
 				Application.MainLoop.Invoke(()=>{
 					Spinner.Visible = true;
-					ActivityProgressBar.Width = Dim.Fill(1);
+					ActivityProgressBar.Width = Dim.Fill () - Spinner.Width;
 					this.LayoutSubviews();
 				});
 			}
@@ -139,13 +137,14 @@ namespace UICatalog.Scenarios {
 
 				Application.MainLoop.Invoke(()=>{
 					Spinner.Visible = false;
-					ActivityProgressBar.Width = Dim.Fill() - Spinner.SpinnerWidth;
+					ActivityProgressBar.Width = Dim.Fill () - Spinner.Width;
 					this.LayoutSubviews();
 				});
 			}
 
 			internal void Pulse ()
 			{
+				Spinner.Visible = true;
 				if (PulseBtnClick != null) {
 					PulseBtnClick?.Invoke ();
 

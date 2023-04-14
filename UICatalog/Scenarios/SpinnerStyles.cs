@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
@@ -11,12 +9,20 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Progress")]
 
 	public class SpinnerViewStyles : Scenario {
+		class Property {
+			public string Name { get; set; }
+		}
 
 		public override void Setup ()
 		{
 			const int DEFAULT_DELAY = 130;
 			const string DEFAULT_CUSTOM = @"-\|/";
-			var styleEnum = Enum.GetValues (typeof (SpinnerStyle)).Cast<SpinnerStyle> ().ToList ();
+			var styleDict = new Dictionary<int, KeyValuePair<string, Type>> ();
+			int i = 0;
+			foreach (var style in typeof (SpinnerStyle).GetNestedTypes ()) {
+				styleDict.Add (i, new KeyValuePair<string, Type> (style.Name, style));
+				i++;
+			}
 
 			var preview = new View () {
 				X = Pos.Center (),
@@ -95,8 +101,8 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (customField);
 
-			var styleArray = styleEnum.Select (e => NStack.ustring.Make (e.ToString ())).ToArray ();
-			if (styleArray.Length < 2)
+			var styleArray = styleDict.Select (e => NStack.ustring.Make (e.Value.Key.ToString ())).ToArray ();
+			if (styleArray.Length < 1)
 				return;
 
 			var styles = new ListView () {
@@ -106,30 +112,33 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Fill (1)
 			};
 			styles.SetSource (styleArray);
-			styles.SelectedItem = (int)SpinnerStyle.Custom;
+			styles.SelectedItem = 0; // SpinnerStyle.Custom;
 			Win.Add (styles);
+			SetCustom ();
+
 			customField.TextChanged += (s, e) => {
 				if (customField.Text.Length > 0) {
-					if (styles.SelectedItem != (int)SpinnerStyle.Custom)
-						styles.SelectedItem = (int)SpinnerStyle.Custom;
+					if (styles.SelectedItem != 0)
+						styles.SelectedItem = 0; // SpinnerStyle.Custom
 					SetCustom ();
 				}
 			};
 
 			styles.SelectedItemChanged += (s, e) => {
-				if ((SpinnerStyle)e.Item == SpinnerStyle.Custom) {
-					//customField.Text = DEFAULT_CUSTOM;
-					delayField.Text = DEFAULT_DELAY.ToString ();
+				if (e.Item == 0) { // SpinnerStyle.Custom
+					if (customField.Text.Length < 1)
+						customField.Text = DEFAULT_CUSTOM;
+					if (delayField.Text.Length < 1)
+						delayField.Text = DEFAULT_DELAY.ToString ();
 					SetCustom ();
 				} else {
 					spinner.Visible = true;
-					spinner.SpinnerStyle = (SpinnerStyle)e.Item;
-					ckbReverse.Checked = false;
-					ckbBounce.Checked = spinner.SpinBounce;
-					ckbAscii.Checked = spinner.IsAsciiOnly;
-					ckbNoSpecial.Checked = !spinner.HasSpecialCharacters;
+					spinner.Style = (SpinnerStyle)Activator.CreateInstance(styleDict [e.Item].Value);
 					delayField.Text = spinner.SpinDelayInMilliseconds.ToString ();
-					customField.Text = "";
+					ckbBounce.Checked = spinner.SpinBounce;
+					ckbNoSpecial.Checked = !spinner.HasSpecialCharacters;
+					ckbAscii.Checked = spinner.IsAsciiOnly;
+					ckbReverse.Checked = false;
 				}
 			};
 
@@ -150,14 +159,14 @@ namespace UICatalog.Scenarios {
 					if (ushort.TryParse (delayField.Text.ToString (), out var d))
 						spinner.SpinDelayInMilliseconds = d;
 					else {
-						spinner.SpinDelayInMilliseconds = DEFAULT_DELAY;
 						delayField.Text = DEFAULT_DELAY.ToString ();
+						spinner.SpinDelayInMilliseconds = DEFAULT_DELAY;
 					}
 					var str = new List<string> ();
 					foreach (var c in customField.Text.ToString ().ToCharArray ()) {
 						str.Add (c.ToString ());
 					}
-					spinner.Frames = str.ToArray ();
+					spinner.Sequence = str.ToArray ();
 				} else {
 					spinner.Visible = false;
 				}
