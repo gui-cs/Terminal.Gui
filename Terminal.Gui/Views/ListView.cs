@@ -351,10 +351,12 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
+			base.Redraw (bounds);
+
 			var current = ColorScheme.Focus;
 			Driver.SetAttribute (current);
 			Move (0, 0);
-			var f = Frame;
+			var f = Bounds;
 			var item = top;
 			bool focused = HasFocus;
 			int col = allowsMarking ? 2 : 0;
@@ -480,7 +482,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual bool MovePageUp ()
 		{
-			int n = (selected - Frame.Height);
+			int n = (selected - Bounds.Height);
 			if (n < 0)
 				n = 0;
 			if (n != selected) {
@@ -500,12 +502,12 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual bool MovePageDown ()
 		{
-			var n = (selected + Frame.Height);
+			var n = (selected + Bounds.Height);
 			if (n >= source.Count)
 				n = source.Count - 1;
 			if (n != selected) {
 				selected = n;
-				if (source.Count >= Frame.Height)
+				if (source.Count >= Bounds.Height)
 					top = Math.Max (selected, 0);
 				else
 					top = 0;
@@ -537,7 +539,7 @@ namespace Terminal.Gui {
 			} else if (selected + 1 < source.Count) { //can move by down by one.
 				selected++;
 
-				if (selected >= top + Frame.Height) {
+				if (selected >= top + Bounds.Height) {
 					top++;
 				} else if (selected < top) {
 					top = Math.Max (selected, 0);
@@ -547,8 +549,8 @@ namespace Terminal.Gui {
 			} else if (selected == 0) {
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
-			} else if (selected >= top + Frame.Height) {
-				top = Math.Max (source.Count - Frame.Height, 0);
+			} else if (selected >= top + Bounds.Height) {
+				top = Math.Max (source.Count - Bounds.Height, 0);
 				SetNeedsDisplay ();
 			}
 
@@ -580,8 +582,8 @@ namespace Terminal.Gui {
 				}
 				if (selected < top) {
 					top = Math.Max (selected, 0);
-				} else if (selected > top + Frame.Height) {
-					top = Math.Max (selected - Frame.Height + 1, 0);
+				} else if (selected > top + Bounds.Height) {
+					top = Math.Max (selected - Bounds.Height + 1, 0);
 				}
 				OnSelectedChanged ();
 				SetNeedsDisplay ();
@@ -601,7 +603,7 @@ namespace Terminal.Gui {
 		{
 			if (source.Count > 0 && selected != source.Count - 1) {
 				selected = source.Count - 1;
-				if (top + selected > Frame.Height - 1) {
+				if (top + selected > Bounds.Height - 1) {
 					top = Math.Max (selected, 0);
 				}
 				OnSelectedChanged ();
@@ -736,12 +738,21 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void EnsureSelectedItemVisible ()
 		{
-			SuperView?.LayoutSubviews ();
-			if (selected < top) {
-				top = Math.Max (selected, 0);
-			} else if (Frame.Height > 0 && selected >= top + Frame.Height) {
-				top = Math.Max (selected - Frame.Height + 1, 0);
+			if (SuperView?.IsInitialized == true) {
+				if (selected < top) {
+					top = Math.Max (selected, 0);
+				} else if (Bounds.Height > 0 && selected >= top + Bounds.Height) {
+					top = Math.Max (selected - Bounds.Height + 1, 0);
+				}
+				LayoutStarted -= ListView_LayoutStarted;
+			} else {
+				LayoutStarted += ListView_LayoutStarted;
 			}
+		}
+
+		private void ListView_LayoutStarted (object sender, LayoutEventArgs e)
+		{
+			EnsureSelectedItemVisible ();
 		}
 
 		///<inheritdoc/>
@@ -783,11 +794,11 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if (me.Y + top >= source.Count) {
+			if (me.Y + top - GetFramesThickness ().Top >= source.Count) {
 				return true;
 			}
 
-			selected = top + me.Y;
+			selected = top - GetFramesThickness().Top + me.Y;
 			if (AllowsAll ()) {
 				Source.SetMark (SelectedItem, !Source.IsMarked (SelectedItem));
 				SetNeedsDisplay ();

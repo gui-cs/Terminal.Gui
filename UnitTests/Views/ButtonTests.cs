@@ -24,6 +24,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
 			Assert.Equal ('_', btn.HotKeySpecifier);
 			Assert.True (btn.CanFocus);
+			Assert.Equal (new Rect (0, 0, 4, 1), btn.Bounds);
 			Assert.Equal (new Rect (0, 0, 4, 1), btn.Frame);
 			Assert.Equal (Key.Null, btn.HotKey);
 			var expected = @"
@@ -31,7 +32,7 @@ namespace Terminal.Gui.ViewsTests {
 ";
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Application.End (rs);
-			
+
 			btn = new Button ("ARGS", true) { Text = "Test" };
 			Assert.Equal ("Test", btn.Text);
 			Application.Top.Add (btn);
@@ -42,6 +43,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
 			Assert.Equal ('_', btn.HotKeySpecifier);
 			Assert.True (btn.CanFocus);
+			Assert.Equal (new Rect (0, 0, 10, 1), btn.Bounds);
 			Assert.Equal (new Rect (0, 0, 10, 1), btn.Frame);
 			Assert.Equal (Key.T, btn.HotKey);
 			expected = @"
@@ -49,7 +51,7 @@ namespace Terminal.Gui.ViewsTests {
 ";
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Application.End (rs);
-			
+
 			btn = new Button (3, 4, "Test", true);
 			Assert.Equal ("Test", btn.Text);
 			Application.Top.Add (btn);
@@ -60,6 +62,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
 			Assert.Equal ('_', btn.HotKeySpecifier);
 			Assert.True (btn.CanFocus);
+			Assert.Equal (new Rect (0, 0, 10, 1), btn.Bounds);
 			Assert.Equal (new Rect (3, 4, 10, 1), btn.Frame);
 			Assert.Equal (Key.T, btn.HotKey);
 			expected = @"
@@ -76,7 +79,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var clicked = false;
 			Button btn = new Button ("Test");
-			btn.Clicked += (s,e) => clicked = true;
+			btn.Clicked += (s, e) => clicked = true;
 			Application.Top.Add (btn);
 			Application.Begin (Application.Top);
 
@@ -119,7 +122,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var clicked = false;
 			Button btn = new Button ("Test");
-			btn.Clicked += (s,e) => clicked = true;
+			btn.Clicked += (s, e) => clicked = true;
 			Application.Top.Add (btn);
 			Application.Begin (Application.Top);
 
@@ -135,7 +138,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (clicked);
 		}
 
-
 		/// <summary>
 		/// This test demonstrates how to change the activation key for Button
 		/// as described in the README.md keyboard handling section
@@ -146,7 +148,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			int pressed = 0;
 			var btn = new Button ("Press Me");
-			btn.Clicked += (s,e) => pressed++;
+			btn.Clicked += (s, e) => pressed++;
 
 			// The Button class supports the Accept command
 			Assert.Contains (Command.Accept, btn.GetSupportedCommands ());
@@ -215,7 +217,7 @@ namespace Terminal.Gui.ViewsTests {
 				X = Pos.Center (),
 				Y = Pos.Center ()
 			};
-			var win = new Window ("Test Demo 你") {
+			var win = new Window () {
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			};
@@ -233,7 +235,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Rect (0, 0, 16, 1), btn.Bounds);
 
 			var expected = @"
-┌┤Test Demo 你├──────────────┐
+┌────────────────────────────┐
 │                            │
 │      [ Say Hello 你 ]      │
 │                            │
@@ -255,7 +257,6 @@ namespace Terminal.Gui.ViewsTests {
 			var win = new Window () {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
-				Title = "Test Demo 你"
 			};
 			win.Add (btn);
 			Application.Top.Add (win);
@@ -271,7 +272,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Rect (0, 0, 16, 1), btn.Bounds);
 
 			var expected = @"
-┌┤Test Demo 你├──────────────┐
+┌────────────────────────────┐
 │                            │
 │      [ Say Hello 你 ]      │
 │                            │
@@ -294,7 +295,6 @@ namespace Terminal.Gui.ViewsTests {
 			var win = new Window () {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
-				Title = "Test Demo 你"
 			};
 			win.Add (btn);
 			Application.Top.Add (win);
@@ -308,7 +308,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 			var expected = @"
-┌┤Test Demo 你├──────────────┐
+┌────────────────────────────┐
 │                            │
 │      [ Say Hello 你 ]      │
 │                            │
@@ -330,7 +330,6 @@ namespace Terminal.Gui.ViewsTests {
 			var win = new Window () {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
-				Title = "Test Demo 你"
 			};
 			win.Add (btn);
 			Application.Top.Add (win);
@@ -340,7 +339,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 			var expected = @"
-┌┤Test Demo 你├──────────────┐
+┌────────────────────────────┐
 │                            │
 │      [ Say Hello 你 ]      │
 │                            │
@@ -354,7 +353,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (btn.AutoSize);
 			Application.Refresh ();
 			expected = @"
-┌┤Test Demo 你├──────────────┐
+┌────────────────────────────┐
 │                            │
 │  [ Say Hello 你 changed ]  │
 │                            │
@@ -377,7 +376,6 @@ namespace Terminal.Gui.ViewsTests {
 			var win = new Window () {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
-				Title = "Test Demo 你"
 			};
 			win.Add (btn);
 			Application.Top.Add (win);
@@ -387,7 +385,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 			var expected = @"
-┌┤Test Demo 你├──────────────┐
+┌────────────────────────────┐
 │                            │
 │            [ Say Hello 你 ]│
 │                            │
@@ -401,7 +399,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (btn.AutoSize);
 			Application.Refresh ();
 			expected = @"
-┌┤Test Demo 你├──────────────┐
+┌────────────────────────────┐
 │                            │
 │    [ Say Hello 你 changed ]│
 │                            │
@@ -483,7 +481,7 @@ namespace Terminal.Gui.ViewsTests {
 			};
 			tabView.AddTab (new TabView.Tab ("Find", tab), true);
 
-			var win = new Window ("Find") {
+			var win = new Window () {
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			};
@@ -512,7 +510,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Rect (0, 3, 12, 1), ckbMatchCase.Frame);
 			Assert.Equal (new Rect (0, 4, 18, 1), ckbMatchWholeWord.Frame);
 			var expected = @"
-┌┤Find├──────────────────────────────────────────────┐
+┌────────────────────────────────────────────────────┐
 │┌────┐                                              │
 ││Find│                                              │
 ││    └─────────────────────────────────────────────┐│
@@ -597,12 +595,12 @@ namespace Terminal.Gui.ViewsTests {
 			object sender = null;
 			KeyChangedEventArgs args = null;
 
-			btn.HotKeyChanged += (s, e) =>{
+			btn.HotKeyChanged += (s, e) => {
 				sender = s;
 				args = e;
 
 			};
-			
+
 			btn.HotKey = Key.r;
 			Assert.Same (btn, sender);
 			Assert.Equal (Key.Y, args.OldKey);

@@ -9,18 +9,13 @@ namespace UICatalog.Scenarios {
 		{
 			Application.Init ();
 
-			var borderStyle = BorderStyle.Double;
+			var borderStyle = LineStyle.Double;
 			var borderThickness = new Thickness (1, 2, 3, 4);
 			var padding = 1;
 
 			Application.Top.Text = $"Border Thickness: {borderThickness}\nPadding: {padding}";
 
-			var win = new Window (new Rect (5, 5, 40, 20), "Window",
-				padding: padding,
-				border: new Border () {
-					BorderStyle = borderStyle,
-					BorderThickness = borderThickness
-				});
+			var win = new Window (new Rect (5, 5, 40, 20)) { Title = "Window" };
 
 			var tf1 = new TextField ("1234567890") { Width = 10 };
 
@@ -48,8 +43,8 @@ namespace UICatalog.Scenarios {
 			Application.Top.Add (win);
 
 			var topLevel = new Toplevel (new Rect (50, 5, 40, 20));
-			//topLevel.BorderFrame.Thickness = borderThickness;
-			//topLevel.BorderFrame.BorderStyle = borderStyle;
+			//topLevel.Border.Thickness = borderThickness;
+			//topLevel.Border.BorderStyle = borderStyle;
 			//topLevel.Padding.Thickness = paddingThickness;
 
 			var tf3 = new TextField ("1234567890") { Width = 10 };
@@ -77,14 +72,9 @@ namespace UICatalog.Scenarios {
 			topLevel.Add (tf3, button2, label2, tv2, tf4);
 			Application.Top.Add (topLevel);
 
-			var frameView = new FrameView (new Rect (95, 5, 40, 20), "FrameView", null,
-				border: new Border () {
-					BorderStyle = borderStyle,
-					BorderThickness = borderThickness
-				}
-			);
-			//frameView.BorderFrame.Thickness = borderThickness;
-			//frameView.BorderFrame.BorderStyle = borderStyle;
+			var frameView = new FrameView (new Rect (95, 5, 40, 20), "FrameView", null);
+			frameView.Border.Thickness = borderThickness;
+			frameView.Border.BorderStyle = borderStyle;
 			//frameView.Padding.Thickness = paddingThickness;
 
 			var tf5 = new TextField ("1234567890") { Width = 10 };

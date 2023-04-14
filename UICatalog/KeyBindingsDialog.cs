@@ -7,9 +7,7 @@ using Terminal.Gui;
 
 namespace UICatalog {
 
-
 	class KeyBindingsDialog : Dialog {
-
 
 		static Dictionary<Command,Key> CurrentBindings = new Dictionary<Command,Key>();
 		private Command[] commands;
@@ -122,9 +120,12 @@ namespace UICatalog {
 			}
 		}
 
-		public KeyBindingsDialog () : base("Keybindings", 50,10)
+		public KeyBindingsDialog () : base()
 		{
-			if(ViewTracker.Instance == null) {
+			Title = "Keybindings";
+			Height = 50;
+			Width = 10;
+			if (ViewTracker.Instance == null) {
 				ViewTracker.Initialize ();
 			}
 			
@@ -178,7 +179,7 @@ namespace UICatalog {
 			Key? key = null;
 
 			// prompt user to hit a key
-			var dlg = new Dialog ("Enter Key");
+			var dlg = new Dialog () { Title = "Enter Key" };
 			dlg.KeyPress += (s, k) => {
 				key = k.KeyEvent.Key;
 				Application.RequestStop ();

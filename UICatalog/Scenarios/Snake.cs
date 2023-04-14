@@ -25,7 +25,6 @@ namespace UICatalog.Scenarios {
 				Height = state.Height
 			};
 
-
 			Win.Add (snakeView);
 
 			Stopwatch sw = new Stopwatch ();
@@ -88,10 +87,10 @@ namespace UICatalog.Scenarios {
 
 				var canvas = new LineCanvas ();
 
-				canvas.AddLine (new Point (0, 0), State.Width - 1, Orientation.Horizontal, BorderStyle.Double);
-				canvas.AddLine (new Point (0, 0), State.Height - 1, Orientation.Vertical, BorderStyle.Double);
-				canvas.AddLine (new Point (0, State.Height - 1), State.Width - 1, Orientation.Horizontal, BorderStyle.Double);
-				canvas.AddLine (new Point (State.Width - 1, 0), State.Height - 1, Orientation.Vertical, BorderStyle.Double);
+				canvas.AddLine (new Point (0, 0), State.Width - 1, Orientation.Horizontal, LineStyle.Double);
+				canvas.AddLine (new Point (0, 0), State.Height - 1, Orientation.Vertical, LineStyle.Double);
+				canvas.AddLine (new Point (0, State.Height - 1), State.Width - 1, Orientation.Horizontal, LineStyle.Double);
+				canvas.AddLine (new Point (State.Width - 1, 0), State.Height - 1, Orientation.Vertical, LineStyle.Double);
 
 				for (int i = 1; i < State.Snake.Count; i++) {
 
@@ -107,14 +106,13 @@ namespace UICatalog.Scenarios {
 						pt2,
 						length,
 						orientation,
-						BorderStyle.Single);
+						LineStyle.Single);
 
 				}
 
-				foreach(var p in canvas.GenerateImage (bounds)) {
+				foreach(var p in canvas.GetMap (bounds)) {
 					AddRune (p.Key.X, p.Key.Y, p.Value);
 				}
-
 
 				Driver.SetAttribute (red);
 				AddRune (State.Apple.X, State.Apple.Y, 'A');

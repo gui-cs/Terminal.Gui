@@ -16,7 +16,7 @@ namespace UICatalog.Scenarios {
 		public override void Init ()
 		{
 			Application.Init ();
-			Application.Top.Add (new DynamicMenuBarSample ($"{Application.QuitKey} to Quit - Scenario: {GetName ()}"));
+			Application.Top.Add (new DynamicMenuBarSample () { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" });
 		}
 
 		public class DynamicMenuItemList {
@@ -74,7 +74,7 @@ namespace UICatalog.Scenarios {
 
 			public DynamicMenuItemModel DataContext { get; set; }
 
-			public DynamicMenuBarSample (ustring title) : base (title)
+			public DynamicMenuBarSample () : base ()
 			{
 				DataContext = new DynamicMenuItemModel ();
 
@@ -200,7 +200,6 @@ namespace UICatalog.Scenarios {
 
 				Add (_frmMenu);
 
-
 				var _frmMenuDetails = new DynamicMenuBarDetails ("Menu Details:") {
 					X = Pos.Right (_frmMenu),
 					Y = Pos.Top (_frmMenu),
@@ -285,7 +284,6 @@ namespace UICatalog.Scenarios {
 						DataContext.Parent = ustring.Empty;
 					}
 				};
-
 
 				var _btnOk = new Button ("Ok") {
 					X = Pos.Right (_frmMenu) + 20,
@@ -493,9 +491,7 @@ namespace UICatalog.Scenarios {
 					SetFrameDetails (null);
 				};
 
-
 				SetFrameDetails ();
-
 
 				var ustringConverter = new UStringValueConverter ();
 				var listWrapperConverter = new ListWrapperConverter ();
@@ -503,7 +499,6 @@ namespace UICatalog.Scenarios {
 				var lblMenuBar = new Binding (this, "MenuBar", _lblMenuBar, "Text", ustringConverter);
 				var lblParent = new Binding (this, "Parent", _lblParent, "Text", ustringConverter);
 				var lstMenus = new Binding (this, "Menus", _lstMenus, "Source", listWrapperConverter);
-
 
 				void SetFrameDetails (MenuItem menuBarItem = null)
 				{
@@ -625,7 +620,6 @@ namespace UICatalog.Scenarios {
 					_currentEditMenuBarItem.CheckType = menuItem.checkStyle;
 					SetFrameDetails (_currentEditMenuBarItem);
 				}
-
 
 				//_frmMenuDetails.Initialized += (s, e) => _frmMenuDetails.Enabled = false;
 			}
@@ -845,7 +839,6 @@ namespace UICatalog.Scenarios {
 
 			}
 
-
 			public DynamicMenuItem EnterMenuItem ()
 			{
 				var valid = false;
@@ -881,7 +874,7 @@ namespace UICatalog.Scenarios {
 					_txtTitle.Text = ustring.Empty;
 					Application.RequestStop ();
 				};
-				var _dialog = new Dialog ("Please enter the menu details.", _btnOk, _btnCancel);
+				var _dialog = new Dialog (_btnOk, _btnCancel) { Title = "Enter the menu details." };
 
 				Width = Dim.Fill ();
 				Height = Dim.Fill () - 1;

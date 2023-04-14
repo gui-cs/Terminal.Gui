@@ -73,7 +73,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <example>
 		/// 	[SerializableConfigurationProperty(Scope = typeof(Configuration.ThemeManager.ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
-		///	public static BorderStyle DefaultBorderStyle {
+		///	public static LineStyle DefaultBorderStyle {
 		///	...
 		/// </example>
 		[AttributeUsage (AttributeTargets.Property, AllowMultiple = false, Inherited = false)]

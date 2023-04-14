@@ -477,6 +477,9 @@ namespace Terminal.Gui {
 				WantMousePositionReports = host.WantMousePositionReports;
 			}
 
+			Border.Thickness = new Thickness (1);
+			Border.BorderStyle = LineStyle.Single;
+
 			if (Application.Current != null) {
 				Application.Current.DrawContentComplete += Current_DrawContentComplete;
 			}
@@ -534,19 +537,16 @@ namespace Terminal.Gui {
 
 		public override void Redraw (Rect bounds)
 		{
-		}
-
-		// Draws the Menu, within the Frame
-		private void Current_DrawContentComplete (object sender, DrawEventArgs e)
-		{
 			if (barItems.Children == null) {
 				return;
 			}
-			var savedClip = Driver.Clip;
+			var savedClip = Application.Driver.Clip;
 			Application.Driver.Clip = Application.Top.Frame;
 
 			Driver.SetAttribute (GetNormalColor ());
-			DrawFrame (Bounds, padding: 0, fill: true);
+
+			OnDrawFrames ();
+			OnRenderLineCanvas ();
 
 			for (int i = Bounds.Y; i < barItems.Children.Length; i++) {
 				if (i < 0)
@@ -555,10 +555,11 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (item == null ? GetNormalColor ()
 					: i == current ? ColorScheme.Focus : GetNormalColor ());
 				if (item == null) {
-					Move (0, i + 1);
+					Move (-1, i);
 					Driver.AddRune (Driver.LeftTee);
-				} else if (Frame.X + 1 < Driver.Cols)
-					Move (1, i + 1);
+				} else if (Frame.X < Driver.Cols) {
+					Move (0, i);
+				}
 
 				Driver.SetAttribute (DetermineColorSchemeFor (item, i));
 				for (int p = Bounds.X; p < Frame.Width - 2; p++) { // This - 2 is for the border
@@ -576,8 +577,8 @@ namespace Terminal.Gui {
 				}
 
 				if (item == null) {
-					if (SuperView?.Frame.Right - Frame.X > Frame.Width - 1) {
-						Move (Frame.Width - 1, i + 1);
+					if (SuperView?.Frame.Right - Frame.X > Frame.Width) {
+						Move (Frame.Width - 2, i);
 						Driver.AddRune (Driver.RightTee);
 					}
 					continue;
@@ -604,9 +605,9 @@ namespace Terminal.Gui {
 					textToDraw = item.Title;
 				}
 
-				ViewToScreen (2, i + 1, out int vtsCol, out _, false);
+				ViewToScreen (0, i, out int vtsCol, out _, false);
 				if (vtsCol < Driver.Cols) {
-					Move (2, i + 1);
+					Move (1, i);
 					if (!item.IsEnabled ()) {
 						DrawHotString (textToDraw, ColorScheme.Disabled, ColorScheme.Disabled);
 					} else if (i == 0 && host.UseSubMenusSingleFrame && item.Parent.Parent != null) {
@@ -616,7 +617,7 @@ namespace Terminal.Gui {
 							Text = textToDraw
 						};
 						// The -3 is left/right border + one space (not sure what for)
-						tf.Draw (ViewToScreen (new Rect (2, i + 1, Frame.Width - 3, 1)),
+						tf.Draw (ViewToScreen (new Rect (1, i, Frame.Width - 3, 1)),
 							i == current ? ColorScheme.Focus : GetNormalColor (),
 							i == current ? ColorScheme.HotFocus : ColorScheme.HotNormal,
 							SuperView == null ? default : SuperView.ViewToScreen (SuperView.Bounds));
@@ -628,16 +629,16 @@ namespace Terminal.Gui {
 
 					// The help string
 					var l = item.ShortcutTag.ConsoleWidth == 0 ? item.Help.ConsoleWidth : item.Help.ConsoleWidth + item.ShortcutTag.ConsoleWidth + 2;
-					var col = Frame.Width - l - 2;
-					ViewToScreen (col, i + 1, out vtsCol, out _, false);
+					var col = Frame.Width - l - 3;
+					ViewToScreen (col, i, out vtsCol, out _, false);
 					if (vtsCol < Driver.Cols) {
-						Move (col, 1 + i);
+						Move (col, i);
 						Driver.AddStr (item.Help);
 
 						// The shortcut tag string
 						if (!item.ShortcutTag.IsEmpty) {
 							l = item.ShortcutTag.ConsoleWidth;
-							Move (Frame.Width - l - 2, 1 + i);
+							Move (Frame.Width - l - 3, i);
 							Driver.AddStr (item.ShortcutTag);
 						}
 					}
@@ -646,6 +647,11 @@ namespace Terminal.Gui {
 			Driver.Clip = savedClip;
 
 			PositionCursor ();
+		}
+
+		private void Current_DrawContentComplete (object sender, DrawEventArgs e)
+		{
+			Redraw (e.Rect);
 		}
 
 		public override void PositionCursor ()
@@ -692,7 +698,7 @@ namespace Terminal.Gui {
 		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
 			// To ncurses simulate a AltMask key pressing Alt+Space because
-			// it can�t detect an alone special key down was pressed.
+			// it can't detect an alone special key down was pressed.
 			if (keyEvent.IsAlt && keyEvent.Key == Key.AltMask) {
 				OnKeyDown (keyEvent);
 				return true;
@@ -1050,7 +1056,7 @@ namespace Terminal.Gui {
 		public MenuBar () : this (new MenuBarItem [] { }) { }
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="MenuBar"/> class with the specified set of toplevel menu items.
+		/// Initializes a new instance of the <see cref="MenuBar"/> class with the specified set of Toplevel menu items.
 		/// </summary>
 		/// <param name="menus">Individual menu items; a null item will result in a separator being drawn.</param>
 		public MenuBar (MenuBarItem [] menus) : base ()
@@ -1264,6 +1270,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event EventHandler MenuAllClosed;
 
+		// BUGBUG: Hack
 		internal Menu openMenu;
 		Menu ocm;
 		internal Menu openCurrentMenu {
@@ -1374,12 +1381,12 @@ namespace Terminal.Gui {
 				}
 
 				// This positions the submenu horizontally aligned with the first character of the
-				// menu it belongs to's text
+				// text belonging to the menu 
 				for (int i = 0; i < index; i++)
 					pos += Menus [i].TitleLength + (Menus [i].Help.ConsoleWidth > 0 ? Menus [i].Help.ConsoleWidth + 2 : 0) + leftPadding + rightPadding;
 				var superView = SuperView == null ? Application.Top : SuperView;
 				Point locationOffset;
-				if (superView.Border != null && superView.Border.BorderStyle != BorderStyle.None) {
+				if (superView.BorderStyle != LineStyle.None) {
 					locationOffset = new Point (superView.Frame.X + 1, superView.Frame.Y + 1);
 				} else {
 					locationOffset = new Point (superView.Frame.X, superView.Frame.Y);

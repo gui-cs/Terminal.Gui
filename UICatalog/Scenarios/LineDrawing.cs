@@ -26,7 +26,6 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Fill ()
 			};
 
-
 			tools.ColorChanged += (c) => canvas.SetColor (c);
 			tools.SetStyle += (b) => canvas.BorderStyle = b;
 
@@ -39,7 +38,7 @@ namespace UICatalog.Scenarios {
 
 			LineCanvas grid;
 			public event Action<Color> ColorChanged;
-			public event Action<BorderStyle> SetStyle;
+			public event Action<LineStyle> SetStyle;
 
 			Dictionary<Point, Color> swatches = new Dictionary<Point, Color> {
 				{ new Point(1,1),Color.Red},
@@ -53,17 +52,17 @@ namespace UICatalog.Scenarios {
 			{
 				grid = new LineCanvas ();
 
-				grid.AddLine (new Point (0, 0), int.MaxValue, Orientation.Vertical, BorderStyle.Single);
-				grid.AddLine (new Point (0, 0), width, Orientation.Horizontal, BorderStyle.Single);
-				grid.AddLine (new Point (width, 0), int.MaxValue, Orientation.Vertical, BorderStyle.Single);
+				grid.AddLine (new Point (0, 0), int.MaxValue, Orientation.Vertical, LineStyle.Single);
+				grid.AddLine (new Point (0, 0), width, Orientation.Horizontal, LineStyle.Single);
+				grid.AddLine (new Point (width, 0), int.MaxValue, Orientation.Vertical, LineStyle.Single);
 
-				grid.AddLine (new Point (0, 2), width, Orientation.Horizontal, BorderStyle.Single);
+				grid.AddLine (new Point (0, 2), width, Orientation.Horizontal, LineStyle.Single);
 
-				grid.AddLine (new Point (2, 0), int.MaxValue, Orientation.Vertical, BorderStyle.Single);
-				grid.AddLine (new Point (4, 0), int.MaxValue, Orientation.Vertical, BorderStyle.Single);
-				grid.AddLine (new Point (6, 0), int.MaxValue, Orientation.Vertical, BorderStyle.Single);
+				grid.AddLine (new Point (2, 0), int.MaxValue, Orientation.Vertical, LineStyle.Single);
+				grid.AddLine (new Point (4, 0), int.MaxValue, Orientation.Vertical, LineStyle.Single);
+				grid.AddLine (new Point (6, 0), int.MaxValue, Orientation.Vertical, LineStyle.Single);
 
-				grid.AddLine (new Point (0, 4), width, Orientation.Horizontal, BorderStyle.Single);
+				grid.AddLine (new Point (0, 4), width, Orientation.Horizontal, LineStyle.Single);
 			}
 			public override void Redraw (Rect bounds)
 			{
@@ -72,7 +71,7 @@ namespace UICatalog.Scenarios {
 				Driver.SetAttribute (new Terminal.Gui.Attribute (Color.DarkGray, ColorScheme.Normal.Background));
 				
 				
-				foreach(var p in grid.GenerateImage(bounds))
+				foreach(var p in grid.GetMap(bounds))
 				{
 					this.AddRune(p.Key.X,p.Key.Y,p.Value);
 				}
@@ -101,17 +100,17 @@ namespace UICatalog.Scenarios {
 
 					if (mouseEvent.X == 3 && mouseEvent.Y == 3) {
 
-						SetStyle?.Invoke (BorderStyle.Double);
+						SetStyle?.Invoke (LineStyle.Double);
 						return true;
 					}
 					if (mouseEvent.X == 5 && mouseEvent.Y == 3) {
 
-						SetStyle?.Invoke (BorderStyle.Single);
+						SetStyle?.Invoke (LineStyle.Single);
 						return true;
 					}
 					if (mouseEvent.X == 7 && mouseEvent.Y == 3) {
 
-						SetStyle?.Invoke (BorderStyle.Rounded);
+						SetStyle?.Invoke (LineStyle.Rounded);
 						return true;
 					}
 				}
@@ -129,8 +128,6 @@ namespace UICatalog.Scenarios {
 			int currentColor;
 
 			Point? currentLineStart = null;
-
-			public BorderStyle BorderStyle { get; internal set; }
 
 			public DrawingArea ()
 			{
@@ -158,7 +155,7 @@ namespace UICatalog.Scenarios {
 
 					var canvas = canvases [kvp.Value];
 
-					foreach(var p in canvas.GenerateImage(bounds))
+					foreach(var p in canvas.GetMap(bounds))
 					{
 						this.AddRune(p.Key.X,p.Key.Y,p.Value);
 					}
@@ -184,7 +181,6 @@ namespace UICatalog.Scenarios {
 							orientation = Orientation.Horizontal;
 							length = end.X - start.X;
 						}
-
 
 						canvases [currentColor].AddLine (
 							start,

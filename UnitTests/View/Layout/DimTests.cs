@@ -86,11 +86,11 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var testVal = Rect.Empty;
 			var dim = Dim.Width (new View (testVal));
-			Assert.Equal ($"View(Width,View()({{X={testVal.X},Y={testVal.Y},Width={testVal.Width},Height={testVal.Height}}}))", dim.ToString ());
+			Assert.Equal ($"View(Width,View()({testVal}))", dim.ToString ());
 
 			testVal = new Rect (1, 2, 3, 4);
 			dim = Dim.Width (new View (testVal));
-			Assert.Equal ($"View(Width,View()({{X={testVal.X},Y={testVal.Y},Width={testVal.Width},Height={testVal.Height}}}))", dim.ToString ());
+			Assert.Equal ($"View(Width,View()({testVal}))", dim.ToString ());
 		}
 
 		[Fact]
@@ -134,7 +134,6 @@ namespace Terminal.Gui.ViewTests {
 			Assert.NotEqual (dim1, dim2);
 		}
 
-
 		[Fact]
 		public void Height_Set_To_Null_Throws ()
 		{
@@ -147,11 +146,11 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var testVal = Rect.Empty;
 			var dim = Dim.Height (new View (testVal));
-			Assert.Equal ($"View(Height,View()({{X={testVal.X},Y={testVal.Y},Width={testVal.Width},Height={testVal.Height}}}))", dim.ToString ());
+			Assert.Equal ($"View(Height,View()({testVal}))", dim.ToString ());
 
 			testVal = new Rect (1, 2, 3, 4);
 			dim = Dim.Height (new View (testVal));
-			Assert.Equal ($"View(Height,View()({{X={testVal.X},Y={testVal.Y},Width={testVal.Width},Height={testVal.Height}}}))", dim.ToString ());
+			Assert.Equal ($"View(Height,View()({testVal}))", dim.ToString ());
 		}
 
 		// TODO: Other Dim.Height tests (e.g. Equal?)
@@ -171,7 +170,6 @@ namespace Terminal.Gui.ViewTests {
 			dim = Dim.Fill (testMargin);
 			Assert.Equal ($"Fill({testMargin})", dim.ToString ());
 		}
-
 
 		[Fact]
 		public void Fill_Equal ()
@@ -259,7 +257,7 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var t = Application.Top;
 
-			var w = new Window ("w") {
+			var w = new Window () {
 				Width = Dim.Fill (0),
 				Height = Dim.Sized (10)
 			};
@@ -296,7 +294,7 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var t = new View ("top") { Width = 80, Height = 25 };
 
-			var w = new Window (new Rect (1, 2, 4, 5), "w");
+			var w = new Window (new Rect (1, 2, 4, 5)) { Title = "w" };
 			t.Add (w);
 			t.LayoutSubviews ();
 
@@ -310,7 +308,7 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var t = new View ("top") { Width = 80, Height = 25 };
 
-			var w = new Window ("w") {
+			var w = new Window () {
 				Width = Dim.Fill (0),
 				Height = Dim.Sized (10)
 			};
@@ -339,7 +337,7 @@ namespace Terminal.Gui.ViewTests {
 			// Testing with the Button because it properly handles the Dim class.
 			var t = Application.Top;
 
-			var w = new Window ("w") {
+			var w = new Window () {
 				Width = 100,
 				Height = 100
 			};
@@ -425,12 +423,12 @@ namespace Terminal.Gui.ViewTests {
 				Assert.Equal (49, f2.Frame.Width); // 50-1=49
 				Assert.Equal (5, f2.Frame.Height);
 
-				Assert.Equal ("Combine(View(Width,FrameView(f1)({X=0,Y=0,Width=49,Height=5}))-Absolute(2))", v1.Width.ToString ());
+				Assert.Equal ("Combine(View(Width,FrameView(f1)((0,0,49,5)))-Absolute(2))", v1.Width.ToString ());
 				Assert.Equal ("Combine(Fill(0)-Absolute(2))", v1.Height.ToString ());
 				Assert.Equal (47, v1.Frame.Width); // 49-2=47
 				Assert.Equal (89, v1.Frame.Height); // 98-5-2-2=89
 
-				Assert.Equal ("Combine(View(Width,FrameView(f2)({X=49,Y=0,Width=49,Height=5}))-Absolute(2))", v2.Width.ToString ());
+				Assert.Equal ("Combine(View(Width,FrameView(f2)((49,0,49,5)))-Absolute(2))", v2.Width.ToString ());
 				Assert.Equal ("Combine(Fill(0)-Absolute(2))", v2.Height.ToString ());
 				Assert.Equal (47, v2.Frame.Width); // 49-2=47
 				Assert.Equal (89, v2.Frame.Height); // 98-5-2-2=89
@@ -445,8 +443,8 @@ namespace Terminal.Gui.ViewTests {
 				Assert.Equal (50, v4.Frame.Width);
 				Assert.Equal (50, v4.Frame.Height);
 
-				Assert.Equal ("Combine(View(Width,Button(v1)({X=2,Y=7,Width=47,Height=89}))-View(Width,Button(v3)({X=0,Y=0,Width=9,Height=9})))", v5.Width.ToString ());
-				Assert.Equal ("Combine(View(Height,Button(v1)({X=2,Y=7,Width=47,Height=89}))-View(Height,Button(v3)({X=0,Y=0,Width=9,Height=9})))", v5.Height.ToString ());
+				Assert.Equal ("Combine(View(Width,Button(v1)((2,7,47,89)))-View(Width,Button(v3)((0,0,9,9))))", v5.Width.ToString ());
+				Assert.Equal ("Combine(View(Height,Button(v1)((2,7,47,89)))-View(Height,Button(v3)((0,0,9,9))))", v5.Height.ToString ());
 				Assert.Equal (38, v5.Frame.Width); // 47-9=38
 				Assert.Equal (80, v5.Frame.Height); // 89-9=80
 
@@ -478,13 +476,13 @@ namespace Terminal.Gui.ViewTests {
 				Assert.Equal (5, f2.Frame.Height);
 
 				v1.Text = "Button1";
-				Assert.Equal ("Combine(View(Width,FrameView(f1)({X=0,Y=0,Width=99,Height=5}))-Absolute(2))", v1.Width.ToString ());
+				Assert.Equal ("Combine(View(Width,FrameView(f1)((0,0,99,5)))-Absolute(2))", v1.Width.ToString ());
 				Assert.Equal ("Combine(Fill(0)-Absolute(2))", v1.Height.ToString ());
 				Assert.Equal (97, v1.Frame.Width); // 99-2=97
 				Assert.Equal (189, v1.Frame.Height); // 198-2-7=189
 
 				v2.Text = "Button2";
-				Assert.Equal ("Combine(View(Width,FrameView(f2)({X=99,Y=0,Width=99,Height=5}))-Absolute(2))", v2.Width.ToString ());
+				Assert.Equal ("Combine(View(Width,FrameView(f2)((99,0,99,5)))-Absolute(2))", v2.Width.ToString ());
 				Assert.Equal ("Combine(Fill(0)-Absolute(2))", v2.Height.ToString ());
 				Assert.Equal (97, v2.Frame.Width); // 99-2=97
 				Assert.Equal (189, v2.Frame.Height); // 198-2-7=189
@@ -508,8 +506,8 @@ namespace Terminal.Gui.ViewTests {
 				Assert.Equal (1, v4.Frame.Height); // 1 because is Dim.DimAbsolute
 
 				v5.Text = "Button5";
-				Assert.Equal ("Combine(View(Width,Button(v1)({X=2,Y=7,Width=97,Height=189}))-View(Width,Button(v3)({X=0,Y=0,Width=19,Height=19})))", v5.Width.ToString ());
-				Assert.Equal ("Combine(View(Height,Button(v1)({X=2,Y=7,Width=97,Height=189}))-View(Height,Button(v3)({X=0,Y=0,Width=19,Height=19})))", v5.Height.ToString ());
+				Assert.Equal ("Combine(View(Width,Button(v1)((2,7,97,189)))-View(Width,Button(v3)((0,0,19,19))))", v5.Width.ToString ());
+				Assert.Equal ("Combine(View(Height,Button(v1)((2,7,97,189)))-View(Height,Button(v3)((0,0,19,19))))", v5.Height.ToString ());
 				Assert.Equal (78, v5.Frame.Width); // 97-9=78
 				Assert.Equal (170, v5.Frame.Height); // 189-19=170
 
@@ -544,25 +542,24 @@ namespace Terminal.Gui.ViewTests {
 		//	Assert.Throws<InvalidOperationException> (() => super.LayoutSubviews ());
 		//}
 
-
 		/// <summary>
 		/// This is an intentionally obtuse test. See https://github.com/gui-cs/Terminal.Gui/issues/2461
 		/// </summary>
 		[Fact]
-		public void DimCombine_ObtuseScenario_Does_Not_Throw ()
+		public void DimCombine_ObtuseScenario_Throw_If_SuperView_Refs_SubView ()
 		{
-			var t = new View ("top") { Width = 80, Height = 25 };
+			var t = new View () { Width = 80, Height = 25 };
 
-			var w = new Window ("w") {
+			var w = new Window () {
 				Width = Dim.Width (t) - 2,    // 78
 				Height = Dim.Height (t) - 2   // 23
 			};
-			var f = new FrameView ("f");
-			var v1 = new View ("v1") {
+			var f = new FrameView ();
+			var v1 = new View () {
 				Width = Dim.Width (w) - 2,    // 76
 				Height = Dim.Height (w) - 2   // 21
 			};
-			var v2 = new View ("v2") {
+			var v2 = new View () {
 				Width = Dim.Width (v1) - 2,   // 74
 				Height = Dim.Height (v1) - 2  // 19
 			};
@@ -571,11 +568,12 @@ namespace Terminal.Gui.ViewTests {
 			w.Add (f);
 			t.Add (w);
 
-			// BUGBUG: v2 - f references t here; t is f's super-superview. This is not supported!
+			// BUGBUG: v2 - f references t here; t is f's super-superview. This is supported!
+			// BUGBUG: v2 - f references v2 here; v2 is f's subview. This is not supported!
 			f.Width = Dim.Width (t) - Dim.Width (v2);      // 80 - 74 = 6
 			f.Height = Dim.Height (t) - Dim.Height (v2);   // 25 - 19 = 6
 
-			t.LayoutSubviews ();
+			Assert.Throws<InvalidOperationException> (t.LayoutSubviews);
 			Assert.Equal (80, t.Frame.Width);
 			Assert.Equal (25, t.Frame.Height);
 			Assert.Equal (78, w.Frame.Width);
@@ -583,6 +581,47 @@ namespace Terminal.Gui.ViewTests {
 			// BUGBUG: v2 - this no longer works - see above
 			//Assert.Equal (6, f.Frame.Width);
 			//Assert.Equal (6, f.Frame.Height);
+			//Assert.Equal (76, v1.Frame.Width);
+			//Assert.Equal (21, v1.Frame.Height);
+			//Assert.Equal (74, v2.Frame.Width);
+			//Assert.Equal (19, v2.Frame.Height);
+		}
+
+		[Fact]
+		public void DimCombine_ObtuseScenario_Does_Not_Throw_If_Two_SubViews_Refs_The_Same_SuperView ()
+		{
+			var t = new View ("top") { Width = 80, Height = 25 };
+
+			var w = new Window () {
+				Width = Dim.Width (t) - 2,    // 78
+				Height = Dim.Height (t) - 2   // 23
+			};
+			var f = new FrameView ();
+			var v1 = new View () {
+				Width = Dim.Width (w) - 2,    // 76
+				Height = Dim.Height (w) - 2   // 21
+			};
+			var v2 = new View () {
+				Width = Dim.Width (v1) - 2,   // 74
+				Height = Dim.Height (v1) - 2  // 19
+			};
+
+			f.Add (v1, v2);
+			w.Add (f);
+			t.Add (w);
+
+			f.Width = Dim.Width (t) - Dim.Width (w) + 4;      // 80 - 74 = 6
+			f.Height = Dim.Height (t) - Dim.Height (w) + 4;   // 25 - 19 = 6
+
+			// BUGBUG: v2 - f references t and w here; t is f's super-superview and w is f's superview. This is supported!
+			var exception = Record.Exception (t.LayoutSubviews);
+			Assert.Null (exception);
+			Assert.Equal (80, t.Frame.Width);
+			Assert.Equal (25, t.Frame.Height);
+			Assert.Equal (78, w.Frame.Width);
+			Assert.Equal (23, w.Frame.Height);
+			Assert.Equal (6, f.Frame.Width);
+			Assert.Equal (6, f.Frame.Height);
 			Assert.Equal (76, v1.Frame.Width);
 			Assert.Equal (21, v1.Frame.Height);
 			Assert.Equal (74, v2.Frame.Width);
@@ -592,23 +631,23 @@ namespace Terminal.Gui.ViewTests {
 		[Fact]
 		public void PosCombine_View_Not_Added_Throws ()
 		{
-			var t = new View ("t") { Width = 80, Height = 50 };
+			var t = new View () { Width = 80, Height = 50 };
 
 			// BUGBUG: v2 - super should not reference it's superview (t)
-			var super = new View ("super") {
+			var super = new View () {
 				Width = Dim.Width (t) - 2,
 				Height = Dim.Height (t) - 2
 			};
 			t.Add (super);
 
-			var sub = new View ("sub");
+			var sub = new View ();
 			super.Add (sub);
 
-			var v1 = new View ("v1") {
+			var v1 = new View () {
 				Width = Dim.Width (super) - 2,
 				Height = Dim.Height (super) - 2
 			};
-			var v2 = new View ("v2") {
+			var v2 = new View () {
 				Width = Dim.Width (v1) - 2,
 				Height = Dim.Height (v1) - 2
 			};
@@ -619,7 +658,6 @@ namespace Terminal.Gui.ViewTests {
 
 			Assert.Throws<InvalidOperationException> (() => t.LayoutSubviews ());
 		}
-
 
 		[Fact, AutoInitShutdown]
 		public void Dim_Add_Operator ()
@@ -1265,6 +1303,50 @@ namespace Terminal.Gui.ViewTests {
 				Assert.Equal (1, label.Frame.Width);
 				Assert.Equal (51, label.Frame.Height);
 			}
+		}
+
+		[Fact]
+		public void Dim_Referencing_SuperView_Does_Not_Throw ()
+		{
+			var super = new View ("super") {
+				Width = 10,
+				Height = 10
+			};
+			var view = new View ("view") {
+				Width = Dim.Width (super),      // this is allowed
+				Height = Dim.Height (super),    // this is allowed
+			};
+
+			super.Add (view);
+			super.BeginInit ();
+			super.EndInit ();
+
+			var exception = Record.Exception (super.LayoutSubviews);
+			Assert.Null (exception);
+		}
+
+		[Fact]
+		public void Dim_SyperView_Referencing_SubView_Throws ()
+		{
+			var super = new View ("super") {
+				Width = 10,
+				Height = 10
+			};
+			var view2 = new View ("view2") {
+				Width = 10,
+				Height = 10,
+			};
+			var view = new View ("view") {
+				Width = Dim.Width (view2),      // this is not allowed
+				Height = Dim.Height (view2),    // this is not allowed
+			};
+
+			view.Add (view2);
+			super.Add (view);
+			super.BeginInit ();
+			super.EndInit ();
+
+			Assert.Throws<InvalidOperationException> (super.LayoutSubviews);
 		}
 	}
 }

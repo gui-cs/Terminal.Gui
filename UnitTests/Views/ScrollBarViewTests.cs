@@ -539,12 +539,12 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (_scrollBar.Visible);
 			Assert.Equal ("Absolute(1)", _scrollBar.Width.ToString ());
 			Assert.Equal (1, _scrollBar.Bounds.Width);
-			Assert.Equal ("Combine(View(Height,HostView()({X=0,Y=0,Width=80,Height=25}))-Absolute(1))",
+			Assert.Equal ("Combine(View(Height,HostView()((0,0,80,25)))-Absolute(1))",
 				_scrollBar.Height.ToString ());
 			Assert.Equal (24, _scrollBar.Bounds.Height);
 			Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
 			Assert.True (_scrollBar.OtherScrollBarView.Visible);
-			Assert.Equal ("Combine(View(Width,HostView()({X=0,Y=0,Width=80,Height=25}))-Absolute(1))",
+			Assert.Equal ("Combine(View(Width,HostView()((0,0,80,25)))-Absolute(1))",
 				_scrollBar.OtherScrollBarView.Width.ToString ());
 			Assert.Equal (79, _scrollBar.OtherScrollBarView.Bounds.Width);
 			Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
@@ -556,12 +556,12 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (_scrollBar.Visible);
 			Assert.Equal ("Absolute(1)", _scrollBar.Width.ToString ());
 			Assert.Equal (1, _scrollBar.Bounds.Width);
-			Assert.Equal ("Combine(View(Height,HostView()({X=0,Y=0,Width=80,Height=25}))-Absolute(1))",
+			Assert.Equal ("Combine(View(Height,HostView()((0,0,80,25)))-Absolute(1))",
 				_scrollBar.Height.ToString ());
 			Assert.Equal (24, _scrollBar.Bounds.Height);
 			Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
 			Assert.True (_scrollBar.OtherScrollBarView.Visible);
-			Assert.Equal ("View(Width,HostView()({X=0,Y=0,Width=80,Height=25}))",
+			Assert.Equal ("View(Width,HostView()((0,0,80,25)))",
 				_scrollBar.OtherScrollBarView.Width.ToString ());
 			Assert.Equal (80, _scrollBar.OtherScrollBarView.Bounds.Width);
 			Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
@@ -573,12 +573,12 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (_scrollBar.Visible);
 			Assert.Equal ("Absolute(1)", _scrollBar.Width.ToString ());
 			Assert.Equal (1, _scrollBar.Bounds.Width);
-			Assert.Equal ("Combine(View(Height,HostView()({X=0,Y=0,Width=80,Height=25}))-Absolute(1))",
+			Assert.Equal ("Combine(View(Height,HostView()((0,0,80,25)))-Absolute(1))",
 				_scrollBar.Height.ToString ());
 			Assert.Equal (24, _scrollBar.Bounds.Height);
 			Assert.False (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
 			Assert.False (_scrollBar.OtherScrollBarView.Visible);
-			Assert.Equal ("View(Width,HostView()({X=0,Y=0,Width=80,Height=25}))",
+			Assert.Equal ("View(Width,HostView()((0,0,80,25)))",
 				_scrollBar.OtherScrollBarView.Width.ToString ());
 			Assert.Equal (80, _scrollBar.OtherScrollBarView.Bounds.Width);
 			Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
@@ -590,12 +590,12 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (_scrollBar.Visible);
 			Assert.Equal ("Absolute(1)", _scrollBar.Width.ToString ());
 			Assert.Equal (1, _scrollBar.Bounds.Width);
-			Assert.Equal ("View(Height,HostView()({X=0,Y=0,Width=80,Height=25}))",
+			Assert.Equal ("View(Height,HostView()((0,0,80,25)))",
 				_scrollBar.Height.ToString ());
 			Assert.Equal (25, _scrollBar.Bounds.Height);
 			Assert.False (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
 			Assert.False (_scrollBar.OtherScrollBarView.Visible);
-			Assert.Equal ("View(Width,HostView()({X=0,Y=0,Width=80,Height=25}))",
+			Assert.Equal ("View(Width,HostView()((0,0,80,25)))",
 				_scrollBar.OtherScrollBarView.Width.ToString ());
 			Assert.Equal (80, _scrollBar.OtherScrollBarView.Bounds.Width);
 			Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
@@ -607,12 +607,12 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (_scrollBar.Visible);
 			Assert.Equal ("Absolute(1)", _scrollBar.Width.ToString ());
 			Assert.Equal (1, _scrollBar.Bounds.Width);
-			Assert.Equal ("Combine(View(Height,HostView()({X=0,Y=0,Width=80,Height=25}))-Absolute(1))",
+			Assert.Equal ("Combine(View(Height,HostView()((0,0,80,25)))-Absolute(1))",
 				_scrollBar.Height.ToString ());
 			Assert.Equal (24, _scrollBar.Bounds.Height);
 			Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);
 			Assert.True (_scrollBar.OtherScrollBarView.Visible);
-			Assert.Equal ("Combine(View(Width,HostView()({X=0,Y=0,Width=80,Height=25}))-Absolute(1))",
+			Assert.Equal ("Combine(View(Width,HostView()((0,0,80,25)))-Absolute(1))",
 				_scrollBar.OtherScrollBarView.Width.ToString ());
 			Assert.Equal (79, _scrollBar.OtherScrollBarView.Bounds.Width);
 			Assert.Equal ("Absolute(1)", _scrollBar.OtherScrollBarView.Height.ToString ());
@@ -825,7 +825,7 @@ namespace Terminal.Gui.ViewsTests {
 				Height = Dim.Fill (),
 				Text = "This is the help text for the Second Step.\n\nPress the button to see a message box.\n\nEnter name too."
 			};
-			var win = new Window ("Test") {
+			var win = new Window () {
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			};
@@ -889,7 +889,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (0, scrollBar.Position);
 			Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
 			var expected = @"
-┌┤Test├─────────────────────────────────────┐
+┌───────────────────────────────────────────┐
 │This is the help text for the Second Step. │
 │                                           │
 │Press the button to see a message box.     │
@@ -926,7 +926,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (0, scrollBar.Position);
 			Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
 			expected = @"
-┌┤Test├──────────────────┐
+┌────────────────────────┐
 │This is the help text   │
 │for the Second Step.    │
 │                        │
@@ -962,7 +962,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (0, scrollBar.Position);
 			Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
 			expected = @"
-┌┤Test├──┐
+┌────────┐
 │This   ▲│
 │is the ┬│
 │help   ││
@@ -977,7 +977,6 @@ namespace Terminal.Gui.ViewsTests {
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 10, 10), pos);
 		}
-
 
 		[Fact, AutoInitShutdown]
 		public void ContentBottomRightCorner_Not_Redraw_If_Both_Size_Equal_To_Zero ()
@@ -1154,7 +1153,6 @@ This is a test
 			Assert.False (sbv.ShowScrollIndicator);
 			Assert.False (sbv.Visible);
 		}
-
 
 		[Fact, AutoInitShutdown]
 		public void ClearOnVisibleFalse_Gets_Sets ()

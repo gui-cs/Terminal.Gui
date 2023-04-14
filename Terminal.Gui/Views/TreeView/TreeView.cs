@@ -306,6 +306,10 @@ namespace Terminal.Gui {
 		{
 			Application.Driver.SetCursorVisibility (DesiredCursorVisibility);
 
+			if (SelectedObject == null && Objects.Any ()) {
+				SelectedObject = Objects.First ();
+			}
+
 			return base.OnEnter (view);
 		}
 
@@ -545,7 +549,7 @@ namespace Terminal.Gui {
 			}
 
 			cachedLineMap = new ReadOnlyCollection<Branch<T>> (toReturn);
-			
+
 			// Update the collection used for search-typing
 			KeystrokeNavigator.Collection = cachedLineMap.Select (b => AspectGetter (b.Model)).ToArray ();
 			return cachedLineMap;
@@ -609,7 +613,6 @@ namespace Terminal.Gui {
 
 			return base.ProcessKey (keyEvent);
 		}
-
 
 		/// <summary>
 		/// <para>Triggers the <see cref="ObjectActivated"/> event with the <see cref="SelectedObject"/>.</para>
@@ -712,7 +715,7 @@ namespace Terminal.Gui {
 		/// <param name="e"></param>
 		protected virtual void OnObjectActivated (ObjectActivatedEventArgs<T> e)
 		{
-			ObjectActivated?.Invoke (this,e);
+			ObjectActivated?.Invoke (this, e);
 		}
 
 		/// <summary>
@@ -1075,7 +1078,6 @@ namespace Terminal.Gui {
 			GoToEnd ();
 		}
 
-
 		/// <summary>
 		/// Sets the selection to the next branch that matches the <paramref name="predicate"/>.
 		/// </summary>
@@ -1126,7 +1128,6 @@ namespace Terminal.Gui {
 			if (idx == -1) {
 				return;
 			}
-
 
 			/*this -1 allows for possible horizontal scroll bar in the last row of the control*/
 			int leaveSpace = Style.LeaveLastRow ? 1 : 0;

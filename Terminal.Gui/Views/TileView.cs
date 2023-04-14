@@ -9,7 +9,7 @@ namespace Terminal.Gui {
 	/// A <see cref="View"/> consisting of a moveable bar that divides
 	/// the display area into resizeable <see cref="Tiles"/>.
 	/// </summary>
-	public partial class TileView : View {
+	public class TileView : View {
 		TileView parentTileView;
 
 		/// <summary>
@@ -23,7 +23,7 @@ namespace Terminal.Gui {
 		/// new instances use <see cref="TileView.RebuildForTileCount(int)"/> 
 		/// or <see cref="TileView.InsertTile(int)"/>.
 		/// </summary>
-		public partial class Tile {
+		public class Tile {
 			/// <summary>
 			/// The <see cref="ContentView"/> that is contained in this <see cref="TileView"/>.
 			/// Add new child views to this member for multiple 
@@ -43,7 +43,7 @@ namespace Terminal.Gui {
 			/// </summary>
 			/// <remarks>
 			/// Title are not rendered for root level tiles 
-			/// <see cref="BorderStyle"/> is <see cref="BorderStyle.None"/>.
+			/// <see cref="Gui.LineStyle"/> is <see cref="LineStyle.None"/>.
 			///</remarks>
 			public string Title {
 				get => _title;
@@ -373,16 +373,15 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// BUGBUG: v2 Temporary for now
+		/// The line style to use when drawing the splitter lines.
 		/// </summary>
-		public BorderStyle BorderStyle { get; set; } = BorderStyle.None;
+		public LineStyle LineStyle { get; set; } = LineStyle.None;
 
 		/// <summary>
-		/// Overriden so no Frames get drawn (BUGBUG: v2 fix this hack)
+		/// Overridden so no Frames get drawn (BUGBUG: v2 fix this hack)
 		/// </summary>
-		/// <param name="bounds"></param>
 		/// <returns></returns>
-		public override bool OnDrawFrames (Rect bounds)
+		public override bool OnDrawFrames ()
 		{
 			return false;
 		}
@@ -403,11 +402,11 @@ namespace Terminal.Gui {
 			if (IsRootTileView ()) {
 				if (HasBorder ()) {
 
-					lc.AddLine (new Point (0, 0), bounds.Width - 1, Orientation.Horizontal, BorderStyle);
-					lc.AddLine (new Point (0, 0), bounds.Height - 1, Orientation.Vertical, BorderStyle);
+					lc.AddLine (new Point (0, 0), bounds.Width - 1, Orientation.Horizontal, LineStyle);
+					lc.AddLine (new Point (0, 0), bounds.Height - 1, Orientation.Vertical, LineStyle);
 
-					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Width + 1, Orientation.Horizontal, BorderStyle);
-					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Height + 1, Orientation.Vertical, BorderStyle);
+					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Width + 1, Orientation.Horizontal, LineStyle);
+					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Height + 1, Orientation.Vertical, LineStyle);
 				}
 
 				foreach (var line in allLines) {
@@ -428,12 +427,12 @@ namespace Terminal.Gui {
 						length += 2;
 					}
 
-					lc.AddLine (origin, length, line.Orientation, BorderStyle);
+					lc.AddLine (origin, length, line.Orientation, LineStyle);
 				}
 			}
 
 			Driver.SetAttribute (ColorScheme.Normal);
-			foreach (var p in lc.GenerateImage (bounds)) {
+			foreach (var p in lc.GetMap (bounds)) {
 				this.AddRune (p.Key.X, p.Key.Y, p.Value);
 			}
 			
@@ -612,7 +611,6 @@ namespace Terminal.Gui {
 					spaceForLast--;
 				}
 
-
 				// don't shrink if it would take us below min size of left panel
 				if (spaceForLast < tiles [idx].MinSize) {
 					return false;
@@ -781,7 +779,6 @@ namespace Terminal.Gui {
 						splitterLines [Math.Min (i, splitterLines.Count - 1)].Visible = false;
 					}
 
-
 				}
 			}
 		}
@@ -941,7 +938,7 @@ namespace Terminal.Gui {
 
 					// Start a Drag
 					SetFocus ();
-					Application.EnsuresTopOnFront ();
+					Application.BringOverlappedTopToFront ();
 
 					if (mouseEvent.Flags == MouseFlags.Button1Pressed) {
 						dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
@@ -1070,7 +1067,7 @@ namespace Terminal.Gui {
 
 		private bool HasBorder ()
 		{
-			return BorderStyle != BorderStyle.None;
+			return LineStyle != LineStyle.None;
 		}
 
 		/// <inheritdoc/>

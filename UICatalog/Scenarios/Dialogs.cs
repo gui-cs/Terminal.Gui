@@ -9,7 +9,6 @@ namespace UICatalog.Scenarios {
 	public class Dialogs : Scenario {
 		static int CODE_POINT = '你'; // We know this is a wide char
 
-
 		public override void Setup ()
 		{
 			var frame = new FrameView ("Dialog Options") {
@@ -115,7 +114,6 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (styleRadioGroup);
 
-
 			frame.ForceValidatePosDim = true;
 			void Top_Loaded (object sender, EventArgs args)
 			{
@@ -197,10 +195,14 @@ namespace UICatalog.Scenarios {
 
 					// This tests dynamically adding buttons; ensuring the dialog resizes if needed and 
 					// the buttons are laid out correctly
-					dialog = new Dialog (titleEdit.Text, width, height,
-						buttons.ToArray ()) {
+					dialog = new Dialog (buttons.ToArray ()) {
+						Title = titleEdit.Text,
 						ButtonAlignment = (Dialog.ButtonAlignments)styleRadioGroup.SelectedItem
 					};
+					if (height != 0 || width != 0) {
+						dialog.Height = height;
+						dialog.Width = width;
+					}
 
 					var add = new Button ("Add a button") {
 						X = Pos.Center (),

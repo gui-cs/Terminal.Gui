@@ -28,7 +28,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.Null (Application.MainLoop);
 			Assert.Null (Application.Iteration);
 			Assert.Null (Application.RootMouseEvent);
-			Assert.Null (Application.Resized);
+			Assert.Null (Application.TerminalResized);
 		}
 
 		void Post_Init_State ()
@@ -40,7 +40,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.NotNull (Application.MainLoop);
 			Assert.Null (Application.Iteration);
 			Assert.Null (Application.RootMouseEvent);
-			Assert.Null (Application.Resized);
+			Assert.Null (Application.TerminalResized);
 		}
 
 		void Init ()
@@ -124,11 +124,10 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.Null (Application.Driver);
 		}
 
-
 		class TestToplevel : Toplevel {
 			public TestToplevel ()
 			{
-				IsMdiContainer = false;
+				IsOverlappedContainer = false;
 			}
 		}
 
@@ -291,7 +290,7 @@ namespace Terminal.Gui.ApplicationTests {
 		[Fact]
 		public void Run_T_After_InitNullDriver_with_TestTopLevel_Throws ()
 		{
-			Application.ForceFakeConsole = true;
+			Application._forceFakeConsole = true;
 
 			Application.Init (null, null);
 			Assert.Equal (typeof (FakeDriver), Application.Driver.GetType ());
@@ -334,7 +333,7 @@ namespace Terminal.Gui.ApplicationTests {
 		[Fact]
 		public void Run_T_NoInit_DoesNotThrow ()
 		{
-			Application.ForceFakeConsole = true;
+			Application._forceFakeConsole = true;
 
 			Application.Iteration = () => {
 				Application.RequestStop ();
@@ -509,7 +508,7 @@ namespace Terminal.Gui.ApplicationTests {
 				t3.RequestStop ();
 				t2.RequestStop ();
 			};
-			// Now this will close the MdiContainer when all MdiChildes was closed
+			// Now this will close the OverlappedContainer when all OverlappedChildren was closed
 			t2.Closed += (s,_) => {
 				t1.RequestStop ();
 			};
@@ -558,8 +557,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.Equal (Application.Top, rs.Toplevel);
 			Assert.Null (Application.MouseGrabView);  // public
 			Assert.Null (Application.WantContinuousButtonPressedView); // public
-			Assert.False (Application.DebugDrawBounds);
-			Assert.False (Application.ShowChild (Application.Top));
+			Assert.False (Application.MoveToOverlappedChild (Application.Top));
 		}
 
 		#region KeyboardTests
@@ -772,10 +770,10 @@ namespace Terminal.Gui.ApplicationTests {
 		public void EnsuresTopOnFront_CanFocus_True_By_Keyboard_And_Mouse ()
 		{
 			var top = Application.Top;
-			var win = new Window ("win") { X = 0, Y = 0, Width = 20, Height = 10 };
+			var win = new Window () { Title = "win", X = 0, Y = 0, Width = 20, Height = 10 };
 			var tf = new TextField () { Width = 10 };
 			win.Add (tf);
-			var win2 = new Window ("win2") { X = 22, Y = 0, Width = 20, Height = 10 };
+			var win2 = new Window () { Title = "win2", X = 22, Y = 0, Width = 20, Height = 10 };
 			var tf2 = new TextField () { Width = 10 };
 			win2.Add (tf2);
 			top.Add (win, win2);
@@ -809,7 +807,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.True (win2.HasFocus);
 			Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 			win2.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Released });
-			Assert.Null (Toplevel.dragPosition);
+			Assert.Null (Toplevel._dragPosition);
 		}
 
 		[Fact]
@@ -817,10 +815,10 @@ namespace Terminal.Gui.ApplicationTests {
 		public void EnsuresTopOnFront_CanFocus_False_By_Keyboard_And_Mouse ()
 		{
 			var top = Application.Top;
-			var win = new Window ("win") { X = 0, Y = 0, Width = 20, Height = 10 };
+			var win = new Window () { Title = "win", X = 0, Y = 0, Width = 20, Height = 10 };
 			var tf = new TextField () { Width = 10 };
 			win.Add (tf);
-			var win2 = new Window ("win2") { X = 22, Y = 0, Width = 20, Height = 10 };
+			var win2 = new Window () { Title = "win2", X = 22, Y = 0, Width = 20, Height = 10 };
 			var tf2 = new TextField () { Width = 10 };
 			win2.Add (tf2);
 			top.Add (win, win2);
@@ -861,17 +859,11 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.True (win2.HasFocus);
 			Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 			win2.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Released });
-			Assert.Null (Toplevel.dragPosition);
+			Assert.Null (Toplevel._dragPosition);
 		}
 
 		#endregion
 
-		[Fact, AutoInitShutdown]
-		public void GetSupportedCultures_Method ()
-		{
-			var cultures = Application.GetSupportedCultures ();
-			Assert.Equal (cultures.Count, Application.SupportedCultures.Count);
-		}
 
 		#region mousegrabtests
 		[Fact, AutoInitShutdown]
