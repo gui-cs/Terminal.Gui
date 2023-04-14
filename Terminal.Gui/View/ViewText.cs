@@ -5,7 +5,6 @@ using NStack;
 namespace Terminal.Gui {
 
 	public partial class View {
-
 		ustring _text;
 
 		/// <summary>
@@ -44,6 +43,17 @@ namespace Terminal.Gui {
 #endif
 			}
 		}
+
+		/// <summary>
+		/// Gets or sets the <see cref="Gui.TextFormatter"/> used to format <see cref="Text"/>.
+		/// </summary>
+		public TextFormatter TextFormatter { get; set; }
+
+		void TextFormatter_HotKeyChanged (object sender, KeyChangedEventArgs e)
+		{
+			HotKeyChanged?.Invoke (this, e);
+		}
+
 
 		/// <summary>
 		/// Can be overridden if the <see cref="Terminal.Gui.TextFormatter.Text"/> has
