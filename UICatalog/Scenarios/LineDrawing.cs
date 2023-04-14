@@ -29,7 +29,7 @@ namespace UICatalog.Scenarios {
 
 			tools.ColorChanged += (c) => {
 				canvas.SetColor (c);
-				canvas.BorderFrame.ColorScheme = new ColorScheme () {
+				canvas.Border.ColorScheme = new ColorScheme () {
 					Normal = new Terminal.Gui.Attribute (c, canvas.ColorScheme.Normal.Background)
 				};
 				Win.Redraw (Win.Bounds);
