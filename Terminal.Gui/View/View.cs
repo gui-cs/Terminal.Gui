@@ -5,6 +5,7 @@ using System.Linq;
 using NStack;
 
 namespace Terminal.Gui {
+	#region API Docs
 	/// <summary>
 	/// View is the base class for all views on the screen and represents a visible element that can render itself and 
 	/// contains zero or more nested views, called SubViews.
@@ -110,6 +111,7 @@ namespace Terminal.Gui {
 	///     instead of on every run.
 	///   </para>
 	/// </remarks>
+	#endregion API Docs
 	public partial class View : Responder, ISupportInitializeNotification {
 
 		#region Constructors and Initialization
