@@ -22,7 +22,7 @@ namespace Terminal.Gui.ViewTests {
 			var r = new View ();
 			Assert.NotNull (r);
 			Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);
-			Assert.Equal ("View()({X=0,Y=0,Width=0,Height=0})", r.ToString ());
+			Assert.Equal ("View()((0,0,0,0))", r.ToString ());
 			Assert.False (r.CanFocus);
 			Assert.False (r.HasFocus);
 			Assert.Equal (new Rect (0, 0, 0, 0), r.Bounds);
@@ -46,7 +46,7 @@ namespace Terminal.Gui.ViewTests {
 			r = new View (Rect.Empty);
 			Assert.NotNull (r);
 			Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
-			Assert.Equal ("View()({X=0,Y=0,Width=0,Height=0})", r.ToString ());
+			Assert.Equal ("View()((0,0,0,0))", r.ToString ());
 			Assert.False (r.CanFocus);
 			Assert.False (r.HasFocus);
 			Assert.Equal (new Rect (0, 0, 0, 0), r.Bounds);
@@ -70,7 +70,7 @@ namespace Terminal.Gui.ViewTests {
 			r = new View (new Rect (1, 2, 3, 4));
 			Assert.NotNull (r);
 			Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
-			Assert.Equal ("View()({X=1,Y=2,Width=3,Height=4})", r.ToString ());
+			Assert.Equal ("View()((1,2,3,4))", r.ToString ());
 			Assert.False (r.CanFocus);
 			Assert.False (r.HasFocus);
 			Assert.Equal (new Rect (0, 0, 3, 4), r.Bounds);
@@ -94,7 +94,7 @@ namespace Terminal.Gui.ViewTests {
 			r = new View ("Vertical View", TextDirection.TopBottom_LeftRight);
 			Assert.NotNull (r);
 			Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);
-			Assert.Equal ("View(Vertical View)({X=0,Y=0,Width=1,Height=13})", r.ToString ());
+			Assert.Equal ("View(Vertical View)((0,0,1,13))", r.ToString ());
 			Assert.False (r.CanFocus);
 			Assert.False (r.HasFocus);
 			Assert.Equal (new Rect (0, 0, 1, 13), r.Bounds);
@@ -134,7 +134,6 @@ namespace Terminal.Gui.ViewTests {
 
 			// TODO: Add more
 		}
-
 
 		[Fact]
 		public void View_With_No_Difference_Between_An_Object_Initializer_And_A_Constructor ()
@@ -412,7 +411,6 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (v2.CanFocus);
 		}
 
-
 		[Fact]
 		public void Multi_Thread_Toplevels ()
 		{
@@ -593,7 +591,6 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (79, view.Bounds.Width);
 			Assert.Equal (24, view.Bounds.Height);
 
-
 			view.X = 0;
 			view.Y = 0;
 			Assert.Equal ("Absolute(0)", view.X.ToString ());
@@ -718,120 +715,21 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (top2, v2.GetTopSuperView ());
 		}
 
-
-		[Fact, AutoInitShutdown]
-		public void DrawFrame_With_Positive_Positions ()
-		{
-			var view = new View (new Rect (0, 0, 8, 4));
-
-			view.DrawContent += (s, e) => view.DrawFrame (view.Bounds, 0, true);
-
-			Assert.Equal (Point.Empty, new Point (view.Frame.X, view.Frame.Y));
-			Assert.Equal (new Size (8, 4), new Size (view.Frame.Width, view.Frame.Height));
-
-			Application.Top.Add (view);
-			Application.Begin (Application.Top);
-
-			var expected = @"
-┌──────┐
-│      │
-│      │
-└──────┘
-";
-
-			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (0, 0, 8, 4), pos);
-		}
-
-		[Fact, AutoInitShutdown]
-		public void DrawFrame_With_Minimum_Size ()
-		{
-			var view = new View (new Rect (0, 0, 2, 2));
-
-			view.DrawContent += (s, e) => view.DrawFrame (view.Bounds, 0, true);
-
-			Assert.Equal (Point.Empty, new Point (view.Frame.X, view.Frame.Y));
-			Assert.Equal (new Size (2, 2), new Size (view.Frame.Width, view.Frame.Height));
-
-			Application.Top.Add (view);
-			Application.Begin (Application.Top);
-
-			var expected = @"
-┌┐
-└┘
-";
-
-			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (0, 0, 2, 2), pos);
-		}
-
-		[Fact, AutoInitShutdown]
-		public void DrawFrame_With_Negative_Positions ()
-		{
-			var view = new View (new Rect (-1, 0, 8, 4));
-
-			view.DrawContent += (s, e) => view.DrawFrame (view.Bounds, 0, true);
-
-			Assert.Equal (new Point (-1, 0), new Point (view.Frame.X, view.Frame.Y));
-			Assert.Equal (new Size (8, 4), new Size (view.Frame.Width, view.Frame.Height));
-
-			Application.Top.Add (view);
-			Application.Begin (Application.Top);
-
-			var expected = @"
-──────┐
-      │
-      │
-──────┘
-";
-
-			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (0, 0, 7, 4), pos);
-
-			view.Frame = new Rect (-1, -1, 8, 4);
-			Application.Refresh ();
-
-			expected = @"
-      │
-      │
-──────┘
-";
-
-			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (6, 0, 7, 3), pos);
-
-			view.Frame = new Rect (0, 0, 8, 4);
-			((FakeDriver)Application.Driver).SetBufferSize (7, 4);
-
-			expected = @"
-┌──────
-│      
-│      
-└──────
-";
-
-			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Assert.Equal (new Rect (0, 0, 7, 4), pos);
-
-			view.Frame = new Rect (0, 0, 8, 4);
-			((FakeDriver)Application.Driver).SetBufferSize (7, 3);
-		}
-
+		
 
 		[Fact, AutoInitShutdown]
 		public void Clear_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
 		{
-			var view = new View () {
+			var view = new FrameView () {
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			};
 			view.DrawContent += (s, e) => {
-				view.DrawFrame (view.Bounds);
 				var savedClip = Application.Driver.Clip;
-				Application.Driver.Clip = new Rect (1, 1, view.Bounds.Width - 2, view.Bounds.Height - 2);
-				for (int row = 0; row < view.Bounds.Height - 2; row++) {
+				Application.Driver.Clip = new Rect (1, 1, view.Bounds.Width, view.Bounds.Height);
+				for (int row = 0; row < view.Bounds.Height; row++) {
 					Application.Driver.Move (1, row + 1);
-					for (int col = 0; col < view.Bounds.Width - 2; col++) {
+					for (int col = 0; col < view.Bounds.Width; col++) {
 						Application.Driver.AddStr ($"{col}");
 					}
 				}
@@ -857,7 +755,7 @@ namespace Terminal.Gui.ViewTests {
 			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 20, 10), pos);
 
-			view.Clear ();
+			view.Clear (view.Frame);
 
 			expected = @"
 ";
@@ -869,17 +767,16 @@ namespace Terminal.Gui.ViewTests {
 		[Fact, AutoInitShutdown]
 		public void Clear_Bounds_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
 		{
-			var view = new View () {
+			var view = new FrameView () {
 				Width = Dim.Fill (),
 				Height = Dim.Fill ()
 			};
 			view.DrawContent += (s, e) => {
-				view.DrawFrame (view.Bounds);
 				var savedClip = Application.Driver.Clip;
-				Application.Driver.Clip = new Rect (1, 1, view.Bounds.Width - 2, view.Bounds.Height - 2);
-				for (int row = 0; row < view.Bounds.Height - 2; row++) {
+				Application.Driver.Clip = new Rect (1, 1, view.Bounds.Width, view.Bounds.Height);
+				for (int row = 0; row < view.Bounds.Height; row++) {
 					Application.Driver.Move (1, row + 1);
-					for (int col = 0; col < view.Bounds.Width - 2; col++) {
+					for (int col = 0; col < view.Bounds.Width; col++) {
 						Application.Driver.AddStr ($"{col}");
 					}
 				}
@@ -905,7 +802,7 @@ namespace Terminal.Gui.ViewTests {
 			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 20, 10), pos);
 
-			view.Clear (view.Bounds);
+			view.Clear (view.Frame);
 
 			expected = @"
 ";
@@ -1467,7 +1364,6 @@ At 0,0
 			v.LayoutSubviews ();
 			v.Redraw (v.Bounds);
 
-
 			string looksLike =
 @"    
 111
@@ -1551,12 +1447,12 @@ At 0,0
 		{
 			var view = new View ();
 			Assert.NotNull (view.Margin);
-			Assert.NotNull (view.BorderFrame);
+			Assert.NotNull (view.Border);
 			Assert.NotNull (view.Padding);
 
 			view.Dispose ();
 			Assert.Null (view.Margin);
-			Assert.Null (view.BorderFrame);
+			Assert.Null (view.Border);
 			Assert.Null (view.Padding);
 		}
 	}

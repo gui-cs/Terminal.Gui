@@ -534,7 +534,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The application toplevel color scheme, for the default toplevel views.
+		/// The application Toplevel color scheme, for the default Toplevel views.
 		/// </summary>
 		/// <remarks>
 		/// <para>
@@ -544,7 +544,7 @@ namespace Terminal.Gui {
 		public static ColorScheme TopLevel { get => GetColorScheme (); set => SetColorScheme (value); }
 
 		/// <summary>
-		/// The base color scheme, for the default toplevel views.
+		/// The base color scheme, for the default Toplevel views.
 		/// </summary>
 		/// <remarks>
 		/// <para>
@@ -918,30 +918,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Draws the title for a Window-style view incorporating padding. 
-		/// </summary>
-		/// <param name="region">Screen relative region where the frame will be drawn.</param>
-		/// <param name="title">The title for the window. The title will only be drawn if <c>title</c> is not null or empty and paddingTop is greater than 0.</param>
-		/// <param name="paddingLeft">Number of columns to pad on the left (if 0 the border will not appear on the left).</param>
-		/// <param name="paddingTop">Number of rows to pad on the top (if 0 the border and title will not appear on the top).</param>
-		/// <param name="paddingRight">Number of columns to pad on the right (if 0 the border will not appear on the right).</param>
-		/// <param name="paddingBottom">Number of rows to pad on the bottom (if 0 the border will not appear on the bottom).</param>
-		/// <param name="textAlignment">Not yet implemented.</param>
-		/// <remarks></remarks>
-		public virtual void DrawWindowTitle (Rect region, ustring title, int paddingLeft, int paddingTop, int paddingRight, int paddingBottom, TextAlignment textAlignment = TextAlignment.Left)
-		{
-			var width = region.Width - (paddingLeft + 1) * 2;
-			if (!ustring.IsNullOrEmpty (title) && width > 2 && region.Y + paddingTop <= region.Y + paddingBottom) {
-				Move (region.X + 2 + paddingLeft, region.Y + paddingTop);
-				//AddRune (' ');
-				var str = title.Sum (r => Math.Max (Rune.ColumnWidth (r), 1)) >= width
-					? TextFormatter.Format (title, width - 2, false, false) [0] : title;
-				AddStr (str);
-				//AddRune (' ');
-			}
-		}
-
-		/// <summary>
 		/// Enables diagnostic functions
 		/// </summary>
 		[Flags]
@@ -951,13 +927,13 @@ namespace Terminal.Gui {
 			/// </summary>
 			Off = 0b_0000_0000,
 			/// <summary>
-			/// When enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool, LineStyle)"/> will draw a 
+			/// When enabled, <see cref="Frame.OnDrawFrames"/> will draw a 
 			/// ruler in the frame for any side with a padding value greater than 0.
 			/// </summary>
 			FrameRuler = 0b_0000_0001,
 			/// <summary>
-			/// When Enabled, <see cref="DrawWindowFrame(Rect, int, int, int, int, bool, bool, LineStyle)"/> will use
-			/// 'L', 'R', 'T', and 'B' for padding instead of ' '.
+			/// When enabled, <see cref="Frame.OnDrawFrames"/> will draw a 
+			/// 'L', 'R', 'T', and 'B' when clearing <see cref="Thickness"/>'s instead of ' '.
 			/// </summary>
 			FramePadding = 0b_0000_0010,
 		}
@@ -966,201 +942,7 @@ namespace Terminal.Gui {
 		/// Set flags to enable/disable <see cref="ConsoleDriver"/> diagnostics.
 		/// </summary>
 		public static DiagnosticFlags Diagnostics { get; set; }
-
-		/// <summary>
-		/// Draws a frame for a window with padding and an optional visible border inside the padding. 
-		/// </summary>
-		/// <param name="region">Screen relative region where the frame will be drawn.</param>
-		/// <param name="paddingLeft">Number of columns to pad on the left (if 0 the border will not appear on the left).</param>
-		/// <param name="paddingTop">Number of rows to pad on the top (if 0 the border and title will not appear on the top).</param>
-		/// <param name="paddingRight">Number of columns to pad on the right (if 0 the border will not appear on the right).</param>
-		/// <param name="paddingBottom">Number of rows to pad on the bottom (if 0 the border will not appear on the bottom).</param>
-		/// <param name="border">If set to <c>true</c> and any padding dimension is > 0 the border will be drawn.</param>
-		/// <param name="fill">If set to <c>true</c> it will clear the content area (the area inside the padding) with the current color, otherwise the content area will be left untouched.</param>
-		/// <param name="lineStyle">The line style to be used.</param>
-		[ObsoleteAttribute ("This method is obsolete in v2. Use use LineCanvas or Frame instead.", false)]
-		public virtual void DrawWindowFrame (Rect region, int paddingLeft = 0, int paddingTop = 0, int paddingRight = 0,
-			int paddingBottom = 0, bool border = true, bool fill = false, LineStyle lineStyle = LineStyle.Single)
-		{
-			char clearChar = ' ';
-			char leftChar = clearChar;
-			char rightChar = clearChar;
-			char topChar = clearChar;
-			char bottomChar = clearChar;
-
-			if ((Diagnostics & DiagnosticFlags.FramePadding) == DiagnosticFlags.FramePadding) {
-				leftChar = 'L';
-				rightChar = 'R';
-				topChar = 'T';
-				bottomChar = 'B';
-				clearChar = 'C';
-			}
-
-			void AddRuneAt (int col, int row, Rune ch)
-			{
-				Move (col, row);
-				AddRune (ch);
-			}
-
-			// fwidth is count of hLine chars
-			int fwidth = (int)(region.Width - (paddingRight + paddingLeft));
-
-			// fheight is count of vLine chars
-			int fheight = (int)(region.Height - (paddingBottom + paddingTop));
-
-			// fleft is location of left frame line
-			int fleft = region.X + paddingLeft - 1;
-
-			// fright is location of right frame line
-			int fright = fleft + fwidth + 1;
-
-			// ftop is location of top frame line
-			int ftop = region.Y + paddingTop - 1;
-
-			// fbottom is location of bottom frame line
-			int fbottom = ftop + fheight + 1;
-
-			var borderStyle = lineStyle;
-
-			Rune hLine = default, vLine = default,
-				uRCorner = default, uLCorner = default, lLCorner = default, lRCorner = default;
-
-			if (border) {
-				switch (borderStyle) {
-				case LineStyle.None:
-					break;
-				case LineStyle.Single:
-					hLine = HLine;
-					vLine = VLine;
-					uRCorner = URCorner;
-					uLCorner = ULCorner;
-					lLCorner = LLCorner;
-					lRCorner = LRCorner;
-					break;
-				case LineStyle.Double:
-					hLine = HDLine;
-					vLine = VDLine;
-					uRCorner = URDCorner;
-					uLCorner = ULDCorner;
-					lLCorner = LLDCorner;
-					lRCorner = LRDCorner;
-					break;
-				case LineStyle.Rounded:
-					hLine = HRLine;
-					vLine = VRLine;
-					uRCorner = URRCorner;
-					uLCorner = ULRCorner;
-					lLCorner = LLRCorner;
-					lRCorner = LRRCorner;
-					break;
-				}
-			} else {
-				hLine = vLine = uRCorner = uLCorner = lLCorner = lRCorner = clearChar;
-			}
-
-			// Outside top
-			if (paddingTop > 1) {
-				for (int r = region.Y; r < ftop; r++) {
-					for (int c = region.X; c < region.X + region.Width; c++) {
-						AddRuneAt (c, r, topChar);
-					}
-				}
-			}
-
-			// Outside top-left
-			for (int c = region.X; c < fleft; c++) {
-				AddRuneAt (c, ftop, leftChar);
-			}
-
-			// Frame top-left corner
-			AddRuneAt (fleft, ftop, paddingTop >= 0 ? (paddingLeft >= 0 ? uLCorner : hLine) : leftChar);
-
-			// Frame top
-			for (int c = fleft + 1; c < fleft + 1 + fwidth; c++) {
-				AddRuneAt (c, ftop, paddingTop > 0 ? hLine : topChar);
-			}
-
-			// Frame top-right corner
-			if (fright > fleft) {
-				AddRuneAt (fright, ftop, paddingTop >= 0 ? (paddingRight >= 0 ? uRCorner : hLine) : rightChar);
-			}
-
-			// Outside top-right corner
-			for (int c = fright + 1; c < fright + paddingRight; c++) {
-				AddRuneAt (c, ftop, rightChar);
-			}
-
-			// Left, Fill, Right
-			if (fbottom > ftop) {
-				for (int r = ftop + 1; r < fbottom; r++) {
-					// Outside left
-					for (int c = region.X; c < fleft; c++) {
-						AddRuneAt (c, r, leftChar);
-					}
-
-					// Frame left
-					AddRuneAt (fleft, r, paddingLeft > 0 ? vLine : leftChar);
-
-					// Fill
-					if (fill) {
-						for (int x = fleft + 1; x < fright; x++) {
-							AddRuneAt (x, r, clearChar);
-						}
-					}
-
-					// Frame right
-					if (fright > fleft) {
-						var v = vLine;
-						if ((Diagnostics & DiagnosticFlags.FrameRuler) == DiagnosticFlags.FrameRuler) {
-							v = (char)(((int)'0') + ((r - ftop) % 10)); // vLine;
-						}
-						AddRuneAt (fright, r, paddingRight > 0 ? v : rightChar);
-					}
-
-					// Outside right
-					for (int c = fright + 1; c < fright + paddingRight; c++) {
-						AddRuneAt (c, r, rightChar);
-					}
-				}
-
-				// Outside Bottom
-				for (int c = region.X; c < region.X + region.Width; c++) {
-					AddRuneAt (c, fbottom, leftChar);
-				}
-
-				// Frame bottom-left
-				AddRuneAt (fleft, fbottom, paddingLeft > 0 ? lLCorner : leftChar);
-
-				if (fright > fleft) {
-					// Frame bottom
-					for (int c = fleft + 1; c < fright; c++) {
-						var h = hLine;
-						if ((Diagnostics & DiagnosticFlags.FrameRuler) == DiagnosticFlags.FrameRuler) {
-							h = (char)(((int)'0') + ((c - fleft) % 10)); // hLine;
-						}
-						AddRuneAt (c, fbottom, paddingBottom > 0 ? h : bottomChar);
-					}
-
-					// Frame bottom-right
-					AddRuneAt (fright, fbottom, paddingRight > 0 ? (paddingBottom > 0 ? lRCorner : hLine) : rightChar);
-				}
-
-				// Outside right
-				for (int c = fright + 1; c < fright + paddingRight; c++) {
-					AddRuneAt (c, fbottom, rightChar);
-				}
-			}
-
-			// Out bottom - ensure top is always drawn if we overlap
-			if (paddingBottom > 0) {
-				for (int r = fbottom + 1; r < fbottom + paddingBottom; r++) {
-					for (int c = region.X; c < region.X + region.Width; c++) {
-						AddRuneAt (c, r, bottomChar);
-					}
-				}
-			}
-		}
-
+		
 		/// <summary>
 		/// Suspend the application, typically needs to save the state, suspend the app and upon return, reset the console driver.
 		/// </summary>
@@ -1436,6 +1218,11 @@ namespace Terminal.Gui {
 				return;
 			}
 
+		}
+
+		internal void SetAttribute (object attribute)
+		{
+			throw new NotImplementedException ();
 		}
 	}
 

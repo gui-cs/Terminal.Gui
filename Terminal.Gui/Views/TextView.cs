@@ -1887,7 +1887,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Gets or sets a value indicating whether pressing ENTER in a <see cref="TextView"/>
-		/// creates a new line of text in the view or activates the default button for the toplevel.
+		/// creates a new line of text in the view or activates the default button for the Toplevel.
 		/// </summary>
 		public bool AllowsReturn {
 			get => allowsReturn;
@@ -2705,7 +2705,6 @@ namespace Terminal.Gui {
 			Clipboard.Contents += text;
 		}
 
-
 		/// <summary>
 		/// Inserts the given <paramref name="toAdd"/> text at the current cursor position
 		/// exactly as if the user had just typed it
@@ -2723,7 +2722,6 @@ namespace Terminal.Gui {
 
 					throw new ArgumentException ($"Cannot insert character '{ch}' because it does not map to a Key");
 				}
-
 
 				InsertText (new KeyEvent () { Key = key });
 			}
@@ -3303,7 +3301,7 @@ namespace Terminal.Gui {
 
 		bool MovePreviousView ()
 		{
-			if (Application.MdiTop != null) {
+			if (Application.OverlappedTop != null) {
 				return SuperView?.FocusPrev () == true;
 			}
 
@@ -3312,7 +3310,7 @@ namespace Terminal.Gui {
 
 		bool MoveNextView ()
 		{
-			if (Application.MdiTop != null) {
+			if (Application.OverlappedTop != null) {
 				return SuperView?.FocusNext () == true;
 			}
 
@@ -4476,7 +4474,6 @@ namespace Terminal.Gui {
 			historyText?.Clear (Text);
 		}
 	}
-
 
 	/// <summary>
 	/// Renders an overlay on another view at a given point that allows selecting

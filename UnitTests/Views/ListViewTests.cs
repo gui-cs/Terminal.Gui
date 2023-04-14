@@ -113,7 +113,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Throws<ArgumentException> (() => lv.AddKeyBinding (Key.Space));
 		}
 
-
 		/// <summary>
 		/// Tests that when none of the Commands in a chained keybinding are possible
 		/// the <see cref="View.ProcessKey(KeyEvent)"/> returns the appropriate result
@@ -176,6 +175,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			List<string> source = new List<string> () { "One", "Two", "Three" };
 			ListView lv = new ListView (source) { Height = 2, AllowsMarking = true };
+			lv.BeginInit (); lv.EndInit ();
 			Assert.Equal (-1, lv.SelectedItem);
 			Assert.True (lv.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
 			Assert.Equal (0, lv.SelectedItem);

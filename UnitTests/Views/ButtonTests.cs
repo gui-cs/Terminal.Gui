@@ -138,7 +138,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (clicked);
 		}
 
-
 		/// <summary>
 		/// This test demonstrates how to change the activation key for Button
 		/// as described in the README.md keyboard handling section
