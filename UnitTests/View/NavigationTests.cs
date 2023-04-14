@@ -472,9 +472,9 @@ namespace Terminal.Gui.ViewTests {
 
 			var t = Application.Top;
 
-			var w = new Window ("w");
-			var f = new FrameView ("f");
-			var v = new View ("v") { CanFocus = true };
+			var w = new Window ();
+			var f = new FrameView ();
+			var v = new View () { CanFocus = true };
 			f.Add (v);
 			w.Add (f);
 			t.Add (w);
@@ -509,9 +509,9 @@ namespace Terminal.Gui.ViewTests {
 
 			var t = Application.Top;
 
-			var w = new Window ("w");
-			var f = new FrameView ("f");
-			var v = new View ("v") { CanFocus = true };
+			var w = new Window ();
+			var f = new FrameView ();
+			var v = new View () { CanFocus = true };
 			f.Add (v);
 			w.Add (f);
 			t.Add (w);
@@ -552,10 +552,10 @@ namespace Terminal.Gui.ViewTests {
 
 			var t = Application.Top;
 
-			var w = new Window ("w");
-			var f = new FrameView ("f");
-			var v1 = new View ("v1") { CanFocus = true };
-			var v2 = new View ("v2") { CanFocus = true };
+			var w = new Window ();
+			var f = new FrameView ();
+			var v1 = new View () { CanFocus = true };
+			var v2 = new View () { CanFocus = true };
 			f.Add (v1, v2);
 			w.Add (f);
 			t.Add (w);
@@ -587,10 +587,10 @@ namespace Terminal.Gui.ViewTests {
 
 			var t = Application.Top;
 
-			var w = new Window ("w");
-			var f = new FrameView ("f");
-			var v1 = new View ("v1");
-			var v2 = new View ("v2") { CanFocus = true };
+			var w = new Window ();
+			var f = new FrameView ();
+			var v1 = new View ();
+			var v2 = new View () { CanFocus = true };
 			f.Add (v1, v2);
 			w.Add (f);
 			t.Add (w);
@@ -620,7 +620,6 @@ namespace Terminal.Gui.ViewTests {
 			Application.Run ();
 			Application.Shutdown ();
 		}
-
 
 		[Fact]
 		public void Navigation_With_Null_Focused_View ()
@@ -728,7 +727,6 @@ namespace Terminal.Gui.ViewTests {
 
 			Assert.Equal (1, iterations);
 		}
-
 
 		[Fact]
 		[AutoInitShutdown]
@@ -875,7 +873,7 @@ namespace Terminal.Gui.ViewTests {
 			tf.KeyPress -= Tf_KeyPress;
 			tfQuiting = false;
 			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
-			Application.MainLoop.MainIteration ();
+			Application.MainLoop.RunIteration ();
 			Assert.True (sbQuiting);
 			Assert.False (tfQuiting);
 			Assert.False (topQuiting);
@@ -883,7 +881,7 @@ namespace Terminal.Gui.ViewTests {
 			sb.RemoveItem (0);
 			sbQuiting = false;
 			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
-			Application.MainLoop.MainIteration ();
+			Application.MainLoop.RunIteration ();
 			Assert.False (sbQuiting);
 			Assert.False (tfQuiting);
 			Assert.True (topQuiting);
@@ -924,7 +922,7 @@ namespace Terminal.Gui.ViewTests {
 			tf.KeyPress -= Tf_KeyPress;
 			tfQuiting = false;
 			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
-			Application.MainLoop.MainIteration ();
+			Application.MainLoop.RunIteration ();
 			Assert.True (sbQuiting);
 			Assert.False (tfQuiting);
 		}

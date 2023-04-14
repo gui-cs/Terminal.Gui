@@ -1,5 +1,5 @@
 //
-// System.Drawing.Rectangle.cs
+// Derived from System.Drawing.Rectangle.cs
 //
 // Author:
 //   Mike Kestner (mkestner@speakeasy.net)
@@ -9,6 +9,7 @@
 //
 
 using System;
+using System.Drawing;
 
 namespace Terminal.Gui
 {
@@ -80,12 +81,12 @@ namespace Terminal.Gui
 		}
 
 		/// <summary>
-		///	Inflate Shared Method
+		///	Produces a new Rect by inflating an existing Rect by the specified coordinate values.
 		/// </summary>
 		///
 		/// <remarks>
-		///	Produces a new Rectangle by inflating an existing 
-		///	Rectangle by the specified coordinate values.
+		///	Produces a new Rect by inflating an existing Rect by the specified coordinate values.
+		///     The rectangle is enlarged in both directions along an axis. 
 		/// </remarks>
 
 		public static Rect Inflate (Rect rect, int x, int y)
@@ -96,32 +97,33 @@ namespace Terminal.Gui
 		}
 
 		/// <summary>
-		///	Inflate Method
+		///	Inflates an existing Rect by the specified coordinate values.
 		/// </summary>
 		///
 		/// <remarks>
-		///	Inflates the Rectangle by a specified width and height.
+		///	This method enlarges this rectangle, not a copy of it. The rectangle is enlarged in both directions along an axis. 
 		/// </remarks>
 
 		public void Inflate (int width, int height)
 		{
-			Inflate (new Size (width, height));
+			// Set dims first so we don't lose the original values on exception
+			Width += width * 2;
+			Height += height * 2;
+
+			X -= width;
+			Y -= height;
 		}
 
 		/// <summary>
-		///	Inflate Method
+		///	Inflates an existing Rect by the specified Sizwe.
 		/// </summary>
 		///
 		/// <remarks>
-		///	Inflates the Rectangle by a specified Size.
+		///	This method enlarges this rectangle, not a copy of it. The rectangle is enlarged in both directions along an axis. 
 		/// </remarks>
-
 		public void Inflate (Size size)
 		{
-			X -= size.Width;
-			Y -= size.Height;
-			Width += size.Width * 2;
-			Height += size.Height * 2;
+			Inflate (size.Width, size.Height);
 		}
 
 		/// <summary>
@@ -162,20 +164,27 @@ namespace Terminal.Gui
 		}
 
 		/// <summary>
-		///	Union Shared Method
+		///	Produces the uninion of two rectangles.
 		/// </summary>
 		///
 		/// <remarks>
 		///	Produces a new Rectangle from the union of 2 existing 
-		///	Rectangles.
+		///	Rectangles. 
 		/// </remarks>
 
 		public static Rect Union (Rect a, Rect b)
 		{
-			return FromLTRB (Math.Min (a.Left, b.Left),
-					 Math.Min (a.Top, b.Top),
-					 Math.Max (a.Right, b.Right),
-					 Math.Max (a.Bottom, b.Bottom));
+			//int x1 = Math.Min (a.X, b.X);
+			//int x2 = Math.Max (a.X + a.Width, b.X + b.Width);
+			//int y1 = Math.Min (a.Y, b.Y);oS
+			//int y2 = Math.Max (a.Y + a.Height, b.Y + b.Height);
+			//return new Rect (x1, y1, x2 - x1, y2 - y1);
+
+			int x1 = Math.Min (a.X, b.X);
+			int x2 = Math.Max (a.X + Math.Abs (a.Width), b.X + Math.Abs (b.Width));
+			int y1 = Math.Min (a.Y, b.Y);
+			int y2 = Math.Max (a.Y + Math.Abs (a.Height), b.Y + Math.Abs (b.Height));
+			return new Rect (x1, y1, x2 - x1, y2 - y1);
 		}
 
 		/// <summary>
@@ -250,7 +259,6 @@ namespace Terminal.Gui
 			Width = this.width;
 			Height = this.height;
 		}
-
 
 
 		/// <summary>
@@ -489,9 +497,7 @@ namespace Terminal.Gui
 
 		public override string ToString ()
 		{
-			return String.Format ("{{X={0},Y={1},Width={2},Height={3}}}",
-						 X, Y, Width, Height);
+			return $"({X},{Y},{Width},{Height})";
 		}
-
 	}
 }

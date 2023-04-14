@@ -30,7 +30,6 @@ namespace Terminal.Gui {
 			this.textField = textField;
 			SelectionKey = Key.Tab;
 
-
 			ColorScheme = new ColorScheme{
 				Normal = new Attribute(Color.DarkGray,0),
 				Focus = new Attribute(Color.DarkGray,0),
@@ -138,19 +137,13 @@ namespace Terminal.Gui {
 				newText += insert.Replacement;
 				textField.Text = newText;
 
-				this.MoveCursorToEnd ();
+				this.textField.MoveEnd();
 
 				this.ClearSuggestions ();
 				return true;
 			}
 
 			return false;
-		}
-
-		internal void MoveCursorToEnd ()
-		{
-			textField.ClearAllSelection ();
-			textField.CursorPosition = textField.Text.Length;
 		}
 
 		internal void SetTextTo (FileSystemInfo fileSystemInfo)
@@ -160,12 +153,7 @@ namespace Terminal.Gui {
 				newText += System.IO.Path.DirectorySeparatorChar;
 			}
 			textField.Text = newText;
-			this.MoveCursorToEnd ();
-		}
-
-		internal bool CursorIsAtEnd ()
-		{
-			return textField.CursorPosition == textField.Text.Length;
+			textField.MoveEnd ();
 		}
 
 		/// <summary>
@@ -176,7 +164,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private bool MakingSuggestion ()
 		{
-			return Suggestions.Any () && this.SelectedIdx != -1 && textField.HasFocus && this.CursorIsAtEnd ();
+			return Suggestions.Any () && this.SelectedIdx != -1 && textField.HasFocus && textField.CursorIsAtEnd ();
 		}
 
 		private bool CycleSuggestion (int direction)

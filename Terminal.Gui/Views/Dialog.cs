@@ -32,91 +32,65 @@ namespace Terminal.Gui {
 		[SerializableConfigurationProperty (Scope = typeof (ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
 		public static ButtonAlignments DefaultButtonAlignment { get; set; } = ButtonAlignments.Center;
 
+		// TODO: Reenable once border/borderframe design is settled
 		/// <summary>
 		/// Defines the default border styling for <see cref="Dialog"/>. Can be configured via <see cref="ConfigurationManager"/>.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-		public static Border DefaultBorder { get; set; } = new Border () {
-			BorderStyle = BorderStyle.Single,
-		};
+		//[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+		//public static Border DefaultBorder { get; set; } = new Border () {
+		//	LineStyle = LineStyle.Single,
+		//};
 
 		internal List<Button> buttons = new List<Button> ();
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Computed"/> positioning 
+		/// with no <see cref="Button"/>s.
+		/// </summary>
+		/// <remarks>
+		/// By default, <see cref="View.X"/> and <see cref="View.Y"/> are set to <c>Pos.Center ()</c> and <see cref="View.Width"/> and <see cref="View.Height"/> are set 
+		/// to <c>Width = Dim.Percent (85)</c>, centering the Dialog vertically and horizontally. 
+		/// </remarks>
+		public Dialog () : this (null) { }
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Computed"/> positioning 
 		/// and an optional set of <see cref="Button"/>s to display
 		/// </summary>
-		/// <param name="title">Title for the dialog.</param>
-		/// <param name="width">Width for the dialog.</param>
-		/// <param name="height">Height for the dialog.</param>
 		/// <param name="buttons">Optional buttons to lay out at the bottom of the dialog.</param>
 		/// <remarks>
-		/// if <c>width</c> and <c>height</c> are both 0, the Dialog will be vertically and horizontally centered in the
-		/// container and the size will be 85% of the container. 
-		/// After initialization use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> to override this with a location or size.
+		/// By default, <see cref="View.X"/> and <see cref="View.Y"/> are set to <c>Pos.Center ()</c> and <see cref="View.Width"/> and <see cref="View.Height"/> are set 
+		/// to <c>Width = Dim.Percent (85)</c>, centering the Dialog vertically and horizontally. 
 		/// </remarks>
-		/// <remarks>
-		/// Use the constructor that does not take a <c>width</c> and <c>height</c> instead.
-		/// </remarks>
-		public Dialog (ustring title, int width, int height, params Button [] buttons) : base (title: title, padding: 0, border: DefaultBorder)
+		public Dialog (params Button [] buttons) : base ()
 		{
-			SetInitialProperties (width, height, buttons);
+			SetInitialProperties (buttons);
 		}
 
-		private void SetInitialProperties (int width, int height, Button [] buttons)
+		private void SetInitialProperties (Button [] buttons)
 		{
 			X = Pos.Center ();
 			Y = Pos.Center ();
 
-			if (width == 0 & height == 0) {
-				Width = Dim.Percent (85);
-				Height = Dim.Percent (85);
-			} else {
-				Width = width;
-				Height = height;
-			}
+			Width = Dim.Percent (85);
+			Height = Dim.Percent (85);
 
 			ColorScheme = Colors.Dialog;
+
 			Modal = true;
 			ButtonAlignment = DefaultButtonAlignment;
 
 			if (buttons != null) {
 				foreach (var b in buttons) {
-					this.buttons.Add (b);
-					Add (b);
+					AddButton (b);
 				}
 			}
 
-			LayoutStarted += (s, args) => {
-				LayoutStartedHandler ();
+			LayoutComplete += (s, args) => {
+				LayoutButtons ();
 			};
+
 		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Computed"/>.
-		/// </summary>
-		/// <remarks>
-		/// <para>
-		/// Te Dialog will be vertically and horizontally centered in the container and the size will be 85% of the container. 
-		/// After initialization use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> to override this with a location or size.
-		/// </para>
-		/// <para>
-		/// Use <see cref="AddButton(Button)"/> to add buttons to the dialog.
-		/// </para>
-		/// </remarks>
-		public Dialog () : this (title: ustring.Empty, width: 0, height: 0, buttons: null) { }
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Dialog"/> class using <see cref="LayoutStyle.Computed"/> positioning 
-		/// and with an optional set of <see cref="Button"/>s to display
-		/// </summary>
-		/// <param name="title">Title for the dialog.</param>
-		/// <param name="buttons">Optional buttons to lay out at the bottom of the dialog.</param>
-		/// <remarks>
-		/// Te Dialog will be vertically and horizontally centered in the container and the size will be 85% of the container. 
-		/// After initialization use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> to override this with a location or size.
-		/// </remarks>
-		public Dialog (ustring title, params Button [] buttons) : this (title: title, width: 0, height: 0, buttons: buttons) { }
 
 		/// <summary>
 		/// Adds a <see cref="Button"/> to the <see cref="Dialog"/>, its layout will be controlled by the <see cref="Dialog"/>
@@ -124,22 +98,26 @@ namespace Terminal.Gui {
 		/// <param name="button">Button to add.</param>
 		public void AddButton (Button button)
 		{
-			if (button == null)
+			if (button == null) {
 				return;
+			}
 
+			//button.AutoSize = false; // BUGBUG: v2 - Hack to get around autosize not accounting for Margin?
 			buttons.Add (button);
 			Add (button);
 			SetNeedsDisplay ();
 			LayoutSubviews ();
 		}
 
-		// Get the width of all buttons, not including any spacing
+		// Get the width of all buttons, not including any Margin.
 		internal int GetButtonsWidth ()
 		{
 			if (buttons.Count == 0) {
 				return 0;
 			}
-			return buttons.Select (b => b.Frame.Width).Sum ();
+			//var widths = buttons.Select (b => b.TextFormatter.GetFormattedSize ().Width + b.BorderFrame.Thickness.Horizontal + b.Padding.Thickness.Horizontal);
+			var widths = buttons.Select (b => b.Frame.Width);
+			return widths.Sum ();
 		}
 
 		/// <summary>
@@ -167,14 +145,13 @@ namespace Terminal.Gui {
 			Right
 		}
 
-
 		/// <summary>
 		/// Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the 
 		/// bottom of the dialog. 
 		/// </summary>
 		public ButtonAlignments ButtonAlignment { get; set; }
 
-		void LayoutStartedHandler ()
+		void LayoutButtons ()
 		{
 			if (buttons.Count == 0 || !IsInitialized) return;
 
@@ -209,8 +186,8 @@ namespace Terminal.Gui {
 						button.X = Pos.AnchorEnd (shiftLeft);
 					} else {
 						if (i == 0) {
-							// first (leftmost) button - always hard flush left
-							var left = Bounds.Width + Border.BorderThickness.Horizontal;
+							// first (leftmost) button 
+							var left = Bounds.Width;
 							button.X = Pos.AnchorEnd (left);
 						} else {
 							shiftLeft += button.Frame.Width + (spacing);

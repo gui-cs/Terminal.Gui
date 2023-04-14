@@ -37,7 +37,6 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 
-
 		[Fact]
 		public void EnsureValidScrollOffsets_LoadSmallerTable ()
 		{
@@ -67,7 +66,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (0, tableView.RowOffset);
 			Assert.Equal (0, tableView.ColumnOffset);
 
-
 			// Trying to set invalid indexes should not be possible
 			tableView.RowOffset = 20;
 			tableView.ColumnOffset = 10;
@@ -92,7 +90,6 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.Redraw (tableView.Bounds);
 		}
 
-
 		[Fact]
 		public void SelectedCellChanged_NotFiredForSameValue ()
 		{
@@ -114,7 +111,6 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.SelectedColumn = 10;
 			Assert.True (called);
 		}
-
 
 
 		[Fact]
@@ -199,7 +195,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (tableView.IsSelected (2, 4));
 		}
 
-
 		[Fact]
 		public void IsSelected_MultiSelectionOn_Horizontal ()
 		{
@@ -222,7 +217,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (tableView.IsSelected (2, 1));
 			Assert.False (tableView.IsSelected (3, 1));
 		}
-
 
 
 		[Fact]
@@ -269,7 +263,6 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (tableView);
 			Application.Begin (Application.Top);
 
-
 			Application.Top.FocusFirst ();
 			Assert.True (tableView.HasFocus);
 
@@ -314,7 +307,6 @@ namespace Terminal.Gui.ViewsTests {
 			// table should now be 3x3
 			Assert.Equal (9, tableView.GetAllSelectedCells ().Count ());
 		}
-
 
 		[Fact]
 		public void DeleteRow_SelectLastRow_AdjustsSelectionToPreventOverrun ()
@@ -362,7 +354,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Point (1, 1), tableView.GetAllSelectedCells ().Single ());
 		}
 
-
 		[Fact]
 		public void GetAllSelectedCells_SquareSelection_ReturnsFour ()
 		{
@@ -386,7 +377,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Point (1, 2), selected [2]);
 			Assert.Equal (new Point (2, 2), selected [3]);
 		}
-
 
 		[Fact]
 		public void GetAllSelectedCells_SquareSelection_FullRowSelect ()
@@ -414,7 +404,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Point (1, 2), selected [4]);
 			Assert.Equal (new Point (2, 2), selected [5]);
 		}
-
 
 		[Fact]
 		public void GetAllSelectedCells_TwoIsolatedSelections_ReturnsSix ()
@@ -476,7 +465,6 @@ namespace Terminal.Gui.ViewsTests {
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
 		}
-
 
 		[Fact, AutoInitShutdown]
 		public void TableView_ExpandLastColumn_False ()
@@ -757,7 +745,6 @@ namespace Terminal.Gui.ViewsTests {
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
-
 			string expectedColors = @"
 00000
 00000
@@ -802,7 +789,6 @@ namespace Terminal.Gui.ViewsTests {
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
-
 			string expectedColors = @"
 00000
 00000
@@ -821,7 +807,6 @@ namespace Terminal.Gui.ViewsTests {
 
 			Application.Shutdown ();
 		}
-
 
 		[Theory, AutoInitShutdown]
 		[InlineData (false)]
@@ -860,7 +845,6 @@ namespace Terminal.Gui.ViewsTests {
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
-
 			string expectedColors = @"
 00000
 00000
@@ -875,7 +859,6 @@ namespace Terminal.Gui.ViewsTests {
 				focused ? rowHighlight.HotFocus : rowHighlight.HotNormal,
 				// 2
 				rowHighlight.Normal});
-
 
 			// change the value in the table so that
 			// it no longer matches the RowColorGetter
@@ -892,7 +875,6 @@ namespace Terminal.Gui.ViewsTests {
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
-
 			expectedColors = @"
 00000
 00000
@@ -908,7 +890,6 @@ namespace Terminal.Gui.ViewsTests {
 				tv.ColorScheme.Normal,
 				// 1
 				focused ? tv.ColorScheme.HotFocus : tv.ColorScheme.HotNormal });
-
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -954,7 +935,6 @@ namespace Terminal.Gui.ViewsTests {
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
-
 			string expectedColors = @"
 00000
 00000
@@ -969,7 +949,6 @@ namespace Terminal.Gui.ViewsTests {
 				focused ? tv.ColorScheme.HotFocus : tv.ColorScheme.HotNormal,
 				// 2
 				cellHighlight.Normal});
-
 
 			// change the value in the table so that
 			// it no longer matches the ColorGetter
@@ -986,7 +965,6 @@ namespace Terminal.Gui.ViewsTests {
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
-
 			expectedColors = @"
 00000
 00000
@@ -1002,7 +980,6 @@ namespace Terminal.Gui.ViewsTests {
 				tv.ColorScheme.Normal,				
 				// 1
 				focused ? tv.ColorScheme.HotFocus : tv.ColorScheme.HotNormal });
-
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -1097,10 +1074,8 @@ namespace Terminal.Gui.ViewsTests {
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
-
 			// Scroll right
 			tableView.ProcessKey (new KeyEvent () { Key = Key.CursorRight });
-
 
 			tableView.Redraw (tableView.Bounds);
 
@@ -1117,7 +1092,6 @@ namespace Terminal.Gui.ViewsTests {
 │2│3│4│";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
-
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -1161,10 +1135,8 @@ namespace Terminal.Gui.ViewsTests {
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
-
 			// Scroll right
 			tableView.ProcessKey (new KeyEvent () { Key = Key.CursorRight });
-
 
 			tableView.Redraw (tableView.Bounds);
 
@@ -1174,14 +1146,12 @@ namespace Terminal.Gui.ViewsTests {
 			// area as we scroll until the new column (D) is exposed.  But it makes
 			// the view 'jump' to expose all new columns
 
-
 			expected =
 				@"
 │D│E│F│
 │4│5│6│";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
-
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -1208,7 +1178,6 @@ namespace Terminal.Gui.ViewsTests {
 			dt.Columns.Add ("D");
 			dt.Columns.Add ("E");
 			dt.Columns.Add ("F");
-
 
 			dt.Rows.Add (1, 2, 3, 4, 5, 6);
 			tableView.Table = dt;
@@ -1254,7 +1223,6 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 		}
 
-
 		[Fact, AutoInitShutdown]
 		public void TestColumnStyle_AllColumnsVisibleFalse_BehavesAsTableNull ()
 		{
@@ -1268,7 +1236,6 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.Style.GetOrCreateColumnStyle (dt.Columns ["F"]).Visible = false;
 			tableView.LayoutSubviews ();
 
-
 			// expect nothing to be rendered when all columns are invisible
 			string expected =
 				@"
@@ -1276,7 +1243,6 @@ namespace Terminal.Gui.ViewsTests {
 
 			tableView.Redraw (tableView.Bounds);
 			TestHelpers.AssertDriverContentsAre (expected, output);
-
 
 			// expect behavior to match when Table is null
 			tableView.Table = null;
@@ -1406,7 +1372,6 @@ namespace Terminal.Gui.ViewsTests {
 			// Expect the cursor to stay at 1
 			Assert.Equal (1, tableView.SelectedColumn);
 		}
-
 
 		[InlineData (true)]
 		[InlineData (false)]
@@ -1586,7 +1551,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (0, s2.X);
 			Assert.Equal (1, s2.Y);
 
-
 			// Go back to the toggled cell
 			tableView.ProcessKey (new KeyEvent { Key = Key.CursorRight });
 			tableView.ProcessKey (new KeyEvent { Key = Key.CursorUp });
@@ -1638,7 +1602,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Empty (tableView.MultiSelectedRegions.Where (r => r.IsToggled));
 
 		}
-
 
 		[Fact, AutoInitShutdown]
 		public void TestToggleCells_MultiSelectOn_SquareSelectToggled ()
@@ -1708,7 +1671,6 @@ namespace Terminal.Gui.ViewsTests {
 			// 2 square selections
 			Assert.Equal (8, tableView.GetAllSelectedCells ().Count ());
 		}
-
 
 		[Theory, AutoInitShutdown]
 		[InlineData (new object [] { true, true })]
@@ -1888,7 +1850,6 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Shutdown ();
 		}
 
-
 		[Fact, AutoInitShutdown]
 		public void ScrollIndicators ()
 		{
@@ -1931,10 +1892,8 @@ namespace Terminal.Gui.ViewsTests {
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
-
 			// Scroll right
 			tableView.ProcessKey (new KeyEvent () { Key = Key.CursorRight });
-
 
 			// since A is now pushed off screen we get indicator showing
 			// that user can scroll left to see first column
@@ -1947,7 +1906,6 @@ namespace Terminal.Gui.ViewsTests {
 │2│3│4│";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
-
 
 			// Scroll right twice more (to end of columns)
 			tableView.ProcessKey (new KeyEvent () { Key = Key.CursorRight });
@@ -2021,7 +1979,6 @@ namespace Terminal.Gui.ViewsTests {
 
 			}
 
-
 			tv.Redraw (tv.Bounds);
 			expected =
 							@"
@@ -2031,7 +1988,6 @@ namespace Terminal.Gui.ViewsTests {
 01111101101111111110
 ";
 			TestHelpers.AssertDriverColorsAre (expected, new Attribute [] { tv.ColorScheme.Normal, color });
-
 
 		}
 
@@ -2102,7 +2058,6 @@ namespace Terminal.Gui.ViewsTests {
 			// after last row
 			Assert.Null (tableView.ScreenToCell (1, 4));
 
-
 			// ---------------- X=2 -----------------------
 			// ( even though there is a horizontal dividing line here we treat it as a hit on the cell before)
 			// click in header
@@ -2115,7 +2070,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Point (0, 1), tableView.ScreenToCell (2, 3));
 			// after last row
 			Assert.Null (tableView.ScreenToCell (2, 4));
-
 
 			// ---------------- X=3 -----------------------
 			// click in header
@@ -2180,7 +2134,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Null (tableView.ScreenToCell (1, 4, out col));
 			Assert.Null (col);
 
-
 			// ---------------- X=2 -----------------------
 			// click in header
 			Assert.Null (tableView.ScreenToCell (2, 0, out col));
@@ -2197,7 +2150,6 @@ namespace Terminal.Gui.ViewsTests {
 			// after last row
 			Assert.Null (tableView.ScreenToCell (2, 4, out col));
 			Assert.Null (col);
-
 
 			// ---------------- X=3 -----------------------
 			// click in header

@@ -42,7 +42,6 @@ namespace UICatalog.Tests {
 			return FakeConsole.MockKeyPresses.Count;
 		}
 
-
 		/// <summary>
 		/// <para>
 		/// This runs through all Scenarios defined in UI Catalog, calling Init, Setup, and Run.
@@ -222,7 +221,8 @@ namespace UICatalog.Tests {
 				.Select (t => new KeyValuePair<string, Type> (t.Name, t))
 				.ToDictionary (t => t.Key, t => t.Value);
 
-			_leftPane = new Window ("Classes") {
+			_leftPane = new Window () {
+				Title = "Classes",
 				X = 0,
 				Y = 0,
 				Width = 15,
@@ -327,7 +327,14 @@ namespace UICatalog.Tests {
 				_settingsPane.SetFocus ();
 			};
 			_classListView.SelectedItemChanged += (s, args) => {
-				ClearClass (_curView);
+				// Remove existing class, if any
+				if (_curView != null) {
+					_curView.LayoutComplete -= LayoutCompleteHandler;
+					_hostPane.Remove (_curView);
+					_curView.Dispose ();
+					_curView = null;
+					_hostPane.Clear ();
+				}
 				_curView = CreateClass (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
 			};
 
@@ -407,7 +414,6 @@ namespace UICatalog.Tests {
 			Assert.Equal (_viewClasses.Count, iterations);
 
 			Application.Shutdown ();
-
 
 			void DimPosChanged (View view)
 			{
@@ -511,17 +517,6 @@ namespace UICatalog.Tests {
 					types.Add (type);
 				}
 				return types;
-			}
-
-			void ClearClass (View view)
-			{
-				// Remove existing class, if any
-				if (view != null) {
-					view.LayoutComplete -= LayoutCompleteHandler;
-					_hostPane.Remove (view);
-					view.Dispose ();
-					_hostPane.Clear ();
-				}
 			}
 
 			View CreateClass (Type type)

@@ -173,7 +173,6 @@ namespace Terminal.Gui.DriverTests {
 		//	output.WriteLine ($"Add timeout to force quit after {abortTime}ms");
 		//	_ = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
 
-
 		//	Key key = Key.Unknown;
 			
 		//	Application.Top.KeyPress += (e) => {
@@ -206,7 +205,7 @@ namespace Terminal.Gui.DriverTests {
 			var driver = (FakeDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 			var wasTerminalResized = false;
-			Application.Resized = (e) => {
+			Application.TerminalResized = (e) => {
 				wasTerminalResized = true;
 				Assert.Equal (120, e.Cols);
 				Assert.Equal (40, e.Rows);
@@ -252,13 +251,13 @@ namespace Terminal.Gui.DriverTests {
 				System.Threading.Tasks.Task.Delay (500).Wait ();
 				Application.MainLoop.Invoke (() => {
 					var lbl = new Label ("Hello World") { X = Pos.Center () };
-					var dlg = new Dialog ("Test", new Button ("Ok"));
+					var dlg = new Dialog (new Button ("Ok"));
 					dlg.Add (lbl);
 					Application.Begin (dlg);
 
 					var expected = @"
 ┌──────────────────┐
-│┌┤Test├─────────┐ │
+│┌───────────────┐ │
 ││  Hello World  │ │
 ││               │ │
 ││               │ │
@@ -275,7 +274,7 @@ namespace Terminal.Gui.DriverTests {
 
 					expected = @"
 ┌──────────────────┐
-│┌┤Test├─────────┐ │
+│┌───────────────┐ │
 ││  Hello World  │ │
 ││               │ │
 ││               │ │

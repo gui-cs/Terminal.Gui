@@ -10,8 +10,8 @@ using Xunit;
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.ViewsTests {
-	public class MdiTests {
-		public MdiTests ()
+	public class OverlappedTests {
+		public OverlappedTests ()
 		{
 #if DEBUG_IDISPOSABLE
 			Responder.Instances.Clear ();
@@ -19,9 +19,8 @@ namespace Terminal.Gui.ViewsTests {
 #endif
 		}
 
-
 		[Fact]
-		public void Dispose_Toplevel_IsMdiContainer_False_With_Begin_End ()
+		public void Dispose_Toplevel_IsOverlappedContainer_False_With_Begin_End ()
 		{
 			Application.Init (new FakeDriver ());
 
@@ -39,12 +38,12 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Fact]
-		public void Dispose_Toplevel_IsMdiContainer_True_With_Begin ()
+		public void Dispose_Toplevel_IsOverlappedContainer_True_With_Begin ()
 		{
 			Application.Init (new FakeDriver ());
 
-			var mdi = new Toplevel { IsMdiContainer = true };
-			var rs = Application.Begin (mdi);
+			var overlapped = new Toplevel { IsOverlappedContainer = true };
+			var rs = Application.Begin (overlapped);
 			Application.End (rs);
 
 			Application.Shutdown ();
@@ -56,7 +55,7 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void Application_RequestStop_With_Params_On_A_Not_MdiContainer_Always_Use_Application_Current ()
+		public void Application_RequestStop_With_Params_On_A_Not_OverlappedContainer_Always_Use_Application_Current ()
 		{
 			var top1 = new Toplevel ();
 			var top2 = new Toplevel ();
@@ -68,25 +67,25 @@ namespace Terminal.Gui.ViewsTests {
 			var iterations = 4;
 
 			top1.Ready += (s, e) => {
-				Assert.Null (Application.MdiChildes);
+				Assert.Null (Application.OverlappedChildren);
 				Application.Run (top2);
 			};
 			top2.Ready += (s, e) => {
-				Assert.Null (Application.MdiChildes);
+				Assert.Null (Application.OverlappedChildren);
 				Application.Run (top3);
 			};
 			top3.Ready += (s, e) => {
-				Assert.Null (Application.MdiChildes);
+				Assert.Null (Application.OverlappedChildren);
 				Application.Run (top4);
 			};
 			top4.Ready += (s, e) => {
-				Assert.Null (Application.MdiChildes);
+				Assert.Null (Application.OverlappedChildren);
 				Application.Run (d);
 			};
 
 			d.Ready += (s, e) => {
-				Assert.Null (Application.MdiChildes);
-				// This will close the d because on a not MdiContainer the Application.Current it always used.
+				Assert.Null (Application.OverlappedChildren);
+				// This will close the d because on a not OverlappedContainer the Application.Current it always used.
 				Application.RequestStop (top1);
 				Assert.True (Application.Current == d);
 			};
@@ -94,7 +93,7 @@ namespace Terminal.Gui.ViewsTests {
 			d.Closed += (s,e) => Application.RequestStop (top1);
 
 			Application.Iteration += () => {
-				Assert.Null (Application.MdiChildes);
+				Assert.Null (Application.OverlappedChildren);
 				if (iterations == 4) 					Assert.True (Application.Current == d);
 else if (iterations == 3) 					Assert.True (Application.Current == top4);
 else if (iterations == 2) 					Assert.True (Application.Current == top3);
@@ -106,57 +105,57 @@ else 					Assert.True (Application.Current == top1);
 
 			Application.Run (top1);
 
-			Assert.Null (Application.MdiChildes);
+			Assert.Null (Application.OverlappedChildren);
 		}
 
-		class Mdi : Toplevel {
-			public Mdi ()
+		class Overlapped : Toplevel {
+			public Overlapped ()
 			{
-				IsMdiContainer = true;
+				IsOverlappedContainer = true;
 			}
 		}
 
 		[Fact]
 		[AutoInitShutdown]
-		public void MdiContainer_With_Toplevel_RequestStop_Balanced ()
+		public void OverlappedContainer_With_Toplevel_RequestStop_Balanced ()
 		{
-			var mdi = new Mdi ();
+			var overlapped = new Overlapped ();
 			var c1 = new Toplevel ();
 			var c2 = new Window ();
 			var c3 = new Window ();
 			var d = new Dialog ();
 
-			// MdiChild = c1, c2, c3
+			// OverlappedChild = c1, c2, c3
 			// d1 = 1
 			var iterations = 4;
 
-			mdi.Ready += (s, e) => {
-				Assert.Empty (Application.MdiChildes);
+			overlapped.Ready += (s, e) => {
+				Assert.Empty (Application.OverlappedChildren);
 				Application.Run (c1);
 			};
 			c1.Ready += (s, e) => {
-				Assert.Single (Application.MdiChildes);
+				Assert.Single (Application.OverlappedChildren);
 				Application.Run (c2);
 			};
 			c2.Ready += (s, e) => {
-				Assert.Equal (2, Application.MdiChildes.Count);
+				Assert.Equal (2, Application.OverlappedChildren.Count);
 				Application.Run (c3);
 			};
 			c3.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.OverlappedChildren.Count);
 				Application.Run (d);
 			};
 
-			// More easy because the Mdi Container handles all at once
+			// More easy because the Overlapped Container handles all at once
 			d.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
-				// This will not close the MdiContainer because d is a modal toplevel and will be closed.
-				mdi.RequestStop ();
+				Assert.Equal (3, Application.OverlappedChildren.Count);
+				// This will not close the OverlappedContainer because d is a modal Toplevel and will be closed.
+				overlapped.RequestStop ();
 			};
 
-			// Now this will close the MdiContainer propagating through the MdiChildes.
+			// Now this will close the OverlappedContainer propagating through the OverlappedChildren.
 			d.Closed += (s,e) => {
-				mdi.RequestStop ();
+				overlapped.RequestStop ();
 			};
 
 			Application.Iteration += () => {
@@ -165,57 +164,57 @@ else 					Assert.True (Application.Current == top1);
 					Assert.True (Application.Current == d);
 					Assert.False (d.Running);
 				} else {
-					Assert.Equal (iterations, Application.MdiChildes.Count);
-					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + 1).ToString (), Application.MdiChildes [i].Id);
+					Assert.Equal (iterations, Application.OverlappedChildren.Count);
+					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + 1).ToString (), Application.OverlappedChildren [i].Id);
 				}
 				iterations--;
 			};
 
-			Application.Run (mdi);
+			Application.Run (overlapped);
 
-			Assert.Empty (Application.MdiChildes);
+			Assert.Empty (Application.OverlappedChildren);
 		}
 
 		[Fact]
 		[AutoInitShutdown]
-		public void MdiContainer_With_Application_RequestStop_MdiTop_With_Params ()
+		public void OverlappedContainer_With_Application_RequestStop_OverlappedTop_With_Params ()
 		{
-			var mdi = new Mdi ();
+			var overlapped = new Overlapped ();
 			var c1 = new Toplevel ();
 			var c2 = new Window ();
 			var c3 = new Window ();
 			var d = new Dialog ();
 
-			// MdiChild = c1, c2, c3
+			// OverlappedChild = c1, c2, c3
 			// d1 = 1
 			var iterations = 4;
 
-			mdi.Ready += (s, e) => {
-				Assert.Empty (Application.MdiChildes);
+			overlapped.Ready += (s, e) => {
+				Assert.Empty (Application.OverlappedChildren);
 				Application.Run (c1);
 			};
 			c1.Ready += (s, e) => {
-				Assert.Single (Application.MdiChildes);
+				Assert.Single (Application.OverlappedChildren);
 				Application.Run (c2);
 			};
 			c2.Ready += (s, e) => {
-				Assert.Equal (2, Application.MdiChildes.Count);
+				Assert.Equal (2, Application.OverlappedChildren.Count);
 				Application.Run (c3);
 			};
 			c3.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.OverlappedChildren.Count);
 				Application.Run (d);
 			};
 
-			// Also easy because the Mdi Container handles all at once
+			// Also easy because the Overlapped Container handles all at once
 			d.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
-				// This will not close the MdiContainer because d is a modal toplevel
-				Application.RequestStop (mdi);
+				Assert.Equal (3, Application.OverlappedChildren.Count);
+				// This will not close the OverlappedContainer because d is a modal Toplevel
+				Application.RequestStop (overlapped);
 			};
 
-			// Now this will close the MdiContainer propagating through the MdiChildes.
-			d.Closed += (s,e) => Application.RequestStop (mdi);
+			// Now this will close the OverlappedContainer propagating through the OverlappedChildren.
+			d.Closed += (s,e) => Application.RequestStop (overlapped);
 
 			Application.Iteration += () => {
 				if (iterations == 4) {
@@ -223,153 +222,153 @@ else 					Assert.True (Application.Current == top1);
 					Assert.True (Application.Current == d);
 					Assert.False (d.Running);
 				} else {
-					Assert.Equal (iterations, Application.MdiChildes.Count);
-					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + 1).ToString (), Application.MdiChildes [i].Id);
+					Assert.Equal (iterations, Application.OverlappedChildren.Count);
+					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + 1).ToString (), Application.OverlappedChildren [i].Id);
 				}
 				iterations--;
 			};
 
-			Application.Run (mdi);
+			Application.Run (overlapped);
 
-			Assert.Empty (Application.MdiChildes);
+			Assert.Empty (Application.OverlappedChildren);
 		}
 
 		[Fact]
 		[AutoInitShutdown]
-		public void MdiContainer_With_Application_RequestStop_MdiTop_Without_Params ()
+		public void OverlappedContainer_With_Application_RequestStop_OverlappedTop_Without_Params ()
 		{
-			var mdi = new Mdi ();
+			var overlapped = new Overlapped ();
 			var c1 = new Toplevel ();
 			var c2 = new Window ();
 			var c3 = new Window ();
 			var d = new Dialog ();
 
-			// MdiChild = c1, c2, c3 = 3
+			// OverlappedChild = c1, c2, c3 = 3
 			// d1 = 1
 			var iterations = 4;
 
-			mdi.Ready += (s, e) => {
-				Assert.Empty (Application.MdiChildes);
+			overlapped.Ready += (s, e) => {
+				Assert.Empty (Application.OverlappedChildren);
 				Application.Run (c1);
 			};
 			c1.Ready += (s, e) => {
-				Assert.Single (Application.MdiChildes);
+				Assert.Single (Application.OverlappedChildren);
 				Application.Run (c2);
 			};
 			c2.Ready += (s, e) => {
-				Assert.Equal (2, Application.MdiChildes.Count);
+				Assert.Equal (2, Application.OverlappedChildren.Count);
 				Application.Run (c3);
 			};
 			c3.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.OverlappedChildren.Count);
 				Application.Run (d);
 			};
 
 			//More harder because it's sequential.
 			d.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.OverlappedChildren.Count);
 				// Close the Dialog
 				Application.RequestStop ();
 			};
 
-			// Now this will close the MdiContainer propagating through the MdiChildes.
-			d.Closed += (s, e) => Application.RequestStop (mdi);
+			// Now this will close the OverlappedContainer propagating through the OverlappedChildren.
+			d.Closed += (s, e) => Application.RequestStop (overlapped);
 
 			Application.Iteration += () => {
 				if (iterations == 4) {
-					// The Dialog still is the current top and we can't request stop to MdiContainer
+					// The Dialog still is the current top and we can't request stop to OverlappedContainer
 					// because we are not using parameter calls.
 					Assert.True (Application.Current == d);
 					Assert.False (d.Running);
 				} else {
-					Assert.Equal (iterations, Application.MdiChildes.Count);
-					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + 1).ToString (), Application.MdiChildes [i].Id);
+					Assert.Equal (iterations, Application.OverlappedChildren.Count);
+					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + 1).ToString (), Application.OverlappedChildren [i].Id);
 				}
 				iterations--;
 			};
 
-			Application.Run (mdi);
+			Application.Run (overlapped);
 
-			Assert.Empty (Application.MdiChildes);
+			Assert.Empty (Application.OverlappedChildren);
 		}
 
 		[Fact]
 		[AutoInitShutdown]
-		public void IsMdiChild_Testing ()
+		public void IsOverlappedChild_Testing ()
 		{
-			var mdi = new Mdi ();
+			var overlapped = new Overlapped ();
 			var c1 = new Toplevel ();
 			var c2 = new Window ();
 			var c3 = new Window ();
 			var d = new Dialog ();
 
 			Application.Iteration += () => {
-				Assert.False (mdi.IsMdiChild);
-				Assert.True (c1.IsMdiChild);
-				Assert.True (c2.IsMdiChild);
-				Assert.True (c3.IsMdiChild);
-				Assert.False (d.IsMdiChild);
+				Assert.False (overlapped.IsOverlapped);
+				Assert.True (c1.IsOverlapped);
+				Assert.True (c2.IsOverlapped);
+				Assert.True (c3.IsOverlapped);
+				Assert.False (d.IsOverlapped);
 
-				mdi.RequestStop ();
+				overlapped.RequestStop ();
 			};
 
-			Application.Run (mdi);
+			Application.Run (overlapped);
 		}
 
 		[Fact]
 		[AutoInitShutdown]
 		public void Modal_Toplevel_Can_Open_Another_Modal_Toplevel_But_RequestStop_To_The_Caller_Also_Sets_Current_Running_To_False_Too ()
 		{
-			var mdi = new Mdi ();
+			var overlapped = new Overlapped ();
 			var c1 = new Toplevel ();
 			var c2 = new Window ();
 			var c3 = new Window ();
 			var d1 = new Dialog ();
 			var d2 = new Dialog ();
 
-			// MdiChild = c1, c2, c3 = 3
+			// OverlappedChild = c1, c2, c3 = 3
 			// d1, d2 = 2
 			var iterations = 5;
 
-			mdi.Ready += (s, e) => {
-				Assert.Empty (Application.MdiChildes);
+			overlapped.Ready += (s, e) => {
+				Assert.Empty (Application.OverlappedChildren);
 				Application.Run (c1);
 			};
 			c1.Ready += (s, e) => {
-				Assert.Single (Application.MdiChildes);
+				Assert.Single (Application.OverlappedChildren);
 				Application.Run (c2);
 			};
 			c2.Ready += (s, e) => {
-				Assert.Equal (2, Application.MdiChildes.Count);
+				Assert.Equal (2, Application.OverlappedChildren.Count);
 				Application.Run (c3);
 			};
 			c3.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.OverlappedChildren.Count);
 				Application.Run (d1);
 			};
 			d1.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.OverlappedChildren.Count);
 				Application.Run (d2);
 			};
 
 			d2.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.OverlappedChildren.Count);
 				Assert.True (Application.Current == d2);
 				Assert.True (Application.Current.Running);
 				// Trying to close the Dialog1
 				d1.RequestStop ();
 			};
 
-			// Now this will close the MdiContainer propagating through the MdiChildes.
+			// Now this will close the OverlappedContainer propagating through the OverlappedChildren.
 			d1.Closed += (s, e) => {
 				Assert.True (Application.Current == d1);
 				Assert.False (Application.Current.Running);
-				mdi.RequestStop ();
+				overlapped.RequestStop ();
 			};
 
 			Application.Iteration += () => {
 				if (iterations == 5) {
-					// The Dialog2 still is the current top and we can't request stop to MdiContainer
+					// The Dialog2 still is the current top and we can't request stop to OverlappedContainer
 					// because Dialog2 and Dialog1 must be closed first.
 					// Dialog2 will be closed in this iteration.
 					Assert.True (Application.Current == d2);
@@ -380,185 +379,185 @@ else 					Assert.True (Application.Current == top1);
 					Assert.True (Application.Current == d1);
 					Assert.False (Application.Current.Running);
 				} else {
-					Assert.Equal (iterations, Application.MdiChildes.Count);
-					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + 1).ToString (), Application.MdiChildes [i].Id);
+					Assert.Equal (iterations, Application.OverlappedChildren.Count);
+					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + 1).ToString (), Application.OverlappedChildren [i].Id);
 				}
 				iterations--;
 			};
 
-			Application.Run (mdi);
+			Application.Run (overlapped);
 
-			Assert.Empty (Application.MdiChildes);
+			Assert.Empty (Application.OverlappedChildren);
 		}
 
 		[Fact]
 		[AutoInitShutdown]
 		public void Modal_Toplevel_Can_Open_Another_Not_Modal_Toplevel_But_RequestStop_To_The_Caller_Also_Sets_Current_Running_To_False_Too ()
 		{
-			var mdi = new Mdi ();
+			var overlapped = new Overlapped ();
 			var c1 = new Toplevel ();
 			var c2 = new Window ();
 			var c3 = new Window ();
 			var d1 = new Dialog ();
 			var c4 = new Toplevel ();
 
-			// MdiChild = c1, c2, c3, c4 = 4
+			// OverlappedChild = c1, c2, c3, c4 = 4
 			// d1 = 1
 			var iterations = 5;
 
-			mdi.Ready += (s, e) => {
-				Assert.Empty (Application.MdiChildes);
+			overlapped.Ready += (s, e) => {
+				Assert.Empty (Application.OverlappedChildren);
 				Application.Run (c1);
 			};
 			c1.Ready += (s, e) => {
-				Assert.Single (Application.MdiChildes);
+				Assert.Single (Application.OverlappedChildren);
 				Application.Run (c2);
 			};
 			c2.Ready += (s, e) => {
-				Assert.Equal (2, Application.MdiChildes.Count);
+				Assert.Equal (2, Application.OverlappedChildren.Count);
 				Application.Run (c3);
 			};
 			c3.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.OverlappedChildren.Count);
 				Application.Run (d1);
 			};
 			d1.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.OverlappedChildren.Count);
 				Application.Run (c4);
 			};
 
 			c4.Ready += (s, e) => {
-				Assert.Equal (4, Application.MdiChildes.Count);
+				Assert.Equal (4, Application.OverlappedChildren.Count);
 				// Trying to close the Dialog1
 				d1.RequestStop ();
 			};
 
-			// Now this will close the MdiContainer propagating through the MdiChildes.
+			// Now this will close the OverlappedContainer propagating through the OverlappedChildren.
 			d1.Closed += (s, e) => {
-				mdi.RequestStop ();
+				overlapped.RequestStop ();
 			};
 
 			Application.Iteration += () => {
 				if (iterations == 5) {
-					// The Dialog2 still is the current top and we can't request stop to MdiContainer
+					// The Dialog2 still is the current top and we can't request stop to OverlappedContainer
 					// because Dialog2 and Dialog1 must be closed first.
 					// Using request stop here will call the Dialog again without need
 					Assert.True (Application.Current == d1);
 					Assert.False (Application.Current.Running);
 					Assert.True (c4.Running);
 				} else {
-					Assert.Equal (iterations, Application.MdiChildes.Count);
+					Assert.Equal (iterations, Application.OverlappedChildren.Count);
 					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + (iterations == 4 && i == 0 ? 2 : 1)).ToString (),
-							Application.MdiChildes [i].Id);
+							Application.OverlappedChildren [i].Id);
 				}
 				iterations--;
 			};
 
-			Application.Run (mdi);
+			Application.Run (overlapped);
 
-			Assert.Empty (Application.MdiChildes);
+			Assert.Empty (Application.OverlappedChildren);
 		}
 
 		[Fact]
 		[AutoInitShutdown]
 		public void MoveCurrent_Returns_False_If_The_Current_And_Top_Parameter_Are_Both_With_Running_Set_To_False ()
 		{
-			var mdi = new Mdi ();
+			var overlapped = new Overlapped ();
 			var c1 = new Toplevel ();
 			var c2 = new Window ();
 			var c3 = new Window ();
 
-			// MdiChild = c1, c2, c3
+			// OverlappedChild = c1, c2, c3
 			var iterations = 3;
 
-			mdi.Ready += (s, e) => {
-				Assert.Empty (Application.MdiChildes);
+			overlapped.Ready += (s, e) => {
+				Assert.Empty (Application.OverlappedChildren);
 				Application.Run (c1);
 			};
 			c1.Ready += (s, e) => {
-				Assert.Single (Application.MdiChildes);
+				Assert.Single (Application.OverlappedChildren);
 				Application.Run (c2);
 			};
 			c2.Ready += (s, e) => {
-				Assert.Equal (2, Application.MdiChildes.Count);
+				Assert.Equal (2, Application.OverlappedChildren.Count);
 				Application.Run (c3);
 			};
 			c3.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.OverlappedChildren.Count);
 				c3.RequestStop ();
 				c1.RequestStop ();
 			};
-			// Now this will close the MdiContainer propagating through the MdiChildes.
+			// Now this will close the OverlappedContainer propagating through the OverlappedChildren.
 			c1.Closed += (s, e) => {
-				mdi.RequestStop ();
+				overlapped.RequestStop ();
 			};
 			Application.Iteration += () => {
 				if (iterations == 3) {
 					// The Current still is c3 because Current.Running is false.
 					Assert.True (Application.Current == c3);
 					Assert.False (Application.Current.Running);
-					// But the childes order were reorder by Running = false
-					Assert.True (Application.MdiChildes [0] == c3);
-					Assert.True (Application.MdiChildes [1] == c1);
-					Assert.True (Application.MdiChildes [^1] == c2);
+					// But the Children order were reorder by Running = false
+					Assert.True (Application.OverlappedChildren [0] == c3);
+					Assert.True (Application.OverlappedChildren [1] == c1);
+					Assert.True (Application.OverlappedChildren [^1] == c2);
 				} else if (iterations == 2) {
 					// The Current is c1 and Current.Running is false.
 					Assert.True (Application.Current == c1);
 					Assert.False (Application.Current.Running);
-					Assert.True (Application.MdiChildes [0] == c1);
-					Assert.True (Application.MdiChildes [^1] == c2);
+					Assert.True (Application.OverlappedChildren [0] == c1);
+					Assert.True (Application.OverlappedChildren [^1] == c2);
 				} else if (iterations == 1) {
 					// The Current is c2 and Current.Running is false.
 					Assert.True (Application.Current == c2);
 					Assert.False (Application.Current.Running);
-					Assert.True (Application.MdiChildes [^1] == c2);
+					Assert.True (Application.OverlappedChildren [^1] == c2);
 				} else {
-					// The Current is mdi.
-					Assert.True (Application.Current == mdi);
-					Assert.Empty (Application.MdiChildes);
+					// The Current is overlapped.
+					Assert.True (Application.Current == overlapped);
+					Assert.Empty (Application.OverlappedChildren);
 				}
 				iterations--;
 			};
 
-			Application.Run (mdi);
+			Application.Run (overlapped);
 
-			Assert.Empty (Application.MdiChildes);
+			Assert.Empty (Application.OverlappedChildren);
 		}
 
 		[Fact]
 		[AutoInitShutdown]
-		public void MdiContainer_Throws_If_More_Than_One ()
+		public void OverlappedContainer_Throws_If_More_Than_One ()
 		{
-			var mdi = new Mdi ();
-			var mdi2 = new Mdi ();
+			var overlapped = new Overlapped ();
+			var overlapped2 = new Overlapped ();
 
-			mdi.Ready += (s, e) => {
-				Assert.Throws<InvalidOperationException> (() => Application.Run (mdi2));
-				mdi.RequestStop ();
+			overlapped.Ready += (s, e) => {
+				Assert.Throws<InvalidOperationException> (() => Application.Run (overlapped2));
+				overlapped.RequestStop ();
 			};
 
-			Application.Run (mdi);
+			Application.Run (overlapped);
 		}
 
 		[Fact]
 		[AutoInitShutdown]
-		public void MdiContainer_Open_And_Close_Modal_And_Open_Not_Modal_Toplevels_Randomly ()
+		public void OverlappedContainer_Open_And_Close_Modal_And_Open_Not_Modal_Toplevels_Randomly ()
 		{
-			var mdi = new Mdi ();
+			var overlapped = new Overlapped ();
 			var logger = new Toplevel ();
 
 			var iterations = 1; // The logger
 			var running = true;
 			var stageCompleted = true;
 			var allStageClosed = false;
-			var mdiRequestStop = false;
+			var overlappedRequestStop = false;
 
-			mdi.Ready += (s, e) => {
-				Assert.Empty (Application.MdiChildes);
+			overlapped.Ready += (s, e) => {
+				Assert.Empty (Application.OverlappedChildren);
 				Application.Run (logger);
 			};
 
-			logger.Ready += (s, e) => Assert.Single (Application.MdiChildes);
+			logger.Ready += (s, e) => Assert.Single (Application.OverlappedChildren);
 
 			Application.Iteration += () => {
 				if (stageCompleted && running) {
@@ -566,13 +565,13 @@ else 					Assert.True (Application.Current == top1);
 					var stage = new Window () { Modal = true };
 
 					stage.Ready += (s, e) => {
-						Assert.Equal (iterations, Application.MdiChildes.Count);
+						Assert.Equal (iterations, Application.OverlappedChildren.Count);
 						stage.RequestStop ();
 					};
 
 					stage.Closed += (_, _) => {
 						if (iterations == 11) 							allStageClosed = true;
-						Assert.Equal (iterations, Application.MdiChildes.Count);
+						Assert.Equal (iterations, Application.OverlappedChildren.Count);
 						if (running) {
 							stageCompleted = true;
 
@@ -580,7 +579,7 @@ else 					Assert.True (Application.Current == top1);
 
 							rpt.Ready += (s, e) => {
 								iterations++;
-								Assert.Equal (iterations, Application.MdiChildes.Count);
+								Assert.Equal (iterations, Application.OverlappedChildren.Count);
 							};
 
 							Application.Run (rpt);
@@ -591,87 +590,87 @@ else 					Assert.True (Application.Current == top1);
 
 				} else if (iterations == 11 && running) {
 					running = false;
-					Assert.Equal (iterations, Application.MdiChildes.Count);
+					Assert.Equal (iterations, Application.OverlappedChildren.Count);
 
-				} else if (!mdiRequestStop && running && !allStageClosed) 					Assert.Equal (iterations, Application.MdiChildes.Count);
-else if (!mdiRequestStop && !running && allStageClosed) {
-					Assert.Equal (iterations, Application.MdiChildes.Count);
-					mdiRequestStop = true;
-					mdi.RequestStop ();
-				} else 					Assert.Empty (Application.MdiChildes);
+				} else if (!overlappedRequestStop && running && !allStageClosed) 					Assert.Equal (iterations, Application.OverlappedChildren.Count);
+else if (!overlappedRequestStop && !running && allStageClosed) {
+					Assert.Equal (iterations, Application.OverlappedChildren.Count);
+					overlappedRequestStop = true;
+					overlapped.RequestStop ();
+				} else 					Assert.Empty (Application.OverlappedChildren);
 			};
 
-			Application.Run (mdi);
+			Application.Run (overlapped);
 
-			Assert.Empty (Application.MdiChildes);
+			Assert.Empty (Application.OverlappedChildren);
 		}
 
 		[Fact]
 		[AutoInitShutdown]
 		public void AllChildClosed_Event_Test ()
 		{
-			var mdi = new Mdi ();
+			var overlapped = new Overlapped ();
 			var c1 = new Toplevel ();
 			var c2 = new Window ();
 			var c3 = new Window ();
 
-			// MdiChild = c1, c2, c3
+			// OverlappedChild = c1, c2, c3
 			var iterations = 3;
 
-			mdi.Ready += (s, e) => {
-				Assert.Empty (Application.MdiChildes);
+			overlapped.Ready += (s, e) => {
+				Assert.Empty (Application.OverlappedChildren);
 				Application.Run (c1);
 			};
 			c1.Ready += (s, e) => {
-				Assert.Single (Application.MdiChildes);
+				Assert.Single (Application.OverlappedChildren);
 				Application.Run (c2);
 			};
 			c2.Ready += (s, e) => {
-				Assert.Equal (2, Application.MdiChildes.Count);
+				Assert.Equal (2, Application.OverlappedChildren.Count);
 				Application.Run (c3);
 			};
 			c3.Ready += (s, e) => {
-				Assert.Equal (3, Application.MdiChildes.Count);
+				Assert.Equal (3, Application.OverlappedChildren.Count);
 				c3.RequestStop ();
 				c2.RequestStop ();
 				c1.RequestStop ();
 			};
-			// Now this will close the MdiContainer when all MdiChildes was closed
-			mdi.AllChildClosed += (s, e) => {
-				mdi.RequestStop ();
+			// Now this will close the OverlappedContainer when all OverlappedChildren was closed
+			overlapped.AllChildClosed += (s, e) => {
+				overlapped.RequestStop ();
 			};
 			Application.Iteration += () => {
 				if (iterations == 3) {
 					// The Current still is c3 because Current.Running is false.
 					Assert.True (Application.Current == c3);
 					Assert.False (Application.Current.Running);
-					// But the childes order were reorder by Running = false
-					Assert.True (Application.MdiChildes [0] == c3);
-					Assert.True (Application.MdiChildes [1] == c2);
-					Assert.True (Application.MdiChildes [^1] == c1);
+					// But the Children order were reorder by Running = false
+					Assert.True (Application.OverlappedChildren [0] == c3);
+					Assert.True (Application.OverlappedChildren [1] == c2);
+					Assert.True (Application.OverlappedChildren [^1] == c1);
 				} else if (iterations == 2) {
 					// The Current is c2 and Current.Running is false.
 					Assert.True (Application.Current == c2);
 					Assert.False (Application.Current.Running);
-					Assert.True (Application.MdiChildes [0] == c2);
-					Assert.True (Application.MdiChildes [^1] == c1);
+					Assert.True (Application.OverlappedChildren [0] == c2);
+					Assert.True (Application.OverlappedChildren [^1] == c1);
 				} else if (iterations == 1) {
 					// The Current is c1 and Current.Running is false.
 					Assert.True (Application.Current == c1);
 					Assert.False (Application.Current.Running);
-					Assert.True (Application.MdiChildes [^1] == c1);
+					Assert.True (Application.OverlappedChildren [^1] == c1);
 				} else {
-					// The Current is mdi.
-					Assert.True (Application.Current == mdi);
+					// The Current is overlapped.
+					Assert.True (Application.Current == overlapped);
 					Assert.False (Application.Current.Running);
-					Assert.Empty (Application.MdiChildes);
+					Assert.Empty (Application.OverlappedChildren);
 				}
 				iterations--;
 			};
 
-			Application.Run (mdi);
+			Application.Run (overlapped);
 
-			Assert.Empty (Application.MdiChildes);
+			Assert.Empty (Application.OverlappedChildren);
 		}
 	}
 }

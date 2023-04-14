@@ -25,8 +25,8 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (top.Modal);
 			Assert.Null (top.MenuBar);
 			Assert.Null (top.StatusBar);
-			Assert.False (top.IsMdiContainer);
-			Assert.False (top.IsMdiChild);
+			Assert.False (top.IsOverlappedContainer);
+			Assert.False (top.IsOverlapped);
 		}
 
 		[Fact]
@@ -41,7 +41,7 @@ namespace Terminal.Gui.ViewsTests {
 
 		[Fact]
 		[AutoInitShutdown]
-		public void Application_Top_EnsureVisibleBounds_To_Driver_Rows_And_Cols ()
+		public void Application_Top_GetLocationThatFits_To_Driver_Rows_And_Cols ()
 		{
 			var iterations = 0;
 
@@ -201,7 +201,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (top, Application.Top);
 
 			// Application.Top without menu and status bar.
-			var supView = top.EnsureVisibleBounds (top, 2, 2, out int nx, out int ny, out MenuBar mb, out StatusBar sb);
+			var supView = top.GetLocationThatFits (top, 2, 2, out int nx, out int ny, out MenuBar mb, out StatusBar sb);
 			Assert.Equal (Application.Top, supView);
 			Assert.Equal (0, nx);
 			Assert.Equal (0, ny);
@@ -212,7 +212,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.NotNull (top.MenuBar);
 
 			// Application.Top with a menu and without status bar.
-			top.EnsureVisibleBounds (top, 2, 2, out nx, out ny, out mb, out sb);
+			top.GetLocationThatFits (top, 2, 2, out nx, out ny, out mb, out sb);
 			Assert.Equal (0, nx);
 			Assert.Equal (1, ny);
 			Assert.NotNull (mb);
@@ -222,7 +222,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.NotNull (top.StatusBar);
 
 			// Application.Top with a menu and status bar.
-			top.EnsureVisibleBounds (top, 2, 2, out nx, out ny, out mb, out sb);
+			top.GetLocationThatFits (top, 2, 2, out nx, out ny, out mb, out sb);
 			Assert.Equal (0, nx);
 			// The available height is lower than the Application.Top height minus
 			// the menu bar and status bar, then the top can go beyond the bottom
@@ -234,7 +234,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Null (top.MenuBar);
 
 			// Application.Top without a menu and with a status bar.
-			top.EnsureVisibleBounds (top, 2, 2, out nx, out ny, out mb, out sb);
+			top.GetLocationThatFits (top, 2, 2, out nx, out ny, out mb, out sb);
 			Assert.Equal (0, nx);
 			// The available height is lower than the Application.Top height minus
 			// the status bar, then the top can go beyond the bottom
@@ -251,13 +251,13 @@ namespace Terminal.Gui.ViewsTests {
 			top.LayoutSubviews ();
 
 			// The SuperView is always the same regardless of the caller.
-			supView = top.EnsureVisibleBounds (win, 0, 0, out nx, out ny, out mb, out sb);
+			supView = top.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);
 			Assert.Equal (Application.Top, supView);
-			supView = win.EnsureVisibleBounds (win, 0, 0, out nx, out ny, out mb, out sb);
+			supView = win.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);
 			Assert.Equal (Application.Top, supView);
 
 			// Application.Top without menu and status bar.
-			top.EnsureVisibleBounds (win, 0, 0, out nx, out ny, out mb, out sb);
+			top.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);
 			Assert.Equal (0, nx);
 			Assert.Equal (0, ny);
 			Assert.Null (mb);
@@ -267,7 +267,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.NotNull (top.MenuBar);
 
 			// Application.Top with a menu and without status bar.
-			top.EnsureVisibleBounds (win, 2, 2, out nx, out ny, out mb, out sb);
+			top.GetLocationThatFits (win, 2, 2, out nx, out ny, out mb, out sb);
 			Assert.Equal (0, nx);
 			Assert.Equal (1, ny);
 			Assert.NotNull (mb);
@@ -277,7 +277,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.NotNull (top.StatusBar);
 
 			// Application.Top with a menu and status bar.
-			top.EnsureVisibleBounds (win, 30, 20, out nx, out ny, out mb, out sb);
+			top.GetLocationThatFits (win, 30, 20, out nx, out ny, out mb, out sb);
 			Assert.Equal (0, nx);
 			// The available height is lower than the Application.Top height minus
 			// the menu bar and status bar, then the top can go beyond the bottom
@@ -296,7 +296,7 @@ namespace Terminal.Gui.ViewsTests {
 			top.Add (win);
 
 			// Application.Top without menu and status bar.
-			top.EnsureVisibleBounds (win, 0, 0, out nx, out ny, out mb, out sb);
+			top.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);
 			Assert.Equal (0, nx);
 			Assert.Equal (0, ny);
 			Assert.Null (mb);
@@ -306,7 +306,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.NotNull (top.MenuBar);
 
 			// Application.Top with a menu and without status bar.
-			top.EnsureVisibleBounds (win, 2, 2, out nx, out ny, out mb, out sb);
+			top.GetLocationThatFits (win, 2, 2, out nx, out ny, out mb, out sb);
 			Assert.Equal (2, nx);
 			Assert.Equal (2, ny);
 			Assert.NotNull (mb);
@@ -316,7 +316,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.NotNull (top.StatusBar);
 
 			// Application.Top with a menu and status bar.
-			top.EnsureVisibleBounds (win, 30, 20, out nx, out ny, out mb, out sb);
+			top.GetLocationThatFits (win, 30, 20, out nx, out ny, out mb, out sb);
 			Assert.Equal (20, nx); // 20+60=80
 			Assert.Equal (9, ny); // 9+15+1(mb)=25
 			Assert.NotNull (mb);
@@ -325,14 +325,14 @@ namespace Terminal.Gui.ViewsTests {
 			top.PositionToplevels ();
 			Assert.Equal (new Rect (0, 1, 60, 15), win.Frame);
 
-			Assert.Null (Toplevel.dragPosition);
+			Assert.Null (Toplevel._dragPosition);
 			win.MouseEvent (new MouseEvent () { X = 6, Y = 0, Flags = MouseFlags.Button1Pressed });
-			Assert.Equal (new Point (6, 0), Toplevel.dragPosition);
+			Assert.Equal (new Point (6, 0), Toplevel._dragPosition);
 			win.MouseEvent (new MouseEvent () { X = 6, Y = 0, Flags = MouseFlags.Button1Released });
-			Assert.Null (Toplevel.dragPosition);
+			Assert.Null (Toplevel._dragPosition);
 			win.CanFocus = false;
 			win.MouseEvent (new MouseEvent () { X = 6, Y = 0, Flags = MouseFlags.Button1Pressed });
-			Assert.Null (Toplevel.dragPosition);
+			Assert.Null (Toplevel._dragPosition);
 		}
 
 		[Fact]
@@ -341,7 +341,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var isRunning = false;
 
-			var win1 = new Window ("Win1") { Id = "win1", Width = Dim.Percent (50f), Height = Dim.Fill () };
+			var win1 = new Window () { Id = "win1", Width = Dim.Percent (50f), Height = Dim.Fill () };
 			var lblTf1W1 = new Label ("Enter text in TextField on Win1:") { Id = "lblTf1W1" };
 			var tf1W1 = new TextField ("Text1 on Win1") { Id = "tf1W1", X = Pos.Right (lblTf1W1) + 1, Width = Dim.Fill () };
 			var lblTvW1 = new Label ("Enter text in TextView on Win1:") { Id = "lblTvW1", Y = Pos.Bottom (lblTf1W1) + 1 };
@@ -350,7 +350,7 @@ namespace Terminal.Gui.ViewsTests {
 			var tf2W1 = new TextField ("Text2 on Win1") { Id = "tf2W1", X = Pos.Left (tf1W1), Width = Dim.Fill () };
 			win1.Add (lblTf1W1, tf1W1, lblTvW1, tvW1, lblTf2W1, tf2W1);
 
-			var win2 = new Window ("Win2") { Id = "win2", X = Pos.Right (win1) + 1, Width = Dim.Percent (50f), Height = Dim.Fill () };
+			var win2 = new Window () { Id = "win2", X = Pos.Right (win1) + 1, Width = Dim.Percent (50f), Height = Dim.Fill () };
 			var lblTf1W2 = new Label ("Enter text in TextField on Win2:") { Id = "lblTf1W2" };
 			var tf1W2 = new TextField ("Text1 on Win2") { Id = "tf1W2", X = Pos.Right (lblTf1W2) + 1, Width = Dim.Fill () };
 			var lblTvW2 = new Label ("Enter text in TextView on Win2:") { Id = "lblTvW2", Y = Pos.Bottom (lblTf1W2) + 1 };
@@ -443,17 +443,17 @@ namespace Terminal.Gui.ViewsTests {
 
 		[Fact]
 		[AutoInitShutdown]
-		public void KeyBindings_Command_With_MdiTop ()
+		public void KeyBindings_Command_With_OverlappedTop ()
 		{
 			var top = Application.Top;
-			Assert.Null (Application.MdiTop);
-			top.IsMdiContainer = true;
+			Assert.Null (Application.OverlappedTop);
+			top.IsOverlappedContainer = true;
 			Application.Begin (top);
-			Assert.Equal (Application.Top, Application.MdiTop);
+			Assert.Equal (Application.Top, Application.OverlappedTop);
 
 			var isRunning = true;
 
-			var win1 = new Window ("Win1") { Width = Dim.Percent (50f), Height = Dim.Fill () };
+			var win1 = new Window () { Id = "win1", Width = Dim.Percent (50f), Height = Dim.Fill () };
 			var lblTf1W1 = new Label ("Enter text in TextField on Win1:");
 			var tf1W1 = new TextField ("Text1 on Win1") { X = Pos.Right (lblTf1W1) + 1, Width = Dim.Fill () };
 			var lblTvW1 = new Label ("Enter text in TextView on Win1:") { Y = Pos.Bottom (lblTf1W1) + 1 };
@@ -462,7 +462,7 @@ namespace Terminal.Gui.ViewsTests {
 			var tf2W1 = new TextField ("Text2 on Win1") { X = Pos.Left (tf1W1), Width = Dim.Fill () };
 			win1.Add (lblTf1W1, tf1W1, lblTvW1, tvW1, lblTf2W1, tf2W1);
 
-			var win2 = new Window ("Win2") { Width = Dim.Percent (50f), Height = Dim.Fill () };
+			var win2 = new Window () { Id = "win2", Width = Dim.Percent (50f), Height = Dim.Fill () };
 			var lblTf1W2 = new Label ("Enter text in TextField on Win2:");
 			var tf1W2 = new TextField ("Text1 on Win2") { X = Pos.Right (lblTf1W2) + 1, Width = Dim.Fill () };
 			var lblTvW2 = new Label ("Enter text in TextView on Win2:") { Y = Pos.Bottom (lblTf1W2) + 1 };
@@ -475,109 +475,109 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Null (top.Focused);
 			Assert.Equal (top, Application.Current);
 			Assert.True (top.IsCurrentTop);
-			Assert.Equal (top, Application.MdiTop);
+			Assert.Equal (top, Application.OverlappedTop);
 			Application.Begin (win1);
 			Assert.Equal (new Rect (0, 0, 40, 25), win1.Frame);
 			Assert.NotEqual (top, Application.Current);
 			Assert.False (top.IsCurrentTop);
 			Assert.Equal (win1, Application.Current);
 			Assert.True (win1.IsCurrentTop);
-			Assert.True (win1.IsMdiChild);
+			Assert.True (win1.IsOverlapped);
 			Assert.Null (top.Focused);
 			Assert.Null (top.MostFocused);
 			Assert.Equal (tf1W1, win1.MostFocused);
-			Assert.True (win1.IsMdiChild);
-			Assert.Single (Application.MdiChildes);
+			Assert.True (win1.IsOverlapped);
+			Assert.Single (Application.OverlappedChildren);
 			Application.Begin (win2);
 			Assert.Equal (new Rect (0, 0, 40, 25), win2.Frame);
 			Assert.NotEqual (top, Application.Current);
 			Assert.False (top.IsCurrentTop);
 			Assert.Equal (win2, Application.Current);
 			Assert.True (win2.IsCurrentTop);
-			Assert.True (win2.IsMdiChild);
+			Assert.True (win2.IsOverlapped);
 			Assert.Null (top.Focused);
 			Assert.Null (top.MostFocused);
 			Assert.Equal (tf1W2, win2.MostFocused);
-			Assert.Equal (2, Application.MdiChildes.Count);
+			Assert.Equal (2, Application.OverlappedChildren.Count);
 
-			Application.ShowChild (win1);
+			Application.MoveToOverlappedChild (win1);
 			Assert.Equal (win1, Application.Current);
-			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			win1.Running = true;
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Application.QuitKey, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Application.QuitKey, new KeyModifiers ())));
 			Assert.False (isRunning);
 			Assert.False (win1.Running);
-			Assert.Equal (win1, Application.MdiChildes [0]);
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.Z | Key.CtrlMask, new KeyModifiers ())));
-			Assert.False (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.F5, new KeyModifiers ())));
+			Assert.Equal (win1, Application.OverlappedChildren [0]);
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.False (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Key.F5, new KeyModifiers ())));
 
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
 			Assert.True (win1.IsCurrentTop);
 			Assert.Equal (tvW1, win1.MostFocused);
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
 			Assert.Equal ($"\tFirst line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.BackTab | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Key.BackTab | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal ($"First line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf2W1, win1.MostFocused);
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
-			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
+			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf1W1, win1.MostFocused);
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
-			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf1W1, win1.MostFocused);
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
-			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
+			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tvW1, win1.MostFocused);
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.I | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Key.I | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf2W1, win1.MostFocused);
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.BackTab | Key.ShiftMask, new KeyModifiers ())));
-			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Key.BackTab | Key.ShiftMask, new KeyModifiers ())));
+			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tvW1, win1.MostFocused);
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
-			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
+			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf1W1, win1.MostFocused);
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ())));
-			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ())));
+			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf2W1, win1.MostFocused);
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
-			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
+			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf1W1, win1.MostFocused);
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal (win2, Application.MdiChildes [0]);
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (win2, Application.OverlappedChildren [0]);
 			Assert.Equal (tf1W2, win2.MostFocused);
 			tf2W2.SetFocus ();
 			Assert.True (tf2W2.HasFocus);
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ())));
-			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ())));
+			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf1W1, win1.MostFocused);
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Application.AlternateForwardKey, new KeyModifiers ())));
-			Assert.Equal (win2, Application.MdiChildes [0]);
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Application.AlternateForwardKey, new KeyModifiers ())));
+			Assert.Equal (win2, Application.OverlappedChildren [0]);
 			Assert.Equal (tf2W2, win2.MostFocused);
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Application.AlternateBackwardKey, new KeyModifiers ())));
-			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Application.AlternateBackwardKey, new KeyModifiers ())));
+			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf1W1, win1.MostFocused);
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
-			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
+			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tvW1, win1.MostFocused);
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.B | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Key.B | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf1W1, win1.MostFocused);
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
-			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
+			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tvW1, win1.MostFocused);
 			Assert.Equal (new Point (0, 0), tvW1.CursorPosition);
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.End | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Key.End | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tvW1, win1.MostFocused);
 			Assert.Equal (new Point (16, 1), tvW1.CursorPosition);
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.F | Key.CtrlMask, new KeyModifiers ())));
-			Assert.Equal (win1, Application.MdiChildes [0]);
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Key.F | Key.CtrlMask, new KeyModifiers ())));
+			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf2W1, win1.MostFocused);
 
-			Assert.True (Application.MdiChildes [0].ProcessKey (new KeyEvent (Key.L | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKey (new KeyEvent (Key.L | Key.CtrlMask, new KeyModifiers ())));
 		}
 
 		[Fact]
@@ -664,17 +664,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (Key.PageDown | Key.CtrlMask, Application.AlternateForwardKey);
 			Assert.Equal (Key.PageUp | Key.CtrlMask, Application.AlternateBackwardKey);
 			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
-		}
-
-		[Fact]
-		[AutoInitShutdown]
-		public void FileDialog_FileSystemWatcher ()
-		{
-			for (int i = 0; i < 8; i++) {
-				var fd = new FileDialog ();
-				fd.Ready += (s, e) => Application.RequestStop ();
-				Application.Run (fd);
-			}
 		}
 
 		[Fact, AutoInitShutdown]
@@ -825,8 +814,8 @@ namespace Terminal.Gui.ViewsTests {
 			var win = new Window () {
 				X = 3,
 				Y = 2,
-				Width = Dim.Fill (10),
-				Height = Dim.Fill (5)
+				Width = 10,
+				Height = 5
 			};
 			var top = Application.Top;
 			top.Add (win);
@@ -841,7 +830,9 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Iteration = () => {
 				iterations++;
 				if (iterations == 0) {
-					((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+					((FakeDriver)Application.Driver).SetBufferSize (30, 10);
+				} else if (iterations == 1) {
+					location = win.Frame;
 
 					Assert.Null (Application.MouseGrabView);
 					// Grab the mouse
@@ -856,8 +847,7 @@ namespace Terminal.Gui.ViewsTests {
 
 					Assert.Equal (win, Application.MouseGrabView);
 					Assert.Equal (location, Application.MouseGrabView.Frame);
-
-				} else if (iterations == 1) {
+				} else if (iterations == 2) {
 					Assert.Equal (win, Application.MouseGrabView);
 					// Drag to left
 					movex = 1;
@@ -873,14 +863,14 @@ namespace Terminal.Gui.ViewsTests {
 
 					Assert.Equal (win, Application.MouseGrabView);
 
-				} else if (iterations == 2) {
+				} else if (iterations == 3) {
 					// we should have moved +1, +0
 					Assert.Equal (win, Application.MouseGrabView);
 					Assert.Equal (win, Application.MouseGrabView);
 					location.Offset (movex, movey);
 					Assert.Equal (location, Application.MouseGrabView.Frame);
 
-				} else if (iterations == 3) {
+				} else if (iterations == 4) {
 					Assert.Equal (win, Application.MouseGrabView);
 					// Drag up
 					movex = 0;
@@ -896,13 +886,13 @@ namespace Terminal.Gui.ViewsTests {
 
 					Assert.Equal (win, Application.MouseGrabView);
 
-				} else if (iterations == 4) {
+				} else if (iterations == 5) {
 					// we should have moved +0, -1
 					Assert.Equal (win, Application.MouseGrabView);
 					location.Offset (movex, movey);
 					Assert.Equal (location, Application.MouseGrabView.Frame);
 
-				} else if (iterations == 5) {
+				} else if (iterations == 6) {
 					Assert.Equal (win, Application.MouseGrabView);
 					// Ungrab the mouse
 					movex = 0;
@@ -917,7 +907,7 @@ namespace Terminal.Gui.ViewsTests {
 						});
 
 					Assert.Null (Application.MouseGrabView);
-				} else if (iterations == 8) {
+				} else if (iterations == 7) {
 					Application.RequestStop ();
 				}
 			};
@@ -926,7 +916,7 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void EnsureVisibleBounds_With_Border_Null_Not_Throws ()
+		public void GetLocationThatFits_With_Border_Null_Not_Throws ()
 		{
 			var top = new Toplevel ();
 			Application.Begin (top);
@@ -1042,6 +1032,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Rect (0, 0, 10, 5), view._needsDisplay);
 		}
 
+		// BUGBUG: Broke this test with #2483 - @bdisp I need your help figuring out why
 		[Fact, AutoInitShutdown]
 		public void Toplevel_Inside_ScrollView_MouseGrabView ()
 		{
@@ -1052,7 +1043,7 @@ namespace Terminal.Gui.ViewsTests {
 				Height = 16,
 				ContentSize = new Size (200, 100)
 			};
-			var win = new Window ("Window") { X = 3, Y = 3, Width = Dim.Fill (3), Height = Dim.Fill (3) };
+			var win = new Window () { X = 3, Y = 3, Width = Dim.Fill (3), Height = Dim.Fill (3) };
 			scrollView.Add (win);
 			var top = Application.Top;
 			top.Add (scrollView);
@@ -1066,7 +1057,7 @@ namespace Terminal.Gui.ViewsTests {
                                           ▲
                                           ┬
                                           │
-      ┌┤Window├───────────────────────────┴
+      ┌───────────────────────────────────┴
       │                                   ░
       │                                   ░
       │                                   ░
@@ -1111,7 +1102,7 @@ namespace Terminal.Gui.ViewsTests {
                                           ┴
                                           ░
                                           ░
-         ┌┤Window├────────────────────────░
+         ┌────────────────────────────────░
          │                                ░
          │                                ░
          │                                ░
@@ -1138,7 +1129,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
                                           ▲
                                           ┬
-     ┌┤Window├────────────────────────────│
+     ┌────────────────────────────────────│
      │                                    ┴
      │                                    ░
      │                                    ░
@@ -1178,7 +1169,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void Dialog_Bounds_Bigger_Than_Driver_Cols_And_Rows_Allow_Drag_Beyond_Left_Right_And_Bottom ()
 		{
 			var top = Application.Top;
-			var dialog = new Dialog ("", 20, 3, new Button ("Ok"));
+			var dialog = new Dialog (new Button ("Ok")) { Width = 20, Height = 3 };
 			Application.Begin (top);
 			((FakeDriver)Application.Driver).SetBufferSize (40, 10);
 			Application.Begin (dialog);
@@ -1295,7 +1286,7 @@ namespace Terminal.Gui.ViewsTests {
 		[Fact, AutoInitShutdown]
 		public void Single_Smaller_Top_Will_Have_Cleaning_Trails_Chunk_On_Move ()
 		{
-			var dialog = new Dialog ("Single smaller Dialog") { Width = 30, Height = 10 };
+			var dialog = new Dialog () { Width = 30, Height = 10 };
 			dialog.Add (new Label (
 				"How should I've to react. Cleaning all chunk trails or setting the 'Cols' and 'Rows' to this dialog length?\n" +
 				"Cleaning is more easy to fix this.") {
@@ -1313,7 +1304,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Null (Application.MouseGrabView);
 			Assert.Equal (new Rect (25, 7, 30, 10), dialog.Frame);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
-                         ┌┤Single smaller Dialog├─────┐
+                         ┌────────────────────────────┐
                          │ How should I've to react.  │
                          │Cleaning all chunk trails or│
                          │   setting the 'Cols' and   │
@@ -1339,7 +1330,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.Equal (new Rect (25, 7, 30, 10), dialog.Frame);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
-                         ┌┤Single smaller Dialog├─────┐
+                         ┌────────────────────────────┐
                          │ How should I've to react.  │
                          │Cleaning all chunk trails or│
                          │   setting the 'Cols' and   │
@@ -1364,7 +1355,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (dialog, Application.MouseGrabView);
 			Assert.Equal (new Rect (20, 10, 30, 10), dialog.Frame);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
-                    ┌┤Single smaller Dialog├─────┐
+                    ┌────────────────────────────┐
                     │ How should I've to react.  │
                     │Cleaning all chunk trails or│
                     │   setting the 'Cols' and   │
@@ -1378,6 +1369,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.End (rs);
 		}
 
+		// BUGBUG: Broke this test with #2483 - @bdisp I need your help figuring out why
 		[Fact, AutoInitShutdown]
 		public void Draw_A_Top_Subview_On_A_Dialog ()
 		{
@@ -1418,7 +1410,7 @@ namespace Terminal.Gui.ViewsTests {
 					Y = viewToScreen.Y + 1,
 					Width = 18,
 					Height = 5,
-					Border = new Border () { BorderStyle = BorderStyle.Single }
+					BorderStyle = LineStyle.Single
 				};
 				Application.Current.DrawContentComplete += Current_DrawContentComplete;
 				top.Add (view);
@@ -1441,7 +1433,7 @@ namespace Terminal.Gui.ViewsTests {
 					Application.Current.DrawContentComplete -= Current_DrawContentComplete;
 				}
 			};
-			var dialog = new Dialog ("", 15, 10, btnPopup);
+			var dialog = new Dialog (btnPopup) { Width = 15, Height = 10 };
 			var rs = Application.Begin (dialog);
 
 			Assert.Equal (new Rect (2, 5, 15, 10), dialog.Frame);
