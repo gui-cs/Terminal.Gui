@@ -73,13 +73,11 @@ namespace Terminal.Gui.ViewsTests {
 
 			view.Redraw (view.Bounds);
 
-
 			var expected = @"─";
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
 			view.SetNeedsDisplay ();
 			view.Redraw (view.Bounds);
-
 
 			expected = @"\";
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);

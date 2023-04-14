@@ -571,7 +571,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-
 		static void ProcessKeyUpEvent (KeyEvent ke)
 		{
 			var chain = _toplevels.ToList ();
@@ -1136,7 +1135,6 @@ namespace Terminal.Gui {
 			last?.PositionCursor ();
 			Driver.Refresh ();
 		}
-
 
 
 		/// <summary>

@@ -666,7 +666,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
 		}
 
-
 		[Fact, AutoInitShutdown]
 		public void Mouse_Drag_On_Top_With_Superview_Null ()
 		{

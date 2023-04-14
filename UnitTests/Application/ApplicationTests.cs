@@ -124,7 +124,6 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.Null (Application.Driver);
 		}
 
-
 		class TestToplevel : Toplevel {
 			public TestToplevel ()
 			{

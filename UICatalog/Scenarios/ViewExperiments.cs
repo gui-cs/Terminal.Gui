@@ -190,7 +190,6 @@ namespace UICatalog.Scenarios {
 				viewToEdit.Y = Pos.Center () + 4;
 
 
-
 				//rbBorderStyle.SelectedItemChanged += (e) => {
 				//	viewToEdit.Border.BorderStyle = (BorderStyle)e.SelectedItem;
 				//	viewToEdit.SetNeedsDisplay ();

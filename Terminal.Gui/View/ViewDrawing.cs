@@ -45,7 +45,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-
 		/// <summary>
 		/// Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.
 		/// </summary>
@@ -79,7 +78,6 @@ namespace Terminal.Gui {
 			return Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled;
 		}
 
-		
 		/// <summary>
 		/// Displays the specified character in the specified column and row of the View.
 		/// </summary>
@@ -104,7 +102,6 @@ namespace Terminal.Gui {
 			_needsDisplay = Rect.Empty;
 			_childNeedsDisplay = false;
 		}
-
 
 		// The view-relative region that needs to be redrawn
 		internal Rect _needsDisplay { get; private set; } = Rect.Empty;
@@ -162,7 +159,6 @@ namespace Terminal.Gui {
 				_superView.SetSubViewNeedsDisplay ();
 		}
 
-
 		/// <summary>
 		///   Clears the view region with the current color.
 		/// </summary>
@@ -182,7 +178,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-
 		// BUGBUG: Stupid that this takes screen-relative. We should have a tenet that says 
 		// "View APIs only deal with View-relative coords". 
 		/// <summary>
@@ -201,7 +196,6 @@ namespace Terminal.Gui {
 					Driver.AddRune (' ');
 			}
 		}
-
 
 		// Clips a rectangle in screen coordinates to the dimensions currently available on the screen
 		internal Rect ScreenClip (Rect regionScreen)
@@ -229,7 +223,6 @@ namespace Terminal.Gui {
 		public Rect ClipToBounds ()
 		{
 			var clip = Bounds;
-
 
 			return SetClip (clip);
 		}
@@ -513,7 +506,6 @@ namespace Terminal.Gui {
 		{
 			DrawContentComplete?.Invoke (this, new DrawEventArgs (viewport));
 		}
-
 
 	}
 }

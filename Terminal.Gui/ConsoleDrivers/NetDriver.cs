@@ -1115,7 +1115,6 @@ namespace Terminal.Gui {
 		{
 		}
 
-
 		public override void SetAttribute (Attribute c)
 		{
 			base.SetAttribute (c);
@@ -1171,7 +1170,6 @@ namespace Terminal.Gui {
 				return MapKeyModifiers (keyInfo, Key.DeleteChar);
 			case ConsoleKey.Insert:
 				return MapKeyModifiers (keyInfo, Key.InsertChar);
-
 
 			case ConsoleKey.Oem1:
 			case ConsoleKey.Oem2:
@@ -1440,7 +1438,6 @@ namespace Terminal.Gui {
 			visibility = savedCursorVisibility ?? CursorVisibility.Default;
 			return visibility == CursorVisibility.Default;
 		}
-
 
 		/// <inheritdoc/>
 		public override bool SetCursorVisibility (CursorVisibility visibility)

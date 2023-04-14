@@ -79,7 +79,6 @@ namespace UICatalog.Scenarios {
 				}),
 			});
 
-
 			Application.Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
@@ -364,7 +363,6 @@ namespace UICatalog.Scenarios {
 				tableView.Update ();
 				e.Handled = true;
 			}
-
 
 		}
 

@@ -611,7 +611,6 @@ namespace Terminal.Gui {
 					spaceForLast--;
 				}
 
-
 				// don't shrink if it would take us below min size of left panel
 				if (spaceForLast < tiles [idx].MinSize) {
 					return false;
@@ -779,7 +778,6 @@ namespace Terminal.Gui {
 					} else {
 						splitterLines [Math.Min (i, splitterLines.Count - 1)].Visible = false;
 					}
-
 
 				}
 			}

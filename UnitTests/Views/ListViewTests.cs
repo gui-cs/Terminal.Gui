@@ -113,7 +113,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Throws<ArgumentException> (() => lv.AddKeyBinding (Key.Space));
 		}
 
-
 		/// <summary>
 		/// Tests that when none of the Commands in a chained keybinding are possible
 		/// the <see cref="View.ProcessKey(KeyEvent)"/> returns the appropriate result

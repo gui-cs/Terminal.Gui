@@ -109,7 +109,6 @@ namespace UICatalog.Scenarios {
 				scrollBarCbx.Refresh ();
 			};
 
-
 			var btnMoveUp = new Button ("Move _Up") {
 				X = 1,
 				Y = Pos.Bottom(lbListView),

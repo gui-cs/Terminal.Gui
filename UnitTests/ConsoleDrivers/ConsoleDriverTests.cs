@@ -173,7 +173,6 @@ namespace Terminal.Gui.DriverTests {
 		//	output.WriteLine ($"Add timeout to force quit after {abortTime}ms");
 		//	_ = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
 
-
 		//	Key key = Key.Unknown;
 			
 		//	Application.Top.KeyPress += (e) => {

@@ -127,7 +127,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		ToggleOverwrite,
 
-
 		/// <summary>
 		/// Enables overwrite mode such that newly typed text overwrites the text that is
 		/// already there (typically associated with the Insert key).

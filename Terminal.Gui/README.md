@@ -40,7 +40,6 @@ All files required to build the **Terminal.Gui** library (and NuGet package).
 
 - `Types/` - A folder (not namespace) containing implementations of `Point`, `Rect`, and `Size` which are ancient versions of the modern `System.Drawing.Point`, `System.Drawing.Size`, and `System.Drawning.Rectangle`.
 
-
 ## Version numbers
 
 Version info for Terminal.Gui is managed by [gitversion](https://gitversion.net).

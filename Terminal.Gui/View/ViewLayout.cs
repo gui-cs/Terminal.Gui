@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using NStack;
 
-
 namespace Terminal.Gui {
 	/// <summary>
 	/// Determines the LayoutStyle for a <see cref="View"/>, if Absolute, during <see cref="View.LayoutSubviews"/>, the
@@ -80,7 +79,7 @@ namespace Terminal.Gui {
 	/// </para>
 	/// </remarks>
 	public partial class View : Responder, ISupportInitializeNotification {
-		
+
 		// The frame for the object. Superview relative.
 		Rect _frame;
 
@@ -127,7 +126,6 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public Frame Border { get; private set; }
 
-
 		/// <summary>
 		/// Gets or sets whether the view has a one row/col thick border.
 		/// </summary>
@@ -163,7 +161,6 @@ namespace Terminal.Gui {
 				SetNeedsLayout ();
 			}
 		}
-
 
 		/// <summary>
 		/// Means the Thickness inside of an element that offsets the `Content` from the Border. 
@@ -232,7 +229,6 @@ namespace Terminal.Gui {
 			Padding.ThicknessChanged += ThicknessChangedHandler;
 			Padding.Parent = this;
 		}
-
 
 		LayoutStyle _layoutStyle;
 
@@ -542,7 +538,6 @@ namespace Terminal.Gui {
 			LayoutNeeded = false;
 		}
 
-
 		/// <summary>
 		/// Converts a point from screen-relative coordinates to view-relative coordinates.
 		/// </summary>
@@ -616,7 +611,6 @@ namespace Terminal.Gui {
 			return new Rect (x, y, region.Width, region.Height);
 		}
 
-		
 
 		/// <summary>
 		/// Sets the View's <see cref="Frame"/> to the frame-relative coordinates if its container. The
@@ -716,7 +710,6 @@ namespace Terminal.Gui {
 
 				return newDimension;
 			}
-
 
 			// horizontal
 			(newX, newW) = GetNewLocationAndDimension (superviewFrame.X, superviewFrame.Width, _x, _width, autosize.Width);
@@ -832,7 +825,6 @@ namespace Terminal.Gui {
 
 			// Set of all nodes with no incoming edges
 			var noEdgeNodes = new HashSet<View> (nodes.Where (n => edges.All (e => !e.To.Equals (n))));
-
 
 			while (noEdgeNodes.Any ()) {
 				//  remove a node n from S
@@ -1013,7 +1005,7 @@ namespace Terminal.Gui {
 				}
 			}
 		}
-		
+
 		bool ResizeView (bool autoSize)
 		{
 			if (!autoSize) {
@@ -1098,7 +1090,7 @@ namespace Terminal.Gui {
 			return !(ForceValidatePosDim && (!(height is Dim.DimAbsolute)) || dimValue != rect.Size.Height
 			    - GetHotKeySpecifierLength (false));
 		}
-		
+
 		/// <summary>
 		/// Determines if the View's <see cref="Width"/> can be set to a new value.
 		/// </summary>
@@ -1170,7 +1162,7 @@ namespace Terminal.Gui {
 
 			return canSetHeight;
 		}
-		
+
 		/// <summary>
 		/// Finds which view that belong to the <paramref name="start"/> superview at the provided location.
 		/// </summary>

@@ -55,7 +55,6 @@ namespace Terminal.Gui {
 			Border.Data = "Border";
 		}
 
-
 		///<inheritdoc/>
 		public override bool OnEnter (View view)
 		{

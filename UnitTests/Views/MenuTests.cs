@@ -568,7 +568,6 @@ Edit
 			Application.MainLoop.MainIteration ();
 			Assert.Equal ("Copy", miAction);
 
-
 			string GetCurrentMenuBarItemTitle ()
 			{
 				return mbiCurrent != null ? mbiCurrent.Title.ToString () : "Closed";
@@ -1464,7 +1463,6 @@ Edit
 			Application.Top.Redraw (Application.Top.Bounds);
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), output);
 
-
 			Assert.True (menu.MouseEvent (new MouseEvent () { X = 8, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }));
 			Assert.False (menu.IsMenuOpen);
 			Assert.True (tf.HasFocus);
@@ -1829,7 +1827,6 @@ Edit
 			mi.CheckType = MenuItemCheckStyle.Radio;
 			Assert.Throws<InvalidOperationException> (mi.ToggleChecked);
 		}
-
 
 		[Fact, AutoInitShutdown]
 		public void Menu_With_Separator ()

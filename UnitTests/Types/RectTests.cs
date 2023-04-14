@@ -149,7 +149,6 @@ namespace Terminal.Gui.TypeTests {
 			Assert.Equal (yxCount, rect.Height * rect.Width);
 		}
 
-
 		[Theory]
 		// Empty
 		[InlineData (
@@ -256,7 +255,6 @@ namespace Terminal.Gui.TypeTests {
 			Assert.Equal (new Rect (-2, -2, 6, 6), result);
 		}
 
-
 		[Fact]
 		public void Union_EmptyRectangles ()
 		{
@@ -274,7 +272,6 @@ namespace Terminal.Gui.TypeTests {
 			var result = Rect.Union (r1, r2);
 			Assert.Equal (new Rect (0, 0, 2, 2), result);
 		}
-
 
 		[Fact]
 		public void Union_RectanglesOverlap_ReturnsCombinedRectangle ()

@@ -370,7 +370,6 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.Equal (2, callbackCount);
 		}
 
-
 		class MillisecondTolerance : IEqualityComparer<TimeSpan> {
 			int _tolerance = 0;
 			public MillisecondTolerance (int tolerance) { _tolerance = tolerance; }
@@ -566,7 +565,6 @@ namespace Terminal.Gui.ApplicationTests {
 
 				_wakeUp.Reset ();
 				for (var i = 0; i < numIncrements; i++) 					Launch (r, tf, (j + 1) * numIncrements);
-
 
 				while (tbCounter != (j + 1) * numIncrements) // Wait for tbCounter to reach expected value
 				{

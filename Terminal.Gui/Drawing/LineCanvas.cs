@@ -52,7 +52,6 @@ namespace Terminal.Gui {
 			{IntersectionRuneType.RightTee,new RightTeeIntersectionRuneResolver()},
 			{IntersectionRuneType.BottomTee,new BottomTeeIntersectionRuneResolver()},
 
-
 			{IntersectionRuneType.Crosshair,new CrosshairIntersectionRuneResolver()},
 			// TODO: Add other resolvers
 		};
@@ -244,7 +243,6 @@ namespace Terminal.Gui {
 			return sb.ToString ();
 		}
 
-
 		private abstract class IntersectionRuneResolver {
 			readonly Rune round;
 			readonly Rune doubleH;
@@ -267,7 +265,6 @@ namespace Terminal.Gui {
 
 				bool doubleHorizontal = intersects.Any (l => l.Line.Orientation == Orientation.Horizontal && l.Line.Style == LineStyle.Double);
 				bool doubleVertical = intersects.Any (l => l.Line.Orientation == Orientation.Vertical && l.Line.Style == LineStyle.Double);
-
 
 				if (doubleHorizontal) {
 					return doubleVertical ? doubleBoth : doubleH;
@@ -422,7 +419,6 @@ namespace Terminal.Gui {
 			return cell;
 		}
 
-
 		private IntersectionRuneType GetRuneTypeForIntersects (IntersectionDefinition [] intersects)
 		{
 			var set = new HashSet<IntersectionType> (intersects.Select (i => i.Type));
@@ -451,7 +447,6 @@ namespace Terminal.Gui {
 				return IntersectionRuneType.Crosshair;
 			}
 
-
 			if (Has (set,
 				IntersectionType.StartLeft,
 				IntersectionType.StartRight,
@@ -460,7 +455,6 @@ namespace Terminal.Gui {
 				return IntersectionRuneType.Crosshair;
 			}
 			#endregion
-
 
 			#region Corner Conditions
 			if (Exactly (set,
@@ -513,7 +507,6 @@ namespace Terminal.Gui {
 				return IntersectionRuneType.BottomTee;
 			}
 
-
 			if (Has (set,
 				IntersectionType.PassOverVertical,
 				IntersectionType.StartRight)) {
@@ -525,7 +518,6 @@ namespace Terminal.Gui {
 				IntersectionType.StartUp)) {
 				return IntersectionRuneType.LeftTee;
 			}
-
 
 			if (Has (set,
 				IntersectionType.PassOverVertical,

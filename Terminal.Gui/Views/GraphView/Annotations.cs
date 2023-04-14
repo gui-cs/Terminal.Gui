@@ -31,7 +31,6 @@ namespace Terminal.Gui {
 		void Render (GraphView graph);
 	}
 
-
 	/// <summary>
 	/// Displays text at a given position (in screen space or graph space)
 	/// </summary>
@@ -199,7 +198,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-
 		/// <summary>
 		/// Adds an entry into the legend.  Duplicate entries are permissable
 		/// </summary>
@@ -237,7 +235,6 @@ namespace Terminal.Gui {
 		/// True to add line before plotting series.  Defaults to false
 		/// </summary>
 		public bool BeforeSeries { get; set; }
-
 
 		/// <summary>
 		/// Draws lines connecting each of the <see cref="Points"/>

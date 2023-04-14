@@ -171,7 +171,6 @@ else 					Assert.Equal ($"w{index}", top.Id);
 			Assert.Equal ("w1", tops [^1].Id);
 		}
 
-
 		private Stack<Toplevel> CreateToplevels ()
 		{
 			var toplevels = new Stack<Toplevel> ();

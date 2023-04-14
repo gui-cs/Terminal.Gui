@@ -81,7 +81,6 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (6, second.Frame.X);
 		}
 
-
 		[Fact]
 		public void LayoutSubviews_ViewThatRefsSubView_Throws ()
 		{
@@ -1518,7 +1517,6 @@ Y
 			Assert.Equal (6, testView.Frame.Y);
 		}
 
-
 		[Theory, AutoInitShutdown]
 		[InlineData (1)]
 		[InlineData (2)]
@@ -1548,7 +1546,6 @@ Y
 
 			var rs = Application.Begin (win);
 			bool firstIteration = false;
-
 
 
 			((FakeDriver)Application.Driver).SetBufferSize (20, height);
@@ -1686,7 +1683,6 @@ Y
 
 			var rs = Application.Begin (win);
 			bool firstIteration = false;
-
 
 
 			((FakeDriver)Application.Driver).SetBufferSize (width, 7);
@@ -1859,7 +1855,6 @@ Y
 
 			Application.End (rs);
 		}
-
 
 		[Fact]
 		public void Draw_Vertical_Throws_IndexOutOfRangeException_With_Negative_Bounds ()

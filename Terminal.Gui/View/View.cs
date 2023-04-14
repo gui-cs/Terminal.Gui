@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using NStack;
 
-
 namespace Terminal.Gui {
-
 	/// <summary>
 	/// View is the base class for all views on the screen and represents a visible element that can render itself and 
 	/// contains zero or more nested views, called SubViews.
@@ -376,7 +372,7 @@ namespace Terminal.Gui {
 		/// Gets or sets a value indicating whether this <see cref="View"/> want continuous button pressed event.
 		/// </summary>
 		public virtual bool WantContinuousButtonPressed { get; set; }
-		
+
 		ustring _title = ustring.Empty;
 
 		/// <summary>
@@ -568,7 +564,7 @@ namespace Terminal.Gui {
 
 			LayoutFrames ();
 		}
-		
+
 		internal bool _addingView;
 
 		/// <summary>
@@ -609,7 +605,6 @@ namespace Terminal.Gui {
 			}
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
-
 
 			OnAdded (new SuperViewChangedEventArgs (this, view));
 			if (IsInitialized && !view.IsInitialized) {
@@ -752,7 +747,7 @@ namespace Terminal.Gui {
 				}
 			});
 		}
-		
+
 		/// <summary>
 		///   Positions the cursor in the right position based on the currently focused view in the chain.
 		/// </summary>
@@ -1009,7 +1004,6 @@ namespace Terminal.Gui {
 
 			return toReturn;
 		}
-
 
 		/// <summary>
 		/// <para>Adds a new key combination that will trigger the given <paramref name="command"/>
@@ -1402,7 +1396,7 @@ namespace Terminal.Gui {
 
 			return view._focused != null ? GetMostFocused (view._focused) : view;
 		}
-		
+
 		/// <summary>
 		/// Get or sets if  the <see cref="View"/> has been initialized (via <see cref="ISupportInitialize.BeginInit"/> 
 		/// and <see cref="ISupportInitialize.EndInit"/>).
@@ -1501,7 +1495,6 @@ namespace Terminal.Gui {
 				HotKey = hk;
 			}
 		}
-		
 
 		/// <inheritdoc/>
 		public override bool OnMouseEnter (MouseEvent mouseEvent)
@@ -1686,7 +1679,7 @@ namespace Terminal.Gui {
 
 			return true;
 		}
-		
+
 		/// <summary>
 		/// Get the top superview of a given <see cref="View"/>.
 		/// </summary>

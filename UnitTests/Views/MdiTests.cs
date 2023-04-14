@@ -19,7 +19,6 @@ namespace Terminal.Gui.ViewsTests {
 #endif
 		}
 
-
 		[Fact]
 		public void Dispose_Toplevel_IsMdiContainer_False_With_Begin_End ()
 		{

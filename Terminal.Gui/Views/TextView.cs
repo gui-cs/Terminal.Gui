@@ -2705,7 +2705,6 @@ namespace Terminal.Gui {
 			Clipboard.Contents += text;
 		}
 
-
 		/// <summary>
 		/// Inserts the given <paramref name="toAdd"/> text at the current cursor position
 		/// exactly as if the user had just typed it
@@ -2723,7 +2722,6 @@ namespace Terminal.Gui {
 
 					throw new ArgumentException ($"Cannot insert character '{ch}' because it does not map to a Key");
 				}
-
 
 				InsertText (new KeyEvent () { Key = key });
 			}
@@ -4476,7 +4474,6 @@ namespace Terminal.Gui {
 			historyText?.Clear (Text);
 		}
 	}
-
 
 	/// <summary>
 	/// Renders an overlay on another view at a given point that allows selecting

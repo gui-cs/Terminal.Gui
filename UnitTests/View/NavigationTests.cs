@@ -621,7 +621,6 @@ namespace Terminal.Gui.ViewTests {
 			Application.Shutdown ();
 		}
 
-
 		[Fact]
 		public void Navigation_With_Null_Focused_View ()
 		{
@@ -728,7 +727,6 @@ namespace Terminal.Gui.ViewTests {
 
 			Assert.Equal (1, iterations);
 		}
-
 
 		[Fact]
 		[AutoInitShutdown]

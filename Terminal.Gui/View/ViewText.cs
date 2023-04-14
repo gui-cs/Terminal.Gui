@@ -1,6 +1,5 @@
-﻿using System;
-using System.Linq;
-using NStack;
+﻿using NStack;
+using System;
 
 namespace Terminal.Gui {
 
@@ -53,7 +52,6 @@ namespace Terminal.Gui {
 		{
 			HotKeyChanged?.Invoke (this, e);
 		}
-
 
 		/// <summary>
 		/// Can be overridden if the <see cref="Terminal.Gui.TextFormatter.Text"/> has
@@ -142,7 +140,6 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 		}
 
-
 		/// <summary>
 		/// Gets the width or height of the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> characters 
 		/// in the <see cref="Text"/> property.
@@ -194,7 +191,6 @@ namespace Terminal.Gui {
 			return new Size (_frame.Size.Width + GetHotKeySpecifierLength (),
 					 _frame.Size.Height + GetHotKeySpecifierLength (false));
 		}
-
 
 	}
 }
