@@ -5,7 +5,7 @@ using System.Linq;
 using NStack;
 
 namespace Terminal.Gui {
-	public partial class View : Responder, ISupportInitializeNotification {
+	public partial class View  {
 		/// <summary>
 		/// Event fired when the view receives the mouse event for the first time.
 		/// </summary>
@@ -110,6 +110,5 @@ namespace Terminal.Gui {
 		/// Gets or sets a value indicating whether this <see cref="View"/> want continuous button pressed event.
 		/// </summary>
 		public virtual bool WantContinuousButtonPressed { get; set; }
-
 	}
 }

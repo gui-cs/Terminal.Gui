@@ -3,25 +3,6 @@ using System.Linq;
 using NStack;
 
 namespace Terminal.Gui {
-	/// <remarks>
-	/// <para>
-	///    Views have a <see cref="ColorScheme"/> property that defines the default colors that subviews
-	///    should use for rendering. This ensures that the views fit in the context where
-	///    they are being used, and allows for themes to be plugged in. For example, the
-	///    default colors for windows and toplevels uses a blue background, while it uses
-	///    a white background for dialog boxes and a red background for errors.
-	/// </para>
-	/// <para>
-	///    Subclasses should not rely on <see cref="ColorScheme"/> being
-	///    set at construction time. If a <see cref="ColorScheme"/> is not set on a view, the view will inherit the
-	///    value from its <see cref="SuperView"/> and the value might only be valid once a view has been
-	///    added to a SuperView. 
-	/// </para>
-	/// <para>
-	///    By using  <see cref="ColorScheme"/> applications will work both
-	///    in color as well as black and white displays.
-	/// </para>
-	/// </remarks>
 	public partial class View {
 
 		ColorScheme _colorScheme;

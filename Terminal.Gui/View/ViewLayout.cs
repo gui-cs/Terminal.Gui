@@ -26,59 +26,7 @@ namespace Terminal.Gui {
 		Computed
 	}
 
-	/// <summary>
-	/// View is the base class for all views on the screen and represents a visible element that can render itself and 
-	/// contains zero or more nested views, called SubViews.
-	/// </summary>
-	/// <remarks>
-	/// <para>
-	///    The View defines the base functionality for user interface elements in Terminal.Gui. Views
-	///    can contain one or more subviews, can respond to user input and render themselves on the screen.
-	/// </para>
-	/// <para>
-	///    Views supports two layout styles: <see cref="LayoutStyle.Absolute"/> or <see cref="LayoutStyle.Computed"/>. 
-	///    The choice as to which layout style is used by the View 
-	///    is determined when the View is initialized. To create a View using Absolute layout, call a constructor that takes a
-	///    Rect parameter to specify the absolute position and size (the View.<see cref="View.Frame "/>). To create a View 
-	///    using Computed layout use a constructor that does not take a Rect parameter and set the X, Y, Width and Height 
-	///    properties on the view. Both approaches use coordinates that are relative to the container they are being added to. 
-	/// </para>
-	/// <para>
-	///    To switch between Absolute and Computed layout, use the <see cref="LayoutStyle"/> property. 
-	/// </para>
-	/// <para>
-	///    Computed layout is more flexible and supports dynamic console apps where controls adjust layout
-	///    as the terminal resizes or other Views change size or position. The X, Y, Width and Height 
-	///    properties are Dim and Pos objects that dynamically update the position of a view.
-	///    The X and Y properties are of type <see cref="Pos"/>
-	///    and you can use either absolute positions, percentages or anchor
-	///    points. The Width and Height properties are of type
-	///    <see cref="Dim"/> and can use absolute position,
-	///    percentages and anchors. These are useful as they will take
-	///    care of repositioning views when view's frames are resized or
-	///    if the terminal size changes.
-	/// </para>
-	/// <para>
-	///    Absolute layout requires specifying coordinates and sizes of Views explicitly, and the
-	///    View will typically stay in a fixed position and size. To change the position and size use the
-	///    <see cref="Frame"/> property.
-	/// </para>
-	/// <para>
-	///    Subviews (child views) can be added to a View by calling the <see cref="Add(View)"/> method. 
-	///    The container of a View can be accessed with the <see cref="SuperView"/> property.
-	/// </para>
-	/// <para>
-	///    To flag a region of the View's <see cref="Bounds"/> to be redrawn call <see cref="SetNeedsDisplay(Rect)"/>. 
-	///    To flag the entire view for redraw call <see cref="SetNeedsDisplay()"/>.
-	/// </para>
-	/// <para>
-	///    The <see cref="LayoutSubviews"/> method is invoked when the size or layout of a view has
-	///    changed. The default processing system will keep the size and dimensions
-	///    for views that use the <see cref="LayoutStyle.Absolute"/>, and will recompute the
-	///    frames for the vies that use <see cref="LayoutStyle.Computed"/>.
-	/// </para>
-	/// </remarks>
-	public partial class View : Responder, ISupportInitializeNotification {
+	public partial class View {
 
 		// The frame for the object. Superview relative.
 		Rect _frame;

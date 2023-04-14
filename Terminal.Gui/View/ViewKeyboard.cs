@@ -5,7 +5,7 @@ using System.Linq;
 using NStack;
 
 namespace Terminal.Gui {
-	public partial class View : Responder, ISupportInitializeNotification {
+	public partial class View  {
 		ShortcutHelper _shortcutHelper;
 
 		/// <summary>
