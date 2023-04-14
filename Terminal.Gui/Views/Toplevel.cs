@@ -649,7 +649,7 @@ namespace Terminal.Gui {
 			}
 
 			// BUGBUG: v2 hack for now
-			var mfLength = top.BorderFrame.Thickness.Top > 0 ? 2 : 1;
+			var mfLength = top.Border?.Thickness.Top > 0 ? 2 : 1;
 			if (top.Frame.Width <= maxWidth) {
 				nx = Math.Max (targetX, 0);
 				nx = nx + top.Frame.Width > maxWidth ? Math.Max (maxWidth - top.Frame.Width, 0) : nx;
@@ -765,7 +765,8 @@ namespace Terminal.Gui {
 			}
 
 			if (!_needsDisplay.IsEmpty || _childNeedsDisplay || LayoutNeeded) {
-				Driver.SetAttribute (Enabled ? Colors.Base.Normal : Colors.Base.Disabled);
+				Driver.SetAttribute (GetNormalColor ());
+				Clear (ViewToScreen (bounds));
 				LayoutSubviews ();
 				PositionToplevels ();
 
@@ -776,6 +777,7 @@ namespace Terminal.Gui {
 								top.SetNeedsLayout ();
 								top.SetNeedsDisplay (top.Bounds);
 								top.Redraw (top.Bounds);
+								top.OnRenderLineCanvas ();
 							}
 						}
 					}
@@ -787,8 +789,13 @@ namespace Terminal.Gui {
 						view.SetNeedsDisplay (view.Bounds);
 					}
 				}
+				base.Redraw (Bounds);
+
+				if (this.MenuBar != null && this.MenuBar.IsMenuOpen && this.MenuBar.openMenu != null) {
+					// TODO: Hack until we can get compositing working right.
+					this.MenuBar.openMenu.Redraw (this.MenuBar.openMenu.Bounds);
+				}
 			}
-			base.Redraw (Bounds);
 		}
 
 		bool OutsideTopFrame (Toplevel top)

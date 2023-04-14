@@ -81,7 +81,7 @@ namespace UICatalog.Scenarios {
 				Driver.SetAttribute (new Terminal.Gui.Attribute (Color.DarkGray, ColorScheme.Normal.Background));
 				
 				
-				foreach(var p in grid.GenerateImage(bounds))
+				foreach(var p in grid.GetMap(bounds))
 				{
 					this.AddRune(p.Key.X,p.Key.Y,p.Value);
 				}
@@ -207,7 +207,7 @@ namespace UICatalog.Scenarios {
 
 					var canvas = canvases [kvp.Value];
 
-					foreach(var p in canvas.GenerateImage(bounds))
+					foreach(var p in canvas.GetMap(bounds))
 					{
 						this.AddRune(p.Key.X,p.Key.Y,p.Value);
 					}

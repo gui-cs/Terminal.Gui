@@ -558,7 +558,6 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.Equal (Application.Top, rs.Toplevel);
 			Assert.Null (Application.MouseGrabView);  // public
 			Assert.Null (Application.WantContinuousButtonPressedView); // public
-			Assert.False (Application._debugDrawBounds);
 			Assert.False (Application.ShowChild (Application.Top));
 		}
 

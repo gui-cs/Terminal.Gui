@@ -189,13 +189,13 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (GetNormalColor ());
 
 			if (Style.ShowBorder) {
-
+				
 				// How much space do we need to leave at the bottom to show the tabs
 				int spaceAtBottom = Math.Max (0, GetTabHeight (false) - 1);
 				int startAtY = Math.Max (0, GetTabHeight (true) - 1);
 
-				DrawFrame (new Rect (0, startAtY, bounds.Width,
-				Math.Max (bounds.Height - spaceAtBottom - startAtY, 0)), 0, true);
+				Border.DrawFrame (new Rect (0, startAtY, bounds.Width,
+				Math.Max (bounds.Height - spaceAtBottom - startAtY, 0)), false);
 			}
 
 			if (Tabs.Any ()) {

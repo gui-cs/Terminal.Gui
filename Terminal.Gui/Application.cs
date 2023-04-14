@@ -999,7 +999,8 @@ namespace Terminal.Gui {
 			if (refreshDriver) {
 				MdiTop?.OnChildLoaded (toplevel);
 				toplevel.OnLoaded ();
-				Redraw (toplevel);
+				toplevel.SetNeedsDisplay ();
+				toplevel.Redraw (toplevel.Bounds);
 				toplevel.PositionCursor ();
 				Driver.Refresh ();
 			}
@@ -1118,13 +1119,6 @@ namespace Terminal.Gui {
 			SynchronizationContext.SetSynchronizationContext (syncContext: null);
 		}
 
-
-		static void Redraw (View view)
-		{
-			view.Redraw (view.Bounds);
-			Driver.Refresh ();
-		}
-
 		/// <summary>
 		/// Triggers a refresh of the entire display.
 		/// </summary>
@@ -1229,9 +1223,11 @@ namespace Terminal.Gui {
 			if (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._childNeedsDisplay || state.Toplevel.LayoutNeeded
 				|| MdiChildNeedsDisplay ()) {
 				state.Toplevel.Redraw (state.Toplevel.Bounds);
-				if (_debugDrawBounds) {
-					DrawBounds (state.Toplevel);
-				}
+				//if (state.Toplevel.SuperView != null) {
+				//	state.Toplevel.SuperView?.OnRenderLineCanvas ();
+				//} else {
+				//	state.Toplevel.OnRenderLineCanvas ();
+				//}
 				state.Toplevel.PositionCursor ();
 				Driver.Refresh ();
 			} else {
@@ -1273,17 +1269,6 @@ namespace Terminal.Gui {
 				}
 			}
 			return false;
-		}
-
-		internal static bool _debugDrawBounds = false;
-
-		// Need to look into why this does not work properly.
-		static void DrawBounds (View v)
-		{
-			v.DrawFrame (v.Frame, padding: 0, fill: false);
-			if (v.InternalSubviews != null && v.InternalSubviews.Count > 0)
-				foreach (var sub in v.InternalSubviews)
-					DrawBounds (sub);
 		}
 
 		/// <summary>
