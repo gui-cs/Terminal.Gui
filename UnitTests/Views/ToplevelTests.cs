@@ -325,14 +325,14 @@ namespace Terminal.Gui.ViewsTests {
 			top.PositionToplevels ();
 			Assert.Equal (new Rect (0, 1, 60, 15), win.Frame);
 
-			Assert.Null (Toplevel.dragPosition);
+			Assert.Null (Toplevel._dragPosition);
 			win.MouseEvent (new MouseEvent () { X = 6, Y = 0, Flags = MouseFlags.Button1Pressed });
-			Assert.Equal (new Point (6, 0), Toplevel.dragPosition);
+			Assert.Equal (new Point (6, 0), Toplevel._dragPosition);
 			win.MouseEvent (new MouseEvent () { X = 6, Y = 0, Flags = MouseFlags.Button1Released });
-			Assert.Null (Toplevel.dragPosition);
+			Assert.Null (Toplevel._dragPosition);
 			win.CanFocus = false;
 			win.MouseEvent (new MouseEvent () { X = 6, Y = 0, Flags = MouseFlags.Button1Pressed });
-			Assert.Null (Toplevel.dragPosition);
+			Assert.Null (Toplevel._dragPosition);
 		}
 
 		[Fact]

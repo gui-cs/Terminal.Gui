@@ -267,11 +267,11 @@ namespace Terminal.Gui {
 			// Shutdown is the bookend for Init. As such it needs to clean up all resources
 			// Init created. Apps that do any threading will need to code defensively for this.
 			// e.g. see Issue #537
-			foreach (var t in _Toplevels) {
+			foreach (var t in _toplevels) {
 				t.Running = false;
 				t.Dispose ();
 			}
-			_Toplevels.Clear ();
+			_toplevels.Clear ();
 			Current = null;
 			Top?.Dispose ();
 			Top = null;
@@ -291,7 +291,7 @@ namespace Terminal.Gui {
 			_initialized = false;
 			_mouseGrabView = null;
 			_enableConsoleScrolling = false;
-			lastMouseOwnerView = null;
+			_lastMouseOwnerView = null;
 
 			// Reset synchronization context to allow the user to run async/await,
 			// as the main loop has been ended, the synchronization context from 
@@ -429,34 +429,34 @@ namespace Terminal.Gui {
 				Toplevel.EndInit ();
 			}
 
-			lock (_Toplevels) {
+			lock (_toplevels) {
 				// If Top was already initialized with Init, and Begin has never been called
 				// Top was not added to the Toplevels Stack. It will thus never get disposed.
 				// Clean it up here:
-				if (Top != null && Toplevel != Top && !_Toplevels.Contains (Top)) {
+				if (Top != null && Toplevel != Top && !_toplevels.Contains (Top)) {
 					Top.Dispose ();
 					Top = null;
-				} else if (Top != null && Toplevel != Top && _Toplevels.Contains (Top)) {
+				} else if (Top != null && Toplevel != Top && _toplevels.Contains (Top)) {
 					Top.OnLeave (Toplevel);
 				}
 				if (string.IsNullOrEmpty (Toplevel.Id.ToString ())) {
 					var count = 1;
-					var id = (_Toplevels.Count + count).ToString ();
-					while (_Toplevels.Count > 0 && _Toplevels.FirstOrDefault (x => x.Id.ToString () == id) != null) {
+					var id = (_toplevels.Count + count).ToString ();
+					while (_toplevels.Count > 0 && _toplevels.FirstOrDefault (x => x.Id.ToString () == id) != null) {
 						count++;
-						id = (_Toplevels.Count + count).ToString ();
+						id = (_toplevels.Count + count).ToString ();
 					}
-					Toplevel.Id = (_Toplevels.Count + count).ToString ();
+					Toplevel.Id = (_toplevels.Count + count).ToString ();
 
-					_Toplevels.Push (Toplevel);
+					_toplevels.Push (Toplevel);
 				} else {
-					var dup = _Toplevels.FirstOrDefault (x => x.Id.ToString () == Toplevel.Id);
+					var dup = _toplevels.FirstOrDefault (x => x.Id.ToString () == Toplevel.Id);
 					if (dup == null) {
-						_Toplevels.Push (Toplevel);
+						_toplevels.Push (Toplevel);
 					}
 				}
 
-				if (_Toplevels.FindDuplicates (new ToplevelEqualityComparer ()).Count > 0) {
+				if (_toplevels.FindDuplicates (new ToplevelEqualityComparer ()).Count > 0) {
 					throw new ArgumentException ("There are duplicates Toplevels Id's");
 				}
 			}
@@ -474,7 +474,7 @@ namespace Terminal.Gui {
 				} else {
 					refreshDriver = false;
 				}
-			} else if ((OverlappedTop != null && Toplevel != OverlappedTop && Current?.Modal == true && !_Toplevels.Peek ().Modal)
+			} else if ((OverlappedTop != null && Toplevel != OverlappedTop && Current?.Modal == true && !_toplevels.Peek ().Modal)
 				|| (OverlappedTop != null && Toplevel != OverlappedTop && Current?.Running == false)) {
 				refreshDriver = false;
 				MoveCurrent (Toplevel);
@@ -489,7 +489,7 @@ namespace Terminal.Gui {
 			}
 			Toplevel.LayoutSubviews ();
 			Toplevel.PositionToplevels ();
-			Toplevel.WillPresent ();
+			Toplevel.FocusFirst ();
 			if (refreshDriver) {
 				OverlappedTop?.OnChildLoaded (Toplevel);
 				Toplevel.OnLoaded ();
@@ -627,7 +627,7 @@ namespace Terminal.Gui {
 		{
 			Driver.UpdateOffScreen ();
 			View last = null;
-			foreach (var v in _Toplevels.Reverse ()) {
+			foreach (var v in _toplevels.Reverse ()) {
 				if (v.Visible) {
 					v.SetNeedsDisplay ();
 					v.Redraw (v.Bounds);
@@ -766,14 +766,14 @@ namespace Terminal.Gui {
 				&& (!Top._needsDisplay.IsEmpty || Top._childNeedsDisplay || Top.LayoutNeeded)) {
 				state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
 				Top.Redraw (Top.Bounds);
-				foreach (var top in _Toplevels.Reverse ()) {
+				foreach (var top in _toplevels.Reverse ()) {
 					if (top != Top && top != state.Toplevel) {
 						top.SetNeedsDisplay ();
 						top.Redraw (top.Bounds);
 					}
 				}
 			}
-			if (_Toplevels.Count == 1 && state.Toplevel == Top
+			if (_toplevels.Count == 1 && state.Toplevel == Top
 				&& (Driver.Cols != state.Toplevel.Frame.Width || Driver.Rows != state.Toplevel.Frame.Height)
 				&& (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._childNeedsDisplay || state.Toplevel.LayoutNeeded)) {
 
@@ -852,7 +852,7 @@ namespace Terminal.Gui {
 			} else if ((OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Modal == false
 				&& Current?.Running == true && !top.Running)
 				|| (OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Modal == false
-				&& Current?.Running == false && !top.Running && _Toplevels.ToArray () [1].Running)) {
+				&& Current?.Running == false && !top.Running && _toplevels.ToArray () [1].Running)) {
 
 				MoveCurrent (top);
 			} else if (OverlappedTop != null && Current != top && Current?.Running == true && !top.Running
@@ -910,13 +910,13 @@ namespace Terminal.Gui {
 
 			// End the RunState.Toplevel 
 			// First, take it off the Toplevel Stack
-			if (_Toplevels.Count > 0) {
-				if (_Toplevels.Peek () != runState.Toplevel) {
+			if (_toplevels.Count > 0) {
+				if (_toplevels.Peek () != runState.Toplevel) {
 					// If there the top of the stack is not the RunState.Toplevel then
 					// this call to End is not balanced with the call to Begin that started the RunState
 					throw new ArgumentException ("End must be balanced with calls to Begin");
 				}
-				_Toplevels.Pop ();
+				_toplevels.Pop ();
 			}
 
 			// Notify that it is closing
@@ -929,11 +929,11 @@ namespace Terminal.Gui {
 			}
 
 			// Set Current and Top to the next TopLevel on the stack
-			if (_Toplevels.Count == 0) {
+			if (_toplevels.Count == 0) {
 				Current = null;
 			} else {
-				Current = _Toplevels.Peek ();
-				if (_Toplevels.Count == 1 && Current == OverlappedTop) {
+				Current = _toplevels.Peek ();
+				if (_toplevels.Count == 1 && Current == OverlappedTop) {
 					OverlappedTop.OnAllChildClosed ();
 				} else {
 					SetCurrentOverlappedAsTop ();
@@ -950,7 +950,7 @@ namespace Terminal.Gui {
 		#endregion Run (Begin, Run, End)
 
 		#region Toplevel handling
-		static readonly Stack<Toplevel> _Toplevels = new Stack<Toplevel> ();
+		static readonly Stack<Toplevel> _toplevels = new Stack<Toplevel> ();
 
 		/// <summary>
 		/// The <see cref="Toplevel"/> object used for the application on startup (<seealso cref="Application.Top"/>)
@@ -967,11 +967,11 @@ namespace Terminal.Gui {
 
 		static void EnsureModalOrVisibleAlwaysOnTop (Toplevel Toplevel)
 		{
-			if (!Toplevel.Running || (Toplevel == Current && Toplevel.Visible) || OverlappedTop == null || _Toplevels.Peek ().Modal) {
+			if (!Toplevel.Running || (Toplevel == Current && Toplevel.Visible) || OverlappedTop == null || _toplevels.Peek ().Modal) {
 				return;
 			}
 
-			foreach (var top in _Toplevels.Reverse ()) {
+			foreach (var top in _toplevels.Reverse ()) {
 				if (top.Modal && top != Current) {
 					MoveCurrent (top);
 					return;
@@ -992,12 +992,12 @@ namespace Terminal.Gui {
 				return null;
 			}
 
-			if (_Toplevels != null) {
-				int count = _Toplevels.Count;
+			if (_toplevels != null) {
+				int count = _toplevels.Count;
 				if (count > 0) {
 					var rx = x - startFrame.X;
 					var ry = y - startFrame.Y;
-					foreach (var t in _Toplevels) {
+					foreach (var t in _toplevels) {
 						if (t != Current) {
 							if (t != start && t.Visible && t.Frame.Contains (rx, ry)) {
 								start = t;
@@ -1028,16 +1028,16 @@ namespace Terminal.Gui {
 		{
 			// The Current is modal and the top is not modal Toplevel then
 			// the Current must be moved above the first not modal Toplevel.
-			if (OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Modal == true && !_Toplevels.Peek ().Modal) {
-				lock (_Toplevels) {
-					_Toplevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
+			if (OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Modal == true && !_toplevels.Peek ().Modal) {
+				lock (_toplevels) {
+					_toplevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
 				}
 				var index = 0;
-				var savedToplevels = _Toplevels.ToArray ();
+				var savedToplevels = _toplevels.ToArray ();
 				foreach (var t in savedToplevels) {
 					if (!t.Modal && t != Current && t != top && t != savedToplevels [index]) {
-						lock (_Toplevels) {
-							_Toplevels.MoveTo (top, index, new ToplevelEqualityComparer ());
+						lock (_toplevels) {
+							_toplevels.MoveTo (top, index, new ToplevelEqualityComparer ());
 						}
 					}
 					index++;
@@ -1047,26 +1047,26 @@ namespace Terminal.Gui {
 			// The Current and the top are both not running Toplevel then
 			// the top must be moved above the first not running Toplevel.
 			if (OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Running == false && !top.Running) {
-				lock (_Toplevels) {
-					_Toplevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
+				lock (_toplevels) {
+					_toplevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
 				}
 				var index = 0;
-				foreach (var t in _Toplevels.ToArray ()) {
+				foreach (var t in _toplevels.ToArray ()) {
 					if (!t.Running && t != Current && index > 0) {
-						lock (_Toplevels) {
-							_Toplevels.MoveTo (top, index - 1, new ToplevelEqualityComparer ());
+						lock (_toplevels) {
+							_toplevels.MoveTo (top, index - 1, new ToplevelEqualityComparer ());
 						}
 					}
 					index++;
 				}
 				return false;
 			}
-			if ((OverlappedTop != null && top?.Modal == true && _Toplevels.Peek () != top)
+			if ((OverlappedTop != null && top?.Modal == true && _toplevels.Peek () != top)
 				|| (OverlappedTop != null && Current != OverlappedTop && Current?.Modal == false && top == OverlappedTop)
 				|| (OverlappedTop != null && Current?.Modal == false && top != Current)
 				|| (OverlappedTop != null && Current?.Modal == true && top == OverlappedTop)) {
-				lock (_Toplevels) {
-					_Toplevels.MoveTo (top, 0, new ToplevelEqualityComparer ());
+				lock (_toplevels) {
+					_toplevels.MoveTo (top, 0, new ToplevelEqualityComparer ());
 					Current = top;
 				}
 			}
@@ -1083,7 +1083,7 @@ namespace Terminal.Gui {
 			var full = new Rect (0, 0, Driver.Cols, Driver.Rows);
 			TerminalResized?.Invoke (new ResizedEventArgs () { Cols = full.Width, Rows = full.Height });
 			Driver.Clip = full;
-			foreach (var t in _Toplevels) {
+			foreach (var t in _toplevels) {
 				t.SetRelativeLayout (full);
 				t.LayoutSubviews ();
 				t.PositionToplevels ();
@@ -1199,7 +1199,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static Action<MouseEvent> RootMouseEvent;
 
-		static View lastMouseOwnerView;
+		static View _lastMouseOwnerView;
 
 		static void ProcessMouseEvent (MouseEvent me)
 		{
@@ -1239,7 +1239,7 @@ namespace Terminal.Gui {
 					View = view
 				};
 				if (OutsideFrame (new Point (nme.X, nme.Y), _mouseGrabView.Frame)) {
-					lastMouseOwnerView?.OnMouseLeave (me);
+					_lastMouseOwnerView?.OnMouseLeave (me);
 				}
 				//System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
 				if (_mouseGrabView?.OnMouseEvent (nme) == true) {
@@ -1268,13 +1268,13 @@ namespace Terminal.Gui {
 					View = view
 				};
 
-				if (lastMouseOwnerView == null) {
-					lastMouseOwnerView = view;
+				if (_lastMouseOwnerView == null) {
+					_lastMouseOwnerView = view;
 					view.OnMouseEnter (nme);
-				} else if (lastMouseOwnerView != view) {
-					lastMouseOwnerView.OnMouseLeave (nme);
+				} else if (_lastMouseOwnerView != view) {
+					_lastMouseOwnerView.OnMouseLeave (nme);
 					view.OnMouseEnter (nme);
-					lastMouseOwnerView = view;
+					_lastMouseOwnerView = view;
 				}
 
 				if (!view.WantMousePositionReports && me.Flags == MouseFlags.ReportMousePosition)
@@ -1315,7 +1315,7 @@ namespace Terminal.Gui {
 
 		static void OnAlternateForwardKeyChanged (KeyChangedEventArgs e)
 		{
-			foreach (var top in _Toplevels.ToArray ()) {
+			foreach (var top in _toplevels.ToArray ()) {
 				top.OnAlternateForwardKeyChanged (e);
 			}
 		}
@@ -1339,7 +1339,7 @@ namespace Terminal.Gui {
 
 		static void OnAlternateBackwardKeyChanged (KeyChangedEventArgs oldKey)
 		{
-			foreach (var top in _Toplevels.ToArray ()) {
+			foreach (var top in _toplevels.ToArray ()) {
 				top.OnAlternateBackwardKeyChanged (oldKey);
 			}
 		}
@@ -1363,7 +1363,7 @@ namespace Terminal.Gui {
 		static void OnQuitKeyChanged (KeyChangedEventArgs e)
 		{
 			// Duplicate the list so if it changes during enumeration we're safe
-			foreach (var top in _Toplevels.ToArray ()) {
+			foreach (var top in _toplevels.ToArray ()) {
 				top.OnQuitKeyChanged (e);
 			}
 		}
@@ -1374,7 +1374,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var chain = _Toplevels.ToList ();
+			var chain = _toplevels.ToList ();
 			foreach (var topLevel in chain) {
 				if (topLevel.ProcessHotKey (ke))
 					return;
@@ -1400,7 +1400,7 @@ namespace Terminal.Gui {
 
 		static void ProcessKeyDownEvent (KeyEvent ke)
 		{
-			var chain = _Toplevels.ToList ();
+			var chain = _toplevels.ToList ();
 			foreach (var topLevel in chain) {
 				if (topLevel.OnKeyDown (ke))
 					return;
@@ -1411,7 +1411,7 @@ namespace Terminal.Gui {
 
 		static void ProcessKeyUpEvent (KeyEvent ke)
 		{
-			var chain = _Toplevels.ToList ();
+			var chain = _toplevels.ToList ();
 			foreach (var topLevel in chain) {
 				if (topLevel.OnKeyUp (ke))
 					return;

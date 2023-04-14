@@ -807,7 +807,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.True (win2.HasFocus);
 			Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 			win2.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Released });
-			Assert.Null (Toplevel.dragPosition);
+			Assert.Null (Toplevel._dragPosition);
 		}
 
 		[Fact]
@@ -859,7 +859,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.True (win2.HasFocus);
 			Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 			win2.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Released });
-			Assert.Null (Toplevel.dragPosition);
+			Assert.Null (Toplevel._dragPosition);
 		}
 
 		#endregion

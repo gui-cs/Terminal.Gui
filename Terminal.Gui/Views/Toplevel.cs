@@ -252,14 +252,14 @@ namespace Terminal.Gui {
 
 		private void Application_UnGrabbingMouse (object sender, GrabMouseEventArgs e)
 		{
-			if (Application.MouseGrabView == this && dragPosition.HasValue) {
+			if (Application.MouseGrabView == this && _dragPosition.HasValue) {
 				e.Cancel = true;
 			}
 		}
 
 		private void Application_GrabbingMouse (object sender, GrabMouseEventArgs e)
 		{
-			if (Application.MouseGrabView == this && dragPosition.HasValue) {
+			if (Application.MouseGrabView == this && _dragPosition.HasValue) {
 				e.Cancel = true;
 			}
 		}
@@ -792,8 +792,8 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		internal static Point? dragPosition;
-		Point start;
+		internal static Point? _dragPosition;
+		Point _startGrabPoint;
 
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent mouseEvent)
@@ -805,7 +805,7 @@ namespace Terminal.Gui {
 			//System.Diagnostics.Debug.WriteLine ($"dragPosition before: {dragPosition.HasValue}");
 
 			int nx, ny;
-			if (!dragPosition.HasValue && (mouseEvent.Flags == MouseFlags.Button1Pressed
+			if (!_dragPosition.HasValue && (mouseEvent.Flags == MouseFlags.Button1Pressed
 				|| mouseEvent.Flags == MouseFlags.Button2Pressed
 				|| mouseEvent.Flags == MouseFlags.Button3Pressed)) {
 
@@ -814,11 +814,11 @@ namespace Terminal.Gui {
 
 				// Only start grabbing if the user clicks on the title bar.
 				if (mouseEvent.Y == 0 && mouseEvent.Flags == MouseFlags.Button1Pressed) {
-					start = new Point (mouseEvent.X, mouseEvent.Y);
-					dragPosition = new Point ();
+					_startGrabPoint = new Point (mouseEvent.X, mouseEvent.Y);
+					_dragPosition = new Point ();
 					nx = mouseEvent.X - mouseEvent.OfX;
 					ny = mouseEvent.Y - mouseEvent.OfY;
-					dragPosition = new Point (nx, ny);
+					_dragPosition = new Point (nx, ny);
 					Application.GrabMouse (this);
 				}
 
@@ -826,7 +826,7 @@ namespace Terminal.Gui {
 				return true;
 			} else if (mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) ||
 				mouseEvent.Flags == MouseFlags.Button3Pressed) {
-				if (dragPosition.HasValue) {
+				if (_dragPosition.HasValue) {
 					if (SuperView == null) {
 						// Redraw the entire app window using just our Frame. Since we are 
 						// Application.Top, and our Frame always == our Bounds (Location is always (0,0))
@@ -837,11 +837,11 @@ namespace Terminal.Gui {
 					} else {
 						SuperView.SetNeedsDisplay ();
 					}
-					GetLocationThatFits (this, mouseEvent.X + (SuperView == null ? mouseEvent.OfX - start.X : Frame.X - start.X),
-						mouseEvent.Y + (SuperView == null ? mouseEvent.OfY - start.Y : Frame.Y - start.Y),
+					GetLocationThatFits (this, mouseEvent.X + (SuperView == null ? mouseEvent.OfX - _startGrabPoint.X : Frame.X - _startGrabPoint.X),
+						mouseEvent.Y + (SuperView == null ? mouseEvent.OfY - _startGrabPoint.Y : Frame.Y - _startGrabPoint.Y),
 						out nx, out ny, out _, out _);
 
-					dragPosition = new Point (nx, ny);
+					_dragPosition = new Point (nx, ny);
 					X = nx;
 					Y = ny;
 					//System.Diagnostics.Debug.WriteLine ($"Drag: nx:{nx},ny:{ny}");
@@ -851,8 +851,8 @@ namespace Terminal.Gui {
 				}
 			}
 
-			if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released) && dragPosition.HasValue) {
-				dragPosition = null;
+			if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released) && _dragPosition.HasValue) {
+				_dragPosition = null;
 				Application.UngrabMouse ();
 			}
 
@@ -953,7 +953,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		protected override void Dispose (bool disposing)
 		{
-			dragPosition = null;
+			_dragPosition = null;
 			base.Dispose (disposing);
 		}
 	}
