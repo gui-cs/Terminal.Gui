@@ -148,8 +148,8 @@ namespace Terminal.Gui {
 			var borderBounds = new Rect (
 				screenBounds.X + Math.Max (0, Thickness.Left - 1),
 				screenBounds.Y + Math.Max (0, Thickness.Top - 1),
-				screenBounds.Width - Math.Max (0, Math.Max (0, Thickness.Left - 1) - Math.Max (0, Thickness.Right - 1)),
-				screenBounds.Height - Math.Max (0, Math.Max (0, Thickness.Top - 1) - Math.Max (0, Thickness.Bottom - 1)));
+				Math.Max (0, screenBounds.Width - Math.Max (0, Math.Max (0, Thickness.Left - 1) + Math.Max (0, Thickness.Right - 1))),
+				Math.Max (0, screenBounds.Height - Math.Max (0, Math.Max (0, Thickness.Top - 1) + Math.Max (0, Thickness.Bottom - 1))));
 
 			var topTitleLineY = borderBounds.Y;
 			var titleY = borderBounds.Y;
