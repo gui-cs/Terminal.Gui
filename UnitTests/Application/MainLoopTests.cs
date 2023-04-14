@@ -95,7 +95,7 @@ namespace Terminal.Gui.ApplicationTests {
 			};
 
 			ml.AddIdle (fn);
-			ml.MainIteration ();
+			ml.RunIteration ();
 			Assert.Equal (1, functionCalled);
 		}
 
@@ -111,7 +111,7 @@ namespace Terminal.Gui.ApplicationTests {
 			};
 
 			Assert.False (ml.RemoveIdle (fn));
-			ml.MainIteration ();
+			ml.RunIteration ();
 			Assert.Equal (0, functionCalled);
 		}
 
@@ -128,7 +128,7 @@ namespace Terminal.Gui.ApplicationTests {
 
 			ml.AddIdle (fn);
 			Assert.True (ml.RemoveIdle (fn));
-			ml.MainIteration ();
+			ml.RunIteration ();
 			Assert.Equal (0, functionCalled);
 		}
 
@@ -145,20 +145,20 @@ namespace Terminal.Gui.ApplicationTests {
 
 			ml.AddIdle (fn);
 			ml.AddIdle (fn);
-			ml.MainIteration ();
+			ml.RunIteration ();
 			Assert.Equal (2, functionCalled);
 			Assert.Equal (2, ml.IdleHandlers.Count);
 
 			functionCalled = 0;
 			Assert.True (ml.RemoveIdle (fn));
 			Assert.Single (ml.IdleHandlers);
-			ml.MainIteration ();
+			ml.RunIteration ();
 			Assert.Equal (1, functionCalled);
 
 			functionCalled = 0;
 			Assert.True (ml.RemoveIdle (fn));
 			Assert.Empty (ml.IdleHandlers);
-			ml.MainIteration ();
+			ml.RunIteration ();
 			Assert.Equal (0, functionCalled);
 			Assert.False (ml.RemoveIdle (fn));
 		}
@@ -496,7 +496,7 @@ namespace Terminal.Gui.ApplicationTests {
 
 			var actionCalled = 0;
 			ml.Invoke (() => { actionCalled++; });
-			ml.MainIteration ();
+			ml.RunIteration ();
 			Assert.Equal (1, actionCalled);
 		}
 
@@ -521,7 +521,7 @@ namespace Terminal.Gui.ApplicationTests {
 				throw new NotImplementedException ();
 			}
 
-			public void MainIteration ()
+			public void Iteration ()
 			{
 				throw new NotImplementedException ();
 			}

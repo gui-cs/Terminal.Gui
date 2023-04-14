@@ -1631,7 +1631,7 @@ namespace Terminal.Gui {
 			return ic > 0;
 		}
 
-		void IMainLoopDriver.MainIteration ()
+		void IMainLoopDriver.Iteration ()
 		{
 			while (inputResult.Count > 0) {
 				ProcessInput?.Invoke (inputResult.Dequeue ().Value);

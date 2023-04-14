@@ -478,7 +478,7 @@ Edit
 			Assert.False (menu.IsMenuOpen);
 			Assert.Equal ("Closed", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("None", GetCurrentMenuTitle ());
-			Application.MainLoop.MainIteration ();
+			Application.MainLoop.RunIteration ();
 			Assert.Equal ("New", miAction);
 
 			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
@@ -493,7 +493,7 @@ Edit
 			Assert.False (menu.IsMenuOpen);
 			Assert.Equal ("Closed", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("None", GetCurrentMenuTitle ());
-			Application.MainLoop.MainIteration ();
+			Application.MainLoop.RunIteration ();
 			Assert.Equal ("About", miAction);
 
 			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
@@ -565,7 +565,7 @@ Edit
 			Assert.False (menu.IsMenuOpen);
 			Assert.Equal ("Closed", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("None", GetCurrentMenuTitle ());
-			Application.MainLoop.MainIteration ();
+			Application.MainLoop.RunIteration ();
 			Assert.Equal ("Copy", miAction);
 
 			string GetCurrentMenuBarItemTitle ()
@@ -1083,7 +1083,7 @@ Edit
 //			Assert.Equal (new Rect (1, 0, 11, 1), pos);
 
 //			Assert.True (menu.ProcessKey (new (Key.N, null)));
-//			Application.MainLoop.MainIteration ();
+//			Application.MainLoop.RunIteration ();
 //			Assert.True (newAction);
 
 //			Assert.True (menu.ProcessHotKey (new (Key.AltMask, new KeyModifiers () { Alt = true })));
@@ -1098,7 +1098,7 @@ Edit
 
 //			Assert.True (menu.ProcessKey (new (Key.CursorRight, null)));
 //			Assert.True (menu.ProcessKey (new (Key.C, null)));
-//			Application.MainLoop.MainIteration ();
+//			Application.MainLoop.RunIteration ();
 //			Assert.True (copyAction);
 //		}
 
@@ -1255,7 +1255,7 @@ Edit
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), output);
 
 			Assert.True (Application.Top.Subviews [1].ProcessKey (new (Key.N, null)));
-			Application.MainLoop.MainIteration ();
+			Application.MainLoop.RunIteration ();
 			Assert.True (newAction);
 
 			Assert.True (menu.ProcessHotKey (new (Key.AltMask | Key.E, new KeyModifiers () { Alt = true })));
@@ -1264,7 +1264,7 @@ Edit
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (1), output);
 
 			Assert.True (Application.Top.Subviews [1].ProcessKey (new (Key.C, null)));
-			Application.MainLoop.MainIteration ();
+			Application.MainLoop.RunIteration ();
 			Assert.True (copyAction);
 		}
 
@@ -1757,7 +1757,7 @@ Edit
 			Assert.False (mi.Checked);
 			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
-			Application.MainLoop.MainIteration ();
+			Application.MainLoop.RunIteration ();
 			Assert.True (mi.Checked);
 			Assert.True (menu.MouseEvent (new MouseEvent () {
 				X = 0,
@@ -1771,13 +1771,13 @@ Edit
 				Flags = MouseFlags.Button1Clicked,
 				View = menu.openMenu
 			}));
-			Application.MainLoop.MainIteration ();
+			Application.MainLoop.RunIteration ();
 			Assert.False (mi.Checked);
 
 			mi.AllowNullChecked = true;
 			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
-			Application.MainLoop.MainIteration ();
+			Application.MainLoop.RunIteration ();
 			Assert.Null (mi.Checked);
 			Assert.True (menu.MouseEvent (new MouseEvent () {
 				X = 0,
@@ -1797,11 +1797,11 @@ Edit
 				Flags = MouseFlags.Button1Clicked,
 				View = menu.openMenu
 			}));
-			Application.MainLoop.MainIteration ();
+			Application.MainLoop.RunIteration ();
 			Assert.True (mi.Checked);
 			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
-			Application.MainLoop.MainIteration ();
+			Application.MainLoop.RunIteration ();
 			Assert.False (mi.Checked);
 			Assert.True (menu.MouseEvent (new MouseEvent () {
 				X = 0,
@@ -1815,7 +1815,7 @@ Edit
 				Flags = MouseFlags.Button1Clicked,
 				View = menu.openMenu
 			}));
-			Application.MainLoop.MainIteration ();
+			Application.MainLoop.RunIteration ();
 			Assert.Null (mi.Checked);
 
 			mi.AllowNullChecked = false;

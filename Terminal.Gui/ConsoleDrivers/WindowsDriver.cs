@@ -1979,7 +1979,7 @@ namespace Terminal.Gui {
 			return ic > 0;
 		}
 
-		void IMainLoopDriver.MainIteration ()
+		void IMainLoopDriver.Iteration ()
 		{
 			while (resultQueue.Count > 0) {
 				var inputRecords = resultQueue.Dequeue ();

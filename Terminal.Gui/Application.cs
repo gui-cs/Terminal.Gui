@@ -742,7 +742,7 @@ namespace Terminal.Gui {
 					state.Toplevel.OnReady ();
 				}
 
-				MainLoop.MainIteration ();
+				MainLoop.RunIteration ();
 				Iteration?.Invoke ();
 
 				EnsureModalOrVisibleAlwaysOnTop (state.Toplevel);

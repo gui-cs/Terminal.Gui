@@ -873,7 +873,7 @@ namespace Terminal.Gui.ViewTests {
 			tf.KeyPress -= Tf_KeyPress;
 			tfQuiting = false;
 			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
-			Application.MainLoop.MainIteration ();
+			Application.MainLoop.RunIteration ();
 			Assert.True (sbQuiting);
 			Assert.False (tfQuiting);
 			Assert.False (topQuiting);
@@ -881,7 +881,7 @@ namespace Terminal.Gui.ViewTests {
 			sb.RemoveItem (0);
 			sbQuiting = false;
 			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
-			Application.MainLoop.MainIteration ();
+			Application.MainLoop.RunIteration ();
 			Assert.False (sbQuiting);
 			Assert.False (tfQuiting);
 			Assert.True (topQuiting);
@@ -922,7 +922,7 @@ namespace Terminal.Gui.ViewTests {
 			tf.KeyPress -= Tf_KeyPress;
 			tfQuiting = false;
 			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
-			Application.MainLoop.MainIteration ();
+			Application.MainLoop.RunIteration ();
 			Assert.True (sbQuiting);
 			Assert.False (tfQuiting);
 		}
