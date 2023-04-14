@@ -799,6 +799,11 @@ namespace Terminal.Gui {
 			}
 
 			selected = top - GetFramesThickness().Top + me.Y;
+			if (selected < 0) {
+				// Out of bounds
+				return true;
+			}
+
 			if (AllowsAll ()) {
 				Source.SetMark (SelectedItem, !Source.IsMarked (SelectedItem));
 				SetNeedsDisplay ();
