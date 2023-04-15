@@ -546,7 +546,9 @@ namespace Terminal.Gui {
 				.Table
 				.Rows
 				.Cast<DataRow> ()
-				.Select ((o, idx) => style.GetRepresentation (o [0]))
+				.Select ((o, idx) => col == 0 ? 
+					RowToStats(idx).FileSystemInfo.Name :
+					style.GetRepresentation (o [0])?.TrimStart('.'))
 				.ToArray ();
 
 			collectionNavigator = new CollectionNavigator (collection);
