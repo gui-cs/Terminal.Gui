@@ -456,15 +456,14 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TableView_HideHeaders_True_ExactBounds ()
+		public void TableView_ShowHeadersFalse_AndNoHeaderLines ()
 		{
-			var tv = SetUpMiniTable ();
+			var tv = GetABCDEFTableView (out _);
+			tv.Bounds = new Rect (0, 0, 5, 5);
 
-			// the thing we are testing
-			tv.Style.HideHeaders = true;
+			tv.Style.ShowHeaders = false;
 			tv.Style.ShowHorizontalHeaderOverline = false;
-			// width exactly matches the max col widths
-			tv.Bounds = new Rect (0, 0, 5, 1);
+			tv.Style.ShowHorizontalHeaderUnderline = false;
 
 			tv.Redraw (tv.Bounds);
 
@@ -472,53 +471,69 @@ namespace Terminal.Gui.ViewsTests {
 │1│2│
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+		[Fact, AutoInitShutdown]
+		public void TableView_ShowHeadersFalse_OverlineTrue ()
+		{
+			var tv = GetABCDEFTableView (out _);
+			tv.Bounds = new Rect (0, 0, 5, 5);
 
-			// test borders without headers
-			tv.Style.ShowHorizontalHeaderUnderline = false;
+			tv.Style.ShowHeaders = false;
 			tv.Style.ShowHorizontalHeaderOverline = true;
-			// width exactly matches the max col widths
-			tv.Bounds = new Rect (0, 0, 5, 2);
-
-			tv.Redraw (tv.Bounds);
-
-			expected = @"
-┌─┬─┐
-│1│2│
-";
-			TestHelpers.AssertDriverContentsAre (expected, output);
-
-			// test underline is ignored when set to true
-			tv.Style.ShowHorizontalHeaderUnderline = true;
-			// width exactly matches the max col widths
-			tv.Bounds = new Rect (0, 0, 5, 2);
-
-			tv.Redraw (tv.Bounds);
-
-			expected = @"
-┌─┬─┐
-│1│2│
-";
-			TestHelpers.AssertDriverContentsAre (expected, output);
-
-			// test HideHeaders disabling brings back header row
-			tv.Style.HideHeaders = false;
 			tv.Style.ShowHorizontalHeaderUnderline = false;
-			// width exactly matches the max col widths
-			tv.Bounds = new Rect (0, 0, 5, 3);
 
 			tv.Redraw (tv.Bounds);
 
-			expected = @"
+			string expected = @"
 ┌─┬─┐
-│A│B│
 │1│2│
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+		[Fact, AutoInitShutdown]
+		public void TableView_ShowHeadersFalse_UnderlineTrue ()
+		{
+			var tv = GetABCDEFTableView (out _);
+			tv.Bounds = new Rect (0, 0, 5, 5);
 
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
+			tv.Style.ShowHeaders = false;
+			tv.Style.ShowHorizontalHeaderOverline = false;
+			tv.Style.ShowHorizontalHeaderUnderline = true;
+			// Horizontal scrolling option is part of the underline
+			tv.Style.ShowHorizontalScrollIndicators = true;
+
+
+			tv.Redraw (tv.Bounds);
+
+			string expected = @"
+├─┼─►
+│1│2│
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
 		}
 
+		[Fact, AutoInitShutdown]
+		public void TableView_ShowHeadersFalse_AllLines ()
+		{
+			var tv = GetABCDEFTableView (out _);
+			tv.Bounds = new Rect (0, 0, 5, 5);
+
+			tv.Style.ShowHeaders = false;
+			tv.Style.ShowHorizontalHeaderOverline = true;
+			tv.Style.ShowHorizontalHeaderUnderline = true;
+			// Horizontal scrolling option is part of the underline
+			tv.Style.ShowHorizontalScrollIndicators = true;
+
+
+			tv.Redraw (tv.Bounds);
+
+			string expected = @"
+┌─┬─┐
+├─┼─►
+│1│2│
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
 
 		[Fact, AutoInitShutdown]
 		public void TableView_ExpandLastColumn_True ()

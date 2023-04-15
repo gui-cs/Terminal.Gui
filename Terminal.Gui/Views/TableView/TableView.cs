@@ -262,14 +262,14 @@ namespace Terminal.Gui {
 					line++;
 				}
 
-				if (!Style.HideHeaders) {
+				if (Style.ShowHeaders) {
 					RenderHeaderMidline (line, columnsToRender);
 					line++;
+				}
 
-					if (Style.ShowHorizontalHeaderUnderline) {
-						RenderHeaderUnderline (line, bounds.Width, columnsToRender);
-						line++;
-					}
+				if (Style.ShowHorizontalHeaderUnderline) {
+					RenderHeaderUnderline (line, bounds.Width, columnsToRender);
+					line++;
 				}
 			}
 
@@ -318,13 +318,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private int GetHeaderHeight ()
 		{
-			if (Style.HideHeaders) {
-				if (Style.ShowHorizontalHeaderOverline)
-					return 1;
-				return 0;
-			}
-
-			int heightRequired = 1;
+			int heightRequired = Style.ShowHeaders ? 1 : 0;
 
 			if (Style.ShowHorizontalHeaderOverline)
 				heightRequired++;
@@ -1777,11 +1771,12 @@ namespace Terminal.Gui {
 		public class TableStyle {
 
 			/// <summary>
-			/// Gets or sets a flag indicating whether to suppress rendering headers of a <see cref="TableView"/>.
-			/// Defaults to false.  ShowHorizontalHeaderOverline may still be used, and AlwaysShowHeaders will
-			/// always show it.
+			/// Gets or sets a flag indicating whether to render headers of a <see cref="TableView"/>.
+			/// Defaults to <see langword="true"/>.
 			/// </summary>
-			public bool HideHeaders { get; set; } = false;
+			/// <remarks><see cref="ShowHorizontalHeaderOverline"/>, <see cref="ShowHorizontalHeaderUnderline"/> etc
+			/// may still be used even if <see cref="ShowHeaders"/> is <see langword="false"/>.</remarks>
+			public bool ShowHeaders { get; set; } = true;
 
 			/// <summary>
 			/// When scrolling down always lock the column headers in place as the first row of the table
