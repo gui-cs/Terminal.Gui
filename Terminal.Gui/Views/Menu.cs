@@ -537,7 +537,6 @@ namespace Terminal.Gui {
 
 		public override void Redraw (Rect bounds)
 		{
-		
 			if (barItems.Children == null) {
 				return;
 			}
@@ -547,6 +546,7 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (GetNormalColor ());
 
 			OnDrawFrames ();
+			OnRenderLineCanvas ();
 
 			for (int i = Bounds.Y; i < barItems.Children.Length; i++) {
 				if (i < 0)
@@ -646,7 +646,6 @@ namespace Terminal.Gui {
 			}
 			Driver.Clip = savedClip;
 
-			OnRenderLineCanvas ();
 			PositionCursor ();
 		}
 
