@@ -54,18 +54,18 @@ namespace UICatalog.Scenarios {
 			{
 				grid = new LineCanvas ();
 
-				int maxHeight = 10000;
+				grid.AddLine (new Point (0, 0), 7, Orientation.Vertical, LineStyle.Single);
+				grid.AddLine (new Point (0, 0), width + 1, Orientation.Horizontal, LineStyle.Single);
+				grid.AddLine (new Point (width, 0), 7, Orientation.Vertical, LineStyle.Single);
+				grid.AddLine (new Point (0, 6), width + 1, Orientation.Horizontal, LineStyle.Single);
 
-				grid.AddLine (new Point (0, 0), maxHeight, Orientation.Vertical, LineStyle.Single);
-				grid.AddLine (new Point (0, 0), width+1, Orientation.Horizontal, LineStyle.Single);
-				grid.AddLine (new Point (width, 0), maxHeight, Orientation.Vertical, LineStyle.Single);
+				grid.AddLine (new Point (2, 0), 7, Orientation.Vertical, LineStyle.Single);
+				grid.AddLine (new Point (4, 0), 7, Orientation.Vertical, LineStyle.Single);
+				grid.AddLine (new Point (6, 0), 7, Orientation.Vertical, LineStyle.Single);
+				grid.AddLine (new Point (8, 0), 7, Orientation.Vertical, LineStyle.Single);
+				grid.AddLine (new Point (10, 0), 7, Orientation.Vertical, LineStyle.Single);
 
 				grid.AddLine (new Point (0, 2), width + 1, Orientation.Horizontal, LineStyle.Single);
-
-				grid.AddLine (new Point (2, 0), maxHeight, Orientation.Vertical, LineStyle.Single);
-				grid.AddLine (new Point (4, 0), maxHeight, Orientation.Vertical, LineStyle.Single);
-				grid.AddLine (new Point (6, 0), maxHeight, Orientation.Vertical, LineStyle.Single);
-
 				grid.AddLine (new Point (0, 4), width + 1, Orientation.Horizontal, LineStyle.Single);
 			}
 			public override void Redraw (Rect bounds)
@@ -213,13 +213,13 @@ namespace UICatalog.Scenarios {
 
 				if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)) {
 					if (currentLineStart == null) {
-						currentLineStart = new Point (mouseEvent.X, mouseEvent.Y);
+						currentLineStart = new Point (mouseEvent.X - 1, mouseEvent.Y - 1);
 					}
 				} else {
 					if (currentLineStart != null) {
 
 						var start = currentLineStart.Value;
-						var end = new Point (mouseEvent.X, mouseEvent.Y);
+						var end = new Point (mouseEvent.X - 1, mouseEvent.Y - 1);
 						var orientation = Orientation.Vertical;
 						var length = end.Y - start.Y;
 
