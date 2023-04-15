@@ -16,7 +16,7 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Top Level Windows")]
 	public class TableEditor : Scenario {
 		TableView tableView;
-		private MenuItem miHideHeaders;
+		private MenuItem miShowHeaders;
 		private MenuItem miAlwaysShowHeaders;
 		private MenuItem miHeaderOverline;
 		private MenuItem miHeaderMidline;
@@ -56,7 +56,7 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
 				new MenuBarItem ("_View", new MenuItem [] {
-					miHideHeaders = new MenuItem ("_HideHeaders", "", () => ToggleHideHeaders()){Checked = tableView.Style.HideHeaders, CheckType = MenuItemCheckStyle.Checked },
+					miShowHeaders = new MenuItem ("_ShowHeaders", "", () => ToggleShowHeaders()){Checked = tableView.Style.ShowHeaders, CheckType = MenuItemCheckStyle.Checked },
 					miAlwaysShowHeaders = new MenuItem ("_AlwaysShowHeaders", "", () => ToggleAlwaysShowHeaders()){Checked = tableView.Style.AlwaysShowHeaders, CheckType = MenuItemCheckStyle.Checked },
 					miHeaderOverline = new MenuItem ("_HeaderOverLine", "", () => ToggleOverline()){Checked = tableView.Style.ShowHorizontalHeaderOverline, CheckType = MenuItemCheckStyle.Checked },
 					miHeaderMidline = new MenuItem ("_HeaderMidLine", "", () => ToggleHeaderMidline()){Checked = tableView.Style.ShowVerticalHeaderLines, CheckType = MenuItemCheckStyle.Checked },
@@ -376,10 +376,10 @@ namespace UICatalog.Scenarios {
 			tableView.Update ();
 		}
 
-		private void ToggleHideHeaders ()
+		private void ToggleShowHeaders ()
 		{
-			miHideHeaders.Checked = !miHideHeaders.Checked;
-			tableView.Style.HideHeaders = (bool)miHideHeaders.Checked;
+			miShowHeaders.Checked = !miShowHeaders.Checked;
+			tableView.Style.ShowHeaders = (bool)miShowHeaders.Checked;
 			tableView.Update ();
 		}
 
