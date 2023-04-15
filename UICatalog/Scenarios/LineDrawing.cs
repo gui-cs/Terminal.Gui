@@ -141,17 +141,17 @@ namespace UICatalog.Scenarios {
 					}
 					if (mouseEvent.X == 1 && mouseEvent.Y == 5) {
 
-						SetStyle?.Invoke (LineStyle.Thick);
+						SetStyle?.Invoke (LineStyle.Heavy);
 						return true;
 					}
 					if (mouseEvent.X == 3 && mouseEvent.Y == 5) {
 
-						SetStyle?.Invoke (LineStyle.ThickDashed);
+						SetStyle?.Invoke (LineStyle.HeavyDashed);
 						return true;
 					}
 					if (mouseEvent.X == 5 && mouseEvent.Y == 5) {
 
-						SetStyle?.Invoke (LineStyle.ThickDotted);
+						SetStyle?.Invoke (LineStyle.HeavyDotted);
 						return true;
 					}
 					if (mouseEvent.X == 7 && mouseEvent.Y == 5) {

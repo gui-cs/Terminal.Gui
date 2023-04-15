@@ -34,25 +34,25 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The border is drawn using heavy line glyphs.
 		/// </summary>
-		Thick,
+		Heavy,
 		/// <summary>
 		/// The border is drawn using heavy line glyphs with dashed (double and triple) straight lines.
 		/// </summary>
-		ThickDashed,
+		HeavyDashed,
 		/// <summary>
 		/// The border is drawn using heavy line glyphs with short dashed (triple and quadruple) straight lines.
 		/// </summary>
-		ThickDotted,
+		HeavyDotted,
 		/// <summary>
-		/// The border is drawn using single-width line glyphs with rounded corners.
+		/// The border is drawn using thin line glyphs with rounded corners.
 		/// </summary>
 		Rounded,
 		/// <summary>
-		/// The border is drawn using single-width line glyphs with rounded corners and dashed (double and triple) straight lines.
+		/// The border is drawn using thin line glyphs with rounded corners and dashed (double and triple) straight lines.
 		/// </summary>
 		RoundedDashed,
 		/// <summary>
-		/// The border is drawn using single-width line glyphs with rounded corners and short dashed (triple and quadruple) straight lines.
+		/// The border is drawn using thin line glyphs with rounded corners and short dashed (triple and quadruple) straight lines.
 		/// </summary>
 		RoundedDotted,
 		// TODO: Support Ruler
@@ -298,15 +298,15 @@ namespace Terminal.Gui {
 				var useRounded = intersects.Any (i => i.Line.Length != 0 && (
 					i.Line.Style == LineStyle.Rounded || i.Line.Style == LineStyle.RoundedDashed || i.Line.Style == LineStyle.RoundedDotted));
 
-				// Note that there aren't any glyphs for intersections of double lines with thick lines
+				// Note that there aren't any glyphs for intersections of double lines with heavy lines
 
 				bool doubleHorizontal = intersects.Any (l => l.Line.Orientation == Orientation.Horizontal && l.Line.Style == LineStyle.Double);
 				bool doubleVertical = intersects.Any (l => l.Line.Orientation == Orientation.Vertical && l.Line.Style == LineStyle.Double);
 
 				bool thickHorizontal = intersects.Any (l => l.Line.Orientation == Orientation.Horizontal && (
-					l.Line.Style == LineStyle.Thick || l.Line.Style == LineStyle.ThickDashed || l.Line.Style == LineStyle.ThickDotted));
+					l.Line.Style == LineStyle.Heavy || l.Line.Style == LineStyle.HeavyDashed || l.Line.Style == LineStyle.HeavyDotted));
 				bool thickVertical = intersects.Any (l => l.Line.Orientation == Orientation.Vertical && (
-					l.Line.Style == LineStyle.Thick || l.Line.Style == LineStyle.ThickDashed || l.Line.Style == LineStyle.ThickDotted));
+					l.Line.Style == LineStyle.Heavy || l.Line.Style == LineStyle.HeavyDashed || l.Line.Style == LineStyle.HeavyDotted));
 
 				if (doubleHorizontal) {
 					return doubleVertical ? doubleBoth : doubleH;
@@ -410,9 +410,9 @@ namespace Terminal.Gui {
 			var useDashed = intersects.Any (i => i.Line.Style == LineStyle.Dashed || i.Line.Style == LineStyle.RoundedDashed);
 			var useDotted = intersects.Any (i => i.Line.Style == LineStyle.Dotted || i.Line.Style == LineStyle.RoundedDotted);
 			// horiz and vert lines same as Single for Rounded
-			var useThick = intersects.Any (i => i.Line.Style == LineStyle.Thick);
-			var useThickDashed = intersects.Any (i => i.Line.Style == LineStyle.ThickDashed);
-			var useThickDotted = intersects.Any (i => i.Line.Style == LineStyle.ThickDotted);
+			var useThick = intersects.Any (i => i.Line.Style == LineStyle.Heavy);
+			var useThickDashed = intersects.Any (i => i.Line.Style == LineStyle.HeavyDashed);
+			var useThickDotted = intersects.Any (i => i.Line.Style == LineStyle.HeavyDotted);
 			// TODO: Support ruler
 			//var useRuler = intersects.Any (i => i.Line.Style == LineStyle.Ruler && i.Line.Length != 0);
 

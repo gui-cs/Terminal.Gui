@@ -689,19 +689,19 @@ namespace Terminal.Gui.DrawingTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TestLineCanvas_Window_Thick ()
+		public void TestLineCanvas_Window_Heavy ()
 		{
 			var v = GetCanvas (out var canvas);
 
 			// outer box
-			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, LineStyle.Thick);
-			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, LineStyle.Thick);
-			canvas.AddLine (new Point (9, 4), -9, Orientation.Horizontal, LineStyle.Thick);
-			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical, LineStyle.Thick);
+			canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Heavy);
+			canvas.AddLine (new Point (9, 0), 5, Orientation.Vertical, LineStyle.Heavy);
+			canvas.AddLine (new Point (9, 4), -10, Orientation.Horizontal, LineStyle.Heavy);
+			canvas.AddLine (new Point (0, 4), -5, Orientation.Vertical, LineStyle.Heavy);
 
 
-			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical, LineStyle.Thick);
-			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, LineStyle.Thick);
+			canvas.AddLine (new Point (5, 0), 5, Orientation.Vertical, LineStyle.Heavy);
+			canvas.AddLine (new Point (0, 2), 10, Orientation.Horizontal, LineStyle.Heavy);
 
 			v.Redraw (v.Bounds);
 
@@ -718,19 +718,19 @@ namespace Terminal.Gui.DrawingTests {
 		[Theory, AutoInitShutdown]
 		[InlineData (LineStyle.Single)]
 		[InlineData (LineStyle.Rounded)]
-		public void TestLineCanvas_Window_ThickTop_ThinSides (LineStyle thinStyle)
+		public void TestLineCanvas_Window_HeavyTop_ThinSides (LineStyle thinStyle)
 		{
 			var v = GetCanvas (out var canvas);
 
 			// outer box
-			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, LineStyle.Thick);
-			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, thinStyle);
-			canvas.AddLine (new Point (9, 4), -9, Orientation.Horizontal, LineStyle.Thick);
-			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical, thinStyle);
+			canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Heavy);
+			canvas.AddLine (new Point (9, 0), 5, Orientation.Vertical, thinStyle);
+			canvas.AddLine (new Point (9, 4), -10, Orientation.Horizontal, LineStyle.Heavy);
+			canvas.AddLine (new Point (0, 4), -5, Orientation.Vertical, thinStyle);
 
 
-			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical, thinStyle);
-			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, LineStyle.Thick);
+			canvas.AddLine (new Point (5, 0), 5, Orientation.Vertical, thinStyle);
+			canvas.AddLine (new Point (0, 2), 10, Orientation.Horizontal, LineStyle.Heavy);
 
 			v.Redraw (v.Bounds);
 
@@ -748,19 +748,19 @@ namespace Terminal.Gui.DrawingTests {
 		[Theory, AutoInitShutdown]
 		[InlineData (LineStyle.Single)]
 		[InlineData (LineStyle.Rounded)]
-		public void TestLineCanvas_Window_ThinTop_ThickSides (LineStyle thinStyle)
+		public void TestLineCanvas_Window_ThinTop_HeavySides (LineStyle thinStyle)
 		{
 			var v = GetCanvas (out var canvas);
 
 			// outer box
-			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, thinStyle);
-			canvas.AddLine (new Point (9, 0), 4, Orientation.Vertical, LineStyle.Thick);
-			canvas.AddLine (new Point (9, 4), -9, Orientation.Horizontal, thinStyle);
-			canvas.AddLine (new Point (0, 4), -4, Orientation.Vertical, LineStyle.Thick);
+			canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, thinStyle);
+			canvas.AddLine (new Point (9, 0), 5, Orientation.Vertical, LineStyle.Heavy);
+			canvas.AddLine (new Point (9, 4), -10, Orientation.Horizontal, thinStyle);
+			canvas.AddLine (new Point (0, 4), -5, Orientation.Vertical, LineStyle.Heavy);
 
 
-			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical, LineStyle.Thick);
-			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, thinStyle);
+			canvas.AddLine (new Point (5, 0), 5, Orientation.Vertical, LineStyle.Heavy);
+			canvas.AddLine (new Point (0, 2), 10, Orientation.Horizontal, thinStyle);
 
 			v.Redraw (v.Bounds);
 

@@ -1181,6 +1181,16 @@ namespace Terminal.Gui {
 		public Rune HDtLine = '\u2504';
 
 		/// <summary>
+		/// Horizontal quadruple dashed line character.
+		/// </summary>
+		public Rune HD4Line = '\u2508';
+
+		/// <summary>
+		/// Vertical double dashed line character.
+		/// </summary>
+		public Rune VD2Line = '\u254e';
+
+		/// <summary>
 		/// Vertical quadruple dashed line character.
 		/// </summary>
 		public Rune VDtLine = '\u250a';
@@ -1231,9 +1241,79 @@ namespace Terminal.Gui {
 		public Rune HThDtLine = '\u2505';
 
 		/// <summary>
+		/// Horizontal heavy quadruple dashed line character.
+		/// </summary>
+		public Rune HThD4Line = '\u2509';
+
+		/// <summary>
+		/// Vertical heavy double dashed line character.
+		/// </summary>
+		public Rune VThD2Line = '\u254f';
+
+		/// <summary>
 		/// Vertical heavy quadruple dashed line character.
 		/// </summary>
 		public Rune VThDtLine = '\u250b';
+
+		/// <summary>
+		/// The left half line.
+		/// </summary>
+		public Rune HalfLeftLine = '\u2574';
+
+		/// <summary>
+		/// The up half line.
+		/// </summary>
+		public Rune HalfTopLine = '\u2575';
+
+		/// <summary>
+		/// The right half line.
+		/// </summary>
+		public Rune HalfRightLine = '\u2576';
+
+		/// <summary>
+		/// The down half line.
+		/// </summary>
+		public Rune HalfBottomLine = '\u2577';
+
+		/// <summary>
+		/// The heavy left half line.
+		/// </summary>
+		public Rune ThHalfLeftLine = '\u2578';
+
+		/// <summary>
+		/// The heavy up half line.
+		/// </summary>
+		public Rune ThHalfTopLine = '\u2579';
+
+		/// <summary>
+		/// The heavy right half line.
+		/// </summary>
+		public Rune ThHalfRightLine = '\u257a';
+
+		/// <summary>
+		/// The heavy light down half line.
+		/// </summary>
+		public Rune ThHalfBottomLine = '\u257b';
+
+		/// <summary>
+		/// The light left and heavy right line.
+		/// </summary>
+		public Rune ThRightSideLine = '\u257c';
+
+		/// <summary>
+		/// The light up and heavy down line.
+		/// </summary>
+		public Rune ThBottomSideLine = '\u257d';
+
+		/// <summary>
+		/// The heavy left and light right line.
+		/// </summary>
+		public Rune ThLeftSideLine = '\u257e';
+
+		/// <summary>
+		/// The heavy up and light down line.
+		/// </summary>
+		public Rune ThTopSideLine = '\u257f';
 
 		private Attribute currentAttribute;
 
