@@ -445,6 +445,86 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Fact, AutoInitShutdown]
+		public void TableView_ShowHeadersFalse_AndNoHeaderLines ()
+		{
+			var tv = GetABCDEFTableView (out _);
+			tv.Bounds = new Rect (0, 0, 5, 5);
+
+			tv.Style.ShowHeaders = false;
+			tv.Style.ShowHorizontalHeaderOverline = false;
+			tv.Style.ShowHorizontalHeaderUnderline = false;
+
+			tv.Redraw (tv.Bounds);
+
+			string expected = @"
+│1│2│
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+		[Fact, AutoInitShutdown]
+		public void TableView_ShowHeadersFalse_OverlineTrue ()
+		{
+			var tv = GetABCDEFTableView (out _);
+			tv.Bounds = new Rect (0, 0, 5, 5);
+
+			tv.Style.ShowHeaders = false;
+			tv.Style.ShowHorizontalHeaderOverline = true;
+			tv.Style.ShowHorizontalHeaderUnderline = false;
+
+			tv.Redraw (tv.Bounds);
+
+			string expected = @"
+┌─┬─┐
+│1│2│
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+		[Fact, AutoInitShutdown]
+		public void TableView_ShowHeadersFalse_UnderlineTrue ()
+		{
+			var tv = GetABCDEFTableView (out _);
+			tv.Bounds = new Rect (0, 0, 5, 5);
+
+			tv.Style.ShowHeaders = false;
+			tv.Style.ShowHorizontalHeaderOverline = false;
+			tv.Style.ShowHorizontalHeaderUnderline = true;
+			// Horizontal scrolling option is part of the underline
+			tv.Style.ShowHorizontalScrollIndicators = true;
+
+
+			tv.Redraw (tv.Bounds);
+
+			string expected = @"
+├─┼─►
+│1│2│
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TableView_ShowHeadersFalse_AllLines ()
+		{
+			var tv = GetABCDEFTableView (out _);
+			tv.Bounds = new Rect (0, 0, 5, 5);
+
+			tv.Style.ShowHeaders = false;
+			tv.Style.ShowHorizontalHeaderOverline = true;
+			tv.Style.ShowHorizontalHeaderUnderline = true;
+			// Horizontal scrolling option is part of the underline
+			tv.Style.ShowHorizontalScrollIndicators = true;
+
+
+			tv.Redraw (tv.Bounds);
+
+			string expected = @"
+┌─┬─┐
+├─┼─►
+│1│2│
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
 		public void TableView_ExpandLastColumn_True ()
 		{
 			var tv = SetUpMiniTable ();
@@ -1706,14 +1786,14 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.EnsureSelectedCellIsVisible ();
 			Assert.Equal (smooth ? 1 : 3, tableView.ColumnOffset);
 		}
-		
+
 		[Fact, AutoInitShutdown]
 		public void LongColumnTest ()
 		{
 			var tableView = new TableView ();
 
-			Application.Top.Add(tableView);
-			Application.Begin(Application.Top);
+			Application.Top.Add (tableView);
+			Application.Begin (Application.Top);
 
 			tableView.ColorScheme = Colors.TopLevel;
 
@@ -1816,8 +1896,8 @@ namespace Terminal.Gui.ViewsTests {
 			// Now test making the width too small for the MinAcceptableWidth
 			// the Column won't fit so should not be rendered
 			var driver = ((FakeDriver)Application.Driver);
-			driver.UpdateOffScreen();
-			
+			driver.UpdateOffScreen ();
+
 
 			tableView.Bounds = new Rect (0, 0, 9, 5);
 			tableView.LayoutSubviews ();
@@ -1989,6 +2069,236 @@ namespace Terminal.Gui.ViewsTests {
 ";
 			TestHelpers.AssertDriverColorsAre (expected, new Attribute [] { tv.ColorScheme.Normal, color });
 
+		}
+
+
+		[Fact, AutoInitShutdown]
+		public void ShowHorizontalBottomLine_WithVerticalCellLines ()
+		{
+			var tableView = GetABCDEFTableView (out _);
+			tableView.BeginInit (); tableView.EndInit ();
+
+			tableView.ColorScheme = Colors.TopLevel;
+
+			// 3 columns are visibile
+			tableView.Bounds = new Rect (0, 0, 7, 5);
+			tableView.Style.ShowHorizontalHeaderUnderline = true;
+			tableView.Style.ShowHorizontalHeaderOverline = false;
+			tableView.Style.AlwaysShowHeaders = true;
+			tableView.Style.SmoothHorizontalScrolling = true;
+			tableView.Style.ShowHorizontalBottomline = true;
+
+			tableView.Redraw (tableView.Bounds);
+
+			// user can only scroll right so sees right indicator
+			// Because first column in table is A
+			string expected =
+				@"
+│A│B│C│
+├─┼─┼─►
+│1│2│3│
+└─┴─┴─┘";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+		[Fact, AutoInitShutdown]
+		public void ShowHorizontalBottomLine_NoCellLines ()
+		{
+			var tableView = GetABCDEFTableView (out _);
+			tableView.BeginInit (); tableView.EndInit ();
+
+			tableView.ColorScheme = Colors.TopLevel;
+
+			// 3 columns are visibile
+			tableView.Bounds = new Rect (0, 0, 7, 5);
+			tableView.Style.ShowHorizontalHeaderUnderline = true;
+			tableView.Style.ShowHorizontalHeaderOverline = false;
+			tableView.Style.AlwaysShowHeaders = true;
+			tableView.Style.SmoothHorizontalScrolling = true;
+			tableView.Style.ShowHorizontalBottomline = true;
+			tableView.Style.ShowVerticalCellLines = false;
+
+			tableView.Redraw (tableView.Bounds);
+
+			// user can only scroll right so sees right indicator
+			// Because first column in table is A
+			string expected =
+				@"
+│A│B│C│
+└─┴─┴─►
+ 1 2 3
+───────";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestFullRowSelect_SelectionColorStopsAtTableEdge_WithCellLines ()
+		{
+			var tv = GetTwoRowSixColumnTable ();
+			tv.Table.Rows.Add (1, 2, 3, 4, 5, 6);
+			tv.LayoutSubviews ();
+
+
+			tv.Bounds = new Rect (0, 0, 7, 6);
+
+			tv.FullRowSelect = true;
+			tv.Style.ShowHorizontalBottomline = true;
+
+			// Clicking in bottom row
+			tv.MouseEvent (new MouseEvent {
+				X = 1,
+				Y = 4,
+				Flags = MouseFlags.Button1Clicked
+			});
+
+			// should select that row
+			Assert.Equal (2, tv.SelectedRow);
+
+
+			tv.Redraw (tv.Bounds);
+
+			string expected =
+				@"
+│A│B│C│
+├─┼─┼─►
+│1│2│3│
+│1│2│3│
+│1│2│3│
+└─┴─┴─┘";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			var normal = tv.ColorScheme.Normal;
+			var focus = tv.ColorScheme.HotFocus = new Attribute (Color.Magenta, Color.White);
+
+			tv.Redraw (tv.Bounds);
+
+			// HotFocus color (1) should be used for rendering the selected line
+			// But should not spill into the borders.  Normal color (0) should be
+			// used for the rest.
+			expected =
+				@"
+0000000
+0000000
+0000000
+0000000
+0111110
+0000000";
+
+			TestHelpers.AssertDriverColorsAre (expected, normal, focus);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestFullRowSelect_AlwaysUseNormalColorForVerticalCellLines ()
+		{
+			var tv = GetTwoRowSixColumnTable ();
+			tv.Table.Rows.Add (1, 2, 3, 4, 5, 6);
+			tv.LayoutSubviews ();
+
+
+			tv.Bounds = new Rect (0, 0, 7, 6);
+
+			tv.FullRowSelect = true;
+			tv.Style.ShowHorizontalBottomline = true;
+			tv.Style.AlwaysUseNormalColorForVerticalCellLines = true;
+
+			// Clicking in bottom row
+			tv.MouseEvent (new MouseEvent {
+				X = 1,
+				Y = 4,
+				Flags = MouseFlags.Button1Clicked
+			});
+
+			// should select that row
+			Assert.Equal (2, tv.SelectedRow);
+
+
+			tv.Redraw (tv.Bounds);
+
+			string expected =
+				@"
+│A│B│C│
+├─┼─┼─►
+│1│2│3│
+│1│2│3│
+│1│2│3│
+└─┴─┴─┘";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			var normal = tv.ColorScheme.Normal;
+			var focus = tv.ColorScheme.HotFocus = new Attribute (Color.Magenta, Color.White);
+
+			tv.Redraw (tv.Bounds);
+
+			// HotFocus color (1) should be used for cells only because
+			// AlwaysUseNormalColorForVerticalCellLines is true
+			expected =
+				@"
+0000000
+0000000
+0000000
+0000000
+0101010
+0000000";
+
+			TestHelpers.AssertDriverColorsAre (expected, normal, focus);
+		}
+		[Fact, AutoInitShutdown]
+		public void TestFullRowSelect_SelectionColorDoesNotStop_WhenShowVerticalCellLinesIsFalse ()
+		{
+			var tv = GetTwoRowSixColumnTable ();
+			tv.Table.Rows.Add (1, 2, 3, 4, 5, 6);
+			tv.LayoutSubviews ();
+
+
+			tv.Bounds = new Rect (0, 0, 7, 6);
+
+			tv.FullRowSelect = true;
+			tv.Style.ShowVerticalCellLines = false;
+			tv.Style.ShowVerticalHeaderLines = false;
+
+			// Clicking in bottom row
+			tv.MouseEvent (new MouseEvent {
+				X = 1,
+				Y = 4,
+				Flags = MouseFlags.Button1Clicked
+			});
+
+			// should select that row
+			Assert.Equal (2, tv.SelectedRow);
+
+
+			tv.Redraw (tv.Bounds);
+
+			string expected =
+				@"
+A B C
+───────
+1 2 3
+1 2 3
+1 2 3";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			var normal = tv.ColorScheme.Normal;
+			var focus = tv.ColorScheme.HotFocus = new Attribute (Color.Magenta, Color.White);
+
+			tv.Redraw (tv.Bounds);
+
+			// HotFocus color (1) should be used for rendering the selected line
+			// Note that because there are no vertical cell lines we use the hot focus
+			// color for the whole row
+			expected =
+				@"
+000000
+000000
+000000
+000000
+111111";
+
+			TestHelpers.AssertDriverColorsAre (expected, normal, focus);
 		}
 
 		/// <summary>

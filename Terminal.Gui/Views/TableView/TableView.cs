@@ -1,5 +1,6 @@
 using NStack;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -258,8 +259,10 @@ namespace Terminal.Gui {
 					line++;
 				}
 
-				RenderHeaderMidline (line, columnsToRender);
-				line++;
+				if (Style.ShowHeaders) {
+					RenderHeaderMidline (line, columnsToRender);
+					line++;
+				}
 
 				if (Style.ShowHorizontalHeaderUnderline) {
 					RenderHeaderUnderline (line, bounds.Width, columnsToRender);
@@ -278,8 +281,17 @@ namespace Terminal.Gui {
 				var rowToRender = RowOffset + (line - headerLinesConsumed);
 
 				//if we have run off the end of the table
-				if (TableIsNullOrInvisible () || rowToRender >= Table.Rows.Count || rowToRender < 0)
+				if (TableIsNullOrInvisible () || rowToRender < 0)
 					continue;
+
+				// No more data
+				if(rowToRender >= Table.Rows.Count) {
+
+					if(rowToRender == Table.Rows.Count && Style.ShowHorizontalBottomline) {
+						RenderBottomLine (line, bounds.Width, columnsToRender);
+					}
+					continue;
+				}
 
 				RenderRow (line, rowToRender, columnsToRender);
 			}
@@ -312,7 +324,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private int GetHeaderHeight ()
 		{
-			int heightRequired = 1;
+			int heightRequired = Style.ShowHeaders ? 1 : 0;
 
 			if (Style.ShowHorizontalHeaderOverline)
 				heightRequired++;
@@ -474,16 +486,49 @@ namespace Terminal.Gui {
 			}
 
 		}
+
+		private void RenderBottomLine (int row, int availableWidth, ColumnToRender [] columnsToRender)
+		{
+			// Renders a line at the bottom of the table after all the data like:
+			// └─────────────────────────────────┴──────────┴──────┴──────────┴────────┴────────────────────────────────────────────┘
+
+			for (int c = 0; c < availableWidth; c++) {
+
+				// Start by assuming we just draw a straight line the
+				// whole way but update to instead draw BottomTee / Corner etc
+				var rune = Driver.HLine;
+
+				if (Style.ShowVerticalCellLines) {
+					if (c == 0) {
+						// for first character render line
+						rune = Driver.LLCorner;
+
+					}
+					// if the next column is the start of a header
+					else if (columnsToRender.Any (r => r.X == c + 1)) {
+						rune =  Driver.BottomTee;
+					} else if (c == availableWidth - 1) {
+
+						// for the last character in the table
+						rune = Driver.LRCorner;
+
+					}
+					  // if the next console column is the lastcolumns end
+					  else if (Style.ExpandLastColumn == false &&
+							  columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c)) {
+						rune = Driver.BottomTee;
+					}
+				}
+
+				AddRuneAt (Driver, c, row, rune);
+			}
+		}
 		private void RenderRow (int row, int rowToRender, ColumnToRender [] columnsToRender)
 		{
 			var focused = HasFocus;
 
 			var rowScheme = (Style.RowColorGetter?.Invoke (
 				new RowColorGetterArgs (Table, rowToRender))) ?? ColorScheme;
-
-			//render start of line
-			if (style.ShowVerticalCellLines)
-				AddRune (0, row, Driver.VLine);
 
 			//start by clearing the entire line
 			Move (0, row);
@@ -564,6 +609,11 @@ namespace Terminal.Gui {
 				if (!FullRowSelect)
 					Driver.SetAttribute (Enabled ? rowScheme.Normal : rowScheme.Disabled);
 
+				if(style.AlwaysUseNormalColorForVerticalCellLines && style.ShowVerticalCellLines) {
+
+					Driver.SetAttribute (rowScheme.Normal);
+				}
+
 				RenderSeparator (current.X - 1, row, false);
 
 				if (Style.ExpandLastColumn == false && current.IsVeryLast) {
@@ -571,9 +621,15 @@ namespace Terminal.Gui {
 				}
 			}
 
-			//render end of line
-			if (style.ShowVerticalCellLines)
+			if (style.ShowVerticalCellLines) {
+
+				Driver.SetAttribute (rowScheme.Normal);
+
+				//render start and end of line
+				AddRune (0, row, Driver.VLine);
 				AddRune (Bounds.Width - 1, row, Driver.VLine);
+			}
+				
 		}
 
 		/// <summary>
@@ -1755,6 +1811,14 @@ namespace Terminal.Gui {
 		public class TableStyle {
 
 			/// <summary>
+			/// Gets or sets a flag indicating whether to render headers of a <see cref="TableView"/>.
+			/// Defaults to <see langword="true"/>.
+			/// </summary>
+			/// <remarks><see cref="ShowHorizontalHeaderOverline"/>, <see cref="ShowHorizontalHeaderUnderline"/> etc
+			/// may still be used even if <see cref="ShowHeaders"/> is <see langword="false"/>.</remarks>
+			public bool ShowHeaders { get; set; } = true;
+
+			/// <summary>
 			/// When scrolling down always lock the column headers in place as the first row of the table
 			/// </summary>
 			public bool AlwaysShowHeaders { get; set; } = false;
@@ -1787,12 +1851,25 @@ namespace Terminal.Gui {
 			/// </summary>
 			public bool ShowHorizontalScrollIndicators { get; set; } = true;
 
+			
+			/// <summary>
+			/// Gets or sets a flag indicating whether there should be a horizontal line after all the data
+			/// in the table. Defaults to <see langword="false"/>.
+			/// </summary>
+			public bool ShowHorizontalBottomline { get; set; } = false;
+
 			/// <summary>
 			/// True to invert the colors of the first symbol of the selected cell in the <see cref="TableView"/>.
 			/// This gives the appearance of a cursor for when the <see cref="ConsoleDriver"/> doesn't otherwise show
 			/// this
 			/// </summary>
 			public bool InvertSelectedCellFirstCharacter { get; set; } = false;
+
+			/// <summary>
+			/// Gets or sets a flag indicating whether to force <see cref="ColorScheme.Normal"/> use when rendering
+			/// vertical cell lines (even when <see cref="FullRowSelect"/> is on).
+			/// </summary>
+			public bool AlwaysUseNormalColorForVerticalCellLines { get; set; } = false;
 
 			/// <summary>
 			/// Collection of columns for which you want special rendering (e.g. custom column lengths, text alignment etc)

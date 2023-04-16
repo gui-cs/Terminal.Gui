@@ -38,6 +38,12 @@ namespace Terminal.Gui {
 		public bool UseColors { get; set; }
 
 		/// <summary>
+		/// Gets or sets the culture to use (e.g. for number formatting).
+		/// Defaults to <see cref="CultureInfo.CurrentUICulture"/>.
+		/// <summary>
+		public CultureInfo Culture {get;set;} = CultureInfo.CurrentUICulture;
+
+		/// <summary>
 		/// Sets a <see cref="ColorScheme"/> to use for directories rows of
 		/// the <see cref="TableView"/>.
 		/// </summary>

@@ -148,7 +148,7 @@ namespace Terminal.Gui {
 					// TODO: Fiddle factor, seems the Bounds are wrong for someone
 					- 2)
 			};
-			this.btnOk.Clicked += (s, e) => this.Accept ();
+			this.btnOk.Clicked += (s, e) => this.Accept (true);
 			this.btnOk.KeyPress += (s, k) => {
 				this.NavigateIf (k, Key.CursorLeft, this.btnCancel);
 				this.NavigateIf (k, Key.CursorUp, this.tableView);
@@ -537,13 +537,18 @@ namespace Terminal.Gui {
 
 		private void UpdateCollectionNavigator ()
 		{
+			tableView.EnsureValidSelection ();
+			var col = tableView.SelectedColumn;
+			var style = tableView.Style.GetColumnStyleIfAny (tableView.Table.Columns [col]);
+
 
 			var collection = tableView
 				.Table
 				.Rows
 				.Cast<DataRow> ()
-				.Select ((o, idx) => RowToStats (idx))
-				.Select (s => s.FileSystemInfo.Name)
+				.Select ((o, idx) => col == 0 ? 
+					RowToStats(idx).FileSystemInfo.Name :
+					style.GetRepresentation (o [0])?.TrimStart('.'))
 				.ToArray ();
 
 			collectionNavigator = new CollectionNavigator (collection);
@@ -767,7 +772,11 @@ namespace Terminal.Gui {
 		{
 			if (!keyEvent.Handled && keyEvent.KeyEvent.Key == isKey) {
 				keyEvent.Handled = true;
-				this.Accept ();
+
+				// User hit Enter in text box so probably wants the
+				// contents of the text box as their selection not
+				// whatever lingering selection is in TableView
+				this.Accept (false);
 			}
 		}
 
@@ -777,7 +786,12 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			this.MultiSelected = toMultiAccept.Select (s => s.FileSystemInfo.FullName).ToList ().AsReadOnly ();
+			// Don't include ".." (IsParent) in multiselections
+			this.MultiSelected = toMultiAccept
+				.Where(s=>!s.IsParent)
+				.Select (s => s.FileSystemInfo.FullName)
+				.ToList ().AsReadOnly ();
+
 			this.tbPath.Text = this.MultiSelected.Count == 1 ? this.MultiSelected [0] : string.Empty;
 
 			FinishAccept ();
@@ -800,8 +814,13 @@ namespace Terminal.Gui {
 			FinishAccept ();
 		}
 
-		private void Accept ()
+		private void Accept (bool allowMulti)
 		{
+			if(allowMulti && TryAcceptMulti())
+			{
+				return;
+			}
+
 			if (!this.IsCompatibleWithOpenMode (this.tbPath.Text.ToString (), out string reason)) {
 				if (reason != null) {
 					feedback = reason;
@@ -910,6 +929,10 @@ namespace Terminal.Gui {
 
 				this.pushingState = false;
 			}
+
+			if (obj.NewCol != obj.OldCol) {
+				UpdateCollectionNavigator ();
+			}
 		}
 
 		private bool TableView_KeyUp (KeyEvent keyEvent)
@@ -995,20 +1018,9 @@ namespace Terminal.Gui {
 
 		private void CellActivate (object sender, CellActivatedEventArgs obj)
 		{
-			var multi = this.MultiRowToStats ();
-			string reason = null;
-			if (multi.Any ()) {
-				if (multi.All (m => this.IsCompatibleWithOpenMode (m.FileSystemInfo.FullName, out reason))) {
-					this.Accept (multi);
-					return;
-				} else {
-					if (reason != null) {
-						feedback = reason;
-						SetNeedsDisplay ();
-					}
-
-					return;
-				}
+			if(TryAcceptMulti())
+			{
+				return;
 			}
 
 			var stats = this.RowToStats (obj.Row);
@@ -1020,6 +1032,33 @@ namespace Terminal.Gui {
 
 			if (stats.FileSystemInfo is IFileInfo f) {
 				this.Accept (f);
+			}
+		}
+
+		private bool TryAcceptMulti ()
+		{
+			var multi = this.MultiRowToStats ();
+			string reason = null;
+			
+			if (!multi.Any ())
+			{
+				return false;
+			}
+			
+			if (multi.All (m => this.IsCompatibleWithOpenMode (
+				m.FileSystemInfo.FullName, out reason)))
+			{
+				this.Accept (multi);
+				return true;
+			} 
+			else 
+			{
+				if (reason != null) {
+					feedback = reason;
+					SetNeedsDisplay ();
+				}
+
+				return false;
 			}
 		}
 
@@ -1109,7 +1148,8 @@ namespace Terminal.Gui {
 		/// <param name="addCurrentStateToHistory"></param>
 		/// <param name="setPathText"></param>
 		/// <param name="clearForward"></param>
-		internal void PushState (IDirectoryInfo d, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true)
+		/// <param name="pathText">Optional alternate string to set path to.</param>
+		internal void PushState (IDirectoryInfo d, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true, string pathText = null)
 		{
 			// no change of state
 			if (d == this.State?.Directory) {
@@ -1119,7 +1159,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			PushState (new FileDialogState (d, this), addCurrentStateToHistory, setPathText, clearForward);
+			PushState (new FileDialogState (d, this), addCurrentStateToHistory, setPathText, clearForward, pathText);
 		}
 
 		private void RefreshState ()
@@ -1128,7 +1168,7 @@ namespace Terminal.Gui {
 			PushState (State, false, false, false);
 		}
 
-		private void PushState (FileDialogState newState, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true)
+		private void PushState (FileDialogState newState, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true, string pathText = null)
 		{
 			if (State is SearchState search) {
 				search.Cancel ();
@@ -1144,6 +1184,12 @@ namespace Terminal.Gui {
 
 				this.tbPath.Autocomplete.ClearSuggestions ();
 
+				if(pathText != null)
+				{
+					this.tbPath.Text = pathText;
+					this.tbPath.MoveEnd ();
+				}
+				else
 				if (setPathText) {
 					this.tbPath.Text = newState.Directory.FullName;
 					this.tbPath.MoveEnd ();
@@ -1219,10 +1265,9 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// If <see cref="TableView.MultiSelect"/> is on and multiple rows are selected
-		/// this returns a union of all <see cref="FileSystemInfoStats"/> in the selection.
+		/// If <see cref="TableView.MultiSelect"/> is this returns a union of all
+		/// <see cref="FileSystemInfoStats"/> in the selection.
 		/// </summary>
-		/// <remarks>Returns an empty collection if there are not at least 2 rows in the selection</remarks>
 		/// <returns></returns>
 		private IEnumerable<FileSystemInfoStats> MultiRowToStats ()
 		{
@@ -1239,7 +1284,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			return toReturn.Count > 1 ? toReturn : Enumerable.Empty<FileSystemInfoStats> ();
+			return toReturn;
 		}
 		private FileSystemInfoStats RowToStats (int rowIndex)
 		{
