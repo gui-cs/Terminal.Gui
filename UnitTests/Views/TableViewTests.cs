@@ -2190,6 +2190,62 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Fact, AutoInitShutdown]
+		public void TestFullRowSelect_AlwaysUseNormalColorForVerticalCellLines ()
+		{
+			var tv = GetTwoRowSixColumnTable ();
+			tv.Table.Rows.Add (1, 2, 3, 4, 5, 6);
+			tv.LayoutSubviews ();
+
+
+			tv.Bounds = new Rect (0, 0, 7, 6);
+
+			tv.FullRowSelect = true;
+			tv.Style.ShowHorizontalBottomline = true;
+			tv.Style.AlwaysUseNormalColorForVerticalCellLines = true;
+
+			// Clicking in bottom row
+			tv.MouseEvent (new MouseEvent {
+				X = 1,
+				Y = 4,
+				Flags = MouseFlags.Button1Clicked
+			});
+
+			// should select that row
+			Assert.Equal (2, tv.SelectedRow);
+
+
+			tv.Redraw (tv.Bounds);
+
+			string expected =
+				@"
+│A│B│C│
+├─┼─┼─►
+│1│2│3│
+│1│2│3│
+│1│2│3│
+└─┴─┴─┘";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			var normal = tv.ColorScheme.Normal;
+			var focus = tv.ColorScheme.HotFocus = new Attribute (Color.Magenta, Color.White);
+
+			tv.Redraw (tv.Bounds);
+
+			// HotFocus color (1) should be used for cells only because
+			// AlwaysUseNormalColorForVerticalCellLines is true
+			expected =
+				@"
+0000000
+0000000
+0000000
+0000000
+0101010
+0000000";
+
+			TestHelpers.AssertDriverColorsAre (expected, normal, focus);
+		}
+		[Fact, AutoInitShutdown]
 		public void TestFullRowSelect_SelectionColorDoesNotStop_WhenShowVerticalCellLinesIsFalse ()
 		{
 			var tv = GetTwoRowSixColumnTable ();

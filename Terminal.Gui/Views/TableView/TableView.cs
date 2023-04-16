@@ -609,6 +609,11 @@ namespace Terminal.Gui {
 				if (!FullRowSelect)
 					Driver.SetAttribute (Enabled ? rowScheme.Normal : rowScheme.Disabled);
 
+				if(style.AlwaysUseNormalColorForVerticalCellLines && style.ShowVerticalCellLines) {
+
+					Driver.SetAttribute (rowScheme.Normal);
+				}
+
 				RenderSeparator (current.X - 1, row, false);
 
 				if (Style.ExpandLastColumn == false && current.IsVeryLast) {
@@ -1859,6 +1864,12 @@ namespace Terminal.Gui {
 			/// this
 			/// </summary>
 			public bool InvertSelectedCellFirstCharacter { get; set; } = false;
+
+			/// <summary>
+			/// Gets or sets a flag indicating whether to force <see cref="ColorScheme.Normal"/> use when rendering
+			/// vertical cell lines (even when <see cref="FullRowSelect"/> is on).
+			/// </summary>
+			public bool AlwaysUseNormalColorForVerticalCellLines { get; set; } = false;
 
 			/// <summary>
 			/// Collection of columns for which you want special rendering (e.g. custom column lengths, text alignment etc)
