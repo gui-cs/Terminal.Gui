@@ -423,7 +423,6 @@ namespace Terminal.Gui.FileServicesTests {
 			TestHelpers.AssertDriverContentsAre (expected, output, true);
 		}
 
-
 		[Fact, AutoInitShutdown]
 		public void TestDirectoryContents_Windows ()
 		{
@@ -504,7 +503,6 @@ namespace Terminal.Gui.FileServicesTests {
 					// string
 					Assert.False (tb.AcceptSelectionIfAny ());
 				}
-
 
 				[Fact, AutoInitShutdown]
 				public void Autocomplete_AcceptSuggstion ()

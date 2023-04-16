@@ -63,7 +63,6 @@ namespace Terminal.Gui {
 					children = children.Where (MatchesApiFilter).ToList ();
 				}
 
-
 				// allow navigating up as '..'
 				if (dir.Parent != null) {
 					children.Add (new FileSystemInfoStats (dir.Parent, Parent.Style.Culture) { IsParent = true });

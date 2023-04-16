@@ -978,7 +978,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Rect (0, 0, 10, 10), pos);
 		}
 
-
 		[Fact, AutoInitShutdown]
 		public void ContentBottomRightCorner_Not_Redraw_If_Both_Size_Equal_To_Zero ()
 		{
@@ -1154,7 +1153,6 @@ This is a test
 			Assert.False (sbv.ShowScrollIndicator);
 			Assert.False (sbv.Visible);
 		}
-
 
 		[Fact, AutoInitShutdown]
 		public void ClearOnVisibleFalse_Gets_Sets ()

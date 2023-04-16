@@ -245,7 +245,6 @@ namespace Terminal.Gui.ViewTests {
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 
-
 		[Fact, AutoInitShutdown]
 		public void HasSuperView_Title ()
 		{

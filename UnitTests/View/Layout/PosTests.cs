@@ -1027,7 +1027,6 @@ namespace Terminal.Gui.ViewTests {
 			Application.Top.Add (container);
 			Application.Top.LayoutSubviews ();
 
-
 			Assert.Equal (100, container.Frame.Width);
 			Assert.Equal (100, container.Frame.Height);
 

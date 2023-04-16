@@ -63,7 +63,6 @@ namespace Terminal.Gui {
 			'"','<','>','|','*','?',
 		};
 
-
 		/// <summary>
 		/// The UI selected <see cref="IAllowedType"/> from combo box. May be null.
 		/// </summary>
@@ -124,7 +123,6 @@ namespace Terminal.Gui {
 		/// <remarks>Ensure you use a try/catch block with appropriate
 		/// error handling (e.g. showing a <see cref="MessageBox"/></remarks>
 		public IFileOperations FileOperationsHandler { get; set; } = new DefaultFileOperations ();
-
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="FileDialog"/> class.
@@ -247,7 +245,6 @@ namespace Terminal.Gui {
 					CycleToNextTableEntryBeginningWith (k);
 				}
 
-
 			};
 
 			this.treeView = new TreeView<object> () {
@@ -275,7 +272,6 @@ namespace Terminal.Gui {
 				this.btnToggleSplitterCollapse.Text = GetToggleSplitterText (newState);
 				this.LayoutSubviews();
 			};
-
 
 			tbFind = new TextField {
 				X = Pos.Right (this.btnToggleSplitterCollapse) + 1,
@@ -317,7 +313,6 @@ namespace Terminal.Gui {
 			this.tableView.Style.ShowHorizontalHeaderUnderline = true;
 			this.tableView.Style.ShowHorizontalScrollIndicators = true;
 
-
 			this.SetupTableColumns ();
 
 			this.sorter = new FileDialogSorter (this, this.tableView);
@@ -337,7 +332,6 @@ namespace Terminal.Gui {
 			this.tableView.AddKeyBinding (Key.End | Key.ShiftMask, Command.BottomEndExtend);
 
 			this.treeView.KeyDown += (s, k) => {
-
 
 				var selected = treeView.SelectedObject;
 				if (selected != null) {
@@ -454,7 +448,6 @@ namespace Terminal.Gui {
 		}
 
 
-
 		/// <inheritdoc/>
 		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
@@ -544,13 +537,18 @@ namespace Terminal.Gui {
 
 		private void UpdateCollectionNavigator ()
 		{
+			tableView.EnsureValidSelection ();
+			var col = tableView.SelectedColumn;
+			var style = tableView.Style.GetColumnStyleIfAny (tableView.Table.Columns [col]);
+
 
 			var collection = tableView
 				.Table
 				.Rows
 				.Cast<DataRow> ()
-				.Select ((o, idx) => RowToStats (idx))
-				.Select (s => s.FileSystemInfo.Name)
+				.Select ((o, idx) => col == 0 ? 
+					RowToStats(idx).FileSystemInfo.Name :
+					style.GetRepresentation (o [0])?.TrimStart('.'))
 				.ToArray ();
 
 			collectionNavigator = new CollectionNavigator (collection);
@@ -592,7 +590,6 @@ namespace Terminal.Gui {
 			set => this.tableView.MultiSelect = value;
 		}
 
-
 		/// <summary>
 		/// Gets or Sets a collection of file types that the user can/must select. Only applies
 		/// when <see cref="OpenMode"/> is <see cref="OpenMode.File"/> or <see cref="OpenMode.Mixed"/>.
@@ -614,7 +611,6 @@ namespace Terminal.Gui {
 		/// <remarks>If selecting only a single file/directory then you should use <see cref="Path"/> instead.</remarks>
 		public IReadOnlyList<string> MultiSelected { get; private set; }
 			= Enumerable.Empty<string> ().ToList ().AsReadOnly ();
-
 
 		/// <inheritdoc/>
 		public override void Redraw (Rect bounds)
@@ -801,7 +797,6 @@ namespace Terminal.Gui {
 			FinishAccept ();
 		}
 
-
 		private void Accept (IFileInfo f)
 		{
 			if (!this.IsCompatibleWithOpenMode (f.FullName, out var reason)) {
@@ -934,8 +929,11 @@ namespace Terminal.Gui {
 
 				this.pushingState = false;
 			}
-		}
 
+			if (obj.NewCol != obj.OldCol) {
+				UpdateCollectionNavigator ();
+			}
+		}
 
 		private bool TableView_KeyUp (KeyEvent keyEvent)
 		{
@@ -965,7 +963,6 @@ namespace Terminal.Gui {
 
 			return false;
 		}
-
 
 		private void SetupTableColumns ()
 		{
@@ -1027,7 +1024,6 @@ namespace Terminal.Gui {
 			}
 
 			var stats = this.RowToStats (obj.Row);
-
 
 			if (stats.FileSystemInfo is IDirectoryInfo d) {
 				this.PushState (d, true);
@@ -1317,7 +1313,6 @@ namespace Terminal.Gui {
 			return null;
 		}
 
-
 		private void PathChanged ()
 		{
 			// avoid re-entry
@@ -1579,7 +1574,6 @@ namespace Terminal.Gui {
 						} catch (OperationCanceledException) {
 							cancel = true;
 						}
-
 
 						if (cancel || finished) {
 							break;

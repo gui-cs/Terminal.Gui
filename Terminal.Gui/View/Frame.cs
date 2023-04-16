@@ -12,7 +12,6 @@ namespace Terminal.Gui {
 	// TODO: v2 - If a Frame has focus, navigation keys (e.g Command.NextView) should cycle through SubViews of the Frame
 	// QUESTION: How does a user navigate out of a Frame to another Frame, or back into the Parent's SubViews?
 
-
 	/// <summary>
 	/// Frames are a special form of <see cref="View"/> that act as adornments; they appear outside of the <see cref="View.Bounds"/>
 	/// enabling borders, menus, etc... 
@@ -149,8 +148,8 @@ namespace Terminal.Gui {
 			var borderBounds = new Rect (
 				screenBounds.X + Math.Max (0, Thickness.Left - 1),
 				screenBounds.Y + Math.Max (0, Thickness.Top - 1),
-				screenBounds.Width - Math.Max (0, Math.Max (0, Thickness.Left - 1) - Math.Max (0, Thickness.Right - 1)),
-				screenBounds.Height - Math.Max (0, Math.Max (0, Thickness.Top - 1) - Math.Max (0, Thickness.Bottom - 1)));
+				Math.Max (0, screenBounds.Width - Math.Max (0, Math.Max (0, Thickness.Left - 1) + Math.Max (0, Thickness.Right - 1))),
+				Math.Max (0, screenBounds.Height - Math.Max (0, Math.Max (0, Thickness.Top - 1) + Math.Max (0, Thickness.Bottom - 1))));
 
 			var topTitleLineY = borderBounds.Y;
 			var titleY = borderBounds.Y;
@@ -183,7 +182,6 @@ namespace Terminal.Gui {
 				titleBarsLength = 3;
 				sideLineLength++;
 			}
-
 
 			if (Id == "Border" && Thickness.Top > 0 && maxTitleWidth > 0 && !ustring.IsNullOrEmpty (Parent?.Title)) {
 				var prevAttr = Driver.GetAttribute ();
@@ -277,7 +275,6 @@ namespace Terminal.Gui {
 
 				}
 			}
-
 
 			Driver.Clip = prevClip;
 		}
