@@ -27,6 +27,7 @@ namespace UICatalog.Scenarios {
 		private MenuItem miSmoothScrolling;
 		private MenuItem miAlternatingColors;
 		private MenuItem miCursor;
+		private MenuItem miBottomline;
 
 		ColorScheme redColorScheme;
 		ColorScheme redColorSchemeAlt;
@@ -59,6 +60,7 @@ namespace UICatalog.Scenarios {
 					miHeaderOverline = new MenuItem ("_HeaderOverLine", "", () => ToggleOverline()){Checked = tableView.Style.ShowHorizontalHeaderOverline, CheckType = MenuItemCheckStyle.Checked },
 					miHeaderMidline = new MenuItem ("_HeaderMidLine", "", () => ToggleHeaderMidline()){Checked = tableView.Style.ShowVerticalHeaderLines, CheckType = MenuItemCheckStyle.Checked },
 					miHeaderUnderline = new MenuItem ("_HeaderUnderLine", "", () => ToggleUnderline()){Checked = tableView.Style.ShowHorizontalHeaderUnderline, CheckType = MenuItemCheckStyle.Checked },
+					miBottomline = new MenuItem ("_BottomLine", "", () => ToggleBottomline()){Checked = tableView.Style.ShowHorizontalBottomline, CheckType = MenuItemCheckStyle.Checked },
 					miShowHorizontalScrollIndicators = new MenuItem ("_HorizontalScrollIndicators", "", () => ToggleHorizontalScrollIndicators()){Checked = tableView.Style.ShowHorizontalScrollIndicators, CheckType = MenuItemCheckStyle.Checked },
 					miFullRowSelect =new MenuItem ("_FullRowSelect", "", () => ToggleFullRowSelect()){Checked = tableView.FullRowSelect, CheckType = MenuItemCheckStyle.Checked },
 					miCellLines =new MenuItem ("_CellLines", "", () => ToggleCellLines()){Checked = tableView.Style.ShowVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
@@ -395,6 +397,12 @@ namespace UICatalog.Scenarios {
 		{
 			miHeaderUnderline.Checked = !miHeaderUnderline.Checked;
 			tableView.Style.ShowHorizontalHeaderUnderline = (bool)miHeaderUnderline.Checked;
+			tableView.Update ();
+		}
+		private void ToggleBottomline()
+		{
+			miBottomline.Checked = !miBottomline.Checked;
+			tableView.Style.ShowHorizontalBottomline = (bool)miBottomline.Checked;
 			tableView.Update ();
 		}
 		private void ToggleHorizontalScrollIndicators ()
