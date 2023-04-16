@@ -27,7 +27,7 @@ namespace UICatalog.Scenarios {
 			};
 
 			tools.ColorChanged += (c) => canvas.SetColor (c);
-			tools.SetStyle += (b) => canvas.BorderStyle = b;
+			tools.SetStyle += (b) => canvas.LineStyle = b;
 
 			Win.Add (canvas);
 			Win.Add (tools);
@@ -52,17 +52,19 @@ namespace UICatalog.Scenarios {
 			{
 				grid = new LineCanvas ();
 
-				grid.AddLine (new Point (0, 0), int.MaxValue, Orientation.Vertical, LineStyle.Single);
-				grid.AddLine (new Point (0, 0), width, Orientation.Horizontal, LineStyle.Single);
-				grid.AddLine (new Point (width, 0), int.MaxValue, Orientation.Vertical, LineStyle.Single);
+				int maxHeight = 10000;
 
-				grid.AddLine (new Point (0, 2), width, Orientation.Horizontal, LineStyle.Single);
+				grid.AddLine (new Point (0, 0), maxHeight, Orientation.Vertical, LineStyle.Single);
+				grid.AddLine (new Point (0, 0), width+1, Orientation.Horizontal, LineStyle.Single);
+				grid.AddLine (new Point (width, 0), maxHeight, Orientation.Vertical, LineStyle.Single);
 
-				grid.AddLine (new Point (2, 0), int.MaxValue, Orientation.Vertical, LineStyle.Single);
-				grid.AddLine (new Point (4, 0), int.MaxValue, Orientation.Vertical, LineStyle.Single);
-				grid.AddLine (new Point (6, 0), int.MaxValue, Orientation.Vertical, LineStyle.Single);
+				grid.AddLine (new Point (0, 2), width + 1, Orientation.Horizontal, LineStyle.Single);
 
-				grid.AddLine (new Point (0, 4), width, Orientation.Horizontal, LineStyle.Single);
+				grid.AddLine (new Point (2, 0), maxHeight, Orientation.Vertical, LineStyle.Single);
+				grid.AddLine (new Point (4, 0), maxHeight, Orientation.Vertical, LineStyle.Single);
+				grid.AddLine (new Point (6, 0), maxHeight, Orientation.Vertical, LineStyle.Single);
+
+				grid.AddLine (new Point (0, 4), width + 1, Orientation.Horizontal, LineStyle.Single);
 			}
 			public override void Redraw (Rect bounds)
 			{
@@ -128,6 +130,7 @@ namespace UICatalog.Scenarios {
 			int currentColor;
 
 			Point? currentLineStart = null;
+			public LineStyle LineStyle { get; set; }
 
 			public DrawingArea ()
 			{
@@ -182,11 +185,19 @@ namespace UICatalog.Scenarios {
 							length = end.X - start.X;
 						}
 
+						if(length > 0) {
+							length++;
+						}
+						else {
+							length--;
+						}
+						
+
 						canvases [currentColor].AddLine (
 							start,
 							length,
 							orientation,
-							BorderStyle);
+							LineStyle);
 
 						currentLineStart = null;
 						SetNeedsDisplay ();

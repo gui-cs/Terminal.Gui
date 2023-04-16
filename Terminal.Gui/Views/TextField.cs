@@ -1058,6 +1058,7 @@ namespace Terminal.Gui {
 					|| (x > 0 && (char)text [x] == ' ')) {
 
 					var newPosBw = GetModel ().WordBackward (x, 0);
+					if (newPosBw == null) return true;
 					sbw = newPosBw.Value.col;
 				}
 				if (sbw != -1) {
@@ -1065,6 +1066,7 @@ namespace Terminal.Gui {
 					PositionCursor (x);
 				}
 				var newPosFw = GetModel ().WordForward (x, 0);
+				if (newPosFw == null) return true;
 				ClearAllSelection ();
 				if (newPosFw.Value.col != -1 && sbw != -1) {
 					point = newPosFw.Value.col;
