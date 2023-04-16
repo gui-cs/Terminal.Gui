@@ -1,5 +1,6 @@
 using NStack;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -258,8 +259,10 @@ namespace Terminal.Gui {
 					line++;
 				}
 
-				RenderHeaderMidline (line, columnsToRender);
-				line++;
+				if (Style.ShowHeaders) {
+					RenderHeaderMidline (line, columnsToRender);
+					line++;
+				}
 
 				if (Style.ShowHorizontalHeaderUnderline) {
 					RenderHeaderUnderline (line, bounds.Width, columnsToRender);
@@ -321,7 +324,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private int GetHeaderHeight ()
 		{
-			int heightRequired = 1;
+			int heightRequired = Style.ShowHeaders ? 1 : 0;
 
 			if (Style.ShowHorizontalHeaderOverline)
 				heightRequired++;
@@ -1799,6 +1802,14 @@ namespace Terminal.Gui {
 		/// <a href="https://gui-cs.github.io/Terminal.Gui/articles/tableview.html">See TableView Deep Dive for more information</a>.
 		/// </summary>
 		public class TableStyle {
+
+			/// <summary>
+			/// Gets or sets a flag indicating whether to render headers of a <see cref="TableView"/>.
+			/// Defaults to <see langword="true"/>.
+			/// </summary>
+			/// <remarks><see cref="ShowHorizontalHeaderOverline"/>, <see cref="ShowHorizontalHeaderUnderline"/> etc
+			/// may still be used even if <see cref="ShowHeaders"/> is <see langword="false"/>.</remarks>
+			public bool ShowHeaders { get; set; } = true;
 
 			/// <summary>
 			/// When scrolling down always lock the column headers in place as the first row of the table
