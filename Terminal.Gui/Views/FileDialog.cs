@@ -537,13 +537,18 @@ namespace Terminal.Gui {
 
 		private void UpdateCollectionNavigator ()
 		{
+			tableView.EnsureValidSelection ();
+			var col = tableView.SelectedColumn;
+			var style = tableView.Style.GetColumnStyleIfAny (tableView.Table.Columns [col]);
+
 
 			var collection = tableView
 				.Table
 				.Rows
 				.Cast<DataRow> ()
-				.Select ((o, idx) => RowToStats (idx))
-				.Select (s => s.FileSystemInfo.Name)
+				.Select ((o, idx) => col == 0 ? 
+					RowToStats(idx).FileSystemInfo.Name :
+					style.GetRepresentation (o [0])?.TrimStart('.'))
 				.ToArray ();
 
 			collectionNavigator = new CollectionNavigator (collection);
@@ -909,6 +914,10 @@ namespace Terminal.Gui {
 			} finally {
 
 				this.pushingState = false;
+			}
+
+			if (obj.NewCol != obj.OldCol) {
+				UpdateCollectionNavigator ();
 			}
 		}
 
