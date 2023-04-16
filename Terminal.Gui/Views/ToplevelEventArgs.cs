@@ -9,10 +9,10 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Creates a new instance of the <see cref="ToplevelClosingEventArgs"/> class.
 		/// </summary>
-		/// <param name="Toplevel"></param>
-		public ToplevelEventArgs (Toplevel Toplevel)
+		/// <param name="toplevel"></param>
+		public ToplevelEventArgs (Toplevel toplevel)
 		{
-			Toplevel = Toplevel;
+			Toplevel = toplevel;
 		}
 
 		/// <summary>
