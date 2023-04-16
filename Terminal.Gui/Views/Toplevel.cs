@@ -777,10 +777,11 @@ namespace Terminal.Gui {
 				}
 				base.Redraw (Bounds);
 
-				if (this.MenuBar != null && this.MenuBar.IsMenuOpen && this.MenuBar.openMenu != null) {
-					// TODO: Hack until we can get compositing working right.
-					this.MenuBar.openMenu.Redraw (this.MenuBar.openMenu.Bounds);
-				}
+				// This is causing the menus drawn incorrectly if UseSubMenusSingleFrame is true
+				//if (this.MenuBar != null && this.MenuBar.IsMenuOpen && this.MenuBar.openMenu != null) {
+				//	// TODO: Hack until we can get compositing working right.
+				//	this.MenuBar.openMenu.Redraw (this.MenuBar.openMenu.Bounds);
+				//}
 			}
 		}
 

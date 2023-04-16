@@ -445,6 +445,86 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Fact, AutoInitShutdown]
+		public void TableView_ShowHeadersFalse_AndNoHeaderLines ()
+		{
+			var tv = GetABCDEFTableView (out _);
+			tv.Bounds = new Rect (0, 0, 5, 5);
+
+			tv.Style.ShowHeaders = false;
+			tv.Style.ShowHorizontalHeaderOverline = false;
+			tv.Style.ShowHorizontalHeaderUnderline = false;
+
+			tv.Redraw (tv.Bounds);
+
+			string expected = @"
+│1│2│
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+		[Fact, AutoInitShutdown]
+		public void TableView_ShowHeadersFalse_OverlineTrue ()
+		{
+			var tv = GetABCDEFTableView (out _);
+			tv.Bounds = new Rect (0, 0, 5, 5);
+
+			tv.Style.ShowHeaders = false;
+			tv.Style.ShowHorizontalHeaderOverline = true;
+			tv.Style.ShowHorizontalHeaderUnderline = false;
+
+			tv.Redraw (tv.Bounds);
+
+			string expected = @"
+┌─┬─┐
+│1│2│
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+		[Fact, AutoInitShutdown]
+		public void TableView_ShowHeadersFalse_UnderlineTrue ()
+		{
+			var tv = GetABCDEFTableView (out _);
+			tv.Bounds = new Rect (0, 0, 5, 5);
+
+			tv.Style.ShowHeaders = false;
+			tv.Style.ShowHorizontalHeaderOverline = false;
+			tv.Style.ShowHorizontalHeaderUnderline = true;
+			// Horizontal scrolling option is part of the underline
+			tv.Style.ShowHorizontalScrollIndicators = true;
+
+
+			tv.Redraw (tv.Bounds);
+
+			string expected = @"
+├─┼─►
+│1│2│
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TableView_ShowHeadersFalse_AllLines ()
+		{
+			var tv = GetABCDEFTableView (out _);
+			tv.Bounds = new Rect (0, 0, 5, 5);
+
+			tv.Style.ShowHeaders = false;
+			tv.Style.ShowHorizontalHeaderOverline = true;
+			tv.Style.ShowHorizontalHeaderUnderline = true;
+			// Horizontal scrolling option is part of the underline
+			tv.Style.ShowHorizontalScrollIndicators = true;
+
+
+			tv.Redraw (tv.Bounds);
+
+			string expected = @"
+┌─┬─┐
+├─┼─►
+│1│2│
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
 		public void TableView_ExpandLastColumn_True ()
 		{
 			var tv = SetUpMiniTable ();
