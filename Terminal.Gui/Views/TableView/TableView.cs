@@ -530,10 +530,6 @@ namespace Terminal.Gui {
 			var rowScheme = (Style.RowColorGetter?.Invoke (
 				new RowColorGetterArgs (Table, rowToRender))) ?? ColorScheme;
 
-			//render start of line
-			if (style.ShowVerticalCellLines)
-				AddRune (0, row, Driver.VLine);
-
 			//start by clearing the entire line
 			Move (0, row);
 
@@ -620,9 +616,15 @@ namespace Terminal.Gui {
 				}
 			}
 
-			//render end of line
-			if (style.ShowVerticalCellLines)
+			if (style.ShowVerticalCellLines) {
+
+				Driver.SetAttribute (rowScheme.Normal);
+
+				//render start and end of line
+				AddRune (0, row, Driver.VLine);
 				AddRune (Bounds.Width - 1, row, Driver.VLine);
+			}
+				
 		}
 
 		/// <summary>
