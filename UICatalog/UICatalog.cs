@@ -249,6 +249,7 @@ namespace UICatalog {
 		/// the command line) and each time a Scenario ends.
 		/// </summary>
 		public class UICatalogTopLevel : Toplevel {
+			public MenuItem? miIsMenuBorderDisabled;
 			public MenuItem? miIsMouseDisabled;
 			public MenuItem? miEnableConsoleScrolling;
 
@@ -343,7 +344,7 @@ namespace UICatalog {
 				//ContentPane.Tiles.ElementAt (0).ContentView.Add (CategoryListView);
 
 				ScenarioListView = new ListView () {
-					X = Pos.Right(CategoryListView) - 1,
+					X = Pos.Right (CategoryListView) - 1,
 					Y = 1,
 					Width = Dim.Fill (0),
 					Height = Dim.Fill (1),
@@ -447,9 +448,27 @@ namespace UICatalog {
 					new MenuItem [] { },
 					CreateEnableConsoleScrollingMenuItems (),
 					CreateDisabledEnabledMouseItems (),
+					CreateDisabledEnabledMenuBorder (),
 					CreateKeybindingsMenuItems ()
 				};
 				return menuItems;
+			}
+
+			MenuItem [] CreateDisabledEnabledMenuBorder ()
+			{
+				List<MenuItem> menuItems = new List<MenuItem> ();
+				miIsMenuBorderDisabled = new MenuItem {
+					Title = "Disable _Menu Border"
+				};
+				miIsMenuBorderDisabled.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miIsMenuBorderDisabled!.Title!.ToString ()!.Substring (1, 1) [0];
+				miIsMenuBorderDisabled.CheckType |= MenuItemCheckStyle.Checked;
+				miIsMenuBorderDisabled.Action += () => {
+					miIsMenuBorderDisabled.Checked = (bool)!miIsMenuBorderDisabled.Checked!;
+					MenuBar.MenusBorderStyle = !(bool)miIsMenuBorderDisabled.Checked ? LineStyle.Single : LineStyle.None;
+				};
+				menuItems.Add (miIsMenuBorderDisabled);
+
+				return menuItems.ToArray ();
 			}
 
 			MenuItem [] CreateDisabledEnabledMouseItems ()
@@ -676,7 +695,7 @@ namespace UICatalog {
 				miEnableConsoleScrolling!.Checked = Application.EnableConsoleScrolling;
 
 				var height = (UICatalogApp.ShowStatusBar ? 1 : 0);// + (MenuBar.Visible ? 1 : 0);
-				//ContentPane.Height = Dim.Fill (height);
+										  //ContentPane.Height = Dim.Fill (height);
 
 				StatusBar.Visible = UICatalogApp.ShowStatusBar;
 
