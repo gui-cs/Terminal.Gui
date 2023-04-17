@@ -41,13 +41,13 @@ namespace UICatalog.Scenarios {
 			var win1 = new Window () {
 				AutoSize = false,
 				Title = "win1",
-				Text = "Win1 30%/50% Single",
+				Text = "Win1 30%/50% Heavy",
 				X = 20,
 				Y = 0,
 				Width = 30, //Dim.Percent (30) - 5,
 				Height = 10, //Dim.Percent (50) - 5,
 				//ColorScheme = Colors.ColorSchemes ["Base"],
-				BorderStyle = LineStyle.Double,
+				BorderStyle = LineStyle.Heavy,
 				SuperViewRendersLineCanvas = true
 			};
 			win1.Padding.Thickness = new Thickness (1);

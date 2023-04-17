@@ -253,7 +253,7 @@ namespace UICatalog.Scenarios {
 			};
 
 			Add (new Label ("Background:") {
-				Y = 5
+				Y = 12
 			});
 
 			var colorEnum = Enum.GetValues (typeof (Color)).Cast<Color> ().ToList ();
@@ -261,7 +261,7 @@ namespace UICatalog.Scenarios {
 				e => NStack.ustring.Make (e.ToString ())).ToArray ()) {
 
 				X = 2,
-				Y = 6,
+				Y = 13,
 				//SelectedItem = (int)smartView.BorderFrame.BackgroundColor
 			};
 			rbBackground.SelectedItemChanged += (s, e) => {

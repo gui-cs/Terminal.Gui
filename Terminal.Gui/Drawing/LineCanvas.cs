@@ -16,17 +16,45 @@ namespace Terminal.Gui {
 		/// </summary>
 		None,
 		/// <summary>
-		/// The border is drawn using single-width line glyphs.
+		/// The border is drawn using thin line glyphs.
 		/// </summary>
 		Single,
 		/// <summary>
-		/// The border is drawn using double-width line glyphs.
+		/// The border is drawn using thin line glyphs with dashed (double and triple) straight lines.
+		/// </summary>
+		Dashed,
+		/// <summary>
+		/// The border is drawn using thin line glyphs with short dashed (triple and quadruple) straight lines.
+		/// </summary>
+		Dotted,
+		/// <summary>
+		/// The border is drawn using thin double line glyphs.
 		/// </summary>
 		Double,
 		/// <summary>
-		/// The border is drawn using single-width line glyphs with rounded corners.
+		/// The border is drawn using heavy line glyphs.
+		/// </summary>
+		Heavy,
+		/// <summary>
+		/// The border is drawn using heavy line glyphs with dashed (double and triple) straight lines.
+		/// </summary>
+		HeavyDashed,
+		/// <summary>
+		/// The border is drawn using heavy line glyphs with short dashed (triple and quadruple) straight lines.
+		/// </summary>
+		HeavyDotted,
+		/// <summary>
+		/// The border is drawn using thin line glyphs with rounded corners.
 		/// </summary>
 		Rounded,
+		/// <summary>
+		/// The border is drawn using thin line glyphs with rounded corners and dashed (double and triple) straight lines.
+		/// </summary>
+		RoundedDashed,
+		/// <summary>
+		/// The border is drawn using thin line glyphs with rounded corners and short dashed (triple and quadruple) straight lines.
+		/// </summary>
+		RoundedDotted,
 		// TODO: Support Ruler
 		///// <summary> 
 		///// The border is drawn as a diagnostic ruler ("|123456789...").
@@ -248,30 +276,50 @@ namespace Terminal.Gui {
 			readonly Rune doubleH;
 			readonly Rune doubleV;
 			readonly Rune doubleBoth;
+			readonly Rune thickH;
+			readonly Rune thickV;
+			readonly Rune thickBoth;
 			readonly Rune normal;
 
-			public IntersectionRuneResolver (Rune round, Rune doubleH, Rune doubleV, Rune doubleBoth, Rune normal)
+			public IntersectionRuneResolver (Rune round, Rune doubleH, Rune doubleV, Rune doubleBoth, Rune thickH, Rune thickV, Rune thickBoth, Rune normal)
 			{
 				this.round = round;
 				this.doubleH = doubleH;
 				this.doubleV = doubleV;
 				this.doubleBoth = doubleBoth;
+				this.thickH = thickH;
+				this.thickV = thickV;
+				this.thickBoth = thickBoth;
 				this.normal = normal;
 			}
 
 			public Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
 			{
-				var useRounded = intersects.Any (i => i.Line.Style == LineStyle.Rounded && i.Line.Length != 0);
+				var useRounded = intersects.Any (i => i.Line.Length != 0 && (
+					i.Line.Style == LineStyle.Rounded || i.Line.Style == LineStyle.RoundedDashed || i.Line.Style == LineStyle.RoundedDotted));
+
+				// Note that there aren't any glyphs for intersections of double lines with heavy lines
 
 				bool doubleHorizontal = intersects.Any (l => l.Line.Orientation == Orientation.Horizontal && l.Line.Style == LineStyle.Double);
 				bool doubleVertical = intersects.Any (l => l.Line.Orientation == Orientation.Vertical && l.Line.Style == LineStyle.Double);
 
+				bool thickHorizontal = intersects.Any (l => l.Line.Orientation == Orientation.Horizontal && (
+					l.Line.Style == LineStyle.Heavy || l.Line.Style == LineStyle.HeavyDashed || l.Line.Style == LineStyle.HeavyDotted));
+				bool thickVertical = intersects.Any (l => l.Line.Orientation == Orientation.Vertical && (
+					l.Line.Style == LineStyle.Heavy || l.Line.Style == LineStyle.HeavyDashed || l.Line.Style == LineStyle.HeavyDotted));
+
 				if (doubleHorizontal) {
 					return doubleVertical ? doubleBoth : doubleH;
 				}
-
 				if (doubleVertical) {
 					return doubleV;
+				}
+
+				if (thickHorizontal) {
+					return thickVertical ? thickBoth : thickH;
+				}
+				if (thickVertical) {
+					return thickV;
 				}
 
 				return useRounded ? round : normal;
@@ -280,7 +328,7 @@ namespace Terminal.Gui {
 
 		private class ULIntersectionRuneResolver : IntersectionRuneResolver {
 			public ULIntersectionRuneResolver () :
-				base ('╭', '╒', '╓', '╔', '┌')
+				base ('╭', '╒', '╓', '╔', '┍', '┎', '┏', '┌')
 			{
 
 			}
@@ -288,7 +336,7 @@ namespace Terminal.Gui {
 		private class URIntersectionRuneResolver : IntersectionRuneResolver {
 
 			public URIntersectionRuneResolver () :
-				base ('╮', '╕', '╖', '╗', '┐')
+				base ('╮', '╕', '╖', '╗', '┑', '┒', '┓', '┐')
 			{
 
 			}
@@ -296,14 +344,14 @@ namespace Terminal.Gui {
 		private class LLIntersectionRuneResolver : IntersectionRuneResolver {
 
 			public LLIntersectionRuneResolver () :
-				base ('╰', '╘', '╙', '╚', '└')
+				base ('╰', '╘', '╙', '╚', '┕', '┖', '┗', '└')
 			{
 
 			}
 		}
 		private class LRIntersectionRuneResolver : IntersectionRuneResolver {
 			public LRIntersectionRuneResolver () :
-				base ('╯', '╛', '╜', '╝', '┘')
+				base ('╯', '╛', '╜', '╝', '┙', '┚', '┛', '┘')
 			{
 
 			}
@@ -311,35 +359,35 @@ namespace Terminal.Gui {
 
 		private class TopTeeIntersectionRuneResolver : IntersectionRuneResolver {
 			public TopTeeIntersectionRuneResolver () :
-				base ('┬', '╤', '╥', '╦', '┬')
+				base ('┬', '╤', '╥', '╦', '┯', '┰', '┳', '┬')
 			{
 
 			}
 		}
 		private class LeftTeeIntersectionRuneResolver : IntersectionRuneResolver {
 			public LeftTeeIntersectionRuneResolver () :
-				base ('├', '╞', '╟', '╠', '├')
+				base ('├', '╞', '╟', '╠', '┝', '┠', '┣', '├')
 			{
 
 			}
 		}
 		private class RightTeeIntersectionRuneResolver : IntersectionRuneResolver {
 			public RightTeeIntersectionRuneResolver () :
-				base ('┤', '╡', '╢', '╣', '┤')
+				base ('┤', '╡', '╢', '╣', '┥', '┨', '┫', '┤')
 			{
 
 			}
 		}
 		private class BottomTeeIntersectionRuneResolver : IntersectionRuneResolver {
 			public BottomTeeIntersectionRuneResolver () :
-				base ('┴', '╧', '╨', '╩', '┴')
+				base ('┴', '╧', '╨', '╩', '┷', '┸', '┻', '┴')
 			{
 
 			}
 		}
 		private class CrosshairIntersectionRuneResolver : IntersectionRuneResolver {
 			public CrosshairIntersectionRuneResolver () :
-				base ('┼', '╪', '╫', '╬', '┼')
+				base ('┼', '╪', '╫', '╬', '┿', '╂', '╋', '┼')
 			{
 
 			}
@@ -357,23 +405,46 @@ namespace Terminal.Gui {
 				return runeResolvers [runeType].GetRuneForIntersects (driver, intersects);
 			}
 
-			// TODO: Remove these two once we have all of the below ported to IntersectionRuneResolvers
+			// TODO: Remove these once we have all of the below ported to IntersectionRuneResolvers
 			var useDouble = intersects.Any (i => i.Line.Style == LineStyle.Double);
-			var useRounded = intersects.Any (i => i.Line.Style == LineStyle.Rounded);
+			var useDashed = intersects.Any (i => i.Line.Style == LineStyle.Dashed || i.Line.Style == LineStyle.RoundedDashed);
+			var useDotted = intersects.Any (i => i.Line.Style == LineStyle.Dotted || i.Line.Style == LineStyle.RoundedDotted);
+			// horiz and vert lines same as Single for Rounded
+			var useThick = intersects.Any (i => i.Line.Style == LineStyle.Heavy);
+			var useThickDashed = intersects.Any (i => i.Line.Style == LineStyle.HeavyDashed);
+			var useThickDotted = intersects.Any (i => i.Line.Style == LineStyle.HeavyDotted);
 			// TODO: Support ruler
 			//var useRuler = intersects.Any (i => i.Line.Style == LineStyle.Ruler && i.Line.Length != 0);
 
-			// TODO: maybe make these resolvers to for simplicity?
-			// or for dotted lines later on or that kind of thing?
+			// TODO: maybe make these resolvers too for simplicity?
 			switch (runeType) {
 			case IntersectionRuneType.None:
 				return null;
 			case IntersectionRuneType.Dot:
 				return (Rune)'.';
 			case IntersectionRuneType.HLine:
-				return useDouble ? driver.HDLine : driver.HLine;
+				if (useDouble) {
+					return driver.HDbLine;
+				}
+				if (useDashed) {
+					return driver.HDsLine;
+				}
+				if (useDotted) {
+					return driver.HDtLine;
+				}
+				return useThick ? driver.HThLine : (useThickDashed ? driver.HThDsLine : (useThickDotted ? driver.HThDtLine : driver.HLine));
 			case IntersectionRuneType.VLine:
-				return useDouble ? driver.VDLine : driver.VLine;
+				if (useDouble) {
+					return driver.VDbLine;
+				}
+				if (useDashed) {
+					return driver.VDsLine;
+				}
+				if (useDotted) {
+					return driver.VDtLine;
+				}
+				return useThick ? driver.VThLine : (useThickDashed ? driver.VThDsLine : (useThickDotted ? driver.VThDtLine : driver.VLine));
+
 			default: throw new Exception ("Could not find resolver or switch case for " + nameof (runeType) + ":" + runeType);
 			}
 		}
