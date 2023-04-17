@@ -581,7 +581,7 @@ namespace Terminal.Gui.DrawingTests {
 			// outer box
 			canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Rounded);
 
-			// BorderStyle.Single is ignored because corner overlaps with the above line which is Rounded
+			// LineStyle.Single is ignored because corner overlaps with the above line which is Rounded
 			// this results in a rounded corner being used.
 			canvas.AddLine (new Point (9, 0), 5, Orientation.Vertical, LineStyle.Single);
 			canvas.AddLine (new Point (9, 4), -10, Orientation.Horizontal, LineStyle.Rounded);
@@ -688,8 +688,96 @@ namespace Terminal.Gui.DrawingTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
 
-		[Fact, SetupFakeDriver]
-		public void Top_Left_From_TopRigth_TopDown ()
+		[Fact, AutoInitShutdown]
+		public void TestLineCanvas_Window_Heavy ()
+		{
+			var v = GetCanvas (out var canvas);
+
+			// outer box
+			canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Heavy);
+			canvas.AddLine (new Point (9, 0), 5, Orientation.Vertical, LineStyle.Heavy);
+			canvas.AddLine (new Point (9, 4), -10, Orientation.Horizontal, LineStyle.Heavy);
+			canvas.AddLine (new Point (0, 4), -5, Orientation.Vertical, LineStyle.Heavy);
+
+
+			canvas.AddLine (new Point (5, 0), 5, Orientation.Vertical, LineStyle.Heavy);
+			canvas.AddLine (new Point (0, 2), 10, Orientation.Horizontal, LineStyle.Heavy);
+
+			v.Redraw (v.Bounds);
+
+			string looksLike =
+@"    
+┏━━━━┳━━━┓
+┃    ┃   ┃
+┣━━━━╋━━━┫
+┃    ┃   ┃
+┗━━━━┻━━━┛";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (LineStyle.Single)]
+		[InlineData (LineStyle.Rounded)]
+		public void TestLineCanvas_Window_HeavyTop_ThinSides (LineStyle thinStyle)
+		{
+			var v = GetCanvas (out var canvas);
+
+			// outer box
+			canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Heavy);
+			canvas.AddLine (new Point (9, 0), 5, Orientation.Vertical, thinStyle);
+			canvas.AddLine (new Point (9, 4), -10, Orientation.Horizontal, LineStyle.Heavy);
+			canvas.AddLine (new Point (0, 4), -5, Orientation.Vertical, thinStyle);
+
+
+			canvas.AddLine (new Point (5, 0), 5, Orientation.Vertical, thinStyle);
+			canvas.AddLine (new Point (0, 2), 10, Orientation.Horizontal, LineStyle.Heavy);
+
+			v.Redraw (v.Bounds);
+
+			string looksLike =
+@"    
+┍━━━━┯━━━┑
+│    │   │
+┝━━━━┿━━━┥
+│    │   │
+┕━━━━┷━━━┙
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (LineStyle.Single)]
+		[InlineData (LineStyle.Rounded)]
+		public void TestLineCanvas_Window_ThinTop_HeavySides (LineStyle thinStyle)
+		{
+			var v = GetCanvas (out var canvas);
+
+			// outer box
+			canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, thinStyle);
+			canvas.AddLine (new Point (9, 0), 5, Orientation.Vertical, LineStyle.Heavy);
+			canvas.AddLine (new Point (9, 4), -10, Orientation.Horizontal, thinStyle);
+			canvas.AddLine (new Point (0, 4), -5, Orientation.Vertical, LineStyle.Heavy);
+
+
+			canvas.AddLine (new Point (5, 0), 5, Orientation.Vertical, LineStyle.Heavy);
+			canvas.AddLine (new Point (0, 2), 10, Orientation.Horizontal, thinStyle);
+
+			v.Redraw (v.Bounds);
+
+			string looksLike =
+@"    
+┎────┰───┒
+┃    ┃   ┃
+┠────╂───┨
+┃    ┃   ┃
+┖────┸───┚
+
+";
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestLineCanvas_LeaveMargin_Top1_Left1 ()
 		{
 			var canvas = new LineCanvas ();
 
@@ -705,7 +793,7 @@ namespace Terminal.Gui.DrawingTests {
 		}
 
 		[Fact, SetupFakeDriver]
-		public void Top_Left_From_TopRigth_LeftUp ()
+		public void Top_Left_From_TopRight_LeftUp ()
 		{
 			var canvas = new LineCanvas ();
 
