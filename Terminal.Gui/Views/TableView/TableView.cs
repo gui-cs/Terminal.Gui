@@ -530,10 +530,6 @@ namespace Terminal.Gui {
 			var rowScheme = (Style.RowColorGetter?.Invoke (
 				new RowColorGetterArgs (Table, rowToRender))) ?? ColorScheme;
 
-			//render start of line
-			if (style.ShowVerticalCellLines)
-				AddRune (0, row, Driver.VLine);
-
 			//start by clearing the entire line
 			Move (0, row);
 
@@ -613,6 +609,11 @@ namespace Terminal.Gui {
 				if (!FullRowSelect)
 					Driver.SetAttribute (Enabled ? rowScheme.Normal : rowScheme.Disabled);
 
+				if(style.AlwaysUseNormalColorForVerticalCellLines && style.ShowVerticalCellLines) {
+
+					Driver.SetAttribute (rowScheme.Normal);
+				}
+
 				RenderSeparator (current.X - 1, row, false);
 
 				if (Style.ExpandLastColumn == false && current.IsVeryLast) {
@@ -620,9 +621,15 @@ namespace Terminal.Gui {
 				}
 			}
 
-			//render end of line
-			if (style.ShowVerticalCellLines)
+			if (style.ShowVerticalCellLines) {
+
+				Driver.SetAttribute (rowScheme.Normal);
+
+				//render start and end of line
+				AddRune (0, row, Driver.VLine);
 				AddRune (Bounds.Width - 1, row, Driver.VLine);
+			}
+				
 		}
 
 		/// <summary>
@@ -1857,6 +1864,12 @@ namespace Terminal.Gui {
 			/// this
 			/// </summary>
 			public bool InvertSelectedCellFirstCharacter { get; set; } = false;
+
+			/// <summary>
+			/// Gets or sets a flag indicating whether to force <see cref="ColorScheme.Normal"/> use when rendering
+			/// vertical cell lines (even when <see cref="FullRowSelect"/> is on).
+			/// </summary>
+			public bool AlwaysUseNormalColorForVerticalCellLines { get; set; } = false;
 
 			/// <summary>
 			/// Collection of columns for which you want special rendering (e.g. custom column lengths, text alignment etc)
