@@ -47,7 +47,7 @@ namespace Terminal.Gui.DialogTests {
 			string expectedAfter = string.Empty;
 			string expectedDuring = string.Empty;
 			bool cancel = false;
-			r.TitleChanging += (s,args) => {
+			r.TitleChanging += (s, args) => {
 				Assert.Equal (expectedDuring, args.NewTitle);
 				args.Cancel = cancel;
 			};
@@ -73,7 +73,7 @@ namespace Terminal.Gui.DialogTests {
 			Assert.Equal (ustring.Empty, r.Title);
 
 			string expected = string.Empty;
-			r.TitleChanged += (s,args) => {
+			r.TitleChanged += (s, args) => {
 				Assert.Equal (r.Title, args.NewTitle);
 			};
 
@@ -231,8 +231,9 @@ namespace Terminal.Gui.DialogTests {
 			var wizard = new Wizard () { Title = title, Width = width, Height = height };
 			wizard.AddStep (new Wizard.WizardStep () { Title = "ABCD" });
 
-			Application.End (Application.Begin (wizard));
+			var rs = Application.Begin (wizard);
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{topRow}\n{separatorRow}\n{buttonRow}\n{bottomRow}", output);
+			Application.End (rs);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -554,7 +555,7 @@ namespace Terminal.Gui.DialogTests {
 			};
 
 			closedFired = false;
-			wizard.Closed += (s,e) => {
+			wizard.Closed += (s, e) => {
 				closedFired = true;
 			};
 
@@ -592,7 +593,7 @@ namespace Terminal.Gui.DialogTests {
 			};
 
 			closedFired = false;
-			wizard.Closed += (s,e) => {
+			wizard.Closed += (s, e) => {
 				closedFired = true;
 			};
 

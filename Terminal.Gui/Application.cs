@@ -56,7 +56,7 @@ namespace Terminal.Gui {
 
 		// For Unit testing - ignores UseSystemConsole
 		internal static bool _forceFakeConsole;
-		
+
 		private static bool? _enableConsoleScrolling;
 		/// <summary>
 		/// The current <see cref="ConsoleDriver.EnableConsoleScrolling"/> used in the terminal.
@@ -119,7 +119,7 @@ namespace Terminal.Gui {
 			   File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
 			).ToList ();
 		}
-		
+
 		#region Initialization (Init/Shutdown)
 
 		/// <summary>
@@ -357,7 +357,7 @@ namespace Terminal.Gui {
 			/// For debug (see DEBUG_IDISPOSABLE define) purposes; the runstate instances that have been created
 			/// </summary>
 			public static List<RunState> Instances = new List<RunState> ();
-			
+
 			/// <summary>
 			/// Creates a new RunState object.
 			/// </summary>
@@ -404,7 +404,7 @@ namespace Terminal.Gui {
 		/// Building block API: Prepares the provided <see cref="Toplevel"/> for execution.
 		/// </summary>
 		/// <returns>The <see cref="RunState"/> handle that needs to be passed to the <see cref="End(RunState)"/> method upon completion.</returns>
-		/// <param name="Toplevel">The <see cref="Toplevel"/> to prepare execution for.</param>
+		/// <param name="toplevel">The <see cref="Toplevel"/> to prepare execution for.</param>
 		/// <remarks>
 		/// This method prepares the provided <see cref="Toplevel"/> for running with the focus,
 		/// it adds this to the list of <see cref="Toplevel"/>s, sets up the <see cref="MainLoop"/> to process the
@@ -413,46 +413,56 @@ namespace Terminal.Gui {
 		/// the <see cref="RunLoop"/> method, and then the <see cref="End(RunState)"/> method upon termination which will
 		///  undo these changes.
 		/// </remarks>
-		public static RunState Begin (Toplevel Toplevel)
+		public static RunState Begin (Toplevel toplevel)
 		{
-			if (Toplevel == null) {
-				throw new ArgumentNullException (nameof (Toplevel));
-			} else if (Toplevel.IsOverlappedContainer && OverlappedTop != Toplevel && OverlappedTop != null) {
+			if (toplevel == null) {
+				throw new ArgumentNullException (nameof (toplevel));
+			} else if (toplevel.IsOverlappedContainer && OverlappedTop != toplevel && OverlappedTop != null) {
 				throw new InvalidOperationException ("Only one Overlapped Container is allowed.");
 			}
 
-			var rs = new RunState (Toplevel);
+			var rs = new RunState (toplevel);
 
 			// View implements ISupportInitializeNotification which is derived from ISupportInitialize
-			if (!Toplevel.IsInitialized) {
-				Toplevel.BeginInit ();
-				Toplevel.EndInit ();
+			if (Top != null && !_toplevels.Contains (Top) && toplevel != Top) {
+				if (toplevel.IsOverlappedContainer) {
+					Top.Dispose ();
+					Top = null;
+					Top = toplevel;
+				}
+				Top.BeginInit ();
+				Top.EndInit ();
+			}
+			if (!toplevel.IsInitialized) {
+				toplevel.BeginInit ();
+				toplevel.EndInit ();
 			}
 
 			lock (_toplevels) {
 				// If Top was already initialized with Init, and Begin has never been called
-				// Top was not added to the Toplevels Stack. It will thus never get disposed.
-				// Clean it up here:
-				if (Top != null && Toplevel != Top && !_toplevels.Contains (Top)) {
-					Top.Dispose ();
-					Top = null;
-				} else if (Top != null && Toplevel != Top && _toplevels.Contains (Top)) {
-					Top.OnLeave (Toplevel);
+				// Top was not added to the Toplevels Stack and is needed to add it.
+				if (Top != null && !_toplevels.Contains (Top)) {
+					Top.Id = "1";
+					_toplevels.Push (Top);
 				}
-				if (string.IsNullOrEmpty (Toplevel.Id.ToString ())) {
+				// If toplevel parameter is different of Top then invoke the Leave event.
+				if (Top != null && toplevel != Top && _toplevels.Contains (Top)) {
+					Top.OnLeave (toplevel);
+				}
+				if (string.IsNullOrEmpty (toplevel.Id.ToString ())) {
 					var count = 1;
 					var id = (_toplevels.Count + count).ToString ();
 					while (_toplevels.Count > 0 && _toplevels.FirstOrDefault (x => x.Id.ToString () == id) != null) {
 						count++;
 						id = (_toplevels.Count + count).ToString ();
 					}
-					Toplevel.Id = (_toplevels.Count + count).ToString ();
+					toplevel.Id = (_toplevels.Count + count).ToString ();
 
-					_toplevels.Push (Toplevel);
+					_toplevels.Push (toplevel);
 				} else {
-					var dup = _toplevels.FirstOrDefault (x => x.Id.ToString () == Toplevel.Id);
+					var dup = _toplevels.FirstOrDefault (x => x.Id.ToString () == toplevel.Id);
 					if (dup == null) {
-						_toplevels.Push (Toplevel);
+						_toplevels.Push (toplevel);
 					}
 				}
 
@@ -460,46 +470,43 @@ namespace Terminal.Gui {
 					throw new ArgumentException ("There are duplicates Toplevels Id's");
 				}
 			}
-			if (Top == null || Toplevel.IsOverlappedContainer) {
-				Top = Toplevel;
-			}
 
 			var refreshDriver = true;
-			if (OverlappedTop == null || Toplevel.IsOverlappedContainer || (Current?.Modal == false && Toplevel.Modal)
-				|| (Current?.Modal == false && !Toplevel.Modal) || (Current?.Modal == true && Toplevel.Modal)) {
+			if (OverlappedTop == null || toplevel.IsOverlappedContainer || (Current?.Modal == false && toplevel.Modal)
+				|| (Current?.Modal == false && !toplevel.Modal) || (Current?.Modal == true && toplevel.Modal)) {
 
-				if (Toplevel.Visible) {
-					Current = Toplevel;
+				if (toplevel.Visible) {
+					Current = toplevel;
 					SetCurrentOverlappedAsTop ();
 				} else {
 					refreshDriver = false;
 				}
-			} else if ((OverlappedTop != null && Toplevel != OverlappedTop && Current?.Modal == true && !_toplevels.Peek ().Modal)
-				|| (OverlappedTop != null && Toplevel != OverlappedTop && Current?.Running == false)) {
+			} else if ((OverlappedTop != null && toplevel != OverlappedTop && Current?.Modal == true && !_toplevels.Peek ().Modal)
+				|| (OverlappedTop != null && toplevel != OverlappedTop && Current?.Running == false)) {
 				refreshDriver = false;
-				MoveCurrent (Toplevel);
+				MoveCurrent (toplevel);
 			} else {
 				refreshDriver = false;
 				MoveCurrent (Current);
 			}
 
 			Driver.PrepareToRun (MainLoop, ProcessKeyEvent, ProcessKeyDownEvent, ProcessKeyUpEvent, ProcessMouseEvent);
-			if (Toplevel.LayoutStyle == LayoutStyle.Computed) {
-				Toplevel.SetRelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
+			if (toplevel.LayoutStyle == LayoutStyle.Computed) {
+				toplevel.SetRelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
 			}
-			Toplevel.LayoutSubviews ();
-			Toplevel.PositionToplevels ();
-			Toplevel.FocusFirst ();
+			toplevel.LayoutSubviews ();
+			toplevel.PositionToplevels ();
+			toplevel.FocusFirst ();
 			if (refreshDriver) {
-				OverlappedTop?.OnChildLoaded (Toplevel);
-				Toplevel.OnLoaded ();
-				Toplevel.SetNeedsDisplay ();
-				Toplevel.Redraw (Toplevel.Bounds);
-				Toplevel.PositionCursor ();
+				OverlappedTop?.OnChildLoaded (toplevel);
+				toplevel.OnLoaded ();
+				toplevel.SetNeedsDisplay ();
+				toplevel.Redraw (toplevel.Bounds);
+				toplevel.PositionCursor ();
 				Driver.Refresh ();
 			}
 
-			NotifyNewRunState?.Invoke (Toplevel, new RunStateEventArgs (rs));
+			NotifyNewRunState?.Invoke (toplevel, new RunStateEventArgs (rs));
 			return rs;
 		}
 
@@ -618,7 +625,7 @@ namespace Terminal.Gui {
 				}
 #endif
 			}
-		}		
+		}
 
 		/// <summary>
 		/// Triggers a refresh of the entire display.
@@ -892,7 +899,7 @@ namespace Terminal.Gui {
 				NotifyStopRunState?.Invoke (top, new ToplevelEventArgs (top));
 			}
 		}
-		
+
 		/// <summary>
 		/// Building block API: completes the execution of a <see cref="Toplevel"/> that was started with <see cref="Begin(Toplevel)"/> .
 		/// </summary>

@@ -73,12 +73,12 @@ namespace Terminal.Gui.ApplicationTests {
 			Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
 			// Validate there are no outstanding RunState-based instances left
-			foreach (var inst in Application.RunState.Instances) 				Assert.True (inst.WasDisposed);
+			foreach (var inst in Application.RunState.Instances) Assert.True (inst.WasDisposed);
 #endif
 		}
 
 		[Fact]
-		public void Begin_End_Cleans_Up_RunState ()
+		public void Begin_End_Cleans_Up_RunState_With_New_Toplevel ()
 		{
 			// Setup Mock driver
 			Init ();
@@ -87,6 +87,38 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.Throws<ArgumentNullException> (() => Application.Begin (null));
 
 			var top = new Toplevel ();
+			var rs = Application.Begin (top);
+			Assert.NotNull (rs);
+			Assert.Equal (top, Application.Current);
+			Application.End (rs);
+
+			Assert.NotNull (Application.Current);
+			Assert.NotNull (Application.Top);
+			Assert.NotNull (Application.MainLoop);
+			Assert.NotNull (Application.Driver);
+
+			Shutdown ();
+
+#if DEBUG_IDISPOSABLE
+			Assert.True (rs.WasDisposed);
+#endif
+
+			Assert.Null (Application.Current);
+			Assert.Null (Application.Top);
+			Assert.Null (Application.MainLoop);
+			Assert.Null (Application.Driver);
+		}
+
+		[Fact]
+		public void Begin_End_Cleans_Up_RunState_With_Application_Top ()
+		{
+			// Setup Mock driver
+			Init ();
+
+			// Test null Toplevel
+			Assert.Throws<ArgumentNullException> (() => Application.Begin (null));
+
+			var top = Application.Top;
 			var rs = Application.Begin (top);
 			Assert.NotNull (rs);
 			Assert.Equal (top, Application.Current);

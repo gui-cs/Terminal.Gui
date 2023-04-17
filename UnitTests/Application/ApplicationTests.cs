@@ -132,7 +132,7 @@ namespace Terminal.Gui.ApplicationTests {
 		}
 
 		[Fact]
-		public void Init_Begin_End_Cleans_Up ()
+		public void Init_Begin_End_Cleans_Up_New_Toplevel ()
 		{
 			Init ();
 
@@ -150,6 +150,49 @@ namespace Terminal.Gui.ApplicationTests {
 			Application.NotifyNewRunState += NewRunStateFn;
 
 			Toplevel topLevel = new Toplevel ();
+			var rs = Application.Begin (topLevel);
+			Assert.NotNull (rs);
+			Assert.NotNull (runstate);
+			Assert.Equal (rs, runstate);
+
+			Assert.Equal (topLevel, Application.Top);
+			Assert.Equal (topLevel, Application.Current);
+
+			Application.NotifyNewRunState -= NewRunStateFn;
+			Application.End (runstate);
+
+			Assert.NotNull (Application.Current);
+			Assert.NotNull (Application.Top);
+			Assert.NotNull (Application.MainLoop);
+			Assert.NotNull (Application.Driver);
+
+			Shutdown ();
+
+			Assert.Null (Application.Current);
+			Assert.Null (Application.Top);
+			Assert.Null (Application.MainLoop);
+			Assert.Null (Application.Driver);
+		}
+
+		[Fact]
+		public void Init_Begin_End_Cleans_Up_Application_Top ()
+		{
+			Init ();
+
+			// Begin will cause Run() to be called, which will call Begin(). Thus will block the tests
+			// if we don't stop
+			Application.Iteration = () => {
+				Application.RequestStop ();
+			};
+
+			Application.RunState runstate = null;
+			EventHandler<RunStateEventArgs> NewRunStateFn = (s, e) => {
+				Assert.NotNull (e.State);
+				runstate = e.State;
+			};
+			Application.NotifyNewRunState += NewRunStateFn;
+
+			Toplevel topLevel = Application.Top;
 			var rs = Application.Begin (topLevel);
 			Assert.NotNull (rs);
 			Assert.NotNull (runstate);
@@ -420,9 +463,9 @@ namespace Terminal.Gui.ApplicationTests {
 			Init ();
 			var top = Application.Top;
 			var count = 0;
-			top.Loaded += (s,e) => count++;
-			top.Ready += (s,e) => count++;
-			top.Unloaded += (s,e) => count++;
+			top.Loaded += (s, e) => count++;
+			top.Ready += (s, e) => count++;
+			top.Unloaded += (s, e) => count++;
 			Application.Iteration = () => Application.RequestStop ();
 			Application.Run ();
 			Application.Shutdown ();
@@ -461,7 +504,7 @@ namespace Terminal.Gui.ApplicationTests {
 		#endregion
 
 		[Fact, AutoInitShutdown]
-		public void Begin_Sets_Application_Top_To_Console_Size()
+		public void Begin_Sets_Application_Top_To_Console_Size ()
 		{
 			Assert.Equal (new Rect (0, 0, 80, 25), Application.Top.Frame);
 
@@ -476,7 +519,7 @@ namespace Terminal.Gui.ApplicationTests {
 		[AutoInitShutdown]
 		public void SetCurrentAsTop_Run_A_Not_Modal_Toplevel_Make_It_The_Current_Application_Top ()
 		{
-			var t1 = new Toplevel ();
+			var t1 = Application.Top;
 			var t2 = new Toplevel ();
 			var t3 = new Toplevel ();
 			var d = new Dialog ();
@@ -485,15 +528,15 @@ namespace Terminal.Gui.ApplicationTests {
 			// t1, t2, t3, d, t4
 			var iterations = 5;
 
-			t1.Ready += (s,e) => {
+			t1.Ready += (s, e) => {
 				Assert.Equal (t1, Application.Top);
 				Application.Run (t2);
 			};
-			t2.Ready += (s,e) => {
+			t2.Ready += (s, e) => {
 				Assert.Equal (t2, Application.Top);
 				Application.Run (t3);
 			};
-			t3.Ready += (s,e) => {
+			t3.Ready += (s, e) => {
 				Assert.Equal (t3, Application.Top);
 				Application.Run (d);
 			};
@@ -509,7 +552,7 @@ namespace Terminal.Gui.ApplicationTests {
 				t2.RequestStop ();
 			};
 			// Now this will close the OverlappedContainer when all OverlappedChildren was closed
-			t2.Closed += (s,_) => {
+			t2.Closed += (s, _) => {
 				t1.RequestStop ();
 			};
 			Application.Iteration += () => {
@@ -741,7 +784,7 @@ namespace Terminal.Gui.ApplicationTests {
 			var top = Application.Top;
 			var isQuiting = false;
 
-			top.Closing += (s,e) => {
+			top.Closing += (s, e) => {
 				isQuiting = true;
 				e.Cancel = true;
 			};
