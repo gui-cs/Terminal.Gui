@@ -30,9 +30,7 @@ namespace UICatalog.Scenarios {
 				Width = 22,
 				Height = 3,
 				//Title = "Preview",
-				Border = new Border () {
-					BorderStyle = BorderStyle.Single
-				}
+				BorderStyle = LineStyle.Single
 			};
 			Win.Add (preview);
 
