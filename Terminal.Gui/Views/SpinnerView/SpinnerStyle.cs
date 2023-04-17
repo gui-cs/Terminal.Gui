@@ -43,7 +43,7 @@ namespace Terminal.Gui {
 		/// <remarks>This is the maximum speed the spinner will rotate at.  You still need to
 		/// call <see cref="View.SetNeedsDisplay()"/> or <see cref="SpinnerView.AutoSpin"/> to
 		/// advance/start animation.</remarks>
-		public abstract int SpinDelayInMilliseconds { get; }
+		public abstract int SpinDelay { get; }
 
 		/// <summary>
 		/// Gets or sets whether spinner should go back and forth through the Sequence rather than
@@ -65,13 +65,13 @@ namespace Terminal.Gui {
 
 		// Placeholder when user has specified Delay and Sequence manually
 		public class Custom : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => Array.Empty<string> ();
 		}
 		public class Dots : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -89,7 +89,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Dots2 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -105,7 +105,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Dots3 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -123,7 +123,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Dots4 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => true;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -139,7 +139,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Dots5 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -164,7 +164,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Dots6 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => true;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -186,7 +186,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Dots7 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => true;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -208,7 +208,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Dots8 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -245,7 +245,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Dots9 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -261,7 +261,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Dots10 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -276,7 +276,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Dots11 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 100;
+			public override int SpinDelay => 100;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -292,7 +292,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Dots12 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -356,7 +356,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Dots8Bit : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -620,7 +620,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Line : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 130;
+			public override int SpinDelay => 130;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -632,7 +632,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Line2 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 100;
+			public override int SpinDelay => 100;
 			public override bool SpinBounce => true;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -644,7 +644,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Pipe : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 100;
+			public override int SpinDelay => 100;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -660,7 +660,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class SimpleDots : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 400;
+			public override int SpinDelay => 400;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -672,7 +672,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class SimpleDotsScrolling : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 200;
+			public override int SpinDelay => 200;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -686,7 +686,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Star : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 70;
+			public override int SpinDelay => 70;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -700,7 +700,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Star2 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -711,7 +711,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Flip : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 70;
+			public override int SpinDelay => 70;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -731,7 +731,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Hamburger : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 100;
+			public override int SpinDelay => 100;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -742,7 +742,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class GrowVertical : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 120;
+			public override int SpinDelay => 120;
 			public override bool SpinBounce => true;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -756,7 +756,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class GrowHorizontal : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 120;
+			public override int SpinDelay => 120;
 			public override bool SpinBounce => true;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -771,7 +771,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Balloon : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 140;
+			public override int SpinDelay => 140;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -786,7 +786,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Balloon2 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 120;
+			public override int SpinDelay => 120;
 			public override bool SpinBounce => true;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -799,7 +799,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Noise : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 100;
+			public override int SpinDelay => 100;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -810,7 +810,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Bounce : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 120;
+			public override int SpinDelay => 120;
 			public override bool SpinBounce => true;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -821,7 +821,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class BoxBounce : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 120;
+			public override int SpinDelay => 120;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -833,7 +833,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class BoxBounce2 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 100;
+			public override int SpinDelay => 100;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -845,7 +845,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Triangle : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 50;
+			public override int SpinDelay => 50;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -857,7 +857,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Arc : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 100;
+			public override int SpinDelay => 100;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -871,7 +871,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Circle : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 120;
+			public override int SpinDelay => 120;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -882,7 +882,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class SquareCorners : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 180;
+			public override int SpinDelay => 180;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -894,7 +894,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class CircleQuarters : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 120;
+			public override int SpinDelay => 120;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -906,7 +906,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class CircleHalves : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 50;
+			public override int SpinDelay => 50;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -918,7 +918,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Squish : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 100;
+			public override int SpinDelay => 100;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -928,7 +928,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Toggle : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 250;
+			public override int SpinDelay => 250;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -938,7 +938,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Toggle2 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -948,7 +948,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Toggle3 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 120;
+			public override int SpinDelay => 120;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -958,7 +958,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Toggle4 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 100;
+			public override int SpinDelay => 100;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -970,7 +970,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Toggle5 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 100;
+			public override int SpinDelay => 100;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -980,7 +980,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Toggle6 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 300;
+			public override int SpinDelay => 300;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -990,7 +990,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Toggle7 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -1000,7 +1000,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Toggle8 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 100;
+			public override int SpinDelay => 100;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -1010,7 +1010,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Toggle9 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 100;
+			public override int SpinDelay => 100;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -1020,7 +1020,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Toggle10 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 100;
+			public override int SpinDelay => 100;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -1031,7 +1031,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Toggle11 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 50;
+			public override int SpinDelay => 50;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -1041,7 +1041,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Toggle12 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 120;
+			public override int SpinDelay => 120;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -1051,7 +1051,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Toggle13 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -1062,7 +1062,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Arrow : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 100;
+			public override int SpinDelay => 100;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -1078,7 +1078,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Arrow2 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => true;
 			public override string [] Sequence => new string []
@@ -1094,7 +1094,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Arrow3 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 120;
+			public override int SpinDelay => 120;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -1108,7 +1108,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class BouncingBar : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => true;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -1124,7 +1124,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class BouncingBall : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => true;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -1138,7 +1138,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Smiley : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 200;
+			public override int SpinDelay => 200;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => true;
 			public override string [] Sequence => new string []
@@ -1148,7 +1148,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Monkey : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 300;
+			public override int SpinDelay => 300;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => true;
 			public override string [] Sequence => new string []
@@ -1160,7 +1160,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Hearts : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 100;
+			public override int SpinDelay => 100;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => true;
 			public override string [] Sequence => new string []
@@ -1173,7 +1173,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Clock : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 100;
+			public override int SpinDelay => 100;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => true;
 			public override string [] Sequence => new string []
@@ -1193,7 +1193,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Earth : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 180;
+			public override int SpinDelay => 180;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => true;
 			public override string [] Sequence => new string []
@@ -1204,7 +1204,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Material : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 17;
+			public override int SpinDelay => 17;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -1304,7 +1304,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Moon : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => true;
 			public override string [] Sequence => new string []
@@ -1320,7 +1320,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Runner : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 140;
+			public override int SpinDelay => 140;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => true;
 			public override string [] Sequence => new string []
@@ -1330,7 +1330,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Pong : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => true;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -1368,7 +1368,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Shark : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 120;
+			public override int SpinDelay => 120;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -1402,7 +1402,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Dqpb : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 100;
+			public override int SpinDelay => 100;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -1414,7 +1414,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Weather : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 100;
+			public override int SpinDelay => 100;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => true;
 			public override string [] Sequence => new string []
@@ -1445,7 +1445,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Christmas : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 400;
+			public override int SpinDelay => 400;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => true;
 			public override string [] Sequence => new string []
@@ -1455,7 +1455,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Grenade : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => true;
 			public override string [] Sequence => new string []
@@ -1477,7 +1477,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Points : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 125;
+			public override int SpinDelay => 125;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -1490,7 +1490,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Layer : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 150;
+			public override int SpinDelay => 150;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -1501,7 +1501,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class BetaWave : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -1516,7 +1516,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class FingerDance : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 160;
+			public override int SpinDelay => 160;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => true;
 			public override string [] Sequence => new string []
@@ -1530,7 +1530,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class FistBump : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => true;
 			public override string [] Sequence => new string []
@@ -1545,7 +1545,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class SoccerHeader : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => true;
 			public override bool HasSpecialCharacters => true;
 			public override string [] Sequence => new string []
@@ -1560,7 +1560,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class MindBlown : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 160;
+			public override int SpinDelay => 160;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => true;
 			public override string [] Sequence => new string []
@@ -1582,7 +1582,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Speaker : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 160;
+			public override int SpinDelay => 160;
 			public override bool SpinBounce => true;
 			public override bool HasSpecialCharacters => true;
 			public override string [] Sequence => new string []
@@ -1593,7 +1593,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class OrangePulse : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 100;
+			public override int SpinDelay => 100;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => true;
 			public override string [] Sequence => new string []
@@ -1606,7 +1606,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class BluePulse : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 100;
+			public override int SpinDelay => 100;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => true;
 			public override string [] Sequence => new string []
@@ -1619,7 +1619,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class OrangeBluePulse : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 100;
+			public override int SpinDelay => 100;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => true;
 			public override string [] Sequence => new string []
@@ -1637,7 +1637,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class TimeTravelClock : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => 100;
+			public override int SpinDelay => 100;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => true;
 			public override string [] Sequence => new string []
@@ -1657,7 +1657,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Aesthetic : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []
@@ -1673,7 +1673,7 @@ namespace Terminal.Gui {
 			};
 		}
 		public class Aesthetic2 : SpinnerStyle {
-			public override int SpinDelayInMilliseconds => DEFAULT_DELAY;
+			public override int SpinDelay => DEFAULT_DELAY;
 			public override bool SpinBounce => DEFAULT_BOUNCE;
 			public override bool HasSpecialCharacters => DEFAULT_SPECIAL;
 			public override string [] Sequence => new string []

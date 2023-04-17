@@ -84,7 +84,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (delayField);
 			delayField.TextChanged += (s, e) => {
 				if (ushort.TryParse (delayField.Text.ToString (), out var i))
-					spinner.SpinDelayInMilliseconds = i;
+					spinner.SpinDelay = i;
 			};
 
 			var customLabel = new Label ("Custom:") {
@@ -132,7 +132,7 @@ namespace UICatalog.Scenarios {
 				} else {
 					spinner.Visible = true;
 					spinner.Style = (SpinnerStyle)Activator.CreateInstance(styleDict [e.Item].Value);
-					delayField.Text = spinner.SpinDelayInMilliseconds.ToString ();
+					delayField.Text = spinner.SpinDelay.ToString ();
 					ckbBounce.Checked = spinner.SpinBounce;
 					ckbNoSpecial.Checked = !spinner.HasSpecialCharacters;
 					ckbAscii.Checked = spinner.IsAsciiOnly;
@@ -155,10 +155,10 @@ namespace UICatalog.Scenarios {
 				if (customField.Text.Length > 0) {
 					spinner.Visible = true;
 					if (ushort.TryParse (delayField.Text.ToString (), out var d))
-						spinner.SpinDelayInMilliseconds = d;
+						spinner.SpinDelay = d;
 					else {
 						delayField.Text = DEFAULT_DELAY.ToString ();
-						spinner.SpinDelayInMilliseconds = DEFAULT_DELAY;
+						spinner.SpinDelay = DEFAULT_DELAY;
 					}
 					var str = new List<string> ();
 					foreach (var c in customField.Text.ToString ().ToCharArray ()) {

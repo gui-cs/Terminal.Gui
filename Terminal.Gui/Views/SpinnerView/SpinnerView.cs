@@ -19,7 +19,7 @@ namespace Terminal.Gui {
 		private static readonly SpinnerStyle DEFAULT_STYLE = new SpinnerStyle.Line ();
 
 		private SpinnerStyle _style = DEFAULT_STYLE;
-		private int _delay = DEFAULT_STYLE.SpinDelayInMilliseconds;
+		private int _delay = DEFAULT_STYLE.SpinDelay;
 		private bool _bounce = DEFAULT_STYLE.SpinBounce;
 		private string [] _sequence = DEFAULT_STYLE.Sequence;
 		private bool _bounceReverse = false;
@@ -44,7 +44,7 @@ namespace Terminal.Gui {
 		/// <remarks>This is the maximum speed the spinner will rotate at.  You still need to
 		/// call <see cref="View.SetNeedsDisplay()"/> or <see cref="SpinnerView.AutoSpin"/> to
 		/// advance/start animation.</remarks>
-		public int SpinDelayInMilliseconds { get => _delay; set => SetDelay (value); }
+		public int SpinDelay { get => _delay; set => SetDelay (value); }
 
 		/// <summary>
 		/// Gets or sets whether spinner should go back and forth through the frames rather than
@@ -87,7 +87,7 @@ namespace Terminal.Gui {
 			if (style is not null) {
 				_style = style;
 				_sequence = style.Sequence;
-				_delay = style.SpinDelayInMilliseconds;
+				_delay = style.SpinDelay;
 				_bounce = style.SpinBounce;
 				Width = GetSpinnerWidth ();
 			}
@@ -148,7 +148,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
-			if (DateTime.Now - _lastRender > TimeSpan.FromMilliseconds (SpinDelayInMilliseconds)) {
+			if (DateTime.Now - _lastRender > TimeSpan.FromMilliseconds (SpinDelay)) {
 				//_currentIdx = (_currentIdx + 1) % Sequence.Length;
 				if (Sequence is not null && Sequence.Length > 1) {
 					int d = 1;
@@ -199,7 +199,7 @@ namespace Terminal.Gui {
 			}
 
 			_timeout = Application.MainLoop.AddTimeout (
-				TimeSpan.FromMilliseconds (SpinDelayInMilliseconds), (m) => {
+				TimeSpan.FromMilliseconds (SpinDelay), (m) => {
 					Application.MainLoop.Invoke (this.SetNeedsDisplay);
 					return true;
 				});

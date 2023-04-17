@@ -69,7 +69,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestSpinnerView_NoThrottle ()
 		{
 			var view = GetSpinnerView ();
-			view.SpinDelayInMilliseconds = 0;
+			view.SpinDelay = 0;
 
 			view.Redraw (view.Bounds);
 
