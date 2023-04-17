@@ -942,7 +942,7 @@ namespace Terminal.Gui {
 		/// Set flags to enable/disable <see cref="ConsoleDriver"/> diagnostics.
 		/// </summary>
 		public static DiagnosticFlags Diagnostics { get; set; }
-		
+
 		/// <summary>
 		/// Suspend the application, typically needs to save the state, suspend the app and upon return, reset the console driver.
 		/// </summary>
@@ -1118,42 +1118,32 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Horizontal double line character.
 		/// </summary>
-		public Rune HDLine = '\u2550';
+		public Rune HDbLine = '\u2550';
 
 		/// <summary>
 		/// Vertical double line character.
 		/// </summary>
-		public Rune VDLine = '\u2551';
+		public Rune VDbLine = '\u2551';
 
 		/// <summary>
 		/// Upper left double corner
 		/// </summary>
-		public Rune ULDCorner = '\u2554';
+		public Rune ULDbCorner = '\u2554';
 
 		/// <summary>
 		/// Lower left double corner
 		/// </summary>
-		public Rune LLDCorner = '\u255a';
+		public Rune LLDbCorner = '\u255a';
 
 		/// <summary>
 		/// Upper right double corner
 		/// </summary>
-		public Rune URDCorner = '\u2557';
+		public Rune URDbCorner = '\u2557';
 
 		/// <summary>
 		/// Lower right double corner
 		/// </summary>
-		public Rune LRDCorner = '\u255d';
-
-		/// <summary>
-		/// Horizontal line character for rounded corners.
-		/// </summary>
-		public Rune HRLine = '\u2500';
-
-		/// <summary>
-		/// Vertical line character for rounded corners.
-		/// </summary>
-		public Rune VRLine = '\u2502';
+		public Rune LRDbCorner = '\u255d';
 
 		/// <summary>
 		/// Upper left rounded corner
@@ -1174,6 +1164,157 @@ namespace Terminal.Gui {
 		/// Lower right rounded corner
 		/// </summary>
 		public Rune LRRCorner = '\u256f';
+
+		/// <summary>
+		/// Horizontal double dashed line character.
+		/// </summary>
+		public Rune HDsLine = '\u254c';
+
+		/// <summary>
+		/// Vertical triple dashed line character.
+		/// </summary>
+		public Rune VDsLine = '\u2506';
+
+		/// <summary>
+		/// Horizontal triple dashed line character.
+		/// </summary>
+		public Rune HDtLine = '\u2504';
+
+		/// <summary>
+		/// Horizontal quadruple dashed line character.
+		/// </summary>
+		public Rune HD4Line = '\u2508';
+
+		/// <summary>
+		/// Vertical double dashed line character.
+		/// </summary>
+		public Rune VD2Line = '\u254e';
+
+		/// <summary>
+		/// Vertical quadruple dashed line character.
+		/// </summary>
+		public Rune VDtLine = '\u250a';
+
+		/// <summary>
+		/// Horizontal heavy line character.
+		/// </summary>
+		public Rune HThLine = '\u2501';
+
+		/// <summary>
+		/// Vertical heavy line character.
+		/// </summary>
+		public Rune VThLine = '\u2503';
+
+		/// <summary>
+		/// Upper left heavy corner
+		/// </summary>
+		public Rune ULThCorner = '\u250f';
+
+		/// <summary>
+		/// Lower left heavy corner
+		/// </summary>
+		public Rune LLThCorner = '\u2517';
+
+		/// <summary>
+		/// Upper right heavy corner
+		/// </summary>
+		public Rune URThCorner = '\u2513';
+
+		/// <summary>
+		/// Lower right heavy corner
+		/// </summary>
+		public Rune LRThCorner = '\u251b';
+
+		/// <summary>
+		/// Horizontal heavy double dashed line character.
+		/// </summary>
+		public Rune HThDsLine = '\u254d';
+
+		/// <summary>
+		/// Vertical heavy triple dashed line character.
+		/// </summary>
+		public Rune VThDsLine = '\u2507';
+
+		/// <summary>
+		/// Horizontal heavy triple dashed line character.
+		/// </summary>
+		public Rune HThDtLine = '\u2505';
+
+		/// <summary>
+		/// Horizontal heavy quadruple dashed line character.
+		/// </summary>
+		public Rune HThD4Line = '\u2509';
+
+		/// <summary>
+		/// Vertical heavy double dashed line character.
+		/// </summary>
+		public Rune VThD2Line = '\u254f';
+
+		/// <summary>
+		/// Vertical heavy quadruple dashed line character.
+		/// </summary>
+		public Rune VThDtLine = '\u250b';
+
+		/// <summary>
+		/// The left half line.
+		/// </summary>
+		public Rune HalfLeftLine = '\u2574';
+
+		/// <summary>
+		/// The up half line.
+		/// </summary>
+		public Rune HalfTopLine = '\u2575';
+
+		/// <summary>
+		/// The right half line.
+		/// </summary>
+		public Rune HalfRightLine = '\u2576';
+
+		/// <summary>
+		/// The down half line.
+		/// </summary>
+		public Rune HalfBottomLine = '\u2577';
+
+		/// <summary>
+		/// The heavy left half line.
+		/// </summary>
+		public Rune ThHalfLeftLine = '\u2578';
+
+		/// <summary>
+		/// The heavy up half line.
+		/// </summary>
+		public Rune ThHalfTopLine = '\u2579';
+
+		/// <summary>
+		/// The heavy right half line.
+		/// </summary>
+		public Rune ThHalfRightLine = '\u257a';
+
+		/// <summary>
+		/// The heavy light down half line.
+		/// </summary>
+		public Rune ThHalfBottomLine = '\u257b';
+
+		/// <summary>
+		/// The light left and heavy right line.
+		/// </summary>
+		public Rune ThRightSideLine = '\u257c';
+
+		/// <summary>
+		/// The light up and heavy down line.
+		/// </summary>
+		public Rune ThBottomSideLine = '\u257d';
+
+		/// <summary>
+		/// The heavy left and light right line.
+		/// </summary>
+		public Rune ThLeftSideLine = '\u257e';
+
+		/// <summary>
+		/// The heavy up and light down line.
+		/// </summary>
+		public Rune ThTopSideLine = '\u257f';
+
 		private Attribute currentAttribute;
 
 		/// <summary>

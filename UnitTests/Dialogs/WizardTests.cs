@@ -118,12 +118,12 @@ namespace Terminal.Gui.DialogTests {
 			var btnNextText = "Finish";
 			var btnNext = $"{d.LeftBracket}{d.LeftDefaultIndicator} {btnNextText} {d.RightDefaultIndicator}{d.RightBracket}";
 
-			var topRow = $"{d.ULDCorner}╡{title}{stepTitle}╞{new string (d.HDLine.ToString () [0], width - title.Length - stepTitle.Length - 4)}{d.URDCorner}";
-			var row2 = $"{d.VDLine}{new string (' ', width - 2)}{d.VDLine}";
+			var topRow = $"{d.ULDbCorner}╡{title}{stepTitle}╞{new string (d.HDbLine.ToString () [0], width - title.Length - stepTitle.Length - 4)}{d.URDbCorner}";
+			var row2 = $"{d.VDbLine}{new string (' ', width - 2)}{d.VDbLine}";
 			var row3 = row2;
-			var separatorRow = $"{d.VDLine}{new string (d.HLine.ToString () [0], width - 2)}{d.VDLine}";
-			var buttonRow = $"{d.VDLine}{btnBack}{new string (' ', width - btnBack.Length - btnNext.Length - 2)}{btnNext}{d.VDLine}";
-			var bottomRow = $"{d.LLDCorner}{new string (d.HDLine.ToString () [0], width - 2)}{d.LRDCorner}";
+			var separatorRow = $"{d.VDbLine}{new string (d.HLine.ToString () [0], width - 2)}{d.VDbLine}";
+			var buttonRow = $"{d.VDbLine}{btnBack}{new string (' ', width - btnBack.Length - btnNext.Length - 2)}{btnNext}{d.VDbLine}";
+			var bottomRow = $"{d.LLDbCorner}{new string (d.HDbLine.ToString () [0], width - 2)}{d.LRDbCorner}";
 
 			var wizard = new Wizard () { Title = title, Width = width, Height = height };
 			var runstate = Application.Begin (wizard);
@@ -150,13 +150,13 @@ namespace Terminal.Gui.DialogTests {
 			var btnNextText = "Finish"; // "Next";
 			var btnNext = $"{d.LeftBracket}{d.LeftDefaultIndicator} {btnNextText} {d.RightDefaultIndicator}{d.RightBracket}";
 
-			var topRow = $"{d.ULDCorner}╡{title} - {stepTitle}╞{new string (d.HDLine.ToString () [0], width - title.Length - stepTitle.Length - 7)}{d.URDCorner}";
-			var row2 = $"{d.VDLine}{new string (' ', width - 2)}{d.VDLine}";
+			var topRow = $"{d.ULDbCorner}╡{title} - {stepTitle}╞{new string (d.HDbLine.ToString () [0], width - title.Length - stepTitle.Length - 7)}{d.URDbCorner}";
+			var row2 = $"{d.VDbLine}{new string (' ', width - 2)}{d.VDbLine}";
 			var row3 = row2;
 			var row4 = row3;
-			var separatorRow = $"{d.VDLine}{new string (d.HLine.ToString () [0], width - 2)}{d.VDLine}";
-			var buttonRow = $"{d.VDLine}{btnBack}{new string (' ', width - btnBack.Length - btnNext.Length - 2)}{btnNext}{d.VDLine}";
-			var bottomRow = $"{d.LLDCorner}{new string (d.HDLine.ToString () [0], width - 2)}{d.LRDCorner}";
+			var separatorRow = $"{d.VDbLine}{new string (d.HLine.ToString () [0], width - 2)}{d.VDbLine}";
+			var buttonRow = $"{d.VDbLine}{btnBack}{new string (' ', width - btnBack.Length - btnNext.Length - 2)}{btnNext}{d.VDbLine}";
+			var bottomRow = $"{d.LLDbCorner}{new string (d.HDbLine.ToString () [0], width - 2)}{d.LRDbCorner}";
 
 			var wizard = new Wizard () { Title = title, Width = width, Height = height };
 			wizard.AddStep (new Wizard.WizardStep () { Title = stepTitle });
@@ -220,13 +220,13 @@ namespace Terminal.Gui.DialogTests {
 			var btnNextText = "Finish";
 			var btnNext = $"{d.LeftBracket}{d.LeftDefaultIndicator} {btnNextText} {d.RightDefaultIndicator}{d.RightBracket}";
 
-			var topRow = $"{d.ULDCorner}╡{title}{stepTitle}╞{new string (d.HDLine.ToString () [0], width - title.Length - stepTitle.Length - 4)}{d.URDCorner}";
-			var separatorRow = $"{d.VDLine}{new string (d.HLine.ToString () [0], width - 2)}{d.VDLine}";
+			var topRow = $"{d.ULDbCorner}╡{title}{stepTitle}╞{new string (d.HDbLine.ToString () [0], width - title.Length - stepTitle.Length - 4)}{d.URDbCorner}";
+			var separatorRow = $"{d.VDbLine}{new string (d.HLine.ToString () [0], width - 2)}{d.VDbLine}";
 
 			// Once this is fixed, revert to commented out line: https://github.com/gui-cs/Terminal.Gui/issues/1791
-			var buttonRow = $"{d.VDLine}{new string (' ', width - btnNext.Length - 2)}{btnNext}{d.VDLine}";
+			var buttonRow = $"{d.VDbLine}{new string (' ', width - btnNext.Length - 2)}{btnNext}{d.VDbLine}";
 			//var buttonRow = $"{d.VDLine}{new String (' ', width - btnNext.Length - 2)}{btnNext}{d.VDLine}";
-			var bottomRow = $"{d.LLDCorner}{new string (d.HDLine.ToString () [0], width - 2)}{d.LRDCorner}";
+			var bottomRow = $"{d.LLDbCorner}{new string (d.HDbLine.ToString () [0], width - 2)}{d.LRDbCorner}";
 
 			var wizard = new Wizard () { Title = title, Width = width, Height = height };
 			wizard.AddStep (new Wizard.WizardStep () { Title = "ABCD" });

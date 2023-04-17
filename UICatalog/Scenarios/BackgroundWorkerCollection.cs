@@ -107,7 +107,7 @@ namespace UICatalog.Scenarios {
 					var top = Application.OverlappedChildren.Find ((x) => x.Data.ToString () == "WorkerApp");
 					item.Checked = top.Visible = (bool)!item.Checked;
 					if (top.Visible) {
-						Application.MoveToOverlappedChild (null);
+						Application.MoveToOverlappedChild (top);
 					} else {
 						Application.OverlappedTop.SetNeedsDisplay ();
 					}
@@ -139,7 +139,7 @@ namespace UICatalog.Scenarios {
 						item.Checked = false;
 					}
 					item.Action += () => {
-						Application.MoveToOverlappedChild (null);
+						Application.MoveToOverlappedChild (top);
 					};
 					menuItems.Add (item);
 				}

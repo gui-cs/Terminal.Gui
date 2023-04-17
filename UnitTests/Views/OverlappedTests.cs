@@ -90,15 +90,15 @@ namespace Terminal.Gui.ViewsTests {
 				Assert.True (Application.Current == d);
 			};
 
-			d.Closed += (s,e) => Application.RequestStop (top1);
+			d.Closed += (s, e) => Application.RequestStop (top1);
 
 			Application.Iteration += () => {
 				Assert.Null (Application.OverlappedChildren);
-				if (iterations == 4) 					Assert.True (Application.Current == d);
-else if (iterations == 3) 					Assert.True (Application.Current == top4);
-else if (iterations == 2) 					Assert.True (Application.Current == top3);
-else if (iterations == 1) 					Assert.True (Application.Current == top2);
-else 					Assert.True (Application.Current == top1);
+				if (iterations == 4) Assert.True (Application.Current == d);
+				else if (iterations == 3) Assert.True (Application.Current == top4);
+				else if (iterations == 2) Assert.True (Application.Current == top3);
+				else if (iterations == 1) Assert.True (Application.Current == top2);
+				else Assert.True (Application.Current == top1);
 				Application.RequestStop (top1);
 				iterations--;
 			};
@@ -154,7 +154,7 @@ else 					Assert.True (Application.Current == top1);
 			};
 
 			// Now this will close the OverlappedContainer propagating through the OverlappedChildren.
-			d.Closed += (s,e) => {
+			d.Closed += (s, e) => {
 				overlapped.RequestStop ();
 			};
 
@@ -165,7 +165,7 @@ else 					Assert.True (Application.Current == top1);
 					Assert.False (d.Running);
 				} else {
 					Assert.Equal (iterations, Application.OverlappedChildren.Count);
-					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + 1).ToString (), Application.OverlappedChildren [i].Id);
+					for (int i = 0; i < iterations; i++) Assert.Equal ((iterations - i + 1).ToString (), Application.OverlappedChildren [i].Id);
 				}
 				iterations--;
 			};
@@ -214,7 +214,7 @@ else 					Assert.True (Application.Current == top1);
 			};
 
 			// Now this will close the OverlappedContainer propagating through the OverlappedChildren.
-			d.Closed += (s,e) => Application.RequestStop (overlapped);
+			d.Closed += (s, e) => Application.RequestStop (overlapped);
 
 			Application.Iteration += () => {
 				if (iterations == 4) {
@@ -223,7 +223,7 @@ else 					Assert.True (Application.Current == top1);
 					Assert.False (d.Running);
 				} else {
 					Assert.Equal (iterations, Application.OverlappedChildren.Count);
-					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + 1).ToString (), Application.OverlappedChildren [i].Id);
+					for (int i = 0; i < iterations; i++) Assert.Equal ((iterations - i + 1).ToString (), Application.OverlappedChildren [i].Id);
 				}
 				iterations--;
 			};
@@ -282,7 +282,7 @@ else 					Assert.True (Application.Current == top1);
 					Assert.False (d.Running);
 				} else {
 					Assert.Equal (iterations, Application.OverlappedChildren.Count);
-					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + 1).ToString (), Application.OverlappedChildren [i].Id);
+					for (int i = 0; i < iterations; i++) Assert.Equal ((iterations - i + 1).ToString (), Application.OverlappedChildren [i].Id);
 				}
 				iterations--;
 			};
@@ -380,7 +380,7 @@ else 					Assert.True (Application.Current == top1);
 					Assert.False (Application.Current.Running);
 				} else {
 					Assert.Equal (iterations, Application.OverlappedChildren.Count);
-					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + 1).ToString (), Application.OverlappedChildren [i].Id);
+					for (int i = 0; i < iterations; i++) Assert.Equal ((iterations - i + 1).ToString (), Application.OverlappedChildren [i].Id);
 				}
 				iterations--;
 			};
@@ -447,7 +447,7 @@ else 					Assert.True (Application.Current == top1);
 					Assert.True (c4.Running);
 				} else {
 					Assert.Equal (iterations, Application.OverlappedChildren.Count);
-					for (int i = 0; i < iterations; i++) 						Assert.Equal ((iterations - i + (iterations == 4 && i == 0 ? 2 : 1)).ToString (),
+					for (int i = 0; i < iterations; i++) Assert.Equal ((iterations - i + (iterations == 4 && i == 0 ? 2 : 1)).ToString (),
 							Application.OverlappedChildren [i].Id);
 				}
 				iterations--;
@@ -570,7 +570,7 @@ else 					Assert.True (Application.Current == top1);
 					};
 
 					stage.Closed += (_, _) => {
-						if (iterations == 11) 							allStageClosed = true;
+						if (iterations == 11) allStageClosed = true;
 						Assert.Equal (iterations, Application.OverlappedChildren.Count);
 						if (running) {
 							stageCompleted = true;
@@ -592,12 +592,12 @@ else 					Assert.True (Application.Current == top1);
 					running = false;
 					Assert.Equal (iterations, Application.OverlappedChildren.Count);
 
-				} else if (!overlappedRequestStop && running && !allStageClosed) 					Assert.Equal (iterations, Application.OverlappedChildren.Count);
-else if (!overlappedRequestStop && !running && allStageClosed) {
+				} else if (!overlappedRequestStop && running && !allStageClosed) Assert.Equal (iterations, Application.OverlappedChildren.Count);
+				else if (!overlappedRequestStop && !running && allStageClosed) {
 					Assert.Equal (iterations, Application.OverlappedChildren.Count);
 					overlappedRequestStop = true;
 					overlapped.RequestStop ();
-				} else 					Assert.Empty (Application.OverlappedChildren);
+				} else Assert.Empty (Application.OverlappedChildren);
 			};
 
 			Application.Run (overlapped);
@@ -671,6 +671,12 @@ else if (!overlappedRequestStop && !running && allStageClosed) {
 			Application.Run (overlapped);
 
 			Assert.Empty (Application.OverlappedChildren);
+		}
+
+		[Fact]
+		public void MoveToOverlappedChild_Throw_NullReferenceException_Passing_Null_Parameter ()
+		{
+			Assert.Throws<NullReferenceException> (delegate { Application.MoveToOverlappedChild (null); });
 		}
 	}
 }
