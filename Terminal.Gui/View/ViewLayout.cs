@@ -188,7 +188,7 @@ namespace Terminal.Gui {
 		/// the <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties.
 		/// </summary>
 		/// <value>The layout style.</value>
-		public LayoutStyle LayoutStyle {
+		public virtual LayoutStyle LayoutStyle {
 			get => _layoutStyle;
 			set {
 				_layoutStyle = value;
@@ -260,7 +260,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		/// </remarks>
-		public Pos X {
+		public virtual Pos X {
 			get => VerifyIsIntialized (_x);
 			set {
 				if (ForceValidatePosDim && !ValidatePosDim (_x, value)) {
@@ -280,7 +280,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		/// </remarks>
-		public Pos Y {
+		public virtual Pos Y {
 			get => VerifyIsIntialized (_y);
 			set {
 				if (ForceValidatePosDim && !ValidatePosDim (_y, value)) {
@@ -301,7 +301,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		/// </remarks>
-		public Dim Width {
+		public virtual Dim Width {
 			get => VerifyIsIntialized (_width);
 			set {
 				if (ForceValidatePosDim && !ValidatePosDim (_width, value)) {
@@ -326,7 +326,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>The height.</value>
 		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
-		public Dim Height {
+		public virtual Dim Height {
 			get => VerifyIsIntialized (_height);
 			set {
 				if (ForceValidatePosDim && !ValidatePosDim (_height, value)) {

@@ -426,9 +426,7 @@ namespace Terminal.Gui {
 			// View implements ISupportInitializeNotification which is derived from ISupportInitialize
 			if (Top != null && !_toplevels.Contains (Top) && toplevel != Top) {
 				if (toplevel.IsOverlappedContainer) {
-					Top.Dispose ();
-					Top = null;
-					Top = toplevel;
+					ResetTop (toplevel);
 				}
 				Top.BeginInit ();
 				Top.EndInit ();
@@ -477,7 +475,6 @@ namespace Terminal.Gui {
 
 				if (toplevel.Visible) {
 					Current = toplevel;
-					SetCurrentOverlappedAsTop ();
 				} else {
 					refreshDriver = false;
 				}
@@ -508,6 +505,19 @@ namespace Terminal.Gui {
 
 			NotifyNewRunState?.Invoke (toplevel, new RunStateEventArgs (rs));
 			return rs;
+		}
+
+		private static void ResetTop (Toplevel toplevel)
+		{
+			Top.Dispose ();
+			Top = null;
+			Top = toplevel;
+			Top.LayoutStyle = LayoutStyle.Absolute;
+			Top.X = null;
+			Top.Y = null;
+			Top.Width = null;
+			Top.Height = null;
+			Top.Frame = new Rect (0, 0, Driver.Cols, Driver.Rows);
 		}
 
 		/// <summary>
@@ -554,6 +564,7 @@ namespace Terminal.Gui {
 					if (type != typeof (Toplevel)) {
 						throw new ArgumentException ($"{top.GetType ().Name} must be derived from TopLevel");
 					}
+					ResetTop (top);
 					Run (top, errorHandler);
 				} else {
 					// This codepath should be impossible because Init(null, null) will select the platform default driver
@@ -943,7 +954,6 @@ namespace Terminal.Gui {
 				if (_toplevels.Count == 1 && Current == OverlappedTop) {
 					OverlappedTop.OnAllChildClosed ();
 				} else {
-					SetCurrentOverlappedAsTop ();
 					Current.OnEnter (Current);
 				}
 				Refresh ();
@@ -1089,9 +1099,11 @@ namespace Terminal.Gui {
 		{
 			var full = new Rect (0, 0, Driver.Cols, Driver.Rows);
 			TerminalResized?.Invoke (new ResizedEventArgs () { Cols = full.Width, Rows = full.Height });
-			Driver.Clip = full;
+			Driver.Clip = Top.Frame = full;
 			foreach (var t in _toplevels) {
-				t.SetRelativeLayout (full);
+				if (t.LayoutStyle == LayoutStyle.Computed) {
+					t.SetRelativeLayout (full);
+				}
 				t.LayoutSubviews ();
 				t.PositionToplevels ();
 				t.OnTerminalResized (new SizeChangedEventArgs (full.Size));

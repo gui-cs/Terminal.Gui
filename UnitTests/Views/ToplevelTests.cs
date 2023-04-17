@@ -41,7 +41,7 @@ namespace Terminal.Gui.ViewsTests {
 
 		[Fact]
 		[AutoInitShutdown]
-		public void Application_Top_GetLocationThatFits_To_Driver_Rows_And_Cols ()
+		public void Application_Top_Is_Always_The_One_Created_By_Init_Or_A_Replaced ()
 		{
 			var iterations = 0;
 
@@ -53,40 +53,65 @@ namespace Terminal.Gui.ViewsTests {
 					Assert.Equal (0, Application.Top.Frame.Y);
 					Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
 					Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
+					Assert.Equal ("Top1", Application.Current.Text);
+					Assert.Equal (0, Application.Current.Frame.X);
+					Assert.Equal (0, Application.Current.Frame.Y);
+					Assert.Equal (Application.Driver.Cols, Application.Current.Frame.Width);
+					Assert.Equal (Application.Driver.Rows, Application.Current.Frame.Height);
 
-					Application.Top.ProcessHotKey (new KeyEvent (Key.CtrlMask | Key.R, new KeyModifiers ()));
+					Application.Current.ProcessHotKey (new KeyEvent (Key.CtrlMask | Key.R, new KeyModifiers ()));
 				} else if (iterations == 1) {
-					Assert.Equal ("Top2", Application.Top.Text);
+					Assert.Equal ("Top1", Application.Top.Text);
 					Assert.Equal (0, Application.Top.Frame.X);
 					Assert.Equal (0, Application.Top.Frame.Y);
 					Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
 					Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
+					Assert.Equal ("Top2", Application.Current.Text);
+					Assert.Equal (0, Application.Current.Frame.X);
+					Assert.Equal (0, Application.Current.Frame.Y);
+					Assert.Equal (Application.Driver.Cols, Application.Current.Frame.Width);
+					Assert.Equal (Application.Driver.Rows, Application.Current.Frame.Height);
 
-					Application.Top.ProcessHotKey (new KeyEvent (Key.CtrlMask | Key.C, new KeyModifiers ()));
+					Application.Current.ProcessHotKey (new KeyEvent (Key.CtrlMask | Key.C, new KeyModifiers ()));
 				} else if (iterations == 3) {
 					Assert.Equal ("Top1", Application.Top.Text);
 					Assert.Equal (0, Application.Top.Frame.X);
 					Assert.Equal (0, Application.Top.Frame.Y);
 					Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
 					Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
+					Assert.Equal ("Top1", Application.Current.Text);
+					Assert.Equal (0, Application.Current.Frame.X);
+					Assert.Equal (0, Application.Current.Frame.Y);
+					Assert.Equal (Application.Driver.Cols, Application.Current.Frame.Width);
+					Assert.Equal (Application.Driver.Rows, Application.Current.Frame.Height);
 
-					Application.Top.ProcessHotKey (new KeyEvent (Key.CtrlMask | Key.R, new KeyModifiers ()));
+					Application.Current.ProcessHotKey (new KeyEvent (Key.CtrlMask | Key.R, new KeyModifiers ()));
 				} else if (iterations == 4) {
-					Assert.Equal ("Top2", Application.Top.Text);
+					Assert.Equal ("Top1", Application.Top.Text);
 					Assert.Equal (0, Application.Top.Frame.X);
 					Assert.Equal (0, Application.Top.Frame.Y);
 					Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
 					Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
+					Assert.Equal ("Top2", Application.Current.Text);
+					Assert.Equal (0, Application.Current.Frame.X);
+					Assert.Equal (0, Application.Current.Frame.Y);
+					Assert.Equal (Application.Driver.Cols, Application.Current.Frame.Width);
+					Assert.Equal (Application.Driver.Rows, Application.Current.Frame.Height);
 
-					Application.Top.ProcessHotKey (new KeyEvent (Key.CtrlMask | Key.C, new KeyModifiers ()));
+					Application.Current.ProcessHotKey (new KeyEvent (Key.CtrlMask | Key.C, new KeyModifiers ()));
 				} else if (iterations == 6) {
 					Assert.Equal ("Top1", Application.Top.Text);
 					Assert.Equal (0, Application.Top.Frame.X);
 					Assert.Equal (0, Application.Top.Frame.Y);
 					Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
 					Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
+					Assert.Equal ("Top1", Application.Current.Text);
+					Assert.Equal (0, Application.Current.Frame.X);
+					Assert.Equal (0, Application.Current.Frame.Y);
+					Assert.Equal (Application.Driver.Cols, Application.Current.Frame.Width);
+					Assert.Equal (Application.Driver.Rows, Application.Current.Frame.Height);
 
-					Application.Top.ProcessHotKey (new KeyEvent (Key.CtrlMask | Key.Q, new KeyModifiers ()));
+					Application.Current.ProcessHotKey (new KeyEvent (Key.CtrlMask | Key.Q, new KeyModifiers ()));
 				}
 				iterations++;
 			};
@@ -198,7 +223,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Null (top.StatusBar);
 
 			Application.Begin (top);
-			Assert.Equal (top, Application.Top);
+			Assert.NotEqual (top, Application.Top);
 
 			// Application.Top without menu and status bar.
 			var supView = top.GetLocationThatFits (top, 2, 2, out int nx, out int ny, out MenuBar mb, out StatusBar sb);
@@ -208,8 +233,8 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Null (mb);
 			Assert.Null (sb);
 
-			top.AddMenuStatusBar (new MenuBar ());
-			Assert.NotNull (top.MenuBar);
+			Application.Top.AddMenuStatusBar (new MenuBar ());
+			Assert.NotNull (Application.Top.MenuBar);
 
 			// Application.Top with a menu and without status bar.
 			top.GetLocationThatFits (top, 2, 2, out nx, out ny, out mb, out sb);
@@ -218,8 +243,8 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.NotNull (mb);
 			Assert.Null (sb);
 
-			top.AddMenuStatusBar (new StatusBar ());
-			Assert.NotNull (top.StatusBar);
+			Application.Top.AddMenuStatusBar (new StatusBar ());
+			Assert.NotNull (Application.Top.StatusBar);
 
 			// Application.Top with a menu and status bar.
 			top.GetLocationThatFits (top, 2, 2, out nx, out ny, out mb, out sb);
@@ -230,8 +255,8 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.NotNull (mb);
 			Assert.NotNull (sb);
 
-			top.RemoveMenuStatusBar (top.MenuBar);
-			Assert.Null (top.MenuBar);
+			Application.Top.RemoveMenuStatusBar (Application.Top.MenuBar);
+			Assert.Null (Application.Top.MenuBar);
 
 			// Application.Top without a menu and with a status bar.
 			top.GetLocationThatFits (top, 2, 2, out nx, out ny, out mb, out sb);
@@ -242,9 +267,9 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Null (mb);
 			Assert.NotNull (sb);
 
-			top.RemoveMenuStatusBar (top.StatusBar);
-			Assert.Null (top.StatusBar);
-			Assert.Null (top.MenuBar);
+			Application.Top.RemoveMenuStatusBar (Application.Top.StatusBar);
+			Assert.Null (Application.Top.StatusBar);
+			Assert.Null (Application.Top.MenuBar);
 
 			var win = new Window () { Width = Dim.Fill (), Height = Dim.Fill () };
 			top.Add (win);
@@ -252,9 +277,9 @@ namespace Terminal.Gui.ViewsTests {
 
 			// The SuperView is always the same regardless of the caller.
 			supView = top.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);
-			Assert.Equal (Application.Top, supView);
+			Assert.Equal (top, supView);
 			supView = win.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);
-			Assert.Equal (Application.Top, supView);
+			Assert.Equal (top, supView);
 
 			// Application.Top without menu and status bar.
 			top.GetLocationThatFits (win, 0, 0, out nx, out ny, out mb, out sb);

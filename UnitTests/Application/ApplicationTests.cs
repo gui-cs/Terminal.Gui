@@ -155,7 +155,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.NotNull (runstate);
 			Assert.Equal (rs, runstate);
 
-			Assert.Equal (topLevel, Application.Top);
+			Assert.NotEqual (topLevel, Application.Top);
 			Assert.Equal (topLevel, Application.Current);
 
 			Application.NotifyNewRunState -= NewRunStateFn;
@@ -510,14 +510,12 @@ namespace Terminal.Gui.ApplicationTests {
 
 			((FakeDriver)Application.Driver).SetBufferSize (5, 5);
 			Application.Begin (Application.Top);
-			Assert.Equal (new Rect (0, 0, 80, 25), Application.Top.Frame);
-			((FakeDriver)Application.Driver).SetBufferSize (5, 5);
 			Assert.Equal (new Rect (0, 0, 5, 5), Application.Top.Frame);
 		}
 
 		[Fact]
 		[AutoInitShutdown]
-		public void SetCurrentAsTop_Run_A_Not_Modal_Toplevel_Make_It_The_Current_Application_Top ()
+		public void Run_A_Not_Modal_Toplevel_Does_Not_Make_It_The_Current_Application_Top ()
 		{
 			var t1 = Application.Top;
 			var t2 = new Toplevel ();
@@ -533,19 +531,23 @@ namespace Terminal.Gui.ApplicationTests {
 				Application.Run (t2);
 			};
 			t2.Ready += (s, e) => {
-				Assert.Equal (t2, Application.Top);
+				Assert.Equal (t1, Application.Top);
+				Assert.Equal (t2, Application.Current);
 				Application.Run (t3);
 			};
 			t3.Ready += (s, e) => {
-				Assert.Equal (t3, Application.Top);
+				Assert.Equal (t1, Application.Top);
+				Assert.Equal (t3, Application.Current);
 				Application.Run (d);
 			};
 			d.Ready += (s, e) => {
-				Assert.Equal (t3, Application.Top);
+				Assert.Equal (t1, Application.Top);
+				Assert.Equal (d, Application.Current);
 				Application.Run (t4);
 			};
 			t4.Ready += (s, e) => {
-				Assert.Equal (t4, Application.Top);
+				Assert.Equal (t1, Application.Top);
+				Assert.Equal (t4, Application.Current);
 				t4.RequestStop ();
 				d.RequestStop ();
 				t3.RequestStop ();
@@ -560,22 +562,22 @@ namespace Terminal.Gui.ApplicationTests {
 					// The Current still is t4 because Current.Running is false.
 					Assert.Equal (t4, Application.Current);
 					Assert.False (Application.Current.Running);
-					Assert.Equal (t4, Application.Top);
+					Assert.Equal (t1, Application.Top);
 				} else if (iterations == 4) {
 					// The Current is d and Current.Running is false.
 					Assert.Equal (d, Application.Current);
 					Assert.False (Application.Current.Running);
-					Assert.Equal (t4, Application.Top);
+					Assert.Equal (t1, Application.Top);
 				} else if (iterations == 3) {
 					// The Current is t3 and Current.Running is false.
 					Assert.Equal (t3, Application.Current);
 					Assert.False (Application.Current.Running);
-					Assert.Equal (t3, Application.Top);
+					Assert.Equal (t1, Application.Top);
 				} else if (iterations == 2) {
 					// The Current is t2 and Current.Running is false.
 					Assert.Equal (t2, Application.Current);
 					Assert.False (Application.Current.Running);
-					Assert.Equal (t2, Application.Top);
+					Assert.Equal (t1, Application.Top);
 				} else {
 					// The Current is t1.
 					Assert.Equal (t1, Application.Current);
@@ -1054,5 +1056,312 @@ namespace Terminal.Gui.ApplicationTests {
 			}
 		}
 		#endregion
+
+		[Fact, AutoInitShutdown]
+		public void Applicaton_Top_LayoutStyle_Pos_Dim_Frame ()
+		{
+			Assert.Equal (LayoutStyle.Absolute, Application.Top.LayoutStyle);
+			Assert.False (Application.Top.IsInitialized);
+			Assert.Null (Application.Top.X);
+			Assert.Null (Application.Top.Y);
+			Assert.Null (Application.Top.Width);
+			Assert.Null (Application.Top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), Application.Top.Frame);
+
+			Application.Begin (Application.Top);
+
+			Assert.Equal (LayoutStyle.Absolute, Application.Top.LayoutStyle);
+			Assert.True (Application.Top.IsInitialized);
+			Assert.Null (Application.Top.X);
+			Assert.Null (Application.Top.Y);
+			Assert.Null (Application.Top.Width);
+			Assert.Null (Application.Top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), Application.Top.Frame);
+
+			Application.Top.LayoutStyle = LayoutStyle.Computed;
+
+			Assert.Equal (LayoutStyle.Absolute, Application.Top.LayoutStyle);
+
+			Application.Top.X = 1;
+			Application.Top.Y = 1;
+			Application.Top.Width = 1;
+			Application.Top.Height = 1;
+
+			Assert.Null (Application.Top.X);
+			Assert.Null (Application.Top.Y);
+			Assert.Null (Application.Top.Width);
+			Assert.Null (Application.Top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), Application.Top.Frame);
+
+			Application.Top.Frame = new Rect (1, 1, 1, 1);
+
+			Assert.Null (Application.Top.X);
+			Assert.Null (Application.Top.Y);
+			Assert.Null (Application.Top.Width);
+			Assert.Null (Application.Top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), Application.Top.Frame);
+
+			((FakeDriver)Application.Driver).SetBufferSize (1, 1);
+
+			Assert.Null (Application.Top.X);
+			Assert.Null (Application.Top.Y);
+			Assert.Null (Application.Top.Width);
+			Assert.Null (Application.Top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), Application.Top.Frame);
+			Assert.Equal (new Rect (0, 0, 1, 1), Application.Top.Frame);
+
+			// empty frame
+			((FakeDriver)Application.Driver).SetBufferSize (0, 0);
+
+			Assert.Null (Application.Top.X);
+			Assert.Null (Application.Top.Y);
+			Assert.Null (Application.Top.Width);
+			Assert.Null (Application.Top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), Application.Top.Frame);
+			Assert.Equal (Rect.Empty, Application.Top.Frame);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Applicaton_Top_LayoutStyle_Pos_Dim_Frame_With_Other_Toplevel ()
+		{
+			var top = new Toplevel (new Rect (1, 1, 10, 10));
+
+			Application.Begin (top);
+
+			Assert.Equal (LayoutStyle.Absolute, Application.Top.LayoutStyle);
+			Assert.True (Application.Top.IsInitialized);
+			Assert.Null (Application.Top.X);
+			Assert.Null (Application.Top.Y);
+			Assert.Null (Application.Top.Width);
+			Assert.Null (Application.Top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), Application.Top.Frame);
+			Assert.Equal (LayoutStyle.Absolute, top.LayoutStyle);
+			Assert.True (top.IsInitialized);
+			Assert.Null (top.X);
+			Assert.Null (top.Y);
+			Assert.Null (top.Width);
+			Assert.Null (top.Height);
+			Assert.Equal (new Rect (1, 1, 10, 10), top.Frame);
+
+			top.LayoutStyle = LayoutStyle.Computed;
+
+			Assert.Equal (LayoutStyle.Absolute, Application.Top.LayoutStyle);
+			Assert.Equal (LayoutStyle.Computed, top.LayoutStyle);
+
+			top.X = 1;
+			top.Y = 1;
+			top.Width = 1;
+			top.Height = 1;
+
+			Assert.Null (Application.Top.X);
+			Assert.Null (Application.Top.Y);
+			Assert.Null (Application.Top.Width);
+			Assert.Null (Application.Top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), Application.Top.Frame);
+			Assert.Equal (1, top.X);
+			Assert.Equal (1, top.Y);
+			Assert.Equal (1, top.Width);
+			Assert.Equal (1, top.Height);
+			Assert.Equal (new Rect (1, 1, 1, 1), top.Frame);
+
+			top.Frame = new Rect (5, 5, 10, 10);
+
+			Assert.Null (Application.Top.X);
+			Assert.Null (Application.Top.Y);
+			Assert.Null (Application.Top.Width);
+			Assert.Null (Application.Top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), Application.Top.Frame);
+			Assert.Equal (1, top.X);
+			Assert.Equal (1, top.Y);
+			Assert.Equal (1, top.Width);
+			Assert.Equal (1, top.Height);
+			Assert.Equal (new Rect (5, 5, 10, 10), top.Frame);
+
+			top.LayoutStyle = LayoutStyle.Absolute;
+			((FakeDriver)Application.Driver).SetBufferSize (1, 1);
+
+			Assert.Null (Application.Top.X);
+			Assert.Null (Application.Top.Y);
+			Assert.Null (Application.Top.Width);
+			Assert.Null (Application.Top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), Application.Top.Frame);
+			Assert.Equal (new Rect (0, 0, 1, 1), Application.Top.Frame);
+			Assert.Equal (1, top.X);
+			Assert.Equal (1, top.Y);
+			Assert.Equal (1, top.Width);
+			Assert.Equal (1, top.Height);
+			Assert.Equal (new Rect (5, 5, 10, 10), top.Frame);
+
+			top.LayoutStyle = LayoutStyle.Computed;
+			((FakeDriver)Application.Driver).SetBufferSize (1, 1);
+
+			Assert.Null (Application.Top.X);
+			Assert.Null (Application.Top.Y);
+			Assert.Null (Application.Top.Width);
+			Assert.Null (Application.Top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), Application.Top.Frame);
+			Assert.Equal (new Rect (0, 0, 1, 1), Application.Top.Frame);
+			Assert.Equal (0, top.X);
+			Assert.Equal (0, top.Y);
+			Assert.Equal (1, top.Width);
+			Assert.Equal (1, top.Height);
+			Assert.Equal (new Rect (0, 0, 1, 1), top.Frame);
+
+			top.LayoutStyle = LayoutStyle.Absolute;
+			// empty frame
+			((FakeDriver)Application.Driver).SetBufferSize (0, 0);
+
+			Assert.Null (Application.Top.X);
+			Assert.Null (Application.Top.Y);
+			Assert.Null (Application.Top.Width);
+			Assert.Null (Application.Top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), Application.Top.Frame);
+			Assert.Equal (Rect.Empty, Application.Top.Frame);
+			Assert.Equal (0, top.X);
+			Assert.Equal (0, top.Y);
+			Assert.Equal (1, top.Width);
+			Assert.Equal (1, top.Height);
+			Assert.Equal (new Rect (0, 0, 1, 1), top.Frame);
+
+			top.LayoutStyle = LayoutStyle.Computed;
+			// empty frame
+			((FakeDriver)Application.Driver).SetBufferSize (0, 0);
+
+			Assert.Null (Application.Top.X);
+			Assert.Null (Application.Top.Y);
+			Assert.Null (Application.Top.Width);
+			Assert.Null (Application.Top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), Application.Top.Frame);
+			Assert.Equal (Rect.Empty, Application.Top.Frame);
+			Assert.Equal (0, top.X);
+			Assert.Equal (0, top.Y);
+			Assert.Equal (1, top.Width);
+			Assert.Equal (1, top.Height);
+			Assert.Equal (new Rect (0, 0, 1, 1), top.Frame);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Applicaton_Top_LayoutStyle_Pos_Dim_Frame_With_A_OverlappedTop ()
+		{
+			var top = new Toplevel (new Rect (1, 1, 10, 10)) {
+				X = 0,
+				Y = 0,
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				IsOverlappedContainer = true
+			};
+
+			Application.Begin (top);
+
+			Assert.Equal (Application.Top, top);
+			Assert.Equal (LayoutStyle.Absolute, top.LayoutStyle);
+			Assert.True (top.IsInitialized);
+			Assert.Null (top.X);
+			Assert.Null (top.Y);
+			Assert.Null (top.Width);
+			Assert.Null (top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), top.Frame);
+
+			top.LayoutStyle = LayoutStyle.Computed;
+
+			Assert.Equal (LayoutStyle.Absolute, top.LayoutStyle);
+
+			top.X = 1;
+			top.Y = 1;
+			top.Width = 1;
+			top.Height = 1;
+
+			Assert.Null (top.X);
+			Assert.Null (top.Y);
+			Assert.Null (top.Width);
+			Assert.Null (top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), top.Frame);
+
+			top.Frame = new Rect (1, 1, 1, 1);
+
+			Assert.Null (top.X);
+			Assert.Null (top.Y);
+			Assert.Null (top.Width);
+			Assert.Null (top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), top.Frame);
+
+			((FakeDriver)Application.Driver).SetBufferSize (1, 1);
+
+			Assert.Null (top.X);
+			Assert.Null (top.Y);
+			Assert.Null (top.Width);
+			Assert.Null (top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), top.Frame);
+			Assert.Equal (new Rect (0, 0, 1, 1), top.Frame);
+
+			// empty frame
+			((FakeDriver)Application.Driver).SetBufferSize (0, 0);
+
+			Assert.Null (top.X);
+			Assert.Null (top.Y);
+			Assert.Null (top.Width);
+			Assert.Null (top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), top.Frame);
+			Assert.Equal (Rect.Empty, top.Frame);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Applicaton_Top_LayoutStyle_Pos_Dim_Frame_Handled_By_Toplevel_Variable ()
+		{
+			var top = Application.Top;
+
+			Application.Begin (top);
+
+			Assert.Equal (Application.Top, top);
+			Assert.Equal (LayoutStyle.Absolute, top.LayoutStyle);
+			Assert.True (top.IsInitialized);
+			Assert.Null (top.X);
+			Assert.Null (top.Y);
+			Assert.Null (top.Width);
+			Assert.Null (top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), top.Frame);
+
+			top.LayoutStyle = LayoutStyle.Computed;
+
+			Assert.Equal (LayoutStyle.Absolute, top.LayoutStyle);
+
+			top.X = 1;
+			top.Y = 1;
+			top.Width = 1;
+			top.Height = 1;
+
+			Assert.Null (top.X);
+			Assert.Null (top.Y);
+			Assert.Null (top.Width);
+			Assert.Null (top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), top.Frame);
+
+			top.Frame = new Rect (1, 1, 1, 1);
+
+			Assert.Null (top.X);
+			Assert.Null (top.Y);
+			Assert.Null (top.Width);
+			Assert.Null (top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), top.Frame);
+
+			((FakeDriver)Application.Driver).SetBufferSize (1, 1);
+
+			Assert.Null (top.X);
+			Assert.Null (top.Y);
+			Assert.Null (top.Width);
+			Assert.Null (top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), top.Frame);
+			Assert.Equal (new Rect (0, 0, 1, 1), top.Frame);
+
+			// empty frame
+			((FakeDriver)Application.Driver).SetBufferSize (0, 0);
+
+			Assert.Null (top.X);
+			Assert.Null (top.Y);
+			Assert.Null (top.Width);
+			Assert.Null (top.Height);
+			Assert.Equal (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows), top.Frame);
+			Assert.Equal (Rect.Empty, top.Frame);
+		}
 	}
 }

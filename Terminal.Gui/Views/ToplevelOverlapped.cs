@@ -105,19 +105,6 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-
-		static bool SetCurrentOverlappedAsTop ()
-		{
-			if (OverlappedTop == null && Current != Top && Current?.SuperView == null && Current?.Modal == false) {
-				if (Current.Frame != new Rect (0, 0, Driver.Cols, Driver.Rows)) {
-					Current.Frame = new Rect (0, 0, Driver.Cols, Driver.Rows);
-				}
-				Top = Current;
-				return true;
-			}
-			return false;
-		}
-
 		/// <summary>
 		/// Move to the next Overlapped child from the <see cref="OverlappedTop"/>.
 		/// </summary>

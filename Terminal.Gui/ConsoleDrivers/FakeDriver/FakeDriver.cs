@@ -536,8 +536,9 @@ namespace Terminal.Gui {
 			rows = height;
 			if (!EnableConsoleScrolling) {
 				SetWindowSize (width, height);
+			} else {
+				ProcessResize ();
 			}
-			ProcessResize ();
 		}
 
 		public void SetWindowSize (int width, int height)
@@ -548,9 +549,12 @@ namespace Terminal.Gui {
 					SetBufferSize (width, height);
 					cols = width;
 					rows = height;
+				} else {
+					ProcessResize ();
 				}
+			} else {
+				ProcessResize ();
 			}
-			ProcessResize ();
 		}
 
 		public void SetWindowPosition (int left, int top)

@@ -368,6 +368,72 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool IsLoaded { get; private set; }
 
+		/// <inheritdoc/>
+		public override LayoutStyle LayoutStyle {
+			get => base.LayoutStyle; set {
+				if (this == Application.Top) {
+					base.LayoutStyle = LayoutStyle.Absolute;
+				} else {
+					base.LayoutStyle = value;
+				}
+			}
+		}
+
+		/// <inheritdoc/>
+		public override Pos X {
+			get => base.X; set {
+				if (this == Application.Top) {
+					base.X = null;
+				} else {
+					base.X = value;
+				}
+			}
+		}
+
+		/// <inheritdoc/>
+		public override Pos Y {
+			get => base.Y; set {
+				if (this == Application.Top) {
+					base.Y = null;
+				} else {
+					base.Y = value;
+				}
+			}
+		}
+
+		/// <inheritdoc/>
+		public override Dim Width {
+			get => base.Width; set {
+				if (this == Application.Top) {
+					base.Width = null;
+				} else {
+					base.Width = value;
+				}
+			}
+		}
+
+		/// <inheritdoc/>
+		public override Dim Height {
+			get => base.Height; set {
+				if (this == Application.Top) {
+					base.Height = null;
+				} else {
+					base.Height = value;
+				}
+			}
+		}
+
+		/// <inheritdoc/>
+		public override Rect Frame {
+			get => base.Frame;
+			set {
+				if (this == Application.Top && value != new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows)) {
+					return;
+				}
+				base.Frame = value;
+			}
+		}
+
 		///<inheritdoc/>
 		public override bool OnKeyDown (KeyEvent keyEvent)
 		{
@@ -648,27 +714,27 @@ namespace Terminal.Gui {
 			//System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
 			bool menuVisible, statusVisible;
 			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
-				menuVisible = Application.Top.MenuBar?.Visible == true;
-				menuBar = Application.Top.MenuBar;
+				menuVisible = ((Toplevel)superView).MenuBar?.Visible == true;
+				menuBar = ((Toplevel)superView).MenuBar;
 			} else {
-				var t = top.SuperView;
+				var t = superView;
 				while (t is not Toplevel) {
 					t = t.SuperView;
 				}
 				menuVisible = ((Toplevel)t).MenuBar?.Visible == true;
 				menuBar = ((Toplevel)t).MenuBar;
 			}
-			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
+			if (menuVisible || top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
 				maxWidth = menuVisible ? 1 : 0;
 			} else {
 				maxWidth = 0;
 			}
 			ny = Math.Max (targetY, maxWidth);
 			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
-				statusVisible = Application.Top.StatusBar?.Visible == true;
-				statusBar = Application.Top.StatusBar;
+				statusVisible = ((Toplevel)superView).StatusBar?.Visible == true;
+				statusBar = ((Toplevel)superView).StatusBar;
 			} else {
-				var t = top.SuperView;
+				var t = superView;
 				while (t is not Toplevel) {
 					t = t.SuperView;
 				}
