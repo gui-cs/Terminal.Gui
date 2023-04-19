@@ -1392,7 +1392,7 @@ namespace Terminal.Gui {
 					pos += Menus [i].TitleLength + (Menus [i].Help.ConsoleWidth > 0 ? Menus [i].Help.ConsoleWidth + 2 : 0) + leftPadding + rightPadding;
 				var superView = SuperView == null ? Application.Top : SuperView;
 				Point locationOffset;
-				if (superView.BorderStyle != LineStyle.None) {
+				if (superView != Application.Top && superView.BorderStyle != LineStyle.None) {
 					locationOffset = new Point (superView.Frame.X + 1, superView.Frame.Y + 1);
 				} else {
 					locationOffset = new Point (superView.Frame.X, superView.Frame.Y);

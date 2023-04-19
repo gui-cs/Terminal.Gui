@@ -1658,7 +1658,7 @@ Edit
 		}
 
 		[Fact, AutoInitShutdown]
-		public void MenuBar_In_Window_Without_Other_Views ()
+		public void MenuBar_In_Window_Without_Other_Views_With_Top_Init_With_Parameterless_Run ()
 		{
 			var win = new Window ();
 			var menu = new MenuBar (new MenuBarItem [] {
@@ -1671,12 +1671,97 @@ Edit
 						new MenuItem ("Selected", "", null)
 					})
 				})
-			}); ;
+			});
 			win.Add (menu);
 			var top = Application.Top;
 			top.Add (win);
-			Application.Begin (top);
 			((FakeDriver)Application.Driver).SetBufferSize (40, 8);
+
+			Application.Iteration += () => {
+				TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+
+				Assert.True (win.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
+				top.Redraw (top.Bounds);
+				TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│┌──────┐                              │
+││ New  │                              │
+│└──────┘                              │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+
+				Assert.True (menu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+				Application.Refresh ();
+				TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│      ┌─────────┐                     │
+│      │ Delete ►│                     │
+│      └─────────┘                     │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+
+				Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+				top.Redraw (top.Bounds);
+				TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│      ┌─────────┐                     │
+│      │ Delete ►│┌───────────┐        │
+│      └─────────┘│ All       │        │
+│                 │ Selected  │        │
+│                 └───────────┘        │
+└──────────────────────────────────────┘", output);
+
+				Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+				top.Redraw (top.Bounds);
+				TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│┌──────┐                              │
+││ New  │                              │
+│└──────┘                              │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+
+				Application.RequestStop ();
+			};
+
+			Application.Run ();
+		}
+
+		[Fact, AutoInitShutdown]
+		public void MenuBar_In_Window_Without_Other_Views_With_Top_Init ()
+		{
+			var win = new Window ();
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("File", new MenuItem [] {
+					new MenuItem ("New", "", null)
+				}),
+				new MenuBarItem ("Edit", new MenuItem [] {
+					new MenuBarItem ("Delete", new MenuItem [] {
+						new MenuItem ("All", "", null),
+						new MenuItem ("Selected", "", null)
+					})
+				})
+			});
+			win.Add (menu);
+			var top = Application.Top;
+			top.Add (win);
+			((FakeDriver)Application.Driver).SetBufferSize (40, 8);
+			Application.Begin (top);
 
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1735,6 +1820,174 @@ Edit
 │                                      │
 │                                      │
 └──────────────────────────────────────┘", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void MenuBar_In_Window_Without_Other_Views_Without_Top_Init ()
+		{
+			var win = new Window ();
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("File", new MenuItem [] {
+					new MenuItem ("New", "", null)
+				}),
+				new MenuBarItem ("Edit", new MenuItem [] {
+					new MenuBarItem ("Delete", new MenuItem [] {
+						new MenuItem ("All", "", null),
+						new MenuItem ("Selected", "", null)
+					})
+				})
+			});
+			win.Add (menu);
+			((FakeDriver)Application.Driver).SetBufferSize (40, 8);
+			Application.Begin (win);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+
+			Assert.True (win.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
+			win.Redraw (win.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│┌──────┐                              │
+││ New  │                              │
+│└──────┘                              │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+
+			Assert.True (menu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│      ┌─────────┐                     │
+│      │ Delete ►│                     │
+│      └─────────┘                     │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+
+			Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			win.Redraw (win.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│      ┌─────────┐                     │
+│      │ Delete ►│┌───────────┐        │
+│      └─────────┘│ All       │        │
+│                 │ Selected  │        │
+│                 └───────────┘        │
+└──────────────────────────────────────┘", output);
+
+			Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			win.Redraw (win.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│┌──────┐                              │
+││ New  │                              │
+│└──────┘                              │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void MenuBar_In_Window_Without_Other_Views_Without_Top_Init_With_Run_T ()
+		{
+			((FakeDriver)Application.Driver).SetBufferSize (40, 8);
+
+			Application.Iteration += () => {
+				var top = Application.Top;
+
+				TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+
+				Assert.True (top.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
+				top.Redraw (top.Bounds);
+				TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│┌──────┐                              │
+││ New  │                              │
+│└──────┘                              │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+
+				Assert.True (top.Subviews [0].ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+				Application.Refresh ();
+				TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│      ┌─────────┐                     │
+│      │ Delete ►│                     │
+│      └─────────┘                     │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+
+				Assert.True (((MenuBar)top.Subviews [0]).openMenu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+				top.Redraw (top.Bounds);
+				TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│      ┌─────────┐                     │
+│      │ Delete ►│┌───────────┐        │
+│      └─────────┘│ All       │        │
+│                 │ Selected  │        │
+│                 └───────────┘        │
+└──────────────────────────────────────┘", output);
+
+				Assert.True (((MenuBar)top.Subviews [0]).openMenu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+				top.Redraw (top.Bounds);
+				TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│ File  Edit                           │
+│┌──────┐                              │
+││ New  │                              │
+│└──────┘                              │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+
+				Application.RequestStop ();
+			};
+
+			Application.Run<CustomWindow> ();
+		}
+
+		private class CustomWindow : Window {
+			public CustomWindow ()
+			{
+				var menu = new MenuBar (new MenuBarItem [] {
+					new MenuBarItem ("File", new MenuItem [] {
+						new MenuItem ("New", "", null)
+					}),
+					new MenuBarItem ("Edit", new MenuItem [] {
+						new MenuBarItem ("Delete", new MenuItem [] {
+							new MenuItem ("All", "", null),
+							new MenuItem ("Selected", "", null)
+						})
+					})
+				});
+				Add (menu);
+			}
 		}
 
 		[Fact, AutoInitShutdown]
