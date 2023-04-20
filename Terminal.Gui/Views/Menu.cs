@@ -512,7 +512,15 @@ namespace Terminal.Gui {
 
 		private void Application_RootMouseEvent (MouseEvent me)
 		{
-			var view = View.FindDeepestView (this, me.X, me.Y, out int rx, out int ry);
+			if (me.View is MenuBar) {
+				return;
+			}
+			var locationOffset = GetDriverLocationOffset (null);
+			if (SuperView != null) {
+				locationOffset.X += SuperView.Border.Thickness.Left;
+				locationOffset.Y += SuperView.Border.Thickness.Top;
+			}
+			var view = View.FindDeepestView (this, me.X + locationOffset.X, me.Y + locationOffset.Y, out int rx, out int ry);
 			if (view == this) {
 				var nme = new MouseEvent () {
 					X = rx,
@@ -540,8 +548,8 @@ namespace Terminal.Gui {
 			if (barItems.Children == null) {
 				return;
 			}
-			var savedClip = Application.Driver.Clip;
-			Application.Driver.Clip = Application.Top.Frame;
+			var savedClip = Driver.Clip;
+			Driver.Clip = DriverFrame;
 
 			Driver.SetAttribute (GetNormalColor ());
 
@@ -549,8 +557,12 @@ namespace Terminal.Gui {
 			OnRenderLineCanvas ();
 
 			for (int i = Bounds.Y; i < barItems.Children.Length; i++) {
-				if (i < 0)
+				if (i < 0) {
 					continue;
+				}
+				if (ViewToScreen (Bounds).Y + i >= Driver.Rows) {
+					break;
+				}
 				var item = barItems.Children [i];
 				Driver.SetAttribute (item == null ? GetNormalColor ()
 					: i == current ? ColorScheme.Focus : GetNormalColor ());
@@ -858,12 +870,17 @@ namespace Terminal.Gui {
 			}
 			host.handled = false;
 			bool disabled;
-			var meYOffset = BorderStyle != LineStyle.None ? 1 : 0;
+			Point locationOffset = default;
+			if (SuperView != null) {
+				locationOffset.X += SuperView.Border.Thickness.Left;
+				locationOffset.Y += SuperView.Border.Thickness.Top;
+			}
+			var meYOffset = Border.Thickness.Top + locationOffset.Y;
+			var meY = me.Y - meYOffset;
 			if (me.Flags == MouseFlags.Button1Clicked) {
 				disabled = false;
-				if (me.Y < meYOffset)
+				if (meY < 0)
 					return true;
-				var meY = me.Y - meYOffset;
 				if (meY >= barItems.Children.Length)
 					return true;
 				var item = barItems.Children [meY];
@@ -878,14 +895,14 @@ namespace Terminal.Gui {
 				me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
 
 				disabled = false;
-				if (me.Y < meYOffset || me.Y - meYOffset >= barItems.Children.Length) {
+				if (meY < 0 || meY >= barItems.Children.Length) {
 					return true;
 				}
-				var item = barItems.Children [me.Y - meYOffset];
+				var item = barItems.Children [meY];
 				if (item == null) return true;
 				if (item == null || !item.IsEnabled ()) disabled = true;
 				if (item != null && !disabled)
-					current = me.Y - meYOffset;
+					current = meY;
 				if (host.UseSubMenusSingleFrame || !CheckSubMenu ()) {
 					SetNeedsDisplay ();
 					SetParentSetNeedsDisplay ();
@@ -1390,12 +1407,12 @@ namespace Terminal.Gui {
 				// text belonging to the menu 
 				for (int i = 0; i < index; i++)
 					pos += Menus [i].TitleLength + (Menus [i].Help.ConsoleWidth > 0 ? Menus [i].Help.ConsoleWidth + 2 : 0) + leftPadding + rightPadding;
+
 				var superView = SuperView == null ? Application.Top : SuperView;
-				Point locationOffset;
-				if (superView.BorderStyle != LineStyle.None) {
-					locationOffset = new Point (superView.Frame.X + 1, superView.Frame.Y + 1);
-				} else {
-					locationOffset = new Point (superView.Frame.X, superView.Frame.Y);
+				var locationOffset = GetDriverLocationOffset (superView);
+				if (superView != Application.Top) {
+					locationOffset.X += superView.Border.Thickness.Left;
+					locationOffset.Y += superView.Border.Thickness.Top;
 				}
 				openMenu = new Menu (this, Frame.X + pos + locationOffset.X, Frame.Y + 1 + locationOffset.Y, Menus [index], null, MenusBorderStyle);
 				openCurrentMenu = openMenu;
@@ -1923,7 +1940,12 @@ namespace Terminal.Gui {
 				(me.Flags == MouseFlags.ReportMousePosition && selected > -1) ||
 				(me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) && selected > -1)) {
 				int pos = xOrigin;
-				int cx = me.X;
+				Point locationOffset = default;
+				if (SuperView != null) {
+					locationOffset.X += SuperView.Border.Thickness.Left;
+					locationOffset.Y += SuperView.Border.Thickness.Top;
+				}
+				int cx = me.X - locationOffset.X;
 				for (int i = 0; i < Menus.Length; i++) {
 					if (cx >= pos && cx < pos + leftPadding + Menus [i].TitleLength + Menus [i].Help.ConsoleWidth + rightPadding) {
 						if (me.Flags == MouseFlags.Button1Clicked) {

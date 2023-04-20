@@ -903,7 +903,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Null (tf.ContextMenu.MenuBar);
 		}
 
-		// BUGBUG: Broke this test with #2483 - @bdisp I need your help figuring out why
 		[Fact, AutoInitShutdown]
 		public void Draw_A_ContextManu_Over_A_Dialog ()
 		{
@@ -980,6 +979,52 @@ namespace Terminal.Gui.ViewsTests {
 └───────────────────
 │                  │
 └──────────────────┘", output);
+
+			Application.End (rs);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Draw_A_ContextManu_Over_A_Top_Dialog ()
+		{
+			((FakeDriver)Application.Driver).SetBufferSize (20, 15);
+
+			Assert.Equal (new Rect (0, 0, 20, 15), Application.Driver.Clip);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"", output);
+
+			var dialog = new Dialog () { X = 2, Y = 2, Width = 15, Height = 4 };
+			dialog.Add (new TextField ("Test") { X = Pos.Center (), Width = 10 });
+			var rs = Application.Begin (dialog);
+
+			Assert.Equal (new Rect (2, 2, 15, 4), dialog.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+  ┌─────────────┐
+  │ Test        │
+  │             │
+  └─────────────┘", output);
+
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessMouseEvent",
+				new MouseEvent () {
+					X = 9,
+					Y = 3,
+					Flags = MouseFlags.Button3Clicked
+				});
+
+			var firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+  ┌─────────────┐   
+  │ Test        │   
+┌───────────────────
+│ Select All   Ctrl+
+│ Delete All   Ctrl+
+│ Copy         Ctrl+
+│ Cut          Ctrl+
+│ Paste        Ctrl+
+│ Undo         Ctrl+
+│ Redo         Ctrl+
+└───────────────────", output);
 
 			Application.End (rs);
 		}

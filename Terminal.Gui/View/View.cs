@@ -322,6 +322,17 @@ namespace Terminal.Gui {
 		public static ConsoleDriver Driver => Application.Driver;
 
 		/// <summary>
+		/// Gets the current driver <see cref="Rect"/> in use by the view.
+		/// </summary>
+		public static Rect DriverFrame => new (0, 0, Driver.Cols, Driver.Rows);
+
+		/// <summary>
+		/// Gets the current driver location and dimension in use by the view
+		/// offset by the <see cref="Application.Top"/> location and dimension.
+		/// </summary>
+		public static (Point Location, Point Dimension) DriverFrameOffset => new (new Point (Application.Top.Frame.X, Application.Top.Frame.Y), new (Application.Top.Frame.X + Application.Top.Frame.Width - Driver.Cols, Application.Top.Frame.Y + Application.Top.Frame.Height - Driver.Rows));
+
+		/// <summary>
 		/// Gets or sets arbitrary data for the view.
 		/// </summary>
 		/// <remarks>This property is not used internally.</remarks>
@@ -434,7 +445,7 @@ namespace Terminal.Gui {
 				}
 			}
 		}
-		
+
 		/// <summary>
 		/// Event fired when the <see cref="Visible"/> value is being changed.
 		/// </summary>
@@ -481,7 +492,7 @@ namespace Terminal.Gui {
 
 			return true;
 		}
-		
+
 		/// <summary>
 		/// Pretty prints the View
 		/// </summary>
@@ -507,6 +518,19 @@ namespace Terminal.Gui {
 				subview.Dispose ();
 			}
 			base.Dispose (disposing);
+		}
+
+		/// <summary>
+		/// Gets the superview location offset relative to the <see cref="DriverFrame"/>.
+		/// </summary>
+		/// <param name="superView"></param>
+		/// <returns>The location offset and the respective superview.</returns>
+		public Point GetDriverLocationOffset (View superView)
+		{
+			var superViewFrame = superView == null || (superView == Application.Top && SuperView != superView) ? DriverFrame : superView.Frame;
+			var sv = superView == null ? Application.Top : superView;
+			return new Point (superViewFrame.X - sv.Frame.X - (superViewFrame.X != sv.Frame.X ? 1 : 0),
+				superViewFrame.Y - sv.Frame.Y - (superViewFrame.Y != sv.Frame.Y ? 1 : 0));
 		}
 	}
 }

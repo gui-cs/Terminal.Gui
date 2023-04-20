@@ -94,10 +94,10 @@ namespace Terminal.Gui {
 			container = Application.Top;
 			container.Closing += Container_Closing;
 			container.TerminalResized += Container_Resized;
-			var frame = container.Frame;
+			var frame = View.DriverFrame;
 			var position = Position;
 			if (Host != null) {
-				Host.ViewToScreen (container.Frame.X, container.Frame.Y, out int x, out int y);
+				Host.ViewToScreen (frame.X, frame.Y, out int x, out int y);
 				var pos = new Point (x, y);
 				pos.Y += Host.Frame.Height - 1;
 				if (position != pos) {
@@ -119,7 +119,7 @@ namespace Terminal.Gui {
 					if (Host == null) {
 						position.Y = frame.Bottom - rect.Height - 1;
 					} else {
-						Host.ViewToScreen (container.Frame.X, container.Frame.Y, out int x, out int y);
+						Host.ViewToScreen (frame.X, frame.Y, out int x, out int y);
 						var pos = new Point (x, y);
 						position.Y = pos.Y - rect.Height - 1;
 					}
