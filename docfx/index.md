@@ -10,6 +10,7 @@ A toolkit for building rich console apps for .NET, .NET Core, and Mono that work
 
 * [API Reference](~/api/Terminal.Gui/Terminal.Gui.yml)
 * [Views and controls built into the Terminal.Gui library](~/articles/views.md)
+* [Threading](~/articles/threading.md)
 * [Terminal.Gui API Overview](~/articles/overview.md)
 * [Keyboard Event Processing](~/articles/keyboard.md)
 * [Event Processing and the Application Main Loop](~/articles/mainloop.md)
