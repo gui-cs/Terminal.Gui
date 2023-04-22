@@ -162,7 +162,7 @@ namespace Terminal.Gui {
 			var sideLineLength = borderBounds.Height;
 			var canDrawBorder = borderBounds.Width > 0 && borderBounds.Height > 0;
 
-			if (maxTitleWidth > 0 && !ustring.IsNullOrEmpty (Parent?.Title)) {
+			if (!ustring.IsNullOrEmpty (Parent?.Title)) {
 				if (Thickness.Top == 2) {
 					topTitleLineY = borderBounds.Y - 1;
 					titleY = topTitleLineY + 1;
@@ -234,7 +234,7 @@ namespace Terminal.Gui {
 						// ┌────┐
 						//┌┘View└
 						//│
-						if (borderBounds.Width > 4 && Thickness.Top > 2) {
+						if (borderBounds.Width >= 4 && Thickness.Top > 2) {
 							lc.AddLine (new Point (borderBounds.X + 1, topTitleLineY), Math.Min (borderBounds.Width - 2, maxTitleWidth + 2), Orientation.Horizontal, BorderStyle, Driver.GetAttribute ());
 							lc.AddLine (new Point (borderBounds.X + 1, topTitleLineY + 2), Math.Min (borderBounds.Width - 2, maxTitleWidth + 2), Orientation.Horizontal, BorderStyle, Driver.GetAttribute ());
 						}
