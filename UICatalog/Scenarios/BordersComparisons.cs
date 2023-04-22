@@ -9,13 +9,16 @@ namespace UICatalog.Scenarios {
 		{
 			Application.Init ();
 
-			var borderStyle = LineStyle.Double;
-			var borderThickness = new Thickness (1, 2, 3, 4);
-			var padding = 1;
+			var borderStyle = LineStyle.Single;
+			var borderThickness = new Thickness (1);
+			var paddingThickness = new Thickness (1);
 
-			Application.Top.Text = $"Border Thickness: {borderThickness}\nPadding: {padding}";
+			Application.Top.Text = $"Border Thickness: {borderThickness}\nPadding: {paddingThickness}";
 
 			var win = new Window (new Rect (5, 5, 40, 20)) { Title = "Window" };
+			win.Border.Thickness = borderThickness;
+			win.Border.BorderStyle = borderStyle;
+			win.Padding.Thickness = paddingThickness;
 
 			var tf1 = new TextField ("1234567890") { Width = 10 };
 
@@ -23,7 +26,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = Pos.Center (),
 			};
-			button.Clicked += (s,e) => MessageBox.Query (20, 7, "Hi", "I'm a Window?", "Yes", "No");
+			button.Clicked += (s, e) => MessageBox.Query (20, 7, "Hi", "I'm a Window?", "Yes", "No");
 			var label = new Label ("I'm a Window") {
 				X = Pos.Center (),
 				Y = Pos.Center () - 1,
@@ -42,10 +45,10 @@ namespace UICatalog.Scenarios {
 			win.Add (tf1, button, label, tv, tf2);
 			Application.Top.Add (win);
 
-			var topLevel = new Toplevel (new Rect (50, 5, 40, 20));
-			//topLevel.Border.Thickness = borderThickness;
-			//topLevel.Border.BorderStyle = borderStyle;
-			//topLevel.Padding.Thickness = paddingThickness;
+			var topLevel = new Toplevel (new Rect (50, 5, 40, 20)) { ColorScheme = Colors.Base, Title = "Toplevel" };
+			topLevel.Border.Thickness = borderThickness;
+			topLevel.Border.BorderStyle = borderStyle;
+			topLevel.Padding.Thickness = paddingThickness;
 
 			var tf3 = new TextField ("1234567890") { Width = 10 };
 
@@ -53,7 +56,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = Pos.Center (),
 			};
-			button2.Clicked += (s,e) => MessageBox.Query (20, 7, "Hi", "I'm a Toplevel?", "Yes", "No");
+			button2.Clicked += (s, e) => MessageBox.Query (20, 7, "Hi", "I'm a Toplevel?", "Yes", "No");
 			var label2 = new Label ("I'm a Toplevel") {
 				X = Pos.Center (),
 				Y = Pos.Center () - 1,
@@ -72,10 +75,10 @@ namespace UICatalog.Scenarios {
 			topLevel.Add (tf3, button2, label2, tv2, tf4);
 			Application.Top.Add (topLevel);
 
-			var frameView = new FrameView (new Rect (95, 5, 40, 20), "FrameView", null);
+			var frameView = new FrameView (new Rect (95, 5, 40, 20), "FrameView", null) { ColorScheme = Colors.Base };
 			frameView.Border.Thickness = borderThickness;
 			frameView.Border.BorderStyle = borderStyle;
-			//frameView.Padding.Thickness = paddingThickness;
+			frameView.Padding.Thickness = paddingThickness;
 
 			var tf5 = new TextField ("1234567890") { Width = 10 };
 
@@ -83,7 +86,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = Pos.Center (),
 			};
-			button3.Clicked += (s,e) => MessageBox.Query (20, 7, "Hi", "I'm a FrameView?", "Yes", "No");
+			button3.Clicked += (s, e) => MessageBox.Query (20, 7, "Hi", "I'm a FrameView?", "Yes", "No");
 			var label3 = new Label ("I'm a FrameView") {
 				X = Pos.Center (),
 				Y = Pos.Center () - 1,

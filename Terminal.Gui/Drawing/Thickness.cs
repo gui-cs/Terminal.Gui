@@ -106,6 +106,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// <see langword="true"/> if all sides are equal to zero and
+		/// <see langword="false"/> if one of the sides are greater than zero.
+		/// </summary>
+		public bool IsEmpty => Left == 0 && Top == 0 && Right == 0 && Bottom == 0;
+
+		/// <summary>
 		/// Returns a rectangle describing the location and size of the inside area of <paramref name="rect"/>
 		/// with the thickness widths subtracted. The height and width of the returned rectangle will
 		/// never be less than 0.

@@ -102,9 +102,14 @@ namespace Terminal.Gui {
 		/// <param name="region">The view-relative region that needs to be redrawn.</param>
 		public void SetNeedsDisplay (Rect region)
 		{
-			if (_needsDisplay.IsEmpty)
+			if (_needsDisplay.IsEmpty) {
 				_needsDisplay = region;
-			else {
+				if (region.IsEmpty && !_frame.Size.IsEmpty) {
+					// force redraw if bounds is empty but not frame
+					// this is needed because the SetChildsNeedsDisplay don't exist
+					_childNeedsDisplay = true;
+				}
+			} else {
 				var x = Math.Min (_needsDisplay.X, region.X);
 				var y = Math.Min (_needsDisplay.Y, region.Y);
 				var w = Math.Max (_needsDisplay.Width, region.Width);

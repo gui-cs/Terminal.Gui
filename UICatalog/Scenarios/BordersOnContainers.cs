@@ -18,7 +18,7 @@ namespace UICatalog.Scenarios {
 			smartView.Width = 40;
 			smartView.Height = 20;
 			smartView.BorderStyle = borderStyle;
-			
+
 			smartView.ColorScheme = Colors.TopLevel;
 
 			var tf1 = new TextField ("1234567890") { Width = 10 };
@@ -45,106 +45,16 @@ namespace UICatalog.Scenarios {
 			};
 			smartView.Add (tf1, button, label, tf2, tv);
 
-			Add (new Label ("Padding:") {
-				X = Pos.Center () - 23,
-			});
-
-			var paddingTopEdit = new TextField ("") {
-				X = Pos.Center () - 22,
-				Y = 1,
-				Width = 5
-			};
-			paddingTopEdit.TextChanging += (s, e) => {
-				try {
-					smartView.Padding.Thickness = new Thickness (smartView.Padding.Thickness.Left,
-						int.Parse (e.NewText.ToString ()), smartView.Padding.Thickness.Right,
-						smartView.Padding.Thickness.Bottom);
-				} catch {
-					if (!e.NewText.IsEmpty) {
-						e.Cancel = true;
-					}
-				}
-			};
-			paddingTopEdit.Text = $"{smartView.Padding.Thickness.Top}";
-
-			Add (paddingTopEdit);
-
-			var paddingLeftEdit = new TextField ("") {
-				X = Pos.Center () - 30,
-				Y = 2,
-				Width = 5
-			};
-			paddingLeftEdit.TextChanging += (s, e) => {
-				try {
-					smartView.Padding.Thickness = new Thickness (int.Parse (e.NewText.ToString ()),
-						smartView.Padding.Thickness.Top, smartView.Padding.Thickness.Right,
-						smartView.Padding.Thickness.Bottom);
-				} catch {
-					if (!e.NewText.IsEmpty) {
-						e.Cancel = true;
-					}
-				}
-			};
-			paddingLeftEdit.Text = $"{smartView.Padding.Thickness.Left}";
-			Add (paddingLeftEdit);
-
-			var paddingRightEdit = new TextField ("") {
-				X = Pos.Center () - 15,
-				Y = 2,
-				Width = 5
-			};
-			paddingRightEdit.TextChanging += (s, e) => {
-				try {
-					smartView.Padding.Thickness = new Thickness (smartView.Padding.Thickness.Left,
-						smartView.Padding.Thickness.Top, int.Parse (e.NewText.ToString ()),
-						smartView.Padding.Thickness.Bottom);
-				} catch {
-					if (!e.NewText.IsEmpty) {
-						e.Cancel = true;
-					}
-				}
-			};
-			paddingRightEdit.Text = $"{smartView.Padding.Thickness.Right}";
-			Add (paddingRightEdit);
-
-			var paddingBottomEdit = new TextField ("") {
-				X = Pos.Center () - 22,
-				Y = 3,
-				Width = 5
-			};
-			paddingBottomEdit.TextChanging += (s, e) => {
-				try {
-					smartView.Padding.Thickness = new Thickness (smartView.Padding.Thickness.Left,
-						smartView.Padding.Thickness.Top, smartView.Padding.Thickness.Right,
-						int.Parse (e.NewText.ToString ()));
-				} catch {
-					if (!e.NewText.IsEmpty) {
-						e.Cancel = true;
-					}
-				}
-			};
-			paddingBottomEdit.Text = $"{smartView.Padding.Thickness.Bottom}";
-			Add (paddingBottomEdit);
-
-			var replacePadding = new Button ("Replace all based on top") {
-				X = Pos.Left (paddingLeftEdit),
-				Y = 5
-			};
-			replacePadding.Clicked += (s, e) => {
-				smartView.Padding.Thickness = new Thickness (smartView.Padding.Thickness.Top);
-				if (paddingTopEdit.Text.IsEmpty) {
-					paddingTopEdit.Text = "0";
-				}
-				paddingBottomEdit.Text = paddingLeftEdit.Text = paddingRightEdit.Text = paddingTopEdit.Text;
-			};
-			Add (replacePadding);
+			var distance = 20;
+			var offsetLeftSide = 7;
+			var offsetButtons = 5;
 
 			Add (new Label ("Border:") {
-				X = Pos.Center () + 11,
+				X = Pos.Center (),
 			});
 
 			var borderTopEdit = new TextField ("") {
-				X = Pos.Center () + 12,
+				X = Pos.Center (),
 				Y = 1,
 				Width = 5
 			};
@@ -164,7 +74,7 @@ namespace UICatalog.Scenarios {
 			Add (borderTopEdit);
 
 			var borderLeftEdit = new TextField ("") {
-				X = Pos.Center () + 5,
+				X = Pos.Left (borderTopEdit) - 7,
 				Y = 2,
 				Width = 5
 			};
@@ -183,7 +93,7 @@ namespace UICatalog.Scenarios {
 			Add (borderLeftEdit);
 
 			var borderRightEdit = new TextField ("") {
-				X = Pos.Center () + 19,
+				X = Pos.Right (borderTopEdit) + 2,
 				Y = 2,
 				Width = 5
 			};
@@ -202,7 +112,7 @@ namespace UICatalog.Scenarios {
 			Add (borderRightEdit);
 
 			var borderBottomEdit = new TextField ("") {
-				X = Pos.Center () + 12,
+				X = Pos.Left (borderTopEdit),
 				Y = 3,
 				Width = 5
 			};
@@ -220,8 +130,8 @@ namespace UICatalog.Scenarios {
 			borderBottomEdit.Text = $"{smartView.Border.Thickness.Bottom}";
 			Add (borderBottomEdit);
 
-			var replaceBorder = new Button ("Replace all based on top") {
-				X = Pos.Left (borderLeftEdit),
+			var replaceBorder = new Button ("Copy  Top") {
+				X = Pos.Center (),
 				Y = 5
 			};
 			replaceBorder.Clicked += (s, e) => {
@@ -232,6 +142,195 @@ namespace UICatalog.Scenarios {
 				borderBottomEdit.Text = borderLeftEdit.Text = borderRightEdit.Text = borderTopEdit.Text;
 			};
 			Add (replaceBorder);
+
+			Add (new Label ("Margin:") {
+				X = Pos.Left (borderLeftEdit) - distance,
+			});
+
+			var marginTopEdit = new TextField ("") {
+				X = Pos.Left (borderTopEdit) - distance - 6,
+				Y = 1,
+				Width = 5
+			};
+			marginTopEdit.TextChanging += (s, e) => {
+				try {
+					smartView.Margin.Thickness = new Thickness (smartView.Margin.Thickness.Left,
+						int.Parse (e.NewText.ToString ()), smartView.Margin.Thickness.Right,
+						smartView.Margin.Thickness.Bottom);
+				} catch {
+					if (!e.NewText.IsEmpty) {
+						e.Cancel = true;
+					}
+				}
+			};
+			marginTopEdit.Text = $"{smartView.Margin.Thickness.Top}";
+
+			Add (marginTopEdit);
+
+			var marginLeftEdit = new TextField ("") {
+				X = Pos.Left (marginTopEdit) - offsetLeftSide,
+				Y = 2,
+				Width = 5
+			};
+			marginLeftEdit.TextChanging += (s, e) => {
+				try {
+					smartView.Margin.Thickness = new Thickness (int.Parse (e.NewText.ToString ()),
+						smartView.Margin.Thickness.Top, smartView.Margin.Thickness.Right,
+						smartView.Margin.Thickness.Bottom);
+				} catch {
+					if (!e.NewText.IsEmpty) {
+						e.Cancel = true;
+					}
+				}
+			};
+			marginLeftEdit.Text = $"{smartView.Margin.Thickness.Left}";
+			Add (marginLeftEdit);
+
+			var marginRightEdit = new TextField ("") {
+				X = Pos.Right (marginTopEdit) + 2,
+				Y = 2,
+				Width = 5
+			};
+			marginRightEdit.TextChanging += (s, e) => {
+				try {
+					smartView.Margin.Thickness = new Thickness (smartView.Margin.Thickness.Left,
+						smartView.Margin.Thickness.Top, int.Parse (e.NewText.ToString ()),
+						smartView.Margin.Thickness.Bottom);
+				} catch {
+					if (!e.NewText.IsEmpty) {
+						e.Cancel = true;
+					}
+				}
+			};
+			marginRightEdit.Text = $"{smartView.Margin.Thickness.Right}";
+			Add (marginRightEdit);
+
+			var marginBottomEdit = new TextField ("") {
+				X = Pos.Left (marginTopEdit),
+				Y = 3,
+				Width = 5
+			};
+			marginBottomEdit.TextChanging += (s, e) => {
+				try {
+					smartView.Margin.Thickness = new Thickness (smartView.Margin.Thickness.Left,
+						smartView.Margin.Thickness.Top, smartView.Margin.Thickness.Right,
+						int.Parse (e.NewText.ToString ()));
+				} catch {
+					if (!e.NewText.IsEmpty) {
+						e.Cancel = true;
+					}
+				}
+			};
+			marginBottomEdit.Text = $"{smartView.Margin.Thickness.Bottom}";
+			Add (marginBottomEdit);
+
+			var replaceMargin = new Button ("Copy  Top") {
+				X = Pos.Left (replaceBorder) - distance - offsetButtons,
+				Y = 5
+			};
+			replaceMargin.Clicked += (s, e) => {
+				smartView.Margin.Thickness = new Thickness (smartView.Margin.Thickness.Top);
+				if (marginTopEdit.Text.IsEmpty) {
+					marginTopEdit.Text = "0";
+				}
+				marginBottomEdit.Text = marginLeftEdit.Text = marginRightEdit.Text = marginTopEdit.Text;
+			};
+			Add (replaceMargin);
+
+			Add (new Label ("Padding:") {
+				X = Pos.Right (borderTopEdit) + distance,
+			});
+
+			var paddingTopEdit = new TextField ("") {
+				X = Pos.Right (borderTopEdit) + distance + 1,
+				Y = 1,
+				Width = 5
+			};
+			paddingTopEdit.TextChanging += (s, e) => {
+				try {
+					smartView.Padding.Thickness = new Thickness (smartView.Padding.Thickness.Left,
+						int.Parse (e.NewText.ToString ()), smartView.Padding.Thickness.Right,
+						smartView.Padding.Thickness.Bottom);
+				} catch {
+					if (!e.NewText.IsEmpty) {
+						e.Cancel = true;
+					}
+				}
+			};
+			paddingTopEdit.Text = $"{smartView.Padding.Thickness.Top}";
+
+			Add (paddingTopEdit);
+
+			var paddingLeftEdit = new TextField ("") {
+				X = Pos.Left (paddingTopEdit) - offsetLeftSide,
+				Y = 2,
+				Width = 5
+			};
+			paddingLeftEdit.TextChanging += (s, e) => {
+				try {
+					smartView.Padding.Thickness = new Thickness (int.Parse (e.NewText.ToString ()),
+						smartView.Padding.Thickness.Top, smartView.Padding.Thickness.Right,
+						smartView.Padding.Thickness.Bottom);
+				} catch {
+					if (!e.NewText.IsEmpty) {
+						e.Cancel = true;
+					}
+				}
+			};
+			paddingLeftEdit.Text = $"{smartView.Padding.Thickness.Left}";
+			Add (paddingLeftEdit);
+
+			var paddingRightEdit = new TextField ("") {
+				X = Pos.Right (paddingTopEdit) + 2,
+				Y = 2,
+				Width = 5
+			};
+			paddingRightEdit.TextChanging += (s, e) => {
+				try {
+					smartView.Padding.Thickness = new Thickness (smartView.Padding.Thickness.Left,
+						smartView.Padding.Thickness.Top, int.Parse (e.NewText.ToString ()),
+						smartView.Padding.Thickness.Bottom);
+				} catch {
+					if (!e.NewText.IsEmpty) {
+						e.Cancel = true;
+					}
+				}
+			};
+			paddingRightEdit.Text = $"{smartView.Padding.Thickness.Right}";
+			Add (paddingRightEdit);
+
+			var paddingBottomEdit = new TextField ("") {
+				X = Pos.Left (paddingTopEdit),
+				Y = 3,
+				Width = 5
+			};
+			paddingBottomEdit.TextChanging += (s, e) => {
+				try {
+					smartView.Padding.Thickness = new Thickness (smartView.Padding.Thickness.Left,
+						smartView.Padding.Thickness.Top, smartView.Padding.Thickness.Right,
+						int.Parse (e.NewText.ToString ()));
+				} catch {
+					if (!e.NewText.IsEmpty) {
+						e.Cancel = true;
+					}
+				}
+			};
+			paddingBottomEdit.Text = $"{smartView.Padding.Thickness.Bottom}";
+			Add (paddingBottomEdit);
+
+			var replacePadding = new Button ("Copy  Top") {
+				X = Pos.Right (replaceBorder) + distance / 2 + offsetButtons / 2,
+				Y = 5
+			};
+			replacePadding.Clicked += (s, e) => {
+				smartView.Padding.Thickness = new Thickness (smartView.Padding.Thickness.Top);
+				if (paddingTopEdit.Text.IsEmpty) {
+					paddingTopEdit.Text = "0";
+				}
+				paddingBottomEdit.Text = paddingLeftEdit.Text = paddingRightEdit.Text = paddingTopEdit.Text;
+			};
+			Add (replacePadding);
+
 
 			smartView.Y = Pos.Center () + 4;
 
@@ -249,49 +348,48 @@ namespace UICatalog.Scenarios {
 
 			rbBorderStyle.SelectedItemChanged += (s, e) => {
 				smartView.BorderStyle = (LineStyle)e.SelectedItem;
+				borderLeftEdit.Text = smartView.Border.Thickness.Left.ToString ();
+				borderTopEdit.Text = smartView.Border.Thickness.Top.ToString ();
+				borderRightEdit.Text = smartView.Border.Thickness.Right.ToString ();
+				borderBottomEdit.Text = smartView.Border.Thickness.Bottom.ToString ();
 				smartView.SetNeedsDisplay ();
 			};
 
-			Add (new Label ("Background:") {
-				Y = 12
+			Add (new Label ("BorderBrush:") {
+				Y = Pos.Bottom (replaceBorder)
 			});
 
 			var colorEnum = Enum.GetValues (typeof (Color)).Cast<Color> ().ToList ();
-			var rbBackground = new RadioGroup (colorEnum.Select (
-				e => NStack.ustring.Make (e.ToString ())).ToArray ()) {
-
-				X = 2,
-				Y = 13,
-				//SelectedItem = (int)smartView.BorderFrame.BackgroundColor
-			};
-			rbBackground.SelectedItemChanged += (s, e) => {
-//				smartView.Border.BackgroundColor = (Color)e.SelectedItem;
-				smartView.Border.ColorScheme = new ColorScheme() { 
-					Normal = new Terminal.Gui.Attribute(Color.Red, Color.White),
-					HotNormal = new Terminal.Gui.Attribute (Color.Magenta, Color.White),
-					Disabled = new Terminal.Gui.Attribute (Color.Gray, Color.White),
-					Focus = new Terminal.Gui.Attribute (Color.Blue, Color.White),
-					HotFocus = new Terminal.Gui.Attribute (Color.BrightBlue, Color.White),	
-				};
-			};
-			Add (rbBackground);
-
-			Add (new Label ("BorderBrush:") {
-				X = Pos.AnchorEnd (20),
-				Y = 5
-			});
 
 			var rbBorderBrush = new RadioGroup (colorEnum.Select (
 				e => NStack.ustring.Make (e.ToString ())).ToArray ()) {
 
-				X = Pos.AnchorEnd (18),
-				Y = 6,
-				//SelectedItem = (int)smartView.Border.ForgroundColor
+				X = 2,
+				Y = Pos.Bottom (replaceBorder) + 1,
+				SelectedItem = (int)smartView.Border.ColorScheme.Normal.Background
 			};
 			rbBorderBrush.SelectedItemChanged += (s, e) => {
-				//smartView.Border.ForgroundColor = (Color)e.SelectedItem;
+				smartView.Border.ColorScheme.Normal = new Terminal.Gui.Attribute (smartView.Padding.ColorScheme.Normal.Background, (Color)e.SelectedItem);
 			};
 			Add (rbBorderBrush);
+
+			Add (new Label ("PaddingBrush:") {
+				X = Pos.AnchorEnd (20),
+				Y = Pos.Bottom (replaceBorder)
+			});
+
+			var rbPaddingBrush = new RadioGroup (colorEnum.Select (
+				e => NStack.ustring.Make (e.ToString ())).ToArray ()) {
+
+				X = Pos.AnchorEnd (18),
+				Y = Pos.Bottom (replaceBorder) + 1,
+				SelectedItem = (int)smartView.Padding.ColorScheme.Normal.Background
+			};
+			rbPaddingBrush.SelectedItemChanged += (s, e) => {
+				smartView.Padding.ColorScheme.Normal = new Terminal.Gui.Attribute (smartView.Padding.ColorScheme.Normal.Foreground, (Color)e.SelectedItem);
+				smartView.Border.ColorScheme.Normal = new Terminal.Gui.Attribute ((Color)e.SelectedItem, smartView.Border.ColorScheme.Normal.Background);
+			};
+			Add (rbPaddingBrush);
 
 			Add (smartView);
 

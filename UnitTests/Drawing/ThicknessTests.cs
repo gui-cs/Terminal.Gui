@@ -288,7 +288,7 @@ namespace Terminal.Gui.DrawingTests {
 		}
 
 		[Fact ()]
-		public void GetInsideTests_Positive_Thickness_Non_Empty_Size()
+		public void GetInsideTests_Positive_Thickness_Non_Empty_Size ()
 		{
 
 			var t = new Thickness (1, 1, 1, 1);
@@ -493,7 +493,7 @@ namespace Terminal.Gui.DrawingTests {
 
 			Application.Top.Add (f);
 			Application.Begin (Application.Top);
-			
+
 			((FakeDriver)Application.Driver).SetBufferSize (45, 20);
 			var t = new Thickness (0, 0, 0, 0);
 			var r = new Rect (2, 2, 40, 15);
@@ -631,6 +631,14 @@ namespace Terminal.Gui.DrawingTests {
 			var t = new Thickness (1, 2, 3, 4);
 			Assert.Equal (t.GetHashCode (), t.GetHashCode ());
 		}
+
+		[Fact ()]
+		public void IsEmpty ()
+		{
+			var t = new Thickness (0);
+			Assert.True (t.IsEmpty);
+			t.Bottom = 1;
+			Assert.False (t.IsEmpty);
+		}
 	}
 }
-
