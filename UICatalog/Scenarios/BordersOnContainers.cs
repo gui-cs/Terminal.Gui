@@ -1,6 +1,4 @@
-﻿using NStack;
-using System;
-using System.Globalization;
+﻿using System;
 using System.Linq;
 using Terminal.Gui;
 
@@ -61,9 +59,10 @@ namespace UICatalog.Scenarios {
 			};
 			borderTopEdit.TextChanging += (s, e) => {
 				try {
-					if (ustring.IsNullOrEmpty (e.NewText)) {
+					if (string.IsNullOrEmpty (e.NewText.ToString ())) {
 						e.Cancel = true;
 						((TextField)s).Text = "0";
+						return;
 					}
 					smartView.Border.Thickness = new Thickness (smartView.Border.Thickness.Left,
 						int.Parse (e.NewText.ToString ()), smartView.Border.Thickness.Right,
@@ -85,6 +84,11 @@ namespace UICatalog.Scenarios {
 			};
 			borderLeftEdit.TextChanging += (s, e) => {
 				try {
+					if (string.IsNullOrEmpty (e.NewText.ToString ())) {
+						e.Cancel = true;
+						((TextField)s).Text = "0";
+						return;
+					}
 					smartView.Border.Thickness = new Thickness (int.Parse (e.NewText.ToString ()),
 						smartView.Border.Thickness.Top, smartView.Border.Thickness.Right,
 						smartView.Border.Thickness.Bottom);
@@ -104,6 +108,11 @@ namespace UICatalog.Scenarios {
 			};
 			borderRightEdit.TextChanging += (s, e) => {
 				try {
+					if (string.IsNullOrEmpty (e.NewText.ToString ())) {
+						e.Cancel = true;
+						((TextField)s).Text = "0";
+						return;
+					}
 					smartView.Border.Thickness = new Thickness (smartView.Border.Thickness.Left,
 						smartView.Border.Thickness.Top, int.Parse (e.NewText.ToString ()),
 						smartView.Border.Thickness.Bottom);
@@ -123,6 +132,11 @@ namespace UICatalog.Scenarios {
 			};
 			borderBottomEdit.TextChanging += (s, e) => {
 				try {
+					if (string.IsNullOrEmpty (e.NewText.ToString ())) {
+						e.Cancel = true;
+						((TextField)s).Text = "0";
+						return;
+					}
 					smartView.Border.Thickness = new Thickness (smartView.Border.Thickness.Left,
 						smartView.Border.Thickness.Top, smartView.Border.Thickness.Right,
 						int.Parse (e.NewText.ToString ()));
@@ -159,6 +173,11 @@ namespace UICatalog.Scenarios {
 			};
 			marginTopEdit.TextChanging += (s, e) => {
 				try {
+					if (string.IsNullOrEmpty (e.NewText.ToString ())) {
+						e.Cancel = true;
+						((TextField)s).Text = "0";
+						return;
+					}
 					smartView.Margin.Thickness = new Thickness (smartView.Margin.Thickness.Left,
 						int.Parse (e.NewText.ToString ()), smartView.Margin.Thickness.Right,
 						smartView.Margin.Thickness.Bottom);
@@ -179,6 +198,11 @@ namespace UICatalog.Scenarios {
 			};
 			marginLeftEdit.TextChanging += (s, e) => {
 				try {
+					if (string.IsNullOrEmpty (e.NewText.ToString ())) {
+						e.Cancel = true;
+						((TextField)s).Text = "0";
+						return;
+					}
 					smartView.Margin.Thickness = new Thickness (int.Parse (e.NewText.ToString ()),
 						smartView.Margin.Thickness.Top, smartView.Margin.Thickness.Right,
 						smartView.Margin.Thickness.Bottom);
@@ -198,6 +222,11 @@ namespace UICatalog.Scenarios {
 			};
 			marginRightEdit.TextChanging += (s, e) => {
 				try {
+					if (string.IsNullOrEmpty (e.NewText.ToString ())) {
+						e.Cancel = true;
+						((TextField)s).Text = "0";
+						return;
+					}
 					smartView.Margin.Thickness = new Thickness (smartView.Margin.Thickness.Left,
 						smartView.Margin.Thickness.Top, int.Parse (e.NewText.ToString ()),
 						smartView.Margin.Thickness.Bottom);
@@ -217,6 +246,11 @@ namespace UICatalog.Scenarios {
 			};
 			marginBottomEdit.TextChanging += (s, e) => {
 				try {
+					if (string.IsNullOrEmpty (e.NewText.ToString ())) {
+						e.Cancel = true;
+						((TextField)s).Text = "0";
+						return;
+					}
 					smartView.Margin.Thickness = new Thickness (smartView.Margin.Thickness.Left,
 						smartView.Margin.Thickness.Top, smartView.Margin.Thickness.Right,
 						int.Parse (e.NewText.ToString ()));
@@ -253,6 +287,11 @@ namespace UICatalog.Scenarios {
 			};
 			paddingTopEdit.TextChanging += (s, e) => {
 				try {
+					if (string.IsNullOrEmpty (e.NewText.ToString ())) {
+						e.Cancel = true;
+						((TextField)s).Text = "0";
+						return;
+					}
 					smartView.Padding.Thickness = new Thickness (smartView.Padding.Thickness.Left,
 						int.Parse (e.NewText.ToString ()), smartView.Padding.Thickness.Right,
 						smartView.Padding.Thickness.Bottom);
@@ -273,6 +312,11 @@ namespace UICatalog.Scenarios {
 			};
 			paddingLeftEdit.TextChanging += (s, e) => {
 				try {
+					if (string.IsNullOrEmpty (e.NewText.ToString ())) {
+						e.Cancel = true;
+						((TextField)s).Text = "0";
+						return;
+					}
 					smartView.Padding.Thickness = new Thickness (int.Parse (e.NewText.ToString ()),
 						smartView.Padding.Thickness.Top, smartView.Padding.Thickness.Right,
 						smartView.Padding.Thickness.Bottom);
@@ -292,6 +336,11 @@ namespace UICatalog.Scenarios {
 			};
 			paddingRightEdit.TextChanging += (s, e) => {
 				try {
+					if (string.IsNullOrEmpty (e.NewText.ToString ())) {
+						e.Cancel = true;
+						((TextField)s).Text = "0";
+						return;
+					}
 					smartView.Padding.Thickness = new Thickness (smartView.Padding.Thickness.Left,
 						smartView.Padding.Thickness.Top, int.Parse (e.NewText.ToString ()),
 						smartView.Padding.Thickness.Bottom);
@@ -311,6 +360,11 @@ namespace UICatalog.Scenarios {
 			};
 			paddingBottomEdit.TextChanging += (s, e) => {
 				try {
+					if (string.IsNullOrEmpty (e.NewText.ToString ())) {
+						e.Cancel = true;
+						((TextField)s).Text = "0";
+						return;
+					}
 					smartView.Padding.Thickness = new Thickness (smartView.Padding.Thickness.Left,
 						smartView.Padding.Thickness.Top, smartView.Padding.Thickness.Right,
 						int.Parse (e.NewText.ToString ()));
