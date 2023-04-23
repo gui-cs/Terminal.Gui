@@ -347,7 +347,13 @@ namespace UICatalog.Scenarios {
 			Add (rbBorderStyle);
 
 			rbBorderStyle.SelectedItemChanged += (s, e) => {
-				smartView.BorderStyle = (LineStyle)e.SelectedItem;
+				var prevBorderStyle = smartView.BorderStyle;
+				smartView.Border.BorderStyle = (LineStyle)e.SelectedItem;
+				if (smartView.Border.BorderStyle == LineStyle.None) {
+					smartView.Border.Thickness = new Thickness (0);
+				} else if (prevBorderStyle == LineStyle.None && smartView.Border.BorderStyle != LineStyle.None) {
+					smartView.Border.Thickness = new Thickness (1);
+				}
 				borderLeftEdit.Text = smartView.Border.Thickness.Left.ToString ();
 				borderTopEdit.Text = smartView.Border.Thickness.Top.ToString ();
 				borderRightEdit.Text = smartView.Border.Thickness.Right.ToString ();
@@ -356,6 +362,7 @@ namespace UICatalog.Scenarios {
 			};
 
 			Add (new Label ("BorderBrush:") {
+				X = Pos.Right (rbBorderStyle),
 				Y = Pos.Bottom (replaceBorder)
 			});
 
@@ -364,7 +371,7 @@ namespace UICatalog.Scenarios {
 			var rbBorderBrush = new RadioGroup (colorEnum.Select (
 				e => NStack.ustring.Make (e.ToString ())).ToArray ()) {
 
-				X = 2,
+				X = Pos.Right (rbBorderStyle),
 				Y = Pos.Bottom (replaceBorder) + 1,
 				SelectedItem = (int)smartView.Border.ColorScheme.Normal.Background
 			};
