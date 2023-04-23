@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NStack;
+using System;
 using System.Globalization;
 using System.Linq;
 using Terminal.Gui;
@@ -60,6 +61,10 @@ namespace UICatalog.Scenarios {
 			};
 			borderTopEdit.TextChanging += (s, e) => {
 				try {
+					if (ustring.IsNullOrEmpty (e.NewText)) {
+						e.Cancel = true;
+						((TextField)s).Text = "0";
+					}
 					smartView.Border.Thickness = new Thickness (smartView.Border.Thickness.Left,
 						int.Parse (e.NewText.ToString ()), smartView.Border.Thickness.Right,
 						smartView.Border.Thickness.Bottom);
