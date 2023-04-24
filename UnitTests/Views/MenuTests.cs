@@ -2555,7 +2555,7 @@ wo
 				Assert.Equal (items [i], menu.Menus [0].Title);
 			}
 
-						((FakeDriver)Application.Driver).SetBufferSize (20, 15);
+			((FakeDriver)Application.Driver).SetBufferSize (20, 15);
 			menu.OpenMenu ();
 			firstIteration = false;
 			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
@@ -2570,6 +2570,35 @@ wo
     │ Save As   Save
     │ Delete     Del
     └───────────────", output);
+
+			Application.End (rs);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Resizing_Close_Menus ()
+		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("File", new MenuItem [] {
+					new MenuItem("Open", "Open a file", () => {},null,null, Key.CtrlMask | Key.O)
+				})
+			});
+			Application.Top.Add (menu);
+			var rs = Application.Begin (Application.Top);
+
+			menu.OpenMenu ();
+			var firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ File                         
+┌────────────────────────────┐
+│ Open   Open a file  Ctrl+O │
+└────────────────────────────┘", output);
+
+			((FakeDriver)Application.Driver).SetBufferSize (20, 15);
+			firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ File", output);
 
 			Application.End (rs);
 		}

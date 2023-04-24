@@ -514,8 +514,7 @@ namespace Terminal.Gui {
 		private void Current_TerminalResized (object sender, SizeChangedEventArgs e)
 		{
 			if (host.IsMenuOpen) {
-				host.CloseMenu (false);
-				host.OpenMenu ();
+				host.CloseAllMenus ();
 			}
 		}
 
