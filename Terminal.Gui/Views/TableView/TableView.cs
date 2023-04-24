@@ -15,6 +15,7 @@ namespace Terminal.Gui {
 	/// </summary>
 	public partial class TableView : View {
 
+		private LineCanvas grid = new LineCanvas ();
 		private int columnOffset;
 		private int rowOffset;
 		private int selectedRow;
@@ -234,9 +235,6 @@ namespace Terminal.Gui {
 			Move (0, 0);
 			var frame = Frame;
 
-			scrollRightPoint = null;
-			scrollLeftPoint = null;
-
 			// What columns to render at what X offset in viewport
 			var columnsToRender = CalculateViewport (bounds).ToArray ();
 
@@ -245,51 +243,101 @@ namespace Terminal.Gui {
 			//invalidate current row (prevents scrolling around leaving old characters in the frame
 			Driver.AddStr (new string (' ', bounds.Width));
 
-			int line = 0;
+			if (Table == null || columnsToRender.Length < 1) {
+				return;
+			}
 
-			if (ShouldRenderHeaders ()) {
-				// Render something like:
-				/*
-					┌────────────────────┬──────────┬───────────┬──────────────┬─────────┐
-					│ArithmeticComparator│chi       │Healthboard│Interpretation│Labnumber│
-					└────────────────────┴──────────┴───────────┴──────────────┴─────────┘
-				*/
-				if (Style.ShowHorizontalHeaderOverline) {
-					RenderHeaderOverline (line, bounds.Width, columnsToRender);
-					line++;
+			var lastCol = columnsToRender [columnsToRender.Length - 1];
+			var width = bounds.Width;
+			if (!Style.ExpandLastColumn) {
+				width = lastCol.X + lastCol.Width;
+			}
+
+			// render the cell lines
+			grid.Clear ();
+			if (Style.LineColor.Initialized)
+				Driver.SetAttribute (Style.LineColor);
+			else
+				Driver.SetAttribute (this.ColorScheme.Normal);
+			RenderCellLines (width, Table.Rows.Count, columnsToRender);
+
+			foreach (var p in grid.GetMap (bounds)) {
+				this.AddRune (p.Key.X, p.Key.Y, p.Value);
+			}
+
+			// render arrows
+			scrollRightPoint = null;
+			scrollLeftPoint = null;
+			int hh = GetHeaderHeightIfAny ();
+			if (Style.ShowHorizontalScrollIndicators) {
+				if (hh > 0 && MoreColumnsToLeft ()) {
+					scrollLeftPoint = new Point (0, hh);
+				}
+				if (hh > 0 && MoreColumnsToRight (columnsToRender)) {
+					scrollRightPoint = new Point (width - 1, hh);
+				}
+			}
+			if (scrollLeftPoint != null) {
+				AddRuneAt (Driver, 0, scrollLeftPoint.Value.Y - 1, Driver.LeftArrow);
+			}
+			if (scrollRightPoint != null) {
+				AddRuneAt (Driver, scrollRightPoint.Value.X, scrollRightPoint.Value.Y - 1, Driver.RightArrow);
+			}
+
+			// render the header contents
+			if (Style.ShowHeaders && hh > 0) {
+				var padChar = ' ';
+				if (Style.ShowHorizontalHeaderThroughline &&
+					(!Style.ShowHorizontalHeaderOverline || !Style.ShowHorizontalHeaderUnderline)) {
+					padChar = (char)Driver.HLine;
 				}
 
-				if (Style.ShowHeaders) {
-					RenderHeaderMidline (line, columnsToRender);
-					line++;
-				}
-
+				var yh = hh - 1;
 				if (Style.ShowHorizontalHeaderUnderline) {
-					RenderHeaderUnderline (line, bounds.Width, columnsToRender);
-					line++;
+					yh--;
+				}
+
+				for (var i = 0; i < columnsToRender.Length; i++) {
+
+					var current = columnsToRender [i];
+
+					var colStyle = Style.GetColumnStyleIfAny (current.Column);
+					var colName = current.Column.ColumnName;
+
+					//RenderSeparator (current.X - 1, yh, true);
+
+					Move (current.X, yh);
+
+					Driver.AddStr (TruncateOrPad (colName, colName, current.Width, colStyle, padChar));
+
+					/*
+					if (Style.ExpandLastColumn == false && current.IsVeryLast) {
+						RenderSeparator (current.X + current.Width - 1, yh, true);
+					}
+					*/
 				}
 			}
 
-			int headerLinesConsumed = line;
+			// render the cell contents
+			for (var line = hh; line < frame.Height; line++) {
 
-			//render the cells
-			for (; line < frame.Height; line++) {
-
-				ClearLine (line, bounds.Width);
+				//ClearLine (line, width);
 
 				//work out what Row to render
-				var rowToRender = RowOffset + (line - headerLinesConsumed);
+				var rowToRender = RowOffset + (line - hh);
 
 				//if we have run off the end of the table
 				if (TableIsNullOrInvisible () || rowToRender < 0)
 					continue;
 
 				// No more data
-				if(rowToRender >= Table.Rows.Count) {
+				if (rowToRender >= Table.Rows.Count) {
 
-					if(rowToRender == Table.Rows.Count && Style.ShowHorizontalBottomline) {
-						RenderBottomLine (line, bounds.Width, columnsToRender);
+					/*
+					if (rowToRender == Table.Rows.Count && Style.ShowHorizontalBottomline) {
+						RenderBottomLine (line, width, columnsToRender);
 					}
+					*/
 					continue;
 				}
 
@@ -335,86 +383,91 @@ namespace Terminal.Gui {
 			return heightRequired;
 		}
 
-		private void RenderHeaderOverline (int row, int availableWidth, ColumnToRender [] columnsToRender)
+		private void RenderCellLines (int width, int height, ColumnToRender [] columnsToRender)
 		{
-			// Renders a line above table headers (when visible) like:
-			// ┌────────────────────┬──────────┬───────────┬──────────────┬─────────┐
+			var row = 0;
+			int hh = GetHeaderHeightIfAny ();
 
-			for (int c = 0; c < availableWidth; c++) {
-
-				var rune = Driver.HLine;
-
-				if (Style.ShowVerticalHeaderLines) {
-
-					if (c == 0) {
-						rune = Driver.ULCorner;
-					}
-					// if the next column is the start of a header
-					else if (columnsToRender.Any (r => r.X == c + 1)) {
-						rune = Driver.TopTee;
-					} else if (c == availableWidth - 1) {
-						rune = Driver.URCorner;
-					}
-					  // if the next console column is the lastcolumns end
-					  else if (Style.ExpandLastColumn == false &&
-						   columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c)) {
-						rune = Driver.TopTee;
-					}
-				}
-
-				AddRuneAt (Driver, c, row, rune);
-			}
-		}
-
-		private void RenderHeaderMidline (int row, ColumnToRender [] columnsToRender)
-		{
-			// Renders something like:
-			// │ArithmeticComparator│chi       │Healthboard│Interpretation│Labnumber│
-
-			ClearLine (row, Bounds.Width);
-
-			//render start of line
-			if (style.ShowVerticalHeaderLines)
-				AddRune (0, row, Driver.VLine);
-
-			for (int i = 0; i < columnsToRender.Length; i++) {
-
-				var current = columnsToRender [i];
-
-				var colStyle = Style.GetColumnStyleIfAny (current.Column);
-				var colName = current.Column.ColumnName;
-
-				RenderSeparator (current.X - 1, row, true);
-
-				Move (current.X, row);
-
-				Driver.AddStr (TruncateOrPad (colName, colName, current.Width, colStyle));
-
-				if (Style.ExpandLastColumn == false && current.IsVeryLast) {
-					RenderSeparator (current.X + current.Width - 1, row, true);
-				}
-			}
-
-			//render end of line
-			if (style.ShowVerticalHeaderLines)
-				AddRune (Bounds.Width - 1, row, Driver.VLine);
-		}
-
-		private void RenderHeaderUnderline (int row, int availableWidth, ColumnToRender [] columnsToRender)
-		{
+			// First render the header, something like:
 			/*
-			 *  First lets work out if we should be rendering scroll indicators
-			 */
+				┌────────────────────┬──────────┬───────────┬──────────────┬─────────┐
+				│ArithmeticComparator│chi       │Healthboard│Interpretation│Labnumber│
+				└────────────────────┴──────────┴───────────┴──────────────┴─────────┘
+			*/
 
+			if (hh > 0) {
+				if (Style.ShowHorizontalHeaderOverline) {
+					grid.AddLine (new Point (0, row), width, Orientation.Horizontal, Style.OuterHeaderLineStyle);
+					row++;
+				}
+				if (Style.ShowHeaders) {
+					var lineStyle = Style.InnerHeaderLineStyle;
+					if (!Style.ShowHorizontalHeaderOverline)
+						lineStyle = Style.OuterHeaderLineStyle;
+					if (Style.ShowHorizontalHeaderThroughline &&
+						(!Style.ShowHorizontalHeaderOverline || !Style.ShowHorizontalHeaderUnderline)) {
+						grid.AddLine (new Point (0, row), width, Orientation.Horizontal, lineStyle);
+					}
+					row++;
+				}
+				if (Style.ShowHorizontalHeaderUnderline) {
+					var lineStyle = Style.InnerHeaderLineStyle;
+					if (!Style.ShowHorizontalHeaderOverline && !Style.ShowHeaders)
+						lineStyle = Style.OuterHeaderLineStyle;
+					grid.AddLine (new Point (0, row), width, Orientation.Horizontal, lineStyle);
+					row++;
+				}
+
+				if (row > 1 && Style.ShowVerticalHeaderLines) {
+					foreach (var col in columnsToRender) {
+						var lineStyle = Style.InnerHeaderLineStyle;
+						if (col.X - 1 == 0) {
+							lineStyle = Style.OuterHeaderLineStyle;
+						}
+						grid.AddLine (new Point (col.X - 1, 0), row, Orientation.Vertical, lineStyle);
+					}
+					grid.AddLine (new Point (width - 1, 0), row, Orientation.Vertical, Style.OuterHeaderLineStyle);
+				}
+			}
+
+			if (Style.ShowHorizontalBottomline) {
+				height++;
+			}
+
+			// render the vertical cell lines
+			if (Style.ShowVerticalCellLines) {
+				foreach (var col in columnsToRender) {
+					var lineStyle = Style.InnerLineStyle;
+					if (col.X - 1 == 0) {
+						lineStyle = Style.OuterLineStyle;
+					}
+					grid.AddLine (new Point (col.X - 1, row - 1), height - RowOffset + 1, Orientation.Vertical, lineStyle);
+				}
+				grid.AddLine (new Point (width - 1, row - 1), height - RowOffset + 1, Orientation.Vertical, Style.OuterLineStyle);
+			}
+
+			// render the bottom line
+			if (Style.ShowHorizontalBottomline) {
+				grid.AddLine (new Point (0, height - RowOffset + hh - 1), width, Orientation.Horizontal, Style.OuterLineStyle);
+			}
+		}
+
+		private bool MoreColumnsToLeft ()
+		{
 			// are there are visible columns to the left that have been pushed
 			// off the screen due to horizontal scrolling?
 			bool moreColumnsToLeft = ColumnOffset > 0;
 
 			// if we moved left would we find a new column (or are they all invisible?)
 			if (!TryGetNearestVisibleColumn (ColumnOffset - 1, false, false, out _)) {
-				moreColumnsToLeft = false;
+				return false;
 			}
 
+			return moreColumnsToLeft;
+		}
+
+		private bool MoreColumnsToRight (ColumnToRender [] columnsToRender)
+		{
 			// are there visible columns to the right that have not yet been reached?
 			// lets find out, what is the column index of the last column we are rendering
 			int lastColumnIdxRendered = ColumnOffset + columnsToRender.Length - 1;
@@ -425,104 +478,12 @@ namespace Terminal.Gui {
 			// if we went right from the last column would we find a new visible column?
 			if (!TryGetNearestVisibleColumn (lastColumnIdxRendered + 1, true, false, out _)) {
 				// no we would not
-				moreColumnsToRight = false;
+				return false;
 			}
 
-			/*
-			 *  Now lets draw the line itself
-			 */
-
-			// Renders a line below the table headers (when visible) like:
-			// ├──────────┼───────────┼───────────────────┼──────────┼────────┼─────────────┤
-
-			for (int c = 0; c < availableWidth; c++) {
-
-				// Start by assuming we just draw a straight line the
-				// whole way but update to instead draw a header indicator
-				// or scroll arrow etc
-				var rune = Driver.HLine;
-
-				if (Style.ShowVerticalHeaderLines) {
-					if (c == 0) {
-						// for first character render line
-						rune = Style.ShowVerticalCellLines ? Driver.LeftTee : Driver.LLCorner;
-
-						// unless we have horizontally scrolled along
-						// in which case render an arrow, to indicate user
-						// can scroll left
-						if (Style.ShowHorizontalScrollIndicators && moreColumnsToLeft) {
-							rune = Driver.LeftArrow;
-							scrollLeftPoint = new Point (c, row);
-						}
-
-					}
-					// if the next column is the start of a header
-					else if (columnsToRender.Any (r => r.X == c + 1)) {
-
-						/*TODO: is ┼ symbol in Driver?*/
-						rune = Style.ShowVerticalCellLines ? '┼' : Driver.BottomTee;
-					} else if (c == availableWidth - 1) {
-
-						// for the last character in the table
-						rune = Style.ShowVerticalCellLines ? Driver.RightTee : Driver.LRCorner;
-
-						// unless there is more of the table we could horizontally
-						// scroll along to see. In which case render an arrow,
-						// to indicate user can scroll right
-						if (Style.ShowHorizontalScrollIndicators && moreColumnsToRight) {
-							rune = Driver.RightArrow;
-							scrollRightPoint = new Point (c, row);
-						}
-
-					}
-					  // if the next console column is the lastcolumns end
-					  else if (Style.ExpandLastColumn == false &&
-							  columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c)) {
-						rune = Style.ShowVerticalCellLines ? '┼' : Driver.BottomTee;
-					}
-				}
-
-				AddRuneAt (Driver, c, row, rune);
-			}
-
+			return moreColumnsToRight;
 		}
 
-		private void RenderBottomLine (int row, int availableWidth, ColumnToRender [] columnsToRender)
-		{
-			// Renders a line at the bottom of the table after all the data like:
-			// └─────────────────────────────────┴──────────┴──────┴──────────┴────────┴────────────────────────────────────────────┘
-
-			for (int c = 0; c < availableWidth; c++) {
-
-				// Start by assuming we just draw a straight line the
-				// whole way but update to instead draw BottomTee / Corner etc
-				var rune = Driver.HLine;
-
-				if (Style.ShowVerticalCellLines) {
-					if (c == 0) {
-						// for first character render line
-						rune = Driver.LLCorner;
-
-					}
-					// if the next column is the start of a header
-					else if (columnsToRender.Any (r => r.X == c + 1)) {
-						rune =  Driver.BottomTee;
-					} else if (c == availableWidth - 1) {
-
-						// for the last character in the table
-						rune = Driver.LRCorner;
-
-					}
-					  // if the next console column is the lastcolumns end
-					  else if (Style.ExpandLastColumn == false &&
-							  columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c)) {
-						rune = Driver.BottomTee;
-					}
-				}
-
-				AddRuneAt (Driver, c, row, rune);
-			}
-		}
 		private void RenderRow (int row, int rowToRender, ColumnToRender [] columnsToRender)
 		{
 			var focused = HasFocus;
@@ -541,8 +502,8 @@ namespace Terminal.Gui {
 				color = Enabled ? rowScheme.Normal : rowScheme.Disabled;
 			}
 
-			Driver.SetAttribute (color);
-			Driver.AddStr (new string (' ', Bounds.Width));
+			//Driver.SetAttribute (color);
+			//Driver.AddStr (new string (' ', Bounds.Width));
 
 			// Render cells for each visible header for the current row
 			for (int i = 0; i < columnsToRender.Length; i++) {
@@ -605,31 +566,19 @@ namespace Terminal.Gui {
 					Driver.SetAttribute (color);
 				}
 
-				// If not in full row select mode always, reset color scheme to normal and render the vertical line (or space) at the end of the cell
-				if (!FullRowSelect)
-					Driver.SetAttribute (Enabled ? rowScheme.Normal : rowScheme.Disabled);
-
-				if(style.AlwaysUseNormalColorForVerticalCellLines && style.ShowVerticalCellLines) {
-
-					Driver.SetAttribute (rowScheme.Normal);
+				// TODO: style.AlwaysUseNormalColorForVerticalCellLines is no longer possible after switch to LineCanvas
+				// This is an attempt at a workaround, but requires cell lines to be drawn first and doesn't respect LineStyle
+				/*
+				if (FullRowSelect && style.ShowVerticalCellLines && !style.AlwaysUseNormalColorForVerticalCellLines) {
+					if (current.X - 1 != 0) {
+						RenderSeparator (current.X - 1, row, false);
+					}
+					if (Style.ExpandLastColumn == false && current.IsVeryLast) {
+						RenderSeparator (current.X + current.Width - 1, row, false);
+					}
 				}
-
-				RenderSeparator (current.X - 1, row, false);
-
-				if (Style.ExpandLastColumn == false && current.IsVeryLast) {
-					RenderSeparator (current.X + current.Width - 1, row, false);
-				}
+				*/
 			}
-
-			if (style.ShowVerticalCellLines) {
-
-				Driver.SetAttribute (rowScheme.Normal);
-
-				//render start and end of line
-				AddRune (0, row, Driver.VLine);
-				AddRune (Bounds.Width - 1, row, Driver.VLine);
-			}
-				
 		}
 
 		/// <summary>
@@ -689,11 +638,12 @@ namespace Terminal.Gui {
 		/// <param name="representation">The string representation of <paramref name="originalCellValue"/></param>
 		/// <param name="availableHorizontalSpace"></param>
 		/// <param name="colStyle">Optional style indicating custom alignment for the cell</param>
+		/// <param name="padChar">Character used to pad string (defaults to space)</param>
 		/// <returns></returns>
-		private string TruncateOrPad (object originalCellValue, string representation, int availableHorizontalSpace, ColumnStyle colStyle)
+		private string TruncateOrPad (object originalCellValue, string representation, int availableHorizontalSpace, ColumnStyle colStyle, char padChar = ' ')
 		{
 			if (string.IsNullOrEmpty (representation))
-				return new string(' ',availableHorizontalSpace);
+				return new string (padChar, availableHorizontalSpace);
 
 			// if value is not wide enough
 			if (representation.Sum (c => Rune.ColumnWidth (c)) < availableHorizontalSpace) {
@@ -704,17 +654,17 @@ namespace Terminal.Gui {
 				switch (colStyle?.GetAlignment (originalCellValue) ?? TextAlignment.Left) {
 
 				case TextAlignment.Left:
-					return representation + new string (' ', toPad);
+					return representation + new string (padChar, toPad);
 				case TextAlignment.Right:
-					return new string (' ', toPad) + representation;
+					return new string (padChar, toPad) + representation;
 
 				// TODO: With single line cells, centered and justified are the same right?
 				case TextAlignment.Centered:
 				case TextAlignment.Justified:
 					return
-						new string (' ', (int)Math.Floor (toPad / 2.0)) + // round down
+						new string (padChar, (int)Math.Floor (toPad / 2.0)) + // round down
 						representation +
-						 new string (' ', (int)Math.Ceiling (toPad / 2.0)); // round up
+						 new string (padChar, (int)Math.Ceiling (toPad / 2.0)); // round up
 				}
 			}
 
@@ -1834,6 +1784,11 @@ namespace Terminal.Gui {
 			public bool ShowHorizontalHeaderUnderline { get; set; } = true;
 
 			/// <summary>
+			/// True to render a solid line through the headers (only when Overline and/or Underline are <see langword="false"/>)
+			/// </summary>
+			public bool ShowHorizontalHeaderThroughline { get; set; } = true;
+
+			/// <summary>
 			/// True to render a solid line vertical line between cells
 			/// </summary>
 			public bool ShowVerticalCellLines { get; set; } = true;
@@ -1845,9 +1800,9 @@ namespace Terminal.Gui {
 
 			/// <summary>
 			/// True to render a arrows on the right/left of the table when 
-			/// there are more column(s) that can be scrolled to.  Requires
-			/// <see cref="ShowHorizontalHeaderUnderline"/> to be true.
-			/// Defaults to true
+			/// there are more column(s) that can be scrolled to.  Applied to the
+			/// lowest Horizontal Header line.
+			/// Defaults to <see langword="true"/>.
 			/// </summary>
 			public bool ShowHorizontalScrollIndicators { get; set; } = true;
 
@@ -1865,16 +1820,42 @@ namespace Terminal.Gui {
 			/// </summary>
 			public bool InvertSelectedCellFirstCharacter { get; set; } = false;
 
+			// TODO: I changed the default to true for now, but false doesn't work currently
 			/// <summary>
 			/// Gets or sets a flag indicating whether to force <see cref="ColorScheme.Normal"/> use when rendering
 			/// vertical cell lines (even when <see cref="FullRowSelect"/> is on).
 			/// </summary>
-			public bool AlwaysUseNormalColorForVerticalCellLines { get; set; } = false;
+			public bool AlwaysUseNormalColorForVerticalCellLines { get; set; } = true;
 
 			/// <summary>
 			/// Collection of columns for which you want special rendering (e.g. custom column lengths, text alignment etc)
 			/// </summary>
 			public Dictionary<DataColumn, ColumnStyle> ColumnStyles { get; set; } = new Dictionary<DataColumn, ColumnStyle> ();
+
+			/// <summary>
+			/// The colors to use for border lines)
+			/// </summary>
+			public Attribute LineColor { get; set; }
+
+			/// <summary>
+			/// The style to use for border lines within the header)
+			/// </summary>
+			public LineStyle OuterHeaderLineStyle { get; set; } = LineStyle.Single;
+
+			/// <summary>
+			/// The style to use for border lines within the header)
+			/// </summary>
+			public LineStyle InnerHeaderLineStyle { get; set; } = LineStyle.Single;
+
+			/// <summary>
+			/// The style to use for border lines around the edge of the table)
+			/// </summary>
+			public LineStyle OuterLineStyle { get; set; } = LineStyle.Single;
+
+			/// <summary>
+			/// The style to use for border lines within the table)
+			/// </summary>
+			public LineStyle InnerLineStyle { get; set; } = LineStyle.Single;
 
 			/// <summary>
 			/// Delegate for coloring specific rows in a different color.  For cell color <see cref="ColumnStyle.ColorGetter"/>

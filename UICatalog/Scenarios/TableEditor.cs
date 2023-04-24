@@ -20,6 +20,7 @@ namespace UICatalog.Scenarios {
 		private MenuItem miAlwaysShowHeaders;
 		private MenuItem miHeaderOverline;
 		private MenuItem miHeaderMidline;
+		private MenuItem miHeaderThruline;
 		private MenuItem miHeaderUnderline;
 		private MenuItem miShowHorizontalScrollIndicators;
 		private MenuItem miCellLines;
@@ -61,7 +62,8 @@ namespace UICatalog.Scenarios {
 					miShowHeaders = new MenuItem ("_ShowHeaders", "", () => ToggleShowHeaders()){Checked = tableView.Style.ShowHeaders, CheckType = MenuItemCheckStyle.Checked },
 					miAlwaysShowHeaders = new MenuItem ("_AlwaysShowHeaders", "", () => ToggleAlwaysShowHeaders()){Checked = tableView.Style.AlwaysShowHeaders, CheckType = MenuItemCheckStyle.Checked },
 					miHeaderOverline = new MenuItem ("_HeaderOverLine", "", () => ToggleOverline()){Checked = tableView.Style.ShowHorizontalHeaderOverline, CheckType = MenuItemCheckStyle.Checked },
-					miHeaderMidline = new MenuItem ("_HeaderMidLine", "", () => ToggleHeaderMidline()){Checked = tableView.Style.ShowVerticalHeaderLines, CheckType = MenuItemCheckStyle.Checked },
+					miHeaderMidline = new MenuItem ("_VerticalHeaderLines", "", () => ToggleHeaderMidline()){Checked = tableView.Style.ShowVerticalHeaderLines, CheckType = MenuItemCheckStyle.Checked },
+					miHeaderThruline = new MenuItem ("_HeaderThroughLine", "", () => ToggleHeaderThruline()){Checked = tableView.Style.ShowHorizontalHeaderThroughline, CheckType = MenuItemCheckStyle.Checked },
 					miHeaderUnderline = new MenuItem ("_HeaderUnderLine", "", () => ToggleUnderline()){Checked = tableView.Style.ShowHorizontalHeaderUnderline, CheckType = MenuItemCheckStyle.Checked },
 					miBottomline = new MenuItem ("_BottomLine", "", () => ToggleBottomline()){Checked = tableView.Style.ShowHorizontalBottomline, CheckType = MenuItemCheckStyle.Checked },
 					miShowHorizontalScrollIndicators = new MenuItem ("_HorizontalScrollIndicators", "", () => ToggleHorizontalScrollIndicators()){Checked = tableView.Style.ShowHorizontalScrollIndicators, CheckType = MenuItemCheckStyle.Checked },
@@ -404,6 +406,12 @@ namespace UICatalog.Scenarios {
 			tableView.Style.ShowVerticalHeaderLines = (bool)miHeaderMidline.Checked;
 			tableView.Update ();
 		}
+		private void ToggleHeaderThruline ()
+		{
+			miHeaderThruline.Checked = !miHeaderThruline.Checked;
+			tableView.Style.ShowHorizontalHeaderThroughline = (bool)miHeaderThruline.Checked;
+			tableView.Update ();
+		}
 		private void ToggleUnderline ()
 		{
 			miHeaderUnderline.Checked = !miHeaderUnderline.Checked;
@@ -468,6 +476,7 @@ namespace UICatalog.Scenarios {
 
 			miHeaderOverline.Checked = true;
 			miHeaderMidline.Checked = true;
+			miHeaderThruline.Checked = true;
 			miHeaderUnderline.Checked = true;
 			miCellLines.Checked = true;
 
@@ -482,6 +491,7 @@ namespace UICatalog.Scenarios {
 
 			miHeaderOverline.Checked = false;
 			miHeaderMidline.Checked = false;
+			miHeaderThruline.Checked = true;
 			miHeaderUnderline.Checked = false;
 			miCellLines.Checked = false;
 

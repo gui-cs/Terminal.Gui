@@ -1041,6 +1041,11 @@ namespace Terminal.Gui {
 		public Rune BottomTee = '\u2534';
 
 		/// <summary>
+		/// The crosshair.
+		/// </summary>
+		public Rune Crosshair = '\u253c';
+
+		/// <summary>
 		/// Checkmark.
 		/// </summary>
 		public Rune Checked = '\u221a';
@@ -1084,6 +1089,66 @@ namespace Terminal.Gui {
 		/// Up Arrow.
 		/// </summary>
 		public Rune UpArrow = '\u25b2';
+
+		/// <summary>
+		/// Up Down Arrow.
+		/// </summary>
+		public Rune UpDownArrow = '\u2195';
+
+		/// <summary>
+		/// Up Down Arrow.
+		/// </summary>
+		public Rune LeftRightArrow = '\u2194';
+
+		/// <summary>
+		/// Right Double Arrow.
+		/// </summary>
+		public Rune DoubleRightArrow = '\u21d2';
+
+		/// <summary>
+		/// Left Double Arrow.
+		/// </summary>
+		public Rune DoubleLeftArrow = '\u21d0';
+
+		/// <summary>
+		/// Down Double Arrow.
+		/// </summary>
+		public Rune DoubleDownArrow = '\u21d3';
+
+		/// <summary>
+		/// Up Double Arrow.
+		/// </summary>
+		public Rune DoubleUpArrow = '\u21d1';
+
+		/// <summary>
+		/// Up Down Double Arrow.
+		/// </summary>
+		public Rune DoubleUpDownArrow = '\u21d5';
+
+		/// <summary>
+		/// Left Right Double Arrow.
+		/// </summary>
+		public Rune DoubleLeftRightArrow = '\u21d4';
+
+		/// <summary>
+		/// Right Dashed Arrow.
+		/// </summary>
+		public Rune DashedRightArrow = '\u21e2';
+
+		/// <summary>
+		/// Left Dashed Arrow.
+		/// </summary>
+		public Rune DashedLeftArrow = '\u21e0';
+
+		/// <summary>
+		/// Down Dashed Arrow.
+		/// </summary>
+		public Rune DashedDownArrow = '\u21e3';
+
+		/// <summary>
+		/// Up Dashed Arrow.
+		/// </summary>
+		public Rune DashedUpArrow = '\u21e1';
 
 		/// <summary>
 		/// Left indicator for default action (e.g. for <see cref="Button"/>).
