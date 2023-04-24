@@ -33,7 +33,7 @@ namespace Terminal.Gui {
 		public ContextMenu () : this (0, 0, new MenuBarItem ()) { }
 
 		/// <summary>
-		/// Initializes a context menu, with a <see cref="View"/> specifiying the parent/hose of the menu.
+		/// Initializes a context menu, with a <see cref="View"/> specifying the parent/host of the menu.
 		/// </summary>
 		/// <param name="host">The host view.</param>
 		/// <param name="menuItems">The menu items for the context menu.</param>
@@ -91,7 +91,7 @@ namespace Terminal.Gui {
 			if (menuBar != null) {
 				Hide ();
 			}
-			container = Application.Top;
+			container = Application.Current;
 			container.Closing += Container_Closing;
 			container.TerminalResized += Container_Resized;
 			var frame = View.DriverFrame;

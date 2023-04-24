@@ -523,14 +523,25 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets the superview location offset relative to the <see cref="DriverFrame"/>.
 		/// </summary>
-		/// <param name="superView"></param>
-		/// <returns>The location offset and the respective superview.</returns>
-		public Point GetDriverLocationOffset (View superView)
+		/// <returns>The location offset.</returns>
+		public Point GetDriverLocationOffset ()
 		{
-			var superViewFrame = superView == null || (superView == Application.Top && SuperView != superView) ? DriverFrame : superView.Frame;
-			var sv = superView == null ? Application.Top : superView;
+			var superViewFrame = SuperView == null ? DriverFrame : SuperView.Frame;
+			var sv = SuperView == null ? Application.Current : SuperView;
 			return new Point (superViewFrame.X - sv.Frame.X - (superViewFrame.X != sv.Frame.X ? 1 : 0),
 				superViewFrame.Y - sv.Frame.Y - (superViewFrame.Y != sv.Frame.Y ? 1 : 0));
+		}
+
+		/// <summary>
+		/// Gets the <see cref="Application.Current"/> location offset relative to the <see cref="DriverFrame"/>.
+		/// </summary>
+		/// <returns>The location offset.</returns>
+		public Point GetDriverLocationOffsetFromCurrent ()
+		{
+			var topFrame = DriverFrame;
+			var currentFrame = Application.Current.Frame;
+			return new Point (topFrame.X - currentFrame.X - (topFrame.X != currentFrame.X ? 1 : 0),
+				topFrame.Y - currentFrame.Y - (topFrame.Y != currentFrame.Y ? 1 : 0));
 		}
 	}
 }

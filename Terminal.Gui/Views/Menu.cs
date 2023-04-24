@@ -482,6 +482,7 @@ namespace Terminal.Gui {
 
 			if (Application.Current != null) {
 				Application.Current.DrawContentComplete += Current_DrawContentComplete;
+				Application.Current.TerminalResized += Current_TerminalResized;
 			}
 			Application.RootMouseEvent += Application_RootMouseEvent;
 
@@ -510,13 +511,21 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.Enter, Command.Accept);
 		}
 
+		private void Current_TerminalResized (object sender, SizeChangedEventArgs e)
+		{
+			if (host.IsMenuOpen) {
+				host.CloseMenu (false);
+				host.OpenMenu ();
+			}
+		}
+
 		private void Application_RootMouseEvent (MouseEvent me)
 		{
 			if (me.View is MenuBar) {
 				return;
 			}
-			var locationOffset = GetDriverLocationOffset (null);
-			if (SuperView != null) {
+			var locationOffset = GetDriverLocationOffsetFromCurrent ();
+			if (SuperView != null && SuperView != Application.Current) {
 				locationOffset.X += SuperView.Border.Thickness.Left;
 				locationOffset.Y += SuperView.Border.Thickness.Top;
 			}
@@ -870,8 +879,8 @@ namespace Terminal.Gui {
 			}
 			host.handled = false;
 			bool disabled;
-			Point locationOffset = default;
-			if (SuperView != null) {
+			Point locationOffset = GetDriverLocationOffset ();
+			if (SuperView != null && SuperView != Application.Current) {
 				locationOffset.X += SuperView.Border.Thickness.Left;
 				locationOffset.Y += SuperView.Border.Thickness.Top;
 			}
@@ -967,6 +976,7 @@ namespace Terminal.Gui {
 		{
 			if (Application.Current != null) {
 				Application.Current.DrawContentComplete -= Current_DrawContentComplete;
+				Application.Current.TerminalResized -= Current_TerminalResized;
 			}
 			Application.RootMouseEvent -= Application_RootMouseEvent;
 			base.Dispose (disposing);
@@ -1398,7 +1408,7 @@ namespace Terminal.Gui {
 				if (openSubMenu != null && !CloseMenu (false, true))
 					return;
 				if (openMenu != null) {
-					Application.Top.Remove (openMenu);
+					Application.Current.Remove (openMenu);
 					openMenu.Dispose ();
 					openMenu = null;
 				}
@@ -1408,17 +1418,17 @@ namespace Terminal.Gui {
 				for (int i = 0; i < index; i++)
 					pos += Menus [i].TitleLength + (Menus [i].Help.ConsoleWidth > 0 ? Menus [i].Help.ConsoleWidth + 2 : 0) + leftPadding + rightPadding;
 
-				var superView = SuperView == null ? Application.Top : SuperView;
-				var locationOffset = GetDriverLocationOffset (superView);
-				if (superView != Application.Top) {
-					locationOffset.X += superView.Border.Thickness.Left;
-					locationOffset.Y += superView.Border.Thickness.Top;
+				var locationOffset = GetDriverLocationOffset ();
+				// if SuperView is null then it's from a ContextMenu
+				if (SuperView != null && SuperView != Application.Current) {
+					locationOffset.X += SuperView.Border.Thickness.Left;
+					locationOffset.Y += SuperView.Border.Thickness.Top;
 				}
 				openMenu = new Menu (this, Frame.X + pos + locationOffset.X, Frame.Y + 1 + locationOffset.Y, Menus [index], null, MenusBorderStyle);
 				openCurrentMenu = openMenu;
 				openCurrentMenu.previousSubFocused = openMenu;
 
-				Application.Top.Add (openMenu);
+				Application.Current.Add (openMenu);
 				openMenu.SetFocus ();
 				break;
 			default:
@@ -1448,7 +1458,7 @@ namespace Terminal.Gui {
 					}
 					openCurrentMenu.previousSubFocused = last.previousSubFocused;
 					openSubMenu.Add (openCurrentMenu);
-					Application.Top.Add (openCurrentMenu);
+					Application.Current.Add (openCurrentMenu);
 				}
 				selectedSub = openSubMenu.Count - 1;
 				if (selectedSub > -1 && SelectEnabledItem (openCurrentMenu.barItems.Children, openCurrentMenu.current, out openCurrentMenu.current)) {
@@ -1579,7 +1589,7 @@ namespace Terminal.Gui {
 			switch (isSubMenu) {
 			case false:
 				if (openMenu != null) {
-					Application.Top.Remove (openMenu);
+					Application.Current.Remove (openMenu);
 				}
 				SetNeedsDisplay ();
 				if (previousFocused != null && previousFocused is Menu && openMenu != null && previousFocused.ToString () != openCurrentMenu.ToString ())
@@ -1638,7 +1648,7 @@ namespace Terminal.Gui {
 				openCurrentMenu.SetFocus ();
 				if (openSubMenu != null) {
 					menu = openSubMenu [i];
-					Application.Top.Remove (menu);
+					Application.Current.Remove (menu);
 					openSubMenu.Remove (menu);
 					menu.Dispose ();
 				}
@@ -1654,7 +1664,7 @@ namespace Terminal.Gui {
 		{
 			if (openSubMenu != null) {
 				foreach (var item in openSubMenu) {
-					Application.Top.Remove (item);
+					Application.Current.Remove (item);
 					item.Dispose ();
 				}
 			}

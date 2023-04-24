@@ -1079,18 +1079,17 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Null (view3);
 		}
 
-
 		[Fact, AutoInitShutdown]
 		public void ScreenToView_ViewToScreen_FindDeepestView_Full_Top ()
 		{
-			var top = Application.Top;
+			var top = Application.Current;
 			top.BorderStyle = LineStyle.Single;
 			var view = new View () { X = 3, Y = 2, Width = 10, Height = 1, Text = "0123456789" };
 			top.Add (view);
 
 			Application.Begin (top);
 
-			Assert.Equal (Application.Top, top);
+			Assert.Equal (Application.Current, top);
 			Assert.Equal (new Rect (0, 0, 80, 25), View.DriverFrame);
 			Assert.Equal (View.DriverFrame, top.Frame);
 			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
@@ -1205,7 +1204,7 @@ namespace Terminal.Gui.ViewTests {
 
 			Application.Begin (top);
 
-			Assert.Equal (Application.Top, top);
+			Assert.Equal (Application.Current, top);
 			Assert.Equal (new Rect (0, 0, 80, 25), View.DriverFrame);
 			Assert.NotEqual (View.DriverFrame, top.Frame);
 			Assert.Equal (new Rect (3, 2, 20, 10), top.Frame);
