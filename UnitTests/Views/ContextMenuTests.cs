@@ -380,6 +380,8 @@ namespace Terminal.Gui.ViewsTests {
 		[Fact, AutoInitShutdown]
 		public void Show_Display_At_Zero_If_The_Toplevel_Width_Is_Less_Than_The_Menu_Width ()
 		{
+			((FakeDriver)Application.Driver).SetBufferSize (5, 25);
+
 			var cm = new ContextMenu (0, 0,
 				new MenuBarItem (new MenuItem [] {
 					new MenuItem ("One", "", null),
@@ -392,14 +394,12 @@ namespace Terminal.Gui.ViewsTests {
 			cm.Show ();
 			Assert.Equal (new Point (0, 0), cm.Position);
 			Application.Begin (Application.Top);
-			((FakeDriver)Application.Driver).SetBufferSize (5, 25);
 
 			var expected = @"
 ┌────
 │ One
 │ Two
-└────
-";
+└────";
 
 			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 1, 5, 4), pos);
@@ -411,6 +411,8 @@ namespace Terminal.Gui.ViewsTests {
 		[Fact, AutoInitShutdown]
 		public void Show_Display_At_Zero_If_The_Toplevel_Height_Is_Less_Than_The_Menu_Height ()
 		{
+			((FakeDriver)Application.Driver).SetBufferSize (80, 3);
+
 			var cm = new ContextMenu (0, 0,
 				new MenuBarItem (new MenuItem [] {
 					new MenuItem ("One", "", null),
@@ -423,13 +425,11 @@ namespace Terminal.Gui.ViewsTests {
 			cm.Show ();
 			Assert.Equal (new Point (0, 0), cm.Position);
 			Application.Begin (Application.Top);
-			((FakeDriver)Application.Driver).SetBufferSize (80, 3);
 
 			var expected = @"
 ┌──────┐
 │ One  │
-│ Two  │
-";
+│ Two  │";
 
 			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 8, 3), pos);
