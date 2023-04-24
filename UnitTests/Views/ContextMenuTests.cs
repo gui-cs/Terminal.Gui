@@ -904,7 +904,7 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void Draw_A_ContextManu_Over_A_Dialog ()
+		public void Draw_A_ContextMenu_Over_A_Dialog ()
 		{
 			var top = Application.Top;
 			var win = new Window ();
@@ -984,7 +984,7 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void Draw_A_ContextManu_Over_A_Top_Dialog ()
+		public void Draw_A_ContextMenu_Over_A_Top_Dialog ()
 		{
 			((FakeDriver)Application.Driver).SetBufferSize (20, 15);
 
