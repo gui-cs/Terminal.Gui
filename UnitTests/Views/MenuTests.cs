@@ -2306,5 +2306,272 @@ wo
 
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void Draw_A_Menu_Over_A_Dialog ()
+		{
+			var top = Application.Top;
+			var win = new Window ();
+			top.Add (win);
+			Application.Begin (top);
+			((FakeDriver)Application.Driver).SetBufferSize (40, 15);
+
+			Assert.Equal (new Rect (0, 0, 40, 15), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+
+			var items = new List<string> { "New", "Open", "Close", "Save", "Save As", "Delete" };
+			var dialog = new Dialog () { X = 2, Y = 2, Width = 15, Height = 4 };
+			var menu = new MenuBar () { X = Pos.Center (), Width = 10 };
+			menu.Menus = new MenuBarItem [] {
+				new MenuBarItem("File", new MenuItem [] {
+					new MenuItem(items[0], "Create a new file", () => ChangeMenuTitle("New"),null,null, Key.CtrlMask | Key.N),
+					new MenuItem(items[1], "Open a file", () => ChangeMenuTitle("Open"),null,null, Key.CtrlMask | Key.O),
+					new MenuItem(items[2], "Close a file", () => ChangeMenuTitle("Close"),null,null, Key.CtrlMask | Key.C),
+					new MenuItem(items[3], "Save a file", () => ChangeMenuTitle("Save"),null,null, Key.CtrlMask | Key.S),
+					new MenuItem(items[4], "Save a file as", () => ChangeMenuTitle("Save As"),null,null, Key.CtrlMask | Key.A),
+					new MenuItem(items[5], "Delete a file", () => ChangeMenuTitle("Delete"),null,null, Key.CtrlMask | Key.A),
+				})
+			};
+			dialog.Add (menu);
+
+			void ChangeMenuTitle (string title)
+			{
+				menu.Menus [0].Title = title;
+				menu.SetNeedsDisplay ();
+			}
+
+			var rs = Application.Begin (dialog);
+
+			Assert.Equal (new Rect (2, 2, 15, 4), dialog.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│                                      │
+│ ┌─────────────┐                      │
+│ │  File       │                      │
+│ │             │                      │
+│ └─────────────┘                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+
+			Assert.Equal ("File", menu.Menus [0].Title);
+			menu.OpenMenu ();
+			var firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│                                      │
+│ ┌─────────────┐                      │
+│ │  File       │                      │
+│ │ ┌──────────────────────────────────┐
+│ └─│ New    Create a new file  Ctrl+N │
+│   │ Open         Open a file  Ctrl+O │
+│   │ Close       Close a file  Ctrl+C │
+│   │ Save         Save a file  Ctrl+S │
+│   │ Save As   Save a file as  Ctrl+A │
+│   │ Delete     Delete a file  Ctrl+A │
+│   └──────────────────────────────────┘
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessMouseEvent",
+				new MouseEvent () {
+					X = 20,
+					Y = 5,
+					Flags = MouseFlags.Button1Clicked
+				});
+
+			firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Assert.Equal (items [0], menu.Menus [0].Title);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────────────────────────┐
+│                                      │
+│ ┌─────────────┐                      │
+│ │  New        │                      │
+│ │             │                      │
+│ └─────────────┘                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘", output);
+
+			for (int i = 1; i < items.Count; i++) {
+				menu.OpenMenu ();
+
+				ReflectionTools.InvokePrivate (
+					typeof (Application),
+					"ProcessMouseEvent",
+					new MouseEvent () {
+						X = 20,
+						Y = 5 + i,
+						Flags = MouseFlags.Button1Clicked
+					});
+
+				firstIteration = false;
+				Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+				Assert.Equal (items [i], menu.Menus [0].Title);
+			}
+
+			((FakeDriver)Application.Driver).SetBufferSize (20, 15);
+			menu.OpenMenu ();
+			firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────┐
+│                  │
+│ ┌─────────────┐  │
+│ │  Delete     │  │
+│ │ ┌───────────────
+│ └─│ New    Create 
+│   │ Open         O
+│   │ Close       Cl
+│   │ Save         S
+│   │ Save As   Save
+│   │ Delete     Del
+│   └───────────────
+│                  │
+│                  │
+└──────────────────┘", output);
+
+			Application.End (rs);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Draw_A_Menu_Over_A_Top_Dialog ()
+		{
+			((FakeDriver)Application.Driver).SetBufferSize (40, 15);
+
+			Assert.Equal (new Rect (0, 0, 40, 15), Application.Driver.Clip);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"", output);
+
+			var items = new List<string> { "New", "Open", "Close", "Save", "Save As", "Delete" };
+			var dialog = new Dialog () { X = 2, Y = 2, Width = 15, Height = 4 };
+			var menu = new MenuBar () { X = Pos.Center (), Width = 10 };
+			menu.Menus = new MenuBarItem [] {
+				new MenuBarItem("File", new MenuItem [] {
+					new MenuItem(items[0], "Create a new file", () => ChangeMenuTitle("New"),null,null, Key.CtrlMask | Key.N),
+					new MenuItem(items[1], "Open a file", () => ChangeMenuTitle("Open"),null,null, Key.CtrlMask | Key.O),
+					new MenuItem(items[2], "Close a file", () => ChangeMenuTitle("Close"),null,null, Key.CtrlMask | Key.C),
+					new MenuItem(items[3], "Save a file", () => ChangeMenuTitle("Save"),null,null, Key.CtrlMask | Key.S),
+					new MenuItem(items[4], "Save a file as", () => ChangeMenuTitle("Save As"),null,null, Key.CtrlMask | Key.A),
+					new MenuItem(items[5], "Delete a file", () => ChangeMenuTitle("Delete"),null,null, Key.CtrlMask | Key.A),
+				})
+			};
+			dialog.Add (menu);
+
+			void ChangeMenuTitle (string title)
+			{
+				menu.Menus [0].Title = title;
+				menu.SetNeedsDisplay ();
+			}
+
+			var rs = Application.Begin (dialog);
+
+			Assert.Equal (new Rect (2, 2, 15, 4), dialog.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+  ┌─────────────┐
+  │  File       │
+  │             │
+  └─────────────┘", output);
+
+			Assert.Equal ("File", menu.Menus [0].Title);
+			menu.OpenMenu ();
+			var firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+  ┌─────────────┐                       
+  │  File       │                       
+  │ ┌──────────────────────────────────┐
+  └─│ New    Create a new file  Ctrl+N │
+    │ Open         Open a file  Ctrl+O │
+    │ Close       Close a file  Ctrl+C │
+    │ Save         Save a file  Ctrl+S │
+    │ Save As   Save a file as  Ctrl+A │
+    │ Delete     Delete a file  Ctrl+A │
+    └──────────────────────────────────┘", output);
+
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessMouseEvent",
+				new MouseEvent () {
+					X = 20,
+					Y = 5,
+					Flags = MouseFlags.Button1Clicked
+				});
+
+			firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Assert.Equal (items [0], menu.Menus [0].Title);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+  ┌─────────────┐
+  │  New        │
+  │             │
+  └─────────────┘", output);
+
+			for (int i = 1; i < items.Count; i++) {
+				menu.OpenMenu ();
+
+				ReflectionTools.InvokePrivate (
+					typeof (Application),
+					"ProcessMouseEvent",
+					new MouseEvent () {
+						X = 20,
+						Y = 5 + i,
+						Flags = MouseFlags.Button1Clicked
+					});
+
+				firstIteration = false;
+				Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+				Assert.Equal (items [i], menu.Menus [0].Title);
+			}
+
+						((FakeDriver)Application.Driver).SetBufferSize (20, 15);
+			menu.OpenMenu ();
+			firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+  ┌─────────────┐   
+  │  Delete     │   
+  │ ┌───────────────
+  └─│ New    Create 
+    │ Open         O
+    │ Close       Cl
+    │ Save         S
+    │ Save As   Save
+    │ Delete     Del
+    └───────────────", output);
+
+			Application.End (rs);
+		}
 	}
 }

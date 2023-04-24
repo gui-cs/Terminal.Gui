@@ -584,8 +584,12 @@ namespace Terminal.Gui {
 
 				Driver.SetAttribute (DetermineColorSchemeFor (item, i));
 				for (int p = Bounds.X; p < Frame.Width - 2; p++) { // This - 2 is for the border
-					if (p < 0)
+					if (p < 0) {
 						continue;
+					}
+					if (ViewToScreen (Bounds).X + p >= Driver.Cols) {
+						break;
+					}
 					if (item == null)
 						Driver.AddRune (Driver.HLine);
 					else if (i == 0 && p == 0 && host.UseSubMenusSingleFrame && item.Parent.Parent != null)
@@ -626,9 +630,9 @@ namespace Terminal.Gui {
 					textToDraw = item.Title;
 				}
 
-				ViewToScreen (0, i, out int vtsCol, out _, false);
+				ViewToScreen (0, i, out int vtsCol, out int vtsRow, false);
 				if (vtsCol < Driver.Cols) {
-					Move (1, i);
+					Driver.Move (vtsCol + 1, vtsRow);
 					if (!item.IsEnabled ()) {
 						DrawHotString (textToDraw, ColorScheme.Disabled, ColorScheme.Disabled);
 					} else if (i == 0 && host.UseSubMenusSingleFrame && item.Parent.Parent != null) {
@@ -651,15 +655,14 @@ namespace Terminal.Gui {
 					// The help string
 					var l = item.ShortcutTag.ConsoleWidth == 0 ? item.Help.ConsoleWidth : item.Help.ConsoleWidth + item.ShortcutTag.ConsoleWidth + 2;
 					var col = Frame.Width - l - 3;
-					ViewToScreen (col, i, out vtsCol, out _, false);
+					ViewToScreen (col, i, out vtsCol, out vtsRow, false);
 					if (vtsCol < Driver.Cols) {
-						Move (col, i);
+						Driver.Move (vtsCol, vtsRow);
 						Driver.AddStr (item.Help);
 
 						// The shortcut tag string
 						if (!item.ShortcutTag.IsEmpty) {
-							l = item.ShortcutTag.ConsoleWidth;
-							Move (Frame.Width - l - 3, i);
+							Driver.Move (vtsCol + l - item.ShortcutTag.ConsoleWidth, vtsRow);
 							Driver.AddStr (item.ShortcutTag);
 						}
 					}
