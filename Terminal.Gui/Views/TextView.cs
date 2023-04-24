@@ -1596,6 +1596,11 @@ namespace Terminal.Gui {
 			// If this call happens, HistoryText_ChangeText will get called multiple times
 			// when Text is set, which is wrong.
 			//historyText.Clear (Text);
+
+			if (!multiline && !IsInitialized) {
+				currentColumn = Text.RuneCount;
+				leftColumn = currentColumn > Frame.Width + 1 ? currentColumn - Frame.Width + 1 : 0;
+			}
 		}
 
 		private void HistoryText_ChangeText (object sender, HistoryText.HistoryTextItem obj)
@@ -1970,6 +1975,9 @@ namespace Terminal.Gui {
 					}
 					Height = 1;
 					LayoutStyle = lyout;
+					if (!IsInitialized) {
+						model.LoadString (Text);
+					}
 					SetNeedsDisplay ();
 				} else if (multiline && savedHeight != null) {
 					var lyout = LayoutStyle;
@@ -2094,10 +2102,11 @@ namespace Terminal.Gui {
 			}
 
 			if (selecting) {
-				var minRow = Math.Min (Math.Max (Math.Min (selectionStartRow, currentRow) - topRow, 0), Frame.Height);
-				var maxRow = Math.Min (Math.Max (Math.Max (selectionStartRow, currentRow) - topRow, 0), Frame.Height);
-
-				SetNeedsDisplay (new Rect (0, minRow, Frame.Width, maxRow));
+				// BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
+				//var minRow = Math.Min (Math.Max (Math.Min (selectionStartRow, currentRow) - topRow, 0), Frame.Height);
+				//var maxRow = Math.Min (Math.Max (Math.Max (selectionStartRow, currentRow) - topRow, 0), Frame.Height);
+				//SetNeedsDisplay (new Rect (0, minRow, Frame.Width, maxRow));
+				SetNeedsDisplay ();
 			}
 			var line = model.GetLine (currentRow);
 			var col = 0;
@@ -2340,7 +2349,9 @@ namespace Terminal.Gui {
 				if (wordWrap) {
 					SetNeedsDisplay ();
 				} else {
-					SetNeedsDisplay (new Rect (0, startRow - topRow, Frame.Width, startRow - topRow + 1));
+					// BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
+					//SetNeedsDisplay (new Rect (0, startRow - topRow, Frame.Width, startRow - topRow + 1));
+					SetNeedsDisplay ();
 				}
 
 				historyText.Add (new List<List<Rune>> (removedLines), CursorPosition, HistoryText.LineStatus.Removed);
@@ -2746,9 +2757,10 @@ namespace Terminal.Gui {
 			}
 			var prow = currentRow - topRow;
 			if (!wrapNeeded) {
-				SetNeedsDisplay (new Rect (0, prow, Math.Max (Frame.Width, 0), Math.Max (prow + 1, 0)));
+				// BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
+				//SetNeedsDisplay (new Rect (0, prow, Math.Max (Frame.Width, 0), Math.Max (prow + 1, 0)));
+				SetNeedsDisplay ();
 			}
-
 		}
 
 		ustring StringFromRunes (List<Rune> runes)
@@ -2807,7 +2819,9 @@ namespace Terminal.Gui {
 				if (wordWrap) {
 					SetNeedsDisplay ();
 				} else {
-					SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Math.Max (currentRow - topRow + 1, 0)));
+					// BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
+					//SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Math.Max (currentRow - topRow + 1, 0)));
+					SetNeedsDisplay ();
 				}
 
 				UpdateWrapModel ();
@@ -3411,10 +3425,13 @@ namespace Terminal.Gui {
 				leftColumn = 0;
 			}
 
-			if (fullNeedsDisplay)
+			if (fullNeedsDisplay) {
 				SetNeedsDisplay ();
-			else
-				SetNeedsDisplay (new Rect (0, currentRow - topRow, 2, Frame.Height));
+			} else {
+				// BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
+				//SetNeedsDisplay (new Rect (0, currentRow - topRow, 2, Frame.Height));
+				SetNeedsDisplay ();
+			}
 
 			UpdateWrapModel ();
 
@@ -3470,7 +3487,9 @@ namespace Terminal.Gui {
 			if (wrapNeeded) {
 				SetNeedsDisplay ();
 			} else {
-				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
+				// BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
+				//SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
+				SetNeedsDisplay ();
 			}
 			DoNeededAction ();
 		}
@@ -3517,7 +3536,9 @@ namespace Terminal.Gui {
 			if (wrapNeeded) {
 				SetNeedsDisplay ();
 			} else {
-				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
+				// BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
+				//SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
+				SetNeedsDisplay ();
 			}
 			DoNeededAction ();
 		}
@@ -3613,10 +3634,14 @@ namespace Terminal.Gui {
 
 			UpdateWrapModel ();
 
-			if (wrapNeeded)
+			if (wrapNeeded) {
 				SetNeedsDisplay ();
-			else
-				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
+			} else {
+				// BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
+				//SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
+				SetNeedsDisplay ();
+			}
+
 			lastWasKill = setLastWasKill;
 			DoNeededAction ();
 		}
@@ -3684,10 +3709,14 @@ namespace Terminal.Gui {
 
 			UpdateWrapModel ();
 
-			if (wrapNeeded)
+			if (wrapNeeded) {
 				SetNeedsDisplay ();
-			else
-				SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
+			} else {
+				// BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
+				//SetNeedsDisplay (new Rect (0, currentRow - topRow, Frame.Width, Frame.Height));
+				SetNeedsDisplay ();
+			}
+
 			lastWasKill = setLastWasKill;
 			DoNeededAction ();
 		}
@@ -3702,6 +3731,9 @@ namespace Terminal.Gui {
 
 		void MoveStartOfLine ()
 		{
+			if (leftColumn > 0) {
+				SetNeedsDisplay ();
+			}
 			currentColumn = 0;
 			leftColumn = 0;
 			Adjust ();
@@ -4002,8 +4034,10 @@ namespace Terminal.Gui {
 				if (wrapNeeded) {
 					SetNeedsDisplay ();
 				} else {
-					var sr = currentRow - topRow;
-					SetNeedsDisplay (new Rect (0, sr, Frame.Width, sr + 1));
+					// BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
+					//var sr = currentRow - topRow;
+					//SetNeedsDisplay (new Rect (0, sr, Frame.Width, sr + 1));
+					SetNeedsDisplay ();
 				}
 			} else {
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
@@ -4020,8 +4054,10 @@ namespace Terminal.Gui {
 				if (wrapNeeded) {
 					SetNeedsDisplay ();
 				} else {
-					var r = currentRow - topRow;
-					SetNeedsDisplay (new Rect (currentColumn - leftColumn, r, Frame.Width, r + 1));
+					// BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
+					//var r = currentRow - topRow;
+					//SetNeedsDisplay (new Rect (currentColumn - leftColumn, r, Frame.Width, r + 1));
+					SetNeedsDisplay ();
 				}
 			}
 
@@ -4052,8 +4088,11 @@ namespace Terminal.Gui {
 				if (currentColumn < leftColumn) {
 					leftColumn--;
 					SetNeedsDisplay ();
-				} else
-					SetNeedsDisplay (new Rect (0, currentRow - topRow, 1, Frame.Width));
+				} else {
+					// BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
+					//SetNeedsDisplay (new Rect (0, currentRow - topRow, 1, Frame.Width));
+					SetNeedsDisplay ();
+				}
 			} else {
 				// Merges the current line with the previous one.
 				if (currentRow == 0)
