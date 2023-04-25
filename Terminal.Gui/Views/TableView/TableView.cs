@@ -116,6 +116,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// The minimum number of characters to render in any given column.
+		/// </summary>
+		public int MinCellWidth { get; set; }
+
+		/// <summary>
 		/// The maximum number of characters to render in any given column.  This prevents one long column from pushing out all the others
 		/// </summary>
 		public int MaxCellWidth { get; set; } = DefaultMaxCellWidth;
@@ -322,7 +327,7 @@ namespace Terminal.Gui {
 		/// Returns the amount of vertical space required to display the header
 		/// </summary>
 		/// <returns></returns>
-		private int GetHeaderHeight ()
+		protected int GetHeaderHeight ()
 		{
 			int heightRequired = Style.ShowHeaders ? 1 : 0;
 
@@ -1575,6 +1580,14 @@ namespace Terminal.Gui {
 
 				// is there enough space for this column (and it's data)?
 				colWidth = CalculateMaxCellWidth (col, rowsToRender, colStyle) + padding;
+
+				if (MinCellWidth > 0 && colWidth < MinCellWidth) {
+					if (MinCellWidth > MaxCellWidth) {
+						colWidth = MaxCellWidth;
+					} else {
+						colWidth = MinCellWidth;
+					}
+				}
 
 				// there is not enough space for this columns 
 				// visible content
