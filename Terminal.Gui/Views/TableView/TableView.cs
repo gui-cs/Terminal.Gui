@@ -7,19 +7,84 @@ using System.Linq;
 
 namespace Terminal.Gui {
 
+	public interface ITableDataSource
+	{
+		int Rows { get; }
+		int Columns { get; }
+		string[] ColumnNames { get; }
+		object this[int row, int col]
+		{
+			get;
+		}
+	}
+
+	public class DataTableSource : ITableDataSource
+	{
+		readonly DataTable table;
+
+		public DataTableSource(DataTable table)
+		{
+			this.table = table;
+		}
+
+		public object this [int row, int col] => table.Rows[row][col];
+
+		public int Rows => table.Rows.Count;
+
+		public int Columns => table.Columns.Count;
+
+		public string [] ColumnNames => table.Columns.Cast<DataColumn>().Select (c => c.ColumnName).ToArray ();
+	}
 
 	/// <summary>
-	/// View for tabular data based on a <see cref="DataTable"/>.
+	/// View for tabular data based on a <see cref="ITableDataSource"/>.
 	/// 
 	/// <a href="https://gui-cs.github.io/Terminal.Gui/articles/tableview.html">See TableView Deep Dive for more information</a>.
 	/// </summary>
-	public partial class TableView : View {
+	public class TableView : View {
+
+		/// <summary>
+		///  Defines the event arguments for <see cref="TableView.CellActivated"/> event
+		/// </summary>
+		public class CellActivatedEventArgs : EventArgs {
+			/// <summary>
+			/// The current table to which the new indexes refer.  May be null e.g. if selection change is the result of clearing the table from the view
+			/// </summary>
+			/// <value></value>
+			public ITableDataSource Table { get; }
+
+
+			/// <summary>
+			/// The column index of the <see cref="Table"/> cell that is being activated
+			/// </summary>
+			/// <value></value>
+			public int Col { get; }
+
+			/// <summary>
+			/// The row index of the <see cref="Table"/> cell that is being activated
+			/// </summary>
+			/// <value></value>
+			public int Row { get; }
+
+			/// <summary>
+			/// Creates a new instance of arguments describing a cell being activated in <see cref="TableView"/>
+			/// </summary>
+			/// <param name="t"></param>
+			/// <param name="col"></param>
+			/// <param name="row"></param>
+			public CellActivatedEventArgs (ITableDataSource t, int col, int row)
+			{
+				Table = t;
+				Col = col;
+				Row = row;
+			}
+		}
 
 		private int columnOffset;
 		private int rowOffset;
 		private int selectedRow;
 		private int selectedColumn;
-		private DataTable table;
+		private ITableDataSource table;
 		private TableStyle style = new TableStyle ();
 		private Key cellActivationKey = Key.Enter;
 
@@ -39,7 +104,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The data table to render in the view.  Setting this property automatically updates and redraws the control.
 		/// </summary>
-		public DataTable Table { get => table; set { table = value; Update (); } }
+		public ITableDataSource Table { get => table; set { table = value; Update (); } }
 
 		/// <summary>
 		/// Contains options for changing how the table is rendered
@@ -71,7 +136,7 @@ namespace Terminal.Gui {
 			get => columnOffset;
 
 			//try to prevent this being set to an out of bounds column
-			set => columnOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Columns.Count - 1, value));
+			set => columnOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Columns - 1, value));
 		}
 
 		/// <summary>
@@ -79,7 +144,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public int RowOffset {
 			get => rowOffset;
-			set => rowOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Rows.Count - 1, value));
+			set => rowOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Rows - 1, value));
 		}
 
 		/// <summary>
@@ -92,7 +157,7 @@ namespace Terminal.Gui {
 				var oldValue = selectedColumn;
 
 				//try to prevent this being set to an out of bounds column
-				selectedColumn = TableIsNullOrInvisible () ? 0 : Math.Min (Table.Columns.Count - 1, Math.Max (0, value));
+				selectedColumn = TableIsNullOrInvisible () ? 0 : Math.Min (Table.Columns - 1, Math.Max (0, value));
 
 				if (oldValue != selectedColumn)
 					OnSelectedCellChanged (new SelectedCellChangedEventArgs (Table, oldValue, SelectedColumn, SelectedRow, SelectedRow));
@@ -108,7 +173,7 @@ namespace Terminal.Gui {
 
 				var oldValue = selectedRow;
 
-				selectedRow = TableIsNullOrInvisible () ? 0 : Math.Min (Table.Rows.Count - 1, Math.Max (0, value));
+				selectedRow = TableIsNullOrInvisible () ? 0 : Math.Min (Table.Rows - 1, Math.Max (0, value));
 
 				if (oldValue != selectedRow)
 					OnSelectedCellChanged (new SelectedCellChangedEventArgs (Table, SelectedColumn, SelectedColumn, oldValue, selectedRow));
@@ -161,7 +226,7 @@ namespace Terminal.Gui {
 		/// Initialzies a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. 
 		/// </summary>
 		/// <param name="table">The table to display in the control</param>
-		public TableView (DataTable table) : this ()
+		public TableView (ITableDataSource table) : this ()
 		{
 			this.Table = table;
 		}
@@ -285,11 +350,12 @@ namespace Terminal.Gui {
 					continue;
 
 				// No more data
-				if(rowToRender >= Table.Rows.Count) {
+				if(rowToRender >= Table.Rows) {
 
-					if(rowToRender == Table.Rows.Count && Style.ShowHorizontalBottomline) {
+					if(rowToRender == Table.Rows && Style.ShowHorizontalBottomline) {
 						RenderBottomLine (line, bounds.Width, columnsToRender);
 					}
+
 					continue;
 				}
 
@@ -382,7 +448,7 @@ namespace Terminal.Gui {
 				var current = columnsToRender [i];
 
 				var colStyle = Style.GetColumnStyleIfAny (current.Column);
-				var colName = current.Column.ColumnName;
+				var colName = table.ColumnNames[current.Column];
 
 				RenderSeparator (current.X - 1, row, true);
 
@@ -420,7 +486,7 @@ namespace Terminal.Gui {
 			int lastColumnIdxRendered = ColumnOffset + columnsToRender.Length - 1;
 
 			// are there more valid indexes?
-			bool moreColumnsToRight = lastColumnIdxRendered < Table.Columns.Count;
+			bool moreColumnsToRight = lastColumnIdxRendered < Table.Columns;
 
 			// if we went right from the last column would we find a new visible column?
 			if (!TryGetNearestVisibleColumn (lastColumnIdxRendered + 1, true, false, out _)) {
@@ -555,9 +621,9 @@ namespace Terminal.Gui {
 				Move (current.X, row);
 
 				// Set color scheme based on whether the current cell is the selected one
-				bool isSelectedCell = IsSelected (current.Column.Ordinal, rowToRender);
+				bool isSelectedCell = IsSelected (current.Column, rowToRender);
 
-				var val = Table.Rows [rowToRender] [current.Column];
+				var val = Table [rowToRender, current.Column];
 
 				// Render the (possibly truncated) cell value
 				var representation = GetRepresentation (val, colStyle);
@@ -569,7 +635,7 @@ namespace Terminal.Gui {
 				if (colorSchemeGetter != null) {
 					// user has a delegate for defining row color per cell, call it
 					scheme = colorSchemeGetter (
-						new CellColorGetterArgs (Table, rowToRender, current.Column.Ordinal, val, representation, rowScheme));
+						new CellColorGetterArgs (Table, rowToRender, current.Column, val, representation, rowScheme));
 
 					// if users custom color getter returned null, use the row scheme
 					if (scheme == null) {
@@ -590,7 +656,7 @@ namespace Terminal.Gui {
 				var render = TruncateOrPad (val, representation, current.Width, colStyle);
 
 				// While many cells can be selected (see MultiSelectedRegions) only one cell is the primary (drives navigation etc)
-				bool isPrimaryCell = current.Column.Ordinal == selectedColumn && rowToRender == selectedRow;
+				bool isPrimaryCell = current.Column == selectedColumn && rowToRender == selectedRow;
 
 				RenderCell (cellColor, render, isPrimaryCell);
 
@@ -880,9 +946,9 @@ namespace Terminal.Gui {
 		/// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
 		public void ChangeSelectionToEndOfTable (bool extend)
 		{
-			var finalColumn = Table.Columns.Count - 1;
+			var finalColumn = Table.Columns - 1;
 
-			SetSelection (FullRowSelect ? SelectedColumn : finalColumn, Table.Rows.Count - 1, extend);
+			SetSelection (FullRowSelect ? SelectedColumn : finalColumn, Table.Rows - 1, extend);
 			Update ();
 		}
 
@@ -892,7 +958,7 @@ namespace Terminal.Gui {
 		/// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
 		public void ChangeSelectionToEndOfRow (bool extend)
 		{
-			SetSelection (Table.Columns.Count - 1, SelectedRow, extend);
+			SetSelection (Table.Columns - 1, SelectedRow, extend);
 			Update ();
 		}
 
@@ -911,13 +977,13 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void SelectAll ()
 		{
-			if (TableIsNullOrInvisible () || !MultiSelect || Table.Rows.Count == 0)
+			if (TableIsNullOrInvisible () || !MultiSelect || Table.Rows == 0)
 				return;
 
 			ClearMultiSelectedRegions (true);
 
 			// Create a single region over entire table, set the origin of the selection to the active cell so that a followup spread selection e.g. shift-right behaves properly
-			MultiSelectedRegions.Push (new TableSelection (new Point (SelectedColumn, SelectedRow), new Rect (0, 0, Table.Columns.Count, table.Rows.Count)));
+			MultiSelectedRegions.Push (new TableSelection (new Point (SelectedColumn, SelectedRow), new Rect (0, 0, Table.Columns, table.Rows)));
 			Update ();
 		}
 
@@ -927,7 +993,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public IEnumerable<Point> GetAllSelectedCells ()
 		{
-			if (TableIsNullOrInvisible () || Table.Rows.Count == 0)
+			if (TableIsNullOrInvisible () || Table.Rows == 0)
 			{
 				return Enumerable.Empty<Point>();				
 			}
@@ -944,7 +1010,7 @@ namespace Terminal.Gui {
 				var yMax = MultiSelectedRegions.Max (r => r.Rect.Bottom);
 
 				var xMin = FullRowSelect ? 0 : MultiSelectedRegions.Min (r => r.Rect.Left);
-				var xMax = FullRowSelect ? Table.Columns.Count : MultiSelectedRegions.Max (r => r.Rect.Right);
+				var xMax = FullRowSelect ? Table.Columns : MultiSelectedRegions.Max (r => r.Rect.Right);
 
 				for (int y = yMin; y < yMax; y++) {
 					for (int x = xMin; x < xMax; x++) {
@@ -960,7 +1026,7 @@ namespace Terminal.Gui {
 			// if we are selecting the full row
 			if (FullRowSelect) {
 				// all cells in active row are selected
-				for (int x = 0; x < Table.Columns.Count; x++) {
+				for (int x = 0; x < Table.Columns; x++) {
 					toReturn.Add(new Point (x, SelectedRow));
 				}
 			} else {
@@ -1094,11 +1160,11 @@ namespace Terminal.Gui {
 		private bool IsColumnVisible (int columnIndex)
 		{
 			// if the column index provided is out of bounds
-			if (columnIndex < 0 || columnIndex >= table.Columns.Count) {
+			if (columnIndex < 0 || columnIndex >= table.Columns) {
 				return false;
 			}
 
-			return this.Style.GetColumnStyleIfAny (Table.Columns [columnIndex])?.Visible ?? true;
+			return this.Style.GetColumnStyleIfAny (columnIndex)?.Visible ?? true;
 		}
 
 		/// <summary>
@@ -1224,7 +1290,7 @@ namespace Terminal.Gui {
 		/// <param name="clientX">X offset from the top left of the control.</param>
 		/// <param name="clientY">Y offset from the top left of the control.</param>
 		/// <param name="headerIfAny">If the click is in a header this is the column clicked.</param>
-		public Point? ScreenToCell (int clientX, int clientY, out DataColumn headerIfAny)
+		public Point? ScreenToCell (int clientX, int clientY, out int? headerIfAny)
 		{
 			headerIfAny = null;
 
@@ -1247,13 +1313,13 @@ namespace Terminal.Gui {
 
 			// if click is off bottom of the rows don't give an
 			// invalid index back to user!
-			if (rowIdx >= Table.Rows.Count) {
+			if (rowIdx >= Table.Rows) {
 				return null;
 			}
 
 			if (col != null && rowIdx >= 0) {
 
-				return new Point (col.Column.Ordinal, rowIdx);
+				return new Point (col.Column, rowIdx);
 			}
 
 			return null;
@@ -1274,7 +1340,7 @@ namespace Terminal.Gui {
 
 			var headerHeight = GetHeaderHeightIfAny ();
 
-			var colHit = viewPort.FirstOrDefault (c => c.Column.Ordinal == tableColumn);
+			var colHit = viewPort.FirstOrDefault (c => c.Column == tableColumn);
 
 			// current column is outside the scroll area
 			if (colHit == null)
@@ -1319,8 +1385,8 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			ColumnOffset = Math.Max (Math.Min (ColumnOffset, Table.Columns.Count - 1), 0);
-			RowOffset = Math.Max (Math.Min (RowOffset, Table.Rows.Count - 1), 0);
+			ColumnOffset = Math.Max (Math.Min (ColumnOffset, Table.Columns - 1), 0);
+			RowOffset = Math.Max (Math.Min (RowOffset, Table.Rows - 1), 0);
 		}
 
 		/// <summary>
@@ -1336,8 +1402,8 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			SelectedColumn = Math.Max (Math.Min (SelectedColumn, Table.Columns.Count - 1), 0);
-			SelectedRow = Math.Max (Math.Min (SelectedRow, Table.Rows.Count - 1), 0);
+			SelectedColumn = Math.Max (Math.Min (SelectedColumn, Table.Columns - 1), 0);
+			SelectedRow = Math.Max (Math.Min (SelectedRow, Table.Rows - 1), 0);
 
 			// If SelectedColumn is invisible move it to a visible one
 			SelectedColumn = GetNearestVisibleColumn (SelectedColumn, lookRight: true, true);
@@ -1349,23 +1415,23 @@ namespace Terminal.Gui {
 			// evaluate 
 			foreach (var region in oldRegions) {
 				// ignore regions entirely below current table state
-				if (region.Rect.Top >= Table.Rows.Count)
+				if (region.Rect.Top >= Table.Rows)
 					continue;
 
 				// ignore regions entirely too far right of table columns
-				if (region.Rect.Left >= Table.Columns.Count)
+				if (region.Rect.Left >= Table.Columns)
 					continue;
 
 				// ensure region's origin exists
 				region.Origin = new Point (
-					Math.Max (Math.Min (region.Origin.X, Table.Columns.Count - 1), 0),
-					Math.Max (Math.Min (region.Origin.Y, Table.Rows.Count - 1), 0));
+					Math.Max (Math.Min (region.Origin.X, Table.Columns - 1), 0),
+					Math.Max (Math.Min (region.Origin.Y, Table.Rows - 1), 0));
 
 				// ensure regions do not go over edge of table bounds
 				region.Rect = Rect.FromLTRB (region.Rect.Left,
 					region.Rect.Top,
-					Math.Max (Math.Min (region.Rect.Right, Table.Columns.Count), 0),
-					Math.Max (Math.Min (region.Rect.Bottom, Table.Rows.Count), 0)
+					Math.Max (Math.Min (region.Rect.Right, Table.Columns), 0),
+					Math.Max (Math.Min (region.Rect.Bottom, Table.Rows), 0)
 					);
 
 				MultiSelectedRegions.Push (region);
@@ -1382,8 +1448,8 @@ namespace Terminal.Gui {
 		private bool TableIsNullOrInvisible ()
 		{
 			return Table == null ||
-				Table.Columns.Count <= 0 ||
-				Table.Columns.Cast<DataColumn> ().All (
+				Table.Columns <= 0 ||
+				Enumerable.Range(0,Table.Columns).All (
 				c => (Style.GetColumnStyleIfAny (c)?.Visible ?? true) == false);
 		}
 
@@ -1412,14 +1478,15 @@ namespace Terminal.Gui {
 		private bool TryGetNearestVisibleColumn (int columnIndex, bool lookRight, bool allowBumpingInOppositeDirection, out int idx)
 		{
 			// if the column index provided is out of bounds
-			if (columnIndex < 0 || columnIndex >= table.Columns.Count) {
+			if (columnIndex < 0 || columnIndex >= table.Columns) {
 
 				idx = columnIndex;
 				return false;
 			}
 
 			// get the column visibility by index (if no style visible is true)
-			bool [] columnVisibility = Table.Columns.Cast<DataColumn> ()
+			bool [] columnVisibility = 
+				Enumerable.Range(0,Table.Columns)
 				.Select (c => this.Style.GetColumnStyleIfAny (c)?.Visible ?? true)
 				.ToArray ();
 
@@ -1470,7 +1537,7 @@ namespace Terminal.Gui {
 		/// <remarks>Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDisplay()"/></remarks>
 		public void EnsureSelectedCellIsVisible ()
 		{
-			if (Table == null || Table.Columns.Count <= 0) {
+			if (Table == null || Table.Columns <= 0) {
 				return;
 			}
 
@@ -1478,24 +1545,24 @@ namespace Terminal.Gui {
 			var headerHeight = GetHeaderHeightIfAny ();
 
 			//if we have scrolled too far to the left 
-			if (SelectedColumn < columnsToRender.Min (r => r.Column.Ordinal)) {
+			if (SelectedColumn < columnsToRender.Min (r => r.Column)) {
 				ColumnOffset = SelectedColumn;
 			}
 
 			//if we have scrolled too far to the right
-			if (SelectedColumn > columnsToRender.Max (r => r.Column.Ordinal)) {
+			if (SelectedColumn > columnsToRender.Max (r => r.Column)) {
 
 				if (Style.SmoothHorizontalScrolling) {
 
 					// Scroll right 1 column at a time until the users selected column is visible
-					while (SelectedColumn > columnsToRender.Max (r => r.Column.Ordinal)) {
+					while (SelectedColumn > columnsToRender.Max (r => r.Column)) {
 
 						ColumnOffset++;
 						columnsToRender = CalculateViewport (Bounds).ToArray ();
 
 						// if we are already scrolled to the last column then break
 						// this will prevent any theoretical infinite loop
-						if (ColumnOffset >= Table.Columns.Count - 1)
+						if (ColumnOffset >= Table.Columns - 1)
 							break;
 
 					}
@@ -1559,9 +1626,10 @@ namespace Terminal.Gui {
 				rowsToRender -= GetHeaderHeight ();
 
 			bool first = true;
-			var lastColumn = Table.Columns.Cast<DataColumn> ().Last ();
+			var lastColumn = Table.Columns - 1;
 
-			foreach (var col in Table.Columns.Cast<DataColumn> ().Skip (ColumnOffset)) {
+			// TODO : Maybe just a for loop?
+			foreach (var col in Enumerable.Range(0,Table.Columns).Skip (ColumnOffset)) {
 
 				int startingIdxForCurrentHeader = usedSpace;
 				var colStyle = Style.GetColumnStyleIfAny (col);
@@ -1639,18 +1707,21 @@ namespace Terminal.Gui {
 		/// <param name="rowsToRender"></param>
 		/// <param name="colStyle"></param>
 		/// <returns></returns>
-		private int CalculateMaxCellWidth (DataColumn col, int rowsToRender, ColumnStyle colStyle)
+		private int CalculateMaxCellWidth (int col, int rowsToRender, ColumnStyle colStyle)
 		{
-			int spaceRequired = col.ColumnName.Sum (c => Rune.ColumnWidth (c));
+			int spaceRequired = table.ColumnNames[col].Sum (c => Rune.ColumnWidth (c));
 
 			// if table has no rows
 			if (RowOffset < 0)
 				return spaceRequired;
 
-			for (int i = RowOffset; i < RowOffset + rowsToRender && i < Table.Rows.Count; i++) {
+
+			for (int i = RowOffset; i < RowOffset + rowsToRender && i < Table.Rows; i++) {
 
 				//expand required space if cell is bigger than the last biggest cell or header
-				spaceRequired = Math.Max (spaceRequired, GetRepresentation (Table.Rows [i] [col], colStyle).Sum (c => Rune.ColumnWidth (c)));
+				spaceRequired = Math.Max (
+					spaceRequired,
+					GetRepresentation (Table [i,col], colStyle).Sum (c => Rune.ColumnWidth (c)));
 			}
 
 			// Don't require more space than the style allows
@@ -1874,7 +1945,7 @@ namespace Terminal.Gui {
 			/// <summary>
 			/// Collection of columns for which you want special rendering (e.g. custom column lengths, text alignment etc)
 			/// </summary>
-			public Dictionary<DataColumn, ColumnStyle> ColumnStyles { get; set; } = new Dictionary<DataColumn, ColumnStyle> ();
+			public Dictionary<int, ColumnStyle> ColumnStyles { get; set; } = new Dictionary<int, ColumnStyle> ();
 
 			/// <summary>
 			/// Delegate for coloring specific rows in a different color.  For cell color <see cref="ColumnStyle.ColorGetter"/>
@@ -1913,7 +1984,7 @@ namespace Terminal.Gui {
 			/// </summary>
 			/// <param name="col"></param>
 			/// <returns></returns>
-			public ColumnStyle GetColumnStyleIfAny (DataColumn col)
+			public ColumnStyle GetColumnStyleIfAny (int col)
 			{
 				return ColumnStyles.TryGetValue (col, out ColumnStyle result) ? result : null;
 			}
@@ -1923,7 +1994,7 @@ namespace Terminal.Gui {
 			/// </summary>
 			/// <param name="col"></param>
 			/// <returns></returns>
-			public ColumnStyle GetOrCreateColumnStyle (DataColumn col)
+			public ColumnStyle GetOrCreateColumnStyle (int col)
 			{
 				if (!ColumnStyles.ContainsKey (col))
 					ColumnStyles.Add (col, new ColumnStyle ());
@@ -1940,7 +2011,7 @@ namespace Terminal.Gui {
 			/// <summary>
 			/// The column to render
 			/// </summary>
-			public DataColumn Column { get; set; }
+			public int Column { get; set; }
 
 			/// <summary>
 			/// The horizontal position to begin rendering the column at
@@ -1958,7 +2029,7 @@ namespace Terminal.Gui {
 			/// </summary>
 			public bool IsVeryLast { get; }
 
-			public ColumnToRender (DataColumn col, int x, int width, bool isVeryLast)
+			public ColumnToRender (int col, int x, int width, bool isVeryLast)
 			{
 				Column = col;
 				X = x;
@@ -1977,7 +2048,7 @@ namespace Terminal.Gui {
 			/// <summary>
 			/// The data table hosted by the <see cref="TableView"/> control.
 			/// </summary>
-			public DataTable Table { get; }
+			public ITableDataSource Table { get; }
 
 			/// <summary>
 			/// The index of the row in <see cref="Table"/> for which color is needed
@@ -2004,7 +2075,7 @@ namespace Terminal.Gui {
 			/// </summary>
 			public ColorScheme RowScheme { get; }
 
-			internal CellColorGetterArgs (DataTable table, int rowIdx, int colIdx, object cellValue, string representation, ColorScheme rowScheme)
+			internal CellColorGetterArgs (ITableDataSource table, int rowIdx, int colIdx, object cellValue, string representation, ColorScheme rowScheme)
 			{
 				Table = table;
 				RowIndex = rowIdx;
@@ -2017,7 +2088,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Arguments for <see cref="RowColorGetterDelegate"/>. Describes a row of data in a <see cref="DataTable"/>
+		/// Arguments for <see cref="RowColorGetterDelegate"/>. Describes a row of data in a <see cref="ITableDataSource"/>
 		/// for which <see cref="ColorScheme"/> is sought.
 		/// </summary>
 		public class RowColorGetterArgs {
@@ -2025,14 +2096,14 @@ namespace Terminal.Gui {
 			/// <summary>
 			/// The data table hosted by the <see cref="TableView"/> control.
 			/// </summary>
-			public DataTable Table { get; }
+			public ITableDataSource Table { get; }
 
 			/// <summary>
 			/// The index of the row in <see cref="Table"/> for which color is needed
 			/// </summary>
 			public int RowIndex { get; }
 
-			internal RowColorGetterArgs (DataTable table, int rowIdx)
+			internal RowColorGetterArgs (ITableDataSource table, int rowIdx)
 			{
 				Table = table;
 				RowIndex = rowIdx;
