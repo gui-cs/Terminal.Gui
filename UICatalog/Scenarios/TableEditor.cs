@@ -735,6 +735,8 @@ namespace UICatalog.Scenarios {
 		};
 		private void SetDemoTableStyles ()
 		{
+			tableView.Style.ColumnStyles.Clear();
+
 			var alignMid = new TableView.ColumnStyle () {
 				Alignment = TextAlignment.Centered
 			};
