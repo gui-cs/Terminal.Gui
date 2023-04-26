@@ -18,13 +18,11 @@ namespace UICatalog.Scenarios {
 	public class ListColumnEditor : Scenario {
 		ListColumnView listColView;
 		private MenuItem miCellLines;
-		private MenuItem miFullRowSelect;
 		private MenuItem miExpandLastColumn;
 		private MenuItem miAlwaysUseNormalColorForVerticalCellLines;
 		private MenuItem miSmoothScrolling;
 		private MenuItem miAlternatingColors;
 		private MenuItem miCursor;
-		private MenuItem miBottomline;
 		private MenuItem miPopulateVertical;
 		private MenuItem miScrollParallel;
 
@@ -51,8 +49,6 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
 				new MenuBarItem ("_View", new MenuItem [] {
-					miBottomline = new MenuItem ("_BottomLine", "", () => ToggleBottomline()){Checked = listColView.Style.ShowHorizontalBottomline, CheckType = MenuItemCheckStyle.Checked },
-					miFullRowSelect =new MenuItem ("_FullRowSelect", "", () => ToggleFullRowSelect()){Checked = listColView.FullRowSelect, CheckType = MenuItemCheckStyle.Checked },
 					miCellLines =new MenuItem ("_CellLines", "", () => ToggleCellLines()){Checked = listColView.Style.ShowVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
 					miExpandLastColumn = new MenuItem ("_ExpandLastColumn", "", () => ToggleExpandLastColumn()){Checked = listColView.Style.ExpandLastColumn, CheckType = MenuItemCheckStyle.Checked },
 					miAlwaysUseNormalColorForVerticalCellLines = new MenuItem ("_AlwaysUseNormalColorForVerticalCellLines", "", () => ToggleAlwaysUseNormalColorForVerticalCellLines()){Checked = listColView.Style.AlwaysUseNormalColorForVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
@@ -109,107 +105,36 @@ namespace UICatalog.Scenarios {
 
 				listColView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out DataColumn clickedCol);
 
-				/*
-				if (clickedCol != null) {
-					if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
-
-						// left click in a header
-						SortList (clickedCol);
-					} else if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
-
-						// right click in a header
-						ShowHeaderContextMenu (clickedCol, e);
-					}
+				if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
+					ShowContextMenu (e);
 				}
-				*/
 			};
 
 			listColView.AddKeyBinding (Key.Space, Command.ToggleChecked);
 		}
 
-		// Disable sorting for now
-		/*
-		private void SortList (DataColumn clickedCol)
+		private void SortList (bool asc)
 		{
-			var sort = GetProposedNewSortOrder (clickedCol, out var isAsc);
-
-			SortList (clickedCol, sort, isAsc);
-		}
-
-		private void SortList (DataColumn clickedCol, string sort, bool isAsc)
-		{
-			// set a sort order
-			listColView.Table.DefaultView.Sort = sort;
-
-			// copy the rows from the view
-			var sortedCopy = listColView.Table.DefaultView.ToTable ();
-			listColView.Table.Rows.Clear ();
-			foreach (DataRow r in sortedCopy.Rows) {
-				listColView.Table.ImportRow (r);
+			Array array = new object [listColView.Count];
+			listColView.ListData.CopyTo(array, 0);
+			Array.Sort (array);
+			if (!asc) {
+				Array.Reverse (array);
 			}
-
-			foreach (DataColumn col in listColView.Table.Columns) {
-
-				// remove any lingering sort indicator
-				col.ColumnName = TrimArrows (col.ColumnName);
-
-				// add a new one if this the one that is being sorted
-				if (col == clickedCol) {
-					col.ColumnName += isAsc ? '▲' : '▼';
-				}
-			}
-
-			listColView.Update ();
+			listColView.ListData = array;
 		}
 
-		private string TrimArrows (string columnName)
+		private void ShowContextMenu (MouseEventEventArgs e)
 		{
-			return columnName.TrimEnd ('▼', '▲');
-		}
-		private string StripArrows (string columnName)
-		{
-			return columnName.Replace ("▼", "").Replace ("▲", "");
-		}
-		private string GetProposedNewSortOrder (DataColumn clickedCol, out bool isAsc)
-		{
-			// work out new sort order
-			var sort = listColView.Table.DefaultView.Sort;
-
-			if (sort?.EndsWith ("ASC") ?? false) {
-				sort = $"{clickedCol.ColumnName} DESC";
-				isAsc = false;
-			} else {
-				sort = $"{clickedCol.ColumnName} ASC";
-				isAsc = true;
-			}
-
-			return sort;
-		}
-
-		private void ShowHeaderContextMenu (DataColumn clickedCol, MouseEventEventArgs e)
-		{
-			var sort = GetProposedNewSortOrder (clickedCol, out var isAsc);
-
 			var contextMenu = new ContextMenu (e.MouseEvent.X + 1, e.MouseEvent.Y + 1,
 				new MenuBarItem (new MenuItem [] {
-					new MenuItem ($"Sort {StripArrows(sort)}","",()=>SortList(clickedCol,sort,isAsc)),
+					new MenuItem ("Sort Ascending","",()=>SortList(true)),
+					new MenuItem ("Sort Descending","",()=>SortList(false)),
 				})
 			);
 
 			contextMenu.Show ();
 		}
-
-		private DataColumn GetColumn ()
-		{
-			if (listColView.Table == null)
-				return null;
-
-			if (listColView.SelectedColumn < 0 || listColView.SelectedColumn > listColView.Table.Columns.Count)
-				return null;
-
-			return listColView.Table.Columns [listColView.SelectedColumn];
-		}
-		*/
 
 		private void SetupScrollBar ()
 		{
@@ -245,35 +170,14 @@ namespace UICatalog.Scenarios {
 		{
 			if (e.KeyEvent.Key == Key.DeleteChar) {
 
-				if (listColView.FullRowSelect) {
-					// Delete button deletes all rows when in full row mode
-					foreach (int toRemove in listColView.GetAllSelectedCells ().Select (p => p.Y).Distinct ().OrderByDescending (i => i))
-						listColView.Table.Rows.RemoveAt (toRemove);
-				} else {
-
-					// otherwise set all selected cells to null
-					foreach (var pt in listColView.GetAllSelectedCells ()) {
-						listColView.Table.Rows [pt.Y] [pt.X] = DBNull.Value;
-					}
+				foreach (var pt in listColView.GetAllSelectedCells ()) {
+					listColView.Table.Rows [pt.Y] [pt.X] = DBNull.Value;
 				}
 
 				listColView.Update ();
 				e.Handled = true;
 			}
 
-		}
-
-		private void ToggleBottomline()
-		{
-			miBottomline.Checked = !miBottomline.Checked;
-			listColView.Style.ShowHorizontalBottomline = (bool)miBottomline.Checked;
-			listColView.Update ();
-		}
-		private void ToggleFullRowSelect ()
-		{
-			miFullRowSelect.Checked = !miFullRowSelect.Checked;
-			listColView.FullRowSelect = (bool)miFullRowSelect.Checked;
-			listColView.Update ();
 		}
 
 		private void ToggleExpandLastColumn ()
@@ -402,6 +306,7 @@ namespace UICatalog.Scenarios {
 			listColView.Style.ShowHorizontalHeaderOverline = false;
 			listColView.Style.ShowHorizontalHeaderUnderline = false;
 			listColView.Style.ShowHorizontalBottomline = false;
+			listColView.FullRowSelect = false;
 		}
 
 		private void EditCurrentCell (object sender, CellActivatedEventArgs e)
