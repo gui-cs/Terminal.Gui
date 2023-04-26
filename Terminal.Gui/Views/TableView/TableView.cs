@@ -20,7 +20,7 @@ namespace Terminal.Gui {
 
 	public class DataTableSource : ITableDataSource
 	{
-		readonly DataTable table;
+		public readonly DataTable table;
 
 		public DataTableSource(DataTable table)
 		{
@@ -42,43 +42,6 @@ namespace Terminal.Gui {
 	/// <a href="https://gui-cs.github.io/Terminal.Gui/articles/tableview.html">See TableView Deep Dive for more information</a>.
 	/// </summary>
 	public class TableView : View {
-
-		/// <summary>
-		///  Defines the event arguments for <see cref="TableView.CellActivated"/> event
-		/// </summary>
-		public class CellActivatedEventArgs : EventArgs {
-			/// <summary>
-			/// The current table to which the new indexes refer.  May be null e.g. if selection change is the result of clearing the table from the view
-			/// </summary>
-			/// <value></value>
-			public ITableDataSource Table { get; }
-
-
-			/// <summary>
-			/// The column index of the <see cref="Table"/> cell that is being activated
-			/// </summary>
-			/// <value></value>
-			public int Col { get; }
-
-			/// <summary>
-			/// The row index of the <see cref="Table"/> cell that is being activated
-			/// </summary>
-			/// <value></value>
-			public int Row { get; }
-
-			/// <summary>
-			/// Creates a new instance of arguments describing a cell being activated in <see cref="TableView"/>
-			/// </summary>
-			/// <param name="t"></param>
-			/// <param name="col"></param>
-			/// <param name="row"></param>
-			public CellActivatedEventArgs (ITableDataSource t, int col, int row)
-			{
-				Table = t;
-				Col = col;
-				Row = row;
-			}
-		}
 
 		private int columnOffset;
 		private int rowOffset;
