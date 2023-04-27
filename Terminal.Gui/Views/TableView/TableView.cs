@@ -7,35 +7,6 @@ using System.Linq;
 
 namespace Terminal.Gui {
 
-	public interface ITableDataSource
-	{
-		int Rows { get; }
-		int Columns { get; }
-		string[] ColumnNames { get; }
-		object this[int row, int col]
-		{
-			get;
-		}
-	}
-
-	public class DataTableSource : ITableDataSource
-	{
-		public readonly DataTable table;
-
-		public DataTableSource(DataTable table)
-		{
-			this.table = table;
-		}
-
-		public object this [int row, int col] => table.Rows[row][col];
-
-		public int Rows => table.Rows.Count;
-
-		public int Columns => table.Columns.Count;
-
-		public string [] ColumnNames => table.Columns.Cast<DataColumn>().Select (c => c.ColumnName).ToArray ();
-	}
-
 	/// <summary>
 	/// View for tabular data based on a <see cref="ITableDataSource"/>.
 	/// 
@@ -1291,7 +1262,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Returns the screen position (relative to the control client area) that the given cell is rendered or null if it is outside the current scroll area or no table is loaded
 		/// </summary>
-		/// <param name="tableColumn">The index of the <see cref="Table"/> column you are looking for, use <see cref="DataColumn.Ordinal"/></param>
+		/// <param name="tableColumn">The index of the <see cref="Table"/> column you are looking for</param>
 		/// <param name="tableRow">The index of the row in <see cref="Table"/> that you are looking for</param>
 		/// <returns></returns>
 		public Point? CellToScreen (int tableColumn, int tableRow)
@@ -1403,7 +1374,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Returns true if the <see cref="Table"/> is not set or all the
-		/// <see cref="DataColumn"/> in the <see cref="Table"/> have an explicit
+		/// columns in the <see cref="Table"/> have an explicit
 		/// <see cref="ColumnStyle"/> that marks them <see cref="ColumnStyle.visible"/>
 		/// <see langword="false"/>.
 		/// </summary>
@@ -1418,7 +1389,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Returns <paramref name="columnIndex"/> unless the <see cref="ColumnStyle.Visible"/> is false for
-		/// the indexed <see cref="DataColumn"/>.  If so then the index returned is nudged to the nearest visible
+		/// the indexed column.  If so then the index returned is nudged to the nearest visible
 		/// column.
 		/// </summary>
 		/// <remarks>Returns <paramref name="columnIndex"/> unchanged if it is invalid (e.g. out of bounds).</remarks>
