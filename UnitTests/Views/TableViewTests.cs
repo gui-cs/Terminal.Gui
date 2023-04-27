@@ -2492,11 +2492,7 @@ A B C
 		{
 			var tv = new TableView ();
 			tv.ColorScheme = Colors.TopLevel;
-			tv.Bounds = new Rect (0, 0, 50, 5);
-			tv.Style.ShowHorizontalHeaderUnderline = true;
-			tv.Style.ShowHorizontalHeaderOverline = false;
-			tv.Style.AlwaysShowHeaders = true;
-			tv.Style.SmoothHorizontalScrolling = true;
+			tv.Bounds = new Rect (0, 0, 50, 6);
 
 			tv.Table = new EnumerableTableDataSource<Type> (
 				new Type [] { typeof (string), typeof (int), typeof (float) },
@@ -2512,6 +2508,7 @@ A B C
 
 			string expected =
 				@"
+┌──────┬─────────┬───────────────────────────────┐
 │Name  │Namespace│BaseType                       │
 ├──────┼─────────┼───────────────────────────────┤
 │String│System   │System.Object                  │
@@ -2519,7 +2516,6 @@ A B C
 │Single│System   │System.ValueType               │";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
-			int? col;
 		}
 		private TableView GetTwoRowSixColumnTable ()
 		{
