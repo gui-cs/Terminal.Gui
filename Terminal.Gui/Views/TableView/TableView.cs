@@ -230,8 +230,9 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
+			base.Redraw (bounds);
+
 			Move (0, 0);
-			var frame = Frame;
 
 			scrollRightPoint = null;
 			scrollLeftPoint = null;
@@ -272,7 +273,7 @@ namespace Terminal.Gui {
 			int headerLinesConsumed = line;
 
 			//render the cells
-			for (; line < frame.Height; line++) {
+			for (; line < Bounds.Height; line++) {
 
 				ClearLine (line, bounds.Width);
 
@@ -1160,25 +1161,29 @@ namespace Terminal.Gui {
 				return true;
 			}
 
+			// TODO: Revert this (or not) once #2578 is solved
+			var boundsX = me.X - GetFramesThickness ().Left;
+			var boundsY = me.Y - GetFramesThickness ().Top;
+
 			if (me.Flags.HasFlag (MouseFlags.Button1Clicked)) {
 
 				if (scrollLeftPoint != null
-					&& scrollLeftPoint.Value.X == me.X
-					&& scrollLeftPoint.Value.Y == me.Y) {
+					&& scrollLeftPoint.Value.X == boundsX
+					&& scrollLeftPoint.Value.Y == boundsY) {
 					ColumnOffset--;
 					EnsureValidScrollOffsets ();
 					SetNeedsDisplay ();
 				}
 
 				if (scrollRightPoint != null
-					&& scrollRightPoint.Value.X == me.X
-					&& scrollRightPoint.Value.Y == me.Y) {
+					&& scrollRightPoint.Value.X == boundsX
+					&& scrollRightPoint.Value.Y == boundsY) {
 					ColumnOffset++;
 					EnsureValidScrollOffsets ();
 					SetNeedsDisplay ();
 				}
 
-				var hit = ScreenToCell (me.X, me.Y);
+				var hit = ScreenToCell (boundsX, boundsY);
 				if (hit != null) {
 
 					if (MultiSelect && HasControlOrAlt (me)) {
@@ -1193,7 +1198,7 @@ namespace Terminal.Gui {
 
 			// Double clicking a cell activates
 			if (me.Flags == MouseFlags.Button1DoubleClicked) {
-				var hit = ScreenToCell (me.X, me.Y);
+				var hit = ScreenToCell (boundsX, boundsY);
 				if (hit != null) {
 					OnCellActivated (new CellActivatedEventArgs (Table, hit.Value.X, hit.Value.Y));
 				}
