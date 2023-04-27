@@ -757,7 +757,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			if (!_needsDisplay.IsEmpty || _childNeedsDisplay || LayoutNeeded) {
+			if (!_needsDisplay.IsEmpty || _subViewNeedsDisplay || LayoutNeeded) {
 				Driver.SetAttribute (GetNormalColor ());
 				Clear (ViewToScreen (bounds));
 				LayoutSubviews ();
@@ -780,6 +780,7 @@ namespace Terminal.Gui {
 					if (view.Frame.IntersectsWith (bounds) && !OutsideTopFrame (this)) {
 						view.SetNeedsLayout ();
 						view.SetNeedsDisplay (view.Bounds);
+						view.SetSubViewNeedsDisplay ();
 					}
 				}
 				base.Redraw (Bounds);
