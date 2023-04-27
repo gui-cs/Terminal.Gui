@@ -2140,10 +2140,11 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var tv = GetTwoRowSixColumnTable (out var dt);
 			dt.Rows.Add (1, 2, 3, 4, 5, 6);
-			tv.LayoutSubviews ();
-
 
 			tv.Bounds = new Rect (0, 0, 7, 6);
+			tv.Frame = new Rect (0, 0, 7, 6);
+			tv.LayoutSubviews ();
+
 
 			tv.FullRowSelect = true;
 			tv.Style.ShowHorizontalBottomline = true;
@@ -2197,10 +2198,10 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var tv = GetTwoRowSixColumnTable (out var dt);
 			dt.Rows.Add (1, 2, 3, 4, 5, 6);
-			tv.LayoutSubviews ();
-
 
 			tv.Bounds = new Rect (0, 0, 7, 6);
+			tv.Frame = new Rect (0, 0, 7, 6);
+			tv.LayoutSubviews ();
 
 			tv.FullRowSelect = true;
 			tv.Style.ShowHorizontalBottomline = true;
