@@ -36,7 +36,7 @@ namespace UICatalog.Scenarios {
 
 			var jumpLabel = new Label ("Jump To Glyph:") { X = Pos.Right (_charMap) + 1, Y = Pos.Y (_charMap) };
 			Win.Add (jumpLabel);
-			var jumpEdit = new TextField () { X = Pos.Right (jumpLabel) + 1, Y = Pos.Y (_charMap), Width = 10, Caption = "e.g. 01BE3"};
+			var jumpEdit = new TextField () { X = Pos.Right (jumpLabel) + 1, Y = Pos.Y (_charMap), Width = 10, Caption = "e.g. 01BE3" };
 			Win.Add (jumpEdit);
 			var errorLabel = new Label ("") { X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap), ColorScheme = Colors.ColorSchemes ["error"] };
 			Win.Add (errorLabel);
@@ -81,7 +81,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.X (label) + 1,
 				Y = Pos.Bottom (label),
 				Width = radioItems.Max (r => r.radioLabel.Length) + 2,
-				Height = Dim.Fill(1),
+				Height = Dim.Fill (1),
 				SelectedItem = 0
 			};
 			jumpList.SelectedItemChanged += (s, args) => {
@@ -146,7 +146,7 @@ namespace UICatalog.Scenarios {
 
 		public static uint MaxCodePointVal => 0x10FFFF;
 
-		public static int RowLabelWidth => $"U+{MaxCodePointVal:x5}".Length + 1; 
+		public static int RowLabelWidth => $"U+{MaxCodePointVal:x5}".Length + 1;
 		public static int RowWidth => RowLabelWidth + (COLUMN_WIDTH * 16);
 
 		public CharMap ()
@@ -167,7 +167,6 @@ namespace UICatalog.Scenarios {
 					SetNeedsDisplay ();
 				}
 			};
-			DrawContent += CharMap_DrawContent;
 
 			AddCommand (Command.ScrollUp, () => {
 				if (SelectedGlyph >= 16) {
@@ -195,12 +194,12 @@ namespace UICatalog.Scenarios {
 			});
 			AddCommand (Command.PageUp, () => {
 				var page = (uint)(Bounds.Height / ROW_HEIGHT - 1) * 16;
-				SelectedGlyph -= Math.Min(page, SelectedGlyph);
+				SelectedGlyph -= Math.Min (page, SelectedGlyph);
 				return true;
 			});
 			AddCommand (Command.PageDown, () => {
 				var page = (uint)(Bounds.Height / ROW_HEIGHT - 1) * 16;
-				SelectedGlyph += Math.Min(page, MaxCodePointVal -SelectedGlyph);
+				SelectedGlyph += Math.Min (page, MaxCodePointVal - SelectedGlyph);
 				return true;
 			});
 			AddCommand (Command.TopHome, () => {
@@ -226,9 +225,9 @@ namespace UICatalog.Scenarios {
 			Clipboard.Contents = $"{new Rune (SelectedGlyph)}";
 		}
 
-		private void CharMap_DrawContent (object sender, DrawEventArgs e)
+		public override bool OnDrawContent (Rect contentArea)
 		{
-			Rect viewport = e.Rect;
+			Rect viewport = contentArea;
 
 			var oldClip = Driver.Clip;
 			Driver.Clip = Bounds;
@@ -279,6 +278,8 @@ namespace UICatalog.Scenarios {
 				}
 			}
 			Driver.Clip = oldClip;
+
+			return false;
 		}
 
 		ContextMenu _contextMenu = new ContextMenu ();
@@ -330,12 +331,6 @@ namespace UICatalog.Scenarios {
 				_contextMenu.Show ();
 			}
 		}
-
-		protected override void Dispose (bool disposing)
-		{
-			DrawContent -= CharMap_DrawContent;
-			base.Dispose (disposing);
-		}
 	}
 
 	class UnicodeRange {
@@ -348,7 +343,7 @@ namespace UICatalog.Scenarios {
 			this.End = end;
 			this.Category = category;
 		}
-			
+
 		public static List<UnicodeRange> Ranges = new List<UnicodeRange> {
 			new UnicodeRange (0x0000, 0x001F, "ASCII Control Characters"),
 			new UnicodeRange (0x0080, 0x009F, "C0 Control Characters"),
@@ -359,8 +354,8 @@ namespace UICatalog.Scenarios {
 			new UnicodeRange(0x2190, 0x21ff,"Arrows" ),
 			new UnicodeRange(0x2200, 0x22ff,"Mathematical symbols"),
 			new UnicodeRange(0x2300, 0x23ff,"Miscellaneous Technical"),
-			new UnicodeRange(0x24B6, 0x24e9,"Circled Latin Capital Letters"), 
-			new UnicodeRange(0x1F130, 0x1F149,"Squared Latin Capital Letters"), 
+			new UnicodeRange(0x24B6, 0x24e9,"Circled Latin Capital Letters"),
+			new UnicodeRange(0x1F130, 0x1F149,"Squared Latin Capital Letters"),
 			new UnicodeRange(0x2500, 0x25ff,"Box Drawing & Geometric Shapes"),
 			new UnicodeRange(0x2600, 0x26ff,"Miscellaneous Symbols"),
 			new UnicodeRange(0x2700, 0x27ff,"Dingbats"),
@@ -496,5 +491,5 @@ namespace UICatalog.Scenarios {
 			new UnicodeRange((uint)(CharMap.MaxCodePointVal - 16), (uint)CharMap.MaxCodePointVal,"End"),
 		};
 	}
-	
+
 }

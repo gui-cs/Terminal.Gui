@@ -78,7 +78,7 @@ namespace UICatalog.Scenarios {
 			// Use ContentChanged to detect if the user has typed something in a TextView.
 			// The TextChanged property is only fired if the TextView.Text property is
 			// explicitly set
-			textView.ContentsChanged += (s,a) => {
+			textView.ContentsChanged += (s, a) => {
 				labelMirroringTextView.Enabled = !labelMirroringTextView.Enabled;
 				labelMirroringTextView.Text = textView.Text;
 			};
@@ -90,14 +90,14 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (textView),
 				Checked = true
 			};
-			chxMultiline.Toggled += (s,e) => textView.Multiline = (bool)e.OldValue;
+			chxMultiline.Toggled += (s, e) => textView.Multiline = (bool)e.OldValue;
 			Win.Add (chxMultiline);
 
 			var chxWordWrap = new CheckBox ("Word Wrap") {
 				X = Pos.Right (chxMultiline) + 2,
 				Y = Pos.Top (chxMultiline)
 			};
-			chxWordWrap.Toggled += (s,e) => textView.WordWrap = (bool)e.OldValue;
+			chxWordWrap.Toggled += (s, e) => textView.WordWrap = (bool)e.OldValue;
 			Win.Add (chxWordWrap);
 
 			// TextView captures Tabs (so users can enter /t into text) by default;
@@ -111,7 +111,7 @@ namespace UICatalog.Scenarios {
 
 			Key keyTab = textView.GetKeyFromCommand (Command.Tab);
 			Key keyBackTab = textView.GetKeyFromCommand (Command.BackTab);
-			chxCaptureTabs.Toggled += (s,e) => {
+			chxCaptureTabs.Toggled += (s, e) => {
 				if (e.OldValue == true) {
 					textView.AddKeyBinding (keyTab, Command.Tab);
 					textView.AddKeyBinding (keyBackTab, Command.BackTab);
@@ -139,7 +139,7 @@ namespace UICatalog.Scenarios {
 			};
 			var array = ((MemoryStream)hexEditor.Source).ToArray ();
 			labelMirroringHexEditor.Text = Encoding.UTF8.GetString (array, 0, array.Length);
-			hexEditor.Edited += (s,kv) => {
+			hexEditor.Edited += (s, kv) => {
 				hexEditor.ApplyEdits ();
 				var array = ((MemoryStream)hexEditor.Source).ToArray ();
 				labelMirroringHexEditor.Text = Encoding.UTF8.GetString (array, 0, array.Length);
@@ -222,9 +222,9 @@ namespace UICatalog.Scenarios {
 				X = 1
 			};
 			var appendAutocompleteTextField = new TextField () {
-				X = Pos.Right(labelAppendAutocomplete),
+				X = Pos.Right (labelAppendAutocomplete),
 				Y = labelAppendAutocomplete.Y,
-				Width = Dim.Fill()
+				Width = Dim.Fill ()
 			};
 			appendAutocompleteTextField.Autocomplete = new AppendAutocomplete (appendAutocompleteTextField);
 			appendAutocompleteTextField.Autocomplete.SuggestionGenerator = new SingleWordSuggestionGenerator {

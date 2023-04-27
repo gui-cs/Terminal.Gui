@@ -542,7 +542,7 @@ Y
 			Assert.Equal (new Rect (0, 0, 3, 1), lbl._needsDisplay);
 			Assert.Equal (new Rect (0, 0, 0, 0), lbl.SuperView._needsDisplay);
 			Assert.True (lbl.SuperView.LayoutNeeded);
-			lbl.SuperView.Redraw (lbl.SuperView.Bounds);
+			lbl.SuperView.Draw ();
 			Assert.Equal ("12  ", GetContents ());
 
 			string GetContents ()
@@ -624,7 +624,7 @@ Y
 			Assert.Equal (new Rect (0, 0, 32, 32), pos);
 
 			verticalView.Text = $"最初の行{Environment.NewLine}二行目";
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			Assert.Equal (new Rect (0, 3, 2, 20), verticalView.Frame);
 			expected = @"
 ┌──────────────────────────────┐
@@ -1051,7 +1051,7 @@ Y
 			Assert.Equal (new Rect (0, 0, 22, 22), pos);
 
 			verticalView.Text = $"最初_の行二行目";
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			Assert.True (horizontalView.AutoSize);
 			Assert.True (verticalView.AutoSize);
 			// height was initialized with 8 and can only grow or keep initial value
@@ -1716,13 +1716,12 @@ Y
 				Assert.Equal (new Rect (0, 0, 0, 4), subview.Frame);
 				expected = @"
 ┌─┐
+│││
+│││
+│││
+│││
 │ │
-│ │
-│ │
-│ │
-│ │
-└─┘
-";
+└─┘";
 				break;
 			case 4:
 				Assert.Equal (new Rect (0, 0, 1, 4), subview.Frame);

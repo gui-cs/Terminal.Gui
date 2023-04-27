@@ -56,7 +56,7 @@ namespace Terminal.Gui {
 
 		// For Unit testing - ignores UseSystemConsole
 		internal static bool _forceFakeConsole;
-		
+
 		private static bool? _enableConsoleScrolling;
 		/// <summary>
 		/// The current <see cref="ConsoleDriver.EnableConsoleScrolling"/> used in the terminal.
@@ -119,7 +119,7 @@ namespace Terminal.Gui {
 			   File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
 			).ToList ();
 		}
-		
+
 		#region Initialization (Init/Shutdown)
 
 		/// <summary>
@@ -357,7 +357,7 @@ namespace Terminal.Gui {
 			/// For debug (see DEBUG_IDISPOSABLE define) purposes; the runstate instances that have been created
 			/// </summary>
 			public static List<RunState> Instances = new List<RunState> ();
-			
+
 			/// <summary>
 			/// Creates a new RunState object.
 			/// </summary>
@@ -494,7 +494,7 @@ namespace Terminal.Gui {
 				OverlappedTop?.OnChildLoaded (Toplevel);
 				Toplevel.OnLoaded ();
 				Toplevel.SetNeedsDisplay ();
-				Toplevel.Redraw (Toplevel.Bounds);
+				Toplevel.Draw ();
 				Toplevel.PositionCursor ();
 				Driver.Refresh ();
 			}
@@ -618,7 +618,7 @@ namespace Terminal.Gui {
 				}
 #endif
 			}
-		}		
+		}
 
 		/// <summary>
 		/// Triggers a refresh of the entire display.
@@ -630,7 +630,7 @@ namespace Terminal.Gui {
 			foreach (var v in _toplevels.Reverse ()) {
 				if (v.Visible) {
 					v.SetNeedsDisplay ();
-					v.Redraw (v.Bounds);
+					v.Draw ();
 				}
 				last = v;
 			}
@@ -765,11 +765,11 @@ namespace Terminal.Gui {
 			if (state.Toplevel != Top
 				&& (!Top._needsDisplay.IsEmpty || Top._childNeedsDisplay || Top.LayoutNeeded)) {
 				state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
-				Top.Redraw (Top.Bounds);
+				Top.Draw ();
 				foreach (var top in _toplevels.Reverse ()) {
 					if (top != Top && top != state.Toplevel) {
 						top.SetNeedsDisplay ();
-						top.Redraw (top.Bounds);
+						top.Draw ();
 					}
 				}
 			}
@@ -784,7 +784,7 @@ namespace Terminal.Gui {
 
 			if (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._childNeedsDisplay || state.Toplevel.LayoutNeeded
 				|| OverlappedChildNeedsDisplay ()) {
-				state.Toplevel.Redraw (state.Toplevel.Bounds);
+				state.Toplevel.Draw ();
 				//if (state.Toplevel.SuperView != null) {
 				//	state.Toplevel.SuperView?.OnRenderLineCanvas ();
 				//} else {
@@ -797,7 +797,7 @@ namespace Terminal.Gui {
 			}
 			if (state.Toplevel != Top && !state.Toplevel.Modal
 				&& (!Top._needsDisplay.IsEmpty || Top._childNeedsDisplay || Top.LayoutNeeded)) {
-				Top.Redraw (Top.Bounds);
+				Top.Draw ();
 			}
 		}
 
@@ -892,7 +892,7 @@ namespace Terminal.Gui {
 				NotifyStopRunState?.Invoke (top, new ToplevelEventArgs (top));
 			}
 		}
-		
+
 		/// <summary>
 		/// Building block API: completes the execution of a <see cref="Toplevel"/> that was started with <see cref="Begin(Toplevel)"/> .
 		/// </summary>

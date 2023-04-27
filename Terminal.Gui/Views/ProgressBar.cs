@@ -275,7 +275,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void Redraw (Rect region)
+		public override void OnDraw ()
 		{
 			DrawFrame ();
 

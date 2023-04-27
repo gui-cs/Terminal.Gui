@@ -90,7 +90,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			public override void Redraw (Rect bounds)
+			public override void OnDraw ()
 			{
 				var current = ColorScheme.Focus;
 				Driver.SetAttribute (current);
@@ -534,9 +534,9 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDraw ()
 		{
-			base.Redraw (bounds);
+			base.OnDraw ();
 
 			if (!autoHide) {
 				return;

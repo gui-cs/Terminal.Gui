@@ -34,7 +34,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			public override void Redraw (Rect bounds)
+			public override void OnDraw ()
 			{
 				if (autocomplete.LastPopupPos == null) {
 					return;

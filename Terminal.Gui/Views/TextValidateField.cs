@@ -501,7 +501,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDraw ()
 		{
 			if (provider == null) {
 				Move (0, 0);
@@ -512,7 +512,7 @@ namespace Terminal.Gui {
 			var bgcolor = !IsValid ? Color.BrightRed : ColorScheme.Focus.Background;
 			var textColor = new Attribute (ColorScheme.Focus.Foreground, bgcolor);
 
-			var (margin_left, margin_right) = GetMargins (bounds.Width);
+			var (margin_left, margin_right) = GetMargins (Bounds.Width);
 
 			Move (0, 0);
 

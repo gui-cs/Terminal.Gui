@@ -656,14 +656,14 @@ namespace Terminal.Gui.ViewTests {
 				win.SetFocus ();
 				Assert.False (button.HasFocus);
 				Assert.False (win.HasFocus);
-				top.Redraw (top.Bounds);
+				top.Draw ();
 				Assert.True (RunesCount () == 0);
 
 				win.Visible = true;
 				win.FocusFirst ();
 				Assert.True (button.HasFocus);
 				Assert.True (win.HasFocus);
-				top.Redraw (top.Bounds);
+				top.Draw ();
 				Assert.True (RunesCount () > 0);
 
 				Application.RequestStop ();
@@ -715,7 +715,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (top2, v2.GetTopSuperView ());
 		}
 
-		
+
 
 		[Fact, AutoInitShutdown]
 		public void Clear_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
@@ -734,6 +734,7 @@ namespace Terminal.Gui.ViewTests {
 					}
 				}
 				Application.Driver.Clip = savedClip;
+				e.Cancel = true;
 			};
 			Application.Top.Add (view);
 			Application.Begin (Application.Top);
@@ -781,6 +782,7 @@ namespace Terminal.Gui.ViewTests {
 					}
 				}
 				Application.Driver.Clip = savedClip;
+				e.Cancel = true;
 			};
 			Application.Top.Add (view);
 			Application.Begin (Application.Top);
@@ -1040,7 +1042,7 @@ cccccccccccccccccccc", output);
 				return true;
 			}
 
-			public override void Redraw (Rect bounds)
+			public override void OnDraw ()
 			{
 				var idx = 0;
 				// BUGBUG: v2 - this should use Boudns, not Frame
@@ -1078,7 +1080,7 @@ cccccccccccccccccccc", output);
 			top.Add (label, view);
 			Application.Begin (top);
 
-			top.Redraw (top.Bounds);
+			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -1091,7 +1093,7 @@ At 0,0
 			view.LayoutStyle = LayoutStyle.Absolute;
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
 			Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplay);
-			top.Redraw (top.Bounds);
+			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0     
  A text wit", output);
@@ -1112,7 +1114,7 @@ At 0,0
 			top.Add (label, view);
 			Application.Begin (top);
 
-			top.Redraw (top.Bounds);
+			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -1126,7 +1128,7 @@ At 0,0
 			Assert.Equal (new Rect (1, 1, 10, 1), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
 			Assert.Equal (new Rect (0, 0, 30, 2), view._needsDisplay);
-			top.Redraw (top.Bounds);
+			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0     
  A text wit", output);
@@ -1147,7 +1149,7 @@ At 0,0
 			top.Add (label, view);
 			Application.Begin (top);
 
-			view.Redraw (view.Bounds);
+			view.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -1160,7 +1162,7 @@ At 0,0
 			view.LayoutStyle = LayoutStyle.Absolute;
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
 			Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplay);
-			view.Redraw (view.Bounds);
+			view.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
  A text wit                  
@@ -1183,7 +1185,7 @@ At 0,0
 			top.Add (label, view);
 			Application.Begin (top);
 
-			view.Redraw (view.Bounds);
+			view.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -1197,7 +1199,7 @@ At 0,0
 			Assert.Equal (new Rect (1, 1, 10, 1), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
 			Assert.Equal (new Rect (0, 0, 30, 2), view._needsDisplay);
-			view.Redraw (view.Bounds);
+			view.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
  A text wit                  
@@ -1232,7 +1234,7 @@ At 0,0
 			view.LayoutStyle = LayoutStyle.Absolute;
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
 			Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplay);
-			top.Redraw (top.Bounds);
+			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0       
              
@@ -1255,7 +1257,7 @@ At 0,0
 			top.Add (label, view);
 			Application.Begin (top);
 
-			top.Redraw (top.Bounds);
+			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -1269,7 +1271,7 @@ At 0,0
 			Assert.Equal (new Rect (3, 3, 10, 1), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
 			Assert.Equal (new Rect (0, 0, 30, 2), view._needsDisplay);
-			top.Redraw (top.Bounds);
+			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0       
              
@@ -1292,7 +1294,7 @@ At 0,0
 			top.Add (label, view);
 			Application.Begin (top);
 
-			view.Redraw (view.Bounds);
+			view.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -1302,7 +1304,7 @@ At 0,0
 			view.Frame = new Rect (3, 3, 10, 1);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
 			Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplay);
-			view.Redraw (view.Bounds);
+			view.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -1325,7 +1327,7 @@ At 0,0
 			top.Add (label, view);
 			Application.Begin (top);
 
-			view.Redraw (view.Bounds);
+			view.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -1339,7 +1341,7 @@ At 0,0
 			Assert.Equal (new Rect (3, 3, 10, 1), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
 			Assert.Equal (new Rect (0, 0, 30, 2), view._needsDisplay);
-			view.Redraw (view.Bounds);
+			view.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
@@ -1362,7 +1364,7 @@ At 0,0
 			v.Add (bottom);
 
 			v.LayoutSubviews ();
-			v.Redraw (v.Bounds);
+			v.Draw ();
 
 			string looksLike =
 @"    

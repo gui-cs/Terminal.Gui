@@ -315,9 +315,9 @@ namespace Terminal.Gui {
 
 			// Each of these renders lines to either this View's LineCanvas 
 			// Those lines will be finally rendered in OnRenderLineCanvas
-			Margin?.Redraw (Margin.Frame);
-			Border?.Redraw (Border.Frame);
-			Padding?.Redraw (Padding.Frame);
+			Margin?.OnDraw ();
+			Border?.OnDraw ();
+			Padding?.OnDraw ();
 
 			Driver.Clip = prevClip;
 
@@ -325,23 +325,9 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Redraws this view and its subviews; only redraws the views that have been flagged for a re-display.
+		/// Draws all processes for this view.
 		/// </summary>
-		/// <param name="bounds">The bounds (view-relative region) to redraw.</param>
-		/// <remarks>
-		/// <para>
-		///    Always use <see cref="Bounds"/> (view-relative) when calling <see cref="Redraw(Rect)"/>, NOT <see cref="Frame"/> (superview-relative).
-		/// </para>
-		/// <para>
-		///    Views should set the color that they want to use on entry, as otherwise this will inherit
-		///    the last color that was set globally on the driver.
-		/// </para>
-		/// <para>
-		///    Overrides of <see cref="Redraw"/> must ensure they do not set <c>Driver.Clip</c> to a clip region
-		///    larger than the <ref name="bounds"/> parameter, as this will cause the driver to clip the entire region.
-		/// </para>
-		/// </remarks>
-		public virtual void Redraw (Rect bounds)
+		public void Draw ()
 		{
 			if (!CanBeVisible (this)) {
 				return;
@@ -356,12 +342,55 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (GetNormalColor ());
 			}
 
-			if (SuperView != null) {
-				Clear (ViewToScreen (bounds));
+			// Invoke DrawContentEvent
+			if (!OnDrawContent (Bounds)) {
+				OnDraw ();
 			}
 
-			// Invoke DrawContentEvent
-			OnDrawContent (bounds);
+			Driver.Clip = prevClip;
+
+			OnRenderLineCanvas ();
+
+			// Invoke DrawContentCompleteEvent
+			OnDrawContentComplete (Bounds);
+
+			// BUGBUG: v2 - We should be able to use View.SetClip here and not have to resort to knowing Driver details.
+			ClearLayoutNeeded ();
+			ClearNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Redraws this view and its subviews; only redraws the views that have been flagged for a re-display.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		///    Always use <see cref="Bounds"/> (view-relative) when calling <see cref="OnDraw()"/>, NOT <see cref="Frame"/> (superview-relative).
+		/// </para>
+		/// <para>
+		///    Views should set the color that they want to use on entry, as otherwise this will inherit
+		///    the last color that was set globally on the driver.
+		/// </para>
+		/// <para>
+		///    Overrides of <see cref="OnDraw"/> must ensure they do not set <c>Driver.Clip</c> to a clip region
+		///    larger than the <ref name="Bounds"/> property, as this will cause the driver to clip the entire region.
+		/// </para>
+		/// </remarks>
+		public virtual void OnDraw ()
+		{
+			if (SuperView != null) {
+				Clear (ViewToScreen (Bounds));
+			}
+
+			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
+				if (TextFormatter != null) {
+					TextFormatter.NeedsFormat = true;
+				}
+				// This should NOT clear 
+				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
+				    HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
+				    Rect.Empty, false);
+				SetSubViewNeedsDisplay ();
+			}
 
 			// Draw subviews
 			// TODO: Implement OnDrawSubviews (cancelable);
@@ -376,28 +405,25 @@ namespace Terminal.Gui {
 							// Draw the subview
 							// Use the view's bounds (view-relative; Location will always be (0,0)
 							//if (view.Visible && view.Frame.Width > 0 && view.Frame.Height > 0) {
-							view.Redraw (view.Bounds);
+							view.Draw ();
 							//}
 						}
-						view.ClearNeedsDisplay ();
 					}
 				}
 			}
-
-			Driver.Clip = prevClip;
-
-			OnRenderLineCanvas ();
-
-			// Invoke DrawContentCompleteEvent
-			OnDrawContentComplete (bounds);
-
-			// BUGBUG: v2 - We should be able to use View.SetClip here and not have to resort to knowing Driver details.
-			ClearLayoutNeeded ();
-			ClearNeedsDisplay ();
 		}
 
-		internal void OnRenderLineCanvas ()
+		// TODO: Make this cancelable
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool OnRenderLineCanvas ()
 		{
+			if (!IsInitialized) {
+				return false;
+			}
+
 			//Driver.SetAttribute (new Attribute(Color.White, Color.Black));
 
 			// If we have a SuperView, it'll render our frames.
@@ -424,6 +450,8 @@ namespace Terminal.Gui {
 				}
 				LineCanvas.Clear ();
 			}
+
+			return true;
 		}
 
 		/// <summary>
@@ -446,22 +474,12 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// This method will be called before any subviews added with <see cref="Add(View)"/> have been drawn. 
 		/// </remarks>
-		public virtual void OnDrawContent (Rect contentArea)
+		public virtual bool OnDrawContent (Rect contentArea)
 		{
-			// TODO: Make DrawContent a cancelable event
-			// if (!DrawContent?.Invoke(this, new DrawEventArgs (viewport)) {
-			DrawContent?.Invoke (this, new DrawEventArgs (contentArea));
+			var dev = new DrawEventArgs (contentArea);
+			DrawContent?.Invoke (this, dev);
 
-			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
-				if (TextFormatter != null) {
-					TextFormatter.NeedsFormat = true;
-				}
-				// This should NOT clear 
-				TextFormatter?.Draw (ViewToScreen (contentArea), HasFocus ? GetFocusColor () : GetNormalColor (),
-				    HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
-				    Rect.Empty, false);
-				SetSubViewNeedsDisplay ();
-			}
+			return dev.Cancel;
 		}
 
 		/// <summary>

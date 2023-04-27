@@ -2077,7 +2077,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (tv);
 
 			tv.LayoutSubviews ();
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is
@@ -2160,7 +2160,7 @@ a
 
 			Application.Top.Add (tv);
 			Application.Top.LayoutSubviews ();
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is  
 the first
@@ -2175,7 +2175,7 @@ line.
 			tv.CursorPosition = new Point (6, 2);
 			Assert.Equal (new Point (5, 2), tv.CursorPosition);
 			Application.Top.LayoutSubviews ();
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is  
 the first
@@ -2564,17 +2564,17 @@ line.
 			Assert.NotNull (tv.Autocomplete);
 			Assert.Empty (g.AllSuggestions);
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.F, new KeyModifiers ())));
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F", tv.Text);
 			Assert.Equal (new Point (24, 2), tv.CursorPosition);
 			Assert.Empty (tv.Autocomplete.Suggestions);
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Z | Key.CtrlMask, new KeyModifiers ())));
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (new Point (23, 2), tv.CursorPosition);
 			Assert.Empty (tv.Autocomplete.Suggestions);
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.R | Key.CtrlMask, new KeyModifiers ())));
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F", tv.Text);
 			Assert.Equal (new Point (24, 2), tv.CursorPosition);
 			Assert.Empty (tv.Autocomplete.Suggestions);
@@ -2593,7 +2593,7 @@ line.
 			Assert.Equal ("second", g.AllSuggestions [5]);
 			Assert.Equal ("third", g.AllSuggestions [^1]);
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.F, new KeyModifiers ())));
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F", tv.Text);
 			Assert.Equal (new Point (24, 2), tv.CursorPosition);
 			Assert.Single (tv.Autocomplete.Suggestions);
@@ -6112,7 +6112,7 @@ This is the second line.
 
 			tv.WordWrap = true;
 			tv.CursorPosition = new Point (12, 0);
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			Assert.Equal (new Point (12, 0), tv.CursorPosition);
 			Assert.Equal (new Point (12, 0), cp);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6121,7 +6121,7 @@ This is the second line.
 ", output);
 
 			((FakeDriver)Application.Driver).SetBufferSize (6, 25);
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			Assert.Equal (new Point (4, 2), tv.CursorPosition);
 			Assert.Equal (new Point (12, 0), cp);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6140,7 +6140,7 @@ line.
 ", output);
 
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			Assert.Equal (new Point (0, 3), tv.CursorPosition);
 			Assert.Equal (new Point (12, 0), cp);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6159,7 +6159,7 @@ line.
 ", output);
 
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			Assert.Equal (new Point (1, 3), tv.CursorPosition);
 			Assert.Equal (new Point (13, 0), cp);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6178,7 +6178,7 @@ line.
 ", output);
 
 			Assert.True (tv.MouseEvent (new MouseEvent () { X = 0, Y = 3, Flags = MouseFlags.Button1Pressed }));
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			Assert.Equal (new Point (0, 3), tv.CursorPosition);
 			Assert.Equal (new Point (12, 0), cp);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6221,7 +6221,7 @@ This is the second line.
 			tv.CursorPosition = new Point (3, 0);
 			Assert.Equal (new Point (3, 0), tv.CursorPosition);
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
@@ -6231,14 +6231,14 @@ This is the second line.
 			tv.CursorPosition = new Point (0, 1);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			Assert.Equal (new Point (22, 0), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.This is the second line.
 ", output);
 
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
@@ -6278,7 +6278,7 @@ This is the second line.
 			tv.CursorPosition = new Point (3, 0);
 			Assert.Equal (new Point (3, 0), tv.CursorPosition);
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
@@ -6288,14 +6288,14 @@ This is the second line.
 			tv.CursorPosition = new Point (0, 1);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			Assert.Equal (new Point (22, 0), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.This is the second line.
 ", output);
 
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
@@ -6334,7 +6334,7 @@ This is the second line.
 			tv.CursorPosition = new Point (2, 0);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.DeleteChar, new KeyModifiers ())));
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
@@ -6344,14 +6344,14 @@ This is the second line.
 			tv.CursorPosition = new Point (22, 0);
 			Assert.Equal (new Point (22, 0), tv.CursorPosition);
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.DeleteChar, new KeyModifiers ())));
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			Assert.Equal (new Point (22, 0), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.This is the second line.
 ", output);
 
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
@@ -6391,7 +6391,7 @@ This is the second line.
 			tv.CursorPosition = new Point (2, 0);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.DeleteChar, new KeyModifiers ())));
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
@@ -6401,14 +6401,14 @@ This is the second line.
 			tv.CursorPosition = new Point (22, 0);
 			Assert.Equal (new Point (22, 0), tv.CursorPosition);
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.DeleteChar, new KeyModifiers ())));
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			Assert.Equal (new Point (22, 0), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.This is the second line.
 ", output);
 
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  

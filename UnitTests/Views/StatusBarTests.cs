@@ -106,7 +106,7 @@ namespace Terminal.Gui.ViewsTests {
 			});
 			Application.Top.Add (sb);
 
-			sb.Redraw (sb.Bounds);
+			sb.OnDraw ();
 
 			string expected = @$"
 ^O Open {Application.Driver.VLine} Q, CtrlMask to Quit!
@@ -123,7 +123,7 @@ namespace Terminal.Gui.ViewsTests {
 				new StatusItem (Key.CtrlMask | Key.Q, "~CTRL-Q~ Quit", null)
 			});
 			Application.Top.Add (sb);
-			sb.Redraw (sb.Bounds);
+			sb.OnDraw ();
 
 			string expected = @$"
 CTRL-O Open {Application.Driver.VLine} CTRL-Q Quit

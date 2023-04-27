@@ -59,7 +59,7 @@ namespace UICatalog.Scenarios {
 
 		private class SnakeView : View {
 
-			private Attribute red = new Terminal.Gui.Attribute (Color.Red,Color.Black);
+			private Attribute red = new Terminal.Gui.Attribute (Color.Red, Color.Black);
 			private Attribute white = new Terminal.Gui.Attribute (Color.White, Color.Black);
 
 			public SnakeState State { get; }
@@ -78,9 +78,9 @@ namespace UICatalog.Scenarios {
 				};
 			}
 
-			public override void Redraw (Rect bounds)
+			public override void OnDraw ()
 			{
-				base.Redraw (bounds);
+				base.OnDraw ();
 
 				Driver.SetAttribute (white);
 				Clear ();
@@ -110,7 +110,7 @@ namespace UICatalog.Scenarios {
 
 				}
 
-				foreach(var p in canvas.GetMap (bounds)) {
+				foreach (var p in canvas.GetMap (Bounds)) {
 					AddRune (p.Key.X, p.Key.Y, p.Value);
 				}
 
@@ -195,7 +195,7 @@ namespace UICatalog.Scenarios {
 					Apple = GetNewRandomApplePoint ();
 
 					var delta = 5;
-					if(SleepAfterAdvancingState < 40) {
+					if (SleepAfterAdvancingState < 40) {
 						delta = 3;
 					}
 					if (SleepAfterAdvancingState < 30) {

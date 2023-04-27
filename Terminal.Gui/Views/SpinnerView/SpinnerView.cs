@@ -146,7 +146,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDraw ()
 		{
 			if (DateTime.Now - _lastRender > TimeSpan.FromMilliseconds (SpinDelay)) {
 				//_currentIdx = (_currentIdx + 1) % Sequence.Length;
@@ -186,7 +186,7 @@ namespace Terminal.Gui {
 				_lastRender = DateTime.Now;
 			}
 
-			base.Redraw (bounds);
+			base.OnDraw ();
 		}
 
 		/// <summary>

@@ -197,7 +197,7 @@ namespace Terminal.Gui {
 				var tile = new Tile ();
 				tiles.Add (tile);
 				Add (tile.ContentView);
-				tile.TitleChanged += (s,e) => SetNeedsDisplay ();
+				tile.TitleChanged += (s, e) => SetNeedsDisplay ();
 			}
 
 			LayoutSubviews ();
@@ -387,12 +387,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDraw ()
 		{
 			Driver.SetAttribute (ColorScheme.Normal);
 			Clear ();
 
-			base.Redraw (bounds);
+			base.OnDraw ();
 
 			var lc = new LineCanvas ();
 
@@ -402,11 +402,11 @@ namespace Terminal.Gui {
 			if (IsRootTileView ()) {
 				if (HasBorder ()) {
 
-					lc.AddLine (new Point (0, 0), bounds.Width - 1, Orientation.Horizontal, LineStyle);
-					lc.AddLine (new Point (0, 0), bounds.Height - 1, Orientation.Vertical, LineStyle);
+					lc.AddLine (new Point (0, 0), Bounds.Width - 1, Orientation.Horizontal, LineStyle);
+					lc.AddLine (new Point (0, 0), Bounds.Height - 1, Orientation.Vertical, LineStyle);
 
-					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Width + 1, Orientation.Horizontal, LineStyle);
-					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Height + 1, Orientation.Vertical, LineStyle);
+					lc.AddLine (new Point (Bounds.Width - 1, Bounds.Height - 1), -Bounds.Width + 1, Orientation.Horizontal, LineStyle);
+					lc.AddLine (new Point (Bounds.Width - 1, Bounds.Height - 1), -Bounds.Height + 1, Orientation.Vertical, LineStyle);
 				}
 
 				foreach (var line in allLines) {
@@ -432,10 +432,10 @@ namespace Terminal.Gui {
 			}
 
 			Driver.SetAttribute (ColorScheme.Normal);
-			foreach (var p in lc.GetMap (bounds)) {
+			foreach (var p in lc.GetMap (Bounds)) {
 				this.AddRune (p.Key.X, p.Key.Y, p.Value);
 			}
-			
+
 			// Redraw the lines so that focus/drag symbol renders
 			foreach (var line in allLines) {
 				line.DrawSplitterSymbol ();
@@ -528,8 +528,8 @@ namespace Terminal.Gui {
 		{
 			bool focusMoved = false;
 
-			if(keyEvent.Key == ToggleResizable) {
-				foreach(var l in splitterLines) {
+			if (keyEvent.Key == ToggleResizable) {
+				foreach (var l in splitterLines) {
 
 					var iniBefore = l.IsInitialized;
 					l.IsInitialized = false;
@@ -915,9 +915,9 @@ namespace Terminal.Gui {
 				return base.OnEnter (view);
 			}
 
-			public override void Redraw (Rect bounds)
+			public override void OnDraw ()
 			{
-				base.Redraw (bounds);
+				base.OnDraw ();
 
 				DrawSplitterSymbol ();
 			}

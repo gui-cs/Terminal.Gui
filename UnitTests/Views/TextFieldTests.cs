@@ -1457,19 +1457,19 @@ Les Miśerables", output);
 		{
 			var tf = GetTextFieldsInView ();
 
-			tf.Redraw (tf.Bounds);
+			tf.Draw ();
 			TestHelpers.AssertDriverContentsAre ("", output);
 
 			// Caption has no effect when focused
 			tf.Caption = "Enter txt";
 			Assert.True (tf.HasFocus);
-			tf.Redraw (tf.Bounds);
+			tf.Draw ();
 			TestHelpers.AssertDriverContentsAre ("", output);
 
 			Application.Driver.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
 
 			Assert.False (tf.HasFocus);
-			tf.Redraw (tf.Bounds);
+			tf.Draw ();
 			TestHelpers.AssertDriverContentsAre ("Enter txt", output);
 		}
 
@@ -1480,7 +1480,7 @@ Les Miśerables", output);
 		{
 			var tf = GetTextFieldsInView ();
 
-			tf.Redraw (tf.Bounds);
+			tf.Draw ();
 			TestHelpers.AssertDriverContentsAre ("", output);
 
 			tf.Caption = "Enter txt";
@@ -1488,12 +1488,12 @@ Les Miśerables", output);
 
 			// Caption should appear when not focused and no text
 			Assert.False (tf.HasFocus);
-			tf.Redraw (tf.Bounds);
+			tf.Draw ();
 			TestHelpers.AssertDriverContentsAre ("Enter txt", output);
 
 			// but disapear when text is added
 			tf.Text = content;
-			tf.Redraw (tf.Bounds);
+			tf.Draw ();
 			TestHelpers.AssertDriverContentsAre (content, output);
 		}
 
@@ -1511,7 +1511,7 @@ Les Miśerables", output);
 			Application.Driver.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
 			Assert.False (tf.HasFocus);
 
-			tf.Redraw (tf.Bounds);
+			tf.Draw ();
 			TestHelpers.AssertDriverContentsAre ("Misérables", output);
 		}
 
@@ -1526,7 +1526,7 @@ Les Miśerables", output);
 			Application.Driver.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
 			Assert.False (tf.HasFocus);
 
-			tf.Redraw (tf.Bounds);
+			tf.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedRender, output);
 		}
 

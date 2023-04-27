@@ -107,7 +107,7 @@ namespace Terminal.Gui {
 			Initialize ();
 		}
 
-		private void Initialize()
+		private void Initialize ()
 		{
 			CanFocus = true;
 			Width = colorsPerLine * horizontalZoom;
@@ -140,9 +140,9 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDraw ()
 		{
-			base.Redraw (bounds);
+			base.OnDraw ();
 
 			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : GetNormalColor ());
 			var colorIndex = 0;

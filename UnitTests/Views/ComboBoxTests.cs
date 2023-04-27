@@ -816,7 +816,7 @@ Three
 			Assert.True (cb.IsShow);
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
-			cb.Redraw (cb.Bounds);
+			cb.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
      ▼
 One   
@@ -843,7 +843,7 @@ Three ", output);
 			Assert.True (cb.IsShow);
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
-			cb.Redraw (cb.Bounds);
+			cb.Draw ();
 			TestHelpers.AssertDriverColorsAre (@"
 000000
 222222
@@ -855,7 +855,7 @@ Three ", output);
 			Assert.True (cb.IsShow);
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
-			cb.Redraw (cb.Bounds);
+			cb.Draw ();
 			TestHelpers.AssertDriverColorsAre (@"
 000000
 222222
@@ -873,7 +873,7 @@ Three ", output);
 			Assert.True (cb.IsShow);
 			Assert.Equal (2, cb.SelectedItem);
 			Assert.Equal ("Three", cb.Text);
-			cb.Redraw (cb.Bounds);
+			cb.Draw ();
 			TestHelpers.AssertDriverColorsAre (@"
 000000
 222222
@@ -885,7 +885,7 @@ Three ", output);
 			Assert.True (cb.IsShow);
 			Assert.Equal (2, cb.SelectedItem);
 			Assert.Equal ("Three", cb.Text);
-			cb.Redraw (cb.Bounds);
+			cb.Draw ();
 			TestHelpers.AssertDriverColorsAre (@"
 000000
 222222
@@ -897,7 +897,7 @@ Three ", output);
 			Assert.True (cb.IsShow);
 			Assert.Equal (2, cb.SelectedItem);
 			Assert.Equal ("Three", cb.Text);
-			cb.Redraw (cb.Bounds);
+			cb.Draw ();
 			TestHelpers.AssertDriverColorsAre (@"
 000000
 000002

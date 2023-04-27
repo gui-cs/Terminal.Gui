@@ -117,7 +117,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDraw ()
 		{
 			Move (0, 0);
 			Driver.SetAttribute (GetNormalColor ());

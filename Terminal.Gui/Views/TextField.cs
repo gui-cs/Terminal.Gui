@@ -436,7 +436,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDraw ()
 		{
 			var selColor = new Attribute (ColorScheme.Focus.Background, ColorScheme.Focus.Foreground);
 			SetSelectedStartSelectedLength ();

@@ -198,7 +198,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// The View-relative rectangle where View content is displayed. SubViews are positioned relative to 
-		/// Bounds.<see cref="Rect.Location">Location</see> (which is always (0, 0)) and <see cref="Redraw(Rect)"/> clips drawing to 
+		/// Bounds.<see cref="Rect.Location">Location</see> (which is always (0, 0)) and <see cref="Draw()"/> clips drawing to 
 		/// Bounds.<see cref="Rect.Size">Size</see>.
 		/// </summary>
 		/// <value>The bounds.</value>
@@ -469,13 +469,13 @@ namespace Terminal.Gui {
 			if (LayoutNeeded)
 				return;
 			LayoutNeeded = true;
-			if (SuperView == null)
-				return;
-			SuperView.SetNeedsLayout ();
 			foreach (var view in Subviews) {
 				view.SetNeedsLayout ();
 			}
 			TextFormatter.NeedsFormat = true;
+			if (SuperView == null)
+				return;
+			SuperView.SetNeedsLayout ();
 		}
 
 		/// <summary>

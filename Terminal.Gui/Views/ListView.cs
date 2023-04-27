@@ -349,9 +349,9 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDraw ()
 		{
-			base.Redraw (bounds);
+			base.OnDraw ();
 
 			var current = ColorScheme.Focus;
 			Driver.SetAttribute (current);

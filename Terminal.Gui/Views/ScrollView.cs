@@ -355,7 +355,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDraw ()
 		{
 			SetViewsNeedsDisplay ();
 
@@ -363,7 +363,7 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (GetNormalColor ());
 			Clear ();
 
-			contentView.Redraw (contentView.Bounds);
+			contentView.OnDraw ();
 			OnDrawContent (new Rect (ContentOffset,
 				new Size (Math.Max (Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
 					Math.Max (Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0))));
@@ -373,12 +373,12 @@ namespace Terminal.Gui {
 			} else {
 				if (ShowVerticalScrollIndicator) {
 					//vertical.SetRelativeLayout (Bounds);
-					vertical.Redraw (vertical.Bounds);
+					vertical.Draw ();
 				}
 
 				if (ShowHorizontalScrollIndicator) {
 					//horizontal.SetRelativeLayout (Bounds);
-					horizontal.Redraw (horizontal.Bounds);
+					horizontal.Draw ();
 				}
 			}
 
@@ -445,11 +445,11 @@ namespace Terminal.Gui {
 
 			if (v) {
 				vertical.SetRelativeLayout (Bounds);
-				vertical.Redraw (vertical.Bounds);
+				vertical.Draw ();
 			}
 			if (h) {
 				horizontal.SetRelativeLayout (Bounds);
-				horizontal.Redraw (horizontal.Bounds);
+				horizontal.Draw ();
 			}
 		}
 

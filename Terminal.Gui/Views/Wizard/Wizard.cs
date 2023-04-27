@@ -201,7 +201,7 @@ namespace Terminal.Gui {
 						helpTextView.Width = Dim.Fill ();
 
 					} else {
-						contentView.Width = Dim.Fill();
+						contentView.Width = Dim.Fill ();
 					}
 				} else {
 					if (helpTextView.Text.Length > 0) {
@@ -269,7 +269,8 @@ namespace Terminal.Gui {
 		/// The Wizard will be vertically and horizontally centered in the container.
 		/// After initialization use <c>X</c>, <c>Y</c>, <c>Width</c>, and <c>Height</c> change size and position.
 		/// </remarks>
-		public Wizard () : base () { 
+		public Wizard () : base ()
+		{
 
 			// Using Justify causes the Back and Next buttons to be hard justified against
 			// the left and right edge
@@ -302,7 +303,7 @@ namespace Terminal.Gui {
 				AddKeyBinding (Key.Esc, Command.QuitToplevel);
 			}
 			SetNeedsLayout ();
-			
+
 		}
 
 		private void Wizard_TitleChanged (object sender, TitleEventArgs e)
@@ -517,8 +518,8 @@ namespace Terminal.Gui {
 		{
 			SizeStep (newStep);
 
-			newStep.EnabledChanged += (s,e)=> UpdateButtonsAndTitle();
-			newStep.TitleChanged += (s,e) => UpdateButtonsAndTitle ();
+			newStep.EnabledChanged += (s, e) => UpdateButtonsAndTitle ();
+			newStep.TitleChanged += (s, e) => UpdateButtonsAndTitle ();
 			steps.AddLast (newStep);
 			this.Add (newStep);
 			UpdateButtonsAndTitle ();
@@ -677,7 +678,7 @@ namespace Terminal.Gui {
 
 			SetNeedsLayout ();
 			LayoutSubviews ();
-			Redraw (Bounds);
+			Draw ();
 		}
 
 		private void SizeStep (WizardStep step)

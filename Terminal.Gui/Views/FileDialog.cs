@@ -613,19 +613,19 @@ namespace Terminal.Gui {
 			= Enumerable.Empty<string> ().ToList ().AsReadOnly ();
 
 		/// <inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDraw ()
 		{
-			base.Redraw (bounds);
+			base.OnDraw ();
 
 			if (!string.IsNullOrWhiteSpace (feedback)) {
 				var feedbackWidth = feedback.Sum (c => Rune.ColumnWidth (c));
-				var feedbackPadLeft = ((bounds.Width - feedbackWidth) / 2) - 1;
+				var feedbackPadLeft = ((Bounds.Width - feedbackWidth) / 2) - 1;
 
-				feedbackPadLeft = Math.Min (bounds.Width, feedbackPadLeft);
+				feedbackPadLeft = Math.Min (Bounds.Width, feedbackPadLeft);
 				feedbackPadLeft = Math.Max (0, feedbackPadLeft);
 
-				var feedbackPadRight = bounds.Width - (feedbackPadLeft + feedbackWidth + 2);
-				feedbackPadRight = Math.Min (bounds.Width, feedbackPadRight);
+				var feedbackPadRight = Bounds.Width - (feedbackPadLeft + feedbackWidth + 2);
+				feedbackPadRight = Math.Min (Bounds.Width, feedbackPadRight);
 				feedbackPadRight = Math.Max (0, feedbackPadRight);
 
 				Move (0, Bounds.Height / 2);

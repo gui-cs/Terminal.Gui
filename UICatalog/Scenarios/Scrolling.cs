@@ -27,7 +27,7 @@ namespace UICatalog.Scenarios {
 				throw new NotImplementedException ();
 			}
 
-			public override void Redraw (Rect bounds)
+			public override void OnDraw ()
 			{
 				//Point pos = new Point (region.X, region.Y);
 				Driver.SetAttribute (ColorScheme.Focus);
@@ -60,7 +60,7 @@ namespace UICatalog.Scenarios {
 				return new Size (w, h);
 			}
 
-			public override void Redraw (Rect bounds)
+			public override void OnDraw ()
 			{
 				Driver.SetAttribute (ColorScheme.Focus);
 				var f = Frame;

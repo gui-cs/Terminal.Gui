@@ -171,9 +171,12 @@ namespace Terminal.Gui.ViewsTests {
 				ProgressBarStyle = ProgressBarStyle.MarqueeBlocks
 			};
 
+			pb.BeginInit ();
+			pb.EndInit ();
+
 			for (int i = 0; i < 38; i++) {
 				pb.Pulse ();
-				pb.Redraw (pb.Bounds);
+				pb.Draw ();
 				if (i == 0) {
 					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 0, 0]);
 					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
@@ -798,9 +801,12 @@ namespace Terminal.Gui.ViewsTests {
 				BidirectionalMarquee = false
 			};
 
+			pb.BeginInit ();
+			pb.EndInit ();
+
 			for (int i = 0; i < 38; i++) {
 				pb.Pulse ();
-				pb.Redraw (pb.Bounds);
+				pb.Draw ();
 				if (i == 0) {
 					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 0, 0]);
 					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);
@@ -1423,9 +1429,12 @@ namespace Terminal.Gui.ViewsTests {
 				Width = 5
 			};
 
+			pb.BeginInit ();
+			pb.EndInit ();
+
 			for (int i = 0; i <= pb.Frame.Width; i++) {
 				pb.Fraction += 0.2F;
-				pb.Redraw (pb.Bounds);
+				pb.Draw ();
 				if (i == 0) {
 					Assert.Equal (driver.BlocksMeterSegment, (double)driver.Contents [0, 0, 0]);
 					Assert.Equal (' ', (double)driver.Contents [0, 1, 0]);

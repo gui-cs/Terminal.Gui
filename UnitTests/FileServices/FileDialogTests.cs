@@ -400,7 +400,7 @@ namespace Terminal.Gui.FileServicesTests {
 
 			fd.Style.Culture = new CultureInfo("en-US");
 
-			fd.Redraw (fd.Bounds);
+			fd.Draw ();
 			
 			string expected =
 			@"
@@ -435,7 +435,7 @@ namespace Terminal.Gui.FileServicesTests {
 
 			fd.Style.Culture = new CultureInfo("en-US");
 
-			fd.Redraw (fd.Bounds);
+			fd.Draw ();
 
 
 			string expected =
