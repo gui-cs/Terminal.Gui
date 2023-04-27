@@ -2486,6 +2486,41 @@ A B C
 			Assert.Null (tableView.ScreenToCell (3, 4, out col));
 			Assert.Null (col);
 		}
+
+		[Fact,AutoInitShutdown]
+		public void TestEnumerableDataSource_BasicTypes()
+		{
+			var tv = new TableView ();
+			tv.ColorScheme = Colors.TopLevel;
+			tv.Bounds = new Rect (0, 0, 50, 5);
+			tv.Style.ShowHorizontalHeaderUnderline = true;
+			tv.Style.ShowHorizontalHeaderOverline = false;
+			tv.Style.AlwaysShowHeaders = true;
+			tv.Style.SmoothHorizontalScrolling = true;
+
+			tv.Table = new EnumerableTableDataSource<Type> (
+				new Type [] { typeof (string), typeof (int), typeof (float) },
+				new () {
+					{ "Name", (t)=>t.Name},
+					{ "Namespace", (t)=>t.Namespace},
+					{ "BaseType", (t)=>t.BaseType}
+				});
+
+			tv.LayoutSubviews ();
+
+			tv.Redraw (tv.Bounds);
+
+			string expected =
+				@"
+│Name  │Namespace│BaseType                       │
+├──────┼─────────┼───────────────────────────────┤
+│String│System   │System.Object                  │
+│Int32 │System   │System.ValueType               │
+│Single│System   │System.ValueType               │";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+			int? col;
+		}
 		private TableView GetTwoRowSixColumnTable ()
 		{
 			return GetTwoRowSixColumnTable (out _);
