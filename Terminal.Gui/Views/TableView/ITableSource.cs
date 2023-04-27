@@ -2,7 +2,7 @@
 	/// <summary>
 	/// Tabular matrix of data to be displayed in a <see cref="TableView"/>.
 	/// </summary>
-	public interface ITableDataSource
+	public interface ITableSource
 	{
 		/// <summary>
 		/// Gets the number of rows in the table.

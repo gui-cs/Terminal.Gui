@@ -8,7 +8,7 @@ using System.Linq;
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// View for tabular data based on a <see cref="ITableDataSource"/>.
+	/// View for tabular data based on a <see cref="ITableSource"/>.
 	/// 
 	/// <a href="https://gui-cs.github.io/Terminal.Gui/articles/tableview.html">See TableView Deep Dive for more information</a>.
 	/// </summary>
@@ -18,7 +18,7 @@ namespace Terminal.Gui {
 		private int rowOffset;
 		private int selectedRow;
 		private int selectedColumn;
-		private ITableDataSource table;
+		private ITableSource table;
 		private TableStyle style = new TableStyle ();
 		private Key cellActivationKey = Key.Enter;
 
@@ -38,7 +38,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The data table to render in the view.  Setting this property automatically updates and redraws the control.
 		/// </summary>
-		public ITableDataSource Table { get => table; set { table = value; Update (); } }
+		public ITableSource Table { get => table; set { table = value; Update (); } }
 
 		/// <summary>
 		/// Contains options for changing how the table is rendered
@@ -160,7 +160,7 @@ namespace Terminal.Gui {
 		/// Initialzies a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. 
 		/// </summary>
 		/// <param name="table">The table to display in the control</param>
-		public TableView (ITableDataSource table) : this ()
+		public TableView (ITableSource table) : this ()
 		{
 			this.Table = table;
 		}
@@ -1982,7 +1982,7 @@ namespace Terminal.Gui {
 			/// <summary>
 			/// The data table hosted by the <see cref="TableView"/> control.
 			/// </summary>
-			public ITableDataSource Table { get; }
+			public ITableSource Table { get; }
 
 			/// <summary>
 			/// The index of the row in <see cref="Table"/> for which color is needed
@@ -2009,7 +2009,7 @@ namespace Terminal.Gui {
 			/// </summary>
 			public ColorScheme RowScheme { get; }
 
-			internal CellColorGetterArgs (ITableDataSource table, int rowIdx, int colIdx, object cellValue, string representation, ColorScheme rowScheme)
+			internal CellColorGetterArgs (ITableSource table, int rowIdx, int colIdx, object cellValue, string representation, ColorScheme rowScheme)
 			{
 				Table = table;
 				RowIndex = rowIdx;
@@ -2022,7 +2022,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Arguments for <see cref="RowColorGetterDelegate"/>. Describes a row of data in a <see cref="ITableDataSource"/>
+		/// Arguments for <see cref="RowColorGetterDelegate"/>. Describes a row of data in a <see cref="ITableSource"/>
 		/// for which <see cref="ColorScheme"/> is sought.
 		/// </summary>
 		public class RowColorGetterArgs {
@@ -2030,14 +2030,14 @@ namespace Terminal.Gui {
 			/// <summary>
 			/// The data table hosted by the <see cref="TableView"/> control.
 			/// </summary>
-			public ITableDataSource Table { get; }
+			public ITableSource Table { get; }
 
 			/// <summary>
 			/// The index of the row in <see cref="Table"/> for which color is needed
 			/// </summary>
 			public int RowIndex { get; }
 
-			internal RowColorGetterArgs (ITableDataSource table, int rowIdx)
+			internal RowColorGetterArgs (ITableSource table, int rowIdx)
 			{
 				Table = table;
 				RowIndex = rowIdx;

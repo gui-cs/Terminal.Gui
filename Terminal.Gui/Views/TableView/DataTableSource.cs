@@ -3,11 +3,11 @@ using System.Linq;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// <see cref="ITableDataSource"/> implementation that wraps 
+	/// <see cref="ITableSource"/> implementation that wraps 
 	/// a <see cref="System.Data.DataTable"/>.  This class is
 	/// mutable: changes are permitted to the wrapped <see cref="DataTable"/>.
 	/// </summary>
-	public class DataTableSource : ITableDataSource
+	public class DataTableSource : ITableSource
 	{
 		private readonly DataTable table;
 

@@ -5,10 +5,10 @@ using System.Linq;
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// <see cref="ITableDataSource"/> implementation that wraps arbitrary data.
+	/// <see cref="ITableSource"/> implementation that wraps arbitrary data.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class EnumerableTableDataSource<T> : ITableDataSource {
+	public class EnumerableTableDataSource<T> : ITableSource {
 		private T [] data;
 		private string [] cols;
 		private Dictionary<string, Func<T, object>> lamdas;
