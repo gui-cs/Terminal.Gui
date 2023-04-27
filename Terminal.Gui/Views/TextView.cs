@@ -1969,12 +1969,12 @@ namespace Terminal.Gui {
 					_currentColumn = 0;
 					_currentRow = 0;
 					savedHeight = Height;
-					var lyout = LayoutStyle;
+					var prevLayoutStyle = LayoutStyle;
 					if (LayoutStyle == LayoutStyle.Computed) {
 						LayoutStyle = LayoutStyle.Absolute;
 					}
 					Height = 1;
-					LayoutStyle = lyout;
+					LayoutStyle = prevLayoutStyle;
 					if (!IsInitialized) {
 						_model.LoadString (Text);
 					}
