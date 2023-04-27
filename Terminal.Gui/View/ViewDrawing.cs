@@ -295,7 +295,9 @@ namespace Terminal.Gui {
 
 		// TODO: Make this cancelable
 		/// <summary>
-		/// 
+		/// Prepares <see cref="View.LineCanvas"/>. If <see cref="SuperViewRendersLineCanvas"/> is true, only the <see cref="LineCanvas"/> of 
+		/// this view's subviews will be rendered. If <see cref="SuperViewRendersLineCanvas"/> is false (the default), this 
+		/// method will cause the <see cref="LineCanvas"/> be prepared to be rendered.
 		/// </summary>
 		/// <returns></returns>
 		public virtual bool OnDrawFrames ()
@@ -325,7 +327,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Draws all processes for this view.
+		/// Draws the view. Causes the following virtual methods to be called (along with their related events): 
+		/// <see cref="OnDrawContent"/>, <see cref="OnDraw"/>, <see cref="OnDrawContentComplete"/>.
 		/// </summary>
 		public void Draw ()
 		{
@@ -415,7 +418,9 @@ namespace Terminal.Gui {
 
 		// TODO: Make this cancelable
 		/// <summary>
-		/// 
+		/// Renders <see cref="View.LineCanvas"/>. If <see cref="SuperViewRendersLineCanvas"/> is true, only the <see cref="LineCanvas"/> of 
+		/// this view's subviews will be rendered. If <see cref="SuperViewRendersLineCanvas"/> is false (the default), this 
+		/// method will cause the <see cref="LineCanvas"/> to be rendered.
 		/// </summary>
 		/// <returns></returns>
 		public virtual bool OnRenderLineCanvas ()

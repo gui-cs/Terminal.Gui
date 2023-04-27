@@ -57,7 +57,7 @@ namespace Terminal.Gui {
 		public Rect Rect { get; }
 
 		/// <summary>
-		/// Allows canceling a draw of applicable.
+		/// If set to true, the draw operation will be canceled, if applicable.
 		/// </summary>
 		public bool Cancel { get; set; }
 	}
