@@ -415,8 +415,8 @@ namespace Terminal.Gui {
 				LineCanvas.Clear ();
 			}
 
-			if (Subviews.Select (s => s.SuperViewRendersLineCanvas).Count () > 0) {
-				foreach (var subview in Subviews.Where (s => s.SuperViewRendersLineCanvas)) {
+			if (Subviews.Where (s => s.SuperViewRendersLineCanvas).Count () > 0) {
+				foreach (var subview in Subviews.Where (s => s.SuperViewRendersLineCanvas == true)) {
 					// Combine the LineCavas'
 					LineCanvas.Merge (subview.LineCanvas);
 					subview.LineCanvas.Clear ();
