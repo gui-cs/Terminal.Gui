@@ -359,6 +359,19 @@ namespace UICatalog {
 				ScenarioList.Style.ShowVerticalCellLines = false;
 				ScenarioList.Style.ShowVerticalHeaderLines = false;
 
+				/* By default TableView lays out columns at render time and only
+				 * measures y rows of data at a time.  Where y is the height of the
+				 * console. This is for the following reasons:
+				 * 
+				 * - Performance, when tables have a large amount of data
+				 * - Defensive, prevents a single wide cell value pushing other
+				 *   columns off screen (requiring horizontal scrolling
+				 * 
+				 * In the case of UICatalog here, such an approach is overkill so
+				 * we just measure all the data ourselves and set the appropriate
+				 * max widths as ColumnStyles 
+				 */
+
 				var longestName = _scenarios!.Max (s => s.GetName ().Length);
 				ScenarioList.Style.ColumnStyles.Add (0, new ColumnStyle () { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName });
 				ScenarioList.Style.ColumnStyles.Add (1, new ColumnStyle () {  MaxWidth = 1 });
