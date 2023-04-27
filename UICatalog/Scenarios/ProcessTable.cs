@@ -43,6 +43,8 @@ namespace UICatalog.Scenarios {
 
 		private void CreateProcessTable ()
 		{
+			var ro = tableView.RowOffset;
+			var co = tableView.ColumnOffset;
 			tableView.Table = new EnumerableTableSource<Process> (Process.GetProcesses (),
 				new Dictionary<string, Func<Process, object>>() {
 					{ "ID",(p)=>p.Id},
@@ -51,6 +53,10 @@ namespace UICatalog.Scenarios {
 					{ "Virtual Memory",(p)=>p.VirtualMemorySize64},
 					{ "Working Memory",(p)=>p.WorkingSet64},
 				});
+
+			tableView.RowOffset = ro;
+			tableView.ColumnOffset = co;
+			tableView.EnsureValidScrollOffsets ();
 		}
 	}
 }
