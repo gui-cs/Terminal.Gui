@@ -43,7 +43,7 @@ namespace UICatalog.Scenarios {
 
 		private void CreateProcessTable ()
 		{
-			tableView.Table = new EnumerableTableDataSource<Process> (Process.GetProcesses (),
+			tableView.Table = new EnumerableTableSource<Process> (Process.GetProcesses (),
 				new Dictionary<string, Func<Process, object>>() {
 					{ "ID",(p)=>p.Id},
 					{ "Name",(p)=>p.ProcessName},

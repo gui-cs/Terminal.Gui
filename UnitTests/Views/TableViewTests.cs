@@ -2494,7 +2494,7 @@ A B C
 			tv.ColorScheme = Colors.TopLevel;
 			tv.Bounds = new Rect (0, 0, 50, 6);
 
-			tv.Table = new EnumerableTableDataSource<Type> (
+			tv.Table = new EnumerableTableSource<Type> (
 				new Type [] { typeof (string), typeof (int), typeof (float) },
 				new () {
 					{ "Name", (t)=>t.Name},

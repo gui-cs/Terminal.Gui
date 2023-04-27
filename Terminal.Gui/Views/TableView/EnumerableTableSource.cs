@@ -8,7 +8,7 @@ namespace Terminal.Gui {
 	/// <see cref="ITableSource"/> implementation that wraps arbitrary data.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class EnumerableTableDataSource<T> : ITableSource {
+	public class EnumerableTableSource<T> : ITableSource {
 		private T [] data;
 		private string [] cols;
 		private Dictionary<string, Func<T, object>> lamdas;
@@ -30,7 +30,7 @@ namespace Terminal.Gui {
 		///    { "Colname2", (t)=>t.SomeOtherField}
 		///}
 		/// </code></param>
-		public EnumerableTableDataSource (IEnumerable<T> data, Dictionary<string, Func<T, object>> columnDefinitions)
+		public EnumerableTableSource (IEnumerable<T> data, Dictionary<string, Func<T, object>> columnDefinitions)
 		{
 			this.data = data.ToArray ();
 			this.cols = columnDefinitions.Keys.ToArray ();

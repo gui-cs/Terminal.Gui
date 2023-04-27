@@ -57,7 +57,7 @@ tableView.Table = new DataTableSource(yourDataTable);
 
 ## Object data
 If your data objects are not stored in a `System.Data.DataTable` then you can instead
-create a table using `EnumerableTableDataSource<T>` or implementing your own `ITableSource`
+create a table using `EnumerableTableSource<T>` or implementing your own `ITableSource`
 class.
 
 For example to render data for the currently running processes:
