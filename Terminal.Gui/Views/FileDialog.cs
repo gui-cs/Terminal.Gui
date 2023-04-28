@@ -324,12 +324,8 @@ namespace Terminal.Gui {
 			this.tableView.Style.ShowHorizontalHeaderUnderline = true;
 			this.tableView.Style.ShowHorizontalScrollIndicators = true;
 
-			this.SetupTableColumns ();
-
 			this.sorter = new FileDialogSorter (this, this.tableView);
 			this.history = new FileDialogHistory (this);
-
-			this.tableView.Table = new DataTableSource(this.dtFiles);
 
 			this.tbPath.TextChanged += (s, e) => this.PathChanged ();
 
@@ -1324,9 +1320,6 @@ namespace Terminal.Gui {
 					return;
 				}
 
-				// TODO: Consider preserving selection
-				dlg.dtFiles.Rows.Clear ();
-
 				var colName = col == null ? null : StripArrows (tableView.Table.ColumnNames[col.Value]);
 
 				var stats = this.dlg.State?.Children ?? new FileSystemInfoStats [0];
@@ -1342,19 +1335,17 @@ namespace Terminal.Gui {
 				}
 
 				// This portion is never reordered (aways .. at top then folders)
-				var forcedOrder = stats.Select ((v, i) => new { v, i })
-						.OrderByDescending (f => f.v.IsParent)
-						.ThenBy (f => f.v.IsDir() ? -1:100);
+				var forcedOrder = stats
+				.OrderByDescending (f => f.IsParent)
+						.ThenBy (f => f.IsDir() ? -1:100);
 
 				// This portion is flexible based on the column clicked (e.g. alphabetical)
 				var ordered = 
 					this.currentSortIsAsc ?
-					    forcedOrder.ThenBy (f => sortAlgorithm (f.v)):
-						forcedOrder.ThenByDescending (f => sortAlgorithm (f.v));
+					    forcedOrder.ThenBy (f => sortAlgorithm (f)):
+						forcedOrder.ThenByDescending (f => sortAlgorithm (f));
 
-				foreach (var o in ordered) {
-					this.dlg.BuildRow (o.i);
-				}
+				dlg.State.Children = ordered.ToArray();
 
 				foreach (DataColumn c in dlg.dtFiles.Columns) {
 
