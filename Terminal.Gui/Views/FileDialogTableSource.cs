@@ -4,11 +4,15 @@ using System.Linq;
 namespace Terminal.Gui {
 	internal class FileDialogTableSource : ITableSource {
 		readonly FileDialogStyle style;
+		readonly int currentSortColumn;
+		readonly bool currentSortIsAsc;
 		readonly FileDialogState state;
 
-		public FileDialogTableSource (FileDialogState state, FileDialogStyle style)
+		public FileDialogTableSource (FileDialogState state, FileDialogStyle style, int currentSortColumn, bool currentSortIsAsc)
 		{
 			this.style = style;
+			this.currentSortColumn = currentSortColumn;
+			this.currentSortIsAsc = currentSortIsAsc;
 			this.state = state;
 		}
 
@@ -38,13 +42,21 @@ namespace Terminal.Gui {
 
 		public int Columns => 4;
 
-
-		// TODO show arrows for sort
 		public string [] ColumnNames => new string []{
-			style.FilenameColumnName,
-			style.SizeColumnName,
-			style.ModifiedColumnName,
-			style.TypeColumnName
+			MaybeAddSortArrows(style.FilenameColumnName,0),
+			MaybeAddSortArrows(style.SizeColumnName,1),
+			MaybeAddSortArrows(style.ModifiedColumnName,2),
+			MaybeAddSortArrows(style.TypeColumnName,3)
 		};
+
+		private string MaybeAddSortArrows (string name, int idx)
+		{
+			if(idx == currentSortColumn)
+			{
+				return name + (currentSortIsAsc ? " (▲)" : " (▼)");
+			}
+
+			return name;
+		}
 	}
 }
