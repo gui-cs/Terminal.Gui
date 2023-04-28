@@ -107,7 +107,7 @@ namespace Terminal.Gui {
 		private MenuBar allowedTypeMenuBar;
 		private MenuBarItem allowedTypeMenu;
 		private MenuItem [] allowedTypeMenuItems;
-		private DataColumn filenameColumn;
+		private int filenameColumn;
 
 		/// <summary>
 		/// Event fired when user attempts to confirm a selection (or multi selection).
@@ -226,7 +226,7 @@ namespace Terminal.Gui {
 				if (this.tableView.SelectedRow <= 0) {
 					this.NavigateIf (k, Key.CursorUp, this.tbPath);
 				}
-				if (this.tableView.SelectedRow == this.tableView.Table.Rows.Count-1) {
+				if (this.tableView.SelectedRow == this.tableView.Table.Rows - 1) {
 					this.NavigateIf (k, Key.CursorDown, this.btnToggleSplitterCollapse);
 				}
 
@@ -318,7 +318,7 @@ namespace Terminal.Gui {
 			this.sorter = new FileDialogSorter (this, this.tableView);
 			this.history = new FileDialogHistory (this);
 
-			this.tableView.Table = this.dtFiles;
+			this.tableView.Table = new DataTableSource(this.dtFiles);
 
 			this.tbPath.TextChanged += (s, e) => this.PathChanged ();
 
@@ -514,7 +514,7 @@ namespace Terminal.Gui {
 
 		private void CycleToNextTableEntryBeginningWith (KeyEventEventArgs keyEvent)
 		{
-			if (tableView.Table.Rows.Count == 0) {
+			if (tableView.Table.Rows == 0) {
 				return;
 			}
 
@@ -539,11 +539,10 @@ namespace Terminal.Gui {
 		{
 			tableView.EnsureValidSelection ();
 			var col = tableView.SelectedColumn;
-			var style = tableView.Style.GetColumnStyleIfAny (tableView.Table.Columns [col]);
+			var style = tableView.Style.GetColumnStyleIfAny (col);
 
 
-			var collection = tableView
-				.Table
+			var collection = dtFiles
 				.Rows
 				.Cast<DataRow> ()
 				.Select ((o, idx) => col == 0 ? 
@@ -897,7 +896,7 @@ namespace Terminal.Gui {
 
 		private void TableView_SelectedCellChanged (object sender, SelectedCellChangedEventArgs obj)
 		{
-			if (!this.tableView.HasFocus || obj.NewRow == -1 || obj.Table.Rows.Count == 0) {
+			if (!this.tableView.HasFocus || obj.NewRow == -1 || obj.Table.Rows == 0) {
 				return;
 			}
 
@@ -969,7 +968,7 @@ namespace Terminal.Gui {
 			this.dtFiles = new DataTable ();
 
 			var nameStyle = this.tableView.Style.GetOrCreateColumnStyle (
-				filenameColumn = this.dtFiles.Columns.Add (Style.FilenameColumnName, typeof (int))
+				filenameColumn = this.dtFiles.Columns.Add (Style.FilenameColumnName, typeof (int)).Ordinal
 				);
 			nameStyle.RepresentationGetter = (i) => {
 
@@ -989,11 +988,13 @@ namespace Terminal.Gui {
 
 			nameStyle.MinWidth = 50;
 
-			var sizeStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (Style.SizeColumnName, typeof (int)));
+			var sizeStyle = this.tableView.Style.GetOrCreateColumnStyle (
+				this.dtFiles.Columns.Add (Style.SizeColumnName, typeof (int)).Ordinal);
 			sizeStyle.RepresentationGetter = (i) => this.State?.Children [(int)i].HumanReadableLength ?? string.Empty;
 			nameStyle.MinWidth = 10;
 
-			var dateModifiedStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (Style.ModifiedColumnName, typeof (int)));
+			var dateModifiedStyle = this.tableView.Style.GetOrCreateColumnStyle (
+				this.dtFiles.Columns.Add (Style.ModifiedColumnName, typeof (int)).Ordinal);
 			dateModifiedStyle.RepresentationGetter = (i) => 
 			{
 				var s = this.State?.Children [(int)i];
@@ -1006,7 +1007,8 @@ namespace Terminal.Gui {
 
 			dateModifiedStyle.MinWidth = 30;
 
-			var typeStyle = this.tableView.Style.GetOrCreateColumnStyle (this.dtFiles.Columns.Add (Style.TypeColumnName, typeof (int)));
+			var typeStyle = this.tableView.Style.GetOrCreateColumnStyle (
+				this.dtFiles.Columns.Add (Style.TypeColumnName, typeof (int)).Ordinal);
 			typeStyle.RepresentationGetter = (i) => this.State?.Children [(int)i].Type ?? string.Empty;
 			typeStyle.MinWidth = 6;
 
@@ -1237,7 +1239,7 @@ namespace Terminal.Gui {
 
 		private void BuildRow (int idx)
 		{
-			this.tableView.Table.Rows.Add (idx, idx, idx, idx);
+			dtFiles.Rows.Add (idx, idx, idx, idx);
 		}
 
 		private ColorScheme ColorGetter (TableView.CellColorGetterArgs args)
@@ -1277,7 +1279,7 @@ namespace Terminal.Gui {
 
 				foreach (var p in this.tableView.GetAllSelectedCells ()) {
 
-					var add = this.State?.Children [(int)this.tableView.Table.Rows [p.Y] [0]];
+					var add = this.State?.Children [(int)this.tableView.Table[p.Y, 0]];
 					if (add != null) {
 						toReturn.Add (add);
 					}
@@ -1288,7 +1290,7 @@ namespace Terminal.Gui {
 		}
 		private FileSystemInfoStats RowToStats (int rowIndex)
 		{
-			return this.State?.Children [(int)this.tableView.Table.Rows [rowIndex] [0]];
+			return this.State?.Children [(int)this.tableView.Table[rowIndex,0]];
 		}
 		private int? StatsToRow (IFileSystemInfo fileSystemInfo)
 		{
@@ -1299,7 +1301,7 @@ namespace Terminal.Gui {
 
 				// find the row number in our DataTable where the cell
 				// contains idx
-				var match = tableView.Table.Rows
+				var match = dtFiles.Rows
 					.Cast<DataRow> ()
 					.Select ((r, rIdx) => new { row = r, rowIdx = rIdx })
 					.Where (t => (int)t.row [0] == idx)
@@ -1367,7 +1369,7 @@ namespace Terminal.Gui {
 			private readonly FileDialog dlg;
 			private TableView tableView;
 
-			private DataColumn currentSort = null;
+			private int? currentSort = null;
 			private bool currentSortIsAsc = true;
 
 			public FileDialogSorter (FileDialog dlg, TableView tableView)
@@ -1378,17 +1380,17 @@ namespace Terminal.Gui {
 				// if user clicks the mouse in TableView
 				this.tableView.MouseClick += (s, e) => {
 
-					var clickedCell = this.tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out DataColumn clickedCol);
+					var clickedCell = this.tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
 
 					if (clickedCol != null) {
 						if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
 
 							// left click in a header
-							this.SortColumn (clickedCol);
+							this.SortColumn (clickedCol.Value);
 						} else if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
 
 							// right click in a header
-							this.ShowHeaderContextMenu (clickedCol, e);
+							this.ShowHeaderContextMenu (clickedCol.Value, e);
 						}
 					} else {
 						if (clickedCell != null && e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
@@ -1406,10 +1408,14 @@ namespace Terminal.Gui {
 			{
 				var col = this.currentSort;
 
-				// TODO: Consider preserving selection
-				this.tableView.Table.Rows.Clear ();
+				if(col == null) {
+					return;
+				}
 
-				var colName = col == null ? null : StripArrows (col.ColumnName);
+				// TODO: Consider preserving selection
+				dlg.dtFiles.Rows.Clear ();
+
+				var colName = col == null ? null : StripArrows (tableView.Table.ColumnNames[col.Value]);
 
 				var stats = this.dlg.State?.Children ?? new FileSystemInfoStats [0];
 
@@ -1438,13 +1444,13 @@ namespace Terminal.Gui {
 					this.dlg.BuildRow (o.i);
 				}
 
-				foreach (DataColumn c in this.tableView.Table.Columns) {
+				foreach (DataColumn c in dlg.dtFiles.Columns) {
 
 					// remove any lingering sort indicator
 					c.ColumnName = StripArrows (c.ColumnName);
 
 					// add a new one if this the one that is being sorted
-					if (c == col) {
+					if (c.Ordinal == col) {
 						c.ColumnName += this.currentSortIsAsc ? " (▲)" : " (▼)";
 					}
 				}
@@ -1458,13 +1464,13 @@ namespace Terminal.Gui {
 				return columnName.Replace (" (▼)", string.Empty).Replace (" (▲)", string.Empty);
 			}
 
-			private void SortColumn (DataColumn clickedCol)
+			private void SortColumn (int clickedCol)
 			{
 				this.GetProposedNewSortOrder (clickedCol, out var isAsc);
 				this.SortColumn (clickedCol, isAsc);
 			}
 
-			internal void SortColumn (DataColumn col, bool isAsc)
+			internal void SortColumn (int col, bool isAsc)
 			{
 				// set a sort order
 				this.currentSort = col;
@@ -1473,19 +1479,19 @@ namespace Terminal.Gui {
 				this.ApplySort ();
 			}
 
-			private string GetProposedNewSortOrder (DataColumn clickedCol, out bool isAsc)
+			private string GetProposedNewSortOrder (int clickedCol, out bool isAsc)
 			{
 				// work out new sort order
 				if (this.currentSort == clickedCol && this.currentSortIsAsc) {
 					isAsc = false;
-					return $"{clickedCol.ColumnName} DESC";
+					return $"{tableView.Table.ColumnNames[clickedCol]} DESC";
 				} else {
 					isAsc = true;
-					return $"{clickedCol.ColumnName} ASC";
+					return $"{tableView.Table.ColumnNames [clickedCol]} ASC";
 				}
 			}
 
-			private void ShowHeaderContextMenu (DataColumn clickedCol, MouseEventEventArgs e)
+			private void ShowHeaderContextMenu (int clickedCol, MouseEventEventArgs e)
 			{
 				var sort = this.GetProposedNewSortOrder (clickedCol, out var isAsc);
 
@@ -1494,7 +1500,7 @@ namespace Terminal.Gui {
 					e.MouseEvent.Y + 1,
 					new MenuBarItem (new MenuItem []
 					{
-						new MenuItem($"Hide {StripArrows(clickedCol.ColumnName)}", string.Empty, () => this.HideColumn(clickedCol)),
+						new MenuItem($"Hide {StripArrows(tableView.Table.ColumnNames[clickedCol])}", string.Empty, () => this.HideColumn(clickedCol)),
 						new MenuItem($"Sort {StripArrows(sort)}",string.Empty, ()=> this.SortColumn(clickedCol,isAsc)),
 					})
 				);
@@ -1524,7 +1530,7 @@ namespace Terminal.Gui {
 				contextMenu.Show ();
 			}
 
-			private void HideColumn (DataColumn clickedCol)
+			private void HideColumn (int clickedCol)
 			{
 				var style = this.tableView.Style.GetOrCreateColumnStyle (clickedCol);
 				style.Visible = false;

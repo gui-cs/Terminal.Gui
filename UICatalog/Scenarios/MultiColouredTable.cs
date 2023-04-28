@@ -10,6 +10,7 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("TableView")]
 	public class MultiColouredTable : Scenario {
 		TableViewColors tableView;
+		private DataTable table;
 
 		public override void Setup ()
 		{
@@ -60,7 +61,7 @@ namespace UICatalog.Scenarios {
 				Normal = Application.Driver.MakeAttribute (Color.DarkGray, Color.Black)
 			};
 
-			tableView.Table = dt;
+			tableView.Table = new DataTableSource(this.table = dt);
 		}
 				
 		private void Quit ()
@@ -103,11 +104,11 @@ namespace UICatalog.Scenarios {
 			if (e.Table == null)
 				return;
 
-			var oldValue = e.Table.Rows [e.Row] [e.Col].ToString ();
+			var oldValue = e.Table[e.Row, e.Col].ToString ();
 
-			if (GetText ("Enter new value", e.Table.Columns [e.Col].ColumnName, oldValue, out string newText)) {
+			if (GetText ("Enter new value", e.Table.ColumnNames [e.Col], oldValue, out string newText)) {
 				try {
-					e.Table.Rows [e.Row] [e.Col] = string.IsNullOrWhiteSpace (newText) ? DBNull.Value : (object)newText;
+					table.Rows [e.Row] [e.Col] = string.IsNullOrWhiteSpace (newText) ? DBNull.Value : (object)newText;
 				} catch (Exception ex) {
 					MessageBox.ErrorQuery (60, 20, "Failed to set text", ex.Message, "Ok");
 				}
