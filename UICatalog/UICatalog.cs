@@ -378,17 +378,23 @@ namespace UICatalog {
 				// Enable user to find & select a scenario by typing text
 				// TableView does not (currently) have built-in CollectionNavigator support (the ability for the 
 				// user to type and the items that match get selected). We implement it in the app instead. 
-				ScenarioList.KeyPress += (s, a) => {
+				ScenarioList.KeyDown += (s, a) => {
 					if (CollectionNavigator.IsCompatibleKey (a.KeyEvent)) {
 						var newItem = _scenarioCollectionNav?.GetNextMatchingItem (ScenarioList.SelectedRow, (char)a.KeyEvent.KeyValue);
 						if (newItem is int && newItem != -1) {
 							ScenarioList.SelectedRow = (int)newItem;
 							ScenarioList.EnsureSelectedCellIsVisible ();
 							ScenarioList.SetNeedsDisplay ();
+							a.Handled = true;
 						}
 					}
 				};
 				ScenarioList.CellActivated += ScenarioView_OpenSelectedItem;
+
+				// TableView typically is a grid where nav keys are biased for moving left/right.
+				ScenarioList.AddKeyBinding (Key.Home, Command.TopHome);
+				ScenarioList.AddKeyBinding (Key.End, Command.BottomEnd);
+				ScenarioList.ClearKeyBinding (Key.A | Key.CtrlMask);
 
 				KeyDown += KeyDownHandler;
 

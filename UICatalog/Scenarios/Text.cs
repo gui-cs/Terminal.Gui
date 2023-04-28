@@ -116,8 +116,8 @@ namespace UICatalog.Scenarios {
 					textView.AddKeyBinding (keyTab, Command.Tab);
 					textView.AddKeyBinding (keyBackTab, Command.BackTab);
 				} else {
-					textView.ClearKeybinding (keyTab);
-					textView.ClearKeybinding (keyBackTab);
+					textView.ClearKeyBinding (keyTab);
+					textView.ClearKeyBinding (keyBackTab);
 				}
 				textView.WordWrap = (bool)e.OldValue;
 			};

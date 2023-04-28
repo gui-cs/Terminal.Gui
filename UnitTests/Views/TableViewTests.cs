@@ -611,7 +611,7 @@ namespace Terminal.Gui.ViewsTests {
 			activatedValue = null;
 
 			// clear keybindings and ensure that Enter does not trigger the event anymore
-			tv.ClearKeybindings ();
+			tv.ClearKeyBindings ();
 			tv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ()));
 			Assert.Null (activatedValue);
 
@@ -622,7 +622,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			// reset the test
 			activatedValue = null;
-			tv.ClearKeybindings ();
+			tv.ClearKeyBindings ();
 
 			// Old method for changing the activation key
 			tv.CellActivationKey = Key.z;
