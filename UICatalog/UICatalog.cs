@@ -12,9 +12,10 @@ using System.Reflection;
 using System.Threading;
 using static Terminal.Gui.ConfigurationManager;
 using System.Text.Json.Serialization;
+using static Terminal.Gui.TableView;
+
 
 #nullable enable
-
 /// <summary>
 /// UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the catalog of scenarios.
 /// </summary>
@@ -253,8 +254,8 @@ namespace UICatalog {
 			public MenuItem? miIsMouseDisabled;
 			public MenuItem? miEnableConsoleScrolling;
 
-			public ListView CategoryListView;
-			public ListView ScenarioListView;
+			public ListView CategoryList;
+			public TableView ScenarioList;
 
 			public StatusItem Capslock;
 			public StatusItem Numlock;
@@ -323,7 +324,7 @@ namespace UICatalog {
 				//ContentPane.SetSplitterPos (0, 25);
 				//ContentPane.ShortcutAction = () => ContentPane.SetFocus ();
 
-				CategoryListView = new ListView (_categories) {
+				CategoryList = new ListView (_categories) {
 					X = 0,
 					Y = 1,
 					Width = Dim.Percent (30),
@@ -334,37 +335,53 @@ namespace UICatalog {
 					BorderStyle = LineStyle.Single,
 					SuperViewRendersLineCanvas = true
 				};
-				CategoryListView.OpenSelectedItem += (s, a) => {
-					ScenarioListView!.SetFocus ();
+				CategoryList.OpenSelectedItem += (s, a) => {
+					ScenarioList!.SetFocus ();
 				};
-				CategoryListView.SelectedItemChanged += CategoryListView_SelectedChanged;
+				CategoryList.SelectedItemChanged += CategoryView_SelectedChanged;
 
-				//ContentPane.Tiles.ElementAt (0).Title = "Categories";
-				//ContentPane.Tiles.ElementAt (0).MinSize = 2;
-				//ContentPane.Tiles.ElementAt (0).ContentView.Add (CategoryListView);
-
-				ScenarioListView = new ListView () {
-					X = Pos.Right (CategoryListView) - 1,
+				ScenarioList = new TableView () {
+					X = Pos.Right (CategoryList) - 1,
 					Y = 1,
 					Width = Dim.Fill (0),
 					Height = Dim.Fill (1),
-					AllowsMarking = false,
+					//AllowsMarking = false,
 					CanFocus = true,
 					Title = "Scenarios",
 					BorderStyle = LineStyle.Single,
 					SuperViewRendersLineCanvas = true
 				};
+				ScenarioList.FullRowSelect = true;
+				//ScenarioList.Style.ShowHeaders = false;
+				ScenarioList.Style.ShowHorizontalHeaderOverline = false;
+				//ScenarioList.Style.ShowHorizontalHeaderUnderline = false;
+				ScenarioList.Style.ShowHorizontalBottomline = false;
+				ScenarioList.Style.ShowVerticalCellLines = false;
+				ScenarioList.Style.ShowVerticalHeaderLines = false;
 
-				ScenarioListView.OpenSelectedItem += ScenarioListView_OpenSelectedItem;
+				/* By default TableView lays out columns at render time and only
+				 * measures y rows of data at a time.  Where y is the height of the
+				 * console. This is for the following reasons:
+				 * 
+				 * - Performance, when tables have a large amount of data
+				 * - Defensive, prevents a single wide cell value pushing other
+				 *   columns off screen (requiring horizontal scrolling
+				 * 
+				 * In the case of UICatalog here, such an approach is overkill so
+				 * we just measure all the data ourselves and set the appropriate
+				 * max widths as ColumnStyles 
+				 */
 
-				//ContentPane.Tiles.ElementAt (1).Title = "Scenarios";
-				//ContentPane.Tiles.ElementAt (1).ContentView.Add (ScenarioListView);
-				//ContentPane.Tiles.ElementAt (1).MinSize = 2;
+				var longestName = _scenarios!.Max (s => s.GetName ().Length);
+				ScenarioList.Style.ColumnStyles.Add (0, new ColumnStyle () { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName });
+				ScenarioList.Style.ColumnStyles.Add (1, new ColumnStyle () {  MaxWidth = 1 });
+
+				ScenarioList.CellActivated += ScenarioView_OpenSelectedItem;
 
 				KeyDown += KeyDownHandler;
-				//Add (ContentPane);
-				Add (CategoryListView);
-				Add (ScenarioListView);
+
+				Add (CategoryList);
+				Add (ScenarioList);
 
 				Add (MenuBar);
 				Add (StatusBar);
@@ -373,8 +390,10 @@ namespace UICatalog {
 				Unloaded += UnloadedHandler;
 
 				// Restore previous selections
-				CategoryListView.SelectedItem = _cachedCategoryIndex;
-				ScenarioListView.SelectedItem = _cachedScenarioIndex;
+				CategoryList.SelectedItem = _cachedCategoryIndex;
+				CategoryList.EnsureSelectedItemVisible ();
+				ScenarioList.SelectedRow = _cachedScenarioIndex;
+				ScenarioList.EnsureSelectedCellIsVisible ();
 
 				ConfigurationManager.Applied += ConfigAppliedHandler;
 			}
@@ -393,15 +412,15 @@ namespace UICatalog {
 					_isFirstRunning = false;
 				}
 				if (!_isFirstRunning) {
-					ScenarioListView.SetFocus ();
+					ScenarioList.SetFocus ();
 				}
 
 				StatusBar.VisibleChanged += (s, e) => {
 					UICatalogApp.ShowStatusBar = StatusBar.Visible;
 
 					var height = (StatusBar.Visible ? 1 : 0);
-					CategoryListView.Height = Dim.Fill (height);
-					ScenarioListView.Height = Dim.Fill (height);
+					CategoryList.Height = Dim.Fill (height);
+					ScenarioList.Height = Dim.Fill (height);
 					// ContentPane.Height = Dim.Fill (height);
 					LayoutSubviews ();
 					SetSubViewNeedsDisplay ();
@@ -425,16 +444,16 @@ namespace UICatalog {
 			/// Launches the selected scenario, setting the global _selectedScenario
 			/// </summary>
 			/// <param name="e"></param>
-			void ScenarioListView_OpenSelectedItem (object? sender, EventArgs? e)
+			void ScenarioView_OpenSelectedItem (object? sender, EventArgs? e)
 			{
 				if (_selectedScenario is null) {
 					// Save selected item state
-					_cachedCategoryIndex = CategoryListView.SelectedItem;
-					_cachedScenarioIndex = ScenarioListView.SelectedItem;
-					// Create new instance of scenario (even though Scenarios contains instances)
-					var sourceList = ScenarioListView.Source.ToList ();
+					_cachedCategoryIndex = CategoryList.SelectedItem;
+					_cachedScenarioIndex = ScenarioList.SelectedRow;
 
-					_selectedScenario = (Scenario)Activator.CreateInstance (ScenarioListView.Source.ToList () [ScenarioListView.SelectedItem]!.GetType ())!;
+					// Create new instance of scenario (even though Scenarios contains instances)
+					string selectedScenarioName = (string)ScenarioList.Table [ScenarioList.SelectedRow, 0];
+					_selectedScenario = (Scenario)Activator.CreateInstance (_scenarios!.FirstOrDefault (s => s.GetName () == selectedScenarioName)!.GetType ())!;
 
 					// Tell the main app to stop
 					Application.RequestStop ();
@@ -729,18 +748,22 @@ namespace UICatalog {
 				}
 			}
 
-			void CategoryListView_SelectedChanged (object? sender, ListViewItemEventArgs? e)
+			void CategoryView_SelectedChanged (object? sender, ListViewItemEventArgs? e)
 			{
 				var item = _categories! [e!.Item];
 				List<Scenario> newlist;
 				if (e.Item == 0) {
 					// First category is "All"
 					newlist = _scenarios!;
+					newlist = _scenarios!;
 
 				} else {
 					newlist = _scenarios!.Where (s => s.GetCategories ().Contains (item)).ToList ();
 				}
-				ScenarioListView.SetSource (newlist.ToList ());
+				ScenarioList.Table = new EnumerableTableSource<Scenario> (newlist, new Dictionary<string, Func<Scenario, object>> () {
+					{ "Name", (s) => s.GetName() },
+					{ "Description", (s) => s.GetDescription() },
+				});
 			}
 		}
 
