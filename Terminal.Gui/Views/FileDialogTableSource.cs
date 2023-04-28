@@ -38,6 +38,8 @@ namespace Terminal.Gui {
 
 		public int Columns => 4;
 
+
+		// TODO show arrows for sort
 		public string [] ColumnNames => new string []{
 			style.FilenameColumnName,
 			style.SizeColumnName,

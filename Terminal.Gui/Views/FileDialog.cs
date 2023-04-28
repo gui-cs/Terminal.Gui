@@ -373,9 +373,6 @@ namespace Terminal.Gui {
 			this.Add (this.btnForward);
 			this.Add (this.tbPath);
 			this.Add (this.splitContainer);
-
-			// Default sort order is by name
-			sorter.SortColumn(this.filenameColumn,true);
 		}
 
 		private string GetForwardButtonText ()
@@ -1224,7 +1221,7 @@ namespace Terminal.Gui {
 		}
 		private FileSystemInfoStats RowToStats (int rowIndex)
 		{
-			return this.State?.Children [(int)this.tableView.Table[rowIndex,0]];
+			return this.State?.Children [rowIndex];
 		}
 	
 		private void PathChanged ()
@@ -1307,9 +1304,7 @@ namespace Terminal.Gui {
 							this.ShowCellContextMenu (clickedCell, e);
 						}
 					}
-
 				};
-
 			}
 
 			internal void ApplySort ()
@@ -1346,17 +1341,6 @@ namespace Terminal.Gui {
 						forcedOrder.ThenByDescending (f => sortAlgorithm (f));
 
 				dlg.State.Children = ordered.ToArray();
-
-				foreach (DataColumn c in dlg.dtFiles.Columns) {
-
-					// remove any lingering sort indicator
-					c.ColumnName = StripArrows (c.ColumnName);
-
-					// add a new one if this the one that is being sorted
-					if (c.Ordinal == col) {
-						c.ColumnName += this.currentSortIsAsc ? " (▲)" : " (▼)";
-					}
-				}
 
 				this.tableView.Update ();
 				dlg.UpdateCollectionNavigator ();
