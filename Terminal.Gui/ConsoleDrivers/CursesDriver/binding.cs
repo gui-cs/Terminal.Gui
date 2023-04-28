@@ -145,11 +145,6 @@ namespace Unix.Terminal {
 			if (l == 1 || l != lines || c != cols) {
 				lines = l;
 				cols = c;
-				//if (l <= 0 || c <= 0) {
-				//	Console.Out.Write ($"\x1b[8;50;{c}t");
-				//	Console.Out.Flush ();
-				//	return false;
-				//}
 				return true;
 			}
 			return false;
@@ -336,6 +331,7 @@ namespace Unix.Terminal {
 #pragma warning disable RCS1102 // Make class static.
 	internal class Delegates {
 #pragma warning restore RCS1102 // Make class static.
+#pragma warning disable CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
 		public delegate IntPtr initscr ();
 		public delegate int endwin ();
 		public delegate bool isendwin ();
@@ -560,4 +556,5 @@ namespace Unix.Terminal {
 		}
 	}
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning restore CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
 }
