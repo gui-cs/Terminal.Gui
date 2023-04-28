@@ -88,7 +88,6 @@ namespace Terminal.Gui {
 		private FileDialogSorter sorter;
 		private FileDialogHistory history;
 
-		private DataTable dtFiles;
 		private TableView tableView;
 		private TreeView<object> treeView;
 		private TileView splitContainer;
@@ -221,6 +220,18 @@ namespace Terminal.Gui {
 
 			this.tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
 			Style.TableStyle = tableView.Style;
+
+			var nameStyle = Style.TableStyle.GetOrCreateColumnStyle (0);
+			nameStyle.MinWidth = 15;
+
+			var sizeStyle = Style.TableStyle.GetOrCreateColumnStyle (1);
+			sizeStyle.MinWidth = 10;
+
+			var dateModifiedStyle = Style.TableStyle.GetOrCreateColumnStyle (2);
+			dateModifiedStyle.MinWidth = 30;
+
+			var typeStyle = Style.TableStyle.GetOrCreateColumnStyle (3);
+			typeStyle.MinWidth = 6;
 
 			this.tableView.KeyPress += (s, k) => {
 				if (this.tableView.SelectedRow <= 0) {
@@ -541,15 +552,7 @@ namespace Terminal.Gui {
 			var col = tableView.SelectedColumn;
 			var style = tableView.Style.GetColumnStyleIfAny (col);
 
-
-			var collection = dtFiles
-				.Rows
-				.Cast<DataRow> ()
-				.Select ((o, idx) => col == 0 ? 
-					RowToStats(idx).FileSystemInfo.Name :
-					style.GetRepresentation (o [0])?.TrimStart('.'))
-				.ToArray ();
-
+			var collection = Enumerable.Range (0, tableView.Table.Rows).Select (r=> tableView.Table [r, col]).ToArray ();
 			collectionNavigator = new CollectionNavigator (collection);
 		}
 
@@ -963,61 +966,6 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		private void SetupTableColumns ()
-		{
-			this.dtFiles = new DataTable ();
-
-			var nameStyle = this.tableView.Style.GetOrCreateColumnStyle (
-				filenameColumn = this.dtFiles.Columns.Add (Style.FilenameColumnName, typeof (int)).Ordinal
-				);
-			nameStyle.RepresentationGetter = (i) => {
-
-				var stats = this.State?.Children [(int)i];
-
-				if (stats == null) {
-					return string.Empty;
-				}
-
-				var icon = stats.IsParent ? null : Style.IconGetter?.Invoke (stats.FileSystemInfo);
-
-				if (icon != null) {
-					return icon + stats.Name;
-				}
-				return stats.Name;
-			};
-
-			nameStyle.MinWidth = 50;
-
-			var sizeStyle = this.tableView.Style.GetOrCreateColumnStyle (
-				this.dtFiles.Columns.Add (Style.SizeColumnName, typeof (int)).Ordinal);
-			sizeStyle.RepresentationGetter = (i) => this.State?.Children [(int)i].HumanReadableLength ?? string.Empty;
-			nameStyle.MinWidth = 10;
-
-			var dateModifiedStyle = this.tableView.Style.GetOrCreateColumnStyle (
-				this.dtFiles.Columns.Add (Style.ModifiedColumnName, typeof (int)).Ordinal);
-			dateModifiedStyle.RepresentationGetter = (i) => 
-			{
-				var s = this.State?.Children [(int)i];
-				if(s == null || s.IsParent || s.LastWriteTime == null)
-				{
-					return string.Empty;
-				}
-				return s.LastWriteTime.Value.ToString (Style.DateFormat);
-			};
-
-			dateModifiedStyle.MinWidth = 30;
-
-			var typeStyle = this.tableView.Style.GetOrCreateColumnStyle (
-				this.dtFiles.Columns.Add (Style.TypeColumnName, typeof (int)).Ordinal);
-			typeStyle.RepresentationGetter = (i) => this.State?.Children [(int)i].Type ?? string.Empty;
-			typeStyle.MinWidth = 6;
-
-			foreach(var colStyle in Style.TableStyle.ColumnStyles) {
-				colStyle.Value.ColorGetter = this.ColorGetter;
-			}
-			
-		}
-
 		private void CellActivate (object sender, CellActivatedEventArgs obj)
 		{
 			if(TryAcceptMulti())
@@ -1225,21 +1173,11 @@ namespace Terminal.Gui {
 			if (this.State == null) {
 				return;
 			}
-
-			this.dtFiles.Rows.Clear ();
-
-			for (int i = 0; i < this.State.Children.Length; i++) {
-				this.BuildRow (i);
-			}
+			this.tableView.Table = new FileDialogTableSource (this.State, this.Style);
 
 			this.sorter.ApplySort ();
 			this.tableView.Update ();
 			UpdateCollectionNavigator ();
-		}
-
-		private void BuildRow (int idx)
-		{
-			dtFiles.Rows.Add (idx, idx, idx, idx);
 		}
 
 		private ColorScheme ColorGetter (TableView.CellColorGetterArgs args)
@@ -1292,29 +1230,7 @@ namespace Terminal.Gui {
 		{
 			return this.State?.Children [(int)this.tableView.Table[rowIndex,0]];
 		}
-		private int? StatsToRow (IFileSystemInfo fileSystemInfo)
-		{
-			// find array index of the current state for the stats
-			var idx = State?.Children.IndexOf ((f) => f.FileSystemInfo.FullName == fileSystemInfo.FullName);
-
-			if (idx != -1 && idx != null) {
-
-				// find the row number in our DataTable where the cell
-				// contains idx
-				var match = dtFiles.Rows
-					.Cast<DataRow> ()
-					.Select ((r, rIdx) => new { row = r, rowIdx = rIdx })
-					.Where (t => (int)t.row [0] == idx)
-					.ToArray ();
-
-				if (match.Length == 1) {
-					return match [0].rowIdx;
-				}
-			}
-
-			return null;
-		}
-
+	
 		private void PathChanged ()
 		{
 			// avoid re-entry
@@ -1358,12 +1274,8 @@ namespace Terminal.Gui {
 		/// <param name="toRestore"></param>
 		internal void RestoreSelection (IFileSystemInfo toRestore)
 		{
-			var toReselect = StatsToRow (toRestore);
-
-			if (toReselect.HasValue) {
-				tableView.SelectedRow = toReselect.Value;
-				tableView.EnsureSelectedCellIsVisible ();
-			}
+			tableView.SelectedRow = State.Children.IndexOf (r=>r.FileSystemInfo == toRestore);
+			tableView.EnsureSelectedCellIsVisible ();
 		}
 		private class FileDialogSorter {
 			private readonly FileDialog dlg;
