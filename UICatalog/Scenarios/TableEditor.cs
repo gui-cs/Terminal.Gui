@@ -16,6 +16,7 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Top Level Windows")]
 	public class TableEditor : Scenario {
 		TableView tableView;
+		DataTable currentTable;
 		private MenuItem miShowHeaders;
 		private MenuItem miAlwaysShowHeaders;
 		private MenuItem miHeaderOverline;
@@ -139,17 +140,17 @@ namespace UICatalog.Scenarios {
 			// if user clicks the mouse in TableView
 			tableView.MouseClick += (s,e) => {
 
-				tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out DataColumn clickedCol);
+				tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
 
 				if (clickedCol != null) {
 					if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
 
 						// left click in a header
-						SortColumn (clickedCol);
+						SortColumn (clickedCol.Value);
 					} else if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
 
 						// right click in a header
-						ShowHeaderContextMenu (clickedCol, e);
+						ShowHeaderContextMenu (clickedCol.Value, e);
 					}
 				}
 			};
@@ -165,32 +166,32 @@ namespace UICatalog.Scenarios {
 			tableView.Update ();
 		}
 
-		private void SortColumn (DataColumn clickedCol)
+		private void SortColumn (int clickedCol)
 		{
 			var sort = GetProposedNewSortOrder (clickedCol, out var isAsc);
 
 			SortColumn (clickedCol, sort, isAsc);
 		}
 
-		private void SortColumn (DataColumn clickedCol, string sort, bool isAsc)
+		private void SortColumn (int clickedCol, string sort, bool isAsc)
 		{
 			// set a sort order
-			tableView.Table.DefaultView.Sort = sort;
+			currentTable.DefaultView.Sort = sort;
 
 			// copy the rows from the view
-			var sortedCopy = tableView.Table.DefaultView.ToTable ();
-			tableView.Table.Rows.Clear ();
+			var sortedCopy = currentTable.DefaultView.ToTable ();
+			currentTable.Rows.Clear ();
 			foreach (DataRow r in sortedCopy.Rows) {
-				tableView.Table.ImportRow (r);
+				currentTable.ImportRow (r);
 			}
 
-			foreach (DataColumn col in tableView.Table.Columns) {
+			foreach (DataColumn col in currentTable.Columns) {
 
 				// remove any lingering sort indicator
 				col.ColumnName = TrimArrows (col.ColumnName);
 
 				// add a new one if this the one that is being sorted
-				if (col == clickedCol) {
+				if (col.Ordinal == clickedCol) {
 					col.ColumnName += isAsc ? '▲' : '▼';
 				}
 			}
@@ -206,29 +207,31 @@ namespace UICatalog.Scenarios {
 		{
 			return columnName.Replace ("▼", "").Replace ("▲", "");
 		}
-		private string GetProposedNewSortOrder (DataColumn clickedCol, out bool isAsc)
+		private string GetProposedNewSortOrder (int clickedCol, out bool isAsc)
 		{
 			// work out new sort order
-			var sort = tableView.Table.DefaultView.Sort;
+			var sort = currentTable.DefaultView.Sort;
+			var colName = currentTable.Columns[clickedCol];
 
 			if (sort?.EndsWith ("ASC") ?? false) {
-				sort = $"{clickedCol.ColumnName} DESC";
+				sort = $"{colName} DESC";
 				isAsc = false;
 			} else {
-				sort = $"{clickedCol.ColumnName} ASC";
+				sort = $"{colName} ASC";
 				isAsc = true;
 			}
 
 			return sort;
 		}
 
-		private void ShowHeaderContextMenu (DataColumn clickedCol, MouseEventEventArgs e)
+		private void ShowHeaderContextMenu (int clickedCol, MouseEventEventArgs e)
 		{
 			var sort = GetProposedNewSortOrder (clickedCol, out var isAsc);
+			var colName = tableView.Table.ColumnNames[clickedCol];
 
 			var contextMenu = new ContextMenu (e.MouseEvent.X + 1, e.MouseEvent.Y + 1,
 				new MenuBarItem (new MenuItem [] {
-					new MenuItem ($"Hide {TrimArrows(clickedCol.ColumnName)}", "", () => HideColumn(clickedCol)),
+					new MenuItem ($"Hide {TrimArrows(colName)}", "", () => HideColumn(clickedCol)),
 					new MenuItem ($"Sort {StripArrows(sort)}","",()=>SortColumn(clickedCol,sort,isAsc)),
 				})
 			);
@@ -236,7 +239,7 @@ namespace UICatalog.Scenarios {
 			contextMenu.Show ();
 		}
 
-		private void HideColumn (DataColumn clickedCol)
+		private void HideColumn (int clickedCol)
 		{
 			var style = tableView.Style.GetOrCreateColumnStyle (clickedCol);
 			style.Visible = false;
@@ -248,16 +251,16 @@ namespace UICatalog.Scenarios {
 			if (tableView.Table == null)
 				return null;
 
-			if (tableView.SelectedColumn < 0 || tableView.SelectedColumn > tableView.Table.Columns.Count)
+			if (tableView.SelectedColumn < 0 || tableView.SelectedColumn > tableView.Table.Columns)
 				return null;
 
-			return tableView.Table.Columns [tableView.SelectedColumn];
+			return currentTable.Columns [tableView.SelectedColumn];
 		}
 
 		private void SetMinAcceptableWidthToOne ()
 		{
-			foreach (DataColumn c in tableView.Table.Columns) {
-				var style = tableView.Style.GetOrCreateColumnStyle (c);
+			foreach (DataColumn c in currentTable.Columns) {
+				var style = tableView.Style.GetOrCreateColumnStyle (c.Ordinal);
 				style.MinAcceptableWidth = 1;
 			}
 		}
@@ -288,7 +291,7 @@ namespace UICatalog.Scenarios {
 			cancel.Clicked += (s,e) => { Application.RequestStop (); };
 			var d = new Dialog (ok, cancel) { Title = prompt };
 
-			var style = tableView.Style.GetOrCreateColumnStyle (col);
+			var style = tableView.Style.GetOrCreateColumnStyle (col.Ordinal);
 
 			var lbl = new Label () {
 				X = 0,
@@ -341,7 +344,7 @@ namespace UICatalog.Scenarios {
 			};*/
 
 			tableView.DrawContent += (s,e) => {
-				_scrollBar.Size = tableView.Table?.Rows?.Count ?? 0;
+				_scrollBar.Size = tableView.Table?.Rows ?? 0;
 				_scrollBar.Position = tableView.RowOffset;
 				//	_scrollBar.OtherScrollBarView.Size = _listView.Maxlength - 1;
 				//	_scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
@@ -357,12 +360,12 @@ namespace UICatalog.Scenarios {
 				if (tableView.FullRowSelect) {
 					// Delete button deletes all rows when in full row mode
 					foreach (int toRemove in tableView.GetAllSelectedCells ().Select (p => p.Y).Distinct ().OrderByDescending (i => i))
-						tableView.Table.Rows.RemoveAt (toRemove);
+						currentTable.Rows.RemoveAt (toRemove);
 				} else {
 
 					// otherwise set all selected cells to null
 					foreach (var pt in tableView.GetAllSelectedCells ()) {
-						tableView.Table.Rows [pt.Y] [pt.X] = DBNull.Value;
+						currentTable.Rows [pt.Y] [pt.X] = DBNull.Value;
 					}
 				}
 
@@ -520,13 +523,18 @@ namespace UICatalog.Scenarios {
 
 		private void OpenExample (bool big)
 		{
-			tableView.Table = BuildDemoDataTable (big ? 30 : 5, big ? 1000 : 5);
+			SetTable(BuildDemoDataTable (big ? 30 : 5, big ? 1000 : 5));
 			SetDemoTableStyles ();
+		}
+
+		private void SetTable (DataTable dataTable)
+		{
+			tableView.Table = new DataTableSource(currentTable = dataTable);
 		}
 
 		private void OpenUnicodeMap ()
 		{
-			tableView.Table = BuildUnicodeMap ();
+			SetTable(BuildUnicodeMap ());
 			tableView.Update ();
 		}
 
@@ -538,7 +546,7 @@ namespace UICatalog.Scenarios {
 			for (int i = 0; i < 10; i++) {
 
 				var col = dt.Columns.Add (i.ToString (), typeof (uint));
-				var style = tableView.Style.GetOrCreateColumnStyle (col);
+				var style = tableView.Style.GetOrCreateColumnStyle (col.Ordinal);
 				style.RepresentationGetter = (o) => new Rune ((uint)o).ToString ();
 			}
 
@@ -546,7 +554,7 @@ namespace UICatalog.Scenarios {
 			for (int i = 'a'; i < 'a' + 26; i++) {
 
 				var col = dt.Columns.Add (((char)i).ToString (), typeof (uint));
-				var style = tableView.Style.GetOrCreateColumnStyle (col);
+				var style = tableView.Style.GetOrCreateColumnStyle (col.Ordinal);
 				style.RepresentationGetter = (o) => new Rune ((uint)o).ToString ();
 			}
 
@@ -727,6 +735,8 @@ namespace UICatalog.Scenarios {
 		};
 		private void SetDemoTableStyles ()
 		{
+			tableView.Style.ColumnStyles.Clear();
+
 			var alignMid = new TableView.ColumnStyle () {
 				Alignment = TextAlignment.Centered
 			};
@@ -760,28 +770,28 @@ namespace UICatalog.Scenarios {
 								null
 			};
 
-			tableView.Style.ColumnStyles.Add (tableView.Table.Columns ["DateCol"], dateFormatStyle);
-			tableView.Style.ColumnStyles.Add (tableView.Table.Columns ["DoubleCol"], negativeRight);
-			tableView.Style.ColumnStyles.Add (tableView.Table.Columns ["NullsCol"], alignMid);
-			tableView.Style.ColumnStyles.Add (tableView.Table.Columns ["IntCol"], alignRight);
+			tableView.Style.ColumnStyles.Add (currentTable.Columns ["DateCol"].Ordinal, dateFormatStyle);
+			tableView.Style.ColumnStyles.Add (currentTable.Columns ["DoubleCol"].Ordinal, negativeRight);
+			tableView.Style.ColumnStyles.Add (currentTable.Columns ["NullsCol"].Ordinal, alignMid);
+			tableView.Style.ColumnStyles.Add (currentTable.Columns ["IntCol"].Ordinal, alignRight);
 
 			tableView.Update ();
 		}
 
 		private void OpenSimple (bool big)
 		{
-			tableView.Table = BuildSimpleDataTable (big ? 30 : 5, big ? 1000 : 5);
+			SetTable(BuildSimpleDataTable (big ? 30 : 5, big ? 1000 : 5));
 		}
 
 		private void EditCurrentCell (object sender, CellActivatedEventArgs e)
 		{
 			if (e.Table == null)
 				return;
-			var o = e.Table.Rows [e.Row] [e.Col];
+			var o = currentTable.Rows [e.Row] [e.Col];
 
 			var title = o is uint u ? GetUnicodeCategory (u) + $"(0x{o:X4})" : "Enter new value";
 
-			var oldValue = e.Table.Rows [e.Row] [e.Col].ToString ();
+			var oldValue = currentTable.Rows [e.Row] [e.Col].ToString ();
 			bool okPressed = false;
 
 			var ok = new Button ("Ok", is_default: true);
@@ -793,7 +803,7 @@ namespace UICatalog.Scenarios {
 			var lbl = new Label () {
 				X = 0,
 				Y = 1,
-				Text = e.Table.Columns [e.Col].ColumnName
+				Text = currentTable.Columns [e.Col].ColumnName
 			};
 
 			var tf = new TextField () {
@@ -811,7 +821,7 @@ namespace UICatalog.Scenarios {
 			if (okPressed) {
 
 				try {
-					e.Table.Rows [e.Row] [e.Col] = string.IsNullOrWhiteSpace (tf.Text.ToString ()) ? DBNull.Value : (object)tf.Text;
+					currentTable.Rows [e.Row] [e.Col] = string.IsNullOrWhiteSpace (tf.Text.ToString ()) ? DBNull.Value : (object)tf.Text;
 				} catch (Exception ex) {
 					MessageBox.ErrorQuery (60, 20, "Failed to set text", ex.Message, "Ok");
 				}
