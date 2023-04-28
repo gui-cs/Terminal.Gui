@@ -255,7 +255,12 @@ namespace UICatalog {
 			public MenuItem? miEnableConsoleScrolling;
 
 			public ListView CategoryList;
+
+			// UI Catalog uses TableView for the scenario list instead of a ListView to demonstate how
+			// TableView works. There's no real reason not to use ListView. Because we use TableView, and TableView
+			// doesn't (currently) have CollectionNavigator support built in, we implement it here, within the app.
 			public TableView ScenarioList;
+			private CollectionNavigator _scenarioCollectionNav = new CollectionNavigator ();
 
 			public StatusItem Capslock;
 			public StatusItem Numlock;
@@ -311,19 +316,7 @@ namespace UICatalog {
 					OS
 				};
 
-				//ContentPane = new TileView () {
-				//	Id = "ContentPane",
-				//	X = 0,
-				//	Y = 1, // for menu
-				//	Width = Dim.Fill (),
-				//	Height = Dim.Fill (1),
-				//	CanFocus = true,
-				//	Shortcut = Key.CtrlMask | Key.C,
-				//};
-				//ContentPane.LineStyle = LineStyle.Single;
-				//ContentPane.SetSplitterPos (0, 25);
-				//ContentPane.ShortcutAction = () => ContentPane.SetFocus ();
-
+				// Create the Category list view. This list never changes.
 				CategoryList = new ListView (_categories) {
 					X = 0,
 					Y = 1,
@@ -340,6 +333,9 @@ namespace UICatalog {
 				};
 				CategoryList.SelectedItemChanged += CategoryView_SelectedChanged;
 
+				// Create the scenario list. The contents of the scenario list changes whenever the
+				// Category list selection changes (to show just the scenarios that belong to the selected
+				// category).
 				ScenarioList = new TableView () {
 					X = Pos.Right (CategoryList) - 1,
 					Y = 1,
@@ -351,10 +347,14 @@ namespace UICatalog {
 					BorderStyle = LineStyle.Single,
 					SuperViewRendersLineCanvas = true
 				};
+
+				// TableView provides many options for table headers. For simplicity we turn all 
+				// of these off. By enabling FullRowSelect and turning off headers, TableView looks just
+				// like a ListView
 				ScenarioList.FullRowSelect = true;
-				//ScenarioList.Style.ShowHeaders = false;
+				ScenarioList.Style.ShowHeaders = false;
 				ScenarioList.Style.ShowHorizontalHeaderOverline = false;
-				//ScenarioList.Style.ShowHorizontalHeaderUnderline = false;
+				ScenarioList.Style.ShowHorizontalHeaderUnderline = false;
 				ScenarioList.Style.ShowHorizontalBottomline = false;
 				ScenarioList.Style.ShowVerticalCellLines = false;
 				ScenarioList.Style.ShowVerticalHeaderLines = false;
@@ -371,11 +371,23 @@ namespace UICatalog {
 				 * we just measure all the data ourselves and set the appropriate
 				 * max widths as ColumnStyles 
 				 */
-
 				var longestName = _scenarios!.Max (s => s.GetName ().Length);
 				ScenarioList.Style.ColumnStyles.Add (0, new ColumnStyle () { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName });
-				ScenarioList.Style.ColumnStyles.Add (1, new ColumnStyle () {  MaxWidth = 1 });
+				ScenarioList.Style.ColumnStyles.Add (1, new ColumnStyle () { MaxWidth = 1 });
 
+				// Enable user to find & select a scenario by typing text
+				// TableView does not (currently) have built-in CollectionNavigator support (the ability for the 
+				// user to type and the items that match get selected). We implement it in the app instead. 
+				ScenarioList.KeyPress += (s, a) => {
+					if (CollectionNavigator.IsCompatibleKey (a.KeyEvent)) {
+						var newItem = _scenarioCollectionNav?.GetNextMatchingItem (ScenarioList.SelectedRow, (char)a.KeyEvent.KeyValue);
+						if (newItem is int && newItem != -1) {
+							ScenarioList.SelectedRow = (int)newItem;
+							ScenarioList.EnsureSelectedCellIsVisible ();
+							ScenarioList.SetNeedsDisplay ();
+						}
+					}
+				};
 				ScenarioList.CellActivated += ScenarioView_OpenSelectedItem;
 
 				KeyDown += KeyDownHandler;
@@ -764,6 +776,15 @@ namespace UICatalog {
 					{ "Name", (s) => s.GetName() },
 					{ "Description", (s) => s.GetDescription() },
 				});
+
+				// Create a collection of just the scenario names (the 1st column in our TableView)
+				// for CollectionNavigator. 
+				var firstColumnList = new List<object> ();
+				for (var i = 0; i < ScenarioList.Table.Rows; i++) {
+					firstColumnList.Add (ScenarioList.Table [i, 0]);
+				}
+				_scenarioCollectionNav.Collection = firstColumnList;
+
 			}
 		}
 
