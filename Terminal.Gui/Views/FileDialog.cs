@@ -99,9 +99,6 @@ namespace Terminal.Gui {
 		private Button btnBack;
 		private Button btnUp;
 		private string feedback;
-
-		private TableCollectionNavigator collectionNavigator;
-
 		private TextField tbFind;
 		private SpinnerView spinnerView;
 		private MenuBar allowedTypeMenuBar;
@@ -237,14 +234,6 @@ namespace Terminal.Gui {
 				if (k.Handled) {
 					return;
 				}
-
-				if (this.tableView.HasFocus &&
-				!k.KeyEvent.Key.HasFlag (Key.CtrlMask) &&
-				!k.KeyEvent.Key.HasFlag (Key.AltMask) &&
-					char.IsLetterOrDigit ((char)k.KeyEvent.KeyValue)) {
-					CycleToNextTableEntryBeginningWith (k);
-				}
-
 			};
 
 			this.treeView = new TreeView<object> () {
@@ -305,8 +294,6 @@ namespace Terminal.Gui {
 					NavigateIf (o, Key.CursorLeft, btnToggleSplitterCollapse);
 				}
 			};
-
-			collectionNavigator = new TableCollectionNavigator (tableView);
 
 			this.tableView.Style.ShowHorizontalHeaderOverline = true;
 			this.tableView.Style.ShowVerticalCellLines = true;
@@ -512,29 +499,6 @@ namespace Terminal.Gui {
 		private void ClearFeedback ()
 		{
 			feedback = null;
-		}
-
-		private void CycleToNextTableEntryBeginningWith (KeyEventEventArgs keyEvent)
-		{
-			if (tableView.Table.Rows == 0) {
-				return;
-			}
-
-			var row = tableView.SelectedRow;
-
-			// There is a multi select going on and not just for the current row
-			if (tableView.GetAllSelectedCells ().Any (c => c.Y != row)) {
-				return;
-			}
-
-			int match = collectionNavigator.GetNextMatchingItem (row, (char)keyEvent.KeyEvent.KeyValue);
-
-			if (match != -1) {
-				tableView.SelectedRow = match;
-				tableView.EnsureValidSelection ();
-				tableView.EnsureSelectedCellIsVisible ();
-				keyEvent.Handled = true;
-			}
 		}
 
 		/// <summary>

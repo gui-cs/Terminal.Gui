@@ -35,7 +35,7 @@ namespace Terminal.Gui {
             }
 
             var style = this.tableView.Style.GetColumnStyleIfAny(col);
-            return style.RepresentationGetter(rawValue);
+            return style?.RepresentationGetter?.Invoke(rawValue) ?? rawValue;
 		}
 
         /// <inheritdoc/>
