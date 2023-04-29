@@ -1269,7 +1269,6 @@ namespace Terminal.Gui {
 			State.Children = ordered.ToArray();
 
 			this.tableView.Update ();
-			UpdateCollectionNavigator ();
 		}
 
 		private void SortColumn (int clickedCol)
