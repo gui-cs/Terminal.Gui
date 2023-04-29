@@ -236,44 +236,44 @@ namespace UICatalog.Scenarios {
 					viewToEdit.SetNeedsDisplay ();
 				};
 
-				Add (new Label ("BorderBrush:") {
+				Add (new Label ("Border Background Color:") {
 					X = Pos.Right (rbBorderStyle),
 					Y = Pos.Bottom (borderEditor)
 				});
 
-				var rbBorderBrush = new RadioGroup (colorEnum.Select (
+				var rbBorderBGColor = new RadioGroup (colorEnum.Select (
 					e => NStack.ustring.Make (e.ToString ())).ToArray ()) {
 
 					X = Pos.Right (rbBorderStyle),
 					Y = Pos.Bottom (borderEditor) + 1,
 					SelectedItem = (int)viewToEdit.Border.ColorScheme.Normal.Background
 				};
-				rbBorderBrush.SelectedItemChanged += (s, e) => {
+				rbBorderBGColor.SelectedItemChanged += (s, e) => {
 					if (viewToEdit.Border != null) {
 						viewToEdit.Border.ColorScheme.Normal = new Terminal.Gui.Attribute (viewToEdit.Padding.ColorScheme.Normal.Background, (Color)e.SelectedItem);
 					}
 				};
-				Add (rbBorderBrush);
+				Add (rbBorderBGColor);
 
-				Add (new Label ("PaddingBrush:") {
-					X = Pos.AnchorEnd (20),
+				Add (new Label ("Padding Background Color:") {
+					X = Pos.AnchorEnd (25),
 					Y = Pos.Bottom (borderEditor)
 				});
 
-				var rbPaddingBrush = new RadioGroup (colorEnum.Select (
+				var rbPaddingBGColor = new RadioGroup (colorEnum.Select (
 					e => NStack.ustring.Make (e.ToString ())).ToArray ()) {
 
 					X = Pos.AnchorEnd (18),
 					Y = Pos.Bottom (borderEditor) + 1,
 					SelectedItem = (int)viewToEdit.Padding.ColorScheme.Normal.Background
 				};
-				rbPaddingBrush.SelectedItemChanged += (s, e) => {
+				rbPaddingBGColor.SelectedItemChanged += (s, e) => {
 					if (viewToEdit.Padding != null) {
 						viewToEdit.Padding.ColorScheme.Normal = new Terminal.Gui.Attribute (viewToEdit.Padding.ColorScheme.Normal.Foreground, (Color)e.SelectedItem);
 						viewToEdit.Border.ColorScheme.Normal = new Terminal.Gui.Attribute ((Color)e.SelectedItem, viewToEdit.Border.ColorScheme.Normal.Background);
 					}
 				};
-				Add (rbPaddingBrush);
+				Add (rbPaddingBGColor);
 
 				var ckbTitle = new CheckBox ("With title") {
 					X = Pos.Right (paddingEditor) + 1,
