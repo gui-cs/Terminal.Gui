@@ -112,7 +112,7 @@ namespace Terminal.Gui {
 				if (idxCandidate == currentIndex || idxCandidate == -1) {
 					// clear history and treat as a fresh letter
 					ClearSearchString ();
-					
+
 					// match on the fresh letter alone
 					SearchString = new string (keyStruck, 1);
 					idxCandidate = GetNextMatchingItem (currentIndex, SearchString);
@@ -148,40 +148,33 @@ namespace Terminal.Gui {
 				return -1;
 			}
 
-			var collectionLength = GetCollectionLength();
+			var collectionLength = GetCollectionLength ();
 
-			if(currentIndex != -1 && currentIndex < collectionLength && IsMatch(search, ElementAt(currentIndex)))
-			{
+			if (currentIndex != -1 && currentIndex < collectionLength && IsMatch (search, ElementAt (currentIndex))) {
 				// we are already at a match
 				if (minimizeMovement) {
 					// if we would rather not jump around (e.g. user is typing lots of text to get this match)
 					return currentIndex;
 				}
 
-				for (int i = 1 ; i <  collectionLength;i++)
-				{
+				for (int i = 1; i < collectionLength; i++) {
 					//circular
 					var idxCandidate = (i + currentIndex) % collectionLength;
-					if(IsMatch(search, ElementAt(idxCandidate)))
-					{
+					if (IsMatch (search, ElementAt (idxCandidate))) {
 						return idxCandidate;
 					}
 				}
 
 				// nothing else starts with the search term
 				return currentIndex;
-			}
-			else
-			{
+			} else {
 				// search terms no longer match the current selection or there is none
-				for (int i = 0 ; i <  collectionLength;i++)
-				{
-					if(IsMatch(search, ElementAt(i)))
-					{
+				for (int i = 0; i < collectionLength; i++) {
+					if (IsMatch (search, ElementAt (i))) {
 						return i;
 					}
 				}
-				
+
 				// Nothing matches
 				return -1;
 			}
@@ -190,7 +183,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Return the number of elements in the collection
 		/// </summary>
-		protected abstract int  GetCollectionLength ();
+		protected abstract int GetCollectionLength ();
 
 		private bool IsMatch (string search, object value)
 		{

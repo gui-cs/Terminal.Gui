@@ -7,8 +7,7 @@ namespace Terminal.Gui {
 
 	/// <inheritdoc/>
 	/// <remarks>This implementation is based on a static <see cref="Collection"/> of objects.</remarks>
-	public class CollectionNavigator : CollectionNavigatorBase
-	{
+	public class CollectionNavigator : CollectionNavigatorBase {
 		/// <summary>
 		/// The collection of objects to search. <see cref="object.ToString()"/> is used to search the collection.
 		/// </summary>
@@ -28,7 +27,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		protected override object ElementAt (int idx)
 		{
-			return Collection[idx];
+			return Collection [idx];
 		}
 
 		/// <inheritdoc/>
