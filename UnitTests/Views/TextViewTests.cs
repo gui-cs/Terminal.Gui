@@ -6934,5 +6934,19 @@ This is the second line.
 			newPos = model.WordForward (4, 0);
 			Assert.Null (newPos);
 		}
+
+		[Fact, TextViewTestsAutoInitShutdown]
+		public void Cursor_Position_Multiline_False_Initialization ()
+		{
+			Assert.False (_textView.IsInitialized);
+			Assert.True (_textView.Multiline);
+			_textView.Multiline = false;
+			Assert.Equal (32, _textView.CursorPosition.X);
+			Assert.Equal (0, _textView.CursorPosition.Y);
+			Assert.Equal (0, _textView.SelectedLength);
+			Assert.Equal ("", _textView.SelectedText);
+			Assert.Equal ("TAB to jump between text fields.", _textView.Text);
+		}
+
 	}
 }
