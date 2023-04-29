@@ -996,6 +996,7 @@ namespace Terminal.Gui.ViewsTests {
 			var rs = Application.Begin (dialog);
 
 			Assert.Equal (new Rect (2, 2, 15, 4), dialog.Frame);
+			Assert.Equal (dialog, Application.Top);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
   ┌─────────────┐
   │ Test        │
