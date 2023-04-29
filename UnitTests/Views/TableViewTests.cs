@@ -2518,6 +2518,93 @@ A B C
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 		}
+		[Fact, AutoInitShutdown]
+		public void Test_CollectionNavigator ()
+		{
+			var tv = new TableView ();
+			tv.ColorScheme = Colors.TopLevel;
+			tv.Bounds = new Rect (0, 0, 50, 7);
+
+			tv.Table = new EnumerableTableSource<string> (
+				new string [] { "fish", "troll", "trap","zoo" },
+				new () {
+					{ "Name", (t)=>t},
+					{ "EndsWith", (t)=>t.Last()}
+				});
+
+			tv.LayoutSubviews ();
+
+			tv.Redraw (tv.Bounds);
+
+			string expected =
+				@"
+┌─────┬──────────────────────────────────────────┐
+│Name │EndsWith                                  │
+├─────┼──────────────────────────────────────────┤
+│fish │h                                         │
+│troll│l                                         │
+│trap │p                                         │
+│zoo  │o                                         │";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			Assert.Equal (0, tv.SelectedRow);
+
+			// this test assumes no focus
+			Assert.False (tv.HasFocus);
+
+			// already on fish
+			tv.ProcessKey (new KeyEvent {Key = Key.f});
+			Assert.Equal (0, tv.SelectedRow);
+
+			// not focused
+			tv.ProcessKey (new KeyEvent { Key = Key.z });
+			Assert.Equal (0, tv.SelectedRow);
+
+			// ensure that TableView has the input focus
+			Application.Top.Add (tv);
+			Application.Begin (Application.Top);
+
+			Application.Top.FocusFirst ();
+			Assert.True (tv.HasFocus);
+
+			// already on fish
+			tv.ProcessKey (new KeyEvent { Key = Key.f });
+			Assert.Equal (0, tv.SelectedRow);
+
+			// move to zoo
+			tv.ProcessKey (new KeyEvent { Key = Key.z });
+			Assert.Equal (3, tv.SelectedRow);
+
+			// move to troll
+			tv.ProcessKey (new KeyEvent { Key = Key.t });
+			Assert.Equal (1, tv.SelectedRow);
+			
+			// move to trap
+			tv.ProcessKey (new KeyEvent { Key = Key.t });
+			Assert.Equal (2, tv.SelectedRow);
+
+			// change columns to navigate by column 2
+			Assert.Equal (0, tv.SelectedColumn);
+			Assert.Equal (2, tv.SelectedRow);
+			tv.ProcessKey (new KeyEvent { Key = Key.CursorRight });
+			Assert.Equal (1, tv.SelectedColumn);
+			Assert.Equal (2, tv.SelectedRow);
+
+			// nothing ends with t so stay where you are
+			tv.ProcessKey (new KeyEvent { Key = Key.t });
+			Assert.Equal (2, tv.SelectedRow);
+
+			//jump to fish which ends in h
+			tv.ProcessKey (new KeyEvent { Key = Key.h });
+			Assert.Equal (0, tv.SelectedRow);
+
+			// jump to zoo which ends in o
+			tv.ProcessKey (new KeyEvent { Key = Key.o });
+			Assert.Equal (3, tv.SelectedRow);
+
+
+		}
 		private TableView GetTwoRowSixColumnTable ()
 		{
 			return GetTwoRowSixColumnTable (out _);
