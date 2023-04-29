@@ -1090,15 +1090,13 @@ namespace Terminal.Gui.ViewTests {
 			Application.Begin (top);
 
 			Assert.Equal (Application.Current, top);
-			Assert.Equal (new Rect (0, 0, 80, 25), View.DriverFrame);
-			Assert.Equal (View.DriverFrame, top.Frame);
+			Assert.Equal (new Rect (0, 0, 80, 25), new Rect (0, 0, View.Driver.Cols, View.Driver.Rows));
+			Assert.Equal (new Rect (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
 			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
-			Assert.Equal ((Point.Empty, Point.Empty), View.DriverFrameOffset);
 
 			((FakeDriver)Application.Driver).SetBufferSize (20, 10);
-			Assert.Equal (View.DriverFrame, top.Frame);
+			Assert.Equal (new Rect (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
 			Assert.Equal (new Rect (0, 0, 20, 10), top.Frame);
-			Assert.Equal ((Point.Empty, Point.Empty), View.DriverFrameOffset);
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
 │                  │
@@ -1205,16 +1203,14 @@ namespace Terminal.Gui.ViewTests {
 			Application.Begin (top);
 
 			Assert.Equal (Application.Current, top);
-			Assert.Equal (new Rect (0, 0, 80, 25), View.DriverFrame);
-			Assert.NotEqual (View.DriverFrame, top.Frame);
+			Assert.Equal (new Rect (0, 0, 80, 25), new Rect (0, 0, View.Driver.Cols, View.Driver.Rows));
+			Assert.NotEqual (new Rect (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
 			Assert.Equal (new Rect (3, 2, 20, 10), top.Frame);
-			Assert.Equal ((new (3, 2), new Point (-57, -13)), View.DriverFrameOffset);
 
 			((FakeDriver)Application.Driver).SetBufferSize (30, 20);
-			Assert.Equal (new Rect (0, 0, 30, 20), View.DriverFrame);
-			Assert.NotEqual (View.DriverFrame, top.Frame);
+			Assert.Equal (new Rect (0, 0, 30, 20), new Rect (0, 0, View.Driver.Cols, View.Driver.Rows));
+			Assert.NotEqual (new Rect (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
 			Assert.Equal (new Rect (3, 2, 20, 10), top.Frame);
-			Assert.Equal ((new (3, 2), new Point (-7, -8)), View.DriverFrameOffset);
 			var frame = TestHelpers.AssertDriverContentsWithFrameAre (@"
    ┌──────────────────┐
    │                  │

@@ -92,7 +92,7 @@ namespace Terminal.Gui {
 			}
 			container = Application.Current;
 			container.Closing += Container_Closing;
-			var frame = View.DriverFrame;
+			var frame = new Rect (0, 0, View.Driver.Cols, View.Driver.Rows);
 			var position = Position;
 			if (Host != null) {
 				Host.ViewToScreen (frame.X, frame.Y, out int x, out int y);

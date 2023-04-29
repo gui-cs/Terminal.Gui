@@ -322,17 +322,6 @@ namespace Terminal.Gui {
 		public static ConsoleDriver Driver => Application.Driver;
 
 		/// <summary>
-		/// Gets the current driver <see cref="Rect"/> in use by the view.
-		/// </summary>
-		public static Rect DriverFrame => new (0, 0, Driver.Cols, Driver.Rows);
-
-		/// <summary>
-		/// Gets the current driver location and dimension in use by the view
-		/// offset by the <see cref="Application.Top"/> location and dimension.
-		/// </summary>
-		public static (Point Location, Point Dimension) DriverFrameOffset => new (new Point (Application.Top.Frame.X, Application.Top.Frame.Y), new (Application.Top.Frame.X + Application.Top.Frame.Width - Driver.Cols, Application.Top.Frame.Y + Application.Top.Frame.Height - Driver.Rows));
-
-		/// <summary>
 		/// Gets or sets arbitrary data for the view.
 		/// </summary>
 		/// <remarks>This property is not used internally.</remarks>
@@ -526,7 +515,7 @@ namespace Terminal.Gui {
 		/// <returns>The location offset.</returns>
 		public Point GetDriverLocationOffset ()
 		{
-			var superViewFrame = SuperView == null ? DriverFrame : SuperView.Frame;
+			var superViewFrame = SuperView == null ? new Rect (0, 0, Driver.Cols, Driver.Rows) : SuperView.Frame;
 			var sv = SuperView == null ? Application.Current : SuperView;
 			return new Point (superViewFrame.X - sv.Frame.X - (superViewFrame.X != sv.Frame.X ? 1 : 0),
 				superViewFrame.Y - sv.Frame.Y - (superViewFrame.Y != sv.Frame.Y ? 1 : 0));
@@ -538,7 +527,7 @@ namespace Terminal.Gui {
 		/// <returns>The location offset.</returns>
 		public Point GetDriverLocationOffsetFromCurrent ()
 		{
-			var topFrame = DriverFrame;
+			var topFrame = new Rect (0, 0, Driver.Cols, Driver.Rows);
 			var currentFrame = Application.Current.Frame;
 			return new Point (topFrame.X - currentFrame.X - (topFrame.X != currentFrame.X ? 1 : 0),
 				topFrame.Y - currentFrame.Y - (topFrame.Y != currentFrame.Y ? 1 : 0));
