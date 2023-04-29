@@ -85,10 +85,8 @@ namespace Terminal.Gui {
 		private IFileSystem fileSystem;
 		private TextField tbPath;
 
-		private FileDialogSorter sorter;
 		private FileDialogHistory history;
 
-		private DataTable dtFiles;
 		private TableView tableView;
 		private TreeView<object> treeView;
 		private TileView splitContainer;
@@ -107,7 +105,10 @@ namespace Terminal.Gui {
 		private MenuBar allowedTypeMenuBar;
 		private MenuBarItem allowedTypeMenu;
 		private MenuItem [] allowedTypeMenuItems;
-		private int filenameColumn;
+
+		private int currentSortColumn;
+		
+		private bool currentSortIsAsc = true;
 
 		/// <summary>
 		/// Event fired when user attempts to confirm a selection (or multi selection).
@@ -220,7 +221,24 @@ namespace Terminal.Gui {
 			};
 
 			this.tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
+			this.tableView.MouseClick += OnTableViewMouseClick;
 			Style.TableStyle = tableView.Style;
+
+			var nameStyle = Style.TableStyle.GetOrCreateColumnStyle (0);
+			nameStyle.MinWidth = 10;
+			nameStyle.ColorGetter = this.ColorGetter;
+
+			var sizeStyle = Style.TableStyle.GetOrCreateColumnStyle (1);
+			sizeStyle.MinWidth = 10;
+			sizeStyle.ColorGetter = this.ColorGetter;
+
+			var dateModifiedStyle = Style.TableStyle.GetOrCreateColumnStyle (2);
+			dateModifiedStyle.MinWidth = 30;
+			dateModifiedStyle.ColorGetter = this.ColorGetter;
+
+			var typeStyle = Style.TableStyle.GetOrCreateColumnStyle (3);
+			typeStyle.MinWidth = 6;
+			typeStyle.ColorGetter = this.ColorGetter;
 
 			this.tableView.KeyPress += (s, k) => {
 				if (this.tableView.SelectedRow <= 0) {
@@ -313,12 +331,7 @@ namespace Terminal.Gui {
 			this.tableView.Style.ShowHorizontalHeaderUnderline = true;
 			this.tableView.Style.ShowHorizontalScrollIndicators = true;
 
-			this.SetupTableColumns ();
-
-			this.sorter = new FileDialogSorter (this, this.tableView);
 			this.history = new FileDialogHistory (this);
-
-			this.tableView.Table = new DataTableSource(this.dtFiles);
 
 			this.tbPath.TextChanged += (s, e) => this.PathChanged ();
 
@@ -366,9 +379,29 @@ namespace Terminal.Gui {
 			this.Add (this.btnForward);
 			this.Add (this.tbPath);
 			this.Add (this.splitContainer);
+		}
 
-			// Default sort order is by name
-			sorter.SortColumn(this.filenameColumn,true);
+		private void OnTableViewMouseClick (object sender, MouseEventEventArgs e)
+		{
+			var clickedCell = this.tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
+
+			if (clickedCol != null) {
+				if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
+
+					// left click in a header
+					this.SortColumn (clickedCol.Value);
+				} else if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
+
+					// right click in a header
+					this.ShowHeaderContextMenu (clickedCol.Value, e);
+				}
+			} else {
+				if (clickedCell != null && e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
+
+					// right click in rest of table
+					this.ShowCellContextMenu (clickedCell, e);
+				}
+			}
 		}
 
 		private string GetForwardButtonText ()
@@ -541,15 +574,7 @@ namespace Terminal.Gui {
 			var col = tableView.SelectedColumn;
 			var style = tableView.Style.GetColumnStyleIfAny (col);
 
-
-			var collection = dtFiles
-				.Rows
-				.Cast<DataRow> ()
-				.Select ((o, idx) => col == 0 ? 
-					RowToStats(idx).FileSystemInfo.Name :
-					style.GetRepresentation (o [0])?.TrimStart('.'))
-				.ToArray ();
-
+			var collection = State.Children.Select (s=> FileDialogTableSource.GetRawColumnValue(col,s));
 			collectionNavigator = new CollectionNavigator (collection);
 		}
 
@@ -963,61 +988,6 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		private void SetupTableColumns ()
-		{
-			this.dtFiles = new DataTable ();
-
-			var nameStyle = this.tableView.Style.GetOrCreateColumnStyle (
-				filenameColumn = this.dtFiles.Columns.Add (Style.FilenameColumnName, typeof (int)).Ordinal
-				);
-			nameStyle.RepresentationGetter = (i) => {
-
-				var stats = this.State?.Children [(int)i];
-
-				if (stats == null) {
-					return string.Empty;
-				}
-
-				var icon = stats.IsParent ? null : Style.IconGetter?.Invoke (stats.FileSystemInfo);
-
-				if (icon != null) {
-					return icon + stats.Name;
-				}
-				return stats.Name;
-			};
-
-			nameStyle.MinWidth = 50;
-
-			var sizeStyle = this.tableView.Style.GetOrCreateColumnStyle (
-				this.dtFiles.Columns.Add (Style.SizeColumnName, typeof (int)).Ordinal);
-			sizeStyle.RepresentationGetter = (i) => this.State?.Children [(int)i].HumanReadableLength ?? string.Empty;
-			nameStyle.MinWidth = 10;
-
-			var dateModifiedStyle = this.tableView.Style.GetOrCreateColumnStyle (
-				this.dtFiles.Columns.Add (Style.ModifiedColumnName, typeof (int)).Ordinal);
-			dateModifiedStyle.RepresentationGetter = (i) => 
-			{
-				var s = this.State?.Children [(int)i];
-				if(s == null || s.IsParent || s.LastWriteTime == null)
-				{
-					return string.Empty;
-				}
-				return s.LastWriteTime.Value.ToString (Style.DateFormat);
-			};
-
-			dateModifiedStyle.MinWidth = 30;
-
-			var typeStyle = this.tableView.Style.GetOrCreateColumnStyle (
-				this.dtFiles.Columns.Add (Style.TypeColumnName, typeof (int)).Ordinal);
-			typeStyle.RepresentationGetter = (i) => this.State?.Children [(int)i].Type ?? string.Empty;
-			typeStyle.MinWidth = 6;
-
-			foreach(var colStyle in Style.TableStyle.ColumnStyles) {
-				colStyle.Value.ColorGetter = this.ColorGetter;
-			}
-			
-		}
-
 		private void CellActivate (object sender, CellActivatedEventArgs obj)
 		{
 			if(TryAcceptMulti())
@@ -1225,21 +1195,11 @@ namespace Terminal.Gui {
 			if (this.State == null) {
 				return;
 			}
+			this.tableView.Table = new FileDialogTableSource (this.State, this.Style, currentSortColumn, currentSortIsAsc);
 
-			this.dtFiles.Rows.Clear ();
-
-			for (int i = 0; i < this.State.Children.Length; i++) {
-				this.BuildRow (i);
-			}
-
-			this.sorter.ApplySort ();
+			this.ApplySort ();
 			this.tableView.Update ();
 			UpdateCollectionNavigator ();
-		}
-
-		private void BuildRow (int idx)
-		{
-			dtFiles.Rows.Add (idx, idx, idx, idx);
 		}
 
 		private ColorScheme ColorGetter (TableView.CellColorGetterArgs args)
@@ -1279,7 +1239,7 @@ namespace Terminal.Gui {
 
 				foreach (var p in this.tableView.GetAllSelectedCells ()) {
 
-					var add = this.State?.Children [(int)this.tableView.Table[p.Y, 0]];
+					var add = this.State?.Children [p.Y];
 					if (add != null) {
 						toReturn.Add (add);
 					}
@@ -1290,31 +1250,9 @@ namespace Terminal.Gui {
 		}
 		private FileSystemInfoStats RowToStats (int rowIndex)
 		{
-			return this.State?.Children [(int)this.tableView.Table[rowIndex,0]];
+			return this.State?.Children [rowIndex];
 		}
-		private int? StatsToRow (IFileSystemInfo fileSystemInfo)
-		{
-			// find array index of the current state for the stats
-			var idx = State?.Children.IndexOf ((f) => f.FileSystemInfo.FullName == fileSystemInfo.FullName);
-
-			if (idx != -1 && idx != null) {
-
-				// find the row number in our DataTable where the cell
-				// contains idx
-				var match = dtFiles.Rows
-					.Cast<DataRow> ()
-					.Select ((r, rIdx) => new { row = r, rowIdx = rIdx })
-					.Where (t => (int)t.row [0] == idx)
-					.ToArray ();
-
-				if (match.Length == 1) {
-					return match [0].rowIdx;
-				}
-			}
-
-			return null;
-		}
-
+	
 		private void PathChanged ()
 		{
 			// avoid re-entry
@@ -1358,185 +1296,110 @@ namespace Terminal.Gui {
 		/// <param name="toRestore"></param>
 		internal void RestoreSelection (IFileSystemInfo toRestore)
 		{
-			var toReselect = StatsToRow (toRestore);
+			tableView.SelectedRow = State.Children.IndexOf (r=>r.FileSystemInfo == toRestore);
+			tableView.EnsureSelectedCellIsVisible ();
+		}
 
-			if (toReselect.HasValue) {
-				tableView.SelectedRow = toReselect.Value;
-				tableView.EnsureSelectedCellIsVisible ();
+		internal void ApplySort ()
+		{
+			var stats = State?.Children ?? new FileSystemInfoStats [0];
+
+			// This portion is never reordered (aways .. at top then folders)
+			var forcedOrder = stats
+			.OrderByDescending (f => f.IsParent)
+					.ThenBy (f => f.IsDir() ? -1:100);
+
+			// This portion is flexible based on the column clicked (e.g. alphabetical)
+			var ordered = 
+				this.currentSortIsAsc ?
+					forcedOrder.ThenBy (f => FileDialogTableSource.GetRawColumnValue(currentSortColumn,f)):
+					forcedOrder.ThenByDescending (f => FileDialogTableSource.GetRawColumnValue (currentSortColumn, f));
+
+			State.Children = ordered.ToArray();
+
+			this.tableView.Update ();
+			UpdateCollectionNavigator ();
+		}
+
+		private void SortColumn (int clickedCol)
+		{
+			this.GetProposedNewSortOrder (clickedCol, out var isAsc);
+			this.SortColumn (clickedCol, isAsc);
+			this.tableView.Table = new FileDialogTableSource(State,Style,currentSortColumn,currentSortIsAsc);
+		}
+
+		internal void SortColumn (int col, bool isAsc)
+		{
+			// set a sort order
+			this.currentSortColumn = col;
+			this.currentSortIsAsc = isAsc;
+
+			this.ApplySort ();
+		}
+
+		private string GetProposedNewSortOrder (int clickedCol, out bool isAsc)
+		{
+			// work out new sort order
+			if (this.currentSortColumn == clickedCol && this.currentSortIsAsc) {
+				isAsc = false;
+				return $"{tableView.Table.ColumnNames[clickedCol]} DESC";
+			} else {
+				isAsc = true;
+				return $"{tableView.Table.ColumnNames [clickedCol]} ASC";
 			}
 		}
-		private class FileDialogSorter {
-			private readonly FileDialog dlg;
-			private TableView tableView;
 
-			private int? currentSort = null;
-			private bool currentSortIsAsc = true;
+		private void ShowHeaderContextMenu (int clickedCol, MouseEventEventArgs e)
+		{
+			var sort = this.GetProposedNewSortOrder (clickedCol, out var isAsc);
 
-			public FileDialogSorter (FileDialog dlg, TableView tableView)
-			{
-				this.dlg = dlg;
-				this.tableView = tableView;
+			var contextMenu = new ContextMenu (
+				e.MouseEvent.X + 1,
+				e.MouseEvent.Y + 1,
+				new MenuBarItem (new MenuItem []
+				{
+					new MenuItem($"Hide {StripArrows(tableView.Table.ColumnNames[clickedCol])}", string.Empty, () => this.HideColumn(clickedCol)),
+					new MenuItem($"Sort {StripArrows(sort)}",string.Empty, ()=> this.SortColumn(clickedCol,isAsc)),
+				})
+			);
 
-				// if user clicks the mouse in TableView
-				this.tableView.MouseClick += (s, e) => {
-
-					var clickedCell = this.tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
-
-					if (clickedCol != null) {
-						if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
-
-							// left click in a header
-							this.SortColumn (clickedCol.Value);
-						} else if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
-
-							// right click in a header
-							this.ShowHeaderContextMenu (clickedCol.Value, e);
-						}
-					} else {
-						if (clickedCell != null && e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
-
-							// right click in rest of table
-							this.ShowCellContextMenu (clickedCell, e);
-						}
-					}
-
-				};
-
-			}
-
-			internal void ApplySort ()
-			{
-				var col = this.currentSort;
-
-				if(col == null) {
-					return;
-				}
-
-				// TODO: Consider preserving selection
-				dlg.dtFiles.Rows.Clear ();
-
-				var colName = col == null ? null : StripArrows (tableView.Table.ColumnNames[col.Value]);
-
-				var stats = this.dlg.State?.Children ?? new FileSystemInfoStats [0];
-
-				// Do we sort on a column or just use the default sort order?
-				Func<FileSystemInfoStats, object> sortAlgorithm;
-
-				if (colName == null) {
-					sortAlgorithm = (v) => v.GetOrderByDefault ();
-					this.currentSortIsAsc = true;
-				} else {
-					sortAlgorithm = (v) => v.GetOrderByValue (dlg, colName);
-				}
-
-				// This portion is never reordered (aways .. at top then folders)
-				var forcedOrder = stats.Select ((v, i) => new { v, i })
-						.OrderByDescending (f => f.v.IsParent)
-						.ThenBy (f => f.v.IsDir() ? -1:100);
-
-				// This portion is flexible based on the column clicked (e.g. alphabetical)
-				var ordered = 
-					this.currentSortIsAsc ?
-					    forcedOrder.ThenBy (f => sortAlgorithm (f.v)):
-						forcedOrder.ThenByDescending (f => sortAlgorithm (f.v));
-
-				foreach (var o in ordered) {
-					this.dlg.BuildRow (o.i);
-				}
-
-				foreach (DataColumn c in dlg.dtFiles.Columns) {
-
-					// remove any lingering sort indicator
-					c.ColumnName = StripArrows (c.ColumnName);
-
-					// add a new one if this the one that is being sorted
-					if (c.Ordinal == col) {
-						c.ColumnName += this.currentSortIsAsc ? " (▲)" : " (▼)";
-					}
-				}
-
-				this.tableView.Update ();
-				dlg.UpdateCollectionNavigator ();
-			}
-
-			private static string StripArrows (string columnName)
-			{
-				return columnName.Replace (" (▼)", string.Empty).Replace (" (▲)", string.Empty);
-			}
-
-			private void SortColumn (int clickedCol)
-			{
-				this.GetProposedNewSortOrder (clickedCol, out var isAsc);
-				this.SortColumn (clickedCol, isAsc);
-			}
-
-			internal void SortColumn (int col, bool isAsc)
-			{
-				// set a sort order
-				this.currentSort = col;
-				this.currentSortIsAsc = isAsc;
-
-				this.ApplySort ();
-			}
-
-			private string GetProposedNewSortOrder (int clickedCol, out bool isAsc)
-			{
-				// work out new sort order
-				if (this.currentSort == clickedCol && this.currentSortIsAsc) {
-					isAsc = false;
-					return $"{tableView.Table.ColumnNames[clickedCol]} DESC";
-				} else {
-					isAsc = true;
-					return $"{tableView.Table.ColumnNames [clickedCol]} ASC";
-				}
-			}
-
-			private void ShowHeaderContextMenu (int clickedCol, MouseEventEventArgs e)
-			{
-				var sort = this.GetProposedNewSortOrder (clickedCol, out var isAsc);
-
-				var contextMenu = new ContextMenu (
-					e.MouseEvent.X + 1,
-					e.MouseEvent.Y + 1,
-					new MenuBarItem (new MenuItem []
-					{
-						new MenuItem($"Hide {StripArrows(tableView.Table.ColumnNames[clickedCol])}", string.Empty, () => this.HideColumn(clickedCol)),
-						new MenuItem($"Sort {StripArrows(sort)}",string.Empty, ()=> this.SortColumn(clickedCol,isAsc)),
-					})
-				);
-
-				contextMenu.Show ();
-			}
-
-			private void ShowCellContextMenu (Point? clickedCell, MouseEventEventArgs e)
-			{
-				if (clickedCell == null) {
-					return;
-				}
-
-				var contextMenu = new ContextMenu (
-					e.MouseEvent.X + 1,
-					e.MouseEvent.Y + 1,
-					new MenuBarItem (new MenuItem []
-					{
-						new MenuItem($"New", string.Empty, () => dlg.New()),
-						new MenuItem($"Rename",string.Empty, ()=>  dlg.Rename()),
-						new MenuItem($"Delete",string.Empty, ()=>  dlg.Delete()),
-					})
-				);
-
-				dlg.tableView.SetSelection (clickedCell.Value.X, clickedCell.Value.Y, false);
-
-				contextMenu.Show ();
-			}
-
-			private void HideColumn (int clickedCol)
-			{
-				var style = this.tableView.Style.GetOrCreateColumnStyle (clickedCol);
-				style.Visible = false;
-				this.tableView.Update ();
-			}
+			contextMenu.Show ();
 		}
+
+		private static string StripArrows (string columnName)
+		{
+			return columnName.Replace (" (▼)", string.Empty).Replace (" (▲)", string.Empty);
+		}
+
+		private void ShowCellContextMenu (Point? clickedCell, MouseEventEventArgs e)
+		{
+			if (clickedCell == null) {
+				return;
+			}
+
+			var contextMenu = new ContextMenu (
+				e.MouseEvent.X + 1,
+				e.MouseEvent.Y + 1,
+				new MenuBarItem (new MenuItem []
+				{
+					new MenuItem($"New", string.Empty, () => New()),
+					new MenuItem($"Rename",string.Empty, ()=>  Rename()),
+					new MenuItem($"Delete",string.Empty, ()=>  Delete()),
+				})
+			);
+
+			tableView.SetSelection (clickedCell.Value.X, clickedCell.Value.Y, false);
+
+			contextMenu.Show ();
+		}
+
+		private void HideColumn (int clickedCol)
+		{
+			var style = this.tableView.Style.GetOrCreateColumnStyle (clickedCol);
+			style.Visible = false;
+			this.tableView.Update ();
+		}
+		
 		/// <summary>
 		/// State representing a recursive search from <see cref="FileDialogState.Directory"/>
 		/// downwards.
