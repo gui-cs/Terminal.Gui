@@ -22,6 +22,7 @@ namespace UICatalog.Scenarios {
 	public class CsvEditor : Scenario {
 		TableView tableView;
 		private string currentFile;
+		DataTable currentTable;
 		private MenuItem miLeft;
 		private MenuItem miRight;
 		private MenuItem miCentered;
@@ -121,9 +122,7 @@ namespace UICatalog.Scenarios {
 			if (tableView.Table == null || tableView.SelectedColumn == -1)
 				return;
 
-			var col = tableView.Table.Columns [tableView.SelectedColumn];
-
-			var style = tableView.Style.GetColumnStyleIfAny (col);
+			var style = tableView.Style.GetColumnStyleIfAny (tableView.SelectedColumn);
 
 			miLeft.Checked = style?.Alignment == TextAlignment.Left;
 			miRight.Checked = style?.Alignment == TextAlignment.Right;
@@ -136,7 +135,7 @@ namespace UICatalog.Scenarios {
 				return;
 			}
 
-			var currentCol = tableView.Table.Columns [tableView.SelectedColumn];
+			var currentCol = currentTable.Columns [tableView.SelectedColumn];
 
 			if (GetText ("Rename Column", "Name:", currentCol.ColumnName, out string newName)) {
 				currentCol.ColumnName = newName;
@@ -157,7 +156,7 @@ namespace UICatalog.Scenarios {
 			}
 
 			try {
-				tableView.Table.Columns.RemoveAt (tableView.SelectedColumn);
+				currentTable.Columns.RemoveAt (tableView.SelectedColumn);
 				tableView.Update ();
 
 			} catch (Exception ex) {
@@ -179,11 +178,11 @@ namespace UICatalog.Scenarios {
 
 			try {
 
-				var currentCol = tableView.Table.Columns [tableView.SelectedColumn];
+				var currentCol = currentTable.Columns [tableView.SelectedColumn];
 
 				if (GetText ("Move Column", "New Index:", currentCol.Ordinal.ToString (), out string newOrdinal)) {
 
-					var newIdx = Math.Min (Math.Max (0, int.Parse (newOrdinal)), tableView.Table.Columns.Count - 1);
+					var newIdx = Math.Min (Math.Max (0, int.Parse (newOrdinal)), tableView.Table.Columns - 1);
 
 					currentCol.SetOrdinal (newIdx);
 
@@ -209,10 +208,15 @@ namespace UICatalog.Scenarios {
 				return;
 			}
 
-			var colName = tableView.Table.Columns [tableView.SelectedColumn].ColumnName;
+			var colName = tableView.Table.ColumnNames [tableView.SelectedColumn];
 
-			tableView.Table.DefaultView.Sort = colName + (asc ? " asc" : " desc");
-			tableView.Table = tableView.Table.DefaultView.ToTable ();
+			currentTable.DefaultView.Sort = colName + (asc ? " asc" : " desc");
+			SetTable(currentTable.DefaultView.ToTable ());
+		}
+
+		private void SetTable (DataTable dataTable)
+		{			
+			tableView.Table = new DataTableSource(currentTable = dataTable);
 		}
 
 		private void MoveRow ()
@@ -231,23 +235,23 @@ namespace UICatalog.Scenarios {
 
 				int oldIdx = tableView.SelectedRow;
 
-				var currentRow = tableView.Table.Rows [oldIdx];
+				var currentRow = currentTable.Rows [oldIdx];
 
 				if (GetText ("Move Row", "New Row:", oldIdx.ToString (), out string newOrdinal)) {
 
-					var newIdx = Math.Min (Math.Max (0, int.Parse (newOrdinal)), tableView.Table.Rows.Count - 1);
+					var newIdx = Math.Min (Math.Max (0, int.Parse (newOrdinal)), tableView.Table.Rows - 1);
 
 					if (newIdx == oldIdx)
 						return;
 
 					var arrayItems = currentRow.ItemArray;
-					tableView.Table.Rows.Remove (currentRow);
+					currentTable.Rows.Remove (currentRow);
 
 					// Removing and Inserting the same DataRow seems to result in it loosing its values so we have to create a new instance
-					var newRow = tableView.Table.NewRow ();
+					var newRow = currentTable.NewRow ();
 					newRow.ItemArray = arrayItems;
 
-					tableView.Table.Rows.InsertAt (newRow, newIdx);
+					currentTable.Rows.InsertAt (newRow, newIdx);
 
 					tableView.SetSelection (tableView.SelectedColumn, newIdx, false);
 					tableView.EnsureSelectedCellIsVisible ();
@@ -265,9 +269,7 @@ namespace UICatalog.Scenarios {
 				return;
 			}
 
-			var col = tableView.Table.Columns [tableView.SelectedColumn];
-
-			var style = tableView.Style.GetOrCreateColumnStyle (col);
+			var style = tableView.Style.GetOrCreateColumnStyle (tableView.SelectedColumn);
 			style.Alignment = newAlignment;
 
 			miLeft.Checked = style.Alignment == TextAlignment.Left;
@@ -283,14 +285,14 @@ namespace UICatalog.Scenarios {
 				return;
 			}
 
-			var col = tableView.Table.Columns [tableView.SelectedColumn];
+			var col = currentTable.Columns [tableView.SelectedColumn];
 
 			if (col.DataType == typeof (string)) {
 				MessageBox.ErrorQuery ("Cannot Format Column", "String columns cannot be Formatted, try adding a new column to the table with a date/numerical Type", "Ok");
 				return;
 			}
 
-			var style = tableView.Style.GetOrCreateColumnStyle (col);
+			var style = tableView.Style.GetOrCreateColumnStyle (col.Ordinal);
 
 			if (GetText ("Format", "Pattern:", style.Format ?? "", out string newPattern)) {
 				style.Format = newPattern;
@@ -314,11 +316,11 @@ namespace UICatalog.Scenarios {
 				return;
 			}
 
-			var newRow = tableView.Table.NewRow ();
+			var newRow = currentTable.NewRow ();
 
-			var newRowIdx = Math.Min (Math.Max (0, tableView.SelectedRow + 1), tableView.Table.Rows.Count);
+			var newRowIdx = Math.Min (Math.Max (0, tableView.SelectedRow + 1), tableView.Table.Rows);
 
-			tableView.Table.Rows.InsertAt (newRow, newRowIdx);
+			currentTable.Rows.InsertAt (newRow, newRowIdx);
 			tableView.Update ();
 		}
 
@@ -332,7 +334,7 @@ namespace UICatalog.Scenarios {
 
 				var col = new DataColumn (colName);
 
-				var newColIdx = Math.Min (Math.Max (0, tableView.SelectedColumn + 1), tableView.Table.Columns.Count);
+				var newColIdx = Math.Min (Math.Max (0, tableView.SelectedColumn + 1), tableView.Table.Columns);
 
 				int result = MessageBox.Query ("Column Type", "Pick a data type for the column", new ustring [] { "Date", "Integer", "Double", "Text", "Cancel" });
 
@@ -353,7 +355,7 @@ namespace UICatalog.Scenarios {
 					break;
 				}
 
-				tableView.Table.Columns.Add (col);
+				currentTable.Columns.Add (col);
 				col.SetOrdinal (newColIdx);
 				tableView.Update ();
 			}
@@ -371,13 +373,13 @@ namespace UICatalog.Scenarios {
 				new StreamWriter (File.OpenWrite (currentFile)),
 				CultureInfo.InvariantCulture);
 
-			foreach (var col in tableView.Table.Columns.Cast<DataColumn> ().Select (c => c.ColumnName)) {
+			foreach (var col in currentTable.Columns.Cast<DataColumn> ().Select (c => c.ColumnName)) {
 				writer.WriteField (col);
 			}
 
 			writer.NextRecord ();
 
-			foreach (DataRow row in tableView.Table.Rows) {
+			foreach (DataRow row in currentTable.Rows) {
 				foreach (var item in row.ItemArray) {
 					writer.WriteField (item);
 				}
@@ -428,7 +430,7 @@ namespace UICatalog.Scenarios {
 					}
 				}
 
-				tableView.Table = dt;
+				SetTable(dt);
 
 				// Only set the current filename if we successfully loaded the entire file
 				currentFile = filename;
@@ -459,7 +461,7 @@ namespace UICatalog.Scenarios {
 			};*/
 
 			tableView.DrawContent += (s, e) => {
-				_scrollBar.Size = tableView.Table?.Rows?.Count ?? 0;
+				_scrollBar.Size = tableView.Table?.Rows ?? 0;
 				_scrollBar.Position = tableView.RowOffset;
 				//	_scrollBar.OtherScrollBarView.Size = _listView.Maxlength - 1;
 				//	_scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
@@ -475,12 +477,12 @@ namespace UICatalog.Scenarios {
 				if (tableView.FullRowSelect) {
 					// Delete button deletes all rows when in full row mode
 					foreach (int toRemove in tableView.GetAllSelectedCells ().Select (p => p.Y).Distinct ().OrderByDescending (i => i))
-						tableView.Table.Rows.RemoveAt (toRemove);
+						currentTable.Rows.RemoveAt (toRemove);
 				} else {
 
 					// otherwise set all selected cells to null
 					foreach (var pt in tableView.GetAllSelectedCells ()) {
-						tableView.Table.Rows [pt.Y] [pt.X] = DBNull.Value;
+						currentTable.Rows [pt.Y] [pt.X] = DBNull.Value;
 					}
 				}
 
@@ -540,11 +542,11 @@ namespace UICatalog.Scenarios {
 			if (e.Table == null)
 				return;
 
-			var oldValue = e.Table.Rows [e.Row] [e.Col].ToString ();
+			var oldValue = currentTable.Rows [e.Row] [e.Col].ToString ();
 
-			if (GetText ("Enter new value", e.Table.Columns [e.Col].ColumnName, oldValue, out string newText)) {
+			if (GetText ("Enter new value", currentTable.Columns [e.Col].ColumnName, oldValue, out string newText)) {
 				try {
-					e.Table.Rows [e.Row] [e.Col] = string.IsNullOrWhiteSpace (newText) ? DBNull.Value : (object)newText;
+					currentTable.Rows [e.Row] [e.Col] = string.IsNullOrWhiteSpace (newText) ? DBNull.Value : (object)newText;
 				} catch (Exception ex) {
 					MessageBox.ErrorQuery (60, 20, "Failed to set text", ex.Message, "Ok");
 				}
