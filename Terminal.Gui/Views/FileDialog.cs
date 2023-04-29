@@ -100,7 +100,7 @@ namespace Terminal.Gui {
 		private Button btnUp;
 		private string feedback;
 
-		private CollectionNavigator collectionNavigator = new CollectionNavigator ();
+		private TableCollectionNavigator collectionNavigator;
 
 		private TextField tbFind;
 		private SpinnerView spinnerView;
@@ -305,6 +305,8 @@ namespace Terminal.Gui {
 					NavigateIf (o, Key.CursorLeft, btnToggleSplitterCollapse);
 				}
 			};
+
+			collectionNavigator = new TableCollectionNavigator (tableView);
 
 			this.tableView.Style.ShowHorizontalHeaderOverline = true;
 			this.tableView.Style.ShowVerticalCellLines = true;
@@ -533,24 +535,6 @@ namespace Terminal.Gui {
 				tableView.EnsureSelectedCellIsVisible ();
 				keyEvent.Handled = true;
 			}
-		}
-
-		private void UpdateCollectionNavigator ()
-		{
-			tableView.EnsureValidSelection ();
-			var col = tableView.SelectedColumn;
-			var style = tableView.Style.GetColumnStyleIfAny (col);
-
-
-			var collection = dtFiles
-				.Rows
-				.Cast<DataRow> ()
-				.Select ((o, idx) => col == 0 ? 
-					RowToStats(idx).FileSystemInfo.Name :
-					style.GetRepresentation (o [0])?.TrimStart('.'))
-				.ToArray ();
-
-			collectionNavigator = new CollectionNavigator (collection);
 		}
 
 		/// <summary>
@@ -928,10 +912,6 @@ namespace Terminal.Gui {
 
 				this.pushingState = false;
 			}
-
-			if (obj.NewCol != obj.OldCol) {
-				UpdateCollectionNavigator ();
-			}
 		}
 
 		private bool TableView_KeyUp (KeyEvent keyEvent)
@@ -1234,7 +1214,6 @@ namespace Terminal.Gui {
 
 			this.sorter.ApplySort ();
 			this.tableView.Update ();
-			UpdateCollectionNavigator ();
 		}
 
 		private void BuildRow (int idx)
@@ -1456,7 +1435,6 @@ namespace Terminal.Gui {
 				}
 
 				this.tableView.Update ();
-				dlg.UpdateCollectionNavigator ();
 			}
 
 			private static string StripArrows (string columnName)
