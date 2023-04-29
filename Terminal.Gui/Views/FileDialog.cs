@@ -211,12 +211,12 @@ namespace Terminal.Gui {
 //			this.splitContainer.Border.BorderStyle = BorderStyle.None;
 			this.splitContainer.Tiles.ElementAt (0).ContentView.Visible = false;
 
-			this.tableView = new TableView () {
+			this.tableView = new TableView {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 				FullRowSelect = true,
+				CollectionNavigator = new FileDialogCollectionNavigator (this)
 			};
-
 			this.tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
 			this.tableView.MouseClick += OnTableViewMouseClick;
 			Style.TableStyle = tableView.Style;
@@ -1476,6 +1476,29 @@ namespace Terminal.Gui {
 				token.Cancel ();
 
 				return !alreadyCancelled;
+			}
+		}
+		internal class FileDialogCollectionNavigator : CollectionNavigatorBase {
+			private FileDialog fileDialog;
+
+			public FileDialogCollectionNavigator (FileDialog fileDialog)
+			{
+				this.fileDialog = fileDialog;
+			}
+
+			protected override object ElementAt (int idx)
+			{
+				var val = FileDialogTableSource.GetRawColumnValue (fileDialog.tableView.SelectedColumn, fileDialog.State?.Children [idx]);
+				if(val == null) {
+					return string.Empty;
+				}
+
+				return val.ToString().Trim('.');
+			}
+
+			protected override int GetCollectionLength ()
+			{
+				return fileDialog.State?.Children.Length ?? 0;
 			}
 		}
 	}

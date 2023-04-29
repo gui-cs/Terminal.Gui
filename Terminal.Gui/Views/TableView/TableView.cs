@@ -160,7 +160,7 @@ namespace Terminal.Gui {
 		/// Navigator for cycling the selected item in the table by typing.
 		/// Set to null to disable this feature.
 		/// </summary>
-		public TableCollectionNavigator CollectionNavigator { get; set;}
+		public CollectionNavigatorBase CollectionNavigator { get; set;}
 
 		/// <summary>
 		/// Initialzies a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. 
