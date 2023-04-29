@@ -73,7 +73,7 @@ namespace Terminal.Gui {
 
 		public bool IsImage ()
 		{
-			return this.FileSystemInfo is FileSystemInfo f &&
+			return this.FileSystemInfo is IFileSystemInfo f &&
 				ImageExtensions.Contains (
 					f.Extension,
 					StringComparer.InvariantCultureIgnoreCase);
@@ -82,7 +82,7 @@ namespace Terminal.Gui {
 		public bool IsExecutable ()
 		{
 			// TODO: handle linux executable status
-			return this.FileSystemInfo is FileSystemInfo f &&
+			return this.FileSystemInfo is IFileSystemInfo f &&
 				ExecutableExtensions.Contains (
 					f.Extension,
 					StringComparer.InvariantCultureIgnoreCase);
