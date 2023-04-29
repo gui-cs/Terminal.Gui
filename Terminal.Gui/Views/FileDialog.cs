@@ -1301,11 +1301,6 @@ namespace Terminal.Gui {
 		{
 			var stats = State?.Children ?? new FileSystemInfoStats [0];
 
-			// Do we sort on a column or just use the default sort order?
-			Func<FileSystemInfoStats, object> sortAlgorithm;
-
-			sortAlgorithm = (v) => v.GetOrderByValue (this, this.currentSortColumn);
-
 			// This portion is never reordered (aways .. at top then folders)
 			var forcedOrder = stats
 			.OrderByDescending (f => f.IsParent)
@@ -1314,8 +1309,8 @@ namespace Terminal.Gui {
 			// This portion is flexible based on the column clicked (e.g. alphabetical)
 			var ordered = 
 				this.currentSortIsAsc ?
-					forcedOrder.ThenBy (f => sortAlgorithm (f)):
-					forcedOrder.ThenByDescending (f => sortAlgorithm (f));
+					forcedOrder.ThenBy (f => FileDialogTableSource.GetRawColumnValue(currentSortColumn,f)):
+					forcedOrder.ThenByDescending (f => FileDialogTableSource.GetRawColumnValue (currentSortColumn, f));
 
 			State.Children = ordered.ToArray();
 

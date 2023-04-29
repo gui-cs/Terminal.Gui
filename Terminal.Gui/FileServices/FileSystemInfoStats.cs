@@ -88,19 +88,6 @@ namespace Terminal.Gui {
 					StringComparer.InvariantCultureIgnoreCase);
 		}
 
-		internal object GetOrderByValue (FileDialog dlg, int column)
-		{
-			switch(column)
-			{
-				case 0 : return this.FileSystemInfo.Name;
-				case 1 : return this.MachineReadableLength;;
-				case 2 : return this.LastWriteTime;
-				case 3 : return this.Type;
-			}
-
-			throw new ArgumentOutOfRangeException ("Unknown column " + nameof (column));
-		}
-
 		private static string GetHumanReadableFileSize (long value, CultureInfo culture)
 		{
 
