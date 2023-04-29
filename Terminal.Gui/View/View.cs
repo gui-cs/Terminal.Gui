@@ -510,7 +510,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets the superview location offset relative to the <see cref="DriverFrame"/>.
+		/// Gets the superview location offset relative to the <see cref="ConsoleDriver"/> size 
+		/// which is measured by the <see cref="ConsoleDriver.Cols"/> and <see cref="ConsoleDriver.Rows"/>.
 		/// </summary>
 		/// <returns>The location offset.</returns>
 		public Point GetDriverLocationOffset ()
@@ -522,7 +523,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets the <see cref="Application.Current"/> location offset relative to the <see cref="DriverFrame"/>.
+		/// Gets the <see cref="Application.Current"/> location offset relative to the <see cref="ConsoleDriver"/> size.
 		/// </summary>
 		/// <returns>The location offset.</returns>
 		public Point GetDriverLocationOffsetFromCurrent ()
