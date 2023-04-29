@@ -148,43 +148,60 @@ namespace Terminal.Gui {
 				return -1;
 			}
 
-			// find indexes of items that start with the search text
-			int [] matchingIndexes = GetCollection()
-				  .Where (k => k.Value?.ToString ().StartsWith (search, StringComparison.InvariantCultureIgnoreCase) ?? false)
-				  .Select (k => k.Key)
-				  .ToArray ();
+			var collectionLength = GetCollectionLength();
 
-			// if there are items beginning with search
-			if (matchingIndexes.Length > 0) {
-				// is one of them currently selected?
-				var currentlySelected = Array.IndexOf (matchingIndexes, currentIndex);
-
-				if (currentlySelected == -1) {
-					// we are not currently selecting any item beginning with the search
-					// so jump to first item in list that begins with the letter
-					return matchingIndexes [0];
-				} else {
-
-					// the current index is part of the matching collection
-					if (minimizeMovement) {
-						// if we would rather not jump around (e.g. user is typing lots of text to get this match)
-						return matchingIndexes [currentlySelected];
-					}
-
-					// cycle to next (circular)
-					return matchingIndexes [(currentlySelected + 1) % matchingIndexes.Length];
+			if(currentIndex != -1 && currentIndex < collectionLength && IsMatch(search, ElementAt(currentIndex)))
+			{
+				// we are already at a match
+				if (minimizeMovement) {
+					// if we would rather not jump around (e.g. user is typing lots of text to get this match)
+					return currentIndex;
 				}
-			}
 
-			// nothing starts with the search
-			return -1;
+				for (int i = 1 ; i <  collectionLength;i++)
+				{
+					//circular
+					var idxCandidate = (i + currentIndex) % collectionLength;
+					if(IsMatch(search, ElementAt(idxCandidate)))
+					{
+						return idxCandidate;
+					}
+				}
+
+				// nothing else starts with the search term
+				return currentIndex;
+			}
+			else
+			{
+				// search terms no longer match the current selection or there is none
+				for (int i = 0 ; i <  collectionLength;i++)
+				{
+					if(IsMatch(search, ElementAt(i)))
+					{
+						return i;
+					}
+				}
+				
+				// Nothing matches
+				return -1;
+			}
 		}
 
 		/// <summary>
-		/// Returns the index and value of each item that is to be considered for searching.
+		/// Return the number of elements in the collection
+		/// </summary>
+		protected abstract int  GetCollectionLength ();
+
+		private bool IsMatch (string search, object value)
+		{
+			return value?.ToString ().StartsWith (search, StringComparison.InvariantCultureIgnoreCase) ?? false;
+		}
+
+		/// <summary>
+		/// Returns the collection being navigated element at <paramref name="idx"/>.
 		/// </summary>
 		/// <returns></returns>
-		protected abstract IEnumerable<KeyValuePair<int, object>> GetCollection ();
+		protected abstract object ElementAt (int idx);
 
 		private void ClearSearchString ()
 		{

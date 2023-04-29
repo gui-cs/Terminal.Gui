@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,7 +12,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The collection of objects to search. <see cref="object.ToString()"/> is used to search the collection.
 		/// </summary>
-		public IEnumerable<object> Collection { get; set; }
+		public IList Collection { get; set; }
 
 		/// <summary>
 		/// Constructs a new CollectionNavigator.
@@ -22,18 +23,19 @@ namespace Terminal.Gui {
 		/// Constructs a new CollectionNavigator for the given collection.
 		/// </summary>
 		/// <param name="collection"></param>
-		public CollectionNavigator (IEnumerable<object> collection) => Collection = collection;
+		public CollectionNavigator (IList collection) => Collection = collection;
 
 		/// <inheritdoc/>
-		protected override IEnumerable<KeyValuePair<int, object>> GetCollection ()
+		protected override object ElementAt (int idx)
 		{
-			if (Collection == null) {
-				throw new InvalidOperationException ("Collection is null");
-			}
-
-			return Collection.Select ((item, idx) => KeyValuePair.Create(idx, item));
+			return Collection[idx];
 		}
 
+		/// <inheritdoc/>
+		protected override int GetCollectionLength ()
+		{
+			return Collection.Count;
+		}
 
 	}
 }
