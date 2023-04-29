@@ -358,7 +358,6 @@ namespace UICatalog {
 				ScenarioList.Style.ShowHorizontalBottomline = false;
 				ScenarioList.Style.ShowVerticalCellLines = false;
 				ScenarioList.Style.ShowVerticalHeaderLines = false;
-				ScenarioList.MultiSelect = false;
 
 				/* By default TableView lays out columns at render time and only
 				 * measures y rows of data at a time.  Where y is the height of the
@@ -395,6 +394,12 @@ namespace UICatalog {
 				// TableView typically is a grid where nav keys are biased for moving left/right.
 				ScenarioList.AddKeyBinding (Key.Home, Command.TopHome);
 				ScenarioList.AddKeyBinding (Key.End, Command.BottomEnd);
+
+				// Ideally, TableView.MultiSelect = false would turn off any keybindings for
+				// multi-select options. But it currently does not. UI Catalog uses Ctrl-A for
+				// a shortcut to About.
+				ScenarioList.MultiSelect = false;
+				ScenarioList.ClearKeyBinding (Key.CtrlMask | Key.A);
 
 				KeyDown += KeyDownHandler;
 
