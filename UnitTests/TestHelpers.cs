@@ -305,7 +305,44 @@ class TestHelpers {
 			r++;
 		}
 	}
+	/// <summary>
+	/// Verifies the console used all the <paramref name="expectedColors"/> when rendering.
+	/// If one or more of the expected colors are not used then the failure will output both
+	/// the colors that were found to be used and which of your expectations was not met.
+	/// </summary>
+	/// <param name="expectedColors"></param>
+	internal static void AssertDriverUsedColors (params Attribute [] expectedColors)
+	{
+		var driver = ((FakeDriver)Application.Driver);
 
+		var contents = driver.Contents;
+
+		var toFind = expectedColors.ToList ();
+
+		var colorsUsed = new HashSet<int> ();
+
+		for (int r = 0; r < driver.Rows; r++) {
+			for (int c = 0; c < driver.Cols; c++) {
+				int val = contents [r, c, 1];
+				
+				colorsUsed.Add (val);
+
+				var match = toFind.FirstOrDefault (e => e.Value == val);
+
+				// need to check twice because Attribute is a struct and therefore cannot be null
+				if (toFind.Any (e => e.Value == val)) {
+					toFind.Remove (match);
+				}
+			}
+		}
+
+		if(toFind.Any()) {
+			var sb = new StringBuilder ();
+			sb.AppendLine ("The following colors were not used:" + string.Join ("; ", toFind.Select (a => DescribeColor (a))));
+			sb.AppendLine ("Colors used were:" + string.Join ("; ", colorsUsed.Select (DescribeColor)));
+			throw new Exception (sb.ToString());
+		}
+	}
 	private static object DescribeColor (int userExpected)
 	{
 		var a = new Attribute (userExpected);
