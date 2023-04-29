@@ -495,10 +495,10 @@ namespace Terminal.Gui {
 		public Point ScreenToView (int x, int y)
 		{
 			if (SuperView == null) {
-				return new Point (x - _frame.X, y - _frame.Y);
+				return new Point (x - Frame.X, y - Frame.Y);
 			} else {
 				var parent = SuperView.ScreenToView (x, y);
-				return new Point (parent.X - _frame.X, parent.Y - _frame.Y);
+				return new Point (parent.X - Frame.X, parent.Y - Frame.Y);
 			}
 		}
 
@@ -512,10 +512,10 @@ namespace Terminal.Gui {
 		{
 			if (SuperView == null) {
 				var boundsOffset = GetBoundsOffset ();
-				return new Point (x - _frame.X + boundsOffset.X, y - _frame.Y + boundsOffset.Y);
+				return new Point (x - Frame.X + boundsOffset.X, y - Frame.Y + boundsOffset.Y);
 			} else {
 				var parent = SuperView.ScreenToView (x, y);
-				return new Point (parent.X - _frame.X, parent.Y - _frame.Y);
+				return new Point (parent.X - Frame.X, parent.Y - Frame.Y);
 			}
 		}
 
