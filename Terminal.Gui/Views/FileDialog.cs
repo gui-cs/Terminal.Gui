@@ -571,7 +571,7 @@ namespace Terminal.Gui {
 			var col = tableView.SelectedColumn;
 			var style = tableView.Style.GetColumnStyleIfAny (col);
 
-			var collection = Enumerable.Range (0, tableView.Table.Rows).Select (r=> tableView.Table [r, col]).ToArray ();
+			var collection = State.Children.Select (s=> FileDialogTableSource.GetRawColumnValue(col,s));
 			collectionNavigator = new CollectionNavigator (collection);
 		}
 
