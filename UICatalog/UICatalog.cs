@@ -358,6 +358,7 @@ namespace UICatalog {
 				ScenarioList.Style.ShowHorizontalBottomline = false;
 				ScenarioList.Style.ShowVerticalCellLines = false;
 				ScenarioList.Style.ShowVerticalHeaderLines = false;
+				ScenarioList.MultiSelect = false;
 
 				/* By default TableView lays out columns at render time and only
 				 * measures y rows of data at a time.  Where y is the height of the
@@ -394,7 +395,6 @@ namespace UICatalog {
 				// TableView typically is a grid where nav keys are biased for moving left/right.
 				ScenarioList.AddKeyBinding (Key.Home, Command.TopHome);
 				ScenarioList.AddKeyBinding (Key.End, Command.BottomEnd);
-				ScenarioList.ClearKeyBinding (Key.A | Key.CtrlMask);
 
 				KeyDown += KeyDownHandler;
 
