@@ -40,7 +40,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the culture to use (e.g. for number formatting).
 		/// Defaults to <see cref="CultureInfo.CurrentUICulture"/>.
-		/// <summary>
+		/// </summary>
 		public CultureInfo Culture {get;set;} = CultureInfo.CurrentUICulture;
 
 		/// <summary>
