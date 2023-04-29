@@ -226,7 +226,7 @@ namespace Terminal.Gui {
 			Style.TableStyle = tableView.Style;
 
 			var nameStyle = Style.TableStyle.GetOrCreateColumnStyle (0);
-			nameStyle.MinWidth = 15;
+			nameStyle.MinWidth = 10;
 
 			var sizeStyle = Style.TableStyle.GetOrCreateColumnStyle (1);
 			sizeStyle.MinWidth = 10;
@@ -1236,7 +1236,7 @@ namespace Terminal.Gui {
 
 				foreach (var p in this.tableView.GetAllSelectedCells ()) {
 
-					var add = this.State?.Children [(int)this.tableView.Table[p.Y, 0]];
+					var add = this.State?.Children [p.Y];
 					if (add != null) {
 						toReturn.Add (add);
 					}
