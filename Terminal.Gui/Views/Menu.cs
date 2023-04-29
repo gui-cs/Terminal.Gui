@@ -523,7 +523,7 @@ namespace Terminal.Gui {
 			if (me.View is MenuBar) {
 				return;
 			}
-			var locationOffset = GetDriverLocationOffsetFromCurrent ();
+			var locationOffset = host.GetDriverLocationOffsetFromCurrent ();
 			if (SuperView != null && SuperView != Application.Current) {
 				locationOffset.X += SuperView.Border.Thickness.Left;
 				locationOffset.Y += SuperView.Border.Thickness.Top;
@@ -881,7 +881,7 @@ namespace Terminal.Gui {
 			}
 			host.handled = false;
 			bool disabled;
-			Point locationOffset = GetDriverLocationOffset ();
+			Point locationOffset = host.GetDriverLocationOffset ();
 			if (SuperView != null && SuperView != Application.Current) {
 				locationOffset.X += SuperView.Border.Thickness.Left;
 				locationOffset.Y += SuperView.Border.Thickness.Top;
@@ -2098,6 +2098,31 @@ namespace Terminal.Gui {
 			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
 
 			return base.OnEnter (view);
+		}
+
+		/// <summary>
+		/// Gets the superview location offset relative to the <see cref="ConsoleDriver"/> size 
+		/// which is measured by the <see cref="ConsoleDriver.Cols"/> and <see cref="ConsoleDriver.Rows"/>.
+		/// </summary>
+		/// <returns>The location offset.</returns>
+		internal Point GetDriverLocationOffset ()
+		{
+			var superViewFrame = SuperView == null ? new Rect (0, 0, Driver.Cols, Driver.Rows) : SuperView.Frame;
+			var sv = SuperView == null ? Application.Current : SuperView;
+			return new Point (superViewFrame.X - sv.Frame.X - (superViewFrame.X != sv.Frame.X ? 1 : 0),
+				superViewFrame.Y - sv.Frame.Y - (superViewFrame.Y != sv.Frame.Y ? 1 : 0));
+		}
+
+		/// <summary>
+		/// Gets the <see cref="Application.Current"/> location offset relative to the <see cref="ConsoleDriver"/> size.
+		/// </summary>
+		/// <returns>The location offset.</returns>
+		internal Point GetDriverLocationOffsetFromCurrent ()
+		{
+			var topFrame = new Rect (0, 0, Driver.Cols, Driver.Rows);
+			var currentFrame = Application.Current.Frame;
+			return new Point (topFrame.X - currentFrame.X - (topFrame.X != currentFrame.X ? 1 : 0),
+				topFrame.Y - currentFrame.Y - (topFrame.Y != currentFrame.Y ? 1 : 0));
 		}
 	}
 }
