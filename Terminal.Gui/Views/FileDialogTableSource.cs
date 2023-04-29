@@ -42,7 +42,7 @@ namespace Terminal.Gui {
 		{
 			switch (col) {
 			case 0: return stats.FileSystemInfo.Name;
-			case 1: return stats.MachineReadableLength; ;
+			case 1: return stats.MachineReadableLength;
 			case 2: return stats.LastWriteTime;
 			case 3: return stats.Type;
 			}

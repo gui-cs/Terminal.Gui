@@ -105,7 +105,6 @@ namespace Terminal.Gui {
 		private MenuBar allowedTypeMenuBar;
 		private MenuBarItem allowedTypeMenu;
 		private MenuItem [] allowedTypeMenuItems;
-		private int filenameColumn;
 
 		private int currentSortColumn;
 		
