@@ -226,15 +226,19 @@ namespace Terminal.Gui {
 
 			var nameStyle = Style.TableStyle.GetOrCreateColumnStyle (0);
 			nameStyle.MinWidth = 10;
+			nameStyle.ColorGetter = this.ColorGetter;
 
 			var sizeStyle = Style.TableStyle.GetOrCreateColumnStyle (1);
 			sizeStyle.MinWidth = 10;
+			sizeStyle.ColorGetter = this.ColorGetter;
 
 			var dateModifiedStyle = Style.TableStyle.GetOrCreateColumnStyle (2);
 			dateModifiedStyle.MinWidth = 30;
+			dateModifiedStyle.ColorGetter = this.ColorGetter;
 
 			var typeStyle = Style.TableStyle.GetOrCreateColumnStyle (3);
 			typeStyle.MinWidth = 6;
+			typeStyle.ColorGetter = this.ColorGetter;
 
 			this.tableView.KeyPress += (s, k) => {
 				if (this.tableView.SelectedRow <= 0) {
