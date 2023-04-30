@@ -193,7 +193,7 @@ namespace UICatalog.Scenarios {
 				col.ColumnName = TrimArrows (col.ColumnName);
 
 				// add a new one if this the one that is being sorted
-				if (col.Ordinal == clickedCol) {
+				if (col.Ordinal == ToTableCol(clickedCol)) {
 					col.ColumnName += isAsc ? '▲' : '▼';
 				}
 			}
