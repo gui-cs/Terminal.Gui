@@ -31,6 +31,7 @@ namespace UICatalog.Scenarios {
 		private MenuItem miAlternatingColors;
 		private MenuItem miCursor;
 		private MenuItem miBottomline;
+		private MenuItem miCheckboxes;
 
 		ColorScheme redColorScheme;
 		ColorScheme redColorSchemeAlt;
@@ -73,6 +74,7 @@ namespace UICatalog.Scenarios {
 					miSmoothScrolling = new MenuItem ("_SmoothHorizontalScrolling", "", () => ToggleSmoothScrolling()){Checked = tableView.Style.SmoothHorizontalScrolling, CheckType = MenuItemCheckStyle.Checked },
 					new MenuItem ("_AllLines", "", () => ToggleAllCellLines()),
 					new MenuItem ("_NoLines", "", () => ToggleNoCellLines()),
+					miCheckboxes = new MenuItem ("_Checkboxes", "", () => ToggleCheckboxes()){Checked = false, CheckType = MenuItemCheckStyle.Checked },
 					miAlternatingColors = new MenuItem ("Alternating Colors", "", () => ToggleAlternatingColors()){CheckType = MenuItemCheckStyle.Checked},
 					miCursor = new MenuItem ("Invert Selected Cell First Character", "", () => ToggleInvertSelectedCellFirstCharacter()){Checked = tableView.Style.InvertSelectedCellFirstCharacter,CheckType = MenuItemCheckStyle.Checked},
 					new MenuItem ("_ClearColumnStyles", "", () => ClearColumnStyles()),
@@ -439,6 +441,18 @@ namespace UICatalog.Scenarios {
 
 			tableView.Update ();
 
+		}
+
+		private void ToggleCheckboxes ()
+		{
+			if (tableView.Table is CheckBoxTableSourceWrapper wrapper) {
+				// unwrap it to remove check boxes
+				tableView.Table = wrapper.Wrapping;
+				miCheckboxes.Checked = false;
+			} else {
+				tableView.Table = new CheckBoxTableSourceWrapper (tableView, tableView.Table);
+				miCheckboxes.Checked = true;
+			}
 		}
 
 		private void ToggleAlwaysUseNormalColorForVerticalCellLines()
