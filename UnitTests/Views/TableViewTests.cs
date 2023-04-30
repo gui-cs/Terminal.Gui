@@ -28,7 +28,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (0, tableView.ColumnOffset);
 
 			// Set empty table
-			tableView.Table = new DataTableSource(new DataTable ());
+			tableView.Table = new DataTableSource (new DataTable ());
 
 			// Since table has no rows or columns scroll offset should default to 0
 			tableView.EnsureValidScrollOffsets ();
@@ -598,7 +598,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			string activatedValue = null;
 			var tv = new TableView (BuildTable (1, 1));
-			tv.CellActivated += (s, c) => activatedValue = c.Table [c.Row,c.Col].ToString();
+			tv.CellActivated += (s, c) => activatedValue = c.Table [c.Row, c.Col].ToString ();
 
 			Application.Top.Add (tv);
 			Application.Begin (Application.Top);
@@ -907,7 +907,7 @@ namespace Terminal.Gui.ViewsTests {
 			};
 
 			// when B is 2 use the custom highlight colour for the row
-			tv.Style.RowColorGetter += (e) => Convert.ToInt32 (e.Table[e.RowIndex,1]) == 2 ? rowHighlight : null;
+			tv.Style.RowColorGetter += (e) => Convert.ToInt32 (e.Table [e.RowIndex, 1]) == 2 ? rowHighlight : null;
 
 			// private method for forcing the view to be focused/not focused
 			var setFocusMethod = typeof (View).GetMethod ("SetHasFocus", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -944,7 +944,7 @@ namespace Terminal.Gui.ViewsTests {
 			// it no longer matches the RowColorGetter
 			// delegate conditional ( which checks for
 			// the value 2)
-			dt.Rows [0][1] = 5;
+			dt.Rows [0] [1] = 5;
 
 			tv.Redraw (tv.Bounds);
 			expected = @"
@@ -1080,7 +1080,7 @@ namespace Terminal.Gui.ViewsTests {
 			dt.Columns.Add ("B");
 			dt.Rows.Add (1, 2);
 
-			tv.Table = new DataTableSource(dt);
+			tv.Table = new DataTableSource (dt);
 			tv.Style.GetOrCreateColumnStyle (0).MinWidth = 1;
 			tv.Style.GetOrCreateColumnStyle (0).MinWidth = 1;
 			tv.Style.GetOrCreateColumnStyle (1).MaxWidth = 1;
@@ -1144,7 +1144,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			dt.Rows.Add (1, 2, 3, 4, 5, 6);
 
-			tableView.Table = new DataTableSource(dt);
+			tableView.Table = new DataTableSource (dt);
 
 			// select last visible column
 			tableView.SelectedColumn = 2; // column C
@@ -1205,7 +1205,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			dt.Rows.Add (1, 2, 3, 4, 5, 6);
 
-			tableView.Table = new DataTableSource(dt);
+			tableView.Table = new DataTableSource (dt);
 
 			// select last visible column
 			tableView.SelectedColumn = 2; // column C
@@ -1264,7 +1264,7 @@ namespace Terminal.Gui.ViewsTests {
 			dt.Columns.Add ("F");
 
 			dt.Rows.Add (1, 2, 3, 4, 5, 6);
-			tableView.Table = new DataTableSource(dt);
+			tableView.Table = new DataTableSource (dt);
 
 			return tableView;
 		}
@@ -1315,7 +1315,7 @@ namespace Terminal.Gui.ViewsTests {
 			for (int i = 0; i < 6; i++) {
 				tableView.Style.GetOrCreateColumnStyle (i).Visible = false;
 			}
-			
+
 			tableView.LayoutSubviews ();
 
 			// expect nothing to be rendered when all columns are invisible
@@ -1814,7 +1814,7 @@ namespace Terminal.Gui.ViewsTests {
 			dt.Rows.Add (1, 2, new string ('a', 500));
 			dt.Rows.Add (1, 2, "aaa");
 
-			tableView.Table = new DataTableSource(dt);
+			tableView.Table = new DataTableSource (dt);
 			tableView.LayoutSubviews ();
 			tableView.Redraw (tableView.Bounds);
 
@@ -1957,7 +1957,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			dt.Rows.Add (1, 2, 3, 4, 5, 6);
 
-			tableView.Table = new DataTableSource(dt);
+			tableView.Table = new DataTableSource (dt);
 
 			// select last visible column
 			tableView.SelectedColumn = 2; // column C
@@ -2022,7 +2022,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			dt.Rows.Add ("Hello", DBNull.Value, "f");
 
-			tv.Table = new DataTableSource(dt);
+			tv.Table = new DataTableSource (dt);
 			tv.NullSymbol = string.Empty;
 
 			Application.Top.Add (tv);
@@ -2249,6 +2249,91 @@ namespace Terminal.Gui.ViewsTests {
 
 			TestHelpers.AssertDriverColorsAre (expected, normal, focus);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void TestTableViewCheckboxes_Simple()
+		{
+
+			var tv = GetTwoRowSixColumnTable (out var dt);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			tv.LayoutSubviews ();
+
+			var wrapper = new CheckBoxTableSourceWrapper (tv, tv.Table);
+			tv.Table = wrapper;
+
+
+			tv.Redraw (tv.Bounds);
+
+			string expected =
+				@"
+│ │A│B│
+├─┼─┼─►
+│╴│1│2│
+│╴│1│2│
+│╴│1│2│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			Assert.Empty (wrapper.CheckedRows);
+
+			//toggle the top cell
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+			Assert.Single (wrapper.CheckedRows, 0);
+
+			tv.Redraw (tv.Bounds);
+
+			expected =
+				@"
+│ │A│B│
+├─┼─┼─►
+│√│1│2│
+│╴│1│2│
+│╴│1│2│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			tv.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()));
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+
+			Assert.Contains (0,wrapper.CheckedRows);
+			Assert.Contains (1,wrapper.CheckedRows);
+			Assert.Equal (2, wrapper.CheckedRows.Count);
+
+
+			tv.Redraw (tv.Bounds);
+
+			expected =
+				@"
+│ │A│B│
+├─┼─┼─►
+│√│1│2│
+│√│1│2│
+│╴│1│2│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// untoggle top one
+			tv.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+			Assert.Single (wrapper.CheckedRows, 1);
+
+			tv.Redraw (tv.Bounds);
+
+			expected =
+				@"
+│ │A│B│
+├─┼─┼─►
+│╴│1│2│
+│√│1│2│
+│╴│1│2│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+		}
+
 		[Fact, AutoInitShutdown]
 		public void TestFullRowSelect_SelectionColorDoesNotStop_WhenShowVerticalCellLinesIsFalse ()
 		{

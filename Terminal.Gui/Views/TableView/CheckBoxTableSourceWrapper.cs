@@ -28,6 +28,8 @@ namespace Terminal.Gui {
 			this.Wrapping = toWrap;
 			this.tableView = tableView;
 
+			tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
+
 			tableView.MouseClick += TableView_MouseClick;
 			tableView.CellToggled += TableView_CellToggled;
 		}
