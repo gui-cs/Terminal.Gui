@@ -2331,7 +2331,117 @@ namespace Terminal.Gui.ViewsTests {
 │╴│1│2│";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
 
+		[Fact, AutoInitShutdown]
+		public void TestTableViewCheckboxes_SelectAllToggle ()
+		{
+
+			var tv = GetTwoRowSixColumnTable (out var dt);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			tv.LayoutSubviews ();
+
+			var wrapper = new CheckBoxTableSourceWrapper (tv, tv.Table);
+			tv.Table = wrapper;
+
+			//toggle all cells
+			tv.ProcessKey (new KeyEvent (Key.A | Key.CtrlMask, new KeyModifiers { Ctrl = true }));
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+			tv.Redraw (tv.Bounds);
+
+			string expected =
+				@"
+│ │A│B│
+├─┼─┼─►
+│√│1│2│
+│√│1│2│
+│√│1│2│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+			Assert.Contains (0, wrapper.CheckedRows);
+			Assert.Contains (1, wrapper.CheckedRows);
+			Assert.Contains (2, wrapper.CheckedRows);
+			Assert.Equal (3, wrapper.CheckedRows.Count);
+
+			// Untoggle all again
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+			tv.Redraw (tv.Bounds);
+
+			expected =
+				@"
+│ │A│B│
+├─┼─┼─►
+│╴│1│2│
+│╴│1│2│
+│╴│1│2│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			Assert.Empty (wrapper.CheckedRows);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestTableViewCheckboxes_MultiSelectIsUnion_WhenToggling ()
+		{
+			var tv = GetTwoRowSixColumnTable (out var dt);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			tv.LayoutSubviews ();
+
+			var wrapper = new CheckBoxTableSourceWrapper (tv, tv.Table);
+			tv.Table = wrapper;
+			wrapper.CheckedRows.Add (0);
+			wrapper.CheckedRows.Add (2);
+
+			tv.Redraw (tv.Bounds);
+
+			string expected =
+				@"
+│ │A│B│
+├─┼─┼─►
+│√│1│2│
+│╴│1│2│
+│√│1│2│";
+			//toggle top two at once
+			tv.ProcessKey (new KeyEvent (Key.CursorDown | Key.ShiftMask, new KeyModifiers { Shift = true }));
+			Assert.True (tv.IsSelected (0, 0));
+			Assert.True (tv.IsSelected (0, 1));
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+			// Because at least 1 of the rows is not yet ticked we toggle them all to ticked
+			TestHelpers.AssertDriverContentsAre (expected, output);
+			Assert.Contains (0, wrapper.CheckedRows);
+			Assert.Contains (1, wrapper.CheckedRows);
+			Assert.Contains (2, wrapper.CheckedRows);
+			Assert.Equal (3, wrapper.CheckedRows.Count);
+
+			tv.Redraw (tv.Bounds);
+
+			expected =
+				@"
+│ │A│B│
+├─┼─┼─►
+│√│1│2│
+│√│1│2│
+│√│1│2│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// Untoggle the top 2
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+			tv.Redraw (tv.Bounds);
+
+			expected =
+				@"
+│ │A│B│
+├─┼─┼─►
+│╴│1│2│
+│╴│1│2│
+│√│1│2│";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+			Assert.Single (wrapper.CheckedRows, 2);
 		}
 
 		[Fact, AutoInitShutdown]
