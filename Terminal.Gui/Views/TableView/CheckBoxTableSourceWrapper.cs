@@ -16,7 +16,10 @@ namespace Terminal.Gui {
 			UnCheckedRune = new Rune (Application.Driver != null ? Application.Driver.UnChecked : '╴');
 
 			tableView.MouseClick += TableView_MouseClick;
+			tableView.CellToggled += TableView_CellToggled;
 		}
+
+
 		public Rune CheckedRune { get; set; }
 		public Rune UnCheckedRune { get; set; }
 		public ITableSource Wrapping { get; }
@@ -33,12 +36,42 @@ namespace Terminal.Gui {
 
 			if(headerIfAny.HasValue && headerIfAny.Value == 0) {
 				ToggleAllRows ();
+				e.Handled = true;
 				tableView.SetNeedsDisplay ();
 			}
 			else
 			if(hit.HasValue && hit.Value.X == 0) {
 				ToggleRow (hit.Value.Y);
+				e.Handled = true;
 				tableView.SetNeedsDisplay ();
+			}
+		}
+
+		private void TableView_CellToggled (object sender, CellToggledEventArgs e)
+		{
+			// Suppress default toggle behavior when using checkboxes
+			// and instead handle ourselves
+
+			var range = tableView.GetAllSelectedCells ().Select (c => c.Y).Distinct ().ToArray();
+
+			ToggleRows (range);
+			e.Cancel = true;
+			tableView.SetNeedsDisplay ();
+		}
+
+		private void ToggleRows (int [] range)
+		{
+			// if all are ticked untick them
+			if (range.All(CheckedRows.Contains)) {
+				// select none
+				foreach(var r in range) {
+					CheckedRows.Remove (r);
+				}
+			} else {
+				// otherwise tick all
+				foreach (var r in range) {
+					CheckedRows.Add (r);
+				}
 			}
 		}
 

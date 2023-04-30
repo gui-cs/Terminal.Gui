@@ -172,6 +172,12 @@ namespace UICatalog.Scenarios {
 		{
 			var sort = GetProposedNewSortOrder (clickedCol, out var isAsc);
 
+			// don't try to sort on the toggled column
+			if (HasCheckboxes () && clickedCol == 0) {
+				return;
+			}
+				
+
 			SortColumn (clickedCol, sort, isAsc);
 		}
 
@@ -228,6 +234,10 @@ namespace UICatalog.Scenarios {
 
 		private void ShowHeaderContextMenu (int clickedCol, MouseEventEventArgs e)
 		{
+			if(HasCheckboxes() && clickedCol == 0) {
+				return;
+			}
+
 			var sort = GetProposedNewSortOrder (clickedCol, out var isAsc);
 			var colName = tableView.Table.ColumnNames[clickedCol];
 
