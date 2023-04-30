@@ -563,7 +563,7 @@ namespace Terminal.Gui.ViewTests {
 			// BUGBUG: v2 - _needsDisplay needs debugging - test disabled for now.
 			//Assert.Equal (new Rect (new Point (0, 0), rect.Size), view._needsDisplay);
 			Assert.True (view.LayoutNeeded);
-			Assert.False (view._childNeedsDisplay);
+			Assert.False (view._subViewNeedsDisplay);
 			Assert.False (view._addingView);
 			view._addingView = true;
 			Assert.True (view._addingView);

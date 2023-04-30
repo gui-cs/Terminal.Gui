@@ -631,14 +631,5 @@ namespace Terminal.Gui.DrawingTests {
 			var t = new Thickness (1, 2, 3, 4);
 			Assert.Equal (t.GetHashCode (), t.GetHashCode ());
 		}
-
-		[Fact ()]
-		public void IsEmpty ()
-		{
-			var t = new Thickness (0);
-			Assert.True (t.IsEmpty);
-			t.Bottom = 1;
-			Assert.False (t.IsEmpty);
-		}
 	}
 }

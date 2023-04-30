@@ -76,12 +76,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Removes the <see cref="_needsDisplay"/> and the <see cref="_childNeedsDisplay"/> setting on this view.
+		/// Removes the <see cref="_needsDisplay"/> and the <see cref="_subViewNeedsDisplay"/> setting on this view.
 		/// </summary>
 		protected void ClearNeedsDisplay ()
 		{
 			_needsDisplay = Rect.Empty;
-			_childNeedsDisplay = false;
+			_subViewNeedsDisplay = false;
 		}
 
 		// The view-relative region that needs to be redrawn
@@ -104,11 +104,6 @@ namespace Terminal.Gui {
 		{
 			if (_needsDisplay.IsEmpty) {
 				_needsDisplay = region;
-				if (region.IsEmpty && !_frame.Size.IsEmpty) {
-					// force redraw if bounds is empty but not frame
-					// this is needed because the SetChildsNeedsDisplay don't exist
-					_childNeedsDisplay = true;
-				}
 			} else {
 				var x = Math.Min (_needsDisplay.X, region.X);
 				var y = Math.Min (_needsDisplay.Y, region.Y);
@@ -130,18 +125,18 @@ namespace Terminal.Gui {
 				}
 		}
 
-		internal bool _childNeedsDisplay { get; private set; }
+		internal bool _subViewNeedsDisplay { get; private set; }
 
 		/// <summary>
 		/// Indicates that any Subviews (in the <see cref="Subviews"/> list) need to be repainted.
 		/// </summary>
 		public void SetSubViewNeedsDisplay ()
 		{
-			if (_childNeedsDisplay) {
+			if (_subViewNeedsDisplay) {
 				return;
 			}
-			_childNeedsDisplay = true;
-			if (_superView != null && !_superView._childNeedsDisplay)
+			_subViewNeedsDisplay = true;
+			if (_superView != null && !_superView._subViewNeedsDisplay)
 				_superView.SetSubViewNeedsDisplay ();
 		}
 

@@ -251,7 +251,6 @@ namespace UICatalog.Scenarios {
 					viewToEdit.SetNeedsDisplay ();
 				};
 
-
 				var ckbTitle = new CheckBox ("Show Title") {
 					BorderStyle = LineStyle.Double,
 					X = Pos.Left (_borderEditor),
@@ -272,7 +271,6 @@ namespace UICatalog.Scenarios {
 				_paddingEditor.ThicknessChanged += Editor_ThicknessChanged;
 				_paddingEditor.AttributeChanged += Editor_AttributeChanged;
 				Add (_paddingEditor);
-
 
 				viewToEdit.X = Pos.Right (rbBorderStyle);
 				viewToEdit.Y = 0;
