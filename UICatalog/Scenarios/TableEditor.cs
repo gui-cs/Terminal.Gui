@@ -213,7 +213,7 @@ namespace UICatalog.Scenarios {
 		{
 			// work out new sort order
 			var sort = currentTable.DefaultView.Sort;
-			var colName = currentTable.Columns[clickedCol];
+			var colName = tableView.Table.ColumnNames[clickedCol];
 
 			if (sort?.EndsWith ("ASC") ?? false) {
 				sort = $"{colName} DESC";
@@ -248,7 +248,7 @@ namespace UICatalog.Scenarios {
 			tableView.Update ();
 		}
 
-		private DataColumn GetColumn ()
+		private int? GetColumn ()
 		{
 			if (tableView.Table == null)
 				return null;
@@ -256,7 +256,7 @@ namespace UICatalog.Scenarios {
 			if (tableView.SelectedColumn < 0 || tableView.SelectedColumn > tableView.Table.Columns)
 				return null;
 
-			return currentTable.Columns [tableView.SelectedColumn];
+			return tableView.SelectedColumn;
 		}
 
 		private void SetMinAcceptableWidthToOne ()
@@ -284,8 +284,12 @@ namespace UICatalog.Scenarios {
 			RunColumnWidthDialog (col, "MaxWidth", (s, v) => s.MaxWidth = v, (s) => s.MaxWidth);
 		}
 
-		private void RunColumnWidthDialog (DataColumn col, string prompt, Action<ColumnStyle, int> setter, Func<ColumnStyle, int> getter)
+		private void RunColumnWidthDialog (int? col, string prompt, Action<ColumnStyle, int> setter, Func<ColumnStyle, int> getter)
 		{
+			if(col == null) {
+				return;
+			}
+
 			var accepted = false;
 			var ok = new Button ("Ok", is_default: true);
 			ok.Clicked += (s,e) => { accepted = true; Application.RequestStop (); };
@@ -293,12 +297,12 @@ namespace UICatalog.Scenarios {
 			cancel.Clicked += (s,e) => { Application.RequestStop (); };
 			var d = new Dialog (ok, cancel) { Title = prompt };
 
-			var style = tableView.Style.GetOrCreateColumnStyle (col.Ordinal);
+			var style = tableView.Style.GetOrCreateColumnStyle (col.Value);
 
 			var lbl = new Label () {
 				X = 0,
 				Y = 1,
-				Text = col.ColumnName
+				Text = tableView.Table.ColumnNames[col.Value]
 			};
 
 			var tf = new TextField () {
@@ -801,11 +805,17 @@ namespace UICatalog.Scenarios {
 		{
 			if (e.Table == null)
 				return;
-			var o = currentTable.Rows [e.Row] [e.Col];
+
+			var tableCol = ToTableCol(e.Col);
+			if (tableCol < 0) {
+				return;
+			}
+
+			var o = currentTable.Rows [e.Row] [tableCol];
 
 			var title = o is uint u ? GetUnicodeCategory (u) + $"(0x{o:X4})" : "Enter new value";
 
-			var oldValue = currentTable.Rows [e.Row] [e.Col].ToString ();
+			var oldValue = currentTable.Rows [e.Row] [tableCol].ToString ();
 			bool okPressed = false;
 
 			var ok = new Button ("Ok", is_default: true);
@@ -817,7 +827,7 @@ namespace UICatalog.Scenarios {
 			var lbl = new Label () {
 				X = 0,
 				Y = 1,
-				Text = currentTable.Columns [e.Col].ColumnName
+				Text = tableView.Table.ColumnNames[e.Col]
 			};
 
 			var tf = new TextField () {
@@ -835,13 +845,27 @@ namespace UICatalog.Scenarios {
 			if (okPressed) {
 
 				try {
-					currentTable.Rows [e.Row] [e.Col] = string.IsNullOrWhiteSpace (tf.Text.ToString ()) ? DBNull.Value : (object)tf.Text;
+					currentTable.Rows [e.Row] [tableCol] = string.IsNullOrWhiteSpace (tf.Text.ToString ()) ? DBNull.Value : (object)tf.Text;
 				} catch (Exception ex) {
 					MessageBox.ErrorQuery (60, 20, "Failed to set text", ex.Message, "Ok");
 				}
 
 				tableView.Update ();
 			}
+		}
+
+		private int ToTableCol (int col)
+		{
+			if (HasCheckboxes ()) {
+				return col - 1;
+			}
+
+			return col;
+		}
+
+		private bool HasCheckboxes ()
+		{
+			return tableView.Table is CheckBoxTableSourceWrapper;
 		}
 
 		private string GetUnicodeCategory (uint u)
