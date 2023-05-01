@@ -32,6 +32,7 @@ namespace UICatalog.Scenarios {
 		private MenuItem miCursor;
 		private MenuItem miBottomline;
 		private MenuItem miCheckboxes;
+		private MenuItem miRadioboxes;
 
 		ColorScheme redColorScheme;
 		ColorScheme redColorSchemeAlt;
@@ -74,7 +75,8 @@ namespace UICatalog.Scenarios {
 					miSmoothScrolling = new MenuItem ("_SmoothHorizontalScrolling", "", () => ToggleSmoothScrolling()){Checked = tableView.Style.SmoothHorizontalScrolling, CheckType = MenuItemCheckStyle.Checked },
 					new MenuItem ("_AllLines", "", () => ToggleAllCellLines()),
 					new MenuItem ("_NoLines", "", () => ToggleNoCellLines()),
-					miCheckboxes = new MenuItem ("_Checkboxes", "", () => ToggleCheckboxes()){Checked = false, CheckType = MenuItemCheckStyle.Checked },
+					miCheckboxes = new MenuItem ("_Checkboxes", "", () => ToggleCheckboxes(false)){Checked = false, CheckType = MenuItemCheckStyle.Checked },
+					miRadioboxes = new MenuItem ("_Radioboxes", "", () => ToggleCheckboxes(true)){Checked = false, CheckType = MenuItemCheckStyle.Checked },
 					miAlternatingColors = new MenuItem ("Alternating Colors", "", () => ToggleAlternatingColors()){CheckType = MenuItemCheckStyle.Checked},
 					miCursor = new MenuItem ("Invert Selected Cell First Character", "", () => ToggleInvertSelectedCellFirstCharacter()){Checked = tableView.Style.InvertSelectedCellFirstCharacter,CheckType = MenuItemCheckStyle.Checked},
 					new MenuItem ("_ClearColumnStyles", "", () => ClearColumnStyles()),
@@ -457,16 +459,40 @@ namespace UICatalog.Scenarios {
 
 		}
 
-		private void ToggleCheckboxes ()
+		private void ToggleCheckboxes (bool radio)
 		{
 			if (tableView.Table is CheckBoxTableSourceWrapperByIndex wrapper) {
+
 				// unwrap it to remove check boxes
 				tableView.Table = wrapper.Wrapping;
+
 				miCheckboxes.Checked = false;
-			} else {
-				tableView.Table = new CheckBoxTableSourceWrapperByIndex (tableView, tableView.Table);
+				miRadioboxes.Checked = false;
+
+				// if toggling off checkboxes/radio
+				if(wrapper.UseRadioButtons == radio) {
+					return;
+				}
+			}
+			
+			// Either toggling on checkboxes/radio or switching from radio to checkboxes (or vice versa)
+			
+			var source = new CheckBoxTableSourceWrapperByIndex (tableView, tableView.Table) {
+				UseRadioButtons = radio
+			};
+			tableView.Table = source;
+
+
+			if (radio) {
+				miRadioboxes.Checked = true;
+				miCheckboxes.Checked = false;
+			}
+			else {
+
+				miRadioboxes.Checked = false;
 				miCheckboxes.Checked = true;
 			}
+			
 		}
 
 		private void ToggleAlwaysUseNormalColorForVerticalCellLines()

@@ -7,6 +7,8 @@ namespace Terminal.Gui {
 	/// by their row number.
 	/// </summary>
 	public class CheckBoxTableSourceWrapperByIndex : CheckBoxTableSourceWrapperBase {
+
+		/// <inheritdoc/>
 		public CheckBoxTableSourceWrapperByIndex (TableView tableView, ITableSource toWrap) : base (tableView, toWrap)
 		{
 		}
@@ -20,8 +22,6 @@ namespace Terminal.Gui {
 		{
 			return CheckedRows.Contains (row);
 		}
-
-		
 
 		protected override void ToggleRows (int [] range)
 		{
@@ -51,11 +51,16 @@ namespace Terminal.Gui {
 		{
 			if (CheckedRows.Count == Rows) {
 				// select none
-				CheckedRows.Clear ();
+				ClearAllToggles ();
 			} else {
 				// select all
 				CheckedRows = new HashSet<int> (Enumerable.Range (0, Rows));
 			}
+		}
+
+		protected override void ClearAllToggles ()
+		{
+			CheckedRows.Clear ();
 		}
 	}
 }

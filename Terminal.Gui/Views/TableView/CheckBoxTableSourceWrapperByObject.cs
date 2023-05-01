@@ -43,14 +43,19 @@ namespace Terminal.Gui {
 			// if all are ticked untick them
 			if (range.All (IsChecked)) {
 				// select none
-				foreach (var r in range) {
-					setter (toWrap.Data.ElementAt (r), false);
-				}
+				ClearAllToggles ();
 			} else {
 				// otherwise tick all
 				foreach (var r in range) {
 					setter (toWrap.Data.ElementAt (r), true);
 				}
+			}
+		}
+
+		protected override void ClearAllToggles ()
+		{
+			foreach (var e in toWrap.Data) {
+				setter (e, false);
 			}
 		}
 	}

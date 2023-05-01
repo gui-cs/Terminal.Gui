@@ -46,6 +46,23 @@ namespace Terminal.Gui {
 		public Rune UnCheckedRune { get; set; } = new Rune (Application.Driver != null ? Application.Driver.UnChecked : '╴');
 
 		/// <summary>
+		/// Gets or sets whether to only allow a single row to be toggled at once (Radio button).
+		/// </summary>
+		public bool UseRadioButtons { get; set; }
+
+		/// <summary>
+		/// Gets or sets the character to use for checked entry when <see cref="UseRadioButtons"/> is true.
+		/// Defaults to <see cref="ConsoleDriver.Selected"/>
+		/// </summary>
+		public Rune RadioCheckedRune { get; set; } = Application.Driver.Selected;
+
+		/// <summary>
+		/// Gets or sets the character to use for unchecked entries when <see cref="UseRadioButtons"/> is true.
+		/// Defaults to <see cref="ConsoleDriver.UnSelected"/>
+		/// </summary>
+		public Rune RadioUnCheckedRune { get; set; } = Application.Driver.UnSelected;
+
+		/// <summary>
 		/// Gets the <see cref="ITableSource"/> that this instance is wrapping.
 		/// </summary>
 		public ITableSource Wrapping { get; }
@@ -55,6 +72,10 @@ namespace Terminal.Gui {
 		public object this [int row, int col] {
 			get {
 				if (col == 0) {
+					if(UseRadioButtons) {
+						return IsChecked (row) ? RadioCheckedRune : RadioUnCheckedRune;
+					}
+
 					return IsChecked(row) ? CheckedRune : UnCheckedRune;
 				}
 
@@ -88,13 +109,28 @@ namespace Terminal.Gui {
 			var hit = tableView.ScreenToCell (e.MouseEvent.X,e.MouseEvent.Y, out int? headerIfAny);
 
 			if(headerIfAny.HasValue && headerIfAny.Value == 0) {
+
+				// clicking in header with radio buttons does nothing
+				if(UseRadioButtons) {
+					return;
+				}
+
+				// otherwise it ticks all rows
 				ToggleAllRows ();
 				e.Handled = true;
 				tableView.SetNeedsDisplay ();
 			}
 			else
 			if(hit.HasValue && hit.Value.X == 0) {
-				ToggleRow (hit.Value.Y);
+
+				if(UseRadioButtons) {
+
+					ClearAllToggles ();
+					ToggleRow (hit.Value.Y);
+				} else {
+					ToggleRow (hit.Value.Y);
+				}
+
 				e.Handled = true;
 				tableView.SetNeedsDisplay ();
 			}
@@ -104,20 +140,58 @@ namespace Terminal.Gui {
 		{
 			// Suppress default toggle behavior when using checkboxes
 			// and instead handle ourselves
-
 			var range = tableView.GetAllSelectedCells ().Select (c => c.Y).Distinct ().ToArray();
 
-			ToggleRows (range);
+			if(UseRadioButtons) {
+
+				// multi selection makes it unclear what to toggle in this situation
+				if(range.Length != 1) {
+					return;
+				}
+
+				ClearAllToggles ();
+				ToggleRow (range.Single ());
+			}
+			else {
+				ToggleRows (range);
+			}
+
 			e.Cancel = true;
 			tableView.SetNeedsDisplay ();
 		}
 
+		/// <summary>
+		/// Returns true if <paramref name="row"/> is checked.
+		/// </summary>
+		/// <param name="row"></param>
+		/// <returns></returns>
 		protected abstract bool IsChecked (int row);
 
+		/// <summary>
+		/// Flips the checked state for a collection of rows. If
+		/// some (but not all) are selected they should flip to all
+		/// selected.
+		/// </summary>
+		/// <param name="range"></param>
 		protected abstract void ToggleRows (int [] range);
 
+		/// <summary>
+		/// Flips the checked state of the given <paramref name="row"/>/
+		/// </summary>
+		/// <param name="row"></param>
 		protected abstract void ToggleRow (int row);
 
+		/// <summary>
+		/// Called when the 'toggled all' action is performed.
+		/// This should change state from 'some selected' to
+		/// 'all selected' or clear selection if all area already
+		/// selected.
+		/// </summary>
 		protected abstract void ToggleAllRows ();
+
+		/// <summary>
+		/// Clears the toggled state of all rows.
+		/// </summary>
+		protected abstract void ClearAllToggles ();
 	}
 }
