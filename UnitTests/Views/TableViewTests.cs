@@ -2448,7 +2448,6 @@ namespace Terminal.Gui.ViewsTests {
 		[Fact, AutoInitShutdown]
 		public void TestTableViewCheckboxes_ByObject ()
 		{
-
 			var tv = GetPetTable (out var source);
 			tv.LayoutSubviews ();
 			var pets = source.Data;
@@ -2536,6 +2535,64 @@ namespace Terminal.Gui.ViewsTests {
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestTableViewCheckboxes_SelectAllToggle_ByObject ()
+		{
+
+			var tv = GetPetTable (out var source);
+			tv.LayoutSubviews ();
+			var pets = source.Data;
+
+			var wrapper = new CheckBoxTableSourceWrapperByObject<PickablePet> (
+				tv,
+				source,
+				(p) => p.IsPicked,
+				(p, b) => p.IsPicked = b);
+
+			tv.Table = wrapper;
+
+
+			Assert.DoesNotContain (pets, p => p.IsPicked);
+
+			//toggle all cells
+			tv.ProcessKey (new KeyEvent (Key.A | Key.CtrlMask, new KeyModifiers { Ctrl = true }));
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+			Assert.True (pets.All (p => p.IsPicked));
+
+			tv.Redraw (tv.Bounds);
+
+			string expected =
+				@"
+┌─┬───────┬─────────────┐
+│ │Name   │Kind         │
+├─┼───────┼─────────────┤
+│√│Tammy  │Cat          │
+│√│Tibbles│Cat          │
+│√│Ripper │Dog          │";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+			Assert.Empty (pets.Where (p => p.IsPicked));
+
+			tv.Redraw (tv.Bounds);
+
+			expected =
+				@"
+┌─┬───────┬─────────────┐
+│ │Name   │Kind         │
+├─┼───────┼─────────────┤
+│╴│Tammy  │Cat          │
+│╴│Tibbles│Cat          │
+│╴│Ripper │Dog          │
+";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
 		}
 
 		[Fact, AutoInitShutdown]
