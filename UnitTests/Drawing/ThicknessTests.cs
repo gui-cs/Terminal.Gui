@@ -633,4 +633,3 @@ namespace Terminal.Gui.DrawingTests {
 		}
 	}
 }
-

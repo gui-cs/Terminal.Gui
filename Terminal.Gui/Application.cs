@@ -630,6 +630,7 @@ namespace Terminal.Gui {
 			foreach (var v in _toplevels.Reverse ()) {
 				if (v.Visible) {
 					v.SetNeedsDisplay ();
+					v.SetSubViewNeedsDisplay ();
 					v.Draw ();
 				}
 				last = v;
@@ -763,7 +764,7 @@ namespace Terminal.Gui {
 			firstIteration = false;
 
 			if (state.Toplevel != Top
-				&& (!Top._needsDisplay.IsEmpty || Top._childNeedsDisplay || Top.LayoutNeeded)) {
+				&& (!Top._needsDisplay.IsEmpty || Top._subViewNeedsDisplay || Top.LayoutNeeded)) {
 				state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
 				Top.Draw ();
 				foreach (var top in _toplevels.Reverse ()) {
@@ -775,14 +776,14 @@ namespace Terminal.Gui {
 			}
 			if (_toplevels.Count == 1 && state.Toplevel == Top
 				&& (Driver.Cols != state.Toplevel.Frame.Width || Driver.Rows != state.Toplevel.Frame.Height)
-				&& (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._childNeedsDisplay || state.Toplevel.LayoutNeeded)) {
+				&& (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._subViewNeedsDisplay || state.Toplevel.LayoutNeeded)) {
 
 				Driver.SetAttribute (Colors.TopLevel.Normal);
 				state.Toplevel.Clear (new Rect (0, 0, Driver.Cols, Driver.Rows));
 
 			}
 
-			if (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._childNeedsDisplay || state.Toplevel.LayoutNeeded
+			if (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._subViewNeedsDisplay || state.Toplevel.LayoutNeeded
 				|| OverlappedChildNeedsDisplay ()) {
 				state.Toplevel.Draw ();
 				//if (state.Toplevel.SuperView != null) {
@@ -796,7 +797,7 @@ namespace Terminal.Gui {
 				Driver.UpdateCursor ();
 			}
 			if (state.Toplevel != Top && !state.Toplevel.Modal
-				&& (!Top._needsDisplay.IsEmpty || Top._childNeedsDisplay || Top.LayoutNeeded)) {
+				&& (!Top._needsDisplay.IsEmpty || Top._subViewNeedsDisplay || Top.LayoutNeeded)) {
 				Top.Draw ();
 			}
 		}
