@@ -14,15 +14,18 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets the collection of all the checked rows in the <see cref="Wrapping"/> <see cref="ITableSource"/>.
+		/// Gets the collection of all the checked rows in the
+		/// <see cref="CheckBoxTableSourceWrapperBase.Wrapping"/> <see cref="ITableSource"/>.
 		/// </summary>
 		public HashSet<int> CheckedRows { get; private set; } = new HashSet<int> ();
 
+		/// <inheritdoc/>
 		protected override bool IsChecked (int row)
 		{
 			return CheckedRows.Contains (row);
 		}
 
+		/// <inheritdoc/>
 		protected override void ToggleRows (int [] range)
 		{
 			// if all are ticked untick them
@@ -38,6 +41,8 @@ namespace Terminal.Gui {
 				}
 			}
 		}
+
+		/// <inheritdoc/>
 		protected override void ToggleRow (int row)
 		{
 			if (CheckedRows.Contains (row)) {
@@ -47,6 +52,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <inheritdoc/>
 		protected override void ToggleAllRows ()
 		{
 			if (CheckedRows.Count == Rows) {
@@ -58,6 +64,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <inheritdoc/>
 		protected override void ClearAllToggles ()
 		{
 			CheckedRows.Clear ();
