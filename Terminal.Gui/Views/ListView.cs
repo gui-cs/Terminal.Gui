@@ -110,7 +110,7 @@ namespace Terminal.Gui {
 			get => source;
 			set {
 				source = value;
-				KeystrokeNavigator.Collection = source?.ToList ()?.Cast<object> ();
+				KeystrokeNavigator.Collection = source?.ToList ();
 				top = 0;
 				selected = -1;
 				lastSelectedItem = -1;

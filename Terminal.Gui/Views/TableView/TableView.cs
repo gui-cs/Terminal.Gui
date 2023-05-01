@@ -174,14 +174,20 @@ namespace Terminal.Gui
             }
         }
 
-        /// <summary>
-        /// Initialzies a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. 
-        /// </summary>
-        /// <param name="table">The table to display in the control</param>
-        public TableView(ITableSource table) : this()
-        {
-            this.Table = table;
-        }
+		/// <summary>
+		/// Navigator for cycling the selected item in the table by typing.
+		/// Set to null to disable this feature.
+		/// </summary>
+		public CollectionNavigatorBase CollectionNavigator { get; set; }
+
+		/// <summary>
+		/// Initialzies a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. 
+		/// </summary>
+		/// <param name="table">The table to display in the control</param>
+		public TableView (ITableSource table) : this ()
+		{
+			this.Table = table;
+		}
 
         /// <summary>
         /// Initialzies a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. Set the <see cref="Table"/> property to begin editing
@@ -190,17 +196,19 @@ namespace Terminal.Gui
         {
             CanFocus = true;
 
-            // Things this view knows how to do
-            AddCommand(Command.Right, () => { ChangeSelectionByOffset(1, 0, false); return true; });
-            AddCommand(Command.Left, () => { ChangeSelectionByOffset(-1, 0, false); return true; });
-            AddCommand(Command.LineUp, () => { ChangeSelectionByOffset(0, -1, false); return true; });
-            AddCommand(Command.LineDown, () => { ChangeSelectionByOffset(0, 1, false); return true; });
-            AddCommand(Command.PageUp, () => { PageUp(false); return true; });
-            AddCommand(Command.PageDown, () => { PageDown(false); return true; });
-            AddCommand(Command.LeftHome, () => { ChangeSelectionToStartOfRow(false); return true; });
-            AddCommand(Command.RightEnd, () => { ChangeSelectionToEndOfRow(false); return true; });
-            AddCommand(Command.TopHome, () => { ChangeSelectionToStartOfTable(false); return true; });
-            AddCommand(Command.BottomEnd, () => { ChangeSelectionToEndOfTable(false); return true; });
+			this.CollectionNavigator = new TableCollectionNavigator (this);
+
+			// Things this view knows how to do
+			AddCommand (Command.Right, () => { ChangeSelectionByOffset (1, 0, false); return true; });
+			AddCommand (Command.Left, () => { ChangeSelectionByOffset (-1, 0, false); return true; });
+			AddCommand (Command.LineUp, () => { ChangeSelectionByOffset (0, -1, false); return true; });
+			AddCommand (Command.LineDown, () => { ChangeSelectionByOffset (0, 1, false); return true; });
+			AddCommand (Command.PageUp, () => { PageUp (false); return true; });
+			AddCommand (Command.PageDown, () => { PageDown (false); return true; });
+			AddCommand (Command.LeftHome, () => { ChangeSelectionToStartOfRow (false); return true; });
+			AddCommand (Command.RightEnd, () => { ChangeSelectionToEndOfRow (false); return true; });
+			AddCommand (Command.TopHome, () => { ChangeSelectionToStartOfTable (false); return true; });
+			AddCommand (Command.BottomEnd, () => { ChangeSelectionToEndOfTable (false); return true; });
 
             AddCommand(Command.RightExtend, () => { ChangeSelectionByOffset(1, 0, true); return true; });
             AddCommand(Command.LeftExtend, () => { ChangeSelectionByOffset(-1, 0, true); return true; });
@@ -812,8 +820,39 @@ namespace Terminal.Gui
                 return true;
             }
 
-            return false;
-        }
+			if (CollectionNavigator != null &&
+				this.HasFocus &&
+				Table.Rows != 0 &&
+				Terminal.Gui.CollectionNavigator.IsCompatibleKey (keyEvent) &&
+				!keyEvent.Key.HasFlag (Key.CtrlMask) &&
+				!keyEvent.Key.HasFlag (Key.AltMask) &&
+				char.IsLetterOrDigit ((char)keyEvent.KeyValue)) {
+				return CycleToNextTableEntryBeginningWith (keyEvent);
+			}
+
+			return false;
+		}
+
+		private bool CycleToNextTableEntryBeginningWith (KeyEvent keyEvent)
+		{
+			var row = SelectedRow;
+
+			// There is a multi select going on and not just for the current row
+			if (GetAllSelectedCells ().Any (c => c.Y != row)) {
+				return false;
+			}
+
+			int match = CollectionNavigator.GetNextMatchingItem (row, (char)keyEvent.KeyValue);
+
+			if (match != -1) {
+				SelectedRow = match;
+				EnsureValidSelection ();
+				EnsureSelectedCellIsVisible ();
+				return true;
+			}
+
+			return false;
+		}
 
         /// <summary>
         /// Moves the <see cref="SelectedRow"/> and <see cref="SelectedColumn"/> to the given col/row in <see cref="Table"/>. Optionally starting a box selection (see <see cref="MultiSelect"/>)
