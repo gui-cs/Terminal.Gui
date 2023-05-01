@@ -3002,11 +3002,13 @@ A B C
 			tv.ColorScheme = Colors.TopLevel;
 			tv.Bounds = new Rect (0, 0, 25, 6);
 
-			tv.Table = source = new EnumerableTableSource<PickablePet> (
-				new PickablePet [] {
+			var pets = new List<PickablePet> {
 				new PickablePet(false,"Tammy","Cat"),
 				new PickablePet(false,"Tibbles","Cat"),
-				new PickablePet(false,"Ripper","Dog"),},
+				new PickablePet(false,"Ripper","Dog")};
+
+			tv.Table = source = new EnumerableTableSource<PickablePet> (
+				pets,
 				new () {
 					{ "Name", (p) => p.Name},
 					{ "Kind", (p) => p.Kind},
