@@ -97,9 +97,6 @@ namespace Terminal.Gui {
 		private Button btnBack;
 		private Button btnUp;
 		private string feedback;
-
-		private CollectionNavigator collectionNavigator = new CollectionNavigator ();
-
 		private TextField tbFind;
 		private SpinnerView spinnerView;
 		private MenuBar allowedTypeMenuBar;
@@ -107,7 +104,7 @@ namespace Terminal.Gui {
 		private MenuItem [] allowedTypeMenuItems;
 
 		private int currentSortColumn;
-		
+
 		private bool currentSortIsAsc = true;
 
 		/// <summary>
@@ -128,7 +125,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="FileDialog"/> class.
 		/// </summary>
-		public FileDialog () : this(new FileSystem())
+		public FileDialog () : this (new FileSystem ())
 		{
 
 		}
@@ -184,7 +181,7 @@ namespace Terminal.Gui {
 			this.btnBack.Clicked += (s, e) => this.history.Back ();
 
 			this.btnForward = new Button () { X = Pos.Right (btnBack) + 1, Y = 1, NoPadding = true };
-			btnForward.Text = GetForwardButtonText();
+			btnForward.Text = GetForwardButtonText ();
 			this.btnForward.Clicked += (s, e) => this.history.Forward ();
 
 			this.tbPath = new TextField {
@@ -211,15 +208,15 @@ namespace Terminal.Gui {
 				Height = Dim.Fill (1),
 			};
 			this.splitContainer.SetSplitterPos (0, 30);
-//			this.splitContainer.Border.BorderStyle = BorderStyle.None;
+			//			this.splitContainer.Border.BorderStyle = BorderStyle.None;
 			this.splitContainer.Tiles.ElementAt (0).ContentView.Visible = false;
 
-			this.tableView = new TableView () {
+			this.tableView = new TableView {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 				FullRowSelect = true,
+				CollectionNavigator = new FileDialogCollectionNavigator (this)
 			};
-
 			this.tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
 			this.tableView.MouseClick += OnTableViewMouseClick;
 			Style.TableStyle = tableView.Style;
@@ -255,14 +252,6 @@ namespace Terminal.Gui {
 				if (k.Handled) {
 					return;
 				}
-
-				if (this.tableView.HasFocus &&
-				!k.KeyEvent.Key.HasFlag (Key.CtrlMask) &&
-				!k.KeyEvent.Key.HasFlag (Key.AltMask) &&
-					char.IsLetterOrDigit ((char)k.KeyEvent.KeyValue)) {
-					CycleToNextTableEntryBeginningWith (k);
-				}
-
 			};
 
 			this.treeView = new TreeView<object> () {
@@ -288,7 +277,7 @@ namespace Terminal.Gui {
 				var newState = !tile.ContentView.Visible;
 				tile.ContentView.Visible = newState;
 				this.btnToggleSplitterCollapse.Text = GetToggleSplitterText (newState);
-				this.LayoutSubviews();
+				this.LayoutSubviews ();
 			};
 
 			tbFind = new TextField {
@@ -311,12 +300,12 @@ namespace Terminal.Gui {
 					o.Handled = true;
 				}
 
-				if(o.KeyEvent.Key == Key.Esc) {
-					if(CancelSearch()) {
+				if (o.KeyEvent.Key == Key.Esc) {
+					if (CancelSearch ()) {
 						o.Handled = true;
 					}
 				}
-				if(tbFind.CursorIsAtEnd()) {
+				if (tbFind.CursorIsAtEnd ()) {
 					NavigateIf (o, Key.CursorRight, btnCancel);
 				}
 				if (tbFind.CursorIsAtStart ()) {
@@ -421,7 +410,7 @@ namespace Terminal.Gui {
 
 		private string GetToggleSplitterText (bool isExpanded)
 		{
-			return isExpanded ? 
+			return isExpanded ?
 				new string ((char)Driver.LeftArrow, 2) :
 				new string ((char)Driver.RightArrow, 2);
 		}
@@ -545,39 +534,6 @@ namespace Terminal.Gui {
 			feedback = null;
 		}
 
-		private void CycleToNextTableEntryBeginningWith (KeyEventEventArgs keyEvent)
-		{
-			if (tableView.Table.Rows == 0) {
-				return;
-			}
-
-			var row = tableView.SelectedRow;
-
-			// There is a multi select going on and not just for the current row
-			if (tableView.GetAllSelectedCells ().Any (c => c.Y != row)) {
-				return;
-			}
-
-			int match = collectionNavigator.GetNextMatchingItem (row, (char)keyEvent.KeyEvent.KeyValue);
-
-			if (match != -1) {
-				tableView.SelectedRow = match;
-				tableView.EnsureValidSelection ();
-				tableView.EnsureSelectedCellIsVisible ();
-				keyEvent.Handled = true;
-			}
-		}
-
-		private void UpdateCollectionNavigator ()
-		{
-			tableView.EnsureValidSelection ();
-			var col = tableView.SelectedColumn;
-			var style = tableView.Style.GetColumnStyleIfAny (col);
-
-			var collection = State.Children.Select (s=> FileDialogTableSource.GetRawColumnValue(col,s));
-			collectionNavigator = new CollectionNavigator (collection);
-		}
-
 		/// <summary>
 		/// Gets or Sets which <see cref="System.IO.FileSystemInfo"/> type can be selected.
 		/// Defaults to <see cref="OpenMode.Mixed"/> (i.e. <see cref="DirectoryInfo"/> or
@@ -672,11 +628,11 @@ namespace Terminal.Gui {
 
 			// May have been updated after instance was constructed
 			this.btnOk.Text = Style.OkButtonText;
-			this.btnUp.Text = this.GetUpButtonText();
-			this.btnBack.Text = this.GetBackButtonText();
-			this.btnForward.Text = this.GetForwardButtonText();
-			this.btnToggleSplitterCollapse.Text = this.GetToggleSplitterText(false);
-			
+			this.btnUp.Text = this.GetUpButtonText ();
+			this.btnBack.Text = this.GetBackButtonText ();
+			this.btnForward.Text = this.GetForwardButtonText ();
+			this.btnToggleSplitterCollapse.Text = this.GetToggleSplitterText (false);
+
 			tbPath.Autocomplete.ColorScheme.Normal = Attribute.Make (Color.Black, tbPath.ColorScheme.Normal.Background);
 
 			treeView.AddObjects (Style.TreeRootGetter ());
@@ -714,7 +670,7 @@ namespace Terminal.Gui {
 				};
 
 				allowedTypeMenuBar.DrawContentComplete += (s, e) => {
-					
+
 					allowedTypeMenuBar.Move (e.Rect.Width - 1, 0);
 					Driver.AddRune (Driver.DownArrow);
 
@@ -812,7 +768,7 @@ namespace Terminal.Gui {
 
 			// Don't include ".." (IsParent) in multiselections
 			this.MultiSelected = toMultiAccept
-				.Where(s=>!s.IsParent)
+				.Where (s => !s.IsParent)
 				.Select (s => s.FileSystemInfo.FullName)
 				.ToList ().AsReadOnly ();
 
@@ -840,8 +796,7 @@ namespace Terminal.Gui {
 
 		private void Accept (bool allowMulti)
 		{
-			if(allowMulti && TryAcceptMulti())
-			{
+			if (allowMulti && TryAcceptMulti ()) {
 				return;
 			}
 
@@ -953,10 +908,6 @@ namespace Terminal.Gui {
 
 				this.pushingState = false;
 			}
-
-			if (obj.NewCol != obj.OldCol) {
-				UpdateCollectionNavigator ();
-			}
 		}
 
 		private bool TableView_KeyUp (KeyEvent keyEvent)
@@ -990,8 +941,7 @@ namespace Terminal.Gui {
 
 		private void CellActivate (object sender, CellActivatedEventArgs obj)
 		{
-			if(TryAcceptMulti())
-			{
+			if (TryAcceptMulti ()) {
 				return;
 			}
 
@@ -1011,20 +961,16 @@ namespace Terminal.Gui {
 		{
 			var multi = this.MultiRowToStats ();
 			string reason = null;
-			
-			if (!multi.Any ())
-			{
+
+			if (!multi.Any ()) {
 				return false;
 			}
-			
+
 			if (multi.All (m => this.IsCompatibleWithOpenMode (
-				m.FileSystemInfo.FullName, out reason)))
-			{
+				m.FileSystemInfo.FullName, out reason))) {
 				this.Accept (multi);
 				return true;
-			} 
-			else 
-			{
+			} else {
 				if (reason != null) {
 					feedback = reason;
 					SetNeedsDisplay ();
@@ -1156,12 +1102,10 @@ namespace Terminal.Gui {
 
 				this.tbPath.Autocomplete.ClearSuggestions ();
 
-				if(pathText != null)
-				{
+				if (pathText != null) {
 					this.tbPath.Text = pathText;
 					this.tbPath.MoveEnd ();
-				}
-				else
+				} else
 				if (setPathText) {
 					this.tbPath.Text = newState.Directory.FullName;
 					this.tbPath.MoveEnd ();
@@ -1199,7 +1143,6 @@ namespace Terminal.Gui {
 
 			this.ApplySort ();
 			this.tableView.Update ();
-			UpdateCollectionNavigator ();
 		}
 
 		private ColorScheme ColorGetter (TableView.CellColorGetterArgs args)
@@ -1252,7 +1195,7 @@ namespace Terminal.Gui {
 		{
 			return this.State?.Children [rowIndex];
 		}
-	
+
 		private void PathChanged ()
 		{
 			// avoid re-entry
@@ -1284,10 +1227,10 @@ namespace Terminal.Gui {
 			// where the FullName is in fact the current working directory.
 			// really not what most users would expect
 			if (Regex.IsMatch (path, "^\\w:$")) {
-				return fileSystem.DirectoryInfo.New(path + System.IO.Path.DirectorySeparatorChar);
+				return fileSystem.DirectoryInfo.New (path + System.IO.Path.DirectorySeparatorChar);
 			}
 
-			return fileSystem.DirectoryInfo.New(path);
+			return fileSystem.DirectoryInfo.New (path);
 		}
 
 		/// <summary>
@@ -1296,7 +1239,7 @@ namespace Terminal.Gui {
 		/// <param name="toRestore"></param>
 		internal void RestoreSelection (IFileSystemInfo toRestore)
 		{
-			tableView.SelectedRow = State.Children.IndexOf (r=>r.FileSystemInfo == toRestore);
+			tableView.SelectedRow = State.Children.IndexOf (r => r.FileSystemInfo == toRestore);
 			tableView.EnsureSelectedCellIsVisible ();
 		}
 
@@ -1307,25 +1250,24 @@ namespace Terminal.Gui {
 			// This portion is never reordered (aways .. at top then folders)
 			var forcedOrder = stats
 			.OrderByDescending (f => f.IsParent)
-					.ThenBy (f => f.IsDir() ? -1:100);
+					.ThenBy (f => f.IsDir () ? -1 : 100);
 
 			// This portion is flexible based on the column clicked (e.g. alphabetical)
-			var ordered = 
+			var ordered =
 				this.currentSortIsAsc ?
-					forcedOrder.ThenBy (f => FileDialogTableSource.GetRawColumnValue(currentSortColumn,f)):
+					forcedOrder.ThenBy (f => FileDialogTableSource.GetRawColumnValue (currentSortColumn, f)) :
 					forcedOrder.ThenByDescending (f => FileDialogTableSource.GetRawColumnValue (currentSortColumn, f));
 
-			State.Children = ordered.ToArray();
+			State.Children = ordered.ToArray ();
 
 			this.tableView.Update ();
-			UpdateCollectionNavigator ();
 		}
 
 		private void SortColumn (int clickedCol)
 		{
 			this.GetProposedNewSortOrder (clickedCol, out var isAsc);
 			this.SortColumn (clickedCol, isAsc);
-			this.tableView.Table = new FileDialogTableSource(State,Style,currentSortColumn,currentSortIsAsc);
+			this.tableView.Table = new FileDialogTableSource (State, Style, currentSortColumn, currentSortIsAsc);
 		}
 
 		internal void SortColumn (int col, bool isAsc)
@@ -1342,7 +1284,7 @@ namespace Terminal.Gui {
 			// work out new sort order
 			if (this.currentSortColumn == clickedCol && this.currentSortIsAsc) {
 				isAsc = false;
-				return $"{tableView.Table.ColumnNames[clickedCol]} DESC";
+				return $"{tableView.Table.ColumnNames [clickedCol]} DESC";
 			} else {
 				isAsc = true;
 				return $"{tableView.Table.ColumnNames [clickedCol]} ASC";
@@ -1399,7 +1341,7 @@ namespace Terminal.Gui {
 			style.Visible = false;
 			this.tableView.Update ();
 		}
-		
+
 		/// <summary>
 		/// State representing a recursive search from <see cref="FileDialogState.Directory"/>
 		/// downwards.
@@ -1520,12 +1462,35 @@ namespace Terminal.Gui {
 			/// <returns></returns>
 			internal bool Cancel ()
 			{
-				var alreadyCancelled = token.IsCancellationRequested || cancel; 
+				var alreadyCancelled = token.IsCancellationRequested || cancel;
 
 				cancel = true;
 				token.Cancel ();
 
 				return !alreadyCancelled;
+			}
+		}
+		internal class FileDialogCollectionNavigator : CollectionNavigatorBase {
+			private FileDialog fileDialog;
+
+			public FileDialogCollectionNavigator (FileDialog fileDialog)
+			{
+				this.fileDialog = fileDialog;
+			}
+
+			protected override object ElementAt (int idx)
+			{
+				var val = FileDialogTableSource.GetRawColumnValue (fileDialog.tableView.SelectedColumn, fileDialog.State?.Children [idx]);
+				if (val == null) {
+					return string.Empty;
+				}
+
+				return val.ToString ().Trim ('.');
+			}
+
+			protected override int GetCollectionLength ()
+			{
+				return fileDialog.State?.Children.Length ?? 0;
 			}
 		}
 	}

@@ -26,7 +26,7 @@ namespace Terminal.Gui {
 		/// <param name="selected">The index of the item to be selected, the value is clamped to the number of items.</param>
 		public RadioGroup (ustring [] radioLabels, int selected = 0) : base ()
 		{
-			Initialize (Rect.Empty, radioLabels, selected);
+			SetInitalProperties (Rect.Empty, radioLabels, selected);
 		}
 
 		/// <summary>
@@ -37,7 +37,7 @@ namespace Terminal.Gui {
 		/// <param name="selected">The index of item to be selected, the value is clamped to the number of items.</param>
 		public RadioGroup (Rect rect, ustring [] radioLabels, int selected = 0) : base (rect)
 		{
-			Initialize (rect, radioLabels, selected);
+			SetInitalProperties (rect, radioLabels, selected);
 		}
 
 		/// <summary>
@@ -52,7 +52,7 @@ namespace Terminal.Gui {
 			this (MakeRect (x, y, radioLabels != null ? radioLabels.ToList () : null), radioLabels, selected)
 		{ }
 
-		void Initialize (Rect rect, ustring [] radioLabels, int selected)
+		void SetInitalProperties (Rect rect, ustring [] radioLabels, int selected)
 		{
 			if (radioLabels == null) {
 				this.radioLabels = new List<ustring> ();
@@ -61,11 +61,7 @@ namespace Terminal.Gui {
 			}
 
 			this.selected = selected;
-			if (rect == Rect.Empty) {
-				SetWidthHeight (this.radioLabels);
-			} else {
-				Frame = rect;
-			}
+			Frame = rect;
 			CanFocus = true;
 			HotKeySpecifier = new Rune ('_');
 
@@ -82,6 +78,13 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.Home, Command.TopHome);
 			AddKeyBinding (Key.End, Command.BottomEnd);
 			AddKeyBinding (Key.Space, Command.Accept);
+
+			LayoutStarted += RadioGroup_LayoutStarted;
+		}
+
+		private void RadioGroup_LayoutStarted (object sender, EventArgs e)
+		{
+			SetWidthHeight (radioLabels);
 		}
 
 		/// <summary>
@@ -118,13 +121,9 @@ namespace Terminal.Gui {
 			switch (displayMode) {
 			case DisplayModeLayout.Vertical:
 				var r = MakeRect (0, 0, radioLabels);
-				if (IsAdded && LayoutStyle == LayoutStyle.Computed) {
-					Width = r.Width;
-					Height = radioLabels.Count;
-				} else {
-					Frame = new Rect (Frame.Location, new Size (r.Width, radioLabels.Count));
-				}
+				Bounds = new Rect (Bounds.Location, new Size (r.Width, radioLabels.Count));
 				break;
+
 			case DisplayModeLayout.Horizontal:
 				CalculateHorizontalPositions ();
 				var length = 0;
@@ -136,7 +135,7 @@ namespace Terminal.Gui {
 					Width = hr.Width;
 					Height = 1;
 				} else {
-					Frame = new Rect (Frame.Location, new Size (hr.Width, radioLabels.Count));
+					Bounds = new Rect (Bounds.Location, new Size (hr.Width, radioLabels.Count));
 				}
 				break;
 			}
@@ -150,8 +149,9 @@ namespace Terminal.Gui {
 
 			int width = 0;
 
-			foreach (var s in radioLabels)
-				width = Math.Max (s.ConsoleWidth + 3, width);
+			foreach (var s in radioLabels) {
+				width = Math.Max (s.ConsoleWidth + 2, width);
+			}
 			return new Rect (x, y, width, radioLabels.Count);
 		}
 
@@ -189,24 +189,12 @@ namespace Terminal.Gui {
 			}
 		}
 
-		//// Redraws the RadioGroup 
-		//void Update(List<ustring> newRadioLabels)
-		//{
-		//	for (int i = 0; i < radioLabels.Count; i++) {
-		//		Move(0, i);
-		//		Driver.SetAttribute(ColorScheme.Normal);
-		//		Driver.AddStr(ustring.Make(new string (' ', radioLabels[i].ConsoleWidth + 4)));
-		//	}
-		//	if (newRadioLabels.Count != radioLabels.Count) {
-		//		SetWidthHeight(newRadioLabels);
-		//	}
-		//}
-
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
+			base.Redraw (bounds);
+
 			Driver.SetAttribute (GetNormalColor ());
-			Clear ();
 			for (int i = 0; i < radioLabels.Count; i++) {
 				switch (DisplayMode) {
 				case DisplayModeLayout.Vertical:
@@ -387,11 +375,14 @@ namespace Terminal.Gui {
 			}
 			SetFocus ();
 
-			var pos = displayMode == DisplayModeLayout.Horizontal ? me.X : me.Y;
+			int boundsX = me.X - GetFramesThickness ().Left;
+			int boundsY = me.Y - GetFramesThickness ().Top;
+
+			var pos = displayMode == DisplayModeLayout.Horizontal ? boundsX : boundsY;
 			var rCount = displayMode == DisplayModeLayout.Horizontal ? horizontal.Last ().pos + horizontal.Last ().length : radioLabels.Count;
 
 			if (pos < rCount) {
-				var c = displayMode == DisplayModeLayout.Horizontal ? horizontal.FindIndex ((x) => x.pos <= me.X && x.pos + x.length - 2 >= me.X) : me.Y;
+				var c = displayMode == DisplayModeLayout.Horizontal ? horizontal.FindIndex ((x) => x.pos <= boundsX && x.pos + x.length - 2 >= boundsX) : boundsY;
 				if (c > -1) {
 					cursor = SelectedItem = c;
 					SetNeedsDisplay ();

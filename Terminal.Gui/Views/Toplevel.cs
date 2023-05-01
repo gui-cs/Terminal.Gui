@@ -633,14 +633,14 @@ namespace Terminal.Gui {
 				maxWidth = top.SuperView.Bounds.Width;
 				superView = top.SuperView;
 			}
-
-			// BUGBUG: v2 hack for now
-			var mfLength = top.Border?.Thickness.Top > 0 ? 2 : 1;
+			if (superView.Margin != null && superView == top.SuperView) {
+				maxWidth -= superView.GetFramesThickness ().Left + superView.GetFramesThickness ().Right;
+			}
 			if (top.Frame.Width <= maxWidth) {
 				nx = Math.Max (targetX, 0);
 				nx = nx + top.Frame.Width > maxWidth ? Math.Max (maxWidth - top.Frame.Width, 0) : nx;
-				if (nx + mfLength > top.Frame.X + top.Frame.Width) {
-					nx = Math.Max (top.Frame.Right - mfLength, 0);
+				if (nx > top.Frame.X + top.Frame.Width) {
+					nx = Math.Max (top.Frame.Right, 0);
 				}
 			} else {
 				nx = targetX;
@@ -680,11 +680,14 @@ namespace Terminal.Gui {
 			} else {
 				maxWidth = statusVisible ? top.SuperView.Frame.Height - 1 : top.SuperView.Frame.Height;
 			}
+			if (superView.Margin != null && superView == top.SuperView) {
+				maxWidth -= superView.GetFramesThickness ().Top + superView.GetFramesThickness ().Bottom;
+			}
 			ny = Math.Min (ny, maxWidth);
 			if (top.Frame.Height <= maxWidth) {
-				ny = ny + top.Frame.Height >= maxWidth ? Math.Max (maxWidth - top.Frame.Height, menuVisible ? 1 : 0) : ny;
-				if (ny + mfLength > top.Frame.Y + top.Frame.Height) {
-					ny = Math.Max (top.Frame.Bottom - mfLength, 0);
+				ny = ny + top.Frame.Height > maxWidth ? Math.Max (maxWidth - top.Frame.Height, menuVisible ? 1 : 0) : ny;
+				if (ny > top.Frame.Y + top.Frame.Height) {
+					ny = Math.Max (top.Frame.Bottom, 0);
 				}
 			}
 			//System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
@@ -713,9 +716,13 @@ namespace Terminal.Gui {
 			var superView = GetLocationThatFits (top, top.Frame.X, top.Frame.Y,
 				out int nx, out int ny, out _, out StatusBar sb);
 			bool layoutSubviews = false;
+			var maxWidth = 0;
+			if (superView.Margin != null && superView == top.SuperView) {
+				maxWidth -= superView.GetFramesThickness ().Left + superView.GetFramesThickness ().Right;
+			}
 			if ((superView != top || top?.SuperView != null || (top != Application.Top && top.Modal)
 				|| (top?.SuperView == null && top.IsOverlapped))
-				&& (top.Frame.X + top.Frame.Width > Driver.Cols || ny > top.Frame.Y) && top.LayoutStyle == LayoutStyle.Computed) {
+				&& (top.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y) && top.LayoutStyle == LayoutStyle.Computed) {
 
 				if ((top.X == null || top.X is Pos.PosAbsolute) && top.Frame.X != nx) {
 					top.X = nx;
@@ -750,7 +757,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			if (!_needsDisplay.IsEmpty || _childNeedsDisplay || LayoutNeeded) {
+			if (!_needsDisplay.IsEmpty || _subViewNeedsDisplay || LayoutNeeded) {
 				Driver.SetAttribute (GetNormalColor ());
 				Clear (ViewToScreen (bounds));
 				LayoutSubviews ();
@@ -773,6 +780,7 @@ namespace Terminal.Gui {
 					if (view.Frame.IntersectsWith (bounds) && !OutsideTopFrame (this)) {
 						view.SetNeedsLayout ();
 						view.SetNeedsDisplay (view.Bounds);
+						view.SetSubViewNeedsDisplay ();
 					}
 				}
 				base.Redraw (Bounds);
