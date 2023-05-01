@@ -164,6 +164,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Navigator for cycling the selected item in the table by typing.
+		/// Set to null to disable this feature.
+		/// </summary>
+		public CollectionNavigatorBase CollectionNavigator { get; set; }
+
+		/// <summary>
 		/// Initialzies a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. 
 		/// </summary>
 		/// <param name="table">The table to display in the control</param>
@@ -178,6 +184,8 @@ namespace Terminal.Gui {
 		public TableView () : base ()
 		{
 			CanFocus = true;
+
+			this.CollectionNavigator = new TableCollectionNavigator (this);
 
 			// Things this view knows how to do
 			AddCommand (Command.Right, () => { ChangeSelectionByOffset (1, 0, false); return true; });
@@ -743,6 +751,37 @@ namespace Terminal.Gui {
 			var result = InvokeKeybindings (keyEvent);
 			if (result != null) {
 				PositionCursor ();
+				return true;
+			}
+
+			if (CollectionNavigator != null &&
+				this.HasFocus &&
+				Table.Rows != 0 &&
+				Terminal.Gui.CollectionNavigator.IsCompatibleKey (keyEvent) &&
+				!keyEvent.Key.HasFlag (Key.CtrlMask) &&
+				!keyEvent.Key.HasFlag (Key.AltMask) &&
+				char.IsLetterOrDigit ((char)keyEvent.KeyValue)) {
+				return CycleToNextTableEntryBeginningWith (keyEvent);
+			}
+
+			return false;
+		}
+
+		private bool CycleToNextTableEntryBeginningWith (KeyEvent keyEvent)
+		{
+			var row = SelectedRow;
+
+			// There is a multi select going on and not just for the current row
+			if (GetAllSelectedCells ().Any (c => c.Y != row)) {
+				return false;
+			}
+
+			int match = CollectionNavigator.GetNextMatchingItem (row, (char)keyEvent.KeyValue);
+
+			if (match != -1) {
+				SelectedRow = match;
+				EnsureValidSelection ();
+				EnsureSelectedCellIsVisible ();
 				return true;
 			}
 
