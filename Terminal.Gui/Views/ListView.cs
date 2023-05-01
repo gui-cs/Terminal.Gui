@@ -168,7 +168,7 @@ namespace Terminal.Gui {
 				if (allowsMarking) {
 					AddKeyBinding (Key.Space, Command.ToggleChecked);
 				} else {
-					ClearKeybinding (Key.Space);
+					ClearKeyBinding (Key.Space);
 				}
 
 				SetNeedsDisplay ();

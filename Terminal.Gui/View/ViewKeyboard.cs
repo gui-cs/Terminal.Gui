@@ -25,7 +25,7 @@ namespace Terminal.Gui {
 					var v = value == Key.Unknown ? Key.Null : value;
 					if (_hotKey != Key.Null && ContainsKeyBinding (Key.Space | _hotKey)) {
 						if (v == Key.Null) {
-							ClearKeybinding (Key.Space | _hotKey);
+							ClearKeyBinding (Key.Space | _hotKey);
 						} else {
 							ReplaceKeyBinding (Key.Space | _hotKey, Key.Space | v);
 						}
@@ -273,7 +273,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Removes all bound keys from the View and resets the default bindings.
 		/// </summary>
-		public void ClearKeybindings ()
+		public void ClearKeyBindings ()
 		{
 			KeyBindings.Clear ();
 		}
@@ -282,7 +282,7 @@ namespace Terminal.Gui {
 		/// Clears the existing keybinding (if any) for the given <paramref name="key"/>.
 		/// </summary>
 		/// <param name="key"></param>
-		public void ClearKeybinding (Key key)
+		public void ClearKeyBinding (Key key)
 		{
 			KeyBindings.Remove (key);
 		}
@@ -292,7 +292,7 @@ namespace Terminal.Gui {
 		/// keys bound to the same command and this method will clear all of them.
 		/// </summary>
 		/// <param name="command"></param>
-		public void ClearKeybinding (params Command [] command)
+		public void ClearKeyBinding (params Command [] command)
 		{
 			foreach (var kvp in KeyBindings.Where (kvp => kvp.Value.SequenceEqual (command)).ToArray ()) {
 				KeyBindings.Remove (kvp.Key);

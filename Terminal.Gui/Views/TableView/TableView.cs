@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui
 {
@@ -37,10 +38,16 @@ namespace Terminal.Gui
         /// </summary>
         public const int DefaultMinAcceptableWidth = 100;
 
-        /// <summary>
-        /// The data table to render in the view.  Setting this property automatically updates and redraws the control.
-        /// </summary>
-        public ITableSource Table { get => table; set { table = value; Update(); } }
+		/// <summary>
+		/// The data table to render in the view.  Setting this property automatically updates and redraws the control.
+		/// </summary>
+		public ITableSource Table {
+			get => table;
+			set {
+				table = value;
+				Update ();
+			}
+		}
 
         /// <summary>
         /// Contains options for changing how the table is rendered
@@ -300,9 +307,8 @@ namespace Terminal.Gui
                 if (TableIsNullOrInvisible() || rowToRender < 0)
                     continue;
 
-                // No more data
-                if (rowToRender >= Table.Rows)
-                {
+				// No more data
+				if (rowToRender >= Table.Rows) {
 
                     if (rowToRender == Table.Rows && Style.ShowHorizontalBottomline)
                     {
@@ -408,8 +414,8 @@ namespace Terminal.Gui
 
                 var current = columnsToRender[i];
 
-                var colStyle = Style.GetColumnStyleIfAny(current.Column);
-                var colName = table.ColumnNames[current.Column];
+				var colStyle = Style.GetColumnStyleIfAny (current.Column);
+				var colName = table.ColumnNames [current.Column];
 
                 RenderSeparator(current.X - 1, row, true);
 
@@ -545,14 +551,11 @@ namespace Terminal.Gui
                         // for first character render line
                         rune = Driver.LLCorner;
 
-                    }
-                    // if the next column is the start of a header
-                    else if (columnsToRender.Any(r => r.X == c + 1))
-                    {
-                        rune = Driver.BottomTee;
-                    }
-                    else if (c == availableWidth - 1)
-                    {
+					}
+					// if the next column is the start of a header
+					else if (columnsToRender.Any (r => r.X == c + 1)) {
+						rune = Driver.BottomTee;
+					} else if (c == availableWidth - 1) {
 
                         // for the last character in the table
                         rune = Driver.LRCorner;
@@ -670,8 +673,7 @@ namespace Terminal.Gui
                 if (!FullRowSelect)
                     Driver.SetAttribute(Enabled ? rowScheme.Normal : rowScheme.Disabled);
 
-                if (style.AlwaysUseNormalColorForVerticalCellLines && style.ShowVerticalCellLines)
-                {
+				if (style.AlwaysUseNormalColorForVerticalCellLines && style.ShowVerticalCellLines) {
 
                     Driver.SetAttribute(rowScheme.Normal);
                 }
@@ -689,12 +691,12 @@ namespace Terminal.Gui
 
                 Driver.SetAttribute(rowScheme.Normal);
 
-                //render start and end of line
-                AddRune(0, row, Driver.VLine);
-                AddRune(Bounds.Width - 1, row, Driver.VLine);
-            }
+				//render start and end of line
+				AddRune (0, row, Driver.VLine);
+				AddRune (Bounds.Width - 1, row, Driver.VLine);
+			}
 
-        }
+		}
 
         /// <summary>
         /// Override to provide custom multi colouring to cells.  Use <see cref="View.Driver"/> to
@@ -751,18 +753,18 @@ namespace Terminal.Gui
             d.AddRune(ch);
         }
 
-        /// <summary>
-        /// Truncates or pads <paramref name="representation"/> so that it occupies a exactly <paramref name="availableHorizontalSpace"/> using the alignment specified in <paramref name="colStyle"/> (or left if no style is defined)
-        /// </summary>
-        /// <param name="originalCellValue">The object in this cell of the <see cref="Table"/></param>
-        /// <param name="representation">The string representation of <paramref name="originalCellValue"/></param>
-        /// <param name="availableHorizontalSpace"></param>
-        /// <param name="colStyle">Optional style indicating custom alignment for the cell</param>
-        /// <returns></returns>
-        private string TruncateOrPad(object originalCellValue, string representation, int availableHorizontalSpace, ColumnStyle colStyle)
-        {
-            if (string.IsNullOrEmpty(representation))
-                return new string(' ', availableHorizontalSpace);
+		/// <summary>
+		/// Truncates or pads <paramref name="representation"/> so that it occupies a exactly <paramref name="availableHorizontalSpace"/> using the alignment specified in <paramref name="colStyle"/> (or left if no style is defined)
+		/// </summary>
+		/// <param name="originalCellValue">The object in this cell of the <see cref="Table"/></param>
+		/// <param name="representation">The string representation of <paramref name="originalCellValue"/></param>
+		/// <param name="availableHorizontalSpace"></param>
+		/// <param name="colStyle">Optional style indicating custom alignment for the cell</param>
+		/// <returns></returns>
+		private string TruncateOrPad (object originalCellValue, string representation, int availableHorizontalSpace, ColumnStyle colStyle)
+		{
+			if (string.IsNullOrEmpty (representation))
+				return new string (' ', availableHorizontalSpace);
 
             // if value is not wide enough
             if (representation.Sum(c => Rune.ColumnWidth(c)) < availableHorizontalSpace)
@@ -793,14 +795,15 @@ namespace Terminal.Gui
             return new string(representation.TakeWhile(c => (availableHorizontalSpace -= Rune.ColumnWidth(c)) > 0).ToArray());
         }
 
-        /// <inheritdoc/>
-        public override bool ProcessKey(KeyEvent keyEvent)
-        {
-            if (TableIsNullOrInvisible())
-            {
-                PositionCursor();
-                return false;
-            }
+
+		
+		/// <inheritdoc/>
+		public override bool ProcessKey (KeyEvent keyEvent)
+		{
+			if (TableIsNullOrInvisible ()) {
+				PositionCursor ();
+				return false;
+			}
 
             var result = InvokeKeybindings(keyEvent);
             if (result != null)
@@ -834,21 +837,18 @@ namespace Terminal.Gui
             if (extendExistingSelection)
             {
 
-                // If we are extending current selection but there isn't one
-                if (MultiSelectedRegions.Count == 0 || MultiSelectedRegions.All(m => m.IsToggled))
-                {
-                    // Create a new region between the old active cell and the new cell
-                    var rect = CreateTableSelection(SelectedColumn, SelectedRow, col, row);
-                    MultiSelectedRegions.Push(rect);
-                }
-                else
-                {
-                    // Extend the current head selection to include the new cell
-                    var head = MultiSelectedRegions.Pop();
-                    var newRect = CreateTableSelection(head.Origin.X, head.Origin.Y, col, row);
-                    MultiSelectedRegions.Push(newRect);
-                }
-            }
+				// If we are extending current selection but there isn't one
+				if (MultiSelectedRegions.Count == 0 || MultiSelectedRegions.All (m => m.IsToggled)) {
+					// Create a new region between the old active cell and the new cell
+					var rect = CreateTableSelection (SelectedColumn, SelectedRow, col, row);
+					MultiSelectedRegions.Push (rect);
+				} else {
+					// Extend the current head selection to include the new cell
+					var head = MultiSelectedRegions.Pop ();
+					var newRect = CreateTableSelection (head.Origin.X, head.Origin.Y, col, row);
+					MultiSelectedRegions.Push (newRect);
+				}
+			}
 
             SelectedColumn = col;
             SelectedRow = row;
@@ -1004,20 +1004,19 @@ namespace Terminal.Gui
             Update();
         }
 
-        /// <summary>
-        /// Returns all cells in any <see cref="MultiSelectedRegions"/> (if <see cref="MultiSelect"/> is enabled) and the selected cell
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<Point> GetAllSelectedCells()
-        {
-            if (TableIsNullOrInvisible() || Table.Rows == 0)
-            {
-                return Enumerable.Empty<Point>();
-            }
+		/// <summary>
+		/// Returns all cells in any <see cref="MultiSelectedRegions"/> (if <see cref="MultiSelect"/> is enabled) and the selected cell
+		/// </summary>
+		/// <returns></returns>
+		public IEnumerable<Point> GetAllSelectedCells ()
+		{
+			if (TableIsNullOrInvisible () || Table.Rows == 0) {
+				return Enumerable.Empty<Point> ();
+			}
 
             EnsureValidSelection();
 
-            var toReturn = new HashSet<Point>();
+			var toReturn = new HashSet<Point> ();
 
             // If there are one or more rectangular selections
             if (MultiSelect && MultiSelectedRegions.Any())
@@ -1030,37 +1029,30 @@ namespace Terminal.Gui
                 var xMin = FullRowSelect ? 0 : MultiSelectedRegions.Min(r => r.Rect.Left);
                 var xMax = FullRowSelect ? Table.Columns : MultiSelectedRegions.Max(r => r.Rect.Right);
 
-                for (int y = yMin; y < yMax; y++)
-                {
-                    for (int x = xMin; x < xMax; x++)
-                    {
-                        if (IsSelected(x, y))
-                        {
-                            toReturn.Add(new Point(x, y));
-                        }
-                    }
-                }
-            }
+				for (int y = yMin; y < yMax; y++) {
+					for (int x = xMin; x < xMax; x++) {
+						if (IsSelected (x, y)) {
+							toReturn.Add (new Point (x, y));
+						}
+					}
+				}
+			}
 
             // if there are no region selections then it is just the active cell
 
-            // if we are selecting the full row
-            if (FullRowSelect)
-            {
-                // all cells in active row are selected
-                for (int x = 0; x < Table.Columns; x++)
-                {
-                    toReturn.Add(new Point(x, SelectedRow));
-                }
-            }
-            else
-            {
-                // Not full row select and no multi selections
-                toReturn.Add(new Point(SelectedColumn, SelectedRow));
-            }
+			// if we are selecting the full row
+			if (FullRowSelect) {
+				// all cells in active row are selected
+				for (int x = 0; x < Table.Columns; x++) {
+					toReturn.Add (new Point (x, SelectedRow));
+				}
+			} else {
+				// Not full row select and no multi selections
+				toReturn.Add (new Point (SelectedColumn, SelectedRow));
+			}
 
-            return toReturn;
-        }
+			return toReturn;
+		}
 
         /// <summary>
         /// Returns a new rectangle between the two points with positive width/height regardless of relative positioning of the points.  pt1 is always considered the <see cref="TableSelection.Origin"/> point
@@ -1093,8 +1085,8 @@ namespace Terminal.Gui
                 return;
             }
 
-            var regions = GetMultiSelectedRegionsContaining(selectedColumn, selectedRow).ToArray();
-            var toggles = regions.Where(s => s.IsToggled).ToArray();
+			var regions = GetMultiSelectedRegionsContaining (selectedColumn, selectedRow).ToArray ();
+			var toggles = regions.Where (s => s.IsToggled).ToArray ();
 
             // Toggle it off
             if (toggles.Any())
@@ -1103,31 +1095,24 @@ namespace Terminal.Gui
                 var oldRegions = MultiSelectedRegions.ToArray().Reverse();
                 MultiSelectedRegions.Clear();
 
-                foreach (var region in oldRegions)
-                {
-                    if (!toggles.Contains(region))
-                        MultiSelectedRegions.Push(region);
-                }
-            }
-            else
-            {
+				foreach (var region in oldRegions) {
+					if (!toggles.Contains (region))
+						MultiSelectedRegions.Push (region);
+				}
+			} else {
 
-                // user is toggling selection within a rectangular
-                // select.  So toggle the full region
-                if (regions.Any())
-                {
-                    foreach (var r in regions)
-                    {
-                        r.IsToggled = true;
-                    }
-                }
-                else
-                {
-                    // Toggle on a single cell selection
-                    MultiSelectedRegions.Push(
-                    CreateTableSelection(selectedColumn, SelectedRow, selectedColumn, selectedRow, true)
-                    );
-                }
+				// user is toggling selection within a rectangular
+				// select.  So toggle the full region
+				if (regions.Any ()) {
+					foreach (var r in regions) {
+						r.IsToggled = true;
+					}
+				} else {
+					// Toggle on a single cell selection
+					MultiSelectedRegions.Push (
+					CreateTableSelection (selectedColumn, SelectedRow, selectedColumn, selectedRow, true)
+					);
+				}
 
             }
         }
@@ -1158,31 +1143,26 @@ namespace Terminal.Gui
                 return false;
             }
 
-            if (GetMultiSelectedRegionsContaining(col, row).Any())
-            {
-                return true;
-            }
+			if (GetMultiSelectedRegionsContaining (col, row).Any ()) {
+				return true;
+			}
 
             return row == SelectedRow &&
                     (col == SelectedColumn || FullRowSelect);
         }
 
-        private IEnumerable<TableSelection> GetMultiSelectedRegionsContaining(int col, int row)
-        {
-            if (!MultiSelect)
-            {
-                return Enumerable.Empty<TableSelection>();
-            }
+		private IEnumerable<TableSelection> GetMultiSelectedRegionsContaining (int col, int row)
+		{
+			if (!MultiSelect) {
+				return Enumerable.Empty<TableSelection> ();
+			}
 
-            if (FullRowSelect)
-            {
-                return MultiSelectedRegions.Where(r => r.Rect.Bottom > row && r.Rect.Top <= row);
-            }
-            else
-            {
-                return MultiSelectedRegions.Where(r => r.Rect.Contains(col, row));
-            }
-        }
+			if (FullRowSelect) {
+				return MultiSelectedRegions.Where (r => r.Rect.Bottom > row && r.Rect.Top <= row);
+			} else {
+				return MultiSelectedRegions.Where (r => r.Rect.Contains (col, row));
+			}
+		}
 
         /// <summary>
         /// Returns true if the given <paramref name="columnIndex"/> indexes a visible
@@ -1496,20 +1476,20 @@ namespace Terminal.Gui
             }
         }
 
-        /// <summary>
-        /// Returns true if the <see cref="Table"/> is not set or all the
-        /// columns in the <see cref="Table"/> have an explicit
-        /// <see cref="ColumnStyle"/> that marks them <see cref="ColumnStyle.visible"/>
-        /// <see langword="false"/>.
-        /// </summary>
-        /// <returns></returns>
-        private bool TableIsNullOrInvisible()
-        {
-            return Table == null ||
-                Table.Columns <= 0 ||
-                Enumerable.Range(0, Table.Columns).All(
-                c => (Style.GetColumnStyleIfAny(c)?.Visible ?? true) == false);
-        }
+		/// <summary>
+		/// Returns true if the <see cref="Table"/> is not set or all the
+		/// columns in the <see cref="Table"/> have an explicit
+		/// <see cref="ColumnStyle"/> that marks them <see cref="ColumnStyle.visible"/>
+		/// <see langword="false"/>.
+		/// </summary>
+		/// <returns></returns>
+		private bool TableIsNullOrInvisible ()
+		{
+			return Table == null ||
+				Table.Columns <= 0 ||
+				Enumerable.Range (0, Table.Columns).All (
+				c => (Style.GetColumnStyleIfAny (c)?.Visible ?? true) == false);
+		}
 
         /// <summary>
         /// Returns <paramref name="columnIndex"/> unless the <see cref="ColumnStyle.Visible"/> is false for
@@ -1544,11 +1524,11 @@ namespace Terminal.Gui
                 return false;
             }
 
-            // get the column visibility by index (if no style visible is true)
-            bool[] columnVisibility =
-                Enumerable.Range(0, Table.Columns)
-                .Select(c => this.Style.GetColumnStyleIfAny(c)?.Visible ?? true)
-                .ToArray();
+			// get the column visibility by index (if no style visible is true)
+			bool [] columnVisibility =
+				Enumerable.Range (0, Table.Columns)
+				.Select (c => this.Style.GetColumnStyleIfAny (c)?.Visible ?? true)
+				.ToArray ();
 
             // column is visible
             if (columnVisibility[columnIndex])
@@ -1657,13 +1637,13 @@ namespace Terminal.Gui
             }
         }
 
-        /// <summary>
-        /// Invokes the <see cref="SelectedCellChanged"/> event
-        /// </summary>
-        protected virtual void OnSelectedCellChanged(SelectedCellChangedEventArgs args)
-        {
-            SelectedCellChanged?.Invoke(this, args);
-        }
+		/// <summary>
+		/// Invokes the <see cref="SelectedCellChanged"/> event
+		/// </summary>
+		protected virtual void OnSelectedCellChanged (SelectedCellChangedEventArgs args)
+		{
+			SelectedCellChanged?.Invoke (this, args);
+		}
 
         /// <summary>
         /// Invokes the <see cref="CellActivated"/> event
@@ -1674,18 +1654,17 @@ namespace Terminal.Gui
             CellActivated?.Invoke(this, args);
         }
 
-        /// <summary>
-        /// Calculates which columns should be rendered given the <paramref name="bounds"/> in which to display and the <see cref="ColumnOffset"/>
-        /// </summary>
-        /// <param name="bounds"></param>
-        /// <param name="padding"></param>
-        /// <returns></returns>
-        private IEnumerable<ColumnToRender> CalculateViewport(Rect bounds, int padding = 1)
-        {
-            if (TableIsNullOrInvisible())
-            {
-                return Enumerable.Empty<ColumnToRender>();
-            }
+		/// <summary>
+		/// Calculates which columns should be rendered given the <paramref name="bounds"/> in which to display and the <see cref="ColumnOffset"/>
+		/// </summary>
+		/// <param name="bounds"></param>
+		/// <param name="padding"></param>
+		/// <returns></returns>
+		private IEnumerable<ColumnToRender> CalculateViewport (Rect bounds, int padding = 1)
+		{
+			if (TableIsNullOrInvisible ()) {
+				return Enumerable.Empty<ColumnToRender> ();
+			}
 
             var toReturn = new List<ColumnToRender>();
             int usedSpace = 0;
@@ -1704,9 +1683,8 @@ namespace Terminal.Gui
             bool first = true;
             var lastColumn = Table.Columns - 1;
 
-            // TODO : Maybe just a for loop?
-            foreach (var col in Enumerable.Range(0, Table.Columns).Skip(ColumnOffset))
-            {
+			// TODO : Maybe just a for loop?
+			foreach (var col in Enumerable.Range (0, Table.Columns).Skip (ColumnOffset)) {
 
                 int startingIdxForCurrentHeader = usedSpace;
                 var colStyle = Style.GetColumnStyleIfAny(col);
@@ -1759,16 +1737,15 @@ namespace Terminal.Gui
                 colWidth = Math.Min(availableHorizontalSpace, colWidth);
                 var isVeryLast = lastColumn == col;
 
-                // there is space
-                toReturn.Add(new ColumnToRender(col, startingIdxForCurrentHeader, colWidth, isVeryLast));
-                first = false;
-            }
+				// there is space
+				toReturn.Add (new ColumnToRender (col, startingIdxForCurrentHeader, colWidth, isVeryLast));
+				first = false;
+			}
 
-            if (Style.ExpandLastColumn)
-            {
-                var last = toReturn.Last();
-                last.Width = Math.Max(last.Width, availableHorizontalSpace - last.X);
-            }
+			if (Style.ExpandLastColumn) {
+				var last = toReturn.Last ();
+				last.Width = Math.Max (last.Width, availableHorizontalSpace - last.X);
+			}
 
             return toReturn;
         }
@@ -1781,16 +1758,16 @@ namespace Terminal.Gui
             return Style.AlwaysShowHeaders || rowOffset == 0;
         }
 
-        /// <summary>
-        /// Returns the maximum of the <paramref name="col"/> name and the maximum length of data that will be rendered starting at <see cref="RowOffset"/> and rendering <paramref name="rowsToRender"/>
-        /// </summary>
-        /// <param name="col"></param>
-        /// <param name="rowsToRender"></param>
-        /// <param name="colStyle"></param>
-        /// <returns></returns>
-        private int CalculateMaxCellWidth(int col, int rowsToRender, ColumnStyle colStyle)
-        {
-            int spaceRequired = table.ColumnNames[col].Sum(c => Rune.ColumnWidth(c));
+		/// <summary>
+		/// Returns the maximum of the <paramref name="col"/> name and the maximum length of data that will be rendered starting at <see cref="RowOffset"/> and rendering <paramref name="rowsToRender"/>
+		/// </summary>
+		/// <param name="col"></param>
+		/// <param name="rowsToRender"></param>
+		/// <param name="colStyle"></param>
+		/// <returns></returns>
+		private int CalculateMaxCellWidth (int col, int rowsToRender, ColumnStyle colStyle)
+		{
+			int spaceRequired = table.ColumnNames [col].Sum (c => Rune.ColumnWidth (c));
 
             // if table has no rows
             if (RowOffset < 0)
@@ -1800,11 +1777,11 @@ namespace Terminal.Gui
             for (int i = RowOffset; i < RowOffset + rowsToRender && i < Table.Rows; i++)
             {
 
-                //expand required space if cell is bigger than the last biggest cell or header
-                spaceRequired = Math.Max(
-                    spaceRequired,
-                    GetRepresentation(Table[i, col], colStyle).Sum(c => Rune.ColumnWidth(c)));
-            }
+				//expand required space if cell is bigger than the last biggest cell or header
+				spaceRequired = Math.Max (
+					spaceRequired,
+					GetRepresentation (Table [i, col], colStyle).Sum (c => Rune.ColumnWidth (c)));
+			}
 
             // Don't require more space than the style allows
             if (colStyle != null)
@@ -2012,11 +1989,11 @@ namespace Terminal.Gui
             public bool ShowHorizontalScrollIndicators { get; set; } = true;
 
 
-            /// <summary>
-            /// Gets or sets a flag indicating whether there should be a horizontal line after all the data
-            /// in the table. Defaults to <see langword="false"/>.
-            /// </summary>
-            public bool ShowHorizontalBottomline { get; set; } = false;
+			/// <summary>
+			/// Gets or sets a flag indicating whether there should be a horizontal line after all the data
+			/// in the table. Defaults to <see langword="false"/>.
+			/// </summary>
+			public bool ShowHorizontalBottomline { get; set; } = false;
 
             /// <summary>
             /// True to invert the colors of the first symbol of the selected cell in the <see cref="TableView"/>.
