@@ -35,7 +35,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Null (rg.Y);
 			Assert.Null (rg.Width);
 			Assert.Null (rg.Height);
-			Assert.Equal (new Rect (0, 0, 7, 1), rg.Frame);
+			Assert.Equal (new Rect (0, 0, 0, 0), rg.Frame);
 			Assert.Equal (0, rg.SelectedItem);
 
 			rg = new RadioGroup (new Rect (1, 2, 20, 5), new NStack.ustring [] { "Test" });
@@ -57,7 +57,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Null (rg.Y);
 			Assert.Null (rg.Width);
 			Assert.Null (rg.Height);
-			Assert.Equal (new Rect (1, 2, 7, 1), rg.Frame);
+			Assert.Equal (new Rect (1, 2, 6, 1), rg.Frame);
 			Assert.Equal (0, rg.SelectedItem);
 		}
 
@@ -76,8 +76,7 @@ namespace Terminal.Gui.ViewsTests {
 			var rg = new RadioGroup (new NStack.ustring [] { "Test", "New Test 你" });
 			var win = new Window () {
 				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-				Title = "Test Demo 你"
+				Height = Dim.Fill ()
 			};
 			win.Add (rg);
 			Application.Top.Add (win);
@@ -89,10 +88,10 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (2, rg.RadioLabels.Length);
 			Assert.Equal (0, rg.X);
 			Assert.Equal (0, rg.Y);
-			Assert.Equal (14, rg.Width);
-			Assert.Equal (2, rg.Height);
+			Assert.Equal (13, rg.Frame.Width);
+			Assert.Equal (2, rg.Frame.Height);
 			var expected = @"
-┌┤Test Demo 你├──────────────┐
+┌────────────────────────────┐
 │● Test                      │
 │◌ New Test 你               │
 │                            │
@@ -113,7 +112,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (1, rg.Height);
 
 			expected = @"
-┌┤Test Demo 你├──────────────┐
+┌────────────────────────────┐
 │● Test  ◌ New Test 你       │
 │                            │
 │                            │
@@ -133,7 +132,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (23, rg.Width);
 			Assert.Equal (1, rg.Height);
 			expected = @"
-┌┤Test Demo 你├──────────────┐
+┌────────────────────────────┐
 │● Test    ◌ New Test 你     │
 │                            │
 │                            │
