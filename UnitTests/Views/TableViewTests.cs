@@ -2258,7 +2258,7 @@ namespace Terminal.Gui.ViewsTests {
 			dt.Rows.Add (1, 2, 3, 4, 5, 6);
 			tv.LayoutSubviews ();
 
-			var wrapper = new CheckBoxTableSourceWrapper (tv, tv.Table);
+			var wrapper = new CheckBoxTableSourceWrapperByIndex (tv, tv.Table);
 			tv.Table = wrapper;
 
 
@@ -2341,7 +2341,7 @@ namespace Terminal.Gui.ViewsTests {
 			dt.Rows.Add (1, 2, 3, 4, 5, 6);
 			tv.LayoutSubviews ();
 
-			var wrapper = new CheckBoxTableSourceWrapper (tv, tv.Table);
+			var wrapper = new CheckBoxTableSourceWrapperByIndex (tv, tv.Table);
 			tv.Table = wrapper;
 
 			//toggle all cells
@@ -2389,7 +2389,7 @@ namespace Terminal.Gui.ViewsTests {
 			dt.Rows.Add (1, 2, 3, 4, 5, 6);
 			tv.LayoutSubviews ();
 
-			var wrapper = new CheckBoxTableSourceWrapper (tv, tv.Table);
+			var wrapper = new CheckBoxTableSourceWrapperByIndex (tv, tv.Table);
 			tv.Table = wrapper;
 			wrapper.CheckedRows.Add (0);
 			wrapper.CheckedRows.Add (2);
@@ -2442,6 +2442,100 @@ namespace Terminal.Gui.ViewsTests {
 │√│1│2│";
 			TestHelpers.AssertDriverContentsAre (expected, output);
 			Assert.Single (wrapper.CheckedRows, 2);
+		}
+
+
+		[Fact, AutoInitShutdown]
+		public void TestTableViewCheckboxes_ByObject ()
+		{
+
+			var tv = GetPetTable (out var source);
+			tv.LayoutSubviews ();
+			var pets = source.Data;
+
+			var wrapper = new CheckBoxTableSourceWrapperByObject<PickablePet>(
+				tv,
+				source,
+				(p)=>p.IsPicked,
+				(p,b)=>p.IsPicked = b);
+
+			tv.Table = wrapper;
+
+			tv.Redraw (tv.Bounds);
+
+			string expected =
+				@"
+┌─┬───────┬─────────────┐
+│ │Name   │Kind         │
+├─┼───────┼─────────────┤
+│╴│Tammy  │Cat          │
+│╴│Tibbles│Cat          │
+│╴│Ripper │Dog          │";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			Assert.Empty (pets.Where(p=>p.IsPicked));
+
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+			
+			Assert.True (pets.First ().IsPicked);
+
+			tv.Redraw (tv.Bounds);
+
+			expected =
+				@"
+┌─┬───────┬─────────────┐
+│ │Name   │Kind         │
+├─┼───────┼─────────────┤
+│√│Tammy  │Cat          │
+│╴│Tibbles│Cat          │
+│╴│Ripper │Dog          │";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			tv.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()));
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+			Assert.True (pets.ElementAt(0).IsPicked);
+			Assert.True (pets.ElementAt (1).IsPicked);
+			Assert.False (pets.ElementAt (2).IsPicked);
+
+			tv.Redraw (tv.Bounds);
+
+			expected =
+				@"
+┌─┬───────┬─────────────┐
+│ │Name   │Kind         │
+├─┼───────┼─────────────┤
+│√│Tammy  │Cat          │
+│√│Tibbles│Cat          │
+│╴│Ripper │Dog          │";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			tv.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+
+			Assert.False (pets.ElementAt (0).IsPicked);
+			Assert.True (pets.ElementAt (1).IsPicked);
+			Assert.False (pets.ElementAt (2).IsPicked);
+
+			tv.Redraw (tv.Bounds);
+
+			expected =
+				@"
+┌─┬───────┬─────────────┐
+│ │Name   │Kind         │
+├─┼───────┼─────────────┤
+│╴│Tammy  │Cat          │
+│√│Tibbles│Cat          │
+│╴│Ripper │Dog          │";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
 		}
 
 		[Fact, AutoInitShutdown]
@@ -2743,5 +2837,41 @@ A B C
 			tableView.Table = new DataTableSource(dt);
 			return tableView;
 		}
+
+
+		private class PickablePet {
+			public bool IsPicked { get; set; }
+			public string Name{ get; set; }
+			public string Kind { get; set; }
+
+			public PickablePet (bool isPicked, string name, string kind)
+			{
+				IsPicked = isPicked;
+				Name = name;
+				Kind = kind;
+			}
+		}
+
+		private TableView GetPetTable (out EnumerableTableSource<PickablePet> source)
+		{
+			var tv = new TableView ();
+			tv.ColorScheme = Colors.TopLevel;
+			tv.Bounds = new Rect (0, 0, 25, 6);
+
+			tv.Table = source = new EnumerableTableSource<PickablePet> (
+				new PickablePet [] {
+				new PickablePet(false,"Tammy","Cat"),
+				new PickablePet(false,"Tibbles","Cat"),
+				new PickablePet(false,"Ripper","Dog"),},
+				new () {
+					{ "Name", (p) => p.Name},
+					{ "Kind", (p) => p.Kind},
+				});
+
+			tv.LayoutSubviews ();
+
+			return tv;
+		}
+
 	}
 }

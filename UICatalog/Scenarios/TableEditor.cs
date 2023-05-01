@@ -459,12 +459,12 @@ namespace UICatalog.Scenarios {
 
 		private void ToggleCheckboxes ()
 		{
-			if (tableView.Table is CheckBoxTableSourceWrapper wrapper) {
+			if (tableView.Table is CheckBoxTableSourceWrapperByIndex wrapper) {
 				// unwrap it to remove check boxes
 				tableView.Table = wrapper.Wrapping;
 				miCheckboxes.Checked = false;
 			} else {
-				tableView.Table = new CheckBoxTableSourceWrapper (tableView, tableView.Table);
+				tableView.Table = new CheckBoxTableSourceWrapperByIndex (tableView, tableView.Table);
 				miCheckboxes.Checked = true;
 			}
 		}
@@ -875,7 +875,7 @@ namespace UICatalog.Scenarios {
 
 		private bool HasCheckboxes ()
 		{
-			return tableView.Table is CheckBoxTableSourceWrapper;
+			return tableView.Table is CheckBoxTableSourceWrapperBase;
 		}
 
 		private string GetUnicodeCategory (uint u)
