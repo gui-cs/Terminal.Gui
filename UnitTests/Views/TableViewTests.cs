@@ -2596,6 +2596,100 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Fact, AutoInitShutdown]
+		public void TestTableViewRadioBoxes_Simple_ByObject ()
+		{
+
+			var tv = GetPetTable (out var source);
+			tv.LayoutSubviews ();
+			var pets = source.Data;
+
+			var wrapper = new CheckBoxTableSourceWrapperByObject<PickablePet> (
+				tv,
+				source,
+				(p) => p.IsPicked,
+				(p, b) => p.IsPicked = b);
+
+			wrapper.UseRadioButtons = true;
+
+			tv.Table = wrapper;
+			tv.Redraw (tv.Bounds);
+
+			string expected =
+				@"
+┌─┬───────┬─────────────┐
+│ │Name   │Kind         │
+├─┼───────┼─────────────┤
+│◌│Tammy  │Cat          │
+│◌│Tibbles│Cat          │
+│◌│Ripper │Dog          │
+";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			Assert.Empty (pets.Where (p => p.IsPicked));
+
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+			Assert.True (pets.First ().IsPicked);
+
+			tv.Redraw (tv.Bounds);
+
+			expected =
+				@"
+┌─┬───────┬─────────────┐
+│ │Name   │Kind         │
+├─┼───────┼─────────────┤
+│●│Tammy  │Cat          │
+│◌│Tibbles│Cat          │
+│◌│Ripper │Dog          │";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			tv.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()));
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+			Assert.False (pets.ElementAt (0).IsPicked);
+			Assert.True (pets.ElementAt (1).IsPicked);
+			Assert.False (pets.ElementAt (2).IsPicked);
+
+			tv.Redraw (tv.Bounds);
+
+			expected =
+				@"
+┌─┬───────┬─────────────┐
+│ │Name   │Kind         │
+├─┼───────┼─────────────┤
+│◌│Tammy  │Cat          │
+│●│Tibbles│Cat          │
+│◌│Ripper │Dog          │";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			tv.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+
+			Assert.True (pets.ElementAt (0).IsPicked);
+			Assert.False (pets.ElementAt (1).IsPicked);
+			Assert.False (pets.ElementAt (2).IsPicked);
+
+			tv.Redraw (tv.Bounds);
+
+			expected =
+				@"
+┌─┬───────┬─────────────┐
+│ │Name   │Kind         │
+├─┼───────┼─────────────┤
+│●│Tammy  │Cat          │
+│◌│Tibbles│Cat          │
+│◌│Ripper │Dog          │";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
 		public void TestFullRowSelect_SelectionColorDoesNotStop_WhenShowVerticalCellLinesIsFalse ()
 		{
 			var tv = GetTwoRowSixColumnTable (out var dt);
