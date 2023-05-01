@@ -146,6 +146,7 @@ namespace Terminal.Gui {
 
 				// multi selection makes it unclear what to toggle in this situation
 				if(range.Length != 1) {
+					e.Cancel = true;
 					return;
 				}
 

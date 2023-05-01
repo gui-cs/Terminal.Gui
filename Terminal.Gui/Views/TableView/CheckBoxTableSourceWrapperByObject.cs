@@ -47,14 +47,16 @@ namespace Terminal.Gui {
 			var d = toWrap.Data.ElementAt (row);
 			setter (d, !getter(d));
 		}
-
+		
 		/// <inheritdoc/>
 		protected override void ToggleRows (int [] range)
 		{
 			// if all are ticked untick them
 			if (range.All (IsChecked)) {
 				// select none
-				ClearAllToggles ();
+				foreach(var r in range) {
+					setter (toWrap.Data.ElementAt (r), false);
+				}
 			} else {
 				// otherwise tick all
 				foreach (var r in range) {
