@@ -9,7 +9,10 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class DataTableSource : ITableSource
 	{
-		private readonly DataTable table;
+		/// <summary>
+		/// The data table this source wraps.
+		/// </summary>
+		public DataTable DataTable { get; private set; }
 
 		/// <summary>
 		/// Creates a new instance based on the data in <paramref name="table"/>.
@@ -17,19 +20,19 @@ namespace Terminal.Gui {
 		/// <param name="table"></param>
 		public DataTableSource(DataTable table)
 		{
-			this.table = table;
+			this.DataTable = table;
 		}
 
 		/// <inheritdoc/>
-		public object this [int row, int col] => table.Rows[row][col];
+		public object this [int row, int col] => DataTable.Rows[row][col];
 
 		/// <inheritdoc/>
-		public int Rows => table.Rows.Count;
+		public int Rows => DataTable.Rows.Count;
 
 		/// <inheritdoc/>
-		public int Columns => table.Columns.Count;
+		public int Columns => DataTable.Columns.Count;
 
 		/// <inheritdoc/>
-		public string [] ColumnNames => table.Columns.Cast<DataColumn>().Select (c => c.ColumnName).ToArray ();
+		public string [] ColumnNames => DataTable.Columns.Cast<DataColumn>().Select (c => c.ColumnName).ToArray ();
 	}
 }
