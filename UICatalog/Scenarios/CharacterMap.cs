@@ -159,19 +159,7 @@ namespace UICatalog.Scenarios {
 			ColorScheme = Colors.Dialog;
 			CanFocus = true;
 
-			ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePointVal / 16 + 1));
-			ShowVerticalScrollIndicator = true;
-			ShowHorizontalScrollIndicator = false;
-			LayoutComplete += (s, args) => {
-				if (Bounds.Width < RowWidth) {
-					ShowHorizontalScrollIndicator = true;
-				} else if (ShowHorizontalScrollIndicator) {
-					ShowHorizontalScrollIndicator = false;
-					// Snap 1st column into view if it's been scrolled horizontally 
-					ContentOffset = new Point (0, ContentOffset.Y);
-					SetNeedsDisplay ();
-				}
-			};
+			ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePointVal / 16 + (ShowHorizontalScrollIndicator ? 2 : 1)));
 
 			AddCommand (Command.ScrollUp, () => {
 				if (SelectedGlyph >= 16) {
@@ -192,7 +180,7 @@ namespace UICatalog.Scenarios {
 				return true;
 			});
 			AddCommand (Command.ScrollRight, () => {
-				if (SelectedGlyph < MaxCodePointVal - 1) {
+				if (SelectedGlyph < MaxCodePointVal) {
 					SelectedGlyph++;
 				}
 				return true;
@@ -215,6 +203,11 @@ namespace UICatalog.Scenarios {
 				SelectedGlyph = MaxCodePointVal;
 				return true;
 			});
+			AddKeyBinding (Key.Enter, Command.Accept);
+			AddCommand (Command.Accept, () => {
+				MessageBox.Query ("Glyph", $"{new Rune ((uint)SelectedGlyph)} U+{SelectedGlyph:x4}", "Ok");
+				return true;
+			});
 
 			MouseClick += Handle_MouseClick;
 			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
@@ -228,6 +221,30 @@ namespace UICatalog.Scenarios {
 		private void CopyGlyph ()
 		{
 			Clipboard.Contents = $"{new Rune (SelectedGlyph)}";
+		}
+
+		public override void OnDrawContent (Rect contentArea)
+		{
+			base.OnDrawContent (contentArea);
+
+			if (ShowHorizontalScrollIndicator && ContentSize.Height < (int)(MaxCodePointVal / 16 + 2)) {
+				ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePointVal / 16 + 2));
+				int row = (int)_selected / 16;
+				int col = (((int)_selected - (row * 16)) * COLUMN_WIDTH);
+				int width = (Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH) - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
+				if (col + ContentOffset.X >= width) {
+					// Snap to the selected glyph.
+					ContentOffset = new Point (Math.Min (col, col - width + COLUMN_WIDTH), ContentOffset.Y == -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
+				} else {
+					ContentOffset = new Point (ContentOffset.X - col, ContentOffset.Y == -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
+				}
+				SetNeedsDisplay ();
+			} else if (!ShowHorizontalScrollIndicator && ContentSize.Height > (int)(MaxCodePointVal / 16 + 1)) {
+				ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePointVal / 16 + 1));
+				// Snap 1st column into view if it's been scrolled horizontally
+				ContentOffset = new Point (0, ContentOffset.Y < -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
+				SetNeedsDisplay ();
+			}
 		}
 
 		public override void OnDrawContentComplete (Rect contentArea)
