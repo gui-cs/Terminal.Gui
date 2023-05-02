@@ -129,7 +129,6 @@ namespace UICatalog.Scenarios {
 				} else if (row + ContentOffset.Y >= height) {
 					// Moving down.
 					ContentOffset = new Point (ContentOffset.X, Math.Min (row, row - height + ROW_HEIGHT));
-
 				}
 				int col = (((int)_selected - (row * 16)) * COLUMN_WIDTH);
 				int width = (Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH) - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
@@ -286,8 +285,6 @@ namespace UICatalog.Scenarios {
 				}
 			}
 			Driver.Clip = oldClip;
-
-			return false;
 		}
 
 		ContextMenu _contextMenu = new ContextMenu ();

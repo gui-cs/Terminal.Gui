@@ -441,7 +441,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// This method will be called before any subviews added with <see cref="Add(View)"/> have been drawn. 
 		/// </remarks>
-		public virtual bool OnDrawContent (Rect contentArea)
+		public virtual void OnDrawContent (Rect contentArea)
 		{
 			if (SuperView != null) {
 				Clear (ViewToScreen (Bounds));

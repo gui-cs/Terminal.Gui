@@ -2603,7 +2603,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnDrawContent (Rect contentArea)
+		public override void OnDrawContent (Rect contentArea)
 		{
 			SetNormalColor ();
 
@@ -2669,7 +2669,7 @@ namespace Terminal.Gui {
 				return;
 			}
 			if (SelectedLength > 0)
-				return true;
+				return;
 
 			// draw autocomplete
 			GenerateSuggestions ();
@@ -2681,8 +2681,6 @@ namespace Terminal.Gui {
 					: 0);
 
 			Autocomplete.RenderOverlay (renderAt);
-
-			return true;
 		}
 
 		private void GenerateSuggestions ()
