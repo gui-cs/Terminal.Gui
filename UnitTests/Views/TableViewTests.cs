@@ -292,45 +292,43 @@ namespace Terminal.Gui.ViewsTests
             Assert.Equal(4, tableView.RowOffset);
         }
 
-        [Fact]
-        public void DeleteRow_SelectAll_AdjustsSelectionToPreventOverrun()
-        {
-            // create a 4 by 4 table
-            var tableView = new TableView()
-            {
-                Table = BuildTable(4, 4, out var dt),
-                MultiSelect = true,
-                Bounds = new Rect(0, 0, 10, 5)
-            };
-            tableView.BeginInit(); tableView.EndInit();
+		[Fact]
+		public void DeleteRow_SelectAll_AdjustsSelectionToPreventOverrun ()
+		{
+			// create a 4 by 4 table
+			var tableView = new TableView () {
+				Table = BuildTable (4, 4, out var dt),
+				MultiSelect = true,
+				Bounds = new Rect (0, 0, 10, 5)
+			};
+			tableView.BeginInit (); tableView.EndInit ();
 
             tableView.SelectAll();
             Assert.Equal(16, tableView.GetAllSelectedCells().Count());
 
-            // delete one of the columns
-            dt.Columns.RemoveAt(2);
+			// delete one of the columns
+			dt.Columns.RemoveAt (2);
 
             // table should now be 3x4
             Assert.Equal(12, tableView.GetAllSelectedCells().Count());
 
-            // remove a row
-            dt.Rows.RemoveAt(1);
+			// remove a row
+			dt.Rows.RemoveAt (1);
 
             // table should now be 3x3
             Assert.Equal(9, tableView.GetAllSelectedCells().Count());
         }
 
-        [Fact]
-        public void DeleteRow_SelectLastRow_AdjustsSelectionToPreventOverrun()
-        {
-            // create a 4 by 4 table
-            var tableView = new TableView()
-            {
-                Table = BuildTable(4, 4, out var dt),
-                MultiSelect = true,
-                Bounds = new Rect(0, 0, 10, 5)
-            };
-            tableView.BeginInit(); tableView.EndInit();
+		[Fact]
+		public void DeleteRow_SelectLastRow_AdjustsSelectionToPreventOverrun ()
+		{
+			// create a 4 by 4 table
+			var tableView = new TableView () {
+				Table = BuildTable (4, 4, out var dt),
+				MultiSelect = true,
+				Bounds = new Rect (0, 0, 10, 5)
+			};
+			tableView.BeginInit (); tableView.EndInit ();
 
             tableView.ChangeSelectionToEndOfTable(false);
 
@@ -340,8 +338,8 @@ namespace Terminal.Gui.ViewsTests
 
             Assert.Equal(4, tableView.GetAllSelectedCells().Count());
 
-            // remove a row
-            dt.Rows.RemoveAt(0);
+			// remove a row
+			dt.Rows.RemoveAt (0);
 
             tableView.EnsureValidSelection();
 
@@ -647,11 +645,11 @@ namespace Terminal.Gui.ViewsTests
             Assert.Equal("R0C0", activatedValue);
         }
 
-        [Fact, AutoInitShutdown]
-        public void TableViewMultiSelect_CannotFallOffLeft()
-        {
-            var tv = SetUpMiniTable(out var dt);
-            dt.Rows.Add(1, 2); // add another row (brings us to 2 rows)
+		[Fact, AutoInitShutdown]
+		public void TableViewMultiSelect_CannotFallOffLeft ()
+		{
+			var tv = SetUpMiniTable (out var dt);
+			dt.Rows.Add (1, 2); // add another row (brings us to 2 rows)
 
             tv.MultiSelect = true;
             tv.SelectedColumn = 1;
@@ -668,13 +666,13 @@ namespace Terminal.Gui.ViewsTests
             Assert.Equal(0, tv.SelectedColumn);
             Assert.Equal(1, tv.SelectedRow);
 
-            Application.Shutdown();
-        }
-        [Fact, AutoInitShutdown]
-        public void TableViewMultiSelect_CannotFallOffRight()
-        {
-            var tv = SetUpMiniTable(out var dt);
-            dt.Rows.Add(1, 2); // add another row (brings us to 2 rows)
+			Application.Shutdown ();
+		}
+		[Fact, AutoInitShutdown]
+		public void TableViewMultiSelect_CannotFallOffRight ()
+		{
+			var tv = SetUpMiniTable (out var dt);
+			dt.Rows.Add (1, 2); // add another row (brings us to 2 rows)
 
             tv.MultiSelect = true;
             tv.SelectedColumn = 0;
@@ -691,13 +689,13 @@ namespace Terminal.Gui.ViewsTests
             Assert.Equal(1, tv.SelectedColumn);
             Assert.Equal(1, tv.SelectedRow);
 
-            Application.Shutdown();
-        }
-        [Fact, AutoInitShutdown]
-        public void TableViewMultiSelect_CannotFallOffBottom()
-        {
-            var tv = SetUpMiniTable(out var dt);
-            dt.Rows.Add(1, 2); // add another row (brings us to 2 rows)
+			Application.Shutdown ();
+		}
+		[Fact, AutoInitShutdown]
+		public void TableViewMultiSelect_CannotFallOffBottom ()
+		{
+			var tv = SetUpMiniTable (out var dt);
+			dt.Rows.Add (1, 2); // add another row (brings us to 2 rows)
 
             tv.MultiSelect = true;
             tv.SelectedColumn = 0;
@@ -718,12 +716,12 @@ namespace Terminal.Gui.ViewsTests
             Application.Shutdown();
         }
 
-        [Fact, AutoInitShutdown]
-        public void TableViewMultiSelect_CannotFallOffTop()
-        {
-            var tv = SetUpMiniTable(out var dt);
-            dt.Rows.Add(1, 2); // add another row (brings us to 2 rows)
-            tv.LayoutSubviews();
+		[Fact, AutoInitShutdown]
+		public void TableViewMultiSelect_CannotFallOffTop ()
+		{
+			var tv = SetUpMiniTable (out var dt);
+			dt.Rows.Add (1, 2); // add another row (brings us to 2 rows)
+			tv.LayoutSubviews ();
 
             tv.MultiSelect = true;
             tv.SelectedColumn = 1;
@@ -780,12 +778,12 @@ namespace Terminal.Gui.ViewsTests
             Assert.Contains(new Point(0, 1), selected);
         }
 
-        [Fact, AutoInitShutdown]
-        public void TestControlClick_MultiSelect_ThreeRowTable_FullRowSelect()
-        {
-            var tv = GetTwoRowSixColumnTable(out var dt);
-            dt.Rows.Add(1, 2, 3, 4, 5, 6);
-            tv.LayoutSubviews();
+		[Fact, AutoInitShutdown]
+		public void TestControlClick_MultiSelect_ThreeRowTable_FullRowSelect ()
+		{
+			var tv = GetTwoRowSixColumnTable (out var dt);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			tv.LayoutSubviews ();
 
             tv.MultiSelect = true;
 
@@ -909,13 +907,13 @@ namespace Terminal.Gui.ViewsTests
             Application.Shutdown();
         }
 
-        [Theory, AutoInitShutdown]
-        [InlineData(false)]
-        [InlineData(true)]
-        public void TableView_ColorsTest_RowColorGetter(bool focused)
-        {
-            var tv = SetUpMiniTable(out DataTable dt);
-            tv.LayoutSubviews();
+		[Theory, AutoInitShutdown]
+		[InlineData (false)]
+		[InlineData (true)]
+		public void TableView_ColorsTest_RowColorGetter (bool focused)
+		{
+			var tv = SetUpMiniTable (out DataTable dt);
+			tv.LayoutSubviews ();
 
             // width exactly matches the max col widths
             tv.Bounds = new Rect(0, 0, 5, 4);
@@ -997,19 +995,19 @@ namespace Terminal.Gui.ViewsTests
             Application.Shutdown();
         }
 
-        [Theory, AutoInitShutdown]
-        [InlineData(false)]
-        [InlineData(true)]
-        public void TableView_ColorsTest_ColorGetter(bool focused)
-        {
-            var tv = SetUpMiniTable(out var dt);
-            tv.LayoutSubviews();
+		[Theory, AutoInitShutdown]
+		[InlineData (false)]
+		[InlineData (true)]
+		public void TableView_ColorsTest_ColorGetter (bool focused)
+		{
+			var tv = SetUpMiniTable (out var dt);
+			tv.LayoutSubviews ();
 
             // width exactly matches the max col widths
             tv.Bounds = new Rect(0, 0, 5, 4);
 
-            // Create a style for column B
-            var bStyle = tv.Style.GetOrCreateColumnStyle(1);
+			// Create a style for column B
+			var bStyle = tv.Style.GetOrCreateColumnStyle (1);
 
             // when B is 2 use the custom highlight colour
             var cellHighlight = new ColorScheme()
@@ -1053,11 +1051,11 @@ namespace Terminal.Gui.ViewsTests
 				// 2
 				cellHighlight.Normal});
 
-            // change the value in the table so that
-            // it no longer matches the ColorGetter
-            // delegate conditional ( which checks for
-            // the value 2)
-            dt.Rows[0][1] = 5;
+			// change the value in the table so that
+			// it no longer matches the ColorGetter
+			// delegate conditional ( which checks for
+			// the value 2)
+			dt.Rows [0] [1] = 5;
 
 			tv.Draw ();
 			expected = @"
@@ -1088,20 +1086,20 @@ namespace Terminal.Gui.ViewsTests
             Application.Shutdown();
         }
 
-        private TableView SetUpMiniTable()
-        {
-            return SetUpMiniTable(out _);
-        }
-        private TableView SetUpMiniTable(out DataTable dt)
-        {
-            var tv = new TableView();
-            tv.BeginInit(); tv.EndInit();
-            tv.Bounds = new Rect(0, 0, 10, 4);
+		private TableView SetUpMiniTable ()
+		{
+			return SetUpMiniTable (out _);
+		}
+		private TableView SetUpMiniTable (out DataTable dt)
+		{
+			var tv = new TableView ();
+			tv.BeginInit (); tv.EndInit ();
+			tv.Bounds = new Rect (0, 0, 10, 4);
 
-            dt = new DataTable();
-            dt.Columns.Add("A");
-            dt.Columns.Add("B");
-            dt.Rows.Add(1, 2);
+			dt = new DataTable ();
+			dt.Columns.Add ("A");
+			dt.Columns.Add ("B");
+			dt.Rows.Add (1, 2);
 
 			tv.Table = new DataTableSource (dt);
 			tv.Style.GetOrCreateColumnStyle (0).MinWidth = 1;
@@ -1292,10 +1290,10 @@ namespace Terminal.Gui.ViewsTests
             return tableView;
         }
 
-        [Fact, AutoInitShutdown]
-        public void TestColumnStyle_VisibleFalse_IsNotRendered()
-        {
-            var tableView = GetABCDEFTableView(out _);
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_VisibleFalse_IsNotRendered ()
+		{
+			var tableView = GetABCDEFTableView (out _);
 
 			tableView.Style.GetOrCreateColumnStyle (1).Visible = false;
 			tableView.LayoutSubviews ();
@@ -1314,9 +1312,9 @@ namespace Terminal.Gui.ViewsTests
         {
             var tableView = GetABCDEFTableView(out DataTable dt);
 
-            tableView.Style.ShowHorizontalScrollIndicators = true;
-            tableView.Style.ShowHorizontalHeaderUnderline = true;
-            tableView.Style.GetOrCreateColumnStyle(0).Visible = false;
+			tableView.Style.ShowHorizontalScrollIndicators = true;
+			tableView.Style.ShowHorizontalHeaderUnderline = true;
+			tableView.Style.GetOrCreateColumnStyle (0).Visible = false;
 
 			tableView.LayoutSubviews ();
 			tableView.Draw ();
@@ -1334,6 +1332,10 @@ namespace Terminal.Gui.ViewsTests
         public void TestColumnStyle_AllColumnsVisibleFalse_BehavesAsTableNull()
         {
             var tableView = GetABCDEFTableView(out DataTable dt);
+
+			for (int i = 0; i < 6; i++) {
+				tableView.Style.GetOrCreateColumnStyle (i).Visible = false;
+			}
 
 			for (int i = 0; i < 6; i++) {
 				tableView.Style.GetOrCreateColumnStyle (i).Visible = false;
@@ -1375,10 +1377,10 @@ namespace Terminal.Gui.ViewsTests
 
             TestHelpers.AssertDriverContentsAre(expected, output);
 
-            // but if DEF are invisible we shouldn't be showing the indicator
-            tableView.Style.GetOrCreateColumnStyle(3).Visible = false;
-            tableView.Style.GetOrCreateColumnStyle(4).Visible = false;
-            tableView.Style.GetOrCreateColumnStyle(5).Visible = false;
+			// but if DEF are invisible we shouldn't be showing the indicator
+			tableView.Style.GetOrCreateColumnStyle (3).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (4).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (5).Visible = false;
 
             expected =
                    @"
@@ -1410,9 +1412,9 @@ namespace Terminal.Gui.ViewsTests
 
             TestHelpers.AssertDriverContentsAre(expected, output);
 
-            // but if E and F are invisible so we shouldn't show right
-            tableView.Style.GetOrCreateColumnStyle(4).Visible = false;
-            tableView.Style.GetOrCreateColumnStyle(5).Visible = false;
+			// but if E and F are invisible so we shouldn't show right
+			tableView.Style.GetOrCreateColumnStyle (4).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (5).Visible = false;
 
             expected =
                    @"
@@ -1422,8 +1424,8 @@ namespace Terminal.Gui.ViewsTests
 			tableView.Draw ();
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
-            // now also A is invisible so we cannot scroll in either direction
-            tableView.Style.GetOrCreateColumnStyle(0).Visible = false;
+			// now also A is invisible so we cannot scroll in either direction
+			tableView.Style.GetOrCreateColumnStyle (0).Visible = false;
 
             expected =
                    @"
@@ -1439,8 +1441,8 @@ namespace Terminal.Gui.ViewsTests
 			var tableView = GetABCDEFTableView (out var dt);
 			tableView.LayoutSubviews ();
 
-            tableView.Style.GetOrCreateColumnStyle(1).Visible = false;
-            tableView.SelectedColumn = 0;
+			tableView.Style.GetOrCreateColumnStyle (1).Visible = false;
+			tableView.SelectedColumn = 0;
 
             tableView.ProcessKey(new KeyEvent { Key = Key.CursorRight });
 
@@ -1461,8 +1463,8 @@ namespace Terminal.Gui.ViewsTests
             var tableView = GetABCDEFTableView(out var dt);
             tableView.LayoutSubviews();
 
-            tableView.Style.GetOrCreateColumnStyle(0).Visible = false;
-            tableView.SelectedColumn = 0;
+			tableView.Style.GetOrCreateColumnStyle (0).Visible = false;
+			tableView.SelectedColumn = 0;
 
             Assert.Equal(0, tableView.SelectedColumn);
 
@@ -1539,9 +1541,9 @@ namespace Terminal.Gui.ViewsTests
             tableView.SelectedColumn = 3;
             Assert.Equal(3, tableView.SelectedColumn);
 
-            tableView.Style.GetOrCreateColumnStyle(3).Visible = false;
-            tableView.Style.GetOrCreateColumnStyle(4).Visible = false;
-            tableView.Style.GetOrCreateColumnStyle(5).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (3).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (4).Visible = false;
+			tableView.Style.GetOrCreateColumnStyle (5).Visible = false;
 
             // column D is invisible so this method should move to 2 (C)
             tableView.EnsureValidSelection();
@@ -1575,8 +1577,8 @@ namespace Terminal.Gui.ViewsTests
             Assert.True(tableView.IsSelected(2, 0));
             Assert.False(tableView.IsSelected(3, 0));
 
-            // if middle column is invisible
-            tableView.Style.GetOrCreateColumnStyle(1).Visible = false;
+			// if middle column is invisible
+			tableView.Style.GetOrCreateColumnStyle (1).Visible = false;
 
             // it should not be included in the selection
             Assert.Equal(2, tableView.GetAllSelectedCells().Count());
@@ -1588,14 +1590,14 @@ namespace Terminal.Gui.ViewsTests
             Assert.DoesNotContain(new Point(1, 0), tableView.GetAllSelectedCells());
         }
 
-        [Fact, AutoInitShutdown]
-        public void TestColumnStyle_VisibleFalse_MultiSelectingStepsOverInvisibleColumns()
-        {
-            var tableView = GetABCDEFTableView(out _);
-            tableView.LayoutSubviews();
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_VisibleFalse_MultiSelectingStepsOverInvisibleColumns ()
+		{
+			var tableView = GetABCDEFTableView (out _);
+			tableView.LayoutSubviews ();
 
-            // if middle column is invisible
-            tableView.Style.GetOrCreateColumnStyle(1).Visible = false;
+			// if middle column is invisible
+			tableView.Style.GetOrCreateColumnStyle (1).Visible = false;
 
             tableView.ProcessKey(new KeyEvent { Key = Key.CursorRight | Key.ShiftMask });
 
@@ -1798,10 +1800,9 @@ namespace Terminal.Gui.ViewsTests
             tableView.LayoutSubviews();
             tableView.Style.SmoothHorizontalScrolling = smooth;
 
-            if (invisibleCol)
-            {
-                tableView.Style.GetOrCreateColumnStyle(3).Visible = false;
-            }
+			if (invisibleCol) {
+				tableView.Style.GetOrCreateColumnStyle (3).Visible = false;
+			}
 
             // New TableView should have first cell selected 
             Assert.Equal(0, tableView.SelectedColumn);
@@ -1864,8 +1865,8 @@ namespace Terminal.Gui.ViewsTests
 
             TestHelpers.AssertDriverContentsAre(expected, output);
 
-            // get a style for the long column
-            var style = tableView.Style.GetOrCreateColumnStyle(2);
+			// get a style for the long column
+			var style = tableView.Style.GetOrCreateColumnStyle (2);
 
             // one way the API user can fix this for long columns
             // is to specify a MinAcceptableWidth for the column
@@ -2087,17 +2088,15 @@ namespace Terminal.Gui.ViewsTests
                 HotNormal = color,
             };
 
-            // Now the thing we really want to test is the styles!
-            // All cells in the column have a column style that says
-            // the cell is pink!
-            for (int i = 0; i < dt.Columns.Count; i++)
-            {
+			// Now the thing we really want to test is the styles!
+			// All cells in the column have a column style that says
+			// the cell is pink!
+			for (int i = 0; i < dt.Columns.Count; i++) {
 
-                var style = tv.Style.GetOrCreateColumnStyle(i);
-                style.ColorGetter = (e) =>
-                {
-                    return scheme;
-                };
+				var style = tv.Style.GetOrCreateColumnStyle (i);
+				style.ColorGetter = (e) => {
+					return scheme;
+				};
 
             }
 
@@ -2174,19 +2173,19 @@ namespace Terminal.Gui.ViewsTests
             TestHelpers.AssertDriverContentsAre(expected, output);
         }
 
-        [Fact, AutoInitShutdown]
-        public void TestFullRowSelect_SelectionColorStopsAtTableEdge_WithCellLines()
-        {
-            var tv = GetTwoRowSixColumnTable(out var dt);
-            dt.Rows.Add(1, 2, 3, 4, 5, 6);
+		[Fact, AutoInitShutdown]
+		public void TestFullRowSelect_SelectionColorStopsAtTableEdge_WithCellLines ()
+		{
+			var tv = GetTwoRowSixColumnTable (out var dt);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
 
-            tv.Bounds = new Rect(0, 0, 7, 6);
-            tv.Frame = new Rect(0, 0, 7, 6);
-            tv.LayoutSubviews();
+			tv.Bounds = new Rect (0, 0, 7, 6);
+			tv.Frame = new Rect (0, 0, 7, 6);
+			tv.LayoutSubviews ();
 
 
-            tv.FullRowSelect = true;
-            tv.Style.ShowHorizontalBottomline = true;
+			tv.FullRowSelect = true;
+			tv.Style.ShowHorizontalBottomline = true;
 
             // Clicking in bottom row
             tv.MouseEvent(new MouseEvent
@@ -2233,15 +2232,15 @@ namespace Terminal.Gui.ViewsTests
             TestHelpers.AssertDriverColorsAre(expected, normal, focus);
         }
 
-        [Fact, AutoInitShutdown]
-        public void TestFullRowSelect_AlwaysUseNormalColorForVerticalCellLines()
-        {
-            var tv = GetTwoRowSixColumnTable(out var dt);
-            dt.Rows.Add(1, 2, 3, 4, 5, 6);
+		[Fact, AutoInitShutdown]
+		public void TestFullRowSelect_AlwaysUseNormalColorForVerticalCellLines ()
+		{
+			var tv = GetTwoRowSixColumnTable (out var dt);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
 
-            tv.Bounds = new Rect(0, 0, 7, 6);
-            tv.Frame = new Rect(0, 0, 7, 6);
-            tv.LayoutSubviews();
+			tv.Bounds = new Rect (0, 0, 7, 6);
+			tv.Frame = new Rect (0, 0, 7, 6);
+			tv.LayoutSubviews ();
 
             tv.FullRowSelect = true;
             tv.Style.ShowHorizontalBottomline = true;
@@ -2288,14 +2287,14 @@ namespace Terminal.Gui.ViewsTests
 0101010
 0000000";
 
-            TestHelpers.AssertDriverColorsAre(expected, normal, focus);
-        }
-        [Fact, AutoInitShutdown]
-        public void TestFullRowSelect_SelectionColorDoesNotStop_WhenShowVerticalCellLinesIsFalse()
-        {
-            var tv = GetTwoRowSixColumnTable(out var dt);
-            dt.Rows.Add(1, 2, 3, 4, 5, 6);
-            tv.LayoutSubviews();
+			TestHelpers.AssertDriverColorsAre (expected, normal, focus);
+		}
+		[Fact, AutoInitShutdown]
+		public void TestFullRowSelect_SelectionColorDoesNotStop_WhenShowVerticalCellLinesIsFalse ()
+		{
+			var tv = GetTwoRowSixColumnTable (out var dt);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			tv.LayoutSubviews ();
 
 
             tv.Bounds = new Rect(0, 0, 7, 6);
@@ -2352,15 +2351,20 @@ A B C
             return BuildTable(cols, rows, out _);
         }
 
-        /// <summary>
-        /// Builds a simple table of string columns with the requested number of columns and rows
-        /// </summary>
-        /// <param name="cols"></param>
-        /// <param name="rows"></param>
-        /// <returns></returns>
-        public static DataTableSource BuildTable(int cols, int rows, out DataTable dt)
-        {
-            dt = new DataTable();
+		public static DataTableSource BuildTable (int cols, int rows)
+		{
+			return BuildTable (cols, rows, out _);
+		}
+
+		/// <summary>
+		/// Builds a simple table of string columns with the requested number of columns and rows
+		/// </summary>
+		/// <param name="cols"></param>
+		/// <param name="rows"></param>
+		/// <returns></returns>
+		public static DataTableSource BuildTable (int cols, int rows, out DataTable dt)
+		{
+			dt = new DataTable ();
 
             for (int c = 0; c < cols; c++)
             {
@@ -2465,8 +2469,8 @@ A B C
 │1│2│3│
 │1│2│3│";
 
-            TestHelpers.AssertDriverContentsAre(expected, output);
-            int? col;
+			TestHelpers.AssertDriverContentsAre (expected, output);
+			int? col;
 
             // ---------------- X=0 -----------------------
             // click is before first cell
@@ -2666,13 +2670,13 @@ A B C
             tableView.Style.AlwaysShowHeaders = true;
             tableView.Style.SmoothHorizontalScrolling = true;
 
-            dt = new DataTable();
-            dt.Columns.Add("A");
-            dt.Columns.Add("B");
-            dt.Columns.Add("C");
-            dt.Columns.Add("D");
-            dt.Columns.Add("E");
-            dt.Columns.Add("F");
+			dt = new DataTable ();
+			dt.Columns.Add ("A");
+			dt.Columns.Add ("B");
+			dt.Columns.Add ("C");
+			dt.Columns.Add ("D");
+			dt.Columns.Add ("E");
+			dt.Columns.Add ("F");
 
             dt.Rows.Add(1, 2, 3, 4, 5, 6);
             dt.Rows.Add(1, 2, 3, 4, 5, 6);

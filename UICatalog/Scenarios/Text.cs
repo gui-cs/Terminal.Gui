@@ -90,65 +90,55 @@ namespace UICatalog.Scenarios
 				labelMirroringTextView.Text = textView.Text;
 			};
 
-            // By default TextView is a multi-line control. It can be forced to 
-            // single-line mode.
-            var chxMultiline = new CheckBox("Multiline")
-            {
-                X = Pos.Left(textView),
-                Y = Pos.Bottom(textView),
-                Checked = textView.Multiline
-            };
-            Win.Add(chxMultiline);
+			// By default TextView is a multi-line control. It can be forced to 
+			// single-line mode.
+			var chxMultiline = new CheckBox ("Multiline") {
+				X = Pos.Left (textView),
+				Y = Pos.Bottom (textView),
+				Checked = textView.Multiline
+			};
+			Win.Add (chxMultiline);
 
-            var chxWordWrap = new CheckBox("Word Wrap")
-            {
-                X = Pos.Right(chxMultiline) + 2,
-                Y = Pos.Top(chxMultiline),
-                Checked = textView.WordWrap
-            };
-            chxWordWrap.Toggled += (s, e) => textView.WordWrap = (bool)e.NewValue;
-            Win.Add(chxWordWrap);
+			var chxWordWrap = new CheckBox ("Word Wrap") {
+				X = Pos.Right (chxMultiline) + 2,
+				Y = Pos.Top (chxMultiline),
+				Checked = textView.WordWrap
+			};
+			chxWordWrap.Toggled += (s,e) => textView.WordWrap = (bool)e.NewValue;
+			Win.Add (chxWordWrap);
 
-            // TextView captures Tabs (so users can enter /t into text) by default;
-            // This means using Tab to navigate doesn't work by default. This shows
-            // how to turn tab capture off.
-            var chxCaptureTabs = new CheckBox("Capture Tabs")
-            {
-                X = Pos.Right(chxWordWrap) + 2,
-                Y = Pos.Top(chxWordWrap),
-                Checked = textView.AllowsTab
-            };
+			// TextView captures Tabs (so users can enter /t into text) by default;
+			// This means using Tab to navigate doesn't work by default. This shows
+			// how to turn tab capture off.
+			var chxCaptureTabs = new CheckBox ("Capture Tabs") {
+				X = Pos.Right (chxWordWrap) + 2,
+				Y = Pos.Top (chxWordWrap),
+				Checked = textView.AllowsTab
+			};
 
-            chxMultiline.Toggled += (s, e) =>
-            {
-                textView.Multiline = (bool)e.NewValue;
-                if (!textView.Multiline && (bool)chxWordWrap.Checked)
-                {
-                    chxWordWrap.Checked = false;
-                }
-                if (!textView.Multiline && (bool)chxCaptureTabs.Checked)
-                {
-                    chxCaptureTabs.Checked = false;
-                }
-            };
+			chxMultiline.Toggled += (s, e) => {
+				textView.Multiline = (bool)e.NewValue;
+				if (!textView.Multiline && (bool)chxWordWrap.Checked) {
+					chxWordWrap.Checked = false;
+				}
+				if (!textView.Multiline && (bool)chxCaptureTabs.Checked) {
+					chxCaptureTabs.Checked = false;
+				}
+			};
 
-            Key keyTab = textView.GetKeyFromCommand(Command.Tab);
-            Key keyBackTab = textView.GetKeyFromCommand(Command.BackTab);
-            chxCaptureTabs.Toggled += (s, e) =>
-            {
-                if (e.NewValue == true)
-                {
-                    textView.AddKeyBinding(keyTab, Command.Tab);
-                    textView.AddKeyBinding(keyBackTab, Command.BackTab);
-                }
-                else
-                {
-                    textView.ClearKeyBinding(keyTab);
-                    textView.ClearKeyBinding(keyBackTab);
-                }
-                textView.AllowsTab = (bool)e.NewValue;
-            };
-            Win.Add(chxCaptureTabs);
+			Key keyTab = textView.GetKeyFromCommand (Command.Tab);
+			Key keyBackTab = textView.GetKeyFromCommand (Command.BackTab);
+			chxCaptureTabs.Toggled += (s,e) => {
+				if (e.NewValue == true) {
+					textView.AddKeyBinding (keyTab, Command.Tab);
+					textView.AddKeyBinding (keyBackTab, Command.BackTab);
+				} else {
+					textView.ClearKeyBinding (keyTab);
+					textView.ClearKeyBinding (keyBackTab);
+				}
+				textView.AllowsTab = (bool)e.NewValue;
+			};
+			Win.Add (chxCaptureTabs);
 
             var hexEditor = new HexView(new MemoryStream(Encoding.UTF8.GetBytes("HexEditor Unicode that shouldn't 𝔹Aℝ𝔽!")))
             {
