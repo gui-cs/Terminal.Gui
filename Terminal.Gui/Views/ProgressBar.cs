@@ -275,7 +275,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void OnDraw ()
+		public override void OnDrawContent (Rect contentArea)
 		{
 			DrawFrame ();
 
@@ -357,7 +357,7 @@ namespace Terminal.Gui {
 			case ProgressBarFormat.FramedProgressPadded:
 				padding = 2;
 				Border.DrawFrame (Bounds, false);
-				Border.DrawFrame (new Rect (Bounds.X + padding/2, Bounds.Y + padding/2, Bounds.Width - (padding), Bounds.Height - padding - 1), false);
+				Border.DrawFrame (new Rect (Bounds.X + padding / 2, Bounds.Y + padding / 2, Bounds.Width - (padding), Bounds.Height - padding - 1), false);
 				break;
 			}
 		}

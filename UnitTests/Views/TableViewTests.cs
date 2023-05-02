@@ -84,12 +84,12 @@ namespace Terminal.Gui.ViewsTests
             tableView.ColorScheme = new ColorScheme();
             tableView.Bounds = new Rect(0, 0, 25, 10);
 
-            // Set a table with 1 column
-            tableView.Table = BuildTable(1, 50, out var dt);
-            tableView.Draw();
+			// Set a table with 1 column
+			tableView.Table = BuildTable (1, 50, out var dt);
+			tableView.Draw();
 
-            dt.Columns.Remove(dt.Columns[0]);
-            tableView.Draw();
+            dt.Columns.Remove (dt.Columns [0]);
+			tableView.Draw();
         }
 
         [Fact]
@@ -471,7 +471,7 @@ namespace Terminal.Gui.ViewsTests
             tv.Style.ShowHorizontalHeaderOverline = false;
             tv.Style.ShowHorizontalHeaderUnderline = false;
 
-            tv.Draw();
+			tv.Draw ();
 
             string expected = @"
 │1│2│
@@ -488,7 +488,7 @@ namespace Terminal.Gui.ViewsTests
             tv.Style.ShowHorizontalHeaderOverline = true;
             tv.Style.ShowHorizontalHeaderUnderline = false;
 
-            tv.Draw();
+			tv.Draw ();
 
             string expected = @"
 ┌─┬─┐
@@ -509,7 +509,7 @@ namespace Terminal.Gui.ViewsTests
             tv.Style.ShowHorizontalScrollIndicators = true;
 
 
-            tv.Draw();
+			tv.Draw ();
 
             string expected = @"
 ├─┼─►
@@ -531,7 +531,7 @@ namespace Terminal.Gui.ViewsTests
             tv.Style.ShowHorizontalScrollIndicators = true;
 
 
-            tv.Draw();
+			tv.Draw ();
 
             string expected = @"
 ┌─┬─┐
@@ -549,7 +549,7 @@ namespace Terminal.Gui.ViewsTests
             // the thing we are testing
             tv.Style.ExpandLastColumn = true;
 
-            tv.Draw();
+			tv.Draw ();
 
             string expected = @"
 ┌─┬──────┐
@@ -571,7 +571,7 @@ namespace Terminal.Gui.ViewsTests
             // the thing we are testing
             tv.Style.ExpandLastColumn = false;
 
-            tv.Draw();
+			tv.Draw ();
 
             string expected = @"
 ┌─┬─┬────┐
@@ -595,7 +595,7 @@ namespace Terminal.Gui.ViewsTests
             // width exactly matches the max col widths
             tv.Bounds = new Rect(0, 0, 5, 4);
 
-            tv.Draw();
+			tv.Draw ();
 
             string expected = @"
 ┌─┬─┐
@@ -836,7 +836,7 @@ namespace Terminal.Gui.ViewsTests
             // when the view is/isn't focused 
             setFocusMethod.Invoke(tv, new object[] { focused, tv, true });
 
-            tv.Draw();
+			tv.Draw ();
 
             string expected = @"
 ┌─┬─┐
@@ -880,7 +880,7 @@ namespace Terminal.Gui.ViewsTests
             // when the view is/isn't focused 
             setFocusMethod.Invoke(tv, new object[] { focused, tv, true });
 
-            tv.Draw();
+			tv.Draw ();
 
             string expected = @"
 ┌─┬─┐
@@ -937,7 +937,7 @@ namespace Terminal.Gui.ViewsTests
             // when the view is/isn't focused 
             setFocusMethod.Invoke(tv, new object[] { focused, tv, true });
 
-            tv.Draw();
+			tv.Draw ();
 
             string expected = @"
 ┌─┬─┐
@@ -968,8 +968,8 @@ namespace Terminal.Gui.ViewsTests
 			// the value 2)
 			dt.Rows [0] [1] = 5;
 
-            tv.Draw();
-            expected = @"
+			tv.Draw ();
+			expected = @"
 ┌─┬─┐
 │A│B│
 ├─┼─┤
@@ -1028,7 +1028,7 @@ namespace Terminal.Gui.ViewsTests
             // when the view is/isn't focused 
             setFocusMethod.Invoke(tv, new object[] { focused, tv, true });
 
-            tv.Draw();
+			tv.Draw ();
 
             string expected = @"
 ┌─┬─┐
@@ -1059,8 +1059,8 @@ namespace Terminal.Gui.ViewsTests
             // the value 2)
             dt.Rows[0][1] = 5;
 
-            tv.Draw();
-            expected = @"
+			tv.Draw ();
+			expected = @"
 ┌─┬─┐
 │A│B│
 ├─┼─┤
@@ -1172,7 +1172,7 @@ namespace Terminal.Gui.ViewsTests
             // select last visible column
             tableView.SelectedColumn = 2; // column C
 
-            tableView.Draw();
+			tableView.Draw ();
 
             string expected =
                 @"
@@ -1184,7 +1184,7 @@ namespace Terminal.Gui.ViewsTests
             // Scroll right
             tableView.ProcessKey(new KeyEvent() { Key = Key.CursorRight });
 
-            tableView.Draw();
+			tableView.Draw ();
 
             // Note that with SmoothHorizontalScrolling only a single new column
             // is exposed when scrolling right.  This is not always the case though
@@ -1233,7 +1233,7 @@ namespace Terminal.Gui.ViewsTests
             // select last visible column
             tableView.SelectedColumn = 2; // column C
 
-            tableView.Draw();
+			tableView.Draw ();
 
             string expected =
                 @"
@@ -1245,7 +1245,7 @@ namespace Terminal.Gui.ViewsTests
             // Scroll right
             tableView.ProcessKey(new KeyEvent() { Key = Key.CursorRight });
 
-            tableView.Draw();
+			tableView.Draw ();
 
             // notice that without smooth scrolling we just update the first column
             // rendered in the table to the newly exposed column (D).  This is fast
@@ -1297,9 +1297,9 @@ namespace Terminal.Gui.ViewsTests
         {
             var tableView = GetABCDEFTableView(out _);
 
-            tableView.Style.GetOrCreateColumnStyle(1).Visible = false;
-            tableView.LayoutSubviews();
-            tableView.Draw();
+			tableView.Style.GetOrCreateColumnStyle (1).Visible = false;
+			tableView.LayoutSubviews ();
+			tableView.Draw ();
 
             string expected =
                 @"
@@ -1318,8 +1318,8 @@ namespace Terminal.Gui.ViewsTests
             tableView.Style.ShowHorizontalHeaderUnderline = true;
             tableView.Style.GetOrCreateColumnStyle(0).Visible = false;
 
-            tableView.LayoutSubviews();
-            tableView.Draw();
+			tableView.LayoutSubviews ();
+			tableView.Draw ();
 
             string expected =
                 @"
@@ -1346,25 +1346,25 @@ namespace Terminal.Gui.ViewsTests
                 @"
 ";
 
-            tableView.Draw();
-            TestHelpers.AssertDriverContentsAre(expected, output);
+			tableView.Draw ();
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
             // expect behavior to match when Table is null
             tableView.Table = null;
 
-            tableView.Draw();
-            TestHelpers.AssertDriverContentsAre(expected, output);
-        }
+			tableView.Draw ();
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
 
         [Fact, AutoInitShutdown]
         public void TestColumnStyle_RemainingColumnsInvisible_NoScrollIndicator()
         {
             var tableView = GetABCDEFTableView(out DataTable dt);
 
-            tableView.Style.ShowHorizontalScrollIndicators = true;
-            tableView.Style.ShowHorizontalHeaderUnderline = true;
-            tableView.LayoutSubviews();
-            tableView.Draw();
+			tableView.Style.ShowHorizontalScrollIndicators = true;
+			tableView.Style.ShowHorizontalHeaderUnderline = true;
+			tableView.LayoutSubviews ();
+			tableView.Draw ();
 
             // normally we should have scroll indicators because DEF are of screen
             string expected =
@@ -1385,9 +1385,9 @@ namespace Terminal.Gui.ViewsTests
 │A│B│C│
 ├─┼─┼─┤
 │1│2│3│";
-            tableView.Draw();
-            TestHelpers.AssertDriverContentsAre(expected, output);
-        }
+			tableView.Draw ();
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
 
         [Fact, AutoInitShutdown]
         public void TestColumnStyle_PreceedingColumnsInvisible_NoScrollIndicator()
@@ -1397,9 +1397,9 @@ namespace Terminal.Gui.ViewsTests
             tableView.Style.ShowHorizontalScrollIndicators = true;
             tableView.Style.ShowHorizontalHeaderUnderline = true;
 
-            tableView.ColumnOffset = 1;
-            tableView.LayoutSubviews();
-            tableView.Draw();
+			tableView.ColumnOffset = 1;
+			tableView.LayoutSubviews ();
+			tableView.Draw ();
 
             // normally we should have scroll indicators because A,E and F are of screen
             string expected =
@@ -1419,8 +1419,8 @@ namespace Terminal.Gui.ViewsTests
 │B│C│D│
 ◄─┼─┼─┤
 │2│3│4│";
-            tableView.Draw();
-            TestHelpers.AssertDriverContentsAre(expected, output);
+			tableView.Draw ();
+			TestHelpers.AssertDriverContentsAre (expected, output);
 
             // now also A is invisible so we cannot scroll in either direction
             tableView.Style.GetOrCreateColumnStyle(0).Visible = false;
@@ -1430,14 +1430,14 @@ namespace Terminal.Gui.ViewsTests
 │B│C│D│
 ├─┼─┼─┤
 │2│3│4│";
-            tableView.Draw();
-            TestHelpers.AssertDriverContentsAre(expected, output);
-        }
-        [Fact, AutoInitShutdown]
-        public void TestColumnStyle_VisibleFalse_CursorStepsOverInvisibleColumns()
-        {
-            var tableView = GetABCDEFTableView(out var dt);
-            tableView.LayoutSubviews();
+			tableView.Draw ();
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+		[Fact, AutoInitShutdown]
+		public void TestColumnStyle_VisibleFalse_CursorStepsOverInvisibleColumns ()
+		{
+			var tableView = GetABCDEFTableView (out var dt);
+			tableView.LayoutSubviews ();
 
             tableView.Style.GetOrCreateColumnStyle(1).Visible = false;
             tableView.SelectedColumn = 0;
@@ -1850,7 +1850,7 @@ namespace Terminal.Gui.ViewsTests
 
 			tableView.Table = new DataTableSource (dt);
 			tableView.LayoutSubviews ();
-            tableView.Draw();
+			tableView.Draw ();
 
             // default behaviour of TableView is not to render
             // columns unless there is sufficient space
@@ -1871,10 +1871,10 @@ namespace Terminal.Gui.ViewsTests
             // is to specify a MinAcceptableWidth for the column
             style.MaxWidth = 10;
 
-            tableView.LayoutSubviews();
-            tableView.Draw();
-            expected =
-                @"
+			tableView.LayoutSubviews ();
+			tableView.Draw ();
+			expected =
+				@"
 │A│B│Very Long Column   │
 ├─┼─┼───────────────────┤
 │1│2│aaaaaaaaaaaaaaaaaaa│
@@ -1893,10 +1893,10 @@ namespace Terminal.Gui.ViewsTests
                 return s.ToString().Length < 15 ? s.ToString() : s.ToString().Substring(0, 13) + "...";
             };
 
-            tableView.LayoutSubviews();
-            tableView.Draw();
-            expected =
-                @"
+			tableView.LayoutSubviews ();
+			tableView.Draw ();
+			expected =
+				@"
 │A│B│Very Long Column   │
 ├─┼─┼───────────────────┤
 │1│2│aaaaaaaaaaaaa...   │
@@ -1919,10 +1919,10 @@ namespace Terminal.Gui.ViewsTests
             // less space down to this limit
             style.MinAcceptableWidth = 5;
 
-            tableView.LayoutSubviews();
-            tableView.Draw();
-            expected =
-                @"
+			tableView.LayoutSubviews ();
+			tableView.Draw ();
+			expected =
+				@"
 │A│B│Very Long Column   │
 ├─┼─┼───────────────────┤
 │1│2│aaaaaaaaaaaaaaaaaaa│
@@ -1936,10 +1936,10 @@ namespace Terminal.Gui.ViewsTests
             driver.UpdateOffScreen();
 
 
-            tableView.Bounds = new Rect(0, 0, 9, 5);
-            tableView.LayoutSubviews();
-            tableView.Draw();
-            expected =
+			tableView.Bounds = new Rect (0, 0, 9, 5);
+			tableView.LayoutSubviews ();
+			tableView.Draw ();
+			expected =
 @"
 │A│B    │
 ├─┼─────►
@@ -1949,13 +1949,13 @@ namespace Terminal.Gui.ViewsTests
 ";
             TestHelpers.AssertDriverContentsAre(expected, output);
 
-            // setting width to 10 leaves just enough space for the column to
-            // meet MinAcceptableWidth of 5.  Column width includes terminator line
-            // symbol (e.g. ┤ or │)
-            tableView.Bounds = new Rect(0, 0, 10, 5);
-            tableView.LayoutSubviews();
-            tableView.Draw();
-            expected =
+			// setting width to 10 leaves just enough space for the column to
+			// meet MinAcceptableWidth of 5.  Column width includes terminator line
+			// symbol (e.g. ┤ or │)
+			tableView.Bounds = new Rect (0, 0, 10, 5);
+			tableView.LayoutSubviews ();
+			tableView.Draw ();
+			expected =
 @"
 │A│B│Very│
 ├─┼─┼────┤
@@ -1997,7 +1997,7 @@ namespace Terminal.Gui.ViewsTests
             // select last visible column
             tableView.SelectedColumn = 2; // column C
 
-            tableView.Draw();
+			tableView.Draw ();
 
             // user can only scroll right so sees right indicator
             // Because first column in table is A
@@ -2012,9 +2012,9 @@ namespace Terminal.Gui.ViewsTests
             // Scroll right
             tableView.ProcessKey(new KeyEvent() { Key = Key.CursorRight });
 
-            // since A is now pushed off screen we get indicator showing
-            // that user can scroll left to see first column
-            tableView.Draw();
+			// since A is now pushed off screen we get indicator showing
+			// that user can scroll left to see first column
+			tableView.Draw ();
 
             expected =
                 @"
@@ -2028,7 +2028,7 @@ namespace Terminal.Gui.ViewsTests
             tableView.ProcessKey(new KeyEvent() { Key = Key.CursorRight });
             tableView.ProcessKey(new KeyEvent() { Key = Key.CursorRight });
 
-            tableView.Draw();
+			tableView.Draw ();
 
             expected =
                 @"
@@ -2064,7 +2064,7 @@ namespace Terminal.Gui.ViewsTests
             Application.Top.Add(tv);
             Application.Begin(Application.Top);
 
-            tv.Draw();
+			tv.Draw ();
 
             var expected =
                 @"
@@ -2101,9 +2101,9 @@ namespace Terminal.Gui.ViewsTests
 
             }
 
-            tv.Draw();
-            expected =
-                            @"
+			tv.Draw ();
+			expected =
+							@"
 00000000000000000000
 00000000000000000000
 00000000000000000000
@@ -2130,7 +2130,7 @@ namespace Terminal.Gui.ViewsTests
             tableView.Style.SmoothHorizontalScrolling = true;
             tableView.Style.ShowHorizontalBottomline = true;
 
-            tableView.Draw();
+			tableView.Draw ();
 
             // user can only scroll right so sees right indicator
             // Because first column in table is A
@@ -2160,7 +2160,7 @@ namespace Terminal.Gui.ViewsTests
             tableView.Style.ShowHorizontalBottomline = true;
             tableView.Style.ShowVerticalCellLines = false;
 
-            tableView.Draw();
+			tableView.Draw ();
 
             // user can only scroll right so sees right indicator
             // Because first column in table is A
@@ -2200,7 +2200,7 @@ namespace Terminal.Gui.ViewsTests
             Assert.Equal(2, tv.SelectedRow);
 
 
-            tv.OnDraw();
+			tv.OnDrawContent (tv.Bounds);
 
             string expected =
                 @"
@@ -2216,7 +2216,7 @@ namespace Terminal.Gui.ViewsTests
             var normal = tv.ColorScheme.Normal;
             var focus = tv.ColorScheme.HotFocus = new Attribute(Color.Magenta, Color.White);
 
-            tv.Draw();
+			tv.Draw ();
 
             // HotFocus color (1) should be used for rendering the selected line
             // But should not spill into the borders.  Normal color (0) should be
@@ -2259,7 +2259,7 @@ namespace Terminal.Gui.ViewsTests
             Assert.Equal(2, tv.SelectedRow);
 
 
-            tv.OnDraw();
+			tv.OnDrawContent (tv.Bounds);
 
             string expected =
                 @"
@@ -2275,7 +2275,7 @@ namespace Terminal.Gui.ViewsTests
             var normal = tv.ColorScheme.Normal;
             var focus = tv.ColorScheme.HotFocus = new Attribute(Color.Magenta, Color.White);
 
-            tv.Draw();
+			tv.Draw ();
 
             // HotFocus color (1) should be used for cells only because
             // AlwaysUseNormalColorForVerticalCellLines is true
@@ -2316,7 +2316,7 @@ namespace Terminal.Gui.ViewsTests
             Assert.Equal(2, tv.SelectedRow);
 
 
-            tv.Draw();
+			tv.Draw ();
 
             string expected =
                 @"
@@ -2331,7 +2331,7 @@ A B C
             var normal = tv.ColorScheme.Normal;
             var focus = tv.ColorScheme.HotFocus = new Attribute(Color.Magenta, Color.White);
 
-            tv.Draw();
+			tv.Draw ();
 
             // HotFocus color (1) should be used for rendering the selected line
             // Note that because there are no vertical cell lines we use the hot focus
@@ -2389,7 +2389,7 @@ A B C
             tableView.BeginInit(); tableView.EndInit();
             tableView.LayoutSubviews();
 
-            tableView.Draw();
+			tableView.Draw ();
 
             // user can only scroll right so sees right indicator
             // Because first column in table is A
@@ -2454,7 +2454,7 @@ A B C
             var tableView = GetTwoRowSixColumnTable();
             tableView.LayoutSubviews();
 
-            tableView.Draw();
+			tableView.Draw ();
 
             // user can only scroll right so sees right indicator
             // Because first column in table is A
@@ -2550,7 +2550,7 @@ A B C
 
             tv.LayoutSubviews();
 
-            tv.Draw ();
+			tv.Draw ();
 
             string expected =
                 @"
@@ -2579,7 +2579,7 @@ A B C
 
 			tv.LayoutSubviews ();
 
-			tv.Draw ();
+			tv.Draw();
 
 			string expected =
 				@"

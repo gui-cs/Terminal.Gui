@@ -751,7 +751,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void OnDraw ()
+		public override void OnDrawContent (Rect contentArea)
 		{
 			if (!Visible) {
 				return;
@@ -783,7 +783,8 @@ namespace Terminal.Gui {
 						view.SetSubViewNeedsDisplay ();
 					}
 				}
-				base.OnDraw ();
+
+				base.OnDrawContent (contentArea);
 
 				// This is causing the menus drawn incorrectly if UseSubMenusSingleFrame is true
 				//if (this.MenuBar != null && this.MenuBar.IsMenuOpen && this.MenuBar.openMenu != null) {

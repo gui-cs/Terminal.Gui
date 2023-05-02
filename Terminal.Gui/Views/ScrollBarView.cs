@@ -31,7 +31,7 @@ namespace Terminal.Gui {
 		ScrollBarView otherScrollBarView;
 		View contentBottomRightCorner;
 
-		bool showBothScrollIndicator => OtherScrollBarView != null && OtherScrollBarView.showScrollIndicator && showScrollIndicator;
+		bool showBothScrollIndicator => OtherScrollBarView?.showScrollIndicator == true && showScrollIndicator;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using <see cref="LayoutStyle.Absolute"/> layout.
@@ -111,15 +111,27 @@ namespace Terminal.Gui {
 				OtherScrollBarView.ShowScrollIndicator = true;
 			}
 			ShowScrollIndicator = true;
-			contentBottomRightCorner = new View (" ") { Visible = host.Visible, ClearOnVisibleFalse = false };
-			Host.SuperView.Add (contentBottomRightCorner);
-			// BUGBUG: v2 - Host may be superview and thus this may be bogus
-			contentBottomRightCorner.X = Pos.Right (host) - 1;
-			contentBottomRightCorner.Y = Pos.Bottom (host) - 1;
-			contentBottomRightCorner.Width = 1;
-			contentBottomRightCorner.Height = 1;
-			contentBottomRightCorner.MouseClick += ContentBottomRightCorner_MouseClick;
+			CreateBottomRightCorner ();
 			ClearOnVisibleFalse = false;
+		}
+
+		private void CreateBottomRightCorner ()
+		{
+			if (Host != null && (contentBottomRightCorner == null && OtherScrollBarView == null
+				|| (contentBottomRightCorner == null && OtherScrollBarView != null && OtherScrollBarView.contentBottomRightCorner == null))) {
+
+				contentBottomRightCorner = new View (" ") {
+					Id = "contentBottomRightCorner",
+					Visible = Host.Visible,
+					ClearOnVisibleFalse = false
+				};
+				Host.Add (contentBottomRightCorner);
+				contentBottomRightCorner.X = Pos.Right (Host) - 1;
+				contentBottomRightCorner.Y = Pos.Bottom (Host) - 1;
+				contentBottomRightCorner.Width = 1;
+				contentBottomRightCorner.Height = 1;
+				contentBottomRightCorner.MouseClick += ContentBottomRightCorner_MouseClick;
+			}
 		}
 
 		private void Host_VisibleChanged (object sender, EventArgs e)
@@ -155,13 +167,14 @@ namespace Terminal.Gui {
 		void ContentBottomRightCorner_MouseClick (object sender, MouseEventEventArgs me)
 		{
 			if (me.MouseEvent.Flags == MouseFlags.WheeledDown || me.MouseEvent.Flags == MouseFlags.WheeledUp
-				|| me.MouseEvent.Flags == MouseFlags.WheeledRight || me.MouseEvent.Flags == MouseFlags.WheeledLeft) {
-				me.Handled = true;
+			    || me.MouseEvent.Flags == MouseFlags.WheeledRight || me.MouseEvent.Flags == MouseFlags.WheeledLeft) {
+
 				MouseEvent (me.MouseEvent);
 			} else if (me.MouseEvent.Flags == MouseFlags.Button1Clicked) {
-				me.Handled = true;
 				Host.SetFocus ();
 			}
+
+			me.Handled = true;
 		}
 
 		void SetInitialProperties (int size, int position, bool isVertical)
@@ -172,6 +185,8 @@ namespace Terminal.Gui {
 			this.size = size;
 			WantContinuousButtonPressed = true;
 			ClearOnVisibleFalse = false;
+
+			Added += (s, e) => CreateBottomRightCorner ();
 
 			Initialized += (s, e) => {
 				SetWidthHeight ();
@@ -409,10 +424,10 @@ namespace Terminal.Gui {
 			}
 
 			if (showScrollIndicator) {
-				OnDraw ();
+				Draw ();
 			}
 			if (otherScrollBarView != null && otherScrollBarView.showScrollIndicator) {
-				otherScrollBarView.OnDraw ();
+				otherScrollBarView.Draw ();
 			}
 		}
 
@@ -493,7 +508,7 @@ namespace Terminal.Gui {
 		int posRightTee;
 
 		///<inheritdoc/>
-		public override void OnDraw ()
+		public override void OnDrawContent (Rect contentArea)
 		{
 			if (ColorScheme == null || ((!showScrollIndicator || Size == 0) && AutoHideScrollBars && Visible)) {
 				if ((!showScrollIndicator || Size == 0) && AutoHideScrollBars && Visible) {
@@ -658,10 +673,10 @@ namespace Terminal.Gui {
 		public override bool MouseEvent (MouseEvent mouseEvent)
 		{
 			if (mouseEvent.Flags != MouseFlags.Button1Pressed && mouseEvent.Flags != MouseFlags.Button1DoubleClicked &&
-				!mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) &&
-				mouseEvent.Flags != MouseFlags.Button1Released && mouseEvent.Flags != MouseFlags.WheeledDown &&
-				mouseEvent.Flags != MouseFlags.WheeledUp && mouseEvent.Flags != MouseFlags.WheeledRight &&
-				mouseEvent.Flags != MouseFlags.WheeledLeft && mouseEvent.Flags != MouseFlags.Button1TripleClicked) {
+			    !mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) &&
+			    mouseEvent.Flags != MouseFlags.Button1Released && mouseEvent.Flags != MouseFlags.WheeledDown &&
+			    mouseEvent.Flags != MouseFlags.WheeledUp && mouseEvent.Flags != MouseFlags.WheeledRight &&
+			    mouseEvent.Flags != MouseFlags.WheeledLeft && mouseEvent.Flags != MouseFlags.Button1TripleClicked) {
 				return false;
 			}
 
@@ -680,7 +695,7 @@ namespace Terminal.Gui {
 			var pos = Position;
 
 			if (mouseEvent.Flags != MouseFlags.Button1Released
-				&& (Application.MouseGrabView == null || Application.MouseGrabView != this)) {
+			    && (Application.MouseGrabView == null || Application.MouseGrabView != this)) {
 				Application.GrabMouse (this);
 			} else if (mouseEvent.Flags == MouseFlags.Button1Released && Application.MouseGrabView != null && Application.MouseGrabView == this) {
 				lastLocation = -1;
@@ -688,7 +703,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 			if (showScrollIndicator && (mouseEvent.Flags == MouseFlags.WheeledDown || mouseEvent.Flags == MouseFlags.WheeledUp ||
-				mouseEvent.Flags == MouseFlags.WheeledRight || mouseEvent.Flags == MouseFlags.WheeledLeft)) {
+			    mouseEvent.Flags == MouseFlags.WheeledRight || mouseEvent.Flags == MouseFlags.WheeledLeft)) {
 				return Host.MouseEvent (mouseEvent);
 			}
 
@@ -783,8 +798,8 @@ namespace Terminal.Gui {
 				return 0;
 			}
 			return isVertical ?
-				(KeepContentAlwaysInViewport ? Host.Bounds.Height + (showBothScrollIndicator ? -2 : -1) : 0) :
-				(KeepContentAlwaysInViewport ? Host.Bounds.Width + (showBothScrollIndicator ? -2 : -1) : 0);
+			    (KeepContentAlwaysInViewport ? Host.Bounds.Height + (showBothScrollIndicator ? -2 : -1) : 0) :
+			    (KeepContentAlwaysInViewport ? Host.Bounds.Width + (showBothScrollIndicator ? -2 : -1) : 0);
 		}
 
 		///<inheritdoc/>

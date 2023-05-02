@@ -198,7 +198,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void OnDraw ()
+		public override void OnDrawContent (Rect contentArea)
 		{
 			Attribute currentAttribute;
 			var current = ColorScheme.Focus;

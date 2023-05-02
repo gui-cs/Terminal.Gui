@@ -465,7 +465,7 @@ namespace Terminal.Gui.FileServicesTests {
 			var exe = new Attribute (Color.BrightYellow);
 			fd.Style.ColorSchemeExeOrRecommended = GetColorScheme (exe);
 
-			fd.Redraw (fd.Bounds);
+			fd.Draw ();
 
 			TestHelpers.AssertDriverUsedColors (other,dir,img,exe);
 		}

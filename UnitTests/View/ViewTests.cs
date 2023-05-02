@@ -1042,7 +1042,7 @@ cccccccccccccccccccc", output);
 				return true;
 			}
 
-			public override void OnDraw ()
+			public override void OnDrawContent (Rect contentArea)
 			{
 				var idx = 0;
 				// BUGBUG: v2 - this should use Boudns, not Frame

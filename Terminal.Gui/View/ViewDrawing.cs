@@ -317,9 +317,9 @@ namespace Terminal.Gui {
 
 			// Each of these renders lines to either this View's LineCanvas 
 			// Those lines will be finally rendered in OnRenderLineCanvas
-			Margin?.OnDraw ();
-			Border?.OnDraw ();
-			Padding?.OnDraw ();
+			Margin?.OnDrawContent (Bounds);
+			Border?.OnDrawContent (Bounds);
+			Padding?.OnDrawContent (Bounds);
 
 			Driver.Clip = prevClip;
 
@@ -328,8 +328,21 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Draws the view. Causes the following virtual methods to be called (along with their related events): 
-		/// <see cref="OnDrawContent"/>, <see cref="OnDraw"/>, <see cref="OnDrawContentComplete"/>.
+		/// <see cref="OnDrawContent"/>, <see cref="OnDrawContentComplete"/>.
 		/// </summary>
+		/// <remarks>
+		/// <para>
+		///    Always use <see cref="Bounds"/> (view-relative) when calling <see cref="OnDrawContent(Rect)"/>, NOT <see cref="Frame"/> (superview-relative).
+		/// </para>
+		/// <para>
+		///    Views should set the color that they want to use on entry, as otherwise this will inherit
+		///    the last color that was set globally on the driver.
+		/// </para>
+		/// <para>
+		///    Overrides of <see cref="OnDrawContent(Rect)"/> must ensure they do not set <c>Driver.Clip</c> to a clip region
+		///    larger than the <ref name="Bounds"/> property, as this will cause the driver to clip the entire region.
+		/// </para>
+		/// </remarks>
 		public void Draw ()
 		{
 			if (!CanBeVisible (this)) {
@@ -346,8 +359,11 @@ namespace Terminal.Gui {
 			}
 
 			// Invoke DrawContentEvent
-			if (!OnDrawContent (Bounds)) {
-				OnDraw ();
+			var dev = new DrawEventArgs (Bounds);
+			DrawContent?.Invoke (this, dev);
+
+			if (!dev.Cancel) {
+				OnDrawContent (Bounds);
 			}
 
 			Driver.Clip = prevClip;
@@ -360,60 +376,6 @@ namespace Terminal.Gui {
 			// BUGBUG: v2 - We should be able to use View.SetClip here and not have to resort to knowing Driver details.
 			ClearLayoutNeeded ();
 			ClearNeedsDisplay ();
-		}
-
-		/// <summary>
-		/// Redraws this view and its subviews; only redraws the views that have been flagged for a re-display.
-		/// </summary>
-		/// <remarks>
-		/// <para>
-		///    Always use <see cref="Bounds"/> (view-relative) when calling <see cref="OnDraw()"/>, NOT <see cref="Frame"/> (superview-relative).
-		/// </para>
-		/// <para>
-		///    Views should set the color that they want to use on entry, as otherwise this will inherit
-		///    the last color that was set globally on the driver.
-		/// </para>
-		/// <para>
-		///    Overrides of <see cref="OnDraw"/> must ensure they do not set <c>Driver.Clip</c> to a clip region
-		///    larger than the <ref name="Bounds"/> property, as this will cause the driver to clip the entire region.
-		/// </para>
-		/// </remarks>
-		public virtual void OnDraw ()
-		{
-			if (SuperView != null) {
-				Clear (ViewToScreen (Bounds));
-			}
-
-			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
-				if (TextFormatter != null) {
-					TextFormatter.NeedsFormat = true;
-				}
-				// This should NOT clear 
-				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
-				    HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
-				    Rect.Empty, false);
-				SetSubViewNeedsDisplay ();
-			}
-
-			// Draw subviews
-			// TODO: Implement OnDrawSubviews (cancelable);
-			if (_subviews != null) {
-				foreach (var view in _subviews) {
-					if (view.Visible) { //!view._needsDisplay.IsEmpty || view._childNeedsDisplay || view.LayoutNeeded) {
-						if (true) { //view.Frame.IntersectsWith (bounds)) { // && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
-							if (view.LayoutNeeded) {
-								view.LayoutSubviews ();
-							}
-
-							// Draw the subview
-							// Use the view's bounds (view-relative; Location will always be (0,0)
-							//if (view.Visible && view.Frame.Width > 0 && view.Frame.Height > 0) {
-							view.Draw ();
-							//}
-						}
-					}
-				}
-			}
 		}
 
 		// TODO: Make this cancelable
@@ -481,10 +443,40 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public virtual bool OnDrawContent (Rect contentArea)
 		{
-			var dev = new DrawEventArgs (contentArea);
-			DrawContent?.Invoke (this, dev);
+			if (SuperView != null) {
+				Clear (ViewToScreen (Bounds));
+			}
 
-			return dev.Cancel;
+			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
+				if (TextFormatter != null) {
+					TextFormatter.NeedsFormat = true;
+				}
+				// This should NOT clear 
+				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
+				    HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
+				    Rect.Empty, false);
+				SetSubViewNeedsDisplay ();
+			}
+
+			// Draw subviews
+			// TODO: Implement OnDrawSubviews (cancelable);
+			if (_subviews != null) {
+				foreach (var view in _subviews) {
+					if (view.Visible) { //!view._needsDisplay.IsEmpty || view._childNeedsDisplay || view.LayoutNeeded) {
+						if (true) { //view.Frame.IntersectsWith (bounds)) { // && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
+							if (view.LayoutNeeded) {
+								view.LayoutSubviews ();
+							}
+
+							// Draw the subview
+							// Use the view's bounds (view-relative; Location will always be (0,0)
+							//if (view.Visible && view.Frame.Width > 0 && view.Frame.Height > 0) {
+							view.Draw ();
+							//}
+						}
+					}
+				}
+			}
 		}
 
 		/// <summary>
@@ -503,13 +495,13 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Enables overrides after completed drawing infinitely scrolled content and/or a background behind removed controls.
 		/// </summary>
-		/// <param name="viewport">The view-relative rectangle describing the currently visible viewport into the <see cref="View"/></param>
+		/// <param name="contentArea">The view-relative rectangle describing the currently visible viewport into the <see cref="View"/></param>
 		/// <remarks>
 		/// This method will be called after any subviews removed with <see cref="Remove(View)"/> have been completed drawing.
 		/// </remarks>
-		public virtual void OnDrawContentComplete (Rect viewport)
+		public virtual void OnDrawContentComplete (Rect contentArea)
 		{
-			DrawContentComplete?.Invoke (this, new DrawEventArgs (viewport));
+			DrawContentComplete?.Invoke (this, new DrawEventArgs (contentArea));
 		}
 
 	}

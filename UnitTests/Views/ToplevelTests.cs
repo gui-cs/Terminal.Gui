@@ -1026,7 +1026,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Rect (1, 3, 10, 5), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 5), view._needsDisplay);
 
-			view.OnDraw ();
+			view.OnDrawContent (view.Bounds);
 			view.Frame = new Rect (1, 3, 10, 5);
 			Assert.Equal (new Rect (1, 3, 10, 5), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 5), view._needsDisplay);

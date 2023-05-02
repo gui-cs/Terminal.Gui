@@ -122,18 +122,24 @@ namespace UICatalog.Scenarios {
 			set {
 				_selected = value;
 				int row = (int)_selected / 16;
-				int height = (Bounds.Height / ROW_HEIGHT) - 1;
+				int height = (Bounds.Height / ROW_HEIGHT) - (ShowHorizontalScrollIndicator ? 2 : 1);
 				if (row + ContentOffset.Y < 0) {
 					// Moving up.
-					ContentOffset = new Point (0, row);
+					ContentOffset = new Point (ContentOffset.X, row);
 				} else if (row + ContentOffset.Y >= height) {
 					// Moving down.
-					ContentOffset = new Point (0, Math.Min (row, (row - height) + 1));
+					ContentOffset = new Point (ContentOffset.X, Math.Min (row, row - height + ROW_HEIGHT));
 
-				} else {
-					//ContentOffset = new Point (0, Math.Min (row, (row - height) - 1));
 				}
-
+				int col = (((int)_selected - (row * 16)) * COLUMN_WIDTH);
+				int width = (Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH) - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
+				if (col + ContentOffset.X < 0) {
+					// Moving left.
+					ContentOffset = new Point (col, ContentOffset.Y);
+				} else if (col + ContentOffset.X >= width) {
+					// Moving right.
+					ContentOffset = new Point (Math.Min (col, col - width + COLUMN_WIDTH), ContentOffset.Y);
+				}
 				SetNeedsDisplay ();
 			}
 		}
@@ -160,7 +166,7 @@ namespace UICatalog.Scenarios {
 			LayoutComplete += (s, args) => {
 				if (Bounds.Width < RowWidth) {
 					ShowHorizontalScrollIndicator = true;
-				} else {
+				} else if (ShowHorizontalScrollIndicator) {
 					ShowHorizontalScrollIndicator = false;
 					// Snap 1st column into view if it's been scrolled horizontally 
 					ContentOffset = new Point (0, ContentOffset.Y);
@@ -225,9 +231,11 @@ namespace UICatalog.Scenarios {
 			Clipboard.Contents = $"{new Rune (SelectedGlyph)}";
 		}
 
-		public override bool OnDrawContent (Rect contentArea)
+		public override void OnDrawContentComplete (Rect contentArea)
 		{
-			Rect viewport = contentArea;
+			Rect viewport = new Rect (ContentOffset,
+				new Size (Math.Max (Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
+					Math.Max (Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0)));
 
 			var oldClip = Driver.Clip;
 			Driver.Clip = Bounds;

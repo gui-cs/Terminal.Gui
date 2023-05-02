@@ -108,7 +108,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void OnDraw ()
+		public override void OnDrawContent (Rect contentArea)
 		{
 			if (CellSize.X == 0 || CellSize.Y == 0) {
 				throw new Exception ($"{nameof (CellSize)} cannot be 0");
@@ -179,7 +179,6 @@ namespace Terminal.Gui {
 			foreach (var a in Annotations.ToArray ().Where (a => !a.BeforeSeries)) {
 				a.Render (this);
 			}
-
 		}
 
 		/// <summary>

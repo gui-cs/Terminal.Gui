@@ -498,28 +498,12 @@ namespace Terminal.Gui {
 		/// <param name="y">Y screen-coordinate point.</param>
 		public Point ScreenToView (int x, int y)
 		{
+			Point boundsOffset = SuperView == null ? Point.Empty : SuperView.GetBoundsOffset ();
 			if (SuperView == null) {
-				return new Point (x - Frame.X, y - _frame.Y);
-			} else {
-				var parent = SuperView.ScreenToView (x, y);
-				return new Point (parent.X - _frame.X, parent.Y - _frame.Y);
-			}
-		}
-
-		/// <summary>
-		/// Converts a point from screen-relative coordinates to bounds-relative coordinates.
-		/// </summary>
-		/// <returns>The mapped point.</returns>
-		/// <param name="x">X screen-coordinate point.</param>
-		/// <param name="y">Y screen-coordinate point.</param>
-		public Point ScreenToBounds (int x, int y)
-		{
-			if (SuperView == null) {
-				var boundsOffset = GetBoundsOffset ();
 				return new Point (x - Frame.X + boundsOffset.X, y - Frame.Y + boundsOffset.Y);
 			} else {
-				var parent = SuperView.ScreenToView (x, y);
-				return new Point (parent.X - _frame.X, parent.Y - _frame.Y);
+				var parent = SuperView.ScreenToView (x - boundsOffset.X, y - boundsOffset.Y);
+				return new Point (parent.X - Frame.X, parent.Y - Frame.Y);
 			}
 		}
 

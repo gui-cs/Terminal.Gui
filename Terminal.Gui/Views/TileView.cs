@@ -387,12 +387,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override void OnDraw ()
+		public override void OnDrawContent (Rect contentArea)
 		{
 			Driver.SetAttribute (ColorScheme.Normal);
 			Clear ();
 
-			base.OnDraw ();
+			base.OnDrawContent (contentArea);
 
 			var lc = new LineCanvas ();
 
@@ -915,9 +915,9 @@ namespace Terminal.Gui {
 				return base.OnEnter (view);
 			}
 
-			public override void OnDraw ()
+			public override void OnDrawContent (Rect contentArea)
 			{
-				base.OnDraw ();
+				base.OnDrawContent (contentArea);
 
 				DrawSplitterSymbol ();
 			}

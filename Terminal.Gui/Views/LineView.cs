@@ -66,9 +66,9 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Draws the line including any starting/ending anchors
 		/// </summary>
-		public override void OnDraw ()
+		public override void OnDrawContent (Rect contentArea)
 		{
-			base.OnDraw ();
+			base.OnDrawContent (contentArea);
 
 			Move (0, 0);
 			Driver.SetAttribute (GetNormalColor ());

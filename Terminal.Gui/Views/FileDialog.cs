@@ -593,9 +593,9 @@ namespace Terminal.Gui {
 			= Enumerable.Empty<string> ().ToList ().AsReadOnly ();
 
 		/// <inheritdoc/>
-		public override void OnDraw ()
+		public override void OnDrawContent (Rect contentArea)
 		{
-			base.OnDraw ();
+			base.OnDrawContent (contentArea);
 
 			if (!string.IsNullOrWhiteSpace (feedback)) {
 				var feedbackWidth = feedback.Sum (c => Rune.ColumnWidth (c));

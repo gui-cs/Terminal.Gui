@@ -177,7 +177,7 @@ namespace Terminal.Gui {
 
 
 		///<inheritdoc/>
-		public override void OnDraw ()
+		public override void OnDrawContent (Rect contentArea)
 		{
 			Move (0, 0);
 			Driver.SetAttribute (GetNormalColor ());
@@ -193,7 +193,7 @@ namespace Terminal.Gui {
 			}
 
 			if (Tabs.Any ()) {
-				tabsBar.OnDraw ();
+				tabsBar.OnDrawContent (contentArea);
 				contentView.SetNeedsDisplay ();
 				var savedClip = contentView.ClipToBounds ();
 				contentView.Draw ();
@@ -468,7 +468,7 @@ namespace Terminal.Gui {
 				return base.OnEnter (view);
 			}
 
-			public override void OnDraw ()
+			public override void OnDrawContent (Rect contentArea)
 			{
 				var tabLocations = host.CalculateViewport (Bounds).ToArray ();
 				var width = Bounds.Width;
@@ -482,7 +482,6 @@ namespace Terminal.Gui {
 
 				RenderUnderline (tabLocations, width);
 				Driver.SetAttribute (GetNormalColor ());
-
 			}
 
 			/// <summary>

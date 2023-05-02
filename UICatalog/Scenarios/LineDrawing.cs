@@ -68,9 +68,10 @@ namespace UICatalog.Scenarios {
 				grid.AddLine (new Point (0, 2), width + 1, Orientation.Horizontal, LineStyle.Single);
 				grid.AddLine (new Point (0, 4), width + 1, Orientation.Horizontal, LineStyle.Single);
 			}
-			public override void OnDraw ()
+
+			public override void OnDrawContent (Rect contentArea)
 			{
-				base.OnDraw ();
+				base.OnDrawContent (contentArea);
 
 				Driver.SetAttribute (new Terminal.Gui.Attribute (Color.DarkGray, ColorScheme.Normal.Background));
 
@@ -191,9 +192,9 @@ namespace UICatalog.Scenarios {
 				currentColor = canvases.Count - 1;
 			}
 
-			public override void OnDraw ()
+			public override void OnDrawContent (Rect contentArea)
 			{
-				base.OnDraw ();
+				base.OnDrawContent (contentArea);
 
 				foreach (var kvp in colorLayers) {
 
@@ -206,6 +207,7 @@ namespace UICatalog.Scenarios {
 					}
 				}
 			}
+
 			public override bool OnMouseEvent (MouseEvent mouseEvent)
 			{
 

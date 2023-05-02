@@ -160,9 +160,9 @@ namespace UICatalog.Scenarios {
 				currentFrame = (currentFrame + 1) % frameCount;
 			}
 
-			public override void OnDraw ()
+			public override void OnDrawContent (Rect contentArea)
 			{
-				base.OnDraw ();
+				base.OnDrawContent (contentArea);
 
 				if (oldSize != Bounds) {
 					// Invalidate cached images now size has changed

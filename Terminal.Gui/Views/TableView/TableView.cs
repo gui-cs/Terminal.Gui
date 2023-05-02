@@ -253,23 +253,23 @@ namespace Terminal.Gui
             AddKeyBinding(CellActivationKey, Command.Accept);
         }
 
-        ///<inheritdoc/>
-        public override void OnDraw()
-        {
-            base.Redraw(bounds);
+		///<inheritdoc/>
+		public override void OnDrawContent (Rect contentArea)
+		{
+			base.OnDrawContent (contentArea);
 
             Move(0, 0);
 
             scrollRightPoint = null;
             scrollLeftPoint = null;
 
-            // What columns to render at what X offset in viewport
-            var columnsToRender = CalculateViewport(Bounds).ToArray();
+			// What columns to render at what X offset in viewport
+			var columnsToRender = CalculateViewport (Bounds).ToArray ();
 
             Driver.SetAttribute(GetNormalColor());
 
-            //invalidate current row (prevents scrolling around leaving old characters in the frame
-            Driver.AddStr(new string(' ', Bounds.Width));
+			//invalidate current row (prevents scrolling around leaving old characters in the frame
+			Driver.AddStr (new string (' ', Bounds.Width));
 
             int line = 0;
 
@@ -281,11 +281,10 @@ namespace Terminal.Gui
 					│ArithmeticComparator│chi       │Healthboard│Interpretation│Labnumber│
 					└────────────────────┴──────────┴───────────┴──────────────┴─────────┘
 				*/
-                if (Style.ShowHorizontalHeaderOverline)
-                {
-                    RenderHeaderOverline(line, Bounds.Width, columnsToRender);
-                    line++;
-                }
+				if (Style.ShowHorizontalHeaderOverline) {
+					RenderHeaderOverline (line, Bounds.Width, columnsToRender);
+					line++;
+				}
 
                 if (Style.ShowHeaders)
                 {
@@ -293,12 +292,11 @@ namespace Terminal.Gui
                     line++;
                 }
 
-                if (Style.ShowHorizontalHeaderUnderline)
-                {
-                    RenderHeaderUnderline(line, Bounds.Width, columnsToRender);
-                    line++;
-                }
-            }
+				if (Style.ShowHorizontalHeaderUnderline) {
+					RenderHeaderUnderline (line, Bounds.Width, columnsToRender);
+					line++;
+				}
+			}
 
             int headerLinesConsumed = line;
 
@@ -306,7 +304,7 @@ namespace Terminal.Gui
             for (; line < Bounds.Height; line++)
             {
 
-                ClearLine(line, Bounds.Width);
+				ClearLine (line, Bounds.Width);
 
                 //work out what Row to render
                 var rowToRender = RowOffset + (line - headerLinesConsumed);
@@ -318,10 +316,9 @@ namespace Terminal.Gui
 				// No more data
 				if (rowToRender >= Table.Rows) {
 
-                    if (rowToRender == Table.Rows && Style.ShowHorizontalBottomline)
-                    {
-                        RenderBottomLine(line, Bounds.Width, columnsToRender);
-                    }
+					if (rowToRender == Table.Rows && Style.ShowHorizontalBottomline) {
+						RenderBottomLine (line, Bounds.Width, columnsToRender);
+					}
 
                     continue;
                 }
@@ -804,7 +801,7 @@ namespace Terminal.Gui
         }
 
 
-		
+
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
@@ -2242,17 +2239,17 @@ namespace Terminal.Gui
             /// </summary>
             public bool IsToggled { get; set; }
 
-            /// <summary>
-            /// Creates a new selected area starting at the origin corner and covering the provided rectangular area
-            /// </summary>
-            /// <param name="origin"></param>
-            /// <param name="rect"></param>
-            public TableSelection(Point origin, Rect rect)
-            {
-                Origin = origin;
-                Rect = rect;
-            }
-        }
-        #endregion
-    }
+			/// <summary>
+			/// Creates a new selected area starting at the origin corner and covering the provided rectangular area
+			/// </summary>
+			/// <param name="origin"></param>
+			/// <param name="rect"></param>
+			public TableSelection (Point origin, Rect rect)
+			{
+				Origin = origin;
+				Rect = rect;
+			}
+		}
+		#endregion
+	}
 }

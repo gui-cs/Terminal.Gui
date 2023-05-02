@@ -1652,8 +1652,8 @@ Y
 				break;
 			}
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-
 		}
+
 		[Theory, AutoInitShutdown]
 		[InlineData (1)]
 		[InlineData (2)]

@@ -421,6 +421,9 @@ namespace Terminal.Gui {
 				throw new InvalidOperationException ("Only one Overlapped Container is allowed.");
 			}
 
+			// Ensure the mouse is ungrabed.
+			_mouseGrabView = null;
+
 			var rs = new RunState (Toplevel);
 
 			// View implements ISupportInitializeNotification which is derived from ISupportInitialize
@@ -770,6 +773,7 @@ namespace Terminal.Gui {
 				foreach (var top in _toplevels.Reverse ()) {
 					if (top != Top && top != state.Toplevel) {
 						top.SetNeedsDisplay ();
+						top.SetSubViewNeedsDisplay ();
 						top.Draw ();
 					}
 				}
@@ -798,8 +802,8 @@ namespace Terminal.Gui {
 			}
 			if (state.Toplevel != Top && !state.Toplevel.Modal
 				&& (!Top._needsDisplay.IsEmpty || Top._subViewNeedsDisplay || Top.LayoutNeeded)) {
-				Top.Draw ();
-			}
+                Top.Draw();
+            }
 		}
 
 		/// <summary>

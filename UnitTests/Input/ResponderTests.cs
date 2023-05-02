@@ -83,7 +83,7 @@ namespace Terminal.Gui.InputTests {
 
 			// ScrollBarView overrides both MouseEvent (from Responder) and Redraw (from View)
 			Assert.True (Responder.IsOverridden (new ScrollBarView () { Text = "ScrollBarView overrides MouseEvent" }, "MouseEvent"));
-			Assert.True (Responder.IsOverridden (new ScrollBarView () { Text = "ScrollBarView overrides OnDraw" }, "OnDraw"));
+			Assert.True (Responder.IsOverridden (new ScrollBarView () { Text = "ScrollBarView overrides OnDrawContent" }, "OnDrawContent"));
 
 			Assert.True (Responder.IsOverridden (new Button () { Text = "Button overrides MouseEvent" }, "MouseEvent"));
 		}

@@ -78,9 +78,9 @@ namespace UICatalog.Scenarios {
 				};
 			}
 
-			public override void OnDraw ()
+			public override void OnDrawContent (Rect contentArea)
 			{
-				base.OnDraw ();
+				base.OnDrawContent (contentArea);
 
 				Driver.SetAttribute (white);
 				Clear ();

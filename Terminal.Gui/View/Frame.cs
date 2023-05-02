@@ -124,7 +124,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Redraws the Frames that comprise the <see cref="Frame"/>.
 		/// </summary>
-		public override void OnDraw ()
+		public override void OnDrawContent (Rect contentArea)
 		{
 			if (Thickness == Thickness.Empty) return;
 

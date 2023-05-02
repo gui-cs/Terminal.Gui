@@ -146,7 +146,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override void OnDraw ()
+		public override void OnDrawContent (Rect contentArea)
 		{
 			if (DateTime.Now - _lastRender > TimeSpan.FromMilliseconds (SpinDelay)) {
 				//_currentIdx = (_currentIdx + 1) % Sequence.Length;
@@ -186,7 +186,7 @@ namespace Terminal.Gui {
 				_lastRender = DateTime.Now;
 			}
 
-			base.OnDraw ();
+			base.OnDrawContent (contentArea);
 		}
 
 		/// <summary>
