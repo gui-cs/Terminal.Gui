@@ -802,8 +802,8 @@ namespace Terminal.Gui {
 			}
 			if (state.Toplevel != Top && !state.Toplevel.Modal
 				&& (!Top._needsDisplay.IsEmpty || Top._subViewNeedsDisplay || Top.LayoutNeeded)) {
-                Top.Draw();
-            }
+				Top.Draw ();
+			}
 		}
 
 		/// <summary>

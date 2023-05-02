@@ -8,79 +8,72 @@ using Terminal.Gui;
 using Terminal.Gui.TextValidateProviders;
 
 
-namespace UICatalog.Scenarios
-{
-    [ScenarioMetadata(Name: "Text Input Controls", Description: "Tests all text input controls")]
-    [ScenarioCategory("Controls")]
-    [ScenarioCategory("Mouse and Keyboard")]
-    [ScenarioCategory("Text and Formatting")]
-    public class Text : Scenario
-    {
-        public override void Setup()
-        {
-            // TextField is a simple, single-line text input control
-            var textField = new TextField("TextField with test text. Unicode shouldn't 𝔹Aℝ𝔽!")
-            {
-                X = 1,
-                Y = 0,
-                Width = Dim.Percent(50) - 1,
-                Height = 2
-            };
+namespace UICatalog.Scenarios {
+	[ScenarioMetadata (Name: "Text Input Controls", Description: "Tests all text input controls")]
+	[ScenarioCategory ("Controls")]
+	[ScenarioCategory ("Mouse and Keyboard")]
+	[ScenarioCategory ("Text and Formatting")]
+	public class Text : Scenario {
+		public override void Setup ()
+		{
+			// TextField is a simple, single-line text input control
+			var textField = new TextField ("TextField with test text. Unicode shouldn't 𝔹Aℝ𝔽!") {
+				X = 1,
+				Y = 0,
+				Width = Dim.Percent (50) - 1,
+				Height = 2
+			};
 
-            var singleWordGenerator = new SingleWordSuggestionGenerator();
-            textField.Autocomplete.SuggestionGenerator = singleWordGenerator;
+			var singleWordGenerator = new SingleWordSuggestionGenerator ();
+			textField.Autocomplete.SuggestionGenerator = singleWordGenerator;
 
-            textField.TextChanging += TextField_TextChanging;
+			textField.TextChanging += TextField_TextChanging;
 
-            void TextField_TextChanging(object sender, TextChangingEventArgs e)
-            {
-                singleWordGenerator.AllSuggestions = Regex.Matches(e.NewText.ToString(), "\\w+")
-                    .Select(s => s.Value)
-                    .Distinct().ToList();
-            }
-            Win.Add(textField);
+			void TextField_TextChanging (object sender, TextChangingEventArgs e)
+			{
+				singleWordGenerator.AllSuggestions = Regex.Matches (e.NewText.ToString (), "\\w+")
+				    .Select (s => s.Value)
+				    .Distinct ().ToList ();
+			}
+			Win.Add (textField);
 
-            var labelMirroringTextField = new Label(textField.Text)
-            {
-                X = Pos.Right(textField) + 1,
-                Y = Pos.Top(textField),
-                Width = Dim.Fill(1) - 1
-            };
-            Win.Add(labelMirroringTextField);
+			var labelMirroringTextField = new Label (textField.Text) {
+				X = Pos.Right (textField) + 1,
+				Y = Pos.Top (textField),
+				Width = Dim.Fill (1) - 1
+			};
+			Win.Add (labelMirroringTextField);
 
-            textField.TextChanged += (s, prev) =>
-            {
-                labelMirroringTextField.Text = textField.Text;
-            };
+			textField.TextChanged += (s, prev) => {
+				labelMirroringTextField.Text = textField.Text;
+			};
 
-            // TextView is a rich (as in functionality, not formatting) text editing control
-            var textView = new TextView()
-            {
-                X = 1,
-                Y = Pos.Bottom(textField),
-                Width = Dim.Percent(50) - 1,
-                Height = Dim.Percent(30),
-            };
-            textView.Text = "TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!";
-            textView.DrawContent += TextView_DrawContent;
+			// TextView is a rich (as in functionality, not formatting) text editing control
+			var textView = new TextView () {
+				X = 1,
+				Y = Pos.Bottom (textField),
+				Width = Dim.Percent (50) - 1,
+				Height = Dim.Percent (30),
+			};
+			textView.Text = "TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!";
+			textView.DrawContent += TextView_DrawContent;
 
-            // This shows how to enable autocomplete in TextView.
-            void TextView_DrawContent(object sender, DrawEventArgs e)
-            {
-                singleWordGenerator.AllSuggestions = Regex.Matches(textView.Text.ToString(), "\\w+")
-                    .Select(s => s.Value)
-                    .Distinct().ToList();
-            }
-            Win.Add(textView);
+			// This shows how to enable autocomplete in TextView.
+			void TextView_DrawContent (object sender, DrawEventArgs e)
+			{
+				singleWordGenerator.AllSuggestions = Regex.Matches (textView.Text.ToString (), "\\w+")
+				    .Select (s => s.Value)
+				    .Distinct ().ToList ();
+			}
+			Win.Add (textView);
 
-            var labelMirroringTextView = new Label()
-            {
-                X = Pos.Right(textView) + 1,
-                Y = Pos.Top(textView),
-                Width = Dim.Fill(1) - 1,
-                Height = Dim.Height(textView) - 1,
-            };
-            Win.Add(labelMirroringTextView);
+			var labelMirroringTextView = new Label () {
+				X = Pos.Right (textView) + 1,
+				Y = Pos.Top (textView),
+				Width = Dim.Fill (1) - 1,
+				Height = Dim.Height (textView) - 1,
+			};
+			Win.Add (labelMirroringTextView);
 
 			// Use ContentChanged to detect if the user has typed something in a TextView.
 			// The TextChanged property is only fired if the TextView.Text property is
@@ -104,7 +97,7 @@ namespace UICatalog.Scenarios
 				Y = Pos.Top (chxMultiline),
 				Checked = textView.WordWrap
 			};
-			chxWordWrap.Toggled += (s,e) => textView.WordWrap = (bool)e.NewValue;
+			chxWordWrap.Toggled += (s, e) => textView.WordWrap = (bool)e.NewValue;
 			Win.Add (chxWordWrap);
 
 			// TextView captures Tabs (so users can enter /t into text) by default;
@@ -128,7 +121,7 @@ namespace UICatalog.Scenarios
 
 			Key keyTab = textView.GetKeyFromCommand (Command.Tab);
 			Key keyBackTab = textView.GetKeyFromCommand (Command.BackTab);
-			chxCaptureTabs.Toggled += (s,e) => {
+			chxCaptureTabs.Toggled += (s, e) => {
 				if (e.NewValue == true) {
 					textView.AddKeyBinding (keyTab, Command.Tab);
 					textView.AddKeyBinding (keyBackTab, Command.BackTab);
@@ -140,14 +133,13 @@ namespace UICatalog.Scenarios
 			};
 			Win.Add (chxCaptureTabs);
 
-            var hexEditor = new HexView(new MemoryStream(Encoding.UTF8.GetBytes("HexEditor Unicode that shouldn't 𝔹Aℝ𝔽!")))
-            {
-                X = 1,
-                Y = Pos.Bottom(chxMultiline) + 1,
-                Width = Dim.Percent(50) - 1,
-                Height = Dim.Percent(30),
-            };
-            Win.Add(hexEditor);
+			var hexEditor = new HexView (new MemoryStream (Encoding.UTF8.GetBytes ("HexEditor Unicode that shouldn't 𝔹Aℝ𝔽!"))) {
+				X = 1,
+				Y = Pos.Bottom (chxMultiline) + 1,
+				Width = Dim.Percent (50) - 1,
+				Height = Dim.Percent (30),
+			};
+			Win.Add (hexEditor);
 
 			var labelMirroringHexEditor = new Label () {
 				X = Pos.Right (hexEditor) + 1,
@@ -164,85 +156,76 @@ namespace UICatalog.Scenarios
 			};
 			Win.Add (labelMirroringHexEditor);
 
-            var dateField = new DateField(System.DateTime.Now)
-            {
-                X = 1,
-                Y = Pos.Bottom(hexEditor) + 1,
-                Width = 20,
-                IsShortFormat = false
-            };
-            Win.Add(dateField);
+			var dateField = new DateField (System.DateTime.Now) {
+				X = 1,
+				Y = Pos.Bottom (hexEditor) + 1,
+				Width = 20,
+				IsShortFormat = false
+			};
+			Win.Add (dateField);
 
-            var labelMirroringDateField = new Label(dateField.Text)
-            {
-                X = Pos.Right(dateField) + 1,
-                Y = Pos.Top(dateField),
-                Width = Dim.Width(dateField),
-                Height = Dim.Height(dateField),
-            };
-            Win.Add(labelMirroringDateField);
+			var labelMirroringDateField = new Label (dateField.Text) {
+				X = Pos.Right (dateField) + 1,
+				Y = Pos.Top (dateField),
+				Width = Dim.Width (dateField),
+				Height = Dim.Height (dateField),
+			};
+			Win.Add (labelMirroringDateField);
 
-            dateField.TextChanged += (s, prev) =>
-            {
-                labelMirroringDateField.Text = dateField.Text;
-            };
+			dateField.TextChanged += (s, prev) => {
+				labelMirroringDateField.Text = dateField.Text;
+			};
 
-            _timeField = new TimeField(DateTime.Now.TimeOfDay)
-            {
-                X = Pos.Right(labelMirroringDateField) + 5,
-                Y = Pos.Bottom(hexEditor) + 1,
-                Width = 20,
-                IsShortFormat = false
-            };
-            Win.Add(_timeField);
+			_timeField = new TimeField (DateTime.Now.TimeOfDay) {
+				X = Pos.Right (labelMirroringDateField) + 5,
+				Y = Pos.Bottom (hexEditor) + 1,
+				Width = 20,
+				IsShortFormat = false
+			};
+			Win.Add (_timeField);
 
-            _labelMirroringTimeField = new Label(_timeField.Text)
-            {
-                X = Pos.Right(_timeField) + 1,
-                Y = Pos.Top(_timeField),
-                Width = Dim.Width(_timeField),
-                Height = Dim.Height(_timeField),
-            };
-            Win.Add(_labelMirroringTimeField);
+			_labelMirroringTimeField = new Label (_timeField.Text) {
+				X = Pos.Right (_timeField) + 1,
+				Y = Pos.Top (_timeField),
+				Width = Dim.Width (_timeField),
+				Height = Dim.Height (_timeField),
+			};
+			Win.Add (_labelMirroringTimeField);
 
-            _timeField.TimeChanged += TimeChanged;
+			_timeField.TimeChanged += TimeChanged;
 
-            // MaskedTextProvider - uses .NET MaskedTextProvider
-            var netProviderLabel = new Label("NetMaskedTextProvider [ 999 000 LLL >LLL| AAA aaa ]")
-            {
-                X = Pos.Left(dateField),
-                Y = Pos.Bottom(dateField) + 1
-            };
-            Win.Add(netProviderLabel);
+			// MaskedTextProvider - uses .NET MaskedTextProvider
+			var netProviderLabel = new Label ("NetMaskedTextProvider [ 999 000 LLL >LLL| AAA aaa ]") {
+				X = Pos.Left (dateField),
+				Y = Pos.Bottom (dateField) + 1
+			};
+			Win.Add (netProviderLabel);
 
-            var netProvider = new NetMaskedTextProvider("999 000 LLL > LLL | AAA aaa");
+			var netProvider = new NetMaskedTextProvider ("999 000 LLL > LLL | AAA aaa");
 
-            var netProviderField = new TextValidateField(netProvider)
-            {
-                X = Pos.Right(netProviderLabel) + 1,
-                Y = Pos.Y(netProviderLabel),
-            };
+			var netProviderField = new TextValidateField (netProvider) {
+				X = Pos.Right (netProviderLabel) + 1,
+				Y = Pos.Y (netProviderLabel),
+			};
 
-            Win.Add(netProviderField);
+			Win.Add (netProviderField);
 
-            // TextRegexProvider - Regex provider implemented by Terminal.Gui
-            var regexProvider = new Label("TextRegexProvider [ ^([0-9]?[0-9]?[0-9]|1000)$ ]")
-            {
-                X = Pos.Left(netProviderLabel),
-                Y = Pos.Bottom(netProviderLabel) + 1
-            };
-            Win.Add(regexProvider);
+			// TextRegexProvider - Regex provider implemented by Terminal.Gui
+			var regexProvider = new Label ("TextRegexProvider [ ^([0-9]?[0-9]?[0-9]|1000)$ ]") {
+				X = Pos.Left (netProviderLabel),
+				Y = Pos.Bottom (netProviderLabel) + 1
+			};
+			Win.Add (regexProvider);
 
-            var provider2 = new TextRegexProvider("^([0-9]?[0-9]?[0-9]|1000)$") { ValidateOnInput = false };
-            var regexProviderField = new TextValidateField(provider2)
-            {
-                X = Pos.Right(regexProvider) + 1,
-                Y = Pos.Y(regexProvider),
-                Width = 30,
-                TextAlignment = TextAlignment.Centered
-            };
+			var provider2 = new TextRegexProvider ("^([0-9]?[0-9]?[0-9]|1000)$") { ValidateOnInput = false };
+			var regexProviderField = new TextValidateField (provider2) {
+				X = Pos.Right (regexProvider) + 1,
+				Y = Pos.Y (regexProvider),
+				Width = 30,
+				TextAlignment = TextAlignment.Centered
+			};
 
-            Win.Add(regexProviderField);
+			Win.Add (regexProviderField);
 
 			var labelAppendAutocomplete = new Label ("Append Autocomplete:") {
 				Y = Pos.Y (regexProviderField) + 2,
@@ -260,16 +243,16 @@ namespace UICatalog.Scenarios
 				}
 			};
 
-            Win.Add(labelAppendAutocomplete);
-            Win.Add(appendAutocompleteTextField);
-        }
+			Win.Add (labelAppendAutocomplete);
+			Win.Add (appendAutocompleteTextField);
+		}
 
-        TimeField _timeField;
-        Label _labelMirroringTimeField;
+		TimeField _timeField;
+		Label _labelMirroringTimeField;
 
-        private void TimeChanged(object sender, DateTimeEventArgs<TimeSpan> e)
-        {
-            _labelMirroringTimeField.Text = _timeField.Text;
-        }
-    }
+		private void TimeChanged (object sender, DateTimeEventArgs<TimeSpan> e)
+		{
+			_labelMirroringTimeField.Text = _timeField.Text;
+		}
+	}
 }

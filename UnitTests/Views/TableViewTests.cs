@@ -417,14 +417,14 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.BeginInit (); tableView.EndInit ();
 
 			/*  
-					    Sets up disconnected selections like:
+				Sets up disconnected selections like:
 
-					    00000000000
-					    01100000000
-					    01100000000
-					    00000001100
-					    00000000000
-				    */
+				00000000000
+				01100000000
+				01100000000
+				00000001100
+				00000000000
+			*/
 
 			tableView.MultiSelectedRegions.Clear ();
 			tableView.MultiSelectedRegions.Push (new TableView.TableSelection (new Point (1, 1), new Rect (1, 1, 2, 2)));
@@ -1153,7 +1153,7 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.Draw ();
 
 			string expected =
-			    @"
+				@"
 │A│B│C│
 │1│2│3│";
 
@@ -1172,7 +1172,7 @@ namespace Terminal.Gui.ViewsTests {
 			// 'half cells' or scrolls by console unit (scrolling is done by table row/column increments).
 
 			expected =
-			    @"
+				@"
 │B│C│D│
 │2│3│4│";
 
@@ -1214,7 +1214,7 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.Draw ();
 
 			string expected =
-			    @"
+				@"
 │A│B│C│
 │1│2│3│";
 
@@ -1232,7 +1232,7 @@ namespace Terminal.Gui.ViewsTests {
 			// the view 'jump' to expose all new columns
 
 			expected =
-			    @"
+				@"
 │D│E│F│
 │4│5│6│";
 
@@ -1280,7 +1280,7 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.Draw ();
 
 			string expected =
-			    @"
+				@"
 │A│C│D│
 │1│3│4│";
 
@@ -1300,7 +1300,7 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.Draw ();
 
 			string expected =
-			    @"
+				@"
 │B│C│D│
 ├─┼─┼─►
 │2│3│4│";
@@ -1316,16 +1316,11 @@ namespace Terminal.Gui.ViewsTests {
 			for (int i = 0; i < 6; i++) {
 				tableView.Style.GetOrCreateColumnStyle (i).Visible = false;
 			}
-
-			for (int i = 0; i < 6; i++) {
-				tableView.Style.GetOrCreateColumnStyle (i).Visible = false;
-			}
-
 			tableView.LayoutSubviews ();
 
 			// expect nothing to be rendered when all columns are invisible
 			string expected =
-			    @"
+				@"
 ";
 
 			tableView.Draw ();
@@ -1350,7 +1345,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			// normally we should have scroll indicators because DEF are of screen
 			string expected =
-			    @"
+				@"
 │A│B│C│
 ├─┼─┼─►
 │1│2│3│";
@@ -1385,7 +1380,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			// normally we should have scroll indicators because A,E and F are of screen
 			string expected =
-			    @"
+				@"
 │B│C│D│
 ◄─┼─┼─►
 │2│3│4│";
@@ -1536,10 +1531,10 @@ namespace Terminal.Gui.ViewsTests {
 
 			// user has rectangular selection 
 			tableView.MultiSelectedRegions.Push (
-			    new TableView.TableSelection (
+				new TableView.TableSelection (
 				new Point (0, 0),
 				new Rect (0, 0, 3, 1))
-			    );
+				);
 
 			Assert.Equal (3, tableView.GetAllSelectedCells ().Count ());
 			Assert.True (tableView.IsSelected (0, 0));
@@ -1826,7 +1821,7 @@ namespace Terminal.Gui.ViewsTests {
 			// default behaviour of TableView is not to render
 			// columns unless there is sufficient space
 			string expected =
-			    @"
+				@"
 │A│B                    │
 ├─┼─────────────────────►
 │1│2                    │
@@ -1972,7 +1967,7 @@ namespace Terminal.Gui.ViewsTests {
 			// user can only scroll right so sees right indicator
 			// Because first column in table is A
 			string expected =
-			    @"
+				@"
 │A│B│C│
 ├─┼─┼─►
 │1│2│3│";
@@ -1987,7 +1982,7 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.Draw ();
 
 			expected =
-			    @"
+				@"
 │B│C│D│
 ◄─┼─┼─►
 │2│3│4│";
@@ -2001,7 +1996,7 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.Draw ();
 
 			expected =
-			    @"
+				@"
 │D│E│F│
 ◄─┼─┼─┤
 │4│5│6│";
@@ -2036,7 +2031,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			var expected =
-			    @"
+				@"
 ┌─────┬──┬─────────┐
 │C1   │C2│C3       │
 ├─────┼──┼─────────┤
@@ -2101,7 +2096,7 @@ namespace Terminal.Gui.ViewsTests {
 			// user can only scroll right so sees right indicator
 			// Because first column in table is A
 			string expected =
-			    @"
+				@"
 │A│B│C│
 ├─┼─┼─►
 │1│2│3│
@@ -2131,7 +2126,7 @@ namespace Terminal.Gui.ViewsTests {
 			// user can only scroll right so sees right indicator
 			// Because first column in table is A
 			string expected =
-			    @"
+				@"
 │A│B│C│
 └─┴─┴─►
  1 2 3
@@ -2168,7 +2163,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.OnDrawContent (tv.Bounds);
 
 			string expected =
-			    @"
+				@"
 │A│B│C│
 ├─┼─┼─►
 │1│2│3│
@@ -2187,7 +2182,7 @@ namespace Terminal.Gui.ViewsTests {
 			// But should not spill into the borders.  Normal color (0) should be
 			// used for the rest.
 			expected =
-			    @"
+				@"
 0000000
 0000000
 0000000
@@ -2226,7 +2221,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.OnDrawContent (tv.Bounds);
 
 			string expected =
-			    @"
+				@"
 │A│B│C│
 ├─┼─┼─►
 │1│2│3│
@@ -2244,7 +2239,7 @@ namespace Terminal.Gui.ViewsTests {
 			// HotFocus color (1) should be used for cells only because
 			// AlwaysUseNormalColorForVerticalCellLines is true
 			expected =
-			    @"
+				@"
 0000000
 0000000
 0000000
@@ -2282,7 +2277,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			string expected =
-			    @"
+				@"
 A B C
 ───────
 1 2 3
@@ -2300,7 +2295,7 @@ A B C
 			// Note that because there are no vertical cell lines we use the hot focus
 			// color for the whole row
 			expected =
-			    @"
+				@"
 000000
 000000
 000000
@@ -2354,7 +2349,7 @@ A B C
 			// user can only scroll right so sees right indicator
 			// Because first column in table is A
 			string expected =
-			    @"
+				@"
 │A│B│C│
 ├─┼─┼─►
 │1│2│3│
@@ -2419,7 +2414,7 @@ A B C
 			// user can only scroll right so sees right indicator
 			// Because first column in table is A
 			string expected =
-			    @"
+				@"
 │A│B│C│
 ├─┼─┼─►
 │1│2│3│
@@ -2501,19 +2496,19 @@ A B C
 			tv.Bounds = new Rect (0, 0, 50, 6);
 
 			tv.Table = new EnumerableTableSource<Type> (
-			    new Type [] { typeof (string), typeof (int), typeof (float) },
-			    new () {
-		    { "Name", (t)=>t.Name},
-		    { "Namespace", (t)=>t.Namespace},
-		    { "BaseType", (t)=>t.BaseType}
-			    });
+				new Type [] { typeof (string), typeof (int), typeof (float) },
+				new () {
+					{ "Name", (t)=>t.Name},
+					{ "Namespace", (t)=>t.Namespace},
+					{ "BaseType", (t)=>t.BaseType}
+				});
 
 			tv.LayoutSubviews ();
 
 			tv.Draw ();
 
 			string expected =
-			    @"
+				@"
 ┌──────┬─────────┬───────────────────────────────┐
 │Name  │Namespace│BaseType                       │
 ├──────┼─────────┼───────────────────────────────┤
