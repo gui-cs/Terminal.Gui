@@ -452,6 +452,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			tv.Style.ShowHeaders = false;
 			tv.Style.ShowHorizontalHeaderOverline = false;
+			tv.Style.ShowHorizontalHeaderThroughline = false;
 			tv.Style.ShowHorizontalHeaderUnderline = false;
 
 			tv.Redraw (tv.Bounds);
@@ -469,12 +470,13 @@ namespace Terminal.Gui.ViewsTests {
 
 			tv.Style.ShowHeaders = false;
 			tv.Style.ShowHorizontalHeaderOverline = true;
+			tv.Style.ShowHorizontalHeaderThroughline = false;
 			tv.Style.ShowHorizontalHeaderUnderline = false;
 
 			tv.Redraw (tv.Bounds);
 
 			string expected = @"
-┌─┬─┐
+┌─┬─►
 │1│2│
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output);
@@ -487,15 +489,16 @@ namespace Terminal.Gui.ViewsTests {
 
 			tv.Style.ShowHeaders = false;
 			tv.Style.ShowHorizontalHeaderOverline = false;
+			tv.Style.ShowHorizontalHeaderThroughline = false;
 			tv.Style.ShowHorizontalHeaderUnderline = true;
-			// Horizontal scrolling option is part of the underline
+			// Horizontal scrolling option is the lowest header line
 			tv.Style.ShowHorizontalScrollIndicators = true;
 
 
 			tv.Redraw (tv.Bounds);
 
 			string expected = @"
-├─┼─►
+┌─┬─►
 │1│2│
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output);
@@ -509,8 +512,9 @@ namespace Terminal.Gui.ViewsTests {
 
 			tv.Style.ShowHeaders = false;
 			tv.Style.ShowHorizontalHeaderOverline = true;
+			tv.Style.ShowHorizontalHeaderThroughline = false;
 			tv.Style.ShowHorizontalHeaderUnderline = true;
-			// Horizontal scrolling option is part of the underline
+			// Horizontal scrolling option is the lowest header line
 			tv.Style.ShowHorizontalScrollIndicators = true;
 
 
@@ -1130,6 +1134,7 @@ namespace Terminal.Gui.ViewsTests {
 			// 3 columns are visibile
 			tableView.Bounds = new Rect (0, 0, 7, 5);
 			tableView.Style.ShowHorizontalHeaderUnderline = false;
+			tableView.Style.ShowHorizontalHeaderThroughline = false;
 			tableView.Style.ShowHorizontalHeaderOverline = false;
 			tableView.Style.AlwaysShowHeaders = true;
 			tableView.Style.SmoothHorizontalScrolling = true;
@@ -1153,7 +1158,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			string expected =
 				@"
-│A│B│C│
+│A│B│C►
 │1│2│3│";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
@@ -1172,7 +1177,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			expected =
 				@"
-│B│C│D│
+◄B│C│D►
 │2│3│4│";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
@@ -1191,6 +1196,7 @@ namespace Terminal.Gui.ViewsTests {
 			// 3 columns are visibile
 			tableView.Bounds = new Rect (0, 0, 7, 5);
 			tableView.Style.ShowHorizontalHeaderUnderline = false;
+			tableView.Style.ShowHorizontalHeaderThroughline = false;
 			tableView.Style.ShowHorizontalHeaderOverline = false;
 			tableView.Style.AlwaysShowHeaders = true;
 			tableView.Style.SmoothHorizontalScrolling = false;
@@ -1214,7 +1220,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			string expected =
 				@"
-│A│B│C│
+│A│B│C►
 │1│2│3│";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
@@ -1232,7 +1238,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			expected =
 				@"
-│D│E│F│
+◄D│E│F│
 │4│5│6│";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
@@ -1251,6 +1257,7 @@ namespace Terminal.Gui.ViewsTests {
 			// 3 columns are visible
 			tableView.Bounds = new Rect (0, 0, 7, 5);
 			tableView.Style.ShowHorizontalHeaderUnderline = false;
+			tableView.Style.ShowHorizontalHeaderThroughline = false;
 			tableView.Style.ShowHorizontalHeaderOverline = false;
 			tableView.Style.AlwaysShowHeaders = true;
 			tableView.Style.SmoothHorizontalScrolling = false;
@@ -1280,7 +1287,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			string expected =
 				@"
-│A│C│D│
+│A│C│D►
 │1│3│4│";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
@@ -1802,6 +1809,7 @@ namespace Terminal.Gui.ViewsTests {
 			// 25 characters can be printed into table
 			tableView.Bounds = new Rect (0, 0, 25, 5);
 			tableView.Style.ShowHorizontalHeaderUnderline = true;
+			tableView.Style.ShowHorizontalHeaderThroughline = false;
 			tableView.Style.ShowHorizontalHeaderOverline = false;
 			tableView.Style.AlwaysShowHeaders = true;
 			tableView.Style.SmoothHorizontalScrolling = true;
@@ -1943,6 +1951,7 @@ namespace Terminal.Gui.ViewsTests {
 			// 3 columns are visibile
 			tableView.Bounds = new Rect (0, 0, 7, 5);
 			tableView.Style.ShowHorizontalHeaderUnderline = true;
+			tableView.Style.ShowHorizontalHeaderThroughline = false;
 			tableView.Style.ShowHorizontalHeaderOverline = false;
 			tableView.Style.AlwaysShowHeaders = true;
 			tableView.Style.SmoothHorizontalScrolling = true;
@@ -2086,6 +2095,7 @@ namespace Terminal.Gui.ViewsTests {
 			// 3 columns are visibile
 			tableView.Bounds = new Rect (0, 0, 7, 5);
 			tableView.Style.ShowHorizontalHeaderUnderline = true;
+			tableView.Style.ShowHorizontalHeaderThroughline = true;
 			tableView.Style.ShowHorizontalHeaderOverline = false;
 			tableView.Style.AlwaysShowHeaders = true;
 			tableView.Style.SmoothHorizontalScrolling = true;
@@ -2097,7 +2107,7 @@ namespace Terminal.Gui.ViewsTests {
 			// Because first column in table is A
 			string expected =
 				@"
-│A│B│C│
+┌A┬B┬C┐
 ├─┼─┼─►
 │1│2│3│
 └─┴─┴─┘";
@@ -2115,6 +2125,7 @@ namespace Terminal.Gui.ViewsTests {
 			// 3 columns are visibile
 			tableView.Bounds = new Rect (0, 0, 7, 5);
 			tableView.Style.ShowHorizontalHeaderUnderline = true;
+			tableView.Style.ShowHorizontalHeaderThroughline = true;
 			tableView.Style.ShowHorizontalHeaderOverline = false;
 			tableView.Style.AlwaysShowHeaders = true;
 			tableView.Style.SmoothHorizontalScrolling = true;
@@ -2127,7 +2138,7 @@ namespace Terminal.Gui.ViewsTests {
 			// Because first column in table is A
 			string expected =
 				@"
-│A│B│C│
+┌A┬B┬C┐
 └─┴─┴─►
  1 2 3
 ───────";
@@ -2279,7 +2290,7 @@ namespace Terminal.Gui.ViewsTests {
 			string expected =
 				@"
 A B C
-───────
+──────►
 1 2 3
 1 2 3
 1 2 3";
@@ -2617,6 +2628,7 @@ A B C
 			// 3 columns are visible
 			tableView.Bounds = new Rect (0, 0, 7, 5);
 			tableView.Style.ShowHorizontalHeaderUnderline = true;
+			tableView.Style.ShowHorizontalHeaderThroughline = false;
 			tableView.Style.ShowHorizontalHeaderOverline = false;
 			tableView.Style.AlwaysShowHeaders = true;
 			tableView.Style.SmoothHorizontalScrolling = true;
