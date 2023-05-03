@@ -1588,5 +1588,15 @@ Les Miśerables", output);
 			tf.ProcessKey (new KeyEvent (Key.CtrlMask | Key.CursorRight, new KeyModifiers () { Ctrl = true }));
 			Assert.Equal (22, tf.CursorPosition);
 		}
+
+		[Fact, TextFieldTestsAutoInitShutdown]
+		public void Cursor_Position_Initialization ()
+		{
+			Assert.False (_textField.IsInitialized);
+			Assert.Equal (32, _textField.CursorPosition);
+			Assert.Equal (0, _textField.SelectedLength);
+			Assert.Null (_textField.SelectedText);
+			Assert.Equal ("TAB to jump between text fields.", _textField.Text);
+		}
 	}
 }

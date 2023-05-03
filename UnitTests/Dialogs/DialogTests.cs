@@ -181,6 +181,7 @@ namespace Terminal.Gui.DialogTests {
 
 					// This is because of PostionTopLevels and EnsureVisibleBounds
 					Assert.Equal (new Point (3, 2), d.Frame.Location);
+					Assert.Equal (new Size (17, 8), d.Frame.Size);
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
 ╔══════════════════╗
 ║                  ║

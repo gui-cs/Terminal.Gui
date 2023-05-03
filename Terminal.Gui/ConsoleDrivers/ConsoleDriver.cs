@@ -345,6 +345,26 @@ namespace Terminal.Gui {
 		internal string schemeBeingSet = "";
 
 		/// <summary>
+		/// Creates a new instance.
+		/// </summary>
+		public ColorScheme() { }
+
+		/// <summary>
+		/// Creates a new instance, initialized with the values from <paramref name="scheme"/>.
+		/// </summary>
+		/// <param name="scheme">The scheme to initlize the new instance with.</param>
+		public ColorScheme (ColorScheme scheme) : base()
+		{
+			if (scheme != null) {
+				_normal = scheme.Normal;
+				_focus = scheme.Focus;
+				_hotNormal = scheme.HotNormal;
+				_disabled = scheme.Disabled;
+				_hotFocus = scheme.HotFocus;
+			}
+		}
+
+		/// <summary>
 		/// The foreground and background color for text when the view is not focused, hot, or disabled.
 		/// </summary>
 		public Attribute Normal {

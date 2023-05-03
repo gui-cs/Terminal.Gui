@@ -88,16 +88,16 @@ namespace UICatalog.Scenarios {
 			var chxMultiline = new CheckBox ("Multiline") {
 				X = Pos.Left (textView),
 				Y = Pos.Bottom (textView),
-				Checked = true
+				Checked = textView.Multiline
 			};
-			chxMultiline.Toggled += (s,e) => textView.Multiline = (bool)e.OldValue;
 			Win.Add (chxMultiline);
 
 			var chxWordWrap = new CheckBox ("Word Wrap") {
 				X = Pos.Right (chxMultiline) + 2,
-				Y = Pos.Top (chxMultiline)
+				Y = Pos.Top (chxMultiline),
+				Checked = textView.WordWrap
 			};
-			chxWordWrap.Toggled += (s,e) => textView.WordWrap = (bool)e.OldValue;
+			chxWordWrap.Toggled += (s,e) => textView.WordWrap = (bool)e.NewValue;
 			Win.Add (chxWordWrap);
 
 			// TextView captures Tabs (so users can enter /t into text) by default;
@@ -106,20 +106,30 @@ namespace UICatalog.Scenarios {
 			var chxCaptureTabs = new CheckBox ("Capture Tabs") {
 				X = Pos.Right (chxWordWrap) + 2,
 				Y = Pos.Top (chxWordWrap),
-				Checked = true
+				Checked = textView.AllowsTab
+			};
+
+			chxMultiline.Toggled += (s, e) => {
+				textView.Multiline = (bool)e.NewValue;
+				if (!textView.Multiline && (bool)chxWordWrap.Checked) {
+					chxWordWrap.Checked = false;
+				}
+				if (!textView.Multiline && (bool)chxCaptureTabs.Checked) {
+					chxCaptureTabs.Checked = false;
+				}
 			};
 
 			Key keyTab = textView.GetKeyFromCommand (Command.Tab);
 			Key keyBackTab = textView.GetKeyFromCommand (Command.BackTab);
 			chxCaptureTabs.Toggled += (s,e) => {
-				if (e.OldValue == true) {
+				if (e.NewValue == true) {
 					textView.AddKeyBinding (keyTab, Command.Tab);
 					textView.AddKeyBinding (keyBackTab, Command.BackTab);
 				} else {
-					textView.ClearKeybinding (keyTab);
-					textView.ClearKeybinding (keyBackTab);
+					textView.ClearKeyBinding (keyTab);
+					textView.ClearKeyBinding (keyBackTab);
 				}
-				textView.WordWrap = (bool)e.OldValue;
+				textView.AllowsTab = (bool)e.NewValue;
 			};
 			Win.Add (chxCaptureTabs);
 

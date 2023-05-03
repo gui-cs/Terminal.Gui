@@ -76,12 +76,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Removes the <see cref="_needsDisplay"/> and the <see cref="_childNeedsDisplay"/> setting on this view.
+		/// Removes the <see cref="_needsDisplay"/> and the <see cref="_subViewNeedsDisplay"/> setting on this view.
 		/// </summary>
 		protected void ClearNeedsDisplay ()
 		{
 			_needsDisplay = Rect.Empty;
-			_childNeedsDisplay = false;
+			_subViewNeedsDisplay = false;
 		}
 
 		// The view-relative region that needs to be redrawn
@@ -102,9 +102,9 @@ namespace Terminal.Gui {
 		/// <param name="region">The view-relative region that needs to be redrawn.</param>
 		public void SetNeedsDisplay (Rect region)
 		{
-			if (_needsDisplay.IsEmpty)
+			if (_needsDisplay.IsEmpty) {
 				_needsDisplay = region;
-			else {
+			} else {
 				var x = Math.Min (_needsDisplay.X, region.X);
 				var y = Math.Min (_needsDisplay.Y, region.Y);
 				var w = Math.Max (_needsDisplay.Width, region.Width);
@@ -125,18 +125,18 @@ namespace Terminal.Gui {
 				}
 		}
 
-		internal bool _childNeedsDisplay { get; private set; }
+		internal bool _subViewNeedsDisplay { get; private set; }
 
 		/// <summary>
 		/// Indicates that any Subviews (in the <see cref="Subviews"/> list) need to be repainted.
 		/// </summary>
 		public void SetSubViewNeedsDisplay ()
 		{
-			if (_childNeedsDisplay) {
+			if (_subViewNeedsDisplay) {
 				return;
 			}
-			_childNeedsDisplay = true;
-			if (_superView != null && !_superView._childNeedsDisplay)
+			_subViewNeedsDisplay = true;
+			if (_superView != null && !_superView._subViewNeedsDisplay)
 				_superView.SetSubViewNeedsDisplay ();
 		}
 
@@ -410,8 +410,8 @@ namespace Terminal.Gui {
 				LineCanvas.Clear ();
 			}
 
-			if (Subviews.Select (s => s.SuperViewRendersLineCanvas).Count () > 0) {
-				foreach (var subview in Subviews.Where (s => s.SuperViewRendersLineCanvas)) {
+			if (Subviews.Where (s => s.SuperViewRendersLineCanvas).Count () > 0) {
+				foreach (var subview in Subviews.Where (s => s.SuperViewRendersLineCanvas == true)) {
 					// Combine the LineCavas'
 					LineCanvas.Merge (subview.LineCanvas);
 					subview.LineCanvas.Clear ();
