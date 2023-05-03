@@ -265,10 +265,10 @@ namespace Terminal.Gui {
 			if (ShouldRenderHeaders ()) {
 				// Render something like:
 				/*
-							┌────────────────────┬──────────┬───────────┬──────────────┬─────────┐
-							│ArithmeticComparator│chi       │Healthboard│Interpretation│Labnumber│
-							└────────────────────┴──────────┴───────────┴──────────────┴─────────┘
-						*/
+					┌────────────────────┬──────────┬───────────┬──────────────┬─────────┐
+					│ArithmeticComparator│chi       │Healthboard│Interpretation│Labnumber│
+					└────────────────────┴──────────┴───────────┴──────────────┴─────────┘
+				*/
 				if (Style.ShowHorizontalHeaderOverline) {
 					RenderHeaderOverline (line, Bounds.Width, columnsToRender);
 					line++;
@@ -373,7 +373,7 @@ namespace Terminal.Gui {
 					}
 					  // if the next console column is the lastcolumns end
 					  else if (Style.ExpandLastColumn == false &&
-					       columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c)) {
+						columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c)) {
 						rune = Driver.TopTee;
 					}
 				}
@@ -419,8 +419,8 @@ namespace Terminal.Gui {
 		private void RenderHeaderUnderline (int row, int availableWidth, ColumnToRender [] columnsToRender)
 		{
 			/*
-				     *  First lets work out if we should be rendering scroll indicators
-				     */
+			*  First lets work out if we should be rendering scroll indicators
+			*/
 
 			// are there are visible columns to the left that have been pushed
 			// off the screen due to horizontal scrolling?
@@ -445,8 +445,8 @@ namespace Terminal.Gui {
 			}
 
 			/*
-				     *  Now lets draw the line itself
-				     */
+			*  Now lets draw the line itself
+			*/
 
 			// Renders a line below the table headers (when visible) like:
 			// ├──────────┼───────────┼───────────────────┼──────────┼────────┼─────────────┤
@@ -493,7 +493,7 @@ namespace Terminal.Gui {
 					}
 					  // if the next console column is the lastcolumns end
 					  else if (Style.ExpandLastColumn == false &&
-						  columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c)) {
+						columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c)) {
 						rune = Style.ShowVerticalCellLines ? '┼' : Driver.BottomTee;
 					}
 				}
@@ -519,19 +519,16 @@ namespace Terminal.Gui {
 						// for first character render line
 						rune = Driver.LLCorner;
 
-					}
-							    // if the next column is the start of a header
-							    else if (columnsToRender.Any (r => r.X == c + 1)) {
+					} else if (columnsToRender.Any (r => r.X == c + 1)) {
+						// if the next column is the start of a header
 						rune = Driver.BottomTee;
 					} else if (c == availableWidth - 1) {
-
 						// for the last character in the table
 						rune = Driver.LRCorner;
 
-					}
-		    // if the next console column is the lastcolumns end
-		    else if (Style.ExpandLastColumn == false &&
-			    columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c)) {
+					} else if (Style.ExpandLastColumn == false &&
+						  columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c)) {
+						// if the next console column is the lastcolumns end
 						rune = Driver.BottomTee;
 					}
 				}
@@ -544,7 +541,7 @@ namespace Terminal.Gui {
 			var focused = HasFocus;
 
 			var rowScheme = (Style.RowColorGetter?.Invoke (
-			    new RowColorGetterArgs (Table, rowToRender))) ?? ColorScheme;
+				new RowColorGetterArgs (Table, rowToRender))) ?? ColorScheme;
 
 			//start by clearing the entire line
 			Move (0, row);
@@ -728,9 +725,9 @@ namespace Terminal.Gui {
 				case TextAlignment.Centered:
 				case TextAlignment.Justified:
 					return
-					    new string (' ', (int)Math.Floor (toPad / 2.0)) + // round down
-					    representation +
-					     new string (' ', (int)Math.Ceiling (toPad / 2.0)); // round up
+						new string (' ', (int)Math.Floor (toPad / 2.0)) + // round down
+						representation +
+						new string (' ', (int)Math.Ceiling (toPad / 2.0)); // round up
 				}
 			}
 
@@ -864,16 +861,16 @@ namespace Terminal.Gui {
 			SelectedColumn = col;
 			SelectedRow = row;
 			MultiSelectedRegions.Push (
-			    CreateTableSelection (col, row)
-			    );
+				CreateTableSelection (col, row)
+				);
 
 			// if the old cell was not part of a rectangular select
 			// or otherwise selected we need to retain it in the selection
 
 			if (!IsSelected (oldColumn, oldRow)) {
 				MultiSelectedRegions.Push (
-				    CreateTableSelection (oldColumn, oldRow)
-				    );
+					CreateTableSelection (oldColumn, oldRow)
+					);
 			}
 		}
 
@@ -1161,8 +1158,8 @@ namespace Terminal.Gui {
 		public override bool MouseEvent (MouseEvent me)
 		{
 			if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked) &&
-			    me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp &&
-			    me.Flags != MouseFlags.WheeledLeft && me.Flags != MouseFlags.WheeledRight)
+				me.Flags != MouseFlags.WheeledDown && me.Flags != MouseFlags.WheeledUp &&
+				me.Flags != MouseFlags.WheeledLeft && me.Flags != MouseFlags.WheeledRight)
 				return false;
 
 			if (!HasFocus && CanFocus) {
@@ -1630,8 +1627,8 @@ namespace Terminal.Gui {
 					// if this column accepts flexible width rendering and
 					// is therefore happy rendering into less space
 					if (colStyle != null && colStyle.MinAcceptableWidth > 0 &&
-					    // is there enough space to meet the MinAcceptableWidth
-					    (availableHorizontalSpace - usedSpace) >= colStyle.MinAcceptableWidth) {
+						// is there enough space to meet the MinAcceptableWidth
+						(availableHorizontalSpace - usedSpace) >= colStyle.MinAcceptableWidth) {
 						// show column and use use whatever space is 
 						// left for rendering it
 						showColumn = true;
