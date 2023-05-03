@@ -249,6 +249,7 @@ namespace Terminal.Gui {
 			base.Redraw (bounds);
 
 			Move (0, 0);
+			var frame = Frame;
 
 			// What columns to render at what X offset in viewport
 			var columnsToRender = CalculateViewport (bounds).ToArray ();
@@ -274,7 +275,7 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (Style.LineColor);
 			else
 				Driver.SetAttribute (this.ColorScheme.Normal);
-			RenderCellLines (width, Table.Rows.Count, columnsToRender);
+			RenderCellLines (width, Table.Rows, columnsToRender);
 
 			foreach (var p in grid.GetMap (bounds)) {
 				this.AddRune (p.Key.X, p.Key.Y, p.Value);
@@ -317,7 +318,7 @@ namespace Terminal.Gui {
 					var current = columnsToRender [i];
 
 					var colStyle = Style.GetColumnStyleIfAny (current.Column);
-					var colName = current.Column.ColumnName;
+					var colName = Table.ColumnNames [i];
 
 					//RenderSeparator (current.X - 1, yh, true);
 
