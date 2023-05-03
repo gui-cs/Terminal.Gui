@@ -318,7 +318,7 @@ namespace Terminal.Gui {
 					var current = columnsToRender [i];
 
 					var colStyle = Style.GetColumnStyleIfAny (current.Column);
-					var colName = Table.ColumnNames [i];
+					var colName = table.ColumnNames [current.Column];
 
 					//RenderSeparator (current.X - 1, yh, true);
 
