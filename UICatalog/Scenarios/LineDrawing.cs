@@ -68,16 +68,16 @@ namespace UICatalog.Scenarios {
 				grid.AddLine (new Point (0, 2), width + 1, Orientation.Horizontal, LineStyle.Single);
 				grid.AddLine (new Point (0, 4), width + 1, Orientation.Horizontal, LineStyle.Single);
 			}
-			public override void Redraw (Rect bounds)
+
+			public override void OnDrawContent (Rect contentArea)
 			{
-				base.Redraw (bounds);
+				base.OnDrawContent (contentArea);
 
 				Driver.SetAttribute (new Terminal.Gui.Attribute (Color.DarkGray, ColorScheme.Normal.Background));
-				
-				
-				foreach(var p in grid.GetMap(bounds))
-				{
-					this.AddRune(p.Key.X,p.Key.Y,p.Value);
+
+
+				foreach (var p in grid.GetMap (Bounds)) {
+					this.AddRune (p.Key.X, p.Key.Y, p.Value);
 				}
 
 				foreach (var swatch in swatches) {
@@ -192,9 +192,9 @@ namespace UICatalog.Scenarios {
 				currentColor = canvases.Count - 1;
 			}
 
-			public override void Redraw (Rect bounds)
+			public override void OnDrawContent (Rect contentArea)
 			{
-				base.Redraw (bounds);
+				base.OnDrawContent (contentArea);
 
 				foreach (var kvp in colorLayers) {
 
@@ -202,12 +202,12 @@ namespace UICatalog.Scenarios {
 
 					var canvas = canvases [kvp.Value];
 
-					foreach(var p in canvas.GetMap(bounds))
-					{
-						this.AddRune(p.Key.X,p.Key.Y,p.Value);
+					foreach (var p in canvas.GetMap (Bounds)) {
+						this.AddRune (p.Key.X, p.Key.Y, p.Value);
 					}
 				}
 			}
+
 			public override bool OnMouseEvent (MouseEvent mouseEvent)
 			{
 
@@ -229,13 +229,12 @@ namespace UICatalog.Scenarios {
 							length = end.X - start.X;
 						}
 
-						if(length > 0) {
+						if (length > 0) {
 							length++;
-						}
-						else {
+						} else {
 							length--;
 						}
-						
+
 
 						canvases [currentColor].AddLine (
 							start,

@@ -170,7 +170,7 @@ namespace Terminal.Gui {
 		public CollectionNavigatorBase CollectionNavigator { get; set; }
 
 		/// <summary>
-		/// Initialzies a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. 
+		/// Initializes a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. 
 		/// </summary>
 		/// <param name="table">The table to display in the control</param>
 		public TableView (ITableSource table) : this ()
@@ -179,7 +179,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initialzies a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. Set the <see cref="Table"/> property to begin editing
+		/// Initializes a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. Set the <see cref="Table"/> property to begin editing
 		/// </summary>
 		public TableView () : base ()
 		{
@@ -243,9 +243,9 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDrawContent (Rect contentArea)
 		{
-			base.Redraw (bounds);
+			base.OnDrawContent (contentArea);
 
 			Move (0, 0);
 
@@ -253,12 +253,12 @@ namespace Terminal.Gui {
 			scrollLeftPoint = null;
 
 			// What columns to render at what X offset in viewport
-			var columnsToRender = CalculateViewport (bounds).ToArray ();
+			var columnsToRender = CalculateViewport (Bounds).ToArray ();
 
 			Driver.SetAttribute (GetNormalColor ());
 
 			//invalidate current row (prevents scrolling around leaving old characters in the frame
-			Driver.AddStr (new string (' ', bounds.Width));
+			Driver.AddStr (new string (' ', Bounds.Width));
 
 			int line = 0;
 
@@ -270,7 +270,7 @@ namespace Terminal.Gui {
 					└────────────────────┴──────────┴───────────┴──────────────┴─────────┘
 				*/
 				if (Style.ShowHorizontalHeaderOverline) {
-					RenderHeaderOverline (line, bounds.Width, columnsToRender);
+					RenderHeaderOverline (line, Bounds.Width, columnsToRender);
 					line++;
 				}
 
@@ -280,7 +280,7 @@ namespace Terminal.Gui {
 				}
 
 				if (Style.ShowHorizontalHeaderUnderline) {
-					RenderHeaderUnderline (line, bounds.Width, columnsToRender);
+					RenderHeaderUnderline (line, Bounds.Width, columnsToRender);
 					line++;
 				}
 			}
@@ -290,7 +290,7 @@ namespace Terminal.Gui {
 			//render the cells
 			for (; line < Bounds.Height; line++) {
 
-				ClearLine (line, bounds.Width);
+				ClearLine (line, Bounds.Width);
 
 				//work out what Row to render
 				var rowToRender = RowOffset + (line - headerLinesConsumed);
@@ -303,7 +303,7 @@ namespace Terminal.Gui {
 				if (rowToRender >= Table.Rows) {
 
 					if (rowToRender == Table.Rows && Style.ShowHorizontalBottomline) {
-						RenderBottomLine (line, bounds.Width, columnsToRender);
+						RenderBottomLine (line, Bounds.Width, columnsToRender);
 					}
 
 					continue;
@@ -373,7 +373,7 @@ namespace Terminal.Gui {
 					}
 					  // if the next console column is the lastcolumns end
 					  else if (Style.ExpandLastColumn == false &&
-						   columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c)) {
+						columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c)) {
 						rune = Driver.TopTee;
 					}
 				}
@@ -419,8 +419,8 @@ namespace Terminal.Gui {
 		private void RenderHeaderUnderline (int row, int availableWidth, ColumnToRender [] columnsToRender)
 		{
 			/*
-			 *  First lets work out if we should be rendering scroll indicators
-			 */
+			*  First lets work out if we should be rendering scroll indicators
+			*/
 
 			// are there are visible columns to the left that have been pushed
 			// off the screen due to horizontal scrolling?
@@ -445,8 +445,8 @@ namespace Terminal.Gui {
 			}
 
 			/*
-			 *  Now lets draw the line itself
-			 */
+			*  Now lets draw the line itself
+			*/
 
 			// Renders a line below the table headers (when visible) like:
 			// ├──────────┼───────────┼───────────────────┼──────────┼────────┼─────────────┤
@@ -493,7 +493,7 @@ namespace Terminal.Gui {
 					}
 					  // if the next console column is the lastcolumns end
 					  else if (Style.ExpandLastColumn == false &&
-							  columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c)) {
+						columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c)) {
 						rune = Style.ShowVerticalCellLines ? '┼' : Driver.BottomTee;
 					}
 				}
@@ -519,19 +519,16 @@ namespace Terminal.Gui {
 						// for first character render line
 						rune = Driver.LLCorner;
 
-					}
-					// if the next column is the start of a header
-					else if (columnsToRender.Any (r => r.X == c + 1)) {
+					} else if (columnsToRender.Any (r => r.X == c + 1)) {
+						// if the next column is the start of a header
 						rune = Driver.BottomTee;
 					} else if (c == availableWidth - 1) {
-
 						// for the last character in the table
 						rune = Driver.LRCorner;
 
-					}
-					  // if the next console column is the lastcolumns end
-					  else if (Style.ExpandLastColumn == false &&
-							  columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c)) {
+					} else if (Style.ExpandLastColumn == false &&
+						  columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c)) {
+						// if the next console column is the lastcolumns end
 						rune = Driver.BottomTee;
 					}
 				}
@@ -730,7 +727,7 @@ namespace Terminal.Gui {
 					return
 						new string (' ', (int)Math.Floor (toPad / 2.0)) + // round down
 						representation +
-						 new string (' ', (int)Math.Ceiling (toPad / 2.0)); // round up
+						new string (' ', (int)Math.Ceiling (toPad / 2.0)); // round up
 				}
 			}
 
@@ -739,7 +736,7 @@ namespace Terminal.Gui {
 		}
 
 
-		
+
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
@@ -1109,7 +1106,7 @@ namespace Terminal.Gui {
 			}
 
 			return row == SelectedRow &&
-					(col == SelectedColumn || FullRowSelect);
+				(col == SelectedColumn || FullRowSelect);
 		}
 
 		private IEnumerable<TableSelection> GetMultiSelectedRegionsContaining (int col, int row)

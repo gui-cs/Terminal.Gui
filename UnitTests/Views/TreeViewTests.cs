@@ -740,7 +740,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			tv.ColorScheme = new ColorScheme ();
 			tv.LayoutSubviews ();
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			TestHelpers.AssertDriverContentsAre (
 @"├-normal
@@ -757,7 +757,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			tv.Collapse (n1);
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			TestHelpers.AssertDriverContentsAre (
 @"├+normal
@@ -789,7 +789,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			tv.ColorScheme = new ColorScheme ();
 			tv.LayoutSubviews ();
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			TestHelpers.AssertDriverContentsAre (
 @"├-normal
@@ -806,7 +806,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Collapse (n1);
 
 			tv.LayoutSubviews ();
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			TestHelpers.AssertDriverContentsAre (
 @"├+normal
@@ -821,7 +821,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.ScrollOffsetVertical = 1;
 
 			tv.LayoutSubviews ();
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			TestHelpers.AssertDriverContentsAre (
 @"└─pink
@@ -852,7 +852,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			tv.ColorScheme = new ColorScheme ();
 			tv.LayoutSubviews ();
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			// Normal drawing of the tree view
 			TestHelpers.AssertDriverContentsAre (
@@ -882,7 +882,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			// redraw now that the custom color
 			// delegate is registered
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			// Same text
 			TestHelpers.AssertDriverContentsAre (
