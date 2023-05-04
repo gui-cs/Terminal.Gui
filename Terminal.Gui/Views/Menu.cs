@@ -1988,6 +1988,11 @@ namespace Terminal.Gui {
 								Activate (i);
 						}
 						return true;
+					} else if (i == Menus.Length - 1 && me.Flags == MouseFlags.Button1Clicked) {
+						if (IsMenuOpen && !Menus [i].IsTopLevel) {
+							CloseAllMenus ();
+							return true;
+					}
 					}
 					pos += leftPadding + Menus [i].TitleLength + rightPadding;
 				}
