@@ -551,7 +551,7 @@ namespace Terminal.Gui {
 			return GetNormalColor ();
 		}
 
-		public override void Redraw (Rect bounds)
+		public override void OnDrawContent (Rect contentArea)
 		{
 			if (barItems.Children == null) {
 				return;
@@ -674,7 +674,7 @@ namespace Terminal.Gui {
 
 		private void Current_DrawContentComplete (object sender, DrawEventArgs e)
 		{
-			Redraw (e.Rect);
+			OnDrawContent (Bounds);
 		}
 
 		public override void PositionCursor ()
@@ -1222,7 +1222,7 @@ namespace Terminal.Gui {
 		// Spaces after the submenu Title, before Help
 		static int parensAroundHelp = 3;
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDrawContent (Rect contentArea)
 		{
 			Move (0, 0);
 			Driver.SetAttribute (GetNormalColor ());

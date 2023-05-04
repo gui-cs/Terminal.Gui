@@ -147,7 +147,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (menu.IsMenuOpen);
 			isMenuClosed = !menu.IsMenuOpen;
 			Assert.False (isMenuClosed);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			var expected = @"
 Edit
 ┌──────────────────────────────┐
@@ -160,7 +160,7 @@ Edit
 			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (isMenuClosed);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			expected = @"
 Edit
 ┌──────────────────────────────┐
@@ -173,7 +173,7 @@ Edit
 			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 			Assert.True (isMenuClosed);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			expected = @"
 Edit
 ";
@@ -706,7 +706,7 @@ Edit
 			Assert.Equal (Point.Empty, new Point (menu.Frame.X, menu.Frame.Y));
 			Assert.False (menu.UseSubMenusSingleFrame);
 
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			var expected = @"
  Numbers
 ";
@@ -714,7 +714,7 @@ Edit
 			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
 			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, null)));
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			expected = @"
  Numbers  
 ┌────────┐
@@ -727,7 +727,7 @@ Edit
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
 			Assert.True (Application.Top.Subviews [1].ProcessKey (new KeyEvent (Key.CursorDown, null)));
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			expected = @"
  Numbers                 
 ┌────────┐               
@@ -741,7 +741,7 @@ Edit
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
 			Assert.True (Application.Top.Subviews [2].ProcessKey (new KeyEvent (Key.CursorLeft, null)));
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			expected = @"
  Numbers  
 ┌────────┐
@@ -754,7 +754,7 @@ Edit
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
 			Assert.True (Application.Top.Subviews [1].ProcessKey (new KeyEvent (Key.Esc, null)));
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			expected = @"
  Numbers
 ";
@@ -782,7 +782,7 @@ Edit
 			Assert.Equal (Point.Empty, new Point (menu.Frame.X, menu.Frame.Y));
 			Assert.False (menu.UseSubMenusSingleFrame);
 
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			var expected = @"
  Numbers
 ";
@@ -796,7 +796,7 @@ Edit
 				Flags = MouseFlags.Button1Pressed,
 				View = menu
 			}));
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			expected = @"
  Numbers  
 ┌────────┐
@@ -815,7 +815,7 @@ Edit
 				Flags = MouseFlags.ReportMousePosition,
 				View = Application.Top.Subviews [1]
 			}));
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			expected = @"
  Numbers                 
 ┌────────┐               
@@ -835,7 +835,7 @@ Edit
 				Flags = MouseFlags.ReportMousePosition,
 				View = Application.Top.Subviews [1]
 			}));
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			expected = @"
  Numbers  
 ┌────────┐
@@ -854,7 +854,7 @@ Edit
 				Flags = MouseFlags.Button1Clicked,
 				View = Application.Top
 			}));
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			expected = @"
  Numbers
 ";
@@ -885,7 +885,7 @@ Edit
 			menu.UseSubMenusSingleFrame = true;
 			Assert.True (menu.UseSubMenusSingleFrame);
 
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			var expected = @"
  Numbers
 ";
@@ -894,7 +894,7 @@ Edit
 			Assert.Equal (new Rect (1, 0, 8, 1), pos);
 
 			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, null)));
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			expected = @"
  Numbers  
 ┌────────┐
@@ -909,7 +909,7 @@ Edit
 
 			Assert.True (Application.Top.Subviews [1].ProcessKey (new KeyEvent (Key.CursorDown, null)));
 			Assert.True (Application.Top.Subviews [1].ProcessKey (new KeyEvent (Key.Enter, null)));
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			expected = @"
  Numbers       
 ┌─────────────┐
@@ -924,7 +924,7 @@ Edit
 			Assert.Equal (new Rect (1, 0, 15, 7), pos);
 
 			Assert.True (Application.Top.Subviews [2].ProcessKey (new KeyEvent (Key.Enter, null)));
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			expected = @"
  Numbers  
 ┌────────┐
@@ -938,7 +938,7 @@ Edit
 			Assert.Equal (new Rect (1, 0, 10, 6), pos);
 
 			Assert.True (Application.Top.Subviews [1].ProcessKey (new KeyEvent (Key.Esc, null)));
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			expected = @"
  Numbers
 ";
@@ -969,7 +969,7 @@ Edit
 			menu.UseSubMenusSingleFrame = true;
 			Assert.True (menu.UseSubMenusSingleFrame);
 
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			var expected = @"
  Numbers
 ";
@@ -983,7 +983,7 @@ Edit
 				Flags = MouseFlags.Button1Pressed,
 				View = menu
 			}));
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			expected = @"
  Numbers  
 ┌────────┐
@@ -1002,7 +1002,7 @@ Edit
 				Flags = MouseFlags.Button1Clicked,
 				View = Application.Top.Subviews [1]
 			}));
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			expected = @"
  Numbers       
 ┌─────────────┐
@@ -1022,7 +1022,7 @@ Edit
 				Flags = MouseFlags.Button1Clicked,
 				View = Application.Top.Subviews [2]
 			}));
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			expected = @"
  Numbers  
 ┌────────┐
@@ -1041,7 +1041,7 @@ Edit
 				Flags = MouseFlags.Button1Clicked,
 				View = Application.Top
 			}));
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			expected = @"
  Numbers
 ";
@@ -1074,7 +1074,7 @@ Edit
 			Assert.False (menu.OnKeyDown (new (Key.AltMask, new KeyModifiers () { Alt = true })));
 			Assert.True (menu.OnKeyUp (new (Key.AltMask, new KeyModifiers () { Alt = true })));
 			Assert.True (menu.IsMenuOpen);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			var expected = @"
  File  Edit
 ";
@@ -1088,7 +1088,7 @@ Edit
 
 			Assert.True (menu.ProcessHotKey (new (Key.AltMask, new KeyModifiers () { Alt = true })));
 			Assert.True (menu.IsMenuOpen);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			expected = @"
  File  Edit
 ";
@@ -1206,13 +1206,13 @@ Edit
 			Application.Top.Add (menu);
 			Application.Begin (Application.Top);
 
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
 
 			for (var i = 0; i < expectedMenu.Menus.Length; i++) {
 				menu.OpenMenu (i);
 				Assert.True (menu.IsMenuOpen);
-				Application.Top.Redraw (Application.Top.Bounds);
+				Application.Top.Draw ();
 				TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (i), output);
 			}
 		}
@@ -1251,7 +1251,7 @@ Edit
 
 			Assert.True (menu.ProcessHotKey (new (Key.AltMask | Key.F, new KeyModifiers () { Alt = true })));
 			Assert.True (menu.IsMenuOpen);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), output);
 
 			Assert.True (Application.Top.Subviews [1].ProcessKey (new (Key.N, null)));
@@ -1260,7 +1260,7 @@ Edit
 
 			Assert.True (menu.ProcessHotKey (new (Key.AltMask | Key.E, new KeyModifiers () { Alt = true })));
 			Assert.True (menu.IsMenuOpen);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (1), output);
 
 			Assert.True (Application.Top.Subviews [1].ProcessKey (new (Key.C, null)));
@@ -1297,19 +1297,19 @@ Edit
 			// Open first
 			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), output);
 
 			// Open second
 			Assert.True (Application.Top.Subviews [1].ProcessKey (new (Key.CursorRight, null)));
 			Assert.True (menu.IsMenuOpen);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (1), output);
 
 			// Close menu
 			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
 
 			Application.Top.Remove (menu);
@@ -1329,19 +1329,19 @@ Edit
 			// Open first
 			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), output);
 
 			// Open second
 			Assert.True (Application.Top.Subviews [1].ProcessKey (new (Key.CursorRight, null)));
 			Assert.True (menu.IsMenuOpen);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (1), output);
 
 			// Close menu
 			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
 		}
 
@@ -1373,13 +1373,13 @@ Edit
 
 			Assert.True (menu.MouseEvent (new MouseEvent () { X = 1, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }));
 			Assert.True (menu.IsMenuOpen);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), output);
 
 			Assert.True (menu.MouseEvent (new MouseEvent () { X = 1, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }));
 			Assert.False (menu.IsMenuOpen);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
 		}
 
@@ -1436,37 +1436,37 @@ Edit
 			Assert.True (menu.MouseEvent (new MouseEvent () { X = 1, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }));
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (tf.HasFocus);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), output);
 
 			Assert.True (menu.MouseEvent (new MouseEvent () { X = 8, Y = 0, Flags = MouseFlags.ReportMousePosition, View = menu }));
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (tf.HasFocus);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (1), output);
 
 			Assert.True (menu.MouseEvent (new MouseEvent () { X = 15, Y = 0, Flags = MouseFlags.ReportMousePosition, View = menu }));
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (tf.HasFocus);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (2), output);
 
 			Assert.True (menu.MouseEvent (new MouseEvent () { X = 8, Y = 0, Flags = MouseFlags.ReportMousePosition, View = menu }));
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (tf.HasFocus);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
 
 			Assert.True (menu.MouseEvent (new MouseEvent () { X = 1, Y = 0, Flags = MouseFlags.ReportMousePosition, View = menu }));
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (tf.HasFocus);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), output);
 
 			Assert.True (menu.MouseEvent (new MouseEvent () { X = 8, Y = 0, Flags = MouseFlags.Button1Pressed, View = menu }));
 			Assert.False (menu.IsMenuOpen);
 			Assert.True (tf.HasFocus);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
 		}
 
@@ -1499,40 +1499,40 @@ Edit
 			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (tf.HasFocus);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), output);
 
 			// Right - Edit has no sub menu; this tests that no sub menu shows
 			Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (tf.HasFocus);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (1), output);
 
 			// Right - Format
 			Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (tf.HasFocus);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (2), output);
 
 			// Left - Edit
 			Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (tf.HasFocus);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (1), output);
 
 			Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (tf.HasFocus);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), output);
 
 			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 			Assert.True (tf.HasFocus);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
 		}
 
@@ -1596,7 +1596,7 @@ Edit
 				Flags = MouseFlags.Button1Pressed,
 				View = menu
 			}));
-			top.Redraw (top.Bounds);
+			top.Draw ();
 			TestHelpers.AssertDriverColorsAre (@"
 11111100000000
 00000000000000
@@ -1612,7 +1612,7 @@ Edit
 				Flags = MouseFlags.Button1Clicked,
 				View = top.Subviews [1]
 			}));
-			top.Subviews [1].Redraw (top.Bounds);
+			top.Subviews [1].Draw ();
 			TestHelpers.AssertDriverColorsAre (@"
 11111100000000
 00000000000000
@@ -1628,7 +1628,7 @@ Edit
 				Flags = MouseFlags.ReportMousePosition,
 				View = top.Subviews [1]
 			}));
-			top.Subviews [1].Redraw (top.Bounds);
+			top.Subviews [1].Draw ();
 			TestHelpers.AssertDriverColorsAre (@"
 11111100000000
 00000000000000
@@ -1775,7 +1775,7 @@ Edit
 └──────────────────────────────────────┘", output);
 
 			Assert.True (win.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
-			top.Redraw (top.Bounds);
+			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1799,7 +1799,7 @@ Edit
 └──────────────────────────────────────┘", output);
 
 			Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
-			top.Redraw (top.Bounds);
+			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1811,7 +1811,7 @@ Edit
 └──────────────────────────────────────┘", output);
 
 			Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
-			top.Redraw (top.Bounds);
+			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -2237,7 +2237,7 @@ wo
 			Assert.False (menu.UseSubMenusSingleFrame);
 
 			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, null)));
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			var expected = @"
  Numbers
  One    
@@ -2248,7 +2248,7 @@ wo
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
 			Assert.True (Application.Top.Subviews [1].ProcessKey (new KeyEvent (Key.CursorDown, null)));
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			expected = @"
  Numbers         
  One             
@@ -2283,7 +2283,7 @@ wo
 
 
 			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, null)));
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			var expected = @"
  Numbers
  One    
@@ -2295,7 +2295,7 @@ wo
 
 			Assert.True (Application.Top.Subviews [1].ProcessKey (new KeyEvent (Key.CursorDown, null)));
 			Assert.True (Application.Top.Subviews [1].ProcessKey (new KeyEvent (Key.Enter, null)));
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			expected = @"
  Numbers   
 ◄   Two    

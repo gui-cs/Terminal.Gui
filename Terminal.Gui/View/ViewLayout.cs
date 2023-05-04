@@ -198,7 +198,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// The View-relative rectangle where View content is displayed. SubViews are positioned relative to 
-		/// Bounds.<see cref="Rect.Location">Location</see> (which is always (0, 0)) and <see cref="Redraw(Rect)"/> clips drawing to 
+		/// Bounds.<see cref="Rect.Location">Location</see> (which is always (0, 0)) and <see cref="Draw()"/> clips drawing to 
 		/// Bounds.<see cref="Rect.Size">Size</see>.
 		/// </summary>
 		/// <value>The bounds.</value>
@@ -473,13 +473,13 @@ namespace Terminal.Gui {
 			if (LayoutNeeded)
 				return;
 			LayoutNeeded = true;
-			if (SuperView == null)
-				return;
-			SuperView.SetNeedsLayout ();
 			foreach (var view in Subviews) {
 				view.SetNeedsLayout ();
 			}
 			TextFormatter.NeedsFormat = true;
+			if (SuperView == null)
+				return;
+			SuperView.SetNeedsLayout ();
 		}
 
 		/// <summary>
@@ -498,27 +498,11 @@ namespace Terminal.Gui {
 		/// <param name="y">Y screen-coordinate point.</param>
 		public Point ScreenToView (int x, int y)
 		{
+			Point boundsOffset = SuperView == null ? Point.Empty : SuperView.GetBoundsOffset ();
 			if (SuperView == null) {
-				return new Point (x - Frame.X, y - Frame.Y);
-			} else {
-				var parent = SuperView.ScreenToView (x, y);
-				return new Point (parent.X - Frame.X, parent.Y - Frame.Y);
-			}
-		}
-
-		/// <summary>
-		/// Converts a point from screen-relative coordinates to bounds-relative coordinates.
-		/// </summary>
-		/// <returns>The mapped point.</returns>
-		/// <param name="x">X screen-coordinate point.</param>
-		/// <param name="y">Y screen-coordinate point.</param>
-		public Point ScreenToBounds (int x, int y)
-		{
-			if (SuperView == null) {
-				var boundsOffset = GetBoundsOffset ();
 				return new Point (x - Frame.X + boundsOffset.X, y - Frame.Y + boundsOffset.Y);
 			} else {
-				var parent = SuperView.ScreenToView (x, y);
+				var parent = SuperView.ScreenToView (x - boundsOffset.X, y - boundsOffset.Y);
 				return new Point (parent.X - Frame.X, parent.Y - Frame.Y);
 			}
 		}

@@ -177,26 +177,26 @@ namespace Terminal.Gui {
 
 
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDrawContent (Rect contentArea)
 		{
 			Move (0, 0);
 			Driver.SetAttribute (GetNormalColor ());
 
 			if (Style.ShowBorder) {
-				
+
 				// How much space do we need to leave at the bottom to show the tabs
 				int spaceAtBottom = Math.Max (0, GetTabHeight (false) - 1);
 				int startAtY = Math.Max (0, GetTabHeight (true) - 1);
 
-				Border.DrawFrame (new Rect (0, startAtY, bounds.Width,
-				Math.Max (bounds.Height - spaceAtBottom - startAtY, 0)), false);
+				Border.DrawFrame (new Rect (0, startAtY, Bounds.Width,
+				Math.Max (Bounds.Height - spaceAtBottom - startAtY, 0)), false);
 			}
 
 			if (Tabs.Any ()) {
-				tabsBar.Redraw (tabsBar.Bounds);
+				tabsBar.OnDrawContent (contentArea);
 				contentView.SetNeedsDisplay ();
 				var savedClip = contentView.ClipToBounds ();
-				contentView.Redraw (contentView.Bounds);
+				contentView.Draw ();
 				Driver.Clip = savedClip;
 			}
 		}
@@ -468,10 +468,10 @@ namespace Terminal.Gui {
 				return base.OnEnter (view);
 			}
 
-			public override void Redraw (Rect bounds)
+			public override void OnDrawContent (Rect contentArea)
 			{
-				var tabLocations = host.CalculateViewport (bounds).ToArray ();
-				var width = bounds.Width;
+				var tabLocations = host.CalculateViewport (Bounds).ToArray ();
+				var width = Bounds.Width;
 				Driver.SetAttribute (GetNormalColor ());
 
 				if (host.Style.ShowTopLine) {
@@ -482,7 +482,6 @@ namespace Terminal.Gui {
 
 				RenderUnderline (tabLocations, width);
 				Driver.SetAttribute (GetNormalColor ());
-
 			}
 
 			/// <summary>

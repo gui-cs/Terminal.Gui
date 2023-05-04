@@ -302,7 +302,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			cm.Show ();
 			Assert.Equal (new Point (70, 24), cm.Position);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 
 			var expected = @"
                                                                       ┌──────┐
@@ -336,7 +336,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Point (10, 5), cm.Position);
 
 			cm.Show ();
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			Assert.Equal (new Point (10, 5), cm.Position);
 
 			var expected = @"
@@ -357,7 +357,7 @@ namespace Terminal.Gui.ViewsTests {
 			cm.Host.Height = 3;
 
 			cm.Show ();
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			Assert.Equal (new Point (5, 12), cm.Position);
 
 			expected = @"
@@ -590,7 +590,7 @@ namespace Terminal.Gui.ViewsTests {
 			tf.ContextMenu.Show ();
 			Assert.True (ContextMenu.IsShow);
 			Assert.Equal (new Point (9, 3), tf.ContextMenu.Position);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			var expected = @"
  File  Edit                     
                                 
@@ -654,7 +654,7 @@ namespace Terminal.Gui.ViewsTests {
 			tf.ContextMenu.Show ();
 			Assert.True (ContextMenu.IsShow);
 			Assert.Equal (new Point (10, 5), tf.ContextMenu.Position);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			var expected = @"
  File  Edit                                 
 ┌──────────────────────────────────────────┐
