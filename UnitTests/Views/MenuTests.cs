@@ -1690,7 +1690,7 @@ Edit
 └──────────────────────────────────────┘", output);
 
 				Assert.True (win.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
-				top.Redraw (top.Bounds);
+				top.Draw ();
 				TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1714,7 +1714,7 @@ Edit
 └──────────────────────────────────────┘", output);
 
 				Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
-				top.Redraw (top.Bounds);
+				top.Draw();
 				TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1726,7 +1726,7 @@ Edit
 └──────────────────────────────────────┘", output);
 
 				Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
-				top.Redraw (top.Bounds);
+				top.Draw();
 				TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1853,7 +1853,7 @@ Edit
 └──────────────────────────────────────┘", output);
 
 			Assert.True (win.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
-			win.Redraw (win.Bounds);
+			win.Draw();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1877,7 +1877,7 @@ Edit
 └──────────────────────────────────────┘", output);
 
 			Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
-			win.Redraw (win.Bounds);
+			win.Draw();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1889,7 +1889,7 @@ Edit
 └──────────────────────────────────────┘", output);
 
 			Assert.True (menu.openMenu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
-			win.Redraw (win.Bounds);
+			win.Draw();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1920,7 +1920,7 @@ Edit
 └──────────────────────────────────────┘", output);
 
 				Assert.True (top.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
-				top.Redraw (top.Bounds);
+				top.Draw();
 				TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1944,7 +1944,7 @@ Edit
 └──────────────────────────────────────┘", output);
 
 				Assert.True (((MenuBar)top.Subviews [0]).openMenu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
-				top.Redraw (top.Bounds);
+				top.Draw();
 				TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1956,7 +1956,7 @@ Edit
 └──────────────────────────────────────┘", output);
 
 				Assert.True (((MenuBar)top.Subviews [0]).openMenu.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
-				top.Redraw (top.Bounds);
+				top.Draw();
 				TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
