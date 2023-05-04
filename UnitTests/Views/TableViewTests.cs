@@ -19,6 +19,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			this.output = output;
 		}
+
 		[Fact]
 		public void EnsureValidScrollOffsets_WithNoCells ()
 		{
@@ -84,10 +85,10 @@ namespace Terminal.Gui.ViewsTests {
 
 			// Set a table with 1 column
 			tableView.Table = BuildTable (1, 50, out var dt);
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 
 			dt.Columns.Remove (dt.Columns [0]);
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 		}
 
 		[Fact]
@@ -454,7 +455,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Style.ShowHorizontalHeaderOverline = false;
 			tv.Style.ShowHorizontalHeaderUnderline = false;
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			string expected = @"
 │1│2│
@@ -471,7 +472,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Style.ShowHorizontalHeaderOverline = true;
 			tv.Style.ShowHorizontalHeaderUnderline = false;
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			string expected = @"
 ┌─┬─┐
@@ -492,7 +493,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Style.ShowHorizontalScrollIndicators = true;
 
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			string expected = @"
 ├─┼─►
@@ -514,7 +515,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Style.ShowHorizontalScrollIndicators = true;
 
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			string expected = @"
 ┌─┬─┐
@@ -532,7 +533,7 @@ namespace Terminal.Gui.ViewsTests {
 			// the thing we are testing
 			tv.Style.ExpandLastColumn = true;
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			string expected = @"
 ┌─┬──────┐
@@ -554,7 +555,7 @@ namespace Terminal.Gui.ViewsTests {
 			// the thing we are testing
 			tv.Style.ExpandLastColumn = false;
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			string expected = @"
 ┌─┬─┬────┐
@@ -578,7 +579,7 @@ namespace Terminal.Gui.ViewsTests {
 			// width exactly matches the max col widths
 			tv.Bounds = new Rect (0, 0, 5, 4);
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			string expected = @"
 ┌─┬─┐
@@ -815,7 +816,7 @@ namespace Terminal.Gui.ViewsTests {
 			// when the view is/isn't focused 
 			setFocusMethod.Invoke (tv, new object [] { focused, tv, true });
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			string expected = @"
 ┌─┬─┐
@@ -859,7 +860,7 @@ namespace Terminal.Gui.ViewsTests {
 			// when the view is/isn't focused 
 			setFocusMethod.Invoke (tv, new object [] { focused, tv, true });
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			string expected = @"
 ┌─┬─┐
@@ -915,7 +916,7 @@ namespace Terminal.Gui.ViewsTests {
 			// when the view is/isn't focused 
 			setFocusMethod.Invoke (tv, new object [] { focused, tv, true });
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			string expected = @"
 ┌─┬─┐
@@ -946,7 +947,7 @@ namespace Terminal.Gui.ViewsTests {
 			// the value 2)
 			dt.Rows [0] [1] = 5;
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			expected = @"
 ┌─┬─┐
 │A│B│
@@ -1005,7 +1006,7 @@ namespace Terminal.Gui.ViewsTests {
 			// when the view is/isn't focused 
 			setFocusMethod.Invoke (tv, new object [] { focused, tv, true });
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			string expected = @"
 ┌─┬─┐
@@ -1036,7 +1037,7 @@ namespace Terminal.Gui.ViewsTests {
 			// the value 2)
 			dt.Rows [0] [1] = 5;
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			expected = @"
 ┌─┬─┐
 │A│B│
@@ -1149,7 +1150,7 @@ namespace Terminal.Gui.ViewsTests {
 			// select last visible column
 			tableView.SelectedColumn = 2; // column C
 
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 
 			string expected =
 				@"
@@ -1161,7 +1162,7 @@ namespace Terminal.Gui.ViewsTests {
 			// Scroll right
 			tableView.ProcessKey (new KeyEvent () { Key = Key.CursorRight });
 
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 
 			// Note that with SmoothHorizontalScrolling only a single new column
 			// is exposed when scrolling right.  This is not always the case though
@@ -1210,7 +1211,7 @@ namespace Terminal.Gui.ViewsTests {
 			// select last visible column
 			tableView.SelectedColumn = 2; // column C
 
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 
 			string expected =
 				@"
@@ -1222,7 +1223,7 @@ namespace Terminal.Gui.ViewsTests {
 			// Scroll right
 			tableView.ProcessKey (new KeyEvent () { Key = Key.CursorRight });
 
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 
 			// notice that without smooth scrolling we just update the first column
 			// rendered in the table to the newly exposed column (D).  This is fast
@@ -1276,7 +1277,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			tableView.Style.GetOrCreateColumnStyle (1).Visible = false;
 			tableView.LayoutSubviews ();
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 
 			string expected =
 				@"
@@ -1296,7 +1297,7 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.Style.GetOrCreateColumnStyle (0).Visible = false;
 
 			tableView.LayoutSubviews ();
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 
 			string expected =
 				@"
@@ -1315,7 +1316,6 @@ namespace Terminal.Gui.ViewsTests {
 			for (int i = 0; i < 6; i++) {
 				tableView.Style.GetOrCreateColumnStyle (i).Visible = false;
 			}
-
 			tableView.LayoutSubviews ();
 
 			// expect nothing to be rendered when all columns are invisible
@@ -1323,13 +1323,13 @@ namespace Terminal.Gui.ViewsTests {
 				@"
 ";
 
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// expect behavior to match when Table is null
 			tableView.Table = null;
 
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 			TestHelpers.AssertDriverContentsAre (expected, output);
 		}
 
@@ -1341,7 +1341,7 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.Style.ShowHorizontalScrollIndicators = true;
 			tableView.Style.ShowHorizontalHeaderUnderline = true;
 			tableView.LayoutSubviews ();
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 
 			// normally we should have scroll indicators because DEF are of screen
 			string expected =
@@ -1362,7 +1362,7 @@ namespace Terminal.Gui.ViewsTests {
 │A│B│C│
 ├─┼─┼─┤
 │1│2│3│";
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 			TestHelpers.AssertDriverContentsAre (expected, output);
 		}
 
@@ -1376,7 +1376,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			tableView.ColumnOffset = 1;
 			tableView.LayoutSubviews ();
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 
 			// normally we should have scroll indicators because A,E and F are of screen
 			string expected =
@@ -1396,7 +1396,7 @@ namespace Terminal.Gui.ViewsTests {
 │B│C│D│
 ◄─┼─┼─┤
 │2│3│4│";
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// now also A is invisible so we cannot scroll in either direction
@@ -1407,7 +1407,7 @@ namespace Terminal.Gui.ViewsTests {
 │B│C│D│
 ├─┼─┼─┤
 │2│3│4│";
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 			TestHelpers.AssertDriverContentsAre (expected, output);
 		}
 		[Fact, AutoInitShutdown]
@@ -1532,8 +1532,8 @@ namespace Terminal.Gui.ViewsTests {
 			// user has rectangular selection 
 			tableView.MultiSelectedRegions.Push (
 				new TableView.TableSelection (
-					new Point (0, 0),
-					new Rect (0, 0, 3, 1))
+				new Point (0, 0),
+				new Rect (0, 0, 3, 1))
 				);
 
 			Assert.Equal (3, tableView.GetAllSelectedCells ().Count ());
@@ -1816,7 +1816,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			tableView.Table = new DataTableSource (dt);
 			tableView.LayoutSubviews ();
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 
 			// default behaviour of TableView is not to render
 			// columns unless there is sufficient space
@@ -1838,7 +1838,7 @@ namespace Terminal.Gui.ViewsTests {
 			style.MaxWidth = 10;
 
 			tableView.LayoutSubviews ();
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 			expected =
 				@"
 │A│B│Very Long Column   │
@@ -1859,7 +1859,7 @@ namespace Terminal.Gui.ViewsTests {
 			};
 
 			tableView.LayoutSubviews ();
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 			expected =
 				@"
 │A│B│Very Long Column   │
@@ -1885,7 +1885,7 @@ namespace Terminal.Gui.ViewsTests {
 			style.MinAcceptableWidth = 5;
 
 			tableView.LayoutSubviews ();
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 			expected =
 				@"
 │A│B│Very Long Column   │
@@ -1903,7 +1903,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			tableView.Bounds = new Rect (0, 0, 9, 5);
 			tableView.LayoutSubviews ();
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 			expected =
 @"
 │A│B    │
@@ -1919,7 +1919,7 @@ namespace Terminal.Gui.ViewsTests {
 			// symbol (e.g. ┤ or │)
 			tableView.Bounds = new Rect (0, 0, 10, 5);
 			tableView.LayoutSubviews ();
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 			expected =
 @"
 │A│B│Very│
@@ -1962,7 +1962,7 @@ namespace Terminal.Gui.ViewsTests {
 			// select last visible column
 			tableView.SelectedColumn = 2; // column C
 
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 
 			// user can only scroll right so sees right indicator
 			// Because first column in table is A
@@ -1979,7 +1979,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			// since A is now pushed off screen we get indicator showing
 			// that user can scroll left to see first column
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 
 			expected =
 				@"
@@ -1993,7 +1993,7 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.ProcessKey (new KeyEvent () { Key = Key.CursorRight });
 			tableView.ProcessKey (new KeyEvent () { Key = Key.CursorRight });
 
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 
 			expected =
 				@"
@@ -2028,7 +2028,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (tv);
 			Application.Begin (Application.Top);
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			var expected =
 				@"
@@ -2062,7 +2062,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			}
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			expected =
 							@"
 00000000000000000000
@@ -2091,7 +2091,7 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.Style.SmoothHorizontalScrolling = true;
 			tableView.Style.ShowHorizontalBottomline = true;
 
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 
 			// user can only scroll right so sees right indicator
 			// Because first column in table is A
@@ -2121,7 +2121,7 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.Style.ShowHorizontalBottomline = true;
 			tableView.Style.ShowVerticalCellLines = false;
 
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 
 			// user can only scroll right so sees right indicator
 			// Because first column in table is A
@@ -2160,7 +2160,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (2, tv.SelectedRow);
 
 
-			tv.Redraw (tv.Bounds);
+			tv.OnDrawContent (tv.Bounds);
 
 			string expected =
 				@"
@@ -2176,7 +2176,7 @@ namespace Terminal.Gui.ViewsTests {
 			var normal = tv.ColorScheme.Normal;
 			var focus = tv.ColorScheme.HotFocus = new Attribute (Color.Magenta, Color.White);
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			// HotFocus color (1) should be used for rendering the selected line
 			// But should not spill into the borders.  Normal color (0) should be
@@ -2218,7 +2218,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (2, tv.SelectedRow);
 
 
-			tv.Redraw (tv.Bounds);
+			tv.OnDrawContent (tv.Bounds);
 
 			string expected =
 				@"
@@ -2234,7 +2234,7 @@ namespace Terminal.Gui.ViewsTests {
 			var normal = tv.ColorScheme.Normal;
 			var focus = tv.ColorScheme.HotFocus = new Attribute (Color.Magenta, Color.White);
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			// HotFocus color (1) should be used for cells only because
 			// AlwaysUseNormalColorForVerticalCellLines is true
@@ -2274,7 +2274,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (2, tv.SelectedRow);
 
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			string expected =
 				@"
@@ -2289,7 +2289,7 @@ A B C
 			var normal = tv.ColorScheme.Normal;
 			var focus = tv.ColorScheme.HotFocus = new Attribute (Color.Magenta, Color.White);
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			// HotFocus color (1) should be used for rendering the selected line
 			// Note that because there are no vertical cell lines we use the hot focus
@@ -2344,7 +2344,7 @@ A B C
 			tableView.BeginInit (); tableView.EndInit ();
 			tableView.LayoutSubviews ();
 
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 
 			// user can only scroll right so sees right indicator
 			// Because first column in table is A
@@ -2409,7 +2409,7 @@ A B C
 			var tableView = GetTwoRowSixColumnTable ();
 			tableView.LayoutSubviews ();
 
-			tableView.Redraw (tableView.Bounds);
+			tableView.Draw ();
 
 			// user can only scroll right so sees right indicator
 			// Because first column in table is A
@@ -2505,7 +2505,7 @@ A B C
 
 			tv.LayoutSubviews ();
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			string expected =
 				@"
@@ -2534,7 +2534,7 @@ A B C
 
 			tv.LayoutSubviews ();
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			string expected =
 				@"

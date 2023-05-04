@@ -751,7 +751,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDrawContent (Rect contentArea)
 		{
 			if (!Visible) {
 				return;
@@ -759,17 +759,17 @@ namespace Terminal.Gui {
 
 			if (!_needsDisplay.IsEmpty || _subViewNeedsDisplay || LayoutNeeded) {
 				Driver.SetAttribute (GetNormalColor ());
-				Clear (ViewToScreen (bounds));
+				Clear (ViewToScreen (Bounds));
 				LayoutSubviews ();
 				PositionToplevels ();
 
 				if (this == Application.OverlappedTop) {
 					foreach (var top in Application.OverlappedChildren.AsEnumerable ().Reverse ()) {
-						if (top.Frame.IntersectsWith (bounds)) {
+						if (top.Frame.IntersectsWith (Bounds)) {
 							if (top != this && !top.IsCurrentTop && !OutsideTopFrame (top) && top.Visible) {
 								top.SetNeedsLayout ();
 								top.SetNeedsDisplay (top.Bounds);
-								top.Redraw (top.Bounds);
+								top.Draw ();
 								top.OnRenderLineCanvas ();
 							}
 						}
@@ -777,13 +777,14 @@ namespace Terminal.Gui {
 				}
 
 				foreach (var view in Subviews) {
-					if (view.Frame.IntersectsWith (bounds) && !OutsideTopFrame (this)) {
+					if (view.Frame.IntersectsWith (Bounds) && !OutsideTopFrame (this)) {
 						view.SetNeedsLayout ();
 						view.SetNeedsDisplay (view.Bounds);
 						view.SetSubViewNeedsDisplay ();
 					}
 				}
-				base.Redraw (Bounds);
+
+				base.OnDrawContent (contentArea);
 
 				// This is causing the menus drawn incorrectly if UseSubMenusSingleFrame is true
 				//if (this.MenuBar != null && this.MenuBar.IsMenuOpen && this.MenuBar.openMenu != null) {

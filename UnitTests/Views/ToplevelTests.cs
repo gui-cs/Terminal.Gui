@@ -1026,7 +1026,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Rect (1, 3, 10, 5), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 5), view._needsDisplay);
 
-			view.Redraw (view.Bounds);
+			view.OnDrawContent (view.Bounds);
 			view.Frame = new Rect (1, 3, 10, 5);
 			Assert.Equal (new Rect (1, 3, 10, 5), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 5), view._needsDisplay);
@@ -1421,7 +1421,7 @@ namespace Terminal.Gui.ViewsTests {
 
 					var savedClip = Application.Driver.Clip;
 					Application.Driver.Clip = top.Frame;
-					view.Redraw (view.Bounds);
+					view.Draw ();
 					top.Move (2, 15);
 					View.Driver.AddStr ("One");
 					top.Move (2, 16);
