@@ -264,7 +264,7 @@ namespace Terminal.Gui {
 			}
 
 			var lastCol = columnsToRender [columnsToRender.Length - 1];
-			var width = bounds.Width;
+			var width = Bounds.Width;
 			if (!Style.ExpandLastColumn) {
 				width = lastCol.X + lastCol.Width;
 			}
@@ -277,7 +277,7 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (this.ColorScheme.Normal);
 			RenderCellLines (width, Table.Rows, columnsToRender);
 
-			foreach (var p in grid.GetMap (bounds)) {
+			foreach (var p in grid.GetMap (Bounds)) {
 				this.AddRune (p.Key.X, p.Key.Y, p.Value);
 			}
 
