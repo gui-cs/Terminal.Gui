@@ -270,7 +270,7 @@ namespace Terminal.Gui.DriverTests {
 					Assert.Equal (new Rect (0, 0, 20, 8), pos);
 
 					Assert.True (dlg.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
-					dlg.Redraw (dlg.Bounds);
+					dlg.Draw ();
 
 					expected = @"
 ┌──────────────────┐

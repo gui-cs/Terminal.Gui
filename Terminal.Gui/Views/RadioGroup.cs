@@ -190,9 +190,9 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDrawContent (Rect contentArea)
 		{
-			base.Redraw (bounds);
+			base.OnDrawContent (contentArea);
 
 			Driver.SetAttribute (GetNormalColor ());
 			for (int i = 0; i < radioLabels.Count; i++) {

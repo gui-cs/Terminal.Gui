@@ -215,7 +215,7 @@ namespace Terminal.Gui {
 			var y = GetAxisYPosition (graph);
 
 			graph.Move (screenPosition, y);
-			
+
 			// draw the tick on the axis
 			driver.AddRune (driver.TopTee);
 
@@ -282,7 +282,7 @@ namespace Terminal.Gui {
 
 				// Label or no label definetly render it
 				yield return toRender;
-				
+
 
 				current.X += Increment;
 			}
@@ -448,7 +448,7 @@ namespace Terminal.Gui {
 
 				// draw the axis symbol (and label if it has one)
 				yield return toRender;
-				
+
 
 				current.Y += Increment;
 			}

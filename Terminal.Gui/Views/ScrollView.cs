@@ -262,11 +262,15 @@ namespace Terminal.Gui {
 		/// <param name="view">The view to add to the scrollview.</param>
 		public override void Add (View view)
 		{
-			if (!IsOverridden (view, "MouseEvent")) {
-				view.MouseEnter += View_MouseEnter;
-				view.MouseLeave += View_MouseLeave;
+			if (view.Id == "contentBottomRightCorner") {
+				base.Add (view);
+			} else {
+				if (!IsOverridden (view, "MouseEvent")) {
+					view.MouseEnter += View_MouseEnter;
+					view.MouseLeave += View_MouseLeave;
+				}
+				contentView.Add (view);
 			}
-			contentView.Add (view);
 			SetNeedsLayout ();
 		}
 
@@ -289,25 +293,23 @@ namespace Terminal.Gui {
 		public bool ShowHorizontalScrollIndicator {
 			get => showHorizontalScrollIndicator;
 			set {
-				if (value == showHorizontalScrollIndicator) {
-					return;
-				}
-
-				showHorizontalScrollIndicator = value;
-				SetNeedsLayout ();
-				if (value) {
-					base.Add (horizontal);
-					horizontal.ShowScrollIndicator = value;
-					horizontal.AutoHideScrollBars = autoHideScrollBars;
-					horizontal.OtherScrollBarView = vertical;
-					horizontal.OtherScrollBarView.ShowScrollIndicator = value;
-					horizontal.MouseEnter += View_MouseEnter;
-					horizontal.MouseLeave += View_MouseLeave;
-				} else {
-					base.Remove (horizontal);
-					horizontal.OtherScrollBarView = null;
-					horizontal.MouseEnter -= View_MouseEnter;
-					horizontal.MouseLeave -= View_MouseLeave;
+				if (value != showHorizontalScrollIndicator) {
+					showHorizontalScrollIndicator = value;
+					SetNeedsLayout ();
+					if (value) {
+						horizontal.OtherScrollBarView = vertical;
+						base.Add (horizontal);
+						horizontal.ShowScrollIndicator = value;
+						horizontal.AutoHideScrollBars = autoHideScrollBars;
+						horizontal.OtherScrollBarView.ShowScrollIndicator = value;
+						horizontal.MouseEnter += View_MouseEnter;
+						horizontal.MouseLeave += View_MouseLeave;
+					} else {
+						base.Remove (horizontal);
+						horizontal.OtherScrollBarView = null;
+						horizontal.MouseEnter -= View_MouseEnter;
+						horizontal.MouseLeave -= View_MouseLeave;
+					}
 				}
 				vertical.Height = Dim.Fill (showHorizontalScrollIndicator ? 1 : 0);
 			}
@@ -330,32 +332,30 @@ namespace Terminal.Gui {
 		public bool ShowVerticalScrollIndicator {
 			get => showVerticalScrollIndicator;
 			set {
-				if (value == showVerticalScrollIndicator) {
-					return;
-				}
-
-				showVerticalScrollIndicator = value;
-				SetNeedsLayout ();
-				if (value) {
-					base.Add (vertical);
-					vertical.ShowScrollIndicator = value;
-					vertical.AutoHideScrollBars = autoHideScrollBars;
-					vertical.OtherScrollBarView = horizontal;
-					vertical.OtherScrollBarView.ShowScrollIndicator = value;
-					vertical.MouseEnter += View_MouseEnter;
-					vertical.MouseLeave += View_MouseLeave;
-				} else {
-					Remove (vertical);
-					vertical.OtherScrollBarView = null;
-					vertical.MouseEnter -= View_MouseEnter;
-					vertical.MouseLeave -= View_MouseLeave;
+				if (value != showVerticalScrollIndicator) {
+					showVerticalScrollIndicator = value;
+					SetNeedsLayout ();
+					if (value) {
+						vertical.OtherScrollBarView = horizontal;
+						base.Add (vertical);
+						vertical.ShowScrollIndicator = value;
+						vertical.AutoHideScrollBars = autoHideScrollBars;
+						vertical.OtherScrollBarView.ShowScrollIndicator = value;
+						vertical.MouseEnter += View_MouseEnter;
+						vertical.MouseLeave += View_MouseLeave;
+					} else {
+						Remove (vertical);
+						vertical.OtherScrollBarView = null;
+						vertical.MouseEnter -= View_MouseEnter;
+						vertical.MouseLeave -= View_MouseLeave;
+					}
 				}
 				horizontal.Width = Dim.Fill (showVerticalScrollIndicator ? 1 : 0);
 			}
 		}
 
 		/// <inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDrawContent (Rect contentArea)
 		{
 			SetViewsNeedsDisplay ();
 
@@ -363,22 +363,19 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (GetNormalColor ());
 			Clear ();
 
-			contentView.Redraw (contentView.Bounds);
-			OnDrawContent (new Rect (ContentOffset,
-				new Size (Math.Max (Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
-					Math.Max (Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0))));
+			contentView.Draw ();
 
 			if (autoHideScrollBars) {
 				ShowHideScrollBars ();
 			} else {
 				if (ShowVerticalScrollIndicator) {
 					//vertical.SetRelativeLayout (Bounds);
-					vertical.Redraw (vertical.Bounds);
+					vertical.Draw ();
 				}
 
 				if (ShowHorizontalScrollIndicator) {
 					//horizontal.SetRelativeLayout (Bounds);
-					horizontal.Redraw (horizontal.Bounds);
+					horizontal.Draw ();
 				}
 			}
 
@@ -445,11 +442,11 @@ namespace Terminal.Gui {
 
 			if (v) {
 				vertical.SetRelativeLayout (Bounds);
-				vertical.Redraw (vertical.Bounds);
+				vertical.Draw ();
 			}
 			if (h) {
 				horizontal.SetRelativeLayout (Bounds);
-				horizontal.Redraw (horizontal.Bounds);
+				horizontal.Draw ();
 			}
 		}
 
@@ -545,6 +542,7 @@ namespace Terminal.Gui {
 				me.Flags != MouseFlags.WheeledRight && me.Flags != MouseFlags.WheeledLeft &&
 				//				me.Flags != MouseFlags.Button1Pressed && me.Flags != MouseFlags.Button1Clicked &&
 				!me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
+
 				return false;
 			}
 

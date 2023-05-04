@@ -171,7 +171,7 @@ namespace Terminal.Gui {
 		public CollectionNavigatorBase CollectionNavigator { get; set; }
 
 		/// <summary>
-		/// Initialzies a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. 
+		/// Initializes a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. 
 		/// </summary>
 		/// <param name="table">The table to display in the control</param>
 		public TableView (ITableSource table) : this ()
@@ -180,7 +180,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initialzies a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. Set the <see cref="Table"/> property to begin editing
+		/// Initializes a <see cref="TableView"/> class using <see cref="LayoutStyle.Computed"/> layout. Set the <see cref="Table"/> property to begin editing
 		/// </summary>
 		public TableView () : base ()
 		{
@@ -244,20 +244,20 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDrawContent (Rect contentArea)
 		{
-			base.Redraw (bounds);
+			base.OnDrawContent (contentArea);
 
 			Move (0, 0);
 			var frame = Frame;
 
 			// What columns to render at what X offset in viewport
-			var columnsToRender = CalculateViewport (bounds).ToArray ();
+			var columnsToRender = CalculateViewport (Bounds).ToArray ();
 
 			Driver.SetAttribute (GetNormalColor ());
 
 			//invalidate current row (prevents scrolling around leaving old characters in the frame
-			Driver.AddStr (new string (' ', bounds.Width));
+			Driver.AddStr (new string (' ', Bounds.Width));
 
 			if (Table == null || columnsToRender.Length < 1) {
 				return;
@@ -688,7 +688,7 @@ namespace Terminal.Gui {
 		}
 
 
-		
+
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
 		{
@@ -1058,7 +1058,7 @@ namespace Terminal.Gui {
 			}
 
 			return row == SelectedRow &&
-					(col == SelectedColumn || FullRowSelect);
+				(col == SelectedColumn || FullRowSelect);
 		}
 
 		private IEnumerable<TableSelection> GetMultiSelectedRegionsContaining (int col, int row)

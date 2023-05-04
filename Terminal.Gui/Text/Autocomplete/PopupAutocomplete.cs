@@ -34,7 +34,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			public override void Redraw (Rect bounds)
+			public override void OnDrawContent (Rect contentArea)
 			{
 				if (autocomplete.LastPopupPos == null) {
 					return;
@@ -42,6 +42,7 @@ namespace Terminal.Gui {
 
 				autocomplete.RenderOverlay ((Point)autocomplete.LastPopupPos);
 			}
+
 
 			public override bool MouseEvent (MouseEvent mouseEvent)
 			{

@@ -32,8 +32,8 @@ namespace UICatalog.Scenarios {
 			void TextField_TextChanging (object sender, TextChangingEventArgs e)
 			{
 				singleWordGenerator.AllSuggestions = Regex.Matches (e.NewText.ToString (), "\\w+")
-					.Select (s => s.Value)
-					.Distinct ().ToList ();
+				    .Select (s => s.Value)
+				    .Distinct ().ToList ();
 			}
 			Win.Add (textField);
 
@@ -62,8 +62,8 @@ namespace UICatalog.Scenarios {
 			void TextView_DrawContent (object sender, DrawEventArgs e)
 			{
 				singleWordGenerator.AllSuggestions = Regex.Matches (textView.Text.ToString (), "\\w+")
-					.Select (s => s.Value)
-					.Distinct ().ToList ();
+				    .Select (s => s.Value)
+				    .Distinct ().ToList ();
 			}
 			Win.Add (textView);
 
@@ -78,7 +78,7 @@ namespace UICatalog.Scenarios {
 			// Use ContentChanged to detect if the user has typed something in a TextView.
 			// The TextChanged property is only fired if the TextView.Text property is
 			// explicitly set
-			textView.ContentsChanged += (s,a) => {
+			textView.ContentsChanged += (s, a) => {
 				labelMirroringTextView.Enabled = !labelMirroringTextView.Enabled;
 				labelMirroringTextView.Text = textView.Text;
 			};
@@ -97,7 +97,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (chxMultiline),
 				Checked = textView.WordWrap
 			};
-			chxWordWrap.Toggled += (s,e) => textView.WordWrap = (bool)e.NewValue;
+			chxWordWrap.Toggled += (s, e) => textView.WordWrap = (bool)e.NewValue;
 			Win.Add (chxWordWrap);
 
 			// TextView captures Tabs (so users can enter /t into text) by default;
@@ -121,7 +121,7 @@ namespace UICatalog.Scenarios {
 
 			Key keyTab = textView.GetKeyFromCommand (Command.Tab);
 			Key keyBackTab = textView.GetKeyFromCommand (Command.BackTab);
-			chxCaptureTabs.Toggled += (s,e) => {
+			chxCaptureTabs.Toggled += (s, e) => {
 				if (e.NewValue == true) {
 					textView.AddKeyBinding (keyTab, Command.Tab);
 					textView.AddKeyBinding (keyBackTab, Command.BackTab);
@@ -149,7 +149,7 @@ namespace UICatalog.Scenarios {
 			};
 			var array = ((MemoryStream)hexEditor.Source).ToArray ();
 			labelMirroringHexEditor.Text = Encoding.UTF8.GetString (array, 0, array.Length);
-			hexEditor.Edited += (s,kv) => {
+			hexEditor.Edited += (s, kv) => {
 				hexEditor.ApplyEdits ();
 				var array = ((MemoryStream)hexEditor.Source).ToArray ();
 				labelMirroringHexEditor.Text = Encoding.UTF8.GetString (array, 0, array.Length);
@@ -232,9 +232,9 @@ namespace UICatalog.Scenarios {
 				X = 1
 			};
 			var appendAutocompleteTextField = new TextField () {
-				X = Pos.Right(labelAppendAutocomplete),
+				X = Pos.Right (labelAppendAutocomplete),
 				Y = labelAppendAutocomplete.Y,
-				Width = Dim.Fill()
+				Width = Dim.Fill ()
 			};
 			appendAutocompleteTextField.Autocomplete = new AppendAutocomplete (appendAutocompleteTextField);
 			appendAutocompleteTextField.Autocomplete.SuggestionGenerator = new SingleWordSuggestionGenerator {

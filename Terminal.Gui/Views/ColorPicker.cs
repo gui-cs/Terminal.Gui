@@ -158,9 +158,9 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDrawContent (Rect contentArea)
 		{
-			base.Redraw (bounds);
+			base.OnDrawContent (contentArea);
 
 			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : GetNormalColor ());
 			var colorIndex = 0;

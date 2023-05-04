@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Terminal.Gui {
-	
+
 	/// <summary>
 	/// A straight line control either horizontal or vertical
 	/// </summary>
@@ -33,7 +33,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Creates a horizontal line
 		/// </summary>
-		public LineView () : this(Orientation.Horizontal)
+		public LineView () : this (Orientation.Horizontal)
 		{
 
 		}
@@ -66,32 +66,30 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Draws the line including any starting/ending anchors
 		/// </summary>
-		/// <param name="bounds"></param>
-		public override void Redraw (Rect bounds)
+		public override void OnDrawContent (Rect contentArea)
 		{
-			base.Redraw (bounds);
-			
+			base.OnDrawContent (contentArea);
+
 			Move (0, 0);
 			Driver.SetAttribute (GetNormalColor ());
 
 			var hLineWidth = Math.Max (1, Rune.ColumnWidth (Driver.HLine));
 
 			var dEnd = Orientation == Orientation.Horizontal ?
-				bounds.Width :
-				bounds.Height;
+				Bounds.Width :
+				Bounds.Height;
 
 			for (int d = 0; d < dEnd; d += hLineWidth) {
-				
-				if(Orientation == Orientation.Horizontal) {
+
+				if (Orientation == Orientation.Horizontal) {
 					Move (d, 0);
-				}
-				else {
-					Move (0,d);
+				} else {
+					Move (0, d);
 				}
 
 				Rune rune = LineRune;
 
-				if(d == 0) {
+				if (d == 0) {
 					rune = StartingAnchor ?? LineRune;
 				} else
 				if (d == dEnd - 1) {
