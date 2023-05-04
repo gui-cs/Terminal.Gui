@@ -28,7 +28,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (0, tableView.ColumnOffset);
 
 			// Set empty table
-			tableView.Table = new DataTableSource(new DataTable ());
+			tableView.Table = new DataTableSource (new DataTable ());
 
 			// Since table has no rows or columns scroll offset should default to 0
 			tableView.EnsureValidScrollOffsets ();
@@ -598,7 +598,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			string activatedValue = null;
 			var tv = new TableView (BuildTable (1, 1));
-			tv.CellActivated += (s, c) => activatedValue = c.Table [c.Row,c.Col].ToString();
+			tv.CellActivated += (s, c) => activatedValue = c.Table [c.Row, c.Col].ToString ();
 
 			Application.Top.Add (tv);
 			Application.Begin (Application.Top);
@@ -611,7 +611,7 @@ namespace Terminal.Gui.ViewsTests {
 			activatedValue = null;
 
 			// clear keybindings and ensure that Enter does not trigger the event anymore
-			tv.ClearKeybindings ();
+			tv.ClearKeyBindings ();
 			tv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ()));
 			Assert.Null (activatedValue);
 
@@ -622,7 +622,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			// reset the test
 			activatedValue = null;
-			tv.ClearKeybindings ();
+			tv.ClearKeyBindings ();
 
 			// Old method for changing the activation key
 			tv.CellActivationKey = Key.z;
@@ -907,7 +907,7 @@ namespace Terminal.Gui.ViewsTests {
 			};
 
 			// when B is 2 use the custom highlight colour for the row
-			tv.Style.RowColorGetter += (e) => Convert.ToInt32 (e.Table[e.RowIndex,1]) == 2 ? rowHighlight : null;
+			tv.Style.RowColorGetter += (e) => Convert.ToInt32 (e.Table [e.RowIndex, 1]) == 2 ? rowHighlight : null;
 
 			// private method for forcing the view to be focused/not focused
 			var setFocusMethod = typeof (View).GetMethod ("SetHasFocus", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -944,7 +944,7 @@ namespace Terminal.Gui.ViewsTests {
 			// it no longer matches the RowColorGetter
 			// delegate conditional ( which checks for
 			// the value 2)
-			dt.Rows [0][1] = 5;
+			dt.Rows [0] [1] = 5;
 
 			tv.Redraw (tv.Bounds);
 			expected = @"
@@ -1080,7 +1080,7 @@ namespace Terminal.Gui.ViewsTests {
 			dt.Columns.Add ("B");
 			dt.Rows.Add (1, 2);
 
-			tv.Table = new DataTableSource(dt);
+			tv.Table = new DataTableSource (dt);
 			tv.Style.GetOrCreateColumnStyle (0).MinWidth = 1;
 			tv.Style.GetOrCreateColumnStyle (0).MinWidth = 1;
 			tv.Style.GetOrCreateColumnStyle (1).MaxWidth = 1;
@@ -1144,7 +1144,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			dt.Rows.Add (1, 2, 3, 4, 5, 6);
 
-			tableView.Table = new DataTableSource(dt);
+			tableView.Table = new DataTableSource (dt);
 
 			// select last visible column
 			tableView.SelectedColumn = 2; // column C
@@ -1205,7 +1205,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			dt.Rows.Add (1, 2, 3, 4, 5, 6);
 
-			tableView.Table = new DataTableSource(dt);
+			tableView.Table = new DataTableSource (dt);
 
 			// select last visible column
 			tableView.SelectedColumn = 2; // column C
@@ -1264,7 +1264,7 @@ namespace Terminal.Gui.ViewsTests {
 			dt.Columns.Add ("F");
 
 			dt.Rows.Add (1, 2, 3, 4, 5, 6);
-			tableView.Table = new DataTableSource(dt);
+			tableView.Table = new DataTableSource (dt);
 
 			return tableView;
 		}
@@ -1315,7 +1315,7 @@ namespace Terminal.Gui.ViewsTests {
 			for (int i = 0; i < 6; i++) {
 				tableView.Style.GetOrCreateColumnStyle (i).Visible = false;
 			}
-			
+
 			tableView.LayoutSubviews ();
 
 			// expect nothing to be rendered when all columns are invisible
@@ -1814,7 +1814,7 @@ namespace Terminal.Gui.ViewsTests {
 			dt.Rows.Add (1, 2, new string ('a', 500));
 			dt.Rows.Add (1, 2, "aaa");
 
-			tableView.Table = new DataTableSource(dt);
+			tableView.Table = new DataTableSource (dt);
 			tableView.LayoutSubviews ();
 			tableView.Redraw (tableView.Bounds);
 
@@ -1957,7 +1957,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			dt.Rows.Add (1, 2, 3, 4, 5, 6);
 
-			tableView.Table = new DataTableSource(dt);
+			tableView.Table = new DataTableSource (dt);
 
 			// select last visible column
 			tableView.SelectedColumn = 2; // column C
@@ -2022,7 +2022,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			dt.Rows.Add ("Hello", DBNull.Value, "f");
 
-			tv.Table = new DataTableSource(dt);
+			tv.Table = new DataTableSource (dt);
 			tv.NullSymbol = string.Empty;
 
 			Application.Top.Add (tv);
@@ -2334,7 +2334,7 @@ A B C
 				dt.Rows.Add (newRow);
 			}
 
-			return new DataTableSource(dt);
+			return new DataTableSource (dt);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -2439,10 +2439,10 @@ A B C
 			// ---------------- X=1 -----------------------
 			// click in header
 			Assert.Null (tableView.ScreenToCell (1, 0, out col));
-			Assert.Equal ("A", tableView.Table.ColumnNames[col.Value]);
+			Assert.Equal ("A", tableView.Table.ColumnNames [col.Value]);
 			// click in header row line  (click in the horizontal line below header counts as click in header above - consistent with the column hit box)
 			Assert.Null (tableView.ScreenToCell (1, 1, out col));
-			Assert.Equal ("A", tableView.Table.ColumnNames[col.Value]);
+			Assert.Equal ("A", tableView.Table.ColumnNames [col.Value]);
 			// click in cell 0,0
 			Assert.Equal (new Point (0, 0), tableView.ScreenToCell (1, 2, out col));
 			Assert.Null (col);
@@ -2456,7 +2456,7 @@ A B C
 			// ---------------- X=2 -----------------------
 			// click in header
 			Assert.Null (tableView.ScreenToCell (2, 0, out col));
-			Assert.Equal ("A", tableView.Table.ColumnNames[col.Value]);
+			Assert.Equal ("A", tableView.Table.ColumnNames [col.Value]);
 			// click in header row line
 			Assert.Null (tableView.ScreenToCell (2, 1, out col));
 			Assert.Equal ("A", tableView.Table.ColumnNames [col.Value]);
@@ -2476,7 +2476,7 @@ A B C
 			Assert.Equal ("B", tableView.Table.ColumnNames [col.Value]);
 			// click in header row line
 			Assert.Null (tableView.ScreenToCell (3, 1, out col));
-			Assert.Equal ("B", tableView.Table.ColumnNames[col.Value]);
+			Assert.Equal ("B", tableView.Table.ColumnNames [col.Value]);
 			// click in cell 1,0
 			Assert.Equal (new Point (1, 0), tableView.ScreenToCell (3, 2, out col));
 			Assert.Null (col);
@@ -2488,8 +2488,8 @@ A B C
 			Assert.Null (col);
 		}
 
-		[Fact,AutoInitShutdown]
-		public void TestEnumerableDataSource_BasicTypes()
+		[Fact, AutoInitShutdown]
+		public void TestEnumerableDataSource_BasicTypes ()
 		{
 			var tv = new TableView ();
 			tv.ColorScheme = Colors.TopLevel;
@@ -2518,6 +2518,93 @@ A B C
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 		}
+		[Fact, AutoInitShutdown]
+		public void Test_CollectionNavigator ()
+		{
+			var tv = new TableView ();
+			tv.ColorScheme = Colors.TopLevel;
+			tv.Bounds = new Rect (0, 0, 50, 7);
+
+			tv.Table = new EnumerableTableSource<string> (
+				new string [] { "fish", "troll", "trap", "zoo" },
+				new () {
+					{ "Name", (t)=>t},
+					{ "EndsWith", (t)=>t.Last()}
+				});
+
+			tv.LayoutSubviews ();
+
+			tv.Redraw (tv.Bounds);
+
+			string expected =
+				@"
+┌─────┬──────────────────────────────────────────┐
+│Name │EndsWith                                  │
+├─────┼──────────────────────────────────────────┤
+│fish │h                                         │
+│troll│l                                         │
+│trap │p                                         │
+│zoo  │o                                         │";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			Assert.Equal (0, tv.SelectedRow);
+
+			// this test assumes no focus
+			Assert.False (tv.HasFocus);
+
+			// already on fish
+			tv.ProcessKey (new KeyEvent { Key = Key.f });
+			Assert.Equal (0, tv.SelectedRow);
+
+			// not focused
+			tv.ProcessKey (new KeyEvent { Key = Key.z });
+			Assert.Equal (0, tv.SelectedRow);
+
+			// ensure that TableView has the input focus
+			Application.Top.Add (tv);
+			Application.Begin (Application.Top);
+
+			Application.Top.FocusFirst ();
+			Assert.True (tv.HasFocus);
+
+			// already on fish
+			tv.ProcessKey (new KeyEvent { Key = Key.f });
+			Assert.Equal (0, tv.SelectedRow);
+
+			// move to zoo
+			tv.ProcessKey (new KeyEvent { Key = Key.z });
+			Assert.Equal (3, tv.SelectedRow);
+
+			// move to troll
+			tv.ProcessKey (new KeyEvent { Key = Key.t });
+			Assert.Equal (1, tv.SelectedRow);
+
+			// move to trap
+			tv.ProcessKey (new KeyEvent { Key = Key.t });
+			Assert.Equal (2, tv.SelectedRow);
+
+			// change columns to navigate by column 2
+			Assert.Equal (0, tv.SelectedColumn);
+			Assert.Equal (2, tv.SelectedRow);
+			tv.ProcessKey (new KeyEvent { Key = Key.CursorRight });
+			Assert.Equal (1, tv.SelectedColumn);
+			Assert.Equal (2, tv.SelectedRow);
+
+			// nothing ends with t so stay where you are
+			tv.ProcessKey (new KeyEvent { Key = Key.t });
+			Assert.Equal (2, tv.SelectedRow);
+
+			//jump to fish which ends in h
+			tv.ProcessKey (new KeyEvent { Key = Key.h });
+			Assert.Equal (0, tv.SelectedRow);
+
+			// jump to zoo which ends in o
+			tv.ProcessKey (new KeyEvent { Key = Key.o });
+			Assert.Equal (3, tv.SelectedRow);
+
+
+		}
 		private TableView GetTwoRowSixColumnTable ()
 		{
 			return GetTwoRowSixColumnTable (out _);
@@ -2545,7 +2632,7 @@ A B C
 			dt.Rows.Add (1, 2, 3, 4, 5, 6);
 			dt.Rows.Add (1, 2, 3, 4, 5, 6);
 
-			tableView.Table = new DataTableSource(dt);
+			tableView.Table = new DataTableSource (dt);
 			return tableView;
 		}
 	}

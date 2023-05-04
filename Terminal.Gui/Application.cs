@@ -56,7 +56,7 @@ namespace Terminal.Gui {
 
 		// For Unit testing - ignores UseSystemConsole
 		internal static bool _forceFakeConsole;
-		
+
 		private static bool? _enableConsoleScrolling;
 		/// <summary>
 		/// The current <see cref="ConsoleDriver.EnableConsoleScrolling"/> used in the terminal.
@@ -119,7 +119,7 @@ namespace Terminal.Gui {
 			   File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
 			).ToList ();
 		}
-		
+
 		#region Initialization (Init/Shutdown)
 
 		/// <summary>
@@ -357,7 +357,7 @@ namespace Terminal.Gui {
 			/// For debug (see DEBUG_IDISPOSABLE define) purposes; the runstate instances that have been created
 			/// </summary>
 			public static List<RunState> Instances = new List<RunState> ();
-			
+
 			/// <summary>
 			/// Creates a new RunState object.
 			/// </summary>
@@ -618,7 +618,7 @@ namespace Terminal.Gui {
 				}
 #endif
 			}
-		}		
+		}
 
 		/// <summary>
 		/// Triggers a refresh of the entire display.
@@ -630,6 +630,7 @@ namespace Terminal.Gui {
 			foreach (var v in _toplevels.Reverse ()) {
 				if (v.Visible) {
 					v.SetNeedsDisplay ();
+					v.SetSubViewNeedsDisplay ();
 					v.Redraw (v.Bounds);
 				}
 				last = v;
@@ -763,7 +764,7 @@ namespace Terminal.Gui {
 			firstIteration = false;
 
 			if (state.Toplevel != Top
-				&& (!Top._needsDisplay.IsEmpty || Top._childNeedsDisplay || Top.LayoutNeeded)) {
+				&& (!Top._needsDisplay.IsEmpty || Top._subViewNeedsDisplay || Top.LayoutNeeded)) {
 				state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
 				Top.Redraw (Top.Bounds);
 				foreach (var top in _toplevels.Reverse ()) {
@@ -775,14 +776,14 @@ namespace Terminal.Gui {
 			}
 			if (_toplevels.Count == 1 && state.Toplevel == Top
 				&& (Driver.Cols != state.Toplevel.Frame.Width || Driver.Rows != state.Toplevel.Frame.Height)
-				&& (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._childNeedsDisplay || state.Toplevel.LayoutNeeded)) {
+				&& (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._subViewNeedsDisplay || state.Toplevel.LayoutNeeded)) {
 
 				Driver.SetAttribute (Colors.TopLevel.Normal);
 				state.Toplevel.Clear (new Rect (0, 0, Driver.Cols, Driver.Rows));
 
 			}
 
-			if (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._childNeedsDisplay || state.Toplevel.LayoutNeeded
+			if (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._subViewNeedsDisplay || state.Toplevel.LayoutNeeded
 				|| OverlappedChildNeedsDisplay ()) {
 				state.Toplevel.Redraw (state.Toplevel.Bounds);
 				//if (state.Toplevel.SuperView != null) {
@@ -796,7 +797,7 @@ namespace Terminal.Gui {
 				Driver.UpdateCursor ();
 			}
 			if (state.Toplevel != Top && !state.Toplevel.Modal
-				&& (!Top._needsDisplay.IsEmpty || Top._childNeedsDisplay || Top.LayoutNeeded)) {
+				&& (!Top._needsDisplay.IsEmpty || Top._subViewNeedsDisplay || Top.LayoutNeeded)) {
 				Top.Redraw (Top.Bounds);
 			}
 		}
@@ -892,7 +893,7 @@ namespace Terminal.Gui {
 				NotifyStopRunState?.Invoke (top, new ToplevelEventArgs (top));
 			}
 		}
-		
+
 		/// <summary>
 		/// Building block API: completes the execution of a <see cref="Toplevel"/> that was started with <see cref="Begin(Toplevel)"/> .
 		/// </summary>

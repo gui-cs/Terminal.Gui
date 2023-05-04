@@ -379,6 +379,10 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public bool GetMinimumBounds (out Size size)
 		{
+			if (!IsInitialized) {
+				size = new Size (0, 0);
+				return false;
+			}
 			size = Bounds.Size;
 
 			if (!AutoSize && !ustring.IsNullOrEmpty (TextFormatter.Text)) {
@@ -962,7 +966,7 @@ namespace Terminal.Gui {
 
 			var aSize = true;
 			var nBoundsSize = GetAutoSize ();
-			if (nBoundsSize != Bounds.Size) {
+			if (IsInitialized && nBoundsSize != Bounds.Size) {
 				if (ForceValidatePosDim) {
 					aSize = SetWidthHeight (nBoundsSize);
 				} else {
@@ -1007,7 +1011,13 @@ namespace Terminal.Gui {
 		/// <returns>The <see cref="Size"/> required to fit the text.</returns>
 		public Size GetAutoSize ()
 		{
-			var rect = TextFormatter.CalcRect (Bounds.X, Bounds.Y, TextFormatter.Text, TextFormatter.Direction);
+			int x = 0;
+			int y = 0;
+			if (IsInitialized) {
+				x = Bounds.X;
+				y = Bounds.Y; 
+			}
+			var rect = TextFormatter.CalcRect (x, y,TextFormatter.Text, TextFormatter.Direction);
 			var newWidth = rect.Size.Width - GetHotKeySpecifierLength () + Margin.Thickness.Horizontal + Border.Thickness.Horizontal + Padding.Thickness.Horizontal;
 			var newHeight = rect.Size.Height - GetHotKeySpecifierLength (false) + Margin.Thickness.Vertical + Border.Thickness.Vertical + Padding.Thickness.Vertical;
 			return new Size (newWidth, newHeight);

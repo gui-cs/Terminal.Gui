@@ -193,7 +193,7 @@ namespace UICatalog.Scenarios {
 					};
 				}
 
-				scrollView.ClearKeybindings ();
+				scrollView.ClearKeyBindings ();
 
 				buttons = new List<Button> ();
 				Button prevButton = null;

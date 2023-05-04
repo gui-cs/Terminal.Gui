@@ -161,7 +161,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (1, pressed);
 
 			// remove the default keybinding (Enter)
-			btn.ClearKeybinding (Command.Accept);
+			btn.ClearKeyBinding (Command.Accept);
 
 			// After clearing the default keystroke the Enter button no longer does anything for the Button
 			Application.Driver.SendKeys ('\n', ConsoleKey.Enter, false, false, false);
