@@ -208,7 +208,7 @@ namespace UICatalog.Scenarios {
 				};
 				Add (_frmMenuDetails);
 
-				_btnMenuBarUp.Clicked += (s,e) => {
+				_btnMenuBarUp.Clicked += (s, e) => {
 					var i = _currentSelectedMenuBar;
 					var menuItem = _menuBar != null && _menuBar.Menus.Length > 0 ? _menuBar.Menus [i] : null;
 					if (menuItem != null) {
@@ -222,7 +222,7 @@ namespace UICatalog.Scenarios {
 					}
 				};
 
-				_btnMenuBarDown.Clicked += (s,e) => {
+				_btnMenuBarDown.Clicked += (s, e) => {
 					var i = _currentSelectedMenuBar;
 					var menuItem = _menuBar != null && _menuBar.Menus.Length > 0 ? _menuBar.Menus [i] : null;
 					if (menuItem != null) {
@@ -236,7 +236,7 @@ namespace UICatalog.Scenarios {
 					}
 				};
 
-				_btnUp.Clicked += (s,e) => {
+				_btnUp.Clicked += (s, e) => {
 					var i = _lstMenus.SelectedItem;
 					var menuItem = DataContext.Menus.Count > 0 ? DataContext.Menus [i].MenuItem : null;
 					if (menuItem != null) {
@@ -251,7 +251,7 @@ namespace UICatalog.Scenarios {
 					}
 				};
 
-				_btnDown.Clicked += (s,e) => {
+				_btnDown.Clicked += (s, e) => {
 					var i = _lstMenus.SelectedItem;
 					var menuItem = DataContext.Menus.Count > 0 ? DataContext.Menus [i].MenuItem : null;
 					if (menuItem != null) {
@@ -266,7 +266,7 @@ namespace UICatalog.Scenarios {
 					}
 				};
 
-				_btnPreviowsParent.Clicked += (s,e) => {
+				_btnPreviowsParent.Clicked += (s, e) => {
 					if (_currentMenuBarItem != null && _currentMenuBarItem.Parent != null) {
 						var mi = _currentMenuBarItem;
 						_currentMenuBarItem = _currentMenuBarItem.Parent as MenuBarItem;
@@ -295,16 +295,16 @@ namespace UICatalog.Scenarios {
 					X = Pos.Right (_btnOk) + 3,
 					Y = Pos.Top (_btnOk),
 				};
-				_btnCancel.Clicked += (s,e) => {
+				_btnCancel.Clicked += (s, e) => {
 					SetFrameDetails (_currentEditMenuBarItem);
 				};
 				Add (_btnCancel);
 
-				_lstMenus.SelectedItemChanged += (s,e) => {
+				_lstMenus.SelectedItemChanged += (s, e) => {
 					SetFrameDetails ();
 				};
 
-				_btnOk.Clicked += (s,e) => {
+				_btnOk.Clicked += (s, e) => {
 					if (ustring.IsNullOrEmpty (_frmMenuDetails._txtTitle.Text) && _currentEditMenuBarItem != null) {
 						MessageBox.ErrorQuery ("Invalid title", "Must enter a valid title!.", "Ok");
 					} else if (_currentEditMenuBarItem != null) {
@@ -320,7 +320,7 @@ namespace UICatalog.Scenarios {
 					}
 				};
 
-				_btnAdd.Clicked += (s,e) => {
+				_btnAdd.Clicked += (s, e) => {
 					if (MenuBar == null) {
 						MessageBox.ErrorQuery ("Menu Bar Error", "Must add a MenuBar first!", "Ok");
 						_btnAddMenuBar.SetFocus ();
@@ -357,7 +357,7 @@ namespace UICatalog.Scenarios {
 					}
 				};
 
-				_btnRemove.Clicked += (s,e) => {
+				_btnRemove.Clicked += (s, e) => {
 					var menuItem = DataContext.Menus.Count > 0 ? DataContext.Menus [_lstMenus.SelectedItem].MenuItem : null;
 					if (menuItem != null) {
 						var childrens = ((MenuBarItem)_currentMenuBarItem).Children;
@@ -389,7 +389,7 @@ namespace UICatalog.Scenarios {
 					}
 				};
 
-				_lstMenus.OpenSelectedItem += (s,e) => {
+				_lstMenus.OpenSelectedItem += (s, e) => {
 					_currentMenuBarItem = DataContext.Menus [e.Item].MenuItem;
 					if (!(_currentMenuBarItem is MenuBarItem)) {
 						MessageBox.ErrorQuery ("Menu Open Error", "Must allows sub menus first!", "Ok");
@@ -403,18 +403,18 @@ namespace UICatalog.Scenarios {
 				};
 
 				_lstMenus.Enter += (s, e) => {
-					var menuBarItem = DataContext.Menus.Count > 0 ? DataContext.Menus [_lstMenus.SelectedItem].MenuItem : null;
+					var menuBarItem = _lstMenus.SelectedItem > -1 && DataContext.Menus.Count > 0 ? DataContext.Menus [_lstMenus.SelectedItem].MenuItem : null;
 					SetFrameDetails (menuBarItem);
 				};
 
-				_btnNext.Clicked += (s,e) => {
+				_btnNext.Clicked += (s, e) => {
 					if (_menuBar != null && _currentSelectedMenuBar + 1 < _menuBar.Menus.Length) {
 						_currentSelectedMenuBar++;
 					}
 					SelectCurrentMenuBarItem ();
 				};
 
-				_btnPrevious.Clicked += (s,e) => {
+				_btnPrevious.Clicked += (s, e) => {
 					if (_currentSelectedMenuBar - 1 > -1) {
 						_currentSelectedMenuBar--;
 					}
@@ -428,7 +428,7 @@ namespace UICatalog.Scenarios {
 					}
 				};
 
-				_btnAddMenuBar.Clicked += (s,e) => {
+				_btnAddMenuBar.Clicked += (s, e) => {
 					var frameDetails = new DynamicMenuBarDetails (null, false);
 					var item = frameDetails.EnterMenuItem ();
 					if (item == null) {
@@ -455,7 +455,7 @@ namespace UICatalog.Scenarios {
 					_menuBar.SetNeedsDisplay ();
 				};
 
-				_btnRemoveMenuBar.Clicked += (s,e) => {
+				_btnRemoveMenuBar.Clicked += (s, e) => {
 					if (_menuBar == null || _menuBar.Menus.Length == 0) {
 						return;
 					}
@@ -505,7 +505,7 @@ namespace UICatalog.Scenarios {
 					MenuItem menuItem;
 
 					if (menuBarItem == null) {
-						menuItem = DataContext.Menus.Count > 0 ? DataContext.Menus [_lstMenus.SelectedItem].MenuItem : null;
+						menuItem = _lstMenus.SelectedItem > -1 && DataContext.Menus.Count > 0 ? DataContext.Menus [_lstMenus.SelectedItem].MenuItem : null;
 					} else {
 						menuItem = menuBarItem;
 					}
@@ -778,7 +778,7 @@ namespace UICatalog.Scenarios {
 					X = Pos.X (_lblShortcut),
 					Y = Pos.Bottom (_txtShortcut) + 1
 				};
-				_btnShortcut.Clicked += (s,e) => {
+				_btnShortcut.Clicked += (s, e) => {
 					_txtShortcut.Text = "";
 				};
 				Add (_btnShortcut);
@@ -829,7 +829,7 @@ namespace UICatalog.Scenarios {
 						_txtShortcut.Enabled = _ckbIsTopLevel.Checked == false && _ckbSubMenu.Checked == false;
 					}
 				};
-				_ckbNullCheck.Toggled += (s,e) => {
+				_ckbNullCheck.Toggled += (s, e) => {
 					if (_menuItem != null) {
 						_menuItem.AllowNullChecked = (bool)_ckbNullCheck.Checked;
 					}
@@ -861,7 +861,7 @@ namespace UICatalog.Scenarios {
 				var _btnOk = new Button ("Ok") {
 					IsDefault = true,
 				};
-				_btnOk.Clicked += (s,e) => {
+				_btnOk.Clicked += (s, e) => {
 					if (ustring.IsNullOrEmpty (_txtTitle.Text)) {
 						MessageBox.ErrorQuery ("Invalid title", "Must enter a valid title!.", "Ok");
 					} else {
@@ -870,7 +870,7 @@ namespace UICatalog.Scenarios {
 					}
 				};
 				var _btnCancel = new Button ("Cancel");
-				_btnCancel.Clicked += (s,e) => {
+				_btnCancel.Clicked += (s, e) => {
 					_txtTitle.Text = ustring.Empty;
 					Application.RequestStop ();
 				};
