@@ -250,6 +250,7 @@ namespace UICatalog {
 		/// the command line) and each time a Scenario ends.
 		/// </summary>
 		public class UICatalogTopLevel : Toplevel {
+			public MenuItem? miUseSubMenusSingleFrame;
 			public MenuItem? miIsMenuBorderDisabled;
 			public MenuItem? miIsMouseDisabled;
 			public MenuItem? miEnableConsoleScrolling;
@@ -491,18 +492,36 @@ namespace UICatalog {
 					CreateEnableConsoleScrollingMenuItems (),
 					CreateDisabledEnabledMouseItems (),
 					CreateDisabledEnabledMenuBorder (),
+					CreateDisabledEnableUseSubMenusSingleFrame (),
 					CreateKeybindingsMenuItems ()
 				};
 				return menuItems;
+			}
+
+			MenuItem [] CreateDisabledEnableUseSubMenusSingleFrame ()
+			{
+				List<MenuItem> menuItems = new List<MenuItem> ();
+				miUseSubMenusSingleFrame = new MenuItem {
+					Title = "Enable _Sub-Menus Single Frame"
+				};
+				miUseSubMenusSingleFrame.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miUseSubMenusSingleFrame!.Title!.ToString ()!.Substring (8, 1) [0];
+				miUseSubMenusSingleFrame.CheckType |= MenuItemCheckStyle.Checked;
+				miUseSubMenusSingleFrame.Action += () => {
+					miUseSubMenusSingleFrame.Checked = (bool)!miUseSubMenusSingleFrame.Checked!;
+					MenuBar.UseSubMenusSingleFrame = (bool)miUseSubMenusSingleFrame.Checked;
+				};
+				menuItems.Add (miUseSubMenusSingleFrame);
+
+				return menuItems.ToArray ();
 			}
 
 			MenuItem [] CreateDisabledEnabledMenuBorder ()
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
 				miIsMenuBorderDisabled = new MenuItem {
-					Title = "Disable _Menu Border"
+					Title = "Disable Menu _Border"
 				};
-				miIsMenuBorderDisabled.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miIsMenuBorderDisabled!.Title!.ToString ()!.Substring (1, 1) [0];
+				miIsMenuBorderDisabled.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miIsMenuBorderDisabled!.Title!.ToString ()!.Substring (14, 1) [0];
 				miIsMenuBorderDisabled.CheckType |= MenuItemCheckStyle.Checked;
 				miIsMenuBorderDisabled.Action += () => {
 					miIsMenuBorderDisabled.Checked = (bool)!miIsMenuBorderDisabled.Checked!;
@@ -709,6 +728,11 @@ namespace UICatalog {
 
 				_themeMenuItems = ((UICatalogTopLevel)Application.Top).CreateThemeMenuItems ();
 				_themeMenuBarItem!.Children = _themeMenuItems;
+				foreach (var mi in _themeMenuItems!) {
+					if (mi != null && mi.Parent == null) {
+						mi.Parent = _themeMenuBarItem;
+					}
+				}
 
 				var checkedThemeMenu = _themeMenuItems?.Where (m => m?.Checked ?? false).FirstOrDefault ();
 				if (checkedThemeMenu != null) {
