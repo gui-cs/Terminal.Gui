@@ -11,6 +11,8 @@
   // null.
   //
   "$schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
+  "ConsoleDriver.DefaultCheckedGlyph": "❌",
+  "ConsoleDriver.DefaultUnCheckedGlyph": "⬜",
   "Application.AlternateBackwardKey": {
     "Key": "PageUp",
     "Modifiers": [

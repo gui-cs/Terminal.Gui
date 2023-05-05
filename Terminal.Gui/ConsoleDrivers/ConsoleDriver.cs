@@ -1060,15 +1060,21 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Rune BottomTee = '\u2534';
 
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
+		public static Rune DefaultCheckedGlyph { get; set; } = '\u221a';
+
 		/// <summary>
 		/// Checkmark.
 		/// </summary>
-		public Rune Checked = '\u221a';
+		public Rune Checked = DefaultCheckedGlyph;
+
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
+		public static Rune DefaultUnCheckedGlyph { get; set; } = '\u2574';
 
 		/// <summary>
 		/// Un-checked checkmark.
 		/// </summary>
-		public Rune UnChecked = '\u2574';
+		public Rune UnChecked = DefaultUnCheckedGlyph;
 
 		/// <summary>
 		/// Null-checked checkmark.
