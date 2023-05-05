@@ -989,7 +989,7 @@ namespace Terminal.Gui.ViewsTests {
 			((FakeDriver)Application.Driver).SetBufferSize (20, 15);
 
 			Assert.Equal (new Rect (0, 0, 20, 15), Application.Driver.Clip);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"", output);
+			TestHelpers.AssertDriverContentsWithFrameAre ("", output);
 
 			var dialog = new Dialog () { X = 2, Y = 2, Width = 15, Height = 4 };
 			dialog.Add (new TextField ("Test") { X = Pos.Center (), Width = 10 });
@@ -1026,6 +1026,117 @@ namespace Terminal.Gui.ViewsTests {
 │ Undo         Ctrl+
 │ Redo         Ctrl+
 └───────────────────", output);
+
+			Application.End (rs);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Draw_A_ContextMenu_Over_A_Borderless_Top ()
+		{
+			((FakeDriver)Application.Driver).SetBufferSize (20, 15);
+
+			Assert.Equal (new Rect (0, 0, 20, 15), Application.Driver.Clip);
+			TestHelpers.AssertDriverContentsWithFrameAre ("", output);
+
+			var top = new Toplevel () { X = 2, Y = 2, Width = 15, Height = 4 };
+			top.Add (new TextField ("Test") { X = Pos.Center (), Width = 10 });
+			var rs = Application.Begin (top);
+
+			Assert.Equal (new Rect (2, 2, 15, 4), top.Frame);
+			Assert.Equal (top, Application.Top);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+    Test", output);
+
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessMouseEvent",
+				new MouseEvent () {
+					X = 8,
+					Y = 2,
+					Flags = MouseFlags.Button3Clicked
+				});
+
+			var firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+    Test            
+┌───────────────────
+│ Select All   Ctrl+
+│ Delete All   Ctrl+
+│ Copy         Ctrl+
+│ Cut          Ctrl+
+│ Paste        Ctrl+
+│ Undo         Ctrl+
+│ Redo         Ctrl+
+└───────────────────", output);
+
+			Application.End (rs);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void UseSubMenusSingleFrame_True_By_Mouse ()
+		{
+			var cm = new ContextMenu (5, 10,
+				new MenuBarItem ("Numbers", new MenuItem [] {
+					new MenuItem ("One", "", null),
+					new MenuBarItem ("Two", new MenuItem [] {
+					new MenuItem ("Sub-Menu 1", "", null),
+					new MenuItem ("Sub-Menu 2", "", null)
+					}),
+					new MenuItem ("Three", "", null),
+				})
+			) { UseSubMenusSingleFrame = true };
+
+			cm.Show ();
+			var rs = Application.Begin (Application.Top);
+
+			Assert.Equal (new Rect (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+     ┌────────┐
+     │ One    │
+     │ Two   ►│
+     │ Three  │
+     └────────┘", output);
+
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessMouseEvent",
+				new MouseEvent () {
+					X = 5,
+					Y = 13,
+					Flags = MouseFlags.Button1Clicked
+				});
+
+			var firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Assert.Equal (new Rect (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+			Assert.Equal (new Rect (5, 11, 15, 6), Application.Top.Subviews [1].Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+     ┌─────────────┐
+     │◄    Two     │
+     ├─────────────┤
+     │ Sub-Menu 1  │
+     │ Sub-Menu 2  │
+     └─────────────┘", output);
+
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessMouseEvent",
+				new MouseEvent () {
+					X = 5,
+					Y = 12,
+					Flags = MouseFlags.Button1Clicked
+				});
+
+			firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Assert.Equal (new Rect (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+     ┌────────┐
+     │ One    │
+     │ Two   ►│
+     │ Three  │
+     └────────┘", output);
 
 			Application.End (rs);
 		}

@@ -202,7 +202,7 @@ namespace Terminal.Gui {
 		/// Gets the parent for this <see cref="MenuItem"/>.
 		/// </summary>
 		/// <value>The parent.</value>
-		public MenuItem Parent { get; internal set; }
+		public MenuItem Parent { get; set; }
 
 		/// <summary>
 		/// Gets if this <see cref="MenuItem"/> is from a sub-menu.
@@ -443,7 +443,7 @@ namespace Terminal.Gui {
 			}
 			int minX = x;
 			int minY = y;
-			var borderOffset = border != LineStyle.None ? 2 : 0; // This 2 is frame border?
+			var borderOffset = 2; // This 2 is for the space around
 			int maxW = (items.Max (z => z?.Width) ?? 0) + borderOffset;
 			int maxH = items.Length + borderOffset;
 			if (parent != null && x + maxW > Driver.Cols) {
@@ -518,18 +518,33 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <inheritdoc/>
+		public override void OnVisibleChanged ()
+		{
+			base.OnVisibleChanged ();
+			if (Visible) {
+				Application.RootMouseEvent += Application_RootMouseEvent;
+			} else {
+				Application.RootMouseEvent -= Application_RootMouseEvent;
+			}
+		}
+
 		private void Application_RootMouseEvent (MouseEvent me)
 		{
 			if (me.View is MenuBar) {
 				return;
 			}
-			var locationOffset = host.GetDriverLocationOffsetFromCurrent ();
+			var locationOffset = host.GetScreenOffsetFromCurrent ();
 			if (SuperView != null && SuperView != Application.Current) {
 				locationOffset.X += SuperView.Border.Thickness.Left;
 				locationOffset.Y += SuperView.Border.Thickness.Top;
 			}
 			var view = View.FindDeepestView (this, me.X + locationOffset.X, me.Y + locationOffset.Y, out int rx, out int ry);
 			if (view == this) {
+				if (!Visible) {
+					throw new InvalidOperationException ("This shouldn't running on a invisible menu!");
+				}
+
 				var nme = new MouseEvent () {
 					X = rx,
 					Y = ry,
@@ -674,7 +689,9 @@ namespace Terminal.Gui {
 
 		private void Current_DrawContentComplete (object sender, DrawEventArgs e)
 		{
-			OnDrawContent (Bounds);
+			if (Visible) {
+				OnDrawContent (Bounds);
+			}
 		}
 
 		public override void PositionCursor ()
@@ -881,13 +898,7 @@ namespace Terminal.Gui {
 			}
 			host.handled = false;
 			bool disabled;
-			Point locationOffset = host.GetDriverLocationOffset ();
-			if (SuperView != null && SuperView != Application.Current) {
-				locationOffset.X += SuperView.Border.Thickness.Left;
-				locationOffset.Y += SuperView.Border.Thickness.Top;
-			}
-			var meYOffset = Border.Thickness.Top + locationOffset.Y;
-			var meY = me.Y - meYOffset;
+			var meY = me.Y - (Border == null ? 0 : Border.Thickness.Top);
 			if (me.Flags == MouseFlags.Button1Clicked) {
 				disabled = false;
 				if (meY < 0)
@@ -1313,7 +1324,7 @@ namespace Terminal.Gui {
 			set {
 				if (ocm != value) {
 					ocm = value;
-					if (ocm.current > -1) {
+					if (ocm != null && ocm.current > -1) {
 						OnMenuOpened ();
 					}
 				}
@@ -1420,8 +1431,11 @@ namespace Terminal.Gui {
 				for (int i = 0; i < index; i++)
 					pos += Menus [i].TitleLength + (Menus [i].Help.ConsoleWidth > 0 ? Menus [i].Help.ConsoleWidth + 2 : 0) + leftPadding + rightPadding;
 
-				var locationOffset = GetDriverLocationOffset ();
+				var locationOffset = Point.Empty;
 				// if SuperView is null then it's from a ContextMenu
+				if (SuperView == null) {
+					locationOffset = GetScreenOffset ();
+				}
 				if (SuperView != null && SuperView != Application.Current) {
 					locationOffset.X += SuperView.Border.Thickness.Left;
 					locationOffset.Y += SuperView.Border.Thickness.Top;
@@ -1446,15 +1460,15 @@ namespace Terminal.Gui {
 						openCurrentMenu = new Menu (this, last.Frame.Left + last.Frame.Width + locationOffset.X, last.Frame.Top + locationOffset.Y + last.current, subMenu, last, MenusBorderStyle);
 					} else {
 						var first = openSubMenu.Count > 0 ? openSubMenu.First () : openMenu;
+						// 2 is for the parent and the separator
 						var mbi = new MenuItem [2 + subMenu.Children.Length];
 						mbi [0] = new MenuItem () { Title = subMenu.Title, Parent = subMenu };
 						mbi [1] = null;
 						for (int j = 0; j < subMenu.Children.Length; j++) {
 							mbi [j + 2] = subMenu.Children [j];
 						}
-						var newSubMenu = new MenuBarItem (mbi);
-						ViewToScreen (first.Frame.Left, first.Frame.Top, out int rx, out int ry);
-						openCurrentMenu = new Menu (this, rx, ry, newSubMenu, null, MenusBorderStyle);
+						var newSubMenu = new MenuBarItem (mbi) { Parent = subMenu };
+						openCurrentMenu = new Menu (this, first.Frame.Left, first.Frame.Top, newSubMenu, null, MenusBorderStyle);
 						last.Visible = false;
 						Application.GrabMouse (openCurrentMenu);
 					}
@@ -1607,6 +1621,14 @@ namespace Terminal.Gui {
 					if (!reopen) {
 						selected = -1;
 					}
+					if (openSubMenu != null) {
+						openSubMenu = null;
+					}
+					if (openCurrentMenu != null) {
+						Application.Current.Remove (openCurrentMenu);
+						openCurrentMenu.Dispose ();
+						openCurrentMenu = null;
+					}
 					LastFocused.SetFocus ();
 				} else if (openSubMenu == null || openSubMenu.Count == 0) {
 					CloseAllMenus ();
@@ -1675,7 +1697,7 @@ namespace Terminal.Gui {
 		internal void CloseAllMenus ()
 		{
 			if (!isMenuOpening && !isMenuClosing) {
-				if (openSubMenu != null && !CloseMenu (false, true))
+				if (openSubMenu != null && !CloseMenu (false, true, true))
 					return;
 				if (!CloseMenu (false))
 					return;
@@ -1983,16 +2005,19 @@ namespace Terminal.Gui {
 								}
 								Activate (i);
 							}
-						} else {
-							if (IsMenuOpen)
+						} else if (IsMenuOpen) {
+							if (!UseSubMenusSingleFrame || (UseSubMenusSingleFrame && openCurrentMenu != null
+								&& openCurrentMenu.barItems.Parent != null && openCurrentMenu.barItems.Parent.Parent != Menus [i])) {
+
 								Activate (i);
+							}
 						}
 						return true;
 					} else if (i == Menus.Length - 1 && me.Flags == MouseFlags.Button1Clicked) {
 						if (IsMenuOpen && !Menus [i].IsTopLevel) {
 							CloseAllMenus ();
 							return true;
-					}
+						}
 					}
 					pos += leftPadding + Menus [i].TitleLength + rightPadding;
 				}
@@ -2106,28 +2131,29 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets the superview location offset relative to the <see cref="ConsoleDriver"/> size 
-		/// which is measured by the <see cref="ConsoleDriver.Cols"/> and <see cref="ConsoleDriver.Rows"/>.
+		/// Gets the superview location offset relative to the <see cref="ConsoleDriver"/> location.
 		/// </summary>
 		/// <returns>The location offset.</returns>
-		internal Point GetDriverLocationOffset ()
+		internal Point GetScreenOffset ()
 		{
 			var superViewFrame = SuperView == null ? new Rect (0, 0, Driver.Cols, Driver.Rows) : SuperView.Frame;
 			var sv = SuperView == null ? Application.Current : SuperView;
-			return new Point (superViewFrame.X - sv.Frame.X - (superViewFrame.X != sv.Frame.X ? 1 : 0),
-				superViewFrame.Y - sv.Frame.Y - (superViewFrame.Y != sv.Frame.Y ? 1 : 0));
+			var boundsOffset = sv.GetBoundsOffset ();
+			return new Point (superViewFrame.X - sv.Frame.X - boundsOffset.X,
+				superViewFrame.Y - sv.Frame.Y - boundsOffset.Y);
 		}
 
 		/// <summary>
-		/// Gets the <see cref="Application.Current"/> location offset relative to the <see cref="ConsoleDriver"/> size.
+		/// Gets the <see cref="Application.Current"/> location offset relative to the <see cref="ConsoleDriver"/> location.
 		/// </summary>
 		/// <returns>The location offset.</returns>
-		internal Point GetDriverLocationOffsetFromCurrent ()
+		internal Point GetScreenOffsetFromCurrent ()
 		{
-			var topFrame = new Rect (0, 0, Driver.Cols, Driver.Rows);
+			var screen = new Rect (0, 0, Driver.Cols, Driver.Rows);
 			var currentFrame = Application.Current.Frame;
-			return new Point (topFrame.X - currentFrame.X - (topFrame.X != currentFrame.X ? 1 : 0),
-				topFrame.Y - currentFrame.Y - (topFrame.Y != currentFrame.Y ? 1 : 0));
+			var boundsOffset = Application.Top.GetBoundsOffset ();
+			return new Point (screen.X - currentFrame.X - boundsOffset.X
+				, screen.Y - currentFrame.Y - boundsOffset.Y);
 		}
 	}
 }
