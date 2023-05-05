@@ -21,6 +21,7 @@ namespace UICatalog.Scenarios {
 				X = 1,
 				Y = 0,
 				Width = Dim.Percent (50) - 1,
+				// Height will be replaced with 1
 				Height = 2
 			};
 
@@ -51,7 +52,7 @@ namespace UICatalog.Scenarios {
 			// TextView is a rich (as in functionality, not formatting) text editing control
 			var textView = new TextView () {
 				X = 1,
-				Y = Pos.Bottom (textField),
+				Y = Pos.Bottom (textField) + 1,
 				Width = Dim.Percent (50) - 1,
 				Height = Dim.Percent (30),
 			};
