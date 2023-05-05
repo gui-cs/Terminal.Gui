@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 using static Terminal.Gui.ConfigurationManager;
 using Rune = System.Rune;
 
@@ -11,7 +6,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Defines the standard set of glyph characters that can be used to draw checkboxes, lines, borders, etc...
 	/// </summary>
-	public class Glyphs {
+	public static class Glyphs {
 
 		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
 		public static Rune HotKeySpecifier { get; set; } = '_';
