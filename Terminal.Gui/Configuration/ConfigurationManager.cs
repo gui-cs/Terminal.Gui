@@ -249,7 +249,7 @@ namespace Terminal.Gui {
 				classesWithConfigProps.Add (classWithConfig.Name, classWithConfig);
 			}
 
-			Debug.WriteLine ($"ConfigManager.getConfigProperties found {classesWithConfigProps.Count} clases:");
+			Debug.WriteLine ($"ConfigManager.getConfigProperties found {classesWithConfigProps.Count} classes:");
 			classesWithConfigProps.ToList ().ForEach (x => Debug.WriteLine ($"  Class: {x.Key}"));
 
 			foreach (var p in from c in classesWithConfigProps
@@ -274,7 +274,7 @@ namespace Terminal.Gui {
 			_allConfigProperties = _allConfigProperties!.OrderBy (x => x.Key).ToDictionary (x => x.Key, x => x.Value, StringComparer.InvariantCultureIgnoreCase);
 
 			Debug.WriteLine ($"ConfigManager.Initialize found {_allConfigProperties.Count} properties:");
-			_allConfigProperties.ToList ().ForEach (x => Debug.WriteLine ($"  Property: {x.Key}"));
+			//_allConfigProperties.ToList ().ForEach (x => Debug.WriteLine ($"  Property: {x.Key}"));
 
 			AppSettings = new AppScope ();
 		}

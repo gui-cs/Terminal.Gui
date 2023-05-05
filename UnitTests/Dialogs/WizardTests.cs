@@ -114,16 +114,16 @@ namespace Terminal.Gui.DialogTests {
 			d.SetBufferSize (width, height);
 
 			var btnBackText = "Back";
-			var btnBack = $"{d.LeftBracket} {btnBackText} {d.RightBracket}";
+			var btnBack = $"{Glyphs.LeftBracket} {btnBackText} {Glyphs.RightBracket}";
 			var btnNextText = "Finish";
-			var btnNext = $"{d.LeftBracket}{d.LeftDefaultIndicator} {btnNextText} {d.RightDefaultIndicator}{d.RightBracket}";
+			var btnNext = $"{Glyphs.LeftBracket}{Glyphs.LeftDefaultIndicator} {btnNextText} {Glyphs.RightDefaultIndicator}{Glyphs.RightBracket}";
 
-			var topRow = $"{d.ULDbCorner}╡{title}{stepTitle}╞{new string (d.HDbLine.ToString () [0], width - title.Length - stepTitle.Length - 4)}{d.URDbCorner}";
-			var row2 = $"{d.VDbLine}{new string (' ', width - 2)}{d.VDbLine}";
+			var topRow = $"{Glyphs.ULDbCorner}╡{title}{stepTitle}╞{new string (Glyphs.HDbLine.ToString () [0], width - title.Length - stepTitle.Length - 4)}{Glyphs.URDbCorner}";
+			var row2 = $"{Glyphs.VDbLine}{new string (' ', width - 2)}{Glyphs.VDbLine}";
 			var row3 = row2;
-			var separatorRow = $"{d.VDbLine}{new string (d.HLine.ToString () [0], width - 2)}{d.VDbLine}";
-			var buttonRow = $"{d.VDbLine}{btnBack}{new string (' ', width - btnBack.Length - btnNext.Length - 2)}{btnNext}{d.VDbLine}";
-			var bottomRow = $"{d.LLDbCorner}{new string (d.HDbLine.ToString () [0], width - 2)}{d.LRDbCorner}";
+			var separatorRow = $"{Glyphs.VDbLine}{new string (Glyphs.HLine.ToString () [0], width - 2)}{Glyphs.VDbLine}";
+			var buttonRow = $"{Glyphs.VDbLine}{btnBack}{new string (' ', width - btnBack.Length - btnNext.Length - 2)}{btnNext}{Glyphs.VDbLine}";
+			var bottomRow = $"{Glyphs.LLDbCorner}{new string (Glyphs.HDbLine.ToString () [0], width - 2)}{Glyphs.LRDbCorner}";
 
 			var wizard = new Wizard () { Title = title, Width = width, Height = height };
 			var runstate = Application.Begin (wizard);
@@ -146,17 +146,17 @@ namespace Terminal.Gui.DialogTests {
 			d.SetBufferSize (width, height);
 
 			//	var btnBackText = "Back";
-			var btnBack = string.Empty; // $"{d.LeftBracket} {btnBackText} {d.RightBracket}";
+			var btnBack = string.Empty; // $"{Glyphs.LeftBracket} {btnBackText} {Glyphs.RightBracket}";
 			var btnNextText = "Finish"; // "Next";
-			var btnNext = $"{d.LeftBracket}{d.LeftDefaultIndicator} {btnNextText} {d.RightDefaultIndicator}{d.RightBracket}";
+			var btnNext = $"{Glyphs.LeftBracket}{Glyphs.LeftDefaultIndicator} {btnNextText} {Glyphs.RightDefaultIndicator}{Glyphs.RightBracket}";
 
-			var topRow = $"{d.ULDbCorner}╡{title} - {stepTitle}╞{new string (d.HDbLine.ToString () [0], width - title.Length - stepTitle.Length - 7)}{d.URDbCorner}";
-			var row2 = $"{d.VDbLine}{new string (' ', width - 2)}{d.VDbLine}";
+			var topRow = $"{Glyphs.ULDbCorner}╡{title} - {stepTitle}╞{new string (Glyphs.HDbLine.ToString () [0], width - title.Length - stepTitle.Length - 7)}{Glyphs.URDbCorner}";
+			var row2 = $"{Glyphs.VDbLine}{new string (' ', width - 2)}{Glyphs.VDbLine}";
 			var row3 = row2;
 			var row4 = row3;
-			var separatorRow = $"{d.VDbLine}{new string (d.HLine.ToString () [0], width - 2)}{d.VDbLine}";
-			var buttonRow = $"{d.VDbLine}{btnBack}{new string (' ', width - btnBack.Length - btnNext.Length - 2)}{btnNext}{d.VDbLine}";
-			var bottomRow = $"{d.LLDbCorner}{new string (d.HDbLine.ToString () [0], width - 2)}{d.LRDbCorner}";
+			var separatorRow = $"{Glyphs.VDbLine}{new string (Glyphs.HLine.ToString () [0], width - 2)}{Glyphs.VDbLine}";
+			var buttonRow = $"{Glyphs.VDbLine}{btnBack}{new string (' ', width - btnBack.Length - btnNext.Length - 2)}{btnNext}{Glyphs.VDbLine}";
+			var bottomRow = $"{Glyphs.LLDbCorner}{new string (Glyphs.HDbLine.ToString () [0], width - 2)}{Glyphs.LRDbCorner}";
 
 			var wizard = new Wizard () { Title = title, Width = width, Height = height };
 			wizard.AddStep (new Wizard.WizardStep () { Title = stepTitle });
@@ -218,15 +218,15 @@ namespace Terminal.Gui.DialogTests {
 			d.SetBufferSize (width, height);
 
 			var btnNextText = "Finish";
-			var btnNext = $"{d.LeftBracket}{d.LeftDefaultIndicator} {btnNextText} {d.RightDefaultIndicator}{d.RightBracket}";
+			var btnNext = $"{Glyphs.LeftBracket}{Glyphs.LeftDefaultIndicator} {btnNextText} {Glyphs.RightDefaultIndicator}{Glyphs.RightBracket}";
 
-			var topRow = $"{d.ULDbCorner}╡{title}{stepTitle}╞{new string (d.HDbLine.ToString () [0], width - title.Length - stepTitle.Length - 4)}{d.URDbCorner}";
-			var separatorRow = $"{d.VDbLine}{new string (d.HLine.ToString () [0], width - 2)}{d.VDbLine}";
+			var topRow = $"{Glyphs.ULDbCorner}╡{title}{stepTitle}╞{new string (Glyphs.HDbLine.ToString () [0], width - title.Length - stepTitle.Length - 4)}{Glyphs.URDbCorner}";
+			var separatorRow = $"{Glyphs.VDbLine}{new string (Glyphs.HLine.ToString () [0], width - 2)}{Glyphs.VDbLine}";
 
 			// Once this is fixed, revert to commented out line: https://github.com/gui-cs/Terminal.Gui/issues/1791
-			var buttonRow = $"{d.VDbLine}{new string (' ', width - btnNext.Length - 2)}{btnNext}{d.VDbLine}";
-			//var buttonRow = $"{d.VDLine}{new String (' ', width - btnNext.Length - 2)}{btnNext}{d.VDLine}";
-			var bottomRow = $"{d.LLDbCorner}{new string (d.HDbLine.ToString () [0], width - 2)}{d.LRDbCorner}";
+			var buttonRow = $"{Glyphs.VDbLine}{new string (' ', width - btnNext.Length - 2)}{btnNext}{Glyphs.VDbLine}";
+			//var buttonRow = $"{Glyphs.VDLine}{new String (' ', width - btnNext.Length - 2)}{btnNext}{Glyphs.VDLine}";
+			var bottomRow = $"{Glyphs.LLDbCorner}{new string (Glyphs.HDbLine.ToString () [0], width - 2)}{Glyphs.LRDbCorner}";
 
 			var wizard = new Wizard () { Title = title, Width = width, Height = height };
 			wizard.AddStep (new Wizard.WizardStep () { Title = "ABCD" });

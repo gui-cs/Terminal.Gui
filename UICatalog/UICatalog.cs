@@ -414,9 +414,7 @@ namespace UICatalog {
 
 				// Restore previous selections
 				CategoryList.SelectedItem = _cachedCategoryIndex;
-				CategoryList.EnsureSelectedItemVisible ();
 				ScenarioList.SelectedRow = _cachedScenarioIndex;
-				ScenarioList.EnsureSelectedCellIsVisible ();
 
 				ConfigurationManager.Applied += ConfigAppliedHandler;
 			}
@@ -450,6 +448,8 @@ namespace UICatalog {
 				};
 
 				Loaded -= LoadedHandler;
+				CategoryList.EnsureSelectedItemVisible ();
+				ScenarioList.EnsureSelectedCellIsVisible ();
 			}
 
 			private void UnloadedHandler (object? sender, EventArgs? args)

@@ -86,16 +86,16 @@ namespace UICatalog.Scenarios {
 				}
 
 				Driver.SetAttribute (new Terminal.Gui.Attribute (ColorScheme.Normal.Foreground, ColorScheme.Normal.Background));
-				AddRune (1, 3, Application.Driver.HLine);
-				AddRune (3, 3, Application.Driver.HDsLine);
-				AddRune (5, 3, Application.Driver.HDtLine);
-				AddRune (7, 3, Application.Driver.ULRCorner);
-				AddRune (9, 3, Application.Driver.HDsLine);
-				AddRune (11, 3, Application.Driver.HDtLine);
-				AddRune (1, 5, Application.Driver.HThLine);
-				AddRune (3, 5, Application.Driver.HThDsLine);
-				AddRune (5, 5, Application.Driver.HThDtLine);
-				AddRune (7, 5, Application.Driver.HDbLine);
+				AddRune (1, 3, Glyphs.HLine);
+				AddRune (3, 3, Glyphs.HDsLine);
+				AddRune (5, 3, Glyphs.HDtLine);
+				AddRune (7, 3, Glyphs.ULRCorner);
+				AddRune (9, 3, Glyphs.HDsLine);
+				AddRune (11, 3, Glyphs.HDtLine);
+				AddRune (1, 5, Glyphs.HThLine);
+				AddRune (3, 5, Glyphs.HThDsLine);
+				AddRune (5, 5, Glyphs.HThDtLine);
+				AddRune (7, 5, Glyphs.HDbLine);
 			}
 
 			public override bool OnMouseEvent (MouseEvent mouseEvent)

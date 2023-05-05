@@ -507,7 +507,7 @@ namespace Terminal.Gui {
 				}
 
 				Move (selected.X - 1, y);
-				Driver.AddRune (host.Style.TabsOnBottom ? Driver.LLCorner : Driver.ULCorner);
+				Driver.AddRune (host.Style.TabsOnBottom ? Glyphs.LLCorner : Glyphs.ULCorner);
 
 				for (int i = 0; i < selected.Width; i++) {
 
@@ -516,11 +516,11 @@ namespace Terminal.Gui {
 						return;
 					}
 
-					Driver.AddRune (Driver.HLine);
+					Driver.AddRune (Glyphs.HLine);
 				}
 
 				// Add the end of the selected tab
-				Driver.AddRune (host.Style.TabsOnBottom ? Driver.LRCorner : Driver.URCorner);
+				Driver.AddRune (host.Style.TabsOnBottom ? Glyphs.LRCorner : Glyphs.URCorner);
 
 			}
 
@@ -549,7 +549,7 @@ namespace Terminal.Gui {
 
 					if (toRender.IsSelected) {
 						Move (toRender.X - 1, y);
-						Driver.AddRune (Driver.VLine);
+						Driver.AddRune (Glyphs.VLine);
 					}
 
 					Move (toRender.X, y);
@@ -573,7 +573,7 @@ namespace Terminal.Gui {
 					Driver.SetAttribute (GetNormalColor ());
 
 					if (toRender.IsSelected) {
-						Driver.AddRune (Driver.VLine);
+						Driver.AddRune (Glyphs.VLine);
 					}
 				}
 			}
@@ -593,7 +593,7 @@ namespace Terminal.Gui {
 				if (!host.Style.ShowBorder) {
 
 					for (int x = 0; x < width; x++) {
-						Driver.AddRune (Driver.HLine);
+						Driver.AddRune (Glyphs.HLine);
 					}
 
 				}
@@ -605,14 +605,14 @@ namespace Terminal.Gui {
 
 				Move (selected.X - 1, y);
 
-				Driver.AddRune (selected.X == 1 ? Driver.VLine :
-			(host.Style.TabsOnBottom ? Driver.URCorner : Driver.LRCorner));
+				Driver.AddRune (selected.X == 1 ? Glyphs.VLine :
+					(host.Style.TabsOnBottom ? Glyphs.URCorner : Glyphs.LRCorner));
 
 				Driver.AddStr (new string (' ', selected.Width));
 
 				Driver.AddRune (selected.X + selected.Width == width - 1 ?
-		     Driver.VLine :
-				(host.Style.TabsOnBottom ? Driver.ULCorner : Driver.LLCorner));
+				     Glyphs.VLine :
+					(host.Style.TabsOnBottom ? Glyphs.ULCorner : Glyphs.LLCorner));
 
 				// draw scroll indicators
 
@@ -621,7 +621,7 @@ namespace Terminal.Gui {
 					Move (0, y);
 
 					// indicate that
-					Driver.AddRune (Driver.LeftArrow);
+					Driver.AddRune (Glyphs.LeftArrow);
 				}
 
 				// if there are more tabs to the right not visible
@@ -629,7 +629,7 @@ namespace Terminal.Gui {
 					Move (width - 1, y);
 
 					// indicate that
-					Driver.AddRune (Driver.RightArrow);
+					Driver.AddRune (Glyphs.RightArrow);
 				}
 			}
 

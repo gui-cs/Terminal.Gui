@@ -105,7 +105,7 @@ namespace UICatalog.Scenarios {
 
 			var series = new MultiBarSeries (3, 1, 0.25f, new [] { magenta, cyan, red });
 
-			var stiple = Application.Driver.Stipple;
+			var stiple = Glyphs.Stipple;
 
 			series.AddBars ("'96", stiple, 5900, 9000, 14000);
 			series.AddBars ("'97", stiple, 6100, 9200, 14800);
@@ -428,7 +428,7 @@ namespace UICatalog.Scenarios {
 			graphView.AxisY.ShowLabelsEvery = 0;
 			graphView.AxisY.Minimum = 0;
 
-			var stiple = new GraphCellToRender (Application.Driver.Stipple);
+			var stiple = new GraphCellToRender (Glyphs.Stipple);
 
 			// Bars in 2 directions
 

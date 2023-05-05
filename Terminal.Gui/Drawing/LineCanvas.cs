@@ -424,26 +424,26 @@ namespace Terminal.Gui {
 				return (Rune)'.';
 			case IntersectionRuneType.HLine:
 				if (useDouble) {
-					return driver.HDbLine;
+					return Glyphs.HDbLine;
 				}
 				if (useDashed) {
-					return driver.HDsLine;
+					return Glyphs.HDsLine;
 				}
 				if (useDotted) {
-					return driver.HDtLine;
+					return Glyphs.HDtLine;
 				}
-				return useThick ? driver.HThLine : (useThickDashed ? driver.HThDsLine : (useThickDotted ? driver.HThDtLine : driver.HLine));
+				return useThick ? Glyphs.HThLine : (useThickDashed ? Glyphs.HThDsLine : (useThickDotted ? Glyphs.HThDtLine : Glyphs.HLine));
 			case IntersectionRuneType.VLine:
 				if (useDouble) {
-					return driver.VDbLine;
+					return Glyphs.VDbLine;
 				}
 				if (useDashed) {
-					return driver.VDsLine;
+					return Glyphs.VDsLine;
 				}
 				if (useDotted) {
-					return driver.VDtLine;
+					return Glyphs.VDtLine;
 				}
-				return useThick ? driver.VThLine : (useThickDashed ? driver.VThDsLine : (useThickDotted ? driver.VThDtLine : driver.VLine));
+				return useThick ? Glyphs.VThLine : (useThickDashed ? Glyphs.VThDsLine : (useThickDotted ? Glyphs.VThDtLine : Glyphs.VLine));
 
 			default: throw new Exception ("Could not find resolver or switch case for " + nameof (runeType) + ":" + runeType);
 			}

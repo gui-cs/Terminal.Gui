@@ -385,8 +385,8 @@ namespace Terminal.Gui {
 						Driver.SetAttribute (current);
 					}
 					if (allowsMarking) {
-						Driver.AddRune (source.IsMarked (item) ? (AllowsMultipleSelection ? Driver.Checked : Driver.Selected) :
-							(AllowsMultipleSelection ? Driver.UnChecked : Driver.UnSelected));
+						Driver.AddRune (source.IsMarked (item) ? (AllowsMultipleSelection ? Glyphs.Checked : Glyphs.Selected) :
+							(AllowsMultipleSelection ? Glyphs.UnChecked : Glyphs.UnSelected));
 						Driver.AddRune (' ');
 					}
 					Source.Render (this, Driver, isSelected, item, col, row, f.Width - col, start);

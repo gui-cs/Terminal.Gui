@@ -83,11 +83,11 @@ namespace Terminal.Gui {
 		/// <param name="is_checked"></param>
 		void SetInitialProperties (ustring s, bool is_checked)
 		{
-			charNullChecked = new Rune (Driver != null ? Driver.NullChecked : '?');
-			charChecked = new Rune (Driver != null ? Driver.Checked : '√');
-			charUnChecked = new Rune (Driver != null ? Driver.UnChecked : '╴');
+			charNullChecked = Glyphs.NullChecked;
+			charChecked = Glyphs.Checked;
+			charUnChecked = Glyphs.UnChecked;
 			Checked = is_checked;
-			HotKeySpecifier = new Rune ('_');
+			HotKeySpecifier = Glyphs.HotKeySpecifier;
 			CanFocus = true;
 			AutoSize = true;
 			Text = s;

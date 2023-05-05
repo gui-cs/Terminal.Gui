@@ -131,7 +131,7 @@ namespace Terminal.Gui {
 							Driver.SetAttribute (current);
 						}
 						if (AllowsMarking) {
-							Driver.AddRune (Source.IsMarked (item) ? (AllowsMultipleSelection ? Driver.Checked : Driver.Selected) : (AllowsMultipleSelection ? Driver.UnChecked : Driver.UnSelected));
+							Driver.AddRune (Source.IsMarked (item) ? (AllowsMultipleSelection ? Glyphs.Checked : Glyphs.Selected) : (AllowsMultipleSelection ? Glyphs.UnChecked : Glyphs.UnSelected));
 							Driver.AddRune (' ');
 						}
 						Source.Render (this, Driver, isSelected, item, col, row, f.Width - col, start);
@@ -544,7 +544,7 @@ namespace Terminal.Gui {
 
 			Driver.SetAttribute (ColorScheme.Focus);
 			Move (Bounds.Right - 1, 0);
-			Driver.AddRune (Driver.DownArrow);
+			Driver.AddRune (Glyphs.DownArrow);
 		}
 
 		///<inheritdoc/>

@@ -1150,10 +1150,10 @@ Edit
 			// 
 			// The width of the Frame is determined in Menu.cs line 144, where `Width` is calculated
 			//   1 space before the Title and 2 spaces after the Title/Check/Help
-			public string expectedTopRow (int i) => $"{d.ULCorner}{new string (d.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{d.URCorner}  \n";
+			public string expectedTopRow (int i) => $"{Glyphs.ULCorner}{new string (Glyphs.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{Glyphs.URCorner}  \n";
 			// The 3 spaces at end are a result of Menu.cs line 1062 where `pos` is calculated (` + spacesAfterTitle`)
-			public string expectedMenuItemRow (int i) => $"{d.VLine} {Menus [i].Children [0].Title}  {d.VLine}   \n";
-			public string expectedBottomRow (int i) => $"{d.LLCorner}{new string (d.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{d.LRCorner}  \n";
+			public string expectedMenuItemRow (int i) => $"{Glyphs.VLine} {Menus [i].Children [0].Title}  {Glyphs.VLine}   \n";
+			public string expectedBottomRow (int i) => $"{Glyphs.LLCorner}{new string (Glyphs.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{Glyphs.LRCorner}  \n";
 
 			// The fulll expected string for an open sub menu
 			public string expectedSubMenuOpen (int i) => ClosedMenuText +
