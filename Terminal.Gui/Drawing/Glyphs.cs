@@ -4,8 +4,20 @@ using Rune = System.Rune;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// Defines the standard set of glyph characters that can be used to draw checkboxes, lines, borders, etc...
+	/// Defines the standard set of glyphs used to draw checkboxes, lines, borders, etc...
 	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// The default glyphs can be changed via the <see cref="ConfigurationManager"/>. Within a <c>config.json</c> file 
+	/// tHe JSon property name is the <see cref="Glyphs"/> property prefixed with "Glyphs.". 
+	/// </para>
+	/// <para>
+	/// The JSon property can be either a decimal number or a string. The string may be one of:
+	/// - A unicode char (e.g. "☑")
+	/// - A hex value in U+ format (e.g. "U+2611")
+	/// - A hex value in \u format (e.g. "\\u2611")
+	/// </para>
+	/// </remarks>
 	public static class Glyphs {
 
 		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
