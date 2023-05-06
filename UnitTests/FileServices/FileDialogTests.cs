@@ -384,10 +384,10 @@ namespace Terminal.Gui.FileServicesTests {
 			fd.Draw ();
 			
 			string expected =
-			@"
+			@$"
  ┌──────────────────────────────────────────────────────────────────┐
  │/demo/                                                            │
- │[▲]                                                               │
+│{Application.Glyphs.LeftBracket}▲{Application.Glyphs.RightBracket}                                                               │
  │┌────────────┬──────────┬──────────────────────────────┬─────────┐│
  ││Filename (▲)│Size      │Modified                      │Type     ││
  │├────────────┼──────────┼──────────────────────────────┼─────────┤│
@@ -398,7 +398,7 @@ namespace Terminal.Gui.FileServicesTests {
  │                                                                  │
  │                                                                  │
  │                                                                  │
- │[ ►► ] Enter Search                            [ Cancel ] [ Ok ]  │
+│{Application.Glyphs.LeftBracket} ►► {Application.Glyphs.RightBracket} Enter Search                            {Application.Glyphs.LeftBracket} Cancel {Application.Glyphs.RightBracket} {Application.Glyphs.LeftBracket} Ok {Application.Glyphs.RightBracket}  │
  └──────────────────────────────────────────────────────────────────┘
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output, true);
@@ -420,10 +420,10 @@ namespace Terminal.Gui.FileServicesTests {
 
 
 			string expected =
-			@"
+			@$"
 ┌──────────────────────────────────────────────────────────────────┐
 │c:\demo\                                                          │
-│[▲]                                                               │
+│{Application.Glyphs.LeftBracket}▲{Application.Glyphs.RightBracket}                                                               │
 │┌────────────┬──────────┬──────────────────────────────┬─────────┐│
 ││Filename (▲)│Size      │Modified                      │Type     ││
 │├────────────┼──────────┼──────────────────────────────┼─────────┤│
@@ -434,7 +434,7 @@ namespace Terminal.Gui.FileServicesTests {
 ││mybinary.exe│7.00 bytes│2001-01-01T11:44:42           │.exe     ││
 │                                                                  │
 │                                                                  │
-│[ ►► ] Enter Search                            [ Cancel ] [ Ok ]  │
+│{Application.Glyphs.LeftBracket} ►► {Application.Glyphs.RightBracket} Enter Search                            {Application.Glyphs.LeftBracket} Cancel {Application.Glyphs.RightBracket} {Application.Glyphs.LeftBracket} Ok {Application.Glyphs.RightBracket}  │
 └──────────────────────────────────────────────────────────────────┘
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output, true);

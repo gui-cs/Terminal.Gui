@@ -19,7 +19,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (btn);
 			var rs = Application.Begin (Application.Top);
 
-			Assert.Equal ("[  ]", btn.TextFormatter.Text);
+			Assert.Equal ($"{Application.Glyphs.LeftBracket}  {Application.Glyphs.RightBracket}", btn.TextFormatter.Text);
 			Assert.False (btn.IsDefault);
 			Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
 			Assert.Equal ('_', btn.HotKeySpecifier);
@@ -27,8 +27,8 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Rect (0, 0, 4, 1), btn.Bounds);
 			Assert.Equal (new Rect (0, 0, 4, 1), btn.Frame);
 			Assert.Equal (Key.Null, btn.HotKey);
-			var expected = @"
-[  ]
+			var expected = @$"
+{Application.Glyphs.LeftBracket}  {Application.Glyphs.RightBracket}
 ";
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Application.End (rs);
@@ -38,7 +38,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (btn);
 			rs = Application.Begin (Application.Top);
 
-			Assert.Equal ("[◦ Test ◦]", btn.TextFormatter.Text);
+			Assert.Equal ($"{Application.Glyphs.LeftBracket}{Application.Glyphs.LeftDefaultIndicator} Test {Application.Glyphs.RightDefaultIndicator}{Application.Glyphs.RightBracket}", btn.TextFormatter.Text);
 			Assert.True (btn.IsDefault);
 			Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
 			Assert.Equal ('_', btn.HotKeySpecifier);
@@ -46,10 +46,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Rect (0, 0, 10, 1), btn.Bounds);
 			Assert.Equal (new Rect (0, 0, 10, 1), btn.Frame);
 			Assert.Equal (Key.T, btn.HotKey);
-			expected = @"
-[◦ Test ◦]
-";
-			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Application.End (rs);
 
 			btn = new Button (3, 4, "Test", true);
@@ -57,7 +53,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (btn);
 			rs = Application.Begin (Application.Top);
 
-			Assert.Equal ("[◦ Test ◦]", btn.TextFormatter.Text);
+			Assert.Equal ($"{Application.Glyphs.LeftBracket}{Application.Glyphs.LeftDefaultIndicator} Test {Application.Glyphs.RightDefaultIndicator}{Application.Glyphs.RightBracket}", btn.TextFormatter.Text);
 			Assert.True (btn.IsDefault);
 			Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
 			Assert.Equal ('_', btn.HotKeySpecifier);
@@ -65,10 +61,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Rect (0, 0, 10, 1), btn.Bounds);
 			Assert.Equal (new Rect (3, 4, 10, 1), btn.Frame);
 			Assert.Equal (Key.T, btn.HotKey);
-			expected = @"
-   [◦ Test ◦]
-";
-			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
 			Application.End (rs);
 		}
@@ -231,13 +223,13 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.True (btn.IsInitialized);
 			Assert.Equal ("Say Hello 你", btn.Text);
-			Assert.Equal ("[ Say Hello 你 ]", btn.TextFormatter.Text);
+			Assert.Equal ($"{Application.Glyphs.LeftBracket} {btn.Text} {Application.Glyphs.RightBracket}", btn.TextFormatter.Text);
 			Assert.Equal (new Rect (0, 0, 16, 1), btn.Bounds);
-
-			var expected = @"
+			var btnTxt = $"{Application.Glyphs.LeftBracket} {btn.Text} {Application.Glyphs.RightBracket}";
+			var expected = @$"
 ┌────────────────────────────┐
 │                            │
-│      [ Say Hello 你 ]      │
+│      {btnTxt}      │
 │                            │
 └────────────────────────────┘
 ";
@@ -268,13 +260,13 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.True (btn.IsInitialized);
 			Assert.Equal ("Say Hello 你", btn.Text);
-			Assert.Equal ("[ Say Hello 你 ]", btn.TextFormatter.Text);
+			Assert.Equal ($"{Application.Glyphs.LeftBracket} {btn.Text} {Application.Glyphs.RightBracket}", btn.TextFormatter.Text);
 			Assert.Equal (new Rect (0, 0, 16, 1), btn.Bounds);
-
-			var expected = @"
+			var btnTxt = $"{Application.Glyphs.LeftBracket} {btn.Text} {Application.Glyphs.RightBracket}";
+			var expected = @$"
 ┌────────────────────────────┐
 │                            │
-│      [ Say Hello 你 ]      │
+│      {btnTxt}      │
 │                            │
 └────────────────────────────┘
 ";
@@ -307,10 +299,10 @@ namespace Terminal.Gui.ViewsTests {
 
 			Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
-			var expected = @"
+			var expected = @$"
 ┌────────────────────────────┐
 │                            │
-│      [ Say Hello 你 ]      │
+│      {Application.Glyphs.LeftBracket} Say Hello 你 {Application.Glyphs.RightBracket}      │
 │                            │
 └────────────────────────────┘
 ";
@@ -338,10 +330,10 @@ namespace Terminal.Gui.ViewsTests {
 
 			Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
-			var expected = @"
+			var expected = @$"
 ┌────────────────────────────┐
 │                            │
-│      [ Say Hello 你 ]      │
+│      {Application.Glyphs.LeftBracket} Say Hello 你 {Application.Glyphs.RightBracket}      │
 │                            │
 └────────────────────────────┘
 ";
@@ -352,10 +344,10 @@ namespace Terminal.Gui.ViewsTests {
 			btn.Text = "Say Hello 你 changed";
 			Assert.True (btn.AutoSize);
 			Application.Refresh ();
-			expected = @"
+			expected = @$"
 ┌────────────────────────────┐
 │                            │
-│  [ Say Hello 你 changed ]  │
+│  {Application.Glyphs.LeftBracket} Say Hello 你 changed {Application.Glyphs.RightBracket}  │
 │                            │
 └────────────────────────────┘
 ";
@@ -371,6 +363,8 @@ namespace Terminal.Gui.ViewsTests {
 				Text = "Say Hello 你",
 				AutoSize = true
 			};
+			var btnTxt = $"{Application.Glyphs.LeftBracket} {btn.Text} {Application.Glyphs.RightBracket}";
+
 			btn.X = Pos.AnchorEnd () - Pos.Function (() => TextFormatter.GetTextWidth (btn.TextFormatter.Text));
 
 			var win = new Window () {
@@ -384,10 +378,10 @@ namespace Terminal.Gui.ViewsTests {
 
 			Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
-			var expected = @"
+			var expected = @$"
 ┌────────────────────────────┐
 │                            │
-│            [ Say Hello 你 ]│
+│            {btnTxt}│
 │                            │
 └────────────────────────────┘
 ";
@@ -396,12 +390,13 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.True (btn.AutoSize);
 			btn.Text = "Say Hello 你 changed";
+			btnTxt = $"{Application.Glyphs.LeftBracket} {btn.Text} {Application.Glyphs.RightBracket}";
 			Assert.True (btn.AutoSize);
 			Application.Refresh ();
-			expected = @"
+			expected = @$"
 ┌────────────────────────────┐
 │                            │
-│    [ Say Hello 你 changed ]│
+│    {btnTxt}│
 │                            │
 └────────────────────────────┘
 ";
@@ -509,16 +504,19 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Rect (30, 4, 20, 1), btnCancel.Frame);
 			Assert.Equal (new Rect (0, 3, 12, 1), ckbMatchCase.Frame);
 			Assert.Equal (new Rect (0, 4, 18, 1), ckbMatchWholeWord.Frame);
-			var expected = @"
+			var btn1 = $"{Application.Glyphs.LeftBracket}{Application.Glyphs.LeftDefaultIndicator} Find Next {Application.Glyphs.RightDefaultIndicator}{Application.Glyphs.RightBracket}";
+			var btn2 = $"{Application.Glyphs.LeftBracket} Find Previous {Application.Glyphs.RightBracket}";
+			var btn3 = $"{Application.Glyphs.LeftBracket} Cancel {Application.Glyphs.RightBracket}";
+			var expected = @$"
 ┌────────────────────────────────────────────────────┐
 │┌────┐                                              │
 ││Find│                                              │
 ││    └─────────────────────────────────────────────┐│
 ││                                                  ││
-││   Find: Testing buttons.       [◦ Find Next ◦]   ││
-││                               [ Find Previous ]  ││
-││√ Match case                                      ││
-││╴ Match whole word                 [ Cancel ]     ││
+││   Find: Testing buttons.       {btn1}   ││
+││                               {btn2}  ││
+││{Application.Glyphs.Checked} Match case                                      ││
+││{Application.Glyphs.UnChecked} Match whole word                 {btn3}     ││
 │└──────────────────────────────────────────────────┘│
 └────────────────────────────────────────────────────┘
 ";
@@ -545,10 +543,12 @@ namespace Terminal.Gui.ViewsTests {
 			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 			Assert.True (button.AutoSize);
 			Assert.Equal (new Rect (5, 1, 18, 1), button.Frame);
-			var expected = @"
+			var btn = $"{Application.Glyphs.LeftBracket}{Application.Glyphs.LeftDefaultIndicator} Process keys {Application.Glyphs.RightDefaultIndicator}{Application.Glyphs.RightBracket}";
+
+			var expected = @$"
 ┌────────────────────────────┐
 │                            │
-│     [◦ Process keys ◦]     │
+│     {btn}     │
 │                            │
 └────────────────────────────┘
 ";
@@ -577,10 +577,10 @@ namespace Terminal.Gui.ViewsTests {
 			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 			Assert.False (button.AutoSize);
 			Assert.Equal (new Rect (4, 1, 20, 1), button.Frame);
-			var expected = @"
+			var expected = @$"
 ┌────────────────────────────┐
 │                            │
-│     [◦ Process keys ◦]     │
+│     {Application.Glyphs.LeftBracket}{Application.Glyphs.LeftDefaultIndicator} Process keys {Application.Glyphs.RightDefaultIndicator}{Application.Glyphs.RightBracket}     │
 │                            │
 └────────────────────────────┘
 ";

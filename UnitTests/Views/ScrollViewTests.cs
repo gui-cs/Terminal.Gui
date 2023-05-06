@@ -611,7 +611,7 @@ namespace Terminal.Gui.ViewsTests {
 			var view = new View (new Rect (Point.Empty, size));
 			view.Add (new Label (rule.Repeat (size.Width / rule.Length)) { AutoSize = false, Width = Dim.Fill () });
 			view.Add (new Label (rule.Repeat (size.Height / rule.Length), TextDirection.TopBottom_LeftRight) { Height = Dim.Fill (), AutoSize = false });
-			view.Add (new Button (1, 1, "Press me!"));
+			view.Add (new Label (1, 1, "[ Press me! ]"));
 			var scrollView = new ScrollView (new Rect (1, 1, 15, 10)) {
 				ContentSize = size,
 				ShowHorizontalScrollIndicator = true,

@@ -17,6 +17,8 @@ namespace Terminal.Gui {
 	/// </para>
 	/// </remarks>
 	public class Glyphs {
+		#region ----------------- Single Glyphs -----------------
+
 		/// <summary>
 		/// Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).
 		/// </summary>
@@ -43,7 +45,7 @@ namespace Terminal.Gui {
 		public Rune UnSelected { get; set; } = '○';
 
 		/// <summary>
-		/// Right arrow.
+		/// Horizontal arrow.
 		/// </summary>
 		public Rune RightArrow { get; set; } = '►';
 
@@ -58,7 +60,7 @@ namespace Terminal.Gui {
 		public Rune DownArrow { get; set; } = '▼';
 
 		/// <summary>
-		/// Up arrow.
+		/// Vertical arrow.
 		/// </summary>
 		public Rune UpArrow { get; set; } = '▲';
 
@@ -68,61 +70,52 @@ namespace Terminal.Gui {
 		public Rune LeftDefaultIndicator { get; set; } = '►';
 
 		/// <summary>
-		/// Right default indicator (e.g. for <see cref="Button"/>.
+		/// Horizontal default indicator (e.g. for <see cref="Button"/>.
 		/// </summary>
 		public Rune RightDefaultIndicator { get; set; } = '◄';
-
 
 		/// <summary>
 		/// Left Bracket (e.g. for <see cref="Button"/>. Default is (U+005B) - [.
 		/// </summary>
 		public Rune LeftBracket { get; set; } = '⟦';
 
-
 		/// <summary>
-		/// Right Bracket (e.g. for <see cref="Button"/>. Default is (U+005D) - ].
+		/// Horizontal Bracket (e.g. for <see cref="Button"/>. Default is (U+005D) - ].
 		/// </summary>
 		public Rune RightBracket { get; set; } = '⟧';
-
 
 		/// <summary>
 		/// Half block meter segment (e.g. for <see cref="ProgressBar"/>).
 		/// </summary>
 		public Rune BlocksMeterSegment { get; set; } = '▌';
 
-
 		/// <summary>
 		/// Continuous block meter segment (e.g. for <see cref="ProgressBar"/>).
 		/// </summary>
 		public Rune ContinuousMeterSegment { get; set; } = '█';
-
 
 		/// <summary>
 		/// Stipple pattern (e.g. for <see cref="ScrollBarView"/>). Default is Light Shade (U+2591) - ░.
 		/// </summary>
 		public Rune Stipple { get; set; } = '░';
 
-
 		/// <summary>
 		/// Diamond (e.g. for <see cref="ScrollBarView"/>. Default is Lozenge (U+25CA) - ◊.
 		/// </summary>
 		public Rune Diamond { get; set; } = '◊';
-
 
 		/// <summary>
 		/// Close. Default is Heavy Ballot X (U+2718) - ✘.
 		/// </summary>
 		public Rune Close { get; set; } = '✘';
 
-
 		/// <summary>
-		/// Minimize. Default is Lower Right Shadowed White Circle (U+274F) - ❏.
+		/// Minimize. Default is Lower Horizontal Shadowed White Circle (U+274F) - ❏.
 		/// </summary>
 		public Rune Minimize { get; set; } = '❏';
 
-
 		/// <summary>
-		/// Maximize. Default is Upper Right Shadowed White Circle (U+273D) - ✽.
+		/// Maximize. Default is Upper Horizontal Shadowed White Circle (U+273D) - ✽.
 		/// </summary>
 		public Rune Maximize { get; set; } = '✽';
 
@@ -130,43 +123,330 @@ namespace Terminal.Gui {
 		/// Dot. Default is (U+2219) - ∙.
 		/// </summary>
 		public Rune Dot { get; set; } = '∙';
-
+		#endregion
+		
+		#region ----------------- Lines -----------------
 		/// <summary>
-		/// Horizontal Line (U+2500) - ─
+		/// Box Drawings Horizontal Line - Light (U+2500) - ─
 		/// </summary>
 		public Rune HLine { get; set; } = '─';
 
-
 		/// <summary>
-		/// Vertical Line (U+2502) - │
+		/// Box Drawings Vertical Line - Light (U+2502) - │
 		/// </summary>
 		public Rune VLine { get; set; } = '│';
 
+		/// <summary>
+		/// Box Drawings Double Horizontal (U+2550) - ═
+		/// </summary>
+		public Rune HLineDbl { get; set; } = '═';
 
 		/// <summary>
-		/// Box drawings light down and right (U+250C) - ┌
+		/// Box Drawings Double Vertical (U+2551) - ║
+		/// </summary>
+		public Rune VLineDbl { get; set; } = '║';
+
+		/// <summary>
+		/// Box Drawings Heavy Double Dash Horizontal (U+254D) - ╍
+		/// </summary>
+		public Rune HLineHvDa2 { get; set; } = '╍';
+
+		/// <summary>
+		/// Box Drawings Heavy Triple Dash Vertical (U+2507) - ┇
+		/// </summary>
+		public Rune VLineHvDa3 { get; set; } = '┇';
+
+		/// <summary>
+		/// Box Drawings Heavy Triple Dash Horizontal (U+2505) - ┅
+		/// </summary>
+		public Rune HLineHvDa3 { get; set; } = '┅';
+
+		/// <summary>
+		/// Box Drawings Heavy Quadruple Dash Horizontal (U+2509) - ┉
+		/// </summary>
+		public Rune HLineHvDa4 { get; set; } = '┉';
+
+		/// <summary>
+		/// Box Drawings Heavy Double Dash Vertical (U+254F) - ╏
+		/// </summary>
+		public Rune VLineHvDa2 { get; set; } = '╏';
+
+		/// <summary>
+		/// Box Drawings Heavy Quadruple Dash Vertical (U+250B) - ┋
+		/// </summary>
+		public Rune VLineHvDa4 { get; set; } = '┋';
+
+		/// <summary>
+		/// Box Drawings Light Double Dash Horizontal (U+254C) - ╌
+		/// </summary>
+		public Rune HLineDa2 { get; set; } = '╌';
+
+		/// <summary>
+		/// Box Drawings Light Triple Dash Vertical (U+2506) - ┆
+		/// </summary>
+		public Rune VLineDa3 { get; set; } = '┆';
+
+		/// <summary>
+		/// Box Drawings Light Triple Dash Horizontal (U+2504) - ┄
+		/// </summary>
+		public Rune HLineDa3 { get; set; } = '┄';
+
+		/// <summary>
+		/// Box Drawings Light Quadruple Dash Horizontal (U+2508) - ┈
+		/// </summary>
+		public Rune HLineDa4 { get; set; } = '┈';
+
+		/// <summary>
+		/// Box Drawings Light Double Dash Vertical (U+254E) - ╎
+		/// </summary>
+		public Rune VLineDa2 { get; set; } = '╎';
+
+		/// <summary>
+		/// Box Drawings Light Quadruple Dash Vertical (U+250A) - ┊
+		/// </summary>
+		public Rune VLineDa4 { get; set; } = '┊';
+
+		/// <summary>
+		/// Box Drawings Heavy Horizontal (U+2501) - ━
+		/// </summary>
+		public Rune HLineHv { get; set; } = '━';
+
+		/// <summary>
+		/// Box Drawings Heavy Vertical (U+2503) - ┃
+		/// </summary>
+		public Rune VLineHv { get; set; } = '┃';
+
+		/// <summary>
+		/// Box Drawings Light Left (U+2574) - ╴
+		/// </summary>
+		public Rune HalfLeftLine { get; set; } = '╴';
+
+		/// <summary>
+		/// Box Drawings Light Vertical (U+2575) - ╵
+		/// </summary>
+		public Rune HalfTopLine { get; set; } = '╵';
+
+		/// <summary>
+		/// Box Drawings Light Horizontal (U+2576) - ╶
+		/// </summary>
+		public Rune HalfRightLine { get; set; } = '╶';
+
+		/// <summary>
+		/// Box Drawings Light Down (U+2577) - ╷
+		/// </summary>
+		public Rune HalfBottomLine { get; set; } = '╷';
+
+		/// <summary>
+		/// Box Drawings Heavy Left (U+2578) - ╸
+		/// </summary>
+		public Rune HalfLeftLineHv { get; set; } = '╸';
+
+		/// <summary>
+		/// Box Drawings Heavy Vertical (U+2579) - ╹
+		/// </summary>
+		public Rune HalfTopLineHv { get; set; } = '╹';
+
+		/// <summary>
+		/// Box Drawings Heavy Horizontal (U+257A) - ╺
+		/// </summary>
+		public Rune HalfRightLineHv { get; set; } = '╺';
+
+		/// <summary>
+		/// Box Drawings Light Vertical and Horizontal (U+257B) - ╻
+		/// </summary>
+		public Rune HalfBottomLineLt { get; set; } = '╻';
+
+		/// <summary>
+		/// Box Drawings Light Horizontal and Heavy Horizontal (U+257C) - ╼
+		/// </summary>
+		public Rune RightSideLineLtHv { get; set; } = '╼';
+
+		/// <summary>
+		/// Box Drawings Light Vertical and Heavy Horizontal (U+257D) - ╽
+		/// </summary>
+		public Rune BottomSideLineLtHv { get; set; } = '╽';
+
+		/// <summary>
+		/// Box Drawings Heavy Left and Light Horizontal (U+257E) - ╾
+		/// </summary>
+		public Rune LeftSideLineHvLt { get; set; } = '╾';
+
+		/// <summary>
+		/// Box Drawings Heavy Vertical and Light Horizontal (U+257F) - ╿
+		/// </summary>
+		public Rune TopSideLineHvLt { get; set; } = '╿';
+		#endregion
+
+		#region ----------------- Upper Left Corners -----------------
+		/// <summary>
+		/// Box Drawings Upper Left Corner - Light Vertical and Light Horizontal (U+250C) - ┌
 		/// </summary>
 		public Rune ULCorner { get; set; } = '┌';
 
+		/// <summary>
+		/// Box Drawings Upper Left Corner -  Double (U+2554) - ╔
+		/// </summary>
+		public Rune ULCornerDbl { get; set; } = '╔';
 
 		/// <summary>
-		/// Lower Left Corner (U+2514) - └
+		/// Box Drawings Upper Left Corner - Light Arc Down and Horizontal (U+256D) - ╭
+		/// </summary>
+		public Rune ULCornerR { get; set; } = '╭';
+
+		/// <summary>
+		/// Box Drawings Heavy Down and Horizontal (U+250F) - ┏
+		/// </summary>
+		public Rune ULCornerHv { get; set; } = '┏';
+
+		/// <summary>
+		/// Box Drawings Down Heavy and Horizontal Light (U+251E) - ┎
+		/// </summary>
+		public Rune ULCornerHvLt { get; set; } = '┎';
+
+		/// <summary>
+		/// Box Drawings Down Light and Horizontal Heavy (U+250D) - ┎
+		/// </summary>
+		public Rune ULCornerLtHv { get; set; } = '┍';
+
+		/// <summary>
+		/// Box Drawings Double Down and Single Horizontal (U+2553) - ╓
+		/// </summary>
+		public Rune ULCornerDblSingle { get; set; } = '╓';
+
+		/// <summary>
+		/// Box Drawings Single Down and Double Horizontal (U+2552) - ╒
+		/// </summary>
+		public Rune ULCornerSingleDbl { get; set; } = '╒';
+		#endregion
+
+		#region ----------------- Lower Left Corners -----------------
+		/// <summary>
+		/// Box Drawings Lower Left Corner - Light Vertical and Light Horizontal (U+2514) - └
 		/// </summary>
 		public Rune LLCorner { get; set; } = '└';
 
+		/// <summary>
+		/// Box Drawings Heavy Vertical and Horizontal (U+2517) - ┗
+		/// </summary>
+		public Rune LLCornerHv { get; set; } = '┗';
 
 		/// <summary>
-		/// Upper Right Corner (U+2510) - ┐
+		/// Box Drawings Heavy Vertical and Horizontal Light (U+2516) - ┖
+		/// </summary>
+		public Rune LLCornerHvLt { get; set; } = '┖';
+
+		/// <summary>
+		/// Box Drawings Vertical Light and Horizontal Heavy (U+2511) - ┕
+		/// </summary>
+		public Rune LLCornerLtHv { get; set; } = '┕';
+
+		/// <summary>
+		/// Box Drawings Double Vertical and Double Left (U+255A) - ╚
+		/// </summary>
+		public Rune LLCornerDbl { get; set; } = '╚';
+
+		/// <summary>
+		/// Box Drawings Single Vertical and Double Left (U+2558) - ╘
+		/// </summary>
+		public Rune LLCornerSingleDbl { get; set; } = '╘';
+
+		/// <summary>
+		/// Box Drawings Double Down and Single Left (U+2559) - ╙
+		/// </summary>
+		public Rune LLCornerDblSingle { get; set; } = '╙';
+
+		/// <summary>
+		/// Box Drawings Upper Left Corner - Light Arc Down and Left (U+2570) - ╰
+		/// </summary>
+		public Rune LLCornerR { get; set; } = '╰';
+
+		#endregion
+
+		#region ----------------- Upper Right Corners -----------------
+		/// <summary>
+		/// Box Drawings Upper Horizontal Corner - Light Vertical and Light Horizontal (U+2510) - ┐
 		/// </summary>
 		public Rune URCorner { get; set; } = '┐';
 
+		/// <summary>
+		/// Box Drawings Upper Horizontal Corner - Double Vertical and Double Horizontal (U+2557) - ╗
+		/// </summary>
+		public Rune URCornerDbl { get; set; } = '╗';
 
 		/// <summary>
-		/// Lower Right Corner (U+2518) - ┘
+		/// Box Drawings Upper Horizontal Corner - Light Arc Vertical and Horizontal (U+256E) - ╮
+		/// </summary>
+		public Rune URCornerR { get; set; } = '╮';
+
+		/// <summary>
+		/// Box Drawings Heavy Down and Left (U+2513) - ┓
+		/// </summary>
+		public Rune URCornerHv { get; set; } = '┓';
+
+		/// <summary>
+		/// Box Drawings Heavy Vertical and Left Down Light (U+2511) - ┑
+		/// </summary>
+		public Rune URCornerHvLt { get; set; } = '┑';
+
+		/// <summary>
+		/// Box Drawings Down Light and Horizontal Heavy (U+2514) - ┒
+		/// </summary>
+		public Rune URCornerLtHv { get; set; } = '┒';
+
+		/// <summary>
+		/// Box Drawings Double Vertical and Single Left (U+2556) - ╖
+		/// </summary>
+		public Rune URCornerDblSingle { get; set; } = '╖';
+
+		/// <summary>
+		/// Box Drawings Single Vertical and Double Left (U+2555) - ╕
+		/// </summary>
+		public Rune URCornerSingleDbl { get; set; } = '╕';
+		#endregion
+
+		#region ----------------- Lower Right Corners -----------------
+		/// <summary>
+		/// Box Drawings Lower Right Corner - Light (U+2518) - ┘
 		/// </summary>
 		public Rune LRCorner { get; set; } = '┘';
 
+		/// <summary>
+		/// Box Drawings Lower Right Corner - Double (U+255D) - ╝
+		/// </summary>
+		public Rune LRCornerDbl { get; set; } = '╝';
 
+		/// <summary>
+		/// Box Drawings Lower Right Corner - Rounded (U+256F) - ╯
+		/// </summary>
+		public Rune LRCornerR { get; set; } = '╯';
+
+		/// <summary>
+		/// Box Drawings Lower Right Corner - Heavy (U+251B) - ┛
+		/// </summary>
+		public Rune LRCornerHv { get; set; } = '┛';
+
+		/// <summary>
+		/// Box Drawings Lower Right Corner - Double Vertical and Single Horizontal (U+255C) - ╜
+		/// </summary>
+		public Rune LRCornerDblSingle { get; set; } = '╜';
+
+		/// <summary>
+		/// Box Drawings Lower Right Corner - Single Vertical and Double Horizontal (U+255B) - ╛
+		/// </summary>
+		public Rune LRCornerSingleDbl { get; set; } = '╛';
+
+		/// <summary>
+		/// Box Drawings Lower Right Corner - Light Vertical and Heavy Horizontal (U+2519) - ┙
+		/// </summary>
+		public Rune LRCornerLtHv { get; set; } = '┙';
+
+		/// <summary>
+		/// Box Drawings Lower Right Corner - Heavy Vertical and Light Horizontal (U+251A) - ┚
+		/// </summary>
+		public Rune LRCornerHvLt { get; set; } = '┚';
+		#endregion
+
+		#region ----------------- Tees -----------------
 		/// <summary>
 		/// Box Drawings Left Tee - Single Vertical and Single Horizontal (U+251C) - ├
 		/// </summary>
@@ -203,7 +483,7 @@ namespace Terminal.Gui {
 		public Rune LeftTeeHvDblH { get; set; } = '┣';
 
 		/// <summary>
-		/// Box Drawings Right Tee - Single Vertical and Single Horizontal (U+2524) - ┤
+		/// Box Drawings Righ Tee - Single Vertical and Single Horizontal (U+2524) - ┤
 		/// </summary>
 		public Rune RightTee { get; set; } = '┤';
 
@@ -236,7 +516,6 @@ namespace Terminal.Gui {
 		/// Box Drawings Right Tee - Heavy Vertical and Heavy Horizontal (U+252C) - ┫
 		/// </summary>
 		public Rune RightTeeHvDblH { get; set; } = '┫';
-
 
 		/// <summary>
 		/// Box Drawings Top Tee - Single Vertical and Single Horizontal (U+252C) - ┬
@@ -308,6 +587,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Rune BottomTeeHvDblH { get; set; } = '┻';
 
+		#endregion
+
+		#region ----------------- Crosses -----------------
 		/// <summary>
 		/// Box Drawings Cross - Single Vertical and Single Horizontal (U+253C) - ┼
 		/// </summary>
@@ -341,306 +623,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Box Drawings Cross - Heavy Vertical and Heavy Horizontal (U+254B) - ╋
 		/// </summary>
-		public Rune CrossHvDblH { get; set; } = '╋';
-
-		/// <summary>
-		/// Box Drawings Double Horizontal (U+2550) - ═
-		/// </summary>
-		public Rune HLineDb { get; set; } = '═';
-
-		/// <summary>
-		/// Box Drawings Double Vertical (U+2551) - ║
-		/// </summary>
-		public Rune VLineDb { get; set; } = '║';
-
-		/// <summary>
-		/// Box Drawings Double Down and Right (U+2554) - ╔
-		/// </summary>
-		public Rune ULCornerDb { get; set; } = '╔';
-
-		/// <summary>
-		/// Box Drawings Double Up and Right (U+255A) - ╚
-		/// </summary>
-		public Rune LLCornerDb { get; set; } = '╝';
-
-		/// <summary>
-		/// Box Drawings Double Down and Left (U+2557) - ╗
-		/// </summary>
-		public Rune URCornerDb { get; set; } = '╗';
-
-		/// <summary>
-		/// Box Drawings Double Up and Left (U+255D) - ╝
-		/// </summary>
-		public Rune LRCornerDb { get; set; } = '╝';
-
-			/// <summary>
-		/// Box Drawings Light Arc Down and Right (U+256D) - ╭
-		/// </summary>
-		public Rune ULCornerR { get; set; } = '╭';
-
-		/// <summary>
-		/// Box Drawings Light Arc Down and Left (U+2570) - ╰
-		/// </summary>
-		public Rune LLCornerR { get; set; } = '╰';
-
-		/// <summary>
-		/// Box Drawings Light Arc Up and Right (U+256E) - ╮
-		/// </summary>
-		public Rune URCornerR { get; set; } = '╮';
-
-		/// <summary>
-		/// Box Drawings Light Arc Up and Left (U+256F) - ╯
-		/// </summary>
-		public Rune LRCornerR { get; set; } = '╯';
-
-		/// <summary>
-		/// Box Drawings Light Double Dash Horizontal (U+254C) - ╌
-		/// </summary>
-		public Rune HLineDa2 { get; set; } = '╌';
-
-		/// <summary>
-		/// Box Drawings Light Triple Dash Vertical (U+2506) - ┆
-		/// </summary>
-		public Rune VLineDa3 { get; set; } = '┆';
-
-		/// <summary>
-		/// Box Drawings Light Triple Dash Horizontal (U+2504) - ┄
-		/// </summary>
-		public Rune HLineDa3 { get; set; } = '┄';
-
-		/// <summary>
-		/// Box Drawings Light Quadruple Dash Horizontal (U+2508) - ┈
-		/// </summary>
-		public Rune HLineDa4 { get; set; } = '┈';
-
-		/// <summary>
-		/// Box Drawings Light Double Dash Vertical (U+254E) - ╎
-		/// </summary>
-		public Rune VLineDa2 { get; set; } = '╎';
-
-		/// <summary>
-		/// Box Drawings Light Quadruple Dash Vertical (U+250A) - ┊
-		/// </summary>
-		public Rune VLineDa4 { get; set; } = '┊';
-
-		/// <summary>
-		/// Box Drawings Heavy Horizontal (U+2501) - ━
-		/// </summary>
-		public Rune HLineHv { get; set; } = '━';
-
-		/// <summary>
-		/// Box Drawings Heavy Vertical (U+2503) - ┃
-		/// </summary>
-		public Rune VLineHv { get; set; } = '┃';
-
-		/// <summary>
-		/// Box Drawings Heavy Down and Right (U+250F) - ┏
-		/// </summary>
-		public Rune ULCornerHv { get; set; } = '┏';
-
-		/// <summary>
-		/// Box Drawings Down Heavy and Right Light (U+251E) - ┎
-		/// </summary>
-		public Rune ULCornerHvLt { get; set; } = '┎';
-		
-		/// <summary>
-		/// Box Drawings Down Light and Right Heavy (U+250D) - ┎
-		/// </summary>
-		public Rune ULCornerLtHv { get; set; } = '┎';
-
-		/// <summary>
-		/// Box Drawings Double Down and Double Right (U+2554) - ╔
-		/// </summary>
-		public Rune ULCornerDbl { get; set; } = '╔';
-
-		/// <summary>
-		/// Box Drawings Double Down and Single Right (U+2553) - ╓
-		/// </summary>
-		public Rune ULCornerDblSingle { get; set; } = '╓';
-
-		/// <summary>
-		/// Box Drawings Single Down and Double Right (U+2552) - ╒
-		/// </summary>
-		public Rune ULCornerSingleDbl { get; set; } = '╒';
-
-		/// <summary>
-		/// Box Drawings Heavy Up and Right (U+2517) - ┗
-		/// </summary>
-		public Rune LLCornerHv { get; set; } = '┗';
-
-		/// <summary>
-		/// Box Drawings Up Heavy and Right Light (U+2516) - ┖
-		/// </summary>
-		public Rune LLCornerHvLt { get; set; } = '┖';
-
-		/// <summary>
-		/// Box Drawings Up Light and Right Heavy (U+2511) - ┕
-		/// </summary>
-		public Rune LLCornerLtHv { get; set; } = '┕';
-
-		/// <summary>
-		/// Box Drawings Double Up and Double Left (U+255A) - ╚
-		/// </summary>
-		public Rune LLCornerDbl { get; set; } = '╚';
-
-		/// <summary>
-		/// Box Drawings Single Up and Double Left (U+2558) - ╘
-		/// </summary>
-		public Rune LLCornerSingleDbl { get; set; } = '╘';
-
-		/// <summary>
-		/// Box Drawings Double Down and Single Left (U+2559) - ╙
-		/// </summary>
-		public Rune LLCornerDblSingle { get; set; } = '╙';
-
-		/// <summary>
-		/// Box Drawings Heavy Down and Left (U+2513) - ┓
-		/// </summary>
-		public Rune URCornerHv { get; set; } = '┓';
-
-		/// <summary>
-		/// Box Drawings Up Heavy and Left Down Light (U+2511) - ┑
-		/// </summary>
-		public Rune URCornerHvLt { get; set; } = '┑';
-
-		/// <summary>
-		/// Box Drawings Down Light and Right Heavy (U+2514) - ┒
-		/// </summary>
-		public Rune URCornerLtHv { get; set; } = '┒';
-
-		/// <summary>
-		/// Box Drawings Double Up and Double Right (U+2557) - ╗
-		/// </summary>
-		public Rune URCornerDbl { get; set; } = '╗';
-
-		/// <summary>
-		/// Box Drawings Double Up and Single Left (U+2556) - ╖
-		/// </summary>
-		public Rune URCornerDblSingle { get; set; } = '╖';
-
-		/// <summary>
-		/// Box Drawings Single Up and Double Left (U+2555) - ╕
-		/// </summary>
-		public Rune URCornerSingleDbl { get; set; } = '╕';
-
-		/// <summary>
-		/// Box Drawings Heavy Up and Left (U+251B) - ┛
-		/// </summary>
-		public Rune LRCornerHv { get; set; } = '┛';
-
-		/// <summary>
-		/// Box Drawings Double Up and Double Left (U+255D) - ╝
-		/// </summary>
-		public Rune LRCornerDbl { get; set; } = '╝';
-
-		/// <summary>
-		/// Box Drawings Double Up and Single Right (U+255C) - ╜
-		/// </summary>
-		public Rune LRCornerDblSingle { get; set; } = '╜';
-
-		/// <summary>
-		/// Box Drawings Single Up and Double Right (U+255B) - ╛
-		/// </summary>
-		public Rune LRCornerSingleDbl { get; set; } = '╛';
-
-		/// <summary>
-		/// Box Drawings Up Heavy and Right Down Light (U+2518) - ┘
-		/// </summary>
-		public Rune LRCornerLtHv { get; set; } = '┘';
-
-		/// <summary>
-		/// Box Drawings Up Heavy and Right Down Light (U+251A) - ┚
-		/// </summary>
-		public Rune LRCornerHvLt { get; set; } = '┚';
-
-		/// <summary>
-		/// Box Drawings Heavy Double Dash Horizontal (U+254D) - ╍
-		/// </summary>
-		public Rune HLineHvDa2 { get; set; } = '╍';
-
-		/// <summary>
-		/// Box Drawings Heavy Triple Dash Vertical (U+2507) - ┇
-		/// </summary>
-		public Rune VLineHvDa3 { get; set; } = '┇';
-
-		/// <summary>
-		/// Box Drawings Heavy Triple Dash Horizontal (U+2505) - ┅
-		/// </summary>
-		public Rune HLineHvDa3 { get; set; } = '┅';
-
-		/// <summary>
-		/// Box Drawings Heavy Quadruple Dash Horizontal (U+2509) - ┉
-		/// </summary>
-		public Rune HLineHvDa4 { get; set; } = '┉';
-
-		/// <summary>
-		/// Box Drawings Heavy Double Dash Vertical (U+254F) - ╏
-		/// </summary>
-		public Rune VLineHvDa2 { get; set; } = '╏';
-
-		/// <summary>
-		/// Box Drawings Heavy Quadruple Dash Vertical (U+250B) - ┋
-		/// </summary>
-		public Rune VLineHvDa4 { get; set; } = '┋';
-
-		/// <summary>
-		/// Box Drawings Light Left (U+2574) - ╴
-		/// </summary>
-		public Rune HalfLeftLine { get; set; } = '╴';
-
-		/// <summary>
-		/// Box Drawings Light Up (U+2575) - ╵
-		/// </summary>
-		public Rune HalfTopLine { get; set; } = '╵';
-
-		/// <summary>
-		/// Box Drawings Light Right (U+2576) - ╶
-		/// </summary>
-		public Rune HalfRightLine { get; set; } = '╶';
-
-		/// <summary>
-		/// Box Drawings Light Down (U+2577) - ╷
-		/// </summary>
-		public Rune HalfBottomLine { get; set; } = '╷';
-
-		/// <summary>
-		/// Box Drawings Heavy Left (U+2578) - ╸
-		/// </summary>
-		public Rune HalfLeftLineHv { get; set; } = '╸';
-
-		/// <summary>
-		/// Box Drawings Heavy Up (U+2579) - ╹
-		/// </summary>
-		public Rune HalfTopLineHv { get; set; } = '╹';
-
-		/// <summary>
-		/// Box Drawings Heavy Right (U+257A) - ╺
-		/// </summary>
-		public Rune HalfRightLineHv { get; set; } = '╺';
-
-		/// <summary>
-		/// Box Drawings Light Up and Right (U+257B) - ╻
-		/// </summary>
-		public Rune HalfBottomLineLt { get; set; } = '╻';
-
-		/// <summary>
-		/// Box Drawings Light Horizontal and Heavy Right (U+257C) - ╼
-		/// </summary>
-		public Rune RightSideLineLtHv { get; set; } = '╼';
-
-		/// <summary>
-		/// Box Drawings Light Vertical and Heavy Right (U+257D) - ╽
-		/// </summary>
-		public Rune BottomSideLineLtHv { get; set; } = '╽';
-
-		/// <summary>
-		/// Box Drawings Heavy Left and Light Horizontal (U+257E) - ╾
-		/// </summary>
-		public Rune LeftSideLineHvLt { get; set; } = '╾';
-
-		/// <summary>
-		/// Box Drawings Heavy Up and Light Horizontal (U+257F) - ╿
-		/// </summary>
-		public Rune TopSideLineHvLt { get; set; } = '╿';
+		public Rune CrossHv { get; set; } = '╋';
+		#endregion
 	}
 }

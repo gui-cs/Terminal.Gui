@@ -681,7 +681,7 @@ namespace Terminal.Gui.ViewsTests {
 					MessageBox.Query ("", "Hello Word", "Ok");
 
 				} else if (iterations == 1) {
-					TestHelpers.AssertDriverContentsWithFrameAre (@"
+					TestHelpers.AssertDriverContentsWithFrameAre (@$"
 ┌──────────────────────────────────────┐
 │                                      │
 │                                      │
@@ -690,7 +690,7 @@ namespace Terminal.Gui.ViewsTests {
 │       ┌──────────────────────┐       │
 │       │      Hello Word      │       │
 │       │                      │       │
-│       │       [◦ Ok ◦]       │       │
+│       │       {Application.Glyphs.LeftBracket}{Application.Glyphs.LeftDefaultIndicator} Ok {Application.Glyphs.RightDefaultIndicator}{Application.Glyphs.RightBracket}       │       │
 │       └──────────────────────┘       │
 │                                      │
 │                                      │
@@ -731,7 +731,7 @@ namespace Terminal.Gui.ViewsTests {
 				} else if (iterations == 4) {
 					Assert.Equal (Application.Current, Application.MouseGrabView);
 
-					TestHelpers.AssertDriverContentsWithFrameAre (@"
+					TestHelpers.AssertDriverContentsWithFrameAre (@$"
 ┌──────────────────────────────────────┐
 │                                      │
 │                                      │
@@ -740,7 +740,7 @@ namespace Terminal.Gui.ViewsTests {
 │      ┌──────────────────────┐        │
 │      │      Hello Word      │        │
 │      │                      │        │
-│      │       [◦ Ok ◦]       │        │
+│      │       {Application.Glyphs.LeftBracket}{Application.Glyphs.LeftDefaultIndicator} Ok {Application.Glyphs.RightDefaultIndicator}{Application.Glyphs.RightBracket}       │        │
 │      └──────────────────────┘        │
 │                                      │
 │                                      │
@@ -767,7 +767,7 @@ namespace Terminal.Gui.ViewsTests {
 				} else if (iterations == 6) {
 					Assert.Equal (Application.Current, Application.MouseGrabView);
 
-					TestHelpers.AssertDriverContentsWithFrameAre (@"
+					TestHelpers.AssertDriverContentsWithFrameAre (@$"
 ┌──────────────────────────────────────┐
 │                                      │
 │                                      │
@@ -775,7 +775,7 @@ namespace Terminal.Gui.ViewsTests {
 │      ┌──────────────────────┐        │
 │      │      Hello Word      │        │
 │      │                      │        │
-│      │       [◦ Ok ◦]       │        │
+│      │       {Application.Glyphs.LeftBracket}{Application.Glyphs.LeftDefaultIndicator} Ok {Application.Glyphs.RightDefaultIndicator}{Application.Glyphs.RightBracket}       │        │
 │      └──────────────────────┘        │
 │                                      │
 │                                      │
@@ -1176,9 +1176,9 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Refresh ();
 			Assert.Equal (new Rect (0, 0, 40, 10), top.Frame);
 			Assert.Equal (new Rect (10, 3, 20, 3), dialog.Frame);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@$"
           ┌──────────────────┐
-          │      [ Ok ]      │
+          │      {Application.Glyphs.LeftBracket} Ok {Application.Glyphs.RightBracket}      │
           └──────────────────┘
 ", output);
 
@@ -1207,9 +1207,9 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Refresh ();
 			Assert.Equal (new Rect (0, 0, 40, 10), top.Frame);
 			Assert.Equal (new Rect (0, 0, 20, 3), dialog.Frame);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@$"
 ┌──────────────────┐
-│      [ Ok ]      │
+│      {Application.Glyphs.LeftBracket} Ok {Application.Glyphs.RightBracket}      │
 └──────────────────┘
 ", output);
 
@@ -1227,9 +1227,9 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Refresh ();
 			Assert.Equal (new Rect (0, 0, 20, 3), top.Frame);
 			Assert.Equal (new Rect (0, 0, 20, 3), dialog.Frame);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@$"
 ┌──────────────────┐
-│      [ Ok ]      │
+│      {Application.Glyphs.LeftBracket} Ok {Application.Glyphs.RightBracket}      │
 └──────────────────┘
 ", output);
 
@@ -1249,7 +1249,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Rect (-1, 0, 20, 3), dialog.Frame);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ──────────────────┐
-      [ Ok ]      │
+│      {Application.Glyphs.LeftBracket} Ok {Application.Glyphs.RightBracket}      │
 ", output);
 
 			ReflectionTools.InvokePrivate (
@@ -1437,7 +1437,7 @@ namespace Terminal.Gui.ViewsTests {
 			var rs = Application.Begin (dialog);
 
 			Assert.Equal (new Rect (2, 5, 15, 10), dialog.Frame);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@$"
 ┌──────────────────┐
 │                  │
 │                  │
@@ -1451,7 +1451,7 @@ namespace Terminal.Gui.ViewsTests {
 │ │             │  │
 │ │             │  │
 │ │             │  │
-│ │  [ Popup ]  │  │
+│ │  {Application.Glyphs.LeftBracket} Popup {Application.Glyphs.RightBracket}  │  │
 │ └─────────────┘  │
 │                  │
 │                  │
@@ -1470,7 +1470,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			var firstIteration = false;
 			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@$"
 ┌──────────────────┐
 │                  │
 │                  │
@@ -1484,7 +1484,7 @@ namespace Terminal.Gui.ViewsTests {
 │ │             │  │
 │ │             │  │
 │ │             │  │
-│ │  [ Popup ]  │  │
+│ │  {Application.Glyphs.LeftBracket} Popup {Application.Glyphs.RightBracket}  │  │
 │┌────────────────┐│
 ││One             ││
 ││Two             ││

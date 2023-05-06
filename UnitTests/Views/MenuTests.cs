@@ -2040,10 +2040,10 @@ Edit
 				View = menu
 			}));
 			Application.Refresh ();
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@$"
  Nullable Checked       
 ┌──────────────────────┐
-│ ⍰ Check this out 你  │
+│ {Application.Glyphs.NullChecked} Check this out 你  │
 └──────────────────────┘", output);
 			Assert.True (menu.openMenu.MouseEvent (new MouseEvent () {
 				X = 0,

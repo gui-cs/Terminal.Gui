@@ -3789,7 +3789,7 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal (6, TextFormatter.GetLengthThatFits (runes, 6));
 			runes = ustring.Make ("こんにちは 世界").ToRuneList ();
 			Assert.Equal (3, TextFormatter.GetLengthThatFits (runes, 6));
-			runes = ustring.Make ("[ Say Hello 你 ]").ToRuneList ();
+			runes = ustring.Make ("{Application.Glyphs.LeftBracket} Say Hello 你 {Application.Glyphs.RightBracket}").ToRuneList ();
 			Assert.Equal (15, TextFormatter.GetLengthThatFits (runes, 16));
 		}
 

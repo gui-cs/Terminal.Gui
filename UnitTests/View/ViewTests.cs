@@ -1388,7 +1388,7 @@ At 0,0
 				Y = Pos.Center () - 2  // center minus 2 minus two lines top and bottom borders equal to zero (4-2-2=0)
 			};
 
-			var button = new Button ("Press me!") {
+			var button = new Label ("[ Press me! ]") {
 				X = Pos.Center (),
 				Y = Pos.Center ()
 			};
@@ -1430,11 +1430,11 @@ At 0,0
 				frame.Frame.Right, frame.Frame.Bottom));
 			Assert.Equal (new Rect (0, 0, 38, 1), label.Frame);
 			Assert.Equal (new Rect (12, 2, 13, 1), button.Frame);
-			var expected = @"
+			var expected = @$"
                     ┌──────────────────────────────────────┐
                     │    This should be the first line.    │
                     │                                      │
-                    │            [ Press me! ]             │
+                    │            {Application.Glyphs.LeftBracket} Press me! {Application.Glyphs.RightBracket}             │
                     │                                      │
                     │                                      │
                     │                                      │

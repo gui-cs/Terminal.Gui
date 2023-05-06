@@ -90,10 +90,10 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (0, rg.Y);
 			Assert.Equal (13, rg.Frame.Width);
 			Assert.Equal (2, rg.Frame.Height);
-			var expected = @"
+			var expected = @$"
 ┌────────────────────────────┐
-│● Test                      │
-│◌ New Test 你               │
+│{Application.Glyphs.Selected} Test                      │
+│{Application.Glyphs.UnSelected} New Test 你               │
 │                            │
 └────────────────────────────┘
 ";
@@ -111,9 +111,9 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (21, rg.Width);
 			Assert.Equal (1, rg.Height);
 
-			expected = @"
+			expected = @$"
 ┌────────────────────────────┐
-│● Test  ◌ New Test 你       │
+│{Application.Glyphs.Selected} Test  {Application.Glyphs.UnSelected} New Test 你       │
 │                            │
 │                            │
 └────────────────────────────┘
@@ -131,9 +131,9 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (0, rg.Y);
 			Assert.Equal (23, rg.Width);
 			Assert.Equal (1, rg.Height);
-			expected = @"
+			expected = @$"
 ┌────────────────────────────┐
-│● Test    ◌ New Test 你     │
+│{Application.Glyphs.Selected} Test    {Application.Glyphs.UnSelected} New Test 你     │
 │                            │
 │                            │
 └────────────────────────────┘

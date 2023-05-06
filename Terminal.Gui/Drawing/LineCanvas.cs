@@ -357,8 +357,8 @@ namespace Terminal.Gui {
 			public override void SetGlyphs ()
 			{
 				_round = Application.Glyphs.URCornerR;
-				_doubleH = Application.Glyphs.URCornerDblSingle;
-				_doubleV = Application.Glyphs.URCornerSingleDbl;
+				_doubleH = Application.Glyphs.URCornerSingleDbl;
+				_doubleV = Application.Glyphs.URCornerDblSingle;
 				_doubleBoth = Application.Glyphs.URCornerDbl;
 				_thickH = Application.Glyphs.URCornerHvLt;
 				_thickV = Application.Glyphs.URCornerLtHv;
@@ -384,8 +384,8 @@ namespace Terminal.Gui {
 			public override void SetGlyphs ()
 			{
 				_round = Application.Glyphs.LRCornerR;
-				_doubleH = Application.Glyphs.LRCornerDblSingle;
-				_doubleV = Application.Glyphs.LRCornerSingleDbl;
+				_doubleH = Application.Glyphs.LRCornerSingleDbl;
+				_doubleV = Application.Glyphs.LRCornerDblSingle;
 				_doubleBoth = Application.Glyphs.LRCornerDbl;
 				_thickH = Application.Glyphs.LRCornerLtHv;
 				_thickV = Application.Glyphs.LRCornerHvLt;
@@ -455,7 +455,7 @@ namespace Terminal.Gui {
 				_doubleBoth = Application.Glyphs.CrossDbl;
 				_thickH = Application.Glyphs.CrossHvH;
 				_thickV = Application.Glyphs.CrossHvV;
-				_thickBoth = Application.Glyphs.CrossDbl;
+				_thickBoth = Application.Glyphs.CrossHv;
 				_normal = Application.Glyphs.Cross;
 			}
 		}
@@ -491,7 +491,7 @@ namespace Terminal.Gui {
 				return (Rune)Application.Glyphs.Dot;
 			case IntersectionRuneType.HLine:
 				if (useDouble) {
-					return Application.Glyphs.HLineDb;
+					return Application.Glyphs.HLineDbl;
 				}
 				if (useDashed) {
 					return Application.Glyphs.HLineDa2;
@@ -502,7 +502,7 @@ namespace Terminal.Gui {
 				return useThick ? Application.Glyphs.HLineHv : (useThickDashed ? Application.Glyphs.HLineHvDa2 : (useThickDotted ? Application.Glyphs.HLineHvDa3 : Application.Glyphs.HLine));
 			case IntersectionRuneType.VLine:
 				if (useDouble) {
-					return Application.Glyphs.VLineDb;
+					return Application.Glyphs.VLineDbl;
 				}
 				if (useDashed) {
 					return Application.Glyphs.VLineDa3;
