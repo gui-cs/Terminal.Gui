@@ -20,17 +20,17 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).
 		/// </summary>
-		public Rune Checked { get; set; } = '√';
+		public Rune Checked { get; set; } = '☑';
 
 		/// <summary>
 		/// Not Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).
 		/// </summary>
-		public Rune UnChecked { get; set; } = '╴';
+		public Rune UnChecked { get; set; } = '☐';
 
 		/// <summary>
 		/// Null Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).
 		/// </summary>
-		public Rune NullChecked { get; set; } = '⍰';
+		public Rune NullChecked { get; set; } = '☒';
 
 		/// <summary>
 		/// Selected indicator  (e.g. for <see cref="ListView"/> and <see cref="RadioGroup"/>).
