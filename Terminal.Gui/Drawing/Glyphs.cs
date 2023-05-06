@@ -42,7 +42,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Rune UnSelected { get; set; } = '◌';
 
-		/// </summary>
+		/// <summary>
 		/// Right arrow.
 		/// </summary>
 		public Rune RightArrow { get; set; } = '►';

@@ -222,14 +222,14 @@ namespace Terminal.Gui.DrawingTests {
 			TestHelpers.AssertEqual (output, expected, $"{lc}");
 		}
 
-		[InlineData (0, 0, Orientation.Horizontal, "─")]
-		[InlineData (1, 0, Orientation.Horizontal, "─")]
-		[InlineData (0, 1, Orientation.Horizontal, "─")]
-		[InlineData (0, 0, Orientation.Vertical, "│")]
-		[InlineData (1, 0, Orientation.Vertical, "│")]
-		[InlineData (0, 1, Orientation.Vertical, "│")]
+		[InlineData (Orientation.Horizontal, "─")]
+		[InlineData (Orientation.Horizontal, "─")]
+		[InlineData (Orientation.Horizontal, "─")]
+		[InlineData (Orientation.Vertical, "│")]
+		[InlineData (Orientation.Vertical, "│")]
+		[InlineData (Orientation.Vertical, "│")]
 		[Theory, SetupFakeDriver]
-		public void Length_Zero_Alone_Is_Line (int x, int y, Orientation orientation, string expected)
+		public void Length_Zero_Alone_Is_Line (Orientation orientation, string expected)
 		{
 			var lc = new LineCanvas ();
 			// Add a line at 0, 0 that's has length of 0
@@ -237,14 +237,14 @@ namespace Terminal.Gui.DrawingTests {
 			TestHelpers.AssertEqual (output, expected, $"{lc}");
 		}
 
-		[InlineData (0, 0, Orientation.Horizontal, "┼")]
-		[InlineData (1, 0, Orientation.Horizontal, "┼")]
-		[InlineData (0, 1, Orientation.Horizontal, "┼")]
-		[InlineData (0, 0, Orientation.Vertical, "┼")]
-		[InlineData (1, 0, Orientation.Vertical, "┼")]
-		[InlineData (0, 1, Orientation.Vertical, "┼")]
+		[InlineData (Orientation.Horizontal, "┼")]
+		[InlineData (Orientation.Horizontal, "┼")]
+		[InlineData (Orientation.Horizontal, "┼")]
+		[InlineData (Orientation.Vertical, "┼")]
+		[InlineData (Orientation.Vertical, "┼")]
+		[InlineData (Orientation.Vertical, "┼")]
 		[Theory, SetupFakeDriver]
-		public void Length_Zero_Cross_Is_Cross (int x, int y, Orientation orientation, string expected)
+		public void Length_Zero_Cross_Is_Cross (Orientation orientation, string expected)
 		{
 			var lc = new LineCanvas ();
 
@@ -256,14 +256,14 @@ namespace Terminal.Gui.DrawingTests {
 			TestHelpers.AssertEqual (output, expected, $"{lc}");
 		}
 
-		[InlineData (0, 0, Orientation.Horizontal, "╥")]
-		[InlineData (1, 0, Orientation.Horizontal, "╥")]
-		[InlineData (0, 1, Orientation.Horizontal, "╥")]
-		[InlineData (0, 0, Orientation.Vertical, "╞")]
-		[InlineData (1, 0, Orientation.Vertical, "╞")]
-		[InlineData (0, 1, Orientation.Vertical, "╞")]
+		[InlineData (Orientation.Horizontal, "╥")]
+		[InlineData (Orientation.Horizontal, "╥")]
+		[InlineData (Orientation.Horizontal, "╥")]
+		[InlineData (Orientation.Vertical, "╞")]
+		[InlineData (Orientation.Vertical, "╞")]
+		[InlineData (Orientation.Vertical, "╞")]
 		[Theory, SetupFakeDriver]
-		public void Length_Zero_NextTo_Opposite_Is_T (int x, int y, Orientation orientation, string expected)
+		public void Length_Zero_NextTo_Opposite_Is_T (Orientation orientation, string expected)
 		{
 			var lc = new LineCanvas ();
 

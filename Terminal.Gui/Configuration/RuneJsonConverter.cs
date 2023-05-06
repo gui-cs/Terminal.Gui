@@ -14,8 +14,7 @@ namespace Terminal.Gui {
 	/// A number
 	/// - The unicode code in decimal
 	/// </summary>
-	public class RuneJsonConverter : JsonConverter<System.Rune> {
-		/// <inheritdoc/>
+	internal class RuneJsonConverter : JsonConverter<System.Rune> {
 		public override System.Rune Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 		{
 			if (reader.TokenType == JsonTokenType.String) {
@@ -37,7 +36,6 @@ namespace Terminal.Gui {
 			throw new JsonException ($"Unexpected StartObject token when parsing Rune: {reader.TokenType}.");
 		}
 
-		/// <inheritdoc/>
 		public override void Write (Utf8JsonWriter writer, System.Rune value, JsonSerializerOptions options)
 		{
 			// HACK: Writes a JSON comment in addition to the glyph to ease debugging.
@@ -47,4 +45,5 @@ namespace Terminal.Gui {
 			writer.WriteRawValue ($"\"{value}\"");
 		}
 	}
+#pragma warning restore 1591
 }

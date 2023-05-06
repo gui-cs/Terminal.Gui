@@ -82,7 +82,7 @@ namespace Terminal.Gui {
 		/// config data to/from <see cref="ConfigurationManager"/> JSON documents.
 		/// </summary>
 		/// <typeparam name="scopeT"></typeparam>
-		public class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT : Scope<scopeT> {
+		class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT : Scope<scopeT> {
 			// See: https://stackoverflow.com/questions/60830084/how-to-pass-an-argument-by-reference-using-reflection
 			internal abstract class ReadHelper {
 				public abstract object? Read (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options);
@@ -97,7 +97,6 @@ namespace Terminal.Gui {
 					=> _readDelegate.Invoke (ref reader, type, options);
 			}
 
-			/// <inheritdoc/>
 			public override scopeT Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 			{
 				if (reader.TokenType != JsonTokenType.StartObject) {
@@ -170,7 +169,6 @@ namespace Terminal.Gui {
 				throw new JsonException ();
 			}
 
-			/// <inheritdoc/>
 			public override void Write (Utf8JsonWriter writer, scopeT scope, JsonSerializerOptions options)
 			{
 				writer.WriteStartObject ();

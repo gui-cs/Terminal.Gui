@@ -39,7 +39,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public DirectoryInfo Path { get; }
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Returns a string representation of this instance (<see cref="DisplayName"/>).
+		/// </summary>
+		/// <returns></returns>
 		public override string ToString ()
 		{
 			return this.DisplayName;
