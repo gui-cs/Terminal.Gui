@@ -474,6 +474,7 @@ namespace UICatalog.Scenarios {
 		{
 			tableView.Style.ShowHorizontalHeaderOverline = true;
 			tableView.Style.ShowVerticalHeaderLines = true;
+			tableView.Style.ShowHorizontalHeaderThroughline = true;
 			tableView.Style.ShowHorizontalHeaderUnderline = true;
 			tableView.Style.ShowVerticalCellLines = true;
 
@@ -489,12 +490,13 @@ namespace UICatalog.Scenarios {
 		{
 			tableView.Style.ShowHorizontalHeaderOverline = false;
 			tableView.Style.ShowVerticalHeaderLines = false;
+			tableView.Style.ShowHorizontalHeaderThroughline = false;
 			tableView.Style.ShowHorizontalHeaderUnderline = false;
 			tableView.Style.ShowVerticalCellLines = false;
 
 			miHeaderOverline.Checked = false;
 			miHeaderMidline.Checked = false;
-			miHeaderThruline.Checked = true;
+			miHeaderThruline.Checked = false;
 			miHeaderUnderline.Checked = false;
 			miCellLines.Checked = false;
 

@@ -138,6 +138,16 @@ namespace Terminal.Gui {
 		public char SeparatorSymbol { get; set; } = ' ';
 
 		/// <summary>
+		/// The symbol to pad around values (between separators)
+		/// </summary>
+		public char HeaderPaddingSymbol { get; set; } = ' ';
+
+		/// <summary>
+		/// The symbol to pad around values (between separators)
+		/// </summary>
+		public char CellPaddingSymbol { get; set; } = ' ';
+
+		/// <summary>
 		/// This event is raised when the selected cell in the table changes.
 		/// </summary>
 		public event EventHandler<SelectedCellChangedEventArgs> SelectedCellChanged;
@@ -302,7 +312,7 @@ namespace Terminal.Gui {
 
 			// render the header contents
 			if (Style.ShowHeaders && hh > 0) {
-				var padChar = ' ';
+				var padChar = HeaderPaddingSymbol;
 				if (Style.ShowHorizontalHeaderThroughline &&
 					(!Style.ShowHorizontalHeaderOverline || !Style.ShowHorizontalHeaderUnderline)) {
 					padChar = (char)Driver.HLine;
@@ -337,6 +347,8 @@ namespace Terminal.Gui {
 			// render the cell contents
 			for (var line = hh; line < frame.Height; line++) {
 
+				var padChar = CellPaddingSymbol;
+
 				//ClearLine (line, width);
 
 				//work out what Row to render
@@ -356,7 +368,7 @@ namespace Terminal.Gui {
 					continue;
 				}
 
-				RenderRow (line, rowToRender, columnsToRender);
+				RenderRow (line, rowToRender, columnsToRender, padChar);
 			}
 		}
 
@@ -499,7 +511,7 @@ namespace Terminal.Gui {
 			return moreColumnsToRight;
 		}
 
-		private void RenderRow (int row, int rowToRender, ColumnToRender [] columnsToRender)
+		private void RenderRow (int row, int rowToRender, ColumnToRender [] columnsToRender, char padChar)
 		{
 			var focused = HasFocus;
 
@@ -563,7 +575,7 @@ namespace Terminal.Gui {
 					cellColor = Enabled ? scheme.Normal : scheme.Disabled;
 				}
 
-				var render = TruncateOrPad (val, representation, current.Width, colStyle);
+				var render = TruncateOrPad (val, representation, current.Width, colStyle, padChar);
 
 				// While many cells can be selected (see MultiSelectedRegions) only one cell is the primary (drives navigation etc)
 				bool isPrimaryCell = current.Column == selectedColumn && rowToRender == selectedRow;
@@ -1680,7 +1692,7 @@ namespace Terminal.Gui {
 		private string GetRepresentation (object value, ColumnStyle colStyle)
 		{
 			if (value == null || value == DBNull.Value) {
-				return NullSymbol;
+				return string.IsNullOrEmpty(NullSymbol) ? " " : NullSymbol;
 			}
 
 			return colStyle != null ? colStyle.GetRepresentation (value) : value.ToString ();
