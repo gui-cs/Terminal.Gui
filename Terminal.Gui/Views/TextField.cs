@@ -469,7 +469,7 @@ namespace Terminal.Gui {
 					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? selColor : ColorScheme.Focus);
 				}
 				if (col + cols <= width) {
-					Driver.AddRune ((Rune)(Secret ? '*' : rune));
+					Driver.AddRune ((Rune)(Secret ? CM.Glyphs.Dot : rune));
 				}
 				if (!TextModel.SetCol (ref col, width, cols)) {
 					break;

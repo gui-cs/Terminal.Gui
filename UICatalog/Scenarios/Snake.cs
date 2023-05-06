@@ -115,7 +115,7 @@ namespace UICatalog.Scenarios {
 				}
 
 				Driver.SetAttribute (red);
-				AddRune (State.Apple.X, State.Apple.Y, 'A');
+				AddRune (State.Apple.X, State.Apple.Y, CM.Glyphs.Apple);
 				Driver.SetAttribute (white);
 			}
 			public override bool OnKeyDown (KeyEvent keyEvent)

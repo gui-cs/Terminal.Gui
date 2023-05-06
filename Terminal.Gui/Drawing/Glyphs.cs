@@ -125,8 +125,24 @@ namespace Terminal.Gui {
 		/// Dot. Default is (U+2219) - ∙.
 		/// </summary>
 		public Rune Dot { get; set; } = '∙';
+
+		/// <summary>
+		/// Expand (e.g. for <see cref="TreeView"/>.
+		/// </summary>
+		public Rune Expand { get; set; } = '+';
+
+		/// <summary>
+		/// Expand (e.g. for <see cref="TreeView"/>.
+		/// </summary>
+		public Rune Collapse { get; set; } = '-';
+
+		/// <summary>
+		/// Apple. Because snek.
+		/// </summary>
+		public Rune Apple { get; set; } = '❦' ; // BUGBUG: "🍎"[0] should work, but doesn't 
+
 		#endregion
-		
+
 		#region ----------------- Lines -----------------
 		/// <summary>
 		/// Box Drawings Horizontal Line - Light (U+2500) - ─

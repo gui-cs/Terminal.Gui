@@ -1236,9 +1236,9 @@ namespace Terminal.Gui.ViewsTests {
 			gv.Draw ();
 
 			var expected =
-@"
+@$"
  │
- ┤      x
+ ┤      {CM.Glyphs.Dot}
  ┤
 0┼┬┬┬┬┬┬┬┬
  0    5";
@@ -1378,11 +1378,11 @@ namespace Terminal.Gui.ViewsTests {
 			gv.Draw ();
 
 			var expected =
-@"
+@$"
  │
-1┤x
+1┤{CM.Glyphs.Dot}
  │ 
-0┼┬┬┬┬x┬┬┬
+0┼┬┬┬┬{CM.Glyphs.Dot}┬┬┬
  0    5   
           
           ";
@@ -1417,13 +1417,13 @@ namespace Terminal.Gui.ViewsTests {
 			gv.Draw ();
 
 			var expected =
-	@"
+	@$"
    │
   2┤
    │
-  1┤x
+  1┤{CM.Glyphs.Dot}
    │ 
-  0┼┬┬┬┬x┬
+  0┼┬┬┬┬{CM.Glyphs.Dot}┬
    0    5
          
           ";

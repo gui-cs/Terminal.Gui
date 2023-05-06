@@ -476,7 +476,7 @@ namespace Terminal.Gui {
 					else if (columnsToRender.Any (r => r.X == c + 1)) {
 
 						/*TODO: is ┼ symbol in Driver?*/
-						rune = Style.ShowVerticalCellLines ? '┼' : CM.Glyphs.BottomTee;
+						rune = Style.ShowVerticalCellLines ? CM.Glyphs.Cross : CM.Glyphs.BottomTee;
 					} else if (c == availableWidth - 1) {
 
 						// for the last character in the table
@@ -494,7 +494,7 @@ namespace Terminal.Gui {
 					  // if the next console column is the lastcolumns end
 					  else if (Style.ExpandLastColumn == false &&
 						columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c)) {
-						rune = Style.ShowVerticalCellLines ? '┼' : CM.Glyphs.BottomTee;
+						rune = Style.ShowVerticalCellLines ? CM.Glyphs.Cross : CM.Glyphs.BottomTee;
 					}
 				}
 
