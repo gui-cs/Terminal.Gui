@@ -95,7 +95,7 @@ namespace Terminal.Gui {
 			{IntersectionRuneType.RightTee,new RightTeeIntersectionRuneResolver()},
 			{IntersectionRuneType.BottomTee,new BottomTeeIntersectionRuneResolver()},
 
-			{IntersectionRuneType.Crosshair,new CrosshairIntersectionRuneResolver()},
+			{IntersectionRuneType.Cross,new CrossIntersectionRuneResolver()},
 			// TODO: Add other resolvers
 		};
 
@@ -354,13 +354,6 @@ namespace Terminal.Gui {
 			}
 		}
 		private class URIntersectionRuneResolver : IntersectionRuneResolver {
-
-			//public URIntersectionRuneResolver () :
-			//	base ('╮', '╕', '╖', '╗', '┑', '┒', '┓', Application.Glyphs.URCorner)
-			//{
-
-			//}
-
 			public override void SetGlyphs ()
 			{
 				_round = Application.Glyphs.URCornerR;
@@ -374,12 +367,6 @@ namespace Terminal.Gui {
 			}
 		}
 		private class LLIntersectionRuneResolver : IntersectionRuneResolver {
-
-			//public LLIntersectionRuneResolver () :
-			//	base ('╰', '╘', '╙', '╚', '┕', '┖', '┗', '└')
-			//{
-
-			//}
 			public override void SetGlyphs ()
 			{
 				_round = Application.Glyphs.LLCornerR;
@@ -394,11 +381,6 @@ namespace Terminal.Gui {
 
 		}
 		private class LRIntersectionRuneResolver : IntersectionRuneResolver {
-			//public LRIntersectionRuneResolver () :
-			//	base ('╯', '╛', '╜', '╝', '┙', '┚', '┛', '┘')
-			//{
-
-			//}
 			public override void SetGlyphs ()
 			{
 				_round = Application.Glyphs.LRCornerR;
@@ -413,11 +395,6 @@ namespace Terminal.Gui {
 		}
 
 		private class TopTeeIntersectionRuneResolver : IntersectionRuneResolver {
-			//public TopTeeIntersectionRuneResolver () :
-			//	base ('┬', '╤', '╥', '╦', '┯', '┰', '┳', '┬')
-			//{
-
-			//}
 			public override void SetGlyphs ()
 			{
 				_round = Application.Glyphs.TopTee;
@@ -431,12 +408,6 @@ namespace Terminal.Gui {
 			}
 		}
 		private class LeftTeeIntersectionRuneResolver : IntersectionRuneResolver {
-			//public LeftTeeIntersectionRuneResolver () :
-			//	base ('├', '╞', '╟', '╠', '┝', '┠', '┣', '├')
-			//{
-
-			//}
-			//}
 			public override void SetGlyphs ()
 			{
 				_round = Application.Glyphs.LeftTee;
@@ -450,11 +421,6 @@ namespace Terminal.Gui {
 			}
 		}
 		private class RightTeeIntersectionRuneResolver : IntersectionRuneResolver {
-			//public RightTeeIntersectionRuneResolver () :
-			//	base ('┤', '╡', '╢', '╣', '┥', '┨', '┫', '┤')
-			//{
-
-			//}
 			public override void SetGlyphs ()
 			{
 				_round = Application.Glyphs.RightTee;
@@ -468,11 +434,6 @@ namespace Terminal.Gui {
 			}
 		}
 		private class BottomTeeIntersectionRuneResolver : IntersectionRuneResolver {
-			//public BottomTeeIntersectionRuneResolver () :
-			//	base ('┴', '╧', '╨', '╩', '┷', '┸', '┻', '┴')
-			//{
-
-			//}
 			public override void SetGlyphs ()
 			{
 				_round = Application.Glyphs.BottomTee;
@@ -485,12 +446,7 @@ namespace Terminal.Gui {
 				_normal = Application.Glyphs.BottomTee;
 			}
 		}
-		private class CrosshairIntersectionRuneResolver : IntersectionRuneResolver {
-			//public CrosshairIntersectionRuneResolver () :
-			//	base ('┼', '╪', '╫', Application.Glyphs.CrossHairDb, '┿', '╂', '╋', Application.Glyphs.CrossHair)
-			//{
-
-			//}
+		private class CrossIntersectionRuneResolver : IntersectionRuneResolver {
 			public override void SetGlyphs ()
 			{
 				_round = Application.Glyphs.Cross;
@@ -532,7 +488,7 @@ namespace Terminal.Gui {
 			case IntersectionRuneType.None:
 				return null;
 			case IntersectionRuneType.Dot:
-				return (Rune)'.';
+				return (Rune)Application.Glyphs.Dot;
 			case IntersectionRuneType.HLine:
 				if (useDouble) {
 					return Application.Glyphs.HLineDb;
@@ -604,12 +560,12 @@ namespace Terminal.Gui {
 		{
 			var set = new HashSet<IntersectionType> (intersects.Select (i => i.Type));
 
-			#region Crosshair Conditions
+			#region Cross Conditions
 			if (Has (set,
 				IntersectionType.PassOverHorizontal,
 				IntersectionType.PassOverVertical
 				)) {
-				return IntersectionRuneType.Crosshair;
+				return IntersectionRuneType.Cross;
 			}
 
 			if (Has (set,
@@ -617,7 +573,7 @@ namespace Terminal.Gui {
 				IntersectionType.StartLeft,
 				IntersectionType.StartRight
 				)) {
-				return IntersectionRuneType.Crosshair;
+				return IntersectionRuneType.Cross;
 			}
 
 			if (Has (set,
@@ -625,7 +581,7 @@ namespace Terminal.Gui {
 				IntersectionType.StartUp,
 				IntersectionType.StartDown
 				)) {
-				return IntersectionRuneType.Crosshair;
+				return IntersectionRuneType.Cross;
 			}
 
 			if (Has (set,
@@ -633,7 +589,7 @@ namespace Terminal.Gui {
 				IntersectionType.StartRight,
 				IntersectionType.StartUp,
 				IntersectionType.StartDown)) {
-				return IntersectionRuneType.Crosshair;
+				return IntersectionRuneType.Cross;
 			}
 			#endregion
 
@@ -804,7 +760,7 @@ namespace Terminal.Gui {
 			BottomTee,
 			RightTee,
 			LeftTee,
-			Crosshair,
+			Cross,
 			HLine,
 			VLine,
 		}

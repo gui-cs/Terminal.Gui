@@ -126,6 +126,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Rune Maximize { get; set; } = '✽';
 
+		/// <summary>
+		/// Dot. Default is (U+2219) - ∙.
+		/// </summary>
+		public Rune Dot { get; set; } = '∙';
 
 		/// <summary>
 		/// Horizontal Line (U+2500) - ─
