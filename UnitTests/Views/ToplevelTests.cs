@@ -690,7 +690,7 @@ namespace Terminal.Gui.ViewsTests {
 │       ┌──────────────────────┐       │
 │       │      Hello Word      │       │
 │       │                      │       │
-│       │       {Application.Glyphs.LeftBracket}{Application.Glyphs.LeftDefaultIndicator} Ok {Application.Glyphs.RightDefaultIndicator}{Application.Glyphs.RightBracket}       │       │
+│       │       {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}       │       │
 │       └──────────────────────┘       │
 │                                      │
 │                                      │
@@ -740,7 +740,7 @@ namespace Terminal.Gui.ViewsTests {
 │      ┌──────────────────────┐        │
 │      │      Hello Word      │        │
 │      │                      │        │
-│      │       {Application.Glyphs.LeftBracket}{Application.Glyphs.LeftDefaultIndicator} Ok {Application.Glyphs.RightDefaultIndicator}{Application.Glyphs.RightBracket}       │        │
+│      │       {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}       │        │
 │      └──────────────────────┘        │
 │                                      │
 │                                      │
@@ -775,7 +775,7 @@ namespace Terminal.Gui.ViewsTests {
 │      ┌──────────────────────┐        │
 │      │      Hello Word      │        │
 │      │                      │        │
-│      │       {Application.Glyphs.LeftBracket}{Application.Glyphs.LeftDefaultIndicator} Ok {Application.Glyphs.RightDefaultIndicator}{Application.Glyphs.RightBracket}       │        │
+│      │       {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}       │        │
 │      └──────────────────────┘        │
 │                                      │
 │                                      │
@@ -1178,7 +1178,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Rect (10, 3, 20, 3), dialog.Frame);
 			TestHelpers.AssertDriverContentsWithFrameAre (@$"
           ┌──────────────────┐
-          │      {Application.Glyphs.LeftBracket} Ok {Application.Glyphs.RightBracket}      │
+          │      {CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket}      │
           └──────────────────┘
 ", output);
 
@@ -1209,7 +1209,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Rect (0, 0, 20, 3), dialog.Frame);
 			TestHelpers.AssertDriverContentsWithFrameAre (@$"
 ┌──────────────────┐
-│      {Application.Glyphs.LeftBracket} Ok {Application.Glyphs.RightBracket}      │
+│      {CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket}      │
 └──────────────────┘
 ", output);
 
@@ -1229,7 +1229,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Rect (0, 0, 20, 3), dialog.Frame);
 			TestHelpers.AssertDriverContentsWithFrameAre (@$"
 ┌──────────────────┐
-│      {Application.Glyphs.LeftBracket} Ok {Application.Glyphs.RightBracket}      │
+│      {CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket}      │
 └──────────────────┘
 ", output);
 
@@ -1247,9 +1247,9 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Refresh ();
 			Assert.Equal (new Rect (0, 0, 19, 2), top.Frame);
 			Assert.Equal (new Rect (-1, 0, 20, 3), dialog.Frame);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@$"
 ──────────────────┐
-│      {Application.Glyphs.LeftBracket} Ok {Application.Glyphs.RightBracket}      │
+      {CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket}      │
 ", output);
 
 			ReflectionTools.InvokePrivate (
@@ -1451,7 +1451,7 @@ namespace Terminal.Gui.ViewsTests {
 │ │             │  │
 │ │             │  │
 │ │             │  │
-│ │  {Application.Glyphs.LeftBracket} Popup {Application.Glyphs.RightBracket}  │  │
+│ │  {CM.Glyphs.LeftBracket} Popup {CM.Glyphs.RightBracket}  │  │
 │ └─────────────┘  │
 │                  │
 │                  │
@@ -1484,7 +1484,7 @@ namespace Terminal.Gui.ViewsTests {
 │ │             │  │
 │ │             │  │
 │ │             │  │
-│ │  {Application.Glyphs.LeftBracket} Popup {Application.Glyphs.RightBracket}  │  │
+│ │  {CM.Glyphs.LeftBracket} Popup {CM.Glyphs.RightBracket}  │  │
 │┌────────────────┐│
 ││One             ││
 ││Two             ││

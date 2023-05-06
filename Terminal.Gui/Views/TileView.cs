@@ -729,7 +729,7 @@ namespace Terminal.Gui {
 				line.Height = orientation == Orientation.Vertical
 					? Dim.Fill () : 1;
 				line.LineRune = orientation == Orientation.Vertical ?
-					Application.Glyphs.VLine : Application.Glyphs.HLine;
+					CM.Glyphs.VLine : CM.Glyphs.HLine;
 
 				if (orientation == Orientation.Vertical) {
 					line.X = splitterDistances [i];
@@ -938,7 +938,7 @@ namespace Terminal.Gui {
 					var location = moveRuneRenderLocation ??
 						new Point (Bounds.Width / 2, Bounds.Height / 2);
 
-					AddRune (location.X, location.Y, Application.Glyphs.Diamond);
+					AddRune (location.X, location.Y, CM.Glyphs.Diamond);
 				}
 			}
 

@@ -138,7 +138,7 @@ namespace Terminal.Gui {
 				}
 				if (i + 1 < Items.Length) {
 					Driver.AddRune (' ');
-					Driver.AddRune (Application.Glyphs.VLine);
+					Driver.AddRune (CM.Glyphs.VLine);
 					Driver.AddRune (' ');
 				}
 			}

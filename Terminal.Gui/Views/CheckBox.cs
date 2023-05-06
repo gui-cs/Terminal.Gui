@@ -83,9 +83,9 @@ namespace Terminal.Gui {
 		/// <param name="is_checked"></param>
 		void SetInitialProperties (ustring s, bool is_checked)
 		{
-			charNullChecked = Application.Glyphs.NullChecked;
-			charChecked = Application.Glyphs.Checked;
-			charUnChecked = Application.Glyphs.UnChecked;
+			charNullChecked = CM.Glyphs.NullChecked;
+			charChecked = CM.Glyphs.Checked;
+			charUnChecked = CM.Glyphs.UnChecked;
 			Checked = is_checked;
 			HotKeySpecifier = '_';
 			CanFocus = true;

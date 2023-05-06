@@ -210,16 +210,16 @@ namespace Terminal.Gui {
 				if (cur.IsLast ()) {
 					yield return new Rune (' ');
 				} else {
-					yield return Application.Glyphs.VLine;
+					yield return CM.Glyphs.VLine;
 				}
 
 				yield return new Rune (' ');
 			}
 
 			if (IsLast ()) {
-				yield return Application.Glyphs.LLCorner;
+				yield return CM.Glyphs.LLCorner;
 			} else {
-				yield return Application.Glyphs.LeftTee;
+				yield return CM.Glyphs.LeftTee;
 			}
 		}
 
@@ -246,7 +246,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public Rune GetExpandableSymbol (ConsoleDriver driver)
 		{
-			var leafSymbol = tree.Style.ShowBranchLines ? Application.Glyphs.HLine : ' ';
+			var leafSymbol = tree.Style.ShowBranchLines ? CM.Glyphs.HLine : ' ';
 
 			if (IsExpanded) {
 				return tree.Style.CollapseableSymbol ?? leafSymbol;

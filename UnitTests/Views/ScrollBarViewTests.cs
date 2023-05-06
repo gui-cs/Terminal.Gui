@@ -1105,7 +1105,7 @@ This is a test
 			Assert.False (sbv.ShowScrollIndicator);
 			Assert.False (sbv.Visible);
 			TestHelpers.AssertDriverContentsWithFrameAre (@$"
-This is a test{Application.Glyphs.LeftBracket} Click Me! {Application.Glyphs.RightBracket}
+This is a test{CM.Glyphs.LeftBracket} Click Me! {CM.Glyphs.RightBracket}
 This is a test             
 This is a test             
 This is a test             
@@ -1132,7 +1132,7 @@ This is a test             ", output);
 			Application.Top.Draw ();
 			Assert.False (sbv.Visible);
 			TestHelpers.AssertDriverContentsWithFrameAre (@$"
-This is a test{Application.Glyphs.LeftBracket} Click Me! {Application.Glyphs.RightBracket}
+This is a test{CM.Glyphs.LeftBracket} Click Me! {CM.Glyphs.RightBracket}
 This is a test             
 This is a test             
 This is a test             

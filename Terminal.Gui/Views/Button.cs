@@ -107,10 +107,10 @@ namespace Terminal.Gui {
 
 			HotKeySpecifier = new Rune ('_');
 
-			_leftBracket = Application.Glyphs.LeftBracket;
-			_rightBracket = Application.Glyphs.RightBracket;
-			_leftDefault = Application.Glyphs.LeftDefaultIndicator;
-			_rightDefault = Application.Glyphs.RightDefaultIndicator;
+			_leftBracket = CM.Glyphs.LeftBracket;
+			_rightBracket = CM.Glyphs.RightBracket;
+			_leftDefault = CM.Glyphs.LeftDefaultIndicator;
+			_rightDefault = CM.Glyphs.RightDefaultIndicator;
 
 			CanFocus = true;
 			AutoSize = true;

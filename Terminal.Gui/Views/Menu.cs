@@ -591,7 +591,7 @@ namespace Terminal.Gui {
 					: i == current ? ColorScheme.Focus : GetNormalColor ());
 				if (item == null && BorderStyle != LineStyle.None) {
 					Move (-1, i);
-					Driver.AddRune (Application.Glyphs.LeftTee);
+					Driver.AddRune (CM.Glyphs.LeftTee);
 				} else if (Frame.X < Driver.Cols) {
 					Move (0, i);
 				}
@@ -605,12 +605,12 @@ namespace Terminal.Gui {
 						break;
 					}
 					if (item == null)
-						Driver.AddRune (Application.Glyphs.HLine);
+						Driver.AddRune (CM.Glyphs.HLine);
 					else if (i == 0 && p == 0 && host.UseSubMenusSingleFrame && item.Parent.Parent != null)
-						Driver.AddRune (Application.Glyphs.LeftArrow);
+						Driver.AddRune (CM.Glyphs.LeftArrow);
 					// This `- 3` is left border + right border + one row in from right
 					else if (p == Frame.Width - 3 && barItems.SubMenu (barItems.Children [i]) != null)
-						Driver.AddRune (Application.Glyphs.RightArrow);
+						Driver.AddRune (CM.Glyphs.RightArrow);
 					else
 						Driver.AddRune (' ');
 				}
@@ -618,19 +618,19 @@ namespace Terminal.Gui {
 				if (item == null) {
 					if (BorderStyle != LineStyle.None && SuperView?.Frame.Right - Frame.X > Frame.Width) {
 						Move (Frame.Width - 2, i);
-						Driver.AddRune (Application.Glyphs.RightTee);
+						Driver.AddRune (CM.Glyphs.RightTee);
 					}
 					continue;
 				}
 
 				ustring textToDraw;
-				var nullCheckedChar = Application.Glyphs.NullChecked;
-				var checkChar = Application.Glyphs.Selected;
-				var uncheckedChar = Application.Glyphs.UnSelected;
+				var nullCheckedChar = CM.Glyphs.NullChecked;
+				var checkChar = CM.Glyphs.Selected;
+				var uncheckedChar = CM.Glyphs.UnSelected;
 
 				if (item.CheckType.HasFlag (MenuItemCheckStyle.Checked)) {
-					checkChar = Application.Glyphs.Checked;
-					uncheckedChar = Application.Glyphs.UnChecked;
+					checkChar = CM.Glyphs.Checked;
+					uncheckedChar = CM.Glyphs.UnChecked;
 				}
 
 				// Support Checked even though CheckType wasn't set

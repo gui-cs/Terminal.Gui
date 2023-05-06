@@ -92,8 +92,8 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (2, rg.Frame.Height);
 			var expected = @$"
 ┌────────────────────────────┐
-│{Application.Glyphs.Selected} Test                      │
-│{Application.Glyphs.UnSelected} New Test 你               │
+│{CM.Glyphs.Selected} Test                      │
+│{CM.Glyphs.UnSelected} New Test 你               │
 │                            │
 └────────────────────────────┘
 ";
@@ -113,7 +113,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			expected = @$"
 ┌────────────────────────────┐
-│{Application.Glyphs.Selected} Test  {Application.Glyphs.UnSelected} New Test 你       │
+│{CM.Glyphs.Selected} Test  {CM.Glyphs.UnSelected} New Test 你       │
 │                            │
 │                            │
 └────────────────────────────┘
@@ -133,7 +133,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (1, rg.Height);
 			expected = @$"
 ┌────────────────────────────┐
-│{Application.Glyphs.Selected} Test    {Application.Glyphs.UnSelected} New Test 你     │
+│{CM.Glyphs.Selected} Test    {CM.Glyphs.UnSelected} New Test 你     │
 │                            │
 │                            │
 └────────────────────────────┘

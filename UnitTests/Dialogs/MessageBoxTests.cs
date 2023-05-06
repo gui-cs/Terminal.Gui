@@ -215,7 +215,7 @@ namespace Terminal.Gui.DialogTests {
 			aboutMessage.AppendLine (@"0123456789012345678901234567890123456789");
 			aboutMessage.AppendLine (@"https://github.com/gui-cs/Terminal.Gui");
 			var message = aboutMessage.ToString ();
-			var btn = $"{Application.Glyphs.LeftBracket}{Application.Glyphs.LeftDefaultIndicator} Ok {Application.Glyphs.RightDefaultIndicator}{Application.Glyphs.RightBracket}";
+			var btn = $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
 
 			((FakeDriver)Application.Driver).SetBufferSize (40 + 4, 8);
 
@@ -269,7 +269,7 @@ namespace Terminal.Gui.DialogTests {
                                     ┌─────┐
                                     │Messa│
                                     │ ge  │
-                                    │ Ok {Application.Glyphs.RightDefaultIndicator}│
+                                    │ Ok {CM.Glyphs.RightDefaultIndicator}│
                                     └─────┘
 ", output);
 
@@ -285,7 +285,7 @@ namespace Terminal.Gui.DialogTests {
 		{
 			var iterations = -1;
 			Application.Begin (Application.Top);
-			var btn = $"{Application.Glyphs.LeftBracket}{Application.Glyphs.LeftDefaultIndicator} Ok {Application.Glyphs.RightDefaultIndicator}{Application.Glyphs.RightBracket}";
+			var btn = $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
 
 			Application.Iteration += () => {
 				iterations++;
@@ -319,7 +319,7 @@ namespace Terminal.Gui.DialogTests {
 			Application.Top.BorderStyle = LineStyle.Double;
 			((FakeDriver)Application.Driver).SetBufferSize (20, 10);
 
-			var btn = $"{Application.Glyphs.LeftBracket}{Application.Glyphs.LeftDefaultIndicator} btn {Application.Glyphs.RightDefaultIndicator}{Application.Glyphs.RightBracket}";
+			var btn = $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} btn {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
 			Application.Iteration += () => {
 				iterations++;
 
@@ -375,7 +375,7 @@ namespace Terminal.Gui.DialogTests {
 			Application.Top.BorderStyle = LineStyle.Double;
 			((FakeDriver)Application.Driver).SetBufferSize (20, 10);
 
-			var btn = $"{Application.Glyphs.LeftBracket}{Application.Glyphs.LeftDefaultIndicator} btn {Application.Glyphs.RightDefaultIndicator}{Application.Glyphs.RightBracket}";
+			var btn = $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} btn {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
 
 			Application.Iteration += () => {
 				iterations++;
@@ -433,7 +433,7 @@ namespace Terminal.Gui.DialogTests {
 			Application.Top.BorderStyle = LineStyle.Double;
 			((FakeDriver)Application.Driver).SetBufferSize (20, 10);
 
-			var btn = $"{Application.Glyphs.LeftBracket}{Application.Glyphs.LeftDefaultIndicator} btn {Application.Glyphs.RightDefaultIndicator}{Application.Glyphs.RightBracket}";
+			var btn = $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} btn {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
 
 			Application.Iteration += () => {
 				iterations++;
@@ -488,7 +488,7 @@ namespace Terminal.Gui.DialogTests {
 			Application.Begin (Application.Top);
 			Application.Top.BorderStyle = LineStyle.Double;
 			((FakeDriver)Application.Driver).SetBufferSize (20, 10);
-			var btn = $"{Application.Glyphs.LeftBracket}{Application.Glyphs.LeftDefaultIndicator} btn {Application.Glyphs.RightDefaultIndicator}{Application.Glyphs.RightBracket}";
+			var btn = $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} btn {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
 
 			Application.Iteration += () => {
 				iterations++;
@@ -565,7 +565,7 @@ namespace Terminal.Gui.DialogTests {
                 ┌──────────────────────────────────────────────┐
                 │                                              │
                 │                                              │
-                │                   {Application.Glyphs.LeftBracket}{Application.Glyphs.LeftDefaultIndicator} ok {Application.Glyphs.RightDefaultIndicator}{Application.Glyphs.RightBracket}                   │
+                │                   {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}                   │
                 └──────────────────────────────────────────────┘", output);
 					Application.RequestStop ();
 				}

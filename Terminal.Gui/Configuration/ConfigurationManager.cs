@@ -1,4 +1,6 @@
-﻿using System;
+﻿global using CM = Terminal.Gui.ConfigurationManager;
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,8 +10,6 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using static Terminal.Gui.ConfigurationManager;
 
 #nullable enable
 
@@ -229,6 +229,13 @@ namespace Terminal.Gui {
 		[SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true), JsonPropertyName ("AppSettings")]
 		public static AppScope? AppSettings { get; set; }
 
+		/// <summary>
+		/// The set of glyphs used to draw checkboxes, lines, borders, etc...See also <seealso cref="Terminal.Gui.GlyphDefinitions"/>.
+		/// </summary>
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true),
+			JsonPropertyName ("Glyphs")]
+		public static GlyphDefinitions Glyphs { get; set; } = new GlyphDefinitions ();
+		
 		/// <summary>
 		/// Initializes the internal state of ConfigurationManager. Nominally called once as part of application
 		/// startup to initialize global state. Also called from some Unit Tests to ensure correctness (e.g. Reset()).

@@ -23,7 +23,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (ckb.Checked);
 			Assert.False (ckb.AllowNullChecked);
 			Assert.Equal (string.Empty, ckb.Text);
-			Assert.Equal ($"{Application.Glyphs.UnChecked} ", ckb.TextFormatter.Text);
+			Assert.Equal ($"{CM.Glyphs.UnChecked} ", ckb.TextFormatter.Text);
 			Assert.True (ckb.CanFocus);
 			Assert.Equal (new Rect (0, 0, 2, 1), ckb.Frame);
 
@@ -32,7 +32,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (ckb.Checked);
 			Assert.False (ckb.AllowNullChecked);
 			Assert.Equal ("Test", ckb.Text);
-			Assert.Equal ($"{Application.Glyphs.Checked} Test", ckb.TextFormatter.Text);
+			Assert.Equal ($"{CM.Glyphs.Checked} Test", ckb.TextFormatter.Text);
 			Assert.True (ckb.CanFocus);
 			Assert.Equal (new Rect (0, 0, 6, 1), ckb.Frame);
 
@@ -41,7 +41,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (ckb.Checked);
 			Assert.False (ckb.AllowNullChecked);
 			Assert.Equal ("Test", ckb.Text);
-			Assert.Equal ($"{Application.Glyphs.UnChecked} Test", ckb.TextFormatter.Text);
+			Assert.Equal ($"{CM.Glyphs.UnChecked} Test", ckb.TextFormatter.Text);
 			Assert.True (ckb.CanFocus);
 			Assert.Equal (new Rect (1, 2, 6, 1), ckb.Frame);
 
@@ -50,7 +50,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (ckb.Checked);
 			Assert.False (ckb.AllowNullChecked);
 			Assert.Equal ("Test", ckb.Text);
-			Assert.Equal ($"{Application.Glyphs.Checked} Test", ckb.TextFormatter.Text);
+			Assert.Equal ($"{CM.Glyphs.Checked} Test", ckb.TextFormatter.Text);
 			Assert.True (ckb.CanFocus);
 			Assert.Equal (new Rect (3, 4, 6, 1), ckb.Frame);
 		}
@@ -85,7 +85,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Refresh ();
 
 			var expected = @$"
-{Application.Glyphs.Checked} Test
+{CM.Glyphs.Checked} Test
 ";
 
 			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
@@ -116,11 +116,11 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (checkBox.IsInitialized);
 			Assert.Equal (new Rect (1, 1, 19, 1), checkBox.Frame);
 			Assert.Equal ("Check this out 你", checkBox.Text);
-			Assert.Equal ($"{Application.Glyphs.UnChecked} Check this out 你", checkBox.TextFormatter.Text);
+			Assert.Equal ($"{CM.Glyphs.UnChecked} Check this out 你", checkBox.TextFormatter.Text);
 			Assert.True (checkBox.AutoSize);
 
 			checkBox.Checked = true;
-			Assert.Equal ($"{Application.Glyphs.Checked} Check this out 你", checkBox.TextFormatter.Text);
+			Assert.Equal ($"{CM.Glyphs.Checked} Check this out 你", checkBox.TextFormatter.Text);
 
 			//checkBox.AutoSize = false;
 			// It isn't auto-size so the height is guaranteed by the SetMinWidthHeight
@@ -199,7 +199,7 @@ namespace Terminal.Gui.ViewsTests {
 			var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {Application.Glyphs.UnChecked} Check this out 你        │
+│ {CM.Glyphs.UnChecked} Check this out 你        │
 │                            │
 └────────────────────────────┘
 ";
@@ -212,7 +212,7 @@ namespace Terminal.Gui.ViewsTests {
 			expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {Application.Glyphs.Checked} Check this out 你        │
+│ {CM.Glyphs.Checked} Check this out 你        │
 │                            │
 └────────────────────────────┘
 ";
@@ -251,7 +251,7 @@ namespace Terminal.Gui.ViewsTests {
 			var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│    {Application.Glyphs.UnChecked} Check this out 你     │
+│    {CM.Glyphs.UnChecked} Check this out 你     │
 │                            │
 └────────────────────────────┘
 ";
@@ -264,7 +264,7 @@ namespace Terminal.Gui.ViewsTests {
 			expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│    {Application.Glyphs.Checked} Check this out 你     │
+│    {CM.Glyphs.Checked} Check this out 你     │
 │                            │
 └────────────────────────────┘
 ";
@@ -313,8 +313,8 @@ namespace Terminal.Gui.ViewsTests {
 			var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {Application.Glyphs.UnChecked}   Check  first  out  你  │
-│ {Application.Glyphs.UnChecked}  Check  second  out  你  │
+│ {CM.Glyphs.UnChecked}   Check  first  out  你  │
+│ {CM.Glyphs.UnChecked}  Check  second  out  你  │
 │                            │
 └────────────────────────────┘
 ";
@@ -332,8 +332,8 @@ namespace Terminal.Gui.ViewsTests {
 			expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {Application.Glyphs.Checked}   Check  first  out  你  │
-│ {Application.Glyphs.Checked}  Check  second  out  你  │
+│ {CM.Glyphs.Checked}   Check  first  out  你  │
+│ {CM.Glyphs.Checked}  Check  second  out  你  │
 │                            │
 └────────────────────────────┘
 ";
@@ -372,7 +372,7 @@ namespace Terminal.Gui.ViewsTests {
 			var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│       Check this out 你 {Application.Glyphs.UnChecked}  │
+│       Check this out 你 {CM.Glyphs.UnChecked}  │
 │                            │
 └────────────────────────────┘
 ";
@@ -385,7 +385,7 @@ namespace Terminal.Gui.ViewsTests {
 			expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│       Check this out 你 {Application.Glyphs.Checked}  │
+│       Check this out 你 {CM.Glyphs.Checked}  │
 │                            │
 └────────────────────────────┘
 ";
@@ -418,7 +418,7 @@ namespace Terminal.Gui.ViewsTests {
 			var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│         {Application.Glyphs.UnChecked} Check this out 你│
+│         {CM.Glyphs.UnChecked} Check this out 你│
 │                            │
 └────────────────────────────┘
 ";
@@ -432,7 +432,7 @@ namespace Terminal.Gui.ViewsTests {
 			expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {Application.Glyphs.UnChecked} Check this out 你 changed│
+│ {CM.Glyphs.UnChecked} Check this out 你 changed│
 │                            │
 └────────────────────────────┘
 ";
@@ -464,7 +464,7 @@ namespace Terminal.Gui.ViewsTests {
 			var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│         {Application.Glyphs.UnChecked} Check this out 你│
+│         {CM.Glyphs.UnChecked} Check this out 你│
 │                            │
 └────────────────────────────┘
 ";
@@ -478,7 +478,7 @@ namespace Terminal.Gui.ViewsTests {
 			expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {Application.Glyphs.UnChecked} Check this out 你 changed│
+│ {CM.Glyphs.UnChecked} Check this out 你 changed│
 │                            │
 └────────────────────────────┘
 ";
@@ -505,7 +505,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Null (checkBox.Checked);
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@$"
-{Application.Glyphs.NullChecked} Check this out 你", output);
+{CM.Glyphs.NullChecked} Check this out 你", output);
 			Assert.True (checkBox.MouseEvent (new MouseEvent () { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
 			Assert.True (checkBox.Checked);
 			Assert.True (checkBox.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ())));

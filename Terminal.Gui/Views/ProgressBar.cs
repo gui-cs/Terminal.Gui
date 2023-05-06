@@ -124,16 +124,16 @@ namespace Terminal.Gui {
 				progressBarStyle = value;
 				switch (value) {
 				case ProgressBarStyle.Blocks:
-					SegmentCharacter = Application.Glyphs.BlocksMeterSegment;
+					SegmentCharacter = CM.Glyphs.BlocksMeterSegment;
 					break;
 				case ProgressBarStyle.Continuous:
-					SegmentCharacter = Application.Glyphs.ContinuousMeterSegment;
+					SegmentCharacter = CM.Glyphs.ContinuousMeterSegment;
 					break;
 				case ProgressBarStyle.MarqueeBlocks:
-					SegmentCharacter = Application.Glyphs.BlocksMeterSegment;
+					SegmentCharacter = CM.Glyphs.BlocksMeterSegment;
 					break;
 				case ProgressBarStyle.MarqueeContinuous:
-					SegmentCharacter = Application.Glyphs.ContinuousMeterSegment;
+					SegmentCharacter = CM.Glyphs.ContinuousMeterSegment;
 					break;
 				}
 				SetNeedsDisplay ();
@@ -170,7 +170,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private Rune segmentCharacter = Application.Glyphs.BlocksMeterSegment;
+		private Rune segmentCharacter = CM.Glyphs.BlocksMeterSegment;
 
 		/// <summary>
 		/// Segment indicator for meter views.

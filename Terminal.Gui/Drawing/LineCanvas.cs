@@ -16,7 +16,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		None,
 		/// <summary>
-		/// The border is drawn using thin line Application.Glyphs.
+		/// The border is drawn using thin line CM.Glyphs.
 		/// </summary>
 		Single,
 		/// <summary>
@@ -28,11 +28,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		Dotted,
 		/// <summary>
-		/// The border is drawn using thin double line Application.Glyphs.
+		/// The border is drawn using thin double line CM.Glyphs.
 		/// </summary>
 		Double,
 		/// <summary>
-		/// The border is drawn using heavy line Application.Glyphs.
+		/// The border is drawn using heavy line CM.Glyphs.
 		/// </summary>
 		Heavy,
 		/// <summary>
@@ -343,120 +343,120 @@ namespace Terminal.Gui {
 		private class ULIntersectionRuneResolver : IntersectionRuneResolver {
 			public override void SetGlyphs ()
 			{
-				_round = Application.Glyphs.ULCornerR;
-				_doubleH = Application.Glyphs.ULCornerSingleDbl;
-				_doubleV = Application.Glyphs.ULCornerDblSingle;
-				_doubleBoth = Application.Glyphs.ULCornerDbl;
-				_thickH = Application.Glyphs.ULCornerLtHv;
-				_thickV = Application.Glyphs.ULCornerHvLt;
-				_thickBoth = Application.Glyphs.ULCornerHv;
-				_normal = Application.Glyphs.ULCorner;
+				_round = CM.Glyphs.ULCornerR;
+				_doubleH = CM.Glyphs.ULCornerSingleDbl;
+				_doubleV = CM.Glyphs.ULCornerDblSingle;
+				_doubleBoth = CM.Glyphs.ULCornerDbl;
+				_thickH = CM.Glyphs.ULCornerLtHv;
+				_thickV = CM.Glyphs.ULCornerHvLt;
+				_thickBoth = CM.Glyphs.ULCornerHv;
+				_normal = CM.Glyphs.ULCorner;
 			}
 		}
 		private class URIntersectionRuneResolver : IntersectionRuneResolver {
 			public override void SetGlyphs ()
 			{
-				_round = Application.Glyphs.URCornerR;
-				_doubleH = Application.Glyphs.URCornerSingleDbl;
-				_doubleV = Application.Glyphs.URCornerDblSingle;
-				_doubleBoth = Application.Glyphs.URCornerDbl;
-				_thickH = Application.Glyphs.URCornerHvLt;
-				_thickV = Application.Glyphs.URCornerLtHv;
-				_thickBoth = Application.Glyphs.URCornerHv;
-				_normal = Application.Glyphs.URCorner;
+				_round = CM.Glyphs.URCornerR;
+				_doubleH = CM.Glyphs.URCornerSingleDbl;
+				_doubleV = CM.Glyphs.URCornerDblSingle;
+				_doubleBoth = CM.Glyphs.URCornerDbl;
+				_thickH = CM.Glyphs.URCornerHvLt;
+				_thickV = CM.Glyphs.URCornerLtHv;
+				_thickBoth = CM.Glyphs.URCornerHv;
+				_normal = CM.Glyphs.URCorner;
 			}
 		}
 		private class LLIntersectionRuneResolver : IntersectionRuneResolver {
 			public override void SetGlyphs ()
 			{
-				_round = Application.Glyphs.LLCornerR;
-				_doubleH = Application.Glyphs.LLCornerSingleDbl;
-				_doubleV = Application.Glyphs.LLCornerDblSingle;
-				_doubleBoth = Application.Glyphs.LLCornerDbl;
-				_thickH = Application.Glyphs.LLCornerLtHv;
-				_thickV = Application.Glyphs.LLCornerHvLt;
-				_thickBoth = Application.Glyphs.LLCornerHv;
-				_normal = Application.Glyphs.LLCorner;
+				_round = CM.Glyphs.LLCornerR;
+				_doubleH = CM.Glyphs.LLCornerSingleDbl;
+				_doubleV = CM.Glyphs.LLCornerDblSingle;
+				_doubleBoth = CM.Glyphs.LLCornerDbl;
+				_thickH = CM.Glyphs.LLCornerLtHv;
+				_thickV = CM.Glyphs.LLCornerHvLt;
+				_thickBoth = CM.Glyphs.LLCornerHv;
+				_normal = CM.Glyphs.LLCorner;
 			}
 
 		}
 		private class LRIntersectionRuneResolver : IntersectionRuneResolver {
 			public override void SetGlyphs ()
 			{
-				_round = Application.Glyphs.LRCornerR;
-				_doubleH = Application.Glyphs.LRCornerSingleDbl;
-				_doubleV = Application.Glyphs.LRCornerDblSingle;
-				_doubleBoth = Application.Glyphs.LRCornerDbl;
-				_thickH = Application.Glyphs.LRCornerLtHv;
-				_thickV = Application.Glyphs.LRCornerHvLt;
-				_thickBoth = Application.Glyphs.LRCornerHv;
-				_normal = Application.Glyphs.LRCorner;
+				_round = CM.Glyphs.LRCornerR;
+				_doubleH = CM.Glyphs.LRCornerSingleDbl;
+				_doubleV = CM.Glyphs.LRCornerDblSingle;
+				_doubleBoth = CM.Glyphs.LRCornerDbl;
+				_thickH = CM.Glyphs.LRCornerLtHv;
+				_thickV = CM.Glyphs.LRCornerHvLt;
+				_thickBoth = CM.Glyphs.LRCornerHv;
+				_normal = CM.Glyphs.LRCorner;
 			}
 		}
 
 		private class TopTeeIntersectionRuneResolver : IntersectionRuneResolver {
 			public override void SetGlyphs ()
 			{
-				_round = Application.Glyphs.TopTee;
-				_doubleH = Application.Glyphs.TopTeeDblH;
-				_doubleV = Application.Glyphs.TopTeeDblV;
-				_doubleBoth = Application.Glyphs.TopTeeDbl;
-				_thickH = Application.Glyphs.TopTeeHvH;
-				_thickV = Application.Glyphs.TopTeeHvV;
-				_thickBoth = Application.Glyphs.TopTeeHvDblH;
-				_normal = Application.Glyphs.TopTee;
+				_round = CM.Glyphs.TopTee;
+				_doubleH = CM.Glyphs.TopTeeDblH;
+				_doubleV = CM.Glyphs.TopTeeDblV;
+				_doubleBoth = CM.Glyphs.TopTeeDbl;
+				_thickH = CM.Glyphs.TopTeeHvH;
+				_thickV = CM.Glyphs.TopTeeHvV;
+				_thickBoth = CM.Glyphs.TopTeeHvDblH;
+				_normal = CM.Glyphs.TopTee;
 			}
 		}
 		private class LeftTeeIntersectionRuneResolver : IntersectionRuneResolver {
 			public override void SetGlyphs ()
 			{
-				_round = Application.Glyphs.LeftTee;
-				_doubleH = Application.Glyphs.LeftTeeDblH;
-				_doubleV = Application.Glyphs.LeftTeeDblV;
-				_doubleBoth = Application.Glyphs.LeftTeeDbl;
-				_thickH = Application.Glyphs.LeftTeeHvH;
-				_thickV = Application.Glyphs.LeftTeeHvV;
-				_thickBoth = Application.Glyphs.LeftTeeHvDblH;
-				_normal = Application.Glyphs.LeftTee;
+				_round = CM.Glyphs.LeftTee;
+				_doubleH = CM.Glyphs.LeftTeeDblH;
+				_doubleV = CM.Glyphs.LeftTeeDblV;
+				_doubleBoth = CM.Glyphs.LeftTeeDbl;
+				_thickH = CM.Glyphs.LeftTeeHvH;
+				_thickV = CM.Glyphs.LeftTeeHvV;
+				_thickBoth = CM.Glyphs.LeftTeeHvDblH;
+				_normal = CM.Glyphs.LeftTee;
 			}
 		}
 		private class RightTeeIntersectionRuneResolver : IntersectionRuneResolver {
 			public override void SetGlyphs ()
 			{
-				_round = Application.Glyphs.RightTee;
-				_doubleH = Application.Glyphs.RightTeeDblH;
-				_doubleV = Application.Glyphs.RightTeeDblV;
-				_doubleBoth = Application.Glyphs.RightTeeDbl;
-				_thickH = Application.Glyphs.RightTeeHvH;
-				_thickV = Application.Glyphs.RightTeeHvV;
-				_thickBoth = Application.Glyphs.RightTeeHvDblH;
-				_normal = Application.Glyphs.RightTee;
+				_round = CM.Glyphs.RightTee;
+				_doubleH = CM.Glyphs.RightTeeDblH;
+				_doubleV = CM.Glyphs.RightTeeDblV;
+				_doubleBoth = CM.Glyphs.RightTeeDbl;
+				_thickH = CM.Glyphs.RightTeeHvH;
+				_thickV = CM.Glyphs.RightTeeHvV;
+				_thickBoth = CM.Glyphs.RightTeeHvDblH;
+				_normal = CM.Glyphs.RightTee;
 			}
 		}
 		private class BottomTeeIntersectionRuneResolver : IntersectionRuneResolver {
 			public override void SetGlyphs ()
 			{
-				_round = Application.Glyphs.BottomTee;
-				_doubleH = Application.Glyphs.BottomTeeDblH;
-				_doubleV = Application.Glyphs.BottomTeeDblV;
-				_doubleBoth = Application.Glyphs.BottomTeeDbl;
-				_thickH = Application.Glyphs.BottomTeeHvH;
-				_thickV = Application.Glyphs.BottomTeeHvV;
-				_thickBoth = Application.Glyphs.BottomTeeHvDblH;
-				_normal = Application.Glyphs.BottomTee;
+				_round = CM.Glyphs.BottomTee;
+				_doubleH = CM.Glyphs.BottomTeeDblH;
+				_doubleV = CM.Glyphs.BottomTeeDblV;
+				_doubleBoth = CM.Glyphs.BottomTeeDbl;
+				_thickH = CM.Glyphs.BottomTeeHvH;
+				_thickV = CM.Glyphs.BottomTeeHvV;
+				_thickBoth = CM.Glyphs.BottomTeeHvDblH;
+				_normal = CM.Glyphs.BottomTee;
 			}
 		}
 		private class CrossIntersectionRuneResolver : IntersectionRuneResolver {
 			public override void SetGlyphs ()
 			{
-				_round = Application.Glyphs.Cross;
-				_doubleH = Application.Glyphs.CrossDblH;
-				_doubleV = Application.Glyphs.CrossDblV;
-				_doubleBoth = Application.Glyphs.CrossDbl;
-				_thickH = Application.Glyphs.CrossHvH;
-				_thickV = Application.Glyphs.CrossHvV;
-				_thickBoth = Application.Glyphs.CrossHv;
-				_normal = Application.Glyphs.Cross;
+				_round = CM.Glyphs.Cross;
+				_doubleH = CM.Glyphs.CrossDblH;
+				_doubleV = CM.Glyphs.CrossDblV;
+				_doubleBoth = CM.Glyphs.CrossDbl;
+				_thickH = CM.Glyphs.CrossHvH;
+				_thickV = CM.Glyphs.CrossHvV;
+				_thickBoth = CM.Glyphs.CrossHv;
+				_normal = CM.Glyphs.Cross;
 			}
 		}
 
@@ -488,29 +488,29 @@ namespace Terminal.Gui {
 			case IntersectionRuneType.None:
 				return null;
 			case IntersectionRuneType.Dot:
-				return (Rune)Application.Glyphs.Dot;
+				return (Rune)CM.Glyphs.Dot;
 			case IntersectionRuneType.HLine:
 				if (useDouble) {
-					return Application.Glyphs.HLineDbl;
+					return CM.Glyphs.HLineDbl;
 				}
 				if (useDashed) {
-					return Application.Glyphs.HLineDa2;
+					return CM.Glyphs.HLineDa2;
 				}
 				if (useDotted) {
-					return Application.Glyphs.HLineDa3;
+					return CM.Glyphs.HLineDa3;
 				}
-				return useThick ? Application.Glyphs.HLineHv : (useThickDashed ? Application.Glyphs.HLineHvDa2 : (useThickDotted ? Application.Glyphs.HLineHvDa3 : Application.Glyphs.HLine));
+				return useThick ? CM.Glyphs.HLineHv : (useThickDashed ? CM.Glyphs.HLineHvDa2 : (useThickDotted ? CM.Glyphs.HLineHvDa3 : CM.Glyphs.HLine));
 			case IntersectionRuneType.VLine:
 				if (useDouble) {
-					return Application.Glyphs.VLineDbl;
+					return CM.Glyphs.VLineDbl;
 				}
 				if (useDashed) {
-					return Application.Glyphs.VLineDa3;
+					return CM.Glyphs.VLineDa3;
 				}
 				if (useDotted) {
-					return Application.Glyphs.VLineDa3;
+					return CM.Glyphs.VLineDa3;
 				}
-				return useThick ? Application.Glyphs.VLineHv : (useThickDashed ? Application.Glyphs.VLineHvDa3 : (useThickDotted ? Application.Glyphs.VLineHvDa4 : Application.Glyphs.VLine));
+				return useThick ? CM.Glyphs.VLineHv : (useThickDashed ? CM.Glyphs.VLineHvDa3 : (useThickDotted ? CM.Glyphs.VLineHvDa4 : CM.Glyphs.VLine));
 
 			default: throw new Exception ("Could not find resolver or switch case for " + nameof (runeType) + ":" + runeType);
 			}

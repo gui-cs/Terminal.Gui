@@ -1388,7 +1388,7 @@ At 0,0
 				Y = Pos.Center () - 2  // center minus 2 minus two lines top and bottom borders equal to zero (4-2-2=0)
 			};
 
-			var button = new Label ("[ Press me! ]") {
+			var button = new Button ("Press me!") {
 				X = Pos.Center (),
 				Y = Pos.Center ()
 			};
@@ -1434,7 +1434,7 @@ At 0,0
                     ┌──────────────────────────────────────┐
                     │    This should be the first line.    │
                     │                                      │
-                    │            {Application.Glyphs.LeftBracket} Press me! {Application.Glyphs.RightBracket}             │
+                    │            {CM.Glyphs.LeftBracket} Press me! {CM.Glyphs.RightBracket}             │
                     │                                      │
                     │                                      │
                     │                                      │

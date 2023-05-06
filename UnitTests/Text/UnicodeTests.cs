@@ -73,7 +73,7 @@ namespace Terminal.Gui.TextTests {
 │これは広いルーンラインです。│
 │これは ┌────────────┐ です。│
 │これは │ワイドルーン│ です。│
-│これは │  {Application.Glyphs.LeftBracket} 選ぶ {Application.Glyphs.RightBracket}  │ です。│
+│これは │  {CM.Glyphs.LeftBracket} 選ぶ {CM.Glyphs.RightBracket}  │ です。│
 │これは └────────────┘ です。│
 │これは広いルーンラインです。│
 │これは広いルーンラインです。│

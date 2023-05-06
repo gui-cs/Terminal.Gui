@@ -1,4 +1,6 @@
-﻿using Rune = System.Rune;
+﻿using static Terminal.Gui.ConfigurationManager;
+using System.Text.Json.Serialization;
+using Rune = System.Rune;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -7,7 +9,7 @@ namespace Terminal.Gui {
 	/// <remarks>
 	/// <para>
 	/// The default glyphs can be changed via the <see cref="ConfigurationManager"/>. Within a <c>config.json</c> file 
-	/// tHe JSon property name is the <see cref="Glyphs"/> property prefixed with "Application.Glyphs.". 
+	/// The JSon property name is the <see cref="GlyphDefinitions"/> property prefixed with "CM.Glyphs.". 
 	/// </para>
 	/// <para>
 	/// The JSon property can be either a decimal number or a string. The string may be one of:
@@ -16,7 +18,7 @@ namespace Terminal.Gui {
 	/// - A hex value in UTF-16 format (e.g. "\\u2611")
 	/// </para>
 	/// </remarks>
-	public class Glyphs {
+	public class GlyphDefinitions {
 		#region ----------------- Single Glyphs -----------------
 
 		/// <summary>
