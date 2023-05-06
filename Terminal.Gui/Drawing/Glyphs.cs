@@ -35,12 +35,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Selected indicator  (e.g. for <see cref="ListView"/> and <see cref="RadioGroup"/>).
 		/// </summary>
-		public Rune Selected { get; set; } = '●';
+		public Rune Selected { get; set; } = '◉';
 
 		/// <summary>
 		/// Not Selected indicator (e.g. for <see cref="ListView"/> and <see cref="RadioGroup"/>).
 		/// </summary>
-		public Rune UnSelected { get; set; } = '◌';
+		public Rune UnSelected { get; set; } = '○';
 
 		/// <summary>
 		/// Right arrow.
