@@ -293,7 +293,12 @@ namespace Terminal.Gui {
 		public override Rect Frame {
 			get => base.Frame;
 			set {
-				base.Frame = value;
+				if (value.Height > 1) {
+					base.Frame = new Rect(value.X, value.Y, value.Width, 1);
+					Height = 1;
+				} else {
+					base.Frame = value;
+				}
 				Adjust ();
 			}
 		}

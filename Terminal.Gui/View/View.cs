@@ -434,7 +434,7 @@ namespace Terminal.Gui {
 				}
 			}
 		}
-		
+
 		/// <summary>
 		/// Event fired when the <see cref="Visible"/> value is being changed.
 		/// </summary>
@@ -481,7 +481,7 @@ namespace Terminal.Gui {
 
 			return true;
 		}
-		
+
 		/// <summary>
 		/// Pretty prints the View
 		/// </summary>
