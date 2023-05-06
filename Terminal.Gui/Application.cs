@@ -49,6 +49,13 @@ namespace Terminal.Gui {
 		public static ConsoleDriver Driver;
 
 		/// <summary>
+		/// The set of glyphs used to draw checkboxes, lines, borders, etc...See also <seealso cref="Terminal.Gui.Glyphs"/>.
+		/// </summary>
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true), 
+			JsonPropertyName ("Glyphs")]
+		public static Glyphs Glyphs { get; set; } = new Glyphs ();
+
+		/// <summary>
 		/// If <see langword="true"/>, forces the use of the System.Console-based (see <see cref="NetDriver"/>) driver. The default is <see langword="false"/>.
 		/// </summary>
 		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]

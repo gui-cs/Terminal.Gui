@@ -57,14 +57,15 @@ namespace Terminal.Gui {
 
 		private static readonly string _configFilename = "config.json";
 
-		private static readonly JsonSerializerOptions serializerOptions = new JsonSerializerOptions {
+		private static readonly JsonSerializerOptions _serializerOptions = new JsonSerializerOptions {
 			ReadCommentHandling = JsonCommentHandling.Skip,
 			PropertyNameCaseInsensitive = true,
 			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
 			WriteIndented = true,
 			Converters = {
-				// No need to set converters - the ConfigRootConverter uses property attributes apply the correct
-				// Converter.
+				// We override the standard Rune converter to support specifying Glyphs in
+				// a flexible way
+				new RuneJsonConverter(),
 			},
 		};
 
@@ -286,12 +287,12 @@ namespace Terminal.Gui {
 		internal static string ToJson ()
 		{
 			Debug.WriteLine ($"ConfigurationManager.ToJson()");
-			return JsonSerializer.Serialize<SettingsScope> (Settings!, serializerOptions);
+			return JsonSerializer.Serialize<SettingsScope> (Settings!, _serializerOptions);
 		}
 
 		internal static Stream ToStream ()
 		{
-			var json = JsonSerializer.Serialize<SettingsScope> (Settings!, serializerOptions);
+			var json = JsonSerializer.Serialize<SettingsScope> (Settings!, _serializerOptions);
 			// turn it into a stream
 			var stream = new MemoryStream ();
 			var writer = new StreamWriter (stream);
@@ -371,8 +372,9 @@ namespace Terminal.Gui {
 			AppSettings = new AppScope ();
 
 			// To enable some unit tests, we only load from resources if the flag is set
-			if (Locations.HasFlag (ConfigLocations.DefaultOnly)) Settings.UpdateFromResource (typeof (ConfigurationManager).Assembly, $"Terminal.Gui.Resources.{_configFilename}");
-
+			if (Locations.HasFlag (ConfigLocations.DefaultOnly)) {
+				Settings.UpdateFromResource (typeof (ConfigurationManager).Assembly, $"Terminal.Gui.Resources.{_configFilename}");
+			}
 			Apply ();
 			ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply ();
 			AppSettings?.Apply ();
@@ -413,7 +415,7 @@ namespace Terminal.Gui {
 		public static void Apply ()
 		{
 			bool settings = Settings?.Apply () ?? false;
-			bool themes = ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false;
+			bool themes = !string.IsNullOrEmpty(ThemeManager.SelectedTheme) && (ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false);
 			bool appsettings = AppSettings?.Apply () ?? false;
 			if (settings || themes || appsettings) {
 				OnApplied ();
@@ -520,7 +522,7 @@ namespace Terminal.Gui {
 		{
 			var emptyScope = new SettingsScope ();
 			emptyScope.Clear ();
-			return JsonSerializer.Serialize<SettingsScope> (emptyScope, serializerOptions);
+			return JsonSerializer.Serialize<SettingsScope> (emptyScope, _serializerOptions);
 		}
 
 		/// <summary>

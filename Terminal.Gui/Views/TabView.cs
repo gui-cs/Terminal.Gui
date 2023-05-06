@@ -507,7 +507,7 @@ namespace Terminal.Gui {
 				}
 
 				Move (selected.X - 1, y);
-				Driver.AddRune (host.Style.TabsOnBottom ? Glyphs.LLCorner : Glyphs.ULCorner);
+				Driver.AddRune (host.Style.TabsOnBottom ? Application.Glyphs.LLCorner : Application.Glyphs.ULCorner);
 
 				for (int i = 0; i < selected.Width; i++) {
 
@@ -516,11 +516,11 @@ namespace Terminal.Gui {
 						return;
 					}
 
-					Driver.AddRune (Glyphs.HLine);
+					Driver.AddRune (Application.Glyphs.HLine);
 				}
 
 				// Add the end of the selected tab
-				Driver.AddRune (host.Style.TabsOnBottom ? Glyphs.LRCorner : Glyphs.URCorner);
+				Driver.AddRune (host.Style.TabsOnBottom ? Application.Glyphs.LRCorner : Application.Glyphs.URCorner);
 
 			}
 
@@ -549,7 +549,7 @@ namespace Terminal.Gui {
 
 					if (toRender.IsSelected) {
 						Move (toRender.X - 1, y);
-						Driver.AddRune (Glyphs.VLine);
+						Driver.AddRune (Application.Glyphs.VLine);
 					}
 
 					Move (toRender.X, y);
@@ -573,7 +573,7 @@ namespace Terminal.Gui {
 					Driver.SetAttribute (GetNormalColor ());
 
 					if (toRender.IsSelected) {
-						Driver.AddRune (Glyphs.VLine);
+						Driver.AddRune (Application.Glyphs.VLine);
 					}
 				}
 			}
@@ -593,7 +593,7 @@ namespace Terminal.Gui {
 				if (!host.Style.ShowBorder) {
 
 					for (int x = 0; x < width; x++) {
-						Driver.AddRune (Glyphs.HLine);
+						Driver.AddRune (Application.Glyphs.HLine);
 					}
 
 				}
@@ -605,14 +605,14 @@ namespace Terminal.Gui {
 
 				Move (selected.X - 1, y);
 
-				Driver.AddRune (selected.X == 1 ? Glyphs.VLine :
-					(host.Style.TabsOnBottom ? Glyphs.URCorner : Glyphs.LRCorner));
+				Driver.AddRune (selected.X == 1 ? Application.Glyphs.VLine :
+					(host.Style.TabsOnBottom ? Application.Glyphs.URCorner : Application.Glyphs.LRCorner));
 
 				Driver.AddStr (new string (' ', selected.Width));
 
 				Driver.AddRune (selected.X + selected.Width == width - 1 ?
-				     Glyphs.VLine :
-					(host.Style.TabsOnBottom ? Glyphs.ULCorner : Glyphs.LLCorner));
+				     Application.Glyphs.VLine :
+					(host.Style.TabsOnBottom ? Application.Glyphs.ULCorner : Application.Glyphs.LLCorner));
 
 				// draw scroll indicators
 
@@ -621,7 +621,7 @@ namespace Terminal.Gui {
 					Move (0, y);
 
 					// indicate that
-					Driver.AddRune (Glyphs.LeftArrow);
+					Driver.AddRune (Application.Glyphs.LeftArrow);
 				}
 
 				// if there are more tabs to the right not visible
@@ -629,7 +629,7 @@ namespace Terminal.Gui {
 					Move (width - 1, y);
 
 					// indicate that
-					Driver.AddRune (Glyphs.RightArrow);
+					Driver.AddRune (Application.Glyphs.RightArrow);
 				}
 			}
 

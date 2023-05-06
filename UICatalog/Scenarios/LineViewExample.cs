@@ -61,7 +61,7 @@ namespace UICatalog.Scenarios {
 			var arrowLine = new LineView () {
 				Y = 7,
 				Width = 10,
-				StartingAnchor = Glyphs.LeftTee,
+				StartingAnchor = Application.Glyphs.LeftTee,
 				EndingAnchor = '>'
 			};
 
@@ -81,7 +81,7 @@ namespace UICatalog.Scenarios {
 			// creates a horizontal line
 			var verticalArrow = new LineView (Orientation.Vertical) {
 				X = 27,
-				StartingAnchor = Glyphs.TopTee,
+				StartingAnchor = Application.Glyphs.TopTee,
 				EndingAnchor = 'V'
 			};
 

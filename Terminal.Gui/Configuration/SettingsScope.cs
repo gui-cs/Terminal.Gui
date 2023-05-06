@@ -47,7 +47,7 @@ namespace Terminal.Gui {
 			{
 				// Update the existing settings with the new settings.
 				try {
-					Update (JsonSerializer.Deserialize<SettingsScope> (stream, serializerOptions)!);
+					Update (JsonSerializer.Deserialize<SettingsScope> (stream, _serializerOptions)!);
 					OnUpdated ();
 					Debug.WriteLine ($"ConfigurationManager: Read configuration from \"{source}\"");
 					Sources.Add (source);
