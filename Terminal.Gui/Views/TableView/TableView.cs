@@ -330,17 +330,17 @@ namespace Terminal.Gui {
 					var colStyle = Style.GetColumnStyleIfAny (current.Column);
 					var colName = table.ColumnNames [current.Column];
 
-					//RenderSeparator (current.X - 1, yh, true);
+					if (!Style.ShowVerticalHeaderLines && current.X - 1 >= 0) {
+						AddRune (current.X - 1, yh, SeparatorSymbol);
+					}
 
 					Move (current.X, yh);
 
 					Driver.AddStr (TruncateOrPad (colName, colName, current.Width, colStyle, padChar));
 
-					/*
-					if (Style.ExpandLastColumn == false && current.IsVeryLast) {
-						RenderSeparator (current.X + current.Width - 1, yh, true);
+					if (!Style.ShowVerticalHeaderLines && !Style.ExpandLastColumn && current.IsVeryLast) {
+						AddRune (current.X + current.Width - 1, yh, SeparatorSymbol);
 					}
-					*/
 				}
 			}
 
@@ -582,29 +582,32 @@ namespace Terminal.Gui {
 
 				RenderCell (cellColor, render, isPrimaryCell);
 
-				// Reset color scheme to normal for drawing separators if we drew text with custom scheme
-				if (scheme != rowScheme) {
+				// Style.AlwaysUseNormalColorForVerticalCellLines is no longer possible after switch to LineCanvas
+				// except when cell lines are disabled and SeparatorSymbol is used
 
-					if (isSelectedCell) {
-						color = focused ? rowScheme.HotFocus : rowScheme.HotNormal;
-					} else {
-						color = Enabled ? rowScheme.Normal : rowScheme.Disabled;
+				if (!Style.ShowVerticalCellLines) {
+
+					if (Style.AlwaysUseNormalColorForVerticalCellLines) {
+						color = rowScheme.Normal;
+
+					} else if (scheme != rowScheme) {
+
+						// Reset color scheme to normal for drawing separators if we drew text with custom scheme
+						if (isSelectedCell) {
+							color = focused ? rowScheme.HotFocus : rowScheme.HotNormal;
+						} else {
+							color = Enabled ? rowScheme.Normal : rowScheme.Disabled;
+						}
 					}
 					Driver.SetAttribute (color);
-				}
 
-				// TODO: style.AlwaysUseNormalColorForVerticalCellLines is no longer possible after switch to LineCanvas
-				// This is an attempt at a workaround, but requires cell lines to be drawn first and doesn't respect LineStyle
-				/*
-				if (FullRowSelect && style.ShowVerticalCellLines && !style.AlwaysUseNormalColorForVerticalCellLines) {
-					if (current.X - 1 != 0) {
-						RenderSeparator (current.X - 1, row, false);
+					if (current.X - 1 >= 0) {
+						AddRune (current.X - 1, row, SeparatorSymbol);
 					}
-					if (Style.ExpandLastColumn == false && current.IsVeryLast) {
-						RenderSeparator (current.X + current.Width - 1, row, false);
+					if (!Style.ExpandLastColumn && current.IsVeryLast) {
+						AddRune (current.X + current.Width - 1, row, SeparatorSymbol);
 					}
 				}
-				*/
 			}
 		}
 
@@ -639,17 +642,6 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (cellColor);
 				Driver.AddStr (render);
 			}
-		}
-
-		private void RenderSeparator (int col, int row, bool isHeader)
-		{
-			if (col < 0)
-				return;
-
-			var renderLines = isHeader ? style.ShowVerticalHeaderLines : style.ShowVerticalCellLines;
-
-			Rune symbol = renderLines ? Driver.VLine : SeparatorSymbol;
-			AddRune (col, row, symbol);
 		}
 
 		void AddRuneAt (ConsoleDriver d, int col, int row, Rune ch)
