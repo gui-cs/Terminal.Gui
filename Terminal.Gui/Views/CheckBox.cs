@@ -87,7 +87,7 @@ namespace Terminal.Gui {
 			charChecked = Glyphs.Checked;
 			charUnChecked = Glyphs.UnChecked;
 			Checked = is_checked;
-			HotKeySpecifier = Glyphs.HotKeySpecifier;
+			HotKeySpecifier = '_';
 			CanFocus = true;
 			AutoSize = true;
 			Text = s;

@@ -1,6 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Text.Json.Serialization;
 using static Terminal.Gui.ConfigurationManager;
-using Rune = System.Rune;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -15,414 +15,396 @@ namespace Terminal.Gui {
 	/// The JSon property can be either a decimal number or a string. The string may be one of:
 	/// - A unicode char (e.g. "☑")
 	/// - A hex value in U+ format (e.g. "U+2611")
-	/// - A hex value in \u format (e.g. "\\u2611")
+	/// - A hex value in UTF-16 format (e.g. "\\u2611")
 	/// </para>
 	/// </remarks>
-	public static class Glyphs {
+	public class Glyphs {
 
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune HotKeySpecifier { get; set; } = '_';
+		// Private constructor to prevent multiple instances
+		private Glyphs () { }
 
-		/// <summary>
-		/// Horizontal line character.
-		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune HLine { get; set; } = '\u2500';
+		// Static instance of the Singleton class
+		private static readonly Glyphs _instance = new Glyphs ();
 
-		/// <summary>
-		/// Vertical line character.
-		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune VLine { get; set; } = '\u2502';
+		// Public static readonly property to access the instance
+		public static Glyphs Instance {
+			get { return _instance; }
+		}
 
 		/// <summary>
-		/// Stipple pattern
+		/// Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune Stipple { get; set; } = '\u2591';
+		public static Rune Checked { get; set; } = '√';
 
 		/// <summary>
-		/// Diamond character
+		/// Not Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune Diamond { get; set; } = '\u25ca';
+		public static Rune UnChecked { get; set; } = '╴';
 
 		/// <summary>
-		/// Upper left corner
+		/// Null Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune ULCorner { get; set; } = '\u250C';
+		public static Rune NullChecked { get; set; } = '⍰';
 
 		/// <summary>
-		/// Lower left corner
+		/// Selected indicator  (e.g. for <see cref="ListView"/> and <see cref="RadioGroup"/>).
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune LLCorner { get; set; } = '\u2514';
+		public static Rune Selected { get; set; } = '●';
 
 		/// <summary>
-		/// Upper right corner
+		/// Not Selected indicator (e.g. for <see cref="ListView"/> and <see cref="RadioGroup"/>).
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune URCorner { get; set; } = '\u2510';
+		public static Rune UnSelected { get; set; } = '◌';
+
+		/// </summary>
+		/// Right arrow.
+		/// </summary>
+		public static Rune RightArrow { get; set; } = '►';
 
 		/// <summary>
-		/// Lower right corner
+		/// Left arrow.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune LRCorner { get; set; } = '\u2518';
+		public static Rune LeftArrow { get; set; } = '◄';
 
 		/// <summary>
-		/// Left tee
+		/// Down arrow.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune LeftTee { get; set; } = '\u251c';
+		public static Rune DownArrow { get; set; } = '▼';
 
 		/// <summary>
-		/// Right tee
+		/// Up arrow.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune RightTee { get; set; } = '\u2524';
+		public static Rune UpArrow { get; set; } = '▲';
 
 		/// <summary>
-		/// Top tee
+		/// Left default indicator (e.g. for <see cref="Button"/>.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune TopTee { get; set; } = '\u252c';
+		public static Rune LeftDefaultIndicator { get; set; } = '◦';
 
 		/// <summary>
-		/// The bottom tee.
+		/// Right default indicator (e.g. for <see cref="Button"/>.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune BottomTee { get; set; } = '\u2534';
+		public static Rune RightDefaultIndicator { get; set; } = '◦';
+
 
 		/// <summary>
-		/// Checkmark.
+		/// Left Bracket (e.g. for <see cref="Button"/>. Default is (U+005B) - [.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune Checked { get; set; } = '\u221a';
-
-		/// <summary>
-		/// Un-checked checkmark.
-		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune UnChecked { get; set; } = '\u2574';
-
-		/// <summary>
-		/// Null-checked checkmark.
-		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune NullChecked { get; set; } = '\u2370';
-
-		/// <summary>
-		/// Selected mark.
-		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune Selected { get; set; } = '\u25cf';
-
-		/// <summary>
-		/// Un-selected selected mark.
-		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune UnSelected { get; set; } = '\u25cc';
-
-		/// <summary>
-		/// Right Arrow.
-		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune RightArrow { get; set; } = '\u25ba';
-
-		/// <summary>
-		/// Left Arrow.
-		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune LeftArrow { get; set; } = '\u25c4';
-
-		/// <summary>
-		/// Down Arrow.
-		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune DownArrow { get; set; } = '\u25bc';
-
-		/// <summary>
-		/// Up Arrow.
-		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune UpArrow { get; set; } = '\u25b2';
-
-		/// <summary>
-		/// Left indicator for default action (e.g. for <see cref="Button"/>).
-		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune LeftDefaultIndicator { get; set; } = '\u25e6';
-
-		/// <summary>
-		/// Right indicator for default action (e.g. for <see cref="Button"/>).
-		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune RightDefaultIndicator { get; set; } = '\u25e6';
-
-		/// <summary>
-		/// Left frame/bracket (e.g. '[' for <see cref="Button"/>).
-		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
 		public static Rune LeftBracket { get; set; } = '[';
 
+
 		/// <summary>
-		/// Right frame/bracket (e.g. ']' for <see cref="Button"/>).
+		/// Right Bracket (e.g. for <see cref="Button"/>. Default is (U+005D) - ].
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
 		public static Rune RightBracket { get; set; } = ']';
 
-		/// <summary>
-		/// Blocks Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
-		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune BlocksMeterSegment { get; set; } = '\u258c';
 
 		/// <summary>
-		/// Continuous Segment indicator for meter views (e.g. <see cref="ProgressBar"/>.
+		/// Half block meter segment (e.g. for <see cref="ProgressBar"/>).
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune ContinuousMeterSegment { get; set; } = '\u2588';
+		public static Rune BlocksMeterSegment { get; set; } = '▌';
+
 
 		/// <summary>
-		/// Horizontal double line character.
+		/// Continuous block meter segment (e.g. for <see cref="ProgressBar"/>).
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune HDbLine { get; set; } = '\u2550';
+		public static Rune ContinuousMeterSegment { get; set; } = '█';
+
 
 		/// <summary>
-		/// Vertical double line character.
+		/// Stipple pattern (e.g. for <see cref="ScrollBarView"/>). Default is Light Shade (U+2591) - ░.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune VDbLine { get; set; } = '\u2551';
+		public static Rune Stipple { get; set; } = '░';
+
 
 		/// <summary>
-		/// Upper left double corner
+		/// Diamond (e.g. for <see cref="ScrollBarView"/>. Default is Lozenge (U+25CA) - ◊.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune ULDbCorner { get; set; } = '\u2554';
+		public static Rune Diamond { get; set; } = '◊';
+
 
 		/// <summary>
-		/// Lower left double corner
+		/// Close. Default is Heavy Ballot X (U+2718) - ✘.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune LLDbCorner { get; set; } = '\u255a';
+		public static Rune Close { get; set; } = '✘';
+
 
 		/// <summary>
-		/// Upper right double corner
+		/// Minimize. Default is Lower Right Shadowed White Circle (U+274F) - ❏.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune URDbCorner { get; set; } = '\u2557';
+		public static Rune Minimize { get; set; } = '❏';
+
 
 		/// <summary>
-		/// Lower right double corner
+		/// Maximize. Default is Upper Right Shadowed White Circle (U+273D) - ✽.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune LRDbCorner { get; set; } = '\u255d';
+		public static Rune Maximize { get; set; } = '✽';
+
 
 		/// <summary>
-		/// Upper left rounded corner
+		/// Horizontal Line (U+2500) - ─
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune ULRCorner { get; set; } = '\u256d';
+		public static Rune HLine { get; set; } = '─';
+
 
 		/// <summary>
-		/// Lower left rounded corner
+		/// Vertical Line (U+2502) - │
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune LLRCorner { get; set; } = '\u2570';
+		public static Rune VLine { get; set; } = '│';
+
 
 		/// <summary>
-		/// Upper right rounded corner
+		/// Upper Left Corner (U+250C) - ┌
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune URRCorner { get; set; } = '\u256e';
+		public static Rune ULCorner { get; set; } = '┌';
+
 
 		/// <summary>
-		/// Lower right rounded corner
+		/// Lower Left Corner (U+2514) - └
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune LRRCorner { get; set; } = '\u256f';
+		public static Rune LLCorner { get; set; } = '└';
+
 
 		/// <summary>
-		/// Horizontal double dashed line character.
+		/// Upper Right Corner (U+2510) - ┐
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune HDsLine { get; set; } = '\u254c';
+		public static Rune URCorner { get; set; } = '┐';
+
 
 		/// <summary>
-		/// Vertical triple dashed line character.
+		/// Lower Right Corner (U+2518) - ┘
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune VDsLine { get; set; } = '\u2506';
+		public static Rune LRCorner { get; set; } = '┘';
+
 
 		/// <summary>
-		/// Horizontal triple dashed line character.
+		/// Left Tee (U+251C) - ├
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune HDtLine { get; set; } = '\u2504';
+		public static Rune LeftTee { get; set; } = '├';
 
 		/// <summary>
-		/// Horizontal quadruple dashed line character.
+		/// Right Tee (U+2524) - ┤
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune HD4Line { get; set; } = '\u2508';
+		public static Rune RightTee { get; set; } = '┤';
 
 		/// <summary>
-		/// Vertical double dashed line character.
+		/// Top Tee (U+252C) - ┬
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune VD2Line { get; set; } = '\u254e';
+		public static Rune TopTee { get; set; } = '┬';
 
 		/// <summary>
-		/// Vertical quadruple dashed line character.
+		/// Bottom Tee (U+2534) - ┴
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune VDtLine { get; set; } = '\u250a';
+		public static Rune BottomTee { get; set; } = '┴';
 
 		/// <summary>
-		/// Horizontal heavy line character.
+		/// Crosshair (U+253C) - ┼
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune HThLine { get; set; } = '\u2501';
+		public static Rune CrossHair { get; set; } = '┼';
 
 		/// <summary>
-		/// Vertical heavy line character.
+		/// Box Drawings Double Horizontal (U+2550) - ═
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune VThLine { get; set; } = '\u2503';
+		public static Rune HLineDb { get; set; } = '═';
 
 		/// <summary>
-		/// Upper left heavy corner
+		/// Box Drawings Double Vertical (U+2551) - ║
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune ULThCorner { get; set; } = '\u250f';
+		public static Rune VLineDb { get; set; } = '║';
 
 		/// <summary>
-		/// Lower left heavy corner
+		/// Box Drawings Double Down and Right (U+2554) - ╔
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune LLThCorner { get; set; } = '\u2517';
+		public static Rune ULCornerDb { get; set; } = '╔';
 
 		/// <summary>
-		/// Upper right heavy corner
+		/// Box Drawings Double Up and Right (U+255A) - ╚
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune URThCorner { get; set; } = '\u2513';
+		public static Rune LLCornerDb { get; set; } = '╝';
 
 		/// <summary>
-		/// Lower right heavy corner
+		/// Box Drawings Double Down and Left (U+2557) - ╗
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune LRThCorner { get; set; } = '\u251b';
+		public static Rune URCornerDb { get; set; } = '╗';
 
 		/// <summary>
-		/// Horizontal heavy double dashed line character.
+		/// Box Drawings Double Up and Left (U+255D) - ╝
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune HThDsLine { get; set; } = '\u254d';
+		public static Rune LRCornerDb { get; set; } = '╝';
 
 		/// <summary>
-		/// Vertical heavy triple dashed line character.
+		/// Box Drawings Double Vertical and Horizontal (U+256C) - ╬
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune VThDsLine { get; set; } = '\u2507';
+		public static Rune CrossHairDb { get; set; } = '╬';
 
 		/// <summary>
-		/// Horizontal heavy triple dashed line character.
+		/// Box Drawings Light Arc Down and Right (U+256D) - ╭
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune HThDtLine { get; set; } = '\u2505';
+		public static Rune ULCornerR { get; set; } = '╭';
 
 		/// <summary>
-		/// Horizontal heavy quadruple dashed line character.
+		/// Box Drawings Light Arc Down and Left (U+2570) - ╰
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune HThD4Line { get; set; } = '\u2509';
+		public static Rune LLCornerR { get; set; } = '╰';
 
 		/// <summary>
-		/// Vertical heavy double dashed line character.
+		/// Box Drawings Light Arc Up and Right (U+256E) - ╮
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune VThD2Line { get; set; } = '\u254f';
+		public static Rune URCornerR { get; set; } = '╮';
 
 		/// <summary>
-		/// Vertical heavy quadruple dashed line character.
+		/// Box Drawings Light Arc Up and Left (U+256F) - ╯
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune VThDtLine { get; set; } = '\u250b';
+		public static Rune LRCornerR { get; set; } = '╯';
 
 		/// <summary>
-		/// The left half line.
+		/// Box Drawings Light Double Dash Horizontal (U+254C) - ╌
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune HalfLeftLine { get; set; } = '\u2574';
+		public static Rune HLineDa2 { get; set; } = '╌';
 
 		/// <summary>
-		/// The up half line.
+		/// Box Drawings Light Triple Dash Vertical (U+2506) - ┆
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune HalfTopLine { get; set; } = '\u2575';
+		public static Rune VLineDa3 { get; set; } = '┆';
 
 		/// <summary>
-		/// The right half line.
+		/// Box Drawings Light Triple Dash Horizontal (U+2504) - ┄
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune HalfRightLine { get; set; } = '\u2576';
+		public static Rune HLineDa3 { get; set; } = '┄';
 
 		/// <summary>
-		/// The down half line.
+		/// Box Drawings Light Quadruple Dash Horizontal (U+2508) - ┈
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune HalfBottomLine { get; set; } = '\u2577';
+		public static Rune HLineDa4 { get; set; } = '┈';
 
 		/// <summary>
-		/// The heavy left half line.
+		/// Box Drawings Light Double Dash Vertical (U+254E) - ╎
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune ThHalfLeftLine { get; set; } = '\u2578';
+		public static Rune VLineDa2 { get; set; } = '╎';
 
 		/// <summary>
-		/// The heavy up half line.
+		/// Box Drawings Light Quadruple Dash Vertical (U+250A) - ┊
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune ThHalfTopLine { get; set; } = '\u2579';
+		public static Rune VLineDa4 { get; set; } = '┊';
 
 		/// <summary>
-		/// The heavy right half line.
+		/// Box Drawings Heavy Horizontal (U+2501) - ━
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune ThHalfRightLine { get; set; } = '\u257a';
+		public static Rune HLineHv { get; set; } = '━';
 
 		/// <summary>
-		/// The heavy light down half line.
+		/// Box Drawings Heavy Vertical (U+2503) - ┃
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune ThHalfBottomLine { get; set; } = '\u257b';
+		public static Rune VLineHv { get; set; } = '┃';
 
 		/// <summary>
-		/// The light left and heavy right line.
+		/// Box Drawings Heavy Down and Right (U+250F) - ┏
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune ThRightSideLine { get; set; } = '\u257c';
+		public static Rune ULCornerHv { get; set; } = '┏';
 
 		/// <summary>
-		/// The light up and heavy down line.
+		/// Box Drawings Heavy Up and Right (U+2517) - ┗
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune ThBottomSideLine { get; set; } = '\u257d';
+		public static Rune LLCornerHv { get; set; } = '┗';
 
 		/// <summary>
-		/// The heavy left and light right line.
+		/// Box Drawings Heavy Down and Left (U+2513) - ┓
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune ThLeftSideLine { get; set; } = '\u257e';
+		public static Rune URCornerHv { get; set; } = '┓';
 
 		/// <summary>
-		/// The heavy up and light down line.
+		/// Box Drawings Heavy Up and Left (U+251B) - ┛
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (RuneJsonConverter))]
-		public static Rune ThTopSideLine { get; set; } = '\u257f';
+		public static Rune LRCornerHv { get; set; } = '┛';
+
+		/// <summary>
+		/// Box Drawings Heavy Double Dash Horizontal (U+254D) - ╍
+		/// </summary>
+		public static Rune HLineHvDa2 { get; set; } = '╍';
+
+		/// <summary>
+		/// Box Drawings Heavy Triple Dash Vertical (U+2507) - ┇
+		/// </summary>
+		public static Rune VLineHvDa3 { get; set; } = '┇';
+
+		/// <summary>
+		/// Box Drawings Heavy Triple Dash Horizontal (U+2505) - ┅
+		/// </summary>
+		public static Rune HLineHvDa3 { get; set; } = '┅';
+
+		/// <summary>
+		/// Box Drawings Heavy Quadruple Dash Horizontal (U+2509) - ┉
+		/// </summary>
+		public static Rune HLineHvDa4 { get; set; } = '┉';
+
+		/// <summary>
+		/// Box Drawings Heavy Double Dash Vertical (U+254F) - ╏
+		/// </summary>
+		public static Rune VLineHvDa2 { get; set; } = '╏';
+
+		/// <summary>
+		/// Box Drawings Heavy Quadruple Dash Vertical (U+250B) - ┋
+		/// </summary>
+		public static Rune VLineHvDa4 { get; set; } = '┋';
+
+		/// <summary>
+		/// Box Drawings Light Left (U+2574) - ╴
+		/// </summary>
+		public static Rune HalfLeftLine { get; set; } = '╴';
+
+		/// <summary>
+		/// Box Drawings Light Up (U+2575) - ╵
+		/// </summary>
+		public static Rune HalfTopLine { get; set; } = '╵';
+
+		/// <summary>
+		/// Box Drawings Light Right (U+2576) - ╶
+		/// </summary>
+		public static Rune HalfRightLine { get; set; } = '╶';
+
+		/// <summary>
+		/// Box Drawings Light Down (U+2577) - ╷
+		/// </summary>
+		public static Rune HalfBottomLine { get; set; } = '╷';
+
+		/// <summary>
+		/// Box Drawings Heavy Left (U+2578) - ╸
+		/// </summary>
+		public static Rune HalfLeftLineHv { get; set; } = '╸';
+
+		/// <summary>
+		/// Box Drawings Heavy Up (U+2579) - ╹
+		/// </summary>
+		public static Rune HalfTopLineHv { get; set; } = '╹';
+
+		/// <summary>
+		/// Box Drawings Heavy Right (U+257A) - ╺
+		/// </summary>
+		public static Rune HalfRightLineHv { get; set; } = '╺';
+
+		/// <summary>
+		/// Box Drawings Light Up and Right (U+257B) - ╻
+		/// </summary>
+		public static Rune HalfBottomLineLt { get; set; } = '╻';
+
+		/// <summary>
+		/// Box Drawings Light Horizontal and Heavy Right (U+257C) - ╼
+		/// </summary>
+		public static Rune RightSideLineLtHv { get; set; } = '╼';
+
+		/// <summary>
+		/// Box Drawings Light Vertical and Heavy Right (U+257D) - ╽
+		/// </summary>
+		public static Rune BottomSideLineLtHv { get; set; } = '╽';
+
+		/// <summary>
+		/// Box Drawings Heavy Left and Light Horizontal (U+257E) - ╾
+		/// </summary>
+		public static Rune LeftSideLineHvLt { get; set; } = '╾';
+
+		/// <summary>
+		/// Box Drawings Heavy Up and Light Horizontal (U+257F) - ╿
+		/// </summary>
+		public static Rune TopSideLineHvLt { get; set; } = '╿';
 	}
 }

@@ -387,7 +387,7 @@ namespace Terminal.Gui {
 		}
 		private class CrosshairIntersectionRuneResolver : IntersectionRuneResolver {
 			public CrosshairIntersectionRuneResolver () :
-				base ('┼', '╪', '╫', '╬', '┿', '╂', '╋', '┼')
+				base ('┼', '╪', '╫', Glyphs.CrossHairDb, '┿', '╂', '╋', Glyphs.CrossHair)
 			{
 
 			}
@@ -424,26 +424,26 @@ namespace Terminal.Gui {
 				return (Rune)'.';
 			case IntersectionRuneType.HLine:
 				if (useDouble) {
-					return Glyphs.HDbLine;
+					return Glyphs.HLineDb;
 				}
 				if (useDashed) {
-					return Glyphs.HDsLine;
+					return Glyphs.HLineDa2;
 				}
 				if (useDotted) {
-					return Glyphs.HDtLine;
+					return Glyphs.HLineDa3;
 				}
-				return useThick ? Glyphs.HThLine : (useThickDashed ? Glyphs.HThDsLine : (useThickDotted ? Glyphs.HThDtLine : Glyphs.HLine));
+				return useThick ? Glyphs.HLineHv : (useThickDashed ? Glyphs.HLineHvDa2 : (useThickDotted ? Glyphs.HLineHvDa3 : Glyphs.HLine));
 			case IntersectionRuneType.VLine:
 				if (useDouble) {
-					return Glyphs.VDbLine;
+					return Glyphs.VLineDb;
 				}
 				if (useDashed) {
-					return Glyphs.VDsLine;
+					return Glyphs.VLineDa3;
 				}
 				if (useDotted) {
-					return Glyphs.VDtLine;
+					return Glyphs.VLineDa3;
 				}
-				return useThick ? Glyphs.VThLine : (useThickDashed ? Glyphs.VThDsLine : (useThickDotted ? Glyphs.VThDtLine : Glyphs.VLine));
+				return useThick ? Glyphs.VLineHv : (useThickDashed ? Glyphs.VLineHvDa3 : (useThickDotted ? Glyphs.VLineHvDa4 : Glyphs.VLine));
 
 			default: throw new Exception ("Could not find resolver or switch case for " + nameof (runeType) + ":" + runeType);
 			}
