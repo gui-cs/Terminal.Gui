@@ -82,7 +82,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets the total width of the left and right sides of the rectangle. Sets the height of the left and right sides of the rectangle to half the specified value.
+		/// Gets the total height of the top and bottom sides of the rectangle. Sets the height of the top and bottom sides of the rectangle to half the specified value.
 		/// </summary>
 		public int Vertical {
 			get {
@@ -94,7 +94,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets the total width of the top and bottom sides of the rectangle. Sets the width of the top and bottom sides of the rectangle to half the specified value.
+		/// Gets the total width of the left and right sides of the rectangle. Sets the width of the left and rigth sides of the rectangle to half the specified value.
 		/// </summary>
 		public int Horizontal {
 			get {
