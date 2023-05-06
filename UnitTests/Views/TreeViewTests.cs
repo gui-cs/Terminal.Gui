@@ -903,6 +903,74 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Fact, AutoInitShutdown]
+		public void TestTreeView_Filter ()
+		{
+			var tv = new TreeView { Width = 20, Height = 10 };
+
+			var n1 = new TreeNode ("root one");
+			var n1_1 = new TreeNode ("leaf 1");
+			var n1_2 = new TreeNode ("leaf 2");
+			n1.Children.Add (n1_1);
+			n1.Children.Add (n1_2);
+
+			var n2 = new TreeNode ("root two");
+			tv.AddObject (n1);
+			tv.AddObject (n2);
+			tv.Expand (n1);
+
+			tv.ColorScheme = new ColorScheme ();
+			tv.Redraw (tv.Bounds);
+
+			// Normal drawing of the tree view
+			TestHelpers.AssertDriverContentsAre (
+@"
+├-root one
+│ ├─leaf 1
+│ └─leaf 2
+└─root two
+", output);
+			var filter = new TreeViewTextFilter<ITreeNode> (tv);
+			tv.Filter = filter;
+
+			// matches nothing
+			filter.Text = "asdfjhasdf";
+			tv.Redraw (tv.Bounds);
+			// Normal drawing of the tree view
+			TestHelpers.AssertDriverContentsAre (
+@"", output);
+
+
+			// Matches everything
+			filter.Text = "root";
+			tv.Redraw (tv.Bounds);
+			TestHelpers.AssertDriverContentsAre (
+@"
+├-root one
+│ ├─leaf 1
+│ └─leaf 2
+└─root two
+", output);
+			// Matches 2 leaf nodes
+			filter.Text = "leaf";
+			tv.Redraw (tv.Bounds);
+			TestHelpers.AssertDriverContentsAre (
+@"
+├-root one
+│ ├─leaf 1
+│ └─leaf 2
+", output);
+
+			// Matches 1 leaf nodes
+			filter.Text = "leaf 1";
+			tv.Redraw (tv.Bounds);
+			TestHelpers.AssertDriverContentsAre (
+@"
+├-root one
+│ ├─leaf 1
+", output);
+		}
+
+		[Fact, AutoInitShutdown]
 		public void DesiredCursorVisibility_MultiSelect ()
 		{
 			var tv = new TreeView { Width = 20, Height = 10 };
