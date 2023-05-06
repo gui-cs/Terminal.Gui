@@ -38,32 +38,29 @@ namespace Terminal.Gui {
 
 		ContentView contentView;
 		ScrollBarView vertical, horizontal;
-		int scrollLines, scrollCols;
+		int scrollAmount;
 
 		/// <summary>
 		///  Initializes a new instance of the <see cref="Gui.ScrollView"/> class using <see cref="LayoutStyle.Absolute"/> positioning.
 		/// </summary>
 		/// <param name="frame"></param>
-		/// <param name="scrollLines">Scroll amount for vertical scrolling</param>
-		/// <param name="scrollCols">Scroll amount for horizontal scrolling</param>
-		public ScrollView (Rect frame, int scrollLines = 1, int scrollCols = 1) : base (frame)
+		public ScrollView (Rect frame) : base (frame)
 		{
-			Initialize (frame, scrollLines, scrollCols);
+			Initialize (frame);
 		}
-
 
 		/// <summary>
 		///  Initializes a new instance of the <see cref="Gui.ScrollView"/> class using <see cref="LayoutStyle.Computed"/> positioning.
 		/// </summary>
-		public ScrollView () : base() 
+		public ScrollView () : base ()
 		{
-			Initialize (Rect.Empty, 1, 1);
+			Initialize (Rect.Empty);
 		}
 
-		void Initialize (Rect frame, int scrollLines = 1, int scrollCols = 1)
+		void Initialize (Rect frame)
 		{
 			contentView = new ContentView (frame);
-			vertical = new ScrollBarView (1, 0, isVertical: true, scrollAmount: scrollLines) {
+			vertical = new ScrollBarView (1, 0, isVertical: true) {
 				X = Pos.AnchorEnd (1),
 				Y = 0,
 				Width = 1,
@@ -73,7 +70,7 @@ namespace Terminal.Gui {
 				ContentOffset = new Point (ContentOffset.X, vertical.Position);
 			};
 			vertical.Host = this;
-			horizontal = new ScrollBarView (1, 0, isVertical: false, scrollAmount: scrollCols) {
+			horizontal = new ScrollBarView (1, 0, isVertical: false) {
 				X = 0,
 				Y = Pos.AnchorEnd (1),
 				Width = Dim.Fill (showVerticalScrollIndicator ? 1 : 0),
@@ -180,23 +177,14 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Sets how many lines will be scrolled when scrolling vertically.
+		/// Gets or sets how many rows or columns will be scrolled with each time scroll command (e.g. when it's executed).
 		/// </summary>
-		public int ScrollLines {
-			get => scrollLines;
+		public int ScrollAmount {
+			get => scrollAmount;
 			set {
-				scrollLines = value;
-				SetNeedsDisplay ();
-			}
-		}
-
-		/// <summary>
-		/// Sets how many lines will be scrolled when scrolling horizontally.
-		/// </summary>
-		public int ScrollCols{
-			get => scrollCols;
-			set {
-				scrollCols = value;
+				scrollAmount = value;
+				vertical.ScrollAmount = scrollAmount;
+				horizontal.ScrollAmount = scrollAmount;
 				SetNeedsDisplay ();
 			}
 		}

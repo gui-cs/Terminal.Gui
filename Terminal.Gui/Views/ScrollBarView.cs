@@ -38,7 +38,7 @@ namespace Terminal.Gui {
 		/// Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using <see cref="LayoutStyle.Absolute"/> layout.
 		/// </summary>
 		/// <param name="rect">Frame for the scrollbar.</param>
-		public ScrollBarView (Rect rect) : this (rect, 0, 0, false, 1) { }
+		public ScrollBarView (Rect rect) : this (rect, 0, 0, false) { }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using <see cref="LayoutStyle.Absolute"/> layout.
@@ -47,16 +47,15 @@ namespace Terminal.Gui {
 		/// <param name="size">The size that this scrollbar represents. Sets the <see cref="Size"/> property.</param>
 		/// <param name="position">The position within this scrollbar. Sets the <see cref="Position"/> property.</param>
 		/// <param name="isVertical">If set to <c>true</c> this is a vertical scrollbar, otherwise, the scrollbar is horizontal. Sets the <see cref="IsVertical"/> property.</param>
-		/// <param name="scrollAmount">Defines how many lines will be scrolled at a time, defaulting to 1. Sets the <see cref="ScrollAmount"/> property.</param>
-		public ScrollBarView (Rect rect, int size, int position, bool isVertical, int scrollAmount) : base (rect)
+		public ScrollBarView (Rect rect, int size, int position, bool isVertical) : base (rect)
 		{
-			Init (size, position, isVertical, scrollAmount);
+			Init (size, position, isVertical);
 		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
-		public ScrollBarView () : this (0, 0, false, 1) { }
+		public ScrollBarView () : this (0, 0, false) { }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using <see cref="LayoutStyle.Computed"/> layout.
@@ -64,10 +63,9 @@ namespace Terminal.Gui {
 		/// <param name="size">The size that this scrollbar represents.</param>
 		/// <param name="position">The position within this scrollbar.</param>
 		/// <param name="isVertical">If set to <c>true</c> this is a vertical scrollbar, otherwise, the scrollbar is horizontal.</param>
-		/// <param name="scrollAmount">Defines how many lines will be scrolled at a time, defaulting to 1. Sets the <see cref="ScrollAmount"/> property.</param>
-		public ScrollBarView (int size, int position, bool isVertical, int scrollAmount) : base ()
+		public ScrollBarView (int size, int position, bool isVertical) : base ()
 		{
-			Init (size, position, isVertical, scrollAmount);
+			Init (size, position, isVertical);
 		}
 
 		/// <summary>
@@ -76,8 +74,7 @@ namespace Terminal.Gui {
 		/// <param name="host">The view that will host this scrollbar.</param>
 		/// <param name="isVertical">If set to <c>true</c> this is a vertical scrollbar, otherwise, the scrollbar is horizontal.</param>
 		/// <param name="showBothScrollIndicator">If set to <c>true (default)</c> will have the other scrollbar, otherwise will have only one.</param>
-		/// <param name="scrollAmount">Defines how many lines will be scrolled at a time, defaulting to 1. Sets the <see cref="ScrollAmount"/> property.</param>
-		public ScrollBarView (View host, bool isVertical, bool showBothScrollIndicator = true, int scrollAmount = 1) : this (0, 0, isVertical, scrollAmount)
+		public ScrollBarView (View host, bool isVertical, bool showBothScrollIndicator = true) : this (0, 0, isVertical)
 		{
 			if (host == null) {
 				throw new ArgumentNullException ("The host parameter can't be null.");
@@ -98,7 +95,7 @@ namespace Terminal.Gui {
 			Host.SuperView.Add (this);
 			AutoHideScrollBars = true;
 			if (showBothScrollIndicator) {
-				OtherScrollBarView = new ScrollBarView (0, 0, !isVertical, scrollAmount) { // TODO : fix scroll amount being the same both vertically and horizontally
+				OtherScrollBarView = new ScrollBarView (0, 0, !isVertical) {
 					ColorScheme = host.ColorScheme,
 					Host = host,
 					CanFocus = false,
@@ -165,10 +162,10 @@ namespace Terminal.Gui {
 			}
 		}
 
-		void Init (int size, int position, bool isVertical, int scrollAmount = 1)
+		void Init (int size, int position, bool isVertical)
 		{
 			vertical = isVertical;
-			this.scrollAmount = scrollAmount;
+			this.scrollAmount = 1;
 			this.position = position;
 			this.size = size;
 			WantContinuousButtonPressed = true;
@@ -186,7 +183,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Sets how many lines will be scrolled at a time.
+		/// Gets or sets how many rows or columns will be scrolled with each time scroll command (e.g. when it's executed).
 		/// </summary>
 		public int ScrollAmount {
 			get => scrollAmount;
