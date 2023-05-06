@@ -17,21 +17,6 @@ namespace Terminal.Gui {
 	/// </para>
 	/// </remarks>
 	public class Glyphs {
-
-		//// Private constructor to prevent multiple instances
-		//private Glyphs () { }
-
-		//// Static instance of the Singleton class
-		//private static readonly Glyphs _instance = new Glyphs ();
-
-		///// <summary>
-		///// Public static readonly property to access the singleton instance.
-		///// </summary>
-		//public static Glyphs Instance {
-		//	get { return _instance; }
-		//	set { throw new InvalidOperationException ("Cannot set the instance of the singleton class."); }
-		//}
-
 		/// <summary>
 		/// Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).
 		/// </summary>
