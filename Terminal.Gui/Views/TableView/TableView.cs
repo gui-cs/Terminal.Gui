@@ -1871,12 +1871,12 @@ namespace Terminal.Gui {
 			/// </summary>
 			public bool InvertSelectedCellFirstCharacter { get; set; } = false;
 
-			// TODO: I changed the default to true for now, but false doesn't work currently
+			// TODO: Fix this for when cell lines are enabled.
 			/// <summary>
 			/// Gets or sets a flag indicating whether to force <see cref="ColorScheme.Normal"/> use when rendering
 			/// vertical cell lines (even when <see cref="FullRowSelect"/> is on).
 			/// </summary>
-			public bool AlwaysUseNormalColorForVerticalCellLines { get; set; } = true;
+			public bool AlwaysUseNormalColorForVerticalCellLines { get; set; } = false;
 
 			/// <summary>
 			/// Collection of columns for which you want special rendering (e.g. custom column lengths, text alignment etc)
