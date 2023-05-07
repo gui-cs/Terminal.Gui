@@ -919,7 +919,8 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Expand (n1);
 
 			tv.ColorScheme = new ColorScheme ();
-			tv.Redraw (tv.Bounds);
+			tv.LayoutSubviews ();
+			tv.Draw ();
 
 			// Normal drawing of the tree view
 			TestHelpers.AssertDriverContentsAre (
@@ -934,7 +935,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			// matches nothing
 			filter.Text = "asdfjhasdf";
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			// Normal drawing of the tree view
 			TestHelpers.AssertDriverContentsAre (
 @"", output);
@@ -942,7 +943,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			// Matches everything
 			filter.Text = "root";
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			TestHelpers.AssertDriverContentsAre (
 @"
 ├-root one
@@ -952,7 +953,7 @@ namespace Terminal.Gui.ViewsTests {
 ", output);
 			// Matches 2 leaf nodes
 			filter.Text = "leaf";
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			TestHelpers.AssertDriverContentsAre (
 @"
 ├-root one
@@ -962,7 +963,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			// Matches 1 leaf nodes
 			filter.Text = "leaf 1";
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 			TestHelpers.AssertDriverContentsAre (
 @"
 ├-root one
