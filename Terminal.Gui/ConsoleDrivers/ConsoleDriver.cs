@@ -771,19 +771,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Tests whether the specified coordinate are valid for drawing. Returns <see langword="false"/>
-		/// if the coordinate is outside of the screen bounds or outside either <see cref="Clip"/> or
-		/// <see cref="ClipRegion"/>.
-		/// </summary>
-		/// <param name="col">The column.</param>
-		/// <param name="row">The row.</param>
-		/// <returns><c>true</c>if it's a valid range,<c>false</c>otherwise.</returns>
-		public bool IsValidLocation (int col, int row) =>
-			col >= 0 && row >= 0 &&
-			col < Cols && row < Rows &&
-			IsInClipRegion (row, col);
-
-		/// <summary>
 		/// Adds the <paramref name="str"/> to the display at the cursor position.
 		/// </summary>
 		/// <param name="str">String.</param>
@@ -967,6 +954,19 @@ namespace Terminal.Gui {
 		/// Suspend the application, typically needs to save the state, suspend the app and upon return, reset the console driver.
 		/// </summary>
 		public abstract void Suspend ();
+
+		/// <summary>
+		/// Tests whether the specified coordinate are valid for drawing. 
+		/// </summary>
+		/// <param name="col">The column.</param>
+		/// <param name="row">The row.</param>
+		/// <returns><see langword="false"/> if the coordinate is outside of the
+		/// screen bounds or outside either <see cref="Clip"/> or
+		/// <see cref="ClipRegion"/>. <see langword="true"/> otherwise.</returns>
+		public bool IsValidLocation (int col, int row) =>
+			col >= 0 && row >= 0 &&
+			col < Cols && row < Rows &&
+			IsInClipRegion (row, col);
 
 		/// <summary>
 		/// Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(ustring)"/> are 
