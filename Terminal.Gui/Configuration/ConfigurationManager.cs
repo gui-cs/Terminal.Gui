@@ -1,4 +1,5 @@
-﻿global using CM = Terminal.Gui.ConfigurationManager;
+﻿global using static Terminal.Gui.ConfigurationManager;
+global using CM = Terminal.Gui.ConfigurationManager;
 
 using System;
 using System.Collections;

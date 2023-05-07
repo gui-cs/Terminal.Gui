@@ -6,7 +6,6 @@ using System.Globalization;
 using System.Reflection;
 using System.IO;
 using System.Text.Json.Serialization;
-using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui {
 	/// <summary>

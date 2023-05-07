@@ -17,86 +17,87 @@ namespace Terminal.Gui {
 		public const int STD_INPUT_HANDLE = -10;
 		public const int STD_ERROR_HANDLE = -12;
 
-		internal IntPtr InputHandle, OutputHandle;
-		IntPtr ScreenBuffer;
-		readonly uint originalConsoleMode;
-		CursorVisibility? initialCursorVisibility = null;
-		CursorVisibility? currentCursorVisibility = null;
-		CursorVisibility? pendingCursorVisibility = null;
+		IntPtr _inputHandle, _outputHandle;
+		IntPtr _screenBuffer;
+		readonly uint _originalConsoleMode;
+		CursorVisibility? _initialCursorVisibility = null;
+		CursorVisibility? _currentCursorVisibility = null;
+		CursorVisibility? _pendingCursorVisibility = null;
 
 		public WindowsConsole ()
 		{
-			InputHandle = GetStdHandle (STD_INPUT_HANDLE);
-			OutputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
-			originalConsoleMode = ConsoleMode;
-			var newConsoleMode = originalConsoleMode;
+			_inputHandle = GetStdHandle (STD_INPUT_HANDLE);
+			_outputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
+			_originalConsoleMode = _consoleMode;
+			var newConsoleMode = _originalConsoleMode;
 			newConsoleMode |= (uint)(ConsoleModes.EnableMouseInput | ConsoleModes.EnableExtendedFlags);
 			newConsoleMode &= ~(uint)ConsoleModes.EnableQuickEditMode;
 			newConsoleMode &= ~(uint)ConsoleModes.EnableProcessedInput;
-			ConsoleMode = newConsoleMode;
+			_consoleMode = newConsoleMode;
 		}
 
-		public CharInfo [] OriginalStdOutChars;
+		CharInfo [] _originalStdOutChars;
 
 		public bool WriteToConsole (Size size, CharInfo [] charInfoBuffer, Coord coords, SmallRect window)
 		{
-			if (ScreenBuffer == IntPtr.Zero) {
+			if (_screenBuffer == IntPtr.Zero) {
 				ReadFromConsoleOutput (size, coords, ref window);
 			}
 
-			return WriteConsoleOutput (ScreenBuffer, charInfoBuffer, coords, new Coord () { X = window.Left, Y = window.Top }, ref window);
+			return WriteConsoleOutput (_screenBuffer, charInfoBuffer, coords, new Coord () { X = window.Left, Y = window.Top }, ref window);
 		}
 
 		public void ReadFromConsoleOutput (Size size, Coord coords, ref SmallRect window)
 		{
-			ScreenBuffer = CreateConsoleScreenBuffer (
+			_screenBuffer = CreateConsoleScreenBuffer (
 				DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
 				ShareMode.FileShareRead | ShareMode.FileShareWrite,
 				IntPtr.Zero,
 				1,
 				IntPtr.Zero
 			);
-			if (ScreenBuffer == INVALID_HANDLE_VALUE) {
+			if (_screenBuffer == INVALID_HANDLE_VALUE) {
 				var err = Marshal.GetLastWin32Error ();
 
-				if (err != 0)
+				if (err != 0) {
 					throw new System.ComponentModel.Win32Exception (err);
+				}
 			}
 
-			if (!initialCursorVisibility.HasValue && GetCursorVisibility (out CursorVisibility visibility)) {
-				initialCursorVisibility = visibility;
+			if (!_initialCursorVisibility.HasValue && GetCursorVisibility (out CursorVisibility visibility)) {
+				_initialCursorVisibility = visibility;
 			}
 
-			if (!SetConsoleActiveScreenBuffer (ScreenBuffer)) {
+			if (!SetConsoleActiveScreenBuffer (_screenBuffer)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
 
-			OriginalStdOutChars = new CharInfo [size.Height * size.Width];
+			_originalStdOutChars = new CharInfo [size.Height * size.Width];
 
-			if (!ReadConsoleOutput (ScreenBuffer, OriginalStdOutChars, coords, new Coord () { X = 0, Y = 0 }, ref window)) {
+			if (!ReadConsoleOutput (_screenBuffer, _originalStdOutChars, coords, new Coord () { X = 0, Y = 0 }, ref window)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
 		}
 
 		public bool SetCursorPosition (Coord position)
 		{
-			return SetConsoleCursorPosition (ScreenBuffer, position);
+			return SetConsoleCursorPosition (_screenBuffer, position);
 		}
 
 		public void SetInitialCursorVisibility ()
 		{
-			if (initialCursorVisibility.HasValue == false && GetCursorVisibility (out CursorVisibility visibility)) {
-				initialCursorVisibility = visibility;
+			if (_initialCursorVisibility.HasValue == false && GetCursorVisibility (out CursorVisibility visibility)) {
+				_initialCursorVisibility = visibility;
 			}
 		}
 
 		public bool GetCursorVisibility (out CursorVisibility visibility)
 		{
-			if (ScreenBuffer == IntPtr.Zero) {
+			if (_screenBuffer == IntPtr.Zero) {
 				visibility = CursorVisibility.Invisible;
 				return false;
 			}
-			if (!GetConsoleCursorInfo (ScreenBuffer, out ConsoleCursorInfo info)) {
+			if (!GetConsoleCursorInfo (_screenBuffer, out ConsoleCursorInfo info)) {
 				var err = Marshal.GetLastWin32Error ();
 				if (err != 0) {
 					throw new System.ComponentModel.Win32Exception (err);
@@ -106,20 +107,21 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (!info.bVisible)
+			if (!info.bVisible) {
 				visibility = CursorVisibility.Invisible;
-			else if (info.dwSize > 50)
+			} else if (info.dwSize > 50) {
 				visibility = CursorVisibility.Box;
-			else
+			} else {
 				visibility = CursorVisibility.Underline;
+			}
 
 			return true;
 		}
 
 		public bool EnsureCursorVisibility ()
 		{
-			if (initialCursorVisibility.HasValue && pendingCursorVisibility.HasValue && SetCursorVisibility (pendingCursorVisibility.Value)) {
-				pendingCursorVisibility = null;
+			if (_initialCursorVisibility.HasValue && _pendingCursorVisibility.HasValue && SetCursorVisibility (_pendingCursorVisibility.Value)) {
+				_pendingCursorVisibility = null;
 
 				return true;
 			}
@@ -129,30 +131,31 @@ namespace Terminal.Gui {
 
 		public void ForceRefreshCursorVisibility ()
 		{
-			if (currentCursorVisibility.HasValue) {
-				pendingCursorVisibility = currentCursorVisibility;
-				currentCursorVisibility = null;
+			if (_currentCursorVisibility.HasValue) {
+				_pendingCursorVisibility = _currentCursorVisibility;
+				_currentCursorVisibility = null;
 			}
 		}
 
 		public bool SetCursorVisibility (CursorVisibility visibility)
 		{
-			if (initialCursorVisibility.HasValue == false) {
-				pendingCursorVisibility = visibility;
+			if (_initialCursorVisibility.HasValue == false) {
+				_pendingCursorVisibility = visibility;
 
 				return false;
 			}
 
-			if (currentCursorVisibility.HasValue == false || currentCursorVisibility.Value != visibility) {
+			if (_currentCursorVisibility.HasValue == false || _currentCursorVisibility.Value != visibility) {
 				ConsoleCursorInfo info = new ConsoleCursorInfo {
 					dwSize = (uint)visibility & 0x00FF,
 					bVisible = ((uint)visibility & 0xFF00) != 0
 				};
 
-				if (!SetConsoleCursorInfo (ScreenBuffer, ref info))
+				if (!SetConsoleCursorInfo (_screenBuffer, ref info)) {
 					return false;
+				}
 
-				currentCursorVisibility = visibility;
+				_currentCursorVisibility = visibility;
 			}
 
 			return true;
@@ -160,35 +163,36 @@ namespace Terminal.Gui {
 
 		public void Cleanup ()
 		{
-			if (initialCursorVisibility.HasValue) {
-				SetCursorVisibility (initialCursorVisibility.Value);
+			if (_initialCursorVisibility.HasValue) {
+				SetCursorVisibility (_initialCursorVisibility.Value);
 			}
 
 			SetConsoleOutputWindow (out _);
 
-			ConsoleMode = originalConsoleMode;
+			_consoleMode = _originalConsoleMode;
 			//ContinueListeningForConsoleEvents = false;
-			if (!SetConsoleActiveScreenBuffer (OutputHandle)) {
+			if (!SetConsoleActiveScreenBuffer (_outputHandle)) {
 				var err = Marshal.GetLastWin32Error ();
 				Console.WriteLine ("Error: {0}", err);
 			}
 
-			if (ScreenBuffer != IntPtr.Zero)
-				CloseHandle (ScreenBuffer);
+			if (_screenBuffer != IntPtr.Zero) {
+				CloseHandle (_screenBuffer);
+			}
 
-			ScreenBuffer = IntPtr.Zero;
+			_screenBuffer = IntPtr.Zero;
 		}
 
 		internal Size GetConsoleBufferWindow (out Point position)
 		{
-			if (ScreenBuffer == IntPtr.Zero) {
+			if (_screenBuffer == IntPtr.Zero) {
 				position = Point.Empty;
 				return Size.Empty;
 			}
 
 			var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
 			csbi.cbSize = (uint)Marshal.SizeOf (csbi);
-			if (!GetConsoleScreenBufferInfoEx (ScreenBuffer, ref csbi)) {
+			if (!GetConsoleScreenBufferInfoEx (_screenBuffer, ref csbi)) {
 				//throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 				position = Point.Empty;
 				return Size.Empty;
@@ -204,7 +208,7 @@ namespace Terminal.Gui {
 		{
 			var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
 			csbi.cbSize = (uint)Marshal.SizeOf (csbi);
-			if (!GetConsoleScreenBufferInfoEx (OutputHandle, ref csbi)) {
+			if (!GetConsoleScreenBufferInfoEx (_outputHandle, ref csbi)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
 			var sz = new Size (csbi.srWindow.Right - csbi.srWindow.Left + 1,
@@ -218,20 +222,20 @@ namespace Terminal.Gui {
 		{
 			var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
 			csbi.cbSize = (uint)Marshal.SizeOf (csbi);
-			if (!GetConsoleScreenBufferInfoEx (ScreenBuffer, ref csbi)) {
+			if (!GetConsoleScreenBufferInfoEx (_screenBuffer, ref csbi)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
-			var maxWinSize = GetLargestConsoleWindowSize (ScreenBuffer);
+			var maxWinSize = GetLargestConsoleWindowSize (_screenBuffer);
 			var newCols = Math.Min (cols, maxWinSize.X);
 			var newRows = Math.Min (rows, maxWinSize.Y);
 			csbi.dwSize = new Coord (newCols, Math.Max (newRows, (short)1));
 			csbi.srWindow = new SmallRect (0, 0, newCols, newRows);
 			csbi.dwMaximumWindowSize = new Coord (newCols, newRows);
-			if (!SetConsoleScreenBufferInfoEx (ScreenBuffer, ref csbi)) {
+			if (!SetConsoleScreenBufferInfoEx (_screenBuffer, ref csbi)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
 			var winRect = new SmallRect (0, 0, (short)(newCols - 1), (short)Math.Max (newRows - 1, 0));
-			if (!SetConsoleWindowInfo (OutputHandle, true, ref winRect)) {
+			if (!SetConsoleWindowInfo (_outputHandle, true, ref winRect)) {
 				//throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 				return new Size (cols, rows);
 			}
@@ -241,21 +245,21 @@ namespace Terminal.Gui {
 
 		void SetConsoleOutputWindow (CONSOLE_SCREEN_BUFFER_INFOEX csbi)
 		{
-			if (ScreenBuffer != IntPtr.Zero && !SetConsoleScreenBufferInfoEx (ScreenBuffer, ref csbi)) {
+			if (_screenBuffer != IntPtr.Zero && !SetConsoleScreenBufferInfoEx (_screenBuffer, ref csbi)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
 		}
 
 		internal Size SetConsoleOutputWindow (out Point position)
 		{
-			if (ScreenBuffer == IntPtr.Zero) {
+			if (_screenBuffer == IntPtr.Zero) {
 				position = Point.Empty;
 				return Size.Empty;
 			}
 
 			var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
 			csbi.cbSize = (uint)Marshal.SizeOf (csbi);
-			if (!GetConsoleScreenBufferInfoEx (ScreenBuffer, ref csbi)) {
+			if (!GetConsoleScreenBufferInfoEx (_screenBuffer, ref csbi)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
 			var sz = new Size (csbi.srWindow.Right - csbi.srWindow.Left + 1,
@@ -263,10 +267,10 @@ namespace Terminal.Gui {
 			position = new Point (csbi.srWindow.Left, csbi.srWindow.Top);
 			SetConsoleOutputWindow (csbi);
 			var winRect = new SmallRect (0, 0, (short)(sz.Width - 1), (short)Math.Max (sz.Height - 1, 0));
-			if (!SetConsoleScreenBufferInfoEx (OutputHandle, ref csbi)) {
+			if (!SetConsoleScreenBufferInfoEx (_outputHandle, ref csbi)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
-			if (!SetConsoleWindowInfo (OutputHandle, true, ref winRect)) {
+			if (!SetConsoleWindowInfo (_outputHandle, true, ref winRect)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
 
@@ -275,13 +279,13 @@ namespace Terminal.Gui {
 
 		//bool ContinueListeningForConsoleEvents = true;
 
-		public uint ConsoleMode {
+		uint _consoleMode {
 			get {
-				GetConsoleMode (InputHandle, out uint v);
+				GetConsoleMode (_inputHandle, out uint v);
 				return v;
 			}
 			set {
-				SetConsoleMode (InputHandle, value);
+				SetConsoleMode (_inputHandle, value);
 			}
 		}
 
@@ -357,14 +361,14 @@ namespace Terminal.Gui {
 		}
 
 		public struct WindowBufferSizeRecord {
-			public Coord size;
+			public Coord _size;
 
 			public WindowBufferSizeRecord (short x, short y)
 			{
-				this.size = new Coord (x, y);
+				_size = new Coord (x, y);
 			}
 
-			public override string ToString () => $"[WindowBufferSize{size}";
+			public override string ToString () => $"[WindowBufferSize{_size}";
 		}
 
 		[StructLayout (LayoutKind.Sequential)]
@@ -445,10 +449,10 @@ namespace Terminal.Gui {
 			public short X;
 			public short Y;
 
-			public Coord (short X, short Y)
+			public Coord (short x, short y)
 			{
-				this.X = X;
-				this.Y = Y;
+				X = x;
+				Y = y;
 			}
 			public override string ToString () => $"({X},{Y})";
 		};
@@ -514,14 +518,14 @@ namespace Terminal.Gui {
 
 		[StructLayout (LayoutKind.Sequential)]
 		public struct ConsoleKeyInfoEx {
-			public ConsoleKeyInfo consoleKeyInfo;
+			public ConsoleKeyInfo ConsoleKeyInfo;
 			public bool CapsLock;
 			public bool NumLock;
 			public bool Scrolllock;
 
 			public ConsoleKeyInfoEx (ConsoleKeyInfo consoleKeyInfo, bool capslock, bool numlock, bool scrolllock)
 			{
-				this.consoleKeyInfo = consoleKeyInfo;
+				ConsoleKeyInfo = consoleKeyInfo;
 				CapsLock = capslock;
 				NumLock = numlock;
 				Scrolllock = scrolllock;
@@ -596,19 +600,13 @@ namespace Terminal.Gui {
 
 		[DllImport ("kernel32.dll", SetLastError = true)]
 		static extern bool GetNumberOfConsoleInputEvents (IntPtr handle, out uint lpcNumberOfEvents);
-		public uint InputEventCount {
-			get {
-				GetNumberOfConsoleInputEvents (InputHandle, out uint v);
-				return v;
-			}
-		}
 
 		public InputRecord [] ReadConsoleInput ()
 		{
 			const int bufferSize = 1;
 			var pRecord = Marshal.AllocHGlobal (Marshal.SizeOf<InputRecord> () * bufferSize);
 			try {
-				ReadConsoleInput (InputHandle, pRecord, bufferSize,
+				ReadConsoleInput (_inputHandle, pRecord, bufferSize,
 					out var numberEventsRead);
 
 				return numberEventsRead == 0
@@ -703,46 +701,46 @@ namespace Terminal.Gui {
 	}
 
 	internal class WindowsDriver : ConsoleDriver {
-		static bool sync = false;
-		WindowsConsole.CharInfo [] OutputBuffer;
-		int cols, rows, left, top;
-		WindowsConsole.SmallRect damageRegion;
-		IClipboard clipboard;
-		int [,,] contents;
+		static bool _sync = false;
+		WindowsConsole.CharInfo [] _outputBuffer;
+		int _cols, _rows, _left, _top;
+		WindowsConsole.SmallRect _damageRegion;
+		IClipboard _clipboard;
+		int [,,] _contents;
 
-		public override int Cols => cols;
-		public override int Rows => rows;
-		public override int Left => left;
-		public override int Top => top;
+		public override int Cols => _cols;
+		public override int Rows => _rows;
+		public override int Left => _left;
+		public override int Top => _top;
 		public override bool EnableConsoleScrolling { get; set; }
-		public override IClipboard Clipboard => clipboard;
-		public override int [,,] Contents => contents;
+		public override IClipboard Clipboard => _clipboard;
+		public override int [,,] Contents => _contents;
 
 		public WindowsConsole WinConsole { get; private set; }
 
-		Action<KeyEvent> keyHandler;
-		Action<KeyEvent> keyDownHandler;
-		Action<KeyEvent> keyUpHandler;
-		Action<MouseEvent> mouseHandler;
+		Action<KeyEvent> _keyHandler;
+		Action<KeyEvent> _keyDownHandler;
+		Action<KeyEvent> _keyUpHandler;
+		Action<MouseEvent> _mouseHandler;
 
 		public WindowsDriver ()
 		{
 			WinConsole = new WindowsConsole ();
-			clipboard = new WindowsClipboard ();
+			_clipboard = new WindowsClipboard ();
 		}
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
-			this.keyHandler = keyHandler;
-			this.keyDownHandler = keyDownHandler;
-			this.keyUpHandler = keyUpHandler;
-			this.mouseHandler = mouseHandler;
+			_keyHandler = keyHandler;
+			_keyDownHandler = keyDownHandler;
+			_keyUpHandler = keyUpHandler;
+			_mouseHandler = mouseHandler;
 
 			var mLoop = mainLoop.Driver as WindowsMainLoop;
 
 			mLoop.ProcessInput = (e) => ProcessInput (e);
 
-			mLoop.WinChanged = (s,e) => {
+			mLoop.WinChanged = (s, e) => {
 				ChangeWin (e.Size);
 			};
 		}
@@ -751,15 +749,15 @@ namespace Terminal.Gui {
 		{
 			if (!EnableConsoleScrolling) {
 				var w = e.Width;
-				if (w == cols - 3 && e.Height < rows) {
+				if (w == _cols - 3 && e.Height < _rows) {
 					w += 3;
 				}
 				var newSize = WinConsole.SetConsoleWindow (
 					(short)Math.Max (w, 16), (short)Math.Max (e.Height, 0));
-				left = 0;
-				top = 0;
-				cols = newSize.Width;
-				rows = newSize.Height;
+				_left = 0;
+				_top = 0;
+				_cols = newSize.Width;
+				_rows = newSize.Height;
 				ResizeScreen ();
 				UpdateOffScreen ();
 				TerminalResized.Invoke ();
@@ -815,17 +813,17 @@ namespace Terminal.Gui {
 						WindowsConsole.ControlKeyState.LeftControlPressed |
 						WindowsConsole.ControlKeyState.EnhancedKey:
 					case WindowsConsole.ControlKeyState.EnhancedKey:
-						key = new KeyEvent (Key.CtrlMask | Key.AltMask, keyModifiers);
+						key = new KeyEvent (Key.CtrlMask | Key.AltMask, _keyModifiers);
 						break;
 					case WindowsConsole.ControlKeyState.LeftAltPressed:
-						key = new KeyEvent (Key.AltMask, keyModifiers);
+						key = new KeyEvent (Key.AltMask, _keyModifiers);
 						break;
 					case WindowsConsole.ControlKeyState.RightControlPressed:
 					case WindowsConsole.ControlKeyState.LeftControlPressed:
-						key = new KeyEvent (Key.CtrlMask, keyModifiers);
+						key = new KeyEvent (Key.CtrlMask, _keyModifiers);
 						break;
 					case WindowsConsole.ControlKeyState.ShiftPressed:
-						key = new KeyEvent (Key.ShiftMask, keyModifiers);
+						key = new KeyEvent (Key.ShiftMask, _keyModifiers);
 						break;
 					case WindowsConsole.ControlKeyState.NumlockOn:
 						break;
@@ -836,47 +834,49 @@ namespace Terminal.Gui {
 					default:
 						switch (inputEvent.KeyEvent.wVirtualKeyCode) {
 						case 0x10:
-							key = new KeyEvent (Key.ShiftMask, keyModifiers);
+							key = new KeyEvent (Key.ShiftMask, _keyModifiers);
 							break;
 						case 0x11:
-							key = new KeyEvent (Key.CtrlMask, keyModifiers);
+							key = new KeyEvent (Key.CtrlMask, _keyModifiers);
 							break;
 						case 0x12:
-							key = new KeyEvent (Key.AltMask, keyModifiers);
+							key = new KeyEvent (Key.AltMask, _keyModifiers);
 							break;
 						default:
-							key = new KeyEvent (Key.Unknown, keyModifiers);
+							key = new KeyEvent (Key.Unknown, _keyModifiers);
 							break;
 						}
 						break;
 					}
 
-					if (inputEvent.KeyEvent.bKeyDown)
-						keyDownHandler (key);
-					else
-						keyUpHandler (key);
+					if (inputEvent.KeyEvent.bKeyDown) {
+						_keyDownHandler (key);
+					} else {
+						_keyUpHandler (key);
+					}
 				} else {
 					if (inputEvent.KeyEvent.bKeyDown) {
 						// May occurs using SendKeys
-						if (keyModifiers == null)
-							keyModifiers = new KeyModifiers ();
+						if (_keyModifiers == null) {
+							_keyModifiers = new KeyModifiers ();
+						}
 						// Key Down - Fire KeyDown Event and KeyStroke (ProcessKey) Event
-						keyDownHandler (new KeyEvent (map, keyModifiers));
-						keyHandler (new KeyEvent (map, keyModifiers));
+						_keyDownHandler (new KeyEvent (map, _keyModifiers));
+						_keyHandler (new KeyEvent (map, _keyModifiers));
 					} else {
-						keyUpHandler (new KeyEvent (map, keyModifiers));
+						_keyUpHandler (new KeyEvent (map, _keyModifiers));
 					}
 				}
 				if (!inputEvent.KeyEvent.bKeyDown && inputEvent.KeyEvent.dwControlKeyState == 0) {
-					keyModifiers = null;
+					_keyModifiers = null;
 				}
 				break;
 
 			case WindowsConsole.EventType.Mouse:
 				var me = ToDriverMouse (inputEvent.MouseEvent);
-				mouseHandler (me);
-				if (processButtonClick) {
-					mouseHandler (
+				_mouseHandler (me);
+				if (_processButtonClick) {
+					_mouseHandler (
 						new MouseEvent () {
 							X = me.X,
 							Y = me.Y,
@@ -887,13 +887,13 @@ namespace Terminal.Gui {
 
 			case WindowsConsole.EventType.WindowBufferSize:
 				var winSize = WinConsole.GetConsoleBufferWindow (out Point pos);
-				left = pos.X;
-				top = pos.Y;
-				cols = inputEvent.WindowBufferSizeEvent.size.X;
+				_left = pos.X;
+				_top = pos.Y;
+				_cols = inputEvent.WindowBufferSizeEvent._size.X;
 				if (EnableConsoleScrolling) {
-					rows = Math.Max (inputEvent.WindowBufferSizeEvent.size.Y, rows);
+					_rows = Math.Max (inputEvent.WindowBufferSizeEvent._size.Y, _rows);
 				} else {
-					rows = inputEvent.WindowBufferSizeEvent.size.Y;
+					_rows = inputEvent.WindowBufferSizeEvent._size.Y;
 				}
 				//System.Diagnostics.Debug.WriteLine ($"{EnableConsoleScrolling},{cols},{rows}");
 				ResizeScreen ();
@@ -906,15 +906,15 @@ namespace Terminal.Gui {
 			}
 		}
 
-		WindowsConsole.ButtonState? lastMouseButtonPressed = null;
-		bool isButtonPressed = false;
-		bool isButtonReleased = false;
-		bool isButtonDoubleClicked = false;
-		Point? point;
-		Point pointMove;
-		//int buttonPressedCount;
-		bool isOneFingerDoubleClicked = false;
-		bool processButtonClick;
+		WindowsConsole.ButtonState? _lastMouseButtonPressed = null;
+		bool _isButtonPressed = false;
+		bool _isButtonReleased = false;
+		bool _isButtonDoubleClicked = false;
+		Point? _point;
+		Point _pointMove;
+		//int _buttonPressedCount;
+		bool _isOneFingerDoubleClicked = false;
+		bool _processButtonClick;
 
 		MouseEvent ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
 		{
@@ -923,7 +923,7 @@ namespace Terminal.Gui {
 			//System.Diagnostics.Debug.WriteLine (
 			//	$"X:{mouseEvent.MousePosition.X};Y:{mouseEvent.MousePosition.Y};ButtonState:{mouseEvent.ButtonState};EventFlags:{mouseEvent.EventFlags}");
 
-			if (isButtonDoubleClicked || isOneFingerDoubleClicked) {
+			if (_isButtonDoubleClicked || _isOneFingerDoubleClicked) {
 				Application.MainLoop.AddIdle (() => {
 					Task.Run (async () => await ProcessButtonDoubleClickedAsync ());
 					return false;
@@ -935,10 +935,10 @@ namespace Terminal.Gui {
 			// be fired with it's bit set to 0. So when the button is up ButtonState will be 0.
 			// To map to the correct driver events we save the last pressed mouse button so we can
 			// map to the correct clicked event.
-			if ((lastMouseButtonPressed != null || isButtonReleased) && mouseEvent.ButtonState != 0) {
-				lastMouseButtonPressed = null;
+			if ((_lastMouseButtonPressed != null || _isButtonReleased) && mouseEvent.ButtonState != 0) {
+				_lastMouseButtonPressed = null;
 				//isButtonPressed = false;
-				isButtonReleased = false;
+				_isButtonReleased = false;
 			}
 
 			var p = new Point () {
@@ -1006,9 +1006,9 @@ namespace Terminal.Gui {
 			//	isButtonReleased = false;
 
 			//}
-			if ((mouseEvent.ButtonState != 0 && mouseEvent.EventFlags == 0 && lastMouseButtonPressed == null && !isButtonDoubleClicked) ||
-				 (lastMouseButtonPressed == null && mouseEvent.EventFlags.HasFlag (WindowsConsole.EventFlags.MouseMoved) &&
-				 mouseEvent.ButtonState != 0 && !isButtonReleased && !isButtonDoubleClicked)) {
+			if ((mouseEvent.ButtonState != 0 && mouseEvent.EventFlags == 0 && _lastMouseButtonPressed == null && !_isButtonDoubleClicked) ||
+				 (_lastMouseButtonPressed == null && mouseEvent.EventFlags.HasFlag (WindowsConsole.EventFlags.MouseMoved) &&
+				 mouseEvent.ButtonState != 0 && !_isButtonReleased && !_isButtonDoubleClicked)) {
 				switch (mouseEvent.ButtonState) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Pressed;
@@ -1023,16 +1023,17 @@ namespace Terminal.Gui {
 					break;
 				}
 
-				if (point == null)
-					point = p;
+				if (_point == null) {
+					_point = p;
+				}
 
 				if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
 					mouseFlag |= MouseFlags.ReportMousePosition;
-					isButtonReleased = false;
-					processButtonClick = false;
+					_isButtonReleased = false;
+					_processButtonClick = false;
 				}
-				lastMouseButtonPressed = mouseEvent.ButtonState;
-				isButtonPressed = true;
+				_lastMouseButtonPressed = mouseEvent.ButtonState;
+				_isButtonPressed = true;
 
 				if ((mouseFlag & MouseFlags.ReportMousePosition) == 0) {
 					Application.MainLoop.AddIdle (() => {
@@ -1041,9 +1042,9 @@ namespace Terminal.Gui {
 					});
 				}
 
-			} else if (lastMouseButtonPressed != null && mouseEvent.EventFlags == 0
-				&& !isButtonReleased && !isButtonDoubleClicked && !isOneFingerDoubleClicked) {
-				switch (lastMouseButtonPressed) {
+			} else if (_lastMouseButtonPressed != null && mouseEvent.EventFlags == 0
+				&& !_isButtonReleased && !_isButtonDoubleClicked && !_isOneFingerDoubleClicked) {
+				switch (_lastMouseButtonPressed) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1Released;
 					break;
@@ -1056,15 +1057,15 @@ namespace Terminal.Gui {
 					mouseFlag = MouseFlags.Button3Released;
 					break;
 				}
-				isButtonPressed = false;
-				isButtonReleased = true;
-				if (point != null && (((Point)point).X == mouseEvent.MousePosition.X && ((Point)point).Y == mouseEvent.MousePosition.Y)) {
-					processButtonClick = true;
+				_isButtonPressed = false;
+				_isButtonReleased = true;
+				if (_point != null && (((Point)_point).X == mouseEvent.MousePosition.X && ((Point)_point).Y == mouseEvent.MousePosition.Y)) {
+					_processButtonClick = true;
 				} else {
-					point = null;
+					_point = null;
 				}
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved
-				&& !isOneFingerDoubleClicked && isButtonReleased && p == point) {
+				&& !_isOneFingerDoubleClicked && _isButtonReleased && p == _point) {
 
 				mouseFlag = ProcessButtonClick (mouseEvent);
 
@@ -1082,8 +1083,8 @@ namespace Terminal.Gui {
 					mouseFlag = MouseFlags.Button3DoubleClicked;
 					break;
 				}
-				isButtonDoubleClicked = true;
-			} else if (mouseEvent.EventFlags == 0 && mouseEvent.ButtonState != 0 && isButtonDoubleClicked) {
+				_isButtonDoubleClicked = true;
+			} else if (mouseEvent.EventFlags == 0 && mouseEvent.ButtonState != 0 && _isButtonDoubleClicked) {
 				switch (mouseEvent.ButtonState) {
 				case WindowsConsole.ButtonState.Button1Pressed:
 					mouseFlag = MouseFlags.Button1TripleClicked;
@@ -1097,7 +1098,7 @@ namespace Terminal.Gui {
 					mouseFlag = MouseFlags.Button3TripleClicked;
 					break;
 				}
-				isButtonDoubleClicked = false;
+				_isButtonDoubleClicked = false;
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseWheeled) {
 				switch ((int)mouseEvent.ButtonState) {
 				case int v when v > 0:
@@ -1134,8 +1135,8 @@ namespace Terminal.Gui {
 
 			} else if (mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved) {
 				mouseFlag = MouseFlags.ReportMousePosition;
-				if (mouseEvent.MousePosition.X != pointMove.X || mouseEvent.MousePosition.Y != pointMove.Y) {
-					pointMove = new Point (mouseEvent.MousePosition.X, mouseEvent.MousePosition.Y);
+				if (mouseEvent.MousePosition.X != _pointMove.X || mouseEvent.MousePosition.Y != _pointMove.Y) {
+					_pointMove = new Point (mouseEvent.MousePosition.X, mouseEvent.MousePosition.Y);
 				}
 			} else if (mouseEvent.ButtonState == 0 && mouseEvent.EventFlags == 0) {
 				mouseFlag = 0;
@@ -1156,7 +1157,7 @@ namespace Terminal.Gui {
 		MouseFlags ProcessButtonClick (WindowsConsole.MouseEventRecord mouseEvent)
 		{
 			MouseFlags mouseFlag = 0;
-			switch (lastMouseButtonPressed) {
+			switch (_lastMouseButtonPressed) {
 			case WindowsConsole.ButtonState.Button1Pressed:
 				mouseFlag = MouseFlags.Button1Clicked;
 				break;
@@ -1169,32 +1170,32 @@ namespace Terminal.Gui {
 				mouseFlag = MouseFlags.Button3Clicked;
 				break;
 			}
-			point = new Point () {
+			_point = new Point () {
 				X = mouseEvent.MousePosition.X,
 				Y = mouseEvent.MousePosition.Y
 			};
-			lastMouseButtonPressed = null;
-			isButtonReleased = false;
-			processButtonClick = false;
-			point = null;
+			_lastMouseButtonPressed = null;
+			_isButtonReleased = false;
+			_processButtonClick = false;
+			_point = null;
 			return mouseFlag;
 		}
 
 		async Task ProcessButtonDoubleClickedAsync ()
 		{
 			await Task.Delay (300);
-			isButtonDoubleClicked = false;
-			isOneFingerDoubleClicked = false;
+			_isButtonDoubleClicked = false;
+			_isOneFingerDoubleClicked = false;
 			//buttonPressedCount = 0;
 		}
 
 		async Task ProcessContinuousButtonPressedAsync (MouseFlags mouseFlag)
 		{
-			while (isButtonPressed) {
+			while (_isButtonPressed) {
 				await Task.Delay (100);
 				var me = new MouseEvent () {
-					X = pointMove.X,
-					Y = pointMove.Y,
+					X = _pointMove.X,
+					Y = _pointMove.Y,
 					Flags = mouseFlag
 				};
 
@@ -1202,8 +1203,8 @@ namespace Terminal.Gui {
 				if (view == null) {
 					break;
 				}
-				if (isButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-					Application.MainLoop.Invoke (() => mouseHandler (me));
+				if (_isButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
+					Application.MainLoop.Invoke (() => _mouseHandler (me));
 				}
 			}
 		}
@@ -1211,19 +1212,22 @@ namespace Terminal.Gui {
 		static MouseFlags SetControlKeyStates (WindowsConsole.MouseEventRecord mouseEvent, MouseFlags mouseFlag)
 		{
 			if (mouseEvent.ControlKeyState.HasFlag (WindowsConsole.ControlKeyState.RightControlPressed) ||
-				mouseEvent.ControlKeyState.HasFlag (WindowsConsole.ControlKeyState.LeftControlPressed))
+				mouseEvent.ControlKeyState.HasFlag (WindowsConsole.ControlKeyState.LeftControlPressed)) {
 				mouseFlag |= MouseFlags.ButtonCtrl;
+			}
 
-			if (mouseEvent.ControlKeyState.HasFlag (WindowsConsole.ControlKeyState.ShiftPressed))
+			if (mouseEvent.ControlKeyState.HasFlag (WindowsConsole.ControlKeyState.ShiftPressed)) {
 				mouseFlag |= MouseFlags.ButtonShift;
+			}
 
 			if (mouseEvent.ControlKeyState.HasFlag (WindowsConsole.ControlKeyState.RightAltPressed) ||
-				 mouseEvent.ControlKeyState.HasFlag (WindowsConsole.ControlKeyState.LeftAltPressed))
+				 mouseEvent.ControlKeyState.HasFlag (WindowsConsole.ControlKeyState.LeftAltPressed)) {
 				mouseFlag |= MouseFlags.ButtonAlt;
+			}
 			return mouseFlag;
 		}
 
-		KeyModifiers keyModifiers;
+		KeyModifiers _keyModifiers;
 
 		public WindowsConsole.ConsoleKeyInfoEx ToConsoleKeyInfoEx (WindowsConsole.KeyEventRecord keyEvent)
 		{
@@ -1236,20 +1240,27 @@ namespace Terminal.Gui {
 			bool numlock = (state & (WindowsConsole.ControlKeyState.NumlockOn)) != 0;
 			bool scrolllock = (state & (WindowsConsole.ControlKeyState.ScrolllockOn)) != 0;
 
-			if (keyModifiers == null)
-				keyModifiers = new KeyModifiers ();
-			if (shift)
-				keyModifiers.Shift = shift;
-			if (alt)
-				keyModifiers.Alt = alt;
-			if (control)
-				keyModifiers.Ctrl = control;
-			if (capslock)
-				keyModifiers.Capslock = capslock;
-			if (numlock)
-				keyModifiers.Numlock = numlock;
-			if (scrolllock)
-				keyModifiers.Scrolllock = scrolllock;
+			if (_keyModifiers == null) {
+				_keyModifiers = new KeyModifiers ();
+			}
+			if (shift) {
+				_keyModifiers.Shift = shift;
+			}
+			if (alt) {
+				_keyModifiers.Alt = alt;
+			}
+			if (control) {
+				_keyModifiers.Ctrl = control;
+			}
+			if (capslock) {
+				_keyModifiers.Capslock = capslock;
+			}
+			if (numlock) {
+				_keyModifiers.Numlock = numlock;
+			}
+			if (scrolllock) {
+				_keyModifiers.Scrolllock = scrolllock;
+			}
 
 			var ConsoleKeyInfo = new ConsoleKeyInfo (keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
 
@@ -1288,7 +1299,7 @@ namespace Terminal.Gui {
 
 		public Key MapKey (WindowsConsole.ConsoleKeyInfoEx keyInfoEx)
 		{
-			var keyInfo = keyInfoEx.consoleKeyInfo;
+			var keyInfo = keyInfoEx.ConsoleKeyInfo;
 			switch (keyInfo.Key) {
 			case ConsoleKey.Escape:
 				return MapKeyModifiers (keyInfo, Key.Esc);
@@ -1359,8 +1370,9 @@ namespace Terminal.Gui {
 			case ConsoleKey.OemComma:
 			case ConsoleKey.OemPlus:
 			case ConsoleKey.OemMinus:
-				if (keyInfo.KeyChar == 0)
+				if (keyInfo.KeyChar == 0) {
 					return Key.Unknown;
+				}
 
 				return (Key)((uint)keyInfo.KeyChar);
 			}
@@ -1423,12 +1435,15 @@ namespace Terminal.Gui {
 		private Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
 		{
 			Key keyMod = new Key ();
-			if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0)
+			if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0) {
 				keyMod = Key.ShiftMask;
-			if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0)
+			}
+			if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0) {
 				keyMod |= Key.CtrlMask;
-			if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0)
+			}
+			if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0) {
 				keyMod |= Key.AltMask;
+			}
 
 			return keyMod != Key.Null ? keyMod | key : key;
 		}
@@ -1452,9 +1467,9 @@ namespace Terminal.Gui {
 				// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
 
 				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
-				cols = winSize.Width;
-				rows = winSize.Height;
-				WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
+				_cols = winSize.Width;
+				_rows = winSize.Height;
+				WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
 
 				CurrentAttribute = MakeColor (Color.White, Color.Black);
 				InitalizeColorSchemes ();
@@ -1471,9 +1486,9 @@ namespace Terminal.Gui {
 
 		public override void ResizeScreen ()
 		{
-			OutputBuffer = new WindowsConsole.CharInfo [Rows * Cols];
-			Clip = new Rect (0, 0, Cols, Rows);
-			damageRegion = new WindowsConsole.SmallRect () {
+			_outputBuffer = new WindowsConsole.CharInfo [Rows * Cols];
+			ClearClipRegion ();
+			_damageRegion = new WindowsConsole.SmallRect () {
 				Top = 0,
 				Left = 0,
 				Bottom = (short)Rows,
@@ -1493,29 +1508,29 @@ namespace Terminal.Gui {
 
 		public override void UpdateOffScreen ()
 		{
-			contents = new int [rows, cols, 3];
-			for (int row = 0; row < rows; row++) {
-				for (int col = 0; col < cols; col++) {
-					int position = row * cols + col;
-					OutputBuffer [position].Attributes = (ushort)Colors.TopLevel.Normal;
-					OutputBuffer [position].Char.UnicodeChar = ' ';
-					contents [row, col, 0] = OutputBuffer [position].Char.UnicodeChar;
-					contents [row, col, 1] = OutputBuffer [position].Attributes;
-					contents [row, col, 2] = 0;
+			_contents = new int [_rows, _cols, 3];
+			for (int row = 0; row < _rows; row++) {
+				for (int col = 0; col < _cols; col++) {
+					int position = row * _cols + col;
+					_outputBuffer [position].Attributes = (ushort)Colors.TopLevel.Normal;
+					_outputBuffer [position].Char.UnicodeChar = ' ';
+					_contents [row, col, 0] = _outputBuffer [position].Char.UnicodeChar;
+					_contents [row, col, 1] = _outputBuffer [position].Attributes;
+					_contents [row, col, 2] = 0;
 				}
 			}
 		}
 
-		int ccol, crow;
+		int _ccol, _crow;
 		public override void Move (int col, int row)
 		{
-			ccol = col;
-			crow = row;
+			_ccol = col;
+			_crow = row;
 		}
 
 		int GetOutputBufferPosition ()
 		{
-			return crow * Cols + ccol;
+			return _crow * Cols + _ccol;
 		}
 
 		public override void AddRune (Rune rune)
@@ -1523,11 +1538,11 @@ namespace Terminal.Gui {
 			rune = MakePrintable (rune);
 			var runeWidth = Rune.ColumnWidth (rune);
 			var position = GetOutputBufferPosition ();
-			var validClip = IsValidContent (ccol, crow, Clip);
+			var validLocation = IsValidLocation (_ccol, _crow);
 
-			if (validClip) {
-				if (runeWidth == 0 && ccol > 0) {
-					var r = contents [crow, ccol - 1, 0];
+			if (validLocation) {
+				if (runeWidth == 0 && _ccol > 0) {
+					var r = _contents [_crow, _ccol - 1, 0];
 					var s = new string (new char [] { (char)r, (char)rune });
 					string sn;
 					if (!s.IsNormalized ()) {
@@ -1536,68 +1551,69 @@ namespace Terminal.Gui {
 						sn = s;
 					}
 					var c = sn [0];
-					var prevPosition = crow * Cols + (ccol - 1);
-					OutputBuffer [prevPosition].Char.UnicodeChar = c;
-					contents [crow, ccol - 1, 0] = c;
-					OutputBuffer [prevPosition].Attributes = (ushort)CurrentAttribute;
-					contents [crow, ccol - 1, 1] = CurrentAttribute;
-					contents [crow, ccol - 1, 2] = 1;
-					WindowsConsole.SmallRect.Update (ref damageRegion, (short)(ccol - 1), (short)crow);
+					var prevPosition = _crow * Cols + (_ccol - 1);
+					_outputBuffer [prevPosition].Char.UnicodeChar = c;
+					_contents [_crow, _ccol - 1, 0] = c;
+					_outputBuffer [prevPosition].Attributes = (ushort)CurrentAttribute;
+					_contents [_crow, _ccol - 1, 1] = CurrentAttribute;
+					_contents [_crow, _ccol - 1, 2] = 1;
+					WindowsConsole.SmallRect.Update (ref _damageRegion, (short)(_ccol - 1), (short)_crow);
 				} else {
-					if (runeWidth < 2 && ccol > 0
-						&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+					if (runeWidth < 2 && _ccol > 0
+						&& Rune.ColumnWidth ((char)_contents [_crow, _ccol - 1, 0]) > 1) {
 
-						var prevPosition = crow * Cols + (ccol - 1);
-						OutputBuffer [prevPosition].Char.UnicodeChar = ' ';
-						contents [crow, ccol - 1, 0] = (int)(uint)' ';
+						var prevPosition = _crow * Cols + (_ccol - 1);
+						_outputBuffer [prevPosition].Char.UnicodeChar = ' ';
+						_contents [_crow, _ccol - 1, 0] = (int)(uint)' ';
 
-					} else if (runeWidth < 2 && ccol <= Clip.Right - 1
-						&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+					} else if (runeWidth < 2 && _ccol <= Clip.Right - 1
+						&& Rune.ColumnWidth ((char)_contents [_crow, _ccol, 0]) > 1) {
 
 						var prevPosition = GetOutputBufferPosition () + 1;
-						OutputBuffer [prevPosition].Char.UnicodeChar = (char)' ';
-						contents [crow, ccol + 1, 0] = (int)(uint)' ';
+						_outputBuffer [prevPosition].Char.UnicodeChar = (char)' ';
+						_contents [_crow, _ccol + 1, 0] = (int)(uint)' ';
 
 					}
-					if (runeWidth > 1 && ccol == Clip.Right - 1) {
-						OutputBuffer [position].Char.UnicodeChar = (char)' ';
-						contents [crow, ccol, 0] = (int)(uint)' ';
+					if (runeWidth > 1 && _ccol == Clip.Right - 1) {
+						_outputBuffer [position].Char.UnicodeChar = (char)' ';
+						_contents [_crow, _ccol, 0] = (int)(uint)' ';
 					} else {
-						OutputBuffer [position].Char.UnicodeChar = (char)rune;
-						contents [crow, ccol, 0] = (int)(uint)rune;
+						_outputBuffer [position].Char.UnicodeChar = (char)rune;
+						_contents [_crow, _ccol, 0] = (int)(uint)rune;
 					}
-					OutputBuffer [position].Attributes = (ushort)CurrentAttribute;
-					contents [crow, ccol, 1] = CurrentAttribute;
-					contents [crow, ccol, 2] = 1;
-					WindowsConsole.SmallRect.Update (ref damageRegion, (short)ccol, (short)crow);
+					_outputBuffer [position].Attributes = (ushort)CurrentAttribute;
+					_contents [_crow, _ccol, 1] = CurrentAttribute;
+					_contents [_crow, _ccol, 2] = 1;
+					WindowsConsole.SmallRect.Update (ref _damageRegion, (short)_ccol, (short)_crow);
 				}
 			}
 
 			if (runeWidth < 0 || runeWidth > 0) {
-				ccol++;
+				_ccol++;
 			}
 
 			if (runeWidth > 1) {
-				if (validClip && ccol < Clip.Right) {
+				if (validLocation && _ccol < Clip.Right) {
 					position = GetOutputBufferPosition ();
-					OutputBuffer [position].Attributes = (ushort)CurrentAttribute;
-					OutputBuffer [position].Char.UnicodeChar = (char)0x00;
-					contents [crow, ccol, 0] = (int)(uint)0x00;
-					contents [crow, ccol, 1] = CurrentAttribute;
-					contents [crow, ccol, 2] = 0;
+					_outputBuffer [position].Attributes = (ushort)CurrentAttribute;
+					_outputBuffer [position].Char.UnicodeChar = (char)0x00;
+					_contents [_crow, _ccol, 0] = (int)(uint)0x00;
+					_contents [_crow, _ccol, 1] = CurrentAttribute;
+					_contents [_crow, _ccol, 2] = 0;
 				}
-				ccol++;
+				_ccol++;
 			}
 
-			if (sync) {
+			if (_sync) {
 				UpdateScreen ();
 			}
 		}
 
 		public override void AddStr (ustring str)
 		{
-			foreach (var rune in str)
+			foreach (var rune in str) {
 				AddRune (rune);
+			}
 		}
 
 		public override void SetAttribute (Attribute c)
@@ -1652,13 +1668,15 @@ namespace Terminal.Gui {
 
 		public override void UpdateScreen ()
 		{
-			if (damageRegion.Left == -1)
+			if (_damageRegion.Left == -1) {
 				return;
+			}
 
 			if (!EnableConsoleScrolling) {
 				var windowSize = WinConsole.GetConsoleBufferWindow (out _);
-				if (!windowSize.IsEmpty && (windowSize.Width != Cols || windowSize.Height != Rows))
+				if (!windowSize.IsEmpty && (windowSize.Width != Cols || windowSize.Height != Rows)) {
 					return;
+				}
 			}
 
 			var bufferCoords = new WindowsConsole.Coord () {
@@ -1673,17 +1691,17 @@ namespace Terminal.Gui {
 			//	Bottom = (short)Clip.Bottom
 			//};
 
-			WinConsole.WriteToConsole (new Size (Cols, Rows), OutputBuffer, bufferCoords, damageRegion);
+			WinConsole.WriteToConsole (new Size (Cols, Rows), _outputBuffer, bufferCoords, _damageRegion);
 
 			// System.Diagnostics.Debugger.Log (0, "debug", $"Region={damageRegion.Right - damageRegion.Left},{damageRegion.Bottom - damageRegion.Top}\n");
-			WindowsConsole.SmallRect.MakeEmpty (ref damageRegion);
+			WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
 		}
 
 		CursorVisibility savedCursorVisibility;
 
 		public override void UpdateCursor ()
 		{
-			if (ccol < 0 || crow < 0 || ccol > Cols || crow > Rows) {
+			if (_ccol < 0 || _crow < 0 || _ccol > Cols || _crow > Rows) {
 				GetCursorVisibility (out CursorVisibility cursorVisibility);
 				savedCursorVisibility = cursorVisibility;
 				SetCursorVisibility (CursorVisibility.Invisible);
@@ -1692,8 +1710,8 @@ namespace Terminal.Gui {
 
 			SetCursorVisibility (savedCursorVisibility);
 			var position = new WindowsConsole.Coord () {
-				X = (short)ccol,
-				Y = (short)crow
+				X = (short)_ccol,
+				Y = (short)_crow
 			};
 			WinConsole.SetCursorPosition (position);
 		}
@@ -1814,6 +1832,7 @@ namespace Terminal.Gui {
 
 		public override void SetColors (short foregroundColorId, short backgroundColorId)
 		{
+			throw new NotImplementedException ();
 		}
 
 		public override void Suspend ()
@@ -1846,18 +1865,18 @@ namespace Terminal.Gui {
 	/// This implementation is used for WindowsDriver.
 	/// </remarks>
 	internal class WindowsMainLoop : IMainLoopDriver {
-		ManualResetEventSlim eventReady = new ManualResetEventSlim (false);
-		ManualResetEventSlim waitForProbe = new ManualResetEventSlim (false);
-		ManualResetEventSlim winChange = new ManualResetEventSlim (false);
-		MainLoop mainLoop;
-		ConsoleDriver consoleDriver;
-		WindowsConsole winConsole;
-		bool winChanged;
-		Size windowSize;
-		CancellationTokenSource tokenSource = new CancellationTokenSource ();
+		ManualResetEventSlim _eventReady = new ManualResetEventSlim (false);
+		ManualResetEventSlim _waitForProbe = new ManualResetEventSlim (false);
+		ManualResetEventSlim _winChange = new ManualResetEventSlim (false);
+		MainLoop _mainLoop;
+		ConsoleDriver _consoleDriver;
+		WindowsConsole _winConsole;
+		bool _winChanged;
+		Size _windowSize;
+		CancellationTokenSource _tokenSource = new CancellationTokenSource ();
 
 		// The records that we keep fetching
-		Queue<WindowsConsole.InputRecord []> resultQueue = new Queue<WindowsConsole.InputRecord []> ();
+		Queue<WindowsConsole.InputRecord []> _resultQueue = new Queue<WindowsConsole.InputRecord []> ();
 
 		/// <summary>
 		/// Invoked when a Key is pressed or released.
@@ -1868,16 +1887,16 @@ namespace Terminal.Gui {
 		/// Invoked when the window is changed.
 		/// </summary>
 		public EventHandler<SizeChangedEventArgs> WinChanged;
-		
+
 		public WindowsMainLoop (ConsoleDriver consoleDriver = null)
 		{
-			this.consoleDriver = consoleDriver ?? throw new ArgumentNullException ("Console driver instance must be provided.");
-			winConsole = ((WindowsDriver)consoleDriver).WinConsole;
+			_consoleDriver = consoleDriver ?? throw new ArgumentNullException ("Console driver instance must be provided.");
+			_winConsole = ((WindowsDriver)consoleDriver).WinConsole;
 		}
 
 		void IMainLoopDriver.Setup (MainLoop mainLoop)
 		{
-			this.mainLoop = mainLoop;
+			_mainLoop = mainLoop;
 			Task.Run (WindowsInputHandler);
 			Task.Run (CheckWinChange);
 		}
@@ -1885,25 +1904,25 @@ namespace Terminal.Gui {
 		void WindowsInputHandler ()
 		{
 			while (true) {
-				waitForProbe.Wait ();
-				waitForProbe.Reset ();
+				_waitForProbe.Wait ();
+				_waitForProbe.Reset ();
 
-				if (resultQueue?.Count == 0) {
-					resultQueue.Enqueue (winConsole.ReadConsoleInput ());
+				if (_resultQueue?.Count == 0) {
+					_resultQueue.Enqueue (_winConsole.ReadConsoleInput ());
 				}
 
-				eventReady.Set ();
+				_eventReady.Set ();
 			}
 		}
 
 		void CheckWinChange ()
 		{
 			while (true) {
-				winChange.Wait ();
-				winChange.Reset ();
+				_winChange.Wait ();
+				_winChange.Reset ();
 				WaitWinChange ();
-				winChanged = true;
-				eventReady.Set ();
+				_winChanged = true;
+				_eventReady.Set ();
 			}
 		}
 
@@ -1911,11 +1930,11 @@ namespace Terminal.Gui {
 		{
 			while (true) {
 				Thread.Sleep (100);
-				if (!consoleDriver.EnableConsoleScrolling) {
-					windowSize = winConsole.GetConsoleBufferWindow (out _);
+				if (!_consoleDriver.EnableConsoleScrolling) {
+					_windowSize = _winConsole.GetConsoleBufferWindow (out _);
 					//System.Diagnostics.Debug.WriteLine ($"{consoleDriver.EnableConsoleScrolling},{windowSize.Width},{windowSize.Height}");
-					if (windowSize != Size.Empty && windowSize.Width != consoleDriver.Cols
-						|| windowSize.Height != consoleDriver.Rows) {
+					if (_windowSize != Size.Empty && _windowSize.Width != _consoleDriver.Cols
+						|| _windowSize.Height != _consoleDriver.Rows) {
 						return;
 					}
 				}
@@ -1925,34 +1944,34 @@ namespace Terminal.Gui {
 		void IMainLoopDriver.Wakeup ()
 		{
 			//tokenSource.Cancel ();
-			eventReady.Set ();
+			_eventReady.Set ();
 		}
 
 		bool IMainLoopDriver.EventsPending (bool wait)
 		{
-			waitForProbe.Set ();
-			winChange.Set ();
+			_waitForProbe.Set ();
+			_winChange.Set ();
 
 			if (CheckTimers (wait, out var waitTimeout)) {
 				return true;
 			}
 
 			try {
-				if (!tokenSource.IsCancellationRequested) {
-					eventReady.Wait (waitTimeout, tokenSource.Token);
+				if (!_tokenSource.IsCancellationRequested) {
+					_eventReady.Wait (waitTimeout, _tokenSource.Token);
 				}
 			} catch (OperationCanceledException) {
 				return true;
 			} finally {
-				eventReady.Reset ();
+				_eventReady.Reset ();
 			}
 
-			if (!tokenSource.IsCancellationRequested) {
-				return resultQueue.Count > 0 || CheckTimers (wait, out _) || winChanged;
+			if (!_tokenSource.IsCancellationRequested) {
+				return _resultQueue.Count > 0 || CheckTimers (wait, out _) || _winChanged;
 			}
 
-			tokenSource.Dispose ();
-			tokenSource = new CancellationTokenSource ();
+			_tokenSource.Dispose ();
+			_tokenSource = new CancellationTokenSource ();
 			return true;
 		}
 
@@ -1960,8 +1979,8 @@ namespace Terminal.Gui {
 		{
 			long now = DateTime.UtcNow.Ticks;
 
-			if (mainLoop.timeouts.Count > 0) {
-				waitTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
+			if (_mainLoop.timeouts.Count > 0) {
+				waitTimeout = (int)((_mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
 				if (waitTimeout < 0)
 					return true;
 			} else {
@@ -1972,8 +1991,8 @@ namespace Terminal.Gui {
 				waitTimeout = 0;
 
 			int ic;
-			lock (mainLoop.idleHandlers) {
-				ic = mainLoop.idleHandlers.Count;
+			lock (_mainLoop.idleHandlers) {
+				ic = _mainLoop.idleHandlers.Count;
 			}
 
 			return ic > 0;
@@ -1981,16 +2000,16 @@ namespace Terminal.Gui {
 
 		void IMainLoopDriver.Iteration ()
 		{
-			while (resultQueue.Count > 0) {
-				var inputRecords = resultQueue.Dequeue ();
+			while (_resultQueue.Count > 0) {
+				var inputRecords = _resultQueue.Dequeue ();
 				if (inputRecords != null && inputRecords.Length > 0) {
 					var inputEvent = inputRecords [0];
 					ProcessInput?.Invoke (inputEvent);
 				}
 			}
-			if (winChanged) {
-				winChanged = false;
-				WinChanged?.Invoke (this, new SizeChangedEventArgs(windowSize));
+			if (_winChanged) {
+				_winChanged = false;
+				WinChanged?.Invoke (this, new SizeChangedEventArgs (_windowSize));
 			}
 		}
 	}
@@ -1998,7 +2017,7 @@ namespace Terminal.Gui {
 	class WindowsClipboard : ClipboardBase {
 		public WindowsClipboard ()
 		{
-			IsSupported = IsClipboardFormatAvailable (cfUnicodeText);
+			IsSupported = IsClipboardFormatAvailable (_cfUnicodeText);
 		}
 
 		public override bool IsSupported { get; }
@@ -2009,30 +2028,33 @@ namespace Terminal.Gui {
 			//	return null;
 
 			try {
-				if (!OpenClipboard (IntPtr.Zero))
+				if (!OpenClipboard (IntPtr.Zero)) {
 					return null;
+				}
 
-				IntPtr handle = GetClipboardData (cfUnicodeText);
-				if (handle == IntPtr.Zero)
+				IntPtr handle = GetClipboardData (_cfUnicodeText);
+				if (handle == IntPtr.Zero) {
 					return null;
+				}
 
 				IntPtr pointer = IntPtr.Zero;
 
 				try {
 					pointer = GlobalLock (handle);
-					if (pointer == IntPtr.Zero)
+					if (pointer == IntPtr.Zero) {
 						return null;
+					}
 
 					int size = GlobalSize (handle);
 					byte [] buff = new byte [size];
 
 					Marshal.Copy (pointer, buff, 0, size);
 
-					return System.Text.Encoding.Unicode.GetString (buff)
-						.TrimEnd ('\0');
+					return System.Text.Encoding.Unicode.GetString (buff).TrimEnd ('\0');
 				} finally {
-					if (pointer != IntPtr.Zero)
+					if (pointer != IntPtr.Zero) {
 						GlobalUnlock (handle);
+					}
 				}
 			} finally {
 				CloseClipboard ();
@@ -2065,7 +2087,7 @@ namespace Terminal.Gui {
 					GlobalUnlock (target);
 				}
 
-				if (SetClipboardData (cfUnicodeText, hGlobal) == default) {
+				if (SetClipboardData (_cfUnicodeText, hGlobal) == default) {
 					ThrowWin32 ();
 				}
 
@@ -2095,7 +2117,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		const uint cfUnicodeText = 13;
+		const uint _cfUnicodeText = 13;
 
 		void ThrowWin32 ()
 		{

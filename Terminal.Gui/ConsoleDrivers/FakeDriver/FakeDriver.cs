@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
 using NStack;
 
 // Alias Console to MockConsole so we don't accidentally use Console
@@ -39,24 +38,24 @@ namespace Terminal.Gui {
 
 		public static FakeDriver.Behaviors FakeBehaviors = new Behaviors ();
 
-		int cols, rows, left, top;
-		public override int Cols => cols;
-		public override int Rows => rows;
+		int _cols, _rows, _left, _top;
+		public override int Cols => _cols;
+		public override int Rows => _rows;
 		// Only handling left here because not all terminals has a horizontal scroll bar.
 		public override int Left => 0;
 		public override int Top => 0;
 		public override bool EnableConsoleScrolling { get; set; }
-		private IClipboard clipboard = null;
-		public override IClipboard Clipboard => clipboard;
+		private IClipboard _clipboard = null;
+		public override IClipboard Clipboard => _clipboard;
 
 		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
-		int [,,] contents;
-		bool [] dirtyLine;
+		int [,,] _contents;
+		bool [] _dirtyLine;
 
 		/// <summary>
 		/// Assists with testing, the format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
 		/// </summary>
-		public override int [,,] Contents => contents;
+		public override int [,,] Contents => _contents;
 
 		//void UpdateOffscreen ()
 		//{
@@ -76,43 +75,43 @@ namespace Terminal.Gui {
 		//		dirtyLine [row] = true;
 		//}
 
-		static bool sync = false;
+		static bool _sync = false;
 
 		public FakeDriver ()
 		{
 			if (FakeBehaviors.UseFakeClipboard) {
-				clipboard = new FakeClipboard (FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException, FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse);
+				_clipboard = new FakeClipboard (FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException, FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse);
 			} else {
 				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
-					clipboard = new WindowsClipboard ();
+					_clipboard = new WindowsClipboard ();
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
-					clipboard = new MacOSXClipboard ();
+					_clipboard = new MacOSXClipboard ();
 				} else {
 					if (CursesDriver.Is_WSL_Platform ()) {
-						clipboard = new WSLClipboard ();
+						_clipboard = new WSLClipboard ();
 					} else {
-						clipboard = new CursesClipboard ();
+						_clipboard = new CursesClipboard ();
 					}
 				}
 			}
 		}
 
-		bool needMove;
+		bool _needMove;
 		// Current row, and current col, tracked by Move/AddCh only
-		int ccol, crow;
+		int _ccol, _crow;
 		public override void Move (int col, int row)
 		{
-			ccol = col;
-			crow = row;
+			_ccol = col;
+			_crow = row;
 
 			if (Clip.Contains (col, row)) {
 				FakeConsole.CursorTop = row;
 				FakeConsole.CursorLeft = col;
-				needMove = false;
+				_needMove = false;
 			} else {
 				FakeConsole.CursorTop = Clip.Y;
 				FakeConsole.CursorLeft = Clip.X;
-				needMove = true;
+				_needMove = true;
 			}
 		}
 
@@ -120,16 +119,16 @@ namespace Terminal.Gui {
 		{
 			rune = MakePrintable (rune);
 			var runeWidth = Rune.ColumnWidth (rune);
-			var validClip = IsValidContent (ccol, crow, Clip);
+			var validLocation = IsValidLocation (_ccol, _crow);
 
-			if (validClip) {
-				if (needMove) {
+			if (validLocation) {
+				if (_needMove) {
 					//MockConsole.CursorLeft = ccol;
 					//MockConsole.CursorTop = crow;
-					needMove = false;
+					_needMove = false;
 				}
-				if (runeWidth == 0 && ccol > 0) {
-					var r = contents [crow, ccol - 1, 0];
+				if (runeWidth == 0 && _ccol > 0) {
+					var r = _contents [_crow, _ccol - 1, 0];
 					var s = new string (new char [] { (char)r, (char)rune });
 					string sn;
 					if (!s.IsNormalized ()) {
@@ -138,47 +137,47 @@ namespace Terminal.Gui {
 						sn = s;
 					}
 					var c = sn [0];
-					contents [crow, ccol - 1, 0] = c;
-					contents [crow, ccol - 1, 1] = CurrentAttribute;
-					contents [crow, ccol - 1, 2] = 1;
+					_contents [_crow, _ccol - 1, 0] = c;
+					_contents [_crow, _ccol - 1, 1] = CurrentAttribute;
+					_contents [_crow, _ccol - 1, 2] = 1;
 
 				} else {
-					if (runeWidth < 2 && ccol > 0
-					&& Rune.ColumnWidth ((Rune)contents [crow, ccol - 1, 0]) > 1) {
+					if (runeWidth < 2 && _ccol > 0
+					&& Rune.ColumnWidth ((Rune)_contents [_crow, _ccol - 1, 0]) > 1) {
 
-						contents [crow, ccol - 1, 0] = (int)(uint)' ';
+						_contents [_crow, _ccol - 1, 0] = (int)(uint)' ';
 
-					} else if (runeWidth < 2 && ccol <= Clip.Right - 1
-						&& Rune.ColumnWidth ((Rune)contents [crow, ccol, 0]) > 1) {
+					} else if (runeWidth < 2 && _ccol <= Clip.Right - 1
+						&& Rune.ColumnWidth ((Rune)_contents [_crow, _ccol, 0]) > 1) {
 
-						contents [crow, ccol + 1, 0] = (int)(uint)' ';
-						contents [crow, ccol + 1, 2] = 1;
+						_contents [_crow, _ccol + 1, 0] = (int)(uint)' ';
+						_contents [_crow, _ccol + 1, 2] = 1;
 
 					}
-					if (runeWidth > 1 && ccol == Clip.Right - 1) {
-						contents [crow, ccol, 0] = (int)(uint)' ';
+					if (runeWidth > 1 && _ccol == Clip.Right - 1) {
+						_contents [_crow, _ccol, 0] = (int)(uint)' ';
 					} else {
-						contents [crow, ccol, 0] = (int)(uint)rune;
+						_contents [_crow, _ccol, 0] = (int)(uint)rune;
 					}
-					contents [crow, ccol, 1] = CurrentAttribute;
-					contents [crow, ccol, 2] = 1;
+					_contents [_crow, _ccol, 1] = CurrentAttribute;
+					_contents [_crow, _ccol, 2] = 1;
 
-					dirtyLine [crow] = true;
+					_dirtyLine [_crow] = true;
 				}
 			} else {
-				needMove = true;
+				_needMove = true;
 			}
 
 			if (runeWidth < 0 || runeWidth > 0) {
-				ccol++;
+				_ccol++;
 			}
 
 			if (runeWidth > 1) {
-				if (validClip && ccol < Clip.Right) {
-					contents [crow, ccol, 1] = CurrentAttribute;
-					contents [crow, ccol, 2] = 0;
+				if (validLocation && _ccol < Clip.Right) {
+					_contents [_crow, _ccol, 1] = CurrentAttribute;
+					_contents [_crow, _ccol, 2] = 0;
 				}
-				ccol++;
+				_ccol++;
 			}
 
 			//if (ccol == Cols) {
@@ -186,15 +185,16 @@ namespace Terminal.Gui {
 			//	if (crow + 1 < Rows)
 			//		crow++;
 			//}
-			if (sync) {
+			if (_sync) {
 				UpdateScreen ();
 			}
 		}
 
 		public override void AddStr (ustring str)
 		{
-			foreach (var rune in str)
+			foreach (var rune in str) {
 				AddRune (rune);
+			}
 		}
 
 		public override void End ()
@@ -224,8 +224,8 @@ namespace Terminal.Gui {
 
 			TerminalResized = terminalResized;
 
-			cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
-			rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
+			_cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
+			_rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
 			FakeConsole.Clear ();
 			ResizeScreen ();
 			// Call InitalizeColorSchemes before UpdateOffScreen as it references Colors
@@ -239,10 +239,10 @@ namespace Terminal.Gui {
 			return MakeColor ((ConsoleColor)fore, (ConsoleColor)back);
 		}
 
-		int redrawColor = -1;
+		int _redrawColor = -1;
 		void SetColor (int color)
 		{
-			redrawColor = color;
+			_redrawColor = color;
 			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
 				.OfType<ConsoleColor> ()
 				.Select (s => (int)s);
@@ -265,29 +265,31 @@ namespace Terminal.Gui {
 			var savedCol = FakeConsole.CursorLeft;
 			var savedCursorVisible = FakeConsole.CursorVisible;
 			for (int row = top; row < rows; row++) {
-				if (!dirtyLine [row])
+				if (!_dirtyLine [row]) {
 					continue;
-				dirtyLine [row] = false;
+				}
+				_dirtyLine [row] = false;
 				for (int col = left; col < cols; col++) {
 					FakeConsole.CursorTop = row;
 					FakeConsole.CursorLeft = col;
 					for (; col < cols; col++) {
-						if (contents [row, col, 2] == 0) {
+						if (_contents [row, col, 2] == 0) {
 							FakeConsole.CursorLeft++;
 							continue;
 						}
 
-						var color = contents [row, col, 1];
-						if (color != redrawColor)
+						var color = _contents [row, col, 1];
+						if (color != _redrawColor) {
 							SetColor (color);
+						}
 
-						Rune rune = contents [row, col, 0];
+						Rune rune = _contents [row, col, 0];
 						if (Rune.DecodeSurrogatePair (rune, out char [] spair)) {
 							FakeConsole.Write (spair);
 						} else {
 							FakeConsole.Write ((char)rune);
 						}
-						contents [row, col, 2] = 0;
+						_contents [row, col, 2] = 0;
 					}
 				}
 			}
@@ -374,8 +376,9 @@ namespace Terminal.Gui {
 			case ConsoleKey.OemComma:
 			case ConsoleKey.OemPlus:
 			case ConsoleKey.OemMinus:
-				if (keyInfo.KeyChar == 0)
+				if (keyInfo.KeyChar == 0) {
 					return Key.Unknown;
+				}
 
 				return (Key)((uint)keyInfo.KeyChar);
 			}
@@ -439,26 +442,29 @@ namespace Terminal.Gui {
 		private Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
 		{
 			Key keyMod = new Key ();
-			if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0)
+			if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0) {
 				keyMod = Key.ShiftMask;
-			if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0)
+			}
+			if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0) {
 				keyMod |= Key.CtrlMask;
-			if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0)
+			}
+			if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0) {
 				keyMod |= Key.AltMask;
+			}
 
 			return keyMod != Key.Null ? keyMod | key : key;
 		}
 
-		Action<KeyEvent> keyDownHandler;
-		Action<KeyEvent> keyHandler;
-		Action<KeyEvent> keyUpHandler;
-		private CursorVisibility savedCursorVisibility;
+		Action<KeyEvent> _keyDownHandler;
+		Action<KeyEvent> _keyHandler;
+		Action<KeyEvent> _keyUpHandler;
+		private CursorVisibility _savedCursorVisibility;
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
-			this.keyDownHandler = keyDownHandler;
-			this.keyHandler = keyHandler;
-			this.keyUpHandler = keyUpHandler;
+			_keyDownHandler = keyDownHandler;
+			_keyHandler = keyHandler;
+			_keyUpHandler = keyUpHandler;
 
 			// Note: Net doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
 			(mainLoop.Driver as FakeMainLoop).KeyPressed += (consoleKey) => ProcessInput (consoleKey);
@@ -482,15 +488,15 @@ namespace Terminal.Gui {
 			var map = MapKey (consoleKey);
 			if (map == (Key)0xffffffff) {
 				if ((consoleKey.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-					keyDownHandler (new KeyEvent (map, keyModifiers));
-					keyUpHandler (new KeyEvent (map, keyModifiers));
+					_keyDownHandler (new KeyEvent (map, keyModifiers));
+					_keyUpHandler (new KeyEvent (map, keyModifiers));
 				}
 				return;
 			}
 
-			keyDownHandler (new KeyEvent (map, keyModifiers));
-			keyHandler (new KeyEvent (map, keyModifiers));
-			keyUpHandler (new KeyEvent (map, keyModifiers));
+			_keyDownHandler (new KeyEvent (map, keyModifiers));
+			_keyHandler (new KeyEvent (map, keyModifiers));
+			_keyUpHandler (new KeyEvent (map, keyModifiers));
 		}
 
 		/// <inheritdoc/>
@@ -506,21 +512,21 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool SetCursorVisibility (CursorVisibility visibility)
 		{
-			savedCursorVisibility = visibility;
+			_savedCursorVisibility = visibility;
 			return FakeConsole.CursorVisible = visibility == CursorVisibility.Default;
 		}
 
 		/// <inheritdoc/>
 		public override bool EnsureCursorVisibility ()
 		{
-			if (!(ccol >= 0 && crow >= 0 && ccol < Cols && crow < Rows)) {
+			if (!(_ccol >= 0 && _crow >= 0 && _ccol < Cols && _crow < Rows)) {
 				GetCursorVisibility (out CursorVisibility cursorVisibility);
-				savedCursorVisibility = cursorVisibility;
+				_savedCursorVisibility = cursorVisibility;
 				SetCursorVisibility (CursorVisibility.Invisible);
 				return false;
 			}
 
-			SetCursorVisibility (savedCursorVisibility);
+			SetCursorVisibility (_savedCursorVisibility);
 			return FakeConsole.CursorVisible;
 		}
 
@@ -532,8 +538,8 @@ namespace Terminal.Gui {
 		public void SetBufferSize (int width, int height)
 		{
 			FakeConsole.SetBufferSize (width, height);
-			cols = width;
-			rows = height;
+			_cols = width;
+			_rows = height;
 			if (!EnableConsoleScrolling) {
 				SetWindowSize (width, height);
 			}
@@ -544,10 +550,10 @@ namespace Terminal.Gui {
 		{
 			FakeConsole.SetWindowSize (width, height);
 			if (!EnableConsoleScrolling) {
-				if (width != cols || height != rows) {
+				if (width != _cols || height != _rows) {
 					SetBufferSize (width, height);
-					cols = width;
-					rows = height;
+					_cols = width;
+					_rows = height;
 				}
 			}
 			ProcessResize ();
@@ -556,13 +562,13 @@ namespace Terminal.Gui {
 		public void SetWindowPosition (int left, int top)
 		{
 			if (EnableConsoleScrolling) {
-				this.left = Math.Max (Math.Min (left, Cols - FakeConsole.WindowWidth), 0);
-				this.top = Math.Max (Math.Min (top, Rows - FakeConsole.WindowHeight), 0);
-			} else if (this.left > 0 || this.top > 0) {
-				this.left = 0;
-				this.top = 0;
+				_left = Math.Max (Math.Min (left, Cols - FakeConsole.WindowWidth), 0);
+				_top = Math.Max (Math.Min (top, Rows - FakeConsole.WindowHeight), 0);
+			} else if (_left > 0 || _top > 0) {
+				_left = 0;
+				_top = 0;
 			}
-			FakeConsole.SetWindowPosition (this.left, this.top);
+			FakeConsole.SetWindowPosition (_left, _top);
 		}
 
 		void ProcessResize ()
@@ -593,30 +599,30 @@ namespace Terminal.Gui {
 			} else {
 				try {
 #pragma warning disable CA1416
-					FakeConsole.WindowLeft = Math.Max (Math.Min (left, Cols - FakeConsole.WindowWidth), 0);
-					FakeConsole.WindowTop = Math.Max (Math.Min (top, Rows - FakeConsole.WindowHeight), 0);
+					FakeConsole.WindowLeft = Math.Max (Math.Min (_left, Cols - FakeConsole.WindowWidth), 0);
+					FakeConsole.WindowTop = Math.Max (Math.Min (_top, Rows - FakeConsole.WindowHeight), 0);
 #pragma warning restore CA1416
 				} catch (Exception) {
 					return;
 				}
 			}
 
-			Clip = new Rect (0, 0, Cols, Rows);
+			ClearClipRegion ();
 		}
 
 		public override void UpdateOffScreen ()
 		{
-			contents = new int [Rows, Cols, 3];
-			dirtyLine = new bool [Rows];
+			_contents = new int [Rows, Cols, 3];
+			_dirtyLine = new bool [Rows];
 
 			// Can raise an exception while is still resizing.
 			try {
-				for (int row = 0; row < rows; row++) {
-					for (int c = 0; c < cols; c++) {
-						contents [row, c, 0] = ' ';
-						contents [row, c, 1] = (ushort)Colors.TopLevel.Normal;
-						contents [row, c, 2] = 0;
-						dirtyLine [row] = true;
+				for (int row = 0; row < _rows; row++) {
+					for (int c = 0; c < _cols; c++) {
+						_contents [row, c, 0] = ' ';
+						_contents [row, c, 1] = (ushort)Colors.TopLevel.Normal;
+						_contents [row, c, 2] = 0;
+						_dirtyLine [row] = true;
 					}
 				}
 			} catch (IndexOutOfRangeException) { }
@@ -649,8 +655,8 @@ namespace Terminal.Gui {
 
 			// Prevents the exception of size changing during resizing.
 			try {
-				if (ccol >= 0 && ccol < FakeConsole.BufferWidth && crow >= 0 && crow < FakeConsole.BufferHeight) {
-					FakeConsole.SetCursorPosition (ccol, crow);
+				if (_ccol >= 0 && _ccol < FakeConsole.BufferWidth && _crow >= 0 && _crow < FakeConsole.BufferHeight) {
+					FakeConsole.SetCursorPosition (_ccol, _crow);
 				}
 			} catch (System.IO.IOException) {
 			} catch (ArgumentOutOfRangeException) {
@@ -691,15 +697,15 @@ namespace Terminal.Gui {
 		public class FakeClipboard : ClipboardBase {
 			public Exception FakeException = null;
 
-			string contents = string.Empty;
+			string _contents = string.Empty;
 
-			bool isSupportedAlwaysFalse = false;
+			bool _isSupportedAlwaysFalse = false;
 
-			public override bool IsSupported => !isSupportedAlwaysFalse;
+			public override bool IsSupported => !_isSupportedAlwaysFalse;
 
 			public FakeClipboard (bool fakeClipboardThrowsNotSupportedException = false, bool isSupportedAlwaysFalse = false)
 			{
-				this.isSupportedAlwaysFalse = isSupportedAlwaysFalse;
+				_isSupportedAlwaysFalse = isSupportedAlwaysFalse;
 				if (fakeClipboardThrowsNotSupportedException) {
 					FakeException = new NotSupportedException ("Fake clipboard exception");
 				}
@@ -710,7 +716,7 @@ namespace Terminal.Gui {
 				if (FakeException != null) {
 					throw FakeException;
 				}
-				return contents;
+				return _contents;
 			}
 
 			protected override void SetClipboardDataImpl (string text)
@@ -718,7 +724,7 @@ namespace Terminal.Gui {
 				if (FakeException != null) {
 					throw FakeException;
 				}
-				contents = text;
+				_contents = text;
 			}
 		}
 

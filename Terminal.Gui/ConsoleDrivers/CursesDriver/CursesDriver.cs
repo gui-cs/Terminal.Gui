@@ -3,7 +3,6 @@
 //
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -21,46 +20,46 @@ namespace Terminal.Gui {
 		public override int Left => 0;
 		public override int Top => 0;
 		public override bool EnableConsoleScrolling { get; set; }
-		public override IClipboard Clipboard { get => clipboard; }
+		public override IClipboard Clipboard { get => _clipboard; }
 
-		CursorVisibility? initialCursorVisibility = null;
-		CursorVisibility? currentCursorVisibility = null;
-		IClipboard clipboard;
-		int [,,] contents;
+		CursorVisibility? _initialCursorVisibility = null;
+		CursorVisibility? _currentCursorVisibility = null;
+		IClipboard _clipboard;
+		int [,,] _contents;
 
-		public override int [,,] Contents => contents;
+		public override int [,,] Contents => _contents;
 
 		// Current row, and current col, tracked by Move/AddRune only
-		int ccol, crow;
-		bool needMove;
+		int _ccol, _crow;
+		bool _needMove;
 		public override void Move (int col, int row)
 		{
-			ccol = col;
-			crow = row;
+			_ccol = col;
+			_crow = row;
 
 			if (Clip.Contains (col, row)) {
 				Curses.move (row, col);
-				needMove = false;
+				_needMove = false;
 			} else {
 				Curses.move (Clip.Y, Clip.X);
-				needMove = true;
+				_needMove = true;
 			}
 		}
 
-		static bool sync = false;
+		static bool _sync = false;
 		public override void AddRune (Rune rune)
 		{
 			rune = MakePrintable (rune);
 			var runeWidth = Rune.ColumnWidth (rune);
-			var validClip = IsValidContent (ccol, crow, Clip);
+			var validLocation = IsValidLocation (_ccol, _crow);
 
-			if (validClip) {
-				if (needMove) {
-					Curses.move (crow, ccol);
-					needMove = false;
+			if (validLocation) {
+				if (_needMove) {
+					Curses.move (_crow, _ccol);
+					_needMove = false;
 				}
-				if (runeWidth == 0 && ccol > 0) {
-					var r = contents [crow, ccol - 1, 0];
+				if (runeWidth == 0 && _ccol > 0) {
+					var r = _contents [_crow, _ccol - 1, 0];
 					var s = new string (new char [] { (char)r, (char)rune });
 					string sn;
 					if (!s.IsNormalized ()) {
@@ -69,60 +68,60 @@ namespace Terminal.Gui {
 						sn = s;
 					}
 					var c = sn [0];
-					Curses.mvaddch (crow, ccol - 1, (int)(uint)c);
-					contents [crow, ccol - 1, 0] = c;
-					contents [crow, ccol - 1, 1] = CurrentAttribute;
-					contents [crow, ccol - 1, 2] = 1;
+					Curses.mvaddch (_crow, _ccol - 1, (int)(uint)c);
+					_contents [_crow, _ccol - 1, 0] = c;
+					_contents [_crow, _ccol - 1, 1] = CurrentAttribute;
+					_contents [_crow, _ccol - 1, 2] = 1;
 
 				} else {
-					if (runeWidth < 2 && ccol > 0
-						&& Rune.ColumnWidth ((char)contents [crow, ccol - 1, 0]) > 1) {
+					if (runeWidth < 2 && _ccol > 0
+						&& Rune.ColumnWidth ((char)_contents [_crow, _ccol - 1, 0]) > 1) {
 
 						var curAtttib = CurrentAttribute;
-						Curses.attrset (contents [crow, ccol - 1, 1]);
-						Curses.mvaddch (crow, ccol - 1, (int)(uint)' ');
-						contents [crow, ccol - 1, 0] = (int)(uint)' ';
-						Curses.move (crow, ccol);
+						Curses.attrset (_contents [_crow, _ccol - 1, 1]);
+						Curses.mvaddch (_crow, _ccol - 1, (int)(uint)' ');
+						_contents [_crow, _ccol - 1, 0] = (int)(uint)' ';
+						Curses.move (_crow, _ccol);
 						Curses.attrset (curAtttib);
 
-					} else if (runeWidth < 2 && ccol <= Clip.Right - 1
-						&& Rune.ColumnWidth ((char)contents [crow, ccol, 0]) > 1) {
+					} else if (runeWidth < 2 && _ccol <= Clip.Right - 1
+						&& Rune.ColumnWidth ((char)_contents [_crow, _ccol, 0]) > 1) {
 
 						var curAtttib = CurrentAttribute;
-						Curses.attrset (contents [crow, ccol + 1, 1]);
-						Curses.mvaddch (crow, ccol + 1, (int)(uint)' ');
-						contents [crow, ccol + 1, 0] = (int)(uint)' ';
-						Curses.move (crow, ccol);
+						Curses.attrset (_contents [_crow, _ccol + 1, 1]);
+						Curses.mvaddch (_crow, _ccol + 1, (int)(uint)' ');
+						_contents [_crow, _ccol + 1, 0] = (int)(uint)' ';
+						Curses.move (_crow, _ccol);
 						Curses.attrset (curAtttib);
 
 					}
-					if (runeWidth > 1 && ccol == Clip.Right - 1) {
+					if (runeWidth > 1 && _ccol == Clip.Right - 1) {
 						Curses.addch ((int)(uint)' ');
-						contents [crow, ccol, 0] = (int)(uint)' ';
+						_contents [_crow, _ccol, 0] = (int)(uint)' ';
 					} else {
 						Curses.addch ((int)(uint)rune);
-						contents [crow, ccol, 0] = (int)(uint)rune;
+						_contents [_crow, _ccol, 0] = (int)(uint)rune;
 					}
-					contents [crow, ccol, 1] = CurrentAttribute;
-					contents [crow, ccol, 2] = 1;
+					_contents [_crow, _ccol, 1] = CurrentAttribute;
+					_contents [_crow, _ccol, 2] = 1;
 				}
 			} else {
-				needMove = true;
+				_needMove = true;
 			}
 
 			if (runeWidth < 0 || runeWidth > 0) {
-				ccol++;
+				_ccol++;
 			}
 
 			if (runeWidth > 1) {
-				if (validClip && ccol < Clip.Right) {
-					contents [crow, ccol, 1] = CurrentAttribute;
-					contents [crow, ccol, 2] = 0;
+				if (validLocation && _ccol < Clip.Right) {
+					_contents [_crow, _ccol, 1] = CurrentAttribute;
+					_contents [_crow, _ccol, 2] = 0;
 				}
-				ccol++;
+				_ccol++;
 			}
 
-			if (sync) {
+			if (_sync) {
 				UpdateScreen ();
 			}
 		}
@@ -130,8 +129,9 @@ namespace Terminal.Gui {
 		public override void AddStr (ustring str)
 		{
 			// TODO; optimize this to determine if the str fits in the clip region, and if so, use Curses.addstr directly
-			foreach (var rune in str)
+			foreach (var rune in str) {
 				AddRune (rune);
+			}
 		}
 
 		public override void Refresh ()
@@ -161,7 +161,7 @@ namespace Terminal.Gui {
 			Curses.endwin ();
 		}
 
-		public override void UpdateScreen () => window.redrawwin ();
+		public override void UpdateScreen () => _window.redrawwin ();
 
 		public override void SetAttribute (Attribute c)
 		{
@@ -169,9 +169,7 @@ namespace Terminal.Gui {
 			Curses.attrset (CurrentAttribute);
 		}
 
-		public Curses.Window window;
-
-		//static short last_color_pair = 16;
+		public Curses.Window _window;
 
 		/// <summary>
 		/// Creates a curses color from the provided foreground and background colors
@@ -198,35 +196,37 @@ namespace Terminal.Gui {
 			return MakeColor ((short)MapColor (fore), (short)MapColor (back));
 		}
 
-		int [,] colorPairs = new int [16, 16];
+		int [,] _colorPairs = new int [16, 16];
 
 		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
 		{
 			// BUGBUG: This code is never called ?? See Issue #2300
 			int f = (short)foreground;
 			int b = (short)background;
-			var v = colorPairs [f, b];
+			var v = _colorPairs [f, b];
 			if ((v & 0x10000) == 0) {
 				b &= 0x7;
 				bool bold = (f & 0x8) != 0;
 				f &= 0x7;
 
 				v = MakeColor ((short)f, (short)b) | (bold ? Curses.A_BOLD : 0);
-				colorPairs [(int)foreground, (int)background] = v | 0x1000;
+				_colorPairs [(int)foreground, (int)background] = v | 0x1000;
 			}
 			SetAttribute (v & 0xffff);
 		}
 
-		Dictionary<int, int> rawPairs = new Dictionary<int, int> ();
+		//Dictionary<int, int> _rawPairs = new Dictionary<int, int> ();
 		public override void SetColors (short foreColorId, short backgroundColorId)
 		{
+			throw new NotImplementedException ();
+
 			// BUGBUG: This code is never called ?? See Issue #2300
-			int key = ((ushort)foreColorId << 16) | (ushort)backgroundColorId;
-			if (!rawPairs.TryGetValue (key, out var v)) {
-				v = MakeColor (foreColorId, backgroundColorId);
-				rawPairs [key] = v;
-			}
-			SetAttribute (v);
+			//int key = ((ushort)foreColorId << 16) | (ushort)backgroundColorId;
+			//if (!_rawPairs.TryGetValue (key, out var v)) {
+			//	v = MakeColor (foreColorId, backgroundColorId);
+			//	_rawPairs [key] = v;
+			//}
+			//SetAttribute (v);
 		}
 
 		static Key MapCursesKey (int cursesKey)
@@ -305,21 +305,25 @@ namespace Terminal.Gui {
 			}
 		}
 
-		KeyModifiers keyModifiers;
+		KeyModifiers _keyModifiers;
 
 		KeyModifiers MapKeyModifiers (Key key)
 		{
-			if (keyModifiers == null)
-				keyModifiers = new KeyModifiers ();
+			if (_keyModifiers == null) {
+				_keyModifiers = new KeyModifiers ();
+			}
 
-			if (!keyModifiers.Shift && (key & Key.ShiftMask) != 0)
-				keyModifiers.Shift = true;
-			if (!keyModifiers.Alt && (key & Key.AltMask) != 0)
-				keyModifiers.Alt = true;
-			if (!keyModifiers.Ctrl && (key & Key.CtrlMask) != 0)
-				keyModifiers.Ctrl = true;
+			if (!_keyModifiers.Shift && (key & Key.ShiftMask) != 0) {
+				_keyModifiers.Shift = true;
+			}
+			if (!_keyModifiers.Alt && (key & Key.AltMask) != 0) {
+				_keyModifiers.Alt = true;
+			}
+			if (!_keyModifiers.Ctrl && (key & Key.CtrlMask) != 0) {
+				_keyModifiers.Ctrl = true;
+			}
 
-			return keyModifiers;
+			return _keyModifiers;
 		}
 
 		void ProcessInput ()
@@ -327,10 +331,11 @@ namespace Terminal.Gui {
 			int wch;
 			var code = Curses.get_wch (out wch);
 			//System.Diagnostics.Debug.WriteLine ($"code: {code}; wch: {wch}");
-			if (code == Curses.ERR)
+			if (code == Curses.ERR) {
 				return;
+			}
 
-			keyModifiers = new KeyModifiers ();
+			_keyModifiers = new KeyModifiers ();
 			Key k = Key.Null;
 
 			if (code == Curses.KEY_CODE_YES) {
@@ -369,9 +374,9 @@ namespace Terminal.Gui {
 					wch -= 60;
 					k = Key.ShiftMask | Key.AltMask | MapCursesKey (wch);
 				}
-				keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
-				keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
-				keyUpHandler (new KeyEvent (k, MapKeyModifiers (k)));
+				_keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
+				_keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
+				_keyUpHandler (new KeyEvent (k, MapKeyModifiers (k)));
 				return;
 			}
 
@@ -407,31 +412,31 @@ namespace Terminal.Gui {
 					} else {
 						// Unfortunately there are no way to differentiate Ctrl+Alt+alfa and Ctrl+Shift+Alt+alfa.
 						if (((Key)wch2 & Key.CtrlMask) != 0) {
-							keyModifiers.Ctrl = true;
+							_keyModifiers.Ctrl = true;
 						}
 						if (wch2 == 0) {
 							k = Key.CtrlMask | Key.AltMask | Key.Space;
 						} else if (wch >= (uint)Key.A && wch <= (uint)Key.Z) {
-							keyModifiers.Shift = true;
-							keyModifiers.Alt = true;
+							_keyModifiers.Shift = true;
+							_keyModifiers.Alt = true;
 						} else if (wch2 < 256) {
 							k = (Key)wch2;
-							keyModifiers.Alt = true;
+							_keyModifiers.Alt = true;
 						} else {
 							k = (Key)((uint)(Key.AltMask | Key.CtrlMask) + wch2);
 						}
 					}
 					key = new KeyEvent (k, MapKeyModifiers (k));
-					keyDownHandler (key);
-					keyHandler (key);
+					_keyDownHandler (key);
+					_keyHandler (key);
 				} else {
 					k = Key.Esc;
-					keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
+					_keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
 				}
 			} else if (wch == Curses.KeyTab) {
 				k = MapCursesKey (wch);
-				keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
-				keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
+				_keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
+				_keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
 			} else {
 				// Unfortunately there are no way to differentiate Ctrl+alfa and Ctrl+Shift+alfa.
 				k = (Key)wch;
@@ -442,11 +447,11 @@ namespace Terminal.Gui {
 						k = Key.CtrlMask | (Key)(wch + 64);
 					}
 				} else if (wch >= (uint)Key.A && wch <= (uint)Key.Z) {
-					keyModifiers.Shift = true;
+					_keyModifiers.Shift = true;
 				}
-				keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
-				keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
-				keyUpHandler (new KeyEvent (k, MapKeyModifiers (k)));
+				_keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
+				_keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
+				_keyUpHandler (new KeyEvent (k, MapKeyModifiers (k)));
 			}
 			// Cause OnKeyUp and OnKeyPressed. Note that the special handling for ESC above 
 			// will not impact KeyUp.
@@ -480,8 +485,8 @@ namespace Terminal.Gui {
 						k = ConsoleKeyMapping.MapConsoleKeyToKey (consoleKeyInfo.Key, out _);
 						k = ConsoleKeyMapping.MapKeyModifiers (consoleKeyInfo, k);
 						key = new KeyEvent (k, MapKeyModifiers (k));
-						keyDownHandler (key);
-						keyHandler (key);
+						_keyDownHandler (key);
+						_keyHandler (key);
 					}
 				} else {
 					cki = EscSeqUtils.ResizeArray (consoleKeyInfo, cki);
@@ -496,7 +501,7 @@ namespace Terminal.Gui {
 				X = pos.X,
 				Y = pos.Y
 			};
-			mouseHandler (me);
+			_mouseHandler (me);
 		}
 
 		void ProcessContinuousButtonPressed (MouseFlags mouseFlag, Point pos)
@@ -504,19 +509,19 @@ namespace Terminal.Gui {
 			ProcessMouseEvent (mouseFlag, pos);
 		}
 
-		Action<KeyEvent> keyHandler;
-		Action<KeyEvent> keyDownHandler;
-		Action<KeyEvent> keyUpHandler;
-		Action<MouseEvent> mouseHandler;
+		Action<KeyEvent> _keyHandler;
+		Action<KeyEvent> _keyDownHandler;
+		Action<KeyEvent> _keyUpHandler;
+		Action<MouseEvent> _mouseHandler;
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			// Note: Curses doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
 			Curses.timeout (0);
-			this.keyHandler = keyHandler;
-			this.keyDownHandler = keyDownHandler;
-			this.keyUpHandler = keyUpHandler;
-			this.mouseHandler = mouseHandler;
+			this._keyHandler = keyHandler;
+			this._keyDownHandler = keyDownHandler;
+			this._keyUpHandler = keyUpHandler;
+			this._mouseHandler = mouseHandler;
 
 			var mLoop = mainLoop.Driver as UnixMainLoop;
 
@@ -532,11 +537,12 @@ namespace Terminal.Gui {
 
 		public override void Init (Action terminalResized)
 		{
-			if (window != null)
+			if (_window != null) {
 				return;
+			}
 
 			try {
-				window = Curses.initscr ();
+				_window = Curses.initscr ();
 				Curses.set_escdelay (10);
 			} catch (Exception e) {
 				throw new Exception ($"Curses failed to initialize, the exception is: {e.Message}");
@@ -550,31 +556,31 @@ namespace Terminal.Gui {
 			//
 			switch (Curses.curs_set (0)) {
 			case 0:
-				currentCursorVisibility = initialCursorVisibility = CursorVisibility.Invisible;
+				_currentCursorVisibility = _initialCursorVisibility = CursorVisibility.Invisible;
 				break;
 
 			case 1:
-				currentCursorVisibility = initialCursorVisibility = CursorVisibility.Underline;
+				_currentCursorVisibility = _initialCursorVisibility = CursorVisibility.Underline;
 				Curses.curs_set (1);
 				break;
 
 			case 2:
-				currentCursorVisibility = initialCursorVisibility = CursorVisibility.Box;
+				_currentCursorVisibility = _initialCursorVisibility = CursorVisibility.Box;
 				Curses.curs_set (2);
 				break;
 
 			default:
-				currentCursorVisibility = initialCursorVisibility = null;
+				_currentCursorVisibility = _initialCursorVisibility = null;
 				break;
 			}
 
 			if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
-				clipboard = new MacOSXClipboard ();
+				_clipboard = new MacOSXClipboard ();
 			} else {
 				if (Is_WSL_Platform ()) {
-					clipboard = new WSLClipboard ();
+					_clipboard = new WSLClipboard ();
 				} else {
-					clipboard = new CursesClipboard ();
+					_clipboard = new CursesClipboard ();
 				}
 			}
 
@@ -631,21 +637,21 @@ namespace Terminal.Gui {
 
 		public override void ResizeScreen ()
 		{
-			Clip = new Rect (0, 0, Cols, Rows);
+			ClearClipRegion ();
 			Curses.refresh ();
 		}
 
 		public override void UpdateOffScreen ()
 		{
-			contents = new int [Rows, Cols, 3];
+			_contents = new int [Rows, Cols, 3];
 			for (int row = 0; row < Rows; row++) {
 				for (int col = 0; col < Cols; col++) {
 					//Curses.move (row, col);
 					//Curses.attrset (Colors.TopLevel.Normal);
 					//Curses.addch ((int)(uint)' ');
-					contents [row, col, 0] = ' ';
-					contents [row, col, 1] = Colors.TopLevel.Normal;
-					contents [row, col, 2] = 0;
+					_contents [row, col, 0] = ' ';
+					_contents [row, col, 1] = Colors.TopLevel.Normal;
+					_contents [row, col, 2] = 0;
 				}
 			}
 		}
@@ -791,10 +797,10 @@ namespace Terminal.Gui {
 		{
 			visibility = CursorVisibility.Invisible;
 
-			if (!currentCursorVisibility.HasValue)
+			if (!_currentCursorVisibility.HasValue)
 				return false;
 
-			visibility = currentCursorVisibility.Value;
+			visibility = _currentCursorVisibility.Value;
 
 			return true;
 		}
@@ -802,8 +808,9 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool SetCursorVisibility (CursorVisibility visibility)
 		{
-			if (initialCursorVisibility.HasValue == false)
+			if (_initialCursorVisibility.HasValue == false) {
 				return false;
+			}
 
 			Curses.curs_set (((int)visibility >> 16) & 0x000000FF);
 
@@ -811,7 +818,7 @@ namespace Terminal.Gui {
 				Console.Out.Write ("\x1b[{0} q", ((int)visibility >> 24) & 0xFF);
 			}
 
-			currentCursorVisibility = visibility;
+			_currentCursorVisibility = visibility;
 
 			return true;
 		}
@@ -861,9 +868,9 @@ namespace Terminal.Gui {
 				key |= Key.CtrlMask;
 				km.Ctrl = control;
 			}
-			keyDownHandler (new KeyEvent (key, km));
-			keyHandler (new KeyEvent (key, km));
-			keyUpHandler (new KeyEvent (key, km));
+			_keyDownHandler (new KeyEvent (key, km));
+			_keyHandler (new KeyEvent (key, km));
+			_keyUpHandler (new KeyEvent (key, km));
 		}
 
 		public override bool GetColors (int value, out Color foreground, out Color background)
@@ -895,18 +902,19 @@ namespace Terminal.Gui {
 		[DllImport ("libc")]
 		static extern int killpg (int pgrp, int pid);
 
-		static int suspendSignal;
+		static int _suspendSignal;
 
 		static int GetSuspendSignal ()
 		{
-			if (suspendSignal != 0)
-				return suspendSignal;
+			if (_suspendSignal != 0) {
+				return _suspendSignal;
+			}
 
 			IntPtr buf = Marshal.AllocHGlobal (8192);
 			if (uname (buf) != 0) {
 				Marshal.FreeHGlobal (buf);
-				suspendSignal = -1;
-				return suspendSignal;
+				_suspendSignal = -1;
+				return _suspendSignal;
 			}
 			try {
 				switch (Marshal.PtrToStringAnsi (buf)) {
@@ -915,21 +923,21 @@ namespace Terminal.Gui {
 				case "FreeBSD":
 				case "NetBSD":
 				case "OpenBSD":
-					suspendSignal = 18;
+					_suspendSignal = 18;
 					break;
 				case "Linux":
 					// TODO: should fetch the machine name and
 					// if it is MIPS return 24
-					suspendSignal = 20;
+					_suspendSignal = 20;
 					break;
 				case "Solaris":
-					suspendSignal = 24;
+					_suspendSignal = 24;
 					break;
 				default:
-					suspendSignal = -1;
+					_suspendSignal = -1;
 					break;
 				}
-				return suspendSignal;
+				return _suspendSignal;
 			} finally {
 				Marshal.FreeHGlobal (buf);
 			}
@@ -942,8 +950,9 @@ namespace Terminal.Gui {
 		static public bool Suspend ()
 		{
 			int signal = GetSuspendSignal ();
-			if (signal == -1)
+			if (signal == -1) {
 				return false;
+			}
 			killpg (0, signal);
 			return true;
 		}
@@ -962,7 +971,7 @@ namespace Terminal.Gui {
 			IsSupported = CheckSupport ();
 		}
 
-		string xclipPath = string.Empty;
+		string _xclipPath = string.Empty;
 		public override bool IsSupported { get; }
 
 		bool CheckSupport ()
@@ -971,7 +980,7 @@ namespace Terminal.Gui {
 			try {
 				var (exitCode, result) = ClipboardProcessRunner.Bash ("which xclip", waitForOutput: true);
 				if (exitCode == 0 && result.FileExists ()) {
-					xclipPath = result;
+					_xclipPath = result;
 					return true;
 				}
 			} catch (Exception) {
@@ -987,7 +996,7 @@ namespace Terminal.Gui {
 			var xclipargs = "-selection clipboard -o";
 
 			try {
-				var (exitCode, result) = ClipboardProcessRunner.Bash ($"{xclipPath} {xclipargs} > {tempFileName}", waitForOutput: false);
+				var (exitCode, result) = ClipboardProcessRunner.Bash ($"{_xclipPath} {xclipargs} > {tempFileName}", waitForOutput: false);
 				if (exitCode == 0) {
 					if (Application.Driver is CursesDriver) {
 						Curses.raw ();
@@ -996,7 +1005,7 @@ namespace Terminal.Gui {
 					return System.IO.File.ReadAllText (tempFileName);
 				}
 			} catch (Exception e) {
-				throw new NotSupportedException ($"\"{xclipPath} {xclipargs}\" failed.", e);
+				throw new NotSupportedException ($"\"{_xclipPath} {xclipargs}\" failed.", e);
 			} finally {
 				System.IO.File.Delete (tempFileName);
 			}
@@ -1007,13 +1016,13 @@ namespace Terminal.Gui {
 		{
 			var xclipargs = "-selection clipboard -i";
 			try {
-				var (exitCode, _) = ClipboardProcessRunner.Bash ($"{xclipPath} {xclipargs}", text, waitForOutput: false);
+				var (exitCode, _) = ClipboardProcessRunner.Bash ($"{_xclipPath} {xclipargs}", text, waitForOutput: false);
 				if (exitCode == 0 && Application.Driver is CursesDriver) {
 					Curses.raw ();
 					Curses.noecho ();
 				}
 			} catch (Exception e) {
-				throw new NotSupportedException ($"\"{xclipPath} {xclipargs} < {text}\" failed", e);
+				throw new NotSupportedException ($"\"{_xclipPath} {xclipargs} < {text}\" failed", e);
 			}
 		}
 	}
@@ -1025,24 +1034,24 @@ namespace Terminal.Gui {
 	///  is used to determine if copy/paste is supported.
 	/// </summary>	
 	class MacOSXClipboard : ClipboardBase {
-		IntPtr nsString = objc_getClass ("NSString");
-		IntPtr nsPasteboard = objc_getClass ("NSPasteboard");
-		IntPtr utfTextType;
-		IntPtr generalPasteboard;
-		IntPtr initWithUtf8Register = sel_registerName ("initWithUTF8String:");
-		IntPtr allocRegister = sel_registerName ("alloc");
-		IntPtr setStringRegister = sel_registerName ("setString:forType:");
-		IntPtr stringForTypeRegister = sel_registerName ("stringForType:");
-		IntPtr utf8Register = sel_registerName ("UTF8String");
-		IntPtr nsStringPboardType;
-		IntPtr generalPasteboardRegister = sel_registerName ("generalPasteboard");
-		IntPtr clearContentsRegister = sel_registerName ("clearContents");
+		IntPtr _nsString = objc_getClass ("NSString");
+		IntPtr _nsPasteboard = objc_getClass ("NSPasteboard");
+		IntPtr _utfTextType;
+		IntPtr _generalPasteboard;
+		IntPtr _initWithUtf8Register = sel_registerName ("initWithUTF8String:");
+		IntPtr _allocRegister = sel_registerName ("alloc");
+		IntPtr _setStringRegister = sel_registerName ("setString:forType:");
+		IntPtr _stringForTypeRegister = sel_registerName ("stringForType:");
+		IntPtr _utf8Register = sel_registerName ("UTF8String");
+		IntPtr _nsStringPboardType;
+		IntPtr _generalPasteboardRegister = sel_registerName ("generalPasteboard");
+		IntPtr _clearContentsRegister = sel_registerName ("clearContents");
 
 		public MacOSXClipboard ()
 		{
-			utfTextType = objc_msgSend (objc_msgSend (nsString, allocRegister), initWithUtf8Register, "public.utf8-plain-text");
-			nsStringPboardType = objc_msgSend (objc_msgSend (nsString, allocRegister), initWithUtf8Register, "NSStringPboardType");
-			generalPasteboard = objc_msgSend (nsPasteboard, generalPasteboardRegister);
+			_utfTextType = objc_msgSend (objc_msgSend (_nsString, _allocRegister), _initWithUtf8Register, "public.utf8-plain-text");
+			_nsStringPboardType = objc_msgSend (objc_msgSend (_nsString, _allocRegister), _initWithUtf8Register, "NSStringPboardType");
+			_generalPasteboard = objc_msgSend (_nsPasteboard, _generalPasteboardRegister);
 			IsSupported = CheckSupport ();
 		}
 
@@ -1060,8 +1069,8 @@ namespace Terminal.Gui {
 
 		protected override string GetClipboardDataImpl ()
 		{
-			var ptr = objc_msgSend (generalPasteboard, stringForTypeRegister, nsStringPboardType);
-			var charArray = objc_msgSend (ptr, utf8Register);
+			var ptr = objc_msgSend (_generalPasteboard, _stringForTypeRegister, _nsStringPboardType);
+			var charArray = objc_msgSend (ptr, _utf8Register);
 			return Marshal.PtrToStringAnsi (charArray);
 		}
 
@@ -1069,9 +1078,9 @@ namespace Terminal.Gui {
 		{
 			IntPtr str = default;
 			try {
-				str = objc_msgSend (objc_msgSend (nsString, allocRegister), initWithUtf8Register, text);
-				objc_msgSend (generalPasteboard, clearContentsRegister);
-				objc_msgSend (generalPasteboard, setStringRegister, str, utfTextType);
+				str = objc_msgSend (objc_msgSend (_nsString, _allocRegister), _initWithUtf8Register, text);
+				objc_msgSend (_generalPasteboard, _clearContentsRegister);
+				objc_msgSend (_generalPasteboard, _setStringRegister, str, _utfTextType);
 			} finally {
 				if (str != default) {
 					objc_msgSend (str, sel_registerName ("release"));
@@ -1105,23 +1114,21 @@ namespace Terminal.Gui {
 	///  clipboard. 
 	/// </summary>
 	class WSLClipboard : ClipboardBase {
-		bool isSupported = false;
 		public WSLClipboard ()
 		{
-			isSupported = CheckSupport ();
 		}
 
 		public override bool IsSupported {
 			get {
-				return isSupported = CheckSupport ();
+				return CheckSupport ();
 			}
 		}
 
-		private static string powershellPath = string.Empty;
+		private static string _powershellPath = string.Empty;
 
 		bool CheckSupport ()
 		{
-			if (string.IsNullOrEmpty (powershellPath)) {
+			if (string.IsNullOrEmpty (_powershellPath)) {
 				// Specify pwsh.exe (not pwsh) to ensure we get the Windows version (invoked via WSL)
 				var (exitCode, result) = ClipboardProcessRunner.Bash ("which pwsh.exe", waitForOutput: true);
 				if (exitCode > 0) {
@@ -1129,10 +1136,10 @@ namespace Terminal.Gui {
 				}
 
 				if (exitCode == 0) {
-					powershellPath = result;
+					_powershellPath = result;
 				}
 			}
-			return !string.IsNullOrEmpty (powershellPath);
+			return !string.IsNullOrEmpty (_powershellPath);
 		}
 
 		protected override string GetClipboardDataImpl ()
@@ -1141,7 +1148,7 @@ namespace Terminal.Gui {
 				return string.Empty;
 			}
 
-			var (exitCode, output) = ClipboardProcessRunner.Process (powershellPath, "-noprofile -command \"Get-Clipboard\"");
+			var (exitCode, output) = ClipboardProcessRunner.Process (_powershellPath, "-noprofile -command \"Get-Clipboard\"");
 			if (exitCode == 0) {
 				if (Application.Driver is CursesDriver) {
 					Curses.raw ();
@@ -1162,7 +1169,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var (exitCode, output) = ClipboardProcessRunner.Process (powershellPath, $"-noprofile -command \"Set-Clipboard -Value \\\"{text}\\\"\"");
+			var (exitCode, output) = ClipboardProcessRunner.Process (_powershellPath, $"-noprofile -command \"Set-Clipboard -Value \\\"{text}\\\"\"");
 			if (exitCode == 0) {
 				if (Application.Driver is CursesDriver) {
 					Curses.raw ();

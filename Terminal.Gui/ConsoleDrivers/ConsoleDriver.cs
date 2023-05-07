@@ -4,14 +4,11 @@
 using NStack;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Terminal.Gui;
-using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -347,13 +344,13 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Creates a new instance.
 		/// </summary>
-		public ColorScheme() { }
+		public ColorScheme () { }
 
 		/// <summary>
 		/// Creates a new instance, initialized with the values from <paramref name="scheme"/>.
 		/// </summary>
 		/// <param name="scheme">The scheme to initlize the new instance with.</param>
-		public ColorScheme (ColorScheme scheme) : base()
+		public ColorScheme (ColorScheme scheme) : base ()
 		{
 			if (scheme != null) {
 				_normal = scheme.Normal;
@@ -617,8 +614,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Provides the defined <see cref="ColorScheme"/>s.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof(ThemeScope), OmitClassName = true)]
-		[JsonConverter(typeof(DictionaryJsonConverter<ColorScheme>))]
+		[SerializableConfigurationProperty (Scope = typeof (ThemeScope), OmitClassName = true)]
+		[JsonConverter (typeof (DictionaryJsonConverter<ColorScheme>))]
 		public static Dictionary<string, ColorScheme> ColorSchemes { get; private set; }
 	}
 
@@ -679,7 +676,7 @@ namespace Terminal.Gui {
 		/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Block"/></remarks>
 		BoxFix = 0x02020164,
 	}
-	
+
 	/// <summary>
 	/// ConsoleDriver is an abstract class that defines the requirements for a console driver.  
 	/// There are currently three implementations: <see cref="CursesDriver"/> (for Unix and Mac), <see cref="WindowsDriver"/>, and <see cref="NetDriver"/> that uses the .NET Console API.
@@ -774,14 +771,18 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Ensures that the column and line are in a valid range from the size of the driver.
+		/// Tests whether the specified coordinate are valid for drawing. Returns <see langword="false"/>
+		/// if the coordinate is outside of the screen bounds or outside either <see cref="Clip"/> or
+		/// <see cref="ClipRegion"/>.
 		/// </summary>
 		/// <param name="col">The column.</param>
 		/// <param name="row">The row.</param>
-		/// <param name="clip">The clip.</param>
 		/// <returns><c>true</c>if it's a valid range,<c>false</c>otherwise.</returns>
-		public bool IsValidContent (int col, int row, Rect clip) =>
-			col >= 0 && row >= 0 && col < Cols && row < Rows && clip.Contains (col, row);
+		public bool IsValidLocation (int col, int row) =>
+			col >= 0 && row >= 0 &&
+			col < Cols && row < Rows &&
+			Clip.Contains (col, row) &&
+			IsInClipRegion (row, col);
 
 		/// <summary>
 		/// Adds the <paramref name="str"/> to the display at the cursor position.
@@ -968,16 +969,71 @@ namespace Terminal.Gui {
 		/// </summary>
 		public abstract void Suspend ();
 
-		Rect clip;
+		/// <summary>
+		/// Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(ustring)"/> are 
+		/// subject to. Setting this property is equivalent to calling <see cref="ClearClipRegion()"/>
+		/// and <see cref="AddToClipRegion(Rect)"/>.
+		/// </summary>
+		/// <value>The rectangle describing the bounds of <see cref="ClipRegion"/>.</value>
+		public Rect Clip {
+			get {
+				if (ClipRegion.Count == 0) {
+					return new Rect (0, 0, Cols, Rows);
+				}
+
+				int minX = ClipRegion.Min (rect => rect.X);
+				int minY = ClipRegion.Min (rect => rect.Y);
+				int maxX = ClipRegion.Max (rect => rect.X + rect.Width);
+				int maxY = ClipRegion.Max (rect => rect.Y + rect.Height);
+
+				return new Rect (minX, minY, maxX - minX, maxY - minY);
+			}
+			set {
+				ClearClipRegion ();
+				AddToClipRegion (value);
+			}
+		}
+
+		List<Rect> _clipRegion = new List<Rect> ();
 
 		/// <summary>
-		/// Controls the current clipping region that AddRune/AddStr is subject to.
+		/// The clipping region that <see cref="AddRune(Rune)"/> and <see cref="AddStr(ustring)"/> are 
+		/// subject to.
 		/// </summary>
 		/// <value>The clip.</value>
-		public Rect Clip {
-			get => clip;
-			set => this.clip = value;
+		public List<Rect> ClipRegion {
+			get => _clipRegion;
+			set => _clipRegion = value;
 		}
+
+		/// <summary>
+		/// Expands <see cref="ClipRegion"/> to include <paramref name="rect"/>.
+		/// </summary>
+		/// <param name="rect"></param>
+		/// <returns>The updated <see cref="ClipRegion"/>.</returns>
+		public List<Rect> AddToClipRegion (Rect rect)
+		{
+			ClipRegion.Add (rect);
+			return ClipRegion;
+		}
+
+		/// <summary>
+		/// Clears the <see cref="ClipRegion"/>. This has the same effect as expanding the clip
+		/// region to include the entire screen.
+		/// </summary>
+		public void ClearClipRegion ()
+		{
+			ClipRegion.Clear ();
+		}
+
+		/// <summary>
+		/// Tests if the specified coordinates are within the <see cref="ClipRegion"/>.
+		/// </summary>
+		/// <param name="col"></param>
+		/// <param name="row"></param>
+		/// <returns><see langword="true"/> if <paramref name="col"/> and <paramref name="col"/> is
+		/// within the clip region.</returns>
+		private bool IsInClipRegion (int col, int row) => ClipRegion.Any (rect => rect.Contains (row, col));
 
 		/// <summary>
 		/// Start of mouse moves.
