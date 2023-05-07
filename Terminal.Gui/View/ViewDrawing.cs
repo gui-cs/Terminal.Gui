@@ -312,8 +312,8 @@ namespace Terminal.Gui {
 			// TODO: Figure out what we should do if we have no superview
 			//if (SuperView != null) {
 			// TODO: Clipping is disabled for now to ensure we see errors
-			Driver.Clip = new Rect (0, 0, Driver.Cols, Driver.Rows);// screenBounds;// SuperView.ClipToBounds ();
-										//}
+			Driver.ClearClipRegion ();// screenBounds;// SuperView.ClipToBounds ();
+						  //}
 
 			// Each of these renders lines to either this View's LineCanvas 
 			// Those lines will be finally rendered in OnRenderLineCanvas

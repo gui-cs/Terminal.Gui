@@ -781,7 +781,6 @@ namespace Terminal.Gui {
 		public bool IsValidLocation (int col, int row) =>
 			col >= 0 && row >= 0 &&
 			col < Cols && row < Rows &&
-			Clip.Contains (col, row) &&
 			IsInClipRegion (row, col);
 
 		/// <summary>
@@ -998,7 +997,8 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// The clipping region that <see cref="AddRune(Rune)"/> and <see cref="AddStr(ustring)"/> are 
-		/// subject to.
+		/// subject to. The clip region is an irregularly shaped area defined by the intersection of a set
+		/// of rectangles added with <see cref="AddToClipRegion(Rect)"/>. To clear the clip region call <see cref="ClearClipRegion"/>.
 		/// </summary>
 		/// <value>The clip.</value>
 		public List<Rect> ClipRegion {
@@ -1033,7 +1033,7 @@ namespace Terminal.Gui {
 		/// <param name="row"></param>
 		/// <returns><see langword="true"/> if <paramref name="col"/> and <paramref name="col"/> is
 		/// within the clip region.</returns>
-		private bool IsInClipRegion (int col, int row) => ClipRegion.Any (rect => rect.Contains (row, col));
+		private bool IsInClipRegion (int col, int row) => ClipRegion.Count == 0 || ClipRegion.Any (rect => rect.Contains (row, col));
 
 		/// <summary>
 		/// Start of mouse moves.
