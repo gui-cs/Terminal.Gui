@@ -206,7 +206,7 @@ namespace Terminal.Gui {
 				}
 				var rl = radioLabels [i];
 				Driver.SetAttribute (GetNormalColor ());
-				Driver.AddStr (ustring.Make (new Rune [] { i == selected ? Driver.Selected : Driver.UnSelected, ' ' }));
+				Driver.AddStr (ustring.Make (new Rune [] { i == selected ? CM.Glyphs.Selected : CM.Glyphs.UnSelected, ' ' }));
 				TextFormatter.FindHotKey (rl, HotKeySpecifier, true, out int hotPos, out Key hotKey);
 				if (hotPos != -1 && (hotKey != Key.Null || hotKey != Key.Unknown)) {
 					var rlRunes = rl.ToRunes ();

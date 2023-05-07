@@ -67,13 +67,13 @@ namespace Terminal.Gui.TextTests {
 			Application.Begin (dg);
 			((FakeDriver)Application.Driver).SetBufferSize (30, 10);
 
-			var expected = @"
+			var expected = @$"
 ┌────────────────────────────┐
 │これは広いルーンラインです。│
 │これは広いルーンラインです。│
 │これは ┌────────────┐ です。│
 │これは │ワイドルーン│ です。│
-│これは │  [ 選ぶ ]  │ です。│
+│これは │  {CM.Glyphs.LeftBracket} 選ぶ {CM.Glyphs.RightBracket}  │ です。│
 │これは └────────────┘ です。│
 │これは広いルーンラインです。│
 │これは広いルーンラインです。│

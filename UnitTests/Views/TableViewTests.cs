@@ -42,6 +42,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void EnsureValidScrollOffsets_LoadSmallerTable ()
 		{
 			var tableView = new TableView ();
+			tableView.BeginInit (); tableView.EndInit ();
 			tableView.Bounds = new Rect (0, 0, 25, 10);
 
 			Assert.Equal (0, tableView.RowOffset);

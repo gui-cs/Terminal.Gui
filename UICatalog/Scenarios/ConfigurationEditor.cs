@@ -61,7 +61,7 @@ namespace UICatalog.Scenarios {
 
 			Application.Top.Add (statusBar);
 
-			Open ();
+			Application.Top.Loaded += (s, a) => Open ();
 
 			ConfigurationEditor._editorColorSchemeChanged += () => {
 				foreach (var t in _tileView.Tiles) {
@@ -80,7 +80,7 @@ namespace UICatalog.Scenarios {
 
 			internal ConfigTextView ()
 			{
-				ContentsChanged += (s,obj) => {
+				ContentsChanged += (s, obj) => {
 					if (IsDirty) {
 						if (!Tile.Title.EndsWith ('*')) {
 							Tile.Title += '*';
@@ -132,7 +132,7 @@ namespace UICatalog.Scenarios {
 				writer.Write (Text.ToString ());
 				writer.Close ();
 				Tile.Title = Tile.Title.TrimEnd ('*');
-				//IsDirty = false;
+				IsDirty = false;
 			}
 		}
 
@@ -163,26 +163,13 @@ namespace UICatalog.Scenarios {
 
 				textView.Read ();
 
-				textView.Enter += (s,e) => {
+				textView.Enter += (s, e) => {
 					_lenStatusItem.Title = $"Len:{textView.Text.Length}";
 				};
 
-				//var mi = new MenuItem () {
-				//	Title = tile.Title,
-				//	CheckType = MenuItemCheckStyle.Checked,
-				//	Checked = true,
-				//};
-				//mi.Action += () => {
-				//	mi.Checked =! mi.Checked;
-				//	_tileView.SetNeedsDisplay ();
-				//};
-
-				//subMenu.Children = subMenu.Children.Append (mi).ToArray ();
 			}
 
-			//var menu = new MenuBar (new MenuBarItem [] { subMenu });
-			//Application.Top.Add (menu);
-
+			Application.Top.LayoutSubviews ();
 		}
 
 		private void Reload ()

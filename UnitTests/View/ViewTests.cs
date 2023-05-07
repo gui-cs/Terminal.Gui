@@ -1430,11 +1430,11 @@ At 0,0
 				frame.Frame.Right, frame.Frame.Bottom));
 			Assert.Equal (new Rect (0, 0, 38, 1), label.Frame);
 			Assert.Equal (new Rect (12, 2, 13, 1), button.Frame);
-			var expected = @"
+			var expected = @$"
                     ┌──────────────────────────────────────┐
                     │    This should be the first line.    │
                     │                                      │
-                    │            [ Press me! ]             │
+                    │            {CM.Glyphs.LeftBracket} Press me! {CM.Glyphs.RightBracket}             │
                     │                                      │
                     │                                      │
                     │                                      │

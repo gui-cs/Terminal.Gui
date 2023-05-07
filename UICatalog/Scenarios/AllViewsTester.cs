@@ -244,8 +244,6 @@ namespace UICatalog.Scenarios {
 
 			Application.Top.Add (_leftPane, _settingsPane, _hostPane);
 
-			Application.Top.LayoutSubviews ();
-
 			_curView = CreateClass (_viewClasses.First ().Value);
 		}
 
@@ -417,8 +415,6 @@ namespace UICatalog.Scenarios {
 
 			// Add
 			_hostPane.Add (view);
-			//DimPosChanged ();
-			_hostPane.LayoutSubviews ();
 			_hostPane.Clear ();
 			_hostPane.SetNeedsDisplay ();
 			UpdateSettings (view);

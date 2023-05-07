@@ -358,23 +358,23 @@ namespace Terminal.Gui {
 
 			for (int c = 0; c < availableWidth; c++) {
 
-				var rune = Driver.HLine;
+				var rune = CM.Glyphs.HLine;
 
 				if (Style.ShowVerticalHeaderLines) {
 
 					if (c == 0) {
-						rune = Driver.ULCorner;
+						rune = CM.Glyphs.ULCorner;
 					}
 					// if the next column is the start of a header
 					else if (columnsToRender.Any (r => r.X == c + 1)) {
-						rune = Driver.TopTee;
+						rune = CM.Glyphs.TopTee;
 					} else if (c == availableWidth - 1) {
-						rune = Driver.URCorner;
+						rune = CM.Glyphs.URCorner;
 					}
 					  // if the next console column is the lastcolumns end
 					  else if (Style.ExpandLastColumn == false &&
 						columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c)) {
-						rune = Driver.TopTee;
+						rune = CM.Glyphs.TopTee;
 					}
 				}
 
@@ -391,7 +391,7 @@ namespace Terminal.Gui {
 
 			//render start of line
 			if (style.ShowVerticalHeaderLines)
-				AddRune (0, row, Driver.VLine);
+				AddRune (0, row, CM.Glyphs.VLine);
 
 			for (int i = 0; i < columnsToRender.Length; i++) {
 
@@ -413,7 +413,7 @@ namespace Terminal.Gui {
 
 			//render end of line
 			if (style.ShowVerticalHeaderLines)
-				AddRune (Bounds.Width - 1, row, Driver.VLine);
+				AddRune (Bounds.Width - 1, row, CM.Glyphs.VLine);
 		}
 
 		private void RenderHeaderUnderline (int row, int availableWidth, ColumnToRender [] columnsToRender)
@@ -456,18 +456,18 @@ namespace Terminal.Gui {
 				// Start by assuming we just draw a straight line the
 				// whole way but update to instead draw a header indicator
 				// or scroll arrow etc
-				var rune = Driver.HLine;
+				var rune = CM.Glyphs.HLine;
 
 				if (Style.ShowVerticalHeaderLines) {
 					if (c == 0) {
 						// for first character render line
-						rune = Style.ShowVerticalCellLines ? Driver.LeftTee : Driver.LLCorner;
+						rune = Style.ShowVerticalCellLines ? CM.Glyphs.LeftTee : CM.Glyphs.LLCorner;
 
 						// unless we have horizontally scrolled along
 						// in which case render an arrow, to indicate user
 						// can scroll left
 						if (Style.ShowHorizontalScrollIndicators && moreColumnsToLeft) {
-							rune = Driver.LeftArrow;
+							rune = CM.Glyphs.LeftArrow;
 							scrollLeftPoint = new Point (c, row);
 						}
 
@@ -476,17 +476,17 @@ namespace Terminal.Gui {
 					else if (columnsToRender.Any (r => r.X == c + 1)) {
 
 						/*TODO: is ┼ symbol in Driver?*/
-						rune = Style.ShowVerticalCellLines ? '┼' : Driver.BottomTee;
+						rune = Style.ShowVerticalCellLines ? CM.Glyphs.Cross : CM.Glyphs.BottomTee;
 					} else if (c == availableWidth - 1) {
 
 						// for the last character in the table
-						rune = Style.ShowVerticalCellLines ? Driver.RightTee : Driver.LRCorner;
+						rune = Style.ShowVerticalCellLines ? CM.Glyphs.RightTee : CM.Glyphs.LRCorner;
 
 						// unless there is more of the table we could horizontally
 						// scroll along to see. In which case render an arrow,
 						// to indicate user can scroll right
 						if (Style.ShowHorizontalScrollIndicators && moreColumnsToRight) {
-							rune = Driver.RightArrow;
+							rune = CM.Glyphs.RightArrow;
 							scrollRightPoint = new Point (c, row);
 						}
 
@@ -494,7 +494,7 @@ namespace Terminal.Gui {
 					  // if the next console column is the lastcolumns end
 					  else if (Style.ExpandLastColumn == false &&
 						columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c)) {
-						rune = Style.ShowVerticalCellLines ? '┼' : Driver.BottomTee;
+						rune = Style.ShowVerticalCellLines ? CM.Glyphs.Cross : CM.Glyphs.BottomTee;
 					}
 				}
 
@@ -512,24 +512,24 @@ namespace Terminal.Gui {
 
 				// Start by assuming we just draw a straight line the
 				// whole way but update to instead draw BottomTee / Corner etc
-				var rune = Driver.HLine;
+				var rune = CM.Glyphs.HLine;
 
 				if (Style.ShowVerticalCellLines) {
 					if (c == 0) {
 						// for first character render line
-						rune = Driver.LLCorner;
+						rune = CM.Glyphs.LLCorner;
 
 					} else if (columnsToRender.Any (r => r.X == c + 1)) {
 						// if the next column is the start of a header
-						rune = Driver.BottomTee;
+						rune = CM.Glyphs.BottomTee;
 					} else if (c == availableWidth - 1) {
 						// for the last character in the table
-						rune = Driver.LRCorner;
+						rune = CM.Glyphs.LRCorner;
 
 					} else if (Style.ExpandLastColumn == false &&
 						  columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c)) {
 						// if the next console column is the lastcolumns end
-						rune = Driver.BottomTee;
+						rune = CM.Glyphs.BottomTee;
 					}
 				}
 
@@ -639,8 +639,8 @@ namespace Terminal.Gui {
 				Driver.SetAttribute (rowScheme.Normal);
 
 				//render start and end of line
-				AddRune (0, row, Driver.VLine);
-				AddRune (Bounds.Width - 1, row, Driver.VLine);
+				AddRune (0, row, CM.Glyphs.VLine);
+				AddRune (Bounds.Width - 1, row, CM.Glyphs.VLine);
 			}
 
 		}
@@ -685,7 +685,7 @@ namespace Terminal.Gui {
 
 			var renderLines = isHeader ? style.ShowVerticalHeaderLines : style.ShowVerticalCellLines;
 
-			Rune symbol = renderLines ? Driver.VLine : SeparatorSymbol;
+			Rune symbol = renderLines ? CM.Glyphs.VLine : SeparatorSymbol;
 			AddRune (col, row, symbol);
 		}
 
@@ -1337,7 +1337,7 @@ namespace Terminal.Gui {
 		/// <remarks>This always calls <see cref="View.SetNeedsDisplay()"/></remarks>
 		public void Update ()
 		{
-			if (TableIsNullOrInvisible ()) {
+			if (!IsInitialized || TableIsNullOrInvisible ()) {
 				SetNeedsDisplay ();
 				return;
 			}

@@ -395,12 +395,12 @@ namespace Terminal.Gui {
 
 		private string GetForwardButtonText ()
 		{
-			return "-" + Driver.RightArrow;
+			return "-" + CM.Glyphs.RightArrow;
 		}
 
 		private string GetBackButtonText ()
 		{
-			return Driver.LeftArrow + "-";
+			return CM.Glyphs.LeftArrow + "-";
 		}
 
 		private string GetUpButtonText ()
@@ -411,8 +411,8 @@ namespace Terminal.Gui {
 		private string GetToggleSplitterText (bool isExpanded)
 		{
 			return isExpanded ?
-				new string ((char)Driver.LeftArrow, 2) :
-				new string ((char)Driver.RightArrow, 2);
+				new string ((char)CM.Glyphs.LeftArrow, 2) :
+				new string ((char)CM.Glyphs.RightArrow, 2);
 		}
 
 		private void Delete ()
@@ -672,7 +672,7 @@ namespace Terminal.Gui {
 				allowedTypeMenuBar.DrawContentComplete += (s, e) => {
 
 					allowedTypeMenuBar.Move (e.Rect.Width - 1, 0);
-					Driver.AddRune (Driver.DownArrow);
+					Driver.AddRune (CM.Glyphs.DownArrow);
 
 				};
 
