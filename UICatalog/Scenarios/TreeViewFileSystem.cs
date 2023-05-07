@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
@@ -50,10 +51,10 @@ namespace UICatalog.Scenarios {
 					Checked = true, CheckType = MenuItemCheckStyle.Checked
 						},
 					null /*separator*/,
-					miPlusMinus = new MenuItem ("_Plus Minus Symbols", "+ -", () => SetExpandableSymbols('+','-')){Checked = true, CheckType = MenuItemCheckStyle.Radio},
-					miArrowSymbols = new MenuItem ("_Arrow Symbols", "> v", () => SetExpandableSymbols('>','v')){Checked = false, CheckType = MenuItemCheckStyle.Radio},
+					miPlusMinus = new MenuItem ("_Plus Minus Symbols", "+ -", () => SetExpandableSymbols((Rune) '+',(Rune) '-')){Checked = true, CheckType = MenuItemCheckStyle.Radio},
+					miArrowSymbols = new MenuItem ("_Arrow Symbols", "> v", () => SetExpandableSymbols((Rune) '>',(Rune) 'v')){Checked = false, CheckType = MenuItemCheckStyle.Radio},
 					miNoSymbols = new MenuItem ("_No Symbols", "", () => SetExpandableSymbols(null,null)){Checked = false, CheckType = MenuItemCheckStyle.Radio},
-					miUnicodeSymbols = new MenuItem ("_Unicode", "ஹ ﷽", () => SetExpandableSymbols('ஹ','﷽')){Checked = false, CheckType = MenuItemCheckStyle.Radio},
+					miUnicodeSymbols = new MenuItem ("_Unicode", "ஹ ﷽", () => SetExpandableSymbols((Rune) 'ஹ',(Rune) '﷽')){Checked = false, CheckType = MenuItemCheckStyle.Radio},
 					null /*separator*/,
 					miColoredSymbols = new MenuItem ("_Colored Symbols", "", () => ShowColoredExpandableSymbols()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
 					miInvertSymbols = new MenuItem ("_Invert Symbols", "", () => InvertExpandableSymbols()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
@@ -255,10 +256,10 @@ namespace UICatalog.Scenarios {
 
 		private void SetExpandableSymbols (Rune? expand, Rune? collapse)
 		{
-			miPlusMinus.Checked = expand == '+';
-			miArrowSymbols.Checked = expand == '>';
+			miPlusMinus.Checked = expand == (Rune)'+';
+			miArrowSymbols.Checked = expand == (Rune)'>';
 			miNoSymbols.Checked = expand == null;
-			miUnicodeSymbols.Checked = expand == 'ஹ';
+			miUnicodeSymbols.Checked = expand == (Rune)'ஹ';
 
 			treeViewFiles.Style.ExpandableSymbol = expand;
 			treeViewFiles.Style.CollapseableSymbol = collapse;

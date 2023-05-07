@@ -1,7 +1,7 @@
 ﻿//
 // ConsoleDriver.cs: Base class for Terminal.Gui ConsoleDriver implementations.
 //
-using NStack;
+using System.Text;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -764,10 +764,10 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public static Rune MakePrintable (Rune c)
 		{
-			if (c <= 0x1F || (c >= 0X7F && c <= 0x9F)) {
+			if (c.Value <= 0x1F || (c.Value >= 0X7F && c.Value <= 0x9F)) {
 				// ASCII (C0) control characters.
 				// C1 control characters (https://www.aivosto.com/articles/control-characters.html#c1)
-				return new Rune (c + 0x2400);
+				return new Rune (c.Value + 0x2400);
 			}
 
 			return c;
@@ -787,7 +787,7 @@ namespace Terminal.Gui {
 		/// Adds the <paramref name="str"/> to the display at the cursor position.
 		/// </summary>
 		/// <param name="str">String.</param>
-		public abstract void AddStr (ustring str);
+		public abstract void AddStr (string str);
 
 		/// <summary>
 		/// Prepare the driver and set the key and mouse events handlers.
@@ -927,12 +927,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="rect"></param>
 		/// <param name="rune"></param>
-		public virtual void FillRect (Rect rect, System.Rune rune = default)
+		public virtual void FillRect (Rect rect, Rune rune = default)
 		{
 			for (var r = rect.Y; r < rect.Y + rect.Height; r++) {
 				for (var c = rect.X; c < rect.X + rect.Width; c++) {
 					Application.Driver.Move (c, r);
-					Application.Driver.AddRune (rune == default ? ' ' : rune);
+					Application.Driver.AddRune ((Rune)(rune == default ? ' ' : rune.Value));
 				}
 			}
 		}

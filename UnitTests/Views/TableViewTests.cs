@@ -9,6 +9,7 @@ using System.Globalization;
 using Xunit.Abstractions;
 using System.Reflection;
 using Terminal.Gui.ViewTests;
+using System.Text;
 
 namespace Terminal.Gui.ViewsTests {
 
@@ -154,13 +155,13 @@ namespace Terminal.Gui.ViewsTests {
 		[Fact]
 		public void Test_SumColumnWidth_UnicodeLength ()
 		{
-			Assert.Equal (11, "hello there".Sum (c => Rune.ColumnWidth (c)));
+			Assert.Equal (11, "hello there".Sum (c => ((Rune)c).ColumnWidth ()));
 
 			// Creates a string with the peculiar (french?) r symbol
 			String surrogate = "Les Mise" + Char.ConvertFromUtf32 (Int32.Parse ("0301", NumberStyles.HexNumber)) + "rables";
 
 			// The unicode width of this string is shorter than the string length! 
-			Assert.Equal (14, surrogate.Sum (c => Rune.ColumnWidth (c)));
+			Assert.Equal (14, surrogate.Sum (c => ((Rune)c).ColumnWidth ()));
 			Assert.Equal (15, surrogate.Length);
 		}
 

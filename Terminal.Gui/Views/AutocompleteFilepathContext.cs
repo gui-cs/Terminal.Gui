@@ -1,4 +1,4 @@
-using NStack;
+using System.Text;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,8 +10,8 @@ namespace Terminal.Gui {
 	internal class AutocompleteFilepathContext : AutocompleteContext {
 		public FileDialogState State { get; set; }
 
-		public AutocompleteFilepathContext (ustring currentLine, int cursorPosition, FileDialogState state)
-			: base (currentLine.ToRuneList (), cursorPosition)
+		public AutocompleteFilepathContext (string currentLine, int cursorPosition, FileDialogState state)
+			: base (currentLine.EnumerateRunes().ToList (), cursorPosition)
 		{
 			this.State = state;
 		}
@@ -30,7 +30,7 @@ namespace Terminal.Gui {
 				return Enumerable.Empty<Suggestion> ();
 			}
 
-			var path = ustring.Make (context.CurrentLine).ToString ();
+			var path = context.CurrentLine.ToString ();
 			var last = path.LastIndexOfAny (FileDialog.Separators);
 			
 			if(string.IsNullOrWhiteSpace(path) || !Path.IsPathRooted(path)) {
@@ -76,7 +76,7 @@ namespace Terminal.Gui {
 
 		public bool IsWordChar (Rune rune)
 		{
-			if (rune == '\n') {
+			if (rune.Value == '\n') {
 				return false;
 			}
 

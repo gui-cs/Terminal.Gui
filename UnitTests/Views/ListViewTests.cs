@@ -480,7 +480,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (1, lw.StartsWith ("TW"));
 			Assert.Equal (2, lw.StartsWith ("TH"));
 
-			lw = new ListWrapper (new List<NStack.ustring> { "One", "Two", "Three" });
+			lw = new ListWrapper (new List<string> { "One", "Two", "Three" });
 
 			Assert.Equal (1, lw.StartsWith ("t"));
 			Assert.Equal (1, lw.StartsWith ("tw"));

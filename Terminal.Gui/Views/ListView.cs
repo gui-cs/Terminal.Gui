@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using NStack;
+using System.Text;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -76,8 +76,8 @@ namespace Terminal.Gui {
 	/// </para>
 	/// <para>
 	///   <see cref="ListView"/> can display any object that implements the <see cref="IList"/> interface.
-	///   <see cref="string"/> values are converted into <see cref="NStack.ustring"/> values before rendering, and other values are
-	///   converted into <see cref="string"/> by calling <see cref="object.ToString"/> and then converting to <see cref="NStack.ustring"/> .
+	///   <see cref="string"/> values are converted into <see cref="string"/> values before rendering, and other values are
+	///   converted into <see cref="string"/> by calling <see cref="object.ToString"/> and then converting to <see cref="string"/> .
 	/// </para>
 	/// <para>
 	///   To change the contents of the ListView, set the <see cref="Source"/> property (when 
@@ -376,7 +376,7 @@ namespace Terminal.Gui {
 				Move (0, row);
 				if (source == null || item >= source.Count) {
 					for (int c = 0; c < f.Width; c++)
-						Driver.AddRune (' ');
+						Driver.AddRune ((Rune)' ');
 				} else {
 					var rowEventArgs = new ListViewRowEventArgs (item);
 					OnRowRender (rowEventArgs);
@@ -387,7 +387,7 @@ namespace Terminal.Gui {
 					if (allowsMarking) {
 						Driver.AddRune (source.IsMarked (item) ? (AllowsMultipleSelection ? CM.Glyphs.Checked : CM.Glyphs.Selected) :
 							(AllowsMultipleSelection ? CM.Glyphs.UnChecked : CM.Glyphs.UnSelected));
-						Driver.AddRune (' ');
+						Driver.AddRune ((Rune)' ');
 					}
 					Source.Render (this, Driver, isSelected, item, col, row, f.Width - col, start);
 				}
@@ -853,7 +853,7 @@ namespace Terminal.Gui {
 			for (int i = 0; i < src.Count; i++) {
 				var t = src [i];
 				int l;
-				if (t is ustring u) {
+				if (t is string u) {
 					l = TextFormatter.GetTextWidth (u);
 				} else if (t is string s) {
 					l = s.Length;
@@ -869,13 +869,13 @@ namespace Terminal.Gui {
 			return maxLength;
 		}
 
-		void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width, int start = 0)
+		void RenderUstr (ConsoleDriver driver, string ustr, int col, int line, int width, int start = 0)
 		{
 			var u = TextFormatter.ClipAndJustify (ustr, width, TextAlignment.Left);
 			driver.AddStr (u);
 			width -= TextFormatter.GetTextWidth (u);
 			while (width-- > 0) {
-				driver.AddRune (' ');
+				driver.AddRune ((Rune)' ');
 			}
 		}
 
@@ -885,9 +885,9 @@ namespace Terminal.Gui {
 			container.Move (col, line);
 			var t = src? [item];
 			if (t == null) {
-				RenderUstr (driver, ustring.Make (""), col, line, width);
+				RenderUstr (driver, "", col, line, width);
 			} else {
-				if (t is ustring u) {
+				if (t is string u) {
 					RenderUstr (driver, u, col, line, width, start);
 				} else if (t is string s) {
 					RenderUstr (driver, s, col, line, width, start);
@@ -927,7 +927,7 @@ namespace Terminal.Gui {
 
 			for (int i = 0; i < src.Count; i++) {
 				var t = src [i];
-				if (t is ustring u) {
+				if (t is string u) {
 					if (u.ToUpper ().StartsWith (search.ToUpperInvariant ())) {
 						return i;
 					}

@@ -1,4 +1,4 @@
-﻿using NStack;
+﻿using System.Text;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -163,11 +163,11 @@ namespace Terminal.Gui {
 			var topTitleLineY = borderBounds.Y;
 			var titleY = borderBounds.Y;
 			var titleBarsLength = 0; // the little vertical thingies
-			var maxTitleWidth = Math.Min (Parent.Title.ConsoleWidth, Math.Min (screenBounds.Width - 4, borderBounds.Width - 4));
+			var maxTitleWidth = Math.Min (Parent.Title.ConsoleWidth(), Math.Min (screenBounds.Width - 4, borderBounds.Width - 4));
 			var sideLineLength = borderBounds.Height;
 			var canDrawBorder = borderBounds.Width > 0 && borderBounds.Height > 0;
 
-			if (!ustring.IsNullOrEmpty (Parent?.Title)) {
+			if (!string.IsNullOrEmpty (Parent?.Title)) {
 				if (Thickness.Top == 2) {
 					topTitleLineY = borderBounds.Y - 1;
 					titleY = topTitleLineY + 1;
@@ -196,7 +196,7 @@ namespace Terminal.Gui {
 
 			}
 
-			if (Id == "Border" && canDrawBorder && Thickness.Top > 0 && maxTitleWidth > 0 && !ustring.IsNullOrEmpty (Parent?.Title)) {
+			if (Id == "Border" && canDrawBorder && Thickness.Top > 0 && maxTitleWidth > 0 && !string.IsNullOrEmpty (Parent?.Title)) {
 				var prevAttr = Driver.GetAttribute ();
 				if (ColorScheme != null) {
 					Driver.SetAttribute (HasFocus ? GetHotNormalColor () : GetNormalColor ());
@@ -225,7 +225,7 @@ namespace Terminal.Gui {
 				if (drawTop) {
 					// ╔╡Title╞═════╗
 					// ╔╡╞═════╗
-					if (borderBounds.Width < 4 || ustring.IsNullOrEmpty (Parent?.Title)) {
+					if (borderBounds.Width < 4 || string.IsNullOrEmpty (Parent?.Title)) {
 						// ╔╡╞╗ should be ╔══╗
 						lc.AddLine (new Point (borderBounds.Location.X, titleY), borderBounds.Width, Orientation.Horizontal, BorderStyle, Driver.GetAttribute ());
 					} else {
@@ -275,14 +275,14 @@ namespace Terminal.Gui {
 					}
 
 					// Redraw title 
-					if (drawTop && Id == "Border" && maxTitleWidth > 0 && !ustring.IsNullOrEmpty (Parent?.Title)) {
+					if (drawTop && Id == "Border" && maxTitleWidth > 0 && !string.IsNullOrEmpty (Parent?.Title)) {
 						prevAttr = Driver.GetAttribute ();
 						if (ColorScheme != null) {
 							Driver.SetAttribute (HasFocus ? GetHotNormalColor () : GetNormalColor ());
 						} else {
 							Driver.SetAttribute (Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetNormalColor ());
 						}
-						DrawTitle (new Rect (borderBounds.X, titleY, Parent.Title.ConsoleWidth, 1), Parent?.Title);
+						DrawTitle (new Rect (borderBounds.X, titleY, Parent.Title.ConsoleWidth(), 1), Parent?.Title);
 						Driver.SetAttribute (prevAttr);
 					}
 
@@ -361,13 +361,13 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="region">Screen relative region where the title will be drawn.</param>
 		/// <param name="title">The title.</param>
-		public void DrawTitle (Rect region, ustring title)
+		public void DrawTitle (Rect region, string title)
 		{
 			var width = region.Width;
-			if (!ustring.IsNullOrEmpty (title)) {
+			if (!string.IsNullOrEmpty (title)) {
 				Driver.Move (region.X + 2, region.Y);
 				//Driver.AddRune (' ');
-				var str = title.Sum (r => Math.Max (Rune.ColumnWidth (r), 1)) >= width
+				var str = title.Sum (r => Math.Max (((Rune)r).ColumnWidth (), 1)) >= width
 					? TextFormatter.Format (title, width, false, false) [0] : title;
 				Driver.AddStr (str);
 			}

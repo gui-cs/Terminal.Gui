@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using Xunit;
 using Xunit.Abstractions;
@@ -37,7 +38,7 @@ namespace Terminal.Gui.ViewsTests {
 				}
 				var ms = new System.IO.MemoryStream (buff).ToArray ();
 				_textView = new TextView () { Width = 30, Height = 10 };
-				_textView.Text = ms;
+				_textView.Text = Encoding.Unicode.GetString (ms);
 			}
 
 			public override void After (MethodInfo methodUnderTest)
@@ -1895,7 +1896,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			for (int i = lCount; i >= 0; i--) {
 				var r = line [i];
-				sumLength += Rune.ColumnWidth (r);
+				sumLength += ((Rune)r).ColumnWidth ();
 				if (r == '\t') {
 					sumLength += tabWidth + 1;
 				}
@@ -2014,7 +2015,7 @@ namespace Terminal.Gui.ViewsTests {
 				Assert.Equal (8, tv.Text.Length);
 				Assert.Equal (text, tv.Text);
 				Assert.False (tv.IsDirty);
-				Assert.Equal ('\u2400', ConsoleDriver.MakePrintable ((Rune)tv.Text [4]));
+				Assert.Equal ((Rune)'\u2400', ConsoleDriver.MakePrintable ((Rune)tv.Text [4]));
 			}
 		}
 
@@ -2200,21 +2201,21 @@ line.
 			var txt = "This is a text.";
 			var txtRunes = TextModel.ToRunes (txt);
 			Assert.Equal (txt.Length, txtRunes.Count);
-			Assert.Equal ('T', txtRunes [0]);
-			Assert.Equal ('h', txtRunes [1]);
-			Assert.Equal ('i', txtRunes [2]);
-			Assert.Equal ('s', txtRunes [3]);
-			Assert.Equal (' ', txtRunes [4]);
-			Assert.Equal ('i', txtRunes [5]);
-			Assert.Equal ('s', txtRunes [6]);
-			Assert.Equal (' ', txtRunes [7]);
-			Assert.Equal ('a', txtRunes [8]);
-			Assert.Equal (' ', txtRunes [9]);
-			Assert.Equal ('t', txtRunes [10]);
-			Assert.Equal ('e', txtRunes [11]);
-			Assert.Equal ('x', txtRunes [12]);
-			Assert.Equal ('t', txtRunes [13]);
-			Assert.Equal ('.', txtRunes [^1]);
+			Assert.Equal ('T', txtRunes [0].Value);
+			Assert.Equal ('h', txtRunes [1].Value);
+			Assert.Equal ('i', txtRunes [2].Value);
+			Assert.Equal ('s', txtRunes [3].Value);
+			Assert.Equal (' ', txtRunes [4].Value);
+			Assert.Equal ('i', txtRunes [5].Value);
+			Assert.Equal ('s', txtRunes [6].Value);
+			Assert.Equal (' ', txtRunes [7].Value);
+			Assert.Equal ('a', txtRunes [8].Value);
+			Assert.Equal (' ', txtRunes [9].Value);
+			Assert.Equal ('t', txtRunes [10].Value);
+			Assert.Equal ('e', txtRunes [11].Value);
+			Assert.Equal ('x', txtRunes [12].Value);
+			Assert.Equal ('t', txtRunes [13].Value);
+			Assert.Equal ('.', txtRunes [^1].Value);
 
 			int col = 0;
 			Assert.True (TextModel.SetCol (ref col, 80, 79));
@@ -2224,11 +2225,11 @@ line.
 			var start = 0;
 			var x = 8;
 			Assert.Equal (8, TextModel.GetColFromX (txtRunes, start, x));
-			Assert.Equal ('a', txtRunes [start + x]);
+			Assert.Equal ('a', txtRunes [start + x].Value);
 			start = 1;
 			x = 7;
 			Assert.Equal (7, TextModel.GetColFromX (txtRunes, start, x));
-			Assert.Equal ('a', txtRunes [start + x]);
+			Assert.Equal ('a', txtRunes [start + x].Value);
 
 			Assert.Equal ((15, 15), TextModel.DisplaySize (txtRunes));
 			Assert.Equal ((6, 6), TextModel.DisplaySize (txtRunes, 1, 7));

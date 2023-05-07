@@ -10,9 +10,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
-using NStack;
+using System.Text;
 using Terminal.Gui.Resources;
-using Rune = System.Rune;
+
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -25,7 +25,7 @@ namespace Terminal.Gui {
 		List<Rune> text;
 		int first, point;
 		int selectedStart = -1; // -1 represents there is no text selection.
-		ustring selectedText;
+		string selectedText;
 		HistoryText historyText = new HistoryText ();
 		CultureInfo currentCulture;
 
@@ -34,7 +34,7 @@ namespace Terminal.Gui {
 		/// been entered yet and the <see cref="View"/> does not yet have
 		/// input focus.
 		/// </summary>
-		public ustring Caption { get; set; }
+		public string Caption { get; set; }
 
 		/// <summary>
 		/// Gets or sets the foreground <see cref="Color"/> to use when 
@@ -64,15 +64,9 @@ namespace Terminal.Gui {
 		///   This event is raised when the <see cref="Text"/> changes. 
 		/// </remarks>
 		/// <remarks>
-		///   The passed <see cref="EventArgs"/> is a <see cref="NStack.ustring"/> containing the old value. 
+		///   The passed <see cref="EventArgs"/> is a <see cref="string"/> containing the old value. 
 		/// </remarks>
 		public event EventHandler<TextChangedEventArgs> TextChanged;
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Computed"/> positioning.
-		/// </summary>
-		/// <param name="text">Initial text contents.</param>
-		public TextField (string text) : this (ustring.Make (text)) { }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Computed"/> positioning.
@@ -83,9 +77,9 @@ namespace Terminal.Gui {
 		/// Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Computed"/> positioning.
 		/// </summary>
 		/// <param name="text">Initial text contents.</param>
-		public TextField (ustring text) : base (text)
+		public TextField (string text) : base (text)
 		{
-			Initialize (text, text.RuneCount + 1);
+			Initialize (text, text.RuneCount() + 1);
 		}
 
 		/// <summary>
@@ -95,12 +89,12 @@ namespace Terminal.Gui {
 		/// <param name="y">The y coordinate.</param>
 		/// <param name="w">The width.</param>
 		/// <param name="text">Initial text contents.</param>
-		public TextField (int x, int y, int w, ustring text) : base (new Rect (x, y, w, 1))
+		public TextField (int x, int y, int w, string text) : base (new Rect (x, y, w, 1))
 		{
 			Initialize (text, w);
 		}
 
-		void Initialize (ustring text, int w)
+		void Initialize (string text, int w)
 		{
 			Height = 1;
 
@@ -108,7 +102,7 @@ namespace Terminal.Gui {
 				text = "";
 
 			this.text = TextModel.ToRunes (text.Split ("\n") [0]);
-			point = text.RuneCount;
+			point = text.RuneCount();
 			first = point > w + 1 ? point - w + 1 : 0;
 			CanFocus = true;
 			Used = true;
@@ -251,7 +245,7 @@ namespace Terminal.Gui {
 			if (obj == null)
 				return;
 
-			Text = ustring.Make (obj?.Lines [obj.CursorPosition.Y]);
+			Text = StringExtensions.Make (obj?.Lines [obj.CursorPosition.Y]);
 			CursorPosition = obj.CursorPosition.X;
 			Adjust ();
 		}
@@ -308,13 +302,13 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
-		public new ustring Text {
+		public new string Text {
 			get {
-				return ustring.Make (text);
+				return StringExtensions.Make (text);
 			}
 
 			set {
-				var oldText = ustring.Make (text);
+				var oldText = StringExtensions.Make (text);
 
 				if (oldText == value)
 					return;
@@ -403,7 +397,7 @@ namespace Terminal.Gui {
 			for (int idx = first < 0 ? 0 : first; idx < text.Count; idx++) {
 				if (idx == point)
 					break;
-				var cols = Rune.ColumnWidth (text [idx]);
+				var cols = text [idx].ColumnWidth ();
 				TextModel.SetCol (ref col, Frame.Width - 1, cols);
 			}
 			var pos = point - first + Math.Min (Frame.X, 0);
@@ -456,7 +450,7 @@ namespace Terminal.Gui {
 			var roc = GetReadOnlyColor ();
 			for (int idx = p; idx < tcount; idx++) {
 				var rune = text [idx];
-				var cols = Rune.ColumnWidth (rune);
+				var cols = ((Rune)rune).ColumnWidth();
 				if (idx == point && HasFocus && !Used && length == 0 && !ReadOnly) {
 					Driver.SetAttribute (selColor);
 				} else if (ReadOnly) {
@@ -474,14 +468,14 @@ namespace Terminal.Gui {
 				if (!TextModel.SetCol (ref col, width, cols)) {
 					break;
 				}
-				if (idx + 1 < tcount && col + Rune.ColumnWidth (text [idx + 1]) > width) {
+				if (idx + 1 < tcount && col + text[idx + 1].ColumnWidth() > width) {
 					break;
 				}
 			}
 
 			Driver.SetAttribute (ColorScheme.Focus);
 			for (int i = col; i < width; i++) {
-				Driver.AddRune (' ');
+				Driver.AddRune ((Rune)' ');
 			}
 
 			PositionCursor ();
@@ -514,8 +508,8 @@ namespace Terminal.Gui {
 			Move (0, 0);
 			var render = Caption;
 
-			if (render.ConsoleWidth > Bounds.Width) {
-				render = render.RuneSubstring (0, Bounds.Width);
+			if (render.ConsoleWidth() > Bounds.Width) {
+				render = render[..Bounds.Width];
 			}
 
 			Driver.AddStr (render);
@@ -574,7 +568,7 @@ namespace Terminal.Gui {
 
 		void SetText (List<Rune> newText)
 		{
-			Text = ustring.Make (newText);
+			Text = StringExtensions.Make (newText);
 		}
 
 		void SetText (IEnumerable<Rune> newText)
@@ -591,7 +585,7 @@ namespace Terminal.Gui {
 		void SetClipboard (IEnumerable<Rune> text)
 		{
 			if (!Secret)
-				Clipboard.Contents = ustring.Make (text.ToList ());
+				Clipboard.Contents = StringExtensions.Make (text.ToList ());
 		}
 
 		int oldCursorPos;
@@ -655,7 +649,7 @@ namespace Terminal.Gui {
 			if (!useOldCursorPos) {
 				oldCursorPos = point;
 			}
-			var kbstr = TextModel.ToRunes (ustring.Make ((uint)kb.Key));
+			var kbstr = TextModel.ToRunes (StringExtensions.Make ((uint)kb.Key));
 			if (Used) {
 				point++;
 				if (point == newText.Count + 1) {
@@ -742,7 +736,7 @@ namespace Terminal.Gui {
 
 			historyText.Redo ();
 
-			//if (ustring.IsNullOrEmpty (Clipboard.Contents))
+			//if (string.IsNullOrEmpty (Clipboard.Contents))
 			//	return true;
 			//var clip = TextModel.ToRunes (Clipboard.Contents);
 			//if (clip == null)
@@ -912,7 +906,7 @@ namespace Terminal.Gui {
 				Adjust ();
 			} else {
 				var newText = DeleteSelectedText ();
-				Text = ustring.Make (newText);
+				Text = StringExtensions.Make (newText);
 				Adjust ();
 			}
 		}
@@ -935,7 +929,7 @@ namespace Terminal.Gui {
 				Adjust ();
 			} else {
 				var newText = DeleteSelectedText ();
-				Text = ustring.Make (newText);
+				Text = StringExtensions.Make (newText);
 				Adjust ();
 			}
 		}
@@ -1005,7 +999,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The selected text.
 		/// </summary>
-		public ustring SelectedText {
+		public string SelectedText {
 			get => Secret ? null : selectedText;
 			private set => selectedText = value;
 		}
@@ -1059,8 +1053,8 @@ namespace Terminal.Gui {
 				EnsureHasFocus ();
 				int x = PositionCursor (ev);
 				int sbw = x;
-				if (x == text.Count || (x > 0 && (char)text [x - 1] != ' ')
-					|| (x > 0 && (char)text [x] == ' ')) {
+				if (x == text.Count || (x > 0 && (char)text [x - 1].Value != ' ')
+					|| (x > 0 && (char)text[x].Value == ' ')) {
 
 					var newPosBw = GetModel ().WordBackward (x, 0);
 					if (newPosBw == null) return true;
@@ -1135,7 +1129,7 @@ namespace Terminal.Gui {
 				length = Math.Abs (x + direction <= text.Count ? x + direction - selectedStart : text.Count - selectedStart);
 				SetSelectedStartSelectedLength ();
 				if (start > -1 && length > 0) {
-					selectedText = length > 0 ? ustring.Make (text).ToString ().Substring (
+					selectedText = length > 0 ? StringExtensions.Make (text).ToString ().Substring (
 						start < 0 ? 0 : start, length > text.Count ? text.Count : length) : "";
 					if (first > start) {
 						first = start;
@@ -1195,22 +1189,22 @@ namespace Terminal.Gui {
 
 			Clipboard.Contents = SelectedText;
 			var newText = DeleteSelectedText ();
-			Text = ustring.Make (newText);
+			Text = StringExtensions.Make (newText);
 			Adjust ();
 		}
 
 		List<Rune> DeleteSelectedText ()
 		{
-			ustring actualText = Text;
+			string actualText = Text;
 			SetSelectedStartSelectedLength ();
 			int selStart = SelectedStart > -1 ? start : point;
 			(var _, var len) = TextModel.DisplaySize (text, 0, selStart, false);
 			(var _, var len2) = TextModel.DisplaySize (text, selStart, selStart + length, false);
-			(var _, var len3) = TextModel.DisplaySize (text, selStart + length, actualText.RuneCount, false);
-			var newText = actualText [0, len] +
-				actualText [len + len2, len + len2 + len3];
+			(var _, var len3) = TextModel.DisplaySize (text, selStart + length, actualText.RuneCount(), false);
+			var newText = actualText[..len] +
+				actualText.Substring(len + len2, len + len2 + len3);
 			ClearAllSelection ();
-			point = selStart >= newText.RuneCount ? newText.RuneCount : selStart;
+			point = selStart >= newText.RuneCount() ? newText.RuneCount() : selStart;
 			return newText.ToRuneList ();
 		}
 
@@ -1219,21 +1213,21 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual void Paste ()
 		{
-			if (ReadOnly || ustring.IsNullOrEmpty (Clipboard.Contents)) {
+			if (ReadOnly || string.IsNullOrEmpty (Clipboard.Contents)) {
 				return;
 			}
 
 			SetSelectedStartSelectedLength ();
 			int selStart = start == -1 ? CursorPosition : start;
-			ustring actualText = Text;
+			string actualText = Text;
 			(int _, int len) = TextModel.DisplaySize (text, 0, selStart, false);
 			(var _, var len2) = TextModel.DisplaySize (text, selStart, selStart + length, false);
-			(var _, var len3) = TextModel.DisplaySize (text, selStart + length, actualText.RuneCount, false);
-			ustring cbTxt = Clipboard.Contents.Split ("\n") [0] ?? "";
-			Text = actualText [0, len] +
+			(var _, var len3) = TextModel.DisplaySize (text, selStart + length, actualText.RuneCount(), false);
+			string cbTxt = Clipboard.Contents.Split ("\n") [0] ?? "";
+			Text = actualText[..len] +
 				cbTxt +
-				actualText [len + len2, len + len2 + len3];
-			point = selStart + cbTxt.RuneCount;
+				actualText.Substring (len + len2, len + len2 + len3);
+			point = selStart + cbTxt.RuneCount();
 			ClearAllSelection ();
 			SetNeedsDisplay ();
 			Adjust ();
@@ -1244,7 +1238,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="newText">The new text to be replaced.</param>
 		/// <returns>Returns the <see cref="TextChangingEventArgs"/></returns>
-		public virtual TextChangingEventArgs OnTextChanging (ustring newText)
+		public virtual TextChangingEventArgs OnTextChanging (string newText)
 		{
 			var ev = new TextChangingEventArgs (newText);
 			TextChanging?.Invoke (this, ev);

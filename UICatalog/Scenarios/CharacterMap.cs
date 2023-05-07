@@ -2,14 +2,12 @@
 //#define BASE_DRAW_CONTENT
 
 using Microsoft.VisualBasic;
-using NStack;
+using System.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Terminal.Gui;
 using Terminal.Gui.Resources;
-using Rune = System.Rune;
 
 namespace UICatalog.Scenarios {
 	/// <summary>
@@ -63,13 +61,13 @@ namespace UICatalog.Scenarios {
 				_charMap.SelectedGlyph = result;
 			};
 
-			var radioItems = new (ustring radioLabel, uint start, uint end) [UnicodeRange.Ranges.Count];
+			var radioItems = new (string radioLabel, uint start, uint end) [UnicodeRange.Ranges.Count];
 
 			for (var i = 0; i < UnicodeRange.Ranges.Count; i++) {
 				var range = UnicodeRange.Ranges [i];
 				radioItems [i] = CreateRadio (range.Category, range.Start, range.End);
 			}
-			(ustring radioLabel, uint start, uint end) CreateRadio (ustring title, uint start, uint end)
+			(string radioLabel, uint start, uint end) CreateRadio (string title, uint start, uint end)
 			{
 				return ($"{title} (U+{start:x5}-{end:x5})", start, end);
 			}

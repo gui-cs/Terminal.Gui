@@ -1,4 +1,4 @@
-﻿using NStack;
+﻿using System.Text;
 using System;
 using System.Globalization;
 using System.Linq;
@@ -1367,8 +1367,8 @@ namespace Terminal.Gui.ViewsTests {
 			var tf = new TextField (text) { Width = 30 };
 
 			Assert.Equal (21, text.Length);
-			Assert.Equal (21, tf.Text.RuneCount);
-			Assert.Equal (21, tf.Text.ConsoleWidth);
+			Assert.Equal (21, tf.Text.RuneCount ());
+			Assert.Equal (21, tf.Text.ConsoleWidth ());
 
 			var runes = tf.Text.ToRuneList ();
 			Assert.Equal (21, runes.Count);
@@ -1376,14 +1376,14 @@ namespace Terminal.Gui.ViewsTests {
 
 			for (int i = 0; i < runes.Count; i++) {
 				var cs = text [i];
-				var cus = (char)runes [i];
+				var cus = (char)runes [i].Value;
 				Assert.Equal (cs, cus);
 			}
 
 			var idx = 15;
 			Assert.Equal ('m', text [idx]);
-			Assert.Equal ('m', (char)runes [idx]);
-			Assert.Equal ("m", ustring.Make (runes [idx]));
+			Assert.Equal ('m', (char)runes [idx].Value);
+			Assert.Equal ("m", runes [idx].ToString ());
 
 			Assert.True (tf.MouseEvent (new MouseEvent {
 				X = idx,
@@ -1503,7 +1503,7 @@ Les Miśerables", output);
 			var caption = "Mise" + Char.ConvertFromUtf32 (Int32.Parse ("0301", NumberStyles.HexNumber)) + "rables";
 
 			Assert.Equal (11, caption.Length);
-			Assert.Equal (10, caption.Sum (c => Rune.ColumnWidth (c)));
+			Assert.Equal (10, caption.Sum (c => ((Rune)c).ColumnWidth ()));
 
 			var tf = GetTextFieldsInView ();
 

@@ -7,7 +7,7 @@ using Terminal.Gui;
 using Xunit;
 using System.Globalization;
 using Xunit.Abstractions;
-using NStack;
+using System.Text;
 using static Terminal.Gui.Application;
 
 namespace Terminal.Gui.DialogTests {
@@ -560,7 +560,7 @@ namespace Terminal.Gui.DialogTests {
 			// Note extra spaces to make dialog even wider
 			//                         123456                           123456
 			var buttonRow = $"{CM.Glyphs.VLine}      {btn1} {btn2} {btn3} {btn4}      {CM.Glyphs.VLine}";
-			var width = ustring.Make (buttonRow).ConsoleWidth;
+			var width = buttonRow.ConsoleWidth();
 			d.SetBufferSize (width, 3);
 
 			// Default - Center
@@ -570,21 +570,21 @@ namespace Terminal.Gui.DialogTests {
 
 			// Justify
 			buttonRow = $"{CM.Glyphs.VLine}{btn1}     {btn2}     {btn3}     {btn4}{CM.Glyphs.VLine}";
-			Assert.Equal (width, ustring.Make (buttonRow).ConsoleWidth);
+			Assert.Equal (width, buttonRow.ConsoleWidth());
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Justify, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 			Application.End (runstate);
 
 			// Right
 			buttonRow = $"{CM.Glyphs.VLine}            {btn1} {btn2} {btn3} {btn4}{CM.Glyphs.VLine}";
-			Assert.Equal (width, ustring.Make (buttonRow).ConsoleWidth);
+			Assert.Equal (width, buttonRow.ConsoleWidth());
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Right, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 			Application.End (runstate);
 
 			// Left
 			buttonRow = $"{CM.Glyphs.VLine}{btn1} {btn2} {btn3} {btn4}            {CM.Glyphs.VLine}";
-			Assert.Equal (width, ustring.Make (buttonRow).ConsoleWidth);
+			Assert.Equal (width, buttonRow.ConsoleWidth());
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Left, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 			Application.End (runstate);

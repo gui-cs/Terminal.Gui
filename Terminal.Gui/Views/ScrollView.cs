@@ -13,6 +13,7 @@
 
 using System;
 using System.Linq;
+using System.Text;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -382,7 +383,7 @@ namespace Terminal.Gui {
 			// Fill in the bottom left corner. Note we don't rely on ScrollBarView.contentBottomRightCorner here
 			// because that only applies when ScrollBarView is hosted.
 			if (ShowVerticalScrollIndicator && ShowHorizontalScrollIndicator) {
-				AddRune (Bounds.Width - 1, Bounds.Height - 1, ' ');
+				AddRune (Bounds.Width - 1, Bounds.Height - 1, new Rune(' '));
 			}
 			Driver.SetAttribute (GetNormalColor ());
 			Driver.Clip = savedClip;

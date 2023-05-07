@@ -1,4 +1,4 @@
-using NStack;
+using System.Text;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -336,7 +336,7 @@ namespace Terminal.Gui {
 			foreach (var tab in Tabs.Skip (TabScrollOffset)) {
 
 				// while there is space for the tab
-				var tabTextWidth = tab.Text.Sum (c => Rune.ColumnWidth (c));
+				var tabTextWidth = tab.Text.Sum (c => ((Rune)c).ColumnWidth ());
 
 				string text = tab.Text.ToString ();
 
@@ -750,13 +750,13 @@ namespace Terminal.Gui {
 		/// A single tab in a <see cref="TabView"/>
 		/// </summary>
 		public class Tab {
-			private ustring text;
+			private string text;
 
 			/// <summary>
 			/// The text to display in a <see cref="TabView"/>
 			/// </summary>
 			/// <value></value>
-			public ustring Text { get => text ?? "Unamed"; set => text = value; }
+			public string Text { get => text ?? "Unamed"; set => text = value; }
 
 			/// <summary>
 			/// The control to display when the tab is selected

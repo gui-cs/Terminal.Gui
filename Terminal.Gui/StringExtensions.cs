@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -28,5 +29,51 @@ namespace Terminal.Gui {
 				.Insert (0, instr, n)
 				.ToString ();
 		}
+
+		public static int ConsoleWidth (this string instr)
+		{
+			return 0;
+		}
+
+		public static int IndexOf (this string instr, Rune rune)
+		{
+			return 0;
+		}
+
+		public static int RuneCount (this string instr)
+		{
+			return 0;
+		}
+
+		public static Rune[] ToRunes (this string instr)
+		{
+			return null;
+		}
+
+		public static List<Rune> ToRuneList (this string instr)
+		{
+			return new List<Rune>();
+		}
+
+		public static string Make (Rune [] runes)
+		{
+			return runes.ToString ();
+		}
+
+		public static string Make (List<Rune> runes)
+		{
+			return runes.ToString ();
+		}
+
+		public static string Make (uint rune)
+		{
+			return rune.ToString ();
+		}
+
+		public static string Make (byte [] bytes)
+		{
+			return bytes.ToString ();
+		}
+
 	}
 }
