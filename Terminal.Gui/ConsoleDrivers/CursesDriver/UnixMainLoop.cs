@@ -191,7 +191,7 @@ namespace Terminal.Gui {
 			return ic > 0;
 		}
 
-		void IMainLoopDriver.Iteration ()
+		void IMainLoopDriver.MainIteration ()
 		{
 			if (winChanged) {
 				winChanged = false;
