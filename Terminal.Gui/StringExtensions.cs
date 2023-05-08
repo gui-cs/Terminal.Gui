@@ -55,6 +55,34 @@ namespace Terminal.Gui {
 			return new List<Rune>();
 		}
 
+		public static (Rune rune, int size) DecodeRune (this string instr, int start = 0, int nbytes = -1)
+		{
+			return new (new Rune (), 0);
+		}
+
+		public static (Rune rune, int size) DecodeLastRune (this string instr, int end = -1)
+		{
+			return new (new Rune (), 0);
+		}
+
+		public static bool DecodeSurrogatePair (this string instr, out char [] chars)
+		{
+			chars = null;
+			if (instr.Length == 2) {
+				chars = instr.ToCharArray ();
+				if (RuneExtensions.EncodeSurrogatePair (chars [0], chars [1], out _)) {
+					chars = new char[] { chars [0], chars [1] };
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public static byte[] ToByteArray (this string instr)
+		{
+			return Encoding.Unicode.GetBytes (instr.ToCharArray ());
+		}
+
 		public static string Make (Rune [] runes)
 		{
 			return runes.ToString ();
@@ -64,6 +92,12 @@ namespace Terminal.Gui {
 		{
 			return runes.ToString ();
 		}
+
+		public static string Make (Rune rune)
+		{
+			return rune.ToString ();
+		}
+
 
 		public static string Make (uint rune)
 		{

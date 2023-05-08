@@ -6,9 +6,21 @@ using System.Threading.Tasks;
 
 namespace Terminal.Gui {
 	public static class RuneExtensions {
+		public static Rune MaxRune = new Rune (0x10FFFF);
+
 		public static int ColumnWidth (this Rune rune)
 		{
-			return 0;
+			return RuneUtilities.ColumnWidth(rune);
+		}
+
+		public static bool IsNonSpacingChar (this Rune rune)
+		{
+			return RuneUtilities.IsNonSpacingChar (rune.Value);
+		}
+
+		public static bool IsWideChar (this Rune rune)
+		{
+			return RuneUtilities.IsWideChar (rune.Value);
 		}
 
 		public static int RuneLen (this Rune rune)
@@ -16,14 +28,9 @@ namespace Terminal.Gui {
 			return 0;
 		}
 
-		public static int EncodeRune (this Rune rune, byte [] bytes, int offset)
+		public static int EncodeRune (this Rune rune, byte [] dest, int offset = 0)
 		{
 			return 0;
-		}
-
-		public static (Rune, int) DecodeRune (string str, int index, int Length)
-		{
-			return new (new Rune(), 0);
 		}
 
 		public static bool DecodeSurrogatePair (this Rune rune, out char [] spair)
@@ -31,6 +38,50 @@ namespace Terminal.Gui {
 			spair = null;
 
 			return true;
+		}
+
+		public static bool EncodeSurrogatePair (char highsurrogate, char lowSurrogate, out Rune result)
+		{
+			try {
+				result = (Rune)char.ConvertToUtf32 (highsurrogate, lowSurrogate);
+			} catch (Exception) {
+				result = default;
+				return false;
+			}
+
+			return true;
+		}
+
+		public static bool IsSurrogatePair (this Rune rune)
+		{
+			return char.IsSurrogatePair (rune.ToString (), 0);
+		}
+
+		public static bool IsSurrogate (this Rune rune)
+		{
+			return char.IsSurrogate (rune.ToString (), 0);
+		}
+
+		public static bool IsValid (byte [] buffer)
+		{
+			var str = Encoding.Unicode.GetString (buffer);
+
+			return Rune.IsValid(str.EnumerateRunes ().Current.Value);
+		}
+
+		public static bool IsValid (this Rune rune)
+		{
+			return Rune.IsValid (rune.Value);
+		}
+
+		internal static bool IsHighSurrogate (this Rune rune)
+		{
+			return char.IsHighSurrogate (rune.ToString (), 0);
+		}
+
+		internal static bool IsLowSurrogate (this Rune rune)
+		{
+			return char.IsLowSurrogate (rune.ToString (), 0);
 		}
 
 		//public static bool operator==(this Rune a, Rune b) {  return a.Equals(b); }

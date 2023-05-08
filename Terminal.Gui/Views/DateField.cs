@@ -341,7 +341,7 @@ namespace Terminal.Gui {
 			if (ReadOnly)
 				return true;
 
-			if (SetText (TextModel.ToRunes (StringExtensions.Make ((uint)kb.Key)).First ()))
+			if (SetText (TextModel.ToRunes (StringExtensions.Make ((Rune)(uint)kb.Key)).First ()))
 				IncCursorPosition ();
 
 			return true;

@@ -649,7 +649,7 @@ namespace Terminal.Gui {
 			if (!useOldCursorPos) {
 				oldCursorPos = point;
 			}
-			var kbstr = TextModel.ToRunes (StringExtensions.Make ((uint)kb.Key));
+			var kbstr = TextModel.ToRunes (StringExtensions.Make ((Rune)(uint)kb.Key));
 			if (Used) {
 				point++;
 				if (point == newText.Count + 1) {
