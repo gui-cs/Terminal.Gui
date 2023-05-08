@@ -597,9 +597,9 @@ namespace Terminal.Gui {
 				Curses.StartColor ();
 				Curses.UseDefaultColors ();
 
-				InitalizeColorSchemes ();
+				InitializeColorSchemes ();
 			} else {
-				InitalizeColorSchemes (false);
+				InitializeColorSchemes (false);
 
 				// BUGBUG: This is a hack to make the colors work on the Mac?
 				// The new Theme support overwrites these colors, so this is not needed?
@@ -751,9 +751,7 @@ namespace Terminal.Gui {
 
 		public override Attribute MakeAttribute (Color fore, Color back)
 		{
-			var f = MapColor (fore);
-			//return MakeColor ((short)(f & 0xffff), (short)MapColor (back)) | ((f & Curses.A_BOLD) != 0 ? Curses.A_BOLD : 0);
-			return MakeColor ((short)(f & 0xffff), (short)MapColor (back));
+			return MakeColor ((short)(MapColor (fore) & 0xffff), (short)MapColor (back));
 		}
 
 		public override void Suspend ()

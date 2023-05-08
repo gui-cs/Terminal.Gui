@@ -228,15 +228,10 @@ namespace Terminal.Gui {
 			_rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
 			FakeConsole.Clear ();
 			ResizeScreen ();
-			// Call InitalizeColorSchemes before UpdateOffScreen as it references Colors
+			// Call InitializeColorSchemes before UpdateOffScreen as it references Colors
 			CurrentAttribute = MakeColor (Color.White, Color.Black);
-			InitalizeColorSchemes ();
+			InitializeColorSchemes ();
 			UpdateOffScreen ();
-		}
-
-		public override Attribute MakeAttribute (Color fore, Color back)
-		{
-			return MakeColor ((ConsoleColor)fore, (ConsoleColor)back);
 		}
 
 		int _redrawColor = -1;
@@ -302,11 +297,6 @@ namespace Terminal.Gui {
 		{
 			UpdateScreen ();
 			UpdateCursor ();
-		}
-
-		public override void SetAttribute (Attribute c)
-		{
-			base.SetAttribute (c);
 		}
 
 		public ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
@@ -647,7 +637,6 @@ namespace Terminal.Gui {
 			return hasColor;
 		}
 
-		#region Unused
 		public override void UpdateCursor ()
 		{
 			if (!EnsureCursorVisibility ())
@@ -663,19 +652,21 @@ namespace Terminal.Gui {
 			}
 		}
 
+		#region Not Implemented
 		public override void StartReportingMouseMoves ()
 		{
+			throw new NotImplementedException ();
 		}
 
 		public override void StopReportingMouseMoves ()
 		{
+			throw new NotImplementedException ();
 		}
 
 		public override void Suspend ()
 		{
+			throw new NotImplementedException ();
 		}
-		
-
 		#endregion
 
 		public class FakeClipboard : ClipboardBase {

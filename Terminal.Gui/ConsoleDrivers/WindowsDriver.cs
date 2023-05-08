@@ -1472,10 +1472,10 @@ namespace Terminal.Gui {
 				WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
 
 				CurrentAttribute = MakeColor (Color.White, Color.Black);
-				InitalizeColorSchemes ();
+				InitializeColorSchemes ();
 
 				CurrentAttribute = MakeColor (Color.White, Color.Black);
-				InitalizeColorSchemes ();
+				InitializeColorSchemes ();
 
 				ResizeScreen ();
 				UpdateOffScreen ();
@@ -1616,11 +1616,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		public override void SetAttribute (Attribute c)
-		{
-			base.SetAttribute (c);
-		}
-
 		public override Attribute MakeColor (Color foreground, Color background)
 		{
 			return MakeColor ((ConsoleColor)foreground, (ConsoleColor)background);
@@ -1634,11 +1629,6 @@ namespace Terminal.Gui {
 				foreground: (Color)f,
 				background: (Color)b
 			);
-		}
-
-		public override Attribute MakeAttribute (Color fore, Color back)
-		{
-			return MakeColor ((ConsoleColor)fore, (ConsoleColor)back);
 		}
 
 		public override void Refresh ()
@@ -1825,19 +1815,21 @@ namespace Terminal.Gui {
 			return hasColor;
 		}
 
-		#region Unused
+		#region Not Implemented
 		public override void Suspend ()
 		{
+			throw new NotImplementedException ();
 		}
 
 		public override void StartReportingMouseMoves ()
 		{
+			throw new NotImplementedException ();
 		}
 
 		public override void StopReportingMouseMoves ()
 		{
+			throw new NotImplementedException ();
 		}
-
 		#endregion
 	}
 

@@ -793,10 +793,10 @@ namespace Terminal.Gui {
 			_rows = _largestBufferHeight;
 
 			CurrentAttribute = MakeColor (Color.White, Color.Black);
-			InitalizeColorSchemes ();
+			InitializeColorSchemes ();
 
 			CurrentAttribute = MakeColor (Color.White, Color.Black);
-			InitalizeColorSchemes ();
+			InitializeColorSchemes ();
 
 			ResizeScreen ();
 			UpdateOffScreen ();
@@ -874,12 +874,7 @@ namespace Terminal.Gui {
 				} catch (IndexOutOfRangeException) { }
 			}
 		}
-
-		public override Attribute MakeAttribute (Color fore, Color back)
-		{
-			return MakeColor ((ConsoleColor)fore, (ConsoleColor)back);
-		}
-
+		
 		public override void Refresh ()
 		{
 			UpdateScreen ();
@@ -1105,14 +1100,12 @@ namespace Terminal.Gui {
 			Console.Out.Write (EscSeqUtils.DisableMouseEvents);
 		}
 
+		#region Not Implemented
 		public override void Suspend ()
 		{
+			throw new NotImplementedException ();
 		}
-
-		public override void SetAttribute (Attribute c)
-		{
-			base.SetAttribute (c);
-		}
+		#endregion
 
 		public ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
 		{

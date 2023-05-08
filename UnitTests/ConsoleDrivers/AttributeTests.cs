@@ -185,8 +185,6 @@ namespace Terminal.Gui.DriverTests {
 
 			var attr = new Attribute (value, fg, bg);
 
-			driver.SetAttribute (attr);
-
 			var ret_attr = Attribute.Get ();
 
 			Assert.Equal (value, ret_attr.Value);

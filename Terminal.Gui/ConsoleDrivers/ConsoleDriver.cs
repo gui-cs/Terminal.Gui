@@ -232,7 +232,7 @@ namespace Terminal.Gui {
 		/// The current attribute the driver is using. 
 		/// </summary>
 		public virtual Attribute CurrentAttribute {
-			get => currentAttribute;
+			get => _currentAttribute;
 			set {
 				if (!value.Initialized && value.HasValidColors && Application.Driver != null) {
 					CurrentAttribute = Application.Driver.MakeAttribute (value.Foreground, value.Background);
@@ -240,7 +240,7 @@ namespace Terminal.Gui {
 				}
 				if (!value.Initialized) Debug.WriteLine ("ConsoleDriver.CurrentAttribute: Attributes must be initialized before use.");
 
-				currentAttribute = value;
+				_currentAttribute = value;
 			}
 		}
 
@@ -255,24 +255,7 @@ namespace Terminal.Gui {
 		{
 			CurrentAttribute = c;
 		}
-
-		///// <summary>
-		///// Set Colors from limit sets of colors. Not implemented by any driver: See Issue #2300.
-		///// </summary>
-		///// <param name="foreground">Foreground.</param>
-		///// <param name="background">Background.</param>
-		//public abstract void SetColors (ConsoleColor foreground, ConsoleColor background);
-
-		//// Advanced uses - set colors to any pre-set pairs, you would need to init_color
-		//// that independently with the R, G, B values.
-		///// <summary>
-		///// Advanced uses - set colors to any pre-set pairs, you would need to init_color
-		///// that independently with the R, G, B values. Not implemented by any driver: See Issue #2300.
-		///// </summary>
-		///// <param name="foregroundColorId">Foreground color identifier.</param>
-		///// <param name="backgroundColorId">Background color identifier.</param>
-		//public abstract void SetColors (short foregroundColorId, short backgroundColorId);
-
+		
 		/// <summary>
 		/// Gets the foreground and background colors based on the value.
 		/// </summary>
@@ -343,8 +326,9 @@ namespace Terminal.Gui {
 		public static DiagnosticFlags Diagnostics { get; set; }
 
 		/// <summary>
-		/// Suspend the application, typically needs to save the state, suspend the app and upon return, reset the console driver.
+		/// Suspends the application (e.g. on Linux via SIGTSTP) and upon resume, resets the console driver.
 		/// </summary>
+		/// <remarks>This is only implemented in <see cref="CursesDriver"/>.</remarks>
 		public abstract void Suspend ();
 
 		/// <summary>
@@ -436,19 +420,8 @@ namespace Terminal.Gui {
 		/// Stop reporting mouses moves.
 		/// </summary>
 		public abstract void StopReportingMouseMoves ();
-
-		///// <summary>
-		///// Disables the cooked event processing from the mouse driver. 
-		///// At startup, it is assumed mouse events are cooked. Not implemented by any driver: See Issue #2300.
-		///// </summary>
-		//public abstract void UncookMouse ();
-
-		///// <summary>
-		///// Enables the cooked event processing from the mouse driver. Not implemented by any driver: See Issue #2300.
-		///// </summary>
-		//public abstract void CookMouse ();
-
-		private Attribute currentAttribute;
+		
+		Attribute _currentAttribute;
 
 		/// <summary>
 		/// Make the attribute for the foreground and background colors.
@@ -456,7 +429,10 @@ namespace Terminal.Gui {
 		/// <param name="fore">Foreground.</param>
 		/// <param name="back">Background.</param>
 		/// <returns></returns>
-		public abstract Attribute MakeAttribute (Color fore, Color back);
+		public virtual Attribute MakeAttribute (Color fore, Color back)
+		{
+			return MakeColor (fore, back);
+		}
 
 		/// <summary>
 		/// Gets the current <see cref="Attribute"/>.
@@ -476,27 +452,13 @@ namespace Terminal.Gui {
 		/// Ensures all <see cref="Attribute"/>s in <see cref="Colors.ColorSchemes"/> are correctly 
 		/// initialized by the driver.
 		/// </summary>
-		/// <remarks>
-		/// This method was previsouly named CreateColors. It was reanmed to InitalizeColorSchemes when
-		/// <see cref="ConfigurationManager"/> was enabled.
-		/// </remarks>
 		/// <param name="supportsColors">Flag indicating if colors are supported (not used).</param>
-		public void InitalizeColorSchemes (bool supportsColors = true)
+		public void InitializeColorSchemes (bool supportsColors = true)
 		{
 			// Ensure all Attributes are initialized by the driver
 			foreach (var s in Colors.ColorSchemes) {
 				s.Value.Initialize ();
 			}
-
-			if (!supportsColors) {
-				return;
-			}
-
-		}
-
-		internal void SetAttribute (object attribute)
-		{
-			throw new NotImplementedException ();
 		}
 	}
 
