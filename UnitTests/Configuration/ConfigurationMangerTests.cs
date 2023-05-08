@@ -224,7 +224,6 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = Key.Q;
 			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
 			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
-			ConfigurationManager.Settings ["Application.UseSystemConsole"].PropertyValue = true;
 			ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue = true;
 			ConfigurationManager.Settings ["Application.EnableConsoleScrolling"].PropertyValue = true;
 			ConfigurationManager.Settings.Apply ();
@@ -233,7 +232,6 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Key.Q, Application.QuitKey);
 			Assert.Equal (Key.F, Application.AlternateForwardKey);
 			Assert.Equal (Key.B, Application.AlternateBackwardKey);
-			Assert.True (Application.UseSystemConsole);
 			Assert.True (Application.IsMouseDisabled);
 			Assert.True (Application.EnableConsoleScrolling);
 
@@ -246,7 +244,6 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
 			Assert.Equal (Key.PageDown | Key.CtrlMask, Application.AlternateForwardKey);
 			Assert.Equal (Key.PageUp | Key.CtrlMask, Application.AlternateBackwardKey);
-			Assert.False (Application.UseSystemConsole);
 			Assert.False (Application.IsMouseDisabled);
 			Assert.False (Application.EnableConsoleScrolling);
 
@@ -254,7 +251,6 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = Key.Q;
 			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
 			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
-			ConfigurationManager.Settings ["Application.UseSystemConsole"].PropertyValue = true;
 			ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue = true;
 			ConfigurationManager.Settings ["Application.EnableConsoleScrolling"].PropertyValue = true;
 			ConfigurationManager.Settings.Apply ();
@@ -271,7 +267,6 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
 			Assert.Equal (Key.PageDown | Key.CtrlMask, Application.AlternateForwardKey);
 			Assert.Equal (Key.PageUp | Key.CtrlMask, Application.AlternateBackwardKey);
-			Assert.False (Application.UseSystemConsole);
 			Assert.False (Application.IsMouseDisabled);
 			Assert.False (Application.EnableConsoleScrolling);
 
@@ -764,7 +759,6 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = Key.Q;
 			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
 			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
-			ConfigurationManager.Settings ["Application.UseSystemConsole"].PropertyValue = true;
 			ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue = true;
 			ConfigurationManager.Settings ["Application.EnableConsoleScrolling"].PropertyValue = true;
 
@@ -777,7 +771,6 @@ namespace Terminal.Gui.ConfigurationTests {
 				Assert.Equal (Key.Q | Key.CtrlMask, ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue);
 				Assert.Equal (Key.PageDown | Key.CtrlMask, ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue);
 				Assert.Equal (Key.PageUp | Key.CtrlMask, ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue);
-				Assert.False ((bool)ConfigurationManager.Settings ["Application.UseSystemConsole"].PropertyValue);
 				Assert.False ((bool)ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue);
 				Assert.False ((bool)ConfigurationManager.Settings ["Application.EnableConsoleScrolling"].PropertyValue);
 			}
