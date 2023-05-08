@@ -641,12 +641,6 @@ namespace Terminal.Gui {
 
 		bool [] _dirtyLine;
 
-		public override void Move (int col, int row)
-		{
-			Col = col;
-			Row = row;
-		}
-
 		public override void AddRune (Rune rune)
 		{
 			if (Contents.Length != Rows * Cols * 3) {

@@ -150,7 +150,7 @@ namespace Terminal.Gui {
 		public int Row { get; internal set; }
 
 		/// <summary>
-		/// Sets <see cref="Col"/> and <see cref="Row"/> to the specified column and row in <see cref="Contents"/>.
+		/// Updates <see cref="Col"/> and <see cref="Row"/> to the specified column and row in <see cref="Contents"/>.
 		/// Used by <see cref="AddRune"/> and <see cref="AddStr"/> to determine where to add content.
 		/// </summary>
 		/// <remarks>
@@ -158,7 +158,11 @@ namespace Terminal.Gui {
 		/// </remarks>
 		/// <param name="col">Column to move to.</param>
 		/// <param name="row">Row to move to.</param>
-		public abstract void Move (int col, int row);
+		public virtual void Move (int col, int row)
+		{
+			Col = col;
+			Row = row;
+		}
 
 		/// <summary>
 		/// Adds the specified rune to the display at the current cursor position.

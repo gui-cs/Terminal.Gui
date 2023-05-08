@@ -29,8 +29,7 @@ namespace Terminal.Gui {
 		
 		public override void Move (int col, int row)
 		{
-			Col = col;
-			Row = row;
+			base.Move (col, row);
 
 			if (IsValidLocation (col, row)) {
 				Curses.move (row, col);

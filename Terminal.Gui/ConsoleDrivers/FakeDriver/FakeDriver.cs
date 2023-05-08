@@ -78,18 +78,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		public override void Move (int col, int row)
-		{
-			Col = col;
-			Row = row;
-
-			// BUGBUG: Why is FakeDriver setting the cursor location here?
-			if (IsValidLocation (col, row)) {
-				FakeConsole.CursorTop = row;
-				FakeConsole.CursorLeft = col;
-			}
-		}
-
 		public override void AddRune (Rune rune)
 		{
 			rune = MakePrintable (rune);

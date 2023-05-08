@@ -1448,13 +1448,7 @@ namespace Terminal.Gui {
 				}
 			}
 		}
-
-		public override void Move (int col, int row)
-		{
-			Col = col;
-			Row = row;
-		}
-
+		
 		int GetOutputBufferPosition ()
 		{
 			return Row * Cols + Col;
