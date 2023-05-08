@@ -130,13 +130,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		public override void AddStr (ustring str)
-		{
-			foreach (var rune in str) {
-				AddRune (rune);
-			}
-		}
-
 		public override void End ()
 		{
 			FakeConsole.ResetColor ();
@@ -502,7 +495,7 @@ namespace Terminal.Gui {
 			TerminalResized?.Invoke ();
 		}
 
-		public override void ResizeScreen ()
+		public virtual void ResizeScreen ()
 		{
 			if (!EnableConsoleScrolling) {
 				if (FakeConsole.WindowHeight > 0) {
@@ -574,11 +567,13 @@ namespace Terminal.Gui {
 
 		public override void UpdateCursor ()
 		{
-			if (!EnsureCursorVisibility ())
+			if (!EnsureCursorVisibility ()) {
 				return;
+			}
 
 			// Prevents the exception of size changing during resizing.
 			try {
+				// BUGBUG: Why is this using BufferWidth/Height and now Cols/Rows?
 				if (Col >= 0 && Col < FakeConsole.BufferWidth && Row >= 0 && Row < FakeConsole.BufferHeight) {
 					FakeConsole.SetCursorPosition (Col, Row);
 				}

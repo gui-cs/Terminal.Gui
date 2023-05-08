@@ -92,12 +92,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The leftmost column in the terminal.
 		/// </summary>
-		public virtual int Left { get; internal set; }
+		public virtual int Left { get; internal set; } = 0;
 
 		/// <summary>
 		/// The topmost row in the terminal.
 		/// </summary>
-		public virtual int Top { get; internal set; }
+		public virtual int Top { get; internal set; } = 0;
 
 		/// <summary>
 		/// Get the operating system clipboard.
@@ -191,7 +191,12 @@ namespace Terminal.Gui {
 		/// Adds the <paramref name="str"/> to the display at the cursor position.
 		/// </summary>
 		/// <param name="str">String.</param>
-		public abstract void AddStr (ustring str);
+		public virtual void AddStr (ustring str)
+		{
+			foreach (var rune in str) {
+				AddRune (rune);
+			}
+		}
 
 		/// <summary>
 		/// Prepare the driver and set the key and mouse events handlers.
@@ -209,28 +214,28 @@ namespace Terminal.Gui {
 		public abstract void Refresh ();
 
 		/// <summary>
-		/// Updates the location of the cursor position
+		/// Sets the position of the terminal cursor to <see cref="Col"/> and <see cref="Row"/>.
 		/// </summary>
 		public abstract void UpdateCursor ();
 
 		/// <summary>
-		/// Retreive the cursor caret visibility
+		/// Gets the terminal cursor visibility.
 		/// </summary>
 		/// <param name="visibility">The current <see cref="CursorVisibility"/></param>
-		/// <returns>true upon success</returns>
+		/// <returns><see langword="true"/> upon success</returns>
 		public abstract bool GetCursorVisibility (out CursorVisibility visibility);
 
 		/// <summary>
-		/// Change the cursor caret visibility
+		/// Sets the terminal cursor visibility.
 		/// </summary>
 		/// <param name="visibility">The wished <see cref="CursorVisibility"/></param>
-		/// <returns>true upon success</returns>
+		/// <returns><see langword="true"/> upon success</returns>
 		public abstract bool SetCursorVisibility (CursorVisibility visibility);
 
 		/// <summary>
-		/// Ensure the cursor visibility
+		/// Determines if the terminal cursor should be visible or not and sets it accordingly.
 		/// </summary>
-		/// <returns>true upon success</returns>
+		/// <returns><see langword="true"/> upon success</returns>
 		public abstract bool EnsureCursorVisibility ();
 
 		/// <summary>
@@ -239,12 +244,7 @@ namespace Terminal.Gui {
 		public abstract void End ();
 
 		/// <summary>
-		/// Resizes the clip area when the screen is resized.
-		/// </summary>
-		public abstract void ResizeScreen ();
-
-		/// <summary>
-		/// Reset and recreate the contents and the driver buffer.
+		/// Clears the <see cref="Contents"/>buffer and the driver buffer.
 		/// </summary>
 		public abstract void UpdateOffScreen ();
 
@@ -254,9 +254,9 @@ namespace Terminal.Gui {
 		public abstract void UpdateScreen ();
 
 		/// <summary>
-		/// The current attribute the driver is using. 
+		/// The <see cref="Attribute"/> that will be used for the next <see cref="AddRune"/> or <see cref="AddStr"/> call.
 		/// </summary>
-		public virtual Attribute CurrentAttribute {
+		public Attribute CurrentAttribute {
 			get => _currentAttribute;
 			set {
 				if (!value.Initialized && value.HasValidColors && Application.Driver != null) {
@@ -280,7 +280,7 @@ namespace Terminal.Gui {
 		{
 			CurrentAttribute = c;
 		}
-		
+
 		/// <summary>
 		/// Gets the foreground and background colors based on the value.
 		/// </summary>
@@ -379,7 +379,7 @@ namespace Terminal.Gui {
 			get => _clip;
 			set => _clip = value;
 		}
-		
+
 
 		/// <summary>
 		/// Start of mouse moves.
@@ -390,7 +390,7 @@ namespace Terminal.Gui {
 		/// Stop reporting mouses moves.
 		/// </summary>
 		public abstract void StopReportingMouseMoves ();
-		
+
 		Attribute _currentAttribute;
 
 		/// <summary>

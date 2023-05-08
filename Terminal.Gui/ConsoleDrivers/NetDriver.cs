@@ -701,13 +701,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		public override void AddStr (ustring str)
-		{
-			foreach (var rune in str) {
-				AddRune (rune);
-			}
-		}
-
 		public override void End ()
 		{
 			_mainLoop._netEvents.StopTasks ();
@@ -776,7 +769,7 @@ namespace Terminal.Gui {
 			StartReportingMouseMoves ();
 		}
 
-		public override void ResizeScreen ()
+		public virtual void ResizeScreen ()
 		{
 			if (!EnableConsoleScrolling && Console.WindowHeight > 0) {
 				// Not supported on Unix.
@@ -1052,16 +1045,38 @@ namespace Terminal.Gui {
 		public override void UpdateCursor ()
 		{
 			EnsureCursorVisibility ();
-			//Debug.WriteLine ($"Before - CursorTop: {Console.CursorTop};CursorLeft: {Console.CursorLeft}");
 
 			if (Col >= 0 && Col < Cols && Row >= 0 && Row < Rows) {
 				SetCursorPosition (Col, Row);
 				SetWindowPosition (0, Row);
 			}
-			//Debug.WriteLine ($"WindowTop: {Console.WindowTop};WindowLeft: {Console.WindowLeft}");
-			//Debug.WriteLine ($"After - CursorTop: {Console.CursorTop};CursorLeft: {Console.CursorLeft}");
 		}
 
+		public override bool GetCursorVisibility (out CursorVisibility visibility)
+		{
+			visibility = savedCursorVisibility ?? CursorVisibility.Default;
+			return visibility == CursorVisibility.Default;
+		}
+
+		public override bool SetCursorVisibility (CursorVisibility visibility)
+		{
+			savedCursorVisibility = visibility;
+			return Console.CursorVisible = visibility == CursorVisibility.Default;
+		}
+
+		public override bool EnsureCursorVisibility ()
+		{
+			if (!(Col >= 0 && Row >= 0 && Col < Cols && Row < Rows)) {
+				GetCursorVisibility (out CursorVisibility cursorVisibility);
+				savedCursorVisibility = cursorVisibility;
+				SetCursorVisibility (CursorVisibility.Invisible);
+				return false;
+			}
+
+			SetCursorVisibility (savedCursorVisibility ?? CursorVisibility.Default);
+			return savedCursorVisibility == CursorVisibility.Default;
+		}
+		
 		public override void StartReportingMouseMoves ()
 		{
 			Console.Out.Write (EscSeqUtils.EnableMouseEvents);
@@ -1391,33 +1406,6 @@ namespace Terminal.Gui {
 			};
 		}
 
-		/// <inheritdoc/>
-		public override bool GetCursorVisibility (out CursorVisibility visibility)
-		{
-			visibility = savedCursorVisibility ?? CursorVisibility.Default;
-			return visibility == CursorVisibility.Default;
-		}
-
-		/// <inheritdoc/>
-		public override bool SetCursorVisibility (CursorVisibility visibility)
-		{
-			savedCursorVisibility = visibility;
-			return Console.CursorVisible = visibility == CursorVisibility.Default;
-		}
-
-		/// <inheritdoc/>
-		public override bool EnsureCursorVisibility ()
-		{
-			if (!(Col >= 0 && Row >= 0 && Col < Cols && Row < Rows)) {
-				GetCursorVisibility (out CursorVisibility cursorVisibility);
-				savedCursorVisibility = cursorVisibility;
-				SetCursorVisibility (CursorVisibility.Invisible);
-				return false;
-			}
-
-			SetCursorVisibility (savedCursorVisibility ?? CursorVisibility.Default);
-			return savedCursorVisibility == CursorVisibility.Default;
-		}
 
 		public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
 		{

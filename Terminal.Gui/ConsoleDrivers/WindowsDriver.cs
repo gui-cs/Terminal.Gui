@@ -492,7 +492,6 @@ namespace Terminal.Gui {
 			public static void Update (ref SmallRect rect, short col, short row)
 			{
 				if (rect.Left == -1) {
-					//System.Diagnostics.Debugger.Log (0, "debug", $"damager From Empty {col},{row}\n");
 					rect.Left = rect.Right = col;
 					rect.Bottom = rect.Top = row;
 					return;
@@ -507,7 +506,6 @@ namespace Terminal.Gui {
 					rect.Top = row;
 				if (row > rect.Bottom)
 					rect.Bottom = row;
-				//System.Diagnostics.Debugger.Log (0, "debug", $"Expanding {rect.ToString ()}\n");
 			}
 
 			public override string ToString ()
@@ -1376,79 +1374,6 @@ namespace Terminal.Gui {
 			return keyMod != Key.Null ? keyMod | key : key;
 		}
 
-		public override void Init (Action terminalResized)
-		{
-			TerminalResized = terminalResized;
-
-			try {
-				// Needed for Windows Terminal
-				// ESC [ ? 1047 h  Activate xterm alternative buffer (no backscroll)
-				// ESC [ ? 1047 l  Restore xterm working buffer (with backscroll)
-				// ESC [ ? 1048 h  Save cursor position
-				// ESC [ ? 1048 l  Restore cursor position
-				// ESC [ ? 1049 h  Save cursor position and activate xterm alternative buffer (no backscroll)
-				// ESC [ ? 1049 l  Restore cursor position and restore xterm working buffer (with backscroll)
-				// Per Issue #2264 using the alterantive screen buffer is required for Windows Terminal to not 
-				// wipe out the backscroll buffer when the application exits.
-				Console.Out.Write ("\x1b[?1047h");
-
-				// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
-
-				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
-				Cols = winSize.Width;
-				Rows = winSize.Height;
-				WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
-
-				CurrentAttribute = MakeColor (Color.White, Color.Black);
-				InitializeColorSchemes ();
-
-				CurrentAttribute = MakeColor (Color.White, Color.Black);
-				InitializeColorSchemes ();
-
-				ResizeScreen ();
-				UpdateOffScreen ();
-			} catch (Win32Exception e) {
-				throw new InvalidOperationException ("The Windows Console output window is not available.", e);
-			}
-		}
-
-		public override void ResizeScreen ()
-		{
-			_outputBuffer = new WindowsConsole.CharInfo [Rows * Cols];
-			Clip = new Rect (0, 0, Cols, Rows); 
-			_damageRegion = new WindowsConsole.SmallRect () {
-				Top = 0,
-				Left = 0,
-				Bottom = (short)Rows,
-				Right = (short)Cols
-			};
-			WinConsole.ForceRefreshCursorVisibility ();
-			if (!EnableConsoleScrolling) {
-				// ANSI ESC "[xJ" Clears part of the screen.
-				// If n is 0 (or missing), clear from cursor to end of screen.
-				// If n is 1, clear from cursor to beginning of the screen.
-				// If n is 2, clear entire screen (and moves cursor to upper left on DOS ANSI.SYS).
-				// If n is 3, clear entire screen and delete all lines saved in the scrollback buffer
-				// DO NOT USE 3J - even with the alternate screen buffer, it clears the entire scrollback buffer
-				Console.Out.Write ("\x1b[3J");
-			}
-		}
-
-		public override void UpdateOffScreen ()
-		{
-			Contents = new int [Rows, Cols, 3];
-			for (int row = 0; row < Rows; row++) {
-				for (int col = 0; col < Cols; col++) {
-					int position = row * Cols + col;
-					_outputBuffer [position].Attributes = (ushort)Colors.TopLevel.Normal;
-					_outputBuffer [position].Char.UnicodeChar = ' ';
-					Contents [row, col, 0] = _outputBuffer [position].Char.UnicodeChar;
-					Contents [row, col, 1] = _outputBuffer [position].Attributes;
-					Contents [row, col, 2] = 0;
-				}
-			}
-		}
-		
 		int GetOutputBufferPosition ()
 		{
 			return Row * Cols + Col;
@@ -1537,13 +1462,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		public override void AddStr (ustring str)
-		{
-			foreach (var rune in str) {
-				AddRune (rune);
-			}
-		}
-
 		public override Attribute MakeColor (Color foreground, Color background)
 		{
 			return MakeColor ((ConsoleColor)foreground, (ConsoleColor)background);
@@ -1558,32 +1476,95 @@ namespace Terminal.Gui {
 				background: (Color)b
 			);
 		}
-
-		public override void Refresh ()
+		
+		public override bool GetColors (int value, out Color foreground, out Color background)
 		{
-			UpdateScreen ();
-
-			WinConsole.SetInitialCursorVisibility ();
-
-			UpdateCursor ();
-#if false
-			var bufferCoords = new WindowsConsole.Coord (){
-				X = (short)Clip.Width,
-				Y = (short)Clip.Height
-			};
-
-			var window = new WindowsConsole.SmallRect (){
-				Top = 0,
-				Left = 0,
-				Right = (short)Clip.Right,
-				Bottom = (short)Clip.Bottom
-			};
-
-			UpdateCursor();
-			WinConsole.WriteToConsole (OutputBuffer, bufferCoords, window);
-#endif
+			bool hasColor = false;
+			foreground = default;
+			background = default;
+			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
+				.OfType<ConsoleColor> ()
+				.Select (s => (int)s);
+			if (values.Contains ((value >> 4) & 0xffff)) {
+				hasColor = true;
+				background = (Color)(ConsoleColor)((value >> 4) & 0xffff);
+			}
+			if (values.Contains (value - ((int)background << 4))) {
+				hasColor = true;
+				foreground = (Color)(ConsoleColor)(value - ((int)background << 4));
+			}
+			return hasColor;
 		}
 
+
+		public override void Init (Action terminalResized)
+		{
+			TerminalResized = terminalResized;
+
+			try {
+				// Needed for Windows Terminal
+				// ESC [ ? 1047 h  Activate xterm alternative buffer (no backscroll)
+				// ESC [ ? 1047 l  Restore xterm working buffer (with backscroll)
+				// ESC [ ? 1048 h  Save cursor position
+				// ESC [ ? 1048 l  Restore cursor position
+				// ESC [ ? 1049 h  Save cursor position and activate xterm alternative buffer (no backscroll)
+				// ESC [ ? 1049 l  Restore cursor position and restore xterm working buffer (with backscroll)
+				// Per Issue #2264 using the alterantive screen buffer is required for Windows Terminal to not 
+				// wipe out the backscroll buffer when the application exits.
+				Console.Out.Write ("\x1b[?1047h");
+
+				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
+				Cols = winSize.Width;
+				Rows = winSize.Height;
+				WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
+
+				CurrentAttribute = MakeColor (Color.White, Color.Black);
+				InitializeColorSchemes ();
+
+				ResizeScreen ();
+				UpdateOffScreen ();
+			} catch (Win32Exception e) {
+				throw new InvalidOperationException ("The Windows Console output window is not available.", e);
+			}
+		}
+
+		public virtual void ResizeScreen ()
+		{
+			_outputBuffer = new WindowsConsole.CharInfo [Rows * Cols];
+			Clip = new Rect (0, 0, Cols, Rows);
+			_damageRegion = new WindowsConsole.SmallRect () {
+				Top = 0,
+				Left = 0,
+				Bottom = (short)Rows,
+				Right = (short)Cols
+			};
+			WinConsole.ForceRefreshCursorVisibility ();
+			if (!EnableConsoleScrolling) {
+				// ANSI ESC "[xJ" Clears part of the screen.
+				// If n is 0 (or missing), clear from cursor to end of screen.
+				// If n is 1, clear from cursor to beginning of the screen.
+				// If n is 2, clear entire screen (and moves cursor to upper left on DOS ANSI.SYS).
+				// If n is 3, clear entire screen and delete all lines saved in the scrollback buffer
+				// DO NOT USE 3J - even with the alternate screen buffer, it clears the entire scrollback buffer
+				Console.Out.Write ("\x1b[3J");
+			}
+		}
+
+		public override void UpdateOffScreen ()
+		{
+			Contents = new int [Rows, Cols, 3];
+			for (int row = 0; row < Rows; row++) {
+				for (int col = 0; col < Cols; col++) {
+					int position = row * Cols + col;
+					_outputBuffer [position].Attributes = (ushort)Colors.TopLevel.Normal;
+					_outputBuffer [position].Char.UnicodeChar = ' ';
+					Contents [row, col, 0] = _outputBuffer [position].Char.UnicodeChar;
+					Contents [row, col, 1] = _outputBuffer [position].Attributes;
+					Contents [row, col, 2] = 0;
+				}
+			}
+		}
+		
 		public override void UpdateScreen ()
 		{
 			if (_damageRegion.Left == -1) {
@@ -1602,17 +1583,15 @@ namespace Terminal.Gui {
 				Y = (short)Clip.Height
 			};
 
-			//var window = new WindowsConsole.SmallRect () {
-			//	Top = 0,
-			//	Left = 0,
-			//	Right = (short)Clip.Right,
-			//	Bottom = (short)Clip.Bottom
-			//};
-
 			WinConsole.WriteToConsole (new Size (Cols, Rows), _outputBuffer, bufferCoords, _damageRegion);
-
-			// System.Diagnostics.Debugger.Log (0, "debug", $"Region={damageRegion.Right - damageRegion.Left},{damageRegion.Bottom - damageRegion.Top}\n");
 			WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
+		}
+
+		public override void Refresh ()
+		{
+			UpdateScreen ();
+			WinConsole.SetInitialCursorVisibility ();
+			UpdateCursor ();
 		}
 
 		CursorVisibility savedCursorVisibility;
@@ -1632,24 +1611,6 @@ namespace Terminal.Gui {
 				Y = (short)Row
 			};
 			WinConsole.SetCursorPosition (position);
-		}
-
-		public override void End ()
-		{
-			WinConsole.Cleanup ();
-			WinConsole = null;
-
-			// Needed for Windows Terminal
-			// Clear the alternative screen buffer from the cursor to the
-			// end of the screen.
-			// Note, [3J causes Windows Terminal to wipe out the entire NON ALTERNATIVE
-			// backbuffer! So we need to use [0J instead.
-			Console.Out.Write ("\x1b[0J");
-
-			// Disable alternative screen buffer.
-			Console.Out.Write ("\x1b[?1047l");
-
-			// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
 		}
 
 		/// <inheritdoc/>
@@ -1723,24 +1684,23 @@ namespace Terminal.Gui {
 				ProcessInput (input);
 			}
 		}
-
-		public override bool GetColors (int value, out Color foreground, out Color background)
+		
+		public override void End ()
 		{
-			bool hasColor = false;
-			foreground = default;
-			background = default;
-			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-				.OfType<ConsoleColor> ()
-				.Select (s => (int)s);
-			if (values.Contains ((value >> 4) & 0xffff)) {
-				hasColor = true;
-				background = (Color)(ConsoleColor)((value >> 4) & 0xffff);
-			}
-			if (values.Contains (value - ((int)background << 4))) {
-				hasColor = true;
-				foreground = (Color)(ConsoleColor)(value - ((int)background << 4));
-			}
-			return hasColor;
+			WinConsole.Cleanup ();
+			WinConsole = null;
+
+			// Needed for Windows Terminal
+			// Clear the alternative screen buffer from the cursor to the
+			// end of the screen.
+			// Note, [3J causes Windows Terminal to wipe out the entire NON ALTERNATIVE
+			// backbuffer! So we need to use [0J instead.
+			Console.Out.Write ("\x1b[0J");
+
+			// Disable alternative screen buffer.
+			Console.Out.Write ("\x1b[?1047l");
+
+			// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
 		}
 
 		#region Not Implemented

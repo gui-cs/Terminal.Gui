@@ -18,15 +18,13 @@ namespace Terminal.Gui {
 	internal class CursesDriver : ConsoleDriver {
 		public override int Cols => Curses.Cols;
 		public override int Rows => Curses.Lines;
-		public override int Left => 0;
-		public override int Top => 0;
 
 		CursorVisibility? _initialCursorVisibility = null;
 		CursorVisibility? _currentCursorVisibility = null;
 
 		// If true, Move set Col and Row to an invalid location
 		bool _atValidLocation;
-		
+
 		public override void Move (int col, int row)
 		{
 			base.Move (col, row);
@@ -36,7 +34,7 @@ namespace Terminal.Gui {
 				_atValidLocation = true;
 			} else {
 				// Not a valid location (outside screen or clip region)
-				// Move within the clip region, then AddStr will actually move to Col, Row
+				// Move within the clip region, then AddRune will actually move to Col, Row
 				Curses.move (Clip.Y, Clip.X);
 				_atValidLocation = false;
 			}
@@ -118,9 +116,7 @@ namespace Terminal.Gui {
 		public override void AddStr (ustring str)
 		{
 			// TODO; optimize this to determine if the str fits in the clip region, and if so, use Curses.addstr directly
-			foreach (var rune in str) {
-				AddRune (rune);
-			}
+			base.AddStr (str);
 		}
 
 		public override void Refresh ()
@@ -591,7 +587,7 @@ namespace Terminal.Gui {
 
 		}
 
-		public override void ResizeScreen ()
+		public virtual void ResizeScreen ()
 		{
 			Clip = new Rect (0, 0, Cols, Rows);
 			Curses.refresh ();
@@ -602,9 +598,6 @@ namespace Terminal.Gui {
 			Contents = new int [Rows, Cols, 3];
 			for (int row = 0; row < Rows; row++) {
 				for (int col = 0; col < Cols; col++) {
-					//Curses.move (row, col);
-					//Curses.attrset (Colors.TopLevel.Normal);
-					//Curses.addch ((int)(uint)' ');
 					Contents [row, col, 0] = ' ';
 					Contents [row, col, 1] = Colors.TopLevel.Normal;
 					Contents [row, col, 2] = 0;
@@ -728,7 +721,7 @@ namespace Terminal.Gui {
 		{
 			Console.Out.Write (EscSeqUtils.DisableMouseEvents);
 		}
-		
+
 		/// <inheritdoc/>
 		public override bool GetCursorVisibility (out CursorVisibility visibility)
 		{
