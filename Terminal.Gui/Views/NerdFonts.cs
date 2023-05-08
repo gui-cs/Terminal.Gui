@@ -9,16 +9,22 @@ namespace Terminal.Gui {
 		{
 			if(_filenameToIcon.ContainsKey(file.Name))
 			{
-				return new string(glyphs[_filenameToIcon[file.Name]],1);
+				return glyphs[_filenameToIcon[file.Name]] + " ";
 			}
 
 			if(_extensionToIcon.ContainsKey(file.Extension))
 			{
-				return new string(glyphs[_extensionToIcon[file.Extension]],1);
+				return glyphs[_extensionToIcon[file.Extension]] + " ";
+			}
+
+			if(file is IDirectoryInfo)
+			{
+				return _nf_cod_folder + " ";
 			}
 				
 			return "";
 		}
+		char _nf_cod_folder = '';
 
 		Dictionary<string,char> glyphs = new Dictionary<string, char>{
 			{"nf-cod-package", ''},
