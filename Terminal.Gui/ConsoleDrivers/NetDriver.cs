@@ -614,7 +614,6 @@ namespace Terminal.Gui {
 		const int COLOR_BRIGHT_CYAN = 96;
 		const int COLOR_BRIGHT_WHITE = 97;
 
-		public override bool EnableConsoleScrolling { get; set; }
 		public NetWinVTConsole NetWinConsole { get; }
 		public bool IsWinPlatform { get; }
 		public override int [,,] Contents => _contents;
