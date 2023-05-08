@@ -3,6 +3,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -37,16 +38,20 @@ namespace Terminal.Gui {
 			_ccol = col;
 			_crow = row;
 
-			if (Clip.Contains (col, row)) {
+			if (IsValidLocation (col, row)) {
 				Curses.move (row, col);
 				_needMove = false;
 			} else {
+				// Not a valid location (outside screen or clip region)
+				// We need to move the cursor to within clip region, and then
+				// later move it to the desired location in AddStr
+				// BUGBUG: Clip.X/Y may actually be outside of the defined clip region rects as 
+				// currently implemented.
 				Curses.move (Clip.Y, Clip.X);
 				_needMove = true;
 			}
 		}
 
-		static bool _sync = false;
 		public override void AddRune (Rune rune)
 		{
 			rune = MakePrintable (rune);
@@ -55,49 +60,48 @@ namespace Terminal.Gui {
 
 			if (validLocation) {
 				if (_needMove) {
+					// Move was called, wanting to put cursor in an invalid location.
+					// We need to move the cursor to the clip region, and then
+					// move it to the desired location.
 					Curses.move (_crow, _ccol);
 					_needMove = false;
 				}
 				if (runeWidth == 0 && _ccol > 0) {
 					var r = _contents [_crow, _ccol - 1, 0];
 					var s = new string (new char [] { (char)r, (char)rune });
-					string sn;
-					if (!s.IsNormalized ()) {
-						sn = s.Normalize ();
-					} else {
-						sn = s;
-					}
+					var sn = !s.IsNormalized () ? s.Normalize () : s;
 					var c = sn [0];
-					Curses.mvaddch (_crow, _ccol - 1, (int)(uint)c);
 					_contents [_crow, _ccol - 1, 0] = c;
 					_contents [_crow, _ccol - 1, 1] = CurrentAttribute;
 					_contents [_crow, _ccol - 1, 2] = 1;
+
+					Curses.mvaddch (_crow, _ccol - 1, c);
 
 				} else {
 					if (runeWidth < 2 && _ccol > 0
 						&& Rune.ColumnWidth ((char)_contents [_crow, _ccol - 1, 0]) > 1) {
 
-						var curAtttib = CurrentAttribute;
+						var curAttr = CurrentAttribute;
 						Curses.attrset (_contents [_crow, _ccol - 1, 1]);
-						Curses.mvaddch (_crow, _ccol - 1, (int)(uint)' ');
-						_contents [_crow, _ccol - 1, 0] = (int)(uint)' ';
+						Curses.mvaddch (_crow, _ccol - 1, System.Text.Rune.ReplacementChar.Value);
+						_contents [_crow, _ccol - 1, 0] = System.Text.Rune.ReplacementChar.Value;
 						Curses.move (_crow, _ccol);
-						Curses.attrset (curAtttib);
+						Curses.attrset (curAttr);
 
 					} else if (runeWidth < 2 && _ccol <= Clip.Right - 1
 						&& Rune.ColumnWidth ((char)_contents [_crow, _ccol, 0]) > 1) {
 
-						var curAtttib = CurrentAttribute;
+						var curAttr = CurrentAttribute;
 						Curses.attrset (_contents [_crow, _ccol + 1, 1]);
-						Curses.mvaddch (_crow, _ccol + 1, (int)(uint)' ');
-						_contents [_crow, _ccol + 1, 0] = (int)(uint)' ';
+						Curses.mvaddch (_crow, _ccol + 1, System.Text.Rune.ReplacementChar.Value);
+						_contents [_crow, _ccol + 1, 0] = System.Text.Rune.ReplacementChar.Value;
 						Curses.move (_crow, _ccol);
-						Curses.attrset (curAtttib);
+						Curses.attrset (curAttr);
 
 					}
 					if (runeWidth > 1 && _ccol == Clip.Right - 1) {
-						Curses.addch ((int)(uint)' ');
-						_contents [_crow, _ccol, 0] = (int)(uint)' ';
+						Curses.addch (System.Text.Rune.ReplacementChar.Value);
+						_contents [_crow, _ccol, 0] = System.Text.Rune.ReplacementChar.Value;
 					} else {
 						Curses.addch ((int)(uint)rune);
 						_contents [_crow, _ccol, 0] = (int)(uint)rune;
@@ -109,7 +113,7 @@ namespace Terminal.Gui {
 				_needMove = true;
 			}
 
-			if (runeWidth < 0 || runeWidth > 0) {
+			if (runeWidth is < 0 or > 0) {
 				_ccol++;
 			}
 
@@ -119,10 +123,6 @@ namespace Terminal.Gui {
 					_contents [_crow, _ccol, 2] = 0;
 				}
 				_ccol++;
-			}
-
-			if (_sync) {
-				UpdateScreen ();
 			}
 		}
 

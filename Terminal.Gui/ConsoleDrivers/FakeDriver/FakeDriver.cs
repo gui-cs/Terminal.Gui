@@ -96,7 +96,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		bool _needMove;
 		// Current row, and current col, tracked by Move/AddCh only
 		int _ccol, _crow;
 		public override void Move (int col, int row)
@@ -107,11 +106,6 @@ namespace Terminal.Gui {
 			if (Clip.Contains (col, row)) {
 				FakeConsole.CursorTop = row;
 				FakeConsole.CursorLeft = col;
-				_needMove = false;
-			} else {
-				FakeConsole.CursorTop = Clip.Y;
-				FakeConsole.CursorLeft = Clip.X;
-				_needMove = true;
 			}
 		}
 
@@ -122,50 +116,36 @@ namespace Terminal.Gui {
 			var validLocation = IsValidLocation (_ccol, _crow);
 
 			if (validLocation) {
-				if (_needMove) {
-					//MockConsole.CursorLeft = ccol;
-					//MockConsole.CursorTop = crow;
-					_needMove = false;
-				}
 				if (runeWidth == 0 && _ccol > 0) {
 					var r = _contents [_crow, _ccol - 1, 0];
-					var s = new string (new char [] { (char)r, (char)rune });
-					string sn;
-					if (!s.IsNormalized ()) {
-						sn = s.Normalize ();
-					} else {
-						sn = s;
-					}
+					var s = new string (new [] { (char)r, (char)rune });
+					var sn = !s.IsNormalized () ? s.Normalize () : s;
 					var c = sn [0];
 					_contents [_crow, _ccol - 1, 0] = c;
 					_contents [_crow, _ccol - 1, 1] = CurrentAttribute;
 					_contents [_crow, _ccol - 1, 2] = 1;
-
 				} else {
 					if (runeWidth < 2 && _ccol > 0
-					&& Rune.ColumnWidth ((Rune)_contents [_crow, _ccol - 1, 0]) > 1) {
+						&& Rune.ColumnWidth (_contents [_crow, _ccol - 1, 0]) > 1) {
 
-						_contents [_crow, _ccol - 1, 0] = (int)(uint)' ';
+						_contents [_crow, _ccol - 1, 0] = System.Text.Rune.ReplacementChar.Value;
 
 					} else if (runeWidth < 2 && _ccol <= Clip.Right - 1
-						&& Rune.ColumnWidth ((Rune)_contents [_crow, _ccol, 0]) > 1) {
+						&& Rune.ColumnWidth (_contents [_crow, _ccol, 0]) > 1) {
 
-						_contents [_crow, _ccol + 1, 0] = (int)(uint)' ';
+						_contents [_crow, _ccol + 1, 0] = System.Text.Rune.ReplacementChar.Value;
 						_contents [_crow, _ccol + 1, 2] = 1;
 
 					}
 					if (runeWidth > 1 && _ccol == Clip.Right - 1) {
-						_contents [_crow, _ccol, 0] = (int)(uint)' ';
+						_contents [_crow, _ccol, 0] = System.Text.Rune.ReplacementChar.Value;
 					} else {
 						_contents [_crow, _ccol, 0] = (int)(uint)rune;
 					}
 					_contents [_crow, _ccol, 1] = CurrentAttribute;
 					_contents [_crow, _ccol, 2] = 1;
-
 					_dirtyLine [_crow] = true;
 				}
-			} else {
-				_needMove = true;
 			}
 
 			if (runeWidth < 0 || runeWidth > 0) {
@@ -178,15 +158,6 @@ namespace Terminal.Gui {
 					_contents [_crow, _ccol, 2] = 0;
 				}
 				_ccol++;
-			}
-
-			//if (ccol == Cols) {
-			//	ccol = 0;
-			//	if (crow + 1 < Rows)
-			//		crow++;
-			//}
-			if (_sync) {
-				UpdateScreen ();
 			}
 		}
 
@@ -248,7 +219,7 @@ namespace Terminal.Gui {
 				FakeConsole.ForegroundColor = (ConsoleColor)((color >> 16) & 0xffff);
 			}
 		}
-
+		
 		public override void UpdateScreen ()
 		{
 			int top = Top;

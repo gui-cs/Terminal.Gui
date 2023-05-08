@@ -652,11 +652,8 @@ namespace Terminal.Gui {
 		int [,,] _contents;
 		bool [] _dirtyLine;
 
-		static bool _sync = false;
-
 		// Current row, and current col, tracked by Move/AddCh only
 		int _ccol, _crow;
-
 		public override void Move (int col, int row)
 		{
 			_ccol = col;
@@ -666,42 +663,40 @@ namespace Terminal.Gui {
 		public override void AddRune (Rune rune)
 		{
 			if (_contents.Length != Rows * Cols * 3) {
+				// BUGBUG: Shouldn't this throw an exception? Doing so to see what happens
+				throw new InvalidOperationException ("Driver contents are wrong size");
 				return;
 			}
+
 			rune = MakePrintable (rune);
 			var runeWidth = Rune.ColumnWidth (rune);
 			var validLocation = IsValidLocation (_ccol, _crow);
 
 			if (validLocation) {
 				if (runeWidth == 0 && _ccol > 0) {
+					// Single column glyph beyond first col
 					var r = _contents [_crow, _ccol - 1, 0];
 					var s = new string (new char [] { (char)r, (char)rune });
-					string sn;
-					if (!s.IsNormalized ()) {
-						sn = s.Normalize ();
-					} else {
-						sn = s;
-					}
+					var sn = !s.IsNormalized () ? s.Normalize () : s;
 					var c = sn [0];
 					_contents [_crow, _ccol - 1, 0] = c;
 					_contents [_crow, _ccol - 1, 1] = CurrentAttribute;
 					_contents [_crow, _ccol - 1, 2] = 1;
-
 				} else {
 					if (runeWidth < 2 && _ccol > 0
 						&& Rune.ColumnWidth ((char)_contents [_crow, _ccol - 1, 0]) > 1) {
 
-						_contents [_crow, _ccol - 1, 0] = (int)(uint)' ';
+						_contents [_crow, _ccol - 1, 0] = (char)System.Text.Rune.ReplacementChar.Value;
 
 					} else if (runeWidth < 2 && _ccol <= Clip.Right - 1
 						&& Rune.ColumnWidth ((char)_contents [_crow, _ccol, 0]) > 1) {
 
-						_contents [_crow, _ccol + 1, 0] = (int)(uint)' ';
+						_contents [_crow, _ccol + 1, 0] = (char)System.Text.Rune.ReplacementChar.Value;
 						_contents [_crow, _ccol + 1, 2] = 1;
 
 					}
 					if (runeWidth > 1 && _ccol == Clip.Right - 1) {
-						_contents [_crow, _ccol, 0] = (int)(uint)' ';
+						_contents [_crow, _ccol, 0] = (char)System.Text.Rune.ReplacementChar.Value;
 					} else {
 						_contents [_crow, _ccol, 0] = (int)(uint)rune;
 					}
@@ -722,10 +717,6 @@ namespace Terminal.Gui {
 					_contents [_crow, _ccol, 2] = 0;
 				}
 				_ccol++;
-			}
-
-			if (_sync) {
-				UpdateScreen ();
 			}
 		}
 
@@ -874,7 +865,7 @@ namespace Terminal.Gui {
 				} catch (IndexOutOfRangeException) { }
 			}
 		}
-		
+
 		public override void Refresh ()
 		{
 			UpdateScreen ();

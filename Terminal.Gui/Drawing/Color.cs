@@ -288,8 +288,9 @@ namespace Terminal.Gui {
 		/// <returns>The current attribute.</returns>
 		public static Attribute Get ()
 		{
-			if (Application.Driver == null)
+			if (Application.Driver == null) {
 				throw new InvalidOperationException ("The Application has not been initialized");
+			}
 			return Application.Driver.GetAttribute ();
 		}
 

@@ -1521,6 +1521,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+		// Current row, and current col, tracked by Move/AddCh only
 		int _ccol, _crow;
 		public override void Move (int col, int row)
 		{
@@ -1533,57 +1534,68 @@ namespace Terminal.Gui {
 			return _crow * Cols + _ccol;
 		}
 
-		public override void AddRune (Rune rune)
+		public override void AddRune (Rune nStackrune)
 		{
-			rune = MakePrintable (rune);
-			var runeWidth = Rune.ColumnWidth (rune);
+			// BUGBUG: https://github.com/gui-cs/Terminal.Gui/issues/2610
+			System.Text.Rune rune = (System.Text.Rune)MakePrintable (nStackrune).Value;
+			var runeWidth = Rune.ColumnWidth (nStackrune);
 			var position = GetOutputBufferPosition ();
 			var validLocation = IsValidLocation (_ccol, _crow);
 
 			if (validLocation) {
 				if (runeWidth == 0 && _ccol > 0) {
+					// Non spacing glyph beyond first col
 					var r = _contents [_crow, _ccol - 1, 0];
-					var s = new string (new char [] { (char)r, (char)rune });
-					string sn;
-					if (!s.IsNormalized ()) {
-						sn = s.Normalize ();
-					} else {
-						sn = s;
-					}
+					var s = new string (new char [] { (char)r, (char)rune.Value });
+					var sn = !s.IsNormalized () ? s.Normalize () : s;
 					var c = sn [0];
-					var prevPosition = _crow * Cols + (_ccol - 1);
-					_outputBuffer [prevPosition].Char.UnicodeChar = c;
 					_contents [_crow, _ccol - 1, 0] = c;
-					_outputBuffer [prevPosition].Attributes = (ushort)CurrentAttribute;
 					_contents [_crow, _ccol - 1, 1] = CurrentAttribute;
 					_contents [_crow, _ccol - 1, 2] = 1;
+
+					var prevPosition = _crow * Cols + (_ccol - 1);
+					_outputBuffer [prevPosition].Char.UnicodeChar = c;
+					_outputBuffer [prevPosition].Attributes = (ushort)CurrentAttribute;
 					WindowsConsole.SmallRect.Update (ref _damageRegion, (short)(_ccol - 1), (short)_crow);
 				} else {
-					if (runeWidth < 2 && _ccol > 0
-						&& Rune.ColumnWidth ((char)_contents [_crow, _ccol - 1, 0]) > 1) {
-
-						var prevPosition = _crow * Cols + (_ccol - 1);
-						_outputBuffer [prevPosition].Char.UnicodeChar = ' ';
-						_contents [_crow, _ccol - 1, 0] = (int)(uint)' ';
-
-					} else if (runeWidth < 2 && _ccol <= Clip.Right - 1
-						&& Rune.ColumnWidth ((char)_contents [_crow, _ccol, 0]) > 1) {
-
-						var prevPosition = GetOutputBufferPosition () + 1;
-						_outputBuffer [prevPosition].Char.UnicodeChar = (char)' ';
-						_contents [_crow, _ccol + 1, 0] = (int)(uint)' ';
-
+					if (runeWidth < 2) {
+						// Single column glyph
+						if (_ccol > 0 && Rune.ColumnWidth ((char)_contents [_crow, _ccol - 1, 0]) > 1) {
+							// glyph to left is wide; nuke it 
+							// BUGBUG: Does this make sense?
+							_contents [_crow, _ccol - 1, 0] = System.Text.Rune.ReplacementChar.Value;
+							var prevPosition = _crow * Cols + (_ccol - 1);
+							_outputBuffer [prevPosition].Char.UnicodeChar = (char)System.Text.Rune.ReplacementChar.Value;
+						} else if (_ccol <= Clip.Right - 1 && Rune.ColumnWidth ((char)_contents [_crow, _ccol, 0]) > 1) {
+							// we're just inside the clip rect and the glyph there is wide
+							// nuke the existing glyph to right
+							_contents [_crow, _ccol + 1, 0] = System.Text.Rune.ReplacementChar.Value;
+							var prevPosition = GetOutputBufferPosition () + 1;
+							_outputBuffer [prevPosition].Char.UnicodeChar = (char)System.Text.Rune.ReplacementChar.Value;
+						}
 					}
+
 					if (runeWidth > 1 && _ccol == Clip.Right - 1) {
-						_outputBuffer [position].Char.UnicodeChar = (char)' ';
-						_contents [_crow, _ccol, 0] = (int)(uint)' ';
+						// Wide glyph and we're just inside the clip rect
+						// ignore it
+						// BUGBUG: Shouldn't we write the unknown glyph glyph?
+						_contents [_crow, _ccol, 0] = System.Text.Rune.ReplacementChar.Value;
+						_outputBuffer [position].Char.UnicodeChar = (char)System.Text.Rune.ReplacementChar.Value;
 					} else {
-						_outputBuffer [position].Char.UnicodeChar = (char)rune;
-						_contents [_crow, _ccol, 0] = (int)(uint)rune;
+						// Add the glyph (wide or not)
+						if (rune.IsBmp) {
+							_contents [_crow, _ccol, 0] = rune.Value;
+							_outputBuffer [position].Char.UnicodeChar = (char) rune.Value;
+						} else {
+							_contents [_crow, _ccol, 0] = (char)System.Text.Rune.ReplacementChar.Value;
+							_outputBuffer [position].Char.UnicodeChar = (char)System.Text.Rune.ReplacementChar.Value;
+
+						}
 					}
-					_outputBuffer [position].Attributes = (ushort)CurrentAttribute;
 					_contents [_crow, _ccol, 1] = CurrentAttribute;
 					_contents [_crow, _ccol, 2] = 1;
+
+					_outputBuffer [position].Attributes = (ushort)CurrentAttribute;
 					WindowsConsole.SmallRect.Update (ref _damageRegion, (short)_ccol, (short)_crow);
 				}
 			}
@@ -1593,19 +1605,15 @@ namespace Terminal.Gui {
 			}
 
 			if (runeWidth > 1) {
-				if (validLocation && _ccol < Clip.Right) {
+				if (rune.IsBmp && _ccol < Clip.Right) {
 					position = GetOutputBufferPosition ();
 					_outputBuffer [position].Attributes = (ushort)CurrentAttribute;
 					_outputBuffer [position].Char.UnicodeChar = (char)0x00;
-					_contents [_crow, _ccol, 0] = (int)(uint)0x00;
+					_contents [_crow, _ccol, 0] = (char)0x00;
 					_contents [_crow, _ccol, 1] = CurrentAttribute;
 					_contents [_crow, _ccol, 2] = 0;
 				}
 				_ccol++;
-			}
-
-			if (_sync) {
-				UpdateScreen ();
 			}
 		}
 

@@ -43,7 +43,7 @@ namespace Terminal.Gui.TextTests {
 		}
 		
 		[Fact, AutoInitShutdown]
-		public void AddRune_On_Clip_Left_Or_Right_Replace_Previous_Or_Next_Wide_Rune_With_Space ()
+		public void AddRune_On_Clip_Left_Or_Right_Replace_Previous_Or_Next_Wide_Rune_With_Replacement ()
 		{
 			var tv = new TextView () {
 				Width = Dim.Fill (),
@@ -71,10 +71,10 @@ namespace Terminal.Gui.TextTests {
 ┌────────────────────────────┐
 │これは広いルーンラインです。│
 │これは広いルーンラインです。│
-│これは ┌────────────┐ です。│
-│これは │ワイドルーン│ です。│
-│これは │  {CM.Glyphs.LeftBracket} 選ぶ {CM.Glyphs.RightBracket}  │ です。│
-│これは └────────────┘ です。│
+│これは�┌────────────┐�です。│
+│これは�│ワイドルーン│�です。│
+│これは�│  {CM.Glyphs.LeftBracket} 選ぶ {CM.Glyphs.RightBracket}  │�です。│
+│これは�└────────────┘�です。│
 │これは広いルーンラインです。│
 │これは広いルーンラインです。│
 └────────────────────────────┘

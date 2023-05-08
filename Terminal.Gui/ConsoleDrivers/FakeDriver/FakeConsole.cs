@@ -235,6 +235,7 @@ namespace Terminal.Gui {
 		/// 
 		/// </summary>
 		public static int BufferWidth { get; set; } = WIDTH;
+		
 		//
 		// Summary:
 		//	Gets or sets the height of the console window area.
