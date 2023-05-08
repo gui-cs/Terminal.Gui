@@ -1077,12 +1077,12 @@ namespace Terminal.Gui {
 			return savedCursorVisibility == CursorVisibility.Default;
 		}
 		
-		public override void StartReportingMouseMoves ()
+		public void StartReportingMouseMoves ()
 		{
 			Console.Out.Write (EscSeqUtils.EnableMouseEvents);
 		}
 
-		public override void StopReportingMouseMoves ()
+		public void StopReportingMouseMoves ()
 		{
 			Console.Out.Write (EscSeqUtils.DisableMouseEvents);
 		}

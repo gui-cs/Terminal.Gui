@@ -68,7 +68,7 @@ namespace Terminal.Gui {
 					Contents [Row, Col, 2] = 1;
 
 					if (runeWidth < 2 && Col > 0
-						&& Rune.ColumnWidth ((char)Contents [Row, Col - 1, 0]) > 1) {
+							&& Rune.ColumnWidth ((char)Contents [Row, Col - 1, 0]) > 1) {
 
 						var curAttr = CurrentAttribute;
 						Curses.attrset (Contents [Row, Col - 1, 1]);
@@ -78,7 +78,7 @@ namespace Terminal.Gui {
 						Curses.attrset (curAttr);
 
 					} else if (runeWidth < 2 && Col <= Clip.Right - 1
-						&& Rune.ColumnWidth ((char)Contents [Row, Col, 0]) > 1) {
+								&& Rune.ColumnWidth ((char)Contents [Row, Col, 0]) > 1) {
 
 						var curAttr = CurrentAttribute;
 						Curses.attrset (Contents [Row, Col + 1, 1]);
@@ -150,7 +150,7 @@ namespace Terminal.Gui {
 		}
 
 		public override void UpdateScreen () => _window.redrawwin ();
-		
+
 		public Curses.Window _window;
 
 		/// <summary>
@@ -307,19 +307,24 @@ namespace Terminal.Gui {
 					return;
 				}
 				k = MapCursesKey (wch);
-				if (wch >= 277 && wch <= 288) { // Shift+(F1 - F12)
+				if (wch >= 277 && wch <= 288) {
+					// Shift+(F1 - F12)
 					wch -= 12;
 					k = Key.ShiftMask | MapCursesKey (wch);
-				} else if (wch >= 289 && wch <= 300) { // Ctrl+(F1 - F12)
+				} else if (wch >= 289 && wch <= 300) {
+					// Ctrl+(F1 - F12)
 					wch -= 24;
 					k = Key.CtrlMask | MapCursesKey (wch);
-				} else if (wch >= 301 && wch <= 312) { // Ctrl+Shift+(F1 - F12)
+				} else if (wch >= 301 && wch <= 312) {
+					// Ctrl+Shift+(F1 - F12)
 					wch -= 36;
 					k = Key.CtrlMask | Key.ShiftMask | MapCursesKey (wch);
-				} else if (wch >= 313 && wch <= 324) { // Alt+(F1 - F12)
+				} else if (wch >= 313 && wch <= 324) {
+					// Alt+(F1 - F12)
 					wch -= 48;
 					k = Key.AltMask | MapCursesKey (wch);
-				} else if (wch >= 325 && wch <= 327) { // Shift+Alt+(F1 - F3)
+				} else if (wch >= 325 && wch <= 327) {
+					// Shift+Alt+(F1 - F3)
 					wch -= 60;
 					k = Key.ShiftMask | Key.AltMask | MapCursesKey (wch);
 				}
@@ -710,12 +715,12 @@ namespace Terminal.Gui {
 			StartReportingMouseMoves ();
 		}
 
-		public override void StartReportingMouseMoves ()
+		public void StartReportingMouseMoves ()
 		{
 			Console.Out.Write (EscSeqUtils.EnableMouseEvents);
 		}
 
-		public override void StopReportingMouseMoves ()
+		public void StopReportingMouseMoves ()
 		{
 			Console.Out.Write (EscSeqUtils.DisableMouseEvents);
 		}
@@ -951,158 +956,6 @@ namespace Terminal.Gui {
 				}
 			} catch (Exception e) {
 				throw new NotSupportedException ($"\"{_xclipPath} {xclipargs} < {text}\" failed", e);
-			}
-		}
-	}
-
-	/// <summary>
-	///  A clipboard implementation for MacOSX. 
-	///  This implementation uses the Mac clipboard API (via P/Invoke) to copy/paste.
-	///  The existance of the Mac pbcopy and pbpaste commands 
-	///  is used to determine if copy/paste is supported.
-	/// </summary>	
-	class MacOSXClipboard : ClipboardBase {
-		IntPtr _nsString = objc_getClass ("NSString");
-		IntPtr _nsPasteboard = objc_getClass ("NSPasteboard");
-		IntPtr _utfTextType;
-		IntPtr _generalPasteboard;
-		IntPtr _initWithUtf8Register = sel_registerName ("initWithUTF8String:");
-		IntPtr _allocRegister = sel_registerName ("alloc");
-		IntPtr _setStringRegister = sel_registerName ("setString:forType:");
-		IntPtr _stringForTypeRegister = sel_registerName ("stringForType:");
-		IntPtr _utf8Register = sel_registerName ("UTF8String");
-		IntPtr _nsStringPboardType;
-		IntPtr _generalPasteboardRegister = sel_registerName ("generalPasteboard");
-		IntPtr _clearContentsRegister = sel_registerName ("clearContents");
-
-		public MacOSXClipboard ()
-		{
-			_utfTextType = objc_msgSend (objc_msgSend (_nsString, _allocRegister), _initWithUtf8Register, "public.utf8-plain-text");
-			_nsStringPboardType = objc_msgSend (objc_msgSend (_nsString, _allocRegister), _initWithUtf8Register, "NSStringPboardType");
-			_generalPasteboard = objc_msgSend (_nsPasteboard, _generalPasteboardRegister);
-			IsSupported = CheckSupport ();
-		}
-
-		public override bool IsSupported { get; }
-
-		bool CheckSupport ()
-		{
-			var (exitCode, result) = ClipboardProcessRunner.Bash ("which pbcopy", waitForOutput: true);
-			if (exitCode != 0 || !result.FileExists ()) {
-				return false;
-			}
-			(exitCode, result) = ClipboardProcessRunner.Bash ("which pbpaste", waitForOutput: true);
-			return exitCode == 0 && result.FileExists ();
-		}
-
-		protected override string GetClipboardDataImpl ()
-		{
-			var ptr = objc_msgSend (_generalPasteboard, _stringForTypeRegister, _nsStringPboardType);
-			var charArray = objc_msgSend (ptr, _utf8Register);
-			return Marshal.PtrToStringAnsi (charArray);
-		}
-
-		protected override void SetClipboardDataImpl (string text)
-		{
-			IntPtr str = default;
-			try {
-				str = objc_msgSend (objc_msgSend (_nsString, _allocRegister), _initWithUtf8Register, text);
-				objc_msgSend (_generalPasteboard, _clearContentsRegister);
-				objc_msgSend (_generalPasteboard, _setStringRegister, str, _utfTextType);
-			} finally {
-				if (str != default) {
-					objc_msgSend (str, sel_registerName ("release"));
-				}
-			}
-		}
-
-		[DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
-		static extern IntPtr objc_getClass (string className);
-
-		[DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
-		static extern IntPtr objc_msgSend (IntPtr receiver, IntPtr selector);
-
-		[DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
-		static extern IntPtr objc_msgSend (IntPtr receiver, IntPtr selector, string arg1);
-
-		[DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
-		static extern IntPtr objc_msgSend (IntPtr receiver, IntPtr selector, IntPtr arg1);
-
-		[DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
-		static extern IntPtr objc_msgSend (IntPtr receiver, IntPtr selector, IntPtr arg1, IntPtr arg2);
-
-		[DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
-		static extern IntPtr sel_registerName (string selectorName);
-	}
-
-	/// <summary>
-	///  A clipboard implementation for Linux, when running under WSL. 
-	///  This implementation uses the Windows clipboard to store the data, and uses Windows'
-	///  powershell.exe (launched via WSL interop services) to set/get the Windows
-	///  clipboard. 
-	/// </summary>
-	class WSLClipboard : ClipboardBase {
-		public WSLClipboard ()
-		{
-		}
-
-		public override bool IsSupported {
-			get {
-				return CheckSupport ();
-			}
-		}
-
-		private static string _powershellPath = string.Empty;
-
-		bool CheckSupport ()
-		{
-			if (string.IsNullOrEmpty (_powershellPath)) {
-				// Specify pwsh.exe (not pwsh) to ensure we get the Windows version (invoked via WSL)
-				var (exitCode, result) = ClipboardProcessRunner.Bash ("which pwsh.exe", waitForOutput: true);
-				if (exitCode > 0) {
-					(exitCode, result) = ClipboardProcessRunner.Bash ("which powershell.exe", waitForOutput: true);
-				}
-
-				if (exitCode == 0) {
-					_powershellPath = result;
-				}
-			}
-			return !string.IsNullOrEmpty (_powershellPath);
-		}
-
-		protected override string GetClipboardDataImpl ()
-		{
-			if (!IsSupported) {
-				return string.Empty;
-			}
-
-			var (exitCode, output) = ClipboardProcessRunner.Process (_powershellPath, "-noprofile -command \"Get-Clipboard\"");
-			if (exitCode == 0) {
-				if (Application.Driver is CursesDriver) {
-					Curses.raw ();
-					Curses.noecho ();
-				}
-
-				if (output.EndsWith ("\r\n")) {
-					output = output.Substring (0, output.Length - 2);
-				}
-				return output;
-			}
-			return string.Empty;
-		}
-
-		protected override void SetClipboardDataImpl (string text)
-		{
-			if (!IsSupported) {
-				return;
-			}
-
-			var (exitCode, output) = ClipboardProcessRunner.Process (_powershellPath, $"-noprofile -command \"Set-Clipboard -Value \\\"{text}\\\"\"");
-			if (exitCode == 0) {
-				if (Application.Driver is CursesDriver) {
-					Curses.raw ();
-					Curses.noecho ();
-				}
 			}
 		}
 	}
