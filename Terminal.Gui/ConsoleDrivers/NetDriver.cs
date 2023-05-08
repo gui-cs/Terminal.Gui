@@ -614,12 +614,6 @@ namespace Terminal.Gui {
 		const int COLOR_BRIGHT_CYAN = 96;
 		const int COLOR_BRIGHT_WHITE = 97;
 
-		int _cols, _rows, _left, _top;
-
-		public override int Cols => _cols;
-		public override int Rows => _rows;
-		public override int Left => _left;
-		public override int Top => _top;
 		public override bool EnableConsoleScrolling { get; set; }
 		public NetWinVTConsole NetWinConsole { get; }
 		public bool IsWinPlatform { get; }
@@ -780,8 +774,8 @@ namespace Terminal.Gui {
 				_largestBufferHeight = Console.WindowHeight;
 			}
 
-			_cols = Console.WindowWidth;
-			_rows = _largestBufferHeight;
+			Cols = Console.WindowWidth;
+			Rows = _largestBufferHeight;
 
 			CurrentAttribute = MakeColor (Color.White, Color.Black);
 			InitializeColorSchemes ();
@@ -854,8 +848,8 @@ namespace Terminal.Gui {
 			lock (_contents) {
 				// Can raise an exception while is still resizing.
 				try {
-					for (int row = 0; row < _rows; row++) {
-						for (int c = 0; c < _cols; c++) {
+					for (int row = 0; row < Rows; row++) {
+						for (int c = 0; c < Cols; c++) {
 							_contents [row, c, 0] = ' ';
 							_contents [row, c, 1] = (ushort)Colors.TopLevel.Normal;
 							_contents [row, c, 2] = 0;
@@ -1048,8 +1042,8 @@ namespace Terminal.Gui {
 					} catch (System.ArgumentOutOfRangeException) { }
 				}
 			}
-			_top = Console.WindowTop;
-			_left = Console.WindowLeft;
+			Top = Console.WindowTop;
+			Left = Console.WindowLeft;
 		}
 
 		private bool EnsureBufferSize ()
@@ -1302,10 +1296,10 @@ namespace Terminal.Gui {
 			} else {
 				_largestBufferHeight = Math.Max (size.Height, _largestBufferHeight);
 			}
-			_top = 0;
-			_left = 0;
-			_cols = size.Width;
-			_rows = _largestBufferHeight;
+			Top = 0;
+			Left = 0;
+			Cols = size.Width;
+			Rows = _largestBufferHeight;
 			ResizeScreen ();
 			UpdateOffScreen ();
 			winChanging = false;

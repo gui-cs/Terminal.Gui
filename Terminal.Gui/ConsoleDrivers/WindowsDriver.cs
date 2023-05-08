@@ -702,15 +702,10 @@ namespace Terminal.Gui {
 
 	internal class WindowsDriver : ConsoleDriver {
 		WindowsConsole.CharInfo [] _outputBuffer;
-		int _cols, _rows, _left, _top;
 		WindowsConsole.SmallRect _damageRegion;
 		IClipboard _clipboard;
 		int [,,] _contents;
 
-		public override int Cols => _cols;
-		public override int Rows => _rows;
-		public override int Left => _left;
-		public override int Top => _top;
 		public override bool EnableConsoleScrolling { get; set; }
 		public override IClipboard Clipboard => _clipboard;
 		public override int [,,] Contents => _contents;
@@ -748,15 +743,15 @@ namespace Terminal.Gui {
 		{
 			if (!EnableConsoleScrolling) {
 				var w = e.Width;
-				if (w == _cols - 3 && e.Height < _rows) {
+				if (w == Cols - 3 && e.Height < Rows) {
 					w += 3;
 				}
 				var newSize = WinConsole.SetConsoleWindow (
 					(short)Math.Max (w, 16), (short)Math.Max (e.Height, 0));
-				_left = 0;
-				_top = 0;
-				_cols = newSize.Width;
-				_rows = newSize.Height;
+				Left = 0;
+				Top = 0;
+				Cols = newSize.Width;
+				Rows = newSize.Height;
 				ResizeScreen ();
 				UpdateOffScreen ();
 				TerminalResized.Invoke ();
@@ -886,13 +881,13 @@ namespace Terminal.Gui {
 
 			case WindowsConsole.EventType.WindowBufferSize:
 				var winSize = WinConsole.GetConsoleBufferWindow (out Point pos);
-				_left = pos.X;
-				_top = pos.Y;
-				_cols = inputEvent.WindowBufferSizeEvent._size.X;
+				Left = pos.X;
+				Top = pos.Y;
+				Cols = inputEvent.WindowBufferSizeEvent._size.X;
 				if (EnableConsoleScrolling) {
-					_rows = Math.Max (inputEvent.WindowBufferSizeEvent._size.Y, _rows);
+					Rows = Math.Max (inputEvent.WindowBufferSizeEvent._size.Y, Rows);
 				} else {
-					_rows = inputEvent.WindowBufferSizeEvent._size.Y;
+					Rows = inputEvent.WindowBufferSizeEvent._size.Y;
 				}
 				//System.Diagnostics.Debug.WriteLine ($"{EnableConsoleScrolling},{cols},{rows}");
 				ResizeScreen ();
@@ -1466,8 +1461,8 @@ namespace Terminal.Gui {
 				// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
 
 				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
-				_cols = winSize.Width;
-				_rows = winSize.Height;
+				Cols = winSize.Width;
+				Rows = winSize.Height;
 				WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
 
 				CurrentAttribute = MakeColor (Color.White, Color.Black);
@@ -1507,10 +1502,10 @@ namespace Terminal.Gui {
 
 		public override void UpdateOffScreen ()
 		{
-			_contents = new int [_rows, _cols, 3];
-			for (int row = 0; row < _rows; row++) {
-				for (int col = 0; col < _cols; col++) {
-					int position = row * _cols + col;
+			_contents = new int [Rows, Cols, 3];
+			for (int row = 0; row < Rows; row++) {
+				for (int col = 0; col < Cols; col++) {
+					int position = row * Cols + col;
 					_outputBuffer [position].Attributes = (ushort)Colors.TopLevel.Normal;
 					_outputBuffer [position].Char.UnicodeChar = ' ';
 					_contents [row, col, 0] = _outputBuffer [position].Char.UnicodeChar;

@@ -78,26 +78,26 @@ namespace Terminal.Gui {
 		/// The handler fired when the terminal is resized.
 		/// </summary>
 		protected Action TerminalResized;
-
+		 
 		/// <summary>
 		/// The current number of columns in the terminal.
 		/// </summary>
-		public abstract int Cols { get; }
+		public virtual int Cols { get; internal set; }
 
 		/// <summary>
 		/// The current number of rows in the terminal.
 		/// </summary>
-		public abstract int Rows { get; }
+		public virtual int Rows { get; internal set; }
 
 		/// <summary>
 		/// The current left in the terminal.
 		/// </summary>
-		public abstract int Left { get; }
+		public virtual int Left { get; internal set; }
 
 		/// <summary>
 		/// The current top in the terminal.
 		/// </summary>
-		public abstract int Top { get; }
+		public virtual int Top { get; internal set; }
 
 		/// <summary>
 		/// Get the operation system clipboard.

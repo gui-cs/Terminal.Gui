@@ -38,12 +38,12 @@ namespace Terminal.Gui {
 
 		public static FakeDriver.Behaviors FakeBehaviors = new Behaviors ();
 
-		int _cols, _rows, _left, _top;
-		public override int Cols => _cols;
-		public override int Rows => _rows;
+		//int Cols, Rows;//, Left, Top;
+		//public override int Cols => Cols;
+		//public override int Rows => Rows;
 		// Only handling left here because not all terminals has a horizontal scroll bar.
-		public override int Left => 0;
-		public override int Top => 0;
+		//public override int Left => 0;
+		//public override int Top => 0;
 		public override bool EnableConsoleScrolling { get; set; }
 		private IClipboard _clipboard = null;
 		public override IClipboard Clipboard => _clipboard;
@@ -193,8 +193,8 @@ namespace Terminal.Gui {
 
 			TerminalResized = terminalResized;
 
-			_cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
-			_rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
+			Cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
+			Rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
 			FakeConsole.Clear ();
 			ResizeScreen ();
 			// Call InitializeColorSchemes before UpdateOffScreen as it references Colors
@@ -497,8 +497,8 @@ namespace Terminal.Gui {
 		public void SetBufferSize (int width, int height)
 		{
 			FakeConsole.SetBufferSize (width, height);
-			_cols = width;
-			_rows = height;
+			Cols = width;
+			Rows = height;
 			if (!EnableConsoleScrolling) {
 				SetWindowSize (width, height);
 			}
@@ -509,10 +509,10 @@ namespace Terminal.Gui {
 		{
 			FakeConsole.SetWindowSize (width, height);
 			if (!EnableConsoleScrolling) {
-				if (width != _cols || height != _rows) {
+				if (width != Cols || height != Rows) {
 					SetBufferSize (width, height);
-					_cols = width;
-					_rows = height;
+					Cols = width;
+					Rows = height;
 				}
 			}
 			ProcessResize ();
@@ -521,13 +521,13 @@ namespace Terminal.Gui {
 		public void SetWindowPosition (int left, int top)
 		{
 			if (EnableConsoleScrolling) {
-				_left = Math.Max (Math.Min (left, Cols - FakeConsole.WindowWidth), 0);
-				_top = Math.Max (Math.Min (top, Rows - FakeConsole.WindowHeight), 0);
-			} else if (_left > 0 || _top > 0) {
-				_left = 0;
-				_top = 0;
+				Left = Math.Max (Math.Min (left, Cols - FakeConsole.WindowWidth), 0);
+				Top = Math.Max (Math.Min (top, Rows - FakeConsole.WindowHeight), 0);
+			} else if (Left > 0 || Top > 0) {
+				Left = 0;
+				Top = 0;
 			}
-			FakeConsole.SetWindowPosition (_left, _top);
+			FakeConsole.SetWindowPosition (Left, Top);
 		}
 
 		void ProcessResize ()
@@ -558,8 +558,8 @@ namespace Terminal.Gui {
 			} else {
 				try {
 #pragma warning disable CA1416
-					FakeConsole.WindowLeft = Math.Max (Math.Min (_left, Cols - FakeConsole.WindowWidth), 0);
-					FakeConsole.WindowTop = Math.Max (Math.Min (_top, Rows - FakeConsole.WindowHeight), 0);
+					FakeConsole.WindowLeft = Math.Max (Math.Min (Left, Cols - FakeConsole.WindowWidth), 0);
+					FakeConsole.WindowTop = Math.Max (Math.Min (Top, Rows - FakeConsole.WindowHeight), 0);
 #pragma warning restore CA1416
 				} catch (Exception) {
 					return;
@@ -576,8 +576,8 @@ namespace Terminal.Gui {
 
 			// Can raise an exception while is still resizing.
 			try {
-				for (int row = 0; row < _rows; row++) {
-					for (int c = 0; c < _cols; c++) {
+				for (int row = 0; row < Rows; row++) {
+					for (int c = 0; c < Cols; c++) {
 						_contents [row, c, 0] = ' ';
 						_contents [row, c, 1] = (ushort)Colors.TopLevel.Normal;
 						_contents [row, c, 2] = 0;
