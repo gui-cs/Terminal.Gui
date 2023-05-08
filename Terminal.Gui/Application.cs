@@ -1148,7 +1148,7 @@ namespace Terminal.Gui {
 			if (!OnGrabbingMouse (view)) {
 				OnGrabbedMouse (view);
 				_mouseGrabView = view;
-				Driver.UncookMouse ();
+				//Driver.UncookMouse ();
 			}
 		}
 
@@ -1162,7 +1162,7 @@ namespace Terminal.Gui {
 			if (!OnUnGrabbingMouse (_mouseGrabView)) {
 				OnUnGrabbedMouse (_mouseGrabView);
 				_mouseGrabView = null;
-				Driver.CookMouse ();
+				//Driver.CookMouse ();
 			}
 		}
 

@@ -256,22 +256,22 @@ namespace Terminal.Gui {
 			CurrentAttribute = c;
 		}
 
-		/// <summary>
-		/// Set Colors from limit sets of colors. Not implemented by any driver: See Issue #2300.
-		/// </summary>
-		/// <param name="foreground">Foreground.</param>
-		/// <param name="background">Background.</param>
-		public abstract void SetColors (ConsoleColor foreground, ConsoleColor background);
+		///// <summary>
+		///// Set Colors from limit sets of colors. Not implemented by any driver: See Issue #2300.
+		///// </summary>
+		///// <param name="foreground">Foreground.</param>
+		///// <param name="background">Background.</param>
+		//public abstract void SetColors (ConsoleColor foreground, ConsoleColor background);
 
-		// Advanced uses - set colors to any pre-set pairs, you would need to init_color
-		// that independently with the R, G, B values.
-		/// <summary>
-		/// Advanced uses - set colors to any pre-set pairs, you would need to init_color
-		/// that independently with the R, G, B values. Not implemented by any driver: See Issue #2300.
-		/// </summary>
-		/// <param name="foregroundColorId">Foreground color identifier.</param>
-		/// <param name="backgroundColorId">Background color identifier.</param>
-		public abstract void SetColors (short foregroundColorId, short backgroundColorId);
+		//// Advanced uses - set colors to any pre-set pairs, you would need to init_color
+		//// that independently with the R, G, B values.
+		///// <summary>
+		///// Advanced uses - set colors to any pre-set pairs, you would need to init_color
+		///// that independently with the R, G, B values. Not implemented by any driver: See Issue #2300.
+		///// </summary>
+		///// <param name="foregroundColorId">Foreground color identifier.</param>
+		///// <param name="backgroundColorId">Background color identifier.</param>
+		//public abstract void SetColors (short foregroundColorId, short backgroundColorId);
 
 		/// <summary>
 		/// Gets the foreground and background colors based on the value.
@@ -437,16 +437,16 @@ namespace Terminal.Gui {
 		/// </summary>
 		public abstract void StopReportingMouseMoves ();
 
-		/// <summary>
-		/// Disables the cooked event processing from the mouse driver. 
-		/// At startup, it is assumed mouse events are cooked. Not implemented by any driver: See Issue #2300.
-		/// </summary>
-		public abstract void UncookMouse ();
+		///// <summary>
+		///// Disables the cooked event processing from the mouse driver. 
+		///// At startup, it is assumed mouse events are cooked. Not implemented by any driver: See Issue #2300.
+		///// </summary>
+		//public abstract void UncookMouse ();
 
-		/// <summary>
-		/// Enables the cooked event processing from the mouse driver. Not implemented by any driver: See Issue #2300.
-		/// </summary>
-		public abstract void CookMouse ();
+		///// <summary>
+		///// Enables the cooked event processing from the mouse driver. Not implemented by any driver: See Issue #2300.
+		///// </summary>
+		//public abstract void CookMouse ();
 
 		private Attribute currentAttribute;
 

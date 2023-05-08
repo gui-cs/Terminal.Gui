@@ -198,36 +198,36 @@ namespace Terminal.Gui {
 
 		int [,] _colorPairs = new int [16, 16];
 
-		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
-		{
-			// BUGBUG: This code is never called ?? See Issue #2300
-			int f = (short)foreground;
-			int b = (short)background;
-			var v = _colorPairs [f, b];
-			if ((v & 0x10000) == 0) {
-				b &= 0x7;
-				bool bold = (f & 0x8) != 0;
-				f &= 0x7;
+		//public override void SetColors (ConsoleColor foreground, ConsoleColor background)
+		//{
+		//	// BUGBUG: This code is never called ?? See Issue #2300
+		//	int f = (short)foreground;
+		//	int b = (short)background;
+		//	var v = _colorPairs [f, b];
+		//	if ((v & 0x10000) == 0) {
+		//		b &= 0x7;
+		//		bool bold = (f & 0x8) != 0;
+		//		f &= 0x7;
 
-				v = MakeColor ((short)f, (short)b) | (bold ? Curses.A_BOLD : 0);
-				_colorPairs [(int)foreground, (int)background] = v | 0x1000;
-			}
-			SetAttribute (v & 0xffff);
-		}
+		//		v = MakeColor ((short)f, (short)b) | (bold ? Curses.A_BOLD : 0);
+		//		_colorPairs [(int)foreground, (int)background] = v | 0x1000;
+		//	}
+		//	SetAttribute (v & 0xffff);
+		//}
 
-		//Dictionary<int, int> _rawPairs = new Dictionary<int, int> ();
-		public override void SetColors (short foreColorId, short backgroundColorId)
-		{
-			throw new NotImplementedException ();
+		////Dictionary<int, int> _rawPairs = new Dictionary<int, int> ();
+		//public override void SetColors (short foreColorId, short backgroundColorId)
+		//{
+		//	throw new NotImplementedException ();
 
-			// BUGBUG: This code is never called ?? See Issue #2300
-			//int key = ((ushort)foreColorId << 16) | (ushort)backgroundColorId;
-			//if (!_rawPairs.TryGetValue (key, out var v)) {
-			//	v = MakeColor (foreColorId, backgroundColorId);
-			//	_rawPairs [key] = v;
-			//}
-			//SetAttribute (v);
-		}
+		//	// BUGBUG: This code is never called ?? See Issue #2300
+		//	//int key = ((ushort)foreColorId << 16) | (ushort)backgroundColorId;
+		//	//if (!_rawPairs.TryGetValue (key, out var v)) {
+		//	//	v = MakeColor (foreColorId, backgroundColorId);
+		//	//	_rawPairs [key] = v;
+		//	//}
+		//	//SetAttribute (v);
+		//}
 
 		static Key MapCursesKey (int cursesKey)
 		{
@@ -774,24 +774,7 @@ namespace Terminal.Gui {
 		{
 			Console.Out.Write (EscSeqUtils.DisableMouseEvents);
 		}
-
-		//int lastMouseInterval;
-		//bool mouseGrabbed;
-
-		public override void UncookMouse ()
-		{
-			//if (mouseGrabbed)
-			//	return;
-			//lastMouseInterval = Curses.mouseinterval (0);
-			//mouseGrabbed = true;
-		}
-
-		public override void CookMouse ()
-		{
-			//mouseGrabbed = false;
-			//Curses.mouseinterval (lastMouseInterval);
-		}
-
+		
 		/// <inheritdoc/>
 		public override bool GetCursorVisibility (out CursorVisibility visibility)
 		{

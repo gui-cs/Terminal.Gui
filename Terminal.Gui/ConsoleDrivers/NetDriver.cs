@@ -1483,31 +1483,6 @@ namespace Terminal.Gui {
 			}
 			return hasColor;
 		}
-
-		#region Unused
-		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
-		{
-		}
-
-		public override void SetColors (short foregroundColorId, short backgroundColorId)
-		{
-			throw new NotImplementedException ();
-		}
-
-		public override void CookMouse ()
-		{
-		}
-
-		public override void UncookMouse ()
-		{
-		}
-		#endregion
-
-		//
-		// These are for the .NET driver, but running natively on Windows, wont run
-		// on the Mono emulation
-		//
-
 	}
 
 	/// <summary>

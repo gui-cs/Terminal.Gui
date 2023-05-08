@@ -1826,15 +1826,6 @@ namespace Terminal.Gui {
 		}
 
 		#region Unused
-		public override void SetColors (ConsoleColor foreground, ConsoleColor background)
-		{
-		}
-
-		public override void SetColors (short foregroundColorId, short backgroundColorId)
-		{
-			throw new NotImplementedException ();
-		}
-
 		public override void Suspend ()
 		{
 		}
@@ -1847,13 +1838,6 @@ namespace Terminal.Gui {
 		{
 		}
 
-		public override void UncookMouse ()
-		{
-		}
-
-		public override void CookMouse ()
-		{
-		}
 		#endregion
 	}
 
