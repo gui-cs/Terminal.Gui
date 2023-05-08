@@ -12,7 +12,6 @@ using Terminal.Gui.Resources;
 using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui {
-
 	/// <summary>
 	/// Modal dialog for selecting files/directories. Has auto-complete and expandable
 	/// navigation pane (Recent, Root drives etc).

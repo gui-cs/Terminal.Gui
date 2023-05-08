@@ -182,6 +182,11 @@ namespace Terminal.Gui {
 		public FileDialogStyle ()
 		{
 			IconGetter = DefaultIconGetter;
+
+			// TODO: Make config setting;
+			var nerd = new NerdFonts();
+			IconGetter = nerd.GetNerdIcon;
+
 			DateFormat = CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern;
 
 			ColorSchemeDirectory = new ColorScheme {
