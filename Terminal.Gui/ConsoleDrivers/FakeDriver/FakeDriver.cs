@@ -78,14 +78,13 @@ namespace Terminal.Gui {
 			}
 		}
 
-		// Current row, and current col, tracked by Move/AddCh only
-		int _ccol, _crow;
 		public override void Move (int col, int row)
 		{
-			_ccol = col;
-			_crow = row;
+			Col = col;
+			Row = row;
 
-			if (Clip.Contains (col, row)) {
+			// BUGBUG: Why is FakeDriver setting the cursor location here?
+			if (IsValidLocation (col, row)) {
 				FakeConsole.CursorTop = row;
 				FakeConsole.CursorLeft = col;
 			}
@@ -95,51 +94,51 @@ namespace Terminal.Gui {
 		{
 			rune = MakePrintable (rune);
 			var runeWidth = Rune.ColumnWidth (rune);
-			var validLocation = IsValidLocation (_ccol, _crow);
+			var validLocation = IsValidLocation (Col, Row);
 
 			if (validLocation) {
-				if (runeWidth == 0 && _ccol > 0) {
-					var r = Contents [_crow, _ccol - 1, 0];
+				if (runeWidth == 0 && Col > 0) {
+					var r = Contents [Row, Col - 1, 0];
 					var s = new string (new [] { (char)r, (char)rune });
 					var sn = !s.IsNormalized () ? s.Normalize () : s;
 					var c = sn [0];
-					Contents [_crow, _ccol - 1, 0] = c;
-					Contents [_crow, _ccol - 1, 1] = CurrentAttribute;
-					Contents [_crow, _ccol - 1, 2] = 1;
+					Contents [Row, Col - 1, 0] = c;
+					Contents [Row, Col - 1, 1] = CurrentAttribute;
+					Contents [Row, Col - 1, 2] = 1;
 				} else {
-					if (runeWidth < 2 && _ccol > 0
-						&& Rune.ColumnWidth (Contents [_crow, _ccol - 1, 0]) > 1) {
+					if (runeWidth < 2 && Col > 0
+						&& Rune.ColumnWidth (Contents [Row, Col - 1, 0]) > 1) {
 
-						Contents [_crow, _ccol - 1, 0] = System.Text.Rune.ReplacementChar.Value;
+						Contents [Row, Col - 1, 0] = System.Text.Rune.ReplacementChar.Value;
 
-					} else if (runeWidth < 2 && _ccol <= Clip.Right - 1
-						&& Rune.ColumnWidth (Contents [_crow, _ccol, 0]) > 1) {
+					} else if (runeWidth < 2 && Col <= Clip.Right - 1
+						&& Rune.ColumnWidth (Contents [Row, Col, 0]) > 1) {
 
-						Contents [_crow, _ccol + 1, 0] = System.Text.Rune.ReplacementChar.Value;
-						Contents [_crow, _ccol + 1, 2] = 1;
+						Contents [Row, Col + 1, 0] = System.Text.Rune.ReplacementChar.Value;
+						Contents [Row, Col + 1, 2] = 1;
 
 					}
-					if (runeWidth > 1 && _ccol == Clip.Right - 1) {
-						Contents [_crow, _ccol, 0] = System.Text.Rune.ReplacementChar.Value;
+					if (runeWidth > 1 && Col == Clip.Right - 1) {
+						Contents [Row, Col, 0] = System.Text.Rune.ReplacementChar.Value;
 					} else {
-						Contents [_crow, _ccol, 0] = (int)(uint)rune;
+						Contents [Row, Col, 0] = (int)(uint)rune;
 					}
-					Contents [_crow, _ccol, 1] = CurrentAttribute;
-					Contents [_crow, _ccol, 2] = 1;
-					_dirtyLine [_crow] = true;
+					Contents [Row, Col, 1] = CurrentAttribute;
+					Contents [Row, Col, 2] = 1;
+					_dirtyLine [Row] = true;
 				}
 			}
 
 			if (runeWidth < 0 || runeWidth > 0) {
-				_ccol++;
+				Col++;
 			}
 
 			if (runeWidth > 1) {
-				if (validLocation && _ccol < Clip.Right) {
-					Contents [_crow, _ccol, 1] = CurrentAttribute;
-					Contents [_crow, _ccol, 2] = 0;
+				if (validLocation && Col < Clip.Right) {
+					Contents [Row, Col, 1] = CurrentAttribute;
+					Contents [Row, Col, 2] = 0;
 				}
-				_ccol++;
+				Col++;
 			}
 		}
 
@@ -158,17 +157,11 @@ namespace Terminal.Gui {
 
 		public override Attribute MakeColor (Color foreground, Color background)
 		{
-			return MakeColor ((ConsoleColor)foreground, (ConsoleColor)background);
-		}
-
-		static Attribute MakeColor (ConsoleColor f, ConsoleColor b)
-		{
-			// Encode the colors into the int value.
 			return new Attribute (
-				value: ((((int)f) & 0xffff) << 16) | (((int)b) & 0xffff),
-				foreground: (Color)f,
-				background: (Color)b
-				);
+				value: ((((int)foreground) & 0xffff) << 16) | (((int)background) & 0xffff),
+				foreground: (Color)foreground,
+				background: (Color)background
+			);
 		}
 
 		public override void Init (Action terminalResized)
@@ -201,7 +194,7 @@ namespace Terminal.Gui {
 				FakeConsole.ForegroundColor = (ConsoleColor)((color >> 16) & 0xffff);
 			}
 		}
-		
+
 		public override void UpdateScreen ()
 		{
 			int top = Top;
@@ -462,7 +455,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool EnsureCursorVisibility ()
 		{
-			if (!(_ccol >= 0 && _crow >= 0 && _ccol < Cols && _crow < Rows)) {
+			if (!(Col >= 0 && Row >= 0 && Col < Cols && Row < Rows)) {
 				GetCursorVisibility (out CursorVisibility cursorVisibility);
 				_savedCursorVisibility = cursorVisibility;
 				SetCursorVisibility (CursorVisibility.Invisible);
@@ -598,8 +591,8 @@ namespace Terminal.Gui {
 
 			// Prevents the exception of size changing during resizing.
 			try {
-				if (_ccol >= 0 && _ccol < FakeConsole.BufferWidth && _crow >= 0 && _crow < FakeConsole.BufferHeight) {
-					FakeConsole.SetCursorPosition (_ccol, _crow);
+				if (Col >= 0 && Col < FakeConsole.BufferWidth && Row >= 0 && Row < FakeConsole.BufferHeight) {
+					FakeConsole.SetCursorPosition (Col, Row);
 				}
 			} catch (System.IO.IOException) {
 			} catch (ArgumentOutOfRangeException) {

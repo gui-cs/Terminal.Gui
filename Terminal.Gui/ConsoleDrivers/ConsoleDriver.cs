@@ -123,7 +123,7 @@ namespace Terminal.Gui {
 		public bool EnableConsoleScrolling { get; set; }
 
 		/// <summary>
-		/// The contents of the application output. The driver writes this buffer to the terminal when <see cref="UpdateScreen"/>
+		/// The contents of the application output. The driver outputs this buffer to the terminal when <see cref="UpdateScreen"/>
 		/// is called.
 		/// <remarks>
 		/// The format of the array is rows, columns, and 3 values on the last column: Rune, Attribute and Dirty Flag
@@ -136,11 +136,28 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="terminalResized">Method to invoke when the terminal is resized.</param>
 		public abstract void Init (Action terminalResized);
+
 		/// <summary>
-		/// Moves the cursor to the specified column and row.
+		/// Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/>
+		/// are used by <see cref="AddRune"/> and <see cref="AddStr"/> to determine where to add content.
 		/// </summary>
-		/// <param name="col">Column to move the cursor to.</param>
-		/// <param name="row">Row to move the cursor to.</param>
+		public int Col { get; internal set; }
+
+		/// <summary>
+		/// Gets the row last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/>
+		/// are used by <see cref="AddRune"/> and <see cref="AddStr"/> to determine where to add content.
+		/// </summary>
+		public int Row { get; internal set; }
+
+		/// <summary>
+		/// Sets <see cref="Col"/> and <see cref="Row"/> to the specified column and row in <see cref="Contents"/>.
+		/// Used by <see cref="AddRune"/> and <see cref="AddStr"/> to determine where to add content.
+		/// </summary>
+		/// <remarks>
+		/// This does not move the cursor on the screen, it only updates the internal state of the driver.
+		/// </remarks>
+		/// <param name="col">Column to move to.</param>
+		/// <param name="row">Row to move to.</param>
 		public abstract void Move (int col, int row);
 
 		/// <summary>

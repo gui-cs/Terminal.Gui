@@ -554,6 +554,7 @@ namespace Terminal.Gui {
 			ref SmallRect lpReadRegion
 		);
 
+		// TODO: This API is obsolete. See https://learn.microsoft.com/en-us/windows/console/writeconsoleoutput
 		[DllImport ("kernel32.dll", EntryPoint = "WriteConsoleOutput", SetLastError = true, CharSet = CharSet.Unicode)]
 		static extern bool WriteConsoleOutput (
 			IntPtr hConsoleOutput,
@@ -932,67 +933,7 @@ namespace Terminal.Gui {
 				X = mouseEvent.MousePosition.X,
 				Y = mouseEvent.MousePosition.Y
 			};
-
-			//if (!isButtonPressed && buttonPressedCount < 2
-			//	&& mouseEvent.EventFlags == WindowsConsole.EventFlags.MouseMoved
-			//	&& (mouseEvent.ButtonState == WindowsConsole.ButtonState.Button1Pressed
-			//	|| mouseEvent.ButtonState == WindowsConsole.ButtonState.Button2Pressed
-			//	|| mouseEvent.ButtonState == WindowsConsole.ButtonState.Button3Pressed)) {
-
-			//	lastMouseButtonPressed = mouseEvent.ButtonState;
-			//	buttonPressedCount++;
-			//} else if (!isButtonPressed && buttonPressedCount > 0 && mouseEvent.ButtonState == 0
-			//	&& mouseEvent.EventFlags == 0) {
-
-			//	buttonPressedCount++;
-			//}
-			//System.Diagnostics.Debug.WriteLine ($"isButtonPressed: {isButtonPressed};buttonPressedCount: {buttonPressedCount};lastMouseButtonPressed: {lastMouseButtonPressed}");
-			//System.Diagnostics.Debug.WriteLine ($"isOneFingerDoubleClicked: {isOneFingerDoubleClicked}");
-
-			//if (buttonPressedCount == 1 && lastMouseButtonPressed != null && p == point
-			//	&& lastMouseButtonPressed == WindowsConsole.ButtonState.Button1Pressed
-			//	|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button2Pressed
-			//	|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button3Pressed) {
-
-			//	switch (lastMouseButtonPressed) {
-			//	case WindowsConsole.ButtonState.Button1Pressed:
-			//		mouseFlag = MouseFlags.Button1DoubleClicked;
-			//		break;
-
-			//	case WindowsConsole.ButtonState.Button2Pressed:
-			//		mouseFlag = MouseFlags.Button2DoubleClicked;
-			//		break;
-
-			//	case WindowsConsole.ButtonState.Button3Pressed:
-			//		mouseFlag = MouseFlags.Button3DoubleClicked;
-			//		break;
-			//	}
-			//	isOneFingerDoubleClicked = true;
-
-			//} else if (buttonPressedCount == 3 && lastMouseButtonPressed != null && isOneFingerDoubleClicked && p == point
-			//	&& lastMouseButtonPressed == WindowsConsole.ButtonState.Button1Pressed
-			//	|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button2Pressed
-			//	|| lastMouseButtonPressed == WindowsConsole.ButtonState.Button3Pressed) {
-
-			//	switch (lastMouseButtonPressed) {
-			//	case WindowsConsole.ButtonState.Button1Pressed:
-			//		mouseFlag = MouseFlags.Button1TripleClicked;
-			//		break;
-
-			//	case WindowsConsole.ButtonState.Button2Pressed:
-			//		mouseFlag = MouseFlags.Button2TripleClicked;
-			//		break;
-
-			//	case WindowsConsole.ButtonState.Button3Pressed:
-			//		mouseFlag = MouseFlags.Button3TripleClicked;
-			//		break;
-			//	}
-			//	buttonPressedCount = 0;
-			//	lastMouseButtonPressed = null;
-			//	isOneFingerDoubleClicked = false;
-			//	isButtonReleased = false;
-
-			//}
+			
 			if ((mouseEvent.ButtonState != 0 && mouseEvent.EventFlags == 0 && _lastMouseButtonPressed == null && !_isButtonDoubleClicked) ||
 				 (_lastMouseButtonPressed == null && mouseEvent.EventFlags.HasFlag (WindowsConsole.EventFlags.MouseMoved) &&
 				 mouseEvent.ButtonState != 0 && !_isButtonReleased && !_isButtonDoubleClicked)) {
@@ -1508,17 +1449,15 @@ namespace Terminal.Gui {
 			}
 		}
 
-		// Current row, and current col, tracked by Move/AddCh only
-		int _ccol, _crow;
 		public override void Move (int col, int row)
 		{
-			_ccol = col;
-			_crow = row;
+			Col = col;
+			Row = row;
 		}
 
 		int GetOutputBufferPosition ()
 		{
-			return _crow * Cols + _ccol;
+			return Row * Cols + Col;
 		}
 
 		public override void AddRune (Rune nStackrune)
@@ -1527,80 +1466,80 @@ namespace Terminal.Gui {
 			System.Text.Rune rune = (System.Text.Rune)MakePrintable (nStackrune).Value;
 			var runeWidth = Rune.ColumnWidth (nStackrune);
 			var position = GetOutputBufferPosition ();
-			var validLocation = IsValidLocation (_ccol, _crow);
+			var validLocation = IsValidLocation (Col, Row);
 
 			if (validLocation) {
-				if (runeWidth == 0 && _ccol > 0) {
+				if (runeWidth == 0 && Col > 0) {
 					// Non spacing glyph beyond first col
-					var r = Contents [_crow, _ccol - 1, 0];
+					var r = Contents [Row, Col - 1, 0];
 					var s = new string (new char [] { (char)r, (char)rune.Value });
 					var sn = !s.IsNormalized () ? s.Normalize () : s;
 					var c = sn [0];
-					Contents [_crow, _ccol - 1, 0] = c;
-					Contents [_crow, _ccol - 1, 1] = CurrentAttribute;
-					Contents [_crow, _ccol - 1, 2] = 1;
+					Contents [Row, Col - 1, 0] = c;
+					Contents [Row, Col - 1, 1] = CurrentAttribute;
+					Contents [Row, Col - 1, 2] = 1;
 
-					var prevPosition = _crow * Cols + (_ccol - 1);
+					var prevPosition = Row * Cols + (Col - 1);
 					_outputBuffer [prevPosition].Char.UnicodeChar = c;
 					_outputBuffer [prevPosition].Attributes = (ushort)CurrentAttribute;
-					WindowsConsole.SmallRect.Update (ref _damageRegion, (short)(_ccol - 1), (short)_crow);
+					WindowsConsole.SmallRect.Update (ref _damageRegion, (short)(Col - 1), (short)Row);
 				} else {
 					if (runeWidth < 2) {
 						// Single column glyph
-						if (_ccol > 0 && Rune.ColumnWidth ((char)Contents [_crow, _ccol - 1, 0]) > 1) {
+						if (Col > 0 && Rune.ColumnWidth ((char)Contents [Row, Col - 1, 0]) > 1) {
 							// glyph to left is wide; nuke it 
 							// BUGBUG: Does this make sense?
-							Contents [_crow, _ccol - 1, 0] = System.Text.Rune.ReplacementChar.Value;
-							var prevPosition = _crow * Cols + (_ccol - 1);
+							Contents [Row, Col - 1, 0] = System.Text.Rune.ReplacementChar.Value;
+							var prevPosition = Row * Cols + (Col - 1);
 							_outputBuffer [prevPosition].Char.UnicodeChar = (char)System.Text.Rune.ReplacementChar.Value;
-						} else if (_ccol <= Clip.Right - 1 && Rune.ColumnWidth ((char)Contents [_crow, _ccol, 0]) > 1) {
+						} else if (Col <= Clip.Right - 1 && Rune.ColumnWidth ((char)Contents [Row, Col, 0]) > 1) {
 							// we're just inside the clip rect and the glyph there is wide
 							// nuke the existing glyph to right
-							Contents [_crow, _ccol + 1, 0] = System.Text.Rune.ReplacementChar.Value;
+							Contents [Row, Col + 1, 0] = System.Text.Rune.ReplacementChar.Value;
 							var prevPosition = GetOutputBufferPosition () + 1;
 							_outputBuffer [prevPosition].Char.UnicodeChar = (char)System.Text.Rune.ReplacementChar.Value;
 						}
 					}
 
-					if (runeWidth > 1 && _ccol == Clip.Right - 1) {
+					if (runeWidth > 1 && Col == Clip.Right - 1) {
 						// Wide glyph and we're just inside the clip rect
 						// ignore it
 						// BUGBUG: Shouldn't we write the unknown glyph glyph?
-						Contents [_crow, _ccol, 0] = System.Text.Rune.ReplacementChar.Value;
+						Contents [Row, Col, 0] = System.Text.Rune.ReplacementChar.Value;
 						_outputBuffer [position].Char.UnicodeChar = (char)System.Text.Rune.ReplacementChar.Value;
 					} else {
 						// Add the glyph (wide or not)
 						if (rune.IsBmp) {
-							Contents [_crow, _ccol, 0] = rune.Value;
+							Contents [Row, Col, 0] = rune.Value;
 							_outputBuffer [position].Char.UnicodeChar = (char) rune.Value;
 						} else {
-							Contents [_crow, _ccol, 0] = (char)System.Text.Rune.ReplacementChar.Value;
+							Contents [Row, Col, 0] = (char)System.Text.Rune.ReplacementChar.Value;
 							_outputBuffer [position].Char.UnicodeChar = (char)System.Text.Rune.ReplacementChar.Value;
 
 						}
 					}
-					Contents [_crow, _ccol, 1] = CurrentAttribute;
-					Contents [_crow, _ccol, 2] = 1;
+					Contents [Row, Col, 1] = CurrentAttribute;
+					Contents [Row, Col, 2] = 1;
 
 					_outputBuffer [position].Attributes = (ushort)CurrentAttribute;
-					WindowsConsole.SmallRect.Update (ref _damageRegion, (short)_ccol, (short)_crow);
+					WindowsConsole.SmallRect.Update (ref _damageRegion, (short)Col, (short)Row);
 				}
 			}
 
 			if (runeWidth < 0 || runeWidth > 0) {
-				_ccol++;
+				Col++;
 			}
 
 			if (runeWidth > 1) {
-				if (rune.IsBmp && _ccol < Clip.Right) {
+				if (rune.IsBmp && Col < Clip.Right) {
 					position = GetOutputBufferPosition ();
 					_outputBuffer [position].Attributes = (ushort)CurrentAttribute;
 					_outputBuffer [position].Char.UnicodeChar = (char)0x00;
-					Contents [_crow, _ccol, 0] = (char)0x00;
-					Contents [_crow, _ccol, 1] = CurrentAttribute;
-					Contents [_crow, _ccol, 2] = 0;
+					Contents [Row, Col, 0] = (char)0x00;
+					Contents [Row, Col, 1] = CurrentAttribute;
+					Contents [Row, Col, 2] = 0;
 				}
-				_ccol++;
+				Col++;
 			}
 		}
 
@@ -1686,7 +1625,7 @@ namespace Terminal.Gui {
 
 		public override void UpdateCursor ()
 		{
-			if (_ccol < 0 || _crow < 0 || _ccol > Cols || _crow > Rows) {
+			if (Col < 0 || Row < 0 || Col > Cols || Row > Rows) {
 				GetCursorVisibility (out CursorVisibility cursorVisibility);
 				savedCursorVisibility = cursorVisibility;
 				SetCursorVisibility (CursorVisibility.Invisible);
@@ -1695,8 +1634,8 @@ namespace Terminal.Gui {
 
 			SetCursorVisibility (savedCursorVisibility);
 			var position = new WindowsConsole.Coord () {
-				X = (short)_ccol,
-				Y = (short)_crow
+				X = (short)Col,
+				Y = (short)Row
 			};
 			WinConsole.SetCursorPosition (position);
 		}

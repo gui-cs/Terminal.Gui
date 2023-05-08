@@ -641,12 +641,10 @@ namespace Terminal.Gui {
 
 		bool [] _dirtyLine;
 
-		// Current row, and current col, tracked by Move/AddCh only
-		int _ccol, _crow;
 		public override void Move (int col, int row)
 		{
-			_ccol = col;
-			_crow = row;
+			Col = col;
+			Row = row;
 		}
 
 		public override void AddRune (Rune rune)
@@ -659,53 +657,53 @@ namespace Terminal.Gui {
 
 			rune = MakePrintable (rune);
 			var runeWidth = Rune.ColumnWidth (rune);
-			var validLocation = IsValidLocation (_ccol, _crow);
+			var validLocation = IsValidLocation (Col, Row);
 
 			if (validLocation) {
-				if (runeWidth == 0 && _ccol > 0) {
+				if (runeWidth == 0 && Col > 0) {
 					// Single column glyph beyond first col
-					var r = Contents [_crow, _ccol - 1, 0];
+					var r = Contents [Row, Col - 1, 0];
 					var s = new string (new char [] { (char)r, (char)rune });
 					var sn = !s.IsNormalized () ? s.Normalize () : s;
 					var c = sn [0];
-					Contents [_crow, _ccol - 1, 0] = c;
-					Contents [_crow, _ccol - 1, 1] = CurrentAttribute;
-					Contents [_crow, _ccol - 1, 2] = 1;
+					Contents [Row, Col - 1, 0] = c;
+					Contents [Row, Col - 1, 1] = CurrentAttribute;
+					Contents [Row, Col - 1, 2] = 1;
 				} else {
-					if (runeWidth < 2 && _ccol > 0
-						&& Rune.ColumnWidth ((char)Contents [_crow, _ccol - 1, 0]) > 1) {
+					if (runeWidth < 2 && Col > 0
+						&& Rune.ColumnWidth ((char)Contents [Row, Col - 1, 0]) > 1) {
 
-						Contents [_crow, _ccol - 1, 0] = (char)System.Text.Rune.ReplacementChar.Value;
+						Contents [Row, Col - 1, 0] = (char)System.Text.Rune.ReplacementChar.Value;
 
-					} else if (runeWidth < 2 && _ccol <= Clip.Right - 1
-						&& Rune.ColumnWidth ((char)Contents [_crow, _ccol, 0]) > 1) {
+					} else if (runeWidth < 2 && Col <= Clip.Right - 1
+						&& Rune.ColumnWidth ((char)Contents [Row, Col, 0]) > 1) {
 
-						Contents [_crow, _ccol + 1, 0] = (char)System.Text.Rune.ReplacementChar.Value;
-						Contents [_crow, _ccol + 1, 2] = 1;
+						Contents [Row, Col + 1, 0] = (char)System.Text.Rune.ReplacementChar.Value;
+						Contents [Row, Col + 1, 2] = 1;
 
 					}
-					if (runeWidth > 1 && _ccol == Clip.Right - 1) {
-						Contents [_crow, _ccol, 0] = (char)System.Text.Rune.ReplacementChar.Value;
+					if (runeWidth > 1 && Col == Clip.Right - 1) {
+						Contents [Row, Col, 0] = (char)System.Text.Rune.ReplacementChar.Value;
 					} else {
-						Contents [_crow, _ccol, 0] = (int)(uint)rune;
+						Contents [Row, Col, 0] = (int)(uint)rune;
 					}
-					Contents [_crow, _ccol, 1] = CurrentAttribute;
-					Contents [_crow, _ccol, 2] = 1;
+					Contents [Row, Col, 1] = CurrentAttribute;
+					Contents [Row, Col, 2] = 1;
 
 				}
-				_dirtyLine [_crow] = true;
+				_dirtyLine [Row] = true;
 			}
 
 			if (runeWidth < 0 || runeWidth > 0) {
-				_ccol++;
+				Col++;
 			}
 
 			if (runeWidth > 1) {
-				if (validLocation && _ccol < Clip.Right) {
-					Contents [_crow, _ccol, 1] = CurrentAttribute;
-					Contents [_crow, _ccol, 2] = 0;
+				if (validLocation && Col < Clip.Right) {
+					Contents [Row, Col, 1] = CurrentAttribute;
+					Contents [Row, Col, 2] = 0;
 				}
-				_ccol++;
+				Col++;
 			}
 		}
 
@@ -1062,9 +1060,9 @@ namespace Terminal.Gui {
 			EnsureCursorVisibility ();
 			//Debug.WriteLine ($"Before - CursorTop: {Console.CursorTop};CursorLeft: {Console.CursorLeft}");
 
-			if (_ccol >= 0 && _ccol < Cols && _crow >= 0 && _crow < Rows) {
-				SetCursorPosition (_ccol, _crow);
-				SetWindowPosition (0, _crow);
+			if (Col >= 0 && Col < Cols && Row >= 0 && Row < Rows) {
+				SetCursorPosition (Col, Row);
+				SetWindowPosition (0, Row);
 			}
 			//Debug.WriteLine ($"WindowTop: {Console.WindowTop};WindowLeft: {Console.WindowLeft}");
 			//Debug.WriteLine ($"After - CursorTop: {Console.CursorTop};CursorLeft: {Console.CursorLeft}");
@@ -1416,7 +1414,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool EnsureCursorVisibility ()
 		{
-			if (!(_ccol >= 0 && _crow >= 0 && _ccol < Cols && _crow < Rows)) {
+			if (!(Col >= 0 && Row >= 0 && Col < Cols && Row < Rows)) {
 				GetCursorVisibility (out CursorVisibility cursorVisibility);
 				savedCursorVisibility = cursorVisibility;
 				SetCursorVisibility (CursorVisibility.Invisible);

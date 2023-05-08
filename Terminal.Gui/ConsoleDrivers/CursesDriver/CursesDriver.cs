@@ -24,25 +24,22 @@ namespace Terminal.Gui {
 		CursorVisibility? _initialCursorVisibility = null;
 		CursorVisibility? _currentCursorVisibility = null;
 
-		// Current row, and current col, tracked by Move/AddRune only
-		int _ccol, _crow;
-		bool _needMove;
+		// If true, Move set Col and Row to an invalid location
+		bool _atValidLocation;
+		
 		public override void Move (int col, int row)
 		{
-			_ccol = col;
-			_crow = row;
+			Col = col;
+			Row = row;
 
 			if (IsValidLocation (col, row)) {
 				Curses.move (row, col);
-				_needMove = false;
+				_atValidLocation = true;
 			} else {
 				// Not a valid location (outside screen or clip region)
-				// We need to move the cursor to within clip region, and then
-				// later move it to the desired location in AddStr
-				// BUGBUG: Clip.X/Y may actually be outside of the defined clip region rects as 
-				// currently implemented.
+				// Move within the clip region, then AddStr will actually move to Col, Row
 				Curses.move (Clip.Y, Clip.X);
-				_needMove = true;
+				_atValidLocation = false;
 			}
 		}
 
@@ -50,73 +47,72 @@ namespace Terminal.Gui {
 		{
 			rune = MakePrintable (rune);
 			var runeWidth = Rune.ColumnWidth (rune);
-			var validLocation = IsValidLocation (_ccol, _crow);
+			var validLocation = IsValidLocation (Col, Row);
 
 			if (validLocation) {
-				if (_needMove) {
-					// Move was called, wanting to put cursor in an invalid location.
-					// We need to move the cursor to the clip region, and then
-					// move it to the desired location.
-					Curses.move (_crow, _ccol);
-					_needMove = false;
+				if (!_atValidLocation) {
+					// Move was called with an invalid location.
+					// Since then, the clip changed, and now we are at a valid location.
+					Curses.move (Row, Col);
+					_atValidLocation = false;
 				}
-				if (runeWidth == 0 && _ccol > 0) {
-					var r = Contents [_crow, _ccol - 1, 0];
+				if (runeWidth == 0 && Col > 0) {
+					var r = Contents [Row, Col - 1, 0];
 					var s = new string (new char [] { (char)r, (char)rune });
 					var sn = !s.IsNormalized () ? s.Normalize () : s;
 					var c = sn [0];
-					Contents [_crow, _ccol - 1, 0] = c;
-					Contents [_crow, _ccol - 1, 1] = CurrentAttribute;
-					Contents [_crow, _ccol - 1, 2] = 1;
+					Contents [Row, Col - 1, 0] = c;
+					Contents [Row, Col - 1, 1] = CurrentAttribute;
+					Contents [Row, Col - 1, 2] = 1;
 
-					Curses.mvaddch (_crow, _ccol - 1, c);
+					Curses.mvaddch (Row, Col - 1, c);
 
 				} else {
-					if (runeWidth < 2 && _ccol > 0
-						&& Rune.ColumnWidth ((char)Contents [_crow, _ccol - 1, 0]) > 1) {
+					if (runeWidth < 2 && Col > 0
+						&& Rune.ColumnWidth ((char)Contents [Row, Col - 1, 0]) > 1) {
 
 						var curAttr = CurrentAttribute;
-						Curses.attrset (Contents [_crow, _ccol - 1, 1]);
-						Curses.mvaddch (_crow, _ccol - 1, System.Text.Rune.ReplacementChar.Value);
-						Contents [_crow, _ccol - 1, 0] = System.Text.Rune.ReplacementChar.Value;
-						Curses.move (_crow, _ccol);
+						Curses.attrset (Contents [Row, Col - 1, 1]);
+						Curses.mvaddch (Row, Col - 1, System.Text.Rune.ReplacementChar.Value);
+						Contents [Row, Col - 1, 0] = System.Text.Rune.ReplacementChar.Value;
+						Curses.move (Row, Col);
 						Curses.attrset (curAttr);
 
-					} else if (runeWidth < 2 && _ccol <= Clip.Right - 1
-						&& Rune.ColumnWidth ((char)Contents [_crow, _ccol, 0]) > 1) {
+					} else if (runeWidth < 2 && Col <= Clip.Right - 1
+						&& Rune.ColumnWidth ((char)Contents [Row, Col, 0]) > 1) {
 
 						var curAttr = CurrentAttribute;
-						Curses.attrset (Contents [_crow, _ccol + 1, 1]);
-						Curses.mvaddch (_crow, _ccol + 1, System.Text.Rune.ReplacementChar.Value);
-						Contents [_crow, _ccol + 1, 0] = System.Text.Rune.ReplacementChar.Value;
-						Curses.move (_crow, _ccol);
+						Curses.attrset (Contents [Row, Col + 1, 1]);
+						Curses.mvaddch (Row, Col + 1, System.Text.Rune.ReplacementChar.Value);
+						Contents [Row, Col + 1, 0] = System.Text.Rune.ReplacementChar.Value;
+						Curses.move (Row, Col);
 						Curses.attrset (curAttr);
 
 					}
-					if (runeWidth > 1 && _ccol == Clip.Right - 1) {
+					if (runeWidth > 1 && Col == Clip.Right - 1) {
 						Curses.addch (System.Text.Rune.ReplacementChar.Value);
-						Contents [_crow, _ccol, 0] = System.Text.Rune.ReplacementChar.Value;
+						Contents [Row, Col, 0] = System.Text.Rune.ReplacementChar.Value;
 					} else {
 						Curses.addch ((int)(uint)rune);
-						Contents [_crow, _ccol, 0] = (int)(uint)rune;
+						Contents [Row, Col, 0] = (int)(uint)rune;
 					}
-					Contents [_crow, _ccol, 1] = CurrentAttribute;
-					Contents [_crow, _ccol, 2] = 1;
+					Contents [Row, Col, 1] = CurrentAttribute;
+					Contents [Row, Col, 2] = 1;
 				}
 			} else {
-				_needMove = true;
+				_atValidLocation = false;
 			}
 
 			if (runeWidth is < 0 or > 0) {
-				_ccol++;
+				Col++;
 			}
 
 			if (runeWidth > 1) {
-				if (validLocation && _ccol < Clip.Right) {
-					Contents [_crow, _ccol, 1] = CurrentAttribute;
-					Contents [_crow, _ccol, 2] = 0;
+				if (validLocation && Col < Clip.Right) {
+					Contents [Row, Col, 1] = CurrentAttribute;
+					Contents [Row, Col, 2] = 0;
 				}
-				_ccol++;
+				Col++;
 			}
 		}
 
@@ -189,39 +185,6 @@ namespace Terminal.Gui {
 		{
 			return MakeColor ((short)MapColor (fore), (short)MapColor (back));
 		}
-
-		int [,] _colorPairs = new int [16, 16];
-
-		//public override void SetColors (ConsoleColor foreground, ConsoleColor background)
-		//{
-		//	// BUGBUG: This code is never called ?? See Issue #2300
-		//	int f = (short)foreground;
-		//	int b = (short)background;
-		//	var v = _colorPairs [f, b];
-		//	if ((v & 0x10000) == 0) {
-		//		b &= 0x7;
-		//		bool bold = (f & 0x8) != 0;
-		//		f &= 0x7;
-
-		//		v = MakeColor ((short)f, (short)b) | (bold ? Curses.A_BOLD : 0);
-		//		_colorPairs [(int)foreground, (int)background] = v | 0x1000;
-		//	}
-		//	SetAttribute (v & 0xffff);
-		//}
-
-		////Dictionary<int, int> _rawPairs = new Dictionary<int, int> ();
-		//public override void SetColors (short foreColorId, short backgroundColorId)
-		//{
-		//	throw new NotImplementedException ();
-
-		//	// BUGBUG: This code is never called ?? See Issue #2300
-		//	//int key = ((ushort)foreColorId << 16) | (ushort)backgroundColorId;
-		//	//if (!_rawPairs.TryGetValue (key, out var v)) {
-		//	//	v = MakeColor (foreColorId, backgroundColorId);
-		//	//	_rawPairs [key] = v;
-		//	//}
-		//	//SetAttribute (v);
-		//}
 
 		static Key MapCursesKey (int cursesKey)
 		{
