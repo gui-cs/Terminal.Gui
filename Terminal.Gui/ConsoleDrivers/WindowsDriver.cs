@@ -1708,16 +1708,6 @@ namespace Terminal.Gui {
 		{
 			throw new NotImplementedException ();
 		}
-
-		public override void StartReportingMouseMoves ()
-		{
-			throw new NotImplementedException ();
-		}
-
-		public override void StopReportingMouseMoves ()
-		{
-			throw new NotImplementedException ();
-		}
 		#endregion
 	}
 

@@ -116,12 +116,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		public override void AddStr (ustring str)
-		{
-			// TODO; optimize this to determine if the str fits in the clip region, and if so, use Curses.addstr directly
-			base.AddStr (str);
-		}
-
 		public override void Refresh ()
 		{
 			Curses.raw ();
@@ -159,7 +153,7 @@ namespace Terminal.Gui {
 		/// <param name="foreground">Contains the curses attributes for the foreground (color, plus any attributes)</param>
 		/// <param name="background">Contains the curses attributes for the background (color, plus any attributes)</param>
 		/// <returns></returns>
-		public static Attribute MakeColor (short foreground, short background)
+		static Attribute MakeColor (short foreground, short background)
 		{
 			var v = (short)((int)foreground | background << 4);
 			//Curses.InitColorPair (++last_color_pair, foreground, background);
@@ -888,75 +882,6 @@ namespace Terminal.Gui {
 			}
 			killpg (0, signal);
 			return true;
-		}
-	}
-
-	/// <summary>
-	///  A clipboard implementation for Linux.
-	///  This implementation uses the xclip command to access the clipboard.
-	/// </summary>	
-	/// <remarks>
-	/// If xclip is not installed, this implementation will not work.
-	/// </remarks>
-	class CursesClipboard : ClipboardBase {
-		public CursesClipboard ()
-		{
-			IsSupported = CheckSupport ();
-		}
-
-		string _xclipPath = string.Empty;
-		public override bool IsSupported { get; }
-
-		bool CheckSupport ()
-		{
-#pragma warning disable RCS1075 // Avoid empty catch clause that catches System.Exception.
-			try {
-				var (exitCode, result) = ClipboardProcessRunner.Bash ("which xclip", waitForOutput: true);
-				if (exitCode == 0 && result.FileExists ()) {
-					_xclipPath = result;
-					return true;
-				}
-			} catch (Exception) {
-				// Permissions issue.
-			}
-#pragma warning restore RCS1075 // Avoid empty catch clause that catches System.Exception.
-			return false;
-		}
-
-		protected override string GetClipboardDataImpl ()
-		{
-			var tempFileName = System.IO.Path.GetTempFileName ();
-			var xclipargs = "-selection clipboard -o";
-
-			try {
-				var (exitCode, result) = ClipboardProcessRunner.Bash ($"{_xclipPath} {xclipargs} > {tempFileName}", waitForOutput: false);
-				if (exitCode == 0) {
-					if (Application.Driver is CursesDriver) {
-						Curses.raw ();
-						Curses.noecho ();
-					}
-					return System.IO.File.ReadAllText (tempFileName);
-				}
-			} catch (Exception e) {
-				throw new NotSupportedException ($"\"{_xclipPath} {xclipargs}\" failed.", e);
-			} finally {
-				System.IO.File.Delete (tempFileName);
-			}
-			return string.Empty;
-		}
-
-		protected override void SetClipboardDataImpl (string text)
-		{
-			var xclipargs = "-selection clipboard -i";
-			try {
-				var (exitCode, _) = ClipboardProcessRunner.Bash ($"{_xclipPath} {xclipargs}", text, waitForOutput: false);
-				if (exitCode == 0 && Application.Driver is CursesDriver) {
-					Curses.raw ();
-					Curses.noecho ();
-				}
-			} catch (Exception e) {
-				throw new NotSupportedException ($"\"{_xclipPath} {xclipargs} < {text}\" failed", e);
-			}
 		}
 	}
 }

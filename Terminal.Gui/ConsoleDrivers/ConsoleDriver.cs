@@ -1,17 +1,30 @@
-﻿//
-// ConsoleDriver.cs: Base class for Terminal.Gui ConsoleDriver implementations.
-//
-using NStack;
+﻿using NStack;
 using System;
 using System.Diagnostics;
 
 namespace Terminal.Gui;
 
 /// <summary>
-/// ConsoleDriver is an abstract class that defines the requirements for a console driver.  
-/// There are currently three implementations: <see cref="CursesDriver"/> (for Unix and Mac), <see cref="WindowsDriver"/>, and <see cref="NetDriver"/> that uses the .NET Console API.
+/// Base class for Terminal.Gui ConsoleDriver implementations.
 /// </summary>
+/// <remarks>
+/// There are currently four implementations:
+/// - <see cref="CursesDriver"/> (for Unix and Mac)
+/// - <see cref="WindowsDriver"/>
+/// - <see cref="NetDriver"/> that uses the .NET Console API
+/// - <see cref="FakeConsole"/> for unit testing.
+/// </remarks>
 public abstract class ConsoleDriver {
+	/// <summary>
+	/// Prepare the driver and set the key and mouse events handlers.
+	/// </summary>
+	/// <param name="mainLoop">The main loop.</param>
+	/// <param name="keyHandler">The handler for ProcessKey</param>
+	/// <param name="keyDownHandler">The handler for key down events</param>
+	/// <param name="keyUpHandler">The handler for key up events</param>
+	/// <param name="mouseHandler">The handler for mouse events</param>
+	public abstract void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler);
+
 	/// <summary>
 	/// The handler fired when the terminal is resized.
 	/// </summary>
@@ -129,22 +142,36 @@ public abstract class ConsoleDriver {
 	/// Adds the <paramref name="str"/> to the display at the cursor position.
 	/// </summary>
 	/// <param name="str">String.</param>
-	public virtual void AddStr (ustring str)
+	public void AddStr (ustring str)
 	{
 		foreach (var rune in str) {
 			AddRune (rune);
 		}
 	}
 
+	Rect _clip;
+
 	/// <summary>
-	/// Prepare the driver and set the key and mouse events handlers.
+	/// Tests whether the specified coordinate are valid for drawing. 
 	/// </summary>
-	/// <param name="mainLoop">The main loop.</param>
-	/// <param name="keyHandler">The handler for ProcessKey</param>
-	/// <param name="keyDownHandler">The handler for key down events</param>
-	/// <param name="keyUpHandler">The handler for key up events</param>
-	/// <param name="mouseHandler">The handler for mouse events</param>
-	public abstract void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler);
+	/// <param name="col">The column.</param>
+	/// <param name="row">The row.</param>
+	/// <returns><see langword="false"/> if the coordinate is outside of the
+	/// screen bounds or outside of <see cref="Clip"/>. <see langword="true"/> otherwise.</returns>
+	public bool IsValidLocation (int col, int row) =>
+		col >= 0 && row >= 0 &&
+		col < Cols && row < Rows &&
+		Clip.Contains (col, row);
+
+	/// <summary>
+	/// Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(ustring)"/> are 
+	/// subject to. 
+	/// </summary>
+	/// <value>The rectangle describing the bounds of <see cref="Clip"/>.</value>
+	public Rect Clip {
+		get => _clip;
+		set => _clip = value;
+	}
 
 	/// <summary>
 	/// Updates the screen to reflect all the changes that have been done to the display buffer
@@ -177,11 +204,6 @@ public abstract class ConsoleDriver {
 	public abstract bool EnsureCursorVisibility ();
 
 	/// <summary>
-	/// Ends the execution of the console driver.
-	/// </summary>
-	public abstract void End ();
-
-	/// <summary>
 	/// Clears the <see cref="Contents"/>buffer and the driver buffer.
 	/// </summary>
 	public abstract void UpdateOffScreen ();
@@ -190,6 +212,8 @@ public abstract class ConsoleDriver {
 	/// Redraws the physical screen with the contents that have been queued up via any of the printing commands.
 	/// </summary>
 	public abstract void UpdateScreen ();
+
+	Attribute _currentAttribute;
 
 	/// <summary>
 	/// The <see cref="Attribute"/> that will be used for the next <see cref="AddRune"/> or <see cref="AddStr"/> call.
@@ -217,6 +241,17 @@ public abstract class ConsoleDriver {
 	public void SetAttribute (Attribute c) => CurrentAttribute = c;
 
 	/// <summary>
+	/// Make the attribute for the foreground and background colors.
+	/// </summary>
+	/// <param name="fore">Foreground.</param>
+	/// <param name="back">Background.</param>
+	/// <returns></returns>
+	public virtual Attribute MakeAttribute (Color fore, Color back)
+	{
+		return MakeColor (fore, back);
+	}
+
+	/// <summary>
 	/// Gets the foreground and background colors based on a platform-dependent color value.
 	/// </summary>
 	/// <param name="value">The platform-dependent color value.</param>
@@ -226,27 +261,29 @@ public abstract class ConsoleDriver {
 	public abstract bool GetColors (int value, out Color foreground, out Color background);
 
 	/// <summary>
-	/// Simulates a key press.
+	/// Gets the current <see cref="Attribute"/>.
 	/// </summary>
-	/// <param name="keyChar">The key character.</param>
-	/// <param name="key">The key.</param>
-	/// <param name="shift">If <see langword="true"/> simulates the Shift key being pressed.</param>
-	/// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
-	/// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
-	public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
+	/// <returns>The current attribute.</returns>
+	public Attribute GetAttribute () => CurrentAttribute;
 
 	/// <summary>
-	/// Fills the specified rectangle with the specified rune.
+	/// Makes an <see cref="Attribute"/>.
 	/// </summary>
-	/// <param name="rect"></param>
-	/// <param name="rune"></param>
-	public void FillRect (Rect rect, Rune rune = default)
+	/// <param name="foreground">The foreground color.</param>
+	/// <param name="background">The background color.</param>
+	/// <returns>The attribute for the foreground and background colors.</returns>
+	public abstract Attribute MakeColor (Color foreground, Color background);
+
+	/// <summary>
+	/// Ensures all <see cref="Attribute"/>s in <see cref="Colors.ColorSchemes"/> are correctly 
+	/// initialized by the driver.
+	/// </summary>
+	/// <param name="supportsColors">Flag indicating if colors are supported (not used).</param>
+	public void InitializeColorSchemes (bool supportsColors = true)
 	{
-		for (var r = rect.Y; r < rect.Y + rect.Height; r++) {
-			for (var c = rect.X; c < rect.X + rect.Width; c++) {
-				Application.Driver.Move (c, r);
-				Application.Driver.AddRune (rune == default ? ' ' : rune);
-			}
+		// Ensure all Attributes are initialized by the driver
+		foreach (var s in Colors.ColorSchemes) {
+			s.Value.Initialize ();
 		}
 	}
 
@@ -282,68 +319,94 @@ public abstract class ConsoleDriver {
 	/// <remarks>This is only implemented in <see cref="CursesDriver"/>.</remarks>
 	public abstract void Suspend ();
 
-	Rect _clip;
-
 	/// <summary>
-	/// Tests whether the specified coordinate are valid for drawing. 
+	/// Simulates a key press.
 	/// </summary>
-	/// <param name="col">The column.</param>
-	/// <param name="row">The row.</param>
-	/// <returns><see langword="false"/> if the coordinate is outside of the
-	/// screen bounds or outside of <see cref="Clip"/>. <see langword="true"/> otherwise.</returns>
-	public bool IsValidLocation (int col, int row) =>
-		col >= 0 && row >= 0 &&
-		col < Cols && row < Rows &&
-		Clip.Contains (col, row);
+	/// <param name="keyChar">The key character.</param>
+	/// <param name="key">The key.</param>
+	/// <param name="shift">If <see langword="true"/> simulates the Shift key being pressed.</param>
+	/// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
+	/// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
+	public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
 
+	// TODO: Move FillRect to ./Drawing	
 	/// <summary>
-	/// Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(ustring)"/> are 
-	/// subject to. 
+	/// Fills the specified rectangle with the specified rune.
 	/// </summary>
-	/// <value>The rectangle describing the bounds of <see cref="Clip"/>.</value>
-	public Rect Clip {
-		get => _clip;
-		set => _clip = value;
-	}
-
-	Attribute _currentAttribute;
-
-	/// <summary>
-	/// Make the attribute for the foreground and background colors.
-	/// </summary>
-	/// <param name="fore">Foreground.</param>
-	/// <param name="back">Background.</param>
-	/// <returns></returns>
-	public virtual Attribute MakeAttribute (Color fore, Color back)
+	/// <param name="rect"></param>
+	/// <param name="rune"></param>
+	public void FillRect (Rect rect, Rune rune = default)
 	{
-		return MakeColor (fore, back);
-	}
-
-	/// <summary>
-	/// Gets the current <see cref="Attribute"/>.
-	/// </summary>
-	/// <returns>The current attribute.</returns>
-	public Attribute GetAttribute () => CurrentAttribute;
-
-	/// <summary>
-	/// Makes an <see cref="Attribute"/>.
-	/// </summary>
-	/// <param name="foreground">The foreground color.</param>
-	/// <param name="background">The background color.</param>
-	/// <returns>The attribute for the foreground and background colors.</returns>
-	public abstract Attribute MakeColor (Color foreground, Color background);
-
-	/// <summary>
-	/// Ensures all <see cref="Attribute"/>s in <see cref="Colors.ColorSchemes"/> are correctly 
-	/// initialized by the driver.
-	/// </summary>
-	/// <param name="supportsColors">Flag indicating if colors are supported (not used).</param>
-	public void InitializeColorSchemes (bool supportsColors = true)
-	{
-		// Ensure all Attributes are initialized by the driver
-		foreach (var s in Colors.ColorSchemes) {
-			s.Value.Initialize ();
+		for (var r = rect.Y; r < rect.Y + rect.Height; r++) {
+			for (var c = rect.X; c < rect.X + rect.Width; c++) {
+				Application.Driver.Move (c, r);
+				Application.Driver.AddRune (rune == default ? ' ' : rune);
+			}
 		}
 	}
+
+	/// <summary>
+	/// Ends the execution of the console driver.
+	/// </summary>
+	public abstract void End ();
+
 }
 
+
+/// <summary>
+/// Terminal Cursor Visibility settings.
+/// </summary>
+/// <remarks>
+/// Hex value are set as 0xAABBCCDD where :
+///
+///     AA stand for the TERMINFO DECSUSR parameter value to be used under Linux and MacOS
+///     BB stand for the NCurses curs_set parameter value to be used under Linux and MacOS
+///     CC stand for the CONSOLE_CURSOR_INFO.bVisible parameter value to be used under Windows
+///     DD stand for the CONSOLE_CURSOR_INFO.dwSize parameter value to be used under Windows
+///</remarks>
+public enum CursorVisibility {
+	/// <summary>
+	///	Cursor caret has default
+	/// </summary>
+	/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Underscore"/>. This default directly depends of the XTerm user configuration settings so it could be Block, I-Beam, Underline with possible blinking.</remarks>
+	Default = 0x00010119,
+
+	/// <summary>
+	///	Cursor caret is hidden
+	/// </summary>
+	Invisible = 0x03000019,
+
+	/// <summary>
+	///	Cursor caret is normally shown as a blinking underline bar _
+	/// </summary>
+	Underline = 0x03010119,
+
+	/// <summary>
+	///	Cursor caret is normally shown as a underline bar _
+	/// </summary>
+	/// <remarks>Under Windows, this is equivalent to <see ref="UnderscoreBlinking"/></remarks>
+	UnderlineFix = 0x04010119,
+
+	/// <summary>
+	///	Cursor caret is displayed a blinking vertical bar |
+	/// </summary>
+	/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Underscore"/></remarks>
+	Vertical = 0x05010119,
+
+	/// <summary>
+	///	Cursor caret is displayed a blinking vertical bar |
+	/// </summary>
+	/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Underscore"/></remarks>
+	VerticalFix = 0x06010119,
+
+	/// <summary>
+	///	Cursor caret is displayed as a blinking block ▉
+	/// </summary>
+	Box = 0x01020164,
+
+	/// <summary>
+	///	Cursor caret is displayed a block ▉
+	/// </summary>
+	/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Block"/></remarks>
+	BoxFix = 0x02020164,
+}
