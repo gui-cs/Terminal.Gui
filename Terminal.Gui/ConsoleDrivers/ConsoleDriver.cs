@@ -276,10 +276,7 @@ namespace Terminal.Gui {
 		/// Implementations should call <c>base.SetAttribute(c)</c>.
 		/// </remarks>
 		/// <param name="c">C.</param>
-		public virtual void SetAttribute (Attribute c)
-		{
-			CurrentAttribute = c;
-		}
+		public void SetAttribute (Attribute c) => CurrentAttribute = c;
 
 		/// <summary>
 		/// Gets the foreground and background colors based on the value.

@@ -61,10 +61,12 @@ namespace Terminal.Gui {
 					Contents [Row, Col - 1, 0] = c;
 					Contents [Row, Col - 1, 1] = CurrentAttribute;
 					Contents [Row, Col - 1, 2] = 1;
-
+					Curses.attrset (Contents [Row, Col - 1, 1]);
 					Curses.mvaddch (Row, Col - 1, c);
-
 				} else {
+					Contents [Row, Col, 1] = CurrentAttribute;
+					Contents [Row, Col, 2] = 1;
+
 					if (runeWidth < 2 && Col > 0
 						&& Rune.ColumnWidth ((char)Contents [Row, Col - 1, 0]) > 1) {
 
@@ -90,11 +92,12 @@ namespace Terminal.Gui {
 						Curses.addch (System.Text.Rune.ReplacementChar.Value);
 						Contents [Row, Col, 0] = System.Text.Rune.ReplacementChar.Value;
 					} else {
+						var curAttr = CurrentAttribute;
+						Curses.attrset (Contents [Row, Col, 1]);
 						Curses.addch ((int)(uint)rune);
+						Curses.attrset (curAttr);
 						Contents [Row, Col, 0] = (int)(uint)rune;
 					}
-					Contents [Row, Col, 1] = CurrentAttribute;
-					Contents [Row, Col, 2] = 1;
 				}
 			} else {
 				_atValidLocation = false;
@@ -147,13 +150,7 @@ namespace Terminal.Gui {
 		}
 
 		public override void UpdateScreen () => _window.redrawwin ();
-
-		public override void SetAttribute (Attribute c)
-		{
-			base.SetAttribute (c);
-			Curses.attrset (CurrentAttribute);
-		}
-
+		
 		public Curses.Window _window;
 
 		/// <summary>
@@ -551,35 +548,36 @@ namespace Terminal.Gui {
 
 				InitializeColorSchemes ();
 			} else {
-				InitializeColorSchemes (false);
+				throw new InvalidOperationException ("V2 - This should never happen. File an Issue if it does.");
+				//InitializeColorSchemes (false);
 
-				// BUGBUG: This is a hack to make the colors work on the Mac?
-				// The new Theme support overwrites these colors, so this is not needed?
-				Colors.TopLevel.Normal = Curses.COLOR_GREEN;
-				Colors.TopLevel.Focus = Curses.COLOR_WHITE;
-				Colors.TopLevel.HotNormal = Curses.COLOR_YELLOW;
-				Colors.TopLevel.HotFocus = Curses.COLOR_YELLOW;
-				Colors.TopLevel.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
-				Colors.Base.Normal = Curses.A_NORMAL;
-				Colors.Base.Focus = Curses.A_REVERSE;
-				Colors.Base.HotNormal = Curses.A_BOLD;
-				Colors.Base.HotFocus = Curses.A_BOLD | Curses.A_REVERSE;
-				Colors.Base.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
-				Colors.Menu.Normal = Curses.A_REVERSE;
-				Colors.Menu.Focus = Curses.A_NORMAL;
-				Colors.Menu.HotNormal = Curses.A_BOLD;
-				Colors.Menu.HotFocus = Curses.A_NORMAL;
-				Colors.Menu.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
-				Colors.Dialog.Normal = Curses.A_REVERSE;
-				Colors.Dialog.Focus = Curses.A_NORMAL;
-				Colors.Dialog.HotNormal = Curses.A_BOLD;
-				Colors.Dialog.HotFocus = Curses.A_NORMAL;
-				Colors.Dialog.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
-				Colors.Error.Normal = Curses.A_BOLD;
-				Colors.Error.Focus = Curses.A_BOLD | Curses.A_REVERSE;
-				Colors.Error.HotNormal = Curses.A_BOLD | Curses.A_REVERSE;
-				Colors.Error.HotFocus = Curses.A_REVERSE;
-				Colors.Error.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
+				//// BUGBUG: This is a hack to make the colors work on the Mac?
+				//// The new Theme support overwrites these colors, so this is not needed?
+				//Colors.TopLevel.Normal = Curses.COLOR_GREEN;
+				//Colors.TopLevel.Focus = Curses.COLOR_WHITE;
+				//Colors.TopLevel.HotNormal = Curses.COLOR_YELLOW;
+				//Colors.TopLevel.HotFocus = Curses.COLOR_YELLOW;
+				//Colors.TopLevel.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
+				//Colors.Base.Normal = Curses.A_NORMAL;
+				//Colors.Base.Focus = Curses.A_REVERSE;
+				//Colors.Base.HotNormal = Curses.A_BOLD;
+				//Colors.Base.HotFocus = Curses.A_BOLD | Curses.A_REVERSE;
+				//Colors.Base.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
+				//Colors.Menu.Normal = Curses.A_REVERSE;
+				//Colors.Menu.Focus = Curses.A_NORMAL;
+				//Colors.Menu.HotNormal = Curses.A_BOLD;
+				//Colors.Menu.HotFocus = Curses.A_NORMAL;
+				//Colors.Menu.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
+				//Colors.Dialog.Normal = Curses.A_REVERSE;
+				//Colors.Dialog.Focus = Curses.A_NORMAL;
+				//Colors.Dialog.HotNormal = Curses.A_BOLD;
+				//Colors.Dialog.HotFocus = Curses.A_NORMAL;
+				//Colors.Dialog.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
+				//Colors.Error.Normal = Curses.A_BOLD;
+				//Colors.Error.Focus = Curses.A_BOLD | Curses.A_REVERSE;
+				//Colors.Error.HotNormal = Curses.A_BOLD | Curses.A_REVERSE;
+				//Colors.Error.HotFocus = Curses.A_REVERSE;
+				//Colors.Error.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
 			}
 
 			ResizeScreen ();
