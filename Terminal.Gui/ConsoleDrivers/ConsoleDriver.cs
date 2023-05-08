@@ -331,82 +331,30 @@ namespace Terminal.Gui {
 		/// <remarks>This is only implemented in <see cref="CursesDriver"/>.</remarks>
 		public abstract void Suspend ();
 
+		Rect _clip;
+
 		/// <summary>
 		/// Tests whether the specified coordinate are valid for drawing. 
 		/// </summary>
 		/// <param name="col">The column.</param>
 		/// <param name="row">The row.</param>
 		/// <returns><see langword="false"/> if the coordinate is outside of the
-		/// screen bounds or outside either <see cref="Clip"/> or
-		/// <see cref="ClipRegion"/>. <see langword="true"/> otherwise.</returns>
+		/// screen bounds or outside of <see cref="Clip"/>. <see langword="true"/> otherwise.</returns>
 		public bool IsValidLocation (int col, int row) =>
 			col >= 0 && row >= 0 &&
 			col < Cols && row < Rows &&
-			IsInClipRegion (row, col);
+			Clip.Contains (col, row);
 
 		/// <summary>
 		/// Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(ustring)"/> are 
-		/// subject to. Setting this property is equivalent to calling <see cref="ClearClipRegion()"/>
-		/// and <see cref="AddToClipRegion(Rect)"/>.
+		/// subject to. 
 		/// </summary>
-		/// <value>The rectangle describing the bounds of <see cref="ClipRegion"/>.</value>
+		/// <value>The rectangle describing the bounds of <see cref="Clip"/>.</value>
 		public Rect Clip {
-			get {
-				if (ClipRegion.Count == 0) {
-					return new Rect (0, 0, Cols, Rows);
-				}
-
-				// BUGBUG: ? This means that if you have a clip region of 0,0,10,10 and 20,20,10,10
-				// BUGBUG: ? the Clip will be 0,0,30,30. Is this the desired behavior?
-				var minX = ClipRegion.Min (rect => rect.X);
-				var minY = ClipRegion.Min (rect => rect.Y);
-				var maxX = ClipRegion.Max (rect => rect.X + rect.Width);
-				var maxY = ClipRegion.Max (rect => rect.Y + rect.Height);
-
-				return new Rect (minX, minY, maxX - minX, maxY - minY);
-			}
-			set {
-				ClearClipRegion ();
-				AddToClipRegion (value);
-			}
+			get => _clip;
+			set => _clip = value;
 		}
-
-		/// <summary>
-		/// The clipping region that <see cref="AddRune(Rune)"/> and <see cref="AddStr(ustring)"/> are 
-		/// subject to. The clip region is an irregularly shaped area defined by the intersection of a set
-		/// of rectangles added with <see cref="AddToClipRegion(Rect)"/>. To clear the clip region call <see cref="ClearClipRegion"/>.
-		/// </summary>
-		/// <value>The clip.</value>
-		public List<Rect> ClipRegion { get; set; } = new List<Rect> ();
-
-		/// <summary>
-		/// Expands <see cref="ClipRegion"/> to include <paramref name="rect"/>.
-		/// </summary>
-		/// <param name="rect"></param>
-		/// <returns>The updated <see cref="ClipRegion"/>.</returns>
-		public List<Rect> AddToClipRegion (Rect rect)
-		{
-			ClipRegion.Add (rect);
-			return ClipRegion;
-		}
-
-		/// <summary>
-		/// Clears the <see cref="ClipRegion"/>. This has the same effect as expanding the clip
-		/// region to include the entire screen.
-		/// </summary>
-		public void ClearClipRegion ()
-		{
-			ClipRegion.Clear ();
-		}
-
-		/// <summary>
-		/// Tests if the specified coordinates are within the <see cref="ClipRegion"/>.
-		/// </summary>
-		/// <param name="col"></param>
-		/// <param name="row"></param>
-		/// <returns><see langword="true"/> if <paramref name="col"/> and <paramref name="col"/> is
-		/// within the clip region.</returns>
-		private bool IsInClipRegion (int col, int row) => ClipRegion.Count == 0 || ClipRegion.Any (rect => rect.Contains (row, col));
+		
 
 		/// <summary>
 		/// Start of mouse moves.

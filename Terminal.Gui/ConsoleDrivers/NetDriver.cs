@@ -813,9 +813,9 @@ namespace Terminal.Gui {
 						Console.SetBufferSize (Cols, Rows);
 #pragma warning restore CA1416
 					} catch (System.IO.IOException) {
-						ClearClipRegion ();
+						Clip = new Rect (0, 0, Cols, Rows);
 					} catch (ArgumentOutOfRangeException) {
-						ClearClipRegion ();
+						Clip = new Rect (0, 0, Cols, Rows);
 					}
 				} else {
 					Console.Out.Write ($"\x1b[8;{Rows};{Cols}t");
@@ -834,16 +834,16 @@ namespace Terminal.Gui {
 							Console.SetBufferSize (Cols, Rows);
 #pragma warning restore CA1416
 						} catch (System.IO.IOException) {
-							ClearClipRegion ();
+							Clip = new Rect (0, 0, Cols, Rows);
 						} catch (ArgumentOutOfRangeException) {
-							ClearClipRegion ();
+							Clip = new Rect (0, 0, Cols, Rows);
 						}
 					}
 				} else {
 					Console.Out.Write ($"\x1b[30;{Rows};{Cols}t");
 				}
 			}
-			ClearClipRegion ();
+			Clip = new Rect (0, 0, Cols, Rows);
 		}
 
 		public override void UpdateOffScreen ()

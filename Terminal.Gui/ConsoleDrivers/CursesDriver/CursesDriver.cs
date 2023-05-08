@@ -637,7 +637,7 @@ namespace Terminal.Gui {
 
 		public override void ResizeScreen ()
 		{
-			ClearClipRegion ();
+			Clip = new Rect (0, 0, Cols, Rows);
 			Curses.refresh ();
 		}
 

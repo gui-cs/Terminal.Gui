@@ -701,7 +701,6 @@ namespace Terminal.Gui {
 	}
 
 	internal class WindowsDriver : ConsoleDriver {
-		static bool _sync = false;
 		WindowsConsole.CharInfo [] _outputBuffer;
 		int _cols, _rows, _left, _top;
 		WindowsConsole.SmallRect _damageRegion;
@@ -1487,7 +1486,7 @@ namespace Terminal.Gui {
 		public override void ResizeScreen ()
 		{
 			_outputBuffer = new WindowsConsole.CharInfo [Rows * Cols];
-			ClearClipRegion ();
+			Clip = new Rect (0, 0, Cols, Rows); 
 			_damageRegion = new WindowsConsole.SmallRect () {
 				Top = 0,
 				Left = 0,

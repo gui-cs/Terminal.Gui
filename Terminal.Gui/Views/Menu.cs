@@ -572,8 +572,7 @@ namespace Terminal.Gui {
 				return;
 			}
 			var savedClip = Driver.Clip;
-			Driver.ClearClipRegion ();
-
+			Driver.Clip = new Rect (0, 0, Driver.Cols, Driver.Rows);
 			Driver.SetAttribute (GetNormalColor ());
 
 			OnDrawFrames ();

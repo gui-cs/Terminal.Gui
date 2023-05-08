@@ -75,8 +75,6 @@ namespace Terminal.Gui {
 		//		dirtyLine [row] = true;
 		//}
 
-		static bool _sync = false;
-
 		public FakeDriver ()
 		{
 			if (FakeBehaviors.UseFakeClipboard) {
@@ -568,7 +566,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			ClearClipRegion ();
+			Clip = new Rect (0, 0, Cols, Rows);
 		}
 
 		public override void UpdateOffScreen ()
@@ -587,6 +585,7 @@ namespace Terminal.Gui {
 					}
 				}
 			} catch (IndexOutOfRangeException) { }
+			Clip = new Rect (0, 0, Cols, Rows);
 		}
 
 		public override bool GetColors (int value, out Color foreground, out Color background)
