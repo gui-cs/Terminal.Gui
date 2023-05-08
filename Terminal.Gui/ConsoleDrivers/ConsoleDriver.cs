@@ -356,10 +356,12 @@ namespace Terminal.Gui {
 					return new Rect (0, 0, Cols, Rows);
 				}
 
-				int minX = ClipRegion.Min (rect => rect.X);
-				int minY = ClipRegion.Min (rect => rect.Y);
-				int maxX = ClipRegion.Max (rect => rect.X + rect.Width);
-				int maxY = ClipRegion.Max (rect => rect.Y + rect.Height);
+				// BUGBUG: ? This means that if you have a clip region of 0,0,10,10 and 20,20,10,10
+				// BUGBUG: ? the Clip will be 0,0,30,30. Is this the desired behavior?
+				var minX = ClipRegion.Min (rect => rect.X);
+				var minY = ClipRegion.Min (rect => rect.Y);
+				var maxX = ClipRegion.Max (rect => rect.X + rect.Width);
+				var maxY = ClipRegion.Max (rect => rect.Y + rect.Height);
 
 				return new Rect (minX, minY, maxX - minX, maxY - minY);
 			}
@@ -369,18 +371,13 @@ namespace Terminal.Gui {
 			}
 		}
 
-		List<Rect> _clipRegion = new List<Rect> ();
-
 		/// <summary>
 		/// The clipping region that <see cref="AddRune(Rune)"/> and <see cref="AddStr(ustring)"/> are 
 		/// subject to. The clip region is an irregularly shaped area defined by the intersection of a set
 		/// of rectangles added with <see cref="AddToClipRegion(Rect)"/>. To clear the clip region call <see cref="ClearClipRegion"/>.
 		/// </summary>
 		/// <value>The clip.</value>
-		public List<Rect> ClipRegion {
-			get => _clipRegion;
-			set => _clipRegion = value;
-		}
+		public List<Rect> ClipRegion { get; set; } = new List<Rect> ();
 
 		/// <summary>
 		/// Expands <see cref="ClipRegion"/> to include <paramref name="rect"/>.
