@@ -38,16 +38,8 @@ namespace Terminal.Gui {
 
 		public static FakeDriver.Behaviors FakeBehaviors = new Behaviors ();
 
-		public override bool EnableConsoleScrolling { get; set; }
-
 		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
-		int [,,] _contents;
 		bool [] _dirtyLine;
-
-		/// <summary>
-		/// Assists with testing, the format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
-		/// </summary>
-		public override int [,,] Contents => _contents;
 
 		//void UpdateOffscreen ()
 		//{
@@ -107,33 +99,33 @@ namespace Terminal.Gui {
 
 			if (validLocation) {
 				if (runeWidth == 0 && _ccol > 0) {
-					var r = _contents [_crow, _ccol - 1, 0];
+					var r = Contents [_crow, _ccol - 1, 0];
 					var s = new string (new [] { (char)r, (char)rune });
 					var sn = !s.IsNormalized () ? s.Normalize () : s;
 					var c = sn [0];
-					_contents [_crow, _ccol - 1, 0] = c;
-					_contents [_crow, _ccol - 1, 1] = CurrentAttribute;
-					_contents [_crow, _ccol - 1, 2] = 1;
+					Contents [_crow, _ccol - 1, 0] = c;
+					Contents [_crow, _ccol - 1, 1] = CurrentAttribute;
+					Contents [_crow, _ccol - 1, 2] = 1;
 				} else {
 					if (runeWidth < 2 && _ccol > 0
-						&& Rune.ColumnWidth (_contents [_crow, _ccol - 1, 0]) > 1) {
+						&& Rune.ColumnWidth (Contents [_crow, _ccol - 1, 0]) > 1) {
 
-						_contents [_crow, _ccol - 1, 0] = System.Text.Rune.ReplacementChar.Value;
+						Contents [_crow, _ccol - 1, 0] = System.Text.Rune.ReplacementChar.Value;
 
 					} else if (runeWidth < 2 && _ccol <= Clip.Right - 1
-						&& Rune.ColumnWidth (_contents [_crow, _ccol, 0]) > 1) {
+						&& Rune.ColumnWidth (Contents [_crow, _ccol, 0]) > 1) {
 
-						_contents [_crow, _ccol + 1, 0] = System.Text.Rune.ReplacementChar.Value;
-						_contents [_crow, _ccol + 1, 2] = 1;
+						Contents [_crow, _ccol + 1, 0] = System.Text.Rune.ReplacementChar.Value;
+						Contents [_crow, _ccol + 1, 2] = 1;
 
 					}
 					if (runeWidth > 1 && _ccol == Clip.Right - 1) {
-						_contents [_crow, _ccol, 0] = System.Text.Rune.ReplacementChar.Value;
+						Contents [_crow, _ccol, 0] = System.Text.Rune.ReplacementChar.Value;
 					} else {
-						_contents [_crow, _ccol, 0] = (int)(uint)rune;
+						Contents [_crow, _ccol, 0] = (int)(uint)rune;
 					}
-					_contents [_crow, _ccol, 1] = CurrentAttribute;
-					_contents [_crow, _ccol, 2] = 1;
+					Contents [_crow, _ccol, 1] = CurrentAttribute;
+					Contents [_crow, _ccol, 2] = 1;
 					_dirtyLine [_crow] = true;
 				}
 			}
@@ -144,8 +136,8 @@ namespace Terminal.Gui {
 
 			if (runeWidth > 1) {
 				if (validLocation && _ccol < Clip.Right) {
-					_contents [_crow, _ccol, 1] = CurrentAttribute;
-					_contents [_crow, _ccol, 2] = 0;
+					Contents [_crow, _ccol, 1] = CurrentAttribute;
+					Contents [_crow, _ccol, 2] = 0;
 				}
 				_ccol++;
 			}
@@ -229,23 +221,23 @@ namespace Terminal.Gui {
 					FakeConsole.CursorTop = row;
 					FakeConsole.CursorLeft = col;
 					for (; col < cols; col++) {
-						if (_contents [row, col, 2] == 0) {
+						if (Contents [row, col, 2] == 0) {
 							FakeConsole.CursorLeft++;
 							continue;
 						}
 
-						var color = _contents [row, col, 1];
+						var color = Contents [row, col, 1];
 						if (color != _redrawColor) {
 							SetColor (color);
 						}
 
-						Rune rune = _contents [row, col, 0];
+						Rune rune = Contents [row, col, 0];
 						if (Rune.DecodeSurrogatePair (rune, out char [] spair)) {
 							FakeConsole.Write (spair);
 						} else {
 							FakeConsole.Write ((char)rune);
 						}
-						_contents [row, col, 2] = 0;
+						Contents [row, col, 2] = 0;
 					}
 				}
 			}
@@ -563,16 +555,16 @@ namespace Terminal.Gui {
 
 		public override void UpdateOffScreen ()
 		{
-			_contents = new int [Rows, Cols, 3];
+			Contents = new int [Rows, Cols, 3];
 			_dirtyLine = new bool [Rows];
 
 			// Can raise an exception while is still resizing.
 			try {
 				for (int row = 0; row < Rows; row++) {
 					for (int c = 0; c < Cols; c++) {
-						_contents [row, c, 0] = ' ';
-						_contents [row, c, 1] = (ushort)Colors.TopLevel.Normal;
-						_contents [row, c, 2] = 0;
+						Contents [row, c, 0] = ' ';
+						Contents [row, c, 1] = (ushort)Colors.TopLevel.Normal;
+						Contents [row, c, 2] = 0;
 						_dirtyLine [row] = true;
 					}
 				}
@@ -634,7 +626,7 @@ namespace Terminal.Gui {
 		public class FakeClipboard : ClipboardBase {
 			public Exception FakeException = null;
 
-			string _contents = string.Empty;
+			string Contents = string.Empty;
 
 			bool _isSupportedAlwaysFalse = false;
 
@@ -653,7 +645,7 @@ namespace Terminal.Gui {
 				if (FakeException != null) {
 					throw FakeException;
 				}
-				return _contents;
+				return Contents;
 			}
 
 			protected override void SetClipboardDataImpl (string text)
@@ -661,7 +653,7 @@ namespace Terminal.Gui {
 				if (FakeException != null) {
 					throw FakeException;
 				}
-				_contents = text;
+				Contents = text;
 			}
 		}
 

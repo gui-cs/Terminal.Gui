@@ -120,12 +120,16 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// NOTE: This functionaliy is currently broken on Windows Terminal.
 		/// </remarks>
-		public abstract bool EnableConsoleScrolling { get; set; }
+		public bool EnableConsoleScrolling { get; set; }
 
 		/// <summary>
-		/// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
+		/// The contents of the application output. The driver writes this buffer to the terminal when <see cref="UpdateScreen"/>
+		/// is called.
+		/// <remarks>
+		/// The format of the array is rows, columns, and 3 values on the last column: Rune, Attribute and Dirty Flag
+		/// </remarks>
 		/// </summary>
-		public virtual int [,,] Contents { get; }
+		public int [,,] Contents { get; internal set; }
 
 		/// <summary>
 		/// Initializes the driver

@@ -703,17 +703,12 @@ namespace Terminal.Gui {
 	internal class WindowsDriver : ConsoleDriver {
 		WindowsConsole.CharInfo [] _outputBuffer;
 		WindowsConsole.SmallRect _damageRegion;
-		int [,,] _contents;
-
-		public override bool EnableConsoleScrolling { get; set; }
-		public override int [,,] Contents => _contents;
-
-		public WindowsConsole WinConsole { get; private set; }
-
 		Action<KeyEvent> _keyHandler;
 		Action<KeyEvent> _keyDownHandler;
 		Action<KeyEvent> _keyUpHandler;
 		Action<MouseEvent> _mouseHandler;
+
+		public WindowsConsole WinConsole { get; private set; }
 
 		public WindowsDriver ()
 		{
@@ -1500,15 +1495,15 @@ namespace Terminal.Gui {
 
 		public override void UpdateOffScreen ()
 		{
-			_contents = new int [Rows, Cols, 3];
+			Contents = new int [Rows, Cols, 3];
 			for (int row = 0; row < Rows; row++) {
 				for (int col = 0; col < Cols; col++) {
 					int position = row * Cols + col;
 					_outputBuffer [position].Attributes = (ushort)Colors.TopLevel.Normal;
 					_outputBuffer [position].Char.UnicodeChar = ' ';
-					_contents [row, col, 0] = _outputBuffer [position].Char.UnicodeChar;
-					_contents [row, col, 1] = _outputBuffer [position].Attributes;
-					_contents [row, col, 2] = 0;
+					Contents [row, col, 0] = _outputBuffer [position].Char.UnicodeChar;
+					Contents [row, col, 1] = _outputBuffer [position].Attributes;
+					Contents [row, col, 2] = 0;
 				}
 			}
 		}
@@ -1537,13 +1532,13 @@ namespace Terminal.Gui {
 			if (validLocation) {
 				if (runeWidth == 0 && _ccol > 0) {
 					// Non spacing glyph beyond first col
-					var r = _contents [_crow, _ccol - 1, 0];
+					var r = Contents [_crow, _ccol - 1, 0];
 					var s = new string (new char [] { (char)r, (char)rune.Value });
 					var sn = !s.IsNormalized () ? s.Normalize () : s;
 					var c = sn [0];
-					_contents [_crow, _ccol - 1, 0] = c;
-					_contents [_crow, _ccol - 1, 1] = CurrentAttribute;
-					_contents [_crow, _ccol - 1, 2] = 1;
+					Contents [_crow, _ccol - 1, 0] = c;
+					Contents [_crow, _ccol - 1, 1] = CurrentAttribute;
+					Contents [_crow, _ccol - 1, 2] = 1;
 
 					var prevPosition = _crow * Cols + (_ccol - 1);
 					_outputBuffer [prevPosition].Char.UnicodeChar = c;
@@ -1552,16 +1547,16 @@ namespace Terminal.Gui {
 				} else {
 					if (runeWidth < 2) {
 						// Single column glyph
-						if (_ccol > 0 && Rune.ColumnWidth ((char)_contents [_crow, _ccol - 1, 0]) > 1) {
+						if (_ccol > 0 && Rune.ColumnWidth ((char)Contents [_crow, _ccol - 1, 0]) > 1) {
 							// glyph to left is wide; nuke it 
 							// BUGBUG: Does this make sense?
-							_contents [_crow, _ccol - 1, 0] = System.Text.Rune.ReplacementChar.Value;
+							Contents [_crow, _ccol - 1, 0] = System.Text.Rune.ReplacementChar.Value;
 							var prevPosition = _crow * Cols + (_ccol - 1);
 							_outputBuffer [prevPosition].Char.UnicodeChar = (char)System.Text.Rune.ReplacementChar.Value;
-						} else if (_ccol <= Clip.Right - 1 && Rune.ColumnWidth ((char)_contents [_crow, _ccol, 0]) > 1) {
+						} else if (_ccol <= Clip.Right - 1 && Rune.ColumnWidth ((char)Contents [_crow, _ccol, 0]) > 1) {
 							// we're just inside the clip rect and the glyph there is wide
 							// nuke the existing glyph to right
-							_contents [_crow, _ccol + 1, 0] = System.Text.Rune.ReplacementChar.Value;
+							Contents [_crow, _ccol + 1, 0] = System.Text.Rune.ReplacementChar.Value;
 							var prevPosition = GetOutputBufferPosition () + 1;
 							_outputBuffer [prevPosition].Char.UnicodeChar = (char)System.Text.Rune.ReplacementChar.Value;
 						}
@@ -1571,21 +1566,21 @@ namespace Terminal.Gui {
 						// Wide glyph and we're just inside the clip rect
 						// ignore it
 						// BUGBUG: Shouldn't we write the unknown glyph glyph?
-						_contents [_crow, _ccol, 0] = System.Text.Rune.ReplacementChar.Value;
+						Contents [_crow, _ccol, 0] = System.Text.Rune.ReplacementChar.Value;
 						_outputBuffer [position].Char.UnicodeChar = (char)System.Text.Rune.ReplacementChar.Value;
 					} else {
 						// Add the glyph (wide or not)
 						if (rune.IsBmp) {
-							_contents [_crow, _ccol, 0] = rune.Value;
+							Contents [_crow, _ccol, 0] = rune.Value;
 							_outputBuffer [position].Char.UnicodeChar = (char) rune.Value;
 						} else {
-							_contents [_crow, _ccol, 0] = (char)System.Text.Rune.ReplacementChar.Value;
+							Contents [_crow, _ccol, 0] = (char)System.Text.Rune.ReplacementChar.Value;
 							_outputBuffer [position].Char.UnicodeChar = (char)System.Text.Rune.ReplacementChar.Value;
 
 						}
 					}
-					_contents [_crow, _ccol, 1] = CurrentAttribute;
-					_contents [_crow, _ccol, 2] = 1;
+					Contents [_crow, _ccol, 1] = CurrentAttribute;
+					Contents [_crow, _ccol, 2] = 1;
 
 					_outputBuffer [position].Attributes = (ushort)CurrentAttribute;
 					WindowsConsole.SmallRect.Update (ref _damageRegion, (short)_ccol, (short)_crow);
@@ -1601,9 +1596,9 @@ namespace Terminal.Gui {
 					position = GetOutputBufferPosition ();
 					_outputBuffer [position].Attributes = (ushort)CurrentAttribute;
 					_outputBuffer [position].Char.UnicodeChar = (char)0x00;
-					_contents [_crow, _ccol, 0] = (char)0x00;
-					_contents [_crow, _ccol, 1] = CurrentAttribute;
-					_contents [_crow, _ccol, 2] = 0;
+					Contents [_crow, _ccol, 0] = (char)0x00;
+					Contents [_crow, _ccol, 1] = CurrentAttribute;
+					Contents [_crow, _ccol, 2] = 0;
 				}
 				_ccol++;
 			}

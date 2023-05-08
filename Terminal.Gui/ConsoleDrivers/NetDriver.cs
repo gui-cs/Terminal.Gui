@@ -616,7 +616,6 @@ namespace Terminal.Gui {
 
 		public NetWinVTConsole NetWinConsole { get; }
 		public bool IsWinPlatform { get; }
-		public override int [,,] Contents => _contents;
 
 		int _largestBufferHeight;
 
@@ -640,8 +639,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
-		int [,,] _contents;
 		bool [] _dirtyLine;
 
 		// Current row, and current col, tracked by Move/AddCh only
@@ -654,7 +651,7 @@ namespace Terminal.Gui {
 
 		public override void AddRune (Rune rune)
 		{
-			if (_contents.Length != Rows * Cols * 3) {
+			if (Contents.Length != Rows * Cols * 3) {
 				// BUGBUG: Shouldn't this throw an exception? Doing so to see what happens
 				throw new InvalidOperationException ("Driver contents are wrong size");
 				return;
@@ -667,33 +664,33 @@ namespace Terminal.Gui {
 			if (validLocation) {
 				if (runeWidth == 0 && _ccol > 0) {
 					// Single column glyph beyond first col
-					var r = _contents [_crow, _ccol - 1, 0];
+					var r = Contents [_crow, _ccol - 1, 0];
 					var s = new string (new char [] { (char)r, (char)rune });
 					var sn = !s.IsNormalized () ? s.Normalize () : s;
 					var c = sn [0];
-					_contents [_crow, _ccol - 1, 0] = c;
-					_contents [_crow, _ccol - 1, 1] = CurrentAttribute;
-					_contents [_crow, _ccol - 1, 2] = 1;
+					Contents [_crow, _ccol - 1, 0] = c;
+					Contents [_crow, _ccol - 1, 1] = CurrentAttribute;
+					Contents [_crow, _ccol - 1, 2] = 1;
 				} else {
 					if (runeWidth < 2 && _ccol > 0
-						&& Rune.ColumnWidth ((char)_contents [_crow, _ccol - 1, 0]) > 1) {
+						&& Rune.ColumnWidth ((char)Contents [_crow, _ccol - 1, 0]) > 1) {
 
-						_contents [_crow, _ccol - 1, 0] = (char)System.Text.Rune.ReplacementChar.Value;
+						Contents [_crow, _ccol - 1, 0] = (char)System.Text.Rune.ReplacementChar.Value;
 
 					} else if (runeWidth < 2 && _ccol <= Clip.Right - 1
-						&& Rune.ColumnWidth ((char)_contents [_crow, _ccol, 0]) > 1) {
+						&& Rune.ColumnWidth ((char)Contents [_crow, _ccol, 0]) > 1) {
 
-						_contents [_crow, _ccol + 1, 0] = (char)System.Text.Rune.ReplacementChar.Value;
-						_contents [_crow, _ccol + 1, 2] = 1;
+						Contents [_crow, _ccol + 1, 0] = (char)System.Text.Rune.ReplacementChar.Value;
+						Contents [_crow, _ccol + 1, 2] = 1;
 
 					}
 					if (runeWidth > 1 && _ccol == Clip.Right - 1) {
-						_contents [_crow, _ccol, 0] = (char)System.Text.Rune.ReplacementChar.Value;
+						Contents [_crow, _ccol, 0] = (char)System.Text.Rune.ReplacementChar.Value;
 					} else {
-						_contents [_crow, _ccol, 0] = (int)(uint)rune;
+						Contents [_crow, _ccol, 0] = (int)(uint)rune;
 					}
-					_contents [_crow, _ccol, 1] = CurrentAttribute;
-					_contents [_crow, _ccol, 2] = 1;
+					Contents [_crow, _ccol, 1] = CurrentAttribute;
+					Contents [_crow, _ccol, 2] = 1;
 
 				}
 				_dirtyLine [_crow] = true;
@@ -705,8 +702,8 @@ namespace Terminal.Gui {
 
 			if (runeWidth > 1) {
 				if (validLocation && _ccol < Clip.Right) {
-					_contents [_crow, _ccol, 1] = CurrentAttribute;
-					_contents [_crow, _ccol, 2] = 0;
+					Contents [_crow, _ccol, 1] = CurrentAttribute;
+					Contents [_crow, _ccol, 2] = 0;
 				}
 				_ccol++;
 			}
@@ -840,17 +837,17 @@ namespace Terminal.Gui {
 
 		public override void UpdateOffScreen ()
 		{
-			_contents = new int [Rows, Cols, 3];
+			Contents = new int [Rows, Cols, 3];
 			_dirtyLine = new bool [Rows];
 
-			lock (_contents) {
+			lock (Contents) {
 				// Can raise an exception while is still resizing.
 				try {
 					for (int row = 0; row < Rows; row++) {
 						for (int c = 0; c < Cols; c++) {
-							_contents [row, c, 0] = ' ';
-							_contents [row, c, 1] = (ushort)Colors.TopLevel.Normal;
-							_contents [row, c, 2] = 0;
+							Contents [row, c, 0] = ' ';
+							Contents [row, c, 1] = (ushort)Colors.TopLevel.Normal;
+							Contents [row, c, 2] = 0;
 							_dirtyLine [row] = true;
 						}
 					}
@@ -866,7 +863,7 @@ namespace Terminal.Gui {
 
 		public override void UpdateScreen ()
 		{
-			if (winChanging || Console.WindowHeight < 1 || _contents.Length != Rows * Cols * 3
+			if (winChanging || Console.WindowHeight < 1 || Contents.Length != Rows * Cols * 3
 				|| (!EnableConsoleScrolling && Rows != Console.WindowHeight)
 				|| (EnableConsoleScrolling && Rows != _largestBufferHeight)) {
 				return;
@@ -898,7 +895,7 @@ namespace Terminal.Gui {
 					lastCol = -1;
 					var outputWidth = 0;
 					for (; col < cols; col++) {
-						if (_contents [row, col, 2] == 0) {
+						if (Contents [row, col, 2] == 0) {
 							if (output.Length > 0) {
 								SetCursorPosition (lastCol, row);
 								Console.Write (output);
@@ -916,20 +913,20 @@ namespace Terminal.Gui {
 						if (lastCol == -1)
 							lastCol = col;
 
-						var attr = _contents [row, col, 1];
+						var attr = Contents [row, col, 1];
 						if (attr != redrawAttr) {
 							redrawAttr = attr;
 							output.Append (WriteAttributes (attr));
 						}
 						outputWidth++;
-						var rune = _contents [row, col, 0];
+						var rune = Contents [row, col, 0];
 						char [] spair;
 						if (Rune.DecodeSurrogatePair ((uint)rune, out spair)) {
 							output.Append (spair);
 						} else {
 							output.Append ((char)rune);
 						}
-						_contents [row, col, 2] = 0;
+						Contents [row, col, 2] = 0;
 					}
 				}
 				if (output.Length > 0) {

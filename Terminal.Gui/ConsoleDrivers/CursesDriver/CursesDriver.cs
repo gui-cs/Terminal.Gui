@@ -20,13 +20,9 @@ namespace Terminal.Gui {
 		public override int Rows => Curses.Lines;
 		public override int Left => 0;
 		public override int Top => 0;
-		public override bool EnableConsoleScrolling { get; set; }
 
 		CursorVisibility? _initialCursorVisibility = null;
 		CursorVisibility? _currentCursorVisibility = null;
-		int [,,] _contents;
-
-		public override int [,,] Contents => _contents;
 
 		// Current row, and current col, tracked by Move/AddRune only
 		int _ccol, _crow;
@@ -65,47 +61,47 @@ namespace Terminal.Gui {
 					_needMove = false;
 				}
 				if (runeWidth == 0 && _ccol > 0) {
-					var r = _contents [_crow, _ccol - 1, 0];
+					var r = Contents [_crow, _ccol - 1, 0];
 					var s = new string (new char [] { (char)r, (char)rune });
 					var sn = !s.IsNormalized () ? s.Normalize () : s;
 					var c = sn [0];
-					_contents [_crow, _ccol - 1, 0] = c;
-					_contents [_crow, _ccol - 1, 1] = CurrentAttribute;
-					_contents [_crow, _ccol - 1, 2] = 1;
+					Contents [_crow, _ccol - 1, 0] = c;
+					Contents [_crow, _ccol - 1, 1] = CurrentAttribute;
+					Contents [_crow, _ccol - 1, 2] = 1;
 
 					Curses.mvaddch (_crow, _ccol - 1, c);
 
 				} else {
 					if (runeWidth < 2 && _ccol > 0
-						&& Rune.ColumnWidth ((char)_contents [_crow, _ccol - 1, 0]) > 1) {
+						&& Rune.ColumnWidth ((char)Contents [_crow, _ccol - 1, 0]) > 1) {
 
 						var curAttr = CurrentAttribute;
-						Curses.attrset (_contents [_crow, _ccol - 1, 1]);
+						Curses.attrset (Contents [_crow, _ccol - 1, 1]);
 						Curses.mvaddch (_crow, _ccol - 1, System.Text.Rune.ReplacementChar.Value);
-						_contents [_crow, _ccol - 1, 0] = System.Text.Rune.ReplacementChar.Value;
+						Contents [_crow, _ccol - 1, 0] = System.Text.Rune.ReplacementChar.Value;
 						Curses.move (_crow, _ccol);
 						Curses.attrset (curAttr);
 
 					} else if (runeWidth < 2 && _ccol <= Clip.Right - 1
-						&& Rune.ColumnWidth ((char)_contents [_crow, _ccol, 0]) > 1) {
+						&& Rune.ColumnWidth ((char)Contents [_crow, _ccol, 0]) > 1) {
 
 						var curAttr = CurrentAttribute;
-						Curses.attrset (_contents [_crow, _ccol + 1, 1]);
+						Curses.attrset (Contents [_crow, _ccol + 1, 1]);
 						Curses.mvaddch (_crow, _ccol + 1, System.Text.Rune.ReplacementChar.Value);
-						_contents [_crow, _ccol + 1, 0] = System.Text.Rune.ReplacementChar.Value;
+						Contents [_crow, _ccol + 1, 0] = System.Text.Rune.ReplacementChar.Value;
 						Curses.move (_crow, _ccol);
 						Curses.attrset (curAttr);
 
 					}
 					if (runeWidth > 1 && _ccol == Clip.Right - 1) {
 						Curses.addch (System.Text.Rune.ReplacementChar.Value);
-						_contents [_crow, _ccol, 0] = System.Text.Rune.ReplacementChar.Value;
+						Contents [_crow, _ccol, 0] = System.Text.Rune.ReplacementChar.Value;
 					} else {
 						Curses.addch ((int)(uint)rune);
-						_contents [_crow, _ccol, 0] = (int)(uint)rune;
+						Contents [_crow, _ccol, 0] = (int)(uint)rune;
 					}
-					_contents [_crow, _ccol, 1] = CurrentAttribute;
-					_contents [_crow, _ccol, 2] = 1;
+					Contents [_crow, _ccol, 1] = CurrentAttribute;
+					Contents [_crow, _ccol, 2] = 1;
 				}
 			} else {
 				_needMove = true;
@@ -117,8 +113,8 @@ namespace Terminal.Gui {
 
 			if (runeWidth > 1) {
 				if (validLocation && _ccol < Clip.Right) {
-					_contents [_crow, _ccol, 1] = CurrentAttribute;
-					_contents [_crow, _ccol, 2] = 0;
+					Contents [_crow, _ccol, 1] = CurrentAttribute;
+					Contents [_crow, _ccol, 2] = 0;
 				}
 				_ccol++;
 			}
@@ -641,15 +637,15 @@ namespace Terminal.Gui {
 
 		public override void UpdateOffScreen ()
 		{
-			_contents = new int [Rows, Cols, 3];
+			Contents = new int [Rows, Cols, 3];
 			for (int row = 0; row < Rows; row++) {
 				for (int col = 0; col < Cols; col++) {
 					//Curses.move (row, col);
 					//Curses.attrset (Colors.TopLevel.Normal);
 					//Curses.addch ((int)(uint)' ');
-					_contents [row, col, 0] = ' ';
-					_contents [row, col, 1] = Colors.TopLevel.Normal;
-					_contents [row, col, 2] = 0;
+					Contents [row, col, 0] = ' ';
+					Contents [row, col, 1] = Colors.TopLevel.Normal;
+					Contents [row, col, 2] = 0;
 				}
 			}
 		}
