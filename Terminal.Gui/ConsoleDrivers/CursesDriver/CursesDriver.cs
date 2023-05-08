@@ -21,11 +21,9 @@ namespace Terminal.Gui {
 		public override int Left => 0;
 		public override int Top => 0;
 		public override bool EnableConsoleScrolling { get; set; }
-		public override IClipboard Clipboard { get => _clipboard; }
 
 		CursorVisibility? _initialCursorVisibility = null;
 		CursorVisibility? _currentCursorVisibility = null;
-		IClipboard _clipboard;
 		int [,,] _contents;
 
 		public override int [,,] Contents => _contents;
@@ -575,12 +573,12 @@ namespace Terminal.Gui {
 			}
 
 			if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
-				_clipboard = new MacOSXClipboard ();
+				Clipboard = new MacOSXClipboard ();
 			} else {
 				if (Is_WSL_Platform ()) {
-					_clipboard = new WSLClipboard ();
+					Clipboard = new WSLClipboard ();
 				} else {
-					_clipboard = new CursesClipboard ();
+					Clipboard = new CursesClipboard ();
 				}
 			}
 

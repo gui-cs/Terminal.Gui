@@ -703,11 +703,9 @@ namespace Terminal.Gui {
 	internal class WindowsDriver : ConsoleDriver {
 		WindowsConsole.CharInfo [] _outputBuffer;
 		WindowsConsole.SmallRect _damageRegion;
-		IClipboard _clipboard;
 		int [,,] _contents;
 
 		public override bool EnableConsoleScrolling { get; set; }
-		public override IClipboard Clipboard => _clipboard;
 		public override int [,,] Contents => _contents;
 
 		public WindowsConsole WinConsole { get; private set; }
@@ -720,7 +718,7 @@ namespace Terminal.Gui {
 		public WindowsDriver ()
 		{
 			WinConsole = new WindowsConsole ();
-			_clipboard = new WindowsClipboard ();
+			Clipboard = new WindowsClipboard ();
 		}
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)

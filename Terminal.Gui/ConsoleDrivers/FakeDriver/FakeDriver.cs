@@ -38,15 +38,7 @@ namespace Terminal.Gui {
 
 		public static FakeDriver.Behaviors FakeBehaviors = new Behaviors ();
 
-		//int Cols, Rows;//, Left, Top;
-		//public override int Cols => Cols;
-		//public override int Rows => Rows;
-		// Only handling left here because not all terminals has a horizontal scroll bar.
-		//public override int Left => 0;
-		//public override int Top => 0;
 		public override bool EnableConsoleScrolling { get; set; }
-		private IClipboard _clipboard = null;
-		public override IClipboard Clipboard => _clipboard;
 
 		// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
 		int [,,] _contents;
@@ -78,17 +70,17 @@ namespace Terminal.Gui {
 		public FakeDriver ()
 		{
 			if (FakeBehaviors.UseFakeClipboard) {
-				_clipboard = new FakeClipboard (FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException, FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse);
+				Clipboard = new FakeClipboard (FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException, FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse);
 			} else {
 				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
-					_clipboard = new WindowsClipboard ();
+					Clipboard = new WindowsClipboard ();
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
-					_clipboard = new MacOSXClipboard ();
+					Clipboard = new MacOSXClipboard ();
 				} else {
 					if (CursesDriver.Is_WSL_Platform ()) {
-						_clipboard = new WSLClipboard ();
+						Clipboard = new WSLClipboard ();
 					} else {
-						_clipboard = new CursesClipboard ();
+						Clipboard = new CursesClipboard ();
 					}
 				}
 			}

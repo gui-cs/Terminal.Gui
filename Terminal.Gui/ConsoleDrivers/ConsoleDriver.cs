@@ -78,31 +78,31 @@ namespace Terminal.Gui {
 		/// The handler fired when the terminal is resized.
 		/// </summary>
 		protected Action TerminalResized;
-		 
+
 		/// <summary>
-		/// The current number of columns in the terminal.
+		/// The number of columns visible in the terminal.
 		/// </summary>
 		public virtual int Cols { get; internal set; }
 
 		/// <summary>
-		/// The current number of rows in the terminal.
+		/// The number of rows visible in the terminal.
 		/// </summary>
 		public virtual int Rows { get; internal set; }
 
 		/// <summary>
-		/// The current left in the terminal.
+		/// The leftmost column in the terminal.
 		/// </summary>
 		public virtual int Left { get; internal set; }
 
 		/// <summary>
-		/// The current top in the terminal.
+		/// The topmost row in the terminal.
 		/// </summary>
 		public virtual int Top { get; internal set; }
 
 		/// <summary>
-		/// Get the operation system clipboard.
+		/// Get the operating system clipboard.
 		/// </summary>
-		public abstract IClipboard Clipboard { get; }
+		public IClipboard Clipboard { get; internal set; }
 
 		/// <summary>
 		/// <para>

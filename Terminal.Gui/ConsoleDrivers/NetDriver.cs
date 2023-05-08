@@ -617,7 +617,6 @@ namespace Terminal.Gui {
 		public override bool EnableConsoleScrolling { get; set; }
 		public NetWinVTConsole NetWinConsole { get; }
 		public bool IsWinPlatform { get; }
-		public override IClipboard Clipboard { get; }
 		public override int [,,] Contents => _contents;
 
 		int _largestBufferHeight;
