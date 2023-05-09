@@ -508,7 +508,7 @@ namespace Terminal.Gui {
 					return CM.Glyphs.VLineDa3;
 				}
 				if (useDotted) {
-					return CM.Glyphs.VLineDa3;
+					return CM.Glyphs.VLineDa4;
 				}
 				return useThick ? CM.Glyphs.VLineHv : (useThickDashed ? CM.Glyphs.VLineHvDa3 : (useThickDotted ? CM.Glyphs.VLineHvDa4 : CM.Glyphs.VLine));
 
