@@ -89,5 +89,41 @@ public class ContentsTests {
 		// Shutdown must be called to safely clean up Application if Init has been called
 		Application.Shutdown ();
 	}
+
+	// TODO: Add these unit tests
+	
+	// AddRune moves correctly
+
+	// AddRune with wide characters are handled correctly
+
+	// AddRune with wide characters and Col < 0 are handled correctly
+
+	// AddRune with wide characters and Col == Cols - 1 are handled correctly
+
+	// AddRune with wide characters and Col == Cols are handled correctly
+
+	// AddStr moves correctly
+
+	// AddStr with wide characters moves correctly
+
+	// AddStr where Col is negative works
+
+	// AddStr where Col is negative and characters include wide / combining characters works
+
+	// AddStr where Col is near Cols and characters include wide / combining characters works
+
+	// Clipping works correctly
+
+	// Clipping works correctly with wide characters
+
+	// Clipping works correctly with combining characters
+
+	// Clipping works correctly with combining characters and wide characters
+
+	// ResizeScreen works correctly
+
+	// Refresh works correctly
+
+	// IsDirty tests
 }
 
