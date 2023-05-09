@@ -1,3 +1,6 @@
+// This code is ported/adapted from https://github.com/devblackops/Terminal-Icons which also uses the licensed under MIT license.
+// Nerd fonts can be installed by following the instructions on the Nerd Fonts repository: https://github.com/ryanoasis/nerd-fonts
+
 using System.Collections.Generic;
 using System.IO.Abstractions;
 
@@ -7,26 +10,35 @@ namespace Terminal.Gui {
 
 		public string GetNerdIcon(IFileSystemInfo file)
 		{
-			if(_filenameToIcon.ContainsKey(file.Name))
+			return GetNerdIconChar(file) + " ";
+		}
+
+		private char GetNerdIconChar(IFileSystemInfo file)
+		{
+			if(FilenameToIcon.ContainsKey(file.Name))
 			{
-				return glyphs[_filenameToIcon[file.Name]] + " ";
+				return Glyphs[FilenameToIcon[file.Name]];
 			}
 
-			if(_extensionToIcon.ContainsKey(file.Extension))
+			if(ExtensionToIcon.ContainsKey(file.Extension))
 			{
-				return glyphs[_extensionToIcon[file.Extension]] + " ";
+				return Glyphs[ExtensionToIcon[file.Extension]];
 			}
 
 			if(file is IDirectoryInfo)
 			{
-				return _nf_cod_folder + " ";
+				return _nf_cod_folder;
 			}
 				
-			return "";
+			return _nf_cod_file;
 		}
 		char _nf_cod_folder = '';
+		char _nf_cod_file = '';
 
-		Dictionary<string,char> glyphs = new Dictionary<string, char>{
+		/// <summary>
+		/// All nerd glyphs by name.
+		/// </summary>
+		public Dictionary<string,char> Glyphs {get;set;} = new Dictionary<string, char>{
 			{"nf-cod-package", ''},
 			{"nf-cod-preview", ''},
 			{"nf-custom-folder_config", ''},
@@ -201,7 +213,10 @@ namespace Terminal.Gui {
 
 		};
 
-		Dictionary<string, string> _filenameToIcon = new Dictionary<string, string> ()
+		/// <summary>
+		/// Mapping of file name to <see cref="Glyphs"/> name.
+		/// </summary>
+		public Dictionary<string, string> FilenameToIcon {get;set;} = new Dictionary<string, string> ()
 		{
 			{"docs","nf-oct-repo"},
 			{"documents","nf-oct-repo"},
@@ -247,107 +262,109 @@ namespace Terminal.Gui {
 			{".kube","nf-mdi-ship_wheel"},
 			{".docker","nf-dev-docker"},
 			{"umbraco","nf-mdi-umbraco"},
+			{".gitattributes", "nf-dev-git"},
+			{".gitconfig", "nf-dev-git"},
+			{".gitignore", "nf-dev-git"},
+			{".gitmodules", "nf-dev-git"},
+			{".gitkeep", "nf-dev-git"},
+			{"git-history", "nf-dev-git"},
+			{"LICENSE", "nf-mdi-certificate"},
+			{"CHANGELOG.md", "nf-fae-checklist_o"},
+			{"CHANGELOG.txt", "nf-fae-checklist_o"},
+			{"CHANGELOG", "nf-fae-checklist_o"},
+			{"README.md", "nf-mdi-library_books"},
+			{"README.txt", "nf-mdi-library_books"},
+			{"README", "nf-mdi-library_books"},
+			{".DS_Store", "nf-fa-file_o"},
+			{".tsbuildinfo", "nf-seti-json"},
+			{".jscsrc", "nf-seti-json"},
+			{".jshintrc", "nf-seti-json"},
+			{"tsconfig.json", "nf-seti-json"},
+			{"tslint.json", "nf-seti-json"},
+			{"composer.lock", "nf-seti-json"},
+			{".jsbeautifyrc", "nf-seti-json"},
+			{".esformatter", "nf-seti-json"},
+			{"cdp.pid", "nf-seti-json"},
+			{".htaccess", "nf-mdi-file_xml"},
+			{".jshintignore", "nf-fa-gear"},
+			{".buildignore", "nf-fa-gear"},
+			{".mrconfig", "nf-fa-gear"},
+			{".yardopts", "nf-fa-gear"},
+			{"manifest.mf", "nf-fa-gear"},
+			{".clang-format", "nf-fa-gear"},
+			{".clang-tidy", "nf-fa-gear"},
+			{"favicon.ico", "nf-seti-favicon"},
+			{".travis.yml", "nf-dev-travis"},
+			{".gitlab-ci.yml", "nf-fa-gitlab"},
+			{".jenkinsfile", "nf-dev-jenkins"},
+			{"bitbucket-pipelines.yml", "nf-dev-bitbucket"},
+			{"bitbucket-pipelines.yaml", "nf-dev-bitbucket"},
+			{".azure-pipelines.yml", "nf-mdi-azure"},
+			
 
+			// Firebase
+			{"firebase.json", "nf-dev-firebase"},
+			{".firebaserc", "nf-dev-firebase"},
 
-			{".gitattributes"                , "nf-dev-git"},
-		{".gitconfig"                    , "nf-dev-git"},
-		{".gitignore"                    , "nf-dev-git"},
-		{".gitmodules"                   , "nf-dev-git"},
-		{".gitkeep"                      , "nf-dev-git"},
-		{"git-history"                   , "nf-dev-git"},
-		{"LICENSE"                       , "nf-mdi-certificate"},
-		{"CHANGELOG.md"                  , "nf-fae-checklist_o"},
-		{"CHANGELOG.txt"                 , "nf-fae-checklist_o"},
-		{"CHANGELOG"                     , "nf-fae-checklist_o"},
-		{"README.md"                     , "nf-mdi-library_books"},
-		{"README.txt"                    , "nf-mdi-library_books"},
-		{"README"                        , "nf-mdi-library_books"},
-		{".DS_Store"                     , "nf-fa-file_o"},
-		{".tsbuildinfo"                  , "nf-seti-json"},
-		{".jscsrc"                       , "nf-seti-json"},
-		{".jshintrc"                     , "nf-seti-json"},
-		{"tsconfig.json"                 , "nf-seti-json"},
-		{"tslint.json"                   , "nf-seti-json"},
-		{"composer.lock"                 , "nf-seti-json"},
-		{".jsbeautifyrc"                 , "nf-seti-json"},
-		{".esformatter"                  , "nf-seti-json"},
-		{"cdp.pid"                       , "nf-seti-json"},
-		{".htaccess"                     , "nf-mdi-file_xml"},
-		{".jshintignore"                 , "nf-fa-gear"},
-		{".buildignore"                  , "nf-fa-gear"},
-		{".mrconfig"                     , "nf-fa-gear"},
-		{".yardopts"                     , "nf-fa-gear"},
-		{"manifest.mf"                   , "nf-fa-gear"},
-		{".clang-format"                 , "nf-fa-gear"},
-		{".clang-tidy"                   , "nf-fa-gear"},
-		{"favicon.ico"                   , "nf-seti-favicon"},
-		{".travis.yml"                   , "nf-dev-travis"},
-		{".gitlab-ci.yml"                , "nf-fa-gitlab"},
-		{".jenkinsfile"                  , "nf-dev-jenkins"},
-		{"bitbucket-pipelines.yml"       , "nf-dev-bitbucket"},
-		{"bitbucket-pipelines.yaml"      , "nf-dev-bitbucket"},
-		{".azure-pipelines.yml"          , "nf-mdi-azure"},
-		
+			// Bower
+			{".bowerrc", "nf-dev-bower"},
+			{"bower.json", "nf-dev-bower"},
 
-		// Firebase
-		{"firebase.json"                 , "nf-dev-firebase"},
-		{".firebaserc"                   , "nf-dev-firebase"},
+			// Conduct
+			{"code_of_conduct.md", "nf-fa-handshake_o"},
+			{"code_of_conduct.txt", "nf-fa-handshake_o"},
 
-		// Bower
-		{".bowerrc"                      , "nf-dev-bower"},
-		{"bower.json"                    , "nf-dev-bower"},
+			// Docker
+			{"Dockerfile", "nf-dev-docker"},
+			{"docker-compose.yml", "nf-dev-docker"},
+			{"docker-compose.yaml", "nf-dev-docker"},
+			{"docker-compose.dev.yml", "nf-dev-docker"},
+			{"docker-compose.local.yml", "nf-dev-docker"},
+			{"docker-compose.ci.yml", "nf-dev-docker"},
+			{"docker-compose.override.yml", "nf-dev-docker"},
+			{"docker-compose.staging.yml", "nf-dev-docker"},
+			{"docker-compose.prod.yml", "nf-dev-docker"},
+			{"docker-compose.production.yml", "nf-dev-docker"},
+			{"docker-compose.test.yml", "nf-dev-docker"},
 
-		// Conduct
-		{"code_of_conduct.md"            , "nf-fa-handshake_o"},
-		{"code_of_conduct.txt"           , "nf-fa-handshake_o"},
+			// Vue
+			{"vue.config.js", "nf-mdi-vuejs"},
+			{"vue.config.ts", "nf-mdi-vuejs"},
 
-		// Docker
-		{"Dockerfile"                    , "nf-dev-docker"},
-		{"docker-compose.yml"            , "nf-dev-docker"},
-		{"docker-compose.yaml"           , "nf-dev-docker"},
-		{"docker-compose.dev.yml"        , "nf-dev-docker"},
-		{"docker-compose.local.yml"      , "nf-dev-docker"},
-		{"docker-compose.ci.yml"         , "nf-dev-docker"},
-		{"docker-compose.override.yml"   , "nf-dev-docker"},
-		{"docker-compose.staging.yml"    , "nf-dev-docker"},
-		{"docker-compose.prod.yml"       , "nf-dev-docker"},
-		{"docker-compose.production.yml" , "nf-dev-docker"},
-		{"docker-compose.test.yml"       , "nf-dev-docker"},
+			// Gulp
+			{"gulpfile.js", "nf-dev-gulp"},
+			{"gulpfile.ts", "nf-dev-gulp"},
+			{"gulpfile.babel.js", "nf-dev-gulp"},
 
-		// Vue
-		{"vue.config.js"                 , "nf-mdi-vuejs"},
-		{"vue.config.ts"                 , "nf-mdi-vuejs"},
+			// Javascript
+			{"gruntfile.js", "nf-seti-grunt"},
 
-		// Gulp
-		{"gulpfile.js"                   , "nf-dev-gulp"},
-		{"gulpfile.ts"                   , "nf-dev-gulp"},
-		{"gulpfile.babel.js"             , "nf-dev-gulp"},
+			// NodeJS
+			{"package.json", "nf-dev-nodejs_small"},
+			{"package-lock.json", "nf-dev-nodejs_small"},
+			{".nvmrc", "nf-dev-nodejs_small"},
+			{".esmrc", "nf-dev-nodejs_small"},
 
-		// Javascript
-		{"gruntfile.js"                  , "nf-seti-grunt"},
+			// NPM
+			{".nmpignore", "nf-dev-npm"},
+			{".npmrc", "nf-dev-npm"},
 
-		// NodeJS
-		{"package.json"                  , "nf-dev-nodejs_small"},
-		{"package-lock.json"             , "nf-dev-nodejs_small"},
-		{".nvmrc"                        , "nf-dev-nodejs_small"},
-		{".esmrc"                        , "nf-dev-nodejs_small"},
+			// Authors
+			{"authors", "nf-oct-person"},
+			{"authors.md", "nf-oct-person"},
+			{"authors.txt", "nf-oct-person"},
 
-		// NPM
-		{".nmpignore"                    , "nf-dev-npm"},
-		{".npmrc"                        , "nf-dev-npm"},
+			// Terraform
+			{".terraform.lock.hcl", "nf-fa-lock"},
 
-		// Authors
-		{"authors"                       , "nf-oct-person"},
-		{"authors.md"                    , "nf-oct-person"},
-		{"authors.txt"                   , "nf-oct-person"},
+			// Gradle
+			{"gradlew", "nf-mdi-elephant"},
+		};
 
-		// Terraform
-		{".terraform.lock.hcl"           , "nf-fa-lock"},
-
-		// Gradle
-		{"gradlew"                       , "nf-mdi-elephant"},
-		};		
-		Dictionary<string, string> _extensionToIcon = new Dictionary<string, string> ()
+		/// <summary>
+		/// Mapping of file extension to <see cref="Glyphs"/> name.
+		/// </summary>
+		public Dictionary<string, string> ExtensionToIcon {get;set;} = new Dictionary<string, string> ()
 		{
 
 			// Archive files
