@@ -1943,7 +1943,7 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.MinCellWidth = 3;
 
 			tableView.LayoutSubviews ();
-			tableView.Draw (tableView.Bounds);
+			tableView.Draw ();
 			expected =
 @"
 │A  │B  │Very Long │    │
@@ -1958,7 +1958,7 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.MinCellWidth = 10;
 
 			tableView.LayoutSubviews ();
-			tableView.Draw (tableView.Bounds);
+			tableView.Draw ();
 			expected =
 @"
 │A    │B    │Very │     │
@@ -2568,7 +2568,7 @@ A B C
 
 			tv.LayoutSubviews ();
 
-			tv.Draw (tv.Bounds);
+			tv.Draw ();
 
 			string horizPerpExpected =
 				@"
