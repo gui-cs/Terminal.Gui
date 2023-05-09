@@ -1627,15 +1627,11 @@ namespace Terminal.Gui {
 				// is there enough space for this column (and it's data)?
 				colWidth = CalculateMaxCellWidth (col, rowsToRender, colStyle) + padding;
 
-				if (colWidth > MaxCellWidth) {
-					colWidth = MaxCellWidth;
-				}
-
-				if (MinCellWidth > 0 && colWidth < MinCellWidth) {
+				if (MinCellWidth > 0 && colWidth < (MinCellWidth + padding)) {
 					if (MinCellWidth > MaxCellWidth) {
-						colWidth = MaxCellWidth;
+						colWidth = MaxCellWidth + padding;
 					} else {
-						colWidth = MinCellWidth;
+						colWidth = MinCellWidth + padding;
 					}
 				}
 
