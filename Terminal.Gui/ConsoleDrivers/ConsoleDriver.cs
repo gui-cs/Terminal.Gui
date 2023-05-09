@@ -147,7 +147,13 @@ public abstract class ConsoleDriver {
 	/// Used by <see cref="AddRune"/> and <see cref="AddStr"/> to determine where to add content.
 	/// </summary>
 	/// <remarks>
+	/// <para>
 	/// This does not move the cursor on the screen, it only updates the internal state of the driver.
+	/// </para>
+	/// <para>
+	/// If <paramref name="col"/> or <paramref name="row"/> are negative or beyond  <see cref="Cols"/> and <see cref="Rows"/>,
+	/// the method still sets those properties.
+	/// </para>
 	/// </remarks>
 	/// <param name="col">Column to move to.</param>
 	/// <param name="row">Row to move to.</param>

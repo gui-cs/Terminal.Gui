@@ -52,5 +52,42 @@ public class ContentsTests {
 		// Shutdown must be called to safely clean up Application if Init has been called
 		Application.Shutdown ();
 	}
+
+	[Theory]
+	[InlineData (typeof (FakeDriver))]
+	//[InlineData (typeof (NetDriver))]
+	//[InlineData (typeof (CursesDriver))]
+	//[InlineData (typeof (WindowsDriver))]
+	public void Move_Bad_Coordinates (Type driverType)
+	{
+		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+		Application.Init (driver);
+
+		Assert.Equal (0, driver.Col);
+		Assert.Equal (0, driver.Row);
+
+		driver.Move (-1, 0);
+		Assert.Equal (-1, driver.Col);
+		Assert.Equal (0, driver.Row);
+
+		driver.Move (0, -1);
+		Assert.Equal (0, driver.Col);
+		Assert.Equal (-1, driver.Row);
+
+		driver.Move (driver.Cols, 0);
+		Assert.Equal (driver.Cols, driver.Col);
+		Assert.Equal (0, driver.Row);
+
+		driver.Move (0, driver.Rows);
+		Assert.Equal (0, driver.Col);
+		Assert.Equal (driver.Rows, driver.Row);
+
+		driver.Move (500, 500);
+		Assert.Equal (500, driver.Col);
+		Assert.Equal (500, driver.Row);
+
+		// Shutdown must be called to safely clean up Application if Init has been called
+		Application.Shutdown ();
+	}
 }
 
