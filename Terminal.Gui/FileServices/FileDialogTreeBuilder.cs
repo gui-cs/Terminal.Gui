@@ -7,6 +7,12 @@ using System.Linq;
 namespace Terminal.Gui {
 
 	class FileDialogTreeBuilder : ITreeBuilder<object> {
+		readonly FileDialog _dlg;
+
+		public FileDialogTreeBuilder(FileDialog dlg)
+		{
+			_dlg = dlg;
+		}
 
 		public bool SupportsCanExpand => true;
 
@@ -27,7 +33,22 @@ namespace Terminal.Gui {
 
 		internal string AspectGetter(object o)
 		{
-			return o is FileDialogRootTreeNode r ? r.DisplayName : ((IDirectoryInfo)o).Name;
+			string icon;
+			string name;
+
+			if(o is FileDialogRootTreeNode r)
+			{
+				icon = _dlg.Style.IconGetter.Invoke(r.Path);
+				name = r.DisplayName;
+			}
+			else
+			{
+				var dir  = (IDirectoryInfo)o;
+				icon = _dlg.Style.IconGetter.Invoke(dir);
+				name = dir.Name;
+			}
+
+			return icon + name;
 		}
 
 		private IEnumerable<IDirectoryInfo> TryGetDirectories (IDirectoryInfo directoryInfo)

@@ -138,7 +138,7 @@ namespace Terminal.Gui {
 		{
 			this.fileSystem = fileSystem;
 			Style = new FileDialogStyle (fileSystem);
-			
+
 			this.btnOk = new Button (Style.OkButtonText) {
 				Y = Pos.AnchorEnd (1),
 				X = Pos.Function (() =>
@@ -260,7 +260,7 @@ namespace Terminal.Gui {
 				Height = Dim.Fill (),
 			};
 
-			var fileDialogTreeBuilder = new FileDialogTreeBuilder ();
+			var fileDialogTreeBuilder = new FileDialogTreeBuilder (this);
 			this.treeView.TreeBuilder = fileDialogTreeBuilder;
 			this.treeView.AspectGetter = fileDialogTreeBuilder.AspectGetter;
 			this.Style.TreeStyle = treeView.Style;
