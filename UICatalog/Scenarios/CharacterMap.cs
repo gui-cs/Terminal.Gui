@@ -19,7 +19,7 @@ namespace UICatalog.Scenarios {
 	///   - Illustrates how to use ScrollView to do infinite scrolling
 	/// </summary>
 	[ScenarioMetadata (Name: "Character Map",
-		Description: "A Unicode character set viewier built as a custom control using the ScrollView control.")]
+		Description: "A Unicode character set viewer built as a custom control using the ScrollView control.")]
 	[ScenarioCategory ("Text and Formatting")]
 	[ScenarioCategory ("Controls")]
 	[ScenarioCategory ("ScrollView")]
@@ -275,19 +275,14 @@ namespace UICatalog.Scenarios {
 				int val = (row) * 16;
 				Driver.SetAttribute (GetNormalColor ());
 				Move (firstColumnX, y + 1);
-				Driver.AddStr (new string (' ', 16 * COLUMN_WIDTH));
+				//Driver.AddStr (new string (' ', 16 * COLUMN_WIDTH));
 				if (val <= MaxCodePointVal) {
 					Driver.SetAttribute (GetNormalColor ());
+					Move (firstColumnX + COLUMN_WIDTH, y + 1);
 					for (int col = 0; col < 16; col++) {
 						uint glyph = (uint)((uint)val + col);
 						var rune = new Rune (glyph);
-						//if (rune >= 0x00D800 && rune <= 0x00DFFF) {
-						//	if (col == 0) {
-						//		Driver.AddStr ("Reserved for surrogate pairs.");
-						//	}
-						//	continue;
-						//}						
-						Move (firstColumnX + (col * COLUMN_WIDTH) + 1, y + 1);
+						Move (firstColumnX + COLUMN_WIDTH * col + 1, y + 1);
 						if (glyph == SelectedGlyph) {
 							Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
 						} else {

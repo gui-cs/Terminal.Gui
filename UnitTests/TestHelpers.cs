@@ -169,7 +169,7 @@ class TestHelpers {
 	{
 		var lines = new List<List<Rune>> ();
 		var sb = new StringBuilder ();
-		var driver = ((FakeDriver)Application.Driver);
+		var driver = Application.Driver;
 		var x = -1;
 		var y = -1;
 		int w = -1;

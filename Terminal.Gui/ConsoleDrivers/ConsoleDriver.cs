@@ -1,8 +1,50 @@
-﻿using NStack;
+﻿using Rune = System.Text.Rune;
+using NStack;
 using System;
 using System.Diagnostics;
+using System.Text;
+using System.Globalization;
 
 namespace Terminal.Gui;
+
+/// <summary>
+/// Extends <see cref="System.Text.Rune"/> to support TUI specific text manipulation.
+/// </summary>
+public static class RuneExtensions {
+
+
+	public static bool IsCombiningMark (this System.Text.Rune rune)
+	{
+		// Convert Rune to string
+		UnicodeCategory category = Rune.GetUnicodeCategory (rune);
+
+		// Check if the category corresponds to a combining mark
+		return category == UnicodeCategory.NonSpacingMark
+			|| category == UnicodeCategory.SpacingCombiningMark
+			|| category == UnicodeCategory.EnclosingMark;
+	}
+
+	/// <summary>
+	/// Extension method for System.Text.Rune to retrieve the number of column positions of a wide-character code.
+	/// This is used to measure runes as displayed by text-based terminals.
+	/// </summary>
+	/// <returns>The width in columns, 0 if the argument is the null character, -1 if the value is not printable,
+	/// otherwise the number of columns that the rune occupies.</returns>
+	/// <param name="rune">The rune.</param>
+	public static int GetColumnWidth (this System.Text.Rune rune)
+	{
+		return System.Rune.ColumnWidth (rune.Value);
+	}
+
+	/// <summary>
+	/// Ensures a Rune is not a control character and can be displayed by translating characters below 0x20
+	/// to equivalent, printable, Unicode chars.
+	/// </summary>
+	/// <param name="run"></param>
+	/// <param name="rune"></param>
+	/// <returns></returns>
+	public static Rune MakePrintable (this System.Text.Rune rune) => Rune.IsControl (rune) ? new Rune (rune.Value + 0x2400) : rune;
+}
 
 /// <summary>
 /// Base class for Terminal.Gui ConsoleDriver implementations.
@@ -116,36 +158,41 @@ public abstract class ConsoleDriver {
 	}
 
 	/// <summary>
-	/// Adds the specified rune to the display at the current cursor position.
+	/// Adds the specified rune to the display at the current cursor position. 
 	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// When the method returns, <see cref="Col"/> will be incremented by the number of columns <paramref name="rune"/> required,
+	/// unless the new column value is outside of the <see cref="Clip"/> or screen dimensions defined by <see cref="Cols"/>.
+	/// </para>
+	/// <para>
+	/// If <paramref name="rune"/> requires more than one column, and <see cref="Col"/> plus the number of columns needed
+	/// exceeds the <see cref="Clip"/> or screen dimensions, the default Unicode replacement character (U+FFFD) will be added instead.
+	/// </para>
+	/// </remarks>
 	/// <param name="rune">Rune to add.</param>
-	public abstract void AddRune (Rune rune);
-
-	/// <summary>
-	/// Ensures a Rune is not a control character and can be displayed by translating characters below 0x20
-	/// to equivalent, printable, Unicode chars.
-	/// </summary>
-	/// <param name="c">Rune to translate</param>
-	/// <returns></returns>
-	public static Rune MakePrintable (Rune c)
+	public virtual void AddRune (System.Rune rune)
 	{
-		if (c <= 0x1F || (c >= 0X7F && c <= 0x9F)) {
-			// ASCII (C0) control characters.
-			// C1 control characters (https://www.aivosto.com/articles/control-characters.html#c1)
-			return new Rune (c + 0x2400);
-		}
 
-		return c;
 	}
 
 	/// <summary>
 	/// Adds the <paramref name="str"/> to the display at the cursor position.
 	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// When the method returns, <see cref="Col"/> will be incremented by the number of columns <paramref name="str"/> required,
+	/// unless the new column value is outside of the <see cref="Clip"/> or screen dimensions defined by <see cref="Cols"/>.
+	/// </para>
+	/// <para>
+	/// If <paramref name="str"/> requires more columns than are available, the output will be clipped.
+	/// </para>
+	/// </remarks>
 	/// <param name="str">String.</param>
 	public void AddStr (ustring str)
 	{
-		foreach (var rune in str) {
-			AddRune (rune);
+		foreach (var c in str) {
+			AddRune (new System.Rune (c));
 		}
 	}
 
@@ -335,12 +382,12 @@ public abstract class ConsoleDriver {
 	/// </summary>
 	/// <param name="rect"></param>
 	/// <param name="rune"></param>
-	public void FillRect (Rect rect, Rune rune = default)
+	public void FillRect (Rect rect, System.Rune rune = default)
 	{
 		for (var r = rect.Y; r < rect.Y + rect.Height; r++) {
 			for (var c = rect.X; c < rect.X + rect.Width; c++) {
 				Application.Driver.Move (c, r);
-				Application.Driver.AddRune (rune == default ? ' ' : rune);
+				Application.Driver.AddRune (rune == default ? new System.Rune (' ') : rune);
 			}
 		}
 	}
