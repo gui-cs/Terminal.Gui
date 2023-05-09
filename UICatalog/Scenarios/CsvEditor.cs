@@ -21,12 +21,12 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Files and IO")]
 	public class CsvEditor : Scenario {
 		TableView tableView;
-		private string currentFile;
+		private string _currentFile;
 		DataTable currentTable;
-		private MenuItem miLeft;
-		private MenuItem miRight;
-		private MenuItem miCentered;
-		private TextField selectedCellLabel;
+		private MenuItem _miLeft;
+		private MenuItem _miRight;
+		private MenuItem _miCentered;
+		private TextField _selectedCellLabel;
 
 		public override void Setup ()
 		{
@@ -61,12 +61,12 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Sort Desc", "", () => Sort(false)),
 				}),
 				new MenuBarItem ("_View", new MenuItem [] {
-					miLeft = new MenuItem ("_Align Left", "", () => Align(TextAlignment.Left)),
-					miRight = new MenuItem ("_Align Right", "", () => Align(TextAlignment.Right)),
-					miCentered = new MenuItem ("_Align Centered", "", () => Align(TextAlignment.Centered)),
+					_miLeft = new MenuItem ("_Align Left", "", () => Align(TextAlignment.Left)),
+					_miRight = new MenuItem ("_Align Right", "", () => Align(TextAlignment.Right)),
+					_miCentered = new MenuItem ("_Align Centered", "", () => Align(TextAlignment.Centered)),
 					
 					// Format requires hard typed data table, when we read a CSV everything is untyped (string) so this only works for new columns in this demo
-					miCentered = new MenuItem ("_Set Format Pattern", "", () => SetFormat()),
+					_miCentered = new MenuItem ("_Set Format Pattern", "", () => SetFormat()),
 				})
 			});
 			Application.Top.Add (menu);
@@ -80,16 +80,16 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (tableView);
 
-			selectedCellLabel = new TextField () {
+			_selectedCellLabel = new TextField () {
 				X = 0,
 				Y = Pos.Bottom (tableView),
 				Text = "0,0",
 				Width = Dim.Fill (),
 				TextAlignment = TextAlignment.Right
 			};
-			selectedCellLabel.TextChanged += SelectedCellLabel_TextChanged;
+			_selectedCellLabel.TextChanged += SelectedCellLabel_TextChanged;
 
-			Win.Add (selectedCellLabel);
+			Win.Add (_selectedCellLabel);
 
 			tableView.SelectedCellChanged += OnSelectedCellChanged;
 			tableView.CellActivated += EditCurrentCell;
@@ -101,11 +101,11 @@ namespace UICatalog.Scenarios {
 		private void SelectedCellLabel_TextChanged (object sender, TextChangedEventArgs e)
 		{
 			// if user is in the text control and editing the selected cell
-			if (!selectedCellLabel.HasFocus)
+			if (!_selectedCellLabel.HasFocus)
 				return;
 
 			// change selected cell to the one the user has typed into the box
-			var match = Regex.Match (selectedCellLabel.Text.ToString (), "^(\\d+),(\\d+)$");
+			var match = Regex.Match (_selectedCellLabel.Text.ToString (), "^(\\d+),(\\d+)$");
 			if (match.Success) {
 
 				tableView.SelectedColumn = int.Parse (match.Groups [1].Value);
@@ -116,17 +116,17 @@ namespace UICatalog.Scenarios {
 		private void OnSelectedCellChanged (object sender, SelectedCellChangedEventArgs e)
 		{
 			// only update the text box if the user is not manually editing it
-			if (!selectedCellLabel.HasFocus)
-				selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}";
+			if (!_selectedCellLabel.HasFocus)
+				_selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}";
 
 			if (tableView.Table == null || tableView.SelectedColumn == -1)
 				return;
 
 			var style = tableView.Style.GetColumnStyleIfAny (tableView.SelectedColumn);
 
-			miLeft.Checked = style?.Alignment == TextAlignment.Left;
-			miRight.Checked = style?.Alignment == TextAlignment.Right;
-			miCentered.Checked = style?.Alignment == TextAlignment.Centered;
+			_miLeft.Checked = style?.Alignment == TextAlignment.Left;
+			_miRight.Checked = style?.Alignment == TextAlignment.Right;
+			_miCentered.Checked = style?.Alignment == TextAlignment.Centered;
 		}
 
 		private void RenameColumn ()
@@ -272,9 +272,9 @@ namespace UICatalog.Scenarios {
 			var style = tableView.Style.GetOrCreateColumnStyle (tableView.SelectedColumn);
 			style.Alignment = newAlignment;
 
-			miLeft.Checked = style.Alignment == TextAlignment.Left;
-			miRight.Checked = style.Alignment == TextAlignment.Right;
-			miCentered.Checked = style.Alignment == TextAlignment.Centered;
+			_miLeft.Checked = style.Alignment == TextAlignment.Left;
+			_miRight.Checked = style.Alignment == TextAlignment.Right;
+			_miCentered.Checked = style.Alignment == TextAlignment.Centered;
 
 			tableView.Update ();
 		}
@@ -365,12 +365,12 @@ namespace UICatalog.Scenarios {
 
 		private void Save ()
 		{
-			if (tableView.Table == null || string.IsNullOrWhiteSpace (currentFile)) {
+			if (tableView.Table == null || string.IsNullOrWhiteSpace (_currentFile)) {
 				MessageBox.ErrorQuery ("No file loaded", "No file is currently loaded", "Ok");
 				return;
 			}
 			using var writer = new CsvWriter (
-				new StreamWriter (File.OpenWrite (currentFile)),
+				new StreamWriter (File.OpenWrite (_currentFile)),
 				CultureInfo.InvariantCulture);
 
 			foreach (var col in currentTable.Columns.Cast<DataColumn> ().Select (c => c.ColumnName)) {
@@ -406,7 +406,7 @@ namespace UICatalog.Scenarios {
 		{
 
 			int lineNumber = 0;
-			currentFile = null;
+			_currentFile = null;
 
 			try {
 				using var reader = new CsvReader (File.OpenText (filename), CultureInfo.InvariantCulture);
@@ -433,8 +433,8 @@ namespace UICatalog.Scenarios {
 				SetTable(dt);
 
 				// Only set the current filename if we successfully loaded the entire file
-				currentFile = filename;
-				Win.Title = $"{this.GetName ()} - {Path.GetFileName (currentFile)}";
+				_currentFile = filename;
+				Win.Title = $"{this.GetName ()} - {Path.GetFileName (_currentFile)}";
 
 			} catch (Exception ex) {
 				MessageBox.ErrorQuery ("Open Failed", $"Error on line {lineNumber}{Environment.NewLine}{ex.Message}", "Ok");
@@ -442,30 +442,30 @@ namespace UICatalog.Scenarios {
 		}
 		private void SetupScrollBar ()
 		{
-			var _scrollBar = new ScrollBarView (tableView, true);
+			var scrollBar = new ScrollBarView (tableView, true);
 
-			_scrollBar.ChangedPosition += (s, e) => {
-				tableView.RowOffset = _scrollBar.Position;
-				if (tableView.RowOffset != _scrollBar.Position) {
-					_scrollBar.Position = tableView.RowOffset;
+			scrollBar.ChangedPosition += (s, e) => {
+				tableView.RowOffset = scrollBar.Position;
+				if (tableView.RowOffset != scrollBar.Position) {
+					scrollBar.Position = tableView.RowOffset;
 				}
 				tableView.SetNeedsDisplay ();
 			};
 			/*
-			_scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
-				_listView.LeftItem = _scrollBar.OtherScrollBarView.Position;
-				if (_listView.LeftItem != _scrollBar.OtherScrollBarView.Position) {
-					_scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
+			scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
+				tableView.LeftItem = scrollBar.OtherScrollBarView.Position;
+				if (tableView.LeftItem != scrollBar.OtherScrollBarView.Position) {
+					scrollBar.OtherScrollBarView.Position = tableView.LeftItem;
 				}
-				_listView.SetNeedsDisplay ();
+				tableView.SetNeedsDisplay ();
 			};*/
 
 			tableView.DrawContent += (s, e) => {
-				_scrollBar.Size = tableView.Table?.Rows ?? 0;
-				_scrollBar.Position = tableView.RowOffset;
-				//	_scrollBar.OtherScrollBarView.Size = _listView.Maxlength - 1;
-				//	_scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
-				_scrollBar.Refresh ();
+				scrollBar.Size = tableView.Table?.Rows ?? 0;
+				scrollBar.Position = tableView.RowOffset;
+				//scrollBar.OtherScrollBarView.Size = tableView.Maxlength - 1;
+				//scrollBar.OtherScrollBarView.Position = tableView.LeftItem;
+				scrollBar.Refresh ();
 			};
 
 		}
