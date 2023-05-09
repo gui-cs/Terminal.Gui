@@ -1,367 +1,389 @@
 ﻿#define DRAW_CONTENT
 //#define BASE_DRAW_CONTENT
 
-using Microsoft.VisualBasic;
 using NStack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Terminal.Gui;
-using Terminal.Gui.Resources;
 using Rune = System.Rune;
 
-namespace UICatalog.Scenarios {
-	/// <summary>
-	/// This Scenario demonstrates building a custom control (a class deriving from View) that:
-	///   - Provides a "Character Map" application (like Windows' charmap.exe).
-	///   - Helps test unicode character rendering in Terminal.Gui
-	///   - Illustrates how to use ScrollView to do infinite scrolling
-	/// </summary>
-	[ScenarioMetadata (Name: "Character Map",
-		Description: "A Unicode character set viewer built as a custom control using the ScrollView control.")]
-	[ScenarioCategory ("Text and Formatting")]
-	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("ScrollView")]
-	public class CharacterMap : Scenario {
-		CharMap _charMap;
-		public override void Setup ()
-		{
-			_charMap = new CharMap () {
-				X = 0,
-				Y = 0,
-				Height = Dim.Fill ()
-			};
-			Win.Add (_charMap);
+namespace UICatalog.Scenarios;
 
-			var jumpLabel = new Label ("Jump To Glyph:") { X = Pos.Right (_charMap) + 1, Y = Pos.Y (_charMap) };
-			Win.Add (jumpLabel);
-			var jumpEdit = new TextField () { X = Pos.Right (jumpLabel) + 1, Y = Pos.Y (_charMap), Width = 10, Caption = "e.g. 01BE3" };
-			Win.Add (jumpEdit);
-			var errorLabel = new Label ("") { X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap), ColorScheme = Colors.ColorSchemes ["error"] };
-			Win.Add (errorLabel);
-			jumpEdit.TextChanged += (s, e) => {
-				uint result = 0;
-				if (jumpEdit.Text.Length == 0) return;
+/// <summary>
+/// This Scenario demonstrates building a custom control (a class deriving from View) that:
+///   - Provides a "Character Map" application (like Windows' charmap.exe).
+///   - Helps test unicode character rendering in Terminal.Gui
+///   - Illustrates how to use ScrollView to do infinite scrolling
+/// </summary>
+[ScenarioMetadata (Name: "Character Map", Description: "A Unicode character set viewer built as a custom control using the ScrollView control.")]
+[ScenarioCategory ("Text and Formatting")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("ScrollView")]
+public class CharacterMap : Scenario {
+	CharMap _charMap;
+	public override void Setup ()
+	{
+		_charMap = new CharMap () {
+			X = 0,
+			Y = 0,
+			Height = Dim.Fill ()
+		};
+		Win.Add (_charMap);
+
+		var jumpLabel = new Label ("Jump To Code Point:") { X = Pos.Right (_charMap) + 1, Y = Pos.Y (_charMap) };
+		Win.Add (jumpLabel);
+		var jumpEdit = new TextField () { X = Pos.Right (jumpLabel) + 1, Y = Pos.Y (_charMap), Width = 10, Caption = "e.g. 01BE3" };
+		Win.Add (jumpEdit);
+		var errorLabel = new Label ("") { X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap), ColorScheme = Colors.ColorSchemes ["error"] };
+		Win.Add (errorLabel);
+		jumpEdit.TextChanged += (s, e) => {
+			uint result = 0;
+			if (jumpEdit.Text.Length == 0) return;
+			try {
+				result = Convert.ToUInt32 (jumpEdit.Text.ToString (), 10);
+			} catch (OverflowException) {
+				errorLabel.Text = $"Invalid (overflow)";
+				return;
+			} catch (FormatException) {
 				try {
-					result = Convert.ToUInt32 (jumpEdit.Text.ToString (), 10);
+					result = Convert.ToUInt32 (jumpEdit.Text.ToString (), 16);
 				} catch (OverflowException) {
 					errorLabel.Text = $"Invalid (overflow)";
 					return;
 				} catch (FormatException) {
-					try {
-						result = Convert.ToUInt32 (jumpEdit.Text.ToString (), 16);
-					} catch (OverflowException) {
-						errorLabel.Text = $"Invalid (overflow)";
-						return;
-					} catch (FormatException) {
-						errorLabel.Text = $"Invalid (can't parse)";
-						return;
-					}
+					errorLabel.Text = $"Invalid (can't parse)";
+					return;
 				}
-				errorLabel.Text = $"U+{result:x4}";
-				_charMap.SelectedGlyph = result;
-			};
-
-			var radioItems = new (ustring radioLabel, uint start, uint end) [UnicodeRange.Ranges.Count];
-
-			for (var i = 0; i < UnicodeRange.Ranges.Count; i++) {
-				var range = UnicodeRange.Ranges [i];
-				radioItems [i] = CreateRadio (range.Category, range.Start, range.End);
 			}
-			(ustring radioLabel, uint start, uint end) CreateRadio (ustring title, uint start, uint end)
-			{
-				return ($"{title} (U+{start:x5}-{end:x5})", start, end);
-			}
+			errorLabel.Text = $"U+{result:x4}";
+			_charMap.SelectedCodePoint = result;
+		};
 
-			var label = new Label ("Jump To Unicode Block:") { X = Pos.Right (_charMap) + 1, Y = Pos.Bottom (jumpLabel) + 1 };
-			Win.Add (label);
+		var radioItems = new (ustring radioLabel, uint start, uint end) [UnicodeRange.Ranges.Count];
 
-			var jumpList = new ListView (radioItems.Select (t => t.radioLabel).ToArray ()) {
-				X = Pos.X (label) + 1,
-				Y = Pos.Bottom (label),
-				Width = radioItems.Max (r => r.radioLabel.Length) + 2,
-				Height = Dim.Fill (1),
-				SelectedItem = 0
-			};
-			jumpList.SelectedItemChanged += (s, args) => {
-				_charMap.StartGlyph = radioItems [jumpList.SelectedItem].start;
-			};
+		for (var i = 0; i < UnicodeRange.Ranges.Count; i++) {
+			var range = UnicodeRange.Ranges [i];
+			radioItems [i] = CreateRadio (range.Category, range.Start, range.End);
+		}
+		(ustring radioLabel, uint start, uint end) CreateRadio (ustring title, uint start, uint end)
+		{
+			return ($"{title} (U+{start:x5}-{end:x5})", start, end);
+		}
 
-			Win.Add (jumpList);
+		var label = new Label ("Jump To Unicode Block:") { X = Pos.Right (_charMap) + 1, Y = Pos.Bottom (jumpLabel) + 1 };
+		Win.Add (label);
 
-			//jumpList.Refresh ();
-			_charMap.SetFocus ();
+		var jumpList = new ListView (radioItems.Select (t => t.radioLabel).ToArray ()) {
+			X = Pos.X (label) + 1,
+			Y = Pos.Bottom (label),
+			Width = radioItems.Max (r => r.radioLabel.Length) + 2,
+			Height = Dim.Fill (1),
+			SelectedItem = 0
+		};
+		jumpList.SelectedItemChanged += (s, args) => {
+			_charMap.StartCodePoint = radioItems [jumpList.SelectedItem].start;
+		};
 
-			_charMap.Width = Dim.Fill () - jumpList.Width;
+		Win.Add (jumpList);
+
+		//jumpList.Refresh ();
+		_charMap.SetFocus ();
+
+		_charMap.Width = Dim.Fill () - jumpList.Width;
+	}
+}
+
+class CharMap : ScrollView {
+
+	/// <summary>
+	/// Specifies the starting offset for the character map. The default is 0x2500 
+	/// which is the Box Drawing characters.
+	/// </summary>
+	public uint StartCodePoint {
+		get => _start;
+		set {
+			_start = value;
+			_selected = value;
+			ContentOffset = new Point (0, (int)(_start / 16));
+			SetNeedsDisplay ();
 		}
 	}
 
-	class CharMap : ScrollView {
-
-		/// <summary>
-		/// Specifies the starting offset for the character map. The default is 0x2500 
-		/// which is the Box Drawing characters.
-		/// </summary>
-		public uint StartGlyph {
-			get => _start;
-			set {
-				_start = value;
-				_selected = value;
-				ContentOffset = new Point (0, (int)(_start / 16));
-				SetNeedsDisplay ();
+	/// <summary>
+	/// Specifies the starting offset for the character map. The default is 0x2500 
+	/// which is the Box Drawing characters.
+	/// </summary>
+	public uint SelectedCodePoint {
+		get => _selected;
+		set {
+			_selected = value;
+			int row = (int)_selected / 16;
+			int height = (Bounds.Height / ROW_HEIGHT) - (ShowHorizontalScrollIndicator ? 2 : 1);
+			if (row + ContentOffset.Y < 0) {
+				// Moving up.
+				ContentOffset = new Point (ContentOffset.X, row);
+			} else if (row + ContentOffset.Y >= height) {
+				// Moving down.
+				ContentOffset = new Point (ContentOffset.X, Math.Min (row, row - height + ROW_HEIGHT));
 			}
-		}
-
-		/// <summary>
-		/// Specifies the starting offset for the character map. The default is 0x2500 
-		/// which is the Box Drawing characters.
-		/// </summary>
-		public uint SelectedGlyph {
-			get => _selected;
-			set {
-				_selected = value;
-				int row = (int)_selected / 16;
-				int height = (Bounds.Height / ROW_HEIGHT) - (ShowHorizontalScrollIndicator ? 2 : 1);
-				if (row + ContentOffset.Y < 0) {
-					// Moving up.
-					ContentOffset = new Point (ContentOffset.X, row);
-				} else if (row + ContentOffset.Y >= height) {
-					// Moving down.
-					ContentOffset = new Point (ContentOffset.X, Math.Min (row, row - height + ROW_HEIGHT));
-				}
-				int col = (((int)_selected - (row * 16)) * COLUMN_WIDTH);
-				int width = (Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH) - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
-				if (col + ContentOffset.X < 0) {
-					// Moving left.
-					ContentOffset = new Point (col, ContentOffset.Y);
-				} else if (col + ContentOffset.X >= width) {
-					// Moving right.
-					ContentOffset = new Point (Math.Min (col, col - width + COLUMN_WIDTH), ContentOffset.Y);
-				}
-				SetNeedsDisplay ();
+			int col = (((int)_selected - (row * 16)) * COLUMN_WIDTH);
+			int width = (Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH) - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
+			if (col + ContentOffset.X < 0) {
+				// Moving left.
+				ContentOffset = new Point (col, ContentOffset.Y);
+			} else if (col + ContentOffset.X >= width) {
+				// Moving right.
+				ContentOffset = new Point (Math.Min (col, col - width + COLUMN_WIDTH), ContentOffset.Y);
 			}
+			SetNeedsDisplay ();
+			Move (col + ContentOffset.X + RowLabelWidth + 1, row + ContentOffset.Y + 1);
+			Driver.UpdateCursor ();
+
 		}
+	}
 
-		uint _start = 0;
-		uint _selected = 0;
+	uint _start = 0;
+	uint _selected = 0;
 
-		public const int COLUMN_WIDTH = 3;
-		public const int ROW_HEIGHT = 1;
+	public const int COLUMN_WIDTH = 2;
+	public const int ROW_HEIGHT = 1;
 
-		public static uint MaxCodePointVal => 0x10FFFF;
+	public static uint MaxCodePoint => 0x10FFFF;
 
-		public static int RowLabelWidth => $"U+{MaxCodePointVal:x5}".Length + 1;
-		public static int RowWidth => RowLabelWidth + (COLUMN_WIDTH * 16);
+	public static int RowLabelWidth => $"U+{MaxCodePoint:x5}".Length + 1;
+	public static int RowWidth => RowLabelWidth + (COLUMN_WIDTH * 16);
 
-		public CharMap ()
-		{
-			ColorScheme = Colors.Dialog;
-			CanFocus = true;
+	public CharMap ()
+	{
+		ColorScheme = Colors.Dialog;
+		CanFocus = true;
 
-			ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePointVal / 16 + (ShowHorizontalScrollIndicator ? 2 : 1)));
+		ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePoint / 16 + (ShowHorizontalScrollIndicator ? 2 : 1)));
 
-			AddCommand (Command.ScrollUp, () => {
-				if (SelectedGlyph >= 16) {
-					SelectedGlyph = SelectedGlyph - 16;
-				}
-				return true;
-			});
-			AddCommand (Command.ScrollDown, () => {
-				if (SelectedGlyph < MaxCodePointVal - 16) {
-					SelectedGlyph = SelectedGlyph + 16;
-				}
-				return true;
-			});
-			AddCommand (Command.ScrollLeft, () => {
-				if (SelectedGlyph > 0) {
-					SelectedGlyph--;
-				}
-				return true;
-			});
-			AddCommand (Command.ScrollRight, () => {
-				if (SelectedGlyph < MaxCodePointVal) {
-					SelectedGlyph++;
-				}
-				return true;
-			});
-			AddCommand (Command.PageUp, () => {
-				var page = (uint)(Bounds.Height / ROW_HEIGHT - 1) * 16;
-				SelectedGlyph -= Math.Min (page, SelectedGlyph);
-				return true;
-			});
-			AddCommand (Command.PageDown, () => {
-				var page = (uint)(Bounds.Height / ROW_HEIGHT - 1) * 16;
-				SelectedGlyph += Math.Min (page, MaxCodePointVal - SelectedGlyph);
-				return true;
-			});
-			AddCommand (Command.TopHome, () => {
-				SelectedGlyph = 0;
-				return true;
-			});
-			AddCommand (Command.BottomEnd, () => {
-				SelectedGlyph = MaxCodePointVal;
-				return true;
-			});
-			AddKeyBinding (Key.Enter, Command.Accept);
-			AddCommand (Command.Accept, () => {
-				MessageBox.Query ("Glyph", $"{new Rune ((uint)SelectedGlyph)} U+{SelectedGlyph:x4}", "Ok");
-				return true;
-			});
-
-			MouseClick += Handle_MouseClick;
-			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
-		}
-
-		private void CopyValue ()
-		{
-			Clipboard.Contents = $"U+{SelectedGlyph:x5}";
-		}
-
-		private void CopyGlyph ()
-		{
-			Clipboard.Contents = $"{new Rune (SelectedGlyph)}";
-		}
-
-		public override void OnDrawContent (Rect contentArea)
-		{
-			base.OnDrawContent (contentArea);
-
-			if (ShowHorizontalScrollIndicator && ContentSize.Height < (int)(MaxCodePointVal / 16 + 2)) {
-				ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePointVal / 16 + 2));
-				int row = (int)_selected / 16;
-				int col = (((int)_selected - (row * 16)) * COLUMN_WIDTH);
-				int width = (Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH) - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
-				if (col + ContentOffset.X >= width) {
-					// Snap to the selected glyph.
-					ContentOffset = new Point (Math.Min (col, col - width + COLUMN_WIDTH), ContentOffset.Y == -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
-				} else {
-					ContentOffset = new Point (ContentOffset.X - col, ContentOffset.Y == -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
-				}
-				SetNeedsDisplay ();
-			} else if (!ShowHorizontalScrollIndicator && ContentSize.Height > (int)(MaxCodePointVal / 16 + 1)) {
-				ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePointVal / 16 + 1));
-				// Snap 1st column into view if it's been scrolled horizontally
-				ContentOffset = new Point (0, ContentOffset.Y < -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
-				SetNeedsDisplay ();
+		AddCommand (Command.ScrollUp, () => {
+			if (SelectedCodePoint >= 16) {
+				SelectedCodePoint = SelectedCodePoint - 16;
 			}
+			return true;
+		});
+		AddCommand (Command.ScrollDown, () => {
+			if (SelectedCodePoint < MaxCodePoint - 16) {
+				SelectedCodePoint = SelectedCodePoint + 16;
+			}
+			return true;
+		});
+		AddCommand (Command.ScrollLeft, () => {
+			if (SelectedCodePoint > 0) {
+				SelectedCodePoint--;
+			}
+			return true;
+		});
+		AddCommand (Command.ScrollRight, () => {
+			if (SelectedCodePoint < MaxCodePoint) {
+				SelectedCodePoint++;
+			}
+			return true;
+		});
+		AddCommand (Command.PageUp, () => {
+			var page = (uint)(Bounds.Height / ROW_HEIGHT - 1) * 16;
+			SelectedCodePoint -= Math.Min (page, SelectedCodePoint);
+			return true;
+		});
+		AddCommand (Command.PageDown, () => {
+			var page = (uint)(Bounds.Height / ROW_HEIGHT - 1) * 16;
+			SelectedCodePoint += Math.Min (page, MaxCodePoint - SelectedCodePoint);
+			return true;
+		});
+		AddCommand (Command.TopHome, () => {
+			SelectedCodePoint = 0;
+			return true;
+		});
+		AddCommand (Command.BottomEnd, () => {
+			SelectedCodePoint = MaxCodePoint;
+			return true;
+		});
+		AddKeyBinding (Key.Enter, Command.Accept);
+		AddCommand (Command.Accept, () => {
+			ShowDetails ();
+			return true;
+		});
+
+		MouseClick += Handle_MouseClick;
+
+		// Reset cursor on resize
+		LayoutComplete += (s, a) => {
+			Driver.SetCursorVisibility (CursorVisibility.Default);
+			SelectedCodePoint = SelectedCodePoint;
+		};
+	}
+
+	private void CopyCodePoint ()
+	{
+		Clipboard.Contents = $"U+{SelectedCodePoint:x5}";
+	}
+
+	private void CopyGlyph ()
+	{
+		Clipboard.Contents = $"{new Rune (SelectedCodePoint)}";
+	}
+
+	public override void OnDrawContent (Rect contentArea)
+	{
+		base.OnDrawContent (contentArea);
+
+		if (ShowHorizontalScrollIndicator && ContentSize.Height < (int)(MaxCodePoint / 16 + 2)) {
+			ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePoint / 16 + 2));
+			int row = (int)_selected / 16;
+			int col = (((int)_selected - (row * 16)) * COLUMN_WIDTH);
+			int width = (Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH) - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
+			if (col + ContentOffset.X >= width) {
+				// Snap to the selected glyph.
+				ContentOffset = new Point (Math.Min (col, col - width + COLUMN_WIDTH), ContentOffset.Y == -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
+			} else {
+				ContentOffset = new Point (ContentOffset.X - col, ContentOffset.Y == -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
+			}
+			SetNeedsDisplay ();
+		} else if (!ShowHorizontalScrollIndicator && ContentSize.Height > (int)(MaxCodePoint / 16 + 1)) {
+			ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePoint / 16 + 1));
+			// Snap 1st column into view if it's been scrolled horizontally
+			ContentOffset = new Point (0, ContentOffset.Y < -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
+			SetNeedsDisplay ();
 		}
+	}
 
-		public override void OnDrawContentComplete (Rect contentArea)
-		{
-			Rect viewport = new Rect (ContentOffset,
-				new Size (Math.Max (Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
-					Math.Max (Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0)));
+	public override void OnDrawContentComplete (Rect contentArea)
+	{
+		Rect viewport = new Rect (ContentOffset,
+			new Size (Math.Max (Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
+				Math.Max (Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0)));
 
-			var oldClip = Driver.Clip;
-			Driver.Clip = Bounds;
+		var oldClip = Driver.Clip;
+		Driver.Clip = Bounds;
+		if (!ShowHorizontalScrollIndicator) {
 			// Redraw doesn't know about the scroll indicators, so if off, add one to height
-			if (!ShowHorizontalScrollIndicator) {
-				Driver.Clip = new Rect (Bounds.X, Bounds.Y, Bounds.Width, Bounds.Height + 1);
+			Driver.Clip = new Rect (Bounds.X, Bounds.Y, Bounds.Width, Bounds.Height + 1);
+		}
+		Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : ColorScheme.Focus);
+		Move (0, 0);
+		Driver.AddStr (new string (' ', RowLabelWidth + 1));
+		for (int hexDigit = 0; hexDigit < 16; hexDigit++) {
+			var x = ContentOffset.X + RowLabelWidth + (hexDigit * COLUMN_WIDTH);
+			if (x > RowLabelWidth - 2) {
+				Move (x, 0);
+				Driver.AddStr ($" {hexDigit:x} ");
 			}
-			Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : ColorScheme.Focus);
-			Move (0, 0);
-			Driver.AddStr (new string (' ', RowLabelWidth + 1));
-			for (int hexDigit = 0; hexDigit < 16; hexDigit++) {
-				var x = ContentOffset.X + RowLabelWidth + (hexDigit * COLUMN_WIDTH);
-				if (x > RowLabelWidth - 2) {
-					Move (x, 0);
-					Driver.AddStr ($" {hexDigit:x} ");
-				}
-			}
-
-			var firstColumnX = viewport.X + RowLabelWidth;
-			for (int row = -ContentOffset.Y, y = 0; row <= (-ContentOffset.Y) + (Bounds.Height / ROW_HEIGHT); row++, y += ROW_HEIGHT) {
-				int val = (row) * 16;
-				Driver.SetAttribute (GetNormalColor ());
-				Move (firstColumnX, y + 1);
-				//Driver.AddStr (new string (' ', 16 * COLUMN_WIDTH));
-				if (val <= MaxCodePointVal) {
-					Driver.SetAttribute (GetNormalColor ());
-					Move (firstColumnX + COLUMN_WIDTH, y + 1);
-					for (int col = 0; col < 16; col++) {
-						uint glyph = (uint)((uint)val + col);
-						var rune = new Rune (glyph);
-						Move (firstColumnX + COLUMN_WIDTH * col + 1, y + 1);
-						if (glyph == SelectedGlyph) {
-							Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
-						} else {
-							Driver.SetAttribute (GetNormalColor ());
-						}
-						Driver.AddRune (rune);
-					}
-					Move (0, y + 1);
-					Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : ColorScheme.Focus);
-					var rowLabel = $"U+{val / 16:x5}_ ";
-					Driver.AddStr (rowLabel);
-				}
-			}
-			Driver.Clip = oldClip;
 		}
 
-		ContextMenu _contextMenu = new ContextMenu ();
-		void Handle_MouseClick (object sender, MouseEventEventArgs args)
-		{
-			var me = args.MouseEvent;
-			if (me.Flags == MouseFlags.ReportMousePosition || (me.Flags != MouseFlags.Button1Clicked &&
-				me.Flags != MouseFlags.Button1DoubleClicked &&
-				me.Flags != _contextMenu.MouseFlags)) {
-				return;
+		var firstColumnX = viewport.X + RowLabelWidth;
+		Driver.SetAttribute (GetNormalColor ());
+		for (int row = -ContentOffset.Y, y = 0; row <= (-ContentOffset.Y) + (Bounds.Height / ROW_HEIGHT); row++, y += ROW_HEIGHT) {
+			var val = (row) * 16;
+			Move (firstColumnX, y + 1);
+			if (val <= MaxCodePoint) {
+				Move (firstColumnX + COLUMN_WIDTH, y + 1);
+				for (int col = 0; col < 16; col++) {
+					Move (firstColumnX + COLUMN_WIDTH * col + 1, y + 1);
+					Driver.AddRune (new Rune ((char)(val + col)));
+				}
+				Move (0, y + 1);
+				Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : ColorScheme.Focus);
+				var rowLabel = $"U+{val / 16:x5}_ ";
+				Driver.AddStr (rowLabel);
+				Driver.SetAttribute (GetNormalColor ());
 			}
+		}
+		Driver.Clip = oldClip;
+	}
 
-			if (me.X < RowLabelWidth) {
-				return;
-			}
+	ContextMenu _contextMenu = new ContextMenu ();
+	void Handle_MouseClick (object sender, MouseEventEventArgs args)
+	{
+		var me = args.MouseEvent;
+		if (me.Flags == MouseFlags.ReportMousePosition || (me.Flags != MouseFlags.Button1Clicked &&
+			me.Flags != MouseFlags.Button1DoubleClicked &&
+			me.Flags != _contextMenu.MouseFlags)) {
+			return;
+		}
 
-			if (me.Y < 1) {
-				return;
-			}
+		if (me.X < RowLabelWidth) {
+			return;
+		}
 
-			var row = (me.Y - 1);
-			var col = (me.X - RowLabelWidth - ContentOffset.X) / COLUMN_WIDTH;
-			uint val = (uint)((((uint)row - (uint)ContentOffset.Y) * 16) + col);
-			if (val > MaxCodePointVal) {
-				return;
-			}
+		if (me.Y < 1) {
+			return;
+		}
 
-			if (me.Flags == MouseFlags.Button1Clicked) {
-				SelectedGlyph = (uint)val;
-				return;
-			}
+		var row = (me.Y - 1);
+		var col = (me.X - RowLabelWidth - ContentOffset.X) / COLUMN_WIDTH;
+		uint val = (uint)((((uint)row - (uint)ContentOffset.Y) * 16) + col);
+		if (val > MaxCodePoint) {
+			return;
+		}
 
-			if (me.Flags == MouseFlags.Button1DoubleClicked) {
-				SelectedGlyph = (uint)val;
-				MessageBox.Query ("Glyph", $"{new Rune (val)} U+{SelectedGlyph:x4}", "Ok");
-				return;
-			}
+		if (me.Flags == MouseFlags.Button1Clicked) {
+			SelectedCodePoint = (uint)val;
+			return;
+		}
 
-			if (me.Flags == _contextMenu.MouseFlags) {
-				SelectedGlyph = (uint)val;
-				_contextMenu = new ContextMenu (me.X + 1, me.Y + 1,
-					new MenuBarItem (new MenuItem [] {
+		if (me.Flags == MouseFlags.Button1DoubleClicked) {
+			SelectedCodePoint = (uint)val;
+			ShowDetails ();
+			return;
+		}
+
+		if (me.Flags == _contextMenu.MouseFlags) {
+			SelectedCodePoint = (uint)val;
+			_contextMenu = new ContextMenu (me.X + 1, me.Y + 1,
+				new MenuBarItem (new MenuItem [] {
 					new MenuItem ("_Copy Glyph", "", () => CopyGlyph (), null, null, Key.C | Key.CtrlMask),
-					new MenuItem ("Copy _Value", "", () => CopyValue (), null, null, Key.C | Key.ShiftMask | Key.CtrlMask),
-					}) {
+					new MenuItem ("Copy Code _Point", "", () => CopyCodePoint (), null, null, Key.C | Key.ShiftMask | Key.CtrlMask),
+				}) {
 
-					}
-				);
-				_contextMenu.Show ();
-			}
+				}
+			);
+			_contextMenu.Show ();
 		}
 	}
 
-	class UnicodeRange {
-		public uint Start;
-		public uint End;
-		public string Category;
-		public UnicodeRange (uint start, uint end, string category)
-		{
-			this.Start = start;
-			this.End = end;
-			this.Category = category;
+	void ShowDetails ()
+	{
+		var title = $"{new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x4}";
+		switch (MessageBox.Query (title, $"{new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x4}", "Copy _Glyph", "Copy Code _Point", "Cancel")) {
+		case 0:
+			CopyGlyph ();
+			break;
+		case 1:
+			CopyCodePoint ();
+			break;
 		}
+	}
 
-		public static List<UnicodeRange> Ranges = new List<UnicodeRange> {
+	public override bool OnEnter (View view)
+	{
+		if (IsInitialized) {
+			Application.Driver.SetCursorVisibility (CursorVisibility.Default);
+			SelectedCodePoint = SelectedCodePoint; // update cursor location
+		} else {
+			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
+		}
+		return base.OnEnter (view);
+	}
+}
+
+class UnicodeRange {
+	public uint Start;
+	public uint End;
+	public string Category;
+	public UnicodeRange (uint start, uint end, string category)
+	{
+		this.Start = start;
+		this.End = end;
+		this.Category = category;
+	}
+
+	public static List<UnicodeRange> Ranges = new List<UnicodeRange> {
 			new UnicodeRange (0x0000, 0x001F, "ASCII Control Characters"),
 			new UnicodeRange (0x0080, 0x009F, "C0 Control Characters"),
 			new UnicodeRange(0x1100, 0x11ff,"Hangul Jamo"),	// This is where wide chars tend to start
@@ -505,8 +527,6 @@ namespace UICatalog.Scenarios {
 			new UnicodeRange (0x20000, 0x2A6DF   ,"CJK Unified Ideographs Extension B"),
 			new UnicodeRange (0x2F800, 0x2FA1F   ,"CJK Compatibility Ideographs Supplement"),
 			new UnicodeRange (0xE0000, 0xE007F   ,"Tags"),
-			new UnicodeRange((uint)(CharMap.MaxCodePointVal - 16), (uint)CharMap.MaxCodePointVal,"End"),
+			new UnicodeRange((uint)(CharMap.MaxCodePoint - 16), (uint)CharMap.MaxCodePoint,"End"),
 		};
-	}
-
 }

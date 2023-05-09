@@ -1384,11 +1384,9 @@ internal class WindowsDriver : ConsoleDriver {
 
 	public override void AddRune (System.Rune systemRune)
 	{
-		var rune = new Rune (systemRune).MakePrintable ();
-		var runeWidth = rune.GetColumnWidth ();
-		var validLocation = IsValidLocation (Col, Row);
+		if (IsValidLocation (Col, Row)) {
+			var rune = new Rune (systemRune).MakePrintable ();
 
-		if (validLocation) {
 			if (!rune.IsBmp) {
 				rune = Rune.ReplacementChar;
 			}
@@ -1402,11 +1400,12 @@ internal class WindowsDriver : ConsoleDriver {
 				}
 			}
 
-			if (runeWidth > 1) {
-				Col++;
+			if (rune.GetColumnWidth () > 1 && Col == Clip.Right - 1) {
+				// This is a double-width character, and we are at the end of the line.
 				Contents [Row, Col, 0] = Rune.ReplacementChar.Value;
 				Contents [Row, Col, 1] = CurrentAttribute;
 				Contents [Row, Col, 2] = 1;
+				Col++;
 			}
 
 			//var extraColumns = 0;
@@ -1576,7 +1575,7 @@ internal class WindowsDriver : ConsoleDriver {
 			WinConsole = null;
 			//throw new InvalidOperationException ("The Windows Console output window is not available.", e);
 		}
-		
+
 		CurrentAttribute = MakeColor (Color.White, Color.Black);
 		InitializeColorSchemes ();
 
@@ -1589,7 +1588,7 @@ internal class WindowsDriver : ConsoleDriver {
 		if (WinConsole == null) {
 			return;
 		}
-		
+
 		_outputBuffer = new WindowsConsole.CharInfo [Rows * Cols];
 		Clip = new Rect (0, 0, Cols, Rows);
 		_damageRegion = new WindowsConsole.SmallRect () {

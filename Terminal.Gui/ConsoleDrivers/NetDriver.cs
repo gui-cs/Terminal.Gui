@@ -633,11 +633,11 @@ internal class NetDriver : ConsoleDriver {
 			return;
 		}
 
-		var rune = new Rune (systemRune).MakePrintable ();
-		var runeWidth = rune.GetColumnWidth ();
+		int runeWidth = -1;
 		var validLocation = IsValidLocation (Col, Row);
-
 		if (validLocation) {
+			var rune = new Rune (systemRune).MakePrintable ();
+			runeWidth = rune.GetColumnWidth ();
 			if (runeWidth == 0 && Col > 0) {
 				// This is a combining character, and we are not at the beginning of the line.
 				var combined = new String (new char [] { (char)Contents [Row, Col - 1, 0], (char)rune.Value });
