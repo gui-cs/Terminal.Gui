@@ -177,26 +177,26 @@ namespace Terminal.Gui {
 
 
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDrawContent (Rect contentArea)
 		{
 			Move (0, 0);
 			Driver.SetAttribute (GetNormalColor ());
 
 			if (Style.ShowBorder) {
-				
+
 				// How much space do we need to leave at the bottom to show the tabs
 				int spaceAtBottom = Math.Max (0, GetTabHeight (false) - 1);
 				int startAtY = Math.Max (0, GetTabHeight (true) - 1);
 
-				Border.DrawFrame (new Rect (0, startAtY, bounds.Width,
-				Math.Max (bounds.Height - spaceAtBottom - startAtY, 0)), false);
+				Border.DrawFrame (new Rect (0, startAtY, Bounds.Width,
+				Math.Max (Bounds.Height - spaceAtBottom - startAtY, 0)), false);
 			}
 
 			if (Tabs.Any ()) {
-				tabsBar.Redraw (tabsBar.Bounds);
+				tabsBar.OnDrawContent (contentArea);
 				contentView.SetNeedsDisplay ();
 				var savedClip = contentView.ClipToBounds ();
-				contentView.Redraw (contentView.Bounds);
+				contentView.Draw ();
 				Driver.Clip = savedClip;
 			}
 		}
@@ -468,10 +468,10 @@ namespace Terminal.Gui {
 				return base.OnEnter (view);
 			}
 
-			public override void Redraw (Rect bounds)
+			public override void OnDrawContent (Rect contentArea)
 			{
-				var tabLocations = host.CalculateViewport (bounds).ToArray ();
-				var width = bounds.Width;
+				var tabLocations = host.CalculateViewport (Bounds).ToArray ();
+				var width = Bounds.Width;
 				Driver.SetAttribute (GetNormalColor ());
 
 				if (host.Style.ShowTopLine) {
@@ -482,7 +482,6 @@ namespace Terminal.Gui {
 
 				RenderUnderline (tabLocations, width);
 				Driver.SetAttribute (GetNormalColor ());
-
 			}
 
 			/// <summary>
@@ -508,7 +507,7 @@ namespace Terminal.Gui {
 				}
 
 				Move (selected.X - 1, y);
-				Driver.AddRune (host.Style.TabsOnBottom ? Driver.LLCorner : Driver.ULCorner);
+				Driver.AddRune (host.Style.TabsOnBottom ? CM.Glyphs.LLCorner : CM.Glyphs.ULCorner);
 
 				for (int i = 0; i < selected.Width; i++) {
 
@@ -517,11 +516,11 @@ namespace Terminal.Gui {
 						return;
 					}
 
-					Driver.AddRune (Driver.HLine);
+					Driver.AddRune (CM.Glyphs.HLine);
 				}
 
 				// Add the end of the selected tab
-				Driver.AddRune (host.Style.TabsOnBottom ? Driver.LRCorner : Driver.URCorner);
+				Driver.AddRune (host.Style.TabsOnBottom ? CM.Glyphs.LRCorner : CM.Glyphs.URCorner);
 
 			}
 
@@ -550,7 +549,7 @@ namespace Terminal.Gui {
 
 					if (toRender.IsSelected) {
 						Move (toRender.X - 1, y);
-						Driver.AddRune (Driver.VLine);
+						Driver.AddRune (CM.Glyphs.VLine);
 					}
 
 					Move (toRender.X, y);
@@ -574,7 +573,7 @@ namespace Terminal.Gui {
 					Driver.SetAttribute (GetNormalColor ());
 
 					if (toRender.IsSelected) {
-						Driver.AddRune (Driver.VLine);
+						Driver.AddRune (CM.Glyphs.VLine);
 					}
 				}
 			}
@@ -594,7 +593,7 @@ namespace Terminal.Gui {
 				if (!host.Style.ShowBorder) {
 
 					for (int x = 0; x < width; x++) {
-						Driver.AddRune (Driver.HLine);
+						Driver.AddRune (CM.Glyphs.HLine);
 					}
 
 				}
@@ -606,14 +605,14 @@ namespace Terminal.Gui {
 
 				Move (selected.X - 1, y);
 
-				Driver.AddRune (selected.X == 1 ? Driver.VLine :
-			(host.Style.TabsOnBottom ? Driver.URCorner : Driver.LRCorner));
+				Driver.AddRune (selected.X == 1 ? CM.Glyphs.VLine :
+					(host.Style.TabsOnBottom ? CM.Glyphs.URCorner : CM.Glyphs.LRCorner));
 
 				Driver.AddStr (new string (' ', selected.Width));
 
 				Driver.AddRune (selected.X + selected.Width == width - 1 ?
-		     Driver.VLine :
-				(host.Style.TabsOnBottom ? Driver.ULCorner : Driver.LLCorner));
+				     CM.Glyphs.VLine :
+					(host.Style.TabsOnBottom ? CM.Glyphs.ULCorner : CM.Glyphs.LLCorner));
 
 				// draw scroll indicators
 
@@ -622,7 +621,7 @@ namespace Terminal.Gui {
 					Move (0, y);
 
 					// indicate that
-					Driver.AddRune (Driver.LeftArrow);
+					Driver.AddRune (CM.Glyphs.LeftArrow);
 				}
 
 				// if there are more tabs to the right not visible
@@ -630,7 +629,7 @@ namespace Terminal.Gui {
 					Move (width - 1, y);
 
 					// indicate that
-					Driver.AddRune (Driver.RightArrow);
+					Driver.AddRune (CM.Glyphs.RightArrow);
 				}
 			}
 

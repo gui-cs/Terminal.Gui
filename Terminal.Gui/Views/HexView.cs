@@ -198,7 +198,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDrawContent (Rect contentArea)
 		{
 			Attribute currentAttribute;
 			var current = ColorScheme.Focus;
@@ -217,7 +217,7 @@ namespace Terminal.Gui {
 
 			for (int line = 0; line < frame.Height; line++) {
 				var lineRect = new Rect (0, line, frame.Width, 1);
-				if (!bounds.Contains (lineRect))
+				if (!Bounds.Contains (lineRect))
 					continue;
 
 				Move (0, line);

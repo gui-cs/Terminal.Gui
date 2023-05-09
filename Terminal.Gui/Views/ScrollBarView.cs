@@ -31,7 +31,7 @@ namespace Terminal.Gui {
 		ScrollBarView otherScrollBarView;
 		View contentBottomRightCorner;
 
-		bool showBothScrollIndicator => OtherScrollBarView != null && OtherScrollBarView.showScrollIndicator && showScrollIndicator;
+		bool showBothScrollIndicator => OtherScrollBarView?.showScrollIndicator == true && showScrollIndicator;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using <see cref="LayoutStyle.Absolute"/> layout.
@@ -111,15 +111,27 @@ namespace Terminal.Gui {
 				OtherScrollBarView.ShowScrollIndicator = true;
 			}
 			ShowScrollIndicator = true;
-			contentBottomRightCorner = new View (" ") { Visible = host.Visible };
-			Host.SuperView.Add (contentBottomRightCorner);
-			// BUGBUG: v2 - Host may be superview and thus this may be bogus
-			contentBottomRightCorner.X = Pos.Right (host) - 1;
-			contentBottomRightCorner.Y = Pos.Bottom (host) - 1;
-			contentBottomRightCorner.Width = 1;
-			contentBottomRightCorner.Height = 1;
-			contentBottomRightCorner.MouseClick += ContentBottomRightCorner_MouseClick;
+			CreateBottomRightCorner ();
 			ClearOnVisibleFalse = false;
+		}
+
+		private void CreateBottomRightCorner ()
+		{
+			if (Host != null && (contentBottomRightCorner == null && OtherScrollBarView == null
+				|| (contentBottomRightCorner == null && OtherScrollBarView != null && OtherScrollBarView.contentBottomRightCorner == null))) {
+
+				contentBottomRightCorner = new View (" ") {
+					Id = "contentBottomRightCorner",
+					Visible = Host.Visible,
+					ClearOnVisibleFalse = false
+				};
+				Host.Add (contentBottomRightCorner);
+				contentBottomRightCorner.X = Pos.Right (Host) - 1;
+				contentBottomRightCorner.Y = Pos.Bottom (Host) - 1;
+				contentBottomRightCorner.Width = 1;
+				contentBottomRightCorner.Height = 1;
+				contentBottomRightCorner.MouseClick += ContentBottomRightCorner_MouseClick;
+			}
 		}
 
 		private void Host_VisibleChanged (object sender, EventArgs e)
@@ -155,13 +167,14 @@ namespace Terminal.Gui {
 		void ContentBottomRightCorner_MouseClick (object sender, MouseEventEventArgs me)
 		{
 			if (me.MouseEvent.Flags == MouseFlags.WheeledDown || me.MouseEvent.Flags == MouseFlags.WheeledUp
-				|| me.MouseEvent.Flags == MouseFlags.WheeledRight || me.MouseEvent.Flags == MouseFlags.WheeledLeft) {
-				me.Handled = true;
+			    || me.MouseEvent.Flags == MouseFlags.WheeledRight || me.MouseEvent.Flags == MouseFlags.WheeledLeft) {
+
 				MouseEvent (me.MouseEvent);
 			} else if (me.MouseEvent.Flags == MouseFlags.Button1Clicked) {
-				me.Handled = true;
 				Host.SetFocus ();
 			}
+
+			me.Handled = true;
 		}
 
 		void SetInitialProperties (int size, int position, bool isVertical)
@@ -171,7 +184,10 @@ namespace Terminal.Gui {
 			this.position = position;
 			this.size = size;
 			WantContinuousButtonPressed = true;
-			
+			ClearOnVisibleFalse = false;
+
+			Added += (s, e) => CreateBottomRightCorner ();
+
 			Initialized += (s, e) => {
 				SetWidthHeight ();
 				SetRelativeLayout (SuperView?.Frame ?? Host?.Frame ?? Frame);
@@ -226,13 +242,11 @@ namespace Terminal.Gui {
 		public int Position {
 			get => position;
 			set {
-				if (!IsInitialized) {
+				position = value;
+				if (IsInitialized) {
 					// We're not initialized so we can't do anything fancy. Just cache value.
-					position = value;
-					return;
+					SetPosition (value);
 				}
-				
-				SetPosition (value);
 			}
 		}
 
@@ -410,10 +424,10 @@ namespace Terminal.Gui {
 			}
 
 			if (showScrollIndicator) {
-				Redraw (Bounds);
+				Draw ();
 			}
 			if (otherScrollBarView != null && otherScrollBarView.showScrollIndicator) {
-				otherScrollBarView.Redraw (otherScrollBarView.Bounds);
+				otherScrollBarView.Draw ();
 			}
 		}
 
@@ -474,10 +488,10 @@ namespace Terminal.Gui {
 			}
 
 			if (showBothScrollIndicator) {
-				Width = vertical ? 1 : Host != SuperView ? Dim.Width (Host) - 1: Dim.Fill () - 1;
-				Height = vertical ? Host != SuperView ? Dim.Height (Host) - 1: Dim.Fill () - 1 : 1;
+				Width = vertical ? 1 : Host != SuperView ? Dim.Width (Host) - 1 : Dim.Fill () - 1;
+				Height = vertical ? Host != SuperView ? Dim.Height (Host) - 1 : Dim.Fill () - 1 : 1;
 
-				otherScrollBarView.Width = otherScrollBarView.vertical ? 1 : Host != SuperView ? Dim.Width (Host) - 1: Dim.Fill () - 1;
+				otherScrollBarView.Width = otherScrollBarView.vertical ? 1 : Host != SuperView ? Dim.Width (Host) - 1 : Dim.Fill () - 1;
 				otherScrollBarView.Height = otherScrollBarView.vertical ? Host != SuperView ? Dim.Height (Host) - 1 : Dim.Fill () - 1 : 1;
 			} else if (showScrollIndicator) {
 				Width = vertical ? 1 : Host != SuperView ? Dim.Width (Host) : Dim.Fill ();
@@ -494,7 +508,7 @@ namespace Terminal.Gui {
 		int posRightTee;
 
 		///<inheritdoc/>
-		public override void Redraw (Rect region)
+		public override void OnDrawContent (Rect contentArea)
 		{
 			if (ColorScheme == null || ((!showScrollIndicator || Size == 0) && AutoHideScrollBars && Visible)) {
 				if ((!showScrollIndicator || Size == 0) && AutoHideScrollBars && Visible) {
@@ -510,7 +524,7 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (Host.HasFocus ? ColorScheme.Focus : GetNormalColor ());
 
 			if (vertical) {
-				if (region.Right < Bounds.Width - 1) {
+				if (Bounds.Right < Bounds.Width - 1) {
 					return;
 				}
 
@@ -524,17 +538,17 @@ namespace Terminal.Gui {
 
 					Move (col, 0);
 					if (Bounds.Height == 1) {
-						Driver.AddRune (Driver.Diamond);
+						Driver.AddRune (CM.Glyphs.Diamond);
 					} else {
-						Driver.AddRune (Driver.UpArrow);
+						Driver.AddRune (CM.Glyphs.UpArrow);
 					}
 					if (Bounds.Height == 3) {
 						Move (col, 1);
-						Driver.AddRune (Driver.Diamond);
+						Driver.AddRune (CM.Glyphs.Diamond);
 					}
 					if (Bounds.Height > 1) {
 						Move (col, Bounds.Height - 1);
-						Driver.AddRune (Driver.DownArrow);
+						Driver.AddRune (CM.Glyphs.DownArrow);
 					}
 				} else {
 					bh -= 2;
@@ -545,7 +559,7 @@ namespace Terminal.Gui {
 					}
 
 					Move (col, 0);
-					Driver.AddRune (Driver.UpArrow);
+					Driver.AddRune (CM.Glyphs.UpArrow);
 
 					bool hasTopTee = false;
 					bool hasDiamond = false;
@@ -553,22 +567,22 @@ namespace Terminal.Gui {
 					for (int y = 0; y < bh; y++) {
 						Move (col, y + 1);
 						if ((y < by1 || y > by2) && ((position > 0 && !hasTopTee) || (hasTopTee && hasBottomTee))) {
-							special = Driver.Stipple;
+							special = CM.Glyphs.Stipple;
 						} else {
 							if (y != by2 && y > 1 && by2 - by1 == 0 && by1 < bh - 1 && hasTopTee && !hasDiamond) {
 								hasDiamond = true;
-								special = Driver.Diamond;
+								special = CM.Glyphs.Diamond;
 							} else {
 								if (y == by1 && !hasTopTee) {
 									hasTopTee = true;
 									posTopTee = y;
-									special = Driver.TopTee;
+									special = CM.Glyphs.TopTee;
 								} else if ((position == 0 && y == bh - 1 || y >= by2 || by2 == 0) && !hasBottomTee) {
 									hasBottomTee = true;
 									posBottomTee = y;
-									special = Driver.BottomTee;
+									special = CM.Glyphs.BottomTee;
 								} else {
-									special = Driver.VLine;
+									special = CM.Glyphs.VLine;
 								}
 							}
 						}
@@ -576,13 +590,13 @@ namespace Terminal.Gui {
 					}
 					if (!hasTopTee) {
 						Move (col, Bounds.Height - 2);
-						Driver.AddRune (Driver.TopTee);
+						Driver.AddRune (CM.Glyphs.TopTee);
 					}
 					Move (col, Bounds.Height - 1);
-					Driver.AddRune (Driver.DownArrow);
+					Driver.AddRune (CM.Glyphs.DownArrow);
 				}
 			} else {
-				if (region.Bottom < Bounds.Height - 1) {
+				if (Bounds.Bottom < Bounds.Height - 1) {
 					return;
 				}
 
@@ -595,8 +609,8 @@ namespace Terminal.Gui {
 					var bx2 = (position + bw) * bw / Size;
 
 					Move (0, row);
-					Driver.AddRune (Driver.LeftArrow);
-					Driver.AddRune (Driver.RightArrow);
+					Driver.AddRune (CM.Glyphs.LeftArrow);
+					Driver.AddRune (CM.Glyphs.RightArrow);
 				} else {
 					bw -= 2;
 					var bx1 = KeepContentAlwaysInViewport ? position * bw / Size : position * bw / (Size + bw);
@@ -606,29 +620,29 @@ namespace Terminal.Gui {
 					}
 
 					Move (0, row);
-					Driver.AddRune (Driver.LeftArrow);
+					Driver.AddRune (CM.Glyphs.LeftArrow);
 
 					bool hasLeftTee = false;
 					bool hasDiamond = false;
 					bool hasRightTee = false;
 					for (int x = 0; x < bw; x++) {
 						if ((x < bx1 || x >= bx2 + 1) && ((position > 0 && !hasLeftTee) || (hasLeftTee && hasRightTee))) {
-							special = Driver.Stipple;
+							special = CM.Glyphs.Stipple;
 						} else {
 							if (x != bx2 && x > 1 && bx2 - bx1 == 0 && bx1 < bw - 1 && hasLeftTee && !hasDiamond) {
 								hasDiamond = true;
-								special = Driver.Diamond;
+								special = CM.Glyphs.Diamond;
 							} else {
 								if (x == bx1 && !hasLeftTee) {
 									hasLeftTee = true;
 									posLeftTee = x;
-									special = Driver.LeftTee;
+									special = CM.Glyphs.LeftTee;
 								} else if ((position == 0 && x == bw - 1 || x >= bx2 || bx2 == 0) && !hasRightTee) {
 									hasRightTee = true;
 									posRightTee = x;
-									special = Driver.RightTee;
+									special = CM.Glyphs.RightTee;
 								} else {
-									special = Driver.HLine;
+									special = CM.Glyphs.HLine;
 								}
 							}
 						}
@@ -636,10 +650,10 @@ namespace Terminal.Gui {
 					}
 					if (!hasLeftTee) {
 						Move (Bounds.Width - 2, row);
-						Driver.AddRune (Driver.LeftTee);
+						Driver.AddRune (CM.Glyphs.LeftTee);
 					}
 
-					Driver.AddRune (Driver.RightArrow);
+					Driver.AddRune (CM.Glyphs.RightArrow);
 				}
 			}
 
@@ -663,6 +677,7 @@ namespace Terminal.Gui {
 				mouseEvent.Flags != MouseFlags.Button1Released && mouseEvent.Flags != MouseFlags.WheeledDown &&
 				mouseEvent.Flags != MouseFlags.WheeledUp && mouseEvent.Flags != MouseFlags.WheeledRight &&
 				mouseEvent.Flags != MouseFlags.WheeledLeft && mouseEvent.Flags != MouseFlags.Button1TripleClicked) {
+
 				return false;
 			}
 
@@ -682,6 +697,7 @@ namespace Terminal.Gui {
 
 			if (mouseEvent.Flags != MouseFlags.Button1Released
 				&& (Application.MouseGrabView == null || Application.MouseGrabView != this)) {
+
 				Application.GrabMouse (this);
 			} else if (mouseEvent.Flags == MouseFlags.Button1Released && Application.MouseGrabView != null && Application.MouseGrabView == this) {
 				lastLocation = -1;
@@ -690,6 +706,7 @@ namespace Terminal.Gui {
 			}
 			if (showScrollIndicator && (mouseEvent.Flags == MouseFlags.WheeledDown || mouseEvent.Flags == MouseFlags.WheeledUp ||
 				mouseEvent.Flags == MouseFlags.WheeledRight || mouseEvent.Flags == MouseFlags.WheeledLeft)) {
+
 				return Host.MouseEvent (mouseEvent);
 			}
 

@@ -107,10 +107,10 @@ namespace Terminal.Gui {
 
 			HotKeySpecifier = new Rune ('_');
 
-			_leftBracket = new Rune (Driver != null ? Driver.LeftBracket : '[');
-			_rightBracket = new Rune (Driver != null ? Driver.RightBracket : ']');
-			_leftDefault = new Rune (Driver != null ? Driver.LeftDefaultIndicator : '<');
-			_rightDefault = new Rune (Driver != null ? Driver.RightDefaultIndicator : '>');
+			_leftBracket = CM.Glyphs.LeftBracket;
+			_rightBracket = CM.Glyphs.RightBracket;
+			_leftDefault = CM.Glyphs.LeftDefaultIndicator;
+			_rightDefault = CM.Glyphs.RightDefaultIndicator;
 
 			CanFocus = true;
 			AutoSize = true;
@@ -166,35 +166,29 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// 
 		/// </summary>
-		public bool NoDecorations {get;set;}
+		public bool NoDecorations { get; set; }
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public bool NoPadding {get;set;}
+		public bool NoPadding { get; set; }
 
 		/// <inheritdoc/>
 		protected override void UpdateTextFormatterText ()
 		{
-			if(NoDecorations)
-			{
+			if (NoDecorations) {
 				TextFormatter.Text = Text;
-			}
-			else
+			} else
 			if (IsDefault)
 				TextFormatter.Text = ustring.Make (_leftBracket) + ustring.Make (_leftDefault) + " " + Text + " " + ustring.Make (_rightDefault) + ustring.Make (_rightBracket);
-			else
-			{
-				if(NoPadding)
-				{
+			else {
+				if (NoPadding) {
 					TextFormatter.Text = ustring.Make (_leftBracket) + Text + ustring.Make (_rightBracket);
-				}
-				else
-				{
+				} else {
 					TextFormatter.Text = ustring.Make (_leftBracket) + " " + Text + " " + ustring.Make (_rightBracket);
 				}
 			}
-				
+
 		}
 
 		///<inheritdoc/>
@@ -283,7 +277,7 @@ namespace Terminal.Gui {
 					if (!HasFocus) {
 						SetFocus ();
 						SetNeedsDisplay ();
-						Redraw (Bounds);
+						Draw ();
 					}
 					OnClicked ();
 				}

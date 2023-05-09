@@ -33,7 +33,10 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Returns a string representation of this <see cref="AllowedTypeAny"/>.
+		/// </summary>
+		/// <returns></returns>
 		public override string ToString ()
 		{
 			return Strings.fdAnyFiles + "(*.*)";

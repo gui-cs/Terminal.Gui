@@ -395,12 +395,12 @@ namespace Terminal.Gui {
 
 		private string GetForwardButtonText ()
 		{
-			return "-" + Driver.RightArrow;
+			return "-" + CM.Glyphs.RightArrow;
 		}
 
 		private string GetBackButtonText ()
 		{
-			return Driver.LeftArrow + "-";
+			return CM.Glyphs.LeftArrow + "-";
 		}
 
 		private string GetUpButtonText ()
@@ -411,8 +411,8 @@ namespace Terminal.Gui {
 		private string GetToggleSplitterText (bool isExpanded)
 		{
 			return isExpanded ?
-				new string ((char)Driver.LeftArrow, 2) :
-				new string ((char)Driver.RightArrow, 2);
+				new string ((char)CM.Glyphs.LeftArrow, 2) :
+				new string ((char)CM.Glyphs.RightArrow, 2);
 		}
 
 		private void Delete ()
@@ -593,19 +593,19 @@ namespace Terminal.Gui {
 			= Enumerable.Empty<string> ().ToList ().AsReadOnly ();
 
 		/// <inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDrawContent (Rect contentArea)
 		{
-			base.Redraw (bounds);
+			base.OnDrawContent (contentArea);
 
 			if (!string.IsNullOrWhiteSpace (feedback)) {
 				var feedbackWidth = feedback.Sum (c => Rune.ColumnWidth (c));
-				var feedbackPadLeft = ((bounds.Width - feedbackWidth) / 2) - 1;
+				var feedbackPadLeft = ((Bounds.Width - feedbackWidth) / 2) - 1;
 
-				feedbackPadLeft = Math.Min (bounds.Width, feedbackPadLeft);
+				feedbackPadLeft = Math.Min (Bounds.Width, feedbackPadLeft);
 				feedbackPadLeft = Math.Max (0, feedbackPadLeft);
 
-				var feedbackPadRight = bounds.Width - (feedbackPadLeft + feedbackWidth + 2);
-				feedbackPadRight = Math.Min (bounds.Width, feedbackPadRight);
+				var feedbackPadRight = Bounds.Width - (feedbackPadLeft + feedbackWidth + 2);
+				feedbackPadRight = Math.Min (Bounds.Width, feedbackPadRight);
 				feedbackPadRight = Math.Max (0, feedbackPadRight);
 
 				Move (0, Bounds.Height / 2);
@@ -672,7 +672,7 @@ namespace Terminal.Gui {
 				allowedTypeMenuBar.DrawContentComplete += (s, e) => {
 
 					allowedTypeMenuBar.Move (e.Rect.Width - 1, 0);
-					Driver.AddRune (Driver.DownArrow);
+					Driver.AddRune (CM.Glyphs.DownArrow);
 
 				};
 

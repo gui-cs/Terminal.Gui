@@ -192,7 +192,7 @@ namespace UICatalog.Scenarios {
 
 				// add a new one if this the one that is being sorted
 				if (col.Ordinal == clickedCol) {
-					col.ColumnName += isAsc ? '▲' : '▼';
+					col.ColumnName += isAsc ? CM.Glyphs.UpArrow : CM.Glyphs.DownArrow;
 				}
 			}
 
@@ -201,11 +201,11 @@ namespace UICatalog.Scenarios {
 
 		private string TrimArrows (string columnName)
 		{
-			return columnName.TrimEnd ('▼', '▲');
+			return columnName.TrimEnd ((char)CM.Glyphs.UpArrow, (char)CM.Glyphs.DownArrow);
 		}
 		private string StripArrows (string columnName)
 		{
-			return columnName.Replace ("▼", "").Replace ("▲", "");
+			return columnName.Replace ($"{CM.Glyphs.DownArrow}", "").Replace ($"{CM.Glyphs.UpArrow}", "");
 		}
 		private string GetProposedNewSortOrder (int clickedCol, out bool isAsc)
 		{

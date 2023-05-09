@@ -117,7 +117,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDrawContent (Rect contentArea)
 		{
 			Move (0, 0);
 			Driver.SetAttribute (GetNormalColor ());
@@ -138,7 +138,7 @@ namespace Terminal.Gui {
 				}
 				if (i + 1 < Items.Length) {
 					Driver.AddRune (' ');
-					Driver.AddRune (Driver.VLine);
+					Driver.AddRune (CM.Glyphs.VLine);
 					Driver.AddRune (' ');
 				}
 			}
