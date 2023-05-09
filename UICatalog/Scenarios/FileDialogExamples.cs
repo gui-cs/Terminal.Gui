@@ -149,10 +149,12 @@ namespace UICatalog.Scenarios {
 				fd.Style.TreeStyle.ShowBranchLines = cbShowTreeBranchLines.Checked ?? false;
 				fd.Style.TableStyle.AlwaysShowHeaders = cbAlwaysTableShowHeaders.Checked ?? false;
 
+				var dirInfoFactory = new FileSystem().DirectoryInfo;
+
 				if (cbDrivesOnlyInTree.Checked ?? false) {
 					fd.Style.TreeRootGetter = () => {
 						return System.Environment.GetLogicalDrives ()
-						.Select (d => new FileDialogRootTreeNode (d, new DirectoryInfo (d)));
+						.Select (d => new FileDialogRootTreeNode (d, dirInfoFactory.New(d)));
 					};
 				}
 

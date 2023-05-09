@@ -15,6 +15,7 @@ namespace Terminal.Gui {
 	/// Stores style settings for <see cref="FileDialog"/>.
 	/// </summary>
 	public class FileDialogStyle {
+		readonly IFileSystem _fileSystem;
 
 		/// <summary>
 		/// Gets or sets the default value to use for <see cref="UseColors"/>.
@@ -155,7 +156,7 @@ namespace Terminal.Gui {
 		/// <see cref="Environment.SpecialFolder"/>.
 		/// </summary>
 		/// <remarks>Must be configured before showing the dialog.</remarks>
-		public FileDialogTreeRootGetter TreeRootGetter { get; set; } = DefaultTreeRootGetter;
+		public FileDialogTreeRootGetter TreeRootGetter { get; set; }
 
 		/// <summary>
 		/// Gets or sets whether to use advanced unicode characters which might not be installed
@@ -179,9 +180,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Creates a new instance of the <see cref="FileDialogStyle"/> class.
 		/// </summary>
-		public FileDialogStyle ()
+		public FileDialogStyle (IFileSystem fileSystem)
 		{
+			_fileSystem = fileSystem;
 			IconGetter = DefaultIconGetter;
+			TreeRootGetter = DefaultTreeRootGetter;
 
 			// TODO: Make config setting;
 			var nerd = new NerdFonts();
@@ -215,7 +218,6 @@ namespace Terminal.Gui {
 				Focus = Application.Driver.MakeAttribute (Color.Black, Color.White),
 				HotFocus = Application.Driver.MakeAttribute (Color.Black, Color.White),
 			};
-
 		}
 
 		private string DefaultIconGetter (IFileSystemInfo arg)
@@ -228,12 +230,14 @@ namespace Terminal.Gui {
 
 		}
 
-		private static IEnumerable<FileDialogRootTreeNode> DefaultTreeRootGetter ()
+		private IEnumerable<FileDialogRootTreeNode> DefaultTreeRootGetter ()
 		{
 			var roots = new List<FileDialogRootTreeNode> ();
 			try {
 				foreach (var d in Environment.GetLogicalDrives ()) {
-					roots.Add (new FileDialogRootTreeNode (d, new DirectoryInfo (d)));
+
+					
+					roots.Add (new FileDialogRootTreeNode (d, _fileSystem.DirectoryInfo.New(d)));
 				}
 
 			} catch (Exception) {
@@ -251,7 +255,8 @@ namespace Terminal.Gui {
 
 							roots.Add (new FileDialogRootTreeNode (
 							special.ToString (),
-							new DirectoryInfo (Environment.GetFolderPath (special))));
+							_fileSystem.DirectoryInfo.New(Environment.GetFolderPath (special))
+							));
 						}
 					} catch (Exception) {
 						// Special file exists but contents are unreadable (permissions?)

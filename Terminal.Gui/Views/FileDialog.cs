@@ -23,7 +23,7 @@ namespace Terminal.Gui {
 		/// be made before the <see cref="Dialog"/> is loaded and shown to the user for the
 		/// first time.
 		/// </summary>
-		public FileDialogStyle Style { get; } = new FileDialogStyle ();
+		public FileDialogStyle Style { get; }
 
 		/// <summary>
 		/// The maximum number of results that will be collected
@@ -137,6 +137,8 @@ namespace Terminal.Gui {
 		public FileDialog (IFileSystem fileSystem)
 		{
 			this.fileSystem = fileSystem;
+			Style = new FileDialogStyle (fileSystem);
+			
 			this.btnOk = new Button (Style.OkButtonText) {
 				Y = Pos.AnchorEnd (1),
 				X = Pos.Function (() =>
@@ -258,8 +260,9 @@ namespace Terminal.Gui {
 				Height = Dim.Fill (),
 			};
 
-			this.treeView.TreeBuilder = new FileDialogTreeBuilder ();
-			this.treeView.AspectGetter = (m) => m is IDirectoryInfo d ? d.Name : m.ToString ();
+			var fileDialogTreeBuilder = new FileDialogTreeBuilder ();
+			this.treeView.TreeBuilder = fileDialogTreeBuilder;
+			this.treeView.AspectGetter = fileDialogTreeBuilder.AspectGetter;
 			this.Style.TreeStyle = treeView.Style;
 
 			this.treeView.SelectionChanged += this.TreeView_SelectionChanged;

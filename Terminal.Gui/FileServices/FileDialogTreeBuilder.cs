@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 
 namespace Terminal.Gui {
 
 	class FileDialogTreeBuilder : ITreeBuilder<object> {
+
 		public bool SupportsCanExpand => true;
 
 		public bool CanExpand (object toExpand)
@@ -18,18 +20,23 @@ namespace Terminal.Gui {
 			return this.TryGetDirectories (NodeToDirectory (forObject));
 		}
 
-		internal static DirectoryInfo NodeToDirectory (object toExpand)
+		internal static IDirectoryInfo NodeToDirectory (object toExpand)
 		{
-			return toExpand is FileDialogRootTreeNode f ? f.Path : (DirectoryInfo)toExpand;
+			return toExpand is FileDialogRootTreeNode f ? f.Path : (IDirectoryInfo)toExpand;
 		}
 
-		private IEnumerable<DirectoryInfo> TryGetDirectories (DirectoryInfo directoryInfo)
+		internal string AspectGetter(object o)
+		{
+			return o is FileDialogRootTreeNode r ? r.DisplayName : ((IDirectoryInfo)o).Name;
+		}
+
+		private IEnumerable<IDirectoryInfo> TryGetDirectories (IDirectoryInfo directoryInfo)
 		{
 			try {
 				return directoryInfo.EnumerateDirectories ();
 			} catch (Exception) {
 
-				return Enumerable.Empty<DirectoryInfo> ();
+				return Enumerable.Empty<IDirectoryInfo> ();
 			}
 		}
 
