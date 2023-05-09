@@ -1,10 +1,8 @@
 ﻿using NStack;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Management;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -28,24 +26,25 @@ namespace Terminal.Gui {
 		/// </summary>
 		public DataTable DataTable { get; private set; }
 
-		private TableView tableView;
+		private TableView _tableView;
 
-		private Rect lastBounds;
-		private int lastMaxCellWidth;
-		private int lastMinCellWidth;
-		private ListColumnStyle lastStyle;
-		private IList lastList;
+		private Rect _lastBounds;
+		private int _lastMaxCellWidth;
+		private int _lastMinCellWidth;
+		private ListColumnStyle _lastStyle;
+		private IList _lastList;
 
 		/// <summary>
-		/// Creates a new table instance based on the data in <paramref name="list"/>.
+		/// Creates a new columned list table instance based on the data in <paramref name="list"/>
+		/// and dimensions from <paramref name="tableView"/>.
 		/// </summary>
-		/// <param name="tableView"></param>
 		/// <param name="list"></param>
+		/// <param name="tableView"></param>
 		/// <param name="style"></param>
 		public ListTableSource (IList list, TableView tableView, ListColumnStyle style)
 		{
 			this.List = list;
-			this.tableView = tableView;
+			this._tableView = tableView;
 			Style = style;
 
 			this.DataTable = CreateTable (CalculateColumns ());
@@ -59,26 +58,26 @@ namespace Terminal.Gui {
 
 		private void TableView_DrawContent (object sender, DrawEventArgs e)
 		{
-			if ((!tableView.Bounds.Equals (lastBounds)) ||
-				tableView.MaxCellWidth != lastMaxCellWidth ||
-				tableView.MinCellWidth != lastMinCellWidth ||
-				Style != lastStyle ||
-				this.List != lastList) {
+			if ((!_tableView.Bounds.Equals (_lastBounds)) ||
+				_tableView.MaxCellWidth != _lastMaxCellWidth ||
+				_tableView.MinCellWidth != _lastMinCellWidth ||
+				Style != _lastStyle ||
+				this.List != _lastList) {
 
 				this.DataTable = CreateTable (CalculateColumns ());
 			}
-			lastBounds = tableView.Bounds;
-			lastMinCellWidth = tableView.MaxCellWidth;
-			lastMaxCellWidth = tableView.MaxCellWidth;
-			lastStyle = Style;
-			lastList = this.List;
+			_lastBounds = _tableView.Bounds;
+			_lastMinCellWidth = _tableView.MaxCellWidth;
+			_lastMaxCellWidth = _tableView.MaxCellWidth;
+			_lastStyle = Style;
+			_lastList = this.List;
 		}
 
 		/// <inheritdoc/>
 		public object this [int row, int col] {
 			get {
 				int idx;
-				if (Style.VerticalOrientation) {
+				if (Style.Orientation == Orientation.Vertical) {
 					idx = (col * Rows) + row;
 				} else {
 					idx = (row * Columns) + col;
@@ -124,34 +123,6 @@ namespace Terminal.Gui {
 			return table;
 		}
 
-		private DataTable TransposeTable (DataTable initialTable, bool includeColumnNames = false)
-		{
-			var newTable = new DataTable ();
-			
-			int offset = 0;
-			if (includeColumnNames) {
-				// This creates a first column to contain existing column names
-				// (TODO: Allow formatting such a column like a header)
-				newTable.Columns.Add (new DataColumn ("0"));
-				offset++;
-			}
-
-			for (int i = 0; i < initialTable.Columns.Count; i++) {
-				DataRow row = newTable.NewRow ();
-				if (includeColumnNames) {
-					row [0] = initialTable.Columns [i].ColumnName;
-				}
-				for (int j = offset; j < initialTable.Rows.Count + offset; j++) {
-					if (newTable.Columns.Count < initialTable.Rows.Count + offset)
-						newTable.Columns.Add (new DataColumn (j.ToString ()));
-					row [j] = initialTable.Rows [j - offset] [i];
-				}
-				newTable.Rows.Add (row);
-			}
-
-			return newTable;
-		}
-
 		/// <summary>
 		/// Returns the size in characters of the longest value read from <see cref="ListTableSource.List"/>
 		/// </summary>
@@ -186,22 +157,22 @@ namespace Terminal.Gui {
 			int cols;
 
 			int colWidth = CalculateMaxLength ();
-			if (colWidth > tableView.MaxCellWidth) {
-				colWidth = tableView.MaxCellWidth;
+			if (colWidth > _tableView.MaxCellWidth) {
+				colWidth = _tableView.MaxCellWidth;
 			}
 
-			if (tableView.MinCellWidth > 0 && colWidth < tableView.MinCellWidth) {
-				if (tableView.MinCellWidth > tableView.MaxCellWidth) {
-					colWidth = tableView.MaxCellWidth;
+			if (_tableView.MinCellWidth > 0 && colWidth < _tableView.MinCellWidth) {
+				if (_tableView.MinCellWidth > _tableView.MaxCellWidth) {
+					colWidth = _tableView.MaxCellWidth;
 				} else {
-					colWidth = tableView.MinCellWidth;
+					colWidth = _tableView.MinCellWidth;
 				}
 			}
-			if (Style.VerticalOrientation != Style.ScrollParallel) {
-				float f = (float)tableView.Bounds.Height - tableView.GetHeaderHeight ();
+			if ((Style.Orientation == Orientation.Vertical) != Style.ScrollParallel) {
+				float f = (float)_tableView.Bounds.Height - _tableView.GetHeaderHeight ();
 				cols = (int)Math.Ceiling (Count / f);
 			} else {
-				cols = ((int)Math.Ceiling (((float)tableView.Bounds.Width - 1) / colWidth)) - 2;
+				cols = ((int)Math.Ceiling (((float)_tableView.Bounds.Width - 1) / colWidth)) - 2;
 			}
 
 			return (cols > 1) ? cols : 1;
@@ -213,13 +184,13 @@ namespace Terminal.Gui {
 		public class ListColumnStyle {
 
 			/// <summary>
-			/// Gets or sets a flag indicating whether to populate data down each column rather than across each row.
-			/// Defaults to <see langword="false"/>.
+			/// Gets or sets an Orientation enum indicating whether to populate data down each column
+			/// rather than across each row.  Defaults to <see cref="Orientation.Horizontal"/>.
 			/// </summary>
-			public bool VerticalOrientation { get; set; } = false;
+			public Orientation Orientation { get; set; } = Orientation.Horizontal;
 
 			/// <summary>
-			/// Gets or sets a flag indicating whether to scroll in the same direction as item population.
+			/// Gets or sets a flag indicating whether to scroll in the same direction as <see cref="ListTableSource.ListColumnStyle.Orientation"/>.
 			/// Defaults to <see langword="false"/>.
 			/// </summary>
 			public bool ScrollParallel { get; set; } = false;

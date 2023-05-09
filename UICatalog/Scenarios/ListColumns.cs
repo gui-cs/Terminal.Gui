@@ -16,16 +16,16 @@ namespace UICatalog.Scenarios {
 	public class ListColumns : Scenario {
 		TableView listColView;
 		DataTable currentTable;
-		private MenuItem miCellLines;
-		private MenuItem miExpandLastColumn;
-		private MenuItem miAlwaysUseNormalColorForVerticalCellLines;
-		private MenuItem miSmoothScrolling;
-		private MenuItem miAlternatingColors;
-		private MenuItem miCursor;
-		private MenuItem miTopline;
-		private MenuItem miBottomline;
-		private MenuItem miOrientVertical;
-		private MenuItem miScrollParallel;
+		private MenuItem _miCellLines;
+		private MenuItem _miExpandLastColumn;
+		private MenuItem _miAlwaysUseNormalColorForVerticalCellLines;
+		private MenuItem _miSmoothScrolling;
+		private MenuItem _miAlternatingColors;
+		private MenuItem _miCursor;
+		private MenuItem _miTopline;
+		private MenuItem _miBottomline;
+		private MenuItem _miOrientVertical;
+		private MenuItem _miScrollParallel;
 
 		ColorScheme alternatingColorScheme;
 
@@ -53,24 +53,25 @@ namespace UICatalog.Scenarios {
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("Open_ListExample", "", () => OpenSimpleList (true)),
+					new MenuItem ("Open_BigListExample", "", () => OpenSimpleList (true)),
+					new MenuItem ("Open_SmListExample", "", () => OpenSimpleList (false)),
 					new MenuItem ("_CloseExample", "", () => CloseExample ()),
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
 				new MenuBarItem ("_View", new MenuItem [] {
-					miTopline = new MenuItem ("_TopLine", "", () => ToggleTopline ()) { Checked = listColView.Style.ShowHorizontalHeaderOverline, CheckType = MenuItemCheckStyle.Checked },
-					miBottomline = new MenuItem ("_BottomLine", "", () => ToggleBottomline ()) { Checked = listColView.Style.ShowHorizontalBottomline, CheckType = MenuItemCheckStyle.Checked },
-					miCellLines = new MenuItem ("_CellLines", "", () => ToggleCellLines ()) { Checked = listColView.Style.ShowVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
-					miExpandLastColumn = new MenuItem ("_ExpandLastColumn", "", () => ToggleExpandLastColumn ()) { Checked = listColView.Style.ExpandLastColumn, CheckType = MenuItemCheckStyle.Checked },
-					miAlwaysUseNormalColorForVerticalCellLines = new MenuItem ("_AlwaysUseNormalColorForVerticalCellLines", "", () => ToggleAlwaysUseNormalColorForVerticalCellLines ()) { Checked = listColView.Style.AlwaysUseNormalColorForVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
-					miSmoothScrolling = new MenuItem ("_SmoothHorizontalScrolling", "", () => ToggleSmoothScrolling ()) { Checked = listColView.Style.SmoothHorizontalScrolling, CheckType = MenuItemCheckStyle.Checked },
-					miAlternatingColors = new MenuItem ("Alternating Colors", "", () => ToggleAlternatingColors ()) { CheckType = MenuItemCheckStyle.Checked},
-					miCursor = new MenuItem ("Invert Selected Cell First Character", "", () => ToggleInvertSelectedCellFirstCharacter ()) { Checked = listColView.Style.InvertSelectedCellFirstCharacter,CheckType = MenuItemCheckStyle.Checked},
+					_miTopline = new MenuItem ("_TopLine", "", () => ToggleTopline ()) { Checked = listColView.Style.ShowHorizontalHeaderOverline, CheckType = MenuItemCheckStyle.Checked },
+					_miBottomline = new MenuItem ("_BottomLine", "", () => ToggleBottomline ()) { Checked = listColView.Style.ShowHorizontalBottomline, CheckType = MenuItemCheckStyle.Checked },
+					_miCellLines = new MenuItem ("_CellLines", "", () => ToggleCellLines ()) { Checked = listColView.Style.ShowVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
+					_miExpandLastColumn = new MenuItem ("_ExpandLastColumn", "", () => ToggleExpandLastColumn ()) { Checked = listColView.Style.ExpandLastColumn, CheckType = MenuItemCheckStyle.Checked },
+					_miAlwaysUseNormalColorForVerticalCellLines = new MenuItem ("_AlwaysUseNormalColorForVerticalCellLines", "", () => ToggleAlwaysUseNormalColorForVerticalCellLines ()) { Checked = listColView.Style.AlwaysUseNormalColorForVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
+					_miSmoothScrolling = new MenuItem ("_SmoothHorizontalScrolling", "", () => ToggleSmoothScrolling ()) { Checked = listColView.Style.SmoothHorizontalScrolling, CheckType = MenuItemCheckStyle.Checked },
+					_miAlternatingColors = new MenuItem ("Alternating Colors", "", () => ToggleAlternatingColors ()) { CheckType = MenuItemCheckStyle.Checked},
+					_miCursor = new MenuItem ("Invert Selected Cell First Character", "", () => ToggleInvertSelectedCellFirstCharacter ()) { Checked = listColView.Style.InvertSelectedCellFirstCharacter,CheckType = MenuItemCheckStyle.Checked},
 				}),
 				new MenuBarItem ("_List", new MenuItem [] {
 					//new MenuItem ("_Hide Headers", "", HideHeaders),
-					miOrientVertical = new MenuItem ("_OrientVertical", "", () => ToggleVerticalOrientation ()) { Checked = listColStyle.VerticalOrientation, CheckType = MenuItemCheckStyle.Checked },
-					miScrollParallel = new MenuItem ("_ScrollParallel", "", () => ToggleScrollParallel ()) { Checked = listColStyle.ScrollParallel, CheckType = MenuItemCheckStyle.Checked },
+					_miOrientVertical = new MenuItem ("_OrientVertical", "", () => ToggleVerticalOrientation ()) { Checked = listColStyle.Orientation == Orientation.Vertical, CheckType = MenuItemCheckStyle.Checked },
+					_miScrollParallel = new MenuItem ("_ScrollParallel", "", () => ToggleScrollParallel ()) { Checked = listColStyle.ScrollParallel, CheckType = MenuItemCheckStyle.Checked },
 					new MenuItem ("Set _Max Cell Width", "", SetListMaxWidth),
 					new MenuItem ("Set Mi_n Cell Width", "", SetListMinWidth),
 				}),
@@ -79,8 +80,9 @@ namespace UICatalog.Scenarios {
 			Application.Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.F2, "~F2~ OpenListExample", () => OpenSimpleList (true)),
+				new StatusItem(Key.F2, "~F2~ OpenBigListEx", () => OpenSimpleList (true)),
 				new StatusItem(Key.F3, "~F3~ CloseExample", () => CloseExample ()),
+				new StatusItem(Key.F4, "~F4~ OpenSmListEx", () => OpenSimpleList (false)),
 				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 			});
 			Application.Top.Add (statusBar);
@@ -122,31 +124,31 @@ namespace UICatalog.Scenarios {
 
 		private void SetupScrollBar ()
 		{
-			var _scrollBar = new ScrollBarView (listColView, true); // (listColView, true, true);
+			var scrollBar = new ScrollBarView (listColView, true); // (listColView, true, true);
 
-			_scrollBar.ChangedPosition += (s, e) => {
-				listColView.RowOffset = _scrollBar.Position;
-				if (listColView.RowOffset != _scrollBar.Position) {
-					_scrollBar.Position = listColView.RowOffset;
+			scrollBar.ChangedPosition += (s, e) => {
+				listColView.RowOffset = scrollBar.Position;
+				if (listColView.RowOffset != scrollBar.Position) {
+					scrollBar.Position = listColView.RowOffset;
 				}
 				listColView.SetNeedsDisplay ();
 			};
 			/*
-			_scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
-				listColView.ColumnOffset = _scrollBar.OtherScrollBarView.Position;
-				if (listColView.ColumnOffset != _scrollBar.OtherScrollBarView.Position) {
-					_scrollBar.OtherScrollBarView.Position = listColView.ColumnOffset;
+			scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
+				listColView.ColumnOffset = scrollBar.OtherScrollBarView.Position;
+				if (listColView.ColumnOffset != scrollBar.OtherScrollBarView.Position) {
+					scrollBar.OtherScrollBarView.Position = listColView.ColumnOffset;
 				}
 				listColView.SetNeedsDisplay ();
 			};
 			*/
 
 			listColView.DrawContent += (s, e) => {
-				_scrollBar.Size = listColView.Table?.Rows ?? 0;
-				_scrollBar.Position = listColView.RowOffset;
-				//_scrollBar.OtherScrollBarView.Size = listColView.Table?.Columns - 1 ?? 0;
-				//_scrollBar.OtherScrollBarView.Position = listColView.ColumnOffset;
-				_scrollBar.Refresh ();
+				scrollBar.Size = listColView.Table?.Rows ?? 0;
+				scrollBar.Position = listColView.RowOffset;
+				//scrollBar.OtherScrollBarView.Size = listColView.Table?.Columns - 1 ?? 0;
+				//scrollBar.OtherScrollBarView.Position = listColView.ColumnOffset;
+				scrollBar.Refresh ();
 			};
 
 		}
@@ -168,20 +170,20 @@ namespace UICatalog.Scenarios {
 
 		private void ToggleTopline ()
 		{
-			miTopline.Checked = !miTopline.Checked;
-			listColView.Style.ShowHorizontalHeaderOverline = (bool)miTopline.Checked;
+			_miTopline.Checked = !_miTopline.Checked;
+			listColView.Style.ShowHorizontalHeaderOverline = (bool)_miTopline.Checked;
 			listColView.Update ();
 		}
 		private void ToggleBottomline ()
 		{
-			miBottomline.Checked = !miBottomline.Checked;
-			listColView.Style.ShowHorizontalBottomline = (bool)miBottomline.Checked;
+			_miBottomline.Checked = !_miBottomline.Checked;
+			listColView.Style.ShowHorizontalBottomline = (bool)_miBottomline.Checked;
 			listColView.Update ();
 		}
 		private void ToggleExpandLastColumn ()
 		{
-			miExpandLastColumn.Checked = !miExpandLastColumn.Checked;
-			listColView.Style.ExpandLastColumn = (bool)miExpandLastColumn.Checked;
+			_miExpandLastColumn.Checked = !_miExpandLastColumn.Checked;
+			listColView.Style.ExpandLastColumn = (bool)_miExpandLastColumn.Checked;
 
 			listColView.Update ();
 
@@ -189,31 +191,31 @@ namespace UICatalog.Scenarios {
 
 		private void ToggleAlwaysUseNormalColorForVerticalCellLines ()
 		{
-			miAlwaysUseNormalColorForVerticalCellLines.Checked = !miAlwaysUseNormalColorForVerticalCellLines.Checked;
-			listColView.Style.AlwaysUseNormalColorForVerticalCellLines = (bool)miAlwaysUseNormalColorForVerticalCellLines.Checked;
+			_miAlwaysUseNormalColorForVerticalCellLines.Checked = !_miAlwaysUseNormalColorForVerticalCellLines.Checked;
+			listColView.Style.AlwaysUseNormalColorForVerticalCellLines = (bool)_miAlwaysUseNormalColorForVerticalCellLines.Checked;
 
 			listColView.Update ();
 		}
 		private void ToggleSmoothScrolling ()
 		{
-			miSmoothScrolling.Checked = !miSmoothScrolling.Checked;
-			listColView.Style.SmoothHorizontalScrolling = (bool)miSmoothScrolling.Checked;
+			_miSmoothScrolling.Checked = !_miSmoothScrolling.Checked;
+			listColView.Style.SmoothHorizontalScrolling = (bool)_miSmoothScrolling.Checked;
 
 			listColView.Update ();
 
 		}
 		private void ToggleCellLines ()
 		{
-			miCellLines.Checked = !miCellLines.Checked;
-			listColView.Style.ShowVerticalCellLines = (bool)miCellLines.Checked;
+			_miCellLines.Checked = !_miCellLines.Checked;
+			listColView.Style.ShowVerticalCellLines = (bool)_miCellLines.Checked;
 			listColView.Update ();
 		}
 		private void ToggleAlternatingColors ()
 		{
 			//toggle menu item
-			miAlternatingColors.Checked = !miAlternatingColors.Checked;
+			_miAlternatingColors.Checked = !_miAlternatingColors.Checked;
 
-			if (miAlternatingColors.Checked == true) {
+			if (_miAlternatingColors.Checked == true) {
 				listColView.Style.RowColorGetter = (a) => { return a.RowIndex % 2 == 0 ? alternatingColorScheme : null; };
 			} else {
 				listColView.Style.RowColorGetter = null;
@@ -224,25 +226,25 @@ namespace UICatalog.Scenarios {
 		private void ToggleInvertSelectedCellFirstCharacter ()
 		{
 			//toggle menu item
-			miCursor.Checked = !miCursor.Checked;
-			listColView.Style.InvertSelectedCellFirstCharacter = (bool)miCursor.Checked;
+			_miCursor.Checked = !_miCursor.Checked;
+			listColView.Style.InvertSelectedCellFirstCharacter = (bool)_miCursor.Checked;
 			listColView.SetNeedsDisplay ();
 		}
 
 		private void ToggleVerticalOrientation ()
 		{
-			miOrientVertical.Checked = !miOrientVertical.Checked;
+			_miOrientVertical.Checked = !_miOrientVertical.Checked;
 			if ((ListTableSource)listColView.Table != null) {
-				((ListTableSource)listColView.Table).Style.VerticalOrientation = (bool)miOrientVertical.Checked;
+				((ListTableSource)listColView.Table).Style.Orientation = (bool)_miOrientVertical.Checked ? Orientation.Vertical : Orientation.Horizontal;
 				listColView.SetNeedsDisplay ();
 			}
 		}
 
 		private void ToggleScrollParallel ()
 		{
-			miScrollParallel.Checked = !miScrollParallel.Checked;
+			_miScrollParallel.Checked = !_miScrollParallel.Checked;
 			if ((ListTableSource)listColView.Table != null) {
-				((ListTableSource)listColView.Table).Style.ScrollParallel = (bool)miScrollParallel.Checked;
+				((ListTableSource)listColView.Table).Style.ScrollParallel = (bool)_miScrollParallel.Checked;
 				listColView.SetNeedsDisplay ();
 			}
 		}
@@ -302,7 +304,7 @@ namespace UICatalog.Scenarios {
 
 		private void OpenSimpleList (bool big)
 		{
-			SetTable (BuildSimpleList (big ? 1023 : 20));
+			SetTable (BuildSimpleList (big ? 1023 : 31));
 		}
 
 		private void SetTable (IList list)
