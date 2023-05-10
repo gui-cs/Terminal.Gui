@@ -122,6 +122,11 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// The minimum number of characters to render in any given column.
+		/// </summary>
+		public int MinCellWidth { get; set; }
+
+		/// <summary>
 		/// The maximum number of characters to render in any given column.  This prevents one long column from pushing out all the others
 		/// </summary>
 		public int MaxCellWidth { get; set; } = DefaultMaxCellWidth;
@@ -145,6 +150,11 @@ namespace Terminal.Gui {
 		/// This event is raised when a cell is activated e.g. by double clicking or pressing <see cref="CellActivationKey"/>
 		/// </summary>
 		public event EventHandler<CellActivatedEventArgs> CellActivated;
+
+		/// <summary>
+		/// This event is raised when a cell is toggled (see <see cref="Command.ToggleChecked"/>
+		/// </summary>
+		public event EventHandler<CellToggledEventArgs> CellToggled;
 
 		/// <summary>
 		/// The key which when pressed should trigger <see cref="CellActivated"/> event.  Defaults to Enter.
@@ -329,7 +339,7 @@ namespace Terminal.Gui {
 		/// Returns the amount of vertical space currently occupied by the header or 0 if it is not visible.
 		/// </summary>
 		/// <returns></returns>
-		private int GetHeaderHeightIfAny ()
+		internal int GetHeaderHeightIfAny ()
 		{
 			return ShouldRenderHeaders () ? GetHeaderHeight () : 0;
 		}
@@ -338,7 +348,7 @@ namespace Terminal.Gui {
 		/// Returns the amount of vertical space required to display the header
 		/// </summary>
 		/// <returns></returns>
-		private int GetHeaderHeight ()
+		internal int GetHeaderHeight ()
 		{
 			int heightRequired = Style.ShowHeaders ? 1 : 0;
 
@@ -1041,6 +1051,13 @@ namespace Terminal.Gui {
 
 		private void ToggleCurrentCellSelection ()
 		{
+
+			var e = new CellToggledEventArgs (Table, selectedColumn, selectedRow);
+			OnCellToggled (e);
+			if (e.Cancel) {
+				return;
+			}
+
 			if (!MultiSelect) {
 				return;
 			}
@@ -1573,6 +1590,14 @@ namespace Terminal.Gui {
 		{
 			CellActivated?.Invoke (this, args);
 		}
+		/// <summary>
+		/// Invokes the <see cref="CellToggled"/> event
+		/// </summary>
+		/// <param name="args"></param>
+		protected virtual void OnCellToggled(CellToggledEventArgs args)
+		{
+			CellToggled?.Invoke (this, args);
+		}
 
 		/// <summary>
 		/// Calculates which columns should be rendered given the <paramref name="bounds"/> in which to display and the <see cref="ColumnOffset"/>
@@ -1618,6 +1643,14 @@ namespace Terminal.Gui {
 
 				// is there enough space for this column (and it's data)?
 				colWidth = CalculateMaxCellWidth (col, rowsToRender, colStyle) + padding;
+
+				if (MinCellWidth > 0 && colWidth < (MinCellWidth + padding)) {
+					if (MinCellWidth > MaxCellWidth) {
+						colWidth = MaxCellWidth + padding;
+					} else {
+						colWidth = MinCellWidth + padding;
+					}
+				}
 
 				// there is not enough space for this columns 
 				// visible content
