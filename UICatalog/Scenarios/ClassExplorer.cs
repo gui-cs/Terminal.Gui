@@ -83,9 +83,28 @@ namespace UICatalog.Scenarios {
 
 			_treeView = new TreeView<object> () {
 				X = 0,
-				Y = 0,
+				Y = 1,
 				Width = Dim.Percent (50),
 				Height = Dim.Fill (),
+			};
+
+			var lblSearch = new Label("Search");
+			var tfSearch = new TextField(){
+				Width = 20,
+				X = Pos.Right(lblSearch),
+			};
+
+			Win.Add(lblSearch);
+			Win.Add(tfSearch);
+
+			var filter = new TreeViewTextFilter<object>(_treeView);
+			_treeView.Filter = filter;
+			tfSearch.TextChanged += (s,e)=>{
+				filter.Text = tfSearch.Text.ToString();
+				if(_treeView.SelectedObject != null)
+				{
+					_treeView.EnsureVisible(_treeView.SelectedObject);
+				}
 			};
 
 			_treeView.AddObjects (AppDomain.CurrentDomain.GetAssemblies ());
