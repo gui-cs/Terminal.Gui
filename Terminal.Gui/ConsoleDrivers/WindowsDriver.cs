@@ -9,9 +9,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Buffers;
-using System.ComponentModel.Design.Serialization;
-using Unix.Terminal;
 
 namespace Terminal.Gui;
 
@@ -1561,7 +1558,7 @@ internal class WindowsDriver : ConsoleDriver {
 			// ESC [ ? 1048 l  Restore cursor position
 			// ESC [ ? 1049 h  Save cursor position and activate xterm alternative buffer (no backscroll)
 			// ESC [ ? 1049 l  Restore cursor position and restore xterm working buffer (with backscroll)
-			// Per Issue #2264 using the alterantive screen buffer is required for Windows Terminal to not 
+			// Per Issue #2264 using the alternative screen buffer is required for Windows Terminal to not 
 			// wipe out the backscroll buffer when the application exits.
 			Console.Out.Write ("\x1b[?1047h");
 
@@ -1606,6 +1603,7 @@ internal class WindowsDriver : ConsoleDriver {
 			// If n is 3, clear entire screen and delete all lines saved in the scrollback buffer
 			// DO NOT USE 3J - even with the alternate screen buffer, it clears the entire scrollback buffer
 			Console.Out.Write ("\x1b[3J");
+			//Console.Out.Write ("\x1b[0J");
 		}
 	}
 
