@@ -9,6 +9,8 @@ using System.Globalization;
 using Xunit.Abstractions;
 using System.Reflection;
 using Terminal.Gui.ViewTests;
+using System.Collections;
+using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui.ViewsTests {
 
@@ -1930,6 +1932,42 @@ namespace Terminal.Gui.ViewsTests {
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
+			tableView.Bounds = new Rect (0, 0, 25, 5);
+
+			// revert style change
+			style.MinAcceptableWidth = TableView.DefaultMinAcceptableWidth;
+
+			// Now let's test the global MaxCellWidth and MinCellWidth
+			tableView.Style.ExpandLastColumn = false;
+			tableView.MaxCellWidth = 10;
+			tableView.MinCellWidth = 3;
+
+			tableView.LayoutSubviews ();
+			tableView.Draw ();
+			expected =
+@"
+│A  │B  │Very Long │    │
+├───┼───┼──────────┼────┤
+│1  │2  │aaaaaaaaaa│    │
+│1  │2  │aaa       │    │
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// MaxCellWidth limits MinCellWidth
+			tableView.MaxCellWidth = 5;
+			tableView.MinCellWidth = 10;
+
+			tableView.LayoutSubviews ();
+			tableView.Draw ();
+			expected =
+@"
+│A    │B    │Very │     │
+├─────┼─────┼─────┼─────┤
+│1    │2    │aaaaa│     │
+│1    │2    │aaa  │     │
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
 			Application.Shutdown ();
 		}
 
@@ -2487,6 +2525,95 @@ A B C
 			// after last row
 			Assert.Null (tableView.ScreenToCell (3, 4, out col));
 			Assert.Null (col);
+		}
+
+		/// <summary>
+		/// Builds a simple list with the requested number of string items
+		/// </summary>
+		/// <param name="items"></param>
+		/// <returns></returns>
+		public static IList BuildList (int items)
+		{
+			var list = new List<string> ();
+			for (int i = 0; i < items; i++) {
+				list.Add ("Item " + i);
+			}
+			return list.ToArray ();
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (new object [] { Orientation.Horizontal, false })]
+		[InlineData (new object [] { Orientation.Vertical, false })]
+		[InlineData (new object [] { Orientation.Horizontal, true })]
+		[InlineData (new object [] { Orientation.Vertical, true })]
+		public void TestListTableSource (Orientation orient, bool parallel)
+		{
+			var list = BuildList (16);
+
+			var tv = new TableView ();
+			//tv.BeginInit (); tv.EndInit ();
+			tv.ColorScheme = Colors.TopLevel;
+			tv.Bounds = new Rect (0, 0, 25, 4);
+			tv.Style = new () {
+				ShowHeaders = false,
+				ShowHorizontalHeaderOverline = false,
+				ShowHorizontalHeaderUnderline = false
+			};
+			var listStyle = new ListTableSource.ListColumnStyle () {
+				Orientation = orient,
+				ScrollParallel = parallel
+			};
+
+			tv.Table = new ListTableSource (list, tv, listStyle);
+
+			tv.LayoutSubviews ();
+
+			tv.Draw ();
+
+			string horizPerpExpected =
+				@"
+│Item 0│Item 1          │
+│Item 2│Item 3          │
+│Item 4│Item 5          │
+│Item 6│Item 7          │";
+
+			string horizParaExpected =
+				@"
+│Item 0 │Item 1 │Item 2 │
+│Item 4 │Item 5 │Item 6 │
+│Item 8 │Item 9 │Item 10│
+│Item 12│Item 13│Item 14│";
+
+			string vertPerpExpected =
+				@"
+│Item 0│Item 4│Item 8   │
+│Item 1│Item 5│Item 9   │
+│Item 2│Item 6│Item 10  │
+│Item 3│Item 7│Item 11  │";
+
+			string vertParaExpected =
+				@"
+│Item 0│Item 8          │
+│Item 1│Item 9          │
+│Item 2│Item 10         │
+│Item 3│Item 11         │";
+
+			string expected;
+			if (orient == Orientation.Vertical)
+				if (parallel) {
+					expected = vertParaExpected;
+				} else {
+					expected = vertPerpExpected;
+				}
+			else {
+				if (parallel) {
+					expected = horizParaExpected;
+				} else {
+					expected = horizPerpExpected;
+				}
+			}
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
 		}
 
 		[Fact, AutoInitShutdown]
