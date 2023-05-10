@@ -2288,6 +2288,446 @@ namespace Terminal.Gui.ViewsTests {
 
 			TestHelpers.AssertDriverColorsAre (expected, normal, focus);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void TestTableViewCheckboxes_Simple()
+		{
+
+			var tv = GetTwoRowSixColumnTable (out var dt);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			tv.LayoutSubviews ();
+
+			var wrapper = new CheckBoxTableSourceWrapperByIndex (tv, tv.Table);
+			tv.Table = wrapper;
+
+
+			tv.Draw ();
+
+			string expected =
+				@"
+│ │A│B│
+├─┼─┼─►
+│╴│1│2│
+│╴│1│2│
+│╴│1│2│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			Assert.Empty (wrapper.CheckedRows);
+
+			//toggle the top cell
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+			Assert.Single (wrapper.CheckedRows, 0);
+
+			tv.Draw();
+
+			expected =
+				@"
+│ │A│B│
+├─┼─┼─►
+│√│1│2│
+│╴│1│2│
+│╴│1│2│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			tv.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()));
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+
+			Assert.Contains (0,wrapper.CheckedRows);
+			Assert.Contains (1,wrapper.CheckedRows);
+			Assert.Equal (2, wrapper.CheckedRows.Count);
+
+
+			tv.Draw();
+
+			expected =
+				@"
+│ │A│B│
+├─┼─┼─►
+│√│1│2│
+│√│1│2│
+│╴│1│2│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// untoggle top one
+			tv.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+			Assert.Single (wrapper.CheckedRows, 1);
+
+			tv.Draw();
+
+			expected =
+				@"
+│ │A│B│
+├─┼─┼─►
+│╴│1│2│
+│√│1│2│
+│╴│1│2│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestTableViewCheckboxes_SelectAllToggle ()
+		{
+
+			var tv = GetTwoRowSixColumnTable (out var dt);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			tv.LayoutSubviews ();
+
+			var wrapper = new CheckBoxTableSourceWrapperByIndex (tv, tv.Table);
+			tv.Table = wrapper;
+
+			//toggle all cells
+			tv.ProcessKey (new KeyEvent (Key.A | Key.CtrlMask, new KeyModifiers { Ctrl = true }));
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+			tv.Draw();
+
+			string expected =
+				@"
+│ │A│B│
+├─┼─┼─►
+│√│1│2│
+│√│1│2│
+│√│1│2│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+			Assert.Contains (0, wrapper.CheckedRows);
+			Assert.Contains (1, wrapper.CheckedRows);
+			Assert.Contains (2, wrapper.CheckedRows);
+			Assert.Equal (3, wrapper.CheckedRows.Count);
+
+			// Untoggle all again
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+			tv.Draw();
+
+			expected =
+				@"
+│ │A│B│
+├─┼─┼─►
+│╴│1│2│
+│╴│1│2│
+│╴│1│2│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			Assert.Empty (wrapper.CheckedRows);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestTableViewCheckboxes_MultiSelectIsUnion_WhenToggling ()
+		{
+			var tv = GetTwoRowSixColumnTable (out var dt);
+			dt.Rows.Add (1, 2, 3, 4, 5, 6);
+			tv.LayoutSubviews ();
+
+			var wrapper = new CheckBoxTableSourceWrapperByIndex (tv, tv.Table);
+			tv.Table = wrapper;
+			wrapper.CheckedRows.Add (0);
+			wrapper.CheckedRows.Add (2);
+
+			tv.Draw();
+
+			string expected =
+				@"
+│ │A│B│
+├─┼─┼─►
+│√│1│2│
+│╴│1│2│
+│√│1│2│";
+			//toggle top two at once
+			tv.ProcessKey (new KeyEvent (Key.CursorDown | Key.ShiftMask, new KeyModifiers { Shift = true }));
+			Assert.True (tv.IsSelected (0, 0));
+			Assert.True (tv.IsSelected (0, 1));
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+			// Because at least 1 of the rows is not yet ticked we toggle them all to ticked
+			TestHelpers.AssertDriverContentsAre (expected, output);
+			Assert.Contains (0, wrapper.CheckedRows);
+			Assert.Contains (1, wrapper.CheckedRows);
+			Assert.Contains (2, wrapper.CheckedRows);
+			Assert.Equal (3, wrapper.CheckedRows.Count);
+
+			tv.Draw();
+
+			expected =
+				@"
+│ │A│B│
+├─┼─┼─►
+│√│1│2│
+│√│1│2│
+│√│1│2│";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// Untoggle the top 2
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+			tv.Draw();
+
+			expected =
+				@"
+│ │A│B│
+├─┼─┼─►
+│╴│1│2│
+│╴│1│2│
+│√│1│2│";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+			Assert.Single (wrapper.CheckedRows, 2);
+		}
+
+
+		[Fact, AutoInitShutdown]
+		public void TestTableViewCheckboxes_ByObject ()
+		{
+			var tv = GetPetTable (out var source);
+			tv.LayoutSubviews ();
+			var pets = source.Data;
+
+			var wrapper = new CheckBoxTableSourceWrapperByObject<PickablePet>(
+				tv,
+				source,
+				(p)=>p.IsPicked,
+				(p,b)=>p.IsPicked = b);
+
+			tv.Table = wrapper;
+
+			tv.Draw();
+
+			string expected =
+				@"
+┌─┬───────┬─────────────┐
+│ │Name   │Kind         │
+├─┼───────┼─────────────┤
+│╴│Tammy  │Cat          │
+│╴│Tibbles│Cat          │
+│╴│Ripper │Dog          │";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			Assert.Empty (pets.Where(p=>p.IsPicked));
+
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+			
+			Assert.True (pets.First ().IsPicked);
+
+			tv.Draw();
+
+			expected =
+				@"
+┌─┬───────┬─────────────┐
+│ │Name   │Kind         │
+├─┼───────┼─────────────┤
+│√│Tammy  │Cat          │
+│╴│Tibbles│Cat          │
+│╴│Ripper │Dog          │";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			tv.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()));
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+			Assert.True (pets.ElementAt(0).IsPicked);
+			Assert.True (pets.ElementAt (1).IsPicked);
+			Assert.False (pets.ElementAt (2).IsPicked);
+
+			tv.Draw();
+
+			expected =
+				@"
+┌─┬───────┬─────────────┐
+│ │Name   │Kind         │
+├─┼───────┼─────────────┤
+│√│Tammy  │Cat          │
+│√│Tibbles│Cat          │
+│╴│Ripper │Dog          │";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			tv.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+
+			Assert.False (pets.ElementAt (0).IsPicked);
+			Assert.True (pets.ElementAt (1).IsPicked);
+			Assert.False (pets.ElementAt (2).IsPicked);
+
+			tv.Draw();
+
+			expected =
+				@"
+┌─┬───────┬─────────────┐
+│ │Name   │Kind         │
+├─┼───────┼─────────────┤
+│╴│Tammy  │Cat          │
+│√│Tibbles│Cat          │
+│╴│Ripper │Dog          │";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestTableViewCheckboxes_SelectAllToggle_ByObject ()
+		{
+
+			var tv = GetPetTable (out var source);
+			tv.LayoutSubviews ();
+			var pets = source.Data;
+
+			var wrapper = new CheckBoxTableSourceWrapperByObject<PickablePet> (
+				tv,
+				source,
+				(p) => p.IsPicked,
+				(p, b) => p.IsPicked = b);
+
+			tv.Table = wrapper;
+
+
+			Assert.DoesNotContain (pets, p => p.IsPicked);
+
+			//toggle all cells
+			tv.ProcessKey (new KeyEvent (Key.A | Key.CtrlMask, new KeyModifiers { Ctrl = true }));
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+			Assert.True (pets.All (p => p.IsPicked));
+
+			tv.Draw();
+
+			string expected =
+				@"
+┌─┬───────┬─────────────┐
+│ │Name   │Kind         │
+├─┼───────┼─────────────┤
+│√│Tammy  │Cat          │
+│√│Tibbles│Cat          │
+│√│Ripper │Dog          │";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+			Assert.Empty (pets.Where (p => p.IsPicked));
+
+			tv.Draw();
+
+			expected =
+				@"
+┌─┬───────┬─────────────┐
+│ │Name   │Kind         │
+├─┼───────┼─────────────┤
+│╴│Tammy  │Cat          │
+│╴│Tibbles│Cat          │
+│╴│Ripper │Dog          │
+";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestTableViewRadioBoxes_Simple_ByObject ()
+		{
+
+			var tv = GetPetTable (out var source);
+			tv.LayoutSubviews ();
+			var pets = source.Data;
+
+			var wrapper = new CheckBoxTableSourceWrapperByObject<PickablePet> (
+				tv,
+				source,
+				(p) => p.IsPicked,
+				(p, b) => p.IsPicked = b);
+
+			wrapper.UseRadioButtons = true;
+
+			tv.Table = wrapper;
+			tv.Draw();
+
+			string expected =
+				@"
+┌─┬───────┬─────────────┐
+│ │Name   │Kind         │
+├─┼───────┼─────────────┤
+│◌│Tammy  │Cat          │
+│◌│Tibbles│Cat          │
+│◌│Ripper │Dog          │
+";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			Assert.Empty (pets.Where (p => p.IsPicked));
+
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+			Assert.True (pets.First ().IsPicked);
+
+			tv.Draw();
+
+			expected =
+				@"
+┌─┬───────┬─────────────┐
+│ │Name   │Kind         │
+├─┼───────┼─────────────┤
+│●│Tammy  │Cat          │
+│◌│Tibbles│Cat          │
+│◌│Ripper │Dog          │";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			tv.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()));
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+			Assert.False (pets.ElementAt (0).IsPicked);
+			Assert.True (pets.ElementAt (1).IsPicked);
+			Assert.False (pets.ElementAt (2).IsPicked);
+
+			tv.Draw();
+
+			expected =
+				@"
+┌─┬───────┬─────────────┐
+│ │Name   │Kind         │
+├─┼───────┼─────────────┤
+│◌│Tammy  │Cat          │
+│●│Tibbles│Cat          │
+│◌│Ripper │Dog          │";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+
+			tv.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
+			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+
+
+			Assert.True (pets.ElementAt (0).IsPicked);
+			Assert.False (pets.ElementAt (1).IsPicked);
+			Assert.False (pets.ElementAt (2).IsPicked);
+
+			tv.Draw();
+
+			expected =
+				@"
+┌─┬───────┬─────────────┐
+│ │Name   │Kind         │
+├─┼───────┼─────────────┤
+│●│Tammy  │Cat          │
+│◌│Tibbles│Cat          │
+│◌│Ripper │Dog          │";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+
 		[Fact, AutoInitShutdown]
 		public void TestFullRowSelect_SelectionColorDoesNotStop_WhenShowVerticalCellLinesIsFalse ()
 		{
@@ -2763,5 +3203,43 @@ A B C
 			tableView.Table = new DataTableSource (dt);
 			return tableView;
 		}
+
+
+		private class PickablePet {
+			public bool IsPicked { get; set; }
+			public string Name{ get; set; }
+			public string Kind { get; set; }
+
+			public PickablePet (bool isPicked, string name, string kind)
+			{
+				IsPicked = isPicked;
+				Name = name;
+				Kind = kind;
+			}
+		}
+
+		private TableView GetPetTable (out EnumerableTableSource<PickablePet> source)
+		{
+			var tv = new TableView ();
+			tv.ColorScheme = Colors.TopLevel;
+			tv.Bounds = new Rect (0, 0, 25, 6);
+
+			var pets = new List<PickablePet> {
+				new PickablePet(false,"Tammy","Cat"),
+				new PickablePet(false,"Tibbles","Cat"),
+				new PickablePet(false,"Ripper","Dog")};
+
+			tv.Table = source = new EnumerableTableSource<PickablePet> (
+				pets,
+				new () {
+					{ "Name", (p) => p.Name},
+					{ "Kind", (p) => p.Kind},
+				});
+
+			tv.LayoutSubviews ();
+
+			return tv;
+		}
+
 	}
 }
