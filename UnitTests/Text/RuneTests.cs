@@ -52,7 +52,7 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal (0, e.ColumnWidth ());
 			string join = "\u1104\u1161";
 			Assert.Equal ("따", join);
-			Assert.Equal (2, join.EnumerateRunes().Sum (x => x.ColumnWidth ()));
+			Assert.Equal (2, join.EnumerateRunes ().Sum (x => x.ColumnWidth ()));
 			Assert.Equal (OperationStatus.Done, Rune.DecodeFromUtf16 (join.ToCharArray (), out Rune result, out int charsConsumed));
 			Assert.False (join.DecodeSurrogatePair (out char [] spair));
 			Assert.Equal (2, join.RuneCount ());
@@ -62,7 +62,7 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal (3, e.Utf8SequenceLength);
 			string joinNormalize = join.Normalize ();
 			Assert.Equal ("따", joinNormalize);
-			Assert.Equal (2, joinNormalize.EnumerateRunes().Sum (x => x.ColumnWidth ()));
+			Assert.Equal (2, joinNormalize.EnumerateRunes ().Sum (x => x.ColumnWidth ()));
 			Assert.Equal (OperationStatus.Done, Rune.DecodeFromUtf16 (joinNormalize.ToCharArray (), out result, out charsConsumed));
 			Assert.False (joinNormalize.DecodeSurrogatePair (out spair));
 			Assert.Equal (1, joinNormalize.RuneCount ());
@@ -196,37 +196,37 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal ('\u1100', (uint)rune.Value);
 			string str = "\u2615";
 			Assert.Equal ("☕", str);
-			Assert.Equal (2, str.EnumerateRunes().Sum(x => x.ColumnWidth()));
+			Assert.Equal (2, str.EnumerateRunes ().Sum (x => x.ColumnWidth ()));
 			Assert.Equal (2, str.ConsoleWidth ());
 			Assert.Equal (1, str.RuneCount ());
 			Assert.Equal (1, str.Length);
 			str = "\u2615\ufe0f"; // Identical but \ufe0f forces it to be rendered as a colorful image as compared to a monochrome text variant.
 			Assert.Equal ("☕️", str);
-			Assert.Equal (2, str.EnumerateRunes().Sum(x => x.ColumnWidth()));
+			Assert.Equal (2, str.EnumerateRunes ().Sum (x => x.ColumnWidth ()));
 			Assert.Equal (2, str.ConsoleWidth ());
 			Assert.Equal (2, str.RuneCount ());
 			Assert.Equal (2, str.Length);
 			str = "\u231a";
 			Assert.Equal ("⌚", str);
-			Assert.Equal (2, str.EnumerateRunes().Sum(x => x.ColumnWidth()));
+			Assert.Equal (2, str.EnumerateRunes ().Sum (x => x.ColumnWidth ()));
 			Assert.Equal (2, str.ConsoleWidth ());
 			Assert.Equal (1, str.RuneCount ());
 			Assert.Equal (1, str.Length);
 			str = "\u231b";
 			Assert.Equal ("⌛", str);
-			Assert.Equal (2, str.EnumerateRunes().Sum(x => x.ColumnWidth()));
+			Assert.Equal (2, str.EnumerateRunes ().Sum (x => x.ColumnWidth ()));
 			Assert.Equal (2, str.ConsoleWidth ());
 			Assert.Equal (1, str.RuneCount ());
 			Assert.Equal (1, str.Length);
 			str = "\u231c";
 			Assert.Equal ("⌜", str);
-			Assert.Equal (1, str.EnumerateRunes().Sum(x => x.ColumnWidth()));
+			Assert.Equal (1, str.EnumerateRunes ().Sum (x => x.ColumnWidth ()));
 			Assert.Equal (1, str.ConsoleWidth ());
 			Assert.Equal (1, str.RuneCount ());
 			Assert.Equal (1, str.Length);
 			str = "\u1dc0";
 			Assert.Equal ("᷀", str);
-			Assert.Equal (0, str.EnumerateRunes().Sum(x => x.ColumnWidth()));
+			Assert.Equal (0, str.EnumerateRunes ().Sum (x => x.ColumnWidth ()));
 			Assert.Equal (0, str.ConsoleWidth ());
 			Assert.Equal (1, str.RuneCount ());
 			Assert.Equal (1, str.Length);
@@ -530,7 +530,7 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal ("ô", f);
 			Assert.Equal (f, s);
 			Assert.Equal (1, f.ConsoleWidth ());
-			Assert.Equal (1, s.EnumerateRunes().Sum (c => c.ColumnWidth ()));
+			Assert.Equal (1, s.EnumerateRunes ().Sum (c => c.ColumnWidth ()));
 			Assert.Equal (2, s.Length);
 			(var rune, var size) = f.DecodeRune ();
 			Assert.Equal (rune, l);
@@ -548,7 +548,7 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal ("A̅", f);
 			Assert.Equal (f, s);
 			Assert.Equal (1, f.ConsoleWidth ());
-			Assert.Equal (1, s.EnumerateRunes().Sum(c => c.ColumnWidth()));
+			Assert.Equal (1, s.EnumerateRunes ().Sum (c => c.ColumnWidth ()));
 			Assert.Equal (2, s.Length);
 			(rune, size) = f.DecodeRune ();
 			Assert.Equal (rune, l);
@@ -566,7 +566,7 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal ("ä", f);
 			Assert.Equal (f, s);
 			Assert.Equal (1, f.ConsoleWidth ());
-			Assert.Equal (1, s.EnumerateRunes().Sum(c => c.ColumnWidth()));
+			Assert.Equal (1, s.EnumerateRunes ().Sum (c => c.ColumnWidth ()));
 			Assert.Equal (2, s.Length);
 			(rune, size) = f.DecodeRune ();
 			Assert.Equal (rune, l);
@@ -584,7 +584,7 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal ("伀〪", f); // Occupies 4 columns.
 			Assert.Equal (f, s);
 			Assert.Equal (4, f.ConsoleWidth ());
-			Assert.Equal (4, s.EnumerateRunes().Sum(c => c.ColumnWidth()));
+			Assert.Equal (4, s.EnumerateRunes ().Sum (c => c.ColumnWidth ()));
 			Assert.Equal (2, s.Length);
 			(rune, size) = f.DecodeRune ();
 			Assert.Equal (rune, l);
@@ -627,10 +627,10 @@ namespace Terminal.Gui.TextTests {
 					Assert.Equal (us, s);
 					if (r.ColumnWidth () < 0) {
 						Assert.NotEqual (r.ColumnWidth (), us.ConsoleWidth ());
-						Assert.NotEqual (s.EnumerateRunes().Sum (c => c.ColumnWidth ()), us.ConsoleWidth ());
+						Assert.NotEqual (s.EnumerateRunes ().Sum (c => c.ColumnWidth ()), us.ConsoleWidth ());
 					} else {
 						Assert.Equal (r.ColumnWidth (), us.ConsoleWidth ());
-						Assert.Equal (s.EnumerateRunes().Sum (c => c.ColumnWidth ()), us.ConsoleWidth ());
+						Assert.Equal (s.EnumerateRunes ().Sum (c => c.ColumnWidth ()), us.ConsoleWidth ());
 					}
 					Assert.Equal (us.RuneCount (), s.Length);
 				} else {
@@ -767,13 +767,31 @@ namespace Terminal.Gui.TextTests {
 			List<Rune> runes = new List<Rune> ();
 			int tSize = 0;
 			for (int i = 0; i < us.RuneCount (); i++) {
-				(Rune rune, int size) = us.Substring (i, 1).DecodeRune ();
+				(Rune rune, int size) = us.DecodeRune (i);
 				runes.Add (rune);
 				tSize += size;
 			}
 			string result = StringExtensions.Make (runes);
 			Assert.Equal ("Hello, 世界", result);
 			Assert.Equal (13, tSize);
+			Assert.Equal (11, result.ConsoleWidth ());
+		}
+
+		[Fact]
+		public void Test_DecodeRune_With_Surrogate_Pairs ()
+		{
+			string us = "Hello, 𝔹𝕆𝔹";
+			List<Rune> runes = new List<Rune> ();
+			int tSize = 0;
+			for (int i = 0; i < us.RuneCount (); i++) {
+				(Rune rune, int size) = us.DecodeRune (i);
+				runes.Add (rune);
+				tSize += size;
+			}
+			string result = StringExtensions.Make (runes);
+			Assert.Equal ("Hello, 𝔹𝕆𝔹", result);
+			Assert.Equal (19, tSize);
+			Assert.Equal (13, result.ConsoleWidth ());
 		}
 
 		[Fact]
@@ -783,13 +801,31 @@ namespace Terminal.Gui.TextTests {
 			List<Rune> runes = new List<Rune> ();
 			int tSize = 0;
 			for (int i = us.RuneCount () - 1; i >= 0; i--) {
-				(Rune rune, int size) = us.Substring (i, 1).DecodeLastRune ();
+				(Rune rune, int size) = us.DecodeLastRune (i);
 				runes.Add (rune);
 				tSize += size;
 			}
 			string result = StringExtensions.Make (runes);
 			Assert.Equal ("界世 ,olleH", result);
 			Assert.Equal (13, tSize);
+			Assert.Equal (11, result.ConsoleWidth ());
+		}
+
+		[Fact]
+		public void Test_DecodeLastRune_With_Surrogate_Pairs ()
+		{
+			string us = "Hello, 𝔹𝕆𝔹";
+			List<Rune> runes = new List<Rune> ();
+			int tSize = 0;
+			for (int i = us.RuneCount () - 1; i >= 0; i--) {
+				(Rune rune, int size) = us.DecodeLastRune (i);
+				runes.Add (rune);
+				tSize += size;
+			}
+			string result = StringExtensions.Make (runes);
+			Assert.Equal ("𝔹𝕆𝔹 ,olleH", result);
+			Assert.Equal (19, tSize);
+			Assert.Equal (13, result.ConsoleWidth ());
 		}
 
 		[Fact]
@@ -863,14 +899,14 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal (200, us.Length);
 			Assert.Equal (200, us.RuneCount ());
 			Assert.Equal (200, us.ConsoleWidth ());
-			int sumRuneWidth = us.EnumerateRunes().Sum (x => x.ColumnWidth ());
+			int sumRuneWidth = us.EnumerateRunes ().Sum (x => x.ColumnWidth ());
 			Assert.Equal (200, sumRuneWidth);
 
 			us = "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\n";
 			Assert.Equal (201, us.Length);
 			Assert.Equal (201, us.RuneCount ());
 			Assert.Equal (200, us.ConsoleWidth ());
-			sumRuneWidth = us.EnumerateRunes().Sum(x => x.ColumnWidth());
+			sumRuneWidth = us.EnumerateRunes ().Sum (x => x.ColumnWidth ());
 			Assert.Equal (199, sumRuneWidth);
 		}
 
