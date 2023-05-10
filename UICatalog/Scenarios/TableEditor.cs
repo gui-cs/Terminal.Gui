@@ -405,8 +405,8 @@ namespace UICatalog.Scenarios {
 		}
 		private void ToggleThruline ()
 		{
-			miHeaderThruline.Checked = !miHeaderThruline.Checked;
-			tableView.Style.ShowHorizontalHeaderThroughline = (bool)miHeaderThruline.Checked;
+			_miHeaderThruline.Checked = !_miHeaderThruline.Checked;
+			tableView.Style.ShowHorizontalHeaderThroughline = (bool)_miHeaderThruline.Checked;
 			tableView.Update ();
 		}
 		private void ToggleUnderline ()

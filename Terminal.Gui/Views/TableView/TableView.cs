@@ -304,10 +304,10 @@ namespace Terminal.Gui {
 				}
 			}
 			if (scrollLeftPoint != null) {
-				AddRuneAt (Driver, 0, scrollLeftPoint.Value.Y - 1, Driver.LeftArrow);
+				AddRuneAt (Driver, 0, scrollLeftPoint.Value.Y - 1, CM.Glyphs.LeftArrow);
 			}
 			if (scrollRightPoint != null) {
-				AddRuneAt (Driver, scrollRightPoint.Value.X, scrollRightPoint.Value.Y - 1, Driver.RightArrow);
+				AddRuneAt (Driver, scrollRightPoint.Value.X, scrollRightPoint.Value.Y - 1, CM.Glyphs.RightArrow);
 			}
 
 			// render the header contents
@@ -315,7 +315,7 @@ namespace Terminal.Gui {
 				var padChar = HeaderPaddingSymbol;
 				if (Style.ShowHorizontalHeaderThroughline &&
 					(!Style.ShowHorizontalHeaderOverline || !Style.ShowHorizontalHeaderUnderline)) {
-					padChar = (char)Driver.HLine;
+					padChar = (char)CM.Glyphs.HLine;
 				}
 
 				var yh = hh - 1;
