@@ -235,6 +235,14 @@ namespace Terminal.Gui {
 		[SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true),
 			JsonPropertyName ("Glyphs")]
 		public static GlyphDefinitions Glyphs { get; set; } = new GlyphDefinitions ();
+
+		/// <summary>
+		/// If <see langword="true"/>, enables the use of Nerd unicode symbols.
+		/// This requires specific font(s) to be installed on the users machine
+		/// to work correctly.  Defaults to <see langword="false"/>.
+		/// </summary>
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
+		public static bool UseNerd { get; set; } = false;
 		
 		/// <summary>
 		/// Initializes the internal state of ConfigurationManager. Nominally called once as part of application

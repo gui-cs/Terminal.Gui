@@ -36,7 +36,7 @@ namespace Terminal.Gui {
 		/// should be used for different file types/directories.  Defaults
 		/// to false.
 		/// </summary>
-		public bool UseColors { get; set; }
+		public bool UseColors { get; set; } = DefaultUseColors;
 
 		/// <summary>
 		/// Gets or sets the culture to use (e.g. for number formatting).
@@ -186,9 +186,10 @@ namespace Terminal.Gui {
 			IconGetter = DefaultIconGetter;
 			TreeRootGetter = DefaultTreeRootGetter;
 
-			// TODO: Make config setting;
-			var nerd = new NerdFonts();
-			IconGetter = nerd.GetNerdIcon;
+			if(ConfigurationManager.UseNerd)
+			{
+				UseNerdForIcons();
+			}
 
 			DateFormat = CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern;
 
@@ -218,6 +219,17 @@ namespace Terminal.Gui {
 				Focus = Application.Driver.MakeAttribute (Color.Black, Color.White),
 				HotFocus = Application.Driver.MakeAttribute (Color.Black, Color.White),
 			};
+		}
+
+		/// <summary>
+		/// Changes <see cref="IconGetter"/> to serve diverse icon set using
+		/// the Nerd fonts. This option requires users to have specific font(s)
+		/// installed.
+		/// </summary>
+		public void UseNerdForIcons ()
+		{
+			var nerd = new NerdFonts();
+			IconGetter = nerd.GetNerdIcon;
 		}
 
 		private string DefaultIconGetter (FileDialogIconGetterArgs args)
