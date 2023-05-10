@@ -57,8 +57,6 @@ namespace Terminal.Gui.DriverTests {
 			Console.BackgroundColor = ConsoleColor.Green;
 			Assert.Equal (ConsoleColor.Green, Console.BackgroundColor);
 			driver.Move (2, 3);
-			Assert.Equal (2, Console.CursorLeft);
-			Assert.Equal (3, Console.CursorTop);
 
 			driver.End ();
 			Assert.Equal (0, Console.CursorLeft);

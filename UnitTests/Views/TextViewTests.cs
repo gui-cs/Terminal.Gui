@@ -2014,7 +2014,7 @@ namespace Terminal.Gui.ViewsTests {
 				Assert.Equal (8, tv.Text.Length);
 				Assert.Equal (text, tv.Text);
 				Assert.False (tv.IsDirty);
-				Assert.Equal ('\u2400', ConsoleDriver.MakePrintable ((Rune)tv.Text [4]));
+				Assert.Equal ('\u2400', new System.Text.Rune(tv.Text [4]).MakePrintable().Value);
 			}
 		}
 

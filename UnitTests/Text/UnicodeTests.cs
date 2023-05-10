@@ -25,9 +25,9 @@ namespace Terminal.Gui.TextTests {
 		[InlineData (0x0001001A, 0x1001A)]
 		public void MakePrintable_Converts_Control_Chars_To_Proper_Unicode (uint code, uint expected)
 		{
-			var actual = ConsoleDriver.MakePrintable (code);
+			var actual = new System.Text.Rune (code).MakePrintable ();
 
-			Assert.Equal (expected, actual.Value);
+			Assert.Equal (expected, (uint)actual.Value);
 		}
 
 		[Theory]
@@ -37,13 +37,22 @@ namespace Terminal.Gui.TextTests {
 		[InlineData (0x010020)]
 		public void MakePrintable_Does_Not_Convert_Ansi_Chars_To_Unicode (uint code)
 		{
-			var actual = ConsoleDriver.MakePrintable (code);
+			var actual = new System.Text.Rune (code).MakePrintable ();
 
-			Assert.Equal (code, actual.Value);
+			Assert.Equal (code, (uint)actual.Value);
 		}
-		
+
+		[Fact]
+		public void MakePrintable_Combining_Character_Is_Not_Printable ()
+		{
+			var actual = new System.Text.Rune (0x0301).MakePrintable ();
+
+			Assert.Equal (0x0301, actual.Value);
+		}
+
+
 		[Fact, AutoInitShutdown]
-		public void AddRune_On_Clip_Left_Or_Right_Replace_Previous_Or_Next_Wide_Rune_With_Space ()
+		public void AddRune_On_Clip_Left_Or_Right_Replace_Previous_Or_Next_Wide_Rune_With_Replacement ()
 		{
 			var tv = new TextView () {
 				Width = Dim.Fill (),
@@ -71,10 +80,10 @@ namespace Terminal.Gui.TextTests {
 ┌────────────────────────────┐
 │これは広いルーンラインです。│
 │これは広いルーンラインです。│
-│これは ┌────────────┐ です。│
-│これは │ワイドルーン│ です。│
-│これは │  {CM.Glyphs.LeftBracket} 選ぶ {CM.Glyphs.RightBracket}  │ です。│
-│これは └────────────┘ です。│
+│これは�┌────────────┐�です。│
+│これは�│ワイドルーン│�です。│
+│これは�│  {CM.Glyphs.LeftBracket} 選ぶ {CM.Glyphs.RightBracket}  │�です。│
+│これは�└────────────┘�です。│
 │これは広いルーンラインです。│
 │これは広いルーンラインです。│
 └────────────────────────────┘

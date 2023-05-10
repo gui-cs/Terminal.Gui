@@ -57,7 +57,7 @@ namespace Terminal.Gui {
 			internal override bool Apply ()
 			{
 				var ret = base.Apply ();
-				Application.Driver?.InitalizeColorSchemes ();
+				Application.Driver?.InitializeColorSchemes ();
 				return ret;
 			}
 		}

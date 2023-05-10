@@ -6,7 +6,6 @@ using System.Globalization;
 using System.Reflection;
 using System.IO;
 using System.Text.Json.Serialization;
-using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -1087,7 +1086,7 @@ namespace Terminal.Gui {
 		{
 			var full = new Rect (0, 0, Driver.Cols, Driver.Rows);
 			TerminalResized?.Invoke (new ResizedEventArgs () { Cols = full.Width, Rows = full.Height });
-			Driver.Clip = full;
+			Driver.Clip = new Rect (0, 0, Driver.Cols, Driver.Rows);
 			foreach (var t in _toplevels) {
 				t.SetRelativeLayout (full);
 				t.LayoutSubviews ();
@@ -1149,7 +1148,7 @@ namespace Terminal.Gui {
 			if (!OnGrabbingMouse (view)) {
 				OnGrabbedMouse (view);
 				_mouseGrabView = view;
-				Driver.UncookMouse ();
+				//Driver.UncookMouse ();
 			}
 		}
 
@@ -1163,7 +1162,7 @@ namespace Terminal.Gui {
 			if (!OnUnGrabbingMouse (_mouseGrabView)) {
 				OnUnGrabbedMouse (_mouseGrabView);
 				_mouseGrabView = null;
-				Driver.CookMouse ();
+				//Driver.CookMouse ();
 			}
 		}
 
