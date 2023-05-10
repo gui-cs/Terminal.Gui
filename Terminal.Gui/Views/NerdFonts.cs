@@ -18,8 +18,6 @@ namespace Terminal.Gui {
 			var file = args.File;
 			var path = args.FileDialog.Path;
 
-			// TODO: opened file
-
 			if(FilenameToIcon.ContainsKey(file.Name))
 			{
 				return Glyphs[FilenameToIcon[file.Name]];
@@ -32,7 +30,9 @@ namespace Terminal.Gui {
 
 			if(file is IDirectoryInfo d)
 			{
-				if(path != null && path.Contains(d.FullName) && args.Context == FileDialogIconGetterContext.Tree)
+				if(path != null &&
+				   path.Contains(d.FullName) &&
+				   args.Context == FileDialogIconGetterContext.Tree)
 				{
 					return _nf_cod_folder_opened;
 				}
@@ -46,7 +46,7 @@ namespace Terminal.Gui {
 		char _nf_cod_file = '';
 
 		/// <summary>
-		/// All nerd glyphs by name.
+		/// All nerd glyphs used by Terminal.Gui by name.
 		/// </summary>
 		public Dictionary<string,char> Glyphs {get;set;} = new Dictionary<string, char>{
 			{"nf-cod-package", ''},
