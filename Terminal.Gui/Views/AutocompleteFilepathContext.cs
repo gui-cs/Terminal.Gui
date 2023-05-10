@@ -11,7 +11,7 @@ namespace Terminal.Gui {
 		public FileDialogState State { get; set; }
 
 		public AutocompleteFilepathContext (string currentLine, int cursorPosition, FileDialogState state)
-			: base (currentLine.EnumerateRunes().ToList (), cursorPosition)
+			: base (currentLine.EnumerateRunes ().ToList (), cursorPosition)
 		{
 			this.State = state;
 		}
@@ -30,18 +30,17 @@ namespace Terminal.Gui {
 				return Enumerable.Empty<Suggestion> ();
 			}
 
-			var path = context.CurrentLine.ToString ();
+			var path = StringExtensions.Make (context.CurrentLine);
 			var last = path.LastIndexOfAny (FileDialog.Separators);
-			
-			if(string.IsNullOrWhiteSpace(path) || !Path.IsPathRooted(path)) {
+
+			if (string.IsNullOrWhiteSpace (path) || !Path.IsPathRooted (path)) {
 				return Enumerable.Empty<Suggestion> ();
 			}
 
 			var term = path.Substring (last + 1);
-			
+
 			// If path is /tmp/ then don't just list everything in it
-			if(string.IsNullOrWhiteSpace(term))
-			{
+			if (string.IsNullOrWhiteSpace (term)) {
 				return Enumerable.Empty<Suggestion> ();
 			}
 
@@ -52,7 +51,7 @@ namespace Terminal.Gui {
 
 			bool isWindows = RuntimeInformation.IsOSPlatform (OSPlatform.Windows);
 
-			var suggestions = state.Children.Where(d=> !d.IsParent).Select (
+			var suggestions = state.Children.Where (d => !d.IsParent).Select (
 				e => e.FileSystemInfo is IDirectoryInfo d
 					? d.Name + System.IO.Path.DirectorySeparatorChar
 					: e.FileSystemInfo.Name)

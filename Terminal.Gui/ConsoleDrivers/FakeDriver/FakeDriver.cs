@@ -119,7 +119,7 @@ namespace Terminal.Gui {
 		public override void AddRune (Rune rune)
 		{
 			rune = MakePrintable (rune);
-			var runeWidth = rune.ColumnWidth();
+			var runeWidth = rune.ColumnWidth ();
 			var validClip = IsValidContent (ccol, crow, Clip);
 
 			if (validClip) {
@@ -149,7 +149,7 @@ namespace Terminal.Gui {
 						contents [crow, ccol - 1, 0] = (int)(uint)' ';
 
 					} else if (runeWidth < 2 && ccol <= Clip.Right - 1
-						&& ((Rune)contents [crow, ccol, 0]).ColumnWidth()  > 1) {
+						&& ((Rune)contents [crow, ccol, 0]).ColumnWidth () > 1) {
 
 						contents [crow, ccol + 1, 0] = (int)(uint)' ';
 						contents [crow, ccol + 1, 2] = 1;
@@ -193,8 +193,8 @@ namespace Terminal.Gui {
 
 		public override void AddStr (string str)
 		{
-			foreach (var rune in str)
-				AddRune ((Rune)rune);
+			foreach (var rune in str.EnumerateRunes ())
+				AddRune (rune);
 		}
 
 		public override void End ()

@@ -719,10 +719,10 @@ namespace Terminal.Gui {
 				return new string (' ', availableHorizontalSpace);
 
 			// if value is not wide enough
-			if (representation.Sum (c => ((Rune)c).ColumnWidth ()) < availableHorizontalSpace) {
+			if (representation.EnumerateRunes ().Sum (c => c.ColumnWidth ()) < availableHorizontalSpace) {
 
 				// pad it out with spaces to the given alignment
-				int toPad = availableHorizontalSpace - (representation.Sum (c => ((Rune)c).ColumnWidth ()) + 1 /*leave 1 space for cell boundary*/);
+				int toPad = availableHorizontalSpace - (representation.EnumerateRunes ().Sum (c => c.ColumnWidth ()) + 1 /*leave 1 space for cell boundary*/);
 
 				switch (colStyle?.GetAlignment (originalCellValue) ?? TextAlignment.Left) {
 
@@ -1594,7 +1594,7 @@ namespace Terminal.Gui {
 		/// Invokes the <see cref="CellToggled"/> event
 		/// </summary>
 		/// <param name="args"></param>
-		protected virtual void OnCellToggled(CellToggledEventArgs args)
+		protected virtual void OnCellToggled (CellToggledEventArgs args)
 		{
 			CellToggled?.Invoke (this, args);
 		}
@@ -1716,7 +1716,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private int CalculateMaxCellWidth (int col, int rowsToRender, ColumnStyle colStyle)
 		{
-			int spaceRequired = table.ColumnNames [col].Sum (c => ((Rune)c).ColumnWidth());
+			int spaceRequired = table.ColumnNames [col].EnumerateRunes ().Sum (c => c.ColumnWidth ());
 
 			// if table has no rows
 			if (RowOffset < 0)
@@ -1728,7 +1728,7 @@ namespace Terminal.Gui {
 				//expand required space if cell is bigger than the last biggest cell or header
 				spaceRequired = Math.Max (
 					spaceRequired,
-					GetRepresentation (Table [i, col], colStyle).Sum (c => ((Rune)c).ColumnWidth()));
+					GetRepresentation (Table [i, col], colStyle).EnumerateRunes ().Sum (c => c.ColumnWidth ()));
 			}
 
 			// Don't require more space than the style allows

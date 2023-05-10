@@ -154,7 +154,7 @@ namespace Terminal.Gui {
 			}
 
 			// If body of line is too long
-			if (lineBody.Sum (l => ((Rune)l).ColumnWidth ()) > availableWidth) {
+			if (lineBody.EnumerateRunes ().Sum (l => l.ColumnWidth ()) > availableWidth) {
 				// remaining space is zero and truncate the line
 				lineBody = new string (lineBody.TakeWhile (c => (availableWidth -= ((Rune)c).ColumnWidth ()) >= 0).ToArray ());
 				availableWidth = 0;

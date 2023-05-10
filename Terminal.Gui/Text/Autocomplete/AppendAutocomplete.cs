@@ -31,12 +31,12 @@ namespace Terminal.Gui {
 			this.textField = textField;
 			SelectionKey = Key.Tab;
 
-			ColorScheme = new ColorScheme{
-				Normal = new Attribute(Color.DarkGray,0),
-				Focus = new Attribute(Color.DarkGray,0),
-				HotNormal = new Attribute(Color.DarkGray,0),
-				HotFocus = new Attribute(Color.DarkGray,0),
-				Disabled = new Attribute(Color.DarkGray,0),
+			ColorScheme = new ColorScheme {
+				Normal = new Attribute (Color.DarkGray, 0),
+				Focus = new Attribute (Color.DarkGray, 0),
+				HotNormal = new Attribute (Color.DarkGray, 0),
+				HotFocus = new Attribute (Color.DarkGray, 0),
+				Disabled = new Attribute (Color.DarkGray, 0),
 			};
 		}
 
@@ -65,16 +65,13 @@ namespace Terminal.Gui {
 			} else
 			if (key == Key.CursorDown) {
 				return this.CycleSuggestion (-1);
-			}
-			else if(key == CloseKey && Suggestions.Any())
-			{
-				ClearSuggestions();
+			} else if (key == CloseKey && Suggestions.Any ()) {
+				ClearSuggestions ();
 				_suspendSuggestions = true;
 				return true;
 			}
 
-			if(char.IsLetterOrDigit((char)kb.KeyValue))
-			{
+			if (char.IsLetterOrDigit ((char)kb.KeyValue)) {
 				_suspendSuggestions = false;
 			}
 
@@ -85,8 +82,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override void GenerateSuggestions (AutocompleteContext context)
 		{
-			if(_suspendSuggestions)
-			{
+			if (_suspendSuggestions) {
 				return;
 			}
 			base.GenerateSuggestions (context);
@@ -108,14 +104,13 @@ namespace Terminal.Gui {
 			var suggestion = this.Suggestions.ElementAt (this.SelectedIdx);
 			var fragment = suggestion.Replacement.Substring (suggestion.Remove);
 
-			int spaceAvailable = textField.Bounds.Width - textField.Text.ConsoleWidth();
-			int spaceRequired = fragment.Sum(c=>((Rune)c).ColumnWidth());
+			int spaceAvailable = textField.Bounds.Width - textField.Text.ConsoleWidth ();
+			int spaceRequired = fragment.EnumerateRunes ().Sum (c => c.ColumnWidth ());
 
-			if(spaceAvailable < spaceRequired)
-			{
-				fragment = new string(
-					fragment.TakeWhile(c=> (spaceAvailable -= ((Rune)c).ColumnWidth()) >= 0)
-					.ToArray()
+			if (spaceAvailable < spaceRequired) {
+				fragment = new string (
+					fragment.TakeWhile (c => (spaceAvailable -= ((Rune)c).ColumnWidth ()) >= 0)
+					.ToArray ()
 				);
 			}
 
@@ -138,7 +133,7 @@ namespace Terminal.Gui {
 				newText += insert.Replacement;
 				textField.Text = newText;
 
-				this.textField.MoveEnd();
+				this.textField.MoveEnd ();
 
 				this.ClearSuggestions ();
 				return true;

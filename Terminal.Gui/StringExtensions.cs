@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Terminal.Gui {
@@ -32,65 +34,71 @@ namespace Terminal.Gui {
 
 		public static int ConsoleWidth (this string instr)
 		{
-			return 0;
-		}
-
-		public static int IndexOf (this string instr, Rune rune)
-		{
-			return 0;
+			return instr.EnumerateRunes ().Sum (r => Math.Max (r.ColumnWidth (), 0));
 		}
 
 		public static int RuneCount (this string instr)
 		{
-			return 0;
+			return instr.EnumerateRunes ().Count ();
 		}
 
-		public static Rune[] ToRunes (this string instr)
+		public static Rune [] ToRunes (this string instr)
 		{
-			return null;
+			return instr.EnumerateRunes ().ToArray ();
 		}
 
 		public static List<Rune> ToRuneList (this string instr)
 		{
-			return new List<Rune>();
+			return instr.EnumerateRunes ().ToList ();
 		}
 
-		public static (Rune rune, int size) DecodeRune (this string instr, int start = 0, int nbytes = -1)
+		public static (Rune Rune, int Size) DecodeRune (this string instr, int start = 0, int nbytes = -1)
 		{
-			return new (new Rune (), 0);
+			return RuneExtensions.DecodeRune (Encoding.UTF8.GetBytes (instr), start, nbytes);
 		}
 
 		public static (Rune rune, int size) DecodeLastRune (this string instr, int end = -1)
 		{
-			return new (new Rune (), 0);
+			var bytes = Encoding.UTF8.GetBytes (instr);
+			return RuneExtensions.DecodeLastRune (bytes, end);
 		}
 
 		public static bool DecodeSurrogatePair (this string instr, out char [] chars)
 		{
 			chars = null;
 			if (instr.Length == 2) {
-				chars = instr.ToCharArray ();
-				if (RuneExtensions.EncodeSurrogatePair (chars [0], chars [1], out _)) {
-					chars = new char[] { chars [0], chars [1] };
+				var charsArray = instr.ToCharArray ();
+				if (RuneExtensions.EncodeSurrogatePair (charsArray [0], charsArray [1], out _)) {
+					chars = charsArray;
 					return true;
 				}
 			}
 			return false;
 		}
 
-		public static byte[] ToByteArray (this string instr)
+		public static byte [] ToByteArray (this string instr)
 		{
 			return Encoding.Unicode.GetBytes (instr.ToCharArray ());
 		}
 
 		public static string Make (Rune [] runes)
 		{
-			return runes.ToString ();
+			var str = string.Empty;
+
+			foreach (var rune in runes) {
+				str += rune.ToString ();
+			}
+
+			return str;
 		}
 
 		public static string Make (List<Rune> runes)
 		{
-			return runes.ToString ();
+			var str = string.Empty;
+			foreach (var rune in runes) {
+				str += rune.ToString ();
+			}
+			return str;
 		}
 
 		public static string Make (Rune rune)
@@ -98,16 +106,24 @@ namespace Terminal.Gui {
 			return rune.ToString ();
 		}
 
-
 		public static string Make (uint rune)
 		{
-			return rune.ToString ();
+			return ((Rune)rune).ToString ();
 		}
 
-		public static string Make (byte [] bytes)
+		public static string Make (byte [] bytes, Encoding encoding = null)
 		{
-			return bytes.ToString ();
+			if (encoding == null) {
+				encoding = Encoding.UTF8;
+			}
+			return encoding.GetString (bytes);
 		}
 
+		public static string Make (params char [] chars)
+		{
+			var c = new char [chars.Length];
+
+			return new string (chars);
+		}
 	}
 }

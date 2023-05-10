@@ -278,13 +278,12 @@ namespace UICatalog.Scenarios {
 					Driver.SetAttribute (GetNormalColor ());
 					for (int col = 0; col < 16; col++) {
 						uint glyph = (uint)((uint)val + col);
-						var rune = new Rune (glyph);
-						//if (rune >= 0x00D800 && rune <= 0x00DFFF) {
-						//	if (col == 0) {
-						//		Driver.AddStr ("Reserved for surrogate pairs.");
-						//	}
-						//	continue;
-						//}						
+						Rune rune;
+						if (char.IsSurrogate ((char)glyph)) {
+							rune = Rune.ReplacementChar;
+						} else {
+							rune = new Rune (glyph);
+						}
 						Move (firstColumnX + (col * COLUMN_WIDTH) + 1, y + 1);
 						if (glyph == SelectedGlyph) {
 							Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);

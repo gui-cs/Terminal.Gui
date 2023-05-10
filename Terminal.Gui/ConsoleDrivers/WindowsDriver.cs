@@ -1596,8 +1596,8 @@ namespace Terminal.Gui {
 
 		public override void AddStr (string str)
 		{
-			foreach (var rune in str)
-				AddRune ((Rune)rune);
+			foreach (var rune in str.EnumerateRunes ())
+				AddRune (rune);
 		}
 
 		public override void SetAttribute (Attribute c)

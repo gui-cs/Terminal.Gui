@@ -1565,7 +1565,7 @@ namespace Terminal.Gui.TextTests {
 			width = text.RuneCount () - 1;
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.Equal (text[..(text.RuneCount () - 1)], wrappedLines [0]);
+			Assert.Equal (text [..(text.RuneCount () - 1)], wrappedLines [0]);
 			Assert.Equal ("e", wrappedLines [1]);
 
 			width = text.RuneCount () - 2;
@@ -3525,70 +3525,6 @@ namespace Terminal.Gui.TextTests {
 		}
 
 		[Fact]
-		public void System_Rune_ColumnWidth ()
-		{
-			var c = new Rune ('a');
-			Assert.Equal (1, c.ColumnWidth ());
-			Assert.Equal (1, c.ToString ().ConsoleWidth ());
-			Assert.Equal (1, c.ToString ().Length);
-
-			c = new Rune ('b');
-			Assert.Equal (1, c.ColumnWidth ());
-			Assert.Equal (1, c.ToString ().ConsoleWidth ());
-			Assert.Equal (1, c.ToString ().Length);
-
-			c = new Rune (123);
-			Assert.Equal (1, c.ColumnWidth ());
-			Assert.Equal (1, c.ToString ().ConsoleWidth ());
-			Assert.Equal (1, c.ToString ().Length);
-
-			c = new Rune ('\u1150');
-			Assert.Equal (2, c.ColumnWidth ());      // 0x1150	ᅐ	Unicode Technical Report #11
-			Assert.Equal (2, c.ToString ().ConsoleWidth ());
-			Assert.Equal (3, c.ToString ().Length);
-
-			c = new Rune ('\u1161');
-			Assert.Equal (0, c.ColumnWidth ());      // 0x1161	ᅡ	column width of 0
-			Assert.Equal (0, c.ToString ().ConsoleWidth ());
-			Assert.Equal (3, c.ToString ().Length);
-
-			c = new Rune (31);
-			Assert.Equal (-1, c.ColumnWidth ());        // non printable character
-			Assert.Equal (0, c.ToString ().ConsoleWidth ());// ConsoleWidth only returns zero or greater than zero
-			Assert.Equal (1, c.ToString ().Length);
-
-			c = new Rune (127);
-			Assert.Equal (-1, c.ColumnWidth ());       // non printable character
-			Assert.Equal (0, c.ToString ().ConsoleWidth ());
-			Assert.Equal (1, c.ToString ().Length);
-		}
-
-		[Fact]
-		public void System_Text_Rune ()
-		{
-			var c = new System.Text.Rune ('a');
-			Assert.Equal (1, c.Utf8SequenceLength);
-
-			c = new System.Text.Rune ('b');
-			Assert.Equal (1, c.Utf8SequenceLength);
-
-			c = new System.Text.Rune (123);
-			Assert.Equal (1, c.Utf8SequenceLength);
-
-			c = new System.Text.Rune ('\u1150');
-			Assert.Equal (3, c.Utf8SequenceLength);         // 0x1150	ᅐ	Unicode Technical Report #11
-
-			c = new System.Text.Rune ('\u1161');
-			Assert.Equal (3, c.Utf8SequenceLength);         // 0x1161	ᅡ	column width of 0
-
-			c = new System.Text.Rune (31);
-			Assert.Equal (1, c.Utf8SequenceLength);         // non printable character
-
-			c = new System.Text.Rune (127);
-			Assert.Equal (1, c.Utf8SequenceLength);         // non printable character
-		}
-
-		[Fact]
 		public void Format_WordWrap_PreserveTrailingSpaces ()
 		{
 			string text = " A sentence has words. \n This is the second Line - 2. ";
@@ -3877,29 +3813,27 @@ namespace Terminal.Gui.TextTests {
 		}
 
 		[Fact]
-		public void Ustring_Array_Is_Not_Equal_ToRunes_Array_And_String_Array ()
+		public void String_Array_Is_Not_Always_Equal_ToRunes_Array ()
 		{
-			var text = "New Test 你";
-			string us = text;
-			string s = text;
-			Assert.Equal (10, us.RuneCount ());
-			Assert.Equal (10, s.Length);
-			// The reason is string index is related to byte length and not rune length
-			Assert.Equal (12, us.Length);
-			Assert.NotEqual (20320, us [9]);
-			Assert.Equal (20320, s [9]);
-			Assert.Equal (228, us [9]);
-			Assert.Equal ("ä", us [9].ToString ());
-			Assert.Equal ("你", s [9].ToString ());
-
-			// Rune array is equal to string array
-			var usToRunes = us.ToRunes ();
+			string s = "New Test 你";
+			// Rune array length is equal to string array
+			var usToRunes = s.ToRunes ();
 			Assert.Equal (10, usToRunes.Length);
 			Assert.Equal (10, s.Length);
 			Assert.Equal (20320, usToRunes [9].Value);
 			Assert.Equal (20320, s [9]);
 			Assert.Equal ("你", usToRunes [9].ToString ());
 			Assert.Equal ("你", s [9].ToString ());
+
+			s = "New Test \U0001d539";
+			// Rune array length isn't equal to string array
+			usToRunes = s.ToRunes ();
+			Assert.Equal (10, usToRunes.Length);
+			Assert.Equal (11, s.Length);
+			Assert.Equal (120121, usToRunes [9].Value);
+			Assert.Equal (55349, s [9]);
+			Assert.Equal ("𝔹", usToRunes [9].ToString ());
+			Assert.Equal ("𝔹", new string (new char [] { s [9], s [10] }));
 		}
 	}
 }

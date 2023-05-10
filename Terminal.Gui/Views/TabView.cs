@@ -336,9 +336,9 @@ namespace Terminal.Gui {
 			foreach (var tab in Tabs.Skip (TabScrollOffset)) {
 
 				// while there is space for the tab
-				var tabTextWidth = tab.Text.Sum (c => ((Rune)c).ColumnWidth ());
+				var tabTextWidth = tab.Text.EnumerateRunes ().Sum (c => c.ColumnWidth ());
 
-				string text = tab.Text.ToString ();
+				string text = tab.Text;
 
 				// The maximum number of characters to use for the tab name as specified
 				// by the user (MaxTabTextWidth).  But not more than the width of the view
@@ -352,7 +352,7 @@ namespace Terminal.Gui {
 				}
 
 				if (tabTextWidth > maxWidth) {
-					text = tab.Text.ToString ().Substring (0, (int)maxWidth);
+					text = tab.Text.Substring (0, (int)maxWidth);
 					tabTextWidth = (int)maxWidth;
 				}
 

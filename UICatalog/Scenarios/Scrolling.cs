@@ -93,7 +93,7 @@ namespace UICatalog.Scenarios {
 							break;
 						}
 						Driver.AddRune (r);
-						nw += r.RuneLen ();
+						nw += r.Utf8SequenceLength;
 					}
 					if (nw > w)
 						w = nw;

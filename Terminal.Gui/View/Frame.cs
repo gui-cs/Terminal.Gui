@@ -367,7 +367,7 @@ namespace Terminal.Gui {
 			if (!string.IsNullOrEmpty (title)) {
 				Driver.Move (region.X + 2, region.Y);
 				//Driver.AddRune (' ');
-				var str = title.Sum (r => Math.Max (((Rune)r).ColumnWidth (), 1)) >= width
+				var str = title.EnumerateRunes().Sum (r => Math.Max (r.ColumnWidth (), 1)) >= width
 					? TextFormatter.Format (title, width, false, false) [0] : title;
 				Driver.AddStr (str);
 			}

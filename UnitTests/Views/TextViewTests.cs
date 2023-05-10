@@ -32,10 +32,7 @@ namespace Terminal.Gui.ViewsTests {
 
 				//                   1         2         3 
 				//         01234567890123456789012345678901=32 (Length)
-				var buff = new byte [txt.Length];
-				for (int i = 0; i < txt.Length; i++) {
-					buff [i] = (byte)txt [i];
-				}
+				var buff = Encoding.Unicode.GetBytes(txt);
 				var ms = new System.IO.MemoryStream (buff).ToArray ();
 				_textView = new TextView () { Width = 30, Height = 10 };
 				_textView.Text = Encoding.Unicode.GetString (ms);

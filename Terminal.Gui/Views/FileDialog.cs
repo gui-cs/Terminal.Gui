@@ -547,7 +547,7 @@ namespace Terminal.Gui {
 		/// is true.
 		/// </summary>
 		public string Path {
-			get => this.tbPath.Text.ToString ();
+			get => this.tbPath.Text;
 			set {
 				this.tbPath.Text = value;
 				this.tbPath.MoveEnd ();
@@ -598,7 +598,7 @@ namespace Terminal.Gui {
 			base.OnDrawContent (contentArea);
 
 			if (!string.IsNullOrWhiteSpace (feedback)) {
-				var feedbackWidth = feedback.Sum (c => ((Rune)c).ColumnWidth ());
+				var feedbackWidth = feedback.EnumerateRunes ().Sum (c => c.ColumnWidth ());
 				var feedbackPadLeft = ((Bounds.Width - feedbackWidth) / 2) - 1;
 
 				feedbackPadLeft = Math.Min (Bounds.Width, feedbackPadLeft);
@@ -800,7 +800,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			if (!this.IsCompatibleWithOpenMode (this.tbPath.Text.ToString (), out string reason)) {
+			if (!this.IsCompatibleWithOpenMode (this.tbPath.Text, out string reason)) {
 				if (reason != null) {
 					feedback = reason;
 					SetNeedsDisplay ();

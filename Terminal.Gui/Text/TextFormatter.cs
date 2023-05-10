@@ -226,10 +226,10 @@ namespace Terminal.Gui {
 				return text;
 
 			// if value is not wide enough
-			if (text.Sum (c => ((Rune)c).ColumnWidth ()) < width) {
+			if (text.EnumerateRunes ().Sum (c => c.ColumnWidth ()) < width) {
 
 				// pad it out with spaces to the given alignment
-				int toPad = width - (text.Sum (c => ((Rune)c).ColumnWidth ()));
+				int toPad = width - (text.EnumerateRunes ().Sum (c => c.ColumnWidth ()));
 
 				return text + new string (' ', toPad);
 			}
@@ -670,7 +670,7 @@ namespace Terminal.Gui {
 		/// <returns>The text width.</returns>
 		public static int GetTextWidth (string text)
 		{
-			return text.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 1));
+			return text.EnumerateRunes ().Sum (r => Math.Max (r.ColumnWidth (), 1));
 		}
 
 		/// <summary>
@@ -687,7 +687,7 @@ namespace Terminal.Gui {
 			for (int i = (startIndex == -1 ? 0 : startIndex); i < (length == -1 ? lines.Count : startIndex + length); i++) {
 				var runes = lines [i];
 				if (runes.Length > 0)
-					max += runes.Max (r => Math.Max (((Rune)r).ColumnWidth (), 1));
+					max += runes.EnumerateRunes ().Max (r => Math.Max (r.ColumnWidth (), 1));
 			}
 			return max;
 		}
@@ -785,14 +785,14 @@ namespace Terminal.Gui {
 				int ml = 1;
 
 				int cols = 0;
-				foreach (var rune in text) {
-					if (rune == '\n') {
+				foreach (var rune in text.EnumerateRunes ()) {
+					if (rune.Value == '\n') {
 						ml++;
 						if (cols > mw) {
 							mw = cols;
 						}
 						cols = 0;
-					} else if (rune != '\r') {
+					} else if (rune.Value != '\r') {
 						cols++;
 						var rw = ((Rune)rune).ColumnWidth ();
 						if (rw > 0) {
@@ -811,15 +811,15 @@ namespace Terminal.Gui {
 				int vh = 0;
 
 				int rows = 0;
-				foreach (var rune in text) {
-					if (rune == '\n') {
+				foreach (var rune in text.EnumerateRunes ()) {
+					if (rune.Value == '\n') {
 						vw++;
 						if (rows > vh) {
 							vh = rows;
 						}
 						rows = 0;
 						cw = 1;
-					} else if (rune != '\r') {
+					} else if (rune.Value != '\r') {
 						rows++;
 						var rw = ((Rune)rune).ColumnWidth ();
 						if (cw < rw) {
@@ -863,7 +863,7 @@ namespace Terminal.Gui {
 			// TODO: Ignore hot_key of two are provided
 			// TODO: Do not support non-alphanumeric chars that can't be typed
 			int i = 0;
-			foreach (Rune c in text) {
+			foreach (Rune c in text.EnumerateRunes ()) {
 				if ((char)c.Value != 0xFFFD) {
 					if (c == hotKeySpecifier) {
 						hot_pos = i;
@@ -878,7 +878,7 @@ namespace Terminal.Gui {
 			// Legacy support - use first upper case char if the specifier was not found
 			if (hot_pos == -1 && firstUpperCase) {
 				i = 0;
-				foreach (Rune c in text) {
+				foreach (Rune c in text.EnumerateRunes ()) {
 					if ((char)c.Value != 0xFFFD) {
 						if (Rune.IsUpper (c)) {
 							hot_key = c;

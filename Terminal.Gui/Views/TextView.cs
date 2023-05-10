@@ -51,16 +51,17 @@ namespace Terminal.Gui {
 			var lines = new List<List<Rune>> ();
 			int start = 0, i = 0;
 			var hasCR = false;
+			var runes = content.EnumerateRunes ().ToList ();
 			// ASCII code 13 = Carriage Return.
 			// ASCII code 10 = Line Feed.
-			for (; i < content.Length; i++) {
-				if (content [i] == 13) {
+			for (; i < runes.Count; i++) {
+				if (runes [i].Value == 13) {
 					hasCR = true;
 					continue;
 				}
-				if (content [i] == 10) {
+				if (runes [i].Value == 10) {
 					if (i - start > 0)
-						lines.Add (ToRunes (content.Substring(start, hasCR ? i - 1 : i)));
+						lines.Add (runes.GetRange (start, hasCR ? i - 1 - start : i - start));
 					else
 						lines.Add (ToRunes (string.Empty));
 					start = i + 1;
@@ -68,7 +69,7 @@ namespace Terminal.Gui {
 				}
 			}
 			if (i - start >= 0)
-				lines.Add (ToRunes (content.Substring (start, 0)));
+				lines.Add (runes.GetRange (start, i - start));
 			return lines;
 		}
 
@@ -256,8 +257,8 @@ namespace Terminal.Gui {
 			int i = start == -1 ? 0 : start;
 			for (; i < tcount; i++) {
 				var rune = t [i];
-				size += rune.ColumnWidth();
-				len += rune.RuneLen ();
+				size += rune.ColumnWidth ();
+				len += rune.RuneUnicodeLength (Encoding.Unicode);
 				if (rune.Value == '\t') {
 					size += tabWidth + 1;
 					len += tabWidth - 1;
@@ -272,7 +273,7 @@ namespace Terminal.Gui {
 			bool IsWideRune (Rune r, int tWidth, out int s, out int l)
 			{
 				s = r.ColumnWidth ();
-				l = r.RuneLen();
+				l = r.RuneUnicodeLength ();
 				if (r.Value == '\t') {
 					s += tWidth + 1;
 					l += tWidth - 1;
@@ -296,7 +297,7 @@ namespace Terminal.Gui {
 
 			for (int i = tcount; i >= 0; i--) {
 				var rune = t [i];
-				size += rune.ColumnWidth();
+				size += rune.ColumnWidth ();
 				if (rune.Value == '\t') {
 					size += tabWidth + 1;
 				}
@@ -407,12 +408,12 @@ namespace Terminal.Gui {
 		{
 			var origTxt = StringExtensions.Make (source);
 			(int _, int len) = TextModel.DisplaySize (source, 0, col, false);
-			(var _, var len2) = TextModel.DisplaySize (source, col, col + matchText.Length, false);
-			(var _, var len3) = TextModel.DisplaySize (source, col + matchText.Length, origTxt.RuneCount(), false);
+			(int _, int len2) = TextModel.DisplaySize (source, col, col + matchText.Length, false);
+			(int _, int len3) = TextModel.DisplaySize (source, col + matchText.Length, origTxt.RuneCount (), false);
 
-			return origTxt[..len] +
+			return origTxt [..len] +
 				textToReplace +
-				origTxt.Substring (len + len2, len + len2 + len3);
+				origTxt.Substring (len + len2, len3);
 		}
 
 		bool ApplyToFind ((Point current, bool found) foundPos)
@@ -517,7 +518,7 @@ namespace Terminal.Gui {
 			if (line.Count > 0) {
 				return line [col > line.Count - 1 ? line.Count - 1 : col];
 			} else {
-				return (Rune)0;
+				return default;
 			}
 		}
 
@@ -544,7 +545,7 @@ namespace Terminal.Gui {
 					return true;
 				}
 			}
-			rune = (Rune)0;
+			rune = default;
 			return false;
 		}
 
@@ -558,7 +559,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 			if (row == 0) {
-				rune = (Rune)0;
+				rune = default;
 				return false;
 			}
 			while (row > 0) {
@@ -570,7 +571,7 @@ namespace Terminal.Gui {
 					return true;
 				}
 			}
-			rune = (Rune)0;
+			rune = default;
 			return false;
 		}
 
@@ -1596,7 +1597,7 @@ namespace Terminal.Gui {
 			//historyText.Clear (Text);
 
 			if (!_multiline && !IsInitialized) {
-				_currentColumn = Text.RuneCount();
+				_currentColumn = Text.RuneCount ();
 				_leftColumn = _currentColumn > Frame.Width + 1 ? _currentColumn - Frame.Width + 1 : 0;
 			}
 		}
@@ -2000,7 +2001,7 @@ namespace Terminal.Gui {
 			set {
 				_historyText.Clear (Text);
 			}
-		} 
+		}
 
 		/// <summary>
 		/// Indicates whatever the text has history changes or not.
@@ -2495,9 +2496,9 @@ namespace Terminal.Gui {
 				_selectionStartColumn = foundPos.current.X;
 				_selectionStartRow = foundPos.current.Y;
 				if (!replaceAll) {
-					_currentColumn = _selectionStartColumn + text.RuneCount();
+					_currentColumn = _selectionStartColumn + text.RuneCount ();
 				} else {
-					_currentColumn = _selectionStartColumn + textToReplace.RuneCount();
+					_currentColumn = _selectionStartColumn + textToReplace.RuneCount ();
 				}
 				_currentRow = foundPos.current.Y;
 				if (!_isReadOnly && replace) {
@@ -2505,7 +2506,7 @@ namespace Terminal.Gui {
 					ClearSelectedRegion ();
 					InsertAllText (textToReplace);
 					StartSelecting ();
-					_selectionStartColumn = _currentColumn - textToReplace.RuneCount();
+					_selectionStartColumn = _currentColumn - textToReplace.RuneCount ();
 				} else {
 					UpdateWrapModel ();
 					SetNeedsDisplay ();
@@ -2774,7 +2775,7 @@ namespace Terminal.Gui {
 				throw new ArgumentNullException (nameof (runes));
 			int size = 0;
 			foreach (var rune in runes) {
-				size += RuneExtensions.RuneLen (rune);
+				size += rune.RuneUnicodeLength ();
 			}
 			var encoded = new byte [size];
 			int offset = 0;
@@ -4180,7 +4181,7 @@ namespace Terminal.Gui {
 					ClearRegion ();
 				}
 				_copyWithoutSelection = false;
-				InsertText (contents);
+				InsertAllText (contents);
 
 				if (_selecting) {
 					_historyText.ReplaceLast (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,

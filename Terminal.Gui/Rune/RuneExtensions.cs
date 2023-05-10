@@ -10,7 +10,7 @@ namespace Terminal.Gui {
 
 		public static int ColumnWidth (this Rune rune)
 		{
-			return RuneUtilities.ColumnWidth(rune);
+			return RuneUtilities.ColumnWidth (rune);
 		}
 
 		public static bool IsNonSpacingChar (this Rune rune)
@@ -23,33 +23,67 @@ namespace Terminal.Gui {
 			return RuneUtilities.IsWideChar (rune.Value);
 		}
 
-		public static int RuneLen (this Rune rune)
+		public static int RuneUnicodeLength (this Rune rune, Encoding encoding = null)
 		{
-			return 0;
+			if (encoding == null) {
+				encoding = Encoding.UTF8;
+			}
+			var bytes = encoding.GetBytes (rune.ToString ().ToCharArray ());
+			var offset = 0;
+			if (bytes [bytes.Length - 1] == 0) {
+				offset++;
+			}
+			return bytes.Length - offset;
 		}
 
-		public static int EncodeRune (this Rune rune, byte [] dest, int offset = 0)
+		public static int EncodeRune (this Rune rune, byte [] dest, int start = 0, int nbytes = -1)
 		{
-			return 0;
+			var bytes = Encoding.UTF8.GetBytes (rune.ToString ());
+			int length = 0;
+			for (int i = 0; i < (nbytes == -1 ? bytes.Length : nbytes); i++) {
+				if (bytes [i] == 0) {
+					break;
+				}
+				dest [start + i] = bytes [i];
+				length++;
+			}
+			return length;
+		}
+
+		public static (Rune Rune, int Size) DecodeRune (byte [] buffer, int start = 0, int nbytes = -1)
+		{
+			var operationStatus = Rune.DecodeFromUtf8 (buffer, out Rune rune, out int bytesConsumed);
+			return (rune, bytesConsumed);
+		}
+
+		public static (Rune Rune, int Size) DecodeLastRune (byte [] buffer, int end = -1)
+		{
+			var operationStatus = Rune.DecodeLastFromUtf8 (buffer, out Rune rune, out int bytesConsumed);
+			if (operationStatus == System.Buffers.OperationStatus.Done) {
+				return (rune, bytesConsumed);
+			} else {
+				return (default, 0);
+			}
 		}
 
 		public static bool DecodeSurrogatePair (this Rune rune, out char [] spair)
 		{
+			if (rune.IsSurrogatePair ()) {
+				spair = rune.ToString ().ToCharArray ();
+				return true;
+			}
 			spair = null;
-
-			return true;
+			return false;
 		}
 
 		public static bool EncodeSurrogatePair (char highsurrogate, char lowSurrogate, out Rune result)
 		{
-			try {
+			result = default;
+			if (char.IsSurrogatePair (highsurrogate, lowSurrogate)) {
 				result = (Rune)char.ConvertToUtf32 (highsurrogate, lowSurrogate);
-			} catch (Exception) {
-				result = default;
-				return false;
+				return true;
 			}
-
-			return true;
+			return false;
 		}
 
 		public static bool IsSurrogatePair (this Rune rune)
@@ -57,82 +91,20 @@ namespace Terminal.Gui {
 			return char.IsSurrogatePair (rune.ToString (), 0);
 		}
 
-		public static bool IsSurrogate (this Rune rune)
-		{
-			return char.IsSurrogate (rune.ToString (), 0);
-		}
-
 		public static bool IsValid (byte [] buffer)
 		{
 			var str = Encoding.Unicode.GetString (buffer);
-
-			return Rune.IsValid(str.EnumerateRunes ().Current.Value);
+			foreach (var rune in str.EnumerateRunes ()) {
+				if (rune == Rune.ReplacementChar) {
+					return false;
+				}
+			}
+			return true;
 		}
 
 		public static bool IsValid (this Rune rune)
 		{
 			return Rune.IsValid (rune.Value);
 		}
-
-		internal static bool IsHighSurrogate (this Rune rune)
-		{
-			return char.IsHighSurrogate (rune.ToString (), 0);
-		}
-
-		internal static bool IsLowSurrogate (this Rune rune)
-		{
-			return char.IsLowSurrogate (rune.ToString (), 0);
-		}
-
-		//public static bool operator==(this Rune a, Rune b) {  return a.Equals(b); }
-
-		//public static bool operator!=(this Rune  a, Rune b) {  return a.Equals(b); }
-
-		//public static bool Equals(this Rune rune, ) { }
 	}
-
-	///// <summary>
-	///// Implements the <see cref="IEqualityComparer{T}"/> for comparing two <see cref="Toplevel"/>s
-	///// used by <see cref="StackExtensions"/>.
-	///// </summary>
-	//public class RuneEqualityComparer : IEqualityComparer<Rune> {
-	//	/// <summary>Determines whether the specified objects are equal.</summary>
-	//	/// <param name="x">The first object of type <see cref="Rune" /> to compare.</param>
-	//	/// <param name="y">The second object of type <see cref="Rune" /> to compare.</param>
-	//	/// <returns>
-	//	///     <see langword="true" /> if the specified objects are equal; otherwise, <see langword="false" />.</returns>
-	//	public bool Equals (Rune x, Rune y)
-	//	{
-	//		return x.Equals (y);
-	//	}
-
-	//	/// <summary>Returns a hash code for the specified object.</summary>
-	//	/// <param name="obj">The <see cref="Toplevel" /> for which a hash code is to be returned.</param>
-	//	/// <returns>A hash code for the specified object.</returns>
-	//	/// <exception cref="ArgumentNullException">The type of <paramref name="obj" /> 
-	//	/// is a reference type and <paramref name="obj" /> is <see langword="null" />.</exception>
-	//	public int GetHashCode (Rune obj)
-	//	{
-	//		return obj.GetHashCode ();
-	//	}
-	//}
-
-	///// <summary>
-	///// Implements the <see cref="IComparer{T}"/> to sort the <see cref="Rune"/> 
-	///// from the <see cref="Application.OverlappedChildren"/> if needed.
-	///// </summary>
-	//public sealed class RuneComparer : IComparer<Rune> {
-	//	/// <summary>Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.</summary>
-	//	/// <param name="x">The first object to compare.</param>
-	//	/// <param name="y">The second object to compare.</param>
-	//	/// <returns>A signed integer that indicates the relative values of <paramref name="x" /> and <paramref name="y" />, as shown in the following table.Value Meaning Less than zero
-	//	///             <paramref name="x" /> is less than <paramref name="y" />.Zero
-	//	///             <paramref name="x" /> equals <paramref name="y" />.Greater than zero
-	//	///             <paramref name="x" /> is greater than <paramref name="y" />.</returns>
-	//	public int Compare (Rune x, Rune y)
-	//	{
-	//		return x.CompareTo (y);
-	//	}
-	//}
-
 }

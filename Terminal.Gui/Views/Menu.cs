@@ -272,10 +272,10 @@ namespace Terminal.Gui {
 		int GetMenuBarItemLength (string title)
 		{
 			int len = 0;
-			foreach (var ch in title) {
-				if (ch == MenuBar.HotKeySpecifier.Value)
+			foreach (var ch in title.EnumerateRunes ()) {
+				if (ch == MenuBar.HotKeySpecifier)
 					continue;
-				len += Math.Max (((Rune)ch).ColumnWidth (), 1);
+				len += Math.Max (ch.ColumnWidth (), 1);
 			}
 
 			return len;
@@ -1807,7 +1807,7 @@ namespace Terminal.Gui {
 			for (int i = 0; i < Menus.Length; i++) {
 				// TODO: this code is duplicated, hotkey should be part of the MenuBarItem
 				var mi = Menus [i];
-				int p = mi.Title.IndexOf (MenuBar.HotKeySpecifier);
+				int p = mi.Title.IndexOf (MenuBar.HotKeySpecifier.ToString ());
 				if (p != -1 && p + 1 < mi.Title.RuneCount ()) {
 					if (Char.ToUpperInvariant ((char)mi.Title [p + 1]) == c) {
 						ProcessMenu (i, mi);
@@ -1916,7 +1916,7 @@ namespace Terminal.Gui {
 				foreach (var mi in Menus [selected].Children) {
 					if (mi == null)
 						continue;
-					int p = mi.Title.IndexOf (MenuBar.HotKeySpecifier);
+					int p = mi.Title.IndexOf (MenuBar.HotKeySpecifier.ToString ());
 					if (p != -1 && p + 1 < mi.Title.RuneCount ()) {
 						if (mi.Title [p + 1] == c) {
 							Selected (mi);
