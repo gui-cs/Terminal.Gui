@@ -41,7 +41,7 @@
   </ItemGroup>
   <PropertyGroup Label="FineCodeCoverage">
     <Enabled>
-      True
+      False
     </Enabled>
     <Exclude>
       [UICatalog]*

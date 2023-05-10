@@ -1150,10 +1150,10 @@ Edit
 			// 
 			// The width of the Frame is determined in Menu.cs line 144, where `Width` is calculated
 			//   1 space before the Title and 2 spaces after the Title/Check/Help
-			public string expectedTopRow (int i) => $"{d.ULCorner}{new string (d.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{d.URCorner}  \n";
+			public string expectedTopRow (int i) => $"{CM.Glyphs.ULCorner}{new string (CM.Glyphs.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{CM.Glyphs.URCorner}  \n";
 			// The 3 spaces at end are a result of Menu.cs line 1062 where `pos` is calculated (` + spacesAfterTitle`)
-			public string expectedMenuItemRow (int i) => $"{d.VLine} {Menus [i].Children [0].Title}  {d.VLine}   \n";
-			public string expectedBottomRow (int i) => $"{d.LLCorner}{new string (d.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{d.LRCorner}  \n";
+			public string expectedMenuItemRow (int i) => $"{CM.Glyphs.VLine} {Menus [i].Children [0].Title}  {CM.Glyphs.VLine}   \n";
+			public string expectedBottomRow (int i) => $"{CM.Glyphs.LLCorner}{new string (CM.Glyphs.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{CM.Glyphs.LRCorner}  \n";
 
 			// The fulll expected string for an open sub menu
 			public string expectedSubMenuOpen (int i) => ClosedMenuText +
@@ -2040,10 +2040,10 @@ Edit
 				View = menu
 			}));
 			Application.Refresh ();
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+			TestHelpers.AssertDriverContentsWithFrameAre (@$"
  Nullable Checked       
 ┌──────────────────────┐
-│ ⍰ Check this out 你  │
+│ {CM.Glyphs.NullChecked} Check this out 你  │
 └──────────────────────┘", output);
 			Assert.True (menu.openMenu.MouseEvent (new MouseEvent () {
 				X = 0,

@@ -4,7 +4,6 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 
 namespace Terminal.Gui {
-
 	class DictionaryJsonConverter<T> : JsonConverter<Dictionary<string, T>> {
 		public override Dictionary<string, T> Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 		{

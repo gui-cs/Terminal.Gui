@@ -167,7 +167,7 @@ namespace Terminal.Gui {
 		protected override void DrawAxisLine (GraphView graph, int x, int y)
 		{
 			graph.Move (x, y);
-			Application.Driver.AddRune (Application.Driver.HLine);
+			Application.Driver.AddRune (CM.Glyphs.HLine);
 		}
 
 		/// <summary>
@@ -217,7 +217,7 @@ namespace Terminal.Gui {
 			graph.Move (screenPosition, y);
 
 			// draw the tick on the axis
-			driver.AddRune (driver.TopTee);
+			Application.Driver.AddRune (CM.Glyphs.TopTee);
 
 			// and the label text
 			if (!string.IsNullOrWhiteSpace (text)) {
@@ -352,7 +352,7 @@ namespace Terminal.Gui {
 		protected override void DrawAxisLine (GraphView graph, int x, int y)
 		{
 			graph.Move (x, y);
-			Application.Driver.AddRune (Application.Driver.VLine);
+			Application.Driver.AddRune (CM.Glyphs.VLine);
 		}
 
 		private int GetAxisYEnd (GraphView graph)
@@ -470,7 +470,7 @@ namespace Terminal.Gui {
 			graph.Move (x, screenPosition);
 
 			// draw the tick on the axis
-			Application.Driver.AddRune (Application.Driver.RightTee);
+			Application.Driver.AddRune (CM.Glyphs.RightTee);
 
 			// and the label text
 			if (!string.IsNullOrWhiteSpace (text)) {

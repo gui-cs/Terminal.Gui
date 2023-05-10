@@ -1,4 +1,6 @@
-﻿using System;
+﻿global using CM = Terminal.Gui.ConfigurationManager;
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,8 +10,6 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using static Terminal.Gui.ConfigurationManager;
 
 #nullable enable
 
@@ -57,14 +57,15 @@ namespace Terminal.Gui {
 
 		private static readonly string _configFilename = "config.json";
 
-		private static readonly JsonSerializerOptions serializerOptions = new JsonSerializerOptions {
+		private static readonly JsonSerializerOptions _serializerOptions = new JsonSerializerOptions {
 			ReadCommentHandling = JsonCommentHandling.Skip,
 			PropertyNameCaseInsensitive = true,
 			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
 			WriteIndented = true,
 			Converters = {
-				// No need to set converters - the ConfigRootConverter uses property attributes apply the correct
-				// Converter.
+				// We override the standard Rune converter to support specifying Glyphs in
+				// a flexible way
+				new RuneJsonConverter(),
 			},
 		};
 
@@ -229,6 +230,13 @@ namespace Terminal.Gui {
 		public static AppScope? AppSettings { get; set; }
 
 		/// <summary>
+		/// The set of glyphs used to draw checkboxes, lines, borders, etc...See also <seealso cref="Terminal.Gui.GlyphDefinitions"/>.
+		/// </summary>
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true),
+			JsonPropertyName ("Glyphs")]
+		public static GlyphDefinitions Glyphs { get; set; } = new GlyphDefinitions ();
+		
+		/// <summary>
 		/// Initializes the internal state of ConfigurationManager. Nominally called once as part of application
 		/// startup to initialize global state. Also called from some Unit Tests to ensure correctness (e.g. Reset()).
 		/// </summary>
@@ -249,7 +257,7 @@ namespace Terminal.Gui {
 				classesWithConfigProps.Add (classWithConfig.Name, classWithConfig);
 			}
 
-			Debug.WriteLine ($"ConfigManager.getConfigProperties found {classesWithConfigProps.Count} clases:");
+			Debug.WriteLine ($"ConfigManager.getConfigProperties found {classesWithConfigProps.Count} classes:");
 			classesWithConfigProps.ToList ().ForEach (x => Debug.WriteLine ($"  Class: {x.Key}"));
 
 			foreach (var p in from c in classesWithConfigProps
@@ -274,7 +282,7 @@ namespace Terminal.Gui {
 			_allConfigProperties = _allConfigProperties!.OrderBy (x => x.Key).ToDictionary (x => x.Key, x => x.Value, StringComparer.InvariantCultureIgnoreCase);
 
 			Debug.WriteLine ($"ConfigManager.Initialize found {_allConfigProperties.Count} properties:");
-			_allConfigProperties.ToList ().ForEach (x => Debug.WriteLine ($"  Property: {x.Key}"));
+			//_allConfigProperties.ToList ().ForEach (x => Debug.WriteLine ($"  Property: {x.Key}"));
 
 			AppSettings = new AppScope ();
 		}
@@ -286,12 +294,12 @@ namespace Terminal.Gui {
 		internal static string ToJson ()
 		{
 			Debug.WriteLine ($"ConfigurationManager.ToJson()");
-			return JsonSerializer.Serialize<SettingsScope> (Settings!, serializerOptions);
+			return JsonSerializer.Serialize<SettingsScope> (Settings!, _serializerOptions);
 		}
 
 		internal static Stream ToStream ()
 		{
-			var json = JsonSerializer.Serialize<SettingsScope> (Settings!, serializerOptions);
+			var json = JsonSerializer.Serialize<SettingsScope> (Settings!, _serializerOptions);
 			// turn it into a stream
 			var stream = new MemoryStream ();
 			var writer = new StreamWriter (stream);
@@ -371,8 +379,9 @@ namespace Terminal.Gui {
 			AppSettings = new AppScope ();
 
 			// To enable some unit tests, we only load from resources if the flag is set
-			if (Locations.HasFlag (ConfigLocations.DefaultOnly)) Settings.UpdateFromResource (typeof (ConfigurationManager).Assembly, $"Terminal.Gui.Resources.{_configFilename}");
-
+			if (Locations.HasFlag (ConfigLocations.DefaultOnly)) {
+				Settings.UpdateFromResource (typeof (ConfigurationManager).Assembly, $"Terminal.Gui.Resources.{_configFilename}");
+			}
 			Apply ();
 			ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply ();
 			AppSettings?.Apply ();
@@ -413,7 +422,7 @@ namespace Terminal.Gui {
 		public static void Apply ()
 		{
 			bool settings = Settings?.Apply () ?? false;
-			bool themes = ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false;
+			bool themes = !string.IsNullOrEmpty(ThemeManager.SelectedTheme) && (ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false);
 			bool appsettings = AppSettings?.Apply () ?? false;
 			if (settings || themes || appsettings) {
 				OnApplied ();
@@ -520,7 +529,7 @@ namespace Terminal.Gui {
 		{
 			var emptyScope = new SettingsScope ();
 			emptyScope.Clear ();
-			return JsonSerializer.Serialize<SettingsScope> (emptyScope, serializerOptions);
+			return JsonSerializer.Serialize<SettingsScope> (emptyScope, _serializerOptions);
 		}
 
 		/// <summary>

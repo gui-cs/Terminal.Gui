@@ -1293,7 +1293,7 @@ namespace Terminal.Gui {
 		/// <remarks>This always calls <see cref="View.SetNeedsDisplay()"/></remarks>
 		public void Update ()
 		{
-			if (TableIsNullOrInvisible ()) {
+			if (!IsInitialized || TableIsNullOrInvisible ()) {
 				SetNeedsDisplay ();
 				return;
 			}

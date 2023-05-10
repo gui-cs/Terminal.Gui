@@ -49,13 +49,13 @@ namespace Terminal.Gui {
 			case Orientation.Horizontal:
 				Height = 1;
 				Width = Dim.Fill ();
-				LineRune = Driver.HLine;
+				LineRune = CM.Glyphs.HLine;
 
 				break;
 			case Orientation.Vertical:
 				Height = Dim.Fill ();
 				Width = 1;
-				LineRune = Driver.VLine;
+				LineRune = CM.Glyphs.VLine;
 				break;
 			default:
 				throw new ArgumentException ($"Unknown Orientation {orientation}");
@@ -73,7 +73,7 @@ namespace Terminal.Gui {
 			Move (0, 0);
 			Driver.SetAttribute (GetNormalColor ());
 
-			var hLineWidth = Math.Max (1, Rune.ColumnWidth (Driver.HLine));
+			var hLineWidth = Math.Max (1, Rune.ColumnWidth (CM.Glyphs.HLine));
 
 			var dEnd = Orientation == Orientation.Horizontal ?
 				Bounds.Width :

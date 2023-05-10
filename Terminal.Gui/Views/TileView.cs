@@ -200,7 +200,9 @@ namespace Terminal.Gui {
 				tile.TitleChanged += (s, e) => SetNeedsDisplay ();
 			}
 
-			LayoutSubviews ();
+			if (IsInitialized) {
+				LayoutSubviews ();
+			}
 		}
 
 		/// <summary>
@@ -233,7 +235,9 @@ namespace Terminal.Gui {
 				}
 			}
 			SetNeedsDisplay ();
-			LayoutSubviews ();
+			if (IsInitialized) {
+				LayoutSubviews ();
+			}
 
 			return toReturn;
 		}
@@ -326,12 +330,18 @@ namespace Terminal.Gui {
 			get { return orientation; }
 			set {
 				orientation = value;
-				LayoutSubviews ();
+				if (IsInitialized) {
+					LayoutSubviews ();
+				}
 			}
 		}
 		/// <inheritdoc/>
 		public override void LayoutSubviews ()
 		{
+			if (!IsInitialized) {
+				return;
+			}
+
 			var contentArea = Bounds;
 
 			if (HasBorder ()) {
@@ -719,7 +729,7 @@ namespace Terminal.Gui {
 				line.Height = orientation == Orientation.Vertical
 					? Dim.Fill () : 1;
 				line.LineRune = orientation == Orientation.Vertical ?
-					Driver.VLine : Driver.HLine;
+					CM.Glyphs.VLine : CM.Glyphs.HLine;
 
 				if (orientation == Orientation.Vertical) {
 					line.X = splitterDistances [i];
@@ -928,7 +938,7 @@ namespace Terminal.Gui {
 					var location = moveRuneRenderLocation ??
 						new Point (Bounds.Width / 2, Bounds.Height / 2);
 
-					AddRune (location.X, location.Y, Driver.Diamond);
+					AddRune (location.X, location.Y, CM.Glyphs.Diamond);
 				}
 			}
 

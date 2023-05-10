@@ -1104,8 +1104,8 @@ This is a test
 			Assert.Null (sbv.OtherScrollBarView);
 			Assert.False (sbv.ShowScrollIndicator);
 			Assert.False (sbv.Visible);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
-This is a test[ Click Me! ]
+			TestHelpers.AssertDriverContentsWithFrameAre (@$"
+This is a test{CM.Glyphs.LeftBracket} Click Me! {CM.Glyphs.RightBracket}
 This is a test             
 This is a test             
 This is a test             
@@ -1131,8 +1131,8 @@ This is a test             ", output);
 			Assert.True (sbv.Visible);
 			Application.Top.Draw ();
 			Assert.False (sbv.Visible);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
-This is a test[ Click Me! ]
+			TestHelpers.AssertDriverContentsWithFrameAre (@$"
+This is a test{CM.Glyphs.LeftBracket} Click Me! {CM.Glyphs.RightBracket}
 This is a test             
 This is a test             
 This is a test             
