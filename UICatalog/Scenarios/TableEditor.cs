@@ -17,6 +17,7 @@ namespace UICatalog.Scenarios {
 	public class TableEditor : Scenario {
 		TableView tableView;
 		DataTable currentTable;
+    
 		private MenuItem _miShowHeaders;
 		private MenuItem _miAlwaysShowHeaders;
 		private MenuItem _miHeaderOverline;
@@ -32,6 +33,8 @@ namespace UICatalog.Scenarios {
 		private MenuItem _miAlternatingColors;
 		private MenuItem _miCursor;
 		private MenuItem _miBottomline;
+		private MenuItem _miCheckboxes;
+		private MenuItem _miRadioboxes;
 
 		ColorScheme redColorScheme;
 		ColorScheme redColorSchemeAlt;
@@ -88,6 +91,8 @@ namespace UICatalog.Scenarios {
 					_miCursor = new MenuItem ("_InvertSelectedCellFirstCharacter", "", () => ToggleInvertSelectedCellFirstCharacter()){Checked = tableView.Style.InvertSelectedCellFirstCharacter,CheckType = MenuItemCheckStyle.Checked},
 					new MenuItem ("ClearColumnSt_yles", "", () => ClearColumnStyles()),
 					new MenuItem ("Sho_wAllColumns", "", ()=>ShowAllColumns())
+					_miCheckboxes = new MenuItem ("_Checkboxes", "", () => ToggleCheckboxes(false)){Checked = false, CheckType = MenuItemCheckStyle.Checked },
+					_miRadioboxes = new MenuItem ("_Radioboxes", "", () => ToggleCheckboxes(true)){Checked = false, CheckType = MenuItemCheckStyle.Checked },
 				}),
 				new MenuBarItem ("_Column", new MenuItem [] {
 					new MenuItem ("Set Ma_x Width", "", SetMaxWidth),
@@ -181,6 +186,12 @@ namespace UICatalog.Scenarios {
 		{
 			var sort = GetProposedNewSortOrder (clickedCol, out var isAsc);
 
+			// don't try to sort on the toggled column
+			if (HasCheckboxes () && clickedCol == 0) {
+				return;
+			}
+				
+
 			SortColumn (clickedCol, sort, isAsc);
 		}
 
@@ -222,7 +233,7 @@ namespace UICatalog.Scenarios {
 		{
 			// work out new sort order
 			var sort = currentTable.DefaultView.Sort;
-			var colName = currentTable.Columns[clickedCol];
+			var colName = tableView.Table.ColumnNames[clickedCol];
 
 			if (sort?.EndsWith ("ASC") ?? false) {
 				sort = $"{colName} DESC";
@@ -237,6 +248,10 @@ namespace UICatalog.Scenarios {
 
 		private void ShowHeaderContextMenu (int clickedCol, MouseEventEventArgs e)
 		{
+			if(HasCheckboxes() && clickedCol == 0) {
+				return;
+			}
+
 			var sort = GetProposedNewSortOrder (clickedCol, out var isAsc);
 			var colName = tableView.Table.ColumnNames[clickedCol];
 
@@ -257,7 +272,7 @@ namespace UICatalog.Scenarios {
 			tableView.Update ();
 		}
 
-		private DataColumn GetColumn ()
+		private int? GetColumn ()
 		{
 			if (tableView.Table == null)
 				return null;
@@ -265,7 +280,7 @@ namespace UICatalog.Scenarios {
 			if (tableView.SelectedColumn < 0 || tableView.SelectedColumn > tableView.Table.Columns)
 				return null;
 
-			return currentTable.Columns [tableView.SelectedColumn];
+			return tableView.SelectedColumn;
 		}
 
 		private void SetMinAcceptableWidthToOne ()
@@ -293,8 +308,12 @@ namespace UICatalog.Scenarios {
 			RunColumnWidthDialog (col, "MaxWidth", (s, v) => s.MaxWidth = v, (s) => s.MaxWidth);
 		}
 
-		private void RunColumnWidthDialog (DataColumn col, string prompt, Action<ColumnStyle, int> setter, Func<ColumnStyle, int> getter)
+		private void RunColumnWidthDialog (int? col, string prompt, Action<ColumnStyle, int> setter, Func<ColumnStyle, int> getter)
 		{
+			if(col == null) {
+				return;
+			}
+
 			var accepted = false;
 			var ok = new Button ("Ok", is_default: true);
 			ok.Clicked += (s,e) => { accepted = true; Application.RequestStop (); };
@@ -302,12 +321,12 @@ namespace UICatalog.Scenarios {
 			cancel.Clicked += (s,e) => { Application.RequestStop (); };
 			var d = new Dialog (ok, cancel) { Title = prompt };
 
-			var style = tableView.Style.GetOrCreateColumnStyle (col.Ordinal);
+			var style = tableView.Style.GetOrCreateColumnStyle (col.Value);
 
 			var lbl = new Label () {
 				X = 0,
 				Y = 1,
-				Text = col.ColumnName
+				Text = tableView.Table.ColumnNames[col.Value]
 			};
 
 			var tf = new TextField () {
@@ -545,6 +564,42 @@ namespace UICatalog.Scenarios {
 
 			tableView.Update ();
 
+		}
+
+		private void ToggleCheckboxes (bool radio)
+		{
+			if (tableView.Table is CheckBoxTableSourceWrapperByIndex wrapper) {
+
+				// unwrap it to remove check boxes
+				tableView.Table = wrapper.Wrapping;
+
+				_miCheckboxes.Checked = false;
+				_miRadioboxes.Checked = false;
+
+				// if toggling off checkboxes/radio
+				if(wrapper.UseRadioButtons == radio) {
+					return;
+				}
+			}
+			
+			// Either toggling on checkboxes/radio or switching from radio to checkboxes (or vice versa)
+			
+			var source = new CheckBoxTableSourceWrapperByIndex (tableView, tableView.Table) {
+				UseRadioButtons = radio
+			};
+			tableView.Table = source;
+
+
+			if (radio) {
+				_miRadioboxes.Checked = true;
+				_miCheckboxes.Checked = false;
+			}
+			else {
+
+				_miRadioboxes.Checked = false;
+				_miCheckboxes.Checked = true;
+			}
+			
 		}
 
 		private void ToggleAlwaysUseNormalColorForVerticalCellLines()
@@ -897,11 +952,17 @@ namespace UICatalog.Scenarios {
 		{
 			if (e.Table == null)
 				return;
-			var o = currentTable.Rows [e.Row] [e.Col];
+
+			var tableCol = ToTableCol(e.Col);
+			if (tableCol < 0) {
+				return;
+			}
+
+			var o = currentTable.Rows [e.Row] [tableCol];
 
 			var title = o is uint u ? GetUnicodeCategory (u) + $"(0x{o:X4})" : "Enter new value";
 
-			var oldValue = currentTable.Rows [e.Row] [e.Col].ToString ();
+			var oldValue = currentTable.Rows [e.Row] [tableCol].ToString ();
 			bool okPressed = false;
 
 			var ok = new Button ("Ok", is_default: true);
@@ -913,7 +974,7 @@ namespace UICatalog.Scenarios {
 			var lbl = new Label () {
 				X = 0,
 				Y = 1,
-				Text = currentTable.Columns [e.Col].ColumnName
+				Text = tableView.Table.ColumnNames[e.Col]
 			};
 
 			var tf = new TextField () {
@@ -931,13 +992,27 @@ namespace UICatalog.Scenarios {
 			if (okPressed) {
 
 				try {
-					currentTable.Rows [e.Row] [e.Col] = string.IsNullOrWhiteSpace (tf.Text.ToString ()) ? DBNull.Value : (object)tf.Text;
+					currentTable.Rows [e.Row] [tableCol] = string.IsNullOrWhiteSpace (tf.Text.ToString ()) ? DBNull.Value : (object)tf.Text;
 				} catch (Exception ex) {
 					MessageBox.ErrorQuery (60, 20, "Failed to set text", ex.Message, "Ok");
 				}
 
 				tableView.Update ();
 			}
+		}
+
+		private int ToTableCol (int col)
+		{
+			if (HasCheckboxes ()) {
+				return col - 1;
+			}
+
+			return col;
+		}
+
+		private bool HasCheckboxes ()
+		{
+			return tableView.Table is CheckBoxTableSourceWrapperBase;
 		}
 
 		private string GetUnicodeCategory (uint u)
