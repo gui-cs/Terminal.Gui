@@ -90,7 +90,7 @@ namespace UICatalog.Scenarios {
 					_miAlternatingColors = new MenuItem ("Alte_rnatingColors", "", () => ToggleAlternatingColors()){CheckType = MenuItemCheckStyle.Checked},
 					_miCursor = new MenuItem ("_InvertSelectedCellFirstCharacter", "", () => ToggleInvertSelectedCellFirstCharacter()){Checked = tableView.Style.InvertSelectedCellFirstCharacter,CheckType = MenuItemCheckStyle.Checked},
 					new MenuItem ("ClearColumnSt_yles", "", () => ClearColumnStyles()),
-					new MenuItem ("Sho_wAllColumns", "", ()=>ShowAllColumns())
+					new MenuItem ("Sho_wAllColumns", "", ()=>ShowAllColumns()),
 					_miCheckboxes = new MenuItem ("_Checkboxes", "", () => ToggleCheckboxes(false)){Checked = false, CheckType = MenuItemCheckStyle.Checked },
 					_miRadioboxes = new MenuItem ("_Radioboxes", "", () => ToggleCheckboxes(true)){Checked = false, CheckType = MenuItemCheckStyle.Checked },
 				}),
