@@ -313,10 +313,6 @@ namespace Terminal.Gui {
 			// render the header contents
 			if (Style.ShowHeaders && hh > 0) {
 				var padChar = HeaderPaddingSymbol;
-				if (Style.ShowHorizontalHeaderThroughline &&
-					(!Style.ShowHorizontalHeaderOverline || !Style.ShowHorizontalHeaderUnderline)) {
-					padChar = (char)CM.Glyphs.HLine;
-				}
 
 				var yh = hh - 1;
 				if (Style.ShowHorizontalHeaderUnderline) {
@@ -336,10 +332,32 @@ namespace Terminal.Gui {
 
 					Move (current.X, yh);
 
-					Driver.AddStr (TruncateOrPad (colName, colName, current.Width, colStyle, padChar));
+					if (current.Width - colName.Length > 0 &&
+						Style.ShowHorizontalHeaderThroughline &&
+						(!Style.ShowHorizontalHeaderOverline || !Style.ShowHorizontalHeaderUnderline)) {
 
-					if (!Style.ShowVerticalHeaderLines && !Style.ExpandLastColumn && current.IsVeryLast) {
-						AddRune (current.X + current.Width - 1, yh, SeparatorSymbol);
+						if (colName.Sum (c => Rune.ColumnWidth (c)) < current.Width) {
+							Driver.AddStr (colName);
+						} else {
+							Driver.AddStr (new string (colName.TakeWhile (h => (current.Width -= Rune.ColumnWidth (h)) > 0).ToArray ()));
+						}
+					} else {
+						Driver.AddStr (TruncateOrPad (colName, colName, current.Width, colStyle, padChar));
+					}
+
+					if (!Style.ExpandLastColumn) {
+						if (!Style.ShowVerticalHeaderLines && current.IsVeryLast) {
+							AddRune (current.X + current.Width - 1, yh, SeparatorSymbol);
+						}
+						if (i == columnsToRender.Length - 1) {
+							for (int j = current.X + current.Width; j < Bounds.Width; j++) {
+								Driver.SetAttribute (GetNormalColor ());
+								AddRune (j, yh, ' ');
+								if (Style.ShowHorizontalHeaderUnderline) {
+									AddRune (j, yh + 1, ' ');
+								}
+							}
+						}
 					}
 				}
 			}
@@ -348,8 +366,6 @@ namespace Terminal.Gui {
 			for (var line = hh; line < frame.Height; line++) {
 
 				var padChar = CellPaddingSymbol;
-
-				//ClearLine (line, width);
 
 				//work out what Row to render
 				var rowToRender = RowOffset + (line - hh);
@@ -370,18 +386,6 @@ namespace Terminal.Gui {
 
 				RenderRow (line, rowToRender, columnsToRender, padChar);
 			}
-		}
-
-		/// <summary>
-		/// Clears a line of the console by filling it with spaces
-		/// </summary>
-		/// <param name="row"></param>
-		/// <param name="width"></param>
-		private void ClearLine (int row, int width)
-		{
-			Move (0, row);
-			Driver.SetAttribute (GetNormalColor ());
-			Driver.AddStr (new string (' ', width));
 		}
 
 		/// <summary>
@@ -428,24 +432,18 @@ namespace Terminal.Gui {
 					row++;
 				}
 				if (Style.ShowHeaders) {
-					var lineStyle = Style.InnerHeaderLineStyle;
-					if (!Style.ShowHorizontalHeaderOverline)
-						lineStyle = Style.OuterHeaderLineStyle;
 					if (Style.ShowHorizontalHeaderThroughline &&
 						(!Style.ShowHorizontalHeaderOverline || !Style.ShowHorizontalHeaderUnderline)) {
-						grid.AddLine (new Point (0, row), width, Orientation.Horizontal, lineStyle);
+						grid.AddLine (new Point (0, row), width, Orientation.Horizontal, Style.InnerHeaderLineStyle);
 					}
 					row++;
 				}
 				if (Style.ShowHorizontalHeaderUnderline) {
-					var lineStyle = Style.InnerHeaderLineStyle;
-					if (!Style.ShowHorizontalHeaderOverline && !Style.ShowHeaders)
-						lineStyle = Style.OuterHeaderLineStyle;
-					grid.AddLine (new Point (0, row), width, Orientation.Horizontal, lineStyle);
+					grid.AddLine (new Point (0, row), width, Orientation.Horizontal, Style.OuterHeaderLineStyle);
 					row++;
 				}
 
-				if (row > 1 && Style.ShowVerticalHeaderLines) {
+				if (row > 1 && Style.ShowVerticalHeaderLines && Style.InnerHeaderLineStyle != LineStyle.None) {
 					foreach (var col in columnsToRender) {
 						var lineStyle = Style.InnerHeaderLineStyle;
 						if (col.X - 1 == 0) {
@@ -606,6 +604,13 @@ namespace Terminal.Gui {
 					}
 					if (!Style.ExpandLastColumn && current.IsVeryLast) {
 						AddRune (current.X + current.Width - 1, row, SeparatorSymbol);
+					}
+				}
+
+				if (!Style.ExpandLastColumn && i == columnsToRender.Length - 1) {
+					for (int j = current.X + current.Width; j < Bounds.Width; j++) {
+						Driver.SetAttribute (GetNormalColor ());
+						AddRune (j, row, ' ');
 					}
 				}
 			}
@@ -1884,27 +1889,27 @@ namespace Terminal.Gui {
 			public Dictionary<int, ColumnStyle> ColumnStyles { get; set; } = new Dictionary<int, ColumnStyle> ();
 
 			/// <summary>
-			/// The colors to use for border lines)
+			/// The colors to use for border lines
 			/// </summary>
 			public Attribute LineColor { get; set; }
 
 			/// <summary>
-			/// The style to use for border lines within the header)
+			/// The style to use for border lines around the header
 			/// </summary>
 			public LineStyle OuterHeaderLineStyle { get; set; } = LineStyle.Single;
 
 			/// <summary>
-			/// The style to use for border lines within the header)
+			/// The style to use for border lines within the header (vertical lines or throughline)
 			/// </summary>
 			public LineStyle InnerHeaderLineStyle { get; set; } = LineStyle.Single;
 
 			/// <summary>
-			/// The style to use for border lines around the edge of the table)
+			/// The style to use for border lines around the edge of the table
 			/// </summary>
 			public LineStyle OuterLineStyle { get; set; } = LineStyle.Single;
 
 			/// <summary>
-			/// The style to use for border lines within the table)
+			/// The style to use for border lines within the table
 			/// </summary>
 			public LineStyle InnerLineStyle { get; set; } = LineStyle.Single;
 
