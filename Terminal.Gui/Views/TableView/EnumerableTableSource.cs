@@ -50,5 +50,10 @@ namespace Terminal.Gui {
 
 		/// <inheritdoc/>
 		public string [] ColumnNames => cols;
+
+		/// <summary>
+		/// Gets the object collection hosted by this wrapper.
+		/// </summary>
+		public IReadOnlyCollection<T> Data => this.data.AsReadOnly();
 	}
 }
