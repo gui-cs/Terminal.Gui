@@ -36,14 +36,14 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		/// Gets or sets the character to use for checked entries. Defaults to <see cref="ConsoleDriver.Checked"/>
+		/// Gets or sets the character to use for checked entries. Defaults to <see cref="GlyphDefinitions.Checked"/>
 		/// </summary>
-		public Rune CheckedRune { get; set; } = new Rune (Application.Driver != null ? Application.Driver.Checked : '√');
+		public Rune CheckedRune { get; set; } = CM.Glyphs.Checked;
 
 		/// <summary>
-		/// Gets or sets the character to use for UnChecked entries. Defaults to <see cref="ConsoleDriver.UnChecked"/>
+		/// Gets or sets the character to use for UnChecked entries. Defaults to <see cref="GlyphDefinitions.UnChecked"/>
 		/// </summary>
-		public Rune UnCheckedRune { get; set; } = new Rune (Application.Driver != null ? Application.Driver.UnChecked : '╴');
+		public Rune UnCheckedRune { get; set; } = CM.Glyphs.UnChecked;
 
 		/// <summary>
 		/// Gets or sets whether to only allow a single row to be toggled at once (Radio button).
@@ -52,15 +52,15 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Gets or sets the character to use for checked entry when <see cref="UseRadioButtons"/> is true.
-		/// Defaults to <see cref="ConsoleDriver.Selected"/>
+		/// Defaults to <see cref="GlyphDefinitions.Selected"/>
 		/// </summary>
-		public Rune RadioCheckedRune { get; set; } = Application.Driver.Selected;
+		public Rune RadioCheckedRune { get; set; } = CM.Glyphs.Selected;
 
 		/// <summary>
 		/// Gets or sets the character to use for unchecked entries when <see cref="UseRadioButtons"/> is true.
-		/// Defaults to <see cref="ConsoleDriver.UnSelected"/>
+		/// Defaults to <see cref="GlyphDefinitions.UnSelected"/>
 		/// </summary>
-		public Rune RadioUnCheckedRune { get; set; } = Application.Driver.UnSelected;
+		public Rune RadioUnCheckedRune { get; set; } = CM.Glyphs.UnSelected;
 
 		/// <summary>
 		/// Gets the <see cref="ITableSource"/> that this instance is wrapping.
@@ -143,7 +143,7 @@ namespace Terminal.Gui {
 			var range = tableView.GetAllSelectedCells ().Select (c => c.Y).Distinct ().ToArray();
 
 			if(UseRadioButtons) {
-
+				
 				// multi selection makes it unclear what to toggle in this situation
 				if(range.Length != 1) {
 					e.Cancel = true;

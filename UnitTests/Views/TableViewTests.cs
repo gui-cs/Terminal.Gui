@@ -2301,7 +2301,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Table = wrapper;
 
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw ();
 
 			string expected =
 				@"
@@ -2320,7 +2320,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.Single (wrapper.CheckedRows, 0);
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw();
 
 			expected =
 				@"
@@ -2341,7 +2341,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (2, wrapper.CheckedRows.Count);
 
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw();
 
 			expected =
 				@"
@@ -2359,7 +2359,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.Single (wrapper.CheckedRows, 1);
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw();
 
 			expected =
 				@"
@@ -2387,7 +2387,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.ProcessKey (new KeyEvent (Key.A | Key.CtrlMask, new KeyModifiers { Ctrl = true }));
 			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw();
 
 			string expected =
 				@"
@@ -2406,7 +2406,7 @@ namespace Terminal.Gui.ViewsTests {
 			// Untoggle all again
 			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw();
 
 			expected =
 				@"
@@ -2433,7 +2433,7 @@ namespace Terminal.Gui.ViewsTests {
 			wrapper.CheckedRows.Add (0);
 			wrapper.CheckedRows.Add (2);
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw();
 
 			string expected =
 				@"
@@ -2455,7 +2455,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Contains (2, wrapper.CheckedRows);
 			Assert.Equal (3, wrapper.CheckedRows.Count);
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw();
 
 			expected =
 				@"
@@ -2470,7 +2470,7 @@ namespace Terminal.Gui.ViewsTests {
 			// Untoggle the top 2
 			tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw();
 
 			expected =
 				@"
@@ -2499,7 +2499,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			tv.Table = wrapper;
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw();
 
 			string expected =
 				@"
@@ -2518,7 +2518,7 @@ namespace Terminal.Gui.ViewsTests {
 			
 			Assert.True (pets.First ().IsPicked);
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw();
 
 			expected =
 				@"
@@ -2539,7 +2539,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (pets.ElementAt (1).IsPicked);
 			Assert.False (pets.ElementAt (2).IsPicked);
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw();
 
 			expected =
 				@"
@@ -2561,7 +2561,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (pets.ElementAt (1).IsPicked);
 			Assert.False (pets.ElementAt (2).IsPicked);
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw();
 
 			expected =
 				@"
@@ -2601,7 +2601,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.True (pets.All (p => p.IsPicked));
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw();
 
 			string expected =
 				@"
@@ -2619,7 +2619,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.Empty (pets.Where (p => p.IsPicked));
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw();
 
 			expected =
 				@"
@@ -2651,7 +2651,7 @@ namespace Terminal.Gui.ViewsTests {
 			wrapper.UseRadioButtons = true;
 
 			tv.Table = wrapper;
-			tv.Redraw (tv.Bounds);
+			tv.Draw();
 
 			string expected =
 				@"
@@ -2671,7 +2671,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.True (pets.First ().IsPicked);
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw();
 
 			expected =
 				@"
@@ -2692,7 +2692,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (pets.ElementAt (1).IsPicked);
 			Assert.False (pets.ElementAt (2).IsPicked);
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw();
 
 			expected =
 				@"
@@ -2714,7 +2714,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (pets.ElementAt (1).IsPicked);
 			Assert.False (pets.ElementAt (2).IsPicked);
 
-			tv.Redraw (tv.Bounds);
+			tv.Draw();
 
 			expected =
 				@"

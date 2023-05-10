@@ -76,10 +76,10 @@ namespace UICatalog.Scenarios {
 					_miSmoothScrolling = new MenuItem ("_SmoothHorizontalScrolling", "", () => ToggleSmoothScrolling()){Checked = tableView.Style.SmoothHorizontalScrolling, CheckType = MenuItemCheckStyle.Checked },
 					new MenuItem ("_AllLines", "", () => ToggleAllCellLines()),
 					new MenuItem ("_NoLines", "", () => ToggleNoCellLines()),
-					miCheckboxes = new MenuItem ("_Checkboxes", "", () => ToggleCheckboxes(false)){Checked = false, CheckType = MenuItemCheckStyle.Checked },
-					miRadioboxes = new MenuItem ("_Radioboxes", "", () => ToggleCheckboxes(true)){Checked = false, CheckType = MenuItemCheckStyle.Checked },
-					miAlternatingColors = new MenuItem ("Alternating Colors", "", () => ToggleAlternatingColors()){CheckType = MenuItemCheckStyle.Checked},
-					miCursor = new MenuItem ("Invert Selected Cell First Character", "", () => ToggleInvertSelectedCellFirstCharacter()){Checked = tableView.Style.InvertSelectedCellFirstCharacter,CheckType = MenuItemCheckStyle.Checked},
+					_miCheckboxes = new MenuItem ("_Checkboxes", "", () => ToggleCheckboxes(false)){Checked = false, CheckType = MenuItemCheckStyle.Checked },
+					_miRadioboxes = new MenuItem ("_Radioboxes", "", () => ToggleCheckboxes(true)){Checked = false, CheckType = MenuItemCheckStyle.Checked },
+					_miAlternatingColors = new MenuItem ("Alternating Colors", "", () => ToggleAlternatingColors()){CheckType = MenuItemCheckStyle.Checked},
+					_miCursor = new MenuItem ("Invert Selected Cell First Character", "", () => ToggleInvertSelectedCellFirstCharacter()){Checked = tableView.Style.InvertSelectedCellFirstCharacter,CheckType = MenuItemCheckStyle.Checked},
 					new MenuItem ("_ClearColumnStyles", "", () => ClearColumnStyles()),
 					new MenuItem ("Sho_w All Columns", "", ()=>ShowAllColumns())
 				}),
@@ -467,8 +467,8 @@ namespace UICatalog.Scenarios {
 				// unwrap it to remove check boxes
 				tableView.Table = wrapper.Wrapping;
 
-				miCheckboxes.Checked = false;
-				miRadioboxes.Checked = false;
+				_miCheckboxes.Checked = false;
+				_miRadioboxes.Checked = false;
 
 				// if toggling off checkboxes/radio
 				if(wrapper.UseRadioButtons == radio) {
@@ -485,13 +485,13 @@ namespace UICatalog.Scenarios {
 
 
 			if (radio) {
-				miRadioboxes.Checked = true;
-				miCheckboxes.Checked = false;
+				_miRadioboxes.Checked = true;
+				_miCheckboxes.Checked = false;
 			}
 			else {
 
-				miRadioboxes.Checked = false;
-				miCheckboxes.Checked = true;
+				_miRadioboxes.Checked = false;
+				_miCheckboxes.Checked = true;
 			}
 			
 		}
