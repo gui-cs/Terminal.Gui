@@ -1,4 +1,4 @@
-// This code is ported/adapted from https://github.com/devblackops/Terminal-Icons which also uses the licensed under MIT license.
+// This code is adapted from https://github.com/devblackops/Terminal-Icons (which also uses the MIT license).
 // Nerd fonts can be installed by following the instructions on the Nerd Fonts repository: https://github.com/ryanoasis/nerd-fonts
 
 using System.Collections.Generic;
