@@ -152,6 +152,11 @@ namespace Terminal.Gui {
 		public event EventHandler<CellActivatedEventArgs> CellActivated;
 
 		/// <summary>
+		/// This event is raised when a cell is toggled (see <see cref="Command.ToggleChecked"/>
+		/// </summary>
+		public event EventHandler<CellToggledEventArgs> CellToggled;
+
+		/// <summary>
 		/// The key which when pressed should trigger <see cref="CellActivated"/> event.  Defaults to Enter.
 		/// </summary>
 		public Key CellActivationKey {
@@ -1046,6 +1051,13 @@ namespace Terminal.Gui {
 
 		private void ToggleCurrentCellSelection ()
 		{
+
+			var e = new CellToggledEventArgs (Table, selectedColumn, selectedRow);
+			OnCellToggled (e);
+			if (e.Cancel) {
+				return;
+			}
+
 			if (!MultiSelect) {
 				return;
 			}
@@ -1577,6 +1589,14 @@ namespace Terminal.Gui {
 		protected virtual void OnCellActivated (CellActivatedEventArgs args)
 		{
 			CellActivated?.Invoke (this, args);
+		}
+		/// <summary>
+		/// Invokes the <see cref="CellToggled"/> event
+		/// </summary>
+		/// <param name="args"></param>
+		protected virtual void OnCellToggled(CellToggledEventArgs args)
+		{
+			CellToggled?.Invoke (this, args);
 		}
 
 		/// <summary>
