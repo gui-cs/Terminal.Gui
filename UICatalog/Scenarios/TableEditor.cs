@@ -607,7 +607,7 @@ namespace UICatalog.Scenarios {
 			new UnicodeRange(0xFB00, 0xFb4f,"Alphabetic Presentation Forms"),
 			new UnicodeRange(0x12400, 0x1240f,"Cuneiform Numbers and Punctuation"),
 			new UnicodeRange(0x1FA00, 0x1FA0f,"Chess Symbols"),
-			new UnicodeRange((uint)(CharMap.MaxCodePointVal - 16), (uint)CharMap.MaxCodePointVal,"End"),
+			new UnicodeRange((uint)(CharMap.MaxCodePoint - 16), (uint)CharMap.MaxCodePoint,"End"),
 
 			new UnicodeRange (0x0020 ,0x007F        ,"Basic Latin"),
 			new UnicodeRange (0x00A0 ,0x00FF        ,"Latin-1 Supplement"),

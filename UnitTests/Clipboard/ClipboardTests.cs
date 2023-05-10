@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
-using static AutoInitShutdownAttribute;
 
 namespace Terminal.Gui.ClipboardTests {
 	public class ClipboardTests {

@@ -12,14 +12,15 @@ namespace Terminal.Gui;
 /// </summary>
 public static class RuneExtensions {
 
-
+	/// <summary>
+	/// Returns <see langword="true"/> if the <see cref="Rune"/> is a combining character.
+	/// </summary>
+	/// <param name="rune"></param>
+	/// <returns></returns>
 	public static bool IsCombiningMark (this System.Text.Rune rune)
 	{
-		// Convert Rune to string
 		UnicodeCategory category = Rune.GetUnicodeCategory (rune);
-
-		// Check if the category corresponds to a combining mark
-		return category == UnicodeCategory.NonSpacingMark
+		return Rune.GetUnicodeCategory (rune) == UnicodeCategory.NonSpacingMark
 			|| category == UnicodeCategory.SpacingCombiningMark
 			|| category == UnicodeCategory.EnclosingMark;
 	}
@@ -40,7 +41,6 @@ public static class RuneExtensions {
 	/// Ensures a Rune is not a control character and can be displayed by translating characters below 0x20
 	/// to equivalent, printable, Unicode chars.
 	/// </summary>
-	/// <param name="run"></param>
 	/// <param name="rune"></param>
 	/// <returns></returns>
 	public static Rune MakePrintable (this System.Text.Rune rune) => Rune.IsControl (rune) ? new Rune (rune.Value + 0x2400) : rune;
@@ -217,8 +217,8 @@ public abstract class ConsoleDriver {
 		Clip.Contains (col, row);
 
 	/// <summary>
-	/// Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(ustring)"/> are 
-	/// subject to. 
+	/// Gets or sets the clip rectangle that <see cref="AddRune(System.Rune)"/> and <see cref="AddStr(ustring)"/> are 
+	/// subject to.
 	/// </summary>
 	/// <value>The rectangle describing the bounds of <see cref="Clip"/>.</value>
 	public Rect Clip {
@@ -274,8 +274,8 @@ public abstract class ConsoleDriver {
 	public Attribute CurrentAttribute {
 		get => _currentAttribute;
 		set {
-			if (!value.Initialized && value.HasValidColors && Application.Driver != null) {
-				CurrentAttribute = Application.Driver.MakeAttribute (value.Foreground, value.Background);
+			if (value is { Initialized: false, HasValidColors: true } && Application.Driver != null) {
+				_currentAttribute = Application.Driver.MakeAttribute (value.Foreground, value.Background);
 				return;
 			}
 			if (!value.Initialized) Debug.WriteLine ("ConsoleDriver.CurrentAttribute: Attributes must be initialized before use.");
@@ -331,8 +331,7 @@ public abstract class ConsoleDriver {
 	/// Ensures all <see cref="Attribute"/>s in <see cref="Colors.ColorSchemes"/> are correctly 
 	/// initialized by the driver.
 	/// </summary>
-	/// <param name="supportsColors">Flag indicating if colors are supported (not used).</param>
-	public void InitializeColorSchemes (bool supportsColors = true)
+	public void InitializeColorSchemes ()
 	{
 		// Ensure all Attributes are initialized by the driver
 		foreach (var s in Colors.ColorSchemes) {

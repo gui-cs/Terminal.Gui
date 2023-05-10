@@ -70,14 +70,7 @@ namespace Terminal.Gui {
 				}
 			}
 		}
-		private int _boxHeight = 2;
-
-		// Cursor runes.
-		private static readonly Rune [] _cursorRunes = new Rune []
-		{
-			0x250C, 0x2500, 0x2500, 0x2510,
-			0x2514, 0x2500, 0x2500, 0x2518
-		};
+		int _boxHeight = 2;
 
 		/// <summary>
 		/// Cursor for the selected color.

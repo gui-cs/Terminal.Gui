@@ -28,12 +28,12 @@ internal class WindowsConsole {
 	{
 		_inputHandle = GetStdHandle (STD_INPUT_HANDLE);
 		_outputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
-		_originalConsoleMode = _consoleMode;
+		_originalConsoleMode = ConsoleMode;
 		var newConsoleMode = _originalConsoleMode;
 		newConsoleMode |= (uint)(ConsoleModes.EnableMouseInput | ConsoleModes.EnableExtendedFlags);
 		newConsoleMode &= ~(uint)ConsoleModes.EnableQuickEditMode;
 		newConsoleMode &= ~(uint)ConsoleModes.EnableProcessedInput;
-		_consoleMode = newConsoleMode;
+		ConsoleMode = newConsoleMode;
 	}
 
 	CharInfo [] _originalStdOutChars;
@@ -169,7 +169,7 @@ internal class WindowsConsole {
 
 		SetConsoleOutputWindow (out _);
 
-		_consoleMode = _originalConsoleMode;
+		ConsoleMode = _originalConsoleMode;
 		//ContinueListeningForConsoleEvents = false;
 		if (!SetConsoleActiveScreenBuffer (_outputHandle)) {
 			var err = Marshal.GetLastWin32Error ();
@@ -279,7 +279,7 @@ internal class WindowsConsole {
 
 	//bool ContinueListeningForConsoleEvents = true;
 
-	uint _consoleMode {
+	uint ConsoleMode {
 		get {
 			GetConsoleMode (_inputHandle, out uint v);
 			return v;
@@ -354,10 +354,8 @@ internal class WindowsConsole {
 		[FieldOffset (12)]
 		public EventFlags EventFlags;
 
-		public override string ToString ()
-		{
-			return $"[Mouse({MousePosition},{ButtonState},{ControlKeyState},{EventFlags}";
-		}
+		public override readonly string ToString () => $"[Mouse({MousePosition},{ButtonState},{ControlKeyState},{EventFlags}";
+
 	}
 
 	public struct WindowBufferSizeRecord {
@@ -368,7 +366,7 @@ internal class WindowsConsole {
 			_size = new Coord (x, y);
 		}
 
-		public override string ToString () => $"[WindowBufferSize{_size}";
+		public override readonly string ToString () => $"[WindowBufferSize{_size}";
 	}
 
 	[StructLayout (LayoutKind.Sequential)]
@@ -404,22 +402,16 @@ internal class WindowsConsole {
 		[FieldOffset (4)]
 		public FocusEventRecord FocusEvent;
 
-		public override string ToString ()
+		public override readonly string ToString ()
 		{
-			switch (EventType) {
-			case EventType.Focus:
-				return FocusEvent.ToString ();
-			case EventType.Key:
-				return KeyEvent.ToString ();
-			case EventType.Menu:
-				return MenuEvent.ToString ();
-			case EventType.Mouse:
-				return MouseEvent.ToString ();
-			case EventType.WindowBufferSize:
-				return WindowBufferSizeEvent.ToString ();
-			default:
-				return "Unknown event type: " + EventType;
-			}
+			return EventType switch {
+				EventType.Focus => FocusEvent.ToString (),
+				EventType.Key => KeyEvent.ToString (),
+				EventType.Menu => MenuEvent.ToString (),
+				EventType.Mouse => MouseEvent.ToString (),
+				EventType.WindowBufferSize => WindowBufferSizeEvent.ToString (),
+				_ => "Unknown event type: " + EventType
+			};
 		}
 	};
 
@@ -454,7 +446,7 @@ internal class WindowsConsole {
 			X = x;
 			Y = y;
 		}
-		public override string ToString () => $"({X},{Y})";
+		public override readonly string ToString () => $"({X},{Y})";
 	};
 
 	[StructLayout (LayoutKind.Explicit, CharSet = CharSet.Unicode)]
@@ -508,10 +500,7 @@ internal class WindowsConsole {
 				rect.Bottom = row;
 		}
 
-		public override string ToString ()
-		{
-			return $"Left={Left},Top={Top},Right={Right},Bottom={Bottom}";
-		}
+		public override readonly string ToString () => $"Left={Left},Top={Top},Right={Right},Bottom={Bottom}";
 	}
 
 	[StructLayout (LayoutKind.Sequential)]
@@ -519,14 +508,14 @@ internal class WindowsConsole {
 		public ConsoleKeyInfo ConsoleKeyInfo;
 		public bool CapsLock;
 		public bool NumLock;
-		public bool Scrolllock;
+		public bool ScrollLock;
 
 		public ConsoleKeyInfoEx (ConsoleKeyInfo consoleKeyInfo, bool capslock, bool numlock, bool scrolllock)
 		{
 			ConsoleKeyInfo = consoleKeyInfo;
 			CapsLock = capslock;
 			NumLock = numlock;
-			Scrolllock = scrolllock;
+			ScrollLock = scrolllock;
 		}
 	}
 
@@ -818,20 +807,12 @@ internal class WindowsDriver : ConsoleDriver {
 				case WindowsConsole.ControlKeyState.CapslockOn:
 					break;
 				default:
-					switch (inputEvent.KeyEvent.wVirtualKeyCode) {
-					case 0x10:
-						key = new KeyEvent (Key.ShiftMask, _keyModifiers);
-						break;
-					case 0x11:
-						key = new KeyEvent (Key.CtrlMask, _keyModifiers);
-						break;
-					case 0x12:
-						key = new KeyEvent (Key.AltMask, _keyModifiers);
-						break;
-					default:
-						key = new KeyEvent (Key.Unknown, _keyModifiers);
-						break;
-					}
+					key = inputEvent.KeyEvent.wVirtualKeyCode switch {
+						0x10 => new KeyEvent (Key.ShiftMask, _keyModifiers),
+						0x11 => new KeyEvent (Key.CtrlMask, _keyModifiers),
+						0x12 => new KeyEvent (Key.AltMask, _keyModifiers),
+						_ => new KeyEvent (Key.Unknown, _keyModifiers)
+					};
 					break;
 				}
 
@@ -843,9 +824,7 @@ internal class WindowsDriver : ConsoleDriver {
 			} else {
 				if (inputEvent.KeyEvent.bKeyDown) {
 					// May occurs using SendKeys
-					if (_keyModifiers == null) {
-						_keyModifiers = new KeyModifiers ();
-					}
+					_keyModifiers ??= new KeyModifiers ();
 					// Key Down - Fire KeyDown Event and KeyStroke (ProcessKey) Event
 					_keyDownHandler (new KeyEvent (map, _keyModifiers));
 					_keyHandler (new KeyEvent (map, _keyModifiers));
@@ -1159,38 +1138,36 @@ internal class WindowsDriver : ConsoleDriver {
 	{
 		var state = keyEvent.dwControlKeyState;
 
-		bool shift = (state & WindowsConsole.ControlKeyState.ShiftPressed) != 0;
-		bool alt = (state & (WindowsConsole.ControlKeyState.LeftAltPressed | WindowsConsole.ControlKeyState.RightAltPressed)) != 0;
-		bool control = (state & (WindowsConsole.ControlKeyState.LeftControlPressed | WindowsConsole.ControlKeyState.RightControlPressed)) != 0;
-		bool capslock = (state & (WindowsConsole.ControlKeyState.CapslockOn)) != 0;
-		bool numlock = (state & (WindowsConsole.ControlKeyState.NumlockOn)) != 0;
-		bool scrolllock = (state & (WindowsConsole.ControlKeyState.ScrolllockOn)) != 0;
+		var shift = (state & WindowsConsole.ControlKeyState.ShiftPressed) != 0;
+		var alt = (state & (WindowsConsole.ControlKeyState.LeftAltPressed | WindowsConsole.ControlKeyState.RightAltPressed)) != 0;
+		var control = (state & (WindowsConsole.ControlKeyState.LeftControlPressed | WindowsConsole.ControlKeyState.RightControlPressed)) != 0;
+		var capsLock = (state & (WindowsConsole.ControlKeyState.CapslockOn)) != 0;
+		var numLock = (state & (WindowsConsole.ControlKeyState.NumlockOn)) != 0;
+		var scrollLock = (state & (WindowsConsole.ControlKeyState.ScrolllockOn)) != 0;
 
-		if (_keyModifiers == null) {
-			_keyModifiers = new KeyModifiers ();
-		}
+		_keyModifiers ??= new KeyModifiers ();
 		if (shift) {
-			_keyModifiers.Shift = shift;
+			_keyModifiers.Shift = true;
 		}
 		if (alt) {
-			_keyModifiers.Alt = alt;
+			_keyModifiers.Alt = true;
 		}
 		if (control) {
-			_keyModifiers.Ctrl = control;
+			_keyModifiers.Ctrl = true;
 		}
-		if (capslock) {
-			_keyModifiers.Capslock = capslock;
+		if (capsLock) {
+			_keyModifiers.Capslock = true;
 		}
-		if (numlock) {
-			_keyModifiers.Numlock = numlock;
+		if (numLock) {
+			_keyModifiers.Numlock = true;
 		}
-		if (scrolllock) {
-			_keyModifiers.Scrolllock = scrolllock;
+		if (scrollLock) {
+			_keyModifiers.Scrolllock = true;
 		}
 
-		var ConsoleKeyInfo = new ConsoleKeyInfo (keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
+		var consoleKeyInfo = new ConsoleKeyInfo (keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
 
-		return new WindowsConsole.ConsoleKeyInfoEx (ConsoleKeyInfo, capslock, numlock, scrolllock);
+		return new WindowsConsole.ConsoleKeyInfoEx (consoleKeyInfo, capsLock, numLock, scrollLock);
 	}
 
 	public WindowsConsole.KeyEventRecord FromVKPacketToKeyEventRecord (WindowsConsole.KeyEventRecord keyEvent)
@@ -1506,7 +1483,6 @@ internal class WindowsDriver : ConsoleDriver {
 		////	}
 		////	Col++;
 		////}
-		///
 		Col++;
 
 	}
@@ -1567,7 +1543,7 @@ internal class WindowsDriver : ConsoleDriver {
 			Rows = winSize.Height;
 			WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
 
-		} catch (Win32Exception e) {
+		} catch (Win32Exception) {
 			// Likely running unit tests. Set WinConsole to null so we can test it elsewhere.
 			WinConsole = null;
 			//throw new InvalidOperationException ("The Windows Console output window is not available.", e);

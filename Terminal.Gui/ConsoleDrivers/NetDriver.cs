@@ -123,10 +123,7 @@ internal class NetEvents {
 
 	public NetEvents (ConsoleDriver consoleDriver)
 	{
-		if (consoleDriver == null) {
-			throw new ArgumentNullException ("Console driver instance must be provided.");
-		}
-		_consoleDriver = consoleDriver;
+		_consoleDriver = consoleDriver ?? throw new ArgumentNullException (nameof (consoleDriver));
 		Task.Run (ProcessInputResultQueue);
 		Task.Run (CheckWinChange);
 	}
@@ -306,14 +303,8 @@ internal class NetEvents {
 
 	void DecodeEscSeq (ref ConsoleKeyInfo newConsoleKeyInfo, ref ConsoleKey key, ConsoleKeyInfo [] cki, ref ConsoleModifiers mod)
 	{
-		string c1Control, code, terminating;
-		string [] values;
 		// isKeyMouse is true if it's CSI<, false otherwise
-		bool isKeyMouse;
-		bool isReq;
-		List<MouseFlags> mouseFlags;
-		Point pos;
-		EscSeqUtils.DecodeEscSeq (EscSeqReqProc, ref newConsoleKeyInfo, ref key, cki, ref mod, out c1Control, out code, out values, out terminating, out isKeyMouse, out mouseFlags, out pos, out isReq, ProcessContinuousButtonPressed);
+		EscSeqUtils.DecodeEscSeq (EscSeqReqProc, ref newConsoleKeyInfo, ref key, cki, ref mod, out var c1Control, out var code, out var values, out var terminating, out var isKeyMouse, out var mouseFlags, out var pos, out var isReq, ProcessContinuousButtonPressed);
 
 		if (isKeyMouse) {
 			foreach (var mf in mouseFlags) {
@@ -440,7 +431,6 @@ internal class NetEvents {
 
 	void GetRequestEvent (string c1Control, string code, string [] values, string terminating)
 	{
-		EventType eventType = new EventType ();
 		switch (terminating) {
 		case "R": // Reports cursor position as CSI r ; c R
 			Point point = new Point {
@@ -449,7 +439,7 @@ internal class NetEvents {
 			};
 			if (_lastCursorPosition.Y != point.Y) {
 				_lastCursorPosition = point;
-				eventType = EventType.WindowPosition;
+				var eventType = EventType.WindowPosition;
 				var winPositionEv = new WindowPositionEvent () {
 					CursorPosition = point
 				};
@@ -630,7 +620,7 @@ internal class NetDriver : ConsoleDriver {
 		if (Contents.Length != Rows * Cols * 3) {
 			// BUGBUG: Shouldn't this throw an exception? Doing so to see what happens
 			throw new InvalidOperationException ("Driver contents are wrong size");
-			return;
+			//return;
 		}
 
 		int runeWidth = -1;
@@ -725,7 +715,7 @@ internal class NetDriver : ConsoleDriver {
 			IsWinPlatform = true;
 			try {
 				NetWinConsole = new NetWinVTConsole ();
-			} catch (ApplicationException e) {
+			} catch (ApplicationException) {
 				// Likely running as a unit test, or in a non-interactive session.
 			}
 		}
@@ -960,41 +950,25 @@ internal class NetDriver : ConsoleDriver {
 
 	int MapColors (ConsoleColor color, bool isForeground = true)
 	{
-		switch (color) {
-		case ConsoleColor.Black:
-			return isForeground ? COLOR_BLACK : COLOR_BLACK + 10;
-		case ConsoleColor.DarkBlue:
-			return isForeground ? COLOR_BLUE : COLOR_BLUE + 10;
-		case ConsoleColor.DarkGreen:
-			return isForeground ? COLOR_GREEN : COLOR_GREEN + 10;
-		case ConsoleColor.DarkCyan:
-			return isForeground ? COLOR_CYAN : COLOR_CYAN + 10;
-		case ConsoleColor.DarkRed:
-			return isForeground ? COLOR_RED : COLOR_RED + 10;
-		case ConsoleColor.DarkMagenta:
-			return isForeground ? COLOR_MAGENTA : COLOR_MAGENTA + 10;
-		case ConsoleColor.DarkYellow:
-			return isForeground ? COLOR_YELLOW : COLOR_YELLOW + 10;
-		case ConsoleColor.Gray:
-			return isForeground ? COLOR_WHITE : COLOR_WHITE + 10;
-		case ConsoleColor.DarkGray:
-			return isForeground ? COLOR_BRIGHT_BLACK : COLOR_BRIGHT_BLACK + 10;
-		case ConsoleColor.Blue:
-			return isForeground ? COLOR_BRIGHT_BLUE : COLOR_BRIGHT_BLUE + 10;
-		case ConsoleColor.Green:
-			return isForeground ? COLOR_BRIGHT_GREEN : COLOR_BRIGHT_GREEN + 10;
-		case ConsoleColor.Cyan:
-			return isForeground ? COLOR_BRIGHT_CYAN : COLOR_BRIGHT_CYAN + 10;
-		case ConsoleColor.Red:
-			return isForeground ? COLOR_BRIGHT_RED : COLOR_BRIGHT_RED + 10;
-		case ConsoleColor.Magenta:
-			return isForeground ? COLOR_BRIGHT_MAGENTA : COLOR_BRIGHT_MAGENTA + 10;
-		case ConsoleColor.Yellow:
-			return isForeground ? COLOR_BRIGHT_YELLOW : COLOR_BRIGHT_YELLOW + 10;
-		case ConsoleColor.White:
-			return isForeground ? COLOR_BRIGHT_WHITE : COLOR_BRIGHT_WHITE + 10;
-		}
-		return 0;
+		return color switch {
+			ConsoleColor.Black => isForeground ? COLOR_BLACK : COLOR_BLACK + 10,
+			ConsoleColor.DarkBlue => isForeground ? COLOR_BLUE : COLOR_BLUE + 10,
+			ConsoleColor.DarkGreen => isForeground ? COLOR_GREEN : COLOR_GREEN + 10,
+			ConsoleColor.DarkCyan => isForeground ? COLOR_CYAN : COLOR_CYAN + 10,
+			ConsoleColor.DarkRed => isForeground ? COLOR_RED : COLOR_RED + 10,
+			ConsoleColor.DarkMagenta => isForeground ? COLOR_MAGENTA : COLOR_MAGENTA + 10,
+			ConsoleColor.DarkYellow => isForeground ? COLOR_YELLOW : COLOR_YELLOW + 10,
+			ConsoleColor.Gray => isForeground ? COLOR_WHITE : COLOR_WHITE + 10,
+			ConsoleColor.DarkGray => isForeground ? COLOR_BRIGHT_BLACK : COLOR_BRIGHT_BLACK + 10,
+			ConsoleColor.Blue => isForeground ? COLOR_BRIGHT_BLUE : COLOR_BRIGHT_BLUE + 10,
+			ConsoleColor.Green => isForeground ? COLOR_BRIGHT_GREEN : COLOR_BRIGHT_GREEN + 10,
+			ConsoleColor.Cyan => isForeground ? COLOR_BRIGHT_CYAN : COLOR_BRIGHT_CYAN + 10,
+			ConsoleColor.Red => isForeground ? COLOR_BRIGHT_RED : COLOR_BRIGHT_RED + 10,
+			ConsoleColor.Magenta => isForeground ? COLOR_BRIGHT_MAGENTA : COLOR_BRIGHT_MAGENTA + 10,
+			ConsoleColor.Yellow => isForeground ? COLOR_BRIGHT_YELLOW : COLOR_BRIGHT_YELLOW + 10,
+			ConsoleColor.White => isForeground ? COLOR_BRIGHT_WHITE : COLOR_BRIGHT_WHITE + 10,
+			var _ => 0
+		};
 	}
 
 	bool SetCursorPosition (int col, int row)
@@ -1221,9 +1195,7 @@ internal class NetDriver : ConsoleDriver {
 
 	Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
 	{
-		if (_keyModifiers == null) {
-			_keyModifiers = new KeyModifiers ();
-		}
+		_keyModifiers ??= new KeyModifiers ();
 		Key keyMod = new Key ();
 		if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0) {
 			keyMod = Key.ShiftMask;
@@ -1419,9 +1391,10 @@ internal class NetDriver : ConsoleDriver {
 
 	public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
 	{
-		NetEvents.InputResult input = new NetEvents.InputResult ();
-		input.EventType = NetEvents.EventType.Key;
-		input.ConsoleKeyInfo = new ConsoleKeyInfo (keyChar, key, shift, alt, control);
+		NetEvents.InputResult input = new NetEvents.InputResult {
+			EventType = NetEvents.EventType.Key,
+			ConsoleKeyInfo = new ConsoleKeyInfo (keyChar, key, shift, alt, control)
+		};
 
 		try {
 			ProcessInput (input);
@@ -1476,10 +1449,11 @@ internal class NetMainLoop : IMainLoopDriver {
 	///   Passing a consoleDriver is provided to capture windows resizing.
 	/// </remarks>
 	/// <param name="consoleDriver">The console driver used by this Net main loop.</param>
+	/// <exception cref="ArgumentNullException"></exception>
 	public NetMainLoop (ConsoleDriver consoleDriver = null)
 	{
 		if (consoleDriver == null) {
-			throw new ArgumentNullException ("Console driver instance must be provided.");
+			throw new ArgumentNullException (nameof (consoleDriver));
 		}
 		_netEvents = new NetEvents (consoleDriver);
 	}

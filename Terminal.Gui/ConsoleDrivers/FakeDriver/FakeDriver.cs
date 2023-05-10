@@ -97,13 +97,13 @@ public class FakeDriver : ConsoleDriver {
 					// Decode
 					OperationStatus opStatus = Rune.DecodeFromUtf16 (remainingInput, out Rune result, out int charsConsumed);
 
-					if (opStatus == OperationStatus.DestinationTooSmall || opStatus == OperationStatus.InvalidData) {
+					if (opStatus is OperationStatus.DestinationTooSmall or OperationStatus.InvalidData) {
 						result = Rune.ReplacementChar;
 					}
 
 					newCombo.Append (result);
 					// Slice and loop again
-					remainingInput = remainingInput.Slice (charsConsumed);
+					remainingInput = remainingInput [charsConsumed..];
 				}
 				newCombo.Append (rune);
 
@@ -513,12 +513,10 @@ public class FakeDriver : ConsoleDriver {
 			if (FakeConsole.WindowHeight > 0) {
 				// Can raise an exception while is still resizing.
 				try {
-#pragma warning disable CA1416
 					FakeConsole.CursorTop = 0;
 					FakeConsole.CursorLeft = 0;
 					FakeConsole.WindowTop = 0;
 					FakeConsole.WindowLeft = 0;
-#pragma warning restore CA1416
 				} catch (System.IO.IOException) {
 					return;
 				} catch (ArgumentOutOfRangeException) {

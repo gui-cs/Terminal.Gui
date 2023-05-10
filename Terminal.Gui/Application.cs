@@ -1207,10 +1207,7 @@ namespace Terminal.Gui {
 
 		static void ProcessMouseEvent (MouseEvent me)
 		{
-			bool OutsideBounds (Point p, Rect r)
-			{
-				return p.X < 0 || p.X > r.Right || p.Y < 0 || p.Y > r.Bottom;
-			}
+			static bool OutsideBounds (Point p, Rect r) => p.X < 0 || p.X > r.Right || p.Y < 0 || p.Y > r.Bottom;
 
 			if (IsMouseDisabled) {
 				return;

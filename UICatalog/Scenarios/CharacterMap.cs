@@ -137,11 +137,20 @@ class CharMap : ScrollView {
 				ContentOffset = new Point (Math.Min (col, col - width + COLUMN_WIDTH), ContentOffset.Y);
 			}
 			SetNeedsDisplay ();
-			Move (col + ContentOffset.X + RowLabelWidth + 1, row + ContentOffset.Y + 1);
-			Driver.UpdateCursor ();
+			UpdateCursor ();
 
 		}
 	}
+
+	void UpdateCursor ()
+	{
+		int row = (int)_selected / 16;
+		int col = (((int)_selected - (row * 16)) * COLUMN_WIDTH);
+
+		Move (col + ContentOffset.X + RowLabelWidth + 1, row + ContentOffset.Y + 1);
+		Driver.UpdateCursor ();
+	}
+
 
 	uint _start = 0;
 	uint _selected = 0;
@@ -163,13 +172,13 @@ class CharMap : ScrollView {
 
 		AddCommand (Command.ScrollUp, () => {
 			if (SelectedCodePoint >= 16) {
-				SelectedCodePoint = SelectedCodePoint - 16;
+				SelectedCodePoint -= 16;
 			}
 			return true;
 		});
 		AddCommand (Command.ScrollDown, () => {
 			if (SelectedCodePoint < MaxCodePoint - 16) {
-				SelectedCodePoint = SelectedCodePoint + 16;
+				SelectedCodePoint += 16;
 			}
 			return true;
 		});
@@ -212,10 +221,7 @@ class CharMap : ScrollView {
 		MouseClick += Handle_MouseClick;
 
 		// Reset cursor on resize
-		LayoutComplete += (s, a) => {
-			Driver.SetCursorVisibility (CursorVisibility.Default);
-			SelectedCodePoint = SelectedCodePoint;
-		};
+		LayoutComplete += (s, a) => { UpdateCursor (); };
 	}
 
 	private void CopyCodePoint ()
@@ -362,8 +368,7 @@ class CharMap : ScrollView {
 	public override bool OnEnter (View view)
 	{
 		if (IsInitialized) {
-			Application.Driver.SetCursorVisibility (CursorVisibility.Default);
-			SelectedCodePoint = SelectedCodePoint; // update cursor location
+			UpdateCursor ();
 		} else {
 			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
 
