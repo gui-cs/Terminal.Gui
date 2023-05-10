@@ -8,13 +8,18 @@ using System.IO.Abstractions;
 namespace Terminal.Gui {
 	internal class NerdFonts {
 
-		public string GetNerdIcon(IFileSystemInfo file)
+		public string GetNerdIcon(FileDialogIconGetterArgs args)
 		{
-			return GetNerdIconChar(file) + " ";
+			return GetNerdIconChar(args) + " ";
 		}
 
-		private char GetNerdIconChar(IFileSystemInfo file)
+		private char GetNerdIconChar(FileDialogIconGetterArgs args)
 		{
+			var file = args.File;
+			var path = args.FileDialog.Path;
+
+			// TODO: opened file
+
 			if(FilenameToIcon.ContainsKey(file.Name))
 			{
 				return Glyphs[FilenameToIcon[file.Name]];
@@ -25,14 +30,19 @@ namespace Terminal.Gui {
 				return Glyphs[ExtensionToIcon[file.Extension]];
 			}
 
-			if(file is IDirectoryInfo)
+			if(file is IDirectoryInfo d)
 			{
+				if(path != null && path.Contains(d.FullName) && args.Context == FileDialogIconGetterContext.Tree)
+				{
+					return _nf_cod_folder_opened;
+				}
 				return _nf_cod_folder;
 			}
 				
 			return _nf_cod_file;
 		}
 		char _nf_cod_folder = '';
+		char _nf_cod_folder_opened = '';
 		char _nf_cod_file = '';
 
 		/// <summary>

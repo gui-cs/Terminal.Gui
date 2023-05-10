@@ -1141,7 +1141,7 @@ namespace Terminal.Gui {
 			if (this.State == null) {
 				return;
 			}
-			this.tableView.Table = new FileDialogTableSource (this.State, this.Style, currentSortColumn, currentSortIsAsc);
+			this.tableView.Table = new FileDialogTableSource (this, this.State, this.Style, currentSortColumn, currentSortIsAsc);
 
 			this.ApplySort ();
 			this.tableView.Update ();
@@ -1269,7 +1269,7 @@ namespace Terminal.Gui {
 		{
 			this.GetProposedNewSortOrder (clickedCol, out var isAsc);
 			this.SortColumn (clickedCol, isAsc);
-			this.tableView.Table = new FileDialogTableSource (State, Style, currentSortColumn, currentSortIsAsc);
+			this.tableView.Table = new FileDialogTableSource (this, State, Style, currentSortColumn, currentSortIsAsc);
 		}
 
 		internal void SortColumn (int col, bool isAsc)

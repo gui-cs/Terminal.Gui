@@ -168,7 +168,7 @@ namespace Terminal.Gui {
 		/// User defined delegate for picking which character(s)/unicode
 		/// symbol(s) to use as an 'icon' for files/folders. 
 		/// </summary>
-		public Func<IFileSystemInfo, string> IconGetter { get; set; }
+		public Func<FileDialogIconGetterArgs, string> IconGetter { get; set; }
 
 		/// <summary>
 		/// Gets or sets the format to use for date/times in the Modified column.
@@ -220,9 +220,11 @@ namespace Terminal.Gui {
 			};
 		}
 
-		private string DefaultIconGetter (IFileSystemInfo arg)
+		private string DefaultIconGetter (FileDialogIconGetterArgs args)
 		{
-			if (arg is IDirectoryInfo) {
+			var file = args.File;
+
+			if (file is IDirectoryInfo) {
 				return UseUnicodeCharacters ? "\ua909 " : "\\";
 			}
 

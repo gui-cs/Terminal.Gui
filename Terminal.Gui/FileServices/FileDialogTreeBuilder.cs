@@ -38,13 +38,15 @@ namespace Terminal.Gui {
 
 			if(o is FileDialogRootTreeNode r)
 			{
-				icon = _dlg.Style.IconGetter.Invoke(r.Path);
+				icon = _dlg.Style.IconGetter.Invoke(
+					new FileDialogIconGetterArgs(_dlg, r.Path, FileDialogIconGetterContext.Tree));
 				name = r.DisplayName;
 			}
 			else
 			{
 				var dir  = (IDirectoryInfo)o;
-				icon = _dlg.Style.IconGetter.Invoke(dir);
+				icon = _dlg.Style.IconGetter.Invoke(
+					new FileDialogIconGetterArgs(_dlg, dir, FileDialogIconGetterContext.Tree));
 				name = dir.Name;
 			}
 
