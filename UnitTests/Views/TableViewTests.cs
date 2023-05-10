@@ -2307,9 +2307,9 @@ namespace Terminal.Gui.ViewsTests {
 				@"
 │ │A│B│
 ├─┼─┼─►
-│╴│1│2│
-│╴│1│2│
-│╴│1│2│";
+│☐│1│2│
+│☐│1│2│
+│☐│1│2│";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
@@ -2326,9 +2326,9 @@ namespace Terminal.Gui.ViewsTests {
 				@"
 │ │A│B│
 ├─┼─┼─►
-│√│1│2│
-│╴│1│2│
-│╴│1│2│";
+│☑│1│2│
+│☐│1│2│
+│☐│1│2│";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
@@ -2347,9 +2347,9 @@ namespace Terminal.Gui.ViewsTests {
 				@"
 │ │A│B│
 ├─┼─┼─►
-│√│1│2│
-│√│1│2│
-│╴│1│2│";
+│☑│1│2│
+│☑│1│2│
+│☐│1│2│";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
@@ -2365,9 +2365,9 @@ namespace Terminal.Gui.ViewsTests {
 				@"
 │ │A│B│
 ├─┼─┼─►
-│╴│1│2│
-│√│1│2│
-│╴│1│2│";
+│☐│1│2│
+│☑│1│2│
+│☐│1│2│";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 		}
@@ -2393,9 +2393,9 @@ namespace Terminal.Gui.ViewsTests {
 				@"
 │ │A│B│
 ├─┼─┼─►
-│√│1│2│
-│√│1│2│
-│√│1│2│";
+│☑│1│2│
+│☑│1│2│
+│☑│1│2│";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 			Assert.Contains (0, wrapper.CheckedRows);
@@ -2412,9 +2412,9 @@ namespace Terminal.Gui.ViewsTests {
 				@"
 │ │A│B│
 ├─┼─┼─►
-│╴│1│2│
-│╴│1│2│
-│╴│1│2│";
+│☐│1│2│
+│☐│1│2│
+│☐│1│2│";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
@@ -2439,9 +2439,9 @@ namespace Terminal.Gui.ViewsTests {
 				@"
 │ │A│B│
 ├─┼─┼─►
-│√│1│2│
-│╴│1│2│
-│√│1│2│";
+│☑│1│2│
+│☐│1│2│
+│☑│1│2│";
 			//toggle top two at once
 			tv.ProcessKey (new KeyEvent (Key.CursorDown | Key.ShiftMask, new KeyModifiers { Shift = true }));
 			Assert.True (tv.IsSelected (0, 0));
@@ -2461,9 +2461,9 @@ namespace Terminal.Gui.ViewsTests {
 				@"
 │ │A│B│
 ├─┼─┼─►
-│√│1│2│
-│√│1│2│
-│√│1│2│";
+│☑│1│2│
+│☑│1│2│
+│☑│1│2│";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
@@ -2476,9 +2476,9 @@ namespace Terminal.Gui.ViewsTests {
 				@"
 │ │A│B│
 ├─┼─┼─►
-│╴│1│2│
-│╴│1│2│
-│√│1│2│";
+│☐│1│2│
+│☐│1│2│
+│☑│1│2│";
 			TestHelpers.AssertDriverContentsAre (expected, output);
 			Assert.Single (wrapper.CheckedRows, 2);
 		}
@@ -2506,9 +2506,9 @@ namespace Terminal.Gui.ViewsTests {
 ┌─┬───────┬─────────────┐
 │ │Name   │Kind         │
 ├─┼───────┼─────────────┤
-│╴│Tammy  │Cat          │
-│╴│Tibbles│Cat          │
-│╴│Ripper │Dog          │";
+│☐│Tammy  │Cat          │
+│☐│Tibbles│Cat          │
+│☐│Ripper │Dog          │";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
@@ -2525,9 +2525,9 @@ namespace Terminal.Gui.ViewsTests {
 ┌─┬───────┬─────────────┐
 │ │Name   │Kind         │
 ├─┼───────┼─────────────┤
-│√│Tammy  │Cat          │
-│╴│Tibbles│Cat          │
-│╴│Ripper │Dog          │";
+│☑│Tammy  │Cat          │
+│☐│Tibbles│Cat          │
+│☐│Ripper │Dog          │";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
@@ -2546,9 +2546,9 @@ namespace Terminal.Gui.ViewsTests {
 ┌─┬───────┬─────────────┐
 │ │Name   │Kind         │
 ├─┼───────┼─────────────┤
-│√│Tammy  │Cat          │
-│√│Tibbles│Cat          │
-│╴│Ripper │Dog          │";
+│☑│Tammy  │Cat          │
+│☑│Tibbles│Cat          │
+│☐│Ripper │Dog          │";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
@@ -2568,9 +2568,9 @@ namespace Terminal.Gui.ViewsTests {
 ┌─┬───────┬─────────────┐
 │ │Name   │Kind         │
 ├─┼───────┼─────────────┤
-│╴│Tammy  │Cat          │
-│√│Tibbles│Cat          │
-│╴│Ripper │Dog          │";
+│☐│Tammy  │Cat          │
+│☑│Tibbles│Cat          │
+│☐│Ripper │Dog          │";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
@@ -2608,9 +2608,9 @@ namespace Terminal.Gui.ViewsTests {
 ┌─┬───────┬─────────────┐
 │ │Name   │Kind         │
 ├─┼───────┼─────────────┤
-│√│Tammy  │Cat          │
-│√│Tibbles│Cat          │
-│√│Ripper │Dog          │";
+│☑│Tammy  │Cat          │
+│☑│Tibbles│Cat          │
+│☑│Ripper │Dog          │";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
@@ -2626,9 +2626,9 @@ namespace Terminal.Gui.ViewsTests {
 ┌─┬───────┬─────────────┐
 │ │Name   │Kind         │
 ├─┼───────┼─────────────┤
-│╴│Tammy  │Cat          │
-│╴│Tibbles│Cat          │
-│╴│Ripper │Dog          │
+│☐│Tammy  │Cat          │
+│☐│Tibbles│Cat          │
+│☐│Ripper │Dog          │
 ";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
@@ -2658,9 +2658,9 @@ namespace Terminal.Gui.ViewsTests {
 ┌─┬───────┬─────────────┐
 │ │Name   │Kind         │
 ├─┼───────┼─────────────┤
-│◌│Tammy  │Cat          │
-│◌│Tibbles│Cat          │
-│◌│Ripper │Dog          │
+│○│Tammy  │Cat          │
+│○│Tibbles│Cat          │
+│○│Ripper │Dog          │
 ";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
@@ -2678,9 +2678,9 @@ namespace Terminal.Gui.ViewsTests {
 ┌─┬───────┬─────────────┐
 │ │Name   │Kind         │
 ├─┼───────┼─────────────┤
-│●│Tammy  │Cat          │
-│◌│Tibbles│Cat          │
-│◌│Ripper │Dog          │";
+│◉│Tammy  │Cat          │
+│○│Tibbles│Cat          │
+│○│Ripper │Dog          │";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
@@ -2699,9 +2699,9 @@ namespace Terminal.Gui.ViewsTests {
 ┌─┬───────┬─────────────┐
 │ │Name   │Kind         │
 ├─┼───────┼─────────────┤
-│◌│Tammy  │Cat          │
-│●│Tibbles│Cat          │
-│◌│Ripper │Dog          │";
+│○│Tammy  │Cat          │
+│◉│Tibbles│Cat          │
+│○│Ripper │Dog          │";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
@@ -2721,9 +2721,9 @@ namespace Terminal.Gui.ViewsTests {
 ┌─┬───────┬─────────────┐
 │ │Name   │Kind         │
 ├─┼───────┼─────────────┤
-│●│Tammy  │Cat          │
-│◌│Tibbles│Cat          │
-│◌│Ripper │Dog          │";
+│◉│Tammy  │Cat          │
+│○│Tibbles│Cat          │
+│○│Ripper │Dog          │";
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 		}
