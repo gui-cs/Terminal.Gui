@@ -97,13 +97,13 @@ namespace UICatalog.Scenarios {
 			Win.Add(lblSearch);
 			Win.Add(tfSearch);
 
-			var filter = new TreeViewTextFilter<object>(treeView);
-			treeView.Filter = filter;
+			var filter = new TreeViewTextFilter<object>(_treeView);
+			_treeView.Filter = filter;
 			tfSearch.TextChanged += (s,e)=>{
 				filter.Text = tfSearch.Text.ToString();
-				if(treeView.SelectedObject != null)
+				if(_treeView.SelectedObject != null)
 				{
-					treeView.EnsureVisible(treeView.SelectedObject);
+					_treeView.EnsureVisible(_treeView.SelectedObject);
 				}
 			};
 
