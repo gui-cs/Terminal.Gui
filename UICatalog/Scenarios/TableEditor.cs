@@ -37,6 +37,14 @@ namespace UICatalog.Scenarios {
 		ColorScheme redColorSchemeAlt;
 		ColorScheme alternatingColorScheme;
 
+		enum TableLineStyleType
+		{
+			OuterHeaderLineStyle,
+			InnerHeaderLineStyle,
+			OuterLineStyle,
+			InnerLineStyle,
+		}
+
 		public override void Setup ()
 		{
 			Win.Title = this.GetName ();
@@ -53,38 +61,39 @@ namespace UICatalog.Scenarios {
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_OpenBigExample", "", () => OpenExample(true)),
-					new MenuItem ("_OpenSmallExample", "", () => OpenExample(false)),
+					new MenuItem ("Open_BigExample", "", () => OpenExample(true)),
+					new MenuItem ("Open_SmallExample", "", () => OpenExample(false)),
 					new MenuItem ("OpenCharacter_Map","",()=>OpenUnicodeMap()),
 					new MenuItem ("_CloseExample", "", () => CloseExample()),
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
 				new MenuBarItem ("_View", new MenuItem [] {
-					_miShowHeaders = new MenuItem ("_ShowHeaders", "", () => ToggleShowHeaders()){Checked = tableView.Style.ShowHeaders, CheckType = MenuItemCheckStyle.Checked },
+					_miShowHeaders = new MenuItem ("Show_Headers", "", () => ToggleShowHeaders()){Checked = tableView.Style.ShowHeaders, CheckType = MenuItemCheckStyle.Checked },
 					_miAlwaysShowHeaders = new MenuItem ("_AlwaysShowHeaders", "", () => ToggleAlwaysShowHeaders()){Checked = tableView.Style.AlwaysShowHeaders, CheckType = MenuItemCheckStyle.Checked },
-					_miHeaderOverline = new MenuItem ("_HeaderOverLine", "", () => ToggleOverline()){Checked = tableView.Style.ShowHorizontalHeaderOverline, CheckType = MenuItemCheckStyle.Checked },
-					_miHeaderThruline = new MenuItem ("_HeaderThruLine", "", () => ToggleThruline()){Checked = tableView.Style.ShowHorizontalHeaderThroughline, CheckType = MenuItemCheckStyle.Checked },
-					_miHeaderUnderline = new MenuItem ("_HeaderUnderLine", "", () => ToggleUnderline()){Checked = tableView.Style.ShowHorizontalHeaderUnderline, CheckType = MenuItemCheckStyle.Checked },
-					_miHeaderVertline = new MenuItem ("_HeaderVertLine", "", () => ToggleHeaderVertline()){Checked = tableView.Style.ShowVerticalHeaderLines, CheckType = MenuItemCheckStyle.Checked },
+					_miHeaderOverline = new MenuItem ("Header_OverLine", "", () => ToggleOverline()){Checked = tableView.Style.ShowHorizontalHeaderOverline, CheckType = MenuItemCheckStyle.Checked },
+					_miHeaderThruline = new MenuItem ("Header_ThroughLine", "", () => ToggleThruline()){Checked = tableView.Style.ShowHorizontalHeaderThroughline, CheckType = MenuItemCheckStyle.Checked },
+					_miHeaderUnderline = new MenuItem ("Header_UnderLine", "", () => ToggleUnderline()){Checked = tableView.Style.ShowHorizontalHeaderUnderline, CheckType = MenuItemCheckStyle.Checked },
+					_miHeaderVertline = new MenuItem ("_VerticalHeaderLines", "", () => ToggleHeaderVertline()){Checked = tableView.Style.ShowVerticalHeaderLines, CheckType = MenuItemCheckStyle.Checked },
 					_miBottomline = new MenuItem ("_BottomLine", "", () => ToggleBottomline()){Checked = tableView.Style.ShowHorizontalBottomline, CheckType = MenuItemCheckStyle.Checked },
-					_miShowHorizontalScrollIndicators = new MenuItem ("_HorizontalScrollIndicators", "", () => ToggleHorizontalScrollIndicators()){Checked = tableView.Style.ShowHorizontalScrollIndicators, CheckType = MenuItemCheckStyle.Checked },
+					_miShowHorizontalScrollIndicators = new MenuItem ("Horizontal_ScrollIndicators", "", () => ToggleHorizontalScrollIndicators()){Checked = tableView.Style.ShowHorizontalScrollIndicators, CheckType = MenuItemCheckStyle.Checked },
 					_miFullRowSelect =new MenuItem ("_FullRowSelect", "", () => ToggleFullRowSelect()){Checked = tableView.FullRowSelect, CheckType = MenuItemCheckStyle.Checked },
 					_miCellLines =new MenuItem ("_CellLines", "", () => ToggleCellLines()){Checked = tableView.Style.ShowVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
+					_miAlwaysUseNormalColorForVerticalCellLines = new MenuItem ("AlwaysUse_NormalColorForVerticalCellLines", "", () => ToggleAlwaysUseNormalColorForVerticalCellLines()){Checked = tableView.Style.AlwaysUseNormalColorForVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
+					new MenuItem ("_LineStyles", "", () => SetLineStyles()),
+					new MenuItem ("AllLines", "", () => ToggleAllCellLines()),
+					new MenuItem ("NoLines", "", () => ToggleNoCellLines()),
 					_miExpandLastColumn = new MenuItem ("_ExpandLastColumn", "", () => ToggleExpandLastColumn()){Checked = tableView.Style.ExpandLastColumn, CheckType = MenuItemCheckStyle.Checked },
-					_miAlwaysUseNormalColorForVerticalCellLines = new MenuItem ("_AlwaysUseNormalColorForVerticalCellLines", "", () => ToggleAlwaysUseNormalColorForVerticalCellLines()){Checked = tableView.Style.AlwaysUseNormalColorForVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
-					_miSmoothScrolling = new MenuItem ("_SmoothHorizontalScrolling", "", () => ToggleSmoothScrolling()){Checked = tableView.Style.SmoothHorizontalScrolling, CheckType = MenuItemCheckStyle.Checked },
-					new MenuItem ("_AllLines", "", () => ToggleAllCellLines()),
-					new MenuItem ("_NoLines", "", () => ToggleNoCellLines()),
-					_miAlternatingColors = new MenuItem ("Alternating Colors", "", () => ToggleAlternatingColors()){CheckType = MenuItemCheckStyle.Checked},
-					_miCursor = new MenuItem ("Invert Selected Cell First Character", "", () => ToggleInvertSelectedCellFirstCharacter()){Checked = tableView.Style.InvertSelectedCellFirstCharacter,CheckType = MenuItemCheckStyle.Checked},
-					new MenuItem ("_ClearColumnStyles", "", () => ClearColumnStyles()),
-					new MenuItem ("Sho_w All Columns", "", ()=>ShowAllColumns())
+					_miSmoothScrolling = new MenuItem ("S_moothHorizontalScrolling", "", () => ToggleSmoothScrolling()){Checked = tableView.Style.SmoothHorizontalScrolling, CheckType = MenuItemCheckStyle.Checked },
+					_miAlternatingColors = new MenuItem ("Alte_rnatingColors", "", () => ToggleAlternatingColors()){CheckType = MenuItemCheckStyle.Checked},
+					_miCursor = new MenuItem ("_InvertSelectedCellFirstCharacter", "", () => ToggleInvertSelectedCellFirstCharacter()){Checked = tableView.Style.InvertSelectedCellFirstCharacter,CheckType = MenuItemCheckStyle.Checked},
+					new MenuItem ("ClearColumnSt_yles", "", () => ClearColumnStyles()),
+					new MenuItem ("Sho_wAllColumns", "", ()=>ShowAllColumns())
 				}),
 				new MenuBarItem ("_Column", new MenuItem [] {
-					new MenuItem ("_Set Max Width", "", SetMaxWidth),
-					new MenuItem ("_Set Min Width", "", SetMinWidth),
-					new MenuItem ("_Set MinAcceptableWidth", "",SetMinAcceptableWidth),
-					new MenuItem ("_Set All MinAcceptableWidth=1", "",SetMinAcceptableWidthToOne),
+					new MenuItem ("Set Ma_x Width", "", SetMaxWidth),
+					new MenuItem ("Set Mi_n Width", "", SetMinWidth),
+					new MenuItem ("Set MinAcceptable_Width", "",SetMinAcceptableWidth),
+					new MenuItem ("Set _All MinAcceptableWidth=1", "",SetMinAcceptableWidthToOne),
 				}),
 			});
 
@@ -317,6 +326,95 @@ namespace UICatalog.Scenarios {
 
 				try {
 					setter (style, int.Parse (tf.Text.ToString ()));
+				} catch (Exception ex) {
+					MessageBox.ErrorQuery (60, 20, "Failed to set", ex.Message, "Ok");
+				}
+
+				tableView.Update ();
+			}
+		}
+
+		// TODO: Play with table borders
+		private void SetLineStyles ()
+		{
+			var style = tableView.Style;
+			var chosenType = TableLineStyleType.OuterHeaderLineStyle;
+			var chosenStyle = LineStyle.None;
+			if (style != null) {
+				// Change selection to existing style value for default type
+				chosenStyle = style.OuterHeaderLineStyle;
+			}
+
+			var borderTypeEnum = Enum.GetNames (typeof (TableLineStyleType));
+			var rbBorderType = new RadioGroup (borderTypeEnum.Select (
+				e => NStack.ustring.Make (e.ToString ())).ToArray ()) {
+				X = 0,
+				Y = 0,
+			};
+
+			var accepted = false;
+			var ok = new Button ("Ok", is_default: true);
+			ok.Clicked += (s, e) => { accepted = true; Application.RequestStop (); };
+			var cancel = new Button ("Cancel");
+			cancel.Clicked += (s, e) => { Application.RequestStop (); };
+			var d = new Dialog (ok, cancel) { Title = "BorderStyles" };
+
+			var borderStyleEnum = Enum.GetValues (typeof (LineStyle)).Cast<LineStyle> ().ToList ();
+			var rbBorderStyle = new RadioGroup (borderStyleEnum.Select (
+				e => NStack.ustring.Make (e.ToString ())).ToArray ()) {
+				X = Pos.Right (rbBorderType) + 2,
+				Y = 0,
+				SelectedItem = (int) chosenStyle
+			};
+
+			// Change selection to existing style value for given type
+			rbBorderType.SelectedItemChanged += (s, e) => {
+				chosenType = (TableLineStyleType) e.SelectedItem;
+				var str = chosenType.ToString ();
+				switch (e.SelectedItem) {
+				case 0:
+					rbBorderStyle.SelectedItem = (int) (TableLineStyleType) style.OuterHeaderLineStyle;
+					break;
+				case 1:
+					rbBorderStyle.SelectedItem = (int) (TableLineStyleType) style.InnerHeaderLineStyle;
+					break;
+				case 2:
+					rbBorderStyle.SelectedItem = (int) (TableLineStyleType) style.OuterLineStyle;
+					break;
+				case 3:
+					rbBorderStyle.SelectedItem = (int) (TableLineStyleType) style.InnerLineStyle;
+					break;
+				}
+			};
+			rbBorderStyle.SelectedItemChanged += (s, e) => {
+				chosenStyle = (LineStyle) e.SelectedItem;
+			};
+
+			d.Add (rbBorderType, rbBorderStyle);
+
+			Application.Run (d);
+
+			if (accepted) {
+
+				try {
+					switch ((int)chosenType) {
+					case 0:
+						Action<TableStyle, LineStyle> setterHdrOut = (s, v) => s.OuterHeaderLineStyle = v;
+						setterHdrOut (style, chosenStyle);
+						break;
+					case 1:
+						Action<TableStyle, LineStyle> setterHdrIn = (s, v) => s.InnerHeaderLineStyle = v;
+						setterHdrIn (style, chosenStyle);
+						break;
+					case 2:
+						Action<TableStyle, LineStyle> setterOut = (s, v) => s.OuterLineStyle = v;
+						setterOut (style, chosenStyle);
+						break;
+					case 3:
+						Action<TableStyle, LineStyle> setterIn = (s, v) => s.InnerLineStyle = v;
+						setterIn (style, chosenStyle);
+						break;
+					}
 				} catch (Exception ex) {
 					MessageBox.ErrorQuery (60, 20, "Failed to set", ex.Message, "Ok");
 				}
