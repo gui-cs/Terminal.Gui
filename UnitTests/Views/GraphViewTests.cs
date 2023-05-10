@@ -68,7 +68,7 @@ namespace Terminal.Gui.ViewsTests {
 				// be the last one
 				throw new Exception ("A test did not call shutdown correctly.  Test stack trace was:" + LastInitFakeDriver);
 			}
-			
+
 			driver.Init (() => { });
 
 			LastInitFakeDriver = Environment.StackTrace;
@@ -257,7 +257,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var gv = new GraphView ();
 			gv.BeginInit (); gv.EndInit ();
-			
+
 			gv.Bounds = new Rect (0, 0, 20, 10);
 
 			// Each cell of screen is responsible for rendering 5 units in graph data model
@@ -344,7 +344,7 @@ namespace Terminal.Gui.ViewsTests {
 			gv.Bounds = new Rect (0, 0, 50, 30);
 			gv.Series.Add (new ScatterSeries () { Points = new List<PointF> { new PointF (1, 1) } });
 			gv.CellSize = new PointF (0, 5);
-			var ex = Assert.Throws<Exception> (() => gv.Redraw (gv.Bounds));
+			var ex = Assert.Throws<Exception> (() => gv.Draw ());
 
 			Assert.Equal ("CellSize cannot be 0", ex.Message);
 
@@ -425,7 +425,7 @@ namespace Terminal.Gui.ViewsTests {
 			gv.Series.Add (series);
 
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 			Assert.Equal (new RectangleF (0, 0, 50, 30), fullGraphBounds);
 			Assert.Equal (new Rect (0, 0, 50, 30), graphScreenBounds);
 
@@ -438,7 +438,7 @@ namespace Terminal.Gui.ViewsTests {
 			// Even with a margin the graph should be drawn from 
 			// the origin, we just get less visible width/height
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 			Assert.Equal (new RectangleF (0, 0, 45, 28), fullGraphBounds);
 
 			// The screen space the graph will be rendered into should
@@ -476,7 +476,7 @@ namespace Terminal.Gui.ViewsTests {
 			gv.Series.Add (series);
 
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 			// Since each cell of the console is 2x5 of graph space the graph
 			// bounds to be rendered are larger
 			Assert.Equal (new RectangleF (0, 0, 100, 150), fullGraphBounds);
@@ -490,7 +490,7 @@ namespace Terminal.Gui.ViewsTests {
 			// Even with a margin the graph should be drawn from 
 			// the origin, we just get less visible width/height
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 			Assert.Equal (new RectangleF (0, 0, 90, 140), fullGraphBounds);
 
 			// The screen space the graph will be rendered into should
@@ -626,12 +626,12 @@ namespace Terminal.Gui.ViewsTests {
 			FakeHAxis fakeXAxis;
 
 			// don't show axis labels that means any labels
-			// that appaer are explicitly from the bars
+			// that appear are explicitly from the bars
 			gv.AxisX = fakeXAxis = new FakeHAxis () { Increment = 0 };
 			gv.AxisY = new FakeVAxis () { Increment = 0 };
 
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			// Since bar series has no bars yet no labels should be displayed
 			Assert.Empty (fakeXAxis.LabelPoints);
@@ -639,7 +639,7 @@ namespace Terminal.Gui.ViewsTests {
 			multibarSeries.AddBars ("hey", 'M', 0.5001f, 0.5001f);
 			fakeXAxis.LabelPoints.Clear ();
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			Assert.Equal (4, fakeXAxis.LabelPoints.Single ());
 
@@ -647,7 +647,7 @@ namespace Terminal.Gui.ViewsTests {
 			multibarSeries.AddBars ("bob", 'M', 1, 2);
 			fakeXAxis.LabelPoints.Clear ();
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			Assert.Equal (3, fakeXAxis.LabelPoints.Count);
 			Assert.Equal (4, fakeXAxis.LabelPoints [0]);
@@ -703,7 +703,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 
 			var graph = GetGraph (out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
-			graph.Redraw (graph.Bounds);
+			graph.Draw ();
 
 			// no bars
 			Assert.Empty (barSeries.BarScreenStarts);
@@ -715,7 +715,7 @@ namespace Terminal.Gui.ViewsTests {
 			barSeries.Orientation = Orientation.Vertical;
 
 			// redraw graph
-			graph.Redraw (graph.Bounds);
+			graph.Draw ();
 
 			// bar should not be drawn
 			Assert.Empty (barSeries.BarScreenStarts);
@@ -737,7 +737,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 
 			var graph = GetGraph (out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
-			graph.Redraw (graph.Bounds);
+			graph.Draw ();
 
 			// no bars
 			Assert.Empty (barSeries.BarScreenStarts);
@@ -760,7 +760,7 @@ namespace Terminal.Gui.ViewsTests {
 			barSeries.Orientation = Orientation.Vertical;
 
 			// redraw graph
-			graph.Redraw (graph.Bounds);
+			graph.Draw ();
 
 			// bar should be drawn at BarEvery 1f + offset 0.5f = 3 screen units
 			Assert.Equal (3, barSeries.BarScreenStarts [0].X);
@@ -790,7 +790,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 
 			var graph = GetGraph (out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
-			graph.Redraw (graph.Bounds);
+			graph.Draw ();
 
 			// no bars
 			Assert.Empty (barSeries.BarScreenStarts);
@@ -816,7 +816,7 @@ namespace Terminal.Gui.ViewsTests {
 				new BarSeries.Bar ("hi2", new GraphCellToRender ('.'), 5));
 
 			// redraw graph
-			graph.Redraw (graph.Bounds);
+			graph.Draw ();
 
 			// since bars are horizontal all have the same X start cordinates
 			Assert.Equal (0, barSeries.BarScreenStarts [0].X);
@@ -910,7 +910,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var gv = GetGraph (out FakeHAxis axis);
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			Assert.DoesNotContain (new Point (-1, 29), axis.DrawAxisLinePoints);
 			Assert.Contains (new Point (0, 29), axis.DrawAxisLinePoints);
@@ -934,7 +934,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			gv.MarginBottom = 10;
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			Assert.DoesNotContain (new Point (-1, 19), axis.DrawAxisLinePoints);
 			Assert.Contains (new Point (0, 19), axis.DrawAxisLinePoints);
@@ -958,7 +958,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			gv.MarginLeft = 5;
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			Assert.DoesNotContain (new Point (4, 29), axis.DrawAxisLinePoints);
 			Assert.Contains (new Point (5, 29), axis.DrawAxisLinePoints);
@@ -990,7 +990,7 @@ namespace Terminal.Gui.ViewsTests {
 			var gv = GetGraph (out FakeVAxis axis);
 
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			Assert.DoesNotContain (new Point (0, -1), axis.DrawAxisLinePoints);
 			Assert.Contains (new Point (0, 1), axis.DrawAxisLinePoints);
@@ -1014,7 +1014,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			gv.MarginBottom = 10;
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			Assert.DoesNotContain (new Point (0, -1), axis.DrawAxisLinePoints);
 			Assert.Contains (new Point (0, 1), axis.DrawAxisLinePoints);
@@ -1039,7 +1039,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			gv.MarginLeft = 5;
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			Assert.DoesNotContain (new Point (5, -1), axis.DrawAxisLinePoints);
 			Assert.Contains (new Point (5, 1), axis.DrawAxisLinePoints);
@@ -1077,7 +1077,7 @@ namespace Terminal.Gui.ViewsTests {
 				ScreenPosition = new Point (3, 1)
 			});
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			var expected =
 @"
@@ -1091,7 +1091,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			// user scrolls up one unit of graph space
 			gv.ScrollOffset = new PointF (0, 1f);
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			// we expect no change in the location of the annotation (only the axis label changes)
 			// this is because screen units are constant and do not change as the viewport into
@@ -1121,7 +1121,7 @@ namespace Terminal.Gui.ViewsTests {
 			});
 
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			var expected =
 @"
@@ -1135,7 +1135,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			// user scrolls up one unit of graph space
 			gv.ScrollOffset = new PointF (0, 1f);
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			// we expect the text annotation to go down one line since
 			// the scroll offset means that that point of graph space is 
@@ -1166,7 +1166,7 @@ namespace Terminal.Gui.ViewsTests {
 			});
 
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			// long text should get truncated
 			// margin takes up 1 units
@@ -1197,7 +1197,7 @@ namespace Terminal.Gui.ViewsTests {
 			});
 
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			// Text is off the screen (graph x axis runs to 8 not 9)
 			var expected =
@@ -1233,12 +1233,12 @@ namespace Terminal.Gui.ViewsTests {
 			points.Points.Add (new PointF (7, 2));
 			gv.Series.Add (points);
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			var expected =
-@"
+@$"
  │
- ┤      x
+ ┤      {CM.Glyphs.Dot}
  ┤
 0┼┬┬┬┬┬┬┬┬
  0    5";
@@ -1267,7 +1267,7 @@ namespace Terminal.Gui.ViewsTests {
 			legend.AddEntry (new GraphCellToRender ('B'), "Bat");
 
 			gv.Annotations.Add (legend);
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			var expected =
 @"
@@ -1295,7 +1295,7 @@ namespace Terminal.Gui.ViewsTests {
 			legend.Border = false;
 
 			gv.Annotations.Add (legend);
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			var expected =
 @"
@@ -1337,7 +1337,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			gv.Annotations.Add (path);
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			var expected =
 @"
@@ -1375,14 +1375,14 @@ namespace Terminal.Gui.ViewsTests {
 			gv.MarginLeft = 1;
 
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			var expected =
-@"
+@$"
  │
-1┤x
+1┤{CM.Glyphs.Dot}
  │ 
-0┼┬┬┬┬x┬┬┬
+0┼┬┬┬┬{CM.Glyphs.Dot}┬┬┬
  0    5   
           
           ";
@@ -1412,18 +1412,18 @@ namespace Terminal.Gui.ViewsTests {
 			// reserve 3 cells of the left for the margin
 			gv.MarginLeft = 3;
 			gv.MarginBottom = 1;
-			
+
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			var expected =
-	@"
+	@$"
    │
   2┤
    │
-  1┤x
+  1┤{CM.Glyphs.Dot}
    │ 
-  0┼┬┬┬┬x┬
+  0┼┬┬┬┬{CM.Glyphs.Dot}┬
    0    5
          
           ";
@@ -1445,7 +1445,7 @@ namespace Terminal.Gui.ViewsTests {
 			});
 
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			var expected =
 	@"
@@ -1469,7 +1469,7 @@ namespace Terminal.Gui.ViewsTests {
 			});
 
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			var expected =
 	@"
@@ -1499,7 +1499,7 @@ namespace Terminal.Gui.ViewsTests {
 			gv.Annotations.Add (path);
 
 			gv.LayoutSubviews ();
-			gv.Redraw (gv.Bounds);
+			gv.Draw ();
 
 			var expected =
 @"
@@ -1552,14 +1552,14 @@ namespace Terminal.Gui.ViewsTests {
 				// render view
 				lbl1.ColorScheme = new ColorScheme ();
 				Assert.Equal (1, lbl1.Height);
-				mount.Redraw (mount.Bounds);
+				mount.Draw ();
 
 				// should have the initial text
 				TestHelpers.AssertDriverContentsAre ("ff", null);
 
 				// change the text and redraw
 				lbl1.Text = "ff1234";
-				mount.Redraw (mount.Bounds);
+				mount.Draw ();
 
 				// should have the new text rendered
 				TestHelpers.AssertDriverContentsAre ("ff1234", null);

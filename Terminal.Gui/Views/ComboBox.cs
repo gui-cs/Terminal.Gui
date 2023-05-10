@@ -90,7 +90,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			public override void Redraw (Rect bounds)
+			public override void OnDrawContent (Rect contentArea)
 			{
 				var current = ColorScheme.Focus;
 				Driver.SetAttribute (current);
@@ -131,7 +131,7 @@ namespace Terminal.Gui {
 							Driver.SetAttribute (current);
 						}
 						if (AllowsMarking) {
-							Driver.AddRune (Source.IsMarked (item) ? (AllowsMultipleSelection ? Driver.Checked : Driver.Selected) : (AllowsMultipleSelection ? Driver.UnChecked : Driver.UnSelected));
+							Driver.AddRune (Source.IsMarked (item) ? (AllowsMultipleSelection ? CM.Glyphs.Checked : CM.Glyphs.Selected) : (AllowsMultipleSelection ? CM.Glyphs.UnChecked : CM.Glyphs.UnSelected));
 							Driver.AddRune (' ');
 						}
 						Source.Render (this, Driver, isSelected, item, col, row, f.Width - col, start);
@@ -534,9 +534,9 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDrawContent (Rect contentArea)
 		{
-			base.Redraw (bounds);
+			base.OnDrawContent (contentArea);
 
 			if (!autoHide) {
 				return;
@@ -544,7 +544,7 @@ namespace Terminal.Gui {
 
 			Driver.SetAttribute (ColorScheme.Focus);
 			Move (Bounds.Right - 1, 0);
-			Driver.AddRune (Driver.DownArrow);
+			Driver.AddRune (CM.Glyphs.DownArrow);
 		}
 
 		///<inheritdoc/>

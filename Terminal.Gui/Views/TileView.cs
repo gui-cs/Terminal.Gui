@@ -197,10 +197,12 @@ namespace Terminal.Gui {
 				var tile = new Tile ();
 				tiles.Add (tile);
 				Add (tile.ContentView);
-				tile.TitleChanged += (s,e) => SetNeedsDisplay ();
+				tile.TitleChanged += (s, e) => SetNeedsDisplay ();
 			}
 
-			LayoutSubviews ();
+			if (IsInitialized) {
+				LayoutSubviews ();
+			}
 		}
 
 		/// <summary>
@@ -233,7 +235,9 @@ namespace Terminal.Gui {
 				}
 			}
 			SetNeedsDisplay ();
-			LayoutSubviews ();
+			if (IsInitialized) {
+				LayoutSubviews ();
+			}
 
 			return toReturn;
 		}
@@ -326,12 +330,18 @@ namespace Terminal.Gui {
 			get { return orientation; }
 			set {
 				orientation = value;
-				LayoutSubviews ();
+				if (IsInitialized) {
+					LayoutSubviews ();
+				}
 			}
 		}
 		/// <inheritdoc/>
 		public override void LayoutSubviews ()
 		{
+			if (!IsInitialized) {
+				return;
+			}
+
 			var contentArea = Bounds;
 
 			if (HasBorder ()) {
@@ -387,12 +397,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDrawContent (Rect contentArea)
 		{
 			Driver.SetAttribute (ColorScheme.Normal);
 			Clear ();
 
-			base.Redraw (bounds);
+			base.OnDrawContent (contentArea);
 
 			var lc = new LineCanvas ();
 
@@ -402,11 +412,11 @@ namespace Terminal.Gui {
 			if (IsRootTileView ()) {
 				if (HasBorder ()) {
 
-					lc.AddLine (new Point (0, 0), bounds.Width - 1, Orientation.Horizontal, LineStyle);
-					lc.AddLine (new Point (0, 0), bounds.Height - 1, Orientation.Vertical, LineStyle);
+					lc.AddLine (new Point (0, 0), Bounds.Width - 1, Orientation.Horizontal, LineStyle);
+					lc.AddLine (new Point (0, 0), Bounds.Height - 1, Orientation.Vertical, LineStyle);
 
-					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Width + 1, Orientation.Horizontal, LineStyle);
-					lc.AddLine (new Point (bounds.Width - 1, bounds.Height - 1), -bounds.Height + 1, Orientation.Vertical, LineStyle);
+					lc.AddLine (new Point (Bounds.Width - 1, Bounds.Height - 1), -Bounds.Width + 1, Orientation.Horizontal, LineStyle);
+					lc.AddLine (new Point (Bounds.Width - 1, Bounds.Height - 1), -Bounds.Height + 1, Orientation.Vertical, LineStyle);
 				}
 
 				foreach (var line in allLines) {
@@ -432,10 +442,10 @@ namespace Terminal.Gui {
 			}
 
 			Driver.SetAttribute (ColorScheme.Normal);
-			foreach (var p in lc.GetMap (bounds)) {
+			foreach (var p in lc.GetMap (Bounds)) {
 				this.AddRune (p.Key.X, p.Key.Y, p.Value);
 			}
-			
+
 			// Redraw the lines so that focus/drag symbol renders
 			foreach (var line in allLines) {
 				line.DrawSplitterSymbol ();
@@ -528,8 +538,8 @@ namespace Terminal.Gui {
 		{
 			bool focusMoved = false;
 
-			if(keyEvent.Key == ToggleResizable) {
-				foreach(var l in splitterLines) {
+			if (keyEvent.Key == ToggleResizable) {
+				foreach (var l in splitterLines) {
 
 					var iniBefore = l.IsInitialized;
 					l.IsInitialized = false;
@@ -719,7 +729,7 @@ namespace Terminal.Gui {
 				line.Height = orientation == Orientation.Vertical
 					? Dim.Fill () : 1;
 				line.LineRune = orientation == Orientation.Vertical ?
-					Driver.VLine : Driver.HLine;
+					CM.Glyphs.VLine : CM.Glyphs.HLine;
 
 				if (orientation == Orientation.Vertical) {
 					line.X = splitterDistances [i];
@@ -915,9 +925,9 @@ namespace Terminal.Gui {
 				return base.OnEnter (view);
 			}
 
-			public override void Redraw (Rect bounds)
+			public override void OnDrawContent (Rect contentArea)
 			{
-				base.Redraw (bounds);
+				base.OnDrawContent (contentArea);
 
 				DrawSplitterSymbol ();
 			}
@@ -928,7 +938,7 @@ namespace Terminal.Gui {
 					var location = moveRuneRenderLocation ??
 						new Point (Bounds.Width / 2, Bounds.Height / 2);
 
-					AddRune (location.X, location.Y, Driver.Diamond);
+					AddRune (location.X, location.Y, CM.Glyphs.Diamond);
 				}
 			}
 

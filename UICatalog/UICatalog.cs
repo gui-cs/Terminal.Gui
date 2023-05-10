@@ -1,3 +1,5 @@
+global using CM = Terminal.Gui.ConfigurationManager;
+
 using NStack;
 using System;
 using System.Collections.Generic;
@@ -116,8 +118,8 @@ namespace UICatalog {
 			Scenario scenario;
 			while ((scenario = RunUICatalogTopLevel ()) != null) {
 				VerifyObjectsWereDisposed ();
-				ConfigurationManager.Themes!.Theme = _cachedTheme!;
-				ConfigurationManager.Apply ();
+				CM.Themes!.Theme = _cachedTheme!;
+				CM.Apply ();
 				scenario.Theme = _cachedTheme;
 				scenario.TopLevelColorScheme = _topLevelColorScheme;
 				scenario.Init ();
@@ -188,8 +190,8 @@ namespace UICatalog {
 
 			// TOOD: THis is a hack. Figure out how to ensure that the file is fully written before reading it.
 			Thread.Sleep (500);
-			ConfigurationManager.Load ();
-			ConfigurationManager.Apply ();
+			CM.Load ();
+			CM.Apply ();
 		}
 
 		/// <summary>
@@ -207,10 +209,10 @@ namespace UICatalog {
 			Application.Init ();
 
 			if (_cachedTheme is null) {
-				_cachedTheme = ConfigurationManager.Themes?.Theme;
+				_cachedTheme = CM.Themes?.Theme;
 			} else {
-				ConfigurationManager.Themes!.Theme = _cachedTheme;
-				ConfigurationManager.Apply ();
+				CM.Themes!.Theme = _cachedTheme;
+				CM.Apply ();
 			}
 
 			//Application.EnableConsoleScrolling = _enableConsoleScrolling;
@@ -250,6 +252,7 @@ namespace UICatalog {
 		/// the command line) and each time a Scenario ends.
 		/// </summary>
 		public class UICatalogTopLevel : Toplevel {
+			public MenuItem? miUseSubMenusSingleFrame;
 			public MenuItem? miIsMenuBorderDisabled;
 			public MenuItem? miIsMouseDisabled;
 			public MenuItem? miEnableConsoleScrolling;
@@ -414,11 +417,9 @@ namespace UICatalog {
 
 				// Restore previous selections
 				CategoryList.SelectedItem = _cachedCategoryIndex;
-				CategoryList.EnsureSelectedItemVisible ();
 				ScenarioList.SelectedRow = _cachedScenarioIndex;
-				ScenarioList.EnsureSelectedCellIsVisible ();
 
-				ConfigurationManager.Applied += ConfigAppliedHandler;
+				CM.Applied += ConfigAppliedHandler;
 			}
 
 			void LoadedHandler (object? sender, EventArgs? args)
@@ -450,11 +451,13 @@ namespace UICatalog {
 				};
 
 				Loaded -= LoadedHandler;
+				CategoryList.EnsureSelectedItemVisible ();
+				ScenarioList.EnsureSelectedCellIsVisible ();
 			}
 
 			private void UnloadedHandler (object? sender, EventArgs? args)
 			{
-				ConfigurationManager.Applied -= ConfigAppliedHandler;
+				CM.Applied -= ConfigAppliedHandler;
 				Unloaded -= UnloadedHandler;
 			}
 
@@ -491,18 +494,36 @@ namespace UICatalog {
 					CreateEnableConsoleScrollingMenuItems (),
 					CreateDisabledEnabledMouseItems (),
 					CreateDisabledEnabledMenuBorder (),
+					CreateDisabledEnableUseSubMenusSingleFrame (),
 					CreateKeybindingsMenuItems ()
 				};
 				return menuItems;
+			}
+
+			MenuItem [] CreateDisabledEnableUseSubMenusSingleFrame ()
+			{
+				List<MenuItem> menuItems = new List<MenuItem> ();
+				miUseSubMenusSingleFrame = new MenuItem {
+					Title = "Enable _Sub-Menus Single Frame"
+				};
+				miUseSubMenusSingleFrame.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miUseSubMenusSingleFrame!.Title!.ToString ()!.Substring (8, 1) [0];
+				miUseSubMenusSingleFrame.CheckType |= MenuItemCheckStyle.Checked;
+				miUseSubMenusSingleFrame.Action += () => {
+					miUseSubMenusSingleFrame.Checked = (bool)!miUseSubMenusSingleFrame.Checked!;
+					MenuBar.UseSubMenusSingleFrame = (bool)miUseSubMenusSingleFrame.Checked;
+				};
+				menuItems.Add (miUseSubMenusSingleFrame);
+
+				return menuItems.ToArray ();
 			}
 
 			MenuItem [] CreateDisabledEnabledMenuBorder ()
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
 				miIsMenuBorderDisabled = new MenuItem {
-					Title = "Disable _Menu Border"
+					Title = "Disable Menu _Border"
 				};
-				miIsMenuBorderDisabled.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miIsMenuBorderDisabled!.Title!.ToString ()!.Substring (1, 1) [0];
+				miIsMenuBorderDisabled.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miIsMenuBorderDisabled!.Title!.ToString ()!.Substring (14, 1) [0];
 				miIsMenuBorderDisabled.CheckType |= MenuItemCheckStyle.Checked;
 				miIsMenuBorderDisabled.Action += () => {
 					miIsMenuBorderDisabled.Checked = (bool)!miIsMenuBorderDisabled.Checked!;
@@ -661,16 +682,16 @@ namespace UICatalog {
 			public MenuItem []? CreateThemeMenuItems ()
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
-				foreach (var theme in ConfigurationManager.Themes!) {
+				foreach (var theme in CM.Themes!) {
 					var item = new MenuItem {
 						Title = theme.Key,
 						Shortcut = Key.AltMask + theme.Key [0]
 					};
 					item.CheckType |= MenuItemCheckStyle.Checked;
-					item.Checked = theme.Key == _cachedTheme; // ConfigurationManager.Themes.Theme;
+					item.Checked = theme.Key == _cachedTheme; // CM.Themes.Theme;
 					item.Action += () => {
-						ConfigurationManager.Themes.Theme = _cachedTheme = theme.Key;
-						ConfigurationManager.Apply ();
+						CM.Themes.Theme = _cachedTheme = theme.Key;
+						CM.Apply ();
 					};
 					menuItems.Add (item);
 				}
@@ -709,14 +730,19 @@ namespace UICatalog {
 
 				_themeMenuItems = ((UICatalogTopLevel)Application.Top).CreateThemeMenuItems ();
 				_themeMenuBarItem!.Children = _themeMenuItems;
+				foreach (var mi in _themeMenuItems!) {
+					if (mi != null && mi.Parent == null) {
+						mi.Parent = _themeMenuBarItem;
+					}
+				}
 
 				var checkedThemeMenu = _themeMenuItems?.Where (m => m?.Checked ?? false).FirstOrDefault ();
 				if (checkedThemeMenu != null) {
 					checkedThemeMenu.Checked = false;
 				}
-				checkedThemeMenu = _themeMenuItems?.Where (m => m != null && m.Title == ConfigurationManager.Themes?.Theme).FirstOrDefault ();
+				checkedThemeMenu = _themeMenuItems?.Where (m => m != null && m.Title == CM.Themes?.Theme).FirstOrDefault ();
 				if (checkedThemeMenu != null) {
-					ConfigurationManager.Themes!.Theme = checkedThemeMenu.Title.ToString ()!;
+					CM.Themes!.Theme = checkedThemeMenu.Title.ToString ()!;
 					checkedThemeMenu.Checked = true;
 				}
 

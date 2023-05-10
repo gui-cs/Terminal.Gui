@@ -440,7 +440,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDrawContent (Rect contentArea)
 		{
 			if (roots == null) {
 				return;
@@ -454,20 +454,20 @@ namespace Terminal.Gui {
 
 			var map = BuildLineMap ();
 
-			for (int line = 0; line < bounds.Height; line++) {
+			for (int line = 0; line < Bounds.Height; line++) {
 
 				var idxToRender = ScrollOffsetVertical + line;
 
 				// Is there part of the tree view to render?
 				if (idxToRender < map.Count) {
 					// Render the line
-					map.ElementAt (idxToRender).Draw (Driver, ColorScheme, line, bounds.Width);
+					map.ElementAt (idxToRender).Draw (Driver, ColorScheme, line, Bounds.Width);
 				} else {
 
 					// Else clear the line to prevent stale symbols due to scrolling etc
 					Move (0, line);
 					Driver.SetAttribute (GetNormalColor ());
-					Driver.AddStr (new string (' ', bounds.Width));
+					Driver.AddStr (new string (' ', Bounds.Width));
 				}
 			}
 		}

@@ -421,6 +421,9 @@ namespace Terminal.Gui {
 				throw new InvalidOperationException ("Only one Overlapped Container is allowed.");
 			}
 
+			// Ensure the mouse is ungrabed.
+			_mouseGrabView = null;
+
 			var rs = new RunState (Toplevel);
 
 			// View implements ISupportInitializeNotification which is derived from ISupportInitialize
@@ -494,7 +497,7 @@ namespace Terminal.Gui {
 				OverlappedTop?.OnChildLoaded (Toplevel);
 				Toplevel.OnLoaded ();
 				Toplevel.SetNeedsDisplay ();
-				Toplevel.Redraw (Toplevel.Bounds);
+				Toplevel.Draw ();
 				Toplevel.PositionCursor ();
 				Driver.Refresh ();
 			}
@@ -631,7 +634,7 @@ namespace Terminal.Gui {
 				if (v.Visible) {
 					v.SetNeedsDisplay ();
 					v.SetSubViewNeedsDisplay ();
-					v.Redraw (v.Bounds);
+					v.Draw ();
 				}
 				last = v;
 			}
@@ -766,11 +769,12 @@ namespace Terminal.Gui {
 			if (state.Toplevel != Top
 				&& (!Top._needsDisplay.IsEmpty || Top._subViewNeedsDisplay || Top.LayoutNeeded)) {
 				state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
-				Top.Redraw (Top.Bounds);
+				Top.Draw ();
 				foreach (var top in _toplevels.Reverse ()) {
 					if (top != Top && top != state.Toplevel) {
 						top.SetNeedsDisplay ();
-						top.Redraw (top.Bounds);
+						top.SetSubViewNeedsDisplay ();
+						top.Draw ();
 					}
 				}
 			}
@@ -785,7 +789,7 @@ namespace Terminal.Gui {
 
 			if (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._subViewNeedsDisplay || state.Toplevel.LayoutNeeded
 				|| OverlappedChildNeedsDisplay ()) {
-				state.Toplevel.Redraw (state.Toplevel.Bounds);
+				state.Toplevel.Draw ();
 				//if (state.Toplevel.SuperView != null) {
 				//	state.Toplevel.SuperView?.OnRenderLineCanvas ();
 				//} else {
@@ -798,7 +802,7 @@ namespace Terminal.Gui {
 			}
 			if (state.Toplevel != Top && !state.Toplevel.Modal
 				&& (!Top._needsDisplay.IsEmpty || Top._subViewNeedsDisplay || Top.LayoutNeeded)) {
-				Top.Redraw (Top.Bounds);
+				Top.Draw ();
 			}
 		}
 
@@ -1204,9 +1208,9 @@ namespace Terminal.Gui {
 
 		static void ProcessMouseEvent (MouseEvent me)
 		{
-			bool OutsideFrame (Point p, Rect r)
+			bool OutsideBounds (Point p, Rect r)
 			{
-				return p.X < 0 || p.X > r.Width - 1 || p.Y < 0 || p.Y > r.Height - 1;
+				return p.X < 0 || p.X > r.Right || p.Y < 0 || p.Y > r.Bottom;
 			}
 
 			if (IsMouseDisabled) {
@@ -1239,7 +1243,7 @@ namespace Terminal.Gui {
 					OfY = me.Y - newxy.Y,
 					View = view
 				};
-				if (OutsideFrame (new Point (nme.X, nme.Y), _mouseGrabView.Frame)) {
+				if (OutsideBounds (new Point (nme.X, nme.Y), _mouseGrabView.Bounds)) {
 					_lastMouseOwnerView?.OnMouseLeave (me);
 				}
 				//System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");

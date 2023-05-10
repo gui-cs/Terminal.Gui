@@ -203,62 +203,49 @@ namespace Terminal.Gui {
 			}
 
 			#region IDictionary
-			/// <inheritdoc/>
+#pragma warning disable 1591
+
 			public ICollection<string> Keys => ((IDictionary<string, ThemeScope>)Themes!).Keys;
-			/// <inheritdoc/>
 			public ICollection<ThemeScope> Values => ((IDictionary<string, ThemeScope>)Themes!).Values;
-			/// <inheritdoc/>
 			public int Count => ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Count;
-			/// <inheritdoc/>
 			public bool IsReadOnly => ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).IsReadOnly;
-			/// <inheritdoc/>
 			public ThemeScope this [string key] { get => ((IDictionary<string, ThemeScope>)Themes!) [key]; set => ((IDictionary<string, ThemeScope>)Themes!) [key] = value; }
-			/// <inheritdoc/>
 			public void Add (string key, ThemeScope value)
 			{
 				((IDictionary<string, ThemeScope>)Themes!).Add (key, value);
 			}
-			/// <inheritdoc/>
 			public bool ContainsKey (string key)
 			{
 				return ((IDictionary<string, ThemeScope>)Themes!).ContainsKey (key);
 			}
-			/// <inheritdoc/>
 			public bool Remove (string key)
 			{
 				return ((IDictionary<string, ThemeScope>)Themes!).Remove (key);
 			}
-			/// <inheritdoc/>
 			public bool TryGetValue (string key, out ThemeScope value)
 			{
 				return ((IDictionary<string, ThemeScope>)Themes!).TryGetValue (key, out value!);
 			}
-			/// <inheritdoc/>
 			public void Add (KeyValuePair<string, ThemeScope> item)
 			{
 				((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Add (item);
 			}
-			/// <inheritdoc/>
 			public void Clear ()
 			{
 				((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Clear ();
 			}
-			/// <inheritdoc/>
 			public bool Contains (KeyValuePair<string, ThemeScope> item)
 			{
 				return ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Contains (item);
 			}
-			/// <inheritdoc/>
 			public void CopyTo (KeyValuePair<string, ThemeScope> [] array, int arrayIndex)
 			{
 				((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).CopyTo (array, arrayIndex);
 			}
-			/// <inheritdoc/>
 			public bool Remove (KeyValuePair<string, ThemeScope> item)
 			{
 				return ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Remove (item);
 			}
-			/// <inheritdoc/>
 			public IEnumerator<KeyValuePair<string, ThemeScope>> GetEnumerator ()
 			{
 				return ((IEnumerable<KeyValuePair<string, ThemeScope>>)Themes!).GetEnumerator ();
@@ -268,6 +255,8 @@ namespace Terminal.Gui {
 			{
 				return ((IEnumerable)Themes!).GetEnumerator ();
 			}
+#pragma warning restore 1591
+
 			#endregion
 		}
 	}

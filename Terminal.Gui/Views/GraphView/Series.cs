@@ -32,9 +32,9 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The color and character that will be rendered in the console
 		/// when there are point(s) in the corresponding graph space.
-		/// Defaults to uncolored 'x'
+		/// Defaults to uncolored 'dot'
 		/// </summary>
-		public GraphCellToRender Fill { get; set; } = new GraphCellToRender ('x');
+		public GraphCellToRender Fill { get; set; } = new GraphCellToRender (CM.Glyphs.Dot);
 
 		/// <summary>
 		/// Draws all points directly onto the graph

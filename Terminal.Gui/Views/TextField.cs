@@ -293,7 +293,12 @@ namespace Terminal.Gui {
 		public override Rect Frame {
 			get => base.Frame;
 			set {
-				base.Frame = value;
+				if (value.Height > 1) {
+					base.Frame = new Rect(value.X, value.Y, value.Width, 1);
+					Height = 1;
+				} else {
+					base.Frame = value;
+				}
 				Adjust ();
 			}
 		}
@@ -436,7 +441,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void Redraw (Rect bounds)
+		public override void OnDrawContent (Rect contentArea)
 		{
 			var selColor = new Attribute (ColorScheme.Focus.Background, ColorScheme.Focus.Foreground);
 			SetSelectedStartSelectedLength ();
@@ -464,7 +469,7 @@ namespace Terminal.Gui {
 					Driver.SetAttribute (idx >= start && length > 0 && idx < start + length ? selColor : ColorScheme.Focus);
 				}
 				if (col + cols <= width) {
-					Driver.AddRune ((Rune)(Secret ? '*' : rune));
+					Driver.AddRune ((Rune)(Secret ? CM.Glyphs.Dot : rune));
 				}
 				if (!TextModel.SetCol (ref col, width, cols)) {
 					break;

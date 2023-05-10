@@ -75,6 +75,12 @@ namespace Terminal.Gui {
 		public override bool OnDrawFrames () => false;
 
 		/// <summary>
+		/// Does nothing for Frame
+		/// </summary>
+		/// <returns></returns>
+		public override bool OnRenderLineCanvas () => false;
+
+		/// <summary>
 		/// Frames only render to their Parent or Parent's SuperView's LineCanvas,
 		/// so this always throws an <see cref="InvalidOperationException"/>.
 		/// </summary>
@@ -118,8 +124,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Redraws the Frames that comprise the <see cref="Frame"/>.
 		/// </summary>
-		/// <param name="bounds"></param>
-		public override void Redraw (Rect bounds)
+		public override void OnDrawContent (Rect contentArea)
 		{
 			if (Thickness == Thickness.Empty) return;
 

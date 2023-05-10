@@ -17,22 +17,23 @@ namespace UICatalog.Scenarios {
 	public class TableEditor : Scenario {
 		TableView tableView;
 		DataTable currentTable;
-		private MenuItem miShowHeaders;
-		private MenuItem miAlwaysShowHeaders;
-		private MenuItem miHeaderOverline;
-		private MenuItem miHeaderMidline;
-		private MenuItem miHeaderUnderline;
-		private MenuItem miShowHorizontalScrollIndicators;
-		private MenuItem miCellLines;
-		private MenuItem miFullRowSelect;
-		private MenuItem miExpandLastColumn;
-		private MenuItem miAlwaysUseNormalColorForVerticalCellLines;
-		private MenuItem miSmoothScrolling;
-		private MenuItem miAlternatingColors;
-		private MenuItem miCursor;
-		private MenuItem miBottomline;
-		private MenuItem miCheckboxes;
-		private MenuItem miRadioboxes;
+    
+		private MenuItem _miShowHeaders;
+		private MenuItem _miAlwaysShowHeaders;
+		private MenuItem _miHeaderOverline;
+		private MenuItem _miHeaderMidline;
+		private MenuItem _miHeaderUnderline;
+		private MenuItem _miShowHorizontalScrollIndicators;
+		private MenuItem _miCellLines;
+		private MenuItem _miFullRowSelect;
+		private MenuItem _miExpandLastColumn;
+		private MenuItem _miAlwaysUseNormalColorForVerticalCellLines;
+		private MenuItem _miSmoothScrolling;
+		private MenuItem _miAlternatingColors;
+		private MenuItem _miCursor;
+		private MenuItem _miBottomline;
+		private MenuItem _miCheckboxes;
+		private MenuItem _miRadioboxes;
 
 		ColorScheme redColorScheme;
 		ColorScheme redColorSchemeAlt;
@@ -61,18 +62,18 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
 				new MenuBarItem ("_View", new MenuItem [] {
-					miShowHeaders = new MenuItem ("_ShowHeaders", "", () => ToggleShowHeaders()){Checked = tableView.Style.ShowHeaders, CheckType = MenuItemCheckStyle.Checked },
-					miAlwaysShowHeaders = new MenuItem ("_AlwaysShowHeaders", "", () => ToggleAlwaysShowHeaders()){Checked = tableView.Style.AlwaysShowHeaders, CheckType = MenuItemCheckStyle.Checked },
-					miHeaderOverline = new MenuItem ("_HeaderOverLine", "", () => ToggleOverline()){Checked = tableView.Style.ShowHorizontalHeaderOverline, CheckType = MenuItemCheckStyle.Checked },
-					miHeaderMidline = new MenuItem ("_HeaderMidLine", "", () => ToggleHeaderMidline()){Checked = tableView.Style.ShowVerticalHeaderLines, CheckType = MenuItemCheckStyle.Checked },
-					miHeaderUnderline = new MenuItem ("_HeaderUnderLine", "", () => ToggleUnderline()){Checked = tableView.Style.ShowHorizontalHeaderUnderline, CheckType = MenuItemCheckStyle.Checked },
-					miBottomline = new MenuItem ("_BottomLine", "", () => ToggleBottomline()){Checked = tableView.Style.ShowHorizontalBottomline, CheckType = MenuItemCheckStyle.Checked },
-					miShowHorizontalScrollIndicators = new MenuItem ("_HorizontalScrollIndicators", "", () => ToggleHorizontalScrollIndicators()){Checked = tableView.Style.ShowHorizontalScrollIndicators, CheckType = MenuItemCheckStyle.Checked },
-					miFullRowSelect =new MenuItem ("_FullRowSelect", "", () => ToggleFullRowSelect()){Checked = tableView.FullRowSelect, CheckType = MenuItemCheckStyle.Checked },
-					miCellLines =new MenuItem ("_CellLines", "", () => ToggleCellLines()){Checked = tableView.Style.ShowVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
-					miExpandLastColumn = new MenuItem ("_ExpandLastColumn", "", () => ToggleExpandLastColumn()){Checked = tableView.Style.ExpandLastColumn, CheckType = MenuItemCheckStyle.Checked },
-					miAlwaysUseNormalColorForVerticalCellLines = new MenuItem ("_AlwaysUseNormalColorForVerticalCellLines", "", () => ToggleAlwaysUseNormalColorForVerticalCellLines()){Checked = tableView.Style.AlwaysUseNormalColorForVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
-					miSmoothScrolling = new MenuItem ("_SmoothHorizontalScrolling", "", () => ToggleSmoothScrolling()){Checked = tableView.Style.SmoothHorizontalScrolling, CheckType = MenuItemCheckStyle.Checked },
+					_miShowHeaders = new MenuItem ("_ShowHeaders", "", () => ToggleShowHeaders()){Checked = tableView.Style.ShowHeaders, CheckType = MenuItemCheckStyle.Checked },
+					_miAlwaysShowHeaders = new MenuItem ("_AlwaysShowHeaders", "", () => ToggleAlwaysShowHeaders()){Checked = tableView.Style.AlwaysShowHeaders, CheckType = MenuItemCheckStyle.Checked },
+					_miHeaderOverline = new MenuItem ("_HeaderOverLine", "", () => ToggleOverline()){Checked = tableView.Style.ShowHorizontalHeaderOverline, CheckType = MenuItemCheckStyle.Checked },
+					_miHeaderMidline = new MenuItem ("_HeaderMidLine", "", () => ToggleHeaderMidline()){Checked = tableView.Style.ShowVerticalHeaderLines, CheckType = MenuItemCheckStyle.Checked },
+					_miHeaderUnderline = new MenuItem ("_HeaderUnderLine", "", () => ToggleUnderline()){Checked = tableView.Style.ShowHorizontalHeaderUnderline, CheckType = MenuItemCheckStyle.Checked },
+					_miBottomline = new MenuItem ("_BottomLine", "", () => ToggleBottomline()){Checked = tableView.Style.ShowHorizontalBottomline, CheckType = MenuItemCheckStyle.Checked },
+					_miShowHorizontalScrollIndicators = new MenuItem ("_HorizontalScrollIndicators", "", () => ToggleHorizontalScrollIndicators()){Checked = tableView.Style.ShowHorizontalScrollIndicators, CheckType = MenuItemCheckStyle.Checked },
+					_miFullRowSelect =new MenuItem ("_FullRowSelect", "", () => ToggleFullRowSelect()){Checked = tableView.FullRowSelect, CheckType = MenuItemCheckStyle.Checked },
+					_miCellLines =new MenuItem ("_CellLines", "", () => ToggleCellLines()){Checked = tableView.Style.ShowVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
+					_miExpandLastColumn = new MenuItem ("_ExpandLastColumn", "", () => ToggleExpandLastColumn()){Checked = tableView.Style.ExpandLastColumn, CheckType = MenuItemCheckStyle.Checked },
+					_miAlwaysUseNormalColorForVerticalCellLines = new MenuItem ("_AlwaysUseNormalColorForVerticalCellLines", "", () => ToggleAlwaysUseNormalColorForVerticalCellLines()){Checked = tableView.Style.AlwaysUseNormalColorForVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
+					_miSmoothScrolling = new MenuItem ("_SmoothHorizontalScrolling", "", () => ToggleSmoothScrolling()){Checked = tableView.Style.SmoothHorizontalScrolling, CheckType = MenuItemCheckStyle.Checked },
 					new MenuItem ("_AllLines", "", () => ToggleAllCellLines()),
 					new MenuItem ("_NoLines", "", () => ToggleNoCellLines()),
 					miCheckboxes = new MenuItem ("_Checkboxes", "", () => ToggleCheckboxes(false)){Checked = false, CheckType = MenuItemCheckStyle.Checked },
@@ -201,8 +202,8 @@ namespace UICatalog.Scenarios {
 				col.ColumnName = TrimArrows (col.ColumnName);
 
 				// add a new one if this the one that is being sorted
-				if (col.Ordinal == ToTableCol(clickedCol)) {
-					col.ColumnName += isAsc ? '▲' : '▼';
+				if (col.Ordinal == clickedCol) {
+					col.ColumnName += isAsc ? CM.Glyphs.UpArrow : CM.Glyphs.DownArrow;
 				}
 			}
 
@@ -211,11 +212,11 @@ namespace UICatalog.Scenarios {
 
 		private string TrimArrows (string columnName)
 		{
-			return columnName.TrimEnd ('▼', '▲');
+			return columnName.TrimEnd ((char)CM.Glyphs.UpArrow, (char)CM.Glyphs.DownArrow);
 		}
 		private string StripArrows (string columnName)
 		{
-			return columnName.Replace ("▼", "").Replace ("▲", "");
+			return columnName.Replace ($"{CM.Glyphs.DownArrow}", "").Replace ($"{CM.Glyphs.UpArrow}", "");
 		}
 		private string GetProposedNewSortOrder (int clickedCol, out bool isAsc)
 		{
@@ -343,30 +344,30 @@ namespace UICatalog.Scenarios {
 
 		private void SetupScrollBar ()
 		{
-			var _scrollBar = new ScrollBarView (tableView, true);
+			var scrollBar = new ScrollBarView (tableView, true);
 
-			_scrollBar.ChangedPosition += (s,e) => {
-				tableView.RowOffset = _scrollBar.Position;
-				if (tableView.RowOffset != _scrollBar.Position) {
-					_scrollBar.Position = tableView.RowOffset;
+			scrollBar.ChangedPosition += (s,e) => {
+				tableView.RowOffset = scrollBar.Position;
+				if (tableView.RowOffset != scrollBar.Position) {
+					scrollBar.Position = tableView.RowOffset;
 				}
 				tableView.SetNeedsDisplay ();
 			};
 			/*
-			_scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
-				_listView.LeftItem = _scrollBar.OtherScrollBarView.Position;
-				if (_listView.LeftItem != _scrollBar.OtherScrollBarView.Position) {
-					_scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
+			scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
+				tableView.LeftItem = scrollBar.OtherScrollBarView.Position;
+				if (tableView.LeftItem != scrollBar.OtherScrollBarView.Position) {
+					scrollBar.OtherScrollBarView.Position = tableView.LeftItem;
 				}
-				_listView.SetNeedsDisplay ();
+				tableView.SetNeedsDisplay ();
 			};*/
 
 			tableView.DrawContent += (s,e) => {
-				_scrollBar.Size = tableView.Table?.Rows ?? 0;
-				_scrollBar.Position = tableView.RowOffset;
-				//	_scrollBar.OtherScrollBarView.Size = _listView.Maxlength - 1;
-				//	_scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
-				_scrollBar.Refresh ();
+				scrollBar.Size = tableView.Table?.Rows ?? 0;
+				scrollBar.Position = tableView.RowOffset;
+				//scrollBar.OtherScrollBarView.Size = tableView.Maxlength - 1;
+				//scrollBar.OtherScrollBarView.Position = tableView.LeftItem;
+				scrollBar.Refresh ();
 			};
 
 		}
@@ -401,59 +402,59 @@ namespace UICatalog.Scenarios {
 
 		private void ToggleShowHeaders ()
 		{
-			miShowHeaders.Checked = !miShowHeaders.Checked;
-			tableView.Style.ShowHeaders = (bool)miShowHeaders.Checked;
+			_miShowHeaders.Checked = !_miShowHeaders.Checked;
+			tableView.Style.ShowHeaders = (bool)_miShowHeaders.Checked;
 			tableView.Update ();
 		}
 
 		private void ToggleAlwaysShowHeaders ()
 		{
-			miAlwaysShowHeaders.Checked = !miAlwaysShowHeaders.Checked;
-			tableView.Style.AlwaysShowHeaders = (bool)miAlwaysShowHeaders.Checked;
+			_miAlwaysShowHeaders.Checked = !_miAlwaysShowHeaders.Checked;
+			tableView.Style.AlwaysShowHeaders = (bool)_miAlwaysShowHeaders.Checked;
 			tableView.Update ();
 		}
 
 		private void ToggleOverline ()
 		{
-			miHeaderOverline.Checked = !miHeaderOverline.Checked;
-			tableView.Style.ShowHorizontalHeaderOverline = (bool)miHeaderOverline.Checked;
+			_miHeaderOverline.Checked = !_miHeaderOverline.Checked;
+			tableView.Style.ShowHorizontalHeaderOverline = (bool)_miHeaderOverline.Checked;
 			tableView.Update ();
 		}
 		private void ToggleHeaderMidline ()
 		{
-			miHeaderMidline.Checked = !miHeaderMidline.Checked;
-			tableView.Style.ShowVerticalHeaderLines = (bool)miHeaderMidline.Checked;
+			_miHeaderMidline.Checked = !_miHeaderMidline.Checked;
+			tableView.Style.ShowVerticalHeaderLines = (bool)_miHeaderMidline.Checked;
 			tableView.Update ();
 		}
 		private void ToggleUnderline ()
 		{
-			miHeaderUnderline.Checked = !miHeaderUnderline.Checked;
-			tableView.Style.ShowHorizontalHeaderUnderline = (bool)miHeaderUnderline.Checked;
+			_miHeaderUnderline.Checked = !_miHeaderUnderline.Checked;
+			tableView.Style.ShowHorizontalHeaderUnderline = (bool)_miHeaderUnderline.Checked;
 			tableView.Update ();
 		}
 		private void ToggleBottomline()
 		{
-			miBottomline.Checked = !miBottomline.Checked;
-			tableView.Style.ShowHorizontalBottomline = (bool)miBottomline.Checked;
+			_miBottomline.Checked = !_miBottomline.Checked;
+			tableView.Style.ShowHorizontalBottomline = (bool)_miBottomline.Checked;
 			tableView.Update ();
 		}
 		private void ToggleHorizontalScrollIndicators ()
 		{
-			miShowHorizontalScrollIndicators.Checked = !miShowHorizontalScrollIndicators.Checked;
-			tableView.Style.ShowHorizontalScrollIndicators = (bool)miShowHorizontalScrollIndicators.Checked;
+			_miShowHorizontalScrollIndicators.Checked = !_miShowHorizontalScrollIndicators.Checked;
+			tableView.Style.ShowHorizontalScrollIndicators = (bool)_miShowHorizontalScrollIndicators.Checked;
 			tableView.Update ();
 		}
 		private void ToggleFullRowSelect ()
 		{
-			miFullRowSelect.Checked = !miFullRowSelect.Checked;
-			tableView.FullRowSelect = (bool)miFullRowSelect.Checked;
+			_miFullRowSelect.Checked = !_miFullRowSelect.Checked;
+			tableView.FullRowSelect = (bool)_miFullRowSelect.Checked;
 			tableView.Update ();
 		}
 
 		private void ToggleExpandLastColumn ()
 		{
-			miExpandLastColumn.Checked = !miExpandLastColumn.Checked;
-			tableView.Style.ExpandLastColumn = (bool)miExpandLastColumn.Checked;
+			_miExpandLastColumn.Checked = !_miExpandLastColumn.Checked;
+			tableView.Style.ExpandLastColumn = (bool)_miExpandLastColumn.Checked;
 
 			tableView.Update ();
 
@@ -497,23 +498,23 @@ namespace UICatalog.Scenarios {
 
 		private void ToggleAlwaysUseNormalColorForVerticalCellLines()
 		{
-			miAlwaysUseNormalColorForVerticalCellLines.Checked = !miAlwaysUseNormalColorForVerticalCellLines.Checked;
-			tableView.Style.AlwaysUseNormalColorForVerticalCellLines = (bool)miAlwaysUseNormalColorForVerticalCellLines.Checked;
+			_miAlwaysUseNormalColorForVerticalCellLines.Checked = !_miAlwaysUseNormalColorForVerticalCellLines.Checked;
+			tableView.Style.AlwaysUseNormalColorForVerticalCellLines = (bool)_miAlwaysUseNormalColorForVerticalCellLines.Checked;
 
 			tableView.Update ();
 		}
 		private void ToggleSmoothScrolling ()
 		{
-			miSmoothScrolling.Checked = !miSmoothScrolling.Checked;
-			tableView.Style.SmoothHorizontalScrolling = (bool)miSmoothScrolling.Checked;
+			_miSmoothScrolling.Checked = !_miSmoothScrolling.Checked;
+			tableView.Style.SmoothHorizontalScrolling = (bool)_miSmoothScrolling.Checked;
 
 			tableView.Update ();
 
 		}
 		private void ToggleCellLines ()
 		{
-			miCellLines.Checked = !miCellLines.Checked;
-			tableView.Style.ShowVerticalCellLines = (bool)miCellLines.Checked;
+			_miCellLines.Checked = !_miCellLines.Checked;
+			tableView.Style.ShowVerticalCellLines = (bool)_miCellLines.Checked;
 			tableView.Update ();
 		}
 		private void ToggleAllCellLines ()
@@ -523,10 +524,10 @@ namespace UICatalog.Scenarios {
 			tableView.Style.ShowHorizontalHeaderUnderline = true;
 			tableView.Style.ShowVerticalCellLines = true;
 
-			miHeaderOverline.Checked = true;
-			miHeaderMidline.Checked = true;
-			miHeaderUnderline.Checked = true;
-			miCellLines.Checked = true;
+			_miHeaderOverline.Checked = true;
+			_miHeaderMidline.Checked = true;
+			_miHeaderUnderline.Checked = true;
+			_miCellLines.Checked = true;
 
 			tableView.Update ();
 		}
@@ -537,10 +538,10 @@ namespace UICatalog.Scenarios {
 			tableView.Style.ShowHorizontalHeaderUnderline = false;
 			tableView.Style.ShowVerticalCellLines = false;
 
-			miHeaderOverline.Checked = false;
-			miHeaderMidline.Checked = false;
-			miHeaderUnderline.Checked = false;
-			miCellLines.Checked = false;
+			_miHeaderOverline.Checked = false;
+			_miHeaderMidline.Checked = false;
+			_miHeaderUnderline.Checked = false;
+			_miCellLines.Checked = false;
 
 			tableView.Update ();
 		}
@@ -548,9 +549,9 @@ namespace UICatalog.Scenarios {
 		private void ToggleAlternatingColors ()
 		{
 			//toggle menu item
-			miAlternatingColors.Checked = !miAlternatingColors.Checked;
+			_miAlternatingColors.Checked = !_miAlternatingColors.Checked;
 
-			if (miAlternatingColors.Checked == true) {
+			if (_miAlternatingColors.Checked == true) {
 				tableView.Style.RowColorGetter = (a) => { return a.RowIndex % 2 == 0 ? alternatingColorScheme : null; };
 			} else {
 				tableView.Style.RowColorGetter = null;
@@ -561,8 +562,8 @@ namespace UICatalog.Scenarios {
 		private void ToggleInvertSelectedCellFirstCharacter ()
 		{
 			//toggle menu item
-			miCursor.Checked = !miCursor.Checked;
-			tableView.Style.InvertSelectedCellFirstCharacter = (bool)miCursor.Checked;
+			_miCursor.Checked = !_miCursor.Checked;
+			tableView.Style.InvertSelectedCellFirstCharacter = (bool)_miCursor.Checked;
 			tableView.SetNeedsDisplay ();
 		}
 		private void CloseExample ()
@@ -817,7 +818,7 @@ namespace UICatalog.Scenarios {
 
 				ColorGetter = (a) => a.CellValue is double d ?
 								// color 0 and negative values red
-								d <= 0.0000001 ? a.RowIndex % 2 == 0 && miAlternatingColors.Checked == true ? redColorSchemeAlt : redColorScheme :
+								d <= 0.0000001 ? a.RowIndex % 2 == 0 && _miAlternatingColors.Checked == true ? redColorSchemeAlt : redColorScheme :
 								// use normal scheme for positive values
 								null :
 								// not a double

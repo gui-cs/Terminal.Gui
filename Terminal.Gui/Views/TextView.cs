@@ -1995,7 +1995,14 @@ namespace Terminal.Gui {
 		/// Indicates whatever the text was changed or not.
 		/// <see langword="true"/> if the text was changed <see langword="false"/> otherwise.
 		/// </summary>
-		public bool IsDirty => _historyText.IsDirty (Text);
+		public bool IsDirty {
+			get {
+				return _historyText.IsDirty (Text);
+			}
+			set {
+				_historyText.Clear (Text);
+			}
+		} 
 
 		/// <summary>
 		/// Indicates whatever the text has history changes or not.

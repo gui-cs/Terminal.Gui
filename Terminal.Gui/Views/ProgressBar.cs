@@ -124,16 +124,16 @@ namespace Terminal.Gui {
 				progressBarStyle = value;
 				switch (value) {
 				case ProgressBarStyle.Blocks:
-					SegmentCharacter = Driver.BlocksMeterSegment;
+					SegmentCharacter = CM.Glyphs.BlocksMeterSegment;
 					break;
 				case ProgressBarStyle.Continuous:
-					SegmentCharacter = Driver.ContinuousMeterSegment;
+					SegmentCharacter = CM.Glyphs.ContinuousMeterSegment;
 					break;
 				case ProgressBarStyle.MarqueeBlocks:
-					SegmentCharacter = Driver.BlocksMeterSegment;
+					SegmentCharacter = CM.Glyphs.BlocksMeterSegment;
 					break;
 				case ProgressBarStyle.MarqueeContinuous:
-					SegmentCharacter = Driver.ContinuousMeterSegment;
+					SegmentCharacter = CM.Glyphs.ContinuousMeterSegment;
 					break;
 				}
 				SetNeedsDisplay ();
@@ -170,7 +170,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private Rune segmentCharacter = Driver.BlocksMeterSegment;
+		private Rune segmentCharacter = CM.Glyphs.BlocksMeterSegment;
 
 		/// <summary>
 		/// Segment indicator for meter views.
@@ -275,7 +275,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override void Redraw (Rect region)
+		public override void OnDrawContent (Rect contentArea)
 		{
 			DrawFrame ();
 
@@ -357,7 +357,7 @@ namespace Terminal.Gui {
 			case ProgressBarFormat.FramedProgressPadded:
 				padding = 2;
 				Border.DrawFrame (Bounds, false);
-				Border.DrawFrame (new Rect (Bounds.X + padding/2, Bounds.Y + padding/2, Bounds.Width - (padding), Bounds.Height - padding - 1), false);
+				Border.DrawFrame (new Rect (Bounds.X + padding / 2, Bounds.Y + padding / 2, Bounds.Width - (padding), Bounds.Height - padding - 1), false);
 				break;
 			}
 		}
