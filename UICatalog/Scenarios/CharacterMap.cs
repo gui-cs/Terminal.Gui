@@ -22,7 +22,7 @@ namespace UICatalog.Scenarios;
 ///   - Helps test unicode character rendering in Terminal.Gui
 ///   - Illustrates how to use ScrollView to do infinite scrolling
 /// </summary>
-[ScenarioMetadata (Name: "Character Map", Description: "A Unicode character set viewer built as a custom control using the ScrollView control.")]
+[ScenarioMetadata (Name: "Character Map", Description: "Unicode viewer demonstrating the ScrollView control.")]
 [ScenarioCategory ("Text and Formatting")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("ScrollView")]
