@@ -123,9 +123,14 @@ namespace Terminal.Gui {
 				contentBottomRightCorner = new View (" ") {
 					Id = "contentBottomRightCorner",
 					Visible = Host.Visible,
-					ClearOnVisibleFalse = false
+					ClearOnVisibleFalse = false,
+					ColorScheme = ColorScheme
 				};
-				Host.Add (contentBottomRightCorner);
+				if (hosted) {
+					Host.SuperView.Add (contentBottomRightCorner);
+				} else {
+					Host.Add (contentBottomRightCorner);
+				}
 				contentBottomRightCorner.X = Pos.Right (Host) - 1;
 				contentBottomRightCorner.Y = Pos.Bottom (Host) - 1;
 				contentBottomRightCorner.Width = 1;
@@ -429,6 +434,11 @@ namespace Terminal.Gui {
 			if (otherScrollBarView != null && otherScrollBarView.showScrollIndicator) {
 				otherScrollBarView.Draw ();
 			}
+			if (contentBottomRightCorner != null && contentBottomRightCorner.Visible) {
+				contentBottomRightCorner.Draw ();
+			} else if (otherScrollBarView != null && otherScrollBarView.contentBottomRightCorner != null && otherScrollBarView.contentBottomRightCorner.Visible) {
+				otherScrollBarView.contentBottomRightCorner.Draw ();
+			}
 		}
 
 		bool CheckBothScrollBars (ScrollBarView scrollBarView, bool pending = false)
@@ -656,14 +666,6 @@ namespace Terminal.Gui {
 					Driver.AddRune (CM.Glyphs.RightArrow);
 				}
 			}
-
-			// BUGBUG: v2 - contentBottomRightCorner is a view. it will be drawn by Host.Superview.OnDraw; no 
-			// need to draw it here.
-			//if (contentBottomRightCorner != null && hosted && showBothScrollIndicator) {
-			//	contentBottomRightCorner.Redraw (contentBottomRightCorner.Bounds);
-			//} else if (otherScrollBarView != null && otherScrollBarView.contentBottomRightCorner != null && otherScrollBarView.hosted && otherScrollBarView.showBothScrollIndicator) {
-			//	otherScrollBarView.contentBottomRightCorner.Redraw (otherScrollBarView.contentBottomRightCorner.Bounds);
-			//}
 		}
 
 		int lastLocation = -1;
