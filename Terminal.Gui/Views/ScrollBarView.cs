@@ -697,7 +697,6 @@ namespace Terminal.Gui {
 
 			if (mouseEvent.Flags != MouseFlags.Button1Released
 				&& (Application.MouseGrabView == null || Application.MouseGrabView != this)) {
-
 				Application.GrabMouse (this);
 			} else if (mouseEvent.Flags == MouseFlags.Button1Released && Application.MouseGrabView != null && Application.MouseGrabView == this) {
 				lastLocation = -1;
@@ -710,11 +709,11 @@ namespace Terminal.Gui {
 				return Host.MouseEvent (mouseEvent);
 			}
 
-			if (location == 0) {
+			if (mouseEvent.Flags == MouseFlags.Button1Pressed && location == 0) {
 				if (pos > 0) {
 					Position = pos - 1;
 				}
-			} else if (location == barsize + 1) {
+			} else if (mouseEvent.Flags == MouseFlags.Button1Pressed && location == barsize + 1) {
 				if (CanScroll (1, out _, vertical)) {
 					Position = pos + 1;
 				}

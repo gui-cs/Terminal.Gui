@@ -13,6 +13,7 @@
 
 using System;
 using System.Linq;
+using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -363,7 +364,9 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (GetNormalColor ());
 			Clear ();
 
-			contentView.Draw ();
+			if (!ustring.IsNullOrEmpty (contentView.Text) || contentView.Subviews.Count > 0) {
+				contentView.Draw ();
+			}
 
 			if (autoHideScrollBars) {
 				ShowHideScrollBars ();
