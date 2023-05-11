@@ -90,7 +90,6 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// DecodeRune unpacks the first UTF-8 encoding in the string returns the rune and its width in bytes.
 		/// </summary>
-		/// <param name="rune">The rune to encode.</param>
 		/// <param name="buffer">The byte array to look into.</param>
 		/// <param name="start">Starting offset to look into.</param>
 		/// <param name="nbytes">Number of bytes valid in the buffer, or -1 to make it the length of the buffer.</param>
@@ -102,7 +101,7 @@ namespace Terminal.Gui {
 			}
 			var str = Encoding.UTF8.GetString (buffer, start, nbytes);
 
-			return str.DecodeRune (0, nbytes);
+			return str.DecodeRune (0);
 		}
 
 		/// <summary>
