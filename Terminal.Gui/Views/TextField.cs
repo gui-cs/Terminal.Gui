@@ -79,7 +79,7 @@ namespace Terminal.Gui {
 		/// <param name="text">Initial text contents.</param>
 		public TextField (string text) : base (text)
 		{
-			Initialize (text, text.RuneCount () + 1);
+			Initialize (text, text.GetRuneCount () + 1);
 		}
 
 		/// <summary>
@@ -102,7 +102,7 @@ namespace Terminal.Gui {
 				text = "";
 
 			this.text = TextModel.ToRunes (text.Split ("\n") [0]);
-			point = text.RuneCount ();
+			point = text.GetRuneCount ();
 			first = point > w + 1 ? point - w + 1 : 0;
 			CanFocus = true;
 			Used = true;
@@ -397,7 +397,7 @@ namespace Terminal.Gui {
 			for (int idx = first < 0 ? 0 : first; idx < text.Count; idx++) {
 				if (idx == point)
 					break;
-				var cols = text [idx].ColumnWidth ();
+				var cols = text [idx].GetColumns ();
 				TextModel.SetCol (ref col, Frame.Width - 1, cols);
 			}
 			var pos = point - first + Math.Min (Frame.X, 0);
@@ -450,7 +450,7 @@ namespace Terminal.Gui {
 			var roc = GetReadOnlyColor ();
 			for (int idx = p; idx < tcount; idx++) {
 				var rune = text [idx];
-				var cols = ((Rune)rune).ColumnWidth ();
+				var cols = ((Rune)rune).GetColumns ();
 				if (idx == point && HasFocus && !Used && length == 0 && !ReadOnly) {
 					Driver.SetAttribute (selColor);
 				} else if (ReadOnly) {
@@ -468,7 +468,7 @@ namespace Terminal.Gui {
 				if (!TextModel.SetCol (ref col, width, cols)) {
 					break;
 				}
-				if (idx + 1 < tcount && col + text [idx + 1].ColumnWidth () > width) {
+				if (idx + 1 < tcount && col + text [idx + 1].GetColumns () > width) {
 					break;
 				}
 			}
@@ -508,7 +508,7 @@ namespace Terminal.Gui {
 			Move (0, 0);
 			var render = Caption;
 
-			if (render.ConsoleWidth () > Bounds.Width) {
+			if (render.GetColumns () > Bounds.Width) {
 				render = render [..Bounds.Width];
 			}
 
@@ -1200,11 +1200,11 @@ namespace Terminal.Gui {
 			int selStart = SelectedStart > -1 ? start : point;
 			(var _, var len) = TextModel.DisplaySize (text, 0, selStart, false);
 			(var _, var len2) = TextModel.DisplaySize (text, selStart, selStart + length, false);
-			(var _, var len3) = TextModel.DisplaySize (text, selStart + length, actualText.RuneCount (), false);
+			(var _, var len3) = TextModel.DisplaySize (text, selStart + length, actualText.GetRuneCount (), false);
 			var newText = actualText [..len] +
 				actualText.Substring (len + len2, len3);
 			ClearAllSelection ();
-			point = selStart >= newText.RuneCount () ? newText.RuneCount () : selStart;
+			point = selStart >= newText.GetRuneCount () ? newText.GetRuneCount () : selStart;
 			return newText.ToRuneList ();
 		}
 
@@ -1222,12 +1222,12 @@ namespace Terminal.Gui {
 			string actualText = Text;
 			(int _, int len) = TextModel.DisplaySize (text, 0, selStart, false);
 			(var _, var len2) = TextModel.DisplaySize (text, selStart, selStart + length, false);
-			(var _, var len3) = TextModel.DisplaySize (text, selStart + length, actualText.RuneCount (), false);
+			(var _, var len3) = TextModel.DisplaySize (text, selStart + length, actualText.GetRuneCount (), false);
 			string cbTxt = Clipboard.Contents.Split ("\n") [0] ?? "";
 			Text = actualText [..len] +
 				cbTxt +
 				actualText.Substring (len + len2, len3);
-			point = selStart + cbTxt.RuneCount ();
+			point = selStart + cbTxt.GetRuneCount ();
 			ClearAllSelection ();
 			SetNeedsDisplay ();
 			Adjust ();

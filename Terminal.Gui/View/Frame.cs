@@ -163,7 +163,7 @@ namespace Terminal.Gui {
 			var topTitleLineY = borderBounds.Y;
 			var titleY = borderBounds.Y;
 			var titleBarsLength = 0; // the little vertical thingies
-			var maxTitleWidth = Math.Min (Parent.Title.ConsoleWidth(), Math.Min (screenBounds.Width - 4, borderBounds.Width - 4));
+			var maxTitleWidth = Math.Min (Parent.Title.GetColumns (), Math.Min (screenBounds.Width - 4, borderBounds.Width - 4));
 			var sideLineLength = borderBounds.Height;
 			var canDrawBorder = borderBounds.Width > 0 && borderBounds.Height > 0;
 
@@ -282,7 +282,7 @@ namespace Terminal.Gui {
 						} else {
 							Driver.SetAttribute (Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetNormalColor ());
 						}
-						DrawTitle (new Rect (borderBounds.X, titleY, Parent.Title.ConsoleWidth(), 1), Parent?.Title);
+						DrawTitle (new Rect (borderBounds.X, titleY, Parent.Title.GetColumns (), 1), Parent?.Title);
 						Driver.SetAttribute (prevAttr);
 					}
 
@@ -367,7 +367,7 @@ namespace Terminal.Gui {
 			if (!string.IsNullOrEmpty (title)) {
 				Driver.Move (region.X + 2, region.Y);
 				//Driver.AddRune (' ');
-				var str = title.EnumerateRunes().Sum (r => Math.Max (r.ColumnWidth (), 1)) >= width
+				var str = title.EnumerateRunes ().Sum (r => Math.Max (r.GetColumns (), 1)) >= width
 					? TextFormatter.Format (title, width, false, false) [0] : title;
 				Driver.AddStr (str);
 			}

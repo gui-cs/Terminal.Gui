@@ -150,7 +150,7 @@ namespace Terminal.Gui {
 			int width = 0;
 
 			foreach (var s in radioLabels) {
-				width = Math.Max (s.ConsoleWidth() + 2, width);
+				width = Math.Max (s.GetColumns () + 2, width);
 			}
 			return new Rect (x, y, width, radioLabels.Count);
 		}
@@ -183,7 +183,7 @@ namespace Terminal.Gui {
 				int length = 0;
 				for (int i = 0; i < radioLabels.Count; i++) {
 					start += length;
-					length = radioLabels [i].ConsoleWidth () + 2 + (i < radioLabels.Count - 1 ? horizontalSpace : 0);
+					length = radioLabels [i].GetColumns () + 2 + (i < radioLabels.Count - 1 ? horizontalSpace : 0);
 					horizontal.Add ((start, length));
 				}
 			}

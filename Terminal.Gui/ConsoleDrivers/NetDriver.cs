@@ -668,8 +668,8 @@ namespace Terminal.Gui {
 			if (contents.Length != Rows * Cols * 3) {
 				return;
 			}
-			rune = MakePrintable (rune);
-			var runeWidth = rune.ColumnWidth ();
+			rune = rune.MakePrintable ();
+			var runeWidth = rune.GetColumns ();
 			var validClip = IsValidContent (ccol, crow, Clip);
 
 			if (validClip) {
@@ -689,12 +689,12 @@ namespace Terminal.Gui {
 
 				} else {
 					if (runeWidth < 2 && ccol > 0
-						&& ((Rune)(char)contents [crow, ccol - 1, 0]).ColumnWidth () > 1) {
+						&& ((Rune)(char)contents [crow, ccol - 1, 0]).GetColumns () > 1) {
 
 						contents [crow, ccol - 1, 0] = (int)(uint)' ';
 
 					} else if (runeWidth < 2 && ccol <= Clip.Right - 1
-						&& ((Rune)(char)contents [crow, ccol, 0]).ColumnWidth () > 1) {
+						&& ((Rune)(char)contents [crow, ccol, 0]).GetColumns () > 1) {
 
 						contents [crow, ccol + 1, 0] = (int)(uint)' ';
 						contents [crow, ccol + 1, 2] = 1;

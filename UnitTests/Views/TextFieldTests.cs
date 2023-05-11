@@ -1367,8 +1367,8 @@ namespace Terminal.Gui.ViewsTests {
 			var tf = new TextField (text) { Width = 30 };
 
 			Assert.Equal (21, text.Length);
-			Assert.Equal (21, tf.Text.RuneCount ());
-			Assert.Equal (21, tf.Text.ConsoleWidth ());
+			Assert.Equal (21, tf.Text.GetRuneCount ());
+			Assert.Equal (21, tf.Text.GetColumns ());
 
 			var runes = tf.Text.ToRuneList ();
 			Assert.Equal (21, runes.Count);
@@ -1503,7 +1503,7 @@ Les Miśerables", output);
 			var caption = "Mise" + Char.ConvertFromUtf32 (Int32.Parse ("0301", NumberStyles.HexNumber)) + "rables";
 
 			Assert.Equal (11, caption.Length);
-			Assert.Equal (10, caption.EnumerateRunes ().Sum (c => c.ColumnWidth ()));
+			Assert.Equal (10, caption.EnumerateRunes ().Sum (c => c.GetColumns ()));
 
 			var tf = GetTextFieldsInView ();
 

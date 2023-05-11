@@ -74,7 +74,7 @@ namespace Terminal.Gui {
 			Move (0, 0);
 			Driver.SetAttribute (GetNormalColor ());
 
-			var hLineWidth = Math.Max (1, CM.Glyphs.HLine.ColumnWidth ());
+			var hLineWidth = Math.Max (1, CM.Glyphs.HLine.GetColumns ());
 
 			var dEnd = Orientation == Orientation.Horizontal ?
 				Bounds.Width :

@@ -598,7 +598,7 @@ namespace Terminal.Gui {
 			base.OnDrawContent (contentArea);
 
 			if (!string.IsNullOrWhiteSpace (feedback)) {
-				var feedbackWidth = feedback.EnumerateRunes ().Sum (c => c.ColumnWidth ());
+				var feedbackWidth = feedback.EnumerateRunes ().Sum (c => c.GetColumns ());
 				var feedbackPadLeft = ((Bounds.Width - feedbackWidth) / 2) - 1;
 
 				feedbackPadLeft = Math.Min (Bounds.Width, feedbackPadLeft);

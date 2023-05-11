@@ -208,7 +208,7 @@ namespace UICatalog.Scenarios {
 				int index = start;
 				while (index < ustr.Length) {
 					(var rune, var size) = ustr.DecodeRune (index, index - ustr.Length);
-					var count = rune.ColumnWidth ();
+					var count = rune.GetColumns ();
 					if (used + count >= width) break;
 					driver.AddRune (rune);
 					used += count;

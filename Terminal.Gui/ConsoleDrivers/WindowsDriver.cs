@@ -1520,8 +1520,8 @@ namespace Terminal.Gui {
 
 		public override void AddRune (Rune rune)
 		{
-			rune = MakePrintable (rune);
-			var runeWidth = rune.ColumnWidth ();
+			rune = rune.MakePrintable ();
+			var runeWidth = rune.GetColumns ();
 			var position = GetOutputBufferPosition ();
 			var validClip = IsValidContent (ccol, crow, Clip);
 
@@ -1545,14 +1545,14 @@ namespace Terminal.Gui {
 					WindowsConsole.SmallRect.Update (ref damageRegion, (short)(ccol - 1), (short)crow);
 				} else {
 					if (runeWidth < 2 && ccol > 0
-						&& ((Rune)(char)contents [crow, ccol - 1, 0]).ColumnWidth () > 1) {
+						&& ((Rune)(char)contents [crow, ccol - 1, 0]).GetColumns () > 1) {
 
 						var prevPosition = crow * Cols + (ccol - 1);
 						OutputBuffer [prevPosition].Char.UnicodeChar = ' ';
 						contents [crow, ccol - 1, 0] = (int)(uint)' ';
 
 					} else if (runeWidth < 2 && ccol <= Clip.Right - 1
-						&& ((Rune)(char)contents [crow, ccol, 0]).ColumnWidth () > 1) {
+						&& ((Rune)(char)contents [crow, ccol, 0]).GetColumns () > 1) {
 
 						var prevPosition = GetOutputBufferPosition () + 1;
 						OutputBuffer [prevPosition].Char.UnicodeChar = (char)' ';

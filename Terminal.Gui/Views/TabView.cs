@@ -336,7 +336,7 @@ namespace Terminal.Gui {
 			foreach (var tab in Tabs.Skip (TabScrollOffset)) {
 
 				// while there is space for the tab
-				var tabTextWidth = tab.Text.EnumerateRunes ().Sum (c => c.ColumnWidth ());
+				var tabTextWidth = tab.Text.EnumerateRunes ().Sum (c => c.GetColumns ());
 
 				string text = tab.Text;
 

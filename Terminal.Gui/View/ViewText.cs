@@ -155,11 +155,11 @@ namespace Terminal.Gui {
 			if (isWidth) {
 				return TextFormatter.IsHorizontalDirection (TextDirection) &&
 				    TextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
-				    ? Math.Max (HotKeySpecifier.ColumnWidth (), 0) : 0;
+				    ? Math.Max (HotKeySpecifier.GetColumns (), 0) : 0;
 			} else {
 				return TextFormatter.IsVerticalDirection (TextDirection) &&
 				    TextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
-				    ? Math.Max (HotKeySpecifier.ColumnWidth(), 0) : 0;
+				    ? Math.Max (HotKeySpecifier.GetColumns(), 0) : 0;
 			}
 		}
 

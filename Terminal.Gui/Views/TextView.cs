@@ -233,7 +233,7 @@ namespace Terminal.Gui {
 			var pX = x + start;
 			for (int i = start; i < t.Count; i++) {
 				var r = t [i];
-				size += r.ColumnWidth ();
+				size += r.GetColumns ();
 				if (r.Value == '\t') {
 					size += tabWidth + 1;
 				}
@@ -257,8 +257,8 @@ namespace Terminal.Gui {
 			int i = start == -1 ? 0 : start;
 			for (; i < tcount; i++) {
 				var rune = t [i];
-				size += rune.ColumnWidth ();
-				len += rune.RuneUnicodeLength (Encoding.Unicode);
+				size += rune.GetColumns ();
+				len += rune.GetEncodingLength (Encoding.Unicode);
 				if (rune.Value == '\t') {
 					size += tabWidth + 1;
 					len += tabWidth - 1;
@@ -272,8 +272,8 @@ namespace Terminal.Gui {
 
 			bool IsWideRune (Rune r, int tWidth, out int s, out int l)
 			{
-				s = r.ColumnWidth ();
-				l = r.RuneUnicodeLength ();
+				s = r.GetColumns ();
+				l = r.GetEncodingLength ();
 				if (r.Value == '\t') {
 					s += tWidth + 1;
 					l += tWidth - 1;
@@ -297,7 +297,7 @@ namespace Terminal.Gui {
 
 			for (int i = tcount; i >= 0; i--) {
 				var rune = t [i];
-				size += rune.ColumnWidth ();
+				size += rune.GetColumns ();
 				if (rune.Value == '\t') {
 					size += tabWidth + 1;
 				}
@@ -409,7 +409,7 @@ namespace Terminal.Gui {
 			var origTxt = StringExtensions.Make (source);
 			(int _, int len) = TextModel.DisplaySize (source, 0, col, false);
 			(int _, int len2) = TextModel.DisplaySize (source, col, col + matchText.Length, false);
-			(int _, int len3) = TextModel.DisplaySize (source, col + matchText.Length, origTxt.RuneCount (), false);
+			(int _, int len3) = TextModel.DisplaySize (source, col + matchText.Length, origTxt.GetRuneCount (), false);
 
 			return origTxt [..len] +
 				textToReplace +
@@ -1597,7 +1597,7 @@ namespace Terminal.Gui {
 			//historyText.Clear (Text);
 
 			if (!_multiline && !IsInitialized) {
-				_currentColumn = Text.RuneCount ();
+				_currentColumn = Text.GetRuneCount ();
 				_leftColumn = _currentColumn > Frame.Width + 1 ? _currentColumn - Frame.Width + 1 : 0;
 			}
 		}
@@ -2120,7 +2120,7 @@ namespace Terminal.Gui {
 				for (int idx = _leftColumn; idx < line.Count; idx++) {
 					if (idx >= _currentColumn)
 						break;
-					var cols = line [idx].ColumnWidth ();
+					var cols = line [idx].GetColumns ();
 					if (line [idx].Value == '\t') {
 						cols += TabWidth + 1;
 					}
@@ -2496,9 +2496,9 @@ namespace Terminal.Gui {
 				_selectionStartColumn = foundPos.current.X;
 				_selectionStartRow = foundPos.current.Y;
 				if (!replaceAll) {
-					_currentColumn = _selectionStartColumn + text.RuneCount ();
+					_currentColumn = _selectionStartColumn + text.GetRuneCount ();
 				} else {
-					_currentColumn = _selectionStartColumn + textToReplace.RuneCount ();
+					_currentColumn = _selectionStartColumn + textToReplace.GetRuneCount ();
 				}
 				_currentRow = foundPos.current.Y;
 				if (!_isReadOnly && replace) {
@@ -2506,7 +2506,7 @@ namespace Terminal.Gui {
 					ClearSelectedRegion ();
 					InsertAllText (textToReplace);
 					StartSelecting ();
-					_selectionStartColumn = _currentColumn - textToReplace.RuneCount ();
+					_selectionStartColumn = _currentColumn - textToReplace.GetRuneCount ();
 				} else {
 					UpdateWrapModel ();
 					SetNeedsDisplay ();
@@ -2625,7 +2625,7 @@ namespace Terminal.Gui {
 				Move (0, row);
 				for (int idxCol = _leftColumn; idxCol < lineRuneCount; idxCol++) {
 					var rune = idxCol >= lineRuneCount ? (Rune)' ' : line [idxCol];
-					var cols = rune.ColumnWidth ();
+					var cols = rune.GetColumns ();
 					if (idxCol < line.Count && _selecting && PointInSelection (idxCol, idxRow)) {
 						SetSelectionColor (line, idxCol);
 					} else if (idxCol == _currentColumn && idxRow == _currentRow && !_selecting && !Used
@@ -2653,7 +2653,7 @@ namespace Terminal.Gui {
 					if (!TextModel.SetCol (ref col, contentArea.Right, cols)) {
 						break;
 					}
-					if (idxCol + 1 < lineRuneCount && col + line [idxCol + 1].ColumnWidth () > right) {
+					if (idxCol + 1 < lineRuneCount && col + line [idxCol + 1].GetColumns () > right) {
 						break;
 					}
 				}
@@ -2775,12 +2775,12 @@ namespace Terminal.Gui {
 				throw new ArgumentNullException (nameof (runes));
 			int size = 0;
 			foreach (var rune in runes) {
-				size += rune.RuneUnicodeLength ();
+				size += rune.GetEncodingLength ();
 			}
 			var encoded = new byte [size];
 			int offset = 0;
 			foreach (var rune in runes) {
-				offset += rune.EncodeRune (encoded, offset);
+				offset += rune.Encode (encoded, offset);
 			}
 			return StringExtensions.Make (encoded);
 		}

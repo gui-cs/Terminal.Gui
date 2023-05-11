@@ -226,16 +226,16 @@ namespace Terminal.Gui {
 				return text;
 
 			// if value is not wide enough
-			if (text.EnumerateRunes ().Sum (c => c.ColumnWidth ()) < width) {
+			if (text.EnumerateRunes ().Sum (c => c.GetColumns ()) < width) {
 
 				// pad it out with spaces to the given alignment
-				int toPad = width - (text.EnumerateRunes ().Sum (c => c.ColumnWidth ()));
+				int toPad = width - (text.EnumerateRunes ().Sum (c => c.GetColumns ()));
 
 				return text + new string (' ', toPad);
 			}
 
 			// value is too wide
-			return new string (text.TakeWhile (c => (width -= ((Rune)c).ColumnWidth ()) >= 0).ToArray ());
+			return new string (text.TakeWhile (c => (width -= ((Rune)c).GetColumns ()) >= 0).ToArray ());
 		}
 
 		/// <summary>
@@ -278,13 +278,13 @@ namespace Terminal.Gui {
 				while ((end = start) < runes.Count) {
 					end = GetNextWhiteSpace (start, width, out bool incomplete);
 					if (end == 0 && incomplete) {
-						start = text.RuneCount ();
+						start = text.GetRuneCount ();
 						break;
 					}
 					lines.Add (StringExtensions.Make (runes.GetRange (start, end - start)));
 					start = end;
 					if (incomplete) {
-						start = text.RuneCount ();
+						start = text.GetRuneCount ();
 						break;
 					}
 				}
@@ -379,7 +379,7 @@ namespace Terminal.Gui {
 				while (length < cWidth && to < runes.Count) {
 					var rune = runes [to];
 					if (IsHorizontalDirection (textDirection)) {
-						length += rune.ColumnWidth ();
+						length += rune.GetColumns ();
 					} else {
 						length++;
 					}
@@ -418,7 +418,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			if (start < text.RuneCount ()) {
+			if (start < text.GetRuneCount ()) {
 				lines.Add (StringExtensions.Make (runes.GetRange (start, runes.Count - start)));
 			}
 
@@ -496,7 +496,7 @@ namespace Terminal.Gui {
 			if (IsHorizontalDirection (textDirection)) {
 				textCount = words.Sum (arg => GetTextWidth (arg));
 			} else {
-				textCount = words.Sum (arg => arg.RuneCount ());
+				textCount = words.Sum (arg => arg.GetRuneCount ());
 			}
 			var spaces = words.Length > 1 ? (width - textCount) / (words.Length - 1) : 0;
 			var extras = words.Length > 1 ? (width - textCount) % (words.Length - 1) : 0;
@@ -643,7 +643,7 @@ namespace Terminal.Gui {
 			var max = 0;
 			result.ForEach (s => {
 				var m = 0;
-				s.ToRuneList ().ForEach (r => m += Math.Max (r.ColumnWidth (), 1));
+				s.ToRuneList ().ForEach (r => m += Math.Max (r.GetColumns (), 1));
 				if (m > max) {
 					max = m;
 				}
@@ -652,7 +652,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Returns the width of the widest line in the text, accounting for wide-glyphs (uses <see cref="StringExtensions.ConsoleWidth"/>).
+		/// Returns the width of the widest line in the text, accounting for wide-glyphs (uses <see cref="StringExtensions.GetColumns"/>).
 		/// <paramref name="text"/> if it contains newlines.
 		/// </summary>
 		/// <param name="text">Text, may contain newlines.</param>
@@ -660,17 +660,17 @@ namespace Terminal.Gui {
 		public static int MaxWidthLine (string text)
 		{
 			var result = TextFormatter.SplitNewLine (text);
-			return result.Max (x => x.ConsoleWidth ());
+			return result.Max (x => x.GetColumns ());
 		}
 
 		/// <summary>
-		/// Gets the number of columns the passed text will use, ignoring newlines and accounting for wide-glyphs (uses <see cref="StringExtensions.ConsoleWidth"/>).
+		/// Gets the number of columns the passed text will use, ignoring newlines and accounting for wide-glyphs (uses <see cref="StringExtensions.GetColumns"/>).
 		/// </summary>
 		/// <param name="text"></param>
 		/// <returns>The text width.</returns>
 		public static int GetTextWidth (string text)
 		{
-			return text.EnumerateRunes ().Sum (r => Math.Max (r.ColumnWidth (), 1));
+			return text.EnumerateRunes ().Sum (r => Math.Max (r.GetColumns (), 1));
 		}
 
 		/// <summary>
@@ -687,7 +687,7 @@ namespace Terminal.Gui {
 			for (int i = (startIndex == -1 ? 0 : startIndex); i < (length == -1 ? lines.Count : startIndex + length); i++) {
 				var runes = lines [i];
 				if (runes.Length > 0)
-					max += runes.EnumerateRunes ().Max (r => Math.Max (r.ColumnWidth (), 1));
+					max += runes.EnumerateRunes ().Max (r => Math.Max (r.GetColumns (), 1));
 			}
 			return max;
 		}
@@ -705,7 +705,7 @@ namespace Terminal.Gui {
 			var max = 0;
 			var runes = text.ToRunes ();
 			for (int i = (startIndex == -1 ? 0 : startIndex); i < (length == -1 ? runes.Length : startIndex + length); i++) {
-				max += Math.Max (runes [i].ColumnWidth (), 1);
+				max += Math.Max (runes [i].GetColumns (), 1);
 			}
 			return max;
 		}
@@ -733,7 +733,7 @@ namespace Terminal.Gui {
 			var runesLength = 0;
 			var runeIdx = 0;
 			for (; runeIdx < runes.Count; runeIdx++) {
-				var runeWidth = Math.Max (runes [runeIdx].ColumnWidth (), 1);
+				var runeWidth = Math.Max (runes [runeIdx].GetColumns (), 1);
 				if (runesLength + runeWidth > columns) {
 					break;
 				}
@@ -755,7 +755,7 @@ namespace Terminal.Gui {
 			for (; lineIdx < lines.Count; lineIdx++) {
 				var runes = lines [lineIdx].ToRuneList ();
 				var maxRruneWidth = runes.Count > 0
-					? runes.Max (r => Math.Max (r.ColumnWidth (), 1)) : 1;
+					? runes.Max (r => Math.Max (r.GetColumns (), 1)) : 1;
 				if (runesLength + maxRruneWidth > width) {
 					break;
 				}
@@ -794,7 +794,7 @@ namespace Terminal.Gui {
 						cols = 0;
 					} else if (rune.Value != '\r') {
 						cols++;
-						var rw = ((Rune)rune).ColumnWidth ();
+						var rw = ((Rune)rune).GetColumns ();
 						if (rw > 0) {
 							rw--;
 						}
@@ -821,7 +821,7 @@ namespace Terminal.Gui {
 						cw = 1;
 					} else if (rune.Value != '\r') {
 						rows++;
-						var rw = ((Rune)rune).ColumnWidth ();
+						var rw = ((Rune)rune).GetColumns ();
 						if (cw < rw) {
 							cw = rw;
 							vw++;
@@ -975,7 +975,7 @@ namespace Terminal.Gui {
 			set {
 				_text = value;
 
-				if (_text != null && _text.RuneCount () > 0 && (Size.Width == 0 || Size.Height == 0 || Size.Width != _text.ConsoleWidth ())) {
+				if (_text != null && _text.GetRuneCount () > 0 && (Size.Width == 0 || Size.Height == 0 || Size.Width != _text.GetColumns ())) {
 					// Provide a default size (width = length of longest line, height = 1)
 					// TODO: It might makes more sense for the default to be width = length of first line?
 					Size = new Size (TextFormatter.MaxWidth (Text, int.MaxValue), 1);
@@ -1411,13 +1411,13 @@ namespace Terminal.Gui {
 					} else {
 						Application.Driver?.AddRune (rune);
 					}
-					var runeWidth = Math.Max (rune.ColumnWidth (), 1);
+					var runeWidth = Math.Max (rune.GetColumns (), 1);
 					if (isVertical) {
 						current++;
 					} else {
 						current += runeWidth;
 					}
-					var nextRuneWidth = idx + 1 > -1 && idx + 1 < runes.Length ? runes [idx + 1].ColumnWidth () : 0;
+					var nextRuneWidth = idx + 1 > -1 && idx + 1 < runes.Length ? runes [idx + 1].GetColumns () : 0;
 					if (!isVertical && idx + 1 < runes.Length && current + nextRuneWidth > start + size) {
 						break;
 					}
