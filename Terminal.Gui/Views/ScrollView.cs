@@ -67,18 +67,18 @@ namespace Terminal.Gui {
 				X = Pos.AnchorEnd (1),
 				Y = 0,
 				Width = 1,
-				Height = Dim.Fill (showHorizontalScrollIndicator ? 1 : 0)
+				Height = Dim.Fill (showHorizontalScrollIndicator ? 1 : 0),
+				Host = this
 			};
 
-			vertical.Host = this;
 			horizontal = new ScrollBarView (1, 0, isVertical: false) {
 				X = 0,
 				Y = Pos.AnchorEnd (1),
 				Width = Dim.Fill (showVerticalScrollIndicator ? 1 : 0),
-				Height = 1
+				Height = 1,
+				Host = this
 			};
 
-			horizontal.Host = this;
 			vertical.OtherScrollBarView = horizontal;
 			horizontal.OtherScrollBarView = vertical;
 			base.Add (contentView);
@@ -395,7 +395,7 @@ namespace Terminal.Gui {
 		{
 			if (showHorizontalScrollIndicator && showVerticalScrollIndicator) {
 				_contentBottomRightCorner.Visible = true;
-			} else {
+			} else if (horizontal.IsAdded || vertical.IsAdded) {
 				_contentBottomRightCorner.Visible = false;
 			}
 		}
