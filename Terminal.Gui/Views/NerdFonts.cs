@@ -30,7 +30,7 @@ namespace Terminal.Gui {
 
 			if(file is IDirectoryInfo d)
 			{
-				if(path != null &&
+				if(!string.IsNullOrWhiteSpace(path) &&
 				   path.Contains(d.FullName) &&
 				   args.Context == FileDialogIconGetterContext.Tree)
 				{
