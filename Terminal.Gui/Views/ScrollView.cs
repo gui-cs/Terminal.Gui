@@ -256,6 +256,8 @@ namespace Terminal.Gui {
 			}
 		}
 
+		View _contentBottomRightCorner;
+
 		/// <summary>
 		/// Adds the view to the scrollview.
 		/// </summary>
@@ -263,6 +265,7 @@ namespace Terminal.Gui {
 		public override void Add (View view)
 		{
 			if (view.Id == "contentBottomRightCorner") {
+				_contentBottomRightCorner = view;
 				base.Add (view);
 			} else {
 				if (!IsOverridden (view, "MouseEvent")) {
@@ -365,27 +368,36 @@ namespace Terminal.Gui {
 
 			contentView.Draw ();
 
+			DrawScrollBars ();
+
+			Driver.Clip = savedClip;
+		}
+
+		private void DrawScrollBars ()
+		{
 			if (autoHideScrollBars) {
 				ShowHideScrollBars ();
 			} else {
 				if (ShowVerticalScrollIndicator) {
-					//vertical.SetRelativeLayout (Bounds);
 					vertical.Draw ();
 				}
-
 				if (ShowHorizontalScrollIndicator) {
-					//horizontal.SetRelativeLayout (Bounds);
 					horizontal.Draw ();
 				}
+				if (ShowVerticalScrollIndicator && ShowHorizontalScrollIndicator) {
+					SetContentBottomRightCornerVisibility ();
+					_contentBottomRightCorner.Draw ();
+				}
 			}
+		}
 
-			// Fill in the bottom left corner. Note we don't rely on ScrollBarView.contentBottomRightCorner here
-			// because that only applies when ScrollBarView is hosted.
-			if (ShowVerticalScrollIndicator && ShowHorizontalScrollIndicator) {
-				AddRune (Bounds.Width - 1, Bounds.Height - 1, ' ');
+		private void SetContentBottomRightCornerVisibility ()
+		{
+			if (showHorizontalScrollIndicator && showVerticalScrollIndicator) {
+				_contentBottomRightCorner.Visible = true;
+			} else {
+				_contentBottomRightCorner.Visible = false;
 			}
-			Driver.SetAttribute (GetNormalColor ());
-			Driver.Clip = savedClip;
 		}
 
 		void ShowHideScrollBars ()
@@ -447,6 +459,11 @@ namespace Terminal.Gui {
 			if (h) {
 				horizontal.SetRelativeLayout (Bounds);
 				horizontal.Draw ();
+			}
+			SetContentBottomRightCornerVisibility ();
+			if (v && h) {
+				_contentBottomRightCorner.SetRelativeLayout (Bounds);
+				_contentBottomRightCorner.Draw ();
 			}
 		}
 
