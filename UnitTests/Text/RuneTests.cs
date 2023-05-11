@@ -778,6 +778,24 @@ namespace Terminal.Gui.TextTests {
 		}
 
 		[Fact]
+		public void Test_DecodeRune_With_Byte_Array ()
+		{
+			byte [] bytes = Encoding.UTF8.GetBytes ("Hello, 世界");
+			List<Rune> runes = new List<Rune> ();
+			int tSize = 0;
+			for (int i = 0; i < bytes.Length; i++) {
+				(Rune rune, int size) = RuneExtensions.DecodeRune (bytes, i);
+				runes.Add (rune);
+				tSize += size;
+				i += size - 1;
+			}
+			string result = StringExtensions.Make (runes);
+			Assert.Equal ("Hello, 世界", result);
+			Assert.Equal (13, tSize);
+			Assert.Equal (11, result.ConsoleWidth ());
+		}
+
+		[Fact]
 		public void Test_DecodeRune_With_Surrogate_Pairs ()
 		{
 			string us = "Hello, 𝔹𝕆𝔹";
@@ -787,6 +805,24 @@ namespace Terminal.Gui.TextTests {
 				(Rune rune, int size) = us.DecodeRune (i);
 				runes.Add (rune);
 				tSize += size;
+			}
+			string result = StringExtensions.Make (runes);
+			Assert.Equal ("Hello, 𝔹𝕆𝔹", result);
+			Assert.Equal (19, tSize);
+			Assert.Equal (13, result.ConsoleWidth ());
+		}
+
+		[Fact]
+		public void Test_DecodeRune_With_Byte_Array_And_Surrogate_Pairs ()
+		{
+			byte [] bytes = Encoding.UTF8.GetBytes ("Hello, 𝔹𝕆𝔹");
+			List<Rune> runes = new List<Rune> ();
+			int tSize = 0;
+			for (int i = 0; i < bytes.Length; i++) {
+				(Rune rune, int size) = RuneExtensions.DecodeRune (bytes, i);
+				runes.Add (rune);
+				tSize += size;
+				i += size - 1;
 			}
 			string result = StringExtensions.Make (runes);
 			Assert.Equal ("Hello, 𝔹𝕆𝔹", result);
@@ -812,6 +848,24 @@ namespace Terminal.Gui.TextTests {
 		}
 
 		[Fact]
+		public void Test_DecodeLastRune_With_Byte_Array ()
+		{
+			byte [] bytes = Encoding.UTF8.GetBytes ("Hello, 世界");
+			List<Rune> runes = new List<Rune> ();
+			int tSize = 0;
+			for (int i = bytes.Length; i > 0; i--) {
+				(Rune rune, int size) = RuneExtensions.DecodeLastRune (bytes, i);
+				runes.Add (rune);
+				tSize += size;
+				i -= size - 1;
+			}
+			string result = StringExtensions.Make (runes);
+			Assert.Equal ("界世 ,olleH", result);
+			Assert.Equal (13, tSize);
+			Assert.Equal (11, result.ConsoleWidth ());
+		}
+
+		[Fact]
 		public void Test_DecodeLastRune_With_Surrogate_Pairs ()
 		{
 			string us = "Hello, 𝔹𝕆𝔹";
@@ -821,6 +875,24 @@ namespace Terminal.Gui.TextTests {
 				(Rune rune, int size) = us.DecodeLastRune (i);
 				runes.Add (rune);
 				tSize += size;
+			}
+			string result = StringExtensions.Make (runes);
+			Assert.Equal ("𝔹𝕆𝔹 ,olleH", result);
+			Assert.Equal (19, tSize);
+			Assert.Equal (13, result.ConsoleWidth ());
+		}
+
+		[Fact]
+		public void Test_DecodeLastRune_With_Byte_Array_And_Surrogate_Pairs ()
+		{
+			byte [] bytes = Encoding.UTF8.GetBytes ("Hello, 𝔹𝕆𝔹");
+			List<Rune> runes = new List<Rune> ();
+			int tSize = 0;
+			for (int i = bytes.Length; i > 0; i--) {
+				(Rune rune, int size) = RuneExtensions.DecodeLastRune (bytes, i);
+				runes.Add (rune);
+				tSize += size;
+				i -= size - 1;
 			}
 			string result = StringExtensions.Make (runes);
 			Assert.Equal ("𝔹𝕆𝔹 ,olleH", result);
@@ -893,7 +965,7 @@ namespace Terminal.Gui.TextTests {
 		}
 
 		[Fact]
-		public void Rune_ColumnWidth_Versus_Ustring_ConsoleWidth ()
+		public void Rune_ColumnWidth_Versus_String_ConsoleWidth ()
 		{
 			string us = "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
 			Assert.Equal (200, us.Length);
@@ -902,12 +974,21 @@ namespace Terminal.Gui.TextTests {
 			int sumRuneWidth = us.EnumerateRunes ().Sum (x => x.ColumnWidth ());
 			Assert.Equal (200, sumRuneWidth);
 
+			// has a '\n' newline
 			us = "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\n";
 			Assert.Equal (201, us.Length);
 			Assert.Equal (201, us.RuneCount ());
 			Assert.Equal (200, us.ConsoleWidth ());
 			sumRuneWidth = us.EnumerateRunes ().Sum (x => x.ColumnWidth ());
 			Assert.Equal (199, sumRuneWidth);
+
+			// has a '\t' and a '\n' newline
+			us = "\t01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\n";
+			Assert.Equal (202, us.Length);
+			Assert.Equal (202, us.RuneCount ());
+			Assert.Equal (200, us.ConsoleWidth ());
+			sumRuneWidth = us.EnumerateRunes ().Sum (x => x.ColumnWidth ());
+			Assert.Equal (198, sumRuneWidth);
 		}
 
 		[Fact]
@@ -937,7 +1018,7 @@ namespace Terminal.Gui.TextTests {
 		}
 
 		[Fact]
-		public void System_Rune_ColumnWidth ()
+		public void Rune_ColumnWidth ()
 		{
 			var r = new Rune ('a');
 			Assert.Equal (1, r.ColumnWidth ());

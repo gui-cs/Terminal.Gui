@@ -95,14 +95,14 @@ namespace Terminal.Gui {
 		/// <param name="start">Starting offset to look into.</param>
 		/// <param name="nbytes">Number of bytes valid in the buffer, or -1 to make it the length of the buffer.</param>
 		/// <returns></returns>
-		public static (Rune Rune, int Size) DecodeRune (this Rune rune, byte [] buffer, int start = 0, int nbytes = -1)
+		public static (Rune Rune, int Size) DecodeRune (byte [] buffer, int start = 0, int nbytes = -1)
 		{
-			var operationStatus = Rune.DecodeFromUtf8 (buffer, out Rune nrune, out int bytesConsumed);
-			if (operationStatus == System.Buffers.OperationStatus.Done) {
-				return (nrune, bytesConsumed);
-			} else {
-				return (Rune.ReplacementChar, 1);
+			if (nbytes == -1) {
+				nbytes = buffer.Length - start;
 			}
+			var str = Encoding.UTF8.GetString (buffer, start, nbytes);
+
+			return str.DecodeRune (0, nbytes);
 		}
 
 		/// <summary>
@@ -113,12 +113,9 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public static (Rune Rune, int Size) DecodeLastRune (byte [] buffer, int end = -1)
 		{
-			var operationStatus = Rune.DecodeLastFromUtf8 (buffer, out Rune rune, out int bytesConsumed);
-			if (operationStatus == System.Buffers.OperationStatus.Done) {
-				return (rune, bytesConsumed);
-			} else {
-				return (Rune.ReplacementChar, 1);
-			}
+			var str = Encoding.UTF8.GetString (buffer, 0, end == -1 ? buffer.Length : end);
+
+			return str.DecodeLastRune (-1);
 		}
 
 		/// <summary>
