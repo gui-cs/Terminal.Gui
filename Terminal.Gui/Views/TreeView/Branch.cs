@@ -74,8 +74,8 @@ namespace Terminal.Gui {
 		public virtual int GetWidth (ConsoleDriver driver)
 		{
 			return
-				GetLinePrefix (driver).Sum (r => r.ColumnWidth ()) +
-				GetExpandableSymbol (driver).ColumnWidth () +
+				GetLinePrefix (driver).Sum (r => r.GetColumns ()) +
+				GetExpandableSymbol (driver).GetColumns () +
 				(tree.AspectGetter (Model) ?? "").Length;
 		}
 
@@ -112,7 +112,7 @@ namespace Terminal.Gui {
 					toSkip--;
 				} else {
 					driver.AddRune (r);
-					availableWidth -= r.ColumnWidth ();
+					availableWidth -= r.GetColumns ();
 				}
 			}
 
@@ -141,7 +141,7 @@ namespace Terminal.Gui {
 				toSkip--;
 			} else {
 				driver.AddRune (expansion);
-				availableWidth -= expansion.ColumnWidth ();
+				availableWidth -= expansion.GetColumns ();
 			}
 
 			// horizontal scrolling has already skipped the prefix but now must also skip some of the line body
@@ -154,9 +154,9 @@ namespace Terminal.Gui {
 			}
 
 			// If body of line is too long
-			if (lineBody.EnumerateRunes ().Sum (l => l.ColumnWidth ()) > availableWidth) {
+			if (lineBody.EnumerateRunes ().Sum (l => l.GetColumns ()) > availableWidth) {
 				// remaining space is zero and truncate the line
-				lineBody = new string (lineBody.TakeWhile (c => (availableWidth -= ((Rune)c).ColumnWidth ()) >= 0).ToArray ());
+				lineBody = new string (lineBody.TakeWhile (c => (availableWidth -= ((Rune)c).GetColumns ()) >= 0).ToArray ());
 				availableWidth = 0;
 			} else {
 

@@ -126,7 +126,7 @@ class TestHelpers {
 				} else {
 					sb.Append ((char)rune.Value);
 				}
-				if (rune.ColumnWidth () > 1) {
+				if (rune.GetColumns () > 1) {
 					c++;
 				}
 			}
@@ -188,7 +188,7 @@ class TestHelpers {
 							runes.InsertRange (i, new List<Rune> () { (Rune)' ' });
 						}
 					}
-					if (rune.ColumnWidth () > 1) {
+					if (rune.GetColumns () > 1) {
 						c++;
 					}
 					if (c + 1 > w) {
@@ -217,7 +217,7 @@ class TestHelpers {
 			List<Rune> row = lines [r];
 			for (int c = row.Count - 1; c >= 0; c--) {
 				var rune = row [c];
-				if (rune != (Rune)' ' || (row.Sum (x => x.ColumnWidth ()) == w)) {
+				if (rune != (Rune)' ' || (row.Sum (x => x.GetColumns ()) == w)) {
 					break;
 				}
 				row.RemoveAt (c);

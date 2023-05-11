@@ -104,12 +104,12 @@ namespace Terminal.Gui {
 			var suggestion = this.Suggestions.ElementAt (this.SelectedIdx);
 			var fragment = suggestion.Replacement.Substring (suggestion.Remove);
 
-			int spaceAvailable = textField.Bounds.Width - textField.Text.ConsoleWidth ();
-			int spaceRequired = fragment.EnumerateRunes ().Sum (c => c.ColumnWidth ());
+			int spaceAvailable = textField.Bounds.Width - textField.Text.GetColumns ();
+			int spaceRequired = fragment.EnumerateRunes ().Sum (c => c.GetColumns ());
 
 			if (spaceAvailable < spaceRequired) {
 				fragment = new string (
-					fragment.TakeWhile (c => (spaceAvailable -= ((Rune)c).ColumnWidth ()) >= 0)
+					fragment.TakeWhile (c => (spaceAvailable -= ((Rune)c).GetColumns ()) >= 0)
 					.ToArray ()
 				);
 			}

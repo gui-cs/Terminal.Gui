@@ -129,7 +129,7 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (scheme);
 			for (int i = 0; i < Items.Length; i++) {
 				var title = Items [i].Title.ToString ();
-				for (int n = 0; n < Items [i].Title.RuneCount(); n++) {
+				for (int n = 0; n < Items [i].Title.GetRuneCount (); n++) {
 					if (title [n] == '~') {
 						scheme = ToggleScheme (scheme);
 						continue;

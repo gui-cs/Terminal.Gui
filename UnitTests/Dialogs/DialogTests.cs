@@ -560,7 +560,7 @@ namespace Terminal.Gui.DialogTests {
 			// Note extra spaces to make dialog even wider
 			//                         123456                           123456
 			var buttonRow = $"{CM.Glyphs.VLine}      {btn1} {btn2} {btn3} {btn4}      {CM.Glyphs.VLine}";
-			var width = buttonRow.ConsoleWidth();
+			var width = buttonRow.GetColumns ();
 			d.SetBufferSize (width, 3);
 
 			// Default - Center
@@ -570,21 +570,21 @@ namespace Terminal.Gui.DialogTests {
 
 			// Justify
 			buttonRow = $"{CM.Glyphs.VLine}{btn1}     {btn2}     {btn3}     {btn4}{CM.Glyphs.VLine}";
-			Assert.Equal (width, buttonRow.ConsoleWidth());
+			Assert.Equal (width, buttonRow.GetColumns ());
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Justify, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 			Application.End (runstate);
 
 			// Right
 			buttonRow = $"{CM.Glyphs.VLine}            {btn1} {btn2} {btn3} {btn4}{CM.Glyphs.VLine}";
-			Assert.Equal (width, buttonRow.ConsoleWidth());
+			Assert.Equal (width, buttonRow.GetColumns ());
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Right, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 			Application.End (runstate);
 
 			// Left
 			buttonRow = $"{CM.Glyphs.VLine}{btn1} {btn2} {btn3} {btn4}            {CM.Glyphs.VLine}";
-			Assert.Equal (width, buttonRow.ConsoleWidth());
+			Assert.Equal (width, buttonRow.GetColumns ());
 			(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Left, new Button (btn1Text), new Button (btn2Text), new Button (btn3Text), new Button (btn4Text));
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 			Application.End (runstate);

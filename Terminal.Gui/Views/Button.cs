@@ -90,7 +90,7 @@ namespace Terminal.Gui {
 		///   in a <see cref="Dialog"/> will implicitly activate this button.
 		/// </param>
 		public Button (int x, int y, string text, bool is_default)
-		    : base (new Rect (x, y, text.RuneCount () + 4 + (is_default ? 2 : 0), 1), text)
+		    : base (new Rect (x, y, text.GetRuneCount () + 4 + (is_default ? 2 : 0), 1), text)
 		{
 			SetInitialProperties (text, is_default);
 		}
@@ -290,7 +290,7 @@ namespace Terminal.Gui {
 		public override void PositionCursor ()
 		{
 			if (HotKey == Key.Unknown && Text != "") {
-				for (int i = 0; i < TextFormatter.Text.RuneCount (); i++) {
+				for (int i = 0; i < TextFormatter.Text.GetRuneCount (); i++) {
 					if (TextFormatter.Text [i] == Text [0]) {
 						Move (i, 0);
 						return;

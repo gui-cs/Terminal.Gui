@@ -11,7 +11,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			this.output = output;
 		}
-		
+
 		// TODO: The tests below that use Label should use View instead.
 		[Fact, AutoInitShutdown]
 		public void Non_Bmp_ConsoleWidth_ColumnWidth_Equal_Two ()
@@ -23,8 +23,8 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal ("𝔹", r.ToString ());
 			Assert.Equal (us, r.ToString ());
 
-			Assert.Equal (2, us.ConsoleWidth ());
-			Assert.Equal (2, r.ColumnWidth ());
+			Assert.Equal (2, us.GetColumns ());
+			Assert.Equal (2, r.GetColumns ());
 
 			var win = new Window () { Title = us };
 			var label = new Label (r.ToString ());
@@ -71,8 +71,8 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal ("豈", r.ToString ());
 			Assert.Equal (us, r.ToString ());
 
-			Assert.Equal (2, us.ConsoleWidth());
-			Assert.Equal (2, r.ColumnWidth ());
+			Assert.Equal (2, us.GetColumns ());
+			Assert.Equal (2, r.GetColumns ());
 
 			var win = new Window () { Title = us };
 			var label = new Label (r.ToString ());

@@ -162,8 +162,8 @@ namespace Terminal.Gui {
 			TitleLength +
 			2 + // space after Title - BUGBUG: This should be 1 
 			(Checked == true || CheckType.HasFlag (MenuItemCheckStyle.Checked) || CheckType.HasFlag (MenuItemCheckStyle.Radio) ? 2 : 0) + // check glyph + space 
-			(Help.ConsoleWidth () > 0 ? 2 + Help.ConsoleWidth () : 0) + // Two spaces before Help
-			(ShortcutTag.ConsoleWidth () > 0 ? 2 + ShortcutTag.ConsoleWidth () : 0); // Pad two spaces before shortcut tag (which are also aligned right)
+			(Help.GetColumns () > 0 ? 2 + Help.GetColumns () : 0) + // Two spaces before Help
+			(ShortcutTag.GetColumns () > 0 ? 2 + ShortcutTag.GetColumns () : 0); // Pad two spaces before shortcut tag (which are also aligned right)
 
 		/// <summary>
 		/// Sets or gets whether the <see cref="MenuItem"/> shows a check indicator or not. See <see cref="MenuItemCheckStyle"/>.
@@ -275,7 +275,7 @@ namespace Terminal.Gui {
 			foreach (var ch in title.EnumerateRunes ()) {
 				if (ch == MenuBar.HotKeySpecifier)
 					continue;
-				len += Math.Max (ch.ColumnWidth (), 1);
+				len += Math.Max (ch.GetColumns (), 1);
 			}
 
 			return len;
@@ -667,7 +667,7 @@ namespace Terminal.Gui {
 					}
 
 					// The help string
-					var l = item.ShortcutTag.ConsoleWidth () == 0 ? item.Help.ConsoleWidth () : item.Help.ConsoleWidth () + item.ShortcutTag.ConsoleWidth () + 2;
+					var l = item.ShortcutTag.GetColumns () == 0 ? item.Help.GetColumns () : item.Help.GetColumns () + item.ShortcutTag.GetColumns () + 2;
 					var col = Frame.Width - l - 3;
 					ViewToScreen (col, i, out vtsCol, out vtsRow, false);
 					if (vtsCol < Driver.Cols) {
@@ -676,7 +676,7 @@ namespace Terminal.Gui {
 
 						// The shortcut tag string
 						if (!string.IsNullOrEmpty (item.ShortcutTag)) {
-							Driver.Move (vtsCol + l - item.ShortcutTag.ConsoleWidth (), vtsRow);
+							Driver.Move (vtsCol + l - item.ShortcutTag.GetColumns (), vtsRow);
 							Driver.AddStr (item.ShortcutTag);
 						}
 					}
@@ -1256,7 +1256,7 @@ namespace Terminal.Gui {
 				}
 				// Note Help on MenuBar is drawn with parens around it
 				DrawHotString (string.IsNullOrEmpty (menu.Help) ? $" {menu.Title} " : $" {menu.Title} ({menu.Help}) ", hotColor, normalColor);
-				pos += leftPadding + menu.TitleLength + (menu.Help.ConsoleWidth () > 0 ? leftPadding + menu.Help.ConsoleWidth () + parensAroundHelp : 0) + rightPadding;
+				pos += leftPadding + menu.TitleLength + (menu.Help.GetColumns () > 0 ? leftPadding + menu.Help.GetColumns () + parensAroundHelp : 0) + rightPadding;
 			}
 			PositionCursor ();
 		}
@@ -1274,7 +1274,7 @@ namespace Terminal.Gui {
 					Move (pos + 1, 0);
 					return;
 				} else {
-					pos += leftPadding + Menus [i].TitleLength + (Menus [i].Help.ConsoleWidth () > 0 ? Menus [i].Help.ConsoleWidth () + parensAroundHelp : 0) + rightPadding;
+					pos += leftPadding + Menus [i].TitleLength + (Menus [i].Help.GetColumns () > 0 ? Menus [i].Help.GetColumns () + parensAroundHelp : 0) + rightPadding;
 				}
 			}
 		}
@@ -1429,7 +1429,7 @@ namespace Terminal.Gui {
 				// This positions the submenu horizontally aligned with the first character of the
 				// text belonging to the menu 
 				for (int i = 0; i < index; i++)
-					pos += Menus [i].TitleLength + (Menus [i].Help.ConsoleWidth () > 0 ? Menus [i].Help.ConsoleWidth () + 2 : 0) + leftPadding + rightPadding;
+					pos += Menus [i].TitleLength + (Menus [i].Help.GetColumns () > 0 ? Menus [i].Help.GetColumns () + 2 : 0) + leftPadding + rightPadding;
 
 				var locationOffset = Point.Empty;
 				// if SuperView is null then it's from a ContextMenu
@@ -1808,7 +1808,7 @@ namespace Terminal.Gui {
 				// TODO: this code is duplicated, hotkey should be part of the MenuBarItem
 				var mi = Menus [i];
 				int p = mi.Title.IndexOf (MenuBar.HotKeySpecifier.ToString ());
-				if (p != -1 && p + 1 < mi.Title.RuneCount ()) {
+				if (p != -1 && p + 1 < mi.Title.GetRuneCount ()) {
 					if (Char.ToUpperInvariant ((char)mi.Title [p + 1]) == c) {
 						ProcessMenu (i, mi);
 						return true;
@@ -1917,7 +1917,7 @@ namespace Terminal.Gui {
 					if (mi == null)
 						continue;
 					int p = mi.Title.IndexOf (MenuBar.HotKeySpecifier.ToString ());
-					if (p != -1 && p + 1 < mi.Title.RuneCount ()) {
+					if (p != -1 && p + 1 < mi.Title.GetRuneCount ()) {
 						if (mi.Title [p + 1] == c) {
 							Selected (mi);
 							return true;
@@ -1981,7 +1981,7 @@ namespace Terminal.Gui {
 				}
 				int cx = me.X - locationOffset.X;
 				for (int i = 0; i < Menus.Length; i++) {
-					if (cx >= pos && cx < pos + leftPadding + Menus [i].TitleLength + Menus [i].Help.ConsoleWidth () + rightPadding) {
+					if (cx >= pos && cx < pos + leftPadding + Menus [i].TitleLength + Menus [i].Help.GetColumns () + rightPadding) {
 						if (me.Flags == MouseFlags.Button1Clicked) {
 							if (Menus [i].IsTopLevel) {
 								ViewToScreen (i, 0, out int rx, out int ry);

@@ -985,12 +985,12 @@ namespace Terminal.Gui.ViewsTests {
 					_textView.ProcessKey (new KeyEvent (Key.K | Key.CtrlMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
-					Assert.Equal ("", _textView.Text.ToString ());
-					Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", Clipboard.Contents.ToString ());
+					Assert.Equal ("", _textView.Text);
+					Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", Clipboard.Contents);
 
 					// Paste
 					_textView.ProcessKey (new KeyEvent (Key.Y | Key.CtrlMask, new KeyModifiers ()));
-					Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", _textView.Text.ToString ());
+					Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", _textView.Text);
 					break;
 				default:
 					iterationsFinished = true;
@@ -1893,7 +1893,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			for (int i = lCount; i >= 0; i--) {
 				var r = line [i];
-				sumLength += ((Rune)r).ColumnWidth ();
+				sumLength += ((Rune)r).GetColumns ();
 				if (r == '\t') {
 					sumLength += tabWidth + 1;
 				}
@@ -2012,7 +2012,7 @@ namespace Terminal.Gui.ViewsTests {
 				Assert.Equal (8, tv.Text.Length);
 				Assert.Equal (text, tv.Text);
 				Assert.False (tv.IsDirty);
-				Assert.Equal ((Rune)'\u2400', ConsoleDriver.MakePrintable ((Rune)tv.Text [4]));
+				Assert.Equal ((Rune)'\u2400', ((Rune)tv.Text [4]).MakePrintable ());
 			}
 		}
 

@@ -131,7 +131,7 @@ namespace Terminal.Gui {
 			if (AutoSize || string.IsNullOrEmpty (Text) || Frame.Width <= 2) {
 				return Text;
 			}
-			return Text [..Math.Min (Frame.Width - 2, Text.RuneCount ())];
+			return Text [..Math.Min (Frame.Width - 2, Text.GetRuneCount ())];
 		}
 
 		/// <summary>

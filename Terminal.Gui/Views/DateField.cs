@@ -125,11 +125,11 @@ namespace Terminal.Gui {
 		{
 			string [] frm = lf.Split (sepChar);
 			for (int i = 0; i < frm.Length; i++) {
-				if (frm [i].Contains ("M") && frm [i].RuneCount () < 2)
+				if (frm [i].Contains ("M") && frm [i].GetRuneCount () < 2)
 					lf = lf.Replace ("M", "MM");
-				if (frm [i].Contains ("d") && frm [i].RuneCount () < 2)
+				if (frm [i].Contains ("d") && frm [i].GetRuneCount () < 2)
 					lf = lf.Replace ("d", "dd");
-				if (frm [i].Contains ("y") && frm [i].RuneCount () < 4)
+				if (frm [i].Contains ("y") && frm [i].GetRuneCount () < 4)
 					lf = lf.Replace ("yy", "yyyy");
 			}
 			return $" {lf}";
@@ -282,7 +282,7 @@ namespace Terminal.Gui {
 					date [1] = vals [i].Trim ();
 				} else {
 					var year = vals [i].Trim ();
-					if (year.RuneCount () == 2) {
+					if (year.GetRuneCount () == 2) {
 						var y = DateTime.Now.Year.ToString ();
 						date [2] = y.Substring (0, 2) + year.ToString ();
 					} else {
