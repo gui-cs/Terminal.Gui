@@ -757,9 +757,10 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			if (!_needsDisplay.IsEmpty || _subViewNeedsDisplay || LayoutNeeded) {
-				Driver.SetAttribute (GetNormalColor ());
-				Clear (ViewToScreen (Bounds));
+			if (NeedsDisplay || SubViewNeedsDisplay || LayoutNeeded) {
+				//Driver.SetAttribute (GetNormalColor ());
+				// TODO: It's bad practice for views to always clear. Defeats the purpose of clipping etc...
+				Clear ();
 				LayoutSubviews ();
 				PositionToplevels ();
 
@@ -776,9 +777,10 @@ namespace Terminal.Gui {
 					}
 				}
 
+				// This should not be here, but in base
 				foreach (var view in Subviews) {
 					if (view.Frame.IntersectsWith (Bounds) && !OutsideTopFrame (this)) {
-						view.SetNeedsLayout ();
+						//view.SetNeedsLayout ();
 						view.SetNeedsDisplay (view.Bounds);
 						view.SetSubViewNeedsDisplay ();
 					}

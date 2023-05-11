@@ -13,6 +13,7 @@
 
 using System;
 using System.Linq;
+using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -360,10 +361,12 @@ namespace Terminal.Gui {
 			SetViewsNeedsDisplay ();
 
 			var savedClip = ClipToBounds ();
-			Driver.SetAttribute (GetNormalColor ());
+			// TODO: It's bad practice for views to always clear a view. It negates clipping.
 			Clear ();
 
-			contentView.Draw ();
+			if (!ustring.IsNullOrEmpty (Text) || Subviews.Count > 0) {
+				contentView.Draw ();
+			}
 
 			if (autoHideScrollBars) {
 				ShowHideScrollBars ();

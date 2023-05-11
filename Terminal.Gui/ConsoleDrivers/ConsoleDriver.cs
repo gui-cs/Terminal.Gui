@@ -291,7 +291,12 @@ public abstract class ConsoleDriver {
 	/// Implementations should call <c>base.SetAttribute(c)</c>.
 	/// </remarks>
 	/// <param name="c">C.</param>
-	public void SetAttribute (Attribute c) => CurrentAttribute = c;
+	public Attribute SetAttribute (Attribute c)
+	{
+		var prevAttribute = CurrentAttribute;
+		CurrentAttribute = c;
+		return prevAttribute;
+	} 
 
 	/// <summary>
 	/// Make the attribute for the foreground and background colors.

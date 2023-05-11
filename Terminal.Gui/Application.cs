@@ -765,42 +765,41 @@ namespace Terminal.Gui {
 			}
 			firstIteration = false;
 
-			if (state.Toplevel != Top
-				&& (!Top._needsDisplay.IsEmpty || Top._subViewNeedsDisplay || Top.LayoutNeeded)) {
-				state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
+			if (state.Toplevel != Top && 
+				(Top.NeedsDisplay|| Top.SubViewNeedsDisplay || Top.LayoutNeeded)) {
+				state.Toplevel.SetNeedsDisplay (state.Toplevel.Frame);
+				Top.Clear ();
 				Top.Draw ();
 				foreach (var top in _toplevels.Reverse ()) {
 					if (top != Top && top != state.Toplevel) {
 						top.SetNeedsDisplay ();
 						top.SetSubViewNeedsDisplay ();
+						top.Clear ();
 						top.Draw ();
 					}
 				}
 			}
 			if (_toplevels.Count == 1 && state.Toplevel == Top
 				&& (Driver.Cols != state.Toplevel.Frame.Width || Driver.Rows != state.Toplevel.Frame.Height)
-				&& (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._subViewNeedsDisplay || state.Toplevel.LayoutNeeded)) {
+				&& (state.Toplevel.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay || state.Toplevel.LayoutNeeded)) {
 
-				Driver.SetAttribute (Colors.TopLevel.Normal);
-				state.Toplevel.Clear (new Rect (0, 0, Driver.Cols, Driver.Rows));
-
+				state.Toplevel.Clear ();
 			}
 
-			if (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._subViewNeedsDisplay || state.Toplevel.LayoutNeeded
-				|| OverlappedChildNeedsDisplay ()) {
+			if (state.Toplevel.NeedsDisplay || 
+				state.Toplevel.SubViewNeedsDisplay || 
+				state.Toplevel.LayoutNeeded || 
+				OverlappedChildNeedsDisplay ()) {
+				state.Toplevel.Clear ();
 				state.Toplevel.Draw ();
-				//if (state.Toplevel.SuperView != null) {
-				//	state.Toplevel.SuperView?.OnRenderLineCanvas ();
-				//} else {
-				//	state.Toplevel.OnRenderLineCanvas ();
-				//}
 				state.Toplevel.PositionCursor ();
 				Driver.Refresh ();
 			} else {
 				Driver.UpdateCursor ();
 			}
-			if (state.Toplevel != Top && !state.Toplevel.Modal
-				&& (!Top._needsDisplay.IsEmpty || Top._subViewNeedsDisplay || Top.LayoutNeeded)) {
+			if (state.Toplevel != Top && 
+				!state.Toplevel.Modal &&
+				(Top.NeedsDisplay|| Top.SubViewNeedsDisplay || Top.LayoutNeeded)) {
 				Top.Draw ();
 			}
 		}
