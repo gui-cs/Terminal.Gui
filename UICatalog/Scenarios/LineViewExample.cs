@@ -40,7 +40,7 @@ namespace UICatalog.Scenarios {
 			// creates a horizontal line
 			var doubleLine = new LineView () {
 				Y = 3,
-				LineRune = '\u2550'
+				LineRune = (Rune)'\u2550'
 			};
 
 			Win.Add (doubleLine);
@@ -62,7 +62,7 @@ namespace UICatalog.Scenarios {
 				Y = 7,
 				Width = 10,
 				StartingAnchor = CM.Glyphs.LeftTee,
-				EndingAnchor = '>'
+				EndingAnchor = (Rune)'>'
 			};
 
 			Win.Add (arrowLine);
@@ -82,7 +82,7 @@ namespace UICatalog.Scenarios {
 			var verticalArrow = new LineView (Orientation.Vertical) {
 				X = 27,
 				StartingAnchor = CM.Glyphs.TopTee,
-				EndingAnchor = 'V'
+				EndingAnchor = (Rune)'V'
 			};
 
 			Win.Add (verticalArrow);

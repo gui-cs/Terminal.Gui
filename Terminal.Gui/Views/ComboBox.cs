@@ -8,7 +8,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using NStack;
+using System.Text;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -122,7 +122,7 @@ namespace Terminal.Gui {
 					Move (0, row);
 					if (Source == null || item >= Source.Count) {
 						for (int c = 0; c < f.Width; c++)
-							Driver.AddRune (' ');
+							Driver.AddRune ((Rune)' ');
 					} else {
 						var rowEventArgs = new ListViewRowEventArgs (item);
 						OnRowRender (rowEventArgs);
@@ -132,7 +132,7 @@ namespace Terminal.Gui {
 						}
 						if (AllowsMarking) {
 							Driver.AddRune (Source.IsMarked (item) ? (AllowsMultipleSelection ? CM.Glyphs.Checked : CM.Glyphs.Selected) : (AllowsMultipleSelection ? CM.Glyphs.UnChecked : CM.Glyphs.UnSelected));
-							Driver.AddRune (' ');
+							Driver.AddRune ((Rune)' ');
 						}
 						Source.Render (this, Driver, isSelected, item, col, row, f.Width - col, start);
 					}
@@ -232,7 +232,7 @@ namespace Terminal.Gui {
 		public event EventHandler<ListViewItemEventArgs> OpenSelectedItem;
 
 		readonly IList searchset = new List<object> ();
-		ustring text = "";
+		string text = "";
 		readonly TextField search;
 		readonly ComboListView listview;
 		bool autoHide = true;
@@ -249,7 +249,7 @@ namespace Terminal.Gui {
 		/// Public constructor
 		/// </summary>
 		/// <param name="text"></param>
-		public ComboBox (ustring text) : base ()
+		public ComboBox (string text) : base ()
 		{
 			search = new TextField ("");
 			listview = new ComboListView (this, HideDropdownListOnClick) { LayoutStyle = LayoutStyle.Computed, CanFocus = true, TabStop = false };
@@ -484,7 +484,7 @@ namespace Terminal.Gui {
 				search.SetFocus ();
 			}
 
-			search.CursorPosition = search.Text.RuneCount;
+			search.CursorPosition = search.Text.RuneCount();
 
 			return base.OnEnter (view);
 		}
@@ -627,7 +627,7 @@ namespace Terminal.Gui {
 
 			if (listview.HasFocus && listview.SelectedItem == 0 && searchset?.Count > 0) // jump back to search
 			{
-				search.CursorPosition = search.Text.RuneCount;
+				search.CursorPosition = search.Text.RuneCount();
 				search.SetFocus ();
 				return true;
 			}
@@ -716,7 +716,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The currently selected list item
 		/// </summary>
-		public new ustring Text {
+		public new string Text {
 			get {
 				return text;
 			}
@@ -750,7 +750,7 @@ namespace Terminal.Gui {
 			}
 
 			SetValue (listview.SelectedItem > -1 ? searchset [listview.SelectedItem] : text);
-			search.CursorPosition = search.Text.ConsoleWidth;
+			search.CursorPosition = search.Text.ConsoleWidth();
 			Search_Changed (this, new TextChangedEventArgs (search.Text));
 			OnOpenSelectedItem ();
 			Reset (keepSearchText: true);
@@ -758,7 +758,7 @@ namespace Terminal.Gui {
 			isShow = false;
 		}
 
-		private int GetSelectedItemFromSource (ustring value)
+		private int GetSelectedItemFromSource (string value)
 		{
 			if (source == null) {
 				return -1;
@@ -814,7 +814,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			if (ustring.IsNullOrEmpty (search.Text) && ustring.IsNullOrEmpty (e.OldValue)) {
+			if (string.IsNullOrEmpty (search.Text) && string.IsNullOrEmpty (e.OldValue)) {
 				ResetSearchSet ();
 			} else if (search.Text != e.OldValue) {
 				isShow = true;

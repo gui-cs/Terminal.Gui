@@ -1,4 +1,4 @@
-﻿using NStack;
+﻿using System.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,14 +17,14 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="RadioGroup"/> class using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
-		public RadioGroup () : this (radioLabels: new ustring [] { }) { }
+		public RadioGroup () : this (radioLabels: new string [] { }) { }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="RadioGroup"/> class using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
 		/// <param name="radioLabels">The radio labels; an array of strings that can contain hotkeys using an underscore before the letter.</param>
 		/// <param name="selected">The index of the item to be selected, the value is clamped to the number of items.</param>
-		public RadioGroup (ustring [] radioLabels, int selected = 0) : base ()
+		public RadioGroup (string [] radioLabels, int selected = 0) : base ()
 		{
 			SetInitalProperties (Rect.Empty, radioLabels, selected);
 		}
@@ -35,7 +35,7 @@ namespace Terminal.Gui {
 		/// <param name="rect">Boundaries for the radio group.</param>
 		/// <param name="radioLabels">The radio labels; an array of strings that can contain hotkeys using an underscore before the letter.</param>
 		/// <param name="selected">The index of item to be selected, the value is clamped to the number of items.</param>
-		public RadioGroup (Rect rect, ustring [] radioLabels, int selected = 0) : base (rect)
+		public RadioGroup (Rect rect, string [] radioLabels, int selected = 0) : base (rect)
 		{
 			SetInitalProperties (rect, radioLabels, selected);
 		}
@@ -48,14 +48,14 @@ namespace Terminal.Gui {
 		/// <param name="y">The y coordinate.</param>
 		/// <param name="radioLabels">The radio labels; an array of strings that can contain hotkeys using an underscore before the letter.</param>
 		/// <param name="selected">The item to be selected, the value is clamped to the number of items.</param>
-		public RadioGroup (int x, int y, ustring [] radioLabels, int selected = 0) :
+		public RadioGroup (int x, int y, string [] radioLabels, int selected = 0) :
 			this (MakeRect (x, y, radioLabels != null ? radioLabels.ToList () : null), radioLabels, selected)
 		{ }
 
-		void SetInitalProperties (Rect rect, ustring [] radioLabels, int selected)
+		void SetInitalProperties (Rect rect, string [] radioLabels, int selected)
 		{
 			if (radioLabels == null) {
-				this.radioLabels = new List<ustring> ();
+				this.radioLabels = new List<string> ();
 			} else {
 				this.radioLabels = radioLabels.ToList ();
 			}
@@ -116,7 +116,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		void SetWidthHeight (List<ustring> radioLabels)
+		void SetWidthHeight (List<string> radioLabels)
 		{
 			switch (displayMode) {
 			case DisplayModeLayout.Vertical:
@@ -141,7 +141,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		static Rect MakeRect (int x, int y, List<ustring> radioLabels)
+		static Rect MakeRect (int x, int y, List<string> radioLabels)
 		{
 			if (radioLabels == null) {
 				return new Rect (x, y, 0, 0);
@@ -150,18 +150,18 @@ namespace Terminal.Gui {
 			int width = 0;
 
 			foreach (var s in radioLabels) {
-				width = Math.Max (s.ConsoleWidth + 2, width);
+				width = Math.Max (s.ConsoleWidth() + 2, width);
 			}
 			return new Rect (x, y, width, radioLabels.Count);
 		}
 
-		List<ustring> radioLabels = new List<ustring> ();
+		List<string> radioLabels = new List<string> ();
 
 		/// <summary>
 		/// The radio labels to display
 		/// </summary>
 		/// <value>The radio labels.</value>
-		public ustring [] RadioLabels {
+		public string [] RadioLabels {
 			get => radioLabels.ToArray ();
 			set {
 				var prevCount = radioLabels.Count;
@@ -183,7 +183,7 @@ namespace Terminal.Gui {
 				int length = 0;
 				for (int i = 0; i < radioLabels.Count; i++) {
 					start += length;
-					length = radioLabels [i].ConsoleWidth + 2 + (i < radioLabels.Count - 1 ? horizontalSpace : 0);
+					length = radioLabels [i].ConsoleWidth () + 2 + (i < radioLabels.Count - 1 ? horizontalSpace : 0);
 					horizontal.Add ((start, length));
 				}
 			}
@@ -206,7 +206,7 @@ namespace Terminal.Gui {
 				}
 				var rl = radioLabels [i];
 				Driver.SetAttribute (GetNormalColor ());
-				Driver.AddStr (ustring.Make (new Rune [] { i == selected ? CM.Glyphs.Selected : CM.Glyphs.UnSelected, ' ' }));
+				Driver.AddStr (StringExtensions.Make (new Rune [] { i == selected ? CM.Glyphs.Selected : CM.Glyphs.UnSelected, (Rune)' ' }));
 				TextFormatter.FindHotKey (rl, HotKeySpecifier, true, out int hotPos, out Key hotKey);
 				if (hotPos != -1 && (hotKey != Key.Null || hotKey != Key.Unknown)) {
 					var rlRunes = rl.ToRunes ();
@@ -301,7 +301,7 @@ namespace Terminal.Gui {
 						if (c == HotKeySpecifier) {
 							nextIsHot = true;
 						} else {
-							if ((nextIsHot && Rune.ToUpper (c) == key) || (key == (uint)hotKey)) {
+							if ((nextIsHot && Rune.ToUpperInvariant (c).Value == key) || (key == (uint)hotKey)) {
 								SelectedItem = i;
 								cursor = i;
 								if (!HasFocus)

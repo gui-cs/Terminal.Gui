@@ -99,7 +99,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (customField);
 
-			var styleArray = styleDict.Select (e => NStack.ustring.Make (e.Value.Key.ToString ())).ToArray ();
+			var styleArray = styleDict.Select (e => e.Value.Key).ToArray ();
 			if (styleArray.Length < 1)
 				return;
 

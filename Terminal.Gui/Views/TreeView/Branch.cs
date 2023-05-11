@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Terminal.Gui {
 	class Branch<T> where T : class {
@@ -73,8 +74,8 @@ namespace Terminal.Gui {
 		public virtual int GetWidth (ConsoleDriver driver)
 		{
 			return
-				GetLinePrefix (driver).Sum (Rune.ColumnWidth) +
-				Rune.ColumnWidth (GetExpandableSymbol (driver)) +
+				GetLinePrefix (driver).Sum (r => r.ColumnWidth ()) +
+				GetExpandableSymbol (driver).ColumnWidth () +
 				(tree.AspectGetter (Model) ?? "").Length;
 		}
 
@@ -111,7 +112,7 @@ namespace Terminal.Gui {
 					toSkip--;
 				} else {
 					driver.AddRune (r);
-					availableWidth -= Rune.ColumnWidth (r);
+					availableWidth -= r.ColumnWidth ();
 				}
 			}
 
@@ -140,7 +141,7 @@ namespace Terminal.Gui {
 				toSkip--;
 			} else {
 				driver.AddRune (expansion);
-				availableWidth -= Rune.ColumnWidth (expansion);
+				availableWidth -= expansion.ColumnWidth ();
 			}
 
 			// horizontal scrolling has already skipped the prefix but now must also skip some of the line body
@@ -153,9 +154,9 @@ namespace Terminal.Gui {
 			}
 
 			// If body of line is too long
-			if (lineBody.Sum (l => Rune.ColumnWidth (l)) > availableWidth) {
+			if (lineBody.EnumerateRunes ().Sum (l => l.ColumnWidth ()) > availableWidth) {
 				// remaining space is zero and truncate the line
-				lineBody = new string (lineBody.TakeWhile (c => (availableWidth -= Rune.ColumnWidth (c)) >= 0).ToArray ());
+				lineBody = new string (lineBody.TakeWhile (c => (availableWidth -= ((Rune)c).ColumnWidth ()) >= 0).ToArray ());
 				availableWidth = 0;
 			} else {
 
@@ -246,17 +247,17 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public Rune GetExpandableSymbol (ConsoleDriver driver)
 		{
-			var leafSymbol = tree.Style.ShowBranchLines ? CM.Glyphs.HLine : ' ';
+			var leafSymbol = tree.Style.ShowBranchLines ? CM.Glyphs.HLine : (Rune)' ';
 
 			if (IsExpanded) {
-				return tree.Style.CollapseableSymbol ?? leafSymbol;
+				return tree.Style.CollapseableSymbol ?? (Rune)leafSymbol;
 			}
 
 			if (CanExpand ()) {
-				return tree.Style.ExpandableSymbol ?? leafSymbol;
+				return tree.Style.ExpandableSymbol ?? (Rune)leafSymbol;
 			}
 
-			return leafSymbol;
+			return (Rune)leafSymbol;
 		}
 
 		/// <summary>
@@ -402,12 +403,12 @@ namespace Terminal.Gui {
 			}
 
 			// if we could theoretically expand
-			if (!IsExpanded && tree.Style.ExpandableSymbol != null) {
+			if (!IsExpanded && tree.Style.ExpandableSymbol != default) {
 				return x == GetLinePrefix (driver).Count ();
 			}
 
 			// if we could theoretically collapse
-			if (IsExpanded && tree.Style.CollapseableSymbol != null) {
+			if (IsExpanded && tree.Style.CollapseableSymbol != default) {
 				return x == GetLinePrefix (driver).Count ();
 			}
 

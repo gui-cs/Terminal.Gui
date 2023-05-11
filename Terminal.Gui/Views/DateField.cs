@@ -8,7 +8,7 @@
 using System;
 using System.Globalization;
 using System.Linq;
-using NStack;
+using System.Text;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -123,13 +123,13 @@ namespace Terminal.Gui {
 
 		string GetLongFormat (string lf)
 		{
-			ustring [] frm = ustring.Make (lf).Split (ustring.Make (sepChar));
+			string [] frm = lf.Split (sepChar);
 			for (int i = 0; i < frm.Length; i++) {
-				if (frm [i].Contains ("M") && frm [i].RuneCount < 2)
+				if (frm [i].Contains ("M") && frm [i].RuneCount () < 2)
 					lf = lf.Replace ("M", "MM");
-				if (frm [i].Contains ("d") && frm [i].RuneCount < 2)
+				if (frm [i].Contains ("d") && frm [i].RuneCount () < 2)
 					lf = lf.Replace ("d", "dd");
-				if (frm [i].Contains ("y") && frm [i].RuneCount < 4)
+				if (frm [i].Contains ("y") && frm [i].RuneCount () < 4)
 					lf = lf.Replace ("yy", "yyyy");
 			}
 			return $" {lf}";
@@ -198,17 +198,17 @@ namespace Terminal.Gui {
 			newText.Add (key);
 			if (CursorPosition < fieldLen)
 				newText = newText.Concat (text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))).ToList ();
-			return SetText (ustring.Make (newText));
+			return SetText (StringExtensions.Make (newText));
 		}
 
-		bool SetText (ustring text)
+		bool SetText (string text)
 		{
-			if (text.IsEmpty) {
+			if (string.IsNullOrEmpty (text)) {
 				return false;
 			}
 
-			ustring [] vals = text.Split (ustring.Make (sepChar));
-			ustring [] frm = ustring.Make (format).Split (ustring.Make (sepChar));
+			string [] vals = text.Split (sepChar);
+			string [] frm = format.Split (sepChar);
 			bool isValidDate = true;
 			int idx = GetFormatIndex (frm, "y");
 			int year = Int32.Parse (vals [idx].ToString ());
@@ -245,7 +245,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		string GetDate (int month, int day, int year, ustring [] fm)
+		string GetDate (int month, int day, int year, string [] fm)
 		{
 			string date = " ";
 			for (int i = 0; i < fm.Length; i++) {
@@ -269,32 +269,31 @@ namespace Terminal.Gui {
 			return date;
 		}
 
-		ustring GetDate (ustring text)
+		string GetDate (string text)
 		{
-			ustring [] vals = text.Split (ustring.Make (sepChar));
-			ustring [] frm = ustring.Make (format).Split (ustring.Make (sepChar));
-			ustring [] date = { null, null, null };
+			string [] vals = text.Split (sepChar);
+			string [] frm = format.Split (sepChar);
+			string [] date = { null, null, null };
 
 			for (int i = 0; i < frm.Length; i++) {
 				if (frm [i].Contains ("M")) {
-					date [0] = vals [i].TrimSpace ();
+					date [0] = vals [i].Trim ();
 				} else if (frm [i].Contains ("d")) {
-					date [1] = vals [i].TrimSpace ();
+					date [1] = vals [i].Trim ();
 				} else {
-					var year = vals [i].TrimSpace ();
-					if (year.RuneCount == 2) {
+					var year = vals [i].Trim ();
+					if (year.RuneCount () == 2) {
 						var y = DateTime.Now.Year.ToString ();
 						date [2] = y.Substring (0, 2) + year.ToString ();
 					} else {
-						date [2] = vals [i].TrimSpace ();
+						date [2] = vals [i].Trim ();
 					}
 				}
 			}
-			return date [0] + ustring.Make (sepChar) + date [1] + ustring.Make (sepChar) + date [2];
-
+			return date [0] + sepChar + date [1] + sepChar + date [2];
 		}
 
-		int GetFormatIndex (ustring [] fm, string t)
+		int GetFormatIndex (string [] fm, string t)
 		{
 			int idx = -1;
 			for (int i = 0; i < fm.Length; i++) {
@@ -342,7 +341,7 @@ namespace Terminal.Gui {
 			if (ReadOnly)
 				return true;
 
-			if (SetText (TextModel.ToRunes (ustring.Make ((uint)kb.Key)).First ()))
+			if (SetText (TextModel.ToRunes (StringExtensions.Make ((Rune)(uint)kb.Key)).First ()))
 				IncCursorPosition ();
 
 			return true;
@@ -379,7 +378,7 @@ namespace Terminal.Gui {
 			if (ReadOnly)
 				return;
 
-			SetText ('0');
+			SetText ((Rune)'0');
 			DecCursorPosition ();
 			return;
 		}
@@ -390,7 +389,7 @@ namespace Terminal.Gui {
 			if (ReadOnly)
 				return;
 
-			SetText ('0');
+			SetText ((Rune)'0');
 			return;
 		}
 
@@ -418,7 +417,7 @@ namespace Terminal.Gui {
 		/// <param name="args">Event arguments</param>
 		public virtual void OnDateChanged (DateTimeEventArgs<DateTime> args)
 		{
-			DateChanged?.Invoke (this,args);
+			DateChanged?.Invoke (this, args);
 		}
 	}
 }

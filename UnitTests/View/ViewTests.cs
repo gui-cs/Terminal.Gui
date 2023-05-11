@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 using Xunit.Abstractions;
-using NStack;
+using System.Text;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
@@ -820,13 +820,13 @@ namespace Terminal.Gui.ViewTests {
 			var horizontalView = new View () {
 				Text = text,
 				AutoSize = true,
-				HotKeySpecifier = '_'
+				HotKeySpecifier = (Rune)'_'
 			};
 
 			var verticalView = new View () {
 				Text = text,
 				AutoSize = true,
-				HotKeySpecifier = '_',
+				HotKeySpecifier = (Rune)'_',
 				TextDirection = TextDirection.TopBottom_LeftRight
 			};
 			Application.Top.Add (horizontalView, verticalView);
@@ -1022,7 +1022,7 @@ cccccccccccccccccccc", output);
 			public bool IsKeyDown { get; set; }
 			public bool IsKeyPress { get; set; }
 			public bool IsKeyUp { get; set; }
-			public override ustring Text { get; set; }
+			public override string Text { get; set; }
 
 			public override bool OnKeyDown (KeyEvent keyEvent)
 			{
@@ -1051,7 +1051,7 @@ cccccccccccccccccccc", output);
 						if (idx < Text.Length) {
 							var rune = Text [idx];
 							if (rune != '\n') {
-								AddRune (c, r, Text [idx]);
+								AddRune (c, r, (Rune)Text [idx]);
 							}
 							idx++;
 							if (rune == '\n') {

@@ -196,7 +196,7 @@ namespace UICatalog.Scenarios {
 				for (int y = 0; y < lines.Length; y++) {
 					var line = lines [y];
 					for (int x = 0; x < line.Length; x++) {
-						AddRune (x, y, line [x]);
+						AddRune (x, y, (Rune)line [x]);
 					}
 				}
 			}

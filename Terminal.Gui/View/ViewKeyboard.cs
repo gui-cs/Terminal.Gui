@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using NStack;
+using System.Text;
 
 namespace Terminal.Gui {
 	public partial class View  {
@@ -69,7 +69,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The keystroke combination used in the <see cref="Shortcut"/> as string.
 		/// </summary>
-		public ustring ShortcutTag => ShortcutHelper.GetShortcutTag (_shortcutHelper.Shortcut);
+		public string ShortcutTag => ShortcutHelper.GetShortcutTag (_shortcutHelper.Shortcut);
 
 		/// <summary>
 		/// The action to run if the <see cref="Shortcut"/> is defined.

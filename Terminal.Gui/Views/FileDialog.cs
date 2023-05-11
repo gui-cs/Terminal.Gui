@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using NStack;
+using System.Text;
 using Terminal.Gui.Resources;
 using static Terminal.Gui.ConfigurationManager;
 
@@ -411,8 +411,8 @@ namespace Terminal.Gui {
 		private string GetToggleSplitterText (bool isExpanded)
 		{
 			return isExpanded ?
-				new string ((char)CM.Glyphs.LeftArrow, 2) :
-				new string ((char)CM.Glyphs.RightArrow, 2);
+				new string ((char)CM.Glyphs.LeftArrow.Value, 2) :
+				new string ((char)CM.Glyphs.RightArrow.Value, 2);
 		}
 
 		private void Delete ()
@@ -547,7 +547,7 @@ namespace Terminal.Gui {
 		/// is true.
 		/// </summary>
 		public string Path {
-			get => this.tbPath.Text.ToString ();
+			get => this.tbPath.Text;
 			set {
 				this.tbPath.Text = value;
 				this.tbPath.MoveEnd ();
@@ -598,7 +598,7 @@ namespace Terminal.Gui {
 			base.OnDrawContent (contentArea);
 
 			if (!string.IsNullOrWhiteSpace (feedback)) {
-				var feedbackWidth = feedback.Sum (c => Rune.ColumnWidth (c));
+				var feedbackWidth = feedback.EnumerateRunes ().Sum (c => c.ColumnWidth ());
 				var feedbackPadLeft = ((Bounds.Width - feedbackWidth) / 2) - 1;
 
 				feedbackPadLeft = Math.Min (Bounds.Width, feedbackPadLeft);
@@ -690,7 +690,7 @@ namespace Terminal.Gui {
 			this.tbPath.FocusFirst ();
 			this.tbPath.SelectAll ();
 
-			if (ustring.IsNullOrEmpty (Title)) {
+			if (string.IsNullOrEmpty (Title)) {
 				switch (OpenMode) {
 				case OpenMode.File:
 					this.Title = $"{Strings.fdOpen} {(MustExist ? Strings.fdExisting + " " : "")}{Strings.fdFile}";
@@ -800,7 +800,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			if (!this.IsCompatibleWithOpenMode (this.tbPath.Text.ToString (), out string reason)) {
+			if (!this.IsCompatibleWithOpenMode (this.tbPath.Text, out string reason)) {
 				if (reason != null) {
 					feedback = reason;
 					SetNeedsDisplay ();

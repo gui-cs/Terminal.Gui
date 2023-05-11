@@ -7,7 +7,7 @@ using Terminal.Gui;
 using Xunit;
 using System.Globalization;
 using Xunit.Abstractions;
-using NStack;
+using System.Text;
 using static Terminal.Gui.Application;
 
 namespace Terminal.Gui.DialogTests {
@@ -42,7 +42,7 @@ namespace Terminal.Gui.DialogTests {
 		public void WizardStep_Set_Title_Fires_TitleChanging ()
 		{
 			var r = new Window ();
-			Assert.Equal (ustring.Empty, r.Title);
+			Assert.Equal (string.Empty, r.Title);
 
 			string expectedAfter = string.Empty;
 			string expectedDuring = string.Empty;
@@ -70,7 +70,7 @@ namespace Terminal.Gui.DialogTests {
 		public void WizardStep_Set_Title_Fires_TitleChanged ()
 		{
 			var r = new Window ();
-			Assert.Equal (ustring.Empty, r.Title);
+			Assert.Equal (string.Empty, r.Title);
 
 			string expected = string.Empty;
 			r.TitleChanged += (s,args) => {

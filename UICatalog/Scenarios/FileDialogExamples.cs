@@ -65,7 +65,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (new Label ("Caption") { X = x++, Y = y++ });
 
 			rgCaption = new RadioGroup { X = x, Y = y };
-			rgCaption.RadioLabels = new NStack.ustring [] { "Ok", "Open", "Save" };
+			rgCaption.RadioLabels = new string [] { "Ok", "Open", "Save" };
 			Win.Add (rgCaption);
 
 			y = 0;
@@ -79,7 +79,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (new Label ("OpenMode") { X = x++, Y = y++ });
 
 			rgOpenMode = new RadioGroup { X = x, Y = y };
-			rgOpenMode.RadioLabels = new NStack.ustring [] { "File", "Directory", "Mixed" };
+			rgOpenMode.RadioLabels = new string [] { "File", "Directory", "Mixed" };
 			Win.Add (rgOpenMode);
 
 			y = 5;
@@ -93,7 +93,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (new Label ("Allowed") { X = x++, Y = y++ });
 
 			rgAllowedTypes = new RadioGroup { X = x, Y = y };
-			rgAllowedTypes.RadioLabels = new NStack.ustring [] { "Any", "Csv (Recommended)", "Csv (Strict)" };
+			rgAllowedTypes.RadioLabels = new string [] { "Any", "Csv (Recommended)", "Csv (Strict)" };
 			Win.Add (rgAllowedTypes);
 
 			var btn = new Button ($"Run Dialog") {

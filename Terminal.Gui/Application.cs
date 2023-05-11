@@ -442,10 +442,10 @@ namespace Terminal.Gui {
 				} else if (Top != null && Toplevel != Top && _toplevels.Contains (Top)) {
 					Top.OnLeave (Toplevel);
 				}
-				if (string.IsNullOrEmpty (Toplevel.Id.ToString ())) {
+				if (string.IsNullOrEmpty (Toplevel.Id)) {
 					var count = 1;
 					var id = (_toplevels.Count + count).ToString ();
-					while (_toplevels.Count > 0 && _toplevels.FirstOrDefault (x => x.Id.ToString () == id) != null) {
+					while (_toplevels.Count > 0 && _toplevels.FirstOrDefault (x => x.Id == id) != null) {
 						count++;
 						id = (_toplevels.Count + count).ToString ();
 					}
@@ -453,7 +453,7 @@ namespace Terminal.Gui {
 
 					_toplevels.Push (Toplevel);
 				} else {
-					var dup = _toplevels.FirstOrDefault (x => x.Id.ToString () == Toplevel.Id);
+					var dup = _toplevels.FirstOrDefault (x => x.Id == Toplevel.Id);
 					if (dup == null) {
 						_toplevels.Push (Toplevel);
 					}

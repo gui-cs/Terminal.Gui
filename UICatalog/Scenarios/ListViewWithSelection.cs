@@ -1,4 +1,4 @@
-﻿using NStack;
+﻿using System.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -202,13 +202,13 @@ namespace UICatalog.Scenarios {
 			}
 
 			// A slightly adapted method from: https://github.com/gui-cs/Terminal.Gui/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
-			private void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width, int start = 0)
+			private void RenderUstr (ConsoleDriver driver, string ustr, int col, int line, int width, int start = 0)
 			{
 				int used = 0;
 				int index = start;
 				while (index < ustr.Length) {
-					(var rune, var size) = Utf8.DecodeRune (ustr, index, index - ustr.Length);
-					var count = Rune.ColumnWidth (rune);
+					(var rune, var size) = ustr.DecodeRune (index, index - ustr.Length);
+					var count = rune.ColumnWidth ();
 					if (used + count >= width) break;
 					driver.AddRune (rune);
 					used += count;
@@ -216,7 +216,7 @@ namespace UICatalog.Scenarios {
 				}
 
 				while (used < width) {
-					driver.AddRune (' ');
+					driver.AddRune ((Rune)' ');
 					used++;
 				}
 			}

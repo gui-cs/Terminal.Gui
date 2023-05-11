@@ -1,4 +1,4 @@
-﻿using NStack;
+﻿using System.Text;
 using System;
 using System.Collections.Generic;
 using Terminal.Gui;
@@ -108,7 +108,7 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (label);
 
-			var styleRadioGroup = new RadioGroup (new ustring [] { "Center", "Justify", "Left", "Right" }) {
+			var styleRadioGroup = new RadioGroup (new string [] { "Center", "Justify", "Left", "Right" }) {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
 			};

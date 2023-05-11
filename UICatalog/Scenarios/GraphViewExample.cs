@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Terminal.Gui;
 
 using Color = Terminal.Gui.Color;
@@ -181,7 +182,7 @@ namespace UICatalog.Scenarios {
 
 			var points2 = new ScatterSeries () {
 				Points = randomPoints,
-				Fill = new GraphCellToRender ('x', red)
+				Fill = new GraphCellToRender ((Rune)'x', red)
 			};
 
 			var line2 = new PathAnnotation () {
@@ -297,8 +298,8 @@ namespace UICatalog.Scenarios {
 
 			about.Text = "This graph shows the life expectancy at birth of a range of countries";
 
-			var softStiple = new GraphCellToRender ('\u2591');
-			var mediumStiple = new GraphCellToRender ('\u2592');
+			var softStiple = new GraphCellToRender ((Rune)'\u2591');
+			var mediumStiple = new GraphCellToRender ((Rune)'\u2592');
 
 			var barSeries = new BarSeries () {
 				Bars = new List<BarSeries.Bar> () {
@@ -492,8 +493,8 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			var softStiple = new GraphCellToRender ('\u2591');
-			var mediumStiple = new GraphCellToRender ('\u2592');
+			var softStiple = new GraphCellToRender ((Rune)'\u2591');
+			var mediumStiple = new GraphCellToRender ((Rune)'\u2592');
 
 			for (int i = 0; i < malesSeries.Bars.Count; i++) {
 				malesSeries.Bars [i].Fill = i % 2 == 0 ? softStiple : mediumStiple;
@@ -559,7 +560,7 @@ namespace UICatalog.Scenarios {
 
 			graphView.GraphColor = Application.Driver.MakeAttribute (Color.White, Color.Black);
 
-			var stiple = new GraphCellToRender ('\u2593');
+			var stiple = new GraphCellToRender ((Rune)'\u2593');
 
 			Random r = new Random ();
 			var series = new DiscoBarSeries ();

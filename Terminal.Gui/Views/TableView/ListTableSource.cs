@@ -1,5 +1,4 @@
-﻿using NStack;
-using System;
+﻿using System;
 using System.Collections;
 using System.Data;
 using System.Linq;
@@ -136,10 +135,8 @@ namespace Terminal.Gui {
 			int maxLength = 0;
 			foreach (var t in List) {
 				int l;
-				if (t is ustring u) {
-					l = TextFormatter.GetTextWidth (u);
-				} else if (t is string s) {
-					l = s.Length;
+				if (t is string s) {
+					l = TextFormatter.GetTextWidth (s);
 				} else {
 					l = t.ToString ().Length;
 				}

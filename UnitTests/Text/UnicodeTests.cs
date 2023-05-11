@@ -1,4 +1,4 @@
-﻿using NStack;
+﻿using System.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,9 +23,9 @@ namespace Terminal.Gui.TextTests {
 		[InlineData (0x0000007F, 0x247F)]
 		[InlineData (0x0000009F, 0x249F)]
 		[InlineData (0x0001001A, 0x1001A)]
-		public void MakePrintable_Converts_Control_Chars_To_Proper_Unicode (uint code, uint expected)
+		public void MakePrintable_Converts_Control_Chars_To_Proper_Unicode (int code, int expected)
 		{
-			var actual = ConsoleDriver.MakePrintable (code);
+			var actual = ConsoleDriver.MakePrintable ((Rune)code);
 
 			Assert.Equal (expected, actual.Value);
 		}
@@ -35,9 +35,9 @@ namespace Terminal.Gui.TextTests {
 		[InlineData (0x7E)]
 		[InlineData (0xA0)]
 		[InlineData (0x010020)]
-		public void MakePrintable_Does_Not_Convert_Ansi_Chars_To_Unicode (uint code)
+		public void MakePrintable_Does_Not_Convert_Ansi_Chars_To_Unicode (int code)
 		{
-			var actual = ConsoleDriver.MakePrintable (code);
+			var actual = ConsoleDriver.MakePrintable ((Rune)code);
 
 			Assert.Equal (code, actual.Value);
 		}

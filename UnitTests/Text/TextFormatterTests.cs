@@ -1,4 +1,4 @@
-﻿using NStack;
+﻿using System.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +21,7 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void Basic_Usage ()
 		{
-			var testText = ustring.Make ("test");
+			var testText = "test";
 			var expectedSize = new Size ();
 			var testBounds = new Rect (0, 0, 100, 1);
 			var tf = new TextFormatter ();
@@ -77,7 +77,7 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void NeedsFormat_Sets ()
 		{
-			var testText = ustring.Make ("test");
+			var testText = "test";
 			var testBounds = new Rect (0, 0, 100, 1);
 			var tf = new TextFormatter ();
 
@@ -103,8 +103,8 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void FindHotKey_Invalid_ReturnsFalse ()
 		{
-			var text = ustring.Empty;
-			Rune hotKeySpecifier = '_';
+			var text = string.Empty;
+			Rune hotKeySpecifier = (Rune)'_';
 			bool supportFirstUpperCase = false;
 			int hotPos = 0;
 			Key hotKey = Key.Unknown;
@@ -144,8 +144,8 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void FindHotKey_AlphaUpperCase_Succeeds ()
 		{
-			var text = ustring.Empty;
-			Rune hotKeySpecifier = '_';
+			var text = string.Empty;
+			Rune hotKeySpecifier = (Rune)'_';
 			bool supportFirstUpperCase = false;
 			int hotPos = 0;
 			Key hotKey = Key.Unknown;
@@ -230,8 +230,8 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void FindHotKey_AlphaLowerCase_Succeeds ()
 		{
-			var text = ustring.Empty;
-			Rune hotKeySpecifier = '_';
+			var text = string.Empty;
+			Rune hotKeySpecifier = (Rune)'_';
 			bool supportFirstUpperCase = false;
 			int hotPos = 0;
 			Key hotKey = Key.Unknown;
@@ -318,8 +318,8 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void FindHotKey_Numeric_Succeeds ()
 		{
-			var text = ustring.Empty;
-			Rune hotKeySpecifier = '_';
+			var text = string.Empty;
+			Rune hotKeySpecifier = (Rune)'_';
 			bool supportFirstUpperCase = false;
 			int hotPos = 0;
 			Key hotKey = Key.Unknown;
@@ -393,7 +393,7 @@ namespace Terminal.Gui.TextTests {
 		{
 			bool supportFirstUpperCase = true;
 
-			var text = ustring.Empty;
+			var text = string.Empty;
 			var hotKeySpecifier = (Rune)0;
 			int hotPos = 0;
 			Key hotKey = Key.Unknown;
@@ -436,7 +436,7 @@ namespace Terminal.Gui.TextTests {
 		{
 			bool supportFirstUpperCase = true;
 
-			var text = ustring.Empty;
+			var text = string.Empty;
 			var hotKeySpecifier = (Rune)0;
 			int hotPos = 0;
 			Key hotKey = Key.Unknown;
@@ -494,17 +494,17 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal (Key.Unknown, hotKey);
 		}
 
-		static ustring testHotKeyAtStart = "_K Before";
-		static ustring testHotKeyAtSecondPos = "a_K Second";
-		static ustring testHotKeyAtLastPos = "Last _K";
-		static ustring testHotKeyAfterLastChar = "After K_";
-		static ustring testMultiHotKeys = "Multiple _K and _R";
-		static ustring testNonEnglish = "Non-english: _Кдать";
+		static string testHotKeyAtStart = "_K Before";
+		static string testHotKeyAtSecondPos = "a_K Second";
+		static string testHotKeyAtLastPos = "Last _K";
+		static string testHotKeyAfterLastChar = "After K_";
+		static string testMultiHotKeys = "Multiple _K and _R";
+		static string testNonEnglish = "Non-english: _Кдать";
 
 		[Fact]
 		public void RemoveHotKeySpecifier_InValid_ReturnsOriginal ()
 		{
-			Rune hotKeySpecifier = '_';
+			Rune hotKeySpecifier = (Rune)'_';
 
 			Assert.Null (TextFormatter.RemoveHotKeySpecifier (null, 0, hotKeySpecifier));
 			Assert.Equal ("", TextFormatter.RemoveHotKeySpecifier ("", 0, hotKeySpecifier));
@@ -518,7 +518,7 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void RemoveHotKeySpecifier_Valid_ReturnsStripped ()
 		{
-			Rune hotKeySpecifier = '_';
+			Rune hotKeySpecifier = (Rune)'_';
 
 			Assert.Equal ("K Before", TextFormatter.RemoveHotKeySpecifier ("_K Before", 0, hotKeySpecifier));
 			Assert.Equal ("aK Second", TextFormatter.RemoveHotKeySpecifier ("a_K Second", 1, hotKeySpecifier));
@@ -531,7 +531,7 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void RemoveHotKeySpecifier_Valid_Legacy_ReturnsOriginal ()
 		{
-			Rune hotKeySpecifier = '_';
+			Rune hotKeySpecifier = (Rune)'_';
 
 			Assert.Equal ("all lower case", TextFormatter.RemoveHotKeySpecifier ("all lower case", 0, hotKeySpecifier));
 			Assert.Equal ("K Before", TextFormatter.RemoveHotKeySpecifier ("K Before", 0, hotKeySpecifier));
@@ -554,21 +554,21 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void CalcRect_SingleLine_Returns_1High ()
 		{
-			var text = ustring.Empty;
+			var text = string.Empty;
 
 			text = "test";
-			Assert.Equal (new Rect (0, 0, text.RuneCount, 1), TextFormatter.CalcRect (0, 0, text));
-			Assert.Equal (new Rect (0, 0, text.ConsoleWidth, 1), TextFormatter.CalcRect (0, 0, text));
+			Assert.Equal (new Rect (0, 0, text.RuneCount (), 1), TextFormatter.CalcRect (0, 0, text));
+			Assert.Equal (new Rect (0, 0, text.ConsoleWidth (), 1), TextFormatter.CalcRect (0, 0, text));
 
 			text = " ~  s  gui.cs   master ↑10";
-			Assert.Equal (new Rect (0, 0, text.RuneCount, 1), TextFormatter.CalcRect (0, 0, text));
-			Assert.Equal (new Rect (0, 0, text.ConsoleWidth, 1), TextFormatter.CalcRect (0, 0, text));
+			Assert.Equal (new Rect (0, 0, text.RuneCount (), 1), TextFormatter.CalcRect (0, 0, text));
+			Assert.Equal (new Rect (0, 0, text.ConsoleWidth (), 1), TextFormatter.CalcRect (0, 0, text));
 		}
 
 		[Fact]
 		public void CalcRect_MultiLine_Returns_nHigh ()
 		{
-			var text = ustring.Empty;
+			var text = string.Empty;
 			var lines = 0;
 
 			text = "line1\nline2";
@@ -601,24 +601,24 @@ namespace Terminal.Gui.TextTests {
 
 			text = " ~  s  gui.cs   master ↑10\n";
 			lines = 2;
-			Assert.Equal (new Rect (0, 0, text.RuneCount - 1, lines), TextFormatter.CalcRect (0, 0, text));
-			Assert.Equal (new Rect (0, 0, text.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 0)), lines), TextFormatter.CalcRect (0, 0, text));
+			Assert.Equal (new Rect (0, 0, text.RuneCount () - 1, lines), TextFormatter.CalcRect (0, 0, text));
+			Assert.Equal (new Rect (0, 0, text.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 0)), lines), TextFormatter.CalcRect (0, 0, text));
 
 			text = "\n ~  s  gui.cs   master ↑10";
 			lines = 2;
-			Assert.Equal (new Rect (0, 0, text.RuneCount - 1, lines), TextFormatter.CalcRect (0, 0, text));
-			Assert.Equal (new Rect (0, 0, text.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 0)), lines), TextFormatter.CalcRect (0, 0, text));
+			Assert.Equal (new Rect (0, 0, text.RuneCount () - 1, lines), TextFormatter.CalcRect (0, 0, text));
+			Assert.Equal (new Rect (0, 0, text.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 0)), lines), TextFormatter.CalcRect (0, 0, text));
 
 			text = " ~  s  gui.cs   master\n↑10";
 			lines = 2;
-			Assert.Equal (new Rect (0, 0, ustring.Make (" ~  s  gui.cs   master\n").RuneCount - 1, lines), TextFormatter.CalcRect (0, 0, text));
-			Assert.Equal (new Rect (0, 0, ustring.Make (" ~  s  gui.cs   master\n").ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 0)), lines), TextFormatter.CalcRect (0, 0, text));
+			Assert.Equal (new Rect (0, 0, " ~  s  gui.cs   master\n".RuneCount () - 1, lines), TextFormatter.CalcRect (0, 0, text));
+			Assert.Equal (new Rect (0, 0, " ~  s  gui.cs   master\n".ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 0)), lines), TextFormatter.CalcRect (0, 0, text));
 		}
 
 		[Fact]
 		public void ClipAndJustify_Invalid_Returns_Original ()
 		{
-			var text = ustring.Empty;
+			var text = string.Empty;
 
 			Assert.Equal (text, TextFormatter.ClipAndJustify (text, 0, TextAlignment.Left));
 
@@ -634,144 +634,144 @@ namespace Terminal.Gui.TextTests {
 		{
 			var align = TextAlignment.Left;
 
-			var text = ustring.Empty;
-			var justifiedText = ustring.Empty;
+			var text = string.Empty;
+			var justifiedText = string.Empty;
 			int maxWidth = 0;
 			int expectedClippedWidth = 0;
 
 			text = "test";
 			maxWidth = 0;
-			Assert.Equal (ustring.Empty, justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align));
+			Assert.Equal (string.Empty, justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align));
 
 			text = "test";
 			maxWidth = 2;
-			Assert.Equal (text.ToRunes () [0..maxWidth], justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align));
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..maxWidth]), justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align));
 
 			text = "test";
 			maxWidth = int.MaxValue;
 			Assert.Equal (text, justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align));
-			Assert.True (justifiedText.RuneCount <= maxWidth);
-			Assert.True (justifiedText.ConsoleWidth <= maxWidth);
+			Assert.True (justifiedText.RuneCount () <= maxWidth);
+			Assert.True (justifiedText.ConsoleWidth () <= maxWidth);
 
 			text = "A sentence has words.";
 			// should fit
-			maxWidth = text.RuneCount + 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should fit.
-			maxWidth = text.RuneCount + 0;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 0;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should fit.
 			maxWidth = int.MaxValue;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should not fit
-			maxWidth = text.RuneCount - 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should not fit
 			maxWidth = 10;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			text = "A\tsentence\thas\twords.";
 			maxWidth = int.MaxValue;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 1)));
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 1)));
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			text = "A\tsentence\thas\twords.";
 			maxWidth = 10;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 1)));
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 1)));
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			text = "line1\nline2\nline3long!";
 			maxWidth = int.MaxValue;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 1)));
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 1)));
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			text = "line1\nline2\nline3long!";
 			maxWidth = 10;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 1)));
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 1)));
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Unicode
 			text = " ~  s  gui.cs   master ↑10";
 			maxWidth = 10;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// should fit
 			text = "Ð ÑÐ";
-			maxWidth = text.RuneCount + 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should fit.
-			maxWidth = text.RuneCount + 0;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 0;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should not fit
-			maxWidth = text.RuneCount - 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 		}
 
 		[Fact]
@@ -779,144 +779,144 @@ namespace Terminal.Gui.TextTests {
 		{
 			var align = TextAlignment.Right;
 
-			var text = ustring.Empty;
-			var justifiedText = ustring.Empty;
+			var text = string.Empty;
+			var justifiedText = string.Empty;
 			int maxWidth = 0;
 			int expectedClippedWidth = 0;
 
 			text = "test";
 			maxWidth = 0;
-			Assert.Equal (ustring.Empty, justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align));
+			Assert.Equal (string.Empty, justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align));
 
 			text = "test";
 			maxWidth = 2;
-			Assert.Equal (text.ToRunes () [0..maxWidth], justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align));
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..maxWidth]), justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align));
 
 			text = "test";
 			maxWidth = int.MaxValue;
 			Assert.Equal (text, justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align));
-			Assert.True (justifiedText.RuneCount <= maxWidth);
-			Assert.True (justifiedText.ConsoleWidth <= maxWidth);
+			Assert.True (justifiedText.RuneCount () <= maxWidth);
+			Assert.True (justifiedText.ConsoleWidth () <= maxWidth);
 
 			text = "A sentence has words.";
 			// should fit
-			maxWidth = text.RuneCount + 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should fit.
-			maxWidth = text.RuneCount + 0;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 0;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should fit.
 			maxWidth = int.MaxValue;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should not fit
-			maxWidth = text.RuneCount - 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should not fit
 			maxWidth = 10;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			text = "A\tsentence\thas\twords.";
 			maxWidth = int.MaxValue;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 1)));
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 1)));
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			text = "A\tsentence\thas\twords.";
 			maxWidth = 10;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 1)));
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 1)));
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			text = "line1\nline2\nline3long!";
 			maxWidth = int.MaxValue;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 1)));
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 1)));
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			text = "line1\nline2\nline3long!";
 			maxWidth = 10;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 1)));
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 1)));
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Unicode
 			text = " ~  s  gui.cs   master ↑10";
 			maxWidth = 10;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// should fit
 			text = "Ð ÑÐ";
-			maxWidth = text.RuneCount + 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should fit.
-			maxWidth = text.RuneCount + 0;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 0;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should not fit
-			maxWidth = text.RuneCount - 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 		}
 
 		[Fact]
@@ -924,144 +924,144 @@ namespace Terminal.Gui.TextTests {
 		{
 			var align = TextAlignment.Centered;
 
-			var text = ustring.Empty;
-			var justifiedText = ustring.Empty;
+			var text = string.Empty;
+			var justifiedText = string.Empty;
 			int maxWidth = 0;
 			int expectedClippedWidth = 0;
 
 			text = "test";
 			maxWidth = 0;
-			Assert.Equal (ustring.Empty, justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align));
+			Assert.Equal (string.Empty, justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align));
 
 			text = "test";
 			maxWidth = 2;
-			Assert.Equal (text.ToRunes () [0..maxWidth], justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align));
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..maxWidth]), justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align));
 
 			text = "test";
 			maxWidth = int.MaxValue;
 			Assert.Equal (text, justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align));
-			Assert.True (justifiedText.RuneCount <= maxWidth);
-			Assert.True (justifiedText.ConsoleWidth <= maxWidth);
+			Assert.True (justifiedText.RuneCount () <= maxWidth);
+			Assert.True (justifiedText.ConsoleWidth () <= maxWidth);
 
 			text = "A sentence has words.";
 			// should fit
-			maxWidth = text.RuneCount + 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should fit.
-			maxWidth = text.RuneCount + 0;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 0;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should fit.
 			maxWidth = int.MaxValue;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should not fit
-			maxWidth = text.RuneCount - 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should not fit
 			maxWidth = 10;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			text = "A\tsentence\thas\twords.";
 			maxWidth = int.MaxValue;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 1)));
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 1)));
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			text = "A\tsentence\thas\twords.";
 			maxWidth = 10;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 1)));
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 1)));
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			text = "line1\nline2\nline3long!";
 			maxWidth = int.MaxValue;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 1)));
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 1)));
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			text = "line1\nline2\nline3long!";
 			maxWidth = 10;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 1)));
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 1)));
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Unicode
 			text = " ~  s  gui.cs   master ↑10";
 			maxWidth = 10;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// should fit
 			text = "Ð ÑÐ";
-			maxWidth = text.RuneCount + 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should fit.
-			maxWidth = text.RuneCount + 0;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 0;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should not fit
-			maxWidth = text.RuneCount - 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 		}
 
 		[Fact]
@@ -1069,136 +1069,136 @@ namespace Terminal.Gui.TextTests {
 		{
 			var align = TextAlignment.Justified;
 
-			var text = ustring.Empty;
-			var justifiedText = ustring.Empty;
+			var text = string.Empty;
+			var justifiedText = string.Empty;
 			int maxWidth = 0;
 			int expectedClippedWidth = 0;
 
 			text = "test";
 			maxWidth = 0;
-			Assert.Equal (ustring.Empty, justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align));
+			Assert.Equal (string.Empty, justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align));
 
 			text = "test";
 			maxWidth = 2;
-			Assert.Equal (text.ToRunes () [0..maxWidth], justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align));
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..maxWidth]), justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align));
 
 			text = "test";
 			maxWidth = int.MaxValue;
 			Assert.Equal (text, justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align));
-			Assert.True (justifiedText.RuneCount <= maxWidth);
+			Assert.True (justifiedText.RuneCount () <= maxWidth);
 
 			text = "A sentence has words.";
 			// should fit
-			maxWidth = text.RuneCount + 1;
-			expectedClippedWidth = Math.Max (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 1;
+			expectedClippedWidth = Math.Max (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Throws<ArgumentOutOfRangeException> (() => ustring.Make (text.ToRunes () [0..expectedClippedWidth]));
+			Assert.Throws<ArgumentOutOfRangeException> (() => StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]));
 
 			// Should fit.
-			maxWidth = text.RuneCount + 0;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 0;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			//Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
+			//Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should fit.
 			maxWidth = 500;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			//Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
+			//Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			//Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			//Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should not fit
-			maxWidth = text.RuneCount - 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			//Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
+			//Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should not fit
 			maxWidth = 10;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			//Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
+			//Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			text = "A\tsentence\thas\twords.";
 			maxWidth = int.MaxValue;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			//Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
+			//Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			text = "A\tsentence\thas\twords.";
 			maxWidth = 10;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 1)));
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 1)));
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			text = "line1\nline2\nline3long!";
 			maxWidth = int.MaxValue;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 1)));
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 1)));
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			text = "line1\nline2\nline3long!";
 			maxWidth = 10;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 1)));
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 1)));
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Unicode
 			text = " ~  s  gui.cs   master ↑10";
 			maxWidth = 10;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// should fit
 			text = "Ð ÑÐ";
-			maxWidth = text.RuneCount + 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			//Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
+			//Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			//Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			//Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should fit.
-			maxWidth = text.RuneCount + 0;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 0;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// Should not fit
-			maxWidth = text.RuneCount - 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			justifiedText = TextFormatter.ClipAndJustify (text, maxWidth, align);
-			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount);
-			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth);
+			Assert.Equal (expectedClippedWidth, justifiedText.RuneCount ());
+			Assert.Equal (expectedClippedWidth, justifiedText.ConsoleWidth ());
 			Assert.True (expectedClippedWidth <= maxWidth);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), justifiedText);
 
 			// see Justify_ tests below
 		}
@@ -1206,7 +1206,7 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void Justify_Invalid ()
 		{
-			var text = ustring.Empty;
+			var text = string.Empty;
 			Assert.Equal (text, TextFormatter.Justify (text, 0));
 
 			text = null;
@@ -1219,8 +1219,8 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void Justify_SingleWord ()
 		{
-			var text = ustring.Empty;
-			var justifiedText = ustring.Empty;
+			var text = string.Empty;
+			var justifiedText = string.Empty;
 			int width = 0;
 			char fillChar = '+';
 
@@ -1228,68 +1228,68 @@ namespace Terminal.Gui.TextTests {
 			text = "word";
 			justifiedText = text;
 
-			width = text.RuneCount;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, width, fillChar).ToString ());
-			width = text.RuneCount + 1;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, width, fillChar).ToString ());
-			width = text.RuneCount + 2;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, width, fillChar).ToString ());
-			width = text.RuneCount + 10;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, width, fillChar).ToString ());
-			width = text.RuneCount + 11;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, width, fillChar).ToString ());
+			width = text.RuneCount ();
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
+			width = text.RuneCount () + 1;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
+			width = text.RuneCount () + 2;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
+			width = text.RuneCount () + 10;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
+			width = text.RuneCount () + 11;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
 
 			// Odd # of chars
 			text = "word.";
 			justifiedText = text;
 
-			width = text.RuneCount;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, width, fillChar).ToString ());
-			width = text.RuneCount + 1;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, width, fillChar).ToString ());
-			width = text.RuneCount + 2;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, width, fillChar).ToString ());
-			width = text.RuneCount + 10;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, width, fillChar).ToString ());
-			width = text.RuneCount + 11;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, width, fillChar).ToString ());
+			width = text.RuneCount ();
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
+			width = text.RuneCount () + 1;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
+			width = text.RuneCount () + 2;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
+			width = text.RuneCount () + 10;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
+			width = text.RuneCount () + 11;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
 
 			// Unicode (even #)
 			text = "Ð¿ÑÐ¸Ð²ÐµÑ";
 			justifiedText = text;
 
-			width = text.RuneCount;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, width, fillChar).ToString ());
-			width = text.RuneCount + 1;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, width, fillChar).ToString ());
-			width = text.RuneCount + 2;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, width, fillChar).ToString ());
-			width = text.RuneCount + 10;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, width, fillChar).ToString ());
-			width = text.RuneCount + 11;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, width, fillChar).ToString ());
+			width = text.RuneCount ();
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
+			width = text.RuneCount () + 1;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
+			width = text.RuneCount () + 2;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
+			width = text.RuneCount () + 10;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
+			width = text.RuneCount () + 11;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
 
 			// Unicode (odd # of chars)
 			text = "Ð¿ÑÐ¸Ð²ÐµÑ.";
 			justifiedText = text;
 
-			width = text.RuneCount;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, width, fillChar).ToString ());
-			width = text.RuneCount + 1;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, width, fillChar).ToString ());
-			width = text.RuneCount + 2;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, width, fillChar).ToString ());
-			width = text.RuneCount + 10;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, width, fillChar).ToString ());
-			width = text.RuneCount + 11;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, width, fillChar).ToString ());
+			width = text.RuneCount ();
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
+			width = text.RuneCount () + 1;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
+			width = text.RuneCount () + 2;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
+			width = text.RuneCount () + 10;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
+			width = text.RuneCount () + 11;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
 		}
 
 		[Fact]
 		public void Justify_Sentence ()
 		{
-			var text = ustring.Empty;
-			var justifiedText = ustring.Empty;
+			var text = string.Empty;
+			var justifiedText = string.Empty;
 			int forceToWidth = 0;
 			char fillChar = '+';
 
@@ -1297,241 +1297,241 @@ namespace Terminal.Gui.TextTests {
 			//      0123456789
 			text = "012 456 89";
 
-			forceToWidth = text.RuneCount;
+			forceToWidth = text.RuneCount ();
 			justifiedText = text.Replace (" ", "+");
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = "012++456+89";
-			forceToWidth = text.RuneCount + 1;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 1;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = text.Replace (" ", "++");
-			forceToWidth = text.RuneCount + 2;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 2;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = "012+++456++89";
-			forceToWidth = text.RuneCount + 3;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 3;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = text.Replace (" ", "+++");
-			forceToWidth = text.RuneCount + 4;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 4;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = "012++++456+++89";
-			forceToWidth = text.RuneCount + 5;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 5;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = text.Replace (" ", "++++");
-			forceToWidth = text.RuneCount + 6;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 6;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = text.Replace (" ", "+++++++++++");
-			forceToWidth = text.RuneCount + 20;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 20;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = "012+++++++++++++456++++++++++++89";
-			forceToWidth = text.RuneCount + 23;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 23;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			// Odd # of spaces
 			//      0123456789
 			text = "012 456 89 end";
 
-			forceToWidth = text.RuneCount;
+			forceToWidth = text.RuneCount ();
 			justifiedText = text.Replace (" ", "+");
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = "012++456+89+end";
-			forceToWidth = text.RuneCount + 1;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 1;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = "012++456++89+end";
-			forceToWidth = text.RuneCount + 2;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 2;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = text.Replace (" ", "++");
-			forceToWidth = text.RuneCount + 3;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 3;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = "012+++456++89++end";
-			forceToWidth = text.RuneCount + 4;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 4;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = "012+++456+++89++end";
-			forceToWidth = text.RuneCount + 5;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 5;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = text.Replace (" ", "+++");
-			forceToWidth = text.RuneCount + 6;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 6;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = "012++++++++456++++++++89+++++++end";
-			forceToWidth = text.RuneCount + 20;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 20;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = "012+++++++++456+++++++++89++++++++end";
-			forceToWidth = text.RuneCount + 23;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 23;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			// Unicode
 			// Even # of chars
 			//      0123456789
 			text = "Ð¿ÑÐ Ð²Ð Ñ";
 
-			forceToWidth = text.RuneCount;
+			forceToWidth = text.RuneCount ();
 			justifiedText = text.Replace (" ", "+");
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = "Ð¿ÑÐ++Ð²Ð+Ñ";
-			forceToWidth = text.RuneCount + 1;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 1;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = text.Replace (" ", "++");
-			forceToWidth = text.RuneCount + 2;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 2;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = "Ð¿ÑÐ+++Ð²Ð++Ñ";
-			forceToWidth = text.RuneCount + 3;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 3;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = text.Replace (" ", "+++");
-			forceToWidth = text.RuneCount + 4;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 4;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = "Ð¿ÑÐ++++Ð²Ð+++Ñ";
-			forceToWidth = text.RuneCount + 5;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 5;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = text.Replace (" ", "++++");
-			forceToWidth = text.RuneCount + 6;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 6;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = text.Replace (" ", "+++++++++++");
-			forceToWidth = text.RuneCount + 20;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 20;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = "Ð¿ÑÐ+++++++++++++Ð²Ð++++++++++++Ñ";
-			forceToWidth = text.RuneCount + 23;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 23;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			// Unicode
 			// Odd # of chars
 			//      0123456789
 			text = "Ð ÑÐ Ð²Ð Ñ";
 
-			forceToWidth = text.RuneCount;
+			forceToWidth = text.RuneCount ();
 			justifiedText = text.Replace (" ", "+");
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = "Ð++ÑÐ+Ð²Ð+Ñ";
-			forceToWidth = text.RuneCount + 1;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 1;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = "Ð++ÑÐ++Ð²Ð+Ñ";
-			forceToWidth = text.RuneCount + 2;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 2;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = text.Replace (" ", "++");
-			forceToWidth = text.RuneCount + 3;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 3;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = "Ð+++ÑÐ++Ð²Ð++Ñ";
-			forceToWidth = text.RuneCount + 4;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 4;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = "Ð+++ÑÐ+++Ð²Ð++Ñ";
-			forceToWidth = text.RuneCount + 5;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 5;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = text.Replace (" ", "+++");
-			forceToWidth = text.RuneCount + 6;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 6;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = "Ð++++++++ÑÐ++++++++Ð²Ð+++++++Ñ";
-			forceToWidth = text.RuneCount + 20;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 20;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 
 			justifiedText = "Ð+++++++++ÑÐ+++++++++Ð²Ð++++++++Ñ";
-			forceToWidth = text.RuneCount + 23;
-			Assert.Equal (justifiedText.ToString (), TextFormatter.Justify (text, forceToWidth, fillChar).ToString ());
-			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount) < text.Count (" "));
-			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth) < text.Count (" "));
+			forceToWidth = text.RuneCount () + 23;
+			Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.RuneCount ()) < text.Count (s => s == ' '));
+			Assert.True (Math.Abs (forceToWidth - justifiedText.ConsoleWidth ()) < text.Count (s => s == ' '));
 		}
 
 		[Fact]
 		public void WordWrap_Invalid ()
 		{
-			var text = ustring.Empty;
+			var text = string.Empty;
 			int width = 0;
 
 			Assert.Empty (TextFormatter.WordWrapText (null, width));
@@ -1542,211 +1542,211 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void WordWrap_BigWidth ()
 		{
-			List<ustring> wrappedLines;
+			List<string> wrappedLines;
 
 			var text = "Constantinople";
 			wrappedLines = TextFormatter.WordWrapText (text, 100);
 			Assert.True (wrappedLines.Count == 1);
-			Assert.Equal ("Constantinople", wrappedLines [0].ToString ());
+			Assert.Equal ("Constantinople", wrappedLines [0]);
 		}
 
-			[Fact]
+		[Fact]
 		public void WordWrap_SingleWordLine ()
 		{
-			var text = ustring.Empty;
+			var text = string.Empty;
 			int width = 0;
-			List<ustring> wrappedLines;
+			List<string> wrappedLines;
 
 			text = "Constantinople";
-			width = text.RuneCount;
+			width = text.RuneCount ();
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.True (wrappedLines.Count == 1);
 
-			width = text.RuneCount - 1;
+			width = text.RuneCount () - 1;
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.Equal (text [0, text.RuneCount - 1].ToString (), wrappedLines [0].ToString ());
-			Assert.Equal ("e", wrappedLines [1].ToString ());
+			Assert.Equal (text [..(text.RuneCount () - 1)], wrappedLines [0]);
+			Assert.Equal ("e", wrappedLines [1]);
 
-			width = text.RuneCount - 2;
+			width = text.RuneCount () - 2;
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.Equal (text [0, text.RuneCount - 2].ToString (), wrappedLines [0].ToString ());
+			Assert.Equal (text [..(text.RuneCount () - 2)], wrappedLines [0]);
 
-			width = text.RuneCount - 5;
+			width = text.RuneCount () - 5;
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.Equal (2, wrappedLines.Count);
 
-			width = (int)Math.Ceiling ((double)(text.RuneCount / 2F));
+			width = (int)Math.Ceiling ((double)(text.RuneCount () / 2F));
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.Equal ("Constan", wrappedLines [0].ToString ());
-			Assert.Equal ("tinople", wrappedLines [1].ToString ());
+			Assert.Equal ("Constan", wrappedLines [0]);
+			Assert.Equal ("tinople", wrappedLines [1]);
 
-			width = (int)Math.Ceiling ((double)(text.RuneCount / 3F));
+			width = (int)Math.Ceiling ((double)(text.RuneCount () / 3F));
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.Equal (3, wrappedLines.Count);
-			Assert.Equal ("Const", wrappedLines [0].ToString ());
-			Assert.Equal ("antin", wrappedLines [1].ToString ());
-			Assert.Equal ("ople", wrappedLines [2].ToString ());
+			Assert.Equal ("Const", wrappedLines [0]);
+			Assert.Equal ("antin", wrappedLines [1]);
+			Assert.Equal ("ople", wrappedLines [2]);
 
-			width = (int)Math.Ceiling ((double)(text.RuneCount / 4F));
+			width = (int)Math.Ceiling ((double)(text.RuneCount () / 4F));
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.Equal (4, wrappedLines.Count);
 
-			width = (int)Math.Ceiling ((double)text.RuneCount / text.RuneCount);
+			width = (int)Math.Ceiling ((double)text.RuneCount () / text.RuneCount ());
 			wrappedLines = TextFormatter.WordWrapText (text, width);
-			Assert.Equal (text.RuneCount, wrappedLines.Count);
-			Assert.Equal (text.ConsoleWidth, wrappedLines.Count);
-			Assert.Equal ("C", wrappedLines [0].ToString ());
-			Assert.Equal ("o", wrappedLines [1].ToString ());
-			Assert.Equal ("n", wrappedLines [2].ToString ());
-			Assert.Equal ("s", wrappedLines [3].ToString ());
-			Assert.Equal ("t", wrappedLines [4].ToString ());
-			Assert.Equal ("a", wrappedLines [5].ToString ());
-			Assert.Equal ("n", wrappedLines [6].ToString ());
-			Assert.Equal ("t", wrappedLines [7].ToString ());
-			Assert.Equal ("i", wrappedLines [8].ToString ());
-			Assert.Equal ("n", wrappedLines [9].ToString ());
-			Assert.Equal ("o", wrappedLines [10].ToString ());
-			Assert.Equal ("p", wrappedLines [11].ToString ());
-			Assert.Equal ("l", wrappedLines [12].ToString ());
-			Assert.Equal ("e", wrappedLines [13].ToString ());
+			Assert.Equal (text.RuneCount (), wrappedLines.Count);
+			Assert.Equal (text.ConsoleWidth (), wrappedLines.Count);
+			Assert.Equal ("C", wrappedLines [0]);
+			Assert.Equal ("o", wrappedLines [1]);
+			Assert.Equal ("n", wrappedLines [2]);
+			Assert.Equal ("s", wrappedLines [3]);
+			Assert.Equal ("t", wrappedLines [4]);
+			Assert.Equal ("a", wrappedLines [5]);
+			Assert.Equal ("n", wrappedLines [6]);
+			Assert.Equal ("t", wrappedLines [7]);
+			Assert.Equal ("i", wrappedLines [8]);
+			Assert.Equal ("n", wrappedLines [9]);
+			Assert.Equal ("o", wrappedLines [10]);
+			Assert.Equal ("p", wrappedLines [11]);
+			Assert.Equal ("l", wrappedLines [12]);
+			Assert.Equal ("e", wrappedLines [13]);
 		}
 
 		[Fact]
 		public void WordWrap_Unicode_SingleWordLine ()
 		{
-			var text = ustring.Empty;
+			var text = string.Empty;
 			int width = 0;
-			List<ustring> wrappedLines;
+			List<string> wrappedLines;
 
 			text = "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ";
-			width = text.RuneCount;
+			width = text.RuneCount ();
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.True (wrappedLines.Count == 1);
 
-			width = text.RuneCount - 1;
+			width = text.RuneCount () - 1;
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..(text.RuneCount - 1)]).ToString (), wrappedLines [0].ToString ());
-			Assert.Equal (ustring.Make (text.ToRunes () [0..(text.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 1)) - 1)]).ToString (), wrappedLines [0].ToString ());
-			Assert.Equal ("ำ", wrappedLines [1].ToString ());
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..(text.RuneCount () - 1)]), wrappedLines [0]);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..(text.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 1)) - 1)]), wrappedLines [0]);
+			Assert.Equal ("ำ", wrappedLines [1]);
 
-			width = text.RuneCount - 2;
+			width = text.RuneCount () - 2;
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..(text.RuneCount - 2)]).ToString (), wrappedLines [0].ToString ());
-			Assert.Equal (ustring.Make (text.ToRunes () [0..(text.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 1)) - 2)]).ToString (), wrappedLines [0].ToString ());
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..(text.RuneCount () - 2)]), wrappedLines [0]);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..(text.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 1)) - 2)]), wrappedLines [0]);
 
-			width = text.RuneCount - 5;
+			width = text.RuneCount () - 5;
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.Equal (2, wrappedLines.Count);
 
-			width = (int)Math.Ceiling ((double)(text.RuneCount / 2F));
+			width = (int)Math.Ceiling ((double)(text.RuneCount () / 2F));
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.Equal ("กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบ", wrappedLines [0].ToString ());
-			Assert.Equal ("ปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ", wrappedLines [1].ToString ());
+			Assert.Equal ("กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบ", wrappedLines [0]);
+			Assert.Equal ("ปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ", wrappedLines [1]);
 
-			width = (int)Math.Ceiling ((double)(text.RuneCount / 3F));
+			width = (int)Math.Ceiling ((double)(text.RuneCount () / 3F));
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.Equal (3, wrappedLines.Count);
-			Assert.Equal ("กขฃคฅฆงจฉชซฌญฎฏฐฑ", wrappedLines [0].ToString ());
-			Assert.Equal ("ฒณดตถทธนบปผฝพฟภมย", wrappedLines [1].ToString ());
-			Assert.Equal ("รฤลฦวศษสหฬอฮฯะัาำ", wrappedLines [2].ToString ());
+			Assert.Equal ("กขฃคฅฆงจฉชซฌญฎฏฐฑ", wrappedLines [0]);
+			Assert.Equal ("ฒณดตถทธนบปผฝพฟภมย", wrappedLines [1]);
+			Assert.Equal ("รฤลฦวศษสหฬอฮฯะัาำ", wrappedLines [2]);
 
-			width = (int)Math.Ceiling ((double)(text.RuneCount / 4F));
+			width = (int)Math.Ceiling ((double)(text.RuneCount () / 4F));
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.Equal (4, wrappedLines.Count);
 
-			width = (int)Math.Ceiling ((double)text.RuneCount / text.RuneCount);
+			width = (int)Math.Ceiling ((double)text.RuneCount () / text.RuneCount ());
 			wrappedLines = TextFormatter.WordWrapText (text, width);
-			Assert.Equal (text.RuneCount, wrappedLines.Count);
-			Assert.Equal (text.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 1)), wrappedLines.Count);
-			Assert.Equal ("ก", wrappedLines [0].ToString ());
-			Assert.Equal ("ข", wrappedLines [1].ToString ());
-			Assert.Equal ("ฃ", wrappedLines [2].ToString ());
-			Assert.Equal ("ำ", wrappedLines [^1].ToString ());
+			Assert.Equal (text.RuneCount (), wrappedLines.Count);
+			Assert.Equal (text.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 1)), wrappedLines.Count);
+			Assert.Equal ("ก", wrappedLines [0]);
+			Assert.Equal ("ข", wrappedLines [1]);
+			Assert.Equal ("ฃ", wrappedLines [2]);
+			Assert.Equal ("ำ", wrappedLines [^1]);
 		}
 
 		[Fact]
 		public void WordWrap_Unicode_LineWithNonBreakingSpace ()
 		{
-			var text = ustring.Empty;
+			var text = string.Empty;
 			int width = 0;
-			List<ustring> wrappedLines;
+			List<string> wrappedLines;
 
 			text = "This\u00A0is\u00A0a\u00A0sentence.";
-			width = text.RuneCount;
+			width = text.RuneCount ();
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.True (wrappedLines.Count == 1);
 
-			width = text.RuneCount - 1;
+			width = text.RuneCount () - 1;
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..(text.RuneCount - 1)]).ToString (), wrappedLines [0].ToString ());
-			Assert.Equal (ustring.Make (text.ToRunes () [0..(text.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 1)) - 1)]).ToString (), wrappedLines [0].ToString ());
-			Assert.Equal (".", wrappedLines [1].ToString ());
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..(text.RuneCount () - 1)]), wrappedLines [0]);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..(text.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 1)) - 1)]), wrappedLines [0]);
+			Assert.Equal (".", wrappedLines [1]);
 
-			width = text.RuneCount - 2;
+			width = text.RuneCount () - 2;
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..(text.RuneCount - 2)]).ToString (), wrappedLines [0].ToString ());
-			Assert.Equal (ustring.Make (text.ToRunes () [0..(text.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 1)) - 2)]).ToString (), wrappedLines [0].ToString ());
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..(text.RuneCount () - 2)]), wrappedLines [0]);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..(text.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 1)) - 2)]), wrappedLines [0]);
 
-			width = text.RuneCount - 5;
+			width = text.RuneCount () - 5;
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.Equal (2, wrappedLines.Count);
 
-			width = (int)Math.Ceiling ((double)(text.RuneCount / 2F));
+			width = (int)Math.Ceiling ((double)(text.RuneCount () / 2F));
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.Equal ("This\u00A0is\u00A0a\u00A0", wrappedLines [0].ToString ());
-			Assert.Equal ("sentence.", wrappedLines [1].ToString ());
+			Assert.Equal ("This\u00A0is\u00A0a\u00A0", wrappedLines [0]);
+			Assert.Equal ("sentence.", wrappedLines [1]);
 
-			width = (int)Math.Ceiling ((double)(text.RuneCount / 3F));
+			width = (int)Math.Ceiling ((double)(text.RuneCount () / 3F));
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.Equal (3, wrappedLines.Count);
-			Assert.Equal ("This\u00A0is", wrappedLines [0].ToString ());
-			Assert.Equal ("\u00a0a\u00a0sent", wrappedLines [1].ToString ());
-			Assert.Equal ("ence.", wrappedLines [2].ToString ());
+			Assert.Equal ("This\u00A0is", wrappedLines [0]);
+			Assert.Equal ("\u00a0a\u00a0sent", wrappedLines [1]);
+			Assert.Equal ("ence.", wrappedLines [2]);
 
-			width = (int)Math.Ceiling ((double)(text.RuneCount / 4F));
+			width = (int)Math.Ceiling ((double)(text.RuneCount () / 4F));
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.Equal (4, wrappedLines.Count);
 
-			width = (int)Math.Ceiling ((double)text.RuneCount / text.RuneCount);
+			width = (int)Math.Ceiling ((double)text.RuneCount () / text.RuneCount ());
 			wrappedLines = TextFormatter.WordWrapText (text, width);
-			Assert.Equal (text.RuneCount, wrappedLines.Count);
-			Assert.Equal (text.ToRuneList ().Sum (r => Math.Max (Rune.ColumnWidth (r), 1)), wrappedLines.Count);
-			Assert.Equal ("T", wrappedLines [0].ToString ());
-			Assert.Equal ("h", wrappedLines [1].ToString ());
-			Assert.Equal ("i", wrappedLines [2].ToString ());
-			Assert.Equal (".", wrappedLines [^1].ToString ());
+			Assert.Equal (text.RuneCount (), wrappedLines.Count);
+			Assert.Equal (text.ToRuneList ().Sum (r => Math.Max (r.ColumnWidth (), 1)), wrappedLines.Count);
+			Assert.Equal ("T", wrappedLines [0]);
+			Assert.Equal ("h", wrappedLines [1]);
+			Assert.Equal ("i", wrappedLines [2]);
+			Assert.Equal (".", wrappedLines [^1]);
 		}
 
 		[Fact]
 		public void WordWrap_Unicode_2LinesWithNonBreakingSpace ()
 		{
-			var text = ustring.Empty;
+			var text = string.Empty;
 			int width = 0;
-			List<ustring> wrappedLines;
+			List<string> wrappedLines;
 
 			text = "This\u00A0is\n\u00A0a\u00A0sentence.";
-			width = text.RuneCount;
+			width = text.RuneCount ();
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.True (wrappedLines.Count == 1);
 
-			width = text.RuneCount - 1;
+			width = text.RuneCount () - 1;
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 #pragma warning disable xUnit2013 // Do not use equality check to check for collection size.
 			Assert.Equal (1, wrappedLines.Count);
 #pragma warning restore xUnit2013 // Do not use equality check to check for collection size.
-			Assert.Equal ("This\u00A0is\u00A0a\u00A0sentence.", wrappedLines [0].ToString ());
+			Assert.Equal ("This\u00A0is\u00A0a\u00A0sentence.", wrappedLines [0]);
 
 			text = "\u00A0\u00A0\u00A0\u00A0\u00A0test\u00A0sentence.";
-			width = text.RuneCount;
+			width = text.RuneCount ();
 			wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.True (wrappedLines.Count == 1);
 		}
@@ -1755,111 +1755,111 @@ namespace Terminal.Gui.TextTests {
 		public void WordWrap_NoNewLines_Default ()
 		{
 			// Calls WordWrapText (text, width) and thus preserveTrailingSpaces defaults to false
-			var text = ustring.Empty;
+			var text = string.Empty;
 			int maxWidth = 0;
 			int expectedClippedWidth = 0;
 
-			List<ustring> wrappedLines;
+			List<string> wrappedLines;
 
 			text = "A sentence has words.";
-			maxWidth = text.RuneCount;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount ();
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
 			Assert.True (wrappedLines.Count == 1);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A sentence has words.", wrappedLines [0].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A sentence has words.", wrappedLines [0]);
 
-			maxWidth = text.RuneCount - 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A sentence has", wrappedLines [0].ToString ());
-			Assert.Equal ("words.", wrappedLines [1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A sentence has", wrappedLines [0]);
+			Assert.Equal ("words.", wrappedLines [1]);
 
-			maxWidth = text.RuneCount - "words.".Length;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - "words.".Length;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A sentence has", wrappedLines [0].ToString ());
-			Assert.Equal ("words.", wrappedLines [1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A sentence has", wrappedLines [0]);
+			Assert.Equal ("words.", wrappedLines [1]);
 
-			maxWidth = text.RuneCount - " words.".Length;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - " words.".Length;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A sentence has", wrappedLines [0].ToString ());
-			Assert.Equal ("words.", wrappedLines [1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A sentence has", wrappedLines [0]);
+			Assert.Equal ("words.", wrappedLines [1]);
 
-			maxWidth = text.RuneCount - "s words.".Length;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - "s words.".Length;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A sentence", wrappedLines [0].ToString ());
-			Assert.Equal ("has words.", wrappedLines [1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A sentence", wrappedLines [0]);
+			Assert.Equal ("has words.", wrappedLines [1]);
 
 			// Unicode 
 			text = "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.";
-			maxWidth = text.RuneCount;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount ();
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
 			Assert.True (wrappedLines.Count == 1);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.", wrappedLines [0].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.", wrappedLines [0]);
 
-			maxWidth = text.RuneCount - 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has", wrappedLines [0].ToString ());
-			Assert.Equal ("words.", wrappedLines [1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has", wrappedLines [0]);
+			Assert.Equal ("words.", wrappedLines [1]);
 
-			maxWidth = text.RuneCount - "words.".Length;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - "words.".Length;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has", wrappedLines [0].ToString ());
-			Assert.Equal ("words.", wrappedLines [1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has", wrappedLines [0]);
+			Assert.Equal ("words.", wrappedLines [1]);
 
-			maxWidth = text.RuneCount - " words.".Length;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - " words.".Length;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has", wrappedLines [0].ToString ());
-			Assert.Equal ("words.", wrappedLines [1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has", wrappedLines [0]);
+			Assert.Equal ("words.", wrappedLines [1]);
 
-			maxWidth = text.RuneCount - "s words.".Length;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - "s words.".Length;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ)", wrappedLines [0].ToString ());
-			Assert.Equal ("has words.", wrappedLines [1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ)", wrappedLines [0]);
+			Assert.Equal ("has words.", wrappedLines [1]);
 
-			maxWidth = text.RuneCount - "Ð²ÐµÑ) has words.".Length;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - "Ð²ÐµÑ) has words.".Length;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A Unicode sentence", wrappedLines [0].ToString ());
-			Assert.Equal ("(Ð¿ÑÐ¸Ð²ÐµÑ) has words.", wrappedLines [1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A Unicode sentence", wrappedLines [0]);
+			Assert.Equal ("(Ð¿ÑÐ¸Ð²ÐµÑ) has words.", wrappedLines [1]);
 		}
 
 		/// <summary>
@@ -1868,286 +1868,286 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void WordWrap_WithNewLines ()
 		{
-			var text = ustring.Empty;
+			var text = string.Empty;
 			int maxWidth = 0;
 			int expectedClippedWidth = 0;
 
-			List<ustring> wrappedLines;
+			List<string> wrappedLines;
 
 			text = "A sentence has words.\nA paragraph has lines.";
-			maxWidth = text.RuneCount;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount ();
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
 #pragma warning disable xUnit2013 // Do not use equality check to check for collection size.
 			Assert.Equal (1, wrappedLines.Count);
 #pragma warning restore xUnit2013 // Do not use equality check to check for collection size.
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.Equal ("A sentence has words.A paragraph has lines.", wrappedLines [0].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.Equal ("A sentence has words.A paragraph has lines.", wrappedLines [0]);
 
-			maxWidth = text.RuneCount - 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
 #pragma warning disable xUnit2013 // Do not use equality check to check for collection size.
 			Assert.Equal (1, wrappedLines.Count);
 #pragma warning restore xUnit2013 // Do not use equality check to check for collection size.
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A sentence has words.A paragraph has lines.", wrappedLines [0].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A sentence has words.A paragraph has lines.", wrappedLines [0]);
 
-			maxWidth = text.RuneCount - "words.".Length;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - "words.".Length;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A sentence has words.A paragraph has", wrappedLines [0].ToString ());
-			Assert.Equal ("lines.", wrappedLines [1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A sentence has words.A paragraph has", wrappedLines [0]);
+			Assert.Equal ("lines.", wrappedLines [1]);
 
 			// Unicode 
 			text = "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode Пункт has Линии.";
-			maxWidth = text.RuneCount;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount ();
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
 			Assert.True (wrappedLines.Count == 1);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode Пункт has Линии.", wrappedLines [0].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode Пункт has Линии.", wrappedLines [0]);
 
-			maxWidth = text.RuneCount - 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode Пункт has", wrappedLines [0].ToString ());
-			Assert.Equal ("Линии.", wrappedLines [1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode Пункт has", wrappedLines [0]);
+			Assert.Equal ("Линии.", wrappedLines [1]);
 
-			maxWidth = text.RuneCount - "words.".Length;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - "words.".Length;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode Пункт has", wrappedLines [0].ToString ());
-			Assert.Equal ("Линии.", wrappedLines [1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode Пункт has", wrappedLines [0]);
+			Assert.Equal ("Линии.", wrappedLines [1]);
 
-			maxWidth = text.RuneCount - "s words.".Length;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - "s words.".Length;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode Пункт", wrappedLines [0].ToString ());
-			Assert.Equal ("has Линии.", wrappedLines [1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode Пункт", wrappedLines [0]);
+			Assert.Equal ("has Линии.", wrappedLines [1]);
 
-			maxWidth = text.RuneCount - "Ð²ÐµÑ) has words.".Length;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - "Ð²ÐµÑ) has words.".Length;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
 			Assert.Equal (2, wrappedLines.Count);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode", wrappedLines [0].ToString ());
-			Assert.Equal ("Пункт has Линии.", wrappedLines [1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode", wrappedLines [0]);
+			Assert.Equal ("Пункт has Линии.", wrappedLines [1]);
 		}
 
 		[Fact]
 		public void WordWrap_Narrow_Default ()
 		{
 			// Calls WordWrapText (text, width) and thus preserveTrailingSpaces defaults to false
-			var text = ustring.Empty;
+			var text = string.Empty;
 			int maxWidth = 1;
 			int expectedClippedWidth = 1;
 
-			List<ustring> wrappedLines;
+			List<string> wrappedLines;
 
 			text = "A sentence has words.";
 			maxWidth = 3;
 			expectedClippedWidth = 3;
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A", wrappedLines [0].ToString ());
-			Assert.Equal ("sen", wrappedLines [1].ToString ());
-			Assert.Equal ("ten", wrappedLines [2].ToString ());
-			Assert.Equal ("ce", wrappedLines [3].ToString ());
-			Assert.Equal ("has", wrappedLines [4].ToString ());
-			Assert.Equal ("wor", wrappedLines [5].ToString ());
-			Assert.Equal ("ds.", wrappedLines [6].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A", wrappedLines [0]);
+			Assert.Equal ("sen", wrappedLines [1]);
+			Assert.Equal ("ten", wrappedLines [2]);
+			Assert.Equal ("ce", wrappedLines [3]);
+			Assert.Equal ("has", wrappedLines [4]);
+			Assert.Equal ("wor", wrappedLines [5]);
+			Assert.Equal ("ds.", wrappedLines [6]);
 
 			maxWidth = 2;
 			expectedClippedWidth = 2;
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A", wrappedLines [0].ToString ());
-			Assert.Equal ("se", wrappedLines [1].ToString ());
-			Assert.Equal ("nt", wrappedLines [2].ToString ());
-			Assert.Equal ("en", wrappedLines [3].ToString ());
-			Assert.Equal ("s.", wrappedLines [^1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A", wrappedLines [0]);
+			Assert.Equal ("se", wrappedLines [1]);
+			Assert.Equal ("nt", wrappedLines [2]);
+			Assert.Equal ("en", wrappedLines [3]);
+			Assert.Equal ("s.", wrappedLines [^1]);
 
 			maxWidth = 1;
 			expectedClippedWidth = 1;
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A", wrappedLines [0].ToString ());
-			Assert.Equal ("s", wrappedLines [1].ToString ());
-			Assert.Equal ("e", wrappedLines [2].ToString ());
-			Assert.Equal ("n", wrappedLines [3].ToString ());
-			Assert.Equal (".", wrappedLines [^1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A", wrappedLines [0]);
+			Assert.Equal ("s", wrappedLines [1]);
+			Assert.Equal ("e", wrappedLines [2]);
+			Assert.Equal ("n", wrappedLines [3]);
+			Assert.Equal (".", wrappedLines [^1]);
 		}
 
 		[Fact]
 		public void WordWrap_PreserveTrailingSpaces_True ()
 		{
-			var text = ustring.Empty;
+			var text = string.Empty;
 			int maxWidth = 1;
 			int expectedClippedWidth = 1;
 
-			List<ustring> wrappedLines;
+			List<string> wrappedLines;
 
 			text = "A sentence has words.";
 			maxWidth = 14;
 			expectedClippedWidth = 14;
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A sentence ", wrappedLines [0].ToString ());
-			Assert.Equal ("has words.", wrappedLines [1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A sentence ", wrappedLines [0]);
+			Assert.Equal ("has words.", wrappedLines [1]);
 			Assert.True (wrappedLines.Count == 2);
 
 			maxWidth = 8;
 			expectedClippedWidth = 8;
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A ", wrappedLines [0].ToString ());
-			Assert.Equal ("sentence", wrappedLines [1].ToString ());
-			Assert.Equal (" has ", wrappedLines [2].ToString ());
-			Assert.Equal ("words.", wrappedLines [^1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A ", wrappedLines [0]);
+			Assert.Equal ("sentence", wrappedLines [1]);
+			Assert.Equal (" has ", wrappedLines [2]);
+			Assert.Equal ("words.", wrappedLines [^1]);
 			Assert.True (wrappedLines.Count == 4);
 
 			maxWidth = 6;
 			expectedClippedWidth = 6;
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A ", wrappedLines [0].ToString ());
-			Assert.Equal ("senten", wrappedLines [1].ToString ());
-			Assert.Equal ("ce ", wrappedLines [2].ToString ());
-			Assert.Equal ("has ", wrappedLines [3].ToString ());
-			Assert.Equal ("words.", wrappedLines [^1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A ", wrappedLines [0]);
+			Assert.Equal ("senten", wrappedLines [1]);
+			Assert.Equal ("ce ", wrappedLines [2]);
+			Assert.Equal ("has ", wrappedLines [3]);
+			Assert.Equal ("words.", wrappedLines [^1]);
 			Assert.True (wrappedLines.Count == 5);
 
 			maxWidth = 3;
 			expectedClippedWidth = 3;
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A ", wrappedLines [0].ToString ());
-			Assert.Equal ("sen", wrappedLines [1].ToString ());
-			Assert.Equal ("ten", wrappedLines [2].ToString ());
-			Assert.Equal ("ce ", wrappedLines [3].ToString ());
-			Assert.Equal ("has", wrappedLines [4].ToString ());
-			Assert.Equal (" ", wrappedLines [5].ToString ());
-			Assert.Equal ("wor", wrappedLines [6].ToString ());
-			Assert.Equal ("ds.", wrappedLines [^1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A ", wrappedLines [0]);
+			Assert.Equal ("sen", wrappedLines [1]);
+			Assert.Equal ("ten", wrappedLines [2]);
+			Assert.Equal ("ce ", wrappedLines [3]);
+			Assert.Equal ("has", wrappedLines [4]);
+			Assert.Equal (" ", wrappedLines [5]);
+			Assert.Equal ("wor", wrappedLines [6]);
+			Assert.Equal ("ds.", wrappedLines [^1]);
 			Assert.True (wrappedLines.Count == 8);
 
 			maxWidth = 2;
 			expectedClippedWidth = 2;
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A ", wrappedLines [0].ToString ());
-			Assert.Equal ("se", wrappedLines [1].ToString ());
-			Assert.Equal ("nt", wrappedLines [2].ToString ());
-			Assert.Equal ("en", wrappedLines [3].ToString ());
-			Assert.Equal ("ce", wrappedLines [4].ToString ());
-			Assert.Equal (" ", wrappedLines [5].ToString ());
-			Assert.Equal ("ha", wrappedLines [6].ToString ());
-			Assert.Equal ("s ", wrappedLines [7].ToString ());
-			Assert.Equal ("wo", wrappedLines [8].ToString ());
-			Assert.Equal ("rd", wrappedLines [9].ToString ());
-			Assert.Equal ("s.", wrappedLines [^1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A ", wrappedLines [0]);
+			Assert.Equal ("se", wrappedLines [1]);
+			Assert.Equal ("nt", wrappedLines [2]);
+			Assert.Equal ("en", wrappedLines [3]);
+			Assert.Equal ("ce", wrappedLines [4]);
+			Assert.Equal (" ", wrappedLines [5]);
+			Assert.Equal ("ha", wrappedLines [6]);
+			Assert.Equal ("s ", wrappedLines [7]);
+			Assert.Equal ("wo", wrappedLines [8]);
+			Assert.Equal ("rd", wrappedLines [9]);
+			Assert.Equal ("s.", wrappedLines [^1]);
 			Assert.True (wrappedLines.Count == 11);
 
 			maxWidth = 1;
 			expectedClippedWidth = 1;
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("A", wrappedLines [0].ToString ());
-			Assert.Equal (" ", wrappedLines [1].ToString ());
-			Assert.Equal ("s", wrappedLines [2].ToString ());
-			Assert.Equal ("e", wrappedLines [3].ToString ());
-			Assert.Equal ("n", wrappedLines [4].ToString ());
-			Assert.Equal ("t", wrappedLines [5].ToString ());
-			Assert.Equal ("e", wrappedLines [6].ToString ());
-			Assert.Equal ("n", wrappedLines [7].ToString ());
-			Assert.Equal ("c", wrappedLines [8].ToString ());
-			Assert.Equal ("e", wrappedLines [9].ToString ());
-			Assert.Equal (" ", wrappedLines [10].ToString ());
-			Assert.Equal (".", wrappedLines [^1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("A", wrappedLines [0]);
+			Assert.Equal (" ", wrappedLines [1]);
+			Assert.Equal ("s", wrappedLines [2]);
+			Assert.Equal ("e", wrappedLines [3]);
+			Assert.Equal ("n", wrappedLines [4]);
+			Assert.Equal ("t", wrappedLines [5]);
+			Assert.Equal ("e", wrappedLines [6]);
+			Assert.Equal ("n", wrappedLines [7]);
+			Assert.Equal ("c", wrappedLines [8]);
+			Assert.Equal ("e", wrappedLines [9]);
+			Assert.Equal (" ", wrappedLines [10]);
+			Assert.Equal (".", wrappedLines [^1]);
 			Assert.True (wrappedLines.Count == text.Length);
 		}
 
 		[Fact]
 		public void WordWrap_PreserveTrailingSpaces_True_Wide_Runes ()
 		{
-			var text = ustring.Empty;
+			var text = string.Empty;
 			int maxWidth = 1;
 			int expectedClippedWidth = 1;
 
-			List<ustring> wrappedLines;
+			List<string> wrappedLines;
 
 			text = "文に は言葉 があり ます。";
 			maxWidth = 14;
 			expectedClippedWidth = 14;
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("文に は言葉 ", wrappedLines [0].ToString ());
-			Assert.Equal ("があり ます。", wrappedLines [1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("文に は言葉 ", wrappedLines [0]);
+			Assert.Equal ("があり ます。", wrappedLines [1]);
 			Assert.True (wrappedLines.Count == 2);
 
 			maxWidth = 3;
 			expectedClippedWidth = 3;
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("文", wrappedLines [0].ToString ());
-			Assert.Equal ("に ", wrappedLines [1].ToString ());
-			Assert.Equal ("は", wrappedLines [2].ToString ());
-			Assert.Equal ("言", wrappedLines [3].ToString ());
-			Assert.Equal ("葉 ", wrappedLines [4].ToString ());
-			Assert.Equal ("が", wrappedLines [5].ToString ());
-			Assert.Equal ("あ", wrappedLines [6].ToString ());
-			Assert.Equal ("り ", wrappedLines [7].ToString ());
-			Assert.Equal ("ま", wrappedLines [8].ToString ());
-			Assert.Equal ("す", wrappedLines [9].ToString ());
-			Assert.Equal ("。", wrappedLines [^1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("文", wrappedLines [0]);
+			Assert.Equal ("に ", wrappedLines [1]);
+			Assert.Equal ("は", wrappedLines [2]);
+			Assert.Equal ("言", wrappedLines [3]);
+			Assert.Equal ("葉 ", wrappedLines [4]);
+			Assert.Equal ("が", wrappedLines [5]);
+			Assert.Equal ("あ", wrappedLines [6]);
+			Assert.Equal ("り ", wrappedLines [7]);
+			Assert.Equal ("ま", wrappedLines [8]);
+			Assert.Equal ("す", wrappedLines [9]);
+			Assert.Equal ("。", wrappedLines [^1]);
 			Assert.True (wrappedLines.Count == 11);
 
 			maxWidth = 2;
 			expectedClippedWidth = 2;
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("文", wrappedLines [0].ToString ());
-			Assert.Equal ("に", wrappedLines [1].ToString ());
-			Assert.Equal (" ", wrappedLines [2].ToString ());
-			Assert.Equal ("は", wrappedLines [3].ToString ());
-			Assert.Equal ("言", wrappedLines [4].ToString ());
-			Assert.Equal ("葉", wrappedLines [5].ToString ());
-			Assert.Equal (" ", wrappedLines [6].ToString ());
-			Assert.Equal ("が", wrappedLines [7].ToString ());
-			Assert.Equal ("あ", wrappedLines [8].ToString ());
-			Assert.Equal ("り", wrappedLines [9].ToString ());
-			Assert.Equal (" ", wrappedLines [10].ToString ());
-			Assert.Equal ("ま", wrappedLines [11].ToString ());
-			Assert.Equal ("す", wrappedLines [12].ToString ());
-			Assert.Equal ("。", wrappedLines [^1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("文", wrappedLines [0]);
+			Assert.Equal ("に", wrappedLines [1]);
+			Assert.Equal (" ", wrappedLines [2]);
+			Assert.Equal ("は", wrappedLines [3]);
+			Assert.Equal ("言", wrappedLines [4]);
+			Assert.Equal ("葉", wrappedLines [5]);
+			Assert.Equal (" ", wrappedLines [6]);
+			Assert.Equal ("が", wrappedLines [7]);
+			Assert.Equal ("あ", wrappedLines [8]);
+			Assert.Equal ("り", wrappedLines [9]);
+			Assert.Equal (" ", wrappedLines [10]);
+			Assert.Equal ("ま", wrappedLines [11]);
+			Assert.Equal ("す", wrappedLines [12]);
+			Assert.Equal ("。", wrappedLines [^1]);
 			Assert.True (wrappedLines.Count == 14);
 
 			maxWidth = 1;
@@ -2155,68 +2155,68 @@ namespace Terminal.Gui.TextTests {
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true);
 			Assert.Empty (wrappedLines);
 			Assert.False (wrappedLines.Count == text.Length);
-			Assert.False (wrappedLines.Count == text.RuneCount);
-			Assert.False (wrappedLines.Count == text.ConsoleWidth);
-			Assert.Equal (25, text.ConsoleWidth);
+			Assert.False (wrappedLines.Count == text.RuneCount ());
+			Assert.False (wrappedLines.Count == text.ConsoleWidth ());
+			Assert.Equal (25, text.ConsoleWidth ());
 			Assert.Equal (25, TextFormatter.GetTextWidth (text));
 		}
 
 		[Fact]
 		public void WordWrap_PreserveTrailingSpaces_False_Wide_Runes ()
 		{
-			var text = ustring.Empty;
+			var text = string.Empty;
 			int maxWidth = 1;
 			int expectedClippedWidth = 1;
 
-			List<ustring> wrappedLines;
+			List<string> wrappedLines;
 
 			text = "文に は言葉 があり ます。";
 			maxWidth = 14;
 			expectedClippedWidth = 14;
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("文に は言葉 ", wrappedLines [0].ToString ());
-			Assert.Equal ("があり ます。", wrappedLines [1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("文に は言葉 ", wrappedLines [0]);
+			Assert.Equal ("があり ます。", wrappedLines [1]);
 			Assert.True (wrappedLines.Count == 2);
 
 			maxWidth = 3;
 			expectedClippedWidth = 3;
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("文", wrappedLines [0].ToString ());
-			Assert.Equal ("に ", wrappedLines [1].ToString ());
-			Assert.Equal ("は", wrappedLines [2].ToString ());
-			Assert.Equal ("言", wrappedLines [3].ToString ());
-			Assert.Equal ("葉 ", wrappedLines [4].ToString ());
-			Assert.Equal ("が", wrappedLines [5].ToString ());
-			Assert.Equal ("あ", wrappedLines [6].ToString ());
-			Assert.Equal ("り ", wrappedLines [7].ToString ());
-			Assert.Equal ("ま", wrappedLines [8].ToString ());
-			Assert.Equal ("す", wrappedLines [9].ToString ());
-			Assert.Equal ("。", wrappedLines [^1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("文", wrappedLines [0]);
+			Assert.Equal ("に ", wrappedLines [1]);
+			Assert.Equal ("は", wrappedLines [2]);
+			Assert.Equal ("言", wrappedLines [3]);
+			Assert.Equal ("葉 ", wrappedLines [4]);
+			Assert.Equal ("が", wrappedLines [5]);
+			Assert.Equal ("あ", wrappedLines [6]);
+			Assert.Equal ("り ", wrappedLines [7]);
+			Assert.Equal ("ま", wrappedLines [8]);
+			Assert.Equal ("す", wrappedLines [9]);
+			Assert.Equal ("。", wrappedLines [^1]);
 			Assert.True (wrappedLines.Count == 11);
 
 			maxWidth = 2;
 			expectedClippedWidth = 2;
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			Assert.Equal ("文", wrappedLines [0].ToString ());
-			Assert.Equal ("に", wrappedLines [1].ToString ());
-			Assert.Equal (" ", wrappedLines [2].ToString ());
-			Assert.Equal ("は", wrappedLines [3].ToString ());
-			Assert.Equal ("言", wrappedLines [4].ToString ());
-			Assert.Equal ("葉", wrappedLines [5].ToString ());
-			Assert.Equal (" ", wrappedLines [6].ToString ());
-			Assert.Equal ("が", wrappedLines [7].ToString ());
-			Assert.Equal ("あ", wrappedLines [8].ToString ());
-			Assert.Equal ("り", wrappedLines [9].ToString ());
-			Assert.Equal (" ", wrappedLines [10].ToString ());
-			Assert.Equal ("ま", wrappedLines [11].ToString ());
-			Assert.Equal ("す", wrappedLines [12].ToString ());
-			Assert.Equal ("。", wrappedLines [^1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			Assert.Equal ("文", wrappedLines [0]);
+			Assert.Equal ("に", wrappedLines [1]);
+			Assert.Equal (" ", wrappedLines [2]);
+			Assert.Equal ("は", wrappedLines [3]);
+			Assert.Equal ("言", wrappedLines [4]);
+			Assert.Equal ("葉", wrappedLines [5]);
+			Assert.Equal (" ", wrappedLines [6]);
+			Assert.Equal ("が", wrappedLines [7]);
+			Assert.Equal ("あ", wrappedLines [8]);
+			Assert.Equal ("り", wrappedLines [9]);
+			Assert.Equal (" ", wrappedLines [10]);
+			Assert.Equal ("ま", wrappedLines [11]);
+			Assert.Equal ("す", wrappedLines [12]);
+			Assert.Equal ("。", wrappedLines [^1]);
 			Assert.True (wrappedLines.Count == 14);
 
 			maxWidth = 1;
@@ -2224,31 +2224,31 @@ namespace Terminal.Gui.TextTests {
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true);
 			Assert.Empty (wrappedLines);
 			Assert.False (wrappedLines.Count == text.Length);
-			Assert.False (wrappedLines.Count == text.RuneCount);
-			Assert.False (wrappedLines.Count == text.ConsoleWidth);
-			Assert.Equal (25, text.ConsoleWidth);
+			Assert.False (wrappedLines.Count == text.RuneCount ());
+			Assert.False (wrappedLines.Count == text.ConsoleWidth ());
+			Assert.Equal (25, text.ConsoleWidth ());
 			Assert.Equal (25, TextFormatter.GetTextWidth (text));
-			//var text = ustring.Empty;
+			//var text = string.Empty;
 			//int maxWidth = 1;
 			//int expectedClippedWidth = 1;
 
-			//List<ustring> wrappedLines;
+			//List<string> wrappedLines;
 
 			//text = "文に は言葉 があり ます。";
 			//maxWidth = 14;
 			//expectedClippedWidth = 14;
 			//wrappedLines = TextFormatter.WordWrapText (text, maxWidth, false);
-			//Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			//Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			//Assert.Equal ("文に は言葉", wrappedLines [0].ToString ());
-			//Assert.Equal ("があり ます。", wrappedLines [1].ToString ());
+			//Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			//Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			//Assert.Equal ("文に は言葉", wrappedLines [0]);
+			//Assert.Equal ("があり ます。", wrappedLines [1]);
 			//Assert.True (wrappedLines.Count == 2);
 
 			//maxWidth = 3;
 			//expectedClippedWidth = 3;
 			//wrappedLines = TextFormatter.WordWrapText (text, maxWidth, false);
-			//Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			//Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
+			//Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			//Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
 			//Assert.Equal ("文 ", wrappedLines [0]);
 			//Assert.Equal ("に ", wrappedLines [1]);
 			//Assert.Equal ("は ", wrappedLines [2]);
@@ -2265,19 +2265,19 @@ namespace Terminal.Gui.TextTests {
 			//maxWidth = 2;
 			//expectedClippedWidth = 2;
 			//wrappedLines = TextFormatter.WordWrapText (text, maxWidth, false);
-			//Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			//Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth));
-			//Assert.Equal ("文", wrappedLines [0].ToString ());
-			//Assert.Equal ("に", wrappedLines [1].ToString ());
-			//Assert.Equal ("は", wrappedLines [2].ToString ());
-			//Assert.Equal ("言", wrappedLines [3].ToString ());
-			//Assert.Equal ("葉", wrappedLines [4].ToString ());
-			//Assert.Equal ("が", wrappedLines [5].ToString ());
-			//Assert.Equal ("あ", wrappedLines [6].ToString ());
-			//Assert.Equal ("り", wrappedLines [7].ToString ());
-			//Assert.Equal ("ま", wrappedLines [8].ToString ());
-			//Assert.Equal ("す", wrappedLines [9].ToString ());
-			//Assert.Equal ("。", wrappedLines [^1].ToString ());
+			//Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			//Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.ConsoleWidth ()));
+			//Assert.Equal ("文", wrappedLines [0]);
+			//Assert.Equal ("に", wrappedLines [1]);
+			//Assert.Equal ("は", wrappedLines [2]);
+			//Assert.Equal ("言", wrappedLines [3]);
+			//Assert.Equal ("葉", wrappedLines [4]);
+			//Assert.Equal ("が", wrappedLines [5]);
+			//Assert.Equal ("あ", wrappedLines [6]);
+			//Assert.Equal ("り", wrappedLines [7]);
+			//Assert.Equal ("ま", wrappedLines [8]);
+			//Assert.Equal ("す", wrappedLines [9]);
+			//Assert.Equal ("。", wrappedLines [^1]);
 			//Assert.Equal (11, wrappedLines.Count);
 
 			//maxWidth = 1;
@@ -2516,7 +2516,7 @@ namespace Terminal.Gui.TextTests {
 				"r" + Environment.NewLine +
 				"d" + Environment.NewLine +
 				"s" + Environment.NewLine +
-				"." + Environment.NewLine; 
+				"." + Environment.NewLine;
 			Assert.Equal (expected, breakLines);
 
 			// Double Spaces
@@ -2530,7 +2530,7 @@ namespace Terminal.Gui.TextTests {
 				"2" + Environment.NewLine +
 				"4" + Environment.NewLine +
 				"5" + Environment.NewLine +
-				"6" + Environment.NewLine; 
+				"6" + Environment.NewLine;
 			Assert.Equal (expected, breakLines);
 
 			// Double Leading spaces should be preserved.
@@ -2603,7 +2603,7 @@ namespace Terminal.Gui.TextTests {
 				"d" + Environment.NewLine +
 				"s" + Environment.NewLine +
 				"." + Environment.NewLine +
-				" " + Environment.NewLine; 
+				" " + Environment.NewLine;
 			Assert.Equal (expected, breakLines);
 		}
 
@@ -2715,8 +2715,8 @@ namespace Terminal.Gui.TextTests {
 			foreach (var line in wrappedLines) {
 				breakLines += $"{line}{Environment.NewLine}";
 			}
-			expected = "   " + Environment.NewLine; 
-				//" " + Environment.NewLine;
+			expected = "   " + Environment.NewLine;
+			//" " + Environment.NewLine;
 			Assert.Equal (expected, breakLines);
 
 			// Single Spaces
@@ -2965,7 +2965,7 @@ namespace Terminal.Gui.TextTests {
 			foreach (var line in wrappedLines) {
 				breakLines += $"{line}{Environment.NewLine}";
 			}
-			expected = " 2 456 8" + Environment.NewLine ;
+			expected = " 2 456 8" + Environment.NewLine;
 			Assert.Equal (expected, breakLines);
 
 			// Complex example
@@ -3030,177 +3030,177 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void WordWrap_PreserveTrailingSpaces_True_With_Tab ()
 		{
-			var text = ustring.Empty;
+			var text = string.Empty;
 			int maxWidth = 1;
 			int expectedClippedWidth = 1;
 
-			List<ustring> wrappedLines;
+			List<string> wrappedLines;
 
 			text = "A sentence\t\t\t has words.";
 			var tabWidth = 4;
 			maxWidth = 14;
 			expectedClippedWidth = 11;
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true, tabWidth);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.Equal ("A sentence\t", wrappedLines [0].ToString ());
-			Assert.Equal ("\t\t has ", wrappedLines [1].ToString ());
-			Assert.Equal ("words.", wrappedLines [2].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.Equal ("A sentence\t", wrappedLines [0]);
+			Assert.Equal ("\t\t has ", wrappedLines [1]);
+			Assert.Equal ("words.", wrappedLines [2]);
 			Assert.True (wrappedLines.Count == 3);
 
 			maxWidth = 8;
 			expectedClippedWidth = 8;
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true, tabWidth);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.Equal ("A ", wrappedLines [0].ToString ());
-			Assert.Equal ("sentence", wrappedLines [1].ToString ());
-			Assert.Equal ("\t\t", wrappedLines [2].ToString ());
-			Assert.Equal ("\t ", wrappedLines [3].ToString ());
-			Assert.Equal ("has ", wrappedLines [4].ToString ());
-			Assert.Equal ("words.", wrappedLines [^1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.Equal ("A ", wrappedLines [0]);
+			Assert.Equal ("sentence", wrappedLines [1]);
+			Assert.Equal ("\t\t", wrappedLines [2]);
+			Assert.Equal ("\t ", wrappedLines [3]);
+			Assert.Equal ("has ", wrappedLines [4]);
+			Assert.Equal ("words.", wrappedLines [^1]);
 			Assert.True (wrappedLines.Count == 6);
 
 			maxWidth = 3;
 			expectedClippedWidth = 3;
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true, tabWidth);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.Equal ("A ", wrappedLines [0].ToString ());
-			Assert.Equal ("sen", wrappedLines [1].ToString ());
-			Assert.Equal ("ten", wrappedLines [2].ToString ());
-			Assert.Equal ("ce", wrappedLines [3].ToString ());
-			Assert.Equal ("\t", wrappedLines [4].ToString ());
-			Assert.Equal ("\t", wrappedLines [5].ToString ());
-			Assert.Equal ("\t", wrappedLines [6].ToString ());
-			Assert.Equal (" ", wrappedLines [7].ToString ());
-			Assert.Equal ("has", wrappedLines [8].ToString ());
-			Assert.Equal (" ", wrappedLines [9].ToString ());
-			Assert.Equal ("wor", wrappedLines [10].ToString ());
-			Assert.Equal ("ds.", wrappedLines [^1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.Equal ("A ", wrappedLines [0]);
+			Assert.Equal ("sen", wrappedLines [1]);
+			Assert.Equal ("ten", wrappedLines [2]);
+			Assert.Equal ("ce", wrappedLines [3]);
+			Assert.Equal ("\t", wrappedLines [4]);
+			Assert.Equal ("\t", wrappedLines [5]);
+			Assert.Equal ("\t", wrappedLines [6]);
+			Assert.Equal (" ", wrappedLines [7]);
+			Assert.Equal ("has", wrappedLines [8]);
+			Assert.Equal (" ", wrappedLines [9]);
+			Assert.Equal ("wor", wrappedLines [10]);
+			Assert.Equal ("ds.", wrappedLines [^1]);
 			Assert.True (wrappedLines.Count == 12);
 
 			maxWidth = 2;
 			expectedClippedWidth = 2;
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true, tabWidth);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.Equal ("A ", wrappedLines [0].ToString ());
-			Assert.Equal ("se", wrappedLines [1].ToString ());
-			Assert.Equal ("nt", wrappedLines [2].ToString ());
-			Assert.Equal ("en", wrappedLines [3].ToString ());
-			Assert.Equal ("ce", wrappedLines [4].ToString ());
-			Assert.Equal ("\t", wrappedLines [5].ToString ());
-			Assert.Equal ("\t", wrappedLines [6].ToString ());
-			Assert.Equal ("\t", wrappedLines [7].ToString ());
-			Assert.Equal (" ", wrappedLines [8].ToString ());
-			Assert.Equal ("ha", wrappedLines [9].ToString ());
-			Assert.Equal ("s ", wrappedLines [10].ToString ());
-			Assert.Equal ("wo", wrappedLines [11].ToString ());
-			Assert.Equal ("rd", wrappedLines [12].ToString ());
-			Assert.Equal ("s.", wrappedLines [^1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.Equal ("A ", wrappedLines [0]);
+			Assert.Equal ("se", wrappedLines [1]);
+			Assert.Equal ("nt", wrappedLines [2]);
+			Assert.Equal ("en", wrappedLines [3]);
+			Assert.Equal ("ce", wrappedLines [4]);
+			Assert.Equal ("\t", wrappedLines [5]);
+			Assert.Equal ("\t", wrappedLines [6]);
+			Assert.Equal ("\t", wrappedLines [7]);
+			Assert.Equal (" ", wrappedLines [8]);
+			Assert.Equal ("ha", wrappedLines [9]);
+			Assert.Equal ("s ", wrappedLines [10]);
+			Assert.Equal ("wo", wrappedLines [11]);
+			Assert.Equal ("rd", wrappedLines [12]);
+			Assert.Equal ("s.", wrappedLines [^1]);
 			Assert.True (wrappedLines.Count == 14);
 
 			maxWidth = 1;
 			expectedClippedWidth = 1;
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true, tabWidth);
-			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount));
-			Assert.Equal ("A", wrappedLines [0].ToString ());
-			Assert.Equal (" ", wrappedLines [1].ToString ());
-			Assert.Equal ("s", wrappedLines [2].ToString ());
-			Assert.Equal ("e", wrappedLines [3].ToString ());
-			Assert.Equal ("n", wrappedLines [4].ToString ());
-			Assert.Equal ("t", wrappedLines [5].ToString ());
-			Assert.Equal ("e", wrappedLines [6].ToString ());
-			Assert.Equal ("n", wrappedLines [7].ToString ());
-			Assert.Equal ("c", wrappedLines [8].ToString ());
-			Assert.Equal ("e", wrappedLines [9].ToString ());
-			Assert.Equal ("\t", wrappedLines [10].ToString ());
-			Assert.Equal ("\t", wrappedLines [11].ToString ());
-			Assert.Equal ("\t", wrappedLines [12].ToString ());
-			Assert.Equal (" ", wrappedLines [13].ToString ());
-			Assert.Equal (".", wrappedLines [^1].ToString ());
+			Assert.True (expectedClippedWidth >= wrappedLines.Max (l => l.RuneCount ()));
+			Assert.Equal ("A", wrappedLines [0]);
+			Assert.Equal (" ", wrappedLines [1]);
+			Assert.Equal ("s", wrappedLines [2]);
+			Assert.Equal ("e", wrappedLines [3]);
+			Assert.Equal ("n", wrappedLines [4]);
+			Assert.Equal ("t", wrappedLines [5]);
+			Assert.Equal ("e", wrappedLines [6]);
+			Assert.Equal ("n", wrappedLines [7]);
+			Assert.Equal ("c", wrappedLines [8]);
+			Assert.Equal ("e", wrappedLines [9]);
+			Assert.Equal ("\t", wrappedLines [10]);
+			Assert.Equal ("\t", wrappedLines [11]);
+			Assert.Equal ("\t", wrappedLines [12]);
+			Assert.Equal (" ", wrappedLines [13]);
+			Assert.Equal (".", wrappedLines [^1]);
 			Assert.True (wrappedLines.Count == text.Length);
 		}
 
 		[Fact]
 		public void WordWrap_Unicode_Wide_Runes ()
 		{
-			ustring text = "これが最初の行です。 こんにちは世界。 これが2行目です。";
-			var width = text.RuneCount;
+			string text = "これが最初の行です。 こんにちは世界。 これが2行目です。";
+			var width = text.RuneCount ();
 			var wrappedLines = TextFormatter.WordWrapText (text, width);
 			Assert.Equal (3, wrappedLines.Count);
-			Assert.Equal ("これが最初の行です。", wrappedLines [0].ToString ());
-			Assert.Equal ("こんにちは世界。", wrappedLines [1].ToString ());
-			Assert.Equal ("これが2行目です。", wrappedLines [^1].ToString ());
+			Assert.Equal ("これが最初の行です。", wrappedLines [0]);
+			Assert.Equal ("こんにちは世界。", wrappedLines [1]);
+			Assert.Equal ("これが2行目です。", wrappedLines [^1]);
 		}
 
 		[Fact]
 		public void ReplaceHotKeyWithTag ()
 		{
 			var tf = new TextFormatter ();
-			ustring text = "test";
+			string text = "test";
 			int hotPos = 0;
 			uint tag = 't';
 
-			Assert.Equal (ustring.Make (new Rune [] { tag, 'e', 's', 't' }), tf.ReplaceHotKeyWithTag (text, hotPos));
+			Assert.Equal (StringExtensions.Make (new Rune [] { (Rune)tag, (Rune)'e', (Rune)'s', (Rune)'t' }), tf.ReplaceHotKeyWithTag (text, hotPos));
 
 			tag = 'e';
 			hotPos = 1;
-			Assert.Equal (ustring.Make (new Rune [] { 't', tag, 's', 't' }), tf.ReplaceHotKeyWithTag (text, hotPos));
+			Assert.Equal (StringExtensions.Make (new Rune [] { (Rune)'t', (Rune)tag, (Rune)'s', (Rune)'t' }), tf.ReplaceHotKeyWithTag (text, hotPos));
 
 			var result = tf.ReplaceHotKeyWithTag (text, hotPos);
-			Assert.Equal ('e', result.ToRunes () [1]);
+			Assert.Equal ((Rune)'e', result.ToRunes () [1]);
 
 			text = "Ok";
 			tag = 'O';
 			hotPos = 0;
-			Assert.Equal (ustring.Make (new Rune [] { tag, 'k' }), result = tf.ReplaceHotKeyWithTag (text, hotPos));
-			Assert.Equal ('O', result.ToRunes () [0]);
+			Assert.Equal (StringExtensions.Make (new Rune [] { (Rune)tag, (Rune)'k' }), result = tf.ReplaceHotKeyWithTag (text, hotPos));
+			Assert.Equal ((Rune)'O', result.ToRunes () [0]);
 
 			text = "[◦ Ok ◦]";
-			text = ustring.Make (new Rune [] { '[', '◦', ' ', 'O', 'k', ' ', '◦', ']' });
+			text = StringExtensions.Make (new Rune [] { (Rune)'[', (Rune)'◦', (Rune)' ', (Rune)'O', (Rune)'k', (Rune)' ', (Rune)'◦', (Rune)']' });
 			var runes = text.ToRuneList ();
-			Assert.Equal (text.RuneCount, runes.Count);
-			Assert.Equal (text, ustring.Make (runes));
+			Assert.Equal (text.RuneCount (), runes.Count);
+			Assert.Equal (text, StringExtensions.Make (runes));
 			tag = 'O';
 			hotPos = 3;
-			Assert.Equal (ustring.Make (new Rune [] { '[', '◦', ' ', tag, 'k', ' ', '◦', ']' }), result = tf.ReplaceHotKeyWithTag (text, hotPos));
-			Assert.Equal ('O', result.ToRunes () [3]);
+			Assert.Equal (StringExtensions.Make (new Rune [] { (Rune)'[', (Rune)'◦', (Rune)' ', (Rune)tag, (Rune)'k', (Rune)' ', (Rune)'◦', (Rune)']' }), result = tf.ReplaceHotKeyWithTag (text, hotPos));
+			Assert.Equal ((Rune)'O', result.ToRunes () [3]);
 
 			text = "^k";
 			tag = '^';
 			hotPos = 0;
-			Assert.Equal (ustring.Make (new Rune [] { tag, 'k' }), result = tf.ReplaceHotKeyWithTag (text, hotPos));
-			Assert.Equal ('^', result.ToRunes () [0]);
+			Assert.Equal (StringExtensions.Make (new Rune [] { (Rune)tag, (Rune)'k' }), result = tf.ReplaceHotKeyWithTag (text, hotPos));
+			Assert.Equal ((Rune)'^', result.ToRunes () [0]);
 		}
 
 		[Fact]
 		public void Reformat_Invalid ()
 		{
-			var text = ustring.Empty;
-			var list = new List<ustring> ();
+			var text = string.Empty;
+			var list = new List<string> ();
 
 			Assert.Throws<ArgumentOutOfRangeException> (() => TextFormatter.Format (text, -1, TextAlignment.Left, false));
 
 			list = TextFormatter.Format (text, 0, TextAlignment.Left, false);
 			Assert.NotEmpty (list);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Empty, list [0]);
+			Assert.Equal (string.Empty, list [0]);
 
 			text = null;
 			list = TextFormatter.Format (text, 0, TextAlignment.Left, false);
 			Assert.NotEmpty (list);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Empty, list [0]);
+			Assert.Equal (string.Empty, list [0]);
 
 			list = TextFormatter.Format (text, 0, TextAlignment.Left, true);
 			Assert.NotEmpty (list);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Empty, list [0]);
+			Assert.Equal (string.Empty, list [0]);
 		}
 
 		[Fact]
 		public void Reformat_NoWordrap_SingleLine ()
 		{
-			var text = ustring.Empty;
-			var list = new List<ustring> ();
+			var text = string.Empty;
+			var list = new List<string> ();
 			var maxWidth = 0;
 			var expectedClippedWidth = 0;
 			var wrap = false;
@@ -3217,45 +3217,45 @@ namespace Terminal.Gui.TextTests {
 			maxWidth = 0;
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Empty, list [0]);
+			Assert.Equal (string.Empty, list [0]);
 
 			maxWidth = 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
 
 			maxWidth = 5;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
 
-			maxWidth = text.RuneCount - 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
 
 			// no clip
-			maxWidth = text.RuneCount + 0;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 0;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
 
-			maxWidth = text.RuneCount + 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
 		}
 
 		[Fact]
 		public void Reformat_NoWordrap_NewLines ()
 		{
-			var text = ustring.Empty;
-			var list = new List<ustring> ();
+			var text = string.Empty;
+			var list = new List<string> ();
 			var maxWidth = 0;
 			var expectedClippedWidth = 0;
 			var wrap = false;
@@ -3264,82 +3264,82 @@ namespace Terminal.Gui.TextTests {
 			maxWidth = 0;
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Empty, list [0]);
+			Assert.Equal (string.Empty, list [0]);
 
 			maxWidth = 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
 
 			maxWidth = 5;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
 
-			maxWidth = text.RuneCount - 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]).Replace ("\n", " "), list [0]);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]).Replace ("\n", " "), list [0]);
 
 			// no clip
-			maxWidth = text.RuneCount + 0;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 0;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]).Replace ("\n", " "), list [0]);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]).Replace ("\n", " "), list [0]);
 
-			maxWidth = text.RuneCount + 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]).Replace ("\n", " "), list [0]);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]).Replace ("\n", " "), list [0]);
 
 			text = "A sentence has words.\r\nLine 2.";
 			maxWidth = 0;
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Empty, list [0]);
+			Assert.Equal (string.Empty, list [0]);
 
 			maxWidth = 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
 
 			maxWidth = 5;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
 
-			maxWidth = text.RuneCount - 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth) + 1;
+			maxWidth = text.RuneCount () - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth) + 1;
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]).Replace ("\r\n", " ").ToString (), list [0].ToString ());
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]).Replace ("\r\n", " "), list [0]);
 
 			// no clip
-			maxWidth = text.RuneCount + 0;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 0;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]).Replace ("\r\n", " "), list [0]);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]).Replace ("\r\n", " "), list [0]);
 
-			maxWidth = text.RuneCount + 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]).Replace ("\r\n", " "), list [0]);
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]).Replace ("\r\n", " "), list [0]);
 		}
 
 		[Fact]
 		public void Reformat_Wrap_Spaces_No_NewLines ()
 		{
-			var text = ustring.Empty;
-			var list = new List<ustring> ();
+			var text = string.Empty;
+			var list = new List<string> ();
 			var maxWidth = 0;
 			var expectedClippedWidth = 0;
 			var wrap = true;
@@ -3353,54 +3353,54 @@ namespace Terminal.Gui.TextTests {
 			maxWidth = 0;
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
-			Assert.Equal (ustring.Empty, list [0]);
+			Assert.Equal (string.Empty, list [0]);
 
 			maxWidth = 1;
 			// remove 3 whitespace chars
-			expectedClippedWidth = text.RuneCount - text.Sum (r => r == ' ' ? 1 : 0);
+			expectedClippedWidth = text.RuneCount () - text.Sum (r => r == ' ' ? 1 : 0);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.Equal (expectedClippedWidth, list.Count);
-			Assert.Equal ("01245689", ustring.Join ("", list.ToArray ()));
+			Assert.Equal ("01245689", string.Join ("", list.ToArray ()));
 
 			maxWidth = 1;
 			// keep 3 whitespace chars
-			expectedClippedWidth = text.RuneCount;
+			expectedClippedWidth = text.RuneCount ();
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap, preserveTrailingSpaces);
 			Assert.Equal (expectedClippedWidth, list.Count);
-			Assert.Equal (text, ustring.Join ("", list.ToArray ()));
+			Assert.Equal (text, string.Join ("", list.ToArray ()));
 
 			maxWidth = 5;
 			// remove 3 whitespace chars
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth - text.Sum (r => r == ' ' ? 1 : 0));
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth - text.Sum (r => r == ' ' ? 1 : 0));
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.Equal (expectedClippedWidth, list.Count);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
-			Assert.Equal ("01245689", ustring.Join ("", list.ToArray ()));
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
+			Assert.Equal ("01245689", string.Join ("", list.ToArray ()));
 
 			maxWidth = 5;
 			// keep 3 whitespace chars
-			expectedClippedWidth = Math.Min (text.RuneCount, (int)Math.Ceiling ((double)(text.RuneCount / 3F)));
+			expectedClippedWidth = Math.Min (text.RuneCount (), (int)Math.Ceiling ((double)(text.RuneCount () / 3F)));
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap, preserveTrailingSpaces);
 			Assert.Equal (expectedClippedWidth - (maxWidth - expectedClippedWidth), list.Count);
-			Assert.Equal (ustring.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
-			Assert.Equal ("012 456 89", ustring.Join ("", list.ToArray ()));
+			Assert.Equal (StringExtensions.Make (text.ToRunes () [0..expectedClippedWidth]), list [0]);
+			Assert.Equal ("012 456 89", string.Join ("", list.ToArray ()));
 
-			maxWidth = text.RuneCount - 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 2);
 			Assert.Equal ("012 456", list [0]);
 			Assert.Equal ("89", list [1]);
 
 			// no clip
-			maxWidth = text.RuneCount + 0;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 0;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
 			Assert.Equal ("012 456 89", list [0]);
 
-			maxWidth = text.RuneCount + 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
 			Assert.Equal ("012 456 89", list [0]);
@@ -3408,22 +3408,22 @@ namespace Terminal.Gui.TextTests {
 			// Odd # of spaces
 			//      0123456789
 			text = "012 456 89 end";
-			maxWidth = text.RuneCount - 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 2);
 			Assert.Equal ("012 456 89", list [0]);
 			Assert.Equal ("end", list [1]);
 
 			// no clip
-			maxWidth = text.RuneCount + 0;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 0;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
 			Assert.Equal ("012 456 89 end", list [0]);
 
-			maxWidth = text.RuneCount + 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
 			Assert.Equal ("012 456 89 end", list [0]);
@@ -3432,8 +3432,8 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void Reformat_Unicode_Wrap_Spaces_No_NewLines ()
 		{
-			var text = ustring.Empty;
-			var list = new List<ustring> ();
+			var text = string.Empty;
+			var list = new List<string> ();
 			var maxWidth = 0;
 			var expectedClippedWidth = 0;
 			var wrap = true;
@@ -3443,22 +3443,22 @@ namespace Terminal.Gui.TextTests {
 			//      0123456789
 			text = "\u2660Ð¿ÑÐ Ð²Ð Ñ";
 
-			maxWidth = text.RuneCount - 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 2);
 			Assert.Equal ("\u2660Ð¿ÑÐ Ð²Ð", list [0]);
 			Assert.Equal ("Ñ", list [1]);
 
 			// no clip
-			maxWidth = text.RuneCount + 0;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 0;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
 			Assert.Equal ("\u2660Ð¿ÑÐ Ð²Ð Ñ", list [0]);
 
-			maxWidth = text.RuneCount + 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
 			Assert.Equal ("\u2660Ð¿ÑÐ Ð²Ð Ñ", list [0]);
@@ -3468,22 +3468,22 @@ namespace Terminal.Gui.TextTests {
 			//      0123456789
 			text = "\u2660 ÑÐ Ð²Ð Ñ";
 
-			maxWidth = text.RuneCount - 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 2);
 			Assert.Equal ("\u2660 ÑÐ Ð²Ð", list [0]);
 			Assert.Equal ("Ñ", list [1]);
 
 			// no clip
-			maxWidth = text.RuneCount + 0;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 0;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
 			Assert.Equal ("\u2660 ÑÐ Ð²Ð Ñ", list [0]);
 
-			maxWidth = text.RuneCount + 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.True (list.Count == 1);
 			Assert.Equal ("\u2660 ÑÐ Ð²Ð Ñ", list [0]);
@@ -3492,8 +3492,8 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void Reformat_Unicode_Wrap_Spaces_NewLines ()
 		{
-			var text = ustring.Empty;
-			var list = new List<ustring> ();
+			var text = string.Empty;
+			var list = new List<string> ();
 			var maxWidth = 0;
 			var expectedClippedWidth = 0;
 			var wrap = true;
@@ -3501,138 +3501,74 @@ namespace Terminal.Gui.TextTests {
 			// Unicode
 			text = "\u2460\u2461\u2462\n\u2460\u2461\u2462\u2463\u2464";
 
-			maxWidth = text.RuneCount - 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () - 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.Equal (2, list.Count);
 			Assert.Equal ("\u2460\u2461\u2462", list [0]);
 			Assert.Equal ("\u2460\u2461\u2462\u2463\u2464", list [1]);
 
 			// no clip
-			maxWidth = text.RuneCount + 0;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 0;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.Equal (2, list.Count);
 			Assert.Equal ("\u2460\u2461\u2462", list [0]);
 			Assert.Equal ("\u2460\u2461\u2462\u2463\u2464", list [1]);
 
-			maxWidth = text.RuneCount + 1;
-			expectedClippedWidth = Math.Min (text.RuneCount, maxWidth);
+			maxWidth = text.RuneCount () + 1;
+			expectedClippedWidth = Math.Min (text.RuneCount (), maxWidth);
 			list = TextFormatter.Format (text, maxWidth, TextAlignment.Left, wrap);
 			Assert.Equal (2, list.Count);
 			Assert.Equal ("\u2460\u2461\u2462", list [0]);
 			Assert.Equal ("\u2460\u2461\u2462\u2463\u2464", list [1]);
-		}
-
-		[Fact]
-		public void System_Rune_ColumnWidth ()
-		{
-			var c = new Rune ('a');
-			Assert.Equal (1, Rune.ColumnWidth (c));
-			Assert.Equal (1, ustring.Make (c).ConsoleWidth);
-			Assert.Equal (1, ustring.Make (c).Length);
-
-			c = new Rune ('b');
-			Assert.Equal (1, Rune.ColumnWidth (c));
-			Assert.Equal (1, ustring.Make (c).ConsoleWidth);
-			Assert.Equal (1, ustring.Make (c).Length);
-
-			c = new Rune (123);
-			Assert.Equal (1, Rune.ColumnWidth (c));
-			Assert.Equal (1, ustring.Make (c).ConsoleWidth);
-			Assert.Equal (1, ustring.Make (c).Length);
-
-			c = new Rune ('\u1150');
-			Assert.Equal (2, Rune.ColumnWidth (c));      // 0x1150	ᅐ	Unicode Technical Report #11
-			Assert.Equal (2, ustring.Make (c).ConsoleWidth);
-			Assert.Equal (3, ustring.Make (c).Length);
-
-			c = new Rune ('\u1161');
-			Assert.Equal (0, Rune.ColumnWidth (c));      // 0x1161	ᅡ	column width of 0
-			Assert.Equal (0, ustring.Make (c).ConsoleWidth);
-			Assert.Equal (3, ustring.Make (c).Length);
-
-			c = new Rune (31);
-			Assert.Equal (-1, Rune.ColumnWidth (c));        // non printable character
-			Assert.Equal (0, ustring.Make (c).ConsoleWidth);// ConsoleWidth only returns zero or greater than zero
-			Assert.Equal (1, ustring.Make (c).Length);
-
-			c = new Rune (127);
-			Assert.Equal (-1, Rune.ColumnWidth (c));       // non printable character
-			Assert.Equal (0, ustring.Make (c).ConsoleWidth);
-			Assert.Equal (1, ustring.Make (c).Length);
-		}
-
-		[Fact]
-		public void System_Text_Rune ()
-		{
-			var c = new System.Text.Rune ('a');
-			Assert.Equal (1, c.Utf8SequenceLength);
-
-			c = new System.Text.Rune ('b');
-			Assert.Equal (1, c.Utf8SequenceLength);
-
-			c = new System.Text.Rune (123);
-			Assert.Equal (1, c.Utf8SequenceLength);
-
-			c = new System.Text.Rune ('\u1150');
-			Assert.Equal (3, c.Utf8SequenceLength);         // 0x1150	ᅐ	Unicode Technical Report #11
-
-			c = new System.Text.Rune ('\u1161');
-			Assert.Equal (3, c.Utf8SequenceLength);         // 0x1161	ᅡ	column width of 0
-
-			c = new System.Text.Rune (31);
-			Assert.Equal (1, c.Utf8SequenceLength);         // non printable character
-
-			c = new System.Text.Rune (127);
-			Assert.Equal (1, c.Utf8SequenceLength);         // non printable character
 		}
 
 		[Fact]
 		public void Format_WordWrap_PreserveTrailingSpaces ()
 		{
-			ustring text = " A sentence has words. \n This is the second Line - 2. ";
+			string text = " A sentence has words. \n This is the second Line - 2. ";
 
 			// With preserveTrailingSpaces = false by default.
 			var list1 = TextFormatter.Format (text, 4, TextAlignment.Left, true);
-			ustring wrappedText1 = ustring.Empty;
-			Assert.Equal (" A", list1 [0].ToString ());
-			Assert.Equal ("sent", list1 [1].ToString ());
-			Assert.Equal ("ence", list1 [2].ToString ());
-			Assert.Equal ("has", list1 [3].ToString ());
-			Assert.Equal ("word", list1 [4].ToString ());
-			Assert.Equal ("s. ", list1 [5].ToString ());
-			Assert.Equal (" Thi", list1 [6].ToString ());
-			Assert.Equal ("s is", list1 [7].ToString ());
-			Assert.Equal ("the", list1 [8].ToString ());
-			Assert.Equal ("seco", list1 [9].ToString ());
-			Assert.Equal ("nd", list1 [10].ToString ());
-			Assert.Equal ("Line", list1 [11].ToString ());
-			Assert.Equal ("- 2.", list1 [^1].ToString ());
+			string wrappedText1 = string.Empty;
+			Assert.Equal (" A", list1 [0]);
+			Assert.Equal ("sent", list1 [1]);
+			Assert.Equal ("ence", list1 [2]);
+			Assert.Equal ("has", list1 [3]);
+			Assert.Equal ("word", list1 [4]);
+			Assert.Equal ("s. ", list1 [5]);
+			Assert.Equal (" Thi", list1 [6]);
+			Assert.Equal ("s is", list1 [7]);
+			Assert.Equal ("the", list1 [8]);
+			Assert.Equal ("seco", list1 [9]);
+			Assert.Equal ("nd", list1 [10]);
+			Assert.Equal ("Line", list1 [11]);
+			Assert.Equal ("- 2.", list1 [^1]);
 			foreach (var txt in list1) wrappedText1 += txt;
-			Assert.Equal (" Asentencehaswords.  This isthesecondLine- 2.", wrappedText1.ToString ());
+			Assert.Equal (" Asentencehaswords.  This isthesecondLine- 2.", wrappedText1);
 
 			// With preserveTrailingSpaces = true.
 			var list2 = TextFormatter.Format (text, 4, TextAlignment.Left, true, true);
-			ustring wrappedText2 = ustring.Empty;
-			Assert.Equal (" A ", list2 [0].ToString ());
-			Assert.Equal ("sent", list2 [1].ToString ());
-			Assert.Equal ("ence", list2 [2].ToString ());
-			Assert.Equal (" ", list2 [3].ToString ());
-			Assert.Equal ("has ", list2 [4].ToString ());
-			Assert.Equal ("word", list2 [5].ToString ());
-			Assert.Equal ("s. ", list2 [6].ToString ());
-			Assert.Equal (" ", list2 [7].ToString ());
-			Assert.Equal ("This", list2 [8].ToString ());
-			Assert.Equal (" is ", list2 [9].ToString ());
-			Assert.Equal ("the ", list2 [10].ToString ());
-			Assert.Equal ("seco", list2 [11].ToString ());
-			Assert.Equal ("nd ", list2 [12].ToString ());
-			Assert.Equal ("Line", list2 [13].ToString ());
-			Assert.Equal (" - ", list2 [14].ToString ());
-			Assert.Equal ("2. ", list2 [^1].ToString ());
+			string wrappedText2 = string.Empty;
+			Assert.Equal (" A ", list2 [0]);
+			Assert.Equal ("sent", list2 [1]);
+			Assert.Equal ("ence", list2 [2]);
+			Assert.Equal (" ", list2 [3]);
+			Assert.Equal ("has ", list2 [4]);
+			Assert.Equal ("word", list2 [5]);
+			Assert.Equal ("s. ", list2 [6]);
+			Assert.Equal (" ", list2 [7]);
+			Assert.Equal ("This", list2 [8]);
+			Assert.Equal (" is ", list2 [9]);
+			Assert.Equal ("the ", list2 [10]);
+			Assert.Equal ("seco", list2 [11]);
+			Assert.Equal ("nd ", list2 [12]);
+			Assert.Equal ("Line", list2 [13]);
+			Assert.Equal (" - ", list2 [14]);
+			Assert.Equal ("2. ", list2 [^1]);
 			foreach (var txt in list2) wrappedText2 += txt;
-			Assert.Equal (" A sentence has words.  This is the second Line - 2. ", wrappedText2.ToString ());
+			Assert.Equal (" A sentence has words.  This is the second Line - 2. ", wrappedText2);
 		}
 
 		[Fact]
@@ -3646,13 +3582,13 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void Format_Justified_Always_Returns_Text_Width_Equal_To_Passed_Width_Horizontal ()
 		{
-			ustring text = "Hello world, how are you today? Pretty neat!";
+			string text = "Hello world, how are you today? Pretty neat!";
 
-			Assert.Equal (44, text.RuneCount);
+			Assert.Equal (44, text.RuneCount ());
 
 			for (int i = 44; i < 80; i++) {
 				var fmtText = TextFormatter.Format (text, i, TextAlignment.Justified, false, true) [0];
-				Assert.Equal (i, fmtText.RuneCount);
+				Assert.Equal (i, fmtText.RuneCount ());
 				var c = (char)fmtText [^1];
 				Assert.Equal ('!', c);
 			}
@@ -3661,13 +3597,13 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void Format_Justified_Always_Returns_Text_Width_Equal_To_Passed_Width_Vertical ()
 		{
-			ustring text = "Hello world, how are you today? Pretty neat!";
+			string text = "Hello world, how are you today? Pretty neat!";
 
-			Assert.Equal (44, text.RuneCount);
+			Assert.Equal (44, text.RuneCount ());
 
 			for (int i = 44; i < 80; i++) {
 				var fmtText = TextFormatter.Format (text, i, TextAlignment.Justified, false, true, 0, TextDirection.TopBottom_LeftRight) [0];
-				Assert.Equal (i, fmtText.RuneCount);
+				Assert.Equal (i, fmtText.RuneCount ());
 				var c = (char)fmtText [^1];
 				Assert.Equal ('!', c);
 			}
@@ -3699,7 +3635,7 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void GetTextWidth_Simple_And_Wide_Runes ()
 		{
-			ustring text = "Hello World";
+			string text = "Hello World";
 			Assert.Equal (11, TextFormatter.GetTextWidth (text));
 			text = "こんにちは世界";
 			Assert.Equal (14, TextFormatter.GetTextWidth (text));
@@ -3708,7 +3644,7 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void GetSumMaxCharWidth_Simple_And_Wide_Runes ()
 		{
-			ustring text = "Hello World";
+			string text = "Hello World";
 			Assert.Equal (11, TextFormatter.GetSumMaxCharWidth (text));
 			Assert.Equal (1, TextFormatter.GetSumMaxCharWidth (text, 6, 1));
 			text = "こんにちは 世界";
@@ -3719,10 +3655,10 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void GetSumMaxCharWidth_List_Simple_And_Wide_Runes ()
 		{
-			var text = new List<ustring> () { "Hello", "World" };
+			var text = new List<string> () { "Hello", "World" };
 			Assert.Equal (2, TextFormatter.GetSumMaxCharWidth (text));
 			Assert.Equal (1, TextFormatter.GetSumMaxCharWidth (text, 1, 1));
-			text = new List<ustring> () { "こんにちは", "世界" };
+			text = new List<string> () { "こんにちは", "世界" };
 			Assert.Equal (4, TextFormatter.GetSumMaxCharWidth (text));
 			Assert.Equal (2, TextFormatter.GetSumMaxCharWidth (text, 1, 1));
 		}
@@ -3731,7 +3667,7 @@ namespace Terminal.Gui.TextTests {
 		public void GetLengthThatFits_runelist ()
 		{
 			int columns = 3;
-			ustring text = "test";
+			string text = "test";
 			var runes = text.ToRuneList ();
 
 			Assert.Equal (3, TextFormatter.GetLengthThatFits (runes, columns));
@@ -3747,7 +3683,7 @@ namespace Terminal.Gui.TextTests {
 		public void GetLengthThatFits_ustring ()
 		{
 			int columns = 3;
-			ustring text = "test";
+			string text = "test";
 
 			Assert.Equal (3, TextFormatter.GetLengthThatFits (text, columns));
 
@@ -3776,7 +3712,7 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void GetLengthThatFits_Simple_And_Wide_Runes ()
 		{
-			ustring text = "Hello World";
+			string text = "Hello World";
 			Assert.Equal (6, TextFormatter.GetLengthThatFits (text, 6));
 			text = "こんにちは 世界";
 			Assert.Equal (3, TextFormatter.GetLengthThatFits (text, 6));
@@ -3785,11 +3721,11 @@ namespace Terminal.Gui.TextTests {
 		[Fact]
 		public void GetLengthThatFits_List_Simple_And_Wide_Runes ()
 		{
-			var runes = ustring.Make ("Hello World").ToRuneList ();
+			var runes = "Hello World".ToRuneList ();
 			Assert.Equal (6, TextFormatter.GetLengthThatFits (runes, 6));
-			runes = ustring.Make ("こんにちは 世界").ToRuneList ();
+			runes = "こんにちは 世界".ToRuneList ();
 			Assert.Equal (3, TextFormatter.GetLengthThatFits (runes, 6));
-			runes = ustring.Make ($"{CM.Glyphs.LeftBracket} Say Hello 你 {CM.Glyphs.RightBracket}").ToRuneList ();
+			runes = $"{CM.Glyphs.LeftBracket} Say Hello 你 {CM.Glyphs.RightBracket}".ToRuneList ();
 			Assert.Equal (15, TextFormatter.GetLengthThatFits (runes, 16));
 		}
 
@@ -3798,11 +3734,11 @@ namespace Terminal.Gui.TextTests {
 		{
 			var text = "Truncate";
 			var list = TextFormatter.Format (text, 3, false, false);
-			Assert.Equal ("Tru", list [^1].ToString ());
+			Assert.Equal ("Tru", list [^1]);
 
 			text = "デモエムポンズ";
 			list = TextFormatter.Format (text, 3, false, false);
-			Assert.Equal ("デ", list [^1].ToString ());
+			Assert.Equal ("デ", list [^1]);
 		}
 
 
@@ -3813,15 +3749,15 @@ namespace Terminal.Gui.TextTests {
 			var width = 60;
 			var preserveTrailingSpaces = false;
 			var formated = TextFormatter.Format (text, width, false, true, preserveTrailingSpaces);
-			Assert.Equal ("Line1", formated [0].ToString ());
-			Assert.Equal ("Line2", formated [1].ToString ());
-			Assert.Equal ("Line3", formated [^1].ToString ());
+			Assert.Equal ("Line1", formated [0]);
+			Assert.Equal ("Line2", formated [1]);
+			Assert.Equal ("Line3", formated [^1]);
 
 			preserveTrailingSpaces = true;
 			formated = TextFormatter.Format (text, width, false, true, preserveTrailingSpaces);
-			Assert.Equal ("Line1", formated [0].ToString ());
-			Assert.Equal ("Line2", formated [1].ToString ());
-			Assert.Equal ("Line3", formated [^1].ToString ());
+			Assert.Equal ("Line1", formated [0]);
+			Assert.Equal ("Line2", formated [1]);
+			Assert.Equal ("Line3", formated [^1]);
 		}
 
 		[Fact]
@@ -3877,29 +3813,27 @@ namespace Terminal.Gui.TextTests {
 		}
 
 		[Fact]
-		public void Ustring_Array_Is_Not_Equal_ToRunes_Array_And_String_Array ()
+		public void String_Array_Is_Not_Always_Equal_ToRunes_Array ()
 		{
-			var text = "New Test 你";
-			ustring us = text;
-			string s = text;
-			Assert.Equal (10, us.RuneCount);
-			Assert.Equal (10, s.Length);
-			// The reason is ustring index is related to byte length and not rune length
-			Assert.Equal (12, us.Length);
-			Assert.NotEqual (20320, us [9]);
-			Assert.Equal (20320, s [9]);
-			Assert.Equal (228, us [9]);
-			Assert.Equal ("ä", ((Rune)us [9]).ToString ());
-			Assert.Equal ("你", s [9].ToString ());
-
-			// Rune array is equal to string array
-			var usToRunes = us.ToRunes ();
+			string s = "New Test 你";
+			// Rune array length is equal to string array
+			var usToRunes = s.ToRunes ();
 			Assert.Equal (10, usToRunes.Length);
 			Assert.Equal (10, s.Length);
-			Assert.Equal (20320, (int)usToRunes [9]);
+			Assert.Equal (20320, usToRunes [9].Value);
 			Assert.Equal (20320, s [9]);
-			Assert.Equal ("你", ((Rune)usToRunes [9]).ToString ());
+			Assert.Equal ("你", usToRunes [9].ToString ());
 			Assert.Equal ("你", s [9].ToString ());
+
+			s = "New Test \U0001d539";
+			// Rune array length isn't equal to string array
+			usToRunes = s.ToRunes ();
+			Assert.Equal (10, usToRunes.Length);
+			Assert.Equal (11, s.Length);
+			Assert.Equal (120121, usToRunes [9].Value);
+			Assert.Equal (55349, s [9]);
+			Assert.Equal ("𝔹", usToRunes [9].ToString ());
+			Assert.Equal ("𝔹", new string (new char [] { s [9], s [10] }));
 		}
 	}
 }
