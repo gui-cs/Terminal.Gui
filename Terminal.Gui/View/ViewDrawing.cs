@@ -203,9 +203,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public Rect ClipToBounds ()
 		{
-			var clip = Bounds;
-
-			return SetClip (clip);
+			return SetClip (Bounds);
 		}
 
 		// BUGBUG: v2 - SetClip should return VIEW-relative so that it can be used to reset it; using Driver.Clip directly should not be necessary. 
