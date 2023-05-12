@@ -10,10 +10,18 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using static Terminal.Gui.ConfigurationManager;
+
 
 #nullable enable
 
 namespace Terminal.Gui {
+
+	internal class NerdFonts {
+
+		[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+		public static bool Enable { get; set; } = false;
+	}
 	/// <summary>
 	/// Provides settings and configuration management for Terminal.Gui applications. 
 	/// <para>
