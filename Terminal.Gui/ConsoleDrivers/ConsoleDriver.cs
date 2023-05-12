@@ -685,6 +685,15 @@ namespace Terminal.Gui {
 	/// There are currently three implementations: <see cref="CursesDriver"/> (for Unix and Mac), <see cref="WindowsDriver"/>, and <see cref="NetDriver"/> that uses the .NET Console API.
 	/// </summary>
 	public abstract class ConsoleDriver {
+
+		/// <summary>
+		/// If <see langword="true"/>, enables the use of Nerd unicode symbols.
+		/// This requires specific font(s) to be installed on the users machine
+		/// to work correctly.  Defaults to <see langword="false"/>.
+		/// </summary>
+		[SerializableConfigurationProperty (Scope = typeof (ThemeScope), OmitClassName = true)]
+		public static bool NerdFonts { get; set; } = false;
+
 		/// <summary>
 		/// The handler fired when the terminal is resized.
 		/// </summary>
