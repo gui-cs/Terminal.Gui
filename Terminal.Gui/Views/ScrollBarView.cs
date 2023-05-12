@@ -715,7 +715,7 @@ namespace Terminal.Gui {
 					Position = pos - 1;
 				}
 			} else if (mouseEvent.Flags == MouseFlags.Button1Pressed && location == barsize + 1) {
-				if (CanScroll (1, out _, vertical)) {
+				if (CanScroll (1, out _, _vertical)) {
 					Position = pos + 1;
 				}
 			} else if (location > 0 && location < barsize + 1) {
