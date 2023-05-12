@@ -186,7 +186,7 @@ namespace Terminal.Gui {
 			IconGetter = DefaultIconGetter;
 			TreeRootGetter = DefaultTreeRootGetter;
 
-			if(ConsoleDriver.NerdFonts)
+			if(NerdFonts.Enable)
 			{
 				UseNerdForIcons();
 			}

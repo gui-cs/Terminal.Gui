@@ -3,10 +3,18 @@
 
 using System.Collections.Generic;
 using System.IO.Abstractions;
-
+using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui {
 	internal class NerdFonts {
+
+		/// <summary>
+		/// If <see langword="true"/>, enables the use of Nerd unicode symbols.
+		/// This requires specific font(s) to be installed on the users machine
+		/// to work correctly.  Defaults to <see langword="false"/>.
+		/// </summary>
+		[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+		public static bool Enable { get; set; } = false;
 
 		public string GetNerdIcon(FileDialogIconGetterArgs args)
 		{
