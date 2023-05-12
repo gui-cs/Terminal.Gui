@@ -544,8 +544,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			// "yellow" is not a color
 			string json = @"
 			{
-				""Themes"" : {
-					""ThemeDefinitions"" : [ 
+				""Themes"" : [
                                         {
 						""Default"" : {
 							""ColorSchemes"": [
@@ -560,8 +559,7 @@ namespace Terminal.Gui.ConfigurationTests {
 							]
 						}
 					}
-					]
-				}
+				]
 			}";
 
 			JsonException jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Settings.Update (json, "test"));
@@ -570,8 +568,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			// AbNormal is not a ColorScheme attribute
 			json = @"
 			{
-				""Themes"" : {
-					""ThemeDefinitions"" : [ 
+				""Themes"" : [ 
                                         {
 						""Default"" : {
 							""ColorSchemes"": [
@@ -586,8 +583,7 @@ namespace Terminal.Gui.ConfigurationTests {
 							]
 						}
 					}
-					]
-				}
+				]
 			}";
 
 			jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Settings.Update (json, "test"));
@@ -596,8 +592,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			// Modify hotNormal background only 
 			json = @"
 			{
-				""Themes"" : {
-					""ThemeDefinitions"" : [ 
+				""Themes"" : [ 
                                         {
 						""Default"" : {
 							""ColorSchemes"": [
@@ -611,8 +606,7 @@ namespace Terminal.Gui.ConfigurationTests {
 							]
 						}
 					}
-					]
-				}
+				]
 			}";
 
 			jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Settings.Update (json, "test"));
@@ -641,8 +635,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			// "yellow" is not a color
 			string json = @"
 			{
-				""Themes"" : {
-					""ThemeDefinitions"" : [ 
+				""Themes"" : [ 
                                         {
 						""Default"" : {
 							""ColorSchemes"": [
@@ -657,7 +650,6 @@ namespace Terminal.Gui.ConfigurationTests {
 							]
 						}
 					}
-					]
 				}
 			}";
 
@@ -666,8 +658,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			// AbNormal is not a ColorScheme attribute
 			json = @"
 			{
-				""Themes"" : {
-					""ThemeDefinitions"" : [ 
+				""Themes"" : [ 
                                         {
 						""Default"" : {
 							""ColorSchemes"": [
@@ -682,7 +673,6 @@ namespace Terminal.Gui.ConfigurationTests {
 							]
 						}
 					}
-					]
 				}
 			}";
 
@@ -691,8 +681,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			// Modify hotNormal background only 
 			json = @"
 			{
-				""Themes"" : {
-					""ThemeDefinitions"" : [ 
+				""Themes"" :  [ 
                                         {
 						""Default"" : {
 							""ColorSchemes"": [
@@ -706,7 +695,6 @@ namespace Terminal.Gui.ConfigurationTests {
 							]
 						}
 					}
-					]
 				}
 			}";
 
