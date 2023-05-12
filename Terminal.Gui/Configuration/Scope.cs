@@ -100,7 +100,7 @@ namespace Terminal.Gui {
 			public override scopeT Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 			{
 				if (reader.TokenType != JsonTokenType.StartObject) {
-					throw new JsonException ($"Expected a JSON object, but got \"{reader.TokenType}\".");
+					throw new JsonException ($"Expected a JSON object (\"{{ \"propName\" : ... }}\"), but got \"{reader.TokenType}\".");
 				}
 
 				var scope = (scopeT)Activator.CreateInstance (typeof (scopeT))!;
