@@ -47,7 +47,6 @@ public class RuneTests {
 		Assert.Equal (code, actual.Value);
 	}
 
-
 	[Theory]
 	[InlineData (0x0338)] // Combining Long Solidus Overlay (U+0338) (e.g. ≠)
 	[InlineData (0x0300)] // Combining Grave Accent
@@ -61,329 +60,134 @@ public class RuneTests {
 		Assert.Equal (code, actual.Value);
 	}
 
-	[Fact]
-	public void TestColumnWidth ()
+	[Theory]
+	[InlineData ('a', "a", 1, 1, 1)]
+	[InlineData ('b', "b", 1, 1, 1)]
+	[InlineData (123, "{", 1, 1, 1)]        // { Left Curly Bracket
+	[InlineData ('\u1150', "ᅐ", 2, 1, 3)]   // ᅐ Hangul Choseong Ceongchieumcieuc
+	[InlineData ('\u1161', "ᅡ", 0, 1, 3)]   // ᅡ Hangul Jungseong A - Unicode Hangul Jamo for join with column width equal to 0 alone.
+	[InlineData (31, "\u001f", -1, 1, 1)]   // non printable character - Information Separator One
+	[InlineData (127, "\u007f", -1, 1, 1)]  // non printable character - Delete
+	[InlineData ('\u20D0', "⃐", 0, 1, 3)]   // ◌⃐ Combining Left Harpoon Above
+	[InlineData ('\u25a0', "■", 1, 1, 3)]   // ■ Black Square
+	[InlineData ('\u25a1', "□", 1, 1, 3)]   // □ White Square
+	[InlineData ('\uf61e', "", 1, 1, 3)]   // Private Use Area
+	[InlineData ('\u2103', "℃", 1, 1, 3)]   // ℃ Degree Celsius
+	[InlineData ('\u1100', "ᄀ", 2, 1, 3)]   // ᄀ Hangul Choseong Kiyeok
+	[InlineData ('\u2501', "━", 1, 1, 3)]   // ━ Box Drawings Heavy Horizontal
+	[InlineData ('\u2615', "☕", 2, 1, 3)] // ☕ Hot Beverage
+	[InlineData ('\u231a', "⌚", 2, 1, 3)] // ⌚ Watch
+	[InlineData ('\u231b', "⌛", 2, 1, 3)] // ⌛ Hourglass
+	[InlineData ('\u231c', "⌜", 1, 1, 3)] // ⌜ Top Left Corner
+	[InlineData ('\u1dc0', "᷀", 0, 1, 3)] // ◌᷀ Combining Dotted Grave Accent
+	public void GetColumns_With_Single_Code (int code, string str, int runeLength, int stringLength, int utf8Length)
 	{
-		Rune a = (Rune)'a';
-		Rune b = (Rune)'b';
-		Rune c = (Rune)123;
-		Rune d = (Rune)'\u1150';  // 0x1150	ᅐ	Unicode Technical Report #11
-		Rune e = (Rune)'\u1161';  // 0x1161	ᅡ	Unicode Hangul Jamo for join with column width equal to 0 alone.
-		Rune f = (Rune)31;    // non printable character
-		Rune g = (Rune)127;   // non printable character
-		string h = "\U0001fa01";
-		string i = "\U000e0fe1";
-		Rune j = (Rune)'\u20D0';
-		Rune k = (Rune)'\u25a0';
-		Rune l = (Rune)'\u25a1';
-		Rune m = (Rune)'\uf61e';
-		byte [] n = new byte [4] { 0xf0, 0x9f, 0x8d, 0x95 }; // UTF-8 Encoding
-		Rune o = new Rune ('\ud83c', '\udf55'); // UTF-16 Encoding;
-		string p = "\U0001F355"; // UTF-32 Encoding
-		Rune q = (Rune)'\u2103';
-		Rune r = (Rune)'\u1100';
-		Rune s = (Rune)'\u2501';
+		var rune = new Rune (code);
+		Assert.Equal (str, rune.ToString ());
+		Assert.Equal (runeLength, rune.GetColumns ());
+		Assert.Equal (stringLength, rune.ToString ().Length);
+		Assert.Equal (utf8Length, rune.Utf8SequenceLength);
+		Assert.True (Rune.IsValid (rune.Value));
+	}
 
-		Assert.Equal (1, a.GetColumns ());
-		Assert.Equal ("a", a.ToString ());
-		Assert.Equal (1, a.ToString ().Length);
-		Assert.Equal (1, a.Utf8SequenceLength);
-		Assert.Equal (1, b.GetColumns ());
-		Assert.Equal ("b", b.ToString ());
-		Assert.Equal (1, b.ToString ().Length);
-		Assert.Equal (1, b.Utf8SequenceLength);
-		var rl = a < b;
-		Assert.True (rl);
-		Assert.Equal (1, c.GetColumns ());
-		Assert.Equal ("{", c.ToString ());
-		Assert.Equal (1, c.ToString ().Length);
-		Assert.Equal (1, c.Utf8SequenceLength);
-		Assert.Equal (2, d.GetColumns ());
-		Assert.Equal ("ᅐ", d.ToString ());
-		Assert.Equal (1, d.ToString ().Length);
-		Assert.Equal (3, d.Utf8SequenceLength);
-		Assert.Equal (0, e.GetColumns ());
-		string join = "\u1104\u1161";
-		Assert.Equal ("따", join);
-		Assert.Equal (2, join.EnumerateRunes ().Sum (x => x.GetColumns ()));
-		Assert.Equal (OperationStatus.Done, Rune.DecodeFromUtf16 (join.ToCharArray (), out Rune result, out int charsConsumed));
-		Assert.False (join.DecodeSurrogatePair (out char [] spair));
-		Assert.Equal (2, join.GetRuneCount ());
-		Assert.Equal (2, join.Length);
-		Assert.Equal ("ᅡ", e.ToString ());
-		Assert.Equal (1, e.ToString ().Length);
-		Assert.Equal (3, e.Utf8SequenceLength);
-		string joinNormalize = join.Normalize ();
-		Assert.Equal ("따", joinNormalize);
-		Assert.Equal (2, joinNormalize.EnumerateRunes ().Sum (x => x.GetColumns ()));
-		Assert.Equal (OperationStatus.Done, Rune.DecodeFromUtf16 (joinNormalize.ToCharArray (), out result, out charsConsumed));
-		Assert.False (joinNormalize.DecodeSurrogatePair (out spair));
-		Assert.Equal (1, joinNormalize.GetRuneCount ());
-		Assert.Equal (1, joinNormalize.Length);
-		Assert.Equal (-1, f.GetColumns ());
-		Assert.Equal (1, f.ToString ().Length);
-		Assert.Equal (1, f.Utf8SequenceLength);
-		Assert.Equal (-1, g.GetColumns ());
-		Assert.Equal (1, g.ToString ().Length);
-		Assert.Equal (1, g.Utf8SequenceLength);
-		var uh = h;
-		(var runeh, var sizeh) = uh.DecodeRune ();
-		Assert.Equal (1, runeh.GetColumns ());
-		Assert.Equal ("🨁", h);
-		Assert.Equal (2, runeh.ToString ().Length);
-		Assert.Equal (4, runeh.Utf8SequenceLength);
-		Assert.Equal (sizeh, runeh.Utf8SequenceLength);
-		for (int x = 0; x < uh.Length - 1; x++) {
-			Assert.Equal (0x1FA01, char.ConvertToUtf32 (uh [x], uh [x + 1]));
-			Assert.True (RuneExtensions.EncodeSurrogatePair (uh [x], uh [x + 1], out result));
-			Assert.Equal (0x1FA01, result.Value);
+	[Theory]
+	[InlineData (new byte [] { 0xf0, 0x9f, 0xa8, 0x81 }, "🨁", 1, 2)] // Neutral Chess Queen
+	[InlineData (new byte [] { 0xf3, 0xa0, 0xbf, 0xa1 }, "󠿡", 1, 2)] // Undefined Character
+	[InlineData (new byte [] { 0xf0, 0x9f, 0x8d, 0x95 }, "🍕", 2, 2)] // 🍕 Slice of Pizza
+	[InlineData (new byte [] { 0xf0, 0x9f, 0xa4, 0x96 }, "🤖", 2, 2)] // 🤖 Robot Face
+	[InlineData (new byte [] { 0xf0, 0x90, 0x90, 0xa1 }, "𐐡", 1, 2)] // 𐐡 Deseret Capital Letter Er
+	[InlineData (new byte [] { 0xf0, 0x9f, 0x8c, 0xb9 }, "🌹", 2, 2)] // 🌹 Rose
+	public void GetColumns_Utf8_Encode (byte [] code, string str, int runeLength, int stringLength)
+	{
+		var operationStatus = Rune.DecodeFromUtf8 (code, out Rune rune, out int bytesConsumed);
+		Assert.Equal (OperationStatus.Done, operationStatus);
+		Assert.Equal (str, rune.ToString ());
+		Assert.Equal (runeLength, rune.GetColumns ());
+		Assert.Equal (stringLength, rune.ToString ().Length);
+		Assert.Equal (bytesConsumed, rune.Utf8SequenceLength);
+		Assert.True (Rune.IsValid (rune.Value));
+	}
+
+	[Theory]
+	[InlineData (new char [] { '\ud83e', '\ude01' }, "🨁", 1, 2, 4)]  // Neutral Chess Queen
+	[InlineData (new char [] { '\udb43', '\udfe1' }, "󠿡", 1, 2, 4)]  // Undefined Character
+	[InlineData (new char [] { '\ud83c', '\udf55' }, "🍕", 2, 2, 4)] // 🍕 Slice of Pizza
+	[InlineData (new char [] { '\ud83e', '\udd16' }, "🤖", 2, 2, 4)] // 🤖 Robot Face
+	[InlineData (new char [] { '\ud83e', '\udde0' }, "🧠", 2, 2, 4)] // 🧠 Brain
+	[InlineData (new char [] { '\ud801', '\udc21' }, "𐐡", 1, 2, 4)]  // 𐐡 Deseret Capital Letter Er
+	[InlineData (new char [] { '\ud83c', '\udf39' }, "🌹", 2, 2, 4)] // 🌹 Rose
+	public void GetColumns_Utf16_Encode (char [] code, string str, int runeLength, int stringLength, int utf8Length)
+	{
+		var rune = new Rune (code [0], code [1]);
+		Assert.Equal (str, rune.ToString ());
+		Assert.Equal (runeLength, rune.GetColumns ());
+		Assert.Equal (stringLength, rune.ToString ().Length);
+		Assert.Equal (utf8Length, rune.Utf8SequenceLength);
+		Assert.True (Rune.IsValid (rune.Value));
+	}
+
+	[Theory]
+	[InlineData ("\U0001fa01", "🨁", 1, 2)] // Neutral Chess Queen
+	[InlineData ("\U000e0fe1", "󠿡", 1, 2)] // Undefined Character
+	[InlineData ("\U0001F355", "🍕", 2, 2)] // 🍕 Slice of Pizza
+	[InlineData ("\U0001F916", "🤖", 2, 2)] // 🤖 Robot Face
+	[InlineData ("\U0001f9e0", "🧠", 2, 2)] // 🧠 Brain
+	[InlineData ("\U00010421", "𐐡", 1, 2)] // 𐐡 Deseret Capital Letter Er
+	[InlineData ("\U0001f339", "🌹", 2, 2)] // 🌹 Rose
+	public void GetColumns_Utf32_Encode (string code, string str, int runeLength, int stringLength)
+	{
+		var operationStatus = Rune.DecodeFromUtf16 (code, out Rune rune, out int charsConsumed);
+		Assert.Equal (OperationStatus.Done, operationStatus);
+		Assert.Equal (str, rune.ToString ());
+		Assert.Equal (runeLength, rune.GetColumns ());
+		Assert.Equal (stringLength, rune.ToString ().Length);
+		Assert.Equal (charsConsumed, rune.Utf16SequenceLength);
+		Assert.True (Rune.IsValid (rune.Value));
+
+		// with DecodeRune
+		(var nrune, var size) = code.DecodeRune ();
+		Assert.Equal (str, nrune.ToString ());
+		Assert.Equal (runeLength, nrune.GetColumns ());
+		Assert.Equal (stringLength, nrune.ToString ().Length);
+		Assert.Equal (size, nrune.Utf8SequenceLength);
+		for (int x = 0; x < code.Length - 1; x++) {
+			Assert.Equal (nrune.Value, char.ConvertToUtf32 (code [x], code [x + 1]));
+			Assert.True (RuneExtensions.EncodeSurrogatePair (code [x], code [x + 1], out Rune result));
+			Assert.Equal (rune, result);
 		}
-		Assert.True (Rune.IsValid (runeh.Value));
-		Assert.True (RuneExtensions.CanBeEncodedAsRune (Encoding.Unicode.GetBytes (uh.ToCharArray ())));
-		//Assert.True (Rune.FullRune (Encoding.Unicode.GetBytes (uh.ToCharArray ()));
-		Assert.Equal (1, uh.GetRuneCount ());
-		(var runelh, var sizelh) = uh.DecodeLastRune ();
+		Assert.True (Rune.IsValid (nrune.Value));
+	}
 
-		Assert.Equal (1, runelh.GetColumns ());
-		Assert.Equal (2, runelh.ToString ().Length);
-		Assert.Equal (4, runelh.Utf8SequenceLength);
-		Assert.Equal (sizelh, runelh.Utf8SequenceLength);
-		Assert.True (Rune.IsValid (runelh.Value));
+	[Theory]
+	[InlineData ("\u2615\ufe0f", "☕️", 2, 2, 2)] // \ufe0f forces it to be rendered as a colorful image as compared to a monochrome text variant.
+	public void GetColumns_String_Without_SurrogatePair (string code, string str, int codeLength, int runesLength, int stringLength)
+	{
+		Assert.Equal (str, code);
+		Assert.Equal (codeLength, code.Length);
+		Assert.Equal (runesLength, code.EnumerateRunes ().Sum (x => x.GetColumns ()));
+		Assert.Equal (runesLength, str.GetColumns ());
+		Assert.Equal (stringLength, str.Length);
+	}
 
-		var ui = i;
-		(var runei, var sizei) = ui.DecodeRune ();
-		Assert.Equal (1, runei.GetColumns ());
-		Assert.Equal ("󠿡", i);
-		Assert.Equal (2, runei.ToString ().Length);
-		Assert.Equal (4, runei.Utf8SequenceLength);
-		Assert.Equal (sizei, runei.Utf8SequenceLength);
-		for (int x = 0; x < ui.Length - 1; x++) {
-			Assert.Equal (0xE0FE1, char.ConvertToUtf32 (ui [x], ui [x + 1]));
-			Assert.True (RuneExtensions.EncodeSurrogatePair (ui [x], ui [x + 1], out result));
-			Assert.Equal (0xE0FE1, result.Value);
-		}
-		Assert.True (Rune.IsValid (runei.Value));
-		Assert.True (RuneExtensions.CanBeEncodedAsRune (Encoding.Unicode.GetBytes (ui.ToCharArray ())));
-		//Assert.True (Rune.FullRune (Encoding.Unicode.GetBytes (ui.ToCharArray ()));
-		(var runeli, var sizeli) = ui.DecodeLastRune ();
-		Assert.Equal (1, runeli.GetColumns ());
-		Assert.Equal (2, runeli.ToString ().Length);
-		Assert.Equal (4, runeli.Utf8SequenceLength);
-		Assert.Equal (sizeli, runeli.Utf8SequenceLength);
-		Assert.True (Rune.IsValid (runeli.Value));
+	[Theory]
+	[InlineData (new char [] { '\ud799', '\udc21' })]
+	public void Rune_Exceptions_Utf16_Encode (char [] code)
+	{
+		Assert.False (RuneExtensions.EncodeSurrogatePair (code [0], code [1], out Rune rune));
+		Assert.Throws<ArgumentOutOfRangeException> (() => new Rune (code [0], code [1]));
+	}
 
-		Assert.Equal (runeh.GetColumns (), runei.GetColumns ());
-		Assert.NotEqual (h, i);
-		Assert.Equal (runeh.ToString ().Length, runei.ToString ().Length);
-		Assert.Equal (runeh.Utf8SequenceLength, runei.Utf8SequenceLength);
-		var uj = j.ToString ();
-		(var runej, var sizej) = uj.DecodeRune ();
-		Assert.Equal (0, j.GetColumns ());
-		Assert.Equal (0, ((Rune)uj [0]).GetColumns ());
-		Assert.Equal (j, (Rune)uj [0]);
-		Assert.Equal ("⃐", j.ToString ());
-		Assert.Equal ("⃐", uj);
-		Assert.Equal (1, j.ToString ().Length);
-		Assert.Equal (1, runej.ToString ().Length);
-		Assert.Equal (3, j.Utf8SequenceLength);
-		Assert.Equal (sizej, runej.Utf8SequenceLength);
-		Assert.Equal (1, k.GetColumns ());
-		Assert.Equal ("■", k.ToString ());
-		Assert.Equal (1, k.ToString ().Length);
-		Assert.Equal (3, k.Utf8SequenceLength);
-		Assert.Equal (1, l.GetColumns ());
-		Assert.Equal ("□", l.ToString ());
-		Assert.Equal (1, l.ToString ().Length);
-		Assert.Equal (3, l.Utf8SequenceLength);
-		Assert.Equal (1, m.GetColumns ());
-		Assert.Equal ("", m.ToString ());
-		Assert.Equal (1, m.ToString ().Length);
-		Assert.Equal (3, m.Utf8SequenceLength);
-		var rn = StringExtensions.Make (n).DecodeRune ().Rune;
-		Assert.Equal (2, rn.GetColumns ());
-		Assert.Equal ("🍕", rn.ToString ());
-		Assert.Equal (2, rn.ToString ().Length);
-		Assert.Equal (4, rn.Utf8SequenceLength);
-		Assert.Equal (2, o.GetColumns ());
-		Assert.Equal ("🍕", o.ToString ());
-		Assert.Equal (2, o.ToString ().Length);
-		Assert.Equal (4, o.Utf8SequenceLength);
-		var rp = p.DecodeRune ().Rune;
-		Assert.Equal (2, rp.GetColumns ());
-		Assert.Equal ("🍕", p);
-		Assert.Equal (2, p.Length);
-		Assert.Equal (4, rp.Utf8SequenceLength);
-		Assert.Equal (1, q.GetColumns ());
-		Assert.Equal ("℃", q.ToString ());
-		Assert.Equal (1, q.ToString ().Length);
-		Assert.Equal (3, q.Utf8SequenceLength);
-		var rq = q.ToString ().DecodeRune ().Rune;
-		Assert.Equal (1, rq.GetColumns ());
-		Assert.Equal ("℃", rq.ToString ());
-		Assert.Equal (1, rq.ToString ().Length);
-		Assert.Equal (3, rq.Utf8SequenceLength);
-		Assert.Equal (2, r.GetColumns ());
-		Assert.Equal ("ᄀ", r.ToString ());
-		Assert.Equal (1, r.ToString ().Length);
-		Assert.Equal (3, r.Utf8SequenceLength);
-		Assert.Equal (1, s.GetColumns ());
-		Assert.Equal ("━", s.ToString ());
-		Assert.Equal (1, s.ToString ().Length);
-		Assert.Equal (3, s.Utf8SequenceLength);
-		var buff = new byte [4];
-		var sb = ((Rune)'\u2503').Encode (buff);
-		Assert.Equal (1, ((Rune)'\u2503').GetColumns ());
-		(var rune, var size) = StringExtensions.Make ('\u2503').DecodeRune ();
-		Assert.Equal (sb, size);
-		Assert.Equal ('\u2503', (uint)rune.Value);
-		var scb = char.ConvertToUtf32 ("℃", 0);
-		var scr = '℃'.ToString ().Length;
-		Assert.Equal (scr, ((Rune)(uint)scb).GetColumns ());
-		buff = new byte [4];
-		sb = ((Rune)'\u1100').Encode (buff);
-		Assert.Equal (2, ((Rune)'\u1100').GetColumns ());
-		Assert.Equal (2, StringExtensions.Make ((Rune)'\u1100').GetColumns ());
-		Assert.Equal (1, '\u1100'.ToString ().Length); // Length as string returns 1 but in reality it occupies 2 columns.
-		(rune, size) = StringExtensions.Make ((Rune)'\u1100').DecodeRune ();
-		Assert.Equal (sb, size);
-		Assert.Equal ('\u1100', (uint)rune.Value);
-		string str = "\u2615";
-		Assert.Equal ("☕", str);
-		Assert.Equal (2, str.EnumerateRunes ().Sum (x => x.GetColumns ()));
-		Assert.Equal (2, str.GetColumns ());
-		Assert.Equal (1, str.GetRuneCount ());
-		Assert.Equal (1, str.Length);
-		str = "\u2615\ufe0f"; // Identical but \ufe0f forces it to be rendered as a colorful image as compared to a monochrome text variant.
-		Assert.Equal ("☕️", str);
-		Assert.Equal (2, str.EnumerateRunes ().Sum (x => x.GetColumns ()));
-		Assert.Equal (2, str.GetColumns ());
-		Assert.Equal (2, str.GetRuneCount ());
-		Assert.Equal (2, str.Length);
-		str = "\u231a";
-		Assert.Equal ("⌚", str);
-		Assert.Equal (2, str.EnumerateRunes ().Sum (x => x.GetColumns ()));
-		Assert.Equal (2, str.GetColumns ());
-		Assert.Equal (1, str.GetRuneCount ());
-		Assert.Equal (1, str.Length);
-		str = "\u231b";
-		Assert.Equal ("⌛", str);
-		Assert.Equal (2, str.EnumerateRunes ().Sum (x => x.GetColumns ()));
-		Assert.Equal (2, str.GetColumns ());
-		Assert.Equal (1, str.GetRuneCount ());
-		Assert.Equal (1, str.Length);
-		str = "\u231c";
-		Assert.Equal ("⌜", str);
-		Assert.Equal (1, str.EnumerateRunes ().Sum (x => x.GetColumns ()));
-		Assert.Equal (1, str.GetColumns ());
-		Assert.Equal (1, str.GetRuneCount ());
-		Assert.Equal (1, str.Length);
-		str = "\u1dc0";
-		Assert.Equal ("᷀", str);
-		Assert.Equal (0, str.EnumerateRunes ().Sum (x => x.GetColumns ()));
-		Assert.Equal (0, str.GetColumns ());
-		Assert.Equal (1, str.GetRuneCount ());
-		Assert.Equal (1, str.Length);
-		str = "\ud83e\udd16";
-		Assert.Equal ("🤖", str);
-		Assert.Equal (2, str.EnumerateRunes ().Sum (x => x.GetColumns ()));
-		Assert.Equal (2, str.GetColumns ());
-		Assert.Equal (1, str.GetRuneCount ()); // Here returns 1 because is a valid surrogate pair resulting in only rune >=U+10000..U+10FFFF
-		Assert.Equal (2, str.Length); // String always preserves the originals values of each surrogate pair
-		str = "\U0001f9e0";
-		Assert.Equal ("🧠", str);
-		Assert.Equal (2, str.EnumerateRunes ().Sum (x => x.GetColumns ()));
-		Assert.Equal (2, str.GetColumns ());
-		Assert.Equal (1, str.GetRuneCount ());
-		Assert.Equal (2, str.Length);
+	[Theory]
+	[InlineData (0x12345678)]
+	[InlineData ('\ud801')]
+	public void Rune_Exceptions_Integers (int code)
+	{
+		Assert.Throws<ArgumentOutOfRangeException> (() => new Rune (code));
 	}
 
 	[Fact]
-	public void TestRune ()
+	public void GetColumns_GetRuneCount ()
 	{
-		Rune a = new Rune ('a');
-		Assert.Equal (1, a.GetColumns ());
-		Assert.Equal (1, a.ToString ().Length);
-		Assert.Equal ("a", a.ToString ());
-		Rune b = new Rune (0x0061);
-		Assert.Equal (1, b.GetColumns ());
-		Assert.Equal (1, b.ToString ().Length);
-		Assert.Equal ("a", b.ToString ());
-		Rune c = new Rune ('\u0061');
-		Assert.Equal (1, c.GetColumns ());
-		Assert.Equal (1, c.ToString ().Length);
-		Assert.Equal ("a", c.ToString ());
-		Rune d = new Rune (0x10421);
-		Assert.Equal (1, d.GetColumns ()); // Many surrogate pairs only occupies 1 column
-		Assert.Equal (2, d.ToString ().Length);
-		Assert.Equal ("𐐡", d.ToString ());
-		Assert.False (RuneExtensions.EncodeSurrogatePair ('\ud799', '\udc21', out Rune rune));
-		Assert.Throws<ArgumentOutOfRangeException> (() => new Rune ('\ud799', '\udc21'));
-		Rune e = new Rune ('\ud801', '\udc21');
-		Assert.Equal (1, e.GetColumns ());
-		Assert.Equal (2, e.ToString ().Length);
-		Assert.Equal ("𐐡", e.ToString ());
-		Assert.Throws<ArgumentOutOfRangeException> (() => Assert.False (Rune.IsValid (new Rune ('\ud801').Value)));
-		Rune f = new Rune ('\ud83c', '\udf39');
-		Assert.Equal (2, f.GetColumns ());
-		Assert.Equal (2, f.ToString ().Length);
-		Assert.Equal ("🌹", f.ToString ());
-		var exception = Record.Exception (() => new Rune (0x10ffff));
-		Assert.Null (exception);
-		Rune g = new Rune (0x10ffff);
-		string s = "\U0010ffff";
-		Assert.Equal (1, g.GetColumns ());
-		Assert.Equal (1, s.GetColumns ());
-		Assert.Equal (2, g.ToString ().Length);
-		Assert.Equal (2, s.Length);
-		Assert.Equal ("􏿿", g.ToString ());
-		Assert.Equal ("􏿿", s);
-		Assert.Equal (g.ToString (), s);
-		Assert.Throws<ArgumentOutOfRangeException> (() => new Rune (0x12345678));
-		var h = new Rune ('\u1150');
-		Assert.Equal (2, h.GetColumns ());
-		Assert.Equal (1, h.ToString ().Length);
-		Assert.Equal ("ᅐ", h.ToString ());
-		var i = new Rune ('\u4F60');
-		Assert.Equal (2, i.GetColumns ());
-		Assert.Equal (1, i.ToString ().Length);
-		Assert.Equal ("你", i.ToString ());
-		var j = new Rune ('\u597D');
-		Assert.Equal (2, j.GetColumns ());
-		Assert.Equal (1, j.ToString ().Length);
-		Assert.Equal ("好", j.ToString ());
-		var k = new Rune ('\ud83d', '\udc02');
-		Assert.Equal (2, k.GetColumns ());
-		Assert.Equal (2, k.ToString ().Length);
-		Assert.Equal ("🐂", k.ToString ());
-		var l = new Rune ('\ud801', '\udcbb');
-		Assert.Equal (1, l.GetColumns ());
-		Assert.Equal (2, l.ToString ().Length);
-		Assert.Equal ("𐒻", l.ToString ());
-		var m = new Rune ('\ud801', '\udccf');
-		Assert.Equal (1, m.GetColumns ());
-		Assert.Equal (2, m.ToString ().Length);
-		Assert.Equal ("𐓏", m.ToString ());
-		var n = new Rune ('\u00e1');
-		Assert.Equal (1, n.GetColumns ());
-		Assert.Equal (1, n.ToString ().Length);
-		Assert.Equal ("á", n.ToString ());
-		var o = new Rune ('\ud83d', '\udd2e');
-		Assert.Equal (2, o.GetColumns ());
-		Assert.Equal (2, o.ToString ().Length);
-		Assert.Equal ("🔮", o.ToString ());
-		var p = new Rune ('\u2329');
-		Assert.Equal (2, p.GetColumns ());
-		Assert.Equal (1, p.ToString ().Length);
-		Assert.Equal ("〈", p.ToString ());
-		var q = new Rune ('\u232a');
-		Assert.Equal (2, q.GetColumns ());
-		Assert.Equal (1, q.ToString ().Length);
-		Assert.Equal ("〉", q.ToString ());
-		var r = "\U0000232a".DecodeRune ().Rune;
-		Assert.Equal (2, r.GetColumns ());
-		Assert.Equal (1, r.ToString ().Length);
-		Assert.Equal ("〉", r.ToString ());
-
 		PrintTextElementCount ('\u00e1'.ToString (), "á", 1, 1, 1, 1);
 		PrintTextElementCount (new string (new char [] { '\u0061', '\u0301' }), "á", 1, 2, 2, 1);
 		PrintTextElementCount (StringExtensions.Make ('\u0061', '\u0301'), "á", 1, 2, 2, 1);
@@ -396,7 +200,7 @@ public class RuneTests {
 			"𐓏", 1, 1, 2, 1);
 	}
 
-	void PrintTextElementCount (string us, string s, int consoleWidth, int runeCount, int stringCount, int txtElementCount)
+	private void PrintTextElementCount (string us, string s, int consoleWidth, int runeCount, int stringCount, int txtElementCount)
 	{
 		Assert.Equal (us.Length, s.Length);
 		Assert.Equal (us, s);
@@ -421,7 +225,7 @@ public class RuneTests {
 		Assert.Equal (8, CountLettersInString ("𐓏𐓘𐓻𐓘𐓻𐓟 𐒻𐓟"));
 	}
 
-	int CountLettersInString (string s)
+	private int CountLettersInString (string s)
 	{
 		int letterCount = 0;
 		foreach (Rune rune in s.EnumerateRunes ()) {
@@ -441,7 +245,7 @@ public class RuneTests {
 		Assert.Throws<Exception> (() => ProcessStringUseRune ("\ud801"));
 	}
 
-	bool ProcessTestStringUseChar (string s)
+	private bool ProcessTestStringUseChar (string s)
 	{
 		char surrogateChar = default;
 		for (int i = 0; i < s.Length; i++) {
@@ -479,7 +283,7 @@ public class RuneTests {
 		return true;
 	}
 
-	bool ProcessStringUseRune (string s)
+	private bool ProcessStringUseRune (string s)
 	{
 		var us = s;
 		string rs = "";
@@ -527,130 +331,74 @@ public class RuneTests {
 		Assert.Equal (3, splitOnComma.Length);
 	}
 
-	[Fact]
-	public void TestValidRune ()
+	[Theory]
+	[InlineData (true, '\u1100')]
+	[InlineData (true, '\ud83c', '\udf39')]
+	[InlineData (true, '\udbff', '\udfff')]
+	[InlineData (false, '\ud801')]
+	[InlineData (false, '\ud83e')]
+	public void Rune_IsValid (bool valid, params char [] chars)
 	{
-		Assert.True (Rune.IsValid (new Rune ('\u1100').Value));
-		Assert.True (Rune.IsValid (new Rune ('\ud83c', '\udf39').Value));
-		Assert.False (Rune.IsValid ('\ud801'));
-		Assert.False (Rune.IsValid ((uint)'\ud801'));
-		Assert.Throws<ArgumentOutOfRangeException> (() => Assert.False (Rune.IsValid (((Rune)'\ud801').Value)));
+		Rune rune = default;
+		bool isValid = true;
+		if (chars.Length == 1) {
+			try {
+				rune = new Rune (chars [0]);
+			} catch (Exception) {
+
+				isValid = false;
+			}
+		} else {
+			rune = new Rune (chars [0], chars [1]);
+		}
+		if (valid) {
+			Assert.NotEqual (default, rune);
+			Assert.True (Rune.IsValid (rune.Value));
+			Assert.True (valid);
+		} else {
+			Assert.False (valid);
+			Assert.False (isValid);
+		}
+	}
+
+	[Theory]
+	[InlineData ('\u006f', '\u0302', "\u006f\u0302", 1, 0, 2, "o", "̂", "ô", 1, 2)]
+	[InlineData ('\u0065', '\u0301', "\u0065\u0301", 1, 0, 2, "e", "́", "é", 1, 2)]
+	public void Test_NonSpacingChar (int code1, int code2, string code, int rune1Length, int rune2Length, int codeLength, string code1String, string code2String, string joinString, int joinLength, int bytesLength)
+	{
+		var rune = new Rune (code1);
+		var nsRune = new Rune (code2);
+		Assert.Equal (rune1Length, rune.GetColumns ());
+		Assert.Equal (rune2Length, nsRune.GetColumns ());
+		var ul = StringExtensions.Make (rune);
+		Assert.Equal (code1String, ul);
+		var uns = StringExtensions.Make (nsRune);
+		Assert.Equal (code2String, uns);
+		var f = $"{rune}{nsRune}".Normalize ();
+		Assert.Equal (f, joinString);
+		Assert.Equal (f, code.Normalize ());
+		Assert.Equal (joinLength, f.GetColumns ());
+		Assert.Equal (joinLength, code.EnumerateRunes ().Sum (c => c.GetColumns ()));
+		Assert.Equal (codeLength, code.Length);
+		(var nrune, var size) = f.DecodeRune ();
+		Assert.Equal (f.ToRunes () [0], nrune);
+		Assert.Equal (bytesLength, size);
+	}
+
+	[Theory]
+	[InlineData (500000000)]
+	[InlineData (0xf801, 0xdfff)]
+	public void Test_MaxRune (params int [] codes)
+	{
+		if (codes.Length == 1) {
+			Assert.Throws<ArgumentOutOfRangeException> (() => new Rune (codes [0]));
+		} else {
+			Assert.Throws<ArgumentOutOfRangeException> (() => new Rune ((char)codes [0], (char)codes [1]));
+		}
 	}
 
 	[Fact]
-	public void TestValid ()
-	{
-		var rune1 = new Rune ('\ud83c', '\udf39');
-		var buff1 = new byte [4];
-		Assert.Equal (4, rune1.Encode (buff1));
-		Assert.True (RuneExtensions.CanBeEncodedAsRune (buff1));
-		Assert.Equal (2, rune1.ToString ().Length);
-		Assert.Equal (4, rune1.Utf8SequenceLength);
-		var c = '\ud801';
-		var buff2 = Encoding.UTF8.GetBytes (new char [] { c });
-		//var buff2 = new byte [4];
-		Assert.Equal (3, buff2.Length);
-		var str = Encoding.UTF8.GetString (buff2);
-		Assert.Equal ("�", str);
-		Assert.False (RuneExtensions.CanBeEncodedAsRune (buff2));
-		Assert.Equal (1, str.Length);
-		Assert.Throws<ArgumentOutOfRangeException> (() => (Rune)'\ud801');
-		Assert.Equal (new byte [] { 0xef, 0xbf, 0xbd }, buff2);
-		Assert.Equal (Rune.ReplacementChar.ToString (), str);
-	}
-
-	[Fact]
-	public void Test_IsNonSpacingChar ()
-	{
-		Rune l = (Rune)'\u0370';
-		Assert.Equal (1, l.GetColumns ());
-		Assert.Equal (1, StringExtensions.Make (l).GetColumns ());
-		Rune ns = (Rune)'\u302a';
-		Assert.Equal (2, ns.GetColumns ());
-		Assert.Equal (2, StringExtensions.Make (ns).GetColumns ());
-		l = (Rune)'\u006f';
-		ns = (Rune)'\u0302';
-		var s = "\u006f\u0302";
-		Assert.Equal (1, l.GetColumns ());
-		Assert.Equal (0, ns.GetColumns ());
-		var ul = StringExtensions.Make (l);
-		Assert.Equal ("o", ul);
-		var uns = StringExtensions.Make (ns);
-		Assert.Equal ("̂", uns);
-		var f = $"{l}{ns}";
-		Assert.Equal ("ô", f);
-		Assert.Equal (f, s);
-		Assert.Equal (1, f.GetColumns ());
-		Assert.Equal (1, s.EnumerateRunes ().Sum (c => c.GetColumns ()));
-		Assert.Equal (2, s.Length);
-		(var rune, var size) = f.DecodeRune ();
-		Assert.Equal (rune, l);
-		Assert.Equal (1, size);
-		l = (Rune)'\u0041';
-		ns = (Rune)'\u0305';
-		s = "\u0041\u0305";
-		Assert.Equal (1, l.GetColumns ());
-		Assert.Equal (0, ns.GetColumns ());
-		ul = StringExtensions.Make (l);
-		Assert.Equal ("A", ul);
-		uns = StringExtensions.Make (ns);
-		Assert.Equal ("̅", uns);
-		f = $"{l}{ns}";
-		Assert.Equal ("A̅", f);
-		Assert.Equal (f, s);
-		Assert.Equal (1, f.GetColumns ());
-		Assert.Equal (1, s.EnumerateRunes ().Sum (c => c.GetColumns ()));
-		Assert.Equal (2, s.Length);
-		(rune, size) = f.DecodeRune ();
-		Assert.Equal (rune, l);
-		Assert.Equal (1, size);
-		l = (Rune)'\u0061';
-		ns = (Rune)'\u0308';
-		s = "\u0061\u0308";
-		Assert.Equal (1, l.GetColumns ());
-		Assert.Equal (0, ns.GetColumns ());
-		ul = StringExtensions.Make (l);
-		Assert.Equal ("a", ul);
-		uns = StringExtensions.Make (ns);
-		Assert.Equal ("̈", uns);
-		f = $"{l}{ns}";
-		Assert.Equal ("ä", f);
-		Assert.Equal (f, s);
-		Assert.Equal (1, f.GetColumns ());
-		Assert.Equal (1, s.EnumerateRunes ().Sum (c => c.GetColumns ()));
-		Assert.Equal (2, s.Length);
-		(rune, size) = f.DecodeRune ();
-		Assert.Equal (rune, l);
-		Assert.Equal (1, size);
-		l = (Rune)'\u4f00';
-		ns = (Rune)'\u302a';
-		s = "\u4f00\u302a";
-		Assert.Equal (2, l.GetColumns ());
-		Assert.Equal (2, ns.GetColumns ());
-		ul = StringExtensions.Make (l);
-		Assert.Equal ("伀", ul);
-		uns = StringExtensions.Make (ns);
-		Assert.Equal ("〪", uns);
-		f = $"{l}{ns}";
-		Assert.Equal ("伀〪", f); // Occupies 4 columns.
-		Assert.Equal (f, s);
-		Assert.Equal (4, f.GetColumns ());
-		Assert.Equal (4, s.EnumerateRunes ().Sum (c => c.GetColumns ()));
-		Assert.Equal (2, s.Length);
-		(rune, size) = f.DecodeRune ();
-		Assert.Equal (rune, l);
-		Assert.Equal (3, size);
-	}
-
-	[Fact]
-	public void Test_MaxRune ()
-	{
-		Assert.Throws<ArgumentOutOfRangeException> (() => new Rune (500000000));
-		Assert.Throws<ArgumentOutOfRangeException> (() => new Rune ((char)0xf801, (char)0xdfff));
-	}
-
-	[Fact]
-	public void Sum_Of_ColumnWidth_Is_Not_Always_Equal_To_ConsoleWidth ()
+	public void Sum_Of_Rune_GetColumns_Is_Not_Always_Equal_To_String_GetColumns ()
 	{
 		const int start = 0x000000;
 		const int end = 0x10ffff;
@@ -687,29 +435,6 @@ public class RuneTests {
 		}
 	}
 
-	[Fact]
-	public void Test_Right_To_Left_Runes ()
-	{
-		Rune r0 = (Rune)0x020000;
-		Rune r7 = (Rune)0x020007;
-		Rune r1b = (Rune)0x02001b;
-		Rune r9b = (Rune)0x02009b;
-
-		Assert.Equal (2, r0.GetColumns ());
-		Assert.Equal (2, r7.GetColumns ());
-		Assert.Equal (2, r1b.GetColumns ());
-		Assert.Equal (2, r9b.GetColumns ());
-
-		"𠀀".DecodeSurrogatePair (out char [] chars);
-		var rtl = new Rune (chars [0], chars [1]);
-		var rtlp = new Rune ('\ud840', '\udc00');
-		var s = "\U00020000";
-
-		Assert.Equal (2, rtl.GetColumns ());
-		Assert.Equal (2, rtlp.GetColumns ());
-		Assert.Equal (2, s.Length);
-	}
-
 	[Theory]
 	[InlineData (0x20D0, 0x20EF)]
 	[InlineData (0x2310, 0x231F)]
@@ -739,50 +464,58 @@ public class RuneTests {
 		}
 	}
 
-	[Fact]
-	public void Test_IsSurrogate ()
+	[Theory]
+	[InlineData ('\ue0fd', false)]
+	[InlineData ('\ud800', true)]
+	[InlineData ('\udfff', true)]
+	public void Test_IsSurrogate (char code, bool isSurrogate)
 	{
-		char c = '\ue0fd';
-		Assert.False (char.IsSurrogate (c.ToString (), 0));
-		Rune r = (Rune)0x927C0;
-		Assert.True (r.IsSurrogatePair ());
-		Assert.True (r.IsSurrogatePair ());
-		Assert.True (char.IsSurrogate (r.ToString (), 0));
-		Assert.True (char.IsSurrogate (r.ToString (), 1));
-		Assert.True (char.IsSurrogatePair (r.ToString (), 0));
+		if (isSurrogate) {
+			Assert.True (char.IsSurrogate (code.ToString (), 0));
+		} else {
+			Assert.False (char.IsSurrogate (code.ToString (), 0));
+		}
+	}
 
-		c = '\ud800';
-		Assert.True (char.IsSurrogate (c.ToString (), 0));
-		c = '\udfff';
-		Assert.True (char.IsSurrogate (c.ToString (), 0));
+	[Theory]
+	[InlineData (unchecked((char)0x40D7C0), (char)0xDC20, 0, "\0", false)]
+	[InlineData ((char)0x0065, (char)0x0301, 0, "\0", false)]
+	[InlineData ('\ud83c', '\udf56', 0x1F356, "🍖", true)] // 🍖 Meat On Bone
+	public void Test_EncodeSurrogatePair (char highSurrogate, char lowSurrogate, int runeValue, string runeString, bool isSurrogatePair)
+	{
+		Rune rune;
+		if (isSurrogatePair) {
+			Assert.True (RuneExtensions.EncodeSurrogatePair ('\ud83c', '\udf56', out rune));
+		} else {
+			Assert.False (RuneExtensions.EncodeSurrogatePair (highSurrogate, lowSurrogate, out rune));
+		}
+		Assert.Equal (runeValue, rune.Value);
+		Assert.Equal (runeString, rune.ToString ());
+	}
+
+	[Theory]
+	[InlineData ('\uea85', null, "", false)] // Private Use Area
+	[InlineData (0x1F356, new char [] { '\ud83c', '\udf56' }, "🍖", true)] // 🍖 Meat On Bone
+	public void Test_DecodeSurrogatePair (int code, char [] charsValue, string runeString, bool isSurrogatePair)
+	{
+		Rune rune = new Rune (code);
+		char [] chars;
+		if (isSurrogatePair) {
+			Assert.True (rune.DecodeSurrogatePair (out chars));
+			Assert.Equal (2, chars.Length);
+			Assert.Equal (charsValue [0], chars [0]);
+			Assert.Equal (charsValue [1], chars [1]);
+			Assert.Equal (runeString, new Rune (chars [0], chars [1]).ToString ());
+		} else {
+			Assert.False (rune.DecodeSurrogatePair (out chars));
+			Assert.Null (chars);
+			Assert.Equal (runeString, rune.ToString ());
+		}
+		Assert.Equal (chars, charsValue);
 	}
 
 	[Fact]
-	public void Test_EncodeSurrogatePair ()
-	{
-		Assert.False (RuneExtensions.EncodeSurrogatePair (unchecked((char)0x40D7C0), (char)0xDC20, out Rune rune));
-		Assert.Equal (0, rune.Value);
-		Assert.False (RuneExtensions.EncodeSurrogatePair ((char)0x0065, (char)0x0301, out rune));
-		Assert.Equal (0, rune.Value);
-		Assert.True (RuneExtensions.EncodeSurrogatePair ('\ud83c', '\udf56', out rune));
-		Assert.Equal (0x1F356, rune.Value);
-		Assert.Equal ("🍖", rune.ToString ());
-	}
-
-	[Fact]
-	public void Test_DecodeSurrogatePair ()
-	{
-		Assert.False (((Rune)'\uea85').DecodeSurrogatePair (out char [] chars));
-		Assert.Null (chars);
-		Assert.True (((Rune)0x1F356).DecodeSurrogatePair (out chars));
-		Assert.Equal (2, chars.Length);
-		Assert.Equal ('\ud83c', chars [0]);
-		Assert.Equal ('\udf56', chars [1]);
-		Assert.Equal ("🍖", new Rune (chars [0], chars [1]).ToString ());
-	}
-
-	[Fact]
-	public void Test_Surrogate_Pairs_Range ()
+	public void Test_All_Surrogate_Pairs_Range ()
 	{
 		for (uint h = 0xd800; h <= 0xdbff; h++) {
 			for (uint l = 0xdc00; l <= 0xdfff; l++) {
@@ -803,64 +536,67 @@ public class RuneTests {
 		}
 	}
 
-	[Fact]
-	public void Test_DecodeRune_Extension ()
+	[Theory]
+	[InlineData ("Hello, 世界", 13, 11, 9)]   // Without Surrogate Pairs
+	[InlineData ("Hello, 𝔹𝕆𝔹", 19, 13, 13)] // With Surrogate Pairs
+	public void Test_DecodeRune_Extension (string text, int bytesLength, int colsLength, int textLength)
 	{
-		string us = "Hello, 世界";
 		List<Rune> runes = new List<Rune> ();
 		int tSize = 0;
-		for (int i = 0; i < us.GetRuneCount (); i++) {
-			(Rune rune, int size) = us.DecodeRune (i);
+		for (int i = 0; i < text.GetRuneCount (); i++) {
+			(Rune rune, int size) = text.DecodeRune (i);
 			runes.Add (rune);
 			tSize += size;
 		}
 		string result = StringExtensions.Make (runes);
-		Assert.Equal ("Hello, 世界", result);
-		Assert.Equal (13, tSize);
-		Assert.Equal (11, result.GetColumns ());
+		Assert.Equal (text, result);
+		Assert.Equal (bytesLength, tSize);
+		Assert.Equal (colsLength, result.GetColumns ());
+		Assert.Equal (textLength, result.Length);
 	}
 
-	[Fact]
-	public void Test_DecodeRune_With_Surrogate_Pairs ()
+	[Theory]
+	[InlineData ("Hello, 世界", 13, 11, 9, "界世 ,olleH")]   // Without Surrogate Pairs
+	[InlineData ("Hello, 𝔹𝕆𝔹", 19, 13, 13, "𝔹𝕆𝔹 ,olleH")] // With Surrogate Pairs
+	public void Test_DecodeLastRune_Extension (string text, int bytesLength, int colsLength, int textLength, string encoded)
 	{
-		string us = "Hello, 𝔹𝕆𝔹";
 		List<Rune> runes = new List<Rune> ();
 		int tSize = 0;
-		for (int i = 0; i < us.GetRuneCount (); i++) {
-			(Rune rune, int size) = us.DecodeRune (i);
+		for (int i = text.GetRuneCount () - 1; i >= 0; i--) {
+			(Rune rune, int size) = text.DecodeLastRune (i);
 			runes.Add (rune);
 			tSize += size;
 		}
 		string result = StringExtensions.Make (runes);
-		Assert.Equal ("Hello, 𝔹𝕆𝔹", result);
-		Assert.Equal (19, tSize);
-		Assert.Equal (13, result.GetColumns ());
+		Assert.Equal (encoded, result);
+		Assert.Equal (bytesLength, tSize);
+		Assert.Equal (colsLength, result.GetColumns ());
+		Assert.Equal (textLength, result.Length);
 	}
 
-	[Fact]
-	public void Test_DecodeLastRune_Extension ()
+	[Theory]
+	[InlineData ("���", false)]
+	[InlineData ("Hello, 世界", true)]
+	[InlineData (new byte [] { 0xff, 0xfe, 0xfd }, false)]
+	[InlineData (new byte [] { 0xf0, 0x9f, 0x8d, 0x95 }, true)]
+	public void Test_CanBeEncodedAsRune_Extension (object text, bool canBeEncodedAsRune)
 	{
-		string us = "Hello, 世界";
-		List<Rune> runes = new List<Rune> ();
-		int tSize = 0;
-		for (int i = us.GetRuneCount () - 1; i >= 0; i--) {
-			(Rune rune, int size) = us.DecodeLastRune (i);
-			runes.Add (rune);
-			tSize += size;
+		string str;
+		if (text is string) {
+			str = (string)text;
+			if (canBeEncodedAsRune) {
+				Assert.True (RuneExtensions.CanBeEncodedAsRune (Encoding.Unicode.GetBytes (str.ToCharArray ())));
+			} else {
+				Assert.False (RuneExtensions.CanBeEncodedAsRune (Encoding.Unicode.GetBytes (str.ToCharArray ())));
+			}
+		} else if (text is byte []) {
+			str = StringExtensions.Make ((byte [])text);
+			if (canBeEncodedAsRune) {
+				Assert.True (RuneExtensions.CanBeEncodedAsRune (Encoding.Unicode.GetBytes (str.ToCharArray ())));
+			} else {
+				Assert.False (RuneExtensions.CanBeEncodedAsRune (Encoding.Unicode.GetBytes (str.ToCharArray ())));
+			}
 		}
-		string result = StringExtensions.Make (runes);
-		Assert.Equal ("界世 ,olleH", result);
-		Assert.Equal (13, tSize);
-		Assert.Equal (11, result.GetColumns ());
-	}
-
-	[Fact]
-	public void Test_Valid_Extension ()
-	{
-		string us = "Hello, 世界";
-		Assert.True (RuneExtensions.CanBeEncodedAsRune (Encoding.Unicode.GetBytes (us.ToCharArray ())));
-		us = StringExtensions.Make (new byte [] { 0xff, 0xfe, 0xfd });
-		Assert.False (RuneExtensions.CanBeEncodedAsRune (Encoding.Unicode.GetBytes (us.ToCharArray ())));
 	}
 
 	[Fact]
@@ -905,7 +641,7 @@ public class RuneTests {
 	}
 
 	[Fact]
-	public void Rune_ColumnWidth_Versus_Ustring_ConsoleWidth_With_Non_Printable_Characters ()
+	public void Rune_GetColumns_Versus_String_GetColumns_With_Non_Printable_Characters ()
 	{
 		int sumRuneWidth = 0;
 		int sumConsoleWidth = 0;
@@ -918,153 +654,60 @@ public class RuneTests {
 		Assert.Equal (0, sumConsoleWidth);
 	}
 
-	[Fact]
-	public void Rune_ColumnWidth_Versus_String_ConsoleWidth ()
+	[Theory]
+	[InlineData ("01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789", 200, 200, 200)]
+	[InlineData ("01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\n", 201, 200, 199)]  // has a '\n' newline
+	[InlineData ("\t01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\n", 202, 200, 198)] // has a '\t' and a '\n' newline
+	public void Rune_ColumnWidth_Versus_String_ConsoleWidth (string text, int stringLength, int strCols, int runeCols)
 	{
-		string us = "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
-		Assert.Equal (200, us.Length);
-		Assert.Equal (200, us.GetRuneCount ());
-		Assert.Equal (200, us.GetColumns ());
-		int sumRuneWidth = us.EnumerateRunes ().Sum (x => x.GetColumns ());
-		Assert.Equal (200, sumRuneWidth);
-
-		// has a '\n' newline
-		us = "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\n";
-		Assert.Equal (201, us.Length);
-		Assert.Equal (201, us.GetRuneCount ());
-		Assert.Equal (200, us.GetColumns ());
-		sumRuneWidth = us.EnumerateRunes ().Sum (x => x.GetColumns ());
-		Assert.Equal (199, sumRuneWidth);
-
-		// has a '\t' and a '\n' newline
-		us = "\t01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\n";
-		Assert.Equal (202, us.Length);
-		Assert.Equal (202, us.GetRuneCount ());
-		Assert.Equal (200, us.GetColumns ());
-		sumRuneWidth = us.EnumerateRunes ().Sum (x => x.GetColumns ());
-		Assert.Equal (198, sumRuneWidth);
+		Assert.Equal (stringLength, text.Length);
+		Assert.Equal (stringLength, text.GetRuneCount ());
+		Assert.Equal (strCols, text.GetColumns ());
+		int sumRuneWidth = text.EnumerateRunes ().Sum (x => x.GetColumns ());
+		Assert.Equal (runeCols, sumRuneWidth);
 	}
 
-	[Fact]
-	public void Rune_IsHighSurrogate_IsLowSurrogate ()
+	[Theory]
+	[InlineData ('\ud800', true)]
+	[InlineData ('\udbff', true)]
+	[InlineData ('\udc00', false)]
+	[InlineData ('\udfff', false)]
+	[InlineData ('\uefff', null)]
+	public void Rune_IsHighSurrogate_IsLowSurrogate (char code, bool? isHighSurrogate)
 	{
-		char c = '\ud800';
-		Assert.True (char.IsHighSurrogate (c));
-
-		c = '\udbff';
-		Assert.True (char.IsHighSurrogate (c));
-
-		c = '\udc00';
-		Assert.True (char.IsLowSurrogate (c));
-
-		c = '\udfff';
-		Assert.True (char.IsLowSurrogate (c));
-	}
-
-	[Fact]
-	public void Rune_ToRunes ()
-	{
-		var str = "First line.";
-		var runes = str.ToRunes ();
-		for (int i = 0; i < runes.Length; i++) {
-			Assert.Equal (str [i], runes [i].Value);
+		if (isHighSurrogate == true) {
+			Assert.True (char.IsHighSurrogate (code));
+		} else if (isHighSurrogate == false) {
+			Assert.True (char.IsLowSurrogate (code));
+		} else {
+			Assert.False (char.IsHighSurrogate (code));
+			Assert.False (char.IsLowSurrogate (code));
 		}
 	}
 
-	[Fact]
-	public void Rune_ColumnWidth ()
+	[Theory]
+	[InlineData ("First line.")]
+	[InlineData ("Hello, 𝔹𝕆𝔹")]
+	public void Rune_ToRunes (string text)
 	{
-		var r = new Rune ('a');
-		Assert.Equal (1, r.GetColumns ());
-		Assert.Equal (1, r.ToString ().GetColumns ());
-		Assert.Equal (1, r.ToString ().Length);
-		Assert.Equal (1, r.Utf16SequenceLength);
-		Assert.Equal (1, r.Utf8SequenceLength);
-
-		r = new Rune ('b');
-		Assert.Equal (1, r.GetColumns ());
-		Assert.Equal (1, r.ToString ().GetColumns ());
-		Assert.Equal (1, r.ToString ().Length);
-		Assert.Equal (1, r.Utf16SequenceLength);
-		Assert.Equal (1, r.Utf8SequenceLength);
-
-		r = new Rune (123);
-		Assert.Equal (1, r.GetColumns ());
-		Assert.Equal (1, r.ToString ().GetColumns ());
-		Assert.Equal (1, r.ToString ().Length);
-		Assert.Equal (1, r.Utf16SequenceLength);
-		Assert.Equal (1, r.Utf8SequenceLength);
-
-		r = new Rune ('\u1150');
-		Assert.Equal (2, r.GetColumns ());      // 0x1150	ᅐ	Unicode Technical Report #11
-		Assert.Equal (2, r.ToString ().GetColumns ());
-		Assert.Equal (1, r.ToString ().Length);
-		Assert.Equal (1, r.Utf16SequenceLength);
-		Assert.Equal (3, r.Utf8SequenceLength);
-
-		r = new Rune ('\u1161');
-		Assert.Equal (0, r.GetColumns ());      // 0x1161	ᅡ	column width of 0
-		Assert.Equal (0, r.ToString ().GetColumns ());
-		Assert.Equal (1, r.ToString ().Length);
-		Assert.Equal (1, r.Utf16SequenceLength);
-		Assert.Equal (3, r.Utf8SequenceLength);
-
-		r = new Rune (31);
-		Assert.Equal (-1, r.GetColumns ());        // non printable character
-		Assert.Equal (0, r.ToString ().GetColumns ());// ConsoleWidth only returns zero or greater than zero
-		Assert.Equal (1, r.ToString ().Length);
-		Assert.Equal (1, r.Utf16SequenceLength);
-		Assert.Equal (1, r.Utf8SequenceLength);
-
-		r = new Rune (127);
-		Assert.Equal (-1, r.GetColumns ());       // non printable character
-		Assert.Equal (0, r.ToString ().GetColumns ());
-		Assert.Equal (1, r.ToString ().Length);
-		Assert.Equal (1, r.Utf16SequenceLength);
-		Assert.Equal (1, r.Utf8SequenceLength);
-
-		r = new Rune (0x16fe0);
-		Assert.Equal (2, r.GetColumns ());       // non printable character
-		Assert.Equal (2, r.ToString ().GetColumns ());
-		Assert.Equal (2, r.ToString ().Length);
-		Assert.Equal (2, r.Utf16SequenceLength);
-		Assert.Equal (4, r.Utf8SequenceLength);
+		var runes = text.ToRunes ();
+		for (int i = 0; i < runes.Length; i++) {
+			Assert.Equal (text.EnumerateRunes ().ToArray () [i].Value, runes [i].Value);
+		}
 	}
 
-	[Fact]
-	public void System_Text_Rune ()
+	[Theory]
+	[InlineData ('a', 1, 1)]
+	[InlineData (31, 1, 1)]
+	[InlineData (123, 1, 1)]
+	[InlineData (127, 1, 1)]
+	[InlineData ('\u1150', 1, 3)]
+	[InlineData ('\u1161', 1, 3)]
+	[InlineData (0x16fe0, 2, 4)]
+	public void System_Text_Rune_SequenceLength (int code, int utf16Length, int utf8Length)
 	{
-		var r = new System.Text.Rune ('a');
-		Assert.Equal (1, r.Utf16SequenceLength);
-		Assert.Equal (1, r.Utf8SequenceLength);
-
-		r = new System.Text.Rune ('b');
-		Assert.Equal (1, r.Utf16SequenceLength);
-		Assert.Equal (1, r.Utf8SequenceLength);
-
-		r = new System.Text.Rune (123);
-		Assert.Equal (1, r.Utf16SequenceLength);
-		Assert.Equal (1, r.Utf8SequenceLength);
-
-		r = new System.Text.Rune ('\u1150');
-		Assert.Equal (1, r.Utf16SequenceLength);
-		Assert.Equal (3, r.Utf8SequenceLength);         // 0x1150	ᅐ	Unicode Technical Report #11
-
-		r = new System.Text.Rune ('\u1161');
-		Assert.Equal (1, r.Utf16SequenceLength);
-		Assert.Equal (3, r.Utf8SequenceLength);         // 0x1161	ᅡ	column width of 0
-
-		r = new System.Text.Rune (31);
-		Assert.Equal (1, r.Utf16SequenceLength);
-		Assert.Equal (1, r.Utf8SequenceLength);         // non printable character
-
-		r = new System.Text.Rune (127);
-		Assert.Equal (1, r.Utf16SequenceLength);
-		Assert.Equal (1, r.Utf8SequenceLength);         // non printable character
-
-		r = new System.Text.Rune (0x16fe0);
-		Assert.Equal (2, r.Utf16SequenceLength);
-		Assert.Equal (4, r.Utf8SequenceLength);
+		var r = new System.Text.Rune (code);
+		Assert.Equal (utf16Length, r.Utf16SequenceLength);
+		Assert.Equal (utf8Length, r.Utf8SequenceLength);
 	}
 }
-

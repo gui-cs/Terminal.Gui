@@ -38,33 +38,13 @@ namespace UICatalog.Scenarios {
 			Win.Add (jumpEdit);
 			var errorLabel = new Label ("") { X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap), ColorScheme = Colors.ColorSchemes ["error"] };
 			Win.Add (errorLabel);
-			jumpEdit.TextChanged += (s, e) => {
-				uint result = 0;
-				if (jumpEdit.Text.Length == 0) return;
-				try {
-					result = Convert.ToUInt32 (jumpEdit.Text.ToString (), 10);
-				} catch (OverflowException) {
-					errorLabel.Text = $"Invalid (overflow)";
-					return;
-				} catch (FormatException) {
-					try {
-						result = Convert.ToUInt32 (jumpEdit.Text.ToString (), 16);
-					} catch (OverflowException) {
-						errorLabel.Text = $"Invalid (overflow)";
-						return;
-					} catch (FormatException) {
-						errorLabel.Text = $"Invalid (can't parse)";
-						return;
-					}
-				}
-				errorLabel.Text = $"U+{result:x4}";
-				_charMap.SelectedGlyph = result;
-			};
 
 			var radioItems = new (string radioLabel, uint start, uint end) [UnicodeRange.Ranges.Count];
 
-			for (var i = 0; i < UnicodeRange.Ranges.Count; i++) {
-				var range = UnicodeRange.Ranges [i];
+			var ranges = UnicodeRange.Ranges.OrderBy (o => o.Start).ToList ();
+
+			for (var i = 0; i < ranges.Count; i++) {
+				var range = ranges [i];
 				radioItems [i] = CreateRadio (range.Category, range.Start, range.End);
 			}
 			(string radioLabel, uint start, uint end) CreateRadio (string title, uint start, uint end)
@@ -87,6 +67,33 @@ namespace UICatalog.Scenarios {
 			};
 
 			Win.Add (jumpList);
+
+			jumpEdit.TextChanged += (s, e) => {
+				uint result = 0;
+				if (jumpEdit.Text.Length == 0) return;
+				try {
+					result = Convert.ToUInt32 (jumpEdit.Text, 10);
+				} catch (OverflowException) {
+					errorLabel.Text = $"Invalid (overflow)";
+					return;
+				} catch (FormatException) {
+					try {
+						result = Convert.ToUInt32 (jumpEdit.Text, 16);
+					} catch (OverflowException) {
+						errorLabel.Text = $"Invalid (overflow)";
+						return;
+					} catch (FormatException) {
+						errorLabel.Text = $"Invalid (can't parse)";
+						return;
+					}
+				}
+				errorLabel.Text = $"U+{result:x4}";
+				_charMap.SelectedGlyph = result;
+				var foundIndex = ranges.FindIndex (x => x.Start <= result && x.End >= result);
+				if (foundIndex > -1 && jumpList.SelectedItem != foundIndex) {
+					jumpList.SelectedItem = foundIndex;
+				}
+			};
 
 			//jumpList.Refresh ();
 			_charMap.SetFocus ();
