@@ -186,7 +186,7 @@ namespace Terminal.Gui {
 			IconGetter = DefaultIconGetter;
 			TreeRootGetter = DefaultTreeRootGetter;
 
-			if(ConfigurationManager.UseNerd)
+			if(ConfigurationManager.NerdFonts)
 			{
 				UseNerdForIcons();
 			}

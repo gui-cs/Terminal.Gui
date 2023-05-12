@@ -241,8 +241,8 @@ namespace Terminal.Gui {
 		/// This requires specific font(s) to be installed on the users machine
 		/// to work correctly.  Defaults to <see langword="false"/>.
 		/// </summary>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
-		public static bool UseNerd { get; set; } = false;
+		[SerializableConfigurationProperty (Scope = typeof (ThemeScope), OmitClassName = true)]
+		public static bool NerdFonts { get; set; } = false;
 		
 		/// <summary>
 		/// Initializes the internal state of ConfigurationManager. Nominally called once as part of application
