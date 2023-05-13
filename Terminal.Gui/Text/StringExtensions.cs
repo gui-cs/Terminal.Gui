@@ -149,7 +149,7 @@ public static class StringExtensions {
 	/// </summary>
 	/// <param name="runes">The rune array to convert.</param>
 	/// <returns></returns>
-	public static string Make (Rune [] runes)
+	public static string ToString (Rune [] runes)
 	{
 		var str = string.Empty;
 
@@ -165,7 +165,7 @@ public static class StringExtensions {
 	/// </summary>
 	/// <param name="runes">The List of runes to convert.</param>
 	/// <returns></returns>
-	public static string Make (List<Rune> runes)
+	public static string ToString (List<Rune> runes)
 	{
 		var str = string.Empty;
 		foreach (var rune in runes) {
@@ -175,49 +175,16 @@ public static class StringExtensions {
 	}
 
 	/// <summary>
-	/// Converts a rune into a string.
-	/// </summary>
-	/// <param name="rune">The rune to convert.</param>
-	/// <returns></returns>
-	public static string Make (Rune rune)
-	{
-		return rune.ToString ();
-	}
-
-	/// <summary>
-	/// Converts a numeric value of a rune into a string.
-	/// </summary>
-	/// <param name="rune">The rune to convert.</param>
-	/// <returns></returns>
-	public static string Make (uint rune)
-	{
-		return ((Rune)rune).ToString ();
-	}
-
-	/// <summary>
-	/// Converts a byte array into a string in te provided encoding (default is UTF8)
+	/// Converts a byte array into a string in the provided encoding (default is UTF8)
 	/// </summary>
 	/// <param name="bytes">The byte array to convert.</param>
 	/// <param name="encoding">The encoding to be used.</param>
 	/// <returns></returns>
-	public static string Make (byte [] bytes, Encoding encoding = null)
+	public static string ToString (byte [] bytes, Encoding encoding = null)
 	{
 		if (encoding == null) {
 			encoding = Encoding.UTF8;
 		}
 		return encoding.GetString (bytes);
 	}
-
-	/// <summary>
-	/// Converts a array of characters into a string.
-	/// </summary>
-	/// <param name="chars">The array of characters to convert.</param>
-	/// <returns></returns>
-	public static string Make (params char [] chars)
-	{
-		var c = new char [chars.Length];
-
-		return new string (chars);
-	}
 }
-

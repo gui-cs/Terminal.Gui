@@ -226,7 +226,7 @@ class TestHelpers {
 
 		// Convert Rune list to string
 		for (int r = 0; r < lines.Count; r++) {
-			var line = Terminal.Gui.StringExtensions.Make (lines [r]).ToString ();
+			var line = Terminal.Gui.StringExtensions.ToString (lines [r]).ToString ();
 			if (r == lines.Count - 1) {
 				sb.Append (line);
 			} else {

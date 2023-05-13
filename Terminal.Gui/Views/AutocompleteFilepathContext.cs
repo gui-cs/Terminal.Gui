@@ -30,7 +30,7 @@ namespace Terminal.Gui {
 				return Enumerable.Empty<Suggestion> ();
 			}
 
-			var path = StringExtensions.Make (context.CurrentLine);
+			var path = StringExtensions.ToString (context.CurrentLine);
 			var last = path.LastIndexOfAny (FileDialog.Separators);
 
 			if (string.IsNullOrWhiteSpace (path) || !Path.IsPathRooted (path)) {

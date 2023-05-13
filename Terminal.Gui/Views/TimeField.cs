@@ -174,12 +174,12 @@ namespace Terminal.Gui {
 			newText.Add (key);
 			if (CursorPosition < fieldLen)
 				newText = newText.Concat (text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))).ToList ();
-			return SetText (StringExtensions.Make (newText));
+			return SetText (StringExtensions.ToString (newText));
 		}
 
 		bool SetText (string text)
 		{
-			if (string.IsNullOrEmpty(text)) {
+			if (string.IsNullOrEmpty (text)) {
 				return false;
 			}
 
@@ -260,7 +260,7 @@ namespace Terminal.Gui {
 			if (ReadOnly)
 				return true;
 
-			if (SetText (TextModel.ToRunes (StringExtensions.Make ((Rune)(uint)kb.Key)).First ()))
+			if (SetText (TextModel.ToRunes (((Rune)(uint)kb.Key).ToString ()).First ()))
 				IncCursorPosition ();
 
 			return true;
@@ -336,7 +336,7 @@ namespace Terminal.Gui {
 		/// <param name="args">The event arguments</param>
 		public virtual void OnTimeChanged (DateTimeEventArgs<TimeSpan> args)
 		{
-			TimeChanged?.Invoke (this,args);
+			TimeChanged?.Invoke (this, args);
 		}
 	}
 }

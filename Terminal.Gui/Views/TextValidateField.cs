@@ -232,7 +232,7 @@ namespace Terminal.Gui {
 			/// </summary>
 			public string Pattern {
 				get {
-					return StringExtensions.Make (pattern);
+					return StringExtensions.ToString (pattern);
 				}
 				set {
 					pattern = value.ToRuneList ();
@@ -244,7 +244,7 @@ namespace Terminal.Gui {
 			///<inheritdoc/>
 			public string Text {
 				get {
-					return StringExtensions.Make (text);
+					return StringExtensions.ToString (text);
 				}
 				set {
 					text = value != string.Empty ? value.ToRuneList () : null;
@@ -272,7 +272,7 @@ namespace Terminal.Gui {
 
 			bool Validate (List<Rune> text)
 			{
-				var match = regex.Match (StringExtensions.Make (text).ToString ());
+				var match = regex.Match (StringExtensions.ToString (text));
 				return match.Success;
 			}
 
@@ -353,7 +353,7 @@ namespace Terminal.Gui {
 			/// </summary>
 			private void CompileMask ()
 			{
-				regex = new Regex (StringExtensions.Make (pattern).ToString (), RegexOptions.Compiled);
+				regex = new Regex (StringExtensions.ToString (pattern), RegexOptions.Compiled);
 			}
 		}
 		#endregion

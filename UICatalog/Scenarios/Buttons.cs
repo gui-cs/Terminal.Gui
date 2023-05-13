@@ -194,9 +194,9 @@ namespace UICatalog.Scenarios {
 				var i = runes.IndexOf ((Rune)'_');
 				string start = "";
 				if (i > -1) {
-					start = StringExtensions.Make (runes.GetRange (0, i));
+					start = StringExtensions.ToString (runes.GetRange (0, i));
 				}
-				txt = start + StringExtensions.Make (runes.GetRange (i + 1, runes.Count - (i + 1)));
+				txt = start + StringExtensions.ToString (runes.GetRange (i + 1, runes.Count - (i + 1)));
 
 				runes = txt.ToRuneList ();
 
@@ -207,8 +207,8 @@ namespace UICatalog.Scenarios {
 				}
 
 				// Slip in the '_'
-				start = StringExtensions.Make (runes.GetRange (0, i));
-				return start + '_' + StringExtensions.Make (runes.GetRange (i, runes.Count - i));
+				start = StringExtensions.ToString (runes.GetRange (0, i));
+				return start + '_' + StringExtensions.ToString (runes.GetRange (i, runes.Count - i));
 			}
 
 			var mhkb = "Click to Change th_is Button's Hotkey";

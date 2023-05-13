@@ -198,7 +198,7 @@ namespace Terminal.Gui {
 			newText.Add (key);
 			if (CursorPosition < fieldLen)
 				newText = newText.Concat (text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))).ToList ();
-			return SetText (StringExtensions.Make (newText));
+			return SetText (StringExtensions.ToString (newText));
 		}
 
 		bool SetText (string text)
@@ -341,7 +341,7 @@ namespace Terminal.Gui {
 			if (ReadOnly)
 				return true;
 
-			if (SetText (TextModel.ToRunes (StringExtensions.Make ((Rune)(uint)kb.Key)).First ()))
+			if (SetText (TextModel.ToRunes (((Rune)(uint)kb.Key).ToString ()).First ()))
 				IncCursorPosition ();
 
 			return true;

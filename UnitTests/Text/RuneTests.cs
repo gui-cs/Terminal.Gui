@@ -160,9 +160,12 @@ public class RuneTests {
 
 	[Theory]
 	[InlineData ("\u2615\ufe0f", "☕️", 2, 2, 2)] // \ufe0f forces it to be rendered as a colorful image as compared to a monochrome text variant.
+	[InlineData ("\u1107\u1165\u11b8", "법", 3, 2, 1)] // the letters 법 join to form the Korean word for "rice:" U+BC95 법 (read from top left to bottom right)
+	[InlineData ("\U0001F468\u200D\U0001F469\u200D\U0001F467", "👨‍👩‍👧", 8, 6, 8)] // Man, Woman and Girl emoji.
+	[InlineData ("\u0915\u093f", "कि", 2, 2, 2)] // Hindi "कि" with DEVANAGARI LETTER KA and DEVANAGARI VOWEL SIGN I
 	public void GetColumns_String_Without_SurrogatePair (string code, string str, int codeLength, int runesLength, int stringLength)
 	{
-		Assert.Equal (str, code);
+		Assert.Equal (str, code.Normalize ());
 		Assert.Equal (codeLength, code.Length);
 		Assert.Equal (runesLength, code.EnumerateRunes ().Sum (x => x.GetColumns ()));
 		Assert.Equal (runesLength, str.GetColumns ());
@@ -189,15 +192,11 @@ public class RuneTests {
 	public void GetColumns_GetRuneCount ()
 	{
 		PrintTextElementCount ('\u00e1'.ToString (), "á", 1, 1, 1, 1);
-		PrintTextElementCount (new string (new char [] { '\u0061', '\u0301' }), "á", 1, 2, 2, 1);
-		PrintTextElementCount (StringExtensions.Make ('\u0061', '\u0301'), "á", 1, 2, 2, 1);
-		PrintTextElementCount (StringExtensions.Make ('\u0065', '\u0301'), "é", 1, 2, 2, 1);
-		PrintTextElementCount (StringExtensions.Make (new Rune [] { new Rune (0x1f469), new Rune (0x1f3fd), new Rune ('\u200d'), new Rune (0x1f692) }),
-			"👩🏽‍🚒", 6, 4, 7, 1);
-		PrintTextElementCount (StringExtensions.Make (new Rune [] { new Rune (0x1f469), new Rune (0x1f3fd), new Rune ('\u200d'), new Rune (0x1f692) }),
-			"\U0001f469\U0001f3fd\u200d\U0001f692", 6, 4, 7, 1);
-		PrintTextElementCount (StringExtensions.Make (new Rune ('\ud801', '\udccf')),
-			"𐓏", 1, 1, 2, 1);
+		PrintTextElementCount ("\u0061\u0301", "á", 1, 2, 2, 1);
+		PrintTextElementCount ("\u0061\u0301", "á", 1, 2, 2, 1);
+		PrintTextElementCount ("\u0065\u0301", "é", 1, 2, 2, 1);
+		PrintTextElementCount ("\U0001f469\U0001f3fd\u200d\U0001f692", "👩🏽‍🚒", 6, 4, 7, 1);
+		PrintTextElementCount ("\ud801\udccf", "𐓏", 1, 1, 2, 1);
 	}
 
 	private void PrintTextElementCount (string us, string s, int consoleWidth, int runeCount, int stringCount, int txtElementCount)
@@ -317,7 +316,7 @@ public class RuneTests {
 		}
 		Assert.Equal (us.GetColumns (), colWidth);
 		Assert.Equal (s, rs);
-		Assert.Equal (s, StringExtensions.Make (runes));
+		Assert.Equal (s, StringExtensions.ToString (runes));
 		return true;
 	}
 
@@ -370,9 +369,9 @@ public class RuneTests {
 		var nsRune = new Rune (code2);
 		Assert.Equal (rune1Length, rune.GetColumns ());
 		Assert.Equal (rune2Length, nsRune.GetColumns ());
-		var ul = StringExtensions.Make (rune);
+		var ul = rune.ToString ();
 		Assert.Equal (code1String, ul);
-		var uns = StringExtensions.Make (nsRune);
+		var uns = nsRune.ToString ();
 		Assert.Equal (code2String, uns);
 		var f = $"{rune}{nsRune}".Normalize ();
 		Assert.Equal (f, joinString);
@@ -408,7 +407,7 @@ public class RuneTests {
 				continue;
 			}
 			Rune r = new Rune ((uint)i);
-			string us = StringExtensions.Make (r);
+			string us = r.ToString ();
 			string hex = i.ToString ("x6");
 			int v = int.Parse (hex, System.Globalization.NumberStyles.HexNumber);
 			string s = char.ConvertFromUtf32 (v);
@@ -443,7 +442,7 @@ public class RuneTests {
 	{
 		for (int i = start; i <= end; i++) {
 			Rune r = new Rune ((uint)i);
-			string us = StringExtensions.Make (r);
+			string us = r.ToString ();
 			string hex = i.ToString ("x6");
 			int v = int.Parse (hex, System.Globalization.NumberStyles.HexNumber);
 			string s = char.ConvertFromUtf32 (v);
@@ -520,7 +519,7 @@ public class RuneTests {
 		for (uint h = 0xd800; h <= 0xdbff; h++) {
 			for (uint l = 0xdc00; l <= 0xdfff; l++) {
 				Rune r = new Rune ((char)h, (char)l);
-				string us = StringExtensions.Make (r);
+				string us = r.ToString ();
 				string hex = r.Value.ToString ("x6");
 				int v = int.Parse (hex, System.Globalization.NumberStyles.HexNumber);
 				string s = char.ConvertFromUtf32 (v);
@@ -548,7 +547,7 @@ public class RuneTests {
 			runes.Add (rune);
 			tSize += size;
 		}
-		string result = StringExtensions.Make (runes);
+		string result = StringExtensions.ToString (runes);
 		Assert.Equal (text, result);
 		Assert.Equal (bytesLength, tSize);
 		Assert.Equal (colsLength, result.GetColumns ());
@@ -567,7 +566,7 @@ public class RuneTests {
 			runes.Add (rune);
 			tSize += size;
 		}
-		string result = StringExtensions.Make (runes);
+		string result = StringExtensions.ToString (runes);
 		Assert.Equal (encoded, result);
 		Assert.Equal (bytesLength, tSize);
 		Assert.Equal (colsLength, result.GetColumns ());
@@ -590,7 +589,7 @@ public class RuneTests {
 				Assert.False (RuneExtensions.CanBeEncodedAsRune (Encoding.Unicode.GetBytes (str.ToCharArray ())));
 			}
 		} else if (text is byte []) {
-			str = StringExtensions.Make ((byte [])text);
+			str = StringExtensions.ToString ((byte [])text);
 			if (canBeEncodedAsRune) {
 				Assert.True (RuneExtensions.CanBeEncodedAsRune (Encoding.Unicode.GetBytes (str.ToCharArray ())));
 			} else {
@@ -647,7 +646,7 @@ public class RuneTests {
 		int sumConsoleWidth = 0;
 		for (uint i = 0; i < 32; i++) {
 			sumRuneWidth += ((Rune)i).GetColumns ();
-			sumConsoleWidth += StringExtensions.Make (i).GetColumns ();
+			sumConsoleWidth += ((Rune)i).ToString ().GetColumns ();
 		}
 
 		Assert.Equal (-32, sumRuneWidth);

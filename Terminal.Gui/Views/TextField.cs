@@ -245,7 +245,7 @@ namespace Terminal.Gui {
 			if (obj == null)
 				return;
 
-			Text = StringExtensions.Make (obj?.Lines [obj.CursorPosition.Y]);
+			Text = StringExtensions.ToString (obj?.Lines [obj.CursorPosition.Y]);
 			CursorPosition = obj.CursorPosition.X;
 			Adjust ();
 		}
@@ -304,11 +304,11 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public new string Text {
 			get {
-				return StringExtensions.Make (text);
+				return StringExtensions.ToString (text);
 			}
 
 			set {
-				var oldText = StringExtensions.Make (text);
+				var oldText = StringExtensions.ToString (text);
 
 				if (oldText == value)
 					return;
@@ -568,7 +568,7 @@ namespace Terminal.Gui {
 
 		void SetText (List<Rune> newText)
 		{
-			Text = StringExtensions.Make (newText);
+			Text = StringExtensions.ToString (newText);
 		}
 
 		void SetText (IEnumerable<Rune> newText)
@@ -585,7 +585,7 @@ namespace Terminal.Gui {
 		void SetClipboard (IEnumerable<Rune> text)
 		{
 			if (!Secret)
-				Clipboard.Contents = StringExtensions.Make (text.ToList ());
+				Clipboard.Contents = StringExtensions.ToString (text.ToList ());
 		}
 
 		int oldCursorPos;
@@ -649,7 +649,7 @@ namespace Terminal.Gui {
 			if (!useOldCursorPos) {
 				oldCursorPos = point;
 			}
-			var kbstr = TextModel.ToRunes (StringExtensions.Make ((Rune)(uint)kb.Key));
+			var kbstr = TextModel.ToRunes (((Rune)(uint)kb.Key).ToString ());
 			if (Used) {
 				point++;
 				if (point == newText.Count + 1) {
@@ -906,7 +906,7 @@ namespace Terminal.Gui {
 				Adjust ();
 			} else {
 				var newText = DeleteSelectedText ();
-				Text = StringExtensions.Make (newText);
+				Text = StringExtensions.ToString (newText);
 				Adjust ();
 			}
 		}
@@ -929,7 +929,7 @@ namespace Terminal.Gui {
 				Adjust ();
 			} else {
 				var newText = DeleteSelectedText ();
-				Text = StringExtensions.Make (newText);
+				Text = StringExtensions.ToString (newText);
 				Adjust ();
 			}
 		}
@@ -1129,7 +1129,7 @@ namespace Terminal.Gui {
 				length = Math.Abs (x + direction <= text.Count ? x + direction - selectedStart : text.Count - selectedStart);
 				SetSelectedStartSelectedLength ();
 				if (start > -1 && length > 0) {
-					selectedText = length > 0 ? StringExtensions.Make (text).ToString ().Substring (
+					selectedText = length > 0 ? StringExtensions.ToString (text).ToString ().Substring (
 						start < 0 ? 0 : start, length > text.Count ? text.Count : length) : "";
 					if (first > start) {
 						first = start;
@@ -1189,7 +1189,7 @@ namespace Terminal.Gui {
 
 			Clipboard.Contents = SelectedText;
 			var newText = DeleteSelectedText ();
-			Text = StringExtensions.Make (newText);
+			Text = StringExtensions.ToString (newText);
 			Adjust ();
 		}
 

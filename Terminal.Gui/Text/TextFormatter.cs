@@ -142,7 +142,7 @@ namespace Terminal.Gui {
 					break;
 				}
 			}
-			return StringExtensions.Make (runes);
+			return StringExtensions.ToString (runes);
 		}
 		static string ReplaceCRLFWithSpace (string str)
 		{
@@ -164,7 +164,7 @@ namespace Terminal.Gui {
 					break;
 				}
 			}
-			return StringExtensions.Make (runes);
+			return StringExtensions.ToString (runes);
 		}
 
 		/// <summary>
@@ -184,18 +184,18 @@ namespace Terminal.Gui {
 				end = i;
 				switch (runes [i].Value) {
 				case '\n':
-					lines.Add (StringExtensions.Make (runes.GetRange (start, end - start)));
+					lines.Add (StringExtensions.ToString (runes.GetRange (start, end - start)));
 					i++;
 					start = i;
 					break;
 
 				case '\r':
 					if ((i + 1) < runes.Count && runes [i + 1].Value == '\n') {
-						lines.Add (StringExtensions.Make (runes.GetRange (start, end - start)));
+						lines.Add (StringExtensions.ToString (runes.GetRange (start, end - start)));
 						i += 2;
 						start = i;
 					} else {
-						lines.Add (StringExtensions.Make (runes.GetRange (start, end - start)));
+						lines.Add (StringExtensions.ToString (runes.GetRange (start, end - start)));
 						i++;
 						start = i;
 					}
@@ -203,9 +203,9 @@ namespace Terminal.Gui {
 				}
 			}
 			if (runes.Count > 0 && lines.Count == 0) {
-				lines.Add (StringExtensions.Make (runes));
+				lines.Add (StringExtensions.ToString (runes));
 			} else if (runes.Count > 0 && start < runes.Count) {
-				lines.Add (StringExtensions.Make (runes.GetRange (start, runes.Count - start)));
+				lines.Add (StringExtensions.ToString (runes.GetRange (start, runes.Count - start)));
 			} else {
 				lines.Add ("");
 			}
@@ -281,7 +281,7 @@ namespace Terminal.Gui {
 						start = text.GetRuneCount ();
 						break;
 					}
-					lines.Add (StringExtensions.Make (runes.GetRange (start, end - start)));
+					lines.Add (StringExtensions.ToString (runes.GetRange (start, end - start)));
 					start = end;
 					if (incomplete) {
 						start = text.GetRuneCount ();
@@ -345,7 +345,7 @@ namespace Terminal.Gui {
 							end--;
 						if (end == start)
 							end = start + GetLengthThatFits (runes.GetRange (end, runes.Count - end), width);
-						lines.Add (StringExtensions.Make (runes.GetRange (start, end - start)));
+						lines.Add (StringExtensions.ToString (runes.GetRange (start, end - start)));
 						start = end;
 						if (runes [end].Value == ' ') {
 							start++;
@@ -360,7 +360,7 @@ namespace Terminal.Gui {
 						if (end == start) {
 							end = start + width;
 						}
-						lines.Add (StringExtensions.Make (runes.GetRange (start, end - start)));
+						lines.Add (StringExtensions.ToString (runes.GetRange (start, end - start)));
 						start = end;
 						if (runes [end].Value == ' ') {
 							start++;
@@ -419,7 +419,7 @@ namespace Terminal.Gui {
 			}
 
 			if (start < text.GetRuneCount ()) {
-				lines.Add (StringExtensions.Make (runes.GetRange (start, runes.Count - start)));
+				lines.Add (StringExtensions.ToString (runes.GetRange (start, runes.Count - start)));
 			}
 
 			return lines;
@@ -459,15 +459,15 @@ namespace Terminal.Gui {
 			int slen = runes.Count;
 			if (slen > width) {
 				if (IsHorizontalDirection (textDirection)) {
-					return StringExtensions.Make (runes.GetRange (0, GetLengthThatFits (text, width)));
+					return StringExtensions.ToString (runes.GetRange (0, GetLengthThatFits (text, width)));
 				} else {
-					return StringExtensions.Make (runes.GetRange (0, width));
+					return StringExtensions.ToString (runes.GetRange (0, width));
 				}
 			} else {
 				if (justify) {
 					return Justify (text, width, ' ', textDirection);
 				} else if (IsHorizontalDirection (textDirection) && GetTextWidth (text) > width) {
-					return StringExtensions.Make (runes.GetRange (0, GetLengthThatFits (text, width)));
+					return StringExtensions.ToString (runes.GetRange (0, GetLengthThatFits (text, width)));
 				}
 				return text;
 			}
@@ -601,7 +601,7 @@ namespace Terminal.Gui {
 			for (int i = 0; i < runeCount; i++) {
 				Rune c = runes [i];
 				if (c.Value == '\n') {
-					var wrappedLines = WordWrapText (StringExtensions.Make (runes.GetRange (lp, i - lp)), width, preserveTrailingSpaces, tabWidth, textDirection);
+					var wrappedLines = WordWrapText (StringExtensions.ToString (runes.GetRange (lp, i - lp)), width, preserveTrailingSpaces, tabWidth, textDirection);
 					foreach (var line in wrappedLines) {
 						lineResult.Add (ClipAndJustify (line, width, justify, textDirection));
 					}
@@ -611,7 +611,7 @@ namespace Terminal.Gui {
 					lp = i + 1;
 				}
 			}
-			foreach (var line in WordWrapText (StringExtensions.Make (runes.GetRange (lp, runeCount - lp)), width, preserveTrailingSpaces, tabWidth, textDirection)) {
+			foreach (var line in WordWrapText (StringExtensions.ToString (runes.GetRange (lp, runeCount - lp)), width, preserveTrailingSpaces, tabWidth, textDirection)) {
 				lineResult.Add (ClipAndJustify (line, width, justify, textDirection));
 			}
 
@@ -921,7 +921,7 @@ namespace Terminal.Gui {
 			if (Rune.IsLetterOrDigit (runes [hotPos])) {
 				runes [hotPos] = new Rune ((uint)runes [hotPos].Value);
 			}
-			return StringExtensions.Make (runes);
+			return StringExtensions.ToString (runes);
 		}
 
 		/// <summary>
@@ -1320,7 +1320,7 @@ namespace Terminal.Gui {
 						x = bounds.Right - runesWidth;
 						CursorPosition = bounds.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
 					} else {
-						var runesWidth = GetTextWidth (StringExtensions.Make (runes));
+						var runesWidth = GetTextWidth (StringExtensions.ToString (runes));
 						x = bounds.Right - runesWidth;
 						CursorPosition = bounds.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
 					}
@@ -1338,7 +1338,7 @@ namespace Terminal.Gui {
 						x = bounds.Left + line + ((bounds.Width - runesWidth) / 2);
 						CursorPosition = (bounds.Width - runesWidth) / 2 + (_hotKeyPos > -1 ? _hotKeyPos : 0);
 					} else {
-						var runesWidth = GetTextWidth (StringExtensions.Make (runes));
+						var runesWidth = GetTextWidth (StringExtensions.ToString (runes));
 						x = bounds.Left + (bounds.Width - runesWidth) / 2;
 						CursorPosition = (bounds.Width - runesWidth) / 2 + (_hotKeyPos > -1 ? _hotKeyPos : 0);
 					}

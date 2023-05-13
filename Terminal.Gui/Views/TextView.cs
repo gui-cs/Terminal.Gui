@@ -75,7 +75,7 @@ namespace Terminal.Gui {
 
 		void Append (List<byte> line)
 		{
-			var str = StringExtensions.Make (line.ToArray ());
+			var str = StringExtensions.ToString (line.ToArray ());
 			_lines.Add (ToRunes (str));
 		}
 
@@ -125,7 +125,7 @@ namespace Terminal.Gui {
 		{
 			var sb = new StringBuilder ();
 			for (int i = 0; i < _lines.Count; i++) {
-				sb.Append (StringExtensions.Make (_lines [i]));
+				sb.Append (StringExtensions.ToString (_lines [i]));
 				if ((i + 1) < _lines.Count) {
 					sb.AppendLine ();
 				}
@@ -394,7 +394,7 @@ namespace Terminal.Gui {
 
 			string GetText (List<Rune> x)
 			{
-				var txt = StringExtensions.Make (x).ToString ();
+				var txt = StringExtensions.ToString (x);
 				if (!matchCase) {
 					txt = txt.ToUpper ();
 				}
@@ -406,7 +406,7 @@ namespace Terminal.Gui {
 
 		string ReplaceText (List<Rune> source, string textToReplace, string matchText, int col)
 		{
-			var origTxt = StringExtensions.Make (source);
+			var origTxt = StringExtensions.ToString (source);
 			(int _, int len) = TextModel.DisplaySize (source, 0, col, false);
 			(int _, int len2) = TextModel.DisplaySize (source, col, col + matchText.Length, false);
 			(int _, int len3) = TextModel.DisplaySize (source, col + matchText.Length, origTxt.GetRuneCount (), false);
@@ -437,7 +437,7 @@ namespace Terminal.Gui {
 		{
 			for (int i = start.Y; i < linesCount; i++) {
 				var x = _lines [i];
-				var txt = StringExtensions.Make (x).ToString ();
+				var txt = StringExtensions.ToString (x);
 				if (!matchCase) {
 					txt = txt.ToUpper ();
 				}
@@ -462,7 +462,7 @@ namespace Terminal.Gui {
 		{
 			for (int i = linesCount; i >= 0; i--) {
 				var x = _lines [i];
-				var txt = StringExtensions.Make (x);
+				var txt = StringExtensions.ToString (x);
 				if (!matchCase) {
 					txt = txt.ToUpper ();
 				}
@@ -973,7 +973,7 @@ namespace Terminal.Gui {
 			for (int i = 0; i < Model.Count; i++) {
 				var line = Model.GetLine (i);
 				var wrappedLines = ToListRune (
-					TextFormatter.Format (StringExtensions.Make (line), width, TextAlignment.Left, true, preserveTrailingSpaces, tabWidth));
+					TextFormatter.Format (StringExtensions.ToString (line), width, TextAlignment.Left, true, preserveTrailingSpaces, tabWidth));
 				int sumColWidth = 0;
 				for (int j = 0; j < wrappedLines.Count; j++) {
 					var wrapLine = wrappedLines [j];
@@ -2782,7 +2782,7 @@ namespace Terminal.Gui {
 			foreach (var rune in runes) {
 				offset += rune.Encode (encoded, offset);
 			}
-			return StringExtensions.Make (encoded);
+			return StringExtensions.ToString (encoded);
 		}
 
 		/// <summary>
@@ -4121,7 +4121,7 @@ namespace Terminal.Gui {
 				_copyWithoutSelection = false;
 			} else {
 				var currentLine = GetCurrentLine ();
-				SetClipboard (StringExtensions.Make (currentLine));
+				SetClipboard (StringExtensions.ToString (currentLine));
 				_copyWithoutSelection = true;
 			}
 			UpdateWrapModel ();

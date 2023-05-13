@@ -635,11 +635,11 @@ namespace Terminal.Gui {
 
 				// Support Checked even though CheckType wasn't set
 				if (item.CheckType == MenuItemCheckStyle.Checked && item.Checked == null) {
-					textToDraw = StringExtensions.Make (new Rune [] { nullCheckedChar, (Rune)' ' }) + item.Title;
+					textToDraw = $"{nullCheckedChar} {item.Title}";
 				} else if (item.Checked == true) {
-					textToDraw = StringExtensions.Make (new Rune [] { checkChar, (Rune)' ' }) + item.Title;
+					textToDraw = $"{checkChar} {item.Title}";
 				} else if (item.CheckType.HasFlag (MenuItemCheckStyle.Checked) || item.CheckType.HasFlag (MenuItemCheckStyle.Radio)) {
-					textToDraw = StringExtensions.Make (new Rune [] { uncheckedChar, (Rune)' ' }) + item.Title;
+					textToDraw = $"{uncheckedChar} {item.Title}";
 				} else {
 					textToDraw = item.Title;
 				}

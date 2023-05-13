@@ -1122,7 +1122,7 @@ namespace UICatalog.Scenarios {
 			public object Convert (object value, object parameter = null)
 			{
 				var data = Encoding.ASCII.GetBytes (value.ToString ());
-				return StringExtensions.Make (data);
+				return StringExtensions.ToString (data);
 			}
 		}
 	}
