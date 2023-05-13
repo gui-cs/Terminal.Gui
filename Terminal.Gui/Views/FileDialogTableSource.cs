@@ -6,13 +6,15 @@ namespace Terminal.Gui {
 		readonly FileDialogStyle style;
 		readonly int currentSortColumn;
 		readonly bool currentSortIsAsc;
+		readonly FileDialog dlg;
 		readonly FileDialogState state;
 
-		public FileDialogTableSource (FileDialogState state, FileDialogStyle style, int currentSortColumn, bool currentSortIsAsc)
+		public FileDialogTableSource (FileDialog dlg, FileDialogState state, FileDialogStyle style, int currentSortColumn, bool currentSortIsAsc)
 		{
 			this.style = style;
 			this.currentSortColumn = currentSortColumn;
 			this.currentSortIsAsc = currentSortIsAsc;
+			this.dlg = dlg;
 			this.state = state;
 		}
 
@@ -22,7 +24,8 @@ namespace Terminal.Gui {
 		{
 			switch (col) {
 			case 0:
-				var icon = stats.IsParent ? null : style.IconGetter?.Invoke (stats.FileSystemInfo);
+				var icon = stats.IsParent ? null : style.IconGetter?.Invoke (
+					new FileDialogIconGetterArgs(dlg,stats.FileSystemInfo, FileDialogIconGetterContext.Table));
 				return icon + (stats?.Name ?? string.Empty);
 			case 1:
 				return stats?.HumanReadableLength ?? string.Empty;

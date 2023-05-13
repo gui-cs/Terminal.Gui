@@ -11,6 +11,11 @@
   // null).
   //
   "$schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
+
+  // Set this to true in a .config file to be loaded to cause JSON parsing errors
+  // to throw exceptions. 
+  "ConfigurationManager.ThrowOnJsonErrors": false,
+
   "Application.AlternateBackwardKey": {
     "Key": "PageUp",
     "Modifiers": [
