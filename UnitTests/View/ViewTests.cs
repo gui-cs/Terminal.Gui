@@ -888,7 +888,7 @@ namespace Terminal.Gui.ViewTests {
 			win.Add (label);
 			var top = Application.Top;
 			top.Add (win);
-			Application.Begin (top);
+			var rs = Application.Begin (top);
 
 			Assert.True (label.Visible);
 			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
@@ -901,6 +901,9 @@ namespace Terminal.Gui.ViewTests {
 ", output);
 
 			label.Visible = false;
+
+			bool firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────────────────────────┐
 │                            │
@@ -1363,6 +1366,8 @@ At 0,0
 			bottom.Add (new Label ("222"));
 			v.Add (bottom);
 
+			v.BeginInit ();
+			v.EndInit ();
 			v.LayoutSubviews ();
 			v.Draw ();
 
