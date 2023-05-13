@@ -2151,6 +2151,16 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <inheritdoc/>
+		public override Attribute GetNormalColor ()
+		{
+			ColorScheme cs = ColorScheme;
+			if (ColorScheme == null) {
+				cs = new ColorScheme ();
+			}
+			return Enabled ? cs.Focus : cs.Disabled;
+		}
+
 		/// <summary>
 		/// Sets the driver to the default color for the control where no text is being rendered. Defaults to <see cref="ColorScheme.Normal"/>.
 		/// </summary>
