@@ -25,13 +25,16 @@ namespace Terminal.Gui.ViewsTests {
 
 		private TabView GetTabView (out TabView.Tab tab1, out TabView.Tab tab2, bool initFakeDriver = true)
 		{
-			if (initFakeDriver)
+			if (initFakeDriver) {
 				InitFakeDriver ();
+			}
 
 			var tv = new TabView ();
 			tv.ColorScheme = new ColorScheme ();
 			tv.AddTab (tab1 = new TabView.Tab ("Tab1", new TextField ("hi")), false);
 			tv.AddTab (tab2 = new TabView.Tab ("Tab2", new Label ("hi2")), false);
+			tv.BeginInit ();
+			tv.EndInit ();
 			return tv;
 		}
 
