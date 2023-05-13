@@ -1284,7 +1284,7 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void Single_Smaller_Top_Will_Have_Cleaning_Trails_Chunk_On_Move ()
+		public void Modal_As_Top_Will_Drag_Cleanly ()
 		{
 			var dialog = new Dialog () { Width = 30, Height = 10 };
 			dialog.Add (new Label (

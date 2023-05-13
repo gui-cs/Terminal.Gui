@@ -34,11 +34,11 @@ namespace Terminal.Gui {
 		/// If it's overridden can return other values.</returns>
 		public virtual Attribute GetNormalColor ()
 		{
+			ColorScheme cs = ColorScheme;
 			if (ColorScheme == null) {
-				var cs = new ColorScheme ();
-				return Enabled ? cs.Normal : cs.Disabled;
+				cs = new ColorScheme ();
 			}
-			return Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
+			return Enabled ? cs.Normal : cs.Disabled;
 		}
 
 		/// <summary>

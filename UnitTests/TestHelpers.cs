@@ -36,7 +36,7 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 	/// Only valid if <see cref="ConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.</param>
 	/// <param name="configLocation">Determines what config file locations <see cref="ConfigurationManager"/> will 
 	/// load from.</param>
-	public AutoInitShutdownAttribute (bool autoInit = true, bool autoShutdown = true,
+	public AutoInitShutdownAttribute (bool autoInit = true,
 		Type consoleDriverType = null,
 		bool useFakeClipboard = false,
 		bool fakeClipboardAlwaysThrowsNotSupportedException = false,
@@ -46,7 +46,6 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 		//Assert.True (autoInit == false && consoleDriverType == null);
 
 		AutoInit = autoInit;
-		AutoShutdown = autoShutdown;
 		_driverType = consoleDriverType ?? typeof (FakeDriver);
 		FakeDriver.FakeBehaviors.UseFakeClipboard = useFakeClipboard;
 		FakeDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException = fakeClipboardAlwaysThrowsNotSupportedException;
@@ -56,25 +55,21 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 
 	static bool _init = false;
 	bool AutoInit { get; }
-	bool AutoShutdown { get; }
 	Type _driverType;
 
 	public override void Before (MethodInfo methodUnderTest)
 	{
 		Debug.WriteLine ($"Before: {methodUnderTest.Name}");
-		if (AutoShutdown && _init) {
-			throw new InvalidOperationException ("After did not run when AutoShutdown was specified.");
-		}
 		if (AutoInit) {
 			Application.Init ((ConsoleDriver)Activator.CreateInstance (_driverType));
 			_init = true;
 		}
 	}
-
+	
 	public override void After (MethodInfo methodUnderTest)
 	{
 		Debug.WriteLine ($"After: {methodUnderTest.Name}");
-		if (AutoShutdown) {
+		if (AutoInit) {
 			Application.Shutdown ();
 			_init = false;
 		}

@@ -18,10 +18,10 @@ namespace UICatalog.Scenarios {
 			// A common, alternate, implementation where `this.Win` is not used is below. This code
 			// leverages ConfigurationManager to borrow the color scheme settings from UICatalog:
 			
-			Application.Init ();
-			ConfigurationManager.Themes.Theme = Theme;
-			ConfigurationManager.Apply ();
-			Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
+			//Application.Init ();
+			//ConfigurationManager.Themes.Theme = Theme;
+			//ConfigurationManager.Apply ();
+			//Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
 		}
 
 		public override void Setup ()
@@ -31,13 +31,37 @@ namespace UICatalog.Scenarios {
 			// With a Scenario, after UI Catalog calls `Scenario.Setup` it calls
 			// `Scenario.Run` which calls `Application.Run`. Example:
 
-			var button = new Button ("Press me!") {
-				AutoSize = false,
+			//var button = new Button ("Press me!") {
+			//	AutoSize = false,
+			//	X = Pos.Center (),
+			//	Y = Pos.Center (),
+			//};
+			//Application.Top.Add (button);
+
+
+			var dialog = new Dialog () { Width = 30, Height = 10 };
+			dialog.Add (new Label (
+				"How should I've to react. Cleaning all chunk trails or setting the 'Cols' and 'Rows' to this dialog length?\n" +
+				"Cleaning is more easy to fix this.") {
 				X = Pos.Center (),
 				Y = Pos.Center (),
-			};
-			Application.Top.Add (button);
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				TextAlignment = TextAlignment.Centered,
+				VerticalTextAlignment = VerticalTextAlignment.Middle,
+				AutoSize = false
+			});
 
+			Application.Init ();
+
+			Application.Run (dialog);
+			
+
+		}
+
+		public override void Run ()
+		{
+			//base.Run ();
 		}
 	}
 }

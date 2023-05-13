@@ -749,12 +749,13 @@ namespace Terminal.Gui {
 				Iteration?.Invoke ();
 
 				EnsureModalOrVisibleAlwaysOnTop (state.Toplevel);
-				if ((state.Toplevel != Current && Current?.Modal == true)
-					|| (state.Toplevel != Current && Current?.Modal == false)) {
+				if (state.Toplevel != Current) {
 					OverlappedTop?.OnDeactivate (state.Toplevel);
 					state.Toplevel = Current;
 					OverlappedTop?.OnActivate (state.Toplevel);
 					Top.SetSubViewNeedsDisplay ();
+					Refresh ();
+				} else if (Current.SuperView == null && Current?.Modal == true) {
 					Refresh ();
 				}
 				if (Driver.EnsureCursorVisibility ()) {

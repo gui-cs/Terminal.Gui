@@ -534,7 +534,11 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override Attribute GetNormalColor ()
 		{
-			return Enabled ? ColorScheme.Focus : ColorScheme.Disabled;
+			ColorScheme cs = ColorScheme;
+			if (ColorScheme == null) {
+				cs = new ColorScheme ();
+			}
+			return Enabled ? cs.Focus : cs.Disabled;
 		}
 
 		Attribute GetReadOnlyColor ()

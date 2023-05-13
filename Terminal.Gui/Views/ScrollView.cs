@@ -368,7 +368,7 @@ namespace Terminal.Gui {
 			Clear ();
 
 			if (!ustring.IsNullOrEmpty (Text) || Subviews.Count > 0) {
-				contentView.Draw ();
+				_contentView.Draw ();
 			}
 
 			DrawScrollBars ();

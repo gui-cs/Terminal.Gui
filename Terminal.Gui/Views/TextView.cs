@@ -2699,12 +2699,6 @@ namespace Terminal.Gui {
 				);
 		}
 
-		/// <inheritdoc/>
-		public override Attribute GetNormalColor ()
-		{
-			return Enabled ? ColorScheme.Focus : ColorScheme.Disabled;
-		}
-
 		///<inheritdoc/>
 		public override bool CanFocus {
 			get => base.CanFocus;
