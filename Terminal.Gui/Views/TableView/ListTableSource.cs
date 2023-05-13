@@ -136,7 +136,7 @@ namespace Terminal.Gui {
 			foreach (var t in List) {
 				int l;
 				if (t is string s) {
-					l = TextFormatter.GetTextWidth (s);
+					l = s.GetColumns ();
 				} else {
 					l = t.ToString ().Length;
 				}

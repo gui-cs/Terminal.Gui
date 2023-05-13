@@ -466,7 +466,7 @@ namespace Terminal.Gui {
 			} else {
 				if (justify) {
 					return Justify (text, width, ' ', textDirection);
-				} else if (IsHorizontalDirection (textDirection) && GetTextWidth (text) > width) {
+				} else if (IsHorizontalDirection (textDirection) && text.GetColumns () > width) {
 					return StringExtensions.ToString (runes.GetRange (0, GetLengthThatFits (text, width)));
 				}
 				return text;
@@ -494,7 +494,7 @@ namespace Terminal.Gui {
 			var words = text.Split (' ');
 			int textCount;
 			if (IsHorizontalDirection (textDirection)) {
-				textCount = words.Sum (arg => GetTextWidth (arg));
+				textCount = words.Sum (arg => arg.GetColumns ());
 			} else {
 				textCount = words.Sum (arg => arg.GetRuneCount ());
 			}
@@ -661,16 +661,6 @@ namespace Terminal.Gui {
 		{
 			var result = TextFormatter.SplitNewLine (text);
 			return result.Max (x => x.GetColumns ());
-		}
-
-		/// <summary>
-		/// Gets the number of columns the passed text will use, ignoring newlines and accounting for wide-glyphs (uses <see cref="StringExtensions.GetColumns"/>).
-		/// </summary>
-		/// <param name="text"></param>
-		/// <returns>The text width.</returns>
-		public static int GetTextWidth (string text)
-		{
-			return text.EnumerateRunes ().Sum (r => Math.Max (r.GetColumns (), 1));
 		}
 
 		/// <summary>
@@ -1158,7 +1148,7 @@ namespace Terminal.Gui {
 		public Size GetFormattedSize ()
 		{
 			var lines = Lines;
-			var width = Lines.Max (line => TextFormatter.GetTextWidth (line));
+			var width = Lines.Max (line => line.GetColumns ());
 			var height = Lines.Count;
 			return new Size (width, height);
 		}
@@ -1320,7 +1310,7 @@ namespace Terminal.Gui {
 						x = bounds.Right - runesWidth;
 						CursorPosition = bounds.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
 					} else {
-						var runesWidth = GetTextWidth (StringExtensions.ToString (runes));
+						var runesWidth = StringExtensions.ToString (runes).GetColumns ();
 						x = bounds.Right - runesWidth;
 						CursorPosition = bounds.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
 					}
@@ -1338,7 +1328,7 @@ namespace Terminal.Gui {
 						x = bounds.Left + line + ((bounds.Width - runesWidth) / 2);
 						CursorPosition = (bounds.Width - runesWidth) / 2 + (_hotKeyPos > -1 ? _hotKeyPos : 0);
 					} else {
-						var runesWidth = GetTextWidth (StringExtensions.ToString (runes));
+						var runesWidth = StringExtensions.ToString (runes).GetColumns ();
 						x = bounds.Left + (bounds.Width - runesWidth) / 2;
 						CursorPosition = (bounds.Width - runesWidth) / 2 + (_hotKeyPos > -1 ? _hotKeyPos : 0);
 					}

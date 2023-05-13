@@ -854,7 +854,7 @@ namespace Terminal.Gui {
 				var t = src [i];
 				int l;
 				if (t is string u) {
-					l = TextFormatter.GetTextWidth (u);
+					l = u.GetColumns ();
 				} else if (t is string s) {
 					l = s.Length;
 				} else {
@@ -873,7 +873,7 @@ namespace Terminal.Gui {
 		{
 			var u = TextFormatter.ClipAndJustify (ustr, width, TextAlignment.Left);
 			driver.AddStr (u);
-			width -= TextFormatter.GetTextWidth (u);
+			width -= u.GetColumns ();
 			while (width-- > 0) {
 				driver.AddRune ((Rune)' ');
 			}

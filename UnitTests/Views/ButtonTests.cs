@@ -365,7 +365,7 @@ namespace Terminal.Gui.ViewsTests {
 			};
 			var btnTxt = $"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}";
 
-			btn.X = Pos.AnchorEnd () - Pos.Function (() => TextFormatter.GetTextWidth (btn.TextFormatter.Text));
+			btn.X = Pos.AnchorEnd () - Pos.Function (() => btn.TextFormatter.Text.GetColumns ());
 
 			var win = new Window () {
 				Width = Dim.Fill (),

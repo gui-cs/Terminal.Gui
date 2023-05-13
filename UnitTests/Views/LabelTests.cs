@@ -232,7 +232,7 @@ Test
 				Text = "Say Hello 你",
 				AutoSize = true
 			};
-			label.X = Pos.AnchorEnd () - Pos.Function (() => TextFormatter.GetTextWidth (label.TextFormatter.Text));
+			label.X = Pos.AnchorEnd () - Pos.Function (() => label.TextFormatter.Text.GetColumns ());
 
 			var win = new Window () {
 				Width = Dim.Fill (),

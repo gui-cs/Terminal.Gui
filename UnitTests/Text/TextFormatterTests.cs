@@ -2158,7 +2158,6 @@ namespace Terminal.Gui.TextTests {
 			Assert.False (wrappedLines.Count == text.GetRuneCount ());
 			Assert.False (wrappedLines.Count == text.GetColumns ());
 			Assert.Equal (25, text.GetColumns ());
-			Assert.Equal (25, TextFormatter.GetTextWidth (text));
 		}
 
 		[Fact]
@@ -2227,7 +2226,6 @@ namespace Terminal.Gui.TextTests {
 			Assert.False (wrappedLines.Count == text.GetRuneCount ());
 			Assert.False (wrappedLines.Count == text.GetColumns ());
 			Assert.Equal (25, text.GetColumns ());
-			Assert.Equal (25, TextFormatter.GetTextWidth (text));
 			//var text = string.Empty;
 			//int maxWidth = 1;
 			//int expectedClippedWidth = 1;
@@ -3635,9 +3633,9 @@ namespace Terminal.Gui.TextTests {
 		public void GetTextWidth_Simple_And_Wide_Runes ()
 		{
 			string text = "Hello World";
-			Assert.Equal (11, TextFormatter.GetTextWidth (text));
+			Assert.Equal (11, text.GetColumns ());
 			text = "こんにちは世界";
-			Assert.Equal (14, TextFormatter.GetTextWidth (text));
+			Assert.Equal (14, text.GetColumns ());
 		}
 
 		[Fact]
