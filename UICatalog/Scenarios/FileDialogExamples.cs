@@ -13,7 +13,6 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Files and IO")]
 	public class FileDialogExamples : Scenario {
 		private CheckBox cbMustExist;
-		private CheckBox cbUnicode;
 		private CheckBox cbUseColors;
 		private CheckBox cbCaseSensitive;
 		private CheckBox cbAllowMultipleSelection;
@@ -23,6 +22,7 @@ namespace UICatalog.Scenarios {
 
 		private RadioGroup rgCaption;
 		private RadioGroup rgOpenMode;
+		private RadioGroup rgIcons;
 		private RadioGroup rgAllowedTypes;
 
 		public override void Setup ()
@@ -32,9 +32,6 @@ namespace UICatalog.Scenarios {
 
 			cbMustExist = new CheckBox ("Must Exist") { Checked = true, Y = y++, X = x };
 			Win.Add (cbMustExist);
-
-			cbUnicode = new CheckBox ("UseUnicode") { Checked = FileDialogStyle.DefaultUseUnicodeCharacters, Y = y++, X = x };
-			Win.Add (cbUnicode);
 
 			cbUseColors = new CheckBox ("Use Colors") { Checked = FileDialogStyle.DefaultUseColors, Y = y++, X = x };
 			Win.Add (cbUseColors);
@@ -69,7 +66,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (rgCaption);
 
 			y = 0;
-			x = 37;
+			x = 34;
 
 			Win.Add (new LineView (Orientation.Vertical) {
 				X = x++,
@@ -81,6 +78,23 @@ namespace UICatalog.Scenarios {
 			rgOpenMode = new RadioGroup { X = x, Y = y };
 			rgOpenMode.RadioLabels = new string [] { "File", "Directory", "Mixed" };
 			Win.Add (rgOpenMode);
+
+			y = 0;
+			x = 48;
+
+			Win.Add (new LineView (Orientation.Vertical) {
+				X = x++,
+				Y = 1,
+				Height = 4
+			});
+			Win.Add (new Label ("Icons") { X = x++, Y = y++ });
+
+			rgIcons = new RadioGroup { X = x, Y = y };
+			rgIcons.RadioLabels = new NStack.ustring [] { "None", "Unicode", "Nerd*" };
+			Win.Add (rgIcons);
+
+			Win.Add(new Label("* Requires installing Nerd fonts"){Y = Pos.AnchorEnd(2)});
+			Win.Add(new Label("  (see: https://github.com/devblackops/Terminal-Icons)"){Y = Pos.AnchorEnd(1)});
 
 			y = 5;
 			x = 24;
@@ -137,7 +151,14 @@ namespace UICatalog.Scenarios {
 					fd.FilesSelected += ConfirmOverwrite;
 				}
 
-				fd.Style.UseUnicodeCharacters = cbUnicode.Checked ?? false;
+				if(rgIcons.SelectedItem == 1)
+				{
+					fd.Style.UseUnicodeCharacters = true;
+				}
+				else if(rgIcons.SelectedItem == 2)
+				{
+					fd.Style.UseNerdForIcons();
+				}
 
 				if (cbCaseSensitive.Checked ?? false) {
 
@@ -149,10 +170,12 @@ namespace UICatalog.Scenarios {
 				fd.Style.TreeStyle.ShowBranchLines = cbShowTreeBranchLines.Checked ?? false;
 				fd.Style.TableStyle.AlwaysShowHeaders = cbAlwaysTableShowHeaders.Checked ?? false;
 
+				var dirInfoFactory = new FileSystem().DirectoryInfo;
+
 				if (cbDrivesOnlyInTree.Checked ?? false) {
 					fd.Style.TreeRootGetter = () => {
 						return System.Environment.GetLogicalDrives ()
-						.Select (d => new FileDialogRootTreeNode (d, new DirectoryInfo (d)));
+						.Select (d => new FileDialogRootTreeNode (d, dirInfoFactory.New(d)));
 					};
 				}
 

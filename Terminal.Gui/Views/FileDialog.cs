@@ -12,7 +12,6 @@ using Terminal.Gui.Resources;
 using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui {
-
 	/// <summary>
 	/// Modal dialog for selecting files/directories. Has auto-complete and expandable
 	/// navigation pane (Recent, Root drives etc).
@@ -24,7 +23,7 @@ namespace Terminal.Gui {
 		/// be made before the <see cref="Dialog"/> is loaded and shown to the user for the
 		/// first time.
 		/// </summary>
-		public FileDialogStyle Style { get; } = new FileDialogStyle ();
+		public FileDialogStyle Style { get; }
 
 		/// <summary>
 		/// The maximum number of results that will be collected
@@ -138,6 +137,8 @@ namespace Terminal.Gui {
 		public FileDialog (IFileSystem fileSystem)
 		{
 			this.fileSystem = fileSystem;
+			Style = new FileDialogStyle (fileSystem);
+
 			this.btnOk = new Button (Style.OkButtonText) {
 				Y = Pos.AnchorEnd (1),
 				X = Pos.Function (() =>
@@ -259,8 +260,9 @@ namespace Terminal.Gui {
 				Height = Dim.Fill (),
 			};
 
-			this.treeView.TreeBuilder = new FileDialogTreeBuilder ();
-			this.treeView.AspectGetter = (m) => m is IDirectoryInfo d ? d.Name : m.ToString ();
+			var fileDialogTreeBuilder = new FileDialogTreeBuilder (this);
+			this.treeView.TreeBuilder = fileDialogTreeBuilder;
+			this.treeView.AspectGetter = fileDialogTreeBuilder.AspectGetter;
 			this.Style.TreeStyle = treeView.Style;
 
 			this.treeView.SelectionChanged += this.TreeView_SelectionChanged;
@@ -1139,7 +1141,7 @@ namespace Terminal.Gui {
 			if (this.State == null) {
 				return;
 			}
-			this.tableView.Table = new FileDialogTableSource (this.State, this.Style, currentSortColumn, currentSortIsAsc);
+			this.tableView.Table = new FileDialogTableSource (this, this.State, this.Style, currentSortColumn, currentSortIsAsc);
 
 			this.ApplySort ();
 			this.tableView.Update ();
@@ -1267,7 +1269,7 @@ namespace Terminal.Gui {
 		{
 			this.GetProposedNewSortOrder (clickedCol, out var isAsc);
 			this.SortColumn (clickedCol, isAsc);
-			this.tableView.Table = new FileDialogTableSource (State, Style, currentSortColumn, currentSortIsAsc);
+			this.tableView.Table = new FileDialogTableSource (this, State, Style, currentSortColumn, currentSortIsAsc);
 		}
 
 		internal void SortColumn (int col, bool isAsc)
