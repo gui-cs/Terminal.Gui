@@ -640,7 +640,9 @@ namespace Terminal.Gui {
 				if (searchset?.Count > 0) {
 					listview.TabStop = true;
 					listview.SetFocus ();
-					SetValue (searchset [listview.SelectedItem]);
+					if (listview.SelectedItem > -1) {
+						SetValue (searchset [listview.SelectedItem]);
+					}
 				} else {
 					listview.TabStop = false;
 					SuperView?.FocusNext ();
