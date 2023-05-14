@@ -153,7 +153,6 @@ namespace Terminal.Gui {
 
 		internal static bool _initialized = false;
 		internal static int _mainThreadId = -1;
-		private static bool? _useSystemConsole;
 
 		// INTERNAL function for initializing an app with a Toplevel factory object, driver, and mainloop.
 		//
@@ -182,9 +181,6 @@ namespace Terminal.Gui {
 				Driver = driver;
 			}
 
-			// @tig this is a hack to restore the UseSystemConsole take from the args
-			_useSystemConsole = _useSystemConsole == null ? UseSystemConsole : _useSystemConsole;
-
 			// Start the process of configuration management.
 			// Note that we end up calling LoadConfigurationFromAllSources
 			// multiple times. We need to do this because some settings are only
@@ -192,10 +188,6 @@ namespace Terminal.Gui {
 			// `Settings` so we can determine which driver to use.
 			ConfigurationManager.Load (true);
 			ConfigurationManager.Apply ();
-
-			if (UseSystemConsole != _useSystemConsole) {
-				UseSystemConsole = (bool)_useSystemConsole;
-			}
 
 			if (Driver == null) {
 				var p = Environment.OSVersion.Platform;
