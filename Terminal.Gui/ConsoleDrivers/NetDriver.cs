@@ -195,12 +195,13 @@ namespace Terminal.Gui {
 						isEscSeq = false;
 						break;
 					}
-				} else if (consoleKeyInfo.KeyChar == (char)Key.Esc && isEscSeq) {
+				} else if (consoleKeyInfo.KeyChar == (char)Key.Esc && isEscSeq && cki != null) {
 					DecodeEscSeq (ref newConsoleKeyInfo, ref key, cki, ref mod);
 					cki = null;
 					break;
 				} else {
 					GetConsoleInputType (consoleKeyInfo);
+					isEscSeq = false;
 					break;
 				}
 			}
