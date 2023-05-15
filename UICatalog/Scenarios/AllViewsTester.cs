@@ -84,6 +84,7 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (0),
 				AllowsMarking = false,
 				ColorScheme = Colors.TopLevel,
+				SelectedItem = 0
 			};
 			_classListView.OpenSelectedItem += (s, a) => {
 				_settingsPane.SetFocus ();
@@ -137,7 +138,7 @@ namespace UICatalog.Scenarios {
 			_xText = new TextField ($"{_xVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
 			_xText.TextChanged += (s, args) => {
 				try {
-					_xVal = int.Parse (_xText.Text.ToString ());
+					_xVal = int.Parse (_xText.Text);
 					DimPosChanged (_curView);
 				} catch {
 
@@ -153,7 +154,7 @@ namespace UICatalog.Scenarios {
 			_yText = new TextField ($"{_yVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
 			_yText.TextChanged += (s,args) => {
 				try {
-					_yVal = int.Parse (_yText.Text.ToString ());
+					_yVal = int.Parse (_yText.Text);
 					DimPosChanged (_curView);
 				} catch {
 
@@ -187,11 +188,11 @@ namespace UICatalog.Scenarios {
 				try {
 					switch (_wRadioGroup.SelectedItem) {
 					case 0:
-						_wVal = Math.Min (int.Parse (_wText.Text.ToString ()), 100);
+						_wVal = Math.Min (int.Parse (_wText.Text), 100);
 						break;
 					case 1:
 					case 2:
-						_wVal = int.Parse (_wText.Text.ToString ());
+						_wVal = int.Parse (_wText.Text);
 						break;
 					}
 					DimPosChanged (_curView);
@@ -210,11 +211,11 @@ namespace UICatalog.Scenarios {
 				try {
 					switch (_hRadioGroup.SelectedItem) {
 					case 0:
-						_hVal = Math.Min (int.Parse (_hText.Text.ToString ()), 100);
+						_hVal = Math.Min (int.Parse (_hText.Text), 100);
 						break;
 					case 1:
 					case 2:
-						_hVal = int.Parse (_hText.Text.ToString ());
+						_hVal = int.Parse (_hText.Text);
 						break;
 					}
 					DimPosChanged (_curView);
@@ -340,7 +341,7 @@ namespace UICatalog.Scenarios {
 
 		void UpdateTitle (View view)
 		{
-			_hostPane.Title = $"{view.GetType ().Name} - {view.X.ToString ()}, {view.Y.ToString ()}, {view.Width.ToString ()}, {view.Height.ToString ()}";
+			_hostPane.Title = $"{view.GetType ().Name} - {view.X}, {view.Y}, {view.Width}, {view.Height}";
 		}
 
 		List<Type> GetAllViewClassesCollection ()
