@@ -237,10 +237,10 @@ namespace Terminal.Gui {
 			var file = args.File;
 
 			if (file is IDirectoryInfo) {
-				return UseUnicodeCharacters ? "\ua909 " : "\\";
+				return UseUnicodeCharacters ? ConfigurationManager.Glyphs.Folder + " " : "\\";
 			}
 
-			return UseUnicodeCharacters ? "\u2630 " : "";
+			return UseUnicodeCharacters ?  ConfigurationManager.Glyphs.File + " " : "";
 
 		}
 
