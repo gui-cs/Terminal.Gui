@@ -237,7 +237,7 @@ namespace Terminal.Gui {
 			var file = args.File;
 
 			if (file is IDirectoryInfo) {
-				return UseUnicodeCharacters ? ConfigurationManager.Glyphs.Folder + " " : "\\";
+				return UseUnicodeCharacters ? ConfigurationManager.Glyphs.Folder + " " : Path.DirectorySeparatorChar.ToString();
 			}
 
 			return UseUnicodeCharacters ?  ConfigurationManager.Glyphs.File + " " : "";
