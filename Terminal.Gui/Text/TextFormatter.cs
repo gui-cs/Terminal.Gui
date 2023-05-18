@@ -345,10 +345,16 @@ namespace Terminal.Gui {
 							end--;
 						if (end == start)
 							end = start + GetLengthThatFits (runes.GetRange (end, runes.Count - end), width);
-						lines.Add (StringExtensions.ToString (runes.GetRange (start, end - start)));
-						start = end;
-						if (runes [end].Value == ' ') {
-							start++;
+						var str = StringExtensions.ToString (runes.GetRange (start, end - start));
+						if (end > start && str.GetColumns () <= width) {
+							lines.Add (str);
+							start = end;
+							if (runes [end].Value == ' ') {
+								start++;
+							}
+						} else {
+							end++;
+							start = end;
 						}
 					}
 
@@ -419,7 +425,10 @@ namespace Terminal.Gui {
 			}
 
 			if (start < text.GetRuneCount ()) {
-				lines.Add (StringExtensions.ToString (runes.GetRange (start, runes.Count - start)));
+				var str = StringExtensions.ToString (runes.GetRange (start, runes.Count - start));
+				if (IsVerticalDirection (textDirection) || preserveTrailingSpaces || (!preserveTrailingSpaces && str.GetColumns () <= width)) {
+					lines.Add (str);
+				}
 			}
 
 			return lines;
