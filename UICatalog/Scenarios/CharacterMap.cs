@@ -88,11 +88,12 @@ namespace UICatalog.Scenarios {
 					}
 				}
 				errorLabel.Text = $"U+{result:x4}";
-				_charMap.SelectedGlyph = result;
 				var foundIndex = ranges.FindIndex (x => x.Start <= result && x.End >= result);
 				if (foundIndex > -1 && jumpList.SelectedItem != foundIndex) {
 					jumpList.SelectedItem = foundIndex;
 				}
+				// Ensure the typed glyph is elected after jumpList
+				_charMap.SelectedGlyph = result;
 			};
 
 			//jumpList.Refresh ();
