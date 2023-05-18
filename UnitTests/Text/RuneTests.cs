@@ -162,7 +162,9 @@ public class RuneTests {
 	[InlineData ("\u2615\ufe0f", "☕️", 2, 2, 2)] // \ufe0f forces it to be rendered as a colorful image as compared to a monochrome text variant.
 	[InlineData ("\u1107\u1165\u11b8", "법", 3, 2, 1)] // the letters 법 join to form the Korean word for "rice:" U+BC95 법 (read from top left to bottom right)
 	[InlineData ("\U0001F468\u200D\U0001F469\u200D\U0001F467", "👨‍👩‍👧", 8, 6, 8)] // Man, Woman and Girl emoji.
-	[InlineData ("\u0915\u093f", "कि", 2, 2, 2)] // Hindi "कि" with DEVANAGARI LETTER KA and DEVANAGARI VOWEL SIGN I
+	[InlineData ("\u0915\u093f", "कि", 2, 2, 2)] // Hindi कि with DEVANAGARI LETTER KA and DEVANAGARI VOWEL SIGN I
+	[InlineData ("\u0e4d\u0e32", "ํา", 2, 1, 2)] // Decomposition: ํ (U+0E4D) - า (U+0E32) = U+0E33 ำ Thai Character Sara Am
+	[InlineData ("\u0e33", "ำ", 1, 1, 1)] // Decomposition: ํ (U+0E4D) - า (U+0E32) = U+0E33 ำ Thai Character Sara Am
 	public void GetColumns_String_Without_SurrogatePair (string code, string str, int codeLength, int runesLength, int stringLength)
 	{
 		Assert.Equal (str, code.Normalize ());
