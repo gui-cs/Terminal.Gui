@@ -119,7 +119,7 @@ namespace Terminal.Gui {
 			if (Host != null && (_contentBottomRightCorner == null && OtherScrollBarView == null
 				|| (_contentBottomRightCorner == null && OtherScrollBarView != null && OtherScrollBarView._contentBottomRightCorner == null))) {
 
-				_contentBottomRightCorner = new View (" ") {
+				_contentBottomRightCorner = new View () {
 					Id = "contentBottomRightCorner",
 					Visible = Host.Visible,
 					ClearOnVisibleFalse = false,
@@ -135,7 +135,13 @@ namespace Terminal.Gui {
 				_contentBottomRightCorner.Width = 1;
 				_contentBottomRightCorner.Height = 1;
 				_contentBottomRightCorner.MouseClick += ContentBottomRightCorner_MouseClick;
+				_contentBottomRightCorner.DrawContent += _contentBottomRightCorner_DrawContent;
 			}
+		}
+
+		private void _contentBottomRightCorner_DrawContent (object sender, DrawEventArgs e)
+		{
+			Driver.SetAttribute (Host.HasFocus ? ColorScheme.Focus : GetNormalColor ());
 		}
 
 		private void Host_VisibleChanged (object sender, EventArgs e)
