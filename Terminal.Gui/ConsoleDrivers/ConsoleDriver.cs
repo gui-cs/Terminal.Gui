@@ -685,6 +685,7 @@ namespace Terminal.Gui {
 	/// There are currently three implementations: <see cref="CursesDriver"/> (for Unix and Mac), <see cref="WindowsDriver"/>, and <see cref="NetDriver"/> that uses the .NET Console API.
 	/// </summary>
 	public abstract class ConsoleDriver {
+
 		/// <summary>
 		/// The handler fired when the terminal is resized.
 		/// </summary>

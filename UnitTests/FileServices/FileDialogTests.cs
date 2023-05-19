@@ -392,7 +392,7 @@ namespace Terminal.Gui.FileServicesTests {
  ││Filename (▲)│Size      │Modified                      │Type     ││
  │├────────────┼──────────┼──────────────────────────────┼─────────┤│
  ││..          │          │                              │dir      ││
- ││\subfolder  │          │2002-01-01T22:42:10           │dir      ││
+ ││/subfolder  │          │2002-01-01T22:42:10           │dir      ││
  ││image.gif   │4.00 bytes│2002-01-01T22:42:10           │.gif     ││
  ││jQuery.js   │7.00 bytes│2001-01-01T11:44:42           │.js      ││
  │                                                                  │
