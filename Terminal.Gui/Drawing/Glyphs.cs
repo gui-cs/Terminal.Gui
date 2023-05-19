@@ -137,10 +137,10 @@ namespace Terminal.Gui {
 		public Rune Collapse { get; set; } = (Rune)'-';
 
 		/// <summary>
-		/// Apple. Because snek.
+		/// Apple. Because snek. And because it's an example of a surrogate pair
 		/// </summary>
-		public Rune Apple { get; set; } = (Rune)'❦' ; // BUGBUG: "🍎"[0] should work, but doesn't 
-
+		public Rune Apple { get; set; } = "🍎".ToRunes () [0];
+	
 		#endregion
 
 		#region ----------------- Lines -----------------
