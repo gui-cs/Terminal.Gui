@@ -146,12 +146,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Folder icon.  Defaults to ꤉ (Kayah Li Digit Nine)
 		/// </summary>
-		public Rune Folder { get; set; } = '꤉';
+		public Rune Folder { get; set; } = (Rune)'꤉';
 
 		/// <summary>
 		/// File icon.  Defaults to ☰ (Trigram For Heaven)
 		/// </summary>
-		public Rune File { get; set; } = '☰';
+		public Rune File { get; set; } = (Rune)'☰';
 
 		#region ----------------- Lines -----------------
 		/// <summary>
