@@ -266,7 +266,7 @@ class CharMap : ScrollView {
 	int _start = 0;
 	int _selected = 0;
 
-	public const int COLUMN_WIDTH = 2;
+	public const int COLUMN_WIDTH = 3;
 	public const int ROW_HEIGHT = 1;
 
 	public static int MaxCodePoint => 0x10FFFF;
