@@ -482,6 +482,8 @@ namespace Terminal.Gui.FileServicesTests {
 		}
 
 		[Theory]
+		[InlineData (".csv", null, false)]
+		[InlineData (".csv", "", false)]
 		[InlineData (".csv", "c:\\MyFile.csv", true)]
 		[InlineData (".csv", "c:\\MyFile.CSV", true)]
 		[InlineData (".csv", "c:\\MyFile.csv.bak", false)]
