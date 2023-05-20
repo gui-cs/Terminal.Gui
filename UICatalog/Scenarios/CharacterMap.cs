@@ -253,6 +253,8 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
+		private Point _cursorPos;
+
 		public override void OnDrawContentComplete (Rect contentArea)
 		{
 			Rect viewport = new Rect (ContentOffset,
@@ -295,6 +297,7 @@ namespace UICatalog.Scenarios {
 						Move (firstColumnX + (col * COLUMN_WIDTH) + 1, y + 1);
 						if (glyph == SelectedGlyph) {
 							Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
+							_cursorPos = new Point (firstColumnX + (col * COLUMN_WIDTH) + 1, y + 1);
 						} else {
 							Driver.SetAttribute (GetNormalColor ());
 						}
@@ -307,6 +310,18 @@ namespace UICatalog.Scenarios {
 				}
 			}
 			Driver.Clip = oldClip;
+		}
+
+		public override void PositionCursor ()
+		{
+			if (_cursorPos.Y < Bounds.Height && SelectedGlyph >= -ContentOffset.Y + _cursorPos.Y - 1
+				&& SelectedGlyph <= (-ContentOffset.Y + _cursorPos.Y - (ShowHorizontalScrollIndicator ? 1 : 0)) * 16 - 1) {
+
+				Application.Driver.SetCursorVisibility (CursorVisibility.Default);
+				Move (_cursorPos.X, _cursorPos.Y);
+			} else {
+				Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+			}
 		}
 
 		ContextMenu _contextMenu = new ContextMenu ();
