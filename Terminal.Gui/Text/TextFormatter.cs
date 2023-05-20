@@ -10,19 +10,20 @@ namespace Terminal.Gui {
 	/// </summary>
 	public enum TextAlignment {
 		/// <summary>
-		/// Aligns the text to the left of the frame.
+		/// The text will be left-aligned.
 		/// </summary>
 		Left,
 		/// <summary>
-		/// Aligns the text to the right side of the frame.
+		/// The text will be right-aligned.
 		/// </summary>
 		Right,
 		/// <summary>
-		/// Centers the text in the frame.
+		/// The text will be centered horizontally.
 		/// </summary>
 		Centered,
 		/// <summary>
-		/// Shows the text as justified text in the frame.
+		/// The text will be justified (spaces will be added to existing spaces such that
+		/// the text fills the container horizontally).
 		/// </summary>
 		Justified
 	}
@@ -32,19 +33,20 @@ namespace Terminal.Gui {
 	/// </summary>
 	public enum VerticalTextAlignment {
 		/// <summary>
-		/// Aligns the text to the top of the frame.
+		/// The text will be top-aligned.
 		/// </summary>
 		Top,
 		/// <summary>
-		/// Aligns the text to the bottom of the frame.
+		/// The text will be bottom-aligned.
 		/// </summary>
 		Bottom,
 		/// <summary>
-		/// Centers the text verticaly in the frame.
+		/// The text will centered vertically.
 		/// </summary>
 		Middle,
 		/// <summary>
-		/// Shows the text as justified text in the frame.
+		/// The text will be justified (spaces will be added to existing spaces such that
+		/// the text fills the container vertically).
 		/// </summary>
 		Justified
 	}
@@ -110,7 +112,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Provides text formatting capabilities for console apps. Supports, hotkeys, horizontal alignment, multiple lines, and word-based line wrap.
+	/// Provides text formatting. Supports <see cref="View.HotKey"/>s, horizontal alignment, vertical alignment, multiple lines, and word-based line wrap.
 	/// </summary>
 	public class TextFormatter {
 
@@ -956,7 +958,6 @@ namespace Terminal.Gui {
 		TextAlignment _textAlignment;
 		VerticalTextAlignment _textVerticalAlignment;
 		TextDirection _textDirection;
-		Attribute _textColor = -1;
 		Key _hotKey;
 		int _hotKeyPos = -1;
 		Size _size;
@@ -967,7 +968,7 @@ namespace Terminal.Gui {
 		public event EventHandler<KeyChangedEventArgs> HotKeyChanged;
 
 		/// <summary>
-		///   The text to be displayed. This text is never modified.
+		///   The text to be displayed. This string is never modified.
 		/// </summary>
 		public virtual string Text {
 			get => _text;

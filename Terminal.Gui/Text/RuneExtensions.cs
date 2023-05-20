@@ -42,6 +42,7 @@ public static class RuneExtensions {
 		/* if we arrive here, ucs is not a combining or C0/C1 control character */
 		return 1 + (BiSearch (codePoint, _combiningWideChars, _combiningWideChars.GetLength (0) - 1) != 0 ? 1 : 0);
 	}
+	
 	/// <summary>
 	/// Returns <see langword="true"/> if the rune is a combining character.
 	/// </summary>
@@ -180,7 +181,7 @@ public static class RuneExtensions {
 	}
 
 	// ---------------- implementation details ------------------
-	// TODO: Can this be handled by the new .NET 8 Rune type.
+	// TODO: Can this be handled by the new .NET 8 Rune type?
 	static readonly int [,] _combining = new int [,] {
 		{ 0x0300, 0x036F }, { 0x0483, 0x0486 }, { 0x0488, 0x0489 },
 		{ 0x0591, 0x05BD }, { 0x05BF, 0x05BF }, { 0x05C1, 0x05C2 },
