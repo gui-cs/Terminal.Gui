@@ -84,7 +84,7 @@ public class CharacterMap : Scenario {
 			}
 		};
 
-		var longestName = UnicodeRange.Ranges.Max (r => r.Category.GetColumns());
+		var longestName = UnicodeRange.Ranges.Max (r => r.Category.GetColumns ());
 		_categoryList.Style.ColumnStyles.Add (0, new ColumnStyle () { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName });
 		_categoryList.Style.ColumnStyles.Add (1, new ColumnStyle () { MaxWidth = 1, MinWidth = 6 });
 		_categoryList.Style.ColumnStyles.Add (2, new ColumnStyle () { MaxWidth = 1, MinWidth = 6 });
@@ -183,7 +183,7 @@ public class CharacterMap : Scenario {
 		_categoryList.SelectedRow = table.Data
 			.Select ((item, index) => new { item, index })
 			.FirstOrDefault (x => x.item.Start <= result && x.item.End >= result)?.index ?? -1;
-		_categoryList.EnsureSelectedCellIsVisible();
+		_categoryList.EnsureSelectedCellIsVisible ();
 
 		// Ensure the typed glyph is selected 
 		_charMap.SelectedCodePoint = (int)result;
