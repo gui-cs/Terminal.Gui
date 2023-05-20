@@ -45,27 +45,17 @@ public class CharacterMap : Scenario {
 		Win.Add (jumpEdit);
 		_errorLabel = new Label ("") { X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap), ColorScheme = Colors.ColorSchemes ["error"] };
 		Win.Add (_errorLabel);
-		jumpEdit.TextChanged += JumpEdit_TextChanged;
-		var rangeItems = new (ustring label, int start, int end) [UnicodeRange.Ranges.Count];
-
-		for (var i = 0; i < UnicodeRange.Ranges.Count; i++) {
-			var range = UnicodeRange.Ranges [i];
-			rangeItems [i] = CreateRangeItem (range.Category, range.Start, range.End);
-		}
-		static (ustring label, int start, int end) CreateRangeItem (ustring title, int start, int end)
-		{
-			return ($"{title} (U+{start:x5}-{end:x5})", start, end);
-		}
 
 		var jumpList = new TableView () {
 			X = Pos.Right (_charMap),
 			Y = Pos.Bottom (jumpLabel),
-			Width = rangeItems.Max (r => r.label.Length) + 19,
+			Width = UnicodeRange.Ranges.Max (r => r.Category.Length) + 19,
 			Height = Dim.Fill ()
 		};
 		jumpList.Table = new EnumerableTableSource<UnicodeRange> (UnicodeRange.Ranges, new Dictionary<string, Func<UnicodeRange, object>> () {
 			{ "Category", (s) => s.Category },
-			{ "Range", (s) => ($"(U+{s.Start:x5}-{s.End:x5})") },
+			{ "Start", (s) => ($"{s.Start:x5}") },
+			{ "End", (s) => ($"{s.End:x5}") },
 		});
 
 		jumpList.FullRowSelect = true;
@@ -86,24 +76,34 @@ public class CharacterMap : Scenario {
 				switch (clickedCol.Value) {
 				case 0:
 					jumpList.Table = new EnumerableTableSource<UnicodeRange> (UnicodeRange.Ranges.OrderBy (r => r.Category), new Dictionary<string, Func<UnicodeRange, object>> () {
-							{ "Category", (s) => s.Category },
-							{ "Range", (s) => ($"(U+{s.Start:x5}-{s.End:x5})") },
+						{ "Category", (s) => s.Category },
+						{ "Start", (s) => ($"{s.Start:x5}") },
+						{ "End", (s) => ($"{s.End:x5}") },
 						});
 					break;
 				case 1:
 					jumpList.Table = new EnumerableTableSource<UnicodeRange> (UnicodeRange.Ranges.OrderBy (r => r.Start), new Dictionary<string, Func<UnicodeRange, object>> () {
-							{ "Category", (s) => s.Category },
-							{ "Range", (s) => ($"(U+{s.Start:x5}-{s.End:x5})") },
+						{ "Category", (s) => s.Category },
+						{ "Start", (s) => ($"{s.Start:x5}") },
+						{ "End", (s) => ($"{s.End:x5}") },
 						});
+					break;
+				case 2:
+					jumpList.Table = new EnumerableTableSource<UnicodeRange> (UnicodeRange.Ranges.OrderBy (r => r.End), new Dictionary<string, Func<UnicodeRange, object>> () {
+						{ "Category", (s) => s.Category },
+						{ "Start", (s) => ($"{s.Start:x5}") },
+						{ "End", (s) => ($"{s.End:x5}") },
+					});
 					break;
 				}
 			}
 		};
 
 
-		var longestName = rangeItems.Max (s => s.label.ConsoleWidth);
+		var longestName = UnicodeRange.Ranges.Max (r => r.Category.Length);
 		jumpList.Style.ColumnStyles.Add (0, new ColumnStyle () { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName });
-		jumpList.Style.ColumnStyles.Add (1, new ColumnStyle () { MaxWidth = 1 });
+		jumpList.Style.ColumnStyles.Add (1, new ColumnStyle () { MaxWidth = 1, MinWidth = 7 });
+		jumpList.Style.ColumnStyles.Add (2, new ColumnStyle () { MaxWidth = 1, MinWidth = 7 });
 
 		jumpList.SelectedCellChanged += (s, args) => {
 			EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)jumpList.Table;
