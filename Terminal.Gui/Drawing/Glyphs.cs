@@ -142,7 +142,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Apple. Because snek. And because it's an example of a surrogate pair
 		/// </summary>
-		public Rune Apple { get; set; } = "🍎".ToRunes () [0];
+		public Rune Apple { get; set; } = (Rune)'❦'; //  "🍎".ToRunes () [0]; // nonBMP
 
 		#endregion
 
