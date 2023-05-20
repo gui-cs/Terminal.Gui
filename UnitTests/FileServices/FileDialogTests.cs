@@ -481,6 +481,35 @@ namespace Terminal.Gui.FileServicesTests {
 			};
 		}
 
+		[Theory]
+		[InlineData (".csv", "c:\\MyFile.csv", true)]
+		[InlineData (".csv", "c:\\MyFile.CSV", true)]
+		[InlineData (".csv", "c:\\MyFile.csv.bak", false)]
+		public void TestAllowedType_Basic(string allowed, string candidate, bool expected)
+		{
+			Assert.Equal (expected, new AllowedType ("Test", allowed).IsAllowed (candidate));
+		}
+
+		[Theory]
+		[InlineData ("Dockerfile", "c:\\temp\\Dockerfile", true)]
+		[InlineData ("Dockerfile", "Dockerfile", true)]
+		[InlineData ("Dockerfile", "someimg.Dockerfile", true)]
+		public void TestAllowedType_SpecificFile(string allowed, string candidate, bool expected)
+		{
+			Assert.Equal (expected, new AllowedType ("Test", allowed).IsAllowed (candidate));
+		}
+
+		[Theory]
+		[InlineData (".Designer.cs", "c:\\MyView.Designer.cs", true)]
+		[InlineData (".Designer.cs", "c:\\temp/MyView.Designer.cs", true)]
+		[InlineData(".Designer.cs","MyView.Designer.cs",true)]
+		[InlineData (".Designer.cs", "c:\\MyView.DESIGNER.CS", true)]
+		[InlineData (".Designer.cs", "MyView.cs", false)]
+		public void TestAllowedType_DoubleBarreled (string allowed, string candidate, bool expected)
+		{
+			Assert.Equal (expected, new AllowedType ("Test", allowed).IsAllowed (candidate));
+		}
+
 		[Theory, AutoInitShutdown]
 		[InlineData (true)]
 		[InlineData (false)]
