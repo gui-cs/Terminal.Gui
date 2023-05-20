@@ -46,6 +46,8 @@ public class CharacterMap : Scenario {
 		_errorLabel = new Label ("") { X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap), ColorScheme = Colors.ColorSchemes ["error"] };
 		Win.Add (_errorLabel);
 
+		jumpEdit.TextChanged += JumpEdit_TextChanged;
+
 		var jumpList = new TableView () {
 			X = Pos.Right (_charMap),
 			Y = Pos.Bottom (jumpLabel),
@@ -117,6 +119,11 @@ public class CharacterMap : Scenario {
 		_charMap.SetFocus ();
 
 		_charMap.Width = Dim.Fill () - jumpList.Width;
+	}
+
+	private void JumpEdit_TextChanged1 (object sender, TextChangedEventArgs e)
+	{
+		throw new NotImplementedException ();
 	}
 
 	private void JumpEdit_TextChanged (object sender, TextChangedEventArgs e)
