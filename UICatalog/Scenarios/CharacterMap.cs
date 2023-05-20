@@ -165,7 +165,14 @@ class CharMap : ScrollView {
 		var row = (int)_selected / 16;
 		var col = (((int)_selected - (row * 16)) * COLUMN_WIDTH);
 
-		Move (col + ContentOffset.X + RowLabelWidth + 1, row + ContentOffset.Y + 1);
+		if (col + ContentOffset.X + RowLabelWidth + 1 >= RowLabelWidth && col + ContentOffset.X + RowLabelWidth + 1 < Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0)
+										&& row + ContentOffset.Y + 1 > 0 && row + ContentOffset.Y + 1 < Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0)) {
+
+			Driver.SetCursorVisibility (CursorVisibility.Default);
+			Move (col + ContentOffset.X + RowLabelWidth + 1, row + ContentOffset.Y + 1);
+		} else {
+			Driver.SetCursorVisibility (CursorVisibility.Invisible);
+		}
 	}
 
 
