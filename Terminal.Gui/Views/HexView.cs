@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -238,7 +239,7 @@ namespace Terminal.Gui {
 
 						Driver.AddStr (offset >= n && !edited ? "  " : string.Format ("{0:x2}", value));
 						SetAttribute (GetNormalColor ());
-						Driver.AddRune (' ');
+						Driver.AddRune ((Rune)' ');
 					}
 					Driver.AddStr (block + 1 == nblocks ? " " : "| ");
 				}
@@ -248,14 +249,14 @@ namespace Terminal.Gui {
 					var b = GetData (data, offset, out bool edited);
 					Rune c;
 					if (offset >= n && !edited)
-						c = ' ';
+						c = (Rune)' ';
 					else {
 						if (b < 32)
-							c = '.';
+							c = (Rune)'.';
 						else if (b > 127)
-							c = '.';
+							c = (Rune)'.';
 						else
-							c = b;
+							Rune.DecodeFromUtf8 (new ReadOnlySpan<byte> (b), out c, out _);
 					}
 					if (offset + displayStart == position || edited)
 						SetAttribute (leftSide ? trackingColor : activeColor);

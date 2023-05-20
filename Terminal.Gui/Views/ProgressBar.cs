@@ -1,4 +1,4 @@
-﻿using NStack;
+﻿using System.Text;
 using System;
 namespace Terminal.Gui {
 	/// <summary>
@@ -184,7 +184,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override ustring Text {
+		public override string Text {
 			get => GetPercentageText ();
 			set {
 				base.Text = SetPercentageText (value);
@@ -206,7 +206,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		ustring GetPercentageText ()
+		string GetPercentageText ()
 		{
 			switch (progressBarStyle) {
 			case ProgressBarStyle.Blocks:
@@ -220,7 +220,7 @@ namespace Terminal.Gui {
 			return base.Text;
 		}
 
-		ustring SetPercentageText (ustring value)
+		string SetPercentageText (string value)
 		{
 			switch (progressBarStyle) {
 			case ProgressBarStyle.Blocks:
@@ -288,7 +288,7 @@ namespace Terminal.Gui {
 					if (Array.IndexOf (activityPos, i) != -1)
 						Driver.AddRune (SegmentCharacter);
 					else
-						Driver.AddRune (' ');
+						Driver.AddRune ((Rune)' ');
 			} else {
 				Move (padding, padding);
 				int mid = (int)(fraction * fWidth);
@@ -296,7 +296,7 @@ namespace Terminal.Gui {
 				for (i = 0; i < mid & i < fWidth; i++)
 					Driver.AddRune (SegmentCharacter);
 				for (; i < fWidth; i++)
-					Driver.AddRune (' ');
+					Driver.AddRune ((Rune)' ');
 			}
 
 			DrawText (fWidth);

@@ -1,6 +1,5 @@
 global using CM = Terminal.Gui.ConfigurationManager;
 
-using NStack;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -646,7 +645,7 @@ namespace UICatalog {
 					};
 				}
 
-				Enum GetDiagnosticsEnumValue (ustring title)
+				Enum GetDiagnosticsEnumValue (string title)
 				{
 					return title!.ToString () switch {
 						FRAME_RULER => ConsoleDriver.DiagnosticFlags.FrameRuler,

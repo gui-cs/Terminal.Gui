@@ -1,5 +1,4 @@
-﻿using NStack;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -143,19 +142,19 @@ namespace Terminal.Gui {
 				return Rect.Empty;
 			}
 
-			System.Rune clearChar = ' ';
-			System.Rune leftChar = clearChar;
-			System.Rune rightChar = clearChar;
-			System.Rune topChar = clearChar;
-			System.Rune bottomChar = clearChar;
+			Rune clearChar = (Rune)' ';
+			Rune leftChar = clearChar;
+			Rune rightChar = clearChar;
+			Rune topChar = clearChar;
+			Rune bottomChar = clearChar;
 
 			if ((ConsoleDriver.Diagnostics & ConsoleDriver.DiagnosticFlags.FramePadding) == ConsoleDriver.DiagnosticFlags.FramePadding) {
-				leftChar = 'L';
-				rightChar = 'R';
-				topChar = 'T';
-				bottomChar = 'B';
+				leftChar = (Rune)'L';
+				rightChar = (Rune)'R';
+				topChar = (Rune)'T';
+				bottomChar = (Rune)'B';
 				if (!string.IsNullOrEmpty (label)) {
-					leftChar = rightChar = bottomChar = topChar = label [0];
+					leftChar = rightChar = bottomChar = topChar = (Rune)label [0];
 				}
 			}
 

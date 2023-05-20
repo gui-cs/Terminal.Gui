@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Reflection;
-using NStack;
-using static Terminal.Gui.SpinnerStyle;
+using System.Text;
 
 namespace Terminal.Gui {
 
@@ -75,8 +73,8 @@ namespace Terminal.Gui {
 		// Cursor runes.
 		private static readonly Rune [] _cursorRunes = new Rune []
 		{
-			0x250C, 0x2500, 0x2500, 0x2510,
-			0x2514, 0x2500, 0x2500, 0x2518
+			(Rune)0x250C, (Rune) 0x2500, (Rune) 0x2500, (Rune) 0x2510,
+			(Rune) 0x2514, (Rune) 0x2500, (Rune) 0x2500, (Rune) 0x2518
 		};
 
 		/// <summary>
@@ -189,7 +187,7 @@ namespace Terminal.Gui {
 			for (var zoomedY = 0; zoomedY < BoxHeight; zoomedY++) {
 				for (var zoomedX = 0; zoomedX < BoxWidth; zoomedX++) {
 					Move (x * BoxWidth + zoomedX, y * BoxHeight + zoomedY);
-					Driver.AddRune (' ');
+					Driver.AddRune ((Rune)' ');
 					index++;
 				}
 			}

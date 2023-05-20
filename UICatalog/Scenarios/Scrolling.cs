@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
@@ -76,23 +77,23 @@ namespace UICatalog.Scenarios {
 						case 0:
 							var er = y.ToString ().ToCharArray (0, 1) [0];
 							nw += er.ToString ().Length;
-							Driver.AddRune (er);
+							Driver.AddRune ((Rune)er);
 							if (y > 9) {
 								er = y.ToString ().ToCharArray (1, 1) [0];
 								nw += er.ToString ().Length;
-								Driver.AddRune (er);
+								Driver.AddRune ((Rune)er);
 							}
-							r = '.';
+							r = (Rune)'.';
 							break;
 						case 1:
-							r = 'o';
+							r = (Rune)'o';
 							break;
 						default:
-							r = 'O';
+							r = (Rune)'O';
 							break;
 						}
 						Driver.AddRune (r);
-						nw += Rune.RuneLen (r);
+						nw += r.Utf8SequenceLength;
 					}
 					if (nw > w)
 						w = nw;

@@ -2,14 +2,12 @@
 //#define BASE_DRAW_CONTENT
 
 using Microsoft.VisualBasic;
-using NStack;
+using System.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Terminal.Gui;
 using Terminal.Gui.Resources;
-using Rune = System.Rune;
 
 namespace UICatalog.Scenarios {
 	/// <summary>
@@ -40,36 +38,16 @@ namespace UICatalog.Scenarios {
 			Win.Add (jumpEdit);
 			var errorLabel = new Label ("") { X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap), ColorScheme = Colors.ColorSchemes ["error"] };
 			Win.Add (errorLabel);
-			jumpEdit.TextChanged += (s, e) => {
-				uint result = 0;
-				if (jumpEdit.Text.Length == 0) return;
-				try {
-					result = Convert.ToUInt32 (jumpEdit.Text.ToString (), 10);
-				} catch (OverflowException) {
-					errorLabel.Text = $"Invalid (overflow)";
-					return;
-				} catch (FormatException) {
-					try {
-						result = Convert.ToUInt32 (jumpEdit.Text.ToString (), 16);
-					} catch (OverflowException) {
-						errorLabel.Text = $"Invalid (overflow)";
-						return;
-					} catch (FormatException) {
-						errorLabel.Text = $"Invalid (can't parse)";
-						return;
-					}
-				}
-				errorLabel.Text = $"U+{result:x4}";
-				_charMap.SelectedGlyph = result;
-			};
 
-			var radioItems = new (ustring radioLabel, uint start, uint end) [UnicodeRange.Ranges.Count];
+			var radioItems = new (string radioLabel, uint start, uint end) [UnicodeRange.Ranges.Count];
 
-			for (var i = 0; i < UnicodeRange.Ranges.Count; i++) {
-				var range = UnicodeRange.Ranges [i];
+			var ranges = UnicodeRange.Ranges.OrderBy (o => o.Start).ToList ();
+
+			for (var i = 0; i < ranges.Count; i++) {
+				var range = ranges [i];
 				radioItems [i] = CreateRadio (range.Category, range.Start, range.End);
 			}
-			(ustring radioLabel, uint start, uint end) CreateRadio (ustring title, uint start, uint end)
+			(string radioLabel, uint start, uint end) CreateRadio (string title, uint start, uint end)
 			{
 				return ($"{title} (U+{start:x5}-{end:x5})", start, end);
 			}
@@ -89,6 +67,34 @@ namespace UICatalog.Scenarios {
 			};
 
 			Win.Add (jumpList);
+
+			jumpEdit.TextChanged += (s, e) => {
+				uint result = 0;
+				if (jumpEdit.Text.Length == 0) return;
+				try {
+					result = Convert.ToUInt32 (jumpEdit.Text, 10);
+				} catch (OverflowException) {
+					errorLabel.Text = $"Invalid (overflow)";
+					return;
+				} catch (FormatException) {
+					try {
+						result = Convert.ToUInt32 (jumpEdit.Text, 16);
+					} catch (OverflowException) {
+						errorLabel.Text = $"Invalid (overflow)";
+						return;
+					} catch (FormatException) {
+						errorLabel.Text = $"Invalid (can't parse)";
+						return;
+					}
+				}
+				errorLabel.Text = $"U+{result:x4}";
+				var foundIndex = ranges.FindIndex (x => x.Start <= result && x.End >= result);
+				if (foundIndex > -1 && jumpList.SelectedItem != foundIndex) {
+					jumpList.SelectedItem = foundIndex;
+				}
+				// Ensure the typed glyph is elected after jumpList
+				_charMap.SelectedGlyph = result;
+			};
 
 			//jumpList.Refresh ();
 			_charMap.SetFocus ();
@@ -247,6 +253,8 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
+		private Point _cursorPos;
+
 		public override void OnDrawContentComplete (Rect contentArea)
 		{
 			Rect viewport = new Rect (ContentOffset,
@@ -280,16 +288,16 @@ namespace UICatalog.Scenarios {
 					Driver.SetAttribute (GetNormalColor ());
 					for (int col = 0; col < 16; col++) {
 						uint glyph = (uint)((uint)val + col);
-						var rune = new Rune (glyph);
-						//if (rune >= 0x00D800 && rune <= 0x00DFFF) {
-						//	if (col == 0) {
-						//		Driver.AddStr ("Reserved for surrogate pairs.");
-						//	}
-						//	continue;
-						//}						
+						Rune rune;
+						if (char.IsSurrogate ((char)glyph)) {
+							rune = Rune.ReplacementChar;
+						} else {
+							rune = new Rune (glyph);
+						}
 						Move (firstColumnX + (col * COLUMN_WIDTH) + 1, y + 1);
 						if (glyph == SelectedGlyph) {
 							Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : ColorScheme.HotNormal);
+							_cursorPos = new Point (firstColumnX + (col * COLUMN_WIDTH) + 1, y + 1);
 						} else {
 							Driver.SetAttribute (GetNormalColor ());
 						}
@@ -302,6 +310,18 @@ namespace UICatalog.Scenarios {
 				}
 			}
 			Driver.Clip = oldClip;
+		}
+
+		public override void PositionCursor ()
+		{
+			if (_cursorPos.Y < Bounds.Height && SelectedGlyph >= -ContentOffset.Y + _cursorPos.Y - 1
+				&& SelectedGlyph <= (-ContentOffset.Y + _cursorPos.Y - (ShowHorizontalScrollIndicator ? 1 : 0)) * 16 - 1) {
+
+				Application.Driver.SetCursorVisibility (CursorVisibility.Default);
+				Move (_cursorPos.X, _cursorPos.Y);
+			} else {
+				Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+			}
 		}
 
 		ContextMenu _contextMenu = new ContextMenu ();

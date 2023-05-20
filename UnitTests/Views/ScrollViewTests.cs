@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestPlatform.Utilities;
-using NStack;
+using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -423,7 +423,7 @@ namespace Terminal.Gui.ViewsTests {
 		//	private Label labelFill;
 		//	private Label labelText;
 
-		//	public CustomButton (string fill, ustring text, int width, int height) : base ()
+		//	public CustomButton (string fill, string text, int width, int height) : base ()
 		//	{
 		//		Width = width;
 		//		Height = height;

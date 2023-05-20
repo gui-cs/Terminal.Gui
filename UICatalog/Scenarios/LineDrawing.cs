@@ -1,8 +1,8 @@
-﻿using NStack;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
+using System.Text;
 using Terminal.Gui;
 using Attribute = Terminal.Gui.Attribute;
 
@@ -73,7 +73,7 @@ namespace UICatalog.Scenarios {
 
 				_colorPicker.ColorChanged += (s, a) => ColorChanged?.Invoke (a.Color);
 
-				_stylePicker = new RadioGroup (Enum.GetNames (typeof (LineStyle)).Select (s => ustring.Make (s)).ToArray ()) {
+				_stylePicker = new RadioGroup (Enum.GetNames (typeof (LineStyle)).ToArray ()) {
 					X = 0,
 					Y = Pos.Bottom (_colorPicker)
 				};

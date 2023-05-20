@@ -1,4 +1,4 @@
-﻿using NStack;
+﻿using System.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,7 +66,7 @@ namespace Terminal.Gui {
 			/// <param name="oldTitle">The <see cref="Title"/> that is/has been replaced.</param>
 			/// <param name="newTitle">The new <see cref="Title"/> to be replaced.</param>
 			/// <returns><c>true</c> if an event handler cancelled the Title change.</returns>
-			public virtual bool OnTitleChanging (ustring oldTitle, ustring newTitle)
+			public virtual bool OnTitleChanging (string oldTitle, string newTitle)
 			{
 				var args = new TitleEventArgs (oldTitle, newTitle);
 				TitleChanging?.Invoke (this, args);
@@ -84,7 +84,7 @@ namespace Terminal.Gui {
 			/// </summary>
 			/// <param name="oldTitle">The <see cref="Title"/> that is/has been replaced.</param>
 			/// <param name="newTitle">The new <see cref="Title"/> to be replaced.</param>
-			public virtual void OnTitleChanged (ustring oldTitle, ustring newTitle)
+			public virtual void OnTitleChanged (string oldTitle, string newTitle)
 			{
 				var args = new TitleEventArgs (oldTitle, newTitle);
 				TitleChanged?.Invoke (this, args);
@@ -467,7 +467,7 @@ namespace Terminal.Gui {
 				var title = titleToRender.GetTrimmedTitle ();
 
 				for (int i = 0; i < title.Length; i++) {
-					AddRune (renderAt.X + i, renderAt.Y, title [i]);
+					AddRune (renderAt.X + i, renderAt.Y, (Rune)title [i]);
 				}
 			}
 		}
