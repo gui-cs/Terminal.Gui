@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Terminal.Gui;
 /// <summary>
-/// Extension to <see cref="string"/> to support TUI text manipulation.
+/// Extensions to <see cref="string"/> to support TUI text manipulation.
 /// </summary>
 public static class StringExtensions {
 	/// <summary>
@@ -120,28 +120,6 @@ public static class StringExtensions {
 			return (rune, bytesConsumed);
 		}
 		return (Rune.ReplacementChar, 1);
-	}
-
-	/// <summary>
-	/// Reports whether the string is a surrogate pair and can be decoded from UTF-16.
-	/// </summary>
-	/// <remarks>
-	/// This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text manipulation.
-	/// </remarks>
-	/// <param name="str">The string to decode.</param>
-	/// <param name="chars">The chars if the string was decoded. <see langword="null"/> otherwise.</param>
-	/// <returns></returns>
-	public static bool DecodeSurrogatePair (this string str, out char [] chars)
-	{
-		chars = null;
-		if (str.Length == 2) {
-			var charsArray = str.ToCharArray ();
-			if (RuneExtensions.EncodeSurrogatePair (charsArray [0], charsArray [1], out _)) {
-				chars = charsArray;
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/// <summary>
