@@ -54,11 +54,6 @@ public class CharacterMap : Scenario {
 			Width = UnicodeRange.Ranges.Max (r => r.Category.Length) + 19,
 			Height = Dim.Fill ()
 		};
-		jumpList.Table = new EnumerableTableSource<UnicodeRange> (UnicodeRange.Ranges, new Dictionary<string, Func<UnicodeRange, object>> () {
-			{ "Category", (s) => s.Category },
-			{ "Start", (s) => ($"{s.Start:x5}") },
-			{ "End", (s) => ($"{s.End:x5}") },
-		});
 
 		jumpList.FullRowSelect = true;
 		//jumpList.Style.ShowHeaders = false;
@@ -69,38 +64,65 @@ public class CharacterMap : Scenario {
 		//jumpList.Style.ShowVerticalHeaderLines = false;
 		jumpList.Style.AlwaysShowHeaders = true;
 
+		EnumerableTableSource<UnicodeRange> CreateTable (int sortByColumn, bool descending)
+		{
+			Func<UnicodeRange, object> orderBy;
+			var categorySort = string.Empty;
+			var startSort = string.Empty;
+			var endSort = string.Empty;
+
+			var sortIndicator = descending ? CM.Glyphs.DownArrow.ToString () : CM.Glyphs.UpArrow.ToString ();
+			switch (sortByColumn) {
+			case 0:
+				orderBy = r => r.Category;
+				categorySort = sortIndicator;
+				break;
+			case 1:
+				orderBy = r => r.Start;
+				startSort = sortIndicator;
+				break;
+			case 2:
+				orderBy = r => r.End;
+				endSort = sortIndicator;
+				break;
+			default:
+				throw new ArgumentException ("Invalid column number.");
+			}
+
+			IOrderedEnumerable<UnicodeRange> sortedRanges = descending ?
+				UnicodeRange.Ranges.OrderByDescending (orderBy) :
+				UnicodeRange.Ranges.OrderBy (orderBy);
+
+			return new EnumerableTableSource<UnicodeRange> (sortedRanges, new Dictionary<string, Func<UnicodeRange, object>> ()
+			{
+				{ $"Category{categorySort}", s => s.Category },
+				{ $"Start{startSort}", s => $"{s.Start:x5}" },
+				{ $"End{endSort}", s => $"{s.End:x5}" },
+			});
+		}
+
+		var isDescending = false;
+
+		jumpList.Table = CreateTable (0, isDescending);
+
 		// if user clicks the mouse in TableView
 		jumpList.MouseClick += (s, e) => {
 			jumpList.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
 			if (clickedCol != null && e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
+				var table = (EnumerableTableSource<UnicodeRange>)jumpList.Table;
+				var prevSelection = table.Data.ElementAt (jumpList.SelectedRow).Category;
+				isDescending = !isDescending;
 
-				// left click in a header
-				switch (clickedCol.Value) {
-				case 0:
-					jumpList.Table = new EnumerableTableSource<UnicodeRange> (UnicodeRange.Ranges.OrderBy (r => r.Category), new Dictionary<string, Func<UnicodeRange, object>> () {
-						{ "Category", (s) => s.Category },
-						{ "Start", (s) => ($"{s.Start:x5}") },
-						{ "End", (s) => ($"{s.End:x5}") },
-						});
-					break;
-				case 1:
-					jumpList.Table = new EnumerableTableSource<UnicodeRange> (UnicodeRange.Ranges.OrderBy (r => r.Start), new Dictionary<string, Func<UnicodeRange, object>> () {
-						{ "Category", (s) => s.Category },
-						{ "Start", (s) => ($"{s.Start:x5}") },
-						{ "End", (s) => ($"{s.End:x5}") },
-						});
-					break;
-				case 2:
-					jumpList.Table = new EnumerableTableSource<UnicodeRange> (UnicodeRange.Ranges.OrderBy (r => r.End), new Dictionary<string, Func<UnicodeRange, object>> () {
-						{ "Category", (s) => s.Category },
-						{ "Start", (s) => ($"{s.Start:x5}") },
-						{ "End", (s) => ($"{s.End:x5}") },
-					});
-					break;
-				}
+				jumpList.Table = CreateTable (clickedCol.Value, isDescending);
+
+				table = (EnumerableTableSource<UnicodeRange>)jumpList.Table;
+				jumpList.SelectedRow = table.Data
+					.Select ((item, index) => new { item, index })
+					.FirstOrDefault (x => x.item.Category == prevSelection)?.index ?? -1;
+				//jumpList.EnsureSelectedCellIsVisible ();
+
 			}
 		};
-
 
 		var longestName = UnicodeRange.Ranges.Max (r => r.Category.Length);
 		jumpList.Style.ColumnStyles.Add (0, new ColumnStyle () { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName });
@@ -109,7 +131,7 @@ public class CharacterMap : Scenario {
 
 		jumpList.SelectedCellChanged += (s, args) => {
 			EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)jumpList.Table;
-			_charMap.StartCodePoint = table.Data.ToArray() [args.NewRow].Start;
+			_charMap.StartCodePoint = table.Data.ToArray () [args.NewRow].Start;
 		};
 
 		Win.Add (jumpList);
@@ -119,11 +141,6 @@ public class CharacterMap : Scenario {
 		_charMap.SetFocus ();
 
 		_charMap.Width = Dim.Fill () - jumpList.Width;
-	}
-
-	private void JumpEdit_TextChanged1 (object sender, TextChangedEventArgs e)
-	{
-		throw new NotImplementedException ();
 	}
 
 	private void JumpEdit_TextChanged (object sender, TextChangedEventArgs e)
@@ -220,7 +237,7 @@ class CharMap : ScrollView {
 
 	public override void PositionCursor ()
 	{
-		if (Cursor.X + ContentOffset.X + RowLabelWidth + 1 >= RowLabelWidth &&
+		if (HasFocus && Cursor.X + ContentOffset.X + RowLabelWidth + 1 >= RowLabelWidth &&
 			Cursor.X + ContentOffset.X + RowLabelWidth + 1 < Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0) &&
 			Cursor.Y + ContentOffset.Y + 1 > 0 &&
 			Cursor.Y + ContentOffset.Y + 1 < Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0)) {
@@ -531,9 +548,6 @@ class CharMap : ScrollView {
 		}
 		// BUGBUG: This is a workaround for some weird ScrollView related mouse grab bug
 		Application.GrabMouse (this);
-		PositionCursor ();
-		Driver.SetCursorVisibility (CursorVisibility.Default);
-
 	}
 
 
