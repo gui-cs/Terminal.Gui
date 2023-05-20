@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Terminal.Gui;
 /// <summary>
-/// Extension to <see cref="string"/> to support TUI text manipulation.
+/// Extensions to <see cref="string"/> to support TUI text manipulation.
 /// </summary>
 public static class StringExtensions {
 	/// <summary>
@@ -123,33 +123,11 @@ public static class StringExtensions {
 	}
 
 	/// <summary>
-	/// Reports whether the string is a surrogate pair and can be decoded from UTF-16.
+	/// Converts a <see cref="Rune"/> generic collection into a string.
 	/// </summary>
-	/// <remarks>
-	/// This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text manipulation.
-	/// </remarks>
-	/// <param name="str">The string to decode.</param>
-	/// <param name="chars">The chars if the string was decoded. <see langword="null"/> otherwise.</param>
+	/// <param name="runes">The enumerable rune to convert.</param>
 	/// <returns></returns>
-	public static bool DecodeSurrogatePair (this string str, out char [] chars)
-	{
-		chars = null;
-		if (str.Length == 2) {
-			var charsArray = str.ToCharArray ();
-			if (RuneExtensions.EncodeSurrogatePair (charsArray [0], charsArray [1], out _)) {
-				chars = charsArray;
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/// <summary>
-	/// Converts a <see cref="Rune"/> array into a string.
-	/// </summary>
-	/// <param name="runes">The rune array to convert.</param>
-	/// <returns></returns>
-	public static string ToString (Rune [] runes)
+	public static string ToString (IEnumerable<Rune> runes)
 	{
 		var str = string.Empty;
 
@@ -161,30 +139,16 @@ public static class StringExtensions {
 	}
 
 	/// <summary>
-	/// Converts a List of runes into a string.
+	/// Converts a byte generic collection into a string in the provided encoding (default is UTF8)
 	/// </summary>
-	/// <param name="runes">The List of runes to convert.</param>
-	/// <returns></returns>
-	public static string ToString (List<Rune> runes)
-	{
-		var str = string.Empty;
-		foreach (var rune in runes) {
-			str += rune.ToString ();
-		}
-		return str;
-	}
-
-	/// <summary>
-	/// Converts a byte array into a string in the provided encoding (default is UTF8)
-	/// </summary>
-	/// <param name="bytes">The byte array to convert.</param>
+	/// <param name="bytes">The enumerable byte to convert.</param>
 	/// <param name="encoding">The encoding to be used.</param>
 	/// <returns></returns>
-	public static string ToString (byte [] bytes, Encoding encoding = null)
+	public static string ToString (IEnumerable<byte> bytes, Encoding encoding = null)
 	{
 		if (encoding == null) {
 			encoding = Encoding.UTF8;
 		}
-		return encoding.GetString (bytes);
+		return encoding.GetString (bytes.ToArray ());
 	}
 }

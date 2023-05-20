@@ -120,7 +120,7 @@ namespace Terminal.Gui {
 			if (Host != null && (_contentBottomRightCorner == null && OtherScrollBarView == null
 				|| (_contentBottomRightCorner == null && OtherScrollBarView != null && OtherScrollBarView._contentBottomRightCorner == null))) {
 
-				_contentBottomRightCorner = new View (" ") {
+				_contentBottomRightCorner = new View () {
 					Id = "contentBottomRightCorner",
 					Visible = Host.Visible,
 					ClearOnVisibleFalse = false,
@@ -136,7 +136,13 @@ namespace Terminal.Gui {
 				_contentBottomRightCorner.Width = 1;
 				_contentBottomRightCorner.Height = 1;
 				_contentBottomRightCorner.MouseClick += ContentBottomRightCorner_MouseClick;
+				_contentBottomRightCorner.DrawContent += _contentBottomRightCorner_DrawContent;
 			}
+		}
+
+		private void _contentBottomRightCorner_DrawContent (object sender, DrawEventArgs e)
+		{
+			Driver.SetAttribute (Host.HasFocus ? ColorScheme.Focus : GetNormalColor ());
 		}
 
 		private void Host_VisibleChanged (object sender, EventArgs e)
@@ -699,7 +705,6 @@ namespace Terminal.Gui {
 
 			if (mouseEvent.Flags != MouseFlags.Button1Released
 				&& (Application.MouseGrabView == null || Application.MouseGrabView != this)) {
-
 				Application.GrabMouse (this);
 			} else if (mouseEvent.Flags == MouseFlags.Button1Released && Application.MouseGrabView != null && Application.MouseGrabView == this) {
 				_lastLocation = -1;
@@ -712,11 +717,11 @@ namespace Terminal.Gui {
 				return Host.MouseEvent (mouseEvent);
 			}
 
-			if (location == 0) {
+			if (mouseEvent.Flags == MouseFlags.Button1Pressed && location == 0) {
 				if (pos > 0) {
 					Position = pos - 1;
 				}
-			} else if (location == barsize + 1) {
+			} else if (mouseEvent.Flags == MouseFlags.Button1Pressed && location == barsize + 1) {
 				if (CanScroll (1, out _, _vertical)) {
 					Position = pos + 1;
 				}

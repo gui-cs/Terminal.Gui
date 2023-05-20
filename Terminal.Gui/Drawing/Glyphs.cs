@@ -8,8 +8,11 @@ namespace Terminal.Gui {
 	/// </summary>
 	/// <remarks>
 	/// <para>
+	/// Access with <see cref="CM.Glyphs"/> (which is a global using alias for <see cref="ConfigurationManager.Glyphs"/>).
+	/// </para>
+	/// <para>
 	/// The default glyphs can be changed via the <see cref="ConfigurationManager"/>. Within a <c>config.json</c> file 
-	/// The JSon property name is the <see cref="GlyphDefinitions"/> property prefixed with "CM.Glyphs.". 
+	/// The Json property name is the property name prefixed with "Glyphs.". 
 	/// </para>
 	/// <para>
 	/// The JSon property can be either a decimal number or a string. The string may be one of:
@@ -140,8 +143,18 @@ namespace Terminal.Gui {
 		/// Apple. Because snek. And because it's an example of a surrogate pair
 		/// </summary>
 		public Rune Apple { get; set; } = "🍎".ToRunes () [0];
-	
+
 		#endregion
+
+		/// <summary>
+		/// Folder icon.  Defaults to ꤉ (Kayah Li Digit Nine)
+		/// </summary>
+		public Rune Folder { get; set; } = (Rune)'꤉';
+
+		/// <summary>
+		/// File icon.  Defaults to ☰ (Trigram For Heaven)
+		/// </summary>
+		public Rune File { get; set; } = (Rune)'☰';
 
 		#region ----------------- Lines -----------------
 		/// <summary>
