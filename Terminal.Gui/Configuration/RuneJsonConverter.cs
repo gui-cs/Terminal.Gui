@@ -2,11 +2,10 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-//using Rune = System.Rune;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// Json converter for <see cref="System.Rune"/>. Supports
+	/// Json converter for <see cref="Rune"/>. Supports
 	/// A string as one of:
 	/// - unicode char (e.g. "☑")
 	/// - U+hex format (e.g. "U+2611")
@@ -14,29 +13,29 @@ namespace Terminal.Gui {
 	/// A number
 	/// - The unicode code in decimal
 	/// </summary>
-	internal class RuneJsonConverter : JsonConverter<System.Rune> {
-		public override System.Rune Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+	internal class RuneJsonConverter : JsonConverter<Rune> {
+		public override Rune Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 		{
 			if (reader.TokenType == JsonTokenType.String) {
 				var value = reader.GetString ();
-				if (value.ToUpper ().StartsWith ("U+") || value.StartsWith ("\\u")) {
+				if (value.StartsWith ("U+", StringComparison.OrdinalIgnoreCase) || value.StartsWith ("\\u")) {
 					try {
 						uint result = uint.Parse (value [2..^0], System.Globalization.NumberStyles.HexNumber);
-						return new System.Rune (result);
+						return new Rune (result);
 					} catch (FormatException e) {
 						throw new JsonException ($"Invalid Rune format: {value}.", e);
 					}
 				} else {
-					return new System.Rune (value [0]);
+					return new Rune (value [0]);
 				}
 				throw new JsonException ($"Invalid Rune format: {value}.");
 			} else if (reader.TokenType == JsonTokenType.Number) {
-				return new System.Rune (reader.GetUInt32 ());
+				return new Rune (reader.GetUInt32 ());
 			}
 			throw new JsonException ($"Unexpected StartObject token when parsing Rune: {reader.TokenType}.");
 		}
 
-		public override void Write (Utf8JsonWriter writer, System.Rune value, JsonSerializerOptions options)
+		public override void Write (Utf8JsonWriter writer, Rune value, JsonSerializerOptions options)
 		{
 			// HACK: Writes a JSON comment in addition to the glyph to ease debugging.
 			// Technically, JSON comments are not valid, but we use relaxed decoding

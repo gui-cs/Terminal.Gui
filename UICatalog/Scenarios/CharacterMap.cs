@@ -1,19 +1,17 @@
 ﻿#define DRAW_CONTENT
 //#define BASE_DRAW_CONTENT
 
-using NStack;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Text.Unicode;
 using System.Threading.Tasks;
 using Terminal.Gui;
-using static System.Net.WebRequestMethods;
 using static Terminal.Gui.TableView;
-using Rune = System.Rune;
 
 namespace UICatalog.Scenarios;
 
@@ -30,6 +28,8 @@ namespace UICatalog.Scenarios;
 public class CharacterMap : Scenario {
 	CharMap _charMap;
 	Label _errorLabel;
+	TableView _categoryList;
+
 	public override void Setup ()
 	{
 		_charMap = new CharMap () {
@@ -48,132 +48,145 @@ public class CharacterMap : Scenario {
 
 		jumpEdit.TextChanged += JumpEdit_TextChanged;
 
-		var jumpList = new TableView () {
+		_categoryList = new TableView () {
 			X = Pos.Right (_charMap),
 			Y = Pos.Bottom (jumpLabel),
-			Width = UnicodeRange.Ranges.Max (r => r.Category.Length) + 19,
 			Height = Dim.Fill ()
 		};
 
-		jumpList.FullRowSelect = true;
+		_categoryList.FullRowSelect = true;
 		//jumpList.Style.ShowHeaders = false;
 		//jumpList.Style.ShowHorizontalHeaderOverline = false;
 		//jumpList.Style.ShowHorizontalHeaderUnderline = false;
-		jumpList.Style.ShowHorizontalBottomline = true;
+		_categoryList.Style.ShowHorizontalBottomline = true;
 		//jumpList.Style.ShowVerticalCellLines = false;
 		//jumpList.Style.ShowVerticalHeaderLines = false;
-		jumpList.Style.AlwaysShowHeaders = true;
-
-		EnumerableTableSource<UnicodeRange> CreateTable (int sortByColumn, bool descending)
-		{
-			Func<UnicodeRange, object> orderBy;
-			var categorySort = string.Empty;
-			var startSort = string.Empty;
-			var endSort = string.Empty;
-
-			var sortIndicator = descending ? CM.Glyphs.DownArrow.ToString () : CM.Glyphs.UpArrow.ToString ();
-			switch (sortByColumn) {
-			case 0:
-				orderBy = r => r.Category;
-				categorySort = sortIndicator;
-				break;
-			case 1:
-				orderBy = r => r.Start;
-				startSort = sortIndicator;
-				break;
-			case 2:
-				orderBy = r => r.End;
-				endSort = sortIndicator;
-				break;
-			default:
-				throw new ArgumentException ("Invalid column number.");
-			}
-
-			IOrderedEnumerable<UnicodeRange> sortedRanges = descending ?
-				UnicodeRange.Ranges.OrderByDescending (orderBy) :
-				UnicodeRange.Ranges.OrderBy (orderBy);
-
-			return new EnumerableTableSource<UnicodeRange> (sortedRanges, new Dictionary<string, Func<UnicodeRange, object>> ()
-			{
-				{ $"Category{categorySort}", s => s.Category },
-				{ $"Start{startSort}", s => $"{s.Start:x5}" },
-				{ $"End{endSort}", s => $"{s.End:x5}" },
-			});
-		}
+		_categoryList.Style.AlwaysShowHeaders = true;
 
 		var isDescending = false;
 
-		jumpList.Table = CreateTable (0, isDescending);
+		_categoryList.Table = CreateCategoryTable (0, isDescending);
 
 		// if user clicks the mouse in TableView
-		jumpList.MouseClick += (s, e) => {
-			jumpList.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
+		_categoryList.MouseClick += (s, e) => {
+			_categoryList.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
 			if (clickedCol != null && e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
-				var table = (EnumerableTableSource<UnicodeRange>)jumpList.Table;
-				var prevSelection = table.Data.ElementAt (jumpList.SelectedRow).Category;
+				var table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+				var prevSelection = table.Data.ElementAt (_categoryList.SelectedRow).Category;
 				isDescending = !isDescending;
 
-				jumpList.Table = CreateTable (clickedCol.Value, isDescending);
+				_categoryList.Table = CreateCategoryTable (clickedCol.Value, isDescending);
 
-				table = (EnumerableTableSource<UnicodeRange>)jumpList.Table;
-				jumpList.SelectedRow = table.Data
+				table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+				_categoryList.SelectedRow = table.Data
 					.Select ((item, index) => new { item, index })
 					.FirstOrDefault (x => x.item.Category == prevSelection)?.index ?? -1;
-				//jumpList.EnsureSelectedCellIsVisible ();
-
 			}
 		};
 
-		var longestName = UnicodeRange.Ranges.Max (r => r.Category.Length);
-		jumpList.Style.ColumnStyles.Add (0, new ColumnStyle () { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName });
-		jumpList.Style.ColumnStyles.Add (1, new ColumnStyle () { MaxWidth = 1, MinWidth = 7 });
-		jumpList.Style.ColumnStyles.Add (2, new ColumnStyle () { MaxWidth = 1, MinWidth = 7 });
+		var longestName = UnicodeRange.Ranges.Max (r => r.Category.GetColumns());
+		_categoryList.Style.ColumnStyles.Add (0, new ColumnStyle () { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName });
+		_categoryList.Style.ColumnStyles.Add (1, new ColumnStyle () { MaxWidth = 1, MinWidth = 6 });
+		_categoryList.Style.ColumnStyles.Add (2, new ColumnStyle () { MaxWidth = 1, MinWidth = 6 });
 
-		jumpList.SelectedCellChanged += (s, args) => {
-			EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)jumpList.Table;
+		_categoryList.Width = _categoryList.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 4;
+
+		_categoryList.SelectedCellChanged += (s, args) => {
+			EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
 			_charMap.StartCodePoint = table.Data.ToArray () [args.NewRow].Start;
 		};
 
-		Win.Add (jumpList);
+		Win.Add (_categoryList);
 
 		_charMap.SelectedCodePoint = 0;
 		//jumpList.Refresh ();
 		_charMap.SetFocus ();
 
-		_charMap.Width = Dim.Fill () - jumpList.Width;
+		_charMap.Width = Dim.Fill () - _categoryList.Width;
+	}
+
+
+	EnumerableTableSource<UnicodeRange> CreateCategoryTable (int sortByColumn, bool descending)
+	{
+		Func<UnicodeRange, object> orderBy;
+		var categorySort = string.Empty;
+		var startSort = string.Empty;
+		var endSort = string.Empty;
+
+		var sortIndicator = descending ? CM.Glyphs.DownArrow.ToString () : CM.Glyphs.UpArrow.ToString ();
+		switch (sortByColumn) {
+		case 0:
+			orderBy = r => r.Category;
+			categorySort = sortIndicator;
+			break;
+		case 1:
+			orderBy = r => r.Start;
+			startSort = sortIndicator;
+			break;
+		case 2:
+			orderBy = r => r.End;
+			endSort = sortIndicator;
+			break;
+		default:
+			throw new ArgumentException ("Invalid column number.");
+		}
+
+		IOrderedEnumerable<UnicodeRange> sortedRanges = descending ?
+			UnicodeRange.Ranges.OrderByDescending (orderBy) :
+			UnicodeRange.Ranges.OrderBy (orderBy);
+
+		return new EnumerableTableSource<UnicodeRange> (sortedRanges, new Dictionary<string, Func<UnicodeRange, object>> ()
+		{
+			{ $"Category{categorySort}", s => s.Category },
+			{ $"Start{startSort}", s => $"{s.Start:x5}" },
+			{ $"End{endSort}", s => $"{s.End:x5}" },
+		});
 	}
 
 	private void JumpEdit_TextChanged (object sender, TextChangedEventArgs e)
 	{
 		var jumpEdit = sender as TextField;
-		//if (e.OldValue == jumpEdit.Text) {
-		//	return;
-		//}
-
-		var result = 0;
-		if (jumpEdit.Text.Length == 0) return;
-		try {
-			result = Convert.ToInt32 (jumpEdit.Text.ToString (), 10);
-		} catch (OverflowException) {
-			_errorLabel.Text = $"Invalid (overflow)";
+		if (jumpEdit.Text.Length == 0) {
 			return;
-		} catch (FormatException) {
+		}
+		uint result = 0;
+
+		if (jumpEdit.Text.StartsWith ("U+", StringComparison.OrdinalIgnoreCase) || jumpEdit.Text.StartsWith ("\\u")) {
 			try {
-				result = Convert.ToInt32 (jumpEdit.Text.ToString (), 16);
-			} catch (OverflowException) {
-				_errorLabel.Text = $"Invalid (overflow)";
-				return;
+				result = uint.Parse (jumpEdit.Text [2..^0], NumberStyles.HexNumber);
 			} catch (FormatException) {
-				_errorLabel.Text = $"Invalid (can't parse)";
+				_errorLabel.Text = $"Invalid hex value";
+				return;
+			}
+		} else if (jumpEdit.Text.StartsWith ("0", StringComparison.OrdinalIgnoreCase) || jumpEdit.Text.StartsWith ("\\u")) {
+			try {
+				result = uint.Parse (jumpEdit.Text, NumberStyles.HexNumber);
+			} catch (FormatException) {
+				_errorLabel.Text = $"Invalid hex value";
+				return;
+			}
+		} else {
+			try {
+				result = uint.Parse (jumpEdit.Text, NumberStyles.Integer);
+			} catch (FormatException) {
+				_errorLabel.Text = $"Invalid value";
 				return;
 			}
 		}
-		if (result > Rune.MaxRune) {
+		if (result > RuneExtensions.MaxUnicodeCodePoint) {
 			_errorLabel.Text = $"Beyond maximum codepoint";
 			return;
 		}
 		_errorLabel.Text = $"U+{result:x4}";
-		_charMap.SelectedCodePoint = result;
+
+		var table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+		_categoryList.SelectedRow = table.Data
+			.Select ((item, index) => new { item, index })
+			.FirstOrDefault (x => x.item.Start <= result && x.item.End >= result)?.index ?? -1;
+		_categoryList.EnsureSelectedCellIsVisible();
+
+		// Ensure the typed glyph is selected 
+		_charMap.SelectedCodePoint = (int)result;
 	}
 }
 

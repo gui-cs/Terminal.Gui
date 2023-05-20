@@ -1,5 +1,4 @@
-﻿using NStack;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using Xunit;
@@ -168,7 +167,7 @@ namespace Terminal.Gui.DrawingTests {
 			TestHelpers.AssertEqual (output, @"
 ╔╡╞╗
 ║  ║",
-			ustring.Make ($"{Environment.NewLine}{lc}"));
+			$"{Environment.NewLine}{lc}");
 		}
 
 		[Fact, SetupFakeDriver]

@@ -1,4 +1,4 @@
-﻿using NStack;
+﻿using System.Text;
 using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
@@ -22,7 +22,7 @@ namespace Terminal.Gui.ViewTests {
 		public void Set_Title_Fires_TitleChanging ()
 		{
 			var r = new View ();
-			Assert.Equal (ustring.Empty, r.Title);
+			Assert.Equal (string.Empty, r.Title);
 
 			string expectedOld = null;
 			string expectedDuring = null;
@@ -55,7 +55,7 @@ namespace Terminal.Gui.ViewTests {
 		public void Set_Title_Fires_TitleChanged ()
 		{
 			var r = new View ();
-			Assert.Equal (ustring.Empty, r.Title);
+			Assert.Equal (string.Empty, r.Title);
 
 			string expectedOld = null;
 			string expected = null;

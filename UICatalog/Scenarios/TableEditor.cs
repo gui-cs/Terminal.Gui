@@ -5,6 +5,7 @@ using Terminal.Gui;
 using System.Linq;
 using System.Globalization;
 using static Terminal.Gui.TableView;
+using System.Text;
 
 namespace UICatalog.Scenarios {
 
@@ -212,7 +213,7 @@ namespace UICatalog.Scenarios {
 
 		private string TrimArrows (string columnName)
 		{
-			return columnName.TrimEnd ((char)CM.Glyphs.UpArrow, (char)CM.Glyphs.DownArrow);
+			return columnName.TrimEnd ((char)CM.Glyphs.UpArrow.Value, (char)CM.Glyphs.DownArrow.Value);
 		}
 		private string StripArrows (string columnName)
 		{

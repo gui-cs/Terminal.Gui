@@ -13,7 +13,6 @@
 
 using System;
 using System.Linq;
-using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -367,7 +366,7 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (GetNormalColor ());
 			Clear ();
 
-			if (!ustring.IsNullOrEmpty (_contentView.Text) || _contentView.Subviews.Count > 0) {
+			if (!string.IsNullOrEmpty (_contentView.Text) || _contentView.Subviews.Count > 0) {
 				_contentView.Draw ();
 			}
 
