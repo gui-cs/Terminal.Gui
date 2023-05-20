@@ -106,7 +106,8 @@ public class CharacterMap : Scenario {
 		jumpList.Style.ColumnStyles.Add (1, new ColumnStyle () { MaxWidth = 1 });
 
 		jumpList.SelectedCellChanged += (s, args) => {
-			_charMap.StartCodePoint = UnicodeRange.Ranges [args.NewRow].Start;
+			EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)jumpList.Table;
+			_charMap.StartCodePoint = table.Data.ToArray() [args.NewRow].Start;
 		};
 
 		Win.Add (jumpList);
