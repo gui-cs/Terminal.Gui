@@ -310,8 +310,9 @@ namespace Terminal.Gui {
 			set {
 				var oldText = StringExtensions.ToString (text);
 
-				if (oldText == value)
+				if (oldText == value) {
 					return;
+				}
 
 				var newText = OnTextChanging (value.Replace ("\t", "").Split ("\n") [0]);
 				if (newText.Cancel) {
@@ -545,9 +546,9 @@ namespace Terminal.Gui {
 
 		void Adjust ()
 		{
-			if (!IsAdded)
+			if (!IsAdded) {
 				return;
-
+			}
 			int offB = OffSetBackground ();
 			if (point < first) {
 				first = point;
@@ -1152,8 +1153,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void ClearAllSelection ()
 		{
-			if (selectedStart == -1 && length == 0 && selectedText == "")
+			if (selectedStart == -1 && length == 0 && selectedText == "") {
 				return;
+			}
 
 			selectedStart = -1;
 			length = 0;
@@ -1188,8 +1190,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual void Cut ()
 		{
-			if (ReadOnly || Secret || length == 0)
+			if (ReadOnly || Secret || length == 0) {
 				return;
+			}
 
 			Clipboard.Contents = SelectedText;
 			var newText = DeleteSelectedText ();

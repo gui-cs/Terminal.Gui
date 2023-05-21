@@ -604,6 +604,17 @@ namespace Terminal.Gui.ViewsTests {
 
 		[Fact]
 		[TextFieldTestsAutoInitShutdown]
+		public void Cut_Preserves_Selection ()
+		{
+			Assert.Equal ("TAB to jump between text fields.", _textField.Text);
+			_textField.SelectedStart = 20;
+			_textField.CursorPosition = 24;
+			_textField.Cut ();
+			Assert.Equal (20, _textField.SelectedStart);
+		}
+
+		[Fact]
+		[TextFieldTestsAutoInitShutdown]
 		public void Copy_Or_Cut_And_Paste_With_Selection ()
 		{
 			_textField.SelectedStart = 20;
@@ -615,6 +626,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal ("TAB to jump between text fields.", _textField.Text);
 			_textField.SelectedStart = 20;
 			_textField.Cut ();
+			Assert.Equal (20, _textField.SelectedStart);
 			_textField.Paste ();
 			Assert.Equal ("TAB to jump between text fields.", _textField.Text);
 		}
