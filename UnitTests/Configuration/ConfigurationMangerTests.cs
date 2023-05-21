@@ -284,8 +284,8 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Empty (ConfigurationManager.Settings.Where (cp => cp.Value.PropertyInfo.GetCustomAttribute (typeof (SerializableConfigurationProperty)) == null));
 
 			// Application is a static class
-			PropertyInfo pi = typeof (Application).GetProperty ("UseSystemConsole");
-			Assert.Equal (pi, ConfigurationManager.Settings ["Application.UseSystemConsole"].PropertyInfo);
+			PropertyInfo pi = typeof (Application).GetProperty ("QuitKey");
+			Assert.Equal (pi, ConfigurationManager.Settings ["Application.QuitKey"].PropertyInfo);
 
 			// FrameView is not a static class and DefaultBorderStyle is Scope.Scheme
 			pi = typeof (FrameView).GetProperty ("DefaultBorderStyle");
@@ -784,7 +784,6 @@ namespace Terminal.Gui.ConfigurationTests {
 				Assert.Equal (Key.Q, Application.QuitKey);
 				Assert.Equal (Key.F, Application.AlternateForwardKey);
 				Assert.Equal (Key.B, Application.AlternateBackwardKey);
-				Assert.True (Application.UseSystemConsole);
 				Assert.True (Application.IsMouseDisabled);
 				Assert.True (Application.EnableConsoleScrolling);
 			}
@@ -793,7 +792,6 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = Key.Q;
 			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
 			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
-			ConfigurationManager.Settings ["Application.UseSystemConsole"].PropertyValue = true;
 			ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue = true;
 			ConfigurationManager.Settings ["Application.EnableConsoleScrolling"].PropertyValue = true;
 

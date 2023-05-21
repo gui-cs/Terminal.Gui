@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Terminal.Gui {
 
@@ -402,7 +403,7 @@ namespace Terminal.Gui {
 				for (int i = 0; i < toRender.Length; i++) {
 
 					graph.Move (0, startDrawingAtY + i);
-					Application.Driver.AddRune (toRender [i]);
+					Application.Driver.AddRune ((Rune)toRender [i]);
 				}
 
 			}

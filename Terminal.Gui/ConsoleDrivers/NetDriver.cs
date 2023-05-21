@@ -11,7 +11,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Rune = System.Text.Rune;
+using System.Text;
 
 namespace Terminal.Gui;
 internal class NetWinVTConsole {
@@ -178,7 +178,7 @@ internal class NetEvents {
 		while (true) {
 			ConsoleKeyInfo consoleKeyInfo = Console.ReadKey (true);
 			if ((consoleKeyInfo.KeyChar == (char)Key.Esc && !_isEscSeq)
-				|| (consoleKeyInfo.KeyChar != (char)Key.Esc && _isEscSeq)) {
+			|| (consoleKeyInfo.KeyChar != (char)Key.Esc && _isEscSeq)) {
 				if (_cki == null && consoleKeyInfo.KeyChar != (char)Key.Esc && _isEscSeq) {
 					_cki = EscSeqUtils.ResizeArray (new ConsoleKeyInfo ((char)Key.Esc, 0,
 						false, false, false), _cki);
@@ -192,12 +192,13 @@ internal class NetEvents {
 					_isEscSeq = false;
 					break;
 				}
-			} else if (consoleKeyInfo.KeyChar == (char)Key.Esc && _isEscSeq) {
+			} else if (consoleKeyInfo.KeyChar == (char)Key.Esc && _isEscSeq && _cki != null) {
 				DecodeEscSeq (ref newConsoleKeyInfo, ref key, _cki, ref mod);
 				_cki = null;
 				break;
 			} else {
 				GetConsoleInputType (consoleKeyInfo);
+				_isEscSeq = false;
 				break;
 			}
 		}
@@ -615,7 +616,7 @@ internal class NetDriver : ConsoleDriver {
 
 	bool [] _dirtyLine;
 
-	public override void AddRune (System.Rune systemRune)
+	public override void AddRune (Rune systemRune)
 	{
 		if (Contents.Length != Rows * Cols * 3) {
 			// BUGBUG: Shouldn't this throw an exception? Doing so to see what happens
@@ -626,8 +627,8 @@ internal class NetDriver : ConsoleDriver {
 		int runeWidth = -1;
 		var validLocation = IsValidLocation (Col, Row);
 		if (validLocation) {
-			var rune = new Rune (systemRune).MakePrintable ();
-			runeWidth = rune.GetColumnWidth ();
+			var rune = systemRune.MakePrintable ();
+			runeWidth = rune.GetColumns ();
 			if (runeWidth == 0 && Col > 0) {
 				// This is a combining character, and we are not at the beginning of the line.
 				var combined = new String (new char [] { (char)Contents [Row, Col - 1, 0], (char)rune.Value });
@@ -639,10 +640,10 @@ internal class NetDriver : ConsoleDriver {
 				Contents [Row, Col, 1] = CurrentAttribute;
 				Contents [Row, Col, 2] = 1;
 
-				if (runeWidth < 2 && Col > 0 && ((Rune)(Contents [Row, Col - 1, 0])).GetColumnWidth () > 1) {
+				if (runeWidth < 2 && Col > 0 && ((Rune)(Contents [Row, Col - 1, 0])).GetColumns () > 1) {
 					// This is a single-width character, and we are not at the beginning of the line.
 					Contents [Row, Col - 1, 0] = Rune.ReplacementChar.Value;
-				} else if (runeWidth < 2 && Col <= Clip.Right - 1 && ((Rune)(Contents [Row, Col, 0])).GetColumnWidth () > 1) {
+				} else if (runeWidth < 2 && Col <= Clip.Right - 1 && ((Rune)(Contents [Row, Col, 0])).GetColumns () > 1) {
 					// This is a single-width character, and we are not at the end of the line.
 					Contents [Row, Col + 1, 0] = Rune.ReplacementChar.Value;
 					Contents [Row, Col + 1, 2] = 1;

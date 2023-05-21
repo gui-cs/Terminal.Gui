@@ -7,7 +7,7 @@ using System.ComponentModel.Design.Serialization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Rune = System.Text.Rune;
+using System.Text;
 using Unix.Terminal;
 using System.Buffers;
 
@@ -41,10 +41,20 @@ internal class CursesDriver : ConsoleDriver {
 		}
 	}
 
-	public override void AddRune (System.Rune systemRune)
+	public override bool IsRuneSupported (Rune rune)
 	{
-		var rune = new Rune(systemRune).MakePrintable ();
-		var runeWidth = rune.GetColumnWidth ();
+		// See Issue #2615 - CursesDriver is broken with non-BMP characters
+		return base.IsRuneSupported (rune) && rune.IsBmp;
+	}
+
+	public override void AddRune (Rune systemRune)
+	{
+		if (!IsRuneSupported (systemRune)) {
+			systemRune = Rune.ReplacementChar;
+		}
+
+		var rune = systemRune.MakePrintable ();
+		var runeWidth = rune.GetColumns ();
 		var validLocation = IsValidLocation (Col, Row);
 
 		if (validLocation) {
@@ -67,7 +77,7 @@ internal class CursesDriver : ConsoleDriver {
 				Contents [Row, Col, 1] = CurrentAttribute;
 				Contents [Row, Col, 2] = 1;
 
-				if (runeWidth < 2 && Col > 0 && ((Rune)(Contents [Row, Col - 1, 0])).GetColumnWidth() > 1) {
+				if (runeWidth < 2 && Col > 0 && ((Rune)(Contents [Row, Col - 1, 0])).GetColumns () > 1) {
 					// This is a single-width character, and we are not at the beginning of the line.
 					var curAttr = CurrentAttribute;
 					Curses.attrset (Contents [Row, Col - 1, 1]);
@@ -76,7 +86,7 @@ internal class CursesDriver : ConsoleDriver {
 					Curses.move (Row, Col);
 					Curses.attrset (curAttr);
 
-				} else if (runeWidth < 2 && Col <= Clip.Right - 1 && ((Rune)(Contents [Row, Col, 0])).GetColumnWidth() > 1) {
+				} else if (runeWidth < 2 && Col <= Clip.Right - 1 && ((Rune)(Contents [Row, Col, 0])).GetColumns () > 1) {
 					// This is a single-width character, and we are not at the end of the line.
 					var curAttr = CurrentAttribute;
 					Curses.attrset (Contents [Row, Col + 1, 1]);
@@ -111,7 +121,7 @@ internal class CursesDriver : ConsoleDriver {
 							}
 							Contents [Row, column, 0] = result.Value;
 							Contents [Row, column, 1] = CurrentAttribute;
-							
+
 							Curses.attrset (Contents [Row, column, 1]);
 							// BUGBUG: workaround curses not supporting non BMP? #
 							Curses.mvaddch (Row, column, Rune.ReplacementChar.Value);

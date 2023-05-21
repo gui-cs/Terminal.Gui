@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using Rune = System.Rune;
+
 
 namespace Terminal.Gui {
 
@@ -275,7 +275,7 @@ namespace Terminal.Gui {
 		/// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
 		public override bool ProcessKey (KeyEvent kb)
 		{
-			if (SuggestionGenerator.IsWordChar ((char)kb.Key)) {
+			if (SuggestionGenerator.IsWordChar ((Rune)(char)kb.Key)) {
 				Visible = true;
 				ManipulatePopup ();
 				closed = false;

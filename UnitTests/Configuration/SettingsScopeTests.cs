@@ -24,7 +24,6 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.True (ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue is Key);
 			Assert.True (ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue is Key);
 			Assert.True (ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue is Key);
-			Assert.True (ConfigurationManager.Settings ["Application.UseSystemConsole"].PropertyValue is bool);
 			Assert.True (ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue is bool);
 			Assert.True (ConfigurationManager.Settings ["Application.EnableConsoleScrolling"].PropertyValue is bool);
 
@@ -73,7 +72,6 @@ namespace Terminal.Gui.ConfigurationTests {
 			///Don't set Quitkey
 			updatedSettings["Application.AlternateForwardKey"].PropertyValue = Key.F;
 			updatedSettings["Application.AlternateBackwardKey"].PropertyValue = Key.B;
-			updatedSettings["Application.UseSystemConsole"].PropertyValue = true;
 			updatedSettings["Application.IsMouseDisabled"].PropertyValue = true;
 			updatedSettings["Application.EnableConsoleScrolling"].PropertyValue = true;
 
@@ -81,7 +79,6 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Key.End, ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue);
 			Assert.Equal (Key.F, updatedSettings ["Application.AlternateForwardKey"].PropertyValue);
 			Assert.Equal (Key.B, updatedSettings ["Application.AlternateBackwardKey"].PropertyValue);
-			Assert.True ((bool)updatedSettings ["Application.UseSystemConsole"].PropertyValue);
 			Assert.True ((bool)updatedSettings ["Application.IsMouseDisabled"].PropertyValue);
 			Assert.True ((bool)updatedSettings ["Application.EnableConsoleScrolling"].PropertyValue);
 		}

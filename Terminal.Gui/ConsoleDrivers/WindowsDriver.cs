@@ -1,7 +1,7 @@
 //
 // WindowsDriver.cs: Windows specific driver
 //
-using Rune = System.Text.Rune;
+using System.Text;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -1356,10 +1356,10 @@ internal class WindowsDriver : ConsoleDriver {
 		return Row * Cols + Col;
 	}
 
-	public override void AddRune (System.Rune systemRune)
+	public override void AddRune (Rune systemRune)
 	{
 		if (IsValidLocation (Col, Row)) {
-			var rune = new Rune (systemRune).MakePrintable ();
+			var rune = systemRune.MakePrintable ();
 
 			if (!rune.IsBmp) {
 				rune = Rune.ReplacementChar;
@@ -1369,12 +1369,12 @@ internal class WindowsDriver : ConsoleDriver {
 
 			if (Col > 0) {
 				var left = new Rune (Contents [Row, Col - 1, 0]);
-				if (left.GetColumnWidth () > 1) {
+				if (left.GetColumns () > 1) {
 					Contents [Row, Col - 1, 0] = Rune.ReplacementChar.Value;
 				}
 			}
 
-			if (rune.GetColumnWidth () > 1 && Col == Clip.Right - 1) {
+			if (rune.GetColumns () > 1 && Col == Clip.Right - 1) {
 				// This is a double-width character, and we are at the end of the line.
 				Contents [Row, Col, 0] = Rune.ReplacementChar.Value;
 				Contents [Row, Col, 1] = CurrentAttribute;
@@ -1414,11 +1414,11 @@ internal class WindowsDriver : ConsoleDriver {
 		//		Contents [Row, Col, 1] = CurrentAttribute;
 		//		Contents [Row, Col, 2] = 1;
 
-		//		if (runeWidth < 2 && Col > 0 && ((Rune)(Contents [Row, Col - 1, 0])).GetColumnWidth () > 1) {
+		//		if (runeWidth < 2 && Col > 0 && ((Rune)(Contents [Row, Col - 1, 0])).GetColumns () > 1) {
 		//			// This is a single-width character, and we are not at the beginning of the line.
 		//			Contents [Row, Col - 1, 0] = Rune.ReplacementChar.Value;
 
-		//		} else if (runeWidth < 2 && Col <= Clip.Right - 1 && ((Rune)(Contents [Row, Col, 0])).GetColumnWidth () > 1) {
+		//		} else if (runeWidth < 2 && Col <= Clip.Right - 1 && ((Rune)(Contents [Row, Col, 0])).GetColumns () > 1) {
 		//			// This is a single-width character, and we are not at the end of the line.
 		//			Contents [Row, Col + 1, 0] = Rune.ReplacementChar.Value;
 		//			Contents [Row, Col + 1, 2] = 1;
@@ -1628,7 +1628,7 @@ internal class WindowsDriver : ConsoleDriver {
 				_outputBuffer [position].Char.UnicodeChar = (char)rune.Value;
 				_outputBuffer [position].Attributes = (ushort)Contents [row, col, 1];
 				WindowsConsole.SmallRect.Update (ref _damageRegion, (short)col, (short)row);
-				var width = rune.GetColumnWidth ();
+				var width = rune.GetColumns ();
 				while (width > 1 && col < Cols - 1) {
 					col++;
 					position = row * Cols + col;

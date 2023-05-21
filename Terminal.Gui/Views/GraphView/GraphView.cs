@@ -1,4 +1,4 @@
-﻿using NStack;
+﻿using System.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -156,7 +156,7 @@ namespace Terminal.Gui {
 
 			if (AxisX.Visible && AxisY.Visible) {
 				Move (axisIntersection.X, axisIntersection.Y);
-				AddRune (axisIntersection.X, axisIntersection.Y, '\u253C');
+				AddRune (axisIntersection.X, axisIntersection.Y, (Rune)'\u253C');
 			}
 
 			SetDriverColorToGraphColor ();

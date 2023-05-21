@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Reflection;
-using NStack;
-using static Terminal.Gui.SpinnerStyle;
+using System.Text;
 
 namespace Terminal.Gui {
 
@@ -182,7 +180,7 @@ namespace Terminal.Gui {
 			for (var zoomedY = 0; zoomedY < BoxHeight; zoomedY++) {
 				for (var zoomedX = 0; zoomedX < BoxWidth; zoomedX++) {
 					Move (x * BoxWidth + zoomedX, y * BoxHeight + zoomedY);
-					Driver.AddRune (' ');
+					Driver.AddRune ((Rune)' ');
 					index++;
 				}
 			}

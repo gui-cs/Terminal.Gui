@@ -1,50 +1,11 @@
-﻿using Rune = System.Text.Rune;
-using NStack;
+//
+// ConsoleDriver.cs: Base class for Terminal.Gui ConsoleDriver implementations.
+//
+using System.Text;
 using System;
 using System.Diagnostics;
-using System.Text;
-using System.Globalization;
 
 namespace Terminal.Gui;
-
-/// <summary>
-/// Extends <see cref="System.Text.Rune"/> to support TUI specific text manipulation.
-/// </summary>
-public static class RuneExtensions {
-
-	/// <summary>
-	/// Returns <see langword="true"/> if the <see cref="Rune"/> is a combining character.
-	/// </summary>
-	/// <param name="rune"></param>
-	/// <returns></returns>
-	public static bool IsCombiningMark (this System.Text.Rune rune)
-	{
-		UnicodeCategory category = Rune.GetUnicodeCategory (rune);
-		return Rune.GetUnicodeCategory (rune) == UnicodeCategory.NonSpacingMark
-			|| category == UnicodeCategory.SpacingCombiningMark
-			|| category == UnicodeCategory.EnclosingMark;
-	}
-
-	/// <summary>
-	/// Extension method for System.Text.Rune to retrieve the number of column positions of a wide-character code.
-	/// This is used to measure runes as displayed by text-based terminals.
-	/// </summary>
-	/// <returns>The width in columns, 0 if the argument is the null character, -1 if the value is not printable,
-	/// otherwise the number of columns that the rune occupies.</returns>
-	/// <param name="rune">The rune.</param>
-	public static int GetColumnWidth (this System.Text.Rune rune)
-	{
-		return System.Rune.ColumnWidth (rune.Value);
-	}
-
-	/// <summary>
-	/// Ensures a Rune is not a control character and can be displayed by translating characters below 0x20
-	/// to equivalent, printable, Unicode chars.
-	/// </summary>
-	/// <param name="rune"></param>
-	/// <returns></returns>
-	public static Rune MakePrintable (this System.Text.Rune rune) => Rune.IsControl (rune) ? new Rune (rune.Value + 0x2400) : rune;
-}
 
 /// <summary>
 /// Base class for Terminal.Gui ConsoleDriver implementations.
@@ -132,19 +93,19 @@ public abstract class ConsoleDriver {
 
 	/// <summary>
 	/// Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/>
-	/// are used by <see cref="AddRune"/> and <see cref="AddStr"/> to determine where to add content.
+	/// are used by <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
 	/// </summary>
 	public int Col { get; internal set; }
 
 	/// <summary>
 	/// Gets the row last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/>
-	/// are used by <see cref="AddRune"/> and <see cref="AddStr"/> to determine where to add content.
+	/// are used by <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
 	/// </summary>
 	public int Row { get; internal set; }
 
 	/// <summary>
 	/// Updates <see cref="Col"/> and <see cref="Row"/> to the specified column and row in <see cref="Contents"/>.
-	/// Used by <see cref="AddRune"/> and <see cref="AddStr"/> to determine where to add content.
+	/// Used by <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
 	/// </summary>
 	/// <remarks>
 	/// <para>
@@ -164,6 +125,20 @@ public abstract class ConsoleDriver {
 	}
 
 	/// <summary>
+	/// Tests if the specified rune is supported by the driver.
+	/// </summary>
+	/// <param name="rune"></param>
+	/// <returns><see langword="true"/> if the rune can be properly presented; <see langword="false"/> if the driver
+	/// does not support displaying this rune.</returns>
+	public virtual bool IsRuneSupported (Rune rune)
+	{
+		if (rune.Value > RuneExtensions.MaxUnicodeCodePoint) {
+			return false;
+		}
+		return true;
+	}
+
+	/// <summary>
 	/// Adds the specified rune to the display at the current cursor position. 
 	/// </summary>
 	/// <remarks>
@@ -177,10 +152,17 @@ public abstract class ConsoleDriver {
 	/// </para>
 	/// </remarks>
 	/// <param name="rune">Rune to add.</param>
-	public virtual void AddRune (System.Rune rune)
+	public virtual void AddRune (Rune rune)
 	{
 
 	}
+
+	/// <summary>
+	/// Adds the specified <see langword="char"/> to the display at the current cursor position. This method
+	/// is a convenience method that calls <see cref="AddRune(Rune)"/> with the <see cref="Rune"/> constructor.
+	/// </summary>
+	/// <param name="c">Character to add.</param>
+	public void AddRune (char c) => AddRune (new Rune (c));
 
 	/// <summary>
 	/// Adds the <paramref name="str"/> to the display at the cursor position.
@@ -195,10 +177,10 @@ public abstract class ConsoleDriver {
 	/// </para>
 	/// </remarks>
 	/// <param name="str">String.</param>
-	public void AddStr (ustring str)
+	public void AddStr (string str)
 	{
 		foreach (var c in str) {
-			AddRune (new System.Rune (c));
+			AddRune (new Rune (c));
 		}
 	}
 
@@ -217,7 +199,7 @@ public abstract class ConsoleDriver {
 		Clip.Contains (col, row);
 
 	/// <summary>
-	/// Gets or sets the clip rectangle that <see cref="AddRune(System.Rune)"/> and <see cref="AddStr(ustring)"/> are 
+	/// Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are 
 	/// subject to.
 	/// </summary>
 	/// <value>The rectangle describing the bounds of <see cref="Clip"/>.</value>
@@ -269,7 +251,7 @@ public abstract class ConsoleDriver {
 	Attribute _currentAttribute;
 
 	/// <summary>
-	/// The <see cref="Attribute"/> that will be used for the next <see cref="AddRune"/> or <see cref="AddStr"/> call.
+	/// The <see cref="Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or <see cref="AddStr"/> call.
 	/// </summary>
 	public Attribute CurrentAttribute {
 		get => _currentAttribute;
@@ -296,7 +278,7 @@ public abstract class ConsoleDriver {
 		var prevAttribute = CurrentAttribute;
 		CurrentAttribute = c;
 		return prevAttribute;
-	} 
+	}
 
 	/// <summary>
 	/// Make the attribute for the foreground and background colors.
@@ -343,7 +325,6 @@ public abstract class ConsoleDriver {
 			s.Value.Initialize ();
 		}
 	}
-
 	/// <summary>
 	/// Enables diagnostic functions
 	/// </summary>
@@ -392,21 +373,28 @@ public abstract class ConsoleDriver {
 	/// </summary>
 	/// <param name="rect"></param>
 	/// <param name="rune"></param>
-	public void FillRect (Rect rect, System.Rune rune = default)
+	public void FillRect (Rect rect, Rune rune = default)
 	{
 		for (var r = rect.Y; r < rect.Y + rect.Height; r++) {
 			for (var c = rect.X; c < rect.X + rect.Width; c++) {
 				Application.Driver.Move (c, r);
-				Application.Driver.AddRune (rune == default ? new System.Rune (' ') : rune);
+				Application.Driver.AddRune (rune == default ? new Rune (' ') : rune);
 			}
 		}
 	}
 
 	/// <summary>
+	/// Fills the specified rectangle with the specified <see langword="char"/>. This method
+	/// is a convenience method that calls <see cref="FillRect(Rect, Rune)"/>.
+	/// </summary>
+	/// <param name="rect"></param>
+	/// <param name="c"></param>
+	public void FillRect (Rect rect, char c) => FillRect (rect, new Rune (c));
+
+	/// <summary>
 	/// Ends the execution of the console driver.
 	/// </summary>
 	public abstract void End ();
-
 }
 
 

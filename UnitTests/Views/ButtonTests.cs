@@ -22,7 +22,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal ($"{CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
 			Assert.False (btn.IsDefault);
 			Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
-			Assert.Equal ('_', btn.HotKeySpecifier);
+			Assert.Equal ('_', btn.HotKeySpecifier.Value);
 			Assert.True (btn.CanFocus);
 			Assert.Equal (new Rect (0, 0, 4, 1), btn.Bounds);
 			Assert.Equal (new Rect (0, 0, 4, 1), btn.Frame);
@@ -41,7 +41,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal ($"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Test {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
 			Assert.True (btn.IsDefault);
 			Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
-			Assert.Equal ('_', btn.HotKeySpecifier);
+			Assert.Equal ('_', btn.HotKeySpecifier.Value);
 			Assert.True (btn.CanFocus);
 			Assert.Equal (new Rect (0, 0, 10, 1), btn.Bounds);
 			Assert.Equal (new Rect (0, 0, 10, 1), btn.Frame);
@@ -56,7 +56,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal ($"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Test {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
 			Assert.True (btn.IsDefault);
 			Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
-			Assert.Equal ('_', btn.HotKeySpecifier);
+			Assert.Equal ('_', btn.HotKeySpecifier.Value);
 			Assert.True (btn.CanFocus);
 			Assert.Equal (new Rect (0, 0, 10, 1), btn.Bounds);
 			Assert.Equal (new Rect (3, 4, 10, 1), btn.Frame);
@@ -172,10 +172,10 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			View b = new Button () { Text = "heya" };
 			Assert.Equal ("heya", b.Text);
-			Assert.True (b.TextFormatter.Text.Contains ("heya"));
+			Assert.Contains ("heya", b.TextFormatter.Text);
 			b.Text = "heyb";
 			Assert.Equal ("heyb", b.Text);
-			Assert.True (b.TextFormatter.Text.Contains ("heyb"));
+			Assert.Contains ("heyb", b.TextFormatter.Text);
 
 			// with cast
 			Assert.Equal ("heyb", ((Button)b).Text);
@@ -365,7 +365,7 @@ namespace Terminal.Gui.ViewsTests {
 			};
 			var btnTxt = $"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}";
 
-			btn.X = Pos.AnchorEnd () - Pos.Function (() => TextFormatter.GetTextWidth (btn.TextFormatter.Text));
+			btn.X = Pos.AnchorEnd () - Pos.Function (() => btn.TextFormatter.Text.GetColumns ());
 
 			var win = new Window () {
 				Width = Dim.Fill (),
@@ -430,7 +430,7 @@ namespace Terminal.Gui.ViewsTests {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (label),
 				Width = 20,
-				Enabled = !txtToFind.Text.IsEmpty,
+				Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 				TextAlignment = TextAlignment.Centered,
 				IsDefault = true,
 				AutoSize = false
@@ -441,7 +441,7 @@ namespace Terminal.Gui.ViewsTests {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindNext) + 1,
 				Width = 20,
-				Enabled = !txtToFind.Text.IsEmpty,
+				Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 				TextAlignment = TextAlignment.Centered,
 				AutoSize = false
 			};

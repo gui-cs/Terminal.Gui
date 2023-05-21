@@ -1,18 +1,17 @@
 ﻿#define DRAW_CONTENT
 //#define BASE_DRAW_CONTENT
 
-using NStack;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Text.Unicode;
 using System.Threading.Tasks;
 using Terminal.Gui;
-using static System.Net.WebRequestMethods;
-using Rune = System.Rune;
+using static Terminal.Gui.TableView;
 
 namespace UICatalog.Scenarios;
 
@@ -22,13 +21,15 @@ namespace UICatalog.Scenarios;
 ///   - Helps test unicode character rendering in Terminal.Gui
 ///   - Illustrates how to use ScrollView to do infinite scrolling
 /// </summary>
-[ScenarioMetadata (Name: "Character Map", Description: "A Unicode character set viewer built as a custom control using the ScrollView control.")]
+[ScenarioMetadata (Name: "Character Map", Description: "Unicode viewer demonstrating the ScrollView control.")]
 [ScenarioCategory ("Text and Formatting")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("ScrollView")]
 public class CharacterMap : Scenario {
 	CharMap _charMap;
 	Label _errorLabel;
+	TableView _categoryList;
+
 	public override void Setup ()
 	{
 		_charMap = new CharMap () {
@@ -44,70 +45,148 @@ public class CharacterMap : Scenario {
 		Win.Add (jumpEdit);
 		_errorLabel = new Label ("") { X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap), ColorScheme = Colors.ColorSchemes ["error"] };
 		Win.Add (_errorLabel);
+
 		jumpEdit.TextChanged += JumpEdit_TextChanged;
-		var rangeItems = new (ustring label, int start, int end) [UnicodeRange.Ranges.Count];
 
-		for (var i = 0; i < UnicodeRange.Ranges.Count; i++) {
-			var range = UnicodeRange.Ranges [i];
-			rangeItems [i] = CreateRangeItem (range.Category, range.Start, range.End);
-		}
-		static (ustring label, int start, int end) CreateRangeItem (ustring title, int start, int end)
-		{
-			return ($"{title} (U+{start:x5}-{end:x5})", start, end);
-		}
-
-		var label = new Label ("Jump To Unicode Range:") { X = Pos.Right (_charMap) + 1, Y = Pos.Bottom (jumpLabel) + 1 };
-		Win.Add (label);
-
-		var jumpList = new ListView (rangeItems.Select (t => t.label).ToArray ()) {
-			X = Pos.X (label) + 1,
-			Y = Pos.Bottom (label),
-			Width = rangeItems.Max (r => r.label.Length) + 2,
-			Height = Dim.Fill (1),
-			SelectedItem = 0
-		};
-		jumpList.SelectedItemChanged += (s, args) => {
-			_charMap.StartCodePoint = rangeItems [jumpList.SelectedItem].start;
+		_categoryList = new TableView () {
+			X = Pos.Right (_charMap),
+			Y = Pos.Bottom (jumpLabel),
+			Height = Dim.Fill ()
 		};
 
-		_charMap.SelectedCodePointChanged += (s, args) => {
-			jumpEdit.TextChanged -= JumpEdit_TextChanged;
-			jumpEdit.Text = $"{args.Item:X6}";
-			jumpEdit.TextChanged += JumpEdit_TextChanged;
+		_categoryList.FullRowSelect = true;
+		//jumpList.Style.ShowHeaders = false;
+		//jumpList.Style.ShowHorizontalHeaderOverline = false;
+		//jumpList.Style.ShowHorizontalHeaderUnderline = false;
+		_categoryList.Style.ShowHorizontalBottomline = true;
+		//jumpList.Style.ShowVerticalCellLines = false;
+		//jumpList.Style.ShowVerticalHeaderLines = false;
+		_categoryList.Style.AlwaysShowHeaders = true;
+
+		var isDescending = false;
+
+		_categoryList.Table = CreateCategoryTable (0, isDescending);
+
+		// if user clicks the mouse in TableView
+		_categoryList.MouseClick += (s, e) => {
+			_categoryList.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
+			if (clickedCol != null && e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
+				var table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+				var prevSelection = table.Data.ElementAt (_categoryList.SelectedRow).Category;
+				isDescending = !isDescending;
+
+				_categoryList.Table = CreateCategoryTable (clickedCol.Value, isDescending);
+
+				table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+				_categoryList.SelectedRow = table.Data
+					.Select ((item, index) => new { item, index })
+					.FirstOrDefault (x => x.item.Category == prevSelection)?.index ?? -1;
+			}
 		};
 
-		Win.Add (jumpList);
+		var longestName = UnicodeRange.Ranges.Max (r => r.Category.GetColumns ());
+		_categoryList.Style.ColumnStyles.Add (0, new ColumnStyle () { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName });
+		_categoryList.Style.ColumnStyles.Add (1, new ColumnStyle () { MaxWidth = 1, MinWidth = 6 });
+		_categoryList.Style.ColumnStyles.Add (2, new ColumnStyle () { MaxWidth = 1, MinWidth = 6 });
+
+		_categoryList.Width = _categoryList.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 4;
+
+		_categoryList.SelectedCellChanged += (s, args) => {
+			EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+			_charMap.StartCodePoint = table.Data.ToArray () [args.NewRow].Start;
+		};
+
+		Win.Add (_categoryList);
 
 		_charMap.SelectedCodePoint = 0;
 		//jumpList.Refresh ();
 		_charMap.SetFocus ();
 
-		_charMap.Width = Dim.Fill () - jumpList.Width;
+		_charMap.Width = Dim.Fill () - _categoryList.Width;
+	}
+
+
+	EnumerableTableSource<UnicodeRange> CreateCategoryTable (int sortByColumn, bool descending)
+	{
+		Func<UnicodeRange, object> orderBy;
+		var categorySort = string.Empty;
+		var startSort = string.Empty;
+		var endSort = string.Empty;
+
+		var sortIndicator = descending ? CM.Glyphs.DownArrow.ToString () : CM.Glyphs.UpArrow.ToString ();
+		switch (sortByColumn) {
+		case 0:
+			orderBy = r => r.Category;
+			categorySort = sortIndicator;
+			break;
+		case 1:
+			orderBy = r => r.Start;
+			startSort = sortIndicator;
+			break;
+		case 2:
+			orderBy = r => r.End;
+			endSort = sortIndicator;
+			break;
+		default:
+			throw new ArgumentException ("Invalid column number.");
+		}
+
+		IOrderedEnumerable<UnicodeRange> sortedRanges = descending ?
+			UnicodeRange.Ranges.OrderByDescending (orderBy) :
+			UnicodeRange.Ranges.OrderBy (orderBy);
+
+		return new EnumerableTableSource<UnicodeRange> (sortedRanges, new Dictionary<string, Func<UnicodeRange, object>> ()
+		{
+			{ $"Category{categorySort}", s => s.Category },
+			{ $"Start{startSort}", s => $"{s.Start:x5}" },
+			{ $"End{endSort}", s => $"{s.End:x5}" },
+		});
 	}
 
 	private void JumpEdit_TextChanged (object sender, TextChangedEventArgs e)
 	{
 		var jumpEdit = sender as TextField;
-		var result = 0;
-		if (jumpEdit.Text.Length == 0) return;
-		try {
-			result = Convert.ToInt32 (jumpEdit.Text.ToString (), 10);
-		} catch (OverflowException) {
-			_errorLabel.Text = $"Invalid (overflow)";
+		if (jumpEdit.Text.Length == 0) {
 			return;
-		} catch (FormatException) {
+		}
+		uint result = 0;
+
+		if (jumpEdit.Text.StartsWith ("U+", StringComparison.OrdinalIgnoreCase) || jumpEdit.Text.StartsWith ("\\u")) {
 			try {
-				result = Convert.ToInt32 (jumpEdit.Text.ToString (), 16);
-			} catch (OverflowException) {
-				_errorLabel.Text = $"Invalid (overflow)";
-				return;
+				result = uint.Parse (jumpEdit.Text [2..^0], NumberStyles.HexNumber);
 			} catch (FormatException) {
-				_errorLabel.Text = $"Invalid (can't parse)";
+				_errorLabel.Text = $"Invalid hex value";
+				return;
+			}
+		} else if (jumpEdit.Text.StartsWith ("0", StringComparison.OrdinalIgnoreCase) || jumpEdit.Text.StartsWith ("\\u")) {
+			try {
+				result = uint.Parse (jumpEdit.Text, NumberStyles.HexNumber);
+			} catch (FormatException) {
+				_errorLabel.Text = $"Invalid hex value";
+				return;
+			}
+		} else {
+			try {
+				result = uint.Parse (jumpEdit.Text, NumberStyles.Integer);
+			} catch (FormatException) {
+				_errorLabel.Text = $"Invalid value";
 				return;
 			}
 		}
+		if (result > RuneExtensions.MaxUnicodeCodePoint) {
+			_errorLabel.Text = $"Beyond maximum codepoint";
+			return;
+		}
 		_errorLabel.Text = $"U+{result:x4}";
-		_charMap.SelectedCodePoint = result;
+
+		var table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+		_categoryList.SelectedRow = table.Data
+			.Select ((item, index) => new { item, index })
+			.FirstOrDefault (x => x.item.Start <= result && x.item.End >= result)?.index ?? -1;
+		_categoryList.EnsureSelectedCellIsVisible ();
+
+		// Ensure the typed glyph is selected 
+		_charMap.SelectedCodePoint = (int)result;
 	}
 }
 
@@ -137,7 +216,8 @@ class CharMap : ScrollView {
 		get => _selected;
 		set {
 			_selected = value;
-			var row = (int)_selected / 16;
+			var col = Cursor.X;
+			var row = Cursor.Y;
 			var height = (Bounds.Height / ROW_HEIGHT) - (ShowHorizontalScrollIndicator ? 2 : 1);
 			if (row + ContentOffset.Y < 0) {
 				// Moving up.
@@ -146,7 +226,6 @@ class CharMap : ScrollView {
 				// Moving down.
 				ContentOffset = new Point (ContentOffset.X, Math.Min (row, row - height + ROW_HEIGHT));
 			}
-			var col = (((int)_selected - (row * 16)) * COLUMN_WIDTH);
 			var width = (Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH) - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
 			if (col + ContentOffset.X < 0) {
 				// Moving left.
@@ -155,25 +234,39 @@ class CharMap : ScrollView {
 				// Moving right.
 				ContentOffset = new Point (Math.Min (col, col - width + COLUMN_WIDTH), ContentOffset.Y);
 			}
-
 			SetNeedsDisplay ();
-			SelectedCodePointChanged?.Invoke (this, new ListViewItemEventArgs (_selected, null));
+			SelectedCodePointChanged?.Invoke (this, new ListViewItemEventArgs (SelectedCodePoint, null));
 		}
+	}
+
+	public Point Cursor {
+		get {
+			var row = SelectedCodePoint / 16;
+			var col = (SelectedCodePoint - row * 16) * COLUMN_WIDTH;
+			return new Point (col, row);
+		}
+		set => throw new NotImplementedException ();
 	}
 
 	public override void PositionCursor ()
 	{
-		var row = (int)_selected / 16;
-		var col = (((int)_selected - (row * 16)) * COLUMN_WIDTH);
+		if (HasFocus && Cursor.X + ContentOffset.X + RowLabelWidth + 1 >= RowLabelWidth &&
+			Cursor.X + ContentOffset.X + RowLabelWidth + 1 < Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0) &&
+			Cursor.Y + ContentOffset.Y + 1 > 0 &&
+			Cursor.Y + ContentOffset.Y + 1 < Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0)) {
 
-		Move (col + ContentOffset.X + RowLabelWidth + 1, row + ContentOffset.Y + 1);
+			Driver.SetCursorVisibility (CursorVisibility.Default);
+			Move (Cursor.X + ContentOffset.X + RowLabelWidth + 1, Cursor.Y + ContentOffset.Y + 1);
+		} else {
+			Driver.SetCursorVisibility (CursorVisibility.Invisible);
+		}
 	}
 
 
 	int _start = 0;
 	int _selected = 0;
 
-	public const int COLUMN_WIDTH = 2;
+	public const int COLUMN_WIDTH = 3;
 	public const int ROW_HEIGHT = 1;
 
 	public static int MaxCodePoint => 0x10FFFF;
@@ -185,8 +278,6 @@ class CharMap : ScrollView {
 	{
 		ColorScheme = Colors.Dialog;
 		CanFocus = true;
-		KeepContentAlwaysInViewport = true;
-
 		ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePoint / 16 + (ShowHorizontalScrollIndicator ? 2 : 1)));
 
 		AddCommand (Command.ScrollUp, () => {
@@ -238,46 +329,28 @@ class CharMap : ScrollView {
 		});
 
 		MouseClick += Handle_MouseClick;
-
-		// Reset cursor on resize
-		//LayoutComplete += (s, a) => { UpdateCursor (); };
-
-		//DrawContent += CharMap_DrawContent;
-
 	}
 
-	private void CopyCodePoint ()
-	{
-		Clipboard.Contents = $"U+{SelectedCodePoint:x5}";
-	}
-
-	private void CopyGlyph ()
-	{
-		Clipboard.Contents = $"{new Rune ((char)SelectedCodePoint)}";
-	}
+	private void CopyCodePoint () => Clipboard.Contents = $"U+{SelectedCodePoint:x5}";
+	private void CopyGlyph () => Clipboard.Contents = $"{new Rune ((char)SelectedCodePoint)}";
 
 	public override void OnDrawContent (Rect contentArea)
 	{
 		if (ShowHorizontalScrollIndicator && ContentSize.Height < (int)(MaxCodePoint / 16 + 2)) {
 			ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePoint / 16 + 2));
-			int row = (int)_selected / 16;
-			int col = (((int)_selected - (row * 16)) * COLUMN_WIDTH);
-			int width = (Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH) - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
-			if (col + ContentOffset.X >= width) {
+			var width = (Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH) - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
+			if (Cursor.X + ContentOffset.X >= width) {
 				// Snap to the selected glyph.
-				ContentOffset = new Point (Math.Min (col, col - width + COLUMN_WIDTH), ContentOffset.Y == -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
+				ContentOffset = new Point (Math.Min (Cursor.X, Cursor.X - width + COLUMN_WIDTH), ContentOffset.Y == -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
 			} else {
-				ContentOffset = new Point (ContentOffset.X - col, ContentOffset.Y == -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
+				ContentOffset = new Point (ContentOffset.X - Cursor.X, ContentOffset.Y == -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
 			}
-			//SetNeedsDisplay ();
 		} else if (!ShowHorizontalScrollIndicator && ContentSize.Height > (int)(MaxCodePoint / 16 + 1)) {
 			ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePoint / 16 + 1));
 			// Snap 1st column into view if it's been scrolled horizontally
 			ContentOffset = new Point (0, ContentOffset.Y < -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
-			//SetNeedsDisplay ();
 		}
 		base.OnDrawContent (contentArea);
-
 	}
 
 	//public void CharMap_DrawContent (object s, DrawEventArgs a)
@@ -296,34 +369,51 @@ class CharMap : ScrollView {
 			// ClipToBounds doesn't know about the scroll indicators, so if off, subtract one from width
 			Driver.Clip = new Rect (Driver.Clip.Location, new Size (Driver.Clip.Width - 1, Driver.Clip.Height));
 		}
-		Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : ColorScheme.Focus);
+
+		var cursorCol = Cursor.X;
+		var cursorRow = Cursor.Y;
+
+		Driver.SetAttribute (GetHotNormalColor ());
 		Move (0, 0);
 		Driver.AddStr (new string (' ', RowLabelWidth + 1));
 		for (int hexDigit = 0; hexDigit < 16; hexDigit++) {
 			var x = ContentOffset.X + RowLabelWidth + (hexDigit * COLUMN_WIDTH);
 			if (x > RowLabelWidth - 2) {
 				Move (x, 0);
-				Driver.AddStr ($" {hexDigit:x} ");
+				Driver.SetAttribute (GetHotNormalColor ());
+				Driver.AddStr (" ");
+				Driver.SetAttribute (HasFocus && (cursorCol + RowLabelWidth == x) ? ColorScheme.HotFocus : GetHotNormalColor ());
+				Driver.AddStr ($"{hexDigit:x}");
+				Driver.SetAttribute (GetHotNormalColor ());
+				Driver.AddStr (" ");
 			}
 		}
 
 		var firstColumnX = viewport.X + RowLabelWidth;
-		Driver.SetAttribute (GetNormalColor ());
-		for (int row = -ContentOffset.Y, y = 0; row <= (-ContentOffset.Y) + (Bounds.Height / ROW_HEIGHT); row++, y += ROW_HEIGHT) {
+		for (int row = -ContentOffset.Y, y = 1; row <= (-ContentOffset.Y) + (Bounds.Height / ROW_HEIGHT); row++, y += ROW_HEIGHT) {
 			var val = (row) * 16;
-			Move (firstColumnX, y + 1);
-			if (val <= MaxCodePoint) {
-				Move (firstColumnX + COLUMN_WIDTH, y + 1);
-				for (int col = 0; col < 16; col++) {
-					Move (firstColumnX + COLUMN_WIDTH * col + 1, y + 1);
-					Driver.AddRune (new Rune ((char)(val + col)));
-				}
-				Move (0, y + 1);
-				Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : ColorScheme.Focus);
-				var rowLabel = $"U+{val / 16:x5}_ ";
-				Driver.AddStr (rowLabel);
-				Driver.SetAttribute (GetNormalColor ());
+			if (val > MaxCodePoint) {
+				continue;
 			}
+			Move (firstColumnX + COLUMN_WIDTH, y);
+			Driver.SetAttribute (GetNormalColor ());
+			for (int col = 0; col < 16; col++) {
+				var x = firstColumnX + COLUMN_WIDTH * col + 1;
+				Move (x, y);
+				if (cursorRow + ContentOffset.Y + 1 == y && cursorCol + ContentOffset.X + firstColumnX + 1 == x && !HasFocus) {
+					Driver.SetAttribute (GetFocusColor ());
+				}
+
+				Driver.AddRune (new Rune (val + col));
+
+				if (cursorRow + ContentOffset.Y + 1 == y && cursorCol + ContentOffset.X + firstColumnX + 1 == x && !HasFocus) {
+					Driver.SetAttribute (GetNormalColor ());
+				}
+			}
+			Move (0, y);
+			Driver.SetAttribute (HasFocus && (cursorRow + ContentOffset.Y + 1 == y) ? ColorScheme.HotFocus : ColorScheme.HotNormal);
+			var rowLabel = $"U+{val / 16:x5}_ ";
+			Driver.AddStr (rowLabel);
 		}
 		Driver.Clip = oldClip;
 	}
@@ -333,8 +423,7 @@ class CharMap : ScrollView {
 	{
 		var me = args.MouseEvent;
 		if (me.Flags == MouseFlags.ReportMousePosition || (me.Flags != MouseFlags.Button1Clicked &&
-			me.Flags != MouseFlags.Button1DoubleClicked &&
-			me.Flags != _contextMenu.MouseFlags)) {
+			me.Flags != MouseFlags.Button1DoubleClicked)) { // && me.Flags != _contextMenu.MouseFlags)) {
 			return;
 		}
 
@@ -474,9 +563,6 @@ class CharMap : ScrollView {
 		}
 		// BUGBUG: This is a workaround for some weird ScrollView related mouse grab bug
 		Application.GrabMouse (this);
-		PositionCursor ();
-		Driver.SetCursorVisibility (CursorVisibility.Default);
-
 	}
 
 
@@ -568,7 +654,7 @@ class UnicodeRange {
 			new UnicodeRange (0xE0000, 0xE007F   ,"Tags"),
 		};
 
-		return ranges.Concat (nonBmpRanges).ToList ();
+		return ranges.Concat (nonBmpRanges).OrderBy (r => r.Category).ToList ();
 	}
 
 	public static List<UnicodeRange> Ranges = GetRanges ();

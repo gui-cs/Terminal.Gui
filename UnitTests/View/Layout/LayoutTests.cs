@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -984,14 +985,14 @@ Y
 			var horizontalView = new View () {
 				Id = "horizontalView",
 				AutoSize = true,
-				HotKeySpecifier = '_',
+				HotKeySpecifier = (Rune)'_',
 				Text = text
 			};
 			var verticalView = new View () {
 				Id = "verticalView",
 				Y = 3,
 				AutoSize = true,
-				HotKeySpecifier = '_',
+				HotKeySpecifier = (Rune)'_',
 				Text = text,
 				TextDirection = TextDirection.TopBottom_LeftRight
 			};

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using NStack;
+using System.Text;
 using Terminal.Gui.Resources;
 
 namespace Terminal.Gui {
@@ -21,7 +21,7 @@ namespace Terminal.Gui {
 	/// <example>
 	/// <code>
 	/// using Terminal.Gui;
-	/// using NStack;
+	/// using System.Text;
 	/// 
 	/// Application.Init();
 	/// 
@@ -77,7 +77,7 @@ namespace Terminal.Gui {
 			///// The title of the <see cref="WizardStep"/>. 
 			///// </summary>
 			///// <remarks>The Title is only displayed when the <see cref="Wizard"/> is used as a modal pop-up (see <see cref="Wizard.Modal"/>.</remarks>
-			//public new ustring Title {
+			//public new string Title {
 			//	// BUGBUG: v2 - No need for this as View now has Title w/ notifications.
 			//	get => title;
 			//	set {
@@ -91,7 +91,7 @@ namespace Terminal.Gui {
 			//	}
 			//}
 
-			//private ustring title = ustring.Empty;
+			//private string title = string.Empty;
 
 			// The contentView works like the ContentView in FrameView.
 			private View contentView = new View () { Data = "WizardContentView" };
@@ -101,7 +101,7 @@ namespace Terminal.Gui {
 			/// the help pane will not be visible and the content will fill the entire WizardStep.
 			/// </summary>
 			/// <remarks>The help text is displayed using a read-only <see cref="TextView"/>.</remarks>
-			public ustring HelpText {
+			public string HelpText {
 				get => helpTextView.Text;
 				set {
 					helpTextView.Text = value;
@@ -116,13 +116,13 @@ namespace Terminal.Gui {
 			/// steps after the first step.
 			/// </summary>
 			/// <remarks>The default text is "Back"</remarks>
-			public ustring BackButtonText { get; set; } = ustring.Empty;
+			public string BackButtonText { get; set; } = string.Empty;
 
 			/// <summary>
 			/// Sets or gets the text for the next/finish button.
 			/// </summary>
 			/// <remarks>The default text is "Next..." if the Pane is not the last pane. Otherwise it is "Finish"</remarks>
-			public ustring NextButtonText { get; set; } = ustring.Empty;
+			public string NextButtonText { get; set; } = string.Empty;
 
 			/// <summary>
 			/// Initializes a new instance of the <see cref="Wizard"/> class using <see cref="LayoutStyle.Computed"/> positioning.
@@ -308,7 +308,7 @@ namespace Terminal.Gui {
 
 		private void Wizard_TitleChanged (object sender, TitleEventArgs e)
 		{
-			if (ustring.IsNullOrEmpty (wizardTitle)) {
+			if (string.IsNullOrEmpty (wizardTitle)) {
 				wizardTitle = e.NewTitle;
 			}
 		}
@@ -531,7 +531,7 @@ namespace Terminal.Gui {
 		///// <remarks>
 		///// The Title is only displayed when the <see cref="Wizard"/> <see cref="Wizard.Modal"/> is set to <c>false</c>.
 		///// </remarks>
-		//public new ustring Title {
+		//public new string Title {
 		//	get {
 		//		// The base (Dialog) Title holds the full title ("Wizard Title - Step Title")
 		//		return base.Title;
@@ -541,7 +541,7 @@ namespace Terminal.Gui {
 		//		base.Title = $"{wizardTitle}{(steps.Count > 0 && currentStep != null ? " - " + currentStep.Title : string.Empty)}";
 		//	}
 		//}
-		private ustring wizardTitle = ustring.Empty;
+		private string wizardTitle = string.Empty;
 
 		/// <summary>
 		/// Raised when the Back button in the <see cref="Wizard"/> is clicked. The Back button is always
@@ -664,14 +664,14 @@ namespace Terminal.Gui {
 			Title = $"{wizardTitle}{(steps.Count > 0 ? " - " + CurrentStep.Title : string.Empty)}";
 
 			// Configure the Back button
-			backBtn.Text = CurrentStep.BackButtonText != ustring.Empty ? CurrentStep.BackButtonText : Strings.wzBack; // "_Back";
+			backBtn.Text = CurrentStep.BackButtonText != string.Empty ? CurrentStep.BackButtonText : Strings.wzBack; // "_Back";
 			backBtn.Visible = (CurrentStep != GetFirstStep ());
 
 			// Configure the Next/Finished button
 			if (CurrentStep == GetLastStep ()) {
-				nextfinishBtn.Text = CurrentStep.NextButtonText != ustring.Empty ? CurrentStep.NextButtonText : Strings.wzFinish; // "Fi_nish";
+				nextfinishBtn.Text = CurrentStep.NextButtonText != string.Empty ? CurrentStep.NextButtonText : Strings.wzFinish; // "Fi_nish";
 			} else {
-				nextfinishBtn.Text = CurrentStep.NextButtonText != ustring.Empty ? CurrentStep.NextButtonText : Strings.wzNext; // "_Next...";
+				nextfinishBtn.Text = CurrentStep.NextButtonText != string.Empty ? CurrentStep.NextButtonText : Strings.wzNext; // "_Next...";
 			}
 
 			SizeStep (CurrentStep);

@@ -1999,10 +1999,10 @@ Edit
 			};
 			mi.Action = mi.ToggleChecked;
 			var menu = new MenuBar (new MenuBarItem [] {
-		new MenuBarItem("Nullable Checked",new MenuItem [] {
-		    mi
-		})
-	    });
+				new MenuBarItem("Nullable Checked",new MenuItem [] {
+					mi
+				})
+			});
 			new CheckBox ();
 			var top = Application.Top;
 			top.Add (menu);
@@ -2086,12 +2086,12 @@ Edit
 		public void Menu_With_Separator ()
 		{
 			var menu = new MenuBar (new MenuBarItem [] {
-		new MenuBarItem("File",new MenuItem [] {
-		    new MenuItem("_Open", "Open a file", () => { }, null, null, Key.CtrlMask | Key.O),
-		    null,
-		    new MenuItem("_Quit","",null)
-		})
-	    });
+				new MenuBarItem("File",new MenuItem [] {
+				    new MenuItem("_Open", "Open a file", () => { }, null, null, Key.CtrlMask | Key.O),
+				    null,
+				    new MenuItem("_Quit","",null)
+				})
+			});
 
 			Application.Top.Add (menu);
 			Application.Begin (Application.Top);

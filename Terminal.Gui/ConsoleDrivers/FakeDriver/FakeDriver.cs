@@ -7,8 +7,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Text;
-using Rune = System.Text.Rune;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
@@ -81,10 +81,10 @@ public class FakeDriver : ConsoleDriver {
 		}
 	}
 
-	public override void AddRune (System.Rune systemRune)
+	public override void AddRune (Rune rune)
 	{
-		var rune = new Rune (systemRune).MakePrintable ();
-		var runeWidth = rune.GetColumnWidth ();
+		rune = rune.MakePrintable ();
+		var runeWidth = rune.GetColumns ();
 		var validLocation = IsValidLocation (Col, Row);
 
 		if (validLocation) {
@@ -119,7 +119,7 @@ public class FakeDriver : ConsoleDriver {
 
 				if (Col > 0) {
 					var left = new Rune (Contents [Row, Col - 1, 0]);
-					if (left.GetColumnWidth () > 1) {
+					if (left.GetColumns () > 1) {
 						Contents [Row, Col - 1, 0] = Rune.ReplacementChar.Value;
 					}
 				}

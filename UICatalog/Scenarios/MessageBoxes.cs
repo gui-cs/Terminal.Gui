@@ -1,5 +1,4 @@
-﻿using NStack;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using Terminal.Gui;
@@ -135,7 +134,7 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (label);
 
-			var styleRadioGroup = new RadioGroup (new ustring [] { "_Query", "_Error" }) {
+			var styleRadioGroup = new RadioGroup (new string [] { "_Query", "_Error" }) {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
 			};
@@ -194,7 +193,7 @@ namespace UICatalog.Scenarios {
 					int numButtons = int.Parse (numButtonsEdit.Text.ToString ());
 					int defaultButton = int.Parse (defaultButtonEdit.Text.ToString ());
 
-					var btns = new List<ustring> ();
+					var btns = new List<string> ();
 					for (int i = 0; i < numButtons; i++) {
 						//btns.Add(btnText[i % 10]);
 						btns.Add (NumberToWords.Convert (i));

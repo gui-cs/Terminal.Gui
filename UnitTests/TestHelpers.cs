@@ -7,8 +7,10 @@ using Xunit;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using System.Diagnostics;
-using Rune = System.Rune;
-using NStack;
+
+using Attribute = Terminal.Gui.Attribute;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+using Xunit.Sdk;
 
 namespace Terminal.Gui;
 // This class enables test functions annotated with the [AutoInitShutdown] attribute to 
@@ -118,10 +120,15 @@ partial class TestHelpers {
 
 		for (int r = 0; r < driver.Rows; r++) {
 			for (int c = 0; c < driver.Cols; c++) {
-				Rune rune = contents [r, c, 0];
-				if (Rune.DecodeSurrogatePair (rune, out char [] spair)) sb.Append (spair);
-				else sb.Append ((char)rune);
-				if (Rune.ColumnWidth (rune) > 1) c++;
+				Rune rune = (Rune)contents [r, c, 0];
+				if (rune.DecodeSurrogatePair (out char [] spair)) {
+					sb.Append (spair);
+				} else {
+					sb.Append ((char)rune.Value);
+				}
+				if (rune.GetColumns () > 1) {
+					c++;
+				}
 			}
 			sb.AppendLine ();
 		}
@@ -168,14 +175,20 @@ partial class TestHelpers {
 			var runes = new List<Rune> ();
 			for (var c = 0; c < driver.Cols; c++) {
 				var rune = (Rune)contents [r, c, 0];
-				if (rune != ' ') {
+				if (rune != (Rune)' ') {
 					if (x == -1) {
 						x = c;
 						y = r;
-						for (int i = 0; i < c; i++) runes.InsertRange (i, new List<Rune> () { ' ' });
+						for (int i = 0; i < c; i++) {
+							runes.InsertRange (i, new List<Rune> () { (Rune)' ' });
+						}
 					}
-					if (Rune.ColumnWidth (rune) > 1) c++;
-					if (c + 1 > w) w = c + 1;
+					if (rune.GetColumns () > 1) {
+						c++;
+					}
+					if (c + 1 > w) {
+						w = c + 1;
+					}
 					h = r - y + 1;
 				}
 				if (x > -1) runes.Add (rune);
@@ -192,16 +205,21 @@ partial class TestHelpers {
 		foreach (var row in lines) {
 			for (var c = row.Count - 1; c >= 0; c--) {
 				var rune = row [c];
-				if (rune != ' ' || row.Sum (x => Rune.ColumnWidth (x)) == w) break;
+				if (rune != (Rune)' ' || (row.Sum (x => x.GetColumns ()) == w)) {
+					break;
+				}
 				row.RemoveAt (c);
 			}
 		}
 
 		// Convert Rune list to string
-		for (var r = 0; r < lines.Count; r++) {
-			var line = ustring.Make (lines [r]).ToString ();
-			if (r == lines.Count - 1) sb.Append (line);
-			else sb.AppendLine (line);
+		for (int r = 0; r < lines.Count; r++) {
+			var line = Terminal.Gui.StringExtensions.ToString (lines [r]).ToString ();
+			if (r == lines.Count - 1) {
+				sb.Append (line);
+			} else {
+				sb.AppendLine (line);
+			}
 		}
 
 		var actualLook = sb.ToString ();
@@ -331,28 +349,6 @@ partial class TestHelpers {
 		if (!string.Equals (expectedLook, actualLook)) {
 			output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
 			output?.WriteLine ("But Was:" + Environment.NewLine + actualLook);
-		}
-
-		Assert.Equal (expectedLook, actualLook);
-	}
-
-	/// <summary>
-	/// Verifies two strings are equivalent. If the assert fails, output will be generated to standard 
-	/// output showing the expected and actual look. 
-	/// </summary>
-	/// <param name="output">Uses <see cref="ustring.ToString()"/> on <paramref name="actualLook"/>.</param>
-	/// <param name="expectedLook">A string containing the expected look. Newlines should be specified as "\r\n" as
-	/// they will be converted to <see cref="Environment.NewLine"/> to make tests platform independent.</param>
-	/// <param name="actualLook"></param>
-	public static void AssertEqual (ITestOutputHelper output, string expectedLook, ustring actualLook)
-	{
-		// Convert newlines to platform-specific newlines
-		expectedLook = ReplaceNewLinesToPlatformSpecific (expectedLook);
-
-		// If test is about to fail show user what things looked like
-		if (!string.Equals (expectedLook, actualLook.ToString ())) {
-			output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
-			output?.WriteLine ("But Was:" + Environment.NewLine + actualLook.ToString ());
 		}
 
 		Assert.Equal (expectedLook, actualLook);

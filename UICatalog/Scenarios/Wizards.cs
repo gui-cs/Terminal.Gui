@@ -1,5 +1,4 @@
-﻿using NStack;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -109,7 +108,7 @@ namespace UICatalog.Scenarios {
 						return;
 					}
 
-					actionLabel.Text = ustring.Empty;
+					actionLabel.Text = string.Empty;
 
 					var wizard = new Wizard () {
 						Title = titleEdit.Text,
@@ -178,7 +177,7 @@ namespace UICatalog.Scenarios {
 					frame.Add (new TextField ("This is a TextField inside of the frame."));
 					secondStep.Add (frame);
 					wizard.StepChanging += (s, args) => {
-						if (args.OldStep == secondStep && firstNameField.Text.IsEmpty) {
+						if (args.OldStep == secondStep && string.IsNullOrEmpty(firstNameField.Text)) {
 							args.Cancel = true;
 							var btn = MessageBox.ErrorQuery ("Second Step", "You must enter a First Name to continue", "Ok");
 						}
@@ -229,7 +228,7 @@ namespace UICatalog.Scenarios {
 					};
 					hideHelpBtn.Clicked += (s, e) => {
 						if (fourthStep.HelpText.Length > 0) {
-							fourthStep.HelpText = ustring.Empty;
+							fourthStep.HelpText = string.Empty;
 						} else {
 							fourthStep.HelpText = help;
 						}

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using NStack;
+using System.Text;
 
 namespace Terminal.Gui {
 	public partial class View {
@@ -162,42 +162,39 @@ namespace Terminal.Gui {
 		public bool SubViewNeedsDisplay {
 			get => _subViewNeedsDisplay;
 		}
+
 		bool _subViewNeedsDisplay;
 
 		/// <summary>
-		/// Indicates that any Subviews (in the <see cref="Subviews"/> list) need to be redrawn.
+		/// Indicates that any Subviews (in the <see cref="Subviews"/> list) need to be repainted.
 		/// </summary>
 		public void SetSubViewNeedsDisplay ()
 		{
 			_subViewNeedsDisplay = true;
-			if (_superView is { _subViewNeedsDisplay: false }) {
+			if (_superView != null && !_superView._subViewNeedsDisplay) {
 				_superView.SetSubViewNeedsDisplay ();
 			}
 		}
 
 		/// <summary>
-		///   Clears the view Frame with the normal background color.s
+		///   Clears the <see cref="Bounds"/> with the normal background color.
 		/// </summary>
 		/// <remarks>
 		///   <para>
-		///     This clears the entire region used by this view.
+		///     This clears the Bounds used by this view.
 		///   </para>
 		/// </remarks>
-		public void Clear ()
-		{
-			var prev = Driver.SetAttribute (GetNormalColor ());
-			Driver.FillRect (Frame);
-			Driver.SetAttribute (prev);
-		}
+		public void Clear () => Clear (ViewToScreen(Bounds));
 
-		// BUGBUG: Stupid that this takes screen-relative. We should have a tenet that says 
-		// "View APIs only deal with View-relative coords". 
+		// BUGBUG: This version of the Clear API should be removed. We should have a tenet that says 
+		// "View APIs only deal with View-relative coords". This is only used by ComboBox which can
+		// be refactored to use the View-relative version.
 		/// <summary>
-		///   Clears the specified region with the normal background. 
+		///   Clears the specified screen-relative rectangle with the normal background. 
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
-		/// <param name="regionScreen">The screen-relative region to clear.</param>
+		/// <param name="regionScreen">The screen-relative rectangle to clear.</param>
 		public void Clear (Rect regionScreen)
 		{
 			var prev = Driver.SetAttribute (GetNormalColor ());
@@ -222,30 +219,13 @@ namespace Terminal.Gui {
 		/// <returns>The current screen-relative clip region, which can be then re-applied by setting <see cref="ConsoleDriver.Clip"/>.</returns>
 		/// <remarks>
 		/// <para>
-		/// <see cref="Bounds"/> is View-relative.
-		/// </para>
-		/// <para>
 		/// If <see cref="ConsoleDriver.Clip"/> and <see cref="Bounds"/> do not intersect, the clip region will be set to <see cref="Rect.Empty"/>.
 		/// </para>
 		/// </remarks>
 		public Rect ClipToBounds ()
 		{
-			return SetClip (Bounds);
-		}
-
-		// BUGBUG: v2 - SetClip should return VIEW-relative so that it can be used to reset it; using Driver.Clip directly should not be necessary. 
-		/// <summary>
-		/// Expands the clip region to include the specified view-relative region.
-		/// </summary>
-		/// <returns>The current screen-relative clip region, which can be then re-applied by setting <see cref="ConsoleDriver.Clip"/>.</returns>
-		/// <param name="region">View-relative clip region.</param>
-		/// <remarks>
-		/// If <see cref="ConsoleDriver.Clip"/> and <paramref name="region"/> do not intersect, the clip region will be set to <see cref="Rect.Empty"/>.
-		/// </remarks>
-		public Rect SetClip (Rect region)
-		{
 			var previous = Driver.Clip;
-			Driver.Clip = Rect.Intersect (previous, ViewToScreen (region));
+			Driver.Clip = Rect.Intersect (previous, ViewToScreen (Bounds));
 			return previous;
 		}
 
@@ -259,16 +239,16 @@ namespace Terminal.Gui {
 		/// <para>The hotkey is any character following the hotkey specifier, which is the underscore ('_') character by default.</para>
 		/// <para>The hotkey specifier can be changed via <see cref="HotKeySpecifier"/></para>
 		/// </remarks>
-		public void DrawHotString (ustring text, Attribute hotColor, Attribute normalColor)
+		public void DrawHotString (string text, Attribute hotColor, Attribute normalColor)
 		{
 			var hotkeySpec = HotKeySpecifier == (Rune)0xffff ? (Rune)'_' : HotKeySpecifier;
 			Application.Driver.SetAttribute (normalColor);
 			foreach (var rune in text) {
-				if (rune == hotkeySpec) {
+				if (rune == hotkeySpec.Value) {
 					Application.Driver.SetAttribute (hotColor);
 					continue;
 				}
-				Application.Driver.AddRune (rune);
+				Application.Driver.AddRune ((Rune)rune);
 				Application.Driver.SetAttribute (normalColor);
 			}
 		}
@@ -279,7 +259,7 @@ namespace Terminal.Gui {
 		/// <param name="text">String to display, the underscore before a letter flags the next letter as the hotkey.</param>
 		/// <param name="focused">If set to <see langword="true"/> this uses the focused colors from the color scheme, otherwise the regular ones.</param>
 		/// <param name="scheme">The color scheme to use.</param>
-		public void DrawHotString (ustring text, bool focused, ColorScheme scheme)
+		public void DrawHotString (string text, bool focused, ColorScheme scheme)
 		{
 			if (focused)
 				DrawHotString (text, scheme.HotFocus, scheme.Focus);
@@ -458,16 +438,16 @@ namespace Terminal.Gui {
 					Clear (ViewToScreen (Bounds));
 				}
 
-				if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
+				if (!string.IsNullOrEmpty (TextFormatter.Text)) {
 					if (TextFormatter != null) {
 						TextFormatter.NeedsFormat = true;
 					}
-					// This should NOT clear 
-					TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
-						HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
-						Rect.Empty, false);
-					SetSubViewNeedsDisplay ();
 				}
+				// This should NOT clear 
+				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
+					HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
+					Rect.Empty, false);
+				SetSubViewNeedsDisplay ();
 			}
 
 			// Draw subviews
