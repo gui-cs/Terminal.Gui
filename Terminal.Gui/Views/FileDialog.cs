@@ -510,7 +510,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			PushState (new SearchState (State?.Directory, this, tbFind.Text.ToString ()), true);
+			PushState (new SearchState (State?.Directory, this, tbFind.Text), true);
 		}
 
 		/// <inheritdoc/>
@@ -1205,7 +1205,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var path = this.tbPath.Text?.ToString ();
+			var path = this.tbPath.Text;
 
 			if (string.IsNullOrWhiteSpace (path)) {
 				return;

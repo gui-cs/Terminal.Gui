@@ -123,7 +123,7 @@ namespace Terminal.Gui {
 				}
 				set {
 					var current = provider != null ? provider.ToString (false, false) : string.Empty;
-					provider = new MaskedTextProvider (value == string.Empty ? "&&&&&&" : value.ToString ());
+					provider = new MaskedTextProvider (value == string.Empty ? "&&&&&&" : value);
 					if (string.IsNullOrEmpty (current) == false) {
 						provider.Set (current);
 					}
@@ -136,7 +136,7 @@ namespace Terminal.Gui {
 					return provider.ToString ();
 				}
 				set {
-					provider.Set (value.ToString ());
+					provider.Set (value);
 				}
 			}
 

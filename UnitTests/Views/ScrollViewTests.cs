@@ -438,7 +438,7 @@ namespace Terminal.Gui.ViewsTests {
 		//					fillText.Append (fill);
 		//				}
 		//			}
-		//			labelFill.Text = fillText.ToString ();
+		//			labelFill.Text = fillText;
 		//		};
 
 		//		labelText = new Label (text) { X = Pos.Center (), Y = Pos.Center () };

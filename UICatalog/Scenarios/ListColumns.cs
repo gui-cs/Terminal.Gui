@@ -285,7 +285,7 @@ namespace UICatalog.Scenarios {
 			if (accepted) {
 
 				try {
-					setter (listColView, int.Parse (tf.Text.ToString ()));
+					setter (listColView, int.Parse (tf.Text));
 				} catch (Exception ex) {
 					MessageBox.ErrorQuery (60, 20, "Failed to set", ex.Message, "Ok");
 				}

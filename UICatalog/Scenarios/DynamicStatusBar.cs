@@ -72,7 +72,7 @@ namespace UICatalog.Scenarios {
 					Height = 4
 				};
 
-				var _txtDelimiter = new TextField (StatusBar.ShortcutDelimiter.ToString ()) {
+				var _txtDelimiter = new TextField (StatusBar.ShortcutDelimiter) {
 					X = Pos.Center (),
 					Width = 2,
 				};
@@ -332,11 +332,11 @@ namespace UICatalog.Scenarios {
 			public static string SetTitleText (string title, string shortcut)
 			{
 				var txt = title;
-				var split = title.ToString ().Split ('~');
+				var split = title.Split ('~');
 				if (split.Length > 1) {
 					txt = split [2].Trim (); ;
 				}
-				if (string.IsNullOrEmpty (shortcut.ToString ())) {
+				if (string.IsNullOrEmpty (shortcut)) {
 					return txt;
 				}
 
