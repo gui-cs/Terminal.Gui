@@ -86,6 +86,11 @@ namespace Terminal.Gui {
 		public bool MultiSelect { get; set; } = true;
 
 		/// <summary>
+		/// Maximum number of nodes that can be expanded in any given branch.
+		/// </summary>
+		public int MaxDepth { get; set; } = 100;
+
+		/// <summary>
 		/// True makes a letter key press navigate to the next visible branch that begins with
 		/// that letter/digit.
 		/// </summary>
