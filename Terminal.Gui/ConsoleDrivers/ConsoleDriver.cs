@@ -752,6 +752,20 @@ namespace Terminal.Gui {
 		public abstract void Move (int col, int row);
 
 		/// <summary>
+		/// Tests if the specified rune is supported by the driver.
+		/// </summary>
+		/// <param name="rune"></param>
+		/// <returns><see langword="true"/> if the rune can be properly presented; <see langword="false"/> if the driver
+		/// does not support displaying this rune.</returns>
+		public virtual bool IsRuneSupported (Rune rune)
+		{
+			if (rune.Value > RuneExtensions.MaxUnicodeCodePoint) {
+				return false;
+			}
+			return true;
+		}
+		
+		/// <summary>
 		/// Adds the specified rune to the display at the current cursor position.
 		/// </summary>
 		/// <param name="rune">Rune to add.</param>

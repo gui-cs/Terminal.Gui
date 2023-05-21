@@ -403,7 +403,9 @@ class CharMap : ScrollView {
 				if (cursorRow + ContentOffset.Y + 1 == y && cursorCol + ContentOffset.X + firstColumnX + 1 == x && !HasFocus) {
 					Driver.SetAttribute (GetFocusColor ());
 				}
-				Driver.AddRune (new Rune ((char)(val + col)));
+				
+				Driver.AddRune (new Rune (val + col));
+
 				if (cursorRow + ContentOffset.Y + 1 == y && cursorCol + ContentOffset.X + firstColumnX + 1 == x && !HasFocus) {
 					Driver.SetAttribute (GetNormalColor ());
 				}

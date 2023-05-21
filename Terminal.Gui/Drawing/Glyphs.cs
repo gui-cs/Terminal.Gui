@@ -8,8 +8,11 @@ namespace Terminal.Gui {
 	/// </summary>
 	/// <remarks>
 	/// <para>
+	/// Access with <see cref="CM.Glyphs"/> (which is a global using alias for <see cref="ConfigurationManager.Glyphs"/>).
+	/// </para>
+	/// <para>
 	/// The default glyphs can be changed via the <see cref="ConfigurationManager"/>. Within a <c>config.json</c> file 
-	/// The JSon property name is the <see cref="GlyphDefinitions"/> property prefixed with "CM.Glyphs.". 
+	/// The Json property name is the property name prefixed with "Glyphs.". 
 	/// </para>
 	/// <para>
 	/// The JSon property can be either a decimal number or a string. The string may be one of:
@@ -137,9 +140,19 @@ namespace Terminal.Gui {
 		public Rune Collapse { get; set; } = (Rune)'-';
 
 		/// <summary>
-		/// Apple. Because snek.
+		/// Apple (non-BMP). Because snek. And because it's an example of a non-BMP surrogate pair. See Issue #2610.
 		/// </summary>
-		public Rune Apple { get; set; } = (Rune)'❦' ; // BUGBUG: "🍎"[0] should work, but doesn't 
+		public Rune Apple { get; set; } = "🍎".ToRunes () [0]; // nonBMP
+
+		/// <summary>
+		/// Apple (BMP). Because snek. See Issue #2610.
+		/// </summary>
+		public Rune AppleBMP { get; set; } = (Rune)'❦';
+
+		///// <summary>
+		///// A nonprintable (low surrogate) that should fail to ctor.
+		///// </summary>
+		//public Rune InvalidGlyph { get; set; } = (Rune)'\ud83d';
 
 		#endregion
 
