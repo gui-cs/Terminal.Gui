@@ -914,7 +914,7 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Fact]
-		[AutoInitShutdown(useFakeClipboard:true)]
+		[AutoInitShutdown (useFakeClipboard: true)]
 		public void KeyBindings_Command ()
 		{
 			var tf = new TextField ("This is a test.") { Width = 20 };
@@ -1597,6 +1597,18 @@ Les Miśerables", output);
 			Assert.Equal (0, _textField.SelectedLength);
 			Assert.Null (_textField.SelectedText);
 			Assert.Equal ("TAB to jump between text fields.", _textField.Text);
+		}
+
+		[Fact, TextFieldTestsAutoInitShutdown]
+		public void Copy_Paste_Surrogate_Pairs ()
+		{
+			_textField.Text = "TextField with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!";
+			_textField.SelectAll ();
+			_textField.Cut ();
+			Assert.Equal ("TextField with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!", Application.Driver.Clipboard.GetClipboardData ());
+			Assert.Equal (string.Empty, _textField.Text);
+			_textField.Paste ();
+			Assert.Equal ("TextField with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!", _textField.Text);
 		}
 	}
 }

@@ -33,7 +33,7 @@ namespace Terminal.Gui.ViewsTests {
 
 				//                   1         2         3 
 				//         01234567890123456789012345678901=32 (Length)
-				var buff = Encoding.Unicode.GetBytes(txt);
+				var buff = Encoding.Unicode.GetBytes (txt);
 				var ms = new System.IO.MemoryStream (buff).ToArray ();
 				_textView = new TextView () { Width = 30, Height = 10 };
 				_textView.Text = Encoding.Unicode.GetString (ms);
@@ -2527,7 +2527,7 @@ line.
 		}
 
 		[Fact]
-		[AutoInitShutdown (useFakeClipboard:true)]
+		[AutoInitShutdown (useFakeClipboard: true)]
 		public void KeyBindings_Command ()
 		{
 			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
@@ -4657,7 +4657,7 @@ line.
 		}
 
 		[Fact]
-		[AutoInitShutdown (useFakeClipboard:true)]
+		[AutoInitShutdown (useFakeClipboard: true)]
 		public void HistoryText_Undo_Redo_Copy_Without_Selection_Multi_Line_Paste ()
 		{
 			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
@@ -6947,5 +6947,16 @@ This is the second line.
 			Assert.Equal ("TAB to jump between text fields.", _textView.Text);
 		}
 
+		[Fact, TextViewTestsAutoInitShutdown]
+		public void Copy_Paste_Surrogate_Pairs ()
+		{
+			_textView.Text = "TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!";
+			_textView.SelectAll ();
+			_textView.Cut ();
+			Assert.Equal ("TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!", Application.Driver.Clipboard.GetClipboardData ());
+			Assert.Equal (string.Empty, _textView.Text);
+			_textView.Paste ();
+			Assert.Equal ("TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!", _textView.Text);
+		}
 	}
 }
