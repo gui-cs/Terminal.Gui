@@ -602,7 +602,7 @@ public class FakeDriver : ConsoleDriver {
 	public class FakeClipboard : ClipboardBase {
 		public Exception FakeException = null;
 
-		string Contents = string.Empty;
+		string _contents = string.Empty;
 
 		bool _isSupportedAlwaysFalse = false;
 
@@ -621,15 +621,18 @@ public class FakeDriver : ConsoleDriver {
 			if (FakeException != null) {
 				throw FakeException;
 			}
-			return Contents;
+			return _contents;
 		}
 
 		protected override void SetClipboardDataImpl (string text)
 		{
+			if (text == null) {
+				throw new ArgumentNullException (nameof (text));
+			}
 			if (FakeException != null) {
 				throw FakeException;
 			}
-			Contents = text;
+			_contents = text;
 		}
 	}
 

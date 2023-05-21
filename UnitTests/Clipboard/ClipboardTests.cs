@@ -39,7 +39,7 @@ namespace Terminal.Gui.ClipboardTests {
 			Application.Iteration += () => Application.RequestStop ();
 			Application.Run ();
 
-			Assert.Equal (clipText, Clipboard.Contents.ToString ());
+			Assert.Equal (clipText, Clipboard.Contents);
 		}
 
 		[Fact, AutoInitShutdown (useFakeClipboard: false)]
@@ -56,7 +56,7 @@ namespace Terminal.Gui.ClipboardTests {
 			Application.Iteration += () => Application.RequestStop ();
 			Application.Run ();
 
-			Assert.Equal (clipText, Clipboard.Contents.ToString ());
+			Assert.Equal (clipText, Clipboard.Contents);
 		}
 
 		[Fact, AutoInitShutdown (useFakeClipboard: false)]
@@ -74,7 +74,7 @@ namespace Terminal.Gui.ClipboardTests {
 			Application.Iteration += () => Application.RequestStop ();
 			Application.Run ();
 
-			Assert.Equal (clipText, Clipboard.Contents.ToString ());
+			Assert.Equal (clipText, Clipboard.Contents);
 		}
 
 		[Fact, AutoInitShutdown (useFakeClipboard: true)]
@@ -92,7 +92,7 @@ namespace Terminal.Gui.ClipboardTests {
 			Application.Iteration += () => Application.RequestStop ();
 			Application.Run ();
 
-			Assert.Equal (clipText, Clipboard.Contents.ToString ());
+			Assert.Equal (clipText, Clipboard.Contents);
 		}
 
 		[Fact, AutoInitShutdown (useFakeClipboard: false)]
@@ -158,12 +158,12 @@ namespace Terminal.Gui.ClipboardTests {
 				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
 					(exitCode, result) = ClipboardProcessRunner.Process ("powershell.exe", $"-command \"Set-Clipboard -Value \\\"{clipText}\\\"\"");
 					output.WriteLine ($"  Windows: powershell.exe Set-Clipboard: exitCode = {exitCode}, result = {result}");
-					getClipText = Clipboard.Contents.ToString ();
+					getClipText = Clipboard.Contents;
 
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
 					(exitCode, result) = ClipboardProcessRunner.Process ("pbcopy", string.Empty, clipText);
 					output.WriteLine ($"  OSX: pbcopy: exitCode = {exitCode}, result = {result}");
-					getClipText = Clipboard.Contents.ToString ();
+					getClipText = Clipboard.Contents;
 
 				} else if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux)) {
 					if (Is_WSL_Platform ()) {
@@ -177,7 +177,7 @@ namespace Terminal.Gui.ClipboardTests {
 
 						if (!failed) {
 							// If we set the OS clipboard via Powershell, then getting Contents should return the same text.
-							getClipText = Clipboard.Contents.ToString ();
+							getClipText = Clipboard.Contents;
 							output.WriteLine ($"  WSL: Clipboard.Contents: {getClipText}");
 						}
 						Application.RequestStop ();
@@ -196,7 +196,7 @@ namespace Terminal.Gui.ClipboardTests {
 					output.WriteLine ($"  Linux: bash xclip -sel clip -i: exitCode = {exitCode}, result = {result}");
 
 					if (!failed) {
-						getClipText = Clipboard.Contents.ToString ();
+						getClipText = Clipboard.Contents;
 						output.WriteLine ($"  Linux via xclip: Clipboard.Contents: {getClipText}");
 					}
 				}

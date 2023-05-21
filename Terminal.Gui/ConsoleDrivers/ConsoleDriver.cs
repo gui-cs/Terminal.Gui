@@ -179,8 +179,8 @@ public abstract class ConsoleDriver {
 	/// <param name="str">String.</param>
 	public void AddStr (string str)
 	{
-		foreach (var c in str) {
-			AddRune (new Rune (c));
+		foreach (var rune in str.EnumerateRunes()) {
+			AddRune (rune);
 		}
 	}
 

@@ -28,21 +28,21 @@ namespace Terminal.Gui;
 /// </para>
 /// </remarks>
 public static class Clipboard {
-	static string contents;
+	static string _contents = string.Empty;
 
 	/// <summary>
-	/// Gets (copies from) or sets (pastes to) the contents of the OS clipboard.
+	/// Gets (copies from) or sets (pastes to) the _contents of the OS clipboard.
 	/// </summary>
 	public static string Contents {
 		get {
 			try {
 				if (IsSupported) {
-					return contents = Application.Driver.Clipboard.GetClipboardData ();
+					return _contents = Application.Driver.Clipboard.GetClipboardData ();
 				} else {
-					return contents;
+					return _contents;
 				}
 			} catch (Exception) {
-				return contents;
+				return _contents;
 			}
 		}
 		set {
@@ -51,13 +51,13 @@ public static class Clipboard {
 					if (value == null) {
 						value = string.Empty;
 					}
-					Application.Driver.Clipboard.SetClipboardData (value.ToString ());
+					Application.Driver.Clipboard.SetClipboardData (value);
 				}
-				contents = value;
+				_contents = value;
 			} catch (NotSupportedException e) {
 				throw e;
 			} catch (Exception) {
-				contents = value;
+				_contents = value;
 			}
 		}
 	}
@@ -70,15 +70,15 @@ public static class Clipboard {
 	public static bool IsSupported { get => Application.Driver.Clipboard.IsSupported; }
 
 	/// <summary>
-	/// Copies the contents of the OS clipboard to <paramref name="result"/> if possible.
+	/// Copies the _contents of the OS clipboard to <paramref name="result"/> if possible.
 	/// </summary>
-	/// <param name="result">The contents of the OS clipboard if successful, <see cref="string.Empty"/> if not.</param>
+	/// <param name="result">The _contents of the OS clipboard if successful, <see cref="string.Empty"/> if not.</param>
 	/// <returns><see langword="true"/> the OS clipboard was retrieved, <see langword="false"/> otherwise.</returns>
 	public static bool TryGetClipboardData (out string result)
 	{
 		if (IsSupported && Application.Driver.Clipboard.TryGetClipboardData (out result)) {
-			if (contents != result) {
-				contents = result;
+			if (_contents != result) {
+				_contents = result;
 			}
 			return true;
 		}
@@ -94,7 +94,7 @@ public static class Clipboard {
 	public static bool TrySetClipboardData (string text)
 	{
 		if (IsSupported && Application.Driver.Clipboard.TrySetClipboardData (text)) {
-			contents = text;
+			_contents = text;
 			return true;
 		}
 		return false;

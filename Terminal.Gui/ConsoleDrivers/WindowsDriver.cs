@@ -1935,17 +1935,14 @@ class WindowsClipboard : ClipboardBase {
 
 	protected override string GetClipboardDataImpl ()
 	{
-		//if (!IsClipboardFormatAvailable (cfUnicodeText))
-		//	return null;
-
 		try {
 			if (!OpenClipboard (IntPtr.Zero)) {
-				return null;
+				return string.Empty;
 			}
 
 			IntPtr handle = GetClipboardData (_cfUnicodeText);
 			if (handle == IntPtr.Zero) {
-				return null;
+				return string.Empty;
 			}
 
 			IntPtr pointer = IntPtr.Zero;
@@ -1953,7 +1950,7 @@ class WindowsClipboard : ClipboardBase {
 			try {
 				pointer = GlobalLock (handle);
 				if (pointer == IntPtr.Zero) {
-					return null;
+					return string.Empty;
 				}
 
 				int size = GlobalSize (handle);
