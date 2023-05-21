@@ -109,7 +109,7 @@ namespace Terminal.Gui {
 		void TextField_TextChanged (object sender, TextChangedEventArgs e)
 		{
 			try {
-				if (!TimeSpan.TryParseExact (Text.ToString ().Trim (), format.Trim (), CultureInfo.CurrentCulture, TimeSpanStyles.None, out TimeSpan result))
+				if (!TimeSpan.TryParseExact (Text.Trim (), format.Trim (), CultureInfo.CurrentCulture, TimeSpanStyles.None, out TimeSpan result))
 					Text = e.OldValue;
 			} catch (Exception) {
 				Text = e.OldValue;

@@ -1129,7 +1129,7 @@ namespace Terminal.Gui {
 				length = Math.Abs (x + direction <= text.Count ? x + direction - selectedStart : text.Count - selectedStart);
 				SetSelectedStartSelectedLength ();
 				if (start > -1 && length > 0) {
-					selectedText = length > 0 ? StringExtensions.ToString (text).ToString ().Substring (
+					selectedText = length > 0 ? StringExtensions.ToString (text).Substring (
 						start < 0 ? 0 : start, length > text.Count ? text.Count : length) : "";
 					if (first > start) {
 						first = start;

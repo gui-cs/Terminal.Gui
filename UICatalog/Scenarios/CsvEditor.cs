@@ -105,7 +105,7 @@ namespace UICatalog.Scenarios {
 				return;
 
 			// change selected cell to the one the user has typed into the box
-			var match = Regex.Match (_selectedCellLabel.Text.ToString (), "^(\\d+),(\\d+)$");
+			var match = Regex.Match (_selectedCellLabel.Text, "^(\\d+),(\\d+)$");
 			if (match.Success) {
 
 				tableView.SelectedColumn = int.Parse (match.Groups [1].Value);
@@ -397,8 +397,8 @@ namespace UICatalog.Scenarios {
 
 			Application.Run (ofd);
 
-			if (!ofd.Canceled && !string.IsNullOrWhiteSpace (ofd.Path?.ToString ())) {
-				Open (ofd.Path.ToString ());
+			if (!ofd.Canceled && !string.IsNullOrWhiteSpace (ofd.Path)) {
+				Open (ofd.Path);
 			}
 		}
 
@@ -534,7 +534,7 @@ namespace UICatalog.Scenarios {
 
 			Application.Run (d);
 
-			enteredText = okPressed ? tf.Text.ToString () : null;
+			enteredText = okPressed ? tf.Text : null;
 			return okPressed;
 		}
 		private void EditCurrentCell (object sender, CellActivatedEventArgs e)

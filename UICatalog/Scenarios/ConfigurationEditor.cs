@@ -129,7 +129,7 @@ namespace UICatalog.Scenarios {
 					Directory.CreateDirectory (FileInfo.DirectoryName!);
 				}
 				using var writer = File.CreateText (FileInfo.FullName);
-				writer.Write (Text.ToString ());
+				writer.Write (Text);
 				writer.Close ();
 				Tile.Title = Tile.Title.TrimEnd ('*');
 				IsDirty = false;

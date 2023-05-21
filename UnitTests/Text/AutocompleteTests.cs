@@ -83,7 +83,7 @@ namespace Terminal.Gui.TextTests {
 			var g = (SingleWordSuggestionGenerator)tv.Autocomplete.SuggestionGenerator;
 
 			Assert.Empty (g.AllSuggestions);
-			g.AllSuggestions = Regex.Matches (tv.Text.ToString (), "\\w+")
+			g.AllSuggestions = Regex.Matches (tv.Text, "\\w+")
 				.Select (s => s.Value)
 				.Distinct ().ToList ();
 			Assert.Equal (3, g.AllSuggestions.Count);
@@ -176,7 +176,7 @@ namespace Terminal.Gui.TextTests {
 			};
 
 			var g = (SingleWordSuggestionGenerator)tv.Autocomplete.SuggestionGenerator;
-			g.AllSuggestions = Regex.Matches (tv.Text.ToString (), "\\w+")
+			g.AllSuggestions = Regex.Matches (tv.Text, "\\w+")
 					.Select (s => s.Value)
 					.Distinct ().ToList ();
 			var top = Application.Top;

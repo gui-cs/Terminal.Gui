@@ -1526,10 +1526,10 @@ namespace Terminal.Gui {
 
 		public override void AddRune (Rune rune)
 		{
-			if (!IsRuneSupported(rune)) {
+			if (!IsRuneSupported (rune)) {
 				rune = Rune.ReplacementChar;
 			}
-			
+
 			rune = rune.MakePrintable ();
 			var runeWidth = rune.GetColumns ();
 			var position = GetOutputBufferPosition ();
@@ -2015,34 +2015,34 @@ namespace Terminal.Gui {
 
 		protected override string GetClipboardDataImpl ()
 		{
-			//if (!IsClipboardFormatAvailable (cfUnicodeText))
-			//	return null;
-
 			try {
-				if (!OpenClipboard (IntPtr.Zero))
-					return null;
+				if (!OpenClipboard (IntPtr.Zero)) {
+					return string.Empty;
+				}
 
 				IntPtr handle = GetClipboardData (cfUnicodeText);
-				if (handle == IntPtr.Zero)
-					return null;
+				if (handle == IntPtr.Zero) {
+					return string.Empty;
+				}
 
 				IntPtr pointer = IntPtr.Zero;
 
 				try {
 					pointer = GlobalLock (handle);
-					if (pointer == IntPtr.Zero)
-						return null;
+					if (pointer == IntPtr.Zero) {
+						return string.Empty;
+					}
 
 					int size = GlobalSize (handle);
 					byte [] buff = new byte [size];
 
 					Marshal.Copy (pointer, buff, 0, size);
 
-					return System.Text.Encoding.Unicode.GetString (buff)
-						.TrimEnd ('\0');
+					return Encoding.Unicode.GetString (buff).TrimEnd ('\0');
 				} finally {
-					if (pointer != IntPtr.Zero)
+					if (pointer != IntPtr.Zero) {
 						GlobalUnlock (handle);
+					}
 				}
 			} finally {
 				CloseClipboard ();

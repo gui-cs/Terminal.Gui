@@ -914,7 +914,7 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Fact]
-		[AutoInitShutdown]
+		[AutoInitShutdown(useFakeClipboard:true)]
 		public void KeyBindings_Command ()
 		{
 			var tf = new TextField ("This is a test.") { Width = 20 };

@@ -505,7 +505,7 @@ namespace UICatalog {
 				miUseSubMenusSingleFrame = new MenuItem {
 					Title = "Enable _Sub-Menus Single Frame"
 				};
-				miUseSubMenusSingleFrame.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miUseSubMenusSingleFrame!.Title!.ToString ()!.Substring (8, 1) [0];
+				miUseSubMenusSingleFrame.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miUseSubMenusSingleFrame!.Title!.Substring (8, 1) [0];
 				miUseSubMenusSingleFrame.CheckType |= MenuItemCheckStyle.Checked;
 				miUseSubMenusSingleFrame.Action += () => {
 					miUseSubMenusSingleFrame.Checked = (bool)!miUseSubMenusSingleFrame.Checked!;
@@ -522,7 +522,7 @@ namespace UICatalog {
 				miIsMenuBorderDisabled = new MenuItem {
 					Title = "Disable Menu _Border"
 				};
-				miIsMenuBorderDisabled.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miIsMenuBorderDisabled!.Title!.ToString ()!.Substring (14, 1) [0];
+				miIsMenuBorderDisabled.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miIsMenuBorderDisabled!.Title!.Substring (14, 1) [0];
 				miIsMenuBorderDisabled.CheckType |= MenuItemCheckStyle.Checked;
 				miIsMenuBorderDisabled.Action += () => {
 					miIsMenuBorderDisabled.Checked = (bool)!miIsMenuBorderDisabled.Checked!;
@@ -539,7 +539,7 @@ namespace UICatalog {
 				miIsMouseDisabled = new MenuItem {
 					Title = "_Disable Mouse"
 				};
-				miIsMouseDisabled.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miIsMouseDisabled!.Title!.ToString ()!.Substring (1, 1) [0];
+				miIsMouseDisabled.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miIsMouseDisabled!.Title!.Substring (1, 1) [0];
 				miIsMouseDisabled.CheckType |= MenuItemCheckStyle.Checked;
 				miIsMouseDisabled.Action += () => {
 					miIsMouseDisabled.Checked = Application.IsMouseDisabled = (bool)!miIsMouseDisabled.Checked!;
@@ -572,7 +572,7 @@ namespace UICatalog {
 				List<MenuItem> menuItems = new List<MenuItem> ();
 				miEnableConsoleScrolling = new MenuItem ();
 				miEnableConsoleScrolling.Title = "_Enable Console Scrolling";
-				miEnableConsoleScrolling.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miEnableConsoleScrolling.Title.ToString ()!.Substring (1, 1) [0];
+				miEnableConsoleScrolling.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miEnableConsoleScrolling.Title!.Substring (1, 1) [0];
 				miEnableConsoleScrolling.CheckType |= MenuItemCheckStyle.Checked;
 				miEnableConsoleScrolling.Action += () => {
 					miEnableConsoleScrolling.Checked = !miEnableConsoleScrolling.Checked;
@@ -647,7 +647,7 @@ namespace UICatalog {
 
 				Enum GetDiagnosticsEnumValue (string title)
 				{
-					return title!.ToString () switch {
+					return title switch {
 						FRAME_RULER => ConsoleDriver.DiagnosticFlags.FrameRuler,
 						FRAME_PADDING => ConsoleDriver.DiagnosticFlags.FramePadding,
 						_ => null!,
@@ -741,7 +741,7 @@ namespace UICatalog {
 				}
 				checkedThemeMenu = _themeMenuItems?.Where (m => m != null && m.Title == CM.Themes?.Theme).FirstOrDefault ();
 				if (checkedThemeMenu != null) {
-					CM.Themes!.Theme = checkedThemeMenu.Title.ToString ()!;
+					CM.Themes!.Theme = checkedThemeMenu.Title!;
 					checkedThemeMenu.Checked = true;
 				}
 

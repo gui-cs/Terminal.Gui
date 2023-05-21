@@ -83,7 +83,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (delayField);
 			delayField.TextChanged += (s, e) => {
-				if (ushort.TryParse (delayField.Text.ToString (), out var i))
+				if (ushort.TryParse (delayField.Text, out var i))
 					spinner.SpinDelay = i;
 			};
 
@@ -154,14 +154,14 @@ namespace UICatalog.Scenarios {
 			{
 				if (customField.Text.Length > 0) {
 					spinner.Visible = true;
-					if (ushort.TryParse (delayField.Text.ToString (), out var d))
+					if (ushort.TryParse (delayField.Text, out var d))
 						spinner.SpinDelay = d;
 					else {
 						delayField.Text = DEFAULT_DELAY.ToString ();
 						spinner.SpinDelay = DEFAULT_DELAY;
 					}
 					var str = new List<string> ();
-					foreach (var c in customField.Text.ToString ().ToCharArray ()) {
+					foreach (var c in customField.Text.ToCharArray ()) {
 						str.Add (c.ToString ());
 					}
 					spinner.Sequence = str.ToArray ();

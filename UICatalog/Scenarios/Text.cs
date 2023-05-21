@@ -31,7 +31,7 @@ namespace UICatalog.Scenarios {
 
 			void TextField_TextChanging (object sender, TextChangingEventArgs e)
 			{
-				singleWordGenerator.AllSuggestions = Regex.Matches (e.NewText.ToString (), "\\w+")
+				singleWordGenerator.AllSuggestions = Regex.Matches (e.NewText, "\\w+")
 				    .Select (s => s.Value)
 				    .Distinct ().ToList ();
 			}
@@ -61,7 +61,7 @@ namespace UICatalog.Scenarios {
 			// This shows how to enable autocomplete in TextView.
 			void TextView_DrawContent (object sender, DrawEventArgs e)
 			{
-				singleWordGenerator.AllSuggestions = Regex.Matches (textView.Text.ToString (), "\\w+")
+				singleWordGenerator.AllSuggestions = Regex.Matches (textView.Text, "\\w+")
 				    .Select (s => s.Value)
 				    .Distinct ().ToList ();
 			}

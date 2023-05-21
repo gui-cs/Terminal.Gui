@@ -40,7 +40,7 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 	/// load from.</param>
 	public AutoInitShutdownAttribute (bool autoInit = true, bool autoShutdown = true,
 		Type consoleDriverType = null,
-		bool useFakeClipboard = false,
+		bool useFakeClipboard = true,
 		bool fakeClipboardAlwaysThrowsNotSupportedException = false,
 		bool fakeClipboardIsSupportedAlwaysTrue = false,
 		ConfigurationManager.ConfigLocations configLocation = ConfigurationManager.ConfigLocations.DefaultOnly)

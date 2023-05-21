@@ -349,7 +349,7 @@ namespace UICatalog.Tests {
 
 			_xText.TextChanged += (s, args) => {
 				try {
-					_xVal = int.Parse (_xText.Text.ToString ());
+					_xVal = int.Parse (_xText.Text);
 					DimPosChanged (_curView);
 				} catch {
 
@@ -358,7 +358,7 @@ namespace UICatalog.Tests {
 
 			_yText.TextChanged += (s, e) => {
 				try {
-					_yVal = int.Parse (_yText.Text.ToString ());
+					_yVal = int.Parse (_yText.Text);
 					DimPosChanged (_curView);
 				} catch {
 
@@ -371,7 +371,7 @@ namespace UICatalog.Tests {
 
 			_wText.TextChanged += (s, args) => {
 				try {
-					_wVal = int.Parse (_wText.Text.ToString ());
+					_wVal = int.Parse (_wText.Text);
 					DimPosChanged (_curView);
 				} catch {
 
@@ -380,7 +380,7 @@ namespace UICatalog.Tests {
 
 			_hText.TextChanged += (s, args) => {
 				try {
-					_hVal = int.Parse (_hText.Text.ToString ());
+					_hVal = int.Parse (_hText.Text);
 					DimPosChanged (_curView);
 				} catch {
 

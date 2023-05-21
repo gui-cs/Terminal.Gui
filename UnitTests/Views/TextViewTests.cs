@@ -28,6 +28,7 @@ namespace Terminal.Gui.ViewsTests {
 			public static string txt = "TAB to jump between text fields.";
 			public override void Before (MethodInfo methodUnderTest)
 			{
+				FakeDriver.FakeBehaviors.UseFakeClipboard = true;
 				base.Before (methodUnderTest);
 
 				//                   1         2         3 
@@ -971,15 +972,15 @@ namespace Terminal.Gui.ViewsTests {
 					_textView.ProcessKey (new KeyEvent (Key.K | Key.CtrlMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
-					Assert.Equal ($"{Environment.NewLine}This is the second line.", _textView.Text.ToString ());
-					Assert.Equal ("This is the first line.", Clipboard.Contents.ToString ());
+					Assert.Equal ($"{Environment.NewLine}This is the second line.", _textView.Text);
+					Assert.Equal ("This is the first line.", Clipboard.Contents);
 					break;
 				case 1:
 					_textView.ProcessKey (new KeyEvent (Key.DeleteChar | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
-					Assert.Equal ("This is the second line.", _textView.Text.ToString ());
-					Assert.Equal ($"This is the first line.{Environment.NewLine}", Clipboard.Contents.ToString ());
+					Assert.Equal ("This is the second line.", _textView.Text);
+					Assert.Equal ($"This is the first line.{Environment.NewLine}", Clipboard.Contents);
 					break;
 				case 2:
 					_textView.ProcessKey (new KeyEvent (Key.K | Key.CtrlMask, new KeyModifiers ()));
@@ -1015,26 +1016,26 @@ namespace Terminal.Gui.ViewsTests {
 					_textView.ProcessKey (new KeyEvent (Key.K | Key.AltMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (1, _textView.CursorPosition.Y);
-					Assert.Equal ($"This is the first line.{Environment.NewLine}", _textView.Text.ToString ());
-					Assert.Equal ($"This is the second line.", Clipboard.Contents.ToString ());
+					Assert.Equal ($"This is the first line.{Environment.NewLine}", _textView.Text);
+					Assert.Equal ($"This is the second line.", Clipboard.Contents);
 					break;
 				case 1:
 					_textView.ProcessKey (new KeyEvent (Key.Backspace | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
 					Assert.Equal (23, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
-					Assert.Equal ("This is the first line.", _textView.Text.ToString ());
-					Assert.Equal ($"This is the second line.{Environment.NewLine}", Clipboard.Contents.ToString ());
+					Assert.Equal ("This is the first line.", _textView.Text);
+					Assert.Equal ($"This is the second line.{Environment.NewLine}", Clipboard.Contents);
 					break;
 				case 2:
 					_textView.ProcessKey (new KeyEvent (Key.K | Key.AltMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
-					Assert.Equal ("", _textView.Text.ToString ());
-					Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", Clipboard.Contents.ToString ());
+					Assert.Equal ("", _textView.Text);
+					Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", Clipboard.Contents);
 
 					// Paste inverted
 					_textView.ProcessKey (new KeyEvent (Key.Y | Key.CtrlMask, new KeyModifiers ()));
-					Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", _textView.Text.ToString ());
+					Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", _textView.Text);
 					break;
 				default:
 					iterationsFinished = true;
@@ -1450,7 +1451,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (1, eventcount);
 			_textView.ProcessKey (new KeyEvent (Key.Y, new KeyModifiers ()));
 			Assert.Equal (1, eventcount);
-			Assert.Equal ("Yay", _textView.Text.ToString ());
+			Assert.Equal ("Yay", _textView.Text);
 		}
 
 		[Fact]
@@ -2526,7 +2527,7 @@ line.
 		}
 
 		[Fact]
-		[AutoInitShutdown]
+		[AutoInitShutdown (useFakeClipboard:true)]
 		public void KeyBindings_Command ()
 		{
 			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
@@ -2579,7 +2580,7 @@ line.
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (new Point (23, 2), tv.CursorPosition);
-			g.AllSuggestions = Regex.Matches (tv.Text.ToString (), "\\w+")
+			g.AllSuggestions = Regex.Matches (tv.Text, "\\w+")
 				.Select (s => s.Value)
 				.Distinct ().ToList ();
 			Assert.Equal (7, g.AllSuggestions.Count);
@@ -4656,7 +4657,7 @@ line.
 		}
 
 		[Fact]
-		[AutoInitShutdown]
+		[AutoInitShutdown (useFakeClipboard:true)]
 		public void HistoryText_Undo_Redo_Copy_Without_Selection_Multi_Line_Paste ()
 		{
 			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
@@ -4690,7 +4691,7 @@ line.
 		}
 
 		[Fact]
-		[AutoInitShutdown]
+		[AutoInitShutdown (useFakeClipboard: true)]
 		public void HistoryText_Undo_Redo_Simple_Copy_Multi_Line_Selected_Paste ()
 		{
 			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
@@ -4727,7 +4728,7 @@ line.
 		}
 
 		[Fact]
-		[AutoInitShutdown]
+		[AutoInitShutdown (useFakeClipboard: true)]
 		public void HistoryText_Undo_Redo_Multi_Line_Selected_Copy_Simple_Paste_Starting_On_Space ()
 		{
 			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
@@ -6707,7 +6708,7 @@ This is the second line.
 			expectedCol = 1;
 			tv.ProcessKey (new KeyEvent (Key.Y, new KeyModifiers ()));
 			Assert.Equal (3, eventcount);
-			Assert.Equal ("Yay", tv.Text.ToString ());
+			Assert.Equal ("Yay", tv.Text);
 		}
 
 		[Fact, TextViewTestsAutoInitShutdown]
