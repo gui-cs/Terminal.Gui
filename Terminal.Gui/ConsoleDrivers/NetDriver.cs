@@ -674,6 +674,9 @@ namespace Terminal.Gui {
 			var validClip = IsValidContent (ccol, crow, Clip);
 
 			if (validClip) {
+				if (rune.Value == 0x1F34E) {
+
+				}
 				if (runeWidth == 0 && ccol > 0) {
 					var r = contents [crow, ccol - 1, 0];
 					var s = new string (new char [] { (char)r, (char)rune.Value });

@@ -48,8 +48,19 @@ namespace Terminal.Gui {
 		}
 
 		static bool sync = false;
+
+		public override bool IsRuneSupported (Rune rune)
+		{
+			// See Issue #2615
+			return base.IsRuneSupported (rune);// && rune.IsBmp;
+		}
+
 		public override void AddRune (Rune rune)
 		{
+			if (!IsRuneSupported (rune)) {
+				rune = Rune.ReplacementChar;
+			}
+
 			rune = rune.MakePrintable ();
 			var runeWidth = rune.GetColumns ();
 			var validClip = IsValidContent (ccol, crow, Clip);

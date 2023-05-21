@@ -59,7 +59,7 @@ namespace UICatalog.Scenarios {
 		}
 
 		private class SnakeView : View {
-
+			Rune _appleRune;
 			private Attribute red = new Terminal.Gui.Attribute (Color.Red, Color.Black);
 			private Attribute white = new Terminal.Gui.Attribute (Color.White, Color.Black);
 
@@ -67,6 +67,11 @@ namespace UICatalog.Scenarios {
 
 			public SnakeView (SnakeState state)
 			{
+				_appleRune = CM.Glyphs.Apple;
+				if (!Driver.IsRuneSupported (_appleRune)) {
+					_appleRune = CM.Glyphs.AppleBMP;
+				}
+
 				State = state;
 				CanFocus = true;
 
@@ -116,7 +121,7 @@ namespace UICatalog.Scenarios {
 				}
 
 				Driver.SetAttribute (red);
-				AddRune (State.Apple.X, State.Apple.Y, CM.Glyphs.Apple);
+				AddRune (State.Apple.X, State.Apple.Y, _appleRune);
 				Driver.SetAttribute (white);
 			}
 			public override bool OnKeyDown (KeyEvent keyEvent)
