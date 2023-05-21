@@ -51,8 +51,8 @@ namespace Terminal.Gui {
 
 		public override bool IsRuneSupported (Rune rune)
 		{
-			// See Issue #2615
-			return base.IsRuneSupported (rune);// && rune.IsBmp;
+			// See Issue #2615 - CursesDriver is broken with non-BMP characters
+			return base.IsRuneSupported (rune) && rune.IsBmp;
 		}
 
 		public override void AddRune (Rune rune)
