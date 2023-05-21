@@ -36,17 +36,17 @@ namespace Terminal.Gui.ViewTests {
 
 			expectedOld = string.Empty;
 			r.Title = expectedDuring = expectedAfter = "title";
-			Assert.Equal (expectedAfter, r.Title.ToString ());
+			Assert.Equal (expectedAfter, r.Title);
 
-			expectedOld = r.Title.ToString ();
+			expectedOld = r.Title;
 			r.Title = expectedDuring = expectedAfter = "a different title";
-			Assert.Equal (expectedAfter, r.Title.ToString ());
+			Assert.Equal (expectedAfter, r.Title);
 
 			// Now setup cancelling the change and change it back to "title"
 			cancel = true;
-			expectedOld = r.Title.ToString ();
+			expectedOld = r.Title;
 			r.Title = expectedDuring = "title";
-			Assert.Equal (expectedAfter, r.Title.ToString ());
+			Assert.Equal (expectedAfter, r.Title);
 			r.Dispose ();
 
 		}
@@ -65,9 +65,9 @@ namespace Terminal.Gui.ViewTests {
 			};
 
 			expected = "title";
-			expectedOld = r.Title.ToString ();
+			expectedOld = r.Title;
 			r.Title = expected;
-			Assert.Equal (expected, r.Title.ToString ());
+			Assert.Equal (expected, r.Title);
 		}
 
 	}

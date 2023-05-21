@@ -37,7 +37,7 @@ namespace Terminal.Gui {
 
 #if DEBUG
 				if (_text != null && string.IsNullOrEmpty (Id)) {
-					Id = _text.ToString ();
+					Id = _text;
 				}
 #endif
 			}

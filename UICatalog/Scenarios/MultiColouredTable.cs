@@ -97,7 +97,7 @@ namespace UICatalog.Scenarios {
 
 			Application.Run (d);
 
-			enteredText = okPressed ? tf.Text.ToString () : null;
+			enteredText = okPressed ? tf.Text : null;
 			return okPressed;
 		}
 		private void EditCurrentCell (object sender, CellActivatedEventArgs e)

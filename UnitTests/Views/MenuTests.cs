@@ -572,17 +572,17 @@ Edit
 
 			string GetCurrentMenuBarItemTitle ()
 			{
-				return mbiCurrent != null ? mbiCurrent.Title.ToString () : "Closed";
+				return mbiCurrent != null ? mbiCurrent.Title : "Closed";
 			}
 
 			string GetCurrenParenttMenuItemTitle ()
 			{
-				return miCurrent?.Parent != null ? miCurrent.Parent.Title.ToString () : "None";
+				return miCurrent?.Parent != null ? miCurrent.Parent.Title : "None";
 			}
 
 			string GetCurrentMenuTitle ()
 			{
-				return miCurrent != null ? miCurrent.Title.ToString () : "None";
+				return miCurrent != null ? miCurrent.Title : "None";
 			}
 		}
 
@@ -1123,7 +1123,7 @@ Edit
 				get {
 					string txt = string.Empty;
 					foreach (var m in Menus)
-						txt += " " + m.Title.ToString () + " ";
+						txt += " " + m.Title + " ";
 					return txt;
 				}
 			}

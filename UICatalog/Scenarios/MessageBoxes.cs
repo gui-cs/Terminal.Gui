@@ -188,10 +188,10 @@ namespace UICatalog.Scenarios {
 			};
 			showMessageBoxButton.Clicked += (s,e) => {
 				try {
-					int width = int.Parse (widthEdit.Text.ToString ());
-					int height = int.Parse (heightEdit.Text.ToString ());
-					int numButtons = int.Parse (numButtonsEdit.Text.ToString ());
-					int defaultButton = int.Parse (defaultButtonEdit.Text.ToString ());
+					int width = int.Parse (widthEdit.Text);
+					int height = int.Parse (heightEdit.Text);
+					int numButtons = int.Parse (numButtonsEdit.Text);
+					int defaultButton = int.Parse (defaultButtonEdit.Text);
 
 					var btns = new List<string> ();
 					for (int i = 0; i < numButtons; i++) {
@@ -199,9 +199,9 @@ namespace UICatalog.Scenarios {
 						btns.Add (NumberToWords.Convert (i));
 					}
 					if (styleRadioGroup.SelectedItem == 0) {
-						buttonPressedLabel.Text = $"{MessageBox.Query (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), defaultButton, (bool)ckbWrapMessage.Checked, btns.ToArray ())}";
+						buttonPressedLabel.Text = $"{MessageBox.Query (width, height, titleEdit.Text, messageEdit.Text, defaultButton, (bool)ckbWrapMessage.Checked, btns.ToArray ())}";
 					} else {
-						buttonPressedLabel.Text = $"{MessageBox.ErrorQuery (width, height, titleEdit.Text.ToString (), messageEdit.Text.ToString (), defaultButton, (bool)ckbWrapMessage.Checked, btns.ToArray ())}";
+						buttonPressedLabel.Text = $"{MessageBox.ErrorQuery (width, height, titleEdit.Text, messageEdit.Text, defaultButton, (bool)ckbWrapMessage.Checked, btns.ToArray ())}";
 					}
 				} catch (FormatException) {
 					buttonPressedLabel.Text = "Invalid Options";

@@ -48,7 +48,7 @@ namespace UICatalog.Scenarios {
 			static void DoMessage (Label Label, string txt)
 			{
 				Label.Clicked += (s,e) => {
-					var btnText = Label.Text.ToString ();
+					var btnText = Label.Text;
 					MessageBox.Query ("Message", $"Did you click {txt}?", "Yes", "No");
 				};
 			}

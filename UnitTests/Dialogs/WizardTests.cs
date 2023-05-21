@@ -53,15 +53,15 @@ namespace Terminal.Gui.DialogTests {
 			};
 
 			r.Title = expectedDuring = expectedAfter = "title";
-			Assert.Equal (expectedAfter, r.Title.ToString ());
+			Assert.Equal (expectedAfter, r.Title);
 
 			r.Title = expectedDuring = expectedAfter = "a different title";
-			Assert.Equal (expectedAfter, r.Title.ToString ());
+			Assert.Equal (expectedAfter, r.Title);
 
 			// Now setup cancelling the change and change it back to "title"
 			cancel = true;
 			r.Title = expectedDuring = "title";
-			Assert.Equal (expectedAfter, r.Title.ToString ());
+			Assert.Equal (expectedAfter, r.Title);
 			r.Dispose ();
 
 		}
@@ -79,11 +79,11 @@ namespace Terminal.Gui.DialogTests {
 
 			expected = "title";
 			r.Title = expected;
-			Assert.Equal (expected, r.Title.ToString ());
+			Assert.Equal (expected, r.Title);
 
 			expected = "another title";
 			r.Title = expected;
-			Assert.Equal (expected, r.Title.ToString ());
+			Assert.Equal (expected, r.Title);
 			r.Dispose ();
 
 		}
@@ -247,7 +247,7 @@ namespace Terminal.Gui.DialogTests {
 			wizard.AddStep (step1);
 
 			// If no current step, should be last step
-			Assert.Equal (step1.Title.ToString (), wizard.GetPreviousStep ().Title.ToString ());
+			Assert.Equal (step1.Title, wizard.GetPreviousStep ().Title);
 
 			wizard.CurrentStep = step1;
 			// If there is 1 step it's current step should be null
@@ -262,7 +262,7 @@ namespace Terminal.Gui.DialogTests {
 			wizard.AddStep (step2);
 			wizard.CurrentStep = step2;
 			step1.Enabled = true;
-			Assert.Equal (step1.Title.ToString (), wizard.GetPreviousStep ().Title.ToString ());
+			Assert.Equal (step1.Title, wizard.GetPreviousStep ().Title);
 
 			// If two steps and at 2 and step 1 is `Enabled = false` should be null
 			step1.Enabled = false;
@@ -280,9 +280,9 @@ namespace Terminal.Gui.DialogTests {
 			step3.Enabled = true;
 			Assert.Null (wizard.GetPreviousStep ());
 			wizard.CurrentStep = step2;
-			Assert.Equal (step1.Title.ToString (), wizard.GetPreviousStep ().Title.ToString ());
+			Assert.Equal (step1.Title, wizard.GetPreviousStep ().Title);
 			wizard.CurrentStep = step3;
-			Assert.Equal (step2.Title.ToString (), wizard.GetPreviousStep ().Title.ToString ());
+			Assert.Equal (step2.Title, wizard.GetPreviousStep ().Title);
 
 			// If three steps with Step2.Enabled = false
 			//   At step 1 should be null
@@ -293,7 +293,7 @@ namespace Terminal.Gui.DialogTests {
 			wizard.CurrentStep = step1;
 			Assert.Null (wizard.GetPreviousStep ());
 			wizard.CurrentStep = step3;
-			Assert.Equal (step1.Title.ToString (), wizard.GetPreviousStep ().Title.ToString ());
+			Assert.Equal (step1.Title, wizard.GetPreviousStep ().Title);
 
 			// If three steps with Step1.Enabled = false & Step2.Enabled = false
 			//   At step 3 should be null
@@ -303,27 +303,27 @@ namespace Terminal.Gui.DialogTests {
 			step1.Enabled = true;
 			step2.Enabled = true;
 			step3.Enabled = true;
-			Assert.Equal (step3.Title.ToString (), wizard.GetPreviousStep ().Title.ToString ());
+			Assert.Equal (step3.Title, wizard.GetPreviousStep ().Title);
 
 			step1.Enabled = false;
 			step2.Enabled = true;
 			step3.Enabled = true;
-			Assert.Equal (step3.Title.ToString (), wizard.GetPreviousStep ().Title.ToString ());
+			Assert.Equal (step3.Title, wizard.GetPreviousStep ().Title);
 
 			step1.Enabled = false;
 			step2.Enabled = false;
 			step3.Enabled = true;
-			Assert.Equal (step3.Title.ToString (), wizard.GetPreviousStep ().Title.ToString ());
+			Assert.Equal (step3.Title, wizard.GetPreviousStep ().Title);
 
 			step1.Enabled = false;
 			step2.Enabled = true;
 			step3.Enabled = false;
-			Assert.Equal (step2.Title.ToString (), wizard.GetPreviousStep ().Title.ToString ());
+			Assert.Equal (step2.Title, wizard.GetPreviousStep ().Title);
 
 			step1.Enabled = true;
 			step2.Enabled = false;
 			step3.Enabled = false;
-			Assert.Equal (step1.Title.ToString (), wizard.GetPreviousStep ().Title.ToString ());
+			Assert.Equal (step1.Title, wizard.GetPreviousStep ().Title);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -338,7 +338,7 @@ namespace Terminal.Gui.DialogTests {
 			wizard.AddStep (step1);
 
 			// If no current step, should be first step
-			Assert.Equal (step1.Title.ToString (), wizard.GetNextStep ().Title.ToString ());
+			Assert.Equal (step1.Title, wizard.GetNextStep ().Title);
 
 			wizard.CurrentStep = step1;
 			// If there is 1 step it's current step should be null
@@ -351,7 +351,7 @@ namespace Terminal.Gui.DialogTests {
 			// If two steps and at 1 and step 2 is `Enabled = true`should be step 2
 			var step2 = new Wizard.WizardStep () { Title = "step2" };
 			wizard.AddStep (step2);
-			Assert.Equal (step2.Title.ToString (), wizard.GetNextStep ().Title.ToString ());
+			Assert.Equal (step2.Title, wizard.GetNextStep ().Title);
 
 			// If two steps and at 1 and step 2 is `Enabled = false` should be null
 			step1.Enabled = true;
@@ -369,9 +369,9 @@ namespace Terminal.Gui.DialogTests {
 			wizard.CurrentStep = step1;
 			step2.Enabled = true;
 			step3.Enabled = true;
-			Assert.Equal (step2.Title.ToString (), wizard.GetNextStep ().Title.ToString ());
+			Assert.Equal (step2.Title, wizard.GetNextStep ().Title);
 			wizard.CurrentStep = step2;
-			Assert.Equal (step3.Title.ToString (), wizard.GetNextStep ().Title.ToString ());
+			Assert.Equal (step3.Title, wizard.GetNextStep ().Title);
 			wizard.CurrentStep = step3;
 			Assert.Null (wizard.GetNextStep ());
 
@@ -382,7 +382,7 @@ namespace Terminal.Gui.DialogTests {
 			wizard.CurrentStep = step1;
 			step2.Enabled = false;
 			step3.Enabled = true;
-			Assert.Equal (step3.Title.ToString (), wizard.GetNextStep ().Title.ToString ());
+			Assert.Equal (step3.Title, wizard.GetNextStep ().Title);
 			wizard.CurrentStep = step3;
 			Assert.Null (wizard.GetNextStep ());
 
@@ -399,27 +399,27 @@ namespace Terminal.Gui.DialogTests {
 			step1.Enabled = true;
 			step2.Enabled = true;
 			step3.Enabled = true;
-			Assert.Equal (step1.Title.ToString (), wizard.GetNextStep ().Title.ToString ());
+			Assert.Equal (step1.Title, wizard.GetNextStep ().Title);
 
 			step1.Enabled = false;
 			step2.Enabled = true;
 			step3.Enabled = true;
-			Assert.Equal (step2.Title.ToString (), wizard.GetNextStep ().Title.ToString ());
+			Assert.Equal (step2.Title, wizard.GetNextStep ().Title);
 
 			step1.Enabled = false;
 			step2.Enabled = false;
 			step3.Enabled = true;
-			Assert.Equal (step3.Title.ToString (), wizard.GetNextStep ().Title.ToString ());
+			Assert.Equal (step3.Title, wizard.GetNextStep ().Title);
 
 			step1.Enabled = false;
 			step2.Enabled = true;
 			step3.Enabled = false;
-			Assert.Equal (step2.Title.ToString (), wizard.GetNextStep ().Title.ToString ());
+			Assert.Equal (step2.Title, wizard.GetNextStep ().Title);
 
 			step1.Enabled = true;
 			step2.Enabled = false;
 			step3.Enabled = false;
-			Assert.Equal (step1.Title.ToString (), wizard.GetNextStep ().Title.ToString ());
+			Assert.Equal (step1.Title, wizard.GetNextStep ().Title);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -459,25 +459,25 @@ namespace Terminal.Gui.DialogTests {
 
 			var step1 = new Wizard.WizardStep () { Title = "step1" };
 			wizard.AddStep (step1);
-			Assert.Equal (step1.Title.ToString (), wizard.GetFirstStep ().Title.ToString ());
+			Assert.Equal (step1.Title, wizard.GetFirstStep ().Title);
 
 			var step2 = new Wizard.WizardStep () { Title = "step2" };
 			wizard.AddStep (step2);
-			Assert.Equal (step1.Title.ToString (), wizard.GetFirstStep ().Title.ToString ());
+			Assert.Equal (step1.Title, wizard.GetFirstStep ().Title);
 
 			var step3 = new Wizard.WizardStep () { Title = "step3" };
 			wizard.AddStep (step3);
-			Assert.Equal (step1.Title.ToString (), wizard.GetFirstStep ().Title.ToString ());
+			Assert.Equal (step1.Title, wizard.GetFirstStep ().Title);
 
 			step1.Enabled = false;
-			Assert.Equal (step2.Title.ToString (), wizard.GetFirstStep ().Title.ToString ());
+			Assert.Equal (step2.Title, wizard.GetFirstStep ().Title);
 
 			step1.Enabled = true;
-			Assert.Equal (step1.Title.ToString (), wizard.GetFirstStep ().Title.ToString ());
+			Assert.Equal (step1.Title, wizard.GetFirstStep ().Title);
 
 			step1.Enabled = false;
 			step2.Enabled = false;
-			Assert.Equal (step3.Title.ToString (), wizard.GetFirstStep ().Title.ToString ());
+			Assert.Equal (step3.Title, wizard.GetFirstStep ().Title);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -489,25 +489,25 @@ namespace Terminal.Gui.DialogTests {
 
 			var step1 = new Wizard.WizardStep () { Title = "step1" };
 			wizard.AddStep (step1);
-			Assert.Equal (step1.Title.ToString (), wizard.GetLastStep ().Title.ToString ());
+			Assert.Equal (step1.Title, wizard.GetLastStep ().Title);
 
 			var step2 = new Wizard.WizardStep () { Title = "step2" };
 			wizard.AddStep (step2);
-			Assert.Equal (step2.Title.ToString (), wizard.GetLastStep ().Title.ToString ());
+			Assert.Equal (step2.Title, wizard.GetLastStep ().Title);
 
 			var step3 = new Wizard.WizardStep () { Title = "step3" };
 			wizard.AddStep (step3);
-			Assert.Equal (step3.Title.ToString (), wizard.GetLastStep ().Title.ToString ());
+			Assert.Equal (step3.Title, wizard.GetLastStep ().Title);
 
 			step3.Enabled = false;
-			Assert.Equal (step2.Title.ToString (), wizard.GetLastStep ().Title.ToString ());
+			Assert.Equal (step2.Title, wizard.GetLastStep ().Title);
 
 			step3.Enabled = true;
-			Assert.Equal (step3.Title.ToString (), wizard.GetLastStep ().Title.ToString ());
+			Assert.Equal (step3.Title, wizard.GetLastStep ().Title);
 
 			step3.Enabled = false;
 			step2.Enabled = false;
-			Assert.Equal (step1.Title.ToString (), wizard.GetLastStep ().Title.ToString ());
+			Assert.Equal (step1.Title, wizard.GetLastStep ().Title);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -561,13 +561,13 @@ namespace Terminal.Gui.DialogTests {
 			runstate = Application.Begin (wizard);
 			Application.RunMainLoopIteration (ref runstate, true, ref firstIteration);
 
-			Assert.Equal (step1.Title.ToString (), wizard.CurrentStep.Title.ToString ());
+			Assert.Equal (step1.Title, wizard.CurrentStep.Title);
 			wizard.NextFinishButton.OnClicked ();
 			Assert.False (finishedFired);
 			Assert.False (closedFired);
 
-			Assert.Equal (step2.Title.ToString (), wizard.CurrentStep.Title.ToString ());
-			Assert.Equal (wizard.GetLastStep ().Title.ToString (), wizard.CurrentStep.Title.ToString ());
+			Assert.Equal (step2.Title, wizard.CurrentStep.Title);
+			Assert.Equal (wizard.GetLastStep ().Title, wizard.CurrentStep.Title);
 			wizard.NextFinishButton.OnClicked ();
 			Application.End (runstate);
 			Assert.True (finishedFired);
@@ -599,8 +599,8 @@ namespace Terminal.Gui.DialogTests {
 			runstate = Application.Begin (wizard);
 			Application.RunMainLoopIteration (ref runstate, true, ref firstIteration);
 
-			Assert.Equal (step2.Title.ToString (), wizard.CurrentStep.Title.ToString ());
-			Assert.Equal (wizard.GetLastStep ().Title.ToString (), wizard.CurrentStep.Title.ToString ());
+			Assert.Equal (step2.Title, wizard.CurrentStep.Title);
+			Assert.Equal (wizard.GetLastStep ().Title, wizard.CurrentStep.Title);
 			wizard.NextFinishButton.OnClicked ();
 			Application.End (runstate);
 			Assert.True (finishedFired);

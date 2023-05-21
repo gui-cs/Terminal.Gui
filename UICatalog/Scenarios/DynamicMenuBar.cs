@@ -84,7 +84,7 @@ namespace UICatalog.Scenarios {
 					Height = 4
 				};
 
-				var _txtDelimiter = new TextField (MenuBar.ShortcutDelimiter.ToString ()) {
+				var _txtDelimiter = new TextField (MenuBar.ShortcutDelimiter) {
 					X = Pos.Center (),
 					Width = 2,
 				};
