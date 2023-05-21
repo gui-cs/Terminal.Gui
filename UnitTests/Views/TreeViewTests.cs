@@ -131,7 +131,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var tree = CreateTree (out Factory f, out Car car1, out Car car2);
 			tree.BeginInit (); tree.EndInit ();
-			
+
 			// control only allows 1 row to be viewed at once
 			tree.Bounds = new Rect (0, 0, 20, 1);
 
@@ -900,6 +900,99 @@ namespace Terminal.Gui.ViewsTests {
 001111
 ",
 				new [] { tv.ColorScheme.Normal, pink });
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestBottomlessTreeView_MaxDepth_5 ()
+		{
+			var tv = new TreeView<string> () { Width = 20, Height = 10 };
+
+			tv.TreeBuilder = new DelegateTreeBuilder<string> (
+				(s) => new [] { (int.Parse (s) + 1).ToString () }
+				);
+
+			tv.AddObject ("1");
+			tv.ColorScheme = new ColorScheme ();
+
+			tv.LayoutSubviews ();
+			tv.Draw ();
+
+			// Nothing expanded
+			TestHelpers.AssertDriverContentsAre (
+@"└+1
+", output);
+			tv.MaxDepth = 5;
+			tv.ExpandAll ();
+
+			tv.Draw ();
+
+			// Normal drawing of the tree view
+			TestHelpers.AssertDriverContentsAre (
+@"    
+└-1
+  └-2
+    └-3
+      └-4
+        └-5
+          └─6
+", output);
+			Assert.False (tv.CanExpand ("6"));
+			Assert.False (tv.IsExpanded ("6"));
+
+			tv.Collapse("6");
+
+			Assert.False (tv.CanExpand ("6"));
+			Assert.False (tv.IsExpanded ("6"));
+
+			tv.Collapse ("5");
+
+			Assert.True (tv.CanExpand ("5"));
+			Assert.False (tv.IsExpanded ("5"));
+
+			tv.Draw ();
+
+			// Normal drawing of the tree view
+			TestHelpers.AssertDriverContentsAre (
+@"    
+└-1
+  └-2
+    └-3
+      └-4
+        └+5
+", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestBottomlessTreeView_MaxDepth_3 ()
+		{
+			var tv = new TreeView<string> () { Width = 20, Height = 10 };
+
+			tv.TreeBuilder = new DelegateTreeBuilder<string> (
+				(s) => new [] { (int.Parse (s) + 1).ToString () }
+				);
+
+			tv.AddObject ("1");
+			tv.ColorScheme = new ColorScheme ();
+
+			tv.LayoutSubviews ();
+			tv.Draw ();
+
+			// Nothing expanded
+			TestHelpers.AssertDriverContentsAre (
+@"└+1
+", output);
+			tv.MaxDepth = 3;
+			tv.ExpandAll ();
+			tv.Draw ();
+
+			// Normal drawing of the tree view
+			TestHelpers.AssertDriverContentsAre (
+@"    
+└-1
+  └-2
+    └-3
+      └─4
+", output);
 		}
 
 		[Fact, AutoInitShutdown]
