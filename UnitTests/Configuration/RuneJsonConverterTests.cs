@@ -22,13 +22,11 @@ public class RunJsonConverterTests {
 	public void RoundTripConversion_Positive (string rune, string expected)
 	{
 		// Arrange
-		var options = new JsonSerializerOptions ();
-		options.Converters.Add (new RuneJsonConverter ());
 
 		// Act
-		var json = JsonSerializer.Serialize (rune, options);
-		var deserialized = JsonSerializer.Deserialize<Rune> (json, options);
-
+		var json = JsonSerializer.Serialize (rune, ConfigurationManager._serializerOptions);
+		var deserialized = JsonSerializer.Deserialize<Rune> (json, ConfigurationManager._serializerOptions);
+		
 		// Assert
 		Assert.Equal (expected, deserialized.ToString ());
 	}
@@ -56,15 +54,11 @@ public class RunJsonConverterTests {
 	[InlineData ("\\U0001F469\\u200D\\U0001F469\\u200D\\U0001F467\\u200D\\U0001F467")]
 	public void RoundTripConversion_Negative (string rune)
 	{
-		// Arrange
-		var options = new JsonSerializerOptions ();
-		options.Converters.Add (new RuneJsonConverter ());
-
 		// Act
-		var json = JsonSerializer.Serialize (rune, options);
+		var json = JsonSerializer.Serialize (rune, ConfigurationManager._serializerOptions);
 
 		// Assert
-		Assert.Throws<JsonException> (() => JsonSerializer.Deserialize<Rune> (json, options));
+		Assert.Throws<JsonException> (() => JsonSerializer.Deserialize<Rune> (json, ConfigurationManager._serializerOptions));
 	}
 
 }

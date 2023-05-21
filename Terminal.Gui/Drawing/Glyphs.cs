@@ -140,9 +140,19 @@ namespace Terminal.Gui {
 		public Rune Collapse { get; set; } = (Rune)'-';
 
 		/// <summary>
-		/// Apple. Because snek. And because it's an example of a surrogate pair
+		/// Apple (non-BMP). Because snek. And because it's an example of a non-BMP surrogate pair. See Issue #2610.
 		/// </summary>
-		public Rune Apple { get; set; } = (Rune)'❦'; //  "🍎".ToRunes () [0]; // nonBMP
+		public Rune Apple { get; set; } = "🍎".ToRunes () [0]; // nonBMP
+
+		/// <summary>
+		/// Apple (BMP). Because snek. See Issue #2610.
+		/// </summary>
+		public Rune AppleBMP { get; set; } = (Rune)'❦';
+
+		///// <summary>
+		///// A nonprintable (low surrogate) that should fail to ctor.
+		///// </summary>
+		//public Rune InvalidGlyph { get; set; } = (Rune)'\ud83d';
 
 		#endregion
 

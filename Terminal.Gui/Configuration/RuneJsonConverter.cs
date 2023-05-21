@@ -58,10 +58,6 @@ internal class RuneJsonConverter : JsonConverter<Rune> {
 					}
 				}
 
-				if (!Rune.IsValid (first)) {
-					throw new JsonException ($"The first codepoint is not valid: {first} in ({value})");
-				}
-
 				Rune result;
 				if (second == RuneExtensions.MaxUnicodeCodePoint + 1) {
 					// Single codepoint
@@ -71,18 +67,18 @@ internal class RuneJsonConverter : JsonConverter<Rune> {
 					return result;
 				}
 
+				// Surrogate pair?
 				if (Rune.TryCreate ((char)first, (char)second, out result)) {
-					// Surrogate pair!
 					return result;
 				}
 
 				if (!Rune.IsValid (second)) {
-					throw new JsonException ($"The second codepoint is not valid: {first} in ({value})");
+					throw new JsonException ($"The second codepoint is not valid: {second} in ({value})");
 				}
 
-				var cm = new Rune (first);
+				var cm = new Rune (second);
 				if (!cm.IsCombiningMark ()) {
-					throw new JsonException ($"The first codepoint is not a combining mark: {cm} in ({value})");
+					throw new JsonException ($"The second codepoint is not a combining mark: {cm} in ({value})");
 				}
 
 				// not a surrogate pair, so a combining mark + char?
