@@ -28,6 +28,7 @@ namespace Terminal.Gui.ViewsTests {
 			public static string txt = "TAB to jump between text fields.";
 			public override void Before (MethodInfo methodUnderTest)
 			{
+				FakeDriver.FakeBehaviors.UseFakeClipboard = true;
 				base.Before (methodUnderTest);
 
 				//                   1         2         3 
@@ -2526,7 +2527,7 @@ line.
 		}
 
 		[Fact]
-		[AutoInitShutdown]
+		[AutoInitShutdown (useFakeClipboard:true)]
 		public void KeyBindings_Command ()
 		{
 			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
