@@ -1260,7 +1260,7 @@ namespace Terminal.Gui {
 					Application.Driver.SetCursorVisibility (value);
 				}
 
-				_desiredCursorVisibility = value;
+				_desiredCursorVisibility = _visibility = value;
 			}
 		}
 
