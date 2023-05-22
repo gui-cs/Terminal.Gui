@@ -1134,8 +1134,8 @@ namespace Terminal.Gui {
 				length = Math.Abs (x + direction <= text.Count ? x + direction - selectedStart : text.Count - selectedStart);
 				SetSelectedStartSelectedLength ();
 				if (start > -1 && length > 0) {
-					selectedText = length > 0 ? StringExtensions.ToString (text).Substring (
-						start < 0 ? 0 : start, length > text.Count ? text.Count : length) : "";
+					selectedText = length > 0 ? StringExtensions.ToString (text.GetRange (
+						start < 0 ? 0 : start, length > text.Count ? text.Count : length)) : "";
 					if (first > start) {
 						first = start;
 					}
@@ -1205,11 +1205,11 @@ namespace Terminal.Gui {
 			string actualText = Text;
 			SetSelectedStartSelectedLength ();
 			int selStart = SelectedStart > -1 ? start : point;
-			(var _, var len) = TextModel.DisplaySize (text, 0, selStart, false);
-			(var _, var len2) = TextModel.DisplaySize (text, selStart, selStart + length, false);
-			(var _, var len3) = TextModel.DisplaySize (text, selStart + length, actualText.GetRuneCount (), false);
-			var newText = actualText [..len] +
-				actualText.Substring (len + len2, len3);
+			(var size, var _) = TextModel.DisplaySize (text, 0, selStart, false);
+			(var size2, var _) = TextModel.DisplaySize (text, selStart, selStart + length, false);
+			(var size3, var _) = TextModel.DisplaySize (text, selStart + length, actualText.GetRuneCount (), false);
+			var newText = actualText [..size] +
+				actualText.Substring (size + size2, size3);
 			ClearAllSelection ();
 			point = selStart >= newText.GetRuneCount () ? newText.GetRuneCount () : selStart;
 			return newText.ToRuneList ();
@@ -1227,13 +1227,13 @@ namespace Terminal.Gui {
 			SetSelectedStartSelectedLength ();
 			int selStart = start == -1 ? CursorPosition : start;
 			string actualText = Text;
-			(int _, int len) = TextModel.DisplaySize (text, 0, selStart, false);
-			(var _, var len2) = TextModel.DisplaySize (text, selStart, selStart + length, false);
-			(var _, var len3) = TextModel.DisplaySize (text, selStart + length, actualText.GetRuneCount (), false);
+			(int size, int _) = TextModel.DisplaySize (text, 0, selStart, false);
+			(var size2, var _) = TextModel.DisplaySize (text, selStart, selStart + length, false);
+			(var size3, var _) = TextModel.DisplaySize (text, selStart + length, actualText.GetRuneCount (), false);
 			string cbTxt = Clipboard.Contents.Split ("\n") [0] ?? "";
-			Text = actualText [..len] +
+			Text = actualText [..size] +
 				cbTxt +
-				actualText.Substring (len + len2, len3);
+				actualText.Substring (size + size2, size3);
 			point = selStart + cbTxt.GetRuneCount ();
 			ClearAllSelection ();
 			SetNeedsDisplay ();
