@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -174,12 +175,12 @@ namespace Terminal.Gui.DriverTests {
 		//	_ = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
 
 		//	Key key = Key.Unknown;
-			
+
 		//	Application.Top.KeyPress += (e) => {
 		//		key = e.KeyEvent.Key;
 		//		output.WriteLine ($"  Application.Top.KeyPress: {key}");
 		//		e.Handled = true;
-				
+
 		//	};
 
 		//	int iterations = 0;
@@ -197,7 +198,7 @@ namespace Terminal.Gui.DriverTests {
 		//	// Shutdown must be called to safely clean up Application if Init has been called
 		//	Application.Shutdown ();
 		//}
-		
+
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
 		public void TerminalResized_Simulation (Type driverType)
@@ -292,6 +293,23 @@ namespace Terminal.Gui.DriverTests {
 
 			Application.Run (win);
 			Application.Shutdown ();
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (-1, false)]
+		[InlineData (0, true)]
+		[InlineData (0xd83d, false)] // not printable "high surrogate"
+		[InlineData (0xdc3d, false)] // not printable "low surrogate"
+		[InlineData (0x10FFFF, true)] // RuneExtensions.MaxUnicodeCodePoint
+		[InlineData (0x10FFFF + 1, false)]
+		public void IsRuneSupported_Tests (int rune, bool expected)
+		{
+			if (expected) {
+				Assert.Equal (expected, Application.Driver.IsRuneSupported ((Rune)rune));
+			} else {
+				Assert.Throws<ArgumentOutOfRangeException> (() => Application.Driver.IsRuneSupported ((Rune)rune));
+				Assert.False (expected);
+			}
 		}
 	}
 }

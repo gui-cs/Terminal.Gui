@@ -759,18 +759,15 @@ namespace Terminal.Gui {
 		/// does not support displaying this rune.</returns>
 		public virtual bool IsRuneSupported (Rune rune)
 		{
-			if (rune.Value > RuneExtensions.MaxUnicodeCodePoint) {
-				return false;
-			}
-			return true;
+			return Rune.IsValid (rune.Value);
 		}
-		
+
 		/// <summary>
 		/// Adds the specified rune to the display at the current cursor position.
 		/// </summary>
 		/// <param name="rune">Rune to add.</param>
 		public abstract void AddRune (Rune rune);
-		
+
 		/// <summary>
 		/// Ensures that the column and line are in a valid range from the size of the driver.
 		/// </summary>
