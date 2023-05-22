@@ -224,7 +224,7 @@ public static class EscSeqUtils {
 	/// This command is special in that the (n) position can accept between 0 and 16 parameters separated by semicolons.
 	/// When no parameters are specified, it is treated the same as a single 0 parameter.
 	/// https://terminalguide.namepad.de/seq/csi_sm/
-	/// </n>summary>
+	/// </summary>
 	public static string CSI_SetGraphicsRendition (params int [] parameters) => $"{CSI}{string.Join (";", parameters)}m";
 	#endregion
 
