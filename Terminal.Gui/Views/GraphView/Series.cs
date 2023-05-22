@@ -119,7 +119,7 @@ namespace Terminal.Gui {
 			}
 
 			for (int i = 0; i < values.Length; i++) {
-				subSeries [i].Bars.Add (new Bar (label,
+				subSeries [i].Bars.Add (new BarSeriesBar (label,
 					new GraphCellToRender (fill), values [i]));
 			}
 		}
@@ -147,7 +147,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Ordered collection of graph bars to position along axis
 		/// </summary>
-		public List<Bar> Bars { get; set; } = new List<Bar> ();
+		public List<BarSeriesBar> Bars { get; set; } = new List<BarSeriesBar> ();
 
 		/// <summary>
 		/// Determines the spacing of bars along the axis. Defaults to 1 i.e. 
@@ -169,12 +169,12 @@ namespace Terminal.Gui {
 		public float Offset { get; set; } = 0;
 
 		/// <summary>
-		/// Overrides the <see cref="Bar.Fill"/> with a fixed color
+		/// Overrides the <see cref="BarSeriesBar.Fill"/> with a fixed color
 		/// </summary>
 		public Attribute? OverrideBarColor { get; set; }
 
 		/// <summary>
-		/// True to draw <see cref="Bar.Text"/> along the axis under the bar.  Defaults
+		/// True to draw <see cref="BarSeriesBar.Text"/> along the axis under the bar.  Defaults
 		/// to true.
 		/// </summary>
 		public bool DrawLabels { get; set; } = true;
@@ -268,7 +268,7 @@ namespace Terminal.Gui {
 		/// <param name="start">Screen position of the start of the bar</param>
 		/// <param name="end">Screen position of the end of the bar</param>
 		/// <param name="beingDrawn">The Bar that occupies this space and is being drawn</param>
-		protected virtual void DrawBarLine (GraphView graph, Point start, Point end, Bar beingDrawn)
+		protected virtual void DrawBarLine (GraphView graph, Point start, Point end, BarSeriesBar beingDrawn)
 		{
 			var adjusted = AdjustColor (beingDrawn.Fill);
 

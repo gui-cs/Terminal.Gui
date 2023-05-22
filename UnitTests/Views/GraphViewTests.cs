@@ -711,7 +711,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Empty (axisY.LabelPoints);
 
 			// bar of height 0
-			barSeries.Bars.Add (new Bar ("hi", new GraphCellToRender ((Rune)'.'), 0));
+			barSeries.Bars.Add (new BarSeriesBar ("hi", new GraphCellToRender ((Rune)'.'), 0));
 			barSeries.Orientation = Orientation.Vertical;
 
 			// redraw graph
@@ -753,9 +753,9 @@ namespace Terminal.Gui.ViewsTests {
 			barSeries.BarEvery = 1f;
 
 			barSeries.Bars.Add (
-				new Bar ("hi1", new GraphCellToRender ((Rune)'.'), 100));
+				new BarSeriesBar ("hi1", new GraphCellToRender ((Rune)'.'), 100));
 			barSeries.Bars.Add (
-				new Bar ("hi2", new GraphCellToRender ((Rune)'.'), 100));
+				new BarSeriesBar ("hi2", new GraphCellToRender ((Rune)'.'), 100));
 
 			barSeries.Orientation = Orientation.Vertical;
 
@@ -809,11 +809,11 @@ namespace Terminal.Gui.ViewsTests {
 
 			// 1 bar that is very wide (100 graph units horizontally = screen pos 50 but bounded by screen)
 			barSeries.Bars.Add (
-				new Bar ("hi1", new GraphCellToRender ((Rune)'.'), 100));
+				new BarSeriesBar ("hi1", new GraphCellToRender ((Rune)'.'), 100));
 
 			// 1 bar that is shorter
 			barSeries.Bars.Add (
-				new Bar ("hi2", new GraphCellToRender ((Rune)'.'), 5));
+				new BarSeriesBar ("hi2", new GraphCellToRender ((Rune)'.'), 5));
 
 			// redraw graph
 			graph.Draw ();
@@ -860,7 +860,7 @@ namespace Terminal.Gui.ViewsTests {
 				return FinalColor = base.AdjustColor (graphCellToRender);
 			}
 
-			protected override void DrawBarLine (GraphView graph, Point start, Point end, Bar beingDrawn)
+			protected override void DrawBarLine (GraphView graph, Point start, Point end, BarSeriesBar beingDrawn)
 			{
 				base.DrawBarLine (graph, start, end, beingDrawn);
 

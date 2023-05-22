@@ -302,24 +302,24 @@ namespace UICatalog.Scenarios {
 			var mediumStiple = new GraphCellToRender ((Rune)'\u2592');
 
 			var barSeries = new BarSeries () {
-				Bars = new List<Bar> () {
-					new Bar ("Switzerland", softStiple, 83.4f),
-					new Bar ("South Korea", !verticalBars?mediumStiple:softStiple, 83.3f),
-					new Bar ("Singapore", softStiple, 83.2f),
-					new Bar ("Spain", !verticalBars?mediumStiple:softStiple, 83.2f),
-					new Bar ("Cyprus", softStiple, 83.1f),
-					new Bar ("Australia", !verticalBars?mediumStiple:softStiple, 83),
-					new Bar ("Italy", softStiple, 83),
-					new Bar ("Norway", !verticalBars?mediumStiple:softStiple, 83),
-					new Bar ("Israel", softStiple, 82.6f),
-					new Bar ("France", !verticalBars?mediumStiple:softStiple, 82.5f),
-					new Bar ("Luxembourg", softStiple, 82.4f),
-					new Bar ("Sweden", !verticalBars?mediumStiple:softStiple, 82.4f),
-					new Bar ("Iceland", softStiple, 82.3f),
-					new Bar ("Canada", !verticalBars?mediumStiple:softStiple, 82.2f),
-					new Bar ("New Zealand", softStiple, 82),
-					new Bar ("Malta", !verticalBars?mediumStiple:softStiple, 81.9f),
-					new Bar ("Ireland", softStiple, 81.8f)
+				Bars = new List<BarSeriesBar> () {
+					new BarSeriesBar ("Switzerland", softStiple, 83.4f),
+					new BarSeriesBar ("South Korea", !verticalBars?mediumStiple:softStiple, 83.3f),
+					new BarSeriesBar ("Singapore", softStiple, 83.2f),
+					new BarSeriesBar ("Spain", !verticalBars?mediumStiple:softStiple, 83.2f),
+					new BarSeriesBar ("Cyprus", softStiple, 83.1f),
+					new BarSeriesBar ("Australia", !verticalBars?mediumStiple:softStiple, 83),
+					new BarSeriesBar ("Italy", softStiple, 83),
+					new BarSeriesBar ("Norway", !verticalBars?mediumStiple:softStiple, 83),
+					new BarSeriesBar ("Israel", softStiple, 82.6f),
+					new BarSeriesBar ("France", !verticalBars?mediumStiple:softStiple, 82.5f),
+					new BarSeriesBar ("Luxembourg", softStiple, 82.4f),
+					new BarSeriesBar ("Sweden", !verticalBars?mediumStiple:softStiple, 82.4f),
+					new BarSeriesBar ("Iceland", softStiple, 82.3f),
+					new BarSeriesBar ("Canada", !verticalBars?mediumStiple:softStiple, 82.2f),
+					new BarSeriesBar ("New Zealand", softStiple, 82),
+					new BarSeriesBar ("Malta", !verticalBars?mediumStiple:softStiple, 81.9f),
+					new BarSeriesBar ("Ireland", softStiple, 81.8f)
 				}
 			};
 
@@ -436,29 +436,29 @@ namespace UICatalog.Scenarios {
 			// Males (negative to make the bars go left)
 			var malesSeries = new BarSeries () {
 				Orientation = Orientation.Horizontal,
-				Bars = new List<Bar> ()
+				Bars = new List<BarSeriesBar> ()
 				{
-					new Bar("0-4",stiple,-2009363),
-					new Bar("5-9",stiple,-2108550),
-					new Bar("10-14",stiple,-2022370),
-					new Bar("15-19",stiple,-1880611),
-					new Bar("20-24",stiple,-2072674),
-					new Bar("25-29",stiple,-2275138),
-					new Bar("30-34",stiple,-2361054),
-					new Bar("35-39",stiple,-2279836),
-					new Bar("40-44",stiple,-2148253),
-					new Bar("45-49",stiple,-2128343),
-					new Bar("50-54",stiple,-2281421),
-					new Bar("55-59",stiple,-2232388),
-					new Bar("60-64",stiple,-1919839),
-					new Bar("65-69",stiple,-1647391),
-					new Bar("70-74",stiple,-1624635),
-					new Bar("75-79",stiple,-1137438),
-					new Bar("80-84",stiple,-766956),
-					new Bar("85-89",stiple,-438663),
-					new Bar("90-94",stiple,-169952),
-					new Bar("95-99",stiple,-34524),
-					new Bar("100+",stiple,-3016)
+					new BarSeriesBar("0-4",stiple,-2009363),
+					new BarSeriesBar("5-9",stiple,-2108550),
+					new BarSeriesBar("10-14",stiple,-2022370),
+					new BarSeriesBar("15-19",stiple,-1880611),
+					new BarSeriesBar("20-24",stiple,-2072674),
+					new BarSeriesBar("25-29",stiple,-2275138),
+					new BarSeriesBar("30-34",stiple,-2361054),
+					new BarSeriesBar("35-39",stiple,-2279836),
+					new BarSeriesBar("40-44",stiple,-2148253),
+					new BarSeriesBar("45-49",stiple,-2128343),
+					new BarSeriesBar("50-54",stiple,-2281421),
+					new BarSeriesBar("55-59",stiple,-2232388),
+					new BarSeriesBar("60-64",stiple,-1919839),
+					new BarSeriesBar("65-69",stiple,-1647391),
+					new BarSeriesBar("70-74",stiple,-1624635),
+					new BarSeriesBar("75-79",stiple,-1137438),
+					new BarSeriesBar("80-84",stiple,-766956),
+					new BarSeriesBar("85-89",stiple,-438663),
+					new BarSeriesBar("90-94",stiple,-169952),
+					new BarSeriesBar("95-99",stiple,-34524),
+					new BarSeriesBar("100+",stiple,-3016)
 
 				}
 			};
@@ -467,29 +467,29 @@ namespace UICatalog.Scenarios {
 			// Females
 			var femalesSeries = new BarSeries () {
 				Orientation = Orientation.Horizontal,
-				Bars = new List<Bar> ()
+				Bars = new List<BarSeriesBar> ()
 				{
-					new Bar("0-4",stiple,1915127),
-					new Bar("5-9",stiple,2011016),
-					new Bar("10-14",stiple,1933970),
-					new Bar("15-19",stiple,1805522),
-					new Bar("20-24",stiple,2001966),
-					new Bar("25-29",stiple,2208929),
-					new Bar("30-34",stiple,2345774),
-					new Bar("35-39",stiple,2308360),
-					new Bar("40-44",stiple,2159877),
-					new Bar("45-49",stiple,2167778),
-					new Bar("50-54",stiple,2353119),
-					new Bar("55-59",stiple,2306537),
-					new Bar("60-64",stiple,1985177),
-					new Bar("65-69",stiple,1734370),
-					new Bar("70-74",stiple,1763853),
-					new Bar("75-79",stiple,1304709),
-					new Bar("80-84",stiple,969611),
-					new Bar("85-89",stiple,638892),
-					new Bar("90-94",stiple,320625),
-					new Bar("95-99",stiple,95559),
-					new Bar("100+",stiple,12818)
+					new BarSeriesBar("0-4",stiple,1915127),
+					new BarSeriesBar("5-9",stiple,2011016),
+					new BarSeriesBar("10-14",stiple,1933970),
+					new BarSeriesBar("15-19",stiple,1805522),
+					new BarSeriesBar("20-24",stiple,2001966),
+					new BarSeriesBar("25-29",stiple,2208929),
+					new BarSeriesBar("30-34",stiple,2345774),
+					new BarSeriesBar("35-39",stiple,2308360),
+					new BarSeriesBar("40-44",stiple,2159877),
+					new BarSeriesBar("45-49",stiple,2167778),
+					new BarSeriesBar("50-54",stiple,2353119),
+					new BarSeriesBar("55-59",stiple,2306537),
+					new BarSeriesBar("60-64",stiple,1985177),
+					new BarSeriesBar("65-69",stiple,1734370),
+					new BarSeriesBar("70-74",stiple,1763853),
+					new BarSeriesBar("75-79",stiple,1304709),
+					new BarSeriesBar("80-84",stiple,969611),
+					new BarSeriesBar("85-89",stiple,638892),
+					new BarSeriesBar("90-94",stiple,320625),
+					new BarSeriesBar("95-99",stiple,95559),
+					new BarSeriesBar("100+",stiple,12818)
 				}
 			};
 
@@ -526,7 +526,7 @@ namespace UICatalog.Scenarios {
 				red = Application.Driver.MakeAttribute (Color.Red, Color.Black);
 				brightred = Application.Driver.MakeAttribute (Color.BrightRed, Color.Black);
 			}
-			protected override void DrawBarLine (GraphView graph, Terminal.Gui.Point start, Terminal.Gui.Point end, Bar beingDrawn)
+			protected override void DrawBarLine (GraphView graph, Terminal.Gui.Point start, Terminal.Gui.Point end, BarSeriesBar beingDrawn)
 			{
 				var driver = Application.Driver;
 
@@ -564,7 +564,7 @@ namespace UICatalog.Scenarios {
 
 			Random r = new Random ();
 			var series = new DiscoBarSeries ();
-			var bars = new List<Bar> ();
+			var bars = new List<BarSeriesBar> ();
 
 			Func<MainLoop, bool> genSample = (l) => {
 
@@ -572,7 +572,7 @@ namespace UICatalog.Scenarios {
 				// generate an imaginary sample
 				for (int i = 0; i < 31; i++) {
 					bars.Add (
-						new Bar (null, stiple, r.Next (0, 100)) {
+						new BarSeriesBar (null, stiple, r.Next (0, 100)) {
 							//ColorGetter = colorDelegate
 						});
 				}

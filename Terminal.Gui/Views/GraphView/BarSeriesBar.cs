@@ -3,7 +3,7 @@
 	/// <summary>
 	/// A single bar in a <see cref="BarSeries"/>
 	/// </summary>
-	public class Bar {
+	public class BarSeriesBar {
 
 		/// <summary>
 		/// Optional text that describes the bar.  This will be rendered on the corresponding
@@ -29,7 +29,7 @@
 		/// <param name="text"></param>
 		/// <param name="fill"></param>
 		/// <param name="value"></param>
-		public Bar (string text, GraphCellToRender fill, float value)
+		public BarSeriesBar (string text, GraphCellToRender fill, float value)
 		{
 			Text = text;
 			Fill = fill;
