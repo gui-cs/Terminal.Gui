@@ -928,7 +928,7 @@ internal class NetDriver : ConsoleDriver {
 		if (values.Contains ((attr >> 16) & 0xffff)) {
 			fg = MapColors ((ConsoleColor)((attr >> 16) & 0xffff));
 		}
-		return $"{EscSeqUtils.CSI}{bg};{fg}m";
+		return EscSeqUtils.CSI_SetGraphicsRendition (bg, fg);
 	}
 
 	int MapColors (ConsoleColor color, bool isForeground = true)

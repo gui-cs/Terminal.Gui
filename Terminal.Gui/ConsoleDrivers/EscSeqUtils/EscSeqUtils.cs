@@ -58,6 +58,18 @@ public static class EscSeqUtils {
 	public static readonly string CSI_DisableUrxvtExtModeMouse = CSI + "?1015l";
 
 	/// <summary>
+	/// Control sequence for enabling mouse events.
+	/// </summary>
+	public static string CSI_EnableMouseEvents { get; set; } =
+		CSI_EnableAnyEventMouse + CSI_EnableUrxvtExtModeMouse + CSI_EnableSgrExtModeMouse;
+
+	/// <summary>
+	/// Control sequence for disabling mouse events.
+	/// </summary>
+	public static string CSI_DisableMouseEvents { get; set; } =
+		CSI_DisableAnyEventMouse + CSI_DisableUrxvtExtModeMouse + CSI_DisableSgrExtModeMouse;
+
+	/// <summary>
 	/// ESC [ ? 1047 h - Activate xterm alternative buffer (no backscroll)
 	/// </summary>
 	public static readonly string CSI_ActivateAltBufferNoBackscroll = CSI + "?1047h";
@@ -206,17 +218,15 @@ public static class EscSeqUtils {
 
 	#endregion
 
+	#region Colors
 	/// <summary>
-	/// Control sequence for enabling mouse events.
-	/// </summary>
-	public static string CSI_EnableMouseEvents { get; set; } =
-		CSI_EnableAnyEventMouse + CSI_EnableUrxvtExtModeMouse + CSI_EnableSgrExtModeMouse;
-
-	/// <summary>
-	/// Control sequence for disabling mouse events.
-	/// </summary>
-	public static string CSI_DisableMouseEvents { get; set; } =
-		CSI_DisableAnyEventMouse + CSI_DisableUrxvtExtModeMouse + CSI_DisableSgrExtModeMouse;
+	/// ESC [ (n) m - SGR - Set Graphics Rendition - Set the format of the screen and text as specified by (n)
+	/// This command is special in that the (n) position can accept between 0 and 16 parameters separated by semicolons.
+	/// When no parameters are specified, it is treated the same as a single 0 parameter.
+	/// https://terminalguide.namepad.de/seq/csi_sm/
+	/// </n>summary>
+	public static string CSI_SetGraphicsRendition (params int [] parameters) => $"{CSI}{string.Join (";", parameters)}m";
+	#endregion
 
 	#region Requests
 	/// <summary>
