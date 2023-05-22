@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using NStack;
+using System.Text;
 
 namespace Terminal.Gui {
 	public partial class View {
@@ -155,7 +155,7 @@ namespace Terminal.Gui {
 			for (var line = 0; line < h; line++) {
 				Move (0, line);
 				for (var col = 0; col < w; col++)
-					Driver.AddRune (' ');
+					Driver.AddRune ((Rune)' ');
 			}
 		}
 
@@ -174,7 +174,7 @@ namespace Terminal.Gui {
 			for (var line = regionScreen.Y; line < regionScreen.Y + h; line++) {
 				Driver.Move (regionScreen.X, line);
 				for (var col = 0; col < w; col++)
-					Driver.AddRune (' ');
+					Driver.AddRune ((Rune)' ');
 			}
 		}
 
@@ -232,16 +232,16 @@ namespace Terminal.Gui {
 		/// <para>The hotkey is any character following the hotkey specifier, which is the underscore ('_') character by default.</para>
 		/// <para>The hotkey specifier can be changed via <see cref="HotKeySpecifier"/></para>
 		/// </remarks>
-		public void DrawHotString (ustring text, Attribute hotColor, Attribute normalColor)
+		public void DrawHotString (string text, Attribute hotColor, Attribute normalColor)
 		{
 			var hotkeySpec = HotKeySpecifier == (Rune)0xffff ? (Rune)'_' : HotKeySpecifier;
 			Application.Driver.SetAttribute (normalColor);
 			foreach (var rune in text) {
-				if (rune == hotkeySpec) {
+				if (rune == hotkeySpec.Value) {
 					Application.Driver.SetAttribute (hotColor);
 					continue;
 				}
-				Application.Driver.AddRune (rune);
+				Application.Driver.AddRune ((Rune)rune);
 				Application.Driver.SetAttribute (normalColor);
 			}
 		}
@@ -252,7 +252,7 @@ namespace Terminal.Gui {
 		/// <param name="text">String to display, the underscore before a letter flags the next letter as the hotkey.</param>
 		/// <param name="focused">If set to <see langword="true"/> this uses the focused colors from the color scheme, otherwise the regular ones.</param>
 		/// <param name="scheme">The color scheme to use.</param>
-		public void DrawHotString (ustring text, bool focused, ColorScheme scheme)
+		public void DrawHotString (string text, bool focused, ColorScheme scheme)
 		{
 			if (focused)
 				DrawHotString (text, scheme.HotFocus, scheme.Focus);
@@ -445,7 +445,7 @@ namespace Terminal.Gui {
 				Clear (ViewToScreen (Bounds));
 			}
 
-			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
+			if (!string.IsNullOrEmpty (TextFormatter.Text)) {
 				if (TextFormatter != null) {
 					TextFormatter.NeedsFormat = true;
 				}

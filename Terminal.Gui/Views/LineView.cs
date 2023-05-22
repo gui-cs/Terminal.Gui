@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Terminal.Gui {
 
@@ -73,7 +74,7 @@ namespace Terminal.Gui {
 			Move (0, 0);
 			Driver.SetAttribute (GetNormalColor ());
 
-			var hLineWidth = Math.Max (1, Rune.ColumnWidth (CM.Glyphs.HLine));
+			var hLineWidth = Math.Max (1, CM.Glyphs.HLine.GetColumns ());
 
 			var dEnd = Orientation == Orientation.Horizontal ?
 				Bounds.Width :

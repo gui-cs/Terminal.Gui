@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using Xunit;
 using Xunit.Abstractions;
@@ -27,17 +28,15 @@ namespace Terminal.Gui.ViewsTests {
 			public static string txt = "TAB to jump between text fields.";
 			public override void Before (MethodInfo methodUnderTest)
 			{
+				FakeDriver.FakeBehaviors.UseFakeClipboard = true;
 				base.Before (methodUnderTest);
 
 				//                   1         2         3 
 				//         01234567890123456789012345678901=32 (Length)
-				var buff = new byte [txt.Length];
-				for (int i = 0; i < txt.Length; i++) {
-					buff [i] = (byte)txt [i];
-				}
+				var buff = Encoding.Unicode.GetBytes (txt);
 				var ms = new System.IO.MemoryStream (buff).ToArray ();
 				_textView = new TextView () { Width = 30, Height = 10 };
-				_textView.Text = ms;
+				_textView.Text = Encoding.Unicode.GetString (ms);
 			}
 
 			public override void After (MethodInfo methodUnderTest)
@@ -973,26 +972,26 @@ namespace Terminal.Gui.ViewsTests {
 					_textView.ProcessKey (new KeyEvent (Key.K | Key.CtrlMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
-					Assert.Equal ($"{Environment.NewLine}This is the second line.", _textView.Text.ToString ());
-					Assert.Equal ("This is the first line.", Clipboard.Contents.ToString ());
+					Assert.Equal ($"{Environment.NewLine}This is the second line.", _textView.Text);
+					Assert.Equal ("This is the first line.", Clipboard.Contents);
 					break;
 				case 1:
 					_textView.ProcessKey (new KeyEvent (Key.DeleteChar | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
-					Assert.Equal ("This is the second line.", _textView.Text.ToString ());
-					Assert.Equal ($"This is the first line.{Environment.NewLine}", Clipboard.Contents.ToString ());
+					Assert.Equal ("This is the second line.", _textView.Text);
+					Assert.Equal ($"This is the first line.{Environment.NewLine}", Clipboard.Contents);
 					break;
 				case 2:
 					_textView.ProcessKey (new KeyEvent (Key.K | Key.CtrlMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
-					Assert.Equal ("", _textView.Text.ToString ());
-					Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", Clipboard.Contents.ToString ());
+					Assert.Equal ("", _textView.Text);
+					Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", Clipboard.Contents);
 
 					// Paste
 					_textView.ProcessKey (new KeyEvent (Key.Y | Key.CtrlMask, new KeyModifiers ()));
-					Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", _textView.Text.ToString ());
+					Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", _textView.Text);
 					break;
 				default:
 					iterationsFinished = true;
@@ -1017,26 +1016,26 @@ namespace Terminal.Gui.ViewsTests {
 					_textView.ProcessKey (new KeyEvent (Key.K | Key.AltMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (1, _textView.CursorPosition.Y);
-					Assert.Equal ($"This is the first line.{Environment.NewLine}", _textView.Text.ToString ());
-					Assert.Equal ($"This is the second line.", Clipboard.Contents.ToString ());
+					Assert.Equal ($"This is the first line.{Environment.NewLine}", _textView.Text);
+					Assert.Equal ($"This is the second line.", Clipboard.Contents);
 					break;
 				case 1:
 					_textView.ProcessKey (new KeyEvent (Key.Backspace | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
 					Assert.Equal (23, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
-					Assert.Equal ("This is the first line.", _textView.Text.ToString ());
-					Assert.Equal ($"This is the second line.{Environment.NewLine}", Clipboard.Contents.ToString ());
+					Assert.Equal ("This is the first line.", _textView.Text);
+					Assert.Equal ($"This is the second line.{Environment.NewLine}", Clipboard.Contents);
 					break;
 				case 2:
 					_textView.ProcessKey (new KeyEvent (Key.K | Key.AltMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
-					Assert.Equal ("", _textView.Text.ToString ());
-					Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", Clipboard.Contents.ToString ());
+					Assert.Equal ("", _textView.Text);
+					Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", Clipboard.Contents);
 
 					// Paste inverted
 					_textView.ProcessKey (new KeyEvent (Key.Y | Key.CtrlMask, new KeyModifiers ()));
-					Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", _textView.Text.ToString ());
+					Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", _textView.Text);
 					break;
 				default:
 					iterationsFinished = true;
@@ -1452,7 +1451,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (1, eventcount);
 			_textView.ProcessKey (new KeyEvent (Key.Y, new KeyModifiers ()));
 			Assert.Equal (1, eventcount);
-			Assert.Equal ("Yay", _textView.Text.ToString ());
+			Assert.Equal ("Yay", _textView.Text);
 		}
 
 		[Fact]
@@ -1895,7 +1894,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			for (int i = lCount; i >= 0; i--) {
 				var r = line [i];
-				sumLength += Rune.ColumnWidth (r);
+				sumLength += ((Rune)r).GetColumns ();
 				if (r == '\t') {
 					sumLength += tabWidth + 1;
 				}
@@ -2014,7 +2013,7 @@ namespace Terminal.Gui.ViewsTests {
 				Assert.Equal (8, tv.Text.Length);
 				Assert.Equal (text, tv.Text);
 				Assert.False (tv.IsDirty);
-				Assert.Equal ('\u2400', ConsoleDriver.MakePrintable ((Rune)tv.Text [4]));
+				Assert.Equal ((Rune)'\u2400', ((Rune)tv.Text [4]).MakePrintable ());
 			}
 		}
 
@@ -2200,21 +2199,21 @@ line.
 			var txt = "This is a text.";
 			var txtRunes = TextModel.ToRunes (txt);
 			Assert.Equal (txt.Length, txtRunes.Count);
-			Assert.Equal ('T', txtRunes [0]);
-			Assert.Equal ('h', txtRunes [1]);
-			Assert.Equal ('i', txtRunes [2]);
-			Assert.Equal ('s', txtRunes [3]);
-			Assert.Equal (' ', txtRunes [4]);
-			Assert.Equal ('i', txtRunes [5]);
-			Assert.Equal ('s', txtRunes [6]);
-			Assert.Equal (' ', txtRunes [7]);
-			Assert.Equal ('a', txtRunes [8]);
-			Assert.Equal (' ', txtRunes [9]);
-			Assert.Equal ('t', txtRunes [10]);
-			Assert.Equal ('e', txtRunes [11]);
-			Assert.Equal ('x', txtRunes [12]);
-			Assert.Equal ('t', txtRunes [13]);
-			Assert.Equal ('.', txtRunes [^1]);
+			Assert.Equal ('T', txtRunes [0].Value);
+			Assert.Equal ('h', txtRunes [1].Value);
+			Assert.Equal ('i', txtRunes [2].Value);
+			Assert.Equal ('s', txtRunes [3].Value);
+			Assert.Equal (' ', txtRunes [4].Value);
+			Assert.Equal ('i', txtRunes [5].Value);
+			Assert.Equal ('s', txtRunes [6].Value);
+			Assert.Equal (' ', txtRunes [7].Value);
+			Assert.Equal ('a', txtRunes [8].Value);
+			Assert.Equal (' ', txtRunes [9].Value);
+			Assert.Equal ('t', txtRunes [10].Value);
+			Assert.Equal ('e', txtRunes [11].Value);
+			Assert.Equal ('x', txtRunes [12].Value);
+			Assert.Equal ('t', txtRunes [13].Value);
+			Assert.Equal ('.', txtRunes [^1].Value);
 
 			int col = 0;
 			Assert.True (TextModel.SetCol (ref col, 80, 79));
@@ -2224,11 +2223,11 @@ line.
 			var start = 0;
 			var x = 8;
 			Assert.Equal (8, TextModel.GetColFromX (txtRunes, start, x));
-			Assert.Equal ('a', txtRunes [start + x]);
+			Assert.Equal ('a', txtRunes [start + x].Value);
 			start = 1;
 			x = 7;
 			Assert.Equal (7, TextModel.GetColFromX (txtRunes, start, x));
-			Assert.Equal ('a', txtRunes [start + x]);
+			Assert.Equal ('a', txtRunes [start + x].Value);
 
 			Assert.Equal ((15, 15), TextModel.DisplaySize (txtRunes));
 			Assert.Equal ((6, 6), TextModel.DisplaySize (txtRunes, 1, 7));
@@ -2528,7 +2527,7 @@ line.
 		}
 
 		[Fact]
-		[AutoInitShutdown]
+		[AutoInitShutdown (useFakeClipboard: true)]
 		public void KeyBindings_Command ()
 		{
 			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
@@ -2581,7 +2580,7 @@ line.
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (new Point (23, 2), tv.CursorPosition);
-			g.AllSuggestions = Regex.Matches (tv.Text.ToString (), "\\w+")
+			g.AllSuggestions = Regex.Matches (tv.Text, "\\w+")
 				.Select (s => s.Value)
 				.Distinct ().ToList ();
 			Assert.Equal (7, g.AllSuggestions.Count);
@@ -4658,7 +4657,7 @@ line.
 		}
 
 		[Fact]
-		[AutoInitShutdown]
+		[AutoInitShutdown (useFakeClipboard: true)]
 		public void HistoryText_Undo_Redo_Copy_Without_Selection_Multi_Line_Paste ()
 		{
 			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
@@ -4692,7 +4691,7 @@ line.
 		}
 
 		[Fact]
-		[AutoInitShutdown]
+		[AutoInitShutdown (useFakeClipboard: true)]
 		public void HistoryText_Undo_Redo_Simple_Copy_Multi_Line_Selected_Paste ()
 		{
 			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
@@ -4729,7 +4728,7 @@ line.
 		}
 
 		[Fact]
-		[AutoInitShutdown]
+		[AutoInitShutdown (useFakeClipboard: true)]
 		public void HistoryText_Undo_Redo_Multi_Line_Selected_Copy_Simple_Paste_Starting_On_Space ()
 		{
 			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
@@ -6709,7 +6708,7 @@ This is the second line.
 			expectedCol = 1;
 			tv.ProcessKey (new KeyEvent (Key.Y, new KeyModifiers ()));
 			Assert.Equal (3, eventcount);
-			Assert.Equal ("Yay", tv.Text.ToString ());
+			Assert.Equal ("Yay", tv.Text);
 		}
 
 		[Fact, TextViewTestsAutoInitShutdown]
@@ -6948,5 +6947,16 @@ This is the second line.
 			Assert.Equal ("TAB to jump between text fields.", _textView.Text);
 		}
 
+		[Fact, TextViewTestsAutoInitShutdown]
+		public void Copy_Paste_Surrogate_Pairs ()
+		{
+			_textView.Text = "TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!";
+			_textView.SelectAll ();
+			_textView.Cut ();
+			Assert.Equal ("TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!", Application.Driver.Clipboard.GetClipboardData ());
+			Assert.Equal (string.Empty, _textView.Text);
+			_textView.Paste ();
+			Assert.Equal ("TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!", _textView.Text);
+		}
 	}
 }

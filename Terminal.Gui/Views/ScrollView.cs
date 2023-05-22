@@ -366,7 +366,9 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (GetNormalColor ());
 			Clear ();
 
-			_contentView.Draw ();
+			if (!string.IsNullOrEmpty (_contentView.Text) || _contentView.Subviews.Count > 0) {
+				_contentView.Draw ();
+			}
 
 			DrawScrollBars ();
 

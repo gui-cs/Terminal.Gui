@@ -2,7 +2,7 @@
 // by phillip.piper@gmail.com). Phillip has explicitly granted permission for his design
 // and code to be used in this library under the MIT license.
 
-using NStack;
+using System.Text;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -86,6 +86,11 @@ namespace Terminal.Gui {
 		public bool MultiSelect { get; set; } = true;
 
 		/// <summary>
+		/// Maximum number of nodes that can be expanded in any given branch.
+		/// </summary>
+		public int MaxDepth { get; set; } = 100;
+
+		/// <summary>
 		/// True makes a letter key press navigate to the next visible branch that begins with
 		/// that letter/digit.
 		/// </summary>
@@ -156,7 +161,7 @@ namespace Terminal.Gui {
 		/// Error message to display when the control is not properly initialized at draw time 
 		/// (nodes added but no tree builder set).
 		/// </summary>
-		public static ustring NoBuilderError = "ERROR: TreeBuilder Not Set";
+		public static string NoBuilderError = "ERROR: TreeBuilder Not Set";
 		private Key objectActivationKey = Key.Enter;
 
 		/// <summary>

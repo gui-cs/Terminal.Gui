@@ -62,7 +62,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (new Label ("Caption") { X = x++, Y = y++ });
 
 			rgCaption = new RadioGroup { X = x, Y = y };
-			rgCaption.RadioLabels = new NStack.ustring [] { "Ok", "Open", "Save" };
+			rgCaption.RadioLabels = new string [] { "Ok", "Open", "Save" };
 			Win.Add (rgCaption);
 
 			y = 0;
@@ -76,7 +76,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (new Label ("OpenMode") { X = x++, Y = y++ });
 
 			rgOpenMode = new RadioGroup { X = x, Y = y };
-			rgOpenMode.RadioLabels = new NStack.ustring [] { "File", "Directory", "Mixed" };
+			rgOpenMode.RadioLabels = new string [] { "File", "Directory", "Mixed" };
 			Win.Add (rgOpenMode);
 
 			y = 0;
@@ -90,11 +90,11 @@ namespace UICatalog.Scenarios {
 			Win.Add (new Label ("Icons") { X = x++, Y = y++ });
 
 			rgIcons = new RadioGroup { X = x, Y = y };
-			rgIcons.RadioLabels = new NStack.ustring [] { "None", "Unicode", "Nerd*" };
+			rgIcons.RadioLabels = new string [] { "None", "Unicode", "Nerd*" };
 			Win.Add (rgIcons);
 
-			Win.Add(new Label("* Requires installing Nerd fonts"){Y = Pos.AnchorEnd(2)});
-			Win.Add(new Label("  (see: https://github.com/devblackops/Terminal-Icons)"){Y = Pos.AnchorEnd(1)});
+			Win.Add (new Label ("* Requires installing Nerd fonts") { Y = Pos.AnchorEnd (2) });
+			Win.Add (new Label ("  (see: https://github.com/devblackops/Terminal-Icons)") { Y = Pos.AnchorEnd (1) });
 
 			y = 5;
 			x = 24;
@@ -107,7 +107,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (new Label ("Allowed") { X = x++, Y = y++ });
 
 			rgAllowedTypes = new RadioGroup { X = x, Y = y };
-			rgAllowedTypes.RadioLabels = new NStack.ustring [] { "Any", "Csv (Recommended)", "Csv (Strict)" };
+			rgAllowedTypes.RadioLabels = new string [] { "Any", "Csv (Recommended)", "Csv (Strict)" };
 			Win.Add (rgAllowedTypes);
 
 			var btn = new Button ($"Run Dialog") {
@@ -121,14 +121,11 @@ namespace UICatalog.Scenarios {
 
 		private void SetupHandler (Button btn)
 		{
-			btn.Clicked += (s,e) => {
-				try
-				{
-					CreateDialog();
-				}	
-				catch(Exception ex)
-				{
-					MessageBox.ErrorQuery("Error",ex.ToString(),"Ok");
+			btn.Clicked += (s, e) => {
+				try {
+					CreateDialog ();
+				} catch (Exception ex) {
+					MessageBox.ErrorQuery ("Error", ex.ToString (), "Ok");
 
 				}
 			};
@@ -136,83 +133,80 @@ namespace UICatalog.Scenarios {
 
 		private void CreateDialog ()
 		{
-			
-				var fd = new FileDialog () {
-					OpenMode = Enum.Parse<OpenMode> (
-						rgOpenMode.RadioLabels [rgOpenMode.SelectedItem].ToString ()),
-					MustExist = cbMustExist.Checked ?? false,
-					AllowsMultipleSelection = cbAllowMultipleSelection.Checked ?? false,
+
+			var fd = new FileDialog () {
+				OpenMode = Enum.Parse<OpenMode> (
+					rgOpenMode.RadioLabels [rgOpenMode.SelectedItem].ToString ()),
+				MustExist = cbMustExist.Checked ?? false,
+				AllowsMultipleSelection = cbAllowMultipleSelection.Checked ?? false,
+			};
+
+			fd.Style.OkButtonText = rgCaption.RadioLabels [rgCaption.SelectedItem].ToString ();
+
+			// If Save style dialog then give them an overwrite prompt
+			if (rgCaption.SelectedItem == 2) {
+				fd.FilesSelected += ConfirmOverwrite;
+			}
+
+			if (rgIcons.SelectedItem == 1) {
+				fd.Style.UseUnicodeCharacters = true;
+			} else if (rgIcons.SelectedItem == 2) {
+				fd.Style.UseNerdForIcons ();
+			}
+
+			if (cbCaseSensitive.Checked ?? false) {
+
+				fd.SearchMatcher = new CaseSensitiveSearchMatcher ();
+			}
+
+			fd.Style.UseColors = cbUseColors.Checked ?? false;
+
+			fd.Style.TreeStyle.ShowBranchLines = cbShowTreeBranchLines.Checked ?? false;
+			fd.Style.TableStyle.AlwaysShowHeaders = cbAlwaysTableShowHeaders.Checked ?? false;
+
+			var dirInfoFactory = new FileSystem ().DirectoryInfo;
+
+			if (cbDrivesOnlyInTree.Checked ?? false) {
+				fd.Style.TreeRootGetter = () => {
+					return System.Environment.GetLogicalDrives ()
+					.Select (d => new FileDialogRootTreeNode (d, dirInfoFactory.New (d)));
 				};
+			}
 
-				fd.Style.OkButtonText = rgCaption.RadioLabels [rgCaption.SelectedItem].ToString ();
+			if (rgAllowedTypes.SelectedItem > 0) {
+				fd.AllowedTypes.Add (new AllowedType ("Data File", ".csv", ".tsv"));
 
-				// If Save style dialog then give them an overwrite prompt
-				if(rgCaption.SelectedItem == 2) {
-					fd.FilesSelected += ConfirmOverwrite;
+				if (rgAllowedTypes.SelectedItem == 1) {
+					fd.AllowedTypes.Insert (1, new AllowedTypeAny ());
 				}
 
-				if(rgIcons.SelectedItem == 1)
-				{
-					fd.Style.UseUnicodeCharacters = true;
-				}
-				else if(rgIcons.SelectedItem == 2)
-				{
-					fd.Style.UseNerdForIcons();
-				}
+			}
 
-				if (cbCaseSensitive.Checked ?? false) {
+			Application.Run (fd);
 
-					fd.SearchMatcher = new CaseSensitiveSearchMatcher ();
-				}
-
-				fd.Style.UseColors = cbUseColors.Checked ?? false;
-
-				fd.Style.TreeStyle.ShowBranchLines = cbShowTreeBranchLines.Checked ?? false;
-				fd.Style.TableStyle.AlwaysShowHeaders = cbAlwaysTableShowHeaders.Checked ?? false;
-
-				var dirInfoFactory = new FileSystem().DirectoryInfo;
-
-				if (cbDrivesOnlyInTree.Checked ?? false) {
-					fd.Style.TreeRootGetter = () => {
-						return System.Environment.GetLogicalDrives ()
-						.Select (d => new FileDialogRootTreeNode (d, dirInfoFactory.New(d)));
-					};
-				}
-
-				if (rgAllowedTypes.SelectedItem > 0) {
-					fd.AllowedTypes.Add (new AllowedType ("Data File", ".csv", ".tsv"));
-
-					if (rgAllowedTypes.SelectedItem == 1) {
-						fd.AllowedTypes.Insert (1, new AllowedTypeAny ());
-					}
-
-				}
-
-				Application.Run (fd);
-
-				if (fd.Canceled) {
-					MessageBox.Query (
-						"Canceled",
-						"You canceled navigation and did not pick anything",
+			if (fd.Canceled) {
+				MessageBox.Query (
+					"Canceled",
+					"You canceled navigation and did not pick anything",
+				"Ok");
+			} else if (cbAllowMultipleSelection.Checked ?? false) {
+				MessageBox.Query (
+					"Chosen!",
+					"You chose:" + Environment.NewLine +
+					string.Join (Environment.NewLine, fd.MultiSelected.Select (m => m)),
 					"Ok");
-				} else if (cbAllowMultipleSelection.Checked ?? false) {
-					MessageBox.Query (
-						"Chosen!",
-						"You chose:" + Environment.NewLine +
-						string.Join (Environment.NewLine, fd.MultiSelected.Select (m => m)),
-						"Ok");
-				} else {
-					MessageBox.Query (
-						"Chosen!",
-						"You chose:" + Environment.NewLine + fd.Path,
-						"Ok");
-				}
+			} else {
+				MessageBox.Query (
+					"Chosen!",
+					"You chose:" + Environment.NewLine + fd.Path,
+					"Ok");
+			}
 		}
 
 		private void ConfirmOverwrite (object sender, FilesSelectedEventArgs e)
 		{
 			if (!string.IsNullOrWhiteSpace (e.Dialog.Path)) {
-				if(File.Exists(e.Dialog.Path)) {
+				if (File.Exists (e.Dialog.Path)) {
 					int result = MessageBox.Query ("Overwrite?", "File already exists", "Yes", "No");
 					e.Cancel = result == 1;
 				}

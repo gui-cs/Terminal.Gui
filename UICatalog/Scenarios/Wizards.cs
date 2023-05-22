@@ -1,5 +1,4 @@
-﻿using NStack;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -100,16 +99,16 @@ namespace UICatalog.Scenarios {
 			showWizardButton.Clicked += (s, e) => {
 				try {
 					int width = 0;
-					int.TryParse (widthEdit.Text.ToString (), out width);
+					int.TryParse (widthEdit.Text, out width);
 					int height = 0;
-					int.TryParse (heightEdit.Text.ToString (), out height);
+					int.TryParse (heightEdit.Text, out height);
 
 					if (width < 1 || height < 1) {
 						MessageBox.ErrorQuery ("Nope", "Height and width must be greater than 0 (much bigger)", "Ok");
 						return;
 					}
 
-					actionLabel.Text = ustring.Empty;
+					actionLabel.Text = string.Empty;
 
 					var wizard = new Wizard () {
 						Title = titleEdit.Text,
@@ -178,7 +177,7 @@ namespace UICatalog.Scenarios {
 					frame.Add (new TextField ("This is a TextField inside of the frame."));
 					secondStep.Add (frame);
 					wizard.StepChanging += (s, args) => {
-						if (args.OldStep == secondStep && firstNameField.Text.IsEmpty) {
+						if (args.OldStep == secondStep && string.IsNullOrEmpty(firstNameField.Text)) {
 							args.Cancel = true;
 							var btn = MessageBox.ErrorQuery ("Second Step", "You must enter a First Name to continue", "Ok");
 						}
@@ -229,7 +228,7 @@ namespace UICatalog.Scenarios {
 					};
 					hideHelpBtn.Clicked += (s, e) => {
 						if (fourthStep.HelpText.Length > 0) {
-							fourthStep.HelpText = ustring.Empty;
+							fourthStep.HelpText = string.Empty;
 						} else {
 							fourthStep.HelpText = help;
 						}

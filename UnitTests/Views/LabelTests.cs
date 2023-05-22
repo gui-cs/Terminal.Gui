@@ -62,10 +62,10 @@ Test
 		{
 			View b = new Label () { Text = "heya" };
 			Assert.Equal ("heya", b.Text);
-			Assert.True (b.TextFormatter.Text.Contains ("heya"));
+			Assert.Contains ("heya", b.TextFormatter.Text);
 			b.Text = "heyb";
 			Assert.Equal ("heyb", b.Text);
-			Assert.True (b.TextFormatter.Text.Contains ("heyb"));
+			Assert.Contains ("heyb", b.TextFormatter.Text);
 
 			// with cast
 			Assert.Equal ("heyb", ((Label)b).Text);
@@ -232,7 +232,7 @@ Test
 				Text = "Say Hello 你",
 				AutoSize = true
 			};
-			label.X = Pos.AnchorEnd () - Pos.Function (() => TextFormatter.GetTextWidth (label.TextFormatter.Text));
+			label.X = Pos.AnchorEnd () - Pos.Function (() => label.TextFormatter.Text.GetColumns ());
 
 			var win = new Window () {
 				Width = Dim.Fill (),

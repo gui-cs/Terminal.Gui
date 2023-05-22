@@ -5,6 +5,7 @@ using Terminal.Gui;
 using System.Linq;
 using System.Globalization;
 using static Terminal.Gui.TableView;
+using System.Text;
 
 namespace UICatalog.Scenarios {
 
@@ -223,7 +224,7 @@ namespace UICatalog.Scenarios {
 
 		private string TrimArrows (string columnName)
 		{
-			return columnName.TrimEnd ((char)CM.Glyphs.UpArrow, (char)CM.Glyphs.DownArrow);
+			return columnName.TrimEnd ((char)CM.Glyphs.UpArrow.Value, (char)CM.Glyphs.DownArrow.Value);
 		}
 		private string StripArrows (string columnName)
 		{
@@ -344,7 +345,7 @@ namespace UICatalog.Scenarios {
 			if (accepted) {
 
 				try {
-					setter (style, int.Parse (tf.Text.ToString ()));
+					setter (style, int.Parse (tf.Text));
 				} catch (Exception ex) {
 					MessageBox.ErrorQuery (60, 20, "Failed to set", ex.Message, "Ok");
 				}
@@ -772,7 +773,7 @@ namespace UICatalog.Scenarios {
 			new UnicodeRange(0xFB00, 0xFb4f,"Alphabetic Presentation Forms"),
 			new UnicodeRange(0x12400, 0x1240f,"Cuneiform Numbers and Punctuation"),
 			new UnicodeRange(0x1FA00, 0x1FA0f,"Chess Symbols"),
-			new UnicodeRange((uint)(CharMap.MaxCodePointVal - 16), (uint)CharMap.MaxCodePointVal,"End"),
+			new UnicodeRange((uint)(CharMap.MaxCodePoint - 16), (uint)CharMap.MaxCodePoint,"End"),
 
 			new UnicodeRange (0x0020 ,0x007F        ,"Basic Latin"),
 			new UnicodeRange (0x00A0 ,0x00FF        ,"Latin-1 Supplement"),
@@ -992,7 +993,7 @@ namespace UICatalog.Scenarios {
 			if (okPressed) {
 
 				try {
-					currentTable.Rows [e.Row] [tableCol] = string.IsNullOrWhiteSpace (tf.Text.ToString ()) ? DBNull.Value : (object)tf.Text;
+					currentTable.Rows [e.Row] [tableCol] = string.IsNullOrWhiteSpace (tf.Text) ? DBNull.Value : (object)tf.Text;
 				} catch (Exception ex) {
 					MessageBox.ErrorQuery (60, 20, "Failed to set text", ex.Message, "Ok");
 				}

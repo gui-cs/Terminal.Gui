@@ -4,7 +4,7 @@ using System.Linq;
 using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
-using NStack;
+using System.Text;
 using Terminal.Gui;
 using CsvHelper;
 using System.Collections.Generic;
@@ -105,7 +105,7 @@ namespace UICatalog.Scenarios {
 				return;
 
 			// change selected cell to the one the user has typed into the box
-			var match = Regex.Match (_selectedCellLabel.Text.ToString (), "^(\\d+),(\\d+)$");
+			var match = Regex.Match (_selectedCellLabel.Text, "^(\\d+),(\\d+)$");
 			if (match.Success) {
 
 				tableView.SelectedColumn = int.Parse (match.Groups [1].Value);
@@ -336,7 +336,7 @@ namespace UICatalog.Scenarios {
 
 				var newColIdx = Math.Min (Math.Max (0, tableView.SelectedColumn + 1), tableView.Table.Columns);
 
-				int result = MessageBox.Query ("Column Type", "Pick a data type for the column", new ustring [] { "Date", "Integer", "Double", "Text", "Cancel" });
+				int result = MessageBox.Query ("Column Type", "Pick a data type for the column", new string [] { "Date", "Integer", "Double", "Text", "Cancel" });
 
 				if (result <= -1 || result >= 4)
 					return;
@@ -397,8 +397,8 @@ namespace UICatalog.Scenarios {
 
 			Application.Run (ofd);
 
-			if (!ofd.Canceled && !string.IsNullOrWhiteSpace (ofd.Path?.ToString ())) {
-				Open (ofd.Path.ToString ());
+			if (!ofd.Canceled && !string.IsNullOrWhiteSpace (ofd.Path)) {
+				Open (ofd.Path);
 			}
 		}
 
@@ -534,7 +534,7 @@ namespace UICatalog.Scenarios {
 
 			Application.Run (d);
 
-			enteredText = okPressed ? tf.Text.ToString () : null;
+			enteredText = okPressed ? tf.Text : null;
 			return okPressed;
 		}
 		private void EditCurrentCell (object sender, CellActivatedEventArgs e)

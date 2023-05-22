@@ -1,5 +1,4 @@
-﻿using NStack;
-using System;
+﻿using System;
 using System.Linq;
 using Terminal.Gui;
 
@@ -100,7 +99,7 @@ namespace UICatalog.Scenarios {
 				};
 				copyTop.Clicked += (s, e) => {
 					Thickness = new Thickness (Thickness.Top);
-					if (_topEdit.Text.IsEmpty) {
+					if (string.IsNullOrEmpty (_topEdit.Text)) {
 						_topEdit.Text = "0";
 					}
 					_bottomEdit.Text = _leftEdit.Text = _rightEdit.Text = _topEdit.Text;
@@ -161,27 +160,27 @@ namespace UICatalog.Scenarios {
 					switch (sender.ToString ()) {
 					case var s when s == _topEdit.ToString ():
 						Thickness = new Thickness (Thickness.Left,
-							int.Parse (e.NewText.ToString ()), Thickness.Right,
+							int.Parse (e.NewText), Thickness.Right,
 							Thickness.Bottom);
 						break;
 					case var s when s == _leftEdit.ToString ():
-						Thickness = new Thickness (int.Parse (e.NewText.ToString ()),
+						Thickness = new Thickness (int.Parse (e.NewText),
 							Thickness.Top, Thickness.Right,
 							Thickness.Bottom);
 						break;
 					case var s when s == _rightEdit.ToString ():
 						Thickness = new Thickness (Thickness.Left,
-							Thickness.Top, int.Parse (e.NewText.ToString ()),
+							Thickness.Top, int.Parse (e.NewText),
 							Thickness.Bottom);
 						break;
 					case var s when s == _bottomEdit.ToString ():
 						Thickness = new Thickness (Thickness.Left,
 							Thickness.Top, Thickness.Right,
-							int.Parse (e.NewText.ToString ()));
+							int.Parse (e.NewText));
 						break;
 					}
 				} catch {
-					if (!e.NewText.IsEmpty) {
+					if (!string.IsNullOrEmpty(e.NewText)) {
 						e.Cancel = true;
 					}
 				}
@@ -194,7 +193,7 @@ namespace UICatalog.Scenarios {
 			private FrameEditor _borderEditor;
 			private FrameEditor _paddingEditor;
 
-			public FramesEditor (ustring title, View viewToEdit)
+			public FramesEditor (string title, View viewToEdit)
 			{
 				this._viewToEdit = viewToEdit;
 
@@ -227,7 +226,7 @@ namespace UICatalog.Scenarios {
 
 				var borderStyleEnum = Enum.GetValues (typeof (LineStyle)).Cast<LineStyle> ().ToList ();
 				var rbBorderStyle = new RadioGroup (borderStyleEnum.Select (
-					e => NStack.ustring.Make (e.ToString ())).ToArray ()) {
+					e => e.ToString ()).ToArray ()) {
 
 					X = Pos.Right (_borderEditor) - 1,
 					Y = Pos.Top (_borderEditor),

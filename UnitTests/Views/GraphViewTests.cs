@@ -8,7 +8,7 @@ using Attribute = Terminal.Gui.Attribute;
 using System.Text;
 using System.Text.RegularExpressions;
 using Xunit.Abstractions;
-using Rune = System.Rune;
+
 
 namespace Terminal.Gui.ViewsTests {
 
@@ -592,7 +592,7 @@ namespace Terminal.Gui.ViewsTests {
 			// user asks for 3 bars per category
 			var series = new MultiBarSeries (3, 7, 1);
 
-			var ex = Assert.Throws<ArgumentException> (() => series.AddBars ("Cars", '#', 1));
+			var ex = Assert.Throws<ArgumentException> (() => series.AddBars ("Cars", (Rune)'#', 1));
 
 			Assert.Equal ("Number of values must match the number of bars per category (Parameter 'values')", ex.Message);
 		}
@@ -636,15 +636,15 @@ namespace Terminal.Gui.ViewsTests {
 			// Since bar series has no bars yet no labels should be displayed
 			Assert.Empty (fakeXAxis.LabelPoints);
 
-			multibarSeries.AddBars ("hey", 'M', 0.5001f, 0.5001f);
+			multibarSeries.AddBars ("hey", (Rune)'M', 0.5001f, 0.5001f);
 			fakeXAxis.LabelPoints.Clear ();
 			gv.LayoutSubviews ();
 			gv.Draw ();
 
 			Assert.Equal (4, fakeXAxis.LabelPoints.Single ());
 
-			multibarSeries.AddBars ("there", 'M', 0.24999f, 0.74999f);
-			multibarSeries.AddBars ("bob", 'M', 1, 2);
+			multibarSeries.AddBars ("there", (Rune)'M', 0.24999f, 0.74999f);
+			multibarSeries.AddBars ("bob", (Rune)'M', 1, 2);
 			fakeXAxis.LabelPoints.Clear ();
 			gv.LayoutSubviews ();
 			gv.Draw ();
@@ -711,7 +711,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Empty (axisY.LabelPoints);
 
 			// bar of height 0
-			barSeries.Bars.Add (new BarSeries.Bar ("hi", new GraphCellToRender ('.'), 0));
+			barSeries.Bars.Add (new BarSeries.Bar ("hi", new GraphCellToRender ((Rune)'.'), 0));
 			barSeries.Orientation = Orientation.Vertical;
 
 			// redraw graph
@@ -753,9 +753,9 @@ namespace Terminal.Gui.ViewsTests {
 			barSeries.BarEvery = 1f;
 
 			barSeries.Bars.Add (
-				new BarSeries.Bar ("hi1", new GraphCellToRender ('.'), 100));
+				new BarSeries.Bar ("hi1", new GraphCellToRender ((Rune)'.'), 100));
 			barSeries.Bars.Add (
-				new BarSeries.Bar ("hi2", new GraphCellToRender ('.'), 100));
+				new BarSeries.Bar ("hi2", new GraphCellToRender ((Rune)'.'), 100));
 
 			barSeries.Orientation = Orientation.Vertical;
 
@@ -809,11 +809,11 @@ namespace Terminal.Gui.ViewsTests {
 
 			// 1 bar that is very wide (100 graph units horizontally = screen pos 50 but bounded by screen)
 			barSeries.Bars.Add (
-				new BarSeries.Bar ("hi1", new GraphCellToRender ('.'), 100));
+				new BarSeries.Bar ("hi1", new GraphCellToRender ((Rune)'.'), 100));
 
 			// 1 bar that is shorter
 			barSeries.Bars.Add (
-				new BarSeries.Bar ("hi2", new GraphCellToRender ('.'), 5));
+				new BarSeries.Bar ("hi2", new GraphCellToRender ((Rune)'.'), 5));
 
 			// redraw graph
 			graph.Draw ();
@@ -1263,8 +1263,8 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var gv = GraphViewTests.GetGraph ();
 			var legend = new LegendAnnotation (new Rect (2, 0, 5, 3));
-			legend.AddEntry (new GraphCellToRender ('A'), "Ant");
-			legend.AddEntry (new GraphCellToRender ('B'), "Bat");
+			legend.AddEntry (new GraphCellToRender ((Rune)'A'), "Ant");
+			legend.AddEntry (new GraphCellToRender ((Rune)'B'), "Bat");
 
 			gv.Annotations.Add (legend);
 			gv.Draw ();
@@ -1288,10 +1288,10 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var gv = GraphViewTests.GetGraph ();
 			var legend = new LegendAnnotation (new Rect (2, 0, 5, 3));
-			legend.AddEntry (new GraphCellToRender ('A'), "Ant");
-			legend.AddEntry (new GraphCellToRender ('B'), "?"); // this will exercise pad
-			legend.AddEntry (new GraphCellToRender ('C'), "Cat");
-			legend.AddEntry (new GraphCellToRender ('H'), "Hattter"); // not enough space for this oen
+			legend.AddEntry (new GraphCellToRender ((Rune)'A'), "Ant");
+			legend.AddEntry (new GraphCellToRender ((Rune)'B'), "?"); // this will exercise pad
+			legend.AddEntry (new GraphCellToRender ((Rune)'C'), "Cat");
+			legend.AddEntry (new GraphCellToRender ((Rune)'H'), "Hattter"); // not enough space for this oen
 			legend.Border = false;
 
 			gv.Annotations.Add (legend);

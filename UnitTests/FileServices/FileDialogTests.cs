@@ -392,7 +392,7 @@ namespace Terminal.Gui.FileServicesTests {
  ││Filename (▲)│Size      │Modified                      │Type     ││
  │├────────────┼──────────┼──────────────────────────────┼─────────┤│
  ││..          │          │                              │dir      ││
- ││\subfolder  │          │2002-01-01T22:42:10           │dir      ││
+ ││/subfolder  │          │2002-01-01T22:42:10           │dir      ││
  ││image.gif   │4.00 bytes│2002-01-01T22:42:10           │.gif     ││
  ││jQuery.js   │7.00 bytes│2001-01-01T11:44:42           │.js      ││
  │                                                                  │
@@ -479,6 +479,37 @@ namespace Terminal.Gui.FileServicesTests {
 				HotFocus = a,
 				HotNormal = a,
 			};
+		}
+
+		[Theory]
+		[InlineData (".csv", null, false)]
+		[InlineData (".csv", "", false)]
+		[InlineData (".csv", "c:\\MyFile.csv", true)]
+		[InlineData (".csv", "c:\\MyFile.CSV", true)]
+		[InlineData (".csv", "c:\\MyFile.csv.bak", false)]
+		public void TestAllowedType_Basic(string allowed, string candidate, bool expected)
+		{
+			Assert.Equal (expected, new AllowedType ("Test", allowed).IsAllowed (candidate));
+		}
+
+		[Theory]
+		[InlineData ("Dockerfile", "c:\\temp\\Dockerfile", true)]
+		[InlineData ("Dockerfile", "Dockerfile", true)]
+		[InlineData ("Dockerfile", "someimg.Dockerfile", true)]
+		public void TestAllowedType_SpecificFile(string allowed, string candidate, bool expected)
+		{
+			Assert.Equal (expected, new AllowedType ("Test", allowed).IsAllowed (candidate));
+		}
+
+		[Theory]
+		[InlineData (".Designer.cs", "c:\\MyView.Designer.cs", true)]
+		[InlineData (".Designer.cs", "c:\\temp/MyView.Designer.cs", true)]
+		[InlineData(".Designer.cs","MyView.Designer.cs",true)]
+		[InlineData (".Designer.cs", "c:\\MyView.DESIGNER.CS", true)]
+		[InlineData (".Designer.cs", "MyView.cs", false)]
+		public void TestAllowedType_DoubleBarreled (string allowed, string candidate, bool expected)
+		{
+			Assert.Equal (expected, new AllowedType ("Test", allowed).IsAllowed (candidate));
 		}
 
 		[Theory, AutoInitShutdown]

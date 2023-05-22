@@ -572,17 +572,17 @@ Edit
 
 			string GetCurrentMenuBarItemTitle ()
 			{
-				return mbiCurrent != null ? mbiCurrent.Title.ToString () : "Closed";
+				return mbiCurrent != null ? mbiCurrent.Title : "Closed";
 			}
 
 			string GetCurrenParenttMenuItemTitle ()
 			{
-				return miCurrent?.Parent != null ? miCurrent.Parent.Title.ToString () : "None";
+				return miCurrent?.Parent != null ? miCurrent.Parent.Title : "None";
 			}
 
 			string GetCurrentMenuTitle ()
 			{
-				return miCurrent != null ? miCurrent.Title.ToString () : "None";
+				return miCurrent != null ? miCurrent.Title : "None";
 			}
 		}
 
@@ -1123,7 +1123,7 @@ Edit
 				get {
 					string txt = string.Empty;
 					foreach (var m in Menus)
-						txt += " " + m.Title.ToString () + " ";
+						txt += " " + m.Title + " ";
 					return txt;
 				}
 			}
@@ -1999,10 +1999,10 @@ Edit
 			};
 			mi.Action = mi.ToggleChecked;
 			var menu = new MenuBar (new MenuBarItem [] {
-		new MenuBarItem("Nullable Checked",new MenuItem [] {
-		    mi
-		})
-	    });
+				new MenuBarItem("Nullable Checked",new MenuItem [] {
+					mi
+				})
+			});
 			new CheckBox ();
 			var top = Application.Top;
 			top.Add (menu);
@@ -2086,12 +2086,12 @@ Edit
 		public void Menu_With_Separator ()
 		{
 			var menu = new MenuBar (new MenuBarItem [] {
-		new MenuBarItem("File",new MenuItem [] {
-		    new MenuItem("_Open", "Open a file", () => { }, null, null, Key.CtrlMask | Key.O),
-		    null,
-		    new MenuItem("_Quit","",null)
-		})
-	    });
+				new MenuBarItem("File",new MenuItem [] {
+				    new MenuItem("_Open", "Open a file", () => { }, null, null, Key.CtrlMask | Key.O),
+				    null,
+				    new MenuItem("_Quit","",null)
+				})
+			});
 
 			Application.Top.Add (menu);
 			Application.Begin (Application.Top);

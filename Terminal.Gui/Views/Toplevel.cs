@@ -1001,7 +1001,7 @@ namespace Terminal.Gui {
 				throw new ArgumentNullException ();
 
 			int hCode = 0;
-			if (int.TryParse (obj.Id.ToString (), out int result)) {
+			if (int.TryParse (obj.Id, out int result)) {
 				hCode = result;
 			}
 			return hCode.GetHashCode ();
@@ -1029,7 +1029,7 @@ namespace Terminal.Gui {
 			else if (y == null)
 				return 1;
 			else
-				return string.Compare (x.Id.ToString (), y.Id.ToString ());
+				return string.Compare (x.Id, y.Id);
 		}
 	}
 }

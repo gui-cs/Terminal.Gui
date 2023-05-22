@@ -3,7 +3,7 @@ using System.Linq;
 using System.IO;
 using System.Collections.Generic;
 using Terminal.Gui;
-using NStack;
+using System.Text;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "ListView & ComboBox", Description: "Demonstrates a ListView populating a ComboBox that acts as a filter.")]
@@ -13,13 +13,13 @@ namespace UICatalog.Scenarios {
 		public override void Setup ()
 		{
 			//TODO: Duplicated code in Demo.cs Consider moving to shared assembly
-			var items = new List<ustring> ();
+			var items = new List<string> ();
 			foreach (var dir in new [] { "/etc", @$"{Environment.GetEnvironmentVariable ("SystemRoot")}\System32" }) {
 				if (Directory.Exists (dir)) {
 					items = Directory.GetFiles (dir).Union(Directory.GetDirectories(dir))
 						.Select (Path.GetFileName)
 						.Where (x => char.IsLetterOrDigit (x [0]))
-						.OrderBy (x => x).Select(x => ustring.Make(x)).ToList() ;
+						.OrderBy (x => x).Select(x => x).ToList() ;
 				}
 			}
 
