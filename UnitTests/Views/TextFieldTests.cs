@@ -25,7 +25,6 @@ namespace Terminal.Gui.ViewsTests {
 
 			public override void Before (MethodInfo methodUnderTest)
 			{
-				FakeDriver.FakeBehaviors.UseFakeClipboard = true;
 				base.Before (methodUnderTest);
 
 				//                                                    1         2         3 
