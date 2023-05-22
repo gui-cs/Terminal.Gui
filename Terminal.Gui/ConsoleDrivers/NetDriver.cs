@@ -119,7 +119,7 @@ internal class NetEvents {
 		bool _neededProcessRequest;
 #endif
 	public bool IsTerminalWithOptions { get; set; }
-	public EscSeqReqProc EscSeqReqProc { get; } = new EscSeqReqProc ();
+	public EscSeqRequests EscSeqRequests { get; } = new EscSeqRequests ();
 
 	public NetEvents (ConsoleDriver consoleDriver)
 	{
@@ -187,17 +187,20 @@ internal class NetEvents {
 				newConsoleKeyInfo = consoleKeyInfo;
 				_cki = EscSeqUtils.ResizeArray (consoleKeyInfo, _cki);
 				if (!Console.KeyAvailable) {
-					DecodeEscSeq (ref newConsoleKeyInfo, ref key, _cki, ref mod);
+					ProcessIncomingEscSeq (ref newConsoleKeyInfo, ref key, _cki, ref mod);
 					_cki = null;
 					_isEscSeq = false;
 					break;
 				}
 			} else if (consoleKeyInfo.KeyChar == (char)Key.Esc && _isEscSeq && _cki != null) {
-				DecodeEscSeq (ref newConsoleKeyInfo, ref key, _cki, ref mod);
+				ProcessIncomingEscSeq (ref newConsoleKeyInfo, ref key, _cki, ref mod);
 				_cki = null;
 				break;
 			} else {
-				GetConsoleInputType (consoleKeyInfo);
+				_inputResultQueue.Enqueue (new InputResult {
+					EventType = EventType.Key,
+					ConsoleKeyInfo = EscSeqUtils.MapConsoleKeyInfo (consoleKeyInfo)
+				});
 				_isEscSeq = false;
 				break;
 			}
@@ -206,6 +209,42 @@ internal class NetEvents {
 
 	void CheckWinChange ()
 	{
+		void WaitWinChange ()
+		{
+			while (true) {
+				// HACK: Sleep for 10ms to mitigate high CPU usage (see issue #1502). 10ms was tested to address the problem, but may not be correct.
+				Thread.Sleep (10);
+				if (_stopTasks) {
+					return;
+				}
+				switch (IsTerminalWithOptions) {
+				case false:
+					int buffHeight, buffWidth;
+					if (((NetDriver)_consoleDriver).IsWinPlatform) {
+						buffHeight = Math.Max (Console.BufferHeight, 0);
+						buffWidth = Math.Max (Console.BufferWidth, 0);
+					} else {
+						buffHeight = _consoleDriver.Rows;
+						buffWidth = _consoleDriver.Cols;
+					}
+					if (RequestWindowSize (
+						Math.Max (Console.WindowHeight, 0),
+						Math.Max (Console.WindowWidth, 0),
+						buffHeight,
+						buffWidth)) {
+
+						return;
+					}
+					break;
+				case true:
+					//Request the size of the text area in characters.
+					EscSeqRequests.Add (EscSeqUtils.CSI_ReportTerminalSizeInChars_Terminator);
+					Console.Out.Write (EscSeqUtils.CSI_ReportTerminalSizeInChars);
+					break;
+				}
+			}
+		}
+
 		while (true) {
 			if (_stopTasks) {
 				return;
@@ -217,49 +256,23 @@ internal class NetEvents {
 		}
 	}
 
-	void WaitWinChange ()
+	bool RequestWindowSize (int winHeight, int winWidth, int buffHeight, int buffWidth)
 	{
-		while (true) {
-			// HACK: Sleep for 10ms to mitigate high CPU usage (see issue #1502). 10ms was tested to address the problem, but may not be correct.
-			Thread.Sleep (10);
-			if (_stopTasks) {
-				return;
-			}
-			switch (IsTerminalWithOptions) {
-			case false:
-				int buffHeight, buffWidth;
-				if (((NetDriver)_consoleDriver).IsWinPlatform) {
-					buffHeight = Math.Max (Console.BufferHeight, 0);
-					buffWidth = Math.Max (Console.BufferWidth, 0);
-				} else {
-					buffHeight = _consoleDriver.Rows;
-					buffWidth = _consoleDriver.Cols;
+		void EnqueueRequestWindowSize (Size size)
+		{
+			_inputResultQueue.Enqueue (new InputResult () {
+				EventType = EventType.WindowSize,
+				WindowSizeEvent = new WindowSizeEvent () {
+					Size = size
 				}
-				if (IsWinChanged (
-					Math.Max (Console.WindowHeight, 0),
-					Math.Max (Console.WindowWidth, 0),
-					buffHeight,
-					buffWidth)) {
-
-					return;
-				}
-				break;
-			case true:
-				//Request the size of the text area in characters.
-				EscSeqReqProc.Add ("t");
-				Console.Out.Write ("\x1b[18t");
-				break;
-			}
+			});
 		}
-	}
 
-	bool IsWinChanged (int winHeight, int winWidth, int buffHeight, int buffWidth)
-	{
 		if (!_consoleDriver.EnableConsoleScrolling) {
 			if (winWidth != _consoleDriver.Cols || winHeight != _consoleDriver.Rows) {
 				var w = Math.Max (winWidth, 0);
 				var h = Math.Max (winHeight, 0);
-				GetWindowSizeEvent (new Size (w, h));
+				EnqueueRequestWindowSize (new Size (w, h));
 				return true;
 			}
 		} else {
@@ -267,66 +280,33 @@ internal class NetEvents {
 				|| buffWidth != _consoleDriver.Cols || buffHeight != _consoleDriver.Rows) {
 
 				_lastWindowHeight = Math.Max (winHeight, 0);
-				GetWindowSizeEvent (new Size (winWidth, _lastWindowHeight));
+				EnqueueRequestWindowSize (new Size (winWidth, _lastWindowHeight));
 				return true;
 			}
 		}
 		return false;
 	}
 
-	void GetWindowSizeEvent (Size size)
+	// Process a CSI sequence received by the driver (key pressed, mouse event, or request/response event)
+	void ProcessIncomingEscSeq (ref ConsoleKeyInfo newConsoleKeyInfo, ref ConsoleKey key, ConsoleKeyInfo [] cki, ref ConsoleModifiers mod)
 	{
-		WindowSizeEvent windowSizeEvent = new WindowSizeEvent () {
-			Size = size
-		};
+		// isMouse is true if it's CSI<, false otherwise
+		EscSeqUtils.DecodeEscSeq (EscSeqRequests, ref newConsoleKeyInfo, ref key, cki, ref mod,
+			out var c1Control, out var code, out var values, out var terminating,
+			out var isMouse, out var mouseFlags,
+			out var pos, out var isReq,
+			(f, p) => HandleMouseEvent (MapMouseFlags (f), p));
 
-		_inputResultQueue.Enqueue (new InputResult () {
-			EventType = EventType.WindowSize,
-			WindowSizeEvent = windowSizeEvent
-		});
-	}
-
-	void GetConsoleInputType (ConsoleKeyInfo consoleKeyInfo)
-	{
-		InputResult inputResult = new InputResult {
-			EventType = EventType.Key
-		};
-		MouseEvent mouseEvent = new MouseEvent ();
-		ConsoleKeyInfo newConsoleKeyInfo = EscSeqUtils.GetConsoleInputKey (consoleKeyInfo);
-		if (inputResult.EventType == EventType.Key) {
-			inputResult.ConsoleKeyInfo = newConsoleKeyInfo;
-		} else {
-			inputResult.MouseEvent = mouseEvent;
-		}
-
-		_inputResultQueue.Enqueue (inputResult);
-	}
-
-	void DecodeEscSeq (ref ConsoleKeyInfo newConsoleKeyInfo, ref ConsoleKey key, ConsoleKeyInfo [] cki, ref ConsoleModifiers mod)
-	{
-		// isKeyMouse is true if it's CSI<, false otherwise
-		EscSeqUtils.DecodeEscSeq (EscSeqReqProc, ref newConsoleKeyInfo, ref key, cki, ref mod, out var c1Control, out var code, out var values, out var terminating, out var isKeyMouse, out var mouseFlags, out var pos, out var isReq, ProcessContinuousButtonPressed);
-
-		if (isKeyMouse) {
+		if (isMouse) {
 			foreach (var mf in mouseFlags) {
-				GetMouseEvent (MapMouseFlags (mf), pos);
+				HandleMouseEvent (MapMouseFlags (mf), pos);
 			}
 			return;
 		} else if (isReq) {
-			GetRequestEvent (c1Control, code, values, terminating);
+			HandleRequestEvent (c1Control, code, values, terminating);
 			return;
 		}
-		InputResult inputResult = new InputResult {
-			EventType = EventType.Key,
-			ConsoleKeyInfo = newConsoleKeyInfo
-		};
-
-		_inputResultQueue.Enqueue (inputResult);
-	}
-
-	void ProcessContinuousButtonPressed (MouseFlags mouseFlag, Point pos)
-	{
-		GetMouseEvent (MapMouseFlags (mouseFlag), pos);
+		HandleKeyboardEvent (newConsoleKeyInfo);
 	}
 
 	MouseButtonState MapMouseFlags (MouseFlags mouseFlags)
@@ -430,10 +410,11 @@ internal class NetEvents {
 
 	Point _lastCursorPosition;
 
-	void GetRequestEvent (string c1Control, string code, string [] values, string terminating)
+	void HandleRequestEvent (string c1Control, string code, string [] values, string terminating)
 	{
 		switch (terminating) {
-		case "R": // Reports cursor position as CSI r ; c R
+		// BUGBUG: I can't find where we send a request for cursor position (ESC[?6n), so I'm not sure if this is needed.
+		case EscSeqUtils.CSI_RequestCursorPositionReport_Terminator:
 			Point point = new Point {
 				X = int.Parse (values [1]) - 1,
 				Y = int.Parse (values [0]) - 1
@@ -452,14 +433,13 @@ internal class NetEvents {
 				return;
 			}
 			break;
-		case "c":
+		case EscSeqUtils.CSI_ReportDeviceAttributes_Terminator:
 			try {
 				var parent = EscSeqUtils.GetParentProcess (Process.GetCurrentProcess ());
 				if (parent == null) { Debug.WriteLine ("Not supported!"); }
 			} catch (Exception ex) {
 				Debug.WriteLine (ex.Message);
 			}
-
 			if (c1Control == "CSI" && values.Length == 2
 				&& values [0] == "1" && values [1] == "0") {
 				// Reports CSI?1;0c ("VT101 with No Options")
@@ -468,10 +448,10 @@ internal class NetEvents {
 				IsTerminalWithOptions = true;
 			}
 			break;
-		case "t":
+		case EscSeqUtils.CSI_ReportTerminalSizeInChars_Terminator:
 			switch (values [0]) {
-			case "8":
-				IsWinChanged (
+			case EscSeqUtils.CSI_ReportTerminalSizeInChars_ResponseValue:
+				RequestWindowSize (
 					Math.Max (int.Parse (values [1]), 0),
 					Math.Max (int.Parse (values [2]), 0),
 					Math.Max (int.Parse (values [1]), 0),
@@ -502,7 +482,7 @@ internal class NetEvents {
 		});
 	}
 
-	void GetMouseEvent (MouseButtonState buttonState, Point pos)
+	void HandleMouseEvent (MouseButtonState buttonState, Point pos)
 	{
 		MouseEvent mouseEvent = new MouseEvent () {
 			Position = pos,
@@ -584,6 +564,16 @@ internal class NetEvents {
 		public WindowSizeEvent WindowSizeEvent;
 		public WindowPositionEvent WindowPositionEvent;
 		public RequestResponseEvent RequestResponseEvent;
+	}
+
+	void HandleKeyboardEvent (ConsoleKeyInfo cki)
+	{
+		InputResult inputResult = new InputResult {
+			EventType = EventType.Key,
+			ConsoleKeyInfo = cki
+		};
+
+		_inputResultQueue.Enqueue (inputResult);
 	}
 }
 
@@ -686,10 +676,10 @@ internal class NetDriver : ConsoleDriver {
 		Console.ResetColor ();
 
 		//Disable alternative screen buffer.
-		Console.Out.Write ("\x1b[?1049l");
+		Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndActivateAltBufferWithBackscroll);
 
 		//Set cursor key to cursor.
-		Console.Out.Write ("\x1b[?25h");
+		Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
 
 		Console.Out.Close ();
 	}
@@ -736,10 +726,10 @@ internal class NetDriver : ConsoleDriver {
 
 		if (NetWinConsole != null) {
 			//Enable alternative screen buffer.
-			Console.Out.Write ("\x1b[?1049h");
+			Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
 
 			//Set cursor key to application.
-			Console.Out.Write ("\x1b[?25l");
+			Console.Out.Write (EscSeqUtils.CSI_HideCursor);
 
 			Console.TreatControlCAsInput = true;
 
@@ -771,7 +761,7 @@ internal class NetDriver : ConsoleDriver {
 		if (NetWinConsole == null) {
 			return;
 		}
-		
+
 		if (!EnableConsoleScrolling && Console.WindowHeight > 0) {
 			// Not supported on Unix.
 			if (IsWinPlatform) {
@@ -793,7 +783,7 @@ internal class NetDriver : ConsoleDriver {
 					Clip = new Rect (0, 0, Cols, Rows);
 				}
 			} else {
-				Console.Out.Write ($"\x1b[8;{Rows};{Cols}t");
+				Console.Out.Write (EscSeqUtils.CSI_SetTerminalWindowSize (Rows, Cols));
 			}
 		} else {
 			if (IsWinPlatform) {
@@ -815,7 +805,7 @@ internal class NetDriver : ConsoleDriver {
 					}
 				}
 			} else {
-				Console.Out.Write ($"\x1b[30;{Rows};{Cols}t");
+				Console.Out.Write (EscSeqUtils.CSI_SetTerminalWindowSize (Rows, Cols));
 			}
 		}
 		Clip = new Rect (0, 0, Cols, Rows);
@@ -896,20 +886,20 @@ internal class NetDriver : ConsoleDriver {
 						continue;
 					}
 
-					if (lastCol == -1)
+					if (lastCol == -1) {
 						lastCol = col;
+					}
 
 					var attr = Contents [row, col, 1];
 					if (attr != redrawAttr) {
 						redrawAttr = attr;
-						output.Append (WriteAttributes (attr));
+						output.Append (GetCsiForAttribute (attr));
 					}
 					outputWidth++;
 					var rune = (Rune)Contents [row, col, 0];
 					if (rune.Utf16SequenceLength == 1) {
 						output.Append (rune);
 					} else {
-						// TODO: Not sure we need to do this. I think we can just append the rune.
 						output.Append (rune.ToString ());
 					}
 					Contents [row, col, 2] = 0;
@@ -923,17 +913,11 @@ internal class NetDriver : ConsoleDriver {
 		SetCursorPosition (0, 0);
 	}
 
-	void SetVirtualCursorPosition (int col, int row)
+	// TODO: Move this to EscSeqUtils in such a way that it remains platform agnostic.
+	string GetCsiForAttribute (int attr)
 	{
-		Console.Out.Write ($"\x1b[{row + 1};{col + 1}H");
-	}
-
-	System.Text.StringBuilder WriteAttributes (int attr)
-	{
-		const string CSI = "\x1b[";
 		int bg = 0;
 		int fg = 0;
-		System.Text.StringBuilder sb = new System.Text.StringBuilder ();
 
 		IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
 			  .OfType<ConsoleColor> ()
@@ -944,9 +928,7 @@ internal class NetDriver : ConsoleDriver {
 		if (values.Contains ((attr >> 16) & 0xffff)) {
 			fg = MapColors ((ConsoleColor)((attr >> 16) & 0xffff));
 		}
-		sb.Append ($"{CSI}{bg};{fg}m");
-
-		return sb;
+		return $"{EscSeqUtils.CSI}{bg};{fg}m";
 	}
 
 	int MapColors (ConsoleColor color, bool isForeground = true)
@@ -983,7 +965,8 @@ internal class NetDriver : ConsoleDriver {
 				return false;
 			}
 		} else {
-			SetVirtualCursorPosition (col, row);
+			// TODO: Explain why + 1 is needed (and why we do this for non-Windows).
+			Console.Out.Write (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
 			return true;
 		}
 	}
@@ -1064,12 +1047,12 @@ internal class NetDriver : ConsoleDriver {
 
 	public void StartReportingMouseMoves ()
 	{
-		Console.Out.Write (EscSeqUtils.EnableMouseEvents);
+		Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
 	}
 
 	public void StopReportingMouseMoves ()
 	{
-		Console.Out.Write (EscSeqUtils.DisableMouseEvents);
+		Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
 	}
 
 	#region Not Implemented
@@ -1233,8 +1216,26 @@ internal class NetDriver : ConsoleDriver {
 		mLoop.ProcessInput = (e) => ProcessInput (e);
 
 		// Check if terminal supports requests
-		_mainLoop._netEvents.EscSeqReqProc.Add ("c");
-		Console.Out.Write ("\x1b[0c");
+		//143 63 c * DA  - Device Attributes
+		//*      [c = Terminal will identify itself
+		//*      [?1; 2c = Terminal is saying it is a VT100 with AVO
+		//*      [> 0c = Secondary DA request (distinguishes VT240 from VT220)
+
+		//CSI Ps c - Send Device Attributes (Primary DA).
+		//	Ps = 0  or omitted ⇒  request attributes from terminal.The
+		//	response depends on the decTerminalID resource setting.
+		//	⇒  CSI ? 1 ; 2 c ("VT100 with Advanced Video Option")
+		//	⇒  CSI ? 1 ; 0 c ("VT101 with No Options")
+		//	⇒  CSI ? 4 ; 6 c ("VT132 with Advanced Video and Graphics")
+		//	⇒  CSI ? 6 c ("VT102")
+		//	⇒  CSI ? 7 c ("VT131")
+		//	⇒  CSI ? 1 2; Ps c ("VT125")
+		//	⇒  CSI ? 6 2; Ps c ("VT220")
+		//	⇒  CSI ? 6 3; Ps c ("VT320")
+		//	⇒  CSI ? 6 4; Ps c ("VT420")
+		// Windows: ESC [ 0 c	DA	Device Attributes	Report the terminal identity. Will emit “\x1b[?1;0c”, indicating "VT101 with No Options".
+		_mainLoop._netEvents.EscSeqRequests.Add (EscSeqUtils.CSI_ReportDeviceAttributes_Terminator);
+		Console.Out.Write (EscSeqUtils.CSI_ReportDeviceAttributes);
 	}
 
 	void ProcessInput (NetEvents.InputResult inputEvent)
@@ -1266,6 +1267,8 @@ internal class NetDriver : ConsoleDriver {
 			ChangeWin (inputEvent.WindowSizeEvent.Size);
 			break;
 		case NetEvents.EventType.RequestResponse:
+			// BUGBUG: What is this for? It does not seem to be used anywhere. 
+			// It is also not clear what it does. View.Data is documented as "This property is not used internally"
 			Application.Top.Data = inputEvent.RequestResponseEvent.ResultTuple;
 			break;
 		}

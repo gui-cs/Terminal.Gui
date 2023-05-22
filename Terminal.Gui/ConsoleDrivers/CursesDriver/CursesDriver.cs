@@ -340,7 +340,7 @@ internal class CursesDriver : ConsoleDriver {
 							new ConsoleKeyInfo ('<', 0, false, false, false)
 						};
 					code = 0;
-					GetEscSeq (ref code, ref k, ref wch2, ref key, ref cki);
+					HandleEscSeqResponse (ref code, ref k, ref wch2, ref key, ref cki);
 				}
 				return;
 			}
@@ -399,7 +399,7 @@ internal class CursesDriver : ConsoleDriver {
 							new ConsoleKeyInfo ((char)Key.Esc, 0, false, false, false),
 							new ConsoleKeyInfo ('[', 0, false, false, false)
 						};
-					GetEscSeq (ref code, ref k, ref wch2, ref key, ref cki);
+					HandleEscSeqResponse (ref code, ref k, ref wch2, ref key, ref cki);
 					return;
 				} else {
 					// Unfortunately there are no way to differentiate Ctrl+Alt+alfa and Ctrl+Shift+Alt+alfa.
@@ -455,7 +455,7 @@ internal class CursesDriver : ConsoleDriver {
 		//}
 	}
 
-	void GetEscSeq (ref int code, ref Key k, ref int wch2, ref KeyEvent key, ref ConsoleKeyInfo [] cki)
+	void HandleEscSeqResponse (ref int code, ref Key k, ref int wch2, ref KeyEvent key, ref ConsoleKeyInfo [] cki)
 	{
 		ConsoleKey ck = 0;
 		ConsoleModifiers mod = 0;
@@ -755,12 +755,12 @@ internal class CursesDriver : ConsoleDriver {
 
 	public void StartReportingMouseMoves ()
 	{
-		Console.Out.Write (EscSeqUtils.EnableMouseEvents);
+		Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
 	}
 
 	public void StopReportingMouseMoves ()
 	{
-		Console.Out.Write (EscSeqUtils.DisableMouseEvents);
+		Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
 	}
 
 	/// <inheritdoc/>
@@ -786,7 +786,7 @@ internal class CursesDriver : ConsoleDriver {
 		Curses.curs_set (((int)visibility >> 16) & 0x000000FF);
 
 		if (visibility != CursorVisibility.Invisible) {
-			Console.Out.Write ("\x1b[{0} q", ((int)visibility >> 24) & 0xFF);
+			Console.Out.Write (EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF)));
 		}
 
 		_currentCursorVisibility = visibility;

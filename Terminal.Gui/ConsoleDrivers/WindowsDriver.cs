@@ -1528,15 +1528,9 @@ internal class WindowsDriver : ConsoleDriver {
 
 		try {
 			// Needed for Windows Terminal
-			// ESC [ ? 1047 h  Activate xterm alternative buffer (no backscroll)
-			// ESC [ ? 1047 l  Restore xterm working buffer (with backscroll)
-			// ESC [ ? 1048 h  Save cursor position
-			// ESC [ ? 1048 l  Restore cursor position
-			// ESC [ ? 1049 h  Save cursor position and activate xterm alternative buffer (no backscroll)
-			// ESC [ ? 1049 l  Restore cursor position and restore xterm working buffer (with backscroll)
 			// Per Issue #2264 using the alternative screen buffer is required for Windows Terminal to not 
 			// wipe out the backscroll buffer when the application exits.
-			Console.Out.Write ("\x1b[?1047h");
+			Console.Out.Write (EscSeqUtils.CSI_ActivateAltBufferNoBackscroll);
 
 			var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
 			Cols = winSize.Width;
@@ -1572,14 +1566,7 @@ internal class WindowsDriver : ConsoleDriver {
 		};
 		WinConsole.ForceRefreshCursorVisibility ();
 		if (!EnableConsoleScrolling) {
-			// ANSI ESC "[xJ" Clears part of the screen.
-			// If n is 0 (or missing), clear from cursor to end of screen.
-			// If n is 1, clear from cursor to beginning of the screen.
-			// If n is 2, clear entire screen (and moves cursor to upper left on DOS ANSI.SYS).
-			// If n is 3, clear entire screen and delete all lines saved in the scrollback buffer
-			// DO NOT USE 3J - even with the alternate screen buffer, it clears the entire scrollback buffer
-			Console.Out.Write ("\x1b[3J");
-			//Console.Out.Write ("\x1b[0J");
+			Console.Out.Write (EscSeqUtils.CSI_ClearScreen (EscSeqUtils.ClearScreenOptions.CursorToEndOfScreen));
 		}
 	}
 
@@ -1752,12 +1739,10 @@ internal class WindowsDriver : ConsoleDriver {
 		// end of the screen.
 		// Note, [3J causes Windows Terminal to wipe out the entire NON ALTERNATIVE
 		// backbuffer! So we need to use [0J instead.
-		Console.Out.Write ("\x1b[0J");
+		Console.Out.Write (EscSeqUtils.CSI_ClearScreen(0));
 
 		// Disable alternative screen buffer.
-		Console.Out.Write ("\x1b[?1047l");
-
-		// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
+		Console.Out.Write (EscSeqUtils.CSI_RestoreAltBufferWithBackscroll);
 	}
 
 	#region Not Implemented
