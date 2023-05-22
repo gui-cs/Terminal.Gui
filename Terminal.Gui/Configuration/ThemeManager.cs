@@ -56,7 +56,7 @@ namespace Terminal.Gui {
 	/// 		}
 	/// 	}
 	/// </code></example> 
-	public partial class ThemeManager : IDictionary<string, ThemeScope> {
+	public class ThemeManager : IDictionary<string, ThemeScope> {
 		private static readonly ThemeManager _instance = new ThemeManager ();
 		static ThemeManager () { } // Make sure it's truly lazy
 		private ThemeManager () { } // Prevent instantiation outside
