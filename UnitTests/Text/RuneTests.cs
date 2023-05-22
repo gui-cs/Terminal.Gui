@@ -713,7 +713,7 @@ public class RuneTests {
 	}
 
 	[Fact]
-	public void Cast_To_Char_Durrogate_Pair_Return_UTF16 ()
+	public void Cast_To_Char_Surrogate_Pair_Return_UTF16 ()
 	{
 		Assert.NotEqual ("𝔹", $"{new Rune (unchecked((char)0x1d539))}");
 		Assert.Equal ("픹", $"{new Rune (unchecked((char)0x1d539))}");
