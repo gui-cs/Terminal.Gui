@@ -7,7 +7,7 @@
 
 		/// <summary>
 		/// Optional text that describes the bar.  This will be rendered on the corresponding
-		/// <see cref="Axis"/> unless <see cref="DrawLabels"/> is false
+		/// <see cref="Axis"/> unless <see cref="BarSeries.DrawLabels"/> is false
 		/// </summary>
 		public string Text { get; set; }
 

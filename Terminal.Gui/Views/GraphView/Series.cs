@@ -72,7 +72,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// The number of units of graph space between bars.  Should be 
-		/// less than <see cref="BarEvery"/>
+		/// less than <see cref="BarSeries.BarEvery"/>
 		/// </summary>
 		public float Spacing { get; }
 
