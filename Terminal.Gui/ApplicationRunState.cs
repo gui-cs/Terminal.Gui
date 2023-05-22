@@ -45,16 +45,16 @@ namespace Terminal.Gui {
 #endif
 
 		/// <summary>
-		/// Releases all resource used by the <see cref="Application.ApplicationRunState"/> object.
+		/// Releases all resource used by the <see cref="ApplicationRunState"/> object.
 		/// </summary>
 		/// <remarks>
-		/// Call <see cref="Dispose()"/> when you are finished using the <see cref="Application.ApplicationRunState"/>. 
+		/// Call <see cref="Dispose()"/> when you are finished using the <see cref="ApplicationRunState"/>. 
 		/// </remarks>
 		/// <remarks>
-		/// <see cref="Dispose()"/> method leaves the <see cref="Application.ApplicationRunState"/> in an unusable state. After
+		/// <see cref="Dispose()"/> method leaves the <see cref="ApplicationRunState"/> in an unusable state. After
 		/// calling <see cref="Dispose()"/>, you must release all references to the
-		/// <see cref="Application.ApplicationRunState"/> so the garbage collector can reclaim the memory that the
-		/// <see cref="Application.ApplicationRunState"/> was occupying.
+		/// <see cref="ApplicationRunState"/> so the garbage collector can reclaim the memory that the
+		/// <see cref="ApplicationRunState"/> was occupying.
 		/// </remarks>
 		public void Dispose ()
 		{
@@ -66,7 +66,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Releases all resource used by the <see cref="Application.ApplicationRunState"/> object.
+		/// Releases all resource used by the <see cref="ApplicationRunState"/> object.
 		/// </summary>
 		/// <param name="disposing">If set to <see langword="true"/> we are disposing and should dispose held objects.</param>
 		protected virtual void Dispose (bool disposing)

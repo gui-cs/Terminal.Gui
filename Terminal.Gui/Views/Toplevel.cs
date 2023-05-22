@@ -31,9 +31,9 @@ namespace Terminal.Gui {
 		public bool Running { get; set; }
 
 		/// <summary>
-		/// Invoked when the <see cref="Toplevel"/> <see cref="Application.ApplicationRunState"/> has begun to be loaded.
+		/// Invoked when the <see cref="Toplevel"/> <see cref="ApplicationRunState"/> has begun to be loaded.
 		/// A Loaded event handler is a good place to finalize initialization before calling 
-		/// <see cref="Application.RunLoop(Application.ApplicationRunState, bool)"/>.
+		/// <see cref="Application.RunLoop(ApplicationRunState, bool)"/>.
 		/// </summary>
 		public event EventHandler Loaded;
 
@@ -47,30 +47,30 @@ namespace Terminal.Gui {
 		public event EventHandler Ready;
 
 		/// <summary>
-		/// Invoked when the Toplevel <see cref="Application.ApplicationRunState"/> has been unloaded.
-		/// A Unloaded event handler is a good place to dispose objects after calling <see cref="Application.End(Application.ApplicationRunState)"/>.
+		/// Invoked when the Toplevel <see cref="ApplicationRunState"/> has been unloaded.
+		/// A Unloaded event handler is a good place to dispose objects after calling <see cref="Application.End(ApplicationRunState)"/>.
 		/// </summary>
 		public event EventHandler Unloaded;
 
 		/// <summary>
-		/// Invoked when the Toplevel <see cref="Application.ApplicationRunState"/> becomes the <see cref="Application.Current"/> Toplevel.
+		/// Invoked when the Toplevel <see cref="ApplicationRunState"/> becomes the <see cref="Application.Current"/> Toplevel.
 		/// </summary>
 		public event EventHandler<ToplevelEventArgs> Activate;
 
 		/// <summary>
-		/// Invoked when the Toplevel<see cref="Application.ApplicationRunState"/> ceases to be the <see cref="Application.Current"/> Toplevel.
+		/// Invoked when the Toplevel<see cref="ApplicationRunState"/> ceases to be the <see cref="Application.Current"/> Toplevel.
 		/// </summary>
 		public event EventHandler<ToplevelEventArgs> Deactivate;
 
 		/// <summary>
-		/// Invoked when a child of the Toplevel <see cref="Application.ApplicationRunState"/> is closed by  
-		/// <see cref="Application.End(Application.ApplicationRunState)"/>.
+		/// Invoked when a child of the Toplevel <see cref="ApplicationRunState"/> is closed by  
+		/// <see cref="Application.End(ApplicationRunState)"/>.
 		/// </summary>
 		public event EventHandler<ToplevelEventArgs> ChildClosed;
 
 		/// <summary>
-		/// Invoked when the last child of the Toplevel <see cref="Application.ApplicationRunState"/> is closed from 
-		/// by <see cref="Application.End(Application.ApplicationRunState)"/>.
+		/// Invoked when the last child of the Toplevel <see cref="ApplicationRunState"/> is closed from 
+		/// by <see cref="Application.End(ApplicationRunState)"/>.
 		/// </summary>
 		public event EventHandler AllChildClosed;
 

@@ -3,12 +3,12 @@
 namespace Terminal.Gui {
 
 	/// <summary>
-	/// Describes a mouse event over a specific <see cref="TabView.Tab"/> in a <see cref="TabView"/>.
+	/// Describes a mouse event over a specific <see cref="Tab"/> in a <see cref="TabView"/>.
 	/// </summary>
 	public class TabMouseEventArgs : EventArgs {
 
 		/// <summary>
-		/// Gets the <see cref="TabView.Tab"/> (if any) that the mouse
+		/// Gets the <see cref="Tab"/> (if any) that the mouse
 		/// was over when the <see cref="MouseEvent"/> occurred.
 		/// </summary>
 		/// <remarks>This will be null if the click is after last tab
@@ -24,7 +24,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Creates a new instance of the <see cref="TabMouseEventArgs"/> class.
 		/// </summary>
-		/// <param name="tab"><see cref="TabView.Tab"/> that the mouse was over when the event occurred.</param>
+		/// <param name="tab"><see cref="Tab"/> that the mouse was over when the event occurred.</param>
 		/// <param name="mouseEvent">The mouse activity being reported</param>
 		public TabMouseEventArgs (Tab tab, MouseEvent mouseEvent)
 		{

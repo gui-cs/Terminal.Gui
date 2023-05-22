@@ -54,7 +54,7 @@ namespace Terminal.Gui {
 		public event EventHandler<TabChangedEventArgs> SelectedTabChanged;
 
 		/// <summary>
-		/// Event fired when a <see cref="TabView.Tab"/> is clicked.  Can be used to cancel navigation,
+		/// Event fired when a <see cref="Tab"/> is clicked.  Can be used to cancel navigation,
 		/// show context menu (e.g. on right click) etc.
 		/// </summary>
 		public event EventHandler<TabMouseEventArgs> TabClicked;
