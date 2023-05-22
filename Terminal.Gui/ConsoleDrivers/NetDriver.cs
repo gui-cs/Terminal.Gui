@@ -284,7 +284,6 @@ internal class NetEvents {
 			});
 			return true;
 		}
-		return false;
 	}
 
 	// Process a CSI sequence received by the driver (key pressed, mouse event, or request/response event)
@@ -853,8 +852,9 @@ internal class NetDriver : ConsoleDriver {
 		var redrawAttr = -1;
 		var lastCol = -1;
 
-		Console.CursorVisible = false;
-
+		GetCursorVisibility (out CursorVisibility savedVisibitity);
+		SetCursorVisibility (CursorVisibility.Invisible); 
+		
 		for (var row = top; row < rows; row++) {
 			if (Console.WindowHeight < 1) {
 				return;
@@ -911,6 +911,7 @@ internal class NetDriver : ConsoleDriver {
 			}
 		}
 		SetCursorPosition (0, 0);
+		SetCursorVisibility (savedVisibitity);
 	}
 
 	// TODO: Move this to EscSeqUtils in such a way that it remains platform agnostic.
@@ -1030,7 +1031,9 @@ internal class NetDriver : ConsoleDriver {
 	public override bool SetCursorVisibility (CursorVisibility visibility)
 	{
 		_cachedCursorVisibility = visibility;
-		return Console.CursorVisible = visibility == CursorVisibility.Default;
+		var isVisible = Console.CursorVisible = visibility == CursorVisibility.Default;
+		Console.Out.Write (isVisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
+		return isVisible;
 	}
 
 	public override bool EnsureCursorVisibility ()
