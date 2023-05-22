@@ -427,9 +427,12 @@ namespace Terminal.Gui {
 			}
 		}
 
+		CursorVisibility visibility;
+
 		void RestoreCursorVisibility ()
 		{
-			if (desiredCursorVisibility != savedCursorVisibility) {
+			Application.Driver.GetCursorVisibility (out visibility);
+			if (desiredCursorVisibility != savedCursorVisibility || visibility != savedCursorVisibility) {
 				DesiredCursorVisibility = savedCursorVisibility;
 			}
 		}
@@ -1253,7 +1256,7 @@ namespace Terminal.Gui {
 		public CursorVisibility DesiredCursorVisibility {
 			get => desiredCursorVisibility;
 			set {
-				if (desiredCursorVisibility != value && HasFocus) {
+					if ((desiredCursorVisibility != value || visibility != value) && HasFocus) {
 					Application.Driver.SetCursorVisibility (value);
 				}
 
