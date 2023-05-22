@@ -711,4 +711,13 @@ public class RuneTests {
 		Assert.Equal (utf16Length, r.Utf16SequenceLength);
 		Assert.Equal (utf8Length, r.Utf8SequenceLength);
 	}
+
+	[Fact]
+	public void Cast_To_Char_Durrogate_Pair_Return_UTF16 ()
+	{
+		Assert.NotEqual ("𝔹", $"{new Rune (unchecked((char)0x1d539))}");
+		Assert.Equal ("픹", $"{new Rune (unchecked((char)0x1d539))}");
+		Assert.Equal ("픹", $"{new Rune (0xd539)}");
+		Assert.Equal ("𝔹", $"{new Rune (0x1d539)}");
+	}
 }

@@ -332,7 +332,7 @@ class CharMap : ScrollView {
 	}
 
 	private void CopyCodePoint () => Clipboard.Contents = $"U+{SelectedCodePoint:x5}";
-	private void CopyGlyph () => Clipboard.Contents = $"{new Rune ((char)SelectedCodePoint)}";
+	private void CopyGlyph () => Clipboard.Contents = $"{new Rune (SelectedCodePoint)}";
 
 	public override void OnDrawContent (Rect contentArea)
 	{
@@ -553,7 +553,7 @@ class CharMap : ScrollView {
 				//}
 			}
 
-			var title = $"{ToCamelCase (name)} - {new Rune ((char)SelectedCodePoint)} U+{SelectedCodePoint:x4}";
+			var title = $"{ToCamelCase (name)} - {new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x4}";
 			switch (MessageBox.Query (title, decResponse, "Copy _Glyph", "Copy Code _Point", "Cancel")) {
 			case 0:
 				CopyGlyph ();
