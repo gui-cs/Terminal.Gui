@@ -213,7 +213,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Sequence of lines to connect points e.g. of a <see cref="ScatterSeries"/>
 	/// </summary>
-	public class PathAnnotation : IAnnotation {
+	public partial class PathAnnotation : IAnnotation {
 
 		/// <summary>
 		/// Points that should be connected.  Lines will be drawn between points in the order
@@ -260,30 +260,6 @@ namespace Terminal.Gui {
 		{
 			for (int i = 0; i < Points.Count - 1; i++) {
 				yield return new LineF (Points [i], Points [i + 1]);
-			}
-		}
-
-		/// <summary>
-		/// Describes two points in graph space and a line between them
-		/// </summary>
-		public class LineF {
-			/// <summary>
-			/// The start of the line
-			/// </summary>
-			public PointF Start { get; }
-
-			/// <summary>
-			/// The end point of the line
-			/// </summary>
-			public PointF End { get; }
-
-			/// <summary>
-			/// Creates a new line between the points
-			/// </summary>
-			public LineF (PointF start, PointF end)
-			{
-				this.Start = start;
-				this.End = end;
 			}
 		}
 	}

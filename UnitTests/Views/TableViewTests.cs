@@ -2999,7 +2999,7 @@ A B C
 				ShowHorizontalHeaderOverline = false,
 				ShowHorizontalHeaderUnderline = false
 			};
-			var listStyle = new ListTableSource.ListColumnStyle () {
+			var listStyle = new ListColumnStyle () {
 				Orientation = orient,
 				ScrollParallel = parallel
 			};

@@ -6,6 +6,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
+// Alias Console to MockConsole so we don't accidentally use Console
+using Console = Terminal.Gui.FakeConsole;
+
 namespace Terminal.Gui {
 
 #pragma warning disable RCS1138 // Add summary to documentation comment.

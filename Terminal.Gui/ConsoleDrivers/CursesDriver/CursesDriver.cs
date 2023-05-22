@@ -180,7 +180,7 @@ namespace Terminal.Gui {
 			Curses.attrset (CurrentAttribute);
 		}
 
-		public Curses.Window window;
+		public CursesWindow window;
 
 		//static short last_color_pair = 16;
 
@@ -592,7 +592,7 @@ namespace Terminal.Gui {
 			Curses.raw ();
 			Curses.noecho ();
 
-			Curses.Window.Standard.keypad (true);
+			CursesWindow.Standard.keypad (true);
 			TerminalResized = terminalResized;
 			StartReportingMouseMoves ();
 
@@ -765,7 +765,7 @@ namespace Terminal.Gui {
 		{
 			StopReportingMouseMoves ();
 			Platform.Suspend ();
-			Curses.Window.Standard.redrawwin ();
+			CursesWindow.Standard.redrawwin ();
 			Curses.refresh ();
 			StartReportingMouseMoves ();
 		}

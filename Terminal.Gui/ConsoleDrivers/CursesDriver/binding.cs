@@ -64,7 +64,7 @@ namespace Unix.Terminal {
 		}
 
 		static int lines, cols;
-		static Window main_window;
+		static CursesWindow main_window;
 		static IntPtr curses_handle, curscr_ptr, lines_ptr, cols_ptr;
 
 		// If true, uses the DllImport into "ncurses", otherwise "libncursesw.so.5"
@@ -97,7 +97,7 @@ namespace Unix.Terminal {
 			cols_ptr = get_ptr ("COLS");
 		}
 
-		static public Window initscr ()
+		static public CursesWindow initscr ()
 		{
 			setlocale (LC_ALL, "");
 			FindNCurses ();
@@ -105,7 +105,7 @@ namespace Unix.Terminal {
 			// Prevents the terminal from being locked after exiting.
 			reset_shell_mode ();
 
-			main_window = new Window (methods.initscr ());
+			main_window = new CursesWindow (methods.initscr ());
 			try {
 				console_sharp_get_dims (out lines, out cols);
 			} catch (DllNotFoundException) {
