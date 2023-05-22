@@ -15,7 +15,7 @@ namespace Terminal.Gui.ConfigurationTests {
 		{
 			ConfigurationManager.Reset ();
 
-			Assert.Equal (3, ((Dictionary<string, ConfigurationManager.ThemeScope>)ConfigurationManager.Settings ["Themes"].PropertyValue).Count);
+			Assert.Equal (3, ((Dictionary<string, ThemeScope>)ConfigurationManager.Settings ["Themes"].PropertyValue).Count);
 
 			ConfigurationManager.GetHardCodedDefaults ();
 			Assert.NotEmpty (ConfigurationManager.Themes);
@@ -30,8 +30,8 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.True (ConfigurationManager.Settings ["Theme"].PropertyValue is string);
 			Assert.Equal ("Default", ConfigurationManager.Settings ["Theme"].PropertyValue as string);
 
-			Assert.True (ConfigurationManager.Settings ["Themes"].PropertyValue is Dictionary<string, ConfigurationManager.ThemeScope>);
-			Assert.Single (((Dictionary<string, ConfigurationManager.ThemeScope>)ConfigurationManager.Settings ["Themes"].PropertyValue));
+			Assert.True (ConfigurationManager.Settings ["Themes"].PropertyValue is Dictionary<string, ThemeScope>);
+			Assert.Single (((Dictionary<string, ThemeScope>)ConfigurationManager.Settings ["Themes"].PropertyValue));
 
 		}
 

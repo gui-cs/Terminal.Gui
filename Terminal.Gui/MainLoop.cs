@@ -45,7 +45,7 @@ namespace Terminal.Gui {
 	///   Monitoring of file descriptors is only available on Unix, there
 	///   does not seem to be a way of supporting this on Windows.
 	/// </remarks>
-	public partial class MainLoop {
+	public class MainLoop {
 
 		internal SortedList<long, Timeout> timeouts = new SortedList<long, Timeout> ();
 		object _timeoutsLockToken = new object ();

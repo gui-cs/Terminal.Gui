@@ -54,7 +54,7 @@ namespace Terminal.Gui {
 	/// Application.Shutdown ();
 	/// </code>
 	/// </example>
-	public partial class Wizard : Dialog {
+	public class Wizard : Dialog {
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Wizard"/> class using <see cref="LayoutStyle.Computed"/> positioning.

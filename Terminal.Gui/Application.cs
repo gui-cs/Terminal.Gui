@@ -304,115 +304,40 @@ namespace Terminal.Gui {
 		#region Run (Begin, Run, End)
 
 		/// <summary>
-		/// Notify that a new <see cref="RunState"/> was created (<see cref="Begin(Toplevel)"/> was called). The token is created in 
+		/// Notify that a new <see cref="ApplicationRunState"/> was created (<see cref="Begin(Toplevel)"/> was called). The token is created in 
 		/// <see cref="Begin(Toplevel)"/> and this event will be fired before that function exits.
 		/// </summary>
 		/// <remarks>
 		///	If <see cref="ExitRunLoopAfterFirstIteration"/> is <see langword="true"/> callers to
 		///	<see cref="Begin(Toplevel)"/> must also subscribe to <see cref="NotifyStopRunState"/>
-		///	and manually dispose of the <see cref="RunState"/> token when the application is done.
+		///	and manually dispose of the <see cref="ApplicationRunState"/> token when the application is done.
 		/// </remarks>
 		public static event EventHandler<RunStateEventArgs> NotifyNewRunState;
 
 		/// <summary>
-		/// Notify that a existent <see cref="RunState"/> is stopping (<see cref="End(RunState)"/> was called).
+		/// Notify that a existent <see cref="ApplicationRunState"/> is stopping (<see cref="End(ApplicationRunState)"/> was called).
 		/// </summary>
 		/// <remarks>
 		///	If <see cref="ExitRunLoopAfterFirstIteration"/> is <see langword="true"/> callers to
 		///	<see cref="Begin(Toplevel)"/> must also subscribe to <see cref="NotifyStopRunState"/>
-		///	and manually dispose of the <see cref="RunState"/> token when the application is done.
+		///	and manually dispose of the <see cref="ApplicationRunState"/> token when the application is done.
 		/// </remarks>
 		public static event EventHandler<ToplevelEventArgs> NotifyStopRunState;
 
 		/// <summary>
-		/// The execution state for a <see cref="Toplevel"/> view.
-		/// </summary>
-		public class RunState : IDisposable {
-			/// <summary>
-			/// Initializes a new <see cref="RunState"/> class.
-			/// </summary>
-			/// <param name="view"></param>
-			public RunState (Toplevel view)
-			{
-				Toplevel = view;
-			}
-			/// <summary>
-			/// The <see cref="Toplevel"/> belonging to this <see cref="RunState"/>.
-			/// </summary>
-			public Toplevel Toplevel { get; internal set; }
-
-#if DEBUG_IDISPOSABLE
-			/// <summary>
-			/// For debug (see DEBUG_IDISPOSABLE define) purposes to verify objects are being disposed properly
-			/// </summary>
-			public bool WasDisposed = false;
-
-			/// <summary>
-			/// For debug (see DEBUG_IDISPOSABLE define) purposes to verify objects are being disposed properly
-			/// </summary>
-			public int DisposedCount = 0;
-
-			/// <summary>
-			/// For debug (see DEBUG_IDISPOSABLE define) purposes; the runstate instances that have been created
-			/// </summary>
-			public static List<RunState> Instances = new List<RunState> ();
-
-			/// <summary>
-			/// Creates a new RunState object.
-			/// </summary>
-			public RunState ()
-			{
-				Instances.Add (this);
-			}
-#endif
-
-			/// <summary>
-			/// Releases all resource used by the <see cref="Application.RunState"/> object.
-			/// </summary>
-			/// <remarks>
-			/// Call <see cref="Dispose()"/> when you are finished using the <see cref="Application.RunState"/>. 
-			/// </remarks>
-			/// <remarks>
-			/// <see cref="Dispose()"/> method leaves the <see cref="Application.RunState"/> in an unusable state. After
-			/// calling <see cref="Dispose()"/>, you must release all references to the
-			/// <see cref="Application.RunState"/> so the garbage collector can reclaim the memory that the
-			/// <see cref="Application.RunState"/> was occupying.
-			/// </remarks>
-			public void Dispose ()
-			{
-				Dispose (true);
-				GC.SuppressFinalize (this);
-#if DEBUG_IDISPOSABLE
-				WasDisposed = true;
-#endif
-			}
-
-			/// <summary>
-			/// Releases all resource used by the <see cref="Application.RunState"/> object.
-			/// </summary>
-			/// <param name="disposing">If set to <see langword="true"/> we are disposing and should dispose held objects.</param>
-			protected virtual void Dispose (bool disposing)
-			{
-				if (Toplevel != null && disposing) {
-					throw new InvalidOperationException ("You must clean up (Dispose) the Toplevel before calling Application.RunState.Dispose");
-				}
-			}
-		}
-
-		/// <summary>
 		/// Building block API: Prepares the provided <see cref="Toplevel"/> for execution.
 		/// </summary>
-		/// <returns>The <see cref="RunState"/> handle that needs to be passed to the <see cref="End(RunState)"/> method upon completion.</returns>
+		/// <returns>The <see cref="ApplicationRunState"/> handle that needs to be passed to the <see cref="End(ApplicationRunState)"/> method upon completion.</returns>
 		/// <param name="Toplevel">The <see cref="Toplevel"/> to prepare execution for.</param>
 		/// <remarks>
 		/// This method prepares the provided <see cref="Toplevel"/> for running with the focus,
 		/// it adds this to the list of <see cref="Toplevel"/>s, sets up the <see cref="MainLoop"/> to process the
 		/// event, lays out the Subviews, focuses the first element, and draws the
 		/// <see cref="Toplevel"/> in the screen. This is usually followed by executing
-		/// the <see cref="RunLoop"/> method, and then the <see cref="End(RunState)"/> method upon termination which will
+		/// the <see cref="RunLoop"/> method, and then the <see cref="End(ApplicationRunState)"/> method upon termination which will
 		///  undo these changes.
 		/// </remarks>
-		public static RunState Begin (Toplevel Toplevel)
+		public static ApplicationRunState Begin (Toplevel Toplevel)
 		{
 			if (Toplevel == null) {
 				throw new ArgumentNullException (nameof (Toplevel));
@@ -423,7 +348,7 @@ namespace Terminal.Gui {
 			// Ensure the mouse is ungrabed.
 			_mouseGrabView = null;
 
-			var rs = new RunState (Toplevel);
+			var rs = new ApplicationRunState (Toplevel);
 
 			// View implements ISupportInitializeNotification which is derived from ISupportInitialize
 			if (!Toplevel.IsInitialized) {
@@ -574,20 +499,20 @@ namespace Terminal.Gui {
 		///   To make a <see cref="Run(Toplevel, Func{Exception, bool})"/> stop execution, call <see cref="Application.RequestStop"/>.
 		///  </para>
 		///  <para>
-		///   Calling <see cref="Run(Toplevel, Func{Exception, bool})"/> is equivalent to calling <see cref="Begin(Toplevel)"/>, followed by <see cref="RunLoop(RunState, bool)"/>,
-		///   and then calling <see cref="End(RunState)"/>.
+		///   Calling <see cref="Run(Toplevel, Func{Exception, bool})"/> is equivalent to calling <see cref="Begin(Toplevel)"/>, followed by <see cref="RunLoop(ApplicationRunState, bool)"/>,
+		///   and then calling <see cref="End(ApplicationRunState)"/>.
 		///  </para>
 		///  <para>
 		///   Alternatively, to have a program control the main loop and 
 		///   process events manually, call <see cref="Begin(Toplevel)"/> to set things up manually and then
-		///   repeatedly call <see cref="RunLoop(RunState, bool)"/> with the wait parameter set to false. By doing this
-		///   the <see cref="RunLoop(RunState, bool)"/> method will only process any pending events, timers, idle handlers and
+		///   repeatedly call <see cref="RunLoop(ApplicationRunState, bool)"/> with the wait parameter set to false. By doing this
+		///   the <see cref="RunLoop(ApplicationRunState, bool)"/> method will only process any pending events, timers, idle handlers and
 		///   then return control immediately.
 		///  </para>
 		///  <para>
 		///   RELEASE builds only: When <paramref name="errorHandler"/> is <see langword="null"/> any exeptions will be rethrown. 
 		///   Otherwise, if <paramref name="errorHandler"/> will be called. If <paramref name="errorHandler"/> 
-		///   returns <see langword="true"/> the <see cref="RunLoop(RunState, bool)"/> will resume; otherwise 
+		///   returns <see langword="true"/> the <see cref="RunLoop(ApplicationRunState, bool)"/> will resume; otherwise 
 		///   this method will exit.
 		///  </para>
 		/// </remarks>
@@ -713,7 +638,7 @@ namespace Terminal.Gui {
 		/// <param name="state">The state returned by the <see cref="Begin(Toplevel)"/> method.</param>
 		/// <param name="wait">By default this is <see langword="true"/> which will execute the loop waiting for events, 
 		/// if set to <see langword="false"/>, a single iteration will execute.</param>
-		public static void RunLoop (RunState state, bool wait = true)
+		public static void RunLoop (ApplicationRunState state, bool wait = true)
 		{
 			if (state == null)
 				throw new ArgumentNullException (nameof (state));
@@ -737,7 +662,7 @@ namespace Terminal.Gui {
 		/// will return after a single iteration.</param>
 		/// <param name="firstIteration">Set to <see langword="true"/> if this is the first run loop iteration. Upon return,
 		/// it will be set to <see langword="false"/> if at least one iteration happened.</param>
-		public static void RunMainLoopIteration (ref RunState state, bool wait, ref bool firstIteration)
+		public static void RunMainLoopIteration (ref ApplicationRunState state, bool wait, ref bool firstIteration)
 		{
 			if (MainLoop.EventsPending (wait)) {
 				// Notify Toplevel it's ready
@@ -900,8 +825,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Building block API: completes the execution of a <see cref="Toplevel"/> that was started with <see cref="Begin(Toplevel)"/> .
 		/// </summary>
-		/// <param name="runState">The <see cref="RunState"/> returned by the <see cref="Begin(Toplevel)"/> method.</param>
-		public static void End (RunState runState)
+		/// <param name="runState">The <see cref="ApplicationRunState"/> returned by the <see cref="Begin(Toplevel)"/> method.</param>
+		public static void End (ApplicationRunState runState)
 		{
 			if (runState == null)
 				throw new ArgumentNullException (nameof (runState));

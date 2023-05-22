@@ -142,7 +142,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets the style settings for the table of files (in currently selected directory).
 		/// </summary>
-		public TableView.TableStyle TableStyle { get; internal set; }
+		public TableStyle TableStyle { get; internal set; }
 
 		/// <summary>
 		/// Gets the style settings for the collapse-able directory/places tree

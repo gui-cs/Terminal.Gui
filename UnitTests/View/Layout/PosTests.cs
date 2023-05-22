@@ -547,9 +547,9 @@ namespace Terminal.Gui.ViewTests {
 				return (win, button);
 			}
 
-			Application.RunState rs;
+			ApplicationRunState rs;
 
-			void cleanup (Application.RunState rs)
+			void cleanup (ApplicationRunState rs)
 			{
 				// Cleanup
 				Application.End (rs);

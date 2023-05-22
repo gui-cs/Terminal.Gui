@@ -670,41 +670,7 @@ namespace Terminal.Gui {
 		{
 		}
 
-		#endregion
-
-		public class FakeClipboard : ClipboardBase {
-			public Exception FakeException = null;
-
-			string contents = string.Empty;
-
-			bool isSupportedAlwaysFalse = false;
-
-			public override bool IsSupported => !isSupportedAlwaysFalse;
-
-			public FakeClipboard (bool fakeClipboardThrowsNotSupportedException = false, bool isSupportedAlwaysFalse = false)
-			{
-				this.isSupportedAlwaysFalse = isSupportedAlwaysFalse;
-				if (fakeClipboardThrowsNotSupportedException) {
-					FakeException = new NotSupportedException ("Fake clipboard exception");
-				}
-			}
-
-			protected override string GetClipboardDataImpl ()
-			{
-				if (FakeException != null) {
-					throw FakeException;
-				}
-				return contents;
-			}
-
-			protected override void SetClipboardDataImpl (string text)
-			{
-				if (FakeException != null) {
-					throw FakeException;
-				}
-				contents = text;
-			}
-		}
+#endregion
 
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 	}

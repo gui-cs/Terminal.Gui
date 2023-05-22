@@ -9,7 +9,7 @@ namespace Terminal.Gui {
 	/// a <see cref="System.Collections.IList"/>.  This class is
 	/// mutable: changes are permitted to the wrapped <see cref="IList"/>.
 	/// </summary>
-	public partial class ListTableSource : ITableSource {
+	public class ListTableSource : ITableSource {
 		/// <summary>
 		/// The list this source wraps.
 		/// </summary>

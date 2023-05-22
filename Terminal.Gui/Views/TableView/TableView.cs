@@ -26,7 +26,7 @@ namespace Terminal.Gui {
 	/// 
 	/// <a href="https://gui-cs.github.io/Terminal.Gui/articles/tableview.html">See TableView Deep Dive for more information</a>.
 	/// </summary>
-	public partial class TableView : View {
+	public class TableView : View {
 
 		private int columnOffset;
 		private int rowOffset;

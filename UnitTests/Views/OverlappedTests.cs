@@ -15,7 +15,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 #if DEBUG_IDISPOSABLE
 			Responder.Instances.Clear ();
-			Application.RunState.Instances.Clear ();
+			ApplicationRunState.Instances.Clear ();
 #endif
 		}
 

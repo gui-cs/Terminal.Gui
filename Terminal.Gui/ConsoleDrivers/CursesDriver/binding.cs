@@ -48,20 +48,6 @@ namespace Unix.Terminal {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 	public partial class Curses {
-		//[StructLayout (LayoutKind.Sequential)]
-		//public struct winsize {
-		//	public ushort ws_row;
-		//	public ushort ws_col;
-		//	public ushort ws_xpixel;   /* unused */
-		//	public ushort ws_ypixel;   /* unused */
-		//};
-
-		[StructLayout (LayoutKind.Sequential)]
-		public struct MouseEvent {
-			public short ID;
-			public int X, Y, Z;
-			public Event ButtonState;
-		}
 
 		static int lines, cols;
 		static CursesWindow main_window;
@@ -310,8 +296,8 @@ namespace Unix.Terminal {
 		static public int init_pair (short pair, short f, short b) => methods.init_pair (pair, f, b);
 		static public int use_default_colors () => methods.use_default_colors ();
 		static public int COLOR_PAIRS () => methods.COLOR_PAIRS ();
-		static public uint getmouse (out MouseEvent ev) => methods.getmouse (out ev);
-		static public uint ungetmouse (ref MouseEvent ev) => methods.ungetmouse (ref ev);
+		static public uint getmouse (out CursesMouseEvent ev) => methods.getmouse (out ev);
+		static public uint ungetmouse (ref CursesMouseEvent ev) => methods.ungetmouse (ref ev);
 		static public int mouseinterval (int interval) => methods.mouseinterval (interval);
 		static public bool is_term_resized (int lines, int columns) => methods.is_term_resized (lines, columns);
 		static public int resize_term (int lines, int columns) => methods.resize_term (lines, columns);
@@ -386,8 +372,8 @@ namespace Unix.Terminal {
 		public delegate int init_pair (short pair, short f, short b);
 		public delegate int use_default_colors ();
 		public delegate int COLOR_PAIRS ();
-		public delegate uint getmouse (out Curses.MouseEvent ev);
-		public delegate uint ungetmouse (ref Curses.MouseEvent ev);
+		public delegate uint getmouse (out CursesMouseEvent ev);
+		public delegate uint ungetmouse (ref CursesMouseEvent ev);
 		public delegate int mouseinterval (int interval);
 		public delegate IntPtr mousemask (IntPtr newmask, out IntPtr oldMask);
 		public delegate bool is_term_resized (int lines, int columns);

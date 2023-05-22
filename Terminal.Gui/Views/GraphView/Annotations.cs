@@ -213,7 +213,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Sequence of lines to connect points e.g. of a <see cref="ScatterSeries"/>
 	/// </summary>
-	public partial class PathAnnotation : IAnnotation {
+	public class PathAnnotation : IAnnotation {
 
 		/// <summary>
 		/// Points that should be connected.  Lines will be drawn between points in the order

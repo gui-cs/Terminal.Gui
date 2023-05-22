@@ -3,7 +3,7 @@ using static Terminal.Gui.Application;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// Event arguments for events about <see cref="RunState"/>
+	/// Event arguments for events about <see cref="ApplicationRunState"/>
 	/// </summary>
 	public class RunStateEventArgs : EventArgs {
 
@@ -11,7 +11,7 @@ namespace Terminal.Gui {
 		/// Creates a new instance of the <see cref="RunStateEventArgs"/> class
 		/// </summary>
 		/// <param name="state"></param>
-		public RunStateEventArgs (RunState state)
+		public RunStateEventArgs (ApplicationRunState state)
 		{
 			State = state;
 		}
@@ -19,6 +19,6 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The state being reported on by the event
 		/// </summary>
-		public RunState State { get; }
+		public ApplicationRunState State { get; }
 	}
 }

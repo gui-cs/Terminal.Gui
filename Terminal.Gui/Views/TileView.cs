@@ -9,7 +9,7 @@ namespace Terminal.Gui {
 	/// A <see cref="View"/> consisting of a moveable bar that divides
 	/// the display area into resizeable <see cref="Tiles"/>.
 	/// </summary>
-	public partial class TileView : View {
+	public class TileView : View {
 		TileView parentTileView;
 
 		/// <summary>

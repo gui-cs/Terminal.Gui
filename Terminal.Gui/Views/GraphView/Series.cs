@@ -142,7 +142,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Series of bars positioned at regular intervals
 	/// </summary>
-	public partial class BarSeries : ISeries {
+	public class BarSeries : ISeries {
 
 		/// <summary>
 		/// Ordered collection of graph bars to position along axis

@@ -15,7 +15,7 @@ namespace Terminal.Gui.ApplicationTests {
 		{
 #if DEBUG_IDISPOSABLE
 			Responder.Instances.Clear ();
-			Application.RunState.Instances.Clear ();
+			ApplicationRunState.Instances.Clear ();
 #endif
 		}
 
@@ -142,7 +142,7 @@ namespace Terminal.Gui.ApplicationTests {
 				Application.RequestStop ();
 			};
 
-			Application.RunState runstate = null;
+			ApplicationRunState runstate = null;
 			EventHandler<RunStateEventArgs> NewRunStateFn = (s, e) => {
 				Assert.NotNull (e.State);
 				runstate = e.State;
@@ -187,7 +187,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Toplevel topLevel = null;
 			Application.InternalInit (() => topLevel = new TestToplevel (), new FakeDriver ());
 
-			Application.RunState runstate = null;
+			ApplicationRunState runstate = null;
 			EventHandler<RunStateEventArgs> NewRunStateFn = (s, e) => {
 				Assert.NotNull (e.State);
 				runstate = e.State;
