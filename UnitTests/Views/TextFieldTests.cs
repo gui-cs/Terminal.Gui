@@ -25,6 +25,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			public override void Before (MethodInfo methodUnderTest)
 			{
+				FakeDriver.FakeBehaviors.UseFakeClipboard = true;
 				base.Before (methodUnderTest);
 
 				//                                                    1         2         3 
@@ -926,7 +927,7 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Fact]
-		[AutoInitShutdown]
+		[AutoInitShutdown(useFakeClipboard:true)]
 		public void KeyBindings_Command ()
 		{
 			var tf = new TextField ("This is a test.") { Width = 20 };

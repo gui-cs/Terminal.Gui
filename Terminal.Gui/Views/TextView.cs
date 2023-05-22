@@ -365,7 +365,7 @@ namespace Terminal.Gui {
 			for (int i = 0; i < _lines.Count; i++) {
 				var x = _lines [i];
 				var txt = GetText (x);
-				var matchText = !matchCase ? text.ToUpper ().ToString () : text.ToString ();
+				var matchText = !matchCase ? text.ToUpper () : text;
 				var col = txt.IndexOf (matchText);
 				while (col > -1) {
 					if (matchWholeWord && !MatchWholeWord (txt, matchText, col)) {
@@ -441,7 +441,7 @@ namespace Terminal.Gui {
 				if (!matchCase) {
 					txt = txt.ToUpper ();
 				}
-				var matchText = !matchCase ? text.ToUpper ().ToString () : text.ToString ();
+				var matchText = !matchCase ? text.ToUpper () : text;
 				var col = txt.IndexOf (matchText, Math.Min (start.X, txt.Length));
 				if (col > -1 && matchWholeWord && !MatchWholeWord (txt, matchText, col)) {
 					continue;
@@ -469,7 +469,7 @@ namespace Terminal.Gui {
 				if (start.Y != i) {
 					start.X = Math.Max (x.Count - 1, 0);
 				}
-				var matchText = !matchCase ? text.ToUpper ().ToString () : text.ToString ();
+				var matchText = !matchCase ? text.ToUpper (): text;
 				var col = txt.LastIndexOf (matchText, _toFind.found ? start.X - 1 : start.X);
 				if (col > -1 && matchWholeWord && !MatchWholeWord (txt, matchText, col)) {
 					continue;

@@ -154,10 +154,10 @@ namespace UICatalog.Scenarios {
 			void CreateAction (List<MenuItem> supportedCultures, MenuItem culture)
 			{
 				culture.Action += () => {
-					Thread.CurrentThread.CurrentUICulture = new CultureInfo (culture.Help.ToString ());
+					Thread.CurrentThread.CurrentUICulture = new CultureInfo (culture.Help);
 					culture.Checked = true;
 					foreach (var item in supportedCultures) {
-						item.Checked = item.Help.ToString () == Thread.CurrentThread.CurrentUICulture.Name;
+						item.Checked = item.Help == Thread.CurrentThread.CurrentUICulture.Name;
 					}
 				};
 			}

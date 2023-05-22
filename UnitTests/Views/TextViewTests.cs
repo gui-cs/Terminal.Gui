@@ -28,6 +28,7 @@ namespace Terminal.Gui.ViewsTests {
 			public static string txt = "TAB to jump between text fields.";
 			public override void Before (MethodInfo methodUnderTest)
 			{
+				FakeDriver.FakeBehaviors.UseFakeClipboard = true;
 				base.Before (methodUnderTest);
 
 				//                   1         2         3 
@@ -2526,7 +2527,7 @@ line.
 		}
 
 		[Fact]
-		[AutoInitShutdown]
+		[AutoInitShutdown (useFakeClipboard:true)]
 		public void KeyBindings_Command ()
 		{
 			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
@@ -4656,7 +4657,7 @@ line.
 		}
 
 		[Fact]
-		[AutoInitShutdown]
+		[AutoInitShutdown (useFakeClipboard:true)]
 		public void HistoryText_Undo_Redo_Copy_Without_Selection_Multi_Line_Paste ()
 		{
 			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
@@ -4690,7 +4691,7 @@ line.
 		}
 
 		[Fact]
-		[AutoInitShutdown]
+		[AutoInitShutdown (useFakeClipboard: true)]
 		public void HistoryText_Undo_Redo_Simple_Copy_Multi_Line_Selected_Paste ()
 		{
 			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
@@ -4727,7 +4728,7 @@ line.
 		}
 
 		[Fact]
-		[AutoInitShutdown]
+		[AutoInitShutdown (useFakeClipboard: true)]
 		public void HistoryText_Undo_Redo_Multi_Line_Selected_Copy_Simple_Paste_Starting_On_Space ()
 		{
 			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";

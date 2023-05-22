@@ -128,7 +128,7 @@ namespace Terminal.Gui {
 			if (this.MakingSuggestion ()) {
 
 				var insert = this.Suggestions.ElementAt (this.SelectedIdx);
-				var newText = textField.Text.ToString ();
+				var newText = textField.Text;
 				newText = newText.Substring (0, newText.Length - insert.Remove);
 				newText += insert.Replacement;
 				textField.Text = newText;

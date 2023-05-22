@@ -26,7 +26,7 @@ public class RunJsonConverterTests {
 		// Act
 		var json = JsonSerializer.Serialize (rune, ConfigurationManager._serializerOptions);
 		var deserialized = JsonSerializer.Deserialize<Rune> (json, ConfigurationManager._serializerOptions);
-		
+
 		// Assert
 		Assert.Equal (expected, deserialized.ToString ());
 	}
@@ -39,7 +39,8 @@ public class RunJsonConverterTests {
 	[InlineData ("🍎🍎")]
 	[InlineData ("U+FFF1F34E")]
 	[InlineData ("\\UFFF1F34E")]
-	[InlineData ("\\ud83d")] // not printable
+	[InlineData ("\\ud83d")] // not printable "high surrogate"
+	[InlineData ("\\udc3d")] // not printable "low surrogate"
 	[InlineData ("\\ud83d \\u1c69")]  // bad surrogate pair
 	[InlineData ("\\ud83ddc69")]
 	// Emoji - Family Unit:

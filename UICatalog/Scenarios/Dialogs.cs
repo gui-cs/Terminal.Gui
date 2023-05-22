@@ -160,11 +160,11 @@ namespace UICatalog.Scenarios {
 					Dialog dialog = null;
 
 					int width = 0;
-					int.TryParse (widthEdit.Text.ToString (), out width);
+					int.TryParse (widthEdit.Text, out width);
 					int height = 0;
-					int.TryParse (heightEdit.Text.ToString (), out height);
+					int.TryParse (heightEdit.Text, out height);
 					int numButtons = 3;
-					int.TryParse (numButtonsEdit.Text.ToString (), out numButtons);
+					int.TryParse (numButtonsEdit.Text, out numButtons);
 
 					var buttons = new List<Button> ();
 					var clicked = -1;

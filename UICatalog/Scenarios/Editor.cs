@@ -386,7 +386,7 @@ namespace UICatalog.Scenarios {
 			if (_fileName != null) {
 				// FIXED: BUGBUG: #279 TextView does not know how to deal with \r\n, only \r 
 				// As a result files saved on Windows and then read back will show invalid chars.
-				return SaveFile (Win.Title.ToString (), _fileName);
+				return SaveFile (Win.Title, _fileName);
 			} else {
 				return SaveAs ();
 			}
@@ -400,20 +400,20 @@ namespace UICatalog.Scenarios {
 			};
 			var sd = new SaveDialog ("Save file", aTypes);
 
-			sd.Path = System.IO.Path.Combine (sd.FileName.ToString (), Win.Title.ToString ());
+			sd.Path = System.IO.Path.Combine (sd.FileName, Win.Title);
 			Application.Run (sd);
 
 			if (!sd.Canceled) {
-				if (System.IO.File.Exists (sd.Path.ToString ())) {
+				if (System.IO.File.Exists (sd.Path)) {
 					if (MessageBox.Query ("Save File",
 						"File already exists. Overwrite any way?", "No", "Ok") == 1) {
-						return SaveFile (sd.FileName.ToString (), sd.Path.ToString ());
+						return SaveFile (sd.FileName, sd.Path);
 					} else {
 						_saved = false;
 						return _saved;
 					}
 				} else {
-					return SaveFile (sd.FileName.ToString (), sd.Path.ToString ());
+					return SaveFile (sd.FileName, sd.Path);
 				}
 			} else {
 				_saved = false;
@@ -426,7 +426,7 @@ namespace UICatalog.Scenarios {
 			try {
 				Win.Title = title;
 				_fileName = file;
-				System.IO.File.WriteAllText (_fileName, _textView.Text.ToString ());
+				System.IO.File.WriteAllText (_fileName, _textView.Text);
 				_originalText = Encoding.Unicode.GetBytes(_textView.Text);
 				_saved = true;
 				_textView.ClearHistoryChanges ();
@@ -509,10 +509,10 @@ namespace UICatalog.Scenarios {
 			void CreateAction (List<MenuItem> supportedCultures, MenuItem culture)
 			{
 				culture.Action += () => {
-					Thread.CurrentThread.CurrentUICulture = new CultureInfo (culture.Help.ToString ());
+					Thread.CurrentThread.CurrentUICulture = new CultureInfo (culture.Help);
 					culture.Checked = true;
 					foreach (var item in supportedCultures) {
-						item.Checked = item.Help.ToString () == Thread.CurrentThread.CurrentUICulture.Name;
+						item.Checked = item.Help == Thread.CurrentThread.CurrentUICulture.Name;
 					}
 				};
 			}
@@ -563,7 +563,7 @@ namespace UICatalog.Scenarios {
 					// setup autocomplete with all words currently in the editor
 					singleWordGenerator.AllSuggestions =
 
-					Regex.Matches (_textView.Text.ToString (), "\\w+")
+					Regex.Matches (_textView.Text, "\\w+")
 					.Select (s => s.Value)
 					.Distinct ().ToList ();
 				} else {
@@ -827,7 +827,7 @@ namespace UICatalog.Scenarios {
 			d.Add (btnFindPrevious);
 
 			txtToFind.TextChanged += (s, e) => {
-				_textToFind = txtToFind.Text.ToString ();
+				_textToFind = txtToFind.Text;
 				_textView.FindTextChanged ();
 				btnFindNext.Enabled = !string.IsNullOrEmpty(txtToFind.Text);
 				btnFindPrevious.Enabled = !string.IsNullOrEmpty(txtToFind.Text);
@@ -921,7 +921,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (label),
 				Width = 20
 			};
-			txtToReplace.TextChanged += (s, e) => _textToReplace = txtToReplace.Text.ToString ();
+			txtToReplace.TextChanged += (s, e) => _textToReplace = txtToReplace.Text;
 			d.Add (txtToReplace);
 
 			var btnFindPrevious = new Button ("Replace _Previous") {
@@ -947,7 +947,7 @@ namespace UICatalog.Scenarios {
 			d.Add (btnReplaceAll);
 
 			txtToFind.TextChanged += (s, e) => {
-				_textToFind = txtToFind.Text.ToString ();
+				_textToFind = txtToFind.Text;
 				_textView.FindTextChanged ();
 				btnFindNext.Enabled = !string.IsNullOrEmpty(txtToFind.Text);
 				btnFindPrevious.Enabled = !string.IsNullOrEmpty(txtToFind.Text);

@@ -160,23 +160,23 @@ namespace UICatalog.Scenarios {
 					switch (sender.ToString ()) {
 					case var s when s == _topEdit.ToString ():
 						Thickness = new Thickness (Thickness.Left,
-							int.Parse (e.NewText.ToString ()), Thickness.Right,
+							int.Parse (e.NewText), Thickness.Right,
 							Thickness.Bottom);
 						break;
 					case var s when s == _leftEdit.ToString ():
-						Thickness = new Thickness (int.Parse (e.NewText.ToString ()),
+						Thickness = new Thickness (int.Parse (e.NewText),
 							Thickness.Top, Thickness.Right,
 							Thickness.Bottom);
 						break;
 					case var s when s == _rightEdit.ToString ():
 						Thickness = new Thickness (Thickness.Left,
-							Thickness.Top, int.Parse (e.NewText.ToString ()),
+							Thickness.Top, int.Parse (e.NewText),
 							Thickness.Bottom);
 						break;
 					case var s when s == _bottomEdit.ToString ():
 						Thickness = new Thickness (Thickness.Left,
 							Thickness.Top, Thickness.Right,
-							int.Parse (e.NewText.ToString ()));
+							int.Parse (e.NewText));
 						break;
 					}
 				} catch {

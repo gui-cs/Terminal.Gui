@@ -99,9 +99,9 @@ namespace UICatalog.Scenarios {
 			showWizardButton.Clicked += (s, e) => {
 				try {
 					int width = 0;
-					int.TryParse (widthEdit.Text.ToString (), out width);
+					int.TryParse (widthEdit.Text, out width);
 					int height = 0;
-					int.TryParse (heightEdit.Text.ToString (), out height);
+					int.TryParse (heightEdit.Text, out height);
 
 					if (width < 1 || height < 1) {
 						MessageBox.ErrorQuery ("Nope", "Height and width must be greater than 0 (much bigger)", "Ok");

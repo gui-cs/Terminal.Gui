@@ -30,37 +30,41 @@ namespace Terminal.Gui;
 public static class Clipboard {
 	static string _contents = string.Empty;
 
-	/// <summary>
-	/// Gets (copies from) or sets (pastes to) the _contents of the OS clipboard.
-	/// </summary>
-	public static string Contents {
-		get {
-			try {
-				if (IsSupported) {
-					return _contents = Application.Driver.Clipboard.GetClipboardData ();
-				} else {
-					return _contents;
+		/// <summary>
+		/// Gets (copies from) or sets (pastes to) the contents of the OS clipboard.
+		/// </summary>
+		public static string Contents {
+			get {
+				try {
+					if (IsSupported) {
+						var clipData = Application.Driver.Clipboard.GetClipboardData ();
+						if (clipData == null) {
+							// throw new InvalidOperationException ($"{Application.Driver.GetType ().Name}.GetClipboardData returned null instead of string.Empty");
+							clipData = string.Empty;
+						}
+						_contents = clipData;
+					}
+				} catch (Exception) {
+					_contents = string.Empty;
 				}
-			} catch (Exception) {
 				return _contents;
 			}
-		}
-		set {
-			try {
-				if (IsSupported) {
-					if (value == null) {
-						value = string.Empty;
+			set {
+				try {
+					if (IsSupported) {
+						if (value == null) {
+							value = string.Empty;
+						}
+						Application.Driver.Clipboard.SetClipboardData (value);
 					}
-					Application.Driver.Clipboard.SetClipboardData (value);
+					_contents = value;
+				} catch (NotSupportedException e) {
+					throw e;
+				} catch (Exception) {
+					_contents = value;
 				}
-				_contents = value;
-			} catch (NotSupportedException e) {
-				throw e;
-			} catch (Exception) {
-				_contents = value;
 			}
 		}
-	}
 
 	/// <summary>
 	/// Returns true if the environmental dependencies are in place to interact with the OS clipboard.
