@@ -213,9 +213,9 @@ namespace Terminal.Gui {
 		/// so that all lines connect up with the appropriate intersection symbols. 
 		/// </summary>
 		/// <returns>A map of all the points within the canvas.</returns>
-		public Dictionary<Point, LineCanvasCell> GetCellMap ()
+		public Dictionary<Point, Cell> GetCellMap ()
 		{
-			var map = new Dictionary<Point, LineCanvasCell> ();
+			var map = new Dictionary<Point, Cell> ();
 
 			// walk through each pixel of the bitmap
 			for (int y = Bounds.Y; y < Bounds.Y + Bounds.Height; y++) {
@@ -528,13 +528,13 @@ namespace Terminal.Gui {
 
 		}
 
-		private LineCanvasCell GetCellForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
+		private Cell GetCellForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
 		{
 			if (!intersects.Any ()) {
 				return null;
 			}
 
-			var cell = new LineCanvasCell ();
+			var cell = new Cell ();
 			cell.Rune = GetRuneForIntersects (driver, intersects);
 			cell.Attribute = GetAttributeForIntersects (intersects);
 			return cell;

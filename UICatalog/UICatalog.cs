@@ -839,10 +839,10 @@ namespace UICatalog {
 			// Validate there are no outstanding Application.RunState-based instances 
 			// after a scenario was selected to run. This proves the main UI Catalog
 			// 'app' closed cleanly.
-			foreach (var inst in ApplicationRunState.Instances) {
+			foreach (var inst in RunState.Instances) {
 				Debug.Assert (inst.WasDisposed);
 			}
-			ApplicationRunState.Instances.Clear ();
+			RunState.Instances.Clear ();
 #endif
 		}
 
