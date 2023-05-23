@@ -852,8 +852,8 @@ internal class NetDriver : ConsoleDriver {
 		var redrawAttr = -1;
 		var lastCol = -1;
 
-		GetCursorVisibility (out CursorVisibility savedVisibitity);
-		SetCursorVisibility (CursorVisibility.Invisible); 
+		//GetCursorVisibility (out CursorVisibility savedVisibitity);
+		//SetCursorVisibility (CursorVisibility.Invisible); 
 		
 		for (var row = top; row < rows; row++) {
 			if (Console.WindowHeight < 1) {
@@ -911,7 +911,7 @@ internal class NetDriver : ConsoleDriver {
 			}
 		}
 		SetCursorPosition (0, 0);
-		SetCursorVisibility (savedVisibitity);
+		//SetCursorVisibility (savedVisibitity);
 	}
 
 	// TODO: Move this to EscSeqUtils in such a way that it remains platform agnostic.
