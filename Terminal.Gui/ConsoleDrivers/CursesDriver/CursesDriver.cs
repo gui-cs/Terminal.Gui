@@ -846,24 +846,13 @@ internal class CursesDriver : ConsoleDriver {
 
 	public override bool GetColors (int value, out Color foreground, out Color background)
 	{
-		bool hasColor = false;
-		foreground = default;
-		background = default;
-		int back = -1;
-		IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-			.OfType<ConsoleColor> ()
-			.Select (s => (int)s);
-		if (values.Contains ((value >> 12) & 0xffff)) {
-			hasColor = true;
-			back = (value >> 12) & 0xffff;
-			background = MapCursesColor (back);
-		}
-		if (values.Contains ((value - (back << 12)) >> 8)) {
-			hasColor = true;
-			foreground = MapCursesColor ((value - (back << 12)) >> 8);
-		}
-		return hasColor;
+		// Assume a 4-bit encoded value for both foreground and background colors.
+		foreground = MapCursesColor ((value >> 4) & 0xF);
+		background = MapCursesColor (value & 0xF);
+
+		return true;
 	}
+
 }
 
 internal static class Platform {

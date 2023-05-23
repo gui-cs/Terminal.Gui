@@ -683,21 +683,6 @@ internal class NetDriver : ConsoleDriver {
 		Console.Out.Close ();
 	}
 
-	public override Attribute MakeColor (Color foreground, Color background)
-	{
-		return MakeColor ((ConsoleColor)foreground, (ConsoleColor)background);
-	}
-
-	static Attribute MakeColor (ConsoleColor f, ConsoleColor b)
-	{
-		// Encode the colors into the int value.
-		return new Attribute (
-			value: ((((int)f) & 0xffff) << 16) | (((int)b) & 0xffff),
-			foreground: (Color)f,
-			background: (Color)b
-			);
-	}
-
 	public override void Init (Action terminalResized)
 	{
 		var p = Environment.OSVersion.Platform;
@@ -893,7 +878,8 @@ internal class NetDriver : ConsoleDriver {
 					var attr = Contents [row, col, 1];
 					if (attr != redrawAttr) {
 						redrawAttr = attr;
-						output.Append (GetCsiForAttribute (attr));
+						GetColors (attr, out var fgColor, out var bgColor);
+						output.Append (EscSeqUtils.CSI_SetGraphicsRendition (MapColors ((ConsoleColor)bgColor, false), MapColors ((ConsoleColor)fgColor, true)));
 					}
 					outputWidth++;
 					var rune = (Rune)Contents [row, col, 0];
@@ -914,48 +900,72 @@ internal class NetDriver : ConsoleDriver {
 		//SetCursorVisibility (savedVisibitity);
 	}
 
-	// TODO: Move this to EscSeqUtils in such a way that it remains platform agnostic.
-	// Also, this code is inefficient (multiple calls to Contains).
-	string GetCsiForAttribute (int attr)
-	{
-		int bg = 0;
-		int fg = 0;
 
-		IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-			  .OfType<ConsoleColor> ()
-			  .Select (s => (int)s);
-		if (values.Contains (attr & 0xffff)) {
-			bg = MapColors ((ConsoleColor)(attr & 0xffff), false);
-		}
-		if (values.Contains ((attr >> 16) & 0xffff)) {
-			fg = MapColors ((ConsoleColor)((attr >> 16) & 0xffff));
-		}
-		return EscSeqUtils.CSI_SetGraphicsRendition (bg, fg);
-	}
+	#region Color Handling
 
+	// Cache the list of ConsoleColor values.
+	private static HashSet<int> ConsoleColorValues = new HashSet<int> (
+		Enum.GetValues (typeof (ConsoleColor)).OfType<ConsoleColor> ().Select (c => (int)c)
+	);
+
+	// Dictionary for mapping ConsoleColor values to the values used by System.Net.Console.
+	private static Dictionary<ConsoleColor, int> colorMap = new Dictionary<ConsoleColor, int> {
+		{ ConsoleColor.Black, COLOR_BLACK },
+		{ ConsoleColor.DarkBlue, COLOR_BLUE },
+		{ ConsoleColor.DarkGreen, COLOR_GREEN },
+		{ ConsoleColor.DarkCyan, COLOR_CYAN },
+		{ ConsoleColor.DarkRed, COLOR_RED },
+		{ ConsoleColor.DarkMagenta, COLOR_MAGENTA },
+		{ ConsoleColor.DarkYellow, COLOR_YELLOW },
+		{ ConsoleColor.Gray, COLOR_WHITE },
+		{ ConsoleColor.DarkGray, COLOR_BRIGHT_BLACK },
+		{ ConsoleColor.Blue, COLOR_BRIGHT_BLUE },
+		{ ConsoleColor.Green, COLOR_BRIGHT_GREEN },
+		{ ConsoleColor.Cyan, COLOR_BRIGHT_CYAN },
+		{ ConsoleColor.Red, COLOR_BRIGHT_RED },
+		{ ConsoleColor.Magenta, COLOR_BRIGHT_MAGENTA },
+		{ ConsoleColor.Yellow, COLOR_BRIGHT_YELLOW },
+		{ ConsoleColor.White, COLOR_BRIGHT_WHITE }
+	};
+
+	// Map a ConsoleColor to a platform dependent value.
 	int MapColors (ConsoleColor color, bool isForeground = true)
 	{
-		return color switch {
-			ConsoleColor.Black => isForeground ? COLOR_BLACK : COLOR_BLACK + 10,
-			ConsoleColor.DarkBlue => isForeground ? COLOR_BLUE : COLOR_BLUE + 10,
-			ConsoleColor.DarkGreen => isForeground ? COLOR_GREEN : COLOR_GREEN + 10,
-			ConsoleColor.DarkCyan => isForeground ? COLOR_CYAN : COLOR_CYAN + 10,
-			ConsoleColor.DarkRed => isForeground ? COLOR_RED : COLOR_RED + 10,
-			ConsoleColor.DarkMagenta => isForeground ? COLOR_MAGENTA : COLOR_MAGENTA + 10,
-			ConsoleColor.DarkYellow => isForeground ? COLOR_YELLOW : COLOR_YELLOW + 10,
-			ConsoleColor.Gray => isForeground ? COLOR_WHITE : COLOR_WHITE + 10,
-			ConsoleColor.DarkGray => isForeground ? COLOR_BRIGHT_BLACK : COLOR_BRIGHT_BLACK + 10,
-			ConsoleColor.Blue => isForeground ? COLOR_BRIGHT_BLUE : COLOR_BRIGHT_BLUE + 10,
-			ConsoleColor.Green => isForeground ? COLOR_BRIGHT_GREEN : COLOR_BRIGHT_GREEN + 10,
-			ConsoleColor.Cyan => isForeground ? COLOR_BRIGHT_CYAN : COLOR_BRIGHT_CYAN + 10,
-			ConsoleColor.Red => isForeground ? COLOR_BRIGHT_RED : COLOR_BRIGHT_RED + 10,
-			ConsoleColor.Magenta => isForeground ? COLOR_BRIGHT_MAGENTA : COLOR_BRIGHT_MAGENTA + 10,
-			ConsoleColor.Yellow => isForeground ? COLOR_BRIGHT_YELLOW : COLOR_BRIGHT_YELLOW + 10,
-			ConsoleColor.White => isForeground ? COLOR_BRIGHT_WHITE : COLOR_BRIGHT_WHITE + 10,
-			var _ => 0
-		};
+		return colorMap.TryGetValue (color, out var colorValue) ? colorValue + (isForeground ? 0 : 10) : 0;
 	}
 
+	/// <summary>
+	/// In the NetDriver, colors are encoded as an int. 
+	/// Extracts the foreground and background colors from the encoded value.
+	/// Assumes a 4-bit encoded value for both foreground and background colors.
+	/// </summary>
+	public override bool GetColors (int value, out Color foreground, out Color background)
+	{
+		// Assume a 4-bit encoded value for both foreground and background colors.
+		foreground = (Color)((value >> 16) & 0xF);
+		background = (Color)(value & 0xF);
+
+		return true;
+	}
+
+	/// <summary>
+	/// In the NetDriver, colors are encoded as an int. 
+	/// However, the foreground color is stored in the most significant 16 bits, 
+	/// and the background color is stored in the least significant 16 bits.
+	/// </summary>
+	public override Attribute MakeColor (Color foreground, Color background)
+	{
+		// Encode the colors into the int value.
+		return new Attribute (
+			value: ((((int)foreground) & 0xffff) << 16) | (((int)background) & 0xffff),
+			foreground: foreground,
+			background: background
+		);
+	}
+
+	#endregion
+
+	#region Cursor Handling
 	bool SetCursorPosition (int col, int row)
 	{
 		if (IsWinPlatform) {
@@ -971,43 +981,6 @@ internal class NetDriver : ConsoleDriver {
 			Console.Out.Write (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
 			return true;
 		}
-	}
-
-	private void SetWindowPosition (int col, int row)
-	{
-		if (IsWinPlatform && EnableConsoleScrolling) {
-			var winTop = Math.Max (Rows - Console.WindowHeight - row, 0);
-			winTop = Math.Min (winTop, Rows - Console.WindowHeight + 1);
-			winTop = Math.Max (winTop, 0);
-			if (winTop != Console.WindowTop) {
-				try {
-					if (!EnsureBufferSize ()) {
-						return;
-					}
-#pragma warning disable CA1416
-					Console.SetWindowPosition (col, winTop);
-#pragma warning restore CA1416
-				} catch (System.IO.IOException) {
-
-				} catch (System.ArgumentOutOfRangeException) { }
-			}
-		}
-		Top = Console.WindowTop;
-		Left = Console.WindowLeft;
-	}
-
-	private bool EnsureBufferSize ()
-	{
-#pragma warning disable CA1416
-		if (IsWinPlatform && Console.BufferHeight < Rows) {
-			try {
-				Console.SetBufferSize (Console.WindowWidth, Rows);
-			} catch (Exception) {
-				return false;
-			}
-		}
-#pragma warning restore CA1416
-		return true;
 	}
 
 	CursorVisibility? _cachedCursorVisibility;
@@ -1048,6 +1021,48 @@ internal class NetDriver : ConsoleDriver {
 		SetCursorVisibility (_cachedCursorVisibility ?? CursorVisibility.Default);
 		return _cachedCursorVisibility == CursorVisibility.Default;
 	}
+	#endregion
+
+	#region Size and Position Handling
+	
+	void SetWindowPosition (int col, int row)
+	{
+		if (IsWinPlatform && EnableConsoleScrolling) {
+			var winTop = Math.Max (Rows - Console.WindowHeight - row, 0);
+			winTop = Math.Min (winTop, Rows - Console.WindowHeight + 1);
+			winTop = Math.Max (winTop, 0);
+			if (winTop != Console.WindowTop) {
+				try {
+					if (!EnsureBufferSize ()) {
+						return;
+					}
+#pragma warning disable CA1416
+					Console.SetWindowPosition (col, winTop);
+#pragma warning restore CA1416
+				} catch (System.IO.IOException) {
+
+				} catch (System.ArgumentOutOfRangeException) { }
+			}
+		}
+		Top = Console.WindowTop;
+		Left = Console.WindowLeft;
+	}
+
+	private bool EnsureBufferSize ()
+	{
+#pragma warning disable CA1416
+		if (IsWinPlatform && Console.BufferHeight < Rows) {
+			try {
+				Console.SetBufferSize (Console.WindowWidth, Rows);
+			} catch (Exception) {
+				return false;
+			}
+		}
+#pragma warning restore CA1416
+		return true;
+	}
+	#endregion
+
 
 	public void StartReportingMouseMoves ()
 	{
@@ -1058,13 +1073,6 @@ internal class NetDriver : ConsoleDriver {
 	{
 		Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
 	}
-
-	#region Not Implemented
-	public override void Suspend ()
-	{
-		throw new NotImplementedException ();
-	}
-	#endregion
 
 	ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
 	{
@@ -1376,7 +1384,6 @@ internal class NetDriver : ConsoleDriver {
 		};
 	}
 
-
 	public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
 	{
 		NetEvents.InputResult input = new NetEvents.InputResult {
@@ -1389,24 +1396,14 @@ internal class NetDriver : ConsoleDriver {
 		} catch (OverflowException) { }
 	}
 
-	public override bool GetColors (int value, out Color foreground, out Color background)
+
+	#region Not Implemented
+	public override void Suspend ()
 	{
-		var hasColor = false;
-		foreground = default;
-		background = default;
-		IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-			  .OfType<ConsoleColor> ()
-			  .Select (s => (int)s);
-		if (values.Contains (value & 0xffff)) {
-			hasColor = true;
-			background = (Color)(ConsoleColor)(value & 0xffff);
-		}
-		if (values.Contains ((value >> 16) & 0xffff)) {
-			hasColor = true;
-			foreground = (Color)(ConsoleColor)((value >> 16) & 0xffff);
-		}
-		return hasColor;
+		throw new NotImplementedException ();
 	}
+	#endregion
+
 }
 
 /// <summary>

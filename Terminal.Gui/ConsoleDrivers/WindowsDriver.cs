@@ -1504,21 +1504,11 @@ internal class WindowsDriver : ConsoleDriver {
 
 	public override bool GetColors (int value, out Color foreground, out Color background)
 	{
-		bool hasColor = false;
-		foreground = default;
-		background = default;
-		IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-			.OfType<ConsoleColor> ()
-			.Select (s => (int)s);
-		if (values.Contains ((value >> 4) & 0xffff)) {
-			hasColor = true;
-			background = (Color)(ConsoleColor)((value >> 4) & 0xffff);
-		}
-		if (values.Contains (value - ((int)background << 4))) {
-			hasColor = true;
-			foreground = (Color)(ConsoleColor)(value - ((int)background << 4));
-		}
-		return hasColor;
+		// Assume a 4-bit encoded value for both foreground and background colors.
+		foreground = (Color)((value >> 16) & 0xF);
+		background = (Color)(value & 0xF);
+
+		return true;
 	}
 
 
