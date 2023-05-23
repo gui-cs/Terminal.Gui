@@ -9,7 +9,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Control that hosts multiple sub views, presenting a single one at once
 	/// </summary>
-	public partial class TabView : View {
+	public class TabView : View {
 		private Tab selectedTab;
 
 		/// <summary>
@@ -54,7 +54,7 @@ namespace Terminal.Gui {
 		public event EventHandler<TabChangedEventArgs> SelectedTabChanged;
 
 		/// <summary>
-		/// Event fired when a <see cref="TabView.Tab"/> is clicked.  Can be used to cancel navigation,
+		/// Event fired when a <see cref="Tab"/> is clicked.  Can be used to cancel navigation,
 		/// show context menu (e.g. on right click) etc.
 		/// </summary>
 		public event EventHandler<TabMouseEventArgs> TabClicked;
@@ -425,8 +425,6 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 		}
 
-		#region Nested Types
-
 		private class TabToRender {
 			public int X { get; set; }
 			public Tab Tab { get; set; }
@@ -745,71 +743,5 @@ namespace Terminal.Gui {
 		{
 			TabClicked?.Invoke (this, tabMouseEventArgs);
 		}
-
-		/// <summary>
-		/// A single tab in a <see cref="TabView"/>
-		/// </summary>
-		public class Tab {
-			private string text;
-
-			/// <summary>
-			/// The text to display in a <see cref="TabView"/>
-			/// </summary>
-			/// <value></value>
-			public string Text { get => text ?? "Unamed"; set => text = value; }
-
-			/// <summary>
-			/// The control to display when the tab is selected
-			/// </summary>
-			/// <value></value>
-			public View View { get; set; }
-
-			/// <summary>
-			/// Creates a new unamed tab with no controls inside
-			/// </summary>
-			public Tab ()
-			{
-
-			}
-
-			/// <summary>
-			/// Creates a new tab with the given text hosting a view
-			/// </summary>
-			/// <param name="text"></param>
-			/// <param name="view"></param>
-			public Tab (string text, View view)
-			{
-				this.Text = text;
-				this.View = view;
-			}
-		}
-
-		/// <summary>
-		/// Describes render stylistic selections of a <see cref="TabView"/>
-		/// </summary>
-		public class TabStyle {
-
-			/// <summary>
-			/// True to show the top lip of tabs.  False to directly begin with tab text during 
-			/// rendering.  When true header line occupies 3 rows, when false only 2.
-			/// Defaults to true.
-			/// 
-			/// <para>When <see cref="TabsOnBottom"/> is enabled this instead applies to the
-			///  bottommost line of the control</para>
-			/// </summary> 
-			public bool ShowTopLine { get; set; } = true;
-
-			/// <summary>
-			/// True to show a solid box around the edge of the control.  Defaults to true.
-			/// </summary>
-			public bool ShowBorder { get; set; } = true;
-
-			/// <summary>
-			/// True to render tabs at the bottom of the view instead of the top
-			/// </summary>
-			public bool TabsOnBottom { get; set; } = false;
-
-		}
-		#endregion
 	}
 }

@@ -5,6 +5,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
     <DebugType>portable</DebugType>
+	<WarningsAsErrors>CS1574<!--,CA1034--></WarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup>
     <!-- Version numbers are automatically updated by gitversion when a release is released -->

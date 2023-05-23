@@ -71,118 +71,6 @@ public static partial class ConfigurationManager {
 	};
 
 	/// <summary>
-	/// An attribute that can be applied to a property to indicate that it should included in the configuration file.
-	/// </summary>
-	/// <example>
-	/// 	[SerializableConfigurationProperty(Scope = typeof(Configuration.ThemeManager.ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
-	///	public static LineStyle DefaultBorderStyle {
-	///	...
-	/// </example>
-	[AttributeUsage (AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
-	public class SerializableConfigurationProperty : System.Attribute {
-		/// <summary>
-		/// Specifies the scope of the property. 
-		/// </summary>
-		public Type? Scope { get; set; }
-
-		/// <summary>
-		/// If <see langword="true"/>, the property will be serialized to the configuration file using only the property name
-		/// as the key. If <see langword="false"/>, the property will be serialized to the configuration file using the
-		/// property name pre-pended with the classname (e.g. <c>Application.UseSystemConsole</c>).
-		/// </summary>
-		public bool OmitClassName { get; set; }
-	}
-
-	/// <summary>
-	/// Holds a property's value and the <see cref="PropertyInfo"/> that allows <see cref="ConfigurationManager"/> 
-	/// to get and set the property's value.
-	/// </summary>
-	/// <remarks>
-	/// Configuration properties must be <see langword="public"/> and <see langword="static"/> 
-	/// and have the <see cref="SerializableConfigurationProperty"/>
-	/// attribute. If the type of the property requires specialized JSON serialization, 
-	/// a <see cref="JsonConverter"/> must be provided using 
-	/// the <see cref="JsonConverterAttribute"/> attribute.
-	/// </remarks>
-	public class ConfigProperty {
-		private object? propertyValue;
-
-		/// <summary>
-		/// Describes the property.
-		/// </summary>
-		public PropertyInfo? PropertyInfo { get; set; }
-
-		/// <summary>
-		/// Helper to get either the Json property named (specified by [JsonPropertyName(name)]
-		/// or the actual property name.
-		/// </summary>
-		/// <param name="pi"></param>
-		/// <returns></returns>
-		public static string GetJsonPropertyName (PropertyInfo pi)
-		{
-			var jpna = pi.GetCustomAttribute (typeof (JsonPropertyNameAttribute)) as JsonPropertyNameAttribute;
-			return jpna?.Name ?? pi.Name;
-		}
-
-		/// <summary>
-		/// Holds the property's value as it was either read from the class's implementation or from a config file. 
-		/// If the property has not been set (e.g. because no configuration file specified a value), 
-		/// this will be <see langword="null"/>.
-		/// </summary>
-		/// <remarks>
-		/// On <see langword="set"/>, performs a sparse-copy of the new value to the existing value (only copies elements of 
-		/// the object that are non-null).
-		/// </remarks>
-		public object? PropertyValue {
-			get => propertyValue;
-			set {
-				propertyValue = value;
-			}
-		}
-
-		internal object? UpdateValueFrom (object source)
-		{
-			if (source == null) {
-				return PropertyValue;
-			}
-
-			var ut = Nullable.GetUnderlyingType (PropertyInfo!.PropertyType);
-			if (source.GetType () != PropertyInfo!.PropertyType && (ut != null && source.GetType () != ut)) {
-				throw new ArgumentException ($"The source object ({PropertyInfo!.DeclaringType}.{PropertyInfo!.Name}) is not of type {PropertyInfo!.PropertyType}.");
-			}
-			if (PropertyValue != null && source != null) {
-				PropertyValue = DeepMemberwiseCopy (source, PropertyValue);
-			} else {
-				PropertyValue = source;
-			}
-
-			return PropertyValue;
-		}
-
-		/// <summary>
-		/// Retrieves (using reflection) the value of the static property described in <see cref="PropertyInfo"/>
-		/// into <see cref="PropertyValue"/>.
-		/// </summary>
-		/// <returns></returns>
-		public object? RetrieveValue ()
-		{
-			return PropertyValue = PropertyInfo!.GetValue (null);
-		}
-
-		/// <summary>
-		/// Applies the <see cref="PropertyValue"/> to the property described by <see cref="PropertyInfo"/>.
-		/// </summary>
-		/// <returns></returns>
-		public bool Apply ()
-		{
-			if (PropertyValue != null) {
-				PropertyInfo?.SetValue (null, DeepMemberwiseCopy (PropertyValue, PropertyInfo?.GetValue (null)));
-			}
-			return PropertyValue != null;
-		}
-	}
-
-	/// <summary>
 	/// A dictionary of all properties in the Terminal.Gui project that are decorated with the <see cref="SerializableConfigurationProperty"/> attribute.
 	/// The keys are the property names pre-pended with the class that implements the property (e.g. <c>Application.UseSystemConsole</c>).
 	/// The values are instances of <see cref="ConfigProperty"/> which hold the property's value and the
@@ -191,7 +79,7 @@ public static partial class ConfigurationManager {
 	/// <remarks>
 	/// Is <see langword="null"/> until <see cref="Initialize"/> is called. 
 	/// </remarks>
-	private static Dictionary<string, ConfigProperty>? _allConfigProperties;
+	internal static Dictionary<string, ConfigProperty>? _allConfigProperties;
 
 	/// <summary>
 	/// The backing property for <see cref="Settings"/>. 
@@ -320,7 +208,7 @@ public static partial class ConfigurationManager {
 
 	internal static StringBuilder jsonErrors = new StringBuilder ();
 
-	private static void AddJsonError (string error)
+	internal static void AddJsonError (string error)
 	{
 		Debug.WriteLine ($"ConfigurationManager: {error}");
 		jsonErrors.AppendLine (error);
