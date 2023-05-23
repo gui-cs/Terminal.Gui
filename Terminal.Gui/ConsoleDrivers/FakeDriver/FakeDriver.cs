@@ -3,6 +3,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -12,16 +13,31 @@ using System.Text;
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui {
-
 	/// <summary>
 	/// Implements a mock ConsoleDriver for unit testing
 	/// </summary>
 	public class FakeDriver : ConsoleDriver {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
-		
+		public class Behaviors {
 
-		public static FakeDriverBehaviors FakeBehaviors = new FakeDriverBehaviors ();
+			public bool UseFakeClipboard { get; internal set; }
+			public bool FakeClipboardAlwaysThrowsNotSupportedException { get; internal set; }
+			public bool FakeClipboardIsSupportedAlwaysFalse { get; internal set; }
+
+			public Behaviors (bool useFakeClipboard = false, bool fakeClipboardAlwaysThrowsNotSupportedException = false, bool fakeClipboardIsSupportedAlwaysTrue = false)
+			{
+				UseFakeClipboard = useFakeClipboard;
+				FakeClipboardAlwaysThrowsNotSupportedException = fakeClipboardAlwaysThrowsNotSupportedException;
+				FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
+
+				// double check usage is correct
+				Debug.Assert (useFakeClipboard == false && fakeClipboardAlwaysThrowsNotSupportedException == false);
+				Debug.Assert (useFakeClipboard == false && fakeClipboardIsSupportedAlwaysTrue == false);
+			}
+		}
+
+		public static FakeDriver.Behaviors FakeBehaviors = new Behaviors ();
 
 		int cols, rows, left, top;
 		public override int Cols => cols;
@@ -670,7 +686,41 @@ namespace Terminal.Gui {
 		{
 		}
 
-#endregion
+		#endregion
+
+		public class FakeClipboard : ClipboardBase {
+			public Exception FakeException = null;
+
+			string contents = string.Empty;
+
+			bool isSupportedAlwaysFalse = false;
+
+			public override bool IsSupported => !isSupportedAlwaysFalse;
+
+			public FakeClipboard (bool fakeClipboardThrowsNotSupportedException = false, bool isSupportedAlwaysFalse = false)
+			{
+				this.isSupportedAlwaysFalse = isSupportedAlwaysFalse;
+				if (fakeClipboardThrowsNotSupportedException) {
+					FakeException = new NotSupportedException ("Fake clipboard exception");
+				}
+			}
+
+			protected override string GetClipboardDataImpl ()
+			{
+				if (FakeException != null) {
+					throw FakeException;
+				}
+				return contents;
+			}
+
+			protected override void SetClipboardDataImpl (string text)
+			{
+				if (FakeException != null) {
+					throw FakeException;
+				}
+				contents = text;
+			}
+		}
 
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 	}

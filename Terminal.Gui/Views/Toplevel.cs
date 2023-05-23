@@ -75,23 +75,23 @@ namespace Terminal.Gui {
 		public event EventHandler AllChildClosed;
 
 		/// <summary>
-		/// Invoked when the Toplevel's <see cref="Application.ApplicationRunState"/> is being closed by  
+		/// Invoked when the Toplevel's <see cref="ApplicationRunState"/> is being closed by  
 		/// <see cref="Application.RequestStop(Toplevel)"/>.
 		/// </summary>
 		public event EventHandler<ToplevelClosingEventArgs> Closing;
 
 		/// <summary>
-		/// Invoked when the Toplevel's <see cref="Application.ApplicationRunState"/> is closed by <see cref="Application.End(Application.ApplicationRunState)"/>.
+		/// Invoked when the Toplevel's <see cref="ApplicationRunState"/> is closed by <see cref="Application.End(ApplicationRunState)"/>.
 		/// </summary>
 		public event EventHandler<ToplevelEventArgs> Closed;
 
 		/// <summary>
-		/// Invoked when a child Toplevel's <see cref="Application.ApplicationRunState"/> has been loaded.
+		/// Invoked when a child Toplevel's <see cref="ApplicationRunState"/> has been loaded.
 		/// </summary>
 		public event EventHandler<ToplevelEventArgs> ChildLoaded;
 
 		/// <summary>
-		/// Invoked when a cjhild Toplevel's <see cref="Application.ApplicationRunState"/> has been unloaded.
+		/// Invoked when a cjhild Toplevel's <see cref="ApplicationRunState"/> has been unloaded.
 		/// </summary>
 		public event EventHandler<ToplevelEventArgs> ChildUnloaded;
 
@@ -174,7 +174,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Called from <see cref="Application.End(Application.ApplicationRunState)"/> before the <see cref="Toplevel"/> is disposed.
+		/// Called from <see cref="Application.End(ApplicationRunState)"/> before the <see cref="Toplevel"/> is disposed.
 		/// </summary>
 		internal virtual void OnUnloaded ()
 		{

@@ -909,7 +909,8 @@ namespace Terminal.Gui {
 			int redrawAttr = -1;
 			var lastCol = -1;
 
-			Console.CursorVisible = false;
+			GetCursorVisibility (out CursorVisibility savedVisibitity);
+			SetCursorVisibility (CursorVisibility.Invisible);
 
 			for (int row = top; row < rows; row++) {
 				if (Console.WindowHeight < 1) {
@@ -967,6 +968,7 @@ namespace Terminal.Gui {
 				}
 			}
 			SetCursorPosition (0, 0);
+			SetCursorVisibility (savedVisibitity);
 		}
 
 		void SetVirtualCursorPosition (int col, int row)
@@ -1444,7 +1446,13 @@ namespace Terminal.Gui {
 		public override bool SetCursorVisibility (CursorVisibility visibility)
 		{
 			savedCursorVisibility = visibility;
-			return Console.CursorVisible = visibility == CursorVisibility.Default;
+			var isVisible = Console.CursorVisible = visibility == CursorVisibility.Default;
+			if (isVisible) {
+				Console.Out.Write ("\x1b[?25h");
+			} else {
+				Console.Out.Write ("\x1b[?25l");
+			}
+			return isVisible;
 		}
 
 		/// <inheritdoc/>
