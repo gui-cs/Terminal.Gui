@@ -186,7 +186,7 @@ namespace UICatalog.Scenarios {
 		{
 			Close (focusedTabView, focusedTabView.SelectedTab);
 		}
-		private void Close (TabView tv, TabView.Tab tabToClose)
+		private void Close (TabView tv, Tab tabToClose)
 		{
 			var tab = tabToClose as OpenedFile;
 
@@ -285,7 +285,7 @@ namespace UICatalog.Scenarios {
 		{
 			Save (focusedTabView, focusedTabView.SelectedTab);
 		}
-		public void Save (TabView tabViewToSave, TabView.Tab tabToSave)
+		public void Save (TabView tabViewToSave, Tab tabToSave)
 		{
 			var tab = tabToSave as OpenedFile;
 
@@ -327,7 +327,7 @@ namespace UICatalog.Scenarios {
 			return true;
 		}
 
-		private class OpenedFile : TabView.Tab {
+		private class OpenedFile : Tab {
 			public FileInfo File { get; set; }
 
 			/// <summary>
