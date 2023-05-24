@@ -300,7 +300,7 @@ public abstract class ConsoleDriver {
 	/// <param name="foreground">The foreground.</param>
 	/// <param name="background">The background.</param>
 	/// <returns></returns>
-	public abstract bool GetColors (int value, out Color foreground, out Color background);
+	internal abstract void GetColors (int value, out Color foreground, out Color background);
 
 	/// <summary>
 	/// Gets the current <see cref="Attribute"/>.

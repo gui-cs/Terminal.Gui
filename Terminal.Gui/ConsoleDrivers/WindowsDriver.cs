@@ -1624,12 +1624,11 @@ internal class WindowsDriver : ConsoleDriver {
 	/// Extracts the foreground and background colors from the encoded value.
 	/// Assumes a 4-bit encoded value for both foreground and background colors.
 	/// </summary>
-	public override bool GetColors (int value, out Color foreground, out Color background)
+	internal override void GetColors (int value, out Color foreground, out Color background)
 	{
 		// Assume a 4-bit encoded value for both foreground and background colors.
 		foreground = (Color)((value >> 16) & 0xF);
 		background = (Color)(value & 0xF);
-		return true;
 	}
 
 	#endregion

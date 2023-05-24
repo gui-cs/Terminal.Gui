@@ -291,13 +291,11 @@ internal class CursesDriver : ConsoleDriver {
 	/// and the background color is stored in the least significant 4 bits.
 	/// The Terminal.GUI Color values are converted to curses color encoding before being encoded.
 	/// </remarks>
-	public override bool GetColors (int value, out Color foreground, out Color background)
+	internal override void GetColors (int value, out Color foreground, out Color background)
 	{
 		// Assume a 4-bit encoded value for both foreground and background colors.
 		foreground = CursesColorNumberToColor ((short)((value >> 4) & 0xF));
 		background = CursesColorNumberToColor ((short)(value & 0xF));
-
-		return true;
 	}
 
 	#endregion

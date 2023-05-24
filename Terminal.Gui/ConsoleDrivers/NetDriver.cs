@@ -834,7 +834,7 @@ internal class NetDriver : ConsoleDriver {
 		var rows = Rows;
 		var cols = Cols;
 		System.Text.StringBuilder output = new System.Text.StringBuilder ();
-		var redrawAttr = -1;
+		Attribute redrawAttr = -1;
 		var lastCol = -1;
 
 		//GetCursorVisibility (out CursorVisibility savedVisibitity);
@@ -875,12 +875,11 @@ internal class NetDriver : ConsoleDriver {
 						lastCol = col;
 					}
 
-					var attr = Contents [row, col, 1];
+					Attribute attr = Contents [row, col, 1];
 					// Performance: Only send the escape sequence if the attribute has changed.
 					if (attr != redrawAttr) {
 						redrawAttr = attr;
-						GetColors (attr, out var fgColor, out var bgColor);
-						output.Append (EscSeqUtils.CSI_SetGraphicsRendition (MapColors ((ConsoleColor)bgColor, false), MapColors ((ConsoleColor)fgColor, true)));
+						output.Append (EscSeqUtils.CSI_SetGraphicsRendition (MapColors ((ConsoleColor)attr.Background, false), MapColors ((ConsoleColor)attr.Foreground, true)));
 					}
 					outputWidth++;
 					var rune = (Rune)Contents [row, col, 0];
@@ -939,13 +938,11 @@ internal class NetDriver : ConsoleDriver {
 	/// Extracts the foreground and background colors from the encoded value.
 	/// Assumes a 4-bit encoded value for both foreground and background colors.
 	/// </remarks>
-	public override bool GetColors (int value, out Color foreground, out Color background)
+	internal override void GetColors (int value, out Color foreground, out Color background)
 	{
 		// Assume a 4-bit encoded value for both foreground and background colors.
 		foreground = (Color)((value >> 16) & 0xF);
 		background = (Color)(value & 0xF);
-
-		return true;
 	}
 
 	/// <remarks>
