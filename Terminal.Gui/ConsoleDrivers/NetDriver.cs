@@ -901,11 +901,10 @@ internal class NetDriver : ConsoleDriver {
 		//SetCursorVisibility (savedVisibitity);
 	}
 
-
 	#region Color Handling
 
 	// Cache the list of ConsoleColor values.
-	private static HashSet<int> ConsoleColorValues = new HashSet<int> (
+	private static readonly HashSet<int> ConsoleColorValues = new HashSet<int> (
 		Enum.GetValues (typeof (ConsoleColor)).OfType<ConsoleColor> ().Select (c => (int)c)
 	);
 

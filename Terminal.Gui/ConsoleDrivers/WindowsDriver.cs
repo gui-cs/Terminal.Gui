@@ -1487,31 +1487,6 @@ internal class WindowsDriver : ConsoleDriver {
 
 	}
 
-	public override Attribute MakeColor (Color foreground, Color background)
-	{
-		return MakeColor ((ConsoleColor)foreground, (ConsoleColor)background);
-	}
-
-	Attribute MakeColor (ConsoleColor f, ConsoleColor b)
-	{
-		// Encode the colors into the int value.
-		return new Attribute (
-			value: ((int)f | (int)b << 4),
-			foreground: (Color)f,
-			background: (Color)b
-		);
-	}
-
-	public override bool GetColors (int value, out Color foreground, out Color background)
-	{
-		// Assume a 4-bit encoded value for both foreground and background colors.
-		foreground = (Color)((value >> 16) & 0xF);
-		background = (Color)(value & 0xF);
-
-		return true;
-	}
-
-
 	public override void Init (Action terminalResized)
 	{
 		TerminalResized = terminalResized;
@@ -1627,6 +1602,40 @@ internal class WindowsDriver : ConsoleDriver {
 		WinConsole.SetInitialCursorVisibility ();
 		UpdateCursor ();
 	}
+
+	#region Color Handling
+
+	/// <summary>
+	/// In the WindowsDriver, colors are encoded as an int. 
+	/// The background color is stored in the least significant 4 bits, 
+	/// and the foreground color is stored in the next 4 bits. 
+	/// </summary>
+	public override Attribute MakeColor (Color foreground, Color background)
+	{
+		// Encode the colors into the int value.
+		return new Attribute (
+			value: (((int)foreground) | ((int)background << 4)),
+			foreground: foreground,
+			background: background
+		);
+	}
+
+	/// <summary>
+	/// Extracts the foreground and background colors from the encoded value.
+	/// Assumes a 4-bit encoded value for both foreground and background colors.
+	/// </summary>
+	public override bool GetColors (int value, out Color foreground, out Color background)
+	{
+		// Assume a 4-bit encoded value for both foreground and background colors.
+		foreground = (Color)((value >> 16) & 0xF);
+		background = (Color)(value & 0xF);
+
+		//foreground = (Color)(value & 0xF);
+		//background = (Color)((value >> 4) & 0xF);
+		return true;
+	}
+
+	#endregion
 
 	CursorVisibility savedCursorVisibility;
 

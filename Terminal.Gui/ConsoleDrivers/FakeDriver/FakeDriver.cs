@@ -13,6 +13,7 @@ using System.Text;
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 using Unix.Terminal;
+using static Terminal.Gui.WindowsConsole;
 
 namespace Terminal.Gui;
 /// <summary>
@@ -198,47 +199,53 @@ public class FakeDriver : ConsoleDriver {
 		UpdateCursor ();
 	}
 
+	#region Color Handling
 
-	public override Attribute MakeColor (Color foreground, Color background)
-	{
-		return new Attribute (
-			value: ((((int)foreground) & 0xffff) << 16) | (((int)background) & 0xffff),
-			foreground: (Color)foreground,
-			background: (Color)background
-		);
-	}
+	// Cache the list of ConsoleColor values.
+	private static readonly HashSet<int> ConsoleColorValues = new HashSet<int> (
+		Enum.GetValues (typeof (ConsoleColor)).OfType<ConsoleColor> ().Select (c => (int)c)
+	);
 
 	void SetColor (int color)
 	{
-		IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-			.OfType<ConsoleColor> ()
-			.Select (s => (int)s);
-		if (values.Contains (color & 0xffff)) {
+		if (ConsoleColorValues.Contains (color & 0xffff)) {
 			FakeConsole.BackgroundColor = (ConsoleColor)(color & 0xffff);
 		}
-		if (values.Contains ((color >> 16) & 0xffff)) {
+		if (ConsoleColorValues.Contains ((color >> 16) & 0xffff)) {
 			FakeConsole.ForegroundColor = (ConsoleColor)((color >> 16) & 0xffff);
 		}
 	}
 
+	/// <remarks>
+	/// In the FakeDriver, colors are encoded as an int; same as NetDriver
+	/// Extracts the foreground and background colors from the encoded value.
+	/// Assumes a 4-bit encoded value for both foreground and background colors.
+	/// </remarks>
 	public override bool GetColors (int value, out Color foreground, out Color background)
 	{
-		bool hasColor = false;
-		foreground = default;
-		background = default;
-		IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-			.OfType<ConsoleColor> ()
-			.Select (s => (int)s);
-		if (values.Contains (value & 0xffff)) {
-			hasColor = true;
-			background = (Color)(ConsoleColor)(value & 0xffff);
-		}
-		if (values.Contains ((value >> 16) & 0xffff)) {
-			hasColor = true;
-			foreground = (Color)(ConsoleColor)((value >> 16) & 0xffff);
-		}
-		return hasColor;
+		// Assume a 4-bit encoded value for both foreground and background colors.
+		foreground = (Color)((value >> 16) & 0xF);
+		background = (Color)(value & 0xF);
+
+		return true;
 	}
+
+	/// <remarks>
+	/// In the FakeDriver, colors are encoded as an int; same as NetDriver
+	/// However, the foreground color is stored in the most significant 16 bits, 
+	/// and the background color is stored in the least significant 16 bits.
+	/// </remarks>
+	public override Attribute MakeColor (Color foreground, Color background)
+	{
+		// Encode the colors into the int value.
+		return new Attribute (
+			value: ((((int)foreground) & 0xffff) << 16) | (((int)background) & 0xffff),
+			foreground: foreground,
+			background: background
+		);
+	}
+
+	#endregion
 
 	public ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
 	{
