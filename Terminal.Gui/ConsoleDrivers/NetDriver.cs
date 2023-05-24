@@ -876,6 +876,7 @@ internal class NetDriver : ConsoleDriver {
 					}
 
 					var attr = Contents [row, col, 1];
+					// Performance: Only send the escape sequence if the attribute has changed.
 					if (attr != redrawAttr) {
 						redrawAttr = attr;
 						GetColors (attr, out var fgColor, out var bgColor);
@@ -934,11 +935,11 @@ internal class NetDriver : ConsoleDriver {
 		return colorMap.TryGetValue (color, out var colorValue) ? colorValue + (isForeground ? 0 : 10) : 0;
 	}
 
-	/// <summary>
+	/// <remarks>
 	/// In the NetDriver, colors are encoded as an int. 
 	/// Extracts the foreground and background colors from the encoded value.
 	/// Assumes a 4-bit encoded value for both foreground and background colors.
-	/// </summary>
+	/// </remarks>
 	public override bool GetColors (int value, out Color foreground, out Color background)
 	{
 		// Assume a 4-bit encoded value for both foreground and background colors.
@@ -948,11 +949,11 @@ internal class NetDriver : ConsoleDriver {
 		return true;
 	}
 
-	/// <summary>
+	/// <remarks>
 	/// In the NetDriver, colors are encoded as an int. 
 	/// However, the foreground color is stored in the most significant 16 bits, 
 	/// and the background color is stored in the least significant 16 bits.
-	/// </summary>
+	/// </remarks>
 	public override Attribute MakeColor (Color foreground, Color background)
 	{
 		// Encode the colors into the int value.

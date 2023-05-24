@@ -30,6 +30,8 @@ namespace Terminal.Gui.ViewsTests {
 			}
 
 			var tv = new TabView ();
+			tv.BeginInit ();
+			tv.EndInit ();
 			tv.ColorScheme = new ColorScheme ();
 			tv.AddTab (tab1 = new Tab ("Tab1", new TextField ("hi")), false);
 			tv.AddTab (tab2 = new Tab ("Tab2", new Label ("hi2")), false);

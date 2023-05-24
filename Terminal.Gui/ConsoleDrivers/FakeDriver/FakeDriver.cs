@@ -44,24 +44,6 @@ public class FakeDriver : ConsoleDriver {
 	// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
 	bool [] _dirtyLine;
 
-	//void UpdateOffscreen ()
-	//{
-	//	int cols = Cols;
-	//	int rows = Rows;
-
-	//	contents = new int [rows, cols, 3];
-	//	for (int r = 0; r < rows; r++) {
-	//		for (int c = 0; c < cols; c++) {
-	//			contents [r, c, 0] = ' ';
-	//			contents [r, c, 1] = MakeColor (ConsoleColor.Gray, ConsoleColor.Black);
-	//			contents [r, c, 2] = 0;
-	//		}
-	//	}
-	//	dirtyLine = new bool [rows];
-	//	for (int row = 0; row < rows; row++)
-	//		dirtyLine [row] = true;
-	//}
-
 	public FakeDriver ()
 	{
 		if (FakeBehaviors.UseFakeClipboard) {
@@ -141,14 +123,6 @@ public class FakeDriver : ConsoleDriver {
 		FakeConsole.Clear ();
 	}
 
-	public override Attribute MakeColor (Color foreground, Color background)
-	{
-		return new Attribute (
-			value: ((((int)foreground) & 0xffff) << 16) | (((int)background) & 0xffff),
-			foreground: (Color)foreground,
-			background: (Color)background
-		);
-	}
 
 	public override void Init (Action terminalResized)
 	{
@@ -166,20 +140,6 @@ public class FakeDriver : ConsoleDriver {
 		UpdateOffScreen ();
 	}
 
-	int _redrawColor = -1;
-	void SetColor (int color)
-	{
-		_redrawColor = color;
-		IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-			.OfType<ConsoleColor> ()
-			.Select (s => (int)s);
-		if (values.Contains (color & 0xffff)) {
-			FakeConsole.BackgroundColor = (ConsoleColor)(color & 0xffff);
-		}
-		if (values.Contains ((color >> 16) & 0xffff)) {
-			FakeConsole.ForegroundColor = (ConsoleColor)((color >> 16) & 0xffff);
-		}
-	}
 
 	public override void UpdateScreen ()
 	{
@@ -206,9 +166,9 @@ public class FakeDriver : ConsoleDriver {
 					}
 
 					var color = Contents [row, col, 1];
-					if (color != _redrawColor) {
-						SetColor (color);
-					}
+					// NOTE: In real drivers setting the color can be a performance hit, so we only do it when needed.
+					// in fakedriver we don't care about perf.
+					SetColor (color);
 
 					var rune = (Rune)Contents [row, col, 0];
 					if (rune.Utf16SequenceLength == 1) {
@@ -236,6 +196,48 @@ public class FakeDriver : ConsoleDriver {
 	{
 		UpdateScreen ();
 		UpdateCursor ();
+	}
+
+
+	public override Attribute MakeColor (Color foreground, Color background)
+	{
+		return new Attribute (
+			value: ((((int)foreground) & 0xffff) << 16) | (((int)background) & 0xffff),
+			foreground: (Color)foreground,
+			background: (Color)background
+		);
+	}
+
+	void SetColor (int color)
+	{
+		IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
+			.OfType<ConsoleColor> ()
+			.Select (s => (int)s);
+		if (values.Contains (color & 0xffff)) {
+			FakeConsole.BackgroundColor = (ConsoleColor)(color & 0xffff);
+		}
+		if (values.Contains ((color >> 16) & 0xffff)) {
+			FakeConsole.ForegroundColor = (ConsoleColor)((color >> 16) & 0xffff);
+		}
+	}
+
+	public override bool GetColors (int value, out Color foreground, out Color background)
+	{
+		bool hasColor = false;
+		foreground = default;
+		background = default;
+		IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
+			.OfType<ConsoleColor> ()
+			.Select (s => (int)s);
+		if (values.Contains (value & 0xffff)) {
+			hasColor = true;
+			background = (Color)(ConsoleColor)(value & 0xffff);
+		}
+		if (values.Contains ((value >> 16) & 0xffff)) {
+			hasColor = true;
+			foreground = (Color)(ConsoleColor)((value >> 16) & 0xffff);
+		}
+		return hasColor;
 	}
 
 	public ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
@@ -554,25 +556,6 @@ public class FakeDriver : ConsoleDriver {
 			}
 		} catch (IndexOutOfRangeException) { }
 		Clip = new Rect (0, 0, Cols, Rows);
-	}
-
-	public override bool GetColors (int value, out Color foreground, out Color background)
-	{
-		bool hasColor = false;
-		foreground = default;
-		background = default;
-		IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-			.OfType<ConsoleColor> ()
-			.Select (s => (int)s);
-		if (values.Contains (value & 0xffff)) {
-			hasColor = true;
-			background = (Color)(ConsoleColor)(value & 0xffff);
-		}
-		if (values.Contains ((value >> 16) & 0xffff)) {
-			hasColor = true;
-			foreground = (Color)(ConsoleColor)((value >> 16) & 0xffff);
-		}
-		return hasColor;
 	}
 
 	public override void UpdateCursor ()
