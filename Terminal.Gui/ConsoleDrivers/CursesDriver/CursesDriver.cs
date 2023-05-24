@@ -192,8 +192,8 @@ internal class CursesDriver : ConsoleDriver {
 		Curses.InitColorPair (v, foreground, background);
 		return new Attribute (
 			value: Curses.ColorPair (v),
-			foreground: MapCursesColor (foreground),
-			background: MapCursesColor (background));
+			foreground: CursesColorNumberToColor (foreground),
+			background: CursesColorNumberToColor (background));
 	}
 
 	/// <remarks>
@@ -204,7 +204,7 @@ internal class CursesDriver : ConsoleDriver {
 	/// </remarks>
 	public override Attribute MakeColor (Color fore, Color back)
 	{
-		return MakeColor ((short)(ColorToCursesColorNumber (fore) & 0xffff), (short)ColorToCursesColorNumber (back));
+		return MakeColor (ColorToCursesColorNumber (fore), ColorToCursesColorNumber (back));
 	}
 
 	static short ColorToCursesColorNumber (Color color)
@@ -247,7 +247,7 @@ internal class CursesDriver : ConsoleDriver {
 		throw new ArgumentException ("Invalid color code");
 	}
 
-	static Color MapCursesColor (int color)
+	static Color CursesColorNumberToColor (short color)
 	{
 		switch (color) {
 		case Curses.COLOR_BLACK:
@@ -295,8 +295,8 @@ internal class CursesDriver : ConsoleDriver {
 	public override bool GetColors (int value, out Color foreground, out Color background)
 	{
 		// Assume a 4-bit encoded value for both foreground and background colors.
-		foreground = MapCursesColor ((value >> 4) & 0xF);
-		background = MapCursesColor (value & 0xF);
+		foreground = CursesColorNumberToColor ((short)((value >> 4) & 0xF));
+		background = CursesColorNumberToColor ((short)(value & 0xF));
 
 		return true;
 	}
