@@ -188,11 +188,10 @@ namespace Terminal.Gui {
 		public Color Background { get; }
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Attribute"/> struct with only the value passed to
-		///   and trying to get the colors if defined.
+		/// Initializes a new instance with a platform-specific color value.
 		/// </summary>
 		/// <param name="value">Value.</param>
-		public Attribute (int value)
+		internal Attribute (int value)
 		{
 			Color foreground = default;
 			Color background = default;

@@ -879,7 +879,8 @@ internal class NetDriver : ConsoleDriver {
 					// Performance: Only send the escape sequence if the attribute has changed.
 					if (attr != redrawAttr) {
 						redrawAttr = attr;
-						output.Append (EscSeqUtils.CSI_SetGraphicsRendition (MapColors ((ConsoleColor)attr.Background, false), MapColors ((ConsoleColor)attr.Foreground, true)));
+						output.Append (EscSeqUtils.CSI_SetGraphicsRendition (
+							MapColors ((ConsoleColor)attr.Background, false), MapColors ((ConsoleColor)attr.Foreground, true)));
 					}
 					outputWidth++;
 					var rune = (Rune)Contents [row, col, 0];
