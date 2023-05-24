@@ -227,7 +227,6 @@ internal class CursesDriver : ConsoleDriver {
 		case Color.Gray:
 			return Curses.COLOR_WHITE;
 		case Color.DarkGray:
-			//return Curses.COLOR_BLACK | Curses.A_BOLD;
 			return Curses.COLOR_GRAY;
 		case Color.BrightBlue:
 			return Curses.COLOR_BLUE | Curses.COLOR_GRAY;
