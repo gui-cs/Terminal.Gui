@@ -1629,9 +1629,6 @@ internal class WindowsDriver : ConsoleDriver {
 		// Assume a 4-bit encoded value for both foreground and background colors.
 		foreground = (Color)((value >> 16) & 0xF);
 		background = (Color)(value & 0xF);
-
-		//foreground = (Color)(value & 0xF);
-		//background = (Color)((value >> 4) & 0xF);
 		return true;
 	}
 
