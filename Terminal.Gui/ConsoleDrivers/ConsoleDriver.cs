@@ -248,6 +248,8 @@ public abstract class ConsoleDriver {
 	/// </summary>
 	public abstract void UpdateScreen ();
 
+	#region Color Handling
+	
 	Attribute _currentAttribute;
 
 	/// <summary>
@@ -325,6 +327,9 @@ public abstract class ConsoleDriver {
 			s.Value.Initialize ();
 		}
 	}
+
+	#endregion
+
 	/// <summary>
 	/// Enables diagnostic functions
 	/// </summary>

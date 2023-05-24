@@ -177,6 +177,132 @@ internal class CursesDriver : ConsoleDriver {
 		}
 	}
 
+	#region Color Handling
+
+	/// <summary>
+	/// Creates an Attribute from the provided curses-based foreground and background color numbers
+	/// </summary>
+	/// <param name="foreground">Contains the curses color number for the foreground (color, plus any attributes)</param>
+	/// <param name="background">Contains the curses color number for the background (color, plus any attributes)</param>
+	/// <returns></returns>
+	static Attribute MakeColor (short foreground, short background)
+	{
+		var v = (short)((int)foreground | background << 4);
+		// TODO: for TrueColor - Use InitExtendedPair
+		Curses.InitColorPair (v, foreground, background);
+		return new Attribute (
+			value: Curses.ColorPair (v),
+			foreground: MapCursesColor (foreground),
+			background: MapCursesColor (background));
+	}
+
+	/// <remarks>
+	/// In the CursesDriver, colors are encoded as an int. 
+	/// The foreground color is stored in the most significant 4 bits, 
+	/// and the background color is stored in the least significant 4 bits.
+	/// The Terminal.GUi Color values are converted to curses color encoding before being encoded.
+	/// </remarks>
+	public override Attribute MakeColor (Color fore, Color back)
+	{
+		return MakeColor ((short)(ColorToCursesColorNumber (fore) & 0xffff), (short)ColorToCursesColorNumber (back));
+	}
+
+	static int ColorToCursesColorNumber (Color color)
+	{
+		switch (color) {
+		case Color.Black:
+			return Curses.COLOR_BLACK;
+		case Color.Blue:
+			return Curses.COLOR_BLUE;
+		case Color.Green:
+			return Curses.COLOR_GREEN;
+		case Color.Cyan:
+			return Curses.COLOR_CYAN;
+		case Color.Red:
+			return Curses.COLOR_RED;
+		case Color.Magenta:
+			return Curses.COLOR_MAGENTA;
+		case Color.Brown:
+			return Curses.COLOR_YELLOW;
+		case Color.Gray:
+			return Curses.COLOR_WHITE;
+		case Color.DarkGray:
+			//return Curses.COLOR_BLACK | Curses.A_BOLD;
+			return Curses.COLOR_GRAY;
+		case Color.BrightBlue:
+			return Curses.COLOR_BLUE | Curses.A_BOLD | Curses.COLOR_GRAY;
+		case Color.BrightGreen:
+			return Curses.COLOR_GREEN | Curses.A_BOLD | Curses.COLOR_GRAY;
+		case Color.BrightCyan:
+			return Curses.COLOR_CYAN | Curses.A_BOLD | Curses.COLOR_GRAY;
+		case Color.BrightRed:
+			return Curses.COLOR_RED | Curses.A_BOLD | Curses.COLOR_GRAY;
+		case Color.BrightMagenta:
+			return Curses.COLOR_MAGENTA | Curses.A_BOLD | Curses.COLOR_GRAY;
+		case Color.BrightYellow:
+			return Curses.COLOR_YELLOW | Curses.A_BOLD | Curses.COLOR_GRAY;
+		case Color.White:
+			return Curses.COLOR_WHITE | Curses.A_BOLD | Curses.COLOR_GRAY;
+		}
+		throw new ArgumentException ("Invalid color code");
+	}
+
+	static Color MapCursesColor (int color)
+	{
+		switch (color) {
+		case Curses.COLOR_BLACK:
+			return Color.Black;
+		case Curses.COLOR_BLUE:
+			return Color.Blue;
+		case Curses.COLOR_GREEN:
+			return Color.Green;
+		case Curses.COLOR_CYAN:
+			return Color.Cyan;
+		case Curses.COLOR_RED:
+			return Color.Red;
+		case Curses.COLOR_MAGENTA:
+			return Color.Magenta;
+		case Curses.COLOR_YELLOW:
+			return Color.Brown;
+		case Curses.COLOR_WHITE:
+			return Color.Gray;
+		case Curses.COLOR_GRAY:
+			return Color.DarkGray;
+		case Curses.COLOR_BLUE | Curses.COLOR_GRAY:
+			return Color.BrightBlue;
+		case Curses.COLOR_GREEN | Curses.COLOR_GRAY:
+			return Color.BrightGreen;
+		case Curses.COLOR_CYAN | Curses.COLOR_GRAY:
+			return Color.BrightCyan;
+		case Curses.COLOR_RED | Curses.COLOR_GRAY:
+			return Color.BrightRed;
+		case Curses.COLOR_MAGENTA | Curses.COLOR_GRAY:
+			return Color.BrightMagenta;
+		case Curses.COLOR_YELLOW | Curses.COLOR_GRAY:
+			return Color.BrightYellow;
+		case Curses.COLOR_WHITE | Curses.COLOR_GRAY:
+			return Color.White;
+		}
+		throw new ArgumentException ("Invalid curses color code");
+	}
+
+	/// <remarks>
+	/// In the CursesDriver, colors are encoded as an int. 
+	/// The foreground color is stored in the most significant 4 bits, 
+	/// and the background color is stored in the least significant 4 bits.
+	/// The Terminal.GUI Color values are converted to curses color encoding before being encoded.
+	/// </remarks>
+	public override bool GetColors (int value, out Color foreground, out Color background)
+	{
+		// Assume a 4-bit encoded value for both foreground and background colors.
+		foreground = MapCursesColor ((value >> 4) & 0xF);
+		background = MapCursesColor (value & 0xF);
+
+		return true;
+	}
+
+	#endregion
+
 	public override void UpdateCursor () => Refresh ();
 
 	public override void End ()
@@ -190,31 +316,6 @@ internal class CursesDriver : ConsoleDriver {
 	public override void UpdateScreen () => _window.redrawwin ();
 
 	public Curses.Window _window;
-
-	/// <summary>
-	/// Creates a curses color from the provided foreground and background colors
-	/// </summary>
-	/// <param name="foreground">Contains the curses attributes for the foreground (color, plus any attributes)</param>
-	/// <param name="background">Contains the curses attributes for the background (color, plus any attributes)</param>
-	/// <returns></returns>
-	static Attribute MakeColor (short foreground, short background)
-	{
-		var v = (short)((int)foreground | background << 4);
-		//Curses.InitColorPair (++last_color_pair, foreground, background);
-		Curses.InitColorPair (v, foreground, background);
-		return new Attribute (
-			//value: Curses.ColorPair (last_color_pair),
-			value: Curses.ColorPair (v),
-			//foreground: (Color)foreground,
-			foreground: MapCursesColor (foreground),
-			//background: (Color)background);
-			background: MapCursesColor (background));
-	}
-
-	public override Attribute MakeColor (Color fore, Color back)
-	{
-		return MakeColor ((short)MapColor (fore), (short)MapColor (back));
-	}
 
 	static Key MapCursesKey (int cursesKey)
 	{
@@ -592,35 +693,6 @@ internal class CursesDriver : ConsoleDriver {
 			InitializeColorSchemes ();
 		} else {
 			throw new InvalidOperationException ("V2 - This should never happen. File an Issue if it does.");
-			//InitializeColorSchemes (false);
-
-			//// BUGBUG: This is a hack to make the colors work on the Mac?
-			//// The new Theme support overwrites these colors, so this is not needed?
-			//Colors.TopLevel.Normal = Curses.COLOR_GREEN;
-			//Colors.TopLevel.Focus = Curses.COLOR_WHITE;
-			//Colors.TopLevel.HotNormal = Curses.COLOR_YELLOW;
-			//Colors.TopLevel.HotFocus = Curses.COLOR_YELLOW;
-			//Colors.TopLevel.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
-			//Colors.Base.Normal = Curses.A_NORMAL;
-			//Colors.Base.Focus = Curses.A_REVERSE;
-			//Colors.Base.HotNormal = Curses.A_BOLD;
-			//Colors.Base.HotFocus = Curses.A_BOLD | Curses.A_REVERSE;
-			//Colors.Base.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
-			//Colors.Menu.Normal = Curses.A_REVERSE;
-			//Colors.Menu.Focus = Curses.A_NORMAL;
-			//Colors.Menu.HotNormal = Curses.A_BOLD;
-			//Colors.Menu.HotFocus = Curses.A_NORMAL;
-			//Colors.Menu.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
-			//Colors.Dialog.Normal = Curses.A_REVERSE;
-			//Colors.Dialog.Focus = Curses.A_NORMAL;
-			//Colors.Dialog.HotNormal = Curses.A_BOLD;
-			//Colors.Dialog.HotFocus = Curses.A_NORMAL;
-			//Colors.Dialog.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
-			//Colors.Error.Normal = Curses.A_BOLD;
-			//Colors.Error.Focus = Curses.A_BOLD | Curses.A_REVERSE;
-			//Colors.Error.HotNormal = Curses.A_BOLD | Curses.A_REVERSE;
-			//Colors.Error.HotFocus = Curses.A_REVERSE;
-			//Colors.Error.Disabled = Curses.A_BOLD | Curses.COLOR_GRAY;
 		}
 
 		ResizeScreen ();
@@ -658,90 +730,6 @@ internal class CursesDriver : ConsoleDriver {
 			return true;
 		}
 		return false;
-	}
-
-	static int MapColor (Color color)
-	{
-		switch (color) {
-		case Color.Black:
-			return Curses.COLOR_BLACK;
-		case Color.Blue:
-			return Curses.COLOR_BLUE;
-		case Color.Green:
-			return Curses.COLOR_GREEN;
-		case Color.Cyan:
-			return Curses.COLOR_CYAN;
-		case Color.Red:
-			return Curses.COLOR_RED;
-		case Color.Magenta:
-			return Curses.COLOR_MAGENTA;
-		case Color.Brown:
-			return Curses.COLOR_YELLOW;
-		case Color.Gray:
-			return Curses.COLOR_WHITE;
-		case Color.DarkGray:
-			//return Curses.COLOR_BLACK | Curses.A_BOLD;
-			return Curses.COLOR_GRAY;
-		case Color.BrightBlue:
-			return Curses.COLOR_BLUE | Curses.A_BOLD | Curses.COLOR_GRAY;
-		case Color.BrightGreen:
-			return Curses.COLOR_GREEN | Curses.A_BOLD | Curses.COLOR_GRAY;
-		case Color.BrightCyan:
-			return Curses.COLOR_CYAN | Curses.A_BOLD | Curses.COLOR_GRAY;
-		case Color.BrightRed:
-			return Curses.COLOR_RED | Curses.A_BOLD | Curses.COLOR_GRAY;
-		case Color.BrightMagenta:
-			return Curses.COLOR_MAGENTA | Curses.A_BOLD | Curses.COLOR_GRAY;
-		case Color.BrightYellow:
-			return Curses.COLOR_YELLOW | Curses.A_BOLD | Curses.COLOR_GRAY;
-		case Color.White:
-			return Curses.COLOR_WHITE | Curses.A_BOLD | Curses.COLOR_GRAY;
-		}
-		throw new ArgumentException ("Invalid color code");
-	}
-
-	static Color MapCursesColor (int color)
-	{
-		switch (color) {
-		case Curses.COLOR_BLACK:
-			return Color.Black;
-		case Curses.COLOR_BLUE:
-			return Color.Blue;
-		case Curses.COLOR_GREEN:
-			return Color.Green;
-		case Curses.COLOR_CYAN:
-			return Color.Cyan;
-		case Curses.COLOR_RED:
-			return Color.Red;
-		case Curses.COLOR_MAGENTA:
-			return Color.Magenta;
-		case Curses.COLOR_YELLOW:
-			return Color.Brown;
-		case Curses.COLOR_WHITE:
-			return Color.Gray;
-		case Curses.COLOR_GRAY:
-			return Color.DarkGray;
-		case Curses.COLOR_BLUE | Curses.COLOR_GRAY:
-			return Color.BrightBlue;
-		case Curses.COLOR_GREEN | Curses.COLOR_GRAY:
-			return Color.BrightGreen;
-		case Curses.COLOR_CYAN | Curses.COLOR_GRAY:
-			return Color.BrightCyan;
-		case Curses.COLOR_RED | Curses.COLOR_GRAY:
-			return Color.BrightRed;
-		case Curses.COLOR_MAGENTA | Curses.COLOR_GRAY:
-			return Color.BrightMagenta;
-		case Curses.COLOR_YELLOW | Curses.COLOR_GRAY:
-			return Color.BrightYellow;
-		case Curses.COLOR_WHITE | Curses.COLOR_GRAY:
-			return Color.White;
-		}
-		throw new ArgumentException ("Invalid curses color code");
-	}
-
-	public override Attribute MakeAttribute (Color fore, Color back)
-	{
-		return MakeColor ((short)(MapColor (fore) & 0xffff), (short)MapColor (back));
 	}
 
 	public override void Suspend ()
@@ -844,14 +832,6 @@ internal class CursesDriver : ConsoleDriver {
 		_keyUpHandler (new KeyEvent (key, km));
 	}
 
-	public override bool GetColors (int value, out Color foreground, out Color background)
-	{
-		// Assume a 4-bit encoded value for both foreground and background colors.
-		foreground = MapCursesColor ((value >> 4) & 0xF);
-		background = MapCursesColor (value & 0xF);
-
-		return true;
-	}
 
 }
 
