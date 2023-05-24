@@ -267,12 +267,12 @@ partial class TestHelpers {
 
 			for (var c = 0; c < line.Length; c++) {
 
-				var val = contents [r, c, 1];
+				Attribute val = new Attribute( contents [r, c, 1]);
 
-				var match = expectedColors.Where (e => e.Value == val).ToList ();
+				var match = expectedColors.Where (e => e == val).ToList ();
 				switch (match.Count) {
 				case 0:
-					throw new Exception ($"Unexpected color {DescribeColor (val)} was used at row {r} and col {c} (indexes start at 0).  Color value was {val} (expected colors were {string.Join (",", expectedColors.Select (c => DescribeColor (c.Value)))})");
+					throw new Exception ($"Unexpected color {val} was used at row {r} and col {c} (indexes start at 0).  Color value was {val} (expected colors were {string.Join (",", expectedColors.Select (c => c.Value.ToString()))})");
 				case > 1:
 					throw new ArgumentException ($"Bad value for expectedColors, {match.Count} Attributes had the same Value");
 				}
@@ -280,7 +280,7 @@ partial class TestHelpers {
 				var colorUsed = Array.IndexOf (expectedColors, match [0]).ToString () [0];
 				var userExpected = line [c];
 
-				if (colorUsed != userExpected) throw new Exception ($"Colors used did not match expected at row {r} and col {c} (indexes start at 0).  Color index used was {colorUsed} ({DescribeColor (val)}) but test expected {userExpected} ({DescribeColor (expectedColors [int.Parse (userExpected.ToString ())].Value)}) (these are indexes into the expectedColors array)");
+				if (colorUsed != userExpected) throw new Exception ($"Colors used did not match expected at row {r} and col {c} (indexes start at 0).  Color index used was {colorUsed} ({val}) but test expected {userExpected} ({expectedColors [int.Parse (userExpected.ToString ())].Value}) (these are indexes into the expectedColors array)");
 			}
 
 			r++;
@@ -300,18 +300,19 @@ partial class TestHelpers {
 
 		var toFind = expectedColors.ToList ();
 
-		var colorsUsed = new HashSet<int> ();
+		// Contents 3rd column is an Attribute
+		var colorsUsed = new HashSet<Attribute> ();
 
 		for (var r = 0; r < driver.Rows; r++) {
 			for (var c = 0; c < driver.Cols; c++) {
-				var val = contents [r, c, 1];
+				var val = new Attribute(contents [r, c, 1]);
 
 				colorsUsed.Add (val);
 
-				var match = toFind.FirstOrDefault (e => e.Value == val);
+				var match = toFind.FirstOrDefault (e => e == val);
 
 				// need to check twice because Attribute is a struct and therefore cannot be null
-				if (toFind.Any (e => e.Value == val)) {
+				if (toFind.Any (e => e == val)) {
 					toFind.Remove (match);
 				}
 			}}
@@ -320,15 +321,9 @@ partial class TestHelpers {
 			return;
 		}
 		var sb = new StringBuilder ();
-		sb.AppendLine ("The following colors were not used:" + string.Join ("; ", toFind.Select (a => DescribeColor (a))));
-		sb.AppendLine ("Colors used were:" + string.Join ("; ", colorsUsed.Select (DescribeColor)));
+		sb.AppendLine ("The following colors were not used:" + string.Join ("; ", toFind.Select (a => a.ToString())));
+		sb.AppendLine ("Colors used were:" + string.Join ("; ", colorsUsed.Select (a => a.ToString())));
 		throw new Exception (sb.ToString ());
-	}
-	
-	private static object DescribeColor (int userExpected)
-	{
-		var a = new Attribute (userExpected);
-		return $"{a.Foreground},{a.Background}";
 	}
 
 #pragma warning disable xUnit1013 // Public method should be marked as test

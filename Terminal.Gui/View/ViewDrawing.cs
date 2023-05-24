@@ -386,7 +386,7 @@ namespace Terminal.Gui {
 			// If we have a SuperView, it'll render our frames.
 			if (!SuperViewRendersLineCanvas && LineCanvas.Bounds != Rect.Empty) {
 				foreach (var p in LineCanvas.GetCellMap ()) { // Get the entire map
-					Driver.SetAttribute (p.Value.Attribute?.Value ?? ColorScheme.Normal);
+					Driver.SetAttribute (p.Value.Attribute ?? ColorScheme.Normal);
 					Driver.Move (p.Key.X, p.Key.Y);
 					Driver.AddRune (p.Value.Rune!.Value);
 				}
@@ -401,7 +401,7 @@ namespace Terminal.Gui {
 				}
 
 				foreach (var p in LineCanvas.GetCellMap ()) { // Get the entire map
-					Driver.SetAttribute (p.Value.Attribute?.Value ?? ColorScheme.Normal);
+					Driver.SetAttribute (p.Value.Attribute ?? ColorScheme.Normal);
 					Driver.Move (p.Key.X, p.Key.Y);
 					Driver.AddRune (p.Value.Rune.Value);
 				}

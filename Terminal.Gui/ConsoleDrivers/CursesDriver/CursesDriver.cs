@@ -69,12 +69,12 @@ internal class CursesDriver : ConsoleDriver {
 				var combined = new String (new char [] { (char)Contents [Row, Col - 1, 0], (char)rune.Value });
 				var normalized = !combined.IsNormalized () ? combined.Normalize () : combined;
 				Contents [Row, Col - 1, 0] = normalized [0];
-				Contents [Row, Col - 1, 1] = CurrentAttribute;
+				Contents [Row, Col - 1, 1] = CurrentAttribute.Value;
 				Contents [Row, Col - 1, 2] = 1;
 				Curses.attrset (Contents [Row, Col - 1, 1]);
 				Curses.mvaddch (Row, Col - 1, normalized [0]);
 			} else {
-				Contents [Row, Col, 1] = CurrentAttribute;
+				Contents [Row, Col, 1] = CurrentAttribute.Value;
 				Contents [Row, Col, 2] = 1;
 
 				if (runeWidth < 2 && Col > 0 && ((Rune)(Contents [Row, Col - 1, 0])).GetColumns () > 1) {
@@ -84,7 +84,7 @@ internal class CursesDriver : ConsoleDriver {
 					Curses.mvaddch (Row, Col - 1, Rune.ReplacementChar.Value);
 					Contents [Row, Col - 1, 0] = Rune.ReplacementChar.Value;
 					Curses.move (Row, Col);
-					Curses.attrset (curAttr);
+					Curses.attrset (curAttr.Value);
 
 				} else if (runeWidth < 2 && Col <= Clip.Right - 1 && ((Rune)(Contents [Row, Col, 0])).GetColumns () > 1) {
 					// This is a single-width character, and we are not at the end of the line.
@@ -93,7 +93,7 @@ internal class CursesDriver : ConsoleDriver {
 					Curses.mvaddch (Row, Col + 1, Rune.ReplacementChar.Value);
 					Contents [Row, Col + 1, 0] = Rune.ReplacementChar.Value;
 					Curses.move (Row, Col);
-					Curses.attrset (curAttr);
+					Curses.attrset (curAttr.Value);
 
 				}
 				if (runeWidth > 1 && Col == Clip.Right - 1) {
@@ -120,7 +120,7 @@ internal class CursesDriver : ConsoleDriver {
 								result = Rune.ReplacementChar;
 							}
 							Contents [Row, column, 0] = result.Value;
-							Contents [Row, column, 1] = CurrentAttribute;
+							Contents [Row, column, 1] = CurrentAttribute.Value;
 
 							Curses.attrset (Contents [Row, column, 1]);
 							// BUGBUG: workaround curses not supporting non BMP? #
@@ -133,7 +133,7 @@ internal class CursesDriver : ConsoleDriver {
 						}
 						Curses.move (Row, Col);
 					}
-					Curses.attrset (curAttr);
+					Curses.attrset (curAttr.Value);
 				}
 			}
 		} else {
@@ -147,7 +147,7 @@ internal class CursesDriver : ConsoleDriver {
 		if (runeWidth > 1) {
 			// This is a double-width character, and we are not at the end of the line.
 			if (validLocation && Col < Clip.Right) {
-				Contents [Row, Col, 1] = CurrentAttribute;
+				Contents [Row, Col, 1] = CurrentAttribute.Value;
 				Contents [Row, Col, 2] = 0;
 
 				//if (rune.IsBmp) {
@@ -709,7 +709,7 @@ internal class CursesDriver : ConsoleDriver {
 		for (int row = 0; row < Rows; row++) {
 			for (int col = 0; col < Cols; col++) {
 				Contents [row, col, 0] = ' ';
-				Contents [row, col, 1] = Colors.TopLevel.Normal;
+				Contents [row, col, 1] = Colors.TopLevel.Normal.Value;
 				Contents [row, col, 2] = 0;
 			}
 		}

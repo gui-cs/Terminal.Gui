@@ -119,7 +119,7 @@ namespace UICatalog.Scenarios {
 				foreach (var canvas in _layers) {
 					
 					foreach (var c in canvas.GetCellMap ()) {
-						Driver.SetAttribute (c.Value.Attribute?.Value ?? ColorScheme.Normal);
+						Driver.SetAttribute (c.Value.Attribute ?? ColorScheme.Normal);
 						this.AddRune (c.Key.X, c.Key.Y, c.Value.Rune.Value);
 					}
 				}

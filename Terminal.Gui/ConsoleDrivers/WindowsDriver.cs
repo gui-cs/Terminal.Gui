@@ -1365,7 +1365,7 @@ internal class WindowsDriver : ConsoleDriver {
 				rune = Rune.ReplacementChar;
 			}
 			Contents [Row, Col, 0] = rune.Value;
-			Contents [Row, Col, 1] = CurrentAttribute;
+			Contents [Row, Col, 1] = CurrentAttribute.Value;
 
 			if (Col > 0) {
 				var left = new Rune (Contents [Row, Col - 1, 0]);
@@ -1377,7 +1377,7 @@ internal class WindowsDriver : ConsoleDriver {
 			if (rune.GetColumns () > 1 && Col == Clip.Right - 1) {
 				// This is a double-width character, and we are at the end of the line.
 				Contents [Row, Col, 0] = Rune.ReplacementChar.Value;
-				Contents [Row, Col, 1] = CurrentAttribute;
+				Contents [Row, Col, 1] = CurrentAttribute.Value;
 				Contents [Row, Col, 2] = 1;
 				Col++;
 			}

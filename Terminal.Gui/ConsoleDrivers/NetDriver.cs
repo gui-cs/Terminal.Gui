@@ -273,7 +273,7 @@ internal class NetEvents {
 			return true;
 		} else {
 			if (winWidth == _consoleDriver.Cols &&
-				winHeight == _lastWindowHeight && 
+				winHeight == _lastWindowHeight &&
 				buffWidth == _consoleDriver.Cols && buffHeight == _consoleDriver.Rows) return false;
 			_lastWindowHeight = Math.Max (winHeight, 0);
 			_inputResultQueue.Enqueue (new InputResult () {
@@ -623,10 +623,10 @@ internal class NetDriver : ConsoleDriver {
 				var combined = new String (new char [] { (char)Contents [Row, Col - 1, 0], (char)rune.Value });
 				var normalized = !combined.IsNormalized () ? combined.Normalize () : combined;
 				Contents [Row, Col - 1, 0] = normalized [0];
-				Contents [Row, Col - 1, 1] = CurrentAttribute;
+				Contents [Row, Col - 1, 1] = CurrentAttribute.Value;
 				Contents [Row, Col - 1, 2] = 1;
 			} else {
-				Contents [Row, Col, 1] = CurrentAttribute;
+				Contents [Row, Col, 1] = CurrentAttribute.Value;
 				Contents [Row, Col, 2] = 1;
 
 				if (runeWidth < 2 && Col > 0 && ((Rune)(Contents [Row, Col - 1, 0])).GetColumns () > 1) {
@@ -655,7 +655,7 @@ internal class NetDriver : ConsoleDriver {
 		if (runeWidth > 1) {
 			// This is a double-width character, and we are not at the end of the line.
 			if (validLocation && Col < Clip.Right) {
-				Contents [Row, Col, 1] = CurrentAttribute;
+				Contents [Row, Col, 1] = CurrentAttribute.Value;
 				Contents [Row, Col, 2] = 0;
 			}
 			Col++;
@@ -834,12 +834,12 @@ internal class NetDriver : ConsoleDriver {
 		var rows = Rows;
 		var cols = Cols;
 		System.Text.StringBuilder output = new System.Text.StringBuilder ();
-		Attribute redrawAttr = -1;
+		Attribute redrawAttr = new Attribute ();
 		var lastCol = -1;
 
 		//GetCursorVisibility (out CursorVisibility savedVisibitity);
 		//SetCursorVisibility (CursorVisibility.Invisible); 
-		
+
 		for (var row = top; row < rows; row++) {
 			if (Console.WindowHeight < 1) {
 				return;
@@ -875,7 +875,7 @@ internal class NetDriver : ConsoleDriver {
 						lastCol = col;
 					}
 
-					Attribute attr = Contents [row, col, 1];
+					Attribute attr = new Attribute (Contents [row, col, 1]);
 					// Performance: Only send the escape sequence if the attribute has changed.
 					if (attr != redrawAttr) {
 						redrawAttr = attr;
@@ -1022,7 +1022,7 @@ internal class NetDriver : ConsoleDriver {
 	#endregion
 
 	#region Size and Position Handling
-	
+
 	void SetWindowPosition (int col, int row)
 	{
 		if (IsWinPlatform && EnableConsoleScrolling) {

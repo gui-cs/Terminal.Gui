@@ -158,34 +158,34 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Attributes are used as elements that contain both a foreground and a background or platform specific features.
+	/// Attributes represent how text is styled when displayed in the terminal. 
 	/// </summary>
 	/// <remarks>
-	///   <see cref="Attribute"/>s are needed to map colors to terminal capabilities that might lack colors. 
+	///   <see cref="Attribute"/> provides a platform independent representation of colors (and someday other forms of text styling).
 	///   They encode both the foreground and the background color and are used in the <see cref="ColorScheme"/>
 	///   class to define color schemes that can be used in an application.
 	/// </remarks>
 	[JsonConverter (typeof (AttributeJsonConverter))]
 	public struct Attribute {
 		/// <summary>
-		/// The <see cref="ConsoleDriver"/>-specific color attribute value. If <see cref="Initialized"/> is <see langword="false"/> 
+		/// The <see cref="ConsoleDriver"/>-specific color value. If <see cref="Initialized"/> is <see langword="false"/> 
 		/// the value of this property is invalid (typically because the Attribute was created before a driver was loaded)
 		/// and the attribute should be re-made (see <see cref="Make(Color, Color)"/>) before it is used.
 		/// </summary>
 		[JsonIgnore (Condition = JsonIgnoreCondition.Always)]
-		public int Value { get; }
+		internal int Value { get; }
 
 		/// <summary>
 		/// The foreground color.
 		/// </summary>
 		[JsonConverter (typeof (ColorJsonConverter))]
-		public Color Foreground { get; }
+		public Color Foreground { get; private init; }
 
 		/// <summary>
 		/// The background color.
 		/// </summary>
 		[JsonConverter (typeof (ColorJsonConverter))]
-		public Color Background { get; }
+		public Color Background { get; private init; }
 
 		/// <summary>
 		/// Initializes a new instance with a platform-specific color value.
@@ -209,7 +209,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Attribute"/> struct.
 		/// </summary>
-		/// <param name="value">Value.</param>
+		/// <param name="value">platform-dependent color value.</param>
 		/// <param name="foreground">Foreground</param>
 		/// <param name="background">Background</param>
 		public Attribute (int value, Color foreground, Color background)
@@ -240,25 +240,35 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="color">The color.</param>
 		public Attribute (Color color) : this (color, color) { }
-
-		/// <summary>
-		/// Implicit conversion from an <see cref="Attribute"/> to the underlying, driver-specific, Int32 representation
-		/// of the color.
-		/// </summary>
-		/// <returns>The driver-specific color value stored in the attribute.</returns>
-		/// <param name="c">The attribute to convert</param>
-		public static implicit operator int (Attribute c)
+		
+		/// <inheritdoc />
+		public override bool Equals (object obj)
 		{
-			if (!c.Initialized) throw new InvalidOperationException ("Attribute: Attributes must be initialized by a driver before use.");
-			return c.Value;
+			if (obj is Attribute other) {
+				return this.Value == other.Value;
+			}
+
+			return false;
 		}
 
 		/// <summary>
-		/// Implicitly convert an driver-specific color value into an <see cref="Attribute"/>
+		/// Compares two attributes for equality.
 		/// </summary>
-		/// <returns>An attribute with the specified driver-specific color value.</returns>
-		/// <param name="v">value</param>
-		public static implicit operator Attribute (int v) => new Attribute (v);
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns></returns>
+		public static bool operator == (Attribute left, Attribute right) => left.Equals (right);
+
+		/// <summary>
+		/// Compares two attributes for inequality.
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns></returns>
+		public static bool operator != (Attribute left, Attribute right) => !(left == right);
+
+		/// <inheritdoc />
+		public override int GetHashCode () => this.Value.GetHashCode ();
 
 		/// <summary>
 		/// Creates an <see cref="Attribute"/> from the specified foreground and background colors.
@@ -274,8 +284,10 @@ namespace Terminal.Gui {
 		{
 			if (Application.Driver == null) {
 				// Create the attribute, but show it's not been initialized
-				return new Attribute (-1, foreground, background) {
-					Initialized = false
+				return new Attribute () {
+					Initialized = false,
+					Foreground = foreground, 
+					Background = background
 				};
 			}
 			return Application.Driver.MakeAttribute (foreground, background);
@@ -310,7 +322,14 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns></returns>
 		[JsonIgnore]
-		public bool HasValidColors { get => (int)Foreground > -1 && (int)Background > -1; }
+		public bool HasValidColors => (int)Foreground > -1 && (int)Background > -1;
+
+		/// <inheritdoc />
+		public override string ToString ()
+		{
+			// Note, Unit tests are dependent on this format
+			return $"{Foreground},{Background}";
+		}
 	}
 
 	/// <summary>

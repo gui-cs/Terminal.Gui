@@ -93,12 +93,12 @@ public class FakeDriver : ConsoleDriver {
 				var combined = newCombo.ToString ();
 				var normalized = !combined.IsNormalized () ? combined.Normalize () : combined;
 				Contents [Row, Col - 1, 0] = normalized [0];// BUGBUG: This is wrong, we need to handle the case where the rune is more than one char
-				Contents [Row, Col - 1, 1] = CurrentAttribute;
+				Contents [Row, Col - 1, 1] = CurrentAttribute.Value;
 				Contents [Row, Col - 1, 2] = 1;
 				Col--;
 			} else {
 				Contents [Row, Col, 0] = rune.Value;
-				Contents [Row, Col, 1] = CurrentAttribute;
+				Contents [Row, Col, 1] = CurrentAttribute.Value;
 
 				if (Col > 0) {
 					var left = new Rune (Contents [Row, Col - 1, 0]);
@@ -110,7 +110,7 @@ public class FakeDriver : ConsoleDriver {
 				if (runeWidth > 1) {
 					Col++;
 					Contents [Row, Col, 0] = Rune.ReplacementChar.Value;
-					Contents [Row, Col, 1] = CurrentAttribute;
+					Contents [Row, Col, 1] = CurrentAttribute.Value;
 					Contents [Row, Col, 2] = 1;
 				}
 			}
