@@ -207,7 +207,7 @@ internal class CursesDriver : ConsoleDriver {
 		return MakeColor ((short)(ColorToCursesColorNumber (fore) & 0xffff), (short)ColorToCursesColorNumber (back));
 	}
 
-	static int ColorToCursesColorNumber (Color color)
+	static short ColorToCursesColorNumber (Color color)
 	{
 		switch (color) {
 		case Color.Black:
@@ -230,19 +230,19 @@ internal class CursesDriver : ConsoleDriver {
 			//return Curses.COLOR_BLACK | Curses.A_BOLD;
 			return Curses.COLOR_GRAY;
 		case Color.BrightBlue:
-			return Curses.COLOR_BLUE | Curses.A_BOLD | Curses.COLOR_GRAY;
+			return Curses.COLOR_BLUE | Curses.COLOR_GRAY;
 		case Color.BrightGreen:
-			return Curses.COLOR_GREEN | Curses.A_BOLD | Curses.COLOR_GRAY;
+			return Curses.COLOR_GREEN | Curses.COLOR_GRAY;
 		case Color.BrightCyan:
-			return Curses.COLOR_CYAN | Curses.A_BOLD | Curses.COLOR_GRAY;
+			return Curses.COLOR_CYAN | Curses.COLOR_GRAY;
 		case Color.BrightRed:
-			return Curses.COLOR_RED | Curses.A_BOLD | Curses.COLOR_GRAY;
+			return Curses.COLOR_RED |  Curses.COLOR_GRAY;
 		case Color.BrightMagenta:
-			return Curses.COLOR_MAGENTA | Curses.A_BOLD | Curses.COLOR_GRAY;
+			return Curses.COLOR_MAGENTA | Curses.COLOR_GRAY;
 		case Color.BrightYellow:
-			return Curses.COLOR_YELLOW | Curses.A_BOLD | Curses.COLOR_GRAY;
+			return Curses.COLOR_YELLOW | Curses.COLOR_GRAY;
 		case Color.White:
-			return Curses.COLOR_WHITE | Curses.A_BOLD | Curses.COLOR_GRAY;
+			return Curses.COLOR_WHITE | Curses.COLOR_GRAY;
 		}
 		throw new ArgumentException ("Invalid color code");
 	}
