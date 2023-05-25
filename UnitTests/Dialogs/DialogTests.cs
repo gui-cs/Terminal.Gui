@@ -42,7 +42,7 @@ namespace Terminal.Gui.DialogTests {
 		//	Application.End (runstate);
 		//}
 
-		private (Application.RunState, Dialog) RunButtonTestDialog (string title, int width, Dialog.ButtonAlignments align, params Button [] btns)
+		private (RunState, Dialog) RunButtonTestDialog (string title, int width, Dialog.ButtonAlignments align, params Button [] btns)
 		{
 			var dlg = new Dialog (btns) {
 				Title = title,
@@ -209,7 +209,7 @@ namespace Terminal.Gui.DialogTests {
 		public void ButtonAlignment_One ()
 		{
 			var d = (FakeDriver)Application.Driver;
-			Application.RunState runstate = null;
+			RunState runstate = null;
 
 			var title = "1234";
 			// E.g "|[ ok ]|"
@@ -281,7 +281,7 @@ namespace Terminal.Gui.DialogTests {
 		[AutoInitShutdown]
 		public void ButtonAlignment_Two ()
 		{
-			Application.RunState runstate = null;
+			RunState runstate = null;
 
 			var d = (FakeDriver)Application.Driver;
 
@@ -327,7 +327,7 @@ namespace Terminal.Gui.DialogTests {
 		[AutoInitShutdown]
 		public void ButtonAlignment_Two_Hidden ()
 		{
-			Application.RunState runstate = null;
+			RunState runstate = null;
 			bool firstIteration = false;
 
 			var d = (FakeDriver)Application.Driver;
@@ -394,7 +394,7 @@ namespace Terminal.Gui.DialogTests {
 		[AutoInitShutdown]
 		public void ButtonAlignment_Three ()
 		{
-			Application.RunState runstate = null;
+			RunState runstate = null;
 
 			var d = (FakeDriver)Application.Driver;
 
@@ -442,7 +442,7 @@ namespace Terminal.Gui.DialogTests {
 		[AutoInitShutdown]
 		public void ButtonAlignment_Four ()
 		{
-			Application.RunState runstate = null;
+			RunState runstate = null;
 
 			var d = (FakeDriver)Application.Driver;
 
@@ -493,7 +493,7 @@ namespace Terminal.Gui.DialogTests {
 		[AutoInitShutdown]
 		public void ButtonAlignment_Four_On_Too_Small_Width ()
 		{
-			Application.RunState runstate = null;
+			RunState runstate = null;
 
 			var d = (FakeDriver)Application.Driver;
 
@@ -540,7 +540,7 @@ namespace Terminal.Gui.DialogTests {
 		[AutoInitShutdown]
 		public void ButtonAlignment_Four_Wider ()
 		{
-			Application.RunState runstate = null;
+			RunState runstate = null;
 
 			var d = (FakeDriver)Application.Driver;
 
@@ -594,7 +594,7 @@ namespace Terminal.Gui.DialogTests {
 		[AutoInitShutdown]
 		public void ButtonAlignment_Four_WideOdd ()
 		{
-			Application.RunState runstate = null;
+			RunState runstate = null;
 
 			var d = (FakeDriver)Application.Driver;
 
@@ -647,7 +647,7 @@ namespace Terminal.Gui.DialogTests {
 		[AutoInitShutdown]
 		public void Zero_Buttons_Works ()
 		{
-			Application.RunState runstate = null;
+			RunState runstate = null;
 
 			var d = (FakeDriver)Application.Driver;
 
@@ -667,7 +667,7 @@ namespace Terminal.Gui.DialogTests {
 		[AutoInitShutdown]
 		public void One_Button_Works ()
 		{
-			Application.RunState runstate = null;
+			RunState runstate = null;
 
 			var d = (FakeDriver)Application.Driver;
 
@@ -687,7 +687,7 @@ namespace Terminal.Gui.DialogTests {
 		[AutoInitShutdown]
 		public void Add_Button_Works ()
 		{
-			Application.RunState runstate = null;
+			RunState runstate = null;
 
 			var d = (FakeDriver)Application.Driver;
 

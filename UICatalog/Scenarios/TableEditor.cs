@@ -903,19 +903,19 @@ namespace UICatalog.Scenarios {
 		{
 			tableView.Style.ColumnStyles.Clear();
 
-			var alignMid = new TableView.ColumnStyle () {
+			var alignMid = new ColumnStyle () {
 				Alignment = TextAlignment.Centered
 			};
-			var alignRight = new TableView.ColumnStyle () {
+			var alignRight = new ColumnStyle () {
 				Alignment = TextAlignment.Right
 			};
 
-			var dateFormatStyle = new TableView.ColumnStyle () {
+			var dateFormatStyle = new ColumnStyle () {
 				Alignment = TextAlignment.Right,
 				RepresentationGetter = (v) => v is DateTime d ? d.ToString ("yyyy-MM-dd") : v.ToString ()
 			};
 
-			var negativeRight = new TableView.ColumnStyle () {
+			var negativeRight = new ColumnStyle () {
 
 				Format = "0.##",
 				MinWidth = 10,
