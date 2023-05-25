@@ -33,6 +33,11 @@ public class TableStyle {
 	public bool ShowHorizontalHeaderUnderline { get; set; } = true;
 
 	/// <summary>
+	/// True to render a solid line through the headers (only when Overline and/or Underline are <see langword="false"/>)
+	/// </summary>
+	public bool ShowHorizontalHeaderThroughline { get; set; } = true;
+
+	/// <summary>
 	/// True to render a solid line vertical line between cells
 	/// </summary>
 	public bool ShowVerticalCellLines { get; set; } = true;
