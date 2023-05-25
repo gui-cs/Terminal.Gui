@@ -690,12 +690,12 @@ namespace Terminal.Gui {
 
 				} else {
 					if (runeWidth < 2 && ccol > 0
-						&& ((Rune)(char)contents [crow, ccol - 1, 0]).GetColumns () > 1) {
+						&& ((Rune)contents [crow, ccol - 1, 0]).GetColumns () > 1) {
 
 						contents [crow, ccol - 1, 0] = (int)(uint)' ';
 
 					} else if (runeWidth < 2 && ccol <= Clip.Right - 1
-						&& ((Rune)(char)contents [crow, ccol, 0]).GetColumns () > 1) {
+						&& ((Rune)contents [crow, ccol, 0]).GetColumns () > 1) {
 
 						contents [crow, ccol + 1, 0] = (int)(uint)' ';
 						contents [crow, ccol + 1, 2] = 1;
@@ -953,11 +953,14 @@ namespace Terminal.Gui {
 						}
 						outputWidth++;
 						var rune = (Rune)contents [row, col, 0];
-						char [] spair;
-						if (rune.DecodeSurrogatePair (out spair)) {
-							output.Append (spair);
-						} else {
-							output.Append ((char)rune.Value);
+						output.Append (rune.ToString ());
+						if (rune.IsSurrogatePair () && rune.GetColumns () < 2) {
+							SetCursorPosition (lastCol, row);
+							Console.Write (output);
+							output.Clear ();
+							lastCol += outputWidth;
+							outputWidth = 0;
+							Console.CursorLeft--;
 						}
 						contents [row, col, 2] = 0;
 					}

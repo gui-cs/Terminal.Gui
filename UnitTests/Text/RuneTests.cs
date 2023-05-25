@@ -539,7 +539,7 @@ public class RuneTests {
 
 	[Theory]
 	[InlineData ("Hello, 世界", 13, 11, 9)]   // Without Surrogate Pairs
-	[InlineData ("Hello, 𝔹𝕆𝔹", 19, 13, 13)] // With Surrogate Pairs
+	[InlineData ("Hello, 𝔹𝕆𝔹", 19, 10, 13)] // With Surrogate Pairs
 	public void Test_DecodeRune_Extension (string text, int bytesLength, int colsLength, int textLength)
 	{
 		List<Rune> runes = new List<Rune> ();
@@ -558,7 +558,7 @@ public class RuneTests {
 
 	[Theory]
 	[InlineData ("Hello, 世界", 13, 11, 9, "界世 ,olleH")]   // Without Surrogate Pairs
-	[InlineData ("Hello, 𝔹𝕆𝔹", 19, 13, 13, "𝔹𝕆𝔹 ,olleH")] // With Surrogate Pairs
+	[InlineData ("Hello, 𝔹𝕆𝔹", 19, 10, 13, "𝔹𝕆𝔹 ,olleH")] // With Surrogate Pairs
 	public void Test_DecodeLastRune_Extension (string text, int bytesLength, int colsLength, int textLength, string encoded)
 	{
 		List<Rune> runes = new List<Rune> ();

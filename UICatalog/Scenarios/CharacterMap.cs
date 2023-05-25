@@ -404,7 +404,7 @@ class CharMap : ScrollView {
 					Driver.SetAttribute (GetFocusColor ());
 				}
 
-				if (char.IsSurrogate ((char)(val + col))) {
+				if (val + col < 0xffff && char.IsSurrogate ((char)(val + col))) {
 					Driver.AddRune (Rune.ReplacementChar);
 				} else {
 					Driver.AddRune (new Rune (val + col));
