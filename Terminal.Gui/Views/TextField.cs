@@ -453,7 +453,7 @@ namespace Terminal.Gui {
 			var roc = GetReadOnlyColor ();
 			for (int idx = p; idx < tcount; idx++) {
 				var rune = _text [idx];
-				var cols = ((Rune)rune).GetColumns ();
+				var cols = rune.GetColumns ();
 				if (idx == _point && HasFocus && !Used && _length == 0 && !ReadOnly) {
 					Driver.SetAttribute (selColor);
 				} else if (ReadOnly) {
@@ -466,7 +466,7 @@ namespace Terminal.Gui {
 					Driver.SetAttribute (idx >= _start && _length > 0 && idx < _start + _length ? selColor : ColorScheme.Focus);
 				}
 				if (col + cols <= width) {
-					Driver.AddRune ((Rune)(Secret ? CM.Glyphs.Dot : rune));
+					Driver.AddRune ((Secret ? CM.Glyphs.Dot : rune));
 				}
 				if (!TextModel.SetCol (ref col, width, cols)) {
 					break;
@@ -1198,14 +1198,11 @@ namespace Terminal.Gui {
 
 		List<Rune> DeleteSelectedText ()
 		{
-			string actualText = Text;
 			SetSelectedStartSelectedLength ();
 			int selStart = SelectedStart > -1 ? _start : _point;
-			(var size, var _) = TextModel.DisplaySize (_text, 0, selStart, false);
-			(var size2, var _) = TextModel.DisplaySize (_text, selStart, selStart + _length, false);
-			(var size3, var _) = TextModel.DisplaySize (_text, selStart + _length, actualText.GetRuneCount (), false);
-			var newText = actualText [..size] +
-				actualText.Substring (size + size2, size3);
+			var newText = StringExtensions.ToString (_text.GetRange (0, selStart)) +
+				 StringExtensions.ToString (_text.GetRange (selStart + _length, _text.Count - (selStart + _length)));
+
 			ClearAllSelection ();
 			_point = selStart >= newText.GetRuneCount () ? newText.GetRuneCount () : selStart;
 			return newText.ToRuneList ();
@@ -1222,14 +1219,11 @@ namespace Terminal.Gui {
 
 			SetSelectedStartSelectedLength ();
 			int selStart = _start == -1 ? CursorPosition : _start;
-			string actualText = Text;
-			(int size, int _) = TextModel.DisplaySize (_text, 0, selStart, false);
-			(var size2, var _) = TextModel.DisplaySize (_text, selStart, selStart + _length, false);
-			(var size3, var _) = TextModel.DisplaySize (_text, selStart + _length, actualText.GetRuneCount (), false);
 			string cbTxt = Clipboard.Contents.Split ("\n") [0] ?? "";
-			Text = actualText [..size] +
+			Text = StringExtensions.ToString (_text.GetRange (0, selStart)) +
 				cbTxt +
-				actualText.Substring (size + size2, size3);
+				StringExtensions.ToString (_text.GetRange (selStart + _length, _text.Count - (selStart + _length)));
+
 			_point = selStart + cbTxt.GetRuneCount ();
 			ClearAllSelection ();
 			SetNeedsDisplay ();
