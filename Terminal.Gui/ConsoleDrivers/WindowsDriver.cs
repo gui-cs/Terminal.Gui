@@ -1356,6 +1356,11 @@ internal class WindowsDriver : ConsoleDriver {
 		return Row * Cols + Col;
 	}
 
+	public override bool IsRuneSupported (Rune rune)
+	{
+		return base.IsRuneSupported (rune) && rune.IsBmp;
+	}
+
 	public override void AddRune (Rune systemRune)
 	{
 		if (IsValidLocation (Col, Row)) {
