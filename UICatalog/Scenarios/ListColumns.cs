@@ -49,7 +49,7 @@ namespace UICatalog.Scenarios {
 					ExpandLastColumn = false,
 				}
 			};
-			var listColStyle = new ListTableSource.ListColumnStyle ();
+			var listColStyle = new ListColumnStyle ();
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {

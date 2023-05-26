@@ -75,7 +75,7 @@ namespace UICatalog.Scenarios {
 		}
 
 		private class ConfigTextView : TextView {
-			internal TileView.Tile Tile { get; set; }
+			internal Tile Tile { get; set; }
 			internal FileInfo FileInfo { get; set; }
 
 			internal ConfigTextView ()

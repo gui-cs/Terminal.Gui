@@ -1147,7 +1147,7 @@ namespace Terminal.Gui {
 			this.tableView.Update ();
 		}
 
-		private ColorScheme ColorGetter (TableView.CellColorGetterArgs args)
+		private ColorScheme ColorGetter (CellColorGetterArgs args)
 		{
 			var stats = this.RowToStats (args.RowIndex);
 
