@@ -278,7 +278,7 @@ namespace Terminal.Gui {
 
 			// BUGBUG: OverlappedTop is not cleared here, but it should be?
 
-			MainLoop?.Stop();
+			//MainLoop?.Stop();
 			MainLoop = null;
 			Driver?.End ();
 			Driver = null;

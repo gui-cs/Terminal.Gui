@@ -49,10 +49,6 @@ internal class CursesDriver : ConsoleDriver {
 
 	public override void AddRune (Rune systemRune)
 	{
-		if (!IsRuneSupported (systemRune)) {
-			systemRune = Rune.ReplacementChar;
-		}
-
 		var rune = systemRune.MakePrintable ();
 		var runeWidth = rune.GetColumns ();
 		var validLocation = IsValidLocation (Col, Row);

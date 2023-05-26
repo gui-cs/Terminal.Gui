@@ -663,7 +663,9 @@ namespace Terminal.Gui.ApplicationTests {
 					Assert.True (btn.ProcessKey (new KeyEvent (Key.Enter, null)));
 					Assert.Equal (cancel, btn.Text);
 					Assert.Equal (one, total);
-				} else if (taskCompleted) 					Application.RequestStop ();
+				} else if (taskCompleted) {
+					Application.RequestStop ();
+				}
 			};
 
 			Application.Run ();

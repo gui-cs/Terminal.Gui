@@ -152,10 +152,7 @@ public abstract class ConsoleDriver {
 	/// </para>
 	/// </remarks>
 	/// <param name="rune">Rune to add.</param>
-	public virtual void AddRune (Rune rune)
-	{
-
-	}
+	public abstract void AddRune (Rune rune); 
 
 	/// <summary>
 	/// Adds the specified <see langword="char"/> to the display at the current cursor position. This method
