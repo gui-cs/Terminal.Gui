@@ -58,5 +58,6 @@
     <IncludeTestAssembly>
       False
     </IncludeTestAssembly>
+    <RunSettingsFilePath>C:\Users\charlie\s\gui-cs\Terminal.Gui\UnitTests\bin\Debug\net7.0\fine-code-coverage\coverage-tool-output\UnitTests-fcc-mscodecoverage-generated.runsettings</RunSettingsFilePath>
   </PropertyGroup>
 </Project>

@@ -6,7 +6,6 @@ using System.Globalization;
 using System.Reflection;
 using System.IO;
 using System.Text.Json.Serialization;
-using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -164,7 +163,9 @@ namespace Terminal.Gui {
 		// calledViaRunT: If false (default) all state will be reset. If true the state will not be reset.
 		internal static void InternalInit (Func<Toplevel> topLevelFactory, ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null, bool calledViaRunT = false)
 		{
-			if (_initialized && driver == null) return;
+			if (_initialized && driver == null) {
+				return;
+			}
 
 			if (_initialized) {
 				throw new InvalidOperationException ("Init has already been called and must be bracketed by Shutdown.");
@@ -277,6 +278,7 @@ namespace Terminal.Gui {
 
 			// BUGBUG: OverlappedTop is not cleared here, but it should be?
 
+			//MainLoop?.Stop();
 			MainLoop = null;
 			Driver?.End ();
 			Driver = null;
@@ -674,12 +676,13 @@ namespace Terminal.Gui {
 				Iteration?.Invoke ();
 
 				EnsureModalOrVisibleAlwaysOnTop (state.Toplevel);
-				if ((state.Toplevel != Current && Current?.Modal == true)
-					|| (state.Toplevel != Current && Current?.Modal == false)) {
+				if (state.Toplevel != Current) {
 					OverlappedTop?.OnDeactivate (state.Toplevel);
 					state.Toplevel = Current;
 					OverlappedTop?.OnActivate (state.Toplevel);
 					Top.SetSubViewNeedsDisplay ();
+					Refresh ();
+				} else if (Current.SuperView == null && Current?.Modal == true) {
 					Refresh ();
 				}
 				if (Driver.EnsureCursorVisibility ()) {
@@ -690,42 +693,41 @@ namespace Terminal.Gui {
 			}
 			firstIteration = false;
 
-			if (state.Toplevel != Top
-				&& (!Top._needsDisplay.IsEmpty || Top._subViewNeedsDisplay || Top.LayoutNeeded)) {
-				state.Toplevel.SetNeedsDisplay (state.Toplevel.Bounds);
+			if (state.Toplevel != Top && 
+				(Top.NeedsDisplay|| Top.SubViewNeedsDisplay || Top.LayoutNeeded)) {
+				state.Toplevel.SetNeedsDisplay (state.Toplevel.Frame);
+				Top.Clear ();
 				Top.Draw ();
 				foreach (var top in _toplevels.Reverse ()) {
 					if (top != Top && top != state.Toplevel) {
 						top.SetNeedsDisplay ();
 						top.SetSubViewNeedsDisplay ();
+						top.Clear ();
 						top.Draw ();
 					}
 				}
 			}
 			if (_toplevels.Count == 1 && state.Toplevel == Top
 				&& (Driver.Cols != state.Toplevel.Frame.Width || Driver.Rows != state.Toplevel.Frame.Height)
-				&& (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._subViewNeedsDisplay || state.Toplevel.LayoutNeeded)) {
+				&& (state.Toplevel.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay || state.Toplevel.LayoutNeeded)) {
 
-				Driver.SetAttribute (Colors.TopLevel.Normal);
-				state.Toplevel.Clear (new Rect (0, 0, Driver.Cols, Driver.Rows));
-
+				state.Toplevel.Clear ();
 			}
 
-			if (!state.Toplevel._needsDisplay.IsEmpty || state.Toplevel._subViewNeedsDisplay || state.Toplevel.LayoutNeeded
-				|| OverlappedChildNeedsDisplay ()) {
+			if (state.Toplevel.NeedsDisplay || 
+				state.Toplevel.SubViewNeedsDisplay || 
+				state.Toplevel.LayoutNeeded || 
+				OverlappedChildNeedsDisplay ()) {
+				state.Toplevel.Clear ();
 				state.Toplevel.Draw ();
-				//if (state.Toplevel.SuperView != null) {
-				//	state.Toplevel.SuperView?.OnRenderLineCanvas ();
-				//} else {
-				//	state.Toplevel.OnRenderLineCanvas ();
-				//}
 				state.Toplevel.PositionCursor ();
 				Driver.Refresh ();
 			} else {
 				Driver.UpdateCursor ();
 			}
-			if (state.Toplevel != Top && !state.Toplevel.Modal
-				&& (!Top._needsDisplay.IsEmpty || Top._subViewNeedsDisplay || Top.LayoutNeeded)) {
+			if (state.Toplevel != Top && 
+				!state.Toplevel.Modal &&
+				(Top.NeedsDisplay|| Top.SubViewNeedsDisplay || Top.LayoutNeeded)) {
 				Top.Draw ();
 			}
 		}
@@ -735,7 +737,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static void DoEvents ()
 		{
-			MainLoop.Driver.Wakeup ();
+			MainLoop.MainLoopDriver.Wakeup ();
 		}
 
 		/// <summary>
@@ -1011,7 +1013,7 @@ namespace Terminal.Gui {
 		{
 			var full = new Rect (0, 0, Driver.Cols, Driver.Rows);
 			TerminalResized?.Invoke (new ResizedEventArgs () { Cols = full.Width, Rows = full.Height });
-			Driver.Clip = full;
+			Driver.Clip = new Rect (0, 0, Driver.Cols, Driver.Rows);
 			foreach (var t in _toplevels) {
 				t.SetRelativeLayout (full);
 				t.LayoutSubviews ();
@@ -1073,7 +1075,7 @@ namespace Terminal.Gui {
 			if (!OnGrabbingMouse (view)) {
 				OnGrabbedMouse (view);
 				_mouseGrabView = view;
-				Driver.UncookMouse ();
+				//Driver.UncookMouse ();
 			}
 		}
 
@@ -1087,7 +1089,7 @@ namespace Terminal.Gui {
 			if (!OnUnGrabbingMouse (_mouseGrabView)) {
 				OnUnGrabbedMouse (_mouseGrabView);
 				_mouseGrabView = null;
-				Driver.CookMouse ();
+				//Driver.CookMouse ();
 			}
 		}
 
@@ -1132,10 +1134,7 @@ namespace Terminal.Gui {
 
 		static void ProcessMouseEvent (MouseEvent me)
 		{
-			bool OutsideBounds (Point p, Rect r)
-			{
-				return p.X < 0 || p.X > r.Right || p.Y < 0 || p.Y > r.Bottom;
-			}
+			static bool OutsideBounds (Point p, Rect r) => p.X < 0 || p.X > r.Right || p.Y < 0 || p.Y > r.Bottom;
 
 			if (IsMouseDisabled) {
 				return;

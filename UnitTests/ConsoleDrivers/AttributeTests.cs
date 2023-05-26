@@ -23,31 +23,29 @@ namespace Terminal.Gui.DriverTests {
 			Assert.Equal (default (Color), attr.Foreground);
 			Assert.Equal (default (Color), attr.Background);
 
-			// Test value, foreground, background
-			var value = 42;
+			// Test foreground, background
 			var fg = new Color ();
 			fg = Color.Red;
 
 			var bg = new Color ();
 			bg = Color.Blue;
 
-			attr = new Attribute (value, fg, bg);
-
-			Assert.Equal (value, attr.Value);
-			Assert.Equal (fg, attr.Foreground);
-			Assert.Equal (bg, attr.Background);
-
-			// value, foreground, background
 			attr = new Attribute (fg, bg);
 
+			Assert.True (attr.Initialized);
+			Assert.True (attr.HasValidColors);
 			Assert.Equal (fg, attr.Foreground);
 			Assert.Equal (bg, attr.Background);
 
 			attr = new Attribute (fg);
+			Assert.True (attr.Initialized);
+			Assert.True (attr.HasValidColors);
 			Assert.Equal (fg, attr.Foreground);
 			Assert.Equal (fg, attr.Background);
 
 			attr = new Attribute (bg);
+			Assert.True (attr.Initialized);
+			Assert.True (attr.HasValidColors);
 			Assert.Equal (bg, attr.Foreground);
 			Assert.Equal (bg, attr.Background);
 
@@ -73,42 +71,13 @@ namespace Terminal.Gui.DriverTests {
 
 			// Test conversion to int
 			attr = new Attribute (value, fg, bg);
-			int value_implicit = (int)attr.Value;
+			int value_implicit = attr.Value;
 			Assert.Equal (value, value_implicit);
 
-			// Test conversion from int
-			attr = value;
 			Assert.Equal (value, attr.Value);
 
 			driver.End ();
 			Application.Shutdown ();
-		}
-
-		[Fact]
-		public void Implicit_Assign_NoDriver ()
-		{
-
-			var attr = new Attribute ();
-
-			var fg = new Color ();
-			fg = Color.Red;
-
-			var bg = new Color ();
-			bg = Color.Blue;
-
-			// Test conversion to int
-			attr = new Attribute (fg, bg);
-			int value_implicit = (int)attr.Value;
-			Assert.False (attr.Initialized);
-
-			Assert.Equal (-1, value_implicit);
-			Assert.False (attr.Initialized);
-
-			// Test conversion from int
-			attr = -1;
-			Assert.Equal (-1, attr.Value);
-			Assert.False (attr.Initialized);
-
 		}
 
 		[Fact]

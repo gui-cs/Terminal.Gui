@@ -9,7 +9,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// The color scheme for this view, if it is not defined, it returns the <see cref="SuperView"/>'s
-		/// color scheme.
+		/// color scheme. 
 		/// </summary>
 		public virtual ColorScheme ColorScheme {
 			get {
@@ -34,7 +34,11 @@ namespace Terminal.Gui {
 		/// If it's overridden can return other values.</returns>
 		public virtual Attribute GetNormalColor ()
 		{
-			return Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
+			ColorScheme cs = ColorScheme;
+			if (ColorScheme == null) {
+				cs = new ColorScheme ();
+			}
+			return Enabled ? cs.Normal : cs.Disabled;
 		}
 
 		/// <summary>
@@ -76,106 +80,126 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Removes the <see cref="_needsDisplay"/> and the <see cref="_subViewNeedsDisplay"/> setting on this view.
+		/// Clears <see cref="NeedsDisplay"/> and <see cref="SubViewNeedsDisplay"/>.
 		/// </summary>
 		protected void ClearNeedsDisplay ()
 		{
-			_needsDisplay = Rect.Empty;
+			_needsDisplayRect = Rect.Empty;
 			_subViewNeedsDisplay = false;
 		}
 
-		// The view-relative region that needs to be redrawn
-		internal Rect _needsDisplay { get; private set; } = Rect.Empty;
+		// The view-relative region that needs to be redrawn. Marked internal for unit tests.
+		internal Rect _needsDisplayRect = Rect.Empty;
 
 		/// <summary>
-		/// Sets a flag indicating this view needs to be redisplayed because its state has changed.
+		/// Gets or sets whether the view needs to be redrawn.
+		/// </summary>
+		public bool NeedsDisplay {
+			get => _needsDisplayRect != Rect.Empty;
+			set {
+				if (value) {
+					SetNeedsDisplay ();
+				} else {
+					ClearNeedsDisplay ();
+				}
+			}
+		}
+
+		/// <summary>
+		/// Sets the area of this view needing to be redrawn to <see cref="Bounds"/>.
 		/// </summary>
 		public void SetNeedsDisplay ()
 		{
-			if (!IsInitialized) return;
+			if (!IsInitialized) {
+				return;
+			}
 			SetNeedsDisplay (Bounds);
 		}
 
 		/// <summary>
-		/// Flags the view-relative region on this View as needing to be redrawn.
+		/// Expands the area of this view needing to be redrawn to include <paramref name="region"/>.
 		/// </summary>
 		/// <param name="region">The view-relative region that needs to be redrawn.</param>
 		public void SetNeedsDisplay (Rect region)
 		{
-			if (_needsDisplay.IsEmpty) {
-				_needsDisplay = region;
+			if (_needsDisplayRect.IsEmpty) {
+				_needsDisplayRect = region;
 			} else {
-				var x = Math.Min (_needsDisplay.X, region.X);
-				var y = Math.Min (_needsDisplay.Y, region.Y);
-				var w = Math.Max (_needsDisplay.Width, region.Width);
-				var h = Math.Max (_needsDisplay.Height, region.Height);
-				_needsDisplay = new Rect (x, y, w, h);
+				var x = Math.Min (_needsDisplayRect.X, region.X);
+				var y = Math.Min (_needsDisplayRect.Y, region.Y);
+				var w = Math.Max (_needsDisplayRect.Width, region.Width);
+				var h = Math.Max (_needsDisplayRect.Height, region.Height);
+				_needsDisplayRect = new Rect (x, y, w, h);
 			}
 			_superView?.SetSubViewNeedsDisplay ();
 
-			if (_subviews == null)
-				return;
+			if (_needsDisplayRect.X < Bounds.X ||
+				_needsDisplayRect.Y < Bounds.Y ||
+				_needsDisplayRect.Width > Bounds.Width ||
+				_needsDisplayRect.Height > Bounds.Height) {
+				Margin?.SetNeedsDisplay (Margin.Bounds);
+				Border?.SetNeedsDisplay (Border.Bounds);
+				Padding?.SetNeedsDisplay (Padding.Bounds);
+			}
 
-			foreach (var view in _subviews)
-				if (view.Frame.IntersectsWith (region)) {
-					var childRegion = Rect.Intersect (view.Frame, region);
-					childRegion.X -= view.Frame.X;
-					childRegion.Y -= view.Frame.Y;
-					view.SetNeedsDisplay (childRegion);
+			if (_subviews == null) {
+				return;
+			}
+
+			foreach (var subview in _subviews) {
+				if (subview.Frame.IntersectsWith (region)) {
+					var subviewRegion = Rect.Intersect (subview.Frame, region);
+					subviewRegion.X -= subview.Frame.X;
+					subviewRegion.Y -= subview.Frame.Y;
+					subview.SetNeedsDisplay (subviewRegion);
 				}
+			}
 		}
 
-		internal bool _subViewNeedsDisplay { get; private set; }
+		/// <summary>
+		/// Gets whether any Subviews need to be redrawn.
+		/// </summary>
+		public bool SubViewNeedsDisplay {
+			get => _subViewNeedsDisplay;
+		}
+
+		bool _subViewNeedsDisplay;
 
 		/// <summary>
 		/// Indicates that any Subviews (in the <see cref="Subviews"/> list) need to be repainted.
 		/// </summary>
 		public void SetSubViewNeedsDisplay ()
 		{
-			if (_subViewNeedsDisplay) {
-				return;
-			}
 			_subViewNeedsDisplay = true;
-			if (_superView != null && !_superView._subViewNeedsDisplay)
+			if (_superView != null && !_superView._subViewNeedsDisplay) {
 				_superView.SetSubViewNeedsDisplay ();
+			}
 		}
 
 		/// <summary>
-		///   Clears the view region with the current color.
+		///   Clears the <see cref="Bounds"/> with the normal background color.
 		/// </summary>
 		/// <remarks>
 		///   <para>
-		///     This clears the entire region used by this view.
+		///     This clears the Bounds used by this view.
 		///   </para>
 		/// </remarks>
-		public void Clear ()
-		{
-			var h = Frame.Height;
-			var w = Frame.Width;
-			for (var line = 0; line < h; line++) {
-				Move (0, line);
-				for (var col = 0; col < w; col++)
-					Driver.AddRune ((Rune)' ');
-			}
-		}
+		public void Clear () => Clear (ViewToScreen(Bounds));
 
-		// BUGBUG: Stupid that this takes screen-relative. We should have a tenet that says 
-		// "View APIs only deal with View-relative coords". 
+		// BUGBUG: This version of the Clear API should be removed. We should have a tenet that says 
+		// "View APIs only deal with View-relative coords". This is only used by ComboBox which can
+		// be refactored to use the View-relative version.
 		/// <summary>
-		///   Clears the specified region with the current color. 
+		///   Clears the specified screen-relative rectangle with the normal background. 
 		/// </summary>
 		/// <remarks>
 		/// </remarks>
-		/// <param name="regionScreen">The screen-relative region to clear.</param>
+		/// <param name="regionScreen">The screen-relative rectangle to clear.</param>
 		public void Clear (Rect regionScreen)
 		{
-			var h = regionScreen.Height;
-			var w = regionScreen.Width;
-			for (var line = regionScreen.Y; line < regionScreen.Y + h; line++) {
-				Driver.Move (regionScreen.X, line);
-				for (var col = 0; col < w; col++)
-					Driver.AddRune ((Rune)' ');
-			}
+			var prev = Driver.SetAttribute (GetNormalColor ());
+			Driver.FillRect (regionScreen);
+			Driver.SetAttribute (prev);
 		}
 
 		// Clips a rectangle in screen coordinates to the dimensions currently available on the screen
@@ -190,35 +214,18 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Sets the <see cref="ConsoleDriver"/>'s clip region to <see cref="Bounds"/>.
+		/// Expands the <see cref="ConsoleDriver"/>'s clip region to include <see cref="Bounds"/>.
 		/// </summary>
 		/// <returns>The current screen-relative clip region, which can be then re-applied by setting <see cref="ConsoleDriver.Clip"/>.</returns>
 		/// <remarks>
-		/// <para>
-		/// <see cref="Bounds"/> is View-relative.
-		/// </para>
 		/// <para>
 		/// If <see cref="ConsoleDriver.Clip"/> and <see cref="Bounds"/> do not intersect, the clip region will be set to <see cref="Rect.Empty"/>.
 		/// </para>
 		/// </remarks>
 		public Rect ClipToBounds ()
 		{
-			return SetClip (Bounds);
-		}
-
-		// BUGBUG: v2 - SetClip should return VIEW-relative so that it can be used to reset it; using Driver.Clip directly should not be necessary. 
-		/// <summary>
-		/// Sets the clip region to the specified view-relative region.
-		/// </summary>
-		/// <returns>The current screen-relative clip region, which can be then re-applied by setting <see cref="ConsoleDriver.Clip"/>.</returns>
-		/// <param name="region">View-relative clip region.</param>
-		/// <remarks>
-		/// If <see cref="ConsoleDriver.Clip"/> and <paramref name="region"/> do not intersect, the clip region will be set to <see cref="Rect.Empty"/>.
-		/// </remarks>
-		public Rect SetClip (Rect region)
-		{
 			var previous = Driver.Clip;
-			Driver.Clip = Rect.Intersect (previous, ViewToScreen (region));
+			Driver.Clip = Rect.Intersect (previous, ViewToScreen (Bounds));
 			return previous;
 		}
 
@@ -304,22 +311,11 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var prevClip = Driver.Clip;
-			Driver.Clip = ViewToScreen (Frame);
-
-			// TODO: Figure out what we should do if we have no superview
-			//if (SuperView != null) {
-			// TODO: Clipping is disabled for now to ensure we see errors
-			Driver.Clip = new Rect (0, 0, Driver.Cols, Driver.Rows);// screenBounds;// SuperView.ClipToBounds ();
-										//}
-
 			// Each of these renders lines to either this View's LineCanvas 
 			// Those lines will be finally rendered in OnRenderLineCanvas
-			Margin?.OnDrawContent (Bounds);
-			Border?.OnDrawContent (Bounds);
-			Padding?.OnDrawContent (Bounds);
-
-			Driver.Clip = prevClip;
+			Margin?.OnDrawContent (Margin.Bounds);
+			Border?.OnDrawContent (Border.Bounds);
+			Padding?.OnDrawContent (Padding.Bounds);
 
 			return true;
 		}
@@ -346,7 +342,6 @@ namespace Terminal.Gui {
 			if (!CanBeVisible (this)) {
 				return;
 			}
-
 			OnDrawFrames ();
 
 			var prevClip = ClipToBounds ();
@@ -367,7 +362,6 @@ namespace Terminal.Gui {
 			Driver.Clip = prevClip;
 
 			OnRenderLineCanvas ();
-
 			// Invoke DrawContentCompleteEvent
 			OnDrawContentComplete (Bounds);
 
@@ -389,27 +383,25 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			//Driver.SetAttribute (new Attribute(Color.White, Color.Black));
-
 			// If we have a SuperView, it'll render our frames.
 			if (!SuperViewRendersLineCanvas && LineCanvas.Bounds != Rect.Empty) {
 				foreach (var p in LineCanvas.GetCellMap ()) { // Get the entire map
-					Driver.SetAttribute (p.Value.Attribute?.Value ?? ColorScheme.Normal);
+					Driver.SetAttribute (p.Value.Attribute ?? ColorScheme.Normal);
 					Driver.Move (p.Key.X, p.Key.Y);
-					Driver.AddRune (p.Value.Rune.Value);
+					Driver.AddRune (p.Value.Rune!.Value);
 				}
 				LineCanvas.Clear ();
 			}
 
-			if (Subviews.Where (s => s.SuperViewRendersLineCanvas).Count () > 0) {
+			if (Subviews.Any (s => s.SuperViewRendersLineCanvas)) {
 				foreach (var subview in Subviews.Where (s => s.SuperViewRendersLineCanvas == true)) {
-					// Combine the LineCavas'
+					// Combine the LineCanvas'
 					LineCanvas.Merge (subview.LineCanvas);
 					subview.LineCanvas.Clear ();
 				}
 
 				foreach (var p in LineCanvas.GetCellMap ()) { // Get the entire map
-					Driver.SetAttribute (p.Value.Attribute?.Value ?? ColorScheme.Normal);
+					Driver.SetAttribute (p.Value.Attribute ?? ColorScheme.Normal);
 					Driver.Move (p.Key.X, p.Key.Y);
 					Driver.AddRune (p.Value.Rune.Value);
 				}
@@ -441,38 +433,45 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public virtual void OnDrawContent (Rect contentArea)
 		{
-			if (SuperView != null) {
-				Clear (ViewToScreen (Bounds));
-			}
+			if (NeedsDisplay) {
+				if (SuperView != null) {
+					Clear (ViewToScreen (Bounds));
+				}
 
-			if (!string.IsNullOrEmpty (TextFormatter.Text)) {
-				if (TextFormatter != null) {
-					TextFormatter.NeedsFormat = true;
+				if (!string.IsNullOrEmpty (TextFormatter.Text)) {
+					if (TextFormatter != null) {
+						TextFormatter.NeedsFormat = true;
+					}
 				}
 				// This should NOT clear 
 				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
-				    HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
-				    Rect.Empty, false);
+					HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
+					Rect.Empty, false);
 				SetSubViewNeedsDisplay ();
 			}
 
 			// Draw subviews
 			// TODO: Implement OnDrawSubviews (cancelable);
-			if (_subviews != null) {
-				foreach (var view in _subviews) {
-					if (view.Visible) { //!view._needsDisplay.IsEmpty || view._childNeedsDisplay || view.LayoutNeeded) {
-						if (true) { //view.Frame.IntersectsWith (bounds)) { // && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
-							if (view.LayoutNeeded) {
-								view.LayoutSubviews ();
-							}
+			if (_subviews != null && SubViewNeedsDisplay) {
+				var subviewsNeedingDraw = _subviews.Where (
+					view => view.Visible &&
+						(view.NeedsDisplay ||
+						view.SubViewNeedsDisplay ||
+						view.LayoutNeeded)
+					);
 
-							// Draw the subview
-							// Use the view's bounds (view-relative; Location will always be (0,0)
-							//if (view.Visible && view.Frame.Width > 0 && view.Frame.Height > 0) {
-							view.Draw ();
-							//}
-						}
+				foreach (var view in subviewsNeedingDraw) {
+					//view.Frame.IntersectsWith (bounds)) {
+					// && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
+					if (view.LayoutNeeded) {
+						view.LayoutSubviews ();
 					}
+
+					// Draw the subview
+					// Use the view's bounds (view-relative; Location will always be (0,0)
+					//if (view.Visible && view.Frame.Width > 0 && view.Frame.Height > 0) {
+					view.Draw ();
+					//}
 				}
 			}
 		}

@@ -11,10 +11,11 @@ namespace Terminal.Gui {
 	/// This implementation is used for FakeDriver.
 	/// </remarks>
 	public class FakeMainLoop : IMainLoopDriver {
-		AutoResetEvent keyReady = new AutoResetEvent (false);
-		AutoResetEvent waitForProbe = new AutoResetEvent (false);
-		ConsoleKeyInfo? keyResult = null;
-		MainLoop mainLoop;
+		AutoResetEvent _keyReady = new AutoResetEvent (false);
+		AutoResetEvent _waitForProbe = new AutoResetEvent (false);
+		ConsoleKeyInfo? _keyResult = null;
+		MainLoop _mainLoop;
+		Thread _readThread;
 		//Func<ConsoleKeyInfo> consoleKeyReaderFn = () => ;
 
 		/// <summary>
@@ -33,18 +34,19 @@ namespace Terminal.Gui {
 
 		void MockKeyReader ()
 		{
-			while (true) {
-				waitForProbe.WaitOne ();
-				keyResult = FakeConsole.ReadKey (true);
-				keyReady.Set ();
+			while (_mainLoop != null && _waitForProbe != null) {
+				_waitForProbe?.WaitOne ();
+				_keyResult = FakeConsole.ReadKey (true);
+				_keyReady?.Set ();
 			}
 		}
 
 		void IMainLoopDriver.Setup (MainLoop mainLoop)
 		{
-			this.mainLoop = mainLoop;
-			Thread readThread = new Thread (MockKeyReader);
-			readThread.Start ();
+			this._mainLoop = mainLoop;
+			_readThread = new Thread (MockKeyReader);
+			// BUGBUG: This thread never gets cleaned up. This causes unit tests to never exit.
+			_readThread.Start ();
 		}
 
 		void IMainLoopDriver.Wakeup ()
@@ -53,35 +55,36 @@ namespace Terminal.Gui {
 
 		bool IMainLoopDriver.EventsPending (bool wait)
 		{
-			keyResult = null;
-			waitForProbe.Set ();
+			_keyResult = null;
+			_waitForProbe.Set ();
 
 			if (CheckTimers (wait, out var waitTimeout)) {
 				return true;
 			}
 
-			keyReady.WaitOne (waitTimeout);
-			return keyResult.HasValue;
+			_keyReady.WaitOne (waitTimeout);
+			return _keyResult.HasValue;
 		}
 
 		bool CheckTimers (bool wait, out int waitTimeout)
 		{
 			long now = DateTime.UtcNow.Ticks;
 
-			if (mainLoop.timeouts.Count > 0) {
-				waitTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
+			if (_mainLoop.timeouts.Count > 0) {
+				waitTimeout = (int)((_mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
 				if (waitTimeout < 0)
 					return true;
 			} else {
 				waitTimeout = -1;
 			}
 
-			if (!wait)
+			if (!wait) {
 				waitTimeout = 0;
+			}
 
 			int ic;
-			lock (mainLoop.idleHandlers) {
-				ic = mainLoop.idleHandlers.Count;
+			lock (_mainLoop.idleHandlers) {
+				ic = _mainLoop.idleHandlers.Count;
 			}
 
 			return ic > 0;
@@ -89,10 +92,19 @@ namespace Terminal.Gui {
 
 		void IMainLoopDriver.Iteration ()
 		{
-			if (keyResult.HasValue) {
-				KeyPressed?.Invoke (keyResult.Value);
-				keyResult = null;
+			if (_keyResult.HasValue) {
+				KeyPressed?.Invoke (_keyResult.Value);
+				_keyResult = null;
 			}
+		}
+		public void TearDown ()
+		{
+			_waitForProbe.Close ();
+			_waitForProbe.Dispose();
+			_waitForProbe = null;
+			_keyReady.Dispose ();
+			_keyReady = null;
+			_mainLoop = null;
 		}
 	}
 }

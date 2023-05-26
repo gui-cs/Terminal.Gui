@@ -2,7 +2,7 @@
 
 #nullable enable
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 /// The root object for a Theme. A Theme is a set of settings that are applied to the running <see cref="Application"/>
@@ -49,7 +49,7 @@ public class ThemeScope : Scope<ThemeScope> {
 	internal override bool Apply ()
 	{
 		var ret = base.Apply ();
-		Application.Driver?.InitalizeColorSchemes ();
+		Application.Driver?.InitializeColorSchemes ();
 		return ret;
 	}
 }

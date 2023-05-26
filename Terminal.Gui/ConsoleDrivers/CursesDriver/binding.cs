@@ -250,7 +250,35 @@ namespace Unix.Terminal {
 
 		public static int StartColor () => methods.start_color ();
 		public static bool HasColors => methods.has_colors ();
+		/// <summary>
+		/// The init_pair routine changes the definition of a color-pair.It takes
+		/// three arguments: the number of the color-pair to be changed, the  fore-
+		/// ground color number, and the background color number.For portable ap-
+		/// plications:
+		/// 
+		/// o The first argument must be a legal color pair  value.If  default
+		/// colors are used (see use_default_colors(3x)) the upper limit is ad-
+		/// justed to allow for extra pairs which use a default color in  fore-
+		/// ground and/or background.
+		/// 
+		/// o The second and third arguments must be legal color values.
+		/// 
+		/// If the  color-pair was previously initialized, the screen is refreshed
+		/// and all occurrences of that color-pair are changed to the new defini-
+		/// tion.
+		/// 
+		/// As an  extension,  ncurses allows you to set color pair 0 via the as-
+		/// sume_default_colors (3x) routine, or to specify the use of default  col-
+		/// ors (color number  -1) if you first invoke the use_default_colors (3x)
+		/// routine.
+		/// </summary>
+		/// <param name="pair"></param>
+		/// <param name="foreground"></param>
+		/// <param name="background"></param>
+		/// <returns></returns>
 		public static int InitColorPair (short pair, short foreground, short background) => methods.init_pair (pair, foreground, background);
+		// TODO: Upgrade to ncurses 6.1 and use the extended version
+		//public static int InitExtendedPair (int pair, int foreground, int background) => methods.init_extended_pair (pair, foreground, background);
 		public static int UseDefaultColors () => methods.use_default_colors ();
 		public static int ColorPairs => methods.COLOR_PAIRS ();
 

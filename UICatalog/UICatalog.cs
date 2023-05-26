@@ -383,8 +383,8 @@ namespace UICatalog {
 				ScenarioList.KeyDown += (s, a) => {
 					if (CollectionNavigator.IsCompatibleKey (a.KeyEvent)) {
 						var newItem = _scenarioCollectionNav?.GetNextMatchingItem (ScenarioList.SelectedRow, (char)a.KeyEvent.KeyValue);
-						if (newItem is int && newItem != -1) {
-							ScenarioList.SelectedRow = (int)newItem;
+						if (newItem is int v && newItem != -1) {
+							ScenarioList.SelectedRow = v;
 							ScenarioList.EnsureSelectedCellIsVisible ();
 							ScenarioList.SetNeedsDisplay ();
 							a.Handled = true;
@@ -489,7 +489,7 @@ namespace UICatalog {
 			{
 				List<MenuItem []> menuItems = new List<MenuItem []> {
 					CreateDiagnosticFlagsMenuItems (),
-					new MenuItem [] { },
+					Array.Empty<MenuItem> (),
 					CreateEnableConsoleScrollingMenuItems (),
 					CreateDisabledEnabledMouseItems (),
 					CreateDisabledEnabledMenuBorder (),
@@ -570,9 +570,10 @@ namespace UICatalog {
 			MenuItem [] CreateEnableConsoleScrollingMenuItems ()
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
-				miEnableConsoleScrolling = new MenuItem ();
-				miEnableConsoleScrolling.Title = "_Enable Console Scrolling";
-				miEnableConsoleScrolling.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miEnableConsoleScrolling.Title!.Substring (1, 1) [0];
+				miEnableConsoleScrolling = new MenuItem {
+					Title = "_Enable Console Scrolling"
+				};
+				miEnableConsoleScrolling.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miEnableConsoleScrolling.Title.ToString ()!.Substring (1, 1) [0];
 				miEnableConsoleScrolling.CheckType |= MenuItemCheckStyle.Checked;
 				miEnableConsoleScrolling.Action += () => {
 					miEnableConsoleScrolling.Checked = !miEnableConsoleScrolling.Checked;

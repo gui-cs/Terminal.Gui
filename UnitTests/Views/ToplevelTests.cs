@@ -1012,7 +1012,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			void view_LayoutStarted (object sender, LayoutEventArgs e)
 			{
-				Assert.Equal (new Rect (0, 0, 20, 10), view._needsDisplay);
+				Assert.Equal (new Rect (0, 0, 20, 10), view._needsDisplayRect);
 				view.LayoutStarted -= view_LayoutStarted;
 			}
 
@@ -1024,12 +1024,12 @@ namespace Terminal.Gui.ViewsTests {
 
 			view.Frame = new Rect (1, 3, 10, 5);
 			Assert.Equal (new Rect (1, 3, 10, 5), view.Frame);
-			Assert.Equal (new Rect (0, 0, 10, 5), view._needsDisplay);
+			Assert.Equal (new Rect (0, 0, 10, 5), view._needsDisplayRect);
 
 			view.OnDrawContent (view.Bounds);
 			view.Frame = new Rect (1, 3, 10, 5);
 			Assert.Equal (new Rect (1, 3, 10, 5), view.Frame);
-			Assert.Equal (new Rect (0, 0, 10, 5), view._needsDisplay);
+			Assert.Equal (new Rect (0, 0, 10, 5), view._needsDisplayRect);
 		}
 
 		// BUGBUG: Broke this test with #2483 - @bdisp I need your help figuring out why
@@ -1284,7 +1284,7 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void Single_Smaller_Top_Will_Have_Cleaning_Trails_Chunk_On_Move ()
+		public void Modal_As_Top_Will_Drag_Cleanly ()
 		{
 			var dialog = new Dialog () { Width = 30, Height = 10 };
 			dialog.Add (new Label (

@@ -22,6 +22,10 @@ namespace Terminal.Gui {
 		public string GetClipboardData ()
 		{
 			try {
+				var result = GetClipboardDataImpl ();
+				if (result == null) {
+					return string.Empty;
+				}
 				return GetClipboardDataImpl ();
 			} catch (NotSupportedException ex) {
 				throw new NotSupportedException ("Failed to copy from the OS clipboard.", ex);
@@ -42,6 +46,10 @@ namespace Terminal.Gui {
 		/// <exception cref="NotSupportedException">Thrown if it was not possible to paste to the OS clipboard.</exception>
 		public void SetClipboardData (string text)
 		{
+			if (text == null) {
+				throw new ArgumentNullException (nameof (text));
+			}
+
 			try {
 				SetClipboardDataImpl (text);
 			} catch (NotSupportedException ex) {
@@ -59,25 +67,21 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Copies the contents of the OS clipboard to <paramref name="result"/> if possible.
 		/// </summary>
-		/// <param name="result">The contents of the OS clipboard if successful, <see cref="string.Empty"/> if not.</param>
+		/// <param name="result">The contents of the OS clipboard if successful.</param>
 		/// <returns><see langword="true"/> the OS clipboard was retrieved, <see langword="false"/> otherwise.</returns>
 		public bool TryGetClipboardData (out string result)
 		{
+			result = string.Empty;
 			// Don't even try to read because environment is not set up.
 			if (!IsSupported) {
-				result = null;
 				return false;
 			}
 
 			try {
 				result = GetClipboardDataImpl ();
-				while (result == null) {
-					result = GetClipboardDataImpl ();
-				}
 				return true;
 			} catch (NotSupportedException ex) {
 				System.Diagnostics.Debug.WriteLine ($"TryGetClipboardData: {ex.Message}");
-				result = null;
 				return false;
 			}
 		}

@@ -2150,6 +2150,16 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <inheritdoc/>
+		public override Attribute GetNormalColor ()
+		{
+			ColorScheme cs = ColorScheme;
+			if (ColorScheme == null) {
+				cs = new ColorScheme ();
+			}
+			return Enabled ? cs.Focus : cs.Disabled;
+		}
+
 		/// <summary>
 		/// Sets the driver to the default color for the control where no text is being rendered. Defaults to <see cref="ColorScheme.Normal"/>.
 		/// </summary>
@@ -2698,12 +2708,6 @@ namespace Terminal.Gui {
 				);
 		}
 
-		/// <inheritdoc/>
-		public override Attribute GetNormalColor ()
-		{
-			return Enabled ? ColorScheme.Focus : ColorScheme.Disabled;
-		}
-
 		///<inheritdoc/>
 		public override bool CanFocus {
 			get => base.CanFocus;
@@ -2743,10 +2747,10 @@ namespace Terminal.Gui {
 				InsertText (new KeyEvent () { Key = key });
 			}
 
-			if (_needsDisplay.IsEmpty) {
-				PositionCursor ();
-			} else {
+			if (NeedsDisplay) {
 				Adjust ();
+			} else {
+				PositionCursor ();
 			}
 		}
 
@@ -2901,7 +2905,7 @@ namespace Terminal.Gui {
 		{
 			var offB = OffSetBackground ();
 			var line = GetCurrentLine ();
-			bool need = !_needsDisplay.IsEmpty || _wrapNeeded;
+			bool need = NeedsDisplay|| _wrapNeeded;
 			var tSize = TextModel.DisplaySize (line, -1, -1, false, TabWidth);
 			var dSize = TextModel.DisplaySize (line, _leftColumn, _currentColumn, true, TabWidth);
 			if (!_wordWrap && _currentColumn < _leftColumn) {
@@ -3975,10 +3979,10 @@ namespace Terminal.Gui {
 
 		void DoNeededAction ()
 		{
-			if (_needsDisplay.IsEmpty) {
-				PositionCursor ();
-			} else {
+			if (NeedsDisplay) {
 				Adjust ();
+			} else {
+				PositionCursor ();
 			}
 		}
 

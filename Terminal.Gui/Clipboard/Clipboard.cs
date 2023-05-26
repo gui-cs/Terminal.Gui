@@ -1,31 +1,34 @@
 ﻿using System.Text;
 using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
-namespace Terminal.Gui {
-	/// <summary>
-	/// Provides cut, copy, and paste support for the OS clipboard.
-	/// </summary>
-	/// <remarks>
-	/// <para>
-	/// On Windows, the <see cref="Clipboard"/> class uses the Windows Clipboard APIs via P/Invoke.
-	/// </para>
-	/// <para>
-	/// On Linux, when not running under Windows Subsystem for Linux (WSL),
-	/// the <see cref="Clipboard"/> class uses the xclip command line tool. If xclip is not installed,
-	/// the clipboard will not work.
-	/// </para>
-	/// <para>
-	/// On Linux, when running under Windows Subsystem for Linux (WSL),
-	/// the <see cref="Clipboard"/> class launches Windows' powershell.exe via WSL interop and uses the
-	/// "Set-Clipboard" and "Get-Clipboard" Powershell CmdLets. 
-	/// </para>
-	/// <para>
-	/// On the Mac, the <see cref="Clipboard"/> class uses the MacO OS X pbcopy and pbpaste command line tools
-	/// and the Mac clipboard APIs vai P/Invoke.
-	/// </para>
-	/// </remarks>
-	public static class Clipboard {
-		static string contents;
+namespace Terminal.Gui;
+
+/// <summary>
+/// Provides cut, copy, and paste support for the OS clipboard.
+/// </summary>
+/// <remarks>
+/// <para>
+/// On Windows, the <see cref="Clipboard"/> class uses the Windows Clipboard APIs via P/Invoke.
+/// </para>
+/// <para>
+/// On Linux, when not running under Windows Subsystem for Linux (WSL),
+/// the <see cref="Clipboard"/> class uses the xclip command line tool. If xclip is not installed,
+/// the clipboard will not work.
+/// </para>
+/// <para>
+/// On Linux, when running under Windows Subsystem for Linux (WSL),
+/// the <see cref="Clipboard"/> class launches Windows' powershell.exe via WSL interop and uses the
+/// "Set-Clipboard" and "Get-Clipboard" Powershell CmdLets. 
+/// </para>
+/// <para>
+/// On the Mac, the <see cref="Clipboard"/> class uses the MacO OS X pbcopy and pbpaste command line tools
+/// and the Mac clipboard APIs vai P/Invoke.
+/// </para>
+/// </remarks>
+public static class Clipboard {
+	static string _contents = string.Empty;
 
 		/// <summary>
 		/// Gets (copies from) or sets (pastes to) the contents of the OS clipboard.
@@ -39,12 +42,12 @@ namespace Terminal.Gui {
 							// throw new InvalidOperationException ($"{Application.Driver.GetType ().Name}.GetClipboardData returned null instead of string.Empty");
 							clipData = string.Empty;
 						}
-						contents = clipData;
+						_contents = clipData;
 					}
 				} catch (Exception) {
-					contents = string.Empty;
+					_contents = string.Empty;
 				}
-				return contents;
+				return _contents;
 			}
 			set {
 				try {
@@ -54,51 +57,120 @@ namespace Terminal.Gui {
 						}
 						Application.Driver.Clipboard.SetClipboardData (value);
 					}
-					contents = value;
+					_contents = value;
 				} catch (NotSupportedException e) {
 					throw e;
 				} catch (Exception) {
-					contents = value;
+					_contents = value;
 				}
 			}
 		}
 
-		/// <summary>
-		/// Returns true if the environmental dependencies are in place to interact with the OS clipboard.
-		/// </summary>
-		/// <remarks>
-		/// </remarks>
-		public static bool IsSupported { get => Application.Driver.Clipboard.IsSupported; }
+	/// <summary>
+	/// Returns true if the environmental dependencies are in place to interact with the OS clipboard.
+	/// </summary>
+	/// <remarks>
+	/// </remarks>
+	public static bool IsSupported { get => Application.Driver.Clipboard.IsSupported; }
 
-		/// <summary>
-		/// Copies the contents of the OS clipboard to <paramref name="result"/> if possible.
-		/// </summary>
-		/// <param name="result">The contents of the OS clipboard if successful, <see cref="string.Empty"/> if not.</param>
-		/// <returns><see langword="true"/> the OS clipboard was retrieved, <see langword="false"/> otherwise.</returns>
-		public static bool TryGetClipboardData (out string result)
-		{
-			if (IsSupported && Application.Driver.Clipboard.TryGetClipboardData (out result)) {
-				if (contents != result) {
-					contents = result;
-				}
-				return true;
+	/// <summary>
+	/// Copies the _contents of the OS clipboard to <paramref name="result"/> if possible.
+	/// </summary>
+	/// <param name="result">The _contents of the OS clipboard if successful, <see cref="string.Empty"/> if not.</param>
+	/// <returns><see langword="true"/> the OS clipboard was retrieved, <see langword="false"/> otherwise.</returns>
+	public static bool TryGetClipboardData (out string result)
+	{
+		if (IsSupported && Application.Driver.Clipboard.TryGetClipboardData (out result)) {
+			if (_contents != result) {
+				_contents = result;
 			}
-			result = string.Empty;
-			return false;
+			return true;
 		}
+		result = string.Empty;
+		return false;
+	}
 
-		/// <summary>
-		/// Pastes the <paramref name="text"/> to the OS clipboard if possible.
-		/// </summary>
-		/// <param name="text">The text to paste to the OS clipboard.</param>
-		/// <returns><see langword="true"/> the OS clipboard was set, <see langword="false"/> otherwise.</returns>
-		public static bool TrySetClipboardData (string text)
-		{
-			if (IsSupported && Application.Driver.Clipboard.TrySetClipboardData (text)) {
-				contents = text;
-				return true;
-			}
-			return false;
+	/// <summary>
+	/// Pastes the <paramref name="text"/> to the OS clipboard if possible.
+	/// </summary>
+	/// <param name="text">The text to paste to the OS clipboard.</param>
+	/// <returns><see langword="true"/> the OS clipboard was set, <see langword="false"/> otherwise.</returns>
+	public static bool TrySetClipboardData (string text)
+	{
+		if (IsSupported && Application.Driver.Clipboard.TrySetClipboardData (text)) {
+			_contents = text;
+			return true;
 		}
+		return false;
+	}
+}
+
+/// <summary>
+/// Helper class for console drivers to invoke shell commands to interact with the clipboard.
+/// Used primarily by CursesDriver, but also used in Unit tests which is why it is in
+/// ConsoleDriver.cs.
+/// </summary>
+internal static class ClipboardProcessRunner {
+	public static (int exitCode, string result) Bash (string commandLine, string inputText = "", bool waitForOutput = false)
+	{
+		var arguments = $"-c \"{commandLine}\"";
+		var (exitCode, result) = Process ("bash", arguments, inputText, waitForOutput);
+
+		return (exitCode, result.TrimEnd ());
+	}
+
+	public static (int exitCode, string result) Process (string cmd, string arguments, string input = null, bool waitForOutput = true)
+	{
+		var output = string.Empty;
+
+		using (Process process = new Process {
+			StartInfo = new ProcessStartInfo {
+				FileName = cmd,
+				Arguments = arguments,
+				RedirectStandardOutput = true,
+				RedirectStandardError = true,
+				RedirectStandardInput = true,
+				UseShellExecute = false,
+				CreateNoWindow = true,
+			}
+		}) {
+			var eventHandled = new TaskCompletionSource<bool> ();
+			process.Start ();
+			if (!string.IsNullOrEmpty (input)) {
+				process.StandardInput.Write (input);
+				process.StandardInput.Close ();
+			}
+
+			if (!process.WaitForExit (5000)) {
+				var timeoutError = $@"Process timed out. Command line: {process.StartInfo.FileName} {process.StartInfo.Arguments}.";
+				throw new TimeoutException (timeoutError);
+			}
+
+			if (waitForOutput && process.StandardOutput.Peek () != -1) {
+				output = process.StandardOutput.ReadToEnd ();
+			}
+
+			if (process.ExitCode > 0) {
+				output = $@"Process failed to run. Command line: {cmd} {arguments}.
+										Output: {output}
+										Error: {process.StandardError.ReadToEnd ()}";
+			}
+
+			return (process.ExitCode, output);
+		}
+	}
+
+	public static bool DoubleWaitForExit (this System.Diagnostics.Process process)
+	{
+		var result = process.WaitForExit (500);
+		if (result) {
+			process.WaitForExit ();
+		}
+		return result;
+	}
+
+	public static bool FileExists (this string value)
+	{
+		return !string.IsNullOrEmpty (value) && !value.Contains ("not found");
 	}
 }
