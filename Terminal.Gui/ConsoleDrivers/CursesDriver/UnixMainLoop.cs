@@ -212,5 +212,9 @@ namespace Terminal.Gui {
 				}
 			}
 		}
+		public void TearDown ()
+		{
+			//throw new NotImplementedException ();
+		}
 	}
 }

@@ -25,7 +25,7 @@ namespace Terminal.Gui.ApplicationTests {
 		public void Constructor_Setups_Driver ()
 		{
 			var ml = new MainLoop (new FakeMainLoop ());
-			Assert.NotNull (ml.Driver);
+			Assert.NotNull (ml.MainLoopDriver);
 		}
 
 		// Idle Handler tests
@@ -522,6 +522,10 @@ namespace Terminal.Gui.ApplicationTests {
 			}
 
 			public void Iteration ()
+			{
+				throw new NotImplementedException ();
+			}
+			public void TearDown ()
 			{
 				throw new NotImplementedException ();
 			}

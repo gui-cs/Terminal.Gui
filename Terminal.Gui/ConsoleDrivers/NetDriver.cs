@@ -1220,7 +1220,7 @@ internal class NetDriver : ConsoleDriver {
 		_keyUpHandler = keyUpHandler;
 		_mouseHandler = mouseHandler;
 
-		var mLoop = _mainLoop = mainLoop.Driver as NetMainLoop;
+		var mLoop = _mainLoop = mainLoop.MainLoopDriver as NetMainLoop;
 
 		// Note: .Net API doesn't support keydown/up events and thus any passed keyDown/UpHandlers will be simulated to be called.
 		mLoop.ProcessInput = (e) => ProcessInput (e);
@@ -1528,5 +1528,9 @@ internal class NetMainLoop : IMainLoopDriver {
 		while (_inputResult.Count > 0) {
 			ProcessInput?.Invoke (_inputResult.Dequeue ().Value);
 		}
+	}
+	public void TearDown ()
+	{
+		//throw new NotImplementedException ();
 	}
 }

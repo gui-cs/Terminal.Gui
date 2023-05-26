@@ -613,7 +613,7 @@ internal class CursesDriver : ConsoleDriver {
 		this._keyUpHandler = keyUpHandler;
 		this._mouseHandler = mouseHandler;
 
-		var mLoop = mainLoop.Driver as UnixMainLoop;
+		var mLoop = mainLoop.MainLoopDriver as UnixMainLoop;
 
 		mLoop.AddWatch (0, UnixMainLoop.Condition.PollIn, x => {
 			ProcessInput ();

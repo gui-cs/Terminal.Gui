@@ -163,7 +163,9 @@ namespace Terminal.Gui {
 		// calledViaRunT: If false (default) all state will be reset. If true the state will not be reset.
 		internal static void InternalInit (Func<Toplevel> topLevelFactory, ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null, bool calledViaRunT = false)
 		{
-			if (_initialized && driver == null) return;
+			if (_initialized && driver == null) {
+				return;
+			}
 
 			if (_initialized) {
 				throw new InvalidOperationException ("Init has already been called and must be bracketed by Shutdown.");
@@ -276,6 +278,7 @@ namespace Terminal.Gui {
 
 			// BUGBUG: OverlappedTop is not cleared here, but it should be?
 
+			MainLoop?.Stop();
 			MainLoop = null;
 			Driver?.End ();
 			Driver = null;
@@ -734,7 +737,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static void DoEvents ()
 		{
-			MainLoop.Driver.Wakeup ();
+			MainLoop.MainLoopDriver.Wakeup ();
 		}
 
 		/// <summary>

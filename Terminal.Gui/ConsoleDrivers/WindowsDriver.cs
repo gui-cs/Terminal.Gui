@@ -711,7 +711,7 @@ internal class WindowsDriver : ConsoleDriver {
 		_keyUpHandler = keyUpHandler;
 		_mouseHandler = mouseHandler;
 
-		var mLoop = mainLoop.Driver as WindowsMainLoop;
+		var mLoop = mainLoop.MainLoopDriver as WindowsMainLoop;
 
 		mLoop.ProcessInput = (e) => ProcessInput (e);
 
@@ -1726,7 +1726,7 @@ internal class WindowsDriver : ConsoleDriver {
 
 	public override void End ()
 	{
-		WinConsole.Cleanup ();
+		WinConsole?.Cleanup ();
 		WinConsole = null;
 
 		// Needed for Windows Terminal
@@ -1902,6 +1902,10 @@ internal class WindowsMainLoop : IMainLoopDriver {
 			_winChanged = false;
 			WinChanged?.Invoke (this, new SizeChangedEventArgs (_windowSize));
 		}
+	}
+	public void TearDown ()
+	{
+		//throw new NotImplementedException ();
 	}
 }
 

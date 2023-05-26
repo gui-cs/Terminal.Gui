@@ -35,6 +35,11 @@ namespace Terminal.Gui {
 		/// The iteration function.
 		/// </summary>
 		void Iteration ();
+
+		/// <summary>
+		/// Ensures that the main loop is terminated and any resources created are freed.
+		/// </summary>
+		void TearDown ();
 	}
 
 	/// <summary>
@@ -77,8 +82,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The current <see cref="IMainLoopDriver"/> in use.
 		/// </summary>
-		/// <value>The driver.</value>
-		public IMainLoopDriver Driver { get; }
+		/// <value>The main loop driver.</value>
+		public IMainLoopDriver MainLoopDriver { get; }
 
 		/// <summary>
 		/// Invoked when a new timeout is added. To be used in the case
@@ -93,7 +98,7 @@ namespace Terminal.Gui {
 		/// (one of the implementations FakeMainLoop, UnixMainLoop, NetMainLoop or WindowsMainLoop).</param>
 		public MainLoop (IMainLoopDriver driver)
 		{
-			Driver = driver;
+			MainLoopDriver = driver;
 			driver.Setup (this);
 		}
 
@@ -128,7 +133,7 @@ namespace Terminal.Gui {
 				idleHandlers.Add (idleHandler);
 			}
 
-			Driver.Wakeup ();
+			MainLoopDriver.Wakeup ();
 			return idleHandler;
 		}
 
@@ -257,13 +262,16 @@ namespace Terminal.Gui {
 
 		bool _running;
 
+		// BUGBUG: Stop is only called from MainLoopUnitTests.cs. As a result, the mainloop
+		// will never exit during other unit tests or normal execution.
 		/// <summary>
 		///   Stops the mainloop.
 		/// </summary>
 		public void Stop ()
 		{
 			_running = false;
-			Driver.Wakeup ();
+			MainLoopDriver.Wakeup ();
+			MainLoopDriver.TearDown();
 		}
 
 		/// <summary>
@@ -276,7 +284,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public bool EventsPending (bool wait = false)
 		{
-			return Driver.EventsPending (wait);
+			return MainLoopDriver.EventsPending (wait);
 		}
 
 		/// <summary>
@@ -294,7 +302,7 @@ namespace Terminal.Gui {
 			if (timeouts.Count > 0)
 				RunTimers ();
 
-			Driver.Iteration ();
+			MainLoopDriver.Iteration ();
 
 			bool runIdle = false;
 			lock (_idleHandlersLock) {
