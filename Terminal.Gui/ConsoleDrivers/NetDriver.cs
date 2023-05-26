@@ -858,11 +858,7 @@ internal class NetDriver : ConsoleDriver {
 				for (; col < cols; col++) {
 					if (Contents [row, col, 2] == 0) {
 						if (output.Length > 0) {
-							SetCursorPosition (lastCol, row);
-							Console.Write (output);
-							output.Clear ();
-							lastCol += outputWidth;
-							outputWidth = 0;
+							WriteToConsole (output, ref lastCol, row, ref outputWidth);
 						} else if (lastCol == -1) {
 							lastCol = col;
 						}
@@ -884,17 +880,12 @@ internal class NetDriver : ConsoleDriver {
 					}
 					outputWidth++;
 					var rune = (Rune)Contents [row, col, 0];
-                    output.Append(rune.ToString());
-                    if (rune.IsSurrogatePair() && rune.GetColumns() < 2)
-                    {
-                        SetCursorPosition(lastCol, row);
-                        Console.Write(output);
-                        output.Clear();
-                        lastCol += outputWidth;
-                        outputWidth = 0;
-                        Console.CursorLeft--;
-                    }
-                    Contents[row, col, 2] = 0;
+					output.Append (rune.ToString ());
+					if (rune.IsSurrogatePair () && rune.GetColumns () < 2) {
+						WriteToConsole (output, ref lastCol, row, ref outputWidth);
+						Console.CursorLeft--;
+					}
+					Contents [row, col, 2] = 0;
 				}
 			}
 			if (output.Length > 0) {
@@ -903,7 +894,17 @@ internal class NetDriver : ConsoleDriver {
 			}
 		}
 		SetCursorPosition (0, 0);
+
 		//SetCursorVisibility (savedVisibitity);
+
+		void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
+		{
+			SetCursorPosition (lastCol, row);
+			Console.Write (output);
+			output.Clear ();
+			lastCol += outputWidth;
+			outputWidth = 0;
+		}
 	}
 
 	#region Color Handling
