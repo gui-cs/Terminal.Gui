@@ -810,14 +810,14 @@ public static class FakeConsole {
 	/// <summary>
 	/// 
 	/// </summary>
-	public static ConsoleKeyInfo ReadKey (bool intercept)
-	{
-		if (MockKeyPresses.Count > 0) {
-			return MockKeyPresses.Pop ();
-		} else {
-			return new ConsoleKeyInfo ('\0', (ConsoleKey)'\0', false, false, false);
-		}
-	}
+	//public static ConsoleKeyInfo ReadKey (bool intercept)
+	//{
+	//	if (MockKeyPresses.Count > 0) {
+	//		return MockKeyPresses.Pop ();
+	//	} else {
+	//		return new ConsoleKeyInfo ('\0', (ConsoleKey)'\0', false, false, false);
+	//	}
+	//}
 
 	/// <summary>
 	/// A stack of keypresses to return when ReadKey is called.
