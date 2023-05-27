@@ -902,6 +902,7 @@ namespace Terminal.Gui {
 				break;
 
 			case WindowsConsole.EventType.Focus:
+				keyModifiers = null;
 				break;
 			}
 		}
