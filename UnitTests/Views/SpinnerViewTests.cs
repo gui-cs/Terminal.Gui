@@ -14,9 +14,9 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Theory, AutoInitShutdown]
-		[InlineData(true)]
-		[InlineData(false)]
-		public void TestSpinnerView_AutoSpin(bool callStop)
+		[InlineData (true)]
+		[InlineData (false)]
+		public void TestSpinnerView_AutoSpin (bool callStop)
 		{
 			var view = GetSpinnerView ();
 
@@ -31,11 +31,10 @@ namespace Terminal.Gui.ViewsTests {
 			view.AutoSpin = true;
 			Assert.Single (Application.MainLoop.timeouts);
 
-			if(callStop) {
+			if (callStop) {
 				view.AutoSpin = false;
 				Assert.Empty (Application.MainLoop.timeouts);
-			}
-			else {
+			} else {
 				Assert.NotEmpty (Application.MainLoop.timeouts);
 			}
 
@@ -66,7 +65,7 @@ namespace Terminal.Gui.ViewsTests {
 			expected = @"\";
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-			Task.Delay (400).Wait();
+			Task.Delay (400).Wait ();
 
 			view.SetNeedsDisplay ();
 			view.Draw ();
