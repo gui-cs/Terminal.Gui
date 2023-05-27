@@ -13,24 +13,33 @@ namespace Terminal.Gui.ViewsTests {
 			this.output = output;
 		}
 
-		[Fact, AutoInitShutdown]
-		public void TestSpinnerView_AutoSpin()
+		[Theory, AutoInitShutdown]
+		[InlineData(true)]
+		[InlineData(false)]
+		public void TestSpinnerView_AutoSpin(bool callStop)
 		{
 			var view = GetSpinnerView ();
 
 			Assert.Empty (Application.MainLoop.timeouts);
-			view.AutoSpin ();
+			view.AutoSpin = true;
 			Assert.NotEmpty (Application.MainLoop.timeouts);
 
 			//More calls to AutoSpin do not add more timeouts
 			Assert.Single (Application.MainLoop.timeouts);
-			view.AutoSpin ();
-			view.AutoSpin ();
-			view.AutoSpin ();
+			view.AutoSpin = true;
+			view.AutoSpin = true;
+			view.AutoSpin = true;
 			Assert.Single (Application.MainLoop.timeouts);
 
+			if(callStop) {
+				view.AutoSpin = false;
+				Assert.Empty (Application.MainLoop.timeouts);
+			}
+			else {
+				Assert.NotEmpty (Application.MainLoop.timeouts);
+			}
+
 			// Dispose clears timeout
-			Assert.NotEmpty (Application.MainLoop.timeouts);
 			view.Dispose ();
 			Assert.Empty (Application.MainLoop.timeouts);
 		}
