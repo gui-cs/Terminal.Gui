@@ -528,14 +528,17 @@ namespace Terminal.Gui {
 
 		}
 
-		private Cell GetCellForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
+		private Cell? GetCellForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
 		{
 			if (!intersects.Any ()) {
 				return null;
 			}
 
 			var cell = new Cell ();
-			cell.Rune = GetRuneForIntersects (driver, intersects);
+			var rune = GetRuneForIntersects (driver, intersects);
+			if (rune.HasValue) {
+				cell.Runes.Add (rune.Value);
+			}
 			cell.Attribute = GetAttributeForIntersects (intersects);
 			return cell;
 		}

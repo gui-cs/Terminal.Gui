@@ -7,6 +7,7 @@ using System.Diagnostics;
 
 namespace Terminal.Gui;
 
+
 /// <summary>
 /// Base class for Terminal.Gui ConsoleDriver implementations.
 /// </summary>
@@ -84,6 +85,15 @@ public abstract class ConsoleDriver {
 	/// </remarks>
 	/// </summary>
 	public int [,,] Contents { get; internal set; }
+
+	///// <summary>
+	///// The contents of the application output. The driver outputs this buffer to the terminal when <see cref="UpdateScreen"/>
+	///// is called.
+	///// <remarks>
+	///// The format of the array is rows, columns. The first index is the row, the second index is the column.
+	///// </remarks>
+	///// </summary>
+	//public Cell [,] Contents { get; internal set; }
 
 	/// <summary>
 	/// Initializes the driver

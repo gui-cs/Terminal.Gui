@@ -388,7 +388,8 @@ namespace Terminal.Gui {
 				foreach (var p in LineCanvas.GetCellMap ()) { // Get the entire map
 					Driver.SetAttribute (p.Value.Attribute ?? ColorScheme.Normal);
 					Driver.Move (p.Key.X, p.Key.Y);
-					Driver.AddRune (p.Value.Rune!.Value);
+					// TODO: #2616 - Support combining sequences that don't normalize
+					Driver.AddRune (p.Value.Runes [0]);
 				}
 				LineCanvas.Clear ();
 			}
@@ -403,7 +404,8 @@ namespace Terminal.Gui {
 				foreach (var p in LineCanvas.GetCellMap ()) { // Get the entire map
 					Driver.SetAttribute (p.Value.Attribute ?? ColorScheme.Normal);
 					Driver.Move (p.Key.X, p.Key.Y);
-					Driver.AddRune (p.Value.Rune.Value);
+					// TODO: #2616 - Support combining sequences that don't normalize
+					Driver.AddRune (p.Value.Runes [0]);
 				}
 				LineCanvas.Clear ();
 			}
