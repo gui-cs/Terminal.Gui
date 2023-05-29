@@ -6958,5 +6958,48 @@ This is the second line.
 			_textView.Paste ();
 			Assert.Equal ("TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!", _textView.Text);
 		}
+
+		[Fact, TextViewTestsAutoInitShutdown]
+		public void RuneCell_LoadRuneCells ()
+		{
+			List<RuneCell> runeCells = new List<RuneCell> ();
+			foreach (var color in Colors.ColorSchemes) {
+				string csName = color.Key;
+				foreach (var rune in csName.EnumerateRunes ()) {
+					runeCells.Add (new RuneCell { Rune = rune, ColorScheme = color.Value });
+				}
+				runeCells.Add (new RuneCell { Rune = (Rune)'\n', ColorScheme = color.Value });
+			}
+
+			_textView.LoadRuneCells (runeCells);
+			Application.Top.Add (_textView);
+			Application.Begin (Application.Top);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+TopLevel
+Base    
+Dialog  
+Menu    
+Error   ", output);
+
+			var attributes = new Attribute [] {
+				// 0
+				Colors.TopLevel.Focus,
+				// 1
+				Colors.Base.Focus,
+				// 2
+				Colors.Dialog.Focus,
+				// 3
+				Colors.Menu.Focus,
+				// 4
+				Colors.Error.Focus
+			};
+
+			TestHelpers.AssertDriverColorsAre (@"
+0000000000
+1111111111
+2222222222
+3333333333
+4444444444", attributes);
+		}
 	}
 }

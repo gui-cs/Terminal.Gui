@@ -71,22 +71,32 @@ namespace Terminal.Gui {
 			return cells;
 		}
 
+		public static List<List<RuneCell>> StringToRuneCells (List<RuneCell> cells)
+		{
+			return SplitNewLines (cells);
+		}
+
 		// Splits a string into a List that contains a List<RuneCell> for each line
 		public static List<List<RuneCell>> StringToRuneCells (string content, ColorScheme? colorScheme = null)
+		{
+			var cells = content.EnumerateRunes ().Select (x => new RuneCell () { Rune = x, ColorScheme = colorScheme }).ToList ();
+
+			return SplitNewLines (cells);
+		}
+
+		private static List<List<RuneCell>> SplitNewLines (List<RuneCell> cells)
 		{
 			var lines = new List<List<RuneCell>> ();
 			int start = 0, i = 0;
 			var hasCR = false;
-			var runes = content.EnumerateRunes ().ToList ();
-			var cells = runes.Select (x => new RuneCell () { Rune = x, ColorScheme = colorScheme }).ToList ();
 			// ASCII code 13 = Carriage Return.
 			// ASCII code 10 = Line Feed.
-			for (; i < runes.Count; i++) {
-				if (runes [i].Value == 13) {
+			for (; i < cells.Count; i++) {
+				if (cells [i].Rune.Value == 13) {
 					hasCR = true;
 					continue;
 				}
-				if (runes [i].Value == 10) {
+				if (cells [i].Rune.Value == 10) {
 					if (i - start > 0)
 						lines.Add (cells.GetRange (start, hasCR ? i - 1 - start : i - start));
 					else
@@ -139,6 +149,13 @@ namespace Terminal.Gui {
 		public void LoadString (string content)
 		{
 			_lines = StringToRuneCells (content);
+
+			OnLinesLoaded ();
+		}
+
+		public void LoadRuneCells (List<RuneCell> cells)
+		{
+			_lines = StringToRuneCells (cells);
 
 			OnLinesLoaded ();
 		}
@@ -2135,6 +2152,18 @@ namespace Terminal.Gui {
 		public void LoadStream (Stream stream)
 		{
 			_model.LoadStream (stream);
+			_historyText.Clear (Text);
+			ResetPosition ();
+			SetNeedsDisplay ();
+		}
+
+		/// <summary>
+		/// Loads the contents of the <see cref="RuneCell"/> list into the <see cref="TextView"/>.
+		/// </summary>
+		/// <param name="cells">Rune cells list to load the contents from.</param>
+		public void LoadRuneCells (List<RuneCell> cells)
+		{
+			_model.LoadRuneCells (cells);
 			_historyText.Clear (Text);
 			ResetPosition ();
 			SetNeedsDisplay ();
