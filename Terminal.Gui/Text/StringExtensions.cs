@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +22,7 @@ public static class StringExtensions {
 	///  The text repeated if <paramref name="n"/> is greater than zero, 
 	///  otherwise <see langword="null"/>.
 	/// </returns>
-	public static string Repeat (this string str, int n)
+	public static string? Repeat (this string str, int n)
 	{
 		if (n <= 0) {
 			return null;
@@ -85,13 +87,13 @@ public static class StringExtensions {
 	/// This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text and attribute manipulation.
 	/// </remarks>
 	/// <param name="str">The string to convert.</param>
-	/// <param name="attribute">The attribute to use.</param>
+	/// <param name="colorScheme">The <see cref="ColorScheme"/> to use.</param>
 	/// <returns></returns>
-	public static List<RuneCell> ToRuneCellList (this string str, Attribute? attribute = null)
+	public static List<RuneCell> ToRuneCellList (this string str, ColorScheme? colorScheme = null)
 	{
 		var cells = new List<RuneCell> ();
 		foreach (var rune in str.EnumerateRunes ()) {
-			cells.Add (new RuneCell { Rune = rune, Attribute = attribute });
+			cells.Add (new RuneCell { Rune = rune, ColorScheme = colorScheme });
 		}
 		return cells;
 	}
@@ -178,7 +180,7 @@ public static class StringExtensions {
 	/// <param name="bytes">The enumerable byte to convert.</param>
 	/// <param name="encoding">The encoding to be used.</param>
 	/// <returns></returns>
-	public static string ToString (IEnumerable<byte> bytes, Encoding encoding = null)
+	public static string ToString (IEnumerable<byte> bytes, Encoding? encoding = null)
 	{
 		if (encoding == null) {
 			encoding = Encoding.UTF8;

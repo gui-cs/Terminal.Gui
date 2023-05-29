@@ -1,3 +1,5 @@
+#nullable enable
+
 // TextView.cs: multi-line text editing
 using System;
 using System.Collections.Generic;
@@ -22,13 +24,13 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The foreground color to draw the glyph with.
 		/// </summary>
-		public Attribute? Attribute { get; set; }
+		public ColorScheme? ColorScheme { get; set; }
 	}
 
 	class TextModel {
 		List<List<RuneCell>> _lines = new List<List<RuneCell>> ();
 
-		public event EventHandler LinesLoaded;
+		public event EventHandler? LinesLoaded;
 
 		public bool LoadFile (string file)
 		{
@@ -51,32 +53,32 @@ namespace Terminal.Gui {
 
 		// Turns the string into cells, this does not split the 
 		// contents on a newline if it is present.
-		internal static List<RuneCell> ToRuneCells (string str, Attribute? attribute = null)
+		internal static List<RuneCell> ToRuneCells (string str, ColorScheme? colorScheme = null)
 		{
 			List<RuneCell> cells = new List<RuneCell> ();
 			foreach (var rune in str.ToRunes ()) {
-				cells.Add (new RuneCell { Rune = rune, Attribute = attribute });
+				cells.Add (new RuneCell { Rune = rune, ColorScheme = colorScheme });
 			}
 			return cells;
 		}
 
-		internal static List<RuneCell> ToRuneCells (IEnumerable<Rune> runes, Attribute? attribute = null)
+		internal static List<RuneCell> ToRuneCells (IEnumerable<Rune> runes, ColorScheme? colorScheme = null)
 		{
 			List<RuneCell> cells = new List<RuneCell> ();
 			foreach (var rune in runes) {
-				cells.Add (new RuneCell { Rune = rune, Attribute = attribute });
+				cells.Add (new RuneCell { Rune = rune, ColorScheme = colorScheme });
 			}
 			return cells;
 		}
 
 		// Splits a string into a List that contains a List<RuneCell> for each line
-		public static List<List<RuneCell>> StringToRuneCells (string content, Attribute? attribute = null)
+		public static List<List<RuneCell>> StringToRuneCells (string content, ColorScheme? colorScheme = null)
 		{
 			var lines = new List<List<RuneCell>> ();
 			int start = 0, i = 0;
 			var hasCR = false;
 			var runes = content.EnumerateRunes ().ToList ();
-			var cells = runes.Select (x => new RuneCell () { Rune = x, Attribute = attribute }).ToList ();
+			var cells = runes.Select (x => new RuneCell () { Rune = x, ColorScheme = colorScheme }).ToList ();
 			// ASCII code 13 = Carriage Return.
 			// ASCII code 10 = Line Feed.
 			for (; i < runes.Count; i++) {
@@ -158,7 +160,7 @@ namespace Terminal.Gui {
 			return sb.ToString ();
 		}
 
-		public string FilePath { get; set; }
+		public string? FilePath { get; set; }
 
 		/// <summary>
 		/// The number of text lines in the model
@@ -410,7 +412,7 @@ namespace Terminal.Gui {
 			return foundPos;
 		}
 
-		internal (Point current, bool found) ReplaceAllText (string text, bool matchCase = false, bool matchWholeWord = false, string textToReplace = null)
+		internal (Point current, bool found) ReplaceAllText (string text, bool matchCase = false, bool matchWholeWord = false, string? textToReplace = null)
 		{
 			bool found = false;
 			Point pos = Point.Empty;
@@ -432,11 +434,11 @@ namespace Terminal.Gui {
 						if (!found) {
 							found = true;
 						}
-						_lines [i] = ReplaceText (x, textToReplace, matchText, col).ToRuneCellList ();
+						_lines [i] = ReplaceText (x, textToReplace!, matchText, col).ToRuneCellList ();
 						x = _lines [i];
 						txt = GetText (x);
 						pos = new Point (col, i);
-						col += (textToReplace.Length - matchText.Length);
+						col += (textToReplace!.Length - matchText.Length);
 					}
 					if (col < 0 || col + 1 > txt.Length) {
 						break;
@@ -810,13 +812,13 @@ namespace Terminal.Gui {
 
 		List<HistoryTextItem> _historyTextItems = new List<HistoryTextItem> ();
 		int _idxHistoryText = -1;
-		string _originalText;
+		string? _originalText;
 
 		public bool IsFromHistory { get; private set; }
 
 		public bool HasHistoryChanges => _idxHistoryText > -1;
 
-		public event EventHandler<HistoryTextItem> ChangeText;
+		public event EventHandler<HistoryTextItem>? ChangeText;
 
 		public void Add (List<List<RuneCell>> lines, Point curPos, LineStatus lineStatus = LineStatus.Original)
 		{
@@ -966,9 +968,9 @@ namespace Terminal.Gui {
 			}
 		}
 
-		void OnChangeText (HistoryTextItem lines)
+		void OnChangeText (HistoryTextItem? lines)
 		{
-			ChangeText?.Invoke (this, lines);
+			ChangeText?.Invoke (this, lines!);
 		}
 
 		public void Clear (string text)
@@ -1108,7 +1110,7 @@ namespace Terminal.Gui {
 			var firstLine = _wrappedModelLines.IndexOf (r => r.ModelLine == modelLine);
 			int modelCol = 0;
 
-			for (int i = firstLine; i <= Math.Min (line, _wrappedModelLines.Count - 1); i++) {
+			for (int i = firstLine; i <= Math.Min (line, _wrappedModelLines!.Count - 1); i++) {
 				var wLine = _wrappedModelLines [i];
 
 				if (i < line) {
@@ -1253,7 +1255,7 @@ namespace Terminal.Gui {
 			int i = firstLine;
 
 			while (modelCol < col) {
-				var wLine = _wrappedModelLines [i];
+				var wLine = _wrappedModelLines! [i];
 				var wLineToCompare = wModelLines [i];
 
 				if (wLine.ModelLine != modelLine || wLineToCompare.ModelLine != modelLine)
@@ -1395,7 +1397,7 @@ namespace Terminal.Gui {
 		int _selectionStartColumn, _selectionStartRow;
 		bool _selecting;
 		bool _wordWrap;
-		WordWrapManager _wrapManager;
+		WordWrapManager? _wrapManager;
 		bool _continuousFind;
 		int _bottomOffset, _rightOffset;
 		int _tabWidth = 4;
@@ -1403,7 +1405,8 @@ namespace Terminal.Gui {
 		bool _allowsReturn = true;
 		bool _multiline = true;
 		HistoryText _historyText = new HistoryText ();
-		CultureInfo _currentCulture;
+		CultureInfo? _currentCulture;
+		ColorScheme? _savedColorScheme;
 
 		/// <summary>
 		/// Raised when the <see cref="Text"/> property of the <see cref="TextView"/> changes.
@@ -1413,7 +1416,7 @@ namespace Terminal.Gui {
 		/// set, not as the user types. To be notified as the user changes the contents of the TextView
 		/// see <see cref="IsDirty"/>.
 		/// </remarks>
-		public event EventHandler TextChanged;
+		public event EventHandler? TextChanged;
 
 		/// <summary>
 		///  Raised when the contents of the <see cref="TextView"/> are changed. 
@@ -1422,12 +1425,12 @@ namespace Terminal.Gui {
 		/// Unlike the <see cref="TextChanged"/> event, this event is raised whenever the user types or
 		/// otherwise changes the contents of the <see cref="TextView"/>.
 		/// </remarks>
-		public event EventHandler<ContentsChangedEventArgs> ContentsChanged;
+		public event EventHandler<ContentsChangedEventArgs>? ContentsChanged;
 
 		/// <summary>
 		/// Invoked with the unwrapped <see cref="CursorPosition"/>.
 		/// </summary>
-		public event EventHandler<PointEventArgs> UnwrappedCursorPosition;
+		public event EventHandler<PointEventArgs>? UnwrappedCursorPosition;
 
 		/// <summary>
 		/// Provides autocomplete context menu based on suggestions at the current cursor
@@ -1442,7 +1445,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public TextView (Rect frame) : base (frame)
 		{
-			Initialize ();
+			SetInitialProperties ();
 		}
 
 		/// <summary>
@@ -1451,18 +1454,18 @@ namespace Terminal.Gui {
 		/// </summary>
 		public TextView () : base ()
 		{
-			Initialize ();
+			SetInitialProperties ();
 		}
 
-		void Initialize ()
+		void SetInitialProperties ()
 		{
 			CanFocus = true;
 			Used = true;
 
-			_model.LinesLoaded += Model_LinesLoaded;
-			_historyText.ChangeText += HistoryText_ChangeText;
+			_model.LinesLoaded += Model_LinesLoaded!;
+			_historyText.ChangeText += HistoryText_ChangeText!;
 
-			Initialized += TextView_Initialized;
+			Initialized += TextView_Initialized!;
 
 			// Things this view knows how to do
 			AddCommand (Command.PageDown, () => { ProcessPageDown (); return true; });
@@ -1512,7 +1515,7 @@ namespace Terminal.Gui {
 			AddCommand (Command.Redo, () => { RedoChanges (); return true; });
 			AddCommand (Command.DeleteAll, () => { DeleteAll (); return true; });
 			AddCommand (Command.Accept, () => {
-				ContextMenu.Position = new Point (CursorPosition.X - _leftColumn + 2, CursorPosition.Y - _topRow + 2);
+				ContextMenu!.Position = new Point (CursorPosition.X - _leftColumn + 2, CursorPosition.Y - _topRow + 2);
 				ShowContextMenu ();
 				return true;
 			});
@@ -1617,7 +1620,7 @@ namespace Terminal.Gui {
 			_currentCulture = Thread.CurrentThread.CurrentUICulture;
 
 			ContextMenu = new ContextMenu () { MenuItems = BuildContextMenuBarItem () };
-			ContextMenu.KeyChanged += ContextMenu_KeyChanged;
+			ContextMenu.KeyChanged += ContextMenu_KeyChanged!;
 
 			AddKeyBinding (ContextMenu.Key, Command.Accept);
 		}
@@ -1703,8 +1706,8 @@ namespace Terminal.Gui {
 		{
 			Autocomplete.HostControl = this;
 			if (Application.Top != null) {
-				Application.Top.AlternateForwardKeyChanged += Top_AlternateForwardKeyChanged;
-				Application.Top.AlternateBackwardKeyChanged += Top_AlternateBackwardKeyChanged;
+				Application.Top.AlternateForwardKeyChanged += Top_AlternateForwardKeyChanged!;
+				Application.Top.AlternateBackwardKeyChanged += Top_AlternateBackwardKeyChanged!;
 			}
 			OnContentsChanged ();
 		}
@@ -1742,7 +1745,7 @@ namespace Terminal.Gui {
 		public override string Text {
 			get {
 				if (_wordWrap) {
-					return _wrapManager.Model.ToString ();
+					return _wrapManager!.Model.ToString ();
 				} else {
 					return _model.ToString ();
 				}
@@ -1771,6 +1774,15 @@ namespace Terminal.Gui {
 					WrapTextModel ();
 					Adjust ();
 				}
+			}
+		}
+
+		///<inheritdoc/>
+		public override ColorScheme ColorScheme {
+			get => base.ColorScheme;
+			set {
+				_savedColorScheme ??= ColorScheme;
+				base.ColorScheme = value;
 			}
 		}
 
@@ -1998,7 +2010,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		Dim savedHeight = null;
+		Dim? savedHeight = null;
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="TextView"/> is a multiline text view.
@@ -2065,7 +2077,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Get the <see cref="ContextMenu"/> for this view.
 		/// </summary>
-		public ContextMenu ContextMenu { get; private set; }
+		public ContextMenu? ContextMenu { get; private set; }
 
 		int GetSelectedLength ()
 		{
@@ -2203,11 +2215,24 @@ namespace Terminal.Gui {
 			}
 		}
 
+		private void SetColorScheme (List<RuneCell> line, int idx)
+		{
+			if (line [idx].ColorScheme != null) {
+				ColorScheme = line [idx].ColorScheme!;
+			}
+		}
+
+		private void RestoreColorScheme ()
+		{
+			ColorScheme ??= _savedColorScheme!;
+		}
+
 		/// <summary>
 		/// Sets the driver to the default color for the control where no text is being rendered. Defaults to <see cref="ColorScheme.Normal"/>.
 		/// </summary>
 		protected virtual void SetNormalColor ()
 		{
+			RestoreColorScheme ();
 			Driver.SetAttribute (GetNormalColor ());
 		}
 
@@ -2216,10 +2241,11 @@ namespace Terminal.Gui {
 		/// current <paramref name="line"/>. Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
 		/// Defaults to <see cref="ColorScheme.Normal"/>.
 		/// </summary>
-		/// <param name="line"></param>
-		/// <param name="idx"></param>
+		/// <param name="line">The line.</param>
+		/// <param name="idx">The index.</param>
 		protected virtual void SetNormalColor (List<RuneCell> line, int idx)
 		{
+			SetColorScheme (line, idx);
 			Driver.SetAttribute (GetNormalColor ());
 		}
 
@@ -2228,10 +2254,11 @@ namespace Terminal.Gui {
 		/// current <paramref name="line"/>. Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
 		/// Defaults to <see cref="ColorScheme.Focus"/>.
 		/// </summary>
-		/// <param name="line"></param>
-		/// <param name="idx"></param>
+		/// <param name="line">The line.</param>
+		/// <param name="idx">The index.</param>
 		protected virtual void SetSelectionColor (List<RuneCell> line, int idx)
 		{
+			SetColorScheme (line, idx);
 			Driver.SetAttribute (new Attribute (ColorScheme.Focus.Background, ColorScheme.Focus.Foreground));
 		}
 
@@ -2240,10 +2267,11 @@ namespace Terminal.Gui {
 		/// current <paramref name="line"/>. Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
 		/// Defaults to <see cref="ColorScheme.Focus"/>.
 		/// </summary>
-		/// <param name="line"></param>
-		/// <param name="idx"></param>
+		/// <param name="line">The line.</param>
+		/// <param name="idx">The index.</param>
 		protected virtual void SetReadOnlyColor (List<RuneCell> line, int idx)
 		{
+			SetColorScheme (line, idx);
 			Attribute attribute;
 			if (ColorScheme.Disabled.Foreground == ColorScheme.Focus.Background) {
 				attribute = new Attribute (ColorScheme.Focus.Foreground, ColorScheme.Focus.Background);
@@ -2258,10 +2286,11 @@ namespace Terminal.Gui {
 		/// current <paramref name="line"/>. Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
 		/// Defaults to <see cref="ColorScheme.HotFocus"/>.
 		/// </summary>
-		/// <param name="line"></param>
-		/// <param name="idx"></param>
+		/// <param name="line">The line.</param>
+		/// <param name="idx">The index.</param>
 		protected virtual void SetUsedColor (List<RuneCell> line, int idx)
 		{
+			SetColorScheme (line, idx);
 			Driver.SetAttribute (ColorScheme.HotFocus);
 		}
 
@@ -2353,7 +2382,7 @@ namespace Terminal.Gui {
 		// Returns a string with the text in the selected 
 		// region.
 		//
-		string GetRegion (int? sRow = null, int? sCol = null, int? cRow = null, int? cCol = null, TextModel model = null)
+		string GetRegion (int? sRow = null, int? sCol = null, int? cRow = null, int? cCol = null, TextModel? model = null)
 		{
 			long start, end;
 			GetEncodedRegionBounds (out start, out end, sRow, sCol, cRow, cCol);
@@ -2472,7 +2501,7 @@ namespace Terminal.Gui {
 		/// <param name="replace"><c>true</c>If is replacing.<c>false</c>otherwise.</param>
 		/// <returns><c>true</c>If the text was found.<c>false</c>otherwise.</returns>
 		public bool FindNextText (string textToFind, out bool gaveFullTurn, bool matchCase = false,
-			bool matchWholeWord = false, string textToReplace = null, bool replace = false)
+			bool matchWholeWord = false, string? textToReplace = null, bool replace = false)
 		{
 			if (_model.Count == 0) {
 				gaveFullTurn = false;
@@ -2497,7 +2526,7 @@ namespace Terminal.Gui {
 		/// <param name="replace"><c>true</c>If the text was found.<c>false</c>otherwise.</param>
 		/// <returns><c>true</c>If the text was found.<c>false</c>otherwise.</returns>
 		public bool FindPreviousText (string textToFind, out bool gaveFullTurn, bool matchCase = false,
-			bool matchWholeWord = false, string textToReplace = null, bool replace = false)
+			bool matchWholeWord = false, string? textToReplace = null, bool replace = false)
 		{
 			if (_model.Count == 0) {
 				gaveFullTurn = false;
@@ -2528,7 +2557,7 @@ namespace Terminal.Gui {
 		/// <param name="textToReplace">The text to replace.</param>
 		/// <returns><c>true</c>If the text was found.<c>false</c>otherwise.</returns>
 		public bool ReplaceAllText (string textToFind, bool matchCase = false, bool matchWholeWord = false,
-			string textToReplace = null)
+			string? textToReplace = null)
 		{
 			if (_isReadOnly || _model.Count == 0) {
 				return false;
@@ -2542,7 +2571,7 @@ namespace Terminal.Gui {
 		}
 
 		bool SetFoundText (string text, (Point current, bool found) foundPos,
-			string textToReplace = null, bool replace = false, bool replaceAll = false)
+			string? textToReplace = null, bool replace = false, bool replaceAll = false)
 		{
 			if (foundPos.found) {
 				StartSelecting ();
@@ -2551,15 +2580,15 @@ namespace Terminal.Gui {
 				if (!replaceAll) {
 					_currentColumn = _selectionStartColumn + text.GetRuneCount ();
 				} else {
-					_currentColumn = _selectionStartColumn + textToReplace.GetRuneCount ();
+					_currentColumn = _selectionStartColumn + textToReplace!.GetRuneCount ();
 				}
 				_currentRow = foundPos.current.Y;
 				if (!_isReadOnly && replace) {
 					Adjust ();
 					ClearSelectedRegion ();
-					InsertAllText (textToReplace);
+					InsertAllText (textToReplace!);
 					StartSelecting ();
-					_selectionStartColumn = _currentColumn - textToReplace.GetRuneCount ();
+					_selectionStartColumn = _currentColumn - textToReplace!.GetRuneCount ();
 				} else {
 					UpdateWrapModel ();
 					SetNeedsDisplay ();
@@ -2583,12 +2612,12 @@ namespace Terminal.Gui {
 			}
 		}
 
-		string _currentCaller;
+		string? _currentCaller;
 
 		/// <summary>
 		/// Restore from original model.
 		/// </summary>
-		void SetWrapModel ([CallerMemberName] string caller = null)
+		void SetWrapModel ([CallerMemberName] string? caller = null)
 		{
 			if (_currentCaller != null)
 				return;
@@ -2596,7 +2625,7 @@ namespace Terminal.Gui {
 			if (_wordWrap) {
 				_currentCaller = caller;
 
-				_currentColumn = _wrapManager.GetModelColFromWrappedLines (_currentRow, _currentColumn);
+				_currentColumn = _wrapManager!.GetModelColFromWrappedLines (_currentRow, _currentColumn);
 				_currentRow = _wrapManager.GetModelLineFromWrappedLines (_currentRow);
 				_selectionStartColumn = _wrapManager.GetModelColFromWrappedLines (_selectionStartRow, _selectionStartColumn);
 				_selectionStartRow = _wrapManager.GetModelLineFromWrappedLines (_selectionStartRow);
@@ -2607,7 +2636,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Update the original model.
 		/// </summary>
-		void UpdateWrapModel ([CallerMemberName] string caller = null)
+		void UpdateWrapModel ([CallerMemberName] string? caller = null)
 		{
 			if (_currentCaller != null && _currentCaller != caller)
 				return;
@@ -2615,7 +2644,7 @@ namespace Terminal.Gui {
 			if (_wordWrap) {
 				_currentCaller = null;
 
-				_wrapManager.UpdateModel (_model, out int nRow, out int nCol,
+				_wrapManager!.UpdateModel (_model, out int nRow, out int nCol,
 					out int nStartRow, out int nStartCol,
 					_currentRow, _currentColumn,
 					_selectionStartRow, _selectionStartColumn, preserveTrailingSpaces: true);
@@ -2637,7 +2666,7 @@ namespace Terminal.Gui {
 			var row = cRow == null ? _currentRow : cRow;
 			var col = cCol == null ? _currentColumn : cCol;
 			if (cRow == null && cCol == null && _wordWrap) {
-				row = _wrapManager.GetModelLineFromWrappedLines (_currentRow);
+				row = _wrapManager!.GetModelLineFromWrappedLines (_currentRow);
 				col = _wrapManager.GetModelColFromWrappedLines (_currentRow, _currentColumn);
 			}
 			UnwrappedCursorPosition?.Invoke (this, new PointEventArgs (new Point ((int)col, (int)row)));
@@ -2651,7 +2680,7 @@ namespace Terminal.Gui {
 			var startCol = _selectionStartColumn;
 			var model = this._model;
 			if (_wordWrap) {
-				cRow = _wrapManager.GetModelLineFromWrappedLines (_currentRow);
+				cRow = _wrapManager!.GetModelLineFromWrappedLines (_currentRow);
 				cCol = _wrapManager.GetModelColFromWrappedLines (_currentRow, _currentColumn);
 				startRow = _wrapManager.GetModelLineFromWrappedLines (_selectionStartRow);
 				startCol = _wrapManager.GetModelColFromWrappedLines (_selectionStartRow, _selectionStartColumn);
@@ -2897,7 +2926,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			List<RuneCell> rest = null;
+			List<RuneCell>? rest = null;
 			int lastp = 0;
 
 			if (_model.Count > 0 && line.Count > 0 && !_copyWithoutSelection) {
@@ -3016,10 +3045,10 @@ namespace Terminal.Gui {
 			int w = 0;
 			int h = 0;
 			if (SuperView?.Frame.Right - Frame.Right < 0) {
-				w = SuperView.Frame.Right - Frame.Right - 1;
+				w = SuperView!.Frame.Right - Frame.Right - 1;
 			}
 			if (SuperView?.Frame.Bottom - Frame.Bottom < 0) {
-				h = SuperView.Frame.Bottom - Frame.Bottom - 1;
+				h = SuperView!.Frame.Bottom - Frame.Bottom - 1;
 			}
 			return (w, h);
 		}
@@ -3953,7 +3982,7 @@ namespace Terminal.Gui {
 			_continuousFind = false;
 		}
 
-		bool InsertText (KeyEvent kb, Attribute? attribute = null)
+		bool InsertText (KeyEvent kb, ColorScheme? colorScheme = null)
 		{
 			//So that special keys like tab can be processed
 			if (_isReadOnly)
@@ -3974,14 +4003,14 @@ namespace Terminal.Gui {
 				_currentColumn = 0;
 			} else {
 				if (Used) {
-					Insert (new RuneCell { Rune = (Rune)(uint)kb.Key, Attribute = attribute });
+					Insert (new RuneCell { Rune = (Rune)(uint)kb.Key, ColorScheme = colorScheme });
 					_currentColumn++;
 					if (_currentColumn >= _leftColumn + Frame.Width) {
 						_leftColumn++;
 						SetNeedsDisplay ();
 					}
 				} else {
-					Insert (new RuneCell { Rune = (Rune)(uint)kb.Key, Attribute = attribute });
+					Insert (new RuneCell { Rune = (Rune)(uint)kb.Key, ColorScheme = colorScheme });
 					_currentColumn++;
 				}
 			}
@@ -4001,9 +4030,9 @@ namespace Terminal.Gui {
 
 				_currentCulture = Thread.CurrentThread.CurrentUICulture;
 
-				ContextMenu.MenuItems = BuildContextMenuBarItem ();
+				ContextMenu!.MenuItems = BuildContextMenuBarItem ();
 			}
-			ContextMenu.Show ();
+			ContextMenu!.Show ();
 		}
 
 		/// <summary>
@@ -4377,7 +4406,7 @@ namespace Terminal.Gui {
 				&& !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
 				&& !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked | MouseFlags.ButtonShift)
 				&& !ev.Flags.HasFlag (MouseFlags.Button1TripleClicked)
-				&& !ev.Flags.HasFlag (ContextMenu.MouseFlags)) {
+				&& !ev.Flags.HasFlag (ContextMenu!.MouseFlags)) {
 				return false;
 			}
 
@@ -4514,7 +4543,7 @@ namespace Terminal.Gui {
 				PositionCursor ();
 				_lastWasKill = false;
 				_columnTrack = _currentColumn;
-			} else if (ev.Flags == ContextMenu.MouseFlags) {
+			} else if (ev.Flags == ContextMenu!.MouseFlags) {
 				ContextMenu.Position = new Point (ev.X + 2, ev.Y + 2);
 				ShowContextMenu ();
 			}
@@ -4524,7 +4553,7 @@ namespace Terminal.Gui {
 
 		void ProcessMouseClick (MouseEvent ev, out List<RuneCell> line)
 		{
-			List<RuneCell> r = null;
+			List<RuneCell>? r = null;
 			if (_model.Count > 0) {
 				var maxCursorPositionableLine = Math.Max ((_model.Count - 1) - _topRow, 0);
 				if (Math.Max (ev.Y, 0) > maxCursorPositionableLine) {
@@ -4541,7 +4570,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			line = r;
+			line = r!;
 		}
 
 		/// <summary>
