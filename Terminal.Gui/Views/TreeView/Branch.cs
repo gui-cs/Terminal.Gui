@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Terminal.Gui {
-	class Branch<T> where T : class {
+	internal class Branch<T> where T : class {
 		/// <summary>
 		/// True if the branch is expanded to reveal child branches.
 		/// </summary>
