@@ -2846,6 +2846,13 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public List<RuneCell> GetCurrentLine () => _model.GetLine (_currentRow);
 
+		/// <summary>
+		/// Returns the characters on the <paramref name="line"/>.
+		/// </summary>
+		/// <param name="line">The intended line.</param>
+		/// <returns></returns>
+		public List<RuneCell> GetLine (int line) => _model.GetLine (line);
+
 		void InsertAllText (string text)
 		{
 			if (string.IsNullOrEmpty (text)) {
