@@ -15,7 +15,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Represents a single row/column within the <see cref="TextView"/>. Includes the glyph and the foreground/background colors.
 	/// </summary>
-	public class RuneCell {
+	public class RuneCell : IEquatable<RuneCell> {
 		/// <summary>
 		/// The glyph to draw.
 		/// </summary>
@@ -25,6 +25,18 @@ namespace Terminal.Gui {
 		/// The foreground color to draw the glyph with.
 		/// </summary>
 		public ColorScheme? ColorScheme { get; set; }
+
+		/// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
+		/// <param name="other">An object to compare with this object.</param>
+		/// <returns>
+		///   <see langword="true" /> if the current object is equal to the <paramref name="other" /> parameter; 
+		///   otherwise, <see langword="false" />.</returns>
+		public bool Equals (RuneCell? other)
+		{
+			return other != null &&
+				Rune.Equals (other.Rune) &&
+				ColorScheme == other.ColorScheme;
+		}
 	}
 
 	class TextModel {
