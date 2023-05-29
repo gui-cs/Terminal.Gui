@@ -511,6 +511,22 @@ namespace Terminal.Gui {
 				_disabled = new Attribute (_disabled.Foreground, _disabled.Background);
 			}
 		}
+
+		/// <summary>
+		/// Sets the foreground and background color for text on all <see cref="ColorScheme"/> attributes.
+		/// </summary>
+		/// <param name="attribute">The attribute to apply to all.</param>
+		/// <returns></returns>
+		public static ColorScheme SetAllAttributesBasedOn (Attribute attribute)
+		{
+			return new ColorScheme () {
+				Normal = attribute,
+				Focus = attribute,
+				HotNormal = attribute,
+				HotFocus = attribute,
+				Disabled = attribute
+			};
+		}
 	}
 
 	/// <summary>
@@ -764,13 +780,13 @@ namespace Terminal.Gui {
 			}
 			return true;
 		}
-		
+
 		/// <summary>
 		/// Adds the specified rune to the display at the current cursor position.
 		/// </summary>
 		/// <param name="rune">Rune to add.</param>
 		public abstract void AddRune (Rune rune);
-		
+
 		/// <summary>
 		/// Ensures that the column and line are in a valid range from the size of the driver.
 		/// </summary>
