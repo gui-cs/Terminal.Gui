@@ -15,7 +15,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Represents a single row/column within the <see cref="TextView"/>. Includes the glyph and the foreground/background colors.
 	/// </summary>
-	public struct RuneCell {
+	public class RuneCell {
 		/// <summary>
 		/// The glyph to draw.
 		/// </summary>
@@ -590,7 +590,7 @@ namespace Terminal.Gui {
 			if (line.Count > 0) {
 				return line [col > line.Count - 1 ? line.Count - 1 : col];
 			} else {
-				return default;
+				return default!;
 			}
 		}
 
@@ -2253,7 +2253,7 @@ namespace Terminal.Gui {
 
 		private void RestoreColorScheme ()
 		{
-			ColorScheme ??= _savedColorScheme!;
+			ColorScheme = _savedColorScheme!;
 		}
 
 		/// <summary>
@@ -2759,7 +2759,7 @@ namespace Terminal.Gui {
 							}
 						}
 					} else {
-						AddRune (col, row, (Rune)rune);
+						AddRune (col, row, rune);
 					}
 					if (!TextModel.SetCol (ref col, contentArea.Right, cols)) {
 						break;
