@@ -2197,23 +2197,23 @@ line.
 		public void Internal_Tests ()
 		{
 			var txt = "This is a text.";
-			var txtRunes = TextModel.ToRunes (txt);
+			var txtRunes = TextModel.ToRuneCells (txt);
 			Assert.Equal (txt.Length, txtRunes.Count);
-			Assert.Equal ('T', txtRunes [0].Value);
-			Assert.Equal ('h', txtRunes [1].Value);
-			Assert.Equal ('i', txtRunes [2].Value);
-			Assert.Equal ('s', txtRunes [3].Value);
-			Assert.Equal (' ', txtRunes [4].Value);
-			Assert.Equal ('i', txtRunes [5].Value);
-			Assert.Equal ('s', txtRunes [6].Value);
-			Assert.Equal (' ', txtRunes [7].Value);
-			Assert.Equal ('a', txtRunes [8].Value);
-			Assert.Equal (' ', txtRunes [9].Value);
-			Assert.Equal ('t', txtRunes [10].Value);
-			Assert.Equal ('e', txtRunes [11].Value);
-			Assert.Equal ('x', txtRunes [12].Value);
-			Assert.Equal ('t', txtRunes [13].Value);
-			Assert.Equal ('.', txtRunes [^1].Value);
+			Assert.Equal ('T', txtRunes [0].Rune.Value);
+			Assert.Equal ('h', txtRunes [1].Rune.Value);
+			Assert.Equal ('i', txtRunes [2].Rune.Value);
+			Assert.Equal ('s', txtRunes [3].Rune.Value);
+			Assert.Equal (' ', txtRunes [4].Rune.Value);
+			Assert.Equal ('i', txtRunes [5].Rune.Value);
+			Assert.Equal ('s', txtRunes [6].Rune.Value);
+			Assert.Equal (' ', txtRunes [7].Rune.Value);
+			Assert.Equal ('a', txtRunes [8].Rune.Value);
+			Assert.Equal (' ', txtRunes [9].Rune.Value);
+			Assert.Equal ('t', txtRunes [10].Rune.Value);
+			Assert.Equal ('e', txtRunes [11].Rune.Value);
+			Assert.Equal ('x', txtRunes [12].Rune.Value);
+			Assert.Equal ('t', txtRunes [13].Rune.Value);
+			Assert.Equal ('.', txtRunes [^1].Rune.Value);
 
 			int col = 0;
 			Assert.True (TextModel.SetCol (ref col, 80, 79));
@@ -2223,11 +2223,11 @@ line.
 			var start = 0;
 			var x = 8;
 			Assert.Equal (8, TextModel.GetColFromX (txtRunes, start, x));
-			Assert.Equal ('a', txtRunes [start + x].Value);
+			Assert.Equal ('a', txtRunes [start + x].Rune.Value);
 			start = 1;
 			x = 7;
 			Assert.Equal (7, TextModel.GetColFromX (txtRunes, start, x));
-			Assert.Equal ('a', txtRunes [start + x].Value);
+			Assert.Equal ('a', txtRunes [start + x].Rune.Value);
 
 			Assert.Equal ((15, 15), TextModel.DisplaySize (txtRunes));
 			Assert.Equal ((6, 6), TextModel.DisplaySize (txtRunes, 1, 7));
@@ -2237,8 +2237,8 @@ line.
 			Assert.Equal (2, TextModel.CalculateLeftColumn (txtRunes, 0, 9, 8));
 
 			var tm = new TextModel ();
-			tm.AddLine (0, TextModel.ToRunes ("This is first line."));
-			tm.AddLine (1, TextModel.ToRunes ("This is last line."));
+			tm.AddLine (0, TextModel.ToRuneCells ("This is first line."));
+			tm.AddLine (1, TextModel.ToRuneCells ("This is last line."));
 			Assert.Equal ((new Point (2, 0), true), tm.FindNextText ("is", out bool gaveFullTurn));
 			Assert.False (gaveFullTurn);
 			Assert.Equal ((new Point (5, 0), true), tm.FindNextText ("is", out gaveFullTurn));
@@ -2262,14 +2262,14 @@ line.
 			Assert.True (gaveFullTurn);
 
 			Assert.Equal ((new Point (9, 1), true), tm.ReplaceAllText ("is", false, false, "really"));
-			Assert.Equal (TextModel.ToRunes ("Threally really first line."), tm.GetLine (0));
-			Assert.Equal (TextModel.ToRunes ("Threally really last line."), tm.GetLine (1));
+			Assert.Equal (TextModel.ToRuneCells ("Threally really first line."), tm.GetLine (0));
+			Assert.Equal (TextModel.ToRuneCells ("Threally really last line."), tm.GetLine (1));
 			tm = new TextModel ();
-			tm.AddLine (0, TextModel.ToRunes ("This is first line."));
-			tm.AddLine (1, TextModel.ToRunes ("This is last line."));
+			tm.AddLine (0, TextModel.ToRuneCells ("This is first line."));
+			tm.AddLine (1, TextModel.ToRuneCells ("This is last line."));
 			Assert.Equal ((new Point (5, 1), true), tm.ReplaceAllText ("is", false, true, "really"));
-			Assert.Equal (TextModel.ToRunes ("This really first line."), tm.GetLine (0));
-			Assert.Equal (TextModel.ToRunes ("This really last line."), tm.GetLine (1));
+			Assert.Equal (TextModel.ToRuneCells ("This really first line."), tm.GetLine (0));
+			Assert.Equal (TextModel.ToRuneCells ("This really last line."), tm.GetLine (1));
 		}
 
 		[Fact]
@@ -2995,12 +2995,12 @@ line.
 
 			foreach (var ls in Enum.GetValues (typeof (HistoryText.LineStatus))) {
 				if ((HistoryText.LineStatus)ls != HistoryText.LineStatus.Original) {
-					Assert.Throws<ArgumentException> (() => ht.Add (new List<List<Rune>> () { new List<Rune> () }, Point.Empty,
+					Assert.Throws<ArgumentException> (() => ht.Add (new List<List<RuneCell>> () { new List<RuneCell> () }, Point.Empty,
 						(HistoryText.LineStatus)ls));
 				}
 			}
 
-			Assert.Null (Record.Exception (() => ht.Add (new List<List<Rune>> () { new List<Rune> () }, Point.Empty,
+			Assert.Null (Record.Exception (() => ht.Add (new List<List<RuneCell>> () { new List<RuneCell> () }, Point.Empty,
 				HistoryText.LineStatus.Original)));
 		}
 

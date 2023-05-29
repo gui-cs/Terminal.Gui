@@ -10,8 +10,23 @@ using System.Threading;
 using Terminal.Gui.Resources;
 
 namespace Terminal.Gui {
+	/// <summary>
+	/// Represents a single row/column within the <see cref="TextView"/>. Includes the glyph and the foreground/background colors.
+	/// </summary>
+	public struct RuneCell {
+		/// <summary>
+		/// The glyph to draw.
+		/// </summary>
+		public Rune Rune { get; set; }
+
+		/// <summary>
+		/// The foreground color to draw the glyph with.
+		/// </summary>
+		public Attribute? Attribute { get; set; }
+	}
+
 	class TextModel {
-		List<List<Rune>> _lines = new List<List<Rune>> ();
+		List<List<RuneCell>> _lines = new List<List<RuneCell>> ();
 
 		public event EventHandler LinesLoaded;
 
@@ -30,28 +45,38 @@ namespace Terminal.Gui {
 				throw new ArgumentNullException (nameof (FilePath));
 
 			FilePath = null;
-			_lines = new List<List<Rune>> ();
+			_lines = new List<List<RuneCell>> ();
 			return true;
 		}
 
-		// Turns the string into runes, this does not split the 
+		// Turns the string into cells, this does not split the 
 		// contents on a newline if it is present.
-		internal static List<Rune> ToRunes (string str)
+		internal static List<RuneCell> ToRuneCells (string str, Attribute? attribute = null)
 		{
-			List<Rune> runes = new List<Rune> ();
-			foreach (var x in str.ToRunes ()) {
-				runes.Add (x);
+			List<RuneCell> cells = new List<RuneCell> ();
+			foreach (var rune in str.ToRunes ()) {
+				cells.Add (new RuneCell { Rune = rune, Attribute = attribute });
 			}
-			return runes;
+			return cells;
 		}
 
-		// Splits a string into a List that contains a List<Rune> for each line
-		public static List<List<Rune>> StringToRunes (string content)
+		internal static List<RuneCell> ToRuneCells (IEnumerable<Rune> runes, Attribute? attribute = null)
 		{
-			var lines = new List<List<Rune>> ();
+			List<RuneCell> cells = new List<RuneCell> ();
+			foreach (var rune in runes) {
+				cells.Add (new RuneCell { Rune = rune, Attribute = attribute });
+			}
+			return cells;
+		}
+
+		// Splits a string into a List that contains a List<RuneCell> for each line
+		public static List<List<RuneCell>> StringToRuneCells (string content, Attribute? attribute = null)
+		{
+			var lines = new List<List<RuneCell>> ();
 			int start = 0, i = 0;
 			var hasCR = false;
 			var runes = content.EnumerateRunes ().ToList ();
+			var cells = runes.Select (x => new RuneCell () { Rune = x, Attribute = attribute }).ToList ();
 			// ASCII code 13 = Carriage Return.
 			// ASCII code 10 = Line Feed.
 			for (; i < runes.Count; i++) {
@@ -61,22 +86,22 @@ namespace Terminal.Gui {
 				}
 				if (runes [i].Value == 10) {
 					if (i - start > 0)
-						lines.Add (runes.GetRange (start, hasCR ? i - 1 - start : i - start));
+						lines.Add (cells.GetRange (start, hasCR ? i - 1 - start : i - start));
 					else
-						lines.Add (ToRunes (string.Empty));
+						lines.Add (ToRuneCells (string.Empty));
 					start = i + 1;
 					hasCR = false;
 				}
 			}
 			if (i - start >= 0)
-				lines.Add (runes.GetRange (start, i - start));
+				lines.Add (cells.GetRange (start, i - start));
 			return lines;
 		}
 
 		void Append (List<byte> line)
 		{
 			var str = StringExtensions.ToString (line.ToArray ());
-			_lines.Add (ToRunes (str));
+			_lines.Add (ToRuneCells (str));
 		}
 
 		public void LoadStream (Stream input)
@@ -84,7 +109,7 @@ namespace Terminal.Gui {
 			if (input == null)
 				throw new ArgumentNullException (nameof (input));
 
-			_lines = new List<List<Rune>> ();
+			_lines = new List<List<RuneCell>> ();
 			var buff = new BufferedStream (input);
 			int v;
 			var line = new List<byte> ();
@@ -111,7 +136,7 @@ namespace Terminal.Gui {
 
 		public void LoadString (string content)
 		{
-			_lines = StringToRunes (content);
+			_lines = StringToRuneCells (content);
 
 			OnLinesLoaded ();
 		}
@@ -145,7 +170,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns>The line.</returns>
 		/// <param name="line">Line number to retrieve.</param>
-		public List<Rune> GetLine (int line)
+		public List<RuneCell> GetLine (int line)
 		{
 			if (_lines.Count > 0) {
 				if (line < Count) {
@@ -154,7 +179,7 @@ namespace Terminal.Gui {
 					return _lines [Count - 1];
 				}
 			} else {
-				_lines.Add (new List<Rune> ());
+				_lines.Add (new List<RuneCell> ());
 				return _lines [0];
 			}
 		}
@@ -164,7 +189,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="pos">Line number where the line will be inserted.</param>
 		/// <param name="runes">The line of text, as a List of Rune.</param>
-		public void AddLine (int pos, List<Rune> runes)
+		public void AddLine (int pos, List<RuneCell> runes)
 		{
 			_lines.Insert (pos, runes);
 		}
@@ -183,10 +208,10 @@ namespace Terminal.Gui {
 			}
 		}
 
-		public void ReplaceLine (int pos, List<Rune> runes)
+		public void ReplaceLine (int pos, List<RuneCell> runes)
 		{
 			if (_lines.Count > 0 && pos < _lines.Count) {
-				_lines [pos] = new List<Rune> (runes);
+				_lines [pos] = new List<RuneCell> (runes);
 			} else if (_lines.Count == 0 || (_lines.Count > 0 && pos >= _lines.Count)) {
 				_lines.Add (runes);
 			}
@@ -204,7 +229,7 @@ namespace Terminal.Gui {
 			last = last < _lines.Count ? last : _lines.Count;
 			for (int i = first; i < last; i++) {
 				var line = GetLine (i);
-				var tabSum = line.Sum (r => r.Value == '\t' ? Math.Max (tabWidth - 1, 0) : 0);
+				var tabSum = line.Sum (c => c.Rune.Value == '\t' ? Math.Max (tabWidth - 1, 0) : 0);
 				var l = line.Count + tabSum;
 				if (l > maxLength) {
 					maxLength = l;
@@ -222,6 +247,15 @@ namespace Terminal.Gui {
 			}
 
 			return false;
+		}
+
+		internal static int GetColFromX (List<RuneCell> t, int start, int x, int tabWidth = 0)
+		{
+			var runes = new List<Rune> ();
+			foreach (var cell in t) {
+				runes.Add (cell.Rune);
+			}
+			return GetColFromX (runes, start, x, tabWidth);
 		}
 
 		internal static int GetColFromX (List<Rune> t, int start, int x, int tabWidth = 0)
@@ -242,6 +276,16 @@ namespace Terminal.Gui {
 				}
 			}
 			return t.Count - start;
+		}
+
+		internal static (int size, int length) DisplaySize (List<RuneCell> t, int start = -1, int end = -1,
+			bool checkNextRune = true, int tabWidth = 0)
+		{
+			List<Rune> runes = new List<Rune> ();
+			foreach (var cell in t) {
+				runes.Add (cell.Rune);
+			}
+			return DisplaySize (runes, start, end, checkNextRune, tabWidth);
 		}
 
 		// Returns the size and length in a range of the string.
@@ -283,6 +327,15 @@ namespace Terminal.Gui {
 			}
 
 			return (size, len);
+		}
+
+		internal static int CalculateLeftColumn (List<RuneCell> t, int start, int end, int width, int tabWidth = 0)
+		{
+			List<Rune> runes = new List<Rune> ();
+			foreach (var cell in t) {
+				runes.Add (cell.Rune);
+			}
+			return CalculateLeftColumn (runes, start, end, width, tabWidth);
 		}
 
 		// Returns the left column in a range of the string.
@@ -379,7 +432,7 @@ namespace Terminal.Gui {
 						if (!found) {
 							found = true;
 						}
-						_lines [i] = ReplaceText (x, textToReplace, matchText, col).ToRuneList ();
+						_lines [i] = ReplaceText (x, textToReplace, matchText, col).ToRuneCellList ();
 						x = _lines [i];
 						txt = GetText (x);
 						pos = new Point (col, i);
@@ -392,7 +445,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			string GetText (List<Rune> x)
+			string GetText (List<RuneCell> x)
 			{
 				var txt = StringExtensions.ToString (x);
 				if (!matchCase) {
@@ -404,7 +457,7 @@ namespace Terminal.Gui {
 			return (pos, found);
 		}
 
-		string ReplaceText (List<Rune> source, string textToReplace, string matchText, int col)
+		string ReplaceText (List<RuneCell> source, string textToReplace, string matchText, int col)
 		{
 			var origTxt = StringExtensions.ToString (source);
 			(int _, int len) = TextModel.DisplaySize (source, 0, col, false);
@@ -469,7 +522,7 @@ namespace Terminal.Gui {
 				if (start.Y != i) {
 					start.X = Math.Max (x.Count - 1, 0);
 				}
-				var matchText = !matchCase ? text.ToUpper (): text;
+				var matchText = !matchCase ? text.ToUpper () : text;
 				var col = txt.LastIndexOf (matchText, _toFind.found ? start.X - 1 : start.X);
 				if (col > -1 && matchWholeWord && !MatchWholeWord (txt, matchText, col)) {
 					continue;
@@ -512,7 +565,7 @@ namespace Terminal.Gui {
 			_toFind.found = false;
 		}
 
-		Rune RuneAt (int col, int row)
+		RuneCell RuneAt (int col, int row)
 		{
 			var line = GetLine (row);
 			if (line.Count > 0) {
@@ -527,9 +580,9 @@ namespace Terminal.Gui {
 			var line = GetLine (row);
 			if (col + 1 < line.Count) {
 				col++;
-				rune = line [col];
+				rune = line [col].Rune;
 				if (col + 1 == line.Count && !Rune.IsLetterOrDigit (rune)
-					&& !Rune.IsWhiteSpace (line [col - 1])) {
+					&& !Rune.IsWhiteSpace (line [col - 1].Rune)) {
 					col++;
 				}
 				return true;
@@ -541,7 +594,7 @@ namespace Terminal.Gui {
 				row++;
 				line = GetLine (row);
 				if (line.Count > 0) {
-					rune = line [0];
+					rune = line [0].Rune;
 					return true;
 				}
 			}
@@ -555,7 +608,7 @@ namespace Terminal.Gui {
 
 			if (col > 0) {
 				col--;
-				rune = line [col];
+				rune = line [col].Rune;
 				return true;
 			}
 			if (row == 0) {
@@ -567,7 +620,7 @@ namespace Terminal.Gui {
 				line = GetLine (row);
 				col = line.Count - 1;
 				if (col >= 0) {
-					rune = line [col];
+					rune = line [col].Rune;
 					return true;
 				}
 			}
@@ -611,7 +664,7 @@ namespace Terminal.Gui {
 			var col = fromCol;
 			var row = fromRow;
 			try {
-				var rune = RuneAt (col, row);
+				var rune = RuneAt (col, row).Rune;
 				var runeType = GetRuneType (rune);
 				int lastValidCol = IsSameRuneType (rune, runeType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune)) ? col : -1;
 
@@ -650,7 +703,7 @@ namespace Terminal.Gui {
 							return;
 						}
 						var line = GetLine (nRow);
-						if (nCol == line.Count && nRow == fromRow && (Rune.IsLetterOrDigit (line [0]) || Rune.IsPunctuation (line [0]) || Rune.IsSymbol (line [0]))) {
+						if (nCol == line.Count && nRow == fromRow && (Rune.IsLetterOrDigit (line [0].Rune) || Rune.IsPunctuation (line [0].Rune) || Rune.IsSymbol (line [0].Rune))) {
 							return;
 						}
 						lastValidCol = IsSameRuneType (nRune, runeType) && Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune) ? nCol : lastValidCol;
@@ -680,7 +733,7 @@ namespace Terminal.Gui {
 			var col = Math.Max (fromCol - 1, 0);
 			var row = fromRow;
 			try {
-				var rune = RuneAt (col, row);
+				var rune = RuneAt (col, row).Rune;
 				var runeType = GetRuneType (rune);
 				int lastValidCol = IsSameRuneType (rune, runeType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune)) ? col : -1;
 
@@ -720,7 +773,7 @@ namespace Terminal.Gui {
 						}
 
 						var line = GetLine (nRow);
-						if (nCol == 0 && nRow == fromRow && (Rune.IsLetterOrDigit (line [0]) || Rune.IsPunctuation (line [0]) || Rune.IsSymbol (line [0]))) {
+						if (nCol == 0 && nRow == fromRow && (Rune.IsLetterOrDigit (line [0].Rune) || Rune.IsPunctuation (line [0].Rune) || Rune.IsSymbol (line [0].Rune))) {
 							return;
 						}
 						lastValidCol = IsSameRuneType (nRune, runeType) && Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune) ? nCol : lastValidCol;
@@ -765,7 +818,7 @@ namespace Terminal.Gui {
 
 		public event EventHandler<HistoryTextItem> ChangeText;
 
-		public void Add (List<List<Rune>> lines, Point curPos, LineStatus lineStatus = LineStatus.Original)
+		public void Add (List<List<RuneCell>> lines, Point curPos, LineStatus lineStatus = LineStatus.Original)
 		{
 			if (lineStatus == LineStatus.Original && _historyTextItems.Count > 0
 				&& _historyTextItems.Last ().LineStatus == LineStatus.Original) {
@@ -786,7 +839,7 @@ namespace Terminal.Gui {
 			_idxHistoryText++;
 		}
 
-		public void ReplaceLast (List<List<Rune>> lines, Point curPos, LineStatus lineStatus)
+		public void ReplaceLast (List<List<RuneCell>> lines, Point curPos, LineStatus lineStatus)
 		{
 			var found = _historyTextItems.FindLast (x => x.LineStatus == lineStatus);
 			if (found != null) {
@@ -859,7 +912,7 @@ namespace Terminal.Gui {
 
 					if (!historyTextItem.Lines [0].SequenceEqual (_historyTextItems [_idxHistoryText - 1].Lines [0])
 						&& historyTextItem.CursorPosition == _historyTextItems [_idxHistoryText - 1].CursorPosition) {
-						historyTextItem.Lines [0] = new List<Rune> (_historyTextItems [_idxHistoryText - 1].Lines [0]);
+						historyTextItem.Lines [0] = new List<RuneCell> (_historyTextItems [_idxHistoryText - 1].Lines [0]);
 					}
 					if (historyTextItem.LineStatus == LineStatus.Added && _historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Removed) {
 						historyTextItem.FinalCursorPosition = _historyTextItems [_idxHistoryText - 2].CursorPosition;
@@ -897,7 +950,7 @@ namespace Terminal.Gui {
 
 					if (historyTextItem.LineStatus == LineStatus.Removed
 						&& !historyTextItem.Lines [0].SequenceEqual (_historyTextItems [_idxHistoryText + 1].Lines [0])) {
-						historyTextItem.Lines [0] = new List<Rune> (_historyTextItems [_idxHistoryText + 1].Lines [0]);
+						historyTextItem.Lines [0] = new List<RuneCell> (_historyTextItems [_idxHistoryText + 1].Lines [0]);
 					}
 					historyTextItem.FinalCursorPosition = _historyTextItems [_idxHistoryText + 1].CursorPosition;
 				} else {
@@ -1030,12 +1083,12 @@ namespace Terminal.Gui {
 			return wrappedModel;
 		}
 
-		public List<List<Rune>> ToListRune (List<string> textList)
+		public List<List<RuneCell>> ToListRune (List<string> textList)
 		{
-			var runesList = new List<List<Rune>> ();
+			var runesList = new List<List<RuneCell>> ();
 
 			foreach (var text in textList) {
-				runesList.Add (text.ToRuneList ());
+				runesList.Add (text.ToRuneCellList ());
 			}
 
 			return runesList;
@@ -1068,7 +1121,7 @@ namespace Terminal.Gui {
 			return modelCol;
 		}
 
-		List<Rune> GetCurrentLine (int row) => Model.GetLine (row);
+		List<RuneCell> GetCurrentLine (int row) => Model.GetLine (row);
 
 		public void AddLine (int row, int col)
 		{
@@ -1084,10 +1137,10 @@ namespace Terminal.Gui {
 			_isWrapModelRefreshing = false;
 		}
 
-		public bool Insert (int row, int col, Rune rune)
+		public bool Insert (int row, int col, RuneCell cell)
 		{
 			var line = GetCurrentLine (GetModelLineFromWrappedLines (row));
-			line.Insert (GetModelColFromWrappedLines (row, col), rune);
+			line.Insert (GetModelColFromWrappedLines (row, col), cell);
 			if (line.Count > _frameWidth) {
 				return true;
 			} else {
@@ -1333,7 +1386,7 @@ namespace Terminal.Gui {
 	///   </item>
 	///  </list>
 	/// </remarks>
-	public partial class TextView : View {
+	public class TextView : View {
 		TextModel _model = new TextModel ();
 		int _topRow;
 		int _leftColumn;
@@ -2121,7 +2174,7 @@ namespace Terminal.Gui {
 					if (idx >= _currentColumn)
 						break;
 					var cols = line [idx].GetColumns ();
-					if (line [idx].Value == '\t') {
+					if (line [idx].Rune.Value == '\t') {
 						cols += TabWidth + 1;
 					}
 					if (!TextModel.SetCol (ref col, Frame.Width, cols)) {
@@ -2165,7 +2218,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="line"></param>
 		/// <param name="idx"></param>
-		protected virtual void SetNormalColor (List<Rune> line, int idx)
+		protected virtual void SetNormalColor (List<RuneCell> line, int idx)
 		{
 			Driver.SetAttribute (GetNormalColor ());
 		}
@@ -2177,7 +2230,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="line"></param>
 		/// <param name="idx"></param>
-		protected virtual void SetSelectionColor (List<Rune> line, int idx)
+		protected virtual void SetSelectionColor (List<RuneCell> line, int idx)
 		{
 			Driver.SetAttribute (new Attribute (ColorScheme.Focus.Background, ColorScheme.Focus.Foreground));
 		}
@@ -2189,7 +2242,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="line"></param>
 		/// <param name="idx"></param>
-		protected virtual void SetReadOnlyColor (List<Rune> line, int idx)
+		protected virtual void SetReadOnlyColor (List<RuneCell> line, int idx)
 		{
 			Attribute attribute;
 			if (ColorScheme.Disabled.Foreground == ColorScheme.Focus.Background) {
@@ -2207,7 +2260,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="line"></param>
 		/// <param name="idx"></param>
-		protected virtual void SetUsedColor (List<Rune> line, int idx)
+		protected virtual void SetUsedColor (List<RuneCell> line, int idx)
 		{
 			Driver.SetAttribute (ColorScheme.HotFocus);
 		}
@@ -2343,12 +2396,12 @@ namespace Terminal.Gui {
 			var endCol = (int)(end & 0xffffffff);
 			var line = _model.GetLine (startRow);
 
-			_historyText.Add (new List<List<Rune>> () { new List<Rune> (line) }, new Point (startCol, startRow));
+			_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (line) }, new Point (startCol, startRow));
 
-			List<List<Rune>> removedLines = new List<List<Rune>> ();
+			List<List<RuneCell>> removedLines = new List<List<RuneCell>> ();
 
 			if (startRow == maxrow) {
-				removedLines.Add (new List<Rune> (line));
+				removedLines.Add (new List<RuneCell> (line));
 
 				line.RemoveRange (startCol, endCol - startCol);
 				_currentColumn = startCol;
@@ -2360,21 +2413,21 @@ namespace Terminal.Gui {
 					SetNeedsDisplay ();
 				}
 
-				_historyText.Add (new List<List<Rune>> (removedLines), CursorPosition, HistoryText.LineStatus.Removed);
+				_historyText.Add (new List<List<RuneCell>> (removedLines), CursorPosition, HistoryText.LineStatus.Removed);
 
 				UpdateWrapModel ();
 
 				return;
 			}
 
-			removedLines.Add (new List<Rune> (line));
+			removedLines.Add (new List<RuneCell> (line));
 
 			line.RemoveRange (startCol, line.Count - startCol);
 			var line2 = _model.GetLine (maxrow);
 			line.AddRange (line2.Skip (endCol));
 			for (int row = startRow + 1; row <= maxrow; row++) {
 
-				removedLines.Add (new List<Rune> (_model.GetLine (startRow + 1)));
+				removedLines.Add (new List<RuneCell> (_model.GetLine (startRow + 1)));
 
 				_model.RemoveLine (startRow + 1);
 			}
@@ -2383,7 +2436,7 @@ namespace Terminal.Gui {
 			}
 			_currentColumn = startCol;
 
-			_historyText.Add (new List<List<Rune>> (removedLines), CursorPosition,
+			_historyText.Add (new List<List<RuneCell>> (removedLines), CursorPosition,
 				HistoryText.LineStatus.Removed);
 
 			UpdateWrapModel ();
@@ -2624,7 +2677,7 @@ namespace Terminal.Gui {
 
 				Move (0, row);
 				for (int idxCol = _leftColumn; idxCol < lineRuneCount; idxCol++) {
-					var rune = idxCol >= lineRuneCount ? (Rune)' ' : line [idxCol];
+					var rune = idxCol >= lineRuneCount ? (Rune)' ' : line [idxCol].Rune;
 					var cols = rune.GetColumns ();
 					if (idxCol < line.Count && _selecting && PointInSelection (idxCol, idxRow)) {
 						SetSelectionColor (line, idxCol);
@@ -2750,16 +2803,16 @@ namespace Terminal.Gui {
 			}
 		}
 
-		void Insert (Rune rune)
+		void Insert (RuneCell cell)
 		{
 			var line = GetCurrentLine ();
 			if (Used) {
-				line.Insert (Math.Min (_currentColumn, line.Count), rune);
+				line.Insert (Math.Min (_currentColumn, line.Count), cell);
 			} else {
 				if (_currentColumn < line.Count) {
 					line.RemoveAt (_currentColumn);
 				}
-				line.Insert (Math.Min (_currentColumn, line.Count), rune);
+				line.Insert (Math.Min (_currentColumn, line.Count), cell);
 			}
 			var prow = _currentRow - _topRow;
 			if (!_wrapNeeded) {
@@ -2769,18 +2822,18 @@ namespace Terminal.Gui {
 			}
 		}
 
-		string StringFromRunes (List<Rune> runes)
+		string StringFromRunes (List<RuneCell> cells)
 		{
-			if (runes == null)
-				throw new ArgumentNullException (nameof (runes));
+			if (cells == null)
+				throw new ArgumentNullException (nameof (cells));
 			int size = 0;
-			foreach (var rune in runes) {
-				size += rune.GetEncodingLength ();
+			foreach (var cell in cells) {
+				size += cell.Rune.GetEncodingLength ();
 			}
 			var encoded = new byte [size];
 			int offset = 0;
-			foreach (var rune in runes) {
-				offset += rune.Encode (encoded, offset);
+			foreach (var cell in cells) {
+				offset += cell.Rune.Encode (encoded, offset);
 			}
 			return StringExtensions.ToString (encoded);
 		}
@@ -2791,7 +2844,7 @@ namespace Terminal.Gui {
 		/// that line
 		/// </summary>
 		/// <returns></returns>
-		public List<Rune> GetCurrentLine () => _model.GetLine (_currentRow);
+		public List<RuneCell> GetCurrentLine () => _model.GetLine (_currentRow);
 
 		void InsertAllText (string text)
 		{
@@ -2799,7 +2852,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var lines = TextModel.StringToRunes (text);
+			var lines = TextModel.StringToRuneCells (text);
 
 			if (lines.Count == 0) {
 				return;
@@ -2809,14 +2862,14 @@ namespace Terminal.Gui {
 
 			var line = GetCurrentLine ();
 
-			_historyText.Add (new List<List<Rune>> () { new List<Rune> (line) }, CursorPosition);
+			_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (line) }, CursorPosition);
 
 			// Optimize single line
 			if (lines.Count == 1) {
 				line.InsertRange (_currentColumn, lines [0]);
 				_currentColumn += lines [0].Count;
 
-				_historyText.Add (new List<List<Rune>> () { new List<Rune> (line) }, CursorPosition,
+				_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (line) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 
 				if (!_wordWrap && _currentColumn - _leftColumn > Frame.Width) {
@@ -2837,7 +2890,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			List<Rune> rest = null;
+			List<RuneCell> rest = null;
 			int lastp = 0;
 
 			if (_model.Count > 0 && line.Count > 0 && !_copyWithoutSelection) {
@@ -2851,12 +2904,12 @@ namespace Terminal.Gui {
 			line.InsertRange (_currentColumn, lines [0]);
 			//model.AddLine (currentRow, lines [0]);
 
-			var addedLines = new List<List<Rune>> () { new List<Rune> (line) };
+			var addedLines = new List<List<RuneCell>> () { new List<RuneCell> (line) };
 
 			for (int i = 1; i < lines.Count; i++) {
 				_model.AddLine (_currentRow + i, lines [i]);
 
-				addedLines.Add (new List<Rune> (lines [i]));
+				addedLines.Add (new List<RuneCell> (lines [i]));
 			}
 
 			if (rest != null) {
@@ -2874,7 +2927,7 @@ namespace Terminal.Gui {
 			_currentColumn = rest != null ? lastp : lines [lines.Count - 1].Count;
 			Adjust ();
 
-			_historyText.Add (new List<List<Rune>> () { new List<Rune> (line) }, CursorPosition,
+			_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (line) }, CursorPosition,
 				HistoryText.LineStatus.Replaced);
 
 			UpdateWrapModel ();
@@ -3348,14 +3401,14 @@ namespace Terminal.Gui {
 				SetWrapModel ();
 
 				var currentLine = GetCurrentLine ();
-				if (currentLine.Count > 0 && currentLine [_currentColumn - 1].Value == '\t') {
+				if (currentLine.Count > 0 && currentLine [_currentColumn - 1].Rune.Value == '\t') {
 
-					_historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
+					_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (currentLine) }, CursorPosition);
 
 					currentLine.RemoveAt (_currentColumn - 1);
 					_currentColumn--;
 
-					_historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
+					_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (GetCurrentLine ()) }, CursorPosition,
 						HistoryText.LineStatus.Replaced);
 				}
 
@@ -3396,7 +3449,7 @@ namespace Terminal.Gui {
 
 			var currentLine = GetCurrentLine ();
 
-			_historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
+			_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (currentLine) }, CursorPosition);
 
 			if (_selecting) {
 				ClearSelectedRegion ();
@@ -3406,11 +3459,11 @@ namespace Terminal.Gui {
 			var rest = currentLine.GetRange (_currentColumn, restCount);
 			currentLine.RemoveRange (_currentColumn, restCount);
 
-			var addedLines = new List<List<Rune>> () { new List<Rune> (currentLine) };
+			var addedLines = new List<List<RuneCell>> () { new List<RuneCell> (currentLine) };
 
 			_model.AddLine (_currentRow + 1, rest);
 
-			addedLines.Add (new List<Rune> (_model.GetLine (_currentRow + 1)));
+			addedLines.Add (new List<RuneCell> (_model.GetLine (_currentRow + 1)));
 
 			_historyText.Add (addedLines, CursorPosition, HistoryText.LineStatus.Added);
 
@@ -3423,7 +3476,7 @@ namespace Terminal.Gui {
 			}
 			_currentColumn = 0;
 
-			_historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
+			_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (GetCurrentLine ()) }, CursorPosition,
 				HistoryText.LineStatus.Replaced);
 
 			if (!_wordWrap && _currentColumn < _leftColumn) {
@@ -3455,12 +3508,12 @@ namespace Terminal.Gui {
 
 			var currentLine = GetCurrentLine ();
 
-			_historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition);
+			_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (GetCurrentLine ()) }, CursorPosition);
 
 			if (_currentColumn == 0) {
 				DeleteTextBackwards ();
 
-				_historyText.ReplaceLast (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
+				_historyText.ReplaceLast (new List<List<RuneCell>> () { new List<RuneCell> (GetCurrentLine ()) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 
 				UpdateWrapModel ();
@@ -3485,7 +3538,7 @@ namespace Terminal.Gui {
 				_currentRow = newPos.Value.row;
 			}
 
-			_historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
+			_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (GetCurrentLine ()) }, CursorPosition,
 				HistoryText.LineStatus.Replaced);
 
 			UpdateWrapModel ();
@@ -3503,12 +3556,12 @@ namespace Terminal.Gui {
 
 			var currentLine = GetCurrentLine ();
 
-			_historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition);
+			_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (GetCurrentLine ()) }, CursorPosition);
 
 			if (currentLine.Count == 0 || _currentColumn == currentLine.Count) {
 				DeleteTextForwards ();
 
-				_historyText.ReplaceLast (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
+				_historyText.ReplaceLast (new List<List<RuneCell>> () { new List<RuneCell> (GetCurrentLine ()) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 
 				UpdateWrapModel ();
@@ -3528,7 +3581,7 @@ namespace Terminal.Gui {
 				_wrapNeeded = true;
 			}
 
-			_historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
+			_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (GetCurrentLine ()) }, CursorPosition,
 				HistoryText.LineStatus.Replaced);
 
 			UpdateWrapModel ();
@@ -3579,7 +3632,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			_historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
+			_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (currentLine) }, CursorPosition);
 
 			if (currentLine.Count == 0) {
 				if (_currentRow > 0) {
@@ -3601,11 +3654,11 @@ namespace Terminal.Gui {
 					_currentRow--;
 					currentLine = _model.GetLine (_currentRow);
 
-					var removedLine = new List<List<Rune>> () { new List<Rune> (currentLine) };
+					var removedLine = new List<List<RuneCell>> () { new List<RuneCell> (currentLine) };
 
-					removedLine.Add (new List<Rune> ());
+					removedLine.Add (new List<RuneCell> ());
 
-					_historyText.Add (new List<List<Rune>> (removedLine), CursorPosition, HistoryText.LineStatus.Removed);
+					_historyText.Add (new List<List<RuneCell>> (removedLine), CursorPosition, HistoryText.LineStatus.Removed);
 
 					_currentColumn = currentLine.Count;
 				}
@@ -3623,7 +3676,7 @@ namespace Terminal.Gui {
 				_currentColumn = 0;
 			}
 
-			_historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
+			_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (GetCurrentLine ()) }, CursorPosition,
 				HistoryText.LineStatus.Replaced);
 
 			UpdateWrapModel ();
@@ -3654,17 +3707,17 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			_historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
+			_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (currentLine) }, CursorPosition);
 
 			if (currentLine.Count == 0) {
 				if (_currentRow < _model.Count - 1) {
-					var removedLines = new List<List<Rune>> () { new List<Rune> (currentLine) };
+					var removedLines = new List<List<RuneCell>> () { new List<RuneCell> (currentLine) };
 
 					_model.RemoveLine (_currentRow);
 
-					removedLines.Add (new List<Rune> (GetCurrentLine ()));
+					removedLines.Add (new List<RuneCell> (GetCurrentLine ()));
 
-					_historyText.Add (new List<List<Rune>> (removedLines), CursorPosition,
+					_historyText.Add (new List<List<RuneCell>> (removedLines), CursorPosition,
 						HistoryText.LineStatus.Removed);
 				}
 				if (_model.Count > 0 || _lastWasKill) {
@@ -3692,7 +3745,7 @@ namespace Terminal.Gui {
 				currentLine.RemoveRange (_currentColumn, restCount);
 			}
 
-			_historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
+			_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (GetCurrentLine ()) }, CursorPosition,
 				HistoryText.LineStatus.Replaced);
 
 			UpdateWrapModel ();
@@ -3733,14 +3786,14 @@ namespace Terminal.Gui {
 			SetWrapModel ();
 
 			if (_selecting) {
-				_historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
+				_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (GetCurrentLine ()) }, CursorPosition,
 					HistoryText.LineStatus.Original);
 
 				ClearSelectedRegion ();
 
 				var currentLine = GetCurrentLine ();
 
-				_historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition,
+				_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (currentLine) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 
 				UpdateWrapModel ();
@@ -3769,14 +3822,14 @@ namespace Terminal.Gui {
 			SetWrapModel ();
 
 			if (_selecting) {
-				_historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
+				_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (GetCurrentLine ()) }, CursorPosition,
 					HistoryText.LineStatus.Original);
 
 				ClearSelectedRegion ();
 
 				var currentLine = GetCurrentLine ();
 
-				_historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition,
+				_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (currentLine) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 
 				UpdateWrapModel ();
@@ -3893,7 +3946,7 @@ namespace Terminal.Gui {
 			_continuousFind = false;
 		}
 
-		bool InsertText (KeyEvent kb)
+		bool InsertText (KeyEvent kb, Attribute? attribute = null)
 		{
 			//So that special keys like tab can be processed
 			if (_isReadOnly)
@@ -3901,32 +3954,32 @@ namespace Terminal.Gui {
 
 			SetWrapModel ();
 
-			_historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition);
+			_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (GetCurrentLine ()) }, CursorPosition);
 
 			if (_selecting) {
 				ClearSelectedRegion ();
 			}
 			if (kb.Key == Key.Enter) {
-				_model.AddLine (_currentRow + 1, new List<Rune> ());
+				_model.AddLine (_currentRow + 1, new List<RuneCell> ());
 				_currentRow++;
 				_currentColumn = 0;
 			} else if ((uint)kb.Key == 13) {
 				_currentColumn = 0;
 			} else {
 				if (Used) {
-					Insert ((Rune)(uint)kb.Key);
+					Insert (new RuneCell { Rune = (Rune)(uint)kb.Key, Attribute = attribute });
 					_currentColumn++;
 					if (_currentColumn >= _leftColumn + Frame.Width) {
 						_leftColumn++;
 						SetNeedsDisplay ();
 					}
 				} else {
-					Insert ((Rune)(uint)kb.Key);
+					Insert (new RuneCell { Rune = (Rune)(uint)kb.Key, Attribute = attribute });
 					_currentColumn++;
 				}
 			}
 
-			_historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
+			_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (GetCurrentLine ()) }, CursorPosition,
 				HistoryText.LineStatus.Replaced);
 
 			UpdateWrapModel ();
@@ -3994,20 +4047,20 @@ namespace Terminal.Gui {
 					return true;
 				}
 
-				_historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
+				_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (currentLine) }, CursorPosition);
 
-				var removedLines = new List<List<Rune>> () { new List<Rune> (currentLine) };
+				var removedLines = new List<List<RuneCell>> () { new List<RuneCell> (currentLine) };
 
 				var nextLine = _model.GetLine (_currentRow + 1);
 
-				removedLines.Add (new List<Rune> (nextLine));
+				removedLines.Add (new List<RuneCell> (nextLine));
 
 				_historyText.Add (removedLines, CursorPosition, HistoryText.LineStatus.Removed);
 
 				currentLine.AddRange (nextLine);
 				_model.RemoveLine (_currentRow + 1);
 
-				_historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition,
+				_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (currentLine) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 
 				if (_wordWrap) {
@@ -4015,11 +4068,11 @@ namespace Terminal.Gui {
 				}
 				DoSetNeedsDisplay (new Rect (0, _currentRow - _topRow, Frame.Width, _currentRow - _topRow + 1));
 			} else {
-				_historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
+				_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (currentLine) }, CursorPosition);
 
 				currentLine.RemoveAt (_currentColumn);
 
-				_historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition,
+				_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (currentLine) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 
 				if (_wordWrap) {
@@ -4053,7 +4106,7 @@ namespace Terminal.Gui {
 				// Delete backwards 
 				var currentLine = GetCurrentLine ();
 
-				_historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
+				_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (currentLine) }, CursorPosition);
 
 				currentLine.RemoveAt (_currentColumn - 1);
 				if (_wordWrap) {
@@ -4061,7 +4114,7 @@ namespace Terminal.Gui {
 				}
 				_currentColumn--;
 
-				_historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition,
+				_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (currentLine) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 
 				if (_currentColumn < _leftColumn) {
@@ -4079,11 +4132,11 @@ namespace Terminal.Gui {
 				var prowIdx = _currentRow - 1;
 				var prevRow = _model.GetLine (prowIdx);
 
-				_historyText.Add (new List<List<Rune>> () { new List<Rune> (prevRow) }, CursorPosition);
+				_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (prevRow) }, CursorPosition);
 
-				List<List<Rune>> removedLines = new List<List<Rune>> () { new List<Rune> (prevRow) };
+				List<List<RuneCell>> removedLines = new List<List<RuneCell>> () { new List<RuneCell> (prevRow) };
 
-				removedLines.Add (new List<Rune> (GetCurrentLine ()));
+				removedLines.Add (new List<RuneCell> (GetCurrentLine ()));
 
 				_historyText.Add (removedLines, new Point (_currentColumn, prowIdx),
 					HistoryText.LineStatus.Removed);
@@ -4096,7 +4149,7 @@ namespace Terminal.Gui {
 				}
 				_currentRow--;
 
-				_historyText.Add (new List<List<Rune>> () { GetCurrentLine () }, new Point (_currentColumn, prowIdx),
+				_historyText.Add (new List<List<RuneCell>> () { GetCurrentLine () }, new Point (_currentColumn, prowIdx),
 					HistoryText.LineStatus.Replaced);
 
 				_currentColumn = prevCount;
@@ -4138,7 +4191,7 @@ namespace Terminal.Gui {
 			if (!_isReadOnly) {
 				ClearRegion ();
 
-				_historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
+				_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (GetCurrentLine ()) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 			}
 			UpdateWrapModel ();
@@ -4159,21 +4212,21 @@ namespace Terminal.Gui {
 			SetWrapModel ();
 			var contents = Clipboard.Contents;
 			if (_copyWithoutSelection && contents.FirstOrDefault (x => x == '\n' || x == '\r') == 0) {
-				var runeList = contents == null ? new List<Rune> () : contents.ToRuneList ();
+				var runeList = contents == null ? new List<RuneCell> () : contents.ToRuneCellList ();
 				var currentLine = GetCurrentLine ();
 
-				_historyText.Add (new List<List<Rune>> () { new List<Rune> (currentLine) }, CursorPosition);
+				_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (currentLine) }, CursorPosition);
 
-				var addedLine = new List<List<Rune>> () { new List<Rune> (currentLine) };
+				var addedLine = new List<List<RuneCell>> () { new List<RuneCell> (currentLine) };
 
 				addedLine.Add (runeList);
 
-				_historyText.Add (new List<List<Rune>> (addedLine), CursorPosition, HistoryText.LineStatus.Added);
+				_historyText.Add (new List<List<RuneCell>> (addedLine), CursorPosition, HistoryText.LineStatus.Added);
 
 				_model.AddLine (_currentRow, runeList);
 				_currentRow++;
 
-				_historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
+				_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (GetCurrentLine ()) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 				OnContentsChanged ();
 			} else {
@@ -4184,7 +4237,7 @@ namespace Terminal.Gui {
 				InsertAllText (contents);
 
 				if (_selecting) {
-					_historyText.ReplaceLast (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
+					_historyText.ReplaceLast (new List<List<RuneCell>> () { new List<RuneCell> (GetCurrentLine ()) }, CursorPosition,
 						HistoryText.LineStatus.Original);
 				}
 			}
@@ -4258,7 +4311,7 @@ namespace Terminal.Gui {
 			DoNeededAction ();
 		}
 
-		IEnumerable<(int col, int row, Rune rune)> ForwardIterator (int col, int row)
+		IEnumerable<(int col, int row, RuneCell rune)> ForwardIterator (int col, int row)
 		{
 			if (col < 0 || row < 0)
 				yield break;
@@ -4361,7 +4414,7 @@ namespace Terminal.Gui {
 				_columnTrack = _currentColumn;
 				ScrollTo (_leftColumn - 1, false);
 			} else if (ev.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
-				ProcessMouseClick (ev, out List<Rune> line);
+				ProcessMouseClick (ev, out List<RuneCell> line);
 				PositionCursor ();
 				if (_model.Count > 0 && _shiftSelecting && _selecting) {
 					if (_currentRow - _topRow + BottomOffset >= Frame.Height - 1
@@ -4421,10 +4474,10 @@ namespace Terminal.Gui {
 				} else if (_selecting) {
 					StopSelecting ();
 				}
-				ProcessMouseClick (ev, out List<Rune> line);
+				ProcessMouseClick (ev, out List<RuneCell> line);
 				(int col, int row)? newPos;
-				if (_currentColumn == line.Count || (_currentColumn > 0 && (line [_currentColumn - 1].Value != ' '
-					|| line [_currentColumn].Value == ' '))) {
+				if (_currentColumn == line.Count || (_currentColumn > 0 && (line [_currentColumn - 1].Rune.Value != ' '
+					|| line [_currentColumn].Rune.Value == ' '))) {
 
 					newPos = _model.WordBackward (_currentColumn, _currentRow);
 					if (newPos.HasValue) {
@@ -4445,7 +4498,7 @@ namespace Terminal.Gui {
 				if (_selecting) {
 					StopSelecting ();
 				}
-				ProcessMouseClick (ev, out List<Rune> line);
+				ProcessMouseClick (ev, out List<RuneCell> line);
 				_currentColumn = 0;
 				if (!_selecting) {
 					StartSelecting ();
@@ -4462,9 +4515,9 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		void ProcessMouseClick (MouseEvent ev, out List<Rune> line)
+		void ProcessMouseClick (MouseEvent ev, out List<RuneCell> line)
 		{
-			List<Rune> r = null;
+			List<RuneCell> r = null;
 			if (_model.Count > 0) {
 				var maxCursorPositionableLine = Math.Max ((_model.Count - 1) - _topRow, 0);
 				if (Math.Max (ev.Y, 0) > maxCursorPositionableLine) {

@@ -193,7 +193,7 @@ namespace Terminal.Gui {
 
 		bool SetText (Rune key)
 		{
-			var text = TextModel.ToRunes (Text);
+			var text = Text.EnumerateRunes ().ToList ();
 			var newText = text.GetRange (0, CursorPosition);
 			newText.Add (key);
 			if (CursorPosition < fieldLen)
@@ -344,7 +344,7 @@ namespace Terminal.Gui {
 			}
 
 			// BUGBUG: This is a hack, we should be able to just use ((Rune)(uint)kb.Key) directly.
-			if (SetText (TextModel.ToRunes (((Rune)(uint)kb.Key).ToString ()).First ())) {
+			if (SetText (((Rune)(uint)kb.Key).ToString ().EnumerateRunes ().First ())) {
 				IncCursorPosition ();
 			}
 

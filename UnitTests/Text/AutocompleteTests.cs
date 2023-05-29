@@ -31,8 +31,8 @@ namespace Terminal.Gui.TextTests {
 
 			ac.HostControl = tv;
 			ac.GenerateSuggestions (
-				new AutocompleteContext(
-				tv.Text.ToRuneList(),2));
+				new AutocompleteContext (
+				tv.Text.ToRuneCellList (), 2));
 
 			Assert.Equal (2, ac.Suggestions.Count);
 			Assert.Equal ("const", ac.Suggestions [0].Title);
@@ -97,46 +97,46 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal ($"F Fortunately super feature.", tv.Text);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.Equal (2, tv.Autocomplete.Suggestions.Count);
-			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions[0].Replacement);
-			Assert.Equal ("feature", tv.Autocomplete.Suggestions[^1].Replacement);
+			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [0].Replacement);
+			Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
 			Assert.Equal (0, tv.Autocomplete.SelectedIdx);
-			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions[tv.Autocomplete.SelectedIdx].Replacement);
+			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [tv.Autocomplete.SelectedIdx].Replacement);
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
 			top.Draw ();
 			Assert.Equal ($"F Fortunately super feature.", tv.Text);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.Equal (2, tv.Autocomplete.Suggestions.Count);
-			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions[0].Replacement);
-			Assert.Equal ("feature", tv.Autocomplete.Suggestions[^1].Replacement);
+			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [0].Replacement);
+			Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
 			Assert.Equal (1, tv.Autocomplete.SelectedIdx);
-			Assert.Equal ("feature", tv.Autocomplete.Suggestions[tv.Autocomplete.SelectedIdx].Replacement);
+			Assert.Equal ("feature", tv.Autocomplete.Suggestions [tv.Autocomplete.SelectedIdx].Replacement);
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
 			top.Draw ();
 			Assert.Equal ($"F Fortunately super feature.", tv.Text);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.Equal (2, tv.Autocomplete.Suggestions.Count);
-			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions[0].Replacement);
-			Assert.Equal ("feature", tv.Autocomplete.Suggestions[^1].Replacement);
+			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [0].Replacement);
+			Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
 			Assert.Equal (0, tv.Autocomplete.SelectedIdx);
-			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions[tv.Autocomplete.SelectedIdx].Replacement);
+			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [tv.Autocomplete.SelectedIdx].Replacement);
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ())));
 			top.Draw ();
 			Assert.Equal ($"F Fortunately super feature.", tv.Text);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.Equal (2, tv.Autocomplete.Suggestions.Count);
-			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions[0].Replacement);
-			Assert.Equal ("feature", tv.Autocomplete.Suggestions[^1].Replacement);
+			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [0].Replacement);
+			Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
 			Assert.Equal (1, tv.Autocomplete.SelectedIdx);
-			Assert.Equal ("feature", tv.Autocomplete.Suggestions[tv.Autocomplete.SelectedIdx].Replacement);
+			Assert.Equal ("feature", tv.Autocomplete.Suggestions [tv.Autocomplete.SelectedIdx].Replacement);
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ())));
 			top.Draw ();
 			Assert.Equal ($"F Fortunately super feature.", tv.Text);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.Equal (2, tv.Autocomplete.Suggestions.Count);
-			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions[0].Replacement);
-			Assert.Equal ("feature", tv.Autocomplete.Suggestions[^1].Replacement);
+			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [0].Replacement);
+			Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
 			Assert.Equal (0, tv.Autocomplete.SelectedIdx);
-			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions[tv.Autocomplete.SelectedIdx].Replacement);
+			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [tv.Autocomplete.SelectedIdx].Replacement);
 			Assert.True (tv.Autocomplete.Visible);
 			top.Draw ();
 			Assert.True (tv.ProcessKey (new KeyEvent (tv.Autocomplete.CloseKey, new KeyModifiers ())));
@@ -155,10 +155,10 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal ($"Fortunately Fortunately super feature.", tv.Text);
 			Assert.Equal (new Point (11, 0), tv.CursorPosition);
 			Assert.Equal (2, tv.Autocomplete.Suggestions.Count);
-			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions[0].Replacement);
-			Assert.Equal ("feature", tv.Autocomplete.Suggestions[^1].Replacement);
+			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [0].Replacement);
+			Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
 			Assert.Equal (0, tv.Autocomplete.SelectedIdx);
-			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions[tv.Autocomplete.SelectedIdx].Replacement);
+			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [tv.Autocomplete.SelectedIdx].Replacement);
 			Assert.True (tv.ProcessKey (new KeyEvent (tv.Autocomplete.CloseKey, new KeyModifiers ())));
 			Assert.Equal ($"Fortunately Fortunately super feature.", tv.Text);
 			Assert.Equal (new Point (11, 0), tv.CursorPosition);
@@ -184,12 +184,12 @@ namespace Terminal.Gui.TextTests {
 			Application.Begin (top);
 
 			// BUGBUG: v2 - I broke this test and don't have time to figure out why. @tznind - help!
-//			for (int i = 0; i < 7; i++) {
-//				Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
-//				Application.Refresh ();
-//				TestHelpers.AssertDriverContentsWithFrameAre (@"
-//This a long line and against TextView.", output);
-//			}
+			//			for (int i = 0; i < 7; i++) {
+			//				Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			//				Application.Refresh ();
+			//				TestHelpers.AssertDriverContentsWithFrameAre (@"
+			//This a long line and against TextView.", output);
+			//			}
 
 			Assert.True (tv.MouseEvent (new MouseEvent () {
 				X = 6,
@@ -231,21 +231,21 @@ This ag long line and against TextView.", output);
 			//This ag long line and against TextView.", output);
 			//			}
 
-//			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
-//			Application.Refresh ();
-//			TestHelpers.AssertDriverContentsWithFrameAre (@"
-//This a long line and against TextView.", output);
+			//			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
+			//			Application.Refresh ();
+			//			TestHelpers.AssertDriverContentsWithFrameAre (@"
+			//This a long line and against TextView.", output);
 
-//			Assert.True (tv.ProcessKey (new KeyEvent (Key.n, new KeyModifiers ())));
-//			Application.Refresh ();
-//			TestHelpers.AssertDriverContentsWithFrameAre (@"
-//This an long line and against TextView.
-//       and                             ", output);
+			//			Assert.True (tv.ProcessKey (new KeyEvent (Key.n, new KeyModifiers ())));
+			//			Application.Refresh ();
+			//			TestHelpers.AssertDriverContentsWithFrameAre (@"
+			//This an long line and against TextView.
+			//       and                             ", output);
 
-//			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
-//			Application.Refresh ();
-//			TestHelpers.AssertDriverContentsWithFrameAre (@"
-//This an long line and against TextView.", output);
+			//			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			//			Application.Refresh ();
+			//			TestHelpers.AssertDriverContentsWithFrameAre (@"
+			//This an long line and against TextView.", output);
 		}
 	}
 }

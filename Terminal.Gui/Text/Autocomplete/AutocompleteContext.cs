@@ -11,7 +11,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The text on the current line.
 		/// </summary>
-		public List<Rune> CurrentLine { get; set; }
+		public List<RuneCell> CurrentLine { get; set; }
 
 		/// <summary>
 		/// The position of the input cursor within the <see cref="CurrentLine"/>.
@@ -21,7 +21,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Creates anew instance of the <see cref="AutocompleteContext"/> class
 		/// </summary>
-		public AutocompleteContext (List<Rune> currentLine, int cursorPosition)
+		public AutocompleteContext (List<RuneCell> currentLine, int cursorPosition)
 		{
 			CurrentLine = currentLine;
 			CursorPosition = cursorPosition;

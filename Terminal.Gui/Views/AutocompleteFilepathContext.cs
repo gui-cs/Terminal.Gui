@@ -11,7 +11,7 @@ namespace Terminal.Gui {
 		public FileDialogState State { get; set; }
 
 		public AutocompleteFilepathContext (string currentLine, int cursorPosition, FileDialogState state)
-			: base (currentLine.EnumerateRunes ().ToList (), cursorPosition)
+			: base (currentLine.ToRuneCellList (), cursorPosition)
 		{
 			this.State = state;
 		}
@@ -73,14 +73,13 @@ namespace Terminal.Gui {
 				f => new Suggestion (term.Length, f, f)).ToList ();
 		}
 
-		public bool IsWordChar (Rune rune)
+		public bool IsWordChar (Rune cell)
 		{
-			if (rune.Value == '\n') {
+			if (cell.Value == '\n') {
 				return false;
 			}
 
 			return true;
 		}
-
 	}
 }

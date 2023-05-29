@@ -151,12 +151,12 @@ namespace UICatalog.Scenarios {
 				Driver.SetAttribute (white);
 			}
 
-			protected override void SetNormalColor (List<Rune> line, int idx)
+			protected override void SetNormalColor (List<RuneCell> line, int idx)
 			{
-				if (IsInStringLiteral (line, idx)) {
+				if (IsInStringLiteral (line.Select (c => c.Rune).ToList (), idx)) {
 					Driver.SetAttribute (magenta);
 				} else
-				if (IsKeyword (line, idx)) {
+				if (IsKeyword (line.Select(c => c.Rune).ToList(), idx)) {
 					Driver.SetAttribute (blue);
 				} else {
 					Driver.SetAttribute (white);

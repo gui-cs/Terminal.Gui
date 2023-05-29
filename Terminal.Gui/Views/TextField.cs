@@ -101,7 +101,7 @@ namespace Terminal.Gui {
 			if (text == null)
 				text = "";
 
-			this._text = TextModel.ToRunes (text.Split ("\n") [0]);
+			this._text = text.Split ("\n") [0].EnumerateRunes ().ToList ();
 			_point = text.GetRuneCount ();
 			_first = _point > w + 1 ? _point - w + 1 : 0;
 			CanFocus = true;
@@ -321,12 +321,12 @@ namespace Terminal.Gui {
 					return;
 				}
 				ClearAllSelection ();
-				_text = TextModel.ToRunes (newText.NewText);
+				_text = newText.NewText.EnumerateRunes ().ToList ();
 
 				if (!Secret && !_historyText.IsFromHistory) {
-					_historyText.Add (new List<List<Rune>> () { oldText.ToRuneList () },
+					_historyText.Add (new List<List<RuneCell>> () { oldText.ToRuneCellList () },
 						new Point (_point, 0));
-					_historyText.Add (new List<List<Rune>> () { _text }, new Point (_point, 0)
+					_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCells (_text) }, new Point (_point, 0)
 						, HistoryText.LineStatus.Replaced);
 				}
 
@@ -520,7 +520,7 @@ namespace Terminal.Gui {
 
 		private void GenerateSuggestions ()
 		{
-			var currentLine = Text.ToRuneList ();
+			var currentLine = Text.ToRuneCellList ();
 			var cursorPosition = Math.Min (this.CursorPosition, currentLine.Count);
 
 			Autocomplete.GenerateSuggestions (
@@ -642,7 +642,7 @@ namespace Terminal.Gui {
 
 		void InsertText (KeyEvent kb, bool useOldCursorPos = true)
 		{
-			_historyText.Add (new List<List<Rune>> () { _text }, new Point (_point, 0));
+			_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCells (_text) }, new Point (_point, 0));
 
 			List<Rune> newText = _text;
 			if (_length > 0) {
@@ -652,7 +652,7 @@ namespace Terminal.Gui {
 			if (!useOldCursorPos) {
 				_oldCursorPos = _point;
 			}
-			var kbstr = TextModel.ToRunes (((Rune)(uint)kb.Key).ToString ());
+			var kbstr = ((Rune)(uint)kb.Key).ToString ().EnumerateRunes ();
 			if (Used) {
 				_point++;
 				if (_point == newText.Count + 1) {
@@ -891,7 +891,7 @@ namespace Terminal.Gui {
 			if (ReadOnly)
 				return;
 
-			_historyText.Add (new List<List<Rune>> () { _text }, new Point (_point, 0));
+			_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCells (_text) }, new Point (_point, 0));
 
 			if (_length == 0) {
 				if (_point == 0)
@@ -922,7 +922,7 @@ namespace Terminal.Gui {
 			if (ReadOnly)
 				return;
 
-			_historyText.Add (new List<List<Rune>> () { _text }, new Point (_point, 0));
+			_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCells (_text) }, new Point (_point, 0));
 
 			if (_length == 0) {
 				if (_text.Count == 0 || _text.Count == _point)

@@ -5,7 +5,7 @@ using System.Text;
 
 
 namespace Terminal.Gui {
-	
+
 	/// <summary>
 	/// <see cref="ISuggestionGenerator"/> which suggests from a collection
 	/// of words those that match the <see cref="AutocompleteContext"/>. You
@@ -28,7 +28,7 @@ namespace Terminal.Gui {
 				return Enumerable.Empty<Suggestion> ();
 			}
 
-			var currentWord = IdxToWord (context.CurrentLine, context.CursorPosition);
+			var currentWord = IdxToWord (context.CurrentLine.Select (c => c.Rune).ToList (), context.CursorPosition);
 
 			if (string.IsNullOrWhiteSpace (currentWord)) {
 				return Enumerable.Empty<Suggestion> ();
@@ -46,11 +46,11 @@ namespace Terminal.Gui {
 		/// Return true if the given symbol should be considered part of a word
 		/// and can be contained in matches. Base behavior is to use <see cref="char.IsLetterOrDigit(char)"/>
 		/// </summary>
-		/// <param name="rune"></param>
+		/// <param name="cell"></param>
 		/// <returns></returns>
-		public virtual bool IsWordChar (Rune rune)
+		public virtual bool IsWordChar (Rune cell)
 		{
-			return Char.IsLetterOrDigit ((char)rune.Value);
+			return Char.IsLetterOrDigit ((char)cell.Value);
 		}
 
 		/// <summary>

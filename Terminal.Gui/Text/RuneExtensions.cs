@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Collections;
+using System.Globalization;
 using System.Text;
 
 namespace Terminal.Gui;
@@ -42,7 +43,25 @@ public static class RuneExtensions {
 		/* if we arrive here, ucs is not a combining or C0/C1 control character */
 		return 1 + (BiSearch (codePoint, _combiningWideChars, _combiningWideChars.GetLength (0) - 1) != 0 ? 1 : 0);
 	}
-	
+
+	/// <summary>
+	/// Gets the number of columns the rune in a cell occupies in the terminal.
+	/// </summary>
+	/// <remarks>
+	/// This is a Terminal.Gui extension method to <see cref="RuneCell"/> to support TUI text manipulation.
+	/// </remarks>
+	/// <param name="cell">The cell with the rune to measure.</param>
+	/// <returns>
+	/// The number of columns required to fit the rune, 0 if the argument is the null character, or
+	/// -1 if the value is not printable, 
+	/// otherwise the number of columns that the rune occupies.
+	/// </returns>
+	public static int GetColumns (this RuneCell cell)
+	{
+		var rune = cell.Rune;
+		return rune.GetColumns ();
+	}
+
 	/// <summary>
 	/// Returns <see langword="true"/> if the rune is a combining character.
 	/// </summary>
