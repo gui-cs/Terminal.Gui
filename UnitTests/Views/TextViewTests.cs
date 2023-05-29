@@ -6996,10 +6996,10 @@ Error   ", output);
 
 			TestHelpers.AssertDriverColorsAre (@"
 0000000000
-1111111111
-2222222222
-3333333333
-4444444444", attributes);
+1111000000
+2222220000
+3333000000
+4444400000", attributes);
 		}
 	}
 }
