@@ -23,24 +23,44 @@ public class TreeTableSource<T> : ITableSource where T : class
 
 	private void Table_KeyPress (object sender, KeyEventEventArgs e)
 	{
-        var tree = RowToTree(tableView.SelectedRow, out _);
+        if(tableView.SelectedColumn != 0)
+        {
+            return;
+        }
+
+        var tree = RowToTree(tableView.SelectedRow, out var lineInTree);
         
         if(tree == null)
         {
             return;
         }
+    
+        var obj = tree.GetObjectOnRow(lineInTree);
 
-        if(tree.ProcessKey(e.KeyEvent))
+        if(obj == null)
         {
-            if(e.KeyEvent.Key == Key.CursorUp || e.KeyEvent.Key == Key.CursorDown)
+            return;
+        }
+
+        if(e.KeyEvent.Key == Key.CursorLeft)
+        {
+            if(tree.IsExpanded(obj))
             {
-                // Let TreeView handle the key but also handle ourselves
-          		e.Handled = false;
+                tree.Collapse(obj);
+                e.Handled = true;
             }
-            else{
-          		e.Handled = true;
+        }
+        if(e.KeyEvent.Key == Key.CursorRight)
+        {
+            if(tree.CanExpand(obj) && !tree.IsExpanded(obj))
+            {
+                tree.Expand(obj);
+                e.Handled = true;
             }
-            
+        }
+        
+        if(e.Handled)
+        {
             tree.InvalidateLineMap();
             tableView.SetNeedsDisplay();
         }
