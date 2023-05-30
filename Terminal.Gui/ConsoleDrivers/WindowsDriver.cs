@@ -873,7 +873,7 @@ namespace Terminal.Gui {
 						keyUpHandler (new KeyEvent (map, keyModifiers));
 					}
 				}
-				if (!inputEvent.KeyEvent.bKeyDown && inputEvent.KeyEvent.dwControlKeyState == 0) {
+				if (!inputEvent.KeyEvent.bKeyDown && (inputEvent.KeyEvent.dwControlKeyState == 0 || inputEvent.KeyEvent.dwControlKeyState == WindowsConsole.ControlKeyState.EnhancedKey)) {
 					keyModifiers = null;
 				}
 				break;
@@ -908,6 +908,7 @@ namespace Terminal.Gui {
 				break;
 
 			case WindowsConsole.EventType.Focus:
+				keyModifiers = null;
 				break;
 			}
 		}
