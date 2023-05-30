@@ -58,7 +58,7 @@ namespace Terminal.Gui.ViewsTests {
 				Host = super,
 				ShowScrollIndicator = true,
 				IsVertical = true
-		};
+			};
 
 			super.Add (sbv);
 			Application.Begin (Application.Top);
@@ -355,7 +355,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			AddHandlers ();
 			_hostView.SuperView.LayoutSubviews ();
-			_hostView.Redraw (_hostView.Bounds);
+			_hostView.Draw ();
 
 			Assert.Equal (_scrollBar.Position, _hostView.Top);
 			Assert.Equal (_scrollBar.Size, _hostView.Lines);
@@ -431,11 +431,11 @@ namespace Terminal.Gui.ViewsTests {
 			AddHandlers ();
 
 			_hostView.Top = 3;
-			_hostView.Redraw (_hostView.Bounds);
+			_hostView.Draw ();
 			Assert.Equal (_scrollBar.Position, _hostView.Top);
 
 			_hostView.Left = 6;
-			_hostView.Redraw (_hostView.Bounds);
+			_hostView.Draw ();
 			Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
 		}
 
@@ -534,7 +534,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			AddHandlers ();
 
-			_hostView.Redraw (_hostView.Bounds);
+			_hostView.Draw ();
 			Assert.True (_scrollBar.ShowScrollIndicator);
 			Assert.True (_scrollBar.Visible);
 			Assert.Equal ("Absolute(1)", _scrollBar.Width.ToString ());
@@ -551,7 +551,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (1, _scrollBar.OtherScrollBarView.Bounds.Height);
 
 			_hostView.Lines = 10;
-			_hostView.Redraw (_hostView.Bounds);
+			_hostView.Draw ();
 			Assert.False (_scrollBar.ShowScrollIndicator);
 			Assert.False (_scrollBar.Visible);
 			Assert.Equal ("Absolute(1)", _scrollBar.Width.ToString ());
@@ -568,7 +568,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (1, _scrollBar.OtherScrollBarView.Bounds.Height);
 
 			_hostView.Cols = 60;
-			_hostView.Redraw (_hostView.Bounds);
+			_hostView.Draw ();
 			Assert.False (_scrollBar.ShowScrollIndicator);
 			Assert.False (_scrollBar.Visible);
 			Assert.Equal ("Absolute(1)", _scrollBar.Width.ToString ());
@@ -585,7 +585,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (1, _scrollBar.OtherScrollBarView.Bounds.Height);
 
 			_hostView.Lines = 40;
-			_hostView.Redraw (_hostView.Bounds);
+			_hostView.Draw ();
 			Assert.True (_scrollBar.ShowScrollIndicator);
 			Assert.True (_scrollBar.Visible);
 			Assert.Equal ("Absolute(1)", _scrollBar.Width.ToString ());
@@ -602,7 +602,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (1, _scrollBar.OtherScrollBarView.Bounds.Height);
 
 			_hostView.Cols = 120;
-			_hostView.Redraw (_hostView.Bounds);
+			_hostView.Draw ();
 			Assert.True (_scrollBar.ShowScrollIndicator);
 			Assert.True (_scrollBar.Visible);
 			Assert.Equal ("Absolute(1)", _scrollBar.Width.ToString ());
@@ -961,6 +961,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (0, textView.LeftColumn);
 			Assert.Equal (0, scrollBar.Position);
 			Assert.Equal (0, scrollBar.OtherScrollBarView.Position);
+			Assert.True (scrollBar.ShowScrollIndicator);
 			expected = @"
 ┌────────┐
 │This   ▲│
@@ -1014,7 +1015,7 @@ This is a tes▼
 			Assert.False (sbv.OtherScrollBarView.ShowScrollIndicator);
 			Assert.False (sbv.Visible);
 			Assert.False (sbv.OtherScrollBarView.Visible);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is a test
 This is a test
@@ -1032,7 +1033,7 @@ This is a test
 			Assert.True (sbv.OtherScrollBarView.ShowScrollIndicator);
 			Assert.True (sbv.Visible);
 			Assert.True (sbv.OtherScrollBarView.Visible);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is a tes▲
 This is a tes┬
@@ -1073,7 +1074,7 @@ This is a tes▼
 			Assert.Equal (0, sbv.Size);
 			Assert.False (sbv.ShowScrollIndicator);
 			Assert.False (sbv.Visible);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is a test
 This is a test
@@ -1103,13 +1104,12 @@ This is a test
 			Assert.Null (sbv.OtherScrollBarView);
 			Assert.False (sbv.ShowScrollIndicator);
 			Assert.False (sbv.Visible);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
-This is a test[ Click Me! ]
+			TestHelpers.AssertDriverContentsWithFrameAre (@$"
+This is a test{CM.Glyphs.LeftBracket} Click Me! {CM.Glyphs.RightBracket}
 This is a test             
 This is a test             
 This is a test             
-This is a test             
-", output);
+This is a test             ", output);
 
 			ReflectionTools.InvokePrivate (
 				typeof (Application),
@@ -1129,14 +1129,14 @@ This is a test
 			Assert.Equal (5, sbv.Size);
 			Assert.False (sbv.ShowScrollIndicator);
 			Assert.True (sbv.Visible);
-			Application.Top.Redraw (Application.Top.Bounds);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
-This is a test[ Click Me! ]
+			Application.Top.Draw ();
+			Assert.False (sbv.Visible);
+			TestHelpers.AssertDriverContentsWithFrameAre (@$"
+This is a test{CM.Glyphs.LeftBracket} Click Me! {CM.Glyphs.RightBracket}
 This is a test             
 This is a test             
 This is a test             
-This is a test             
-", output);
+This is a test             ", output);
 
 			ReflectionTools.InvokePrivate (
 				typeof (Application),
@@ -1157,7 +1157,6 @@ This is a test
 		[Fact, AutoInitShutdown]
 		public void ClearOnVisibleFalse_Gets_Sets ()
 		{
-
 			var text = "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
 			var label = new Label (text);
 			Application.Top.Add (label);
@@ -1180,7 +1179,7 @@ This is a tes▼
 
 			sbv.Visible = false;
 			Assert.False (sbv.Visible);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is a test
 This is a test
@@ -1192,7 +1191,7 @@ This is a test
 
 			sbv.Visible = true;
 			Assert.True (sbv.Visible);
-			Application.Top.Redraw (Application.Top.Bounds);
+			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is a tes▲
 This is a tes┬
