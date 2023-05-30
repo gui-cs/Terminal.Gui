@@ -3056,8 +3056,9 @@ namespace Terminal.Gui {
 			} else if (_currentRow - _topRow + BottomOffset >= Frame.Height + offB.height) {
 				_topRow = Math.Min (Math.Max (_currentRow - Frame.Height + 1 + BottomOffset, 0), _currentRow);
 				need = true;
-			} else if (_topRow > 0 && _currentRow == _topRow) {
+			} else if (_topRow > 0 && _currentRow < _topRow) {
 				_topRow = Math.Max (_topRow - 1, 0);
+				need = true;
 			}
 			if (need) {
 				if (_wrapNeeded) {
@@ -4431,6 +4432,7 @@ namespace Terminal.Gui {
 			_leftColumn = 0;
 			TrackColumn ();
 			PositionCursor ();
+			SetNeedsDisplay ();
 		}
 
 		bool _isButtonShift;
