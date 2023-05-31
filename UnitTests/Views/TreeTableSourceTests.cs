@@ -23,8 +23,7 @@ public class TreeTableSourceTests {
 	{
 		var tv = GetTreeTable (out _);
 
-		//var wrapper = new CheckBoxTableSourceWrapperByIndex (tv, tv.Table);
-		//tv.Table = wrapper;
+		tv.Style.GetOrCreateColumnStyle (1).MinAcceptableWidth = 1;
 
 		tv.Draw ();
 
@@ -44,7 +43,7 @@ public class TreeTableSourceTests {
 		Assert.Equal(0, tv.SelectedColumn);
 
 		// when pressing right we should expand the top route
-		Application.Top.ProcessHotKey(new KeyEvent (Key.CursorRight, new KeyModifiers ()));
+		Application.Top.ProcessHotKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
 
 
 		tv.Draw ();
@@ -60,12 +59,83 @@ public class TreeTableSourceTests {
 ";
 
 		TestHelpers.AssertDriverContentsAre (expected, output);
-
-		tv.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()));
-		tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
 	}
 
+	[Fact, AutoInitShutdown]
+	public void TestTreeTableSource_CombinedWithCheckboxes ()
+	{
+		var tv = GetTreeTable (out var treeSource);
 
+		CheckBoxTableSourceWrapperByIndex checkSource;
+		tv.Table = checkSource = new CheckBoxTableSourceWrapperByIndex (tv, tv.Table);
+		tv.Style.GetOrCreateColumnStyle (2).MinAcceptableWidth = 1;
+
+		tv.Draw ();
+
+		string expected =
+			@"
+    │ │Name          │Description          │
+├─┼──────────────┼─────────────────────┤
+│☐│├+Lost Highway│Exciting night road  │
+│☐│└+Route 66    │Great race course    │
+";
+
+		TestHelpers.AssertDriverContentsAre (expected, output);
+
+		Assert.Equal (2, tv.Table.Rows);
+
+		// top left is selected cell
+		Assert.Equal (0, tv.SelectedRow);
+		Assert.Equal (0, tv.SelectedColumn);
+
+		// when pressing right we move to tree column
+		tv.ProcessKey(new KeyEvent (Key.CursorRight, new KeyModifiers ()));
+
+		// now we are in tree column
+		Assert.Equal (0, tv.SelectedRow);
+		Assert.Equal (1, tv.SelectedColumn);
+
+		Application.Top.ProcessHotKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
+
+		tv.Draw ();
+
+		expected =
+			@"
+
+│ │Name             │Description       │
+├─┼─────────────────┼──────────────────┤
+│☐│├-Lost Highway   │Exciting night roa│
+│☐││ ├─Ford Trans-Am│Talking thunderbir│
+│☐││ └─DeLorean     │Time travelling ca│
+│☐│└+Route 66       │Great race course │
+";
+
+		TestHelpers.AssertDriverContentsAre (expected, output);
+
+		tv.ProcessKey(new KeyEvent(Key.CursorDown,new KeyModifiers ()));
+		tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
+		tv.Draw ();
+
+		expected =
+			@"
+
+│ │Name             │Description       │
+├─┼─────────────────┼──────────────────┤
+│☐│├-Lost Highway   │Exciting night roa│
+│☑││ ├─Ford Trans-Am│Talking thunderbir│
+│☐││ └─DeLorean     │Time travelling ca│
+│☐│└+Route 66       │Great race course │
+";
+
+		TestHelpers.AssertDriverContentsAre (expected, output);
+
+		var selectedObjects = checkSource.CheckedRows.Select (treeSource.GetObjectOnRow).ToArray();
+		var selected = Assert.Single(selectedObjects);
+
+		Assert.Equal ("Ford Trans-Am",selected.Name);
+		Assert.Equal ("Talking thunderbird car", selected.Description);
+
+	}
 
 	interface IDescribedThing {
 		string Name { get; }
@@ -129,11 +199,6 @@ public class TreeTableSourceTests {
 
 		tableView.BeginInit ();
 		tableView.EndInit ();
-		tableView.LayoutSubviews ();
-
-
-		tableView.Style.GetOrCreateColumnStyle (1).MinAcceptableWidth = 1;
-
 		tableView.LayoutSubviews ();
 
 		Application.Top.Add (tableView);
