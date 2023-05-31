@@ -695,11 +695,7 @@ namespace Terminal.Gui {
 			var col = fromCol;
 			var row = fromRow;
 			try {
-				RuneCell cell = RuneAt (col, row);
-				Rune rune = (Rune)'\0';
-				if (cell != null) {
-					rune = cell.Rune;
-				}
+				var rune = RuneAt (col, row).Rune;
 				var runeType = GetRuneType (rune);
 				int lastValidCol = IsSameRuneType (rune, runeType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune)) ? col : -1;
 
@@ -769,9 +765,19 @@ namespace Terminal.Gui {
 			var row = fromRow;
 			try {
 				RuneCell cell = RuneAt (col, row);
-				Rune rune = (Rune)'\0';
+				Rune rune;
 				if (cell != null) {
 					rune = cell.Rune;
+				} else {
+					if (col > 0) {
+						return (col, row);
+					} else if (col == 0 && row > 0) {
+						row--;
+						var line = GetLine (row);
+						return (line.Count, row);
+					} else {
+						return null;
+				}
 				}
 				var runeType = GetRuneType (rune);
 				int lastValidCol = IsSameRuneType (rune, runeType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune)) ? col : -1;
