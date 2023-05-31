@@ -695,7 +695,11 @@ namespace Terminal.Gui {
 			var col = fromCol;
 			var row = fromRow;
 			try {
-				var rune = RuneAt (col, row).Rune;
+				RuneCell cell = RuneAt (col, row);
+				Rune rune = (Rune)'\0';
+				if (cell != null) {
+					rune = cell.Rune;
+				}
 				var runeType = GetRuneType (rune);
 				int lastValidCol = IsSameRuneType (rune, runeType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune)) ? col : -1;
 
@@ -764,7 +768,11 @@ namespace Terminal.Gui {
 			var col = Math.Max (fromCol - 1, 0);
 			var row = fromRow;
 			try {
-				var rune = RuneAt (col, row).Rune;
+				RuneCell cell = RuneAt (col, row);
+				Rune rune = (Rune)'\0';
+				if (cell != null) {
+					rune = cell.Rune;
+				}
 				var runeType = GetRuneType (rune);
 				int lastValidCol = IsSameRuneType (rune, runeType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune)) ? col : -1;
 
