@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Terminal.Gui {
-
 	/// <summary>
 	/// <see cref="ITableSource"/> implementation that wraps arbitrary data.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class EnumerableTableSource<T> : ITableSource {
+	public class EnumerableTableSource<T> : IEnumerableTableSource<T> {
 		private T [] data;
 		private string [] cols;
 		private Dictionary<string, Func<T, object>> lamdas;
@@ -55,5 +54,17 @@ namespace Terminal.Gui {
 		/// Gets the object collection hosted by this wrapper.
 		/// </summary>
 		public IReadOnlyCollection<T> Data => this.data.AsReadOnly();
+
+		/// <inheritdoc/>
+		public IEnumerable<T> GetAllObjects ()
+		{
+			return Data;
+		}
+
+		/// <inheritdoc/>
+		public T GetObjectOnRow (int row)
+		{
+			return Data.ElementAt(row);
+		}
 	}
 }

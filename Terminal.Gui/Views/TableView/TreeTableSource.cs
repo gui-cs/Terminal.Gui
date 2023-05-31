@@ -10,7 +10,7 @@ namespace Terminal.Gui;
 /// An <see cref="ITableSource"/> with expandable rows.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class TreeTableSource<T> : ITableSource, IDisposable where T : class {
+public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T : class {
 	private TreeView<T> tree;
 
 	private string[] cols;
@@ -178,5 +178,17 @@ public class TreeTableSource<T> : ITableSource, IDisposable where T : class {
 		// we cannot just check that SelectedColumn is 0 because source may
 		// be wrapped e.g. with a CheckBoxTableSourceWrapperBase
 		return colNames [column] == cols [0];
+	}
+
+    /// <inheritdoc/>
+	public T GetObjectOnRow (int row)
+	{
+		return RowToObject(row);
+	}
+
+    /// <inheritdoc/>
+	public IEnumerable<T> GetAllObjects ()
+	{
+		return tree.BuildLineMap().Select(b=>b.Model);
 	}
 }

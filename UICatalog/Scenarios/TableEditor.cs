@@ -43,6 +43,8 @@ namespace UICatalog.Scenarios {
 		ColorScheme redColorSchemeAlt;
 		ColorScheme alternatingColorScheme;
 
+		HashSet<FileSystemInfo> _checkedFileSystemInfos = new HashSet<FileSystemInfo>();
+
 		public override void Setup ()
 		{
 			Win.Title = this.GetName ();
@@ -467,7 +469,7 @@ namespace UICatalog.Scenarios {
 
 		private void ToggleCheckboxes (bool radio)
 		{
-			if (tableView.Table is CheckBoxTableSourceWrapperByIndex wrapper) {
+			if (tableView.Table is CheckBoxTableSourceWrapperBase wrapper) {
 
 				// unwrap it to remove check boxes
 				tableView.Table = wrapper.Wrapping;
@@ -481,11 +483,24 @@ namespace UICatalog.Scenarios {
 				}
 			}
 			
+			ITableSource source;
 			// Either toggling on checkboxes/radio or switching from radio to checkboxes (or vice versa)
-			
-			var source = new CheckBoxTableSourceWrapperByIndex (tableView, tableView.Table) {
-				UseRadioButtons = radio
-			};
+			if(tableView.Table is TreeTableSource<FileSystemInfo> treeSource)
+			{
+				source = new CheckBoxTableSourceWrapperByObject<FileSystemInfo> (tableView, treeSource,
+					this._checkedFileSystemInfos.Contains,
+					this.CheckOrUncheckFile
+				) {
+					UseRadioButtons = radio
+				};
+			}
+			else
+			{
+				source = new CheckBoxTableSourceWrapperByIndex (tableView, tableView.Table) {
+					UseRadioButtons = radio
+				};
+			}
+
 			tableView.Table = source;
 
 
@@ -499,6 +514,19 @@ namespace UICatalog.Scenarios {
 				_miCheckboxes.Checked = true;
 			}
 			
+		}
+
+		private void CheckOrUncheckFile (FileSystemInfo info, bool check)
+		{
+			if(check)
+			{
+				_checkedFileSystemInfos.Add(info);
+			}
+			else
+			{
+
+				_checkedFileSystemInfos.Remove(info);
+			}
 		}
 
 		private void ToggleAlwaysUseNormalColorForVerticalCellLines()
