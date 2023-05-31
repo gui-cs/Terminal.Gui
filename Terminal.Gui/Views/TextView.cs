@@ -1896,7 +1896,7 @@ namespace Terminal.Gui {
 		public int SelectionStartColumn {
 			get => _selectionStartColumn;
 			set {
-				var line = _model.GetLine (_currentRow);
+				var line = _model.GetLine (_selectionStartRow);
 				_selectionStartColumn = value < 0 ? 0 : value > line.Count ? line.Count : value;
 				_selecting = true;
 				SetNeedsDisplay ();
