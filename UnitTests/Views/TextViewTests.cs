@@ -6971,10 +6971,6 @@ This is the second line.
 				runeCells.Add (new RuneCell { Rune = (Rune)'\n', ColorScheme = color.Value });
 			}
 
-			//var tv = new TextView () {
-			//	Width = 20,
-			//	Height = 10
-			//};
 			_textView.LoadRuneCells (runeCells);
 			Application.Top.Add (_textView);
 			var rs = Application.Begin (Application.Top);
