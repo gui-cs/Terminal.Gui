@@ -9,7 +9,7 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Controls"), ScenarioCategory ("TreeView"), ScenarioCategory ("Files and IO")]
 	public class TreeTableExample : Scenario {
 
-		List<View> toDispose = new List<View> ();
+		TreeView<FileSystemInfo> tree;
 
 		public override void Setup ()
 		{
@@ -24,11 +24,18 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (),
 			};
 
-			var source = new TreeTableSource<FileSystemInfo> (tbl, "Name", new (){
-		{"Extension", f=>f.Extension},
-		{"CreationTime", f=>f.CreationTime}
 
-	    });
+			tree = new TreeView<FileSystemInfo> {
+				AspectGetter = (f) => f.Name,
+				TreeBuilder = new DelegateTreeBuilder<FileSystemInfo> (GetChildren)
+			};
+
+
+			var source = new TreeTableSource<FileSystemInfo> (tbl, "Name", tree, new (){
+				{"Extension", f=>f.Extension},
+				{"CreationTime", f=>f.CreationTime}
+
+			    });
 
 			foreach (var folder in Enum.GetValues (typeof (Environment.SpecialFolder))) {
 				var path = Environment.GetFolderPath ((Environment.SpecialFolder)folder);
@@ -37,15 +44,7 @@ namespace UICatalog.Scenarios {
 					continue;
 				}
 
-				var tree = new TreeView<FileSystemInfo> ();
-				tree.AspectGetter = (f)=>f.Name;
-
-				tree.TreeBuilder = new DelegateTreeBuilder<FileSystemInfo> (GetChildren);
-
 				tree.AddObject (new DirectoryInfo (path));
-
-				source.AddRow (tree);
-				toDispose.Add (tree);
 			}
 
 			tbl.Table = source;
@@ -72,9 +71,7 @@ namespace UICatalog.Scenarios {
 		{
 			base.Dispose (disposing);
 
-			foreach(var d in toDispose) {
-				d.Dispose ();
-			}
+			tree.Dispose ();
 		}
 	}
 }
