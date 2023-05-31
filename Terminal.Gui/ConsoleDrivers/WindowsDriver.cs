@@ -873,7 +873,7 @@ namespace Terminal.Gui {
 						keyUpHandler (new KeyEvent (map, keyModifiers));
 					}
 				}
-				if (!inputEvent.KeyEvent.bKeyDown && (inputEvent.KeyEvent.dwControlKeyState == 0 || inputEvent.KeyEvent.dwControlKeyState == WindowsConsole.ControlKeyState.EnhancedKey)) {
+				if (!inputEvent.KeyEvent.bKeyDown) {
 					keyModifiers = null;
 				}
 				break;
