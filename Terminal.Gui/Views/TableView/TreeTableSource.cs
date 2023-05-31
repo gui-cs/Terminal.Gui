@@ -142,6 +142,12 @@ public class TreeTableSource<T> : ITableSource, IDisposable where T : class {
 			return false;
 		}
 
+		// if full row is selected then it is hard to tell which sub cell in the tree
+		// has focus so we should typically just always respond with expand/collapse
+		if(tableView.FullRowSelect) {
+			return true;
+		}
+
 		// we cannot just check that SelectedColumn is 0 because source may
 		// be wrapped e.g. with a CheckBoxTableSourceWrapperBase
 		return colNames [selectedColumn] == cols [0];

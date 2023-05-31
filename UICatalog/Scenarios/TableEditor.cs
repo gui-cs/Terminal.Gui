@@ -6,6 +6,7 @@ using System.Linq;
 using System.Globalization;
 using static Terminal.Gui.TableView;
 using System.Text;
+using System.IO;
 
 namespace UICatalog.Scenarios {
 
@@ -36,6 +37,8 @@ namespace UICatalog.Scenarios {
 		private MenuItem _miCheckboxes;
 		private MenuItem _miRadioboxes;
 
+		private List<IDisposable> toDispose = new List<IDisposable>();
+
 		ColorScheme redColorScheme;
 		ColorScheme redColorSchemeAlt;
 		ColorScheme alternatingColorScheme;
@@ -59,6 +62,7 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_OpenBigExample", "", () => OpenExample(true)),
 					new MenuItem ("_OpenSmallExample", "", () => OpenExample(false)),
 					new MenuItem ("OpenCharacter_Map","",()=>OpenUnicodeMap()),
+					new MenuItem ("OpenTreeExample","",()=>OpenTreeExample()),
 					new MenuItem ("_CloseExample", "", () => CloseExample()),
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
@@ -264,7 +268,7 @@ namespace UICatalog.Scenarios {
 
 		private int? GetColumn ()
 		{
-			if (tableView.Table == null)
+			if (tableView.Table  == null)
 				return null;
 
 			if (tableView.SelectedColumn < 0 || tableView.SelectedColumn > tableView.Table.Columns)
@@ -594,6 +598,61 @@ namespace UICatalog.Scenarios {
 			tableView.Update ();
 		}
 
+
+		private IEnumerable<FileSystemInfo> GetChildren (FileSystemInfo arg)
+		{
+			try {
+				return arg is DirectoryInfo d ?
+					d.GetFileSystemInfos () :
+					Enumerable.Empty<FileSystemInfo> ();
+			} catch (Exception) {
+				// Permission denied etc
+				return Enumerable.Empty<FileSystemInfo> ();
+			}
+
+		}
+
+		protected override void Dispose (bool disposing)
+		{
+			base.Dispose (disposing);
+
+			foreach(var d in toDispose) {
+				d.Dispose ();
+			}
+			
+		}
+
+		private void OpenTreeExample()
+		{
+			tableView.Style.ColumnStyles.Clear ();
+
+			var tree = new TreeView<FileSystemInfo> {
+				AspectGetter = (f) => f.Name,
+				TreeBuilder = new DelegateTreeBuilder<FileSystemInfo> (GetChildren)
+			};
+
+
+			var source = new TreeTableSource<FileSystemInfo> (tableView, "Name", tree, new (){
+				{"Extension", f=>f.Extension},
+				{"CreationTime", f=>f.CreationTime}
+
+			    });
+
+			foreach (var folder in Enum.GetValues (typeof (Environment.SpecialFolder))) {
+				var path = Environment.GetFolderPath ((Environment.SpecialFolder)folder);
+
+				if (string.IsNullOrWhiteSpace (path)) {
+					continue;
+				}
+
+				tree.AddObject (new DirectoryInfo (path));
+			}
+
+			tableView.Table = source;
+
+			toDispose.Add (tree);
+		}
+
 		private DataTable BuildUnicodeMap ()
 		{
 			var dt = new DataTable ();
@@ -841,7 +900,7 @@ namespace UICatalog.Scenarios {
 
 		private void EditCurrentCell (object sender, CellActivatedEventArgs e)
 		{
-			if (e.Table == null)
+			if (e.Table as DataTableSource == null)
 				return;
 
 			var tableCol = ToTableCol(e.Col);
