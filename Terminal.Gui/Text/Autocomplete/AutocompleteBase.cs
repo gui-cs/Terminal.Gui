@@ -49,6 +49,9 @@ namespace Terminal.Gui {
 		public virtual Key Reopen { get; set; } = Key.Space | Key.CtrlMask | Key.AltMask;
 
 		/// <inheritdoc/>
+		public virtual AutocompleteContext Context { get; set; }
+
+		/// <inheritdoc/>
 		public abstract bool MouseEvent (MouseEvent me, bool fromHost = false);
 
 		/// <inheritdoc/>

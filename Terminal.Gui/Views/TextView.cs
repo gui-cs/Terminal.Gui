@@ -777,7 +777,7 @@ namespace Terminal.Gui {
 						return (line.Count, row);
 					} else {
 						return null;
-				}
+					}
 				}
 				var runeType = GetRuneType (rune);
 				int lastValidCol = IsSameRuneType (rune, runeType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune)) ? col : -1;
@@ -2223,6 +2223,8 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void PositionCursor ()
 		{
+			ProcessAutocomplete ();
+
 			if (!CanFocus || !Enabled || Application.Driver == null) {
 				return;
 			}
@@ -2745,9 +2747,13 @@ namespace Terminal.Gui {
 			return GetRegion (startRow, startCol, cRow, cCol, model);
 		}
 
+		bool _isDrawing = false;
+
 		///<inheritdoc/>
 		public override void OnDrawContent (Rect contentArea)
 		{
+			_isDrawing = true;
+
 			SetNormalColor ();
 
 			var offB = OffSetBackground ();
@@ -2807,6 +2813,14 @@ namespace Terminal.Gui {
 
 			PositionCursor ();
 
+			_isDrawing = false;
+		}
+
+		private void ProcessAutocomplete ()
+		{
+			if (_isDrawing) {
+				return;
+			}
 			if (_clickWithSelecting) {
 				_clickWithSelecting = false;
 				return;
@@ -2818,7 +2832,7 @@ namespace Terminal.Gui {
 			GenerateSuggestions ();
 
 			var renderAt = new Point (
-				CursorPosition.X - LeftColumn,
+				Autocomplete.Context.CursorPosition,
 				Autocomplete.PopupInsideContainer
 					? (CursorPosition.Y + 1) - TopRow
 					: 0);
@@ -2830,9 +2844,10 @@ namespace Terminal.Gui {
 		{
 			var currentLine = this.GetCurrentLine ();
 			var cursorPosition = Math.Min (this.CurrentColumn, currentLine.Count);
+			Autocomplete.Context = new AutocompleteContext (currentLine, cursorPosition,
+				Autocomplete.Context != null ? Autocomplete.Context.Canceled : false);
 			Autocomplete.GenerateSuggestions (
-				new AutocompleteContext (currentLine, cursorPosition)
-				);
+				Autocomplete.Context);
 		}
 
 		/// <inheritdoc/>
@@ -3094,6 +3109,8 @@ namespace Terminal.Gui {
 		public virtual void OnContentsChanged ()
 		{
 			ContentsChanged?.Invoke (this, new ContentsChangedEventArgs (CurrentRow, CurrentColumn));
+
+			ProcessAutocomplete ();
 		}
 
 		(int width, int height) OffSetBackground ()
@@ -3901,6 +3918,7 @@ namespace Terminal.Gui {
 			UpdateWrapModel ();
 
 			DoNeededAction ();
+			OnContentsChanged ();
 		}
 
 		/// <summary>
@@ -3937,6 +3955,7 @@ namespace Terminal.Gui {
 			UpdateWrapModel ();
 
 			DoNeededAction ();
+			OnContentsChanged ();
 		}
 
 		void MoveLeft ()
@@ -4656,6 +4675,12 @@ namespace Terminal.Gui {
 		protected override void InsertText (string accepted)
 		{
 			((TextView)HostControl).InsertText (accepted);
+		}
+
+		/// <inheritdoc/>
+		protected override void SetCursorPosition (int column)
+		{
+			((TextView)HostControl).CursorPosition = new Point (column, ((TextView)HostControl).CurrentRow);
 		}
 	}
 }

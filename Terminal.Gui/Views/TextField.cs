@@ -332,6 +332,8 @@ namespace Terminal.Gui {
 
 				TextChanged?.Invoke (this, new TextChangedEventArgs (oldText));
 
+				ProcessAutocomplete ();
+
 				if (_point > _text.Count) {
 					_point = Math.Max (TextModel.DisplaySize (_text, 0).size - 1, 0);
 				}
@@ -393,6 +395,8 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void PositionCursor ()
 		{
+			ProcessAutocomplete ();
+
 			var col = 0;
 			for (int idx = _first < 0 ? 0 : _first; idx < _text.Count; idx++) {
 				if (idx == _point)
@@ -437,9 +441,13 @@ namespace Terminal.Gui {
 			}
 		}
 
+		bool _isDrawing = false;
+
 		///<inheritdoc/>
 		public override void OnDrawContent (Rect contentArea)
 		{
+			_isDrawing = true;
+
 			var selColor = new Attribute (ColorScheme.Focus.Background, ColorScheme.Focus.Foreground);
 			SetSelectedStartSelectedLength ();
 
@@ -485,21 +493,31 @@ namespace Terminal.Gui {
 
 			RenderCaption ();
 
-			if (SelectedLength > 0)
+			ProcessAutocomplete ();
+
+			_isDrawing = false;
+		}
+
+		private void ProcessAutocomplete ()
+		{
+			if (_isDrawing) {
 				return;
+			}
+			if (SelectedLength > 0) {
+				return;
+			}
 
 			// draw autocomplete
 			GenerateSuggestions ();
 
 			var renderAt = new Point (
-				CursorPosition - ScrollOffset, 0);
+				Autocomplete.Context.CursorPosition, 0);
 
 			Autocomplete.RenderOverlay (renderAt);
 		}
 
 		private void RenderCaption ()
 		{
-
 			if (HasFocus || Caption == null || Caption.Length == 0
 				|| Text?.Length > 0) {
 				return;
@@ -522,10 +540,11 @@ namespace Terminal.Gui {
 		{
 			var currentLine = Text.ToRuneCellList ();
 			var cursorPosition = Math.Min (this.CursorPosition, currentLine.Count);
+			Autocomplete.Context = new AutocompleteContext (currentLine, cursorPosition,
+				Autocomplete.Context != null ? Autocomplete.Context.Canceled : false);
 
 			Autocomplete.GenerateSuggestions (
-				new AutocompleteContext (currentLine, cursorPosition)
-				);
+				Autocomplete.Context);
 		}
 
 		/// <inheritdoc/>
@@ -548,15 +567,22 @@ namespace Terminal.Gui {
 				return;
 
 			int offB = OffSetBackground ();
+			bool need = !_needsDisplay.IsEmpty;
 			if (_point < _first) {
 				_first = _point;
+				need = true;
 			} else if (Frame.Width > 0 && (_first + _point - (Frame.Width + offB) == 0 ||
 				  TextModel.DisplaySize (_text, _first, _point).size >= Frame.Width + offB)) {
 
 				_first = Math.Max (TextModel.CalculateLeftColumn (_text, _first,
 					_point, Frame.Width + offB), 0);
+				need = true;
 			}
-			SetNeedsDisplay ();
+			if (need) {
+				SetNeedsDisplay ();
+			} else {
+				PositionCursor ();
+			}
 		}
 
 		int OffSetBackground ()
@@ -1151,7 +1177,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void ClearAllSelection ()
 		{
-			if (_selectedStart == -1 && _length == 0 && _selectedText == "")
+			if (_selectedStart == -1 && _length == 0 && string.IsNullOrEmpty (_selectedText))
 				return;
 
 			_selectedStart = -1;
@@ -1332,6 +1358,12 @@ namespace Terminal.Gui {
 		protected override void InsertText (string accepted)
 		{
 			((TextField)HostControl).InsertText (accepted, false);
+		}
+
+		/// <inheritdoc/>
+		protected override void SetCursorPosition (int column)
+		{
+			((TextField)HostControl).CursorPosition = column;
 		}
 	}
 }

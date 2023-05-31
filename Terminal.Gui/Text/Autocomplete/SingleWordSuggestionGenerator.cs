@@ -28,7 +28,9 @@ namespace Terminal.Gui {
 				return Enumerable.Empty<Suggestion> ();
 			}
 
-			var currentWord = IdxToWord (context.CurrentLine.Select (c => c.Rune).ToList (), context.CursorPosition);
+			var line = context.CurrentLine.Select (c => c.Rune).ToList ();
+			var currentWord = IdxToWord (line, context.CursorPosition, out int startIdx);
+			context.CursorPosition = startIdx < 1 ? startIdx : Math.Min (startIdx + 1, line.Count);
 
 			if (string.IsNullOrWhiteSpace (currentWord)) {
 				return Enumerable.Empty<Suggestion> ();
@@ -46,11 +48,11 @@ namespace Terminal.Gui {
 		/// Return true if the given symbol should be considered part of a word
 		/// and can be contained in matches. Base behavior is to use <see cref="char.IsLetterOrDigit(char)"/>
 		/// </summary>
-		/// <param name="cell"></param>
+		/// <param name="rune">The rune.</param>
 		/// <returns></returns>
-		public virtual bool IsWordChar (Rune cell)
+		public virtual bool IsWordChar (Rune rune)
 		{
-			return Char.IsLetterOrDigit ((char)cell.Value);
+			return Char.IsLetterOrDigit ((char)rune.Value);
 		}
 
 		/// <summary>
@@ -68,37 +70,38 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="line"></param>
 		/// <param name="idx"></param>
+		/// <param name="startIdx">The start index of the word.</param>
 		/// <param name="columnOffset"></param>
 		/// <returns></returns>
-		protected virtual string IdxToWord (List<Rune> line, int idx, int columnOffset = 0)
+		protected virtual string IdxToWord (List<Rune> line, int idx, out int startIdx, int columnOffset = 0)
 		{
 			StringBuilder sb = new StringBuilder ();
-			var endIdx = idx;
+			startIdx = idx;
 
 			// get the ending word index
-			while (endIdx < line.Count) {
-				if (IsWordChar (line [endIdx])) {
-					endIdx++;
+			while (startIdx < line.Count) {
+				if (IsWordChar (line [startIdx])) {
+					startIdx++;
 				} else {
 					break;
 				}
 			}
 
 			// It isn't a word char then there is no way to autocomplete that word
-			if (endIdx == idx && columnOffset != 0) {
+			if (startIdx == idx && columnOffset != 0) {
 				return null;
 			}
 
 			// we are at the end of a word. Work out what has been typed so far
-			while (endIdx-- > 0) {
-				if (IsWordChar (line [endIdx])) {
-					sb.Insert (0, (char)line [endIdx].Value);
+			while (startIdx-- > 0) {
+				if (IsWordChar (line [startIdx])) {
+					sb.Insert (0, (char)line [startIdx].Value);
 				} else {
 					break;
 				}
 			}
+			startIdx = Math.Max (startIdx, 0);
 			return sb.ToString ();
 		}
 	}
 }
-

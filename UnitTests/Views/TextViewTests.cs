@@ -2600,8 +2600,8 @@ line.
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (28, 2), tv.CursorPosition);
-			Assert.Single (tv.Autocomplete.Suggestions);
-			Assert.Equal ("first", tv.Autocomplete.Suggestions [0].Replacement);
+			Assert.Empty (tv.Autocomplete.Suggestions);
+			Assert.False (tv.Autocomplete.Visible);
 			g.AllSuggestions = new List<string> ();
 			tv.Autocomplete.ClearSuggestions ();
 			Assert.Empty (g.AllSuggestions);
@@ -6179,7 +6179,7 @@ line.
 			Assert.True (tv.MouseEvent (new MouseEvent () { X = 0, Y = 3, Flags = MouseFlags.Button1Pressed }));
 			tv.Draw ();
 			Assert.Equal (new Point (0, 3), tv.CursorPosition);
-			Assert.Equal (new Point (12, 0), cp);
+			Assert.Equal (new Point (13, 0), cp);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This 
 is   

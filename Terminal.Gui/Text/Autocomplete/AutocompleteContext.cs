@@ -19,13 +19,18 @@ namespace Terminal.Gui {
 		public int CursorPosition { get; set; }
 
 		/// <summary>
-		/// Creates anew instance of the <see cref="AutocompleteContext"/> class
+		/// Gets or sets if the autocomplete was canceled from popup.
 		/// </summary>
-		public AutocompleteContext (List<RuneCell> currentLine, int cursorPosition)
+		public bool Canceled { get; set; }
+
+		/// <summary>
+		/// Creates a new instance of the <see cref="AutocompleteContext"/> class
+		/// </summary>
+		public AutocompleteContext (List<RuneCell> currentLine, int cursorPosition, bool canceled = false)
 		{
 			CurrentLine = currentLine;
 			CursorPosition = cursorPosition;
+			Canceled = canceled;
 		}
 	}
 }
-

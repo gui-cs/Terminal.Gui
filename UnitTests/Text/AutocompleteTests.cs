@@ -145,25 +145,19 @@ namespace Terminal.Gui.TextTests {
 			Assert.Empty (tv.Autocomplete.Suggestions);
 			Assert.Equal (3, g.AllSuggestions.Count);
 			Assert.False (tv.Autocomplete.Visible);
-			top.Draw ();
+			tv.PositionCursor ();
 			Assert.True (tv.ProcessKey (new KeyEvent (tv.Autocomplete.Reopen, new KeyModifiers ())));
 			Assert.Equal ($"F Fortunately super feature.", tv.Text);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.Equal (2, tv.Autocomplete.Suggestions.Count);
 			Assert.Equal (3, g.AllSuggestions.Count);
 			Assert.True (tv.ProcessKey (new KeyEvent (tv.Autocomplete.SelectionKey, new KeyModifiers ())));
-			Assert.Equal ($"Fortunately Fortunately super feature.", tv.Text);
-			Assert.Equal (new Point (11, 0), tv.CursorPosition);
-			Assert.Equal (2, tv.Autocomplete.Suggestions.Count);
-			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [0].Replacement);
-			Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
-			Assert.Equal (0, tv.Autocomplete.SelectedIdx);
-			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [tv.Autocomplete.SelectedIdx].Replacement);
-			Assert.True (tv.ProcessKey (new KeyEvent (tv.Autocomplete.CloseKey, new KeyModifiers ())));
+			tv.PositionCursor ();
 			Assert.Equal ($"Fortunately Fortunately super feature.", tv.Text);
 			Assert.Equal (new Point (11, 0), tv.CursorPosition);
 			Assert.Empty (tv.Autocomplete.Suggestions);
 			Assert.Equal (3, g.AllSuggestions.Count);
+			Assert.False (tv.Autocomplete.Visible);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -183,13 +177,19 @@ namespace Terminal.Gui.TextTests {
 			top.Add (tv);
 			Application.Begin (top);
 
-			// BUGBUG: v2 - I broke this test and don't have time to figure out why. @tznind - help!
-			//			for (int i = 0; i < 7; i++) {
-			//				Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
-			//				Application.Refresh ();
-			//				TestHelpers.AssertDriverContentsWithFrameAre (@"
-			//This a long line and against TextView.", output);
-			//			}
+			for (int i = 0; i < 7; i++) {
+				Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+				Application.Refresh ();
+				if (i < 4 || i > 5) {
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
+This a long line and against TextView.", output);
+				} else {
+					TestHelpers.AssertDriverContentsWithFrameAre (@"
+This a long line and against TextView.
+     and                              
+     against                          ", output);
+				}
+			}
 
 			Assert.True (tv.MouseEvent (new MouseEvent () {
 				X = 6,
@@ -198,19 +198,21 @@ namespace Terminal.Gui.TextTests {
 			}));
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
-This a long line and against TextView.", output);
+This a long line and against TextView.
+     and                              
+     against                          ", output);
 
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.g, new KeyModifiers ())));
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This ag long line and against TextView.
-       against                         ", output);
+     against                           ", output);
 
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This ag long line and against TextView.
-      against                          ", output);
+     against                           ", output);
 
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
 			Application.Refresh ();
@@ -223,29 +225,31 @@ This ag long line and against TextView.
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This ag long line and against TextView.", output);
 
-			// BUGBUG: v2 - I broke this test and don't have time to figure out why. @tznind - help!
-			//			for (int i = 0; i < 3; i++) {
-			//				Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
-			//				Application.Refresh ();
-			//				TestHelpers.AssertDriverContentsWithFrameAre (@"
-			//This ag long line and against TextView.", output);
-			//			}
+			for (int i = 0; i < 3; i++) {
+				Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+				Application.Refresh ();
+				TestHelpers.AssertDriverContentsWithFrameAre (@"
+This ag long line and against TextView.
+     against                           ", output);
+			}
 
-			//			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
-			//			Application.Refresh ();
-			//			TestHelpers.AssertDriverContentsWithFrameAre (@"
-			//This a long line and against TextView.", output);
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+This a long line and against TextView.
+     and                              
+     against                          ", output);
 
-			//			Assert.True (tv.ProcessKey (new KeyEvent (Key.n, new KeyModifiers ())));
-			//			Application.Refresh ();
-			//			TestHelpers.AssertDriverContentsWithFrameAre (@"
-			//This an long line and against TextView.
-			//       and                             ", output);
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.n, new KeyModifiers ())));
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+This an long line and against TextView.
+     and                               ", output);
 
-			//			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
-			//			Application.Refresh ();
-			//			TestHelpers.AssertDriverContentsWithFrameAre (@"
-			//This an long line and against TextView.", output);
+			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+This an long line and against TextView.", output);
 		}
 	}
 }
