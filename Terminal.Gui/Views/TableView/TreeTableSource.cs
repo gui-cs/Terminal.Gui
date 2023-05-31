@@ -104,7 +104,7 @@ public class TreeTableSource<T> : ITableSource, IDisposable where T : class {
 
 	private void Table_KeyPress (object sender, KeyEventEventArgs e)
 	{
-		if (tableView.SelectedColumn != 0) {
+		if (!CursorIsInTreeColumn()) {
 			return;
 		}
 
@@ -131,5 +131,19 @@ public class TreeTableSource<T> : ITableSource, IDisposable where T : class {
 			tree.InvalidateLineMap ();
 			tableView.SetNeedsDisplay ();
 		}
+	}
+
+	private bool CursorIsInTreeColumn ()
+	{
+		var colNames = tableView.Table.ColumnNames;
+		var selectedColumn = tableView.SelectedColumn;
+
+		if (selectedColumn < 0 || selectedColumn >= colNames.Length) {
+			return false;
+		}
+
+		// we cannot just check that SelectedColumn is 0 because source may
+		// be wrapped e.g. with a CheckBoxTableSourceWrapperBase
+		return colNames [selectedColumn] == cols [0];
 	}
 }
