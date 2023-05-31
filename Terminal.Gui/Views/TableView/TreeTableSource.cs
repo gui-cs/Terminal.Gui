@@ -39,6 +39,7 @@ public class TreeTableSource<T> : ITableSource, IDisposable where T : class {
 		this.tableView = table;
 		this.tree = tree;
 		this.tableView.KeyPress += Table_KeyPress;
+		this.tableView.MouseClick += Table_MouseClick;
 
 		var colList = subsequentColumns.Keys.ToList ();
 		colList.Insert (0, firstColumnName);
@@ -48,6 +49,7 @@ public class TreeTableSource<T> : ITableSource, IDisposable where T : class {
 
 		this.lamdas = subsequentColumns;
 	}
+
 
 	/// <inheritdoc/>
 	public object this [int row, int col] => 
@@ -83,7 +85,7 @@ public class TreeTableSource<T> : ITableSource, IDisposable where T : class {
 
 	private string GetColumnZeroRepresentationFromTree (int row)
 	{
-		var branch = tree.BuildLineMap ().ElementAt (row);
+		var branch = RowToBranch(row);
 
 		// Everything on line before the expansion run and branch text
 		Rune [] prefix = branch.GetLinePrefix (Application.Driver).ToArray ();
@@ -104,7 +106,7 @@ public class TreeTableSource<T> : ITableSource, IDisposable where T : class {
 
 	private void Table_KeyPress (object sender, KeyEventEventArgs e)
 	{
-		if (!CursorIsInTreeColumn()) {
+		if (!IsInTreeColumn(tableView.SelectedColumn , true)) {
 			return;
 		}
 
@@ -133,23 +135,48 @@ public class TreeTableSource<T> : ITableSource, IDisposable where T : class {
 		}
 	}
 
-	private bool CursorIsInTreeColumn ()
+	private void Table_MouseClick (object sender, MouseEventEventArgs e)
+	{
+		var hit = tableView.ScreenToCell(e.MouseEvent.X, e.MouseEvent.Y, out var headerIfAny, out var offsetX);
+
+		if(hit == null || headerIfAny != null || !IsInTreeColumn(hit.Value.X,false) || offsetX == null)
+		{
+			return;
+		}
+
+		var branch = RowToBranch (hit.Value.Y);
+		
+		if(branch.IsHitOnExpandableSymbol(Application.Driver,offsetX.Value)) {
+			
+			if(tree.CanExpand(branch.Model) && !tree.IsExpanded(branch.Model)) {
+				tree.Expand (branch.Model);
+			} else {
+				tree.Collapse (branch.Model);
+			}
+		}
+	}
+
+	private Branch<T> RowToBranch (int row)
+	{
+		return tree.BuildLineMap ().ElementAt (row);
+	}
+
+	private bool IsInTreeColumn (int column, bool isKeyboard)
 	{
 		var colNames = tableView.Table.ColumnNames;
-		var selectedColumn = tableView.SelectedColumn;
 
-		if (selectedColumn < 0 || selectedColumn >= colNames.Length) {
+		if (column < 0 || column >= colNames.Length) {
 			return false;
 		}
 
 		// if full row is selected then it is hard to tell which sub cell in the tree
 		// has focus so we should typically just always respond with expand/collapse
-		if(tableView.FullRowSelect) {
+		if(tableView.FullRowSelect && isKeyboard) {
 			return true;
 		}
 
 		// we cannot just check that SelectedColumn is 0 because source may
 		// be wrapped e.g. with a CheckBoxTableSourceWrapperBase
-		return colNames [selectedColumn] == cols [0];
+		return colNames [column] == cols [0];
 	}
 }

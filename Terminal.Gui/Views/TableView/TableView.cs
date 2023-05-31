@@ -1288,19 +1288,31 @@ namespace Terminal.Gui {
 		/// <returns>Cell clicked or null.</returns>
 		public Point? ScreenToCell (int clientX, int clientY)
 		{
-			return ScreenToCell (clientX, clientY, out _);
+			return ScreenToCell (clientX, clientY, out _, out _);
 		}
-
 		/// <inheritdoc cref="ScreenToCell(int, int)"/>
 		/// <param name="clientX">X offset from the top left of the control.</param>
 		/// <param name="clientY">Y offset from the top left of the control.</param>
 		/// <param name="headerIfAny">If the click is in a header this is the column clicked.</param>
 		public Point? ScreenToCell (int clientX, int clientY, out int? headerIfAny)
 		{
-			headerIfAny = null;
+			return ScreenToCell (clientX, clientY, out headerIfAny, out _);
+		}
 
-			if (TableIsNullOrInvisible ())
+		/// <inheritdoc cref="ScreenToCell(int, int)"/>
+		/// <param name="clientX">X offset from the top left of the control.</param>
+		/// <param name="clientY">Y offset from the top left of the control.</param>
+		/// <param name="headerIfAny">If the click is in a header this is the column clicked.</param>
+		/// <param name="offsetX">The horizontal offset of the click within the returned cell.</param>
+		public Point? ScreenToCell (int clientX, int clientY, out int? headerIfAny, out int? offsetX)
+		{
+			headerIfAny = null;
+			offsetX = null;
+
+			if (TableIsNullOrInvisible ()) {
 				return null;
+			}
+				
 
 			var viewPort = CalculateViewport (Bounds);
 
@@ -1311,6 +1323,7 @@ namespace Terminal.Gui {
 			// Click is on the header section of rendered UI
 			if (clientY < headerHeight) {
 				headerIfAny = col?.Column;
+				offsetX = clientX - col.X;
 				return null;
 			}
 
@@ -1324,6 +1337,7 @@ namespace Terminal.Gui {
 
 			if (col != null && rowIdx >= 0) {
 
+				offsetX = clientX - col.X;
 				return new Point (col.Column, rowIdx);
 			}
 
