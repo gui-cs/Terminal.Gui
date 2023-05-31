@@ -6959,7 +6959,7 @@ This is the second line.
 			Assert.Equal ("TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!", _textView.Text);
 		}
 
-		[Fact, AutoInitShutdown]
+		[Fact, TextViewTestsAutoInitShutdown]
 		public void RuneCell_LoadRuneCells ()
 		{
 			List<RuneCell> runeCells = new List<RuneCell> ();
@@ -6971,12 +6971,12 @@ This is the second line.
 				runeCells.Add (new RuneCell { Rune = (Rune)'\n', ColorScheme = color.Value });
 			}
 
-			var tv = new TextView () {
-				Width = 20,
-				Height = 10
-			};
-			tv.LoadRuneCells (runeCells);
-			Application.Top.Add (tv);
+			//var tv = new TextView () {
+			//	Width = 20,
+			//	Height = 10
+			//};
+			_textView.LoadRuneCells (runeCells);
+			Application.Top.Add (_textView);
 			var rs = Application.Begin (Application.Top);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 TopLevel
