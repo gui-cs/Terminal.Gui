@@ -6977,7 +6977,7 @@ This is the second line.
 			};
 			tv.LoadRuneCells (runeCells);
 			Application.Top.Add (tv);
-			Application.Begin (Application.Top);
+			var rs = Application.Begin (Application.Top);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 TopLevel
 Base    
@@ -7004,6 +7004,8 @@ Error   ", output);
 2222220000
 3333000000
 4444400000", attributes);
+
+			Application.End (rs);
 		}
 	}
 }
