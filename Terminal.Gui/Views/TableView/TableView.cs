@@ -1323,7 +1323,7 @@ namespace Terminal.Gui {
 			// Click is on the header section of rendered UI
 			if (clientY < headerHeight) {
 				headerIfAny = col?.Column;
-				offsetX = clientX - col.X;
+				offsetX = col != null ? clientX - col.X : null;
 				return null;
 			}
 
