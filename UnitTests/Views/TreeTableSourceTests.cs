@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -19,7 +16,7 @@ public class TreeTableSourceTests {
 	}
 
 	[Fact, AutoInitShutdown]
-	public void TestTreeTableSource_BasicExpanding ()
+	public void TestTreeTableSource_BasicExpanding_WithKeyboard ()
 	{
 		var tv = GetTreeTable (out _);
 
@@ -59,6 +56,85 @@ public class TreeTableSourceTests {
 ";
 
 		TestHelpers.AssertDriverContentsAre (expected, output);
+
+		// when pressing left we should collapse the top route again
+		Application.Top.ProcessHotKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
+
+
+		tv.Draw ();
+
+		expected =
+			@"
+│Name          │Description            │
+├──────────────┼───────────────────────┤
+│├+Lost Highway│Exciting night road    │
+│└+Route 66    │Great race course      │
+";
+
+		TestHelpers.AssertDriverContentsAre (expected, output);
+	}
+
+	[Fact, AutoInitShutdown]
+	public void TestTreeTableSource_BasicExpanding_WithMouse ()
+	{
+		var tv = GetTreeTable (out _);
+
+		tv.Style.GetOrCreateColumnStyle (1).MinAcceptableWidth = 1;
+
+		tv.Draw ();
+
+		string expected =
+			@"
+│Name          │Description            │
+├──────────────┼───────────────────────┤
+│├+Lost Highway│Exciting night road    │
+│└+Route 66    │Great race course      │";
+
+		TestHelpers.AssertDriverContentsAre (expected, output);
+
+		Assert.Equal (2, tv.Table.Rows);
+
+		// top left is selected cell
+		Assert.Equal (0, tv.SelectedRow);
+		Assert.Equal (0, tv.SelectedColumn);
+
+		Assert.True(tv.OnMouseEvent (new MouseEvent () { X = 2,Y=2,Flags = MouseFlags.Button1Clicked}));
+			
+		tv.Draw ();
+
+		expected =
+			@"
+│Name             │Description         │
+├─────────────────┼────────────────────┤
+│├-Lost Highway   │Exciting night road │
+││ ├─Ford Trans-Am│Talking thunderbird │
+││ └─DeLorean     │Time travelling car │
+│└+Route 66       │Great race course   │
+";
+
+		TestHelpers.AssertDriverContentsAre (expected, output);
+
+		// Clicking to the right/left of the expand/collapse does nothing
+		tv.OnMouseEvent (new MouseEvent () { X = 3, Y = 2, Flags = MouseFlags.Button1Clicked });
+		tv.Draw ();
+		TestHelpers.AssertDriverContentsAre (expected, output);
+		tv.OnMouseEvent (new MouseEvent () { X = 1, Y = 2, Flags = MouseFlags.Button1Clicked });
+		tv.Draw ();
+		TestHelpers.AssertDriverContentsAre (expected, output);
+
+		// Clicking on the + again should collapse
+		tv.OnMouseEvent (new MouseEvent () { X = 2, Y = 2, Flags = MouseFlags.Button1Clicked });
+		tv.Draw ();
+		
+		expected =
+			@"
+│Name          │Description            │
+├──────────────┼───────────────────────┤
+│├+Lost Highway│Exciting night road    │
+│└+Route 66    │Great race course      │";
+
+		TestHelpers.AssertDriverContentsAre (expected, output);
+
 	}
 
 	[Fact, AutoInitShutdown]

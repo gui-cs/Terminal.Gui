@@ -13,7 +13,7 @@ namespace Terminal.Gui;
 public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T : class {
 	private TreeView<T> tree;
 
-	private string[] cols;
+	private string [] cols;
 	private Dictionary<string, Func<T, object>> lamdas;
 	private TableView tableView;
 
@@ -52,8 +52,8 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 
 
 	/// <inheritdoc/>
-	public object this [int row, int col] => 
-		col == 0 ? GetColumnZeroRepresentationFromTree(row):
+	public object this [int row, int col] =>
+		col == 0 ? GetColumnZeroRepresentationFromTree (row) :
 		this.lamdas [ColumnNames [col]] (RowToObject (row));
 
 	/// <inheritdoc/>
@@ -85,7 +85,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 
 	private string GetColumnZeroRepresentationFromTree (int row)
 	{
-		var branch = RowToBranch(row);
+		var branch = RowToBranch (row);
 
 		// Everything on line before the expansion run and branch text
 		Rune [] prefix = branch.GetLinePrefix (Application.Driver).ToArray ();
@@ -106,7 +106,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 
 	private void Table_KeyPress (object sender, KeyEventEventArgs e)
 	{
-		if (!IsInTreeColumn(tableView.SelectedColumn , true)) {
+		if (!IsInTreeColumn (tableView.SelectedColumn, true)) {
 			return;
 		}
 
@@ -137,21 +137,24 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 
 	private void Table_MouseClick (object sender, MouseEventEventArgs e)
 	{
-		var hit = tableView.ScreenToCell(e.MouseEvent.X, e.MouseEvent.Y, out var headerIfAny, out var offsetX);
+		var hit = tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out var headerIfAny, out var offsetX);
 
-		if(hit == null || headerIfAny != null || !IsInTreeColumn(hit.Value.X,false) || offsetX == null)
-		{
+		if (hit == null || headerIfAny != null || !IsInTreeColumn (hit.Value.X, false) || offsetX == null) {
 			return;
 		}
 
 		var branch = RowToBranch (hit.Value.Y);
-		
-		if(branch.IsHitOnExpandableSymbol(Application.Driver,offsetX.Value)) {
-			
-			if(tree.CanExpand(branch.Model) && !tree.IsExpanded(branch.Model)) {
-				tree.Expand (branch.Model);
-			} else {
-				tree.Collapse (branch.Model);
+
+		if (branch.IsHitOnExpandableSymbol (Application.Driver, offsetX.Value)) {
+
+			var m = branch.Model;
+
+			if (tree.CanExpand (m) && !tree.IsExpanded (m)) {
+				tree.Expand (m);
+				e.Handled = true;
+			} else if (tree.IsExpanded (m)) {
+				tree.Collapse (m);
+				e.Handled = true;
 			}
 		}
 	}
@@ -171,7 +174,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 
 		// if full row is selected then it is hard to tell which sub cell in the tree
 		// has focus so we should typically just always respond with expand/collapse
-		if(tableView.FullRowSelect && isKeyboard) {
+		if (tableView.FullRowSelect && isKeyboard) {
 			return true;
 		}
 
@@ -180,15 +183,15 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 		return colNames [column] == cols [0];
 	}
 
-    /// <inheritdoc/>
+	/// <inheritdoc/>
 	public T GetObjectOnRow (int row)
 	{
-		return RowToObject(row);
+		return RowToObject (row);
 	}
 
-    /// <inheritdoc/>
+	/// <inheritdoc/>
 	public IEnumerable<T> GetAllObjects ()
 	{
-		return tree.BuildLineMap().Select(b=>b.Model);
+		return tree.BuildLineMap ().Select (b => b.Model);
 	}
 }
