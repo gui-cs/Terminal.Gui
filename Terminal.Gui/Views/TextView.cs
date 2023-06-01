@@ -37,6 +37,21 @@ namespace Terminal.Gui {
 				Rune.Equals (other.Rune) &&
 				ColorScheme == other.ColorScheme;
 		}
+
+		/// <summary>Returns a string that represents the current object.</summary>
+		/// <returns>A string that represents the current object.</returns>
+		public override string ToString ()
+		{
+			var colorSchemeStr = "null";
+			if (ColorScheme != null) {
+				colorSchemeStr = $"Normal:{ColorScheme.Normal.Foreground},{ColorScheme.Normal.Background}; " +
+					$"Focus:{ColorScheme.Focus.Foreground},{ColorScheme.Focus.Background}; " +
+					$"HotNormal:{ColorScheme.HotNormal.Foreground},{ColorScheme.HotNormal.Background}; " +
+					$"HotFocus:{ColorScheme.HotFocus.Foreground},{ColorScheme.HotFocus.Background}; " +
+					$"Disabled:{ColorScheme.Disabled.Foreground},{ColorScheme.Disabled.Background}";
+			}
+			return $"'{Rune}'; {colorSchemeStr}";
+		}
 	}
 
 	class TextModel {
@@ -1475,6 +1490,26 @@ namespace Terminal.Gui {
 		public event EventHandler<PointEventArgs>? UnwrappedCursorPosition;
 
 		/// <summary>
+		/// Invoked when the normal color is drawn.
+		/// </summary>
+		public event EventHandler<RuneCellEventArgs>? DrawNormalColor;
+
+		/// <summary>
+		/// Invoked when the selection color is drawn.
+		/// </summary>
+		public event EventHandler<RuneCellEventArgs>? DrawSelectionColor;
+
+		/// <summary>
+		/// Invoked when the ready only color is drawn.
+		/// </summary>
+		public event EventHandler<RuneCellEventArgs>? DrawReadOnlyColor;
+
+		/// <summary>
+		/// Invoked when the used color is drawn.
+		/// </summary>
+		public event EventHandler<RuneCellEventArgs>? DrawUsedColor;
+
+		/// <summary>
 		/// Provides autocomplete context menu based on suggestions at the current cursor
 		/// position. Configure <see cref="IAutocomplete.SuggestionGenerator"/> to enable this feature
 		/// </summary>
@@ -2266,7 +2301,7 @@ namespace Terminal.Gui {
 		public override Attribute GetNormalColor ()
 		{
 			return Enabled ? ColorScheme.Focus : ColorScheme.Disabled;
-			}
+		}
 
 		/// <summary>
 		/// Sets the driver to the default color for the control where no text is being rendered. Defaults to <see cref="ColorScheme.Normal"/>.
@@ -2283,40 +2318,57 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="line">The line.</param>
 		/// <param name="idx">The index.</param>
-		protected virtual void SetNormalColor (List<RuneCell> line, int idx)
+		protected virtual void OnDrawNormalColor (List<RuneCell> line, int idx)
 		{
-			SetColorScheme (line, idx);
-			Driver.SetAttribute (GetNormalColor ());
-		}
+			var ev = new RuneCellEventArgs (line, idx);
+			DrawNormalColor?.Invoke (this, ev);
 
-		/// <summary>
-		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idx"/> of the
-		/// current <paramref name="line"/>. Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
-		/// Defaults to <see cref="ColorScheme.Focus"/>.
-		/// </summary>
-		/// <param name="line">The line.</param>
-		/// <param name="idx">The index.</param>
-		protected virtual void SetSelectionColor (List<RuneCell> line, int idx)
-		{
-			SetColorScheme (line, idx);
-			Driver.SetAttribute (new Attribute (ColorScheme.Focus.Background, ColorScheme.Focus.Foreground));
-		}
-
-		/// <summary>
-		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idx"/> of the
-		/// current <paramref name="line"/>. Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
-		/// Defaults to <see cref="ColorScheme.Focus"/>.
-		/// </summary>
-		/// <param name="line">The line.</param>
-		/// <param name="idx">The index.</param>
-		protected virtual void SetReadOnlyColor (List<RuneCell> line, int idx)
-		{
-			SetColorScheme (line, idx);
-			Attribute attribute;
-			if (ColorScheme.Disabled.Foreground == ColorScheme.Focus.Background) {
-				attribute = new Attribute (ColorScheme.Focus.Foreground, ColorScheme.Focus.Background);
+			if (line [idx].ColorScheme != null) {
+				var colorScheme = line [idx].ColorScheme;
+				Driver.SetAttribute (Enabled ? colorScheme!.Focus : colorScheme!.Disabled);
 			} else {
-				attribute = new Attribute (ColorScheme.Disabled.Foreground, ColorScheme.Focus.Background);
+				Driver.SetAttribute (GetNormalColor ());
+			}
+		}
+
+		/// <summary>
+		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idx"/> of the
+		/// current <paramref name="line"/>. Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
+		/// Defaults to <see cref="ColorScheme.Focus"/>.
+		/// </summary>
+		/// <param name="line">The line.</param>
+		/// <param name="idx">The index.</param>
+		protected virtual void OnDrawSelectionColor (List<RuneCell> line, int idx)
+		{
+			var ev = new RuneCellEventArgs (line, idx);
+			DrawSelectionColor?.Invoke (this, ev);
+
+			if (line [idx].ColorScheme != null) {
+				var colorScheme = line [idx].ColorScheme;
+				Driver.SetAttribute (new Attribute (colorScheme!.Focus.Background, colorScheme.Focus.Foreground));
+			} else {
+				Driver.SetAttribute (new Attribute (ColorScheme.Focus.Background, ColorScheme.Focus.Foreground));
+			}
+		}
+
+		/// <summary>
+		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idx"/> of the
+		/// current <paramref name="line"/>. Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
+		/// Defaults to <see cref="ColorScheme.Focus"/>.
+		/// </summary>
+		/// <param name="line">The line.</param>
+		/// <param name="idx">The index.</param>
+		protected virtual void OnDrawReadOnlyColor (List<RuneCell> line, int idx)
+		{
+			var ev = new RuneCellEventArgs (line, idx);
+			DrawReadOnlyColor?.Invoke (this, ev);
+
+			var colorScheme = line [idx].ColorScheme != null ? line [idx].ColorScheme : ColorScheme;
+			Attribute attribute;
+			if (colorScheme!.Disabled.Foreground == colorScheme.Focus.Background) {
+				attribute = new Attribute (colorScheme.Focus.Foreground, colorScheme.Focus.Background);
+			} else {
+				attribute = new Attribute (colorScheme.Disabled.Foreground, colorScheme.Focus.Background);
 			}
 			Driver.SetAttribute (attribute);
 		}
@@ -2328,10 +2380,17 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="line">The line.</param>
 		/// <param name="idx">The index.</param>
-		protected virtual void SetUsedColor (List<RuneCell> line, int idx)
+		protected virtual void OnDrawUsedColor (List<RuneCell> line, int idx)
 		{
-			SetColorScheme (line, idx);
-			Driver.SetAttribute (ColorScheme.HotFocus);
+			var ev = new RuneCellEventArgs (line, idx);
+			DrawUsedColor?.Invoke (this, ev);
+
+			if (line [idx].ColorScheme != null) {
+				var colorScheme = line [idx].ColorScheme;
+				Driver.SetAttribute (new Attribute (colorScheme!.HotNormal.Foreground, colorScheme.Focus.Foreground));
+			} else {
+				Driver.SetAttribute (new Attribute (ColorScheme.HotNormal.Foreground, ColorScheme.Focus.Foreground));
+			}
 		}
 
 		bool _isReadOnly = false;
@@ -2753,14 +2812,14 @@ namespace Terminal.Gui {
 					var rune = idxCol >= lineRuneCount ? (Rune)' ' : line [idxCol].Rune;
 					var cols = rune.GetColumns ();
 					if (idxCol < line.Count && _selecting && PointInSelection (idxCol, idxRow)) {
-						SetSelectionColor (line, idxCol);
+						OnDrawSelectionColor (line, idxCol);
 					} else if (idxCol == _currentColumn && idxRow == _currentRow && !_selecting && !Used
 						&& HasFocus && idxCol < lineRuneCount) {
-						SetSelectionColor (line, idxCol);
+						OnDrawUsedColor (line, idxCol);
 					} else if (ReadOnly) {
-						SetReadOnlyColor (line, idxCol);
+						OnDrawReadOnlyColor (line, idxCol);
 					} else {
-						SetNormalColor (line, idxCol);
+						OnDrawNormalColor (line, idxCol);
 					}
 
 					if (rune.Value == '\t') {
@@ -4484,7 +4543,7 @@ namespace Terminal.Gui {
 				}
 				ProcessMouseClick (ev, out _);
 				if (Used) {
-				PositionCursor ();
+					PositionCursor ();
 				} else {
 					SetNeedsDisplay ();
 				}
