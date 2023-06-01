@@ -198,6 +198,10 @@ namespace UICatalog.Scenarios {
 
 		private void SortColumn (int clickedCol, string sort, bool isAsc)
 		{
+			if(currentTable == null) {
+				return;
+			}
+
 			// set a sort order
 			currentTable.DefaultView.Sort = sort;
 
@@ -286,8 +290,8 @@ namespace UICatalog.Scenarios {
 
 		private void SetMinAcceptableWidthToOne ()
 		{
-			foreach (DataColumn c in currentTable.Columns) {
-				var style = tableView.Style.GetOrCreateColumnStyle (c.Ordinal);
+			for(int i =0;i<tableView.Table.Columns;i++) {
+				var style = tableView.Style.GetOrCreateColumnStyle (i);
 				style.MinAcceptableWidth = 1;
 			}
 		}
@@ -386,6 +390,10 @@ namespace UICatalog.Scenarios {
 
 		private void TableViewKeyPress (object sender, KeyEventEventArgs e)
 		{
+			if(currentTable == null) {
+				return;
+			}
+
 			if (e.KeyEvent.Key == Key.DeleteChar) {
 
 				if (tableView.FullRowSelect) {
@@ -957,7 +965,7 @@ namespace UICatalog.Scenarios {
 
 		private void EditCurrentCell (object sender, CellActivatedEventArgs e)
 		{
-			if (e.Table as DataTableSource == null)
+			if (e.Table as DataTableSource == null || currentTable == null)
 				return;
 
 			var tableCol = ToTableCol (e.Col);
