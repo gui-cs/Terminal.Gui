@@ -1449,7 +1449,6 @@ namespace Terminal.Gui {
 		bool _multiline = true;
 		HistoryText _historyText = new HistoryText ();
 		CultureInfo? _currentCulture;
-		ColorScheme? _savedColorScheme;
 
 		/// <summary>
 		/// Raised when the <see cref="Text"/> property of the <see cref="TextView"/> changes.
@@ -1817,15 +1816,6 @@ namespace Terminal.Gui {
 					WrapTextModel ();
 					Adjust ();
 				}
-			}
-		}
-
-		///<inheritdoc/>
-		public override ColorScheme ColorScheme {
-			get => base.ColorScheme;
-			set {
-				_savedColorScheme ??= ColorScheme;
-				base.ColorScheme = value;
 			}
 		}
 
@@ -2272,24 +2262,17 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void SetColorScheme (List<RuneCell> line, int idx)
+		/// <inheritdoc/>
+		public override Attribute GetNormalColor ()
 		{
-			if (line [idx].ColorScheme != null) {
-				ColorScheme = line [idx].ColorScheme!;
+			return Enabled ? ColorScheme.Focus : ColorScheme.Disabled;
 			}
-		}
-
-		private void RestoreColorScheme ()
-		{
-			ColorScheme = _savedColorScheme!;
-		}
 
 		/// <summary>
 		/// Sets the driver to the default color for the control where no text is being rendered. Defaults to <see cref="ColorScheme.Normal"/>.
 		/// </summary>
 		protected virtual void SetNormalColor ()
 		{
-			RestoreColorScheme ();
 			Driver.SetAttribute (GetNormalColor ());
 		}
 
@@ -2848,12 +2831,6 @@ namespace Terminal.Gui {
 				Autocomplete.Context != null ? Autocomplete.Context.Canceled : false);
 			Autocomplete.GenerateSuggestions (
 				Autocomplete.Context);
-		}
-
-		/// <inheritdoc/>
-		public override Attribute GetNormalColor ()
-		{
-			return Enabled ? ColorScheme.Focus : ColorScheme.Disabled;
 		}
 
 		///<inheritdoc/>
