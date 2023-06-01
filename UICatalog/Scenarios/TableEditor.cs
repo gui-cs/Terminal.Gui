@@ -7,6 +7,7 @@ using System.Globalization;
 using static Terminal.Gui.TableView;
 using System.Text;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace UICatalog.Scenarios {
 
@@ -19,7 +20,7 @@ namespace UICatalog.Scenarios {
 	public class TableEditor : Scenario {
 		TableView tableView;
 		DataTable currentTable;
-    
+
 		private MenuItem _miShowHeaders;
 		private MenuItem _miAlwaysShowHeaders;
 		private MenuItem _miHeaderOverline;
@@ -37,13 +38,13 @@ namespace UICatalog.Scenarios {
 		private MenuItem _miCheckboxes;
 		private MenuItem _miRadioboxes;
 
-		private List<IDisposable> toDispose = new List<IDisposable>();
+		private List<IDisposable> toDispose = new List<IDisposable> ();
 
 		ColorScheme redColorScheme;
 		ColorScheme redColorSchemeAlt;
 		ColorScheme alternatingColorScheme;
 
-		HashSet<FileSystemInfo> _checkedFileSystemInfos = new HashSet<FileSystemInfo>();
+		HashSet<FileSystemInfo> _checkedFileSystemInfos = new HashSet<FileSystemInfo> ();
 
 		public override void Setup ()
 		{
@@ -150,7 +151,7 @@ namespace UICatalog.Scenarios {
 			};
 
 			// if user clicks the mouse in TableView
-			tableView.MouseClick += (s,e) => {
+			tableView.MouseClick += (s, e) => {
 
 				tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
 
@@ -186,7 +187,7 @@ namespace UICatalog.Scenarios {
 			if (HasCheckboxes () && clickedCol == 0) {
 				return;
 			}
-				
+
 
 			SortColumn (clickedCol, sort, isAsc);
 		}
@@ -229,7 +230,7 @@ namespace UICatalog.Scenarios {
 		{
 			// work out new sort order
 			var sort = currentTable.DefaultView.Sort;
-			var colName = tableView.Table.ColumnNames[clickedCol];
+			var colName = tableView.Table.ColumnNames [clickedCol];
 
 			if (sort?.EndsWith ("ASC") ?? false) {
 				sort = $"{colName} DESC";
@@ -244,12 +245,12 @@ namespace UICatalog.Scenarios {
 
 		private void ShowHeaderContextMenu (int clickedCol, MouseEventEventArgs e)
 		{
-			if(HasCheckboxes() && clickedCol == 0) {
+			if (HasCheckboxes () && clickedCol == 0) {
 				return;
 			}
 
 			var sort = GetProposedNewSortOrder (clickedCol, out var isAsc);
-			var colName = tableView.Table.ColumnNames[clickedCol];
+			var colName = tableView.Table.ColumnNames [clickedCol];
 
 			var contextMenu = new ContextMenu (e.MouseEvent.X + 1, e.MouseEvent.Y + 1,
 				new MenuBarItem (new MenuItem [] {
@@ -270,7 +271,7 @@ namespace UICatalog.Scenarios {
 
 		private int? GetColumn ()
 		{
-			if (tableView.Table  == null)
+			if (tableView.Table == null)
 				return null;
 
 			if (tableView.SelectedColumn < 0 || tableView.SelectedColumn > tableView.Table.Columns)
@@ -306,15 +307,15 @@ namespace UICatalog.Scenarios {
 
 		private void RunColumnWidthDialog (int? col, string prompt, Action<ColumnStyle, int> setter, Func<ColumnStyle, int> getter)
 		{
-			if(col == null) {
+			if (col == null) {
 				return;
 			}
 
 			var accepted = false;
 			var ok = new Button ("Ok", is_default: true);
-			ok.Clicked += (s,e) => { accepted = true; Application.RequestStop (); };
+			ok.Clicked += (s, e) => { accepted = true; Application.RequestStop (); };
 			var cancel = new Button ("Cancel");
-			cancel.Clicked += (s,e) => { Application.RequestStop (); };
+			cancel.Clicked += (s, e) => { Application.RequestStop (); };
 			var d = new Dialog (ok, cancel) { Title = prompt };
 
 			var style = tableView.Style.GetOrCreateColumnStyle (col.Value);
@@ -322,7 +323,7 @@ namespace UICatalog.Scenarios {
 			var lbl = new Label () {
 				X = 0,
 				Y = 1,
-				Text = tableView.Table.ColumnNames[col.Value]
+				Text = tableView.Table.ColumnNames [col.Value]
 			};
 
 			var tf = new TextField () {
@@ -353,7 +354,7 @@ namespace UICatalog.Scenarios {
 		{
 			var scrollBar = new ScrollBarView (tableView, true);
 
-			scrollBar.ChangedPosition += (s,e) => {
+			scrollBar.ChangedPosition += (s, e) => {
 				tableView.RowOffset = scrollBar.Position;
 				if (tableView.RowOffset != scrollBar.Position) {
 					scrollBar.Position = tableView.RowOffset;
@@ -369,7 +370,7 @@ namespace UICatalog.Scenarios {
 				tableView.SetNeedsDisplay ();
 			};*/
 
-			tableView.DrawContent += (s,e) => {
+			tableView.DrawContent += (s, e) => {
 				scrollBar.Size = tableView.Table?.Rows ?? 0;
 				scrollBar.Position = tableView.RowOffset;
 				//scrollBar.OtherScrollBarView.Size = tableView.Maxlength - 1;
@@ -439,7 +440,7 @@ namespace UICatalog.Scenarios {
 			tableView.Style.ShowHorizontalHeaderUnderline = (bool)_miHeaderUnderline.Checked;
 			tableView.Update ();
 		}
-		private void ToggleBottomline()
+		private void ToggleBottomline ()
 		{
 			_miBottomline.Checked = !_miBottomline.Checked;
 			tableView.Style.ShowHorizontalBottomline = (bool)_miBottomline.Checked;
@@ -478,24 +479,21 @@ namespace UICatalog.Scenarios {
 				_miRadioboxes.Checked = false;
 
 				// if toggling off checkboxes/radio
-				if(wrapper.UseRadioButtons == radio) {
+				if (wrapper.UseRadioButtons == radio) {
 					return;
 				}
 			}
-			
+
 			ITableSource source;
 			// Either toggling on checkboxes/radio or switching from radio to checkboxes (or vice versa)
-			if(tableView.Table is TreeTableSource<FileSystemInfo> treeSource)
-			{
+			if (tableView.Table is TreeTableSource<FileSystemInfo> treeSource) {
 				source = new CheckBoxTableSourceWrapperByObject<FileSystemInfo> (tableView, treeSource,
 					this._checkedFileSystemInfos.Contains,
 					this.CheckOrUncheckFile
 				) {
 					UseRadioButtons = radio
 				};
-			}
-			else
-			{
+			} else {
 				source = new CheckBoxTableSourceWrapperByIndex (tableView, tableView.Table) {
 					UseRadioButtons = radio
 				};
@@ -507,29 +505,25 @@ namespace UICatalog.Scenarios {
 			if (radio) {
 				_miRadioboxes.Checked = true;
 				_miCheckboxes.Checked = false;
-			}
-			else {
+			} else {
 
 				_miRadioboxes.Checked = false;
 				_miCheckboxes.Checked = true;
 			}
-			
+
 		}
 
 		private void CheckOrUncheckFile (FileSystemInfo info, bool check)
 		{
-			if(check)
-			{
-				_checkedFileSystemInfos.Add(info);
-			}
-			else
-			{
+			if (check) {
+				_checkedFileSystemInfos.Add (info);
+			} else {
 
-				_checkedFileSystemInfos.Remove(info);
+				_checkedFileSystemInfos.Remove (info);
 			}
 		}
 
-		private void ToggleAlwaysUseNormalColorForVerticalCellLines()
+		private void ToggleAlwaysUseNormalColorForVerticalCellLines ()
 		{
 			_miAlwaysUseNormalColorForVerticalCellLines.Checked = !_miAlwaysUseNormalColorForVerticalCellLines.Checked;
 			tableView.Style.AlwaysUseNormalColorForVerticalCellLines = (bool)_miAlwaysUseNormalColorForVerticalCellLines.Checked;
@@ -611,18 +605,18 @@ namespace UICatalog.Scenarios {
 
 		private void OpenExample (bool big)
 		{
-			SetTable(BuildDemoDataTable (big ? 30 : 5, big ? 1000 : 5));
+			SetTable (BuildDemoDataTable (big ? 30 : 5, big ? 1000 : 5));
 			SetDemoTableStyles ();
 		}
 
 		private void SetTable (DataTable dataTable)
 		{
-			tableView.Table = new DataTableSource(currentTable = dataTable);
+			tableView.Table = new DataTableSource (currentTable = dataTable);
 		}
 
 		private void OpenUnicodeMap ()
 		{
-			SetTable(BuildUnicodeMap ());
+			SetTable (BuildUnicodeMap ());
 			tableView.Update ();
 		}
 
@@ -644,13 +638,13 @@ namespace UICatalog.Scenarios {
 		{
 			base.Dispose (disposing);
 
-			foreach(var d in toDispose) {
+			foreach (var d in toDispose) {
 				d.Dispose ();
 			}
-			
+
 		}
 
-		private void OpenTreeExample()
+		private void OpenTreeExample ()
 		{
 			tableView.Style.ColumnStyles.Clear ();
 
@@ -662,24 +656,55 @@ namespace UICatalog.Scenarios {
 
 			var source = new TreeTableSource<FileSystemInfo> (tableView, "Name", tree, new (){
 				{"Extension", f=>f.Extension},
-				{"CreationTime", f=>f.CreationTime}
+				{"CreationTime", f=>f.CreationTime},
+				{"FileSize", GetHumanReadableFileSize}
 
 			    });
 
-			foreach (var folder in Enum.GetValues (typeof (Environment.SpecialFolder))) {
-				var path = Environment.GetFolderPath ((Environment.SpecialFolder)folder);
-
-				if (string.IsNullOrWhiteSpace (path)) {
-					continue;
+			var seen = new HashSet<string> ();
+			try {
+				foreach (var path in Environment.GetLogicalDrives ()) {
+					tree.AddObject (new DirectoryInfo (path));
 				}
-
-				tree.AddObject (new DirectoryInfo (path));
+			} catch (Exception e) {
+				MessageBox.ErrorQuery ("Could not find local drives", e.Message, "Ok");
 			}
 
 			tableView.Table = source;
 
 			toDispose.Add (tree);
 		}
+
+		private string GetHumanReadableFileSize (FileSystemInfo fsi)
+		{
+			if (fsi is not FileInfo fi) {
+				return null;
+			}
+
+			long value = fi.Length;
+			var culture = CultureInfo.CurrentUICulture;
+
+			return GetHumanReadableFileSize (value, culture);
+		}
+
+		private string GetHumanReadableFileSize (long value, CultureInfo culture)
+		{
+			const long ByteConversion = 1024;
+			string [] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+
+			if (value < 0) {
+				return "-" + GetHumanReadableFileSize (-value, culture);
+			}
+
+			if (value == 0) {
+				return "0.0 bytes";
+			}
+
+			int mag = (int)Math.Log (value, ByteConversion);
+			double adjustedSize = value / Math.Pow (1000, mag);
+			return string.Format (culture.NumberFormat, "{0:n2} {1}", adjustedSize, SizeSuffixes [mag]);
+		}
+
 
 		private DataTable BuildUnicodeMap ()
 		{
@@ -878,7 +903,7 @@ namespace UICatalog.Scenarios {
 		};
 		private void SetDemoTableStyles ()
 		{
-			tableView.Style.ColumnStyles.Clear();
+			tableView.Style.ColumnStyles.Clear ();
 
 			var alignMid = new ColumnStyle () {
 				Alignment = TextAlignment.Centered
@@ -923,7 +948,7 @@ namespace UICatalog.Scenarios {
 
 		private void OpenSimple (bool big)
 		{
-			SetTable(BuildSimpleDataTable (big ? 30 : 5, big ? 1000 : 5));
+			SetTable (BuildSimpleDataTable (big ? 30 : 5, big ? 1000 : 5));
 		}
 
 		private void EditCurrentCell (object sender, CellActivatedEventArgs e)
@@ -931,7 +956,7 @@ namespace UICatalog.Scenarios {
 			if (e.Table as DataTableSource == null)
 				return;
 
-			var tableCol = ToTableCol(e.Col);
+			var tableCol = ToTableCol (e.Col);
 			if (tableCol < 0) {
 				return;
 			}
@@ -944,15 +969,15 @@ namespace UICatalog.Scenarios {
 			bool okPressed = false;
 
 			var ok = new Button ("Ok", is_default: true);
-			ok.Clicked += (s,e) => { okPressed = true; Application.RequestStop (); };
+			ok.Clicked += (s, e) => { okPressed = true; Application.RequestStop (); };
 			var cancel = new Button ("Cancel");
-			cancel.Clicked += (s,e) => { Application.RequestStop (); };
+			cancel.Clicked += (s, e) => { Application.RequestStop (); };
 			var d = new Dialog (ok, cancel) { Title = title };
 
 			var lbl = new Label () {
 				X = 0,
 				Y = 1,
-				Text = tableView.Table.ColumnNames[e.Col]
+				Text = tableView.Table.ColumnNames [e.Col]
 			};
 
 			var tf = new TextField () {
