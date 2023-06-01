@@ -3037,7 +3037,7 @@ namespace Terminal.Gui {
 		{
 			var offB = OffSetBackground ();
 			var line = GetCurrentLine ();
-			bool need = !_needsDisplay.IsEmpty || _wrapNeeded;
+			bool need = !_needsDisplay.IsEmpty || _wrapNeeded || !Used;
 			var tSize = TextModel.DisplaySize (line, -1, -1, false, TabWidth);
 			var dSize = TextModel.DisplaySize (line, _leftColumn, _currentColumn, true, TabWidth);
 			if (!_wordWrap && _currentColumn < _leftColumn) {
@@ -4483,7 +4483,11 @@ namespace Terminal.Gui {
 					StopSelecting ();
 				}
 				ProcessMouseClick (ev, out _);
+				if (Used) {
 				PositionCursor ();
+				} else {
+					SetNeedsDisplay ();
+				}
 				_lastWasKill = false;
 				_columnTrack = _currentColumn;
 			} else if (ev.Flags == MouseFlags.WheeledDown) {
