@@ -153,6 +153,10 @@ namespace UICatalog.Scenarios {
 			// if user clicks the mouse in TableView
 			tableView.MouseClick += (s, e) => {
 
+				if(currentTable == null) {
+					return;
+				}
+
 				tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
 
 				if (clickedCol != null) {

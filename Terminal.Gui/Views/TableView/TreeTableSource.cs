@@ -151,11 +151,17 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 
 			if (tree.CanExpand (m) && !tree.IsExpanded (m)) {
 				tree.Expand (m);
+
 				e.Handled = true;
 			} else if (tree.IsExpanded (m)) {
 				tree.Collapse (m);
 				e.Handled = true;
 			}
+		}
+
+		if (e.Handled) {
+			tree.InvalidateLineMap ();
+			tableView.SetNeedsDisplay ();
 		}
 	}
 
