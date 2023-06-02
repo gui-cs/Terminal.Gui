@@ -2414,9 +2414,18 @@ namespace Terminal.Gui {
 
 			if (line [idx].ColorScheme != null) {
 				var colorScheme = line [idx].ColorScheme;
-				Driver.SetAttribute (new Attribute (colorScheme!.HotNormal.Foreground, colorScheme.Focus.Foreground));
+				SetValidUsedColor (colorScheme);
 			} else {
-				Driver.SetAttribute (new Attribute (ColorScheme.HotNormal.Foreground, ColorScheme.Focus.Foreground));
+				SetValidUsedColor (ColorScheme);
+			}
+		}
+
+		private static void SetValidUsedColor (ColorScheme? colorScheme)
+		{
+			if ((colorScheme!.HotNormal.Foreground & colorScheme.Focus.Background) == colorScheme.Focus.Foreground) {
+				Driver.SetAttribute (new Attribute (colorScheme.Focus.Background, colorScheme.Focus.Foreground));
+			} else {
+				Driver.SetAttribute (new Attribute (colorScheme!.HotNormal.Foreground & colorScheme.Focus.Background, colorScheme.Focus.Foreground));
 			}
 		}
 
