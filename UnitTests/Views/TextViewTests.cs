@@ -6974,12 +6974,13 @@ This is the second line.
 			_textView.LoadRuneCells (runeCells);
 			Application.Top.Add (_textView);
 			var rs = Application.Begin (Application.Top);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+			var expectedText = @"
 TopLevel
 Base    
 Dialog  
 Menu    
-Error   ", output);
+Error   ";
+			TestHelpers.AssertDriverContentsWithFrameAre (expectedText, output);
 
 			var attributes = new Attribute [] {
 				// 0
@@ -6993,22 +6994,18 @@ Error   ", output);
 				// 4
 				Colors.Error.Focus
 			};
-
-			TestHelpers.AssertDriverColorsAre (@"
+			var expectedColor = @"
 0000000000
 1111000000
 2222220000
 3333000000
-4444400000", attributes);
+4444400000";
+			TestHelpers.AssertDriverColorsAre (expectedColor, attributes);
 
 			_textView.WordWrap = true;
 			Application.Refresh ();
-			TestHelpers.AssertDriverColorsAre (@"
-0000000000
-1111000000
-2222220000
-3333000000
-4444400000", attributes);
+			TestHelpers.AssertDriverContentsWithFrameAre (expectedText, output);
+			TestHelpers.AssertDriverColorsAre (expectedColor, attributes);
 
 			Application.End (rs);
 		}
