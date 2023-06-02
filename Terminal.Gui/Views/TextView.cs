@@ -3,6 +3,7 @@
 // TextView.cs: multi-line text editing
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Represents a single row/column within the <see cref="TextView"/>. Includes the glyph and the foreground/background colors.
 	/// </summary>
+	[DebuggerDisplay ("{DebuggerDisplay}")]
 	public class RuneCell : IEquatable<RuneCell> {
 		/// <summary>
 		/// The glyph to draw.
@@ -42,15 +44,29 @@ namespace Terminal.Gui {
 		/// <returns>A string that represents the current object.</returns>
 		public override string ToString ()
 		{
+			string colorSchemeStr = ColorSchemeDebuggerDisplay ();
+			return DebuggerDisplay;
+		}
+
+		private string ColorSchemeDebuggerDisplay ()
+		{
 			var colorSchemeStr = "null";
 			if (ColorScheme != null) {
-				colorSchemeStr = $"Normal:{ColorScheme.Normal.Foreground},{ColorScheme.Normal.Background}; " +
-					$"Focus:{ColorScheme.Focus.Foreground},{ColorScheme.Focus.Background}; " +
-					$"HotNormal:{ColorScheme.HotNormal.Foreground},{ColorScheme.HotNormal.Background}; " +
-					$"HotFocus:{ColorScheme.HotFocus.Foreground},{ColorScheme.HotFocus.Background}; " +
-					$"Disabled:{ColorScheme.Disabled.Foreground},{ColorScheme.Disabled.Background}";
+				colorSchemeStr = $"Normal: {ColorScheme.Normal.Foreground},{ColorScheme.Normal.Background}; " +
+					$"Focus: {ColorScheme.Focus.Foreground},{ColorScheme.Focus.Background}; " +
+					$"HotNormal: {ColorScheme.HotNormal.Foreground},{ColorScheme.HotNormal.Background}; " +
+					$"HotFocus: {ColorScheme.HotFocus.Foreground},{ColorScheme.HotFocus.Background}; " +
+					$"Disabled: {ColorScheme.Disabled.Foreground},{ColorScheme.Disabled.Background}";
 			}
-			return $"'{Rune}'; {colorSchemeStr}";
+
+			return colorSchemeStr;
+		}
+
+		private string DebuggerDisplay {
+			get {
+				string colorSchemeStr = ColorSchemeDebuggerDisplay ();
+				return $"U+{Rune.Value:X4} '{Rune.ToString ()}'; {colorSchemeStr}";
+			}
 		}
 	}
 
