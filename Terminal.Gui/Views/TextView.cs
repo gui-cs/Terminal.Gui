@@ -2414,13 +2414,13 @@ namespace Terminal.Gui {
 
 			if (line [idx].ColorScheme != null) {
 				var colorScheme = line [idx].ColorScheme;
-				SetValidUsedColor (colorScheme);
+				SetValidUsedColor (colorScheme!);
 			} else {
 				SetValidUsedColor (ColorScheme);
 			}
 		}
 
-		private static void SetValidUsedColor (ColorScheme? colorScheme)
+		private static void SetValidUsedColor (ColorScheme colorScheme)
 		{
 			if ((colorScheme!.HotNormal.Foreground & colorScheme.Focus.Background) == colorScheme.Focus.Foreground) {
 				Driver.SetAttribute (new Attribute (colorScheme.Focus.Background, colorScheme.Focus.Foreground));
