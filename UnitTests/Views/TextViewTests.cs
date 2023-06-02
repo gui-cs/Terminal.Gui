@@ -7001,6 +7001,15 @@ Error   ", output);
 3333000000
 4444400000", attributes);
 
+			_textView.WordWrap = true;
+			Application.Refresh ();
+			TestHelpers.AssertDriverColorsAre (@"
+0000000000
+1111000000
+2222220000
+3333000000
+4444400000", attributes);
+
 			Application.End (rs);
 		}
 

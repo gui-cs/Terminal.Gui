@@ -250,10 +250,10 @@ namespace Terminal.Gui {
 		/// Adds a line to the model at the specified position.
 		/// </summary>
 		/// <param name="pos">Line number where the line will be inserted.</param>
-		/// <param name="runes">The line of text, as a List of Rune.</param>
-		public void AddLine (int pos, List<RuneCell> runes)
+		/// <param name="cells">The line of text and color, as a List of RuneCell.</param>
+		public void AddLine (int pos, List<RuneCell> cells)
 		{
-			_lines.Insert (pos, runes);
+			_lines.Insert (pos, cells);
 		}
 
 		/// <summary>
@@ -1141,6 +1141,9 @@ namespace Terminal.Gui {
 							nStartRow = lines;
 							isStartRowAndColSetted = true;
 						}
+					}
+					for (int k = j; k < wrapLine.Count; k++) {
+						wrapLine [k].ColorScheme = line [k].ColorScheme;
 					}
 					wrappedModel.AddLine (lines, wrapLine);
 					sumColWidth += wrapLine.Count;
