@@ -2179,6 +2179,7 @@ namespace Terminal.Gui {
 		/// <param name="path">Path to the file to load.</param>
 		public bool LoadFile (string path)
 		{
+			SetWrapModel ();
 			bool res;
 			try {
 				SetWrapModel ();
@@ -2192,6 +2193,7 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 				Adjust ();
 			}
+			UpdateWrapModel ();
 			return res;
 		}
 
@@ -2202,10 +2204,12 @@ namespace Terminal.Gui {
 		/// <param name="stream">Stream to load the contents from.</param>
 		public void LoadStream (Stream stream)
 		{
+			SetWrapModel ();
 			_model.LoadStream (stream);
 			_historyText.Clear (Text);
 			ResetPosition ();
 			SetNeedsDisplay ();
+			UpdateWrapModel ();
 		}
 
 		/// <summary>
@@ -2214,10 +2218,12 @@ namespace Terminal.Gui {
 		/// <param name="cells">Rune cells list to load the contents from.</param>
 		public void LoadRuneCells (List<RuneCell> cells)
 		{
+			SetWrapModel ();
 			_model.LoadRuneCells (cells);
 			_historyText.Clear (Text);
 			ResetPosition ();
 			SetNeedsDisplay ();
+			UpdateWrapModel ();
 		}
 
 		/// <summary>
@@ -2226,9 +2232,11 @@ namespace Terminal.Gui {
 		/// <returns><c>true</c>, if stream was closed, <c>false</c> otherwise.</returns>
 		public bool CloseFile ()
 		{
+			SetWrapModel ();
 			var res = _model.CloseFile ();
 			ResetPosition ();
 			SetNeedsDisplay ();
+			UpdateWrapModel ();
 			return res;
 		}
 

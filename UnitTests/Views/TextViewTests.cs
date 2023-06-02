@@ -7003,5 +7003,24 @@ Error   ", output);
 
 			Application.End (rs);
 		}
+
+		[Fact, TextViewTestsAutoInitShutdown]
+		public void WordWrap_True_LoadStream_New_Text ()
+		{
+			Assert.Equal ("TAB to jump between text fields.", _textView.Text);
+			_textView.WordWrap = true;
+			Assert.Equal ("TAB to jump between text fields.", _textView.Text);
+			var text = "This is the first line.\nThis is the second line.\n";
+			using (System.IO.MemoryStream stream = new System.IO.MemoryStream ()) {
+				var writer = new System.IO.StreamWriter (stream);
+				writer.Write (text);
+				writer.Flush ();
+				stream.Position = 0;
+
+				_textView.LoadStream (stream);
+				Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", _textView.Text);
+				Assert.True (_textView.WordWrap);
+			}
+		}
 	}
 }
