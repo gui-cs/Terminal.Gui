@@ -35,11 +35,6 @@ namespace Terminal.Gui {
 		/// The iteration function.
 		/// </summary>
 		void Iteration ();
-
-		/// <summary>
-		/// Ensures that the main loop is terminated and any resources created are freed.
-		/// </summary>
-		void TearDown ();
 	}
 
 	/// <summary>
@@ -277,7 +272,6 @@ namespace Terminal.Gui {
 		{
 			_running = false;
 			MainLoopDriver.Wakeup ();
-			//MainLoopDriver.TearDown();
 		}
 
 		/// <summary>
