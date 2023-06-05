@@ -2339,19 +2339,20 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idx"/> of the
+		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idxCol"/> of the
 		/// current <paramref name="line"/>. Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
 		/// Defaults to <see cref="ColorScheme.Normal"/>.
 		/// </summary>
 		/// <param name="line">The line.</param>
-		/// <param name="idx">The index.</param>
-		protected virtual void OnDrawNormalColor (List<RuneCell> line, int idx)
+		/// <param name="idxCol">The col index.</param>
+		/// <param name="idxRow">The row index.</param>
+		protected virtual void OnDrawNormalColor (List<RuneCell> line, int idxCol, int idxRow)
 		{
-			var ev = new RuneCellEventArgs (line, idx);
+			var ev = new RuneCellEventArgs (line, idxCol, idxRow);
 			DrawNormalColor?.Invoke (this, ev);
 
-			if (line [idx].ColorScheme != null) {
-				var colorScheme = line [idx].ColorScheme;
+			if (line [idxCol].ColorScheme != null) {
+				var colorScheme = line [idxCol].ColorScheme;
 				Driver.SetAttribute (Enabled ? colorScheme!.Focus : colorScheme!.Disabled);
 			} else {
 				Driver.SetAttribute (GetNormalColor ());
@@ -2359,19 +2360,20 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idx"/> of the
+		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idxCol"/> of the
 		/// current <paramref name="line"/>. Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
 		/// Defaults to <see cref="ColorScheme.Focus"/>.
 		/// </summary>
 		/// <param name="line">The line.</param>
-		/// <param name="idx">The index.</param>
-		protected virtual void OnDrawSelectionColor (List<RuneCell> line, int idx)
+		/// <param name="idxCol">The col index.</param>
+		/// /// <param name="idxRow">The row index.</param>
+		protected virtual void OnDrawSelectionColor (List<RuneCell> line, int idxCol, int idxRow)
 		{
-			var ev = new RuneCellEventArgs (line, idx);
+			var ev = new RuneCellEventArgs (line, idxCol, idxRow);
 			DrawSelectionColor?.Invoke (this, ev);
 
-			if (line [idx].ColorScheme != null) {
-				var colorScheme = line [idx].ColorScheme;
+			if (line [idxCol].ColorScheme != null) {
+				var colorScheme = line [idxCol].ColorScheme;
 				Driver.SetAttribute (new Attribute (colorScheme!.Focus.Background, colorScheme.Focus.Foreground));
 			} else {
 				Driver.SetAttribute (new Attribute (ColorScheme.Focus.Background, ColorScheme.Focus.Foreground));
@@ -2379,18 +2381,19 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idx"/> of the
+		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idxCol"/> of the
 		/// current <paramref name="line"/>. Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
 		/// Defaults to <see cref="ColorScheme.Focus"/>.
 		/// </summary>
 		/// <param name="line">The line.</param>
-		/// <param name="idx">The index.</param>
-		protected virtual void OnDrawReadOnlyColor (List<RuneCell> line, int idx)
+		/// <param name="idxCol">The col index.</param>
+		/// /// <param name="idxRow">The row index.</param>
+		protected virtual void OnDrawReadOnlyColor (List<RuneCell> line, int idxCol, int idxRow)
 		{
-			var ev = new RuneCellEventArgs (line, idx);
+			var ev = new RuneCellEventArgs (line, idxCol, idxRow);
 			DrawReadOnlyColor?.Invoke (this, ev);
 
-			var colorScheme = line [idx].ColorScheme != null ? line [idx].ColorScheme : ColorScheme;
+			var colorScheme = line [idxCol].ColorScheme != null ? line [idxCol].ColorScheme : ColorScheme;
 			Attribute attribute;
 			if (colorScheme!.Disabled.Foreground == colorScheme.Focus.Background) {
 				attribute = new Attribute (colorScheme.Focus.Foreground, colorScheme.Focus.Background);
@@ -2401,19 +2404,20 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idx"/> of the
+		/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idxCol"/> of the
 		/// current <paramref name="line"/>. Override to provide custom coloring by calling <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
 		/// Defaults to <see cref="ColorScheme.HotFocus"/>.
 		/// </summary>
 		/// <param name="line">The line.</param>
-		/// <param name="idx">The index.</param>
-		protected virtual void OnDrawUsedColor (List<RuneCell> line, int idx)
+		/// <param name="idxCol">The col index.</param>
+		/// /// <param name="idxRow">The row index.</param>
+		protected virtual void OnDrawUsedColor (List<RuneCell> line, int idxCol, int idxRow)
 		{
-			var ev = new RuneCellEventArgs (line, idx);
+			var ev = new RuneCellEventArgs (line, idxCol, idxRow);
 			DrawUsedColor?.Invoke (this, ev);
 
-			if (line [idx].ColorScheme != null) {
-				var colorScheme = line [idx].ColorScheme;
+			if (line [idxCol].ColorScheme != null) {
+				var colorScheme = line [idxCol].ColorScheme;
 				SetValidUsedColor (colorScheme!);
 			} else {
 				SetValidUsedColor (ColorScheme);
@@ -2848,14 +2852,14 @@ namespace Terminal.Gui {
 					var rune = idxCol >= lineRuneCount ? (Rune)' ' : line [idxCol].Rune;
 					var cols = rune.GetColumns ();
 					if (idxCol < line.Count && _selecting && PointInSelection (idxCol, idxRow)) {
-						OnDrawSelectionColor (line, idxCol);
+						OnDrawSelectionColor (line, idxCol, idxRow);
 					} else if (idxCol == _currentColumn && idxRow == _currentRow && !_selecting && !Used
 						&& HasFocus && idxCol < lineRuneCount) {
-						OnDrawUsedColor (line, idxCol);
+						OnDrawUsedColor (line, idxCol, idxRow);
 					} else if (ReadOnly) {
-						OnDrawReadOnlyColor (line, idxCol);
+						OnDrawReadOnlyColor (line, idxCol, idxRow);
 					} else {
-						OnDrawNormalColor (line, idxCol);
+						OnDrawNormalColor (line, idxCol, idxRow);
 					}
 
 					if (rune.Value == '\t') {

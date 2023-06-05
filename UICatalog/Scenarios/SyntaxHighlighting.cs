@@ -182,8 +182,8 @@ namespace UICatalog.Scenarios {
 
 		private void ProcessHighlighting (object s, RuneCellEventArgs e)
 		{
-			if (IsKeyword (e.Line.Select (c => c.Rune).ToList (), e.Index)) {
-				e.Line [e.Index].ColorScheme = blue;
+			if (IsKeyword (e.Line.Select (c => c.Rune).ToList (), e.IdxCol)) {
+				e.Line [e.IdxCol].ColorScheme = blue;
 			}
 		}
 
