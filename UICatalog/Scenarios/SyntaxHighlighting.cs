@@ -18,10 +18,77 @@ namespace UICatalog.Scenarios {
 
 		TextView textView;
 		MenuItem miWrap;
-		private HashSet<string> keywords = new HashSet<string> (StringComparer.CurrentCultureIgnoreCase);
+		private HashSet<string> keywords = new HashSet<string> (StringComparer.CurrentCultureIgnoreCase){
+
+			"select",
+			"distinct",
+			"top",
+			"from",
+			"create",
+			"CIPHER",
+			"CLASS_ORIGIN",
+			"CLIENT",
+			"CLOSE",
+			"COALESCE",
+			"CODE",
+			"COLUMNS",
+			"COLUMN_FORMAT",
+			"COLUMN_NAME",
+			"COMMENT",
+			"COMMIT",
+			"COMPACT",
+			"COMPLETION",
+			"COMPRESSED",
+			"COMPRESSION",
+			"CONCURRENT",
+			"CONNECT",
+			"CONNECTION",
+			"CONSISTENT",
+			"CONSTRAINT_CATALOG",
+			"CONSTRAINT_SCHEMA",
+			"CONSTRAINT_NAME",
+			"CONTAINS",
+			"CONTEXT",
+			"CONTRIBUTORS",
+			"COPY",
+			"CPU",
+			"CURSOR_NAME",
+			"primary",
+			"key",
+			"insert",
+			"alter",
+			"add",
+			"update",
+			"set",
+			"delete",
+			"truncate",
+			"as",
+			"order",
+			"by",
+			"asc",
+			"desc",
+			"between",
+			"where",
+			"and",
+			"or",
+			"not",
+			"limit",
+			"null",
+			"is",
+			"drop",
+			"database",
+			"table",
+			"having",
+			"in",
+			"join",
+			"on",
+			"union",
+			"exists",
+		};
 		private ColorScheme blue;
 		private ColorScheme magenta;
 		private ColorScheme white;
+		private ColorScheme green;
 
 		public override void Setup ()
 		{
@@ -31,8 +98,7 @@ namespace UICatalog.Scenarios {
 			new MenuBarItem ("_TextView", new MenuItem [] {
 				miWrap =  new MenuItem ("_Word Wrap", "", () => WordWrap()){CheckType = MenuItemCheckStyle.Checked},
 				null,
-				new MenuItem ("_Syntax Highlighting", "", () => ApplyHighlighting()),
-				new MenuItem ("_In Quotes", "", () => ApplyInQuotes()),
+				new MenuItem ("_Syntax Highlighting", "", () => ApplySyntaxHighlighting()),
 				new MenuItem ("_Load Rune Cells", "", () => ApplyLoadRuneCells()),
 				null,
 				new MenuItem ("_Quit", "", () => Quit()),
@@ -47,7 +113,7 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill ()
 			};
 
-			ApplyHighlighting ();
+			ApplySyntaxHighlighting ();
 
 			Win.Add (textView);
 
@@ -58,100 +124,25 @@ namespace UICatalog.Scenarios {
 			Application.Top.Add (statusBar);
 		}
 
-		private void ApplyHighlighting ()
+		private void ApplySyntaxHighlighting ()
 		{
 			ClearAllEvents ();
 
-			blue = ColorScheme.SetAllAttributesBasedOn (new Attribute (Color.Cyan, Color.Black));
+			green = ColorScheme.SetAllAttributesBasedOn (new Attribute (Color.Green, Color.Black));
+			blue =  ColorScheme.SetAllAttributesBasedOn (new Attribute (Color.Blue, Color.Black));
+			magenta = ColorScheme.SetAllAttributesBasedOn (new Attribute (Color.Magenta, Color.Black));
 			white = ColorScheme.SetAllAttributesBasedOn (new Attribute (Color.White, Color.Black));
 			textView.ColorScheme = white;
-			textView.Text = "SELECT TOP 100 * \nfrom\n MyDb.dbo.Biochemistry;";
-
-			keywords.Add ("select");
-			keywords.Add ("distinct");
-			keywords.Add ("top");
-			keywords.Add ("from");
-			keywords.Add ("create");
-			keywords.Add ("CIPHER");
-			keywords.Add ("CLASS_ORIGIN");
-			keywords.Add ("CLIENT");
-			keywords.Add ("CLOSE");
-			keywords.Add ("COALESCE");
-			keywords.Add ("CODE");
-			keywords.Add ("COLUMNS");
-			keywords.Add ("COLUMN_FORMAT");
-			keywords.Add ("COLUMN_NAME");
-			keywords.Add ("COMMENT");
-			keywords.Add ("COMMIT");
-			keywords.Add ("COMPACT");
-			keywords.Add ("COMPLETION");
-			keywords.Add ("COMPRESSED");
-			keywords.Add ("COMPRESSION");
-			keywords.Add ("CONCURRENT");
-			keywords.Add ("CONNECT");
-			keywords.Add ("CONNECTION");
-			keywords.Add ("CONSISTENT");
-			keywords.Add ("CONSTRAINT_CATALOG");
-			keywords.Add ("CONSTRAINT_SCHEMA");
-			keywords.Add ("CONSTRAINT_NAME");
-			keywords.Add ("CONTAINS");
-			keywords.Add ("CONTEXT");
-			keywords.Add ("CONTRIBUTORS");
-			keywords.Add ("COPY");
-			keywords.Add ("CPU");
-			keywords.Add ("CURSOR_NAME");
-			keywords.Add ("primary");
-			keywords.Add ("key");
-			keywords.Add ("insert");
-			keywords.Add ("alter");
-			keywords.Add ("add");
-			keywords.Add ("update");
-			keywords.Add ("set");
-			keywords.Add ("delete");
-			keywords.Add ("truncate");
-			keywords.Add ("as");
-			keywords.Add ("order");
-			keywords.Add ("by");
-			keywords.Add ("asc");
-			keywords.Add ("desc");
-			keywords.Add ("between");
-			keywords.Add ("where");
-			keywords.Add ("and");
-			keywords.Add ("or");
-			keywords.Add ("not");
-			keywords.Add ("limit");
-			keywords.Add ("null");
-			keywords.Add ("is");
-			keywords.Add ("drop");
-			keywords.Add ("database");
-			keywords.Add ("table");
-			keywords.Add ("having");
-			keywords.Add ("in");
-			keywords.Add ("join");
-			keywords.Add ("on");
-			keywords.Add ("union");
-			keywords.Add ("exists");
+			
+			textView.Text = "/*Query to select:\nLots of data*/\nSELECT TOP 100 * \nfrom\n MyDb.dbo.Biochemistry where TestCode = 'blah';";
 
 			textView.Autocomplete.SuggestionGenerator = new SingleWordSuggestionGenerator () {
 				AllSuggestions = keywords.ToList ()
 			};
-
-			textView.DrawNormalColor += ProcessHighlighting;
-			textView.DrawSelectionColor += ProcessHighlighting;
-			textView.DrawReadOnlyColor += ProcessHighlighting;
-			textView.DrawUsedColor += ProcessHighlighting;
-		}
-
-		private void ApplyInQuotes ()
-		{
-			ClearAllEvents ();
-
-			magenta = ColorScheme.SetAllAttributesBasedOn (new Attribute (Color.Magenta, Color.Black));
-			white = ColorScheme.SetAllAttributesBasedOn (new Attribute (Color.White, Color.Black));
-			textView.ColorScheme = white;
-			textView.Text = "\"SELECT\" TOP \"100\" * \n\"from\"\n \"MyDb\".\"dbo\".\"Biochemistry;\"";
-
-			textView.DrawContent += (s, e) => ProcessInQuotes ();
+			
+			textView.TextChanged += (s,e)=>HighlightTextBasedOnKeywords();
+			textView.DrawContent += (s,e)=>HighlightTextBasedOnKeywords();
+			textView.DrawContentComplete += (s,e)=>HighlightTextBasedOnKeywords();
 		}
 
 		private void ApplyLoadRuneCells ()
@@ -180,45 +171,51 @@ namespace UICatalog.Scenarios {
 			textView.ClearEventHandlers ("DrawUsedColor");
 		}
 
-		private void ProcessHighlighting (object s, RuneCellEventArgs e)
+		private void HighlightTextBasedOnKeywords ()
 		{
-			if (IsKeyword (e.Line.Select (c => c.Rune).ToList (), e.IdxCol)) {
-				e.Line [e.IdxCol].ColorScheme = blue;
-			}
-		}
+			// Comment blocks, quote blocks etc
+			Dictionary<Rune,ColorScheme> blocks = new Dictionary<Rune, ColorScheme>();
 
-		private void ProcessInQuotes ()
-		{
-			var areInQuotes = 0;
-			var quoteRune = new Rune ('"');
+			var comments = new Regex(@"/\*.*?\*/",RegexOptions.Singleline);
+			var commentMatches = comments.Matches(textView.Text);
+
+			var singleQuote = new Regex(@"'.*?'",RegexOptions.Singleline);
+			var singleQuoteMatches = singleQuote.Matches(textView.Text);
+
+			// Find all keywords (ignoring for now if they are in comments, quotes etc)
+			Regex[] keywordRegexes = keywords.Select(k=>new Regex($@"\b{k}\b",RegexOptions.IgnoreCase)).ToArray();
+			Match[] keywordMatches = keywordRegexes.SelectMany(r=>r.Matches(textView.Text)).ToArray();
+
+			int pos = 0;
 
 			for (int y = 0; y < textView.Lines; y++) {
 
 				var line = textView.GetLine (y);
 
 				for (int x = 0; x < line.Count; x++) {
-					bool isQuote;
-					if (line [x].Rune == quoteRune) {
-						isQuote = true;
-						if (areInQuotes == 0) {
-							areInQuotes = 1;
-						} else {
-							areInQuotes = 2;
-						}
-					} else {
-						isQuote = false;
-					}
-					if (!isQuote && areInQuotes == 1) {
+					if (commentMatches.Any(m=>ContainsPosition(m,pos))) {
+						line [x].ColorScheme = green;
+					} else
+					if (singleQuoteMatches.Any(m=>ContainsPosition(m,pos))) {
 						line [x].ColorScheme = magenta;
-					} else {
+					}else
+					if (keywordMatches.Any(m=>ContainsPosition(m,pos))) {
+						line [x].ColorScheme = blue;
+					}  else {
 						line [x].ColorScheme = white;
 					}
-					if (!isQuote && areInQuotes == 2) {
-						areInQuotes = 0;
-					}
+
+					pos++;
 				}
+
+				// for the \n or \r\n that exists in Text but not the returned lines
+				pos += Environment.NewLine.Length;
 			}
-			textView.SetNeedsDisplay ();
+		}
+
+		private bool ContainsPosition (Match m, int pos)
+		{
+			return pos >= m.Index && pos < m.Index + m.Length;
 		}
 
 		private void WordWrap ()
