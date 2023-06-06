@@ -129,20 +129,20 @@ namespace UICatalog.Scenarios {
 			ClearAllEvents ();
 
 			green = ColorScheme.SetAllAttributesBasedOn (new Attribute (Color.Green, Color.Black));
-			blue =  ColorScheme.SetAllAttributesBasedOn (new Attribute (Color.Blue, Color.Black));
+			blue = ColorScheme.SetAllAttributesBasedOn (new Attribute (Color.Blue, Color.Black));
 			magenta = ColorScheme.SetAllAttributesBasedOn (new Attribute (Color.Magenta, Color.Black));
 			white = ColorScheme.SetAllAttributesBasedOn (new Attribute (Color.White, Color.Black));
 			textView.ColorScheme = white;
-			
+
 			textView.Text = "/*Query to select:\nLots of data*/\nSELECT TOP 100 * \nfrom\n MyDb.dbo.Biochemistry where TestCode = 'blah';";
 
 			textView.Autocomplete.SuggestionGenerator = new SingleWordSuggestionGenerator () {
 				AllSuggestions = keywords.ToList ()
 			};
-			
-			textView.TextChanged += (s,e)=>HighlightTextBasedOnKeywords();
-			textView.DrawContent += (s,e)=>HighlightTextBasedOnKeywords();
-			textView.DrawContentComplete += (s,e)=>HighlightTextBasedOnKeywords();
+
+			textView.TextChanged += (s, e) => HighlightTextBasedOnKeywords ();
+			textView.DrawContent += (s, e) => HighlightTextBasedOnKeywords ();
+			textView.DrawContentComplete += (s, e) => HighlightTextBasedOnKeywords ();
 		}
 
 		private void ApplyLoadRuneCells ()
@@ -163,28 +163,25 @@ namespace UICatalog.Scenarios {
 
 		private void ClearAllEvents ()
 		{
+			textView.ClearEventHandlers ("TextChanged");
 			textView.ClearEventHandlers ("DrawContent");
-
-			textView.ClearEventHandlers ("DrawNormalColor");
-			textView.ClearEventHandlers ("DrawSelectionColor");
-			textView.ClearEventHandlers ("DrawReadOnlyColor");
-			textView.ClearEventHandlers ("DrawUsedColor");
+			textView.ClearEventHandlers ("DrawContentComplete");
 		}
 
 		private void HighlightTextBasedOnKeywords ()
 		{
 			// Comment blocks, quote blocks etc
-			Dictionary<Rune,ColorScheme> blocks = new Dictionary<Rune, ColorScheme>();
+			Dictionary<Rune, ColorScheme> blocks = new Dictionary<Rune, ColorScheme> ();
 
-			var comments = new Regex(@"/\*.*?\*/",RegexOptions.Singleline);
-			var commentMatches = comments.Matches(textView.Text);
+			var comments = new Regex (@"/\*.*?\*/", RegexOptions.Singleline);
+			var commentMatches = comments.Matches (textView.Text);
 
-			var singleQuote = new Regex(@"'.*?'",RegexOptions.Singleline);
-			var singleQuoteMatches = singleQuote.Matches(textView.Text);
+			var singleQuote = new Regex (@"'.*?'", RegexOptions.Singleline);
+			var singleQuoteMatches = singleQuote.Matches (textView.Text);
 
 			// Find all keywords (ignoring for now if they are in comments, quotes etc)
-			Regex[] keywordRegexes = keywords.Select(k=>new Regex($@"\b{k}\b",RegexOptions.IgnoreCase)).ToArray();
-			Match[] keywordMatches = keywordRegexes.SelectMany(r=>r.Matches(textView.Text)).ToArray();
+			Regex [] keywordRegexes = keywords.Select (k => new Regex ($@"\b{k}\b", RegexOptions.IgnoreCase)).ToArray ();
+			Match [] keywordMatches = keywordRegexes.SelectMany (r => r.Matches (textView.Text)).ToArray ();
 
 			int pos = 0;
 
@@ -193,15 +190,13 @@ namespace UICatalog.Scenarios {
 				var line = textView.GetLine (y);
 
 				for (int x = 0; x < line.Count; x++) {
-					if (commentMatches.Any(m=>ContainsPosition(m,pos))) {
+					if (commentMatches.Any (m => ContainsPosition (m, pos))) {
 						line [x].ColorScheme = green;
-					} else
-					if (singleQuoteMatches.Any(m=>ContainsPosition(m,pos))) {
+					} else if (singleQuoteMatches.Any (m => ContainsPosition (m, pos))) {
 						line [x].ColorScheme = magenta;
-					}else
-					if (keywordMatches.Any(m=>ContainsPosition(m,pos))) {
+					} else if (keywordMatches.Any (m => ContainsPosition (m, pos))) {
 						line [x].ColorScheme = blue;
-					}  else {
+					} else {
 						line [x].ColorScheme = white;
 					}
 
