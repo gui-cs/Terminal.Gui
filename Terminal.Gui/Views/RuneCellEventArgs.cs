@@ -11,19 +11,26 @@ namespace Terminal.Gui {
 		public List<RuneCell> Line { get; set; }
 
 		/// <summary>
-		/// The index position in the line.
+		/// The col index position in the line.
 		/// </summary>
-		public int Index { get; set; }
+		public int IdxCol { get; set; }
+
+		/// <summary>
+		/// The row index position in the text.
+		/// </summary>
+		public int IdxRow { get; set; }
 
 		/// <summary>
 		/// Creates a new instance of the <see cref="RuneCellEventArgs"/> class.
 		/// </summary>
 		/// <param name="line">The line.</param>
-		/// <param name="index">The index.</param>
-		public RuneCellEventArgs (List<RuneCell> line, int index)
+		/// <param name="idxCol">The col index.</param>
+		/// <param name="idxRow">The row index.</param>
+		public RuneCellEventArgs (List<RuneCell> line, int idxCol, int idxRow)
 		{
 			Line = line;
-			Index = index;
+			IdxCol = idxCol;
+			IdxRow = idxRow;
 		}
 	}
 }
