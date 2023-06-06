@@ -208,8 +208,8 @@ namespace UICatalog.Scenarios {
 					pos++;
 				}
 
-				// for the \n that is not counted
-				pos++;
+				// for the \n or \r\n that exists in Text but not the returned lines
+				pos += Environment.NewLine.Length;
 			}
 		}
 
