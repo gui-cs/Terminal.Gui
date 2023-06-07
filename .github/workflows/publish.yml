@@ -2,12 +2,12 @@ name: Publish Terminal.Gui v2
 on:
   push:
   push:
-    branches: [ v2_develop ]
+    branches:
+      - v2_develop
     tags:
       - v2.0.0-alpha.*
 
 jobs:
-
   publish:
     name: Build and Publish v2 to Nuget.org
     runs-on: ubuntu-latest
