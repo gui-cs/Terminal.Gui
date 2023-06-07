@@ -1,9 +1,0 @@
-branches: 
-  v2_develop:
-    mode: ContinuousDelivery
-    regex: v2_develop
-    tag: alpha
-    source-branches: 
-    - main
-    - develop
-    - v2_develop
