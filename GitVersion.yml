@@ -3,4 +3,7 @@ branches:
     mode: ContinuousDelivery
     regex: v2_develop
     tag: alpha
-    source-branches: []
+    source-branches: 
+    - main
+    - develop
+    - v2_develop
