@@ -16,12 +16,12 @@ jobs:
         fetch-depth: 0 #fetch-depth is needed for GitVersion
 
     - name: Install and calculate the new version with GitVersion 
-      uses: gittools/actions/gitversion/setup@v0.9.15
+      uses: gittools/actions/gitversion/setup@v0
       with:
         versionSpec: 5.x
 
     - name: Determine Version
-      uses: gittools/actions/gitversion/execute@v0.9.15
+      uses: gittools/actions/gitversion/execute@v0
       id: gitversion # step id used as reference for output values
 
     - name: Display GitVersion outputs
@@ -30,9 +30,10 @@ jobs:
         echo "CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }}"
 
     - name: Setup dotnet
-      uses: actions/setup-dotnet@v3.0.3
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.0.100
+        dotnet-version: 7.0
+        dotnet-quality: 'ga'
 
     - name: Install dependencies
       run: dotnet restore
@@ -66,12 +67,6 @@ jobs:
       run: |
         echo "Code coverage percentage: ${{steps.create_coverage_badge.outputs.percentage}}%"
         echo "Badge data: ${{steps.create_coverage_badge.outputs.badge}}"
-        
-    #- name: Prep GitHub Packages
-    #  run: dotnet nuget add source --username tig --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/tig/index.json"
-
-    #- name: Publish to GitHub packages 
-    #  run: dotnet nuget push NStack/bin/Release/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
 
     - name: Publish to NuGet.org
       run: dotnet nuget push Terminal.Gui/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
