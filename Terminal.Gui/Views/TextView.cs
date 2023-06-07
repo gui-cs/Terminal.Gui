@@ -2172,6 +2172,14 @@ namespace Terminal.Gui {
 		/// </summary>
 		public ContextMenu? ContextMenu { get; private set; }
 
+		/// <summary>
+		/// If <see langword="true"/> and the current <see cref="RuneCell.ColorScheme"/> is null 
+		/// will inherit from the previous, otherwise if <see langword="false"/> (default) do nothing.
+		/// If the text is load with <see cref="LoadRuneCells(List{RuneCell})"/> this 
+		/// property is automatically sets to <see langword="true"/>.
+		/// </summary>
+		public bool InheritsPreviousColorScheme { get; set; }
+
 		int GetSelectedLength ()
 		{
 			return SelectedText.Length;
@@ -2249,6 +2257,7 @@ namespace Terminal.Gui {
 			ResetPosition ();
 			SetNeedsDisplay ();
 			UpdateWrapModel ();
+			InheritsPreviousColorScheme = true;
 		}
 
 		/// <summary>
@@ -3193,7 +3202,73 @@ namespace Terminal.Gui {
 		{
 			ContentsChanged?.Invoke (this, new ContentsChangedEventArgs (CurrentRow, CurrentColumn));
 
+			ProcessInheritsPreviousColorScheme (CurrentRow, CurrentColumn);
 			ProcessAutocomplete ();
+		}
+
+		private void ProcessInheritsPreviousColorScheme (int row, int col)
+		{
+			if (!InheritsPreviousColorScheme || (Lines == 1 && GetLine (Lines).Count == 0)) {
+				return;
+			}
+
+			var line = GetLine (row);
+			var lineToSet = line;
+			while (line.Count == 0) {
+				if (row == 0 && line.Count == 0) {
+					return;
+				}
+				row--;
+				line = GetLine (row);
+				lineToSet = line;
+			}
+			var colWithColor = Math.Max (Math.Min (col - 2, line.Count - 1), 0);
+			var cell = line [colWithColor];
+			var colWithoutColor = Math.Max (col - 1, 0);
+
+			if (cell.ColorScheme != null && colWithColor == 0 && lineToSet [colWithoutColor].ColorScheme != null) {
+				for (int r = row - 1; r > -1; r--) {
+					var l = GetLine (r);
+					for (int c = l.Count - 1; c > -1; c--) {
+						if (l [c].ColorScheme == null) {
+							l [c].ColorScheme = cell.ColorScheme;
+						} else {
+							return;
+						}
+					}
+				}
+				return;
+			} else if (cell.ColorScheme == null) {
+				for (int r = row; r > -1; r--) {
+					var l = GetLine (r);
+					colWithColor = l.FindLastIndex (colWithColor > -1 ? colWithColor : l.Count - 1, rc => rc.ColorScheme != null);
+					if (colWithColor > -1 && l [colWithColor].ColorScheme != null) {
+						cell = l [colWithColor];
+						break;
+					}
+				}
+			} else {
+				var cRow = row;
+				while (cell.ColorScheme == null) {
+					if ((colWithColor == 0 || cell.ColorScheme == null) && cRow > 0) {
+						line = GetLine (--cRow);
+						colWithColor = line.Count - 1;
+						cell = line [colWithColor];
+					} else if (cRow == 0 && colWithColor < line.Count) {
+						cell = line [colWithColor + 1];
+					}
+				}
+			}
+			if (cell.ColorScheme != null && colWithColor > -1 && lineToSet [colWithoutColor].ColorScheme == null) {
+				while (lineToSet [colWithoutColor].ColorScheme == null) {
+					lineToSet [colWithoutColor].ColorScheme = cell.ColorScheme;
+					colWithoutColor--;
+					if (colWithoutColor == -1 && row > 0) {
+						lineToSet = GetLine (--row);
+						colWithoutColor = lineToSet.Count - 1;
+					}
+				}
+			}
 		}
 
 		(int width, int height) OffSetBackground ()

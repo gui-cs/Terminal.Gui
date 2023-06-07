@@ -6960,7 +6960,7 @@ This is the second line.
 		}
 
 		[Fact, TextViewTestsAutoInitShutdown]
-		public void RuneCell_LoadRuneCells ()
+		public void RuneCell_LoadRuneCells_InheritsPreviousColorScheme ()
 		{
 			List<RuneCell> runeCells = new List<RuneCell> ();
 			foreach (var color in Colors.ColorSchemes) {
@@ -6974,6 +6974,7 @@ This is the second line.
 			_textView.LoadRuneCells (runeCells);
 			Application.Top.Add (_textView);
 			var rs = Application.Begin (Application.Top);
+			Assert.True (_textView.InheritsPreviousColorScheme);
 			var expectedText = @"
 TopLevel
 Base    
@@ -7007,7 +7008,86 @@ Error   ";
 			TestHelpers.AssertDriverContentsWithFrameAre (expectedText, output);
 			TestHelpers.AssertDriverColorsAre (expectedColor, attributes);
 
+			_textView.CursorPosition = new Point (6, 2);
+			_textView.SelectionStartColumn = 0;
+			_textView.SelectionStartRow = 0;
+			Assert.Equal ($"TopLevel{Environment.NewLine}Base{Environment.NewLine}Dialog", _textView.SelectedText);
+			_textView.Copy ();
+			_textView.Selecting = false;
+			_textView.CursorPosition = new Point (2, 4);
+			_textView.Paste ();
+			Application.Refresh ();
+			expectedText = @"
+TopLevel  
+Base      
+Dialog    
+Menu      
+ErTopLevel
+Base      
+Dialogror ";
+			TestHelpers.AssertDriverContentsWithFrameAre (expectedText, output);
+			expectedColor = @"
+0000000000
+1111000000
+2222220000
+3333000000
+4444444444
+4444000000
+4444444440";
+			TestHelpers.AssertDriverColorsAre (expectedColor, attributes);
+
+			_textView.Undo ();
+			_textView.CursorPosition = new Point (0, 3);
+			_textView.SelectionStartColumn = 0;
+			_textView.SelectionStartRow = 0;
+			Assert.Equal ($"TopLevel{Environment.NewLine}Base{Environment.NewLine}Dialog{Environment.NewLine}", _textView.SelectedText);
+			_textView.Copy ();
+			_textView.Selecting = false;
+			_textView.CursorPosition = new Point (2, 4);
+			_textView.Paste ();
+			Application.Refresh ();
+			expectedText = @"
+TopLevel  
+Base      
+Dialog    
+Menu      
+ErTopLevel
+Base      
+Dialog    
+ror       ";
+			TestHelpers.AssertDriverContentsWithFrameAre (expectedText, output);
+			expectedColor = @"
+0000000000
+1111000000
+2222220000
+3333000000
+4444444444
+4444000000
+4444440000
+4440000000";
+			TestHelpers.AssertDriverColorsAre (expectedColor, attributes);
+
 			Application.End (rs);
+		}
+
+		[Fact, TextViewTestsAutoInitShutdown]
+		public void RuneCell_LoadRuneCells_Without_ColorScheme_Is_Never_Null ()
+		{
+			var cells = new List<RuneCell> {
+				new RuneCell{Rune = new Rune ('T')},
+				new RuneCell{Rune = new Rune ('e')},
+				new RuneCell{Rune = new Rune ('s')},
+				new RuneCell{Rune = new Rune ('t')}
+			};
+			Application.Top.Add (_textView);
+			_textView.LoadRuneCells (cells);
+
+			for (int i = 0; i < _textView.Lines; i++) {
+				var line = _textView.GetLine (i);
+				foreach (var rc in line) {
+					Assert.NotNull (rc.ColorScheme);
+				}
+			}
 		}
 
 		[Fact, TextViewTestsAutoInitShutdown]

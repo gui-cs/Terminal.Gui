@@ -159,6 +159,7 @@ namespace UICatalog.Scenarios {
 			}
 
 			textView.LoadRuneCells (runeCells);
+			textView.Autocomplete.SuggestionGenerator = new SingleWordSuggestionGenerator ();
 		}
 
 		private void ClearAllEvents ()
@@ -166,6 +167,8 @@ namespace UICatalog.Scenarios {
 			textView.ClearEventHandlers ("TextChanged");
 			textView.ClearEventHandlers ("DrawContent");
 			textView.ClearEventHandlers ("DrawContentComplete");
+
+			textView.InheritsPreviousColorScheme = false;
 		}
 
 		private void HighlightTextBasedOnKeywords ()
