@@ -11,11 +11,11 @@ namespace Terminal.Gui;
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T : class {
-	private TreeView<T> tree;
-
-	private string [] cols;
-	private Dictionary<string, Func<T, object>> lamdas;
-	private TableView tableView;
+	
+	private TreeView<T> _tree;
+	private string [] _cols;
+	private Dictionary<string, Func<T, object>> _lamdas;
+	private TableView _tableView;
 
 	/// <summary>
 	/// Creates a new instance of <see cref="TreeTableSource{T}"/> presenting the given
@@ -36,39 +36,39 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 	/// </code></param>
 	public TreeTableSource (TableView table, string firstColumnName, TreeView<T> tree, Dictionary<string, Func<T, object>> subsequentColumns)
 	{
-		this.tableView = table;
-		this.tree = tree;
-		this.tableView.KeyPress += Table_KeyPress;
-		this.tableView.MouseClick += Table_MouseClick;
+		_tableView = table;
+		_tree = tree;
+		_tableView.KeyPress += Table_KeyPress;
+		_tableView.MouseClick += Table_MouseClick;
 
 		var colList = subsequentColumns.Keys.ToList ();
 		colList.Insert (0, firstColumnName);
 
-		this.cols = colList.ToArray ();
+		_cols = colList.ToArray ();
 
 
-		this.lamdas = subsequentColumns;
+		_lamdas = subsequentColumns;
 	}
 
 
 	/// <inheritdoc/>
 	public object this [int row, int col] =>
 		col == 0 ? GetColumnZeroRepresentationFromTree (row) :
-		this.lamdas [ColumnNames [col]] (RowToObject (row));
+		_lamdas [ColumnNames [col]] (RowToObject (row));
 
 	/// <inheritdoc/>
-	public int Rows => tree.BuildLineMap ().Count;
+	public int Rows => _tree.BuildLineMap ().Count;
 
 	/// <inheritdoc/>
-	public int Columns => this.lamdas.Count + 1;
+	public int Columns => _lamdas.Count + 1;
 
 	/// <inheritdoc/>
-	public string [] ColumnNames => cols;
+	public string [] ColumnNames => _cols;
 
 	/// <inheritdoc/>
 	public void Dispose ()
 	{
-		tree.Dispose ();
+		_tree.Dispose ();
 	}
 
 	/// <summary>
@@ -79,7 +79,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 	/// <returns></returns>
 	public T RowToObject (int row)
 	{
-		return tree.BuildLineMap ().ElementAt (row).Model;
+		return _tree.BuildLineMap ().ElementAt (row).Model;
 	}
 
 
@@ -90,7 +90,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 		// Everything on line before the expansion run and branch text
 		Rune [] prefix = branch.GetLinePrefix (Application.Driver).ToArray ();
 		Rune expansion = branch.GetExpandableSymbol (Application.Driver);
-		string lineBody = tree.AspectGetter (branch.Model) ?? "";
+		string lineBody = _tree.AspectGetter (branch.Model) ?? "";
 
 		var sb = new StringBuilder ();
 
@@ -106,38 +106,38 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 
 	private void Table_KeyPress (object sender, KeyEventEventArgs e)
 	{
-		if (!IsInTreeColumn (tableView.SelectedColumn, true)) {
+		if (!IsInTreeColumn (_tableView.SelectedColumn, true)) {
 			return;
 		}
 
-		var obj = tree.GetObjectOnRow (tableView.SelectedRow);
+		var obj = _tree.GetObjectOnRow (_tableView.SelectedRow);
 
 		if (obj == null) {
 			return;
 		}
 
 		if (e.KeyEvent.Key == Key.CursorLeft) {
-			if (tree.IsExpanded (obj)) {
-				tree.Collapse (obj);
+			if (_tree.IsExpanded (obj)) {
+				_tree.Collapse (obj);
 				e.Handled = true;
 			}
 		}
 		if (e.KeyEvent.Key == Key.CursorRight) {
-			if (tree.CanExpand (obj) && !tree.IsExpanded (obj)) {
-				tree.Expand (obj);
+			if (_tree.CanExpand (obj) && !_tree.IsExpanded (obj)) {
+				_tree.Expand (obj);
 				e.Handled = true;
 			}
 		}
 
 		if (e.Handled) {
-			tree.InvalidateLineMap ();
-			tableView.SetNeedsDisplay ();
+			_tree.InvalidateLineMap ();
+			_tableView.SetNeedsDisplay ();
 		}
 	}
 
 	private void Table_MouseClick (object sender, MouseEventEventArgs e)
 	{
-		var hit = tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out var headerIfAny, out var offsetX);
+		var hit = _tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out var headerIfAny, out var offsetX);
 
 		if (hit == null || headerIfAny != null || !IsInTreeColumn (hit.Value.X, false) || offsetX == null) {
 			return;
@@ -149,30 +149,30 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 
 			var m = branch.Model;
 
-			if (tree.CanExpand (m) && !tree.IsExpanded (m)) {
-				tree.Expand (m);
+			if (_tree.CanExpand (m) && !_tree.IsExpanded (m)) {
+				_tree.Expand (m);
 
 				e.Handled = true;
-			} else if (tree.IsExpanded (m)) {
-				tree.Collapse (m);
+			} else if (_tree.IsExpanded (m)) {
+				_tree.Collapse (m);
 				e.Handled = true;
 			}
 		}
 
 		if (e.Handled) {
-			tree.InvalidateLineMap ();
-			tableView.SetNeedsDisplay ();
+			_tree.InvalidateLineMap ();
+			_tableView.SetNeedsDisplay ();
 		}
 	}
 
 	private Branch<T> RowToBranch (int row)
 	{
-		return tree.BuildLineMap ().ElementAt (row);
+		return _tree.BuildLineMap ().ElementAt (row);
 	}
 
 	private bool IsInTreeColumn (int column, bool isKeyboard)
 	{
-		var colNames = tableView.Table.ColumnNames;
+		var colNames = _tableView.Table.ColumnNames;
 
 		if (column < 0 || column >= colNames.Length) {
 			return false;
@@ -180,13 +180,13 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 
 		// if full row is selected then it is hard to tell which sub cell in the tree
 		// has focus so we should typically just always respond with expand/collapse
-		if (tableView.FullRowSelect && isKeyboard) {
+		if (_tableView.FullRowSelect && isKeyboard) {
 			return true;
 		}
 
 		// we cannot just check that SelectedColumn is 0 because source may
 		// be wrapped e.g. with a CheckBoxTableSourceWrapperBase
-		return colNames [column] == cols [0];
+		return colNames [column] == _cols [0];
 	}
 
 	/// <inheritdoc/>
@@ -198,6 +198,6 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 	/// <inheritdoc/>
 	public IEnumerable<T> GetAllObjects ()
 	{
-		return tree.BuildLineMap ().Select (b => b.Model);
+		return _tree.BuildLineMap ().Select (b => b.Model);
 	}
 }
