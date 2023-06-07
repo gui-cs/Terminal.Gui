@@ -1,4 +1,6 @@
+mode: ContinuousDelivery
 branches: 
   v2_develop:
-    regex: ...
+    regex: ^v2_dev(elop)?(ment)?$
+    is-develop: true
     tag: 'alpha'
