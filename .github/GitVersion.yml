@@ -1,3 +1,4 @@
 branches: 
   v2_develop:
+    regex: ...
     tag: 'alpha'
