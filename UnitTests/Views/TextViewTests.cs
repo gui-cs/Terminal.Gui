@@ -960,7 +960,7 @@ namespace Terminal.Gui.ViewsTests {
 
 		[Fact]
 		[TextViewTestsAutoInitShutdown]
-		public void Kill_To_End_Delete_Forwards_And_Copy_To_The_Clipboard ()
+		public void Kill_To_End_Delete_Forwards_Copy_To_The_Clipboard_And_Paste ()
 		{
 			_textView.Text = "This is the first line.\nThis is the second line.";
 			var iteration = 0;
@@ -1003,7 +1003,7 @@ namespace Terminal.Gui.ViewsTests {
 
 		[Fact]
 		[TextViewTestsAutoInitShutdown]
-		public void Kill_To_Start_Delete_Backwards_And_Copy_To_The_Clipboard ()
+		public void Kill_To_Start_Delete_Backwards_Copy_To_The_Clipboard_And_Paste ()
 		{
 			_textView.Text = "This is the first line.\nThis is the second line.";
 			_textView.MoveEnd ();
@@ -6728,12 +6728,12 @@ This is the second line.
 			Kill_Delete_WordBackward ();
 			Assert.Equal (expectedEventCount, eventcount);
 
-			expectedEventCount += 1;
-			Kill_To_End_Delete_Forwards_And_Copy_To_The_Clipboard ();
+			expectedEventCount += 2;
+			Kill_To_End_Delete_Forwards_Copy_To_The_Clipboard_And_Paste ();
 			Assert.Equal (expectedEventCount, eventcount);
 
-			expectedEventCount += 1;
-			Kill_To_Start_Delete_Backwards_And_Copy_To_The_Clipboard ();
+			expectedEventCount += 2;
+			Kill_To_Start_Delete_Backwards_Copy_To_The_Clipboard_And_Paste ();
 			Assert.Equal (expectedEventCount, eventcount);
 		}
 

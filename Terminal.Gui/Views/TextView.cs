@@ -3119,6 +3119,7 @@ namespace Terminal.Gui {
 				HistoryText.LineStatus.Replaced);
 
 			UpdateWrapModel ();
+			OnContentsChanged ();
 		}
 
 		// The column we are tracking, or -1 if we are not tracking any column
@@ -3994,11 +3995,13 @@ namespace Terminal.Gui {
 					HistoryText.LineStatus.Replaced);
 
 				UpdateWrapModel ();
+				OnContentsChanged ();
 
 				return;
 			}
 			if (DeleteTextForwards ()) {
 				UpdateWrapModel ();
+				OnContentsChanged ();
 
 				return;
 			}
@@ -4031,11 +4034,13 @@ namespace Terminal.Gui {
 					HistoryText.LineStatus.Replaced);
 
 				UpdateWrapModel ();
+				OnContentsChanged ();
 
 				return;
 			}
 			if (DeleteTextBackwards ()) {
 				UpdateWrapModel ();
+				OnContentsChanged ();
 
 				return;
 			}
@@ -4416,9 +4421,10 @@ namespace Terminal.Gui {
 
 				_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (currentLine) }, CursorPosition);
 
-				var addedLine = new List<List<RuneCell>> () { new List<RuneCell> (currentLine) };
-
-				addedLine.Add (runeList);
+				var addedLine = new List<List<RuneCell>> {
+					new List<RuneCell> (currentLine),
+					runeList
+				};
 
 				_historyText.Add (new List<List<RuneCell>> (addedLine), CursorPosition, HistoryText.LineStatus.Added);
 
@@ -4427,6 +4433,8 @@ namespace Terminal.Gui {
 
 				_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (GetCurrentLine ()) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
+
+				SetNeedsDisplay ();
 				OnContentsChanged ();
 			} else {
 				if (_selecting) {
@@ -4439,6 +4447,8 @@ namespace Terminal.Gui {
 					_historyText.ReplaceLast (new List<List<RuneCell>> () { new List<RuneCell> (GetCurrentLine ()) }, CursorPosition,
 						HistoryText.LineStatus.Original);
 				}
+
+				SetNeedsDisplay ();
 			}
 			UpdateWrapModel ();
 			_selecting = false;
