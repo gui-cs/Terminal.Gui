@@ -128,8 +128,8 @@ namespace Terminal.Gui {
 			AddCommand (Command.Right, () => { MoveRight (); return true; });
 			AddCommand (Command.CutToEndLine, () => { KillToEnd (); return true; });
 			AddCommand (Command.CutToStartLine, () => { KillToStart (); return true; });
-			AddCommand (Command.Undo, () => { UndoChanges (); return true; });
-			AddCommand (Command.Redo, () => { RedoChanges (); return true; });
+			AddCommand (Command.Undo, () => { Undo (); return true; });
+			AddCommand (Command.Redo, () => { Redo (); return true; });
 			AddCommand (Command.WordLeft, () => { MoveWordLeft (); return true; });
 			AddCommand (Command.WordRight, () => { MoveWordRight (); return true; });
 			AddCommand (Command.KillWordForwards, () => { KillWordForwards (); return true; });
@@ -230,8 +230,8 @@ namespace Terminal.Gui {
 					new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, GetKeyFromCommand (Command.Copy)),
 					new MenuItem (Strings.ctxCut, "", () => Cut (), null, null, GetKeyFromCommand (Command.Cut)),
 					new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, GetKeyFromCommand (Command.Paste)),
-					new MenuItem (Strings.ctxUndo, "", () => UndoChanges (), null, null, GetKeyFromCommand (Command.Undo)),
-					new MenuItem (Strings.ctxRedo, "", () => RedoChanges (), null, null, GetKeyFromCommand (Command.Redo)),
+					new MenuItem (Strings.ctxUndo, "", () => Undo (), null, null, GetKeyFromCommand (Command.Undo)),
+					new MenuItem (Strings.ctxRedo, "", () => Redo (), null, null, GetKeyFromCommand (Command.Redo)),
 				});
 		}
 
@@ -758,7 +758,10 @@ namespace Terminal.Gui {
 			Adjust ();
 		}
 
-		void RedoChanges ()
+		/// <summary>
+		/// Redoes the latest changes.
+		/// </summary>
+		public void Redo ()
 		{
 			if (ReadOnly)
 				return;
@@ -781,7 +784,10 @@ namespace Terminal.Gui {
 			//Adjust ();
 		}
 
-		void UndoChanges ()
+		/// <summary>
+		/// Undoes the latest changes.
+		/// </summary>
+		public void Undo ()
 		{
 			if (ReadOnly)
 				return;

@@ -1607,8 +1607,8 @@ namespace Terminal.Gui {
 			AddCommand (Command.BackTab, () => ProcessBackTab ());
 			AddCommand (Command.NextView, () => ProcessMoveNextView ());
 			AddCommand (Command.PreviousView, () => ProcessMovePreviousView ());
-			AddCommand (Command.Undo, () => { UndoChanges (); return true; });
-			AddCommand (Command.Redo, () => { RedoChanges (); return true; });
+			AddCommand (Command.Undo, () => { Undo (); return true; });
+			AddCommand (Command.Redo, () => { Redo (); return true; });
 			AddCommand (Command.DeleteAll, () => { DeleteAll (); return true; });
 			AddCommand (Command.Accept, () => {
 				ContextMenu!.Position = new Point (CursorPosition.X - _leftColumn + 2, CursorPosition.Y - _topRow + 2);
@@ -1729,8 +1729,8 @@ namespace Terminal.Gui {
 					new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, GetKeyFromCommand (Command.Copy)),
 					new MenuItem (Strings.ctxCut, "", () => Cut (), null, null, GetKeyFromCommand (Command.Cut)),
 					new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, GetKeyFromCommand (Command.Paste)),
-					new MenuItem (Strings.ctxUndo, "", () => UndoChanges (), null, null, GetKeyFromCommand (Command.Undo)),
-					new MenuItem (Strings.ctxRedo, "", () => RedoChanges (), null, null, GetKeyFromCommand (Command.Redo)),
+					new MenuItem (Strings.ctxUndo, "", () => Undo (), null, null, GetKeyFromCommand (Command.Undo)),
+					new MenuItem (Strings.ctxRedo, "", () => Redo (), null, null, GetKeyFromCommand (Command.Redo)),
 				});
 		}
 
@@ -3255,7 +3255,10 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		void RedoChanges ()
+		/// <summary>
+		/// Redoes the latest changes.
+		/// </summary>
+		public void Redo ()
 		{
 			if (ReadOnly)
 				return;
@@ -3263,7 +3266,10 @@ namespace Terminal.Gui {
 			_historyText.Redo ();
 		}
 
-		void UndoChanges ()
+		/// <summary>
+		/// Undoes the latest changes.
+		/// </summary>
+		public void Undo ()
 		{
 			if (ReadOnly)
 				return;
