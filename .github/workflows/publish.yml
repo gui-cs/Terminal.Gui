@@ -1,9 +1,6 @@
 name: Publish Terminal.Gui v2
 on:
   push:
-  push:
-    branches:
-      - v2_develop
     tags:
       - v2.0.0-alpha.*
 
