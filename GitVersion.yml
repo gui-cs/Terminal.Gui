@@ -1,5 +1,7 @@
 branches: 
-  master:
-    tag: ''
   v2_develop:
-    tag: 'alpha'
+    mode: ContinuousDeployment
+    regex: v2_develop
+    tag: alpha
+    source-branches:
+    - v2_develop
