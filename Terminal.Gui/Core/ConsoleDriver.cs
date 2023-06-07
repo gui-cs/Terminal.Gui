@@ -1494,7 +1494,7 @@ namespace Terminal.Gui {
 					process.StandardInput.Close ();
 				}
 
-				if (!process.WaitForExit (5000)) {
+				if (!process.WaitForExit (10000)) {
 					var timeoutError = $@"Process timed out. Command line: {process.StartInfo.FileName} {process.StartInfo.Arguments}.";
 					throw new TimeoutException (timeoutError);
 				}

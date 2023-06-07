@@ -2693,8 +2693,9 @@ namespace Terminal.Gui {
 			} else if (currentRow - topRow + BottomOffset >= Frame.Height + offB.height) {
 				topRow = Math.Min (Math.Max (currentRow - Frame.Height + 1 + BottomOffset, 0), currentRow);
 				need = true;
-			} else if (topRow > 0 && currentRow == topRow) {
+			} else if (topRow > 0 && currentRow < topRow) {
 				topRow = Math.Max (topRow - 1, 0);
+				need = true;
 			}
 			if (need) {
 				if (wrapNeeded) {
@@ -4107,6 +4108,7 @@ namespace Terminal.Gui {
 			leftColumn = 0;
 			TrackColumn ();
 			PositionCursor ();
+			SetNeedsDisplay ();
 		}
 
 		bool MoveNext (ref int col, ref int row, out Rune rune)

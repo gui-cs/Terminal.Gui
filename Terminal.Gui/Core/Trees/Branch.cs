@@ -61,8 +61,15 @@ namespace Terminal.Gui.Trees {
 				return;
 			}
 
-			var children = tree.TreeBuilder.GetChildren (this.Model) ?? Enumerable.Empty<T> ();
+			IEnumerable<T> children;
 
+			if (Depth >= tree.MaxDepth) {
+				children = Enumerable.Empty<T> ();
+			}
+			else {
+				children = tree.TreeBuilder.GetChildren (this.Model) ?? Enumerable.Empty<T> ();
+			}
+			
 			this.ChildBranches = children.ToDictionary (k => k, val => new Branch<T> (tree, this, val));
 		}
 
