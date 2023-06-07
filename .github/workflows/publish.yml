@@ -3,7 +3,7 @@ on:
   push:
     branches: [ v2_develop ]
     tags:
-      - v2.*
+      - v2.0.0-alpha.*
 
 jobs:
 
