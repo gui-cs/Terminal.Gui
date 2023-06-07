@@ -1,18 +1,26 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class TreeTableSourceTests {
+public class TreeTableSourceTests: IDisposable {
 
-	readonly ITestOutputHelper output;
-
+	readonly ITestOutputHelper _output;
+	private readonly Rune _origChecked;
+	private readonly Rune _origUnchecked;
 	public TreeTableSourceTests (ITestOutputHelper output)
 	{
-		this.output = output;
+		_output = output;
+
+		_origChecked = ConfigurationManager.Glyphs.Checked;
+		_origUnchecked = ConfigurationManager.Glyphs.UnChecked;
+		ConfigurationManager.Glyphs.Checked = new Rune ('☑');
+		ConfigurationManager.Glyphs.UnChecked = new Rune ('☐');
 	}
 
 	[Fact, AutoInitShutdown]
@@ -31,7 +39,7 @@ public class TreeTableSourceTests {
 │├+Lost Highway│Exciting night road    │
 │└+Route 66    │Great race course      │";
 
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		Assert.Equal(2, tv.Table.Rows);
 
@@ -55,7 +63,7 @@ public class TreeTableSourceTests {
 │└+Route 66       │Great race course   │
 ";
 
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		// when pressing left we should collapse the top route again
 		Application.Top.ProcessHotKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
@@ -71,7 +79,7 @@ public class TreeTableSourceTests {
 │└+Route 66    │Great race course      │
 ";
 
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 	}
 
 	[Fact, AutoInitShutdown]
@@ -90,7 +98,7 @@ public class TreeTableSourceTests {
 │├+Lost Highway│Exciting night road    │
 │└+Route 66    │Great race course      │";
 
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		Assert.Equal (2, tv.Table.Rows);
 
@@ -112,15 +120,15 @@ public class TreeTableSourceTests {
 │└+Route 66       │Great race course   │
 ";
 
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		// Clicking to the right/left of the expand/collapse does nothing
 		tv.OnMouseEvent (new MouseEvent () { X = 3, Y = 2, Flags = MouseFlags.Button1Clicked });
 		tv.Draw ();
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 		tv.OnMouseEvent (new MouseEvent () { X = 1, Y = 2, Flags = MouseFlags.Button1Clicked });
 		tv.Draw ();
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		// Clicking on the + again should collapse
 		tv.OnMouseEvent (new MouseEvent () { X = 2, Y = 2, Flags = MouseFlags.Button1Clicked });
@@ -133,7 +141,7 @@ public class TreeTableSourceTests {
 │├+Lost Highway│Exciting night road    │
 │└+Route 66    │Great race course      │";
 
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 	}
 
@@ -156,7 +164,7 @@ public class TreeTableSourceTests {
 │☐│└+Route 66    │Great race course    │
 ";
 
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		Assert.Equal (2, tv.Table.Rows);
 
@@ -186,7 +194,7 @@ public class TreeTableSourceTests {
 │☐│└+Route 66       │Great race course │
 ";
 
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		tv.ProcessKey(new KeyEvent(Key.CursorDown,new KeyModifiers ()));
 		tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
@@ -203,7 +211,7 @@ public class TreeTableSourceTests {
 │☐│└+Route 66       │Great race course │
 ";
 
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		var selectedObjects = checkSource.CheckedRows.Select (treeSource.GetObjectOnRow).ToArray();
 		var selected = Assert.Single(selectedObjects);
@@ -284,4 +292,10 @@ public class TreeTableSourceTests {
 		return tableView;
 	}
 
+	public void Dispose ()
+	{
+
+		ConfigurationManager.Glyphs.Checked = _origChecked;
+		ConfigurationManager.Glyphs.UnChecked = _origUnchecked;
+	}
 }
