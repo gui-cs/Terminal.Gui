@@ -1,0 +1,5 @@
+branches: 
+  master:
+    tag: ''
+  v2_develop:
+    tag: 'alpha'
