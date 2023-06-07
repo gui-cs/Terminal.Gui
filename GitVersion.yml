@@ -2,5 +2,4 @@ branches:
   v2_develop:
     regex: v2_develop
     tag: alpha
-    source-branches: 
-    - v2_develop
+    source-branches: []
