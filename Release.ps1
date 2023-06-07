@@ -1,3 +1,5 @@
+# Script for doing a Release of Terminal.Gui
+# For now just does Alpha
 param(
     [Parameter(Mandatory=$true)]
     [int]$Version
