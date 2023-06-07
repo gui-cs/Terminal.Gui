@@ -2,7 +2,7 @@ name: Publish Terminal.Gui v2
 on:
   push:
     tags:
-      - v2.0.0-alpha.*
+      - v2.0.0-*
 
 jobs:
 
