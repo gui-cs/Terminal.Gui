@@ -96,7 +96,7 @@ namespace Terminal.Gui {
 
 		// Turns the string into cells, this does not split the 
 		// contents on a newline if it is present.
-		internal static List<RuneCell> ToRuneCells (string str, ColorScheme? colorScheme = null)
+		internal static List<RuneCell> StringToRuneCells (string str, ColorScheme? colorScheme = null)
 		{
 			List<RuneCell> cells = new List<RuneCell> ();
 			foreach (var rune in str.ToRunes ()) {
@@ -114,13 +114,13 @@ namespace Terminal.Gui {
 			return cells;
 		}
 
-		public static List<List<RuneCell>> StringToRuneCells (List<RuneCell> cells)
+		public static List<List<RuneCell>> ToRuneCells (List<RuneCell> cells)
 		{
 			return SplitNewLines (cells);
 		}
 
 		// Splits a string into a List that contains a List<RuneCell> for each line
-		public static List<List<RuneCell>> StringToRuneCells (string content, ColorScheme? colorScheme = null)
+		public static List<List<RuneCell>> StringToRuneCellsSplitted (string content, ColorScheme? colorScheme = null)
 		{
 			var cells = content.EnumerateRunes ().Select (x => new RuneCell () { Rune = x, ColorScheme = colorScheme }).ToList ();
 
@@ -143,7 +143,7 @@ namespace Terminal.Gui {
 					if (i - start > 0)
 						lines.Add (cells.GetRange (start, hasCR ? i - 1 - start : i - start));
 					else
-						lines.Add (ToRuneCells (string.Empty));
+						lines.Add (StringToRuneCells (string.Empty));
 					start = i + 1;
 					hasCR = false;
 				}
@@ -156,7 +156,7 @@ namespace Terminal.Gui {
 		void Append (List<byte> line)
 		{
 			var str = StringExtensions.ToString (line.ToArray ());
-			_lines.Add (ToRuneCells (str));
+			_lines.Add (StringToRuneCells (str));
 		}
 
 		public void LoadStream (Stream input)
@@ -191,15 +191,21 @@ namespace Terminal.Gui {
 
 		public void LoadString (string content)
 		{
-			_lines = StringToRuneCells (content);
+			_lines = StringToRuneCellsSplitted (content);
 
 			OnLinesLoaded ();
 		}
 
-		public void LoadRuneCells (List<RuneCell> cells)
+		public void LoadRuneCells (List<RuneCell> cells, ColorScheme? colorScheme)
 		{
-			_lines = StringToRuneCells (cells);
-
+			_lines = ToRuneCells (cells);
+			foreach (var line in _lines) {
+				foreach (var cell in line) {
+					if (cell.ColorScheme == null) {
+						cell.ColorScheme = colorScheme;
+					}
+				}
+			}
 			OnLinesLoaded ();
 		}
 
@@ -2238,7 +2244,7 @@ namespace Terminal.Gui {
 		public void LoadRuneCells (List<RuneCell> cells)
 		{
 			SetWrapModel ();
-			_model.LoadRuneCells (cells);
+			_model.LoadRuneCells (cells, ColorScheme);
 			_historyText.Clear (Text);
 			ResetPosition ();
 			SetNeedsDisplay ();
@@ -3034,7 +3040,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var lines = TextModel.StringToRuneCells (text);
+			var lines = TextModel.StringToRuneCellsSplitted (text);
 
 			if (lines.Count == 0) {
 				return;
