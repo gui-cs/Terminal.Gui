@@ -17,7 +17,8 @@ jobs:
     - name: Install and calculate the new version with GitVersion 
       uses: gittools/actions/gitversion/setup@v0
       with:
-        versionSpec: 5.x
+          versionSpec: '6.x'
+          includePrerelease: true
 
     - name: Determine Version
       uses: gittools/actions/gitversion/execute@v0
