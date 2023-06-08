@@ -71,3 +71,9 @@ jobs:
 
     - name: Publish to NuGet.org
       run: dotnet nuget push Terminal.Gui/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+
+    - name: Unlist from NuGet.org if it's an alpha
+      run: dotnet nuget delete Terminal.Gui ${{ steps.gitversion.outputs.SemVer }} --api-key ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+      if: contains(steps.gitversion.outputs.SemVer, 'alpha')
+
+
