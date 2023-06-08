@@ -3297,7 +3297,7 @@ namespace Terminal.Gui {
 					}
 				}
 			}
-			if (cell.ColorScheme != null && colWithColor > -1 && lineToSet [colWithoutColor].ColorScheme == null) {
+			if (cell.ColorScheme != null && colWithColor > -1 && colWithoutColor < lineToSet.Count && lineToSet [colWithoutColor].ColorScheme == null) {
 				while (lineToSet [colWithoutColor].ColorScheme == null) {
 					lineToSet [colWithoutColor].ColorScheme = cell.ColorScheme;
 					colWithoutColor--;
