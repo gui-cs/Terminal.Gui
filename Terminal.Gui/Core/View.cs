@@ -446,11 +446,10 @@ namespace Terminal.Gui {
 		public virtual Rect Frame {
 			get => frame;
 			set {
-				var rect = GetMaxNeedDisplay (frame, value);
-				frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
+				frame = value;
 				TextFormatter.Size = GetBoundsTextFormatterSize ();
 				SetNeedsLayout ();
-				SetNeedsDisplay (rect);
+				SetNeedsDisplay ();
 			}
 		}
 
@@ -823,21 +822,7 @@ namespace Terminal.Gui {
 			}
 			TextFormatter.Size = GetBoundsTextFormatterSize ();
 			SetNeedsLayout ();
-			SetNeedsDisplay (GetMaxNeedDisplay (oldFrame, frame));
-		}
-
-		Rect GetMaxNeedDisplay (Rect oldFrame, Rect newFrame)
-		{
-			var rect = new Rect () {
-				X = Math.Min (oldFrame.X, newFrame.X),
-				Y = Math.Min (oldFrame.Y, newFrame.Y),
-				Width = Math.Max (oldFrame.Width, newFrame.Width),
-				Height = Math.Max (oldFrame.Height, newFrame.Height)
-			};
-			rect.Width += Math.Max (oldFrame.X - newFrame.X, 0);
-			rect.Height += Math.Max (oldFrame.Y - newFrame.Y, 0);
-
-			return rect;
+			SetNeedsDisplay ();
 		}
 
 		void TextFormatter_HotKeyChanged (Key obj)
