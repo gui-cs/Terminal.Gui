@@ -228,13 +228,9 @@ namespace Terminal.Gui {
 		{
 			base.Dispose (disposing);
 
-			// The selected tab will automatically be disposed but
-			// any tabs not visible will need to be manually disposed
-
+			// Manually dispose all tabs
 			foreach (var tab in Tabs) {
-				if (!Equals (SelectedTab, tab)) {
-					tab.View?.Dispose ();
-				}
+				tab.View?.Dispose ();
 			}
 		}
 
