@@ -22,11 +22,13 @@ namespace Terminal.Gui {
 		/// </summary>
 		TabRowView tabsBar;
 
+		private class TabContentView : View { }
+
 		/// <summary>
 		/// This sub view is the main client area of the current tab.  It hosts the <see cref="Tab.View"/> 
 		/// of the tab, the <see cref="SelectedTab"/>
 		/// </summary>
-		View contentView;
+		TabContentView contentView;
 		private List<Tab> tabs = new List<Tab> ();
 
 		/// <summary>
@@ -75,7 +77,13 @@ namespace Terminal.Gui {
 
 					if (selectedTab.View != null) {
 						// remove old content
-						contentView.Remove (selectedTab.View);
+						if (selectedTab.View.Subviews.Count == 0) {
+							contentView.Remove (selectedTab.View);
+						} else {
+							foreach (var view in selectedTab.View.Subviews) {
+								contentView.Remove (view);
+							}
+						}
 					}
 				}
 
@@ -85,7 +93,13 @@ namespace Terminal.Gui {
 
 					// add new content
 					if (selectedTab.View != null) {
-						contentView.Add (selectedTab.View);
+						if (selectedTab.View.Subviews.Count == 0) {
+							contentView.Add (selectedTab.View);
+						} else {
+							foreach (var view in selectedTab.View.Subviews) {
+								contentView.Add (view);
+							}
+						}
 					}
 				}
 
@@ -94,7 +108,6 @@ namespace Terminal.Gui {
 				if (old != value) {
 					OnSelectedTabChanged (old, value);
 				}
-
 			}
 		}
 
@@ -111,7 +124,7 @@ namespace Terminal.Gui {
 		public TabView () : base ()
 		{
 			CanFocus = true;
-			contentView = new View ();
+			contentView = new TabContentView ();
 			tabsBar = new TabRowView (this);
 
 			ApplyStyleChanges ();
@@ -195,7 +208,7 @@ namespace Terminal.Gui {
 				int startAtY = Math.Max (0, GetTabHeight (true) - 1);
 
 				DrawFrame (new Rect (0, startAtY, bounds.Width,
-			       Math.Max (bounds.Height - spaceAtBottom - startAtY, 0)), 0, true);
+					Math.Max (bounds.Height - spaceAtBottom - startAtY, 0)), 0, true);
 			}
 
 			if (Tabs.Any ()) {
@@ -222,7 +235,6 @@ namespace Terminal.Gui {
 				if (!Equals (SelectedTab, tab)) {
 					tab.View?.Dispose ();
 				}
-
 			}
 		}
 
