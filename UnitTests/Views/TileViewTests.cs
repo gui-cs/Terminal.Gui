@@ -2013,10 +2013,14 @@ namespace Terminal.Gui.ViewsTests {
 			top.Tiles.ElementAt (1).ContentView.Add (new Label ("blah"));
 			top.BeginInit ();
 			top.EndInit ();
+			top.LayoutSubviews ();
 
 			tileView.Tiles.ElementAt (1).ContentView.Add (new Label ("Hello"));
 			tileView.ColorScheme = new ColorScheme ();
 			top.ColorScheme = new ColorScheme ();
+
+			tileView.BeginInit ();
+			tileView.EndInit ();
 			tileView.LayoutSubviews ();
 
 			tileView.Draw ();
@@ -2231,6 +2235,8 @@ namespace Terminal.Gui.ViewsTests {
 
 			newContainer.ColorScheme = new ColorScheme ();
 			container.ColorScheme = new ColorScheme ();
+			container.BeginInit ();
+			container.EndInit ();
 			container.LayoutSubviews ();
 			return container;
 		}
