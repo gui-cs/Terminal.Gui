@@ -80,6 +80,8 @@ namespace Terminal.Gui {
 			_bounce = false;
 			SpinReverse = false;
 			SetStyle (DEFAULT_STYLE);
+			
+			AdvanceAnimation();
 		}
 
 		private void SetStyle (SpinnerStyle style)
