@@ -11,8 +11,8 @@ namespace Terminal.Gui {
 	/// A <see cref="View"/> which displays (by default) a spinning line character.
 	/// </summary>
 	/// <remarks>
-	/// By default animation only occurs when you call <see cref="View.SetNeedsDisplay()"/>.
-	/// Use <see cref="AutoSpin"/> to make the automate calls to <see cref="View.SetNeedsDisplay()"/>.
+	/// By default animation only occurs when you call <see cref="SpinnerView.AdvanceAnimation()"/>.
+	/// Use <see cref="AutoSpin"/> to make the automate calls to <see cref="SpinnerView.AdvanceAnimation()"/>.
 	/// </remarks>
 	public class SpinnerView : View {
 		private const int DEFAULT_DELAY = 130;
@@ -42,7 +42,7 @@ namespace Terminal.Gui {
 		/// in the animation.
 		/// </summary>
 		/// <remarks>This is the maximum speed the spinner will rotate at.  You still need to
-		/// call <see cref="View.SetNeedsDisplay()"/> or <see cref="SpinnerView.AutoSpin"/> to
+		/// call <see cref="SpinnerView.AdvanceAnimation()"/> or <see cref="SpinnerView.AutoSpin"/> to
 		/// advance/start animation.</remarks>
 		public int SpinDelay { get => _delay; set => SetDelay (value); }
 
@@ -145,11 +145,18 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		/// <inheritdoc/>
-		public override void OnDrawContent (Rect contentArea)
+		/// <summary>
+		/// Advances the animation frame and notifies main loop
+		/// that repainting needs to happen. Repeated calls are
+		/// ignored based on <see cref="SpinDelay"/>.
+		/// </summary>
+		/// <remarks>Ensure this method is called on the main UI
+		/// thread e.g. via <see cref="MainLoop.Invoke(Action)"/>
+		/// </remarks>
+		public void AdvanceAnimation()
 		{
 			if (DateTime.Now - _lastRender > TimeSpan.FromMilliseconds (SpinDelay)) {
-				//_currentIdx = (_currentIdx + 1) % Sequence.Length;
+
 				if (Sequence is not null && Sequence.Length > 1) {
 					int d = 1;
 					if ((_bounceReverse && !SpinReverse) || (!_bounceReverse && SpinReverse)) {
@@ -186,7 +193,7 @@ namespace Terminal.Gui {
 				_lastRender = DateTime.Now;
 			}
 
-			base.OnDrawContent (contentArea);
+			SetNeedsDisplay();
 		}
 
 		/// <summary>
@@ -214,7 +221,7 @@ namespace Terminal.Gui {
 
 			_timeout = Application.MainLoop.AddTimeout (
 				TimeSpan.FromMilliseconds (SpinDelay), (m) => {
-					Application.MainLoop.Invoke (this.SetNeedsDisplay);
+					Application.MainLoop.Invoke (this.AdvanceAnimation);
 					return true;
 				});
 		}
