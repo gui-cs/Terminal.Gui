@@ -10,12 +10,7 @@ public class AccordionView : View
 
     class Section
     {
-        /// <summary>
-        /// Typically 1 row in height, this is the view that can
-        /// be clicked to expand.  It is a view not a string to allow
-        /// cool stuff like left aligned text with right aligned buttons
-        /// </summary>
-        public View HeaderView { get; set; }
+        public Button HeaderButton { get; set; }
 
 
         public bool IsExpanded {get;set;}
@@ -27,42 +22,39 @@ public class AccordionView : View
         public View BodyView {get;set;}
     }
 
-    public void AddSection(View header, View body)
+    public void AddSection(string header, View body)
     {
+        Button btnExpand = new Button( "> " + header);
+        btnExpand.NoDecorations = true;
+
         var section = new Section{
-            HeaderView = header,
+            HeaderButton = btnExpand,
             BodyView = body,
             IsExpanded = false
         };
+        btnExpand.Clicked += (s,e)=> ExpandOrCollapseSection(section);
 
         _sections.Add(section);
-
-        header.CanFocus = true;
-
-        header.KeyPress += (s,e)=>
-        {
-            if(e.KeyEvent.Key.HasFlag(Key.CursorRight))
-            {
-                section.IsExpanded = true;
-                this.Setup();
-                e.Handled = true;
-            }
-
-            if(e.KeyEvent.Key.HasFlag(Key.CursorLeft))
-            {
-                section.IsExpanded = false;
-                this.Setup();
-                e.Handled = true;
-            }
-        };
 
         Setup();
     }
 
-    private void Setup ()
+	private void ExpandOrCollapseSection (Section section)
+	{
+		section.IsExpanded = !section.IsExpanded;
+
+        var symbol = section.IsExpanded ? "v ":"> ";
+        section.HeaderButton.Text = symbol + section.HeaderButton.Text.Substring(2);
+        
+        Setup();
+	}
+    
+	private void Setup ()
     {
+        var focused = MostFocused;
 
         View last = null;
+        RemoveAll();
 
         // TODO: Set body heights based on the count
         // of how many are expanded and/or dragged relative
@@ -72,7 +64,7 @@ public class AccordionView : View
 
         foreach(var s in _sections)
         {
-            var head = s.HeaderView;
+            var head = s.HeaderButton;
             head.Y = last == null ? 0 : Pos.Bottom(last);
             Add(head);
             last = head;
@@ -86,6 +78,7 @@ public class AccordionView : View
             }
         }
         this.LayoutSubviews();
+        focused?.SetFocus();
         this.SetNeedsDisplay();
     }
 }

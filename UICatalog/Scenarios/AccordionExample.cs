@@ -25,8 +25,8 @@ public class AccordionExample : Scenario {
             Height = Dim.Fill()
         };
 
-        accordion.AddSection(new Label("> Section 1"),new Label ("Hello!!"));
-        accordion.AddSection(new Label("> Section 2"),new Label ("Hello2"));
+        accordion.AddSection("Section 1",new Label ("Hello!!"));
+        accordion.AddSection("Section 2",new Label ("Hello2"));
         Win.Add(accordion);
     }
 }
