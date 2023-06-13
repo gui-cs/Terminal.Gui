@@ -28,12 +28,12 @@ namespace UICatalog.Scenarios {
 			};
 
 			// First time
-			CreateProcessTable ();
+			CreateProcessTable (tableView);
 
 			// Then every second
 			Application.MainLoop.AddTimeout (TimeSpan.FromSeconds (1),
 				(s) => {
-					CreateProcessTable ();
+					CreateProcessTable (tableView);
 					return true;
 				});
 
@@ -41,7 +41,7 @@ namespace UICatalog.Scenarios {
 
 		}
 
-		private void CreateProcessTable ()
+		public static void CreateProcessTable (TableView tableView)
 		{
 			var ro = tableView.RowOffset;
 			var co = tableView.ColumnOffset;

@@ -25,8 +25,18 @@ public class AccordionExample : Scenario {
             Height = Dim.Fill()
         };
 
+        var tbl = new TableView () {
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (1),
+        };
+
+        ProcessTable.CreateProcessTable(tbl);
+
         accordion.AddSection("Section 1",new Label ("Hello!!"));
         accordion.AddSection("Section 2",new Label ("Hello2"));
+        accordion.AddSection("Section 3",tbl);
         Win.Add(accordion);
     }
 }
