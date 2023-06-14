@@ -133,10 +133,10 @@ namespace UICatalog.Scenarios {
 		{
 			ClearAllEvents ();
 
-			green = ColorScheme.SetAllAttributesBasedOn (new Attribute (Color.Green, Color.Black));
-			blue = ColorScheme.SetAllAttributesBasedOn (new Attribute (Color.Blue, Color.Black));
-			magenta = ColorScheme.SetAllAttributesBasedOn (new Attribute (Color.Magenta, Color.Black));
-			white = ColorScheme.SetAllAttributesBasedOn (new Attribute (Color.White, Color.Black));
+			green = new ColorScheme (new Attribute (Color.Green, Color.Black));
+			blue = new ColorScheme (new Attribute (Color.Blue, Color.Black));
+			magenta = new ColorScheme (new Attribute (Color.Magenta, Color.Black));
+			white = new ColorScheme (new Attribute (Color.White, Color.Black));
 			textView.ColorScheme = white;
 
 			textView.Text = "/*Query to select:\nLots of data*/\nSELECT TOP 100 * \nfrom\n MyDb.dbo.Biochemistry where TestCode = 'blah';";

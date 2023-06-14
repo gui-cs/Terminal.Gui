@@ -352,7 +352,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Creates a new instance, initialized with the values from <paramref name="scheme"/>.
 		/// </summary>
-		/// <param name="scheme">The scheme to initlize the new instance with.</param>
+		/// <param name="scheme">The scheme to initialize the new instance with.</param>
 		public ColorScheme (ColorScheme scheme) : base ()
 		{
 			if (scheme != null) {
@@ -362,6 +362,19 @@ namespace Terminal.Gui {
 				_disabled = scheme.Disabled;
 				_hotFocus = scheme.HotFocus;
 			}
+		}
+
+		/// <summary>
+		/// Creates a new instance, initialized with the values from <paramref name="attribute"/>.
+		/// </summary>
+		/// <param name="attribute">The attribute to initialize the new instance with.</param>
+		public ColorScheme (Attribute attribute)
+		{
+			_normal = attribute;
+			_focus = attribute;
+			_hotNormal = attribute;
+			_disabled = attribute;
+			_hotFocus = attribute;
 		}
 
 		/// <summary>
@@ -510,22 +523,6 @@ namespace Terminal.Gui {
 			if (!_disabled.Initialized) {
 				_disabled = new Attribute (_disabled.Foreground, _disabled.Background);
 			}
-		}
-
-		/// <summary>
-		/// Sets the foreground and background color for text on all <see cref="ColorScheme"/> attributes.
-		/// </summary>
-		/// <param name="attribute">The attribute to apply to all.</param>
-		/// <returns></returns>
-		public static ColorScheme SetAllAttributesBasedOn (Attribute attribute)
-		{
-			return new ColorScheme () {
-				Normal = attribute,
-				Focus = attribute,
-				HotNormal = attribute,
-				HotFocus = attribute,
-				Disabled = attribute
-			};
 		}
 	}
 
