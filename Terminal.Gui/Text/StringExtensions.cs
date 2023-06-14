@@ -81,24 +81,6 @@ public static class StringExtensions {
 	public static List<Rune> ToRuneList (this string str) => str.EnumerateRunes ().ToList ();
 
 	/// <summary>
-	/// Converts the string into a <see cref="List{RuneCell}"/>.
-	/// </summary>
-	/// <remarks>
-	/// This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text and attribute manipulation.
-	/// </remarks>
-	/// <param name="str">The string to convert.</param>
-	/// <param name="colorScheme">The <see cref="ColorScheme"/> to use.</param>
-	/// <returns></returns>
-	public static List<RuneCell> ToRuneCellList (this string str, ColorScheme? colorScheme = null)
-	{
-		var cells = new List<RuneCell> ();
-		foreach (var rune in str.EnumerateRunes ()) {
-			cells.Add (new RuneCell { Rune = rune, ColorScheme = colorScheme });
-		}
-		return cells;
-	}
-
-	/// <summary>
 	/// Unpacks the first UTF-8 encoding in the string and returns the rune and its width in bytes.
 	/// </summary>
 	/// <remarks>
@@ -153,22 +135,6 @@ public static class StringExtensions {
 
 		foreach (var rune in runes) {
 			str += rune.ToString ();
-		}
-
-		return str;
-	}
-
-	/// <summary>
-	/// Converts a <see cref="RuneCell"/> generic collection into a string.
-	/// </summary>
-	/// <param name="cells">The enumerable cell to convert.</param>
-	/// <returns></returns>
-	public static string ToString (IEnumerable<RuneCell> cells)
-	{
-		var str = string.Empty;
-
-		foreach (var cell in cells) {
-			str += cell.Rune.ToString ();
 		}
 
 		return str;

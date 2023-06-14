@@ -233,7 +233,7 @@ namespace Terminal.Gui {
 		{
 			var sb = new StringBuilder ();
 			for (int i = 0; i < _lines.Count; i++) {
-				sb.Append (StringExtensions.ToString (_lines [i]));
+				sb.Append (ToString (_lines [i]));
 				if ((i + 1) < _lines.Count) {
 					sb.AppendLine ();
 				}
@@ -517,7 +517,7 @@ namespace Terminal.Gui {
 						if (!found) {
 							found = true;
 						}
-						_lines [i] = ReplaceText (x, textToReplace!, matchText, col).ToRuneCellList ();
+						_lines [i] = ToRuneCellList (ReplaceText (x, textToReplace!, matchText, col));
 						x = _lines [i];
 						txt = GetText (x);
 						pos = new Point (col, i);
@@ -532,7 +532,7 @@ namespace Terminal.Gui {
 
 			string GetText (List<RuneCell> x)
 			{
-				var txt = StringExtensions.ToString (x);
+				var txt = ToString (x);
 				if (!matchCase) {
 					txt = txt.ToUpper ();
 				}
@@ -544,7 +544,7 @@ namespace Terminal.Gui {
 
 		string ReplaceText (List<RuneCell> source, string textToReplace, string matchText, int col)
 		{
-			var origTxt = StringExtensions.ToString (source);
+			var origTxt = ToString (source);
 			(int _, int len) = TextModel.DisplaySize (source, 0, col, false);
 			(int _, int len2) = TextModel.DisplaySize (source, col, col + matchText.Length, false);
 			(int _, int len3) = TextModel.DisplaySize (source, col + matchText.Length, origTxt.GetRuneCount (), false);
@@ -575,7 +575,7 @@ namespace Terminal.Gui {
 		{
 			for (int i = start.Y; i < linesCount; i++) {
 				var x = _lines [i];
-				var txt = StringExtensions.ToString (x);
+				var txt = ToString (x);
 				if (!matchCase) {
 					txt = txt.ToUpper ();
 				}
@@ -600,7 +600,7 @@ namespace Terminal.Gui {
 		{
 			for (int i = linesCount; i >= 0; i--) {
 				var x = _lines [i];
-				var txt = StringExtensions.ToString (x);
+				var txt = ToString (x);
 				if (!matchCase) {
 					txt = txt.ToUpper ();
 				}
@@ -897,6 +897,40 @@ namespace Terminal.Gui {
 				return null;
 			}
 		}
+
+		/// <summary>
+		/// Converts the string into a <see cref="List{RuneCell}"/>.
+		/// </summary>
+		/// <remarks>
+		/// This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text and attribute manipulation.
+		/// </remarks>
+		/// <param name="str">The string to convert.</param>
+		/// <param name="colorScheme">The <see cref="ColorScheme"/> to use.</param>
+		/// <returns></returns>
+		public static List<RuneCell> ToRuneCellList (string str, ColorScheme? colorScheme = null)
+		{
+			var cells = new List<RuneCell> ();
+			foreach (var rune in str.EnumerateRunes ()) {
+				cells.Add (new RuneCell { Rune = rune, ColorScheme = colorScheme });
+			}
+			return cells;
+		}
+
+		/// <summary>
+		/// Converts a <see cref="RuneCell"/> generic collection into a string.
+		/// </summary>
+		/// <param name="cells">The enumerable cell to convert.</param>
+		/// <returns></returns>
+		public static string ToString (IEnumerable<RuneCell> cells)
+		{
+			var str = string.Empty;
+
+			foreach (var cell in cells) {
+				str += cell.Rune.ToString ();
+			}
+
+			return str;
+		}
 	}
 
 	partial class HistoryText {
@@ -1125,7 +1159,7 @@ namespace Terminal.Gui {
 			for (int i = 0; i < Model.Count; i++) {
 				var line = Model.GetLine (i);
 				var wrappedLines = ToListRune (
-				    TextFormatter.Format (StringExtensions.ToString (line), width, TextAlignment.Left, true, preserveTrailingSpaces, tabWidth));
+				    TextFormatter.Format (TextModel.ToString (line), width, TextAlignment.Left, true, preserveTrailingSpaces, tabWidth));
 				int sumColWidth = 0;
 				for (int j = 0; j < wrappedLines.Count; j++) {
 					var wrapLine = wrappedLines [j];
@@ -1190,7 +1224,7 @@ namespace Terminal.Gui {
 			var runesList = new List<List<RuneCell>> ();
 
 			foreach (var text in textList) {
-				runesList.Add (text.ToRuneCellList ());
+				runesList.Add (TextModel.ToRuneCellList (text));
 			}
 
 			return runesList;
@@ -4491,7 +4525,7 @@ namespace Terminal.Gui {
 				_copyWithoutSelection = false;
 			} else {
 				var currentLine = GetCurrentLine ();
-				SetClipboard (StringExtensions.ToString (currentLine));
+				SetClipboard (TextModel.ToString (currentLine));
 				_copyWithoutSelection = true;
 			}
 			UpdateWrapModel ();
@@ -4529,7 +4563,7 @@ namespace Terminal.Gui {
 			SetWrapModel ();
 			var contents = Clipboard.Contents;
 			if (_copyWithoutSelection && contents.FirstOrDefault (x => x == '\n' || x == '\r') == 0) {
-				var runeList = contents == null ? new List<RuneCell> () : contents.ToRuneCellList ();
+				var runeList = contents == null ? new List<RuneCell> () : TextModel.ToRuneCellList (contents);
 				var currentLine = GetCurrentLine ();
 
 				_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (currentLine) }, CursorPosition);

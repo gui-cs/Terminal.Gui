@@ -32,7 +32,7 @@ namespace Terminal.Gui.TextTests {
 			ac.HostControl = tv;
 			ac.GenerateSuggestions (
 				new AutocompleteContext (
-				tv.Text.ToRuneCellList (), 2));
+				TextModel.ToRuneCellList (tv.Text), 2));
 
 			Assert.Equal (2, ac.Suggestions.Count);
 			Assert.Equal ("const", ac.Suggestions [0].Title);

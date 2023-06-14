@@ -245,7 +245,7 @@ namespace Terminal.Gui {
 			if (obj == null)
 				return;
 
-			Text = StringExtensions.ToString (obj?.Lines [obj.CursorPosition.Y]);
+			Text = TextModel.ToString (obj?.Lines [obj.CursorPosition.Y]);
 			CursorPosition = obj.CursorPosition.X;
 			Adjust ();
 		}
@@ -324,7 +324,7 @@ namespace Terminal.Gui {
 				_text = newText.NewText.EnumerateRunes ().ToList ();
 
 				if (!Secret && !_historyText.IsFromHistory) {
-					_historyText.Add (new List<List<RuneCell>> () { oldText.ToRuneCellList () },
+					_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCellList (oldText) },
 						new Point (_point, 0));
 					_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCells (_text) }, new Point (_point, 0)
 						, HistoryText.LineStatus.Replaced);
@@ -538,7 +538,7 @@ namespace Terminal.Gui {
 
 		private void GenerateSuggestions ()
 		{
-			var currentLine = Text.ToRuneCellList ();
+			var currentLine = TextModel.ToRuneCellList (Text);
 			var cursorPosition = Math.Min (this.CursorPosition, currentLine.Count);
 			Autocomplete.Context = new AutocompleteContext (currentLine, cursorPosition,
 				Autocomplete.Context != null ? Autocomplete.Context.Canceled : false);
