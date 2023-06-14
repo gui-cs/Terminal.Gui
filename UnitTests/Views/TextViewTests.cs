@@ -7108,5 +7108,40 @@ ror       ";
 				Assert.True (_textView.WordWrap);
 			}
 		}
+
+		[Fact, TextViewTestsAutoInitShutdown]
+		public void RuneCellEventArgs_WordWrap_True ()
+		{
+			var text = new List<List<RuneCell>> () { TextModel.ToRuneCells ("This is the first line.".ToRunes ()), TextModel.ToRuneCells ("This is the second line.".ToRunes ()) };
+			_textView.DrawNormalColor += _textView_DrawColor;
+			_textView.DrawReadOnlyColor += _textView_DrawColor;
+			_textView.DrawSelectionColor += _textView_DrawColor;
+			_textView.DrawUsedColor += _textView_DrawColor;
+			void _textView_DrawColor (object sender, RuneCellEventArgs e)
+			{
+				Assert.Equal (e.Line [e.Col], text [e.UnwrappedPosition.Row] [e.UnwrappedPosition.Col]);
+			}
+			_textView.Text = $"{TextModel.ToString (text [0])}\n{TextModel.ToString (text [1])}\n";
+			Assert.False (_textView.WordWrap);
+			Application.Top.Add (_textView);
+			Application.Begin (Application.Top);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+This is the first line. 
+This is the second line.", output);
+
+			_textView.Width = 10;
+			_textView.Height = 25;
+			_textView.WordWrap = true;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+This is
+the    
+first  
+line.  
+This is
+the    
+second 
+line.  ", output);
+		}
 	}
 }

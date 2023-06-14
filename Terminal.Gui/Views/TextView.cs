@@ -2429,7 +2429,8 @@ namespace Terminal.Gui {
 		/// <param name="idxRow">The row index.</param>
 		protected virtual void OnDrawNormalColor (List<RuneCell> line, int idxCol, int idxRow)
 		{
-			var ev = new RuneCellEventArgs (line, idxCol, idxRow);
+			var unwrappedPos = GetUnwrappedPosition (idxRow, idxCol);
+			var ev = new RuneCellEventArgs (line, idxCol, unwrappedPos);
 			DrawNormalColor?.Invoke (this, ev);
 
 			if (line [idxCol].ColorScheme != null) {
@@ -2450,7 +2451,8 @@ namespace Terminal.Gui {
 		/// /// <param name="idxRow">The row index.</param>
 		protected virtual void OnDrawSelectionColor (List<RuneCell> line, int idxCol, int idxRow)
 		{
-			var ev = new RuneCellEventArgs (line, idxCol, idxRow);
+			var unwrappedPos = GetUnwrappedPosition (idxRow, idxCol);
+			var ev = new RuneCellEventArgs (line, idxCol, unwrappedPos);
 			DrawSelectionColor?.Invoke (this, ev);
 
 			if (line [idxCol].ColorScheme != null) {
@@ -2471,7 +2473,8 @@ namespace Terminal.Gui {
 		/// /// <param name="idxRow">The row index.</param>
 		protected virtual void OnDrawReadOnlyColor (List<RuneCell> line, int idxCol, int idxRow)
 		{
-			var ev = new RuneCellEventArgs (line, idxCol, idxRow);
+			var unwrappedPos = GetUnwrappedPosition (idxRow, idxCol);
+			var ev = new RuneCellEventArgs (line, idxCol, unwrappedPos);
 			DrawReadOnlyColor?.Invoke (this, ev);
 
 			var colorScheme = line [idxCol].ColorScheme != null ? line [idxCol].ColorScheme : ColorScheme;
@@ -2494,7 +2497,8 @@ namespace Terminal.Gui {
 		/// /// <param name="idxRow">The row index.</param>
 		protected virtual void OnDrawUsedColor (List<RuneCell> line, int idxCol, int idxRow)
 		{
-			var ev = new RuneCellEventArgs (line, idxCol, idxRow);
+			var unwrappedPos = GetUnwrappedPosition (idxRow, idxCol);
+			var ev = new RuneCellEventArgs (line, idxCol, unwrappedPos);
 			DrawUsedColor?.Invoke (this, ev);
 
 			if (line [idxCol].ColorScheme != null) {
@@ -2977,6 +2981,14 @@ namespace Terminal.Gui {
 			PositionCursor ();
 
 			_isDrawing = false;
+		}
+
+		private (int Row, int Col) GetUnwrappedPosition (int line, int col)
+		{
+			if (WordWrap) {
+				return new (_wrapManager!.GetModelLineFromWrappedLines (line), _wrapManager.GetModelColFromWrappedLines (line, col));
+			}
+			return new (line, col);
 		}
 
 		private void ProcessAutocomplete ()
