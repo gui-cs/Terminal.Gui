@@ -73,9 +73,9 @@ namespace Terminal.Gui {
 				f => new Suggestion (term.Length, f, f)).ToList ();
 		}
 
-		public bool IsWordChar (Rune cell)
+		public bool IsWordChar (Rune rune)
 		{
-			if (cell.Value == '\n') {
+			if (rune.Value == '\n') {
 				return false;
 			}
 
