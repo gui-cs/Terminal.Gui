@@ -902,9 +902,6 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Converts the string into a <see cref="List{RuneCell}"/>.
 		/// </summary>
-		/// <remarks>
-		/// This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text and attribute manipulation.
-		/// </remarks>
 		/// <param name="str">The string to convert.</param>
 		/// <param name="colorScheme">The <see cref="ColorScheme"/> to use.</param>
 		/// <returns></returns>
