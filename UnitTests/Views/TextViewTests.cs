@@ -7112,6 +7112,7 @@ ror       ";
 		[Fact, TextViewTestsAutoInitShutdown]
 		public void RuneCellEventArgs_WordWrap_True ()
 		{
+			var eventCount = 0;
 			var text = new List<List<RuneCell>> () { TextModel.ToRuneCells ("This is the first line.".ToRunes ()), TextModel.ToRuneCells ("This is the second line.".ToRunes ()) };
 			_textView.DrawNormalColor += _textView_DrawColor;
 			_textView.DrawReadOnlyColor += _textView_DrawColor;
@@ -7120,6 +7121,7 @@ ror       ";
 			void _textView_DrawColor (object sender, RuneCellEventArgs e)
 			{
 				Assert.Equal (e.Line [e.Col], text [e.UnwrappedPosition.Row] [e.UnwrappedPosition.Col]);
+				eventCount++;
 			}
 			_textView.Text = $"{TextModel.ToString (text [0])}\n{TextModel.ToString (text [1])}\n";
 			Assert.False (_textView.WordWrap);
@@ -7142,6 +7144,8 @@ This is
 the    
 second 
 line.  ", output);
+
+			Assert.Equal (eventCount, (text [0].Count + text [1].Count) * 2);
 		}
 	}
 }
