@@ -82,9 +82,10 @@ namespace Terminal.Gui {
 		{
 			FilePath = file ?? throw new ArgumentNullException (nameof (file));
 
-			var stream = File.OpenRead (file);
-			LoadStream (stream);
-			return true;
+			using (var stream = File.OpenRead (file)) {
+				LoadStream (stream);
+				return true;
+			}
 		}
 
 		public bool CloseFile ()
