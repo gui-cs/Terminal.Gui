@@ -2376,7 +2376,7 @@ namespace Terminal.Gui {
 				for (int idx = _leftColumn; idx < line.Count; idx++) {
 					if (idx >= _currentColumn)
 						break;
-					var cols = line [idx].GetColumns ();
+					var cols = line [idx].Rune.GetColumns ();
 					if (line [idx].Rune.Value == '\t') {
 						cols += TabWidth + 1;
 					}
@@ -2964,7 +2964,7 @@ namespace Terminal.Gui {
 					if (!TextModel.SetCol (ref col, contentArea.Right, cols)) {
 						break;
 					}
-					if (idxCol + 1 < lineRuneCount && col + line [idxCol + 1].GetColumns () > right) {
+					if (idxCol + 1 < lineRuneCount && col + line [idxCol + 1].Rune.GetColumns () > right) {
 						break;
 					}
 				}
