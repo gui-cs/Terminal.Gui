@@ -763,8 +763,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void Redo ()
 		{
-			if (ReadOnly)
+			if (ReadOnly) {
 				return;
+			}
 
 			_historyText.Redo ();
 
@@ -789,8 +790,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void Undo ()
 		{
-			if (ReadOnly)
+			if (ReadOnly) {
 				return;
+			}
 
 			_historyText.Undo ();
 		}
