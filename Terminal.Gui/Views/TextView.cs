@@ -1579,7 +1579,8 @@ namespace Terminal.Gui {
 		public event EventHandler<RuneCellEventArgs>? DrawReadOnlyColor;
 
 		/// <summary>
-		/// Invoked when the used color is drawn.
+		/// Invoked when the used color is drawn. The Used Color is used to indicate
+		/// if the <see cref="Key.InsertChar"/> was pressed and enabled.
 		/// </summary>
 		public event EventHandler<RuneCellEventArgs>? DrawUsedColor;
 
@@ -3288,6 +3289,9 @@ namespace Terminal.Gui {
 			ProcessAutocomplete ();
 		}
 
+		// If InheritsPreviousColorScheme is enabled this method will check if the rune cell on
+		// the row and col location and around has a not null color scheme. If it's null will set it with
+		// the very most previous valid color scheme.
 		private void ProcessInheritsPreviousColorScheme (int row, int col)
 		{
 			if (!InheritsPreviousColorScheme || (Lines == 1 && GetLine (Lines).Count == 0)) {
