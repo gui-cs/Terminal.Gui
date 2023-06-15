@@ -1185,8 +1185,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void ClearAllSelection ()
 		{
-			if (_selectedStart == -1 && _length == 0 && string.IsNullOrEmpty (_selectedText))
+			if (_selectedStart == -1 && _length == 0 && string.IsNullOrEmpty (_selectedText)) {
 				return;
+			}
 
 			_selectedStart = -1;
 			_length = 0;
