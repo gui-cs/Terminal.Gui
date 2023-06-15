@@ -2226,7 +2226,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// If <see langword="true"/> and the current <see cref="RuneCell.ColorScheme"/> is null 
 		/// will inherit from the previous, otherwise if <see langword="false"/> (default) do nothing.
-		/// If the text is load with <see cref="LoadRuneCells(List{RuneCell})"/> this 
+		/// If the text is load with <see cref="Load(List{RuneCell})"/> this 
 		/// property is automatically sets to <see langword="true"/>.
 		/// </summary>
 		public bool InheritsPreviousColorScheme { get; set; }
@@ -2261,7 +2261,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns><c>true</c>, if file was loaded, <c>false</c> otherwise.</returns>
 		/// <param name="path">Path to the file to load.</param>
-		public bool LoadFile (string path)
+		public bool Load (string path)
 		{
 			SetWrapModel ();
 			bool res;
@@ -2286,7 +2286,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns><c>true</c>, if stream was loaded, <c>false</c> otherwise.</returns>
 		/// <param name="stream">Stream to load the contents from.</param>
-		public void LoadStream (Stream stream)
+		public void Load (Stream stream)
 		{
 			SetWrapModel ();
 			_model.LoadStream (stream);
@@ -2300,7 +2300,7 @@ namespace Terminal.Gui {
 		/// Loads the contents of the <see cref="RuneCell"/> list into the <see cref="TextView"/>.
 		/// </summary>
 		/// <param name="cells">Rune cells list to load the contents from.</param>
-		public void LoadRuneCells (List<RuneCell> cells)
+		public void Load (List<RuneCell> cells)
 		{
 			SetWrapModel ();
 			_model.LoadRuneCells (cells, ColorScheme);
@@ -2315,7 +2315,7 @@ namespace Terminal.Gui {
 		/// Loads the contents of the list of <see cref="RuneCell"/> list into the <see cref="TextView"/>.
 		/// </summary>
 		/// <param name="cellsList">List of rune cells list to load the contents from.</param>
-		public void LoadListRuneCells (List<List<RuneCell>> cellsList)
+		public void Load (List<List<RuneCell>> cellsList)
 		{
 			SetWrapModel ();
 			InheritsPreviousColorScheme = true;

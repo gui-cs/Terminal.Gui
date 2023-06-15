@@ -166,9 +166,9 @@ namespace UICatalog.Scenarios {
 			if (File.Exists (path)) {
 				//Reading the file  
 				var cells = ReadFromJsonFile<List<List<RuneCell>>> (path);
-				textView.LoadListRuneCells (cells);
+				textView.Load (cells);
 			} else {
-				textView.LoadRuneCells (runeCells);
+				textView.Load (runeCells);
 			}
 			textView.Autocomplete.SuggestionGenerator = new SingleWordSuggestionGenerator ();
 		}

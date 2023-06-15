@@ -1917,7 +1917,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var result = false;
 			var tv = new TextView ();
-			Assert.Throws<ArgumentNullException> (() => result = tv.LoadFile (null));
+			Assert.Throws<ArgumentNullException> (() => result = tv.Load ((string)null));
 			Assert.False (result);
 		}
 
@@ -1926,7 +1926,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var result = false;
 			var tv = new TextView ();
-			Assert.Throws<ArgumentException> (() => result = tv.LoadFile (""));
+			Assert.Throws<ArgumentException> (() => result = tv.Load (""));
 			Assert.False (result);
 		}
 
@@ -1935,7 +1935,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var result = false;
 			var tv = new TextView ();
-			Assert.Throws<System.IO.FileNotFoundException> (() => result = tv.LoadFile ("blabla"));
+			Assert.Throws<System.IO.FileNotFoundException> (() => result = tv.Load ("blabla"));
 			Assert.False (result);
 		}
 
@@ -1943,14 +1943,14 @@ namespace Terminal.Gui.ViewsTests {
 		public void LoadStream_Throws_If_Stream_Is_Null ()
 		{
 			var tv = new TextView ();
-			Assert.Throws<ArgumentNullException> (() => tv.LoadStream (null));
+			Assert.Throws<ArgumentNullException> (() => tv.Load ((System.IO.Stream)null));
 		}
 
 		[Fact]
 		public void LoadStream_Stream_Is_Empty ()
 		{
 			var tv = new TextView ();
-			tv.LoadStream (new System.IO.MemoryStream ());
+			tv.Load (new System.IO.MemoryStream ());
 			Assert.Equal ("", tv.Text);
 		}
 
@@ -1959,7 +1959,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var text = "This is the first line.\r\nThis is the second line.\r\n";
 			var tv = new TextView ();
-			tv.LoadStream (new System.IO.MemoryStream (System.Text.Encoding.ASCII.GetBytes (text)));
+			tv.Load (new System.IO.MemoryStream (System.Text.Encoding.ASCII.GetBytes (text)));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
 		}
 
@@ -1968,7 +1968,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var text = "This is the first line.\nThis is the second line.\n";
 			var tv = new TextView ();
-			tv.LoadStream (new System.IO.MemoryStream (System.Text.Encoding.ASCII.GetBytes (text)));
+			tv.Load (new System.IO.MemoryStream (System.Text.Encoding.ASCII.GetBytes (text)));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
 		}
 
@@ -1984,7 +1984,7 @@ namespace Terminal.Gui.ViewsTests {
 				stream.Position = 0;
 
 				var tv = new TextView ();
-				tv.LoadStream (stream);
+				tv.Load (stream);
 
 				Assert.Equal (7, text.Length);
 				Assert.Equal (text.Length, tv.Text.Length);
@@ -2005,7 +2005,7 @@ namespace Terminal.Gui.ViewsTests {
 				stream.Position = 0;
 
 				var tv = new TextView ();
-				tv.LoadStream (stream);
+				tv.Load (stream);
 
 				Assert.Equal (8, text.Length);
 				Assert.Equal (text.Length, tv.Text.Length);
@@ -6882,7 +6882,7 @@ This is the second line.
 			};
 
 			var text = "This is the first line.\r\nThis is the second line.\r\n";
-			tv.LoadStream (new System.IO.MemoryStream (System.Text.Encoding.ASCII.GetBytes (text)));
+			tv.Load (new System.IO.MemoryStream (System.Text.Encoding.ASCII.GetBytes (text)));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
 
 			Assert.Equal (1, eventcount);
@@ -6906,7 +6906,7 @@ This is the second line.
 			var fileName = "textview.txt";
 			System.IO.File.WriteAllText (fileName, "This is the first line.\r\nThis is the second line.\r\n");
 
-			tv.LoadFile (fileName);
+			tv.Load (fileName);
 			Assert.Equal (1, eventcount);
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
 		}
@@ -6971,7 +6971,7 @@ This is the second line.
 				runeCells.Add (new RuneCell { Rune = (Rune)'\n', ColorScheme = color.Value });
 			}
 
-			_textView.LoadRuneCells (runeCells);
+			_textView.Load (runeCells);
 			Application.Top.Add (_textView);
 			var rs = Application.Begin (Application.Top);
 			Assert.True (_textView.InheritsPreviousColorScheme);
@@ -7080,7 +7080,7 @@ ror       ";
 				new RuneCell{Rune = new Rune ('t')}
 			};
 			Application.Top.Add (_textView);
-			_textView.LoadRuneCells (cells);
+			_textView.Load (cells);
 
 			for (int i = 0; i < _textView.Lines; i++) {
 				var line = _textView.GetLine (i);
@@ -7103,7 +7103,7 @@ ror       ";
 				writer.Flush ();
 				stream.Position = 0;
 
-				_textView.LoadStream (stream);
+				_textView.Load (stream);
 				Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", _textView.Text);
 				Assert.True (_textView.WordWrap);
 			}
