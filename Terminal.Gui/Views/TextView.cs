@@ -26,7 +26,7 @@ namespace Terminal.Gui {
 		public Rune Rune { get; set; }
 
 		/// <summary>
-		/// The foreground color to draw the glyph with.
+		/// The <see cref="Terminal.Gui.ColorScheme"/> color sets to draw the glyph with.
 		/// </summary>
 		[JsonConverter (typeof (ColorSchemeJsonConverter))]
 		public ColorScheme? ColorScheme { get; set; }
