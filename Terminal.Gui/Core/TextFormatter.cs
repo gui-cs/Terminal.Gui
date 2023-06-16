@@ -1289,8 +1289,9 @@ namespace Terminal.Gui {
 					} else if (!fillRemaining && idx > runes.Length - 1) {
 						break;
 					}
-					if ((!isVertical && idx >= maxBounds.Left + maxBounds.Width - bounds.X) || (isVertical && idx >= maxBounds.Top + maxBounds.Height - bounds.Y))
+					if ((!isVertical && idx >= maxBounds.Left + maxBounds.Width - bounds.X) || (isVertical && idx >= maxBounds.Top + maxBounds.Height - bounds.Y)) {
 						break;
+					}
 
 					var rune = (Rune)' ';
 					if (isVertical) {
