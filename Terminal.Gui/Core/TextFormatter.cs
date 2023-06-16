@@ -1185,15 +1185,29 @@ namespace Terminal.Gui {
 					Math.Max (containerBounds.Y, bounds.Y),
 					Math.Max (Math.Min (containerBounds.Width, containerBounds.Right - bounds.Left), 0),
 					Math.Max (Math.Min (containerBounds.Height, containerBounds.Bottom - bounds.Top), 0));
+			int boundsStart = 0;
+			if (isVertical) {
+				if (bounds.X < 0) {
+					boundsStart = bounds.X;
+				}
+			} else {
+				if (bounds.Y < 0) {
+					boundsStart = bounds.Y;
+				}
 			}
 
 			for (int line = 0; line < linesFormated.Count; line++) {
-				if ((isVertical && line > bounds.Width) || (!isVertical && line > bounds.Height))
+				if (boundsStart < 0) {
+					boundsStart++;
 					continue;
+				}
+				if ((isVertical && line > bounds.Width) || (!isVertical && line > bounds.Height)) {
+					continue;
+				}
 				if ((isVertical && line >= maxBounds.Left + maxBounds.Width)
-					|| (!isVertical && line >= maxBounds.Top + maxBounds.Height))
-
+					|| (!isVertical && line >= maxBounds.Top + maxBounds.Height)) {
 					break;
+				}
 
 				var runes = lines [line].ToRunes ();
 
