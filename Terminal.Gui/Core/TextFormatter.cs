@@ -1176,15 +1176,13 @@ namespace Terminal.Gui {
 			}
 
 			var isVertical = IsVerticalDirection (textDirection);
-			var savedClip = Application.Driver?.Clip;
-			var maxBounds = bounds;
-			if (Application.Driver != null) {
-				Application.Driver.Clip = maxBounds = containerBounds == default
-					? bounds
-					: new Rect (Math.Max (containerBounds.X, bounds.X),
+			var maxBounds = containerBounds == default
+				? bounds
+				: new Rect (Math.Max (containerBounds.X, bounds.X),
 					Math.Max (containerBounds.Y, bounds.Y),
-					Math.Max (Math.Min (containerBounds.Width, containerBounds.Right - bounds.Left), 0),
-					Math.Max (Math.Min (containerBounds.Height, containerBounds.Bottom - bounds.Top), 0));
+					Math.Max (Math.Max (containerBounds.Width, containerBounds.Right - bounds.Left), 0),
+					Math.Max (Math.Max (containerBounds.Height, containerBounds.Bottom - bounds.Top), 0));
+
 			int boundsStart = 0;
 			if (isVertical) {
 				if (bounds.X < 0) {
@@ -1195,7 +1193,6 @@ namespace Terminal.Gui {
 					boundsStart = bounds.Y;
 				}
 			}
-
 			for (int line = 0; line < linesFormated.Count; line++) {
 				if (boundsStart < 0) {
 					boundsStart++;
@@ -1292,7 +1289,7 @@ namespace Terminal.Gui {
 					} else if (!fillRemaining && idx > runes.Length - 1) {
 						break;
 					}
-					if ((!isVertical && idx > maxBounds.Left + maxBounds.Width - bounds.X) || (isVertical && idx > maxBounds.Top + maxBounds.Height - bounds.Y))
+					if ((!isVertical && idx >= maxBounds.Left + maxBounds.Width - bounds.X) || (isVertical && idx >= maxBounds.Top + maxBounds.Height - bounds.Y))
 						break;
 
 					var rune = (Rune)' ';
@@ -1330,8 +1327,6 @@ namespace Terminal.Gui {
 					}
 				}
 			}
-			if (Application.Driver != null)
-				Application.Driver.Clip = (Rect)savedClip;
 		}
 	}
 }
