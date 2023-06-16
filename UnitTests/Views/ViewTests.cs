@@ -4519,5 +4519,26 @@ At 0,0
 222";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void Move_And_ViewToScreen_Should_Not_Use_Clipped_Parameter_As_True_By_Default_But_Only_For_Cursor ()
+		{
+			var container = new View () { Width = 10, Height = 2 };
+			var top = new View () { Width = 10, Height = 1 };
+			var label = new Label ("Label");
+			top.Add (label);
+			var bottom = new View () { Y = 1, Width = 10, Height = 1 };
+			container.Add (top, bottom);
+			Application.Top.Add (container);
+			Application.Begin (Application.Top);
+
+			TestHelpers.AssertDriverContentsAre (@"
+Label", output);
+
+			((FakeDriver)Application.Driver).SetBufferSize (10, 1);
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsAre (@"
+Label", output);
+		}
 	}
 }
