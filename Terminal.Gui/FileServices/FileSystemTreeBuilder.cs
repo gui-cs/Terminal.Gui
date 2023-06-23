@@ -61,15 +61,15 @@ namespace Terminal.Gui {
 		}
 		public int Compare (IFileSystemInfo x, IFileSystemInfo y)
 		{
-			if (x is IDirectoryInfo && y is not IDirectory) {
+			if (x is IDirectoryInfo && y is not IDirectoryInfo) {
 				return -1;
 			}
 
-			if (x is not IDirectoryInfo && y is IDirectory) {
+			if (x is not IDirectoryInfo && y is IDirectoryInfo) {
 				return 1;
 			}
 
-			return 0;
+			return x.Name.CompareTo (y.Name);
 		}
 	}
 }
