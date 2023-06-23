@@ -375,24 +375,15 @@ namespace Terminal.Gui {
 
 		private string AspectGetter (object o)
 		{
-			string icon;
-			string name;
-
 			var fsi = (IFileSystemInfo)o;
 
 			if(o is IDirectoryInfo dir && _treeRoots.ContainsKey(dir)) {
 
 				// Directory has a special name e.g. 'Pictures'
 				return _treeRoots [dir];
-
 			}
 
-			icon = Style.IconGetter.Invoke (
-					new FileDialogIconGetterArgs (this, fsi, FileDialogIconGetterContext.Tree));
-			name = fsi.Name;
-
-			return icon + name;
-			
+			return Style.IconProvider.GetIcon(fsi) + fsi.Name;			
 		}
 
 		private void OnTableViewMouseClick (object sender, MouseEventEventArgs e)

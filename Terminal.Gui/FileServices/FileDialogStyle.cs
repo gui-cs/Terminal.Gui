@@ -38,6 +38,8 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool UseColors { get; set; } = DefaultUseColors;
 
+		public FileSystemIconProvider IconProvider { get; set;} = new FileSystemIconProvider();
+
 		/// <summary>
 		/// Gets or sets the culture to use (e.g. for number formatting).
 		/// Defaults to <see cref="CultureInfo.CurrentUICulture"/>.
@@ -165,12 +167,6 @@ namespace Terminal.Gui {
 		public bool UseUnicodeCharacters { get; set; } = DefaultUseUnicodeCharacters;
 
 		/// <summary>
-		/// User defined delegate for picking which character(s)/unicode
-		/// symbol(s) to use as an 'icon' for files/folders. 
-		/// </summary>
-		public Func<FileDialogIconGetterArgs, string> IconGetter { get; set; }
-
-		/// <summary>
 		/// Gets or sets the format to use for date/times in the Modified column.
 		/// Defaults to <see cref="DateTimeFormatInfo.SortableDateTimePattern"/> 
 		/// of the <see cref="CultureInfo.CurrentCulture"/>
@@ -183,13 +179,7 @@ namespace Terminal.Gui {
 		public FileDialogStyle (IFileSystem fileSystem)
 		{
 			_fileSystem = fileSystem;
-			IconGetter = DefaultIconGetter;
 			TreeRootGetter = DefaultTreeRootGetter;
-
-			if(NerdFonts.Enable)
-			{
-				UseNerdForIcons();
-			}
 
 			DateFormat = CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern;
 
@@ -221,28 +211,6 @@ namespace Terminal.Gui {
 			};
 		}
 
-		/// <summary>
-		/// Changes <see cref="IconGetter"/> to serve diverse icon set using
-		/// the Nerd fonts. This option requires users to have specific font(s)
-		/// installed.
-		/// </summary>
-		public void UseNerdForIcons ()
-		{
-			var nerd = new NerdFonts();
-			IconGetter = nerd.GetNerdIcon;
-		}
-
-		private string DefaultIconGetter (FileDialogIconGetterArgs args)
-		{
-			var file = args.File;
-
-			if (file is IDirectoryInfo) {
-				return UseUnicodeCharacters ? ConfigurationManager.Glyphs.Folder + " " : Path.DirectorySeparatorChar.ToString();
-			}
-
-			return UseUnicodeCharacters ?  ConfigurationManager.Glyphs.File + " " : "";
-
-		}
 
 		private Dictionary<IDirectoryInfo,string> DefaultTreeRootGetter ()
 		{

@@ -238,7 +238,8 @@ namespace UICatalog.Scenarios {
 			treeViewFiles.AddObjects (rootDirs);
 
 			// Determines how to represent objects as strings on the screen
-			treeViewFiles.AspectGetter = FileSystemAspectGetter;
+			var p = new FileSystemIconProvider();
+			treeViewFiles.AspectGetter = (f)=> p.GetIcon(f) + f.Name;
 		}
 
 		private void ShowLines ()
@@ -329,18 +330,6 @@ namespace UICatalog.Scenarios {
 			treeViewFiles.Style.HighlightModelTextOnly = !treeViewFiles.Style.HighlightModelTextOnly;
 			_miHighlightModelTextOnly.Checked = treeViewFiles.Style.HighlightModelTextOnly;
 			treeViewFiles.SetNeedsDisplay ();
-		}
-
-		private string FileSystemAspectGetter (IFileSystemInfo model)
-		{
-			if (model is IDirectoryInfo d) {
-				return d.Name;
-			}
-			if (model is IFileInfo f) {
-				return f.Name;
-			}
-
-			return model.ToString ();
 		}
 
 		private void Quit ()
