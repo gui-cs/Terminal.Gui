@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Text;
 using Terminal.Gui;
@@ -13,7 +14,7 @@ namespace UICatalog.Scenarios {
 		/// <summary>
 		/// A tree view where nodes are files and folders
 		/// </summary>
-		TreeView<FileSystemInfo> treeViewFiles;
+		TreeView<IFileSystemInfo> treeViewFiles;
 
 		MenuItem miShowLines;
 		private MenuItem _miPlusMinus;
@@ -69,7 +70,7 @@ namespace UICatalog.Scenarios {
 			});
 			Application.Top.Add (menu);
 
-			treeViewFiles = new TreeView<FileSystemInfo> () {
+			treeViewFiles = new TreeView<IFileSystemInfo> () {
 				X = 0,
 				Y = 0,
 				Width = Dim.Percent (50),
@@ -100,7 +101,7 @@ namespace UICatalog.Scenarios {
 
 		}
 
-		private void TreeViewFiles_SelectionChanged (object sender, SelectionChangedEventArgs<FileSystemInfo> e)
+		private void TreeViewFiles_SelectionChanged (object sender, SelectionChangedEventArgs<IFileSystemInfo> e)
 		{
 			ShowPropertiesOf (e.NewValue);
 		}
@@ -146,7 +147,7 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
-		private void ShowContextMenu (Point screenPoint, FileSystemInfo forObject)
+		private void ShowContextMenu (Point screenPoint, IFileSystemInfo forObject)
 		{
 			var menu = new ContextMenu ();
 			menu.Position = screenPoint;
@@ -157,7 +158,7 @@ namespace UICatalog.Scenarios {
 		}
 
 		class DetailsFrame : FrameView {
-			private FileSystemInfo fileInfo;
+			private IFileSystemInfo fileInfo;
 
 			public DetailsFrame ()
 			{
@@ -166,11 +167,11 @@ namespace UICatalog.Scenarios {
 				CanFocus = true;
 			}
 
-			public FileSystemInfo FileInfo {
+			public IFileSystemInfo FileInfo {
 				get => fileInfo; set {
 					fileInfo = value;
 					System.Text.StringBuilder sb = null;
-					if (fileInfo is FileInfo f) {
+					if (fileInfo is IFileInfo f) {
 						Title = $"File: {f.Name}";
 						sb = new System.Text.StringBuilder ();
 						sb.AppendLine ($"Path:\n {f.FullName}\n");
@@ -179,7 +180,7 @@ namespace UICatalog.Scenarios {
 						sb.AppendLine ($"Created:\n {f.CreationTime}");
 					}
 
-					if (fileInfo is DirectoryInfo dir) {
+					if (fileInfo is IDirectoryInfo dir) {
 						Title = $"Directory: {dir.Name}";
 						sb = new System.Text.StringBuilder ();
 						sb.AppendLine ($"Path:\n {dir?.FullName}\n");
@@ -191,7 +192,7 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
-		private void ShowPropertiesOf (FileSystemInfo fileSystemInfo)
+		private void ShowPropertiesOf (IFileSystemInfo fileSystemInfo)
 		{
 			_detailsFrame.FileInfo = fileSystemInfo;
 		}
@@ -230,20 +231,14 @@ namespace UICatalog.Scenarios {
 
 		private void SetupFileTree ()
 		{
-
-			// setup delegates
-			treeViewFiles.TreeBuilder = new DelegateTreeBuilder<FileSystemInfo> (
-
-				// Determines how to compute children of any given branch
-				GetChildren,
-				// As a shortcut to enumerating half the file system, tell tree that all directories are expandable (even if they turn out to be empty later on)				
-				(o) => o is DirectoryInfo
-			);
+			// setup how to build tree
+			var fs =  new FileSystem();
+			var rootDirs = DriveInfo.GetDrives ().Select (d=>fs.DirectoryInfo.New(d.RootDirectory.FullName));
+			treeViewFiles.TreeBuilder = new FileSystemTreeBuilder ();
+			treeViewFiles.AddObjects (rootDirs);
 
 			// Determines how to represent objects as strings on the screen
 			treeViewFiles.AspectGetter = FileSystemAspectGetter;
-
-			treeViewFiles.AddObjects (DriveInfo.GetDrives ().Select (d => d.RootDirectory));
 		}
 
 		private void ShowLines ()
@@ -319,8 +314,8 @@ namespace UICatalog.Scenarios {
 
 			if (_miCustomColors.Checked == true) {
 				treeViewFiles.ColorGetter = (m) => {
-					if (m is DirectoryInfo && m.Attributes.HasFlag (FileAttributes.Hidden)) return hidden;
-					if (m is FileInfo && m.Attributes.HasFlag (FileAttributes.Hidden)) return hidden;
+					if (m is IDirectoryInfo && m.Attributes.HasFlag (FileAttributes.Hidden)) return hidden;
+					if (m is IFileInfo && m.Attributes.HasFlag (FileAttributes.Hidden)) return hidden;
 					return null;
 				};
 			} else {
@@ -336,30 +331,12 @@ namespace UICatalog.Scenarios {
 			treeViewFiles.SetNeedsDisplay ();
 		}
 
-		private IEnumerable<FileSystemInfo> GetChildren (FileSystemInfo model)
+		private string FileSystemAspectGetter (IFileSystemInfo model)
 		{
-			// If it is a directory it's children are all contained files and dirs
-			if (model is DirectoryInfo d) {
-				try {
-					return d.GetFileSystemInfos ()
-						//show directories first
-						.OrderBy (a => a is DirectoryInfo ? 0 : 1)
-						.ThenBy (b => b.Name);
-				} catch (SystemException) {
-
-					// Access violation or other error getting the file list for directory
-					return Enumerable.Empty<FileSystemInfo> ();
-				}
-			}
-
-			return Enumerable.Empty<FileSystemInfo> (); ;
-		}
-		private string FileSystemAspectGetter (FileSystemInfo model)
-		{
-			if (model is DirectoryInfo d) {
+			if (model is IDirectoryInfo d) {
 				return d.Name;
 			}
-			if (model is FileInfo f) {
+			if (model is IFileInfo f) {
 				return f.Name;
 			}
 

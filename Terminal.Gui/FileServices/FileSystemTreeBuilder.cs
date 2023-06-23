@@ -6,7 +6,10 @@ using System.Linq;
 
 namespace Terminal.Gui {
 
-	class FileSystemTreeBuilder : ITreeBuilder<IFileSystemInfo>, IComparer<IFileSystemInfo> {
+	/// <summary>
+	/// TreeView builder for creating file system based trees.
+	/// </summary>
+	public class FileSystemTreeBuilder : ITreeBuilder<IFileSystemInfo>, IComparer<IFileSystemInfo> {
 
 
 		public FileSystemTreeBuilder () : this (new FileSystem ())
