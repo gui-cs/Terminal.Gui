@@ -168,8 +168,7 @@ namespace UICatalog.Scenarios {
 
 			if (cbDrivesOnlyInTree.Checked ?? false) {
 				fd.Style.TreeRootGetter = () => {
-					return System.Environment.GetLogicalDrives ()
-					.Select (d => new FileDialogRootTreeNode (d, dirInfoFactory.New (d)));
+					return System.Environment.GetLogicalDrives ().ToDictionary(dirInfoFactory.New,k=>k);
 				};
 			}
 

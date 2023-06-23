@@ -156,7 +156,7 @@ namespace Terminal.Gui {
 		/// <see cref="Environment.SpecialFolder"/>.
 		/// </summary>
 		/// <remarks>Must be configured before showing the dialog.</remarks>
-		public FileDialogTreeRootGetter TreeRootGetter { get; set; }
+		public Func<Dictionary<IDirectoryInfo, string>> TreeRootGetter { get; set; }
 
 		/// <summary>
 		/// Gets or sets whether to use advanced unicode characters which might not be installed
@@ -244,14 +244,17 @@ namespace Terminal.Gui {
 
 		}
 
-		private IEnumerable<FileDialogRootTreeNode> DefaultTreeRootGetter ()
+		private Dictionary<IDirectoryInfo,string> DefaultTreeRootGetter ()
 		{
-			var roots = new List<FileDialogRootTreeNode> ();
+			var roots = new Dictionary<IDirectoryInfo, string> ();
 			try {
 				foreach (var d in Environment.GetLogicalDrives ()) {
 
-					
-					roots.Add (new FileDialogRootTreeNode (d, _fileSystem.DirectoryInfo.New(d)));
+					var dir = _fileSystem.DirectoryInfo.New (d);
+
+					if (!roots.ContainsKey(dir)) {
+						roots.Add (dir, d);
+					}
 				}
 
 			} catch (Exception) {
@@ -262,15 +265,15 @@ namespace Terminal.Gui {
 				foreach (var special in Enum.GetValues (typeof (Environment.SpecialFolder)).Cast<SpecialFolder> ()) {
 					try {
 						var path = Environment.GetFolderPath (special);
-						if (
-							!string.IsNullOrWhiteSpace (path)
-							&& Directory.Exists (path)
-							&& !roots.Any (r => string.Equals (r.Path.FullName, path))) {
 
-							roots.Add (new FileDialogRootTreeNode (
-							special.ToString (),
-							_fileSystem.DirectoryInfo.New(Environment.GetFolderPath (special))
-							));
+						if(string.IsNullOrWhiteSpace (path)) {
+							continue;
+						}
+
+						var dir = _fileSystem.DirectoryInfo.New (path);
+
+						if (!roots.ContainsKey (dir) && dir.Exists) {
+							roots.Add (dir, special.ToString());
 						}
 					} catch (Exception) {
 						// Special file exists but contents are unreadable (permissions?)
