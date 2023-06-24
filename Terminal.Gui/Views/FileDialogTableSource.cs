@@ -24,8 +24,13 @@ namespace Terminal.Gui {
 		{
 			switch (col) {
 			case 0:
+				// do not use icon for ".."
+				if(stats?.IsParent ?? false) {
+					return stats.Name;
+				}
+
 				var icon = dlg.Style.IconProvider.GetIcon(stats.FileSystemInfo);
-				return icon + (stats?.Name ?? string.Empty);
+				return (icon + (stats?.Name ?? string.Empty)).Trim();
 			case 1:
 				return stats?.HumanReadableLength ?? string.Empty;
 			case 2:
