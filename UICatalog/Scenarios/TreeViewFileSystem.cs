@@ -272,8 +272,15 @@ namespace UICatalog.Scenarios {
 			treeViewFiles.AddObjects (rootDirs);
 
 			// Determines how to represent objects as strings on the screen
-			treeViewFiles.AspectGetter = (f)=> (_iconProvider.GetIcon(f) + f.Name).Trim();
+			treeViewFiles.AspectGetter = AspectGetter;
+			
 			_iconProvider.IsOpenGetter = treeViewFiles.IsExpanded;
+		}
+
+		private string AspectGetter (IFileSystemInfo f)
+		{
+				var space = _iconProvider.UseNerdIcons ? " ":string.Empty;
+				return (_iconProvider.GetIcon(f) + space + f.Name).Trim();
 		}
 
 		private void ShowLines ()

@@ -30,7 +30,8 @@ namespace Terminal.Gui {
 				}
 
 				var icon = dlg.Style.IconProvider.GetIcon(stats.FileSystemInfo);
-				return (icon + (stats?.Name ?? string.Empty)).Trim();
+				var space = dlg.Style.IconProvider.UseNerdIcons ? " ":string.Empty;
+				return (icon + space + (stats?.Name ?? string.Empty)).Trim();
 			case 1:
 				return stats?.HumanReadableLength ?? string.Empty;
 			case 2:
