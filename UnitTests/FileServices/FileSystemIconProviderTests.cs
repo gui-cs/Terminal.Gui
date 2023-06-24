@@ -46,7 +46,9 @@ namespace Terminal.Gui.FileServicesTests {
 			
 			Assert.Equal(IsWindows() ? new Rune('\\') : new Rune('/'), p.GetIcon(fs.DirectoryInfo.New(@"c:\")));
 
-			Assert.Equal (new Rune (' '), p.GetIcon (fs.FileInfo.New (@"c:\myfile.txt")));
+			Assert.Equal (new Rune (' '), p.GetIcon (
+				fs.FileInfo.New (GetFileSystemRoot() + @"myfile.txt"))
+				);
 		}
 		private bool IsWindows ()
 		{
@@ -55,17 +57,24 @@ namespace Terminal.Gui.FileServicesTests {
 
 		private IFileSystem GetMockFileSystem()
 		{
-			var fileSystem = new MockFileSystem (new Dictionary<string, MockFileData> (), @"c:\");
-			
-			fileSystem.AddFile (@"c:\myfile.txt", new MockFileData ("Testing is meh."));
-			fileSystem.AddFile (@"c:\demo\jQuery.js", new MockFileData ("some js"));
-			fileSystem.AddFile (@"c:\demo\mybinary.exe", new MockFileData ("some js"));
-			fileSystem.AddFile (@"c:\demo\image.gif", new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 }));
+			string root = GetFileSystemRoot();
 
-			var m = (MockDirectoryInfo)fileSystem.DirectoryInfo.New (@"c:\demo\subfolder");
+			var fileSystem = new MockFileSystem (new Dictionary<string, MockFileData> (), root);
+			
+			fileSystem.AddFile (root+@"myfile.txt", new MockFileData ("Testing is meh."));
+			fileSystem.AddFile (root+@"demo/jQuery.js", new MockFileData ("some js"));
+			fileSystem.AddFile (root+@"demo/mybinary.exe", new MockFileData ("some js"));
+			fileSystem.AddFile (root+@"demo/image.gif", new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 }));
+
+			var m = (MockDirectoryInfo)fileSystem.DirectoryInfo.New (root + @"demo/subfolder");
 			m.Create ();
 
 			return fileSystem;
+		}
+
+		private string GetFileSystemRoot ()
+		{
+			return IsWindows () ? @"c:\" : "/";
 		}
 	}
 }
