@@ -38,6 +38,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool UseColors { get; set; } = DefaultUseColors;
 
+		/// <summary>
+		/// Gets or sets the class responsible for determining which symbol
+		/// to use to represent files and directories.
+		/// </summary>
 		public FileSystemIconProvider IconProvider { get; set;} = new FileSystemIconProvider();
 
 		/// <summary>

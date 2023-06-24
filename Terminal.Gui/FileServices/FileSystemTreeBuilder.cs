@@ -12,19 +12,12 @@ namespace Terminal.Gui {
 	public class FileSystemTreeBuilder : ITreeBuilder<IFileSystemInfo>, IComparer<IFileSystemInfo> {
 
 
-		public FileSystemTreeBuilder () : this (new FileSystem ())
+		public FileSystemTreeBuilder ()
 		{
-
-		}
-		public FileSystemTreeBuilder (IFileSystem fileSystem)
-		{
-			FileSystem = fileSystem;
 			Sorter = this;
 		}
 
 		public bool SupportsCanExpand => true;
-
-		public IFileSystem FileSystem { get; }
 
 		/// <summary>
 		/// Gets or sets a flag indicating whether to show files as leaf elements
@@ -32,15 +25,18 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool IncludeFiles { get; } = true;
 
-
+		/// <summary>
+		/// Gets or sets the order of directory children.  Defaults to <see langword="this"/>.
+		/// </summary>
 		public IComparer<IFileSystemInfo> Sorter { get; set; }
 
-
+		/// <inheritdoc/>
 		public bool CanExpand (IFileSystemInfo toExpand)
 		{
 			return this.TryGetChildren (toExpand).Any ();
 		}
 
+		/// <inheritdoc/>
 		public IEnumerable<IFileSystemInfo> GetChildren (IFileSystemInfo forObject)
 		{
 			return this.TryGetChildren (forObject).OrderBy(k=>k,Sorter);
@@ -62,6 +58,8 @@ namespace Terminal.Gui {
 				return Enumerable.Empty<IFileSystemInfo> ();
 			}
 		}
+
+		/// <inheritdoc/>
 		public int Compare (IFileSystemInfo x, IFileSystemInfo y)
 		{
 			if (x is IDirectoryInfo && y is not IDirectoryInfo) {

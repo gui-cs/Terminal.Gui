@@ -261,7 +261,7 @@ namespace Terminal.Gui {
 				Height = Dim.Fill (),
 			};
 
-			var fileDialogTreeBuilder = new FileSystemTreeBuilder (fileSystem);
+			var fileDialogTreeBuilder = new FileSystemTreeBuilder ();
 			this.treeView.TreeBuilder = fileDialogTreeBuilder;
 			this.treeView.AspectGetter = this.AspectGetter;
 			this.Style.TreeStyle = treeView.Style;
