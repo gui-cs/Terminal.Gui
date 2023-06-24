@@ -22,7 +22,11 @@ namespace UICatalog.Scenarios {
 		private MenuItem _miNoSymbols;
 		private MenuItem _miColoredSymbols;
 		private MenuItem _miInvertSymbols;
-		private MenuItem _miUnicodeSymbols;
+
+		private MenuItem _miBasicIcons;
+		private MenuItem _miUnicodeIcons;
+		private MenuItem _miNerdIcons;
+
 		private MenuItem _miFullPaths;
 		private MenuItem _miLeaveLastRow;
 		private MenuItem _miHighlightModelTextOnly;
@@ -31,6 +35,7 @@ namespace UICatalog.Scenarios {
 		private MenuItem _miMultiSelect;
 
 		private DetailsFrame _detailsFrame;
+		private FileSystemIconProvider _iconProvider = new ();
 
 		public override void Setup ()
 		{
@@ -55,10 +60,13 @@ namespace UICatalog.Scenarios {
 					_miPlusMinus = new MenuItem ("_Plus Minus Symbols", "+ -", () => SetExpandableSymbols((Rune)'+',(Rune)'-')){Checked = true, CheckType = MenuItemCheckStyle.Radio},
 					_miArrowSymbols = new MenuItem ("_Arrow Symbols", "> v", () => SetExpandableSymbols((Rune)'>',(Rune)'v')){Checked = false, CheckType = MenuItemCheckStyle.Radio},
 					_miNoSymbols = new MenuItem ("_No Symbols", "", () => SetExpandableSymbols(default,null)){Checked = false, CheckType = MenuItemCheckStyle.Radio},
-					_miUnicodeSymbols = new MenuItem ("_Unicode", "ஹ ﷽", () => SetExpandableSymbols((Rune)'ஹ',(Rune)'﷽')){Checked = false, CheckType = MenuItemCheckStyle.Radio},
 					null /*separator*/,
 					_miColoredSymbols = new MenuItem ("_Colored Symbols", "", () => ShowColoredExpandableSymbols()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
 					_miInvertSymbols = new MenuItem ("_Invert Symbols", "", () => InvertExpandableSymbols()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
+					null /*separator*/,
+					_miBasicIcons = new MenuItem ("_Basic Icons",null, SetNoIcons){Checked = false, CheckType = MenuItemCheckStyle.Radio},
+					_miUnicodeIcons = new MenuItem ("_Unicode Icons", null, SetUnicodeIcons){Checked = false, CheckType = MenuItemCheckStyle.Radio},
+					_miNerdIcons = new MenuItem ("_Nerd Icons", null, SetNerdIcons){Checked = false, CheckType = MenuItemCheckStyle.Radio},
 					null /*separator*/,
 					_miLeaveLastRow = new MenuItem ("_Leave Last Row", "", () => SetLeaveLastRow()){Checked = true, CheckType = MenuItemCheckStyle.Checked},
 					_miHighlightModelTextOnly = new MenuItem ("_Highlight Model Text Only", "", () => SetCheckHighlightModelTextOnly()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
@@ -98,7 +106,33 @@ namespace UICatalog.Scenarios {
 			SetupScrollBar ();
 
 			treeViewFiles.SetFocus ();
+			
+			UpdateIconCheckedness ();
+		}
 
+		private void SetNoIcons ()
+		{
+			_iconProvider.UseUnicodeCharacters = false;
+			_iconProvider.UseNerdIcons = false;
+			UpdateIconCheckedness ();
+		}
+
+		private void SetUnicodeIcons ()
+		{
+			_iconProvider.UseUnicodeCharacters = true;
+			UpdateIconCheckedness ();
+		}
+		private void SetNerdIcons ()
+		{
+			_iconProvider.UseNerdIcons = true;
+			UpdateIconCheckedness ();
+		}
+		private void UpdateIconCheckedness ()
+		{
+			_miBasicIcons.Checked = !_iconProvider.UseNerdIcons && !_iconProvider.UseUnicodeCharacters;
+			_miUnicodeIcons.Checked = _iconProvider.UseUnicodeCharacters;
+			_miNerdIcons.Checked = _iconProvider.UseNerdIcons;
+			treeViewFiles.SetNeedsDisplay ();
 		}
 
 		private void TreeViewFiles_SelectionChanged (object sender, SelectionChangedEventArgs<IFileSystemInfo> e)
@@ -238,9 +272,8 @@ namespace UICatalog.Scenarios {
 			treeViewFiles.AddObjects (rootDirs);
 
 			// Determines how to represent objects as strings on the screen
-			var p = new FileSystemIconProvider();
-			treeViewFiles.AspectGetter = (f)=> (p.GetIcon(f) + f.Name).Trim();
-			p.IsOpenGetter = treeViewFiles.IsExpanded;
+			treeViewFiles.AspectGetter = (f)=> (_iconProvider.GetIcon(f) + f.Name).Trim();
+			_iconProvider.IsOpenGetter = treeViewFiles.IsExpanded;
 		}
 
 		private void ShowLines ()
@@ -256,7 +289,6 @@ namespace UICatalog.Scenarios {
 			_miPlusMinus.Checked = expand.Value == '+';
 			_miArrowSymbols.Checked = expand.Value == '>';
 			_miNoSymbols.Checked = expand.Value == default;
-			_miUnicodeSymbols.Checked = expand.Value == 'ஹ';
 
 			treeViewFiles.Style.ExpandableSymbol = expand;
 			treeViewFiles.Style.CollapseableSymbol = collapse;
