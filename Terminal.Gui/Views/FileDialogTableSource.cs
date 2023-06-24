@@ -29,9 +29,8 @@ namespace Terminal.Gui {
 					return stats.Name;
 				}
 
-				var icon = dlg.Style.IconProvider.GetIcon(stats.FileSystemInfo);
-				var space = dlg.Style.IconProvider.UseNerdIcons ? " ":string.Empty;
-				return (icon + space + (stats?.Name ?? string.Empty)).Trim();
+				var icon = dlg.Style.IconProvider.GetIconWithOptionalSpace(stats.FileSystemInfo);
+				return (icon + (stats?.Name ?? string.Empty)).Trim();
 			case 1:
 				return stats?.HumanReadableLength ?? string.Empty;
 			case 2:

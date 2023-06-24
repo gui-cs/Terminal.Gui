@@ -383,9 +383,7 @@ namespace Terminal.Gui {
 				return _treeRoots [dir];
 			}
 
-			var space = Style.IconProvider.UseNerdIcons ? " ":string.Empty;
-
-			return (Style.IconProvider.GetIcon(fsi) + space + fsi.Name).Trim();
+			return (Style.IconProvider.GetIconWithOptionalSpace(fsi) + fsi.Name).Trim();
 		}
 
 		private void OnTableViewMouseClick (object sender, MouseEventEventArgs e)

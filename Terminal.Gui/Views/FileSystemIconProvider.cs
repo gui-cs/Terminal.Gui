@@ -72,5 +72,15 @@ namespace Terminal.Gui {
 
 			return UseUnicodeCharacters ? ConfigurationManager.Glyphs.File : new Rune (' ');
 		}
+		
+		/// <summary>
+		/// Returns <see cref="GetIcon(IFileSystemInfo)"/> with an extra
+		/// space on the end if icon is likely to overlap adjacent cells.
+		/// </summary>
+		public string GetIconWithOptionalSpace(IFileSystemInfo fileSystemInfo)
+		{
+			var space = UseNerdIcons ? " " : "";
+			return GetIcon(fileSystemInfo) + space;
+		}
 	}
 }

@@ -85,7 +85,7 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (),
 			};
 
-			_detailsFrame = new DetailsFrame () {
+			_detailsFrame = new DetailsFrame (_iconProvider) {
 				X = Pos.Right (treeViewFiles),
 				Y = 0,
 				Width = Dim.Fill (),
@@ -193,20 +193,23 @@ namespace UICatalog.Scenarios {
 
 		class DetailsFrame : FrameView {
 			private IFileSystemInfo fileInfo;
+			private FileSystemIconProvider _iconProvider;
 
-			public DetailsFrame ()
+			public DetailsFrame (FileSystemIconProvider  iconProvider)
 			{
 				Title = "Details";
 				Visible = true;
 				CanFocus = true;
+				_iconProvider = iconProvider;
 			}
 
 			public IFileSystemInfo FileInfo {
 				get => fileInfo; set {
 					fileInfo = value;
 					System.Text.StringBuilder sb = null;
+
 					if (fileInfo is IFileInfo f) {
-						Title = $"File: {f.Name}";
+						Title = $"{_iconProvider.GetIconWithOptionalSpace(f)}{f.Name}".Trim();
 						sb = new System.Text.StringBuilder ();
 						sb.AppendLine ($"Path:\n {f.FullName}\n");
 						sb.AppendLine ($"Size:\n {f.Length:N0} bytes\n");
@@ -215,7 +218,7 @@ namespace UICatalog.Scenarios {
 					}
 
 					if (fileInfo is IDirectoryInfo dir) {
-						Title = $"Directory: {dir.Name}";
+						Title = $"{_iconProvider.GetIconWithOptionalSpace(dir)}{dir.Name}".Trim();
 						sb = new System.Text.StringBuilder ();
 						sb.AppendLine ($"Path:\n {dir?.FullName}\n");
 						sb.AppendLine ($"Modified:\n {dir.LastWriteTime}\n");
@@ -279,8 +282,7 @@ namespace UICatalog.Scenarios {
 
 		private string AspectGetter (IFileSystemInfo f)
 		{
-				var space = _iconProvider.UseNerdIcons ? " ":string.Empty;
-				return (_iconProvider.GetIcon(f) + space + f.Name).Trim();
+				return (_iconProvider.GetIconWithOptionalSpace(f) + f.Name).Trim();
 		}
 
 		private void ShowLines ()
