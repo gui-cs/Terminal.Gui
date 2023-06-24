@@ -652,6 +652,7 @@ namespace Terminal.Gui {
 			tbPath.Autocomplete.ColorScheme.Normal = Attribute.Make (Color.Black, tbPath.ColorScheme.Normal.Background);
 
 			_treeRoots = Style.TreeRootGetter ();
+			Style.IconProvider.IsOpenGetter = treeView.IsExpanded;
 
 			treeView.AddObjects (_treeRoots.Keys);
 

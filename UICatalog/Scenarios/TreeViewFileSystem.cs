@@ -240,6 +240,7 @@ namespace UICatalog.Scenarios {
 			// Determines how to represent objects as strings on the screen
 			var p = new FileSystemIconProvider();
 			treeViewFiles.AspectGetter = (f)=> p.GetIcon(f) + f.Name;
+			p.IsOpenGetter = treeViewFiles.IsExpanded;
 		}
 
 		private void ShowLines ()
