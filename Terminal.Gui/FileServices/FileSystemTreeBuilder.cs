@@ -12,11 +12,15 @@ namespace Terminal.Gui {
 	public class FileSystemTreeBuilder : ITreeBuilder<IFileSystemInfo>, IComparer<IFileSystemInfo> {
 
 
+		/// <summary>
+		/// Creates a new instance of the <see cref="FileSystemTreeBuilder"/> class.
+		/// </summary>
 		public FileSystemTreeBuilder ()
 		{
 			Sorter = this;
 		}
 
+		/// <inheritdoc/>
 		public bool SupportsCanExpand => true;
 
 		/// <summary>

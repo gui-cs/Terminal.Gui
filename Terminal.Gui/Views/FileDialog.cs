@@ -383,7 +383,7 @@ namespace Terminal.Gui {
 				return _treeRoots [dir];
 			}
 
-			return Style.IconProvider.GetIcon(fsi) + fsi.Name;			
+			return (Style.IconProvider.GetIcon(fsi) + fsi.Name).Trim();
 		}
 
 		private void OnTableViewMouseClick (object sender, MouseEventEventArgs e)
