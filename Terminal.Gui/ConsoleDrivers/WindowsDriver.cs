@@ -17,12 +17,21 @@ internal class WindowsConsole {
 	public const int STD_INPUT_HANDLE = -10;
 	public const int STD_ERROR_HANDLE = -12;
 
+	readonly static char [] SafeCursor = new [] { '\x1b', '7', '\x1b', '[', '0', ';', '0', 'H' };
+	readonly static char [] RestoreCursor = new [] { '\x1b', '8' };
+	readonly static char [] SendTrueColorFg = new [] { '\x1b', '[', '3', '8', ';', '2', ';' };
+	readonly static char [] SendTrueColorBg = new [] { ';', '4', '8', ';', '2', ';' };
+	readonly static char [] SendColorFg = new [] { '\x1b', '[', '3', '8', ';', '5', ';' };
+	readonly static char [] SendColorBg = new [] { ';', '4', '8', ';', '5', ';' };
+
 	IntPtr _inputHandle, _outputHandle;
 	IntPtr _screenBuffer;
 	readonly uint _originalConsoleMode;
 	CursorVisibility? _initialCursorVisibility = null;
 	CursorVisibility? _currentCursorVisibility = null;
 	CursorVisibility? _pendingCursorVisibility = null;
+	readonly StringBuilder _stringBuilder = new StringBuilder (256 * 1024);
+
 
 	public WindowsConsole ()
 	{
@@ -38,13 +47,64 @@ internal class WindowsConsole {
 
 	CharInfo [] _originalStdOutChars;
 
-	public bool WriteToConsole (Size size, CharInfo [] charInfoBuffer, Coord coords, SmallRect window)
+	public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord coords, SmallRect window, bool useTrueColor)
 	{
 		if (_screenBuffer == IntPtr.Zero) {
 			ReadFromConsoleOutput (size, coords, ref window);
 		}
 
-		return WriteConsoleOutput (_screenBuffer, charInfoBuffer, coords, new Coord () { X = window.Left, Y = window.Top }, ref window);
+		if (!useTrueColor) {
+			int i = 0;
+			CharInfo [] ci = new CharInfo [charInfoBuffer.Length];
+			foreach (ExtendedCharInfo info in charInfoBuffer) {
+				ci [i++] = new CharInfo () {
+					Char = new CharUnion () { UnicodeChar = info.Char },
+					Attributes = (ushort)info.Attribute.Value
+				};
+			}
+			return WriteConsoleOutput (_screenBuffer, ci, coords, new Coord () { X = window.Left, Y = window.Top }, ref window);
+		}
+
+
+		return WriteConsoleTrueColorOutput (charInfoBuffer);
+	}
+
+	private bool WriteConsoleTrueColorOutput (ExtendedCharInfo [] charInfoBuffer)
+	{
+		_stringBuilder.Clear ();
+
+		_stringBuilder.Append (SafeCursor);
+
+		Attribute? prev = null;
+		foreach (var info in charInfoBuffer) {
+			var attr = info.Attribute;
+
+			if (attr != prev) {
+				prev = attr;
+				
+				_stringBuilder.Append (SendTrueColorFg);
+				_stringBuilder.Append (attr.TrueColorForeground.Red);
+				_stringBuilder.Append (';');
+				_stringBuilder.Append (attr.TrueColorForeground.Green);
+				_stringBuilder.Append (';');
+				_stringBuilder.Append (attr.TrueColorForeground.Blue);
+				_stringBuilder.Append (SendTrueColorBg);
+				_stringBuilder.Append (attr.TrueColorBackground.Red);
+				_stringBuilder.Append (';');
+				_stringBuilder.Append (attr.TrueColorBackground.Green);
+				_stringBuilder.Append (';');
+				_stringBuilder.Append (attr.TrueColorBackground.Blue);
+				_stringBuilder.Append ('m');
+			}
+
+			_stringBuilder.Append (info.Char != '\x1b' ? info.Char : ' ');
+		}
+
+		_stringBuilder.Append (RestoreCursor);
+
+		string s = _stringBuilder.ToString ();
+		
+		return WriteConsole (_screenBuffer, s, (uint)(s.Length), out uint _, null);
 	}
 
 	public void ReadFromConsoleOutput (Size size, Coord coords, ref SmallRect window)
@@ -461,6 +521,17 @@ internal class WindowsConsole {
 		[FieldOffset (2)] public ushort Attributes;
 	}
 
+	public struct ExtendedCharInfo { 
+		public char Char { get; set; }
+		public Attribute Attribute { get; set; }
+
+		public ExtendedCharInfo(char character,  Attribute attribute)
+		{
+			Char = character;
+			Attribute = attribute;
+		}
+	}
+
 	[StructLayout (LayoutKind.Sequential)]
 	public struct SmallRect {
 		public short Left;
@@ -550,6 +621,15 @@ internal class WindowsConsole {
 		Coord dwBufferCoord,
 		ref SmallRect lpWriteRegion
 	);
+
+	[DllImport ("kernel32.dll", EntryPoint = "WriteConsole", SetLastError = true, CharSet = CharSet.Unicode)]
+	static extern bool WriteConsole (
+			IntPtr hConsoleOutput,
+			String lpbufer,
+			UInt32 NumberOfCharsToWriten,
+			out UInt32 lpNumberOfCharsWritten,
+			object lpReserved
+		);
 
 	[DllImport ("kernel32.dll")]
 	static extern bool SetConsoleCursorPosition (IntPtr hConsoleOutput, Coord dwCursorPosition);
@@ -689,7 +769,7 @@ internal class WindowsConsole {
 }
 
 internal class WindowsDriver : ConsoleDriver {
-	WindowsConsole.CharInfo [] _outputBuffer;
+	WindowsConsole.ExtendedCharInfo [] _outputBuffer;
 	WindowsConsole.SmallRect _damageRegion;
 	Action<KeyEvent> _keyHandler;
 	Action<KeyEvent> _keyDownHandler;
@@ -697,6 +777,8 @@ internal class WindowsDriver : ConsoleDriver {
 	Action<MouseEvent> _mouseHandler;
 
 	public WindowsConsole WinConsole { get; private set; }
+
+	public override bool SupportsTrueColorOutput => Environment.OSVersion.Version.Build >= 14931;
 
 	public WindowsDriver ()
 	{
@@ -1371,11 +1453,15 @@ internal class WindowsDriver : ConsoleDriver {
 			}
 			Contents [Row, Col, 0] = rune.Value;
 			Contents [Row, Col, 1] = CurrentAttribute.Value;
+			_outputBuffer [GetOutputBufferPosition()] = new WindowsConsole.ExtendedCharInfo ((char)rune.Value, CurrentAttribute);
+			WindowsConsole.SmallRect.Update (ref _damageRegion, (short)Col, (short)Row);
 
 			if (Col > 0) {
 				var left = new Rune (Contents [Row, Col - 1, 0]);
 				if (left.GetColumns () > 1) {
+					int prevPosition = Row * Cols + (Col - 1);
 					Contents [Row, Col - 1, 0] = Rune.ReplacementChar.Value;
+					_outputBuffer [prevPosition].Char = (char)Rune.ReplacementChar.Value;
 				}
 			}
 
@@ -1384,6 +1470,7 @@ internal class WindowsDriver : ConsoleDriver {
 				Contents [Row, Col, 0] = Rune.ReplacementChar.Value;
 				Contents [Row, Col, 1] = CurrentAttribute.Value;
 				Contents [Row, Col, 2] = 1;
+				_outputBuffer [GetOutputBufferPosition ()] = new WindowsConsole.ExtendedCharInfo ((char)Rune.ReplacementChar.Value, CurrentAttribute);
 				Col++;
 			}
 
@@ -1526,7 +1613,7 @@ internal class WindowsDriver : ConsoleDriver {
 			return;
 		}
 
-		_outputBuffer = new WindowsConsole.CharInfo [Rows * Cols];
+		_outputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
 		Clip = new Rect (0, 0, Cols, Rows);
 		_damageRegion = new WindowsConsole.SmallRect () {
 			Top = 0,
@@ -1548,10 +1635,10 @@ internal class WindowsDriver : ConsoleDriver {
 		for (int row = 0; row < Rows; row++) {
 			for (int col = 0; col < Cols; col++) {
 				int position = row * Cols + col;
-				_outputBuffer [position].Attributes = (ushort)new Attribute (Color.White, Color.Black).Value; ;
-				_outputBuffer [position].Char.UnicodeChar = ' ';
-				Contents [row, col, 0] = _outputBuffer [position].Char.UnicodeChar;
-				Contents [row, col, 1] = _outputBuffer [position].Attributes;
+				_outputBuffer [position].Attribute = Colors.TopLevel.Normal;
+				_outputBuffer [position].Char = ' ';
+				Contents [row, col, 0] = _outputBuffer [position].Char;
+				Contents [row, col, 1] = _outputBuffer [position].Attribute.Value;
 				Contents [row, col, 2] = 0;
 				WindowsConsole.SmallRect.Update (ref _damageRegion, (short)col, (short)row);
 			}
@@ -1576,28 +1663,7 @@ internal class WindowsDriver : ConsoleDriver {
 			Y = (short)Clip.Height
 		};
 
-		// BUGBUG: Temp hack to simplify - copy output buffer here instead of AddRune
-		WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
-		for (var row = 0; row < Rows; row++) {
-			for (var col = 0; col < Cols; col++) {
-				var rune = new Rune (Contents [row, col, 0]);
-				var position = row * Cols + col;
-				_outputBuffer [position].Char.UnicodeChar = (char)rune.Value;
-				_outputBuffer [position].Attributes = (ushort)Contents [row, col, 1];
-				WindowsConsole.SmallRect.Update (ref _damageRegion, (short)col, (short)row);
-				var width = rune.GetColumns ();
-				while (width > 1 && col < Cols - 1) {
-					col++;
-					position = row * Cols + col;
-					_outputBuffer [position].Char.UnicodeChar = (char)0x00;
-					_outputBuffer [position].Attributes = (ushort)Contents [row, col, 1];
-					WindowsConsole.SmallRect.Update (ref _damageRegion, (short)col, (short)row);
-					width--;
-				}
-			}
-		}
-
-		WinConsole.WriteToConsole (new Size (Cols, Rows), _outputBuffer, bufferCoords, _damageRegion);
+		WinConsole.WriteToConsole (new Size (Cols, Rows), _outputBuffer, bufferCoords, _damageRegion, UseTrueColor);
 		WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
 	}
 
