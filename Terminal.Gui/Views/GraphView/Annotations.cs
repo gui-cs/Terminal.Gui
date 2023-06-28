@@ -224,7 +224,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Color for the line that connects points
 		/// </summary>
-		public Attribute LineColor { get; set; }
+		public Attribute? LineColor { get; set; }
 
 		/// <summary>
 		/// The symbol that gets drawn along the line, defaults to '.'
