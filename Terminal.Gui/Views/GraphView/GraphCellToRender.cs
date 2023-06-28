@@ -16,7 +16,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Optional color to render the <see cref="Rune"/> with
 		/// </summary>
-		public Attribute? Color { get; set; }
+		public Attribute Color { get; set; }
 
 		/// <summary>
 		/// Creates instance and sets <see cref="Rune"/> with default graph coloring
@@ -32,13 +32,6 @@ namespace Terminal.Gui {
 		/// <param name="rune"></param>
 		/// <param name="color"></param>
 		public GraphCellToRender (Rune rune, Attribute color) : this (rune)
-		{
-			Color = color;
-		}
-		/// <summary>
-		/// Creates instance and sets <see cref="Rune"/> and <see cref="Color"/> (or default if null)
-		/// </summary>
-		public GraphCellToRender (Rune rune, Attribute? color) : this (rune)
 		{
 			Color = color;
 		}

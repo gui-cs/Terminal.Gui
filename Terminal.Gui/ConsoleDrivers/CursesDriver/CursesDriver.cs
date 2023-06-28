@@ -675,6 +675,16 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		public static bool CanColorTermTrueColor ()
+		{
+			if (Environment.GetEnvironmentVariable ("COLORTERM") is string value) {
+				value = value.ToLower ();
+				return value.Contains ("truecolor") || value.Contains ("24bit");
+			}
+
+			return false;
+		}
+
 		static int MapColor (Color color)
 		{
 			switch (color) {
