@@ -211,7 +211,7 @@ namespace Terminal.Gui {
 		///   and trying to get the colors if defined.
 		/// </summary>
 		/// <param name="value">Value.</param>
-		public Attribute (int value)
+		public Attribute (int value) : this()
 		{
 			Color foreground = default;
 			Color background = default;
@@ -232,7 +232,7 @@ namespace Terminal.Gui {
 		/// <param name="value">Value.</param>
 		/// <param name="foreground">Foreground</param>
 		/// <param name="background">Background</param>
-		public Attribute (int value, Color foreground, Color background)
+		public Attribute (int value, Color foreground, Color background) : this()
 		{
 			Value = value;
 			Foreground = foreground;
@@ -245,7 +245,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="foreground">Foreground</param>
 		/// <param name="background">Background</param>
-		public Attribute (Color foreground = new Color (), Color background = new Color ())
+		public Attribute (Color foreground = new Color (), Color background = new Color ()) : this()
 		{
 			var make = Make (foreground, background);
 			Initialized = make.Initialized;
