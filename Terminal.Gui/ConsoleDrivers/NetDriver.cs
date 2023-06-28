@@ -796,13 +796,13 @@ namespace Terminal.Gui {
 			Console.TreatControlCAsInput = true;
 
 			if (EnableConsoleScrolling) {
-				largestBufferHeight = Console.BufferHeight;
+				largestWindowHeight = Console.BufferHeight;
 			} else {
-				largestBufferHeight = Console.WindowHeight;
+				largestWindowHeight = Console.WindowHeight;
 			}
 
 			cols = Console.WindowWidth;
-			rows = largestBufferHeight;
+			rows = largestWindowHeight;
 
 			CurrentAttribute = MakeColor (Color.White, Color.Black);
 			InitalizeColorSchemes ();
@@ -918,7 +918,7 @@ namespace Terminal.Gui {
 		{
 			if (winChanging || Console.WindowHeight < 1 || contents.Length != Rows * Cols * 3
 				|| (!EnableConsoleScrolling && Rows != Console.WindowHeight)
-				|| (EnableConsoleScrolling && Rows != largestBufferHeight)) {
+				|| (EnableConsoleScrolling && Rows != largestWindowHeight)) {
 				return;
 			}
 
@@ -1020,73 +1020,73 @@ namespace Terminal.Gui {
 				int bg = 0;
 				int fg = 0;
 
-			IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
-				  .OfType<ConsoleColor> ()
-				  .Select (s => (int)s);
-			if (values.Contains (attr & 0xffff)) {
-				bg = MapColors ((ConsoleColor)(attr & 0xffff), false);
-			}
-			if (values.Contains ((attr >> 16) & 0xffff)) {
-				fg = MapColors ((ConsoleColor)((attr >> 16) & 0xffff));
-			}
-			sb.Append ($"{CSI}{bg};{fg}m");
+				IEnumerable<int> values = Enum.GetValues (typeof (ConsoleColor))
+					  .OfType<ConsoleColor> ()
+					  .Select (s => (int)s);
+				if (values.Contains (attr & 0xffff)) {
+					bg = MapColors ((ConsoleColor)(attr & 0xffff), false);
+				}
+				if (values.Contains ((attr >> 16) & 0xffff)) {
+					fg = MapColors ((ConsoleColor)((attr >> 16) & 0xffff));
+				}
+				sb.Append ($"{CSI}{bg};{fg}m");
 
+				return sb;
+			}
+
+			int MapColors (ConsoleColor color, bool isForeground = true)
+			{
+				switch (color) {
+				case ConsoleColor.Black:
+					return isForeground ? COLOR_BLACK : COLOR_BLACK + 10;
+				case ConsoleColor.DarkBlue:
+					return isForeground ? COLOR_BLUE : COLOR_BLUE + 10;
+				case ConsoleColor.DarkGreen:
+					return isForeground ? COLOR_GREEN : COLOR_GREEN + 10;
+				case ConsoleColor.DarkCyan:
+					return isForeground ? COLOR_CYAN : COLOR_CYAN + 10;
+				case ConsoleColor.DarkRed:
+					return isForeground ? COLOR_RED : COLOR_RED + 10;
+				case ConsoleColor.DarkMagenta:
+					return isForeground ? COLOR_MAGENTA : COLOR_MAGENTA + 10;
+				case ConsoleColor.DarkYellow:
+					return isForeground ? COLOR_YELLOW : COLOR_YELLOW + 10;
+				case ConsoleColor.Gray:
+					return isForeground ? COLOR_WHITE : COLOR_WHITE + 10;
+				case ConsoleColor.DarkGray:
+					return isForeground ? COLOR_BRIGHT_BLACK : COLOR_BRIGHT_BLACK + 10;
+				case ConsoleColor.Blue:
+					return isForeground ? COLOR_BRIGHT_BLUE : COLOR_BRIGHT_BLUE + 10;
+				case ConsoleColor.Green:
+					return isForeground ? COLOR_BRIGHT_GREEN : COLOR_BRIGHT_GREEN + 10;
+				case ConsoleColor.Cyan:
+					return isForeground ? COLOR_BRIGHT_CYAN : COLOR_BRIGHT_CYAN + 10;
+				case ConsoleColor.Red:
+					return isForeground ? COLOR_BRIGHT_RED : COLOR_BRIGHT_RED + 10;
+				case ConsoleColor.Magenta:
+					return isForeground ? COLOR_BRIGHT_MAGENTA : COLOR_BRIGHT_MAGENTA + 10;
+				case ConsoleColor.Yellow:
+					return isForeground ? COLOR_BRIGHT_YELLOW : COLOR_BRIGHT_YELLOW + 10;
+				case ConsoleColor.White:
+					return isForeground ? COLOR_BRIGHT_WHITE : COLOR_BRIGHT_WHITE + 10;
+				}
+				return 0;
+			}
 			return sb;
 		}
 
-		int MapColors (ConsoleColor color, bool isForeground = true)
+		private bool EnsureBufferSize ()
 		{
-			switch (color) {
-			case ConsoleColor.Black:
-				return isForeground ? COLOR_BLACK : COLOR_BLACK + 10;
-			case ConsoleColor.DarkBlue:
-				return isForeground ? COLOR_BLUE : COLOR_BLUE + 10;
-			case ConsoleColor.DarkGreen:
-				return isForeground ? COLOR_GREEN : COLOR_GREEN + 10;
-			case ConsoleColor.DarkCyan:
-				return isForeground ? COLOR_CYAN : COLOR_CYAN + 10;
-			case ConsoleColor.DarkRed:
-				return isForeground ? COLOR_RED : COLOR_RED + 10;
-			case ConsoleColor.DarkMagenta:
-				return isForeground ? COLOR_MAGENTA : COLOR_MAGENTA + 10;
-			case ConsoleColor.DarkYellow:
-				return isForeground ? COLOR_YELLOW : COLOR_YELLOW + 10;
-			case ConsoleColor.Gray:
-				return isForeground ? COLOR_WHITE : COLOR_WHITE + 10;
-			case ConsoleColor.DarkGray:
-				return isForeground ? COLOR_BRIGHT_BLACK : COLOR_BRIGHT_BLACK + 10;
-			case ConsoleColor.Blue:
-				return isForeground ? COLOR_BRIGHT_BLUE : COLOR_BRIGHT_BLUE + 10;
-			case ConsoleColor.Green:
-				return isForeground ? COLOR_BRIGHT_GREEN : COLOR_BRIGHT_GREEN + 10;
-			case ConsoleColor.Cyan:
-				return isForeground ? COLOR_BRIGHT_CYAN : COLOR_BRIGHT_CYAN + 10;
-			case ConsoleColor.Red:
-				return isForeground ? COLOR_BRIGHT_RED : COLOR_BRIGHT_RED + 10;
-			case ConsoleColor.Magenta:
-				return isForeground ? COLOR_BRIGHT_MAGENTA : COLOR_BRIGHT_MAGENTA + 10;
-			case ConsoleColor.Yellow:
-				return isForeground ? COLOR_BRIGHT_YELLOW : COLOR_BRIGHT_YELLOW + 10;
-			case ConsoleColor.White:
-				return isForeground ? COLOR_BRIGHT_WHITE : COLOR_BRIGHT_WHITE + 10;
-			}
-			return 0;
-		}
-
-		bool SetCursorPosition (int col, int row)
-		{
-			if (IsWinPlatform) {
-				// Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.
+#pragma warning disable CA1416
+			if (IsWinPlatform && Console.BufferHeight < Rows) {
 				try {
-					Console.SetCursorPosition (col, row);
-					return true;
+					Console.SetBufferSize (Console.WindowWidth, Rows);
 				} catch (Exception) {
 					return false;
 				}
-			} else {
-				SetVirtualCursorPosition (col, row);
-				return true;
 			}
+#pragma warning restore CA1416
+			return true;
 		}
 
 		private void SetWindowPosition (int col, int row)
@@ -1112,18 +1112,20 @@ namespace Terminal.Gui {
 			left = Console.WindowLeft;
 		}
 
-		private bool EnsureBufferSize ()
+		private bool SetCursorPosition (int col, int row)
 		{
-#pragma warning disable CA1416
-			if (IsWinPlatform && Console.BufferHeight < Rows) {
+			if (IsWinPlatform) {
+				// Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.
 				try {
-					Console.SetBufferSize (Console.WindowWidth, Rows);
+					Console.SetCursorPosition (col, row);
+					return true;
 				} catch (Exception) {
 					return false;
 				}
+			} else {
+				SetVirtualCursorPosition (col, row);
+				return true;
 			}
-#pragma warning restore CA1416
-			return true;
 		}
 
 		private CursorVisibility? savedCursorVisibility;
@@ -1360,14 +1362,14 @@ namespace Terminal.Gui {
 		{
 			winChanging = true;
 			if (!EnableConsoleScrolling) {
-				largestBufferHeight = Math.Max (size.Height, 0);
+				largestWindowHeight = Math.Max (size.Height, 0);
 			} else {
-				largestBufferHeight = Math.Max (size.Height, largestBufferHeight);
+				largestWindowHeight = Math.Max (size.Height, largestWindowHeight);
 			}
 			top = 0;
 			left = 0;
 			cols = size.Width;
-			rows = largestBufferHeight;
+			rows = largestWindowHeight;
 			ResizeScreen ();
 			UpdateOffScreen ();
 			winChanging = false;
