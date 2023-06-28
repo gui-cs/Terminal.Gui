@@ -44,7 +44,7 @@ namespace UICatalog.Scenarios {
 				Checked = Application.Driver.UseTrueColor,
 				Enabled = canTrueColor,
 			};
-			cbUseTrueColor.Toggled += (_) => Application.Driver.UseTrueColor = cbUseTrueColor.Checked;
+			cbUseTrueColor.Toggled += (b, c) => Application.Driver.UseTrueColor = (bool) cbUseTrueColor.Checked;
 			Win.Add (cbUseTrueColor);
 
 			var btnOpenImage = new Button ("Open Image") {
@@ -61,11 +61,13 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (imageView);
 
-			btnOpenImage.Clicked += () => {
-				var ofd = new OpenDialog ("Open Image", "Image");
+			btnOpenImage.Clicked += (_, _) => {
+				List<IAllowedType> allowedTypeList = new ();
+				allowedTypeList.Add (new AllowedType ("Image"));
+				var ofd = new OpenDialog ("Open Image", allowedTypeList);
 				Application.Run (ofd);
 
-				var path = ofd.FilePath.ToString ();
+				var path = ofd.Path.ToString ();
 				
 				if (string.IsNullOrWhiteSpace (path)) {
 					return;
@@ -102,32 +104,32 @@ namespace UICatalog.Scenarios {
 				this.SetNeedsDisplay ();
 			}
 
-			public override void Redraw (Rect bounds)
-			{
-				base.Redraw (bounds);
+			//	public override void Draw (Rect bounds)
+			//	{
+			//		base.Draw (bounds);
 
-				if (fullResImage == null) {
-					return;
-				}	
+			//		if (fullResImage == null) {
+			//			return;
+			//		}	
 
-				// if we have not got a cached resized image of this size
-				if(matchSize == null || bounds.Width != matchSize.Width || bounds.Height != matchSize.Height) {
+			//		// if we have not got a cached resized image of this size
+			//		if(matchSize == null || bounds.Width != matchSize.Width || bounds.Height != matchSize.Height) {
 
-					// generate one
-					matchSize = fullResImage.Clone (x => x.Resize (bounds.Width, bounds.Height));
-				}
-				
-				for (int y = 0; y < bounds.Height; y++) {
-					for (int x = 0; x < bounds.Width; x++) {
-						var rgb = matchSize [x, y];
+			//			// generate one
+			//			matchSize = fullResImage.Clone (x => x.Resize (bounds.Width, bounds.Height));
+			//		}
 
-						var attr = cache.GetOrAdd (rgb, (rgb) => new Attribute (new TrueColor (), new TrueColor (rgb.R, rgb.G, rgb.B)));
-											
-						Driver.SetAttribute(attr);
-						AddRune (x, y, ' ');
-					}
-				}
-			}
+			//		for (int y = 0; y < bounds.Height; y++) {
+			//			for (int x = 0; x < bounds.Width; x++) {
+			//				var rgb = matchSize [x, y];
+
+			//				var attr = cache.GetOrAdd (rgb, (rgb) => new Attribute (new TrueColor (), new TrueColor (rgb.R, rgb.G, rgb.B)));
+
+			//				Driver.SetAttribute(attr);
+			//				AddRune (x, y, (System.Text.Rune) ' ');
+			//			}
+			//		}
+			//	}
 		}
 	}
 }

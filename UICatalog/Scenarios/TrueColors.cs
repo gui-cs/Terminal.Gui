@@ -35,7 +35,7 @@ namespace UICatalog.Scenarios {
 				Checked = Application.Driver.UseTrueColor,
 				Enabled = canTrueColor,
 			};
-			cbUseTrueColor.Toggled += (_) => Application.Driver.UseTrueColor = cbUseTrueColor.Checked;
+			cbUseTrueColor.Toggled += (_, _) => Application.Driver.UseTrueColor = (bool)cbUseTrueColor.Checked;
 			Win.Add (cbUseTrueColor);
 
 			y += 2;
@@ -102,8 +102,8 @@ namespace UICatalog.Scenarios {
 					X = dx++,
 					Y = y,
 					ColorScheme = new ColorScheme () { Normal = new Terminal.Gui.Attribute (
-						colorFunc (i > 255 ? 255 : i),
-						colorFunc (i > 255 ? 255 : i)
+						colorFunc (i > 255 ? 255 : i).ToConsoleColor(),
+						colorFunc (i > 255 ? 255 : i).ToConsoleColor()
 						) }
 				};
 				Win.Add (l);
