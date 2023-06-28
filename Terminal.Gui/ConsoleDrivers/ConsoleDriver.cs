@@ -195,7 +195,17 @@ namespace Terminal.Gui {
 		/// </summary>
 		[JsonConverter (typeof (ColorJsonConverter))]
 		public Color Background { get; }
-
+		
+		/// <summary>
+		/// The foreground color as a <see cref="TrueColor"/>.
+		/// </summary>
+		public TrueColor TrueColorForeground { get; private set; }
+		
+		/// <summary>
+		/// The background color as a <see cref="TrueColor"/>.
+		/// </summary>
+		public TrueColor TrueColorBackground { get; private set; }
+		
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Attribute"/> struct with only the value passed to
 		///   and trying to get the colors if defined.
@@ -846,6 +856,22 @@ namespace Terminal.Gui {
 		/// Redraws the physical screen with the contents that have been queued up via any of the printing commands.
 		/// </summary>
 		public abstract void UpdateScreen ();
+
+		/// <summary>
+		/// Determinates if the current console driver supports TrueColor output-
+		/// </summary>
+		public virtual bool SupportsTrueColorOutput { get => false; }
+
+		bool useTrueColor;
+
+		/// <summary>
+		/// Controls the TureColor output mode. Can be only enabled if the underlying ConsoleDriver supports it.
+		/// Note this will be enabled automaticaly if supported. See also <see cref="SupportsTrueColorOutput"/>
+		/// </summary>
+		public bool UseTrueColor {
+			get => useTrueColor;
+			set => this.useTrueColor = value && SupportsTrueColorOutput;
+		}
 
 		/// <summary>
 		/// The current attribute the driver is using. 
