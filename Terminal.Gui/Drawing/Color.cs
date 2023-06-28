@@ -204,8 +204,7 @@ namespace Terminal.Gui {
 			case Color.BrightMagenta: return new TrueColor (0xFF, 0, 0xFF);
 			case Color.BrightYellow: return new TrueColor (0xFF, 0xFF, 0);
 			case Color.White: return new TrueColor (0xFF, 0xFF, 0xFF);
-			default: return new TrueColor (0x80, 0, 0); // TODO getting unknown color value (-1) during JSON serialization
-								    // Don't know how to map it
+			default: throw new ArgumentException ($"No supported TrueColor mapping for '{consoleColor}'.");
 			};
 		}
 

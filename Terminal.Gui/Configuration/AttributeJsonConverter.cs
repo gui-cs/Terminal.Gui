@@ -32,6 +32,7 @@ namespace Terminal.Gui {
 			Attribute attribute = new Attribute ();
 			Color foreground =  (Color)(-1);
 			Color background =  (Color)(-1);
+			int valuePair = 0;
 			while (reader.Read ()) {
 				if (reader.TokenType == JsonTokenType.EndObject) {
 					if (foreground ==  (Color)(-1) || background ==  (Color)(-1)) {
@@ -47,6 +48,8 @@ namespace Terminal.Gui {
 				string propertyName = reader.GetString ();
 				reader.Read ();
 				string color = $"\"{reader.GetString ()}\"";
+
+				valuePair++;
 
 				switch (propertyName.ToLower ()) {
 				case "foreground":
@@ -68,7 +71,10 @@ namespace Terminal.Gui {
 					throw new JsonException ($"Unknown Attribute property {propertyName}.");
 				}
 
-				attribute = new Attribute (foreground, background);
+				if (valuePair == 2) {
+					attribute = new Attribute (foreground, background);
+					valuePair = 0;
+				}
 			}
 			throw new JsonException ();
 		}
