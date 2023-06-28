@@ -164,6 +164,53 @@ namespace Terminal.Gui {
 				Math.Abs (color1.Green - color2.Green) +
 				Math.Abs (color1.Blue - color2.Blue);
 		}
+		/// <summary>
+		/// Get color by 16 colors palette
+		/// </summary>
+		public static TrueColor Color4 (int code)
+		{
+			if (code == 7) { code = 8; } else if (code == 8) { code = 7; }
+
+			if (code == 8) { return new TrueColor (192, 192, 192); }
+
+			int k = (code > 8) ? 255 : 128;
+
+			return new TrueColor (code / 4 % 2 * k, code / 2 % 2 * k, code % 2 * k);
+		}
+
+		/// <summary>
+		/// Return color diff
+		/// </summary>
+		public static int Diff (TrueColor c1, TrueColor c2)
+		{
+			// TODO: maybe use CIEDE2000
+			return ((c1.Red - c2.Red) * (c1.Red - c2.Red))
+				+ ((c1.Green - c2.Green) * (c1.Green - c2.Green))
+				+ (c1.Blue - c2.Blue) * (c1.Blue - c2.Blue);
+		}
+
+		/// <summary>
+		/// Get color code in 16 colors palette (use approximation)
+		/// </summary>
+		public static int GetCode4 (TrueColor c)
+		{
+			int ans = 0;
+			for (int i = 1; i < 16; i++) {
+				if (Diff (Color4 (i), c) < Diff (Color4 (ans), c)) { ans = i; }
+			}
+
+			return ans;
+		}
+
+		/// <summary>
+		/// Convert code in 16 colors palette to 256 colors palette
+		/// </summary>
+		public static int Code4ToCode8 (int code)
+		{
+			if (code == 0 || code == 7 || code == 8 || code == 15)
+				return code;
+			return (code & 8) + (code & 2) + 4 * (code & 1) + (code & 4) / 4;
+		}
 	}
 
 	/// <summary>
