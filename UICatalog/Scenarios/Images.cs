@@ -109,7 +109,7 @@ namespace UICatalog.Scenarios {
 				fullResImage = image;
 				Draw ();
 				//Driver.UpdateScreen ();
-				//this.SetNeedsDisplay ();
+				SetNeedsDisplay ();
 			}
 
 			public override void OnDrawContent (Rect bounds)
@@ -131,7 +131,7 @@ namespace UICatalog.Scenarios {
 					for (int x = 0; x < bounds.Width; x++) {
 						var rgb = matchSize [x, y];
 
-						var attr = new Attribute (new TrueColor (0, 0, 0), new TrueColor (rgb.R, rgb.G, rgb.B));
+						var attr = cache.GetOrAdd(rgb, rgb => new Attribute (new TrueColor (), new TrueColor (rgb.R, rgb.G, rgb.B)));
 
 						Driver.SetAttribute (attr);
 						AddRune (x, y, (System.Text.Rune)' ');
