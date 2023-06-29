@@ -37,7 +37,7 @@ namespace Terminal.Gui {
 
 			uint newOutputConsoleMode = OutputConsoleMode;
 			newOutputConsoleMode |= (uint)(OutputConsoleModes.EnableProcessedOutput | OutputConsoleModes.EnableVirtualTerminalProcessing | OutputConsoleModes.DisableNewLineAutoReturn);
-			newOutputConsoleMode &= ~(uint)(OutputConsoleModes.EnableWrapAtEolOutput);
+			//newOutputConsoleMode &= ~(uint)(OutputConsoleModes.EnableWrapAtEolOutput);
 			OutputConsoleMode = newOutputConsoleMode;
 		}
 
@@ -89,7 +89,7 @@ namespace Terminal.Gui {
 					prev = attr;
 					
 					// TODO: this is now always true
-					if (attr is Attribute tca) {
+					if (attr is Attribute tca && tca.TrueColorForeground != null && tca.TrueColorBackground != null) {
 						stringBuilder.Append (SendTrueColorFg);
 						stringBuilder.Append (tca.TrueColorForeground.Red);
 						stringBuilder.Append (';');
@@ -1730,6 +1730,11 @@ namespace Terminal.Gui {
 		public override Attribute MakeColor (Color foreground, Color background)
 		{
 			return MakeColor ((ConsoleColor)foreground, (ConsoleColor)background);
+		}
+
+		public override Attribute MakeColor (TrueColor foreground, TrueColor background)
+		{
+			return new Attribute (foreground, background);
 		}
 
 		Attribute MakeColor (ConsoleColor f, ConsoleColor b)

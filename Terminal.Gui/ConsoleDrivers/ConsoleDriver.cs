@@ -117,16 +117,23 @@ namespace Terminal.Gui {
 			Green = green;
 			Blue = blue;
 		}
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TrueColor"/> struct
+		/// with a default color.
+		/// </summary>
+		public TrueColor ()
+		{
+			Red = 255;
+			Green = 255;
+			Blue = 255;
+		}
 
 		/// <summary>
-		/// Converts true color to console color.
+		/// contains a map of true colors to 16-bit colors.
 		/// </summary>
-		/// <returns></returns>
-		public Color ToConsoleColor ()
-		{
-			var trueColorMap = new Dictionary<TrueColor, Color> () {
-				{ new TrueColor (0,0,0),Color.Black},
-				{ new TrueColor (0, 0, 0x80),Color.Blue},
+		private static Dictionary<TrueColor, Color> _trueColorMap = new Dictionary<TrueColor, Color> {
+				{ new TrueColor (0, 0, 0), Color.Black },
+				{ new TrueColor (0, 0, 0x80), Color.Blue },
 				{ new TrueColor (0, 0x80, 0),Color.Green},
 				{ new TrueColor (0, 0x80, 0x80),Color.Cyan},
 				{ new TrueColor (0x80, 0, 0),Color.Red},
@@ -142,8 +149,15 @@ namespace Terminal.Gui {
 				{ new TrueColor (0xFF, 0xFF, 0),Color.BrightYellow},
 				{ new TrueColor (0xFF, 0xFF, 0xFF),Color.White},
 				};
+
+		/// <summary>
+		/// Converts true color to console color.
+		/// </summary>
+		/// <returns></returns>
+		public Color ToConsoleColor ()
+		{
 			// Iterate over all colors in the map
-			var distances = trueColorMap.Select (
+			var distances = _trueColorMap.Select (
 							k => Tuple.Create (
 								// the candidate we are considering matching against (RGB)
 								k.Key,
@@ -153,7 +167,7 @@ namespace Terminal.Gui {
 
 			// get the closest
 			var match = distances.OrderBy (t => t.Item2).First ();
-			return trueColorMap [match.Item1];
+			return _trueColorMap [match.Item1];
 		}
 
 		private float CalculateDistance (TrueColor color1, TrueColor color2)
@@ -211,6 +225,25 @@ namespace Terminal.Gui {
 				return code;
 			return (code & 8) + (code & 2) + 4 * (code & 1) + (code & 4) / 4;
 		}
+
+		/// <summary>
+		/// Converts a 16-bit <see cref="Color"/> to a <see cref="TrueColor"/>
+		/// </summary>
+		/// <param name="c">the <see cref="Color"/> to convert</param>
+		public static implicit operator TrueColor (Color c)
+		{
+			return _trueColorMap.FirstOrDefault (x => x.Value == c).Key;
+		}
+
+		/// <summary>
+		/// constant value for a black color
+		/// </summary>
+		public static TrueColor Black = new TrueColor (0, 0, 0);
+
+		/// <summary>
+		/// constant value for a white color
+		/// </summary>
+		public static TrueColor White = new TrueColor (255, 255, 255);
 	}
 
 	/// <summary>
@@ -222,7 +255,7 @@ namespace Terminal.Gui {
 	///   class to define color schemes that can be used in an application.
 	/// </remarks>
 	[JsonConverter (typeof (AttributeJsonConverter))]
-	public struct Attribute {
+	public class Attribute {
 		/// <summary>
 		/// The <see cref="ConsoleDriver"/>-specific color attribute value. If <see cref="Initialized"/> is <see langword="false"/> 
 		/// the value of this property is invalid (typically because the Attribute was created before a driver was loaded)
@@ -242,23 +275,23 @@ namespace Terminal.Gui {
 		/// </summary>
 		[JsonConverter (typeof (ColorJsonConverter))]
 		public Color Background { get; }
-		
+
 		/// <summary>
 		/// The foreground color as a <see cref="TrueColor"/>.
 		/// </summary>
 		public TrueColor TrueColorForeground { get; private set; }
-		
+
 		/// <summary>
 		/// The background color as a <see cref="TrueColor"/>.
 		/// </summary>
 		public TrueColor TrueColorBackground { get; private set; }
-		
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Attribute"/> struct with only the value passed to
 		///   and trying to get the colors if defined.
 		/// </summary>
 		/// <param name="value">Value.</param>
-		public Attribute (int value) : this()
+		public Attribute (int value)
 		{
 			Color foreground = default;
 			Color background = default;
@@ -279,11 +312,13 @@ namespace Terminal.Gui {
 		/// <param name="value">Value.</param>
 		/// <param name="foreground">Foreground</param>
 		/// <param name="background">Background</param>
-		public Attribute (int value, Color foreground, Color background) : this()
+		public Attribute (int value, Color foreground, Color background)
 		{
 			Value = value;
 			Foreground = foreground;
 			Background = background;
+			TrueColorForeground = (TrueColor)foreground;
+			TrueColorBackground = (TrueColor)background;
 			Initialized = true;
 		}
 
@@ -292,21 +327,29 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="foreground">Foreground</param>
 		/// <param name="background">Background</param>
-		public Attribute (Color foreground = new Color (), Color background = new Color ()) : this()
+		public Attribute (Color foreground = new Color (), Color background = new Color ())
 		{
 			var make = Make (foreground, background);
 			Initialized = make.Initialized;
 			Value = make.Value;
 			Foreground = foreground;
 			Background = background;
+			TrueColorForeground = (TrueColor)foreground;
+			TrueColorBackground = (TrueColor)background;
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Attribute"/> struct
-		///  with the same colors for the foreground and background.
+		/// Initializes a new instance of the <see cref="Attribute"/> struct with <see cref="TrueColor"/> arguments.
 		/// </summary>
-		/// <param name="color">The color.</param>
-		public Attribute (Color color) : this (color, color) { }
+		/// <param name="foreground">Foreground</param>
+		/// <param name="background">Background</param>
+		public Attribute (TrueColor foreground = null, TrueColor background = null)
+		{
+			foreground ??= TrueColor.White;
+			background ??= TrueColor.Black;
+			TrueColorForeground = foreground;
+			TrueColorBackground = background;
+		}
 
 		/// <summary>
 		/// Implicit conversion from an <see cref="Attribute"/> to the underlying, driver-specific, Int32 representation
@@ -821,13 +864,13 @@ namespace Terminal.Gui {
 			}
 			return true;
 		}
-		
+
 		/// <summary>
 		/// Adds the specified rune to the display at the current cursor position.
 		/// </summary>
 		/// <param name="rune">Rune to add.</param>
 		public abstract void AddRune (Rune rune);
-		
+
 		/// <summary>
 		/// Ensures that the column and line are in a valid range from the size of the driver.
 		/// </summary>
@@ -1081,6 +1124,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public abstract Attribute MakeAttribute (Color fore, Color back);
 
+
 		/// <summary>
 		/// Gets the current <see cref="Attribute"/>.
 		/// </summary>
@@ -1094,6 +1138,7 @@ namespace Terminal.Gui {
 		/// <param name="background">The background color.</param>
 		/// <returns>The attribute for the foreground and background colors.</returns>
 		public abstract Attribute MakeColor (Color foreground, Color background);
+		public abstract Attribute MakeColor (TrueColor fore, TrueColor back);
 
 		/// <summary>
 		/// Ensures all <see cref="Attribute"/>s in <see cref="Colors.ColorSchemes"/> are correctly 

@@ -62,8 +62,13 @@ namespace UICatalog.Scenarios {
 			Win.Add (imageView);
 
 			btnOpenImage.Clicked += (_, _) => {
+				string [] allowedExts = {
+					"jpg",
+					"png",
+					"jpeg"
+				};
 				List<IAllowedType> allowedTypeList = new ();
-				allowedTypeList.Add (new AllowedType ("Image"));
+				allowedTypeList.Add (new AllowedType ("Image", allowedExts));
 				var ofd = new OpenDialog ("Open Image", allowedTypeList);
 				Application.Run (ofd);
 
@@ -89,6 +94,7 @@ namespace UICatalog.Scenarios {
 				
 				imageView.SetImage(img);
 			};
+			
 		}
 
 		class ImageView : View {
@@ -101,35 +107,44 @@ namespace UICatalog.Scenarios {
 			internal void SetImage (Image<Rgba32> image)
 			{
 				fullResImage = image;
-				this.SetNeedsDisplay ();
+				Draw ();
+				//Driver.UpdateScreen ();
+				//this.SetNeedsDisplay ();
 			}
 
-			//	public override void Draw (Rect bounds)
-			//	{
-			//		base.Draw (bounds);
+			public override void OnDrawContent (Rect bounds)
+			{
+				//base.OnDrawContent (bounds);
 
-			//		if (fullResImage == null) {
-			//			return;
-			//		}	
+				if (fullResImage == null) {
+					return;
+				}
 
-			//		// if we have not got a cached resized image of this size
-			//		if(matchSize == null || bounds.Width != matchSize.Width || bounds.Height != matchSize.Height) {
+				// if we have not got a cached resized image of this size
+				if (matchSize == null || bounds.Width != matchSize.Width || bounds.Height != matchSize.Height) {
 
-			//			// generate one
-			//			matchSize = fullResImage.Clone (x => x.Resize (bounds.Width, bounds.Height));
-			//		}
+					// generate one
+					matchSize = fullResImage.Clone (x => x.Resize (bounds.Width, bounds.Height));
+				}
 
-			//		for (int y = 0; y < bounds.Height; y++) {
-			//			for (int x = 0; x < bounds.Width; x++) {
-			//				var rgb = matchSize [x, y];
+				for (int y = 0; y < bounds.Height; y++) {
+					for (int x = 0; x < bounds.Width; x++) {
+						var rgb = matchSize [x, y];
 
-			//				var attr = cache.GetOrAdd (rgb, (rgb) => new Attribute (new TrueColor (), new TrueColor (rgb.R, rgb.G, rgb.B)));
+						var attr = new Attribute (new TrueColor (0, 0, 0), new TrueColor (rgb.R, rgb.G, rgb.B));
 
-			//				Driver.SetAttribute(attr);
-			//				AddRune (x, y, (System.Text.Rune) ' ');
-			//			}
-			//		}
-			//	}
+						Driver.SetAttribute (attr);
+						AddRune (x, y, (System.Text.Rune)' ');
+					}
+				}
+				//SetNeedsDisplay (bounds);
+				
+			}
+			public override void OnDrawContentComplete (Rect contentArea)
+			{
+				base.OnDrawContentComplete (contentArea);
+				System.Diagnostics.Debug.WriteLine (contentArea.ToString ());
+			}
 		}
 	}
 }

@@ -208,6 +208,11 @@ namespace Terminal.Gui {
 			return MakeColor ((ConsoleColor)foreground, (ConsoleColor)background);
 		}
 
+		public override Attribute MakeColor (TrueColor foreground, TrueColor background)
+		{
+			return new Attribute (foreground, background);
+		}
+
 		static Attribute MakeColor (ConsoleColor f, ConsoleColor b)
 		{
 			// Encode the colors into the int value.

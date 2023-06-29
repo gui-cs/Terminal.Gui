@@ -82,6 +82,7 @@ namespace UICatalog.Scenarios {
 
 			Application.RootMouseEvent = (e) => {
 				var normal = e.View.GetNormalColor ();
+
 				if (e.View != null) {
 					lblRed.Text = normal.TrueColorForeground.Red.ToString();
 					lblGreen.Text = normal.TrueColorForeground.Green.ToString ();
@@ -102,8 +103,8 @@ namespace UICatalog.Scenarios {
 					X = dx++,
 					Y = y,
 					ColorScheme = new ColorScheme () { Normal = new Terminal.Gui.Attribute (
-						colorFunc (i > 255 ? 255 : i).ToConsoleColor(),
-						colorFunc (i > 255 ? 255 : i).ToConsoleColor()
+						colorFunc (i > 255 ? 255 : i),
+						colorFunc (i > 255 ? 255 : i)
 						) }
 				};
 				Win.Add (l);

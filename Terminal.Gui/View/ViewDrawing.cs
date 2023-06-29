@@ -34,6 +34,10 @@ namespace Terminal.Gui {
 		/// If it's overridden can return other values.</returns>
 		public virtual Attribute GetNormalColor ()
 		{
+			//if (Driver.SupportsTrueColorOutput) {
+			//	return Enabled ? ( : ColorScheme.Disabled;
+				
+			//}
 			return Enabled ? ColorScheme.Normal : ColorScheme.Disabled;
 		}
 

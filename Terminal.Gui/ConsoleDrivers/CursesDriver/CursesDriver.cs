@@ -182,6 +182,11 @@ namespace Terminal.Gui {
 
 		public Curses.Window window;
 
+		public override Attribute MakeColor (TrueColor foreground, TrueColor background)
+		{
+			return new Attribute (foreground, background);
+		}
+
 		//static short last_color_pair = 16;
 
 		/// <summary>
