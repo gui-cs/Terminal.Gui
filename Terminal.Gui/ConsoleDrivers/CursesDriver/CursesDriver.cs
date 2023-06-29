@@ -209,11 +209,6 @@ namespace Terminal.Gui {
 				background: MapCursesColor (background));
 		}
 
-		public override Attribute MakeColor (Color fore, Color back)
-		{
-			return MakeColor ((short)MapColor (fore), (short)MapColor (back));
-		}
-
 		int [,] colorPairs = new int [16, 16];
 
 		public override void SetColors (ConsoleColor foreground, ConsoleColor background)

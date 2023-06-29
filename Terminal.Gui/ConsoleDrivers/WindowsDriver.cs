@@ -57,7 +57,7 @@ namespace Terminal.Gui {
 				foreach (var info in charInfoBuffer) {
 					ci[i++] = new CharInfo () {
 						Char = new CharUnion () { UnicodeChar = info.Char },
-						Attributes = (ushort)(int)info.Attribute
+						Attributes = (ushort) info.Attribute
 					};
 				}
 
@@ -1661,7 +1661,7 @@ namespace Terminal.Gui {
 					var prevPosition = crow * Cols + (ccol - 1);
 					OutputBuffer [prevPosition].Char = c;
 					contents [crow, ccol - 1, 0] = c;
-					OutputBuffer [prevPosition].Attribute = (ushort)CurrentAttribute;
+					OutputBuffer [prevPosition].Attribute = CurrentAttribute;
 					contents [crow, ccol - 1, 1] = CurrentAttribute;
 					contents [crow, ccol - 1, 2] = 1;
 					WindowsConsole.SmallRect.Update (ref damageRegion, (short)(ccol - 1), (short)crow);
@@ -1688,7 +1688,7 @@ namespace Terminal.Gui {
 						OutputBuffer[position].Char = (char)rune.Value;
 						contents [crow, ccol, 0] = (int)(uint)rune.Value;
 					}
-					OutputBuffer [position].Attribute = (ushort)CurrentAttribute;
+					OutputBuffer [position].Attribute = CurrentAttribute;
 					contents [crow, ccol, 1] = CurrentAttribute;
 					contents [crow, ccol, 2] = 1;
 					WindowsConsole.SmallRect.Update (ref damageRegion, (short)ccol, (short)crow);
@@ -1702,7 +1702,7 @@ namespace Terminal.Gui {
 			if (runeWidth > 1) {
 				if (validClip && ccol < Clip.Right) {
 					position = GetOutputBufferPosition ();
-					OutputBuffer [position].Attribute = (ushort)CurrentAttribute;
+					OutputBuffer [position].Attribute = CurrentAttribute;
 					OutputBuffer[position].Char = (char)0x00;
 					contents [crow, ccol, 0] = (int)(uint)0x00;
 					contents [crow, ccol, 1] = CurrentAttribute;
@@ -1725,11 +1725,6 @@ namespace Terminal.Gui {
 		public override void SetAttribute (Attribute c)
 		{
 			base.SetAttribute (c);
-		}
-
-		public override Attribute MakeColor (Color foreground, Color background)
-		{
-			return MakeColor ((ConsoleColor)foreground, (ConsoleColor)background);
 		}
 
 		public override Attribute MakeColor (TrueColor foreground, TrueColor background)

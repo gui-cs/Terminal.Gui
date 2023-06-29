@@ -768,10 +768,6 @@ namespace Terminal.Gui {
 			Console.Out.Close ();
 		}
 
-		public override Attribute MakeColor (Color foreground, Color background)
-		{
-			return MakeColor ((ConsoleColor)foreground, (ConsoleColor)background);
-		}
 		public override Attribute MakeColor (TrueColor foreground, TrueColor background)
 		{
 			return new Attribute (foreground, background);
