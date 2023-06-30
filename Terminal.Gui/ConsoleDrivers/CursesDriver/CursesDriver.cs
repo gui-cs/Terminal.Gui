@@ -231,7 +231,7 @@ internal class CursesDriver : ConsoleDriver {
 		case Color.BrightCyan:
 			return Curses.COLOR_CYAN | Curses.COLOR_GRAY;
 		case Color.BrightRed:
-			return Curses.COLOR_RED |  Curses.COLOR_GRAY;
+			return Curses.COLOR_RED | Curses.COLOR_GRAY;
 		case Color.BrightMagenta:
 			return Curses.COLOR_MAGENTA | Curses.COLOR_GRAY;
 		case Color.BrightYellow:
@@ -725,120 +725,110 @@ internal class CursesDriver : ConsoleDriver {
 		return false;
 	}
 
-		public static bool CanColorTermTrueColor ()
-		{
-			if (Environment.GetEnvironmentVariable ("COLORTERM") is string value) {
-				value = value.ToLower ();
-				return value.Contains ("truecolor") || value.Contains ("24bit");
-			}
-
-			return false;
+	public static bool CanColorTermTrueColor ()
+	{
+		if (Environment.GetEnvironmentVariable ("COLORTERM") is string value) {
+			value = value.ToLower ();
+			return value.Contains ("truecolor") || value.Contains ("24bit");
 		}
 
-		static int MapColor (Color color)
-		{
-			switch (color) {
-			case Color.Black:
-				return Curses.COLOR_BLACK;
-			case Color.Blue:
-				return Curses.COLOR_BLUE;
-			case Color.Green:
-				return Curses.COLOR_GREEN;
-			case Color.Cyan:
-				return Curses.COLOR_CYAN;
-			case Color.Red:
-				return Curses.COLOR_RED;
-			case Color.Magenta:
-				return Curses.COLOR_MAGENTA;
-			case Color.Brown:
-				return Curses.COLOR_YELLOW;
-			case Color.Gray:
-				return Curses.COLOR_WHITE;
-			case Color.DarkGray:
-				//return Curses.COLOR_BLACK | Curses.A_BOLD;
-				return Curses.COLOR_GRAY;
-			case Color.BrightBlue:
-				return Curses.COLOR_BLUE | Curses.A_BOLD | Curses.COLOR_GRAY;
-			case Color.BrightGreen:
-				return Curses.COLOR_GREEN | Curses.A_BOLD | Curses.COLOR_GRAY;
-			case Color.BrightCyan:
-				return Curses.COLOR_CYAN | Curses.A_BOLD | Curses.COLOR_GRAY;
-			case Color.BrightRed:
-				return Curses.COLOR_RED | Curses.A_BOLD | Curses.COLOR_GRAY;
-			case Color.BrightMagenta:
-				return Curses.COLOR_MAGENTA | Curses.A_BOLD | Curses.COLOR_GRAY;
-			case Color.BrightYellow:
-				return Curses.COLOR_YELLOW | Curses.A_BOLD | Curses.COLOR_GRAY;
-			case Color.White:
-				return Curses.COLOR_WHITE | Curses.A_BOLD | Curses.COLOR_GRAY;
-			}
-			throw new ArgumentException ("Invalid color code");
-		}
+		return false;
+	}
 
-		static Color MapCursesColor (int color)
-		{
-			switch (color) {
-			case Curses.COLOR_BLACK:
-				return Color.Black;
-			case Curses.COLOR_BLUE:
-				return Color.Blue;
-			case Curses.COLOR_GREEN:
-				return Color.Green;
-			case Curses.COLOR_CYAN:
-				return Color.Cyan;
-			case Curses.COLOR_RED:
-				return Color.Red;
-			case Curses.COLOR_MAGENTA:
-				return Color.Magenta;
-			case Curses.COLOR_YELLOW:
-				return Color.Brown;
-			case Curses.COLOR_WHITE:
-				return Color.Gray;
-			case Curses.COLOR_GRAY:
-				return Color.DarkGray;
-			case Curses.COLOR_BLUE | Curses.COLOR_GRAY:
-				return Color.BrightBlue;
-			case Curses.COLOR_GREEN | Curses.COLOR_GRAY:
-				return Color.BrightGreen;
-			case Curses.COLOR_CYAN | Curses.COLOR_GRAY:
-				return Color.BrightCyan;
-			case Curses.COLOR_RED | Curses.COLOR_GRAY:
-				return Color.BrightRed;
-			case Curses.COLOR_MAGENTA | Curses.COLOR_GRAY:
-				return Color.BrightMagenta;
-			case Curses.COLOR_YELLOW | Curses.COLOR_GRAY:
-				return Color.BrightYellow;
-			case Curses.COLOR_WHITE | Curses.COLOR_GRAY:
-				return Color.White;
-			}
-			throw new ArgumentException ("Invalid curses color code");
+	static int MapColor (Color color)
+	{
+		switch (color) {
+		case Color.Black:
+			return Curses.COLOR_BLACK;
+		case Color.Blue:
+			return Curses.COLOR_BLUE;
+		case Color.Green:
+			return Curses.COLOR_GREEN;
+		case Color.Cyan:
+			return Curses.COLOR_CYAN;
+		case Color.Red:
+			return Curses.COLOR_RED;
+		case Color.Magenta:
+			return Curses.COLOR_MAGENTA;
+		case Color.Brown:
+			return Curses.COLOR_YELLOW;
+		case Color.Gray:
+			return Curses.COLOR_WHITE;
+		case Color.DarkGray:
+			//return Curses.COLOR_BLACK | Curses.A_BOLD;
+			return Curses.COLOR_GRAY;
+		case Color.BrightBlue:
+			return Curses.COLOR_BLUE | Curses.A_BOLD | Curses.COLOR_GRAY;
+		case Color.BrightGreen:
+			return Curses.COLOR_GREEN | Curses.A_BOLD | Curses.COLOR_GRAY;
+		case Color.BrightCyan:
+			return Curses.COLOR_CYAN | Curses.A_BOLD | Curses.COLOR_GRAY;
+		case Color.BrightRed:
+			return Curses.COLOR_RED | Curses.A_BOLD | Curses.COLOR_GRAY;
+		case Color.BrightMagenta:
+			return Curses.COLOR_MAGENTA | Curses.A_BOLD | Curses.COLOR_GRAY;
+		case Color.BrightYellow:
+			return Curses.COLOR_YELLOW | Curses.A_BOLD | Curses.COLOR_GRAY;
+		case Color.White:
+			return Curses.COLOR_WHITE | Curses.A_BOLD | Curses.COLOR_GRAY;
 		}
+		throw new ArgumentException ("Invalid color code");
+	}
 
-		public override Attribute MakeAttribute (Color fore, Color back)
-		{
-			var f = MapColor (fore);
-			//return MakeColor ((short)(f & 0xffff), (short)MapColor (back)) | ((f & Curses.A_BOLD) != 0 ? Curses.A_BOLD : 0);
-			return MakeColor ((short)(f & 0xffff), (short)MapColor (back));
+	static Color MapCursesColor (int color)
+	{
+		switch (color) {
+		case Curses.COLOR_BLACK:
+			return Color.Black;
+		case Curses.COLOR_BLUE:
+			return Color.Blue;
+		case Curses.COLOR_GREEN:
+			return Color.Green;
+		case Curses.COLOR_CYAN:
+			return Color.Cyan;
+		case Curses.COLOR_RED:
+			return Color.Red;
+		case Curses.COLOR_MAGENTA:
+			return Color.Magenta;
+		case Curses.COLOR_YELLOW:
+			return Color.Brown;
+		case Curses.COLOR_WHITE:
+			return Color.Gray;
+		case Curses.COLOR_GRAY:
+			return Color.DarkGray;
+		case Curses.COLOR_BLUE | Curses.COLOR_GRAY:
+			return Color.BrightBlue;
+		case Curses.COLOR_GREEN | Curses.COLOR_GRAY:
+			return Color.BrightGreen;
+		case Curses.COLOR_CYAN | Curses.COLOR_GRAY:
+			return Color.BrightCyan;
+		case Curses.COLOR_RED | Curses.COLOR_GRAY:
+			return Color.BrightRed;
+		case Curses.COLOR_MAGENTA | Curses.COLOR_GRAY:
+			return Color.BrightMagenta;
+		case Curses.COLOR_YELLOW | Curses.COLOR_GRAY:
+			return Color.BrightYellow;
+		case Curses.COLOR_WHITE | Curses.COLOR_GRAY:
+			return Color.White;
 		}
+		throw new ArgumentException ("Invalid curses color code");
+	}
 
-		public override void Suspend ()
-		{
-			StopReportingMouseMoves ();
-			Platform.Suspend ();
-			Curses.Window.Standard.redrawwin ();
-			Curses.refresh ();
-			StartReportingMouseMoves ();
-		}
+	public override Attribute MakeAttribute (Color fore, Color back)
+	{
+		var f = MapColor (fore);
+		//return MakeColor ((short)(f & 0xffff), (short)MapColor (back)) | ((f & Curses.A_BOLD) != 0 ? Curses.A_BOLD : 0);
+		return MakeColor ((short)(f & 0xffff), (short)MapColor (back));
+	}
 
-		public override void StartReportingMouseMoves ()
-		{
-			Console.Out.Write (EscSeqUtils.EnableMouseEvents);
-		}
-
-		public override void StopReportingMouseMoves ()
-		{
-			Console.Out.Write (EscSeqUtils.DisableMouseEvents);
-		}
+	public override void Suspend ()
+	{
+		StopReportingMouseMoves ();
+		Platform.Suspend ();
+		Curses.Window.Standard.redrawwin ();
+		Curses.refresh ();
+		StartReportingMouseMoves ();
+	}
 
 	public void StartReportingMouseMoves ()
 	{
