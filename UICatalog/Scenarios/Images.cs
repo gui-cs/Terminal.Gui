@@ -9,11 +9,12 @@ using System.IO;
 using Terminal.Gui;
 using Attribute = Terminal.Gui.Attribute;
 
+
+
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Images", Description: "Demonstration of how to render an image with/without true color support.")]
 	[ScenarioCategory ("Colors")]
-	public class Images : Scenario
-	{
+	public class Images : Scenario {
 		public override void Setup ()
 		{
 			base.Setup ();
@@ -56,10 +57,11 @@ namespace UICatalog.Scenarios {
 			var imageView = new ImageView () {
 				X = x,
 				Y = y++,
-				Width = Dim.Fill(),
-				Height = Dim.Fill(),
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
 			};
 			Win.Add (imageView);
+
 
 			btnOpenImage.Clicked += (_, _) => {
 				string [] allowedExts = {
@@ -72,13 +74,16 @@ namespace UICatalog.Scenarios {
 				var ofd = new OpenDialog ("Open Image", allowedTypeList);
 				Application.Run (ofd);
 
-				var path = ofd.Path.ToString ();
-				
+				if (ofd.Canceled)
+					return;
+
+				var path = ofd.FilePaths [0];
+
 				if (string.IsNullOrWhiteSpace (path)) {
 					return;
 				}
 
-				if(!File.Exists(path)) {
+				if (!File.Exists (path)) {
 					return;
 				}
 
@@ -91,8 +96,8 @@ namespace UICatalog.Scenarios {
 					MessageBox.ErrorQuery ("Could not open file", ex.Message, "Ok");
 					return;
 				}
-				
-				imageView.SetImage(img);
+
+				imageView.SetImage (img);
 			};
 			
 		}
@@ -102,19 +107,17 @@ namespace UICatalog.Scenarios {
 			private Image<Rgba32> fullResImage;
 			private Image<Rgba32> matchSize;
 
-			ConcurrentDictionary<Rgba32, Attribute> cache = new ConcurrentDictionary<Rgba32, Attribute>();
+			ConcurrentDictionary<Rgba32, Attribute> cache = new ConcurrentDictionary<Rgba32, Attribute> ();
 
 			internal void SetImage (Image<Rgba32> image)
 			{
 				fullResImage = image;
-				Draw ();
-				//Driver.UpdateScreen ();
-				SetNeedsDisplay ();
+				this.SetNeedsDisplay ();
 			}
 
-			public override void OnDrawContent (Rect bounds)
+			public override void OnDrawContent(Rect bounds)
 			{
-				//base.OnDrawContent (bounds);
+				base.OnDrawContent (bounds);
 
 				if (fullResImage == null) {
 					return;
@@ -131,7 +134,7 @@ namespace UICatalog.Scenarios {
 					for (int x = 0; x < bounds.Width; x++) {
 						var rgb = matchSize [x, y];
 
-						var attr = cache.GetOrAdd(rgb, rgb => new Attribute (new TrueColor (), new TrueColor (rgb.R, rgb.G, rgb.B)));
+						var attr = cache.GetOrAdd (rgb, (rgb) => new Attribute (new TrueColor (), new TrueColor (rgb.R, rgb.G, rgb.B)));
 
 						Driver.SetAttribute (attr);
 						AddRune (x, y, (System.Text.Rune)' ');
@@ -139,7 +142,7 @@ namespace UICatalog.Scenarios {
 				}
 				//SetNeedsDisplay (bounds);
 				
-			}
+				}
 			public override void OnDrawContentComplete (Rect contentArea)
 			{
 				base.OnDrawContentComplete (contentArea);

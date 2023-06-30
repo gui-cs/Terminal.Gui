@@ -340,7 +340,7 @@ namespace Terminal.Gui {
 		QuitToplevel,
 
 		/// <summary>
-		/// Suspend a application (used on Linux).
+		/// Suspend a application (Only implemented in <see cref="CursesDriver"/>).
 		/// </summary>
 		Suspend,
 

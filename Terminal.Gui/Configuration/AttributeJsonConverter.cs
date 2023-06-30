@@ -32,6 +32,7 @@ namespace Terminal.Gui {
 			Attribute attribute = new Attribute (-1);
 			Color foreground =  (Color)(-1);
 			Color background =  (Color)(-1);
+			int valuePair = 0;
 			while (reader.Read ()) {
 				if (reader.TokenType == JsonTokenType.EndObject) {
 					if (foreground ==  (Color)(-1) || background ==  (Color)(-1)) {
@@ -47,6 +48,8 @@ namespace Terminal.Gui {
 				string propertyName = reader.GetString ();
 				reader.Read ();
 				string color = $"\"{reader.GetString ()}\"";
+
+				valuePair++;
 
 				switch (propertyName.ToLower ()) {
 				case "foreground":
@@ -68,7 +71,10 @@ namespace Terminal.Gui {
 					throw new JsonException ($"Unknown Attribute property {propertyName}.");
 				}
 
-				attribute = new Attribute (foreground, background);
+				if (valuePair == 2) {
+					attribute = new Attribute (foreground, background);
+					valuePair = 0;
+				}
 			}
 			throw new JsonException ();
 		}
@@ -76,10 +82,14 @@ namespace Terminal.Gui {
 		public override void Write (Utf8JsonWriter writer, Attribute value, JsonSerializerOptions options)
 		{
 			writer.WriteStartObject ();
-			writer.WritePropertyName ("Foreground");
+			writer.WritePropertyName (nameof(Attribute.Foreground));
 			ColorJsonConverter.Instance.Write (writer, value.Foreground, options);
-			writer.WritePropertyName ("Background");
+			writer.WritePropertyName (nameof (Attribute.Background));
 			ColorJsonConverter.Instance.Write (writer, value.Background, options);
+			writer.WritePropertyName (nameof (Attribute.TrueColorForeground));
+			TrueColorJsonConverter.Instance.Write (writer, value.TrueColorForeground, options);
+			writer.WritePropertyName (nameof (Attribute.TrueColorBackground));
+			TrueColorJsonConverter.Instance.Write (writer, value.TrueColorBackground, options);
 			writer.WriteEndObject ();
 		}
 	}

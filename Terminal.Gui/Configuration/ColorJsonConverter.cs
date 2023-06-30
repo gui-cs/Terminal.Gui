@@ -41,7 +41,7 @@ namespace Terminal.Gui {
 						var r = int.Parse (match.Groups [1].Value);
 						var g = int.Parse (match.Groups [2].Value);
 						var b = int.Parse (match.Groups [3].Value);
-						return new TrueColor (r, g, b).ToConsoleColor ();
+						return TrueColor.ToConsoleColor(new TrueColor (r, g, b));
 					} else {
 						throw new JsonException ($"Invalid Color: '{colorString}'");
 					}

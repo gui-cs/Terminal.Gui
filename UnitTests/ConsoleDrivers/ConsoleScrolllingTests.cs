@@ -66,7 +66,7 @@ namespace Terminal.Gui.DriverTests {
 			Assert.Equal (0, Console.WindowLeft);
 			Assert.Equal (0, Console.WindowTop);
 
-			// MockDriver will now be sets to 120x25
+			// MockDriver will now be set to 120x25
 			driver.SetBufferSize (120, 25);
 			Assert.Equal (120, Application.Driver.Cols);
 			Assert.Equal (25, Application.Driver.Rows);

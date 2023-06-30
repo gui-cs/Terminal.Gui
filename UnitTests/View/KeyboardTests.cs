@@ -160,7 +160,7 @@ namespace Terminal.Gui.ViewTests {
 
 			Application.Top.Add (view);
 
-			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('\0', (ConsoleKey)'\0', shift, alt, control));
+			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('\0', 0, shift, alt, control));
 
 			Application.Iteration += () => Application.RequestStop ();
 

@@ -128,7 +128,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets information if the view was already added to the <see cref="SuperView"/>.
+		/// Indicates whether the view was added to <see cref="SuperView"/>.
 		/// </summary>
 		public bool IsAdded { get; private set; }
 

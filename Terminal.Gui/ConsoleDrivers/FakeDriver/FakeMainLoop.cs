@@ -1,98 +1,62 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 
-namespace Terminal.Gui {
-	/// <summary>
-	/// Mainloop intended to be used with the .NET System.Console API, and can
-	/// be used on Windows and Unix, it is cross platform but lacks things like
-	/// file descriptor monitoring.
-	/// </summary>
-	/// <remarks>
-	/// This implementation is used for FakeDriver.
-	/// </remarks>
-	public class FakeMainLoop : IMainLoopDriver {
-		AutoResetEvent keyReady = new AutoResetEvent (false);
-		AutoResetEvent waitForProbe = new AutoResetEvent (false);
-		ConsoleKeyInfo? keyResult = null;
-		MainLoop mainLoop;
-		//Func<ConsoleKeyInfo> consoleKeyReaderFn = () => ;
+namespace Terminal.Gui;
+public class FakeMainLoop : IMainLoopDriver {
+	private MainLoop _mainLoop;
 
-		/// <summary>
-		/// Invoked when a Key is pressed.
-		/// </summary>
-		public Action<ConsoleKeyInfo> KeyPressed;
+	public Action<ConsoleKeyInfo> KeyPressed;
 
-		/// <summary>
-		/// Creates an instance of the FakeMainLoop. <paramref name="consoleDriver"/> is not used.
-		/// </summary>
-		/// <param name="consoleDriver"></param>
-		public FakeMainLoop (ConsoleDriver consoleDriver = null)
-		{
-			// consoleDriver is not needed/used in FakeConsole
-		}
+	public FakeMainLoop (ConsoleDriver consoleDriver = null)
+	{
+		// consoleDriver is not needed/used in FakeConsole
+	}
+	
+	public void Setup (MainLoop mainLoop)
+	{
+		_mainLoop = mainLoop;
+	}
 
-		void MockKeyReader ()
-		{
-			while (true) {
-				waitForProbe.WaitOne ();
-				keyResult = FakeConsole.ReadKey (true);
-				keyReady.Set ();
-			}
-		}
+	public void Wakeup ()
+	{
+		// No implementation needed for FakeMainLoop
+	}
 
-		void IMainLoopDriver.Setup (MainLoop mainLoop)
-		{
-			this.mainLoop = mainLoop;
-			Thread readThread = new Thread (MockKeyReader);
-			readThread.Start ();
-		}
+	public bool EventsPending (bool wait)
+	{
+		//if (CheckTimers (wait, out var waitTimeout)) {
+		//	return true;
+		//}
 
-		void IMainLoopDriver.Wakeup ()
-		{
-		}
+		// Always return true for FakeMainLoop
+		return true;
+	}
 
-		bool IMainLoopDriver.EventsPending (bool wait)
-		{
-			keyResult = null;
-			waitForProbe.Set ();
+	//private bool CheckTimers (bool wait, out int waitTimeout)
+	//{
+	//	long now = DateTime.UtcNow.Ticks;
 
-			if (CheckTimers (wait, out var waitTimeout)) {
-				return true;
-			}
+	//	if (_mainLoop.timeouts.Count > 0) {
+	//		waitTimeout = (int)((_mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
+	//		if (waitTimeout < 0)
+	//			return true;
+	//	} else {
+	//		waitTimeout = -1;
+	//	}
 
-			keyReady.WaitOne (waitTimeout);
-			return keyResult.HasValue;
-		}
+	//	if (!wait) {
+	//		waitTimeout = 0;
+	//	}
 
-		bool CheckTimers (bool wait, out int waitTimeout)
-		{
-			long now = DateTime.UtcNow.Ticks;
+	//	return _mainLoop.idleHandlers.Count > 0;
+	//}
 
-			if (mainLoop.timeouts.Count > 0) {
-				waitTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
-				if (waitTimeout < 0)
-					return true;
-			} else {
-				waitTimeout = -1;
-			}
-
-			if (!wait)
-				waitTimeout = 0;
-
-			int ic;
-			lock (mainLoop.idleHandlers) {
-				ic = mainLoop.idleHandlers.Count;
-			}
-
-			return ic > 0;
-		}
-
-		void IMainLoopDriver.Iteration ()
-		{
-			if (keyResult.HasValue) {
-				KeyPressed?.Invoke (keyResult.Value);
-				keyResult = null;
-			}
+	public void Iteration ()
+	{
+		if (FakeConsole.MockKeyPresses.Count > 0) {
+			KeyPressed?.Invoke (FakeConsole.MockKeyPresses.Pop ());
 		}
 	}
 }
+

@@ -540,8 +540,8 @@ Y
 			// that was set on the OnAdded method with the text length of 3
 			// and height 1 because wasn't set and the text has 1 line
 			Assert.Equal (new Rect (0, 0, 3, 1), lbl.Frame);
-			Assert.Equal (new Rect (0, 0, 3, 1), lbl._needsDisplay);
-			Assert.Equal (new Rect (0, 0, 0, 0), lbl.SuperView._needsDisplay);
+			Assert.Equal (new Rect (0, 0, 3, 1), lbl._needsDisplayRect);
+			Assert.Equal (new Rect (0, 0, 0, 0), lbl.SuperView._needsDisplayRect);
 			Assert.True (lbl.SuperView.LayoutNeeded);
 			lbl.SuperView.Draw ();
 			Assert.Equal ("12  ", GetContents ());

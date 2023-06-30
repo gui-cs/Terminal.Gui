@@ -18,7 +18,7 @@ namespace UICatalog.Scenarios {
 				X = x,
 				Y = y++
 			};
-			Win.Add(lblDriverName);
+			Win.Add (lblDriverName);
 			y++;
 
 			var cbSupportsTrueColor = new CheckBox ("Driver supports true color ") {
@@ -84,7 +84,7 @@ namespace UICatalog.Scenarios {
 				var normal = e.View.GetNormalColor ();
 
 				if (e.View != null) {
-					lblRed.Text = normal.TrueColorForeground.Red.ToString();
+					lblRed.Text = normal.TrueColorForeground.Red.ToString ();
 					lblGreen.Text = normal.TrueColorForeground.Green.ToString ();
 					lblBlue.Text = normal.TrueColorForeground.Blue.ToString ();
 				}
@@ -102,14 +102,16 @@ namespace UICatalog.Scenarios {
 				var l = new Label (" ") {
 					X = dx++,
 					Y = y,
-					ColorScheme = new ColorScheme () { Normal = new Terminal.Gui.Attribute (
+					ColorScheme = new ColorScheme () {
+						Normal = new Terminal.Gui.Attribute (
 						colorFunc (i > 255 ? 255 : i),
 						colorFunc (i > 255 ? 255 : i)
-						) }
+						)
+					}
 				};
 				Win.Add (l);
 			}
-			y+=2;
+			y += 2;
 		}
 	}
 }

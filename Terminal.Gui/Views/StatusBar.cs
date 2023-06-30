@@ -121,8 +121,9 @@ namespace Terminal.Gui {
 		{
 			Move (0, 0);
 			Driver.SetAttribute (GetNormalColor ());
-			for (int i = 0; i < Frame.Width; i++)
+			for (int i = 0; i < Frame.Width; i++) {
 				Driver.AddRune ((Rune)' ');
+			}
 
 			Move (1, 0);
 			var scheme = GetNormalColor ();
