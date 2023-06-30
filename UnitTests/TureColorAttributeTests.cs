@@ -11,7 +11,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 		public void Constuctors_Constuct ()
 		{
 			var driver = new FakeDriver ();
-			Application.Init (driver, new FakeMainLoop (() => FakeConsole.ReadKey (true)));
+			Application.Init (driver, new FakeMainLoop ());
 			driver.Init (() => { });
 
 			// Test foreground, background

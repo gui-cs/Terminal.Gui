@@ -198,7 +198,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			// Test serializing to human-readable color names
 			var attribute = new Attribute (Color.Blue, Color.Green);
 			var json = JsonSerializer.Serialize<Attribute> (attribute, ConfigurationManagerTests._jsonOptions);
-			Assert.Equal ("{\"Foreground\":\"Blue\",\"Background\":\"Green\"}", json);
+			Assert.Equal ("{\"Foreground\":\"Blue\",\"Background\":\"Green\",\"TrueColorForeground\":\"#000080\",\"TrueColorBackground\":\"#008000\"}", json);
 		}
 	}
 

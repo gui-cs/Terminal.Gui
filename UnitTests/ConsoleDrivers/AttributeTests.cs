@@ -187,14 +187,9 @@ namespace Terminal.Gui.DriverTests {
 			attr = new Attribute (Color.Red, Color.Green);
 			Assert.True (attr.HasValidColors);
 
-			attr = new Attribute (Color.Red, (Color)(-1));
-			Assert.False (attr.HasValidColors);
-
-			attr = new Attribute ((Color)(-1), Color.Green);
-			Assert.False (attr.HasValidColors);
-
-			attr = new Attribute ((Color)(-1), (Color)(-1));
-			Assert.False (attr.HasValidColors);
+			Assert.Throws<ArgumentException> (() => attr = new Attribute (Color.Red, (Color)(-1)));
+			Assert.Throws<ArgumentException> (() => attr = new Attribute ((Color)(-1), Color.Green));
+			Assert.Throws<ArgumentException> (() => attr = new Attribute ((Color)(-1), (Color)(-1)));
 		}
 	}
 }
