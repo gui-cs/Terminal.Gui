@@ -132,6 +132,17 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Initializes a new instance of the <see cref="TrueColor"/> struct
+		/// with a default color.
+		/// </summary>
+		public TrueColor ()
+		{
+			Red = 255;
+			Green = 255;
+			Blue = 255;
+		}
+
+		/// <summary>
 		/// Converts the provided text to a <see cref="TrueColor"/>.
 		/// </summary>
 		/// <param name="text">The text to analyze.</param>
@@ -441,7 +452,16 @@ namespace Terminal.Gui {
 		{
 			return obj is Attribute other && Equals (other);
 		}
-
+		/// <summary>
+		/// Implicit conversion from an <see cref="Attribute"/> to the underlying, driver-specific, Int32 representation
+		/// of the color.
+		/// </summary>
+		/// <returns>The driver-specific color value stored in the attribute.</returns>
+		/// <param name="c">The attribute to convert</param>
+		public static implicit operator Attribute (int i)
+		{
+			return new Attribute (i);
+		}
 		/// <inheritdoc />
 		public bool Equals (Attribute other)
 		{
