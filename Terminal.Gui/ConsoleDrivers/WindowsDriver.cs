@@ -1921,7 +1921,8 @@ namespace Terminal.Gui {
 		void WaitWinChange ()
 		{
 			while (true) {
-				Thread.Sleep (100);
+				// Wait for a while then check if screen has changed sizes
+				Task.Delay(500).Wait();
 				if (!consoleDriver.EnableConsoleScrolling) {
 					windowSize = winConsole.GetConsoleBufferWindow (out _);
 					//System.Diagnostics.Debug.WriteLine ($"{consoleDriver.EnableConsoleScrolling},{windowSize.Width},{windowSize.Height}");

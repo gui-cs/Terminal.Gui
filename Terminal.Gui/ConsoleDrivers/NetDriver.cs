@@ -223,8 +223,8 @@ namespace Terminal.Gui {
 		void WaitWinChange ()
 		{
 			while (true) {
-				// HACK: Sleep for 10ms to mitigate high CPU usage (see issue #1502). 10ms was tested to address the problem, but may not be correct.
-				Thread.Sleep (10);
+				// Wait for a while then check if screen has changed sizes
+				Task.Delay(500).Wait();
 				if (stopTasks) {
 					return;
 				}
