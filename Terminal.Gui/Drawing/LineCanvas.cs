@@ -121,6 +121,10 @@ namespace Terminal.Gui {
 			_lines.Add (new StraightLine (start, length, orientation, style, attribute));
 		}
 
+		/// <summary>
+		/// Adds a new line to the canvas
+		/// </summary>
+		/// <param name="line"></param>
 		public void AddLine (StraightLine line)
 		{
 			_cachedBounds = Rect.Empty;

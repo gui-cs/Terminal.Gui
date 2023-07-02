@@ -32,6 +32,14 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Attribute? Attribute { get; set; }
 
+		/// <summary>
+		/// Creates a new instance of the <see cref="StraightLine"/> class.
+		/// </summary>
+		/// <param name="start"></param>
+		/// <param name="length"></param>
+		/// <param name="orientation"></param>
+		/// <param name="style"></param>
+		/// <param name="attribute"></param>
 		public StraightLine (Point start, int length, Orientation orientation, LineStyle style, Attribute? attribute = default)
 		{
 			this.Start = start;
