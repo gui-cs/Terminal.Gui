@@ -182,6 +182,7 @@ namespace UICatalog.Scenarios {
 				} else {
 					if (_currentLine != null) {
 						_currentLine = null;
+						undoHistory.Clear ();
 						SetNeedsDisplay ();
 					}
 				}
