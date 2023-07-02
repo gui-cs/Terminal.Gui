@@ -29,7 +29,7 @@ namespace Terminal.Gui {
 				throw new JsonException ($"Unexpected StartObject token when parsing Attribute: {reader.TokenType}.");
 			}
 
-			Attribute attribute = new Attribute (-1);
+			Attribute attribute = new Attribute ();
 			Color foreground =  (Color)(-1);
 			Color background =  (Color)(-1);
 			int valuePair = 0;
