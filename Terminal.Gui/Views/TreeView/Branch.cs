@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Terminal.Gui {
-	class Branch<T> where T : class {
+	internal class Branch<T> where T : class {
 		/// <summary>
 		/// True if the branch is expanded to reveal child branches.
 		/// </summary>
@@ -202,7 +202,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="driver"></param>
 		/// <returns></returns>
-		private IEnumerable<Rune> GetLinePrefix (ConsoleDriver driver)
+		internal IEnumerable<Rune> GetLinePrefix (ConsoleDriver driver)
 		{
 			// If not showing line branches or this is a root object.
 			if (!tree.Style.ShowBranchLines) {

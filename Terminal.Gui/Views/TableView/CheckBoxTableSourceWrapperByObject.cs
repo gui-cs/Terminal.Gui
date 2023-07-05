@@ -7,7 +7,7 @@ namespace Terminal.Gui {
 	/// by a property on row objects.
 	/// </summary>
 	public class CheckBoxTableSourceWrapperByObject<T> : CheckBoxTableSourceWrapperBase {
-		private readonly EnumerableTableSource<T> toWrap;
+		private readonly IEnumerableTableSource<T> toWrap;
 		readonly Func<T, bool> getter;
 		readonly Action<T, bool> setter;
 
@@ -20,7 +20,7 @@ namespace Terminal.Gui {
 		/// <param name="setter">Delegate method for setting new checked states on your objects of type <typeparamref name="T"/>.</param>
 		public CheckBoxTableSourceWrapperByObject (
 			TableView tableView,
-			EnumerableTableSource<T> toWrap,
+			IEnumerableTableSource<T> toWrap,
 			Func<T,bool> getter,
 			Action<T,bool> setter) : base (tableView, toWrap)
 		{
@@ -32,7 +32,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		protected override bool IsChecked (int row)
 		{
-			return getter (toWrap.Data.ElementAt (row));
+			return getter (toWrap.GetObjectOnRow (row));
 		}
 
 		/// <inheritdoc/>
@@ -44,7 +44,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		protected override void ToggleRow (int row)
 		{
-			var d = toWrap.Data.ElementAt (row);
+			var d = toWrap.GetObjectOnRow (row);
 			setter (d, !getter(d));
 		}
 		
@@ -55,12 +55,12 @@ namespace Terminal.Gui {
 			if (range.All (IsChecked)) {
 				// select none
 				foreach(var r in range) {
-					setter (toWrap.Data.ElementAt (r), false);
+					setter (toWrap.GetObjectOnRow (r), false);
 				}
 			} else {
 				// otherwise tick all
 				foreach (var r in range) {
-					setter (toWrap.Data.ElementAt (r), true);
+					setter (toWrap.GetObjectOnRow  (r), true);
 				}
 			}
 		}
@@ -68,7 +68,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		protected override void ClearAllToggles ()
 		{
-			foreach (var e in toWrap.Data) {
+			foreach (var e in toWrap.GetAllObjects()) {
 				setter (e, false);
 			}
 		}
