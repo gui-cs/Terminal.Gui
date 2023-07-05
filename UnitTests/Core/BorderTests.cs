@@ -20,8 +20,8 @@ namespace Terminal.Gui.CoreTests {
 			Assert.Equal (BorderStyle.None, b.BorderStyle);
 			Assert.False (b.DrawMarginFrame);
 			Assert.Equal (default, b.BorderThickness);
-			Assert.Equal (default, b.BorderBrush);
-			Assert.Equal (default, b.Background);
+			Assert.Equal ((Color)(-1), b.BorderBrush);
+			Assert.Equal ((Color)(-1), b.Background);
 			Assert.Equal (default, b.Padding);
 			Assert.Equal (0, b.ActualWidth);
 			Assert.Equal (0, b.ActualHeight);
@@ -574,7 +574,7 @@ namespace Terminal.Gui.CoreTests {
 			var lblTop = new Label ("At 0,0");
 			var lblFrame = new Label ("Centered") { X = Pos.Center (), Y = Pos.Center () };
 			var frame = new FrameView () { Y = 1, Width = 20, Height = 3 };
-			var lblFill = new Label () { Width = Dim.Fill(),Height = Dim.Fill(), Visible = false };
+			var lblFill = new Label () { Width = Dim.Fill (), Height = Dim.Fill (), Visible = false };
 			var fillText = new System.Text.StringBuilder ();
 			for (int i = 0; i < frame.Bounds.Height; i++) {
 				if (i > 0) {
