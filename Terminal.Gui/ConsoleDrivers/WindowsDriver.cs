@@ -867,7 +867,6 @@ internal class WindowsDriver : ConsoleDriver {
 			break;
 
 			case WindowsConsole.EventType.Focus:
-				keyModifiers = null;
 				break;
 			}
 		}
