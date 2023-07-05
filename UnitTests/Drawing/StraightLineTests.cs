@@ -81,7 +81,7 @@ namespace Terminal.Gui.DrawingTests {
 		[Theory, SetupFakeDriver]
 		public void Bounds (Orientation orientation, int x, int y, int length, int expectedX, int expectedY, int expectedWidth, int expectedHeight)
 		{
-			var sl = new LineCanvas.StraightLine (new Point (x, y), length, orientation, LineStyle.Single);
+			var sl = new StraightLine (new Point (x, y), length, orientation, LineStyle.Single);
 
 			Assert.Equal (new Rect (expectedX, expectedY, expectedWidth, expectedHeight), sl.Bounds);
 		}
