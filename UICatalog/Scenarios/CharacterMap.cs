@@ -516,7 +516,7 @@ class CharMap : ScrollView {
 			Style = new SpinnerStyle.Aesthetic (),
 
 		};
-		spinner.AutoSpin ();
+		spinner.AutoSpin = true;
 		waitIndicator.Add (errorLabel);
 		waitIndicator.Add (spinner);
 		waitIndicator.Ready += async (s, a) => {
