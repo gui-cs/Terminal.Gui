@@ -87,7 +87,7 @@ namespace Terminal.Gui {
 		private FileDialogHistory history;
 
 		private TableView tableView;
-		private TreeView<object> treeView;
+		private TreeView<IFileSystemInfo> treeView;
 		private TileView splitContainer;
 		private Button btnOk;
 		private Button btnCancel;
@@ -105,6 +105,7 @@ namespace Terminal.Gui {
 		private int currentSortColumn;
 
 		private bool currentSortIsAsc = true;
+		private Dictionary<IDirectoryInfo,string> _treeRoots = new Dictionary<IDirectoryInfo, string>();
 
 		/// <summary>
 		/// Event fired when user attempts to confirm a selection (or multi selection).
@@ -255,14 +256,14 @@ namespace Terminal.Gui {
 				}
 			};
 
-			this.treeView = new TreeView<object> () {
+			this.treeView = new TreeView<IFileSystemInfo> () {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 			};
 
-			var fileDialogTreeBuilder = new FileDialogTreeBuilder (this);
+			var fileDialogTreeBuilder = new FileSystemTreeBuilder ();
 			this.treeView.TreeBuilder = fileDialogTreeBuilder;
-			this.treeView.AspectGetter = fileDialogTreeBuilder.AspectGetter;
+			this.treeView.AspectGetter = this.AspectGetter;
 			this.Style.TreeStyle = treeView.Style;
 
 			this.treeView.SelectionChanged += this.TreeView_SelectionChanged;
@@ -370,6 +371,19 @@ namespace Terminal.Gui {
 			this.Add (this.btnForward);
 			this.Add (this.tbPath);
 			this.Add (this.splitContainer);
+		}
+
+		private string AspectGetter (object o)
+		{
+			var fsi = (IFileSystemInfo)o;
+
+			if(o is IDirectoryInfo dir && _treeRoots.ContainsKey(dir)) {
+
+				// Directory has a special name e.g. 'Pictures'
+				return _treeRoots [dir];
+			}
+
+			return (Style.IconProvider.GetIconWithOptionalSpace(fsi) + fsi.Name).Trim();
 		}
 
 		private void OnTableViewMouseClick (object sender, MouseEventEventArgs e)
@@ -637,7 +651,10 @@ namespace Terminal.Gui {
 
 			tbPath.Autocomplete.ColorScheme.Normal = Attribute.Make (Color.Black, tbPath.ColorScheme.Normal.Background);
 
-			treeView.AddObjects (Style.TreeRootGetter ());
+			_treeRoots = Style.TreeRootGetter ();
+			Style.IconProvider.IsOpenGetter = treeView.IsExpanded;
+
+			treeView.AddObjects (_treeRoots.Keys);
 
 			// if filtering on file type is configured then create the ComboBox and establish
 			// initial filtering by extension(s)
@@ -860,13 +877,13 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		private void TreeView_SelectionChanged (object sender, SelectionChangedEventArgs<object> e)
+		private void TreeView_SelectionChanged (object sender, SelectionChangedEventArgs<IFileSystemInfo> e)
 		{
 			if (e.NewValue == null) {
 				return;
 			}
 
-			this.tbPath.Text = FileDialogTreeBuilder.NodeToDirectory (e.NewValue).FullName;
+			this.tbPath.Text = e.NewValue.FullName;
 		}
 
 		private void UpdateNavigationVisibility ()
