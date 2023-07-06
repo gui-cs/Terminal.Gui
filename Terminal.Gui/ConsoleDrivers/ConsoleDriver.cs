@@ -4,8 +4,10 @@
 using System.Text;
 using System;
 using System.Diagnostics;
+using static Terminal.Gui.ColorScheme;
 
 namespace Terminal.Gui;
+
 
 /// <summary>
 /// Base class for Terminal.Gui ConsoleDriver implementations.
@@ -87,6 +89,15 @@ public abstract class ConsoleDriver {
 	/// </summary>
 	public int [,,] Contents { get; internal set; }
 
+	///// <summary>
+	///// The contents of the application output. The driver outputs this buffer to the terminal when <see cref="UpdateScreen"/>
+	///// is called.
+	///// <remarks>
+	///// The format of the array is rows, columns. The first index is the row, the second index is the column.
+	///// </remarks>
+	///// </summary>
+	//public Cell [,] Contents { get; internal set; }
+
 	/// <summary>
 	/// Initializes the driver
 	/// </summary>
@@ -151,10 +162,7 @@ public abstract class ConsoleDriver {
 	/// does not support displaying this rune.</returns>
 	public virtual bool IsRuneSupported (Rune rune)
 	{
-		if (rune.Value > RuneExtensions.MaxUnicodeCodePoint) {
-			return false;
-		}
-		return true;
+		return Rune.IsValid (rune.Value);
 	}
 
 	/// <summary>
@@ -171,7 +179,7 @@ public abstract class ConsoleDriver {
 	/// </para>
 	/// </remarks>
 	/// <param name="rune">Rune to add.</param>
-	public abstract void AddRune (Rune rune); 
+	public abstract void AddRune (Rune rune);
 
 	/// <summary>
 	/// Adds the specified <see langword="char"/> to the display at the current cursor position. This method
@@ -195,7 +203,7 @@ public abstract class ConsoleDriver {
 	/// <param name="str">String.</param>
 	public void AddStr (string str)
 	{
-		foreach (var rune in str.EnumerateRunes()) {
+		foreach (var rune in str.EnumerateRunes ()) {
 			AddRune (rune);
 		}
 	}
@@ -265,7 +273,7 @@ public abstract class ConsoleDriver {
 	public abstract void UpdateScreen ();
 
 	#region Color Handling
-	
+
 	Attribute _currentAttribute;
 
 	/// <summary>

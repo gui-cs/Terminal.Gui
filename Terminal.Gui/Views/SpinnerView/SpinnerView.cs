@@ -190,9 +190,23 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Automates spinning
+		/// Gets or sets whether spinning should occur automatically or be manually
+		/// triggered (e.g. from a background task).
 		/// </summary>
-		public void AutoSpin ()
+		public bool AutoSpin {
+			get {
+				return _timeout != null;
+			}
+			set {
+				if (value) {
+					AddAutoSpinTimeout ();
+				} else {
+					RemoveAutoSpinTimeout ();
+				}
+			}
+		}
+
+		private void AddAutoSpinTimeout ()
 		{
 			if (_timeout != null) {
 				return;
@@ -205,13 +219,22 @@ namespace Terminal.Gui {
 				});
 		}
 
-		/// <inheritdoc/>
-		protected override void Dispose (bool disposing)
+
+		private void RemoveAutoSpinTimeout ()
 		{
 			if (_timeout != null) {
 				Application.MainLoop.RemoveTimeout (_timeout);
 				_timeout = null;
 			}
+		}
+
+
+
+
+		/// <inheritdoc/>
+		protected override void Dispose (bool disposing)
+		{
+			RemoveAutoSpinTimeout ();
 
 			base.Dispose (disposing);
 		}

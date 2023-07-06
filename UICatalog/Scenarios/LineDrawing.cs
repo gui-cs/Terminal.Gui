@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
 using Terminal.Gui;
 using Attribute = Terminal.Gui.Attribute;
 
@@ -24,7 +22,7 @@ namespace UICatalog.Scenarios {
 
 			var tools = new ToolsView () {
 				Title = "Tools",
-				X = Pos.Right(canvas) - 20,
+				X = Pos.Right (canvas) - 20,
 				Y = 2
 			};
 
@@ -34,6 +32,8 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (canvas);
 			Win.Add (tools);
+
+			Win.KeyPress += (s,e) => { e.Handled = canvas.ProcessKey (e.KeyEvent); };
 		}
 
 		class ToolsView : Window {
@@ -55,7 +55,7 @@ namespace UICatalog.Scenarios {
 			private void ToolsView_Initialized (object sender, EventArgs e)
 			{
 				LayoutSubviews ();
-				Width = Math.Max (_colorPicker.Frame.Width, _stylePicker.Frame.Width) + GetFramesThickness().Horizontal;
+				Width = Math.Max (_colorPicker.Frame.Width, _stylePicker.Frame.Width) + GetFramesThickness ().Horizontal;
 				Height = _colorPicker.Frame.Height + _stylePicker.Frame.Height + _addLayerBtn.Frame.Height + GetFramesThickness ().Vertical;
 				SuperView.LayoutSubviews ();
 			}
@@ -97,7 +97,7 @@ namespace UICatalog.Scenarios {
 			List<LineCanvas> _layers = new List<LineCanvas> ();
 			LineCanvas _currentLayer;
 			Color _currentColor = Color.White;
-			Point? _currentLineStart = null;
+			StraightLine? _currentLine = null;
 
 			public LineStyle LineStyle { get; set; }
 
@@ -106,21 +106,45 @@ namespace UICatalog.Scenarios {
 				AddLayer ();
 			}
 
+			Stack<StraightLine> undoHistory = new ();
+
+			public override bool ProcessKey (KeyEvent e)
+			{
+				if (e.Key == (Key.Z | Key.CtrlMask)) {
+					var pop = _currentLayer.RemoveLastLine ();
+					if(pop != null) {
+						undoHistory.Push (pop);
+						SetNeedsDisplay ();
+						return true;
+					}
+				}
+
+				if (e.Key == (Key.Y | Key.CtrlMask)) {
+					if (undoHistory.Any()) {
+						var pop = undoHistory.Pop ();
+						_currentLayer.AddLine(pop);
+						SetNeedsDisplay ();
+						return true;
+					}
+				}
+
+				return base.ProcessKey (e);
+			}
 			internal void AddLayer ()
 			{
 				_currentLayer = new LineCanvas ();
 				_layers.Add (_currentLayer);
 			}
 
-			public override void OnDrawContent (Rect contentArea)
+			public override void OnDrawContentComplete (Rect contentArea)
 			{
-				base.OnDrawContent (contentArea);
-
+				base.OnDrawContentComplete (contentArea);
 				foreach (var canvas in _layers) {
-					
+
 					foreach (var c in canvas.GetCellMap ()) {
 						Driver.SetAttribute (c.Value.Attribute ?? ColorScheme.Normal);
-						this.AddRune (c.Key.X, c.Key.Y, c.Value.Rune.Value);
+						// TODO: #2616 - Support combining sequences that don't normalize
+						this.AddRune (c.Key.X, c.Key.Y, c.Value.Runes [0]);
 					}
 				}
 			}
@@ -128,14 +152,15 @@ namespace UICatalog.Scenarios {
 			public override bool OnMouseEvent (MouseEvent mouseEvent)
 			{
 				if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)) {
-					if (_currentLineStart == null) {
-						_currentLineStart = new Point (mouseEvent.X - GetBoundsOffset().X, mouseEvent.Y - GetBoundsOffset ().X);
-					}
-				} else {
-					if (_currentLineStart != null) {
+					if (_currentLine == null) {
 
-						var start = _currentLineStart.Value;
-						var end = new Point (mouseEvent.X - GetBoundsOffset ().X, mouseEvent.Y - GetBoundsOffset ().X);
+						_currentLine = new StraightLine (
+							new Point (mouseEvent.X - GetBoundsOffset ().X, mouseEvent.Y - GetBoundsOffset ().X),
+							0, Orientation.Vertical, LineStyle, new Attribute (_currentColor, GetNormalColor ().Background));
+						_currentLayer.AddLine (_currentLine);
+					} else {
+						var start = _currentLine.Start;
+						var end = new Point (mouseEvent.X - GetBoundsOffset ().X, mouseEvent.Y - GetBoundsOffset ().Y);
 						var orientation = Orientation.Vertical;
 						var length = end.Y - start.Y;
 
@@ -150,15 +175,15 @@ namespace UICatalog.Scenarios {
 						} else {
 							length--;
 						}
-
-						_currentLayer.AddLine (
-							start,
-							length,
-							orientation,
-							LineStyle,
-							new Attribute (_currentColor, GetNormalColor().Background));
-
-						_currentLineStart = null;
+						_currentLine.Length = length;
+						_currentLine.Orientation = orientation;
+						_currentLayer.ClearCache ();
+						SetNeedsDisplay ();
+					}
+				} else {
+					if (_currentLine != null) {
+						_currentLine = null;
+						undoHistory.Clear ();
 						SetNeedsDisplay ();
 					}
 				}

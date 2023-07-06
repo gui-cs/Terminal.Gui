@@ -196,5 +196,47 @@ namespace Terminal.Gui.DriverTests {
 			attr = new Attribute ((Color)(-1), (Color)(-1));
 			Assert.False (attr.HasValidColors);
 		}
+
+		[Fact]
+		public void Equals_NotInitialized()
+		{
+			var attr1 = new Attribute (Color.Red, Color.Green);
+			var attr2 = new Attribute (Color.Red, Color.Green);
+
+			Assert.True (attr1.Equals (attr2));
+			Assert.True (attr2.Equals (attr1));
+		}
+
+		[Fact]
+		public void NotEquals_NotInitialized ()
+		{
+			var attr1 = new Attribute (Color.Red, Color.Green);
+			var attr2 = new Attribute (Color.Green, Color.Red);
+
+			Assert.False (attr1.Equals (attr2));
+			Assert.False (attr2.Equals (attr1));
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Equals_Initialized ()
+		{
+			Assert.NotNull(Application.Driver);
+
+			var attr1 = new Attribute (Color.Red, Color.Green);
+			var attr2 = new Attribute (Color.Red, Color.Green);
+
+			Assert.True (attr1.Equals (attr2));
+			Assert.True (attr2.Equals (attr1));
+		}
+
+		[Fact,AutoInitShutdown]
+		public void NotEquals_Initialized ()
+		{
+			var attr1 = new Attribute (Color.Red, Color.Green);
+			var attr2 = new Attribute (Color.Green, Color.Red);
+
+			Assert.False (attr1.Equals (attr2));
+			Assert.False (attr2.Equals (attr1));
+		}
 	}
 }

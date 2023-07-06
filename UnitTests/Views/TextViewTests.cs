@@ -960,7 +960,7 @@ namespace Terminal.Gui.ViewsTests {
 
 		[Fact]
 		[TextViewTestsAutoInitShutdown]
-		public void Kill_To_End_Delete_Forwards_And_Copy_To_The_Clipboard ()
+		public void Kill_To_End_Delete_Forwards_Copy_To_The_Clipboard_And_Paste ()
 		{
 			_textView.Text = "This is the first line.\nThis is the second line.";
 			var iteration = 0;
@@ -1003,7 +1003,7 @@ namespace Terminal.Gui.ViewsTests {
 
 		[Fact]
 		[TextViewTestsAutoInitShutdown]
-		public void Kill_To_Start_Delete_Backwards_And_Copy_To_The_Clipboard ()
+		public void Kill_To_Start_Delete_Backwards_Copy_To_The_Clipboard_And_Paste ()
 		{
 			_textView.Text = "This is the first line.\nThis is the second line.";
 			_textView.MoveEnd ();
@@ -1917,7 +1917,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var result = false;
 			var tv = new TextView ();
-			Assert.Throws<ArgumentNullException> (() => result = tv.LoadFile (null));
+			Assert.Throws<ArgumentNullException> (() => result = tv.Load ((string)null));
 			Assert.False (result);
 		}
 
@@ -1926,7 +1926,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var result = false;
 			var tv = new TextView ();
-			Assert.Throws<ArgumentException> (() => result = tv.LoadFile (""));
+			Assert.Throws<ArgumentException> (() => result = tv.Load (""));
 			Assert.False (result);
 		}
 
@@ -1935,7 +1935,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var result = false;
 			var tv = new TextView ();
-			Assert.Throws<System.IO.FileNotFoundException> (() => result = tv.LoadFile ("blabla"));
+			Assert.Throws<System.IO.FileNotFoundException> (() => result = tv.Load ("blabla"));
 			Assert.False (result);
 		}
 
@@ -1943,14 +1943,14 @@ namespace Terminal.Gui.ViewsTests {
 		public void LoadStream_Throws_If_Stream_Is_Null ()
 		{
 			var tv = new TextView ();
-			Assert.Throws<ArgumentNullException> (() => tv.LoadStream (null));
+			Assert.Throws<ArgumentNullException> (() => tv.Load ((System.IO.Stream)null));
 		}
 
 		[Fact]
 		public void LoadStream_Stream_Is_Empty ()
 		{
 			var tv = new TextView ();
-			tv.LoadStream (new System.IO.MemoryStream ());
+			tv.Load (new System.IO.MemoryStream ());
 			Assert.Equal ("", tv.Text);
 		}
 
@@ -1959,7 +1959,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var text = "This is the first line.\r\nThis is the second line.\r\n";
 			var tv = new TextView ();
-			tv.LoadStream (new System.IO.MemoryStream (System.Text.Encoding.ASCII.GetBytes (text)));
+			tv.Load (new System.IO.MemoryStream (System.Text.Encoding.ASCII.GetBytes (text)));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
 		}
 
@@ -1968,7 +1968,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var text = "This is the first line.\nThis is the second line.\n";
 			var tv = new TextView ();
-			tv.LoadStream (new System.IO.MemoryStream (System.Text.Encoding.ASCII.GetBytes (text)));
+			tv.Load (new System.IO.MemoryStream (System.Text.Encoding.ASCII.GetBytes (text)));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
 		}
 
@@ -1984,7 +1984,7 @@ namespace Terminal.Gui.ViewsTests {
 				stream.Position = 0;
 
 				var tv = new TextView ();
-				tv.LoadStream (stream);
+				tv.Load (stream);
 
 				Assert.Equal (7, text.Length);
 				Assert.Equal (text.Length, tv.Text.Length);
@@ -2005,7 +2005,7 @@ namespace Terminal.Gui.ViewsTests {
 				stream.Position = 0;
 
 				var tv = new TextView ();
-				tv.LoadStream (stream);
+				tv.Load (stream);
 
 				Assert.Equal (8, text.Length);
 				Assert.Equal (text.Length, tv.Text.Length);
@@ -2197,23 +2197,23 @@ line.
 		public void Internal_Tests ()
 		{
 			var txt = "This is a text.";
-			var txtRunes = TextModel.ToRunes (txt);
+			var txtRunes = TextModel.StringToRuneCells (txt);
 			Assert.Equal (txt.Length, txtRunes.Count);
-			Assert.Equal ('T', txtRunes [0].Value);
-			Assert.Equal ('h', txtRunes [1].Value);
-			Assert.Equal ('i', txtRunes [2].Value);
-			Assert.Equal ('s', txtRunes [3].Value);
-			Assert.Equal (' ', txtRunes [4].Value);
-			Assert.Equal ('i', txtRunes [5].Value);
-			Assert.Equal ('s', txtRunes [6].Value);
-			Assert.Equal (' ', txtRunes [7].Value);
-			Assert.Equal ('a', txtRunes [8].Value);
-			Assert.Equal (' ', txtRunes [9].Value);
-			Assert.Equal ('t', txtRunes [10].Value);
-			Assert.Equal ('e', txtRunes [11].Value);
-			Assert.Equal ('x', txtRunes [12].Value);
-			Assert.Equal ('t', txtRunes [13].Value);
-			Assert.Equal ('.', txtRunes [^1].Value);
+			Assert.Equal ('T', txtRunes [0].Rune.Value);
+			Assert.Equal ('h', txtRunes [1].Rune.Value);
+			Assert.Equal ('i', txtRunes [2].Rune.Value);
+			Assert.Equal ('s', txtRunes [3].Rune.Value);
+			Assert.Equal (' ', txtRunes [4].Rune.Value);
+			Assert.Equal ('i', txtRunes [5].Rune.Value);
+			Assert.Equal ('s', txtRunes [6].Rune.Value);
+			Assert.Equal (' ', txtRunes [7].Rune.Value);
+			Assert.Equal ('a', txtRunes [8].Rune.Value);
+			Assert.Equal (' ', txtRunes [9].Rune.Value);
+			Assert.Equal ('t', txtRunes [10].Rune.Value);
+			Assert.Equal ('e', txtRunes [11].Rune.Value);
+			Assert.Equal ('x', txtRunes [12].Rune.Value);
+			Assert.Equal ('t', txtRunes [13].Rune.Value);
+			Assert.Equal ('.', txtRunes [^1].Rune.Value);
 
 			int col = 0;
 			Assert.True (TextModel.SetCol (ref col, 80, 79));
@@ -2223,11 +2223,11 @@ line.
 			var start = 0;
 			var x = 8;
 			Assert.Equal (8, TextModel.GetColFromX (txtRunes, start, x));
-			Assert.Equal ('a', txtRunes [start + x].Value);
+			Assert.Equal ('a', txtRunes [start + x].Rune.Value);
 			start = 1;
 			x = 7;
 			Assert.Equal (7, TextModel.GetColFromX (txtRunes, start, x));
-			Assert.Equal ('a', txtRunes [start + x].Value);
+			Assert.Equal ('a', txtRunes [start + x].Rune.Value);
 
 			Assert.Equal ((15, 15), TextModel.DisplaySize (txtRunes));
 			Assert.Equal ((6, 6), TextModel.DisplaySize (txtRunes, 1, 7));
@@ -2237,8 +2237,8 @@ line.
 			Assert.Equal (2, TextModel.CalculateLeftColumn (txtRunes, 0, 9, 8));
 
 			var tm = new TextModel ();
-			tm.AddLine (0, TextModel.ToRunes ("This is first line."));
-			tm.AddLine (1, TextModel.ToRunes ("This is last line."));
+			tm.AddLine (0, TextModel.StringToRuneCells ("This is first line."));
+			tm.AddLine (1, TextModel.StringToRuneCells ("This is last line."));
 			Assert.Equal ((new Point (2, 0), true), tm.FindNextText ("is", out bool gaveFullTurn));
 			Assert.False (gaveFullTurn);
 			Assert.Equal ((new Point (5, 0), true), tm.FindNextText ("is", out gaveFullTurn));
@@ -2262,14 +2262,14 @@ line.
 			Assert.True (gaveFullTurn);
 
 			Assert.Equal ((new Point (9, 1), true), tm.ReplaceAllText ("is", false, false, "really"));
-			Assert.Equal (TextModel.ToRunes ("Threally really first line."), tm.GetLine (0));
-			Assert.Equal (TextModel.ToRunes ("Threally really last line."), tm.GetLine (1));
+			Assert.Equal (TextModel.StringToRuneCells ("Threally really first line."), tm.GetLine (0));
+			Assert.Equal (TextModel.StringToRuneCells ("Threally really last line."), tm.GetLine (1));
 			tm = new TextModel ();
-			tm.AddLine (0, TextModel.ToRunes ("This is first line."));
-			tm.AddLine (1, TextModel.ToRunes ("This is last line."));
+			tm.AddLine (0, TextModel.StringToRuneCells ("This is first line."));
+			tm.AddLine (1, TextModel.StringToRuneCells ("This is last line."));
 			Assert.Equal ((new Point (5, 1), true), tm.ReplaceAllText ("is", false, true, "really"));
-			Assert.Equal (TextModel.ToRunes ("This really first line."), tm.GetLine (0));
-			Assert.Equal (TextModel.ToRunes ("This really last line."), tm.GetLine (1));
+			Assert.Equal (TextModel.StringToRuneCells ("This really first line."), tm.GetLine (0));
+			Assert.Equal (TextModel.StringToRuneCells ("This really last line."), tm.GetLine (1));
 		}
 
 		[Fact]
@@ -2600,8 +2600,8 @@ line.
 			Assert.True (tv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (28, 2), tv.CursorPosition);
-			Assert.Single (tv.Autocomplete.Suggestions);
-			Assert.Equal ("first", tv.Autocomplete.Suggestions [0].Replacement);
+			Assert.Empty (tv.Autocomplete.Suggestions);
+			Assert.False (tv.Autocomplete.Visible);
 			g.AllSuggestions = new List<string> ();
 			tv.Autocomplete.ClearSuggestions ();
 			Assert.Empty (g.AllSuggestions);
@@ -2995,12 +2995,12 @@ line.
 
 			foreach (var ls in Enum.GetValues (typeof (HistoryText.LineStatus))) {
 				if ((HistoryText.LineStatus)ls != HistoryText.LineStatus.Original) {
-					Assert.Throws<ArgumentException> (() => ht.Add (new List<List<Rune>> () { new List<Rune> () }, Point.Empty,
+					Assert.Throws<ArgumentException> (() => ht.Add (new List<List<RuneCell>> () { new List<RuneCell> () }, Point.Empty,
 						(HistoryText.LineStatus)ls));
 				}
 			}
 
-			Assert.Null (Record.Exception (() => ht.Add (new List<List<Rune>> () { new List<Rune> () }, Point.Empty,
+			Assert.Null (Record.Exception (() => ht.Add (new List<List<RuneCell>> () { new List<RuneCell> () }, Point.Empty,
 				HistoryText.LineStatus.Original)));
 		}
 
@@ -6179,7 +6179,7 @@ line.
 			Assert.True (tv.MouseEvent (new MouseEvent () { X = 0, Y = 3, Flags = MouseFlags.Button1Pressed }));
 			tv.Draw ();
 			Assert.Equal (new Point (0, 3), tv.CursorPosition);
-			Assert.Equal (new Point (12, 0), cp);
+			Assert.Equal (new Point (13, 0), cp);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This 
 is   
@@ -6728,12 +6728,12 @@ This is the second line.
 			Kill_Delete_WordBackward ();
 			Assert.Equal (expectedEventCount, eventcount);
 
-			expectedEventCount += 1;
-			Kill_To_End_Delete_Forwards_And_Copy_To_The_Clipboard ();
+			expectedEventCount += 2;
+			Kill_To_End_Delete_Forwards_Copy_To_The_Clipboard_And_Paste ();
 			Assert.Equal (expectedEventCount, eventcount);
 
-			expectedEventCount += 1;
-			Kill_To_Start_Delete_Backwards_And_Copy_To_The_Clipboard ();
+			expectedEventCount += 2;
+			Kill_To_Start_Delete_Backwards_Copy_To_The_Clipboard_And_Paste ();
 			Assert.Equal (expectedEventCount, eventcount);
 		}
 
@@ -6882,7 +6882,7 @@ This is the second line.
 			};
 
 			var text = "This is the first line.\r\nThis is the second line.\r\n";
-			tv.LoadStream (new System.IO.MemoryStream (System.Text.Encoding.ASCII.GetBytes (text)));
+			tv.Load (new System.IO.MemoryStream (System.Text.Encoding.ASCII.GetBytes (text)));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
 
 			Assert.Equal (1, eventcount);
@@ -6906,7 +6906,7 @@ This is the second line.
 			var fileName = "textview.txt";
 			System.IO.File.WriteAllText (fileName, "This is the first line.\r\nThis is the second line.\r\n");
 
-			tv.LoadFile (fileName);
+			tv.Load (fileName);
 			Assert.Equal (1, eventcount);
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
 		}
@@ -6957,6 +6957,25 @@ This is the second line.
 			Assert.Equal (string.Empty, _textView.Text);
 			_textView.Paste ();
 			Assert.Equal ("TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!", _textView.Text);
+		}
+
+		[Fact, TextViewTestsAutoInitShutdown]
+		public void WordWrap_True_LoadStream_New_Text ()
+		{
+			Assert.Equal ("TAB to jump between text fields.", _textView.Text);
+			_textView.WordWrap = true;
+			Assert.Equal ("TAB to jump between text fields.", _textView.Text);
+			var text = "This is the first line.\nThis is the second line.\n";
+			using (System.IO.MemoryStream stream = new System.IO.MemoryStream ()) {
+				var writer = new System.IO.StreamWriter (stream);
+				writer.Write (text);
+				writer.Flush ();
+				stream.Position = 0;
+
+				_textView.Load (stream);
+				Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", _textView.Text);
+				Assert.True (_textView.WordWrap);
+			}
 		}
 	}
 }

@@ -24,9 +24,13 @@ namespace Terminal.Gui {
 		{
 			switch (col) {
 			case 0:
-				var icon = stats.IsParent ? null : style.IconGetter?.Invoke (
-					new FileDialogIconGetterArgs(dlg,stats.FileSystemInfo, FileDialogIconGetterContext.Table));
-				return icon + (stats?.Name ?? string.Empty);
+				// do not use icon for ".."
+				if(stats?.IsParent ?? false) {
+					return stats.Name;
+				}
+
+				var icon = dlg.Style.IconProvider.GetIconWithOptionalSpace(stats.FileSystemInfo);
+				return (icon + (stats?.Name ?? string.Empty)).Trim();
 			case 1:
 				return stats?.HumanReadableLength ?? string.Empty;
 			case 2:

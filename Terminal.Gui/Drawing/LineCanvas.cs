@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
-
 namespace Terminal.Gui {
 
 	/// <summary>
@@ -123,10 +121,28 @@ namespace Terminal.Gui {
 			_lines.Add (new StraightLine (start, length, orientation, style, attribute));
 		}
 
-		private void AddLine (StraightLine line)
+		/// <summary>
+		/// Adds a new line to the canvas
+		/// </summary>
+		/// <param name="line"></param>
+		public void AddLine (StraightLine line)
 		{
 			_cachedBounds = Rect.Empty;
 			_lines.Add (line);
+		}
+
+		/// <summary>
+		/// Removes the last line added to the canvas
+		/// </summary>
+		/// <returns></returns>
+		public StraightLine RemoveLastLine()
+		{
+			var l = _lines.LastOrDefault ();
+			if(l != null) {
+				_lines.Remove(l);
+			}
+
+			return l;
 		}
 
 		/// <summary>
@@ -138,6 +154,15 @@ namespace Terminal.Gui {
 			_lines.Clear ();
 		}
 
+		/// <summary>
+		/// Clears any cached states from the canvas
+		/// Call this method if you make changes to lines
+		/// that have already been added.
+		/// </summary>
+		public void ClearCache ()
+		{
+			_cachedBounds = Rect.Empty;
+		}
 		private Rect _cachedBounds;
 
 		/// <summary>
@@ -528,14 +553,17 @@ namespace Terminal.Gui {
 
 		}
 
-		private Cell GetCellForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
+		private Cell? GetCellForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
 		{
 			if (!intersects.Any ()) {
 				return null;
 			}
 
 			var cell = new Cell ();
-			cell.Rune = GetRuneForIntersects (driver, intersects);
+			var rune = GetRuneForIntersects (driver, intersects);
+			if (rune.HasValue) {
+				cell.Runes.Add (rune.Value);
+			}
 			cell.Attribute = GetAttributeForIntersects (intersects);
 			return cell;
 		}
@@ -703,256 +731,93 @@ namespace Terminal.Gui {
 				AddLine (line);
 			}
 		}
-
-		internal class IntersectionDefinition {
-			/// <summary>
-			/// The point at which the intersection happens
-			/// </summary>
-			internal Point Point { get; }
-
-			/// <summary>
-			/// Defines how <see cref="Line"/> position relates
-			/// to <see cref="Point"/>.
-			/// </summary>
-			internal IntersectionType Type { get; }
-
-			/// <summary>
-			/// The line that intersects <see cref="Point"/>
-			/// </summary>
-			internal StraightLine Line { get; }
-
-			internal IntersectionDefinition (Point point, IntersectionType type, StraightLine line)
-			{
-				Point = point;
-				Type = type;
-				Line = line;
-			}
-		}
+	}
+	internal class IntersectionDefinition {
+		/// <summary>
+		/// The point at which the intersection happens
+		/// </summary>
+		internal Point Point { get; }
 
 		/// <summary>
-		/// The type of Rune that we will use before considering
-		/// double width, curved borders etc
+		/// Defines how <see cref="Line"/> position relates
+		/// to <see cref="Point"/>.
 		/// </summary>
-		internal enum IntersectionRuneType {
-			None,
-			Dot,
-			ULCorner,
-			URCorner,
-			LLCorner,
-			LRCorner,
-			TopTee,
-			BottomTee,
-			RightTee,
-			LeftTee,
-			Cross,
-			HLine,
-			VLine,
+		internal IntersectionType Type { get; }
+
+		/// <summary>
+		/// The line that intersects <see cref="Point"/>
+		/// </summary>
+		internal StraightLine Line { get; }
+
+		internal IntersectionDefinition (Point point, IntersectionType type, StraightLine line)
+		{
+			Point = point;
+			Type = type;
+			Line = line;
 		}
+	}
 
-		internal enum IntersectionType {
-			/// <summary>
-			/// There is no intersection
-			/// </summary>
-			None,
+	/// <summary>
+	/// The type of Rune that we will use before considering
+	/// double width, curved borders etc
+	/// </summary>
+	internal enum IntersectionRuneType {
+		None,
+		Dot,
+		ULCorner,
+		URCorner,
+		LLCorner,
+		LRCorner,
+		TopTee,
+		BottomTee,
+		RightTee,
+		LeftTee,
+		Cross,
+		HLine,
+		VLine,
+	}
 
-			/// <summary>
-			///  A line passes directly over this point traveling along
-			///  the horizontal axis
-			/// </summary>
-			PassOverHorizontal,
+	internal enum IntersectionType {
+		/// <summary>
+		/// There is no intersection
+		/// </summary>
+		None,
 
-			/// <summary>
-			///  A line passes directly over this point traveling along
-			///  the vertical axis
-			/// </summary>
-			PassOverVertical,
+		/// <summary>
+		///  A line passes directly over this point traveling along
+		///  the horizontal axis
+		/// </summary>
+		PassOverHorizontal,
 
-			/// <summary>
-			/// A line starts at this point and is traveling up
-			/// </summary>
-			StartUp,
+		/// <summary>
+		///  A line passes directly over this point traveling along
+		///  the vertical axis
+		/// </summary>
+		PassOverVertical,
 
-			/// <summary>
-			/// A line starts at this point and is traveling right
-			/// </summary>
-			StartRight,
+		/// <summary>
+		/// A line starts at this point and is traveling up
+		/// </summary>
+		StartUp,
 
-			/// <summary>
-			/// A line starts at this point and is traveling down
-			/// </summary>
-			StartDown,
+		/// <summary>
+		/// A line starts at this point and is traveling right
+		/// </summary>
+		StartRight,
 
-			/// <summary>
-			/// A line starts at this point and is traveling left
-			/// </summary>
-			StartLeft,
+		/// <summary>
+		/// A line starts at this point and is traveling down
+		/// </summary>
+		StartDown,
 
-			/// <summary>
-			/// A line exists at this point who has 0 length
-			/// </summary>
-			Dot
-		}
+		/// <summary>
+		/// A line starts at this point and is traveling left
+		/// </summary>
+		StartLeft,
 
-		// TODO: Add events that notify when StraightLine changes to enable dynamic layout
-		internal class StraightLine {
-			public Point Start { get; }
-			public int Length { get; }
-			public Orientation Orientation { get; }
-			public LineStyle Style { get; }
-			public Attribute? Attribute { get; set; }
-
-			internal StraightLine (Point start, int length, Orientation orientation, LineStyle style, Attribute? attribute = default)
-			{
-				this.Start = start;
-				this.Length = length;
-				this.Orientation = orientation;
-				this.Style = style;
-				this.Attribute = attribute;
-			}
-
-			internal IntersectionDefinition Intersects (int x, int y)
-			{
-				switch (Orientation) {
-				case Orientation.Horizontal: return IntersectsHorizontally (x, y);
-				case Orientation.Vertical: return IntersectsVertically (x, y);
-				default: throw new ArgumentOutOfRangeException (nameof (Orientation));
-				}
-
-			}
-
-			private IntersectionDefinition IntersectsHorizontally (int x, int y)
-			{
-				if (Start.Y != y) {
-					return null;
-				} else {
-					if (StartsAt (x, y)) {
-
-						return new IntersectionDefinition (
-							Start,
-							GetTypeByLength (IntersectionType.StartLeft, IntersectionType.PassOverHorizontal, IntersectionType.StartRight),
-							this
-							);
-
-					}
-
-					if (EndsAt (x, y)) {
-
-						return new IntersectionDefinition (
-							Start,
-							Length < 0 ? IntersectionType.StartRight : IntersectionType.StartLeft,
-							this
-							);
-
-					} else {
-						var xmin = Math.Min (Start.X, Start.X + Length);
-						var xmax = Math.Max (Start.X, Start.X + Length);
-
-						if (xmin < x && xmax > x) {
-							return new IntersectionDefinition (
-							new Point (x, y),
-							IntersectionType.PassOverHorizontal,
-							this
-							);
-						}
-					}
-
-					return null;
-				}
-			}
-
-			private IntersectionDefinition IntersectsVertically (int x, int y)
-			{
-				if (Start.X != x) {
-					return null;
-				} else {
-					if (StartsAt (x, y)) {
-
-						return new IntersectionDefinition (
-							Start,
-							GetTypeByLength (IntersectionType.StartUp, IntersectionType.PassOverVertical, IntersectionType.StartDown),
-							this
-							);
-
-					}
-
-					if (EndsAt (x, y)) {
-
-						return new IntersectionDefinition (
-							Start,
-							Length < 0 ? IntersectionType.StartDown : IntersectionType.StartUp,
-							this
-							);
-
-					} else {
-						var ymin = Math.Min (Start.Y, Start.Y + Length);
-						var ymax = Math.Max (Start.Y, Start.Y + Length);
-
-						if (ymin < y && ymax > y) {
-							return new IntersectionDefinition (
-							new Point (x, y),
-							IntersectionType.PassOverVertical,
-							this
-							);
-						}
-					}
-
-					return null;
-				}
-			}
-
-			private IntersectionType GetTypeByLength (IntersectionType typeWhenNegative, IntersectionType typeWhenZero, IntersectionType typeWhenPositive)
-			{
-				if (Length == 0) {
-					return typeWhenZero;
-				}
-
-				return Length < 0 ? typeWhenNegative : typeWhenPositive;
-			}
-
-			private bool EndsAt (int x, int y)
-			{
-				var sub = (Length == 0) ? 0 : (Length > 0) ? 1 : -1;
-				if (Orientation == Orientation.Horizontal) {
-					return Start.X + Length - sub == x && Start.Y == y;
-				}
-
-				return Start.X == x && Start.Y + Length - sub == y;
-			}
-
-			private bool StartsAt (int x, int y)
-			{
-				return Start.X == x && Start.Y == y;
-			}
-
-			/// <summary>
-			/// Gets the rectangle that describes the bounds of the canvas. Location is the coordinates of the 
-			/// line that is furthest left/top and Size is defined by the line that extends the furthest
-			/// right/bottom.
-			/// </summary>
-			internal Rect Bounds {
-				get {
-
-					// 0 and 1/-1 Length means a size (width or height) of 1
-					var size = Math.Max (1, Math.Abs (Length));
-
-					// How much to offset x or y to get the start of the line
-					var offset = Math.Abs (Length < 0 ? Length + 1 : 0);
-					var x = Start.X - (Orientation == Orientation.Horizontal ? offset : 0);
-					var y = Start.Y - (Orientation == Orientation.Vertical ? offset : 0);
-					var width = Orientation == Orientation.Horizontal ? size : 1;
-					var height = Orientation == Orientation.Vertical ? size : 1;
-
-					return new Rect (x, y, width, height);
-				}
-			}
-
-			/// <summary>
-			/// Formats the Line as a string in (Start.X,Start.Y,Length,Orientation) notation.
-			/// </summary>
-			public override string ToString ()
-			{
-				return $"({Start.X},{Start.Y},{Length},{Orientation})";
-			}
-		}
+		/// <summary>
+		/// A line exists at this point who has 0 length
+		/// </summary>
+		Dot
 	}
 }

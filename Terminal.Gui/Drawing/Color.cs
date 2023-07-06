@@ -420,6 +420,9 @@ namespace Terminal.Gui {
 		/// <param name="color">The color.</param>
 		public Attribute (Color color) : this (color, color) { }
 
+		/// <inheritdoc />
+		public override int GetHashCode () => HashCode.Combine (Value, Foreground, Background);
+
 		/// <summary>
 		/// Compares two attributes for equality.
 		/// </summary>
@@ -547,7 +550,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Creates a new instance, initialized with the values from <paramref name="scheme"/>.
 		/// </summary>
-		/// <param name="scheme">The scheme to initlize the new instance with.</param>
+		/// <param name="scheme">The scheme to initialize the new instance with.</param>
 		public ColorScheme (ColorScheme scheme) : base ()
 		{
 			if (scheme != null) {
@@ -557,6 +560,19 @@ namespace Terminal.Gui {
 				_disabled = scheme.Disabled;
 				_hotFocus = scheme.HotFocus;
 			}
+		}
+
+		/// <summary>
+		/// Creates a new instance, initialized with the values from <paramref name="attribute"/>.
+		/// </summary>
+		/// <param name="attribute">The attribute to initialize the new instance with.</param>
+		public ColorScheme (Attribute attribute)
+		{
+			_normal = attribute;
+			_focus = attribute;
+			_hotNormal = attribute;
+			_disabled = attribute;
+			_hotFocus = attribute;
 		}
 
 		/// <summary>
@@ -641,7 +657,7 @@ namespace Terminal.Gui {
 		/// <returns>true if the two objects are equal</returns>
 		public bool Equals (ColorScheme other)
 		{
-			return other != null &&
+				return other != null &&
 			       EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
 			       EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
 			       EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&

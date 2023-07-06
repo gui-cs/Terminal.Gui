@@ -6,14 +6,14 @@ using System.Text;
 namespace Terminal.Gui {
 	partial class HistoryText {
 		public class HistoryTextItem : EventArgs {
-			public List<List<Rune>> Lines;
+			public List<List<RuneCell>> Lines;
 			public Point CursorPosition;
 			public LineStatus LineStatus;
 			public bool IsUndoing;
 			public Point FinalCursorPosition;
 			public HistoryTextItem RemovedOnAdded;
 
-			public HistoryTextItem (List<List<Rune>> lines, Point curPos, LineStatus linesStatus)
+			public HistoryTextItem (List<List<RuneCell>> lines, Point curPos, LineStatus linesStatus)
 			{
 				Lines = lines;
 				CursorPosition = curPos;
@@ -22,7 +22,7 @@ namespace Terminal.Gui {
 
 			public HistoryTextItem (HistoryTextItem historyTextItem)
 			{
-				Lines = new List<List<Rune>> (historyTextItem.Lines);
+				Lines = new List<List<RuneCell>> (historyTextItem.Lines);
 				CursorPosition = new Point (historyTextItem.CursorPosition.X, historyTextItem.CursorPosition.Y);
 				LineStatus = historyTextItem.LineStatus;
 			}
