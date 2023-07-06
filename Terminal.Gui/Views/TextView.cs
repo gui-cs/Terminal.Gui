@@ -124,7 +124,7 @@ namespace Terminal.Gui {
 		}
 
 		// Splits a string into a List that contains a List<RuneCell> for each line
-		public static List<List<RuneCell>> StringToRuneCellsSplitted (string content, ColorScheme? colorScheme = null)
+		public static List<List<RuneCell>> StringToLinesOfRuneCells (string content, ColorScheme? colorScheme = null)
 		{
 			var cells = content.EnumerateRunes ().Select (x => new RuneCell () { Rune = x, ColorScheme = colorScheme }).ToList ();
 
@@ -195,7 +195,7 @@ namespace Terminal.Gui {
 
 		public void LoadString (string content)
 		{
-			_lines = StringToRuneCellsSplitted (content);
+			_lines = StringToLinesOfRuneCells (content);
 
 			OnLinesLoaded ();
 		}
@@ -1780,14 +1780,14 @@ namespace Terminal.Gui {
 		private MenuBarItem BuildContextMenuBarItem ()
 		{
 			return new MenuBarItem (new MenuItem [] {
-		    new MenuItem (Strings.ctxSelectAll, "", () => SelectAll (), null, null, GetKeyFromCommand (Command.SelectAll)),
-		    new MenuItem (Strings.ctxDeleteAll, "", () => DeleteAll (), null, null, GetKeyFromCommand (Command.DeleteAll)),
-		    new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, GetKeyFromCommand (Command.Copy)),
-		    new MenuItem (Strings.ctxCut, "", () => Cut (), null, null, GetKeyFromCommand (Command.Cut)),
-		    new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, GetKeyFromCommand (Command.Paste)),
-		    new MenuItem (Strings.ctxUndo, "", () => Undo (), null, null, GetKeyFromCommand (Command.Undo)),
-		    new MenuItem (Strings.ctxRedo, "", () => Redo (), null, null, GetKeyFromCommand (Command.Redo)),
-		});
+				new MenuItem (Strings.ctxSelectAll, "", () => SelectAll (), null, null, GetKeyFromCommand (Command.SelectAll)),
+				new MenuItem (Strings.ctxDeleteAll, "", () => DeleteAll (), null, null, GetKeyFromCommand (Command.DeleteAll)),
+				new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, GetKeyFromCommand (Command.Copy)),
+				new MenuItem (Strings.ctxCut, "", () => Cut (), null, null, GetKeyFromCommand (Command.Cut)),
+				new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, GetKeyFromCommand (Command.Paste)),
+				new MenuItem (Strings.ctxUndo, "", () => Undo (), null, null, GetKeyFromCommand (Command.Undo)),
+				new MenuItem (Strings.ctxRedo, "", () => Redo (), null, null, GetKeyFromCommand (Command.Redo)),
+			});
 		}
 
 		private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e)
@@ -1837,7 +1837,7 @@ namespace Terminal.Gui {
 					if (i == 0) {
 						_model.ReplaceLine (startLine, obj.Lines [i]);
 					} else if ((obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Removed)
-						  || !obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Added) {
+						|| !obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Added) {
 						_model.AddLine (startLine, obj.Lines [i]);
 					} else if (Lines > obj.CursorPosition.Y + 1) {
 						_model.RemoveLine (obj.CursorPosition.Y + 1);
@@ -2938,7 +2938,7 @@ namespace Terminal.Gui {
 					if (idxCol < line.Count && _selecting && PointInSelection (idxCol, idxRow)) {
 						OnDrawSelectionColor (line, idxCol, idxRow);
 					} else if (idxCol == _currentColumn && idxRow == _currentRow && !_selecting && !Used
-					      && HasFocus && idxCol < lineRuneCount) {
+						&& HasFocus && idxCol < lineRuneCount) {
 						OnDrawUsedColor (line, idxCol, idxRow);
 					} else if (ReadOnly) {
 						OnDrawReadOnlyColor (line, idxCol, idxRow);
@@ -3006,8 +3006,8 @@ namespace Terminal.Gui {
 			GenerateSuggestions ();
 
 			var renderAt = new Point (
-			    Autocomplete.Context.CursorPosition,
-			    Autocomplete.PopupInsideContainer
+				Autocomplete.Context.CursorPosition,
+				Autocomplete.PopupInsideContainer
 				? (CursorPosition.Y + 1) - TopRow
 				: 0);
 
@@ -3132,7 +3132,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var lines = TextModel.StringToRuneCellsSplitted (text);
+			var lines = TextModel.StringToLinesOfRuneCells (text);
 
 			if (lines.Count == 0) {
 				return;
@@ -3242,12 +3242,12 @@ namespace Terminal.Gui {
 				_leftColumn = _currentColumn;
 				need = true;
 			} else if (!_wordWrap && (_currentColumn - _leftColumn + RightOffset > Frame.Width + offB.width
-			      || dSize.size + RightOffset >= Frame.Width + offB.width)) {
+				|| dSize.size + RightOffset >= Frame.Width + offB.width)) {
 				_leftColumn = TextModel.CalculateLeftColumn (line, _leftColumn, _currentColumn,
 				    Frame.Width + offB.width - RightOffset, TabWidth);
 				need = true;
 			} else if ((_wordWrap && _leftColumn > 0) || (dSize.size + RightOffset < Frame.Width + offB.width
-			      && tSize.size + RightOffset < Frame.Width + offB.width)) {
+				&& tSize.size + RightOffset < Frame.Width + offB.width)) {
 				if (_leftColumn > 0) {
 					_leftColumn = 0;
 					need = true;
@@ -4585,9 +4585,9 @@ namespace Terminal.Gui {
 				_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (currentLine) }, CursorPosition);
 
 				var addedLine = new List<List<RuneCell>> {
-		    new List<RuneCell> (currentLine),
-		    runeList
-		};
+					new List<RuneCell> (currentLine),
+					runeList
+				};
 
 				_historyText.Add (new List<List<RuneCell>> (addedLine), CursorPosition, HistoryText.LineStatus.Added);
 
