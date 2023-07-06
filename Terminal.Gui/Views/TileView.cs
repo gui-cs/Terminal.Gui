@@ -321,11 +321,11 @@ namespace Terminal.Gui {
 			if (IsRootTileView ()) {
 				if (HasBorder ()) {
 
-					lc.AddLine (new Point (0, 0), Bounds.Width - 1, Orientation.Horizontal, LineStyle);
-					lc.AddLine (new Point (0, 0), Bounds.Height - 1, Orientation.Vertical, LineStyle);
+					lc.AddLine (new Point (0, 0), Bounds.Width, Orientation.Horizontal, LineStyle);
+					lc.AddLine (new Point (0, 0), Bounds.Height, Orientation.Vertical, LineStyle);
 
-					lc.AddLine (new Point (Bounds.Width - 1, Bounds.Height - 1), -Bounds.Width + 1, Orientation.Horizontal, LineStyle);
-					lc.AddLine (new Point (Bounds.Width - 1, Bounds.Height - 1), -Bounds.Height + 1, Orientation.Vertical, LineStyle);
+					lc.AddLine (new Point (Bounds.Width - 1, Bounds.Height - 1), -Bounds.Width, Orientation.Horizontal, LineStyle);
+					lc.AddLine (new Point (Bounds.Width - 1, Bounds.Height - 1), -Bounds.Height, Orientation.Vertical, LineStyle);
 				}
 
 				foreach (var line in allLines) {
@@ -334,8 +334,8 @@ namespace Terminal.Gui {
 					line.ViewToScreen (0, 0, out var x1, out var y1);
 					var origin = ScreenToView (x1, y1);
 					var length = line.Orientation == Orientation.Horizontal ?
-							line.Frame.Width - 1 :
-							line.Frame.Height - 1;
+							line.Frame.Width :
+							line.Frame.Height;
 
 					if (!isRoot) {
 						if (line.Orientation == Orientation.Horizontal) {

@@ -866,10 +866,10 @@ internal class WindowsDriver : ConsoleDriver {
 			TerminalResized?.Invoke ();
 			break;
 
-		case WindowsConsole.EventType.Focus:
-			break;
+			case WindowsConsole.EventType.Focus:
+				break;
+			}
 		}
-	}
 
 	WindowsConsole.ButtonState? _lastMouseButtonPressed = null;
 	bool _isButtonPressed = false;

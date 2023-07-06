@@ -142,10 +142,7 @@ public abstract class ConsoleDriver {
 	/// does not support displaying this rune.</returns>
 	public virtual bool IsRuneSupported (Rune rune)
 	{
-		if (rune.Value > RuneExtensions.MaxUnicodeCodePoint) {
-			return false;
-		}
-		return true;
+		return Rune.IsValid (rune.Value);
 	}
 
 	/// <summary>
@@ -162,7 +159,7 @@ public abstract class ConsoleDriver {
 	/// </para>
 	/// </remarks>
 	/// <param name="rune">Rune to add.</param>
-	public abstract void AddRune (Rune rune); 
+	public abstract void AddRune (Rune rune);
 
 	/// <summary>
 	/// Adds the specified <see langword="char"/> to the display at the current cursor position. This method
@@ -186,7 +183,7 @@ public abstract class ConsoleDriver {
 	/// <param name="str">String.</param>
 	public void AddStr (string str)
 	{
-		foreach (var rune in str.EnumerateRunes()) {
+		foreach (var rune in str.EnumerateRunes ()) {
 			AddRune (rune);
 		}
 	}
@@ -256,7 +253,7 @@ public abstract class ConsoleDriver {
 	public abstract void UpdateScreen ();
 
 	#region Color Handling
-	
+
 	Attribute _currentAttribute;
 
 	/// <summary>

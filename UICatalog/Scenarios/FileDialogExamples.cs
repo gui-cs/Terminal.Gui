@@ -148,11 +148,8 @@ namespace UICatalog.Scenarios {
 				fd.FilesSelected += ConfirmOverwrite;
 			}
 
-			if (rgIcons.SelectedItem == 1) {
-				fd.Style.UseUnicodeCharacters = true;
-			} else if (rgIcons.SelectedItem == 2) {
-				fd.Style.UseNerdForIcons ();
-			}
+			fd.Style.IconProvider.UseUnicodeCharacters = rgIcons.SelectedItem == 1;
+			fd.Style.IconProvider.UseNerdIcons = rgIcons.SelectedItem == 2;
 
 			if (cbCaseSensitive.Checked ?? false) {
 
@@ -168,8 +165,7 @@ namespace UICatalog.Scenarios {
 
 			if (cbDrivesOnlyInTree.Checked ?? false) {
 				fd.Style.TreeRootGetter = () => {
-					return System.Environment.GetLogicalDrives ()
-					.Select (d => new FileDialogRootTreeNode (d, dirInfoFactory.New (d)));
+					return System.Environment.GetLogicalDrives ().ToDictionary(dirInfoFactory.New,k=>k);
 				};
 			}
 

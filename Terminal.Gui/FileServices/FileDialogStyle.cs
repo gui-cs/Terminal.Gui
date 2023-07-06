@@ -39,6 +39,12 @@ namespace Terminal.Gui {
 		public bool UseColors { get; set; } = DefaultUseColors;
 
 		/// <summary>
+		/// Gets or sets the class responsible for determining which symbol
+		/// to use to represent files and directories.
+		/// </summary>
+		public FileSystemIconProvider IconProvider { get; set;} = new FileSystemIconProvider();
+
+		/// <summary>
 		/// Gets or sets the culture to use (e.g. for number formatting).
 		/// Defaults to <see cref="CultureInfo.CurrentUICulture"/>.
 		/// </summary>
@@ -156,19 +162,13 @@ namespace Terminal.Gui {
 		/// <see cref="Environment.SpecialFolder"/>.
 		/// </summary>
 		/// <remarks>Must be configured before showing the dialog.</remarks>
-		public FileDialogTreeRootGetter TreeRootGetter { get; set; }
+		public Func<Dictionary<IDirectoryInfo, string>> TreeRootGetter { get; set; }
 
 		/// <summary>
 		/// Gets or sets whether to use advanced unicode characters which might not be installed
 		/// on all users computers.
 		/// </summary>
 		public bool UseUnicodeCharacters { get; set; } = DefaultUseUnicodeCharacters;
-
-		/// <summary>
-		/// User defined delegate for picking which character(s)/unicode
-		/// symbol(s) to use as an 'icon' for files/folders. 
-		/// </summary>
-		public Func<FileDialogIconGetterArgs, string> IconGetter { get; set; }
 
 		/// <summary>
 		/// Gets or sets the format to use for date/times in the Modified column.
@@ -183,13 +183,7 @@ namespace Terminal.Gui {
 		public FileDialogStyle (IFileSystem fileSystem)
 		{
 			_fileSystem = fileSystem;
-			IconGetter = DefaultIconGetter;
 			TreeRootGetter = DefaultTreeRootGetter;
-
-			if(NerdFonts.Enable)
-			{
-				UseNerdForIcons();
-			}
 
 			DateFormat = CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern;
 
@@ -221,37 +215,18 @@ namespace Terminal.Gui {
 			};
 		}
 
-		/// <summary>
-		/// Changes <see cref="IconGetter"/> to serve diverse icon set using
-		/// the Nerd fonts. This option requires users to have specific font(s)
-		/// installed.
-		/// </summary>
-		public void UseNerdForIcons ()
+
+		private Dictionary<IDirectoryInfo,string> DefaultTreeRootGetter ()
 		{
-			var nerd = new NerdFonts();
-			IconGetter = nerd.GetNerdIcon;
-		}
-
-		private string DefaultIconGetter (FileDialogIconGetterArgs args)
-		{
-			var file = args.File;
-
-			if (file is IDirectoryInfo) {
-				return UseUnicodeCharacters ? ConfigurationManager.Glyphs.Folder + " " : Path.DirectorySeparatorChar.ToString();
-			}
-
-			return UseUnicodeCharacters ?  ConfigurationManager.Glyphs.File + " " : "";
-
-		}
-
-		private IEnumerable<FileDialogRootTreeNode> DefaultTreeRootGetter ()
-		{
-			var roots = new List<FileDialogRootTreeNode> ();
+			var roots = new Dictionary<IDirectoryInfo, string> ();
 			try {
 				foreach (var d in Environment.GetLogicalDrives ()) {
 
-					
-					roots.Add (new FileDialogRootTreeNode (d, _fileSystem.DirectoryInfo.New(d)));
+					var dir = _fileSystem.DirectoryInfo.New (d);
+
+					if (!roots.ContainsKey(dir)) {
+						roots.Add (dir, d);
+					}
 				}
 
 			} catch (Exception) {
@@ -262,15 +237,15 @@ namespace Terminal.Gui {
 				foreach (var special in Enum.GetValues (typeof (Environment.SpecialFolder)).Cast<SpecialFolder> ()) {
 					try {
 						var path = Environment.GetFolderPath (special);
-						if (
-							!string.IsNullOrWhiteSpace (path)
-							&& Directory.Exists (path)
-							&& !roots.Any (r => string.Equals (r.Path.FullName, path))) {
 
-							roots.Add (new FileDialogRootTreeNode (
-							special.ToString (),
-							_fileSystem.DirectoryInfo.New(Environment.GetFolderPath (special))
-							));
+						if(string.IsNullOrWhiteSpace (path)) {
+							continue;
+						}
+
+						var dir = _fileSystem.DirectoryInfo.New (path);
+
+						if (!roots.ContainsKey (dir) && dir.Exists) {
+							roots.Add (dir, special.ToString());
 						}
 					} catch (Exception) {
 						// Special file exists but contents are unreadable (permissions?)

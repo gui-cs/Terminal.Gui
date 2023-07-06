@@ -16,16 +16,8 @@ namespace Terminal.Gui {
 		[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
 		public static bool Enable { get; set; } = false;
 
-		public string GetNerdIcon(FileDialogIconGetterArgs args)
+		public char GetNerdIcon(IFileSystemInfo file, bool isOpen)
 		{
-			return GetNerdIconChar(args) + " ";
-		}
-
-		private char GetNerdIconChar(FileDialogIconGetterArgs args)
-		{
-			var file = args.File;
-			var path = args.FileDialog.Path;
-
 			if(FilenameToIcon.ContainsKey(file.Name))
 			{
 				return Glyphs[FilenameToIcon[file.Name]];
@@ -38,13 +30,7 @@ namespace Terminal.Gui {
 
 			if(file is IDirectoryInfo d)
 			{
-				if(!string.IsNullOrWhiteSpace(path) &&
-				   path.Contains(d.FullName) &&
-				   args.Context == FileDialogIconGetterContext.Tree)
-				{
-					return _nf_cod_folder_opened;
-				}
-				return _nf_cod_folder;
+				return isOpen ? _nf_cod_folder_opened :_nf_cod_folder;
 			}
 				
 			return _nf_cod_file;
