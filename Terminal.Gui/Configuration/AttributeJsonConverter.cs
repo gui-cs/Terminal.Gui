@@ -82,10 +82,14 @@ namespace Terminal.Gui {
 		public override void Write (Utf8JsonWriter writer, Attribute value, JsonSerializerOptions options)
 		{
 			writer.WriteStartObject ();
-			writer.WritePropertyName ("Foreground");
+			writer.WritePropertyName (nameof(Attribute.Foreground));
 			ColorJsonConverter.Instance.Write (writer, value.Foreground, options);
-			writer.WritePropertyName ("Background");
+			writer.WritePropertyName (nameof (Attribute.Background));
 			ColorJsonConverter.Instance.Write (writer, value.Background, options);
+			writer.WritePropertyName (nameof (Attribute.TrueColorForeground));
+			TrueColorJsonConverter.Instance.Write (writer, value.TrueColorForeground, options);
+			writer.WritePropertyName (nameof (Attribute.TrueColorBackground));
+			TrueColorJsonConverter.Instance.Write (writer, value.TrueColorBackground, options);
 			writer.WriteEndObject ();
 		}
 	}

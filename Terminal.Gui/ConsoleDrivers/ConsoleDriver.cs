@@ -20,6 +20,8 @@ namespace Terminal.Gui;
 /// - <see cref="FakeConsole"/> for unit testing.
 /// </remarks>
 public abstract class ConsoleDriver {
+	private bool useTrueColor = false;
+
 	/// <summary>
 	/// Prepare the driver and set the key and mouse events handlers.
 	/// </summary>
@@ -113,6 +115,23 @@ public abstract class ConsoleDriver {
 	/// are used by <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
 	/// </summary>
 	public int Row { get; internal set; }
+
+	/// <summary>
+	/// Gets whether the <see cref="ConsoleDriver"/> supports TrueColor output.
+	/// </summary>
+	public virtual bool SupportsTrueColorOutput { get => false; }
+
+	/// <summary>
+	/// Gets or sets whether the <see cref="ConsoleDriver"/> should use TrueColor output.
+	/// </summary>
+	/// <remarks>
+	/// Can only be enabled if <see cref="ConsoleDriver.SupportsTrueColorOutput"/> is true, indicating
+	/// that the <see cref="ConsoleDriver"/> supports it.
+	/// </remarks>
+	public bool UseTrueColor {
+		get => useTrueColor;
+		set => this.useTrueColor = (value && SupportsTrueColorOutput);
+	}
 
 	/// <summary>
 	/// Updates <see cref="Col"/> and <see cref="Row"/> to the specified column and row in <see cref="Contents"/>.

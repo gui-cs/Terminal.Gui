@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-using System;
+using System.Text.RegularExpressions;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -82,7 +85,26 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Indicates the RGB for true colors.
 	/// </summary>
-	public class TrueColor {
+	public readonly struct TrueColor : IEquatable<TrueColor> {
+		private static readonly ImmutableDictionary<TrueColor, Color> TrueColorToConsoleColorMap = new Dictionary<TrueColor, Color> () {
+			{ new TrueColor (0,0,0),Color.Black },
+			{ new TrueColor (0, 0, 0x80),Color.Blue },
+			{ new TrueColor (0, 0x80, 0),Color.Green},
+			{ new TrueColor (0, 0x80, 0x80),Color.Cyan},
+			{ new TrueColor (0x80, 0, 0),Color.Red},
+			{ new TrueColor (0x80, 0, 0x80),Color.Magenta},
+			{ new TrueColor (0xC1, 0x9C, 0x00),Color.Brown},  // TODO confirm this
+			{ new TrueColor (0xC0, 0xC0, 0xC0),Color.Gray},
+			{ new TrueColor (0x80, 0x80, 0x80),Color.DarkGray},
+			{ new TrueColor (0, 0, 0xFF),Color.BrightBlue},
+			{ new TrueColor (0, 0xFF, 0),Color.BrightGreen},
+			{ new TrueColor (0, 0xFF, 0xFF),Color.BrightCyan},
+			{ new TrueColor (0xFF, 0, 0),Color.BrightRed},
+			{ new TrueColor (0xFF, 0, 0xFF),Color.BrightMagenta },
+			{ new TrueColor (0xFF, 0xFF, 0),Color.BrightYellow},
+			{ new TrueColor (0xFF, 0xFF, 0xFF),Color.White},
+		}.ToImmutableDictionary ();
+
 		/// <summary>
 		/// Red color component.
 		/// </summary>
@@ -110,50 +132,138 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Converts true color to console color.
+		/// Converts the provided text to a <see cref="TrueColor"/>.
 		/// </summary>
-		/// <returns></returns>
-		public Color ToConsoleColor ()
+		/// <param name="text">The text to analyze.</param>
+		/// <param name="trueColor">The parsed value.</param>
+		/// <returns>A boolean value indcating whether it was successful.</returns>
+		public static bool TryParse (string text, [NotNullWhen(true)] out TrueColor? trueColor)
 		{
-			var trueColorMap = new Dictionary<TrueColor, Color> () {
-				{ new TrueColor (0,0,0),Color.Black},
-				{ new TrueColor (0, 0, 0x80),Color.Blue},
-				{ new TrueColor (0, 0x80, 0),Color.Green},
-				{ new TrueColor (0, 0x80, 0x80),Color.Cyan},
-				{ new TrueColor (0x80, 0, 0),Color.Red},
-				{ new TrueColor (0x80, 0, 0x80),Color.Magenta},
-				{ new TrueColor (0xC1, 0x9C, 0x00),Color.Brown},  // TODO confirm this
-				{ new TrueColor (0xC0, 0xC0, 0xC0),Color.Gray},
-				{ new TrueColor (0x80, 0x80, 0x80),Color.DarkGray},
-				{ new TrueColor (0, 0, 0xFF),Color.BrightBlue},
-				{ new TrueColor (0, 0xFF, 0),Color.BrightGreen},
-				{ new TrueColor (0, 0xFF, 0xFF),Color.BrightCyan},
-				{ new TrueColor (0xFF, 0, 0),Color.BrightRed},
-				{ new TrueColor (0xFF, 0, 0xFF),Color.BrightMagenta },
-				{ new TrueColor (0xFF, 0xFF, 0),Color.BrightYellow},
-				{ new TrueColor (0xFF, 0xFF, 0xFF),Color.White},
-				};
-			// Iterate over all colors in the map
-			var distances = trueColorMap.Select (
-							k => Tuple.Create (
-								// the candidate we are considering matching against (RGB)
-								k.Key,
+			// empty color
+			if ((text == null) || (text.Length == 0)) {
+				trueColor = null;
+				return false;
+			}
 
-								CalculateDistance (k.Key, this)
-							));
+			// #RRGGBB or #RGB
+			if ((text [0] == '#') &&
+			    ((text.Length == 7) || (text.Length == 4))) {
+				if (text.Length == 7) {
+					var r = Convert.ToInt32 (text.Substring (1, 2), 16);
+					var g = Convert.ToInt32 (text.Substring (3, 2), 16);
+					var b = Convert.ToInt32 (text.Substring (5, 2), 16);
+					trueColor = new TrueColor (r, g, b);
+				} else {
+					var rText = char.ToString (text [1]);
+					var gText = char.ToString (text [2]);
+					var bText = char.ToString (text [3]);
 
-			// get the closest
-			var match = distances.OrderBy (t => t.Item2).First ();
-			return trueColorMap [match.Item1];
+					var r = Convert.ToInt32 (rText + rText, 16);
+					var g = Convert.ToInt32 (gText + gText, 16);
+					var b = Convert.ToInt32 (bText + bText, 16);
+					trueColor = new TrueColor (r, g, b);
+				}
+				return true;
+			}
+
+			// rgb(XX,YY,ZZ)
+			var match = Regex.Match (text, @"rgb\((\d+),(\d+),(\d+)\)");
+			if (match.Success) {
+				var r = int.Parse (match.Groups [1].Value);
+				var g = int.Parse (match.Groups [2].Value);
+				var b = int.Parse (match.Groups [3].Value);
+				trueColor =  new TrueColor (r, g, b);
+				return true;
+			}
+
+			trueColor = null;
+			return false;
 		}
 
-		private float CalculateDistance (TrueColor color1, TrueColor color2)
+		/// <summary>
+		/// Converts a <see cref="Color"/> to a <see cref="TrueColor"/> using a default mapping.
+		/// </summary>
+		/// <param name="consoleColor">The <see cref="Color"/> to convert.</param>
+		/// <returns></returns>
+		public static TrueColor FromConsoleColor (Color consoleColor)
+		{
+			switch (consoleColor) {
+			case Color.Black: return new TrueColor (0, 0, 0);
+			case Color.Blue: return new TrueColor (0, 0, 0x80);
+			case Color.Green: return new TrueColor (0, 0x80, 0);
+			case Color.Cyan: return new TrueColor (0, 0x80, 0x80);
+			case Color.Red: return new TrueColor (0x80, 0, 0);
+			case Color.Magenta: return new TrueColor (0x80, 0, 0x80);
+			case Color.Brown: return new TrueColor (0xC1, 0x9C, 0x00); // TODO confirm this
+			case Color.Gray: return new TrueColor (0xC0, 0xC0, 0xC0);
+			case Color.DarkGray: return new TrueColor (0x80, 0x80, 0x80);
+			case Color.BrightBlue: return new TrueColor (0, 0, 0xFF);
+			case Color.BrightGreen: return new TrueColor (0, 0xFF, 0);
+			case Color.BrightCyan: return new TrueColor (0, 0xFF, 0xFF);
+			case Color.BrightRed: return new TrueColor (0xFF, 0, 0);
+			case Color.BrightMagenta: return new TrueColor (0xFF, 0, 0xFF);
+			case Color.BrightYellow: return new TrueColor (0xFF, 0xFF, 0);
+			case Color.White: return new TrueColor (0xFF, 0xFF, 0xFF);
+			default: throw new ArgumentException ($"No supported TrueColor mapping for '{consoleColor}'.");
+			};
+		}
+
+		/// <summary>
+		/// Converts the provided <see cref="TrueColor"/> to <see cref="Color"/> using a default mapping.
+		/// </summary>
+		/// <param name="trueColor"></param>
+		/// <returns></returns>
+		public static Color ToConsoleColor (TrueColor trueColor)
+		{
+			return TrueColorToConsoleColorMap.OrderBy (kv => CalculateDistance (kv.Key, trueColor)).First ().Value;
+		}
+
+		private static float CalculateDistance (TrueColor color1, TrueColor color2)
 		{
 			// use RGB distance
 			return
 				Math.Abs (color1.Red - color2.Red) +
 				Math.Abs (color1.Green - color2.Green) +
 				Math.Abs (color1.Blue - color2.Blue);
+		}
+
+		/// <inheritdoc/>
+		public static bool operator == (TrueColor left, TrueColor right)
+		{
+			return left.Equals (right);
+		}
+
+		/// <inheritdoc/>
+		public static bool operator != (TrueColor left, TrueColor right)
+		{
+			return !left.Equals (right);
+		}
+
+		/// <inheritdoc/>
+		public override bool Equals (object obj)
+		{
+			return obj is TrueColor other && Equals (other);
+		}
+
+		/// <inheritdoc/>
+		public bool Equals (TrueColor other)
+		{
+			return
+				Red == other.Red &&
+				Green == other.Green &&
+				Blue == other.Blue;
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode ()
+		{
+			return HashCode.Combine (Red, Green, Blue);
+		}
+
+		/// <inheritdoc/>
+		public override string ToString ()
+		{
+			return $"#{Red:X2}{Green:X2}{Blue:X2}";
 		}
 	}
 
@@ -166,7 +276,13 @@ namespace Terminal.Gui {
 	///   class to define color schemes that can be used in an application.
 	/// </remarks>
 	[JsonConverter (typeof (AttributeJsonConverter))]
-	public struct Attribute {
+	public struct Attribute : IEquatable<Attribute> {
+
+		/// <summary>
+		/// Default empty attribute.
+		/// </summary>
+		public static readonly Attribute Default = new Attribute ();
+
 		/// <summary>
 		/// The <see cref="ConsoleDriver"/>-specific color value. If <see cref="Initialized"/> is <see langword="false"/> 
 		/// the value of this property is invalid (typically because the Attribute was created before a driver was loaded)
@@ -188,6 +304,18 @@ namespace Terminal.Gui {
 		public Color Background { get; private init; }
 
 		/// <summary>
+		/// Gets the TrueColor foreground color.
+		/// </summary>
+		[JsonConverter (typeof (TrueColorJsonConverter))]
+		public TrueColor TrueColorForeground { get; private init; }
+
+		/// <summary>
+		/// Gets the TrueColor background color.
+		/// </summary>
+		[JsonConverter (typeof (TrueColorJsonConverter))]
+		public TrueColor TrueColorBackground { get; private init; }
+
+		/// <summary>
 		/// Initializes a new instance with a platform-specific color value.
 		/// </summary>
 		/// <param name="value">Value.</param>
@@ -204,6 +332,8 @@ namespace Terminal.Gui {
 			Value = value;
 			Foreground = foreground;
 			Background = background;
+			TrueColorForeground = TrueColor.FromConsoleColor (foreground);
+			TrueColorBackground = TrueColor.FromConsoleColor (background);
 		}
 
 		/// <summary>
@@ -214,9 +344,11 @@ namespace Terminal.Gui {
 		/// <param name="background">Background</param>
 		public Attribute (int value, Color foreground, Color background)
 		{
-			Value = value;
 			Foreground = foreground;
 			Background = background;
+			TrueColorForeground = TrueColor.FromConsoleColor (foreground);
+			TrueColorBackground = TrueColor.FromConsoleColor (background);
+			Value = value;
 			Initialized = true;
 		}
 
@@ -227,11 +359,58 @@ namespace Terminal.Gui {
 		/// <param name="background">Background</param>
 		public Attribute (Color foreground = new Color (), Color background = new Color ())
 		{
+			Foreground = foreground;
+			Background = background;
+			TrueColorForeground = TrueColor.FromConsoleColor (foreground);
+			TrueColorBackground = TrueColor.FromConsoleColor (background);
+
 			var make = Make (foreground, background);
 			Initialized = make.Initialized;
 			Value = make.Value;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Attribute"/> class.  Populates
+		/// <see cref="TrueColorBackground"/> and <see cref="TrueColorForeground"/>. Also computes
+		/// <see cref="Foreground"/> and <see cref="Background"/> (basic console colors) in case
+		/// driver does not support true color rendering.
+		/// </summary>
+		/// <param name="trueColorForeground"></param>
+		/// <param name="trueColorBackground"></param>
+		public Attribute (TrueColor trueColorForeground, TrueColor trueColorBackground)
+		{
+			Foreground = TrueColor.ToConsoleColor (trueColorForeground);
+			Background = TrueColor.ToConsoleColor (trueColorBackground);
+			TrueColorForeground = trueColorForeground;
+			TrueColorBackground = trueColorBackground;
+			var make = Make (Foreground, Background);
+			Value = make.Value;
+			Initialized = make.Initialized;
+		}
+
+		/// <summary>
+		/// <para>
+		/// Initializes a new instance of the <see cref="Attribute"/> class.  Populates
+		/// <see cref="TrueColorBackground"/> and <see cref="TrueColorForeground"/> with explicit
+		/// fallback values for <see cref="Foreground"/> and <see cref="Background"/> (in case
+		/// driver does not support true color rendering). 
+		/// </para>
+		/// <remarks>If you do not want to manually specify the fallback colors use <see cref="Attribute(TrueColor,TrueColor)"/>
+		/// instead which auto calculates these.</remarks>
+		/// </summary>
+		/// <param name="trueColorForeground">True color RGB values you would like to use.</param>
+		/// <param name="trueColorBackground">True color RGB values you would like to use.</param>
+		/// <param name="foreground">Simple console color replacement if driver does not support true color.</param>
+		/// <param name="background">Simple console color replacement if driver does not support true color.</param>
+		public Attribute (TrueColor trueColorForeground, TrueColor trueColorBackground, Color foreground, Color background)
+		{
 			Foreground = foreground;
 			Background = background;
+			TrueColorForeground = trueColorForeground;
+			TrueColorBackground = trueColorBackground;
+			var make = Make (Foreground, Background);
+			Value = make.Value;
+			Initialized = make.Initialized;
 		}
 
 		/// <summary>
@@ -240,20 +419,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="color">The color.</param>
 		public Attribute (Color color) : this (color, color) { }
-
-		/// <inheritdoc />
-		public override bool Equals (object obj)
-		{
-			return obj is Attribute other && Equals (other);
-		}
-
-		/// <inheritdoc />
-		public bool Equals (Attribute other)
-		{
-			return Value == other.Value &&
-				Foreground == other.Foreground &&
-				Background == other.Background;
-		}
 
 		/// <inheritdoc />
 		public override int GetHashCode () => HashCode.Combine (Value, Foreground, Background);
@@ -273,6 +438,25 @@ namespace Terminal.Gui {
 		/// <param name="right"></param>
 		/// <returns></returns>
 		public static bool operator != (Attribute left, Attribute right) => !(left == right);
+
+		/// <inheritdoc />
+		public override bool Equals (object obj)
+		{
+			return obj is Attribute other && Equals (other);
+		}
+
+		/// <inheritdoc />
+		public bool Equals (Attribute other)
+		{
+			return Value == other.Value &&
+				Foreground == other.Foreground &&
+				Background == other.Background &&
+				TrueColorForeground == other.TrueColorForeground &&
+				TrueColorBackground == other.TrueColorBackground;
+		}
+
+		/// <inheritdoc />
+		public override int GetHashCode () => HashCode.Combine (Value, Foreground, Background, TrueColorForeground, TrueColorBackground);
 
 		/// <summary>
 		/// Creates an <see cref="Attribute"/> from the specified foreground and background colors.
@@ -346,11 +530,11 @@ namespace Terminal.Gui {
 	/// </remarks>
 	[JsonConverter (typeof (ColorSchemeJsonConverter))]
 	public class ColorScheme : IEquatable<ColorScheme> {
-		Attribute _normal = new Attribute (Color.White, Color.Black);
-		Attribute _focus = new Attribute (Color.White, Color.Black);
-		Attribute _hotNormal = new Attribute (Color.White, Color.Black);
-		Attribute _hotFocus = new Attribute (Color.White, Color.Black);
-		Attribute _disabled = new Attribute (Color.White, Color.Black);
+		Attribute _normal = Attribute.Default;
+		Attribute _focus = Attribute.Default;
+		Attribute _hotNormal = Attribute.Default;
+		Attribute _hotFocus = Attribute.Default;
+		Attribute _disabled = Attribute.Default;
 
 		/// <summary>
 		/// Used by <see cref="Colors.SetColorScheme(ColorScheme, string)"/> and <see cref="Colors.GetColorScheme(string)"/> to track which ColorScheme 

@@ -1,12 +1,5 @@
-﻿using Xunit;
-using Terminal.Gui;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.Json;
-using Attribute = Terminal.Gui.Attribute;
+﻿using System.Text.Json;
+using Xunit;
 
 namespace Terminal.Gui.ConfigurationTests {
 	public class ColorJsonConverterTests {
@@ -129,6 +122,56 @@ namespace Terminal.Gui.ConfigurationTests {
 
 			// Assert
 			Assert.Equal (expectedColor, color);
+		}
+	}
+
+	public class TrueColorJsonConverterTests {
+		[Theory]
+		[InlineData (0,0,0, "\"#000000\"")]
+		public void SerializesToHexCode (int r, int g, int b, string expected)
+		{
+			// Arrange
+
+			// Act
+			var actual = JsonSerializer.Serialize (new TrueColor (r, g, b), new JsonSerializerOptions {
+				Converters = { new TrueColorJsonConverter () }
+			});
+
+			//Assert
+			Assert.Equal (expected, actual);
+
+		}
+
+		[Theory]
+		[InlineData ("\"#000000\"", 0, 0, 0)]
+		public void DeserializesFromHexCode (string hexCode, int r, int g, int b)
+		{
+			// Arrange
+			TrueColor expected = new TrueColor (r, g, b);
+
+			// Act
+			var actual = JsonSerializer.Deserialize<TrueColor> (hexCode, new JsonSerializerOptions {
+				Converters = { new TrueColorJsonConverter () }
+			});
+
+			//Assert
+			Assert.Equal (expected, actual);
+		}
+
+		[Theory]
+		[InlineData ("\"rgb(0,0,0)\"", 0, 0, 0)]
+		public void DeserializesFromRgb (string rgb, int r, int g, int b)
+		{
+			// Arrange
+			TrueColor expected = new TrueColor (r, g, b);
+
+			// Act
+			var actual = JsonSerializer.Deserialize<TrueColor> (rgb, new JsonSerializerOptions {
+				Converters = { new TrueColorJsonConverter () }
+			});
+
+			//Assert
+			Assert.Equal (expected, actual);
 		}
 	}
 
