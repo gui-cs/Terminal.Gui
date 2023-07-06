@@ -118,7 +118,7 @@ namespace Terminal.Gui {
 			return cells;
 		}
 
-		public static List<List<RuneCell>> ToRuneCells (List<RuneCell> cells)
+		private static List<List<RuneCell>> ToRuneCells (List<RuneCell> cells)
 		{
 			return SplitNewLines (cells);
 		}
