@@ -344,6 +344,7 @@ namespace Terminal.Gui {
 	/// <remarks>
 	/// See also: <see cref="Colors.ColorSchemes"/>.
 	/// </remarks>
+	[JsonConverter (typeof (ColorSchemeJsonConverter))]
 	public class ColorScheme : IEquatable<ColorScheme> {
 		Attribute _normal = new Attribute (Color.White, Color.Black);
 		Attribute _focus = new Attribute (Color.White, Color.Black);
@@ -472,7 +473,7 @@ namespace Terminal.Gui {
 		/// <returns>true if the two objects are equal</returns>
 		public bool Equals (ColorScheme other)
 		{
-			return other != null &&
+				return other != null &&
 			       EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
 			       EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
 			       EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&
