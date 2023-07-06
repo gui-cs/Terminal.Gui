@@ -548,7 +548,7 @@ namespace Terminal.Gui {
 		/// <remarks>Index 0 of the returned array is the first item that should be visible in the
 		/// top of the control, index 1 is the next etc.</remarks>
 		/// <returns></returns>
-		private IReadOnlyCollection<Branch<T>> BuildLineMap ()
+		internal IReadOnlyCollection<Branch<T>> BuildLineMap ()
 		{
 			if (cachedLineMap != null) {
 				return cachedLineMap;
