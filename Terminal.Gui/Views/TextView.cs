@@ -3239,7 +3239,7 @@ namespace Terminal.Gui {
 		{
 			var offB = OffSetBackground ();
 			var line = GetCurrentLine ();
-			bool need = !_needsDisplay.IsEmpty || _wrapNeeded || !Used;
+			bool need = NeedsDisplay || _wrapNeeded || !Used;
 			var tSize = TextModel.DisplaySize (line, -1, -1, false, TabWidth);
 			var dSize = TextModel.DisplaySize (line, _leftColumn, _currentColumn, true, TabWidth);
 			if (!_wordWrap && _currentColumn < _leftColumn) {

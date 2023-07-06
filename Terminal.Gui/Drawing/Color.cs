@@ -240,16 +240,23 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="color">The color.</param>
 		public Attribute (Color color) : this (color, color) { }
-		
+
 		/// <inheritdoc />
 		public override bool Equals (object obj)
 		{
-			if (obj is Attribute other) {
-				return this.Value == other.Value;
-			}
-
-			return false;
+			return obj is Attribute other && Equals (other);
 		}
+
+		/// <inheritdoc />
+		public bool Equals (Attribute other)
+		{
+			return Value == other.Value &&
+				Foreground == other.Foreground &&
+				Background == other.Background;
+		}
+
+		/// <inheritdoc />
+		public override int GetHashCode () => HashCode.Combine (Value, Foreground, Background);
 
 		/// <summary>
 		/// Compares two attributes for equality.
@@ -267,9 +274,6 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public static bool operator != (Attribute left, Attribute right) => !(left == right);
 
-		/// <inheritdoc />
-		public override int GetHashCode () => this.Value.GetHashCode ();
-
 		/// <summary>
 		/// Creates an <see cref="Attribute"/> from the specified foreground and background colors.
 		/// </summary>
@@ -286,7 +290,7 @@ namespace Terminal.Gui {
 				// Create the attribute, but show it's not been initialized
 				return new Attribute () {
 					Initialized = false,
-					Foreground = foreground, 
+					Foreground = foreground,
 					Background = background
 				};
 			}
@@ -340,7 +344,6 @@ namespace Terminal.Gui {
 	/// <remarks>
 	/// See also: <see cref="Colors.ColorSchemes"/>.
 	/// </remarks>
-	[JsonConverter (typeof (ColorSchemeJsonConverter))]
 	public class ColorScheme : IEquatable<ColorScheme> {
 		Attribute _normal = new Attribute (Color.White, Color.Black);
 		Attribute _focus = new Attribute (Color.White, Color.Black);
@@ -362,7 +365,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Creates a new instance, initialized with the values from <paramref name="scheme"/>.
 		/// </summary>
-		/// <param name="scheme">The scheme to initlize the new instance with.</param>
+		/// <param name="scheme">The scheme to initialize the new instance with.</param>
 		public ColorScheme (ColorScheme scheme) : base ()
 		{
 			if (scheme != null) {
@@ -372,6 +375,19 @@ namespace Terminal.Gui {
 				_disabled = scheme.Disabled;
 				_hotFocus = scheme.HotFocus;
 			}
+		}
+
+		/// <summary>
+		/// Creates a new instance, initialized with the values from <paramref name="attribute"/>.
+		/// </summary>
+		/// <param name="attribute">The attribute to initialize the new instance with.</param>
+		public ColorScheme (Attribute attribute)
+		{
+			_normal = attribute;
+			_focus = attribute;
+			_hotNormal = attribute;
+			_disabled = attribute;
+			_hotFocus = attribute;
 		}
 
 		/// <summary>

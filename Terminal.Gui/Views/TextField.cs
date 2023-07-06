@@ -567,7 +567,7 @@ namespace Terminal.Gui {
 				return;
 
 			int offB = OffSetBackground ();
-			bool need = !_needsDisplay.IsEmpty || !Used;
+			bool need = NeedsDisplay || !Used;
 			if (_point < _first) {
 				_first = _point;
 				need = true;
