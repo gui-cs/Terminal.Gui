@@ -151,9 +151,14 @@ namespace Terminal.Gui {
 		/// <param name="renderAt"></param>
 		public override void RenderOverlay (Point renderAt)
 		{
-			if (!Visible || HostControl?.HasFocus == false || Suggestions.Count == 0) {
+			if (!Context.Canceled && Suggestions.Count > 0 && !Visible && HostControl?.HasFocus == true) {
+				ProcessKey (new KeyEvent ((Key)(Suggestions [0].Title [0]), new KeyModifiers ()));
+			} else if (!Visible || HostControl?.HasFocus == false || Suggestions.Count == 0) {
 				LastPopupPos = null;
 				Visible = false;
+				if (Suggestions.Count == 0) {
+					Context.Canceled = false;
+				}
 				return;
 			}
 
@@ -283,6 +288,7 @@ namespace Terminal.Gui {
 			}
 
 			if (kb.Key == Reopen) {
+				Context.Canceled = false;
 				return ReopenSuggestions ();
 			}
 
@@ -322,6 +328,7 @@ namespace Terminal.Gui {
 
 			if (kb.Key == CloseKey) {
 				Close ();
+				Context.Canceled = true;
 				return true;
 			}
 
@@ -436,6 +443,7 @@ namespace Terminal.Gui {
 		/// <returns>True if the insertion was possible otherwise false</returns>
 		protected virtual bool InsertSelection (Suggestion accepted)
 		{
+			SetCursorPosition (Context.CursorPosition + accepted.Remove);
 			// delete the text
 			for (int i = 0; i < accepted.Remove; i++) {
 				DeleteTextBackwards ();
@@ -455,6 +463,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="accepted"></param>
 		protected abstract void InsertText (string accepted);
+
+		/// <summary>
+		/// Set the cursor position in the <see cref="HostControl"/>.
+		/// </summary>
+		/// <param name="column"></param>
+		protected abstract void SetCursorPosition (int column);
 
 		/// <summary>
 		/// Closes the Autocomplete context menu if it is showing and <see cref="IAutocomplete.ClearSuggestions"/>

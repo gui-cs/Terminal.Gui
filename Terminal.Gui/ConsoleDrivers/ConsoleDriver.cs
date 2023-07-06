@@ -114,8 +114,171 @@ public abstract class ConsoleDriver {
 	public int Row { get; internal set; }
 
 	/// <summary>
-	/// Updates <see cref="Col"/> and <see cref="Row"/> to the specified column and row in <see cref="Contents"/>.
-	/// Used by <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
+	/// Creates a new instance, initialized with the values from <paramref name="scheme"/>.
+	/// </summary>
+	/// <param name="scheme">The scheme to initialize the new instance with.</param>
+	public ColorScheme (ColorScheme scheme) : base ()
+	{
+		if (scheme != null) {
+			_normal = scheme.Normal;
+			_focus = scheme.Focus;
+			_hotNormal = scheme.HotNormal;
+			_disabled = scheme.Disabled;
+			_hotFocus = scheme.HotFocus;
+		}
+	}
+
+		/// <summary>
+		/// The foreground and background color for text when the view is not focused, hot, or disabled.
+		/// </summary>
+		public Attribute Normal {
+			get { return _normal; }
+			set {
+				if (!value.HasValidColors) {
+					return;
+				}
+				_normal = value;
+			}
+		}
+
+		/// <summary>
+		/// The foreground and background color for text when the view has the focus.
+		/// </summary>
+		public Attribute Focus {
+			get { return _focus; }
+			set {
+				if (!value.HasValidColors) {
+					return;
+				}
+				_focus = value;
+			}
+		}
+
+		/// <summary>
+		/// The foreground and background color for text when the view is highlighted (hot).
+		/// </summary>
+		public Attribute HotNormal {
+			get { return _hotNormal; }
+			set {
+				if (!value.HasValidColors) {
+					return;
+				}
+				_hotNormal = value;
+			}
+		}
+
+		/// <summary>
+		/// The foreground and background color for text when the view is highlighted (hot) and has focus.
+		/// </summary>
+		public Attribute HotFocus {
+			get { return _hotFocus; }
+			set {
+				if (!value.HasValidColors) {
+					return;
+				}
+				_hotFocus = value;
+			}
+		}
+
+		/// <summary>
+		/// The default foreground and background color for text, when the view is disabled.
+		/// </summary>
+		public Attribute Disabled {
+			get { return _disabled; }
+			set {
+				if (!value.HasValidColors) {
+					return;
+				}
+				_disabled = value;
+			}
+		}
+
+		/// <summary>
+		/// Compares two <see cref="ColorScheme"/> objects for equality.
+		/// </summary>
+		/// <param name="obj"></param>
+		/// <returns>true if the two objects are equal</returns>
+		public override bool Equals (object obj)
+		{
+			return Equals (obj as ColorScheme);
+		}
+
+		/// <summary>
+		/// Compares two <see cref="ColorScheme"/> objects for equality.
+		/// </summary>
+		/// <param name="other"></param>
+		/// <returns>true if the two objects are equal</returns>
+		public bool Equals (ColorScheme other)
+		{
+			return other != null &&
+			       EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
+			       EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
+			       EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&
+			       EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus) &&
+			       EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
+		}
+
+		/// <summary>
+		/// Returns a hashcode for this instance.
+		/// </summary>
+		/// <returns>hashcode for this instance</returns>
+		public override int GetHashCode ()
+		{
+			int hashCode = -1242460230;
+			hashCode = hashCode * -1521134295 + _normal.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _focus.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _hotNormal.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _hotFocus.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _disabled.GetHashCode ();
+			return hashCode;
+		}
+
+		/// <summary>
+		/// Compares two <see cref="ColorScheme"/> objects for equality.
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns><c>true</c> if the two objects are equivalent</returns>
+		public static bool operator == (ColorScheme left, ColorScheme right)
+		{
+			return EqualityComparer<ColorScheme>.Default.Equals (left, right);
+		}
+
+		/// <summary>
+		/// Compares two <see cref="ColorScheme"/> objects for inequality.
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns><c>true</c> if the two objects are not equivalent</returns>
+		public static bool operator != (ColorScheme left, ColorScheme right)
+		{
+			return !(left == right);
+		}
+
+		internal void Initialize ()
+		{
+			// If the new scheme was created before a driver was loaded, we need to re-make
+			// the attributes
+			if (!_normal.Initialized) {
+				_normal = new Attribute (_normal.Foreground, _normal.Background);
+			}
+			if (!_focus.Initialized) {
+				_focus = new Attribute (_focus.Foreground, _focus.Background);
+			}
+			if (!_hotNormal.Initialized) {
+				_hotNormal = new Attribute (_hotNormal.Foreground, _hotNormal.Background);
+			}
+			if (!_hotFocus.Initialized) {
+				_hotFocus = new Attribute (_hotFocus.Foreground, _hotFocus.Background);
+			}
+			if (!_disabled.Initialized) {
+				_disabled = new Attribute (_disabled.Foreground, _disabled.Background);
+			}
+		}
+	}
+
+	/// <summary>
+	/// The default <see cref="ColorScheme"/>s for the application.
 	/// </summary>
 	/// <remarks>
 	/// <para>
@@ -193,14 +356,108 @@ public abstract class ConsoleDriver {
 	/// <summary>
 	/// Tests whether the specified coordinate are valid for drawing. 
 	/// </summary>
-	/// <param name="col">The column.</param>
-	/// <param name="row">The row.</param>
-	/// <returns><see langword="false"/> if the coordinate is outside of the
-	/// screen bounds or outside of <see cref="Clip"/>. <see langword="true"/> otherwise.</returns>
-	public bool IsValidLocation (int col, int row) =>
-		col >= 0 && row >= 0 &&
-		col < Cols && row < Rows &&
-		Clip.Contains (col, row);
+	
+
+	/// <summary>
+	/// ConsoleDriver is an abstract class that defines the requirements for a console driver.  
+	/// There are currently three implementations: <see cref="CursesDriver"/> (for Unix and Mac), <see cref="WindowsDriver"/>, and <see cref="NetDriver"/> that uses the .NET Console API.
+	/// </summary>
+	public abstract class ConsoleDriver {
+
+		/// <summary>
+		/// The handler fired when the terminal is resized.
+		/// </summary>
+		protected Action TerminalResized;
+
+		/// <summary>
+		/// The current number of columns in the terminal.
+		/// </summary>
+		public abstract int Cols { get; }
+
+		/// <summary>
+		/// The current number of rows in the terminal.
+		/// </summary>
+		public abstract int Rows { get; }
+
+		/// <summary>
+		/// The current left in the terminal.
+		/// </summary>
+		public abstract int Left { get; }
+
+		/// <summary>
+		/// The current top in the terminal.
+		/// </summary>
+		public abstract int Top { get; }
+
+		/// <summary>
+		/// Get the operation system clipboard.
+		/// </summary>
+		public abstract IClipboard Clipboard { get; }
+
+		/// <summary>
+		/// <para>
+		/// If <see langword="false"/> (the default) the height of the Terminal.Gui application (<see cref="Rows"/>) 
+		/// tracks to the height of the visible console view when the console is resized. In this case 
+		/// scrolling in the console will be disabled and all <see cref="Rows"/> will remain visible.
+		/// </para>
+		/// <para>
+		/// If <see langword="true"/> then height of the Terminal.Gui application <see cref="Rows"/> only tracks 
+		/// the height of the visible console view when the console is made larger (the application will only grow in height, never shrink). 
+		/// In this case console scrolling is enabled and the contents (<see cref="Rows"/> high) will scroll
+		/// as the console scrolls. 
+		/// </para>
+		/// </summary>
+		/// <remarks>
+		/// NOTE: This functionaliy is currently broken on Windows Terminal.
+		/// </remarks>
+		public abstract bool EnableConsoleScrolling { get; set; }
+
+		/// <summary>
+		/// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
+		/// </summary>
+		public virtual int [,,] Contents { get; }
+
+		/// <summary>
+		/// Initializes the driver
+		/// </summary>
+		/// <param name="terminalResized">Method to invoke when the terminal is resized.</param>
+		public abstract void Init (Action terminalResized);
+		/// <summary>
+		/// Moves the cursor to the specified column and row.
+		/// </summary>
+		/// <param name="col">Column to move the cursor to.</param>
+		/// <param name="row">Row to move the cursor to.</param>
+		public abstract void Move (int col, int row);
+
+		/// <summary>
+		/// Tests if the specified rune is supported by the driver.
+		/// </summary>
+		/// <param name="rune"></param>
+		/// <returns><see langword="true"/> if the rune can be properly presented; <see langword="false"/> if the driver
+		/// does not support displaying this rune.</returns>
+		public virtual bool IsRuneSupported (Rune rune)
+		{
+			if (rune.Value > RuneExtensions.MaxUnicodeCodePoint) {
+				return false;
+			}
+			return true;
+		}
+		
+		/// <summary>
+		/// Adds the specified rune to the display at the current cursor position.
+		/// </summary>
+		/// <param name="rune">Rune to add.</param>
+		public abstract void AddRune (Rune rune);
+		
+		/// <summary>
+		/// Ensures that the column and line are in a valid range from the size of the driver.
+		/// </summary>
+		/// <param name="col">The column.</param>
+		/// <param name="row">The row.</param>
+		/// <param name="clip">The clip.</param>
+		/// <returns><c>true</c>if it's a valid range,<c>false</c>otherwise.</returns>
+		public bool IsValidContent (int col, int row, Rect clip) =>
+			col >= 0 && row >= 0 && col < Cols && row < Rows && clip.Contains (col, row);
 
 	/// <summary>
 	/// Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are 

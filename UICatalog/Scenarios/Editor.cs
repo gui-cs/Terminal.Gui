@@ -229,7 +229,7 @@ namespace UICatalog.Scenarios {
 		{
 			if (_fileName != null) {
 				// FIXED: BUGBUG: #452 TextView.LoadFile keeps file open and provides no way of closing it
-				_textView.LoadFile (_fileName);
+				_textView.Load (_fileName);
 				//_textView.Text = System.IO.File.ReadAllText (_fileName);
 				_originalText = Encoding.Unicode.GetBytes(_textView.Text);
 				Win.Title = _fileName;

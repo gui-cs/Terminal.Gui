@@ -101,7 +101,7 @@ namespace Terminal.Gui {
 			if (text == null)
 				text = "";
 
-			this._text = TextModel.ToRunes (text.Split ("\n") [0]);
+			this._text = text.Split ("\n") [0].EnumerateRunes ().ToList ();
 			_point = text.GetRuneCount ();
 			_first = _point > w + 1 ? _point - w + 1 : 0;
 			CanFocus = true;
@@ -128,8 +128,8 @@ namespace Terminal.Gui {
 			AddCommand (Command.Right, () => { MoveRight (); return true; });
 			AddCommand (Command.CutToEndLine, () => { KillToEnd (); return true; });
 			AddCommand (Command.CutToStartLine, () => { KillToStart (); return true; });
-			AddCommand (Command.Undo, () => { UndoChanges (); return true; });
-			AddCommand (Command.Redo, () => { RedoChanges (); return true; });
+			AddCommand (Command.Undo, () => { Undo (); return true; });
+			AddCommand (Command.Redo, () => { Redo (); return true; });
 			AddCommand (Command.WordLeft, () => { MoveWordLeft (); return true; });
 			AddCommand (Command.WordRight, () => { MoveWordRight (); return true; });
 			AddCommand (Command.KillWordForwards, () => { KillWordForwards (); return true; });
@@ -230,8 +230,8 @@ namespace Terminal.Gui {
 					new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, GetKeyFromCommand (Command.Copy)),
 					new MenuItem (Strings.ctxCut, "", () => Cut (), null, null, GetKeyFromCommand (Command.Cut)),
 					new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, GetKeyFromCommand (Command.Paste)),
-					new MenuItem (Strings.ctxUndo, "", () => UndoChanges (), null, null, GetKeyFromCommand (Command.Undo)),
-					new MenuItem (Strings.ctxRedo, "", () => RedoChanges (), null, null, GetKeyFromCommand (Command.Redo)),
+					new MenuItem (Strings.ctxUndo, "", () => Undo (), null, null, GetKeyFromCommand (Command.Undo)),
+					new MenuItem (Strings.ctxRedo, "", () => Redo (), null, null, GetKeyFromCommand (Command.Redo)),
 				});
 		}
 
@@ -245,7 +245,7 @@ namespace Terminal.Gui {
 			if (obj == null)
 				return;
 
-			Text = StringExtensions.ToString (obj?.Lines [obj.CursorPosition.Y]);
+			Text = TextModel.ToString (obj?.Lines [obj.CursorPosition.Y]);
 			CursorPosition = obj.CursorPosition.X;
 			Adjust ();
 		}
@@ -321,16 +321,18 @@ namespace Terminal.Gui {
 					return;
 				}
 				ClearAllSelection ();
-				_text = TextModel.ToRunes (newText.NewText);
+				_text = newText.NewText.EnumerateRunes ().ToList ();
 
 				if (!Secret && !_historyText.IsFromHistory) {
-					_historyText.Add (new List<List<Rune>> () { oldText.ToRuneList () },
+					_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCellList (oldText) },
 						new Point (_point, 0));
-					_historyText.Add (new List<List<Rune>> () { _text }, new Point (_point, 0)
+					_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCells (_text) }, new Point (_point, 0)
 						, HistoryText.LineStatus.Replaced);
 				}
 
 				TextChanged?.Invoke (this, new TextChangedEventArgs (oldText));
+
+				ProcessAutocomplete ();
 
 				if (_point > _text.Count) {
 					_point = Math.Max (TextModel.DisplaySize (_text, 0).size - 1, 0);
@@ -393,6 +395,8 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void PositionCursor ()
 		{
+			ProcessAutocomplete ();
+
 			var col = 0;
 			for (int idx = _first < 0 ? 0 : _first; idx < _text.Count; idx++) {
 				if (idx == _point)
@@ -437,9 +441,13 @@ namespace Terminal.Gui {
 			}
 		}
 
+		bool _isDrawing = false;
+
 		///<inheritdoc/>
 		public override void OnDrawContent (Rect contentArea)
 		{
+			_isDrawing = true;
+
 			var selColor = new Attribute (ColorScheme.Focus.Background, ColorScheme.Focus.Foreground);
 			SetSelectedStartSelectedLength ();
 
@@ -485,21 +493,31 @@ namespace Terminal.Gui {
 
 			RenderCaption ();
 
-			if (SelectedLength > 0)
+			ProcessAutocomplete ();
+
+			_isDrawing = false;
+		}
+
+		private void ProcessAutocomplete ()
+		{
+			if (_isDrawing) {
 				return;
+			}
+			if (SelectedLength > 0) {
+				return;
+			}
 
 			// draw autocomplete
 			GenerateSuggestions ();
 
 			var renderAt = new Point (
-				CursorPosition - ScrollOffset, 0);
+				Autocomplete.Context.CursorPosition, 0);
 
 			Autocomplete.RenderOverlay (renderAt);
 		}
 
 		private void RenderCaption ()
 		{
-
 			if (HasFocus || Caption == null || Caption.Length == 0
 				|| Text?.Length > 0) {
 				return;
@@ -520,12 +538,13 @@ namespace Terminal.Gui {
 
 		private void GenerateSuggestions ()
 		{
-			var currentLine = Text.ToRuneList ();
+			var currentLine = TextModel.ToRuneCellList (Text);
 			var cursorPosition = Math.Min (this.CursorPosition, currentLine.Count);
+			Autocomplete.Context = new AutocompleteContext (currentLine, cursorPosition,
+				Autocomplete.Context != null ? Autocomplete.Context.Canceled : false);
 
 			Autocomplete.GenerateSuggestions (
-				new AutocompleteContext (currentLine, cursorPosition)
-				);
+				Autocomplete.Context);
 		}
 
 		/// <inheritdoc/>
@@ -548,15 +567,22 @@ namespace Terminal.Gui {
 				return;
 
 			int offB = OffSetBackground ();
+			bool need = !_needsDisplay.IsEmpty || !Used;
 			if (_point < _first) {
 				_first = _point;
+				need = true;
 			} else if (Frame.Width > 0 && (_first + _point - (Frame.Width + offB) == 0 ||
 				  TextModel.DisplaySize (_text, _first, _point).size >= Frame.Width + offB)) {
 
 				_first = Math.Max (TextModel.CalculateLeftColumn (_text, _first,
 					_point, Frame.Width + offB), 0);
+				need = true;
 			}
-			SetNeedsDisplay ();
+			if (need) {
+				SetNeedsDisplay ();
+			} else {
+				PositionCursor ();
+			}
 		}
 
 		int OffSetBackground ()
@@ -642,7 +668,7 @@ namespace Terminal.Gui {
 
 		void InsertText (KeyEvent kb, bool useOldCursorPos = true)
 		{
-			_historyText.Add (new List<List<Rune>> () { _text }, new Point (_point, 0));
+			_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCells (_text) }, new Point (_point, 0));
 
 			List<Rune> newText = _text;
 			if (_length > 0) {
@@ -652,7 +678,7 @@ namespace Terminal.Gui {
 			if (!useOldCursorPos) {
 				_oldCursorPos = _point;
 			}
-			var kbstr = TextModel.ToRunes (((Rune)(uint)kb.Key).ToString ());
+			var kbstr = ((Rune)(uint)kb.Key).ToString ().EnumerateRunes ();
 			if (Used) {
 				_point++;
 				if (_point == newText.Count + 1) {
@@ -732,10 +758,14 @@ namespace Terminal.Gui {
 			Adjust ();
 		}
 
-		void RedoChanges ()
+		/// <summary>
+		/// Redoes the latest changes.
+		/// </summary>
+		public void Redo ()
 		{
-			if (ReadOnly)
+			if (ReadOnly) {
 				return;
+			}
 
 			_historyText.Redo ();
 
@@ -755,10 +785,14 @@ namespace Terminal.Gui {
 			//Adjust ();
 		}
 
-		void UndoChanges ()
+		/// <summary>
+		/// Undoes the latest changes.
+		/// </summary>
+		public void Undo ()
 		{
-			if (ReadOnly)
+			if (ReadOnly) {
 				return;
+			}
 
 			_historyText.Undo ();
 		}
@@ -891,7 +925,7 @@ namespace Terminal.Gui {
 			if (ReadOnly)
 				return;
 
-			_historyText.Add (new List<List<Rune>> () { _text }, new Point (_point, 0));
+			_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCells (_text) }, new Point (_point, 0));
 
 			if (_length == 0) {
 				if (_point == 0)
@@ -922,7 +956,7 @@ namespace Terminal.Gui {
 			if (ReadOnly)
 				return;
 
-			_historyText.Add (new List<List<Rune>> () { _text }, new Point (_point, 0));
+			_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCells (_text) }, new Point (_point, 0));
 
 			if (_length == 0) {
 				if (_text.Count == 0 || _text.Count == _point)
@@ -1151,8 +1185,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void ClearAllSelection ()
 		{
-			if (_selectedStart == -1 && _length == 0 && _selectedText == "")
+			if (_selectedStart == -1 && _length == 0 && string.IsNullOrEmpty (_selectedText)) {
 				return;
+			}
 
 			_selectedStart = -1;
 			_length = 0;
@@ -1326,6 +1361,12 @@ namespace Terminal.Gui {
 		protected override void InsertText (string accepted)
 		{
 			((TextField)HostControl).InsertText (accepted, false);
+		}
+
+		/// <inheritdoc/>
+		protected override void SetCursorPosition (int column)
+		{
+			((TextField)HostControl).CursorPosition = column;
 		}
 	}
 }

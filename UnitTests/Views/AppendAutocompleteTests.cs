@@ -25,11 +25,13 @@ namespace Terminal.Gui.TextTests {
 			generator.AllSuggestions = new List<string> { "fish" };
 
 			tf.Draw ();
+			tf.PositionCursor ();
 			TestHelpers.AssertDriverContentsAre ("", output);
 
 			tf.ProcessKey (new KeyEvent (Key.f, new KeyModifiers ()));
 
 			tf.Draw ();
+			tf.PositionCursor ();
 			TestHelpers.AssertDriverContentsAre ("fish", output);
 			Assert.Equal ("f", tf.Text);
 
@@ -57,6 +59,7 @@ namespace Terminal.Gui.TextTests {
 			generator.AllSuggestions = new List<string> { "FISH" };
 
 			tf.Draw ();
+			tf.PositionCursor ();
 			TestHelpers.AssertDriverContentsAre ("", output);
 			tf.ProcessKey (new KeyEvent (Key.m, new KeyModifiers ()));
 			tf.ProcessKey (new KeyEvent (Key.y, new KeyModifiers ()));
@@ -65,6 +68,7 @@ namespace Terminal.Gui.TextTests {
 
 			// Even though there is no match on case we should still get the suggestion
 			tf.Draw ();
+			tf.PositionCursor ();
 			TestHelpers.AssertDriverContentsAre ("my fISH", output);
 			Assert.Equal ("my f", tf.Text);
 
@@ -83,6 +87,7 @@ namespace Terminal.Gui.TextTests {
 			// f is typed and suggestion is "fish"
 			Application.Driver.SendKeys ('f', ConsoleKey.F, false, false, false);
 			tf.Draw ();
+			tf.PositionCursor ();
 			TestHelpers.AssertDriverContentsAre ("fish", output);
 			Assert.Equal ("f", tf.Text);
 
@@ -110,6 +115,7 @@ namespace Terminal.Gui.TextTests {
 			// f is typed and suggestion is "fish"
 			Application.Driver.SendKeys ('f', ConsoleKey.F, false, false, false);
 			tf.Draw ();
+			tf.PositionCursor ();
 			TestHelpers.AssertDriverContentsAre ("fish", output);
 			Assert.Equal ("f", tf.Text);
 
@@ -140,6 +146,7 @@ namespace Terminal.Gui.TextTests {
 			// f is typed we should only see 'f' up to size of View (10)
 			Application.Driver.SendKeys ('f', ConsoleKey.F, false, false, false);
 			tf.Draw ();
+			tf.PositionCursor ();
 			TestHelpers.AssertDriverContentsAre (expectRender, output);
 			Assert.Equal ("f", tf.Text);
 		}
@@ -154,6 +161,7 @@ namespace Terminal.Gui.TextTests {
 			// f is typed and suggestion is "fish"
 			Application.Driver.SendKeys ('f', ConsoleKey.F, false, false, false);
 			tf.Draw ();
+			tf.PositionCursor ();
 			TestHelpers.AssertDriverContentsAre ("fish", output);
 			Assert.Equal ("f", tf.Text);
 
@@ -161,12 +169,14 @@ namespace Terminal.Gui.TextTests {
 			Application.Driver.SendKeys (' ', cycleKey, false, false, false);
 
 			tf.Draw ();
+			tf.PositionCursor ();
 			TestHelpers.AssertDriverContentsAre ("friend", output);
 			Assert.Equal ("f", tf.Text);
 
 			// Should be able to cycle in circles endlessly
 			Application.Driver.SendKeys (' ', cycleKey, false, false, false);
 			tf.Draw ();
+			tf.PositionCursor ();
 			TestHelpers.AssertDriverContentsAre ("fish", output);
 			Assert.Equal ("f", tf.Text);
 		}
@@ -179,6 +189,7 @@ namespace Terminal.Gui.TextTests {
 			// f is typed and suggestion is "fish"
 			Application.Driver.SendKeys ('f', ConsoleKey.F, false, false, false);
 			tf.Draw ();
+			tf.PositionCursor ();
 			TestHelpers.AssertDriverContentsAre ("fish", output);
 			Assert.Equal ("f", tf.Text);
 
@@ -197,6 +208,7 @@ namespace Terminal.Gui.TextTests {
 			// f is typed and suggestion is "fish"
 			Application.Driver.SendKeys ('f', ConsoleKey.F, false, false, false);
 			tf.Draw ();
+			tf.PositionCursor ();
 			TestHelpers.AssertDriverContentsAre ("fish", output);
 			Assert.Equal ("f", tf.Text);
 
@@ -219,6 +231,7 @@ namespace Terminal.Gui.TextTests {
 			generator.AllSuggestions = suggestions.ToList ();
 
 			tf.Draw ();
+			tf.PositionCursor ();
 			TestHelpers.AssertDriverContentsAre ("", output);
 
 			return tf;

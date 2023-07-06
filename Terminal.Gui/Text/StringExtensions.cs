@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +22,7 @@ public static class StringExtensions {
 	///  The text repeated if <paramref name="n"/> is greater than zero, 
 	///  otherwise <see langword="null"/>.
 	/// </returns>
-	public static string Repeat (this string str, int n)
+	public static string? Repeat (this string str, int n)
 	{
 		if (n <= 0) {
 			return null;
@@ -144,7 +146,7 @@ public static class StringExtensions {
 	/// <param name="bytes">The enumerable byte to convert.</param>
 	/// <param name="encoding">The encoding to be used.</param>
 	/// <returns></returns>
-	public static string ToString (IEnumerable<byte> bytes, Encoding encoding = null)
+	public static string ToString (IEnumerable<byte> bytes, Encoding? encoding = null)
 	{
 		if (encoding == null) {
 			encoding = Encoding.UTF8;
