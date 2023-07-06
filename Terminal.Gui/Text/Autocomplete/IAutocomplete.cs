@@ -69,6 +69,11 @@ namespace Terminal.Gui {
 		Key Reopen { get; set; }
 
 		/// <summary>
+		/// The context used by the autocomplete menu.
+		/// </summary>
+		AutocompleteContext Context { get; set; }
+
+		/// <summary>
 		/// Renders the autocomplete dialog inside the given <see cref="HostControl"/> at the
 		/// given point.
 		/// </summary>

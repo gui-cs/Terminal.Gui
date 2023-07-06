@@ -352,7 +352,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Creates a new instance, initialized with the values from <paramref name="scheme"/>.
 		/// </summary>
-		/// <param name="scheme">The scheme to initlize the new instance with.</param>
+		/// <param name="scheme">The scheme to initialize the new instance with.</param>
 		public ColorScheme (ColorScheme scheme) : base ()
 		{
 			if (scheme != null) {
@@ -362,6 +362,19 @@ namespace Terminal.Gui {
 				_disabled = scheme.Disabled;
 				_hotFocus = scheme.HotFocus;
 			}
+		}
+
+		/// <summary>
+		/// Creates a new instance, initialized with the values from <paramref name="attribute"/>.
+		/// </summary>
+		/// <param name="attribute">The attribute to initialize the new instance with.</param>
+		public ColorScheme (Attribute attribute)
+		{
+			_normal = attribute;
+			_focus = attribute;
+			_hotNormal = attribute;
+			_disabled = attribute;
+			_hotFocus = attribute;
 		}
 
 		/// <summary>
@@ -764,13 +777,13 @@ namespace Terminal.Gui {
 			}
 			return true;
 		}
-		
+
 		/// <summary>
 		/// Adds the specified rune to the display at the current cursor position.
 		/// </summary>
 		/// <param name="rune">Rune to add.</param>
 		public abstract void AddRune (Rune rune);
-		
+
 		/// <summary>
 		/// Ensures that the column and line are in a valid range from the size of the driver.
 		/// </summary>

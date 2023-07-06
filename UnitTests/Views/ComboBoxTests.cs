@@ -13,7 +13,7 @@ namespace Terminal.Gui.ViewsTests {
 			this.output = output;
 		}
 
-		[Fact]
+		[Fact, AutoInitShutdown]
 		public void Constructors_Defaults ()
 		{
 			var cb = new ComboBox ();
