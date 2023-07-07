@@ -420,9 +420,6 @@ namespace Terminal.Gui {
 		/// <param name="color">The color.</param>
 		public Attribute (Color color) : this (color, color) { }
 
-		/// <inheritdoc />
-		public override int GetHashCode () => HashCode.Combine (Value, Foreground, Background);
-
 		/// <summary>
 		/// Compares two attributes for equality.
 		/// </summary>
@@ -679,7 +676,7 @@ namespace Terminal.Gui {
 			hashCode = hashCode * -1521134295 + _disabled.GetHashCode ();
 			return hashCode;
 		}
-
+		
 		/// <summary>
 		/// Compares two <see cref="ColorScheme"/> objects for equality.
 		/// </summary>
