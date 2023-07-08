@@ -1168,20 +1168,21 @@ namespace Terminal.Gui {
 		{
 			var stats = this.RowToStats (args.RowIndex);
 
-			var color = Style.ColorProvider.GetTrueColor(stats.FileSystemInfo);
-
-			if (!Style.UseColors || color == null) {
+			if (!Style.UseColors) {
 				return tableView.ColorScheme;
 			}
 
+
+			var color = Style.ColorProvider.GetTrueColor(stats.FileSystemInfo)
+			??	TrueColor.FromConsoleColor(Color.White);
 			var black = TrueColor.FromConsoleColor(Color.Black);
 
 			// TODO: Add some kind of cache for this
 			return new ColorScheme{
-				Normal = new Attribute (color.Value,black),
-				HotNormal = new Attribute (color.Value, black),
-				Focus = new Attribute (black, color.Value),
-				HotFocus = new Attribute (black, color.Value),
+				Normal = new Attribute (color,black),
+				HotNormal = new Attribute (color, black),
+				Focus = new Attribute (black, color),
+				HotFocus = new Attribute (black, color),
 			};
 		}
 
