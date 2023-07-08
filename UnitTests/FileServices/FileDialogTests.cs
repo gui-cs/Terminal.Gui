@@ -440,18 +440,6 @@ namespace Terminal.Gui.FileServicesTests {
 			TestHelpers.AssertDriverContentsAre (expected, output, true);
 		}
 
-
-		private ColorScheme GetColorScheme (Attribute a)
-		{
-			return new ColorScheme {
-				Normal = a,
-				Focus = a,
-				Disabled = a,
-				HotFocus = a,
-				HotNormal = a,
-			};
-		}
-
 		[Theory]
 		[InlineData (".csv", null, false)]
 		[InlineData (".csv", "", false)]
