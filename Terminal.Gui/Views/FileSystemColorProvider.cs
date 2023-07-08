@@ -1,11 +1,30 @@
 // This code is adapted from https://github.com/devblackops/Terminal-Icons (which also uses the MIT license).
 
 using System.Collections.Generic;
+using System.IO.Abstractions;
 
 namespace Terminal.Gui {
-	class FileSystemColorProvider
+
+
+	public class FileSystemColorProvider
 	{
         TrueColor b = new TrueColor();
+
+
+		public TrueColor? GetTrueColor (IFileSystemInfo file)
+        {
+            if(FilenameToColor.ContainsKey(file.Name))
+			{
+				return FilenameToColor[file.Name];
+			}
+
+			if(ExtensionToColor.ContainsKey(file.Extension))
+			{
+				return ExtensionToColor[file.Extension];
+			}
+            
+            return null;
+        }
 
         /// <summary>
 		/// Mapping of file/dir name to color.
