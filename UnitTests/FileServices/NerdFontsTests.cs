@@ -10,7 +10,7 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.FileServicesTests {
 
-    public class NerdFontTests
+	public class NerdFontTests
     {
         [Fact]
         public void TestAllFilenamesMapToKnownGlyphs()
