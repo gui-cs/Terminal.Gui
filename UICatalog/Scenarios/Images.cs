@@ -20,7 +20,7 @@ namespace UICatalog.Scenarios {
 			var x = 0;
 			var y = 0;
 
-			var canTrueColor = Application.Driver.SupportsTrueColorOutput;
+			var canTrueColor = Application.Driver.SupportsTrueColor;
 
 			var lblDriverName = new Label ($"Current driver is {Application.Driver.GetType ().Name}") {
 				X = x,

@@ -226,6 +226,27 @@ public static class EscSeqUtils {
 	/// https://terminalguide.namepad.de/seq/csi_sm/
 	/// </summary>
 	public static string CSI_SetGraphicsRendition (params int [] parameters) => $"{CSI}{string.Join (";", parameters)}m";
+
+	/// <summary>
+	/// ESC[38;5;{id}m - Set foreground color (256 colors)
+	/// </summary>
+	public static string CSI_SetForegroundColor (int id) => $"{CSI}38;5;{id}m";
+
+	/// <summary>
+	/// ESC[48;5;{id}m - Set background color (256 colors)
+	/// </summary>
+	public static string CSI_SetBackgroundColor (int id) => $"{CSI}48;5;{id}m";
+
+	/// <summary>
+	/// ESC[38;2;{r};{g};{b}m	Set foreground color as RGB.
+	/// </summary>
+	public static string CSI_SetForegroundColorRGB (int r, int g, int b) => $"{CSI}38;2;{r};{g};{b}m";
+
+	/// <summary>
+	/// ESC[48;2;{r};{g};{b}m	Set background color as RGB.
+	/// </summary>
+	public static string CSI_SetBackgroundColorRGB (int r, int g, int b) => $"{CSI}48;2;{r};{g};{b}m";
+
 	#endregion
 
 	#region Requests

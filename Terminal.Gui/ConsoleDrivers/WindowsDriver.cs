@@ -17,13 +17,6 @@ internal class WindowsConsole {
 	public const int STD_INPUT_HANDLE = -10;
 	public const int STD_ERROR_HANDLE = -12;
 
-	readonly static char [] SafeCursor = new [] { '\x1b', '7', '\x1b', '[', '0', ';', '0', 'H' };
-	readonly static char [] RestoreCursor = new [] { '\x1b', '8' };
-	readonly static char [] SendTrueColorFg = new [] { '\x1b', '[', '3', '8', ';', '2', ';' };
-	readonly static char [] SendTrueColorBg = new [] { ';', '4', '8', ';', '2', ';' };
-	readonly static char [] SendColorFg = new [] { '\x1b', '[', '3', '8', ';', '5', ';' };
-	readonly static char [] SendColorBg = new [] { ';', '4', '8', ';', '5', ';' };
-
 	IntPtr _inputHandle, _outputHandle;
 	IntPtr _screenBuffer;
 	readonly uint _originalConsoleMode;
@@ -31,7 +24,6 @@ internal class WindowsConsole {
 	CursorVisibility? _currentCursorVisibility = null;
 	CursorVisibility? _pendingCursorVisibility = null;
 	readonly StringBuilder _stringBuilder = new StringBuilder (256 * 1024);
-
 
 	public WindowsConsole ()
 	{
@@ -73,7 +65,8 @@ internal class WindowsConsole {
 	{
 		_stringBuilder.Clear ();
 
-		_stringBuilder.Append (SafeCursor);
+		_stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
+		_stringBuilder.Append (EscSeqUtils.CSI_SetCursorPosition (0, 0));
 
 		Attribute? prev = null;
 		foreach (var info in charInfoBuffer) {
@@ -81,29 +74,18 @@ internal class WindowsConsole {
 
 			if (attr != prev) {
 				prev = attr;
-				
-				_stringBuilder.Append (SendTrueColorFg);
-				_stringBuilder.Append (attr.TrueColorForeground.Red);
-				_stringBuilder.Append (';');
-				_stringBuilder.Append (attr.TrueColorForeground.Green);
-				_stringBuilder.Append (';');
-				_stringBuilder.Append (attr.TrueColorForeground.Blue);
-				_stringBuilder.Append (SendTrueColorBg);
-				_stringBuilder.Append (attr.TrueColorBackground.Red);
-				_stringBuilder.Append (';');
-				_stringBuilder.Append (attr.TrueColorBackground.Green);
-				_stringBuilder.Append (';');
-				_stringBuilder.Append (attr.TrueColorBackground.Blue);
-				_stringBuilder.Append ('m');
+
+				_stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.TrueColorForeground.Value.Red, attr.TrueColorForeground.Value.Green, attr.TrueColorForeground.Value.Blue));
+				_stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.TrueColorBackground.Value.Red, attr.TrueColorBackground.Value.Green, attr.TrueColorBackground.Value.Blue));
 			}
 
 			_stringBuilder.Append (info.Char != '\x1b' ? info.Char : ' ');
 		}
 
-		_stringBuilder.Append (RestoreCursor);
+		_stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
 
 		string s = _stringBuilder.ToString ();
-		
+
 		return WriteConsole (_screenBuffer, s, (uint)(s.Length), out uint _, null);
 	}
 
@@ -521,11 +503,11 @@ internal class WindowsConsole {
 		[FieldOffset (2)] public ushort Attributes;
 	}
 
-	public struct ExtendedCharInfo { 
+	public struct ExtendedCharInfo {
 		public char Char { get; set; }
 		public Attribute Attribute { get; set; }
 
-		public ExtendedCharInfo(char character,  Attribute attribute)
+		public ExtendedCharInfo (char character, Attribute attribute)
 		{
 			Char = character;
 			Attribute = attribute;
@@ -778,7 +760,7 @@ internal class WindowsDriver : ConsoleDriver {
 
 	public WindowsConsole WinConsole { get; private set; }
 
-	public override bool SupportsTrueColorOutput => Environment.OSVersion.Version.Build >= 14931;
+	public override bool SupportsTrueColor => Environment.OSVersion.Version.Build >= 14931;
 
 	public WindowsDriver ()
 	{
@@ -948,10 +930,10 @@ internal class WindowsDriver : ConsoleDriver {
 			TerminalResized?.Invoke ();
 			break;
 
-			case WindowsConsole.EventType.Focus:
-				break;
-			}
+		case WindowsConsole.EventType.Focus:
+			break;
 		}
+	}
 
 	WindowsConsole.ButtonState? _lastMouseButtonPressed = null;
 	bool _isButtonPressed = false;
@@ -1453,7 +1435,7 @@ internal class WindowsDriver : ConsoleDriver {
 			}
 			Contents [Row, Col, 0] = rune.Value;
 			Contents [Row, Col, 1] = CurrentAttribute.Value;
-			_outputBuffer [GetOutputBufferPosition()] = new WindowsConsole.ExtendedCharInfo ((char)rune.Value, CurrentAttribute);
+			_outputBuffer [GetOutputBufferPosition ()] = new WindowsConsole.ExtendedCharInfo ((char)rune.Value, CurrentAttribute);
 			WindowsConsole.SmallRect.Update (ref _damageRegion, (short)Col, (short)Row);
 
 			if (Col > 0) {
@@ -1805,7 +1787,7 @@ internal class WindowsDriver : ConsoleDriver {
 		// end of the screen.
 		// Note, [3J causes Windows Terminal to wipe out the entire NON ALTERNATIVE
 		// backbuffer! So we need to use [0J instead.
-		Console.Out.Write (EscSeqUtils.CSI_ClearScreen(0));
+		Console.Out.Write (EscSeqUtils.CSI_ClearScreen (0));
 
 		// Disable alternative screen buffer.
 		Console.Out.Write (EscSeqUtils.CSI_RestoreAltBufferWithBackscroll);

@@ -12,7 +12,7 @@ namespace UICatalog.Scenarios {
 			var x = 2;
 			var y = 1;
 
-			var canTrueColor = true; //  Application.Driver.SupportsTrueColorOutput;
+			var canTrueColor = Application.Driver.SupportsTrueColor;
 
 			var lblDriverName = new Label ($"Current driver is {Application.Driver.GetType ().Name}") {
 				X = x,
@@ -83,9 +83,9 @@ namespace UICatalog.Scenarios {
 			Application.RootMouseEvent = (e) => {
 				var normal = e.View.GetNormalColor ();
 				if (e.View != null) {
-					lblRed.Text = normal.TrueColorForeground.Red.ToString ();
-					lblGreen.Text = normal.TrueColorForeground.Green.ToString ();
-					lblBlue.Text = normal.TrueColorForeground.Blue.ToString ();
+					lblRed.Text = normal.TrueColorForeground.Value.Red.ToString ();
+					lblGreen.Text = normal.TrueColorForeground.Value.Green.ToString ();
+					lblBlue.Text = normal.TrueColorForeground.Value.Blue.ToString ();
 				}
 			};
 		}

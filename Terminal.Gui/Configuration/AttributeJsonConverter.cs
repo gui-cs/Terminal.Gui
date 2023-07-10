@@ -32,10 +32,11 @@ namespace Terminal.Gui {
 			Attribute attribute = new Attribute ();
 			Color foreground = (Color)(-1);
 			Color background = (Color)(-1);
-			int valuePair = 0;
+			TrueColor? trueColorForeground = null;
+			TrueColor? trueColorBackground = null;
 			while (reader.Read ()) {
 				if (reader.TokenType == JsonTokenType.EndObject) {
-					if (foreground == (Color)(-1) || background == (Color)(-1)) {
+					if (!attribute.TrueColorForeground.HasValue || !attribute.TrueColorBackground.HasValue) {
 						throw new JsonException ($"Both Foreground and Background colors must be provided.");
 					}
 					return attribute;
@@ -49,14 +50,18 @@ namespace Terminal.Gui {
 				reader.Read ();
 				string color = $"\"{reader.GetString ()}\"";
 
-				valuePair++;
-
 				switch (propertyName.ToLower ()) {
 				case "foreground":
 					foreground = JsonSerializer.Deserialize<Color> (color, options);
 					break;
 				case "background":
 					background = JsonSerializer.Deserialize<Color> (color, options);
+					break;
+				case "truecolorforeground":
+					trueColorForeground = JsonSerializer.Deserialize<TrueColor> (color, options);
+					break;
+				case "truecolorbackground":
+					trueColorBackground = JsonSerializer.Deserialize<TrueColor> (color, options);
 					break;
 				//case "Bright":
 				//	attribute.Bright = reader.GetBoolean ();
@@ -71,9 +76,11 @@ namespace Terminal.Gui {
 					throw new JsonException ($"Unknown Attribute property {propertyName}.");
 				}
 
-				if (valuePair == 2) {
+				if (foreground != (Color)(-1) && background != (Color)(-1)) {
 					attribute = new Attribute (foreground, background);
-					valuePair = 0;
+				}
+				if (trueColorForeground.HasValue && trueColorBackground.HasValue) {
+					attribute = new Attribute (trueColorForeground, trueColorBackground);
 				}
 			}
 			throw new JsonException ();
@@ -86,10 +93,12 @@ namespace Terminal.Gui {
 			ColorJsonConverter.Instance.Write (writer, value.Foreground, options);
 			writer.WritePropertyName (nameof (Attribute.Background));
 			ColorJsonConverter.Instance.Write (writer, value.Background, options);
-			writer.WritePropertyName (nameof (Attribute.TrueColorForeground));
-			TrueColorJsonConverter.Instance.Write (writer, value.TrueColorForeground, options);
-			writer.WritePropertyName (nameof (Attribute.TrueColorBackground));
-			TrueColorJsonConverter.Instance.Write (writer, value.TrueColorBackground, options);
+			if (value.TrueColorForeground.HasValue && value.TrueColorBackground.HasValue) {
+				writer.WritePropertyName (nameof (Attribute.TrueColorForeground));
+				TrueColorJsonConverter.Instance.Write (writer, value.TrueColorForeground.Value, options);
+				writer.WritePropertyName (nameof (Attribute.TrueColorBackground));
+				TrueColorJsonConverter.Instance.Write (writer, value.TrueColorBackground.Value, options);
+			}
 			writer.WriteEndObject ();
 		}
 	}

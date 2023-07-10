@@ -1,6 +1,1 @@
-{
-  "$schema": "https://xunit.net/schema/current/xunit.runner.schema.json",
-  "parallelizeTestCollections": false,
-  "parallelizeAssembly": false,
-  "stopOnFail": true
-}
+  

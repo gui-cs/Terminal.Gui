@@ -85,6 +85,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Indicates the RGB for true colors.
 	/// </summary>
+	[JsonConverter (typeof (TrueColorJsonConverter))]
 	public readonly struct TrueColor : IEquatable<TrueColor> {
 		private static readonly ImmutableDictionary<TrueColor, Color> TrueColorToConsoleColorMap = new Dictionary<TrueColor, Color> () {
 			{ new TrueColor (0,0,0),Color.Black },
@@ -137,7 +138,7 @@ namespace Terminal.Gui {
 		/// <param name="text">The text to analyze.</param>
 		/// <param name="trueColor">The parsed value.</param>
 		/// <returns>A boolean value indcating whether it was successful.</returns>
-		public static bool TryParse (string text, [NotNullWhen(true)] out TrueColor? trueColor)
+		public static bool TryParse (string text, [NotNullWhen (true)] out TrueColor? trueColor)
 		{
 			// empty color
 			if ((text == null) || (text.Length == 0)) {
@@ -172,7 +173,7 @@ namespace Terminal.Gui {
 				var r = int.Parse (match.Groups [1].Value);
 				var g = int.Parse (match.Groups [2].Value);
 				var b = int.Parse (match.Groups [3].Value);
-				trueColor =  new TrueColor (r, g, b);
+				trueColor = new TrueColor (r, g, b);
 				return true;
 			}
 
@@ -185,27 +186,29 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="consoleColor">The <see cref="Color"/> to convert.</param>
 		/// <returns></returns>
-		public static TrueColor FromConsoleColor (Color consoleColor)
+		public static TrueColor? FromConsoleColor (Color consoleColor)
 		{
-			switch (consoleColor) {
-			case Color.Black: return new TrueColor (0, 0, 0);
-			case Color.Blue: return new TrueColor (0, 0, 0x80);
-			case Color.Green: return new TrueColor (0, 0x80, 0);
-			case Color.Cyan: return new TrueColor (0, 0x80, 0x80);
-			case Color.Red: return new TrueColor (0x80, 0, 0);
-			case Color.Magenta: return new TrueColor (0x80, 0, 0x80);
-			case Color.Brown: return new TrueColor (0xC1, 0x9C, 0x00); // TODO confirm this
-			case Color.Gray: return new TrueColor (0xC0, 0xC0, 0xC0);
-			case Color.DarkGray: return new TrueColor (0x80, 0x80, 0x80);
-			case Color.BrightBlue: return new TrueColor (0, 0, 0xFF);
-			case Color.BrightGreen: return new TrueColor (0, 0xFF, 0);
-			case Color.BrightCyan: return new TrueColor (0, 0xFF, 0xFF);
-			case Color.BrightRed: return new TrueColor (0xFF, 0, 0);
-			case Color.BrightMagenta: return new TrueColor (0xFF, 0, 0xFF);
-			case Color.BrightYellow: return new TrueColor (0xFF, 0xFF, 0);
-			case Color.White: return new TrueColor (0xFF, 0xFF, 0xFF);
-			default: throw new ArgumentException ($"No supported TrueColor mapping for '{consoleColor}'.");
+			return consoleColor switch {
+				Color.Black => new TrueColor (0, 0, 0),
+				Color.Blue => new TrueColor (0, 0, 0x80),
+				Color.Green => new TrueColor (0, 0x80, 0),
+				Color.Cyan => new TrueColor (0, 0x80, 0x80),
+				Color.Red => new TrueColor (0x80, 0, 0),
+				Color.Magenta => new TrueColor (0x80, 0, 0x80),
+				Color.Brown => new TrueColor (0xC1, 0x9C, 0x00) // TODO confirm this
+				,
+				Color.Gray => new TrueColor (0xC0, 0xC0, 0xC0),
+				Color.DarkGray => new TrueColor (0x80, 0x80, 0x80),
+				Color.BrightBlue => new TrueColor (0, 0, 0xFF),
+				Color.BrightGreen => new TrueColor (0, 0xFF, 0),
+				Color.BrightCyan => new TrueColor (0, 0xFF, 0xFF),
+				Color.BrightRed => new TrueColor (0xFF, 0, 0),
+				Color.BrightMagenta => new TrueColor (0xFF, 0, 0xFF),
+				Color.BrightYellow => new TrueColor (0xFF, 0xFF, 0),
+				Color.White => new TrueColor (0xFF, 0xFF, 0xFF),
+				var _ => null
 			};
+			;
 		}
 
 		/// <summary>
@@ -213,9 +216,13 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="trueColor"></param>
 		/// <returns></returns>
-		public static Color ToConsoleColor (TrueColor trueColor)
+		public static Color ToConsoleColor (TrueColor? trueColor)
 		{
-			return TrueColorToConsoleColorMap.OrderBy (kv => CalculateDistance (kv.Key, trueColor)).First ().Value;
+			if (trueColor.HasValue) {
+				return TrueColorToConsoleColorMap.MinBy (kv => CalculateDistance (kv.Key, trueColor.Value)).Value;
+			} else {
+				return (Color)(-1);
+			}
 		}
 
 		private static float CalculateDistance (TrueColor color1, TrueColor color2)
@@ -281,7 +288,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Default empty attribute.
 		/// </summary>
-		public static readonly Attribute Default = new Attribute ();
+		public static readonly Attribute Default = new Attribute (Color.White, Color.Black);
 
 		/// <summary>
 		/// The <see cref="ConsoleDriver"/>-specific color value. If <see cref="Initialized"/> is <see langword="false"/> 
@@ -307,13 +314,13 @@ namespace Terminal.Gui {
 		/// Gets the TrueColor foreground color.
 		/// </summary>
 		[JsonConverter (typeof (TrueColorJsonConverter))]
-		public TrueColor TrueColorForeground { get; private init; }
+		public TrueColor? TrueColorForeground { get; private init; }
 
 		/// <summary>
 		/// Gets the TrueColor background color.
 		/// </summary>
 		[JsonConverter (typeof (TrueColorJsonConverter))]
-		public TrueColor TrueColorBackground { get; private init; }
+		public TrueColor? TrueColorBackground { get; private init; }
 
 		/// <summary>
 		/// Initializes a new instance with a platform-specific color value.
@@ -377,7 +384,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="trueColorForeground"></param>
 		/// <param name="trueColorBackground"></param>
-		public Attribute (TrueColor trueColorForeground, TrueColor trueColorBackground)
+		public Attribute (TrueColor? trueColorForeground, TrueColor? trueColorBackground)
 		{
 			Foreground = TrueColor.ToConsoleColor (trueColorForeground);
 			Background = TrueColor.ToConsoleColor (trueColorBackground);
@@ -395,7 +402,7 @@ namespace Terminal.Gui {
 		/// fallback values for <see cref="Foreground"/> and <see cref="Background"/> (in case
 		/// driver does not support true color rendering). 
 		/// </para>
-		/// <remarks>If you do not want to manually specify the fallback colors use <see cref="Attribute(TrueColor,TrueColor)"/>
+		/// <remarks>If you do not want to manually specify the fallback colors use <see cref="Attribute(TrueColor?,TrueColor?)"/>
 		/// instead which auto calculates these.</remarks>
 		/// </summary>
 		/// <param name="trueColorForeground">True color RGB values you would like to use.</param>
@@ -420,8 +427,6 @@ namespace Terminal.Gui {
 		/// <param name="color">The color.</param>
 		public Attribute (Color color) : this (color, color) { }
 
-		/// <inheritdoc />
-		public override int GetHashCode () => HashCode.Combine (Value, Foreground, Background);
 
 		/// <summary>
 		/// Compares two attributes for equality.
@@ -448,11 +453,15 @@ namespace Terminal.Gui {
 		/// <inheritdoc />
 		public bool Equals (Attribute other)
 		{
+			if (TrueColorForeground.HasValue || TrueColorBackground.HasValue) {
+				return 
+					TrueColorForeground == other.TrueColorForeground &&
+					TrueColorBackground == other.TrueColorBackground;
+			}
+
 			return Value == other.Value &&
 				Foreground == other.Foreground &&
-				Background == other.Background &&
-				TrueColorForeground == other.TrueColorForeground &&
-				TrueColorBackground == other.TrueColorBackground;
+				Background == other.Background;
 		}
 
 		/// <inheritdoc />
@@ -657,12 +666,12 @@ namespace Terminal.Gui {
 		/// <returns>true if the two objects are equal</returns>
 		public bool Equals (ColorScheme other)
 		{
-				return other != null &&
-			       EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
-			       EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
-			       EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&
-			       EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus) &&
-			       EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
+			return other != null &&
+		       EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
+		       EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
+		       EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&
+		       EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus) &&
+		       EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
 		}
 
 		/// <summary>
