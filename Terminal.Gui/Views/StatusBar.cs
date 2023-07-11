@@ -8,6 +8,7 @@
 //   Add mouse support
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using NStack;
 
 namespace Terminal.Gui {
@@ -20,7 +21,7 @@ namespace Terminal.Gui {
 	/// A <see cref="StatusItem.Title"/> set to `~F1~ Help` will render as *F1* using <see cref="ColorScheme.HotNormal"/> and
 	/// *Help* as <see cref="ColorScheme.HotNormal"/>.
 	/// </summary>
-	public class StatusItem {
+	public class StatusItem : INotifyPropertyChanged {
 		/// <summary>
 		/// Initializes a new <see cref="StatusItem"/>.
 		/// </summary>
@@ -39,6 +40,13 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Key Shortcut { get; }
 
+		private ustring title;
+
+		/// <summary>
+		/// Allow register a callback when any property has been changed.
+		/// </summary>
+		public event PropertyChangedEventHandler PropertyChanged;
+
 		/// <summary>
 		/// Gets or sets the title.
 		/// </summary>
@@ -48,7 +56,23 @@ namespace Terminal.Gui {
 		/// A <see cref="StatusItem.Title"/> set to `~F1~ Help` will render as *F1* using <see cref="ColorScheme.HotNormal"/> and
 		/// *Help* as <see cref="ColorScheme.HotNormal"/>.
 		/// </remarks>
-		public ustring Title { get; set; }
+		public ustring Title {
+			get { return title; }
+			set {
+				if (title != value) {
+					title = value;
+					OnPropertyChanged ("Title");
+				}
+			}
+		}
+
+		/// <summary>
+		/// Invoke callback functions.
+		/// </summary>
+		protected virtual void OnPropertyChanged (string propertyName)
+		{
+			PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (propertyName));
+		}
 
 		/// <summary>
 		/// Gets or sets the action to be invoked when the statusbar item is triggered
@@ -61,8 +85,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>This property is not used internally.</remarks>
 		public object Data { get; set; }
-	};
-
+	}
 	/// <summary>
 	/// A status bar is a <see cref="View"/> that snaps to the bottom of a <see cref="Toplevel"/> displaying set of <see cref="StatusItem"/>s.
 	/// The <see cref="StatusBar"/> should be context sensitive. This means, if the main menu and an open text editor are visible, the items probably shown will
@@ -94,6 +117,15 @@ namespace Terminal.Gui {
 			Y = Pos.AnchorEnd (1);
 			Width = Dim.Fill ();
 			Height = 1;
+
+			foreach (var item in Items)
+				item.PropertyChanged += Item_PropertyChanged;
+		}
+
+		private void Item_PropertyChanged (object sender, PropertyChangedEventArgs e)
+		{
+			if (e.PropertyName == "Title")
+				this.SetNeedsDisplay ();
 		}
 
 		static ustring shortcutDelimiter = "-";
