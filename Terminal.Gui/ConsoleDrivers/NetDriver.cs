@@ -232,6 +232,8 @@ internal class NetEvents {
 					break;
 				case true:
 					//Request the size of the text area in characters.
+					// BUGBUG: This is getting called repeatedly / all the time with
+					// Windows terminal v1.18+
 					EscSeqRequests.Add (EscSeqUtils.CSI_ReportTerminalSizeInChars_Terminator);
 					Console.Out.Write (EscSeqUtils.CSI_ReportTerminalSizeInChars);
 					break;
@@ -972,7 +974,7 @@ internal class NetDriver : ConsoleDriver {
 	#region Cursor Handling
 	bool SetCursorPosition (int col, int row)
 	{
-		if (IsWinPlatform) {
+		//if (IsWinPlatform) {
 			// Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.
 			try {
 				Console.SetCursorPosition (col, row);
@@ -980,11 +982,12 @@ internal class NetDriver : ConsoleDriver {
 			} catch (Exception) {
 				return false;
 			}
-		} else {
-			// TODO: Explain why + 1 is needed (and why we do this for non-Windows).
-			Console.Out.Write (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
-			return true;
-		}
+	// BUGBUG: This breaks -usc on WSL; not sure why. But commenting out fixes.
+		//} else {
+		//	// TODO: Explain why + 1 is needed (and why we do this for non-Windows).
+		//	Console.Out.Write (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
+		//	return true;
+		//}
 	}
 
 	CursorVisibility? _cachedCursorVisibility;

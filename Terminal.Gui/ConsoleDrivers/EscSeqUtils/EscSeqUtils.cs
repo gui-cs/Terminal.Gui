@@ -267,7 +267,18 @@ public static class EscSeqUtils {
 	public static readonly string CSI_ReportDeviceAttributes = CSI + "0c";
 
 	/// <summary>
-	/// The terminal reply to <see cref="CSI_ReportDeviceAttributes"/> : Windows Terminal Will emit “\x1b[?1;0c”, indicating "VT101 with No Options".
+	/// The terminal reply to <see cref="CSI_ReportDeviceAttributes"/> :
+	/// Windows Terminal v1.17 and below Will emit “\x1b[?1;0c”, indicating "VT101 with No Options".
+	/// Windows Terminal v1.18+ emits: \x1b[?61;6;7;22;23;24;28;32;42c"
+	/// - 61 - indicates VT525
+	/// - 7 - indicates VT400
+	/// - 6 - indicates Selective Erase
+	/// - 22 - indicates ANSI Color
+	/// - 23 - indicates ANSI Text Locator
+	/// - 24 - indicates VT200 Highlighting
+	/// - 28 - indicates Rectangular Editing
+	/// - 32 - indicates National Replacement Character Sets
+	/// - 42 - indicates ISO Latin-1 Character Set
 	/// </summary>
 	public const string CSI_ReportDeviceAttributes_Terminator = "c";
 
