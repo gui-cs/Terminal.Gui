@@ -118,7 +118,6 @@ internal class NetEvents {
 #if PROCESS_REQUEST
 		bool _neededProcessRequest;
 #endif
-	public bool IsTerminalWithOptions { get; set; }
 	public EscSeqRequests EscSeqRequests { get; } = new EscSeqRequests ();
 
 	public NetEvents (ConsoleDriver consoleDriver)
@@ -206,37 +205,27 @@ internal class NetEvents {
 		void RequestWindowSize ()
 		{
 			while (true) {
-				// HACK: Sleep for 10ms to mitigate high CPU usage (see issue #1502). 10ms was tested to address the problem, but may not be correct.
-				Thread.Sleep (10);
+				// Wait for a while then check if screen has changed sizes
+				Task.Delay (500).Wait ();
+
 				if (_stopTasks) {
 					return;
 				}
-				switch (IsTerminalWithOptions) {
-				case false:
-					int buffHeight, buffWidth;
-					if (((NetDriver)_consoleDriver).IsWinPlatform) {
-						buffHeight = Math.Max (Console.BufferHeight, 0);
-						buffWidth = Math.Max (Console.BufferWidth, 0);
-					} else {
-						buffHeight = _consoleDriver.Rows;
-						buffWidth = _consoleDriver.Cols;
-					}
-					if (EnqueueWindowSizeEvent (
-						Math.Max (Console.WindowHeight, 0),
-						Math.Max (Console.WindowWidth, 0),
-						buffHeight,
-						buffWidth)) {
+				int buffHeight, buffWidth;
+				if (((NetDriver)_consoleDriver).IsWinPlatform) {
+					buffHeight = Math.Max (Console.BufferHeight, 0);
+					buffWidth = Math.Max (Console.BufferWidth, 0);
+				} else {
+					buffHeight = _consoleDriver.Rows;
+					buffWidth = _consoleDriver.Cols;
+				}
+				if (EnqueueWindowSizeEvent (
+					Math.Max (Console.WindowHeight, 0),
+					Math.Max (Console.WindowWidth, 0),
+					buffHeight,
+					buffWidth)) {
 
-						return;
-					}
-					break;
-				case true:
-					//Request the size of the text area in characters.
-					// BUGBUG: This is getting called repeatedly / all the time with
-					// Windows terminal v1.18+
-					EscSeqRequests.Add (EscSeqUtils.CSI_ReportTerminalSizeInChars_Terminator);
-					Console.Out.Write (EscSeqUtils.CSI_ReportTerminalSizeInChars);
-					break;
+					return;
 				}
 			}
 		}
@@ -434,21 +423,7 @@ internal class NetEvents {
 				return;
 			}
 			break;
-		case EscSeqUtils.CSI_ReportDeviceAttributes_Terminator:
-			try {
-				var parent = EscSeqUtils.GetParentProcess (Process.GetCurrentProcess ());
-				if (parent == null) { Debug.WriteLine ("Not supported!"); }
-			} catch (Exception ex) {
-				Debug.WriteLine (ex.Message);
-			}
-			if (c1Control == "CSI" && values.Length == 2
-				&& values [0] == "1" && values [1] == "0") {
-				// Reports CSI?1;0c ("VT101 with No Options")
-				IsTerminalWithOptions = false;
-			} else {
-				IsTerminalWithOptions = true;
-			}
-			break;
+
 		case EscSeqUtils.CSI_ReportTerminalSizeInChars_Terminator:
 			switch (values [0]) {
 			case EscSeqUtils.CSI_ReportTerminalSizeInChars_ResponseValue:
@@ -975,14 +950,14 @@ internal class NetDriver : ConsoleDriver {
 	bool SetCursorPosition (int col, int row)
 	{
 		//if (IsWinPlatform) {
-			// Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.
-			try {
-				Console.SetCursorPosition (col, row);
-				return true;
-			} catch (Exception) {
-				return false;
-			}
-	// BUGBUG: This breaks -usc on WSL; not sure why. But commenting out fixes.
+		// Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.
+		try {
+			Console.SetCursorPosition (col, row);
+			return true;
+		} catch (Exception) {
+			return false;
+		}
+		// BUGBUG: This breaks -usc on WSL; not sure why. But commenting out fixes.
 		//} else {
 		//	// TODO: Explain why + 1 is needed (and why we do this for non-Windows).
 		//	Console.Out.Write (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
@@ -1012,7 +987,7 @@ internal class NetDriver : ConsoleDriver {
 	{
 		_cachedCursorVisibility = visibility;
 		var isVisible = Console.CursorVisible = visibility == CursorVisibility.Default;
-		Console.Out.Write (isVisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
+		//Console.Out.Write (isVisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
 		return isVisible;
 	}
 
@@ -1233,9 +1208,6 @@ internal class NetDriver : ConsoleDriver {
 
 		// Note: .Net API doesn't support keydown/up events and thus any passed keyDown/UpHandlers will be simulated to be called.
 		mLoop.ProcessInput = (e) => ProcessInput (e);
-
-		_mainLoop._netEvents.EscSeqRequests.Add (EscSeqUtils.CSI_ReportDeviceAttributes_Terminator);
-		Console.Out.Write (EscSeqUtils.CSI_ReportDeviceAttributes);
 	}
 
 	volatile bool _winSizeChanging;

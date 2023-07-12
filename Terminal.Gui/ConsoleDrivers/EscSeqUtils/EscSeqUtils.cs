@@ -262,23 +262,36 @@ public static class EscSeqUtils {
 	public const string CSI_RequestCursorPositionReport_Terminator = "R";
 
 	/// <summary>
-	/// ESC [ 0 c - DA Device Attributes - Report the terminal identity. 
+	/// ESC [ 0 c - Send Device Attributes (Primary DA)
+	///
+	/// https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Application-Program-Command-functions
+	/// https://www.xfree86.org/current/ctlseqs.html
+	/// Windows Terminal v1.17 and below emits “\x1b[?1;0c”, indicating "VT101 with No Options".
+	/// Windows Terminal v1.18+ emits: \x1b[?61;6;7;22;23;24;28;32;42c"
+	/// See https://github.com/microsoft/terminal/pull/14906
+	///
+	/// 1 = 132 column mode
+	/// 6 = Selective erase
+	/// 7 = Soft fonts
+	/// 22 = Color text
+	/// 23 = Greek character sets
+	/// 24 = Turkish character sets
+	/// 28 = Rectangular area operations
+	/// 32 = Text macros
+	/// 42 = ISO Latin-2 character set
+	/// 
 	/// </summary>
-	public static readonly string CSI_ReportDeviceAttributes = CSI + "0c";
+	public static readonly string CSI_SendDeviceAttributes = CSI + "0c";
 
 	/// <summary>
-	/// The terminal reply to <see cref="CSI_ReportDeviceAttributes"/> :
-	/// Windows Terminal v1.17 and below Will emit “\x1b[?1;0c”, indicating "VT101 with No Options".
-	/// Windows Terminal v1.18+ emits: \x1b[?61;6;7;22;23;24;28;32;42c"
-	/// - 61 - indicates VT525
-	/// - 7 - indicates VT400
-	/// - 6 - indicates Selective Erase
-	/// - 22 - indicates ANSI Color
-	/// - 23 - indicates ANSI Text Locator
-	/// - 24 - indicates VT200 Highlighting
-	/// - 28 - indicates Rectangular Editing
-	/// - 32 - indicates National Replacement Character Sets
-	/// - 42 - indicates ISO Latin-1 Character Set
+	/// ESC [ > 0 c - Send Device Attributes (Secondary DA)
+	/// Windows Terminal v1.18+ emits: "\x1b[>0;10;1c" (vt100, unknown, vt220)
+	/// </summary>
+	public static readonly string CSI_SendDeviceAttributes2 = CSI + ">0c";
+
+	/// <summary>
+	/// The terminator indicating a reply to <see cref="CSI_SendDeviceAttributes"/> or <see cref="CSI_SendDeviceAttributes2"/>
+	/// 
 	/// </summary>
 	public const string CSI_ReportDeviceAttributes_Terminator = "c";
 
@@ -289,7 +302,7 @@ public static class EscSeqUtils {
 	public static readonly string CSI_ReportTerminalSizeInChars = CSI + "18t";
 
 	/// <summary>
-	/// The terminal reply to <see cref="CSI_ReportTerminalSizeInChars"/> : ESC [ 8 ; height ; width t
+	/// The terminator indicating a reply to <see cref="CSI_ReportTerminalSizeInChars"/> : ESC [ 8 ; height ; width t
 	/// </summary>
 	public const string CSI_ReportTerminalSizeInChars_Terminator = "t";
 
@@ -382,6 +395,7 @@ public static class EscSeqUtils {
 	public static void DecodeEscSeq (EscSeqRequests escSeqRequests, ref ConsoleKeyInfo newConsoleKeyInfo, ref ConsoleKey key, ConsoleKeyInfo [] cki, ref ConsoleModifiers mod, out string c1Control, out string code, out string [] values, out string terminator, out bool isMouse, out List<MouseFlags> buttonState, out Point pos, out bool isResponse, Action<MouseFlags, Point> continuousButtonPressedHandler)
 	{
 		char [] kChars = GetKeyCharArray (cki);
+		Debug.WriteLine ($"EscSeq: {new string(kChars)}");
 		(c1Control, code, values, terminator) = GetEscapeResult (kChars);
 		isMouse = false;
 		buttonState = new List<MouseFlags> () { 0 };
