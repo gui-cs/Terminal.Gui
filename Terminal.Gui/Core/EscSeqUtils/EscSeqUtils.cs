@@ -421,6 +421,9 @@ namespace Terminal.Gui {
 		/// <returns>The char array of the escape sequence.</returns>
 		public static char [] GetKeyCharArray (ConsoleKeyInfo [] cki)
 		{
+			if (cki == null) {
+				return null;
+			}
 			char [] kChar = new char [] { };
 			var length = 0;
 			foreach (var kc in cki) {
