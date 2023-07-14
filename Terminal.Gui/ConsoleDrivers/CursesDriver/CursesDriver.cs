@@ -49,111 +49,111 @@ internal class CursesDriver : ConsoleDriver {
 
 	public override void AddRune (Rune systemRune)
 	{
-		var rune = systemRune.MakePrintable ();
-		var runeWidth = rune.GetColumns ();
-		var validLocation = IsValidLocation (Col, Row);
+		//var rune = systemRune.MakePrintable ();
+		//var runeWidth = rune.GetColumns ();
+		//var validLocation = IsValidLocation (Col, Row);
 
-		if (validLocation) {
-			if (!_atValidLocation) {
-				// Move was called with an invalid location.
-				// Since then, the clip changed, and now we are at a valid location.
-				Curses.move (Row, Col);
-				_atValidLocation = false;
-			}
-			if (runeWidth == 0 && Col > 0) {
-				// This is a combining character, and we are not at the beginning of the line.
-				var combined = new String (new char [] { (char)Contents [Row, Col - 1, 0], (char)rune.Value });
-				var normalized = !combined.IsNormalized () ? combined.Normalize () : combined;
-				Contents [Row, Col - 1, 0] = normalized [0];
-				Contents [Row, Col - 1, 1] = CurrentAttribute.Value;
-				Contents [Row, Col - 1, 2] = 1;
-				Curses.attrset (Contents [Row, Col - 1, 1]);
-				Curses.mvaddch (Row, Col - 1, normalized [0]);
-			} else {
-				Contents [Row, Col, 1] = CurrentAttribute.Value;
-				Contents [Row, Col, 2] = 1;
+		//if (validLocation) {
+		//	if (!_atValidLocation) {
+		//		// Move was called with an invalid location.
+		//		// Since then, the clip changed, and now we are at a valid location.
+		//		Curses.move (Row, Col);
+		//		_atValidLocation = false;
+		//	}
+		//	if (runeWidth == 0 && Col > 0) {
+		//		// This is a combining character, and we are not at the beginning of the line.
+		//		var combined = new String (new char [] { (char)Contents [Row, Col - 1, 0], (char)rune.Value });
+		//		var normalized = !combined.IsNormalized () ? combined.Normalize () : combined;
+		//		Contents [Row, Col - 1, 0] = normalized [0];
+		//		Contents [Row, Col - 1, 1] = CurrentAttribute.Value;
+		//		Contents [Row, Col - 1, 2] = 1;
+		//		Curses.attrset (Contents [Row, Col - 1, 1]);
+		//		Curses.mvaddch (Row, Col - 1, normalized [0]);
+		//	} else {
+		//		Contents [Row, Col, 1] = CurrentAttribute.Value;
+		//		Contents [Row, Col, 2] = 1;
 
-				if (runeWidth < 2 && Col > 0 && ((Rune)(Contents [Row, Col - 1, 0])).GetColumns () > 1) {
-					// This is a single-width character, and we are not at the beginning of the line.
-					var curAttr = CurrentAttribute;
-					Curses.attrset (Contents [Row, Col - 1, 1]);
-					Curses.mvaddch (Row, Col - 1, Rune.ReplacementChar.Value);
-					Contents [Row, Col - 1, 0] = Rune.ReplacementChar.Value;
-					Curses.move (Row, Col);
-					Curses.attrset (curAttr.Value);
+		//		if (runeWidth < 2 && Col > 0 && ((Rune)(Contents [Row, Col - 1, 0])).GetColumns () > 1) {
+		//			// This is a single-width character, and we are not at the beginning of the line.
+		//			var curAttr = CurrentAttribute;
+		//			Curses.attrset (Contents [Row, Col - 1, 1]);
+		//			Curses.mvaddch (Row, Col - 1, Rune.ReplacementChar.Value);
+		//			Contents [Row, Col - 1, 0] = Rune.ReplacementChar.Value;
+		//			Curses.move (Row, Col);
+		//			Curses.attrset (curAttr.Value);
 
-				} else if (runeWidth < 2 && Col <= Clip.Right - 1 && ((Rune)(Contents [Row, Col, 0])).GetColumns () > 1) {
-					// This is a single-width character, and we are not at the end of the line.
-					var curAttr = CurrentAttribute;
-					Curses.attrset (Contents [Row, Col + 1, 1]);
-					Curses.mvaddch (Row, Col + 1, Rune.ReplacementChar.Value);
-					Contents [Row, Col + 1, 0] = Rune.ReplacementChar.Value;
-					Curses.move (Row, Col);
-					Curses.attrset (curAttr.Value);
+		//		} else if (runeWidth < 2 && Col <= Clip.Right - 1 && ((Rune)(Contents [Row, Col, 0])).GetColumns () > 1) {
+		//			// This is a single-width character, and we are not at the end of the line.
+		//			var curAttr = CurrentAttribute;
+		//			Curses.attrset (Contents [Row, Col + 1, 1]);
+		//			Curses.mvaddch (Row, Col + 1, Rune.ReplacementChar.Value);
+		//			Contents [Row, Col + 1, 0] = Rune.ReplacementChar.Value;
+		//			Curses.move (Row, Col);
+		//			Curses.attrset (curAttr.Value);
 
-				}
-				if (runeWidth > 1 && Col == Clip.Right - 1) {
-					// This is a double-width character, and we are at the end of the line.
-					Curses.addch (Rune.ReplacementChar.Value);
-					Contents [Row, Col, 0] = Rune.ReplacementChar.Value;
-				} else {
-					// This is a single-width character, or we are not at the end of the line.
+		//		}
+		//		if (runeWidth > 1 && Col == Clip.Right - 1) {
+		//			// This is a double-width character, and we are at the end of the line.
+		//			Curses.addch (Rune.ReplacementChar.Value);
+		//			Contents [Row, Col, 0] = Rune.ReplacementChar.Value;
+		//		} else {
+		//			// This is a single-width character, or we are not at the end of the line.
 
-					var curAttr = CurrentAttribute;
-					Curses.attrset (Contents [Row, Col, 1]);
+		//			var curAttr = CurrentAttribute;
+		//			Curses.attrset (Contents [Row, Col, 1]);
 
-					if (rune.IsBmp) {
-						Contents [Row, Col, 0] = rune.Value;
-						Curses.addch (Contents [Row, Col, 0]);
-					} else {
-						var column = Col;
-						ReadOnlySpan<char> remainingInput = rune.ToString ().AsSpan ();
-						while (!remainingInput.IsEmpty) {
-							// Decode
-							OperationStatus opStatus = Rune.DecodeFromUtf16 (remainingInput, out Rune result, out int charsConsumed);
+		//			if (rune.IsBmp) {
+		//				Contents [Row, Col, 0] = rune.Value;
+		//				Curses.addch (Contents [Row, Col, 0]);
+		//			} else {
+		//				var column = Col;
+		//				ReadOnlySpan<char> remainingInput = rune.ToString ().AsSpan ();
+		//				while (!remainingInput.IsEmpty) {
+		//					// Decode
+		//					OperationStatus opStatus = Rune.DecodeFromUtf16 (remainingInput, out Rune result, out int charsConsumed);
 
-							if (opStatus != OperationStatus.Done) {
-								result = Rune.ReplacementChar;
-							}
-							Contents [Row, column, 0] = result.Value;
-							Contents [Row, column, 1] = CurrentAttribute.Value;
+		//					if (opStatus != OperationStatus.Done) {
+		//						result = Rune.ReplacementChar;
+		//					}
+		//					Contents [Row, column, 0] = result.Value;
+		//					Contents [Row, column, 1] = CurrentAttribute.Value;
 
-							Curses.attrset (Contents [Row, column, 1]);
-							// BUGBUG: workaround curses not supporting non BMP? #
-							Curses.mvaddch (Row, column, Rune.ReplacementChar.Value);
-							//Curses.mvaddch (Row, column, Contents [Row, column, 0]);
+		//					Curses.attrset (Contents [Row, column, 1]);
+		//					// BUGBUG: workaround curses not supporting non BMP? #
+		//					Curses.mvaddch (Row, column, Rune.ReplacementChar.Value);
+		//					//Curses.mvaddch (Row, column, Contents [Row, column, 0]);
 
-							// Slice and loop again
-							remainingInput = remainingInput.Slice (charsConsumed);
-							column++;
-						}
-						Curses.move (Row, Col);
-					}
-					Curses.attrset (curAttr.Value);
-				}
-			}
-		} else {
-			_atValidLocation = false;
-		}
+		//					// Slice and loop again
+		//					remainingInput = remainingInput.Slice (charsConsumed);
+		//					column++;
+		//				}
+		//				Curses.move (Row, Col);
+		//			}
+		//			Curses.attrset (curAttr.Value);
+		//		}
+		//	}
+		//} else {
+		//	_atValidLocation = false;
+		//}
 
-		if (runeWidth is < 0 or > 0) {
-			Col++;
-		}
+		//if (runeWidth is < 0 or > 0) {
+		//	Col++;
+		//}
 
-		if (runeWidth > 1) {
-			// This is a double-width character, and we are not at the end of the line.
-			if (validLocation && Col < Clip.Right) {
-				Contents [Row, Col, 1] = CurrentAttribute.Value;
-				Contents [Row, Col, 2] = 0;
+		//if (runeWidth > 1) {
+		//	// This is a double-width character, and we are not at the end of the line.
+		//	if (validLocation && Col < Clip.Right) {
+		//		Contents [Row, Col, 1] = CurrentAttribute.Value;
+		//		Contents [Row, Col, 2] = 0;
 
-				//if (rune.IsBmp) {
-				//	// BUGBUG: workaround #2610
-				//	Contents [Row, Col, 0] = (char)0x00;
-				//	Curses.addch (Contents [Row, Col, 0]);
-				//}
-			}
-			Col++;
-		}
+		//		//if (rune.IsBmp) {
+		//		//	// BUGBUG: workaround #2610
+		//		//	Contents [Row, Col, 0] = (char)0x00;
+		//		//	Curses.addch (Contents [Row, Col, 0]);
+		//		//}
+		//	}
+		//	Col++;
+		//}
 	}
 
 	public override void Refresh ()
@@ -701,14 +701,14 @@ internal class CursesDriver : ConsoleDriver {
 
 	public override void UpdateOffScreen ()
 	{
-		Contents = new int [Rows, Cols, 3];
-		for (int row = 0; row < Rows; row++) {
-			for (int col = 0; col < Cols; col++) {
-				Contents [row, col, 0] = ' ';
-				Contents [row, col, 1] = Colors.TopLevel.Normal.Value;
-				Contents [row, col, 2] = 0;
-			}
-		}
+		//Contents = new int [Rows, Cols, 3];
+		//for (int row = 0; row < Rows; row++) {
+		//	for (int col = 0; col < Cols; col++) {
+		//		Contents [row, col, 0] = ' ';
+		//		Contents [row, col, 1] = Colors.TopLevel.Normal.Value;
+		//		Contents [row, col, 2] = 0;
+		//	}
+		//}
 	}
 
 	public static bool Is_WSL_Platform ()

@@ -66,56 +66,56 @@ public class FakeDriver : ConsoleDriver {
 
 	public override void AddRune (Rune rune)
 	{
-		rune = rune.MakePrintable ();
-		var runeWidth = rune.GetColumns ();
-		var validLocation = IsValidLocation (Col, Row);
+		//rune = rune.MakePrintable ();
+		//var runeWidth = rune.GetColumns ();
+		//var validLocation = IsValidLocation (Col, Row);
 
-		if (validLocation) {
-			if (rune.IsCombiningMark () && Col > 0) {
-				// Decode the previous rune
-				var previousRune = new Rune (Contents [Row, Col - 1, 0]);
-				var newCombo = new StringBuilder ();
-				ReadOnlySpan<char> remainingInput = previousRune.ToString ().AsSpan ();
-				while (!remainingInput.IsEmpty) {
-					// Decode
-					OperationStatus opStatus = Rune.DecodeFromUtf16 (remainingInput, out Rune result, out int charsConsumed);
+		//if (validLocation) {
+		//	if (rune.IsCombiningMark () && Col > 0) {
+		//		// Decode the previous rune
+		//		var previousRune = new Rune (Contents [Row, Col - 1, 0]);
+		//		var newCombo = new StringBuilder ();
+		//		ReadOnlySpan<char> remainingInput = previousRune.ToString ().AsSpan ();
+		//		while (!remainingInput.IsEmpty) {
+		//			// Decode
+		//			OperationStatus opStatus = Rune.DecodeFromUtf16 (remainingInput, out Rune result, out int charsConsumed);
 
-					if (opStatus is OperationStatus.DestinationTooSmall or OperationStatus.InvalidData) {
-						result = Rune.ReplacementChar;
-					}
+		//			if (opStatus is OperationStatus.DestinationTooSmall or OperationStatus.InvalidData) {
+		//				result = Rune.ReplacementChar;
+		//			}
 
-					newCombo.Append (result);
-					// Slice and loop again
-					remainingInput = remainingInput [charsConsumed..];
-				}
-				newCombo.Append (rune);
+		//			newCombo.Append (result);
+		//			// Slice and loop again
+		//			remainingInput = remainingInput [charsConsumed..];
+		//		}
+		//		newCombo.Append (rune);
 
-				var combined = newCombo.ToString ();
-				var normalized = !combined.IsNormalized () ? combined.Normalize () : combined;
-				Contents [Row, Col - 1, 0] = normalized [0];// BUGBUG: This is wrong, we need to handle the case where the rune is more than one char
-				Contents [Row, Col - 1, 1] = CurrentAttribute.Value;
-				Contents [Row, Col - 1, 2] = 1;
-				Col--;
-			} else {
-				Contents [Row, Col, 0] = rune.Value;
-				Contents [Row, Col, 1] = CurrentAttribute.Value;
+		//		var combined = newCombo.ToString ();
+		//		var normalized = !combined.IsNormalized () ? combined.Normalize () : combined;
+		//		Contents [Row, Col - 1, 0] = normalized [0];// BUGBUG: This is wrong, we need to handle the case where the rune is more than one char
+		//		Contents [Row, Col - 1, 1] = CurrentAttribute.Value;
+		//		Contents [Row, Col - 1, 2] = 1;
+		//		Col--;
+		//	} else {
+		//		Contents [Row, Col, 0] = rune.Value;
+		//		Contents [Row, Col, 1] = CurrentAttribute.Value;
 
-				if (Col > 0) {
-					var left = new Rune (Contents [Row, Col - 1, 0]);
-					if (left.GetColumns () > 1) {
-						Contents [Row, Col - 1, 0] = Rune.ReplacementChar.Value;
-					}
-				}
+		//		if (Col > 0) {
+		//			var left = new Rune (Contents [Row, Col - 1, 0]);
+		//			if (left.GetColumns () > 1) {
+		//				Contents [Row, Col - 1, 0] = Rune.ReplacementChar.Value;
+		//			}
+		//		}
 
-				if (runeWidth > 1) {
-					Col++;
-					Contents [Row, Col, 0] = Rune.ReplacementChar.Value;
-					Contents [Row, Col, 1] = CurrentAttribute.Value;
-					Contents [Row, Col, 2] = 1;
-				}
-			}
-		}
-		Col++;
+		//		if (runeWidth > 1) {
+		//			Col++;
+		//			Contents [Row, Col, 0] = Rune.ReplacementChar.Value;
+		//			Contents [Row, Col, 1] = CurrentAttribute.Value;
+		//			Contents [Row, Col, 2] = 1;
+		//		}
+		//	}
+		//}
+		//Col++;
 	}
 
 	public override void End ()
@@ -144,53 +144,53 @@ public class FakeDriver : ConsoleDriver {
 
 	public override void UpdateScreen ()
 	{
-		int top = Top;
-		int left = Left;
-		int rows = Math.Min (FakeConsole.WindowHeight + top, Rows);
-		int cols = Cols;
+		//int top = Top;
+		//int left = Left;
+		//int rows = Math.Min (FakeConsole.WindowHeight + top, Rows);
+		//int cols = Cols;
 
-		var savedRow = FakeConsole.CursorTop;
-		var savedCol = FakeConsole.CursorLeft;
-		var savedCursorVisible = FakeConsole.CursorVisible;
-		for (int row = top; row < rows; row++) {
-			if (!_dirtyLine [row]) {
-				continue;
-			}
-			_dirtyLine [row] = false;
-			for (int col = left; col < cols; col++) {
-				FakeConsole.CursorTop = row;
-				FakeConsole.CursorLeft = col;
-				for (; col < cols; col++) {
-					if (Contents [row, col, 2] == 0) {
-						FakeConsole.CursorLeft++;
-						continue;
-					}
+		//var savedRow = FakeConsole.CursorTop;
+		//var savedCol = FakeConsole.CursorLeft;
+		//var savedCursorVisible = FakeConsole.CursorVisible;
+		//for (int row = top; row < rows; row++) {
+		//	if (!_dirtyLine [row]) {
+		//		continue;
+		//	}
+		//	_dirtyLine [row] = false;
+		//	for (int col = left; col < cols; col++) {
+		//		FakeConsole.CursorTop = row;
+		//		FakeConsole.CursorLeft = col;
+		//		for (; col < cols; col++) {
+		//			if (Contents [row, col, 2] == 0) {
+		//				FakeConsole.CursorLeft++;
+		//				continue;
+		//			}
 
-					var color = Contents [row, col, 1];
-					// NOTE: In real drivers setting the color can be a performance hit, so we only do it when needed.
-					// in fakedriver we don't care about perf.
-					SetColor (color);
+		//			var color = Contents [row, col, 1];
+		//			// NOTE: In real drivers setting the color can be a performance hit, so we only do it when needed.
+		//			// in fakedriver we don't care about perf.
+		//			SetColor (color);
 
-					var rune = (Rune)Contents [row, col, 0];
-					if (rune.Utf16SequenceLength == 1) {
-						FakeConsole.Write (rune);
-					} else {
-						// TODO: Not sure we need to do this. I think we can just write the rune.
+		//			var rune = (Rune)Contents [row, col, 0];
+		//			if (rune.Utf16SequenceLength == 1) {
+		//				FakeConsole.Write (rune);
+		//			} else {
+		//				// TODO: Not sure we need to do this. I think we can just write the rune.
 
-						FakeConsole.Write (rune.ToString ());
-					}
-					//if (Rune.DecodeSurrogatePair (rune, out char [] spair)) {
-					//	FakeConsole.Write (spair);
-					//} else {
-					//	FakeConsole.Write ((char)rune);
-					//}
-					Contents [row, col, 2] = 0;
-				}
-			}
-		}
-		FakeConsole.CursorTop = savedRow;
-		FakeConsole.CursorLeft = savedCol;
-		FakeConsole.CursorVisible = savedCursorVisible;
+		//				FakeConsole.Write (rune.ToString ());
+		//			}
+		//			//if (Rune.DecodeSurrogatePair (rune, out char [] spair)) {
+		//			//	FakeConsole.Write (spair);
+		//			//} else {
+		//			//	FakeConsole.Write ((char)rune);
+		//			//}
+		//			Contents [row, col, 2] = 0;
+		//		}
+		//	}
+		//}
+		//FakeConsole.CursorTop = savedRow;
+		//FakeConsole.CursorLeft = savedCol;
+		//FakeConsole.CursorVisible = savedCursorVisible;
 	}
 
 	public override void Refresh ()
@@ -546,21 +546,21 @@ public class FakeDriver : ConsoleDriver {
 
 	public override void UpdateOffScreen ()
 	{
-		Contents = new int [Rows, Cols, 3];
-		_dirtyLine = new bool [Rows];
+		//Contents = new int [Rows, Cols, 3];
+		//_dirtyLine = new bool [Rows];
 
-		// Can raise an exception while is still resizing.
-		try {
-			for (int row = 0; row < Rows; row++) {
-				for (int c = 0; c < Cols; c++) {
-					Contents [row, c, 0] = ' ';
-					Contents [row, c, 1] = 0;
-					Contents [row, c, 2] = 0;
-					_dirtyLine [row] = true;
-				}
-			}
-		} catch (IndexOutOfRangeException) { }
-		Clip = new Rect (0, 0, Cols, Rows);
+		//// Can raise an exception while is still resizing.
+		//try {
+		//	for (int row = 0; row < Rows; row++) {
+		//		for (int c = 0; c < Cols; c++) {
+		//			Contents [row, c, 0] = ' ';
+		//			Contents [row, c, 1] = 0;
+		//			Contents [row, c, 2] = 0;
+		//			_dirtyLine [row] = true;
+		//		}
+		//	}
+		//} catch (IndexOutOfRangeException) { }
+		//Clip = new Rect (0, 0, Cols, Rows);
 	}
 
 	public override void UpdateCursor ()

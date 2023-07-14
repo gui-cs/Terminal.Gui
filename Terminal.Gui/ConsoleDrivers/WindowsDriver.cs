@@ -1425,140 +1425,58 @@ internal class WindowsDriver : ConsoleDriver {
 		return base.IsRuneSupported (rune) && rune.IsBmp;
 	}
 
+	bool [] _dirtyLine;
+
 	public override void AddRune (Rune systemRune)
 	{
-		if (IsValidLocation (Col, Row)) {
-			var rune = systemRune.MakePrintable ();
 
-			if (!rune.IsBmp) {
-				rune = Rune.ReplacementChar;
-			}
-			Contents [Row, Col, 0] = rune.Value;
-			Contents [Row, Col, 1] = CurrentAttribute.Value;
-			_outputBuffer [GetOutputBufferPosition ()] = new WindowsConsole.ExtendedCharInfo ((char)rune.Value, CurrentAttribute);
-			WindowsConsole.SmallRect.Update (ref _damageRegion, (short)Col, (short)Row);
-
-			if (Col > 0) {
-				var left = new Rune (Contents [Row, Col - 1, 0]);
-				if (left.GetColumns () > 1) {
-					int prevPosition = Row * Cols + (Col - 1);
-					Contents [Row, Col - 1, 0] = Rune.ReplacementChar.Value;
-					_outputBuffer [prevPosition].Char = (char)Rune.ReplacementChar.Value;
-				}
-			}
-
-			if (rune.GetColumns () > 1 && Col == Clip.Right - 1) {
-				// This is a double-width character, and we are at the end of the line.
-				Contents [Row, Col, 0] = Rune.ReplacementChar.Value;
-				Contents [Row, Col, 1] = CurrentAttribute.Value;
-				Contents [Row, Col, 2] = 1;
-				_outputBuffer [GetOutputBufferPosition ()] = new WindowsConsole.ExtendedCharInfo ((char)Rune.ReplacementChar.Value, CurrentAttribute);
-				Col++;
-			}
-
-			//var extraColumns = 0;
-			//ReadOnlySpan<char> remainingInput = rune.ToString ().AsSpan ();
-			//while (!remainingInput.IsEmpty) {
-			//	// Decode
-			//	OperationStatus opStatus = Rune.DecodeFromUtf16 (remainingInput, out Rune result, out int charsConsumed);
-
-			//	if (opStatus == OperationStatus.DestinationTooSmall || opStatus == OperationStatus.InvalidData) {
-			//		result = Rune.ReplacementChar;
-			//	}
-			//	Contents [Row, Col + extraColumns, 0] = result.Value;
-			//	Contents [Row, Col + extraColumns, 1] = CurrentAttribute;
-
-			//	// Slice and loop again
-			//	remainingInput = remainingInput.Slice (charsConsumed);
-			//	if (runeWidth > 1) {
-			//		extraColumns++;
-			//		Contents [Row, Col + extraColumns, 0] = ' ';
-			//		Contents [Row, Col + extraColumns, 1] = CurrentAttribute;
-			//	}
-			//}
-		}
-		//if (runeWidth == 0 && Col > 0) {
+		//int runeWidth = -1;
+		//var validLocation = IsValidLocation (Col, Row);
+		//if (validLocation) {
+		//	var rune = systemRune.MakePrintable ();
+		//	runeWidth = rune.GetColumns ();
+		//	if (runeWidth == 0 && Col > 0) {
 		//		// This is a combining character, and we are not at the beginning of the line.
 		//		var combined = new String (new char [] { (char)Contents [Row, Col - 1, 0], (char)rune.Value });
 		//		var normalized = !combined.IsNormalized () ? combined.Normalize () : combined;
 		//		Contents [Row, Col - 1, 0] = normalized [0];
-		//		Contents [Row, Col - 1, 1] = CurrentAttribute;
+		//		Contents [Row, Col - 1, 1] = CurrentAttribute.Value;
 		//		Contents [Row, Col - 1, 2] = 1;
 		//	} else {
-		//		Contents [Row, Col, 1] = CurrentAttribute;
+		//		Contents [Row, Col, 1] = CurrentAttribute.Value;
 		//		Contents [Row, Col, 2] = 1;
 
 		//		if (runeWidth < 2 && Col > 0 && ((Rune)(Contents [Row, Col - 1, 0])).GetColumns () > 1) {
 		//			// This is a single-width character, and we are not at the beginning of the line.
 		//			Contents [Row, Col - 1, 0] = Rune.ReplacementChar.Value;
-
 		//		} else if (runeWidth < 2 && Col <= Clip.Right - 1 && ((Rune)(Contents [Row, Col, 0])).GetColumns () > 1) {
 		//			// This is a single-width character, and we are not at the end of the line.
 		//			Contents [Row, Col + 1, 0] = Rune.ReplacementChar.Value;
 		//			Contents [Row, Col + 1, 2] = 1;
 		//		}
-
 		//		if (runeWidth > 1 && Col == Clip.Right - 1) {
 		//			// This is a double-width character, and we are at the end of the line.
 		//			Contents [Row, Col, 0] = Rune.ReplacementChar.Value;
 		//		} else {
 		//			// This is a single-width character, or we are not at the end of the line.
-		//			// Add the glyph (wide or not)
-		//			//if (rune.IsBmp) {
-		//			//	Contents [Row, Col, 0] = rune.Value;
-		//			//	_outputBuffer [position].Char.UnicodeChar = (char)rune.Value;
-		//			//} else {
-		//			var column = Col;
-		//			ReadOnlySpan<char> remainingInput = rune.ToString ().AsSpan ();
-		//			while (!remainingInput.IsEmpty) {
-		//				// Decode
-		//				OperationStatus opStatus = Rune.DecodeFromUtf16 (remainingInput, out Rune result, out int charsConsumed);
-
-		//				if (opStatus != OperationStatus.Done) {
-		//					result = Rune.ReplacementChar;
-		//				}
-		//				Contents [Row, column, 0] = result.Value;
-		//				Contents [Row, column, 1] = CurrentAttribute;
-
-		//				// Slice and loop again
-		//				remainingInput = remainingInput.Slice (charsConsumed);
-		//				Col = ++column;
-		//			}
-		//			//// BUGBUG: workaround #2610
-		//			//Contents [Row, Col, 0] = (char)Rune.ReplacementChar.Value;
-		//			//_outputBuffer [position].Char.UnicodeChar = (char)Rune.ReplacementChar.Value;
-		//			//}
+		//			Contents [Row, Col, 0] = rune.Value;
 		//		}
+		//		_dirtyLine [Row] = true;
 		//	}
 		//}
 
-		////Col++;
-		////if (runeWidth is < 0 or > 0) {
-		////	// This is a double-width codepoint, and we are not at the end of the line.
-		////	// Move to the right one and...
-		////	Col++;
-		////}
+		//if (runeWidth is < 0 or > 0) {
+		//	Col++;
+		//}
 
-		////if (runeWidth > 1) {
-		////	// This is a double-width character, and we are not at the end of the line.
-		////	// ...clear the next cell.
-		////	if (validLocation && Col < Clip.Right) {
-		////		Contents [Row, Col, 1] = CurrentAttribute;
-		////		Contents [Row, Col, 2] = 0;
-
-		////		//position = GetOutputBufferPosition ();
-		////		//_outputBuffer [position].Attributes = (ushort)CurrentAttribute;
-
-		////		if (rune.IsBmp) {
-		////		//	// BUGBUG: workaround #2610 - put a null char in the second position
-		////			//Contents [Row, Col, 0] = (char)0x00;
-		////		//	_outputBuffer [position].Char.UnicodeChar = (char)0x00;
-		////		}
-		////	}
-		////	Col++;
-		////}
-		Col++;
-
+		//if (runeWidth > 1) {
+		//	// This is a double-width character, and we are not at the end of the line.
+		//	if (validLocation && Col < Clip.Right) {
+		//		Contents [Row, Col, 1] = CurrentAttribute.Value;
+		//		Contents [Row, Col, 2] = 0;
+		//	}
+		//	Col++;
+		//}
 	}
 
 	public override void Init (Action terminalResized)
@@ -1603,6 +1521,8 @@ internal class WindowsDriver : ConsoleDriver {
 			Bottom = (short)Rows,
 			Right = (short)Cols
 		};
+		_dirtyLine = new bool [Rows];
+
 		WinConsole.ForceRefreshCursorVisibility ();
 		if (!EnableConsoleScrolling) {
 			Console.Out.Write (EscSeqUtils.CSI_ClearScreen (EscSeqUtils.ClearScreenOptions.CursorToEndOfScreen));
@@ -1611,20 +1531,26 @@ internal class WindowsDriver : ConsoleDriver {
 
 	public override void UpdateOffScreen ()
 	{
-		Contents = new int [Rows, Cols, 3];
-		WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
+		//Contents = new int [Rows, Cols, 3];
+		//_dirtyLine = new bool [Rows];
 
-		for (int row = 0; row < Rows; row++) {
-			for (int col = 0; col < Cols; col++) {
-				int position = row * Cols + col;
-				_outputBuffer [position].Attribute = Colors.TopLevel.Normal;
-				_outputBuffer [position].Char = ' ';
-				Contents [row, col, 0] = _outputBuffer [position].Char;
-				Contents [row, col, 1] = _outputBuffer [position].Attribute.Value;
-				Contents [row, col, 2] = 0;
-				WindowsConsole.SmallRect.Update (ref _damageRegion, (short)col, (short)row);
-			}
-		}
+		//for (int row = 0; row < Rows; row++) {
+		//	for (int col = 0; col < Cols; col++) {
+		//		int position = row * Cols + col;
+		//		_outputBuffer [position].Attribute = new Attribute (Color.White, Color.Black);
+		//		_outputBuffer [position].Char = ' ';
+		//		Contents [row, col, 0] = _outputBuffer [position].Char;
+		//		Contents [row, col, 1] = _outputBuffer [position].Attribute.Value;
+		//		Contents [row, col, 2] = 0;
+		//	}
+		//	_dirtyLine [row] = true;
+		//}
+		//_damageRegion = new WindowsConsole.SmallRect () {
+		//	Top = 0,
+		//	Left = 0,
+		//	Bottom = (short)Rows,
+		//	Right = (short)Cols
+		//};
 	}
 
 	public override void UpdateScreen ()
@@ -1644,6 +1570,16 @@ internal class WindowsDriver : ConsoleDriver {
 			X = (short)Clip.Width,
 			Y = (short)Clip.Height
 		};
+
+		for (int row = 0; row < Rows; row++) {
+			for (int col = 0; col < Cols; col++) {
+				int position = row * Cols + col;
+				//_outputBuffer [position].Char = (char)Contents [row, col].Runes [0];
+				//_outputBuffer [position].Attribute = Contents [row, col].Attribute;
+			}
+		}
+		//WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
+
 
 		WinConsole.WriteToConsole (new Size (Cols, Rows), _outputBuffer, bufferCoords, _damageRegion, UseTrueColor);
 		WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);

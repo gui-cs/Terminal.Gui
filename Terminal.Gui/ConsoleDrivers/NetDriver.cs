@@ -586,12 +586,6 @@ internal class NetDriver : ConsoleDriver {
 
 	public override void AddRune (Rune systemRune)
 	{
-		if (Contents.Length != Rows * Cols * 3) {
-			// BUGBUG: Shouldn't this throw an exception? Doing so to see what happens
-			throw new InvalidOperationException ("Driver contents are wrong size");
-			//return;
-		}
-
 		int runeWidth = -1;
 		var validLocation = IsValidLocation (Col, Row);
 		if (validLocation) {
@@ -599,29 +593,31 @@ internal class NetDriver : ConsoleDriver {
 			runeWidth = rune.GetColumns ();
 			if (runeWidth == 0 && Col > 0) {
 				// This is a combining character, and we are not at the beginning of the line.
-				var combined = new String (new char [] { (char)Contents [Row, Col - 1, 0], (char)rune.Value });
+				// TODO: Remove hard-coded [0] once combining pairs is supported
+				var combined = $"{Contents [Row, Col - 1].Runes [0]}{rune.Value}";
 				var normalized = !combined.IsNormalized () ? combined.Normalize () : combined;
-				Contents [Row, Col - 1, 0] = normalized [0];
-				Contents [Row, Col - 1, 1] = CurrentAttribute.Value;
-				Contents [Row, Col - 1, 2] = 1;
+				Contents [Row, Col - 1].Runes [0] = (Rune)normalized [0];
+				Contents [Row, Col - 1].Attribute = CurrentAttribute;
+				Contents [Row, Col - 1].IsDirty = true;
 			} else {
-				Contents [Row, Col, 1] = CurrentAttribute.Value;
-				Contents [Row, Col, 2] = 1;
+				Contents [Row, Col].Attribute = CurrentAttribute;
+				Contents [Row, Col].IsDirty = true;
 
-				if (runeWidth < 2 && Col > 0 && ((Rune)(Contents [Row, Col - 1, 0])).GetColumns () > 1) {
+				if (runeWidth < 2 && Col > 0 && Contents [Row, Col - 1].Runes [0].GetColumns () > 1) {
 					// This is a single-width character, and we are not at the beginning of the line.
-					Contents [Row, Col - 1, 0] = Rune.ReplacementChar.Value;
-				} else if (runeWidth < 2 && Col <= Clip.Right - 1 && ((Rune)(Contents [Row, Col, 0])).GetColumns () > 1) {
+					Contents [Row, Col - 1].Runes [0] = Rune.ReplacementChar;
+					Contents [Row, Col - 1].IsDirty = true;
+				} else if (runeWidth < 2 && Col <= Clip.Right - 1 && Contents [Row, Col].Runes [0].GetColumns () > 1) {
 					// This is a single-width character, and we are not at the end of the line.
-					Contents [Row, Col + 1, 0] = Rune.ReplacementChar.Value;
-					Contents [Row, Col + 1, 2] = 1;
+					Contents [Row, Col + 1].Runes [0] = Rune.ReplacementChar;
+					Contents [Row, Col + 1].IsDirty = true;
 				}
 				if (runeWidth > 1 && Col == Clip.Right - 1) {
 					// This is a double-width character, and we are at the end of the line.
-					Contents [Row, Col, 0] = Rune.ReplacementChar.Value;
+					Contents [Row, Col].Runes [0] = Rune.ReplacementChar;
 				} else {
 					// This is a single-width character, or we are not at the end of the line.
-					Contents [Row, Col, 0] = rune.Value;
+					Contents [Row, Col].Runes [0] = rune;
 				}
 				_dirtyLine [Row] = true;
 			}
@@ -634,8 +630,8 @@ internal class NetDriver : ConsoleDriver {
 		if (runeWidth > 1) {
 			// This is a double-width character, and we are not at the end of the line.
 			if (validLocation && Col < Clip.Right) {
-				Contents [Row, Col, 1] = CurrentAttribute.Value;
-				Contents [Row, Col, 2] = 0;
+				Contents [Row, Col].Attribute = CurrentAttribute;
+				Contents [Row, Col].IsDirty = false;
 			}
 			Col++;
 		}
@@ -776,17 +772,20 @@ internal class NetDriver : ConsoleDriver {
 
 	public override void UpdateOffScreen ()
 	{
-		Contents = new int [Rows, Cols, 3];
+		// TODO: This method is really "Clear Contents" now and should not be abstract (or virtual)
+		Contents = new Cell [Rows, Cols];
 		_dirtyLine = new bool [Rows];
 
 		lock (Contents) {
 			// Can raise an exception while is still resizing.
 			try {
-				for (int row = 0; row < Rows; row++) {
-					for (int c = 0; c < Cols; c++) {
-						Contents [row, c, 0] = ' ';
-						Contents [row, c, 1] = new Attribute (Color.White, Color.Black).Value;
-						Contents [row, c, 2] = 0;
+				for (var row = 0; row < Rows; row++) {
+					for (var c = 0; c < Cols; c++) {
+						Contents [row, c] = new Cell () {
+							Runes = new List<Rune> { (Rune)' ' },
+							Attribute = new Attribute (Color.White, Color.Black),
+							IsDirty = true
+						};
 						_dirtyLine [row] = true;
 					}
 				}
@@ -802,7 +801,7 @@ internal class NetDriver : ConsoleDriver {
 
 	public override void UpdateScreen ()
 	{
-		if (_winSizeChanging || Console.WindowHeight < 1 || Contents.Length != Rows * Cols * 3
+		if (_winSizeChanging || Console.WindowHeight < 1 || Contents.Length != Rows * Cols
 			|| (!EnableConsoleScrolling && Rows != Console.WindowHeight)
 			|| (EnableConsoleScrolling && Rows != _largestBufferHeight)) {
 			return;
@@ -835,7 +834,7 @@ internal class NetDriver : ConsoleDriver {
 				lastCol = -1;
 				var outputWidth = 0;
 				for (; col < cols; col++) {
-					if (Contents [row, col, 2] == 0) {
+					if (!Contents [row, col].IsDirty) {
 						if (output.Length > 0) {
 							WriteToConsole (output, ref lastCol, row, ref outputWidth);
 						} else if (lastCol == -1) {
@@ -850,7 +849,7 @@ internal class NetDriver : ConsoleDriver {
 						lastCol = col;
 					}
 
-					Attribute attr = new Attribute (Contents [row, col, 1]);
+					Attribute attr = Contents [row, col].Attribute.Value;
 					// Performance: Only send the escape sequence if the attribute has changed.
 					if (attr != redrawAttr) {
 						redrawAttr = attr;
@@ -858,13 +857,13 @@ internal class NetDriver : ConsoleDriver {
 							MapColors ((ConsoleColor)attr.Background, false), MapColors ((ConsoleColor)attr.Foreground, true)));
 					}
 					outputWidth++;
-					var rune = (Rune)Contents [row, col, 0];
+					var rune = (Rune)Contents [row, col].Runes [0];
 					output.Append (rune.ToString ());
 					if (rune.IsSurrogatePair () && rune.GetColumns () < 2) {
 						WriteToConsole (output, ref lastCol, row, ref outputWidth);
 						Console.CursorLeft--;
 					}
-					Contents [row, col, 2] = 0;
+					Contents [row, col].IsDirty = false;
 				}
 			}
 			if (output.Length > 0) {
