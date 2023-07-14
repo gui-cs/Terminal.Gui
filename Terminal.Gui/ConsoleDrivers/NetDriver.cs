@@ -182,8 +182,10 @@ internal class NetEvents {
 						_isEscSeq = false;
 						break;
 					} else if (consoleKeyInfo.KeyChar == (char)Key.Esc && _isEscSeq && _cki != null) {
-						ProcessRequestResponse (ref newConsoleKeyInfo, ref key, _cki, ref mod);
-						_cki = null;
+						if (_cki != null) {
+							ProcessRequestResponse (ref newConsoleKeyInfo, ref key, _cki, ref mod);
+							_cki = null;
+						}
 						break;
 					} else {
 						_inputResultQueue.Enqueue (new InputResult {

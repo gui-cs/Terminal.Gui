@@ -270,7 +270,8 @@ public static class EscSeqUtils {
 	/// Windows Terminal v1.18+ emits: \x1b[?61;6;7;22;23;24;28;32;42c"
 	/// See https://github.com/microsoft/terminal/pull/14906
 	///
-	/// 1 = 132 column mode
+	/// 61 - The device conforms to level 1 of the character cell display architecture
+	/// (See https://github.com/microsoft/terminal/issues/15693#issuecomment-1633304497)
 	/// 6 = Selective erase
 	/// 7 = Soft fonts
 	/// 22 = Color text
@@ -285,7 +286,7 @@ public static class EscSeqUtils {
 
 	/// <summary>
 	/// ESC [ > 0 c - Send Device Attributes (Secondary DA)
-	/// Windows Terminal v1.18+ emits: "\x1b[>0;10;1c" (vt100, unknown, vt220)
+	/// Windows Terminal v1.18+ emits: "\x1b[>0;10;1c" (vt100, firmware version 1.0, vt220)
 	/// </summary>
 	public static readonly string CSI_SendDeviceAttributes2 = CSI + ">0c";
 
