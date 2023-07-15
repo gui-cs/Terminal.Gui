@@ -788,6 +788,17 @@ namespace Terminal.Gui {
 				prompt.Text = value;
 			}
 		}
+		
+		/// <summary>
+		/// Gets or sets the cancel label for the <see cref="Button"/> displayed to the user
+		/// </summary>
+		/// <value>The cancel.</value>
+		public ustring Cancel{
+			get => cancel.Text;
+			set {
+				cancel.Text = value;
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets the name of the directory field label.
