@@ -63,61 +63,7 @@ public class FakeDriver : ConsoleDriver {
 			}
 		}
 	}
-
-	public override void AddRune (Rune rune)
-	{
-		//rune = rune.MakePrintable ();
-		//var runeWidth = rune.GetColumns ();
-		//var validLocation = IsValidLocation (Col, Row);
-
-		//if (validLocation) {
-		//	if (rune.IsCombiningMark () && Col > 0) {
-		//		// Decode the previous rune
-		//		var previousRune = new Rune (Contents [Row, Col - 1, 0]);
-		//		var newCombo = new StringBuilder ();
-		//		ReadOnlySpan<char> remainingInput = previousRune.ToString ().AsSpan ();
-		//		while (!remainingInput.IsEmpty) {
-		//			// Decode
-		//			OperationStatus opStatus = Rune.DecodeFromUtf16 (remainingInput, out Rune result, out int charsConsumed);
-
-		//			if (opStatus is OperationStatus.DestinationTooSmall or OperationStatus.InvalidData) {
-		//				result = Rune.ReplacementChar;
-		//			}
-
-		//			newCombo.Append (result);
-		//			// Slice and loop again
-		//			remainingInput = remainingInput [charsConsumed..];
-		//		}
-		//		newCombo.Append (rune);
-
-		//		var combined = newCombo.ToString ();
-		//		var normalized = !combined.IsNormalized () ? combined.Normalize () : combined;
-		//		Contents [Row, Col - 1, 0] = normalized [0];// BUGBUG: This is wrong, we need to handle the case where the rune is more than one char
-		//		Contents [Row, Col - 1, 1] = CurrentAttribute.Value;
-		//		Contents [Row, Col - 1, 2] = 1;
-		//		Col--;
-		//	} else {
-		//		Contents [Row, Col, 0] = rune.Value;
-		//		Contents [Row, Col, 1] = CurrentAttribute.Value;
-
-		//		if (Col > 0) {
-		//			var left = new Rune (Contents [Row, Col - 1, 0]);
-		//			if (left.GetColumns () > 1) {
-		//				Contents [Row, Col - 1, 0] = Rune.ReplacementChar.Value;
-		//			}
-		//		}
-
-		//		if (runeWidth > 1) {
-		//			Col++;
-		//			Contents [Row, Col, 0] = Rune.ReplacementChar.Value;
-		//			Contents [Row, Col, 1] = CurrentAttribute.Value;
-		//			Contents [Row, Col, 2] = 1;
-		//		}
-		//	}
-		//}
-		//Col++;
-	}
-
+	
 	public override void End ()
 	{
 		FakeConsole.ResetColor ();
@@ -138,7 +84,7 @@ public class FakeDriver : ConsoleDriver {
 		// Call InitializeColorSchemes before UpdateOffScreen as it references Colors
 		CurrentAttribute = MakeColor (Color.White, Color.Black);
 		InitializeColorSchemes ();
-		UpdateOffScreen ();
+		ClearContents();
 	}
 
 
@@ -510,7 +456,7 @@ public class FakeDriver : ConsoleDriver {
 	void ProcessResize ()
 	{
 		ResizeScreen ();
-		UpdateOffScreen ();
+		ClearContents();
 		TerminalResized?.Invoke ();
 	}
 
@@ -542,25 +488,6 @@ public class FakeDriver : ConsoleDriver {
 		}
 
 		Clip = new Rect (0, 0, Cols, Rows);
-	}
-
-	public override void UpdateOffScreen ()
-	{
-		//Contents = new int [Rows, Cols, 3];
-		//_dirtyLine = new bool [Rows];
-
-		//// Can raise an exception while is still resizing.
-		//try {
-		//	for (int row = 0; row < Rows; row++) {
-		//		for (int c = 0; c < Cols; c++) {
-		//			Contents [row, c, 0] = ' ';
-		//			Contents [row, c, 1] = 0;
-		//			Contents [row, c, 2] = 0;
-		//			_dirtyLine [row] = true;
-		//		}
-		//	}
-		//} catch (IndexOutOfRangeException) { }
-		//Clip = new Rect (0, 0, Cols, Rows);
 	}
 
 	public override void UpdateCursor ()

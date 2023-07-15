@@ -582,62 +582,6 @@ internal class NetDriver : ConsoleDriver {
 	{
 	}
 
-	bool [] _dirtyLine;
-
-	public override void AddRune (Rune systemRune)
-	{
-		int runeWidth = -1;
-		var validLocation = IsValidLocation (Col, Row);
-		if (validLocation) {
-			var rune = systemRune.MakePrintable ();
-			runeWidth = rune.GetColumns ();
-			if (runeWidth == 0 && Col > 0) {
-				// This is a combining character, and we are not at the beginning of the line.
-				// TODO: Remove hard-coded [0] once combining pairs is supported
-				var combined = $"{Contents [Row, Col - 1].Runes [0]}{rune.Value}";
-				var normalized = !combined.IsNormalized () ? combined.Normalize () : combined;
-				Contents [Row, Col - 1].Runes [0] = (Rune)normalized [0];
-				Contents [Row, Col - 1].Attribute = CurrentAttribute;
-				Contents [Row, Col - 1].IsDirty = true;
-			} else {
-				Contents [Row, Col].Attribute = CurrentAttribute;
-				Contents [Row, Col].IsDirty = true;
-
-				if (runeWidth < 2 && Col > 0 && Contents [Row, Col - 1].Runes [0].GetColumns () > 1) {
-					// This is a single-width character, and we are not at the beginning of the line.
-					Contents [Row, Col - 1].Runes [0] = Rune.ReplacementChar;
-					Contents [Row, Col - 1].IsDirty = true;
-				} else if (runeWidth < 2 && Col <= Clip.Right - 1 && Contents [Row, Col].Runes [0].GetColumns () > 1) {
-					// This is a single-width character, and we are not at the end of the line.
-					Contents [Row, Col + 1].Runes [0] = Rune.ReplacementChar;
-					Contents [Row, Col + 1].IsDirty = true;
-				}
-				if (runeWidth > 1 && Col == Clip.Right - 1) {
-					// This is a double-width character, and we are at the end of the line.
-					Contents [Row, Col].Runes [0] = Rune.ReplacementChar;
-				} else {
-					// This is a single-width character, or we are not at the end of the line.
-					Contents [Row, Col].Runes [0] = rune;
-				}
-				_dirtyLine [Row] = true;
-			}
-		}
-
-		if (runeWidth is < 0 or > 0) {
-			Col++;
-		}
-
-		if (runeWidth > 1) {
-			// This is a double-width character, and we are not at the end of the line.
-			if (validLocation && Col < Clip.Right) {
-				Contents [Row, Col].Attribute = CurrentAttribute;
-				Contents [Row, Col].IsDirty = false;
-			}
-			Col++;
-		}
-
-	}
-
 	public override void End ()
 	{
 		_mainLoop._netEvents.StopTasks ();
@@ -708,7 +652,7 @@ internal class NetDriver : ConsoleDriver {
 		}
 
 		ResizeScreen ();
-		UpdateOffScreen ();
+		ClearContents();
 		CurrentAttribute = MakeColor (Color.White, Color.Black);
 		InitializeColorSchemes ();
 
@@ -770,29 +714,6 @@ internal class NetDriver : ConsoleDriver {
 		Clip = new Rect (0, 0, Cols, Rows);
 	}
 
-	public override void UpdateOffScreen ()
-	{
-		// TODO: This method is really "Clear Contents" now and should not be abstract (or virtual)
-		Contents = new Cell [Rows, Cols];
-		_dirtyLine = new bool [Rows];
-
-		lock (Contents) {
-			// Can raise an exception while is still resizing.
-			try {
-				for (var row = 0; row < Rows; row++) {
-					for (var c = 0; c < Cols; c++) {
-						Contents [row, c] = new Cell () {
-							Runes = new List<Rune> { (Rune)' ' },
-							Attribute = new Attribute (Color.White, Color.Black),
-							IsDirty = true
-						};
-						_dirtyLine [row] = true;
-					}
-				}
-			} catch (IndexOutOfRangeException) { }
-		}
-	}
-
 	public override void Refresh ()
 	{
 		UpdateScreen ();
@@ -822,13 +743,13 @@ internal class NetDriver : ConsoleDriver {
 			if (Console.WindowHeight < 1) {
 				return;
 			}
-			if (!_dirtyLine [row]) {
+			if (!_dirtyLines [row]) {
 				continue;
 			}
 			if (!SetCursorPosition (0, row)) {
 				return;
 			}
-			_dirtyLine [row] = false;
+			_dirtyLines [row] = false;
 			output.Clear ();
 			for (var col = left; col < cols; col++) {
 				lastCol = -1;
@@ -1250,7 +1171,7 @@ internal class NetDriver : ConsoleDriver {
 			Cols = inputEvent.WindowSizeEvent.Size.Width;
 			Rows = _largestBufferHeight;
 			ResizeScreen ();
-			UpdateOffScreen ();
+			ClearContents();
 			_winSizeChanging = false;
 			TerminalResized?.Invoke ();
 			break;

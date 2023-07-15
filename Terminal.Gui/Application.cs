@@ -554,7 +554,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static void Refresh ()
 		{
-			Driver.UpdateOffScreen ();
+			Driver.ClearContents();
 			View last = null;
 			foreach (var v in _toplevels.Reverse ()) {
 				if (v.Visible) {
