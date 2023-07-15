@@ -168,4 +168,7 @@
   <data name="wzNext" xml:space="preserve">
     <value>S_eguir</value>
   </data>
+  <data name="fdCancel" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
 </root>

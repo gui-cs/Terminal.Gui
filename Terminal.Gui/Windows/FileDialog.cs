@@ -595,7 +595,7 @@ namespace Terminal.Gui {
 		/// Initializes a new <see cref="FileDialog"/>.
 		/// </summary>
 		public FileDialog () : this (title: string.Empty, prompt: string.Empty,
-			nameFieldLabel: string.Empty, message: string.Empty)
+			cancel: string.Empty,nameFieldLabel: string.Empty, message: string.Empty)
 		{ }
 
 		/// <summary>
@@ -606,8 +606,8 @@ namespace Terminal.Gui {
 		/// <param name="nameFieldLabel">The name of the file field label..</param>
 		/// <param name="message">The message.</param>
 		/// <param name="allowedTypes">The allowed types.</param>
-		public FileDialog (ustring title, ustring prompt, ustring nameFieldLabel, ustring message, List<string> allowedTypes = null)
-			: this (title, prompt, ustring.Empty, nameFieldLabel, message, allowedTypes) { }
+		public FileDialog (ustring title, ustring prompt,ustring cancel, ustring nameFieldLabel, ustring message, List<string> allowedTypes = null)
+			: this (title, prompt,cancel, ustring.Empty, nameFieldLabel, message, allowedTypes) { }
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="FileDialog"/>
@@ -616,8 +616,8 @@ namespace Terminal.Gui {
 		/// <param name="prompt">The prompt.</param>
 		/// <param name="message">The message.</param>
 		/// <param name="allowedTypes">The allowed types.</param>
-		public FileDialog (ustring title, ustring prompt, ustring message, List<string> allowedTypes)
-			: this (title, prompt, ustring.Empty, message, allowedTypes) { }
+		public FileDialog (ustring title, ustring prompt,ustring cancel, ustring message, List<string> allowedTypes)
+			: this (title, prompt,cancel, ustring.Empty, message, allowedTypes) { }
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="FileDialog"/>
@@ -628,7 +628,7 @@ namespace Terminal.Gui {
 		/// <param name="nameFieldLabel">The name of the file field label..</param>
 		/// <param name="message">The message.</param>
 		/// <param name="allowedTypes">The allowed types.</param>
-		public FileDialog (ustring title, ustring prompt, ustring nameDirLabel, ustring nameFieldLabel, ustring message,
+		public FileDialog (ustring title, ustring prompt,ustring cancel, ustring nameDirLabel, ustring nameFieldLabel, ustring message,
 			List<string> allowedTypes = null) : base (title)//, Driver.Cols - 20, Driver.Rows - 5, null)
 		{
 			this.message = new Label (message) {
@@ -697,11 +697,11 @@ namespace Terminal.Gui {
 			dirListView.DirectoryChanged = (dir) => { nameEntry.Text = ustring.Empty; dirEntry.Text = dir; };
 			dirListView.FileChanged = (file) => nameEntry.Text = file == ".." ? "" : file;
 			dirListView.SelectedChanged = (file) => nameEntry.Text = file.Item1 == ".." ? "" : file.Item1;
-			this.cancel = new Button ("Cancel");
+			this.cancel = new Button (cancel.IsEmpty ? "Cancel" : cancel);
 			this.cancel.Clicked += () => {
 				Cancel ();
 			};
-			AddButton (cancel);
+			AddButton (this.cancel);
 
 			this.prompt = new Button (prompt.IsEmpty ? "Ok" : prompt) {
 				IsDefault = true,
@@ -914,7 +914,7 @@ namespace Terminal.Gui {
 		/// <param name="message">The message.</param>
 		/// <param name="allowedTypes">The allowed types.</param>
 		public SaveDialog (ustring title, ustring message, List<string> allowedTypes = null)
-			: base (title, prompt: Strings.fdSave, nameFieldLabel: $"{Strings.fdSaveAs}", message: message, allowedTypes) { }
+			: base (title, prompt: Strings.fdSave,cancel: Strings.fdCancel, nameFieldLabel: $"{Strings.fdSaveAs}", message: message, allowedTypes) { }
 
 		/// <summary>
 		/// Gets the name of the file the user selected for saving, or null
@@ -983,7 +983,7 @@ namespace Terminal.Gui {
 		/// <param name="openMode">The open mode.</param>
 		public OpenDialog (ustring title, ustring message, List<string> allowedTypes = null, OpenMode openMode = OpenMode.File) : base (title,
 			prompt: openMode == OpenMode.File ? Strings.fdOpen : openMode == OpenMode.Directory ? Strings.fdSelectFolder : Strings.fdSelectMixed,
-			nameFieldLabel: Strings.fdOpen, message: message, allowedTypes)
+			cancel: Strings.fdCancel, nameFieldLabel: Strings.fdOpen, message: message, allowedTypes)
 		{
 			this.openMode = openMode;
 			switch (openMode) {

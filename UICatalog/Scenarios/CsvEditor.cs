@@ -393,7 +393,7 @@ namespace UICatalog.Scenarios {
 
 		private void Open ()
 		{
-			var ofd = new FileDialog ("Select File", "Open", "File", "Select a CSV file to open (does not support newlines, escaping etc)") {
+			var ofd = new FileDialog ("Select File", "Open","Cancel", "File", "Select a CSV file to open (does not support newlines, escaping etc)") {
 				AllowedFileTypes = new string [] { ".csv" }
 			};
 

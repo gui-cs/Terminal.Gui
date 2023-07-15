@@ -1,0 +1,68 @@
+<root>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="ctxCopy" xml:space="preserve">
+        <value>复制 (C)</value>
+    </data>
+    <data name="ctxCut" xml:space="preserve">
+        <value>剪切 (T)</value>
+    </data>
+    <data name="ctxDeleteAll" xml:space="preserve">
+        <value>全部删除 (D)</value>
+    </data>
+    <data name="ctxPaste" xml:space="preserve">
+        <value>粘贴 (P)</value>
+    </data>
+    <data name="ctxRedo" xml:space="preserve">
+        <value>重做 (R)</value>
+    </data>
+    <data name="ctxSelectAll" xml:space="preserve">
+        <value>全选 (S)</value>
+    </data>
+    <data name="ctxUndo" xml:space="preserve">
+        <value>撤销 (U)</value>
+    </data>
+    <data name="fdDirectory" xml:space="preserve">
+        <value>目录</value>
+    </data>
+    <data name="fdFile" xml:space="preserve">
+        <value>文件</value>
+    </data>
+    <data name="fdOpen" xml:space="preserve">
+        <value>打开</value>
+    </data>
+    <data name="fdSave" xml:space="preserve">
+        <value>保存</value>
+    </data>
+    <data name="fdSaveAs" xml:space="preserve">
+        <value>另存为</value>
+    </data>
+    <data name="fdSelectFolder" xml:space="preserve">
+        <value>选择目录</value>
+    </data>
+    <data name="fdSelectMixed" xml:space="preserve">
+        <value>多选</value>
+    </data>
+    <data name="wzBack" xml:space="preserve">
+        <value>返回</value>
+    </data>
+    <data name="wzFinish" xml:space="preserve">
+        <value>完成</value>
+    </data>
+    <data name="wzNext" xml:space="preserve">
+        <value>下一步</value>
+    </data>
+    <data name="fdCancel" xml:space="preserve">
+        <value>取消</value>
+    </data>
+</root>

@@ -168,4 +168,7 @@
   <data name="wzNext" xml:space="preserve">
     <value>次に</value>
   </data>
+  <data name="fdCancel" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
 </root>
