@@ -83,6 +83,9 @@ namespace Unix.Terminal {
 		static void LoadMethods ()
 		{
 			var libs = UnmanagedLibrary.IsMacOSPlatform ? new string [] { "libncurses.dylib" } : new string [] { "libncursesw.so.6", "libncursesw.so.5" };
+			if (Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem.Contains ("opensuse")) {
+				libs [0] = "libncursesw.so.5";
+			}
 			curses_library = new UnmanagedLibrary (libs, false);
 			methods = new NativeMethods (curses_library);
 		}
