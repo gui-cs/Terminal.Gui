@@ -398,16 +398,25 @@ class CharMap : ScrollView {
 			Move (firstColumnX + COLUMN_WIDTH, y);
 			Driver.SetAttribute (GetNormalColor ());
 			for (int col = 0; col < 16; col++) {
+
 				var x = firstColumnX + COLUMN_WIDTH * col + 1;
+
+				//Move (x, y);
+				//Driver.SetAttribute (GetNormalColor ());
+				//Driver.AddRune ('!');
+				//Driver.AddRune ('@');
+				//Driver.AddRune ('#');
+
 				Move (x, y);
 				if (cursorRow + ContentOffset.Y + 1 == y && cursorCol + ContentOffset.X + firstColumnX + 1 == x && !HasFocus) {
 					Driver.SetAttribute (GetFocusColor ());
 				}
 
-				if (val + col < 0xffff && char.IsSurrogate ((char)(val + col))) {
+				var rune = new Rune (val + col);
+				if (val + col < 0xffff && char.IsSurrogate ((char)(val + col)) || rune.GetColumns() == 0) {
 					Driver.AddRune (Rune.ReplacementChar);
 				} else {
-					Driver.AddRune (new Rune (val + col));
+					Driver.AddRune (rune);
 				}
 
 				if (cursorRow + ContentOffset.Y + 1 == y && cursorCol + ContentOffset.X + firstColumnX + 1 == x && !HasFocus) {

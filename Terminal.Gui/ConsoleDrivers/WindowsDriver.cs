@@ -1500,6 +1500,11 @@ internal class WindowsDriver : ConsoleDriver {
 		};
 
 		for (int row = 0; row < Rows; row++) {
+			if (!_dirtyLines [row]) {
+				continue;
+			}
+			_dirtyLines [row] = false;
+
 			for (int col = 0; col < Cols; col++) {
 				int position = row * Cols + col;
 				_outputBuffer [position].Attribute = Contents [row, col].Attribute.GetValueOrDefault ();

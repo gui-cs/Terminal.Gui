@@ -53,6 +53,7 @@ internal class CursesDriver : ConsoleDriver {
 		Curses.noecho ();
 		Curses.refresh ();
 		ProcessWinChange ();
+		UpdateScreen ();
 	}
 
 	private void ProcessWinChange ()
@@ -197,7 +198,45 @@ internal class CursesDriver : ConsoleDriver {
 		Curses.endwin ();
 	}
 
-	public override void UpdateScreen () => _window.redrawwin ();
+	public override void UpdateScreen ()
+	{
+		for (int row = 0; row < Rows; row++) {
+			if (!_dirtyLines [row]) {
+				continue;
+			}
+			_dirtyLines [row] = false;
+
+			for (int col = 0; col < Cols; col++) {
+				//Curses.mvaddch (row, col, '+');
+
+				if (Contents [row, col].IsDirty == false) {
+					//Curses.mvaddch (row, col, (char)Rune.ReplacementChar.Value);
+					continue;
+				}
+				Curses.attrset (Contents [row, col].Attribute.GetValueOrDefault ().Value);
+
+				if (Contents [row, col].Runes [0].IsBmp) {
+					Curses.mvaddch (row, col, Contents [row, col].Runes [0].Value);
+				} else {
+					Curses.mvaddch (row, col, Contents [row, col].Runes [0].Value);
+					//_outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
+					if (Contents [row, col].Runes [0].GetColumns () > 1 && col + 1 < Cols) {
+						// TODO: This is a hack to deal with non-BMP and wide characters.
+						//col++;
+						//_outputBuffer [position].Empty = false;
+						//_outputBuffer [position].Char = ' ';
+						//Curses.mvaddch (row, col, '*');
+					}
+				}
+				//if (col < Cols && Contents [row, col].Runes [0].GetColumns () > 1) {
+				//	col++;
+				//	Curses.mvaddch (row, col, '=');
+				//}
+			}
+		}
+
+		_window.redrawwin ();
+	}
 
 	public Curses.Window _window;
 

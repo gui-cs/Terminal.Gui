@@ -198,8 +198,12 @@ public abstract class ConsoleDriver {
 					// This is a double-width character, and we are at the end of the line.
 					Contents [Row, Col].Runes [0] = Rune.ReplacementChar;
 				} else {
-					// This is a single-width character, or we are not at the end of the line.
-					Contents [Row, Col].Runes [0] = rune;
+					if (runeWidth == 1) {
+						// This is a single-width character, or we are not at the end of the line.
+						Contents [Row, Col].Runes [0] = rune;
+					} else {
+						Contents [Row, Col].Runes [0] = (Rune)'*';
+					}
 				}
 				_dirtyLines [Row] = true;
 			}
@@ -217,6 +221,7 @@ public abstract class ConsoleDriver {
 				// Get rendered.
 				Contents [Row, Col].IsDirty = false;
 				Contents [Row, Col].Attribute = CurrentAttribute;
+				//Contents [Row, Col].Runes [0] = (Rune)' ';
 			}
 			Col++;
 		}
