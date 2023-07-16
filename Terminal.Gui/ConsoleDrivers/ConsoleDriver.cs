@@ -210,10 +210,13 @@ public abstract class ConsoleDriver {
 		}
 
 		if (runeWidth > 1) {
-			// This is a double-width character, and we are not at the end of the line.
+			Debug.Assert(runeWidth <= 2);
 			if (validLocation && Col < Clip.Right) {
-				Contents [Row, Col].Attribute = CurrentAttribute;
+				// This is a double-width character, and we are not at the end of the line.
+				// Col now points to the second column of the character. Ensure it doesn't
+				// Get rendered.
 				Contents [Row, Col].IsDirty = false;
+				Contents [Row, Col].Attribute = CurrentAttribute;
 			}
 			Col++;
 		}

@@ -79,7 +79,14 @@ internal class WindowsConsole {
 				_stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.TrueColorBackground.Value.Red, attr.TrueColorBackground.Value.Green, attr.TrueColorBackground.Value.Blue));
 			}
 
-			_stringBuilder.Append (info.Char != '\x1b' ? info.Char : ' ');
+			if (info.Char != '\x1b') {
+				if (!info.Empty) {
+					_stringBuilder.Append (info.Char);
+				} 
+
+			} else {
+				_stringBuilder.Append (' ');
+			}
 		}
 
 		_stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
@@ -506,11 +513,13 @@ internal class WindowsConsole {
 	public struct ExtendedCharInfo {
 		public char Char { get; set; }
 		public Attribute Attribute { get; set; }
+		public bool Empty { get; set; } // TODO: Temp hack until virutal terminal sequences
 
 		public ExtendedCharInfo (char character, Attribute attribute)
 		{
 			Char = character;
 			Attribute = attribute;
+			Empty = false;
 		}
 	}
 
@@ -1424,7 +1433,7 @@ internal class WindowsDriver : ConsoleDriver {
 	{
 		return base.IsRuneSupported (rune) && rune.IsBmp;
 	}
-	
+
 	public override void Init (Action terminalResized)
 	{
 		TerminalResized = terminalResized;
@@ -1474,14 +1483,10 @@ internal class WindowsDriver : ConsoleDriver {
 			Console.Out.Write (EscSeqUtils.CSI_ClearScreen (EscSeqUtils.ClearScreenOptions.CursorToEndOfScreen));
 		}
 	}
-	
+
 
 	public override void UpdateScreen ()
 	{
-		//if (_damageRegion.Left == -1) {
-		//	return;
-		//}
-
 		if (!EnableConsoleScrolling) {
 			var windowSize = WinConsole.GetConsoleBufferWindow (out _);
 			if (!windowSize.IsEmpty && (windowSize.Width != Cols || windowSize.Height != Rows)) {
@@ -1497,12 +1502,28 @@ internal class WindowsDriver : ConsoleDriver {
 		for (int row = 0; row < Rows; row++) {
 			for (int col = 0; col < Cols; col++) {
 				int position = row * Cols + col;
-				//_outputBuffer [position].Char = (char)Contents [row, col].Runes [0];
-				//_outputBuffer [position].Attribute = Contents [row, col].Attribute;
+				_outputBuffer [position].Attribute = Contents [row, col].Attribute.GetValueOrDefault ();
+				if (Contents [row, col].IsDirty == false) {
+					_outputBuffer [position].Empty = true;
+					_outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
+					continue;
+				}
+				_outputBuffer [position].Empty = false;
+				if (Contents [row, col].Runes [0].IsBmp) {
+					_outputBuffer [position].Char = (char)Contents [row, col].Runes [0].Value;
+				} else {
+					//_outputBuffer [position].Empty = true;
+					_outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
+					if (Contents [row, col].Runes [0].GetColumns () > 1 && col + 1 < Cols) {
+						// TODO: This is a hack to deal with non-BMP and wide characters.
+						col++;
+						position = row * Cols + col;
+						_outputBuffer [position].Empty = false;
+						_outputBuffer [position].Char = ' ';
+					}
+				}
 			}
 		}
-		//WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
-
 
 		WinConsole.WriteToConsole (new Size (Cols, Rows), _outputBuffer, bufferCoords, _damageRegion, UseTrueColor);
 		WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
