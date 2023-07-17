@@ -53,7 +53,7 @@
   <!-- Enable Nuget Source Link for github -->
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-    <PackageReference Include="System.Management" Version="7.0.1" />
+    <PackageReference Include="System.Management" Version="7.0.2" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFrameworks>net472;netstandard2.1;net7.0</TargetFrameworks>
