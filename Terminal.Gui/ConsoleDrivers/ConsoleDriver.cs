@@ -198,12 +198,12 @@ public abstract class ConsoleDriver {
 					// This is a double-width character, and we are at the end of the line.
 					Contents [Row, Col].Runes [0] = Rune.ReplacementChar;
 				} else {
-					if (runeWidth == 1) {
+					//if (runeWidth == 1) {
 						// This is a single-width character, or we are not at the end of the line.
 						Contents [Row, Col].Runes [0] = rune;
-					} else {
-						Contents [Row, Col].Runes [0] = (Rune)'*';
-					}
+					//} else {
+						//Contents [Row, Col].Runes [0] = (Rune)'*';
+					//}
 				}
 				_dirtyLines [Row] = true;
 			}
