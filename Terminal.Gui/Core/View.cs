@@ -446,11 +446,10 @@ namespace Terminal.Gui {
 		public virtual Rect Frame {
 			get => frame;
 			set {
-				var rect = GetMaxNeedDisplay (frame, value);
-				frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
+				frame = value;
 				TextFormatter.Size = GetBoundsTextFormatterSize ();
 				SetNeedsLayout ();
-				SetNeedsDisplay (rect);
+				SetNeedsDisplay ();
 			}
 		}
 
@@ -823,21 +822,7 @@ namespace Terminal.Gui {
 			}
 			TextFormatter.Size = GetBoundsTextFormatterSize ();
 			SetNeedsLayout ();
-			SetNeedsDisplay (GetMaxNeedDisplay (oldFrame, frame));
-		}
-
-		Rect GetMaxNeedDisplay (Rect oldFrame, Rect newFrame)
-		{
-			var rect = new Rect () {
-				X = Math.Min (oldFrame.X, newFrame.X),
-				Y = Math.Min (oldFrame.Y, newFrame.Y),
-				Width = Math.Max (oldFrame.Width, newFrame.Width),
-				Height = Math.Max (oldFrame.Height, newFrame.Height)
-			};
-			rect.Width += Math.Max (oldFrame.X - newFrame.X, 0);
-			rect.Height += Math.Max (oldFrame.Y - newFrame.Y, 0);
-
-			return rect;
+			SetNeedsDisplay ();
 		}
 
 		void TextFormatter_HotKeyChanged (Key obj)
@@ -1143,7 +1128,7 @@ namespace Terminal.Gui {
 		/// <param name="rcol">Absolute column; screen-relative.</param>
 		/// <param name="rrow">Absolute row; screen-relative.</param>
 		/// <param name="clipped">Whether to clip the result of the ViewToScreen method, if set to <see langword="true"/>, the rcol, rrow values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</param>
-		internal void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
+		internal void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = false)
 		{
 			// Computes the real row, col relative to the screen.
 			rrow = row + frame.Y;
@@ -1283,7 +1268,7 @@ namespace Terminal.Gui {
 		/// <param name="row">Row.</param>
 		/// <param name="clipped">Whether to clip the result of the ViewToScreen method,
 		///  if set to <see langword="true"/>, the col, row values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</param>
-		public void Move (int col, int row, bool clipped = true)
+		public void Move (int col, int row, bool clipped = false)
 		{
 			if (Driver.Rows == 0) {
 				return;
