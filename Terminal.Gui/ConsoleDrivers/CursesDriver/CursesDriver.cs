@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Text;
 using Unix.Terminal;
 using System.Buffers;
+using System.Data;
 
 namespace Terminal.Gui;
 
@@ -228,6 +229,11 @@ internal class CursesDriver : ConsoleDriver {
 						//Curses.mvaddch (row, col, '*');
 					}
 				}
+
+				if (Contents [row, col].Runes [0].IsSurrogatePair () && Contents [row, col].Runes [0].GetColumns () < 2) {
+					col--;
+				}
+
 				//if (col < Cols && Contents [row, col].Runes [0].GetColumns () > 1) {
 				//	col++;
 				//	Curses.mvaddch (row, col, '=');
