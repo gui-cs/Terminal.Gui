@@ -50,19 +50,18 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestSpinnerView_ThrottlesAnimation ()
 		{
 			var view = GetSpinnerView ();
-
 			view.Draw ();
 
 			var expected = @"\";
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-			view.SetNeedsDisplay ();
+			view.AdvanceAnimation ();
 			view.Draw ();
 
 			expected = @"\";
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-			view.SetNeedsDisplay ();
+			view.AdvanceAnimation ();
 			view.Draw ();
 
 			expected = @"\";
@@ -70,7 +69,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			Task.Delay (400).Wait ();
 
-			view.SetNeedsDisplay ();
+			view.AdvanceAnimation ();
 			view.Draw ();
 
 			expected = "|";
@@ -82,12 +81,13 @@ namespace Terminal.Gui.ViewsTests {
 			var view = GetSpinnerView ();
 			view.SpinDelay = 0;
 
+			view.AdvanceAnimation ();
 			view.Draw ();
 
 			var expected = "|";
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-			view.SetNeedsDisplay ();
+			view.AdvanceAnimation ();
 			view.Draw ();
 
 			expected = "/";

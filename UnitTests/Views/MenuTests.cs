@@ -2695,5 +2695,17 @@ wo
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 0, 8, 1), pos);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void MenuBarItem_Children_Null_Does_Not_Throw ()
+		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem("Test", "", null)
+			});
+			Application.Top.Add (menu);
+
+			var exception = Record.Exception (() => menu.ProcessColdKey (new KeyEvent (Key.Space, new KeyModifiers ())));
+			Assert.Null (exception);
+		}
 	}
 }
