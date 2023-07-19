@@ -43,6 +43,7 @@
 //
 using System;
 using System.Runtime.InteropServices;
+using Terminal.Gui;
 
 namespace Unix.Terminal {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -93,7 +94,8 @@ namespace Unix.Terminal {
 
 					if (attempts == 1) {
 						attempts++;
-						if (Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem.Contains ("opensuse")) {
+						var (exitCode, result) = ClipboardProcessRunner.Bash ("cat /etc/os-release", waitForOutput: true);
+						if (exitCode == 0 && result.Contains ("opensuse")) {
 							libs [0] = "libncursesw.so.5";
 						}
 					} else {
