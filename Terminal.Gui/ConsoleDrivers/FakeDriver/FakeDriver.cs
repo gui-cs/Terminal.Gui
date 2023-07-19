@@ -42,9 +42,6 @@ public class FakeDriver : ConsoleDriver {
 
 	public static FakeDriver.Behaviors FakeBehaviors = new Behaviors ();
 
-	// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
-	bool [] _dirtyLine;
-
 	public FakeDriver ()
 	{
 		if (FakeBehaviors.UseFakeClipboard) {
