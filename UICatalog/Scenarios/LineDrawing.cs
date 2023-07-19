@@ -97,7 +97,7 @@ namespace UICatalog.Scenarios {
 			List<LineCanvas> _layers = new List<LineCanvas> ();
 			LineCanvas _currentLayer;
 			Color _currentColor = Color.White;
-			StraightLine? _currentLine = null;
+			StraightLine _currentLine = null;
 
 			public LineStyle LineStyle { get; set; }
 
