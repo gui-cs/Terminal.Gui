@@ -246,13 +246,6 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal (Key.Unknown, hotKey);
 		}
 
-		static string testHotKeyAtStart = "_K Before";
-		static string testHotKeyAtSecondPos = "a_K Second";
-		static string testHotKeyAtLastPos = "Last _K";
-		static string testHotKeyAfterLastChar = "After K_";
-		static string testMultiHotKeys = "Multiple _K and _R";
-		static string testNonEnglish = "Non-english: _Кдать";
-
 		[Theory]
 		[InlineData (null)]
 		[InlineData ("")]
