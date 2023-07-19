@@ -16,8 +16,6 @@
     <InformationalVersion>1.0</InformationalVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
     <PackageReference Include="NStack.Core" Version="1.0.7" />
     <InternalsVisibleTo Include="UnitTests" />
   </ItemGroup>
@@ -53,7 +51,7 @@
   <!-- Enable Nuget Source Link for github -->
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-    <PackageReference Include="System.Management" Version="7.0.1" />
+    <PackageReference Include="System.Management" Version="7.0.2" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFrameworks>net472;netstandard2.1;net7.0</TargetFrameworks>
