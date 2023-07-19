@@ -11,7 +11,7 @@ namespace Terminal.Gui {
 		public FileDialogState State { get; set; }
 
 		public AutocompleteFilepathContext (string currentLine, int cursorPosition, FileDialogState state)
-			: base (currentLine.EnumerateRunes ().ToList (), cursorPosition)
+			: base (TextModel.ToRuneCellList (currentLine), cursorPosition)
 		{
 			this.State = state;
 		}
@@ -30,7 +30,7 @@ namespace Terminal.Gui {
 				return Enumerable.Empty<Suggestion> ();
 			}
 
-			var path = StringExtensions.ToString (context.CurrentLine);
+			var path = TextModel.ToString (context.CurrentLine);
 			var last = path.LastIndexOfAny (FileDialog.Separators);
 
 			if (string.IsNullOrWhiteSpace (path) || !Path.IsPathRooted (path)) {
@@ -81,6 +81,5 @@ namespace Terminal.Gui {
 
 			return true;
 		}
-
 	}
 }

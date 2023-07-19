@@ -867,7 +867,7 @@ namespace Terminal.Gui {
 						keyUpHandler (new KeyEvent (map, keyModifiers));
 					}
 				}
-				if (!inputEvent.KeyEvent.bKeyDown && inputEvent.KeyEvent.dwControlKeyState == 0) {
+				if (!inputEvent.KeyEvent.bKeyDown) {
 					keyModifiers = null;
 				}
 				break;

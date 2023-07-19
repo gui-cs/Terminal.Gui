@@ -49,16 +49,20 @@ namespace Terminal.Gui.ConfigurationTests {
 			var updatedScheme = Colors.ColorSchemes ["test"];
 			Assert.Equal (Color.Red, updatedScheme.Normal.Foreground);
 			Assert.Equal (Color.Green, updatedScheme.Normal.Background);
+
+			// remove test ColorScheme from Colors to avoid failures on others unit tests with ColorScheme
+			Colors.ColorSchemes.Remove ("test");
+			Assert.Equal (5, Colors.ColorSchemes.Count);
 		}
 
 		[Fact]
 		public void TestApply ()
 		{
 			ConfigurationManager.Reset ();
-			
+
 			var theme = new ThemeScope ();
 			Assert.NotEmpty (theme);
-			
+
 			Themes.Add ("testTheme", theme);
 
 			Assert.Equal (LineStyle.Single, FrameView.DefaultBorderStyle);
@@ -99,9 +103,9 @@ namespace Terminal.Gui.ConfigurationTests {
 			var newTheme = new ThemeScope ();
 			var newColorScheme = new ColorScheme {
 				Normal = new Attribute (Color.Blue, Color.BrightBlue),
-				
+
 				Focus = colorScheme.Focus,
-				HotNormal =colorScheme.HotNormal,
+				HotNormal = colorScheme.HotNormal,
 				HotFocus = colorScheme.HotFocus,
 				Disabled = colorScheme.Disabled,
 			};
