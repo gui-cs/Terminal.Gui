@@ -55,7 +55,6 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 		ConfigurationManager.Locations = configLocation;
 	}
 
-	static bool _init = false;
 	bool AutoInit { get; }
 	Type _driverType;
 
@@ -64,7 +63,6 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 		Debug.WriteLine ($"Before: {methodUnderTest.Name}");
 		if (AutoInit) {
 			Application.Init ((ConsoleDriver)Activator.CreateInstance (_driverType));
-			_init = true;
 		}
 	}
 	
@@ -73,7 +71,6 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 		Debug.WriteLine ($"After: {methodUnderTest.Name}");
 		if (AutoInit) {
 			Application.Shutdown ();
-			_init = false;
 		}
 	}
 }

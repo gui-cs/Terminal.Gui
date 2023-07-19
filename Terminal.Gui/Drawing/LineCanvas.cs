@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -142,7 +143,7 @@ namespace Terminal.Gui {
 				_lines.Remove(l);
 			}
 
-			return l;
+			return l!;
 		}
 
 		/// <summary>
