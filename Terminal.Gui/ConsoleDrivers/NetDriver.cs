@@ -197,15 +197,11 @@ namespace Terminal.Gui {
 						break;
 					}
 				} else if (consoleKeyInfo.KeyChar == (char)Key.Esc && isEscSeq) {
-					if (cki == null) {
-						// This is an error. We got an ESC while we're in an ESC sequence already
-						// but there's no record of the ESC sequence.
-						// Ignore this for now until we can figure out how we got in this state
-						isEscSeq = false;
-					} else {
-						DecodeEscSeq (ref newConsoleKeyInfo, ref key, cki, ref mod);
-					}
+					DecodeEscSeq (ref newConsoleKeyInfo, ref key, cki, ref mod);
 					cki = null;
+					if (!Console.KeyAvailable) {
+						isEscSeq = false;
+					}
 					break;
 				} else {
 					GetConsoleInputType (consoleKeyInfo);
