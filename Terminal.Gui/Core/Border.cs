@@ -445,8 +445,14 @@ namespace Terminal.Gui {
 
 		private void Parent_Removed (View obj)
 		{
-			BorderBrush = default;
-			Background = default;
+			if (borderBrush != null)
+			{
+				BorderBrush = default;
+			}
+			if (background != null)
+			{
+				Background = default;
+			}
 			child.Removed -= Parent_Removed;
 		}
 
