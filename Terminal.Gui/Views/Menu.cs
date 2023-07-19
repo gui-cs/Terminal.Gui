@@ -1842,7 +1842,7 @@ namespace Terminal.Gui {
 					}
 					return true;
 				}
-				if (mi is MenuBarItem menuBarItem && !menuBarItem.IsTopLevel && FindAndOpenMenuByShortcut (kb, menuBarItem.Children)) {
+				if (mi is MenuBarItem menuBarItem && menuBarItem.Children != null && !menuBarItem.IsTopLevel && FindAndOpenMenuByShortcut (kb, menuBarItem.Children)) {
 					return true;
 				}
 			}
