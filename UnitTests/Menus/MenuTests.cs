@@ -1734,5 +1734,17 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void MenuBarItem_Children_Null_Does_Not_Throw ()
+		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem("Test", "", null)
+			});
+			Application.Top.Add (menu);
+
+			var exception = Record.Exception (() => menu.ProcessColdKey (new KeyEvent (Key.Space, new KeyModifiers ())));
+			Assert.Null (exception);
+		}
 	}
 }
