@@ -40,11 +40,11 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var pv = new PanelView (new Label ("This is a test."));
 			Assert.NotNull (pv.Child);
-			Assert.Equal (1, pv.Subviews [0].Subviews.Count);
+			Assert.Single (pv.Subviews [0].Subviews);
 
 			pv.Child = null;
 			Assert.Null (pv.Child);
-			Assert.Equal (0, pv.Subviews [0].Subviews.Count);
+			Assert.Empty (pv.Subviews [0].Subviews);
 		}
 
 		[Fact]
@@ -52,11 +52,11 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var pv = new PanelView ();
 			Assert.Null (pv.Child);
-			Assert.Equal (0, pv.Subviews [0].Subviews.Count);
+			Assert.Empty (pv.Subviews [0].Subviews);
 
 			pv.Add (new Label ("This is a test."));
 			Assert.NotNull (pv.Child);
-			Assert.Equal (1, pv.Subviews [0].Subviews.Count);
+			Assert.Single (pv.Subviews [0].Subviews);
 		}
 
 		[Fact]
@@ -64,12 +64,12 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var pv = new PanelView (new Label ("This is a test."));
 			Assert.NotNull (pv.Child);
-			Assert.Equal (1, pv.Subviews [0].Subviews.Count);
+			Assert.Single (pv.Subviews [0].Subviews);
 			Assert.IsType<Label> (pv.Child);
 
 			pv.Add (new TextField ("This is a test."));
 			Assert.NotNull (pv.Child);
-			Assert.Equal (1, pv.Subviews [0].Subviews.Count);
+			Assert.Single (pv.Subviews [0].Subviews);
 			Assert.IsNotType<Label> (pv.Child);
 			Assert.IsType<TextField> (pv.Child);
 		}
@@ -79,19 +79,19 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var pv = new PanelView (new Label ("This is a test."));
 			Assert.NotNull (pv.Child);
-			Assert.Equal (1, pv.Subviews [0].Subviews.Count);
+			Assert.Single (pv.Subviews [0].Subviews);
 
 			pv.Remove (pv.Child);
 			Assert.Null (pv.Child);
-			Assert.Equal (0, pv.Subviews [0].Subviews.Count);
+			Assert.Empty (pv.Subviews [0].Subviews);
 
 			pv = new PanelView (new Label ("This is a test."));
 			Assert.NotNull (pv.Child);
-			Assert.Equal (1, pv.Subviews [0].Subviews.Count);
+			Assert.Single (pv.Subviews [0].Subviews);
 
 			pv.RemoveAll ();
 			Assert.Null (pv.Child);
-			Assert.Equal (0, pv.Subviews [0].Subviews.Count);
+			Assert.Empty (pv.Subviews [0].Subviews);
 		}
 
 		[Fact]
