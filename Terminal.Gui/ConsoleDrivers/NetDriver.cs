@@ -118,8 +118,6 @@ namespace Terminal.Gui {
 #if PROCESS_REQUEST
 		bool neededProcessRequest;
 #endif
-		// BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/2745
-		//public bool IsTerminalWithOptions { get; set; }
 		public EscSeqReqProc EscSeqReqProc { get; } = new EscSeqReqProc ();
 
 		public NetEvents (ConsoleDriver consoleDriver)
@@ -232,32 +230,22 @@ namespace Terminal.Gui {
 				if (stopTasks) {
 					return;
 				}
-				// BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/2745
-				//switch (IsTerminalWithOptions) {
-				//case false:
-					int buffHeight, buffWidth;
-					if (((NetDriver)consoleDriver).IsWinPlatform) {
-						buffHeight = Math.Max (Console.BufferHeight, 0);
-						buffWidth = Math.Max (Console.BufferWidth, 0);
-					} else {
-						buffHeight = consoleDriver.Rows;
-						buffWidth = consoleDriver.Cols;
-					}
-					if (IsWinChanged (
-						Math.Max (Console.WindowHeight, 0),
-						Math.Max (Console.WindowWidth, 0),
-						buffHeight,
-						buffWidth)) {
+				int buffHeight, buffWidth;
+				if (((NetDriver)consoleDriver).IsWinPlatform) {
+					buffHeight = Math.Max (Console.BufferHeight, 0);
+					buffWidth = Math.Max (Console.BufferWidth, 0);
+				} else {
+					buffHeight = consoleDriver.Rows;
+					buffWidth = consoleDriver.Cols;
+				}
+				if (IsWinChanged (
+					Math.Max (Console.WindowHeight, 0),
+					Math.Max (Console.WindowWidth, 0),
+					buffHeight,
+					buffWidth)) {
 
-						return;
-					}
-				//	break;
-				//case true:
-				//	//Request the size of the text area in characters.
-				//	EscSeqReqProc.Add ("t");
-				//	Console.Out.Write ("\x1b[18t");
-				//	break;
-				//}
+					return;
+				}
 			}
 		}
 
@@ -467,37 +455,6 @@ namespace Terminal.Gui {
 					return;
 				}
 				break;
-			// BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/2745
-			//case "c":
-			//	try {
-			//		var parent = EscSeqUtils.GetParentProcess (Process.GetCurrentProcess ());
-			//		if (parent == null) { Debug.WriteLine ("Not supported!"); }
-			//	} catch (Exception ex) {
-			//		Debug.WriteLine (ex.Message);
-			//	}
-
-			//	if (c1Control == "CSI" && values.Length == 2
-			//		&& values [0] == "1" && values [1] == "0") {
-			//		// Reports CSI?1;0c ("VT101 with No Options")
-			//		IsTerminalWithOptions = false;
-			//	} else {
-			//		IsTerminalWithOptions = true;
-			//	}
-			//	break;
-			//case "t":
-			//	switch (values [0]) {
-			//	case "8":
-			//		IsWinChanged (
-			//			Math.Max (int.Parse (values [1]), 0),
-			//			Math.Max (int.Parse (values [2]), 0),
-			//			Math.Max (int.Parse (values [1]), 0),
-			//			Math.Max (int.Parse (values [2]), 0));
-			//		break;
-			//	default:
-			//		SetRequestedEvent (c1Control, code, values, terminating);
-			//		break;
-			//	}
-			//	break;
 			default:
 				SetRequestedEvent (c1Control, code, values, terminating);
 				break;
@@ -1289,11 +1246,6 @@ namespace Terminal.Gui {
 
 			// Note: Net doesn't support keydown/up events and thus any passed keyDown/UpHandlers will be simulated to be called.
 			mLoop.ProcessInput = (e) => ProcessInput (e);
-
-			// BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/2745
-			//// Check if terminal supports requests
-			//this.mainLoop.netEvents.EscSeqReqProc.Add ("c");
-			//Console.Out.Write ("\x1b[0c");
 		}
 
 		void ProcessInput (NetEvents.InputResult inputEvent)
