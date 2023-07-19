@@ -11,6 +11,7 @@ using System.Diagnostics;
 using Attribute = Terminal.Gui.Attribute;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Xunit.Sdk;
+using System.Globalization;
 
 namespace Terminal.Gui;
 // This class enables test functions annotated with the [AutoInitShutdown] attribute to 
@@ -45,9 +46,8 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 		bool fakeClipboardIsSupportedAlwaysTrue = false,
 		ConfigurationManager.ConfigLocations configLocation = ConfigurationManager.ConfigLocations.DefaultOnly)
 	{
-		//Assert.True (autoInit == false && consoleDriverType == null);
-
 		AutoInit = autoInit;
+		CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
 		_driverType = consoleDriverType ?? typeof (FakeDriver);
 		FakeDriver.FakeBehaviors.UseFakeClipboard = useFakeClipboard;
 		FakeDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException = fakeClipboardAlwaysThrowsNotSupportedException;
