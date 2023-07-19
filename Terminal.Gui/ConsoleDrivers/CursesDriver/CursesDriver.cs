@@ -24,21 +24,16 @@ internal class CursesDriver : ConsoleDriver {
 	CursorVisibility? _initialCursorVisibility = null;
 	CursorVisibility? _currentCursorVisibility = null;
 
-	// If true, Move set Col and Row to an invalid location
-	bool _atValidLocation;
-
 	public override void Move (int col, int row)
 	{
 		base.Move (col, row);
 
 		if (IsValidLocation (col, row)) {
 			Curses.move (row, col);
-			_atValidLocation = true;
 		} else {
 			// Not a valid location (outside screen or clip region)
 			// Move within the clip region, then AddRune will actually move to Col, Row
 			Curses.move (Clip.Y, Clip.X);
-			_atValidLocation = false;
 		}
 	}
 
