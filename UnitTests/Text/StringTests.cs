@@ -16,7 +16,7 @@ public class StringTests {
 	public void TestGetColumns_Null ()
 	{
 		string? str = null;
-		Assert.Equal (0, str.GetColumns ());
+		Assert.Equal (0, str!.GetColumns ());
 	}
 
 	[Fact]
