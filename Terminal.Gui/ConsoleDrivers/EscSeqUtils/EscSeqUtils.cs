@@ -396,7 +396,6 @@ public static class EscSeqUtils {
 	public static void DecodeEscSeq (EscSeqRequests escSeqRequests, ref ConsoleKeyInfo newConsoleKeyInfo, ref ConsoleKey key, ConsoleKeyInfo [] cki, ref ConsoleModifiers mod, out string c1Control, out string code, out string [] values, out string terminator, out bool isMouse, out List<MouseFlags> buttonState, out Point pos, out bool isResponse, Action<MouseFlags, Point> continuousButtonPressedHandler)
 	{
 		char [] kChars = GetKeyCharArray (cki);
-		Debug.WriteLine ($"EscSeq: {new string(kChars)}");
 		(c1Control, code, values, terminator) = GetEscapeResult (kChars);
 		isMouse = false;
 		buttonState = new List<MouseFlags> () { 0 };
