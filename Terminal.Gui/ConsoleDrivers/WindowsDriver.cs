@@ -758,22 +758,20 @@ namespace Terminal.Gui {
 
 		private void ChangeWin (Size e)
 		{
-			if (!EnableConsoleScrolling) {
-				var w = e.Width;
-				if (w == cols - 3 && e.Height < rows) {
-					w += 3;
-				}
-				var newSize = WinConsole.SetConsoleWindow (
-					(short)Math.Max (w, 16), (short)Math.Max (e.Height, 0));
-
-				left = 0;
-				top = 0;
-				cols = newSize.Width;
-				rows = newSize.Height;
-				ResizeScreen ();
-				UpdateOffScreen ();
-				TerminalResized.Invoke ();
+			var w = e.Width;
+			if (w == cols - 3 && e.Height < rows) {
+				w += 3;
 			}
+			var newSize = WinConsole.SetConsoleWindow (
+				(short)Math.Max (w, 16), (short)Math.Max (e.Height, 0));
+
+			left = 0;
+			top = 0;
+			cols = newSize.Width;
+			rows = newSize.Height;
+			ResizeScreen ();
+			UpdateOffScreen ();
+			TerminalResized.Invoke ();
 		}
 
 		void ProcessInput (WindowsConsole.InputRecord inputEvent)
@@ -1442,7 +1440,7 @@ namespace Terminal.Gui {
 				// ESC [ ? 1049 l  Restore cursor position and restore xterm working buffer (with backscroll)
 				// Per Issue #2264 using the alterantive screen buffer is required for Windows Terminal to not 
 				// wipe out the backscroll buffer when the application exits.
-				Console.Out.Write ("\x1b[?1049h");
+				Console.Out.Write ("\x1b[?1047h");
 
 				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
 				cols = winSize.Width;
@@ -1482,14 +1480,17 @@ namespace Terminal.Gui {
 				Right = (short)Cols
 			};
 			WinConsole.ForceRefreshCursorVisibility ();
-			if (!EnableConsoleScrolling) {
-				// ANSI ESC "[xJ" Clears part of the screen.
-				// If n is 0 (or missing), clear from cursor to end of screen.
-				// If n is 1, clear from cursor to beginning of the screen.
-				// If n is 2, clear entire screen (and moves cursor to upper left on DOS ANSI.SYS).
-				// If n is 3, clear entire screen and delete all lines saved in the scrollback buffer
-				// DO NOT USE 3J - even with the alternate screen buffer, it clears the entire scrollback buffer
-				//Console.Out.Write ("\x1b[1;1H");
+
+			// ANSI ESC "[xJ" Clears part of the screen.
+			// If n is 0 (or missing), clear from cursor to end of screen.
+			// If n is 1, clear from cursor to beginning of the screen.
+			// If n is 2, clear entire screen (and moves cursor to upper left on DOS ANSI.SYS).
+			// If n is 3, clear entire screen and delete all lines saved in the scrollback buffer
+			// DO NOT USE 3J - even with the alternate screen buffer, it clears the entire scrollback buffer
+			if (EnableConsoleScrolling) {
+				// This destroys the back-buffer. But it only happens if the app is resized
+				Console.Out.Write ("\x1b[3J");
+			} else {
 				Console.Out.Write ("\x1b[0J");
 			}
 		}
@@ -1658,23 +1659,14 @@ namespace Terminal.Gui {
 			if (damageRegion.Left == -1)
 				return;
 
-			if (!EnableConsoleScrolling) {
-				var windowSize = WinConsole.GetConsoleBufferWindow (out _);
-				if (!windowSize.IsEmpty && (windowSize.Width != Cols || windowSize.Height != Rows))
-					return;
-			}
+			var windowSize = WinConsole.GetConsoleBufferWindow (out _);
+			if (!windowSize.IsEmpty && (windowSize.Width != Cols || windowSize.Height != Rows))
+				return;
 
 			var bufferCoords = new WindowsConsole.Coord () {
 				X = (short)Clip.Width,
 				Y = (short)Clip.Height
 			};
-
-			//var window = new WindowsConsole.SmallRect () {
-			//	Top = 0,
-			//	Left = 0,
-			//	Right = (short)Clip.Right,
-			//	Bottom = (short)Clip.Bottom
-			//};
 
 			WinConsole.WriteToConsole (new Size (Cols, Rows), OutputBuffer, bufferCoords, damageRegion);
 
@@ -1708,7 +1700,7 @@ namespace Terminal.Gui {
 			WinConsole = null;
 
 			// Disable alternative screen buffer.
-			Console.Out.Write ("\x1b[?1049l");
+			Console.Out.Write ("\x1b[?1047l");
 
 			// Needed for Windows Terminal
 			// Clear the alternative screen buffer from the cursor to the
@@ -1716,9 +1708,6 @@ namespace Terminal.Gui {
 			// Note, [3J causes Windows Terminal to wipe out the entire NON ALTERNATIVE
 			// backbuffer! So we need to use [0J instead.
 			Console.Out.Write ("\x1b[0J");
-
-			Console.Out.Write ("\x1b[!p");
-			Console.Out.Write ("\x1b[!p");
 		}
 
 		/// <inheritdoc/>
@@ -1917,13 +1906,10 @@ namespace Terminal.Gui {
 			while (true) {
 				// Wait for a while then check if screen has changed sizes
 				Task.Delay (500).Wait ();
-				if (!consoleDriver.EnableConsoleScrolling) {
-					windowSize = winConsole.GetConsoleBufferWindow (out _);
-					//System.Diagnostics.Debug.WriteLine ($"{consoleDriver.EnableConsoleScrolling},{windowSize.Width},{windowSize.Height}");
-					if (windowSize != Size.Empty && windowSize.Width != consoleDriver.Cols
-						|| windowSize.Height != consoleDriver.Rows) {
-						return;
-					}
+				windowSize = winConsole.GetConsoleBufferWindow (out _);
+				if (windowSize != Size.Empty && windowSize.Width != consoleDriver.Cols
+					|| windowSize.Height != consoleDriver.Rows) {
+					return;
 				}
 			}
 		}
