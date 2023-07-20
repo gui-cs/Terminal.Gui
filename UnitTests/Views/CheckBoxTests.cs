@@ -7,10 +7,10 @@ using Xunit;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests {
-	public class CheckboxTests {
+	public class CheckBoxTests {
 		readonly ITestOutputHelper output;
 
-		public CheckboxTests (ITestOutputHelper output)
+		public CheckBoxTests (ITestOutputHelper output)
 		{
 			this.output = output;
 		}
