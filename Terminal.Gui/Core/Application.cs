@@ -1103,7 +1103,6 @@ namespace Terminal.Gui {
 			// Init created. Apps that do any threading will need to code defensively for this.
 			// e.g. see Issue #537
 			foreach (var t in toplevels) {
-				
 				t.Running = false;
 				t.Dispose ();
 			}
