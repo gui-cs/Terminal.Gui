@@ -1701,13 +1701,6 @@ namespace Terminal.Gui {
 
 			// Disable alternative screen buffer.
 			Console.Out.Write ("\x1b[?1047l");
-
-			// Needed for Windows Terminal
-			// Clear the alternative screen buffer from the cursor to the
-			// end of the screen.
-			// Note, [3J causes Windows Terminal to wipe out the entire NON ALTERNATIVE
-			// backbuffer! So we need to use [0J instead.
-			Console.Out.Write ("\x1b[0J");
 		}
 
 		/// <inheritdoc/>
