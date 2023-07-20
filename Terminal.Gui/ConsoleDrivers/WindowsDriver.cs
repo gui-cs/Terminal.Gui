@@ -164,11 +164,7 @@ namespace Terminal.Gui {
 				SetCursorVisibility (initialCursorVisibility.Value);
 			}
 
-			// BUGBUG: Commenting this out fixes #2634
-			//SetConsoleOutputWindow (out _);
-
 			ConsoleMode = originalConsoleMode;
-			//ContinueListeningForConsoleEvents = false;
 			if (!SetConsoleActiveScreenBuffer (OutputHandle)) {
 				var err = Marshal.GetLastWin32Error ();
 				Console.WriteLine ("Error: {0}", err);
