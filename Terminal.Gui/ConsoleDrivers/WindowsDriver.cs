@@ -164,7 +164,8 @@ namespace Terminal.Gui {
 				SetCursorVisibility (initialCursorVisibility.Value);
 			}
 
-			SetConsoleOutputWindow (out _);
+			// BUGBUG: Commenting this out fixes #2634
+			//SetConsoleOutputWindow (out _);
 
 			ConsoleMode = originalConsoleMode;
 			//ContinueListeningForConsoleEvents = false;
@@ -173,8 +174,9 @@ namespace Terminal.Gui {
 				Console.WriteLine ("Error: {0}", err);
 			}
 
-			if (ScreenBuffer != IntPtr.Zero)
+			if (ScreenBuffer != IntPtr.Zero) {
 				CloseHandle (ScreenBuffer);
+			}
 
 			ScreenBuffer = IntPtr.Zero;
 		}
@@ -1494,7 +1496,7 @@ namespace Terminal.Gui {
 				// If n is 2, clear entire screen (and moves cursor to upper left on DOS ANSI.SYS).
 				// If n is 3, clear entire screen and delete all lines saved in the scrollback buffer
 				// DO NOT USE 3J - even with the alternate screen buffer, it clears the entire scrollback buffer
-				Console.Out.Write ("\x1b[3J");
+				Console.Out.Write ("\x1b[0J");
 			}
 		}
 
@@ -1707,8 +1709,12 @@ namespace Terminal.Gui {
 
 		public override void End ()
 		{
+
 			WinConsole.Cleanup ();
 			WinConsole = null;
+
+			// Disable alternative screen buffer.
+			Console.Out.Write ("\x1b[?1047l");
 
 			// Needed for Windows Terminal
 			// Clear the alternative screen buffer from the cursor to the
@@ -1716,11 +1722,6 @@ namespace Terminal.Gui {
 			// Note, [3J causes Windows Terminal to wipe out the entire NON ALTERNATIVE
 			// backbuffer! So we need to use [0J instead.
 			Console.Out.Write ("\x1b[0J");
-
-			// Disable alternative screen buffer.
-			Console.Out.Write ("\x1b[?1047l");
-
-			// Console.Out.Flush () is not needed. See https://stackoverflow.com/a/20450486/297526
 		}
 
 		/// <inheritdoc/>
