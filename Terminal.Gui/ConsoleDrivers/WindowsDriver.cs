@@ -1476,19 +1476,6 @@ namespace Terminal.Gui {
 				Right = (short)Cols
 			};
 			WinConsole.ForceRefreshCursorVisibility ();
-
-			// ANSI ESC "[xJ" Clears part of the screen.
-			// If n is 0 (or missing), clear from cursor to end of screen.
-			// If n is 1, clear from cursor to beginning of the screen.
-			// If n is 2, clear entire screen (and moves cursor to upper left on DOS ANSI.SYS).
-			// If n is 3, clear entire screen and delete all lines saved in the scrollback buffer
-			// DO NOT USE 3J - even with the alternate screen buffer, it clears the entire scrollback buffer
-			if (EnableConsoleScrolling) {
-				// This destroys the back-buffer. But it only happens if the app is resized
-				Console.Out.Write ("\x1b[3J");
-			} else {
-				Console.Out.Write ("\x1b[0J");
-			}
 		}
 
 		public override void UpdateOffScreen ()
