@@ -95,6 +95,8 @@ namespace Terminal.Gui {
 		/// <param name="availableWidth"></param>
 		public virtual void Draw (ConsoleDriver driver, ColorScheme colorScheme, int y, int availableWidth)
 		{
+			var cells = new List<RuneCell>();
+
 			// true if the current line of the tree is the selected one and control has focus
 			bool isSelected = tree.IsSelected (Model);
 
@@ -110,15 +112,15 @@ namespace Terminal.Gui {
 
 			// if we have scrolled to the right then bits of the prefix will have dispeared off the screen
 			int toSkip = tree.ScrollOffsetHorizontal;
+			var attr = symbolColor;
 
-			driver.SetAttribute (symbolColor);
 			// Draw the line prefix (all parallel lanes or whitespace and an expand/collapse/leaf symbol)
 			foreach (Rune r in prefix) {
 
 				if (toSkip > 0) {
 					toSkip--;
 				} else {
-					driver.AddRune (r);
+					cells.Add(NewRuneCell(attr,r));
 					availableWidth -= r.GetColumns ();
 				}
 			}
@@ -141,13 +143,14 @@ namespace Terminal.Gui {
 					color = new Attribute (color.Background, color.Foreground);
 				}
 
-				driver.SetAttribute (color);
+				attr = color;
 			}
 
 			if (toSkip > 0) {
 				toSkip--;
 			} else {
-				driver.AddRune (expansion);
+
+				cells.Add(NewRuneCell(attr,expansion));
 				availableWidth -= expansion.GetColumns ();
 			}
 
@@ -186,15 +189,35 @@ namespace Terminal.Gui {
 				}
 			}
 
-			driver.SetAttribute (modelColor);
-			driver.AddStr (lineBody);
+			attr = modelColor;
+			cells.AddRange(lineBody.Select(r=>NewRuneCell(attr,new Rune(r))));
 
 			if (availableWidth > 0) {
-				driver.SetAttribute (symbolColor);
-				driver.AddStr (new string (' ', availableWidth));
+				attr = symbolColor;
+				cells.AddRange(
+					Enumerable.Repeat(
+						NewRuneCell(attr,new Rune(' ')),
+						availableWidth
+						));
 			}
+
+			foreach(var cell in cells)
+			{
+				driver.SetAttribute(cell.ColorScheme.Normal);
+				driver.AddRune(cell.Rune);
+			}
+
 			driver.SetAttribute (colorScheme.Normal);
 		}
+
+		private static RuneCell NewRuneCell (Attribute attr, Rune r)
+		{
+			return new RuneCell{
+				Rune = r,
+				ColorScheme = new ColorScheme(attr)
+			};
+		}
+
 
 		/// <summary>
 		/// Gets all characters to render prior to the current branches line.  This includes indentation
