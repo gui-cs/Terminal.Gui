@@ -170,6 +170,12 @@ namespace Terminal.Gui {
 		public event EventHandler<SelectionChangedEventArgs<T>> SelectionChanged;
 
 		/// <summary>
+		/// Called once for each visible row during rendering.  Can be used
+		/// to make last minute changes to color or text rendered
+		/// </summary>
+		public event EventHandler<DrawTreeViewLineEventArgs<T>> DrawLine;
+
+		/// <summary>
 		/// The root objects in the tree, note that this collection is of root objects only.
 		/// </summary>
 		public IEnumerable<T> Objects { get => roots.Keys; }
@@ -1421,7 +1427,57 @@ namespace Terminal.Gui {
 		{
 			SelectionChanged?.Invoke (this, e);
 		}
+
+		/// <summary>
+		/// Raises the DrawLine event
+		/// </summary>
+		/// <param name="e"></param>
+		internal void OnDrawLine (DrawTreeViewLineEventArgs<T> e)
+		{
+			DrawLine?.Invoke(this,e);
+		}
+
 	}
+
+	/// <summary>
+	/// Event args for the <see cref="TreeView{T}.DrawLine"/> event
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	public class DrawTreeViewLineEventArgs<T> where T : class{
+
+		/// <summary>
+		/// The object at this line in the tree
+		/// </summary>
+		public T Model {get;init;}
+
+		/// <summary>
+		/// The <see cref="TreeView{T}"/> that is performing the
+		/// rendering.
+		/// </summary>
+		public TreeView<T> Tree {get; init;}
+
+		/// <summary>
+		/// The line within tree view bounds that is being rendered
+		/// </summary>
+		public int Y {get;init;}
+
+		/// <summary>
+		/// Set to true to cancel drawing (e.g. if you have already manually
+		/// drawn content).
+		/// </summary>
+		public bool Handled {get;set;}
+
+		/// <summary>
+		/// The rune and color of each symbol that will be rendered.  Note
+		/// that only <see cref="ColorScheme.Normal"/> is respected.  You
+		/// can modify these to change what is rendered.
+		/// </summary>
+		/// <remarks>
+		/// Changing the length of this collection may result in corrupt rendering
+		/// </remarks>
+		public List<RuneCell> RuneCells {get; init;}
+	}
+
 
 	class TreeSelection<T> where T : class {
 
