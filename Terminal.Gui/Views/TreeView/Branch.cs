@@ -201,10 +201,21 @@ namespace Terminal.Gui {
 						));
 			}
 
-			foreach(var cell in cells)
-			{
-				driver.SetAttribute(cell.ColorScheme.Normal);
-				driver.AddRune(cell.Rune);
+			var e = new DrawTreeViewLineEventArgs<T>{
+				Model = Model,
+				Y = y,
+				RuneCells = cells,
+				Tree = tree
+			};
+			tree.OnDrawLine(e);
+
+			if(!e.Handled)
+			{	
+				foreach(var cell in cells)
+				{
+					driver.SetAttribute(cell.ColorScheme.Normal);
+					driver.AddRune(cell.Rune);
+				}
 			}
 
 			driver.SetAttribute (colorScheme.Normal);
