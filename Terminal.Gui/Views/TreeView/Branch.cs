@@ -65,11 +65,10 @@ namespace Terminal.Gui {
 
 			if (Depth >= tree.MaxDepth) {
 				children = Enumerable.Empty<T> ();
-			}
-			else {
+			} else {
 				children = tree.TreeBuilder.GetChildren (this.Model) ?? Enumerable.Empty<T> ();
 			}
-			
+
 			this.ChildBranches = children.ToDictionary (k => k, val => new Branch<T> (tree, this, val));
 		}
 
@@ -95,10 +94,10 @@ namespace Terminal.Gui {
 		/// <param name="availableWidth"></param>
 		public virtual void Draw (ConsoleDriver driver, ColorScheme colorScheme, int y, int availableWidth)
 		{
-			var cells = new List<RuneCell>();
+			var cells = new List<RuneCell> ();
 			int? indexOfExpandCollapseSymbol = null;
 			int indexOfModelText;
-			
+
 
 			// true if the current line of the tree is the selected one and control has focus
 			bool isSelected = tree.IsSelected (Model);
@@ -123,7 +122,7 @@ namespace Terminal.Gui {
 				if (toSkip > 0) {
 					toSkip--;
 				} else {
-					cells.Add(NewRuneCell(attr,r));
+					cells.Add (NewRuneCell (attr, r));
 					availableWidth -= r.GetColumns ();
 				}
 			}
@@ -153,13 +152,13 @@ namespace Terminal.Gui {
 				toSkip--;
 			} else {
 				indexOfExpandCollapseSymbol = cells.Count;
-				cells.Add(NewRuneCell(attr,expansion));
+				cells.Add (NewRuneCell (attr, expansion));
 				availableWidth -= expansion.GetColumns ();
 			}
 
 			// horizontal scrolling has already skipped the prefix but now must also skip some of the line body
 			if (toSkip > 0) {
-				
+
 				// For the event record a negative location for where model text starts since it
 				// is pushed off to the left because of scrolling
 				indexOfModelText = -toSkip;
@@ -169,9 +168,7 @@ namespace Terminal.Gui {
 				} else {
 					lineBody = lineBody.Substring (toSkip);
 				}
-			}
-			else
-			{
+			} else {
 				indexOfModelText = cells.Count;
 			}
 
@@ -202,18 +199,18 @@ namespace Terminal.Gui {
 			}
 
 			attr = modelColor;
-			cells.AddRange(lineBody.Select(r=>NewRuneCell(attr,new Rune(r))));
+			cells.AddRange (lineBody.Select (r => NewRuneCell (attr, new Rune (r))));
 
 			if (availableWidth > 0) {
 				attr = symbolColor;
-				cells.AddRange(
-					Enumerable.Repeat(
-						NewRuneCell(attr,new Rune(' ')),
+				cells.AddRange (
+					Enumerable.Repeat (
+						NewRuneCell (attr, new Rune (' ')),
 						availableWidth
 						));
 			}
 
-			var e = new DrawTreeViewLineEventArgs<T>{
+			var e = new DrawTreeViewLineEventArgs<T> {
 				Model = Model,
 				Y = y,
 				RuneCells = cells,
@@ -221,14 +218,12 @@ namespace Terminal.Gui {
 				IndexOfExpandCollapseSymbol = indexOfExpandCollapseSymbol,
 				IndexOfModelText = indexOfModelText,
 			};
-			tree.OnDrawLine(e);
+			tree.OnDrawLine (e);
 
-			if(!e.Handled)
-			{	
-				foreach(var cell in cells)
-				{
-					driver.SetAttribute(cell.ColorScheme.Normal);
-					driver.AddRune(cell.Rune);
+			if (!e.Handled) {
+				foreach (var cell in cells) {
+					driver.SetAttribute (cell.ColorScheme.Normal);
+					driver.AddRune (cell.Rune);
 				}
 			}
 
@@ -237,9 +232,9 @@ namespace Terminal.Gui {
 
 		private static RuneCell NewRuneCell (Attribute attr, Rune r)
 		{
-			return new RuneCell{
+			return new RuneCell {
 				Rune = r,
-				ColorScheme = new ColorScheme(attr)
+				ColorScheme = new ColorScheme (attr)
 			};
 		}
 
