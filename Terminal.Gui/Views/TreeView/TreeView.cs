@@ -1476,6 +1476,26 @@ namespace Terminal.Gui {
 		/// Changing the length of this collection may result in corrupt rendering
 		/// </remarks>
 		public List<RuneCell> RuneCells {get; init;}
+
+		/// <summary>
+		/// The notional index in <see cref="RuneCells"/> which contains the first
+		/// character of the <see cref="TreeView{T}.AspectGetter"/> text (i.e.
+		/// after all branch lines and expansion/collapse sybmols).
+		/// </summary>
+		/// <remarks>
+		/// May be negative or outside of bounds of <see cref="RuneCells"/> if the view
+		/// has been scrolled horizontally.
+		/// </remarks>
+
+		public int IndexOfModelText {get;init;}
+
+		/// <summary>
+		/// If line contains a branch that can be expanded/collapsed then this is
+		/// the index in <see cref="RuneCells"/> at which the symbol is (or null for
+		/// leaf elements).
+		/// </summary>
+		public int? IndexOfExpandCollapseSymbol {get;init;}
+
 	}
 
 

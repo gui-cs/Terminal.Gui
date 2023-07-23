@@ -84,6 +84,7 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Percent (50),
 				Height = Dim.Fill (),
 			};
+			treeViewFiles.DrawLine += TreeViewFiles_DrawLine;
 
 			_detailsFrame = new DetailsFrame (_iconProvider) {
 				X = Pos.Right (treeViewFiles),
@@ -138,6 +139,26 @@ namespace UICatalog.Scenarios {
 		private void TreeViewFiles_SelectionChanged (object sender, SelectionChangedEventArgs<IFileSystemInfo> e)
 		{
 			ShowPropertiesOf (e.NewValue);
+		}
+
+		private void TreeViewFiles_DrawLine (object sender, DrawTreeViewLineEventArgs<IFileSystemInfo> e)
+		{
+			// Render directory icons in yellow
+			if(e.Model is IDirectoryInfo d)
+			{
+				if(_iconProvider.UseNerdIcons || _iconProvider.UseUnicodeCharacters)
+				{
+					if(e.IndexOfModelText > 0 && e.IndexOfModelText < e.RuneCells.Count)
+					{
+						var cell = e.RuneCells[e.IndexOfModelText];
+						cell.ColorScheme = new ColorScheme(
+							new Terminal.Gui.Attribute(
+								Color.BrightYellow,
+								cell.ColorScheme.Normal.Background)
+						);
+					}
+				}
+			}
 		}
 
 		private void TreeViewFiles_KeyPress (object sender, KeyEventEventArgs obj)
