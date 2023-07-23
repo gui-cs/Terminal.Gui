@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -939,7 +940,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (tv.CanExpand ("6"));
 			Assert.False (tv.IsExpanded ("6"));
 
-			tv.Collapse("6");
+			tv.Collapse ("6");
 
 			Assert.False (tv.CanExpand ("6"));
 			Assert.False (tv.IsExpanded ("6"));
@@ -994,7 +995,71 @@ namespace Terminal.Gui.ViewsTests {
       └─4
 ", output);
 		}
+		[Fact, AutoInitShutdown]
+		public void TestTreeView_DrawLineEvent ()
+		{
+			var tv = new TreeView { Width = 20, Height = 10 };
 
+			var eventArgs = new List<DrawTreeViewLineEventArgs<ITreeNode>> ();
+
+			tv.DrawLine += (s, e) => {
+				eventArgs.Add (e);
+			};
+
+			var n1 = new TreeNode ("root one");
+			var n1_1 = new TreeNode ("leaf 1");
+			var n1_2 = new TreeNode ("leaf 2");
+			n1.Children.Add (n1_1);
+			n1.Children.Add (n1_2);
+
+			var n2 = new TreeNode ("root two");
+			tv.AddObject (n1);
+			tv.AddObject (n2);
+			tv.Expand (n1);
+
+			tv.ColorScheme = new ColorScheme ();
+			tv.LayoutSubviews ();
+			tv.Draw ();
+
+			// Normal drawing of the tree view
+			TestHelpers.AssertDriverContentsAre (
+@"
+├-root one
+│ ├─leaf 1
+│ └─leaf 2
+└─root two
+", output);
+			Assert.Equal (4, eventArgs.Count ());
+
+			Assert.Equal (0, eventArgs [0].Y);
+			Assert.Equal (1, eventArgs [1].Y);
+			Assert.Equal (2, eventArgs [2].Y);
+			Assert.Equal (3, eventArgs [3].Y);
+
+			Assert.All (eventArgs, ea => Assert.Equal (ea.Tree, tv));
+			Assert.All (eventArgs, ea => Assert.False (ea.Handled));
+
+			Assert.Equal ("├-root one", eventArgs [0].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+			Assert.Equal ("│ ├─leaf 1", eventArgs [1].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+			Assert.Equal ("│ └─leaf 2", eventArgs [2].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+			Assert.Equal ("└─root two", eventArgs [3].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+
+			Assert.Equal (1,eventArgs [0].IndexOfExpandCollapseSymbol);
+			Assert.Equal (3, eventArgs [1].IndexOfExpandCollapseSymbol);
+			Assert.Equal (3, eventArgs [2].IndexOfExpandCollapseSymbol);
+			Assert.Equal (1, eventArgs [3].IndexOfExpandCollapseSymbol);
+
+			Assert.Equal (2, eventArgs [0].IndexOfModelText);
+			Assert.Equal (4, eventArgs [1].IndexOfModelText);
+			Assert.Equal (4, eventArgs [2].IndexOfModelText);
+			Assert.Equal (2, eventArgs [3].IndexOfModelText);
+
+
+			Assert.Equal ("root one", eventArgs [0].Model.Text);
+			Assert.Equal ("leaf 1", eventArgs [1].Model.Text);
+			Assert.Equal ("leaf 2", eventArgs [2].Model.Text);
+			Assert.Equal ("root two", eventArgs [3].Model.Text);
+		}
 		[Fact, AutoInitShutdown]
 		public void TestTreeView_Filter ()
 		{
