@@ -563,10 +563,9 @@ namespace Terminal.Gui {
 			List<Branch<T>> toReturn = new List<Branch<T>> ();
 
 			foreach (var root in roots.Values) {
-				
+
 				var toAdd = AddToLineMap (root, false, out var isMatch);
-				if(isMatch)
-				{
+				if (isMatch) {
 					toReturn.AddRange (toAdd);
 				}
 			}
@@ -580,41 +579,38 @@ namespace Terminal.Gui {
 
 		private bool IsFilterMatch (Branch<T> branch)
 		{
-			return Filter?.IsMatch(branch.Model) ?? true;
+			return Filter?.IsMatch (branch.Model) ?? true;
 		}
 
-		private IEnumerable<Branch<T>> AddToLineMap (Branch<T> currentBranch,bool parentMatches, out bool match)
+		private IEnumerable<Branch<T>> AddToLineMap (Branch<T> currentBranch, bool parentMatches, out bool match)
 		{
-			bool weMatch = IsFilterMatch(currentBranch);
+			bool weMatch = IsFilterMatch (currentBranch);
 			bool anyChildMatches = false;
-			
-			var toReturn = new List<Branch<T>>();
-			var children = new List<Branch<T>>();
+
+			var toReturn = new List<Branch<T>> ();
+			var children = new List<Branch<T>> ();
 
 			if (currentBranch.IsExpanded) {
 				foreach (var subBranch in currentBranch.ChildBranches.Values) {
 
 					foreach (var sub in AddToLineMap (subBranch, weMatch, out var childMatch)) {
-						
-						if(childMatch)
-						{
-							children.Add(sub);
+
+						if (childMatch) {
+							children.Add (sub);
 							anyChildMatches = true;
 						}
 					}
 				}
 			}
 
-			if(parentMatches || weMatch || anyChildMatches)
-			{
+			if (parentMatches || weMatch || anyChildMatches) {
 				match = true;
-				toReturn.Add(currentBranch);
-			}
-			else{
+				toReturn.Add (currentBranch);
+			} else {
 				match = false;
 			}
-			
-			toReturn.AddRange(children);
+
+			toReturn.AddRange (children);
 			return toReturn;
 		}
 
@@ -1434,71 +1430,10 @@ namespace Terminal.Gui {
 		/// <param name="e"></param>
 		internal void OnDrawLine (DrawTreeViewLineEventArgs<T> e)
 		{
-			DrawLine?.Invoke(this,e);
+			DrawLine?.Invoke (this, e);
 		}
 
 	}
-
-	/// <summary>
-	/// Event args for the <see cref="TreeView{T}.DrawLine"/> event
-	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	public class DrawTreeViewLineEventArgs<T> where T : class{
-
-		/// <summary>
-		/// The object at this line in the tree
-		/// </summary>
-		public T Model {get;init;}
-
-		/// <summary>
-		/// The <see cref="TreeView{T}"/> that is performing the
-		/// rendering.
-		/// </summary>
-		public TreeView<T> Tree {get; init;}
-
-		/// <summary>
-		/// The line within tree view bounds that is being rendered
-		/// </summary>
-		public int Y {get;init;}
-
-		/// <summary>
-		/// Set to true to cancel drawing (e.g. if you have already manually
-		/// drawn content).
-		/// </summary>
-		public bool Handled {get;set;}
-
-		/// <summary>
-		/// The rune and color of each symbol that will be rendered.  Note
-		/// that only <see cref="ColorScheme.Normal"/> is respected.  You
-		/// can modify these to change what is rendered.
-		/// </summary>
-		/// <remarks>
-		/// Changing the length of this collection may result in corrupt rendering
-		/// </remarks>
-		public List<RuneCell> RuneCells {get; init;}
-
-		/// <summary>
-		/// The notional index in <see cref="RuneCells"/> which contains the first
-		/// character of the <see cref="TreeView{T}.AspectGetter"/> text (i.e.
-		/// after all branch lines and expansion/collapse sybmols).
-		/// </summary>
-		/// <remarks>
-		/// May be negative or outside of bounds of <see cref="RuneCells"/> if the view
-		/// has been scrolled horizontally.
-		/// </remarks>
-
-		public int IndexOfModelText {get;init;}
-
-		/// <summary>
-		/// If line contains a branch that can be expanded/collapsed then this is
-		/// the index in <see cref="RuneCells"/> at which the symbol is (or null for
-		/// leaf elements).
-		/// </summary>
-		public int? IndexOfExpandCollapseSymbol {get;init;}
-
-	}
-
-
 	class TreeSelection<T> where T : class {
 
 		public Branch<T> Origin { get; }

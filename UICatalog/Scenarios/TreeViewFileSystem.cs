@@ -107,7 +107,7 @@ namespace UICatalog.Scenarios {
 			SetupScrollBar ();
 
 			treeViewFiles.SetFocus ();
-			
+
 			UpdateIconCheckedness ();
 		}
 
@@ -144,15 +144,12 @@ namespace UICatalog.Scenarios {
 		private void TreeViewFiles_DrawLine (object sender, DrawTreeViewLineEventArgs<IFileSystemInfo> e)
 		{
 			// Render directory icons in yellow
-			if(e.Model is IDirectoryInfo d)
-			{
-				if(_iconProvider.UseNerdIcons || _iconProvider.UseUnicodeCharacters)
-				{
-					if(e.IndexOfModelText > 0 && e.IndexOfModelText < e.RuneCells.Count)
-					{
-						var cell = e.RuneCells[e.IndexOfModelText];
-						cell.ColorScheme = new ColorScheme(
-							new Terminal.Gui.Attribute(
+			if (e.Model is IDirectoryInfo d) {
+				if (_iconProvider.UseNerdIcons || _iconProvider.UseUnicodeCharacters) {
+					if (e.IndexOfModelText > 0 && e.IndexOfModelText < e.RuneCells.Count) {
+						var cell = e.RuneCells [e.IndexOfModelText];
+						cell.ColorScheme = new ColorScheme (
+							new Terminal.Gui.Attribute (
 								Color.BrightYellow,
 								cell.ColorScheme.Normal.Background)
 						);
@@ -216,7 +213,7 @@ namespace UICatalog.Scenarios {
 			private IFileSystemInfo fileInfo;
 			private FileSystemIconProvider _iconProvider;
 
-			public DetailsFrame (FileSystemIconProvider  iconProvider)
+			public DetailsFrame (FileSystemIconProvider iconProvider)
 			{
 				Title = "Details";
 				Visible = true;
@@ -230,7 +227,7 @@ namespace UICatalog.Scenarios {
 					System.Text.StringBuilder sb = null;
 
 					if (fileInfo is IFileInfo f) {
-						Title = $"{_iconProvider.GetIconWithOptionalSpace(f)}{f.Name}".Trim();
+						Title = $"{_iconProvider.GetIconWithOptionalSpace (f)}{f.Name}".Trim ();
 						sb = new System.Text.StringBuilder ();
 						sb.AppendLine ($"Path:\n {f.FullName}\n");
 						sb.AppendLine ($"Size:\n {f.Length:N0} bytes\n");
@@ -239,7 +236,7 @@ namespace UICatalog.Scenarios {
 					}
 
 					if (fileInfo is IDirectoryInfo dir) {
-						Title = $"{_iconProvider.GetIconWithOptionalSpace(dir)}{dir.Name}".Trim();
+						Title = $"{_iconProvider.GetIconWithOptionalSpace (dir)}{dir.Name}".Trim ();
 						sb = new System.Text.StringBuilder ();
 						sb.AppendLine ($"Path:\n {dir?.FullName}\n");
 						sb.AppendLine ($"Modified:\n {dir.LastWriteTime}\n");
@@ -262,7 +259,7 @@ namespace UICatalog.Scenarios {
 
 			var scrollBar = new ScrollBarView (treeViewFiles, true);
 
-			scrollBar.ChangedPosition += (s,e) => {
+			scrollBar.ChangedPosition += (s, e) => {
 				treeViewFiles.ScrollOffsetVertical = scrollBar.Position;
 				if (treeViewFiles.ScrollOffsetVertical != scrollBar.Position) {
 					scrollBar.Position = treeViewFiles.ScrollOffsetVertical;
@@ -270,7 +267,7 @@ namespace UICatalog.Scenarios {
 				treeViewFiles.SetNeedsDisplay ();
 			};
 
-			scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
+			scrollBar.OtherScrollBarView.ChangedPosition += (s, e) => {
 				treeViewFiles.ScrollOffsetHorizontal = scrollBar.OtherScrollBarView.Position;
 				if (treeViewFiles.ScrollOffsetHorizontal != scrollBar.OtherScrollBarView.Position) {
 					scrollBar.OtherScrollBarView.Position = treeViewFiles.ScrollOffsetHorizontal;
@@ -278,7 +275,7 @@ namespace UICatalog.Scenarios {
 				treeViewFiles.SetNeedsDisplay ();
 			};
 
-			treeViewFiles.DrawContent += (s,e) => {
+			treeViewFiles.DrawContent += (s, e) => {
 				scrollBar.Size = treeViewFiles.ContentHeight;
 				scrollBar.Position = treeViewFiles.ScrollOffsetVertical;
 				scrollBar.OtherScrollBarView.Size = treeViewFiles.GetContentWidth (true);
@@ -290,20 +287,20 @@ namespace UICatalog.Scenarios {
 		private void SetupFileTree ()
 		{
 			// setup how to build tree
-			var fs =  new FileSystem();
-			var rootDirs = DriveInfo.GetDrives ().Select (d=>fs.DirectoryInfo.New(d.RootDirectory.FullName));
+			var fs = new FileSystem ();
+			var rootDirs = DriveInfo.GetDrives ().Select (d => fs.DirectoryInfo.New (d.RootDirectory.FullName));
 			treeViewFiles.TreeBuilder = new FileSystemTreeBuilder ();
 			treeViewFiles.AddObjects (rootDirs);
 
 			// Determines how to represent objects as strings on the screen
 			treeViewFiles.AspectGetter = AspectGetter;
-			
+
 			_iconProvider.IsOpenGetter = treeViewFiles.IsExpanded;
 		}
 
 		private string AspectGetter (IFileSystemInfo f)
 		{
-				return (_iconProvider.GetIconWithOptionalSpace(f) + f.Name).Trim();
+			return (_iconProvider.GetIconWithOptionalSpace (f) + f.Name).Trim ();
 		}
 
 		private void ShowLines ()
