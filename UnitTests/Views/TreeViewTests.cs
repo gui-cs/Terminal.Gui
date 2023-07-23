@@ -1124,6 +1124,47 @@ oot two
 		}
 
 		[Fact, AutoInitShutdown]
+		public void TestTreeView_DrawLineEvent_Handled ()
+		{
+			var tv = new TreeView { Width = 20, Height = 10 };
+
+			tv.DrawLine += (s, e) => {
+				if(e.Model.Text.Equals("leaf 1")) {
+					e.Handled = true;
+
+					for (int i = 0; i < 10; i++) {
+
+						e.Tree.AddRune (i,e.Y,new System.Text.Rune('F'));
+					}
+				}
+			};
+
+			var n1 = new TreeNode ("root one");
+			var n1_1 = new TreeNode ("leaf 1");
+			var n1_2 = new TreeNode ("leaf 2");
+			n1.Children.Add (n1_1);
+			n1.Children.Add (n1_2);
+
+			var n2 = new TreeNode ("root two");
+			tv.AddObject (n1);
+			tv.AddObject (n2);
+			tv.Expand (n1);
+
+			tv.ColorScheme = new ColorScheme ();
+			tv.LayoutSubviews ();
+			tv.Draw ();
+
+			// Normal drawing of the tree view
+			TestHelpers.AssertDriverContentsAre (
+@"
+├-root one
+FFFFFFFFFF
+│ └─leaf 2
+└─root two
+", output);
+		}
+
+		[Fact, AutoInitShutdown]
 		public void TestTreeView_Filter ()
 		{
 			var tv = new TreeView { Width = 20, Height = 10 };
