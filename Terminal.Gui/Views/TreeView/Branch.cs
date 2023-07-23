@@ -96,6 +96,9 @@ namespace Terminal.Gui {
 		public virtual void Draw (ConsoleDriver driver, ColorScheme colorScheme, int y, int availableWidth)
 		{
 			var cells = new List<RuneCell>();
+			int? indexOfExpandCollapseSymbol = null;
+			int indexOfModelText;
+			
 
 			// true if the current line of the tree is the selected one and control has focus
 			bool isSelected = tree.IsSelected (Model);
@@ -149,18 +152,27 @@ namespace Terminal.Gui {
 			if (toSkip > 0) {
 				toSkip--;
 			} else {
-
+				indexOfExpandCollapseSymbol = cells.Count;
 				cells.Add(NewRuneCell(attr,expansion));
 				availableWidth -= expansion.GetColumns ();
 			}
 
 			// horizontal scrolling has already skipped the prefix but now must also skip some of the line body
 			if (toSkip > 0) {
+				
+				// For the event record a negative location for where model text starts since it
+				// is pushed off to the left because of scrolling
+				indexOfModelText = -toSkip;
+
 				if (toSkip > lineBody.Length) {
 					lineBody = "";
 				} else {
 					lineBody = lineBody.Substring (toSkip);
 				}
+			}
+			else
+			{
+				indexOfModelText = cells.Count;
 			}
 
 			// If body of line is too long
@@ -205,7 +217,9 @@ namespace Terminal.Gui {
 				Model = Model,
 				Y = y,
 				RuneCells = cells,
-				Tree = tree
+				Tree = tree,
+				IndexOfExpandCollapseSymbol = indexOfExpandCollapseSymbol,
+				IndexOfModelText = indexOfModelText,
 			};
 			tree.OnDrawLine(e);
 
