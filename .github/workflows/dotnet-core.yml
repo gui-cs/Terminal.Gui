@@ -1,4 +1,4 @@
-name: Build & Test Terminal.Gui with .NET Core
+name: .NET Core
 
 on:
   push:
