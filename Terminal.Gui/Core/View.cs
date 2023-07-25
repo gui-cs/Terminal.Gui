@@ -2449,7 +2449,7 @@ namespace Terminal.Gui {
 
 			foreach (var v in ordered) {
 				if (v.LayoutStyle == LayoutStyle.Computed) {
-					v.SetRelativeLayout (Frame);
+					v.SetRelativeLayout (v?.SuperView.Frame ?? Frame);
 				}
 
 				v.LayoutSubviews ();
