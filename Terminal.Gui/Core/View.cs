@@ -2199,7 +2199,7 @@ namespace Terminal.Gui {
 			} else {
 				actY = y?.Anchor (hostFrame.Height) ?? 0;
 
-				actH = Math.Max (CalculateActualHight (height, hostFrame, actY, s), 0);
+				actH = Math.Max (CalculateActualHeight (height, hostFrame, actY, s), 0);
 			}
 
 			var r = new Rect (actX, actY, actW, actH);
@@ -2240,7 +2240,7 @@ namespace Terminal.Gui {
 			return actW;
 		}
 
-		private int CalculateActualHight (Dim height, Rect hostFrame, int actY, Size s)
+		private int CalculateActualHeight (Dim height, Rect hostFrame, int actY, Size s)
 		{
 			int actH;
 			switch (height) {
@@ -2248,8 +2248,8 @@ namespace Terminal.Gui {
 				actH = AutoSize ? s.Height : hostFrame.Height;
 				break;
 			case Dim.DimCombine combine:
-				int leftActH = CalculateActualHight (combine.left, hostFrame, actY, s);
-				int rightActH = CalculateActualHight (combine.right, hostFrame, actY, s);
+				int leftActH = CalculateActualHeight (combine.left, hostFrame, actY, s);
+				int rightActH = CalculateActualHeight (combine.right, hostFrame, actY, s);
 				if (combine.add) {
 					actH = leftActH + rightActH;
 				} else {
