@@ -2639,6 +2639,7 @@ namespace Terminal.Gui {
 				HistoryText.LineStatus.Replaced);
 
 			UpdateWrapModel ();
+			OnContentsChanged ();
 		}
 
 		// The column we are tracking, or -1 if we are not tracking any column
@@ -3568,6 +3569,7 @@ namespace Terminal.Gui {
 			}
 			if (DeleteTextForwards ()) {
 				UpdateWrapModel ();
+				OnContentsChanged ();
 
 				return;
 			}
@@ -3575,6 +3577,7 @@ namespace Terminal.Gui {
 			UpdateWrapModel ();
 
 			DoNeededAction ();
+			OnContentsChanged ();
 		}
 
 		/// <summary>
@@ -3599,11 +3602,13 @@ namespace Terminal.Gui {
 					HistoryText.LineStatus.Replaced);
 
 				UpdateWrapModel ();
+				OnContentsChanged ();
 
 				return;
 			}
 			if (DeleteTextBackwards ()) {
 				UpdateWrapModel ();
+				OnContentsChanged ();
 
 				return;
 			}
@@ -3611,6 +3616,7 @@ namespace Terminal.Gui {
 			UpdateWrapModel ();
 
 			DoNeededAction ();
+			OnContentsChanged ();
 		}
 
 		void MoveLeft ()
@@ -3990,6 +3996,8 @@ namespace Terminal.Gui {
 
 				historyText.Add (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
+
+				SetNeedsDisplay ();
 				OnContentsChanged ();
 			} else {
 				if (selecting) {
@@ -4002,6 +4010,8 @@ namespace Terminal.Gui {
 					historyText.ReplaceLast (new List<List<Rune>> () { new List<Rune> (GetCurrentLine ()) }, CursorPosition,
 						HistoryText.LineStatus.Original);
 				}
+
+				SetNeedsDisplay ();
 			}
 			UpdateWrapModel ();
 			selecting = false;
@@ -4113,6 +4123,7 @@ namespace Terminal.Gui {
 			currentColumn = line.Count;
 			TrackColumn ();
 			PositionCursor ();
+			SetNeedsDisplay ();
 		}
 
 		/// <summary>
