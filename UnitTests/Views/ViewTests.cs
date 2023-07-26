@@ -18,6 +18,12 @@ namespace Terminal.Gui.ViewTests {
 		}
 
 		[Fact]
+		public void Fail ()
+		{
+			Assert.Fail ("Test to prove stopOnFail is working. During CI/CD no more tests should run after this.");
+		}
+
+		[Fact]
 		public void New_Initializes ()
 		{
 			// Parameterless
