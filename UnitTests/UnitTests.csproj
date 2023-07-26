@@ -38,6 +38,11 @@
     <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
     <ProjectReference Include="..\UICatalog\UICatalog.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <PropertyGroup Label="FineCodeCoverage">
     <Enabled>
       True
