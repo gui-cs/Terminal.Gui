@@ -251,7 +251,6 @@ internal class WindowsConsole
         SetConsoleOutputWindow(out _);
 
         ConsoleMode = _originalConsoleMode;
-        //ContinueListeningForConsoleEvents = false;
         if (!SetConsoleActiveScreenBuffer(_outputHandle))
         {
             var err = Marshal.GetLastWin32Error();
@@ -308,6 +307,7 @@ internal class WindowsConsole
     {
         var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX();
         csbi.cbSize = (uint)Marshal.SizeOf(csbi);
+
         if (!GetConsoleScreenBufferInfoEx(_screenBuffer, ref csbi))
         {
             throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
@@ -370,8 +370,6 @@ internal class WindowsConsole
 
         return sz;
     }
-
-    //bool ContinueListeningForConsoleEvents = true;
 
     uint ConsoleMode
     {
@@ -1021,17 +1019,6 @@ internal class WindowsDriver : ConsoleDriver
                 }
                 break;
 
-            case WindowsConsole.EventType.WindowBufferSize:
-                var winSize = WinConsole.GetConsoleBufferWindow(out Point pos);
-                Left = pos.X;
-                Top = pos.Y;
-                Cols = inputEvent.WindowBufferSizeEvent._size.X;
-                Rows = inputEvent.WindowBufferSizeEvent._size.Y;
-                ResizeScreen();
-                ClearContents();
-                TerminalResized?.Invoke();
-                break;
-
             case WindowsConsole.EventType.Focus:
                 break;
         }
@@ -1043,7 +1030,6 @@ internal class WindowsDriver : ConsoleDriver
     bool _isButtonDoubleClicked = false;
     Point? _point;
     Point _pointMove;
-    //int _buttonPressedCount;
     bool _isOneFingerDoubleClicked = false;
     bool _processButtonClick;
 
@@ -1596,11 +1582,6 @@ internal class WindowsDriver : ConsoleDriver
         return keyMod != Key.Null ? keyMod | key : key;
     }
 
-    int GetOutputBufferPosition()
-    {
-        return Row * Cols + Col;
-    }
-
     public override bool IsRuneSupported(Rune rune)
     {
         return base.IsRuneSupported(rune) && rune.IsBmp;
@@ -1613,8 +1594,6 @@ internal class WindowsDriver : ConsoleDriver
         try
         {
             // Needed for Windows Terminal
-            // Per Issue #2264 using the alternative screen buffer is required for Windows Terminal to not 
-            // wipe out the backscroll buffer when the application exits.
             Console.Out.Write(EscSeqUtils.CSI_ActivateAltBufferNoBackscroll);
 
             var winSize = WinConsole.GetConsoleOutputWindow(out Point pos);
@@ -1627,13 +1606,21 @@ internal class WindowsDriver : ConsoleDriver
         {
             // Likely running unit tests. Set WinConsole to null so we can test it elsewhere.
             WinConsole = null;
-            //throw new InvalidOperationException ("The Windows Console output window is not available.", e);
         }
 
         CurrentAttribute = MakeColor(Color.White, Color.Black);
         InitializeColorSchemes();
 
-        ResizeScreen();
+        _outputBuffer = new WindowsConsole.ExtendedCharInfo[Rows * Cols];
+        Clip = new Rect(0, 0, Cols, Rows);
+        _damageRegion = new WindowsConsole.SmallRect()
+        {
+            Top = 0,
+            Left = 0,
+            Bottom = (short)Rows,
+            Right = (short)Cols
+        };
+
         ClearContents();
     }
 
@@ -1656,7 +1643,6 @@ internal class WindowsDriver : ConsoleDriver
         _dirtyLines = new bool[Rows];
 
         WinConsole.ForceRefreshCursorVisibility();
-        Console.Out.Write(EscSeqUtils.CSI_ClearScreen(EscSeqUtils.ClearScreenOptions.CursorToEndOfScreen));
     }
 
 
@@ -1865,13 +1851,6 @@ internal class WindowsDriver : ConsoleDriver
         WinConsole?.Cleanup();
         WinConsole = null;
 
-        // Needed for Windows Terminal
-        // Clear the alternative screen buffer from the cursor to the
-        // end of the screen.
-        // Note, [3J causes Windows Terminal to wipe out the entire NON ALTERNATIVE
-        // backbuffer! So we need to use [0J instead.
-        Console.Out.Write(EscSeqUtils.CSI_ClearScreen(0));
-
         // Disable alternative screen buffer.
         Console.Out.Write(EscSeqUtils.CSI_RestoreAltBufferWithBackscroll);
     }
@@ -1961,7 +1940,7 @@ internal class WindowsMainLoop : IMainLoopDriver
     {
         while (true)
         {
-            Thread.Sleep(100);
+            Task.Delay(500).Wait();
             _windowSize = _winConsole.GetConsoleBufferWindow(out _);
             if (_windowSize != Size.Empty && _windowSize.Width != _consoleDriver.Cols
                 || _windowSize.Height != _consoleDriver.Rows)

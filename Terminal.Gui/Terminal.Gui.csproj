@@ -32,11 +32,6 @@
     <PackageReference Include="System.Management" Version="7.0.1" />
     <InternalsVisibleTo Include="UnitTests" />
    </ItemGroup>
-  <!-- Uncomment the RestoreSources element to have dotnet restore pull NStack from a local dir for testing -->
-  <PropertyGroup>
-    <!-- See https://stackoverflow.com/a/44463578/297526 -->
-    <!--<RestoreSources>$(RestoreSources);..\..\NStack\NStack\bin\Debug;https://api.nuget.org/v3/index.json</RestoreSources>-->
-  </PropertyGroup>
   <!-- API Documentation -->
   <ItemGroup>
     <None Include="..\docfx\images\logo.png">
