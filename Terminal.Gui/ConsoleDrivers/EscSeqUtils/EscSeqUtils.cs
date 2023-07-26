@@ -226,6 +226,27 @@ public static class EscSeqUtils {
 	/// https://terminalguide.namepad.de/seq/csi_sm/
 	/// </summary>
 	public static string CSI_SetGraphicsRendition (params int [] parameters) => $"{CSI}{string.Join (";", parameters)}m";
+
+	/// <summary>
+	/// ESC[38;5;{id}m - Set foreground color (256 colors)
+	/// </summary>
+	public static string CSI_SetForegroundColor (int id) => $"{CSI}38;5;{id}m";
+
+	/// <summary>
+	/// ESC[48;5;{id}m - Set background color (256 colors)
+	/// </summary>
+	public static string CSI_SetBackgroundColor (int id) => $"{CSI}48;5;{id}m";
+
+	/// <summary>
+	/// ESC[38;2;{r};{g};{b}m	Set foreground color as RGB.
+	/// </summary>
+	public static string CSI_SetForegroundColorRGB (int r, int g, int b) => $"{CSI}38;2;{r};{g};{b}m";
+
+	/// <summary>
+	/// ESC[48;2;{r};{g};{b}m	Set background color as RGB.
+	/// </summary>
+	public static string CSI_SetBackgroundColorRGB (int r, int g, int b) => $"{CSI}48;2;{r};{g};{b}m";
+
 	#endregion
 
 	#region Requests
@@ -241,12 +262,37 @@ public static class EscSeqUtils {
 	public const string CSI_RequestCursorPositionReport_Terminator = "R";
 
 	/// <summary>
-	/// ESC [ 0 c - DA Device Attributes - Report the terminal identity. 
+	/// ESC [ 0 c - Send Device Attributes (Primary DA)
+	///
+	/// https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Application-Program-Command-functions
+	/// https://www.xfree86.org/current/ctlseqs.html
+	/// Windows Terminal v1.17 and below emits “\x1b[?1;0c”, indicating "VT101 with No Options".
+	/// Windows Terminal v1.18+ emits: \x1b[?61;6;7;22;23;24;28;32;42c"
+	/// See https://github.com/microsoft/terminal/pull/14906
+	///
+	/// 61 - The device conforms to level 1 of the character cell display architecture
+	/// (See https://github.com/microsoft/terminal/issues/15693#issuecomment-1633304497)
+	/// 6 = Selective erase
+	/// 7 = Soft fonts
+	/// 22 = Color text
+	/// 23 = Greek character sets
+	/// 24 = Turkish character sets
+	/// 28 = Rectangular area operations
+	/// 32 = Text macros
+	/// 42 = ISO Latin-2 character set
+	/// 
 	/// </summary>
-	public static readonly string CSI_ReportDeviceAttributes = CSI + "0c";
+	public static readonly string CSI_SendDeviceAttributes = CSI + "0c";
 
 	/// <summary>
-	/// The terminal reply to <see cref="CSI_ReportDeviceAttributes"/> : Windows Terminal Will emit “\x1b[?1;0c”, indicating "VT101 with No Options".
+	/// ESC [ > 0 c - Send Device Attributes (Secondary DA)
+	/// Windows Terminal v1.18+ emits: "\x1b[>0;10;1c" (vt100, firmware version 1.0, vt220)
+	/// </summary>
+	public static readonly string CSI_SendDeviceAttributes2 = CSI + ">0c";
+
+	/// <summary>
+	/// The terminator indicating a reply to <see cref="CSI_SendDeviceAttributes"/> or <see cref="CSI_SendDeviceAttributes2"/>
+	/// 
 	/// </summary>
 	public const string CSI_ReportDeviceAttributes_Terminator = "c";
 
@@ -257,7 +303,7 @@ public static class EscSeqUtils {
 	public static readonly string CSI_ReportTerminalSizeInChars = CSI + "18t";
 
 	/// <summary>
-	/// The terminal reply to <see cref="CSI_ReportTerminalSizeInChars"/> : ESC [ 8 ; height ; width t
+	/// The terminator indicating a reply to <see cref="CSI_ReportTerminalSizeInChars"/> : ESC [ 8 ; height ; width t
 	/// </summary>
 	public const string CSI_ReportTerminalSizeInChars_Terminator = "t";
 

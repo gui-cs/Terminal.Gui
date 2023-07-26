@@ -1901,7 +1901,7 @@ namespace Terminal.Gui.ViewsTests {
 			// Now test making the width too small for the MinAcceptableWidth
 			// the Column won't fit so should not be rendered
 			var driver = ((FakeDriver)Application.Driver);
-			driver.UpdateOffScreen ();
+			driver.ClearContents ();
 
 
 			tableView.Bounds = new Rect (0, 0, 9, 5);

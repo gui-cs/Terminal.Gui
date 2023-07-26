@@ -11,6 +11,7 @@ using System.Text.Json;
 using System.Text.Unicode;
 using System.Threading.Tasks;
 using Terminal.Gui;
+using static Terminal.Gui.SpinnerStyle;
 using static Terminal.Gui.TableView;
 
 namespace UICatalog.Scenarios;
@@ -398,16 +399,18 @@ class CharMap : ScrollView {
 			Move (firstColumnX + COLUMN_WIDTH, y);
 			Driver.SetAttribute (GetNormalColor ());
 			for (int col = 0; col < 16; col++) {
+
 				var x = firstColumnX + COLUMN_WIDTH * col + 1;
+
 				Move (x, y);
 				if (cursorRow + ContentOffset.Y + 1 == y && cursorCol + ContentOffset.X + firstColumnX + 1 == x && !HasFocus) {
 					Driver.SetAttribute (GetFocusColor ());
 				}
-
-				if (val + col < 0xffff && char.IsSurrogate ((char)(val + col))) {
-					Driver.AddRune (Rune.ReplacementChar);
+				var scalar = val + col;
+				if (Rune.IsValid (scalar)) {
+					Driver.AddRune (new Rune (scalar));
 				} else {
-					Driver.AddRune (new Rune (val + col));
+					Driver.AddRune ((Rune)'?');
 				}
 
 				if (cursorRow + ContentOffset.Y + 1 == y && cursorCol + ContentOffset.X + firstColumnX + 1 == x && !HasFocus) {
@@ -637,7 +640,6 @@ class UnicodeRange {
 
 			new UnicodeRange (0x1F130, 0x1F149   ,"Squared Latin Capital Letters"),
 			new UnicodeRange (0x12400, 0x1240f   ,"Cuneiform Numbers and Punctuation"),
-			new UnicodeRange (0x1FA00, 0x1FA0f   ,"Chess Symbols"),
 			new UnicodeRange (0x10000, 0x1007F   ,"Linear B Syllabary"),
 			new UnicodeRange (0x10080, 0x100FF   ,"Linear B Ideograms"),
 			new UnicodeRange (0x10100, 0x1013F   ,"Aegean Numbers"),

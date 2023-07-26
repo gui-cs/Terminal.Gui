@@ -118,7 +118,6 @@ internal class NetEvents {
 #if PROCESS_REQUEST
 		bool _neededProcessRequest;
 #endif
-	public bool IsTerminalWithOptions { get; set; }
 	public EscSeqRequests EscSeqRequests { get; } = new EscSeqRequests ();
 
 	public NetEvents (ConsoleDriver consoleDriver)
@@ -183,8 +182,10 @@ internal class NetEvents {
 						_isEscSeq = false;
 						break;
 					} else if (consoleKeyInfo.KeyChar == (char)Key.Esc && _isEscSeq && _cki != null) {
-						ProcessRequestResponse (ref newConsoleKeyInfo, ref key, _cki, ref mod);
-						_cki = null;
+						if (_cki != null) {
+							ProcessRequestResponse (ref newConsoleKeyInfo, ref key, _cki, ref mod);
+							_cki = null;
+						}
 						break;
 					} else {
 						_inputResultQueue.Enqueue (new InputResult {
@@ -206,35 +207,27 @@ internal class NetEvents {
 		void RequestWindowSize ()
 		{
 			while (true) {
-				// HACK: Sleep for 10ms to mitigate high CPU usage (see issue #1502). 10ms was tested to address the problem, but may not be correct.
-				Thread.Sleep (10);
+				// Wait for a while then check if screen has changed sizes
+				Task.Delay (500).Wait ();
+
 				if (_stopTasks) {
 					return;
 				}
-				switch (IsTerminalWithOptions) {
-				case false:
-					int buffHeight, buffWidth;
-					if (((NetDriver)_consoleDriver).IsWinPlatform) {
-						buffHeight = Math.Max (Console.BufferHeight, 0);
-						buffWidth = Math.Max (Console.BufferWidth, 0);
-					} else {
-						buffHeight = _consoleDriver.Rows;
-						buffWidth = _consoleDriver.Cols;
-					}
-					if (EnqueueWindowSizeEvent (
-						Math.Max (Console.WindowHeight, 0),
-						Math.Max (Console.WindowWidth, 0),
-						buffHeight,
-						buffWidth)) {
+				int buffHeight, buffWidth;
+				if (((NetDriver)_consoleDriver).IsWinPlatform) {
+					buffHeight = Math.Max (Console.BufferHeight, 0);
+					buffWidth = Math.Max (Console.BufferWidth, 0);
+				} else {
+					buffHeight = _consoleDriver.Rows;
+					buffWidth = _consoleDriver.Cols;
+				}
+				if (EnqueueWindowSizeEvent (
+					Math.Max (Console.WindowHeight, 0),
+					Math.Max (Console.WindowWidth, 0),
+					buffHeight,
+					buffWidth)) {
 
-						return;
-					}
-					break;
-				case true:
-					//Request the size of the text area in characters.
-					EscSeqRequests.Add (EscSeqUtils.CSI_ReportTerminalSizeInChars_Terminator);
-					Console.Out.Write (EscSeqUtils.CSI_ReportTerminalSizeInChars);
-					break;
+					return;
 				}
 			}
 		}
@@ -432,21 +425,7 @@ internal class NetEvents {
 				return;
 			}
 			break;
-		case EscSeqUtils.CSI_ReportDeviceAttributes_Terminator:
-			try {
-				var parent = EscSeqUtils.GetParentProcess (Process.GetCurrentProcess ());
-				if (parent == null) { Debug.WriteLine ("Not supported!"); }
-			} catch (Exception ex) {
-				Debug.WriteLine (ex.Message);
-			}
-			if (c1Control == "CSI" && values.Length == 2
-				&& values [0] == "1" && values [1] == "0") {
-				// Reports CSI?1;0c ("VT101 with No Options")
-				IsTerminalWithOptions = false;
-			} else {
-				IsTerminalWithOptions = true;
-			}
-			break;
+
 		case EscSeqUtils.CSI_ReportTerminalSizeInChars_Terminator:
 			switch (values [0]) {
 			case EscSeqUtils.CSI_ReportTerminalSizeInChars_ResponseValue:
@@ -603,66 +582,6 @@ internal class NetDriver : ConsoleDriver {
 	{
 	}
 
-	bool [] _dirtyLine;
-
-	public override void AddRune (Rune systemRune)
-	{
-		if (Contents.Length != Rows * Cols * 3) {
-			// BUGBUG: Shouldn't this throw an exception? Doing so to see what happens
-			throw new InvalidOperationException ("Driver contents are wrong size");
-			//return;
-		}
-
-		int runeWidth = -1;
-		var validLocation = IsValidLocation (Col, Row);
-		if (validLocation) {
-			var rune = systemRune.MakePrintable ();
-			runeWidth = rune.GetColumns ();
-			if (runeWidth == 0 && Col > 0) {
-				// This is a combining character, and we are not at the beginning of the line.
-				var combined = new String (new char [] { (char)Contents [Row, Col - 1, 0], (char)rune.Value });
-				var normalized = !combined.IsNormalized () ? combined.Normalize () : combined;
-				Contents [Row, Col - 1, 0] = normalized [0];
-				Contents [Row, Col - 1, 1] = CurrentAttribute.Value;
-				Contents [Row, Col - 1, 2] = 1;
-			} else {
-				Contents [Row, Col, 1] = CurrentAttribute.Value;
-				Contents [Row, Col, 2] = 1;
-
-				if (runeWidth < 2 && Col > 0 && ((Rune)(Contents [Row, Col - 1, 0])).GetColumns () > 1) {
-					// This is a single-width character, and we are not at the beginning of the line.
-					Contents [Row, Col - 1, 0] = Rune.ReplacementChar.Value;
-				} else if (runeWidth < 2 && Col <= Clip.Right - 1 && ((Rune)(Contents [Row, Col, 0])).GetColumns () > 1) {
-					// This is a single-width character, and we are not at the end of the line.
-					Contents [Row, Col + 1, 0] = Rune.ReplacementChar.Value;
-					Contents [Row, Col + 1, 2] = 1;
-				}
-				if (runeWidth > 1 && Col == Clip.Right - 1) {
-					// This is a double-width character, and we are at the end of the line.
-					Contents [Row, Col, 0] = Rune.ReplacementChar.Value;
-				} else {
-					// This is a single-width character, or we are not at the end of the line.
-					Contents [Row, Col, 0] = rune.Value;
-				}
-				_dirtyLine [Row] = true;
-			}
-		}
-
-		if (runeWidth is < 0 or > 0) {
-			Col++;
-		}
-
-		if (runeWidth > 1) {
-			// This is a double-width character, and we are not at the end of the line.
-			if (validLocation && Col < Clip.Right) {
-				Contents [Row, Col, 1] = CurrentAttribute.Value;
-				Contents [Row, Col, 2] = 0;
-			}
-			Col++;
-		}
-
-	}
-
 	public override void End ()
 	{
 		_mainLoop._netEvents.StopTasks ();
@@ -733,7 +652,7 @@ internal class NetDriver : ConsoleDriver {
 		}
 
 		ResizeScreen ();
-		UpdateOffScreen ();
+		ClearContents();
 		CurrentAttribute = MakeColor (Color.White, Color.Black);
 		InitializeColorSchemes ();
 
@@ -795,26 +714,6 @@ internal class NetDriver : ConsoleDriver {
 		Clip = new Rect (0, 0, Cols, Rows);
 	}
 
-	public override void UpdateOffScreen ()
-	{
-		Contents = new int [Rows, Cols, 3];
-		_dirtyLine = new bool [Rows];
-
-		lock (Contents) {
-			// Can raise an exception while is still resizing.
-			try {
-				for (int row = 0; row < Rows; row++) {
-					for (int c = 0; c < Cols; c++) {
-						Contents [row, c, 0] = ' ';
-						Contents [row, c, 1] = new Attribute (Color.White, Color.Black).Value;
-						Contents [row, c, 2] = 0;
-						_dirtyLine [row] = true;
-					}
-				}
-			} catch (IndexOutOfRangeException) { }
-		}
-	}
-
 	public override void Refresh ()
 	{
 		UpdateScreen ();
@@ -823,7 +722,7 @@ internal class NetDriver : ConsoleDriver {
 
 	public override void UpdateScreen ()
 	{
-		if (_winSizeChanging || Console.WindowHeight < 1 || Contents.Length != Rows * Cols * 3
+		if (_winSizeChanging || Console.WindowHeight < 1 || Contents.Length != Rows * Cols
 			|| (!EnableConsoleScrolling && Rows != Console.WindowHeight)
 			|| (EnableConsoleScrolling && Rows != _largestBufferHeight)) {
 			return;
@@ -844,19 +743,19 @@ internal class NetDriver : ConsoleDriver {
 			if (Console.WindowHeight < 1) {
 				return;
 			}
-			if (!_dirtyLine [row]) {
+			if (!_dirtyLines [row]) {
 				continue;
 			}
 			if (!SetCursorPosition (0, row)) {
 				return;
 			}
-			_dirtyLine [row] = false;
+			_dirtyLines [row] = false;
 			output.Clear ();
 			for (var col = left; col < cols; col++) {
 				lastCol = -1;
 				var outputWidth = 0;
 				for (; col < cols; col++) {
-					if (Contents [row, col, 2] == 0) {
+					if (!Contents [row, col].IsDirty) {
 						if (output.Length > 0) {
 							WriteToConsole (output, ref lastCol, row, ref outputWidth);
 						} else if (lastCol == -1) {
@@ -871,7 +770,7 @@ internal class NetDriver : ConsoleDriver {
 						lastCol = col;
 					}
 
-					Attribute attr = new Attribute (Contents [row, col, 1]);
+					Attribute attr = Contents [row, col].Attribute.Value;
 					// Performance: Only send the escape sequence if the attribute has changed.
 					if (attr != redrawAttr) {
 						redrawAttr = attr;
@@ -879,13 +778,13 @@ internal class NetDriver : ConsoleDriver {
 							MapColors ((ConsoleColor)attr.Background, false), MapColors ((ConsoleColor)attr.Foreground, true)));
 					}
 					outputWidth++;
-					var rune = (Rune)Contents [row, col, 0];
+					var rune = (Rune)Contents [row, col].Runes [0];
 					output.Append (rune.ToString ());
 					if (rune.IsSurrogatePair () && rune.GetColumns () < 2) {
 						WriteToConsole (output, ref lastCol, row, ref outputWidth);
 						Console.CursorLeft--;
 					}
-					Contents [row, col, 2] = 0;
+					Contents [row, col].IsDirty = false;
 				}
 			}
 			if (output.Length > 0) {
@@ -972,19 +871,20 @@ internal class NetDriver : ConsoleDriver {
 	#region Cursor Handling
 	bool SetCursorPosition (int col, int row)
 	{
-		if (IsWinPlatform) {
-			// Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.
-			try {
-				Console.SetCursorPosition (col, row);
-				return true;
-			} catch (Exception) {
-				return false;
-			}
-		} else {
-			// TODO: Explain why + 1 is needed (and why we do this for non-Windows).
-			Console.Out.Write (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
+		//if (IsWinPlatform) {
+		// Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.
+		try {
+			Console.SetCursorPosition (col, row);
 			return true;
+		} catch (Exception) {
+			return false;
 		}
+		// BUGBUG: This breaks -usc on WSL; not sure why. But commenting out fixes.
+		//} else {
+		//	// TODO: Explain why + 1 is needed (and why we do this for non-Windows).
+		//	Console.Out.Write (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
+		//	return true;
+		//}
 	}
 
 	CursorVisibility? _cachedCursorVisibility;
@@ -1009,7 +909,7 @@ internal class NetDriver : ConsoleDriver {
 	{
 		_cachedCursorVisibility = visibility;
 		var isVisible = Console.CursorVisible = visibility == CursorVisibility.Default;
-		Console.Out.Write (isVisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
+		//Console.Out.Write (isVisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
 		return isVisible;
 	}
 
@@ -1230,9 +1130,6 @@ internal class NetDriver : ConsoleDriver {
 
 		// Note: .Net API doesn't support keydown/up events and thus any passed keyDown/UpHandlers will be simulated to be called.
 		mLoop.ProcessInput = (e) => ProcessInput (e);
-
-		_mainLoop._netEvents.EscSeqRequests.Add (EscSeqUtils.CSI_ReportDeviceAttributes_Terminator);
-		Console.Out.Write (EscSeqUtils.CSI_ReportDeviceAttributes);
 	}
 
 	volatile bool _winSizeChanging;
@@ -1274,7 +1171,7 @@ internal class NetDriver : ConsoleDriver {
 			Cols = inputEvent.WindowSizeEvent.Size.Width;
 			Rows = _largestBufferHeight;
 			ResizeScreen ();
-			UpdateOffScreen ();
+			ClearContents();
 			_winSizeChanging = false;
 			TerminalResized?.Invoke ();
 			break;

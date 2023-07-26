@@ -17,13 +17,6 @@ internal class WindowsConsole {
 	public const int STD_INPUT_HANDLE = -10;
 	public const int STD_ERROR_HANDLE = -12;
 
-	readonly static char [] SafeCursor = new [] { '\x1b', '7', '\x1b', '[', '0', ';', '0', 'H' };
-	readonly static char [] RestoreCursor = new [] { '\x1b', '8' };
-	readonly static char [] SendTrueColorFg = new [] { '\x1b', '[', '3', '8', ';', '2', ';' };
-	readonly static char [] SendTrueColorBg = new [] { ';', '4', '8', ';', '2', ';' };
-	readonly static char [] SendColorFg = new [] { '\x1b', '[', '3', '8', ';', '5', ';' };
-	readonly static char [] SendColorBg = new [] { ';', '4', '8', ';', '5', ';' };
-
 	IntPtr _inputHandle, _outputHandle;
 	IntPtr _screenBuffer;
 	readonly uint _originalConsoleMode;
@@ -31,7 +24,6 @@ internal class WindowsConsole {
 	CursorVisibility? _currentCursorVisibility = null;
 	CursorVisibility? _pendingCursorVisibility = null;
 	readonly StringBuilder _stringBuilder = new StringBuilder (256 * 1024);
-
 
 	public WindowsConsole ()
 	{
@@ -73,7 +65,8 @@ internal class WindowsConsole {
 	{
 		_stringBuilder.Clear ();
 
-		_stringBuilder.Append (SafeCursor);
+		_stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
+		_stringBuilder.Append (EscSeqUtils.CSI_SetCursorPosition (0, 0));
 
 		Attribute? prev = null;
 		foreach (var info in charInfoBuffer) {
@@ -81,29 +74,25 @@ internal class WindowsConsole {
 
 			if (attr != prev) {
 				prev = attr;
-				
-				_stringBuilder.Append (SendTrueColorFg);
-				_stringBuilder.Append (attr.TrueColorForeground.Red);
-				_stringBuilder.Append (';');
-				_stringBuilder.Append (attr.TrueColorForeground.Green);
-				_stringBuilder.Append (';');
-				_stringBuilder.Append (attr.TrueColorForeground.Blue);
-				_stringBuilder.Append (SendTrueColorBg);
-				_stringBuilder.Append (attr.TrueColorBackground.Red);
-				_stringBuilder.Append (';');
-				_stringBuilder.Append (attr.TrueColorBackground.Green);
-				_stringBuilder.Append (';');
-				_stringBuilder.Append (attr.TrueColorBackground.Blue);
-				_stringBuilder.Append ('m');
+
+				_stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.TrueColorForeground.Value.Red, attr.TrueColorForeground.Value.Green, attr.TrueColorForeground.Value.Blue));
+				_stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.TrueColorBackground.Value.Red, attr.TrueColorBackground.Value.Green, attr.TrueColorBackground.Value.Blue));
 			}
 
-			_stringBuilder.Append (info.Char != '\x1b' ? info.Char : ' ');
+			if (info.Char != '\x1b') {
+				if (!info.Empty) {
+					_stringBuilder.Append (info.Char);
+				} 
+
+			} else {
+				_stringBuilder.Append (' ');
+			}
 		}
 
-		_stringBuilder.Append (RestoreCursor);
+		_stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
 
 		string s = _stringBuilder.ToString ();
-		
+
 		return WriteConsole (_screenBuffer, s, (uint)(s.Length), out uint _, null);
 	}
 
@@ -521,14 +510,16 @@ internal class WindowsConsole {
 		[FieldOffset (2)] public ushort Attributes;
 	}
 
-	public struct ExtendedCharInfo { 
+	public struct ExtendedCharInfo {
 		public char Char { get; set; }
 		public Attribute Attribute { get; set; }
+		public bool Empty { get; set; } // TODO: Temp hack until virutal terminal sequences
 
-		public ExtendedCharInfo(char character,  Attribute attribute)
+		public ExtendedCharInfo (char character, Attribute attribute)
 		{
 			Char = character;
 			Attribute = attribute;
+			Empty = false;
 		}
 	}
 
@@ -778,7 +769,7 @@ internal class WindowsDriver : ConsoleDriver {
 
 	public WindowsConsole WinConsole { get; private set; }
 
-	public override bool SupportsTrueColorOutput => Environment.OSVersion.Version.Build >= 14931;
+	public override bool SupportsTrueColor => Environment.OSVersion.Version.Build >= 14931;
 
 	public WindowsDriver ()
 	{
@@ -816,7 +807,7 @@ internal class WindowsDriver : ConsoleDriver {
 			Cols = newSize.Width;
 			Rows = newSize.Height;
 			ResizeScreen ();
-			UpdateOffScreen ();
+			ClearContents ();
 			TerminalResized.Invoke ();
 		}
 	}
@@ -944,14 +935,14 @@ internal class WindowsDriver : ConsoleDriver {
 			}
 			//System.Diagnostics.Debug.WriteLine ($"{EnableConsoleScrolling},{cols},{rows}");
 			ResizeScreen ();
-			UpdateOffScreen ();
+			ClearContents ();
 			TerminalResized?.Invoke ();
 			break;
 
-			case WindowsConsole.EventType.Focus:
-				break;
-			}
+		case WindowsConsole.EventType.Focus:
+			break;
 		}
+	}
 
 	WindowsConsole.ButtonState? _lastMouseButtonPressed = null;
 	bool _isButtonPressed = false;
@@ -1443,142 +1434,6 @@ internal class WindowsDriver : ConsoleDriver {
 		return base.IsRuneSupported (rune) && rune.IsBmp;
 	}
 
-	public override void AddRune (Rune systemRune)
-	{
-		if (IsValidLocation (Col, Row)) {
-			var rune = systemRune.MakePrintable ();
-
-			if (!rune.IsBmp) {
-				rune = Rune.ReplacementChar;
-			}
-			Contents [Row, Col, 0] = rune.Value;
-			Contents [Row, Col, 1] = CurrentAttribute.Value;
-			_outputBuffer [GetOutputBufferPosition()] = new WindowsConsole.ExtendedCharInfo ((char)rune.Value, CurrentAttribute);
-			WindowsConsole.SmallRect.Update (ref _damageRegion, (short)Col, (short)Row);
-
-			if (Col > 0) {
-				var left = new Rune (Contents [Row, Col - 1, 0]);
-				if (left.GetColumns () > 1) {
-					int prevPosition = Row * Cols + (Col - 1);
-					Contents [Row, Col - 1, 0] = Rune.ReplacementChar.Value;
-					_outputBuffer [prevPosition].Char = (char)Rune.ReplacementChar.Value;
-				}
-			}
-
-			if (rune.GetColumns () > 1 && Col == Clip.Right - 1) {
-				// This is a double-width character, and we are at the end of the line.
-				Contents [Row, Col, 0] = Rune.ReplacementChar.Value;
-				Contents [Row, Col, 1] = CurrentAttribute.Value;
-				Contents [Row, Col, 2] = 1;
-				_outputBuffer [GetOutputBufferPosition ()] = new WindowsConsole.ExtendedCharInfo ((char)Rune.ReplacementChar.Value, CurrentAttribute);
-				Col++;
-			}
-
-			//var extraColumns = 0;
-			//ReadOnlySpan<char> remainingInput = rune.ToString ().AsSpan ();
-			//while (!remainingInput.IsEmpty) {
-			//	// Decode
-			//	OperationStatus opStatus = Rune.DecodeFromUtf16 (remainingInput, out Rune result, out int charsConsumed);
-
-			//	if (opStatus == OperationStatus.DestinationTooSmall || opStatus == OperationStatus.InvalidData) {
-			//		result = Rune.ReplacementChar;
-			//	}
-			//	Contents [Row, Col + extraColumns, 0] = result.Value;
-			//	Contents [Row, Col + extraColumns, 1] = CurrentAttribute;
-
-			//	// Slice and loop again
-			//	remainingInput = remainingInput.Slice (charsConsumed);
-			//	if (runeWidth > 1) {
-			//		extraColumns++;
-			//		Contents [Row, Col + extraColumns, 0] = ' ';
-			//		Contents [Row, Col + extraColumns, 1] = CurrentAttribute;
-			//	}
-			//}
-		}
-		//if (runeWidth == 0 && Col > 0) {
-		//		// This is a combining character, and we are not at the beginning of the line.
-		//		var combined = new String (new char [] { (char)Contents [Row, Col - 1, 0], (char)rune.Value });
-		//		var normalized = !combined.IsNormalized () ? combined.Normalize () : combined;
-		//		Contents [Row, Col - 1, 0] = normalized [0];
-		//		Contents [Row, Col - 1, 1] = CurrentAttribute;
-		//		Contents [Row, Col - 1, 2] = 1;
-		//	} else {
-		//		Contents [Row, Col, 1] = CurrentAttribute;
-		//		Contents [Row, Col, 2] = 1;
-
-		//		if (runeWidth < 2 && Col > 0 && ((Rune)(Contents [Row, Col - 1, 0])).GetColumns () > 1) {
-		//			// This is a single-width character, and we are not at the beginning of the line.
-		//			Contents [Row, Col - 1, 0] = Rune.ReplacementChar.Value;
-
-		//		} else if (runeWidth < 2 && Col <= Clip.Right - 1 && ((Rune)(Contents [Row, Col, 0])).GetColumns () > 1) {
-		//			// This is a single-width character, and we are not at the end of the line.
-		//			Contents [Row, Col + 1, 0] = Rune.ReplacementChar.Value;
-		//			Contents [Row, Col + 1, 2] = 1;
-		//		}
-
-		//		if (runeWidth > 1 && Col == Clip.Right - 1) {
-		//			// This is a double-width character, and we are at the end of the line.
-		//			Contents [Row, Col, 0] = Rune.ReplacementChar.Value;
-		//		} else {
-		//			// This is a single-width character, or we are not at the end of the line.
-		//			// Add the glyph (wide or not)
-		//			//if (rune.IsBmp) {
-		//			//	Contents [Row, Col, 0] = rune.Value;
-		//			//	_outputBuffer [position].Char.UnicodeChar = (char)rune.Value;
-		//			//} else {
-		//			var column = Col;
-		//			ReadOnlySpan<char> remainingInput = rune.ToString ().AsSpan ();
-		//			while (!remainingInput.IsEmpty) {
-		//				// Decode
-		//				OperationStatus opStatus = Rune.DecodeFromUtf16 (remainingInput, out Rune result, out int charsConsumed);
-
-		//				if (opStatus != OperationStatus.Done) {
-		//					result = Rune.ReplacementChar;
-		//				}
-		//				Contents [Row, column, 0] = result.Value;
-		//				Contents [Row, column, 1] = CurrentAttribute;
-
-		//				// Slice and loop again
-		//				remainingInput = remainingInput.Slice (charsConsumed);
-		//				Col = ++column;
-		//			}
-		//			//// BUGBUG: workaround #2610
-		//			//Contents [Row, Col, 0] = (char)Rune.ReplacementChar.Value;
-		//			//_outputBuffer [position].Char.UnicodeChar = (char)Rune.ReplacementChar.Value;
-		//			//}
-		//		}
-		//	}
-		//}
-
-		////Col++;
-		////if (runeWidth is < 0 or > 0) {
-		////	// This is a double-width codepoint, and we are not at the end of the line.
-		////	// Move to the right one and...
-		////	Col++;
-		////}
-
-		////if (runeWidth > 1) {
-		////	// This is a double-width character, and we are not at the end of the line.
-		////	// ...clear the next cell.
-		////	if (validLocation && Col < Clip.Right) {
-		////		Contents [Row, Col, 1] = CurrentAttribute;
-		////		Contents [Row, Col, 2] = 0;
-
-		////		//position = GetOutputBufferPosition ();
-		////		//_outputBuffer [position].Attributes = (ushort)CurrentAttribute;
-
-		////		if (rune.IsBmp) {
-		////		//	// BUGBUG: workaround #2610 - put a null char in the second position
-		////			//Contents [Row, Col, 0] = (char)0x00;
-		////		//	_outputBuffer [position].Char.UnicodeChar = (char)0x00;
-		////		}
-		////	}
-		////	Col++;
-		////}
-		Col++;
-
-	}
-
 	public override void Init (Action terminalResized)
 	{
 		TerminalResized = terminalResized;
@@ -1604,7 +1459,7 @@ internal class WindowsDriver : ConsoleDriver {
 		InitializeColorSchemes ();
 
 		ResizeScreen ();
-		UpdateOffScreen ();
+		ClearContents ();
 	}
 
 	public virtual void ResizeScreen ()
@@ -1621,36 +1476,17 @@ internal class WindowsDriver : ConsoleDriver {
 			Bottom = (short)Rows,
 			Right = (short)Cols
 		};
+		_dirtyLines = new bool [Rows];
+
 		WinConsole.ForceRefreshCursorVisibility ();
 		if (!EnableConsoleScrolling) {
 			Console.Out.Write (EscSeqUtils.CSI_ClearScreen (EscSeqUtils.ClearScreenOptions.CursorToEndOfScreen));
 		}
 	}
 
-	public override void UpdateOffScreen ()
-	{
-		Contents = new int [Rows, Cols, 3];
-		WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
-
-		for (int row = 0; row < Rows; row++) {
-			for (int col = 0; col < Cols; col++) {
-				int position = row * Cols + col;
-				_outputBuffer [position].Attribute = Colors.TopLevel.Normal;
-				_outputBuffer [position].Char = ' ';
-				Contents [row, col, 0] = _outputBuffer [position].Char;
-				Contents [row, col, 1] = _outputBuffer [position].Attribute.Value;
-				Contents [row, col, 2] = 0;
-				WindowsConsole.SmallRect.Update (ref _damageRegion, (short)col, (short)row);
-			}
-		}
-	}
 
 	public override void UpdateScreen ()
 	{
-		//if (_damageRegion.Left == -1) {
-		//	return;
-		//}
-
 		if (!EnableConsoleScrolling) {
 			var windowSize = WinConsole.GetConsoleBufferWindow (out _);
 			if (!windowSize.IsEmpty && (windowSize.Width != Cols || windowSize.Height != Rows)) {
@@ -1662,6 +1498,37 @@ internal class WindowsDriver : ConsoleDriver {
 			X = (short)Clip.Width,
 			Y = (short)Clip.Height
 		};
+
+		for (int row = 0; row < Rows; row++) {
+			if (!_dirtyLines [row]) {
+				continue;
+			}
+			_dirtyLines [row] = false;
+
+			for (int col = 0; col < Cols; col++) {
+				int position = row * Cols + col;
+				_outputBuffer [position].Attribute = Contents [row, col].Attribute.GetValueOrDefault ();
+				if (Contents [row, col].IsDirty == false) {
+					_outputBuffer [position].Empty = true;
+					_outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
+					continue;
+				}
+				_outputBuffer [position].Empty = false;
+				if (Contents [row, col].Runes [0].IsBmp) {
+					_outputBuffer [position].Char = (char)Contents [row, col].Runes [0].Value;
+				} else {
+					//_outputBuffer [position].Empty = true;
+					_outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
+					if (Contents [row, col].Runes [0].GetColumns () > 1 && col + 1 < Cols) {
+						// TODO: This is a hack to deal with non-BMP and wide characters.
+						col++;
+						position = row * Cols + col;
+						_outputBuffer [position].Empty = false;
+						_outputBuffer [position].Char = ' ';
+					}
+				}
+			}
+		}
 
 		WinConsole.WriteToConsole (new Size (Cols, Rows), _outputBuffer, bufferCoords, _damageRegion, UseTrueColor);
 		WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
@@ -1805,7 +1672,7 @@ internal class WindowsDriver : ConsoleDriver {
 		// end of the screen.
 		// Note, [3J causes Windows Terminal to wipe out the entire NON ALTERNATIVE
 		// backbuffer! So we need to use [0J instead.
-		Console.Out.Write (EscSeqUtils.CSI_ClearScreen(0));
+		Console.Out.Write (EscSeqUtils.CSI_ClearScreen (0));
 
 		// Disable alternative screen buffer.
 		Console.Out.Write (EscSeqUtils.CSI_RestoreAltBufferWithBackscroll);

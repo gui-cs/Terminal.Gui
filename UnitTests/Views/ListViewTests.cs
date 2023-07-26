@@ -240,7 +240,7 @@ namespace Terminal.Gui.ViewsTests {
 			{
 				var item = "";
 				for (int i = 0; i < 7; i++) {
-					item += (char)Application.Driver.Contents [line, i, 0];
+					item += Application.Driver.Contents [line, i].Runes[0];
 				}
 				return item;
 			}

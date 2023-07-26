@@ -807,17 +807,6 @@ public static class FakeConsole {
 	//	The System.Console.In property is redirected from some stream other than the
 	//	console.
 	//[SecuritySafeCritical]
-	/// <summary>
-	/// 
-	/// </summary>
-	//public static ConsoleKeyInfo ReadKey (bool intercept)
-	//{
-	//	if (MockKeyPresses.Count > 0) {
-	//		return MockKeyPresses.Pop ();
-	//	} else {
-	//		return new ConsoleKeyInfo ('\0', (ConsoleKey)'\0', false, false, false);
-	//	}
-	//}
 
 	/// <summary>
 	/// A stack of keypresses to return when ReadKey is called.

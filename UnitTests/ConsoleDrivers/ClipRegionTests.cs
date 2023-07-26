@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -90,24 +91,24 @@ namespace Terminal.Gui.DriverTests {
 
 			driver.Move (0, 0);
 			driver.AddRune ('x');
-			Assert.Equal ('x', driver.Contents [0, 0, 0]);
+			Assert.Equal ((Rune)'x', driver.Contents [0, 0].Runes [0]);
 
 			driver.Move (5, 5);
 			driver.AddRune ('x');
-			Assert.Equal ('x', driver.Contents [5, 5, 0]);
+			Assert.Equal ((Rune)'x', driver.Contents [5, 5].Runes [0]);
 
 			// Clear the contents
 			driver.FillRect (new Rect (0, 0, driver.Rows, driver.Cols), ' ');
-			Assert.Equal (' ', driver.Contents [0, 0, 0]);
+			Assert.Equal ((Rune)' ', driver.Contents [0, 0].Runes [0]);
 
 			// Setup the region with a single rectangle, fill screen with 'x'
 			driver.Clip = new Rect (5, 5, 5, 5);
 			driver.FillRect (new Rect (0, 0, driver.Rows, driver.Cols), 'x');
-			Assert.Equal (' ', (char)driver.Contents [0, 0, 0]);
-			Assert.Equal (' ', (char)driver.Contents [4, 9, 0]);
-			Assert.Equal ('x', (char)driver.Contents [5, 5, 0]);
-			Assert.Equal ('x', (char)driver.Contents [9, 9, 0]);
-			Assert.Equal (' ', (char)driver.Contents [10, 10, 0]);
+			Assert.Equal ((Rune)' ', driver.Contents [0, 0].Runes [0]);
+			Assert.Equal ((Rune)' ', driver.Contents [4, 9].Runes [0]);
+			Assert.Equal ((Rune)'x', driver.Contents [5, 5].Runes [0]);
+			Assert.Equal ((Rune)'x', driver.Contents [9, 9].Runes [0]);
+			Assert.Equal ((Rune)' ', driver.Contents [10, 10].Runes [0]);
 
 			Application.Shutdown ();
 		}

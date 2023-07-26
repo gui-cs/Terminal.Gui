@@ -847,12 +847,14 @@ namespace Terminal.Gui.ViewsTests {
 			tv.AddObject (n2);
 			tv.Expand (n1);
 
-			var pink = new Attribute (Color.Magenta, Color.Black);
-			var hotpink = new Attribute (Color.BrightMagenta, Color.Black);
-
 			tv.ColorScheme = new ColorScheme ();
 			tv.LayoutSubviews ();
 			tv.Draw ();
+
+			// create a new color scheme
+			var pink = new Attribute (Color.Magenta, Color.Black);
+			var hotpink = new Attribute (Color.BrightMagenta, Color.Black);
+
 
 			// Normal drawing of the tree view
 			TestHelpers.AssertDriverContentsAre (
@@ -870,7 +872,6 @@ namespace Terminal.Gui.ViewsTests {
 ",
 				new [] { tv.ColorScheme.Normal, pink });
 
-			// create a new color scheme
 			var pinkScheme = new ColorScheme {
 				Normal = pink,
 				Focus = hotpink

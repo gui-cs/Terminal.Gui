@@ -140,6 +140,11 @@ namespace Terminal.Gui {
 		public Rune Collapse { get; set; } = (Rune)'-';
 
 		/// <summary>
+		/// Identical To (U+226)
+		/// </summary>
+		public Rune IdenticalTo { get; set; } = (Rune)'≡';
+
+		/// <summary>
 		/// Apple (non-BMP). Because snek. And because it's an example of a non-BMP surrogate pair. See Issue #2610.
 		/// </summary>
 		public Rune Apple { get; set; } = "🍎".ToRunes () [0]; // nonBMP
@@ -165,6 +170,16 @@ namespace Terminal.Gui {
 		/// File icon.  Defaults to ☰ (Trigram For Heaven)
 		/// </summary>
 		public Rune File { get; set; } = (Rune)'☰';
+
+		/// <summary>
+		/// Horizontal Ellipsis - … U+2026
+		/// </summary>
+		public Rune HorizontalEllipsis { get; set; } = (Rune)'…';
+
+		/// <summary>
+		/// Vertical Four Dots - ⁞ U+205e
+		/// </summary>
+		public Rune VerticalFourDots { get; set; } = (Rune)'⁞';
 
 		#region ----------------- Lines -----------------
 		/// <summary>

@@ -11,6 +11,7 @@ using System.Diagnostics;
 using Attribute = Terminal.Gui.Attribute;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Xunit.Sdk;
+using System.Globalization;
 
 namespace Terminal.Gui;
 // This class enables test functions annotated with the [AutoInitShutdown] attribute to 
@@ -45,9 +46,8 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 		bool fakeClipboardIsSupportedAlwaysTrue = false,
 		ConfigurationManager.ConfigLocations configLocation = ConfigurationManager.ConfigLocations.DefaultOnly)
 	{
-		//Assert.True (autoInit == false && consoleDriverType == null);
-
 		AutoInit = autoInit;
+		CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
 		_driverType = consoleDriverType ?? typeof (FakeDriver);
 		FakeDriver.FakeBehaviors.UseFakeClipboard = useFakeClipboard;
 		FakeDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException = fakeClipboardAlwaysThrowsNotSupportedException;
@@ -55,7 +55,6 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 		ConfigurationManager.Locations = configLocation;
 	}
 
-	static bool _init = false;
 	bool AutoInit { get; }
 	Type _driverType;
 
@@ -64,7 +63,6 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 		Debug.WriteLine ($"Before: {methodUnderTest.Name}");
 		if (AutoInit) {
 			Application.Init ((ConsoleDriver)Activator.CreateInstance (_driverType));
-			_init = true;
 		}
 	}
 	
@@ -73,7 +71,6 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 		Debug.WriteLine ($"After: {methodUnderTest.Name}");
 		if (AutoInit) {
 			Application.Shutdown ();
-			_init = false;
 		}
 	}
 }
@@ -120,7 +117,8 @@ partial class TestHelpers {
 
 		for (int r = 0; r < driver.Rows; r++) {
 			for (int c = 0; c < driver.Cols; c++) {
-				Rune rune = (Rune)contents [r, c, 0];
+				// TODO: Remove hard-coded [0] once combining pairs is supported
+				Rune rune = contents [r, c].Runes[0];
 				if (rune.DecodeSurrogatePair (out char [] spair)) {
 					sb.Append (spair);
 				} else {
@@ -174,7 +172,8 @@ partial class TestHelpers {
 		for (var r = 0; r < driver.Rows; r++) {
 			var runes = new List<Rune> ();
 			for (var c = 0; c < driver.Cols; c++) {
-				var rune = (Rune)contents [r, c, 0];
+				// TODO: Remove hard-coded [0] once combining pairs is supported
+				Rune rune = contents [r, c].Runes [0];
 				if (rune != (Rune)' ') {
 					if (x == -1) {
 						x = c;
@@ -267,7 +266,7 @@ partial class TestHelpers {
 
 			for (var c = 0; c < line.Length; c++) {
 
-				Attribute val = new Attribute( contents [r, c, 1]);
+				var val = contents [r, c].Attribute;
 
 				var match = expectedColors.Where (e => e == val).ToList ();
 				switch (match.Count) {
@@ -305,15 +304,16 @@ partial class TestHelpers {
 
 		for (var r = 0; r < driver.Rows; r++) {
 			for (var c = 0; c < driver.Cols; c++) {
-				var val = new Attribute(contents [r, c, 1]);
+				var val = contents [r, c].Attribute;
+				if (val.HasValue) {
+					colorsUsed.Add (val.Value);
 
-				colorsUsed.Add (val);
+					var match = toFind.FirstOrDefault (e => e == val);
 
-				var match = toFind.FirstOrDefault (e => e == val);
-
-				// need to check twice because Attribute is a struct and therefore cannot be null
-				if (toFind.Any (e => e == val)) {
-					toFind.Remove (match);
+					// need to check twice because Attribute is a struct and therefore cannot be null
+					if (toFind.Any (e => e == val)) {
+						toFind.Remove (match);
+					}
 				}
 			}}
 

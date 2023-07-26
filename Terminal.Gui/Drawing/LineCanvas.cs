@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,7 +74,7 @@ namespace Terminal.Gui {
 			ConfigurationManager.Applied += ConfigurationManager_Applied;
 		}
 
-		private void ConfigurationManager_Applied (object sender, ConfigurationManagerEventArgs e)
+		private void ConfigurationManager_Applied (object? sender, ConfigurationManagerEventArgs e)
 		{
 			foreach (var irr in runeResolvers) {
 				irr.Value.SetGlyphs ();
@@ -142,7 +143,7 @@ namespace Terminal.Gui {
 				_lines.Remove(l);
 			}
 
-			return l;
+			return l!;
 		}
 
 		/// <summary>

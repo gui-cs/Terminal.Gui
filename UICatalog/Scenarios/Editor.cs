@@ -60,12 +60,6 @@ namespace UICatalog.Scenarios {
 
 			CreateDemoFile (_fileName);
 
-			var siCursorPosition = new StatusItem (Key.Null, "", null);
-
-			_textView.UnwrappedCursorPosition += (s, e) => {
-				siCursorPosition.Title = $"Ln {e.Point.Y + 1}, Col {e.Point.X + 1}";
-			};
-
 			LoadFile ();
 
 			Win.Add (_textView);
@@ -119,6 +113,8 @@ namespace UICatalog.Scenarios {
 
 			Application.Top.Add (menu);
 
+			var siCursorPosition = new StatusItem (Key.Null, "", null);
+
 			var statusBar = new StatusBar (new StatusItem [] {
 				siCursorPosition,
 				new StatusItem(Key.F2, "~F2~ Open", () => Open()),
@@ -127,6 +123,12 @@ namespace UICatalog.Scenarios {
 				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 				new StatusItem(Key.Null, $"OS Clipboard IsSupported : {Clipboard.IsSupported}", null)
 			});
+
+			_textView.UnwrappedCursorPosition += (s, e) => {
+				siCursorPosition.Title = $"Ln {e.Point.Y + 1}, Col {e.Point.X + 1}";
+				statusBar.SetNeedsDisplay ();
+			};
+
 			Application.Top.Add (statusBar);
 
 			_scrollBar = new ScrollBarView (_textView, true);

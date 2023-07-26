@@ -570,7 +570,7 @@ namespace Terminal.Gui.ConfigurationTests {
 								""UserDefined"": {
 									""AbNormal"": {
 										""foreground"": ""green"",
-										""background"": ""1234""
+										""background"": ""black""
 									}
 								}
 							}
@@ -660,7 +660,7 @@ namespace Terminal.Gui.ConfigurationTests {
 								""UserDefined"": {
 									""AbNormal"": {
 										""foreground"": ""green"",
-										""background"": ""1234""
+										""background"": ""black""
 									}
 								}
 							}

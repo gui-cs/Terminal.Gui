@@ -3,6 +3,7 @@
 //
 using System.Text;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using static Terminal.Gui.ColorScheme;
 
@@ -20,8 +21,6 @@ namespace Terminal.Gui;
 /// - <see cref="FakeConsole"/> for unit testing.
 /// </remarks>
 public abstract class ConsoleDriver {
-	private bool useTrueColor = false;
-
 	/// <summary>
 	/// Prepare the driver and set the key and mouse events handlers.
 	/// </summary>
@@ -87,7 +86,7 @@ public abstract class ConsoleDriver {
 	/// The format of the array is rows, columns, and 3 values on the last column: Rune, Attribute and Dirty Flag
 	/// </remarks>
 	/// </summary>
-	public int [,,] Contents { get; internal set; }
+	//public int [,,] Contents { get; internal set; }
 
 	///// <summary>
 	///// The contents of the application output. The driver outputs this buffer to the terminal when <see cref="UpdateScreen"/>
@@ -96,7 +95,7 @@ public abstract class ConsoleDriver {
 	///// The format of the array is rows, columns. The first index is the row, the second index is the column.
 	///// </remarks>
 	///// </summary>
-	//public Cell [,] Contents { get; internal set; }
+	public Cell [,] Contents { get; internal set; }
 
 	/// <summary>
 	/// Initializes the driver
@@ -115,23 +114,6 @@ public abstract class ConsoleDriver {
 	/// are used by <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
 	/// </summary>
 	public int Row { get; internal set; }
-
-	/// <summary>
-	/// Gets whether the <see cref="ConsoleDriver"/> supports TrueColor output.
-	/// </summary>
-	public virtual bool SupportsTrueColorOutput { get => false; }
-
-	/// <summary>
-	/// Gets or sets whether the <see cref="ConsoleDriver"/> should use TrueColor output.
-	/// </summary>
-	/// <remarks>
-	/// Can only be enabled if <see cref="ConsoleDriver.SupportsTrueColorOutput"/> is true, indicating
-	/// that the <see cref="ConsoleDriver"/> supports it.
-	/// </remarks>
-	public bool UseTrueColor {
-		get => useTrueColor;
-		set => this.useTrueColor = (value && SupportsTrueColorOutput);
-	}
 
 	/// <summary>
 	/// Updates <see cref="Col"/> and <see cref="Row"/> to the specified column and row in <see cref="Contents"/>.
@@ -179,7 +161,71 @@ public abstract class ConsoleDriver {
 	/// </para>
 	/// </remarks>
 	/// <param name="rune">Rune to add.</param>
-	public abstract void AddRune (Rune rune);
+	public void AddRune (Rune rune)
+	{
+		int runeWidth = -1;
+		var validLocation = IsValidLocation (Col, Row);
+		if (validLocation) {
+			rune = rune.MakePrintable ();
+			runeWidth = rune.GetColumns ();
+			if (runeWidth == 0 && Col > 0) {
+				// This is a combining character, and we are not at the beginning of the line.
+				// TODO: Remove hard-coded [0] once combining pairs is supported
+
+				// Convert Runes to string and concatenate
+				string combined = Contents [Row, Col - 1].Runes [0].ToString () + rune.ToString ();
+
+				// Normalize to Form C (Canonical Composition)
+				string normalized = combined.Normalize (NormalizationForm.FormC);
+
+				Contents [Row, Col - 1].Runes [0] = (Rune)normalized [0];
+				Contents [Row, Col - 1].Attribute = CurrentAttribute;
+				Contents [Row, Col - 1].IsDirty = true;
+			} else {
+				Contents [Row, Col].Attribute = CurrentAttribute;
+				Contents [Row, Col].IsDirty = true;
+
+				if (runeWidth < 2 && Col > 0 && Contents [Row, Col - 1].Runes [0].GetColumns () > 1) {
+					// This is a single-width character, and we are not at the beginning of the line.
+					Contents [Row, Col - 1].Runes [0] = Rune.ReplacementChar;
+					Contents [Row, Col - 1].IsDirty = true;
+				} else if (runeWidth < 2 && Col <= Clip.Right - 1 && Contents [Row, Col].Runes [0].GetColumns () > 1) {
+					// This is a single-width character, and we are not at the end of the line.
+					Contents [Row, Col + 1].Runes [0] = Rune.ReplacementChar;
+					Contents [Row, Col + 1].IsDirty = true;
+				}
+				if (runeWidth > 1 && Col == Clip.Right - 1) {
+					// This is a double-width character, and we are at the end of the line.
+					Contents [Row, Col].Runes [0] = Rune.ReplacementChar;
+				} else {
+					//if (runeWidth == 1) {
+						// This is a single-width character, or we are not at the end of the line.
+						Contents [Row, Col].Runes [0] = rune;
+					//} else {
+						//Contents [Row, Col].Runes [0] = (Rune)'*';
+					//}
+				}
+				_dirtyLines [Row] = true;
+			}
+		}
+
+		if (runeWidth is < 0 or > 0) {
+			Col++;
+		}
+
+		if (runeWidth > 1) {
+			Debug.Assert(runeWidth <= 2);
+			if (validLocation && Col < Clip.Right) {
+				// This is a double-width character, and we are not at the end of the line.
+				// Col now points to the second column of the character. Ensure it doesn't
+				// Get rendered.
+				Contents [Row, Col].IsDirty = false;
+				Contents [Row, Col].Attribute = CurrentAttribute;
+				//Contents [Row, Col].Runes [0] = (Rune)' ';
+			}
+			Col++;
+		}
+	}
 
 	/// <summary>
 	/// Adds the specified <see langword="char"/> to the display at the current cursor position. This method
@@ -262,10 +308,36 @@ public abstract class ConsoleDriver {
 	/// <returns><see langword="true"/> upon success</returns>
 	public abstract bool EnsureCursorVisibility ();
 
+	// As performance is a concern, we keep track of the dirty lines and only refresh those.
+	// This is in addition to the dirty flag on each cell.
+	internal bool [] _dirtyLines;
+
 	/// <summary>
-	/// Clears the <see cref="Contents"/>buffer and the driver buffer.
+	/// Clears the <see cref="Contents"/> of the driver.
 	/// </summary>
-	public abstract void UpdateOffScreen ();
+	public void ClearContents ()
+	{
+		// TODO: This method is really "Clear Contents" now and should not be abstract (or virtual)
+		Contents = new Cell [Rows, Cols];
+		_dirtyLines = new bool [Rows];
+
+		lock (Contents) {
+			// Can raise an exception while is still resizing.
+			try {
+				for (var row = 0; row < Rows; row++) {
+					for (var c = 0; c < Cols; c++) {
+						Contents [row, c] = new Cell () {
+							Runes = new List<Rune> { (Rune)' ' },
+							Attribute = new Attribute (Color.White, Color.Black),
+							IsDirty = true
+						};
+						_dirtyLines [row] = true;
+					}
+				}
+			} catch (IndexOutOfRangeException) { }
+		}
+
+	}
 
 	/// <summary>
 	/// Redraws the physical screen with the contents that have been queued up via any of the printing commands.
@@ -273,6 +345,27 @@ public abstract class ConsoleDriver {
 	public abstract void UpdateScreen ();
 
 	#region Color Handling
+
+
+	/// <summary>
+	/// Gets whether the <see cref="ConsoleDriver"/> supports TrueColor output.
+	/// </summary>
+	public virtual bool SupportsTrueColor { get => false; }
+
+	private bool _useTrueColor = true;
+
+	// TODO: Make this a ConfiguationManager setting on Application
+	/// <summary>
+	/// Gets or sets whether the <see cref="ConsoleDriver"/> should use TrueColor output.
+	/// </summary>
+	/// <remarks>
+	/// Can only be enabled if <see cref="ConsoleDriver.SupportsTrueColor"/> is true, indicating
+	/// that the <see cref="ConsoleDriver"/> supports it.
+	/// </remarks>
+	public bool UseTrueColor {
+		get => _useTrueColor && SupportsTrueColor;
+		set => this._useTrueColor = (value && SupportsTrueColor);
+	}
 
 	Attribute _currentAttribute;
 
