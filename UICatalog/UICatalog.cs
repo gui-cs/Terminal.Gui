@@ -121,8 +121,6 @@ namespace UICatalog {
 			// a Scenario was selected. Otherwise, the user wants to exit UI Catalog.
 			Application.Init ();
 			
-			Application.EnableConsoleScrolling = _enableConsoleScrolling;
-			
 			Application.Run<UICatalogTopLevel> ();
 			Application.Shutdown ();
 
@@ -144,7 +142,6 @@ namespace UICatalog {
 
 		static bool _useSystemConsole = false;
 		static ConsoleDriver.DiagnosticFlags _diagnosticFlags;
-		static bool _enableConsoleScrolling = false;
 		static bool _isFirstRunning = true;
 		static ColorScheme _colorScheme;
 
@@ -154,7 +151,6 @@ namespace UICatalog {
 		/// </summary>
 		class UICatalogTopLevel : Toplevel {
 			public MenuItem miIsMouseDisabled;
-			public MenuItem miEnableConsoleScrolling;
 
 			public FrameView LeftPane;
 			public ListView CategoryListView;
@@ -282,7 +278,6 @@ namespace UICatalog {
 				}
 
 				miIsMouseDisabled.Checked = Application.IsMouseDisabled;
-				miEnableConsoleScrolling.Checked = Application.EnableConsoleScrolling;
 				DriverName.Title = $"Driver: {Driver.GetType ().Name}";
 				OS.Title = $"OS: {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem} {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion}";
 
@@ -319,7 +314,6 @@ namespace UICatalog {
 				List<MenuItem []> menuItems = new List<MenuItem []> ();
 				menuItems.Add (CreateDiagnosticFlagsMenuItems ());
 				menuItems.Add (new MenuItem [] { null });
-				menuItems.Add (CreateEnableConsoleScrollingMenuItems ());
 				menuItems.Add (CreateDisabledEnabledMouseItems ());
 				menuItems.Add (CreateKeybindingsMenuItems ());
 				return menuItems;
@@ -353,22 +347,6 @@ namespace UICatalog {
 
 				menuItems.Add (null);
 				menuItems.Add (item);
-
-				return menuItems.ToArray ();
-			}
-
-			MenuItem [] CreateEnableConsoleScrollingMenuItems ()
-			{
-				List<MenuItem> menuItems = new List<MenuItem> ();
-				miEnableConsoleScrolling = new MenuItem ();
-				miEnableConsoleScrolling.Title = "_Enable Console Scrolling";
-				miEnableConsoleScrolling.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miEnableConsoleScrolling.Title.ToString ().Substring (1, 1) [0];
-				miEnableConsoleScrolling.CheckType |= MenuItemCheckStyle.Checked;
-				miEnableConsoleScrolling.Action += () => {
-					miEnableConsoleScrolling.Checked = !miEnableConsoleScrolling.Checked;
-					Application.EnableConsoleScrolling = miEnableConsoleScrolling.Checked;
-				};
-				menuItems.Add (miEnableConsoleScrolling);
 
 				return menuItems.ToArray ();
 			}
