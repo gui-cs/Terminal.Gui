@@ -62,24 +62,6 @@ public abstract class ConsoleDriver {
 	public IClipboard Clipboard { get; internal set; }
 
 	/// <summary>
-	/// <para>
-	/// If <see langword="false"/> (the default) the height of the Terminal.Gui application (<see cref="Rows"/>) 
-	/// tracks to the height of the visible console view when the console is resized. In this case 
-	/// scrolling in the console will be disabled and all <see cref="Rows"/> will remain visible.
-	/// </para>
-	/// <para>
-	/// If <see langword="true"/> then height of the Terminal.Gui application <see cref="Rows"/> only tracks 
-	/// the height of the visible console view when the console is made larger (the application will only grow in height, never shrink). 
-	/// In this case console scrolling is enabled and the contents (<see cref="Rows"/> high) will scroll
-	/// as the console scrolls. 
-	/// </para>
-	/// </summary>
-	/// <remarks>
-	/// NOTE: This functionaliy is currently broken on Windows Terminal.
-	/// </remarks>
-	public bool EnableConsoleScrolling { get; set; }
-
-	/// <summary>
 	/// The contents of the application output. The driver outputs this buffer to the terminal when <see cref="UpdateScreen"/>
 	/// is called.
 	/// <remarks>

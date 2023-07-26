@@ -54,42 +54,7 @@ namespace Terminal.Gui {
 
 		// For Unit testing - ignores UseSystemConsole
 		internal static bool _forceFakeConsole;
-
-		private static bool? _enableConsoleScrolling;
-		/// <summary>
-		/// The current <see cref="ConsoleDriver.EnableConsoleScrolling"/> used in the terminal.
-		/// </summary>
-		/// <remarks>
-		/// <para>
-		/// If <see langword="false"/> (the default) the height of the Terminal.Gui application (<see cref="ConsoleDriver.Rows"/>) 
-		/// tracks to the height of the visible console view when the console is resized. In this case 
-		/// scrolling in the console will be disabled and all <see cref="ConsoleDriver.Rows"/> will remain visible.
-		/// </para>
-		/// <para>
-		/// If <see langword="true"/> then height of the Terminal.Gui application <see cref="ConsoleDriver.Rows"/> only tracks 
-		/// the height of the visible console view when the console is made larger (the application will only grow in height, never shrink). 
-		/// In this case console scrolling is enabled and the contents (<see cref="ConsoleDriver.Rows"/> high) will scroll
-		/// as the console scrolls. 
-		/// </para>
-		/// This API was previously named 'HeightAsBuffer` but was renamed to make its purpose more clear.
-		/// </remarks>
-		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-		public static bool EnableConsoleScrolling {
-			get {
-				if (Driver == null) {
-					return _enableConsoleScrolling.HasValue && _enableConsoleScrolling.Value;
-				}
-				return Driver.EnableConsoleScrolling;
-			}
-			set {
-				_enableConsoleScrolling = value;
-				if (Driver == null) {
-					return;
-				}
-				Driver.EnableConsoleScrolling = value;
-			}
-		}
-
+		
 		private static List<CultureInfo> _cachedSupportedCultures;
 
 		/// <summary>
@@ -225,7 +190,6 @@ namespace Terminal.Gui {
 			MainLoop = new MainLoop (mainLoopDriver);
 
 			try {
-				Driver.EnableConsoleScrolling = EnableConsoleScrolling;
 				Driver.Init (OnTerminalResized);
 			} catch (InvalidOperationException ex) {
 				// This is a case where the driver is unable to initialize the console.
@@ -291,7 +255,6 @@ namespace Terminal.Gui {
 			NotifyStopRunState = null;
 			_initialized = false;
 			_mouseGrabView = null;
-			_enableConsoleScrolling = false;
 			_lastMouseOwnerView = null;
 
 			// Reset synchronization context to allow the user to run async/await,

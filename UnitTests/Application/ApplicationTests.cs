@@ -24,7 +24,6 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.Null (Application.Driver);
 			Assert.Null (Application.Top);
 			Assert.Null (Application.Current);
-			Assert.False (Application.EnableConsoleScrolling);
 			Assert.Null (Application.MainLoop);
 			Assert.Null (Application.Iteration);
 			Assert.Null (Application.RootMouseEvent);
@@ -36,7 +35,6 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.NotNull (Application.Driver);
 			Assert.NotNull (Application.Top);
 			Assert.NotNull (Application.Current);
-			Assert.False (Application.EnableConsoleScrolling);
 			Assert.NotNull (Application.MainLoop);
 			Assert.Null (Application.Iteration);
 			Assert.Null (Application.RootMouseEvent);

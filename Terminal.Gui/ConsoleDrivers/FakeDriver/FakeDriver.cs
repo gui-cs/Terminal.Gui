@@ -60,7 +60,7 @@ public class FakeDriver : ConsoleDriver {
 			}
 		}
 	}
-	
+
 	public override void End ()
 	{
 		FakeConsole.ResetColor ();
@@ -81,7 +81,7 @@ public class FakeDriver : ConsoleDriver {
 		// Call InitializeColorSchemes before UpdateOffScreen as it references Colors
 		CurrentAttribute = MakeColor (Color.White, Color.Black);
 		InitializeColorSchemes ();
-		ClearContents();
+		ClearContents ();
 	}
 
 
@@ -419,31 +419,24 @@ public class FakeDriver : ConsoleDriver {
 		FakeConsole.SetBufferSize (width, height);
 		Cols = width;
 		Rows = height;
-		if (!EnableConsoleScrolling) {
-			SetWindowSize (width, height);
-		}
+		SetWindowSize (width, height);
 		ProcessResize ();
 	}
 
 	public void SetWindowSize (int width, int height)
 	{
 		FakeConsole.SetWindowSize (width, height);
-		if (!EnableConsoleScrolling) {
-			if (width != Cols || height != Rows) {
-				SetBufferSize (width, height);
-				Cols = width;
-				Rows = height;
-			}
+		if (width != Cols || height != Rows) {
+			SetBufferSize (width, height);
+			Cols = width;
+			Rows = height;
 		}
 		ProcessResize ();
 	}
 
 	public void SetWindowPosition (int left, int top)
 	{
-		if (EnableConsoleScrolling) {
-			Left = Math.Max (Math.Min (left, Cols - FakeConsole.WindowWidth), 0);
-			Top = Math.Max (Math.Min (top, Rows - FakeConsole.WindowHeight), 0);
-		} else if (Left > 0 || Top > 0) {
+		if (Left > 0 || Top > 0) {
 			Left = 0;
 			Top = 0;
 		}
@@ -453,33 +446,22 @@ public class FakeDriver : ConsoleDriver {
 	void ProcessResize ()
 	{
 		ResizeScreen ();
-		ClearContents();
+		ClearContents ();
 		TerminalResized?.Invoke ();
 	}
 
 	public virtual void ResizeScreen ()
 	{
-		if (!EnableConsoleScrolling) {
-			if (FakeConsole.WindowHeight > 0) {
-				// Can raise an exception while is still resizing.
-				try {
-					FakeConsole.CursorTop = 0;
-					FakeConsole.CursorLeft = 0;
-					FakeConsole.WindowTop = 0;
-					FakeConsole.WindowLeft = 0;
-				} catch (System.IO.IOException) {
-					return;
-				} catch (ArgumentOutOfRangeException) {
-					return;
-				}
-			}
-		} else {
+		if (FakeConsole.WindowHeight > 0) {
+			// Can raise an exception while is still resizing.
 			try {
-#pragma warning disable CA1416
-				FakeConsole.WindowLeft = Math.Max (Math.Min (Left, Cols - FakeConsole.WindowWidth), 0);
-				FakeConsole.WindowTop = Math.Max (Math.Min (Top, Rows - FakeConsole.WindowHeight), 0);
-#pragma warning restore CA1416
-			} catch (Exception) {
+				FakeConsole.CursorTop = 0;
+				FakeConsole.CursorLeft = 0;
+				FakeConsole.WindowTop = 0;
+				FakeConsole.WindowLeft = 0;
+			} catch (System.IO.IOException) {
+				return;
+			} catch (ArgumentOutOfRangeException) {
 				return;
 			}
 		}

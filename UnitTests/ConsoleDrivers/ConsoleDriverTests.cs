@@ -223,17 +223,6 @@ namespace Terminal.Gui.DriverTests {
 			Assert.Equal (40, Application.Driver.Rows);
 			Assert.True (wasTerminalResized);
 
-			// MockDriver will still be 120x40
-			wasTerminalResized = false;
-			Application.EnableConsoleScrolling = true;
-			driver.SetWindowSize (40, 20);
-			Assert.Equal (120, Application.Driver.Cols);
-			Assert.Equal (40, Application.Driver.Rows);
-			Assert.Equal (120, Console.BufferWidth);
-			Assert.Equal (40, Console.BufferHeight);
-			Assert.Equal (40, Console.WindowWidth);
-			Assert.Equal (20, Console.WindowHeight);
-			Assert.True (wasTerminalResized);
 
 			Application.Shutdown ();
 		}
