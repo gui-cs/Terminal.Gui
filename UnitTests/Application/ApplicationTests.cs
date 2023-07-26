@@ -56,6 +56,11 @@ namespace Terminal.Gui.ApplicationTests {
 			Application.Shutdown ();
 		}
 
+		public void Fail ()
+		{
+			Assert.Fail("Test to prove stopOnFail is working. During CI/CD no more tests should run after this.");
+		}
+
 		[Fact]
 		public void Init_Shutdown_Cleans_Up ()
 		{
