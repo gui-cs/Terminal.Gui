@@ -2717,7 +2717,7 @@ namespace Terminal.Gui {
 			if (!curWrap) {
 				if (curStart > 0 && curOffset > 0 && valueOffset == 0) {
 					newStart = Math.Max (curStart - curOffset, 0);
-				} else if (curOffset == 0 && valueOffset > 0) {
+				} else if (curStart > 0 && curOffset == 0 && valueOffset > 0) {
 					newStart = Math.Max (Math.Min (curStart + valueOffset, curLength - curSize + 1), 0);
 				}
 
