@@ -3,14 +3,9 @@
 //
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using System.Text;
 using Unix.Terminal;
-using System.Buffers;
-using System.Data;
 
 namespace Terminal.Gui;
 
