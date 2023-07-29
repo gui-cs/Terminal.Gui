@@ -1641,6 +1641,45 @@ namespace Terminal.Gui {
 					if (Char.ToUpperInvariant ((char)mi.Title [p + 1]) == c) {
 						ProcessMenu (i, mi);
 						return true;
+					} else if (mi.Children?.Length > 0) {
+						if (FindAndOpenChildrenMenuByHotkey (kb, mi.Children)) {
+							return true;
+						}
+					}
+				} else if (mi.Children?.Length > 0) {
+					if (FindAndOpenChildrenMenuByHotkey (kb, mi.Children)) {
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+
+		bool FindAndOpenChildrenMenuByHotkey (KeyEvent kb, MenuItem [] children)
+		{
+			var c = ((uint)kb.Key & (uint)Key.CharMask);
+			for (int i = 0; i < children.Length; i++) {
+				var mi = children [i];
+				int p = mi.Title.IndexOf (MenuBar.HotKeySpecifier);
+				if (p != -1 && p + 1 < mi.Title.RuneCount) {
+					if (Char.ToUpperInvariant ((char)mi.Title [p + 1]) == c) {
+						var action = mi.Action;
+						if (action != null) {
+							Application.MainLoop.AddIdle (() => {
+								action ();
+								return false;
+							});
+						}
+						return true;
+					} else if (mi is MenuBarItem menuBarItem && menuBarItem?.Children.Length > 0) {
+						if (FindAndOpenChildrenMenuByHotkey (kb, menuBarItem.Children)) {
+							return true;
+						}
+					}
+				} else if (mi is MenuBarItem menuBarItem && menuBarItem?.Children.Length > 0) {
+					if (FindAndOpenChildrenMenuByHotkey (kb, menuBarItem.Children)) {
+						return true;
 					}
 				}
 			}
