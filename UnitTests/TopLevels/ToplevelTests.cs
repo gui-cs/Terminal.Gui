@@ -1009,7 +1009,7 @@ namespace Terminal.Gui.TopLevelTests {
 			Application.End (rs);
 
 			Assert.True (isEnter);
-			Assert.False (isLeave);
+			Assert.True (isLeave);  // Leave event is now also invoked on Application.End allowing preform same output action
 		}
 
 		[Fact, AutoInitShutdown]
