@@ -253,5 +253,115 @@ namespace Terminal.Gui.TopLevelTests {
 			var exception = Record.Exception (() => win.ProcessHotKey (new KeyEvent (Key.AltMask, new KeyModifiers { Alt = true })));
 			Assert.Null (exception);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void Adding_Center_Window_Child_To_Window_Parent_Always_LayoutSubviews ()
+		{
+			var parentWin = new Window ();
+			View childWin = null;
+
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("Child", new MenuItem [] {
+					new MenuItem ("_Create Child", "", () => {
+						childWin = new Window () {
+							X = Pos.Center (),
+							Y = Pos.Center (),
+							Width = 10,
+							Height = 10
+						};
+						parentWin.Add (childWin);
+					})
+				}),
+				new MenuBarItem ("View", new MenuBarItem [] {
+					new MenuBarItem ("Create", new MenuItem [] {
+						new MenuItem("_TextField", "", () => {
+							var tf = new TextField ("Test") {
+								X = Pos.Center (),
+								Y = Pos.Center (),
+								Width = 5
+							};
+							childWin.Add (tf);
+						})
+					})
+				})
+			});
+
+			parentWin.Add (menu);
+			Application.Top.Add (parentWin);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (20, 20);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────┐
+│ Child  View      │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+└──────────────────┘", output);
+
+			Assert.True (parentWin.ProcessHotKey (new KeyEvent (Key.C | Key.AltMask, new KeyModifiers { Alt = true })));
+			Application.MainLoop.MainIteration ();
+			parentWin.Redraw (parentWin.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────┐
+│ Child  View      │
+│                  │
+│                  │
+│                  │
+│    ┌────────┐    │
+│    │        │    │
+│    │        │    │
+│    │        │    │
+│    │        │    │
+│    │        │    │
+│    │        │    │
+│    │        │    │
+│    │        │    │
+│    └────────┘    │
+│                  │
+│                  │
+│                  │
+│                  │
+└──────────────────┘", output);
+
+			Assert.True (parentWin.ProcessHotKey (new KeyEvent (Key.T | Key.AltMask, new KeyModifiers { Alt = true })));
+			Application.MainLoop.MainIteration ();
+			childWin.Redraw (childWin.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────┐
+│ Child  View      │
+│                  │
+│                  │
+│                  │
+│    ┌────────┐    │
+│    │        │    │
+│    │        │    │
+│    │        │    │
+│    │ Test   │    │
+│    │        │    │
+│    │        │    │
+│    │        │    │
+│    │        │    │
+│    └────────┘    │
+│                  │
+│                  │
+│                  │
+│                  │
+└──────────────────┘", output);
+		}
 	}
 }
