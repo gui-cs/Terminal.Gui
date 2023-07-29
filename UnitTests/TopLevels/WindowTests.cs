@@ -238,7 +238,7 @@ namespace Terminal.Gui.TopLevelTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void Activating_MenuBar_By_F9_Does_Not_Throw ()
+		public void Activating_MenuBar_By_Alt_Key_Does_Not_Throw ()
 		{
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("Child", new MenuItem [] {
