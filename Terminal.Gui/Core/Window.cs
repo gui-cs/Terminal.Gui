@@ -291,6 +291,9 @@ namespace Terminal.Gui {
 			if (!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded) {
 				Driver.SetAttribute (GetNormalColor ());
 				Clear ();
+				if (LayoutNeeded) {
+					LayoutSubviews ();
+				}
 				contentView.SetNeedsDisplay ();
 			}
 			var savedClip = contentView.ClipToBounds ();
