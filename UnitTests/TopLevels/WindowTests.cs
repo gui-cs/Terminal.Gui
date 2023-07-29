@@ -253,8 +253,5 @@ namespace Terminal.Gui.TopLevelTests {
 			var exception = Record.Exception (() => win.ProcessHotKey (new KeyEvent (Key.AltMask, new KeyModifiers { Alt = true })));
 			Assert.Null (exception);
 		}
-
-
-		}
 	}
 }
