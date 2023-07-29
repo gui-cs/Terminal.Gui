@@ -5,19 +5,26 @@ All files required to build the **Terminal.Gui** library (and NuGet package).
 ## Project Folder Structure
 
 - `Terminal.Gui.sln` - The Visual Studio solution
-- `Core/` - Source files for all types that comprise the core building blocks of **Terminal-Gui** 
-    - `Application` - A `static` class that provides the base 'application driver'. Given it defines a **Terminal.Gui** application it is both logically and literally (because `static`) a singleton. It has direct dependencies on `MainLoop`, `Events.cs` `NetDriver`, `CursesDriver`, `WindowsDriver`, `Responder`, `View`, and `TopLevel` (and nothing else).
+- `Core/` - Source files for all types that comprise the core building blocks of **Terminal-Gui**
+    - `Application` - A `static` class that provides the base 'application driver'. Given it defines a **Terminal.Gui**
+      application it is both logically and literally (because `static`) a singleton. It has direct dependencies
+      on `MainLoop`, `Events.cs` `NetDriver`, `CursesDriver`, `WindowsDriver`, `Responder`, `View`, and `TopLevel` (and
+      nothing else).
     - `MainLoop` - Defines `IMainLoopDriver` and implements the `MainLoop` class.
     - `ConsoleDriver` - Definition for the Console Driver API.
-    - `Events.cs` - Defines keyboard and mouse-related structs & classes. 
+    - `Events.cs` - Defines keyboard and mouse-related structs & classes.
     - `PosDim.cs` - Implements *Computed Layout* system. These classes have deep dependencies on `View`.
     - `Responder` - Base class for the windowing class hierarchy. Implements support for keyboard & mouse input.
     - `View` - Derived from `Responder`, the base class for non-modal visual elements such as controls.
-    - `Toplevel` - Derived from `View`, the base class for modal visual elements such as top-level windows and dialogs. Supports the concept of `MenuBar` and `StatusBar`.
+    - `Toplevel` - Derived from `View`, the base class for modal visual elements such as top-level windows and dialogs.
+      Supports the concept of `MenuBar` and `StatusBar`.
     - `Window` - Derived from `TopLevel`; implements toplevel views with a visible frame and Title.
-- `Types/` - A folder (not namespace) containing implementations of `Point`, `Rect`, and `Size` which are ancient versions of the modern `System.Drawing.Point`, `System.Drawing.Size`, and `System.Drawning.Rectangle`.
-- `ConsoleDrivers/` - Source files for the three `ConsoleDriver`-based drivers: .NET: `NetDriver`, Unix & Mac: `UnixDriver`, and Windows: `WindowsDriver`.
-- `Views/` - A folder (not namespace) containing the source for all built-in classes that drive from `View` (non-modals). 
+- `Types/` - A folder (not namespace) containing implementations of `Point`, `Rect`, and `Size` which are ancient
+  versions of the modern `System.Drawing.Point`, `System.Drawing.Size`, and `System.Drawning.Rectangle`.
+- `ConsoleDrivers/` - Source files for the three `ConsoleDriver`-based drivers: .NET: `NetDriver`, Unix &
+  Mac: `UnixDriver`, and Windows: `WindowsDriver`.
+- `Views/` - A folder (not namespace) containing the source for all built-in classes that drive from `View` (
+  non-modals).
 - `Windows/` - A folder (not namespace) containing the source of all built-in classes that derive from `Window`.
 
 ## Version numbers
@@ -31,9 +38,10 @@ dotnet tool install --global GitVersion.Tool
 dotnet-gitversion
 ```
 
-The project version (the nuget package and in `Terminal.Gui.dll`) is determined from the latest `git tag`. 
+The project version (the nuget package and in `Terminal.Gui.dll`) is determined from the latest `git tag`.
 
-The format of version numbers is `vmajor.minor.patch.build.height` and follows the [Semantic Versioning](https://semver.org/) rules.
+The format of version numbers is `vmajor.minor.patch.build.height` and follows
+the [Semantic Versioning](https://semver.org/) rules.
 
 To define a new version (e.g. with a higher `major`, `minor`, `patch`, or `build` value) tag a commit using `git tag`:
 
@@ -49,7 +57,7 @@ Doing so will update the `.csproj` files in your branch with version info, which
 
 ## Publishing a Release of Terminal.Gui
 
-First, use the [Semantic Versioning](https://semver.org/) rules.to determine the new verison number. 
+First, use the [Semantic Versioning](https://semver.org/) rules.to determine the new verison number.
 
 Given a version number MAJOR.MINOR.PATCH, increment the:
 
@@ -59,11 +67,12 @@ Given a version number MAJOR.MINOR.PATCH, increment the:
 
 Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
 
-To release a new version (e.g. with a higher `major`, `minor`, or `patch` value) tag a commit using `git tag` and then push that tag directly to the `main` branch on `github.com/gui-cs/Terminal.Gui` (`upstream`).
+To release a new version (e.g. with a higher `major`, `minor`, or `patch` value) tag a commit using `git tag` and then
+push that tag directly to the `main` branch on `github.com/gui-cs/Terminal.Gui` (`upstream`).
 
 The `tag` must be of the form `v<major>.<minor>.<patch>`, e.g. `v2.3.4`.
 
-`patch` can indicate pre-release or not (e.g. `pre`, `beta`, `rc`, etc...). 
+`patch` can indicate pre-release or not (e.g. `pre`, `beta`, `rc`, etc...).
 
 ### 1) Verify the `develop` branch is ready for release
 
@@ -122,7 +131,8 @@ git push --atomic upstream main v2.3.4
 
 https://github.com/gui-cs/Terminal.Gui/actions
 
-### 9) Check Nuget to see the new package version (wait a few minutes) 
+### 9) Check Nuget to see the new package version (wait a few minutes)
+
 https://www.nuget.org/packages/Terminal.Gui
 
 ### 10) Add a new Release in Github: https://github.com/gui-cs/Terminal.Gui/releases
