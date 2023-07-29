@@ -11,6 +11,7 @@ using Attribute = Terminal.Gui.Attribute;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using System.Diagnostics;
+using System.Globalization;
 
 
 // This class enables test functions annotated with the [AutoInitShutdown] attribute to 
@@ -27,15 +28,15 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 	/// </summary>
 	/// <param name="autoInit">If true, Application.Init will be called Before the test runs.</param>
 	/// <param name="autoShutdown">If true, Application.Shutdown will be called After the test runs.</param>
-	/// <param name="consoleDriverType">Determins which ConsoleDriver (FakeDriver, WindowsDriver, 
-	/// CursesDriver, NetDriver) will be used when Appliation.Init is called. If null FakeDriver will be used.
+	/// <param name="consoleDriverType">Determines which ConsoleDriver (FakeDriver, WindowsDriver, 
+	/// CursesDriver, NetDriver) will be used when Application.Init is called. If null FakeDriver will be used.
 	/// Only valid if <paramref name="autoInit"/> is true.</param>
 	/// <param name="useFakeClipboard">If true, will force the use of <see cref="FakeDriver.FakeClipboard"/>. 
-	/// Only valid if <see cref="consoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.</param>
+	/// Only valid if <see cref="ConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.</param>
 	/// <param name="fakeClipboardAlwaysThrowsNotSupportedException">Only valid if <paramref name="autoInit"/> is true.
-	/// Only valid if <see cref="consoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.</param>
+	/// Only valid if <see cref="ConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.</param>
 	/// <param name="fakeClipboardIsSupportedAlwaysTrue">Only valid if <paramref name="autoInit"/> is true.
-	/// Only valid if <see cref="consoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.</param>
+	/// Only valid if <see cref="ConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.</param>
 	public AutoInitShutdownAttribute (bool autoInit = true, bool autoShutdown = true,
 		Type consoleDriverType = null,
 		bool useFakeClipboard = false,
@@ -44,6 +45,7 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 	{
 		//Assert.True (autoInit == false && consoleDriverType == null);
 
+		CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
 		AutoInit = autoInit;
 		AutoShutdown = autoShutdown;
 		DriverType = consoleDriverType ?? typeof (FakeDriver);
