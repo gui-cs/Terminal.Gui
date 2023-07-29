@@ -235,6 +235,25 @@ namespace Terminal.Gui.TopLevelTests {
 │└────────────────┘│
 │ ^Q Quit │ ^O Open│
 └──────────────────┘", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Activating_MenuBar_By_F9_Does_Not_Throw ()
+		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("Child", new MenuItem [] {
+					new MenuItem ("_Create Child", "", null)
+				})
+			});
+			var win = new Window ();
+			win.Add (menu);
+			Application.Top.Add (win);
+			Application.Begin (Application.Top);
+
+			var exception = Record.Exception (() => win.ProcessHotKey (new KeyEvent (Key.AltMask, new KeyModifiers { Alt = true })));
+			Assert.Null (exception);
+		}
+
 
 		}
 	}
