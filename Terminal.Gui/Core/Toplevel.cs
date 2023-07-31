@@ -620,10 +620,10 @@ namespace Terminal.Gui {
 			//System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
 			bool m = false, s = false;
 			mb = null; sb = null;
-			if (!(top is Window) && (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)) {
+			if (!(top is Window && top == Application.Top) && (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)) {
 				m = Application.Top.MenuBar?.Visible == true;
 				mb = Application.Top.MenuBar;
-			} else if (!(top is Window)) {
+			} else if (!(top is Window && top == Application.Top)) {
 				var t = top.SuperView;
 				while (!(t is Toplevel)) {
 					t = t.SuperView;
@@ -637,10 +637,10 @@ namespace Terminal.Gui {
 				l = 0;
 			}
 			ny = Math.Max (y, l);
-			if (!(top is Window) && (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)) {
+			if (!(top is Window && top == Application.Top) && (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)) {
 				s = Application.Top.StatusBar?.Visible == true;
 				sb = Application.Top.StatusBar;
-			} else if (!(top is Window)) {
+			} else if (!(top is Window && top == Application.Top)) {
 				var t = top.SuperView;
 				while (!(t is Toplevel)) {
 					t = t.SuperView;
