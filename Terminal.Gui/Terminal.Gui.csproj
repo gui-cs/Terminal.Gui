@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>portable</DebugType>
   </PropertyGroup>
@@ -10,10 +10,10 @@
     <!-- Version numbers are automatically updated by gitversion when a release is released -->
     <!-- In the source tree the version will always be 1.0 for all projects. -->
     <!-- Do not modify these. Do NOT commit after manually running `dotnet-gitversion /updateprojectfiles` -->
-    <AssemblyVersion>1.0</AssemblyVersion>
-    <FileVersion>1.0</FileVersion>
-    <Version>1.0</Version>
-    <InformationalVersion>1.0</InformationalVersion>
+    <AssemblyVersion>1.13.7.0</AssemblyVersion>
+    <FileVersion>1.13.7.0</FileVersion>
+    <InformationalVersion>1.13.7-v1-build-local-nuget.59+Branch.v1-build-local-nuget.Sha.f0d3f664fb6beeb7dc221beae9608f3d4c2e98b5</InformationalVersion>
+    <Version>1.13.7-v1-build-local-n0059</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NStack.Core" Version="1.0.7" />

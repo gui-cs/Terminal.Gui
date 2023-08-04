@@ -1,0 +1,26 @@
+next-version: 1.13.7
+mode: MainLine
+tag-prefix: '[vV]'
+branches:
+  develop:
+    tag: pre
+    increment: Patch
+  main:
+    tag: rc
+    increment: Patch
+    source-branches:
+    - develop
+    - release
+  feature:
+    tag: useBranchName
+    regex: ^features?[/-]
+    source-branches:
+    - develop
+    - main
+    - release
+    - feature
+    - support
+    - hotfix
+  pull-request:
+    tag: PullRequest
+    increment: Inherit
