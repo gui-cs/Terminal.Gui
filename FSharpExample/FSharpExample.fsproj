@@ -4,8 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <AssemblyVersion>1.13.7.0</AssemblyVersion>
     <FileVersion>1.13.7.0</FileVersion>
-    <InformationalVersion>1.13.7-v1-build-local-nuget.59+Branch.v1-build-local-nuget.Sha.f0d3f664fb6beeb7dc221beae9608f3d4c2e98b5</InformationalVersion>
-    <Version>1.13.7-v1-build-local-n0059</Version>
+    <InformationalVersion>1.13.7-pre.60+Branch.develop.Sha.9b94dfcbb0adb042177b602e7fca383fb1600b57</InformationalVersion>
+    <Version>1.13.7-pre0060</Version>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Program.fs" />
