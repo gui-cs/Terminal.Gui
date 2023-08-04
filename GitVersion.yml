@@ -1,9 +1,7 @@
-mode: Mainline
+mode: ContinuousDeployment
 tag-prefix: '[vV]'
-next-version: 1.13.7
 branches:
   develop:
-    mode: ContinuousDelivery
     tag: pre
   main:
     tag: rc
