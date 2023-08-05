@@ -188,8 +188,8 @@ namespace Terminal.Gui.DriverTests {
 
 			Application.Shutdown ();
 		}
-		
-		
+
+
 		[Fact, AutoInitShutdown]
 		public void AddRune_On_Clip_Left_Or_Right_Replace_Previous_Or_Next_Wide_Rune_With_Space ()
 		{
@@ -311,7 +311,7 @@ namespace Terminal.Gui.DriverTests {
 		}
 
 		private static object packetLock = new object ();
-		
+
 		/// <summary>
 		/// Sometimes when using remote tools EventKeyRecord sends 'virtual keystrokes'.
 		/// These are indicated with the wVirtualKeyCode of 231. When we see this code
@@ -319,46 +319,48 @@ namespace Terminal.Gui.DriverTests {
 		/// when telling the rest of the framework what button was pressed. For full details
 		/// see: https://github.com/gui-cs/Terminal.Gui/issues/2008
 		/// </summary>
-		[Theory, AutoInitShutdown]
+		[Theory]
 		[ClassData (typeof (PacketTest))]
 		public void TestVKPacket (uint unicodeCharacter, bool shift, bool alt, bool control, uint initialVirtualKey, uint initialScanCode, Key expectedRemapping, uint expectedVirtualKey, uint expectedScanCode)
 		{
-			var modifiers = new ConsoleModifiers ();
-			if (shift) modifiers |= ConsoleModifiers.Shift;
-			if (alt) modifiers |= ConsoleModifiers.Alt;
-			if (control) modifiers |= ConsoleModifiers.Control;
-			var mappedConsoleKey = ConsoleKeyMapping.GetConsoleKeyFromKey (unicodeCharacter, modifiers, out uint scanCode, out uint outputChar);
-
-			if ((scanCode > 0 || mappedConsoleKey == 0) && mappedConsoleKey == initialVirtualKey) Assert.Equal (mappedConsoleKey, initialVirtualKey);
-			else Assert.Equal (mappedConsoleKey, outputChar < 0xff ? outputChar & 0xff | 0xff << 8 : outputChar);
-			Assert.Equal (scanCode, initialScanCode);
-
-			var keyChar = ConsoleKeyMapping.GetKeyCharFromConsoleKey (mappedConsoleKey, modifiers, out uint consoleKey, out scanCode);
-
-			//if (scanCode > 0 && consoleKey == keyChar && consoleKey > 48 && consoleKey > 57 && consoleKey < 65 && consoleKey > 91) {
-			if (scanCode > 0 && keyChar == 0 && consoleKey == mappedConsoleKey) Assert.Equal (0, (double)keyChar);
-			else Assert.Equal (keyChar, unicodeCharacter);
-			Assert.Equal (consoleKey, expectedVirtualKey);
-			Assert.Equal (scanCode, expectedScanCode);
-
-			var top = Application.Top;
-
-			top.KeyPress += (e) => {
-				var after = ShortcutHelper.GetModifiersKey (e.KeyEvent);
-				Assert.Equal (expectedRemapping, after);
-				e.Handled = true;
-				Application.RequestStop ();
-			};
-
-			var iterations = -1;
-
-			Application.Iteration += () => {
-				iterations++;
-				if (iterations == 0) Application.Driver.SendKeys ((char)mappedConsoleKey, ConsoleKey.Packet, shift, alt, control);
-			};
-
-
 			lock (packetLock) {
+				Application.ForceFakeConsole = true;
+				Application.Init ();
+
+				var modifiers = new ConsoleModifiers ();
+				if (shift) modifiers |= ConsoleModifiers.Shift;
+				if (alt) modifiers |= ConsoleModifiers.Alt;
+				if (control) modifiers |= ConsoleModifiers.Control;
+				var mappedConsoleKey = ConsoleKeyMapping.GetConsoleKeyFromKey (unicodeCharacter, modifiers, out uint scanCode, out uint outputChar);
+
+				if ((scanCode > 0 || mappedConsoleKey == 0) && mappedConsoleKey == initialVirtualKey) Assert.Equal (mappedConsoleKey, initialVirtualKey);
+				else Assert.Equal (mappedConsoleKey, outputChar < 0xff ? outputChar & 0xff | 0xff << 8 : outputChar);
+				Assert.Equal (scanCode, initialScanCode);
+
+				var keyChar = ConsoleKeyMapping.GetKeyCharFromConsoleKey (mappedConsoleKey, modifiers, out uint consoleKey, out scanCode);
+
+				//if (scanCode > 0 && consoleKey == keyChar && consoleKey > 48 && consoleKey > 57 && consoleKey < 65 && consoleKey > 91) {
+				if (scanCode > 0 && keyChar == 0 && consoleKey == mappedConsoleKey) Assert.Equal (0, (double)keyChar);
+				else Assert.Equal (keyChar, unicodeCharacter);
+				Assert.Equal (consoleKey, expectedVirtualKey);
+				Assert.Equal (scanCode, expectedScanCode);
+
+				var top = Application.Top;
+
+				top.KeyPress += (e) => {
+					var after = ShortcutHelper.GetModifiersKey (e.KeyEvent);
+					Assert.Equal (expectedRemapping, after);
+					e.Handled = true;
+					Application.RequestStop ();
+				};
+
+				var iterations = -1;
+
+				Application.Iteration += () => {
+					iterations++;
+					if (iterations == 0) Application.Driver.SendKeys ((char)mappedConsoleKey, ConsoleKey.Packet, shift, alt, control);
+				};
+
 				Application.Run ();
 				Application.Shutdown ();
 			}
