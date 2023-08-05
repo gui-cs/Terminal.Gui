@@ -142,7 +142,6 @@ namespace Terminal.Gui {
 			Curses.raw ();
 			Curses.noecho ();
 			Curses.refresh ();
-			ProcessWinChange ();
 		}
 
 		private void ProcessWinChange ()
@@ -338,7 +337,13 @@ namespace Terminal.Gui {
 
 			if (code == Curses.KEY_CODE_YES) {
 				if (wch == Curses.KeyResize) {
-					ProcessWinChange ();
+					while (code == Curses.KEY_CODE_YES && wch == Curses.KeyResize) {
+						ProcessWinChange ();
+						code = Curses.get_wch (out wch);
+					}
+					if (wch == 0) {
+						return;
+					}
 				}
 				if (wch == Curses.KeyMouse) {
 					int wch2 = wch;
@@ -529,7 +534,7 @@ namespace Terminal.Gui {
 			});
 
 			mLoop.WinChanged += () => {
-				ProcessWinChange ();
+				ProcessInput ();
 			};
 		}
 
