@@ -1,0 +1,27 @@
+mode: ContinuousDeployment
+tag-prefix: '[vV]'
+branches:
+  develop:
+    tag: pre
+  main:
+    tag: rc
+    increment: Patch
+    source-branches:
+    - develop
+    - release
+  feature:
+    tag: useBranchName
+    regex: ^features?[/-]
+    source-branches:
+    - develop
+    - main
+    - release
+    - feature
+    - support
+    - hotfix
+  pull-request:
+    tag: PullRequest
+    increment: Inherit
+ignore:
+  sha: []
+merge-message-formats: {}
