@@ -40,17 +40,13 @@ internal class CursesDriver : ConsoleDriver {
 
 	public override void Refresh ()
 	{
-		Curses.raw ();
-		Curses.noecho ();
-		Curses.refresh ();
-		ProcessWinChange ();
 		UpdateScreen ();
+		UpdateCursor ();
 	}
 
 	private void ProcessWinChange ()
 	{
 		if (Curses.CheckWinChange ()) {
-			ResizeScreen ();
 			ClearContents ();
 			TerminalResized?.Invoke ();
 		}
@@ -179,7 +175,14 @@ internal class CursesDriver : ConsoleDriver {
 
 	#endregion
 
-	public override void UpdateCursor () => Refresh ();
+	public override void UpdateCursor ()
+	{
+		EnsureCursorVisibility ();
+
+		if (Col >= 0 && Col < Cols && Row >= 0 && Row < Rows) {
+			Curses.move (Row, Col);
+		}
+	}
 
 	public override void End ()
 	{
@@ -198,40 +201,67 @@ internal class CursesDriver : ConsoleDriver {
 			_dirtyLines [row] = false;
 
 			for (int col = 0; col < Cols; col++) {
-				//Curses.mvaddch (row, col, '+');
-
 				if (Contents [row, col].IsDirty == false) {
-					//Curses.mvaddch (row, col, (char)Rune.ReplacementChar.Value);
 					continue;
 				}
 				Curses.attrset (Contents [row, col].Attribute.GetValueOrDefault ().Value);
 
 				if (Contents [row, col].Runes [0].IsBmp) {
-					Curses.mvaddch (row, col, Contents [row, col].Runes [0].Value);
+					//_outputBuffer [position].Char = (char)Contents [row, col].Runes [0].Value;
+					Curses.mvaddwstr (row, col, Contents [row, col].Runes [0].ToString());
+					if (Contents [row, col].Runes [0].GetColumns () > 1 && col + 1 < Cols) {
+						col++;
+						//Curses.mvaddwstr (row, col, ' ');
+					}
+
 				} else {
-					Curses.mvaddch (row, col, Contents [row, col].Runes [0].Value);
+					//_outputBuffer [position].Empty = true;
 					//_outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
+					Curses.mvaddch (row, col, '#');
 					if (Contents [row, col].Runes [0].GetColumns () > 1 && col + 1 < Cols) {
 						// TODO: This is a hack to deal with non-BMP and wide characters.
 						//col++;
-						//_outputBuffer [position].Empty = false;
-						//_outputBuffer [position].Char = ' ';
-						//Curses.mvaddch (row, col, '*');
+						Curses.mvaddch (row, ++col, '*');
 					}
 				}
-
-				if (Contents [row, col].Runes [0].IsSurrogatePair () && Contents [row, col].Runes [0].GetColumns () < 2) {
-					col--;
-				}
-
-				//if (col < Cols && Contents [row, col].Runes [0].GetColumns () > 1) {
-				//	col++;
-				//	Curses.mvaddch (row, col, '=');
-				//}
 			}
-		}
 
-		_window.redrawwin ();
+			//for (int col = 0; col < Cols; col++) {
+			//	//Curses.mvaddch (row, col, '+');
+
+			//	if (Contents [row, col].IsDirty == false) {
+			//		//Curses.mvaddch (row, col, (char)Rune.ReplacementChar.Value);
+			//		continue;
+			//	}
+
+			//	Curses.attrset (Contents [row, col].Attribute.GetValueOrDefault ().Value);
+
+			//	if (Contents [row, col].Runes [0].IsBmp) {
+			//		Curses.mvaddch (row, col, Contents [row, col].Runes [0].Value);
+			//	} else {
+			//		//_outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
+			//		if (Contents [row, col].Runes [0].GetColumns () > 1 && col + 1 < Cols) {
+			//			// TODO: This is a hack to deal with non-BMP and wide characters.
+			//			//col++;
+			//			//_outputBuffer [position].Empty = false;
+			//			//_outputBuffer [position].Char = ' ';
+			//			//Curses.mvaddch (row, col, '*');
+			//		}
+			//	}
+
+			//	if (Contents [row, col].Runes [0].IsSurrogatePair () && Contents [row, col].Runes [0].GetColumns () < 2) {
+			//		col--;
+			//	}
+
+			//	//if (col < Cols && Contents [row, col].Runes [0].GetColumns () > 1) {
+			//	//	col++;
+			//	//	Curses.mvaddch (row, col, '=');
+			//	//}
+			//}
+		}
+		Curses.move (Row, Col);
+
+		_window.wrefresh ();
 	}
 
 	public Curses.Window _window;
@@ -596,33 +626,27 @@ internal class CursesDriver : ConsoleDriver {
 			}
 		}
 
+		if (!Curses.HasColors) {
+			throw new InvalidOperationException ("V2 - This should never happen. File an Issue if it does.");
+		}
+
 		Curses.raw ();
 		Curses.noecho ();
 
 		Curses.Window.Standard.keypad (true);
+
 		TerminalResized = terminalResized;
-		StartReportingMouseMoves ();
 
+		Curses.StartColor ();
+		Curses.UseDefaultColors ();
 		CurrentAttribute = MakeColor (Color.White, Color.Black);
+		InitializeColorSchemes ();
 
-		if (Curses.HasColors) {
-			Curses.StartColor ();
-			Curses.UseDefaultColors ();
-
-			InitializeColorSchemes ();
-		} else {
-			throw new InvalidOperationException ("V2 - This should never happen. File an Issue if it does.");
-		}
-
-		ResizeScreen ();
+		Curses.CheckWinChange ();
 		ClearContents ();
-
-	}
-
-	public virtual void ResizeScreen ()
-	{
-		Clip = new Rect (0, 0, Cols, Rows);
 		Curses.refresh ();
+
+		StartReportingMouseMoves ();
 	}
 
 	public static bool Is_WSL_Platform ()

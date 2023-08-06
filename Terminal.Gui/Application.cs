@@ -517,7 +517,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static void Refresh ()
 		{
-			Driver.ClearContents();
+			//Driver.ClearContents();
 			View last = null;
 			foreach (var v in _toplevels.Reverse ()) {
 				if (v.Visible) {
@@ -976,7 +976,6 @@ namespace Terminal.Gui {
 		{
 			var full = new Rect (0, 0, Driver.Cols, Driver.Rows);
 			TerminalResized?.Invoke (new ResizedEventArgs () { Cols = full.Width, Rows = full.Height });
-			Driver.Clip = new Rect (0, 0, Driver.Cols, Driver.Rows);
 			foreach (var t in _toplevels) {
 				t.SetRelativeLayout (full);
 				t.LayoutSubviews ();

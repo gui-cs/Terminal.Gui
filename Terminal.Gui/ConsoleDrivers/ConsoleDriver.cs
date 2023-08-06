@@ -150,7 +150,7 @@ public abstract class ConsoleDriver {
 		if (validLocation) {
 			rune = rune.MakePrintable ();
 			runeWidth = rune.GetColumns ();
-			if (runeWidth == 0 && Col > 0) {
+			if (runeWidth == 0 && rune.IsCombiningMark() && Col > 0) {
 				// This is a combining character, and we are not at the beginning of the line.
 				// TODO: Remove hard-coded [0] once combining pairs is supported
 
@@ -163,30 +163,57 @@ public abstract class ConsoleDriver {
 				Contents [Row, Col - 1].Runes [0] = (Rune)normalized [0];
 				Contents [Row, Col - 1].Attribute = CurrentAttribute;
 				Contents [Row, Col - 1].IsDirty = true;
+
+				Col--;
 			} else {
 				Contents [Row, Col].Attribute = CurrentAttribute;
 				Contents [Row, Col].IsDirty = true;
 
-				if (runeWidth < 2 && Col > 0 && Contents [Row, Col - 1].Runes [0].GetColumns () > 1) {
-					// This is a single-width character, and we are not at the beginning of the line.
-					Contents [Row, Col - 1].Runes [0] = Rune.ReplacementChar;
-					Contents [Row, Col - 1].IsDirty = true;
-				} else if (runeWidth < 2 && Col <= Clip.Right - 1 && Contents [Row, Col].Runes [0].GetColumns () > 1) {
-					// This is a single-width character, and we are not at the end of the line.
-					Contents [Row, Col + 1].Runes [0] = Rune.ReplacementChar;
-					Contents [Row, Col + 1].IsDirty = true;
+				if (Col > 0) {
+					// Check if cell to left has a wide glyph
+					if (Contents [Row, Col - 1].Runes [0].GetColumns () > 1) {
+						// Invalidate cell to left
+						Contents [Row, Col - 1].Runes [0] = Rune.ReplacementChar;
+						Contents [Row, Col - 1].IsDirty = true;
+					}
 				}
-				if (runeWidth > 1 && Col == Clip.Right - 1) {
-					// This is a double-width character, and we are at the end of the line.
+
+				// Check if we're at right edge of clip
+				if (runeWidth < 1 || (runeWidth == 2 && Col == Clip.Right - 1)) {
+					// Can't put a double width glyph here
 					Contents [Row, Col].Runes [0] = Rune.ReplacementChar;
 				} else {
-					//if (runeWidth == 1) {
+
+					if (runeWidth >= 1) {
 						// This is a single-width character, or we are not at the end of the line.
 						Contents [Row, Col].Runes [0] = rune;
-					//} else {
-						//Contents [Row, Col].Runes [0] = (Rune)'*';
-					//}
+					} else {
+						Contents [Row, Col].Runes [0] = (Rune)'^';
+						Contents [Row, Col].IsDirty = false;
+					}
 				}
+				//if (runeWidth < 2 && Col > 0 && Contents [Row, Col - 1].Runes [0].GetColumns () > 1) {
+				//	// This is a single-width character, and we are not at the beginning of the line.
+				//	Contents [Row, Col - 1].Runes [0] = Rune.ReplacementChar;
+				//	Contents [Row, Col - 1].IsDirty = true;
+				//} else if (runeWidth < 2 && Col <= Clip.Right - 1 && Contents [Row, Col].Runes [0].GetColumns () > 1) {
+				//	// This is a single-width character, and we are not at the end of the line.
+				//	Contents [Row, Col + 1].Runes [0] = Rune.ReplacementChar;
+				//	Contents [Row, Col + 1].IsDirty = true;
+				//}
+				//if (runeWidth > 1 && Col == Clip.Right - 1) {
+				//	// This is a double-width character, and we are at the end of the line.
+				//	Contents [Row, Col].Runes [0] = Rune.ReplacementChar;
+				//} else {
+				//	if (runeWidth > 0) {
+				//		// This is a single-width character, or we are not at the end of the line.
+				//		Contents [Row, Col].Runes [0] = rune;
+				//	}
+				//	else {
+				//		Contents [Row, Col].Runes [0] = (Rune)'^';
+				//		Contents [Row, Col].IsDirty = false;
+				//	}
+				//}
 				_dirtyLines [Row] = true;
 			}
 		}
@@ -301,6 +328,7 @@ public abstract class ConsoleDriver {
 	{
 		// TODO: This method is really "Clear Contents" now and should not be abstract (or virtual)
 		Contents = new Cell [Rows, Cols];
+		Clip = new Rect (0, 0, Cols, Rows);
 		_dirtyLines = new bool [Rows];
 
 		lock (Contents) {
@@ -318,7 +346,6 @@ public abstract class ConsoleDriver {
 				}
 			} catch (IndexOutOfRangeException) { }
 		}
-
 	}
 
 	/// <summary>

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
@@ -407,12 +408,19 @@ class CharMap : ScrollView {
 					Driver.SetAttribute (GetFocusColor ());
 				}
 				var scalar = val + col;
+				Rune rune = (Rune)'?';
 				if (Rune.IsValid (scalar)) {
-					Driver.AddRune (new Rune (scalar));
-				} else {
-					Driver.AddRune ((Rune)'?');
+					rune = new Rune (scalar);
 				}
+				var width = rune.GetColumns ();
+				//if (width == 0) {
+				//	if (rune.IsCombiningMark ()) {
+				//		Driver.AddRune (Rune.ReplacementChar);
+				//	} 
+				//}
 
+				Driver.AddRune (rune);
+	
 				if (cursorRow + ContentOffset.Y + 1 == y && cursorCol + ContentOffset.X + firstColumnX + 1 == x && !HasFocus) {
 					Driver.SetAttribute (GetNormalColor ());
 				}
@@ -572,13 +580,18 @@ class CharMap : ScrollView {
 		Application.GrabMouse (this);
 	}
 
-
 	public override bool OnEnter (View view)
 	{
 		if (IsInitialized) {
 			Application.Driver.SetCursorVisibility (CursorVisibility.Default);
 		}
 		return base.OnEnter (view);
+	}
+
+	public override bool OnLeave (View view)
+	{
+		Driver.SetCursorVisibility (CursorVisibility.Invisible);
+		return base.OnLeave (view);
 	}
 }
 

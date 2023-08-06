@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 
 namespace Terminal.Gui {
-	public partial class View  {
+	public partial class View {
 		static readonly IList<View> _empty = new List<View> (0).AsReadOnly ();
 
 		View _superView = null;
@@ -420,10 +420,12 @@ namespace Terminal.Gui {
 		{
 			var args = new FocusEventArgs (view);
 			Enter?.Invoke (this, args);
-			if (args.Handled)
+			if (args.Handled) {
 				return true;
-			if (base.OnEnter (view))
+			}
+			if (base.OnEnter (view)) {
 				return true;
+			}
 
 			return false;
 		}
@@ -433,11 +435,14 @@ namespace Terminal.Gui {
 		{
 			var args = new FocusEventArgs (view);
 			Leave?.Invoke (this, args);
-			if (args.Handled)
+			if (args.Handled) {
 				return true;
-			if (base.OnLeave (view))
+			}
+			if (base.OnLeave (view)) {
 				return true;
+			}
 
+			Driver.SetCursorVisibility (CursorVisibility.Invisible);
 			return false;
 		}
 
