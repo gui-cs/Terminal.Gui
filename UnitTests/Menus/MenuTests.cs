@@ -254,8 +254,9 @@ Edit
 			// open the menu
 			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
-			Assert.Equal ("_New", miCurrent.Parent.Title);
-			Assert.Equal ("_New doc", miCurrent.Title);
+			// The _New doc isn't enabled because it can't execute and so can't be selected
+			Assert.Equal ("_File", miCurrent.Parent.Title);
+			Assert.Equal ("_New", miCurrent.Title);
 
 			Assert.True (mCurrent.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
