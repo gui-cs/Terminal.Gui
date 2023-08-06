@@ -18,12 +18,13 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (Key.CtrlMask | Key.Q, si.Shortcut);
 			Assert.Equal ("~^Q~ Quit", si.Title);
 			Assert.Null (si.Action);
+			Assert.True (si.IsEnabled ());
 			si = new StatusItem (Key.CtrlMask | Key.Q, "~^Q~ Quit", () => { });
 			Assert.NotNull (si.Action);
 		}
 
 		[Fact]
-		public void StatusBar_Contructor_Default ()
+		public void StatusBar_Constructor_Default ()
 		{
 			var sb = new StatusBar ();
 
@@ -154,6 +155,44 @@ CTRL-O Open {Application.Driver.VLine} CTRL-Q Quit
 			Assert.Equal ("~^O~ Open", sb.Items [0].Title);
 			Assert.Equal ("~^A~ Save As", sb.Items [1].Title);
 			Assert.Equal ("~^Q~ Quit", sb.Items [^1].Title);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void CanExecute_ProcessHotKey ()
+		{
+			Window win = null;
+			var statusBar = new StatusBar (new StatusItem [] {
+				new StatusItem (Key.CtrlMask | Key.N, "~^N~ New", New, CanExecuteNew),
+				new StatusItem (Key.CtrlMask | Key.C, "~^C~ Close", Close, CanExecuteClose)
+			});
+			var top = Application.Top;
+			top.Add (statusBar);
+
+			bool CanExecuteNew () => win == null;
+
+			void New ()
+			{
+				win = new Window ();
+			}
+
+			bool CanExecuteClose () => win != null;
+
+			void Close ()
+			{
+				win = null;
+			}
+
+			Application.Begin (top);
+
+			Assert.Null (win);
+			Assert.True (CanExecuteNew ());
+			Assert.False (CanExecuteClose ());
+
+			Assert.True (top.ProcessHotKey (new KeyEvent (Key.N | Key.CtrlMask, new KeyModifiers () { Alt = true })));
+			Application.MainLoop.MainIteration ();
+			Assert.NotNull (win);
+			Assert.False (CanExecuteNew ());
+			Assert.True (CanExecuteClose ());
 		}
 	}
 }
