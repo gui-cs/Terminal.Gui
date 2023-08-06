@@ -603,63 +603,87 @@ namespace Terminal.Gui {
 			out int nx, out int ny, out View mb, out View sb)
 		{
 			int l;
-			View superView = null;
-			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
+			View superView = GetSuperView (top);
+			if (superView == null || top == Application.Top || superView == Application.Top) {
 				l = Driver.Cols;
 				superView = Application.Top;
 			} else {
-				l = top.SuperView.Frame.Width;
-				superView = top.SuperView;
+				l = superView.Frame.Width;
 			}
+			mb = null; sb = null;
+			if (!(superView is Toplevel)) {
+				nx = x; ny = y;
+				return superView;
+			}
+			var superViewPadding = superView.Border != null ? 1 : 0;
+			var topPadding = top.Modal ? 0 : top.Border != null ? 1 : 0;
 			nx = Math.Max (x, 0);
-			nx = nx + top.Frame.Width > l ? Math.Max (l - top.Frame.Width, 0) : nx;
-			var mfLength = top.Border?.DrawMarginFrame == true ? 2 : 1;
-			if (nx + mfLength > top.Frame.X + top.Frame.Width) {
-				nx = Math.Max (top.Frame.Right - mfLength, 0);
+			nx = nx + superViewPadding * 2 + top.Frame.Width >= l ? Math.Max (l - top.Frame.Width - superViewPadding * 2, 0) : nx;
+			nx = top.Modal && nx == 0 ? superViewPadding : nx;
+			nx = top.Modal && nx + superViewPadding * 2 + top.Frame.Width >= l ? l - top.Frame.Width - superViewPadding : nx;
+			if (nx + topPadding * 2 > top.Frame.X + top.Frame.Width) {
+				nx = Math.Max (top.Frame.Right - topPadding * 2, 0);
 			}
 			//System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
 			bool m = false, s = false;
-			mb = null; sb = null;
-			if (!(top is Window && top == Application.Top) && (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)) {
+			if (!(top is Window && top == Application.Top) && (superView == null || top == Application.Top || superView == Application.Top)) {
 				m = Application.Top.MenuBar?.Visible == true;
 				mb = Application.Top.MenuBar;
 			} else if (!(top is Window && top == Application.Top)) {
-				var t = top.SuperView;
+				var t = superView;
 				while (!(t is Toplevel)) {
-					t = t.SuperView;
+					t = GetSuperView (t);
 				}
 				m = ((Toplevel)t).MenuBar?.Visible == true;
 				mb = ((Toplevel)t).MenuBar;
 			}
-			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
-				l = m ? 1 : 0;
+			if (superView == null || top == Application.Top || superView == Application.Top) {
+				l = m ? 1 + (top.Modal ? superViewPadding - topPadding : 0) : 0;
 			} else {
 				l = 0;
 			}
-			ny = Math.Max (y, l);
-			if (!(top is Window && top == Application.Top) && (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)) {
+			ny = Math.Max (Math.Max (y, l), 0);
+			if (!(top is Window && top == Application.Top) && (superView == null || top == Application.Top || superView == Application.Top)) {
 				s = Application.Top.StatusBar?.Visible == true;
 				sb = Application.Top.StatusBar;
 			} else if (!(top is Window && top == Application.Top)) {
-				var t = top.SuperView;
+				var t = superView;
 				while (!(t is Toplevel)) {
-					t = t.SuperView;
+					t = GetSuperView (t);
 				}
 				s = ((Toplevel)t).StatusBar?.Visible == true;
 				sb = ((Toplevel)t).StatusBar;
 			}
-			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
-				l = s ? Driver.Rows - 1 : Driver.Rows;
+			if (superView == null || top == Application.Top || superView == Application.Top) {
+				l = (s ? Driver.Rows - 1 : Driver.Rows);
 			} else {
-				l = s ? top.SuperView.Frame.Height - 1 : top.SuperView.Frame.Height;
+				l = (s ? superView.Frame.Height - 1 : superView.Frame.Height);
 			}
 			ny = Math.Min (ny, l);
-			ny = ny + top.Frame.Height >= l ? Math.Max (l - top.Frame.Height, m ? 1 : 0) : ny;
-			if (ny + mfLength > top.Frame.Y + top.Frame.Height) {
-				ny = Math.Max (top.Frame.Bottom - mfLength, 0);
+			ny = top.Modal && ny == 0 ? superViewPadding : ny;
+			ny = ny + superViewPadding * 2 + top.Frame.Height >= l ? Math.Max (l - top.Frame.Height - superViewPadding * 2, m ? 1 : 0) : ny;
+			ny = top.Modal && ny + superViewPadding * 2 + top.Frame.Height >= l ? l - top.Frame.Height - superViewPadding : ny;
+			if (ny + topPadding * 2 > top.Frame.Y + top.Frame.Height) {
+				ny = Math.Max (top.Frame.Bottom - topPadding * 2, 0);
 			}
 			//System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
 
+			if (superView != null && superView == top && superView == Application.Top) {
+				nx = superView.Frame.X; ny = superView.Frame.Y;
+			}
+
+			return superView;
+		}
+
+		View GetSuperView (View view)
+		{
+			if (view.SuperView == null) {
+				return Application.Top;
+			}
+			var superView = view.SuperView;
+			if (superView.GetType ().Name == "ContentView") {
+				return superView.SuperView;
+			}
 			return superView;
 		}
 
@@ -669,6 +693,10 @@ namespace Terminal.Gui {
 			foreach (var top in Subviews) {
 				if (top is Toplevel) {
 					PositionToplevel ((Toplevel)top);
+				} else if (top.GetType ().Name == "ContentView") {
+					foreach (var subTop in top.Subviews.Where (v => v is Toplevel)) {
+						PositionToplevel ((Toplevel)subTop);
+					}
 				}
 			}
 		}
@@ -681,16 +709,19 @@ namespace Terminal.Gui {
 		{
 			var superView = EnsureVisibleBounds (top, top.Frame.X, top.Frame.Y,
 				out int nx, out int ny, out _, out View sb);
+			if (superView != null && superView == top && superView == Application.Top) {
+				return;
+			}
 			bool layoutSubviews = false;
-			if ((top?.SuperView != null || (top != Application.Top && top.Modal)
-				|| (top?.SuperView == null && top.IsMdiChild))
-				&& (nx > top.Frame.X || ny > top.Frame.Y) && top.LayoutStyle == LayoutStyle.Computed) {
+			if ((superView != null || (top != Application.Top && top.Modal)
+				|| (superView == null && top.IsMdiChild))
+				&& (nx != top.Frame.X || ny != top.Frame.Y) && top.LayoutStyle == LayoutStyle.Computed) {
 
-				if ((top.X == null || top.X is Pos.PosAbsolute) && top.Bounds.X != nx) {
+				if ((top.X == null || top.X is Pos.PosAbsolute) && top.Frame.X != nx) {
 					top.X = nx;
 					layoutSubviews = true;
 				}
-				if ((top.Y == null || top.Y is Pos.PosAbsolute) && top.Bounds.Y != ny) {
+				if ((top.Y == null || top.Y is Pos.PosAbsolute) && top.Frame.Y != ny) {
 					top.Y = ny;
 					layoutSubviews = true;
 				}

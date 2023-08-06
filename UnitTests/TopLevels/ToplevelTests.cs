@@ -212,7 +212,8 @@ namespace Terminal.Gui.TopLevelTests {
 			// top is Application.Top with a menu and without status bar.
 			top.EnsureVisibleBounds (top, 2, 2, out nx, out ny, out mb, out sb);
 			Assert.Equal (0, nx);
-			Assert.Equal (1, ny);
+			// top is Application.Top and doesn't need to positioned itself.
+			Assert.Equal (0, ny);
 			Assert.NotNull (mb);
 			Assert.Null (sb);
 
@@ -222,7 +223,8 @@ namespace Terminal.Gui.TopLevelTests {
 			// top is Application.Top with a menu and status bar.
 			top.EnsureVisibleBounds (top, 2, 2, out nx, out ny, out mb, out sb);
 			Assert.Equal (0, nx);
-			Assert.Equal (1, ny);
+			// top is Application.Top and doesn't need to positioned itself.
+			Assert.Equal (0, ny);
 			Assert.NotNull (mb);
 			Assert.NotNull (sb);
 
@@ -232,6 +234,7 @@ namespace Terminal.Gui.TopLevelTests {
 			// top is Application.Top without a menu and with a status bar.
 			top.EnsureVisibleBounds (top, 2, 2, out nx, out ny, out mb, out sb);
 			Assert.Equal (0, nx);
+			// top is Application.Top and doesn't need to positioned itself.
 			Assert.Equal (0, ny);
 			Assert.Null (mb);
 			Assert.NotNull (sb);
@@ -1030,6 +1033,113 @@ namespace Terminal.Gui.TopLevelTests {
 			Application.Refresh ();
 			Application.Driver.GetCursorVisibility (out cursor);
 			Assert.Equal (CursorVisibility.Invisible, cursor);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void EnsureVisibleBounds_Top_With_Border_MenuBar_StatusBar_And_Window_With_Border ()
+		{
+			var top = new Window ();
+			top.AddMenuStatusBar (new MenuBar ());
+			top.AddMenuStatusBar (new StatusBar ());
+			var win = new Window () { Width = 10, Height = 10 };
+			top.Add (win);
+			Application.Begin (top);
+
+			Assert.NotNull (top.MenuBar);
+			Assert.NotNull (top.StatusBar);
+
+			// left + top
+			win.X = 0;
+			win.Y = 0;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
+			Assert.Equal (0, nx);
+			Assert.Equal (1, ny);
+
+			// right + bottom
+			win.X = 100;
+			win.Y = 40;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
+			Assert.Equal (68, nx);
+			Assert.Equal (12, ny);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void EnsureVisibleBounds_Top_With_Border_MenuBar_StatusBar_And_Modal_With_Border ()
+		{
+			var top = new Window ();
+			top.AddMenuStatusBar (new MenuBar ());
+			top.AddMenuStatusBar (new StatusBar ());
+			var win = new Window () { Width = 10, Height = 10, Modal = true };
+			Application.Begin (top);
+			Application.Begin (win);
+
+			Assert.NotNull (top.MenuBar);
+			Assert.NotNull (top.StatusBar);
+
+			// left + top
+			win.X = 0;
+			win.Y = 0;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
+			Assert.Equal (1, nx);
+			Assert.Equal (2, ny);
+
+			// right + bottom
+			win.X = 100;
+			win.Y = 40;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
+			Assert.Equal (69, nx);
+			Assert.Equal (13, ny);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void EnsureVisibleBounds_Top_MenuBar_StatusBar_And_Window_With_Border_And_Dim_Fill ()
+		{
+			var top = Application.Top;
+			top.AddMenuStatusBar (new MenuBar ());
+			top.AddMenuStatusBar (new StatusBar ());
+			var win = new Window () { Width = Dim.Fill (10), Height = Dim.Fill (10) };
+			top.Add (win);
+			Application.Begin (top);
+
+			Assert.NotNull (top.MenuBar);
+			Assert.NotNull (top.StatusBar);
+
+			// left + top
+			win.X = 0;
+			win.Y = 0;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
+			Assert.Equal (0, nx);
+			Assert.Equal (1, ny);
+
+			// right + bottom
+			win.X = 100;
+			win.Y = 40;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
+			Assert.Equal (10, nx);
+			Assert.Equal (10, ny);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void EnsureVisibleBounds_Top_With_Border_And_Modal_With_Border ()
+		{
+			var top = new Window ();
+			var win = new Window () { Width = 10, Height = 10, Modal = true };
+			Application.Begin (top);
+			Application.Begin (win);
+
+			// left + top
+			win.X = 0;
+			win.Y = 0;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
+			Assert.Equal (1, nx);
+			Assert.Equal (1, ny);
+
+			// right + bottom
+			win.X = 100;
+			win.Y = 40;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
+			Assert.Equal (69, nx);
+			Assert.Equal (14, ny);
 		}
 	}
 }
