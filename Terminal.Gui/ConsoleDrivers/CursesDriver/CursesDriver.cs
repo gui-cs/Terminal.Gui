@@ -160,6 +160,11 @@ namespace Terminal.Gui {
 			StopReportingMouseMoves ();
 			SetCursorVisibility (CursorVisibility.Default);
 
+			var code = Curses.get_wch (out _);
+			while (code != -1) {
+				code = Curses.get_wch (out _);
+			}
+
 			Curses.endwin ();
 		}
 
