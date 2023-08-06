@@ -497,8 +497,19 @@ namespace Terminal.Gui {
 			}
 		}
 
+		MouseFlags lastMouseFlags;
+
 		void ProcessMouseEvent (MouseFlags mouseFlag, Point pos)
 		{
+			if (((mouseFlag.HasFlag (MouseFlags.Button1Released) || mouseFlag.HasFlag (MouseFlags.Button2Released) || mouseFlag.HasFlag (MouseFlags.Button3Released) || mouseFlag.HasFlag (MouseFlags.Button4Released))
+				&& (!lastMouseFlags.HasFlag (MouseFlags.Button1Pressed) || !lastMouseFlags.HasFlag (MouseFlags.Button2Pressed) || !lastMouseFlags.HasFlag (MouseFlags.Button3Pressed) || !lastMouseFlags.HasFlag (MouseFlags.Button4Pressed)))
+				|| ((mouseFlag.HasFlag (MouseFlags.Button1Clicked) || mouseFlag.HasFlag (MouseFlags.Button2Clicked) || mouseFlag.HasFlag (MouseFlags.Button3Clicked) || mouseFlag.HasFlag (MouseFlags.Button4Clicked)
+				|| mouseFlag.HasFlag (MouseFlags.Button1DoubleClicked) || mouseFlag.HasFlag (MouseFlags.Button2DoubleClicked) || mouseFlag.HasFlag (MouseFlags.Button3DoubleClicked) || mouseFlag.HasFlag (MouseFlags.Button4DoubleClicked))
+				&& lastMouseFlags == 0)) {
+
+				return;
+			}
+			lastMouseFlags = mouseFlag;
 			var me = new MouseEvent () {
 				Flags = mouseFlag,
 				X = pos.X,
