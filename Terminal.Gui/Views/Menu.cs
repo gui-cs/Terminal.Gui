@@ -1664,12 +1664,14 @@ namespace Terminal.Gui {
 				int p = mi.Title.IndexOf (MenuBar.HotKeySpecifier);
 				if (p != -1 && p + 1 < mi.Title.RuneCount) {
 					if (Char.ToUpperInvariant ((char)mi.Title [p + 1]) == c) {
-						var action = mi.Action;
-						if (action != null) {
-							Application.MainLoop.AddIdle (() => {
-								action ();
-								return false;
-							});
+						if (mi.IsEnabled ()) {
+							var action = mi.Action;
+							if (action != null) {
+								Application.MainLoop.AddIdle (() => {
+									action ();
+									return false;
+								});
+							}
 						}
 						return true;
 					} else if (mi is MenuBarItem menuBarItem && menuBarItem?.Children.Length > 0) {
@@ -1701,12 +1703,14 @@ namespace Terminal.Gui {
 					continue;
 				}
 				if ((!(mi is MenuBarItem mbiTopLevel) || mbiTopLevel.IsTopLevel) && mi.Shortcut != Key.Null && mi.Shortcut == (Key)key) {
-					var action = mi.Action;
-					if (action != null) {
-						Application.MainLoop.AddIdle (() => {
-							action ();
-							return false;
-						});
+					if (mi.IsEnabled ()) {
+						var action = mi.Action;
+						if (action != null) {
+							Application.MainLoop.AddIdle (() => {
+								action ();
+								return false;
+							});
+						}
 					}
 					return true;
 				}

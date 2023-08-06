@@ -1747,5 +1747,45 @@ Edit
 			var exception = Record.Exception (() => menu.ProcessColdKey (new KeyEvent (Key.Space, new KeyModifiers ())));
 			Assert.Null (exception);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void CanExecute_ProcessHotKey ()
+		{
+			Window win = null;
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("File", new MenuItem [] {
+					new MenuItem ("_New", "", New, CanExecuteNew),
+					new MenuItem ("_Close", "", Close, CanExecuteClose)
+				}),
+			});
+			var top = Application.Top;
+			top.Add (menu);
+
+			bool CanExecuteNew () => win == null;
+
+			void New ()
+			{
+				win = new Window ();
+			}
+
+			bool CanExecuteClose () => win != null;
+
+			void Close ()
+			{
+				win = null;
+			}
+
+			Application.Begin (top);
+
+			Assert.Null (win);
+			Assert.True (CanExecuteNew ());
+			Assert.False (CanExecuteClose ());
+
+			Assert.True (top.ProcessHotKey (new KeyEvent (Key.N | Key.AltMask, new KeyModifiers () { Alt = true })));
+			Application.MainLoop.MainIteration ();
+			Assert.NotNull (win);
+			Assert.False (CanExecuteNew ());
+			Assert.True (CanExecuteClose ());
+		}
 	}
 }
