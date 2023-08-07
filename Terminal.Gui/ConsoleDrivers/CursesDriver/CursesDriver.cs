@@ -504,14 +504,39 @@ namespace Terminal.Gui {
 
 		void ProcessMouseEvent (MouseFlags mouseFlag, Point pos)
 		{
-			if (((mouseFlag.HasFlag (MouseFlags.Button1Released) || mouseFlag.HasFlag (MouseFlags.Button2Released) || mouseFlag.HasFlag (MouseFlags.Button3Released) || mouseFlag.HasFlag (MouseFlags.Button4Released))
-				&& (!lastMouseFlags.HasFlag (MouseFlags.Button1Pressed) || !lastMouseFlags.HasFlag (MouseFlags.Button2Pressed) || !lastMouseFlags.HasFlag (MouseFlags.Button3Pressed) || !lastMouseFlags.HasFlag (MouseFlags.Button4Pressed)))
-				|| ((mouseFlag.HasFlag (MouseFlags.Button1Clicked) || mouseFlag.HasFlag (MouseFlags.Button2Clicked) || mouseFlag.HasFlag (MouseFlags.Button3Clicked) || mouseFlag.HasFlag (MouseFlags.Button4Clicked)
-				|| mouseFlag.HasFlag (MouseFlags.Button1DoubleClicked) || mouseFlag.HasFlag (MouseFlags.Button2DoubleClicked) || mouseFlag.HasFlag (MouseFlags.Button3DoubleClicked) || mouseFlag.HasFlag (MouseFlags.Button4DoubleClicked))
-				&& lastMouseFlags == 0)) {
+			bool WasButtonReleased (MouseFlags flag)
+			{
+				return flag.HasFlag (MouseFlags.Button1Released) ||
+					flag.HasFlag (MouseFlags.Button2Released) ||
+					flag.HasFlag (MouseFlags.Button3Released) ||
+					flag.HasFlag (MouseFlags.Button4Released);
+			}
 
+			bool IsButtonNotPressed (MouseFlags flag)
+			{
+				return !flag.HasFlag (MouseFlags.Button1Pressed) &&
+					!flag.HasFlag (MouseFlags.Button2Pressed) &&
+					!flag.HasFlag (MouseFlags.Button3Pressed) &&
+					!flag.HasFlag (MouseFlags.Button4Pressed);
+			}
+
+			bool IsButtonClickedOrDoubleClicked (MouseFlags flag)
+			{
+				return flag.HasFlag (MouseFlags.Button1Clicked) ||
+					flag.HasFlag (MouseFlags.Button2Clicked) ||
+					flag.HasFlag (MouseFlags.Button3Clicked) ||
+					flag.HasFlag (MouseFlags.Button4Clicked) ||
+					flag.HasFlag (MouseFlags.Button1DoubleClicked) ||
+					flag.HasFlag (MouseFlags.Button2DoubleClicked) ||
+					flag.HasFlag (MouseFlags.Button3DoubleClicked) ||
+					flag.HasFlag (MouseFlags.Button4DoubleClicked);
+			}
+
+			if ((WasButtonReleased (mouseFlag) && IsButtonNotPressed (lastMouseFlags)) ||
+				(IsButtonClickedOrDoubleClicked (mouseFlag) && lastMouseFlags == 0)) {
 				return;
 			}
+
 			lastMouseFlags = mouseFlag;
 			var me = new MouseEvent () {
 				Flags = mouseFlag,
