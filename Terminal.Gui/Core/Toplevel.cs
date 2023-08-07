@@ -603,7 +603,7 @@ namespace Terminal.Gui {
 			out int nx, out int ny, out View mb, out View sb)
 		{
 			int l;
-			View superView;
+			View superView = null;
 			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
 				l = Driver.Cols;
 				superView = Application.Top;
@@ -618,11 +618,12 @@ namespace Terminal.Gui {
 				nx = Math.Max (top.Frame.Right - mfLength, 0);
 			}
 			//System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
-			bool m, s;
-			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
+			bool m = false, s = false;
+			mb = null; sb = null;
+			if (!(top is Window && top == Application.Top) && (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)) {
 				m = Application.Top.MenuBar?.Visible == true;
 				mb = Application.Top.MenuBar;
-			} else {
+			} else if (!(top is Window && top == Application.Top)) {
 				var t = top.SuperView;
 				while (!(t is Toplevel)) {
 					t = t.SuperView;
@@ -636,10 +637,10 @@ namespace Terminal.Gui {
 				l = 0;
 			}
 			ny = Math.Max (y, l);
-			if (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top) {
+			if (!(top is Window && top == Application.Top) && (top?.SuperView == null || top == Application.Top || top?.SuperView == Application.Top)) {
 				s = Application.Top.StatusBar?.Visible == true;
 				sb = Application.Top.StatusBar;
-			} else {
+			} else if (!(top is Window && top == Application.Top)) {
 				var t = top.SuperView;
 				while (!(t is Toplevel)) {
 					t = t.SuperView;
