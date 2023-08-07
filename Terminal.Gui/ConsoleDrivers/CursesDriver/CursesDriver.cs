@@ -341,14 +341,12 @@ namespace Terminal.Gui {
 			Key k = Key.Null;
 
 			if (code == Curses.KEY_CODE_YES) {
-				if (wch == Curses.KeyResize) {
-					while (code == Curses.KEY_CODE_YES && wch == Curses.KeyResize) {
-						ProcessWinChange ();
-						code = Curses.get_wch (out wch);
-					}
-					if (wch == 0) {
-						return;
-					}
+				while (code == Curses.KEY_CODE_YES && wch == Curses.KeyResize) {
+					ProcessWinChange ();
+					code = Curses.get_wch (out wch);
+				}
+				if (wch == 0) {
+					return;
 				}
 				if (wch == Curses.KeyMouse) {
 					int wch2 = wch;
