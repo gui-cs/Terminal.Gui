@@ -1,9 +1,9 @@
 ﻿using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "WindowInsideWindowCentered", Description: "Window Inside Window Centered")]
+	[ScenarioMetadata (Name: "CenteredWindowInsideWindow", Description: "Centered Window Inside Window")]
 	[ScenarioCategory ("Controls")]
-	public class WindowInsideWindowCentered : Scenario {
+	public class CenteredWindowInsideWindow : Scenario {
 		public override void Init (ColorScheme colorScheme)
 		{
 			Application.Init ();
@@ -121,11 +121,6 @@ namespace UICatalog.Scenarios {
 		private Terminal.Gui.MenuItem createChildMenuItem;
 		private Terminal.Gui.MenuItem centerChildMenuItem;
 		private Terminal.Gui.MenuItem hideChildMenuItem;
-
-		//private Terminal.Gui.MenuBarItem settingsMenu;
-
-		//private Terminal.Gui.MenuItem hideMenuBarMenuItem;
-		//private Terminal.Gui.MenuItem hideStatusBarMenuItem;
 
 		private Terminal.Gui.StatusBar statusBar;
 
