@@ -189,6 +189,10 @@ internal class CursesDriver : ConsoleDriver {
 		StopReportingMouseMoves ();
 		SetCursorVisibility (CursorVisibility.Default);
 
+		// throws away any typeahead that has been typed by
+		// the user and has not yet been read by the program.
+		Curses.flushinp ();
+
 		Curses.endwin ();
 	}
 
@@ -208,7 +212,7 @@ internal class CursesDriver : ConsoleDriver {
 
 				if (Contents [row, col].Runes [0].IsBmp) {
 					//_outputBuffer [position].Char = (char)Contents [row, col].Runes [0].Value;
-					Curses.mvaddwstr (row, col, Contents [row, col].Runes [0].ToString());
+					Curses.mvaddwstr (row, col, Contents [row, col].Runes [0].ToString ());
 					if (Contents [row, col].Runes [0].GetColumns () > 1 && col + 1 < Cols) {
 						col++;
 						//Curses.mvaddwstr (row, col, ' ');
@@ -376,8 +380,12 @@ internal class CursesDriver : ConsoleDriver {
 		Key k = Key.Null;
 
 		if (code == Curses.KEY_CODE_YES) {
-			if (wch == Curses.KeyResize) {
+			while (code == Curses.KEY_CODE_YES && wch == Curses.KeyResize) {
 				ProcessWinChange ();
+				code = Curses.get_wch (out wch);
+			}
+			if (wch == 0) {
+				return;
 			}
 			if (wch == Curses.KeyMouse) {
 				int wch2 = wch;
@@ -536,8 +544,45 @@ internal class CursesDriver : ConsoleDriver {
 		}
 	}
 
+	MouseFlags _lastMouseFlags;
+
 	void ProcessMouseEvent (MouseFlags mouseFlag, Point pos)
 	{
+		bool WasButtonReleased (MouseFlags flag)
+		{
+			return flag.HasFlag (MouseFlags.Button1Released) ||
+				flag.HasFlag (MouseFlags.Button2Released) ||
+				flag.HasFlag (MouseFlags.Button3Released) ||
+				flag.HasFlag (MouseFlags.Button4Released);
+		}
+
+		bool IsButtonNotPressed (MouseFlags flag)
+		{
+			return !flag.HasFlag (MouseFlags.Button1Pressed) &&
+				!flag.HasFlag (MouseFlags.Button2Pressed) &&
+				!flag.HasFlag (MouseFlags.Button3Pressed) &&
+				!flag.HasFlag (MouseFlags.Button4Pressed);
+		}
+
+		bool IsButtonClickedOrDoubleClicked (MouseFlags flag)
+		{
+			return flag.HasFlag (MouseFlags.Button1Clicked) ||
+				flag.HasFlag (MouseFlags.Button2Clicked) ||
+				flag.HasFlag (MouseFlags.Button3Clicked) ||
+				flag.HasFlag (MouseFlags.Button4Clicked) ||
+				flag.HasFlag (MouseFlags.Button1DoubleClicked) ||
+				flag.HasFlag (MouseFlags.Button2DoubleClicked) ||
+				flag.HasFlag (MouseFlags.Button3DoubleClicked) ||
+				flag.HasFlag (MouseFlags.Button4DoubleClicked);
+		}
+
+		if ((WasButtonReleased (mouseFlag) && IsButtonNotPressed (_lastMouseFlags)) ||
+			(IsButtonClickedOrDoubleClicked (mouseFlag) && _lastMouseFlags == 0)) {
+			return;
+		}
+
+		_lastMouseFlags = mouseFlag;
+
 		var me = new MouseEvent () {
 			Flags = mouseFlag,
 			X = pos.X,
@@ -545,6 +590,7 @@ internal class CursesDriver : ConsoleDriver {
 		};
 		_mouseHandler (me);
 	}
+
 
 	void ProcessContinuousButtonPressed (MouseFlags mouseFlag, Point pos)
 	{
@@ -572,9 +618,7 @@ internal class CursesDriver : ConsoleDriver {
 			return true;
 		});
 
-		mLoop.WinChanged += () => {
-			ProcessWinChange ();
-		};
+		mLoop.WinChanged += ProcessInput;
 	}
 
 	public override void Init (Action terminalResized)
