@@ -68,6 +68,8 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 	/// <inheritdoc/>
 	public void Dispose ()
 	{
+		_tableView.KeyPress -= Table_KeyPress;
+		_tableView.MouseClick -= Table_MouseClick;
 		_tree.Dispose ();
 	}
 
