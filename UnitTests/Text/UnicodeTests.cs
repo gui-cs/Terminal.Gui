@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using Microsoft.VisualStudio.TestPlatform.Utilities;
+using Xunit;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
@@ -41,10 +42,10 @@ public class UnicodeTests {
 ┌────────────────────────────┐
 │これは広いルーンラインです。│
 │これは広いルーンラインです。│
-│これは ┌────────────┐ です。│
-│これは │ワイドルーン│ です。│
-│これは │  {CM.Glyphs.LeftBracket} 選ぶ {CM.Glyphs.RightBracket}  │ です。│
-│これは └────────────┘ です。│
+│これは�┌────────────┐�です。│
+│これは�│ワイドルーン│�です。│
+│これは�│  {CM.Glyphs.LeftBracket} 選ぶ {CM.Glyphs.RightBracket}  │�です。│
+│これは�└────────────┘�です。│
 │これは広いルーンラインです。│
 │これは広いルーンラインです。│
 └────────────────────────────┘

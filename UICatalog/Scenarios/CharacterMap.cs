@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
@@ -11,6 +12,7 @@ using System.Text.Json;
 using System.Text.Unicode;
 using System.Threading.Tasks;
 using Terminal.Gui;
+using static Terminal.Gui.SpinnerStyle;
 using static Terminal.Gui.TableView;
 
 namespace UICatalog.Scenarios;
@@ -27,24 +29,31 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("ScrollView")]
 public class CharacterMap : Scenario {
 	CharMap _charMap;
-	Label _errorLabel;
+	public Label _errorLabel;
 	TableView _categoryList;
+
+	// Don't create a Window, just return the top-level view
+	public override void Init ()
+	{
+		Application.Init ();
+		Application.Top.ColorScheme = Colors.Base;
+	}
 
 	public override void Setup ()
 	{
 		_charMap = new CharMap () {
 			X = 0,
-			Y = 0,
+			Y = 1,
 			Height = Dim.Fill ()
 		};
-		Win.Add (_charMap);
+		Application.Top.Add (_charMap);
 
 		var jumpLabel = new Label ("Jump To Code Point:") { X = Pos.Right (_charMap) + 1, Y = Pos.Y (_charMap) };
-		Win.Add (jumpLabel);
+		Application.Top.Add (jumpLabel);
 		var jumpEdit = new TextField () { X = Pos.Right (jumpLabel) + 1, Y = Pos.Y (_charMap), Width = 10, Caption = "e.g. 01BE3" };
-		Win.Add (jumpEdit);
-		_errorLabel = new Label ("") { X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap), ColorScheme = Colors.ColorSchemes ["error"] };
-		Win.Add (_errorLabel);
+		Application.Top.Add (jumpEdit);
+		_errorLabel = new Label ("err") { X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap), ColorScheme = Colors.ColorSchemes ["error"] };
+		Application.Top.Add (_errorLabel);
 
 		jumpEdit.TextChanged += JumpEdit_TextChanged;
 
@@ -96,15 +105,42 @@ public class CharacterMap : Scenario {
 			_charMap.StartCodePoint = table.Data.ToArray () [args.NewRow].Start;
 		};
 
-		Win.Add (_categoryList);
+		Application.Top.Add (_categoryList);
 
 		_charMap.SelectedCodePoint = 0;
 		//jumpList.Refresh ();
 		_charMap.SetFocus ();
 
 		_charMap.Width = Dim.Fill () - _categoryList.Width;
+
+		var menu = new MenuBar (new MenuBarItem [] {
+			new MenuBarItem ("_File", new MenuItem [] {
+				new MenuItem ("_Quit", $"{Application.QuitKey}", () => Application.RequestStop ()),
+			}),
+			new MenuBarItem ("_Options", new MenuItem [] {
+				CreateMenuShowWidth (),
+			})
+		});
+		Application.Top.Add (menu);
+
+		//_charMap.Hover += (s, a) => {
+		//	_errorLabel.Text = $"U+{a.Item:x5} {(Rune)a.Item}";
+		//};
 	}
 
+	MenuItem CreateMenuShowWidth ()
+	{
+		var item = new MenuItem {
+			Title = "_Show Glyph Width",
+		};
+		item.CheckType |= MenuItemCheckStyle.Checked;
+		item.Checked = _charMap?.ShowGlyphWidths;
+		item.Action += () => {
+			_charMap.ShowGlyphWidths = (bool)(item.Checked = !item.Checked);
+		};
+
+		return item;
+	}
 
 	EnumerableTableSource<UnicodeRange> CreateCategoryTable (int sortByColumn, bool descending)
 	{
@@ -177,7 +213,7 @@ public class CharacterMap : Scenario {
 			_errorLabel.Text = $"Beyond maximum codepoint";
 			return;
 		}
-		_errorLabel.Text = $"U+{result:x4}";
+		_errorLabel.Text = $"U+{result:x5}";
 
 		var table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
 		_categoryList.SelectedRow = table.Data
@@ -200,8 +236,7 @@ class CharMap : ScrollView {
 		get => _start;
 		set {
 			_start = value;
-			_selected = value;
-			ContentOffset = new Point (0, (int)(_start / 16));
+			SelectedCodePoint = value;
 			SetNeedsDisplay ();
 		}
 	}
@@ -216,15 +251,16 @@ class CharMap : ScrollView {
 		get => _selected;
 		set {
 			_selected = value;
-			var col = Cursor.X;
-			var row = Cursor.Y;
-			var height = (Bounds.Height / ROW_HEIGHT) - (ShowHorizontalScrollIndicator ? 2 : 1);
+			var row = (SelectedCodePoint / 16 * _rowHeight);
+			var col = (SelectedCodePoint % 16 * COLUMN_WIDTH);
+
+			var height = (Bounds.Height) - (ShowHorizontalScrollIndicator ? 2 : 1);
 			if (row + ContentOffset.Y < 0) {
 				// Moving up.
 				ContentOffset = new Point (ContentOffset.X, row);
 			} else if (row + ContentOffset.Y >= height) {
 				// Moving down.
-				ContentOffset = new Point (ContentOffset.X, Math.Min (row, row - height + ROW_HEIGHT));
+				ContentOffset = new Point (ContentOffset.X, Math.Min (row, row - height + _rowHeight));
 			}
 			var width = (Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH) - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
 			if (col + ContentOffset.X < 0) {
@@ -239,10 +275,15 @@ class CharMap : ScrollView {
 		}
 	}
 
+	public event EventHandler<ListViewItemEventArgs> Hover;
+
+	/// <summary>
+	/// Gets the coordinates of the Cursor based on the SelectedCodePoint in screen coordinates
+	/// </summary>
 	public Point Cursor {
 		get {
-			var row = SelectedCodePoint / 16;
-			var col = (SelectedCodePoint - row * 16) * COLUMN_WIDTH;
+			var row = (SelectedCodePoint / 16 * _rowHeight) + ContentOffset.Y + 1;
+			var col = (SelectedCodePoint % 16 * COLUMN_WIDTH) + ContentOffset.X + RowLabelWidth + 1; // + 1 for padding
 			return new Point (col, row);
 		}
 		set => throw new NotImplementedException ();
@@ -250,35 +291,42 @@ class CharMap : ScrollView {
 
 	public override void PositionCursor ()
 	{
-		if (HasFocus && Cursor.X + ContentOffset.X + RowLabelWidth + 1 >= RowLabelWidth &&
-			Cursor.X + ContentOffset.X + RowLabelWidth + 1 < Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0) &&
-			Cursor.Y + ContentOffset.Y + 1 > 0 &&
-			Cursor.Y + ContentOffset.Y + 1 < Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0)) {
-
+		if (HasFocus &&
+			Cursor.X >= RowLabelWidth &&
+			Cursor.X < Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0) &&
+			Cursor.Y > 0 &&
+			Cursor.Y < Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0)) {
 			Driver.SetCursorVisibility (CursorVisibility.Default);
-			Move (Cursor.X + ContentOffset.X + RowLabelWidth + 1, Cursor.Y + ContentOffset.Y + 1);
+			Move (Cursor.X, Cursor.Y);
 		} else {
 			Driver.SetCursorVisibility (CursorVisibility.Invisible);
 		}
 	}
 
+	public bool ShowGlyphWidths {
+		get => _rowHeight == 2;
+		set {
+			_rowHeight = value ? 2 : 1;
+			SetNeedsDisplay ();
+		}
+	}
 
 	int _start = 0;
 	int _selected = 0;
 
-	public const int COLUMN_WIDTH = 3;
-	public const int ROW_HEIGHT = 1;
+	const int COLUMN_WIDTH = 3;
+	int _rowHeight = 1;
 
 	public static int MaxCodePoint => 0x10FFFF;
 
-	public static int RowLabelWidth => $"U+{MaxCodePoint:x5}".Length + 1;
-	public static int RowWidth => RowLabelWidth + (COLUMN_WIDTH * 16);
+	static int RowLabelWidth => $"U+{MaxCodePoint:x5}".Length + 1;
+	static int RowWidth => RowLabelWidth + (COLUMN_WIDTH * 16);
 
 	public CharMap ()
 	{
 		ColorScheme = Colors.Dialog;
 		CanFocus = true;
-		ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePoint / 16 + (ShowHorizontalScrollIndicator ? 2 : 1)));
+		ContentSize = new Size (CharMap.RowWidth, (int)((MaxCodePoint / 16 + (ShowHorizontalScrollIndicator ? 2 : 1)) * _rowHeight));
 
 		AddCommand (Command.ScrollUp, () => {
 			if (SelectedCodePoint >= 16) {
@@ -305,12 +353,12 @@ class CharMap : ScrollView {
 			return true;
 		});
 		AddCommand (Command.PageUp, () => {
-			var page = (Bounds.Height / ROW_HEIGHT - 1) * 16;
+			var page = (Bounds.Height / _rowHeight - 1) * 16;
 			SelectedCodePoint -= Math.Min (page, SelectedCodePoint);
 			return true;
 		});
 		AddCommand (Command.PageDown, () => {
-			var page = (Bounds.Height / ROW_HEIGHT - 1) * 16;
+			var page = (Bounds.Height / _rowHeight - 1) * 16;
 			SelectedCodePoint += Math.Min (page, MaxCodePoint - SelectedCodePoint);
 			return true;
 		});
@@ -336,26 +384,34 @@ class CharMap : ScrollView {
 
 	public override void OnDrawContent (Rect contentArea)
 	{
-		if (ShowHorizontalScrollIndicator && ContentSize.Height < (int)(MaxCodePoint / 16 + 2)) {
-			ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePoint / 16 + 2));
-			var width = (Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH) - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
-			if (Cursor.X + ContentOffset.X >= width) {
-				// Snap to the selected glyph.
-				ContentOffset = new Point (Math.Min (Cursor.X, Cursor.X - width + COLUMN_WIDTH), ContentOffset.Y == -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
-			} else {
-				ContentOffset = new Point (ContentOffset.X - Cursor.X, ContentOffset.Y == -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
-			}
-		} else if (!ShowHorizontalScrollIndicator && ContentSize.Height > (int)(MaxCodePoint / 16 + 1)) {
-			ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePoint / 16 + 1));
-			// Snap 1st column into view if it's been scrolled horizontally
-			ContentOffset = new Point (0, ContentOffset.Y < -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
-		}
+		//if (ShowHorizontalScrollIndicator && ContentSize.Height < (int)(MaxCodePoint / 16 + 2)) {
+		//	//ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePoint / 16 + 2));
+		//	//ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePoint / 16) * _rowHeight + 2);
+		//	var width = (Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH) - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
+		//	if (Cursor.X + ContentOffset.X >= width) {
+		//		// Snap to the selected glyph.
+		//		ContentOffset = new Point (
+		//			Math.Min (Cursor.X, Cursor.X - width + COLUMN_WIDTH),
+		//			ContentOffset.Y == -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
+		//	} else {
+		//		ContentOffset = new Point (
+		//			ContentOffset.X - Cursor.X,
+		//			ContentOffset.Y == -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
+		//	}
+		//} else if (!ShowHorizontalScrollIndicator && ContentSize.Height > (int)(MaxCodePoint / 16 + 1)) {
+		//	//ContentSize = new Size (CharMap.RowWidth, (int)(MaxCodePoint / 16 + 1));
+		//	// Snap 1st column into view if it's been scrolled horizontally
+		//	ContentOffset = new Point (0, ContentOffset.Y < -ContentSize.Height + Bounds.Height ? ContentOffset.Y - 1 : ContentOffset.Y);
+		//}
 		base.OnDrawContent (contentArea);
 	}
 
 	//public void CharMap_DrawContent (object s, DrawEventArgs a)
 	public override void OnDrawContentComplete (Rect contentArea)
 	{
+		if (contentArea.Height == 0 || contentArea.Width == 0) {
+			return;
+		}
 		Rect viewport = new Rect (ContentOffset,
 			new Size (Math.Max (Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
 				Math.Max (Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0)));
@@ -370,8 +426,8 @@ class CharMap : ScrollView {
 			Driver.Clip = new Rect (Driver.Clip.Location, new Size (Driver.Clip.Width - 1, Driver.Clip.Height));
 		}
 
-		var cursorCol = Cursor.X;
-		var cursorRow = Cursor.Y;
+		var cursorCol = Cursor.X - ContentOffset.X - RowLabelWidth - 1;
+		var cursorRow = Cursor.Y - ContentOffset.Y - 1;
 
 		Driver.SetAttribute (GetHotNormalColor ());
 		Move (0, 0);
@@ -382,7 +438,7 @@ class CharMap : ScrollView {
 				Move (x, 0);
 				Driver.SetAttribute (GetHotNormalColor ());
 				Driver.AddStr (" ");
-				Driver.SetAttribute (HasFocus && (cursorCol + RowLabelWidth == x) ? ColorScheme.HotFocus : GetHotNormalColor ());
+				Driver.SetAttribute (HasFocus && (cursorCol + ContentOffset.X + RowLabelWidth == x) ? ColorScheme.HotFocus : GetHotNormalColor ());
 				Driver.AddStr ($"{hexDigit:x}");
 				Driver.SetAttribute (GetHotNormalColor ());
 				Driver.AddStr (" ");
@@ -390,7 +446,10 @@ class CharMap : ScrollView {
 		}
 
 		var firstColumnX = viewport.X + RowLabelWidth;
-		for (int row = -ContentOffset.Y, y = 1; row <= (-ContentOffset.Y) + (Bounds.Height / ROW_HEIGHT); row++, y += ROW_HEIGHT) {
+		for (int y = 1; y < Bounds.Height; y++) {
+			// What row is this?
+			var row = (y - ContentOffset.Y - 1) / _rowHeight;
+
 			var val = (row) * 16;
 			if (val > MaxCodePoint) {
 				continue;
@@ -398,16 +457,26 @@ class CharMap : ScrollView {
 			Move (firstColumnX + COLUMN_WIDTH, y);
 			Driver.SetAttribute (GetNormalColor ());
 			for (int col = 0; col < 16; col++) {
+
 				var x = firstColumnX + COLUMN_WIDTH * col + 1;
+
 				Move (x, y);
 				if (cursorRow + ContentOffset.Y + 1 == y && cursorCol + ContentOffset.X + firstColumnX + 1 == x && !HasFocus) {
 					Driver.SetAttribute (GetFocusColor ());
 				}
+				var scalar = val + col;
+				Rune rune = (Rune)'?';
+				if (Rune.IsValid (scalar)) {
+					rune = new Rune (scalar);
+				}
+				var width = rune.GetColumns ();
 
-				if (char.IsSurrogate ((char)(val + col))) {
-					Driver.AddRune (Rune.ReplacementChar);
+				// are we at first row of the row?
+				if (!ShowGlyphWidths || (y - ContentOffset.Y) % _rowHeight > 0) {
+					Driver.AddRune (rune);
 				} else {
-					Driver.AddRune (new Rune (val + col));
+					Driver.SetAttribute (ColorScheme.HotNormal);
+					Driver.AddStr ($"{width}");
 				}
 
 				if (cursorRow + ContentOffset.Y + 1 == y && cursorCol + ContentOffset.X + firstColumnX + 1 == x && !HasFocus) {
@@ -416,8 +485,11 @@ class CharMap : ScrollView {
 			}
 			Move (0, y);
 			Driver.SetAttribute (HasFocus && (cursorRow + ContentOffset.Y + 1 == y) ? ColorScheme.HotFocus : ColorScheme.HotNormal);
-			var rowLabel = $"U+{val / 16:x5}_ ";
-			Driver.AddStr (rowLabel);
+			if (!ShowGlyphWidths || (y - ContentOffset.Y) % _rowHeight > 0) {
+				Driver.AddStr ($"U+{val / 16:x5}_ ");
+			} else {
+				Driver.AddStr (new string (' ', RowLabelWidth));
+			}
 		}
 		Driver.Clip = oldClip;
 	}
@@ -426,28 +498,36 @@ class CharMap : ScrollView {
 	void Handle_MouseClick (object sender, MouseEventEventArgs args)
 	{
 		var me = args.MouseEvent;
-		if (me.Flags == MouseFlags.ReportMousePosition || (me.Flags != MouseFlags.Button1Clicked &&
-			me.Flags != MouseFlags.Button1DoubleClicked)) { // && me.Flags != _contextMenu.MouseFlags)) {
+		if (me.Flags != MouseFlags.ReportMousePosition && me.Flags != MouseFlags.Button1Clicked &&
+			me.Flags != MouseFlags.Button1DoubleClicked) {
 			return;
 		}
 
-		if (me.X < RowLabelWidth) {
-			return;
+		if (me.Y == 0) {
+			me.Y = Cursor.Y;
 		}
 
-		if (me.Y < 1) {
-			return;
+		if (me.Y > 0) {
 		}
 
-		var row = me.Y - 1;
+		if (me.X < RowLabelWidth || me.X > RowLabelWidth + (16 * COLUMN_WIDTH) - 1) {
+			me.X = Cursor.X;
+		}
+
+		var row = (me.Y - 1 - ContentOffset.Y) / _rowHeight; // -1 for header
 		var col = (me.X - RowLabelWidth - ContentOffset.X) / COLUMN_WIDTH;
-		if (row < 0 || row > Bounds.Height || col < 0 || col > 15) {
-			return;
+
+		if (col > 15) {
+			col = 15;
 		}
 
-		var val = (row - ContentOffset.Y) * 16 + col;
+		var val = (row) * 16 + col;
 		if (val > MaxCodePoint) {
 			return;
+		}
+
+		if (me.Flags == MouseFlags.ReportMousePosition) {
+			Hover?.Invoke (this, new ListViewItemEventArgs (val, null));
 		}
 
 		if (me.Flags == MouseFlags.Button1Clicked) {
@@ -535,6 +615,7 @@ class CharMap : ScrollView {
 		};
 		Application.Run (waitIndicator);
 
+
 		if (!string.IsNullOrEmpty (decResponse)) {
 			string name = string.Empty;
 
@@ -551,24 +632,155 @@ class CharMap : ScrollView {
 				//&& property3Element.TryGetProperty ("nestedProperty", out JsonElement nestedPropertyElement)) {
 				//	Console.WriteLine (nestedPropertyElement.GetString ());
 				//}
+				decResponse = JsonSerializer.Serialize (document.RootElement, new
+						JsonSerializerOptions {
+					WriteIndented = true
+				});
 			}
 
-			var title = $"{ToCamelCase (name)} - {new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x4}";
-			switch (MessageBox.Query (title, decResponse, "Copy _Glyph", "Copy Code _Point", "Cancel")) {
-			case 0:
+			var title = $"{ToCamelCase (name)} - {new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x5}";
+
+			var copyGlyph = new Button ("Copy _Glyph");
+			var copyCP = new Button ("Copy Code _Point");
+			var cancel = new Button ("Cancel");
+
+			var dlg = new Dialog (copyGlyph, copyCP, cancel) {
+				Title = title
+			};
+
+			copyGlyph.Clicked += (s, a) => {
 				CopyGlyph ();
-				break;
-			case 1:
+				dlg.RequestStop ();
+			};
+			copyCP.Clicked += (s, a) => {
 				CopyCodePoint ();
-				break;
-			}
+				dlg.RequestStop ();
+			};
+			cancel.Clicked += (s, a) => dlg.RequestStop ();
+
+			var rune = (Rune)SelectedCodePoint;
+			var label = new Label () {
+				Text = "IsAscii: ",
+				X = 0,
+				Y = 0
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = $"{rune.IsAscii}",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = ", Bmp: ",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = $"{rune.IsBmp}",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = ", CombiningMark: ",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = $"{rune.IsCombiningMark ()}",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = ", SurrogatePair: ",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = $"{rune.IsSurrogatePair ()}",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = ", Plane: ",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = $"{rune.Plane}",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = "Columns: ",
+				X = 0,
+				Y = Pos.Bottom (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = $"{rune.GetColumns ()}",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = ", Utf16SequenceLength: ",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = $"{rune.Utf16SequenceLength}",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+			label = new Label () {
+				Text = $"Code Point Information from {UcdApiClient.BaseUrl}codepoint/dec/{SelectedCodePoint}:",
+				X = 0,
+				Y = Pos.Bottom (label)
+			};
+			dlg.Add (label);
+
+			var json = new TextView () {
+				X = 0,
+				Y = Pos.Bottom (label),
+				Width = Dim.Fill (),
+				Height = Dim.Fill (2),
+				ReadOnly = true,
+				Text = decResponse
+			};
+			dlg.Add (json);
+
+			Application.Run (dlg);
+
 		} else {
-			MessageBox.ErrorQuery ("Code Point API", $"{UcdApiClient.BaseUrl} did not return a result.", "Ok");
+			MessageBox.ErrorQuery ("Code Point API", $"{UcdApiClient.BaseUrl}codepoint/dec/{SelectedCodePoint} did not return a result for\r\n {new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x5}.", "Ok");
 		}
 		// BUGBUG: This is a workaround for some weird ScrollView related mouse grab bug
 		Application.GrabMouse (this);
 	}
-
 
 	public override bool OnEnter (View view)
 	{
@@ -576,6 +788,12 @@ class CharMap : ScrollView {
 			Application.Driver.SetCursorVisibility (CursorVisibility.Default);
 		}
 		return base.OnEnter (view);
+	}
+
+	public override bool OnLeave (View view)
+	{
+		Driver.SetCursorVisibility (CursorVisibility.Invisible);
+		return base.OnLeave (view);
 	}
 }
 
@@ -637,7 +855,6 @@ class UnicodeRange {
 
 			new UnicodeRange (0x1F130, 0x1F149   ,"Squared Latin Capital Letters"),
 			new UnicodeRange (0x12400, 0x1240f   ,"Cuneiform Numbers and Punctuation"),
-			new UnicodeRange (0x1FA00, 0x1FA0f   ,"Chess Symbols"),
 			new UnicodeRange (0x10000, 0x1007F   ,"Linear B Syllabary"),
 			new UnicodeRange (0x10080, 0x100FF   ,"Linear B Ideograms"),
 			new UnicodeRange (0x10100, 0x1013F   ,"Aegean Numbers"),

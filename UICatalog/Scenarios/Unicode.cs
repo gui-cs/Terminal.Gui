@@ -9,16 +9,9 @@ namespace UICatalog.Scenarios {
 	public class UnicodeInMenu : Scenario {
 		public override void Setup ()
 		{
-			const string IdenticalSign = "\u2261";
-			const string ArrowUpSign = "\u2191";
-			const string ArrowDownSign = "\u2193";
-			const string EllipsesSign = "\u2026";
-			const string StashSign = "\u205E";
-
-			//string text = "Hello world, how are you today? Pretty neat!\nSecond line\n\nFourth Line.";
 			string unicode = "Τὴ γλῶσσα μοῦ ἔδωσαν ἑλληνικὴ\nτὸ σπίτι φτωχικὸ στὶς ἀμμουδιὲς τοῦ Ὁμήρου.\nΜονάχη ἔγνοια ἡ γλῶσσα μου στὶς ἀμμουδιὲς τοῦ Ὁμήρου.";
 
-			string gitString = $"gui.cs master {IdenticalSign} {ArrowDownSign}18 {ArrowUpSign}10 {StashSign}1 {EllipsesSign}";
+			string gitString = $"gui.cs 糊 (hú) {ConfigurationManager.Glyphs.IdenticalTo} {ConfigurationManager.Glyphs.DownArrow}18 {ConfigurationManager.Glyphs.UpArrow}10 {ConfigurationManager.Glyphs.VerticalFourDots}1 {ConfigurationManager.Glyphs.HorizontalEllipsis}";
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_Файл", new MenuItem [] {
@@ -30,7 +23,7 @@ namespace UICatalog.Scenarios {
 				new MenuBarItem ("_Edit", new MenuItem [] {
 					new MenuItem ("_Copy", "", null),
 					new MenuItem ("C_ut", "", null),
-					new MenuItem ("_Paste", "", null)
+					new MenuItem ("_糊", "hú (Paste)", null)
 				})
 			});
 			Application.Top.Add (menu);
@@ -60,11 +53,10 @@ namespace UICatalog.Scenarios {
 			label = new Label ("CheckBox:") { X = Pos.X (label), Y = Pos.Bottom (label) + 1 };
 			Win.Add (label);
 			var checkBox = new CheckBox (gitString) { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50) };
-			var ckbAllowNull = new CheckBox ("Allow null checked") { X = Pos.Right (checkBox) + 1, Y = Pos.Y (label) };
-			ckbAllowNull.Toggled += (s,e) => checkBox.AllowNullChecked = (bool)!e.OldValue;
-			Win.Add (checkBox, ckbAllowNull);
+			var checkBoxRight = new CheckBox ($"Align Right - {gitString}") { X = 20, Y = Pos.Bottom (checkBox), Width = Dim.Percent (50), TextAlignment = TextAlignment.Right};
+			Win.Add (checkBox, checkBoxRight);
 
-			label = new Label ("ComboBox:") { X = Pos.X (label), Y = Pos.Bottom (label) + 1 };
+			label = new Label ("ComboBox:") { X = Pos.X (label), Y = Pos.Bottom (checkBoxRight) + 1 };
 			Win.Add (label);
 			var comboBox = new ComboBox () {
 				X = 20,

@@ -13,7 +13,7 @@ using Attribute = Terminal.Gui.Attribute;
 namespace Terminal.Gui.ConfigurationTests {
 	public class ConfigurationManagerTests {
 
-		public static readonly JsonSerializerOptions _jsonOptions = new() {
+		public static readonly JsonSerializerOptions _jsonOptions = new () {
 			Converters = {
 				new AttributeJsonConverter (),
 				new ColorJsonConverter (),
@@ -65,44 +65,43 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (boolSrc, boolCopy);
 
 			// Structs
-			var attrDest = new Attribute (1);
-			var attrSrc = new Attribute (2);
+			var attrDest = new Attribute (Color.Black);
+			var attrSrc = new Attribute (Color.White);
 			var attrCopy = DeepMemberwiseCopy (attrSrc, attrDest);
 			Assert.Equal (attrSrc, attrCopy);
 
 			// Classes
-			var colorschemeDest = new ColorScheme () { Disabled = new Attribute (1) };
-			var colorschemeSrc = new ColorScheme () { Disabled = new Attribute (2) };
+			var colorschemeDest = new ColorScheme () { Disabled = new Attribute (Color.Black) };
+			var colorschemeSrc = new ColorScheme () { Disabled = new Attribute (Color.White) };
 			var colorschemeCopy = DeepMemberwiseCopy (colorschemeSrc, colorschemeDest);
 			Assert.Equal (colorschemeSrc, colorschemeCopy);
 
 			// Dictionaries
-			var dictDest = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (1) } };
-			var dictSrc = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (2) } };
+			var dictDest = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (Color.Black) } };
+			var dictSrc = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (Color.White) } };
 			var dictCopy = (Dictionary<string, Attribute>)DeepMemberwiseCopy (dictSrc, dictDest);
 			Assert.Equal (dictSrc, dictCopy);
 
-			dictDest = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (1) } };
-			dictSrc = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (2) }, { "Normal", new Attribute (3) } };
+			dictDest = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (Color.Black) } };
+			dictSrc = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (Color.White) }, { "Normal", new Attribute (Color.Blue) } };
 			dictCopy = (Dictionary<string, Attribute>)DeepMemberwiseCopy (dictSrc, dictDest);
 			Assert.Equal (dictSrc, dictCopy);
 
 			// src adds an item
-			dictDest = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (1) } };
-			dictSrc = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (2) }, { "Normal", new Attribute (3) } };
+			dictDest = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (Color.Black) } };
+			dictSrc = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (Color.White) }, { "Normal", new Attribute (Color.Blue) } };
 			dictCopy = (Dictionary<string, Attribute>)DeepMemberwiseCopy (dictSrc, dictDest);
 			Assert.Equal (2, dictCopy.Count);
 			Assert.Equal (dictSrc ["Disabled"], dictCopy ["Disabled"]);
 			Assert.Equal (dictSrc ["Normal"], dictCopy ["Normal"]);
 
 			// src updates only one item
-			dictDest = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (1) }, { "Normal", new Attribute (2) } };
-			dictSrc = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (3) } };
+			dictDest = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (Color.Black) }, { "Normal", new Attribute (Color.White) } };
+			dictSrc = new Dictionary<string, Attribute> () { { "Disabled", new Attribute (Color.White) } };
 			dictCopy = (Dictionary<string, Attribute>)DeepMemberwiseCopy (dictSrc, dictDest);
 			Assert.Equal (2, dictCopy.Count);
 			Assert.Equal (dictSrc ["Disabled"], dictCopy ["Disabled"]);
 			Assert.Equal (dictDest ["Normal"], dictCopy ["Normal"]);
-
 		}
 
 		//[Fact ()]
@@ -207,7 +206,7 @@ namespace Terminal.Gui.ConfigurationTests {
 		}
 
 		[Fact]
-		public void Reset_Resets()
+		public void Reset_Resets ()
 		{
 			ConfigurationManager.Locations = ConfigLocations.DefaultOnly;
 			ConfigurationManager.Reset ();
@@ -225,7 +224,6 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
 			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
 			ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue = true;
-			ConfigurationManager.Settings ["Application.EnableConsoleScrolling"].PropertyValue = true;
 			ConfigurationManager.Settings.Apply ();
 
 			// assert apply worked
@@ -233,7 +231,6 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Key.F, Application.AlternateForwardKey);
 			Assert.Equal (Key.B, Application.AlternateBackwardKey);
 			Assert.True (Application.IsMouseDisabled);
-			Assert.True (Application.EnableConsoleScrolling);
 
 			//act
 			ConfigurationManager.Reset ();
@@ -245,14 +242,12 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Key.PageDown | Key.CtrlMask, Application.AlternateForwardKey);
 			Assert.Equal (Key.PageUp | Key.CtrlMask, Application.AlternateBackwardKey);
 			Assert.False (Application.IsMouseDisabled);
-			Assert.False (Application.EnableConsoleScrolling);
 
 			// arrange
 			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = Key.Q;
 			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
 			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
 			ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue = true;
-			ConfigurationManager.Settings ["Application.EnableConsoleScrolling"].PropertyValue = true;
 			ConfigurationManager.Settings.Apply ();
 
 			ConfigurationManager.Locations = ConfigLocations.DefaultOnly;
@@ -268,7 +263,6 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Key.PageDown | Key.CtrlMask, Application.AlternateForwardKey);
 			Assert.Equal (Key.PageUp | Key.CtrlMask, Application.AlternateBackwardKey);
 			Assert.False (Application.IsMouseDisabled);
-			Assert.False (Application.EnableConsoleScrolling);
 
 		}
 
@@ -312,7 +306,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.Reset ();
 			ConfigurationManager.GetHardCodedDefaults ();
 			var stream = ConfigurationManager.ToStream ();
-			
+
 			ConfigurationManager.Settings.Update (stream, "TestConfigurationManagerToJson");
 		}
 
@@ -320,7 +314,7 @@ namespace Terminal.Gui.ConfigurationTests {
 		public void TestConfigurationManagerInitDriver_NoLocations ()
 		{
 
-			
+
 		}
 
 		[Fact, AutoInitShutdown (configLocation: ConfigLocations.DefaultOnly)]
@@ -336,7 +330,7 @@ namespace Terminal.Gui.ConfigurationTests {
 
 			// Change Base
 			var json = ConfigurationManager.ToStream ();
-			
+
 			ConfigurationManager.Settings.Update (json, "TestConfigurationManagerInitDriver");
 
 			var colorSchemes = ((Dictionary<string, ColorScheme>)ConfigurationManager.Themes [ConfigurationManager.Themes.Theme] ["ColorSchemes"].PropertyValue);
@@ -507,7 +501,7 @@ namespace Terminal.Gui.ConfigurationTests {
 
 			ConfigurationManager.Reset ();
 			ConfigurationManager.ThrowOnJsonErrors = true;
-			
+
 			ConfigurationManager.Settings.Update (json, "TestConfigurationManagerUpdateFromJson");
 
 			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
@@ -518,7 +512,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Color.White, Colors.ColorSchemes ["Base"].Normal.Foreground);
 			Assert.Equal (Color.Blue, Colors.ColorSchemes ["Base"].Normal.Background);
 
-			var colorSchemes = (Dictionary<string, ColorScheme>)Themes.First().Value ["ColorSchemes"].PropertyValue;
+			var colorSchemes = (Dictionary<string, ColorScheme>)Themes.First ().Value ["ColorSchemes"].PropertyValue;
 			Assert.Equal (Color.White, colorSchemes ["Base"].Normal.Foreground);
 			Assert.Equal (Color.Blue, colorSchemes ["Base"].Normal.Background);
 
@@ -571,7 +565,7 @@ namespace Terminal.Gui.ConfigurationTests {
 								""UserDefined"": {
 									""AbNormal"": {
 										""foreground"": ""green"",
-										""background"": ""1234""
+										""background"": ""black""
 									}
 								}
 							}
@@ -615,7 +609,7 @@ namespace Terminal.Gui.ConfigurationTests {
 
 			jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Settings.Update (json, "test"));
 			Assert.StartsWith ("Unknown property", jsonException.Message);
-			
+
 			Assert.Equal (0, ConfigurationManager.jsonErrors.Length);
 
 			ConfigurationManager.ThrowOnJsonErrors = false;
@@ -661,7 +655,7 @@ namespace Terminal.Gui.ConfigurationTests {
 								""UserDefined"": {
 									""AbNormal"": {
 										""foreground"": ""green"",
-										""background"": ""1234""
+										""background"": ""black""
 									}
 								}
 							}
@@ -696,7 +690,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.Settings.Update (json, "test");
 
 			ConfigurationManager.Settings.Update ("{}}", "test");
-			
+
 			Assert.NotEqual (0, ConfigurationManager.jsonErrors.Length);
 
 			Application.Shutdown ();
@@ -743,12 +737,11 @@ namespace Terminal.Gui.ConfigurationTests {
 		public void Load_FiresUpdated ()
 		{
 			ConfigurationManager.Reset ();
-			
+
 			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = Key.Q;
 			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
 			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
 			ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue = true;
-			ConfigurationManager.Settings ["Application.EnableConsoleScrolling"].PropertyValue = true;
 
 			ConfigurationManager.Updated += ConfigurationManager_Updated;
 			bool fired = false;
@@ -760,7 +753,6 @@ namespace Terminal.Gui.ConfigurationTests {
 				Assert.Equal (Key.PageDown | Key.CtrlMask, ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue);
 				Assert.Equal (Key.PageUp | Key.CtrlMask, ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue);
 				Assert.False ((bool)ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue);
-				Assert.False ((bool)ConfigurationManager.Settings ["Application.EnableConsoleScrolling"].PropertyValue);
 			}
 
 			ConfigurationManager.Load (true);
@@ -785,7 +777,6 @@ namespace Terminal.Gui.ConfigurationTests {
 				Assert.Equal (Key.F, Application.AlternateForwardKey);
 				Assert.Equal (Key.B, Application.AlternateBackwardKey);
 				Assert.True (Application.IsMouseDisabled);
-				Assert.True (Application.EnableConsoleScrolling);
 			}
 
 			// act
@@ -793,7 +784,6 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
 			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
 			ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue = true;
-			ConfigurationManager.Settings ["Application.EnableConsoleScrolling"].PropertyValue = true;
 
 			ConfigurationManager.Apply ();
 

@@ -149,7 +149,12 @@ namespace Unix.Terminal {
 			{
 				return Curses.waddch (Handle, ch);
 			}
-	
+
+			//public int echochar (char ch)
+			//{
+			//	return Curses.wechochar (Handle, ch);
+			//}
+
 			public int refresh ()
 			{
 				return Curses.wrefresh (Handle);

@@ -1137,7 +1137,7 @@ namespace Terminal.Gui.ViewsTests {
 			{
 				var item = "";
 				for (int i = 0; i < 16; i++) {
-					item += (char)Application.Driver.Contents [0, i, 0];
+					item += Application.Driver.Contents [0, i].Runes [0];
 				}
 				return item;
 			}

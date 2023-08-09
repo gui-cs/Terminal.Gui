@@ -79,7 +79,7 @@ namespace UICatalog.Scenarios {
 							_fractionTimer = null;
 							button.Enabled = true;
 						}
-						Application.MainLoop.Driver.Wakeup ();
+						Application.MainLoop.MainLoopDriver.Wakeup ();
 					}, null, 0, _timerTick);
 				}
 			};
@@ -128,7 +128,7 @@ namespace UICatalog.Scenarios {
 				marqueesBlocksPB.Text = marqueesContinuousPB.Text = DateTime.Now.TimeOfDay.ToString ();
 				marqueesBlocksPB.Pulse ();
 				marqueesContinuousPB.Pulse ();
-				Application.MainLoop.Driver.Wakeup ();
+				Application.MainLoop.MainLoopDriver.Wakeup ();
 			}, null, 0, 300);
 
 			Application.Top.Unloaded += Top_Unloaded;

@@ -214,8 +214,6 @@ namespace UICatalog {
 				CM.Apply ();
 			}
 
-			//Application.EnableConsoleScrolling = _enableConsoleScrolling;
-
 			Application.Run<UICatalogTopLevel> ();
 			Application.Shutdown ();
 
@@ -239,7 +237,6 @@ namespace UICatalog {
 
 		static bool _useSystemConsole = false;
 		static ConsoleDriver.DiagnosticFlags _diagnosticFlags;
-		//static bool _enableConsoleScrolling = false;
 		static bool _isFirstRunning = true;
 		static string _topLevelColorScheme = string.Empty;
 
@@ -254,7 +251,6 @@ namespace UICatalog {
 			public MenuItem? miUseSubMenusSingleFrame;
 			public MenuItem? miIsMenuBorderDisabled;
 			public MenuItem? miIsMouseDisabled;
-			public MenuItem? miEnableConsoleScrolling;
 
 			public ListView CategoryList;
 
@@ -383,8 +379,8 @@ namespace UICatalog {
 				ScenarioList.KeyDown += (s, a) => {
 					if (CollectionNavigator.IsCompatibleKey (a.KeyEvent)) {
 						var newItem = _scenarioCollectionNav?.GetNextMatchingItem (ScenarioList.SelectedRow, (char)a.KeyEvent.KeyValue);
-						if (newItem is int && newItem != -1) {
-							ScenarioList.SelectedRow = (int)newItem;
+						if (newItem is int v && newItem != -1) {
+							ScenarioList.SelectedRow = v;
 							ScenarioList.EnsureSelectedCellIsVisible ();
 							ScenarioList.SetNeedsDisplay ();
 							a.Handled = true;
@@ -426,8 +422,7 @@ namespace UICatalog {
 				ConfigChanged ();
 
 				miIsMouseDisabled!.Checked = Application.IsMouseDisabled;
-				miEnableConsoleScrolling!.Checked = Application.EnableConsoleScrolling;
-				DriverName.Title = $"Driver: {Driver.GetType ().Name}";
+				DriverName.Title = $"Driver: {Driver.GetVersionInfo()}";
 				OS.Title = $"OS: {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem} {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion}";
 
 				if (_selectedScenario != null) {
@@ -489,8 +484,7 @@ namespace UICatalog {
 			{
 				List<MenuItem []> menuItems = new List<MenuItem []> {
 					CreateDiagnosticFlagsMenuItems (),
-					new MenuItem [] { },
-					CreateEnableConsoleScrollingMenuItems (),
+					Array.Empty<MenuItem> (),
 					CreateDisabledEnabledMouseItems (),
 					CreateDisabledEnabledMenuBorder (),
 					CreateDisabledEnableUseSubMenusSingleFrame (),
@@ -563,22 +557,6 @@ namespace UICatalog {
 
 				menuItems.Add (null!);
 				menuItems.Add (item);
-
-				return menuItems.ToArray ();
-			}
-
-			MenuItem [] CreateEnableConsoleScrollingMenuItems ()
-			{
-				List<MenuItem> menuItems = new List<MenuItem> ();
-				miEnableConsoleScrolling = new MenuItem ();
-				miEnableConsoleScrolling.Title = "_Enable Console Scrolling";
-				miEnableConsoleScrolling.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miEnableConsoleScrolling.Title!.Substring (1, 1) [0];
-				miEnableConsoleScrolling.CheckType |= MenuItemCheckStyle.Checked;
-				miEnableConsoleScrolling.Action += () => {
-					miEnableConsoleScrolling.Checked = !miEnableConsoleScrolling.Checked;
-					Application.EnableConsoleScrolling = (bool)miEnableConsoleScrolling.Checked!;
-				};
-				menuItems.Add (miEnableConsoleScrolling);
 
 				return menuItems.ToArray ();
 			}
@@ -759,7 +737,6 @@ namespace UICatalog {
 				StatusBar.Items [0].Title = $"~{Application.QuitKey} to quit";
 
 				miIsMouseDisabled!.Checked = Application.IsMouseDisabled;
-				miEnableConsoleScrolling!.Checked = Application.EnableConsoleScrolling;
 
 				var height = (UICatalogApp.ShowStatusBar ? 1 : 0);// + (MenuBar.Visible ? 1 : 0);
 										  //ContentPane.Height = Dim.Fill (height);

@@ -142,8 +142,9 @@ namespace UICatalog.Scenarios {
 				foreach (var canvas in _layers) {
 
 					foreach (var c in canvas.GetCellMap ()) {
-						Driver.SetAttribute (c.Value.Attribute?.Value ?? ColorScheme.Normal);
-						this.AddRune (c.Key.X, c.Key.Y, c.Value.Rune.Value);
+						Driver.SetAttribute (c.Value.Attribute ?? ColorScheme.Normal);
+						// TODO: #2616 - Support combining sequences that don't normalize
+						this.AddRune (c.Key.X, c.Key.Y, c.Value.Runes [0]);
 					}
 				}
 			}

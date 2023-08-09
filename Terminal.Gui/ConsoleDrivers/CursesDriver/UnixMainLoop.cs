@@ -97,8 +97,8 @@ namespace Terminal.Gui {
 		{
 			this.mainLoop = mainLoop;
 			pipe (wakeupPipes);
-			AddWatch (wakeupPipes [0], Condition.PollIn, ml => {
-				read (wakeupPipes [0], ignore, readHandle);
+			AddWatch (wakeupPipes [1], Condition.PollIn, ml => {
+				read (wakeupPipes [1], ignore, readHandle);
 				return true;
 			});
 		}
@@ -211,6 +211,10 @@ namespace Terminal.Gui {
 						descriptorWatchers.Remove (p.fd);
 				}
 			}
+		}
+		public void TearDown ()
+		{
+			//throw new NotImplementedException ();
 		}
 	}
 }

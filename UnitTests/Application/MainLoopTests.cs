@@ -25,7 +25,7 @@ namespace Terminal.Gui.ApplicationTests {
 		public void Constructor_Setups_Driver ()
 		{
 			var ml = new MainLoop (new FakeMainLoop ());
-			Assert.NotNull (ml.Driver);
+			Assert.NotNull (ml.MainLoopDriver);
 		}
 
 		// Idle Handler tests
@@ -525,6 +525,10 @@ namespace Terminal.Gui.ApplicationTests {
 			{
 				throw new NotImplementedException ();
 			}
+			public void TearDown ()
+			{
+				throw new NotImplementedException ();
+			}
 
 			public void Setup (MainLoop mainLoop)
 			{
@@ -659,7 +663,9 @@ namespace Terminal.Gui.ApplicationTests {
 					Assert.True (btn.ProcessKey (new KeyEvent (Key.Enter, null)));
 					Assert.Equal (cancel, btn.Text);
 					Assert.Equal (one, total);
-				} else if (taskCompleted) 					Application.RequestStop ();
+				} else if (taskCompleted) {
+					Application.RequestStop ();
+				}
 			};
 
 			Application.Run ();

@@ -15,6 +15,7 @@ docfx/api
 docs/
 
 UnitTests/TestResults
+TestResults
 
 #git merge files
 *.orig

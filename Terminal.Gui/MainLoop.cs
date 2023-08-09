@@ -77,8 +77,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The current <see cref="IMainLoopDriver"/> in use.
 		/// </summary>
-		/// <value>The driver.</value>
-		public IMainLoopDriver Driver { get; }
+		/// <value>The main loop driver.</value>
+		public IMainLoopDriver MainLoopDriver { get; }
 
 		/// <summary>
 		/// Invoked when a new timeout is added. To be used in the case
@@ -93,7 +93,7 @@ namespace Terminal.Gui {
 		/// (one of the implementations FakeMainLoop, UnixMainLoop, NetMainLoop or WindowsMainLoop).</param>
 		public MainLoop (IMainLoopDriver driver)
 		{
-			Driver = driver;
+			MainLoopDriver = driver;
 			driver.Setup (this);
 		}
 
@@ -128,7 +128,7 @@ namespace Terminal.Gui {
 				idleHandlers.Add (idleHandler);
 			}
 
-			Driver.Wakeup ();
+			MainLoopDriver.Wakeup ();
 			return idleHandler;
 		}
 
@@ -140,8 +140,9 @@ namespace Terminal.Gui {
 		///  This method also returns <c>false</c> if the idle handler is not found.
 		public bool RemoveIdle (Func<bool> token)
 		{
-			lock (_idleHandlersLock)
+			lock (_idleHandlersLock) {
 				return idleHandlers.Remove (token);
+			}
 		}
 
 		void AddTimeout (TimeSpan time, Timeout timeout)
@@ -149,7 +150,7 @@ namespace Terminal.Gui {
 			lock (_timeoutsLockToken) {
 				var k = (DateTime.UtcNow + time).Ticks;
 				timeouts.Add (NudgeToUniqueKey (k), timeout);
-				TimeoutAdded?.Invoke (this, new TimeoutEventArgs(timeout, k));
+				TimeoutAdded?.Invoke (this, new TimeoutEventArgs (timeout, k));
 			}
 		}
 
@@ -166,8 +167,9 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public object AddTimeout (TimeSpan time, Func<MainLoop, bool> callback)
 		{
-			if (callback == null)
+			if (callback == null) {
 				throw new ArgumentNullException (nameof (callback));
+			}
 			var timeout = new Timeout () {
 				Span = time,
 				Callback = callback
@@ -188,8 +190,9 @@ namespace Terminal.Gui {
 		{
 			lock (_timeoutsLockToken) {
 				var idx = timeouts.IndexOfValue (token as Timeout);
-				if (idx == -1)
+				if (idx == -1) {
 					return false;
+				}
 				timeouts.RemoveAt (idx);
 			}
 			return true;
@@ -213,8 +216,9 @@ namespace Terminal.Gui {
 				var k = t.Key;
 				var timeout = t.Value;
 				if (k < now) {
-					if (timeout.Callback (this))
+					if (timeout.Callback (this)) {
 						AddTimeout (timeout.Span, timeout);
+					}
 				} else {
 					lock (_timeoutsLockToken) {
 						timeouts.Add (NudgeToUniqueKey (k), timeout);
@@ -249,21 +253,25 @@ namespace Terminal.Gui {
 			}
 
 			foreach (var idle in iterate) {
-				if (idle ())
-					lock (_idleHandlersLock)
+				if (idle ()) {
+					lock (_idleHandlersLock) {
 						idleHandlers.Add (idle);
+					}
+				}
 			}
 		}
 
 		bool _running;
 
+		// BUGBUG: Stop is only called from MainLoopUnitTests.cs. As a result, the mainloop
+		// will never exit during other unit tests or normal execution.
 		/// <summary>
 		///   Stops the mainloop.
 		/// </summary>
 		public void Stop ()
 		{
 			_running = false;
-			Driver.Wakeup ();
+			MainLoopDriver.Wakeup ();
 		}
 
 		/// <summary>
@@ -276,7 +284,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public bool EventsPending (bool wait = false)
 		{
-			return Driver.EventsPending (wait);
+			return MainLoopDriver.EventsPending (wait);
 		}
 
 		/// <summary>
@@ -291,10 +299,11 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public void RunIteration ()
 		{
-			if (timeouts.Count > 0)
+			if (timeouts.Count > 0) {
 				RunTimers ();
+			}
 
-			Driver.Iteration ();
+			MainLoopDriver.Iteration ();
 
 			bool runIdle = false;
 			lock (_idleHandlersLock) {

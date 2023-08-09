@@ -91,7 +91,7 @@ namespace Unix.Terminal {
 		const int RTLD_LAZY = 1;
 		const int RTLD_GLOBAL = 8;
 
-		readonly string libraryPath;
+		public readonly string LibraryPath;
 		readonly IntPtr handle;
 
 		public IntPtr NativeLibraryHandle => handle;
@@ -104,13 +104,15 @@ namespace Unix.Terminal {
 		public UnmanagedLibrary (string [] libraryPathAlternatives, bool isFullPath)
 		{
 			if (isFullPath) {
-				this.libraryPath = FirstValidLibraryPath (libraryPathAlternatives);
-				this.handle = PlatformSpecificLoadLibrary (this.libraryPath);
+				this.LibraryPath = FirstValidLibraryPath (libraryPathAlternatives);
+				this.handle = PlatformSpecificLoadLibrary (this.LibraryPath);
 			} else {
 				foreach (var lib in libraryPathAlternatives) {
 					this.handle = PlatformSpecificLoadLibrary (lib);
-					if (this.handle != IntPtr.Zero)
+					if (this.handle != IntPtr.Zero) {
+						this.LibraryPath = lib;
 						break;
+					}
 				}
 			}
 

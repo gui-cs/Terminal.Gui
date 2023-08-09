@@ -97,7 +97,7 @@ namespace Terminal.Gui {
 			}
 
 			foreach (var top in _toplevels) {
-				if (top != Current && top.Visible && (!top._needsDisplay.IsEmpty || top._subViewNeedsDisplay || top.LayoutNeeded)) {
+				if (top != Current && top.Visible && (top.NeedsDisplay || top.SubViewNeedsDisplay || top.LayoutNeeded)) {
 					OverlappedTop.SetSubViewNeedsDisplay ();
 					return true;
 				}
