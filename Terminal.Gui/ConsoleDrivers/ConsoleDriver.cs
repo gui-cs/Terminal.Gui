@@ -135,7 +135,7 @@ public abstract class ConsoleDriver {
 	/// <remarks>
 	/// <para>
 	/// When the method returns, <see cref="Col"/> will be incremented by the number of columns <paramref name="rune"/> required,
-	/// unless the new column value is outside of the <see cref="Clip"/> or screen dimensions defined by <see cref="Cols"/>.
+	/// even if the new column value is outside of the <see cref="Clip"/> or screen dimensions defined by <see cref="Cols"/>.
 	/// </para>
 	/// <para>
 	/// If <paramref name="rune"/> requires more than one column, and <see cref="Col"/> plus the number of columns needed
@@ -150,7 +150,7 @@ public abstract class ConsoleDriver {
 		if (validLocation) {
 			rune = rune.MakePrintable ();
 			runeWidth = rune.GetColumns ();
-			if (runeWidth == 0 && rune.IsCombiningMark() && Col > 0) {
+			if (runeWidth == 0 && rune.IsCombiningMark () && Col > 0) {
 				// This is a combining character, and we are not at the beginning of the line.
 				// TODO: Remove hard-coded [0] once combining pairs is supported
 
@@ -223,7 +223,7 @@ public abstract class ConsoleDriver {
 		}
 
 		if (runeWidth > 1) {
-			Debug.Assert(runeWidth <= 2);
+			Debug.Assert (runeWidth <= 2);
 			if (validLocation && Col < Clip.Right) {
 				// This is a double-width character, and we are not at the end of the line.
 				// Col now points to the second column of the character. Ensure it doesn't

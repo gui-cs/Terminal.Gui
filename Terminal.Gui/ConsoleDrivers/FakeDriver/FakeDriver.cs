@@ -14,6 +14,7 @@ using System.Text;
 using Console = Terminal.Gui.FakeConsole;
 using Unix.Terminal;
 using static Terminal.Gui.WindowsConsole;
+using System.Drawing;
 
 namespace Terminal.Gui;
 /// <summary>
@@ -87,53 +88,94 @@ public class FakeDriver : ConsoleDriver {
 
 	public override void UpdateScreen ()
 	{
-		//int top = Top;
-		//int left = Left;
-		//int rows = Math.Min (FakeConsole.WindowHeight + top, Rows);
-		//int cols = Cols;
+		var savedRow = FakeConsole.CursorTop;
+		var savedCol = FakeConsole.CursorLeft;
+		var savedCursorVisible = FakeConsole.CursorVisible;
 
-		//var savedRow = FakeConsole.CursorTop;
-		//var savedCol = FakeConsole.CursorLeft;
-		//var savedCursorVisible = FakeConsole.CursorVisible;
-		//for (int row = top; row < rows; row++) {
-		//	if (!_dirtyLine [row]) {
-		//		continue;
-		//	}
-		//	_dirtyLine [row] = false;
-		//	for (int col = left; col < cols; col++) {
-		//		FakeConsole.CursorTop = row;
-		//		FakeConsole.CursorLeft = col;
-		//		for (; col < cols; col++) {
-		//			if (Contents [row, col, 2] == 0) {
-		//				FakeConsole.CursorLeft++;
-		//				continue;
-		//			}
+		var top = 0;
+		var left = 0;
+		var rows = Rows;
+		var cols = Cols;
+		System.Text.StringBuilder output = new System.Text.StringBuilder ();
+		Attribute redrawAttr = new Attribute ();
+		var lastCol = -1;
 
-		//			var color = Contents [row, col, 1];
-		//			// NOTE: In real drivers setting the color can be a performance hit, so we only do it when needed.
-		//			// in fakedriver we don't care about perf.
-		//			SetColor (color);
+		for (var row = top; row < rows; row++) {
+			if (!_dirtyLines [row]) {
+				continue;
+			}
 
-		//			var rune = (Rune)Contents [row, col, 0];
-		//			if (rune.Utf16SequenceLength == 1) {
-		//				FakeConsole.Write (rune);
-		//			} else {
-		//				// TODO: Not sure we need to do this. I think we can just write the rune.
+			FakeConsole.CursorTop = row;
+			FakeConsole.CursorLeft = 0;
 
-		//				FakeConsole.Write (rune.ToString ());
-		//			}
-		//			//if (Rune.DecodeSurrogatePair (rune, out char [] spair)) {
-		//			//	FakeConsole.Write (spair);
-		//			//} else {
-		//			//	FakeConsole.Write ((char)rune);
-		//			//}
-		//			Contents [row, col, 2] = 0;
-		//		}
-		//	}
-		//}
-		//FakeConsole.CursorTop = savedRow;
-		//FakeConsole.CursorLeft = savedCol;
-		//FakeConsole.CursorVisible = savedCursorVisible;
+			_dirtyLines [row] = false;
+			output.Clear ();
+			for (var col = left; col < cols; col++) {
+				lastCol = -1;
+				var outputWidth = 0;
+				for (; col < cols; col++) {
+					if (!Contents [row, col].IsDirty) {
+						if (output.Length > 0) {
+							WriteToConsole (output, ref lastCol, row, ref outputWidth);
+						} else if (lastCol == -1) {
+							lastCol = col;
+						}
+						if (lastCol + 1 < cols)
+							lastCol++;
+						continue;
+					}
+
+					if (lastCol == -1) {
+						lastCol = col;
+					}
+
+					Attribute attr = Contents [row, col].Attribute.Value;
+					// Performance: Only send the escape sequence if the attribute has changed.
+					if (attr != redrawAttr) {
+						redrawAttr = attr;
+						FakeConsole.ForegroundColor = (ConsoleColor)attr.Foreground;
+						FakeConsole.BackgroundColor = (ConsoleColor)attr.Background;
+					}
+					outputWidth++;
+					var rune = (Rune)Contents [row, col].Runes [0];
+					output.Append (rune.ToString ());
+					if (rune.IsSurrogatePair () && rune.GetColumns () < 2) {
+						WriteToConsole (output, ref lastCol, row, ref outputWidth);
+						FakeConsole.CursorLeft--;
+					}
+					Contents [row, col].IsDirty = false;
+				}
+			}
+			if (output.Length > 0) {
+				FakeConsole.CursorTop = row;
+				FakeConsole.CursorLeft = lastCol;
+
+				foreach (var c in output.ToString ()) {
+					FakeConsole.Write (c);
+				}
+			}
+		}
+		FakeConsole.CursorTop = 0;
+		FakeConsole.CursorLeft = 0;
+
+		//SetCursorVisibility (savedVisibitity);
+
+		void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
+		{
+			FakeConsole.CursorTop = row;
+			FakeConsole.CursorLeft = lastCol;
+			foreach (var c in output.ToString ()) {
+				FakeConsole.Write (c);
+			}
+			
+			output.Clear ();
+			lastCol += outputWidth;
+			outputWidth = 0;
+		}
+
+		FakeConsole.CursorTop = savedRow;
+		FakeConsole.CursorLeft = savedCol;
+		FakeConsole.CursorVisible = savedCursorVisible;
 	}
 
 	public override void Refresh ()

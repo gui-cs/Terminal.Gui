@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Text;
+using Wcwidth;
 
 namespace Terminal.Gui;
 
@@ -26,21 +27,24 @@ public static class RuneExtensions {
 	/// </returns>
 	public static int GetColumns (this Rune rune)
 	{
-		// TODO: I believe there is a way to do this without using our own tables, using Rune.
-		var codePoint = rune.Value;
-		switch (codePoint) {
-		case < 0x20:
-		case >= 0x7f and < 0xa0:
-			return -1;
-		case < 0x7f:
-			return 1;
-		}
-		/* binary search in table of non-spacing characters */
-		if (BiSearch (codePoint, _combining, _combining.GetLength (0) - 1) != 0) {
-			return 0;
-		}
-		/* if we arrive here, ucs is not a combining or C0/C1 control character */
-		return 1 + (BiSearch (codePoint, _combiningWideChars, _combiningWideChars.GetLength (0) - 1) != 0 ? 1 : 0);
+		return UnicodeCalculator.GetWidth (rune);
+		
+		//// TODO: I believe there is a way to do this without using our own tables, using Rune.
+		//// See https://www.cl.cam.ac.uk/~mgk25/ucs/wcwidth.c
+		//var codePoint = rune.Value;
+		//switch (codePoint) {
+		//case < 0x20:
+		//case >= 0x7f and < 0xa0:
+		//	return -1;
+		//case < 0x7f:
+		//	return 1;
+		//}
+		///* binary search in table of non-spacing characters */
+		//if (BiSearch (codePoint, _combining, _combining.GetLength (0) - 1) != 0) {
+		//	return 0;
+		//}
+		///* if we arrive here, ucs is not a combining or C0/C1 control character */
+		//return 1 + (BiSearch (codePoint, _combiningWideChars, _combiningWideChars.GetLength (0) - 1) != 0 ? 1 : 0);
 	}
 
 	/// <summary>

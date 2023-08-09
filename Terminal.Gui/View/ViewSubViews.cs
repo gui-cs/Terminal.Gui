@@ -442,7 +442,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			Driver.SetCursorVisibility (CursorVisibility.Invisible);
+			Driver?.SetCursorVisibility (CursorVisibility.Invisible);
 			return false;
 		}
 
