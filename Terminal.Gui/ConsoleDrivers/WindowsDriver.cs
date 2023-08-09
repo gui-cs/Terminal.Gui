@@ -1426,17 +1426,15 @@ namespace Terminal.Gui {
 
 			try {
 				// Needed for Windows Terminal
-				// ESC [ ? 1047 h  Activate xterm alternative buffer (no backscroll)
-				// ESC [ ? 1047 l  Restore xterm working buffer (with backscroll)
+				// ESC [ ? 1047 h  Save cursor position and activate xterm alternative buffer (no backscroll)
+				// ESC [ ? 1047 l  Restore cursor position and restore xterm working buffer (with backscroll)
 				// ESC [ ? 1048 h  Save cursor position
 				// ESC [ ? 1048 l  Restore cursor position
-				// ESC [ ? 1049 h  Save cursor position and activate xterm alternative buffer (no backscroll)
-				// ESC [ ? 1049 l  Restore cursor position and restore xterm working buffer (with backscroll)
-				// Per Issue #2264 using the alterantive screen buffer is required for Windows Terminal to not 
+				// ESC [ ? 1049 h  Activate xterm alternative buffer (no backscroll)
+				// ESC [ ? 1049 l  Restore xterm working buffer (with backscroll)
+				// Per Issue #2264 using the alternative screen buffer is required for Windows Terminal to not 
 				// wipe out the backscroll buffer when the application exits.
-				Console.Out.Write ("\x1b[?1047h");
-
-				Console.Out.Write ("\x1b[3J");
+				Console.Out.Write ("\x1b[?1049h");
 
 				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
 				cols = winSize.Width;
@@ -1475,8 +1473,6 @@ namespace Terminal.Gui {
 				Bottom = (short)Rows,
 				Right = (short)Cols
 			};
-			Console.Out.Write ("\x1b[3J");
-
 			WinConsole.ForceRefreshCursorVisibility ();
 		}
 
@@ -1685,7 +1681,7 @@ namespace Terminal.Gui {
 			WinConsole = null;
 
 			// Disable alternative screen buffer.
-			Console.Out.Write ("\x1b[?1047l");
+			Console.Out.Write ("\x1b[?1049l");
 		}
 
 		/// <inheritdoc/>
