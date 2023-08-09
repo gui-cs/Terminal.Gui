@@ -517,7 +517,8 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static void Refresh ()
 		{
-			//Driver.ClearContents();
+			// TODO: Figure out how to remove this call to ClearContents. Refresh should just repaint damaged areas, not clear
+			Driver.ClearContents();
 			View last = null;
 			foreach (var v in _toplevels.Reverse ()) {
 				if (v.Visible) {

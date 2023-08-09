@@ -29,7 +29,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("ScrollView")]
 public class CharacterMap : Scenario {
 	CharMap _charMap;
-	Label _errorLabel;
+	public Label _errorLabel;
 	TableView _categoryList;
 
 	// Don't create a Window, just return the top-level view
@@ -52,7 +52,7 @@ public class CharacterMap : Scenario {
 		Application.Top.Add (jumpLabel);
 		var jumpEdit = new TextField () { X = Pos.Right (jumpLabel) + 1, Y = Pos.Y (_charMap), Width = 10, Caption = "e.g. 01BE3" };
 		Application.Top.Add (jumpEdit);
-		_errorLabel = new Label ("") { X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap), ColorScheme = Colors.ColorSchemes ["error"] };
+		_errorLabel = new Label ("err") { X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap), ColorScheme = Colors.ColorSchemes ["error"] };
 		Application.Top.Add (_errorLabel);
 
 		jumpEdit.TextChanged += JumpEdit_TextChanged;
@@ -122,6 +122,10 @@ public class CharacterMap : Scenario {
 			})
 		});
 		Application.Top.Add (menu);
+
+		//_charMap.Hover += (s, a) => {
+		//	_errorLabel.Text = $"U+{a.Item:x5} {(Rune)a.Item}";
+		//};
 	}
 
 	MenuItem CreateMenuShowWidth ()
@@ -209,7 +213,7 @@ public class CharacterMap : Scenario {
 			_errorLabel.Text = $"Beyond maximum codepoint";
 			return;
 		}
-		_errorLabel.Text = $"U+{result:x4}";
+		_errorLabel.Text = $"U+{result:x5}";
 
 		var table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
 		_categoryList.SelectedRow = table.Data
@@ -270,6 +274,8 @@ class CharMap : ScrollView {
 			SelectedCodePointChanged?.Invoke (this, new ListViewItemEventArgs (SelectedCodePoint, null));
 		}
 	}
+
+	public event EventHandler<ListViewItemEventArgs> Hover;
 
 	/// <summary>
 	/// Gets the coordinates of the Cursor based on the SelectedCodePoint in screen coordinates
@@ -442,7 +448,7 @@ class CharMap : ScrollView {
 		var firstColumnX = viewport.X + RowLabelWidth;
 		for (int y = 1; y < Bounds.Height; y++) {
 			// What row is this?
-			var row = (y - ContentOffset.Y) / _rowHeight;
+			var row = (y - ContentOffset.Y - 1) / _rowHeight;
 
 			var val = (row) * 16;
 			if (val > MaxCodePoint) {
@@ -492,20 +498,20 @@ class CharMap : ScrollView {
 	void Handle_MouseClick (object sender, MouseEventEventArgs args)
 	{
 		var me = args.MouseEvent;
-		if (me.Flags == MouseFlags.ReportMousePosition || (me.Flags != MouseFlags.Button1Clicked &&
-			me.Flags != MouseFlags.Button1DoubleClicked)) {
+		if (me.Flags != MouseFlags.ReportMousePosition && me.Flags != MouseFlags.Button1Clicked &&
+			me.Flags != MouseFlags.Button1DoubleClicked) {
 			return;
 		}
 
 		if (me.Y == 0) {
-			me.Y = Cursor.Y ;
+			me.Y = Cursor.Y;
 		}
 
 		if (me.Y > 0) {
 		}
 
 		if (me.X < RowLabelWidth || me.X > RowLabelWidth + (16 * COLUMN_WIDTH) - 1) {
-			me.X = Cursor.X ;
+			me.X = Cursor.X;
 		}
 
 		var row = (me.Y - 1 - ContentOffset.Y) / _rowHeight; // -1 for header
@@ -518,6 +524,10 @@ class CharMap : ScrollView {
 		var val = (row) * 16 + col;
 		if (val > MaxCodePoint) {
 			return;
+		}
+
+		if (me.Flags == MouseFlags.ReportMousePosition) {
+			Hover?.Invoke (this, new ListViewItemEventArgs (val, null));
 		}
 
 		if (me.Flags == MouseFlags.Button1Clicked) {
@@ -605,6 +615,7 @@ class CharMap : ScrollView {
 		};
 		Application.Run (waitIndicator);
 
+
 		if (!string.IsNullOrEmpty (decResponse)) {
 			string name = string.Empty;
 
@@ -621,19 +632,151 @@ class CharMap : ScrollView {
 				//&& property3Element.TryGetProperty ("nestedProperty", out JsonElement nestedPropertyElement)) {
 				//	Console.WriteLine (nestedPropertyElement.GetString ());
 				//}
+				decResponse = JsonSerializer.Serialize (document.RootElement, new
+						JsonSerializerOptions {
+					WriteIndented = true
+				});
 			}
 
-			var title = $"{ToCamelCase (name)} - {new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x4}";
-			switch (MessageBox.Query (title, decResponse, "Copy _Glyph", "Copy Code _Point", "Cancel")) {
-			case 0:
+			var title = $"{ToCamelCase (name)} - {new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x5}";
+
+			var copyGlyph = new Button ("Copy _Glyph");
+			var copyCP = new Button ("Copy Code _Point");
+			var cancel = new Button ("Cancel");
+
+			var dlg = new Dialog (copyGlyph, copyCP, cancel) {
+				Title = title
+			};
+
+			copyGlyph.Clicked += (s, a) => {
 				CopyGlyph ();
-				break;
-			case 1:
+				dlg.RequestStop ();
+			};
+			copyCP.Clicked += (s, a) => {
 				CopyCodePoint ();
-				break;
-			}
+				dlg.RequestStop ();
+			};
+			cancel.Clicked += (s, a) => dlg.RequestStop ();
+
+			var rune = (Rune)SelectedCodePoint;
+			var label = new Label () {
+				Text = "IsAscii: ",
+				X = 0,
+				Y = 0
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = $"{rune.IsAscii}",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = ", Bmp: ",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = $"{rune.IsBmp}",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = ", CombiningMark: ",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = $"{rune.IsCombiningMark ()}",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = ", SurrogatePair: ",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = $"{rune.IsSurrogatePair ()}",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = ", Plane: ",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = $"{rune.Plane}",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = "Columns: ",
+				X = 0,
+				Y = Pos.Bottom (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = $"{rune.GetColumns ()}",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = ", Utf16SequenceLength: ",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+
+			label = new Label () {
+				Text = $"{rune.Utf16SequenceLength}",
+				X = Pos.Right (label),
+				Y = Pos.Top (label)
+			};
+			dlg.Add (label);
+			label = new Label () {
+				Text = $"Code Point Information from {UcdApiClient.BaseUrl}codepoint/dec/{SelectedCodePoint}:",
+				X = 0,
+				Y = Pos.Bottom (label)
+			};
+			dlg.Add (label);
+
+			var json = new TextView () {
+				X = 0,
+				Y = Pos.Bottom (label),
+				Width = Dim.Fill (),
+				Height = Dim.Fill (2),
+				ReadOnly = true,
+				Text = decResponse
+			};
+			dlg.Add (json);
+
+			Application.Run (dlg);
+
 		} else {
-			MessageBox.ErrorQuery ("Code Point API", $"{UcdApiClient.BaseUrl} did not return a result.", "Ok");
+			MessageBox.ErrorQuery ("Code Point API", $"{UcdApiClient.BaseUrl}codepoint/dec/{SelectedCodePoint} did not return a result for\r\n {new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x5}.", "Ok");
 		}
 		// BUGBUG: This is a workaround for some weird ScrollView related mouse grab bug
 		Application.GrabMouse (this);

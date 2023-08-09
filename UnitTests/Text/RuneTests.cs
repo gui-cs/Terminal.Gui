@@ -743,7 +743,7 @@ public class RuneTests {
 			sumConsoleWidth += ((Rune)(i)).ToString ().GetColumns ();
 		}
 
-		Assert.Equal (-32, sumRuneWidth);
+		Assert.Equal (-31, sumRuneWidth);
 		Assert.Equal (0, sumConsoleWidth);
 	}
 

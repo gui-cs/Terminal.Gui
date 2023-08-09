@@ -1,4 +1,5 @@
-﻿using System.Buffers;
+﻿using Microsoft.VisualStudio.TestPlatform.Utilities;
+using System.Buffers;
 using System.Text;
 using Xunit;
 using Xunit.Abstractions;
@@ -24,8 +25,8 @@ public class AddRuneTests {
 		driver.Init (() => { });
 
 		driver.AddRune (new Rune ('a'));
-		Assert.Equal ((Rune)'a', driver.Contents[0,0].Runes[0]);
-		
+		Assert.Equal ((Rune)'a', driver.Contents [0, 0].Runes [0]);
+
 		driver.End ();
 		Application.Shutdown ();
 	}
@@ -39,7 +40,7 @@ public class AddRuneTests {
 
 		driver.Move (driver.Cols, driver.Rows);
 		driver.AddRune ('a');
-		
+
 		for (var col = 0; col < driver.Cols; col++) {
 			for (var row = 0; row < driver.Rows; row++) {
 				Assert.Equal ((Rune)' ', driver.Contents [row, col].Runes [0]);
@@ -103,7 +104,7 @@ public class AddRuneTests {
 		Assert.Equal (OperationStatus.Done, operationStatus);
 		Assert.Equal (charsConsumed, rune.Utf16SequenceLength);
 		Assert.Equal (2, rune.GetColumns ());
-		
+
 		driver.AddRune (rune);
 		Assert.Equal (rune, driver.Contents [0, 0].Runes [0]);
 		Assert.Equal (0, driver.Row);
@@ -134,6 +135,61 @@ public class AddRuneTests {
 		//	}
 		//}
 
+		driver.End ();
+		Application.Shutdown ();
+	}
+
+
+	[Fact]
+	public void AddRune_Accented_Letter_With_Three_Combining_Unicode_Chars ()
+	{
+		var driver = new FakeDriver ();
+		Application.Init (driver);
+		driver.Init (() => { });
+
+		var expected = new Rune ('ắ');
+
+		var text = "\u1eaf";
+		driver.AddStr (text);
+		Assert.Equal (expected, driver.Contents [0, 0].Runes [0]);
+		Assert.Equal ((Rune)' ', driver.Contents [0, 1].Runes [0]);
+
+		driver.ClearContents ();
+		driver.Move (0, 0);
+
+		text = "\u0103\u0301";
+		driver.AddStr (text);
+		Assert.Equal (expected, driver.Contents [0, 0].Runes [0]);
+		Assert.Equal ((Rune)' ', driver.Contents [0, 1].Runes [0]);
+
+		driver.ClearContents ();
+		driver.Move (0, 0);
+
+		text = "\u0061\u0306\u0301";
+		driver.AddStr (text);
+		Assert.Equal (expected, driver.Contents [0, 0].Runes [0]);
+		Assert.Equal ((Rune)' ', driver.Contents [0, 1].Runes [0]);
+
+		//		var s = "a\u0301\u0300\u0306";
+
+
+		//		TestHelpers.AssertDriverContentsWithFrameAre (@"
+		//ắ", output);
+
+		//		tf.Text = "\u1eaf";
+		//		Application.Refresh ();
+		//		TestHelpers.AssertDriverContentsWithFrameAre (@"
+		//ắ", output);
+
+		//		tf.Text = "\u0103\u0301";
+		//		Application.Refresh ();
+		//		TestHelpers.AssertDriverContentsWithFrameAre (@"
+		//ắ", output);
+
+		//		tf.Text = "\u0061\u0306\u0301";
+		//		Application.Refresh ();
+		//		TestHelpers.AssertDriverContentsWithFrameAre (@"
+		//ắ", output);
 		driver.End ();
 		Application.Shutdown ();
 	}

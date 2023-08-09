@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using Microsoft.VisualStudio.TestPlatform.Utilities;
+using Xunit;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
