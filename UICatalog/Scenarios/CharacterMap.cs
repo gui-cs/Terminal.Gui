@@ -232,8 +232,8 @@ class CharMap : ScrollView {
 		get => _start;
 		set {
 			_start = value;
-			_selected = value;
-			ContentOffset = new Point (0, (int)(_start / 16));
+			SelectedCodePoint = value;
+			//ContentOffset = new Point (0, (int)(_start / 16));
 			SetNeedsDisplay ();
 		}
 	}
