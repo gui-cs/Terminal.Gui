@@ -32,21 +32,28 @@ public class CharacterMap : Scenario {
 	Label _errorLabel;
 	TableView _categoryList;
 
+	// Don't create a Window, just return the top-level view
+	public override void Init ()
+	{
+		Application.Init ();
+		Application.Top.ColorScheme = Colors.Base;
+	}
+
 	public override void Setup ()
 	{
 		_charMap = new CharMap () {
 			X = 0,
-			Y = 0,
+			Y = 1,
 			Height = Dim.Fill ()
 		};
-		Win.Add (_charMap);
+		Application.Top.Add (_charMap);
 
 		var jumpLabel = new Label ("Jump To Code Point:") { X = Pos.Right (_charMap) + 1, Y = Pos.Y (_charMap) };
-		Win.Add (jumpLabel);
+		Application.Top.Add (jumpLabel);
 		var jumpEdit = new TextField () { X = Pos.Right (jumpLabel) + 1, Y = Pos.Y (_charMap), Width = 10, Caption = "e.g. 01BE3" };
-		Win.Add (jumpEdit);
+		Application.Top.Add (jumpEdit);
 		_errorLabel = new Label ("") { X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap), ColorScheme = Colors.ColorSchemes ["error"] };
-		Win.Add (_errorLabel);
+		Application.Top.Add (_errorLabel);
 
 		jumpEdit.TextChanged += JumpEdit_TextChanged;
 
@@ -98,15 +105,38 @@ public class CharacterMap : Scenario {
 			_charMap.StartCodePoint = table.Data.ToArray () [args.NewRow].Start;
 		};
 
-		Win.Add (_categoryList);
+		Application.Top.Add (_categoryList);
 
 		_charMap.SelectedCodePoint = 0;
 		//jumpList.Refresh ();
 		_charMap.SetFocus ();
 
 		_charMap.Width = Dim.Fill () - _categoryList.Width;
+
+		var menu = new MenuBar (new MenuBarItem [] {
+			new MenuBarItem ("_File", new MenuItem [] {
+				new MenuItem ("_Quit", $"{Application.QuitKey}", () => Application.RequestStop ()),
+			}),
+			new MenuBarItem ("_Options", new MenuItem [] {
+				CreateMenuShowWidth (),
+			})
+		});
+		Application.Top.Add (menu);
 	}
 
+	MenuItem CreateMenuShowWidth ()
+	{
+		var item = new MenuItem {
+			Title = "_Show Glyph Width",
+		};
+		item.CheckType |= MenuItemCheckStyle.Checked;
+		item.Checked = _charMap?.ShowGlyphWidths;
+		item.Action += () => {
+			_charMap.ShowGlyphWidths = (bool)(item.Checked = !item.Checked);
+		};
+
+		return item;
+	}
 
 	EnumerableTableSource<UnicodeRange> CreateCategoryTable (int sortByColumn, bool descending)
 	{
@@ -194,7 +224,6 @@ public class CharacterMap : Scenario {
 
 class CharMap : ScrollView {
 
-	public bool ShowColumnWidths { get; set;}
 	/// <summary>
 	/// Specifies the starting offset for the character map. The default is 0x2500 
 	/// which is the Box Drawing characters.
@@ -220,7 +249,7 @@ class CharMap : ScrollView {
 		set {
 			_selected = value;
 			var row = (SelectedCodePoint / 16 * _rowHeight);
-			var col = (SelectedCodePoint % 16 * COLUMN_WIDTH); 
+			var col = (SelectedCodePoint % 16 * COLUMN_WIDTH);
 
 			var height = (Bounds.Height) - (ShowHorizontalScrollIndicator ? 2 : 1);
 			if (row + ContentOffset.Y < 0) {
@@ -257,7 +286,7 @@ class CharMap : ScrollView {
 
 	public override void PositionCursor ()
 	{
-		if (HasFocus && 
+		if (HasFocus &&
 			Cursor.X >= RowLabelWidth &&
 			Cursor.X < Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0) &&
 			Cursor.Y > 0 &&
@@ -269,12 +298,19 @@ class CharMap : ScrollView {
 		}
 	}
 
+	public bool ShowGlyphWidths {
+		get => _rowHeight == 2;
+		set {
+			_rowHeight = value ? 2 : 1;
+			SetNeedsDisplay ();
+		}
+	}
 
 	int _start = 0;
 	int _selected = 0;
 
 	const int COLUMN_WIDTH = 3;
-	int _rowHeight = 2;
+	int _rowHeight = 1;
 
 	public static int MaxCodePoint => 0x10FFFF;
 
@@ -405,51 +441,46 @@ class CharMap : ScrollView {
 		for (int y = 1; y < Bounds.Height; y++) {
 			// What row is this?
 			var row = (y - ContentOffset.Y) / _rowHeight;
-			//Move (0, y);
-			//Driver.SetAttribute (HasFocus && (cursorRow + ContentOffset.Y + 1 == y) ? ColorScheme.HotFocus : ColorScheme.HotNormal);
-			//Driver.AddStr ($"y={y},r={row}");
 
-			// are we at first row of the row?
-			if ((y - ContentOffset.Y) % _rowHeight > 0) {
-				var val = (row) * 16;
-				if (val > MaxCodePoint) {
-					continue;
+			var val = (row) * 16;
+			if (val > MaxCodePoint) {
+				continue;
+			}
+			Move (firstColumnX + COLUMN_WIDTH, y);
+			Driver.SetAttribute (GetNormalColor ());
+			for (int col = 0; col < 16; col++) {
+
+				var x = firstColumnX + COLUMN_WIDTH * col + 1;
+
+				Move (x, y);
+				if (cursorRow + ContentOffset.Y + 1 == y && cursorCol + ContentOffset.X + firstColumnX + 1 == x && !HasFocus) {
+					Driver.SetAttribute (GetFocusColor ());
 				}
-				Move (firstColumnX + COLUMN_WIDTH, y);
-				Driver.SetAttribute (GetNormalColor ());
-				for (int col = 0; col < 16; col++) {
+				var scalar = val + col;
+				Rune rune = (Rune)'?';
+				if (Rune.IsValid (scalar)) {
+					rune = new Rune (scalar);
+				}
+				var width = rune.GetColumns ();
 
-					var x = firstColumnX + COLUMN_WIDTH * col + 1;
-
-					Move (x, y);
-					if (cursorRow + ContentOffset.Y + 1 == y && cursorCol + ContentOffset.X + firstColumnX + 1 == x && !HasFocus) {
-						Driver.SetAttribute (GetFocusColor ());
-					}
-					var scalar = val + col;
-					Rune rune = (Rune)'?';
-					if (Rune.IsValid (scalar)) {
-						rune = new Rune (scalar);
-					}
-					var width = rune.GetColumns ();
-					//if (width == 0) {
-					//	if (rune.IsCombiningMark ()) {
-					//		Driver.AddRune (Rune.ReplacementChar);
-					//	} 
-					//}
-
+				// are we at first row of the row?
+				if (!ShowGlyphWidths || (y - ContentOffset.Y) % _rowHeight > 0) {
 					Driver.AddRune (rune);
-
-					if (cursorRow + ContentOffset.Y + 1 == y && cursorCol + ContentOffset.X + firstColumnX + 1 == x && !HasFocus) {
-						Driver.SetAttribute (GetNormalColor ());
-					}
+				} else {
+					Driver.SetAttribute (ColorScheme.HotNormal);
+					Driver.AddStr ($"{width}");
 				}
-				Move (0, y);
-				Driver.SetAttribute (HasFocus && (cursorRow + ContentOffset.Y + 1 == y) ? ColorScheme.HotFocus : ColorScheme.HotNormal);
-				var rowLabel = $"U+{val / 16:x5}_ ";
-				Driver.AddStr (rowLabel);
+
+				if (cursorRow + ContentOffset.Y + 1 == y && cursorCol + ContentOffset.X + firstColumnX + 1 == x && !HasFocus) {
+					Driver.SetAttribute (GetNormalColor ());
+				}
+			}
+			Move (0, y);
+			Driver.SetAttribute (HasFocus && (cursorRow + ContentOffset.Y + 1 == y) ? ColorScheme.HotFocus : ColorScheme.HotNormal);
+			if (!ShowGlyphWidths || (y - ContentOffset.Y) % _rowHeight > 0) {
+				Driver.AddStr ($"U+{val / 16:x5}_ ");
 			} else {
-				//Move (firstColumnX + 1, y);
-				//Driver.AddStr ("+++++++++++++++++++");
+				Driver.AddStr (new string (' ', RowLabelWidth));
 			}
 		}
 		Driver.Clip = oldClip;
@@ -460,33 +491,29 @@ class CharMap : ScrollView {
 	{
 		var me = args.MouseEvent;
 		if (me.Flags == MouseFlags.ReportMousePosition || (me.Flags != MouseFlags.Button1Clicked &&
-			me.Flags != MouseFlags.Button1DoubleClicked)) { // && me.Flags != _contextMenu.MouseFlags)) {
+			me.Flags != MouseFlags.Button1DoubleClicked)) {
 			return;
 		}
 
-		//if (me.X < RowLabelWidth) {
-		//	return;
-		//}
+		if (me.Y == 0) {
+			me.Y = Cursor.Y ;
+		}
 
-		//if (me.Y < 1) {
-		//	return;
-		//}
+		if (me.Y > 0) {
+		}
+
+		if (me.X < RowLabelWidth || me.X > RowLabelWidth + (16 * COLUMN_WIDTH) - 1) {
+			me.X = Cursor.X ;
+		}
 
 		var row = (me.Y - 1 - ContentOffset.Y) / _rowHeight; // -1 for header
 		var col = (me.X - RowLabelWidth - ContentOffset.X) / COLUMN_WIDTH;
-		//if (row < 0 || row > Bounds.Height || col > 15) {
-		//	return;
-		//}
 
-		if (row < 0) {
-			row = (Cursor.Y) / _rowHeight;
+		if (col > 15) {
+			col = 15;
 		}
 
-		if (col < 0) {
-			col = (Cursor.X) / COLUMN_WIDTH;
-		}
-
-		var val = (row ) * 16 + col;
+		var val = (row) * 16 + col;
 		if (val > MaxCodePoint) {
 			return;
 		}
