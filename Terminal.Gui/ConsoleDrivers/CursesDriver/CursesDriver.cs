@@ -206,29 +206,25 @@ internal class CursesDriver : ConsoleDriver {
 			}
 			_dirtyLines [row] = false;
 
-			// HACK: Clear line
-			//Curses.mvaddwstr (row, 0, new string ('_', Cols));
-
 			for (int col = 0; col < Cols; col++) {
 				if (Contents [row, col].IsDirty == false) {
 					continue;
 				}
 				Curses.attrset (Contents [row, col].Attribute.GetValueOrDefault ().Value);
 
-				if (Contents [row, col].Runes [0].IsBmp) {
-					//_outputBuffer [position].Char = (char)Contents [row, col].Runes [0].Value;
-					var rune = Contents [row, col].Runes [0];
+				var rune = Contents [row, col].Runes [0];
+				if (rune.IsBmp) {
+					// BUGBUG: CursesDriver doesn't render CharMap correctly for wide chars (and other Unicode) - Curses is doing something funky with glyphs that report GetColums() of 1 yet are rendered wide. E.g. 0x2064 (invisible times) is reported as 1 column but is rendered as 2. WindowsDriver & NetDriver correctly render this as 1 column, overlapping the next cell.
 					Curses.mvaddch (row, col, rune.Value);
-					if (Contents [row, col].Runes [0].GetColumns () == 2 && col + 1 < Cols) {
+					if (rune.GetColumns() == 2 && col + 1 < Cols) {
 						col++;
+						// BUGBUG: 
 						//Curses.mvaddwstr (row, col, ' ');
 					}
 
 				} else {
-					//_outputBuffer [position].Empty = true;
-					//_outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
 					Curses.mvaddch (row, col, '#');
-					if (Contents [row, col].Runes [0].GetColumns () > 1 && col + 1 < Cols) {
+					if (rune.GetColumns () > 1 && col + 1 < Cols) {
 						// TODO: This is a hack to deal with non-BMP and wide characters.
 						//col++;
 						Curses.mvaddch (row, ++col, '*');
@@ -239,119 +235,6 @@ internal class CursesDriver : ConsoleDriver {
 
 		Curses.move (Row, Col);
 		_window.wrefresh ();
-
-		//for (int col = 0; col < Cols; col++) {
-		//	//Curses.mvaddch (row, col, '+');
-
-		//	if (Contents [row, col].IsDirty == false) {
-		//		//Curses.mvaddch (row, col, (char)Rune.ReplacementChar.Value);
-		//		continue;
-		//	}
-
-		//	Curses.attrset (Contents [row, col].Attribute.GetValueOrDefault ().Value);
-
-		//	if (Contents [row, col].Runes [0].IsBmp) {
-		//		Curses.mvaddch (row, col, Contents [row, col].Runes [0].Value);
-		//	} else {
-		//		//_outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
-		//		if (Contents [row, col].Runes [0].GetColumns () > 1 && col + 1 < Cols) {
-		//			// TODO: This is a hack to deal with non-BMP and wide characters.
-		//			//col++;
-		//			//_outputBuffer [position].Empty = false;
-		//			//_outputBuffer [position].Char = ' ';
-		//			//Curses.mvaddch (row, col, '*');
-		//		}
-		//	}
-
-		//	if (Contents [row, col].Runes [0].IsSurrogatePair () && Contents [row, col].Runes [0].GetColumns () < 2) {
-		//		col--;
-		//	}
-
-		//	//if (col < Cols && Contents [row, col].Runes [0].GetColumns () > 1) {
-		//	//	col++;
-		//	//	Curses.mvaddch (row, col, '=');
-		//	//}
-		//}
-		//}
-
-
-		//var top = 0;
-		//var left = 0;
-		//var rows = Rows;
-		//var cols = Cols;
-		//System.Text.StringBuilder output = new System.Text.StringBuilder ();
-		//Attribute redrawAttr = new Attribute ();
-		//var lastCol = -1;
-
-		//Curses.attrset (MakeColor (ColorToCursesColorNumber (Color.White), ColorToCursesColorNumber (Color.Black)).Value);
-
-		////GetCursorVisibility (out CursorVisibility savedVisibitity);
-		////SetCursorVisibility (CursorVisibility.Invisible); 
-
-		//for (var row = top; row < rows; row++) {
-		//	//if (Console.WindowHeight < 1) {
-		//	//	return;
-		//	//}
-		//	if (!_dirtyLines [row]) {
-		//		continue;
-		//	}
-		//	Curses.move (Row, 0);
-
-		//	_dirtyLines [row] = false;
-		//	output.Clear ();
-		//	for (var col = left; col < cols; col++) {
-		//		lastCol = -1;
-		//		var outputWidth = 0;
-		//		for (; col < cols; col++) {
-		//			if (!Contents [row, col].IsDirty) {
-		//				if (output.Length > 0) {
-		//					WriteToConsole (output, ref lastCol, row, ref outputWidth);
-		//				} else if (lastCol == -1) {
-		//					lastCol = col;
-		//				}
-		//				if (lastCol + 1 < cols)
-		//					lastCol++;
-		//				continue;
-		//			}
-
-		//			if (lastCol == -1) {
-		//				lastCol = col;
-		//			}
-
-		//			Attribute attr = Contents [row, col].Attribute.Value;
-		//			// Performance: Only send the escape sequence if the attribute has changed.
-		//			if (attr != redrawAttr) {
-		//				redrawAttr = attr;
-		//				//Curses.attrset (attr.Value);
-		//				//output.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Value));
-		//				//output.Append (EscSeqUtils.CSI_SetBackgroundColor (0));
-		//			}
-		//			outputWidth++;
-		//			var rune = (Rune)Contents [row, col].Runes [0];
-		//			output.Append (rune.ToString ());
-		//			if (rune.IsSurrogatePair () && rune.GetColumns () < 2) {
-		//				WriteToConsole (output, ref lastCol, row, ref outputWidth);
-		//				Curses.move (Row, Col - 1);
-		//			}
-		//			Contents [row, col].IsDirty = false;
-		//		}
-		//	}
-		//	if (output.Length > 0) {
-		//		Curses.mvaddwstr (row, lastCol, output.ToString ());
-		//	}
-		//}
-
-		//Curses.move (Row, Col);
-
-		//_window.wrefresh ();
-
-		//void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
-		//{
-		//	Curses.mvaddwstr (row, lastCol, output.ToString());
-		//	output.Clear ();
-		//	lastCol += outputWidth;
-		//	outputWidth = 0;
-		//}
 	}
 
 	public Curses.Window _window;
