@@ -67,8 +67,7 @@ public class FakeDriver : ConsoleDriver {
 		FakeConsole.ResetColor ();
 		FakeConsole.Clear ();
 	}
-
-
+	
 	public override void Init (Action terminalResized)
 	{
 		FakeConsole.MockKeyPresses.Clear ();

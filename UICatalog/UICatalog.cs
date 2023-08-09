@@ -422,7 +422,7 @@ namespace UICatalog {
 				ConfigChanged ();
 
 				miIsMouseDisabled!.Checked = Application.IsMouseDisabled;
-				DriverName.Title = $"Driver: {Driver.GetType ().Name}";
+				DriverName.Title = $"Driver: {Driver.GetVersionInfo()}";
 				OS.Title = $"OS: {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem} {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion}";
 
 				if (_selectedScenario != null) {

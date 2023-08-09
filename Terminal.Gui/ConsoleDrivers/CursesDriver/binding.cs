@@ -71,6 +71,7 @@ namespace Unix.Terminal {
 		//static bool use_naked_driver;
 
 		static UnmanagedLibrary curses_library;
+
 		static NativeMethods methods;
 
 		[DllImport ("libc")]
@@ -97,6 +98,13 @@ namespace Unix.Terminal {
 			cols_ptr = get_ptr ("COLS");
 		}
 
+		static public string curses_version ()
+		{
+			var v = methods.curses_version ();
+			return $"{Marshal.PtrToStringAnsi (v)}, {curses_library.LibraryPath}";
+
+		}
+
 		static public Window initscr ()
 		{
 			setlocale (LC_ALL, "");
@@ -116,6 +124,9 @@ namespace Unix.Terminal {
 							 "or DYLD_LIBRARY_PATH directory or run /sbin/ldconfig");
 				Environment.Exit (1);
 			}
+
+			//Console.Error.WriteLine ($"using curses {Curses.curses_version ()}");
+
 			return main_window;
 		}
 
@@ -433,6 +444,7 @@ namespace Unix.Terminal {
 		public delegate int savetty ();
 		public delegate int resetty ();
 		public delegate int set_escdelay (int size);
+		public delegate IntPtr curses_version ();
 	}
 
 	internal class NativeMethods {
@@ -507,6 +519,7 @@ namespace Unix.Terminal {
 		public readonly Delegates.savetty savetty;
 		public readonly Delegates.resetty resetty;
 		public readonly Delegates.set_escdelay set_escdelay;
+		public readonly Delegates.curses_version curses_version;
 		public UnmanagedLibrary UnmanagedLibrary;
 
 		public NativeMethods (UnmanagedLibrary lib)
@@ -583,6 +596,7 @@ namespace Unix.Terminal {
 			savetty = lib.GetNativeMethodDelegate<Delegates.savetty> ("savetty");
 			resetty = lib.GetNativeMethodDelegate<Delegates.resetty> ("resetty");
 			set_escdelay = lib.GetNativeMethodDelegate<Delegates.set_escdelay> ("set_escdelay");
+			curses_version = lib.GetNativeMethodDelegate<Delegates.curses_version> ("curses_version");
 		}
 	}
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

@@ -534,6 +534,12 @@ public abstract class ConsoleDriver {
 	/// Ends the execution of the console driver.
 	/// </summary>
 	public abstract void End ();
+	
+	/// <summary>
+	/// Returns the name of the driver and relevant library version information.
+	/// </summary>
+	/// <returns></returns>
+	public virtual string GetVersionInfo () => GetType ().Name;
 }
 
 
