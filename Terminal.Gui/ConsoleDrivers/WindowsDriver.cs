@@ -1436,6 +1436,8 @@ namespace Terminal.Gui {
 				// wipe out the backscroll buffer when the application exits.
 				Console.Out.Write ("\x1b[?1047h");
 
+				Console.Out.Write ("\x1b[3J");
+
 				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
 				cols = winSize.Width;
 				rows = winSize.Height;
@@ -1473,6 +1475,8 @@ namespace Terminal.Gui {
 				Bottom = (short)Rows,
 				Right = (short)Cols
 			};
+			Console.Out.Write ("\x1b[3J");
+
 			WinConsole.ForceRefreshCursorVisibility ();
 		}
 
