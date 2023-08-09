@@ -686,14 +686,61 @@ public class RuneTests {
 		Assert.False (d.SequenceEqual (b [1]));
 	}
 
+	/// <summary>
+	/// Shows the difference between using Wcwidth.UnicodeCalculator and our
+	/// own port of wcwidth. Specifically, the UnicodeCalculator is more accurate to spec
+	/// where null has a width of 0, and our port says it's -1.
+	/// </summary>
+	/// <param name="expectedColumns"></param>
+	/// <param name="scalar"></param>
+	[Theory]
+	[InlineData (0, 0)]
+	[InlineData (-1, 1)]
+	[InlineData (-1, 2)]
+	[InlineData (-1, 3)]
+	[InlineData (-1, 4)]
+	[InlineData (-1, 5)]
+	[InlineData (-1, 6)]
+	[InlineData (-1, 7)]
+	[InlineData (-1, 8)]
+	[InlineData (-1, 9)]
+	[InlineData (-1, 10)]
+	[InlineData (-1, 11)]
+	[InlineData (-1, 12)]
+	[InlineData (-1, 13)]
+	[InlineData (-1, 14)]
+	[InlineData (-1, 15)]
+	[InlineData (-1, 16)]
+	[InlineData (-1, 17)]
+	[InlineData (-1, 18)]
+	[InlineData (-1, 19)]
+	[InlineData (-1, 20)]
+	[InlineData (-1, 21)]
+	[InlineData (-1, 22)]
+	[InlineData (-1, 23)]
+	[InlineData (-1, 24)]
+	[InlineData (-1, 25)]
+	[InlineData (-1, 26)]
+	[InlineData (-1, 27)]
+	[InlineData (-1, 28)]
+	[InlineData (-1, 29)]
+	[InlineData (-1, 30)]
+	[InlineData (-1, 31)]
+	public void Rune_GetColumns_Non_Printable (int expectedColumns, int scalar)
+	{
+		var rune = new Rune (scalar);
+		Assert.Equal (expectedColumns, rune.GetColumns());
+		Assert.Equal (0, rune.ToString().GetColumns());
+	}
+
 	[Fact]
 	public void Rune_GetColumns_Versus_String_GetColumns_With_Non_Printable_Characters ()
 	{
 		int sumRuneWidth = 0;
 		int sumConsoleWidth = 0;
 		for (uint i = 0; i < 32; i++) {
-			sumRuneWidth += ((Rune)i).GetColumns ();
-			sumConsoleWidth += ((Rune)i).ToString ().GetColumns ();
+			sumRuneWidth += ((Rune)(i)).GetColumns ();
+			sumConsoleWidth += ((Rune)(i)).ToString ().GetColumns ();
 		}
 
 		Assert.Equal (-32, sumRuneWidth);

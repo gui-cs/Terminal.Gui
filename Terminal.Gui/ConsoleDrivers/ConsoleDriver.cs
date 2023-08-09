@@ -189,40 +189,23 @@ public abstract class ConsoleDriver {
 					}
 				} else if (runeWidth == 2) {
 					if (Col == Clip.Right - 1) {
+						// We're at the right edge of the clip, so we can't display a wide character.
+						// TODO: Figure out if it is better to show a replacement character or ' '
 						Contents [Row, Col].Runes = new List<Rune> { Rune.ReplacementChar };
 					} else {
 						Contents [Row, Col].Runes = new List<Rune> { rune };
 						if (Col < Clip.Right - 1) {
-							Contents [Row, Col + 1].Runes = new List<Rune> { (Rune)' ' };
+							// Invalidate cell to right so that it doesn't get drawn
+							// TODO: Figure out if it is better to show a replacement character or ' '
+							Contents [Row, Col + 1].Runes = new List<Rune> { Rune.ReplacementChar };
 							Contents [Row, Col + 1].IsDirty = true;
 						}
 					}
 				} else {
+					// This is a non-spacing character, so we don't need to do anything
 					Contents [Row, Col].Runes = new List<Rune> { (Rune)' ' };
 					Contents [Row, Col].IsDirty = false;
 				}
-				//if (runeWidth < 2 && Col > 0 && Contents [Row, Col - 1].Runes [0].GetColumns () > 1) {
-				//	// This is a single-width character, and we are not at the beginning of the line.
-				//	Contents [Row, Col - 1].Runes [0] = Rune.ReplacementChar;
-				//	Contents [Row, Col - 1].IsDirty = true;
-				//} else if (runeWidth < 2 && Col <= Clip.Right - 1 && Contents [Row, Col].Runes [0].GetColumns () > 1) {
-				//	// This is a single-width character, and we are not at the end of the line.
-				//	Contents [Row, Col + 1].Runes [0] = Rune.ReplacementChar;
-				//	Contents [Row, Col + 1].IsDirty = true;
-				//}
-				//if (runeWidth > 1 && Col == Clip.Right - 1) {
-				//	// This is a double-width character, and we are at the end of the line.
-				//	Contents [Row, Col].Runes [0] = Rune.ReplacementChar;
-				//} else {
-				//	if (runeWidth > 0) {
-				//		// This is a single-width character, or we are not at the end of the line.
-				//		Contents [Row, Col].Runes [0] = rune;
-				//	}
-				//	else {
-				//		Contents [Row, Col].Runes [0] = (Rune)'^';
-				//		Contents [Row, Col].IsDirty = false;
-				//	}
-				//}
 				_dirtyLines [Row] = true;
 			}
 		}
@@ -239,6 +222,8 @@ public abstract class ConsoleDriver {
 				// Get rendered.
 				Contents [Row, Col].IsDirty = false;
 				Contents [Row, Col].Attribute = CurrentAttribute;
+
+				// TODO: Determine if we should wipe this out (for now now)
 				//Contents [Row, Col].Runes [0] = (Rune)' ';
 			}
 			Col++;
