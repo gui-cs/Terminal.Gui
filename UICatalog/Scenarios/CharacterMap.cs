@@ -404,6 +404,9 @@ class CharMap : ScrollView {
 	//public void CharMap_DrawContent (object s, DrawEventArgs a)
 	public override void OnDrawContentComplete (Rect contentArea)
 	{
+		if (contentArea.Height == 0 || contentArea.Width == 0) {
+			return;
+		}
 		Rect viewport = new Rect (ContentOffset,
 			new Size (Math.Max (Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
 				Math.Max (Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0)));

@@ -160,7 +160,7 @@ public abstract class ConsoleDriver {
 				// Normalize to Form C (Canonical Composition)
 				string normalized = combined.Normalize (NormalizationForm.FormC);
 
-				Contents [Row, Col - 1].Runes [0] = (Rune)normalized [0];
+				Contents [Row, Col - 1].Runes = new List<Rune> { (Rune)normalized [0] }; ;
 				Contents [Row, Col - 1].Attribute = CurrentAttribute;
 				Contents [Row, Col - 1].IsDirty = true;
 
@@ -173,24 +173,33 @@ public abstract class ConsoleDriver {
 					// Check if cell to left has a wide glyph
 					if (Contents [Row, Col - 1].Runes [0].GetColumns () > 1) {
 						// Invalidate cell to left
-						Contents [Row, Col - 1].Runes [0] = Rune.ReplacementChar;
+						Contents [Row, Col - 1].Runes = new List<Rune> { Rune.ReplacementChar };
 						Contents [Row, Col - 1].IsDirty = true;
 					}
 				}
 
-				// Check if we're at right edge of clip
-				if (runeWidth < 1 || (runeWidth == 2 && Col == Clip.Right - 1)) {
-					// Can't put a double width glyph here
-					Contents [Row, Col].Runes [0] = Rune.ReplacementChar;
-				} else {
 
-					if (runeWidth >= 1) {
-						// This is a single-width character, or we are not at the end of the line.
-						Contents [Row, Col].Runes [0] = rune;
-					} else {
-						Contents [Row, Col].Runes [0] = (Rune)'^';
-						Contents [Row, Col].IsDirty = false;
+				if (runeWidth < 1) {
+					Contents [Row, Col].Runes = new List<Rune> { Rune.ReplacementChar };
+
+				} else if (runeWidth == 1) {
+					Contents [Row, Col].Runes = new List<Rune> { rune };
+					if (Col < Clip.Right - 1) {
+						Contents [Row, Col + 1].IsDirty = true;
 					}
+				} else if (runeWidth == 2) {
+					if (Col == Clip.Right - 1) {
+						Contents [Row, Col].Runes = new List<Rune> { Rune.ReplacementChar };
+					} else {
+						Contents [Row, Col].Runes = new List<Rune> { rune };
+						if (Col < Clip.Right - 1) {
+							Contents [Row, Col + 1].Runes = new List<Rune> { (Rune)' ' };
+							Contents [Row, Col + 1].IsDirty = true;
+						}
+					}
+				} else {
+					Contents [Row, Col].Runes = new List<Rune> { (Rune)' ' };
+					Contents [Row, Col].IsDirty = false;
 				}
 				//if (runeWidth < 2 && Col > 0 && Contents [Row, Col - 1].Runes [0].GetColumns () > 1) {
 				//	// This is a single-width character, and we are not at the beginning of the line.
