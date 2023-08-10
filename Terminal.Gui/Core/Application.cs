@@ -804,7 +804,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			if ((view == null || view == MdiTop) && !Current.Modal && MdiTop != null
+			if ((view == null || view == MdiTop || view.SuperView == MdiTop) && !Current.Modal && MdiTop != null
 				&& me.Flags != MouseFlags.ReportMousePosition && me.Flags != 0) {
 
 				var top = FindDeepestTop (Top, me.X, me.Y, out _, out _);
@@ -1216,18 +1216,32 @@ namespace Terminal.Gui {
 			}
 			if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.ChildNeedsDisplay || state.Toplevel.LayoutNeeded
 				|| MdiChildNeedsDisplay ()) {
-				state.Toplevel.Redraw (state.Toplevel.Bounds);
-				if (DebugDrawBounds) {
-					DrawBounds (state.Toplevel);
-				}
-				state.Toplevel.PositionCursor ();
-				Driver.Refresh ();
+
+				bool isTopNeedsDisplay;
+				do {
+					state.Toplevel.Redraw (state.Toplevel.Bounds);
+					if (DebugDrawBounds) {
+						DrawBounds (state.Toplevel);
+					}
+					state.Toplevel.PositionCursor ();
+					Driver.Refresh ();
+					isTopNeedsDisplay = IsTopNeedsDisplay (state.Toplevel);
+					if (isTopNeedsDisplay) {
+						Top.Redraw (Top.Bounds);
+					}
+				} while (isTopNeedsDisplay);
 			} else {
 				Driver.UpdateCursor ();
 			}
-			if (state.Toplevel != Top && !state.Toplevel.Modal
-				&& (!Top.NeedDisplay.IsEmpty || Top.ChildNeedsDisplay || Top.LayoutNeeded)) {
-				Top.Redraw (Top.Bounds);
+
+			bool IsTopNeedsDisplay (Toplevel toplevel)
+			{
+				if (toplevel != Top && !toplevel.Modal
+					&& (!Top.NeedDisplay.IsEmpty || Top.ChildNeedsDisplay || Top.LayoutNeeded)) {
+
+					return true;
+				}
+				return false;
 			}
 		}
 
