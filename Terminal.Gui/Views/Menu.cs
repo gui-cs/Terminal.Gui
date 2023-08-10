@@ -943,6 +943,17 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Key Key { get; set; } = Key.F9;
 
+		///<inheritdoc/>
+		public override bool Visible {
+			get => base.Visible;
+			set {
+				base.Visible = value;
+				if (!value) {
+					CloseAllMenus ();
+				}
+			}
+		}
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MenuBar"/>.
 		/// </summary>
@@ -1745,10 +1756,11 @@ namespace Terminal.Gui {
 		public override bool ProcessHotKey (KeyEvent kb)
 		{
 			if (kb.Key == Key) {
-				if (!IsMenuOpen)
+				if (Visible && !IsMenuOpen) {
 					OpenMenu ();
-				else
+				} else {
 					CloseAllMenus ();
+				}
 				return true;
 			}
 
