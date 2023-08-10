@@ -1787,5 +1787,27 @@ Edit
 			Assert.False (CanExecuteNew ());
 			Assert.True (CanExecuteClose ());
 		}
+
+		[Fact, AutoInitShutdown]
+		public void Visible_False_Key_Does_Not_Open_And_Close_All_Opened_Menus ()
+		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("File", new MenuItem [] {
+					new MenuItem ("New", "", null)
+				})
+			});
+			Application.Top.Add (menu);
+			Application.Begin (Application.Top);
+
+			Assert.True (menu.Visible);
+			Assert.True (menu.ProcessHotKey (new KeyEvent (menu.Key, new KeyModifiers ())));
+			Assert.True (menu.IsMenuOpen);
+
+			menu.Visible = false;
+			Assert.False (menu.IsMenuOpen);
+
+			Assert.True (menu.ProcessHotKey (new KeyEvent (menu.Key, new KeyModifiers ())));
+			Assert.False (menu.IsMenuOpen);
+		}
 	}
 }
