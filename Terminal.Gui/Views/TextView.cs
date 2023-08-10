@@ -2407,7 +2407,11 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override Attribute GetNormalColor ()
 		{
-			return Enabled ? ColorScheme.Focus : ColorScheme.Disabled;
+			ColorScheme cs = ColorScheme;
+			if (ColorScheme == null) {
+				cs = new ColorScheme ();
+			}
+			return Enabled ? cs.Focus : cs.Disabled;
 		}
 
 		/// <summary>
@@ -3063,10 +3067,10 @@ namespace Terminal.Gui {
 				InsertText (new KeyEvent () { Key = key });
 			}
 
-			if (_needsDisplay.IsEmpty) {
-				PositionCursor ();
-			} else {
+			if (NeedsDisplay) {
 				Adjust ();
+			} else {
+				PositionCursor ();
 			}
 		}
 
@@ -3235,7 +3239,7 @@ namespace Terminal.Gui {
 		{
 			var offB = OffSetBackground ();
 			var line = GetCurrentLine ();
-			bool need = !_needsDisplay.IsEmpty || _wrapNeeded || !Used;
+			bool need = NeedsDisplay || _wrapNeeded || !Used;
 			var tSize = TextModel.DisplaySize (line, -1, -1, false, TabWidth);
 			var dSize = TextModel.DisplaySize (line, _leftColumn, _currentColumn, true, TabWidth);
 			if (!_wordWrap && _currentColumn < _leftColumn) {
@@ -4395,10 +4399,10 @@ namespace Terminal.Gui {
 
 		void DoNeededAction ()
 		{
-			if (_needsDisplay.IsEmpty) {
-				PositionCursor ();
-			} else {
+			if (NeedsDisplay) {
 				Adjust ();
+			} else {
+				PositionCursor ();
 			}
 		}
 

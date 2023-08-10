@@ -12,12 +12,12 @@ namespace UICatalog.Scenarios {
 			//    that reads "Press <hotkey> to Quit". Access this Window with `this.Win`.
 			//  - Sets the Theme & the ColorScheme property of `this.Win` to `colorScheme`.
 			// To override this, implement an override of `Init`.
-			
+
 			//base.Init ();
-			
+
 			// A common, alternate, implementation where `this.Win` is not used is below. This code
 			// leverages ConfigurationManager to borrow the color scheme settings from UICatalog:
-			
+
 			Application.Init ();
 			ConfigurationManager.Themes.Theme = Theme;
 			ConfigurationManager.Apply ();
@@ -37,7 +37,6 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Center (),
 			};
 			Application.Top.Add (button);
-
 		}
 	}
 }

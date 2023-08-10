@@ -184,41 +184,43 @@ namespace Terminal.Gui.InputTests {
 		[ClassData (typeof (PacketTest))]
 		public void TestVKPacket (uint unicodeCharacter, bool shift, bool alt, bool control, uint initialVirtualKey, uint initialScanCode, Key expectedRemapping, uint expectedVirtualKey, uint expectedScanCode)
 		{
-			var modifiers = new ConsoleModifiers ();
-			if (shift) modifiers |= ConsoleModifiers.Shift;
-			if (alt) modifiers |= ConsoleModifiers.Alt;
-			if (control) modifiers |= ConsoleModifiers.Control;
-			var mappedConsoleKey = ConsoleKeyMapping.GetConsoleKeyFromKey (unicodeCharacter, modifiers, out uint scanCode, out uint outputChar);
-
-			if ((scanCode > 0 || mappedConsoleKey == 0) && mappedConsoleKey == initialVirtualKey) Assert.Equal (mappedConsoleKey, initialVirtualKey);
-			else Assert.Equal (mappedConsoleKey, outputChar < 0xff ? outputChar & 0xff | 0xff << 8 : outputChar);
-			Assert.Equal (scanCode, initialScanCode);
-
-			var keyChar = ConsoleKeyMapping.GetKeyCharFromConsoleKey (mappedConsoleKey, modifiers, out uint consoleKey, out scanCode);
-
-			//if (scanCode > 0 && consoleKey == keyChar && consoleKey > 48 && consoleKey > 57 && consoleKey < 65 && consoleKey > 91) {
-			if (scanCode > 0 && keyChar == 0 && consoleKey == mappedConsoleKey) Assert.Equal (0, (double)keyChar);
-			else Assert.Equal (keyChar, unicodeCharacter);
-			Assert.Equal (consoleKey, expectedVirtualKey);
-			Assert.Equal (scanCode, expectedScanCode);
-
-			var top = Application.Top;
-
-			top.KeyPress += (s, e) => {
-				var after = ShortcutHelper.GetModifiersKey (e.KeyEvent);
-				Assert.Equal (expectedRemapping, after);
-				e.Handled = true;
-				Application.RequestStop ();
-			};
-
-			var iterations = -1;
-
-			Application.Iteration += () => {
-				iterations++;
-				if (iterations == 0) Application.Driver.SendKeys ((char)mappedConsoleKey, ConsoleKey.Packet, shift, alt, control);
-			};
-
 			lock (packetLock) {
+				Application._forceFakeConsole = true;
+				Application.Init ();
+
+				var modifiers = new ConsoleModifiers ();
+				if (shift) modifiers |= ConsoleModifiers.Shift;
+				if (alt) modifiers |= ConsoleModifiers.Alt;
+				if (control) modifiers |= ConsoleModifiers.Control;
+				var mappedConsoleKey = ConsoleKeyMapping.GetConsoleKeyFromKey (unicodeCharacter, modifiers, out uint scanCode, out uint outputChar);
+
+				if ((scanCode > 0 || mappedConsoleKey == 0) && mappedConsoleKey == initialVirtualKey) Assert.Equal (mappedConsoleKey, initialVirtualKey);
+				else Assert.Equal (mappedConsoleKey, outputChar < 0xff ? outputChar & 0xff | 0xff << 8 : outputChar);
+				Assert.Equal (scanCode, initialScanCode);
+
+				var keyChar = ConsoleKeyMapping.GetKeyCharFromConsoleKey (mappedConsoleKey, modifiers, out uint consoleKey, out scanCode);
+
+				//if (scanCode > 0 && consoleKey == keyChar && consoleKey > 48 && consoleKey > 57 && consoleKey < 65 && consoleKey > 91) {
+				if (scanCode > 0 && keyChar == 0 && consoleKey == mappedConsoleKey) Assert.Equal (0, (double)keyChar);
+				else Assert.Equal (keyChar, unicodeCharacter);
+				Assert.Equal (consoleKey, expectedVirtualKey);
+				Assert.Equal (scanCode, expectedScanCode);
+
+				var top = Application.Top;
+
+				top.KeyPress += (s, e) => {
+					var after = ShortcutHelper.GetModifiersKey (e.KeyEvent);
+					Assert.Equal (expectedRemapping, after);
+					e.Handled = true;
+					Application.RequestStop ();
+				};
+
+				var iterations = -1;
+
+				Application.Iteration += () => {
+					iterations++;
+					if (iterations == 0) Application.Driver.SendKeys ((char)mappedConsoleKey, ConsoleKey.Packet, shift, alt, control);
+				};
 				Application.Run ();
 				Application.Shutdown ();
 			}

@@ -898,7 +898,7 @@ namespace Terminal.Gui {
 					// End Drag
 
 					Application.UngrabMouse ();
-					Driver.UncookMouse ();
+					//Driver.UncookMouse ();
 					FinalisePosition (
 						dragOrignalPos,
 						Orientation == Orientation.Horizontal ? Y : X);
