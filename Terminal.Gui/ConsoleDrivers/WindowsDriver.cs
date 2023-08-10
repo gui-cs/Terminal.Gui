@@ -5,7 +5,9 @@ using NStack;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Management;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -1420,9 +1422,9 @@ namespace Terminal.Gui {
 			return keyMod != Key.Null ? keyMod | key : key;
 		}
 
-#pragma warning disable CA1416 // Validate platform compatibility
 		private static string GetParentProcessName ()
 		{
+#pragma warning disable CA1416 // Validate platform compatibility
 			var myId = Process.GetCurrentProcess ().Id;
 			var query = string.Format ($"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {myId}");
 			var search = new ManagementObjectSearcher ("root\\CIMV2", query);
@@ -1456,8 +1458,8 @@ namespace Terminal.Gui {
 			}
 
 			return parent.ProcessName;
-		}
 #pragma warning restore CA1416 // Validate platform compatibility
+		}
 
 		public override void Init (Action terminalResized)
 		{
