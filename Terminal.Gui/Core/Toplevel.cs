@@ -426,6 +426,32 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		///<inheritdoc/>
+		public override bool ProcessHotKey (KeyEvent keyEvent)
+		{
+			if (base.ProcessHotKey (keyEvent)) {
+				return true;
+			}
+
+			if (this.IsMdiChild && Application.Top.ProcessHotKey (keyEvent)) {
+				return true;
+			}
+			return false;
+		}
+
+		///<inheritdoc/>
+		public override bool ProcessColdKey (KeyEvent keyEvent)
+		{
+			if (base.ProcessColdKey (keyEvent)) {
+				return true;
+			}
+
+			if (ShortcutHelper.FindAndOpenByShortcut (keyEvent, this)) {
+				return true;
+			}
+			return false;
+		}
+
 		private void MovePreviousViewOrTop ()
 		{
 			if (Application.MdiTop == null) {
@@ -489,19 +515,6 @@ namespace Terminal.Gui {
 			} else {
 				Application.RequestStop ();
 			}
-		}
-
-		///<inheritdoc/>
-		public override bool ProcessColdKey (KeyEvent keyEvent)
-		{
-			if (base.ProcessColdKey (keyEvent)) {
-				return true;
-			}
-
-			if (ShortcutHelper.FindAndOpenByShortcut (keyEvent, this)) {
-				return true;
-			}
-			return false;
 		}
 
 		View GetDeepestFocusedSubview (View view)
