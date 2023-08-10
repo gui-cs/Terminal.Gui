@@ -445,12 +445,10 @@ namespace Terminal.Gui {
 
 		private void Parent_Removed (View obj)
 		{
-			if (borderBrush != null)
-			{
+			if (borderBrush != null) {
 				BorderBrush = default;
 			}
-			if (background != null)
-			{
+			if (background != null) {
 				Background = default;
 			}
 			child.Removed -= Parent_Removed;
@@ -800,7 +798,7 @@ namespace Terminal.Gui {
 			SetBorderBrush (driver);
 
 			// Draw the upper BorderThickness
-			for (int r = frame.Y;
+			for (int r = Math.Max (frame.Y, 0);
 				r < Math.Min (frame.Y + borderThickness.Top, frame.Bottom); r++) {
 				for (int c = frame.X;
 					c < Math.Min (frame.Right, driver.Cols); c++) {
@@ -810,7 +808,7 @@ namespace Terminal.Gui {
 			}
 
 			// Draw the left BorderThickness
-			for (int r = Math.Min (frame.Y + borderThickness.Top, frame.Bottom);
+			for (int r = Math.Max (Math.Min (frame.Y + borderThickness.Top, frame.Bottom), 0);
 				r < Math.Min (frame.Bottom - borderThickness.Bottom, driver.Rows); r++) {
 				for (int c = frame.X;
 					c < Math.Min (frame.X + borderThickness.Left, frame.Right); c++) {
@@ -820,7 +818,7 @@ namespace Terminal.Gui {
 			}
 
 			// Draw the right BorderThickness
-			for (int r = Math.Min (frame.Y + borderThickness.Top, frame.Bottom);
+			for (int r = Math.Max (Math.Min (frame.Y + borderThickness.Top, frame.Bottom), 0);
 				r < Math.Min (frame.Bottom - borderThickness.Bottom, driver.Rows); r++) {
 				for (int c = Math.Max (frame.Right - borderThickness.Right, frame.X);
 					c < Math.Min (frame.Right, driver.Cols); c++) {
@@ -842,7 +840,7 @@ namespace Terminal.Gui {
 			SetBackground (driver);
 
 			// Draw the upper Padding
-			for (int r = frame.Y + borderThickness.Top;
+			for (int r = Math.Max (frame.Y + borderThickness.Top, 0);
 				r < Math.Min (frame.Y + sumThickness.Top, frame.Bottom - borderThickness.Bottom); r++) {
 				for (int c = frame.X + borderThickness.Left;
 					c < Math.Min (frame.Right - borderThickness.Right, driver.Cols); c++) {
@@ -852,7 +850,7 @@ namespace Terminal.Gui {
 			}
 
 			// Draw the left Padding
-			for (int r = frame.Y + sumThickness.Top;
+			for (int r = Math.Max (frame.Y + sumThickness.Top, 0);
 				r < Math.Min (frame.Bottom - sumThickness.Bottom, driver.Rows); r++) {
 				for (int c = frame.X + borderThickness.Left;
 					c < Math.Min (frame.X + sumThickness.Left, frame.Right - borderThickness.Right); c++) {
@@ -862,7 +860,7 @@ namespace Terminal.Gui {
 			}
 
 			// Draw the right Padding
-			for (int r = frame.Y + sumThickness.Top;
+			for (int r = Math.Max (frame.Y + sumThickness.Top, 0);
 				r < Math.Min (frame.Bottom - sumThickness.Bottom, driver.Rows); r++) {
 				for (int c = Math.Max (frame.Right - sumThickness.Right, frame.X + sumThickness.Left);
 					c < Math.Max (frame.Right - borderThickness.Right, frame.X + sumThickness.Left); c++) {
