@@ -1420,6 +1420,7 @@ namespace Terminal.Gui {
 			return keyMod != Key.Null ? keyMod | key : key;
 		}
 
+#pragma warning disable CA1416 // Validate platform compatibility
 		private static string GetParentProcessName ()
 		{
 			var myId = Process.GetCurrentProcess ().Id;
@@ -1456,6 +1457,7 @@ namespace Terminal.Gui {
 
 			return parent.ProcessName;
 		}
+#pragma warning restore CA1416 // Validate platform compatibility
 
 		public override void Init (Action terminalResized)
 		{
