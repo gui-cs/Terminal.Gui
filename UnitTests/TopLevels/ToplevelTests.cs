@@ -1054,6 +1054,10 @@ namespace Terminal.Gui.TopLevelTests {
 			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
 			Assert.Equal (0, nx);
 			Assert.Equal (1, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (0, 1, 10, 10), win.Frame);
 
 			// right + bottom
 			win.X = 100;
@@ -1061,6 +1065,10 @@ namespace Terminal.Gui.TopLevelTests {
 			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
 			Assert.Equal (68, nx);
 			Assert.Equal (12, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (68, 12, 10, 10), win.Frame);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1082,6 +1090,10 @@ namespace Terminal.Gui.TopLevelTests {
 			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
 			Assert.Equal (1, nx);
 			Assert.Equal (2, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (1, 2, 10, 10), win.Frame);
 
 			// right + bottom
 			win.X = 100;
@@ -1089,6 +1101,10 @@ namespace Terminal.Gui.TopLevelTests {
 			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
 			Assert.Equal (69, nx);
 			Assert.Equal (13, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (69, 13, 10, 10), win.Frame);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1110,6 +1126,10 @@ namespace Terminal.Gui.TopLevelTests {
 			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
 			Assert.Equal (0, nx);
 			Assert.Equal (1, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (0, 1, 70, 14), win.Frame);
 
 			// right + bottom
 			win.X = 100;
@@ -1117,6 +1137,10 @@ namespace Terminal.Gui.TopLevelTests {
 			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
 			Assert.Equal (10, nx);
 			Assert.Equal (10, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (10, 10, 60, 5), win.Frame);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1133,6 +1157,10 @@ namespace Terminal.Gui.TopLevelTests {
 			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
 			Assert.Equal (1, nx);
 			Assert.Equal (1, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (1, 1, 10, 10), win.Frame);
 
 			// right + bottom
 			win.X = 100;
@@ -1140,6 +1168,161 @@ namespace Terminal.Gui.TopLevelTests {
 			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
 			Assert.Equal (69, nx);
 			Assert.Equal (14, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (69, 14, 10, 10), win.Frame);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void EnsureVisibleBounds_MdiTop_With_Border_MenuBar_StatusBar_And_ChildWindow_With_Border ()
+		{
+			var top = new Window () { IsMdiContainer = true };
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem("File", Array.Empty<MenuBarItem> ())
+			});
+			var statusBar = new StatusBar (new StatusItem [] {
+				new StatusItem(Key.F2, "~F2~ File", null)
+			});
+			top.Add (menu, statusBar);
+			var win = new Window () { Width = 10, Height = 10 };
+			Application.Begin (top);
+			var rs = Application.Begin (win);
+			((FakeDriver)Application.Driver).SetBufferSize (20, 20);
+
+			Assert.NotNull (top.MenuBar);
+			Assert.NotNull (top.StatusBar);
+			Assert.True (top.IsMdiContainer);
+			Assert.True (win.IsMdiChild);
+
+			// left + top
+			win.X = 0;
+			win.Y = 0;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
+			Assert.Equal (1, nx);
+			Assert.Equal (2, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (1, 2, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────┐
+│ File             │
+│┌────────┐        │
+││        │        │
+││        │        │
+││        │        │
+││        │        │
+││        │        │
+││        │        │
+││        │        │
+││        │        │
+│└────────┘        │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│ F2 File          │
+└──────────────────┘", output);
+
+			// right + bottom
+			win.X = 100;
+			win.Y = 40;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
+			Assert.Equal (9, nx);
+			Assert.Equal (8, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (9, 8, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────┐
+│ File             │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│        ┌────────┐│
+│        │        ││
+│        │        ││
+│        │        ││
+│        │        ││
+│        │        ││
+│        │        ││
+│        │        ││
+│        │        ││
+│        └────────┘│
+│ F2 File          │
+└──────────────────┘", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void RunMainLoopIteration_Mdi_IsTopNeedsDisplay ()
+		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem("File", Array.Empty<MenuItem> ())
+			}) { Visible = false };
+			var statusBar = new StatusBar (new StatusItem []{
+				new StatusItem(Key.F2, "~F2~ File", null)
+			}) { Visible = false };
+
+			var top = new Toplevel ();
+			top.IsMdiContainer = true;
+			top.Add (menu, statusBar);
+
+			Application.Begin (top);
+
+			var childWin = new Window () { Width = 5, Height = 5 };
+			var rs = Application.Begin (childWin);
+
+			Assert.Single (Application.MdiChildes);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌───┐
+│   │
+│   │
+│   │
+└───┘", output);
+			Assert.Equal (0, childWin.Frame.Y);
+
+			menu.Visible = true;
+			var firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ File
+┌───┐
+│   │
+│   │
+│   │
+└───┘", output);
+			Assert.Equal (1, childWin.Frame.Y);
+
+			menu.Visible = false;
+			childWin.Y = 25;
+			firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌───┐
+│   │
+│   │
+│   │
+└───┘", output);
+			Assert.Equal (20, childWin.Frame.Y);
+
+			statusBar.Visible = true;
+			firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌───┐   
+│   │   
+│   │   
+│   │   
+└───┘   
+ F2 File", output);
+			Assert.Equal (19, childWin.Frame.Y);
 		}
 	}
 }

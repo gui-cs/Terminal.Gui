@@ -11,6 +11,7 @@
 
 using System;
 using System.Collections;
+using System.Linq;
 using NStack;
 
 namespace Terminal.Gui {
@@ -291,8 +292,26 @@ namespace Terminal.Gui {
 			if (!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded) {
 				Driver.SetAttribute (GetNormalColor ());
 				Clear ();
-				LayoutSubviews ();
+				var savedFrame = Frame;
 				PositionToplevels ();
+				if (SuperView == null && this != Application.Top && LayoutStyle == LayoutStyle.Computed) {
+					SetRelativeLayout (Application.Top.Frame);
+					if (Frame != savedFrame) {
+						Application.Top.SetNeedsDisplay ();
+					}
+				}
+				LayoutSubviews ();
+				if (this == Application.MdiTop) {
+					foreach (var top in Application.MdiChildes.AsEnumerable ().Reverse ()) {
+						if (top.Frame.IntersectsWith (bounds)) {
+							if (top != this && !top.IsCurrentTop && !OutsideTopFrame (top) && top.Visible) {
+								top.SetNeedsLayout ();
+								top.SetNeedsDisplay (top.Bounds);
+								top.Redraw (top.Bounds);
+							}
+						}
+					}
+				}
 				contentView.SetNeedsDisplay ();
 			}
 			var savedClip = contentView.ClipToBounds ();

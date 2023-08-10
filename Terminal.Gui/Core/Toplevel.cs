@@ -631,9 +631,11 @@ namespace Terminal.Gui {
 			var superViewPadding = superView.Border != null ? 1 : 0;
 			var topPadding = top.Modal ? 0 : top.Border != null ? 1 : 0;
 			nx = Math.Max (x, 0);
-			nx = nx + superViewPadding * 2 + top.Frame.Width >= l ? Math.Max (l - top.Frame.Width - superViewPadding * 2, 0) : nx;
+			nx = !top.IsMdiChild && !top.Modal && nx + superViewPadding * 2 + top.Frame.Width >= l ? Math.Max (l - top.Frame.Width - superViewPadding * 2, 0) : nx;
 			nx = top.Modal && nx == 0 ? superViewPadding : nx;
-			nx = top.Modal && nx + superViewPadding * 2 + top.Frame.Width >= l ? l - top.Frame.Width - superViewPadding : nx;
+			nx = top.IsMdiChild && nx < superViewPadding ? superViewPadding : nx;
+			nx = top.Modal && nx + superViewPadding + top.Frame.Width >= l ? l - top.Frame.Width - superViewPadding : nx;
+			nx = top.IsMdiChild && nx + superViewPadding + top.Frame.Width >= l ? l - top.Frame.Width - superViewPadding : nx;
 			if (nx + topPadding * 2 > top.Frame.X + top.Frame.Width) {
 				nx = Math.Max (top.Frame.Right - topPadding * 2, 0);
 			}
@@ -655,7 +657,9 @@ namespace Terminal.Gui {
 			} else {
 				l = 0;
 			}
-			ny = Math.Max (Math.Max (y, l), 0);
+			ny = Math.Max (y, l);
+			ny = top.Modal && ny == 0 ? superViewPadding : ny;
+			ny = top.IsMdiChild && ny < superViewPadding + l ? ny + superViewPadding : ny;
 			if (!(top is Window && top == Application.Top) && (superView == null || top == Application.Top || superView == Application.Top)) {
 				s = Application.Top.StatusBar?.Visible == true;
 				sb = Application.Top.StatusBar;
@@ -673,9 +677,9 @@ namespace Terminal.Gui {
 				l = (s ? superView.Frame.Height - 1 : superView.Frame.Height);
 			}
 			ny = Math.Min (ny, l);
-			ny = top.Modal && ny == 0 ? superViewPadding : ny;
-			ny = ny + superViewPadding * 2 + top.Frame.Height >= l ? Math.Max (l - top.Frame.Height - superViewPadding * 2, m ? 1 : 0) : ny;
+			ny = !top.IsMdiChild && !top.Modal && ny + superViewPadding * 2 + top.Frame.Height >= l ? Math.Max (l - top.Frame.Height - superViewPadding * 2, m ? 1 : 0) : ny;
 			ny = top.Modal && ny + superViewPadding * 2 + top.Frame.Height >= l ? l - top.Frame.Height - superViewPadding : ny;
+			ny = top.IsMdiChild && ny + superViewPadding + top.Frame.Height >= l ? Math.Max (l - top.Frame.Height - superViewPadding, m ? 1 : 0) : ny;
 			if (ny + topPadding * 2 > top.Frame.Y + top.Frame.Height) {
 				ny = Math.Max (top.Frame.Bottom - topPadding * 2, 0);
 			}
@@ -797,7 +801,7 @@ namespace Terminal.Gui {
 			base.Redraw (Bounds);
 		}
 
-		bool OutsideTopFrame (Toplevel top)
+		internal bool OutsideTopFrame (Toplevel top)
 		{
 			if (top.Frame.X > Driver.Cols || top.Frame.Y > Driver.Rows) {
 				return true;
