@@ -71,6 +71,7 @@ namespace Unix.Terminal {
 		//static bool use_naked_driver;
 
 		static UnmanagedLibrary curses_library;
+
 		static NativeMethods methods;
 
 		[DllImport ("libc")]
@@ -97,6 +98,13 @@ namespace Unix.Terminal {
 			cols_ptr = get_ptr ("COLS");
 		}
 
+		static public string curses_version ()
+		{
+			var v = methods.curses_version ();
+			return $"{Marshal.PtrToStringAnsi (v)}, {curses_library.LibraryPath}";
+
+		}
+
 		static public Window initscr ()
 		{
 			setlocale (LC_ALL, "");
@@ -116,6 +124,9 @@ namespace Unix.Terminal {
 							 "or DYLD_LIBRARY_PATH directory or run /sbin/ldconfig");
 				Environment.Exit (1);
 			}
+
+			//Console.Error.WriteLine ($"using curses {Curses.curses_version ()}");
+
 			return main_window;
 		}
 
@@ -141,7 +152,10 @@ namespace Unix.Terminal {
 
 			console_sharp_get_dims (out l, out c);
 
-			if (l == 1 || l != lines || c != cols) {
+			if (l < 1) {
+				l = 1;
+			}
+			if (l != lines || c != cols) {
 				lines = l;
 				cols = c;
 				return true;
@@ -322,10 +336,12 @@ namespace Unix.Terminal {
 		static public int move (int line, int col) => methods.move (line, col);
 		static public int curs_set (int visibility) => methods.curs_set (visibility);
 		//static public int addch (int ch) => methods.addch (ch);
+		static public int echochar (int ch) => methods.echochar (ch);
 		static public int addwstr (string s) => methods.addwstr (s);
 		static public int mvaddwstr (int y, int x, string s) => methods.mvaddwstr (y, x, s);
 		static public int wmove (IntPtr win, int line, int col) => methods.wmove (win, line, col);
 		static public int waddch (IntPtr win, int ch) => methods.waddch (win, ch);
+		//static public int wechochar (IntPtr win, int ch) => methods.wechochar (win, ch);
 		static public int attron (int attrs) => methods.attron (attrs);
 		static public int attroff (int attrs) => methods.attroff (attrs);
 		static public int attrset (int attrs) => methods.attrset (attrs);
@@ -397,6 +413,7 @@ namespace Unix.Terminal {
 		public delegate int move (int line, int col);
 		public delegate int curs_set (int visibility);
 		public delegate int addch (int ch);
+		public delegate int echochar (int ch);
 		public delegate int mvaddch (int y, int x, int ch);
 		public delegate int addwstr ([MarshalAs (UnmanagedType.LPWStr)] string s);
 		public delegate int mvaddwstr (int y, int x, [MarshalAs (UnmanagedType.LPWStr)] string s);
@@ -430,6 +447,7 @@ namespace Unix.Terminal {
 		public delegate int savetty ();
 		public delegate int resetty ();
 		public delegate int set_escdelay (int size);
+		public delegate IntPtr curses_version ();
 	}
 
 	internal class NativeMethods {
@@ -471,11 +489,13 @@ namespace Unix.Terminal {
 		public readonly Delegates.move move;
 		public readonly Delegates.curs_set curs_set;
 		public readonly Delegates.addch addch;
+		public readonly Delegates.echochar echochar;
 		public readonly Delegates.mvaddch mvaddch;
 		public readonly Delegates.addwstr addwstr;
 		public readonly Delegates.mvaddwstr mvaddwstr;
 		public readonly Delegates.wmove wmove;
 		public readonly Delegates.waddch waddch;
+		//public readonly Delegates.wechochar wechochar;
 		public readonly Delegates.attron attron;
 		public readonly Delegates.attroff attroff;
 		public readonly Delegates.attrset attrset;
@@ -504,6 +524,7 @@ namespace Unix.Terminal {
 		public readonly Delegates.savetty savetty;
 		public readonly Delegates.resetty resetty;
 		public readonly Delegates.set_escdelay set_escdelay;
+		public readonly Delegates.curses_version curses_version;
 		public UnmanagedLibrary UnmanagedLibrary;
 
 		public NativeMethods (UnmanagedLibrary lib)
@@ -547,6 +568,7 @@ namespace Unix.Terminal {
 			move = lib.GetNativeMethodDelegate<Delegates.move> ("move");
 			curs_set = lib.GetNativeMethodDelegate<Delegates.curs_set> ("curs_set");
 			addch = lib.GetNativeMethodDelegate<Delegates.addch> ("addch");
+			echochar = lib.GetNativeMethodDelegate<Delegates.echochar> ("echochar");
 			mvaddch = lib.GetNativeMethodDelegate<Delegates.mvaddch> ("mvaddch");
 			addwstr = lib.GetNativeMethodDelegate<Delegates.addwstr> ("addwstr");
 			mvaddwstr = lib.GetNativeMethodDelegate<Delegates.mvaddwstr> ("mvaddwstr");
@@ -580,6 +602,7 @@ namespace Unix.Terminal {
 			savetty = lib.GetNativeMethodDelegate<Delegates.savetty> ("savetty");
 			resetty = lib.GetNativeMethodDelegate<Delegates.resetty> ("resetty");
 			set_escdelay = lib.GetNativeMethodDelegate<Delegates.set_escdelay> ("set_escdelay");
+			curses_version = lib.GetNativeMethodDelegate<Delegates.curses_version> ("curses_version");
 		}
 	}
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

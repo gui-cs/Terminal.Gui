@@ -3,14 +3,9 @@
 //
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using System.Text;
 using Unix.Terminal;
-using System.Buffers;
-using System.Data;
 
 namespace Terminal.Gui;
 
@@ -23,6 +18,8 @@ internal class CursesDriver : ConsoleDriver {
 
 	CursorVisibility? _initialCursorVisibility = null;
 	CursorVisibility? _currentCursorVisibility = null;
+
+	public override string GetVersionInfo () => $"{Curses.curses_version()}";
 
 	public override void Move (int col, int row)
 	{
@@ -45,17 +42,13 @@ internal class CursesDriver : ConsoleDriver {
 
 	public override void Refresh ()
 	{
-		Curses.raw ();
-		Curses.noecho ();
-		Curses.refresh ();
-		ProcessWinChange ();
 		UpdateScreen ();
+		UpdateCursor ();
 	}
 
 	private void ProcessWinChange ()
 	{
 		if (Curses.CheckWinChange ()) {
-			ResizeScreen ();
 			ClearContents ();
 			TerminalResized?.Invoke ();
 		}
@@ -184,12 +177,23 @@ internal class CursesDriver : ConsoleDriver {
 
 	#endregion
 
-	public override void UpdateCursor () => Refresh ();
+	public override void UpdateCursor ()
+	{
+		EnsureCursorVisibility ();
+
+		if (Col >= 0 && Col < Cols && Row >= 0 && Row < Rows) {
+			Curses.move (Row, Col);
+		}
+	}
 
 	public override void End ()
 	{
 		StopReportingMouseMoves ();
 		SetCursorVisibility (CursorVisibility.Default);
+
+		// throws away any typeahead that has been typed by
+		// the user and has not yet been read by the program.
+		Curses.flushinp ();
 
 		Curses.endwin ();
 	}
@@ -203,40 +207,33 @@ internal class CursesDriver : ConsoleDriver {
 			_dirtyLines [row] = false;
 
 			for (int col = 0; col < Cols; col++) {
-				//Curses.mvaddch (row, col, '+');
-
 				if (Contents [row, col].IsDirty == false) {
-					//Curses.mvaddch (row, col, (char)Rune.ReplacementChar.Value);
 					continue;
 				}
 				Curses.attrset (Contents [row, col].Attribute.GetValueOrDefault ().Value);
 
-				if (Contents [row, col].Runes [0].IsBmp) {
-					Curses.mvaddch (row, col, Contents [row, col].Runes [0].Value);
+				var rune = Contents [row, col].Runes [0];
+				if (rune.IsBmp) {
+					// BUGBUG: CursesDriver doesn't render CharMap correctly for wide chars (and other Unicode) - Curses is doing something funky with glyphs that report GetColums() of 1 yet are rendered wide. E.g. 0x2064 (invisible times) is reported as 1 column but is rendered as 2. WindowsDriver & NetDriver correctly render this as 1 column, overlapping the next cell.
+					if (rune.GetColumns () < 2) {
+						Curses.mvaddch (row, col, rune.Value);
+					} else /*if (col + 1 < Cols)*/ {
+						Curses.mvaddwstr (row, col, rune.ToString ());
+					}
+
 				} else {
-					Curses.mvaddch (row, col, Contents [row, col].Runes [0].Value);
-					//_outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
-					if (Contents [row, col].Runes [0].GetColumns () > 1 && col + 1 < Cols) {
+					Curses.mvaddwstr (row, col, rune.ToString());
+					if (rune.GetColumns () > 1 && col + 1 < Cols) {
 						// TODO: This is a hack to deal with non-BMP and wide characters.
 						//col++;
-						//_outputBuffer [position].Empty = false;
-						//_outputBuffer [position].Char = ' ';
-						//Curses.mvaddch (row, col, '*');
+						Curses.mvaddch (row, ++col, '*');
 					}
 				}
-
-				if (Contents [row, col].Runes [0].IsSurrogatePair () && Contents [row, col].Runes [0].GetColumns () < 2) {
-					col--;
-				}
-
-				//if (col < Cols && Contents [row, col].Runes [0].GetColumns () > 1) {
-				//	col++;
-				//	Curses.mvaddch (row, col, '=');
-				//}
 			}
 		}
 
-		_window.redrawwin ();
+		Curses.move (Row, Col);
+		_window.wrefresh ();
 	}
 
 	public Curses.Window _window;
@@ -351,8 +348,12 @@ internal class CursesDriver : ConsoleDriver {
 		Key k = Key.Null;
 
 		if (code == Curses.KEY_CODE_YES) {
-			if (wch == Curses.KeyResize) {
+			while (code == Curses.KEY_CODE_YES && wch == Curses.KeyResize) {
 				ProcessWinChange ();
+				code = Curses.get_wch (out wch);
+			}
+			if (wch == 0) {
+				return;
 			}
 			if (wch == Curses.KeyMouse) {
 				int wch2 = wch;
@@ -511,8 +512,45 @@ internal class CursesDriver : ConsoleDriver {
 		}
 	}
 
+	MouseFlags _lastMouseFlags;
+
 	void ProcessMouseEvent (MouseFlags mouseFlag, Point pos)
 	{
+		bool WasButtonReleased (MouseFlags flag)
+		{
+			return flag.HasFlag (MouseFlags.Button1Released) ||
+				flag.HasFlag (MouseFlags.Button2Released) ||
+				flag.HasFlag (MouseFlags.Button3Released) ||
+				flag.HasFlag (MouseFlags.Button4Released);
+		}
+
+		bool IsButtonNotPressed (MouseFlags flag)
+		{
+			return !flag.HasFlag (MouseFlags.Button1Pressed) &&
+				!flag.HasFlag (MouseFlags.Button2Pressed) &&
+				!flag.HasFlag (MouseFlags.Button3Pressed) &&
+				!flag.HasFlag (MouseFlags.Button4Pressed);
+		}
+
+		bool IsButtonClickedOrDoubleClicked (MouseFlags flag)
+		{
+			return flag.HasFlag (MouseFlags.Button1Clicked) ||
+				flag.HasFlag (MouseFlags.Button2Clicked) ||
+				flag.HasFlag (MouseFlags.Button3Clicked) ||
+				flag.HasFlag (MouseFlags.Button4Clicked) ||
+				flag.HasFlag (MouseFlags.Button1DoubleClicked) ||
+				flag.HasFlag (MouseFlags.Button2DoubleClicked) ||
+				flag.HasFlag (MouseFlags.Button3DoubleClicked) ||
+				flag.HasFlag (MouseFlags.Button4DoubleClicked);
+		}
+
+		if ((WasButtonReleased (mouseFlag) && IsButtonNotPressed (_lastMouseFlags)) ||
+			(IsButtonClickedOrDoubleClicked (mouseFlag) && _lastMouseFlags == 0)) {
+			return;
+		}
+
+		_lastMouseFlags = mouseFlag;
+
 		var me = new MouseEvent () {
 			Flags = mouseFlag,
 			X = pos.X,
@@ -520,6 +558,7 @@ internal class CursesDriver : ConsoleDriver {
 		};
 		_mouseHandler (me);
 	}
+
 
 	void ProcessContinuousButtonPressed (MouseFlags mouseFlag, Point pos)
 	{
@@ -547,9 +586,7 @@ internal class CursesDriver : ConsoleDriver {
 			return true;
 		});
 
-		mLoop.WinChanged += () => {
-			ProcessWinChange ();
-		};
+		mLoop.WinChanged += ProcessInput;
 	}
 
 	public override void Init (Action terminalResized)
@@ -601,33 +638,27 @@ internal class CursesDriver : ConsoleDriver {
 			}
 		}
 
+		if (!Curses.HasColors) {
+			throw new InvalidOperationException ("V2 - This should never happen. File an Issue if it does.");
+		}
+
 		Curses.raw ();
 		Curses.noecho ();
 
 		Curses.Window.Standard.keypad (true);
+
 		TerminalResized = terminalResized;
-		StartReportingMouseMoves ();
 
+		Curses.StartColor ();
+		Curses.UseDefaultColors ();
 		CurrentAttribute = MakeColor (Color.White, Color.Black);
+		InitializeColorSchemes ();
 
-		if (Curses.HasColors) {
-			Curses.StartColor ();
-			Curses.UseDefaultColors ();
-
-			InitializeColorSchemes ();
-		} else {
-			throw new InvalidOperationException ("V2 - This should never happen. File an Issue if it does.");
-		}
-
-		ResizeScreen ();
+		Curses.CheckWinChange ();
 		ClearContents ();
-
-	}
-
-	public virtual void ResizeScreen ()
-	{
-		Clip = new Rect (0, 0, Cols, Rows);
 		Curses.refresh ();
+
+		StartReportingMouseMoves ();
 	}
 
 	public static bool Is_WSL_Platform ()

@@ -28,7 +28,6 @@
       "Ctrl"
     ]
   },
-  "Application.EnableConsoleScrolling": false,
   "Application.QuitKey": {
     "Key": "Q",
     "Modifiers": [

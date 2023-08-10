@@ -62,24 +62,6 @@ public abstract class ConsoleDriver {
 	public IClipboard Clipboard { get; internal set; }
 
 	/// <summary>
-	/// <para>
-	/// If <see langword="false"/> (the default) the height of the Terminal.Gui application (<see cref="Rows"/>) 
-	/// tracks to the height of the visible console view when the console is resized. In this case 
-	/// scrolling in the console will be disabled and all <see cref="Rows"/> will remain visible.
-	/// </para>
-	/// <para>
-	/// If <see langword="true"/> then height of the Terminal.Gui application <see cref="Rows"/> only tracks 
-	/// the height of the visible console view when the console is made larger (the application will only grow in height, never shrink). 
-	/// In this case console scrolling is enabled and the contents (<see cref="Rows"/> high) will scroll
-	/// as the console scrolls. 
-	/// </para>
-	/// </summary>
-	/// <remarks>
-	/// NOTE: This functionaliy is currently broken on Windows Terminal.
-	/// </remarks>
-	public bool EnableConsoleScrolling { get; set; }
-
-	/// <summary>
 	/// The contents of the application output. The driver outputs this buffer to the terminal when <see cref="UpdateScreen"/>
 	/// is called.
 	/// <remarks>
@@ -153,7 +135,7 @@ public abstract class ConsoleDriver {
 	/// <remarks>
 	/// <para>
 	/// When the method returns, <see cref="Col"/> will be incremented by the number of columns <paramref name="rune"/> required,
-	/// unless the new column value is outside of the <see cref="Clip"/> or screen dimensions defined by <see cref="Cols"/>.
+	/// even if the new column value is outside of the <see cref="Clip"/> or screen dimensions defined by <see cref="Cols"/>.
 	/// </para>
 	/// <para>
 	/// If <paramref name="rune"/> requires more than one column, and <see cref="Col"/> plus the number of columns needed
@@ -168,7 +150,7 @@ public abstract class ConsoleDriver {
 		if (validLocation) {
 			rune = rune.MakePrintable ();
 			runeWidth = rune.GetColumns ();
-			if (runeWidth == 0 && Col > 0) {
+			if (runeWidth == 0 && rune.IsCombiningMark () && Col > 0) {
 				// This is a combining character, and we are not at the beginning of the line.
 				// TODO: Remove hard-coded [0] once combining pairs is supported
 
@@ -178,32 +160,51 @@ public abstract class ConsoleDriver {
 				// Normalize to Form C (Canonical Composition)
 				string normalized = combined.Normalize (NormalizationForm.FormC);
 
-				Contents [Row, Col - 1].Runes [0] = (Rune)normalized [0];
+				Contents [Row, Col - 1].Runes = new List<Rune> { (Rune)normalized [0] }; ;
 				Contents [Row, Col - 1].Attribute = CurrentAttribute;
 				Contents [Row, Col - 1].IsDirty = true;
+
+				//Col--;
 			} else {
 				Contents [Row, Col].Attribute = CurrentAttribute;
 				Contents [Row, Col].IsDirty = true;
 
-				if (runeWidth < 2 && Col > 0 && Contents [Row, Col - 1].Runes [0].GetColumns () > 1) {
-					// This is a single-width character, and we are not at the beginning of the line.
-					Contents [Row, Col - 1].Runes [0] = Rune.ReplacementChar;
-					Contents [Row, Col - 1].IsDirty = true;
-				} else if (runeWidth < 2 && Col <= Clip.Right - 1 && Contents [Row, Col].Runes [0].GetColumns () > 1) {
-					// This is a single-width character, and we are not at the end of the line.
-					Contents [Row, Col + 1].Runes [0] = Rune.ReplacementChar;
-					Contents [Row, Col + 1].IsDirty = true;
+				if (Col > 0) {
+					// Check if cell to left has a wide glyph
+					if (Contents [Row, Col - 1].Runes [0].GetColumns () > 1) {
+						// Invalidate cell to left
+						Contents [Row, Col - 1].Runes = new List<Rune> { Rune.ReplacementChar };
+						Contents [Row, Col - 1].IsDirty = true;
+					}
 				}
-				if (runeWidth > 1 && Col == Clip.Right - 1) {
-					// This is a double-width character, and we are at the end of the line.
-					Contents [Row, Col].Runes [0] = Rune.ReplacementChar;
+
+
+				if (runeWidth < 1) {
+					Contents [Row, Col].Runes = new List<Rune> { Rune.ReplacementChar };
+
+				} else if (runeWidth == 1) {
+					Contents [Row, Col].Runes = new List<Rune> { rune };
+					if (Col < Clip.Right - 1) {
+						Contents [Row, Col + 1].IsDirty = true;
+					}
+				} else if (runeWidth == 2) {
+					if (Col == Clip.Right - 1) {
+						// We're at the right edge of the clip, so we can't display a wide character.
+						// TODO: Figure out if it is better to show a replacement character or ' '
+						Contents [Row, Col].Runes = new List<Rune> { Rune.ReplacementChar };
+					} else {
+						Contents [Row, Col].Runes = new List<Rune> { rune };
+						if (Col < Clip.Right - 1) {
+							// Invalidate cell to right so that it doesn't get drawn
+							// TODO: Figure out if it is better to show a replacement character or ' '
+							Contents [Row, Col + 1].Runes = new List<Rune> { Rune.ReplacementChar };
+							Contents [Row, Col + 1].IsDirty = true;
+						}
+					}
 				} else {
-					//if (runeWidth == 1) {
-						// This is a single-width character, or we are not at the end of the line.
-						Contents [Row, Col].Runes [0] = rune;
-					//} else {
-						//Contents [Row, Col].Runes [0] = (Rune)'*';
-					//}
+					// This is a non-spacing character, so we don't need to do anything
+					Contents [Row, Col].Runes = new List<Rune> { (Rune)' ' };
+					Contents [Row, Col].IsDirty = false;
 				}
 				_dirtyLines [Row] = true;
 			}
@@ -214,13 +215,15 @@ public abstract class ConsoleDriver {
 		}
 
 		if (runeWidth > 1) {
-			Debug.Assert(runeWidth <= 2);
+			Debug.Assert (runeWidth <= 2);
 			if (validLocation && Col < Clip.Right) {
 				// This is a double-width character, and we are not at the end of the line.
 				// Col now points to the second column of the character. Ensure it doesn't
 				// Get rendered.
 				Contents [Row, Col].IsDirty = false;
 				Contents [Row, Col].Attribute = CurrentAttribute;
+
+				// TODO: Determine if we should wipe this out (for now now)
 				//Contents [Row, Col].Runes [0] = (Rune)' ';
 			}
 			Col++;
@@ -319,6 +322,7 @@ public abstract class ConsoleDriver {
 	{
 		// TODO: This method is really "Clear Contents" now and should not be abstract (or virtual)
 		Contents = new Cell [Rows, Cols];
+		Clip = new Rect (0, 0, Cols, Rows);
 		_dirtyLines = new bool [Rows];
 
 		lock (Contents) {
@@ -336,7 +340,6 @@ public abstract class ConsoleDriver {
 				}
 			} catch (IndexOutOfRangeException) { }
 		}
-
 	}
 
 	/// <summary>
@@ -516,6 +519,12 @@ public abstract class ConsoleDriver {
 	/// Ends the execution of the console driver.
 	/// </summary>
 	public abstract void End ();
+	
+	/// <summary>
+	/// Returns the name of the driver and relevant library version information.
+	/// </summary>
+	/// <returns></returns>
+	public virtual string GetVersionInfo () => GetType ().Name;
 }
 
 

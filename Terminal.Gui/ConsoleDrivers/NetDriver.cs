@@ -113,7 +113,6 @@ internal class NetEvents {
 	ConsoleDriver _consoleDriver;
 	volatile ConsoleKeyInfo [] _cki = null;
 	volatile static bool _isEscSeq;
-	int _lastWindowHeight;
 	bool _stopTasks;
 #if PROCESS_REQUEST
 		bool _neededProcessRequest;
@@ -171,7 +170,7 @@ internal class NetEvents {
 					|| (consoleKeyInfo.KeyChar != (char)Key.Esc && _isEscSeq)) {
 						if (_cki == null && consoleKeyInfo.KeyChar != (char)Key.Esc && _isEscSeq) {
 							_cki = EscSeqUtils.ResizeArray (new ConsoleKeyInfo ((char)Key.Esc, 0,
-								false, false, false), _cki);
+							    false, false, false), _cki);
 						}
 						_isEscSeq = true;
 						newConsoleKeyInfo = consoleKeyInfo;
@@ -222,10 +221,10 @@ internal class NetEvents {
 					buffWidth = _consoleDriver.Cols;
 				}
 				if (EnqueueWindowSizeEvent (
-					Math.Max (Console.WindowHeight, 0),
-					Math.Max (Console.WindowWidth, 0),
-					buffHeight,
-					buffWidth)) {
+				    Math.Max (Console.WindowHeight, 0),
+				    Math.Max (Console.WindowWidth, 0),
+				    buffHeight,
+				    buffWidth)) {
 
 					return;
 				}
@@ -253,30 +252,16 @@ internal class NetEvents {
 	/// <returns></returns>
 	bool EnqueueWindowSizeEvent (int winHeight, int winWidth, int buffHeight, int buffWidth)
 	{
-		if (!_consoleDriver.EnableConsoleScrolling) {
-			if (winWidth == _consoleDriver.Cols && winHeight == _consoleDriver.Rows) return false;
-			var w = Math.Max (winWidth, 0);
-			var h = Math.Max (winHeight, 0);
-			_inputResultQueue.Enqueue (new InputResult () {
-				EventType = EventType.WindowSize,
-				WindowSizeEvent = new WindowSizeEvent () {
-					Size = new Size (w, h)
-				}
-			});
-			return true;
-		} else {
-			if (winWidth == _consoleDriver.Cols &&
-				winHeight == _lastWindowHeight &&
-				buffWidth == _consoleDriver.Cols && buffHeight == _consoleDriver.Rows) return false;
-			_lastWindowHeight = Math.Max (winHeight, 0);
-			_inputResultQueue.Enqueue (new InputResult () {
-				EventType = EventType.WindowSize,
-				WindowSizeEvent = new WindowSizeEvent () {
-					Size = new Size (winWidth, _lastWindowHeight)
-				}
-			});
-			return true;
-		}
+		if (winWidth == _consoleDriver.Cols && winHeight == _consoleDriver.Rows) return false;
+		var w = Math.Max (winWidth, 0);
+		var h = Math.Max (winHeight, 0);
+		_inputResultQueue.Enqueue (new InputResult () {
+			EventType = EventType.WindowSize,
+			WindowSizeEvent = new WindowSizeEvent () {
+				Size = new Size (w, h)
+			}
+		});
+		return true;
 	}
 
 	// Process a CSI sequence received by the driver (key pressed, mouse event, or request/response event)
@@ -284,10 +269,10 @@ internal class NetEvents {
 	{
 		// isMouse is true if it's CSI<, false otherwise
 		EscSeqUtils.DecodeEscSeq (EscSeqRequests, ref newConsoleKeyInfo, ref key, cki, ref mod,
-			out var c1Control, out var code, out var values, out var terminating,
-			out var isMouse, out var mouseFlags,
-			out var pos, out var isReq,
-			(f, p) => HandleMouseEvent (MapMouseFlags (f), p));
+		    out var c1Control, out var code, out var values, out var terminating,
+		    out var isMouse, out var mouseFlags,
+		    out var pos, out var isReq,
+		    (f, p) => HandleMouseEvent (MapMouseFlags (f), p));
 
 		if (isMouse) {
 			foreach (var mf in mouseFlags) {
@@ -430,10 +415,10 @@ internal class NetEvents {
 			switch (values [0]) {
 			case EscSeqUtils.CSI_ReportTerminalSizeInChars_ResponseValue:
 				EnqueueWindowSizeEvent (
-					Math.Max (int.Parse (values [1]), 0),
-					Math.Max (int.Parse (values [2]), 0),
-					Math.Max (int.Parse (values [1]), 0),
-					Math.Max (int.Parse (values [2]), 0));
+				    Math.Max (int.Parse (values [1]), 0),
+				    Math.Max (int.Parse (values [2]), 0),
+				    Math.Max (int.Parse (values [1]), 0),
+				    Math.Max (int.Parse (values [2]), 0));
 				break;
 			default:
 				EnqueueRequestResponseEvent (c1Control, code, values, terminating);
@@ -636,14 +621,8 @@ internal class NetDriver : ConsoleDriver {
 
 			Console.TreatControlCAsInput = true;
 
-			if (EnableConsoleScrolling) {
-				_largestBufferHeight = Console.BufferHeight;
-			} else {
-				_largestBufferHeight = Console.WindowHeight;
-			}
-
 			Cols = Console.WindowWidth;
-			Rows = _largestBufferHeight;
+			Rows = Console.WindowHeight;
 		} else {
 			// Simluate
 			Cols = 80;
@@ -652,7 +631,7 @@ internal class NetDriver : ConsoleDriver {
 		}
 
 		ResizeScreen ();
-		ClearContents();
+		ClearContents ();
 		CurrentAttribute = MakeColor (Color.White, Color.Black);
 		InitializeColorSchemes ();
 
@@ -665,7 +644,7 @@ internal class NetDriver : ConsoleDriver {
 			return;
 		}
 
-		if (!EnableConsoleScrolling && Console.WindowHeight > 0) {
+		if (Console.WindowHeight > 0) {
 			// Not supported on Unix.
 			if (IsWinPlatform) {
 				// Can raise an exception while is still resizing.
@@ -688,29 +667,8 @@ internal class NetDriver : ConsoleDriver {
 			} else {
 				Console.Out.Write (EscSeqUtils.CSI_SetTerminalWindowSize (Rows, Cols));
 			}
-		} else {
-			if (IsWinPlatform) {
-				if (Console.WindowHeight > 0) {
-					// Can raise an exception while is still resizing.
-					try {
-#pragma warning disable CA1416
-						Console.CursorTop = 0;
-						Console.CursorLeft = 0;
-						if (Console.WindowHeight > Rows) {
-							Console.SetWindowSize (Cols, Rows);
-						}
-						Console.SetBufferSize (Cols, Rows);
-#pragma warning restore CA1416
-					} catch (System.IO.IOException) {
-						Clip = new Rect (0, 0, Cols, Rows);
-					} catch (ArgumentOutOfRangeException) {
-						Clip = new Rect (0, 0, Cols, Rows);
-					}
-				}
-			} else {
-				Console.Out.Write (EscSeqUtils.CSI_SetTerminalWindowSize (Rows, Cols));
-			}
 		}
+
 		Clip = new Rect (0, 0, Cols, Rows);
 	}
 
@@ -722,9 +680,7 @@ internal class NetDriver : ConsoleDriver {
 
 	public override void UpdateScreen ()
 	{
-		if (_winSizeChanging || Console.WindowHeight < 1 || Contents.Length != Rows * Cols
-			|| (!EnableConsoleScrolling && Rows != Console.WindowHeight)
-			|| (EnableConsoleScrolling && Rows != _largestBufferHeight)) {
+		if (_winSizeChanging || Console.WindowHeight < 1 || Contents.Length != Rows * Cols || Rows != Console.WindowHeight) {
 			return;
 		}
 
@@ -775,7 +731,7 @@ internal class NetDriver : ConsoleDriver {
 					if (attr != redrawAttr) {
 						redrawAttr = attr;
 						output.Append (EscSeqUtils.CSI_SetGraphicsRendition (
-							MapColors ((ConsoleColor)attr.Background, false), MapColors ((ConsoleColor)attr.Foreground, true)));
+						    MapColors ((ConsoleColor)attr.Background, false), MapColors ((ConsoleColor)attr.Foreground, true)));
 					}
 					outputWidth++;
 					var rune = (Rune)Contents [row, col].Runes [0];
@@ -810,28 +766,28 @@ internal class NetDriver : ConsoleDriver {
 
 	// Cache the list of ConsoleColor values.
 	private static readonly HashSet<int> ConsoleColorValues = new HashSet<int> (
-		Enum.GetValues (typeof (ConsoleColor)).OfType<ConsoleColor> ().Select (c => (int)c)
+	    Enum.GetValues (typeof (ConsoleColor)).OfType<ConsoleColor> ().Select (c => (int)c)
 	);
 
 	// Dictionary for mapping ConsoleColor values to the values used by System.Net.Console.
 	private static Dictionary<ConsoleColor, int> colorMap = new Dictionary<ConsoleColor, int> {
-		{ ConsoleColor.Black, COLOR_BLACK },
-		{ ConsoleColor.DarkBlue, COLOR_BLUE },
-		{ ConsoleColor.DarkGreen, COLOR_GREEN },
-		{ ConsoleColor.DarkCyan, COLOR_CYAN },
-		{ ConsoleColor.DarkRed, COLOR_RED },
-		{ ConsoleColor.DarkMagenta, COLOR_MAGENTA },
-		{ ConsoleColor.DarkYellow, COLOR_YELLOW },
-		{ ConsoleColor.Gray, COLOR_WHITE },
-		{ ConsoleColor.DarkGray, COLOR_BRIGHT_BLACK },
-		{ ConsoleColor.Blue, COLOR_BRIGHT_BLUE },
-		{ ConsoleColor.Green, COLOR_BRIGHT_GREEN },
-		{ ConsoleColor.Cyan, COLOR_BRIGHT_CYAN },
-		{ ConsoleColor.Red, COLOR_BRIGHT_RED },
-		{ ConsoleColor.Magenta, COLOR_BRIGHT_MAGENTA },
-		{ ConsoleColor.Yellow, COLOR_BRIGHT_YELLOW },
-		{ ConsoleColor.White, COLOR_BRIGHT_WHITE }
-	};
+	{ ConsoleColor.Black, COLOR_BLACK },
+	{ ConsoleColor.DarkBlue, COLOR_BLUE },
+	{ ConsoleColor.DarkGreen, COLOR_GREEN },
+	{ ConsoleColor.DarkCyan, COLOR_CYAN },
+	{ ConsoleColor.DarkRed, COLOR_RED },
+	{ ConsoleColor.DarkMagenta, COLOR_MAGENTA },
+	{ ConsoleColor.DarkYellow, COLOR_YELLOW },
+	{ ConsoleColor.Gray, COLOR_WHITE },
+	{ ConsoleColor.DarkGray, COLOR_BRIGHT_BLACK },
+	{ ConsoleColor.Blue, COLOR_BRIGHT_BLUE },
+	{ ConsoleColor.Green, COLOR_BRIGHT_GREEN },
+	{ ConsoleColor.Cyan, COLOR_BRIGHT_CYAN },
+	{ ConsoleColor.Red, COLOR_BRIGHT_RED },
+	{ ConsoleColor.Magenta, COLOR_BRIGHT_MAGENTA },
+	{ ConsoleColor.Yellow, COLOR_BRIGHT_YELLOW },
+	{ ConsoleColor.White, COLOR_BRIGHT_WHITE }
+    };
 
 	// Map a ConsoleColor to a platform dependent value.
 	int MapColors (ConsoleColor color, bool isForeground = true)
@@ -860,9 +816,9 @@ internal class NetDriver : ConsoleDriver {
 	{
 		// Encode the colors into the int value.
 		return new Attribute (
-			value: ((((int)foreground) & 0xffff) << 16) | (((int)background) & 0xffff),
-			foreground: foreground,
-			background: background
+		    value: ((((int)foreground) & 0xffff) << 16) | (((int)background) & 0xffff),
+		    foreground: foreground,
+		    background: background
 		);
 	}
 
@@ -931,23 +887,6 @@ internal class NetDriver : ConsoleDriver {
 
 	void SetWindowPosition (int col, int row)
 	{
-		if (IsWinPlatform && EnableConsoleScrolling) {
-			var winTop = Math.Max (Rows - Console.WindowHeight - row, 0);
-			winTop = Math.Min (winTop, Rows - Console.WindowHeight + 1);
-			winTop = Math.Max (winTop, 0);
-			if (winTop != Console.WindowTop) {
-				try {
-					if (!EnsureBufferSize ()) {
-						return;
-					}
-#pragma warning disable CA1416
-					Console.SetWindowPosition (col, winTop);
-#pragma warning restore CA1416
-				} catch (System.IO.IOException) {
-
-				} catch (System.ArgumentOutOfRangeException) { }
-			}
-		}
 		Top = Console.WindowTop;
 		Left = Console.WindowLeft;
 	}
@@ -1161,17 +1100,12 @@ internal class NetDriver : ConsoleDriver {
 			break;
 		case NetEvents.EventType.WindowSize:
 			_winSizeChanging = true;
-			if (!EnableConsoleScrolling) {
-				_largestBufferHeight = Math.Max (inputEvent.WindowSizeEvent.Size.Height, 0);
-			} else {
-				_largestBufferHeight = Math.Max (inputEvent.WindowSizeEvent.Size.Height, _largestBufferHeight);
-			}
 			Top = 0;
 			Left = 0;
 			Cols = inputEvent.WindowSizeEvent.Size.Width;
-			Rows = _largestBufferHeight;
+			Rows = Math.Max (inputEvent.WindowSizeEvent.Size.Height, 0); ;
 			ResizeScreen ();
-			ClearContents();
+			ClearContents ();
 			_winSizeChanging = false;
 			TerminalResized?.Invoke ();
 			break;

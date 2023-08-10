@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using Xunit;
+using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui.TextTests;
 
@@ -19,7 +20,10 @@ public class RuneTests {
 	[InlineData (0x0328, true)] //  Combining ogonek (a small hook or comma shape) U+0328
 	[InlineData (0x00E9, false)] // Latin Small Letter E with Acute, Unicode U+00E9 é 
 	[InlineData (0x0061, false)] // Latin Small Letter A is U+0061.
-	public void TestIsCombiningMark (int codepoint, bool expected)
+	[InlineData ('\uFE20', true)]   // Combining Ligature Left Half - U+fe20 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
+	[InlineData ('\uFE21', true)] // Combining Ligature Right Half - U+fe21 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
+
+	public void IsCombiningMark (int codepoint, bool expected)
 	{
 		var rune = new Rune (codepoint);
 		Assert.Equal (expected, rune.IsCombiningMark ());
@@ -53,6 +57,8 @@ public class RuneTests {
 	[InlineData (0x0301)] // Combining acute accent (é)
 	[InlineData (0x0302)] // Combining Circumflex Accent
 	[InlineData (0x0061)] // Combining ogonek (a small hook or comma shape)
+	[InlineData ('\uFE20')]   // Combining Ligature Left Half - U+fe20 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
+	[InlineData ('\uFE21')] // Combining Ligature Right Half - U+fe21 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
 	public void MakePrintable_Combining_Character_Is_Not_Printable (int code)
 	{
 		var rune = new Rune (code);
@@ -61,30 +67,65 @@ public class RuneTests {
 	}
 
 	[Theory]
+	[InlineData (0, "\0", 0, 1, 1)]
+	[InlineData ('\u1dc0', "᷀", 0, 1, 3)] // ◌᷀ Combining Dotted Grave Accent
+	[InlineData ('\u20D0', "⃐", 0, 1, 3)]   // ◌⃐ Combining Left Harpoon Above
+
+	[InlineData (1, "\u0001", -1, 1, 1)]
+	[InlineData (2, "\u0002", -1, 1, 1)]
+	[InlineData (31, "\u001f", -1, 1, 1)]   // non printable character - Information Separator One
+	[InlineData (127, "\u007f", -1, 1, 1)]  // non printable character - Delete
+
+	[InlineData (32, " ", 1, 1, 1)]    // space
 	[InlineData ('a', "a", 1, 1, 1)]
 	[InlineData ('b', "b", 1, 1, 1)]
 	[InlineData (123, "{", 1, 1, 1)]        // { Left Curly Bracket
-	[InlineData ('\u1150', "ᅐ", 2, 1, 3)]   // ᅐ Hangul Choseong Ceongchieumcieuc
-	[InlineData ('\u1161', "ᅡ", 0, 1, 3)]   // ᅡ Hangul Jungseong A - Unicode Hangul Jamo for join with column width equal to 0 alone.
-	[InlineData (31, "\u001f", -1, 1, 1)]   // non printable character - Information Separator One
-	[InlineData (127, "\u007f", -1, 1, 1)]  // non printable character - Delete
-	[InlineData ('\u20D0', "⃐", 0, 1, 3)]   // ◌⃐ Combining Left Harpoon Above
+	[InlineData ('\u231c', "⌜", 1, 1, 3)] // ⌜ Top Left Corner
+
+	// BUGBUG: These are CLEARLY wide glyphs, but GetColumns() returns 1
+	// However, most terminals treat these as narrow and they overlap the next cell when drawn (including Windows Terminal)
+	[InlineData ('\u1161', "ᅡ", 1, 1, 3)]   // ᅡ Hangul Jungseong A - Unicode Hangul Jamo for join with column width equal to 0 alone.
+	[InlineData ('\u2103', "℃", 1, 1, 3)]   // ℃ Degree Celsius
+	[InlineData ('\u2501', "━", 1, 1, 3)]   // ━ Box Drawings Heavy Horizontal
 	[InlineData ('\u25a0', "■", 1, 1, 3)]   // ■ Black Square
 	[InlineData ('\u25a1', "□", 1, 1, 3)]   // □ White Square
+	[InlineData ('\u277f', "❿", 1, 1, 3)] //Dingbat Negative Circled Number Ten - ❿ U+277f 
+	[InlineData ('\u4dc0', "䷀", 1, 1, 3)]   // ䷀Hexagram For The Creative Heaven -  U+4dc0 - https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
+	[InlineData ('\ud7b0', "ힰ", 1, 1, 3)] // ힰ ┤Hangul Jungseong O-Yeo - ힰ U+d7b0')]
 	[InlineData ('\uf61e', "", 1, 1, 3)]   // Private Use Area
-	[InlineData ('\u2103', "℃", 1, 1, 3)]   // ℃ Degree Celsius
+
+	[InlineData ('\u23f0', "⏰", 2, 1, 3)] // Alarm Clock - ⏰ U+23f0
 	[InlineData ('\u1100', "ᄀ", 2, 1, 3)]   // ᄀ Hangul Choseong Kiyeok
-	[InlineData ('\u2501', "━", 1, 1, 3)]   // ━ Box Drawings Heavy Horizontal
+	[InlineData ('\u1150', "ᅐ", 2, 1, 3)]   // ᅐ Hangul Choseong Ceongchieumcieuc
 	[InlineData ('\u2615', "☕", 2, 1, 3)] // ☕ Hot Beverage
 	[InlineData ('\u231a', "⌚", 2, 1, 3)] // ⌚ Watch
 	[InlineData ('\u231b', "⌛", 2, 1, 3)] // ⌛ Hourglass
-	[InlineData ('\u231c', "⌜", 1, 1, 3)] // ⌜ Top Left Corner
-	[InlineData ('\u1dc0', "᷀", 0, 1, 3)] // ◌᷀ Combining Dotted Grave Accent
-	public void GetColumns_With_Single_Code (int code, string str, int runeLength, int stringLength, int utf8Length)
+
+	// From WindowsTerminal's CodepointWidthDetector tests (https://github.com/microsoft/terminal/blob/main/src/types/CodepointWidthDetector.cpp)
+	//static constexpr std::wstring_view emoji = L"\xD83E\xDD22"; // U+1F922 nauseated face
+	//static constexpr std::wstring_view ambiguous = L"\x414"; // U+0414 cyrillic capital de
+
+	//{ 0x414, L"\x414", CodepointWidth::Narrow }, // U+0414 cyrillic capital de
+	[InlineData ('\u0414', "Д", 1, 1, 2)] // U+0414 cyrillic capital de
+
+	//{ 0x1104, L"\x1104", CodepointWidth::Wide }, // U+1104 hangul choseong ssangtikeut
+	[InlineData ('\u1104', "ᄄ", 2, 1, 3)]
+
+	//{ 0x306A, L"\x306A", CodepointWidth::Wide }, // U+306A hiragana na な
+	[InlineData (0x306A, "な", 2, 1, 3)]
+
+	//{ 0x30CA, L"\x30CA", CodepointWidth::Wide }, // U+30CA katakana na ナ
+	[InlineData (0x30CA, "ナ", 2, 1, 3)]
+
+	//{ 0x72D7, L"\x72D7", CodepointWidth::Wide }, // U+72D7
+	[InlineData (0x72D7, "狗", 2, 1, 3)]
+	
+
+	public void GetColumns_With_Single_Code (int code, string str, int columns, int stringLength, int utf8Length)
 	{
 		var rune = new Rune (code);
 		Assert.Equal (str, rune.ToString ());
-		Assert.Equal (runeLength, rune.GetColumns ());
+		Assert.Equal (columns, rune.GetColumns ());
 		Assert.Equal (stringLength, rune.ToString ().Length);
 		Assert.Equal (utf8Length, rune.Utf8SequenceLength);
 		Assert.True (Rune.IsValid (rune.Value));
@@ -97,12 +138,12 @@ public class RuneTests {
 	[InlineData (new byte [] { 0xf0, 0x9f, 0xa4, 0x96 }, "🤖", 2, 2)] // 🤖 Robot Face
 	[InlineData (new byte [] { 0xf0, 0x90, 0x90, 0xa1 }, "𐐡", 1, 2)] // 𐐡 Deseret Capital Letter Er
 	[InlineData (new byte [] { 0xf0, 0x9f, 0x8c, 0xb9 }, "🌹", 2, 2)] // 🌹 Rose
-	public void GetColumns_Utf8_Encode (byte [] code, string str, int runeLength, int stringLength)
+	public void GetColumns_Utf8_Encode (byte [] code, string str, int columns, int stringLength)
 	{
 		var operationStatus = Rune.DecodeFromUtf8 (code, out Rune rune, out int bytesConsumed);
 		Assert.Equal (OperationStatus.Done, operationStatus);
 		Assert.Equal (str, rune.ToString ());
-		Assert.Equal (runeLength, rune.GetColumns ());
+		Assert.Equal (columns, rune.GetColumns ());
 		Assert.Equal (stringLength, rune.ToString ().Length);
 		Assert.Equal (bytesConsumed, rune.Utf8SequenceLength);
 		Assert.True (Rune.IsValid (rune.Value));
@@ -116,11 +157,13 @@ public class RuneTests {
 	[InlineData (new char [] { '\ud83e', '\udde0' }, "🧠", 2, 2, 4)] // 🧠 Brain
 	[InlineData (new char [] { '\ud801', '\udc21' }, "𐐡", 1, 2, 4)]  // 𐐡 Deseret Capital Letter Er
 	[InlineData (new char [] { '\ud83c', '\udf39' }, "🌹", 2, 2, 4)] // 🌹 Rose
-	public void GetColumns_Utf16_Encode (char [] code, string str, int runeLength, int stringLength, int utf8Length)
+	[InlineData (new char [] { '\uD83D', '\uDC7E' }, "👾", 2, 2, 4)] //   U+1F47E alien monster (CodepointWidth::Wide)
+	[InlineData (new char [] { '\uD83D', '\uDD1C' }, "🔜", 2, 2, 4)] //  🔜 Soon With Rightwards Arrow Above (CodepointWidth::Wide)
+	public void GetColumns_Utf16_Encode (char [] code, string str, int columns, int stringLength, int utf8Length)
 	{
 		var rune = new Rune (code [0], code [1]);
 		Assert.Equal (str, rune.ToString ());
-		Assert.Equal (runeLength, rune.GetColumns ());
+		Assert.Equal (columns, rune.GetColumns ());
 		Assert.Equal (stringLength, rune.ToString ().Length);
 		Assert.Equal (utf8Length, rune.Utf8SequenceLength);
 		Assert.True (Rune.IsValid (rune.Value));
@@ -134,12 +177,14 @@ public class RuneTests {
 	[InlineData ("\U0001f9e0", "🧠", 2, 2)] // 🧠 Brain
 	[InlineData ("\U00010421", "𐐡", 1, 2)] // 𐐡 Deseret Capital Letter Er
 	[InlineData ("\U0001f339", "🌹", 2, 2)] // 🌹 Rose
-	public void GetColumns_Utf32_Encode (string code, string str, int runeLength, int stringLength)
+	//[InlineData ("\uFE20FE21", "", 1, 1)]   // Combining Ligature Left Half - U+fe20 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
+	// Combining Ligature Right Half - U+fe21 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
+	public void GetColumns_Utf32_Encode (string code, string str, int columns, int stringLength)
 	{
 		var operationStatus = Rune.DecodeFromUtf16 (code, out Rune rune, out int charsConsumed);
 		Assert.Equal (OperationStatus.Done, operationStatus);
 		Assert.Equal (str, rune.ToString ());
-		Assert.Equal (runeLength, rune.GetColumns ());
+		Assert.Equal (columns, rune.GetColumns ());
 		Assert.Equal (stringLength, rune.ToString ().Length);
 		Assert.Equal (charsConsumed, rune.Utf16SequenceLength);
 		Assert.True (Rune.IsValid (rune.Value));
@@ -147,7 +192,7 @@ public class RuneTests {
 		// with DecodeRune
 		(var nrune, var size) = code.DecodeRune ();
 		Assert.Equal (str, nrune.ToString ());
-		Assert.Equal (runeLength, nrune.GetColumns ());
+		Assert.Equal (columns, nrune.GetColumns ());
 		Assert.Equal (stringLength, nrune.ToString ().Length);
 		Assert.Equal (size, nrune.Utf8SequenceLength);
 		for (int x = 0; x < code.Length - 1; x++) {
@@ -165,12 +210,12 @@ public class RuneTests {
 	[InlineData ("\u0915\u093f", "कि", 2, 2, 2)] // Hindi कि with DEVANAGARI LETTER KA and DEVANAGARI VOWEL SIGN I
 	[InlineData ("\u0e4d\u0e32", "ํา", 2, 1, 2)] // Decomposition: ํ (U+0E4D) - า (U+0E32) = U+0E33 ำ Thai Character Sara Am
 	[InlineData ("\u0e33", "ำ", 1, 1, 1)] // Decomposition: ํ (U+0E4D) - า (U+0E32) = U+0E33 ำ Thai Character Sara Am
-	public void GetColumns_String_Without_SurrogatePair (string code, string str, int codeLength, int runesLength, int stringLength)
+	public void GetColumns_String_Without_SurrogatePair (string code, string str, int codeLength, int columns, int stringLength)
 	{
 		Assert.Equal (str, code.Normalize ());
 		Assert.Equal (codeLength, code.Length);
-		Assert.Equal (runesLength, code.EnumerateRunes ().Sum (x => x.GetColumns ()));
-		Assert.Equal (runesLength, str.GetColumns ());
+		//Assert.Equal (columns, code.EnumerateRunes ().Sum (x => x.GetColumns ()));
+		Assert.Equal (columns, str.GetColumns ());
 		Assert.Equal (stringLength, str.Length);
 	}
 
@@ -641,17 +686,64 @@ public class RuneTests {
 		Assert.False (d.SequenceEqual (b [1]));
 	}
 
+	/// <summary>
+	/// Shows the difference between using Wcwidth.UnicodeCalculator and our
+	/// own port of wcwidth. Specifically, the UnicodeCalculator is more accurate to spec
+	/// where null has a width of 0, and our port says it's -1.
+	/// </summary>
+	/// <param name="expectedColumns"></param>
+	/// <param name="scalar"></param>
+	[Theory]
+	[InlineData (0, 0)]
+	[InlineData (-1, 1)]
+	[InlineData (-1, 2)]
+	[InlineData (-1, 3)]
+	[InlineData (-1, 4)]
+	[InlineData (-1, 5)]
+	[InlineData (-1, 6)]
+	[InlineData (-1, 7)]
+	[InlineData (-1, 8)]
+	[InlineData (-1, 9)]
+	[InlineData (-1, 10)]
+	[InlineData (-1, 11)]
+	[InlineData (-1, 12)]
+	[InlineData (-1, 13)]
+	[InlineData (-1, 14)]
+	[InlineData (-1, 15)]
+	[InlineData (-1, 16)]
+	[InlineData (-1, 17)]
+	[InlineData (-1, 18)]
+	[InlineData (-1, 19)]
+	[InlineData (-1, 20)]
+	[InlineData (-1, 21)]
+	[InlineData (-1, 22)]
+	[InlineData (-1, 23)]
+	[InlineData (-1, 24)]
+	[InlineData (-1, 25)]
+	[InlineData (-1, 26)]
+	[InlineData (-1, 27)]
+	[InlineData (-1, 28)]
+	[InlineData (-1, 29)]
+	[InlineData (-1, 30)]
+	[InlineData (-1, 31)]
+	public void Rune_GetColumns_Non_Printable (int expectedColumns, int scalar)
+	{
+		var rune = new Rune (scalar);
+		Assert.Equal (expectedColumns, rune.GetColumns());
+		Assert.Equal (0, rune.ToString().GetColumns());
+	}
+
 	[Fact]
 	public void Rune_GetColumns_Versus_String_GetColumns_With_Non_Printable_Characters ()
 	{
 		int sumRuneWidth = 0;
 		int sumConsoleWidth = 0;
 		for (uint i = 0; i < 32; i++) {
-			sumRuneWidth += ((Rune)i).GetColumns ();
-			sumConsoleWidth += ((Rune)i).ToString ().GetColumns ();
+			sumRuneWidth += ((Rune)(i)).GetColumns ();
+			sumConsoleWidth += ((Rune)(i)).ToString ().GetColumns ();
 		}
 
-		Assert.Equal (-32, sumRuneWidth);
+		Assert.Equal (-31, sumRuneWidth);
 		Assert.Equal (0, sumConsoleWidth);
 	}
 

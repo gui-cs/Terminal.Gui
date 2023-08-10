@@ -27,16 +27,12 @@
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
-    <PackageReference Include="System.IO.Abstractions" Version="19.2.29" />
-    <PackageReference Include="System.Text.Json" Version="7.0.2" />
-    <PackageReference Include="System.Management" Version="7.0.1" />
+    <PackageReference Include="System.IO.Abstractions" Version="19.2.51" />
+    <PackageReference Include="System.Text.Json" Version="7.0.3" />
+    <PackageReference Include="System.Management" Version="7.0.2" />
+    <PackageReference Include="Wcwidth" Version="1.0.0" />
     <InternalsVisibleTo Include="UnitTests" />
    </ItemGroup>
-  <!-- Uncomment the RestoreSources element to have dotnet restore pull NStack from a local dir for testing -->
-  <PropertyGroup>
-    <!-- See https://stackoverflow.com/a/44463578/297526 -->
-    <!--<RestoreSources>$(RestoreSources);..\..\NStack\NStack\bin\Debug;https://api.nuget.org/v3/index.json</RestoreSources>-->
-  </PropertyGroup>
   <!-- API Documentation -->
   <ItemGroup>
     <None Include="..\docfx\images\logo.png">

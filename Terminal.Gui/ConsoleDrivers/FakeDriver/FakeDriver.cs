@@ -14,6 +14,7 @@ using System.Text;
 using Console = Terminal.Gui.FakeConsole;
 using Unix.Terminal;
 using static Terminal.Gui.WindowsConsole;
+using System.Drawing;
 
 namespace Terminal.Gui;
 /// <summary>
@@ -60,14 +61,13 @@ public class FakeDriver : ConsoleDriver {
 			}
 		}
 	}
-	
+
 	public override void End ()
 	{
 		FakeConsole.ResetColor ();
 		FakeConsole.Clear ();
 	}
-
-
+	
 	public override void Init (Action terminalResized)
 	{
 		FakeConsole.MockKeyPresses.Clear ();
@@ -81,59 +81,100 @@ public class FakeDriver : ConsoleDriver {
 		// Call InitializeColorSchemes before UpdateOffScreen as it references Colors
 		CurrentAttribute = MakeColor (Color.White, Color.Black);
 		InitializeColorSchemes ();
-		ClearContents();
+		ClearContents ();
 	}
 
 
 	public override void UpdateScreen ()
 	{
-		//int top = Top;
-		//int left = Left;
-		//int rows = Math.Min (FakeConsole.WindowHeight + top, Rows);
-		//int cols = Cols;
+		var savedRow = FakeConsole.CursorTop;
+		var savedCol = FakeConsole.CursorLeft;
+		var savedCursorVisible = FakeConsole.CursorVisible;
 
-		//var savedRow = FakeConsole.CursorTop;
-		//var savedCol = FakeConsole.CursorLeft;
-		//var savedCursorVisible = FakeConsole.CursorVisible;
-		//for (int row = top; row < rows; row++) {
-		//	if (!_dirtyLine [row]) {
-		//		continue;
-		//	}
-		//	_dirtyLine [row] = false;
-		//	for (int col = left; col < cols; col++) {
-		//		FakeConsole.CursorTop = row;
-		//		FakeConsole.CursorLeft = col;
-		//		for (; col < cols; col++) {
-		//			if (Contents [row, col, 2] == 0) {
-		//				FakeConsole.CursorLeft++;
-		//				continue;
-		//			}
+		var top = 0;
+		var left = 0;
+		var rows = Rows;
+		var cols = Cols;
+		System.Text.StringBuilder output = new System.Text.StringBuilder ();
+		Attribute redrawAttr = new Attribute ();
+		var lastCol = -1;
 
-		//			var color = Contents [row, col, 1];
-		//			// NOTE: In real drivers setting the color can be a performance hit, so we only do it when needed.
-		//			// in fakedriver we don't care about perf.
-		//			SetColor (color);
+		for (var row = top; row < rows; row++) {
+			if (!_dirtyLines [row]) {
+				continue;
+			}
 
-		//			var rune = (Rune)Contents [row, col, 0];
-		//			if (rune.Utf16SequenceLength == 1) {
-		//				FakeConsole.Write (rune);
-		//			} else {
-		//				// TODO: Not sure we need to do this. I think we can just write the rune.
+			FakeConsole.CursorTop = row;
+			FakeConsole.CursorLeft = 0;
 
-		//				FakeConsole.Write (rune.ToString ());
-		//			}
-		//			//if (Rune.DecodeSurrogatePair (rune, out char [] spair)) {
-		//			//	FakeConsole.Write (spair);
-		//			//} else {
-		//			//	FakeConsole.Write ((char)rune);
-		//			//}
-		//			Contents [row, col, 2] = 0;
-		//		}
-		//	}
-		//}
-		//FakeConsole.CursorTop = savedRow;
-		//FakeConsole.CursorLeft = savedCol;
-		//FakeConsole.CursorVisible = savedCursorVisible;
+			_dirtyLines [row] = false;
+			output.Clear ();
+			for (var col = left; col < cols; col++) {
+				lastCol = -1;
+				var outputWidth = 0;
+				for (; col < cols; col++) {
+					if (!Contents [row, col].IsDirty) {
+						if (output.Length > 0) {
+							WriteToConsole (output, ref lastCol, row, ref outputWidth);
+						} else if (lastCol == -1) {
+							lastCol = col;
+						}
+						if (lastCol + 1 < cols)
+							lastCol++;
+						continue;
+					}
+
+					if (lastCol == -1) {
+						lastCol = col;
+					}
+
+					Attribute attr = Contents [row, col].Attribute.Value;
+					// Performance: Only send the escape sequence if the attribute has changed.
+					if (attr != redrawAttr) {
+						redrawAttr = attr;
+						FakeConsole.ForegroundColor = (ConsoleColor)attr.Foreground;
+						FakeConsole.BackgroundColor = (ConsoleColor)attr.Background;
+					}
+					outputWidth++;
+					var rune = (Rune)Contents [row, col].Runes [0];
+					output.Append (rune.ToString ());
+					if (rune.IsSurrogatePair () && rune.GetColumns () < 2) {
+						WriteToConsole (output, ref lastCol, row, ref outputWidth);
+						FakeConsole.CursorLeft--;
+					}
+					Contents [row, col].IsDirty = false;
+				}
+			}
+			if (output.Length > 0) {
+				FakeConsole.CursorTop = row;
+				FakeConsole.CursorLeft = lastCol;
+
+				foreach (var c in output.ToString ()) {
+					FakeConsole.Write (c);
+				}
+			}
+		}
+		FakeConsole.CursorTop = 0;
+		FakeConsole.CursorLeft = 0;
+
+		//SetCursorVisibility (savedVisibitity);
+
+		void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
+		{
+			FakeConsole.CursorTop = row;
+			FakeConsole.CursorLeft = lastCol;
+			foreach (var c in output.ToString ()) {
+				FakeConsole.Write (c);
+			}
+			
+			output.Clear ();
+			lastCol += outputWidth;
+			outputWidth = 0;
+		}
+
+		FakeConsole.CursorTop = savedRow;
+		FakeConsole.CursorLeft = savedCol;
+		FakeConsole.CursorVisible = savedCursorVisible;
 	}
 
 	public override void Refresh ()
@@ -419,31 +460,24 @@ public class FakeDriver : ConsoleDriver {
 		FakeConsole.SetBufferSize (width, height);
 		Cols = width;
 		Rows = height;
-		if (!EnableConsoleScrolling) {
-			SetWindowSize (width, height);
-		}
+		SetWindowSize (width, height);
 		ProcessResize ();
 	}
 
 	public void SetWindowSize (int width, int height)
 	{
 		FakeConsole.SetWindowSize (width, height);
-		if (!EnableConsoleScrolling) {
-			if (width != Cols || height != Rows) {
-				SetBufferSize (width, height);
-				Cols = width;
-				Rows = height;
-			}
+		if (width != Cols || height != Rows) {
+			SetBufferSize (width, height);
+			Cols = width;
+			Rows = height;
 		}
 		ProcessResize ();
 	}
 
 	public void SetWindowPosition (int left, int top)
 	{
-		if (EnableConsoleScrolling) {
-			Left = Math.Max (Math.Min (left, Cols - FakeConsole.WindowWidth), 0);
-			Top = Math.Max (Math.Min (top, Rows - FakeConsole.WindowHeight), 0);
-		} else if (Left > 0 || Top > 0) {
+		if (Left > 0 || Top > 0) {
 			Left = 0;
 			Top = 0;
 		}
@@ -453,33 +487,22 @@ public class FakeDriver : ConsoleDriver {
 	void ProcessResize ()
 	{
 		ResizeScreen ();
-		ClearContents();
+		ClearContents ();
 		TerminalResized?.Invoke ();
 	}
 
 	public virtual void ResizeScreen ()
 	{
-		if (!EnableConsoleScrolling) {
-			if (FakeConsole.WindowHeight > 0) {
-				// Can raise an exception while is still resizing.
-				try {
-					FakeConsole.CursorTop = 0;
-					FakeConsole.CursorLeft = 0;
-					FakeConsole.WindowTop = 0;
-					FakeConsole.WindowLeft = 0;
-				} catch (System.IO.IOException) {
-					return;
-				} catch (ArgumentOutOfRangeException) {
-					return;
-				}
-			}
-		} else {
+		if (FakeConsole.WindowHeight > 0) {
+			// Can raise an exception while is still resizing.
 			try {
-#pragma warning disable CA1416
-				FakeConsole.WindowLeft = Math.Max (Math.Min (Left, Cols - FakeConsole.WindowWidth), 0);
-				FakeConsole.WindowTop = Math.Max (Math.Min (Top, Rows - FakeConsole.WindowHeight), 0);
-#pragma warning restore CA1416
-			} catch (Exception) {
+				FakeConsole.CursorTop = 0;
+				FakeConsole.CursorLeft = 0;
+				FakeConsole.WindowTop = 0;
+				FakeConsole.WindowLeft = 0;
+			} catch (System.IO.IOException) {
+				return;
+			} catch (ArgumentOutOfRangeException) {
 				return;
 			}
 		}

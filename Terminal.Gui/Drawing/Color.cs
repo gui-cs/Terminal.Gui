@@ -688,7 +688,7 @@ namespace Terminal.Gui {
 			hashCode = hashCode * -1521134295 + _disabled.GetHashCode ();
 			return hashCode;
 		}
-		
+
 		/// <summary>
 		/// Compares two <see cref="ColorScheme"/> objects for equality.
 		/// </summary>

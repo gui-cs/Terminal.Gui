@@ -170,6 +170,12 @@ namespace Terminal.Gui {
 		public event EventHandler<SelectionChangedEventArgs<T>> SelectionChanged;
 
 		/// <summary>
+		/// Called once for each visible row during rendering.  Can be used
+		/// to make last minute changes to color or text rendered
+		/// </summary>
+		public event EventHandler<DrawTreeViewLineEventArgs<T>> DrawLine;
+
+		/// <summary>
 		/// The root objects in the tree, note that this collection is of root objects only.
 		/// </summary>
 		public IEnumerable<T> Objects { get => roots.Keys; }
@@ -557,10 +563,9 @@ namespace Terminal.Gui {
 			List<Branch<T>> toReturn = new List<Branch<T>> ();
 
 			foreach (var root in roots.Values) {
-				
+
 				var toAdd = AddToLineMap (root, false, out var isMatch);
-				if(isMatch)
-				{
+				if (isMatch) {
 					toReturn.AddRange (toAdd);
 				}
 			}
@@ -574,41 +579,38 @@ namespace Terminal.Gui {
 
 		private bool IsFilterMatch (Branch<T> branch)
 		{
-			return Filter?.IsMatch(branch.Model) ?? true;
+			return Filter?.IsMatch (branch.Model) ?? true;
 		}
 
-		private IEnumerable<Branch<T>> AddToLineMap (Branch<T> currentBranch,bool parentMatches, out bool match)
+		private IEnumerable<Branch<T>> AddToLineMap (Branch<T> currentBranch, bool parentMatches, out bool match)
 		{
-			bool weMatch = IsFilterMatch(currentBranch);
+			bool weMatch = IsFilterMatch (currentBranch);
 			bool anyChildMatches = false;
-			
-			var toReturn = new List<Branch<T>>();
-			var children = new List<Branch<T>>();
+
+			var toReturn = new List<Branch<T>> ();
+			var children = new List<Branch<T>> ();
 
 			if (currentBranch.IsExpanded) {
 				foreach (var subBranch in currentBranch.ChildBranches.Values) {
 
 					foreach (var sub in AddToLineMap (subBranch, weMatch, out var childMatch)) {
-						
-						if(childMatch)
-						{
-							children.Add(sub);
+
+						if (childMatch) {
+							children.Add (sub);
 							anyChildMatches = true;
 						}
 					}
 				}
 			}
 
-			if(parentMatches || weMatch || anyChildMatches)
-			{
+			if (parentMatches || weMatch || anyChildMatches) {
 				match = true;
-				toReturn.Add(currentBranch);
-			}
-			else{
+				toReturn.Add (currentBranch);
+			} else {
 				match = false;
 			}
-			
-			toReturn.AddRange(children);
+
+			toReturn.AddRange (children);
 			return toReturn;
 		}
 
@@ -1421,8 +1423,17 @@ namespace Terminal.Gui {
 		{
 			SelectionChanged?.Invoke (this, e);
 		}
-	}
 
+		/// <summary>
+		/// Raises the DrawLine event
+		/// </summary>
+		/// <param name="e"></param>
+		internal void OnDrawLine (DrawTreeViewLineEventArgs<T> e)
+		{
+			DrawLine?.Invoke (this, e);
+		}
+
+	}
 	class TreeSelection<T> where T : class {
 
 		public Branch<T> Origin { get; }

@@ -50,6 +50,9 @@
     "Windows & FrameViews": {
       "commandName": "Project",
       "commandLineArgs": "\"Windows & FrameViews\""
+    },
+    "Profile 1": {
+      "commandName": "Executable"
     }
   }
 }

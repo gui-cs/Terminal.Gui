@@ -440,6 +440,36 @@ namespace Terminal.Gui.FileServicesTests {
 			TestHelpers.AssertDriverContentsAre (expected, output, true);
 		}
 
+		[Fact, AutoInitShutdown]
+		public void TestDirectoryContents_Windows_Colors ()
+		{
+			if (!IsWindows ()) {
+				return;
+			}
+
+			var fd = GetWindowsDialog ();
+			fd.Title = string.Empty;
+
+			fd.Style.Culture = new CultureInfo ("en-US");
+			fd.Style.UseColors = true;
+
+			var dir = new Attribute (Color.Magenta);
+			fd.Style.ColorSchemeDirectory = GetColorScheme (dir);
+
+			var img = new Attribute (Color.Cyan);
+			fd.Style.ColorSchemeImage = GetColorScheme (img);
+
+			var other = new Attribute (Color.BrightGreen);
+			fd.Style.ColorSchemeOther = GetColorScheme (other);
+
+			var exe = new Attribute (Color.BrightYellow);
+			fd.Style.ColorSchemeExeOrRecommended = GetColorScheme (exe);
+
+			fd.Draw ();
+
+			TestHelpers.AssertDriverUsedColors (other, dir, img, exe);
+		}
+
 		private ColorScheme GetColorScheme (Attribute a)
 		{
 			return new ColorScheme {
