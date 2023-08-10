@@ -572,17 +572,14 @@ namespace Terminal.Gui {
 
 		public void Run (Action action)
 		{
-			if (action == null)
+			if (action == null || host == null)
 				return;
 
 			Application.UngrabMouse ();
 			host.CloseAllMenus ();
 			Application.Refresh ();
 
-			Application.MainLoop.AddIdle (() => {
-				action ();
-				return false;
-			});
+			host.Run (action);
 		}
 
 		public override bool OnLeave (View view)
@@ -1130,7 +1127,11 @@ namespace Terminal.Gui {
 			Application.UngrabMouse ();
 			CloseAllMenus ();
 			Application.Refresh ();
+			Run (action);
+		}
 
+		internal void Run (Action action)
+		{
 			Application.MainLoop.AddIdle (() => {
 				action ();
 				return false;
@@ -1667,10 +1668,7 @@ namespace Terminal.Gui {
 						if (mi.IsEnabled ()) {
 							var action = mi.Action;
 							if (action != null) {
-								Application.MainLoop.AddIdle (() => {
-									action ();
-									return false;
-								});
+								Run (action);
 							}
 						}
 						return true;
@@ -1706,10 +1704,7 @@ namespace Terminal.Gui {
 					if (mi.IsEnabled ()) {
 						var action = mi.Action;
 						if (action != null) {
-							Application.MainLoop.AddIdle (() => {
-								action ();
-								return false;
-							});
+							Run (action);
 						}
 					}
 					return true;
