@@ -1420,6 +1420,43 @@ namespace Terminal.Gui {
 			return keyMod != Key.Null ? keyMod | key : key;
 		}
 
+		private static string GetParentProcessName ()
+		{
+			var myId = Process.GetCurrentProcess ().Id;
+			var query = string.Format ($"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {myId}");
+			var search = new ManagementObjectSearcher ("root\\CIMV2", query);
+			var queryObj = search.Get ().OfType<ManagementBaseObject> ().FirstOrDefault ();
+			if (queryObj == null) {
+				return null;
+			}
+			var parentId = (uint)queryObj ["ParentProcessId"];
+			var parent = Process.GetProcessById ((int)parentId);
+			var prevParent = parent;
+
+			// Check if the parent is from other parent
+			while (queryObj != null) {
+				query = string.Format ($"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {parentId}");
+				search = new ManagementObjectSearcher ("root\\CIMV2", query);
+				queryObj = search.Get ().OfType<ManagementBaseObject> ().FirstOrDefault ();
+				if (queryObj == null) {
+					return parent.ProcessName;
+				}
+				parentId = (uint)queryObj ["ParentProcessId"];
+				try {
+					parent = Process.GetProcessById ((int)parentId);
+					if (string.Equals (parent.ProcessName, "explorer", StringComparison.InvariantCultureIgnoreCase)) {
+						return prevParent.ProcessName;
+					}
+					prevParent = parent;
+				} catch (ArgumentException) {
+
+					return prevParent.ProcessName;
+				}
+			}
+
+			return parent.ProcessName;
+		}
+
 		public override void Init (Action terminalResized)
 		{
 			TerminalResized = terminalResized;
@@ -1434,7 +1471,9 @@ namespace Terminal.Gui {
 				// ESC [ ? 1049 l  Restore xterm working buffer (with backscroll)
 				// Per Issue #2264 using the alternative screen buffer is required for Windows Terminal to not 
 				// wipe out the backscroll buffer when the application exits.
-				Console.Out.Write ("\x1b[?1049h");
+				if (string.Equals (GetParentProcessName (), "WindowsTerminal", StringComparison.InvariantCultureIgnoreCase)) {
+					Console.Out.Write ("\x1b[?1049h");
+				}
 
 				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
 				cols = winSize.Width;
@@ -1681,7 +1720,9 @@ namespace Terminal.Gui {
 			WinConsole = null;
 
 			// Disable alternative screen buffer.
-			Console.Out.Write ("\x1b[?1049l");
+			if (string.Equals (GetParentProcessName (), "WindowsTerminal", StringComparison.InvariantCultureIgnoreCase)) {
+				Console.Out.Write ("\x1b[?1049l");
+			}
 		}
 
 		/// <inheritdoc/>
