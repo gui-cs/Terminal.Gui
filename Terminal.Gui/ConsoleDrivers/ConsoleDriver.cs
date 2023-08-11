@@ -353,21 +353,23 @@ public abstract class ConsoleDriver {
 	/// <summary>
 	/// Gets whether the <see cref="ConsoleDriver"/> supports TrueColor output.
 	/// </summary>
-	public virtual bool SupportsTrueColor { get => false; }
+	public virtual bool SupportsTrueColor { get => true; }
 
-	private bool _useTrueColor = true;
+	private bool _force16Colors = false;
 
 	// TODO: Make this a ConfiguationManager setting on Application
 	/// <summary>
-	/// Gets or sets whether the <see cref="ConsoleDriver"/> should use TrueColor output.
+	/// Gets or sets whether the <see cref="ConsoleDriver"/> should use 16 colors instead of the default TrueColors.
 	/// </summary>
 	/// <remarks>
-	/// Can only be enabled if <see cref="ConsoleDriver.SupportsTrueColor"/> is true, indicating
-	/// that the <see cref="ConsoleDriver"/> supports it.
+	/// Will be forced to <see langword="true"/> if <see cref="ConsoleDriver.SupportsTrueColor"/> is  <see langword="false"/>, indicating
+	/// that the <see cref="ConsoleDriver"/> cannot support TrueColor.
 	/// </remarks>
-	public bool UseTrueColor {
-		get => _useTrueColor && SupportsTrueColor;
-		set => this._useTrueColor = (value && SupportsTrueColor);
+	public virtual bool Force16Colors {
+		get => _force16Colors || !SupportsTrueColor;
+		set {
+			_force16Colors = (value || !SupportsTrueColor);
+		}
 	}
 
 	Attribute _currentAttribute;

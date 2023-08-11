@@ -554,6 +554,8 @@ internal class NetDriver : ConsoleDriver {
 	const int COLOR_BRIGHT_CYAN = 96;
 	const int COLOR_BRIGHT_WHITE = 97;
 
+	public override bool SupportsTrueColor => Environment.OSVersion.Version.Build >= 14931;
+
 	public NetWinVTConsole NetWinConsole { get; private set; }
 	public bool IsWinPlatform { get; private set; }
 
@@ -719,8 +721,15 @@ internal class NetDriver : ConsoleDriver {
 					// Performance: Only send the escape sequence if the attribute has changed.
 					if (attr != redrawAttr) {
 						redrawAttr = attr;
-						output.Append (EscSeqUtils.CSI_SetGraphicsRendition (
-						    MapColors ((ConsoleColor)attr.Background, false), MapColors ((ConsoleColor)attr.Foreground, true)));
+
+						if (Force16Colors) {
+							output.Append (EscSeqUtils.CSI_SetGraphicsRendition (
+								MapColors ((ConsoleColor)attr.Background, false), MapColors ((ConsoleColor)attr.Foreground, true)));
+						} else {
+							output.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.TrueColorForeground.Value.Red, attr.TrueColorForeground.Value.Green, attr.TrueColorForeground.Value.Blue));
+							output.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.TrueColorBackground.Value.Red, attr.TrueColorBackground.Value.Green, attr.TrueColorBackground.Value.Blue));
+						}
+
 					}
 					outputWidth++;
 					var rune = (Rune)Contents [row, col].Runes [0];

@@ -447,15 +447,26 @@ public static class EscSeqUtils {
 				escSeqRequests.Remove (terminator);
 				return;
 			}
-			key = GetConsoleKey (terminator [0], values [0], ref mod);
-			if (key != 0 && values.Length > 1) {
-				mod |= GetConsoleModifiers (values [1]);
+			if (!string.IsNullOrEmpty (terminator)) {
+				key = GetConsoleKey (terminator [0], values [0], ref mod);
+				if (key != 0 && values.Length > 1) {
+					mod |= GetConsoleModifiers (values [1]);
+				}
+				newConsoleKeyInfo = new ConsoleKeyInfo ('\0',
+					key,
+					(mod & ConsoleModifiers.Shift) != 0,
+					(mod & ConsoleModifiers.Alt) != 0,
+					(mod & ConsoleModifiers.Control) != 0);
+			} else {
+				// BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/2803
+				// This is caused by NetDriver depending on Console.KeyAvailable?
+				throw new InvalidOperationException ($"CSI response, but there's no terminator");
+				//newConsoleKeyInfo = new ConsoleKeyInfo ('\0',
+				//	key,
+				//	(mod & ConsoleModifiers.Shift) != 0,
+				//	(mod & ConsoleModifiers.Alt) != 0,
+				//	(mod & ConsoleModifiers.Control) != 0);
 			}
-			newConsoleKeyInfo = new ConsoleKeyInfo ('\0',
-				key,
-				(mod & ConsoleModifiers.Shift) != 0,
-				(mod & ConsoleModifiers.Alt) != 0,
-				(mod & ConsoleModifiers.Control) != 0);
 			break;
 		}
 	}
@@ -579,14 +590,14 @@ public static class EscSeqUtils {
 	/// <summary>
 	/// Gets the <see cref="ConsoleKey"/> depending on terminating and value.
 	/// </summary>
-	/// <param name="terminating">The terminating.</param>
+	/// <param name="terminator">The terminator indicating a reply to <see cref="CSI_SendDeviceAttributes"/> or <see cref="CSI_SendDeviceAttributes2"/>.</param>
 	/// <param name="value">The value.</param>
 	/// <param name="mod">The <see cref="ConsoleModifiers"/> which may changes.</param>
 	/// <returns>The <see cref="ConsoleKey"/> and probably the <see cref="ConsoleModifiers"/>.</returns>
-	public static ConsoleKey GetConsoleKey (char terminating, string value, ref ConsoleModifiers mod)
+	public static ConsoleKey GetConsoleKey (char terminator, string value, ref ConsoleModifiers mod)
 	{
 		ConsoleKey key;
-		switch (terminating) {
+		switch (terminator) {
 		case 'A':
 			key = ConsoleKey.UpArrow;
 			break;
