@@ -9,7 +9,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using static Unix.Terminal.Curses;
+using System.Diagnostics;
+using System.Management;
 
 namespace Terminal.Gui;
 
@@ -69,18 +70,8 @@ internal class WindowsConsole {
 
 				if (attr != prev) {
 					prev = attr;
-					if (force16Colors) {
-						//// Assume a 4-bit encoded value for both foreground and background colors.
-						//// GetColors (value, out foreground, out background);
-						//var foreground = (int)attr.TrueColorForeground.Value;
-						//var background = attr.TrueColorForeground.Value;
-						//_stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColor (foreground));
-						//_stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColor (background));
-
-					} else {
-						_stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.TrueColorForeground.Value.Red, attr.TrueColorForeground.Value.Green, attr.TrueColorForeground.Value.Blue));
-						_stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.TrueColorBackground.Value.Red, attr.TrueColorBackground.Value.Green, attr.TrueColorBackground.Value.Blue));
-					}
+					_stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.TrueColorForeground.Value.Red, attr.TrueColorForeground.Value.Green, attr.TrueColorForeground.Value.Blue));
+					_stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.TrueColorBackground.Value.Red, attr.TrueColorBackground.Value.Green, attr.TrueColorBackground.Value.Blue));
 				}
 
 				if (info.Char != '\x1b') {
@@ -772,7 +763,7 @@ internal class WindowsDriver : ConsoleDriver {
 
 	public WindowsConsole WinConsole { get; private set; }
 
-	public override bool SupportsTrueColor => Environment.OSVersion.Version.Build >= 14931;
+	public override bool SupportsTrueColor => _isWindowsTerminal && Environment.OSVersion.Version.Build >= 14931;
 
 	public override bool Force16Colors {
 		get => base.Force16Colors;
@@ -783,10 +774,15 @@ internal class WindowsDriver : ConsoleDriver {
 		}
 	}
 
+	bool _isWindowsTerminal = false;
+
 	public WindowsDriver ()
 	{
 		WinConsole = new WindowsConsole ();
 		Clipboard = new WindowsClipboard ();
+
+		_isWindowsTerminal = false;//Environment.GetEnvironmentVariable ("WT_SESSION") != null;
+
 	}
 
 	public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
@@ -1428,7 +1424,17 @@ internal class WindowsDriver : ConsoleDriver {
 
 		try {
 			// Needed for Windows Terminal
-			Console.Out.Write (EscSeqUtils.CSI_ActivateAltBufferNoBackscroll);
+			// ESC [ ? 1047 h  Save cursor position and activate xterm alternative buffer (no backscroll)
+			// ESC [ ? 1047 l  Restore cursor position and restore xterm working buffer (with backscroll)
+			// ESC [ ? 1048 h  Save cursor position
+			// ESC [ ? 1048 l  Restore cursor position
+			// ESC [ ? 1049 h  Activate xterm alternative buffer (no backscroll)
+			// ESC [ ? 1049 l  Restore xterm working buffer (with backscroll)
+			// Per Issue #2264 using the alternative screen buffer is required for Windows Terminal to not 
+			// wipe out the backscroll buffer when the application exits.
+			if (_isWindowsTerminal) {
+				Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+			}
 
 			var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
 			Cols = winSize.Width;
@@ -1524,7 +1530,6 @@ internal class WindowsDriver : ConsoleDriver {
 
 	public override void Refresh ()
 	{
-	
 		UpdateScreen ();
 		WinConsole.SetInitialCursorVisibility ();
 		UpdateCursor ();
@@ -1656,8 +1661,10 @@ internal class WindowsDriver : ConsoleDriver {
 		WinConsole?.Cleanup ();
 		WinConsole = null;
 
-		// Disable alternative screen buffer.
-		Console.Out.Write (EscSeqUtils.CSI_RestoreAltBufferWithBackscroll);
+		if (_isWindowsTerminal) {
+			// Disable alternative screen buffer.
+			Console.Out.Write (EscSeqUtils.CSI_RestoreAltBufferWithBackscroll);
+		}
 	}
 
 	#region Not Implemented
@@ -1666,6 +1673,45 @@ internal class WindowsDriver : ConsoleDriver {
 		throw new NotImplementedException ();
 	}
 	#endregion
+
+	static string GetParentProcessName ()
+	{
+#pragma warning disable CA1416 // Validate platform compatibility
+		var myId = Process.GetCurrentProcess ().Id;
+		var query = string.Format ($"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {myId}");
+		var search = new ManagementObjectSearcher ("root\\CIMV2", query);
+		var queryObj = search.Get ().OfType<ManagementBaseObject> ().FirstOrDefault ();
+		if (queryObj == null) {
+			return null;
+		}
+		var parentId = (uint)queryObj ["ParentProcessId"];
+		var parent = Process.GetProcessById ((int)parentId);
+		var prevParent = parent;
+
+		// Check if the parent is from other parent
+		while (queryObj != null) {
+			query = string.Format ($"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {parentId}");
+			search = new ManagementObjectSearcher ("root\\CIMV2", query);
+			queryObj = search.Get ().OfType<ManagementBaseObject> ().FirstOrDefault ();
+			if (queryObj == null) {
+				return parent.ProcessName;
+			}
+			parentId = (uint)queryObj ["ParentProcessId"];
+			try {
+				parent = Process.GetProcessById ((int)parentId);
+				if (string.Equals (parent.ProcessName, "explorer", StringComparison.InvariantCultureIgnoreCase)) {
+					return prevParent.ProcessName;
+				}
+				prevParent = parent;
+			} catch (ArgumentException) {
+
+				return prevParent.ProcessName;
+			}
+		}
+
+		return parent.ProcessName;
+#pragma warning restore CA1416 // Validate platform compatibility
+	}
 }
 
 /// <summary>
@@ -1819,10 +1865,6 @@ internal class WindowsMainLoop : IMainLoopDriver {
 			_winChanged = false;
 			WinChanged?.Invoke (this, new SizeChangedEventArgs (_windowSize));
 		}
-	}
-	public void TearDown ()
-	{
-		//throw new NotImplementedException ();
 	}
 }
 
