@@ -86,6 +86,8 @@ namespace Terminal.Gui {
 		MainLoop mainLoop;
 		bool winChanged;
 
+		bool _runningUnitTests = false;
+		
 		public Action WinChanged;
 
 		void IMainLoopDriver.Wakeup ()
@@ -96,11 +98,15 @@ namespace Terminal.Gui {
 		void IMainLoopDriver.Setup (MainLoop mainLoop)
 		{
 			this.mainLoop = mainLoop;
-			pipe (wakeupPipes);
-			AddWatch (wakeupPipes [1], Condition.PollIn, ml => {
-				read (wakeupPipes [1], ignore, readHandle);
-				return true;
-			});
+			try {
+				pipe (wakeupPipes);
+				AddWatch (wakeupPipes [1], Condition.PollIn, ml => {
+					read (wakeupPipes [1], ignore, readHandle);
+					return true;
+				});
+			} catch (DllNotFoundException e) {
+				_runningUnitTests = true;
+			}
 		}
 
 		/// <summary>

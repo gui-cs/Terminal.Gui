@@ -784,7 +784,9 @@ internal class WindowsDriver : ConsoleDriver {
 		set {
 			base.Force16Colors = value;
 			// BUGBUG: This is a hack until we fully support VirtualTerminalSequences
-			WinConsole = new WindowsConsole ();
+			if (WinConsole != null) {
+				WinConsole = new WindowsConsole ();
+			}
 			Refresh ();
 		}
 	}
@@ -822,12 +824,19 @@ internal class WindowsDriver : ConsoleDriver {
 		if (w == Cols - 3 && e.Height < Rows) {
 			w += 3;
 		}
-		var newSize = WinConsole.SetConsoleWindow (
-		    (short)Math.Max (w, 16), (short)Math.Max (e.Height, 0));
 		Left = 0;
 		Top = 0;
-		Cols = newSize.Width;
-		Rows = newSize.Height;
+		Cols = e.Width;
+		Rows = e.Height;
+
+		if (WinConsole != null) {
+			var newSize = WinConsole.SetConsoleWindow (
+				(short)Math.Max (w, 16), (short)Math.Max (e.Height, 0));
+
+			Cols = newSize.Width;
+			Rows = newSize.Height;
+		}
+
 		ResizeScreen ();
 		ClearContents ();
 		TerminalResized.Invoke ();
@@ -1436,7 +1445,6 @@ internal class WindowsDriver : ConsoleDriver {
 	public override void Init (Action terminalResized)
 	{
 		TerminalResized = terminalResized;
-
 		
 		try {
 
@@ -1480,10 +1488,6 @@ internal class WindowsDriver : ConsoleDriver {
 
 	void ResizeScreen ()
 	{
-		if (WinConsole == null) {
-			return;
-		}
-
 		_outputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
 		Clip = new Rect (0, 0, Cols, Rows);
 		_damageRegion = new WindowsConsole.SmallRect () {
@@ -1494,13 +1498,13 @@ internal class WindowsDriver : ConsoleDriver {
 		};
 		_dirtyLines = new bool [Rows];
 
-		WinConsole.ForceRefreshCursorVisibility ();
+		WinConsole?.ForceRefreshCursorVisibility ();
 	}
-
-
+	
+	
 	public override void UpdateScreen ()
 	{
-		var windowSize = WinConsole.GetConsoleBufferWindow (out _);
+		var windowSize = WinConsole?.GetConsoleBufferWindow (out _) ?? new Size (Cols, Rows);
 		if (!windowSize.IsEmpty && (windowSize.Width != Cols || windowSize.Height != Rows)) {
 			return;
 		}
@@ -1548,7 +1552,7 @@ internal class WindowsDriver : ConsoleDriver {
 			Right = (short)Cols
 		};
 
-		if (!WinConsole.WriteToConsole (new Size (Cols, Rows), _outputBuffer, bufferCoords, _damageRegion, Force16Colors)) {
+		if (WinConsole != null && !WinConsole.WriteToConsole (new Size (Cols, Rows), _outputBuffer, bufferCoords, _damageRegion, Force16Colors)) {
 			var err = Marshal.GetLastWin32Error ();
 			if (err != 0) {
 				throw new System.ComponentModel.Win32Exception (err);
@@ -1560,7 +1564,7 @@ internal class WindowsDriver : ConsoleDriver {
 	public override void Refresh ()
 	{
 		UpdateScreen ();
-		WinConsole.SetInitialCursorVisibility ();
+		WinConsole?.SetInitialCursorVisibility ();
 		UpdateCursor ();
 	}
 
@@ -1594,42 +1598,46 @@ internal class WindowsDriver : ConsoleDriver {
 
 	#endregion
 
-	CursorVisibility savedCursorVisibility;
+	CursorVisibility _cachedCursorVisibility;
 
 	public override void UpdateCursor ()
 	{
 		if (Col < 0 || Row < 0 || Col > Cols || Row > Rows) {
 			GetCursorVisibility (out CursorVisibility cursorVisibility);
-			savedCursorVisibility = cursorVisibility;
+			_cachedCursorVisibility = cursorVisibility;
 			SetCursorVisibility (CursorVisibility.Invisible);
 			return;
 		}
 
-		SetCursorVisibility (savedCursorVisibility);
+		SetCursorVisibility (_cachedCursorVisibility);
 		var position = new WindowsConsole.Coord () {
 			X = (short)Col,
 			Y = (short)Row
 		};
-		WinConsole.SetCursorPosition (position);
+		WinConsole?.SetCursorPosition (position);
 	}
 
 	/// <inheritdoc/>
 	public override bool GetCursorVisibility (out CursorVisibility visibility)
 	{
-		return WinConsole.GetCursorVisibility (out visibility);
+		if (WinConsole != null) {
+			return WinConsole.GetCursorVisibility (out visibility);
+		}
+		visibility = _cachedCursorVisibility;
+		return true;
 	}
 
 	/// <inheritdoc/>
 	public override bool SetCursorVisibility (CursorVisibility visibility)
 	{
-		savedCursorVisibility = visibility;
-		return WinConsole.SetCursorVisibility (visibility);
+		_cachedCursorVisibility = visibility;
+		return WinConsole == null || WinConsole.SetCursorVisibility (visibility);
 	}
 
 	/// <inheritdoc/>
 	public override bool EnsureCursorVisibility ()
 	{
-		return WinConsole.EnsureCursorVisibility ();
+		return WinConsole == null || WinConsole.EnsureCursorVisibility ();
 	}
 
 	public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)

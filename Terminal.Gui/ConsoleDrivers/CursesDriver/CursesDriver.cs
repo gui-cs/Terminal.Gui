@@ -3,6 +3,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using Unix.Terminal;
@@ -13,13 +14,16 @@ namespace Terminal.Gui;
 /// This is the Curses driver for the gui.cs/Terminal framework.
 /// </summary>
 internal class CursesDriver : ConsoleDriver {
+	
 	public override int Cols => Curses.Cols;
 	public override int Rows => Curses.Lines;
 
 	CursorVisibility? _initialCursorVisibility = null;
 	CursorVisibility? _currentCursorVisibility = null;
 
-	public override string GetVersionInfo () => $"{Curses.curses_version()}";
+	public override string GetVersionInfo () => $"{Curses.curses_version ()}";
+
+	public override bool SupportsTrueColor => false;
 
 	public override void Move (int col, int row)
 	{
@@ -65,6 +69,7 @@ internal class CursesDriver : ConsoleDriver {
 	static Attribute MakeColor (short foreground, short background)
 	{
 		var v = (short)((int)foreground | background << 4);
+
 		// TODO: for TrueColor - Use InitExtendedPair
 		Curses.InitColorPair (v, foreground, background);
 		return new Attribute (
@@ -81,7 +86,14 @@ internal class CursesDriver : ConsoleDriver {
 	/// </remarks>
 	public override Attribute MakeColor (Color fore, Color back)
 	{
-		return MakeColor (ColorToCursesColorNumber (fore), ColorToCursesColorNumber (back));
+		if (_window != null) {
+			return MakeColor (ColorToCursesColorNumber (fore), ColorToCursesColorNumber (back));
+		} else {
+			return new Attribute (
+				value: 0,
+				foreground: fore,
+				background: back);
+		}
 	}
 
 	static short ColorToCursesColorNumber (Color color)
@@ -191,6 +203,9 @@ internal class CursesDriver : ConsoleDriver {
 		StopReportingMouseMoves ();
 		SetCursorVisibility (CursorVisibility.Default);
 
+		if (_window == null) {
+			return;
+		}
 		// throws away any typeahead that has been typed by
 		// the user and has not yet been read by the program.
 		Curses.flushinp ();
@@ -222,7 +237,7 @@ internal class CursesDriver : ConsoleDriver {
 					}
 
 				} else {
-					Curses.mvaddwstr (row, col, rune.ToString());
+					Curses.mvaddwstr (row, col, rune.ToString ());
 					if (rune.GetColumns () > 1 && col + 1 < Cols) {
 						// TODO: This is a hack to deal with non-BMP and wide characters.
 						//col++;
@@ -599,34 +614,57 @@ internal class CursesDriver : ConsoleDriver {
 			_window = Curses.initscr ();
 			Curses.set_escdelay (10);
 		} catch (Exception e) {
-			throw new Exception ($"Curses failed to initialize, the exception is: {e.Message}");
+			_window = null;
+			Debug.WriteLine ($"Curses failed to initialize. Assuming Unit Tests. The exception is: {e.Message}");
 		}
 
-		// Ensures that all procedures are performed at some previous closing.
-		Curses.doupdate ();
+		if (_window != null) {
+			// Ensures that all procedures are performed at some previous closing.
+			Curses.doupdate ();
 
-		// 
-		// We are setting Invisible as default so we could ignore XTerm DECSUSR setting
-		//
-		switch (Curses.curs_set (0)) {
-		case 0:
-			_currentCursorVisibility = _initialCursorVisibility = CursorVisibility.Invisible;
-			break;
+			// 
+			// We are setting Invisible as default so we could ignore XTerm DECSUSR setting
+			//
+			switch (Curses.curs_set (0)) {
+			case 0:
+				_currentCursorVisibility = _initialCursorVisibility = CursorVisibility.Invisible;
+				break;
 
-		case 1:
-			_currentCursorVisibility = _initialCursorVisibility = CursorVisibility.Underline;
-			Curses.curs_set (1);
-			break;
+			case 1:
+				_currentCursorVisibility = _initialCursorVisibility = CursorVisibility.Underline;
+				Curses.curs_set (1);
+				break;
 
-		case 2:
-			_currentCursorVisibility = _initialCursorVisibility = CursorVisibility.Box;
-			Curses.curs_set (2);
-			break;
+			case 2:
+				_currentCursorVisibility = _initialCursorVisibility = CursorVisibility.Box;
+				Curses.curs_set (2);
+				break;
 
-		default:
-			_currentCursorVisibility = _initialCursorVisibility = null;
-			break;
+			default:
+				_currentCursorVisibility = _initialCursorVisibility = null;
+				break;
+			}
+			if (!Curses.HasColors) {
+				throw new InvalidOperationException ("V2 - This should never happen. File an Issue if it does.");
+			}
+
+			Curses.raw ();
+			Curses.noecho ();
+
+			Curses.Window.Standard.keypad (true);
+
+			Curses.StartColor ();
+			Curses.UseDefaultColors ();
+			Curses.CheckWinChange ();
 		}
+
+		CurrentAttribute = MakeColor (Color.White, Color.Black);
+		InitializeColorSchemes ();
+
+		ClearContents ();
+
+		TerminalResized = terminalResized;
+		StartReportingMouseMoves ();
 
 		if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
 			Clipboard = new MacOSXClipboard ();
@@ -638,27 +676,9 @@ internal class CursesDriver : ConsoleDriver {
 			}
 		}
 
-		if (!Curses.HasColors) {
-			throw new InvalidOperationException ("V2 - This should never happen. File an Issue if it does.");
+		if (_window != null) {
+			Curses.refresh ();
 		}
-
-		Curses.raw ();
-		Curses.noecho ();
-
-		Curses.Window.Standard.keypad (true);
-
-		TerminalResized = terminalResized;
-
-		Curses.StartColor ();
-		Curses.UseDefaultColors ();
-		CurrentAttribute = MakeColor (Color.White, Color.Black);
-		InitializeColorSchemes ();
-
-		Curses.CheckWinChange ();
-		ClearContents ();
-		Curses.refresh ();
-
-		StartReportingMouseMoves ();
 	}
 
 	public static bool Is_WSL_Platform ()

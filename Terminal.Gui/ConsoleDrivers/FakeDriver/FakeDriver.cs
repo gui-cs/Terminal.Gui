@@ -43,6 +43,8 @@ public class FakeDriver : ConsoleDriver {
 
 	public static FakeDriver.Behaviors FakeBehaviors = new Behaviors ();
 
+	public override bool SupportsTrueColor => false;
+
 	public FakeDriver ()
 	{
 		if (FakeBehaviors.UseFakeClipboard) {
