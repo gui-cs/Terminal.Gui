@@ -109,7 +109,7 @@ namespace Terminal.Gui {
 				OtherScrollBarView.ShowScrollIndicator = true;
 			}
 			ShowScrollIndicator = true;
-			contentBottomRightCorner = new View (" ") { Visible = host.Visible };
+			contentBottomRightCorner = new View (" ") { Visible = host.Visible, ColorScheme = host.ColorScheme };
 			Host.SuperView.Add (contentBottomRightCorner);
 			contentBottomRightCorner.X = Pos.Right (host) - 1;
 			contentBottomRightCorner.Y = Pos.Bottom (host) - 1;
@@ -346,23 +346,23 @@ namespace Terminal.Gui {
 			}
 
 			if (showBothScrollIndicator) {
-				if (contentBottomRightCorner != null) {
+				if (contentBottomRightCorner != null && !contentBottomRightCorner.Visible) {
 					contentBottomRightCorner.Visible = true;
-				} else if (otherScrollBarView != null && otherScrollBarView.contentBottomRightCorner != null) {
+				} else if (otherScrollBarView != null && otherScrollBarView.contentBottomRightCorner != null && !otherScrollBarView.contentBottomRightCorner.Visible) {
 					otherScrollBarView.contentBottomRightCorner.Visible = true;
 				}
 			} else if (!showScrollIndicator) {
-				if (contentBottomRightCorner != null) {
+				if (contentBottomRightCorner != null && contentBottomRightCorner.Visible) {
 					contentBottomRightCorner.Visible = false;
-				} else if (otherScrollBarView != null && otherScrollBarView.contentBottomRightCorner != null) {
+				} else if (otherScrollBarView != null && otherScrollBarView.contentBottomRightCorner != null && otherScrollBarView.contentBottomRightCorner.Visible) {
 					otherScrollBarView.contentBottomRightCorner.Visible = false;
 				}
 				if (Application.MouseGrabView != null && Application.MouseGrabView == this) {
 					Application.UngrabMouse ();
 				}
-			} else if (contentBottomRightCorner != null) {
+			} else if (contentBottomRightCorner != null && contentBottomRightCorner.Visible) {
 				contentBottomRightCorner.Visible = false;
-			} else if (otherScrollBarView != null && otherScrollBarView.contentBottomRightCorner != null) {
+			} else if (otherScrollBarView != null && otherScrollBarView.contentBottomRightCorner != null && otherScrollBarView.contentBottomRightCorner.Visible) {
 				otherScrollBarView.contentBottomRightCorner.Visible = false;
 			}
 			if (Host?.Visible == true && showScrollIndicator && !Visible) {

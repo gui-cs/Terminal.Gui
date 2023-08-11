@@ -88,11 +88,18 @@ namespace Terminal.Gui {
 
 			public ContentView (Rect frame, Window instance) : base (frame)
 			{
-				this.instance = instance;
+				Initialize (instance);
 			}
 			public ContentView (Window instance) : base ()
 			{
+				Initialize (instance);
+			}
+
+			private void Initialize (Window instance)
+			{
 				this.instance = instance;
+				CanFocus = this.instance.CanFocus;
+				Driver?.SetCursorVisibility (CursorVisibility.Invisible);
 			}
 
 			public override void OnCanFocusChanged ()
