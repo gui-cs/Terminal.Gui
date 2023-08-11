@@ -17,40 +17,38 @@ using static Terminal.Gui.TableView;
 
 
 #nullable enable
-/// <summary>
-/// UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the catalog of scenarios.
-/// </summary>
-/// <remarks>
-/// <para>
-///	UI Catalog attempts to satisfy the following goals:
-/// </para>
-/// <para>
-/// <list type="number">
-///	<item>
-///		<description>
-///		Be an easy to use showcase for Terminal.Gui concepts and features.
-///		</description>
-///	</item>
-///	<item>
-///		<description>
-///		Provide sample code that illustrates how to properly implement said concepts & features.
-///		</description>
-///	</item>
-///	<item>
-///		<description>
-///		Make it easy for contributors to add additional samples in a structured way.
-///		</description>
-///	</item>
-/// </list>
-/// </para>	
-/// <para>
-///	See the project README for more details (https://github.com/gui-cs/Terminal.Gui/tree/master/UICatalog/README.md).
-/// </para>	
-/// </remarks>
+
 namespace UICatalog {
 	/// <summary>
-	/// UI Catalog is a comprehensive sample app and scenario library for <see cref="Terminal.Gui"/>
+	/// UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the catalog of scenarios.
 	/// </summary>
+	/// <remarks>
+	/// <para>
+	///	UI Catalog attempts to satisfy the following goals:
+	/// </para>
+	/// <para>
+	/// <list type="number">
+	///	<item>
+	///		<description>
+	///		Be an easy to use showcase for Terminal.Gui concepts and features.
+	///		</description>
+	///	</item>
+	///	<item>
+	///		<description>
+	///		Provide sample code that illustrates how to properly implement said concepts & features.
+	///		</description>
+	///	</item>
+	///	<item>
+	///		<description>
+	///		Make it easy for contributors to add additional samples in a structured way.
+	///		</description>
+	///	</item>
+	/// </list>
+	/// </para>	
+	/// <para>
+	///	See the project README for more details (https://github.com/gui-cs/Terminal.Gui/tree/master/UICatalog/README.md).
+	/// </para>	
+	/// </remarks>
 	class UICatalogApp {
 		//[SerializableConfigurationProperty (Scope = typeof (AppScope), OmitClassName = true), JsonPropertyName ("UICatalog.StatusBar")]
 		//public static bool ShowStatusBar { get; set; } = true;
@@ -114,8 +112,7 @@ namespace UICatalog {
 			_aboutMessage.AppendLine (@"");
 			_aboutMessage.AppendLine (@"https://github.com/gui-cs/Terminal.Gui");
 
-			Scenario scenario;
-			while ((scenario = RunUICatalogTopLevel ()) != null) {
+			while (RunUICatalogTopLevel () is { } scenario) {
 				VerifyObjectsWereDisposed ();
 				CM.Themes!.Theme = _cachedTheme!;
 				CM.Apply ();
@@ -187,7 +184,7 @@ namespace UICatalog {
 				return;
 			}
 
-			// TOOD: THis is a hack. Figure out how to ensure that the file is fully written before reading it.
+			// TODO: This is a hack. Figure out how to ensure that the file is fully written before reading it.
 			Thread.Sleep (500);
 			CM.Load ();
 			CM.Apply ();
@@ -272,7 +269,7 @@ namespace UICatalog {
 				_themeMenuBarItem = new MenuBarItem ("_Themes", _themeMenuItems);
 				MenuBar = new MenuBar (new MenuBarItem [] {
 					new MenuBarItem ("_File", new MenuItem [] {
-						new MenuItem ("_Quit", "Quit UI Catalog", () => RequestStop(), null, null)
+						new MenuItem ("_Quit", "Quit UI Catalog", RequestStop, null, null)
 					}),
 					_themeMenuBarItem,
 					new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems()),
@@ -484,15 +481,16 @@ namespace UICatalog {
 			{
 				List<MenuItem []> menuItems = new List<MenuItem []> {
 					CreateDiagnosticFlagsMenuItems (),
-					Array.Empty<MenuItem> (),
+					new MenuItem [] { null! },
 					CreateDisabledEnabledMouseItems (),
 					CreateDisabledEnabledMenuBorder (),
 					CreateDisabledEnableUseSubMenusSingleFrame (),
-					CreateKeybindingsMenuItems ()
+					CreateKeyBindingsMenuItems ()
 				};
 				return menuItems;
 			}
 
+			// TODO: This should be an ConfigurationManager setting
 			MenuItem [] CreateDisabledEnableUseSubMenusSingleFrame ()
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
@@ -510,6 +508,7 @@ namespace UICatalog {
 				return menuItems.ToArray ();
 			}
 
+			// TODO: This should be an ConfigurationManager setting
 			MenuItem [] CreateDisabledEnabledMenuBorder ()
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
@@ -543,7 +542,7 @@ namespace UICatalog {
 				return menuItems.ToArray ();
 			}
 
-			MenuItem [] CreateKeybindingsMenuItems ()
+			MenuItem [] CreateKeyBindingsMenuItems ()
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
 				var item = new MenuItem {

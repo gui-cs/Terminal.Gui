@@ -29,13 +29,15 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (cbSupportsTrueColor);
 
-			var cbUseTrueColor = new CheckBox ("Use true color") {
+			var cbUseTrueColor = new CheckBox ("Force 16 colors") {
 				X = x,
 				Y = y++,
-				Checked = Application.Driver.UseTrueColor,
+				Checked = Application.Driver.Force16Colors,
 				Enabled = canTrueColor,
 			};
-			cbUseTrueColor.Toggled += (_, evt) => Application.Driver.UseTrueColor = evt.NewValue ?? false;
+			cbUseTrueColor.Toggled += (_, evt) => {
+				Application.Driver.Force16Colors = evt.NewValue ?? false;
+			};
 			Win.Add (cbUseTrueColor);
 
 			y += 2;
@@ -81,8 +83,8 @@ namespace UICatalog.Scenarios {
 			Win.Add (lblBlue);
 
 			Application.RootMouseEvent = (e) => {
-				var normal = e.View.GetNormalColor ();
 				if (e.View != null) {
+					var normal = e.View.GetNormalColor ();
 					lblRed.Text = normal.TrueColorForeground.Value.Red.ToString ();
 					lblGreen.Text = normal.TrueColorForeground.Value.Green.ToString ();
 					lblBlue.Text = normal.TrueColorForeground.Value.Blue.ToString ();

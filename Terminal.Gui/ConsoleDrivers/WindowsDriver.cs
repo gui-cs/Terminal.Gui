@@ -9,6 +9,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using static Unix.Terminal.Curses;
 
 namespace Terminal.Gui;
 
@@ -39,13 +40,13 @@ internal class WindowsConsole {
 
 	CharInfo [] _originalStdOutChars;
 
-	public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord coords, SmallRect window, bool useTrueColor)
+	public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord coords, SmallRect window, bool force16Colors)
 	{
 		if (_screenBuffer == IntPtr.Zero) {
 			ReadFromConsoleOutput (size, coords, ref window);
 		}
 
-		if (!useTrueColor) {
+		if (force16Colors) {
 			int i = 0;
 			CharInfo [] ci = new CharInfo [charInfoBuffer.Length];
 			foreach (ExtendedCharInfo info in charInfoBuffer) {
@@ -55,45 +56,49 @@ internal class WindowsConsole {
 				};
 			}
 			return WriteConsoleOutput (_screenBuffer, ci, coords, new Coord () { X = window.Left, Y = window.Top }, ref window);
-		}
+		} else {
 
+			_stringBuilder.Clear ();
 
-		return WriteConsoleTrueColorOutput (charInfoBuffer);
-	}
+			_stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
+			_stringBuilder.Append (EscSeqUtils.CSI_SetCursorPosition (0, 0));
 
-	private bool WriteConsoleTrueColorOutput (ExtendedCharInfo [] charInfoBuffer)
-	{
-		_stringBuilder.Clear ();
+			Attribute? prev = null;
+			foreach (var info in charInfoBuffer) {
+				var attr = info.Attribute;
 
-		_stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
-		_stringBuilder.Append (EscSeqUtils.CSI_SetCursorPosition (0, 0));
+				if (attr != prev) {
+					prev = attr;
+					if (force16Colors) {
+						//// Assume a 4-bit encoded value for both foreground and background colors.
+						//// GetColors (value, out foreground, out background);
+						//var foreground = (int)attr.TrueColorForeground.Value;
+						//var background = attr.TrueColorForeground.Value;
+						//_stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColor (foreground));
+						//_stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColor (background));
 
-		Attribute? prev = null;
-		foreach (var info in charInfoBuffer) {
-			var attr = info.Attribute;
-
-			if (attr != prev) {
-				prev = attr;
-
-				_stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.TrueColorForeground.Value.Red, attr.TrueColorForeground.Value.Green, attr.TrueColorForeground.Value.Blue));
-				_stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.TrueColorBackground.Value.Red, attr.TrueColorBackground.Value.Green, attr.TrueColorBackground.Value.Blue));
-			}
-
-			if (info.Char != '\x1b') {
-				if (!info.Empty) {
-					_stringBuilder.Append (info.Char);
+					} else {
+						_stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.TrueColorForeground.Value.Red, attr.TrueColorForeground.Value.Green, attr.TrueColorForeground.Value.Blue));
+						_stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.TrueColorBackground.Value.Red, attr.TrueColorBackground.Value.Green, attr.TrueColorBackground.Value.Blue));
+					}
 				}
 
-			} else {
-				_stringBuilder.Append (' ');
+				if (info.Char != '\x1b') {
+					if (!info.Empty) {
+						_stringBuilder.Append (info.Char);
+					}
+
+				} else {
+					_stringBuilder.Append (' ');
+				}
 			}
+
+			_stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
+
+			string s = _stringBuilder.ToString ();
+
+			return WriteConsole (_screenBuffer, s, (uint)(s.Length), out uint _, null);
 		}
-
-		_stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
-
-		string s = _stringBuilder.ToString ();
-
-		return WriteConsole (_screenBuffer, s, (uint)(s.Length), out uint _, null);
 	}
 
 	public void ReadFromConsoleOutput (Size size, Coord coords, ref SmallRect window)
@@ -769,6 +774,15 @@ internal class WindowsDriver : ConsoleDriver {
 
 	public override bool SupportsTrueColor => Environment.OSVersion.Version.Build >= 14931;
 
+	public override bool Force16Colors {
+		get => base.Force16Colors;
+		set {
+			base.Force16Colors = value;
+			// BUGBUG: This is a hack until we fully support VirtualTerminalSequences
+			WinConsole = new WindowsConsole ();
+		}
+	}
+
 	public WindowsDriver ()
 	{
 		WinConsole = new WindowsConsole ();
@@ -1441,7 +1455,7 @@ internal class WindowsDriver : ConsoleDriver {
 		ClearContents ();
 	}
 
-	public virtual void ResizeScreen ()
+	void ResizeScreen ()
 	{
 		if (WinConsole == null) {
 			return;
@@ -1504,12 +1518,13 @@ internal class WindowsDriver : ConsoleDriver {
 			}
 		}
 
-		WinConsole.WriteToConsole (new Size (Cols, Rows), _outputBuffer, bufferCoords, _damageRegion, UseTrueColor);
+		WinConsole.WriteToConsole (new Size (Cols, Rows), _outputBuffer, bufferCoords, _damageRegion, Force16Colors);
 		WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
 	}
 
 	public override void Refresh ()
 	{
+	
 		UpdateScreen ();
 		WinConsole.SetInitialCursorVisibility ();
 		UpdateCursor ();
