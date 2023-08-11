@@ -557,12 +557,6 @@ internal class NetDriver : ConsoleDriver {
 	public NetWinVTConsole NetWinConsole { get; private set; }
 	public bool IsWinPlatform { get; private set; }
 
-	int _largestBufferHeight;
-
-	public NetDriver ()
-	{
-	}
-
 	public override void End ()
 	{
 		_mainLoop._netEvents.StopTasks ();
@@ -623,7 +617,6 @@ internal class NetDriver : ConsoleDriver {
 			// Simluate
 			Cols = 80;
 			Rows = 25;
-			_largestBufferHeight = Rows;
 		}
 
 		ResizeScreen ();
