@@ -250,6 +250,11 @@ namespace UICatalog.Scenarios {
 
 		private void SetMinAcceptableWidthToOne ()
 		{
+			var columns = tableView?.Table?.Columns;
+			if (columns is null) {
+				MessageBox.ErrorQuery ("No Table", "No table is currently loaded", "Ok");
+				return;
+			}
 			foreach (DataColumn c in tableView.Table.Columns) 
 			{
 				var style = tableView.Style.GetOrCreateColumnStyle (c);
@@ -276,6 +281,10 @@ namespace UICatalog.Scenarios {
 
 		private void RunColumnWidthDialog (DataColumn col, string prompt, Action<ColumnStyle,int> setter,Func<ColumnStyle,int> getter)
 		{
+			if (col is null) {
+				MessageBox.ErrorQuery ("No Table", "No table is currently loaded", "Ok");
+				return;
+			}
 			var accepted = false;
 			var ok = new Button ("Ok", is_default: true);
 			ok.Clicked += () => { accepted = true; Application.RequestStop (); };

@@ -696,16 +696,16 @@ namespace Terminal.Gui {
 		/// </para>
 		/// </summary>
 		/// <remarks>
-		/// NOTE: This functionaliy is currently broken on Windows Terminal.
+		/// NOTE: Changes to Windows Terminal prevents this functionality from working. It only really worked on Windows 'conhost' previously.
 		/// </remarks>
+		[Obsolete ("This API is deprecated and has no impact when enabled.", false)]
 		public abstract bool EnableConsoleScrolling { get; set; }
-
 		/// <summary>
-		/// This API is deprecated; use <see cref="EnableConsoleScrolling"/> instead.
+		/// This API is deprecated and has no impact when enabled.
 		/// </summary>
-		[Obsolete ("This API is deprecated; use EnableConsoleScrolling instead.", false)]
+		[Obsolete ("This API is deprecated and has no impact when enabled.", false)]
 		public abstract bool HeightAsBuffer { get; set; }
-
+		
 		/// <summary>
 		/// The format is rows, columns and 3 values on the last column: Rune, Attribute and Dirty Flag
 		/// </summary>
@@ -1494,7 +1494,7 @@ namespace Terminal.Gui {
 					process.StandardInput.Close ();
 				}
 
-				if (!process.WaitForExit (5000)) {
+				if (!process.WaitForExit (10000)) {
 					var timeoutError = $@"Process timed out. Command line: {process.StartInfo.FileName} {process.StartInfo.Arguments}.";
 					throw new TimeoutException (timeoutError);
 				}

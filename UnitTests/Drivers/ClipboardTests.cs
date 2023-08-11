@@ -102,8 +102,8 @@ namespace Terminal.Gui.DriverTests {
 		[Fact, AutoInitShutdown (useFakeClipboard: false)]
 		public void IsSupported_Get ()
 		{
-			if (Clipboard.IsSupported) 				Assert.True (Clipboard.IsSupported);
-else 				Assert.False (Clipboard.IsSupported);
+			if (Clipboard.IsSupported) Assert.True (Clipboard.IsSupported);
+			else Assert.False (Clipboard.IsSupported);
 		}
 
 		[Fact, AutoInitShutdown (useFakeClipboard: false)]
@@ -129,15 +129,15 @@ else 				Assert.False (Clipboard.IsSupported);
 		public void TrySetClipboardData_Sets_The_OS_Clipboard ()
 		{
 			var clipText = "The TrySetClipboardData_Sets_The_OS_Clipboard unit test pasted this to the OS clipboard.";
-			if (Clipboard.IsSupported) 				Assert.True (Clipboard.TrySetClipboardData (clipText));
-else 				Assert.False (Clipboard.TrySetClipboardData (clipText));
+			if (Clipboard.IsSupported) Assert.True (Clipboard.TrySetClipboardData (clipText));
+			else Assert.False (Clipboard.TrySetClipboardData (clipText));
 
 			Application.Iteration += () => Application.RequestStop ();
 
 			Application.Run ();
 
-			if (Clipboard.IsSupported) 				Assert.Equal (clipText, Clipboard.Contents);
-else 				Assert.NotEqual (clipText, Clipboard.Contents);
+			if (Clipboard.IsSupported) Assert.Equal (clipText, Clipboard.Contents);
+			else Assert.NotEqual (clipText, Clipboard.Contents);
 		}
 
 
@@ -209,7 +209,9 @@ else 				Assert.NotEqual (clipText, Clipboard.Contents);
 
 			Application.Run ();
 
-			if (!failed) 				Assert.Equal (clipText, getClipText);
+			if (!failed) {
+				Assert.Equal (clipText, getClipText);
+			}
 		}
 
 		[Fact, AutoInitShutdown (useFakeClipboard: false)]
@@ -265,7 +267,7 @@ else 				Assert.NotEqual (clipText, Clipboard.Contents);
 
 			Application.Run ();
 
-			if (!failed) 				Assert.Equal (clipText, clipReadText.TrimEnd ());
+			if (!failed) Assert.Equal (clipText, clipReadText.TrimEnd ());
 
 		}
 
