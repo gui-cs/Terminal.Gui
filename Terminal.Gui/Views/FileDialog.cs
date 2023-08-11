@@ -1172,20 +1172,18 @@ namespace Terminal.Gui {
 				return tableView.ColorScheme;
 			}
 
-			if (stats.IsDir ()) {
-				return Style.ColorSchemeDirectory;
-			}
-			if (stats.IsImage ()) {
-				return Style.ColorSchemeImage;
-			}
-			if (stats.IsExecutable ()) {
-				return Style.ColorSchemeExeOrRecommended;
-			}
-			if (stats.FileSystemInfo is IFileInfo f && this.MatchesAllowedTypes (f)) {
-				return Style.ColorSchemeExeOrRecommended;
-			}
 
-			return Style.ColorSchemeOther;
+			var color = Style.ColorProvider.GetTrueColor(stats.FileSystemInfo)
+			??	TrueColor.FromConsoleColor(Color.White);
+			var black = TrueColor.FromConsoleColor(Color.Black);
+
+			// TODO: Add some kind of cache for this
+			return new ColorScheme{
+				Normal = new Attribute (color,black),
+				HotNormal = new Attribute (color, black),
+				Focus = new Attribute (black, color),
+				HotFocus = new Attribute (black, color),
+			};
 		}
 
 		/// <summary>

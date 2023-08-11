@@ -45,34 +45,17 @@ namespace Terminal.Gui {
 		public FileSystemIconProvider IconProvider { get; set;} = new FileSystemIconProvider();
 
 		/// <summary>
+		///	Gets or sets the class thatis responsible for determining which color
+		/// to use to represent files and directories when <see cref="UseColors"/> is
+		/// <see langword="true"/>.
+		/// </summary>
+		public FileSystemColorProvider ColorProvider { get;set;} = new FileSystemColorProvider();
+
+		/// <summary>
 		/// Gets or sets the culture to use (e.g. for number formatting).
 		/// Defaults to <see cref="CultureInfo.CurrentUICulture"/>.
 		/// </summary>
 		public CultureInfo Culture {get;set;} = CultureInfo.CurrentUICulture;
-
-		/// <summary>
-		/// Sets a <see cref="ColorScheme"/> to use for directories rows of
-		/// the <see cref="TableView"/>.
-		/// </summary>
-		public ColorScheme ColorSchemeDirectory { get; set; }
-
-		/// <summary>
-		/// Sets a <see cref="ColorScheme"/> to use for file rows with an image extension
-		/// of the <see cref="TableView"/>. Defaults to White text on Black background.
-		/// </summary>
-		public ColorScheme ColorSchemeImage { get; set; }
-
-		/// <summary>
-		/// Sets a <see cref="ColorScheme"/> to use for file rows with an executable extension
-		/// or that match <see cref="FileDialog.AllowedTypes"/> in the <see cref="TableView"/>.
-		/// </summary>
-		public ColorScheme ColorSchemeExeOrRecommended { get; set; }
-
-		/// <summary>
-		/// Colors to use when <see cref="UseColors"/> is true but file does not match any other
-		/// classification (<see cref="ColorSchemeDirectory"/>, <see cref="ColorSchemeImage"/> etc).
-		/// </summary>
-		public ColorScheme ColorSchemeOther { get; set; }
 
 		/// <summary>
 		/// Gets or sets the header text displayed in the Filename column of the files table.
@@ -186,33 +169,6 @@ namespace Terminal.Gui {
 			TreeRootGetter = DefaultTreeRootGetter;
 
 			DateFormat = CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern;
-
-			ColorSchemeDirectory = new ColorScheme {
-				Normal = Application.Driver.MakeAttribute (Color.Blue, Color.Black),
-				HotNormal = Application.Driver.MakeAttribute (Color.Blue, Color.Black),
-				Focus = Application.Driver.MakeAttribute (Color.Black, Color.Blue),
-				HotFocus = Application.Driver.MakeAttribute (Color.Black, Color.Blue),
-
-			};
-
-			ColorSchemeImage = new ColorScheme {
-				Normal = Application.Driver.MakeAttribute (Color.Magenta, Color.Black),
-				HotNormal = Application.Driver.MakeAttribute (Color.Magenta, Color.Black),
-				Focus = Application.Driver.MakeAttribute (Color.Black, Color.Magenta),
-				HotFocus = Application.Driver.MakeAttribute (Color.Black, Color.Magenta),
-			};
-			ColorSchemeExeOrRecommended = new ColorScheme {
-				Normal = Application.Driver.MakeAttribute (Color.Green, Color.Black),
-				HotNormal = Application.Driver.MakeAttribute (Color.Green, Color.Black),
-				Focus = Application.Driver.MakeAttribute (Color.Black, Color.Green),
-				HotFocus = Application.Driver.MakeAttribute (Color.Black, Color.Green),
-			};
-			ColorSchemeOther = new ColorScheme {
-				Normal = Application.Driver.MakeAttribute (Color.White, Color.Black),
-				HotNormal = Application.Driver.MakeAttribute (Color.White, Color.Black),
-				Focus = Application.Driver.MakeAttribute (Color.Black, Color.White),
-				HotFocus = Application.Driver.MakeAttribute (Color.Black, Color.White),
-			};
 		}
 
 
