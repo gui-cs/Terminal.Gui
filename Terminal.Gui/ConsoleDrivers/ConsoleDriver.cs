@@ -349,13 +349,13 @@ public abstract class ConsoleDriver {
 
 	#region Color Handling
 
-
+	
 	/// <summary>
 	/// Gets whether the <see cref="ConsoleDriver"/> supports TrueColor output.
 	/// </summary>
 	public virtual bool SupportsTrueColor { get => true; }
 
-	private bool _force16Colors = false;
+	bool _force16Colors = false;
 
 	// TODO: Make this a ConfiguationManager setting on Application
 	/// <summary>
