@@ -540,7 +540,7 @@ namespace UICatalog {
 				miForce16Colors.CheckType |= MenuItemCheckStyle.Checked;
 				miForce16Colors.Action += () => {
 					miForce16Colors.Checked = Application.Driver.Force16Colors = (bool)!miForce16Colors.Checked!;
-
+					Application.Refresh ();
 				};
 				menuItems.Add (miForce16Colors);
 
