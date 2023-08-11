@@ -6634,11 +6634,11 @@ This is the second line.
 			Kill_Delete_WordBackward ();
 			Assert.Equal (expectedEventCount, eventcount);
 
-			expectedEventCount += 1;
+			expectedEventCount += 2;
 			Kill_To_End_Delete_Forwards_And_Copy_To_The_Clipboard ();
 			Assert.Equal (expectedEventCount, eventcount);
 
-			expectedEventCount += 1;
+			expectedEventCount += 2;
 			Kill_To_Start_Delete_Backwards_And_Copy_To_The_Clipboard ();
 			Assert.Equal (expectedEventCount, eventcount);
 		}
@@ -6826,6 +6826,36 @@ This is the second line.
 			var exception = Record.Exception (() => tv.ReplaceAllText (textToFind, false, false, textToReplace));
 			Assert.Null (exception);
 			Assert.Equal (textToReplace, tv.Text);
+		}
+
+		[Fact]
+		[TextViewTestsAutoInitShutdown]
+		public void Paste_Always_Render_Screen ()
+		{
+			var win = new Window ();
+			win.Border.BorderStyle = BorderStyle.None;
+			win.Border.DrawMarginFrame = false;
+			win.Add (_textView);
+			Application.Top.Add (win);
+			Application.Begin (Application.Top);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+TAB to jump between text field", output);
+
+			Assert.True (_textView.ProcessKey (new KeyEvent (Key.End | Key.ShiftMask, new KeyModifiers () { Shift = true }))); // Select line
+			Assert.Equal ("TAB to jump between text fields.", _textView.SelectedText);
+			Assert.True (_textView.ProcessKey (new KeyEvent (Key.C | Key.CtrlMask, new KeyModifiers ()))); // Copy
+			Assert.Equal ("TAB to jump between text fields.", Clipboard.Contents);
+			Assert.True (_textView.ProcessKey (new KeyEvent (Key.End, new KeyModifiers ()))); // Go to end of line
+			Assert.True (_textView.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ()))); // New line
+			Assert.Equal (new Point (0, 1), _textView.CursorPosition);
+			Assert.Equal ("", _textView.SelectedText);
+			Assert.True (_textView.ProcessKey (new KeyEvent (Key.Y | Key.CtrlMask, new KeyModifiers ()))); // Paste
+			Assert.Equal ($"TAB to jump between text fields.{Environment.NewLine}TAB to jump between text fields.", _textView.Text);
+			win.Redraw (win.Bounds);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ to jump between text fields.
+ to jump between text fields.", output);
 		}
 	}
 }

@@ -160,7 +160,10 @@ namespace Unix.Terminal {
 
 			console_sharp_get_dims (out l, out c);
 
-			if (l == 1 || l != lines || c != cols) {
+			if (l < 1) {
+				l = 1;
+			}
+			if (l != lines || c != cols) {
 				lines = l;
 				cols = c;
 				return true;
