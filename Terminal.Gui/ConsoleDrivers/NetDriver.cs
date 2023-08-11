@@ -561,10 +561,10 @@ internal class NetDriver : ConsoleDriver {
 
 	public override void End ()
 	{
-		_mainLoop._netEvents.StopTasks ();
+		_mainLoop?._netEvents.StopTasks ();
 
 		if (IsWinPlatform) {
-			NetWinConsole.Cleanup ();
+			NetWinConsole?.Cleanup ();
 		}
 
 		StopReportingMouseMoves ();
