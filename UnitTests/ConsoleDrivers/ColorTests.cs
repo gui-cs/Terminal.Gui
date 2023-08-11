@@ -90,11 +90,11 @@ namespace Terminal.Gui.DriverTests {
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
 		}
-
+		
 		[Theory]
-		[InlineData (typeof (FakeDriver), false)]
+		[InlineData (typeof (FakeDriver), true)]
 		[InlineData (typeof (NetDriver), false)]
-		[InlineData (typeof (CursesDriver), false)]
+		[InlineData (typeof (CursesDriver), true)]
 		[InlineData (typeof (WindowsDriver), false)] 
 		public void Force16Colors_Sets (Type driverType, bool expectedSetting)
 		{

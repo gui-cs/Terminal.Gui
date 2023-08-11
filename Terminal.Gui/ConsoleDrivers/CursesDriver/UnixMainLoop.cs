@@ -87,12 +87,14 @@ namespace Terminal.Gui {
 		bool winChanged;
 
 		bool _runningUnitTests = false;
-		
+
 		public Action WinChanged;
 
 		void IMainLoopDriver.Wakeup ()
 		{
-			write (wakeupPipes [1], ignore, (IntPtr)1);
+			if (!_runningUnitTests) {
+				write (wakeupPipes [1], ignore, (IntPtr)1);
+			}
 		}
 
 		void IMainLoopDriver.Setup (MainLoop mainLoop)
@@ -117,10 +119,12 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public void RemoveWatch (object token)
 		{
-			var watch = token as Watch;
-			if (watch == null)
-				return;
-			descriptorWatchers.Remove (watch.File);
+			if (!_runningUnitTests) {
+				var watch = token as Watch;
+				if (watch == null)
+					return;
+				descriptorWatchers.Remove (watch.File);
+			}
 		}
 
 		/// <summary>
@@ -136,8 +140,9 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public object AddWatch (int fileDescriptor, Condition condition, Func<MainLoop, bool> callback)
 		{
-			if (callback == null)
+			if (callback == null) {
 				throw new ArgumentNullException (nameof (callback));
+			}
 
 			var watch = new Watch () { Condition = condition, Callback = callback, File = fileDescriptor };
 			descriptorWatchers [fileDescriptor] = watch;
@@ -147,8 +152,9 @@ namespace Terminal.Gui {
 
 		void UpdatePollMap ()
 		{
-			if (!poll_dirty)
+			if (!poll_dirty) {
 				return;
+			}
 			poll_dirty = false;
 
 			pollmap = new Pollfd [descriptorWatchers.Count];
