@@ -1452,10 +1452,11 @@ internal class WindowsDriver : ConsoleDriver {
 		TerminalResized = terminalResized;
 		
 		try {
-
-			var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
-			Cols = winSize.Width;
-			Rows = winSize.Height;
+			if (WinConsole != null) {
+				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
+				Cols = winSize.Width;
+				Rows = winSize.Height;
+			} 
 			WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
 
 			// Needed for Windows Terminal
