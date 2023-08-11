@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>portable</DebugType>
   </PropertyGroup>
@@ -10,14 +10,12 @@
     <!-- Version numbers are automatically updated by gitversion when a release is released -->
     <!-- In the source tree the version will always be 1.0 for all projects. -->
     <!-- Do not modify these. Do NOT commit after manually running `dotnet-gitversion /updateprojectfiles` -->
-    <AssemblyVersion>1.0</AssemblyVersion>
-    <FileVersion>1.0</FileVersion>
-    <Version>1.0</Version>
-    <InformationalVersion>1.0</InformationalVersion>
+    <AssemblyVersion>1.13.6.0</AssemblyVersion>
+    <FileVersion>1.13.6.0</FileVersion>
+    <InformationalVersion>1.13.6-pre.2+Branch.develop.Sha.90208d6577b9d34bf0c4e9057b4227297bc9118d</InformationalVersion>
+    <Version>1.13.6-pre0002</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
     <PackageReference Include="NStack.Core" Version="1.0.7" />
     <InternalsVisibleTo Include="UnitTests" />
   </ItemGroup>
@@ -53,7 +51,7 @@
   <!-- Enable Nuget Source Link for github -->
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-    <PackageReference Include="System.Management" Version="7.0.1" />
+    <PackageReference Include="System.Management" Version="7.0.2" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFrameworks>net472;netstandard2.1;net7.0</TargetFrameworks>
@@ -61,8 +59,9 @@
     <AssemblyName>Terminal.Gui</AssemblyName>
     <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
     <GenerateDocumentationFile Condition=" '$(Configuration)' == 'Release' ">true</GenerateDocumentationFile>
-    <!--<GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>-->
+    <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Debug' ">true</GeneratePackageOnBuild>
     <PackageId>Terminal.Gui</PackageId>
+    <PackageVersion>$(PackageVersion)</PackageVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/gui-cs/Terminal.Gui/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/gui-cs/Terminal.Gui.git</RepositoryUrl>

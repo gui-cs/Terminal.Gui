@@ -113,12 +113,10 @@ namespace Terminal.Gui {
 		ConsoleDriver consoleDriver;
 		volatile ConsoleKeyInfo [] cki = null;
 		static volatile bool isEscSeq;
-		int lastWindowHeight;
 		bool stopTasks;
 #if PROCESS_REQUEST
 		bool neededProcessRequest;
 #endif
-		public bool IsTerminalWithOptions { get; set; }
 		public EscSeqReqProc EscSeqReqProc { get; } = new EscSeqReqProc ();
 
 		public NetEvents (ConsoleDriver consoleDriver)
@@ -198,6 +196,9 @@ namespace Terminal.Gui {
 				} else if (consoleKeyInfo.KeyChar == (char)Key.Esc && isEscSeq) {
 					DecodeEscSeq (ref newConsoleKeyInfo, ref key, cki, ref mod);
 					cki = null;
+					if (!Console.KeyAvailable) {
+						isEscSeq = false;
+					}
 					break;
 				} else {
 					GetConsoleInputType (consoleKeyInfo);
@@ -222,56 +223,38 @@ namespace Terminal.Gui {
 		void WaitWinChange ()
 		{
 			while (true) {
-				// HACK: Sleep for 10ms to mitigate high CPU usage (see issue #1502). 10ms was tested to address the problem, but may not be correct.
-				Thread.Sleep (10);
+				// Wait for a while then check if screen has changed sizes
+				Task.Delay (500).Wait ();
+
 				if (stopTasks) {
 					return;
 				}
-				switch (IsTerminalWithOptions) {
-				case false:
-					int buffHeight, buffWidth;
-					if (((NetDriver)consoleDriver).IsWinPlatform) {
-						buffHeight = Math.Max (Console.BufferHeight, 0);
-						buffWidth = Math.Max (Console.BufferWidth, 0);
-					} else {
-						buffHeight = consoleDriver.Rows;
-						buffWidth = consoleDriver.Cols;
-					}
-					if (IsWinChanged (
-						Math.Max (Console.WindowHeight, 0),
-						Math.Max (Console.WindowWidth, 0),
-						buffHeight,
-						buffWidth)) {
+				int buffHeight, buffWidth;
+				if (((NetDriver)consoleDriver).IsWinPlatform) {
+					buffHeight = Math.Max (Console.BufferHeight, 0);
+					buffWidth = Math.Max (Console.BufferWidth, 0);
+				} else {
+					buffHeight = consoleDriver.Rows;
+					buffWidth = consoleDriver.Cols;
+				}
+				if (IsWinChanged (
+					Math.Max (Console.WindowHeight, 0),
+					Math.Max (Console.WindowWidth, 0),
+					buffHeight,
+					buffWidth)) {
 
-						return;
-					}
-					break;
-				case true:
-					//Request the size of the text area in characters.
-					EscSeqReqProc.Add ("t");
-					Console.Out.Write ("\x1b[18t");
-					break;
+					return;
 				}
 			}
 		}
 
 		bool IsWinChanged (int winHeight, int winWidth, int buffHeight, int buffWidth)
 		{
-			if (!consoleDriver.EnableConsoleScrolling) {
-				if (winWidth != consoleDriver.Cols || winHeight != consoleDriver.Rows) {
-					var w = Math.Max (winWidth, 0);
-					var h = Math.Max (winHeight, 0);
-					GetWindowSizeEvent (new Size (w, h));
-					return true;
-				}
-			} else {
-				if (winWidth != consoleDriver.Cols || winHeight != lastWindowHeight
-					|| buffWidth != consoleDriver.Cols || buffHeight != consoleDriver.Rows) {
-
-					lastWindowHeight = Math.Max (winHeight, 0);
-					GetWindowSizeEvent (new Size (winWidth, lastWindowHeight));
-					return true;
-				}
+			if (winWidth != consoleDriver.Cols || winHeight != consoleDriver.Rows) {
+				var w = Math.Max (winWidth, 0);
+				var h = Math.Max (winHeight, 0);
+				GetWindowSizeEvent (new Size (w, h));
+				return true;
 			}
 			return false;
 		}
@@ -461,36 +444,6 @@ namespace Terminal.Gui {
 					return;
 				}
 				break;
-			case "c":
-				try {
-					var parent = EscSeqUtils.GetParentProcess (Process.GetCurrentProcess ());
-					if (parent == null) { Debug.WriteLine ("Not supported!"); }
-				} catch (Exception ex) {
-					Debug.WriteLine (ex.Message);
-				}
-
-				if (c1Control == "CSI" && values.Length == 2
-					&& values [0] == "1" && values [1] == "0") {
-					// Reports CSI?1;0c ("VT101 with No Options")
-					IsTerminalWithOptions = false;
-				} else {
-					IsTerminalWithOptions = true;
-				}
-				break;
-			case "t":
-				switch (values [0]) {
-				case "8":
-					IsWinChanged (
-						Math.Max (int.Parse (values [1]), 0),
-						Math.Max (int.Parse (values [2]), 0),
-						Math.Max (int.Parse (values [1]), 0),
-						Math.Max (int.Parse (values [2]), 0));
-					break;
-				default:
-					SetRequestedEvent (c1Control, code, values, terminating);
-					break;
-				}
-				break;
 			default:
 				SetRequestedEvent (c1Control, code, values, terminating);
 				break;
@@ -620,19 +573,14 @@ namespace Terminal.Gui {
 		public override int Rows => rows;
 		public override int Left => left;
 		public override int Top => top;
+		[Obsolete ("This API is deprecated", false)]
 		public override bool EnableConsoleScrolling { get; set; }
-		[Obsolete ("This API is deprecated; use EnableConsoleScrolling instead.", false)]
-		public override bool HeightAsBuffer {
-			get => EnableConsoleScrolling;
-			set => EnableConsoleScrolling = value;
-		}
-
+		[Obsolete ("This API is deprecated", false)]
+		public override bool HeightAsBuffer { get; set; }
 		public NetWinVTConsole NetWinConsole { get; }
 		public bool IsWinPlatform { get; }
 		public override IClipboard Clipboard { get; }
 		public override int [,,] Contents => contents;
-
-		int largestBufferHeight;
 
 		public NetDriver ()
 		{
@@ -788,14 +736,8 @@ namespace Terminal.Gui {
 
 			Console.TreatControlCAsInput = true;
 
-			if (EnableConsoleScrolling) {
-				largestBufferHeight = Console.BufferHeight;
-			} else {
-				largestBufferHeight = Console.WindowHeight;
-			}
-
 			cols = Console.WindowWidth;
-			rows = largestBufferHeight;
+			rows = Console.WindowHeight; 
 
 			CurrentAttribute = MakeColor (Color.White, Color.Black);
 			InitalizeColorSchemes ();
@@ -811,54 +753,31 @@ namespace Terminal.Gui {
 
 		public override void ResizeScreen ()
 		{
-			if (!EnableConsoleScrolling) {
-				if (Console.WindowHeight > 0) {
-					// Not supported on Unix.
-					if (IsWinPlatform) {
-						// Can raise an exception while is still resizing.
-						try {
-#pragma warning disable CA1416
-							Console.CursorTop = 0;
-							Console.CursorLeft = 0;
-							Console.WindowTop = 0;
-							Console.WindowLeft = 0;
-							if (Console.WindowHeight > Rows) {
-								Console.SetWindowSize (Cols, Rows);
-							}
-							Console.SetBufferSize (Cols, Rows);
-#pragma warning restore CA1416
-						} catch (System.IO.IOException) {
-							setClip ();
-						} catch (ArgumentOutOfRangeException) {
-							setClip ();
-						}
-					} else {
-						Console.Out.Write ($"\x1b[8;{Rows};{Cols}t");
-					}
-				}
-			} else {
+			if (Console.WindowHeight > 0) {
+				// Not supported on Unix.
 				if (IsWinPlatform) {
-					if (Console.WindowHeight > 0) {
-						// Can raise an exception while is still resizing.
-						try {
+					// Can raise an exception while is still resizing.
+					try {
 #pragma warning disable CA1416
-							Console.CursorTop = 0;
-							Console.CursorLeft = 0;
-							if (Console.WindowHeight > Rows) {
-								Console.SetWindowSize (Cols, Rows);
-							}
-							Console.SetBufferSize (Cols, Rows);
-#pragma warning restore CA1416
-						} catch (System.IO.IOException) {
-							setClip ();
-						} catch (ArgumentOutOfRangeException) {
-							setClip ();
+						Console.CursorTop = 0;
+						Console.CursorLeft = 0;
+						Console.WindowTop = 0;
+						Console.WindowLeft = 0;
+						if (Console.WindowHeight > Rows) {
+							Console.SetWindowSize (Cols, Rows);
 						}
+						Console.SetBufferSize (Cols, Rows);
+#pragma warning restore CA1416
+					} catch (System.IO.IOException) {
+						setClip ();
+					} catch (ArgumentOutOfRangeException) {
+						setClip ();
 					}
 				} else {
-					Console.Out.Write ($"\x1b[30;{Rows};{Cols}t");
+					Console.Out.Write ($"\x1b[8;{Rows};{Cols}t");
 				}
 			}
+
 			setClip ();
 
 			void setClip ()
@@ -900,9 +819,7 @@ namespace Terminal.Gui {
 
 		public override void UpdateScreen ()
 		{
-			if (winChanging || Console.WindowHeight < 1 || contents.Length != Rows * Cols * 3
-				|| (!EnableConsoleScrolling && Rows != Console.WindowHeight)
-				|| (EnableConsoleScrolling && Rows != largestBufferHeight)) {
+			if (winChanging || Console.WindowHeight < 1 || contents.Length != Rows * Cols * 3 || Rows != Console.WindowHeight) {
 				return;
 			}
 
@@ -1057,23 +974,6 @@ namespace Terminal.Gui {
 
 		private void SetWindowPosition (int col, int row)
 		{
-			if (IsWinPlatform && EnableConsoleScrolling) {
-				var winTop = Math.Max (Rows - Console.WindowHeight - row, 0);
-				winTop = Math.Min (winTop, Rows - Console.WindowHeight + 1);
-				winTop = Math.Max (winTop, 0);
-				if (winTop != Console.WindowTop) {
-					try {
-						if (!EnsureBufferSize ()) {
-							return;
-						}
-#pragma warning disable CA1416
-						Console.SetWindowPosition (col, winTop);
-#pragma warning restore CA1416
-					} catch (System.IO.IOException) {
-
-					} catch (System.ArgumentOutOfRangeException) { }
-				}
-			}
 			top = Console.WindowTop;
 			left = Console.WindowLeft;
 		}
@@ -1282,10 +1182,6 @@ namespace Terminal.Gui {
 
 			// Note: Net doesn't support keydown/up events and thus any passed keyDown/UpHandlers will be simulated to be called.
 			mLoop.ProcessInput = (e) => ProcessInput (e);
-
-			// Check if terminal supports requests
-			this.mainLoop.netEvents.EscSeqReqProc.Add ("c");
-			Console.Out.Write ("\x1b[0c");
 		}
 
 		void ProcessInput (NetEvents.InputResult inputEvent)
@@ -1327,15 +1223,10 @@ namespace Terminal.Gui {
 		void ChangeWin (Size size)
 		{
 			winChanging = true;
-			if (!EnableConsoleScrolling) {
-				largestBufferHeight = Math.Max (size.Height, 0);
-			} else {
-				largestBufferHeight = Math.Max (size.Height, largestBufferHeight);
-			}
 			top = 0;
 			left = 0;
 			cols = size.Width;
-			rows = largestBufferHeight;
+			rows = Math.Max (size.Height, 0); 
 			ResizeScreen ();
 			UpdateOffScreen ();
 			winChanging = false;

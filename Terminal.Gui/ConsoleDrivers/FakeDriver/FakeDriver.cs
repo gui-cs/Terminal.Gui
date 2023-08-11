@@ -45,12 +45,10 @@ namespace Terminal.Gui {
 		// Only handling left here because not all terminals has a horizontal scroll bar.
 		public override int Left => 0;
 		public override int Top => 0;
+		[Obsolete ("This API is deprecated", false)]
 		public override bool EnableConsoleScrolling { get; set; }
-		[Obsolete ("This API is deprecated; use EnableConsoleScrolling instead.", false)]
-		public override bool HeightAsBuffer {
-			get => EnableConsoleScrolling;
-			set => EnableConsoleScrolling = value;
-		}
+		[Obsolete ("This API is deprecated", false)]
+		public override bool HeightAsBuffer { get; set; }
 		private IClipboard clipboard = null;
 		public override IClipboard Clipboard => clipboard;
 
@@ -537,31 +535,24 @@ namespace Terminal.Gui {
 			FakeConsole.SetBufferSize (width, height);
 			cols = width;
 			rows = height;
-			if (!EnableConsoleScrolling) {
-				SetWindowSize (width, height);
-			}
+			SetWindowSize (width, height);
 			ProcessResize ();
 		}
 
 		public void SetWindowSize (int width, int height)
 		{
 			FakeConsole.SetWindowSize (width, height);
-			if (!EnableConsoleScrolling) {
-				if (width != cols || height != rows) {
-					SetBufferSize (width, height);
-					cols = width;
-					rows = height;
-				}
+			if (width != cols || height != rows) {
+				SetBufferSize (width, height);
+				cols = width;
+				rows = height;
 			}
 			ProcessResize ();
 		}
 
 		public void SetWindowPosition (int left, int top)
 		{
-			if (EnableConsoleScrolling) {
-				this.left = Math.Max (Math.Min (left, Cols - FakeConsole.WindowWidth), 0);
-				this.top = Math.Max (Math.Min (top, Rows - FakeConsole.WindowHeight), 0);
-			} else if (this.left > 0 || this.top > 0) {
+			if (this.left > 0 || this.top > 0) {
 				this.left = 0;
 				this.top = 0;
 			}
@@ -577,29 +568,18 @@ namespace Terminal.Gui {
 
 		public override void ResizeScreen ()
 		{
-			if (!EnableConsoleScrolling) {
-				if (FakeConsole.WindowHeight > 0) {
-					// Can raise an exception while is still resizing.
-					try {
-#pragma warning disable CA1416
-						FakeConsole.CursorTop = 0;
-						FakeConsole.CursorLeft = 0;
-						FakeConsole.WindowTop = 0;
-						FakeConsole.WindowLeft = 0;
-#pragma warning restore CA1416
-					} catch (System.IO.IOException) {
-						return;
-					} catch (ArgumentOutOfRangeException) {
-						return;
-					}
-				}
-			} else {
+			if (FakeConsole.WindowHeight > 0) {
+				// Can raise an exception while is still resizing.
 				try {
 #pragma warning disable CA1416
-					FakeConsole.WindowLeft = Math.Max (Math.Min (left, Cols - FakeConsole.WindowWidth), 0);
-					FakeConsole.WindowTop = Math.Max (Math.Min (top, Rows - FakeConsole.WindowHeight), 0);
+					FakeConsole.CursorTop = 0;
+					FakeConsole.CursorLeft = 0;
+					FakeConsole.WindowTop = 0;
+					FakeConsole.WindowLeft = 0;
 #pragma warning restore CA1416
-				} catch (Exception) {
+				} catch (System.IO.IOException) {
+					return;
+				} catch (ArgumentOutOfRangeException) {
 					return;
 				}
 			}

@@ -636,6 +636,81 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (sbv.OtherScrollBarView.Visible);
 		}
 
+		private class TextViewScrollBarView : ScrollBarView {
+			private TextView _textView;
+
+			public TextViewScrollBarView (TextView textView) : base (textView, true)
+			{
+				_textView = textView;
+
+				ChangedPosition += TextViewScrollBarView_ChangedPosition;
+				OtherScrollBarView.ChangedPosition += OtherScrollBarView_ChangedPosition;
+				VisibleChanged += TextViewScrollBarView_VisibleChanged;
+				OtherScrollBarView.VisibleChanged += OtherScrollBarView_VisibleChanged;
+				_textView.DrawContent += TextView_DrawContent;
+				Initialized += TextViewScrollBarView_Initialized;
+				OtherScrollBarView.Initialized += OtherScrollBarView_Initialized;
+			}
+
+			private void OtherScrollBarView_Initialized (object sender, EventArgs e)
+			{
+				OtherScrollBarView_VisibleChanged ();
+			}
+
+			private void TextViewScrollBarView_Initialized (object sender, EventArgs e)
+			{
+				TextViewScrollBarView_VisibleChanged ();
+			}
+
+			private void TextView_DrawContent (Rect obj)
+			{
+				Size = _textView.Lines;
+				Position = _textView.TopRow;
+				if (OtherScrollBarView != null) {
+					OtherScrollBarView.Size = _textView.Maxlength;
+					OtherScrollBarView.Position = _textView.LeftColumn;
+				}
+				LayoutSubviews ();
+				Refresh ();
+			}
+
+			private void OtherScrollBarView_VisibleChanged ()
+			{
+				if (OtherScrollBarView.Visible && _textView.BottomOffset == 0) {
+					_textView.BottomOffset = 1;
+				} else if (!OtherScrollBarView.Visible && _textView.BottomOffset == 1) {
+					_textView.BottomOffset = 0;
+				}
+			}
+
+			private void TextViewScrollBarView_VisibleChanged ()
+			{
+				if (Visible && _textView.RightOffset == 0) {
+					_textView.RightOffset = 1;
+				} else if (!Visible && _textView.RightOffset == 1) {
+					_textView.RightOffset = 0;
+				}
+			}
+
+			private void OtherScrollBarView_ChangedPosition ()
+			{
+				_textView.LeftColumn = OtherScrollBarView.Position;
+				if (_textView.LeftColumn != OtherScrollBarView.Position) {
+					OtherScrollBarView.Position = _textView.LeftColumn;
+				}
+				_textView.SetNeedsDisplay ();
+			}
+
+			private void TextViewScrollBarView_ChangedPosition ()
+			{
+				_textView.TopRow = Position;
+				if (_textView.TopRow != Position) {
+					Position = _textView.TopRow;
+				}
+				_textView.SetNeedsDisplay ();
+			}
+		}
+
 		[Fact, AutoInitShutdown]
 		public void Hosting_ShowBothScrollIndicator_Invisible ()
 		{
@@ -650,50 +725,8 @@ namespace Terminal.Gui.ViewTests {
 			};
 			win.Add (textView);
 
-			var scrollBar = new ScrollBarView (textView, true);
+			var scrollBar = new TextViewScrollBarView (textView);
 
-			scrollBar.ChangedPosition += () => {
-				textView.TopRow = scrollBar.Position;
-				if (textView.TopRow != scrollBar.Position) {
-					scrollBar.Position = textView.TopRow;
-				}
-				textView.SetNeedsDisplay ();
-			};
-
-			scrollBar.OtherScrollBarView.ChangedPosition += () => {
-				textView.LeftColumn = scrollBar.OtherScrollBarView.Position;
-				if (textView.LeftColumn != scrollBar.OtherScrollBarView.Position) {
-					scrollBar.OtherScrollBarView.Position = textView.LeftColumn;
-				}
-				textView.SetNeedsDisplay ();
-			};
-
-			scrollBar.VisibleChanged += () => {
-				if (scrollBar.Visible && textView.RightOffset == 0) {
-					textView.RightOffset = 1;
-				} else if (!scrollBar.Visible && textView.RightOffset == 1) {
-					textView.RightOffset = 0;
-				}
-			};
-
-			scrollBar.OtherScrollBarView.VisibleChanged += () => {
-				if (scrollBar.OtherScrollBarView.Visible && textView.BottomOffset == 0) {
-					textView.BottomOffset = 1;
-				} else if (!scrollBar.OtherScrollBarView.Visible && textView.BottomOffset == 1) {
-					textView.BottomOffset = 0;
-				}
-			};
-
-			textView.DrawContent += (e) => {
-				scrollBar.Size = textView.Lines;
-				scrollBar.Position = textView.TopRow;
-				if (scrollBar.OtherScrollBarView != null) {
-					scrollBar.OtherScrollBarView.Size = textView.Maxlength;
-					scrollBar.OtherScrollBarView.Position = textView.LeftColumn;
-				}
-				scrollBar.LayoutSubviews ();
-				scrollBar.Refresh ();
-			};
 			Application.Top.Add (win);
 
 			Application.Begin (Application.Top);
@@ -970,6 +1003,612 @@ This is a test
 			Assert.Equal (5, sbv.Size);
 			Assert.False (sbv.ShowScrollIndicator);
 			Assert.False (sbv.Visible);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ScrollBarView_Inside_TextView_Always_Scroll ()
+		{
+			var text = "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n1234567890\n";
+			var tv1 = new TextView () {
+				Id = "tv1",
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				Text = text
+			};
+			var f1 = new FrameView () {
+				Width = Dim.Fill (),
+				Height = Dim.Percent (70)
+			};
+			f1.Add (tv1);
+			var sBar1 = new TextViewScrollBarView (tv1);
+			var tv2 = new TextView () {
+				Id = "tv2",
+				Width = Dim.Fill (),
+				Height = Dim.Fill (),
+				Text = text,
+				ReadOnly = true
+			};
+			var f2 = new FrameView () {
+				Y = Pos.Bottom (f1),
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+			f2.Add (tv2);
+			var sBar2 = new TextViewScrollBarView (tv2);
+			var win = new Window () {
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
+			win.Add (f1, f2);
+
+			Application.Top.Add (win);
+
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (10, 20);
+
+			// sBar1
+			Assert.True (sBar1.Visible);
+			Assert.Equal (0, sBar1.Position);
+			Assert.Equal (0, tv1.TopRow);
+			Assert.False (sBar1.OtherScrollBarView.Visible);
+			Assert.Equal (0, sBar1.OtherScrollBarView.Position);
+			Assert.Equal (0, tv1.LeftColumn);
+			Assert.Equal (0, tv1.BottomOffset);
+			Assert.Equal (1, tv1.RightOffset);
+			Assert.Equal (new Point (0, 0), tv1.CursorPosition);
+
+			// sBar2
+			Assert.True (sBar2.Visible);
+			Assert.Equal (0, sBar2.Position);
+			Assert.Equal (0, tv2.TopRow);
+			Assert.False (sBar2.OtherScrollBarView.Visible);
+			Assert.Equal (0, sBar2.OtherScrollBarView.Position);
+			Assert.Equal (0, tv2.LeftColumn);
+			Assert.Equal (0, tv2.BottomOffset);
+			Assert.Equal (1, tv2.RightOffset);
+			Assert.Equal (new Point (0, 0), tv2.CursorPosition);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌────────┐
+│┌──────┐│
+││1    ▲││
+││2    ┬││
+││3    │││
+││4    │││
+││5    │││
+││6    │││
+││7    │││
+││8    ┴││
+││9    ░││
+││10   ▼││
+│└──────┘│
+│┌──────┐│
+││1    ▲││
+││2    ┬││
+││3    ┴││
+││4    ▼││
+│└──────┘│
+└────────┘", output);
+
+			Assert.True (sBar1.MouseEvent (new MouseEvent { X = 0, Y = 9, Flags = MouseFlags.Button1Pressed, View = sBar1 }));
+			Assert.True (sBar1.MouseEvent (new MouseEvent { X = 0, Y = 9, Flags = MouseFlags.Button1Released, View = sBar1 }));
+			Assert.True (sBar2.MouseEvent (new MouseEvent { X = 0, Y = 3, Flags = MouseFlags.Button1Pressed, View = sBar2 }));
+			Assert.True (sBar2.MouseEvent (new MouseEvent { X = 0, Y = 3, Flags = MouseFlags.Button1Released, View = sBar2 }));
+			win.Redraw (win.Bounds);
+			Application.MainLoop.MainIteration ();
+			win.Redraw (win.Bounds);
+
+			// sBar1
+			Assert.True (sBar1.Visible);
+			Assert.Equal (2, sBar1.Position);
+			Assert.Equal (2, tv1.TopRow);
+			Assert.True (sBar1.OtherScrollBarView.Visible);
+			Assert.Equal (0, sBar1.OtherScrollBarView.Position);
+			Assert.Equal (0, tv1.LeftColumn);
+			Assert.Equal (1, tv1.BottomOffset);
+			Assert.Equal (1, tv1.RightOffset);
+			Assert.Equal (new Point (0, 0), tv1.CursorPosition);
+
+			// sBar2
+			Assert.True (sBar2.Visible);
+			Assert.Equal (1, sBar2.Position);
+			Assert.Equal (1, tv2.TopRow);
+			Assert.False (sBar2.OtherScrollBarView.Visible);
+			Assert.Equal (0, sBar2.OtherScrollBarView.Position);
+			Assert.Equal (0, tv2.LeftColumn);
+			Assert.Equal (0, tv2.BottomOffset);
+			Assert.Equal (1, tv2.RightOffset);
+			Assert.Equal (new Point (0, 0), tv2.CursorPosition);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌────────┐
+│┌──────┐│
+││3    ▲││
+││4    ░││
+││5    ┬││
+││6    │││
+││7    │││
+││8    │││
+││9    │││
+││10   ┴││
+││12345▼││
+││◄├┤░► ││
+│└──────┘│
+│┌──────┐│
+││2    ▲││
+││3    ┬││
+││4    ┴││
+││5    ▼││
+│└──────┘│
+└────────┘", output);
+
+			Assert.True (sBar1.MouseEvent (new MouseEvent { X = 0, Y = 8, Flags = MouseFlags.Button1Pressed, View = sBar1 }));
+			Assert.True (sBar1.MouseEvent (new MouseEvent { X = 0, Y = 8, Flags = MouseFlags.Button1Released, View = sBar1 }));
+			Assert.True (sBar2.MouseEvent (new MouseEvent { X = 0, Y = 3, Flags = MouseFlags.Button1Pressed, View = sBar2 }));
+			Assert.True (sBar2.MouseEvent (new MouseEvent { X = 0, Y = 3, Flags = MouseFlags.Button1Released, View = sBar2 }));
+			win.Redraw (win.Bounds);
+			Application.MainLoop.MainIteration ();
+			win.Redraw (win.Bounds);
+
+			// sBar1
+			Assert.True (sBar1.Visible);
+			Assert.Equal (3, sBar1.Position);
+			Assert.Equal (3, tv1.TopRow);
+			Assert.True (sBar1.OtherScrollBarView.Visible);
+			Assert.Equal (0, sBar1.OtherScrollBarView.Position);
+			Assert.Equal (0, tv1.LeftColumn);
+			Assert.Equal (1, tv1.BottomOffset);
+			Assert.Equal (1, tv1.RightOffset);
+			Assert.Equal (new Point (0, 0), tv1.CursorPosition);
+
+			// sBar2
+			Assert.True (sBar2.Visible);
+			Assert.Equal (2, sBar2.Position);
+			Assert.Equal (2, tv2.TopRow);
+			Assert.False (sBar2.OtherScrollBarView.Visible);
+			Assert.Equal (0, sBar2.OtherScrollBarView.Position);
+			Assert.Equal (0, tv2.LeftColumn);
+			Assert.Equal (0, tv2.BottomOffset);
+			Assert.Equal (1, tv2.RightOffset);
+			Assert.Equal (new Point (0, 0), tv2.CursorPosition);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌────────┐
+│┌──────┐│
+││4    ▲││
+││5    ░││
+││6    ┬││
+││7    │││
+││8    │││
+││9    │││
+││10   │││
+││12345┴││
+││     ▼││
+││◄├┤░► ││
+│└──────┘│
+│┌──────┐│
+││3    ▲││
+││4    ┬││
+││5    ┴││
+││6    ▼││
+│└──────┘│
+└────────┘", output);
+
+			Assert.True (sBar1.OtherScrollBarView.MouseEvent (new MouseEvent { X = 4, Y = 0, Flags = MouseFlags.Button1Pressed, View = sBar1 }));
+			Assert.True (sBar1.OtherScrollBarView.MouseEvent (new MouseEvent { X = 4, Y = 0, Flags = MouseFlags.Button1Released, View = sBar1 }));
+			Assert.True (sBar2.MouseEvent (new MouseEvent { X = 0, Y = 3, Flags = MouseFlags.Button1Pressed, View = sBar2 }));
+			Assert.True (sBar2.MouseEvent (new MouseEvent { X = 0, Y = 3, Flags = MouseFlags.Button1Released, View = sBar2 }));
+			win.Redraw (win.Bounds);
+			Application.MainLoop.MainIteration ();
+			win.Redraw (win.Bounds);
+
+			// sBar1
+			Assert.True (sBar1.Visible);
+			Assert.Equal (3, sBar1.Position);
+			Assert.Equal (3, tv1.TopRow);
+			Assert.True (sBar1.OtherScrollBarView.Visible);
+			Assert.Equal (1, sBar1.OtherScrollBarView.Position);
+			Assert.Equal (1, tv1.LeftColumn);
+			Assert.Equal (1, tv1.BottomOffset);
+			Assert.Equal (1, tv1.RightOffset);
+			Assert.Equal (new Point (0, 0), tv1.CursorPosition);
+
+			// sBar2
+			Assert.True (sBar2.Visible);
+			Assert.Equal (3, sBar2.Position);
+			Assert.Equal (3, tv2.TopRow);
+			Assert.False (sBar2.OtherScrollBarView.Visible);
+			Assert.Equal (0, sBar2.OtherScrollBarView.Position);
+			Assert.Equal (0, tv2.LeftColumn);
+			Assert.Equal (0, tv2.BottomOffset);
+			Assert.Equal (1, tv2.RightOffset);
+			Assert.Equal (new Point (0, 0), tv2.CursorPosition);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌────────┐
+│┌──────┐│
+││     ▲││
+││     ░││
+││     ┬││
+││     │││
+││     │││
+││     │││
+││0    │││
+││23456┴││
+││     ▼││
+││◄├─┤► ││
+│└──────┘│
+│┌──────┐│
+││4    ▲││
+││5    ┬││
+││6    ┴││
+││7    ▼││
+│└──────┘│
+└────────┘", output);
+
+			Assert.True (sBar1.OtherScrollBarView.MouseEvent (new MouseEvent { X = 4, Y = 0, Flags = MouseFlags.Button1Pressed, View = sBar1 }));
+			Assert.True (sBar1.OtherScrollBarView.MouseEvent (new MouseEvent { X = 4, Y = 0, Flags = MouseFlags.Button1Released, View = sBar1 }));
+			Assert.True (sBar2.MouseEvent (new MouseEvent { X = 0, Y = 3, Flags = MouseFlags.Button1Pressed, View = sBar2 }));
+			Assert.True (sBar2.MouseEvent (new MouseEvent { X = 0, Y = 3, Flags = MouseFlags.Button1Released, View = sBar2 }));
+			win.Redraw (win.Bounds);
+			Application.MainLoop.MainIteration ();
+			win.Redraw (win.Bounds);
+
+			// sBar1
+			Assert.True (sBar1.Visible);
+			Assert.Equal (3, sBar1.Position);
+			Assert.Equal (3, tv1.TopRow);
+			Assert.True (sBar1.OtherScrollBarView.Visible);
+			Assert.Equal (2, sBar1.OtherScrollBarView.Position);
+			Assert.Equal (2, tv1.LeftColumn);
+			Assert.Equal (1, tv1.BottomOffset);
+			Assert.Equal (1, tv1.RightOffset);
+			Assert.Equal (new Point (0, 0), tv1.CursorPosition);
+
+			// sBar2
+			Assert.True (sBar2.Visible);
+			Assert.Equal (4, sBar2.Position);
+			Assert.Equal (4, tv2.TopRow);
+			Assert.False (sBar2.OtherScrollBarView.Visible);
+			Assert.Equal (0, sBar2.OtherScrollBarView.Position);
+			Assert.Equal (0, tv2.LeftColumn);
+			Assert.Equal (0, tv2.BottomOffset);
+			Assert.Equal (1, tv2.RightOffset);
+			Assert.Equal (new Point (0, 0), tv2.CursorPosition);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌────────┐
+│┌──────┐│
+││     ▲││
+││     ░││
+││     ┬││
+││     │││
+││     │││
+││     │││
+││     │││
+││34567┴││
+││     ▼││
+││◄├─┤► ││
+│└──────┘│
+│┌──────┐│
+││5    ▲││
+││6    ┬││
+││7    ┴││
+││8    ▼││
+│└──────┘│
+└────────┘", output);
+
+			Assert.True (sBar1.OtherScrollBarView.MouseEvent (new MouseEvent { X = 4, Y = 0, Flags = MouseFlags.Button1Pressed, View = sBar1 }));
+			Assert.True (sBar1.OtherScrollBarView.MouseEvent (new MouseEvent { X = 4, Y = 0, Flags = MouseFlags.Button1Released, View = sBar1 }));
+			Assert.True (sBar2.MouseEvent (new MouseEvent { X = 0, Y = 3, Flags = MouseFlags.Button1Pressed, View = sBar2 }));
+			Assert.True (sBar2.MouseEvent (new MouseEvent { X = 0, Y = 3, Flags = MouseFlags.Button1Released, View = sBar2 }));
+			win.Redraw (win.Bounds);
+			Application.MainLoop.MainIteration ();
+			win.Redraw (win.Bounds);
+
+			// sBar1
+			Assert.True (sBar1.Visible);
+			Assert.Equal (3, sBar1.Position);
+			Assert.Equal (3, tv1.TopRow);
+			Assert.True (sBar1.OtherScrollBarView.Visible);
+			Assert.Equal (3, sBar1.OtherScrollBarView.Position);
+			Assert.Equal (3, tv1.LeftColumn);
+			Assert.Equal (1, tv1.BottomOffset);
+			Assert.Equal (1, tv1.RightOffset);
+			Assert.Equal (new Point (0, 0), tv1.CursorPosition);
+
+			// sBar2
+			Assert.True (sBar2.Visible);
+			Assert.Equal (5, sBar2.Position);
+			Assert.Equal (5, tv2.TopRow);
+			Assert.False (sBar2.OtherScrollBarView.Visible);
+			Assert.Equal (0, sBar2.OtherScrollBarView.Position);
+			Assert.Equal (0, tv2.LeftColumn);
+			Assert.Equal (0, tv2.BottomOffset);
+			Assert.Equal (1, tv2.RightOffset);
+			Assert.Equal (new Point (0, 0), tv2.CursorPosition);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌────────┐
+│┌──────┐│
+││     ▲││
+││     ░││
+││     ┬││
+││     │││
+││     │││
+││     │││
+││     │││
+││45678┴││
+││     ▼││
+││◄├─┤► ││
+│└──────┘│
+│┌──────┐│
+││6    ▲││
+││7    ┬││
+││8    ┴││
+││9    ▼││
+│└──────┘│
+└────────┘", output);
+
+			Assert.True (sBar1.OtherScrollBarView.MouseEvent (new MouseEvent { X = 4, Y = 0, Flags = MouseFlags.Button1Pressed, View = sBar1 }));
+			Assert.True (sBar1.OtherScrollBarView.MouseEvent (new MouseEvent { X = 4, Y = 0, Flags = MouseFlags.Button1Released, View = sBar1 }));
+			Assert.True (sBar2.MouseEvent (new MouseEvent { X = 0, Y = 3, Flags = MouseFlags.Button1Pressed, View = sBar2 }));
+			Assert.True (sBar2.MouseEvent (new MouseEvent { X = 0, Y = 3, Flags = MouseFlags.Button1Released, View = sBar2 }));
+			win.Redraw (win.Bounds);
+			Application.MainLoop.MainIteration ();
+			win.Redraw (win.Bounds);
+
+			// sBar1
+			Assert.True (sBar1.Visible);
+			Assert.Equal (3, sBar1.Position);
+			Assert.Equal (3, tv1.TopRow);
+			Assert.True (sBar1.OtherScrollBarView.Visible);
+			Assert.Equal (4, sBar1.OtherScrollBarView.Position);
+			Assert.Equal (4, tv1.LeftColumn);
+			Assert.Equal (1, tv1.BottomOffset);
+			Assert.Equal (1, tv1.RightOffset);
+			Assert.Equal (new Point (0, 0), tv1.CursorPosition);
+
+			// sBar2
+			Assert.True (sBar2.Visible);
+			Assert.Equal (6, sBar2.Position);
+			Assert.Equal (6, tv2.TopRow);
+			Assert.False (sBar2.OtherScrollBarView.Visible);
+			Assert.Equal (0, sBar2.OtherScrollBarView.Position);
+			Assert.Equal (0, tv2.LeftColumn);
+			Assert.Equal (0, tv2.BottomOffset);
+			Assert.Equal (1, tv2.RightOffset);
+			Assert.Equal (new Point (0, 0), tv2.CursorPosition);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌────────┐
+│┌──────┐│
+││     ▲││
+││     ░││
+││     ┬││
+││     │││
+││     │││
+││     │││
+││     │││
+││56789┴││
+││     ▼││
+││◄░├┤► ││
+│└──────┘│
+│┌──────┐│
+││7    ▲││
+││8    ┬││
+││9    ┴││
+││10   ▼││
+│└──────┘│
+└────────┘", output);
+
+			Assert.True (sBar1.OtherScrollBarView.MouseEvent (new MouseEvent { X = 4, Y = 0, Flags = MouseFlags.Button1Pressed, View = sBar1 }));
+			Assert.True (sBar1.OtherScrollBarView.MouseEvent (new MouseEvent { X = 4, Y = 0, Flags = MouseFlags.Button1Released, View = sBar1 }));
+			Assert.True (sBar2.MouseEvent (new MouseEvent { X = 0, Y = 3, Flags = MouseFlags.Button1Pressed, View = sBar2 }));
+			Assert.True (sBar2.MouseEvent (new MouseEvent { X = 0, Y = 3, Flags = MouseFlags.Button1Released, View = sBar2 }));
+			win.Redraw (win.Bounds);
+			Application.MainLoop.MainIteration ();
+			win.Redraw (win.Bounds);
+
+			// sBar1
+			Assert.True (sBar1.Visible);
+			Assert.Equal (3, sBar1.Position);
+			Assert.Equal (3, tv1.TopRow);
+			Assert.True (sBar1.OtherScrollBarView.Visible);
+			Assert.Equal (5, sBar1.OtherScrollBarView.Position);
+			Assert.Equal (5, tv1.LeftColumn);
+			Assert.Equal (1, tv1.BottomOffset);
+			Assert.Equal (1, tv1.RightOffset);
+			Assert.Equal (new Point (0, 0), tv1.CursorPosition);
+
+			// sBar2
+			Assert.True (sBar2.Visible);
+			Assert.Equal (8, sBar2.Position);
+			Assert.Equal (8, tv2.TopRow);
+			Assert.True (sBar2.OtherScrollBarView.Visible);
+			Assert.Equal (0, sBar2.OtherScrollBarView.Position);
+			Assert.Equal (0, tv2.LeftColumn);
+			Assert.Equal (1, tv2.BottomOffset);
+			Assert.Equal (1, tv2.RightOffset);
+			Assert.Equal (new Point (0, 0), tv2.CursorPosition);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌────────┐
+│┌──────┐│
+││     ▲││
+││     ░││
+││     ┬││
+││     │││
+││     │││
+││     │││
+││     │││
+││67890┴││
+││     ▼││
+││◄░├┤► ││
+│└──────┘│
+│┌──────┐│
+││9    ▲││
+││10   ◊││
+││12345▼││
+││◄├┤░► ││
+│└──────┘│
+└────────┘", output);
+
+			Assert.True (sBar1.MouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed, View = sBar1 }));
+			Assert.True (sBar1.MouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Released, View = sBar1 }));
+			Assert.True (sBar2.MouseEvent (new MouseEvent { X = 0, Y = 2, Flags = MouseFlags.Button1Pressed, View = sBar2 }));
+			Assert.True (sBar2.MouseEvent (new MouseEvent { X = 0, Y = 2, Flags = MouseFlags.Button1Released, View = sBar2 }));
+			win.Redraw (win.Bounds);
+			Application.MainLoop.MainIteration ();
+			win.Redraw (win.Bounds);
+
+			// sBar1
+			Assert.True (sBar1.Visible);
+			Assert.Equal (2, sBar1.Position);
+			Assert.Equal (2, tv1.TopRow);
+			Assert.True (sBar1.OtherScrollBarView.Visible);
+			Assert.Equal (5, sBar1.OtherScrollBarView.Position);
+			Assert.Equal (5, tv1.LeftColumn);
+			Assert.Equal (1, tv1.BottomOffset);
+			Assert.Equal (1, tv1.RightOffset);
+			Assert.Equal (new Point (0, 0), tv1.CursorPosition);
+
+			// sBar2
+			Assert.True (sBar2.Visible);
+			Assert.Equal (9, sBar2.Position);
+			Assert.Equal (9, tv2.TopRow);
+			Assert.True (sBar2.OtherScrollBarView.Visible);
+			Assert.Equal (0, sBar2.OtherScrollBarView.Position);
+			Assert.Equal (0, tv2.LeftColumn);
+			Assert.Equal (1, tv2.BottomOffset);
+			Assert.Equal (1, tv2.RightOffset);
+			Assert.Equal (new Point (0, 0), tv2.CursorPosition);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌────────┐
+│┌──────┐│
+││     ▲││
+││     ░││
+││     ┬││
+││     │││
+││     │││
+││     │││
+││     │││
+││     ┴││
+││67890▼││
+││◄░├┤► ││
+│└──────┘│
+│┌──────┐│
+││10   ▲││
+││12345◊││
+││     ▼││
+││◄├┤░► ││
+│└──────┘│
+└────────┘", output);
+
+			Assert.True (sBar1.MouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed, View = sBar1 }));
+			Assert.True (sBar1.MouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Released, View = sBar1 }));
+			Assert.True (sBar2.OtherScrollBarView.MouseEvent (new MouseEvent { X = 4, Y = 0, Flags = MouseFlags.Button1Pressed, View = sBar2 }));
+			Assert.True (sBar2.OtherScrollBarView.MouseEvent (new MouseEvent { X = 4, Y = 0, Flags = MouseFlags.Button1Released, View = sBar2 }));
+			win.Redraw (win.Bounds);
+			Application.MainLoop.MainIteration ();
+			win.Redraw (win.Bounds);
+
+			// sBar1
+			Assert.True (sBar1.Visible);
+			Assert.Equal (1, sBar1.Position);
+			Assert.Equal (1, tv1.TopRow);
+			Assert.True (sBar1.OtherScrollBarView.Visible);
+			Assert.Equal (5, sBar1.OtherScrollBarView.Position);
+			Assert.Equal (5, tv1.LeftColumn);
+			Assert.Equal (1, tv1.BottomOffset);
+			Assert.Equal (1, tv1.RightOffset);
+			Assert.Equal (new Point (0, 0), tv1.CursorPosition);
+
+			// sBar2
+			Assert.True (sBar2.Visible);
+			Assert.Equal (9, sBar2.Position);
+			Assert.Equal (9, tv2.TopRow);
+			Assert.True (sBar2.OtherScrollBarView.Visible);
+			Assert.Equal (1, sBar2.OtherScrollBarView.Position);
+			Assert.Equal (1, tv2.LeftColumn);
+			Assert.Equal (1, tv2.BottomOffset);
+			Assert.Equal (1, tv2.RightOffset);
+			Assert.Equal (new Point (0, 0), tv2.CursorPosition);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌────────┐
+│┌──────┐│
+││     ▲││
+││     ┬││
+││     │││
+││     │││
+││     │││
+││     │││
+││     ┴││
+││     ░││
+││     ▼││
+││◄░├┤► ││
+│└──────┘│
+│┌──────┐│
+││0    ▲││
+││23456◊││
+││     ▼││
+││◄├─┤► ││
+│└──────┘│
+└────────┘", output);
+
+			Assert.True (sBar1.MouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed, View = sBar1 }));
+			Assert.True (sBar1.MouseEvent (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.Button1Released, View = sBar1 }));
+			Assert.True (sBar2.OtherScrollBarView.MouseEvent (new MouseEvent { X = 4, Y = 0, Flags = MouseFlags.Button1Pressed, View = sBar2 }));
+			Assert.True (sBar2.OtherScrollBarView.MouseEvent (new MouseEvent { X = 4, Y = 0, Flags = MouseFlags.Button1Released, View = sBar2 }));
+			win.Redraw (win.Bounds);
+			Application.MainLoop.MainIteration ();
+			win.Redraw (win.Bounds);
+
+			// sBar1
+			Assert.True (sBar1.Visible);
+			Assert.Equal (0, sBar1.Position);
+			Assert.Equal (0, tv1.TopRow);
+			Assert.False (sBar1.OtherScrollBarView.Visible);
+			Assert.Equal (0, sBar1.OtherScrollBarView.Position);
+			Assert.Equal (0, tv1.LeftColumn);
+			Assert.Equal (0, tv1.BottomOffset);
+			Assert.Equal (1, tv1.RightOffset);
+			Assert.Equal (new Point (0, 0), tv1.CursorPosition);
+
+			// sBar2
+			Assert.True (sBar2.Visible);
+			Assert.Equal (9, sBar2.Position);
+			Assert.Equal (9, tv2.TopRow);
+			Assert.True (sBar2.OtherScrollBarView.Visible);
+			Assert.Equal (2, sBar2.OtherScrollBarView.Position);
+			Assert.Equal (2, tv2.LeftColumn);
+			Assert.Equal (1, tv2.BottomOffset);
+			Assert.Equal (1, tv2.RightOffset);
+			Assert.Equal (new Point (0, 0), tv2.CursorPosition);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌────────┐
+│┌──────┐│
+││1    ▲││
+││2    ┬││
+││3    │││
+││4    │││
+││5    │││
+││6    │││
+││7    │││
+││8    ┴││
+││9    ░││
+││10   ▼││
+│└──────┘│
+│┌──────┐│
+││     ▲││
+││34567◊││
+││     ▼││
+││◄├─┤► ││
+│└──────┘│
+└────────┘", output);
 		}
 	}
 }
