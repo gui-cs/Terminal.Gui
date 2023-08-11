@@ -554,7 +554,7 @@ internal class NetDriver : ConsoleDriver {
 	const int COLOR_BRIGHT_CYAN = 96;
 	const int COLOR_BRIGHT_WHITE = 97;
 
-	public override bool SupportsTrueColor => Environment.OSVersion.Version.Build >= 14931;
+	public override bool SupportsTrueColor => true;// Environment.OSVersion.Version.Build >= 14931;
 
 	public NetWinVTConsole NetWinConsole { get; private set; }
 	public bool IsWinPlatform { get; private set; }
