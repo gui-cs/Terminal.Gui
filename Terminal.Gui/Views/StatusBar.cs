@@ -27,11 +27,13 @@ namespace Terminal.Gui {
 		/// <param name="shortcut">Shortcut to activate the <see cref="StatusItem"/>.</param>
 		/// <param name="title">Title for the <see cref="StatusItem"/>.</param>
 		/// <param name="action">Action to invoke when the <see cref="StatusItem"/> is activated.</param>
-		public StatusItem (Key shortcut, ustring title, Action action)
+		/// <param name="canExecute">Function to determine if the action can currently be executed.</param>
+		public StatusItem (Key shortcut, ustring title, Action action, Func<bool> canExecute = null)
 		{
 			Title = title ?? "";
 			Shortcut = shortcut;
 			Action = action;
+			CanExecute = canExecute;
 		}
 
 		/// <summary>
@@ -54,7 +56,22 @@ namespace Terminal.Gui {
 		/// Gets or sets the action to be invoked when the statusbar item is triggered
 		/// </summary>
 		/// <value>Action to invoke.</value>
-		public Action Action { get; }
+		public Action Action { get; set; }
+
+		/// <summary>
+		/// Gets or sets the action to be invoked to determine if the <see cref="StatusItem"/> can be triggered. 
+		/// If <see cref="CanExecute"/> returns <see langword="true"/> the status item will be enabled. Otherwise, it will be disabled.
+		/// </summary>
+		/// <value>Function to determine if the action is can be executed or not.</value>
+		public Func<bool> CanExecute { get; set; }
+
+		/// <summary>
+		/// Returns <see langword="true"/> if the status item is enabled. This method is a wrapper around <see cref="CanExecute"/>.
+		/// </summary>
+		public bool IsEnabled ()
+		{
+			return CanExecute == null ? true : CanExecute ();
+		}
 
 		/// <summary>
 		/// Gets or sets arbitrary data for the status item.
@@ -116,6 +133,17 @@ namespace Terminal.Gui {
 			return result;
 		}
 
+		Attribute DetermineColorSchemeFor (StatusItem item)
+		{
+			if (item != null) {
+				if (item.IsEnabled ()) {
+					return GetNormalColor ();
+				}
+				return ColorScheme.Disabled;
+			}
+			return GetNormalColor ();
+		}
+
 		///<inheritdoc/>
 		public override void Redraw (Rect bounds)
 		{
@@ -129,9 +157,12 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (scheme);
 			for (int i = 0; i < Items.Length; i++) {
 				var title = Items [i].Title.ToString ();
+				Driver.SetAttribute (DetermineColorSchemeFor (Items [i]));
 				for (int n = 0; n < Items [i].Title.RuneCount; n++) {
 					if (title [n] == '~') {
-						scheme = ToggleScheme (scheme);
+						if (Items [i].IsEnabled ()) {
+							scheme = ToggleScheme (scheme);
+						}
 						continue;
 					}
 					Driver.AddRune (title [n]);
@@ -149,7 +180,9 @@ namespace Terminal.Gui {
 		{
 			foreach (var item in Items) {
 				if (kb.Key == item.Shortcut) {
-					Run (item.Action);
+					if (item.IsEnabled ()) {
+						Run (item.Action);
+					}
 					return true;
 				}
 			}
@@ -165,7 +198,10 @@ namespace Terminal.Gui {
 			int pos = 1;
 			for (int i = 0; i < Items.Length; i++) {
 				if (me.X >= pos && me.X < pos + GetItemTitleLength (Items [i].Title)) {
-					Run (Items [i].Action);
+					var item = Items [i];
+					if (item.IsEnabled ()) {
+						Run (item.Action);
+					}
 					break;
 				}
 				pos += GetItemTitleLength (Items [i].Title) + 3;
