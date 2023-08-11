@@ -11,6 +11,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Management;
+using static Terminal.Gui.WindowsConsole;
+using static Unix.Terminal.Curses;
+using System.Drawing;
 
 namespace Terminal.Gui;
 
@@ -47,6 +50,7 @@ internal class WindowsConsole {
 			ReadFromConsoleOutput (size, coords, ref window);
 		}
 
+		bool result = false;
 		if (force16Colors) {
 			int i = 0;
 			CharInfo [] ci = new CharInfo [charInfoBuffer.Length];
@@ -56,7 +60,8 @@ internal class WindowsConsole {
 					Attributes = (ushort)info.Attribute.Value
 				};
 			}
-			return WriteConsoleOutput (_screenBuffer, ci, coords, new Coord () { X = window.Left, Y = window.Top }, ref window);
+
+			result = WriteConsoleOutput (_screenBuffer, ci, coords, new Coord () { X = window.Left, Y = window.Top }, ref window);
 		} else {
 
 			_stringBuilder.Clear ();
@@ -88,8 +93,17 @@ internal class WindowsConsole {
 
 			string s = _stringBuilder.ToString ();
 
-			return WriteConsole (_screenBuffer, s, (uint)(s.Length), out uint _, null);
+			result = WriteConsole (_screenBuffer, s, (uint)(s.Length), out uint _, null);
 		}
+
+		if (!result) {
+			var err = Marshal.GetLastWin32Error ();
+			if (err != 0) {
+				throw new System.ComponentModel.Win32Exception (err);
+			}
+		}
+
+		return result;
 	}
 
 	public void ReadFromConsoleOutput (Size size, Coord coords, ref SmallRect window)
@@ -771,17 +785,18 @@ internal class WindowsDriver : ConsoleDriver {
 			base.Force16Colors = value;
 			// BUGBUG: This is a hack until we fully support VirtualTerminalSequences
 			WinConsole = new WindowsConsole ();
+			Refresh ();
 		}
 	}
 
-	bool _isWindowsTerminal = false;
+	readonly bool _isWindowsTerminal = false;
 
 	public WindowsDriver ()
 	{
 		WinConsole = new WindowsConsole ();
 		Clipboard = new WindowsClipboard ();
 
-		_isWindowsTerminal = false;//Environment.GetEnvironmentVariable ("WT_SESSION") != null;
+		_isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") != null;
 
 	}
 
@@ -1422,7 +1437,14 @@ internal class WindowsDriver : ConsoleDriver {
 	{
 		TerminalResized = terminalResized;
 
+		
 		try {
+
+			var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
+			Cols = winSize.Width;
+			Rows = winSize.Height;
+			WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
+
 			// Needed for Windows Terminal
 			// ESC [ ? 1047 h  Save cursor position and activate xterm alternative buffer (no backscroll)
 			// ESC [ ? 1047 l  Restore cursor position and restore xterm working buffer (with backscroll)
@@ -1435,14 +1457,9 @@ internal class WindowsDriver : ConsoleDriver {
 			if (_isWindowsTerminal) {
 				Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
 			}
-
-			var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
-			Cols = winSize.Width;
-			Rows = winSize.Height;
-			WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
-
-		} catch (Win32Exception) {
+		} catch (Win32Exception e) {
 			// Likely running unit tests. Set WinConsole to null so we can test it elsewhere.
+			Debug.WriteLine ($"Likely running unit tests. Setting WinConsole to null so we can test it elsewhere. Exception: {e}");
 			WinConsole = null;
 		}
 
@@ -1524,7 +1541,19 @@ internal class WindowsDriver : ConsoleDriver {
 			}
 		}
 
-		WinConsole.WriteToConsole (new Size (Cols, Rows), _outputBuffer, bufferCoords, _damageRegion, Force16Colors);
+		_damageRegion = new WindowsConsole.SmallRect () {
+			Top = 0,
+			Left = 0,
+			Bottom = (short)Rows,
+			Right = (short)Cols
+		};
+
+		if (!WinConsole.WriteToConsole (new Size (Cols, Rows), _outputBuffer, bufferCoords, _damageRegion, Force16Colors)) {
+			var err = Marshal.GetLastWin32Error ();
+			if (err != 0) {
+				throw new System.ComponentModel.Win32Exception (err);
+			}
+		}
 		WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
 	}
 
