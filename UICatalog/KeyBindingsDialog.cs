@@ -123,8 +123,8 @@ namespace UICatalog {
 		public KeyBindingsDialog () : base()
 		{
 			Title = "Keybindings";
-			Height = 50;
-			Width = 10;
+			//Height = 50;
+			//Width = 10;
 			if (ViewTracker.Instance == null) {
 				ViewTracker.Initialize ();
 			}

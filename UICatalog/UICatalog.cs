@@ -247,6 +247,7 @@ namespace UICatalog {
 		public class UICatalogTopLevel : Toplevel {
 			public MenuItem? miUseSubMenusSingleFrame;
 			public MenuItem? miIsMenuBorderDisabled;
+			public MenuItem? miForce16Colors;
 			public MenuItem? miIsMouseDisabled;
 
 			public ListView CategoryList;
@@ -419,7 +420,7 @@ namespace UICatalog {
 				ConfigChanged ();
 
 				miIsMouseDisabled!.Checked = Application.IsMouseDisabled;
-				DriverName.Title = $"Driver: {Driver.GetVersionInfo()}";
+				DriverName.Title = $"Driver: {Driver.GetVersionInfo ()}";
 				OS.Title = $"OS: {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystem} {Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.OperatingSystemVersion}";
 
 				if (_selectedScenario != null) {
@@ -482,6 +483,8 @@ namespace UICatalog {
 				List<MenuItem []> menuItems = new List<MenuItem []> {
 					CreateDiagnosticFlagsMenuItems (),
 					new MenuItem [] { null! },
+					CreateForce16ColorItems (),
+					new MenuItem [] { null! },
 					CreateDisabledEnabledMouseItems (),
 					CreateDisabledEnabledMenuBorder (),
 					CreateDisabledEnableUseSubMenusSingleFrame (),
@@ -522,6 +525,24 @@ namespace UICatalog {
 					MenuBar.MenusBorderStyle = !(bool)miIsMenuBorderDisabled.Checked ? LineStyle.Single : LineStyle.None;
 				};
 				menuItems.Add (miIsMenuBorderDisabled);
+
+				return menuItems.ToArray ();
+			}
+
+
+			MenuItem [] CreateForce16ColorItems ()
+			{
+				List<MenuItem> menuItems = new List<MenuItem> ();
+				miForce16Colors = new MenuItem {
+					Title = "Force 16 _Colors"
+				};
+				miForce16Colors.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miForce16Colors!.Title!.Substring (10, 1) [0];
+				miForce16Colors.CheckType |= MenuItemCheckStyle.Checked;
+				miForce16Colors.Action += () => {
+					miForce16Colors.Checked = Application.Driver.Force16Colors = (bool)!miForce16Colors.Checked!;
+
+				};
+				menuItems.Add (miForce16Colors);
 
 				return menuItems.ToArray ();
 			}
