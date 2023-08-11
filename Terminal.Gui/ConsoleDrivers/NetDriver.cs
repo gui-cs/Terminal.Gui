@@ -1,12 +1,8 @@
 ﻿//
 // NetDriver.cs: The System.Console-based .NET driver, works on Windows and Unix, but is not particularly efficient.
 //
-// Authors:
-//   Miguel de Icaza (miguel@gnome.org)
-//
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -14,7 +10,7 @@ using System.Threading.Tasks;
 using System.Text;
 
 namespace Terminal.Gui;
-internal class NetWinVTConsole {
+class NetWinVTConsole {
 	IntPtr _inputHandle, _outputHandle, _errorHandle;
 	uint _originalInputConsoleMode, _originalOutputConsoleMode, _originalErrorConsoleMode;
 
