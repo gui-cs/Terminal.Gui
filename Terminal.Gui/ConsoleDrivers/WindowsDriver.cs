@@ -795,7 +795,10 @@ internal class WindowsDriver : ConsoleDriver {
 
 	public WindowsDriver ()
 	{
-		WinConsole = new WindowsConsole ();
+		if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
+			WinConsole = new WindowsConsole ();
+			// otherwise we're probably running in unite tests
+		}
 		Clipboard = new WindowsClipboard ();
 
 		_isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") != null;
