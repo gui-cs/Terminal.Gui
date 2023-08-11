@@ -369,6 +369,7 @@ public abstract class ConsoleDriver {
 		get => _force16Colors || !SupportsTrueColor;
 		set {
 			_force16Colors = (value || !SupportsTrueColor);
+			Refresh ();
 		}
 	}
 

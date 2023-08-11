@@ -247,8 +247,10 @@ internal class CursesDriver : ConsoleDriver {
 			}
 		}
 
-		Curses.move (Row, Col);
-		_window.wrefresh ();
+		if (_window != null) {
+			Curses.move (Row, Col);
+			_window.wrefresh ();
+		}
 	}
 
 	public Curses.Window _window;
