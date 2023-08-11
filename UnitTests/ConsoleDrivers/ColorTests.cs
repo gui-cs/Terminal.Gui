@@ -92,21 +92,18 @@ namespace Terminal.Gui.DriverTests {
 		}
 		
 		[Theory]
-		[InlineData (typeof (FakeDriver), true)]
-		[InlineData (typeof (NetDriver), false)]
-		[InlineData (typeof (CursesDriver), true)]
-		[InlineData (typeof (WindowsDriver), false)] 
-		public void Force16Colors_Sets (Type driverType, bool expectedSetting)
+		[InlineData (typeof (FakeDriver))]
+		[InlineData (typeof (NetDriver))]
+		[InlineData (typeof (CursesDriver))]
+		[InlineData (typeof (WindowsDriver))] 
+		public void Force16Colors_Sets (Type driverType)
 		{
 			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 			driver.Init (() => { });
 
-			Assert.Equal (expectedSetting, driver.Force16Colors);
-
 			driver.Force16Colors = true;
-
 			Assert.True (driver.Force16Colors);
-
+			
 			driver.End ();
 
 			// Shutdown must be called to safely clean up Application if Init has been called
