@@ -797,7 +797,7 @@ internal class WindowsDriver : ConsoleDriver {
 	{
 		if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
 			WinConsole = new WindowsConsole ();
-			// otherwise we're probably running in unite tests
+			// otherwise we're probably running in unit tests
 			Clipboard = new WindowsClipboard ();
 		} else {
 			Clipboard = new FakeDriver.FakeClipboard ();
