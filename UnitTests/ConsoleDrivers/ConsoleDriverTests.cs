@@ -14,6 +14,7 @@ namespace Terminal.Gui.DriverTests {
 
 		public ConsoleDriverTests (ITestOutputHelper output)
 		{
+			ConsoleDriver.RunningUnitTests = true;
 			this.output = output;
 		}
 

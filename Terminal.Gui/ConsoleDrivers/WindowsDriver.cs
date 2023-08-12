@@ -1563,7 +1563,7 @@ internal class WindowsDriver : ConsoleDriver {
 			Right = (short)Cols
 		};
 
-		if (WinConsole != null && !WinConsole.WriteToConsole (new Size (Cols, Rows), _outputBuffer, bufferCoords, _damageRegion, Force16Colors)) {
+		if (!RunningUnitTests && WinConsole != null && !WinConsole.WriteToConsole (new Size (Cols, Rows), _outputBuffer, bufferCoords, _damageRegion, Force16Colors)) {
 			var err = Marshal.GetLastWin32Error ();
 			if (err != 0) {
 				throw new System.ComponentModel.Win32Exception (err);
