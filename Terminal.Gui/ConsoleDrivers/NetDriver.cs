@@ -611,20 +611,22 @@ internal class NetDriver : ConsoleDriver {
 		TerminalResized = terminalResized;
 
 		try {
+			// In unit tests, this will throw
+			Console.TreatControlCAsInput = true;
+
+			Cols = Console.WindowWidth;
+			Rows = Console.WindowHeight;
+
 			//Enable alternative screen buffer.
 			Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
 
 			//Set cursor key to application.
 			Console.Out.Write (EscSeqUtils.CSI_HideCursor);
 
-			Console.TreatControlCAsInput = true;
-			Cols = Console.WindowWidth;
-			Rows = Console.WindowHeight;
 		} catch (IOException) {
 			// We are being run in an environment that does not support a console
 			// such as a unit test, or a pipe.
 			_runningUnitTests = true;
-			throw new InvalidProgramException ();
 			Cols = 80;
 			Rows = 24;
 		}
