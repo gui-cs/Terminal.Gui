@@ -5,18 +5,12 @@ using Xunit;
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.DriverTests {
-	public class ColorTests: IDisposable
-		{
+	public class ColorTests {
 		public ColorTests ()
 		{
 			ConsoleDriver.RunningUnitTests = true;
 		}
 		
-		public void Dispose ()
-		{
-			// ... clean up test data from the database ...
-		}
-
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
 		[InlineData (typeof (NetDriver))]
@@ -100,12 +94,12 @@ namespace Terminal.Gui.DriverTests {
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
 		}
-		
+
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
 		[InlineData (typeof (NetDriver))]
 		[InlineData (typeof (CursesDriver))]
-		[InlineData (typeof (WindowsDriver))] 
+		[InlineData (typeof (WindowsDriver))]
 		public void Force16Colors_Sets (Type driverType)
 		{
 			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
@@ -113,7 +107,7 @@ namespace Terminal.Gui.DriverTests {
 
 			driver.Force16Colors = true;
 			Assert.True (driver.Force16Colors);
-			
+
 			driver.End ();
 
 			// Shutdown must be called to safely clean up Application if Init has been called

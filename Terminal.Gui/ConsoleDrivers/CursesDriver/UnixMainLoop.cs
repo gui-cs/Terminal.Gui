@@ -98,6 +98,10 @@ namespace Terminal.Gui {
 		void IMainLoopDriver.Setup (MainLoop mainLoop)
 		{
 			this.mainLoop = mainLoop;
+			if (ConsoleDriver.RunningUnitTests) {
+				return;
+			}
+			
 			try {
 				pipe (wakeupPipes);
 				AddWatch (wakeupPipes [1], Condition.PollIn, ml => {
