@@ -777,7 +777,7 @@ internal class WindowsDriver : ConsoleDriver {
 
 	public WindowsConsole WinConsole { get; private set; }
 
-	public override bool SupportsTrueColor => _isWindowsTerminal && Environment.OSVersion.Version.Build >= 14931;
+	public override bool SupportsTrueColor => _runningUnitTests || (_isWindowsTerminal && Environment.OSVersion.Version.Build >= 14931);
 
 	public override bool Force16Colors {
 		get => base.Force16Colors;
@@ -1452,7 +1452,11 @@ internal class WindowsDriver : ConsoleDriver {
 	public override void Init (Action terminalResized)
 	{
 		TerminalResized = terminalResized;
-		
+
+		if (Environment.OSVersion.Platform == PlatformID.Unix) {
+			_runningUnitTests = true;
+			return;
+		}
 		try {
 			if (WinConsole != null) {
 				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
@@ -1708,7 +1712,7 @@ internal class WindowsDriver : ConsoleDriver {
 		WinConsole?.Cleanup ();
 		WinConsole = null;
 
-		if (_isWindowsTerminal) {
+		if (!_runningUnitTests && _isWindowsTerminal) {
 			// Disable alternative screen buffer.
 			Console.Out.Write (EscSeqUtils.CSI_RestoreAltBufferWithBackscroll);
 		}
@@ -1720,45 +1724,6 @@ internal class WindowsDriver : ConsoleDriver {
 		throw new NotImplementedException ();
 	}
 	#endregion
-
-	static string GetParentProcessName ()
-	{
-#pragma warning disable CA1416 // Validate platform compatibility
-		var myId = Process.GetCurrentProcess ().Id;
-		var query = string.Format ($"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {myId}");
-		var search = new ManagementObjectSearcher ("root\\CIMV2", query);
-		var queryObj = search.Get ().OfType<ManagementBaseObject> ().FirstOrDefault ();
-		if (queryObj == null) {
-			return null;
-		}
-		var parentId = (uint)queryObj ["ParentProcessId"];
-		var parent = Process.GetProcessById ((int)parentId);
-		var prevParent = parent;
-
-		// Check if the parent is from other parent
-		while (queryObj != null) {
-			query = string.Format ($"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {parentId}");
-			search = new ManagementObjectSearcher ("root\\CIMV2", query);
-			queryObj = search.Get ().OfType<ManagementBaseObject> ().FirstOrDefault ();
-			if (queryObj == null) {
-				return parent.ProcessName;
-			}
-			parentId = (uint)queryObj ["ParentProcessId"];
-			try {
-				parent = Process.GetProcessById ((int)parentId);
-				if (string.Equals (parent.ProcessName, "explorer", StringComparison.InvariantCultureIgnoreCase)) {
-					return prevParent.ProcessName;
-				}
-				prevParent = parent;
-			} catch (ArgumentException) {
-
-				return prevParent.ProcessName;
-			}
-		}
-
-		return parent.ProcessName;
-#pragma warning restore CA1416 // Validate platform compatibility
-	}
 }
 
 /// <summary>
