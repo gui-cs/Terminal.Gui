@@ -5,7 +5,17 @@ using Xunit;
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.DriverTests {
-	public class ColorTests {
+	public class ColorTests: IDisposable
+		{
+		public ColorTests ()
+		{
+			ConsoleDriver.RunningUnitTests = true;
+		}
+		
+		public void Dispose ()
+		{
+			// ... clean up test data from the database ...
+		}
 
 		[Theory]
 		[InlineData (typeof (FakeDriver))]

@@ -86,13 +86,11 @@ namespace Terminal.Gui {
 		MainLoop mainLoop;
 		bool winChanged;
 
-		bool _runningUnitTests = false;
-
 		public Action WinChanged;
 
 		void IMainLoopDriver.Wakeup ()
 		{
-			if (!_runningUnitTests) {
+			if (!ConsoleDriver.RunningUnitTests) {
 				write (wakeupPipes [1], ignore, (IntPtr)1);
 			}
 		}
@@ -107,7 +105,7 @@ namespace Terminal.Gui {
 					return true;
 				});
 			} catch (DllNotFoundException e) {
-				_runningUnitTests = true;
+				throw new NotSupportedException ("liblibc not found", e);
 			}
 		}
 
@@ -119,7 +117,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public void RemoveWatch (object token)
 		{
-			if (!_runningUnitTests) {
+			if (!ConsoleDriver.RunningUnitTests) {
 				var watch = token as Watch;
 				if (watch == null)
 					return;
@@ -223,10 +221,6 @@ namespace Terminal.Gui {
 						descriptorWatchers.Remove (p.fd);
 				}
 			}
-		}
-		public void TearDown ()
-		{
-			//throw new NotImplementedException ();
 		}
 	}
 }
