@@ -624,6 +624,7 @@ internal class NetDriver : ConsoleDriver {
 			// We are being run in an environment that does not support a console
 			// such as a unit test, or a pipe.
 			_runningUnitTests = true;
+			throw new InvalidProgramException ();
 			Cols = 80;
 			Rows = 24;
 		}
