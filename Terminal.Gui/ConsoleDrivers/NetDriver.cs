@@ -3,6 +3,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -554,7 +555,7 @@ internal class NetDriver : ConsoleDriver {
 	const int COLOR_BRIGHT_CYAN = 96;
 	const int COLOR_BRIGHT_WHITE = 97;
 
-	public override bool SupportsTrueColor => true;// Environment.OSVersion.Version.Build >= 14931;
+	public override bool SupportsTrueColor => Environment.OSVersion.Platform == PlatformID.Unix || (IsWinPlatform && Environment.OSVersion.Version.Build >= 14931);
 
 	public NetWinVTConsole NetWinConsole { get; private set; }
 	public bool IsWinPlatform { get; private set; }
@@ -617,6 +618,7 @@ internal class NetDriver : ConsoleDriver {
 			Rows = Console.WindowHeight;
 		} else {
 			// Simluate
+			throw new InvalidOperationException ("blah");
 			Cols = 80;
 			Rows = 25;
 		}

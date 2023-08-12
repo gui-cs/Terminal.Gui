@@ -657,16 +657,12 @@ internal class CursesDriver : ConsoleDriver {
 
 			Curses.StartColor ();
 			Curses.UseDefaultColors ();
-			Curses.CheckWinChange ();
 		}
 
 		CurrentAttribute = MakeColor (Color.White, Color.Black);
 		InitializeColorSchemes ();
 
-		ClearContents ();
-
 		TerminalResized = terminalResized;
-		StartReportingMouseMoves ();
 
 		if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
 			Clipboard = new MacOSXClipboard ();
@@ -679,7 +675,10 @@ internal class CursesDriver : ConsoleDriver {
 		}
 
 		if (_window != null) {
+			Curses.CheckWinChange ();
+			ClearContents ();
 			Curses.refresh ();
+			StartReportingMouseMoves ();
 		}
 	}
 
