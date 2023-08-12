@@ -14,7 +14,8 @@ namespace Terminal.Gui;
 /// This is the Curses driver for the gui.cs/Terminal framework.
 /// </summary>
 internal class CursesDriver : ConsoleDriver {
-	
+	bool _runningUnitTests = false;
+
 	public override int Cols => Curses.Cols;
 	public override int Rows => Curses.Lines;
 
@@ -28,6 +29,10 @@ internal class CursesDriver : ConsoleDriver {
 	public override void Move (int col, int row)
 	{
 		base.Move (col, row);
+
+		if (_runningUnitTests) {
+			return;
+		}
 
 		if (IsValidLocation (col, row)) {
 			Curses.move (row, col);
@@ -52,7 +57,7 @@ internal class CursesDriver : ConsoleDriver {
 
 	private void ProcessWinChange ()
 	{
-		if (Curses.CheckWinChange ()) {
+		if (!_runningUnitTests && Curses.CheckWinChange ()) {
 			ClearContents ();
 			TerminalResized?.Invoke ();
 		}
@@ -86,7 +91,7 @@ internal class CursesDriver : ConsoleDriver {
 	/// </remarks>
 	public override Attribute MakeColor (Color fore, Color back)
 	{
-		if (_window != null) {
+		if (!_runningUnitTests) {
 			return MakeColor (ColorToCursesColorNumber (fore), ColorToCursesColorNumber (back));
 		} else {
 			return new Attribute (
@@ -193,7 +198,7 @@ internal class CursesDriver : ConsoleDriver {
 	{
 		EnsureCursorVisibility ();
 
-		if (Col >= 0 && Col < Cols && Row >= 0 && Row < Rows) {
+		if (!_runningUnitTests && Col >= 0 && Col < Cols && Row >= 0 && Row < Rows) {
 			Curses.move (Row, Col);
 		}
 	}
@@ -203,7 +208,7 @@ internal class CursesDriver : ConsoleDriver {
 		StopReportingMouseMoves ();
 		SetCursorVisibility (CursorVisibility.Default);
 
-		if (_window == null) {
+		if (_runningUnitTests) {
 			return;
 		}
 		// throws away any typeahead that has been typed by
@@ -223,6 +228,10 @@ internal class CursesDriver : ConsoleDriver {
 
 			for (int col = 0; col < Cols; col++) {
 				if (Contents [row, col].IsDirty == false) {
+					continue;
+				}
+				if (_runningUnitTests) {
+					// In unit tests, we don't want to actually write to the screen.
 					continue;
 				}
 				Curses.attrset (Contents [row, col].Attribute.GetValueOrDefault ().Value);
@@ -247,7 +256,7 @@ internal class CursesDriver : ConsoleDriver {
 			}
 		}
 
-		if (_window != null) {
+		if (!_runningUnitTests) {
 			Curses.move (Row, Col);
 			_window.wrefresh ();
 		}
@@ -589,8 +598,10 @@ internal class CursesDriver : ConsoleDriver {
 
 	public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 	{
-		// Note: Curses doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
-		Curses.timeout (0);
+		if (!_runningUnitTests) {
+			// Note: Curses doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
+			Curses.timeout (0);
+		}
 		this._keyHandler = keyHandler;
 		this._keyDownHandler = keyDownHandler;
 		this._keyUpHandler = keyUpHandler;
@@ -608,19 +619,16 @@ internal class CursesDriver : ConsoleDriver {
 
 	public override void Init (Action terminalResized)
 	{
-		if (_window != null) {
-			return;
-		}
-
 		try {
 			_window = Curses.initscr ();
 			Curses.set_escdelay (10);
 		} catch (Exception e) {
 			_window = null;
+			_runningUnitTests = true;
 			Debug.WriteLine ($"Curses failed to initialize. Assuming Unit Tests. The exception is: {e.Message}");
 		}
 
-		if (_window != null) {
+		if (!_runningUnitTests) {
 			// Ensures that all procedures are performed at some previous closing.
 			Curses.doupdate ();
 
@@ -674,7 +682,7 @@ internal class CursesDriver : ConsoleDriver {
 			}
 		}
 
-		if (_window != null) {
+		if (!_runningUnitTests) {
 			Curses.CheckWinChange ();
 			ClearContents ();
 			Curses.refresh ();
@@ -699,20 +707,26 @@ internal class CursesDriver : ConsoleDriver {
 	public override void Suspend ()
 	{
 		StopReportingMouseMoves ();
-		Platform.Suspend ();
-		Curses.Window.Standard.redrawwin ();
-		Curses.refresh ();
+		if (!_runningUnitTests) {
+			Platform.Suspend ();
+			Curses.Window.Standard.redrawwin ();
+			Curses.refresh ();
+		}
 		StartReportingMouseMoves ();
 	}
 
 	public void StartReportingMouseMoves ()
 	{
-		Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
+		if (!_runningUnitTests) {
+			Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
+		}
 	}
 
 	public void StopReportingMouseMoves ()
 	{
-		Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
+		if (!_runningUnitTests) {
+			Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
+		}
 	}
 
 	/// <inheritdoc/>
@@ -735,7 +749,9 @@ internal class CursesDriver : ConsoleDriver {
 			return false;
 		}
 
-		Curses.curs_set (((int)visibility >> 16) & 0x000000FF);
+		if (!_runningUnitTests) {
+			Curses.curs_set (((int)visibility >> 16) & 0x000000FF);
+		}
 
 		if (visibility != CursorVisibility.Invisible) {
 			Console.Out.Write (EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF)));
