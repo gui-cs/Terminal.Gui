@@ -95,7 +95,7 @@ namespace Terminal.Gui.DriverTests {
 		[InlineData (typeof (FakeDriver))]
 		[InlineData (typeof (NetDriver))]
 		[InlineData (typeof (CursesDriver))]
-		//[InlineData (typeof (WindowsDriver))] 
+		[InlineData (typeof (WindowsDriver))] 
 		public void Force16Colors_Sets (Type driverType)
 		{
 			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
