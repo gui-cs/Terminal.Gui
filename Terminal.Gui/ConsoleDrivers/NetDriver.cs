@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -555,6 +556,8 @@ internal class NetDriver : ConsoleDriver {
 	const int COLOR_BRIGHT_CYAN = 96;
 	const int COLOR_BRIGHT_WHITE = 97;
 
+	bool _runningUnitTests = false;
+
 	public override bool SupportsTrueColor => Environment.OSVersion.Platform == PlatformID.Unix || (IsWinPlatform && Environment.OSVersion.Version.Build >= 14931);
 
 	public NetWinVTConsole NetWinConsole { get; private set; }
@@ -611,10 +614,17 @@ internal class NetDriver : ConsoleDriver {
 		//Set cursor key to application.
 		Console.Out.Write (EscSeqUtils.CSI_HideCursor);
 
-		Console.TreatControlCAsInput = true;
-
-		Cols = Console.WindowWidth;
-		Rows = Console.WindowHeight;
+		try {
+			Console.TreatControlCAsInput = true;
+			Cols = Console.WindowWidth;
+			Rows = Console.WindowHeight;
+		} catch (IOException) {
+			// We are being run in an environment that does not support a console
+			// such as a unit test, or a pipe.
+			_runningUnitTests = true;
+			Cols = 80;
+			Rows = 24;
+		}
 
 		ResizeScreen ();
 		ClearContents ();
@@ -626,12 +636,12 @@ internal class NetDriver : ConsoleDriver {
 
 	public virtual void ResizeScreen ()
 	{
-		if (Console.WindowHeight > 0) {
-			// Not supported on Unix.
-			if (IsWinPlatform) {
-				// Can raise an exception while is still resizing.
-				try {
+		// Not supported on Unix.
+		if (IsWinPlatform) {
+			// Can raise an exception while is still resizing.
+			try {
 #pragma warning disable CA1416
+				if (Console.WindowHeight > 0) {
 					Console.CursorTop = 0;
 					Console.CursorLeft = 0;
 					Console.WindowTop = 0;
@@ -640,16 +650,17 @@ internal class NetDriver : ConsoleDriver {
 						Console.SetWindowSize (Cols, Rows);
 					}
 					Console.SetBufferSize (Cols, Rows);
-#pragma warning restore CA1416
-				} catch (System.IO.IOException) {
-					Clip = new Rect (0, 0, Cols, Rows);
-				} catch (ArgumentOutOfRangeException) {
-					Clip = new Rect (0, 0, Cols, Rows);
 				}
-			} else {
-				Console.Out.Write (EscSeqUtils.CSI_SetTerminalWindowSize (Rows, Cols));
+#pragma warning restore CA1416
+			} catch (System.IO.IOException) {
+				Clip = new Rect (0, 0, Cols, Rows);
+			} catch (ArgumentOutOfRangeException) {
+				Clip = new Rect (0, 0, Cols, Rows);
 			}
+		} else {
+			Console.Out.Write (EscSeqUtils.CSI_SetTerminalWindowSize (Rows, Cols));
 		}
+
 
 		Clip = new Rect (0, 0, Cols, Rows);
 	}
@@ -662,7 +673,7 @@ internal class NetDriver : ConsoleDriver {
 
 	public override void UpdateScreen ()
 	{
-		if (_winSizeChanging || Console.WindowHeight < 1 || Contents.Length != Rows * Cols || Rows != Console.WindowHeight) {
+		if (_runningUnitTests || _winSizeChanging || Console.WindowHeight < 1 || Contents.Length != Rows * Cols || Rows != Console.WindowHeight) {
 			return;
 		}
 
@@ -853,7 +864,7 @@ internal class NetDriver : ConsoleDriver {
 	public override bool SetCursorVisibility (CursorVisibility visibility)
 	{
 		_cachedCursorVisibility = visibility;
-		var isVisible = Console.CursorVisible = visibility == CursorVisibility.Default;
+		var isVisible = _runningUnitTests ? visibility == CursorVisibility.Default : Console.CursorVisible = visibility == CursorVisibility.Default;
 		//Console.Out.Write (isVisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
 		return isVisible;
 	}
@@ -876,23 +887,15 @@ internal class NetDriver : ConsoleDriver {
 
 	void SetWindowPosition (int col, int row)
 	{
-		Top = Console.WindowTop;
-		Left = Console.WindowLeft;
-	}
-
-	private bool EnsureBufferSize ()
-	{
-#pragma warning disable CA1416
-		if (IsWinPlatform && Console.BufferHeight < Rows) {
-			try {
-				Console.SetBufferSize (Console.WindowWidth, Rows);
-			} catch (Exception) {
-				return false;
-			}
+		if (!_runningUnitTests) {
+			Top = Console.WindowTop;
+			Left = Console.WindowLeft;
+		} else {
+			Top = row;
+			Left = col;
 		}
-#pragma warning restore CA1416
-		return true;
 	}
+	
 	#endregion
 
 
