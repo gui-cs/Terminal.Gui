@@ -605,23 +605,16 @@ internal class NetDriver : ConsoleDriver {
 
 		TerminalResized = terminalResized;
 
-		if (NetWinConsole != null) {
-			//Enable alternative screen buffer.
-			Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+		//Enable alternative screen buffer.
+		Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
 
-			//Set cursor key to application.
-			Console.Out.Write (EscSeqUtils.CSI_HideCursor);
+		//Set cursor key to application.
+		Console.Out.Write (EscSeqUtils.CSI_HideCursor);
 
-			Console.TreatControlCAsInput = true;
+		Console.TreatControlCAsInput = true;
 
-			Cols = Console.WindowWidth;
-			Rows = Console.WindowHeight;
-		} else {
-			// Simluate
-			throw new InvalidOperationException ("blah");
-			Cols = 80;
-			Rows = 25;
-		}
+		Cols = Console.WindowWidth;
+		Rows = Console.WindowHeight;
 
 		ResizeScreen ();
 		ClearContents ();
@@ -633,10 +626,6 @@ internal class NetDriver : ConsoleDriver {
 
 	public virtual void ResizeScreen ()
 	{
-		if (NetWinConsole == null) {
-			return;
-		}
-
 		if (Console.WindowHeight > 0) {
 			// Not supported on Unix.
 			if (IsWinPlatform) {
@@ -673,9 +662,6 @@ internal class NetDriver : ConsoleDriver {
 
 	public override void UpdateScreen ()
 	{
-		if (NetWinConsole == null) {
-			return;
-		}
 		if (_winSizeChanging || Console.WindowHeight < 1 || Contents.Length != Rows * Cols || Rows != Console.WindowHeight) {
 			return;
 		}
@@ -867,9 +853,6 @@ internal class NetDriver : ConsoleDriver {
 	public override bool SetCursorVisibility (CursorVisibility visibility)
 	{
 		_cachedCursorVisibility = visibility;
-		if (NetWinConsole == null) {
-			return visibility == CursorVisibility.Default;
-		}
 		var isVisible = Console.CursorVisible = visibility == CursorVisibility.Default;
 		//Console.Out.Write (isVisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
 		return isVisible;
@@ -893,10 +876,8 @@ internal class NetDriver : ConsoleDriver {
 
 	void SetWindowPosition (int col, int row)
 	{
-		if (NetWinConsole != null) {
-			Top = Console.WindowTop;
-			Left = Console.WindowLeft;
-		}
+		Top = Console.WindowTop;
+		Left = Console.WindowLeft;
 	}
 
 	private bool EnsureBufferSize ()
