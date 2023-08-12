@@ -625,7 +625,7 @@ internal class CursesDriver : ConsoleDriver {
 		} catch (Exception e) {
 			_window = null;
 			_runningUnitTests = true;
-			Debug.WriteLine ($"Curses failed to initialize. Assuming Unit Tests. The exception is: {e.Message}");
+			throw new InvalidProgramException ($"Curses failed to initialize. Assuming Unit Tests. The exception is: {e.Message}");
 		}
 
 		if (!_runningUnitTests) {
