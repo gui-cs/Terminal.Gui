@@ -834,7 +834,7 @@ internal class WindowsDriver : ConsoleDriver {
 		Cols = e.Width;
 		Rows = e.Height;
 
-		if (WinConsole != null) {
+		if (!_runningUnitTests) {
 			var newSize = WinConsole.SetConsoleWindow (
 				(short)Math.Max (w, 16), (short)Math.Max (e.Height, 0));
 
@@ -1447,6 +1447,8 @@ internal class WindowsDriver : ConsoleDriver {
 		return base.IsRuneSupported (rune) && rune.IsBmp;
 	}
 
+	bool _runningUnitTests = false;
+	
 	public override void Init (Action terminalResized)
 	{
 		TerminalResized = terminalResized;
@@ -1472,7 +1474,9 @@ internal class WindowsDriver : ConsoleDriver {
 				Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
 			}
 		} catch (Win32Exception e) {
-			// Likely running unit tests. Set WinConsole to null so we can test it elsewhere.
+			// We are being run in an environment that does not support a console
+			// such as a unit test, or a pipe.
+			_runningUnitTests = true;
 			Debug.WriteLine ($"Likely running unit tests. Setting WinConsole to null so we can test it elsewhere. Exception: {e}");
 			WinConsole = null;
 		}

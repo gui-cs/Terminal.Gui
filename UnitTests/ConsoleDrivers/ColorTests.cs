@@ -16,7 +16,7 @@ namespace Terminal.Gui.DriverTests {
 		{
 			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
-//			driver.Init (() => { });
+
 			Assert.Equal (ConsoleColor.Gray, Console.ForegroundColor);
 			Assert.Equal (ConsoleColor.Black, Console.BackgroundColor);
 
