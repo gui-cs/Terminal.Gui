@@ -14,7 +14,6 @@ namespace Terminal.Gui;
 /// This is the Curses driver for the gui.cs/Terminal framework.
 /// </summary>
 internal class CursesDriver : ConsoleDriver {
-	bool _runningUnitTests = false;
 
 	public override int Cols => Curses.Cols;
 	public override int Rows => Curses.Lines;
@@ -30,7 +29,7 @@ internal class CursesDriver : ConsoleDriver {
 	{
 		base.Move (col, row);
 
-		if (_runningUnitTests) {
+		if (RunningUnitTests) {
 			return;
 		}
 
@@ -57,7 +56,7 @@ internal class CursesDriver : ConsoleDriver {
 
 	private void ProcessWinChange ()
 	{
-		if (!_runningUnitTests && Curses.CheckWinChange ()) {
+		if (!RunningUnitTests && Curses.CheckWinChange ()) {
 			ClearContents ();
 			TerminalResized?.Invoke ();
 		}
@@ -91,7 +90,7 @@ internal class CursesDriver : ConsoleDriver {
 	/// </remarks>
 	public override Attribute MakeColor (Color fore, Color back)
 	{
-		if (!_runningUnitTests) {
+		if (!RunningUnitTests) {
 			return MakeColor (ColorToCursesColorNumber (fore), ColorToCursesColorNumber (back));
 		} else {
 			return new Attribute (
@@ -198,7 +197,7 @@ internal class CursesDriver : ConsoleDriver {
 	{
 		EnsureCursorVisibility ();
 
-		if (!_runningUnitTests && Col >= 0 && Col < Cols && Row >= 0 && Row < Rows) {
+		if (!RunningUnitTests && Col >= 0 && Col < Cols && Row >= 0 && Row < Rows) {
 			Curses.move (Row, Col);
 		}
 	}
@@ -208,7 +207,7 @@ internal class CursesDriver : ConsoleDriver {
 		StopReportingMouseMoves ();
 		SetCursorVisibility (CursorVisibility.Default);
 
-		if (_runningUnitTests) {
+		if (RunningUnitTests) {
 			return;
 		}
 		// throws away any typeahead that has been typed by
@@ -230,7 +229,7 @@ internal class CursesDriver : ConsoleDriver {
 				if (Contents [row, col].IsDirty == false) {
 					continue;
 				}
-				if (_runningUnitTests) {
+				if (RunningUnitTests) {
 					// In unit tests, we don't want to actually write to the screen.
 					continue;
 				}
@@ -256,7 +255,7 @@ internal class CursesDriver : ConsoleDriver {
 			}
 		}
 
-		if (!_runningUnitTests) {
+		if (!RunningUnitTests) {
 			Curses.move (Row, Col);
 			_window.wrefresh ();
 		}
@@ -598,7 +597,7 @@ internal class CursesDriver : ConsoleDriver {
 
 	public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 	{
-		if (!_runningUnitTests) {
+		if (!RunningUnitTests) {
 			// Note: Curses doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
 			Curses.timeout (0);
 		}
@@ -619,16 +618,11 @@ internal class CursesDriver : ConsoleDriver {
 
 	public override void Init (Action terminalResized)
 	{
-		try {
+		if (!RunningUnitTests) {
+
 			_window = Curses.initscr ();
 			Curses.set_escdelay (10);
-		} catch (Exception e) {
-			_window = null;
-			_runningUnitTests = true;
-			throw new InvalidProgramException ($"Curses failed to initialize. Assuming Unit Tests. The exception is: {e.Message}");
-		}
 
-		if (!_runningUnitTests) {
 			// Ensures that all procedures are performed at some previous closing.
 			Curses.doupdate ();
 
@@ -682,11 +676,12 @@ internal class CursesDriver : ConsoleDriver {
 			}
 		}
 
-		if (!_runningUnitTests) {
+		ClearContents ();
+		StartReportingMouseMoves ();
+
+		if (!RunningUnitTests) {
 			Curses.CheckWinChange ();
-			ClearContents ();
 			Curses.refresh ();
-			StartReportingMouseMoves ();
 		}
 	}
 
@@ -707,7 +702,7 @@ internal class CursesDriver : ConsoleDriver {
 	public override void Suspend ()
 	{
 		StopReportingMouseMoves ();
-		if (!_runningUnitTests) {
+		if (!RunningUnitTests) {
 			Platform.Suspend ();
 			Curses.Window.Standard.redrawwin ();
 			Curses.refresh ();
@@ -717,14 +712,14 @@ internal class CursesDriver : ConsoleDriver {
 
 	public void StartReportingMouseMoves ()
 	{
-		if (!_runningUnitTests) {
+		if (!RunningUnitTests) {
 			Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
 		}
 	}
 
 	public void StopReportingMouseMoves ()
 	{
-		if (!_runningUnitTests) {
+		if (!RunningUnitTests) {
 			Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
 		}
 	}
@@ -749,7 +744,7 @@ internal class CursesDriver : ConsoleDriver {
 			return false;
 		}
 
-		if (!_runningUnitTests) {
+		if (!RunningUnitTests) {
 			Curses.curs_set (((int)visibility >> 16) & 0x000000FF);
 		}
 

@@ -22,6 +22,17 @@ namespace Terminal.Gui;
 /// </remarks>
 public abstract class ConsoleDriver {
 	/// <summary>
+	/// Set this to true in any unit tests that attempt to test drivers other than FakeDriver.
+	/// <code>
+	///  public ColorTests ()
+	///  {
+	///    ConsoleDriver.RunningUnitTests = true;
+	///  }
+	/// </code>
+	/// </summary>
+	internal static bool RunningUnitTests { get; set; }
+
+	/// <summary>
 	/// Prepare the driver and set the key and mouse events handlers.
 	/// </summary>
 	/// <param name="mainLoop">The main loop.</param>

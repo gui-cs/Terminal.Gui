@@ -556,8 +556,6 @@ internal class NetDriver : ConsoleDriver {
 	const int COLOR_BRIGHT_CYAN = 96;
 	const int COLOR_BRIGHT_WHITE = 97;
 
-	bool _runningUnitTests = false;
-
 	public override bool SupportsTrueColor => Environment.OSVersion.Platform == PlatformID.Unix || (IsWinPlatform && Environment.OSVersion.Version.Build >= 14931);
 
 	public NetWinVTConsole NetWinConsole { get; private set; }
@@ -573,7 +571,7 @@ internal class NetDriver : ConsoleDriver {
 
 		StopReportingMouseMoves ();
 
-		if (!_runningUnitTests) {
+		if (!RunningUnitTests) {
 			Console.ResetColor ();
 
 			//Disable alternative screen buffer.
@@ -581,8 +579,8 @@ internal class NetDriver : ConsoleDriver {
 
 			//Set cursor key to cursor.
 			Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
+			Console.Out.Close ();
 		}
-		Console.Out.Close ();
 	}
 
 	public override void Init (Action terminalResized)
@@ -610,10 +608,10 @@ internal class NetDriver : ConsoleDriver {
 
 		TerminalResized = terminalResized;
 
-		try {
-			// In unit tests, this will throw
-			Console.TreatControlCAsInput = true;
 
+		if (!RunningUnitTests) {
+			Console.TreatControlCAsInput = true;
+			
 			Cols = Console.WindowWidth;
 			Rows = Console.WindowHeight;
 
@@ -623,10 +621,9 @@ internal class NetDriver : ConsoleDriver {
 			//Set cursor key to application.
 			Console.Out.Write (EscSeqUtils.CSI_HideCursor);
 
-		} catch (IOException) {
+		} else {
 			// We are being run in an environment that does not support a console
 			// such as a unit test, or a pipe.
-			_runningUnitTests = true;
 			Cols = 80;
 			Rows = 24;
 		}
@@ -678,7 +675,7 @@ internal class NetDriver : ConsoleDriver {
 
 	public override void UpdateScreen ()
 	{
-		if (_runningUnitTests || _winSizeChanging || Console.WindowHeight < 1 || Contents.Length != Rows * Cols || Rows != Console.WindowHeight) {
+		if (RunningUnitTests || _winSizeChanging || Console.WindowHeight < 1 || Contents.Length != Rows * Cols || Rows != Console.WindowHeight) {
 			return;
 		}
 
@@ -869,7 +866,7 @@ internal class NetDriver : ConsoleDriver {
 	public override bool SetCursorVisibility (CursorVisibility visibility)
 	{
 		_cachedCursorVisibility = visibility;
-		var isVisible = _runningUnitTests ? visibility == CursorVisibility.Default : Console.CursorVisible = visibility == CursorVisibility.Default;
+		var isVisible = RunningUnitTests ? visibility == CursorVisibility.Default : Console.CursorVisible = visibility == CursorVisibility.Default;
 		//Console.Out.Write (isVisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
 		return isVisible;
 	}
@@ -892,7 +889,7 @@ internal class NetDriver : ConsoleDriver {
 
 	void SetWindowPosition (int col, int row)
 	{
-		if (!_runningUnitTests) {
+		if (!RunningUnitTests) {
 			Top = Console.WindowTop;
 			Left = Console.WindowLeft;
 		} else {
@@ -900,18 +897,22 @@ internal class NetDriver : ConsoleDriver {
 			Left = col;
 		}
 	}
-	
+
 	#endregion
 
 
 	public void StartReportingMouseMoves ()
 	{
-		Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
+		if (!RunningUnitTests) {
+			Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
+		}
 	}
 
 	public void StopReportingMouseMoves ()
 	{
-		Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
+		if (!RunningUnitTests) {
+			Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
+		}
 	}
 
 	ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)

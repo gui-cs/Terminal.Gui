@@ -777,7 +777,7 @@ internal class WindowsDriver : ConsoleDriver {
 
 	public WindowsConsole WinConsole { get; private set; }
 
-	public override bool SupportsTrueColor => _runningUnitTests || (_isWindowsTerminal && Environment.OSVersion.Version.Build >= 14931);
+	public override bool SupportsTrueColor => RunningUnitTests || (_isWindowsTerminal && Environment.OSVersion.Version.Build >= 14931);
 
 	public override bool Force16Colors {
 		get => base.Force16Colors;
@@ -834,7 +834,7 @@ internal class WindowsDriver : ConsoleDriver {
 		Cols = e.Width;
 		Rows = e.Height;
 
-		if (!_runningUnitTests) {
+		if (!RunningUnitTests) {
 			var newSize = WinConsole.SetConsoleWindow (
 				(short)Math.Max (w, 16), (short)Math.Max (e.Height, 0));
 
@@ -1447,16 +1447,14 @@ internal class WindowsDriver : ConsoleDriver {
 		return base.IsRuneSupported (rune) && rune.IsBmp;
 	}
 
-	bool _runningUnitTests = false;
-	
 	public override void Init (Action terminalResized)
 	{
 		TerminalResized = terminalResized;
 
-		if (Environment.OSVersion.Platform == PlatformID.Unix) {
-			_runningUnitTests = true;
+		if (RunningUnitTests) {
 			return;
 		}
+		
 		try {
 			if (WinConsole != null) {
 				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
@@ -1480,7 +1478,6 @@ internal class WindowsDriver : ConsoleDriver {
 		} catch (Win32Exception e) {
 			// We are being run in an environment that does not support a console
 			// such as a unit test, or a pipe.
-			_runningUnitTests = true;
 			Debug.WriteLine ($"Likely running unit tests. Setting WinConsole to null so we can test it elsewhere. Exception: {e}");
 			WinConsole = null;
 		}
@@ -1712,7 +1709,7 @@ internal class WindowsDriver : ConsoleDriver {
 		WinConsole?.Cleanup ();
 		WinConsole = null;
 
-		if (!_runningUnitTests && _isWindowsTerminal) {
+		if (!RunningUnitTests && _isWindowsTerminal) {
 			// Disable alternative screen buffer.
 			Console.Out.Write (EscSeqUtils.CSI_RestoreAltBufferWithBackscroll);
 		}
