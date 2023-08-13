@@ -29,7 +29,8 @@ namespace UICatalog.Scenarios {
 
 	public partial class ParentWindowClass {
 
-		private ChildWindowClass? _childWindow;
+		private ChildWindowClass _childWindow;
+
 		public ParentWindowClass ()
 		{
 			InitializeComponent ();
@@ -38,17 +39,59 @@ namespace UICatalog.Scenarios {
 			createChildMenuItem.Action = CreateChildWindow;
 			centerChildMenuItem.CanExecute = CanExecuteCenterChildWindow;
 			centerChildMenuItem.Action = CenterChildWindow;
-			hideChildMenuItem.CanExecute = CanExecuteHideChildWindow;
-			hideChildMenuItem.Action = HideChildWindow;
+			hideShowChildMenuItem.CanExecute = CanExecuteHideShowChildWindow;
+			hideShowChildMenuItem.Action = HideShowChildWindow;
+			borderChildMenuItem.CanExecute = CanExecuteCenterChildWindow;
+			borderChildMenuItem.Action = BorderToggleChildWindow;
+			parentMenu.Action = BorderToggleParentWindow;
 			// StatusBar
 			createChildStatusItem.CanExecute = CanExecuteCreateChildWindow;
 			createChildStatusItem.Action = CreateChildWindow;
 			centerChildStatusItem.CanExecute = CanExecuteCenterChildWindow;
 			centerChildStatusItem.Action = CenterChildWindow;
-			hideChildStatusItem.CanExecute = CanExecuteHideChildWindow;
-			hideChildStatusItem.Action = HideChildWindow;
+			hideShowChildStatusItem.CanExecute = CanExecuteHideShowChildWindow;
+			hideShowChildStatusItem.Action = HideShowChildWindow;
+			borderChildStatusItem.CanExecute = CanExecuteCenterChildWindow;
+			borderChildStatusItem.Action = BorderToggleChildWindow;
+			borderParentStatusItem.Action = BorderToggleParentWindow;
 
 			KeyPress += ParentWindowClass_KeyPress;
+		}
+
+		private void BorderToggleParentWindow ()
+		{
+			if (Border.BorderStyle == BorderStyle.None) {
+				Border.BorderStyle = BorderStyle.Single;
+				// MenuBar
+				parentMenu.Title = "Borderless _Parent";
+				// StatusBar
+				borderParentStatusItem.Title = "~CTRL-F1~ Borderless Parent";
+			} else {
+				Border.BorderStyle = BorderStyle.None;
+				Border.DrawMarginFrame = false;
+				// MenuBar
+				parentMenu.Title = "Border _Parent";
+				// StatusBar
+				borderParentStatusItem.Title = "~CTRL-F1~ Border Parent";
+			}
+		}
+
+		private void BorderToggleChildWindow ()
+		{
+			if (_childWindow.Border.BorderStyle == BorderStyle.None) {
+				_childWindow.Border.BorderStyle = BorderStyle.Single;
+				// MenuBar
+				borderChildMenuItem.Title = "_Borderless Child";
+				// StatusBar
+				borderChildStatusItem.Title = "~CTRL-F2~ Borderless Child";
+			} else {
+				_childWindow.Border.BorderStyle = BorderStyle.None;
+				_childWindow.Border.DrawMarginFrame = false;
+				// MenuBar
+				borderChildMenuItem.Title = "_Border Child";
+				// StatusBar
+				borderChildStatusItem.Title = "~CTRL-F2~ Border Child";
+			}
 		}
 
 		private void ParentWindowClass_KeyPress (KeyEventEventArgs obj)
@@ -82,22 +125,22 @@ namespace UICatalog.Scenarios {
 			_childWindow.SetNeedsDisplay ();
 		}
 
-		private bool CanExecuteHideChildWindow () => _childWindow != null;
+		private bool CanExecuteHideShowChildWindow () => _childWindow != null;
 
-		private void HideChildWindow ()
+		private void HideShowChildWindow ()
 		{
 			if (_childWindow.Visible) {
 				_childWindow.Visible = false;
 				// MenuBar
-				hideChildMenuItem.Title = "Un_Hide Child";
+				hideShowChildMenuItem.Title = "Un_Hide Child";
 				// StatusBar
-				hideChildStatusItem.Title = "~CTRL-F7~ UnHide Child";
+				hideShowChildStatusItem.Title = "~CTRL-F7~ UnHide Child";
 			} else {
 				_childWindow.Visible = true;
 				// MenuBar
-				hideChildMenuItem.Title = "_Hide Child";
+				hideShowChildMenuItem.Title = "_Hide Child";
 				// StatusBar
-				hideChildStatusItem.Title = "~CTRL-F7~ Hide Child";
+				hideShowChildStatusItem.Title = "~CTRL-F7~ Hide Child";
 			}
 		}
 	}
@@ -120,13 +163,18 @@ namespace UICatalog.Scenarios {
 
 		private Terminal.Gui.MenuItem createChildMenuItem;
 		private Terminal.Gui.MenuItem centerChildMenuItem;
-		private Terminal.Gui.MenuItem hideChildMenuItem;
+		private Terminal.Gui.MenuItem hideShowChildMenuItem;
+		private Terminal.Gui.MenuItem borderChildMenuItem;
+
+		private Terminal.Gui.MenuBarItem parentMenu;
 
 		private Terminal.Gui.StatusBar statusBar;
 
 		private Terminal.Gui.StatusItem createChildStatusItem;
 		private Terminal.Gui.StatusItem centerChildStatusItem;
-		private Terminal.Gui.StatusItem hideChildStatusItem;
+		private Terminal.Gui.StatusItem hideShowChildStatusItem;
+		private Terminal.Gui.StatusItem borderChildStatusItem;
+		private Terminal.Gui.StatusItem borderParentStatusItem;
 
 		private void InitializeComponent ()
 		{
@@ -151,21 +199,24 @@ namespace UICatalog.Scenarios {
 			this.menuBar.TextAlignment = Terminal.Gui.TextAlignment.Left;
 			this.childMenu = new Terminal.Gui.MenuBarItem ();
 			this.childMenu.Title = "Ch_ild";
+			this.parentMenu = new Terminal.Gui.MenuBarItem ();
+			this.parentMenu.Title = "Borderless _Parent";
+			this.menuBar.Menus = new Terminal.Gui.MenuBarItem [] {
+					this.childMenu, this.parentMenu};
 			this.createChildMenuItem = new Terminal.Gui.MenuItem ();
 			this.createChildMenuItem.Title = "_Create Child";
 			this.createChildMenuItem.Data = "createChildMenuItem";
-			this.menuBar.Menus = new Terminal.Gui.MenuBarItem [] {
-					this.childMenu};
 			this.centerChildMenuItem = new Terminal.Gui.MenuItem ();
 			this.centerChildMenuItem.Title = "C_enter Child";
 			this.centerChildMenuItem.Data = "centerChildMenuItem";
-			this.centerChildMenuItem.CanExecute = () => false;
-			this.hideChildMenuItem = new Terminal.Gui.MenuItem ();
-			this.hideChildMenuItem.Title = "_Hide Child";
-			this.hideChildMenuItem.Data = "hideChildMenuItem";
-			this.hideChildMenuItem.CanExecute = () => false;
+			this.hideShowChildMenuItem = new Terminal.Gui.MenuItem ();
+			this.hideShowChildMenuItem.Title = "_Hide Child";
+			this.hideShowChildMenuItem.Data = "hideChildMenuItem";
+			this.borderChildMenuItem = new Terminal.Gui.MenuItem ();
+			this.borderChildMenuItem.Title = "_Borderless Child";
+			this.borderChildMenuItem.Data = "borderChildMenuItem";
 			this.childMenu.Children = new Terminal.Gui.MenuItem [] {
-					this.createChildMenuItem, this.centerChildMenuItem, this.hideChildMenuItem};
+					this.createChildMenuItem, this.centerChildMenuItem, this.hideShowChildMenuItem, this.borderChildMenuItem};
 			this.Add (this.menuBar);
 			this.statusBar = new Terminal.Gui.StatusBar ();
 			this.statusBar.Width = Dim.Fill ();
@@ -178,10 +229,14 @@ namespace UICatalog.Scenarios {
 			this.createChildStatusItem.Data = "createChildStatusItem";
 			this.centerChildStatusItem = new Terminal.Gui.StatusItem (Key.F6 | Key.CtrlMask, "~CTRL-F6~ Center Child", null);
 			this.centerChildStatusItem.Data = "centerChildStatusItem";
-			this.hideChildStatusItem = new Terminal.Gui.StatusItem (Key.F7 | Key.CtrlMask, "~CTRL-F7~ Hide Child", null);
-			this.hideChildStatusItem.Data = "hideChildStatusItem";
+			this.hideShowChildStatusItem = new Terminal.Gui.StatusItem (Key.F7 | Key.CtrlMask, "~CTRL-F7~ Hide Child", null);
+			this.hideShowChildStatusItem.Data = "hideChildStatusItem";
+			this.borderChildStatusItem = new Terminal.Gui.StatusItem (Key.F2 | Key.CtrlMask, "~CTRL-F2~ Borderless Child", null);
+			this.borderChildStatusItem.Data = "borderChildStatusItem";
+			this.borderParentStatusItem = new Terminal.Gui.StatusItem (Key.F1 | Key.CtrlMask, "~CTRL-F1~ Borderless Parent", null);
+			this.borderParentStatusItem.Data = "borderParentStatusItem";
 			this.statusBar.Items = new StatusItem [] {
-					this.createChildStatusItem, this.centerChildStatusItem, this.hideChildStatusItem};
+					this.createChildStatusItem, this.centerChildStatusItem, this.hideShowChildStatusItem, this.borderChildStatusItem, this.borderParentStatusItem};
 			this.Add (statusBar);
 		}
 	}
@@ -223,6 +278,10 @@ namespace UICatalog.Scenarios {
 	public partial class ChildWindowClass : Terminal.Gui.Window {
 
 		private Terminal.Gui.Button button1;
+		private Terminal.Gui.Label Label1;
+		private Terminal.Gui.Label Label2;
+		private Terminal.Gui.Label Label3;
+		private Terminal.Gui.Label Label4;
 
 		private void InitializeComponent ()
 		{
@@ -230,6 +289,7 @@ namespace UICatalog.Scenarios {
 			this.Height = 16;
 			this.X = Pos.Center ();
 			this.Y = Pos.Center ();
+			this.ColorScheme = Colors.TopLevel;
 			this.Modal = false;
 			this.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
 			this.Border.BorderBrush = Terminal.Gui.Color.White;
@@ -242,7 +302,15 @@ namespace UICatalog.Scenarios {
 			this.button1.X = Pos.Center ();
 			this.button1.Y = Pos.Center ();
 			this.button1.Text = "Press Me";
-			this.Add (this.button1);
+			this.Label1 = new Terminal.Gui.Label ("TL");
+			this.Label2 = new Terminal.Gui.Label ("TR");
+			this.Label2.X = Pos.AnchorEnd (2);
+			this.Label3 = new Terminal.Gui.Label ("BL");
+			this.Label3.Y = Pos.AnchorEnd (1);
+			this.Label4 = new Terminal.Gui.Label ("BR");
+			this.Label4.X = Pos.AnchorEnd (2);
+			this.Label4.Y = Pos.AnchorEnd (1);
+			this.Add (this.button1, this.Label1, this.Label2, this.Label3, this.Label4);
 		}
 	}
 }
