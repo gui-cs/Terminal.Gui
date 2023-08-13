@@ -1228,6 +1228,7 @@ namespace Terminal.Gui {
 					isTopNeedsDisplay = IsTopNeedsDisplay (state.Toplevel);
 					if (isTopNeedsDisplay) {
 						Top.Redraw (Top.Bounds);
+						state.Toplevel.SetNeedsDisplay ();
 					}
 				} while (isTopNeedsDisplay);
 			} else {
