@@ -534,8 +534,24 @@ namespace Terminal.Gui {
 
 			var chain = toplevels.ToList ();
 			foreach (var topLevel in chain) {
-				if (topLevel.ProcessHotKey (ke))
+				if (topLevel.ProcessHotKey (ke)) {
+					if (MdiTop != null && MdiTop.MostFocused != null) {
+						var posX = MdiTop.MostFocused.Frame.X;
+						var posY = MdiTop.MostFocused.Frame.Y;
+						var view = FindDeepestView (Current, posX, posY, out int _, out int _);
+						if ((view == null || view == MdiTop || view.SuperView == MdiTop) && !Current.Modal && MdiTop != null
+							&& ke.Key != Key.Null && ke.Key != Key.Unknown) {
+
+							var top = FindDeepestTop (Top, posX, posY, out _, out _);
+							view = FindDeepestView (top, posX, posY, out _, out _);
+
+							if (view != null && view != Current) {
+								MoveCurrent ((Toplevel)top);
+							}
+						}
+					}
 					return;
+				}
 				if (topLevel.Modal)
 					break;
 			}
