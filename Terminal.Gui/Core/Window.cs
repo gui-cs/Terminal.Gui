@@ -298,6 +298,7 @@ namespace Terminal.Gui {
 					SetRelativeLayout (Application.Top.Frame);
 					if (Frame != savedFrame) {
 						Application.Top.SetNeedsDisplay ();
+						Redraw (Bounds);
 					}
 				}
 				LayoutSubviews ();
