@@ -669,15 +669,15 @@ internal class CursesDriver : ConsoleDriver {
 		if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
 			Clipboard = new FakeDriver.FakeClipboard ();
 		} else {
-		if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
-			Clipboard = new MacOSXClipboard ();
-		} else {
-			if (Is_WSL_Platform ()) {
-				Clipboard = new WSLClipboard ();
+			if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
+				Clipboard = new MacOSXClipboard ();
 			} else {
-				Clipboard = new CursesClipboard ();
+				if (Is_WSL_Platform ()) {
+					Clipboard = new WSLClipboard ();
+				} else {
+					Clipboard = new CursesClipboard ();
+				}
 			}
-		}
 		}
 
 		ClearContents ();
