@@ -294,10 +294,11 @@ namespace Terminal.Gui {
 				Clear ();
 				var savedFrame = Frame;
 				PositionToplevels ();
-				if (SuperView == null && this != Application.Top && LayoutStyle == LayoutStyle.Computed) {
+				if (Application.MdiTop != null && SuperView == null && this != Application.Top && LayoutStyle == LayoutStyle.Computed) {
 					SetRelativeLayout (Application.Top.Frame);
 					if (Frame != savedFrame) {
 						Application.Top.SetNeedsDisplay ();
+						Application.Top.Redraw (Application.Top.Bounds);
 						Redraw (Bounds);
 					}
 				}
