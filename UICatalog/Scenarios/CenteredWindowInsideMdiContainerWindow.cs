@@ -74,9 +74,6 @@ namespace UICatalog.Scenarios {
 				// StatusBar
 				borderParentStatusItem.Title = "~CTRL-F1~ Border Parent";
 			}
-			//SetChildNeedsDisplay ();
-			_childWindow.SetNeedsDisplay ();
-			SetNeedsDisplay ();
 		}
 
 		private void BorderToggleChildWindow ()
@@ -102,12 +99,10 @@ namespace UICatalog.Scenarios {
 			switch (obj.KeyEvent.Key) {
 			case Key.F8:
 				menuBar.Visible = !menuBar.Visible;
-				//_childWindow.SetNeedsDisplay ();
 				obj.Handled = true;
 				break;
 			case Key.F10:
 				statusBar.Visible = !statusBar.Visible;
-				//_childWindow.SetNeedsDisplay ();
 				obj.Handled = true;
 				break;
 			}
@@ -128,7 +123,6 @@ namespace UICatalog.Scenarios {
 		{
 			_childWindow.X = Pos.Center ();
 			_childWindow.Y = Pos.Center ();
-			_childWindow.SetNeedsDisplay ();
 		}
 
 		private bool CanExecuteHideShowChildWindow () => _childWindow != null;
