@@ -5,9 +5,7 @@ using NStack;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Management;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -1683,7 +1681,6 @@ namespace Terminal.Gui {
 
 		public override void End ()
 		{
-
 			WinConsole.Cleanup ();
 			WinConsole = null;
 
