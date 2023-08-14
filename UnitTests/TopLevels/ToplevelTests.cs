@@ -2554,5 +2554,93 @@ BL      BR";
 01331111111111111110
 00000000000000000000", attributes);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void MdiTop_Border_Redraw_MdiChild_With_Border_On_Position_Changed ()
+		{
+			var top = Top_With_MenuBar_And_StatusBar (false, true);
+			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels ();
+			Application.Begin (top);
+			var rs = Application.Begin (win);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (TopLeft_Top_With_Border_MenuBar_StatusBar_And_Window_With_Border, output);
+			var attributes = new Attribute [] {
+				// 0
+				Colors.Base.Normal,
+				// 1
+				Colors.Menu.Normal,
+				// 2
+				Colors.TopLevel.Normal,
+				// 3
+				Colors.Menu.HotNormal
+			};
+			TestHelpers.AssertDriverColorsAre (@"
+00000000000000000000
+01111111111111111110
+02222222222000000000
+02222222222000000000
+02222222222000000000
+02222222222000000000
+02222222222000000000
+02222222222000000000
+02222222222000000000
+02222222222000000000
+02222222222000000000
+02222222222000000000
+00000000000000000000
+00000000000000000000
+00000000000000000000
+00000000000000000000
+00000000000000000000
+00000000000000000000
+01331111111111111110
+00000000000000000000", attributes);
+
+			win.X = Pos.Center ();
+			win.Y = Pos.Center ();
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────┐
+│ File             │
+│                  │
+│                  │
+│                  │
+│    ┌────────┐    │
+│    │TL    TR│    │
+│    │        │    │
+│    │        │    │
+│    │        │    │
+│    │        │    │
+│    │        │    │
+│    │        │    │
+│    │BL    BR│    │
+│    └────────┘    │
+│                  │
+│                  │
+│                  │
+│ F2 File          │
+└──────────────────┘", output);
+			TestHelpers.AssertDriverColorsAre (@"
+00000000000000000000
+01111111111111111110
+00000000000000000000
+00000000000000000000
+00000000000000000000
+00000222222222200000
+00000222222222200000
+00000222222222200000
+00000222222222200000
+00000222222222200000
+00000222222222200000
+00000222222222200000
+00000222222222200000
+00000222222222200000
+00000222222222200000
+00000000000000000000
+00000000000000000000
+00000000000000000000
+01331111111111111110
+00000000000000000000", attributes);
+		}
 	}
 }
