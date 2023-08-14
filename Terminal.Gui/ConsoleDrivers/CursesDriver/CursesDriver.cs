@@ -666,6 +666,9 @@ internal class CursesDriver : ConsoleDriver {
 
 		TerminalResized = terminalResized;
 
+		if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
+			Clipboard = new FakeDriver.FakeClipboard ();
+		} else {
 		if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
 			Clipboard = new MacOSXClipboard ();
 		} else {
@@ -674,6 +677,7 @@ internal class CursesDriver : ConsoleDriver {
 			} else {
 				Clipboard = new CursesClipboard ();
 			}
+		}
 		}
 
 		ClearContents ();
