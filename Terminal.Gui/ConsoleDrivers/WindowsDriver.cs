@@ -711,6 +711,7 @@ namespace Terminal.Gui {
 		WindowsConsole.SmallRect damageRegion;
 		IClipboard clipboard;
 		int [,,] contents;
+		readonly bool isWindowsTerminal;
 
 		public override int Cols => cols;
 		public override int Rows => rows;
@@ -734,6 +735,8 @@ namespace Terminal.Gui {
 		{
 			WinConsole = new WindowsConsole ();
 			clipboard = new WindowsClipboard ();
+
+			isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") != null;
 		}
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
@@ -1422,45 +1425,6 @@ namespace Terminal.Gui {
 			return keyMod != Key.Null ? keyMod | key : key;
 		}
 
-		private static string GetParentProcessName ()
-		{
-#pragma warning disable CA1416 // Validate platform compatibility
-			var myId = Process.GetCurrentProcess ().Id;
-			var query = string.Format ($"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {myId}");
-			var search = new ManagementObjectSearcher ("root\\CIMV2", query);
-			var queryObj = search.Get ().OfType<ManagementBaseObject> ().FirstOrDefault ();
-			if (queryObj == null) {
-				return null;
-			}
-			var parentId = (uint)queryObj ["ParentProcessId"];
-			var parent = Process.GetProcessById ((int)parentId);
-			var prevParent = parent;
-
-			// Check if the parent is from other parent
-			while (queryObj != null) {
-				query = string.Format ($"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {parentId}");
-				search = new ManagementObjectSearcher ("root\\CIMV2", query);
-				queryObj = search.Get ().OfType<ManagementBaseObject> ().FirstOrDefault ();
-				if (queryObj == null) {
-					return parent.ProcessName;
-				}
-				parentId = (uint)queryObj ["ParentProcessId"];
-				try {
-					parent = Process.GetProcessById ((int)parentId);
-					if (string.Equals (parent.ProcessName, "explorer", StringComparison.InvariantCultureIgnoreCase)) {
-						return prevParent.ProcessName;
-					}
-					prevParent = parent;
-				} catch (ArgumentException) {
-
-					return prevParent.ProcessName;
-				}
-			}
-
-			return parent.ProcessName;
-#pragma warning restore CA1416 // Validate platform compatibility
-		}
-
 		public override void Init (Action terminalResized)
 		{
 			TerminalResized = terminalResized;
@@ -1475,7 +1439,7 @@ namespace Terminal.Gui {
 				// ESC [ ? 1049 l  Restore xterm working buffer (with backscroll)
 				// Per Issue #2264 using the alternative screen buffer is required for Windows Terminal to not 
 				// wipe out the backscroll buffer when the application exits.
-				if (string.Equals (GetParentProcessName (), "WindowsTerminal", StringComparison.InvariantCultureIgnoreCase)) {
+				if (isWindowsTerminal) {
 					Console.Out.Write ("\x1b[?1049h");
 				}
 
@@ -1724,7 +1688,7 @@ namespace Terminal.Gui {
 			WinConsole = null;
 
 			// Disable alternative screen buffer.
-			if (string.Equals (GetParentProcessName (), "WindowsTerminal", StringComparison.InvariantCultureIgnoreCase)) {
+			if (isWindowsTerminal) {
 				Console.Out.Write ("\x1b[?1049l");
 			}
 		}
