@@ -1016,12 +1016,31 @@ namespace Terminal.Gui.TopLevelTests {
 		[Fact, AutoInitShutdown]
 		public void OnEnter_OnLeave_Triggered_On_Application_Begin_End_With_More_Toplevels ()
 		{
+			var iterations = 0;
+			var steps = new int [5];
 			var isEnterTop = false;
 			var isLeaveTop = false;
 			var vt = new View ();
-			vt.Enter += (_) => isEnterTop = true;
-			vt.Leave += (_) => isLeaveTop = true;
 			var top = Application.Top;
+			var diag = new Dialog ();
+
+			vt.Enter += (e) => {
+				iterations++;
+				isEnterTop = true;
+				if (iterations == 1) {
+					steps [0] = iterations;
+					Assert.Null (e.View);
+				} else {
+					steps [4] = iterations;
+					Assert.Equal (diag, e.View);
+				}
+			};
+			vt.Leave += (e) => {
+				iterations++;
+				steps [1] = iterations;
+				isLeaveTop = true;
+				Assert.Equal (diag, e.View);
+			};
 			top.Add (vt);
 
 			Assert.False (vt.CanFocus);
@@ -1040,19 +1059,28 @@ namespace Terminal.Gui.TopLevelTests {
 			var isEnterDiag = false;
 			var isLeaveDiag = false;
 			var vd = new View ();
-			vd.Enter += (_) => isEnterDiag = true;
-			vd.Leave += (_) => isLeaveDiag = true;
-			var d = new Dialog ();
-			d.Add (vd);
+			vd.Enter += (e) => {
+				iterations++;
+				steps [2] = iterations;
+				isEnterDiag = true;
+				Assert.Null (e.View);
+			};
+			vd.Leave += (e) => {
+				iterations++;
+				steps [3] = iterations;
+				isLeaveDiag = true;
+				Assert.Equal (top, e.View);
+			};
+			diag.Add (vd);
 
 			Assert.False (vd.CanFocus);
-			exception = Record.Exception (() => d.OnEnter (d));
+			exception = Record.Exception (() => diag.OnEnter (diag));
 			Assert.Null (exception);
-			exception = Record.Exception (() => d.OnLeave (d));
+			exception = Record.Exception (() => diag.OnLeave (diag));
 			Assert.Null (exception);
 
 			vd.CanFocus = true;
-			var rs = Application.Begin (d);
+			var rs = Application.Begin (diag);
 
 			Assert.True (isEnterDiag);
 			Assert.False (isLeaveDiag);
@@ -1068,6 +1096,11 @@ namespace Terminal.Gui.TopLevelTests {
 			Assert.True (isEnterTop);
 			Assert.False (isLeaveTop);  // Leave event cannot be trigger because it v.Enter was performed and v is focused
 			Assert.True (vt.HasFocus);
+			Assert.Equal (1, steps [0]);
+			Assert.Equal (2, steps [1]);
+			Assert.Equal (3, steps [2]);
+			Assert.Equal (4, steps [3]);
+			Assert.Equal (5, steps [^1]);
 		}
 
 		[Fact, AutoInitShutdown]
