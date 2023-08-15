@@ -764,11 +764,25 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (view1.CanFocus);
 			Assert.True (view1.HasFocus);
 			Assert.True (view2.CanFocus);
-			Assert.False (view2.HasFocus);
+			Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
+
+			Assert.True (Application.Top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
+			Assert.True (view1.CanFocus);
+			Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
+			Assert.True (view2.CanFocus);
+			Assert.True (view2.HasFocus);
+
+			Assert.True (Application.Top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
+			Assert.True (view1.CanFocus);
+			Assert.True (view1.HasFocus);
+			Assert.True (view2.CanFocus);
+			Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
 			view1.CanFocus = false;
 			Assert.False (view1.CanFocus);
 			Assert.False (view1.HasFocus);
+			Assert.True (view2.CanFocus);
+			Assert.True (view2.HasFocus);
 			Assert.Equal (win2, Application.Current.Focused);
 			Assert.Equal (view2, Application.Current.MostFocused);
 		}
@@ -790,11 +804,26 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (view1.CanFocus);
 			Assert.True (view1.HasFocus);
 			Assert.True (view2.CanFocus);
-			Assert.False (view2.HasFocus);
+			Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
+
+			Assert.True (Application.Top.ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (Application.Top.ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (view1.CanFocus);
+			Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
+			Assert.True (view2.CanFocus);
+			Assert.True (view2.HasFocus);
+
+			Assert.True (Application.Top.ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (view1.CanFocus);
+			Assert.True (view1.HasFocus);
+			Assert.True (view2.CanFocus);
+			Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
 			view1.CanFocus = false;
 			Assert.False (view1.CanFocus);
 			Assert.False (view1.HasFocus);
+			Assert.True (view2.CanFocus);
+			Assert.False (view2.HasFocus);
 			Assert.Equal (win1, Application.Current.Focused);
 			Assert.Equal (view12, Application.Current.MostFocused);
 		}
@@ -815,13 +844,27 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (view1.CanFocus);
 			Assert.True (view1.HasFocus);
 			Assert.True (view2.CanFocus);
-			Assert.False (view2.HasFocus);
+			Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
+
+			Assert.True (Application.Top.ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (view1.CanFocus);
+			Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
+			Assert.True (view2.CanFocus);
+			Assert.True (view2.HasFocus);
+
+			Assert.True (Application.Top.ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (view1.CanFocus);
+			Assert.True (view1.HasFocus);
+			Assert.True (view2.CanFocus);
+			Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
 			win1.CanFocus = false;
 			Assert.False (view1.CanFocus);
 			Assert.False (view1.HasFocus);
 			Assert.False (win1.CanFocus);
 			Assert.False (win1.HasFocus);
+			Assert.True (view2.CanFocus);
+			Assert.True (view2.HasFocus);
 			Assert.Equal (win2, Application.Current.Focused);
 			Assert.Equal (view2, Application.Current.MostFocused);
 		}

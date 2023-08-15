@@ -832,7 +832,8 @@ namespace Terminal.Gui {
 					OverlappedTop.OnAllChildClosed ();
 				} else {
 					SetCurrentOverlappedAsTop ();
-					Current.OnEnter (Current);
+					runState.Toplevel.OnLeave (Current);
+					Current.OnEnter (runState.Toplevel);
 				}
 				Refresh ();
 			}
