@@ -284,7 +284,7 @@ namespace Terminal.Gui {
 			/// <inheritdoc/>
 			public override void OnCanFocusChanged ()
 			{
-				if (Border.Child != null) {
+				if (Border?.Child != null) {
 					Border.Child.CanFocus = CanFocus;
 				}
 				base.OnCanFocusChanged ();
