@@ -1009,7 +1009,8 @@ namespace Terminal.Gui.TopLevelTests {
 			Application.End (rs);
 
 			Assert.True (isEnter);
-			Assert.True (isLeave);  // Leave event is now also invoked on Application.End allowing preform same output action
+			Assert.False (isLeave);  // Leave event cannot be trigger because it v.Enter was performed and v is focused
+			Assert.True (v.HasFocus);
 		}
 
 		[Fact, AutoInitShutdown]

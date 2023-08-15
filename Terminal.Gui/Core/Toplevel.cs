@@ -570,9 +570,6 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Remove (View view)
 		{
-			if (InternalSubviews.Count < 1) {
-				CanFocus = false;
-			}
 			if (this is Toplevel toplevel && toplevel.MenuBar != null) {
 				RemoveMenuStatusBar (view);
 			}
