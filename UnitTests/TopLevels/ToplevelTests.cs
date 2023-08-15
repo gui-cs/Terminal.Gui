@@ -1014,6 +1014,63 @@ namespace Terminal.Gui.TopLevelTests {
 		}
 
 		[Fact, AutoInitShutdown]
+		public void OnEnter_OnLeave_Triggered_On_Application_Begin_End_With_More_Toplevels ()
+		{
+			var isEnterTop = false;
+			var isLeaveTop = false;
+			var vt = new View ();
+			vt.Enter += (_) => isEnterTop = true;
+			vt.Leave += (_) => isLeaveTop = true;
+			var top = Application.Top;
+			top.Add (vt);
+
+			Assert.False (vt.CanFocus);
+			var exception = Record.Exception (() => top.OnEnter (top));
+			Assert.Null (exception);
+			exception = Record.Exception (() => top.OnLeave (top));
+			Assert.Null (exception);
+
+			vt.CanFocus = true;
+			Application.Begin (top);
+
+			Assert.True (isEnterTop);
+			Assert.False (isLeaveTop);
+
+			isEnterTop = false;
+			var isEnterDiag = false;
+			var isLeaveDiag = false;
+			var vd = new View ();
+			vd.Enter += (_) => isEnterDiag = true;
+			vd.Leave += (_) => isLeaveDiag = true;
+			var d = new Dialog ();
+			d.Add (vd);
+
+			Assert.False (vd.CanFocus);
+			exception = Record.Exception (() => d.OnEnter (d));
+			Assert.Null (exception);
+			exception = Record.Exception (() => d.OnLeave (d));
+			Assert.Null (exception);
+
+			vd.CanFocus = true;
+			var rs = Application.Begin (d);
+
+			Assert.True (isEnterDiag);
+			Assert.False (isLeaveDiag);
+			Assert.False (isEnterTop);
+			Assert.True (isLeaveTop);
+
+			isEnterDiag = false;
+			isLeaveTop = false;
+			Application.End (rs);
+
+			Assert.False (isEnterDiag);
+			Assert.True (isLeaveDiag);
+			Assert.True (isEnterTop);
+			Assert.False (isLeaveTop);  // Leave event cannot be trigger because it v.Enter was performed and v is focused
+			Assert.True (vt.HasFocus);
+		}
+
+		[Fact, AutoInitShutdown]
 		public void PositionCursor_SetCursorVisibility_To_Invisible_If_Focused_Is_Null ()
 		{
 			var tf = new TextField ("test") { Width = 5 };
