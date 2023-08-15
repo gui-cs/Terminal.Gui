@@ -552,9 +552,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Add (View view)
 		{
-			if (!CanFocus) {
-				CanFocus = true;
-			}
+			CanFocus = true;
 			AddMenuStatusBar (view);
 			base.Add (view);
 		}
