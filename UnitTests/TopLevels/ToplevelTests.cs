@@ -1031,5 +1031,22 @@ namespace Terminal.Gui.TopLevelTests {
 			Application.Driver.GetCursorVisibility (out cursor);
 			Assert.Equal (CursorVisibility.Invisible, cursor);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void Activating_MenuBar_By_Alt_Key_Does_Not_Throw ()
+		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("Child", new MenuItem [] {
+					new MenuItem ("_Create Child", "", null)
+				})
+			});
+			var topChild = new Toplevel ();
+			topChild.Add (menu);
+			Application.Top.Add (topChild);
+			Application.Begin (Application.Top);
+
+			var exception = Record.Exception (() => topChild.ProcessHotKey (new KeyEvent (Key.AltMask, new KeyModifiers { Alt = true })));
+			Assert.Null (exception);
+		}
 	}
 }

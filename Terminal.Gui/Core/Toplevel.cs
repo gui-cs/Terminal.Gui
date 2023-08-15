@@ -552,6 +552,9 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Add (View view)
 		{
+			if (!CanFocus) {
+				CanFocus = true;
+			}
 			AddMenuStatusBar (view);
 			base.Add (view);
 		}
@@ -569,6 +572,9 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Remove (View view)
 		{
+			if (InternalSubviews.Count < 1) {
+				CanFocus = false;
+			}
 			if (this is Toplevel toplevel && toplevel.MenuBar != null) {
 				RemoveMenuStatusBar (view);
 			}
