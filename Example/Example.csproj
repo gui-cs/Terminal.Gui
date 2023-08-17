@@ -7,8 +7,8 @@
     <!-- Do not modify these. -->
     <AssemblyVersion>1.14.0.0</AssemblyVersion>
     <FileVersion>1.14.0.0</FileVersion>
-    <Version>1.14.0-v1-develop-branc0113</Version>
-    <InformationalVersion>1.14.0-v1-develop-branching-update.113+Branch.v1-develop-branching-update.Sha.a36b5c45a68b3d89f4a920cd6ad775ed40cdc51d</InformationalVersion>
+    <Version>1.14.0-v1-develop-branc0114</Version>
+    <InformationalVersion>1.14.0-v1-develop-branching-update.114+Branch.v1-develop-branching-update.Sha.da42a3c595a0e7146db50be7001215a563e857b3</InformationalVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
