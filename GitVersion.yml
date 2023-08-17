@@ -1,4 +1,3 @@
-next-version: 1.14.0
 mode: ContinuousDeployment
 tag-prefix: '[vV]'
 continuous-delivery-fallback-tag: 'pre'
