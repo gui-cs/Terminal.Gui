@@ -21,18 +21,17 @@ branches:
     mode: ContinuousDeployment
     tag: pre
     regex: ^v2_develop?[/-]
-    is-release-branch: false
+    is-release-branch: true
     tracks-release-branches: true
-    source-branches:
-    - v2_develop
+    is-source-branch-for: ['v2']
+    source-branches: []
   v2:
     mode: ContinuousDeployment
-    is-release-branch: true
+    is-release-branch: false
     tag: alpha
     increment: Patch
     regex: ^v2?[/-]
-    is-source-branch-for: ['v2_develop']
-    source-branches: []
+    source-branches: ['v2_develop']
 
   # feature:
   #   tag: useBranchName
