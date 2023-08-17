@@ -4,7 +4,7 @@ continuous-delivery-fallback-tag: 'pre'
 branches:
   develop:
     mode: ContinuousDeployment
-    tag: pre.{BranchName}
+    tag: pre
   main:
     tag: rc
     increment: Patch
