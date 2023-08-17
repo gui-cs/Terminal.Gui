@@ -7,9 +7,9 @@
   <PropertyGroup>
     <AssemblyVersion>1.14.0.0</AssemblyVersion>
     <FileVersion>1.14.0.0</FileVersion>
-    <InformationalVersion>1.14.0-v1-develop-branching-update.115+Branch.v1-develop-branching-update.Sha.196872f2340046682a9fc98bceba4894e866e1c5</InformationalVersion>
+    <InformationalVersion>1.14.0-v1-develop-branching-update.118+Branch.v1-develop-branching-update.Sha.d88d0eb9f66ab7ee0e63dcfc84e8444bc8efee5c</InformationalVersion>
     <PackageVersion>$(Version)</PackageVersion>
-    <Version>1.14.0-v1-develop-branc0115</Version>
+    <Version>1.14.0-v1-develop-branc0118</Version>
   </PropertyGroup>
   <!-- =================================================================== -->
   <!-- .NET Build Settings -->
