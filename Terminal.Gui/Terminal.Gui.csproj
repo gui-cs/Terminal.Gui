@@ -26,6 +26,15 @@
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
   </PropertyGroup>
   <!-- =================================================================== -->
+  <!-- Configuration Manager -->
+  <!-- =================================================================== -->
+  <ItemGroup>
+    <None Remove="Resources\config.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\config.json" />
+  </ItemGroup>
+  <!-- =================================================================== -->
   <!-- Dependencies -->
   <!-- =================================================================== -->
   <ItemGroup>
