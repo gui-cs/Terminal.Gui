@@ -66,4 +66,4 @@ jobs:
     #     echo "Badge data: ${{steps.create_coverage_badge.outputs.badge}}"
         
     - name: Publish to NuGet.org
-      run: dotnet nuget push Terminal.Gui/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} 
+      run: dotnet nuget push Terminal.Gui/bin/Release/Terminal.Gui.${{ steps.gitversion.outputs.SemVer }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} 
