@@ -1,11 +1,19 @@
 name: Publish Terminal.Gui
+
 on:
   push:
+    branches: [ main, v2_release ]
     tags:
       - v*
+    paths-ignore:
+      - '**.md'
+
+  pull_request:
+    branches: [ develop, v2_develop ]
+    paths-ignore:
+      - '**.md'
 
 jobs:
-
   publish:
     name: Build and Publish to Nuget.org
     runs-on: ubuntu-latest
@@ -59,7 +67,6 @@ jobs:
         color: brightgreen
         path: UnitTests/TestResults/coverage.opencover.xml
         gist-filename: code-coverage.json
-        # https://gist.github.com/migueldeicaza/90ef67a684cb71db1817921a970f8d27
         gist-id: 90ef67a684cb71db1817921a970f8d27
         gist-auth-token: ${{ secrets.GIST_AUTH_TOKEN }}   
 
