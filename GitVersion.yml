@@ -1,4 +1,5 @@
 mode: ContinuousDeployment
+next-version: 1.14.0
 tag-prefix: '[vV]'
 branches:
   develop:
@@ -8,17 +9,13 @@ branches:
     increment: Patch
     source-branches:
     - develop
-    - release
+    - main # v1_release
   feature:
     tag: useBranchName
     regex: ^features?[/-]
     source-branches:
     - develop
-    - main
-    - release
-    - feature
-    - support
-    - hotfix
+    - main # v1_release
   pull-request:
     tag: PullRequest
     increment: Inherit
