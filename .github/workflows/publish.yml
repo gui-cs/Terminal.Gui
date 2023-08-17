@@ -16,14 +16,8 @@ on:
       - '**.md'
 
 jobs:
-  if_merged:
-    if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-    steps:
-    - run: |
-        echo The PR was merged
-
   publish:
+    if: github.event.pull_request.merged == true
     name: Build and Publish to Nuget.org
     runs-on: ubuntu-latest
 
