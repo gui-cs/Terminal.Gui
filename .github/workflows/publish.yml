@@ -27,11 +27,6 @@ jobs:
       uses: gittools/actions/gitversion/execute@v0
       id: gitversion # step id used as reference for output values
 
-    - name: Display GitVersion outputs
-      run: |
-        echo "Version: ${{ steps.gitversion.outputs.SemVer }}"
-        echo "CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }}"
-
     - name: Setup dotnet
       uses: actions/setup-dotnet@v3
       with:
