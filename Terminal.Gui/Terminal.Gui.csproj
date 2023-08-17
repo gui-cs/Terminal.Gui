@@ -5,13 +5,11 @@
   <!-- GitVersion.xml controls settings  -->
   <!-- =================================================================== -->
   <PropertyGroup>
-    <VersionPrefix>1.14.0</VersionPrefix>
-    <VersionSuffix>pre.$([System.DateTime]::UtcNow.ToString("yyyyMMdd.HHmm"))</VersionSuffix>
     <AssemblyVersion>1.14.0.0</AssemblyVersion>
     <FileVersion>1.14.0.0</FileVersion>
-    <InformationalVersion>1.14.0-v1-develop-branching-update.114+Branch.v1-develop-branching-update.Sha.da42a3c595a0e7146db50be7001215a563e857b3</InformationalVersion>
+    <InformationalVersion>1.14.0-v1-develop-branching-update.115+Branch.v1-develop-branching-update.Sha.196872f2340046682a9fc98bceba4894e866e1c5</InformationalVersion>
     <PackageVersion>$(Version)</PackageVersion>
-    <Version>1.14.0-v1-develop-branc0114</Version>
+    <Version>1.14.0-v1-develop-branc0115</Version>
   </PropertyGroup>
   <!-- =================================================================== -->
   <!-- Enables printing of version info after build -->
@@ -34,16 +32,20 @@
     <TargetFrameworks>net472;netstandard2.1;net7.0</TargetFrameworks>
     <RootNamespace>Terminal.Gui</RootNamespace>
     <AssemblyName>Terminal.Gui</AssemblyName>
+    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
   </PropertyGroup>
   <!-- =================================================================== -->
   <!-- Dependencies -->
   <!-- =================================================================== -->
   <ItemGroup>
     <PackageReference Include="NStack.Core" Version="1.0.7" />
+    <PackageReference Include="System.Management" Version="7.0.2" />
+    <!-- Enable Nuget Source Link for github -->
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
     <InternalsVisibleTo Include="UnitTests" />
   </ItemGroup>
-  <!-- Uncomment the RestoreSources element to have dotnet restore pull NStack from a local dir for testing -->
   <PropertyGroup>
+    <!-- Uncomment the RestoreSources element to have dotnet restore pull NStack from a local dir for testing -->
     <!-- See https://stackoverflow.com/a/44463578/297526 -->
     <!--<RestoreSources>$(RestoreSources);..\..\NStack\NStack\bin\Debug;https://api.nuget.org/v3/index.json</RestoreSources>-->
   </PropertyGroup>
@@ -103,11 +105,10 @@
     <!-- Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <!-- Embed source files that are not tracked by the source control manager in the PDB -->
+    <GitRepositoryRemoteName>upstream</GitRepositoryRemoteName>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <EnableSourceLink>true</EnableSourceLink>
+    <DebugType>Embedded</DebugType>
+    <Authors>Miguel de Icaza, Tig Kindel (@tig), @BDisp</Authors>
   </PropertyGroup>
-  <ItemGroup>
-    <!-- Enable Nuget Source Link for github -->
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-    <PackageReference Include="System.Management" Version="7.0.2" />
-  </ItemGroup>
 </Project>
