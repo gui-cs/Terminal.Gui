@@ -102,7 +102,7 @@
     <GitRepositoryRemoteName>upstream</GitRepositoryRemoteName>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <EnableSourceLink>true</EnableSourceLink>
-    <DebugType>Embedded</DebugType>
+    <!--<DebugType>Embedded</DebugType>-->
     <Authors>Miguel de Icaza, Tig Kindel (@tig), @BDisp</Authors>
   </PropertyGroup>
 </Project>
