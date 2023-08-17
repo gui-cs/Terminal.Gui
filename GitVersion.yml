@@ -1,10 +1,11 @@
+next-version: 1.14.0
 mode: ContinuousDeployment
 tag-prefix: '[vV]'
-next-version: 1.14.0
+continuous-delivery-fallback-tag: 'pre'
 branches:
   develop:
     mode: ContinuousDeployment
-    tag: pre
+    tag: pre.{BranchName}
   main:
     tag: rc
     increment: Patch
