@@ -1,24 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" InitialTargets="main">
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>portable</DebugType>
-    <VersionSuffix></VersionSuffix>
-    <Version>$(VersionPrefix)</Version>
-    <FileVersion>1.14.0.0</FileVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
-    <DebugType>portable</DebugType>
-    <VersionSuffix>pre.$([System.DateTime]::UtcNow.ToString("yyyyMMdd.HHmm"))</VersionSuffix>
-    <Version>1.14.0-v1-develop-branc0112</Version>
-  </PropertyGroup>
-
+  <!-- =================================================================== -->
+  <!-- Version numbers -->
+  <!-- Automatically updated by gitversion (run `dotnet-gitversion /updateprojectfiles`)  -->
+  <!-- =================================================================== -->
   <PropertyGroup>
-    <!-- Version numbers are automatically updated by gitversion when a release is released -->
     <VersionPrefix>1.14.0</VersionPrefix>
+    <AssemblyVersion>1.14.0.0</AssemblyVersion>
+    <FileVersion>1.14.0.0</FileVersion>
+    <InformationalVersion>1.14.0-v1-develop-branching-update.113+Branch.v1-develop-branching-update.Sha.a36b5c45a68b3d89f4a920cd6ad775ed40cdc51d</InformationalVersion>
     <PackageVersion>$(Version)</PackageVersion>
+    <Version>1.14.0-v1-develop-branc0113</Version>
   </PropertyGroup>
-
-
+  <!-- =================================================================== -->
+  <!-- Enables printing of version info during build -->
+  <!-- =================================================================== -->
   <Target Name="main" AfterTargets="Resources">
     <!-- Msbuild will process the first target in the file by default.
             By creating this target, and making it depend on the two following targets,
@@ -28,6 +23,26 @@
   <Target Name="main">
     <Message Text="Built Terminal.Gui $(Version)" Importance="high" />
   </Target>
+  <!-- =================================================================== -->
+  <!-- .NET Build Settings -->
+  <!-- =================================================================== -->
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>portable</DebugType>
+    <VersionSuffix></VersionSuffix>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
+    <DebugType>portable</DebugType>
+    <VersionSuffix>pre.$([System.DateTime]::UtcNow.ToString("yyyyMMdd.HHmm"))</VersionSuffix>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworks>net472;netstandard2.1;net7.0</TargetFrameworks>
+    <RootNamespace>Terminal.Gui</RootNamespace>
+    <AssemblyName>Terminal.Gui</AssemblyName>
+  </PropertyGroup>
+  <!-- =================================================================== -->
+  <!-- Dependencies -->
+  <!-- =================================================================== -->
   <ItemGroup>
     <PackageReference Include="NStack.Core" Version="1.0.7" />
     <InternalsVisibleTo Include="UnitTests" />
@@ -37,7 +52,9 @@
     <!-- See https://stackoverflow.com/a/44463578/297526 -->
     <!--<RestoreSources>$(RestoreSources);..\..\NStack\NStack\bin\Debug;https://api.nuget.org/v3/index.json</RestoreSources>-->
   </PropertyGroup>
+  <!-- =================================================================== -->
   <!-- API Documentation -->
+  <!-- =================================================================== -->
   <ItemGroup>
     <None Include="..\docfx\images\logo.png">
       <Pack>True</Pack>
@@ -48,6 +65,9 @@
       <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
+  <!-- =================================================================== -->
+  <!-- i18 -->
+  <!-- =================================================================== -->
   <ItemGroup>
     <Compile Update="Resources\Strings.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -61,21 +81,26 @@
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <!-- Enable Nuget Source Link for github -->
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-    <PackageReference Include="System.Management" Version="7.0.2" />
-  </ItemGroup>
+  <!-- =================================================================== -->
+  <!-- Nuget  -->
+  <!-- =================================================================== -->
   <PropertyGroup>
-    <TargetFrameworks>net472;netstandard2.1;net7.0</TargetFrameworks>
-    <RootNamespace>Terminal.Gui</RootNamespace>
-    <AssemblyName>Terminal.Gui</AssemblyName>
-    <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
-    <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Debug' ">true</GeneratePackageOnBuild>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Terminal.Gui</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/gui-cs/Terminal.Gui/</PackageProjectUrl>
+    <PackageIcon>logo.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>csharp, terminal, c#, f#, gui, toolkit, console, tui</PackageTags>
+    <Description>Cross platform Terminal UI toolkit for .NET</Description>
+    <Owners>Miguel de Icaza, Tig Kindel</Owners>
+    <Summary>A toolkit for building rich console apps for .NET that works on Windows, Mac, and Linux/Unix.</Summary>
+    <Title>Terminal.Gui - Cross platform Terminal User Interface (TUI) toolkit for .NET</Title>
+    <PackageReleaseNotes>
+      See: https://github.com/gui-cs/Terminal.Gui/releases
+    </PackageReleaseNotes>
+    <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
+    <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Debug' ">true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <RepositoryUrl>https://github.com/gui-cs/Terminal.Gui.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <IncludeSymbols>true</IncludeSymbols>
@@ -84,15 +109,10 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <!-- Embed source files that are not tracked by the source control manager in the PDB -->
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <PackageIcon>logo.png</PackageIcon>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageTags>csharp, terminal, c#, f#, gui, toolkit, console, tui</PackageTags>
-    <Description>Cross platform Terminal UI toolkit for .NET</Description>
-    <Owners>Miguel de Icaza, Charlie Kindel</Owners>
-    <Summary>A toolkit for building rich console apps for .NET that works on Windows, Mac, and Linux/Unix.</Summary>
-    <Title>Terminal.Gui - Cross platform Terminal User Interface (TUI) toolkit for .NET</Title>
-    <PackageReleaseNotes>
-      See: https://github.com/gui-cs/Terminal.Gui/releases
-    </PackageReleaseNotes>
   </PropertyGroup>
+  <ItemGroup>
+    <!-- Enable Nuget Source Link for github -->
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+    <PackageReference Include="System.Management" Version="7.0.2" />
+  </ItemGroup>
 </Project>

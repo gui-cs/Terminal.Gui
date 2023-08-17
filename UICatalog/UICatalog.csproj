@@ -9,8 +9,8 @@
     <!-- Do not modify these. -->
     <AssemblyVersion>1.14.0.0</AssemblyVersion>
     <FileVersion>1.14.0.0</FileVersion>
-    <Version>1.14.0-v1-develop-branc0112</Version>
-    <InformationalVersion>1.14.0-v1-develop-branching-update.112+Branch.v1-develop-branching-update.Sha.1e9c48c2ec1488b48d00d60f014c6cdee53e9604</InformationalVersion>
+    <Version>1.14.0-v1-develop-branc0113</Version>
+    <InformationalVersion>1.14.0-v1-develop-branching-update.113+Branch.v1-develop-branching-update.Sha.a36b5c45a68b3d89f4a920cd6ad775ed40cdc51d</InformationalVersion>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
