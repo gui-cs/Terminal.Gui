@@ -777,7 +777,7 @@ internal class WindowsDriver : ConsoleDriver {
 
 	public WindowsConsole WinConsole { get; private set; }
 
-	public override bool SupportsTrueColor => RunningUnitTests || (_isWindowsTerminal && Environment.OSVersion.Version.Build >= 14931);
+	public override bool SupportsTrueColor => RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931);
 
 	public override bool Force16Colors {
 		get => base.Force16Colors;
