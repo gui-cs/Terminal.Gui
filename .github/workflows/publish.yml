@@ -75,11 +75,5 @@ jobs:
     #     echo "Code coverage percentage: ${{steps.create_coverage_badge.outputs.percentage}}%"
     #     echo "Badge data: ${{steps.create_coverage_badge.outputs.badge}}"
         
-    #- name: Prep GitHub Packages
-    #  run: dotnet nuget add source --username tig --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/tig/index.json"
-
-    #- name: Publish to GitHub packages 
-    #  run: dotnet nuget push NStack/bin/Release/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
-
     - name: Publish to NuGet.org
-      run: dotnet nuget push Terminal.Gui/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+      run: dotnet nuget push Terminal.Gui/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} 
