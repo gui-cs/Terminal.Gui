@@ -10,10 +10,19 @@ on:
 
   pull_request:
     branches: [ develop, v2_develop ]
+    types:
+      - closed
     paths-ignore:
       - '**.md'
 
 jobs:
+  if_merged:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+    - run: |
+        echo The PR was merged
+
   publish:
     name: Build and Publish to Nuget.org
     runs-on: ubuntu-latest
