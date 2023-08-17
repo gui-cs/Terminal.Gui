@@ -7,8 +7,8 @@
     <!-- Do not modify these. -->
     <AssemblyVersion>1.14.0.0</AssemblyVersion>
     <FileVersion>1.14.0.0</FileVersion>
-    <Version>1.14.0-v1-develop-branc0111</Version>
-    <InformationalVersion>1.14.0-v1-develop-branching-update.111+Branch.v1-develop-branching-update.Sha.fccf0213e2c55836fe3c05c08d7164b976f30cf8</InformationalVersion>
+    <Version>1.14.0-v1-develop-branc0112</Version>
+    <InformationalVersion>1.14.0-v1-develop-branching-update.112+Branch.v1-develop-branching-update.Sha.1e9c48c2ec1488b48d00d60f014c6cdee53e9604</InformationalVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="ReactiveUI.Fody" Version="19.4.1" />

@@ -3,20 +3,22 @@
     <DebugType>portable</DebugType>
     <VersionSuffix></VersionSuffix>
     <Version>$(VersionPrefix)</Version>
-    <AssemblyVersion>1.14.0.0</AssemblyVersion>
-    <InformationalVersion>1.14.0-v1-develop-branching-update.111+Branch.v1-develop-branching-update.Sha.fccf0213e2c55836fe3c05c08d7164b976f30cf8</InformationalVersion>
+    <FileVersion>1.14.0.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
     <DebugType>portable</DebugType>
     <VersionSuffix>pre.$([System.DateTime]::UtcNow.ToString("yyyyMMdd.HHmm"))</VersionSuffix>
-    <Version>1.14.0-v1-develop-branc0111</Version>
+    <Version>1.14.0-v1-develop-branc0112</Version>
   </PropertyGroup>
+
   <PropertyGroup>
     <!-- Version numbers are automatically updated by gitversion when a release is released -->
     <VersionPrefix>1.14.0</VersionPrefix>
     <PackageVersion>$(Version)</PackageVersion>
   </PropertyGroup>
+
+
   <Target Name="main" AfterTargets="Resources">
     <!-- Msbuild will process the first target in the file by default.
             By creating this target, and making it depend on the two following targets,
