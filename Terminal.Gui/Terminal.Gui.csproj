@@ -1,27 +1,23 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" InitialTargets="main">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <!-- =================================================================== -->
   <!-- Version numbers -->
   <!-- Automatically updated by gitversion (run `dotnet-gitversion /updateprojectfiles`)  -->
+  <!-- GitVersion.xml controls settings  -->
   <!-- =================================================================== -->
   <PropertyGroup>
     <VersionPrefix>1.14.0</VersionPrefix>
+    <VersionSuffix>pre.$([System.DateTime]::UtcNow.ToString("yyyyMMdd.HHmm"))</VersionSuffix>
     <AssemblyVersion>1.14.0.0</AssemblyVersion>
     <FileVersion>1.14.0.0</FileVersion>
-    <InformationalVersion>1.14.0-v1-develop-branching-update.113+Branch.v1-develop-branching-update.Sha.a36b5c45a68b3d89f4a920cd6ad775ed40cdc51d</InformationalVersion>
+    <InformationalVersion>1.14.0-v1-develop-branching-update.114+Branch.v1-develop-branching-update.Sha.da42a3c595a0e7146db50be7001215a563e857b3</InformationalVersion>
     <PackageVersion>$(Version)</PackageVersion>
-    <Version>1.14.0-v1-develop-branc0113</Version>
+    <Version>1.14.0-v1-develop-branc0114</Version>
   </PropertyGroup>
   <!-- =================================================================== -->
-  <!-- Enables printing of version info during build -->
+  <!-- Enables printing of version info after build -->
   <!-- =================================================================== -->
-  <Target Name="main" AfterTargets="Resources">
-    <!-- Msbuild will process the first target in the file by default.
-            By creating this target, and making it depend on the two following targets,
-            we can ensure that they will all be executed
-            -->
-  </Target>
-  <Target Name="main">
-    <Message Text="Built Terminal.Gui $(Version)" Importance="high" />
+  <Target Name="Diag" AfterTargets="Pack">
+    <Message Text="Built and packaged: $(OutDir)$(OutputPath)Terminal.Gui.dll $(AssemblyVersion)" Importance="high" />
   </Target>
   <!-- =================================================================== -->
   <!-- .NET Build Settings -->
@@ -33,7 +29,6 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
     <DebugType>portable</DebugType>
-    <VersionSuffix>pre.$([System.DateTime]::UtcNow.ToString("yyyyMMdd.HHmm"))</VersionSuffix>
   </PropertyGroup>
   <PropertyGroup>
     <TargetFrameworks>net472;netstandard2.1;net7.0</TargetFrameworks>
