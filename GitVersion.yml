@@ -19,7 +19,7 @@ branches:
     - develop
     - main
   pull-request:
-    tag: PullRequest
+    tag: PullRequest.{BranchName}
     increment: Inherit
 ignore:
   sha: []
