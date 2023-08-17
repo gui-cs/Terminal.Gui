@@ -10,6 +10,7 @@ on:
 
 jobs:
   publish:
+    if: github.event.pull_request.merged == true
     name: Build and Publish to Nuget.org
     runs-on: ubuntu-latest
 
