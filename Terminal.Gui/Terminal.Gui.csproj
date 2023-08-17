@@ -12,12 +12,6 @@
     <Version>1.14.0-v1-develop-branc0115</Version>
   </PropertyGroup>
   <!-- =================================================================== -->
-  <!-- Enables printing of version info after build -->
-  <!-- =================================================================== -->
-  <Target Name="Diag" AfterTargets="Pack">
-    <Message Text="Built and packaged: $(OutDir)$(OutputPath)Terminal.Gui.dll $(AssemblyVersion)" Importance="high" />
-  </Target>
-  <!-- =================================================================== -->
   <!-- .NET Build Settings -->
   <!-- =================================================================== -->
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
