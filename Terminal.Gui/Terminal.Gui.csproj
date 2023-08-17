@@ -1,29 +1,51 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk" InitialTargets="main">
+
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>portable</DebugType>
+    <VersionSuffix></VersionSuffix>
+    <Version>$(VersionPrefix)</Version>
+    <AssemblyVersion>1.14.0.0</AssemblyVersion>
+    <InformationalVersion>1.14.0-pre.109+Branch.develop.Sha.bdf9ec112cb6fe4860dd9eb238144c65528327cf</InformationalVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
     <DebugType>portable</DebugType>
+    <VersionSuffix>pre.$([System.DateTime]::UtcNow.ToString("yyyyMMdd.HHmm"))</VersionSuffix>
+    <Version>1.14.0-pre0109</Version>
   </PropertyGroup>
+
   <PropertyGroup>
     <!-- Version numbers are automatically updated by gitversion when a release is released -->
-    <!-- In the source tree the version will always be 1.0 for all projects. -->
-    <!-- Do not modify these. Do NOT commit after manually running `dotnet-gitversion /updateprojectfiles` -->
-    <AssemblyVersion>1.13.6.0</AssemblyVersion>
-    <FileVersion>1.13.6.0</FileVersion>
-    <InformationalVersion>1.13.6-pre.2+Branch.develop.Sha.90208d6577b9d34bf0c4e9057b4227297bc9118d</InformationalVersion>
-    <Version>1.13.6-pre0002</Version>
+    <VersionPrefix>1.14.0</VersionPrefix>
+    <FileVersion>1.14.0.0</FileVersion>
+    <Deterministic>false</Deterministic>
+    <PackageVersion>$(Version)</PackageVersion>
   </PropertyGroup>
+
+  <Target Name="main" AfterTargets="Resources">
+    <!-- Msbuild will process the first target in the file by default.
+            By creating this target, and making it depend on the two following targets,
+            we can ensure that they will all be executed
+            -->
+  </Target>
+
+
+  <Target Name="main">
+    <Message Text="Built Terminal.Gui $(Version)" Importance="high" />
+  </Target>
+
   <ItemGroup>
     <PackageReference Include="NStack.Core" Version="1.0.7" />
     <InternalsVisibleTo Include="UnitTests" />
   </ItemGroup>
   <!-- Uncomment the RestoreSources element to have dotnet restore pull NStack from a local dir for testing -->
+
   <PropertyGroup>
     <!-- See https://stackoverflow.com/a/44463578/297526 -->
     <!--<RestoreSources>$(RestoreSources);..\..\NStack\NStack\bin\Debug;https://api.nuget.org/v3/index.json</RestoreSources>-->
   </PropertyGroup>
+
+
   <!-- API Documentation -->
   <ItemGroup>
     <None Include="..\docfx\images\logo.png">
@@ -35,6 +57,7 @@
       <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
+  
   <ItemGroup>
     <Compile Update="Resources\Strings.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -42,26 +65,29 @@
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
   </ItemGroup>
+  
   <ItemGroup>
     <EmbeddedResource Update="Resources\Strings.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  
   <!-- Enable Nuget Source Link for github -->
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
     <PackageReference Include="System.Management" Version="7.0.2" />
   </ItemGroup>
+
+
   <PropertyGroup>
     <TargetFrameworks>net472;netstandard2.1;net7.0</TargetFrameworks>
     <RootNamespace>Terminal.Gui</RootNamespace>
     <AssemblyName>Terminal.Gui</AssemblyName>
     <DocumentationFile>bin\Release\Terminal.Gui.xml</DocumentationFile>
-    <GenerateDocumentationFile Condition=" '$(Configuration)' == 'Release' ">true</GenerateDocumentationFile>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Debug' ">true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Terminal.Gui</PackageId>
-    <PackageVersion>$(PackageVersion)</PackageVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/gui-cs/Terminal.Gui/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/gui-cs/Terminal.Gui.git</RepositoryUrl>
