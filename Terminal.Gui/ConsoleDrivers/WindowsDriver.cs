@@ -709,6 +709,7 @@ namespace Terminal.Gui {
 		WindowsConsole.SmallRect damageRegion;
 		IClipboard clipboard;
 		int [,,] contents;
+		readonly bool isWindowsTerminal;
 
 		public override int Cols => cols;
 		public override int Rows => rows;
@@ -732,6 +733,8 @@ namespace Terminal.Gui {
 		{
 			WinConsole = new WindowsConsole ();
 			clipboard = new WindowsClipboard ();
+
+			isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") != null;
 		}
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
@@ -1426,15 +1429,17 @@ namespace Terminal.Gui {
 
 			try {
 				// Needed for Windows Terminal
-				// ESC [ ? 1047 h  Activate xterm alternative buffer (no backscroll)
-				// ESC [ ? 1047 l  Restore xterm working buffer (with backscroll)
+				// ESC [ ? 1047 h  Save cursor position and activate xterm alternative buffer (no backscroll)
+				// ESC [ ? 1047 l  Restore cursor position and restore xterm working buffer (with backscroll)
 				// ESC [ ? 1048 h  Save cursor position
 				// ESC [ ? 1048 l  Restore cursor position
-				// ESC [ ? 1049 h  Save cursor position and activate xterm alternative buffer (no backscroll)
-				// ESC [ ? 1049 l  Restore cursor position and restore xterm working buffer (with backscroll)
-				// Per Issue #2264 using the alterantive screen buffer is required for Windows Terminal to not 
+				// ESC [ ? 1049 h  Activate xterm alternative buffer (no backscroll)
+				// ESC [ ? 1049 l  Restore xterm working buffer (with backscroll)
+				// Per Issue #2264 using the alternative screen buffer is required for Windows Terminal to not 
 				// wipe out the backscroll buffer when the application exits.
-				Console.Out.Write ("\x1b[?1047h");
+				if (isWindowsTerminal) {
+					Console.Out.Write ("\x1b[?1049h");
+				}
 
 				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
 				cols = winSize.Width;
@@ -1676,12 +1681,13 @@ namespace Terminal.Gui {
 
 		public override void End ()
 		{
-
 			WinConsole.Cleanup ();
 			WinConsole = null;
 
 			// Disable alternative screen buffer.
-			Console.Out.Write ("\x1b[?1047l");
+			if (isWindowsTerminal) {
+				Console.Out.Write ("\x1b[?1049l");
+			}
 		}
 
 		/// <inheritdoc/>

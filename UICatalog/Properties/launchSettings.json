@@ -52,7 +52,12 @@
       "commandLineArgs": "\"Windows & FrameViews\""
     },
     "Docker": {
-      "commandName": "Docker"      
+      "commandName": "Docker"
+    },
+    "UICatalog WT": {
+      "commandName": "Executable",
+      "executablePath": "wt",
+      "commandLineArgs": "UICatalog.exe"
     }
   }
 }
