@@ -5,10 +5,10 @@
 //   Ross Ferguson (ross.c.ferguson@btinternet.com)
 //
 
+using NStack;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using NStack;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -719,6 +719,18 @@ namespace Terminal.Gui {
 		public new ustring Text {
 			get {
 				return text;
+			}
+			set {
+				search.Text = text = value;
+			}
+		}
+
+		/// <summary>
+		/// Current search text 
+		/// </summary>
+		public ustring SearchText {
+			get {
+				return search.Text;
 			}
 			set {
 				search.Text = text = value;
