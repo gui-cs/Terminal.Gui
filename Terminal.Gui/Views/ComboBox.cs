@@ -869,7 +869,7 @@ namespace Terminal.Gui {
 				OnOpenSelectedItem ();
 			}
 			var rect = listview.ViewToScreen (listview.Bounds);
-			Reset (SelectedItem > -1);
+			Reset (keepSearchText: true);
 			listview.Clear (rect);
 			listview.TabStop = false;
 			SuperView?.SendSubviewToBack (this);
