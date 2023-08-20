@@ -1147,6 +1147,8 @@ namespace Terminal.Gui {
 				action ();
 				return false;
 			});
+
+			CloseAllMenus ();
 		}
 
 		/// <summary>
