@@ -6,8 +6,6 @@ namespace UICatalog.Scenarios {
 	public class CenteredWindowInsideWindow : Scenario {
 		public override void Init (ColorScheme colorScheme)
 		{
-			Application.Init ();
-
 			Application.Run<ParentWindowClass> ();
 			Application.Shutdown ();
 		}

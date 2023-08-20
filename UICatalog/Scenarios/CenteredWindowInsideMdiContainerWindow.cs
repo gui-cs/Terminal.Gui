@@ -6,8 +6,6 @@ namespace UICatalog.Scenarios {
 	public class CenteredWindowInsideMdiContainerWindow : Scenario {
 		public override void Init (ColorScheme colorScheme)
 		{
-			Application.Init ();
-
 			Application.Run<ParentWindowMdiContainerClass> ();
 			Application.Shutdown ();
 		}
