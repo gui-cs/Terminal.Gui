@@ -1467,6 +1467,8 @@ namespace Terminal.Gui {
 						selected = -1;
 					}
 					LastFocused.SetFocus ();
+				} else if (LastFocused == null && !IsMenuOpen) {
+					Application.Current?.FocusFirst ();
 				} else {
 					SetFocus ();
 					PositionCursor ();
