@@ -256,10 +256,12 @@ namespace Terminal.Gui {
 			contentView.Add (view);
 			if (view.CanFocus) {
 				CanFocus = true;
+				if (contentView.HasFocus && contentView.MostFocused == null) {
+					view.SetFocus ();
+				}
 			}
 			AddMenuStatusBar (view);
 		}
-
 
 		/// <inheritdoc/>
 		public override void Remove (View view)
