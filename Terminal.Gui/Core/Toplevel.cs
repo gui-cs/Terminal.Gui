@@ -510,7 +510,9 @@ namespace Terminal.Gui {
 
 		private void QuitToplevel ()
 		{
-			if (Application.MdiTop != null) {
+			if (IsMdiChild) {
+				RequestStop ();
+			} else if (Application.MdiTop != null) {
 				Application.MdiTop.RequestStop ();
 			} else {
 				Application.RequestStop ();
