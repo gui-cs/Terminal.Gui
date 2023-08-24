@@ -535,21 +535,7 @@ namespace Terminal.Gui {
 			var chain = toplevels.ToList ();
 			foreach (var topLevel in chain) {
 				if (topLevel.ProcessHotKey (ke)) {
-					if (MdiTop != null && MdiTop.MostFocused != null) {
-						var posX = MdiTop.MostFocused.Frame.X;
-						var posY = MdiTop.MostFocused.Frame.Y;
-						var view = FindDeepestView (Current, posX, posY, out int _, out int _);
-						if ((view == null || view == MdiTop || view.SuperView == MdiTop) && !Current.Modal && MdiTop != null
-							&& ke.Key != Key.Null && ke.Key != Key.Unknown) {
-
-							var top = FindDeepestTop (Top, posX, posY, out _, out _);
-							view = FindDeepestView (top, posX, posY, out _, out _);
-
-							if (view != null && view != Current) {
-								MoveCurrent ((Toplevel)top);
-							}
-						}
-					}
+					EnsuresMdiTopOnFrontIfMdiTopMostFocused ();
 					return;
 				}
 				if (topLevel.Modal)
@@ -782,6 +768,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			EnsuresMdiTopOnFrontIfMdiTopMostFocused ();
 			var view = FindDeepestView (Current, me.X, me.Y, out int rx, out int ry);
 
 			if (view != null && view.WantContinuousButtonPressed)
@@ -859,9 +846,18 @@ namespace Terminal.Gui {
 					WantContinuousButtonPressedView = null;
 
 				// Should we bubbled up the event, if it is not handled?
-				view.OnMouseEvent (nme);
+				if (view.OnMouseEvent (nme)) {
+					EnsuresMdiTopOnFrontIfMdiTopMostFocused ();
+				}
 
 				EnsuresTopOnFront ();
+			}
+		}
+
+		static void EnsuresMdiTopOnFrontIfMdiTopMostFocused ()
+		{
+			if (MdiTop != null && MdiTop.MostFocused != null && Current != MdiTop) {
+				MoveCurrent (Top);
 			}
 		}
 
@@ -1203,8 +1199,10 @@ namespace Terminal.Gui {
 				Iteration?.Invoke ();
 
 				EnsureModalOrVisibleAlwaysOnTop (state.Toplevel);
+				EnsuresNotModalNotRunningAndNotCurrent (state.Toplevel);
 				if ((state.Toplevel != Current && Current?.Modal == true)
 					|| (state.Toplevel != Current && Current?.Modal == false)) {
+
 					MdiTop?.OnDeactivate (state.Toplevel);
 					state.Toplevel = Current;
 					MdiTop?.OnActivate (state.Toplevel);
@@ -1276,6 +1274,20 @@ namespace Terminal.Gui {
 			}
 			if (!toplevel.Visible && toplevel == Current) {
 				MoveNext ();
+			}
+		}
+
+		static void EnsuresNotModalNotRunningAndNotCurrent (Toplevel curRunStateTop)
+		{
+			if (MdiTop == null || !curRunStateTop.Running) {
+				return;
+			}
+
+			foreach (var top in toplevels) {
+				if (!top.IsMdiContainer && top?.Running == false && top != Current && top?.Modal == false) {
+					MoveCurrent (top);
+					return;
+				}
 			}
 		}
 
@@ -1616,6 +1628,10 @@ namespace Terminal.Gui {
 
 		internal static bool ShowChild (Toplevel top)
 		{
+			if (Current == top) {
+				return false;
+			}
+
 			if (top.Visible && MdiTop != null && Current?.Modal == false) {
 				lock (toplevels) {
 					toplevels.MoveTo (top, 0, new ToplevelEqualityComparer ());
