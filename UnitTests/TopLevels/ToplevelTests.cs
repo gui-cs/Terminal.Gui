@@ -2449,22 +2449,42 @@ BL      BR";
 		}
 
 		[Fact, AutoInitShutdown]
-		public void Show_Menu_On_Front_MdiChild_By_Keyboard ()
+		public void Show_Menu_On_Front_MdiChild_By_Keyboard_And_Mouse_With_Run_Action ()
 		{
 			var top = Top_With_MenuBar_And_StatusBar (false, true);
 			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels ();
 			Application.Begin (top);
 			Application.Begin (win);
 
+			var isNew = false;
 			var menu = top.MenuBar;
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessKeyEvent",
-				new KeyEvent (menu.Key, new KeyModifiers ()));
+			var mi = menu.Menus [0].Children [0];
+			mi.Action = () => isNew = true;
+			Assert.False (menu.IsMenuOpen);
+			var expectedClosed = @"
+┌──────────────────┐
+│ File             │
+│┌────────┐        │
+││TL    TR│        │
+││        │        │
+││        │        │
+││        │        │
+││        │        │
+││        │        │
+││        │        │
+││BL    BR│        │
+│└────────┘        │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│ F2 File          │
+└──────────────────┘";
+			TestHelpers.AssertDriverContentsWithFrameAre (expectedClosed, output);
 
-			Application.Refresh ();
-			Assert.True (menu.IsMenuOpen);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+			var expectedOpened = @"
 ┌──────────────────┐
 │ File             │
 │┌──────┐─┐        │
@@ -2484,7 +2504,60 @@ BL      BR";
 │                  │
 │                  │
 │ F2 File          │
-└──────────────────┘", output);
+└──────────────────┘";
+
+			// using keyboard
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessKeyEvent",
+				new KeyEvent (menu.Key, new KeyModifiers ()));
+
+			Application.Refresh ();
+			Assert.True (menu.IsMenuOpen);
+			TestHelpers.AssertDriverContentsWithFrameAre (expectedOpened, output);
+
+			// run action
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessKeyEvent",
+				new KeyEvent (Key.Enter, new KeyModifiers ()));
+
+			Application.MainLoop.MainIteration ();
+			Application.Refresh ();
+			Assert.False (menu.IsMenuOpen);
+			Assert.True (isNew);
+			TestHelpers.AssertDriverContentsWithFrameAre (expectedClosed, output);
+
+			// using mouse
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessMouseEvent",
+				new MouseEvent () {
+					X = 1,
+					Y = 1,
+					Flags = MouseFlags.Button1Pressed
+				});
+
+			Application.Refresh ();
+			Assert.True (menu.IsMenuOpen);
+			TestHelpers.AssertDriverContentsWithFrameAre (expectedOpened, output);
+
+			// run action
+			isNew = false;
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessMouseEvent",
+				new MouseEvent () {
+					X = 2,
+					Y = 4,
+					Flags = MouseFlags.Button1Clicked
+				});
+
+			Application.MainLoop.MainIteration ();
+			Application.Refresh ();
+			Assert.False (menu.IsMenuOpen);
+			Assert.True (isNew);
+			TestHelpers.AssertDriverContentsWithFrameAre (expectedClosed, output);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -2641,6 +2714,52 @@ BL      BR";
 00000000000000000000
 01331111111111111110
 00000000000000000000", attributes);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Application_QuitKey_Close_Current_MdiChild ()
+		{
+			var top = Top_With_MenuBar_And_StatusBar (false, true);
+			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels ();
+
+			Assert.True (top.IsMdiContainer);
+
+			var iterations = -1;
+			Application.Iteration += () => {
+				iterations++;
+				if (iterations == 0) {
+					Assert.True (top.Running);
+					Assert.False (win.Running);
+					Assert.Equal (top, Application.Current);
+
+					Application.Run (win);
+				} else if (iterations == 1) {
+					Assert.True (top.Running);
+					Assert.True (win.Running);
+					Assert.Equal (win, Application.Current);
+
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessKeyEvent",
+						new KeyEvent (Application.QuitKey, new KeyModifiers ()));
+				} else if (iterations == 2) {
+					Assert.True (top.Running);
+					Assert.False (win.Running);
+					Assert.Equal (top, Application.Current);
+
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessKeyEvent",
+						new KeyEvent (Application.QuitKey, new KeyModifiers ()));
+				}
+			};
+
+			Application.Run (top);
+
+			Assert.False (top.Running);
+			Assert.False (win.Running);
+			Assert.Null (Application.Current);
+			Assert.Equal (2, iterations);
 		}
 	}
 }
