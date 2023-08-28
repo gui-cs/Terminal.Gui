@@ -19,19 +19,17 @@ jobs:
       with:
         fetch-depth: 0 #fetch-depth is needed for GitVersion
         
-    - name: Install and calculate the new version with GitVersion 
-      uses: gittools/actions/gitversion/setup@v0
-      with:
-          versionSpec: '6.x'
-          includePrerelease: true
+    # - name: Install and calculate the new version with GitVersion 
+    #   uses: gittools/actions/gitversion/setup@v0
+    #   with:
+    #       versionSpec: '6.x'
+    #       includePrerelease: true
 
-    - name: Determine Version
-      uses: gittools/actions/gitversion/execute@v0
-      with:
-          versionSpec: '6.x'
-          includePrerelease: true
-          useConfigFile: true
-      id: gitversion # step id used as reference for output values
+    # - name: Determine Version
+    #   uses: gittools/actions/gitversion/execute@v0
+    #   with:
+    #       useConfigFile: true
+    #   id: gitversion # step id used as reference for output values
 
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v3
