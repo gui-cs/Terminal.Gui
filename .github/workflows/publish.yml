@@ -28,7 +28,7 @@ jobs:
       uses: gittools/actions/gitversion/execute@v0
       with:
         useConfigFile: true
-        additionalArguments: /verbosity Diagnostic
+        #additionalArguments: /verbosity Diagnostic
       id: gitversion # step id used as reference for output values
 
     - name: Setup dotnet
