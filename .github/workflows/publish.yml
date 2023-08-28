@@ -27,7 +27,12 @@ jobs:
     - name: Determine Version
       uses: gittools/actions/gitversion/execute@v0
       with:
-        useConfigFile: true      
+        useConfigFile: true
+        additionalArguments: |
+          '/showConfig'
+          '/diag'
+          '/verbosity Verbose'
+        
       id: gitversion # step id used as reference for output values
 
     - name: Setup dotnet
