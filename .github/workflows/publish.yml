@@ -21,17 +21,21 @@ jobs:
     - name: Install and calculate the new version with GitVersion 
       uses: gittools/actions/gitversion/setup@v0
       with:
-        versionSpec: 5.x
+          versionSpec: '6.x'
+          includePrerelease: true
 
     - name: Determine Version
       uses: gittools/actions/gitversion/execute@v0
+      with:
+        useConfigFile: true      
       id: gitversion # step id used as reference for output values
 
     - name: Setup dotnet
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 7.0
-
+        dotnet-quality: 'ga'
+        
     - name: Install dependencies
       run: dotnet restore
 
