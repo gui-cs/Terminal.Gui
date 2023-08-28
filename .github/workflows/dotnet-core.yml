@@ -43,7 +43,7 @@ jobs:
 
     - name: Build Debug
       run: |
-        dotnet-gitversion /updateprojectfiles
+        #dotnet-gitversion /updateprojectfiles
         dotnet build --configuration Debug --no-restore
         
     - name: Test
