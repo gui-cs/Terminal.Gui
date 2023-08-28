@@ -375,8 +375,10 @@ namespace Terminal.Gui {
 		public Color BorderBrush {
 			get => borderBrush != null ? (Color)borderBrush : (Color)(-1);
 			set {
-				borderBrush = value;
-				OnBorderChanged ();
+				if (Enum.IsDefined (typeof (Color), value)) {
+					borderBrush = value;
+					OnBorderChanged ();
+				}
 			}
 		}
 
@@ -386,8 +388,10 @@ namespace Terminal.Gui {
 		public Color Background {
 			get => background != null ? (Color)background : (Color)(-1);
 			set {
-				background = value;
-				OnBorderChanged ();
+				if (Enum.IsDefined (typeof (Color), value)) {
+					background = value;
+					OnBorderChanged ();
+				}
 			}
 		}
 
@@ -445,12 +449,10 @@ namespace Terminal.Gui {
 
 		private void Parent_Removed (View obj)
 		{
-			if (borderBrush != null)
-			{
+			if (borderBrush != null) {
 				BorderBrush = default;
 			}
-			if (background != null)
-			{
+			if (background != null) {
 				Background = default;
 			}
 			child.Removed -= Parent_Removed;
