@@ -28,7 +28,9 @@ jobs:
     - name: Determine Version
       uses: gittools/actions/gitversion/execute@v0
       with:
-        useConfigFile: true
+          versionSpec: '6.x'
+          includePrerelease: true
+          useConfigFile: true
       id: gitversion # step id used as reference for output values
 
     - name: Setup .NET Core
