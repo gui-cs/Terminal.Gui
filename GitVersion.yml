@@ -5,6 +5,7 @@ branches:
   develop:
     mode: ContinuousDeployment
     tag: pre
+    regex: ^develop$
   main:
     tag: rc
     increment: Patch
