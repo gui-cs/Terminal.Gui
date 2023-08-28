@@ -28,7 +28,7 @@ jobs:
       uses: gittools/actions/gitversion/execute@v0
       with:
         useConfigFile: true
-        additionalArguments: /showConfig /diag /verbosity Verbose
+        additionalArguments: /verbosity Verbose
         
       id: gitversion # step id used as reference for output values
 
