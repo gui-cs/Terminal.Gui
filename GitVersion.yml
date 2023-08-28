@@ -1,27 +1,34 @@
 next-version: 1.14.0
+
 mode: ContinuousDeployment
 tag-prefix: '[vV]'
 continuous-delivery-fallback-tag: 'pre'
+
 branches:
   develop:
     mode: ContinuousDeployment
     tag: pre
     regex: ^develop
+
   main:
     tag: rc
     increment: Patch
     source-branches:
     - develop
     - main
+- 
   feature:
     tag: useBranchName
     regex: ^features?[/-]
     source-branches:
     - develop
     - main
+- 
   pull-request:
     tag: PullRequest.{BranchName}
     increment: Inherit
+    
+    
 ignore:
   sha: []
 merge-message-formats: {}
