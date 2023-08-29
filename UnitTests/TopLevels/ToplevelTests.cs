@@ -1035,7 +1035,7 @@ namespace Terminal.Gui.TopLevelTests {
 			Assert.Equal (CursorVisibility.Invisible, cursor);
 		}
 
-		private Window Top_With_MenuBar_And_StatusBar (bool borderless = false, bool isMdiContainer = false)
+		private Window Top_With_MenuBar_And_StatusBar (bool borderless = false, bool isMdiContainer = false, bool resize = true)
 		{
 			var top = new Window ();
 			if (borderless) {
@@ -1054,7 +1054,9 @@ namespace Terminal.Gui.TopLevelTests {
 				new StatusItem(Key.F2, "~F2~ File", null)
 			});
 			top.Add (menu, statusBar);
-			((FakeDriver)Application.Driver).SetBufferSize (20, 20);
+			if (resize) {
+				((FakeDriver)Application.Driver).SetBufferSize (20, 20);
+			}
 
 			return top;
 		}
@@ -2760,6 +2762,131 @@ BL      BR";
 			Assert.False (win.Running);
 			Assert.Null (Application.Current);
 			Assert.Equal (2, iterations);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Clicking_On_MdiContainer_With_MostFocused_Null_Or_Invalid_Maintain_Current_Child_Focused ()
+		{
+			var top = Top_With_MenuBar_And_StatusBar (false, true, false);
+			var win1 = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels ();
+			var tf1 = new TextField () { Width = 6 };
+			win1.Add (tf1);
+			var win2 = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels ();
+			var tf2 = new TextField () { Width = 6 };
+			win2.Add (tf2);
+			win2.X = Pos.Right (win1);
+
+			Assert.True (top.IsMdiContainer);
+
+			var iterations = -1;
+			Application.Iteration += () => {
+				iterations++;
+				if (iterations == 0) {
+					Assert.True (top.Running);
+					Assert.False (win1.Running);
+					Assert.False (win2.Running);
+					Assert.Equal (top, Application.Current);
+
+					Application.Run (win1);
+				} else if (iterations == 1) {
+					Assert.True (top.Running);
+					Assert.True (win1.Running);
+					Assert.False (win2.Running);
+					Assert.Equal (win1, Application.Current);
+
+					Application.Run (win2);
+				} else if (iterations == 2) {
+					Assert.True (top.Running);
+					Assert.True (win1.Running);
+					Assert.True (win2.Running);
+					Assert.Equal (win2, Application.Current);
+					Assert.Equal (tf2, win2.MostFocused);
+					Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
+					Assert.Equal (new Rect (1, 2, 10, 10), win1.Frame);
+					Assert.Equal (new Rect (11, 2, 10, 10), win2.Frame);
+
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessMouseEvent",
+						new MouseEvent () {
+							X = 30,
+							Y = 2,
+							Flags = MouseFlags.Button1Clicked
+						});
+				} else if (iterations == 3) {
+					Assert.True (top.Running);
+					Assert.True (win1.Running);
+					Assert.True (win2.Running);
+					Assert.Equal (win2, Application.Current);
+					Assert.Equal (tf2, win2.MostFocused);
+
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessMouseEvent",
+						new MouseEvent () {
+							X = 1,
+							Y = 2,
+							Flags = MouseFlags.Button1Clicked
+						});
+				} else if (iterations == 4) {
+					Assert.True (top.Running);
+					Assert.True (win1.Running);
+					Assert.True (win2.Running);
+					Assert.Equal (win1, Application.Current);
+					Assert.Equal (tf1, win1.MostFocused);
+
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessMouseEvent",
+						new MouseEvent () {
+							X = 30,
+							Y = 2,
+							Flags = MouseFlags.Button1Clicked
+						});
+				} else if (iterations == 5) {
+					Assert.True (top.Running);
+					Assert.True (win1.Running);
+					Assert.True (win2.Running);
+					Assert.Equal (win1, Application.Current);
+					Assert.Equal (tf1, win1.MostFocused);
+
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessKeyEvent",
+						new KeyEvent (Application.QuitKey, new KeyModifiers ()));
+				} else if (iterations == 6) {
+					Assert.True (top.Running);
+					Assert.False (win1.Running);
+					Assert.True (win2.Running);
+					Assert.Equal (win2, Application.Current);
+					Assert.Equal (tf2, win2.MostFocused);
+
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessKeyEvent",
+						new KeyEvent (Application.QuitKey, new KeyModifiers ()));
+				} else if (iterations == 7) {
+					Assert.True (top.Running);
+					Assert.False (win1.Running);
+					Assert.False (win2.Running);
+					Assert.Equal (top, Application.Current);
+					Assert.Equal (top.Subviews [0], top.MostFocused);
+					Assert.Equal ("ContentView", top.Subviews [0].GetType ().Name);
+
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessKeyEvent",
+						new KeyEvent (Application.QuitKey, new KeyModifiers ()));
+				}
+			};
+
+			Application.Run (top);
+
+			Assert.False (top.Running);
+			Assert.False (win1.Running);
+			Assert.False (win2.Running);
+			Assert.Null (Application.Current);
+			Assert.Equal (7, iterations);
 		}
 	}
 }
