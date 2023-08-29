@@ -813,7 +813,7 @@ namespace Terminal.Gui {
 				var top = FindDeepestTop (Top, me.X, me.Y, out _, out _);
 				view = FindDeepestView (top, me.X, me.Y, out rx, out ry);
 
-				if (view != null && view != MdiTop && top != Current) {
+				if (view != null && top.MostFocused != null && view != MdiTop && top != Current) {
 					MoveCurrent ((Toplevel)top);
 				}
 			}
