@@ -813,7 +813,9 @@ namespace Terminal.Gui {
 				var top = FindDeepestTop (Top, me.X, me.Y, out _, out _);
 				view = FindDeepestView (top, me.X, me.Y, out rx, out ry);
 
-				if (view != null && top.MostFocused != null && view != MdiTop && top != Current) {
+				if (view != null && view != MdiTop && top != Current && top.MostFocused != null
+					&& top.MostFocused.GetType ().Name != "ContentView") {
+
 					MoveCurrent ((Toplevel)top);
 				}
 			}
@@ -856,7 +858,9 @@ namespace Terminal.Gui {
 
 		static void EnsuresMdiTopOnFrontIfMdiTopMostFocused ()
 		{
-			if (MdiTop != null && MdiTop.MostFocused != null && Current != MdiTop) {
+			if (MdiTop != null && Current != MdiTop && MdiTop.MostFocused != null
+				&& MdiTop.MostFocused.GetType ().Name != "ContentView") {
+
 				MoveCurrent (Top);
 			}
 		}
@@ -1199,7 +1203,9 @@ namespace Terminal.Gui {
 				Iteration?.Invoke ();
 
 				EnsureModalOrVisibleAlwaysOnTop (state.Toplevel);
-				EnsuresNotModalNotRunningAndNotCurrent (state.Toplevel);
+				if (!EnsuresNotModalNotRunningAndNotCurrent (state.Toplevel)) {
+					EnsuresMdiChildOnFrontIfMdiTopNotMostFocused ();
+				}
 				if ((state.Toplevel != Current && Current?.Modal == true)
 					|| (state.Toplevel != Current && Current?.Modal == false)) {
 
@@ -1260,6 +1266,15 @@ namespace Terminal.Gui {
 			}
 		}
 
+		static void EnsuresMdiChildOnFrontIfMdiTopNotMostFocused ()
+		{
+			if (MdiTop != null && Current == MdiTop && (MdiTop.MostFocused == null
+				|| MdiTop.MostFocused.GetType ().Name == "ContentView")) {
+
+				MoveNext ();
+			}
+		}
+
 		static void EnsureModalOrVisibleAlwaysOnTop (Toplevel toplevel)
 		{
 			if (!toplevel.Running || (toplevel == Current && toplevel.Visible) || MdiTop == null || toplevels.Peek ().Modal) {
@@ -1277,18 +1292,20 @@ namespace Terminal.Gui {
 			}
 		}
 
-		static void EnsuresNotModalNotRunningAndNotCurrent (Toplevel curRunStateTop)
+		static bool EnsuresNotModalNotRunningAndNotCurrent (Toplevel curRunStateTop)
 		{
 			if (MdiTop == null || !curRunStateTop.Running) {
-				return;
+				return false;
 			}
 
 			foreach (var top in toplevels) {
 				if (!top.IsMdiContainer && top?.Running == false && top != Current && top?.Modal == false) {
 					MoveCurrent (top);
-					return;
+					return true;
 				}
 			}
+
+			return false;
 		}
 
 		static bool MdiChildNeedsDisplay ()
