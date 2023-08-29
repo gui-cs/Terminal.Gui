@@ -10,6 +10,7 @@
     <InformationalVersion>1.14.0+Branch.v1-develop-branching-update.Sha.f47377ce8ba5a97f2f84c745eca04c336b094e96</InformationalVersion>
     <PackageVersion>$(Version)</PackageVersion>
     <Version>1.14.0</Version>-->
+
   </PropertyGroup>
   <!-- =================================================================== -->
   <!-- .NET Build Settings -->
