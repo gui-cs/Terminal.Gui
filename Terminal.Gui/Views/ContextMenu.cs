@@ -162,7 +162,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void Hide ()
 		{
-			menuBar.CleanUp ();
+			menuBar?.CleanUp ();
 			Dispose ();
 		}
 
