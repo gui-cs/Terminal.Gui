@@ -5,11 +5,8 @@
   <!-- GitVersion.xml controls settings  -->
   <!-- =================================================================== -->
   <PropertyGroup>
-    <!--<AssemblyVersion>1.14.0.0</AssemblyVersion>
-    <FileVersion>1.14.0.0</FileVersion>
-    <InformationalVersion>1.14.0+Branch.v1-develop-branching-update.Sha.f47377ce8ba5a97f2f84c745eca04c336b094e96</InformationalVersion>
-    <PackageVersion>$(Version)</PackageVersion>
-    <Version>1.14.0</Version>-->
+    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.0.0</Version>
   </PropertyGroup>
   <!-- =================================================================== -->
   <!-- .NET Build Settings -->
