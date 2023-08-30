@@ -7,10 +7,8 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <!-- Version numbers are automatically updated by gitversion when a release is released -->
     <!-- Do not modify these. -->
-    <AssemblyVersion>1.14.0.0</AssemblyVersion>
-    <FileVersion>1.14.0.0</FileVersion>
-    <Version>1.14.0</Version>
-    <InformationalVersion>1.14.0+Branch.v1-develop-branching-update.Sha.f47377ce8ba5a97f2f84c745eca04c336b094e96</InformationalVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.0.0</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DefineConstants>TRACE</DefineConstants>
