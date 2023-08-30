@@ -2,12 +2,13 @@ next-version: 1.14.0
 mode: ContinuousDeployment
 tag-prefix: '[vV]'
 continuous-delivery-fallback-tag: pre
-next-version: 1.14.0
 branches:
   develop:
     mode: ContinuousDeployment
     tag: pre
     regex: ^develop?[/-]
+    source-branches:
+    - main
   main:
     tag: rc
     increment: Patch
