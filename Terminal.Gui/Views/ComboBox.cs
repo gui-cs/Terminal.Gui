@@ -39,7 +39,7 @@ namespace Terminal.Gui {
 
 			private void Initialize (ComboBox container, bool hideDropdownListOnClick)
 			{
-				this.container = container ?? throw new ArgumentNullException ("ComboBox container cannot be null.", nameof (container));
+				this.container = container ?? throw new ArgumentNullException (nameof(container), "ComboBox container cannot be null.");
 				HideDropdownListOnClick = hideDropdownListOnClick;
 			}
 
