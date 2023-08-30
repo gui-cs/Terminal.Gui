@@ -26,4 +26,3 @@ branches:
     increment: Inherit
 ignore:
   sha: []
-merge-message-formats: {}

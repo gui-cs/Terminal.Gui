@@ -21,14 +21,14 @@ jobs:
     - name: Install GitVersion 
       uses: gittools/actions/gitversion/setup@v0
       with:
-          versionSpec: '6.x'
+          versionSpec: '5.x'
           includePrerelease: true
 
     - name: Determine Version
       uses: gittools/actions/gitversion/execute@v0
       with:
         useConfigFile: true
-        #additionalArguments: /verbosity Diagnostic
+        additionalArguments: /b develop
       id: gitversion # step id used as reference for output values
 
     - name: Setup dotnet
