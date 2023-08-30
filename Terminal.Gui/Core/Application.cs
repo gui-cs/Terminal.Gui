@@ -69,16 +69,15 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static List<Toplevel> MdiChildes {
 			get {
+				List<Toplevel> mdiChildes = new List<Toplevel> ();
 				if (MdiTop != null) {
-					List<Toplevel> mdiChildes = new List<Toplevel> ();
 					foreach (var top in toplevels) {
 						if (top != MdiTop && !top.Modal) {
 							mdiChildes.Add (top);
 						}
 					}
-					return mdiChildes;
 				}
-				return null;
+				return mdiChildes;
 			}
 		}
 

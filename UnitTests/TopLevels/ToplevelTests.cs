@@ -1,5 +1,4 @@
 ﻿using System;
-using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -2887,6 +2886,24 @@ BL      BR";
 			Assert.False (win2.Running);
 			Assert.Null (Application.Current);
 			Assert.Equal (7, iterations);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void MdiChildes_Null_Does_Not_Throws ()
+		{
+			var top = Top_With_MenuBar_And_StatusBar (false, true);
+
+			Assert.True (top.IsMdiContainer);
+
+			Application.Begin (top);
+
+			var mdiChildes = Application.MdiChildes;
+			Assert.Empty (mdiChildes);
+
+			top.IsMdiContainer = false;
+			var exception = Record.Exception (() => mdiChildes = Application.MdiChildes);
+			Assert.Null (exception);
+			Assert.Empty (mdiChildes);
 		}
 	}
 }
