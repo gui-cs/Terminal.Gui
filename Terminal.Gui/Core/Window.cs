@@ -273,9 +273,6 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 			contentView.Remove (view);
 
-			if (contentView.InternalSubviews.Count < 1) {
-				CanFocus = false;
-			}
 			RemoveMenuStatusBar (view);
 			if (view != contentView && Focused == null) {
 				FocusFirst ();

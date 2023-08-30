@@ -1,12 +1,14 @@
 mode: ContinuousDeployment
 tag-prefix: '[vV]'
 continuous-delivery-fallback-tag: pre
-next-version: 1.14.0
 branches:
   develop:
     mode: ContinuousDeployment
     tag: pre
-    regex: ^develop?[/-]
+    regex: develop
+    source-branches:
+    - main
+    pre-release-weight: 100
   main:
     tag: rc
     increment: Patch
@@ -24,4 +26,3 @@ branches:
     increment: Inherit
 ignore:
   sha: []
-merge-message-formats: {}
