@@ -1454,13 +1454,13 @@ internal class WindowsDriver : ConsoleDriver {
 		if (RunningUnitTests) {
 			return;
 		}
-		
+
 		try {
 			if (WinConsole != null) {
 				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
 				Cols = winSize.Width;
 				Rows = winSize.Height;
-			} 
+			}
 			WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
 
 			// Needed for Windows Terminal
@@ -1511,8 +1511,7 @@ internal class WindowsDriver : ConsoleDriver {
 
 		WinConsole?.ForceRefreshCursorVisibility ();
 	}
-	
-	
+
 	public override void UpdateScreen ()
 	{
 		var windowSize = WinConsole?.GetConsoleBufferWindow (out _) ?? new Size (Cols, Rows);
@@ -1711,7 +1710,7 @@ internal class WindowsDriver : ConsoleDriver {
 
 		if (!RunningUnitTests && _isWindowsTerminal) {
 			// Disable alternative screen buffer.
-			Console.Out.Write (EscSeqUtils.CSI_RestoreAltBufferWithBackscroll);
+			Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndActivateAltBufferWithBackscroll);
 		}
 	}
 
