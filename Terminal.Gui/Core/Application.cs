@@ -111,8 +111,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static View WantContinuousButtonPressedView { get; private set; }
 
-		private static bool? _enableConsoleScrolling;
-
 		/// <summary>
 		/// The current <see cref="ConsoleDriver.EnableConsoleScrolling"/> used in the terminal.
 		/// </summary>
@@ -128,32 +126,17 @@ namespace Terminal.Gui {
 		/// In this case console scrolling is enabled and the contents (<see cref="ConsoleDriver.Rows"/> high) will scroll
 		/// as the console scrolls. 
 		/// </para>
-		/// This API was previously named 'HeightAsBuffer` but was renamed to make its purpose more clear.
+		/// <para>This API is deprecated and has no impact when enabled.</para>
+		/// <para>This API was previously named 'HeightAsBuffer` but was renamed to make its purpose more clear.</para>
 		/// </remarks>
-		public static bool EnableConsoleScrolling {
-			get {
-				if (Driver == null) {
-					return _enableConsoleScrolling.HasValue && _enableConsoleScrolling.Value;
-				}
-				return Driver.EnableConsoleScrolling;
-			}
-			set {
-				_enableConsoleScrolling = value;
-				if (Driver == null) {
-					return;
-				}
-				Driver.EnableConsoleScrolling = value;
-			}
-		}
+		[Obsolete ("This API is deprecated and has no impact when enabled.", false)]
+		public static bool EnableConsoleScrolling { get; set; }
 
 		/// <summary>
 		/// This API is deprecated; use <see cref="EnableConsoleScrolling"/> instead.
 		/// </summary>
-		[Obsolete ("This API is deprecated; use EnableConsoleScrolling instead.", false)]
-		public static bool HeightAsBuffer {
-			get => EnableConsoleScrolling;
-			set => EnableConsoleScrolling = value;
-		}
+		[Obsolete ("This API is deprecated and has no impact when enabled.", false)]
+		public static bool HeightAsBuffer { get; set; }
 
 		static Key alternateForwardKey = Key.PageDown | Key.CtrlMask;
 
@@ -449,7 +432,6 @@ namespace Terminal.Gui {
 			MainLoop = new MainLoop (mainLoopDriver);
 
 			try {
-				Driver.EnableConsoleScrolling = EnableConsoleScrolling;
 				Driver.Init (TerminalResized);
 			} catch (InvalidOperationException ex) {
 				// This is a case where the driver is unable to initialize the console.
@@ -1071,7 +1053,8 @@ namespace Terminal.Gui {
 					MdiTop.OnAllChildClosed ();
 				} else {
 					SetCurrentAsTop ();
-					Current.OnEnter (Current);
+					runState.Toplevel.OnLeave (Current);
+					Current.OnEnter (runState.Toplevel);
 				}
 				Refresh ();
 			}
@@ -1125,7 +1108,6 @@ namespace Terminal.Gui {
 			NotifyStopRunState = null;
 			_initialized = false;
 			mouseGrabView = null;
-			_enableConsoleScrolling = false;
 
 			// Reset synchronization context to allow the user to run async/await,
 			// as the main loop has been ended, the synchronization context from 

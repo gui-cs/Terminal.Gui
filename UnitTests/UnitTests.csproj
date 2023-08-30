@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <!-- https://stackoverflow.com/questions/294216/why-does-c-sharp-forbid-generic-attribute-types -->
@@ -7,12 +7,9 @@
     <IsPackable>false</IsPackable>
     <UseDataCollector />
     <!-- Version numbers are automatically updated by gitversion when a release is released -->
-    <!-- In the source tree the version will always be 2.0 for all projects. -->
     <!-- Do not modify these. -->
-    <AssemblyVersion>1.10.1.0</AssemblyVersion>
-    <FileVersion>1.10.1.0</FileVersion>
-    <Version>1.10.1</Version>
-    <InformationalVersion>1.10.1+6.Branch.main.Sha.f7ee66ddbf8dbcfb0d96af7d63789879091670ec</InformationalVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.0.0</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DefineConstants>TRACE</DefineConstants>
@@ -21,8 +18,8 @@
     <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
-    <PackageReference Include="ReportGenerator" Version="5.1.23" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+    <PackageReference Include="ReportGenerator" Version="5.1.24" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
     <PackageReference Include="xunit" Version="2.5.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.0">
@@ -37,6 +34,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
     <ProjectReference Include="..\UICatalog\UICatalog.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <PropertyGroup Label="FineCodeCoverage">
     <Enabled>

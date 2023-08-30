@@ -49,16 +49,21 @@ namespace Terminal.Gui.MenuTests {
 			Assert.NotNull (cm.Host);
 		}
 
-		[Fact]
-		[AutoInitShutdown]
-		public void Show_Hide_IsShow ()
+		private ContextMenu Create_ContextMenu_With_Two_MenuItem (int x, int y)
 		{
-			var cm = new ContextMenu (10, 5,
+			return new ContextMenu (x, y,
 				new MenuBarItem (new MenuItem [] {
 					new MenuItem ("One", "", null),
 					new MenuItem ("Two", "", null)
 				})
 			);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void Show_Hide_IsShow ()
+		{
+			var cm = Create_ContextMenu_With_Two_MenuItem (10, 5);
 
 			cm.Show ();
 			Assert.True (ContextMenu.IsShow);
@@ -901,6 +906,66 @@ namespace Terminal.Gui.MenuTests {
 			Assert.True (tf.ContextMenu.MenuBar.IsMenuOpen);
 			Assert.True (top.Subviews [1].ProcessKey (new KeyEvent (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Null (tf.ContextMenu.MenuBar);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void RequestStop_While_ContextMenu_Is_Open_Does_Not_Throws ()
+		{
+			var cm = Create_ContextMenu_With_Two_MenuItem (10, 5);
+			var top = Application.Top;
+			var isMenuAllClosed = false;
+			MenuBarItem mi = null;
+			var iterations = -1;
+			Application.Iteration += () => {
+				iterations++;
+				if (iterations == 0) {
+					cm.Show ();
+					Assert.True (ContextMenu.IsShow);
+					mi = cm.MenuBar.Menus [0];
+					mi.Action = () => {
+						var dialog1 = new Dialog ();
+						Application.Run (dialog1);
+
+						Assert.False (ContextMenu.IsShow);
+						Assert.True (isMenuAllClosed);
+					};
+
+					cm.MenuBar.MenuAllClosed += () => isMenuAllClosed = true;
+
+				} else if (iterations == 1) {
+					mi.Action ();
+				} else if (iterations == 2) {
+					Application.RequestStop ();
+				} else if (iterations == 3) {
+					isMenuAllClosed = false;
+					cm.Show ();
+					Assert.True (ContextMenu.IsShow);
+
+					cm.MenuBar.MenuAllClosed += () => isMenuAllClosed = true;
+				} else if (iterations == 4) {
+					var exception = Record.Exception (() => Application.RequestStop ());
+					Assert.Null (exception);
+				} else {
+					Application.RequestStop ();
+				}
+			};
+
+			var isTopClosed = false;
+			top.Closing += (_) => {
+				var dialog2 = new Dialog ();
+				Application.Run (dialog2);
+
+				Assert.False (ContextMenu.IsShow);
+				Assert.True (isMenuAllClosed);
+
+				isTopClosed = true;
+			};
+
+			Application.Run ();
+
+			Assert.True (isTopClosed);
+			Assert.False (ContextMenu.IsShow);
+			Assert.True (isMenuAllClosed);
 		}
 	}
 }

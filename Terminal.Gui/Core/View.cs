@@ -371,7 +371,7 @@ namespace Terminal.Gui {
 						SuperView?.EnsureFocus ();
 						if (SuperView != null && SuperView.Focused == null) {
 							SuperView.FocusNext ();
-							if (SuperView.Focused == null) {
+							if (SuperView.Focused == null && Application.Current != null) {
 								Application.Current.FocusNext ();
 							}
 							Application.EnsuresTopOnFront ();
@@ -995,9 +995,6 @@ namespace Terminal.Gui {
 			view.tabIndex = -1;
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
-			if (subviews.Count < 1) {
-				CanFocus = false;
-			}
 			foreach (var v in subviews) {
 				if (v.Frame.IntersectsWith (touched))
 					view.SetNeedsDisplay ();
@@ -2199,7 +2196,7 @@ namespace Terminal.Gui {
 			} else {
 				actY = y?.Anchor (hostFrame.Height) ?? 0;
 
-				actH = Math.Max (CalculateActualHight (height, hostFrame, actY, s), 0);
+				actH = Math.Max (CalculateActualHeight (height, hostFrame, actY, s), 0);
 			}
 
 			var r = new Rect (actX, actY, actW, actH);
@@ -2240,7 +2237,7 @@ namespace Terminal.Gui {
 			return actW;
 		}
 
-		private int CalculateActualHight (Dim height, Rect hostFrame, int actY, Size s)
+		private int CalculateActualHeight (Dim height, Rect hostFrame, int actY, Size s)
 		{
 			int actH;
 			switch (height) {
@@ -2248,8 +2245,8 @@ namespace Terminal.Gui {
 				actH = AutoSize ? s.Height : hostFrame.Height;
 				break;
 			case Dim.DimCombine combine:
-				int leftActH = CalculateActualHight (combine.left, hostFrame, actY, s);
-				int rightActH = CalculateActualHight (combine.right, hostFrame, actY, s);
+				int leftActH = CalculateActualHeight (combine.left, hostFrame, actY, s);
+				int rightActH = CalculateActualHeight (combine.right, hostFrame, actY, s);
 				if (combine.add) {
 					actH = leftActH + rightActH;
 				} else {
@@ -2449,7 +2446,7 @@ namespace Terminal.Gui {
 
 			foreach (var v in ordered) {
 				if (v.LayoutStyle == LayoutStyle.Computed) {
-					v.SetRelativeLayout (Frame);
+					v.SetRelativeLayout (v?.SuperView.Frame ?? Frame);
 				}
 
 				v.LayoutSubviews ();

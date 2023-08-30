@@ -1,11 +1,14 @@
 name: Publish Terminal.Gui
+
 on:
   push:
+    branches: [ main, develop, v2_release, v2_develop ]
     tags:
       - v*
+    paths-ignore:
+      - '**.md'
 
 jobs:
-
   publish:
     name: Build and Publish to Nuget.org
     runs-on: ubuntu-latest
@@ -13,27 +16,27 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        fetch-depth: 0 #fetch-depth is needed for GitVersion
+        fetch-depth: 0 # fetch-depth is needed for GitVersion
 
-    - name: Install and calculate the new version with GitVersion 
+    - name: Install GitVersion 
       uses: gittools/actions/gitversion/setup@v0
       with:
-        versionSpec: 5.x
+          versionSpec: '5.x'
+          includePrerelease: true
 
     - name: Determine Version
       uses: gittools/actions/gitversion/execute@v0
+      with:
+        useConfigFile: true
+        #additionalArguments: /b develop
       id: gitversion # step id used as reference for output values
-
-    - name: Display GitVersion outputs
-      run: |
-        echo "Version: ${{ steps.gitversion.outputs.SemVer }}"
-        echo "CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }}"
 
     - name: Setup dotnet
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 7.0
-
+        dotnet-quality: 'ga'
+        
     - name: Install dependencies
       run: dotnet restore
 
@@ -45,33 +48,27 @@ jobs:
     - name: Pack
       run: dotnet pack -c Release --include-symbols -p:Version='${{ steps.gitversion.outputs.SemVer }}' 
 
-    - name: Test to generate Code Coverage Report
-      run: |
-        dotnet test --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings
-        mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
+    # - name: Test to generate Code Coverage Report
+    #   run: |
+    #     sed -i 's/"stopOnFail": false/"stopOnFail": true/g' UnitTests/xunit.runner.json
+    #     dotnet test --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings
+    #     mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
 
-    - name: Create Test Coverage Badge
-      uses: simon-k/dotnet-code-coverage-badge@v1.0.0
-      id: create_coverage_badge
-      with:
-        label: Unit Test Coverage
-        color: brightgreen
-        path: UnitTests/TestResults/coverage.opencover.xml
-        gist-filename: code-coverage.json
-        # https://gist.github.com/migueldeicaza/90ef67a684cb71db1817921a970f8d27
-        gist-id: 90ef67a684cb71db1817921a970f8d27
-        gist-auth-token: ${{ secrets.GIST_AUTH_TOKEN }}   
+    # - name: Create Test Coverage Badge
+    #   uses: simon-k/dotnet-code-coverage-badge@v1.0.0
+    #   id: create_coverage_badge
+    #   with:
+    #     label: Unit Test Coverage
+    #     color: brightgreen
+    #     path: UnitTests/TestResults/coverage.opencover.xml
+    #     gist-filename: code-coverage.json
+    #     gist-id: 90ef67a684cb71db1817921a970f8d27
+    #     gist-auth-token: ${{ secrets.GIST_AUTH_TOKEN }}   
 
-    - name: Print Code Coverage
-      run: |
-        echo "Code coverage percentage: ${{steps.create_coverage_badge.outputs.percentage}}%"
-        echo "Badge data: ${{steps.create_coverage_badge.outputs.badge}}"
+    # - name: Print Code Coverage
+    #   run: |
+    #     echo "Code coverage percentage: ${{steps.create_coverage_badge.outputs.percentage}}%"
+    #     echo "Badge data: ${{steps.create_coverage_badge.outputs.badge}}"
         
-    #- name: Prep GitHub Packages
-    #  run: dotnet nuget add source --username tig --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/tig/index.json"
-
-    #- name: Publish to GitHub packages 
-    #  run: dotnet nuget push NStack/bin/Release/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
-
     - name: Publish to NuGet.org
-      run: dotnet nuget push Terminal.Gui/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+      run: dotnet nuget push Terminal.Gui/bin/Release/Terminal.Gui.${{ steps.gitversion.outputs.SemVer }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} 

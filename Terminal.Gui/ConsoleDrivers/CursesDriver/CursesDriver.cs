@@ -20,12 +20,10 @@ namespace Terminal.Gui {
 		public override int Rows => Curses.Lines;
 		public override int Left => 0;
 		public override int Top => 0;
+		[Obsolete ("This API is deprecated", false)]
 		public override bool EnableConsoleScrolling { get; set; }
-		[Obsolete ("This API is deprecated; use EnableConsoleScrolling instead.", false)]
-		public override bool HeightAsBuffer {
-			get => EnableConsoleScrolling;
-			set => EnableConsoleScrolling = value;
-		}
+		[Obsolete ("This API is deprecated", false)]
+		public override bool HeightAsBuffer { get; set; }
 		public override IClipboard Clipboard { get => clipboard; }
 
 		CursorVisibility? initialCursorVisibility = null;
@@ -144,7 +142,6 @@ namespace Terminal.Gui {
 			Curses.raw ();
 			Curses.noecho ();
 			Curses.refresh ();
-			ProcessWinChange ();
 		}
 
 		private void ProcessWinChange ()
@@ -162,6 +159,10 @@ namespace Terminal.Gui {
 		{
 			StopReportingMouseMoves ();
 			SetCursorVisibility (CursorVisibility.Default);
+
+			// throws away any typeahead that has been typed by
+			// the user and has not yet been read by the program.
+			Curses.flushinp ();
 
 			Curses.endwin ();
 		}
@@ -339,8 +340,12 @@ namespace Terminal.Gui {
 			Key k = Key.Null;
 
 			if (code == Curses.KEY_CODE_YES) {
-				if (wch == Curses.KeyResize) {
+				while (code == Curses.KEY_CODE_YES && wch == Curses.KeyResize) {
 					ProcessWinChange ();
+					code = Curses.get_wch (out wch);
+				}
+				if (wch == 0) {
+					return;
 				}
 				if (wch == Curses.KeyMouse) {
 					int wch2 = wch;
@@ -494,8 +499,44 @@ namespace Terminal.Gui {
 			}
 		}
 
+		MouseFlags lastMouseFlags;
+
 		void ProcessMouseEvent (MouseFlags mouseFlag, Point pos)
 		{
+			bool WasButtonReleased (MouseFlags flag)
+			{
+				return flag.HasFlag (MouseFlags.Button1Released) ||
+					flag.HasFlag (MouseFlags.Button2Released) ||
+					flag.HasFlag (MouseFlags.Button3Released) ||
+					flag.HasFlag (MouseFlags.Button4Released);
+			}
+
+			bool IsButtonNotPressed (MouseFlags flag)
+			{
+				return !flag.HasFlag (MouseFlags.Button1Pressed) &&
+					!flag.HasFlag (MouseFlags.Button2Pressed) &&
+					!flag.HasFlag (MouseFlags.Button3Pressed) &&
+					!flag.HasFlag (MouseFlags.Button4Pressed);
+			}
+
+			bool IsButtonClickedOrDoubleClicked (MouseFlags flag)
+			{
+				return flag.HasFlag (MouseFlags.Button1Clicked) ||
+					flag.HasFlag (MouseFlags.Button2Clicked) ||
+					flag.HasFlag (MouseFlags.Button3Clicked) ||
+					flag.HasFlag (MouseFlags.Button4Clicked) ||
+					flag.HasFlag (MouseFlags.Button1DoubleClicked) ||
+					flag.HasFlag (MouseFlags.Button2DoubleClicked) ||
+					flag.HasFlag (MouseFlags.Button3DoubleClicked) ||
+					flag.HasFlag (MouseFlags.Button4DoubleClicked);
+			}
+
+			if ((WasButtonReleased (mouseFlag) && IsButtonNotPressed (lastMouseFlags)) ||
+				(IsButtonClickedOrDoubleClicked (mouseFlag) && lastMouseFlags == 0)) {
+				return;
+			}
+
+			lastMouseFlags = mouseFlag;
 			var me = new MouseEvent () {
 				Flags = mouseFlag,
 				X = pos.X,
@@ -531,7 +572,7 @@ namespace Terminal.Gui {
 			});
 
 			mLoop.WinChanged += () => {
-				ProcessWinChange ();
+				ProcessInput ();
 			};
 		}
 

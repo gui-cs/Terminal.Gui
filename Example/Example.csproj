@@ -3,12 +3,9 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
     <!-- Version numbers are automatically updated by gitversion when a release is released -->
-    <!-- In the source tree the version will always be 1.0 for all projects. -->
     <!-- Do not modify these. -->
-    <AssemblyVersion>1.10.1.0</AssemblyVersion>
-    <FileVersion>1.10.1.0</FileVersion>
-    <Version>1.10.1</Version>
-    <InformationalVersion>1.10.1+6.Branch.main.Sha.f7ee66ddbf8dbcfb0d96af7d63789879091670ec</InformationalVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
