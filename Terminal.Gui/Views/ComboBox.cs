@@ -39,10 +39,7 @@ namespace Terminal.Gui {
 
 			private void Initialize (ComboBox container, bool hideDropdownListOnClick)
 			{
-				if (container == null)
-					throw new ArgumentNullException ("ComboBox container cannot be null.", nameof (container));
-
-				this.container = container;
+				this.container = container ?? throw new ArgumentNullException (nameof (container), "ComboBox container cannot be null.");
 				HideDropdownListOnClick = hideDropdownListOnClick;
 			}
 
@@ -236,7 +233,7 @@ namespace Terminal.Gui {
 		readonly TextField search;
 		readonly ComboListView listview;
 		bool autoHide = true;
-		int minimumHeight = 2;
+		readonly int minimumHeight = 2;
 
 		/// <summary>
 		/// Public constructor
@@ -296,7 +293,7 @@ namespace Terminal.Gui {
 			listview.Y = Pos.Bottom (search);
 			listview.OpenSelectedItem += (object sender, ListViewItemEventArgs a) => Selected ();
 
-			this.Add (search, listview);
+			Add (search, listview);
 
 			// On resize
 			LayoutComplete += (object sender, LayoutEventArgs a) => {
@@ -723,7 +720,19 @@ namespace Terminal.Gui {
 				return text;
 			}
 			set {
-				search.Text = text = value;
+				SetSearchText (value);
+			}
+		}
+
+		/// <summary>
+		/// Current search text 
+		/// </summary>
+		public string SearchText {
+			get {
+				return search.Text;
+			}
+			set {
+				SetSearchText (value);
 			}
 		}
 
@@ -779,7 +788,7 @@ namespace Terminal.Gui {
 		private void Reset (bool keepSearchText = false)
 		{
 			if (!keepSearchText) {
-				search.Text = text = "";
+				SetSearchText (string.Empty);
 			}
 
 			ResetSearchSet ();
@@ -790,6 +799,10 @@ namespace Terminal.Gui {
 			if (Subviews.Count > 0) {
 				search.SetFocus ();
 			}
+		}
+		private void SetSearchText (string value)
+		{
+			search.Text = text = value;
 		}
 
 		private void ResetSearchSet (bool noCopy = false)
@@ -847,7 +860,7 @@ namespace Terminal.Gui {
 			listview.SetSource (searchset);
 			listview.Clear (); // Ensure list shrinks in Dialog as you type
 			listview.Height = CalculatetHeight ();
-			this.SuperView?.BringSubviewToFront (this);
+			SuperView?.BringSubviewToFront (this);
 		}
 
 		/// <summary>
@@ -861,7 +874,8 @@ namespace Terminal.Gui {
 				OnOpenSelectedItem ();
 			}
 			var rect = listview.ViewToScreen (listview.Bounds);
-			Reset (SelectedItem > -1);
+			Reset (keepSearchText: true);
+			listview.Clear (rect);
 			listview.Clear (rect);
 			listview.TabStop = false;
 			SuperView?.SendSubviewToBack (this);

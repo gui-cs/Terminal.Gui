@@ -101,7 +101,7 @@ namespace Terminal.Gui.ViewsTests {
 			cb.Text = "Tw";
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
 			Assert.True (opened);
-			Assert.Equal ("", cb.Text);
+			Assert.Equal ("Tw", cb.Text);
 			Assert.False (cb.IsShow);
 			cb.SetSource (null);
 			Assert.False (cb.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
@@ -262,7 +262,7 @@ Three
 			Assert.False (cb.IsShow);
 			Assert.Equal (2, cb.Source.Count);
 			Assert.Equal (-1, cb.SelectedItem);
-			Assert.Equal ("", cb.Text);
+			Assert.Equal ("T", cb.Text);
 			Assert.True (cb.ProcessKey (new KeyEvent (Key.Esc, new KeyModifiers ())));
 			Assert.False (cb.IsShow);
 			Assert.Equal (-1, cb.SelectedItem); // retains last accept selected item
