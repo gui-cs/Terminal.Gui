@@ -876,7 +876,6 @@ namespace Terminal.Gui {
 			var rect = listview.ViewToScreen (listview.Bounds);
 			Reset (keepSearchText: true);
 			listview.Clear (rect);
-			listview.Clear (rect);
 			listview.TabStop = false;
 			SuperView?.SendSubviewToBack (this);
 			SuperView?.SetNeedsDisplay (rect);
