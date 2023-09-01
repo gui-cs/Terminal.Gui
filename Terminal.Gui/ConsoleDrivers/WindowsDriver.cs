@@ -1796,8 +1796,8 @@ internal class WindowsMainLoop : IMainLoopDriver {
 		while (true) {
 			Task.Delay (500).Wait ();
 			_windowSize = _winConsole.GetConsoleBufferWindow (out _);
-			if (_windowSize != Size.Empty && _windowSize.Width != _consoleDriver.Cols
-			    || _windowSize.Height != _consoleDriver.Rows) {
+			if (_windowSize != Size.Empty && (_windowSize.Width != _consoleDriver.Cols
+			    || _windowSize.Height != _consoleDriver.Rows)) {
 				return;
 			}
 		}
