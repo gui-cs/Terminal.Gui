@@ -803,8 +803,46 @@ internal class WindowsDriver : ConsoleDriver {
 			Clipboard = new FakeDriver.FakeClipboard ();
 		}
 
-		_isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") != null;
+		_isWindowsTerminal = GetParentProcessName () == "WindowsTerminal";
+	}
 
+	private static string GetParentProcessName ()
+	{
+#pragma warning disable CA1416 // Validate platform compatibility
+		var myId = Process.GetCurrentProcess ().Id;
+		var query = string.Format ($"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {myId}");
+		var search = new ManagementObjectSearcher ("root\\CIMV2", query);
+		var queryObj = search.Get ().OfType<ManagementBaseObject> ().FirstOrDefault ();
+		if (queryObj == null) {
+			return null;
+		}
+		var parentId = (uint)queryObj ["ParentProcessId"];
+		var parent = Process.GetProcessById ((int)parentId);
+		var prevParent = parent;
+
+		// Check if the parent is from other parent
+		while (queryObj != null) {
+			query = string.Format ($"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {parentId}");
+			search = new ManagementObjectSearcher ("root\\CIMV2", query);
+			queryObj = search.Get ().OfType<ManagementBaseObject> ().FirstOrDefault ();
+			if (queryObj == null) {
+				return parent.ProcessName;
+			}
+			parentId = (uint)queryObj ["ParentProcessId"];
+			try {
+				parent = Process.GetProcessById ((int)parentId);
+				if (string.Equals (parent.ProcessName, "explorer", StringComparison.InvariantCultureIgnoreCase)) {
+					return prevParent.ProcessName;
+				}
+				prevParent = parent;
+			} catch (ArgumentException) {
+
+				return prevParent.ProcessName;
+			}
+		}
+
+		return parent.ProcessName;
+#pragma warning restore CA1416 // Validate platform compatibility
 	}
 
 	public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
