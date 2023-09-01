@@ -803,7 +803,9 @@ internal class WindowsDriver : ConsoleDriver {
 			Clipboard = new FakeDriver.FakeClipboard ();
 		}
 
-		_isWindowsTerminal = GetParentProcessName () == "WindowsTerminal";
+		if (!RunningUnitTests) {
+			_isWindowsTerminal = GetParentProcessName () == "WindowsTerminal";
+		}
 	}
 
 	private static string GetParentProcessName ()
