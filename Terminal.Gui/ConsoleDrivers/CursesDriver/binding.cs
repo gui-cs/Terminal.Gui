@@ -43,6 +43,7 @@
 //
 using System;
 using System.Runtime.InteropServices;
+using Terminal.Gui;
 
 namespace Unix.Terminal {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -83,8 +84,25 @@ namespace Unix.Terminal {
 		static void LoadMethods ()
 		{
 			var libs = UnmanagedLibrary.IsMacOSPlatform ? new string [] { "libncurses.dylib" } : new string [] { "libncursesw.so.6", "libncursesw.so.5" };
-			curses_library = new UnmanagedLibrary (libs, false);
-			methods = new NativeMethods (curses_library);
+			var attempts = 1;
+			while (true) {
+				try {
+					curses_library = new UnmanagedLibrary (libs, false);
+					methods = new NativeMethods (curses_library);
+					break;
+				} catch (Exception ex) {
+
+					if (attempts == 1) {
+						attempts++;
+						var (exitCode, result) = ClipboardProcessRunner.Bash ("cat /etc/os-release", waitForOutput: true);
+						if (exitCode == 0 && result.Contains ("opensuse")) {
+							libs [0] = "libncursesw.so.5";
+						}
+					} else {
+						throw ex.GetBaseException ();
+					}
+				}
+			}
 		}
 
 		static void FindNCurses ()

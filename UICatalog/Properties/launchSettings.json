@@ -54,8 +54,8 @@
       "commandName": "Project",
       "commandLineArgs": "\"Windows & FrameViews\""
     },
-    "Profile 1": {
-      "commandName": "Executable"
+    "Docker": {
+      "commandName": "Docker"
     }
   }
 }

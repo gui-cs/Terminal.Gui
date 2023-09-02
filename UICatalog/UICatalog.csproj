@@ -11,6 +11,7 @@
     <FileVersion>2.0</FileVersion>
     <Version>2.0</Version>
     <InformationalVersion>2.0</InformationalVersion>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DefineConstants>TRACE</DefineConstants>
@@ -28,6 +29,7 @@
   <None Update="./Scenarios/Spinning_globe_dark_small.gif" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.4" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
