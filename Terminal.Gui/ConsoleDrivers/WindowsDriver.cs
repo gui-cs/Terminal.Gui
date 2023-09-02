@@ -777,21 +777,11 @@ internal class WindowsDriver : ConsoleDriver {
 
 	public WindowsConsole WinConsole { get; private set; }
 
-	public override bool SupportsTrueColor => RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931);
-
-	public override bool Force16Colors {
-		get => base.Force16Colors;
-		set {
-			base.Force16Colors = value;
-			// BUGBUG: This is a hack until we fully support VirtualTerminalSequences
-			if (WinConsole != null) {
-				WinConsole = new WindowsConsole ();
-			}
-			Refresh ();
-		}
-	}
+	public override bool SupportsTrueColor => RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931
+		&& (_isWindowsTerminal || _parentProcessName == "devenv"));
 
 	readonly bool _isWindowsTerminal = false;
+	readonly string _parentProcessName = "WindowsTerminal";
 
 	public WindowsDriver ()
 	{
@@ -804,7 +794,11 @@ internal class WindowsDriver : ConsoleDriver {
 		}
 
 		if (!RunningUnitTests) {
-			_isWindowsTerminal = GetParentProcessName () == "WindowsTerminal";
+			_parentProcessName = GetParentProcessName ();
+			_isWindowsTerminal = _parentProcessName == "WindowsTerminal";
+			if (!_isWindowsTerminal && _parentProcessName != "devenv") {
+				Force16Colors = true;
+			}
 		}
 	}
 
@@ -1748,7 +1742,7 @@ internal class WindowsDriver : ConsoleDriver {
 		WinConsole?.Cleanup ();
 		WinConsole = null;
 
-		if (!RunningUnitTests && _isWindowsTerminal) {
+		if (!RunningUnitTests && (_isWindowsTerminal || _parentProcessName == "devenv")) {
 			// Disable alternative screen buffer.
 			Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndActivateAltBufferWithBackscroll);
 		}

@@ -360,7 +360,6 @@ public abstract class ConsoleDriver {
 
 	#region Color Handling
 
-	
 	/// <summary>
 	/// Gets whether the <see cref="ConsoleDriver"/> supports TrueColor output.
 	/// </summary>
@@ -380,7 +379,6 @@ public abstract class ConsoleDriver {
 		get => _force16Colors || !SupportsTrueColor;
 		set {
 			_force16Colors = (value || !SupportsTrueColor);
-			Refresh ();
 		}
 	}
 
@@ -533,7 +531,7 @@ public abstract class ConsoleDriver {
 	/// Ends the execution of the console driver.
 	/// </summary>
 	public abstract void End ();
-	
+
 	/// <summary>
 	/// Returns the name of the driver and relevant library version information.
 	/// </summary>
