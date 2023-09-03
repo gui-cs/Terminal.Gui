@@ -16,7 +16,7 @@ branches:
     regex: ^v2_develop?[/-]
     is-release-branch: true
     tracks-release-branches: true
-    is-source-branch-for: ['v2']
+    #is-source-branch-for: ['v2']
     source-branches: []
 
   main:
