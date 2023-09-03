@@ -17,8 +17,8 @@ branches:
     is-release-branch: true
     tracks-release-branches: true
     is-source-branch-for: ['v2']
-    source-branches: 
-      - v2
+    source-branches: []
+
   main:
     tag: rc
     increment: Patch
