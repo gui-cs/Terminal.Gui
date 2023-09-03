@@ -2,16 +2,13 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>9.0</LangVersion>
     <StartupObject>UICatalog.UICatalogApp</StartupObject>
-    <!-- Version numbers are automatically updated by gitversion when a release is released -->
-    <!-- In the source tree the version will always be 2.0 for all projects. -->
-    <!-- Do not modify these. -->
-    <AssemblyVersion>1.13.6.0</AssemblyVersion>
-    <FileVersion>1.13.6.0</FileVersion>
-    <Version>1.13.6-pre0002</Version>
-    <InformationalVersion>1.13.6-pre.2+Branch.develop.Sha.90208d6577b9d34bf0c4e9057b4227297bc9118d</InformationalVersion>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <!-- Version numbers are automatically updated by gitversion when a release is released -->
+    <!-- Do not modify these. -->
+    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.0.0</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DefineConstants>TRACE</DefineConstants>
@@ -23,8 +20,8 @@
     <None Update="./Scenarios/Spinning_globe_dark_small.gif" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.1" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.0.2" />
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
   </ItemGroup>

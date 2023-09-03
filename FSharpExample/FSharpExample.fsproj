@@ -2,10 +2,10 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
-    <AssemblyVersion>1.13.6.0</AssemblyVersion>
-    <FileVersion>1.13.6.0</FileVersion>
-    <InformationalVersion>1.13.6-pre.2+Branch.develop.Sha.90208d6577b9d34bf0c4e9057b4227297bc9118d</InformationalVersion>
-    <Version>1.13.6-pre0002</Version>
+    <AssemblyVersion>1.14.0.0</AssemblyVersion>
+    <FileVersion>1.14.0.0</FileVersion>
+    <InformationalVersion>1.14.0-pre.1+Branch.develop.Sha.e0b7464669ef87b96b57f2285200e02bcf85d0e7</InformationalVersion>
+    <Version>1.14.0-pre0001</Version>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Program.fs" />

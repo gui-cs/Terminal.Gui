@@ -1053,7 +1053,8 @@ namespace Terminal.Gui {
 					MdiTop.OnAllChildClosed ();
 				} else {
 					SetCurrentAsTop ();
-					Current.OnEnter (Current);
+					runState.Toplevel.OnLeave (Current);
+					Current.OnEnter (runState.Toplevel);
 				}
 				Refresh ();
 			}

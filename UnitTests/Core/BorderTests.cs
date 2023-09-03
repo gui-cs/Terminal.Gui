@@ -619,5 +619,29 @@ At 0,0
 ████████████████████
 At 0,4              ", output);
 		}
+
+		[Fact]
+		public void BorderBrush_Background_Only_Is_Set_To_Valid_Color_Enum ()
+		{
+			var border = new Border ();
+			Assert.Equal ((Color)(-1), border.BorderBrush);
+			Assert.Equal ((Color)(-1), border.Background);
+			Assert.Null (border.GetFieldValue<string> ("borderBrush"));
+			Assert.Null (border.GetFieldValue<string> ("background"));
+
+			border.BorderBrush = (Color)(-1);
+			border.Background = (Color)(-1);
+			Assert.Equal ((Color)(-1), border.BorderBrush);
+			Assert.Equal ((Color)(-1), border.Background);
+			Assert.Null (border.GetFieldValue<Color?> ("borderBrush"));
+			Assert.Null (border.GetFieldValue<Color?> ("background"));
+
+			border.BorderBrush = Color.Blue;
+			border.Background = Color.White;
+			Assert.Equal (Color.Blue, border.BorderBrush);
+			Assert.Equal (Color.White, border.Background);
+			Assert.Equal (Color.Blue, border.GetFieldValue<Color> ("borderBrush"));
+			Assert.Equal (Color.White, border.GetFieldValue<Color?> ("background"));
+		}
 	}
 }

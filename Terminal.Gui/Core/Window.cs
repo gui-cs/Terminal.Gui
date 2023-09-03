@@ -88,11 +88,18 @@ namespace Terminal.Gui {
 
 			public ContentView (Rect frame, Window instance) : base (frame)
 			{
-				this.instance = instance;
+				Initialize (instance);
 			}
 			public ContentView (Window instance) : base ()
 			{
+				Initialize (instance);
+			}
+
+			private void Initialize (Window instance)
+			{
 				this.instance = instance;
+				CanFocus = this.instance.CanFocus;
+				Driver?.SetCursorVisibility (CursorVisibility.Invisible);
 			}
 
 			public override void OnCanFocusChanged ()
@@ -263,9 +270,6 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 			contentView.Remove (view);
 
-			if (contentView.InternalSubviews.Count < 1) {
-				CanFocus = false;
-			}
 			RemoveMenuStatusBar (view);
 			if (view != contentView && Focused == null) {
 				FocusFirst ();
