@@ -12,7 +12,7 @@ branches:
 
   v2_develop:
     mode: ContinuousDeployment
-    tag: pre
+    tag: alpha
     regex: ^v2_develop?[/-]
     is-release-branch: true
     tracks-release-branches: true
