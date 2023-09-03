@@ -603,6 +603,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="title">The title.</param>
 		/// <param name="prompt">The prompt.</param>
+		/// <param name="cancel">The cancel</param>
 		/// <param name="nameFieldLabel">The name of the file field label..</param>
 		/// <param name="message">The message.</param>
 		/// <param name="allowedTypes">The allowed types.</param>
@@ -614,6 +615,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="title">The title.</param>
 		/// <param name="prompt">The prompt.</param>
+		/// <param name="cancel">The cancel</param>
 		/// <param name="message">The message.</param>
 		/// <param name="allowedTypes">The allowed types.</param>
 		public FileDialog (ustring title, ustring prompt,ustring cancel, ustring message, List<string> allowedTypes)
@@ -624,6 +626,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="title">The title.</param>
 		/// <param name="prompt">The prompt.</param>
+		/// <param name="cancel">The cancel</param>
 		/// <param name="nameDirLabel">The name of the directory field label.</param>
 		/// <param name="nameFieldLabel">The name of the file field label..</param>
 		/// <param name="message">The message.</param>
