@@ -151,7 +151,7 @@
     <value>另存为 (_S)</value>
   </data>
   <data name="fdOpen" xml:space="preserve">
-    <value>打开 (_O)</value>
+    <value>打开</value>
   </data>
   <data name="wzNext" xml:space="preserve">
     <value>下一步 (_N)...</value>

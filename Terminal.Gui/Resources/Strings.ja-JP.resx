@@ -151,7 +151,7 @@
     <value>名前を付けて保存 (_S)</value>
   </data>
   <data name="fdOpen" xml:space="preserve">
-    <value>開く (_O)</value>
+    <value>開く</value>
   </data>
   <data name="fdSelectFolder" xml:space="preserve">
     <value>フォルダーを選択 (_S)</value>
