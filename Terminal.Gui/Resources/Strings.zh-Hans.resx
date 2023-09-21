@@ -208,7 +208,7 @@
     <value>任意文件</value>
   </data>
   <data name="fdDeleteBody" xml:space="preserve">
-    <value>您是否要删除“{0}”？此操作不可撤销。</value>
+    <value>您是否要删除“{0}”？此操作不可撤销</value>
   </data>
   <data name="fdDeleteFailedTitle" xml:space="preserve">
     <value>删除失败</value>

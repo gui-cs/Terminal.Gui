@@ -172,7 +172,7 @@
     <value>同じ名前のディレクトリはすでに存在しました</value>
   </data>
   <data name="fdDeleteBody" xml:space="preserve">
-    <value>“{0}”を削除もよろしいですか？この操作は元に戻りません。</value>
+    <value>“{0}”を削除もよろしいですか？この操作は元に戻りません</value>
   </data>
   <data name="fdType" xml:space="preserve">
     <value>タイプ</value>

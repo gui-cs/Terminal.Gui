@@ -212,7 +212,7 @@
     <comment>Describes an AllowedType that matches anything</comment>
   </data>
   <data name="fdDeleteBody" xml:space="preserve">
-    <value>Are you sure you want to delete '{0}'? This operation is permanent.</value>
+    <value>Are you sure you want to delete '{0}'? This operation is permanent</value>
   </data>
   <data name="fdDeleteFailedTitle" xml:space="preserve">
     <value>Delete Failed</value>
