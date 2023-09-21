@@ -142,7 +142,7 @@
     <value>_Dossier</value>
   </data>
   <data name="fdFile" xml:space="preserve">
-    <value>_Ficher</value>
+    <value>Ficher</value>
   </data>
   <data name="fdSave" xml:space="preserve">
     <value>_Enregistrer</value>
@@ -151,7 +151,7 @@
     <value>E_nregistrer sous</value>
   </data>
   <data name="fdOpen" xml:space="preserve">
-    <value>_Ouvrir</value>
+    <value>Ouvrir</value>
   </data>
   <data name="fdSelectFolder" xml:space="preserve">
     <value>Sélection de _dossier</value>

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -118,130 +118,126 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ctxSelectAll" xml:space="preserve">
-    <value>_Select All</value>
+    <value>全选 (_S)</value>
   </data>
   <data name="ctxDeleteAll" xml:space="preserve">
-    <value>_Delete All</value>
+    <value>清空 (_D)</value>
   </data>
   <data name="ctxCopy" xml:space="preserve">
-    <value>_Copy</value>
+    <value>复制 (_C)</value>
   </data>
   <data name="ctxCut" xml:space="preserve">
-    <value>Cu_t</value>
+    <value>剪切 (_T)</value>
   </data>
   <data name="ctxPaste" xml:space="preserve">
-    <value>_Paste</value>
+    <value>粘贴 (_P)</value>
   </data>
   <data name="ctxUndo" xml:space="preserve">
-    <value>_Undo</value>
+    <value>撤销 (_U)</value>
   </data>
   <data name="ctxRedo" xml:space="preserve">
-    <value>_Redo</value>
+    <value>重做 (_R)</value>
   </data>
   <data name="fdDirectory" xml:space="preserve">
-    <value>Directory</value>
+    <value>目录</value>
   </data>
   <data name="fdFile" xml:space="preserve">
-    <value>File</value>
+    <value>文件</value>
   </data>
   <data name="fdSave" xml:space="preserve">
-    <value>Save</value>
+    <value>保存</value>
   </data>
   <data name="fdSaveAs" xml:space="preserve">
-    <value>Save as</value>
+    <value>另存为</value>
   </data>
   <data name="fdOpen" xml:space="preserve">
-    <value>Open</value>
-  </data>
-  <data name="fdSelectFolder" xml:space="preserve">
-    <value>Select folder</value>
-  </data>
-  <data name="fdSelectMixed" xml:space="preserve">
-    <value>Select Mixed</value>
-  </data>
-  <data name="wzBack" xml:space="preserve">
-    <value>_Back</value>
-  </data>
-  <data name="wzFinish" xml:space="preserve">
-    <value>Fi_nish</value>
+    <value>打开</value>
   </data>
   <data name="wzNext" xml:space="preserve">
-    <value>_Next...</value>
+    <value>下一步 (_N)...</value>
+  </data>
+  <data name="fdSelectFolder" xml:space="preserve">
+    <value>选择文件夹</value>
+  </data>
+  <data name="fdSelectMixed" xml:space="preserve">
+    <value>混合选择</value>
+  </data>
+  <data name="wzBack" xml:space="preserve">
+    <value>返回 (_B)</value>
+  </data>
+  <data name="wzFinish" xml:space="preserve">
+    <value>结束 (_N)</value>
   </data>
   <data name="fdDirectoryAlreadyExistsFeedback" xml:space="preserve">
-    <value>Directory already exists with that name</value>
-    <comment>When trying to save a file with a name already taken by a directory</comment>
+    <value>已存在相同名称的目录</value>
   </data>
   <data name="fdDirectoryMustExistFeedback" xml:space="preserve">
-    <value>Must select an existing directory</value>
+    <value>必须选择已有的目录</value>
   </data>
   <data name="fdFileAlreadyExistsFeedback" xml:space="preserve">
-    <value>File already exists with that name</value>
+    <value>已存在相同名称的文件</value>
   </data>
   <data name="fdFileMustExistFeedback" xml:space="preserve">
-    <value>Must select an existing file</value>
-    <comment>When trying to save a directory with a name already used by a file</comment>
+    <value>必须选择已有的文件</value>
   </data>
   <data name="fdFilename" xml:space="preserve">
-    <value>Filename</value>
+    <value>文件名</value>
   </data>
   <data name="fdFileOrDirectoryMustExistFeedback" xml:space="preserve">
-    <value>Must select an existing file or directory</value>
+    <value>必须选择已有的文件或目录</value>
   </data>
   <data name="fdModified" xml:space="preserve">
-    <value>Modified</value>
+    <value>修改时间</value>
   </data>
   <data name="fdPathCaption" xml:space="preserve">
-    <value>Enter Path</value>
+    <value>请输入路径</value>
   </data>
   <data name="fdSearchCaption" xml:space="preserve">
-    <value>Enter Search</value>
+    <value>输入以搜索</value>
   </data>
   <data name="fdSize" xml:space="preserve">
-    <value>Size</value>
+    <value>大小</value>
   </data>
   <data name="fdType" xml:space="preserve">
-    <value>Type</value>
+    <value>类型</value>
   </data>
   <data name="fdWrongFileTypeFeedback" xml:space="preserve">
-    <value>Wrong file type</value>
-    <comment>When trying to open/save a file that does not match the provided filter (e.g. csv)</comment>
+    <value>文件类型有误</value>
   </data>
   <data name="fdAnyFiles" xml:space="preserve">
-    <value>Any Files</value>
-    <comment>Describes an AllowedType that matches anything</comment>
+    <value>任意文件</value>
   </data>
   <data name="fdDeleteBody" xml:space="preserve">
-    <value>Are you sure you want to delete '{0}'? This operation is permanent.</value>
+    <value>您是否要删除“{0}”？此操作不可撤销。</value>
   </data>
   <data name="fdDeleteFailedTitle" xml:space="preserve">
-    <value>Delete Failed</value>
+    <value>删除失败</value>
   </data>
   <data name="fdDeleteTitle" xml:space="preserve">
-    <value>Delete {0}</value>
+    <value>删除 {0}</value>
   </data>
   <data name="fdNewFailed" xml:space="preserve">
-    <value>New Failed</value>
+    <value>新建失败</value>
   </data>
   <data name="fdNewTitle" xml:space="preserve">
-    <value>New Folder</value>
+    <value>新建文件夹</value>
   </data>
   <data name="fdNo" xml:space="preserve">
-    <value>No</value>
+    <value>否</value>
   </data>
   <data name="fdRenameFailedTitle" xml:space="preserve">
-    <value>Rename Failed</value>
+    <value>重命名失败</value>
   </data>
   <data name="fdRenamePrompt" xml:space="preserve">
-    <value>Name:</value>
+    <value>名称：</value>
   </data>
   <data name="fdRenameTitle" xml:space="preserve">
-    <value>Rename</value>
+    <value>重命名</value>
   </data>
   <data name="fdYes" xml:space="preserve">
-    <value>Yes</value>
+    <value>是</value>
   </data>
   <data name="fdExisting" xml:space="preserve">
-    <value>Existing</value>
+    <value>已有</value>
   </data>
 </root>
