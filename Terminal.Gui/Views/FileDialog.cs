@@ -188,7 +188,6 @@ namespace Terminal.Gui {
 
 			this.tbPath = new TextField {
 				Width = Dim.Fill (0),
-				Caption = Style.PathCaption,
 				CaptionColor = Color.Black
 			};
 			this.tbPath.KeyPress += (s, k) => {
@@ -644,10 +643,14 @@ namespace Terminal.Gui {
 
 			// May have been updated after instance was constructed
 			this.btnOk.Text = Style.OkButtonText;
+			this.btnCancel.Text = Style.CancelButtonText;
 			this.btnUp.Text = this.GetUpButtonText ();
 			this.btnBack.Text = this.GetBackButtonText ();
 			this.btnForward.Text = this.GetForwardButtonText ();
 			this.btnToggleSplitterCollapse.Text = this.GetToggleSplitterText (false);
+
+			tbPath.Caption = Style.PathCaption;
+			tbFind.Caption = Style.SearchCaption;
 
 			tbPath.Autocomplete.ColorScheme.Normal = Attribute.Make (Color.Black, tbPath.ColorScheme.Normal.Background);
 
