@@ -648,11 +648,16 @@ namespace Terminal.Gui {
 			this.btnToggleSplitterCollapse.Text = this.GetToggleSplitterText (false);
 
 			if(Style.FlipOkCancelButtonLayoutOrder) {
-				var p1 = btnOk.X;
-				var p2 = btnCancel.X;
+				btnCancel.X = Pos.Function(this.CalculateOkButtonPosX);
+				btnOk.X = Pos.Right (btnCancel) + 1;
 
-				btnOk.X = p2;
-				btnCancel.X = p1;
+
+				// Flip tab order too for consistency
+				var p1 = this.btnOk.TabIndex;
+				var p2 = this.btnCancel.TabIndex;
+
+				this.btnOk.TabIndex = p2;
+				this.btnCancel.TabIndex = p1;
 			}
 
 			tbPath.Caption = Style.PathCaption;

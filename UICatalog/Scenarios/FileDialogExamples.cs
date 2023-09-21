@@ -25,6 +25,9 @@ namespace UICatalog.Scenarios {
 		private RadioGroup rgIcons;
 		private RadioGroup rgAllowedTypes;
 
+		private TextField tbOkButton;
+		private TextField tbCancelButton;
+		private CheckBox cbFlipButtonOrder;
 		public override void Setup ()
 		{
 			var y = 0;
@@ -110,6 +113,25 @@ namespace UICatalog.Scenarios {
 			rgAllowedTypes.RadioLabels = new string [] { "Any", "Csv (Recommended)", "Csv (Strict)" };
 			Win.Add (rgAllowedTypes);
 
+			y = 5;
+			x = 45;
+
+			Win.Add (new LineView (Orientation.Vertical) {
+				X = x++,
+				Y = y + 1,
+				Height = 4
+			});
+			Win.Add (new Label ("Buttons") { X = x++, Y = y++ });
+
+			Win.Add(new Label("Ok Text:") { X = x, Y = y++ });
+			tbOkButton = new TextField () { X = x, Y = y++, Width = 12 };
+			Win.Add (tbOkButton);
+			Win.Add (new Label ("Cancel Text:") { X = x, Y = y++ });
+			tbCancelButton = new TextField () { X = x, Y = y++, Width = 12 };
+			Win.Add (tbCancelButton);
+			cbFlipButtonOrder = new CheckBox ("Flip Order") { X = x, Y = y++};
+			Win.Add (cbFlipButtonOrder);
+
 			var btn = new Button ($"Run Dialog") {
 				X = 1,
 				Y = 9
@@ -176,6 +198,16 @@ namespace UICatalog.Scenarios {
 					fd.AllowedTypes.Insert (1, new AllowedTypeAny ());
 				}
 
+			}
+
+			if (!string.IsNullOrWhiteSpace (tbOkButton.Text)) {
+				fd.Style.OkButtonText = tbOkButton.Text;
+			}
+			if (!string.IsNullOrWhiteSpace (tbCancelButton.Text)) {
+				fd.Style.CancelButtonText= tbCancelButton.Text;
+			}
+			if(cbFlipButtonOrder.Checked ?? false) {
+				fd.Style.FlipOkCancelButtonLayoutOrder = true;
 			}
 
 			Application.Run (fd);
