@@ -145,19 +145,19 @@
     <value>ファイル</value>
   </data>
   <data name="fdSave" xml:space="preserve">
-    <value>保存</value>
+    <value>保存 (_S)</value>
   </data>
   <data name="fdSaveAs" xml:space="preserve">
-    <value>名前を付けて保存</value>
+    <value>名前を付けて保存 (_S)</value>
   </data>
   <data name="fdOpen" xml:space="preserve">
-    <value>開く</value>
+    <value>開く (_O)</value>
   </data>
   <data name="fdSelectFolder" xml:space="preserve">
-    <value>フォルダーを選択</value>
+    <value>フォルダーを選択 (_S)</value>
   </data>
   <data name="fdSelectMixed" xml:space="preserve">
-    <value>混在選択</value>
+    <value>混在選択 (_S)</value>
   </data>
   <data name="wzBack" xml:space="preserve">
     <value>戻る (_B)</value>
@@ -190,10 +190,10 @@
     <value>新規ディレクトリ</value>
   </data>
   <data name="fdNo" xml:space="preserve">
-    <value>いいえ</value>
+    <value>いいえ (_N)</value>
   </data>
   <data name="fdYes" xml:space="preserve">
-    <value>はい</value>
+    <value>はい (_Y)</value>
   </data>
   <data name="fdModified" xml:space="preserve">
     <value>変更日時</value>

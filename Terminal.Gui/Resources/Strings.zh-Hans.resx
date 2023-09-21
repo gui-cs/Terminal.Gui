@@ -145,22 +145,22 @@
     <value>文件</value>
   </data>
   <data name="fdSave" xml:space="preserve">
-    <value>保存</value>
+    <value>保存 (_S)</value>
   </data>
   <data name="fdSaveAs" xml:space="preserve">
-    <value>另存为</value>
+    <value>另存为 (_S)</value>
   </data>
   <data name="fdOpen" xml:space="preserve">
-    <value>打开</value>
+    <value>打开 (_O)</value>
   </data>
   <data name="wzNext" xml:space="preserve">
     <value>下一步 (_N)...</value>
   </data>
   <data name="fdSelectFolder" xml:space="preserve">
-    <value>选择文件夹</value>
+    <value>选择文件夹 (_S)</value>
   </data>
   <data name="fdSelectMixed" xml:space="preserve">
-    <value>混合选择</value>
+    <value>混合选择 (_S)</value>
   </data>
   <data name="wzBack" xml:space="preserve">
     <value>返回 (_B)</value>
@@ -223,7 +223,7 @@
     <value>新建文件夹</value>
   </data>
   <data name="fdNo" xml:space="preserve">
-    <value>否</value>
+    <value>否 (_N)</value>
   </data>
   <data name="fdRenameFailedTitle" xml:space="preserve">
     <value>重命名失败</value>
@@ -235,7 +235,7 @@
     <value>重命名</value>
   </data>
   <data name="fdYes" xml:space="preserve">
-    <value>是</value>
+    <value>是 (_Y)</value>
   </data>
   <data name="fdExisting" xml:space="preserve">
     <value>已有</value>

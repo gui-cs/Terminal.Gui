@@ -145,7 +145,7 @@
     <value>Ficher</value>
   </data>
   <data name="fdSave" xml:space="preserve">
-    <value>_Enregistrer</value>
+    <value>Enregistrer</value>
   </data>
   <data name="fdSaveAs" xml:space="preserve">
     <value>E_nregistrer sous</value>
