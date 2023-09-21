@@ -142,11 +142,7 @@ namespace Terminal.Gui {
 
 			this.btnOk = new Button (Style.OkButtonText) {
 				Y = Pos.AnchorEnd (1),
-				X = Pos.Function (() =>
-					this.Bounds.Width
-					- btnOk.Bounds.Width
-					// TODO: Fiddle factor, seems the Bounds are wrong for someone
-					- 2)
+				X = Pos.Function (CalculateOkButtonPosX)
 			};
 			this.btnOk.Clicked += (s, e) => this.Accept (true);
 			this.btnOk.KeyPress += (s, k) => {
@@ -156,14 +152,7 @@ namespace Terminal.Gui {
 
 			this.btnCancel = new Button ("Cancel") {
 				Y = Pos.AnchorEnd (1),
-				X = Pos.Function (() =>
-					this.Bounds.Width
-					- btnOk.Bounds.Width
-					- btnCancel.Bounds.Width
-					- 1
-					// TODO: Fiddle factor, seems the Bounds are wrong for someone
-					- 2
-					)
+				X = Pos.Right (btnOk) + 1
 			};
 			this.btnCancel.KeyPress += (s, k) => {
 				this.NavigateIf (k, Key.CursorLeft, this.btnToggleSplitterCollapse);
@@ -284,7 +273,6 @@ namespace Terminal.Gui {
 
 			tbFind = new TextField {
 				X = Pos.Right (this.btnToggleSplitterCollapse) + 1,
-				Caption = Style.SearchCaption,
 				CaptionColor = Color.Black,
 				Width = 30,
 				Y = Pos.AnchorEnd (1),
@@ -370,6 +358,16 @@ namespace Terminal.Gui {
 			this.Add (this.btnForward);
 			this.Add (this.tbPath);
 			this.Add (this.splitContainer);
+		}
+
+		private int CalculateOkButtonPosX ()
+		{
+			return this.Bounds.Width
+				- btnOk.Bounds.Width
+				- btnCancel.Bounds.Width
+				- 1
+				// TODO: Fiddle factor, seems the Bounds are wrong for someone
+				- 2;
 		}
 
 		private string AspectGetter (object o)
@@ -648,6 +646,14 @@ namespace Terminal.Gui {
 			this.btnBack.Text = this.GetBackButtonText ();
 			this.btnForward.Text = this.GetForwardButtonText ();
 			this.btnToggleSplitterCollapse.Text = this.GetToggleSplitterText (false);
+
+			if(Style.FlipOkCancelButtonLayoutOrder) {
+				var p1 = btnOk.X;
+				var p2 = btnCancel.X;
+
+				btnOk.X = p2;
+				btnCancel.X = p1;
+			}
 
 			tbPath.Caption = Style.PathCaption;
 			tbFind.Caption = Style.SearchCaption;

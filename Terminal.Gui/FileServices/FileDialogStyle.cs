@@ -99,6 +99,13 @@ namespace Terminal.Gui {
 		public string CancelButtonText { get; set; } = "Cancel";
 
 		/// <summary>
+		/// Gets or sets whether to flip the order of the Ok and Cancel buttons. Defaults
+		/// to false (Ok button then Cancel button). Set to true to show Cancel button on
+		/// left then Ok button instead.
+		/// </summary>
+		public bool FlipOkCancelButtonLayoutOrder { get; set; }
+
+		/// <summary>
 		/// Gets or sets error message when user attempts to select a file type that is not one of <see cref="FileDialog.AllowedTypes"/>
 		/// </summary>
 		public string WrongFileTypeFeedback { get; set; } = Strings.fdWrongFileTypeFeedback;
