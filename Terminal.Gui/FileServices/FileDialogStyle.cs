@@ -21,7 +21,7 @@ namespace Terminal.Gui {
 		/// Gets or sets the default value to use for <see cref="UseColors"/>.
 		/// This can be populated from .tui config files via <see cref="ConfigurationManager"/>
 		/// </summary>
-		[SerializableConfigurationProperty(Scope = typeof (SettingsScope))]
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
 		public static bool DefaultUseColors { get; set; }
 
 		/// <summary>
@@ -42,20 +42,20 @@ namespace Terminal.Gui {
 		/// Gets or sets the class responsible for determining which symbol
 		/// to use to represent files and directories.
 		/// </summary>
-		public FileSystemIconProvider IconProvider { get; set;} = new FileSystemIconProvider();
+		public FileSystemIconProvider IconProvider { get; set; } = new FileSystemIconProvider ();
 
 		/// <summary>
 		///	Gets or sets the class thatis responsible for determining which color
 		/// to use to represent files and directories when <see cref="UseColors"/> is
 		/// <see langword="true"/>.
 		/// </summary>
-		public FileSystemColorProvider ColorProvider { get;set;} = new FileSystemColorProvider();
+		public FileSystemColorProvider ColorProvider { get; set; } = new FileSystemColorProvider ();
 
 		/// <summary>
 		/// Gets or sets the culture to use (e.g. for number formatting).
 		/// Defaults to <see cref="CultureInfo.CurrentUICulture"/>.
 		/// </summary>
-		public CultureInfo Culture {get;set;} = CultureInfo.CurrentUICulture;
+		public CultureInfo Culture { get; set; } = CultureInfo.CurrentUICulture;
 
 		/// <summary>
 		/// Gets or sets the header text displayed in the Filename column of the files table.
@@ -184,7 +184,7 @@ namespace Terminal.Gui {
 		}
 
 
-		private Dictionary<IDirectoryInfo,string> DefaultTreeRootGetter ()
+		private Dictionary<IDirectoryInfo, string> DefaultTreeRootGetter ()
 		{
 			var roots = new Dictionary<IDirectoryInfo, string> ();
 			try {
@@ -192,7 +192,7 @@ namespace Terminal.Gui {
 
 					var dir = _fileSystem.DirectoryInfo.New (d);
 
-					if (!roots.ContainsKey(dir)) {
+					if (!roots.ContainsKey (dir)) {
 						roots.Add (dir, d);
 					}
 				}
@@ -206,14 +206,14 @@ namespace Terminal.Gui {
 					try {
 						var path = Environment.GetFolderPath (special);
 
-						if(string.IsNullOrWhiteSpace (path)) {
+						if (string.IsNullOrWhiteSpace (path)) {
 							continue;
 						}
 
 						var dir = _fileSystem.DirectoryInfo.New (path);
 
 						if (!roots.ContainsKey (dir) && dir.Exists) {
-							roots.Add (dir, special.ToString());
+							roots.Add (dir, special.ToString ());
 						}
 					} catch (Exception) {
 						// Special file exists but contents are unreadable (permissions?)

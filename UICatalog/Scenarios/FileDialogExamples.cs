@@ -123,13 +123,13 @@ namespace UICatalog.Scenarios {
 			});
 			Win.Add (new Label ("Buttons") { X = x++, Y = y++ });
 
-			Win.Add(new Label("Ok Text:") { X = x, Y = y++ });
+			Win.Add (new Label ("Ok Text:") { X = x, Y = y++ });
 			tbOkButton = new TextField () { X = x, Y = y++, Width = 12 };
 			Win.Add (tbOkButton);
 			Win.Add (new Label ("Cancel Text:") { X = x, Y = y++ });
 			tbCancelButton = new TextField () { X = x, Y = y++, Width = 12 };
 			Win.Add (tbCancelButton);
-			cbFlipButtonOrder = new CheckBox ("Flip Order") { X = x, Y = y++};
+			cbFlipButtonOrder = new CheckBox ("Flip Order") { X = x, Y = y++ };
 			Win.Add (cbFlipButtonOrder);
 
 			var btn = new Button ($"Run Dialog") {
@@ -187,7 +187,7 @@ namespace UICatalog.Scenarios {
 
 			if (cbDrivesOnlyInTree.Checked ?? false) {
 				fd.Style.TreeRootGetter = () => {
-					return System.Environment.GetLogicalDrives ().ToDictionary(dirInfoFactory.New,k=>k);
+					return System.Environment.GetLogicalDrives ().ToDictionary (dirInfoFactory.New, k => k);
 				};
 			}
 
@@ -204,9 +204,9 @@ namespace UICatalog.Scenarios {
 				fd.Style.OkButtonText = tbOkButton.Text;
 			}
 			if (!string.IsNullOrWhiteSpace (tbCancelButton.Text)) {
-				fd.Style.CancelButtonText= tbCancelButton.Text;
+				fd.Style.CancelButtonText = tbCancelButton.Text;
 			}
-			if(cbFlipButtonOrder.Checked ?? false) {
+			if (cbFlipButtonOrder.Checked ?? false) {
 				fd.Style.FlipOkCancelButtonLayoutOrder = true;
 			}
 

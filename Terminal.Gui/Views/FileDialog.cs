@@ -105,7 +105,7 @@ namespace Terminal.Gui {
 		private int currentSortColumn;
 
 		private bool currentSortIsAsc = true;
-		private Dictionary<IDirectoryInfo,string> _treeRoots = new Dictionary<IDirectoryInfo, string>();
+		private Dictionary<IDirectoryInfo, string> _treeRoots = new Dictionary<IDirectoryInfo, string> ();
 
 		/// <summary>
 		/// Event fired when user attempts to confirm a selection (or multi selection).
@@ -374,13 +374,13 @@ namespace Terminal.Gui {
 		{
 			var fsi = (IFileSystemInfo)o;
 
-			if(o is IDirectoryInfo dir && _treeRoots.ContainsKey(dir)) {
+			if (o is IDirectoryInfo dir && _treeRoots.ContainsKey (dir)) {
 
 				// Directory has a special name e.g. 'Pictures'
 				return _treeRoots [dir];
 			}
 
-			return (Style.IconProvider.GetIconWithOptionalSpace(fsi) + fsi.Name).Trim();
+			return (Style.IconProvider.GetIconWithOptionalSpace (fsi) + fsi.Name).Trim ();
 		}
 
 		private void OnTableViewMouseClick (object sender, MouseEventEventArgs e)
@@ -647,8 +647,8 @@ namespace Terminal.Gui {
 			this.btnForward.Text = this.GetForwardButtonText ();
 			this.btnToggleSplitterCollapse.Text = this.GetToggleSplitterText (false);
 
-			if(Style.FlipOkCancelButtonLayoutOrder) {
-				btnCancel.X = Pos.Function(this.CalculateOkButtonPosX);
+			if (Style.FlipOkCancelButtonLayoutOrder) {
+				btnCancel.X = Pos.Function (this.CalculateOkButtonPosX);
 				btnOk.X = Pos.Right (btnCancel) + 1;
 
 
@@ -1187,13 +1187,13 @@ namespace Terminal.Gui {
 			}
 
 
-			var color = Style.ColorProvider.GetTrueColor(stats.FileSystemInfo)
-			??	TrueColor.FromConsoleColor(Color.White);
-			var black = TrueColor.FromConsoleColor(Color.Black);
+			var color = Style.ColorProvider.GetTrueColor (stats.FileSystemInfo)
+			?? TrueColor.FromConsoleColor (Color.White);
+			var black = TrueColor.FromConsoleColor (Color.Black);
 
 			// TODO: Add some kind of cache for this
-			return new ColorScheme{
-				Normal = new Attribute (color,black),
+			return new ColorScheme {
+				Normal = new Attribute (color, black),
 				HotNormal = new Attribute (color, black),
 				Focus = new Attribute (black, color),
 				HotFocus = new Attribute (black, color),
