@@ -24,8 +24,8 @@ namespace UICatalog.Scenarios {
 			_cultureInfoSource = Application.SupportedCultures.Append (CultureInfo.InvariantCulture).ToArray ();
 			_cultureInfoNameSource = Application.SupportedCultures.Select (c => $"{c.NativeName} ({c.Name})").Append ("Invariant").ToArray ();
 			var languageMenus = Application.SupportedCultures
-				.Select (c => new MenuItem ($"{c.NativeName} ({c.Name})", "", () => SetCulture (c))
-				).Concat (
+				.Select (c => new MenuItem ($"{c.NativeName} ({c.Name})", "", () => SetCulture (c)))
+				.Concat (
 					new MenuItem [] {
 						null,
 						new MenuItem ("Invariant", "", () => SetCulture (CultureInfo.InvariantCulture))
@@ -130,9 +130,9 @@ namespace UICatalog.Scenarios {
 		private void LanguageComboBox_SelectChanged (object sender, ListViewItemEventArgs e)
 		{
 			if (e.Value is string cultureName) {
-				var item = Array.IndexOf (_cultureInfoNameSource, cultureName);
-				if (item >= 0) {
-					SetCulture (_cultureInfoSource [Array.IndexOf (_cultureInfoNameSource, cultureName)]);
+				var index = Array.IndexOf (_cultureInfoNameSource, cultureName);
+				if (index >= 0) {
+					SetCulture (_cultureInfoSource [index]);
 				}
 			}
 		}
@@ -148,7 +148,9 @@ namespace UICatalog.Scenarios {
 			dialog.MustExist = !isSaveFile;
 			dialog.AllowsMultipleSelection = !isSaveFile;
 			_currentOpenMode++;
-			if (_currentOpenMode > OpenMode.Mixed) _currentOpenMode = OpenMode.File;
+			if (_currentOpenMode > OpenMode.Mixed) {
+				_currentOpenMode = OpenMode.File;
+			}
 			Application.Run (dialog);
 		}
 		public void ShowWizard ()
