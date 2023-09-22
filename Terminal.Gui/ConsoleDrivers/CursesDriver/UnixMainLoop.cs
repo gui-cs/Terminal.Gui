@@ -175,6 +175,10 @@ namespace Terminal.Gui {
 			if (mainLoop.timeouts.Count > 0) {
 				pollTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
 				if (pollTimeout < 0) {
+					// This avoids poll waiting infinitely if pollTimeout=-1 until some action is detected
+					if (pollTimeout == -1) {
+						pollTimeout = 0;
+					}
 					return true;
 				}
 			} else
