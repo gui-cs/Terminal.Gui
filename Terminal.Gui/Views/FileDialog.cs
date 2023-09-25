@@ -714,7 +714,7 @@ namespace Terminal.Gui {
 
 			// if no path has been provided
 			if (this.tbPath.Text.Length <= 0) {
-				this.tbPath.Text = Environment.CurrentDirectory;
+				this.Path = Environment.CurrentDirectory;
 			}
 
 			// to streamline user experience and allow direct typing of paths
@@ -805,7 +805,7 @@ namespace Terminal.Gui {
 				.Select (s => s.FileSystemInfo.FullName)
 				.ToList ().AsReadOnly ();
 
-			this.tbPath.Text = this.MultiSelected.Count == 1 ? this.MultiSelected [0] : string.Empty;
+			this.Path = this.MultiSelected.Count == 1 ? this.MultiSelected [0] : string.Empty;
 
 			FinishAccept ();
 		}
@@ -818,7 +818,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			this.tbPath.Text = f.FullName;
+			this.Path = f.FullName;
 
 			if (AllowsMultipleSelection) {
 				this.MultiSelected = new List<string> { f.FullName }.AsReadOnly ();
@@ -897,7 +897,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			this.tbPath.Text = e.NewValue.FullName;
+			this.Path = e.NewValue.FullName;
 		}
 
 		private void UpdateNavigationVisibility ()
@@ -933,7 +933,7 @@ namespace Terminal.Gui {
 			try {
 				this.pushingState = true;
 
-				this.tbPath.Text = dest.FullName;
+				this.Path = dest.FullName;
 				this.State.Selected = stats;
 				this.tbPath.Autocomplete.ClearSuggestions ();
 
@@ -1136,12 +1136,10 @@ namespace Terminal.Gui {
 				this.tbPath.Autocomplete.ClearSuggestions ();
 
 				if (pathText != null) {
-					this.tbPath.Text = pathText;
-					this.tbPath.MoveEnd ();
+					this.Path = pathText;
 				} else
 				if (setPathText) {
-					this.tbPath.Text = newState.Directory.FullName;
-					this.tbPath.MoveEnd ();
+					this.Path = newState.Directory.FullName;
 				}
 
 				this.State = newState;
