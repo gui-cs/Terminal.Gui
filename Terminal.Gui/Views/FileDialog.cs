@@ -154,7 +154,7 @@ namespace Terminal.Gui {
 				this.NavigateIf (k, Key.CursorUp, this.tableView);
 			};
 
-			this.btnCancel = new Button ("Cancel") {
+			this.btnCancel = new Button (Strings.btnCancel) {
 				Y = Pos.AnchorEnd (1),
 				X = Pos.Function (() =>
 					this.Bounds.Width
@@ -710,19 +710,31 @@ namespace Terminal.Gui {
 			this.tbPath.SelectAll ();
 
 			if (string.IsNullOrEmpty (Title)) {
-				switch (OpenMode) {
-				case OpenMode.File:
-					this.Title = $"{Strings.fdOpen} {(MustExist ? Strings.fdExisting + " " : "")}{Strings.fdFile}";
-					break;
-				case OpenMode.Directory:
-					this.Title = $"{Strings.fdOpen} {(MustExist ? Strings.fdExisting + " " : "")}{Strings.fdDirectory}";
-					break;
-				case OpenMode.Mixed:
-					this.Title = $"{Strings.fdOpen} {(MustExist ? Strings.fdExisting : "")}";
-					break;
-				}
+				this.Title = GetDefaultTitle ();
 			}
 			this.LayoutSubviews ();
+		}
+		/// <summary>
+		/// Gets a default dialog title, when <see cref="Title"/> is not set or empty, 
+		/// result of the function will be shown.
+		/// </summary>
+		protected virtual string GetDefaultTitle ()
+		{
+			List<string> titleParts = new () {
+				Strings.fdOpen
+			};
+			if (MustExist) {
+				titleParts.Add (Strings.fdExisting);
+			}
+			switch (OpenMode) {
+			case OpenMode.File:
+				titleParts.Add (Strings.fdFile);
+				break;
+			case OpenMode.Directory:
+				titleParts.Add (Strings.fdDirectory);
+				break;
+			}
+			return string.Join (' ', titleParts);
 		}
 
 		private void AllowedTypeMenuClicked (int idx)

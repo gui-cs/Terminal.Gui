@@ -145,10 +145,10 @@
     <value>文件</value>
   </data>
   <data name="fdSave" xml:space="preserve">
-    <value>保存 (_S)</value>
+    <value>保存</value>
   </data>
   <data name="fdSaveAs" xml:space="preserve">
-    <value>另存为 (_S)</value>
+    <value>另存为</value>
   </data>
   <data name="fdOpen" xml:space="preserve">
     <value>打开</value>
@@ -222,7 +222,7 @@
   <data name="fdNewTitle" xml:space="preserve">
     <value>新建文件夹</value>
   </data>
-  <data name="fdNo" xml:space="preserve">
+  <data name="btnNo" xml:space="preserve">
     <value>否 (_N)</value>
   </data>
   <data name="fdRenameFailedTitle" xml:space="preserve">
@@ -234,10 +234,25 @@
   <data name="fdRenameTitle" xml:space="preserve">
     <value>重命名</value>
   </data>
-  <data name="fdYes" xml:space="preserve">
+  <data name="btnYes" xml:space="preserve">
     <value>是 (_Y)</value>
   </data>
   <data name="fdExisting" xml:space="preserve">
     <value>已有</value>
+  </data>
+  <data name="btnOk" xml:space="preserve">
+    <value>确定 (_O)</value>
+  </data>
+  <data name="btnOpen" xml:space="preserve">
+    <value>打开 (_O)</value>
+  </data>
+  <data name="btnSave" xml:space="preserve">
+    <value>保存 (_S)</value>
+  </data>
+  <data name="btnSaveAs" xml:space="preserve">
+    <value>另存为 (_S)</value>
+  </data>
+  <data name="btnCancel" xml:space="preserve">
+    <value>取消 (_C)</value>
   </data>
 </root>
