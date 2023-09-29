@@ -24,7 +24,7 @@ namespace Terminal.Gui {
 			int result = MessageBox.Query (
 				string.Format (Strings.fdDeleteTitle, adjective),
 				string.Format (Strings.fdDeleteBody, adjective),
-				Strings.fdYes, Strings.fdNo);
+				Strings.btnYes, Strings.btnNo);
 
 			try {
 				if (result == 0) {
@@ -37,7 +37,7 @@ namespace Terminal.Gui {
 					return true;
 				}
 			} catch (Exception ex) {
-				MessageBox.ErrorQuery (Strings.fdDeleteFailedTitle, ex.Message, "Ok");
+				MessageBox.ErrorQuery (Strings.fdDeleteFailedTitle, ex.Message, Strings.btnOk);
 			}
 
 			return false;
@@ -47,14 +47,14 @@ namespace Terminal.Gui {
 		{
 
 			bool confirm = false;
-			var btnOk = new Button ("Ok") {
+			var btnOk = new Button (Strings.btnOk) {
 				IsDefault = true,
 			};
 			btnOk.Clicked += (s, e) => {
 				confirm = true;
 				Application.RequestStop ();
 			};
-			var btnCancel = new Button ("Cancel");
+			var btnCancel = new Button (Strings.btnCancel);
 			btnCancel.Clicked += (s, e) => {
 				confirm = false;
 				Application.RequestStop ();

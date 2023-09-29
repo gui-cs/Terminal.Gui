@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -59,6 +60,8 @@ namespace Terminal.Gui.ViewsTests {
 		[Fact]
 		public void KeyBindings_Command ()
 		{
+			CultureInfo cultureBackup = CultureInfo.CurrentCulture;
+			CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 			DateField df = new DateField (DateTime.Parse ("12/12/1971"));
 			df.ReadOnly = true;
 			Assert.True (df.ProcessKey (new KeyEvent (Key.DeleteChar, new KeyModifiers ())));
@@ -93,6 +96,7 @@ namespace Terminal.Gui.ViewsTests {
 			df.ReadOnly = false;
 			Assert.True (df.ProcessKey (new KeyEvent (Key.D1, new KeyModifiers ())));
 			Assert.Equal (" 12/02/1971", df.Text);
+			CultureInfo.CurrentCulture = cultureBackup;
 		}
 	}
 }
