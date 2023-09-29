@@ -398,7 +398,7 @@ namespace Terminal.Gui.FileServicesTests {
  │                                                                  │
  │                                                                  │
  │                                                                  │
-│{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                            {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket}  │
+│{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                            {CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}  │
  └──────────────────────────────────────────────────────────────────┘
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output, true);
@@ -434,7 +434,7 @@ namespace Terminal.Gui.FileServicesTests {
 ││mybinary.exe│7.00 bytes│2001-01-01T11:44:42           │.exe     ││
 │                                                                  │
 │                                                                  │
-│{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                            {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket}  │
+│{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                            {CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}  │
 └──────────────────────────────────────────────────────────────────┘
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output, true);

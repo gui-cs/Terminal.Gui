@@ -105,7 +105,7 @@ namespace Terminal.Gui {
 		private int currentSortColumn;
 
 		private bool currentSortIsAsc = true;
-		private Dictionary<IDirectoryInfo,string> _treeRoots = new Dictionary<IDirectoryInfo, string>();
+		private Dictionary<IDirectoryInfo, string> _treeRoots = new Dictionary<IDirectoryInfo, string> ();
 
 		/// <summary>
 		/// Event fired when user attempts to confirm a selection (or multi selection).
@@ -142,11 +142,7 @@ namespace Terminal.Gui {
 
 			this.btnOk = new Button (Style.OkButtonText) {
 				Y = Pos.AnchorEnd (1),
-				X = Pos.Function (() =>
-					this.Bounds.Width
-					- btnOk.Bounds.Width
-					// TODO: Fiddle factor, seems the Bounds are wrong for someone
-					- 2)
+				X = Pos.Function (CalculateOkButtonPosX)
 			};
 			this.btnOk.Clicked += (s, e) => this.Accept (true);
 			this.btnOk.KeyPress += (s, k) => {
@@ -156,14 +152,7 @@ namespace Terminal.Gui {
 
 			this.btnCancel = new Button (Strings.btnCancel) {
 				Y = Pos.AnchorEnd (1),
-				X = Pos.Function (() =>
-					this.Bounds.Width
-					- btnOk.Bounds.Width
-					- btnCancel.Bounds.Width
-					- 1
-					// TODO: Fiddle factor, seems the Bounds are wrong for someone
-					- 2
-					)
+				X = Pos.Right (btnOk) + 1
 			};
 			this.btnCancel.KeyPress += (s, k) => {
 				this.NavigateIf (k, Key.CursorLeft, this.btnToggleSplitterCollapse);
@@ -188,7 +177,6 @@ namespace Terminal.Gui {
 
 			this.tbPath = new TextField {
 				Width = Dim.Fill (0),
-				Caption = Style.PathCaption,
 				CaptionColor = Color.Black
 			};
 			this.tbPath.KeyPress += (s, k) => {
@@ -285,7 +273,6 @@ namespace Terminal.Gui {
 
 			tbFind = new TextField {
 				X = Pos.Right (this.btnToggleSplitterCollapse) + 1,
-				Caption = Style.SearchCaption,
 				CaptionColor = Color.Black,
 				Width = 30,
 				Y = Pos.AnchorEnd (1),
@@ -373,17 +360,27 @@ namespace Terminal.Gui {
 			this.Add (this.splitContainer);
 		}
 
+		private int CalculateOkButtonPosX ()
+		{
+			return this.Bounds.Width
+				- btnOk.Bounds.Width
+				- btnCancel.Bounds.Width
+				- 1
+				// TODO: Fiddle factor, seems the Bounds are wrong for someone
+				- 2;
+		}
+
 		private string AspectGetter (object o)
 		{
 			var fsi = (IFileSystemInfo)o;
 
-			if(o is IDirectoryInfo dir && _treeRoots.ContainsKey(dir)) {
+			if (o is IDirectoryInfo dir && _treeRoots.ContainsKey (dir)) {
 
 				// Directory has a special name e.g. 'Pictures'
 				return _treeRoots [dir];
 			}
 
-			return (Style.IconProvider.GetIconWithOptionalSpace(fsi) + fsi.Name).Trim();
+			return (Style.IconProvider.GetIconWithOptionalSpace (fsi) + fsi.Name).Trim ();
 		}
 
 		private void OnTableViewMouseClick (object sender, MouseEventEventArgs e)
@@ -644,10 +641,27 @@ namespace Terminal.Gui {
 
 			// May have been updated after instance was constructed
 			this.btnOk.Text = Style.OkButtonText;
+			this.btnCancel.Text = Style.CancelButtonText;
 			this.btnUp.Text = this.GetUpButtonText ();
 			this.btnBack.Text = this.GetBackButtonText ();
 			this.btnForward.Text = this.GetForwardButtonText ();
 			this.btnToggleSplitterCollapse.Text = this.GetToggleSplitterText (false);
+
+			if (Style.FlipOkCancelButtonLayoutOrder) {
+				btnCancel.X = Pos.Function (this.CalculateOkButtonPosX);
+				btnOk.X = Pos.Right (btnCancel) + 1;
+
+
+				// Flip tab order too for consistency
+				var p1 = this.btnOk.TabIndex;
+				var p2 = this.btnCancel.TabIndex;
+
+				this.btnOk.TabIndex = p2;
+				this.btnCancel.TabIndex = p1;
+			}
+
+			tbPath.Caption = Style.PathCaption;
+			tbFind.Caption = Style.SearchCaption;
 
 			tbPath.Autocomplete.ColorScheme.Normal = Attribute.Make (Color.Black, tbPath.ColorScheme.Normal.Background);
 
@@ -700,7 +714,7 @@ namespace Terminal.Gui {
 
 			// if no path has been provided
 			if (this.tbPath.Text.Length <= 0) {
-				this.tbPath.Text = Environment.CurrentDirectory;
+				this.Path = Environment.CurrentDirectory;
 			}
 
 			// to streamline user experience and allow direct typing of paths
@@ -803,7 +817,7 @@ namespace Terminal.Gui {
 				.Select (s => s.FileSystemInfo.FullName)
 				.ToList ().AsReadOnly ();
 
-			this.tbPath.Text = this.MultiSelected.Count == 1 ? this.MultiSelected [0] : string.Empty;
+			this.Path = this.MultiSelected.Count == 1 ? this.MultiSelected [0] : string.Empty;
 
 			FinishAccept ();
 		}
@@ -816,7 +830,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			this.tbPath.Text = f.FullName;
+			this.Path = f.FullName;
 
 			if (AllowsMultipleSelection) {
 				this.MultiSelected = new List<string> { f.FullName }.AsReadOnly ();
@@ -895,7 +909,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			this.tbPath.Text = e.NewValue.FullName;
+			this.Path = e.NewValue.FullName;
 		}
 
 		private void UpdateNavigationVisibility ()
@@ -931,7 +945,7 @@ namespace Terminal.Gui {
 			try {
 				this.pushingState = true;
 
-				this.tbPath.Text = dest.FullName;
+				this.Path = dest.FullName;
 				this.State.Selected = stats;
 				this.tbPath.Autocomplete.ClearSuggestions ();
 
@@ -1134,12 +1148,10 @@ namespace Terminal.Gui {
 				this.tbPath.Autocomplete.ClearSuggestions ();
 
 				if (pathText != null) {
-					this.tbPath.Text = pathText;
-					this.tbPath.MoveEnd ();
+					this.Path = pathText;
 				} else
 				if (setPathText) {
-					this.tbPath.Text = newState.Directory.FullName;
-					this.tbPath.MoveEnd ();
+					this.Path = newState.Directory.FullName;
 				}
 
 				this.State = newState;
@@ -1185,13 +1197,13 @@ namespace Terminal.Gui {
 			}
 
 
-			var color = Style.ColorProvider.GetTrueColor(stats.FileSystemInfo)
-			??	TrueColor.FromConsoleColor(Color.White);
-			var black = TrueColor.FromConsoleColor(Color.Black);
+			var color = Style.ColorProvider.GetTrueColor (stats.FileSystemInfo)
+			?? TrueColor.FromConsoleColor (Color.White);
+			var black = TrueColor.FromConsoleColor (Color.Black);
 
 			// TODO: Add some kind of cache for this
-			return new ColorScheme{
-				Normal = new Attribute (color,black),
+			return new ColorScheme {
+				Normal = new Attribute (color, black),
 				HotNormal = new Attribute (color, black),
 				Focus = new Attribute (black, color),
 				HotFocus = new Attribute (black, color),
