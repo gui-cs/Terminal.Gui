@@ -54,7 +54,7 @@ namespace Terminal.Gui {
 
 		// For Unit testing - ignores UseSystemConsole
 		internal static bool _forceFakeConsole;
-		
+
 		private static List<CultureInfo> _cachedSupportedCultures;
 
 		/// <summary>
@@ -242,7 +242,7 @@ namespace Terminal.Gui {
 
 			// BUGBUG: OverlappedTop is not cleared here, but it should be?
 
-			MainLoop?.Stop();
+			MainLoop?.Stop ();
 			MainLoop = null;
 			Driver?.End ();
 			Driver = null;
@@ -518,7 +518,7 @@ namespace Terminal.Gui {
 		public static void Refresh ()
 		{
 			// TODO: Figure out how to remove this call to ClearContents. Refresh should just repaint damaged areas, not clear
-			Driver.ClearContents();
+			Driver.ClearContents ();
 			View last = null;
 			foreach (var v in _toplevels.Reverse ()) {
 				if (v.Visible) {
@@ -657,8 +657,8 @@ namespace Terminal.Gui {
 			}
 			firstIteration = false;
 
-			if (state.Toplevel != Top && 
-				(Top.NeedsDisplay|| Top.SubViewNeedsDisplay || Top.LayoutNeeded)) {
+			if (state.Toplevel != Top &&
+				(Top.NeedsDisplay || Top.SubViewNeedsDisplay || Top.LayoutNeeded)) {
 				state.Toplevel.SetNeedsDisplay (state.Toplevel.Frame);
 				Top.Clear ();
 				Top.Draw ();
@@ -678,9 +678,9 @@ namespace Terminal.Gui {
 				state.Toplevel.Clear ();
 			}
 
-			if (state.Toplevel.NeedsDisplay || 
-				state.Toplevel.SubViewNeedsDisplay || 
-				state.Toplevel.LayoutNeeded || 
+			if (state.Toplevel.NeedsDisplay ||
+				state.Toplevel.SubViewNeedsDisplay ||
+				state.Toplevel.LayoutNeeded ||
 				OverlappedChildNeedsDisplay ()) {
 				state.Toplevel.Clear ();
 				state.Toplevel.Draw ();
@@ -689,9 +689,9 @@ namespace Terminal.Gui {
 			} else {
 				Driver.UpdateCursor ();
 			}
-			if (state.Toplevel != Top && 
+			if (state.Toplevel != Top &&
 				!state.Toplevel.Modal &&
-				(Top.NeedsDisplay|| Top.SubViewNeedsDisplay || Top.LayoutNeeded)) {
+				(Top.NeedsDisplay || Top.SubViewNeedsDisplay || Top.LayoutNeeded)) {
 				Top.Draw ();
 			}
 		}
@@ -832,7 +832,8 @@ namespace Terminal.Gui {
 					OverlappedTop.OnAllChildClosed ();
 				} else {
 					SetCurrentOverlappedAsTop ();
-					Current.OnEnter (Current);
+					runState.Toplevel.OnLeave (Current);
+					Current.OnEnter (runState.Toplevel);
 				}
 				Refresh ();
 			}

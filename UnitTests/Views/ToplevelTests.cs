@@ -962,7 +962,98 @@ namespace Terminal.Gui.ViewsTests {
 			Application.End (rs);
 
 			Assert.True (isEnter);
-			Assert.False (isLeave);
+			Assert.False (isLeave);  // Leave event cannot be trigger because it v.Enter was performed and v is focused
+			Assert.True (v.HasFocus);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void OnEnter_OnLeave_Triggered_On_Application_Begin_End_With_More_Toplevels ()
+		{
+			var iterations = 0;
+			var steps = new int [5];
+			var isEnterTop = false;
+			var isLeaveTop = false;
+			var vt = new View ();
+			var top = Application.Top;
+			var diag = new Dialog ();
+
+			vt.Enter += (s, e) => {
+				iterations++;
+				isEnterTop = true;
+				if (iterations == 1) {
+					steps [0] = iterations;
+					Assert.Null (e.View);
+				} else {
+					steps [4] = iterations;
+					Assert.Equal (diag, e.View);
+				}
+			};
+			vt.Leave += (s, e) => {
+				iterations++;
+				steps [1] = iterations;
+				isLeaveTop = true;
+				Assert.Equal (diag, e.View);
+			};
+			top.Add (vt);
+
+			Assert.False (vt.CanFocus);
+			var exception = Record.Exception (() => top.OnEnter (top));
+			Assert.Null (exception);
+			exception = Record.Exception (() => top.OnLeave (top));
+			Assert.Null (exception);
+
+			vt.CanFocus = true;
+			Application.Begin (top);
+
+			Assert.True (isEnterTop);
+			Assert.False (isLeaveTop);
+
+			isEnterTop = false;
+			var isEnterDiag = false;
+			var isLeaveDiag = false;
+			var vd = new View ();
+			vd.Enter += (s, e) => {
+				iterations++;
+				steps [2] = iterations;
+				isEnterDiag = true;
+				Assert.Null (e.View);
+			};
+			vd.Leave += (s, e) => {
+				iterations++;
+				steps [3] = iterations;
+				isLeaveDiag = true;
+				Assert.Equal (top, e.View);
+			};
+			diag.Add (vd);
+
+			Assert.False (vd.CanFocus);
+			exception = Record.Exception (() => diag.OnEnter (diag));
+			Assert.Null (exception);
+			exception = Record.Exception (() => diag.OnLeave (diag));
+			Assert.Null (exception);
+
+			vd.CanFocus = true;
+			var rs = Application.Begin (diag);
+
+			Assert.True (isEnterDiag);
+			Assert.False (isLeaveDiag);
+			Assert.False (isEnterTop);
+			Assert.True (isLeaveTop);
+
+			isEnterDiag = false;
+			isLeaveTop = false;
+			Application.End (rs);
+
+			Assert.False (isEnterDiag);
+			Assert.True (isLeaveDiag);
+			Assert.True (isEnterTop);
+			Assert.False (isLeaveTop);  // Leave event cannot be trigger because it v.Enter was performed and v is focused
+			Assert.True (vt.HasFocus);
+			Assert.Equal (1, steps [0]);
+			Assert.Equal (2, steps [1]);
+			Assert.Equal (3, steps [2]);
+			Assert.Equal (4, steps [3]);
+			Assert.Equal (5, steps [^1]);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1493,6 +1584,23 @@ namespace Terminal.Gui.ViewsTests {
 └──────────────────┘", output);
 
 			Application.End (rs);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Activating_MenuBar_By_Alt_Key_Does_Not_Throw ()
+		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("Child", new MenuItem [] {
+					new MenuItem ("_Create Child", "", null)
+				})
+			});
+			var topChild = new Toplevel ();
+			topChild.Add (menu);
+			Application.Top.Add (topChild);
+			Application.Begin (Application.Top);
+
+			var exception = Record.Exception (() => topChild.ProcessHotKey (new KeyEvent (Key.AltMask, new KeyModifiers { Alt = true })));
+			Assert.Null (exception);
 		}
 	}
 }
