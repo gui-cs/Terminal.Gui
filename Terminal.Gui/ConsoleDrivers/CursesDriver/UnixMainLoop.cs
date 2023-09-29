@@ -82,7 +82,6 @@ namespace Terminal.Gui {
 		bool poll_dirty = true;
 		int [] wakeupPipes = new int [2];
 		static IntPtr ignore = Marshal.AllocHGlobal (1);
-		static IntPtr readHandle = Marshal.AllocHGlobal (1);
 		MainLoop mainLoop;
 		bool winChanged;
 
@@ -101,11 +100,11 @@ namespace Terminal.Gui {
 			if (ConsoleDriver.RunningUnitTests) {
 				return;
 			}
-			
+
 			try {
 				pipe (wakeupPipes);
-				AddWatch (wakeupPipes [1], Condition.PollIn, ml => {
-					read (wakeupPipes [1], ignore, readHandle);
+				AddWatch (wakeupPipes [0], Condition.PollIn, ml => {
+					read (wakeupPipes [0], ignore, (IntPtr)1);
 					return true;
 				});
 			} catch (DllNotFoundException e) {
@@ -190,6 +189,18 @@ namespace Terminal.Gui {
 			if (mainLoop.timeouts.Count > 0) {
 				pollTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
 				if (pollTimeout < 0) {
+					// This avoids 'poll' waiting infinitely if 'pollTimeout < 0' until some action is detected
+					// This can occur after IMainLoopDriver.Wakeup is executed where the pollTimeout is less than 0
+					// and no event occurred in elapsed time when the 'poll' is start running again.
+					/*
+					The 'poll' function in the C standard library uses a signed integer as the timeout argument, where:
+
+					    - A positive value specifies a timeout in milliseconds.
+					    - A value of 0 means the poll function will return immediately, checking for events and not waiting.
+					    - A value of -1 means the poll function will wait indefinitely until an event occurs or an error occurs.
+					    - A negative value other than -1 typically indicates an error.
+					 */
+					pollTimeout = 0;
 					return true;
 				}
 			} else
