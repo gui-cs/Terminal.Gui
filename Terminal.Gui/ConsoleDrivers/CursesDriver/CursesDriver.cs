@@ -142,6 +142,7 @@ namespace Terminal.Gui {
 			Curses.raw ();
 			Curses.noecho ();
 			Curses.refresh ();
+			ProcessWinChange ();
 		}
 
 		private void ProcessWinChange ()
