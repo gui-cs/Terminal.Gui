@@ -777,21 +777,11 @@ internal class WindowsDriver : ConsoleDriver {
 
 	public WindowsConsole WinConsole { get; private set; }
 
-	public override bool SupportsTrueColor => RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931);
-
-	public override bool Force16Colors {
-		get => base.Force16Colors;
-		set {
-			base.Force16Colors = value;
-			// BUGBUG: This is a hack until we fully support VirtualTerminalSequences
-			if (WinConsole != null) {
-				WinConsole = new WindowsConsole ();
-			}
-			Refresh ();
-		}
-	}
+	public override bool SupportsTrueColor => RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931
+		&& (_isWindowsTerminal || _parentProcessName == "devenv"));
 
 	readonly bool _isWindowsTerminal = false;
+	readonly string _parentProcessName = "WindowsTerminal";
 
 	public WindowsDriver ()
 	{
@@ -803,8 +793,52 @@ internal class WindowsDriver : ConsoleDriver {
 			Clipboard = new FakeDriver.FakeClipboard ();
 		}
 
-		_isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") != null;
+		if (!RunningUnitTests) {
+			_parentProcessName = GetParentProcessName ();
+			_isWindowsTerminal = _parentProcessName == "WindowsTerminal";
+			if (!_isWindowsTerminal && _parentProcessName != "devenv") {
+				Force16Colors = true;
+			}
+		}
+	}
 
+	private static string GetParentProcessName ()
+	{
+#pragma warning disable CA1416 // Validate platform compatibility
+		var myId = Process.GetCurrentProcess ().Id;
+		var query = string.Format ($"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {myId}");
+		var search = new ManagementObjectSearcher ("root\\CIMV2", query);
+		var queryObj = search.Get ().OfType<ManagementBaseObject> ().FirstOrDefault ();
+		if (queryObj == null) {
+			return null;
+		}
+		var parentId = (uint)queryObj ["ParentProcessId"];
+		var parent = Process.GetProcessById ((int)parentId);
+		var prevParent = parent;
+
+		// Check if the parent is from other parent
+		while (queryObj != null) {
+			query = string.Format ($"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {parentId}");
+			search = new ManagementObjectSearcher ("root\\CIMV2", query);
+			queryObj = search.Get ().OfType<ManagementBaseObject> ().FirstOrDefault ();
+			if (queryObj == null) {
+				return parent.ProcessName;
+			}
+			parentId = (uint)queryObj ["ParentProcessId"];
+			try {
+				parent = Process.GetProcessById ((int)parentId);
+				if (string.Equals (parent.ProcessName, "explorer", StringComparison.InvariantCultureIgnoreCase)) {
+					return prevParent.ProcessName;
+				}
+				prevParent = parent;
+			} catch (ArgumentException) {
+
+				return prevParent.ProcessName;
+			}
+		}
+
+		return parent.ProcessName;
+#pragma warning restore CA1416 // Validate platform compatibility
 	}
 
 	public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
@@ -1454,13 +1488,13 @@ internal class WindowsDriver : ConsoleDriver {
 		if (RunningUnitTests) {
 			return;
 		}
-		
+
 		try {
 			if (WinConsole != null) {
 				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
 				Cols = winSize.Width;
 				Rows = winSize.Height;
-			} 
+			}
 			WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
 
 			// Needed for Windows Terminal
@@ -1511,8 +1545,7 @@ internal class WindowsDriver : ConsoleDriver {
 
 		WinConsole?.ForceRefreshCursorVisibility ();
 	}
-	
-	
+
 	public override void UpdateScreen ()
 	{
 		var windowSize = WinConsole?.GetConsoleBufferWindow (out _) ?? new Size (Cols, Rows);
@@ -1709,9 +1742,9 @@ internal class WindowsDriver : ConsoleDriver {
 		WinConsole?.Cleanup ();
 		WinConsole = null;
 
-		if (!RunningUnitTests && _isWindowsTerminal) {
+		if (!RunningUnitTests && (_isWindowsTerminal || _parentProcessName == "devenv")) {
 			// Disable alternative screen buffer.
-			Console.Out.Write (EscSeqUtils.CSI_RestoreAltBufferWithBackscroll);
+			Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndActivateAltBufferWithBackscroll);
 		}
 	}
 
@@ -1797,8 +1830,8 @@ internal class WindowsMainLoop : IMainLoopDriver {
 		while (true) {
 			Task.Delay (500).Wait ();
 			_windowSize = _winConsole.GetConsoleBufferWindow (out _);
-			if (_windowSize != Size.Empty && _windowSize.Width != _consoleDriver.Cols
-			    || _windowSize.Height != _consoleDriver.Rows) {
+			if (_windowSize != Size.Empty && (_windowSize.Width != _consoleDriver.Cols
+			    || _windowSize.Height != _consoleDriver.Rows)) {
 				return;
 			}
 		}
