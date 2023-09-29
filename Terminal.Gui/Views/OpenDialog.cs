@@ -55,8 +55,7 @@ namespace Terminal.Gui {
 	/// To select more than one file, users can use the spacebar, or control-t.
 	/// </para>
 	/// </remarks>
-	public class OpenDialog : FileDialog {		
-
+	public class OpenDialog : FileDialog {
 		/// <summary>
 		/// Initializes a new <see cref="OpenDialog"/>.
 		/// </summary>
@@ -70,9 +69,9 @@ namespace Terminal.Gui {
 		/// <param name="openMode">The open mode.</param>
 		public OpenDialog (string title, List<IAllowedType> allowedTypes = null, OpenMode openMode = OpenMode.File)
 		{
-			this.OpenMode = openMode;
+			OpenMode = openMode;
 			Title = title;
-			Style.OkButtonText = openMode == OpenMode.File ? Strings.fdOpen : openMode == OpenMode.Directory ? Strings.fdSelectFolder : Strings.fdSelectMixed;
+			Style.OkButtonText = openMode == OpenMode.File ? Strings.btnOpen : openMode == OpenMode.Directory ? Strings.fdSelectFolder : Strings.fdSelectMixed;
 			
 			if (allowedTypes != null) {
 				AllowedTypes = allowedTypes;

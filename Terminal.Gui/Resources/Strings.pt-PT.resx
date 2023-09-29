@@ -168,4 +168,13 @@
   <data name="wzNext" xml:space="preserve">
     <value>S_eguir</value>
   </data>
+  <data name="btnSaveAs" xml:space="preserve">
+    <value>Guardar como</value>
+  </data>
+  <data name="btnSave" xml:space="preserve">
+    <value>Guardar</value>
+  </data>
+  <data name="btnOpen" xml:space="preserve">
+    <value>Abrir</value>
+  </data>
 </root>

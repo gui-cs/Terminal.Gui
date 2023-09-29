@@ -42,7 +42,7 @@ namespace Terminal.Gui {
 		{
 			//: base (title, prompt: Strings.fdSave, nameFieldLabel: $"{Strings.fdSaveAs}:", message: message, allowedTypes) { }
 			Title = title;
-			Style.OkButtonText = Strings.fdSave;
+			Style.OkButtonText = Strings.btnSave;
 
 			if(allowedTypes != null) {
 				AllowedTypes = allowedTypes;
@@ -61,6 +61,25 @@ namespace Terminal.Gui {
 
 				return Path;
 			}
+		}
+
+		protected override string GetDefaultTitle ()
+		{
+			List<string> titleParts = new () {
+				Strings.fdSave
+			};
+			if (MustExist) {
+				titleParts.Add (Strings.fdExisting);
+			}
+			switch (OpenMode) {
+			case OpenMode.File:
+				titleParts.Add (Strings.fdFile);
+				break;
+			case OpenMode.Directory:
+				titleParts.Add (Strings.fdDirectory);
+				break;
+			}
+			return string.Join (' ', titleParts);
 		}
 	}
 }
