@@ -103,15 +103,17 @@ class NetWinVTConsole {
 	static extern uint GetLastError ();
 }
 
-internal class NetEvents {
+internal class NetEvents : IDisposable {
 	ManualResetEventSlim _inputReady = new ManualResetEventSlim (false);
 	ManualResetEventSlim _waitForStart = new ManualResetEventSlim (false);
 	ManualResetEventSlim _winChange = new ManualResetEventSlim (false);
 	Queue<InputResult?> _inputResultQueue = new Queue<InputResult?> ();
 	ConsoleDriver _consoleDriver;
-	volatile ConsoleKeyInfo [] _cki = null;
-	volatile static bool _isEscSeq;
-	bool _stopTasks;
+	ConsoleKeyInfo [] _cki;
+	bool _isEscSeq;
+	CancellationTokenSource _cancellationTokenSource;
+	CancellationToken _cancellationToken;
+
 #if PROCESS_REQUEST
 		bool _neededProcessRequest;
 #endif
@@ -120,19 +122,16 @@ internal class NetEvents {
 	public NetEvents (ConsoleDriver consoleDriver)
 	{
 		_consoleDriver = consoleDriver ?? throw new ArgumentNullException (nameof (consoleDriver));
+		_cancellationTokenSource = new CancellationTokenSource ();
+		_cancellationToken = _cancellationTokenSource.Token;
 		Task.Run (ProcessInputResultQueue);
 		Task.Run (CheckWindowSizeChange);
-	}
-
-	internal void StopTasks ()
-	{
-		_stopTasks = true;
 	}
 
 	public InputResult? ReadConsoleInput ()
 	{
 		while (true) {
-			if (_stopTasks) {
+			if (_cancellationToken.IsCancellationRequested) {
 				return null;
 			}
 			_waitForStart.Set ();
@@ -151,6 +150,24 @@ internal class NetEvents {
 		}
 	}
 
+	static ConsoleKeyInfo ReadConsoleKeyInfo (CancellationToken cancellationToken, bool intercept = true)
+	{
+		// if there is a key available, return it without waiting
+		//  (or dispatching work to the thread queue)
+		if (Console.KeyAvailable) {
+			return Console.ReadKey (intercept);
+		}
+
+		while (!cancellationToken.IsCancellationRequested) {
+			Task.Delay (100);
+			if (Console.KeyAvailable) {
+				return Console.ReadKey (intercept);
+			}
+		}
+		cancellationToken.ThrowIfCancellationRequested ();
+		return default;
+	}
+
 	void ProcessInputResultQueue ()
 	{
 		while (true) {
@@ -163,9 +180,18 @@ internal class NetEvents {
 				ConsoleKeyInfo newConsoleKeyInfo = default;
 
 				while (true) {
-					ConsoleKeyInfo consoleKeyInfo = Console.ReadKey (true);
+					if (_cancellationToken.IsCancellationRequested) {
+						return;
+					}
+					ConsoleKeyInfo consoleKeyInfo;
+					try {
+						consoleKeyInfo = ReadConsoleKeyInfo (_cancellationToken, true);
+					} catch (OperationCanceledException) {
+						return;
+					}
 					if ((consoleKeyInfo.KeyChar == (char)Key.Esc && !_isEscSeq)
-					|| (consoleKeyInfo.KeyChar != (char)Key.Esc && _isEscSeq)) {
+						|| (consoleKeyInfo.KeyChar != (char)Key.Esc && _isEscSeq)) {
+
 						if (_cki == null && consoleKeyInfo.KeyChar != (char)Key.Esc && _isEscSeq) {
 							_cki = EscSeqUtils.ResizeArray (new ConsoleKeyInfo ((char)Key.Esc, 0,
 							    false, false, false), _cki);
@@ -179,17 +205,16 @@ internal class NetEvents {
 						_isEscSeq = false;
 						break;
 					} else if (consoleKeyInfo.KeyChar == (char)Key.Esc && _isEscSeq && _cki != null) {
-						if (_cki != null) {
-							ProcessRequestResponse (ref newConsoleKeyInfo, ref key, _cki, ref mod);
-							_cki = null;
+						ProcessRequestResponse (ref newConsoleKeyInfo, ref key, _cki, ref mod);
+						_cki = null;
+						if (Console.KeyAvailable) {
+							_cki = EscSeqUtils.ResizeArray (consoleKeyInfo, _cki);
+						} else {
+							ProcessMapConsoleKeyInfo (consoleKeyInfo);
 						}
 						break;
 					} else {
-						_inputResultQueue.Enqueue (new InputResult {
-							EventType = EventType.Key,
-							ConsoleKeyInfo = EscSeqUtils.MapConsoleKeyInfo (consoleKeyInfo)
-						});
-						_isEscSeq = false;
+						ProcessMapConsoleKeyInfo (consoleKeyInfo);
 						break;
 					}
 				}
@@ -197,19 +222,25 @@ internal class NetEvents {
 
 			_inputReady.Set ();
 		}
+
+		void ProcessMapConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
+		{
+			_inputResultQueue.Enqueue (new InputResult {
+				EventType = EventType.Key,
+				ConsoleKeyInfo = EscSeqUtils.MapConsoleKeyInfo (consoleKeyInfo)
+			});
+			_isEscSeq = false;
+		}
 	}
 
 	void CheckWindowSizeChange ()
 	{
-		void RequestWindowSize ()
+		void RequestWindowSize (CancellationToken cancellationToken)
 		{
-			while (true) {
+			while (!cancellationToken.IsCancellationRequested) {
 				// Wait for a while then check if screen has changed sizes
-				Task.Delay (500).Wait ();
+				Task.Delay (500, cancellationToken);
 
-				if (_stopTasks) {
-					return;
-				}
 				int buffHeight, buffWidth;
 				if (((NetDriver)_consoleDriver).IsWinPlatform) {
 					buffHeight = Math.Max (Console.BufferHeight, 0);
@@ -227,15 +258,20 @@ internal class NetEvents {
 					return;
 				}
 			}
+			cancellationToken.ThrowIfCancellationRequested ();
 		}
 
 		while (true) {
-			if (_stopTasks) {
+			if (_cancellationToken.IsCancellationRequested) {
 				return;
 			}
 			_winChange.Wait ();
 			_winChange.Reset ();
-			RequestWindowSize ();
+			try {
+				RequestWindowSize (_cancellationToken);
+			} catch (OperationCanceledException) {
+				return;
+			}
 			_inputReady.Set ();
 		}
 	}
@@ -536,6 +572,23 @@ internal class NetEvents {
 
 		_inputResultQueue.Enqueue (inputResult);
 	}
+
+	public void Dispose ()
+	{
+		_cancellationTokenSource.Cancel ();
+		_cancellationTokenSource.Dispose ();
+		_cancellationTokenSource = null;
+		FlushIn ();
+	}
+
+	void FlushIn ()
+	{
+		// throws away any typeahead that has been typed by
+		// the user and has not yet been read by the program.
+		while (Console.KeyAvailable) {
+			Console.ReadKey (true);
+		}
+	}
 }
 
 internal class NetDriver : ConsoleDriver {
@@ -563,7 +616,7 @@ internal class NetDriver : ConsoleDriver {
 
 	public override void End ()
 	{
-		_mainLoop?._netEvents.StopTasks ();
+		_mainLoop?._netEvents.Dispose ();
 
 		if (IsWinPlatform) {
 			NetWinConsole?.Cleanup ();
@@ -611,7 +664,7 @@ internal class NetDriver : ConsoleDriver {
 
 		if (!RunningUnitTests) {
 			Console.TreatControlCAsInput = true;
-			
+
 			Cols = Console.WindowWidth;
 			Rows = Console.WindowHeight;
 
