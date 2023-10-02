@@ -12,24 +12,25 @@ on:
       
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 7.0
+        dotnet-quality: 'ga'
 
     - name: Install dependencies
       run: |
         dotnet restore
 
     - name: Build Debug
-      run: dotnet build --configuration Debug --no-restore
-
+      run: |
+        dotnet build --configuration Debug --no-restore
+        
     - name: Test
       run: |
         sed -i 's/"stopOnFail": false/"stopOnFail": true/g' UnitTests/xunit.runner.json
