@@ -378,7 +378,7 @@ namespace Terminal.Gui.ViewTests {
 		/// <summary>
 		/// Tests Pos.Left, Pos.X, Pos.Top, Pos.Y, Pos.Right, and Pos.Bottom set operations
 		/// </summary>
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void PosSide_SetsValue ()
 		{
 			string side; // used in format string
@@ -533,7 +533,7 @@ namespace Terminal.Gui.ViewTests {
 		}
 
 		// See: https://github.com/gui-cs/Terminal.Gui/issues/504
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void LeftTopBottomRight_Win_ShouldNotThrow ()
 		{
 			// Setup Fake driver
@@ -611,9 +611,6 @@ namespace Terminal.Gui.ViewTests {
 			// If Application.RunState is used then we must use Application.RunLoop with the rs parameter
 			Application.RunLoop (rs);
 			cleanup (rs);
-#if DEBUG_IDISPOSABLE
-			Assert.Empty (Responder.Instances);
-#endif
 		}
 
 		[Fact]
@@ -818,7 +815,7 @@ namespace Terminal.Gui.ViewTests {
 		//	Application.Shutdown ();
 		//}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void PosCombine_Will_Throws ()
 		{
 			Application.Init (new FakeDriver ());
@@ -850,12 +847,9 @@ namespace Terminal.Gui.ViewTests {
 			Application.Shutdown ();
 
 			v2.Dispose ();
-#if DEBUG_IDISPOSABLE
-			Assert.Empty (Responder.Instances);
-#endif
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void Pos_Add_Operator ()
 		{
 			Application.Init (new FakeDriver ());
@@ -899,12 +893,9 @@ namespace Terminal.Gui.ViewTests {
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
-#if DEBUG_IDISPOSABLE
-			Assert.Empty (Responder.Instances);
-#endif
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void Pos_Subtract_Operator ()
 		{
 			Application.Init (new FakeDriver ());
@@ -960,12 +951,10 @@ namespace Terminal.Gui.ViewTests {
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
-#if DEBUG_IDISPOSABLE
-			Assert.Empty (Responder.Instances);
-#endif
+
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void Internal_Tests ()
 		{
 			var posFactor = new Pos.PosFactor (0.10F);
