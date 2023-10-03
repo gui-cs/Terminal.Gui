@@ -65,12 +65,15 @@ namespace Terminal.Gui {
 	/// Facilitates box drawing and line intersection detection
 	/// and rendering.  Does not support diagonal lines.
 	/// </summary>
-	public class LineCanvas {
+	public class LineCanvas : IDisposable {
 		/// <summary>
 		/// Creates a new instance.
 		/// </summary>
 		public LineCanvas()
 		{
+			// TODO: Refactor ConfigurationManager to not use an event handler for this.
+			// Instead, have it call a method on any class appropriately attributed
+			// to update the cached values. See Issue #2871
 			ConfigurationManager.Applied += ConfigurationManager_Applied;
 		}
 
@@ -731,6 +734,12 @@ namespace Terminal.Gui {
 			foreach (var line in lineCanvas._lines) {
 				AddLine (line);
 			}
+		}
+		
+		/// <inheritdoc />
+		public void Dispose ()
+		{
+			ConfigurationManager.Applied -= ConfigurationManager_Applied;
 		}
 	}
 	internal class IntersectionDefinition {

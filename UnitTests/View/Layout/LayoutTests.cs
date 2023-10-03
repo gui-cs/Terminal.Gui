@@ -29,6 +29,9 @@ namespace Terminal.Gui.ViewTests {
 			sub2.Width = Dim.Width (sub1);
 
 			Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
+			root.Dispose ();
+			sub1.Dispose ();
+			sub2.Dispose ();
 		}
 
 		[Fact]
@@ -43,6 +46,9 @@ namespace Terminal.Gui.ViewTests {
 
 			var exception = Record.Exception (root.LayoutSubviews);
 			Assert.Null (exception);
+			root.Dispose ();
+			sub1.Dispose ();
+			sub2.Dispose ();
 		}
 
 		[Fact]
@@ -60,6 +66,9 @@ namespace Terminal.Gui.ViewTests {
 			root.LayoutSubviews ();
 
 			Assert.Equal (6, second.Frame.X);
+			root.Dispose ();
+			first.Dispose ();
+			second.Dispose ();
 		}
 
 		[Fact]
@@ -74,12 +83,16 @@ namespace Terminal.Gui.ViewTests {
 
 			var second = new View () { Id = "second" };
 			root.Add (second);
-
+			
 			second.X = Pos.Right (first) + 1;
 
 			root.LayoutSubviews ();
 
 			Assert.Equal (6, second.Frame.X);
+			root.Dispose ();
+			top.Dispose ();
+			first.Dispose ();
+			second.Dispose ();
 		}
 
 		[Fact]
@@ -92,6 +105,8 @@ namespace Terminal.Gui.ViewTests {
 			super.Add (sub);
 			super.Width = Dim.Width (sub);
 			Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
+			root.Dispose ();
+			super.Dispose ();
 		}
 
 		[Fact, AutoInitShutdown]
@@ -173,7 +188,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (5, rHeight);
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void GetCurrentWidth_TrySetWidth ()
 		{
 			var top = new View () {
@@ -204,6 +219,7 @@ namespace Terminal.Gui.ViewTests {
 			top.LayoutSubviews ();
 
 			Assert.True (v.TrySetWidth (0, out _));
+			top.Dispose ();
 		}
 
 		[Fact]
@@ -237,6 +253,7 @@ namespace Terminal.Gui.ViewTests {
 			top.LayoutSubviews ();
 
 			Assert.True (v.TrySetHeight (0, out _));
+			top.Dispose ();
 		}
 
 		[Fact]
@@ -249,6 +266,9 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (view1.AutoSize);
 			Assert.False (view2.AutoSize);
 			Assert.False (view3.AutoSize);
+			view1.Dispose ();
+			view2.Dispose ();
+			view3.Dispose ();
 		}
 
 		[Fact]
@@ -262,6 +282,9 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (view1.AutoSize);
 			Assert.False (view2.AutoSize);
 			Assert.False (view3.AutoSize);
+			view1.Dispose ();
+			view2.Dispose ();
+			view3.Dispose ();
 		}
 
 		[Fact]
@@ -274,6 +297,9 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (label1.AutoSize);
 			Assert.True (label2.AutoSize);
 			Assert.True (label3.AutoSize);
+			label1.Dispose ();
+			label2.Dispose ();
+			label3.Dispose ();
 		}
 
 		[Fact]
@@ -287,6 +313,9 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (label1.AutoSize);
 			Assert.True (label2.AutoSize);
 			Assert.True (label3.AutoSize);
+			label1.Dispose ();
+			label2.Dispose ();
+			label3.Dispose ();
 		}
 
 		[Fact]
@@ -301,6 +330,7 @@ namespace Terminal.Gui.ViewTests {
 
 			Assert.False (label.AutoSize);
 			Assert.Equal ("(0,0,0,1)", label.Bounds.ToString ());
+			super.Dispose ();
 		}
 
 		[Fact]
@@ -316,6 +346,7 @@ namespace Terminal.Gui.ViewTests {
 
 			Assert.True (label.AutoSize);
 			Assert.Equal ("(0,0,8,1)", label.Bounds.ToString ());
+			super.Dispose ();
 		}
 
 		[Fact, AutoInitShutdown]
@@ -337,10 +368,11 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal ("(0,0,28,78)", label.Bounds.ToString ());
 			Assert.False (label.IsInitialized);
 
-			Application.Begin (Application.Top);
+			var rs = Application.Begin (Application.Top);
 			Assert.True (label.IsInitialized);
 			Assert.False (label.AutoSize);
 			Assert.Equal ("(0,0,28,78)", label.Bounds.ToString ());
+			Application.End (rs);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -366,7 +398,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal ("(0,0,28,2)", label.Bounds.ToString ());
 			Assert.False (label.IsInitialized);
 
-			Application.Begin (Application.Top);
+			var rs = Application.Begin (Application.Top);
 
 			Assert.True (label.AutoSize);
 			Assert.Equal ("(0,0,28,2)", label.Bounds.ToString ());
@@ -377,6 +409,7 @@ namespace Terminal.Gui.ViewTests {
 
 			Assert.False (label.AutoSize);
 			Assert.Equal ("(0,0,28,1)", label.Bounds.ToString ());
+			Application.End (rs);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -391,7 +424,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (label.AutoSize);
 			Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
 
-			Application.Begin (Application.Top);
+			var rs = Application.Begin (Application.Top);
 
 			Assert.True (label.AutoSize);
 			// Here the AutoSize ensuring the right size with width 28 (Dim.Fill)
@@ -430,6 +463,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (label.AutoSize);
 			// BUGBUG: v2 - AutoSize is broken - temporarily disabling test See #2432
 			//Assert.Equal ("(0,0,28,3)", label.Bounds.ToString ());
+			Application.End (rs);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -440,7 +474,7 @@ namespace Terminal.Gui.ViewTests {
 			var viewY = new View ("Y") { Y = Pos.Bottom (label) };
 
 			Application.Top.Add (label, viewX, viewY);
-			Application.Begin (Application.Top);
+			var rs = Application.Begin (Application.Top);
 
 			Assert.True (label.AutoSize);
 			Assert.Equal (new Rect (0, 0, 10, 2), label.Frame);
@@ -468,6 +502,7 @@ Y
 
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 11, 3), pos);
+			Application.End (rs);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -478,7 +513,7 @@ Y
 			var viewY = new View ("Y") { Y = Pos.Bottom (label) };
 
 			Application.Top.Add (label, viewX, viewY);
-			Application.Begin (Application.Top);
+			var rs = Application.Begin (Application.Top);
 
 			Assert.True (label.AutoSize);
 			Assert.Equal (new Rect (0, 0, 2, 10), label.Frame);
@@ -522,6 +557,7 @@ Y
 
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 3, 11), pos);
+			Application.End (rs);
 		}
 
 		[Fact]
@@ -530,7 +566,7 @@ Y
 		{
 			var lbl = new Label ("123");
 			Application.Top.Add (lbl);
-			Application.Begin (Application.Top);
+			var rs = Application.Begin (Application.Top);
 
 			Assert.True (lbl.AutoSize);
 			Assert.Equal ("123 ", GetContents ());
@@ -554,6 +590,7 @@ Y
 				}
 				return text;
 			}
+			Application.End (rs);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -579,7 +616,7 @@ Y
 			};
 			win.Add (horizontalView, verticalView);
 			Application.Top.Add (win);
-			Application.Begin (Application.Top);
+			var rs = Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (32, 32);
 
 			Assert.False (horizontalView.AutoSize);
@@ -664,6 +701,7 @@ Y
 
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 32, 32), pos);
+			Application.End (rs);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -674,7 +712,7 @@ Y
 			win.Add (view);
 			Application.Top.Add (win);
 
-			Application.Begin (Application.Top);
+			var rs = Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (22, 22);
 
 			Assert.Equal (new Rect (0, 0, 22, 22), win.Frame);
@@ -976,6 +1014,7 @@ Y
 
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 22, 22), pos);
+			Application.End (rs);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1004,7 +1043,7 @@ Y
 			};
 			win.Add (horizontalView, verticalView);
 			Application.Top.Add (win);
-			Application.Begin (Application.Top);
+			var rs = Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (22, 22);
 
 			Assert.True (horizontalView.AutoSize);
@@ -1088,6 +1127,7 @@ Y
 
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 22, 22), pos);
+			Application.End (rs);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1109,7 +1149,7 @@ Y
 
 			Assert.True (label.AutoSize);
 
-			Application.Begin (Application.Top);
+			var rs = Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 			var expected = @$"
 ┌┤Test Demo 你├──────────────┐
@@ -1134,6 +1174,7 @@ Y
 ";
 
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Application.End (rs);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1195,7 +1236,7 @@ Y
 			Assert.Equal ("Absolute(10)", view6.Width.ToString ());
 			Assert.Equal ("Absolute(5)", view6.Height.ToString ());
 
-			Application.Begin (Application.Top);
+			var rs = Application.Begin (Application.Top);
 
 			Assert.True (view1.IsInitialized);
 			Assert.True (view2.IsInitialized);
@@ -1226,6 +1267,7 @@ Y
 			Assert.Equal (new Rect (0, 0, 10, 5), view6.Frame);
 			Assert.Equal ("Absolute(10)", view6.Width.ToString ());
 			Assert.Equal ("Absolute(5)", view6.Height.ToString ());
+			Application.End (rs);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1288,7 +1330,7 @@ Y
 			//Assert.Equal ("Absolute(10)", view6.Width.ToString ());
 			//Assert.Equal ("Absolute(5)", view6.Height.ToString ());
 
-			Application.Begin (Application.Top);
+			var rs = Application.Begin (Application.Top);
 
 			Assert.True (view1.IsInitialized);
 			Assert.True (view2.IsInitialized);
@@ -1320,6 +1362,7 @@ Y
 			//Assert.Equal (new Rect (0, 0, 10, 17), view6.Frame);
 			//Assert.Equal ("Absolute(10)", view6.Width.ToString ());
 			//Assert.Equal ("Absolute(5)", view6.Height.ToString ());
+			Application.End (rs);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1374,6 +1417,7 @@ Y
 			// BUGBUG: v2 - Autosize is broken when setting Width/Height AutoSize. Disabling test for now.
 			//Assert.Equal ("Absolute(2)", view2.Width.ToString ());
 			//Assert.Equal ("Absolute(17)", view2.Height.ToString ());
+			Application.End (rs);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1410,9 +1454,10 @@ Y
 			Assert.Equal ("Center", view2.Y.ToString ());
 			Assert.Equal ("Fill(0)", view2.Width.ToString ());
 			Assert.Equal ("Fill(0)", view2.Height.ToString ());
+		
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void SetRelativeLayout_PosCombine_Center_Plus_Absolute ()
 		{
 			var superView = new View () {
@@ -1516,6 +1561,9 @@ Y
 			testView.SetRelativeLayout (superView.Frame);
 			Assert.Equal (6, testView.Frame.X);
 			Assert.Equal (6, testView.Frame.Y);
+
+			superView.Dispose ();
+
 		}
 
 		[Theory, AutoInitShutdown]
@@ -1653,6 +1701,7 @@ Y
 				break;
 			}
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Application.End (rs);
 		}
 
 		[Theory, AutoInitShutdown]
@@ -1803,6 +1852,7 @@ Y
 				break;
 			}
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Application.End (rs);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1856,7 +1906,7 @@ Y
 			Application.End (rs);
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void Draw_Vertical_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
 		{
 			Application.Init (new FakeDriver ());
@@ -1887,7 +1937,7 @@ Y
 			Application.Shutdown ();
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void Draw_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
 		{
 			Application.Init (new FakeDriver ());

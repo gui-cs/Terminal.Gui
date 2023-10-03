@@ -84,20 +84,6 @@ namespace Terminal.Gui.ApplicationTests {
 		}
 
 		[Fact]
-		public void Init_Shutdown_Toplevel_Not_Disposed ()
-		{
-			Application.Init (new FakeDriver ());
-
-			Application.Shutdown ();
-
-#if DEBUG_IDISPOSABLE
-			// 4 for Application.Top and it's 3 Frames
-			Assert.Equal (4, Responder.Instances.Count);
-			Assert.True (Responder.Instances [0].WasDisposed);
-#endif
-		}
-
-		[Fact]
 		public void Init_Unbalanced_Throws ()
 		{
 			Application.Init (new FakeDriver ());

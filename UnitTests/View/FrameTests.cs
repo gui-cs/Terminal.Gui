@@ -41,6 +41,7 @@ namespace Terminal.Gui.ViewTests {
 
 			view.Margin.Thickness = new Thickness (1, 2, 3, 4);
 			Assert.Equal (new Thickness (3, 5, 7, 9), view.GetFramesThickness ());
+			view.Dispose ();
 		}
 
 		[Theory, AutoInitShutdown]
@@ -91,7 +92,7 @@ namespace Terminal.Gui.ViewTests {
 				break;
 			}
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-
+			Application.End (rs);
 		}
 
 		[Theory, AutoInitShutdown]
@@ -242,6 +243,7 @@ namespace Terminal.Gui.ViewTests {
 ╚═══╝";
 
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Application.End (rs);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -268,6 +270,7 @@ namespace Terminal.Gui.ViewTests {
 ╚════════╝";
 
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Application.End (rs);
 		}
 
 		[Theory, AutoInitShutdown]
@@ -379,6 +382,7 @@ namespace Terminal.Gui.ViewTests {
 				break;
 			}
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Application.End (rs);
 		}
 
 		[Theory, AutoInitShutdown]
@@ -490,6 +494,7 @@ namespace Terminal.Gui.ViewTests {
 				break;
 			}
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Application.End (rs);
 		}
 
 		[Theory, AutoInitShutdown]
@@ -601,6 +606,7 @@ namespace Terminal.Gui.ViewTests {
 				break;
 			}
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Application.End (rs);
 		}
 	}
 }

@@ -74,11 +74,12 @@ namespace Terminal.Gui.ViewTests {
 
 			var top = Application.Top;
 			top.Add (win);
-			Application.Begin (top);
+			var rs = Application.Begin (top);
 
 			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
 			Assert.Equal (new Rect (0, 0, 80, 25), win.Frame);
 			Assert.Equal (new Rect (68, 22, 10, 1), tv.Frame);
+			Application.End (rs);
 		}
 
 		[Fact]
@@ -102,13 +103,15 @@ namespace Terminal.Gui.ViewTests {
 			var status = new StatusBar ();
 			var top = Application.Top;
 			top.Add (win, menu, status);
-			Application.Begin (top);
+			var rs = Application.Begin (top);
 
 			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
 			Assert.Equal (new Rect (0, 0, 80, 1), menu.Frame);
 			Assert.Equal (new Rect (0, 24, 80, 1), status.Frame);
 			Assert.Equal (new Rect (0, 1, 80, 23), win.Frame);
 			Assert.Equal (new Rect (68, 20, 10, 1), tv.Frame);
+
+			Application.End (rs);
 		}
 
 		[Fact]
@@ -129,7 +132,7 @@ namespace Terminal.Gui.ViewTests {
 
 			var top = Application.Top;
 			top.Add (win);
-			Application.Begin (top);
+			var rs = Application.Begin (top);
 			((FakeDriver)Application.Driver).SetBufferSize (40, 10);
 
 			Assert.True (label.AutoSize);
@@ -150,6 +153,7 @@ namespace Terminal.Gui.ViewTests {
 ";
 
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Application.End (rs);
 		}
 
 		[Fact]
@@ -170,7 +174,7 @@ namespace Terminal.Gui.ViewTests {
 
 			var top = Application.Top;
 			top.Add (win);
-			Application.Begin (top);
+			var rs = Application.Begin (top);
 			((FakeDriver)Application.Driver).SetBufferSize (40, 10);
 
 			Assert.True (label.AutoSize);
@@ -192,6 +196,7 @@ namespace Terminal.Gui.ViewTests {
 ";
 
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Application.End (rs);
 		}
 
 		[Fact]
@@ -214,7 +219,7 @@ namespace Terminal.Gui.ViewTests {
 			var status = new StatusBar (new StatusItem [] { new (Key.F1, "~F1~ Help", null) });
 			var top = Application.Top;
 			top.Add (win, menu, status);
-			Application.Begin (top);
+			var rs = Application.Begin (top);
 
 			Assert.True (label.AutoSize);
 			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
@@ -251,6 +256,7 @@ namespace Terminal.Gui.ViewTests {
 ";
 
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Application.End (rs);
 		}
 
 		[Fact]
@@ -273,7 +279,7 @@ namespace Terminal.Gui.ViewTests {
 			var status = new StatusBar (new StatusItem [] { new (Key.F1, "~F1~ Help", null) });
 			var top = Application.Top;
 			top.Add (win, menu, status);
-			Application.Begin (top);
+			var rs = Application.Begin (top);
 
 			Assert.True (label.AutoSize);
 			Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
@@ -310,6 +316,7 @@ namespace Terminal.Gui.ViewTests {
 ";
 
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Application.End (rs);
 		}
 
 		[Fact]
@@ -518,6 +525,11 @@ namespace Terminal.Gui.ViewTests {
 			// Pos.Bottom(win) -1
 			pos = Pos.Bottom (new View (testRect)) - testInt;
 			Assert.Equal ($"Combine(Combine(View({side},View()({testRect}))+Absolute(0)){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+
+#if DEBUG_IDISPOSABLE
+			// HACK: Force clean up of Responders to avoid having to Dispose all the Views created above.
+			Responder.Instances.Clear ();
+#endif
 		}
 
 		// See: https://github.com/gui-cs/Terminal.Gui/issues/504
@@ -599,6 +611,9 @@ namespace Terminal.Gui.ViewTests {
 			// If Application.RunState is used then we must use Application.RunLoop with the rs parameter
 			Application.RunLoop (rs);
 			cleanup (rs);
+#if DEBUG_IDISPOSABLE
+			Assert.Empty (Responder.Instances);
+#endif
 		}
 
 		[Fact]
@@ -833,12 +848,16 @@ namespace Terminal.Gui.ViewTests {
 
 			Assert.Throws<InvalidOperationException> (() => Application.Run ());
 			Application.Shutdown ();
+
+			v2.Dispose ();
+#if DEBUG_IDISPOSABLE
+			Assert.Empty (Responder.Instances);
+#endif
 		}
 
 		[Fact]
 		public void Pos_Add_Operator ()
 		{
-
 			Application.Init (new FakeDriver ());
 
 			var top = Application.Top;
@@ -880,12 +899,14 @@ namespace Terminal.Gui.ViewTests {
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
+#if DEBUG_IDISPOSABLE
+			Assert.Empty (Responder.Instances);
+#endif
 		}
 
 		[Fact]
 		public void Pos_Subtract_Operator ()
 		{
-
 			Application.Init (new FakeDriver ());
 
 			var top = Application.Top;
@@ -912,6 +933,7 @@ namespace Terminal.Gui.ViewTests {
 				if (k.KeyEvent.Key == Key.Enter) {
 					Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
 					view.Remove (listLabels [count - 1]);
+					listLabels [count - 1].Dispose ();
 
 					Assert.Equal ($"Absolute({count})", field.Y.ToString ());
 					field.Y -= 1;
@@ -938,6 +960,9 @@ namespace Terminal.Gui.ViewTests {
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
+#if DEBUG_IDISPOSABLE
+			Assert.Empty (Responder.Instances);
+#endif
 		}
 
 		[Fact]
@@ -974,6 +999,8 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (40, posRight.Anchor (0));
 			var posViewBottom = new Pos.PosView (view, 3);
 			Assert.Equal (11, posViewBottom.Anchor (0));
+			
+			view.Dispose ();
 		}
 
 		[Fact]
@@ -1008,7 +1035,6 @@ namespace Terminal.Gui.ViewTests {
 		[Theory, AutoInitShutdown]
 		[InlineData (true)]
 		[InlineData (false)]
-
 		public void PosPercentPlusOne (bool testHorizontal)
 		{
 			var container = new View {
@@ -1065,6 +1091,8 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (new Rect (0, 0, 10, 10), super.Frame);
 			Assert.Equal (new Rect (0, 0, 2, 2), view1.Frame);
 			Assert.Equal (new Rect (8, 0, 2, 2), view2.Frame);
+
+			super.Dispose ();
 		}
 	}
 }

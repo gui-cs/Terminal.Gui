@@ -68,6 +68,7 @@ namespace Terminal.Gui.ViewTests {
 			expectedOld = r.Title;
 			r.Title = expected;
 			Assert.Equal (expected, r.Title);
+			r.Dispose ();
 		}
 
 	}
