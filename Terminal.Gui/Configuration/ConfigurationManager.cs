@@ -15,6 +15,31 @@ using System.Text.Json.Serialization;
 #nullable enable
 
 namespace Terminal.Gui;
+
+/// <summary>
+/// <para>
+/// Classes should implement this interface on any class that should be notified when the configuration changes.
+/// This is an alternative to using the <see cref="ConfigurationManager.Updated"/> and
+/// <see cref="ConfigurationManager.Applied"/> events.
+/// <para>
+/// When the configuration has changed, the <see cref="ConfigurationManager"/> will call the <see cref="OnUpdated"/>
+/// method. When the configuration is being applied, the <see cref="OnApplied"/> method will be called.
+/// 
+/// </para>
+/// </summary>
+public interface ISupportConfigChanges {
+
+	/// <summary>
+	/// Called when the configuration has been updated.
+	/// </summary>
+	public void OnUpdated ();
+
+	/// <summary>
+	/// Called when the configuration is being applied.
+	/// </summary>
+	public void OnApplied ();
+}
+
 /// <summary>
 /// Provides settings and configuration management for Terminal.Gui applications. 
 /// <para>
@@ -326,6 +351,10 @@ public static partial class ConfigurationManager {
 	{
 		Debug.WriteLine ($"ConfigurationManager.OnApplied()");
 		Applied?.Invoke (null, new ConfigurationManagerEventArgs ());
+
+		// TODO: Refactor ConfigurationManager to not use an event handler for this.
+		// Instead, have it call a method on any class appropriately attributed
+		// to update the cached values. See Issue #2871
 	}
 
 	/// <summary>

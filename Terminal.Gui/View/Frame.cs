@@ -56,19 +56,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Frames only render to their Parent or Parent's SuperView's LineCanvas,
-		/// so this always throws an <see cref="InvalidOperationException"/>.
-		/// </summary>
-		public override LineCanvas LineCanvas {
-			get {
-				throw new NotImplementedException ();
-			}
-			set {
-				throw new NotImplementedException ();
-			}
-		}
-
-		/// <summary>
 		/// Does nothing for Frame
 		/// </summary>
 		/// <returns></returns>

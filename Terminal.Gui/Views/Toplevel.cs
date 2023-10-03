@@ -966,6 +966,9 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		protected override void Dispose (bool disposing)
 		{
+			Application.GrabbingMouse -= Application_GrabbingMouse;
+			Application.UnGrabbingMouse -= Application_UnGrabbingMouse;
+
 			_dragPosition = null;
 			base.Dispose (disposing);
 		}

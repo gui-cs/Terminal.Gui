@@ -62,16 +62,50 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 	{
 		Debug.WriteLine ($"Before: {methodUnderTest.Name}");
 		if (AutoInit) {
+#if DEBUG_IDISPOSABLE && FORCE_RESPONDER_DISPOSE
+			// Clear out any lingering Responder instances from previous tests
+			Responder.Instances.Clear ();
+			Assert.Equal (0, Responder.Instances.Count);
+#endif
 			Application.Init ((ConsoleDriver)Activator.CreateInstance (_driverType));
 		}
 	}
-	
+
 	public override void After (MethodInfo methodUnderTest)
 	{
 		Debug.WriteLine ($"After: {methodUnderTest.Name}");
 		if (AutoInit) {
 			Application.Shutdown ();
+#if DEBUG_IDISPOSABLE && FORCE_RESPONDER_DISPOSE
+			Assert.Equal (0, Responder.Instances.Count);
+#endif
 		}
+	}
+}
+
+[AttributeUsage (AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+public class TestRespondersDisposed : Xunit.Sdk.BeforeAfterTestAttribute {
+	public TestRespondersDisposed ()
+	{
+		CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
+	}
+
+	public override void Before (MethodInfo methodUnderTest)
+	{
+		Debug.WriteLine ($"Before: {methodUnderTest.Name}");
+#if DEBUG_IDISPOSABLE
+		// Clear out any lingering Responder instances from previous tests
+		Responder.Instances.Clear ();
+		Assert.Equal (0, Responder.Instances.Count);
+#endif
+	}
+
+	public override void After (MethodInfo methodUnderTest)
+	{
+		Debug.WriteLine ($"After: {methodUnderTest.Name}");
+#if DEBUG_IDISPOSABLE
+		Assert.Equal (0, Responder.Instances.Count);
+#endif
 	}
 }
 
@@ -118,7 +152,7 @@ partial class TestHelpers {
 		for (int r = 0; r < driver.Rows; r++) {
 			for (int c = 0; c < driver.Cols; c++) {
 				// TODO: Remove hard-coded [0] once combining pairs is supported
-				Rune rune = contents [r, c].Runes[0];
+				Rune rune = contents [r, c].Runes [0];
 				if (rune.DecodeSurrogatePair (out char [] spair)) {
 					sb.Append (spair);
 				} else {
@@ -134,14 +168,14 @@ partial class TestHelpers {
 		var actualLook = sb.ToString ();
 
 		if (string.Equals (expectedLook, actualLook)) return;
-		
+
 		// get rid of trailing whitespace on each line (and leading/trailing whitespace of start/end of full string)
 		expectedLook = TrailingWhiteSpaceRegEx ().Replace (expectedLook, "").Trim ();
 		actualLook = TrailingWhiteSpaceRegEx ().Replace (actualLook, "").Trim ();
 
 		if (ignoreLeadingWhitespace) {
-			expectedLook = LeadingWhitespaceRegEx().Replace (expectedLook, "").Trim ();
-			actualLook = LeadingWhitespaceRegEx().Replace (actualLook, "").Trim ();
+			expectedLook = LeadingWhitespaceRegEx ().Replace (expectedLook, "").Trim ();
+			actualLook = LeadingWhitespaceRegEx ().Replace (actualLook, "").Trim ();
 		}
 
 		// standardize line endings for the comparison
@@ -166,7 +200,7 @@ partial class TestHelpers {
 		var y = -1;
 		var w = -1;
 		var h = -1;
-		
+
 		var contents = driver.Contents;
 
 		for (var r = 0; r < driver.Rows; r++) {
@@ -226,7 +260,7 @@ partial class TestHelpers {
 		if (string.Equals (expectedLook, actualLook)) {
 			return new Rect (x > -1 ? x : 0, y > -1 ? y : 0, w > -1 ? w : 0, h > -1 ? h : 0);
 		}
-		
+
 		// standardize line endings for the comparison
 		expectedLook = expectedLook.Replace ("\r\n", "\n");
 		actualLook = actualLook.Replace ("\r\n", "\n");
@@ -258,7 +292,7 @@ partial class TestHelpers {
 
 		expectedLook = expectedLook.Trim ();
 		var driver = (FakeDriver)Application.Driver;
-		
+
 		var contents = driver.Contents;
 
 		var r = 0;
@@ -271,7 +305,7 @@ partial class TestHelpers {
 				var match = expectedColors.Where (e => e == val).ToList ();
 				switch (match.Count) {
 				case 0:
-					throw new Exception ($"Unexpected color {val} was used at row {r} and col {c} (indexes start at 0).  Color value was {val} (expected colors were {string.Join (",", expectedColors.Select (c => c.Value.ToString()))})");
+					throw new Exception ($"Unexpected color {val} was used at row {r} and col {c} (indexes start at 0).  Color value was {val} (expected colors were {string.Join (",", expectedColors.Select (c => c.Value.ToString ()))})");
 				case > 1:
 					throw new ArgumentException ($"Bad value for expectedColors, {match.Count} Attributes had the same Value");
 				}
@@ -315,14 +349,15 @@ partial class TestHelpers {
 						toFind.Remove (match);
 					}
 				}
-			}}
+			}
+		}
 
 		if (!toFind.Any ()) {
 			return;
 		}
 		var sb = new StringBuilder ();
-		sb.AppendLine ("The following colors were not used:" + string.Join ("; ", toFind.Select (a => a.ToString())));
-		sb.AppendLine ("Colors used were:" + string.Join ("; ", colorsUsed.Select (a => a.ToString())));
+		sb.AppendLine ("The following colors were not used:" + string.Join ("; ", toFind.Select (a => a.ToString ())));
+		sb.AppendLine ("Colors used were:" + string.Join ("; ", colorsUsed.Select (a => a.ToString ())));
 		throw new Exception (sb.ToString ());
 	}
 

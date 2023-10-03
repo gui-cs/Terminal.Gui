@@ -45,6 +45,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal ("FrameSubview", top.MostFocused.Text);
 			top.ProcessKey (new KeyEvent (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
 			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
+			top.Dispose ();
 		}
 
 
@@ -69,6 +70,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (r.Subviews.IndexOf (v1), r.TabIndexes.IndexOf (v1));
 			Assert.Equal (r.Subviews.IndexOf (v2), r.TabIndexes.IndexOf (v2));
 			Assert.Equal (r.Subviews.IndexOf (v3), r.TabIndexes.IndexOf (v3));
+			r.Dispose ();
 		}
 
 		[Fact]
@@ -89,6 +91,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (r.TabIndexes.IndexOf (v1) == 0);
 			Assert.True (r.TabIndexes.IndexOf (v2) == 1);
 			Assert.True (r.TabIndexes.IndexOf (v3) == 2);
+			r.Dispose ();
 		}
 
 		[Fact]
@@ -109,6 +112,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (r.TabIndexes.IndexOf (v1) == 0);
 			Assert.True (r.TabIndexes.IndexOf (v2) == 1);
 			Assert.True (r.TabIndexes.IndexOf (v3) == 2);
+			r.Dispose ();
 		}
 
 		[Fact]
@@ -129,8 +133,9 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (r.TabIndexes.IndexOf (v1) == 0);
 			Assert.True (r.TabIndexes.IndexOf (v2) == 1);
 			Assert.True (r.TabIndexes.IndexOf (v3) == 2);
-		}
-
+			r.Dispose ();
+		} 
+		
 		[Fact]
 		public void SendSubviewBackwards_Subviews_vs_TabIndexes ()
 		{
@@ -149,6 +154,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (r.TabIndexes.IndexOf (v1) == 0);
 			Assert.True (r.TabIndexes.IndexOf (v2) == 1);
 			Assert.True (r.TabIndexes.IndexOf (v3) == 2);
+			r.Dispose ();
 		}
 
 		[Fact]
@@ -168,6 +174,7 @@ namespace Terminal.Gui.ViewTests {
 			v1.TabIndex = 2;
 			Assert.True (r.Subviews.IndexOf (v1) == 0);
 			Assert.True (r.TabIndexes.IndexOf (v1) == 2);
+			r.Dispose ();
 		}
 
 		[Fact]
@@ -183,6 +190,7 @@ namespace Terminal.Gui.ViewTests {
 			v1.TabIndex = 3;
 			Assert.True (r.Subviews.IndexOf (v1) == 0);
 			Assert.True (r.TabIndexes.IndexOf (v1) == 2);
+			r.Dispose ();
 		}
 
 		[Fact]
@@ -198,6 +206,7 @@ namespace Terminal.Gui.ViewTests {
 			v1.TabIndex = -1;
 			Assert.True (r.Subviews.IndexOf (v1) == 0);
 			Assert.True (r.TabIndexes.IndexOf (v1) == 0);
+			r.Dispose ();
 		}
 
 		[Fact]
@@ -215,6 +224,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (r.Subviews.IndexOf (v1) == 0);
 			Assert.True (r.TabIndexes.IndexOf (v1) == 0);
 			Assert.Equal (-1, v1.TabIndex);
+			r.Dispose ();
 		}
 
 		[Fact]
@@ -231,6 +241,7 @@ namespace Terminal.Gui.ViewTests {
 			v1.TabIndex = 1;
 			Assert.True (r.Subviews.IndexOf (v1) == 0);
 			Assert.True (r.TabIndexes.IndexOf (v1) == 1);
+			r.Dispose ();
 		}
 
 		[Fact]
@@ -255,6 +266,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (v1.HasFocus);
 			Assert.False (v2.HasFocus);
 			Assert.True (v3.HasFocus);
+			r.Dispose ();
 		}
 
 		[Fact]
@@ -279,6 +291,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (v1.HasFocus);
 			Assert.False (v2.HasFocus);
 			Assert.False (v3.HasFocus);
+			r.Dispose ();
 		}
 
 		[Fact]
@@ -303,6 +316,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (v1.HasFocus);
 			Assert.False (v2.HasFocus);
 			Assert.False (v3.HasFocus);
+			r.Dispose ();
 		}
 
 		[Fact]
@@ -327,6 +341,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (v1.HasFocus);
 			Assert.False (v2.HasFocus);
 			Assert.False (v3.HasFocus);
+			r.Dispose ();
 		}
 
 		[Fact]
@@ -359,6 +374,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (v1.HasFocus);
 			Assert.False (v2.HasFocus);
 			Assert.True (v3.HasFocus);
+			r.Dispose ();
 		}
 
 		[Fact]
@@ -391,6 +407,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (v1.HasFocus);
 			Assert.False (v2.HasFocus);
 			Assert.True (v3.HasFocus);
+			r.Dispose ();
 		}
 
 		[Fact]
@@ -433,6 +450,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (r.TabIndexes.IndexOf (v3), v3.TabIndex);
 			Assert.Equal (2, v3.TabIndex);
 			Assert.True (v3.TabStop);
+			r.Dispose ();
 		}
 
 		[Fact]
@@ -463,6 +481,7 @@ namespace Terminal.Gui.ViewTests {
 			v.CanFocus = true;
 			Assert.False (f.CanFocus);
 			Assert.True (v.CanFocus);
+			t.Dispose ();
 		}
 
 		[Fact]
@@ -986,7 +1005,8 @@ namespace Terminal.Gui.ViewTests {
 			window.Add (view);
 
 			// Act
-			Application.Begin (top);
+			var rs = Application.Begin (top);
+			Application.End (rs);
 			Application.Shutdown ();
 
 			// Assert does Not throw NullReferenceException
@@ -1018,12 +1038,14 @@ namespace Terminal.Gui.ViewTests {
 			subView1.Add (subView1subView1);
 			var view2 = new View { CanFocus = true };
 			top.Add (view1, view2);
-			Application.Begin (top);
+			var rs = Application.Begin (top);
 
 			view2.SetFocus ();
 			Assert.True (view1Leave);
 			Assert.True (subView1Leave);
 			Assert.False (subView1subView1Leave);
+			Application.End (rs);
+			subView1subView1.Dispose ();
 		}
 
 		[Fact, AutoInitShutdown]

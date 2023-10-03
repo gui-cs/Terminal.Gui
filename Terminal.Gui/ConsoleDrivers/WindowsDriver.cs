@@ -14,6 +14,7 @@ using System.Management;
 using static Terminal.Gui.WindowsConsole;
 using static Unix.Terminal.Curses;
 using System.Drawing;
+using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui;
 
@@ -841,6 +842,8 @@ internal class WindowsDriver : ConsoleDriver {
 #pragma warning restore CA1416 // Validate platform compatibility
 	}
 
+	WindowsMainLoop _mainLoop;
+
 	public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 	{
 		_keyHandler = keyHandler;
@@ -848,29 +851,25 @@ internal class WindowsDriver : ConsoleDriver {
 		_keyUpHandler = keyUpHandler;
 		_mouseHandler = mouseHandler;
 
-		var mLoop = mainLoop.MainLoopDriver as WindowsMainLoop;
-
-		mLoop.ProcessInput = (e) => ProcessInput (e);
-
-		mLoop.WinChanged = (s, e) => {
-			ChangeWin (e.Size);
-		};
+		_mainLoop = mainLoop.MainLoopDriver as WindowsMainLoop;
+		_mainLoop.ProcessInput += ProcessInput;
+		_mainLoop.WinChanged += ChangeWin;
 	}
 
-	private void ChangeWin (Size e)
+	private void ChangeWin (Object s, SizeChangedEventArgs e)
 	{
-		var w = e.Width;
-		if (w == Cols - 3 && e.Height < Rows) {
+		var w = e.Size.Width;
+		if (w == Cols - 3 && e.Size.Height < Rows) {
 			w += 3;
 		}
 		Left = 0;
 		Top = 0;
-		Cols = e.Width;
-		Rows = e.Height;
+		Cols = e.Size.Width;
+		Rows = e.Size.Height;
 
 		if (!RunningUnitTests) {
 			var newSize = WinConsole.SetConsoleWindow (
-				(short)Math.Max (w, 16), (short)Math.Max (e.Height, 0));
+				(short)Math.Max (w, 16), (short)Math.Max (e.Size.Height, 0));
 
 			Cols = newSize.Width;
 			Rows = newSize.Height;
@@ -1739,6 +1738,13 @@ internal class WindowsDriver : ConsoleDriver {
 
 	public override void End ()
 	{
+		if (_mainLoop != null) {
+			_mainLoop.ProcessInput -= ProcessInput;
+			_mainLoop.WinChanged -= ChangeWin;
+			_mainLoop.Dispose ();
+		}
+		_mainLoop = null;
+		
 		WinConsole?.Cleanup ();
 		WinConsole = null;
 
@@ -1763,7 +1769,7 @@ internal class WindowsDriver : ConsoleDriver {
 /// <remarks>
 /// This implementation is used for WindowsDriver.
 /// </remarks>
-internal class WindowsMainLoop : IMainLoopDriver {
+internal class WindowsMainLoop : IMainLoopDriver, IDisposable {
 	ManualResetEventSlim _eventReady = new ManualResetEventSlim (false);
 	ManualResetEventSlim _waitForProbe = new ManualResetEventSlim (false);
 	ManualResetEventSlim _winChange = new ManualResetEventSlim (false);
@@ -1772,8 +1778,8 @@ internal class WindowsMainLoop : IMainLoopDriver {
 	WindowsConsole _winConsole;
 	bool _winChanged;
 	Size _windowSize;
-	CancellationTokenSource _tokenSource = new CancellationTokenSource ();
-
+	CancellationTokenSource _eventReadyTokenSource = new CancellationTokenSource ();
+	
 	// The records that we keep fetching
 	Queue<WindowsConsole.InputRecord []> _resultQueue = new Queue<WindowsConsole.InputRecord []> ();
 
@@ -1799,10 +1805,10 @@ internal class WindowsMainLoop : IMainLoopDriver {
 		Task.Run (WindowsInputHandler);
 		Task.Run (CheckWinChange);
 	}
-
+	
 	void WindowsInputHandler ()
 	{
-		while (true) {
+		while (_mainLoop != null) {
 			_waitForProbe.Wait ();
 			_waitForProbe.Reset ();
 
@@ -1816,27 +1822,24 @@ internal class WindowsMainLoop : IMainLoopDriver {
 
 	void CheckWinChange ()
 	{
-		while (true) {
+		while (_mainLoop != null) {
 			_winChange.Wait ();
 			_winChange.Reset ();
-			WaitWinChange ();
+			
+			while (_mainLoop != null) {
+				Task.Delay (500).Wait ();
+				_windowSize = _winConsole.GetConsoleBufferWindow (out _);
+				if (_windowSize != Size.Empty && (_windowSize.Width != _consoleDriver.Cols
+								|| _windowSize.Height != _consoleDriver.Rows)) {
+					break;
+				}
+			}
+			
 			_winChanged = true;
 			_eventReady.Set ();
 		}
 	}
-
-	void WaitWinChange ()
-	{
-		while (true) {
-			Task.Delay (500).Wait ();
-			_windowSize = _winConsole.GetConsoleBufferWindow (out _);
-			if (_windowSize != Size.Empty && (_windowSize.Width != _consoleDriver.Cols
-			    || _windowSize.Height != _consoleDriver.Rows)) {
-				return;
-			}
-		}
-	}
-
+	
 	void IMainLoopDriver.Wakeup ()
 	{
 		//tokenSource.Cancel ();
@@ -1853,8 +1856,8 @@ internal class WindowsMainLoop : IMainLoopDriver {
 		}
 
 		try {
-			if (!_tokenSource.IsCancellationRequested) {
-				_eventReady.Wait (waitTimeout, _tokenSource.Token);
+			if (!_eventReadyTokenSource.IsCancellationRequested) {
+				_eventReady.Wait (waitTimeout, _eventReadyTokenSource.Token);
 			}
 		} catch (OperationCanceledException) {
 			return true;
@@ -1862,20 +1865,20 @@ internal class WindowsMainLoop : IMainLoopDriver {
 			_eventReady.Reset ();
 		}
 
-		if (!_tokenSource.IsCancellationRequested) {
+		if (!_eventReadyTokenSource.IsCancellationRequested) {
 			return _resultQueue.Count > 0 || CheckTimers (wait, out _) || _winChanged;
 		}
 
-		_tokenSource.Dispose ();
-		_tokenSource = new CancellationTokenSource ();
+		_eventReadyTokenSource.Dispose ();
+		_eventReadyTokenSource = new CancellationTokenSource ();
 		return true;
 	}
-
+	
 	bool CheckTimers (bool wait, out int waitTimeout)
 	{
 		long now = DateTime.UtcNow.Ticks;
 
-		if (_mainLoop.timeouts.Count > 0) {
+		if (_mainLoop?.timeouts.Count > 0) {
 			waitTimeout = (int)((_mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
 			if (waitTimeout < 0)
 				return true;
@@ -1883,9 +1886,14 @@ internal class WindowsMainLoop : IMainLoopDriver {
 			waitTimeout = -1;
 		}
 
-		if (!wait)
+		if (!wait) {
 			waitTimeout = 0;
+		}
 
+		if (_mainLoop == null) {
+			return false;
+		}
+		
 		int ic;
 		lock (_mainLoop.idleHandlers) {
 			ic = _mainLoop.idleHandlers.Count;
@@ -1907,6 +1915,17 @@ internal class WindowsMainLoop : IMainLoopDriver {
 			_winChanged = false;
 			WinChanged?.Invoke (this, new SizeChangedEventArgs (_windowSize));
 		}
+	}
+	public void Dispose ()
+	{
+		_eventReadyTokenSource?.Cancel ();
+		_eventReadyTokenSource?.Dispose ();
+		_eventReady?.Dispose ();
+
+		_mainLoop = null;
+		_winChange?.Dispose ();
+		_waitForProbe?.Dispose ();
+
 	}
 }
 

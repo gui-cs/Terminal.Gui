@@ -19,25 +19,22 @@ namespace Terminal.Gui.ViewsTests {
 #endif
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void Dispose_Toplevel_IsOverlappedContainer_False_With_Begin_End ()
 		{
 			Application.Init (new FakeDriver ());
 
 			var top = new Toplevel ();
 			var rs = Application.Begin (top);
-			Application.End (rs);
-
-			Application.Shutdown ();
-
 #if DEBUG_IDISPOSABLE
-			Assert.Equal (8, Responder.Instances.Count);
-			Assert.True (Responder.Instances [0].WasDisposed);
-			Assert.True (Responder.Instances [1].WasDisposed);
+			Assert.Equal (4, Responder.Instances.Count);
 #endif
+
+			Application.End (rs);
+			Application.Shutdown ();
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void Dispose_Toplevel_IsOverlappedContainer_True_With_Begin ()
 		{
 			Application.Init (new FakeDriver ());
@@ -47,11 +44,6 @@ namespace Terminal.Gui.ViewsTests {
 			Application.End (rs);
 
 			Application.Shutdown ();
-#if DEBUG_IDISPOSABLE
-			Assert.Equal (8, Responder.Instances.Count);
-			Assert.True (Responder.Instances [0].WasDisposed);
-			Assert.True (Responder.Instances [1].WasDisposed);
-#endif
 		}
 
 		[Fact, AutoInitShutdown]
