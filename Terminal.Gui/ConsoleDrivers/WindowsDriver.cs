@@ -11,17 +11,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Management;
-using static Terminal.Gui.WindowsConsole;
-using static Unix.Terminal.Curses;
-using System.Drawing;
-using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui;
 
 internal class WindowsConsole {
 	public const int STD_OUTPUT_HANDLE = -11;
 	public const int STD_INPUT_HANDLE = -10;
-	public const int STD_ERROR_HANDLE = -12;
 
 	IntPtr _inputHandle, _outputHandle;
 	IntPtr _screenBuffer;
