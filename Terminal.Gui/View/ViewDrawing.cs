@@ -288,7 +288,7 @@ namespace Terminal.Gui {
 		/// The canvas that any line drawing that is to be shared by subviews of this view should add lines to.
 		/// </summary>
 		/// <remarks><see cref="Border"/> adds border lines to this LineCanvas.</remarks>
-		public virtual LineCanvas LineCanvas { get; internal set; } = new LineCanvas ();
+		public LineCanvas LineCanvas { get; } = new LineCanvas ();
 
 		/// <summary>
 		/// Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for

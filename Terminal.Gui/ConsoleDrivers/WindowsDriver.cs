@@ -1736,7 +1736,7 @@ internal class WindowsDriver : ConsoleDriver {
 		if (_mainLoop != null) {
 			_mainLoop.ProcessInput -= ProcessInput;
 			_mainLoop.WinChanged -= ChangeWin;
-			_mainLoop.Dispose ();
+			//_mainLoop.Dispose ();
 		}
 		_mainLoop = null;
 		
@@ -1764,7 +1764,7 @@ internal class WindowsDriver : ConsoleDriver {
 /// <remarks>
 /// This implementation is used for WindowsDriver.
 /// </remarks>
-internal class WindowsMainLoop : IMainLoopDriver, IDisposable {
+internal class WindowsMainLoop : IMainLoopDriver {
 	ManualResetEventSlim _eventReady = new ManualResetEventSlim (false);
 	ManualResetEventSlim _waitForProbe = new ManualResetEventSlim (false);
 	ManualResetEventSlim _winChange = new ManualResetEventSlim (false);
@@ -1911,17 +1911,17 @@ internal class WindowsMainLoop : IMainLoopDriver, IDisposable {
 			WinChanged?.Invoke (this, new SizeChangedEventArgs (_windowSize));
 		}
 	}
-	public void Dispose ()
-	{
-		_eventReadyTokenSource?.Cancel ();
-		_eventReadyTokenSource?.Dispose ();
-		_eventReady?.Dispose ();
+	
+	//public void Dispose ()
+	//{
+	//	_eventReadyTokenSource?.Cancel ();
+	//	_eventReadyTokenSource?.Dispose ();
+	//	_eventReady?.Dispose ();
 
-		_mainLoop = null;
-		_winChange?.Dispose ();
-		_waitForProbe?.Dispose ();
-
-	}
+	//	_mainLoop = null;
+	//	_winChange?.Dispose ();
+	//	_waitForProbe?.Dispose ();
+	//}
 }
 
 class WindowsClipboard : ClipboardBase {
