@@ -17,30 +17,6 @@ using System.Text.Json.Serialization;
 namespace Terminal.Gui;
 
 /// <summary>
-/// <para>
-/// Classes should implement this interface on any class that should be notified when the configuration changes.
-/// This is an alternative to using the <see cref="ConfigurationManager.Updated"/> and
-/// <see cref="ConfigurationManager.Applied"/> events.
-/// <para>
-/// When the configuration has changed, the <see cref="ConfigurationManager"/> will call the <see cref="OnUpdated"/>
-/// method. When the configuration is being applied, the <see cref="OnApplied"/> method will be called.
-/// 
-/// </para>
-/// </summary>
-public interface ISupportConfigChanges {
-
-	/// <summary>
-	/// Called when the configuration has been updated.
-	/// </summary>
-	public void OnUpdated ();
-
-	/// <summary>
-	/// Called when the configuration is being applied.
-	/// </summary>
-	public void OnApplied ();
-}
-
-/// <summary>
 /// Provides settings and configuration management for Terminal.Gui applications. 
 /// <para>
 /// Users can set Terminal.Gui settings on a global or per-application basis by providing JSON formatted configuration files.
