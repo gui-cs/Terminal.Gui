@@ -63,6 +63,10 @@ namespace Terminal.Gui {
 			}
 		}
 
+		/// <summary>
+		/// Gets the default title for the <see cref="SaveDialog"/>.
+		/// </summary>
+		/// <returns></returns>
 		protected override string GetDefaultTitle ()
 		{
 			List<string> titleParts = new () {

@@ -5,11 +5,15 @@ using System.IO.Abstractions;
 
 namespace Terminal.Gui {
 
-
+	/// <summary>
+	/// Provides a way to get the color of a file or directory.
+	/// </summary>
 	public class FileSystemColorProvider {
-		
-
-
+		/// <summary>
+		/// Gets the color to use.
+		/// </summary>
+		/// <param name="file"></param>
+		/// <returns></returns>
 		public TrueColor? GetTrueColor (IFileSystemInfo file)
 		{
 			if (FilenameToColor.ContainsKey (file.Name)) {

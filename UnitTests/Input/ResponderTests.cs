@@ -50,7 +50,7 @@ namespace Terminal.Gui.InputTests {
 		
 			var r = new Responder ();
 #if DEBUG_IDISPOSABLE
-			Assert.Equal (1, Responder.Instances.Count);
+			Assert.Single (Responder.Instances);
 #endif
 
 			r.Dispose ();

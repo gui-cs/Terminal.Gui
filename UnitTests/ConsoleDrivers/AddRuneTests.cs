@@ -1,9 +1,7 @@
-﻿//////using Microsoft.VisualStudio.TestPlatform.Utilities;
-using System.Buffers;
+﻿using System.Buffers;
 using System.Text;
 using Xunit;
 using Xunit.Abstractions;
-using static Terminal.Gui.SpinnerStyle;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
