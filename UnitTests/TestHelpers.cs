@@ -96,7 +96,7 @@ public class TestRespondersDisposed : Xunit.Sdk.BeforeAfterTestAttribute {
 #if DEBUG_IDISPOSABLE
 		// Clear out any lingering Responder instances from previous tests
 		Responder.Instances.Clear ();
-		Assert.Equal (0, Responder.Instances.Count);
+		Assert.Empty (Responder.Instances);
 #endif
 	}
 
@@ -104,7 +104,9 @@ public class TestRespondersDisposed : Xunit.Sdk.BeforeAfterTestAttribute {
 	{
 		Debug.WriteLine ($"After: {methodUnderTest.Name}");
 #if DEBUG_IDISPOSABLE
+#pragma warning disable xUnit2013 // Do not use equality check to check for collection size.
 		Assert.Equal (0, Responder.Instances.Count);
+#pragma warning restore xUnit2013 // Do not use equality check to check for collection size.
 #endif
 	}
 }

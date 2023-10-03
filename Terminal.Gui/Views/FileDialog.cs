@@ -729,7 +729,7 @@ namespace Terminal.Gui {
 			this.LayoutSubviews ();
 		}
 		/// <summary>
-		/// Gets a default dialog title, when <see cref="Title"/> is not set or empty, 
+		/// Gets a default dialog title, when <see cref="View.Title"/> is not set or empty, 
 		/// result of the function will be shown.
 		/// </summary>
 		protected virtual string GetDefaultTitle ()
