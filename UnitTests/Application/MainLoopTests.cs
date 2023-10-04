@@ -171,7 +171,7 @@ namespace Terminal.Gui.ApplicationTests {
 			var functionCalled = 0;
 			Func<bool> fn1 = () => {
 				functionCalled++;
-				if (functionCalled == 10) 					return false;
+				if (functionCalled == 10) return false;
 				return true;
 			};
 
@@ -179,7 +179,7 @@ namespace Terminal.Gui.ApplicationTests {
 			var stopCount = 0;
 			Func<bool> fnStop = () => {
 				stopCount++;
-				if (stopCount == 20) 					ml.Stop ();
+				if (stopCount == 20) ml.Stop ();
 				return true;
 			};
 
@@ -208,7 +208,7 @@ namespace Terminal.Gui.ApplicationTests {
 			var stopCount = 0;
 			Func<bool> fnStop = () => {
 				stopCount++;
-				if (stopCount == 10) 					ml.Stop ();
+				if (stopCount == 10) ml.Stop ();
 				return true;
 			};
 
@@ -231,7 +231,9 @@ namespace Terminal.Gui.ApplicationTests {
 			var functionCalled = 0;
 			Func<bool> fn = () => {
 				functionCalled++;
-				if (functionCalled == 10) 					ml.Stop ();
+				if (functionCalled == 10) {
+					ml.Stop ();
+				}
 				return true;
 			};
 
@@ -270,7 +272,7 @@ namespace Terminal.Gui.ApplicationTests {
 		{
 			var ml = new MainLoop (new FakeMainLoop ());
 			var ms = 100;
-			
+
 			var originTicks = DateTime.UtcNow.Ticks;
 
 			var callbackCount = 0;
@@ -288,7 +290,7 @@ namespace Terminal.Gui.ApplicationTests {
 
 			var token = ml.AddTimeout (TimeSpan.FromMilliseconds (ms), callback);
 
-			Assert.Same (ml,sender);
+			Assert.Same (ml, sender);
 			Assert.NotNull (args.Timeout);
 			Assert.True (args.Ticks - originTicks >= 100 * TimeSpan.TicksPerMillisecond);
 
@@ -323,7 +325,7 @@ namespace Terminal.Gui.ApplicationTests {
 			var callbackCount = 0;
 			Func<MainLoop, bool> callback = (loop) => {
 				callbackCount++;
-				if (callbackCount == 2) 					ml.Stop ();
+				if (callbackCount == 2) ml.Stop ();
 				return true;
 			};
 
@@ -353,7 +355,7 @@ namespace Terminal.Gui.ApplicationTests {
 			var callbackCount = 0;
 			Func<MainLoop, bool> callback = (loop) => {
 				callbackCount++;
-				if (callbackCount == 2) 					ml.Stop ();
+				if (callbackCount == 2) ml.Stop ();
 				return true;
 			};
 
@@ -441,7 +443,7 @@ namespace Terminal.Gui.ApplicationTests {
 			var stopCount = 0;
 			Func<bool> fnStop = () => {
 				stopCount++;
-				if (stopCount == 10) 					ml.Stop ();
+				if (stopCount == 10) ml.Stop ();
 				return true;
 			};
 			ml.AddIdle (fnStop);
@@ -469,7 +471,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Func<bool> fnStop = () => {
 				Thread.Sleep (10); // Sleep to enable timer to fire
 				stopCount++;
-				if (stopCount == 10) 					ml.Stop ();
+				if (stopCount == 10) ml.Stop ();
 				return true;
 			};
 			ml.AddIdle (fnStop);
@@ -498,6 +500,84 @@ namespace Terminal.Gui.ApplicationTests {
 			ml.Invoke (() => { actionCalled++; });
 			ml.RunIteration ();
 			Assert.Equal (1, actionCalled);
+		}
+
+		[Fact]
+		public void CheckTimer_NoTimers_Wait_True_Returns_False ()
+		{
+			var ml = new MainLoop (new FakeMainLoop ());
+			var retVal = ml.CheckTimers (true, out var waitTimeOut);
+			Assert.False (retVal);
+			Assert.Equal (-1, waitTimeOut);
+		}
+
+		//[Fact]
+		//public void CheckTimer_NoTimers_Wait_False_Returns_False ()
+		//{
+		//	var ml = new MainLoop (new FakeMainLoop ());
+		//	var retVal = ml.CheckTimers (true, out var waitTimeOut);
+		//	Assert.False (retVal);
+		//	Assert.Equal (-1, waitTimeOut);
+		//}
+
+		//[Fact]
+		//public void CheckTimer_WithTimer_Wait_False_Returns_0 ()
+		//{
+		//	var ml = new MainLoop (new FakeMainLoop ());
+		//	var ms = TimeSpan.FromMilliseconds (50);
+
+		//	var callbackCount = 0;
+		//	Func<MainLoop, bool> callback = (loop) => {
+		//		callbackCount++;
+		//		return false;
+		//	};
+
+		//	var token = ml.AddTimeout (ms, callback);
+		//	var retVal = ml.CheckTimers (false, out var waitTimeOut);
+
+		//	Assert.True (retVal);
+		//	Assert.Equal (0, waitTimeOut);
+		//}
+
+		[Fact]
+		public void CheckTimer_With1Timer_Wait_True_Returns_Timer ()
+		{
+			var ml = new MainLoop (new FakeMainLoop ());
+			var ms = TimeSpan.FromMilliseconds (50);
+
+			var callbackCount = 0;
+			Func<MainLoop, bool> callback = (loop) => {
+				callbackCount++;
+				return false;
+			};
+
+			var token = ml.AddTimeout (ms, callback);
+			var retVal = ml.CheckTimers (true, out var waitTimeOut);
+
+			Assert.True (retVal);
+			// It should take < 10ms to execute to here
+			Assert.True (ms.TotalMilliseconds <= (waitTimeOut + 10));
+		}
+
+		[Fact]
+		public void CheckTimer_With2Timers_Wait_True_Returns_Timer ()
+		{
+			var ml = new MainLoop (new FakeMainLoop ());
+			var ms = TimeSpan.FromMilliseconds (50);
+
+			var callbackCount = 0;
+			Func<MainLoop, bool> callback = (loop) => {
+				callbackCount++;
+				return false;
+			};
+
+			var token1 = ml.AddTimeout (ms, callback);
+			var token2 = ml.AddTimeout (ms, callback);
+			var retVal = ml.CheckTimers (true, out var waitTimeOut);
+
+			Assert.True (retVal);
+			// It should take < 10ms to execute to here
+			Assert.True (ms.TotalMilliseconds <= (waitTimeOut + 10));
 		}
 
 		[Fact]
@@ -557,7 +637,7 @@ namespace Terminal.Gui.ApplicationTests {
 				Application.MainLoop.Invoke (() => {
 					tf.Text = $"index{r.Next ()}";
 					Interlocked.Increment (ref tbCounter);
-					if (target == tbCounter) 						// On last increment wake up the check
+					if (target == tbCounter)                                                // On last increment wake up the check
 						_wakeUp.Set ();
 				});
 			});
@@ -568,7 +648,7 @@ namespace Terminal.Gui.ApplicationTests {
 			for (int j = 0; j < numPasses; j++) {
 
 				_wakeUp.Reset ();
-				for (var i = 0; i < numIncrements; i++) 					Launch (r, tf, (j + 1) * numIncrements);
+				for (var i = 0; i < numIncrements; i++) Launch (r, tf, (j + 1) * numIncrements);
 
 				while (tbCounter != (j + 1) * numIncrements) // Wait for tbCounter to reach expected value
 				{
@@ -638,7 +718,7 @@ namespace Terminal.Gui.ApplicationTests {
 
 			var btnLaunch = new Button ("Open Window");
 
-			btnLaunch.Clicked += (s,e) => action ();
+			btnLaunch.Clicked += (s, e) => action ();
 
 			Application.Top.Add (btnLaunch);
 
@@ -704,7 +784,7 @@ namespace Terminal.Gui.ApplicationTests {
 				Text = "total"
 			};
 
-			totalbtn.Clicked += (s,e) => {
+			totalbtn.Clicked += (s, e) => {
 				MessageBox.Query ("Count", $"Count is {total}", "Ok");
 			};
 
