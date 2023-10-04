@@ -1390,8 +1390,8 @@ internal class NetMainLoop : IMainLoopDriver {
 	{
 		var now = DateTime.UtcNow.Ticks;
 
-		if (_mainLoop.timeouts.Count > 0) {
-			waitTimeout = (int)((_mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
+		if (_mainLoop._timeouts.Count > 0) {
+			waitTimeout = (int)((_mainLoop._timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
 			if (waitTimeout < 0) {
 				return true;
 			}
@@ -1404,8 +1404,8 @@ internal class NetMainLoop : IMainLoopDriver {
 		}
 
 		int ic;
-		lock (_mainLoop.idleHandlers) {
-			ic = _mainLoop.idleHandlers.Count;
+		lock (_mainLoop._idleHandlers) {
+			ic = _mainLoop._idleHandlers.Count;
 		}
 
 		return ic > 0;

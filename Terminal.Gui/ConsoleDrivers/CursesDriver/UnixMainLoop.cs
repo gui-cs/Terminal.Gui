@@ -186,8 +186,8 @@ namespace Terminal.Gui {
 		{
 			long now = DateTime.UtcNow.Ticks;
 
-			if (mainLoop.timeouts.Count > 0) {
-				pollTimeout = (int)((mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
+			if (mainLoop._timeouts.Count > 0) {
+				pollTimeout = (int)((mainLoop._timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
 				if (pollTimeout < 0) {
 					// This avoids 'poll' waiting infinitely if 'pollTimeout < 0' until some action is detected
 					// This can occur after IMainLoopDriver.Wakeup is executed where the pollTimeout is less than 0
@@ -210,8 +210,8 @@ namespace Terminal.Gui {
 				pollTimeout = 0;
 
 			int ic;
-			lock (mainLoop.idleHandlers) {
-				ic = mainLoop.idleHandlers.Count;
+			lock (mainLoop._idleHandlers) {
+				ic = mainLoop._idleHandlers.Count;
 			}
 
 			return ic > 0;

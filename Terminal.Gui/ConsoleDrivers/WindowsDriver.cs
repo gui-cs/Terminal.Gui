@@ -1840,13 +1840,12 @@ internal class WindowsMainLoop : IMainLoopDriver {
 		//tokenSource.Cancel ();
 		_eventReady.Set ();
 	}
-
+	
 	bool IMainLoopDriver.EventsPending (bool wait)
 	{
 		_waitForProbe.Set ();
 		_winChange.Set ();
-
-		if (CheckTimers (wait, out var waitTimeout)) {
+		if (_mainLoop.CheckTimers (wait, out var waitTimeout)) {
 			return true;
 		}
 
@@ -1861,7 +1860,7 @@ internal class WindowsMainLoop : IMainLoopDriver {
 		}
 
 		if (!_eventReadyTokenSource.IsCancellationRequested) {
-			return _resultQueue.Count > 0 || CheckTimers (wait, out _) || _winChanged;
+			return _resultQueue.Count > 0 || _mainLoop.CheckTimers (wait, out _) || _winChanged;
 		}
 
 		_eventReadyTokenSource.Dispose ();
@@ -1869,33 +1868,7 @@ internal class WindowsMainLoop : IMainLoopDriver {
 		return true;
 	}
 	
-	bool CheckTimers (bool wait, out int waitTimeout)
-	{
-		long now = DateTime.UtcNow.Ticks;
 
-		if (_mainLoop?.timeouts.Count > 0) {
-			waitTimeout = (int)((_mainLoop.timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
-			if (waitTimeout < 0)
-				return true;
-		} else {
-			waitTimeout = -1;
-		}
-
-		if (!wait) {
-			waitTimeout = 0;
-		}
-
-		if (_mainLoop == null) {
-			return false;
-		}
-		
-		int ic;
-		lock (_mainLoop.idleHandlers) {
-			ic = _mainLoop.idleHandlers.Count;
-		}
-
-		return ic > 0;
-	}
 
 	void IMainLoopDriver.Iteration ()
 	{
