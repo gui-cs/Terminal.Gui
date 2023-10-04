@@ -20,30 +20,30 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var view = GetSpinnerView ();
 
-			Assert.Empty (Application.MainLoop.timeouts);
+			Assert.Empty (Application.MainLoop._timeouts);
 			view.AutoSpin = true;
-			Assert.NotEmpty (Application.MainLoop.timeouts);
+			Assert.NotEmpty (Application.MainLoop._timeouts);
 			Assert.True (view.AutoSpin);
 
 			//More calls to AutoSpin do not add more timeouts
-			Assert.Single (Application.MainLoop.timeouts);
+			Assert.Single (Application.MainLoop._timeouts);
 			view.AutoSpin = true;
 			view.AutoSpin = true;
 			view.AutoSpin = true;
 			Assert.True (view.AutoSpin);
-			Assert.Single (Application.MainLoop.timeouts);
+			Assert.Single (Application.MainLoop._timeouts);
 
 			if (callStop) {
 				view.AutoSpin = false;
-				Assert.Empty (Application.MainLoop.timeouts);
+				Assert.Empty (Application.MainLoop._timeouts);
 				Assert.False (view.AutoSpin);
 			} else {
-				Assert.NotEmpty (Application.MainLoop.timeouts);
+				Assert.NotEmpty (Application.MainLoop._timeouts);
 			}
 
 			// Dispose clears timeout
 			view.Dispose ();
-			Assert.Empty (Application.MainLoop.timeouts);
+			Assert.Empty (Application.MainLoop._timeouts);
 		}
 
 		[Fact, AutoInitShutdown]

@@ -505,8 +505,8 @@ namespace Terminal.Gui.ApplicationTests {
 		{
 			var testMainloop = new TestMainloop ();
 			var mainloop = new MainLoop (testMainloop);
-			Assert.Empty (mainloop.timeouts);
-			Assert.Empty (mainloop.idleHandlers);
+			Assert.Empty (mainloop._timeouts);
+			Assert.Empty (mainloop._idleHandlers);
 			Assert.NotNull (new Timeout () {
 				Span = new TimeSpan (),
 				Callback = (_) => true
