@@ -1363,7 +1363,7 @@ internal class NetMainLoop : IMainLoopDriver {
 	{
 		_waitForProbe.Set ();
 
-		if (CheckTimers (wait, out var waitTimeout)) {
+		if (_mainLoop.CheckTimers (wait, out var waitTimeout)) {
 			return true;
 		}
 
@@ -1378,37 +1378,12 @@ internal class NetMainLoop : IMainLoopDriver {
 		}
 
 		if (!_tokenSource.IsCancellationRequested) {
-			return _inputResult.Count > 0 || CheckTimers (wait, out _);
+			return _inputResult.Count > 0 || _mainLoop.CheckTimers (wait, out _);
 		}
 
 		_tokenSource.Dispose ();
 		_tokenSource = new CancellationTokenSource ();
 		return true;
-	}
-
-	bool CheckTimers (bool wait, out int waitTimeout)
-	{
-		var now = DateTime.UtcNow.Ticks;
-
-		if (_mainLoop._timeouts.Count > 0) {
-			waitTimeout = (int)((_mainLoop._timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
-			if (waitTimeout < 0) {
-				return true;
-			}
-		} else {
-			waitTimeout = -1;
-		}
-
-		if (!wait) {
-			waitTimeout = 0;
-		}
-
-		int ic;
-		lock (_mainLoop._idleHandlers) {
-			ic = _mainLoop._idleHandlers.Count;
-		}
-
-		return ic > 0;
 	}
 
 	void IMainLoopDriver.Iteration ()
