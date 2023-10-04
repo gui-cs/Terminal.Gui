@@ -240,6 +240,10 @@ namespace Terminal.Gui {
 			if (_timeouts.Count > 0) {
 				waitTimeout = (int)((_timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
 				if (waitTimeout < 0)
+					// This avoids 'poll' waiting infinitely if 'waitTimeout < 0' until some action is detected
+					// This can occur after IMainLoopDriver.Wakeup is executed where the pollTimeout is less than 0
+					// and no event occurred in elapsed time when the 'poll' is start running again.
+					waitTimeout = 0; 
 					return true;
 			} else {
 				waitTimeout = -1;

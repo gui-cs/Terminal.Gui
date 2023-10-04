@@ -64,7 +64,7 @@ namespace Terminal.Gui {
 			public Func<MainLoop, bool> Callback;
 		}
 
-		Dictionary<int, Watch> descriptorWatchers = new Dictionary<int, Watch> ();
+		Dictionary<int, Watch> _descriptorWatchers = new Dictionary<int, Watch> ();
 
 		[DllImport ("libc")]
 		extern static int poll ([In, Out] Pollfd [] ufds, uint nfds, int timeout);
@@ -78,33 +78,33 @@ namespace Terminal.Gui {
 		[DllImport ("libc")]
 		extern static int write (int fd, IntPtr buf, IntPtr n);
 
-		Pollfd [] pollmap;
-		bool poll_dirty = true;
-		int [] wakeupPipes = new int [2];
-		static IntPtr ignore = Marshal.AllocHGlobal (1);
-		MainLoop mainLoop;
-		bool winChanged;
+		Pollfd [] _pollmap;
+		bool _poll_dirty = true;
+		int [] _wakeupPipes = new int [2];
+		static IntPtr _ignore = Marshal.AllocHGlobal (1);
+		MainLoop _mainLoop;
+		bool _winChanged;
 
 		public Action WinChanged;
 
 		void IMainLoopDriver.Wakeup ()
 		{
 			if (!ConsoleDriver.RunningUnitTests) {
-				write (wakeupPipes [1], ignore, (IntPtr)1);
+				write (_wakeupPipes [1], _ignore, (IntPtr)1);
 			}
 		}
 
 		void IMainLoopDriver.Setup (MainLoop mainLoop)
 		{
-			this.mainLoop = mainLoop;
+			this._mainLoop = mainLoop;
 			if (ConsoleDriver.RunningUnitTests) {
 				return;
 			}
 
 			try {
-				pipe (wakeupPipes);
-				AddWatch (wakeupPipes [0], Condition.PollIn, ml => {
-					read (wakeupPipes [0], ignore, (IntPtr)1);
+				pipe (_wakeupPipes);
+				AddWatch (_wakeupPipes [0], Condition.PollIn, ml => {
+					read (_wakeupPipes [0], _ignore, (IntPtr)1);
 					return true;
 				});
 			} catch (DllNotFoundException e) {
@@ -124,7 +124,7 @@ namespace Terminal.Gui {
 				var watch = token as Watch;
 				if (watch == null)
 					return;
-				descriptorWatchers.Remove (watch.File);
+				_descriptorWatchers.Remove (watch.File);
 			}
 		}
 
@@ -146,23 +146,23 @@ namespace Terminal.Gui {
 			}
 
 			var watch = new Watch () { Condition = condition, Callback = callback, File = fileDescriptor };
-			descriptorWatchers [fileDescriptor] = watch;
-			poll_dirty = true;
+			_descriptorWatchers [fileDescriptor] = watch;
+			_poll_dirty = true;
 			return watch;
 		}
 
 		void UpdatePollMap ()
 		{
-			if (!poll_dirty) {
+			if (!_poll_dirty) {
 				return;
 			}
-			poll_dirty = false;
+			_poll_dirty = false;
 
-			pollmap = new Pollfd [descriptorWatchers.Count];
+			_pollmap = new Pollfd [_descriptorWatchers.Count];
 			int i = 0;
-			foreach (var fd in descriptorWatchers.Keys) {
-				pollmap [i].fd = fd;
-				pollmap [i].events = (short)descriptorWatchers [fd].Condition;
+			foreach (var fd in _descriptorWatchers.Keys) {
+				_pollmap [i].fd = fd;
+				_pollmap [i].events = (short)_descriptorWatchers [fd].Condition;
 				i++;
 			}
 		}
@@ -171,69 +171,34 @@ namespace Terminal.Gui {
 		{
 			UpdatePollMap ();
 
-			bool checkTimersResult = CheckTimers (wait, out var pollTimeout);
+			bool checkTimersResult = _mainLoop.CheckTimers (wait, out var pollTimeout);
 
-			var n = poll (pollmap, (uint)pollmap.Length, pollTimeout);
+			var n = poll (_pollmap, (uint)_pollmap.Length, pollTimeout);
 
 			if (n == KEY_RESIZE) {
-				winChanged = true;
+				_winChanged = true;
 			}
 
 			return checkTimersResult || n >= KEY_RESIZE;
 		}
 
-		bool CheckTimers (bool wait, out int pollTimeout)
-		{
-			long now = DateTime.UtcNow.Ticks;
-
-			if (mainLoop._timeouts.Count > 0) {
-				pollTimeout = (int)((mainLoop._timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
-				if (pollTimeout < 0) {
-					// This avoids 'poll' waiting infinitely if 'pollTimeout < 0' until some action is detected
-					// This can occur after IMainLoopDriver.Wakeup is executed where the pollTimeout is less than 0
-					// and no event occurred in elapsed time when the 'poll' is start running again.
-					/*
-					The 'poll' function in the C standard library uses a signed integer as the timeout argument, where:
-
-					    - A positive value specifies a timeout in milliseconds.
-					    - A value of 0 means the poll function will return immediately, checking for events and not waiting.
-					    - A value of -1 means the poll function will wait indefinitely until an event occurs or an error occurs.
-					    - A negative value other than -1 typically indicates an error.
-					 */
-					pollTimeout = 0;
-					return true;
-				}
-			} else
-				pollTimeout = -1;
-
-			if (!wait)
-				pollTimeout = 0;
-
-			int ic;
-			lock (mainLoop._idleHandlers) {
-				ic = mainLoop._idleHandlers.Count;
-			}
-
-			return ic > 0;
-		}
-
 		void IMainLoopDriver.Iteration ()
 		{
-			if (winChanged) {
-				winChanged = false;
+			if (_winChanged) {
+				_winChanged = false;
 				WinChanged?.Invoke ();
 			}
-			if (pollmap != null) {
-				foreach (var p in pollmap) {
+			if (_pollmap != null) {
+				foreach (var p in _pollmap) {
 					Watch watch;
 
 					if (p.revents == 0)
 						continue;
 
-					if (!descriptorWatchers.TryGetValue (p.fd, out watch))
+					if (!_descriptorWatchers.TryGetValue (p.fd, out watch))
 						continue;
-					if (!watch.Callback (this.mainLoop))
-						descriptorWatchers.Remove (p.fd);
+					if (!watch.Callback (this._mainLoop))
+						_descriptorWatchers.Remove (p.fd);
 				}
 			}
 		}
