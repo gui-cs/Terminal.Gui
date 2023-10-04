@@ -624,8 +624,8 @@ namespace Terminal.Gui {
 		/// Run one iteration of the <see cref="MainLoop"/>.
 		/// </summary>
 		/// <param name="state">The state returned by <see cref="Begin(Toplevel)"/>.</param>
-		/// <param name="wait">If <see langword="true"/> will execute the <see cref="MainLoop"/> waiting for events. If <see langword="true"/>
-		/// will return after a single iteration.</param>
+		/// <param name="wait">If <see langword="true"/> will execute the <see cref="MainLoop"/> waiting for events. If <see langword="false"/>
+		/// the method will return after a single iteration.</param>
 		/// <param name="firstIteration">Set to <see langword="true"/> if this is the first run loop iteration. Upon return,
 		/// it will be set to <see langword="false"/> if at least one iteration happened.</param>
 		public static void RunMainLoopIteration (ref RunState state, bool wait, ref bool firstIteration)

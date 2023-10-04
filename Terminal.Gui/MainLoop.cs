@@ -235,6 +235,10 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public bool CheckTimers (bool wait, out int waitTimeout)
 		{
+			if (wait == false) {
+				throw new InvalidOperationException ("CheckTimers should not be called with wait == false");
+			}
+			
 			long now = DateTime.UtcNow.Ticks;
 
 			if (_timeouts.Count > 0) {
