@@ -503,7 +503,7 @@ namespace Terminal.Gui.ApplicationTests {
 		}
 
 		[Fact]
-		public void CheckTimer_NoTimers_Returns_False ()
+		public void CheckTimersAndIdleHandlers_NoTimers_Returns_False ()
 		{
 			var ml = new MainLoop (new FakeMainLoop ());
 			var retVal = ml.CheckTimersAndIdleHandlers (out var waitTimeOut);
@@ -512,7 +512,7 @@ namespace Terminal.Gui.ApplicationTests {
 		}
 
 		[Fact]
-		public void CheckTimer_NoTimers_WithIdle_Returns_True ()
+		public void CheckTimersAndIdleHandlers_NoTimers_WithIdle_Returns_True ()
 		{
 			var ml = new MainLoop (new FakeMainLoop ());
 			Func<bool> fnTrue = () => true;
@@ -524,18 +524,14 @@ namespace Terminal.Gui.ApplicationTests {
 		}
 
 		[Fact]
-		public void CheckTimer_With1Timer_Returns_Timer ()
+		public void CheckTimersAndIdleHandlers_With1Timer_Returns_Timer ()
 		{
 			var ml = new MainLoop (new FakeMainLoop ());
 			var ms = TimeSpan.FromMilliseconds (50);
 
-			var callbackCount = 0;
-			Func<MainLoop, bool> callback = (loop) => {
-				callbackCount++;
-				return false;
-			};
+			static bool Callback (MainLoop loop) => false;
 
-			var token = ml.AddTimeout (ms, callback);
+			_ = ml.AddTimeout (ms, Callback);
 			var retVal = ml.CheckTimersAndIdleHandlers (out var waitTimeOut);
 
 			Assert.True (retVal);
@@ -544,19 +540,15 @@ namespace Terminal.Gui.ApplicationTests {
 		}
 
 		[Fact]
-		public void CheckTimer_With2Timers_Returns_Timer ()
+		public void CheckTimersAndIdleHandlers_With2Timers_Returns_Timer ()
 		{
 			var ml = new MainLoop (new FakeMainLoop ());
 			var ms = TimeSpan.FromMilliseconds (50);
 
-			var callbackCount = 0;
-			Func<MainLoop, bool> callback = (loop) => {
-				callbackCount++;
-				return false;
-			};
+			static bool Callback (MainLoop loop) => false;
 
-			var token1 = ml.AddTimeout (ms, callback);
-			var token2 = ml.AddTimeout (ms, callback);
+			_ = ml.AddTimeout (ms, Callback);
+			_ = ml.AddTimeout (ms, Callback);
 			var retVal = ml.CheckTimersAndIdleHandlers (out var waitTimeOut);
 
 			Assert.True (retVal);
