@@ -464,8 +464,8 @@ namespace Terminal.Gui {
 		///   To make a <see cref="Run(Toplevel, Func{Exception, bool})"/> stop execution, call <see cref="Application.RequestStop"/>.
 		///  </para>
 		///  <para>
-		///   Calling <see cref="Run(Toplevel, Func{Exception, bool})"/> is equivalent to calling <see cref="Begin(Toplevel)"/>, followed by <see cref="RunLoop(RunState, bool)"/>,
-		///   and then calling <see cref="End(RunState)"/>.
+		///   Calling <see cref="Run(Toplevel, Func{Exception, bool})"/> is equivalent to calling <see cref="Begin(Toplevel)"/>,
+		///   followed by <see cref="RunLoop(RunState)"/>, and then calling <see cref="End(RunState)"/>.
 		///  </para>
 		///  <para>
 		///   Alternatively, to have a program control the main loop and 
@@ -481,7 +481,7 @@ namespace Terminal.Gui {
 		///   this method will exit.
 		///  </para>
 		/// </remarks>
-		/// <param name="view">The <see cref="Toplevel"/> to run modally.</param>
+		/// <param name="view">The <see cref="Toplevel"/> to run as a modal.</param>
 		/// <param name="errorHandler">RELEASE builds only: Handler for any unhandled exceptions (resumes when returns true, rethrows when null).</param>
 		public static void Run (Toplevel view, Func<Exception, bool> errorHandler = null)
 		{

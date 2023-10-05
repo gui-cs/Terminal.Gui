@@ -1765,18 +1765,18 @@ internal class WindowsDriver : ConsoleDriver {
 /// This implementation is used for WindowsDriver.
 /// </remarks>
 internal class WindowsMainLoop : IMainLoopDriver {
-	ManualResetEventSlim _eventReady = new ManualResetEventSlim (false);
-	ManualResetEventSlim _waitForProbe = new ManualResetEventSlim (false);
-	ManualResetEventSlim _winChange = new ManualResetEventSlim (false);
+	readonly ManualResetEventSlim _eventReady = new ManualResetEventSlim (false);
+	readonly ManualResetEventSlim _waitForProbe = new ManualResetEventSlim (false);
+	readonly ManualResetEventSlim _winChange = new ManualResetEventSlim (false);
 	MainLoop _mainLoop;
-	ConsoleDriver _consoleDriver;
-	WindowsConsole _winConsole;
+	readonly ConsoleDriver _consoleDriver;
+	readonly WindowsConsole _winConsole;
 	bool _winChanged;
 	Size _windowSize;
 	CancellationTokenSource _eventReadyTokenSource = new CancellationTokenSource ();
 	
 	// The records that we keep fetching
-	Queue<WindowsConsole.InputRecord []> _resultQueue = new Queue<WindowsConsole.InputRecord []> ();
+	readonly Queue<WindowsConsole.InputRecord []> _resultQueue = new Queue<WindowsConsole.InputRecord []> ();
 
 	/// <summary>
 	/// Invoked when a Key is pressed or released.
@@ -1790,7 +1790,7 @@ internal class WindowsMainLoop : IMainLoopDriver {
 
 	public WindowsMainLoop (ConsoleDriver consoleDriver = null)
 	{
-		_consoleDriver = consoleDriver ?? throw new ArgumentNullException ("Console driver instance must be provided.");
+		_consoleDriver = consoleDriver ?? throw new ArgumentNullException (nameof(consoleDriver));
 		_winConsole = ((WindowsDriver)consoleDriver).WinConsole;
 	}
 
@@ -1851,6 +1851,8 @@ internal class WindowsMainLoop : IMainLoopDriver {
 
 		try {
 			if (!_eventReadyTokenSource.IsCancellationRequested) {
+				// Note: ManualResetEventSlim.Wait will wait indefinitely if the timeout is -1. The timeout is -1 when there
+				// are no timers, but there IS an idle handler waiting.
 				_eventReady.Wait (waitTimeout, _eventReadyTokenSource.Token);
 			}
 		} catch (OperationCanceledException) {
@@ -1874,7 +1876,7 @@ internal class WindowsMainLoop : IMainLoopDriver {
 	{
 		while (_resultQueue.Count > 0) {
 			var inputRecords = _resultQueue.Dequeue ();
-			if (inputRecords != null && inputRecords.Length > 0) {
+			if (inputRecords is { Length: > 0 }) {
 				var inputEvent = inputRecords [0];
 				ProcessInput?.Invoke (inputEvent);
 			}

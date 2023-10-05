@@ -1301,9 +1301,9 @@ internal class NetDriver : ConsoleDriver {
 /// This implementation is used for NetDriver.
 /// </remarks>
 internal class NetMainLoop : IMainLoopDriver {
-	ManualResetEventSlim _keyReady = new ManualResetEventSlim (false);
-	ManualResetEventSlim _waitForProbe = new ManualResetEventSlim (false);
-	Queue<NetEvents.InputResult?> _inputResult = new Queue<NetEvents.InputResult?> ();
+	readonly ManualResetEventSlim _keyReady = new ManualResetEventSlim (false);
+	readonly ManualResetEventSlim _waitForProbe = new ManualResetEventSlim (false);
+	readonly Queue<NetEvents.InputResult?> _inputResult = new Queue<NetEvents.InputResult?> ();
 	MainLoop _mainLoop;
 	CancellationTokenSource _tokenSource = new CancellationTokenSource ();
 	internal NetEvents _netEvents;
@@ -1369,6 +1369,8 @@ internal class NetMainLoop : IMainLoopDriver {
 
 		try {
 			if (!_tokenSource.IsCancellationRequested) {
+				// Note: ManualResetEventSlim.Wait will wait indefinitely if the timeout is -1. The timeout is -1 when there
+				// are no timers, but there IS an idle handler waiting.
 				_keyReady.Wait (waitTimeout, _tokenSource.Token);
 			}
 		} catch (OperationCanceledException) {
