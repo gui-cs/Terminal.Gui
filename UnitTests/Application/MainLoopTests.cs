@@ -133,7 +133,7 @@ namespace Terminal.Gui.ApplicationTests {
 		}
 
 		[Fact]
-		public void AddTwice_Function_CalledTwice ()
+		public void AddIdleTwice_Function_CalledTwice ()
 		{
 			var ml = new MainLoop (new FakeMainLoop ());
 
@@ -503,16 +503,28 @@ namespace Terminal.Gui.ApplicationTests {
 		}
 
 		[Fact]
-		public void CheckTimer_NoTimers_Wait_True_Returns_False ()
+		public void CheckTimer_NoTimers_Returns_False ()
 		{
 			var ml = new MainLoop (new FakeMainLoop ());
 			var retVal = ml.CheckTimersAndIdleHandlers (out var waitTimeOut);
 			Assert.False (retVal);
-			Assert.Equal (0, waitTimeOut);
+			Assert.Equal (-1, waitTimeOut);
 		}
 
 		[Fact]
-		public void CheckTimer_With1Timer_Wait_True_Returns_Timer ()
+		public void CheckTimer_NoTimers_WithIdle_Returns_True ()
+		{
+			var ml = new MainLoop (new FakeMainLoop ());
+			Func<bool> fnTrue = () => true;
+
+			ml.AddIdle (fnTrue);
+			var retVal = ml.CheckTimersAndIdleHandlers (out var waitTimeOut);
+			Assert.True (retVal);
+			Assert.Equal (-1, waitTimeOut);
+		}
+
+		[Fact]
+		public void CheckTimer_With1Timer_Returns_Timer ()
 		{
 			var ml = new MainLoop (new FakeMainLoop ());
 			var ms = TimeSpan.FromMilliseconds (50);
@@ -532,7 +544,7 @@ namespace Terminal.Gui.ApplicationTests {
 		}
 
 		[Fact]
-		public void CheckTimer_With2Timers_Wait_True_Returns_Timer ()
+		public void CheckTimer_With2Timers_Returns_Timer ()
 		{
 			var ml = new MainLoop (new FakeMainLoop ());
 			var ms = TimeSpan.FromMilliseconds (50);
