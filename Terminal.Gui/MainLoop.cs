@@ -28,8 +28,7 @@ namespace Terminal.Gui {
 		/// Must report whether there are any events pending, or even block waiting for events.
 		/// </summary>
 		/// <returns><c>true</c>, if there were pending events, <c>false</c> otherwise.</returns>
-		/// <param name="wait">If set to <c>true</c> wait until an event is available, otherwise return immediately.</param>
-		bool EventsPending (bool wait);
+		bool EventsPending ();
 
 		/// <summary>
 		/// The iteration function.
@@ -38,8 +37,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	///   Simple main loop implementation that can be used to monitor
-	///   file descriptor, run timers and idle handlers.
+	///   The MainLoop monitors timers and idle handlers.
 	/// </summary>
 	/// <remarks>
 	///   Monitoring of file descriptors is only available on Unix, there
@@ -48,16 +46,16 @@ namespace Terminal.Gui {
 	public class MainLoop {
 
 		internal SortedList<long, Timeout> _timeouts = new SortedList<long, Timeout> ();
-		object _timeoutsLockToken = new object ();
+		readonly object _timeoutsLockToken = new object ();
 
 		/// <summary>
 		/// The idle handlers and lock that must be held while manipulating them
 		/// </summary>
-		object _idleHandlersLock = new object ();
+		readonly object _idleHandlersLock = new object ();
 		internal List<Func<bool>> _idleHandlers = new List<Func<bool>> ();
 
 		/// <summary>
-		/// Gets the list of all timeouts sorted by the <see cref="TimeSpan"/> time ticks./>.
+		/// Gets the list of all timeouts sorted by the <see cref="TimeSpan"/> time ticks.
 		/// A shorter limit time can be added at the end, but it will be called before an
 		///  earlier addition that has a longer limit time.
 		/// </summary>
@@ -87,9 +85,9 @@ namespace Terminal.Gui {
 		public event EventHandler<TimeoutEventArgs> TimeoutAdded;
 
 		/// <summary>
-		///  Creates a new Mainloop. 
+		///  Creates a new MainLoop. 
 		/// </summary>
-		/// <param name="driver">Should match the <see cref="ConsoleDriver"/> 
+		/// <param name="driver">The <see cref="ConsoleDriver"/> instance
 		/// (one of the implementations FakeMainLoop, UnixMainLoop, NetMainLoop or WindowsMainLoop).</param>
 		public MainLoop (IMainLoopDriver driver)
 		{
@@ -98,7 +96,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Runs <c>action</c> on the thread that is processing events
+		///   Runs <paramref name="action"/> on the thread that is processing events
 		/// </summary>
 		/// <param name="action">the action to be invoked on the main processing thread.</param>
 		public void Invoke (Action action)
@@ -115,10 +113,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <remarks>
 		/// <para>
-		///   Remove an idle hander by calling <see cref="RemoveIdle(Func{bool})"/> with the token this method returns.
+		///   Remove an idle handler by calling <see cref="RemoveIdle(Func{bool})"/> with the token this method returns.
 		/// </para>
 		/// <para>
-		///   If the <c>idleHandler</c> returns <c>false</c> it will be removed and not called subsequently.
+		///   If the <paramref name="idleHandler"/> returns  <see langword="false"/> it will be removed and not called subsequently.
 		/// </para>
 		/// </remarks>
 		/// <param name="idleHandler">Token that can be used to remove the idle handler with <see cref="RemoveIdle(Func{bool})"/> .</param>
@@ -200,7 +198,7 @@ namespace Terminal.Gui {
 
 		void RunTimers ()
 		{
-			long now = DateTime.UtcNow.Ticks;
+			var now = DateTime.UtcNow.Ticks;
 			SortedList<long, Timeout> copy;
 
 			// lock prevents new timeouts being added
@@ -212,9 +210,7 @@ namespace Terminal.Gui {
 				_timeouts = new SortedList<long, Timeout> ();
 			}
 
-			foreach (var t in copy) {
-				var k = t.Key;
-				var timeout = t.Value;
+			foreach ((var k, var timeout) in copy) {
 				if (k < now) {
 					if (timeout.Callback (this)) {
 						AddTimeout (timeout.Span, timeout);
@@ -228,43 +224,36 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Checks if there are any outstanding timers that need to be processed. Called from the driver's <see cref="IMainLoopDriver"/>.
+		/// Called from <see cref="IMainLoopDriver.EventsPending"/> to check if there are any outstanding timers or idle handlers.
 		/// </summary>
-		/// <param name="wait">If <see langword="false"/> <paramref name="waitTimeout"/> will be set to 0.</param>
-		/// <param name="waitTimeout">Returns the number of milliseconds remaining in the current timer.</param>
-		/// <returns></returns>
-		public bool CheckTimers (bool wait, out int waitTimeout)
+		/// <param name="waitTimeout">Returns the number of milliseconds remaining in the current timer (if any).</param>
+		/// <returns><see langword="true"/> if there is a timer or idle handler active.</returns>
+		public bool CheckTimersAndIdleHandlers (out int waitTimeout)
 		{
-			if (wait == false) {
-				throw new InvalidOperationException ("CheckTimers should not be called with wait == false");
-			}
-			
-			long now = DateTime.UtcNow.Ticks;
+			var now = DateTime.UtcNow.Ticks;
 
-			if (_timeouts.Count > 0) {
-				waitTimeout = (int)((_timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
-				if (waitTimeout < 0)
-					// This avoids 'poll' waiting infinitely if 'waitTimeout < 0' until some action is detected
-					// This can occur after IMainLoopDriver.Wakeup is executed where the pollTimeout is less than 0
-					// and no event occurred in elapsed time when the 'poll' is start running again.
-					waitTimeout = 0; 
+			waitTimeout = 0;
+
+			lock (_timeouts) {
+				if (_timeouts.Count > 0) {
+					waitTimeout = (int)((_timeouts.Keys [0] - now) / TimeSpan.TicksPerMillisecond);
+					if (waitTimeout < 0) {
+						// This avoids 'poll' waiting infinitely if 'waitTimeout < 0' until some action is detected
+						// This can occur after IMainLoopDriver.Wakeup is executed where the pollTimeout is less than 0
+						// and no event occurred in elapsed time when the 'poll' is start running again.
+						waitTimeout = 0;
+					}
 					return true;
-			} else {
-				waitTimeout = -1;
+				}
 			}
 
-			if (!wait) {
-				waitTimeout = 0;
-			}
+			// There are no timers set, check if there are any idle handlers
 
-			int ic;
 			lock (_idleHandlers) {
-				ic = _idleHandlers.Count;
+				return _idleHandlers.Count > 0;
 			}
-
-			return ic > 0;
 		}
-		
+
 		/// <summary>
 		/// Finds the closest number to <paramref name="k"/> that is not
 		/// present in <see cref="_timeouts"/> (incrementally).
@@ -320,9 +309,9 @@ namespace Terminal.Gui {
 		///   Typically used if you need to flush the input queue while still
 		///   running some of your own code in your main thread.
 		/// </remarks>
-		public bool EventsPending (bool wait = false)
+		public bool EventsPending ()
 		{
-			return MainLoopDriver.EventsPending (wait);
+			return MainLoopDriver.EventsPending ();
 		}
 
 		/// <summary>
@@ -337,8 +326,10 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public void RunIteration ()
 		{
-			if (_timeouts.Count > 0) {
-				RunTimers ();
+			lock (_timeouts) {
+				if (_timeouts.Count > 0) {
+					RunTimers ();
+				}
 			}
 
 			MainLoopDriver.Iteration ();
@@ -347,7 +338,7 @@ namespace Terminal.Gui {
 			lock (_idleHandlersLock) {
 				runIdle = _idleHandlers.Count > 0;
 			}
-			
+
 			if (runIdle) {
 				RunIdle ();
 			}
@@ -358,10 +349,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void Run ()
 		{
-			bool prev = _running;
+			var prev = _running;
 			_running = true;
 			while (_running) {
-				EventsPending (true);
+				EventsPending ();
 				RunIteration ();
 			}
 			_running = prev;

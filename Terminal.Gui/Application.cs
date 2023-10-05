@@ -470,14 +470,14 @@ namespace Terminal.Gui {
 		///  <para>
 		///   Alternatively, to have a program control the main loop and 
 		///   process events manually, call <see cref="Begin(Toplevel)"/> to set things up manually and then
-		///   repeatedly call <see cref="RunLoop(RunState, bool)"/> with the wait parameter set to false. By doing this
-		///   the <see cref="RunLoop(RunState, bool)"/> method will only process any pending events, timers, idle handlers and
+		///   repeatedly call <see cref="RunLoop(RunState)"/> with the wait parameter set to false. By doing this
+		///   the <see cref="RunLoop(RunState)"/> method will only process any pending events, timers, idle handlers and
 		///   then return control immediately.
 		///  </para>
 		///  <para>
-		///   RELEASE builds only: When <paramref name="errorHandler"/> is <see langword="null"/> any exeptions will be rethrown. 
+		///   RELEASE builds only: When <paramref name="errorHandler"/> is <see langword="null"/> any exceptions will be rethrown. 
 		///   Otherwise, if <paramref name="errorHandler"/> will be called. If <paramref name="errorHandler"/> 
-		///   returns <see langword="true"/> the <see cref="RunLoop(RunState, bool)"/> will resume; otherwise 
+		///   returns <see langword="true"/> the <see cref="RunLoop(RunState)"/> will resume; otherwise 
 		///   this method will exit.
 		///  </para>
 		/// </remarks>
@@ -598,13 +598,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		///  Building block API: Runs the <see cref="MainLoop"/> for the created <see cref="Toplevel"/>.
 		/// </summary>
-		/// <remarks>
-		///  Use the <paramref name="wait"/> parameter to control whether this is a blocking or non-blocking call.
-		/// </remarks>
 		/// <param name="state">The state returned by the <see cref="Begin(Toplevel)"/> method.</param>
-		/// <param name="wait">By default this is <see langword="true"/> which will execute the loop waiting for events, 
-		/// if set to <see langword="false"/>, a single iteration will execute.</param>
-		public static void RunLoop (RunState state, bool wait = true)
+		public static void RunLoop (RunState state)
 		{
 			if (state == null)
 				throw new ArgumentNullException (nameof (state));
@@ -616,7 +611,7 @@ namespace Terminal.Gui {
 				if (ExitRunLoopAfterFirstIteration && !firstIteration) {
 					return;
 				}
-				RunMainLoopIteration (ref state, wait, ref firstIteration);
+				RunMainLoopIteration (ref state, ref firstIteration);
 			}
 		}
 
@@ -624,13 +619,11 @@ namespace Terminal.Gui {
 		/// Run one iteration of the <see cref="MainLoop"/>.
 		/// </summary>
 		/// <param name="state">The state returned by <see cref="Begin(Toplevel)"/>.</param>
-		/// <param name="wait">If <see langword="true"/> will execute the <see cref="MainLoop"/> waiting for events. If <see langword="false"/>
-		/// the method will return after a single iteration.</param>
 		/// <param name="firstIteration">Set to <see langword="true"/> if this is the first run loop iteration. Upon return,
 		/// it will be set to <see langword="false"/> if at least one iteration happened.</param>
-		public static void RunMainLoopIteration (ref RunState state, bool wait, ref bool firstIteration)
+		public static void RunMainLoopIteration (ref RunState state, ref bool firstIteration)
 		{
-			if (MainLoop.EventsPending (wait)) {
+			if (MainLoop.EventsPending ()) {
 				// Notify Toplevel it's ready
 				if (firstIteration) {
 					state.Toplevel.OnReady ();
@@ -652,9 +645,8 @@ namespace Terminal.Gui {
 				if (Driver.EnsureCursorVisibility ()) {
 					state.Toplevel.SetNeedsDisplay ();
 				}
-			} else if (!wait) {
-				return;
 			}
+
 			firstIteration = false;
 
 			if (state.Toplevel != Top &&
@@ -696,13 +688,13 @@ namespace Terminal.Gui {
 			}
 		}
 
-		/// <summary>
-		/// Wakes up the <see cref="MainLoop"/> that might be waiting on input; must be thread safe.
-		/// </summary>
-		public static void DoEvents ()
-		{
-			MainLoop.MainLoopDriver.Wakeup ();
-		}
+		///// <summary>
+		///// Wakes up the <see cref="MainLoop"/> that might be waiting on input; must be thread safe.
+		///// </summary>
+		//public static void DoEvents ()
+		//{
+		//	MainLoop.MainLoopDriver.Wakeup ();
+		//}
 
 		/// <summary>
 		/// Stops running the most recent <see cref="Toplevel"/> or the <paramref name="top"/> if provided.

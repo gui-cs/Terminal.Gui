@@ -506,38 +506,10 @@ namespace Terminal.Gui.ApplicationTests {
 		public void CheckTimer_NoTimers_Wait_True_Returns_False ()
 		{
 			var ml = new MainLoop (new FakeMainLoop ());
-			var retVal = ml.CheckTimers (true, out var waitTimeOut);
+			var retVal = ml.CheckTimersAndIdleHandlers (out var waitTimeOut);
 			Assert.False (retVal);
-			Assert.Equal (-1, waitTimeOut);
+			Assert.Equal (0, waitTimeOut);
 		}
-
-		//[Fact]
-		//public void CheckTimer_NoTimers_Wait_False_Returns_False ()
-		//{
-		//	var ml = new MainLoop (new FakeMainLoop ());
-		//	var retVal = ml.CheckTimers (true, out var waitTimeOut);
-		//	Assert.False (retVal);
-		//	Assert.Equal (-1, waitTimeOut);
-		//}
-
-		//[Fact]
-		//public void CheckTimer_WithTimer_Wait_False_Returns_0 ()
-		//{
-		//	var ml = new MainLoop (new FakeMainLoop ());
-		//	var ms = TimeSpan.FromMilliseconds (50);
-
-		//	var callbackCount = 0;
-		//	Func<MainLoop, bool> callback = (loop) => {
-		//		callbackCount++;
-		//		return false;
-		//	};
-
-		//	var token = ml.AddTimeout (ms, callback);
-		//	var retVal = ml.CheckTimers (false, out var waitTimeOut);
-
-		//	Assert.True (retVal);
-		//	Assert.Equal (0, waitTimeOut);
-		//}
 
 		[Fact]
 		public void CheckTimer_With1Timer_Wait_True_Returns_Timer ()
@@ -552,7 +524,7 @@ namespace Terminal.Gui.ApplicationTests {
 			};
 
 			var token = ml.AddTimeout (ms, callback);
-			var retVal = ml.CheckTimers (true, out var waitTimeOut);
+			var retVal = ml.CheckTimersAndIdleHandlers (out var waitTimeOut);
 
 			Assert.True (retVal);
 			// It should take < 10ms to execute to here
@@ -573,7 +545,7 @@ namespace Terminal.Gui.ApplicationTests {
 
 			var token1 = ml.AddTimeout (ms, callback);
 			var token2 = ml.AddTimeout (ms, callback);
-			var retVal = ml.CheckTimers (true, out var waitTimeOut);
+			var retVal = ml.CheckTimersAndIdleHandlers (out var waitTimeOut);
 
 			Assert.True (retVal);
 			// It should take < 10ms to execute to here
@@ -596,7 +568,7 @@ namespace Terminal.Gui.ApplicationTests {
 		private class TestMainloop : IMainLoopDriver {
 			private MainLoop mainLoop;
 
-			public bool EventsPending (bool wait)
+			public bool EventsPending ()
 			{
 				throw new NotImplementedException ();
 			}

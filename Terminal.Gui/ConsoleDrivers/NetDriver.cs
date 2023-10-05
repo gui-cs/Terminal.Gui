@@ -1359,11 +1359,11 @@ internal class NetMainLoop : IMainLoopDriver {
 		_keyReady.Set ();
 	}
 
-	bool IMainLoopDriver.EventsPending (bool wait)
+	bool IMainLoopDriver.EventsPending ()
 	{
 		_waitForProbe.Set ();
 
-		if (_mainLoop.CheckTimers (wait, out var waitTimeout)) {
+		if (_mainLoop.CheckTimersAndIdleHandlers (out var waitTimeout)) {
 			return true;
 		}
 
@@ -1378,7 +1378,7 @@ internal class NetMainLoop : IMainLoopDriver {
 		}
 
 		if (!_tokenSource.IsCancellationRequested) {
-			return _inputResult.Count > 0 || _mainLoop.CheckTimers (wait, out _);
+			return _inputResult.Count > 0 || _mainLoop.CheckTimersAndIdleHandlers (out _);
 		}
 
 		_tokenSource.Dispose ();

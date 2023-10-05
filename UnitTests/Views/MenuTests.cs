@@ -2376,7 +2376,7 @@ wo
 			Assert.Equal ("File", menu.Menus [0].Title);
 			menu.OpenMenu ();
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
 │                                      │
@@ -2404,7 +2404,7 @@ wo
 				});
 
 			firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			Assert.Equal (items [0], menu.Menus [0].Title);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -2436,14 +2436,14 @@ wo
 					});
 
 				firstIteration = false;
-				Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+				Application.RunMainLoopIteration (ref rs, ref firstIteration);
 				Assert.Equal (items [i], menu.Menus [0].Title);
 			}
 
 			((FakeDriver)Application.Driver).SetBufferSize (20, 15);
 			menu.OpenMenu ();
 			firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
 │                  │
@@ -2505,7 +2505,7 @@ wo
 			Assert.Equal ("File", menu.Menus [0].Title);
 			menu.OpenMenu ();
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
   ┌─────────────┐                       
   │  File       │                       
@@ -2528,7 +2528,7 @@ wo
 				});
 
 			firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			Assert.Equal (items [0], menu.Menus [0].Title);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
   ┌─────────────┐
@@ -2549,14 +2549,14 @@ wo
 					});
 
 				firstIteration = false;
-				Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+				Application.RunMainLoopIteration (ref rs, ref firstIteration);
 				Assert.Equal (items [i], menu.Menus [0].Title);
 			}
 
 			((FakeDriver)Application.Driver).SetBufferSize (20, 15);
 			menu.OpenMenu ();
 			firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
   ┌─────────────┐   
   │  Delete     │   
@@ -2585,7 +2585,7 @@ wo
 
 			menu.OpenMenu ();
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
  File                         
 ┌────────────────────────────┐
@@ -2594,7 +2594,7 @@ wo
 
 			((FakeDriver)Application.Driver).SetBufferSize (20, 15);
 			firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
  File", output);
 

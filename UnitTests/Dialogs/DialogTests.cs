@@ -352,7 +352,7 @@ namespace Terminal.Gui.DialogTests {
 			button2 = new Button (btn2Text);
 			(runstate, dlg) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Center, button1, button2);
 			button1.Visible = false;
-			Application.RunMainLoopIteration (ref runstate, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref runstate, ref firstIteration);
 			buttonRow = $@"{CM.Glyphs.VLine}         {btn2} {CM.Glyphs.VLine}";
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 			Application.End (runstate);
@@ -363,7 +363,7 @@ namespace Terminal.Gui.DialogTests {
 			button2 = new Button (btn2Text);
 			(runstate, dlg) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Justify, button1, button2);
 			button1.Visible = false;
-			Application.RunMainLoopIteration (ref runstate, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref runstate, ref firstIteration);
 			buttonRow = $@"{CM.Glyphs.VLine}          {btn2}{CM.Glyphs.VLine}";
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 			Application.End (runstate);
@@ -374,7 +374,7 @@ namespace Terminal.Gui.DialogTests {
 			button2 = new Button (btn2Text);
 			(runstate, dlg) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Right, button1, button2);
 			button1.Visible = false;
-			Application.RunMainLoopIteration (ref runstate, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref runstate, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 			Application.End (runstate);
 
@@ -384,7 +384,7 @@ namespace Terminal.Gui.DialogTests {
 			button2 = new Button (btn2Text);
 			(runstate, dlg) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Left, button1, button2);
 			button1.Visible = false;
-			Application.RunMainLoopIteration (ref runstate, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref runstate, ref firstIteration);
 			buttonRow = $@"{CM.Glyphs.VLine}        {btn2}  {CM.Glyphs.VLine}";
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 			Application.End (runstate);
@@ -713,7 +713,7 @@ namespace Terminal.Gui.DialogTests {
 			buttonRow = $"{CM.Glyphs.VLine} {btn1} {btn2} {CM.Glyphs.VLine}";
 			dlg.AddButton (new Button (btn2Text));
 			bool first = false;
-			Application.RunMainLoopIteration (ref runstate, true, ref first);
+			Application.RunMainLoopIteration (ref runstate, ref first);
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 			Application.End (runstate);
 
@@ -729,7 +729,7 @@ namespace Terminal.Gui.DialogTests {
 			buttonRow = $"{CM.Glyphs.VLine}{btn1}   {btn2}{CM.Glyphs.VLine}";
 			dlg.AddButton (new Button (btn2Text));
 			first = false;
-			Application.RunMainLoopIteration (ref runstate, true, ref first);
+			Application.RunMainLoopIteration (ref runstate, ref first);
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 			Application.End (runstate);
 
@@ -745,7 +745,7 @@ namespace Terminal.Gui.DialogTests {
 			buttonRow = $"{CM.Glyphs.VLine}  {btn1} {btn2}{CM.Glyphs.VLine}";
 			dlg.AddButton (new Button (btn2Text));
 			first = false;
-			Application.RunMainLoopIteration (ref runstate, true, ref first);
+			Application.RunMainLoopIteration (ref runstate, ref first);
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 			Application.End (runstate);
 
@@ -761,7 +761,7 @@ namespace Terminal.Gui.DialogTests {
 			buttonRow = $"{CM.Glyphs.VLine}{btn1} {btn2}  {CM.Glyphs.VLine}";
 			dlg.AddButton (new Button (btn2Text));
 			first = false;
-			Application.RunMainLoopIteration (ref runstate, true, ref first);
+			Application.RunMainLoopIteration (ref runstate, ref first);
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
 			Application.End (runstate);
 		}
