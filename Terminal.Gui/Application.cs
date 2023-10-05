@@ -50,6 +50,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// If <see langword="true"/>, forces the use of the System.Console-based (see <see cref="NetDriver"/>) driver. The default is <see langword="false"/>.
 		/// </summary>
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
 		public static bool UseSystemConsole { get; set; } = false;
 
 		// For Unit testing - ignores UseSystemConsole
