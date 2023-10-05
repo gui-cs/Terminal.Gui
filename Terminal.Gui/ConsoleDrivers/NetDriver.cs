@@ -576,18 +576,17 @@ internal class NetEvents : IDisposable {
 
 	public void Dispose ()
 	{
-		_cancellationTokenSource.Cancel ();
-		_cancellationTokenSource.Dispose ();
+		_cancellationTokenSource?.Cancel ();
+		_cancellationTokenSource?.Dispose ();
 		_cancellationTokenSource = null;
-		FlushIn ();
-	}
-
-	void FlushIn ()
-	{
-		// throws away any typeahead that has been typed by
-		// the user and has not yet been read by the program.
-		while (Console.KeyAvailable) {
-			Console.ReadKey (true);
+		try {
+			// throws away any typeahead that has been typed by
+			// the user and has not yet been read by the program.
+			while (Console.KeyAvailable) {
+				Console.ReadKey (true);
+			}
+		} catch (InvalidOperationException) {
+			// Ignore - Console input has already been closed
 		}
 	}
 }
@@ -1399,14 +1398,9 @@ internal class NetMainLoop : IMainLoopDriver {
 	public void TearDown ()
 	{
 		_inputResult?.Clear ();
-		
 		_tokenSource?.Cancel ();
-		_tokenSource?.Dispose ();
-		
 		_keyReady?.Dispose ();
-
 		_waitForProbe?.Dispose ();
-
 		_netEvents?.Dispose ();
 
 		_mainLoop = null;
