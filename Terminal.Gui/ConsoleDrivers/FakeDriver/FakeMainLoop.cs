@@ -1,4 +1,5 @@
 ﻿using System;
+using static Terminal.Gui.NetEvents;
 
 namespace Terminal.Gui;
 
@@ -32,6 +33,10 @@ internal class FakeMainLoop : IMainLoopDriver {
 		if (FakeConsole.MockKeyPresses.Count > 0) {
 			KeyPressed?.Invoke (FakeConsole.MockKeyPresses.Pop ());
 		}
+	}
+
+	public void TearDown ()
+	{
 	}
 }
 

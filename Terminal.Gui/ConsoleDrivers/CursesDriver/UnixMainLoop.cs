@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using static Terminal.Gui.NetEvents;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -204,6 +205,13 @@ namespace Terminal.Gui {
 					_descriptorWatchers.Remove (p.fd);
 				}
 			}
+		}
+
+		public void TearDown ()
+		{
+			_descriptorWatchers?.Clear ();
+
+			_mainLoop = null;
 		}
 	}
 }

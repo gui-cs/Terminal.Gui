@@ -16,6 +16,9 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes the <see cref="MainLoop"/>, gets the calling main loop for the initialization.
 		/// </summary>
+		/// <remarks>
+		/// Call <see cref="TearDown"/> to release resources.
+		/// </remarks>
 		/// <param name="mainLoop">Main loop.</param>
 		void Setup (MainLoop mainLoop);
 
@@ -34,6 +37,11 @@ namespace Terminal.Gui {
 		/// The iteration function.
 		/// </summary>
 		void Iteration ();
+
+		/// <summary>
+		/// Tears down the <see cref="MainLoop"/> driver. Releases resources created in <see cref="Setup"/>.
+		/// </summary>
+		void TearDown ();
 	}
 
 	/// <summary>
@@ -43,7 +51,7 @@ namespace Terminal.Gui {
 	///   Monitoring of file descriptors is only available on Unix, there
 	///   does not seem to be a way of supporting this on Windows.
 	/// </remarks>
-	public class MainLoop {
+	public class MainLoop : IDisposable {
 
 		internal SortedList<long, Timeout> _timeouts = new SortedList<long, Timeout> ();
 		readonly object _timeoutsLockToken = new object ();
@@ -76,7 +84,7 @@ namespace Terminal.Gui {
 		/// The current <see cref="IMainLoopDriver"/> in use.
 		/// </summary>
 		/// <value>The main loop driver.</value>
-		public IMainLoopDriver MainLoopDriver { get; }
+		public IMainLoopDriver MainLoopDriver { get; private set; }
 
 		/// <summary>
 		/// Invoked when a new timeout is added. To be used in the case
@@ -87,6 +95,9 @@ namespace Terminal.Gui {
 		/// <summary>
 		///  Creates a new MainLoop. 
 		/// </summary>
+		/// <remarks>
+		/// Use <see cref="Dispose"/> to release resources.
+		/// </remarks>
 		/// <param name="driver">The <see cref="ConsoleDriver"/> instance
 		/// (one of the implementations FakeMainLoop, UnixMainLoop, NetMainLoop or WindowsMainLoop).</param>
 		public MainLoop (IMainLoopDriver driver)
@@ -294,17 +305,6 @@ namespace Terminal.Gui {
 
 		bool _running;
 
-		// BUGBUG: Stop is only called from MainLoopUnitTests.cs. As a result, the mainloop
-		// will never exit during other unit tests or normal execution.
-		/// <summary>
-		///   Stops the mainloop.
-		/// </summary>
-		public void Stop ()
-		{
-			_running = false;
-			MainLoopDriver.Wakeup ();
-		}
-
 		/// <summary>
 		///   Determines whether there are pending events to be processed.
 		/// </summary>
@@ -325,7 +325,7 @@ namespace Terminal.Gui {
 		///   Use this to process all pending events (timers, idle handlers and file watches).
 		///
 		///   <code>
-		///     while (main.EvenstPending ()) RunIteration ();
+		///     while (main.EventsPending ()) RunIteration ();
 		///   </code>
 		/// </remarks>
 		public void RunIteration ()
@@ -335,10 +335,10 @@ namespace Terminal.Gui {
 					RunTimers ();
 				}
 			}
-
+			
 			MainLoopDriver.Iteration ();
 
-			bool runIdle = false;
+			var runIdle = false;
 			lock (_idleHandlersLock) {
 				runIdle = _idleHandlers.Count > 0;
 			}
@@ -360,6 +360,25 @@ namespace Terminal.Gui {
 				RunIteration ();
 			}
 			_running = prev;
+		}
+
+		/// <summary>
+		/// Stops the main loop driver and calls <see cref="IMainLoopDriver.Wakeup"/>.
+		/// </summary>
+		public void Stop ()
+		{
+			_running = false;
+			MainLoopDriver.Wakeup ();
+		}
+		
+		/// <inheritdoc/>
+		public void Dispose ()
+		{
+			GC.SuppressFinalize (this);
+			Stop ();
+			_running = false;
+			MainLoopDriver?.TearDown ();
+			MainLoopDriver = null;
 		}
 	}
 }
