@@ -1,6 +1,19 @@
 //
 // WindowsDriver.cs: Windows specific driver
 //
+
+// HACK:
+// WindowsConsole/Terminal has two issues:
+// 1) Tearing can occur when the console is resized.
+// 2) The values provided during Init (and the first WindowsConsole.EventType.WindowBufferSize) are not correct.
+//
+// If HACK_CHECK_WINCHANGED is defined then we ignore WindowsConsole.EventType.WindowBufferSize events
+// and instead check the console size every every 500ms in a thread in WidowsMainLoop. 
+// As of Windows 11 23H2 25947.1000 and/or WT 1.19.2682 tearing no longer occurs when using 
+// the WindowsConsole.EventType.WindowBufferSize event. However, on Init the window size is
+// still incorrect so we still need this hack.
+#define HACK_CHECK_WINCHANGED
+
 using System.Text;
 using System;
 using System.Collections.Generic;
@@ -13,6 +26,7 @@ using System.Diagnostics;
 using System.Management;
 
 namespace Terminal.Gui;
+
 
 internal class WindowsConsole {
 	public const int STD_OUTPUT_HANDLE = -11;
@@ -40,10 +54,10 @@ internal class WindowsConsole {
 
 	CharInfo [] _originalStdOutChars;
 
-	public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord coords, SmallRect window, bool force16Colors)
+	public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord bufferSize, SmallRect window, bool force16Colors)
 	{
 		if (_screenBuffer == IntPtr.Zero) {
-			ReadFromConsoleOutput (size, coords, ref window);
+			ReadFromConsoleOutput (size, bufferSize, ref window);
 		}
 
 		bool result = false;
@@ -57,7 +71,7 @@ internal class WindowsConsole {
 				};
 			}
 
-			result = WriteConsoleOutput (_screenBuffer, ci, coords, new Coord () { X = window.Left, Y = window.Top }, ref window);
+			result = WriteConsoleOutput (_screenBuffer, ci, bufferSize, new Coord () { X = window.Left, Y = window.Top }, ref window);
 		} else {
 
 			_stringBuilder.Clear ();
@@ -848,9 +862,12 @@ internal class WindowsDriver : ConsoleDriver {
 
 		_mainLoop = mainLoop.MainLoopDriver as WindowsMainLoop;
 		_mainLoop.ProcessInput += ProcessInput;
+#if HACK_CHECK_WINCHANGED
 		_mainLoop.WinChanged += ChangeWin;
+#endif
 	}
 
+#if HACK_CHECK_WINCHANGED
 	private void ChangeWin (Object s, SizeChangedEventArgs e)
 	{
 		var w = e.Size.Width;
@@ -874,6 +891,7 @@ internal class WindowsDriver : ConsoleDriver {
 		ClearContents ();
 		TerminalResized.Invoke ();
 	}
+#endif
 
 	void ProcessInput (WindowsConsole.InputRecord inputEvent)
 	{
@@ -988,6 +1006,18 @@ internal class WindowsDriver : ConsoleDriver {
 
 		case WindowsConsole.EventType.Focus:
 			break;
+
+#if !HACK_CHECK_WINCHANGED
+		case WindowsConsole.EventType.WindowBufferSize:
+			
+			Cols = inputEvent.WindowBufferSizeEvent._size.X;
+			Rows = inputEvent.WindowBufferSizeEvent._size.Y;
+
+			ResizeScreen ();
+			ClearContents ();
+			TerminalResized.Invoke ();
+			break;
+#endif
 		}
 	}
 
@@ -1485,6 +1515,8 @@ internal class WindowsDriver : ConsoleDriver {
 
 		try {
 			if (WinConsole != null) {
+				// BUGBUG: The results from GetConsoleOutputWindow are incorrect when called from Init. 
+				// Our thread in WindowsMainLoop.CheckWin will get the correct results. See #if HACK_CHECK_WINCHANGED
 				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
 				Cols = winSize.Width;
 				Rows = winSize.Height;
@@ -1735,8 +1767,9 @@ internal class WindowsDriver : ConsoleDriver {
 	{
 		if (_mainLoop != null) {
 			_mainLoop.ProcessInput -= ProcessInput;
-			_mainLoop.WinChanged -= ChangeWin;
-			//_mainLoop.Dispose ();
+#if HACK_CHECK_WINCHANGED
+			//_mainLoop.WinChanged -= ChangeWin;
+#endif
 		}
 		_mainLoop = null;
 
@@ -1767,12 +1800,9 @@ internal class WindowsDriver : ConsoleDriver {
 internal class WindowsMainLoop : IMainLoopDriver {
 	readonly ManualResetEventSlim _eventReady = new ManualResetEventSlim (false);
 	readonly ManualResetEventSlim _waitForProbe = new ManualResetEventSlim (false);
-	readonly ManualResetEventSlim _winChange = new ManualResetEventSlim (false);
 	MainLoop _mainLoop;
 	readonly ConsoleDriver _consoleDriver;
 	readonly WindowsConsole _winConsole;
-	bool _winChanged;
-	Size _windowSize;
 	CancellationTokenSource _eventReadyTokenSource = new CancellationTokenSource ();
 	CancellationTokenSource _inputHandlerTokenSource = new CancellationTokenSource ();
 
@@ -1799,7 +1829,9 @@ internal class WindowsMainLoop : IMainLoopDriver {
 	{
 		_mainLoop = mainLoop;
 		Task.Run (WindowsInputHandler, _inputHandlerTokenSource.Token);
+#if HACK_CHECK_WINCHANGED
 		Task.Run (CheckWinChange);
+#endif
 	}
 
 	void WindowsInputHandler ()
@@ -1824,12 +1856,18 @@ internal class WindowsMainLoop : IMainLoopDriver {
 		}
 	}
 
+#if HACK_CHECK_WINCHANGED
+	readonly ManualResetEventSlim _winChange = new ManualResetEventSlim (false);
+	bool _winChanged;
+	Size _windowSize;
 	void CheckWinChange ()
 	{
 		while (_mainLoop != null) {
 			_winChange.Wait ();
 			_winChange.Reset ();
 
+			// Check if the window size changed every half second. 
+			// We do this to minimize the weird tearing seen on Windows when resizing the console
 			while (_mainLoop != null) {
 				Task.Delay (500).Wait ();
 				_windowSize = _winConsole.GetConsoleBufferWindow (out _);
@@ -1843,6 +1881,7 @@ internal class WindowsMainLoop : IMainLoopDriver {
 			_eventReady.Set ();
 		}
 	}
+#endif
 
 	void IMainLoopDriver.Wakeup ()
 	{
@@ -1852,7 +1891,9 @@ internal class WindowsMainLoop : IMainLoopDriver {
 	bool IMainLoopDriver.EventsPending ()
 	{
 		_waitForProbe.Set ();
+#if HACK_CHECK_WINCHANGED          
 		_winChange.Set ();
+#endif
 		if (_mainLoop.CheckTimersAndIdleHandlers (out var waitTimeout)) {
 			return true;
 		}
@@ -1870,7 +1911,11 @@ internal class WindowsMainLoop : IMainLoopDriver {
 		}
 
 		if (!_eventReadyTokenSource.IsCancellationRequested) {
+#if HACK_CHECK_WINCHANGED
 			return _resultQueue.Count > 0 || _mainLoop.CheckTimersAndIdleHandlers (out _) || _winChanged;
+#else
+			return _resultQueue.Count > 0 || _mainLoop.CheckTimersAndIdleHandlers (out _);
+#endif
 		}
 
 		_eventReadyTokenSource.Dispose ();
@@ -1887,10 +1932,12 @@ internal class WindowsMainLoop : IMainLoopDriver {
 				ProcessInput?.Invoke (inputEvent);
 			}
 		}
+#if HACK_CHECK_WINCHANGED
 		if (_winChanged) {
 			_winChanged = false;
 			WinChanged?.Invoke (this, new SizeChangedEventArgs (_windowSize));
 		}
+#endif
 	}
 
 	void IMainLoopDriver.TearDown ()
@@ -1902,7 +1949,9 @@ internal class WindowsMainLoop : IMainLoopDriver {
 		_eventReadyTokenSource?.Dispose ();
 		_eventReady?.Dispose ();
 
+#if HACK_CHECK_WINCHANGED
 		_winChange?.Dispose ();
+#endif
 		_waitForProbe?.Dispose ();
 
 		_mainLoop = null;
