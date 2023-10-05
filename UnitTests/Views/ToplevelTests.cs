@@ -1416,7 +1416,7 @@ namespace Terminal.Gui.ViewsTests {
 				});
 
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			Assert.Equal (dialog, Application.MouseGrabView);
 
 			Assert.Equal (new Rect (25, 7, 30, 10), dialog.Frame);
@@ -1442,7 +1442,7 @@ namespace Terminal.Gui.ViewsTests {
 				});
 
 			firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			Assert.Equal (dialog, Application.MouseGrabView);
 			Assert.Equal (new Rect (20, 10, 30, 10), dialog.Frame);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -1560,7 +1560,7 @@ namespace Terminal.Gui.ViewsTests {
 				});
 
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@$"
 ┌──────────────────┐
 │                  │

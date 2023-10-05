@@ -846,7 +846,7 @@ namespace Terminal.Gui.ViewTests {
 			label.Visible = false;
 
 			bool firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────────────────────────┐
 │                            │

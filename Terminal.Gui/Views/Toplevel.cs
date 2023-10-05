@@ -33,7 +33,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when the <see cref="Toplevel"/> <see cref="RunState"/> has begun to be loaded.
 		/// A Loaded event handler is a good place to finalize initialization before calling 
-		/// <see cref="Application.RunLoop(RunState, bool)"/>.
+		/// <see cref="Application.RunLoop(RunState)"/>.
 		/// </summary>
 		public event EventHandler Loaded;
 

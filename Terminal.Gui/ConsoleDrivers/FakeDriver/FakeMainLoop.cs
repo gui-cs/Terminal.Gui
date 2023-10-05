@@ -21,7 +21,7 @@ internal class FakeMainLoop : IMainLoopDriver {
 		// No implementation needed for FakeMainLoop
 	}
 
-	public bool EventsPending (bool wait)
+	public bool EventsPending ()
 	{
 		// Always return true for FakeMainLoop
 		return true;

@@ -125,7 +125,7 @@ namespace Terminal.Gui.ViewsTests {
 			//checkBox.AutoSize = false;
 			// It isn't auto-size so the height is guaranteed by the SetMinWidthHeight
 			//checkBox.Text = "Check this out 你 changed";
-			//Application.RunMainLoopIteration (ref runstate, true, ref first);
+			//Application.RunMainLoopIteration (ref runstate, ref first);
 			// BUGBUG - v2 - Autosize is busted; disabling tests for now
 //			Assert.Equal (new Rect (1, 1, 19, 1), checkBox.Frame);
 //			expected = @"
@@ -142,7 +142,7 @@ namespace Terminal.Gui.ViewsTests {
 //			checkBox.Width = 19;
 //			// It isn't auto-size so the height is guaranteed by the SetMinWidthHeight
 //			checkBox.Text = "Check this out 你 changed";
-//			Application.RunMainLoopIteration (ref runstate, true, ref first);
+//			Application.RunMainLoopIteration (ref runstate, ref first);
 //			Assert.False (checkBox.AutoSize);
 //			Assert.Equal (new Rect (1, 1, 19, 1), checkBox.Frame);
 //			expected = @"
@@ -157,7 +157,7 @@ namespace Terminal.Gui.ViewsTests {
 //			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 
 //			checkBox.AutoSize = true;
-//			Application.RunMainLoopIteration (ref runstate, true, ref first);
+//			Application.RunMainLoopIteration (ref runstate, ref first);
 //			Assert.Equal (new Rect (1, 1, 27, 1), checkBox.Frame);
 //			expected = @"
 //┌┤Test Demo 你├──────────────┐

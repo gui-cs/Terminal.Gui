@@ -1841,11 +1841,11 @@ internal class WindowsMainLoop : IMainLoopDriver {
 		_eventReady.Set ();
 	}
 	
-	bool IMainLoopDriver.EventsPending (bool wait)
+	bool IMainLoopDriver.EventsPending ()
 	{
 		_waitForProbe.Set ();
 		_winChange.Set ();
-		if (_mainLoop.CheckTimers (wait, out var waitTimeout)) {
+		if (_mainLoop.CheckTimersAndIdleHandlers (out var waitTimeout)) {
 			return true;
 		}
 
@@ -1860,7 +1860,7 @@ internal class WindowsMainLoop : IMainLoopDriver {
 		}
 
 		if (!_eventReadyTokenSource.IsCancellationRequested) {
-			return _resultQueue.Count > 0 || _mainLoop.CheckTimers (wait, out _) || _winChanged;
+			return _resultQueue.Count > 0 || _mainLoop.CheckTimersAndIdleHandlers (out _) || _winChanged;
 		}
 
 		_eventReadyTokenSource.Dispose ();
