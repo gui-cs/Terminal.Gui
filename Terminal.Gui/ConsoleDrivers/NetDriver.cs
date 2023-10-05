@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Text;
+using static Terminal.Gui.NetEvents;
 
 namespace Terminal.Gui;
 class NetWinVTConsole {
@@ -1394,8 +1395,20 @@ internal class NetMainLoop : IMainLoopDriver {
 			ProcessInput?.Invoke (_inputResult.Dequeue ().Value);
 		}
 	}
+	
 	public void TearDown ()
 	{
-		//throw new NotImplementedException ();
+		_inputResult?.Clear ();
+		
+		_tokenSource?.Cancel ();
+		_tokenSource?.Dispose ();
+		
+		_keyReady?.Dispose ();
+
+		_waitForProbe?.Dispose ();
+
+		_netEvents?.Dispose ();
+
+		_mainLoop = null;
 	}
 }

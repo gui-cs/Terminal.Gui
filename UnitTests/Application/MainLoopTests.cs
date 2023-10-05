@@ -613,8 +613,10 @@ namespace Terminal.Gui.ApplicationTests {
 				Application.MainLoop.Invoke (() => {
 					tf.Text = $"index{r.Next ()}";
 					Interlocked.Increment (ref tbCounter);
-					if (target == tbCounter)                                                // On last increment wake up the check
+					if (target == tbCounter) {
+						// On last increment wake up the check
 						_wakeUp.Set ();
+					}
 				});
 			});
 		}

@@ -1739,7 +1739,7 @@ internal class WindowsDriver : ConsoleDriver {
 			//_mainLoop.Dispose ();
 		}
 		_mainLoop = null;
-		
+
 		WinConsole?.Cleanup ();
 		WinConsole = null;
 
@@ -1774,7 +1774,8 @@ internal class WindowsMainLoop : IMainLoopDriver {
 	bool _winChanged;
 	Size _windowSize;
 	CancellationTokenSource _eventReadyTokenSource = new CancellationTokenSource ();
-	
+	CancellationTokenSource _inputHandlerTokenSource = new CancellationTokenSource ();
+
 	// The records that we keep fetching
 	readonly Queue<WindowsConsole.InputRecord []> _resultQueue = new Queue<WindowsConsole.InputRecord []> ();
 
@@ -1790,22 +1791,30 @@ internal class WindowsMainLoop : IMainLoopDriver {
 
 	public WindowsMainLoop (ConsoleDriver consoleDriver = null)
 	{
-		_consoleDriver = consoleDriver ?? throw new ArgumentNullException (nameof(consoleDriver));
+		_consoleDriver = consoleDriver ?? throw new ArgumentNullException (nameof (consoleDriver));
 		_winConsole = ((WindowsDriver)consoleDriver).WinConsole;
 	}
 
 	void IMainLoopDriver.Setup (MainLoop mainLoop)
 	{
 		_mainLoop = mainLoop;
-		Task.Run (WindowsInputHandler);
+		Task.Run (WindowsInputHandler, _inputHandlerTokenSource.Token);
 		Task.Run (CheckWinChange);
 	}
-	
+
 	void WindowsInputHandler ()
 	{
 		while (_mainLoop != null) {
-			_waitForProbe.Wait ();
-			_waitForProbe.Reset ();
+			try {
+				if (!_inputHandlerTokenSource.IsCancellationRequested) {
+					_waitForProbe.Wait (_inputHandlerTokenSource.Token);
+				}
+
+			} catch (OperationCanceledException) {
+				return;
+			} finally {
+				_waitForProbe.Reset ();
+			}
 
 			if (_resultQueue?.Count == 0) {
 				_resultQueue.Enqueue (_winConsole.ReadConsoleInput ());
@@ -1820,7 +1829,7 @@ internal class WindowsMainLoop : IMainLoopDriver {
 		while (_mainLoop != null) {
 			_winChange.Wait ();
 			_winChange.Reset ();
-			
+
 			while (_mainLoop != null) {
 				Task.Delay (500).Wait ();
 				_windowSize = _winConsole.GetConsoleBufferWindow (out _);
@@ -1829,18 +1838,17 @@ internal class WindowsMainLoop : IMainLoopDriver {
 					break;
 				}
 			}
-			
+
 			_winChanged = true;
 			_eventReady.Set ();
 		}
 	}
-	
+
 	void IMainLoopDriver.Wakeup ()
 	{
-		//tokenSource.Cancel ();
 		_eventReady.Set ();
 	}
-	
+
 	bool IMainLoopDriver.EventsPending ()
 	{
 		_waitForProbe.Set ();
@@ -1869,8 +1877,6 @@ internal class WindowsMainLoop : IMainLoopDriver {
 		_eventReadyTokenSource = new CancellationTokenSource ();
 		return true;
 	}
-	
-
 
 	void IMainLoopDriver.Iteration ()
 	{
@@ -1886,17 +1892,21 @@ internal class WindowsMainLoop : IMainLoopDriver {
 			WinChanged?.Invoke (this, new SizeChangedEventArgs (_windowSize));
 		}
 	}
-	
-	//public void Dispose ()
-	//{
-	//	_eventReadyTokenSource?.Cancel ();
-	//	_eventReadyTokenSource?.Dispose ();
-	//	_eventReady?.Dispose ();
 
-	//	_mainLoop = null;
-	//	_winChange?.Dispose ();
-	//	_waitForProbe?.Dispose ();
-	//}
+	void IMainLoopDriver.TearDown ()
+	{
+		_inputHandlerTokenSource?.Cancel ();
+		_inputHandlerTokenSource?.Dispose ();
+
+		_eventReadyTokenSource?.Cancel ();
+		_eventReadyTokenSource?.Dispose ();
+		_eventReady?.Dispose ();
+
+		_winChange?.Dispose ();
+		_waitForProbe?.Dispose ();
+
+		_mainLoop = null;
+	}
 }
 
 class WindowsClipboard : ClipboardBase {
