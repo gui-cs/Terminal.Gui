@@ -226,7 +226,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Called from <see cref="IMainLoopDriver.EventsPending"/> to check if there are any outstanding timers or idle handlers.
 		/// </summary>
-		/// <param name="waitTimeout">Returns the number of milliseconds remaining in the current timer (if any).</param>
+		/// <param name="waitTimeout">Returns the number of milliseconds remaining in the current timer (if any). Will be -1 if
+		/// there are no active timers.</param>
 		/// <returns><see langword="true"/> if there is a timer or idle handler active.</returns>
 		public bool CheckTimersAndIdleHandlers (out int waitTimeout)
 		{
@@ -245,6 +246,9 @@ namespace Terminal.Gui {
 					}
 					return true;
 				}
+				// ManualResetEventSlim.Wait, which is called by IMainLoopDriver.EventsPending, will wait indefinitely if
+				// the timeout is -1.
+				waitTimeout = -1;
 			}
 
 			// There are no timers set, check if there are any idle handlers
