@@ -65,7 +65,7 @@ namespace Terminal.Gui {
 			public Func<MainLoop, bool> Callback;
 		}
 
-		Dictionary<int, Watch> _descriptorWatchers = new Dictionary<int, Watch> ();
+		readonly Dictionary<int, Watch> _descriptorWatchers = new Dictionary<int, Watch> ();
 
 		[DllImport ("libc")]
 		extern static int poll ([In, Out] Pollfd [] ufds, uint nfds, int timeout);
@@ -207,7 +207,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		public void TearDown ()
+		void IMainLoopDriver.TearDown ()
 		{
 			_descriptorWatchers?.Clear ();
 
