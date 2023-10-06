@@ -105,15 +105,19 @@ class NetWinVTConsole {
 }
 
 internal class NetEvents : IDisposable {
-	ManualResetEventSlim _inputReady = new ManualResetEventSlim (false);
-	ManualResetEventSlim _waitForStart = new ManualResetEventSlim (false);
-	ManualResetEventSlim _winChange = new ManualResetEventSlim (false);
-	Queue<InputResult?> _inputResultQueue = new Queue<InputResult?> ();
-	ConsoleDriver _consoleDriver;
+	readonly ManualResetEventSlim _inputReady = new ManualResetEventSlim (false);
+	CancellationTokenSource _inputReadyCancellationTokenSource;
+
+	readonly ManualResetEventSlim _waitForStart = new ManualResetEventSlim (false);
+	//CancellationTokenSource _waitForStartCancellationTokenSource;
+
+	readonly ManualResetEventSlim _winChange = new ManualResetEventSlim (false);
+
+	readonly Queue<InputResult?> _inputQueue = new Queue<InputResult?> ();
+
+	readonly ConsoleDriver _consoleDriver;
 	ConsoleKeyInfo [] _cki;
 	bool _isEscSeq;
-	CancellationTokenSource _cancellationTokenSource;
-	CancellationToken _cancellationToken;
 
 #if PROCESS_REQUEST
 		bool _neededProcessRequest;
@@ -123,32 +127,40 @@ internal class NetEvents : IDisposable {
 	public NetEvents (ConsoleDriver consoleDriver)
 	{
 		_consoleDriver = consoleDriver ?? throw new ArgumentNullException (nameof (consoleDriver));
-		_cancellationTokenSource = new CancellationTokenSource ();
-		_cancellationToken = _cancellationTokenSource.Token;
-		Task.Run (ProcessInputResultQueue);
-		Task.Run (CheckWindowSizeChange);
+		_inputReadyCancellationTokenSource = new CancellationTokenSource ();
+
+		Task.Run (ProcessInputQueue, _inputReadyCancellationTokenSource.Token);
+
+		Task.Run (CheckWindowSizeChange, _inputReadyCancellationTokenSource.Token);
 	}
 
-	public InputResult? ReadConsoleInput ()
+	public InputResult? DequeueInput ()
 	{
-		while (true) {
-			if (_cancellationToken.IsCancellationRequested) {
-				return null;
-			}
+		while (!_inputReadyCancellationTokenSource.Token.IsCancellationRequested) {
 			_waitForStart.Set ();
 			_winChange.Set ();
 
-			if (_inputResultQueue.Count == 0) {
-				_inputReady.Wait ();
+			try {
+				if (!_inputReadyCancellationTokenSource.Token.IsCancellationRequested) {
+					if (_inputQueue.Count == 0) {
+						_inputReady.Wait (_inputReadyCancellationTokenSource.Token);
+					}
+				}
+
+			} catch (OperationCanceledException) {
+				return null;
+			} finally {
 				_inputReady.Reset ();
 			}
+			
 #if PROCESS_REQUEST
 				_neededProcessRequest = false;
 #endif
-			if (_inputResultQueue.Count > 0) {
-				return _inputResultQueue.Dequeue ();
+			if (_inputQueue.Count > 0) {
+				return _inputQueue.Dequeue ();
 			}
 		}
+		return null;
 	}
 
 	static ConsoleKeyInfo ReadConsoleKeyInfo (CancellationToken cancellationToken, bool intercept = true)
@@ -169,24 +181,25 @@ internal class NetEvents : IDisposable {
 		return default;
 	}
 
-	void ProcessInputResultQueue ()
+	void ProcessInputQueue ()
 	{
-		while (true) {
-			_waitForStart.Wait ();
+		while (!_inputReadyCancellationTokenSource.Token.IsCancellationRequested) {
+	
+			_waitForStart.Wait (_inputReadyCancellationTokenSource.Token);
 			_waitForStart.Reset ();
 
-			if (_inputResultQueue.Count == 0) {
+			if (_inputQueue.Count == 0) {
 				ConsoleKey key = 0;
 				ConsoleModifiers mod = 0;
 				ConsoleKeyInfo newConsoleKeyInfo = default;
 
 				while (true) {
-					if (_cancellationToken.IsCancellationRequested) {
+					if (_inputReadyCancellationTokenSource.Token.IsCancellationRequested) {
 						return;
 					}
 					ConsoleKeyInfo consoleKeyInfo;
 					try {
-						consoleKeyInfo = ReadConsoleKeyInfo (_cancellationToken, true);
+						consoleKeyInfo = ReadConsoleKeyInfo (_inputReadyCancellationTokenSource.Token, true);
 					} catch (OperationCanceledException) {
 						return;
 					}
@@ -226,7 +239,7 @@ internal class NetEvents : IDisposable {
 
 		void ProcessMapConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
 		{
-			_inputResultQueue.Enqueue (new InputResult {
+			_inputQueue.Enqueue (new InputResult {
 				EventType = EventType.Key,
 				ConsoleKeyInfo = EscSeqUtils.MapConsoleKeyInfo (consoleKeyInfo)
 			});
@@ -263,13 +276,13 @@ internal class NetEvents : IDisposable {
 		}
 
 		while (true) {
-			if (_cancellationToken.IsCancellationRequested) {
+			if (_inputReadyCancellationTokenSource.IsCancellationRequested) {
 				return;
 			}
-			_winChange.Wait ();
+			_winChange.Wait (_inputReadyCancellationTokenSource.Token);
 			_winChange.Reset ();
 			try {
-				RequestWindowSize (_cancellationToken);
+				RequestWindowSize (_inputReadyCancellationTokenSource.Token);
 			} catch (OperationCanceledException) {
 				return;
 			}
@@ -290,7 +303,7 @@ internal class NetEvents : IDisposable {
 		if (winWidth == _consoleDriver.Cols && winHeight == _consoleDriver.Rows) return false;
 		var w = Math.Max (winWidth, 0);
 		var h = Math.Max (winHeight, 0);
-		_inputResultQueue.Enqueue (new InputResult () {
+		_inputQueue.Enqueue (new InputResult () {
 			EventType = EventType.WindowSize,
 			WindowSizeEvent = new WindowSizeEvent () {
 				Size = new Size (w, h)
@@ -437,7 +450,7 @@ internal class NetEvents : IDisposable {
 				var winPositionEv = new WindowPositionEvent () {
 					CursorPosition = point
 				};
-				_inputResultQueue.Enqueue (new InputResult () {
+				_inputQueue.Enqueue (new InputResult () {
 					EventType = eventType,
 					WindowPositionEvent = winPositionEv
 				});
@@ -474,7 +487,7 @@ internal class NetEvents : IDisposable {
 		var requestRespEv = new RequestResponseEvent () {
 			ResultTuple = (c1Control, code, values, terminating)
 		};
-		_inputResultQueue.Enqueue (new InputResult () {
+		_inputQueue.Enqueue (new InputResult () {
 			EventType = eventType,
 			RequestResponseEvent = requestRespEv
 		});
@@ -487,7 +500,7 @@ internal class NetEvents : IDisposable {
 			ButtonState = buttonState,
 		};
 
-		_inputResultQueue.Enqueue (new InputResult () {
+		_inputQueue.Enqueue (new InputResult () {
 			EventType = EventType.Mouse,
 			MouseEvent = mouseEvent
 		});
@@ -571,14 +584,15 @@ internal class NetEvents : IDisposable {
 			ConsoleKeyInfo = cki
 		};
 
-		_inputResultQueue.Enqueue (inputResult);
+		_inputQueue.Enqueue (inputResult);
 	}
 
 	public void Dispose ()
 	{
-		_cancellationTokenSource?.Cancel ();
-		_cancellationTokenSource?.Dispose ();
-		_cancellationTokenSource = null;
+		_inputReadyCancellationTokenSource?.Cancel ();
+		_inputReadyCancellationTokenSource?.Dispose ();
+		_inputReadyCancellationTokenSource = null;
+
 		try {
 			// throws away any typeahead that has been typed by
 			// the user and has not yet been read by the program.
@@ -616,8 +630,6 @@ internal class NetDriver : ConsoleDriver {
 
 	public override void End ()
 	{
-		_mainLoop?._netEvents.Dispose ();
-
 		if (IsWinPlatform) {
 			NetWinConsole?.Cleanup ();
 		}
@@ -1116,10 +1128,10 @@ internal class NetDriver : ConsoleDriver {
 		_keyUpHandler = keyUpHandler;
 		_mouseHandler = mouseHandler;
 
-		var mLoop = _mainLoop = mainLoop.MainLoopDriver as NetMainLoop;
+		_mainLoop = mainLoop.MainLoopDriver as NetMainLoop;
 
 		// Note: .Net API doesn't support keydown/up events and thus any passed keyDown/UpHandlers will be simulated to be called.
-		mLoop.ProcessInput = (e) => ProcessInput (e);
+		_mainLoop.ProcessInput = ProcessInput;
 	}
 
 	volatile bool _winSizeChanging;
@@ -1301,11 +1313,12 @@ internal class NetDriver : ConsoleDriver {
 /// This implementation is used for NetDriver.
 /// </remarks>
 internal class NetMainLoop : IMainLoopDriver {
-	readonly ManualResetEventSlim _keyReady = new ManualResetEventSlim (false);
+	readonly ManualResetEventSlim _eventReady = new ManualResetEventSlim (false);
 	readonly ManualResetEventSlim _waitForProbe = new ManualResetEventSlim (false);
-	readonly Queue<NetEvents.InputResult?> _inputResult = new Queue<NetEvents.InputResult?> ();
+	readonly Queue<NetEvents.InputResult?> _resultQueue = new Queue<NetEvents.InputResult?> ();
 	MainLoop _mainLoop;
-	CancellationTokenSource _tokenSource = new CancellationTokenSource ();
+	CancellationTokenSource _eventReadyTokenSource = new CancellationTokenSource ();
+	readonly CancellationTokenSource _inputHandlerTokenSource = new CancellationTokenSource ();
 	internal NetEvents _netEvents;
 
 	/// <summary>
@@ -1331,32 +1344,43 @@ internal class NetMainLoop : IMainLoopDriver {
 
 	void NetInputHandler ()
 	{
-		while (true) {
-			_waitForProbe.Wait ();
-			_waitForProbe.Reset ();
-			if (_inputResult.Count == 0) {
-				_inputResult.Enqueue (_netEvents.ReadConsoleInput ());
+		while (_mainLoop != null) {
+			try {
+				if (!_inputHandlerTokenSource.IsCancellationRequested) {
+					_waitForProbe.Wait (_inputHandlerTokenSource.Token);
+				}
+
+			} catch (OperationCanceledException) {
+				return;
+			} finally {
+				_waitForProbe.Reset ();
+			}
+
+			if (_resultQueue.Count == 0) {
+				_resultQueue.Enqueue (_netEvents.DequeueInput ());
 			}
 			try {
-				while (_inputResult.Peek () == null) {
-					_inputResult.Dequeue ();
+				while (_resultQueue.Peek () == null) {
+					_resultQueue.Dequeue ();
 				}
-				if (_inputResult.Count > 0) {
-					_keyReady.Set ();
+				if (_resultQueue.Count > 0) {
+					_eventReady.Set ();
 				}
-			} catch (InvalidOperationException) { }
+			} catch (InvalidOperationException) {
+				// Ignore
+			}
 		}
 	}
 
 	void IMainLoopDriver.Setup (MainLoop mainLoop)
 	{
 		_mainLoop = mainLoop;
-		Task.Run (NetInputHandler);
+		Task.Run (NetInputHandler, _inputHandlerTokenSource.Token);
 	}
 
 	void IMainLoopDriver.Wakeup ()
 	{
-		_keyReady.Set ();
+		_eventReady.Set ();
 	}
 
 	bool IMainLoopDriver.EventsPending ()
@@ -1368,40 +1392,46 @@ internal class NetMainLoop : IMainLoopDriver {
 		}
 
 		try {
-			if (!_tokenSource.IsCancellationRequested) {
+			if (!_eventReadyTokenSource.IsCancellationRequested) {
 				// Note: ManualResetEventSlim.Wait will wait indefinitely if the timeout is -1. The timeout is -1 when there
 				// are no timers, but there IS an idle handler waiting.
-				_keyReady.Wait (waitTimeout, _tokenSource.Token);
+				_eventReady.Wait (waitTimeout, _eventReadyTokenSource.Token);
 			}
 		} catch (OperationCanceledException) {
 			return true;
 		} finally {
-			_keyReady.Reset ();
+			_eventReady.Reset ();
 		}
 
-		if (!_tokenSource.IsCancellationRequested) {
-			return _inputResult.Count > 0 || _mainLoop.CheckTimersAndIdleHandlers (out _);
+		if (!_eventReadyTokenSource.IsCancellationRequested) {
+			return _resultQueue.Count > 0 || _mainLoop.CheckTimersAndIdleHandlers (out _);
 		}
 
-		_tokenSource.Dispose ();
-		_tokenSource = new CancellationTokenSource ();
+		_eventReadyTokenSource.Dispose ();
+		_eventReadyTokenSource = new CancellationTokenSource ();
 		return true;
 	}
 
 	void IMainLoopDriver.Iteration ()
 	{
-		while (_inputResult.Count > 0) {
-			ProcessInput?.Invoke (_inputResult.Dequeue ().Value);
+		while (_resultQueue.Count > 0) {
+			ProcessInput?.Invoke (_resultQueue.Dequeue ().Value);
 		}
 	}
 	
-	public void TearDown ()
+	void IMainLoopDriver.TearDown ()
 	{
-		_inputResult?.Clear ();
-		_tokenSource?.Cancel ();
-		_keyReady?.Dispose ();
+		_inputHandlerTokenSource?.Cancel ();
+		_inputHandlerTokenSource?.Dispose ();
+		_eventReadyTokenSource?.Cancel ();
+		_eventReadyTokenSource?.Dispose ();
+		
+		_eventReady?.Dispose ();
+
+		_resultQueue?.Clear ();
 		_waitForProbe?.Dispose ();
 		_netEvents?.Dispose ();
+		_netEvents = null;
 
 		_mainLoop = null;
 	}
