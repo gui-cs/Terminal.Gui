@@ -207,9 +207,11 @@ internal class CursesDriver : ConsoleDriver {
 		StopReportingMouseMoves ();
 		SetCursorVisibility (CursorVisibility.Default);
 
-		_mainLoop.RemoveWatch (_processInputToken);
-		_mainLoop.WinChanged -= ProcessInput;
-		
+		if (_mainLoop != null) {
+			_mainLoop.RemoveWatch (_processInputToken);
+			_mainLoop.WinChanged -= ProcessInput;
+		}
+
 		if (RunningUnitTests) {
 			return;
 		}
