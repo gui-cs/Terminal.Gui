@@ -1954,7 +1954,7 @@ internal class WindowsMainLoop : IMainLoopDriver {
 #if HACK_CHECK_WINCHANGED
 		_winChange?.Dispose ();
 #endif
-		_waitForProbe?.Dispose ();
+		//_waitForProbe?.Dispose ();
 
 		_mainLoop = null;
 	}
