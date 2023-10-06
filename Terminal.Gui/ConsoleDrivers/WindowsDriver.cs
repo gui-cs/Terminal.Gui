@@ -1949,6 +1949,8 @@ internal class WindowsMainLoop : IMainLoopDriver {
 		_eventReadyTokenSource?.Dispose ();
 		_eventReady?.Dispose ();
 
+		_resultQueue?.Clear ();
+
 #if HACK_CHECK_WINCHANGED
 		_winChange?.Dispose ();
 #endif
