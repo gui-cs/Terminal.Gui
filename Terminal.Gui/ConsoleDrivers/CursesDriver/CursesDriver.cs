@@ -207,6 +207,9 @@ internal class CursesDriver : ConsoleDriver {
 		StopReportingMouseMoves ();
 		SetCursorVisibility (CursorVisibility.Default);
 
+		_mainLoop.RemoveWatch (_processInputToken);
+		_mainLoop.WinChanged -= ProcessInput;
+		
 		if (RunningUnitTests) {
 			return;
 		}
@@ -595,6 +598,9 @@ internal class CursesDriver : ConsoleDriver {
 	Action<KeyEvent> _keyUpHandler;
 	Action<MouseEvent> _mouseHandler;
 
+	UnixMainLoop _mainLoop;
+	object _processInputToken;
+	
 	public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 	{
 		if (!RunningUnitTests) {
@@ -606,14 +612,14 @@ internal class CursesDriver : ConsoleDriver {
 		this._keyUpHandler = keyUpHandler;
 		this._mouseHandler = mouseHandler;
 
-		var mLoop = mainLoop.MainLoopDriver as UnixMainLoop;
+		_mainLoop = mainLoop.MainLoopDriver as UnixMainLoop;
 
-		mLoop.AddWatch (0, UnixMainLoop.Condition.PollIn, x => {
+		_processInputToken = _mainLoop?.AddWatch (0, UnixMainLoop.Condition.PollIn, x => {
 			ProcessInput ();
 			return true;
 		});
 
-		mLoop.WinChanged += ProcessInput;
+		_mainLoop.WinChanged += ProcessInput;
 	}
 
 	public override void Init (Action terminalResized)
