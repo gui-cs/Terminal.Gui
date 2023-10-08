@@ -1654,6 +1654,10 @@ internal class WindowsDriver : ConsoleDriver {
 		    background: background
 		);
 	}
+	public override Attribute MakeColor (ColorNames foreground, ColorNames background)
+	{
+		return MakeColor (new Color (foreground), new Color (background));
+	}
 
 	/// <summary>
 	/// Extracts the foreground and background colors from the encoded value.

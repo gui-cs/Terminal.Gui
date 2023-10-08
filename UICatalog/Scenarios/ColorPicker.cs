@@ -89,8 +89,9 @@ namespace UICatalog.Scenarios {
 			Win.Add (_demoView);
 
 			// Set default colors.
-			backgroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Background;
-			foregroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Foreground;
+			// BUGBUG: (v2 truecolor) This code depends on 8-bit color names; disabling for now
+			//backgroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Background;
+			//foregroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Foreground;
 		}
 
 		/// <summary>
@@ -124,7 +125,9 @@ namespace UICatalog.Scenarios {
 		/// Update Demo Label.
 		/// </summary>
 		private void UpdateDemoLabel () => _demoView.ColorScheme = new ColorScheme () {
-			Normal = new Terminal.Gui.Attribute (foregroundColorPicker.SelectedColor, backgroundColorPicker.SelectedColor)
+			// BUGBUG: (v2 truecolor) This code depends on 8-bit color names; disabling for now
+
+			//Normal = new Terminal.Gui.Attribute (foregroundColorPicker.SelectedColor, backgroundColorPicker.SelectedColor)
 		};
 	}
 }

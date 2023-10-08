@@ -50,12 +50,12 @@ namespace Terminal.Gui.DriverTests {
 		[Fact]
 		public void TestAllColors ()
 		{
-			var colors = System.Enum.GetValues (typeof (Color));
-			Attribute [] attrs = new Attribute [colors.Length];
+			var colorNames = System.Enum.GetValues (typeof (ColorNames));
+			Attribute [] attrs = new Attribute [colorNames.Length];
 
 			int idx = 0;
-			foreach (Color bg in colors) {
-				attrs [idx] = new Attribute (bg, colors.Length - 1 - bg);
+			foreach (int bg in colorNames) {
+				attrs [idx] = new Attribute (bg, colorNames.Length - 1 - bg);
 				idx++;
 			}
 			Assert.Equal (16, attrs.Length);

@@ -1198,8 +1198,8 @@ namespace Terminal.Gui {
 
 
 			var color = Style.ColorProvider.GetTrueColor (stats.FileSystemInfo)
-			?? TrueColor.FromConsoleColor (Color.White);
-			var black = TrueColor.FromConsoleColor (Color.Black);
+			?? TrueColor.FromColorName (Color.White);
+			var black = TrueColor.FromColorName (Color.Black);
 
 			// TODO: Add some kind of cache for this
 			return new ColorScheme {

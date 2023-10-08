@@ -426,6 +426,16 @@ public abstract class ConsoleDriver {
 	}
 
 	/// <summary>
+	/// Make the attribute for the foreground and background colors.
+	/// </summary>
+	/// <param name="fore">Foreground.</param>
+	/// <param name="back">Background.</param>
+	/// <returns></returns>
+	public virtual Attribute MakeAttribute (ColorNames fore, ColorNames back)
+	{
+		return MakeColor (fore, back);
+	}
+	/// <summary>
 	/// Gets the foreground and background colors based on a platform-dependent color value.
 	/// </summary>
 	/// <param name="value">The platform-dependent color value.</param>
@@ -438,6 +448,14 @@ public abstract class ConsoleDriver {
 	/// </summary>
 	/// <returns>The current attribute.</returns>
 	public Attribute GetAttribute () => CurrentAttribute;
+
+	/// <summary>
+	/// Makes an <see cref="Attribute"/>.
+	/// </summary>
+	/// <param name="foreground">The foreground color.</param>
+	/// <param name="background">The background color.</param>
+	/// <returns>The attribute for the foreground and background colors.</returns>
+	public abstract Attribute MakeColor (ColorNames foreground, ColorNames background);
 
 	/// <summary>
 	/// Makes an <see cref="Attribute"/>.

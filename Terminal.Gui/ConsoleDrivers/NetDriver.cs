@@ -152,7 +152,7 @@ internal class NetEvents : IDisposable {
 			} finally {
 				_inputReady.Reset ();
 			}
-			
+
 #if PROCESS_REQUEST
 				_neededProcessRequest = false;
 #endif
@@ -184,7 +184,7 @@ internal class NetEvents : IDisposable {
 	void ProcessInputQueue ()
 	{
 		while (!_inputReadyCancellationTokenSource.Token.IsCancellationRequested) {
-	
+
 			_waitForStart.Wait (_inputReadyCancellationTokenSource.Token);
 			_waitForStart.Reset ();
 
@@ -793,7 +793,7 @@ internal class NetDriver : ConsoleDriver {
 
 						if (Force16Colors) {
 							output.Append (EscSeqUtils.CSI_SetGraphicsRendition (
-								MapColors ((ConsoleColor)attr.Background, false), MapColors ((ConsoleColor)attr.Foreground, true)));
+								MapColors ((ConsoleColor)attr.Background.Value, false), MapColors ((ConsoleColor)attr.Foreground.Value, true)));
 						} else {
 							output.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.TrueColorForeground.Value.Red, attr.TrueColorForeground.Value.Green, attr.TrueColorForeground.Value.Blue));
 							output.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.TrueColorBackground.Value.Red, attr.TrueColorBackground.Value.Green, attr.TrueColorBackground.Value.Blue));
@@ -889,6 +889,10 @@ internal class NetDriver : ConsoleDriver {
 		);
 	}
 
+	public override Attribute MakeColor (ColorNames foreground, ColorNames background)
+	{
+		return MakeColor (new Color (foreground), new Color (background));
+	}
 	#endregion
 
 	#region Cursor Handling
@@ -1418,14 +1422,14 @@ internal class NetMainLoop : IMainLoopDriver {
 			ProcessInput?.Invoke (_resultQueue.Dequeue ().Value);
 		}
 	}
-	
+
 	void IMainLoopDriver.TearDown ()
 	{
 		_inputHandlerTokenSource?.Cancel ();
 		_inputHandlerTokenSource?.Dispose ();
 		_eventReadyTokenSource?.Cancel ();
 		_eventReadyTokenSource?.Dispose ();
-		
+
 		_eventReady?.Dispose ();
 
 		_resultQueue?.Clear ();

@@ -80,7 +80,7 @@ namespace Terminal.Gui {
 
 			set {
 				var colorIndex = value.Y * _cols + value.X;
-				SelectedColor = (Color)colorIndex;
+				SelectedColor = (ColorNames)colorIndex;
 			}
 		}
 
@@ -92,17 +92,17 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Selected color.
 		/// </summary>
-		public Color SelectedColor {
+		public ColorNames SelectedColor {
 			get {
-				return (Color)_selectColorIndex;
+				return (ColorNames)_selectColorIndex;
 			}
 
 			set {
-				Color prev = (Color)_selectColorIndex;
+				ColorNames prev = (ColorNames)_selectColorIndex;
 				_selectColorIndex = (int)value;
 				ColorChanged?.Invoke (this, new ColorEventArgs () {
-					PreviousColor = prev,
-					Color = value,
+					PreviousColor = new Color(prev),
+					Color = new Color(value),
 				});
 				SetNeedsDisplay ();
 			}
