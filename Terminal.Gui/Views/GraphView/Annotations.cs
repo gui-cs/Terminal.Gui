@@ -156,7 +156,14 @@ namespace Terminal.Gui {
 		public void Render (GraphView graph)
 		{
 			if (Border) {
-				graph.Border.DrawFrame (Bounds, true);
+
+				var lc = new LineCanvas ();
+				lc.AddRectangle (Bounds,LineStyle.Single);
+				foreach(var p in lc.GetMap(Bounds))
+				{
+					graph.AddRune (p.Key.X, p.Key.Y, p.Value);
+				}
+				lc.Dispose ();
 			}
 
 			// start the legend at

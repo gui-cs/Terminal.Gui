@@ -125,6 +125,22 @@ namespace Terminal.Gui {
 			_lines.Add (new StraightLine (start, length, orientation, style, attribute));
 		}
 
+
+		/// <summary>
+		/// Adds 4 new lines to canvas, these correspond to the edges of the passed <paramref name="rect"/>.
+		/// </summary>
+		/// <param name="rect">Defines the location of the lines to add.</param>
+		/// <param name="style">The line style to use e.g. single/double etc.</param>
+		/// <param name="attribute">Optional custom color to use for the rectangle lines.</param>
+		public void AddRectangle(Rect rect, LineStyle style, Attribute? attribute = default)
+		{
+			_cachedBounds = Rect.Empty;
+			_lines.Add (new StraightLine (new Point(rect.Left,rect.Top), rect.Width, Orientation.Horizontal, style, attribute));
+			_lines.Add (new StraightLine (new Point (rect.Right-1, rect.Top), rect.Height, Orientation.Vertical, style, attribute));
+			_lines.Add (new StraightLine (new Point (rect.Right-1, rect.Bottom-1), -rect.Width, Orientation.Horizontal, style, attribute));
+			_lines.Add (new StraightLine (new Point (rect.Left, rect.Bottom-1), -rect.Height, Orientation.Vertical, style, attribute));
+		}
+
 		/// <summary>
 		/// Adds a new line to the canvas
 		/// </summary>
