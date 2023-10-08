@@ -31,9 +31,9 @@ namespace Terminal.Gui {
 				var colorString = reader.GetString ();
 
 				// Check if the color string is a color name
-				if (Enum.TryParse (colorString, ignoreCase: true, out Color color)) {
+				if (Enum.TryParse (colorString, ignoreCase: true, out ColorNames color)) {
 					// Return the parsed color
-					return color;
+					return new Color(color);
 				} else {
 					// Parse the color string as an RGB value
 					var match = Regex.Match (colorString, @"rgb\((\d+),(\d+),(\d+)\)");

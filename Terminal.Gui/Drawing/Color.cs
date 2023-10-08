@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
@@ -15,7 +16,7 @@ namespace Terminal.Gui {
 	/// The <see cref="Attribute.HasValidColors"/> value indicates either no-color has been set or the color is invalid.
 	/// </remarks>
 	[JsonConverter (typeof (ColorJsonConverter))]
-	public enum Color {
+	public enum ColorNames {
 		/// <summary>
 		/// The black color.
 		/// </summary>
@@ -82,6 +83,109 @@ namespace Terminal.Gui {
 		White
 	}
 
+	public class Color {
+		public Color (ColorNames colorName)
+		{
+			var tc = TrueColor.FromColorName (colorName).GetValueOrDefault ();
+			Value = (tc.Alpha << 24) | (tc.Red << 16) | (tc.Green << 8) | tc.Blue;
+		}
+
+		public Color ()
+		{
+			Value = -1;
+		}
+
+		/// <summary>
+		/// The black color.
+		/// </summary>
+		public const int Black = (int)ColorNames.Black;
+
+		/// <summary>
+		/// The blue color.
+		/// </summary>
+		public const int Blue = (int)ColorNames.Blue;
+		/// <summary>
+		/// The green color.
+		/// </summary>
+		public const int Green = (int)ColorNames.Green;
+		/// <summary>
+		/// The cyan color.
+		/// </summary>
+		public const int Cyan = (int)ColorNames.Cyan;
+		/// <summary>
+		/// The red color.
+		/// </summary>
+		public const int Red = (int)ColorNames.Red;
+		/// <summary>
+		/// The magenta color.
+		/// </summary>
+		public const int Magenta = (int)ColorNames.Magenta;
+		/// <summary>
+		/// The brown color.
+		/// </summary>
+		public const int Brown = (int)ColorNames.Brown;
+		/// <summary>
+		/// The gray color.
+		/// </summary>
+		public const int Gray = (int)ColorNames.Gray;
+		/// <summary>
+		/// The dark gray color.
+		/// </summary>
+		public const int DarkGray = (int)ColorNames.DarkGray;
+		/// <summary>
+		/// The bright bBlue color.
+		/// </summary>
+		public const int BrightBlue = (int)ColorNames.BrightBlue;
+		/// <summary>
+		/// The bright green color.
+		/// </summary>
+		public const int BrightGreen = (int)ColorNames.BrightGreen;
+		/// <summary>
+		/// The bright cyan color.
+		/// </summary>
+		public const int BrightCyan = (int)ColorNames.BrightCyan;
+		/// <summary>
+		/// The bright red color.
+		/// </summary>
+		public const int BrightRed = (int)ColorNames.BrightRed;
+		/// <summary>
+		/// The bright magenta color.
+		/// </summary>
+		public const int BrightMagenta = (int)ColorNames.BrightMagenta;
+		/// <summary>
+		/// The bright yellow color.
+		/// </summary>
+		public const int BrightYellow = (int)ColorNames.BrightYellow;
+		/// <summary>
+		/// The White color.
+		/// </summary>
+		public const int White = (int)ColorNames.White;
+
+		/// <summary>
+		/// The truecolor value. -1 if not valid. 
+		/// </summary>
+		public int Value { get; set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
+		public static implicit operator Color (int value)
+		{
+			return new Color { Value = value };
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="color"></param>
+		public static explicit operator int (Color color)
+		{
+			return color.Value;
+		}
+
+	}
+
 	/// <summary>
 	/// Indicates the RGB for true colors.
 	/// </summary>
@@ -118,6 +222,14 @@ namespace Terminal.Gui {
 		/// Blue color component.
 		/// </summary>
 		public int Blue { get; }
+
+		/// <summary>
+		/// Blue color component.
+		/// </summary>
+		/// <remarks>
+		/// Not currently supported; here for completeness. 
+		/// </remarks>
+		public int Alpha { get; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TrueColor"/> struct.
@@ -186,29 +298,38 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="consoleColor">The <see cref="Color"/> to convert.</param>
 		/// <returns></returns>
-		public static TrueColor? FromConsoleColor (Color consoleColor)
+		public static TrueColor? FromColorName (ColorNames consoleColor)
 		{
 			return consoleColor switch {
-				Color.Black => new TrueColor (0, 0, 0),
-				Color.Blue => new TrueColor (0, 0, 0x80),
-				Color.Green => new TrueColor (0, 0x80, 0),
-				Color.Cyan => new TrueColor (0, 0x80, 0x80),
-				Color.Red => new TrueColor (0x80, 0, 0),
-				Color.Magenta => new TrueColor (0x80, 0, 0x80),
-				Color.Brown => new TrueColor (0xC1, 0x9C, 0x00) // TODO confirm this
+				ColorNames.Black => new TrueColor (0, 0, 0),
+				ColorNames.Blue => new TrueColor (0, 0, 0x80),
+				ColorNames.Green => new TrueColor (0, 0x80, 0),
+				ColorNames.Cyan => new TrueColor (0, 0x80, 0x80),
+				ColorNames.Red => new TrueColor (0x80, 0, 0),
+				ColorNames.Magenta => new TrueColor (0x80, 0, 0x80),
+				ColorNames.Brown => new TrueColor (0xC1, 0x9C, 0x00) // TODO confirm this
 				,
-				Color.Gray => new TrueColor (0xC0, 0xC0, 0xC0),
-				Color.DarkGray => new TrueColor (0x80, 0x80, 0x80),
-				Color.BrightBlue => new TrueColor (0, 0, 0xFF),
-				Color.BrightGreen => new TrueColor (0, 0xFF, 0),
-				Color.BrightCyan => new TrueColor (0, 0xFF, 0xFF),
-				Color.BrightRed => new TrueColor (0xFF, 0, 0),
-				Color.BrightMagenta => new TrueColor (0xFF, 0, 0xFF),
-				Color.BrightYellow => new TrueColor (0xFF, 0xFF, 0),
-				Color.White => new TrueColor (0xFF, 0xFF, 0xFF),
+				ColorNames.Gray => new TrueColor (0xC0, 0xC0, 0xC0),
+				ColorNames.DarkGray => new TrueColor (0x80, 0x80, 0x80),
+				ColorNames.BrightBlue => new TrueColor (0, 0, 0xFF),
+				ColorNames.BrightGreen => new TrueColor (0, 0xFF, 0),
+				ColorNames.BrightCyan => new TrueColor (0, 0xFF, 0xFF),
+				ColorNames.BrightRed => new TrueColor (0xFF, 0, 0),
+				ColorNames.BrightMagenta => new TrueColor (0xFF, 0, 0xFF),
+				ColorNames.BrightYellow => new TrueColor (0xFF, 0xFF, 0),
+				ColorNames.White => new TrueColor (0xFF, 0xFF, 0xFF),
 				var _ => null
 			};
-			;
+		}
+
+		/// <summary>
+		/// Converts a <see cref="Color"/> to a <see cref="TrueColor"/> using a default mapping.
+		/// </summary>
+		/// <param name="consoleColor">The <see cref="Color"/> to convert.</param>
+		/// <returns></returns>
+		public static TrueColor? FromColorName (int color16)
+		{
+			return FromColorName ((ColorNames)color16);
 		}
 
 		/// <summary>
@@ -339,8 +460,8 @@ namespace Terminal.Gui {
 			Value = value;
 			Foreground = foreground;
 			Background = background;
-			TrueColorForeground = TrueColor.FromConsoleColor (foreground);
-			TrueColorBackground = TrueColor.FromConsoleColor (background);
+			//TrueColorForeground = TrueColor.FromColorName (foreground);
+			//TrueColorBackground = TrueColor.FromColorName (background);
 		}
 
 		/// <summary>
@@ -353,8 +474,8 @@ namespace Terminal.Gui {
 		{
 			Foreground = foreground;
 			Background = background;
-			TrueColorForeground = TrueColor.FromConsoleColor (foreground);
-			TrueColorBackground = TrueColor.FromConsoleColor (background);
+			//TrueColorForeground = TrueColor.FromColorName (foreground);
+			//TrueColorBackground = TrueColor.FromColorName (background);
 			Value = value;
 			Initialized = true;
 		}
@@ -364,12 +485,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="foreground">Foreground</param>
 		/// <param name="background">Background</param>
-		public Attribute (Color foreground = new Color (), Color background = new Color ())
+		public Attribute (Color foreground, Color background)
 		{
 			Foreground = foreground;
 			Background = background;
-			TrueColorForeground = TrueColor.FromConsoleColor (foreground);
-			TrueColorBackground = TrueColor.FromConsoleColor (background);
+			//TrueColorForeground = TrueColor.FromColorName (foreground);
+			//TrueColorBackground = TrueColor.FromColorName (background);
 
 			var make = Make (foreground, background);
 			Initialized = make.Initialized;
@@ -485,6 +606,30 @@ namespace Terminal.Gui {
 					Initialized = false,
 					Foreground = foreground,
 					Background = background
+				};
+			}
+			return Application.Driver.MakeAttribute (foreground, background);
+		}
+
+
+		/// <summary>
+		/// Creates an <see cref="Attribute"/> from the specified foreground and background colors.
+		/// </summary>
+		/// <remarks>
+		/// If a <see cref="ConsoleDriver"/> has not been loaded (<c>Application.Driver == null</c>) this
+		/// method will return an attribute with <see cref="Initialized"/> set to  <see langword="false"/>.
+		/// </remarks>
+		/// <returns>The new attribute.</returns>
+		/// <param name="foreground">Foreground color to use.</param>
+		/// <param name="background">Background color to use.</param>
+		public static Attribute Make (ColorNames foreground, ColorNames background)
+		{
+			if (Application.Driver == null) {
+				// Create the attribute, but show it's not been initialized
+				return new Attribute () {
+					Initialized = false,
+					Foreground = new Color(foreground),
+					Background = new Color(background)
 				};
 			}
 			return Application.Driver.MakeAttribute (foreground, background);

@@ -69,7 +69,7 @@ public class FakeDriver : ConsoleDriver {
 		FakeConsole.ResetColor ();
 		FakeConsole.Clear ();
 	}
-	
+
 	public override void Init (Action terminalResized)
 	{
 		FakeConsole.MockKeyPresses.Clear ();
@@ -134,8 +134,8 @@ public class FakeDriver : ConsoleDriver {
 					// Performance: Only send the escape sequence if the attribute has changed.
 					if (attr != redrawAttr) {
 						redrawAttr = attr;
-						FakeConsole.ForegroundColor = (ConsoleColor)attr.Foreground;
-						FakeConsole.BackgroundColor = (ConsoleColor)attr.Background;
+						FakeConsole.ForegroundColor = (ConsoleColor)attr.Foreground.Value;
+						FakeConsole.BackgroundColor = (ConsoleColor)attr.Background.Value;
 					}
 					outputWidth++;
 					var rune = (Rune)Contents [row, col].Runes [0];
@@ -168,7 +168,7 @@ public class FakeDriver : ConsoleDriver {
 			foreach (var c in output.ToString ()) {
 				FakeConsole.Write (c);
 			}
-			
+
 			output.Clear ();
 			lastCol += outputWidth;
 			outputWidth = 0;
@@ -229,6 +229,10 @@ public class FakeDriver : ConsoleDriver {
 		);
 	}
 
+	public override Attribute MakeColor (ColorNames foreground, ColorNames background)
+	{
+		return MakeColor (new Color (foreground), new Color (background));
+	}
 	#endregion
 
 	public ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)

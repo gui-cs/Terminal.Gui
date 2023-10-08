@@ -11,7 +11,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void Constructors ()
 		{
 			var colorPicker = new ColorPicker ();
-			Assert.Equal (Color.Black, colorPicker.SelectedColor);
+			Assert.Equal (ColorNames.Black, colorPicker.SelectedColor);
 			Assert.Equal (new Point (0, 0), colorPicker.Cursor);
 			Assert.True (colorPicker.CanFocus);
 
@@ -26,25 +26,25 @@ namespace Terminal.Gui.ViewsTests {
 		public void KeyBindings_Command ()
 		{
 			var colorPicker = new ColorPicker ();
-			Assert.Equal (Color.Black, colorPicker.SelectedColor);
+			Assert.Equal (ColorNames.Black, colorPicker.SelectedColor);
 
 			Assert.True (colorPicker.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
-			Assert.Equal (Color.Blue, colorPicker.SelectedColor);
+			Assert.Equal (ColorNames.Blue, colorPicker.SelectedColor);
 
 			Assert.True (colorPicker.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
-			Assert.Equal (Color.BrightBlue, colorPicker.SelectedColor);
+			Assert.Equal (ColorNames.BrightBlue, colorPicker.SelectedColor);
 
 			Assert.True (colorPicker.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
-			Assert.Equal (Color.DarkGray, colorPicker.SelectedColor);
+			Assert.Equal (ColorNames.DarkGray, colorPicker.SelectedColor);
 
 			Assert.True (colorPicker.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ())));
-			Assert.Equal (Color.Black, colorPicker.SelectedColor);
+			Assert.Equal (ColorNames.Black, colorPicker.SelectedColor);
 
 			Assert.True (colorPicker.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
-			Assert.Equal (Color.Black, colorPicker.SelectedColor);
+			Assert.Equal (ColorNames.Black, colorPicker.SelectedColor);
 
 			Assert.True (colorPicker.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ())));
-			Assert.Equal (Color.Black, colorPicker.SelectedColor);
+			Assert.Equal (ColorNames.Black, colorPicker.SelectedColor);
 		}
 
 		[Fact]
@@ -52,12 +52,12 @@ namespace Terminal.Gui.ViewsTests {
 		public void MouseEvents ()
 		{
 			var colorPicker = new ColorPicker ();
-			Assert.Equal (Color.Black, colorPicker.SelectedColor);
+			Assert.Equal (ColorNames.Black, colorPicker.SelectedColor);
 
 			Assert.False (colorPicker.MouseEvent (new MouseEvent ()));
 
 			Assert.True (colorPicker.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked, X = 4, Y = 0 }));
-			Assert.Equal (Color.Blue, colorPicker.SelectedColor);
+			Assert.Equal (ColorNames.Blue, colorPicker.SelectedColor);
 		}
 
 		[Fact]
@@ -65,7 +65,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void SelectedColorAndCursor ()
 		{
 			var colorPicker = new ColorPicker ();
-			colorPicker.SelectedColor = Color.White;
+			colorPicker.SelectedColor = ColorNames.White;
 			Assert.Equal (7, colorPicker.Cursor.X);
 			Assert.Equal (1, colorPicker.Cursor.Y);
 
@@ -74,10 +74,10 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (0, colorPicker.Cursor.Y);
 
 			colorPicker.Cursor = new Point (7, 1);
-			Assert.Equal (Color.White, colorPicker.SelectedColor);
+			Assert.Equal (ColorNames.White, colorPicker.SelectedColor);
 
 			colorPicker.Cursor = new Point (0, 0);
-			Assert.Equal (Color.Black, colorPicker.SelectedColor);
+			Assert.Equal (ColorNames.Black, colorPicker.SelectedColor);
 		}
 	}
 }

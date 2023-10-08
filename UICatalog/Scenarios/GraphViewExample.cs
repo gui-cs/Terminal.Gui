@@ -96,7 +96,8 @@ namespace UICatalog.Scenarios {
 
 			about.Text = "Housing Expenditures by income thirds 1996-2003";
 
-			var fore = graphView.ColorScheme.Normal.Foreground == Color.Black ? Color.White : graphView.ColorScheme.Normal.Foreground;
+			// BUGBUG: (v2 truecolor) This code depends on 8-bit color names; refactor
+			var fore = graphView.ColorScheme.Normal.Foreground == new Color(ColorNames.Black) ? new Color(ColorNames.White) : graphView.ColorScheme.Normal.Foreground;
 			var black = Application.Driver.MakeAttribute (fore, Color.Black);
 			var cyan = Application.Driver.MakeAttribute (Color.BrightCyan, Color.Black);
 			var magenta = Application.Driver.MakeAttribute (Color.BrightMagenta, Color.Black);
