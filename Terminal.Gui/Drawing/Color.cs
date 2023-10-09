@@ -15,7 +15,6 @@ namespace Terminal.Gui {
 	/// <remarks>
 	/// The <see cref="Attribute.HasValidColors"/> value indicates either no-color has been set or the color is invalid.
 	/// </remarks>
-	[JsonConverter (typeof (ColorJsonConverter))]
 	public enum ColorNames {
 		/// <summary>
 		/// The black color.
@@ -83,6 +82,7 @@ namespace Terminal.Gui {
 		White
 	}
 
+	[JsonConverter (typeof (ColorJsonConverter))]
 	public class Color {
 		public Color (ColorNames colorName)
 		{
@@ -474,8 +474,8 @@ namespace Terminal.Gui {
 		{
 			Foreground = foreground;
 			Background = background;
-			//TrueColorForeground = TrueColor.FromColorName (foreground);
-			//TrueColorBackground = TrueColor.FromColorName (background);
+			TrueColorForeground = TrueColor.FromColorName ((ColorNames)foreground.Value);
+			TrueColorBackground = TrueColor.FromColorName ((ColorNames)background.Value);
 			Value = value;
 			Initialized = true;
 		}
@@ -489,8 +489,8 @@ namespace Terminal.Gui {
 		{
 			Foreground = foreground;
 			Background = background;
-			//TrueColorForeground = TrueColor.FromColorName (foreground);
-			//TrueColorBackground = TrueColor.FromColorName (background);
+			TrueColorForeground = TrueColor.FromColorName ((ColorNames)foreground.Value);
+			TrueColorBackground = TrueColor.FromColorName ((ColorNames)background.Value);
 
 			var make = Make (foreground, background);
 			Initialized = make.Initialized;
