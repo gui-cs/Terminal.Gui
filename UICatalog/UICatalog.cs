@@ -50,9 +50,6 @@ namespace UICatalog {
 	/// </para>	
 	/// </remarks>
 	class UICatalogApp {
-		//[SerializableConfigurationProperty (Scope = typeof (AppScope), OmitClassName = true), JsonPropertyName ("UICatalog.StatusBar")]
-		//public static bool ShowStatusBar { get; set; } = true;
-
 		[SerializableConfigurationProperty (Scope = typeof (AppScope), OmitClassName = true), JsonPropertyName ("UICatalog.StatusBar")]
 		public static bool ShowStatusBar { get; set; } = true;
 
