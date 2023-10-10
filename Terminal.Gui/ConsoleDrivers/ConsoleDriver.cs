@@ -441,7 +441,7 @@ public abstract class ConsoleDriver {
 	/// <param name="value">The platform-dependent color value.</param>
 	/// <param name="foreground">The foreground.</param>
 	/// <param name="background">The background.</param>
-	internal abstract void GetColors (int value, out Color foreground, out Color background);
+	internal abstract void GetColors (int value, out ColorNames foreground, out ColorNames background);
 
 	/// <summary>
 	/// Gets the current <see cref="Attribute"/>.

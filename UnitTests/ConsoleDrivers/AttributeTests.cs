@@ -172,10 +172,10 @@ namespace Terminal.Gui.DriverTests {
 		{
 			var driver = Application.Driver;
 			var attrValue = new Attribute (Color.Red, Color.Green).Value;
-			driver.GetColors (attrValue, out Color fg, out Color bg);
+			driver.GetColors (attrValue, out ColorNames fg, out ColorNames bg);
 
-			Assert.Equal ((Color)Color.Red, fg);
-			Assert.Equal ((Color)Color.Green, bg);
+			Assert.Equal ((Color)Color.Red, (Color)fg);
+			Assert.Equal ((Color)Color.Green, (Color)bg);
 		}
 
 		[Fact]

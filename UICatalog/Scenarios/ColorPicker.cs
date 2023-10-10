@@ -61,6 +61,7 @@ namespace UICatalog.Scenarios {
 			backgroundColorPicker = new ColorPicker () { 
 				Title = "Background Color",
 				Y = 0,
+				X = 0,
 				BoxHeight = 1,
 				BoxWidth = 4,
 				BorderStyle = LineStyle.Single
@@ -68,7 +69,6 @@ namespace UICatalog.Scenarios {
 			backgroundColorPicker.X = Pos.AnchorEnd () - (Pos.Right (backgroundColorPicker) - Pos.Left (backgroundColorPicker));
 			backgroundColorPicker.ColorChanged += BackgroundColor_ColorChanged;
 			Win.Add (backgroundColorPicker);
-
 			_backgroundColorLabel = new Label ();
 			_backgroundColorLabel.X = Pos.AnchorEnd () - (Pos.Right (_backgroundColorLabel) - Pos.Left (_backgroundColorLabel));
 			_backgroundColorLabel.Y = Pos.Bottom (backgroundColorPicker) + 1;
@@ -89,9 +89,8 @@ namespace UICatalog.Scenarios {
 			Win.Add (_demoView);
 
 			// Set default colors.
-			// BUGBUG: (v2 truecolor) This code depends on 8-bit color names; disabling for now
-			//backgroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Background;
-			//foregroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Foreground;
+			foregroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Foreground.ColorName;
+			backgroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Background.ColorName;
 		}
 
 		/// <summary>
@@ -125,9 +124,7 @@ namespace UICatalog.Scenarios {
 		/// Update Demo Label.
 		/// </summary>
 		private void UpdateDemoLabel () => _demoView.ColorScheme = new ColorScheme () {
-			// BUGBUG: (v2 truecolor) This code depends on 8-bit color names; disabling for now
-
-			//Normal = new Terminal.Gui.Attribute (foregroundColorPicker.SelectedColor, backgroundColorPicker.SelectedColor)
+			Normal = new Attribute (foregroundColorPicker.SelectedColor, backgroundColorPicker.SelectedColor)
 		};
 	}
 }

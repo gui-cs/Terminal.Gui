@@ -207,11 +207,11 @@ public class FakeDriver : ConsoleDriver {
 	/// Extracts the foreground and background colors from the encoded value.
 	/// Assumes a 4-bit encoded value for both foreground and background colors.
 	/// </remarks>
-	internal override void GetColors (int value, out Color foreground, out Color background)
+	internal override void GetColors (int value, out ColorNames foreground, out ColorNames background)
 	{
 		// Assume a 4-bit encoded value for both foreground and background colors.
-		foreground = (Color)((value >> 16) & 0xF);
-		background = (Color)(value & 0xF);
+		foreground = (ColorNames)((value >> 16) & 0xF);
+		background = (ColorNames)(value & 0xF);
 	}
 
 	/// <remarks>
@@ -223,7 +223,7 @@ public class FakeDriver : ConsoleDriver {
 	{
 		// Encode the colors into the int value.
 		return new Attribute (
-			value: ((((int)foreground) & 0xffff) << 16) | (((int)background) & 0xffff),
+			platformColor: ((((int)foreground) & 0xffff) << 16) | (((int)background) & 0xffff),
 			foreground: foreground,
 			background: background
 		);

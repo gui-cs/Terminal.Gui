@@ -2516,9 +2516,9 @@ namespace Terminal.Gui {
 		{
 			// BUGBUG: (v2 truecolor) This code depends on 8-bit color names; disabling for now
 			//if ((colorScheme!.HotNormal.Foreground & colorScheme.Focus.Background) == colorScheme.Focus.Foreground) {
-			//	Driver.SetAttribute (new Attribute (colorScheme.Focus.Background, colorScheme.Focus.Foreground));
+				Driver.SetAttribute (new Attribute (colorScheme.Focus.Background, colorScheme.Focus.Foreground));
 			//} else {
-			//	Driver.SetAttribute (new Attribute (colorScheme!.HotNormal.Foreground & colorScheme.Focus.Background, colorScheme.Focus.Foreground));
+				//Driver.SetAttribute (new Attribute (colorScheme!.HotNormal.Foreground & colorScheme.Focus.Background, colorScheme.Focus.Foreground));
 			//}
 		}
 

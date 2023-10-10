@@ -33,7 +33,7 @@ namespace UICatalog.Scenarios {
 				};
 				Win.Add (hl);
 				vx++;
-				foreach (Color fg in colors) {
+				foreach (ColorNames fg in colors) {
 					var c = new Attribute (fg, bg);
 					var t = x.ToString ();
 					var l = new Label (x, y, t [t.Length - 1].ToString ()) {
