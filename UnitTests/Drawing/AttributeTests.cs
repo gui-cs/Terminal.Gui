@@ -10,6 +10,83 @@ using Console = Terminal.Gui.FakeConsole;
 namespace Terminal.Gui.DrawingTests;
 public class AttributeTests {
 	[Fact]
+	public void DefaultConstructor ()
+	{
+		// Arrange & Act
+		var attribute = new Attribute ();
+
+		// Assert
+		Assert.False (attribute.Initialized);
+		Assert.Equal (-1, attribute.Value);
+		Assert.Equal ((Color)Color.White, attribute.Foreground);
+		Assert.Equal ((Color)Color.Black, attribute.Background);
+
+	}
+
+	[Fact]
+	public void PlatformColorConstructor ()
+	{
+		// Arrange & Act
+		var attribute = new Attribute (42);
+
+		// Assert
+		Assert.False (attribute.Initialized);
+		Assert.Equal (42, attribute.Value);
+		Assert.Equal ((Color)Color.White, attribute.Foreground);
+		Assert.Equal ((Color)Color.Black, attribute.Background);
+	}
+
+	[Fact]
+	public void ColorNamesConstructor ()
+	{
+		// Arrange & Act
+		var attribute = new Attribute (ColorNames.Blue);
+
+		// Assert
+		Assert.Equal ((Color)Color.Blue, attribute.Foreground);
+		Assert.Equal ((Color)Color.Blue, attribute.Background);
+	}
+
+	[Fact, AutoInitShutdown]
+	public void ColorConstructor ()
+	{
+		// Arrange & Act
+		var foregroundColor = new Color (0, 0, 255);
+		var backgroundColor = new Color (255, 255, 255);
+		var attribute = new Attribute (foregroundColor, backgroundColor);
+
+		// Assert
+		Assert.Equal (foregroundColor, attribute.Foreground);
+		Assert.Equal (backgroundColor, attribute.Background);
+	}
+
+	[Fact, AutoInitShutdown]
+	public void ColorAndColorNamesConstructor ()
+	{
+		// Arrange & Act
+		var foregroundColor = new Color (0, 0, 255);
+		var backgroundColorName = ColorNames.Black;
+		var attribute = new Attribute (foregroundColor, backgroundColorName);
+
+		// Assert
+		Assert.Equal (foregroundColor, attribute.Foreground);
+		Assert.Equal ((Color)backgroundColorName, attribute.Background);
+	}
+
+	[Fact]
+	public void ColorNamesAndColorConstructor ()
+	{
+		// Arrange & Act
+		var foregroundColorName = ColorNames.BrightYellow;
+		var backgroundColor = new Color (128, 128, 128);
+		var attribute = new Attribute (foregroundColorName, backgroundColor);
+
+		// Assert
+		Assert.Equal ((Color)foregroundColorName, attribute.Foreground);
+		Assert.Equal (backgroundColor, attribute.Background);
+	}
+
+	[Fact]
 	public void Constuctors_Constuct ()
 	{
 		var driver = new FakeDriver ();
@@ -52,6 +129,68 @@ public class AttributeTests {
 		driver.End ();
 		Application.Shutdown ();
 	}
+
+	[Fact]
+	public void MakeColorAndColor_ForegroundAndBackgroundShouldMatchInput ()
+	{
+		// Arrange
+		var foregroundColor = new Color (0, 0, 255);
+		var backgroundColor = new Color (255, 255, 255);
+
+		// Act
+		var attribute = Attribute.Make (foregroundColor, backgroundColor);
+
+		// Assert
+		Assert.Equal (foregroundColor, attribute.Foreground);
+		Assert.Equal (backgroundColor, attribute.Background);
+	}
+
+	[Fact]
+	public void MakeColorNamesAndColorNames_ForegroundAndBackgroundShouldMatchInput ()
+	{
+		// Arrange
+		var foregroundColorName = ColorNames.BrightYellow;
+		var backgroundColorName = ColorNames.Black;
+
+		// Act
+		var attribute = Attribute.Make (foregroundColorName, backgroundColorName);
+
+		// Assert
+		Assert.Equal ((Color)foregroundColorName, attribute.Foreground);
+		Assert.Equal ((Color)backgroundColorName, attribute.Background);
+	}
+
+	[Fact]
+	public void MakeColorNamesAndColor_ForegroundAndBackgroundShouldMatchInput ()
+	{
+		// Arrange
+		var foregroundColorName = ColorNames.Green;
+		var backgroundColor = new Color (128, 128, 128);
+
+		// Act
+		var attribute = Attribute.Make (foregroundColorName, backgroundColor);
+
+		// Assert
+		Assert.Equal ((Color)foregroundColorName, attribute.Foreground);
+		Assert.Equal (backgroundColor, attribute.Background);
+	}
+
+	[Fact]
+	public void MakeColorAndColorNames_ForegroundAndBackgroundShouldMatchInput ()
+	{
+		// Arrange
+		var foregroundColor = new Color (255, 0, 0);
+		var backgroundColorName = ColorNames.White;
+
+		// Act
+		var attribute = Attribute.Make (foregroundColor, backgroundColorName);
+
+		// Assert
+		Assert.Equal (foregroundColor, attribute.Foreground);
+		Assert.Equal ((Color)backgroundColorName, attribute.Background);
+	}
+
+
 
 	[Fact]
 	public void Implicit_Assign ()
@@ -238,4 +377,68 @@ public class AttributeTests {
 		Assert.False (attr1.Equals (attr2));
 		Assert.False (attr2.Equals (attr1));
 	}
+
+
+	[Fact]
+	public void EqualityOperator_ShouldReturnTrueForEqualAttributes ()
+	{
+		// Arrange
+		var attribute1 = new Attribute (Color.Red, Color.Black);
+		var attribute2 = new Attribute (Color.Red, Color.Black);
+
+		// Act & Assert
+		Assert.True (attribute1 == attribute2);
+	}
+
+	[Fact]
+	public void EqualityOperator_ShouldReturnFalseForDifferentAttributes ()
+	{
+		// Arrange
+		var attribute1 = new Attribute (Color.Red, Color.Black);
+		var attribute2 = new Attribute (Color.Blue, Color.Black);
+
+		// Act & Assert
+		Assert.False (attribute1 == attribute2);
+	}
+
+	[Fact]
+	public void InequalityOperator_ShouldReturnTrueForDifferentAttributes ()
+	{
+		// Arrange
+		var attribute1 = new Attribute (Color.Red, Color.Black);
+		var attribute2 = new Attribute (Color.Blue, Color.Black);
+
+		// Act & Assert
+		Assert.True (attribute1 != attribute2);
+	}
+
+	[Fact]
+	public void InequalityOperator_ShouldReturnFalseForEqualAttributes ()
+	{
+		// Arrange
+		var attribute1 = new Attribute (Color.Red, Color.Black);
+		var attribute2 = new Attribute (Color.Red, Color.Black);
+
+		// Act & Assert
+		Assert.False (attribute1 != attribute2);
+	}
+
+
+	[Fact]
+	public void ToString_ShouldReturnFormattedStringWithForegroundAndBackground ()
+	{
+		// Arrange
+		var foregroundColor = new Color (0, 0, 255);
+		var backgroundColor = new Color (255, 255, 255);
+		var expectedString = $"{foregroundColor},{backgroundColor}";
+
+		// Act
+		var attribute = new Attribute (foregroundColor, backgroundColor);
+		var attributeString = attribute.ToString ();
+
+		// Assert
+		Assert.Equal (expectedString, attributeString);
+	}
+
+
 }
