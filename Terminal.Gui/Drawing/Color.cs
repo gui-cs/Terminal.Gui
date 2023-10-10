@@ -937,7 +937,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Creates a new instance.
 		/// </summary>
-		public ColorScheme () { }
+		public ColorScheme () : this (Attribute.Default) { }
 
 		/// <summary>
 		/// Creates a new instance, initialized with the values from <paramref name="scheme"/>.
