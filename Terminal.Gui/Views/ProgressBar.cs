@@ -90,7 +90,7 @@ namespace Terminal.Gui {
 			CanFocus = false;
 			fraction = 0;
 			ColorScheme = new ColorScheme () {
-				Normal = Application.Driver.MakeAttribute (Color.BrightGreen, Color.Gray),
+				Normal = new Attribute (Color.BrightGreen, Color.Gray),
 				HotNormal = Colors.Base.Normal
 			};
 			if (rect.IsEmpty) {

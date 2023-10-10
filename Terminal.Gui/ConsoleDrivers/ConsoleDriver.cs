@@ -391,7 +391,7 @@ public abstract class ConsoleDriver {
 		get => _currentAttribute;
 		set {
 			if (value is { Initialized: false, HasValidColors: true } && Application.Driver != null) {
-				_currentAttribute = Application.Driver.MakeAttribute (value.Foreground, value.Background);
+				_currentAttribute = new Attribute (value.Foreground, value.Background);
 				return;
 			}
 			if (!value.Initialized) Debug.WriteLine ("ConsoleDriver.CurrentAttribute: Attributes must be initialized before use.");

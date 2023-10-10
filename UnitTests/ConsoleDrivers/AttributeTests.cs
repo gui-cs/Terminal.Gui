@@ -25,10 +25,10 @@ namespace Terminal.Gui.DriverTests {
 
 			// Test foreground, background
 			var fg = new Color ();
-			fg = Color.Red;
+			fg = (Color)Color.Red;
 
 			var bg = new Color ();
-			bg = Color.Blue;
+			bg = (Color)Color.Blue;
 
 			attr = new Attribute (fg, bg);
 
@@ -64,10 +64,10 @@ namespace Terminal.Gui.DriverTests {
 
 			var value = 42;
 			var fg = new Color ();
-			fg = Color.Red;
+			fg = (Color)Color.Red;
 
 			var bg = new Color ();
-			bg = Color.Blue;
+			bg = (Color)Color.Blue;
 
 			// Test conversion to int
 			attr = new Attribute (value, fg, bg);
@@ -84,10 +84,10 @@ namespace Terminal.Gui.DriverTests {
 		public void Make_SetsNotInitialized_NoDriver ()
 		{
 			var fg = new Color ();
-			fg = Color.Red;
+			fg = (Color)Color.Red;
 
 			var bg = new Color ();
-			bg = Color.Blue;
+			bg = (Color)Color.Blue;
 
 			var a = Attribute.Make (fg, bg);
 
@@ -102,10 +102,10 @@ namespace Terminal.Gui.DriverTests {
 			driver.Init (() => { });
 
 			var fg = new Color ();
-			fg = Color.Red;
+			fg = (Color)Color.Red;
 
 			var bg = new Color ();
-			bg = Color.Blue;
+			bg = (Color)Color.Blue;
 
 			var attr = Attribute.Make (fg, bg);
 			Assert.True (attr.Initialized);
@@ -121,10 +121,10 @@ namespace Terminal.Gui.DriverTests {
 		{
 
 			var fg = new Color ();
-			fg = Color.Red;
+			fg = (Color)Color.Red;
 
 			var bg = new Color ();
-			bg = Color.Blue;
+			bg = (Color)Color.Blue;
 
 			var attr = Attribute.Make (fg, bg);
 			Assert.False (attr.Initialized);
@@ -147,10 +147,10 @@ namespace Terminal.Gui.DriverTests {
 
 			var value = 42;
 			var fg = new Color ();
-			fg = Color.Red;
+			fg = (Color)Color.Red;
 
 			var bg = new Color ();
-			bg = Color.Blue;
+			bg = (Color)Color.Blue;
 
 			var attr = new Attribute (value, fg, bg);
 
@@ -174,8 +174,8 @@ namespace Terminal.Gui.DriverTests {
 			var attrValue = new Attribute (Color.Red, Color.Green).Value;
 			driver.GetColors (attrValue, out Color fg, out Color bg);
 
-			Assert.Equal (Color.Red, fg);
-			Assert.Equal (Color.Green, bg);
+			Assert.Equal ((Color)Color.Red, fg);
+			Assert.Equal ((Color)Color.Green, bg);
 		}
 
 		[Fact]

@@ -509,7 +509,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var bgcolor = !IsValid ? Color.BrightRed : ColorScheme.Focus.Background;
+			var bgcolor = !IsValid ? (Color)Color.BrightRed : ColorScheme.Focus.Background;
 			var textColor = new Attribute (ColorScheme.Focus.Foreground, bgcolor);
 
 			var (margin_left, margin_right) = GetMargins (Bounds.Width);

@@ -59,7 +59,7 @@ namespace UICatalog.Scenarios {
 				Disabled = Win.ColorScheme.Disabled,
 				HotFocus = Win.ColorScheme.HotFocus,
 				Focus = Win.ColorScheme.Focus,
-				Normal = Application.Driver.MakeAttribute (Color.DarkGray, Color.Black)
+				Normal = new Attribute (Color.DarkGray, Color.Black)
 			};
 
 			tableView.Table = new DataTableSource (this.table = dt);
@@ -127,7 +127,7 @@ namespace UICatalog.Scenarios {
 				for (int i = 0; i < render.Length; i++) {
 
 					if (unicorns != -1 && i >= unicorns && i <= unicorns + 8) {
-						Driver.SetAttribute (Driver.MakeAttribute (Color.White, cellColor.Background));
+						Driver.SetAttribute (new Attribute (Color.White, cellColor.Background));
 					}
 
 					if (rainbows != -1 && i >= rainbows && i <= rainbows + 8) {
@@ -135,28 +135,28 @@ namespace UICatalog.Scenarios {
 						var letterOfWord = i - rainbows;
 						switch (letterOfWord) {
 						case 0:
-							Driver.SetAttribute (Driver.MakeAttribute (Color.Red, cellColor.Background));
+							Driver.SetAttribute (new Attribute (Color.Red, cellColor.Background));
 							break;
 						case 1:
-							Driver.SetAttribute (Driver.MakeAttribute (Color.BrightRed, cellColor.Background));
+							Driver.SetAttribute (new Attribute (Color.BrightRed, cellColor.Background));
 							break;
 						case 2:
-							Driver.SetAttribute (Driver.MakeAttribute (Color.BrightYellow, cellColor.Background));
+							Driver.SetAttribute (new Attribute (Color.BrightYellow, cellColor.Background));
 							break;
 						case 3:
-							Driver.SetAttribute (Driver.MakeAttribute (Color.Green, cellColor.Background));
+							Driver.SetAttribute (new Attribute (Color.Green, cellColor.Background));
 							break;
 						case 4:
-							Driver.SetAttribute (Driver.MakeAttribute (Color.BrightGreen, cellColor.Background));
+							Driver.SetAttribute (new Attribute (Color.BrightGreen, cellColor.Background));
 							break;
 						case 5:
-							Driver.SetAttribute (Driver.MakeAttribute (Color.BrightBlue, cellColor.Background));
+							Driver.SetAttribute (new Attribute (Color.BrightBlue, cellColor.Background));
 							break;
 						case 6:
-							Driver.SetAttribute (Driver.MakeAttribute (Color.BrightCyan, cellColor.Background));
+							Driver.SetAttribute (new Attribute (Color.BrightCyan, cellColor.Background));
 							break;
 						case 7:
-							Driver.SetAttribute (Driver.MakeAttribute (Color.Cyan, cellColor.Background));
+							Driver.SetAttribute (new Attribute (Color.Cyan, cellColor.Background));
 							break;
 						}
 					}
