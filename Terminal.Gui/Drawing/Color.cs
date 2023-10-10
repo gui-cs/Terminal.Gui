@@ -733,18 +733,6 @@ namespace Terminal.Gui {
 		public override int GetHashCode () => HashCode.Combine (Value, Foreground, Background);
 
 		/// <summary>
-		/// Gets the current <see cref="Attribute"/> from the driver.
-		/// </summary>
-		/// <returns>The current attribute.</returns>
-		public static Attribute Get ()
-		{
-			if (Application.Driver == null) {
-				throw new InvalidOperationException ("The Application has not been initialized");
-			}
-			return Application.Driver.GetAttribute ();
-		}
-
-		/// <summary>
 		/// If <see langword="true"/> the attribute has been initialized by a <see cref="ConsoleDriver"/> and 
 		/// thus has <see cref="Value"/> that is valid for that driver. If <see langword="false"/> the <see cref="Foreground"/>
 		/// and <see cref="Background"/> colors may have been set '-1' but
