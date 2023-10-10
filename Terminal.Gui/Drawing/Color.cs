@@ -141,6 +141,9 @@ namespace Terminal.Gui {
 			B = c.B;
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Color"/>.
+		/// </summary>
 		public Color ()
 		{
 			A = 0xFF;
@@ -231,7 +234,7 @@ namespace Terminal.Gui {
 		// Euclidean distance between the input color and each dictionary color in RGB space,
 		// and keeps track of the closest entry found so far. The function returns a KeyValuePair
 		// representing the closest color entry and its associated color name.
-		public static ColorNames FindClosestColor (Color inputColor)
+		internal static ColorNames FindClosestColor (Color inputColor)
 		{
 			ColorNames closestColor = ColorNames.Black; // Default to Black
 			double closestDistance = double.MaxValue;
@@ -608,11 +611,11 @@ namespace Terminal.Gui {
 			Foreground = d.Foreground;
 			Background = d.Background;
 		}
-		
+
 		/// <summary>
 		/// Initializes a new instance with platform specific color value.
 		/// </summary>
-		/// <param name="value">Value.</param>
+		/// <param name="platformColor">Value.</param>
 		internal Attribute (int platformColor)
 		{
 			ColorNames foreground = Default.Foreground.ColorName;
@@ -629,9 +632,9 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Initializes a new instance with <see cref="ColorNames" value./>
+		/// Initializes a new instance with a <see cref="ColorNames"/> value.
 		/// </summary>
-		/// <param name="value">Value.</param>
+		/// <param name="colorName">Value.</param>
 		internal Attribute (ColorNames colorName)
 		{
 			ColorNames foreground = colorName;

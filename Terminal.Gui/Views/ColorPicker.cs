@@ -117,8 +117,6 @@ namespace Terminal.Gui {
 			SetInitialProperties ();
 		}
 
-		bool laidOut = false;
-
 		private void SetInitialProperties ()
 		{
 			CanFocus = true;

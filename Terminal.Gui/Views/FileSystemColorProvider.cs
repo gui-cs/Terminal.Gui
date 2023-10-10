@@ -14,7 +14,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="file"></param>
 		/// <returns></returns>
-		public Color? GetColor (IFileSystemInfo file)
+		public Color GetColor (IFileSystemInfo file)
 		{
 			if (FilenameToColor.ContainsKey (file.Name)) {
 				return FilenameToColor [file.Name];
