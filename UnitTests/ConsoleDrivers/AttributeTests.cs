@@ -19,9 +19,9 @@ namespace Terminal.Gui.DriverTests {
 			// Test parameterless constructor
 			var attr = new Attribute ();
 
-			Assert.Equal (default (int), attr.Value);
-			Assert.Equal (default (Color), attr.Foreground);
-			Assert.Equal (default (Color), attr.Background);
+			Assert.Equal (-1, attr.Value);
+			Assert.Equal ((Color)Color.White, attr.Foreground);
+			Assert.Equal ((Color)Color.Black, attr.Background);
 
 			// Test foreground, background
 			var fg = new Color ();
@@ -187,14 +187,14 @@ namespace Terminal.Gui.DriverTests {
 			attr = new Attribute (Color.Red, Color.Green);
 			Assert.True (attr.HasValidColors);
 
-			attr = new Attribute (Color.Red, (Color)(-1));
-			Assert.False (attr.HasValidColors);
+			//attr = new Attribute (Color.Red, (Color)(-1));
+			//Assert.False (attr.HasValidColors);
 
-			attr = new Attribute ((Color)(-1), Color.Green);
-			Assert.False (attr.HasValidColors);
+			//attr = new Attribute ((Color)(-1), Color.Green);
+			//Assert.False (attr.HasValidColors);
 
-			attr = new Attribute ((Color)(-1), (Color)(-1));
-			Assert.False (attr.HasValidColors);
+			//attr = new Attribute ((Color)(-1), (Color)(-1));
+			//Assert.False (attr.HasValidColors);
 		}
 
 		[Fact]

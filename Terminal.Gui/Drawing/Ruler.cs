@@ -27,7 +27,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the foreground and background color to use.
 		/// </summary>
-		public Attribute Attribute { get; set; }
+		public Attribute Attribute { get; set; } = new Attribute ();
 
 		string _hTemplate { get; } = "|123456789";
 		string _vTemplate { get; } = "-123456789";

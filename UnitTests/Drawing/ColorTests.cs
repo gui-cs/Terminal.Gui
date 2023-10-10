@@ -55,7 +55,7 @@ public class ColorTests {
 		Assert.Equal (expectedR, color.R);
 		Assert.Equal (expectedG, color.G);
 		Assert.Equal (expectedB, color.B);
-		Assert.Equal (0, color.A); // Alpha should be 0 by default
+		Assert.Equal (0xFF, color.A); // Alpha should be FF by default
 	}
 
 	[Fact]
@@ -98,7 +98,7 @@ public class ColorTests {
 	{
 		// Arrange
 		ColorNames colorName = ColorNames.Blue;
-		var expectedColor = new Color (0, 0, 0x80); // Blue
+		var expectedColor = new Color (0, 55, 218); // Blue
 
 		// Act
 		var color = new Color (colorName);
@@ -111,7 +111,7 @@ public class ColorTests {
 	public void Color_ToString_WithNamedColor ()
 	{
 		// Arrange
-		Color color = new Color (0, 0, 0x80); // Blue
+		Color color = new Color (0, 55, 218); // Blue
 
 		// Act
 		string colorString = color.ToString ();
@@ -124,13 +124,13 @@ public class ColorTests {
 	public void Color_ToString_WithRGBColor ()
 	{
 		// Arrange
-		Color color = new Color (128, 64, 32); // Custom RGB color
+		Color color = new Color (1, 64, 32); // Custom RGB color
 
 		// Act
 		string colorString = color.ToString ();
 
 		// Assert
-		Assert.Equal ("#804020", colorString);
+		Assert.Equal ("#014020", colorString);
 	}
 
 	[Fact]
@@ -167,7 +167,7 @@ public class ColorTests {
 	{
 		// Arrange
 		ColorNames colorName = ColorNames.Blue;
-		var expectedColor = new Color (0, 0, 0x80); // Blue
+		var expectedColor = new Color (0, 55, 218); // Blue
 
 		// Act
 		Color color = (Color)colorName;
@@ -221,7 +221,7 @@ public class ColorTests {
 	{
 		// Arrange
 		var color1 = new Color (ColorNames.Red);
-		var color2 = new Color (0x80, 0, 0); // Red in RGB
+		var color2 = new Color (197, 15, 31); // Red in RGB
 
 		// Act & Assert
 		Assert.True (ColorNames.Red == color1);
@@ -239,7 +239,7 @@ public class ColorTests {
 	{
 		// Arrange
 		var color1 = new Color (ColorNames.Red);
-		var color2 = new Color (0, 255, 255); // Cyan in RGB
+		var color2 = new Color (58, 150, 221); // Cyan in RGB
 
 		// Act & Assert
 		Assert.False (ColorNames.Red == color2);
@@ -254,7 +254,7 @@ public class ColorTests {
 	{
 		// Arrange
 		var colorName = ColorNames.Red;
-		var expectedColor = new Color (255, 0, 0); // Red in RGB
+		var expectedColor = new Color (197, 15, 31); // Red in RGB
 
 		// Act
 		var convertedColor = Color.FromColorName (colorName);
@@ -268,7 +268,7 @@ public class ColorTests {
 	{
 		// Arrange
 		int colorNameId = (int)ColorNames.Green;
-		var expectedColor = new Color (0, 255, 0); // Green in RGB
+		var expectedColor = new Color (19, 161, 14); // Green in RGB
 
 		// Act
 		var convertedColor = Color.FromColorName (colorNameId);
@@ -281,7 +281,7 @@ public class ColorTests {
 	public void Color_ColorName_Get_ReturnsClosestColorName ()
 	{
 		// Arrange
-		var color = new Color (128, 64, 32); // Custom RGB color, closest to Brown (0xC1, 0x9C, 0x00)
+		var color = new Color (128, 64, 40); // Custom RGB color, closest to Brown 
 		var expectedColorName = ColorNames.Brown;
 
 		// Act
@@ -299,9 +299,9 @@ public class ColorTests {
 		{
 			(new Color(0, 0, 0), ColorNames.Black),
 			(new Color(255, 255, 255), ColorNames.White),
-			(new Color(0, 0, 255), ColorNames.BrightBlue),
+			(new Color(5, 100, 255), ColorNames.BrightBlue),
 			(new Color(0, 255, 0), ColorNames.BrightGreen),
-			(new Color(255, 0, 0), ColorNames.BrightRed),
+			(new Color(255, 70, 8), ColorNames.BrightRed),
 			(new Color(0, 128, 128), ColorNames.Cyan),
 			(new Color(128, 64, 32), ColorNames.Brown),
 		};

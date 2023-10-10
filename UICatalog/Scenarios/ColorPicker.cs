@@ -117,7 +117,8 @@ namespace UICatalog.Scenarios {
 		private void UpdateColorLabel (Label label, ColorPicker colorPicker)
 		{
 			label.Clear ();
-			label.Text = $"{colorPicker.SelectedColor} - {(int)colorPicker.SelectedColor}";
+			var color = (Color)colorPicker.SelectedColor;
+			label.Text = $"{colorPicker.SelectedColor} ({(int)colorPicker.SelectedColor}) #{color.R:X2}{color.G:X2}{color.B:X2}";
 		}
 
 		/// <summary>

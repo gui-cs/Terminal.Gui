@@ -552,7 +552,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			}";
 
 			JsonException jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Settings.Update (json, "test"));
-			Assert.Equal ("Invalid Color: 'yellow'", jsonException.Message);
+			Assert.Equal ("Unexpected color name: yellow.", jsonException.Message);
 
 			// AbNormal is not a ColorScheme attribute
 			json = @"

@@ -883,7 +883,7 @@ internal class NetDriver : ConsoleDriver {
 	{
 		// Encode the colors into the int value.
 		return new Attribute (
-			platformColor: ((((int)foreground) & 0xffff) << 16) | (((int)background) & 0xffff),
+			platformColor: ((((int)foreground.ColorName) & 0xffff) << 16) | (((int)background.ColorName) & 0xffff),
 			foreground: foreground,
 			background: background
 		);
