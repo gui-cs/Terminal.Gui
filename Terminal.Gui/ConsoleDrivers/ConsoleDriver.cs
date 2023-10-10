@@ -390,7 +390,8 @@ public abstract class ConsoleDriver {
 	public Attribute CurrentAttribute {
 		get => _currentAttribute;
 		set {
-			if (value is { Initialized: false, HasValidColors: true } && Application.Driver != null) {
+			//if (value is { Initialized: false, HasValidColors: true } && Application.Driver != null) {
+			if (value is { Initialized: false } && Application.Driver != null) {
 				_currentAttribute = new Attribute (value.Foreground, value.Background);
 				return;
 			}

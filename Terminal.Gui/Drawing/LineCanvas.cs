@@ -545,17 +545,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private Attribute? GetAttributeForIntersects (IntersectionDefinition? [] intersects)
-		{
-			var set = new List<IntersectionDefinition?> (intersects.Where (i => i!.Line.Attribute?.HasValidColors ?? false));
-
-			if (set.Count == 0) {
-				return null;
-			}
-
-			return set [0]!.Line.Attribute;
-
-		}
+		private Attribute? GetAttributeForIntersects (IntersectionDefinition? [] intersects) =>intersects [0]!.Line.Attribute;
 
 		private Cell? GetCellForIntersects (ConsoleDriver driver, IntersectionDefinition? [] intersects)
 		{
