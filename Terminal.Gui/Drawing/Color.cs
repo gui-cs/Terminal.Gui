@@ -215,14 +215,14 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="consoleColor">The <see cref="Color"/> to convert.</param>
 		/// <returns></returns>
-		public static Color FromColorName (ColorNames consoleColor) => _colorNames.FirstOrDefault (x => x.Value == consoleColor).Key;
+		private static Color FromColorName (ColorNames consoleColor) => _colorNames.FirstOrDefault (x => x.Value == consoleColor).Key;
 
 		/// <summary>
 		/// Converts a legacy <see cref="ColorNames"/> index to a 24-bit <see cref="Color"/>.
 		/// </summary>
 		/// <param name="colorNameId">The index into the <see cref="ColorNames"/> enum to convert.</param>
 		/// <returns></returns>
-		public static Color FromColorName (int colorNameId)
+		private static Color FromColorName (int colorNameId)
 		{
 			return FromColorName ((ColorNames)colorNameId);
 		}

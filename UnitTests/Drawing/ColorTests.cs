@@ -257,21 +257,7 @@ public class ColorTests {
 		var expectedColor = new Color (197, 15, 31); // Red in RGB
 
 		// Act
-		var convertedColor = Color.FromColorName (colorName);
-
-		// Assert
-		Assert.Equal (expectedColor, convertedColor);
-	}
-
-	[Fact]
-	public void Color_FromColorName_ConvertsColorNameIdToColor ()
-	{
-		// Arrange
-		int colorNameId = (int)ColorNames.Green;
-		var expectedColor = new Color (19, 161, 14); // Green in RGB
-
-		// Act
-		var convertedColor = Color.FromColorName (colorNameId);
+		var convertedColor = (Color)colorName;
 
 		// Assert
 		Assert.Equal (expectedColor, convertedColor);
