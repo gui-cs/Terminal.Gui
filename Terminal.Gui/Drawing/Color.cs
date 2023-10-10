@@ -744,12 +744,13 @@ namespace Terminal.Gui {
 		[JsonIgnore]
 		public bool Initialized { get; internal set; }
 
-		/// <summary>
-		/// Returns <see langword="true"/> if the Attribute is valid (both foreground and background have valid color values).
-		/// </summary>
-		/// <returns></returns>
-		[JsonIgnore]
-		public bool HasValidColors => (int)Foreground.ColorName > -1 && (int)Background.ColorName > -1;
+		//// TODO: This no longer makes sense - remove it
+		///// <summary>
+		///// Returns <see langword="true"/> if the Attribute is valid (both foreground and background have valid color values).
+		///// </summary>
+		///// <returns></returns>
+		//[JsonIgnore]
+		//public bool HasValidColors => (int)Foreground.ColorName > -1 && (int)Background.ColorName > -1;
 
 		/// <inheritdoc />
 		public override string ToString ()
@@ -820,9 +821,9 @@ namespace Terminal.Gui {
 		public Attribute Normal {
 			get { return _normal; }
 			set {
-				if (!value.HasValidColors) {
-					return;
-				}
+				//if (!value.HasValidColors) {
+				//	return;
+				//}
 				_normal = value;
 			}
 		}
@@ -833,9 +834,9 @@ namespace Terminal.Gui {
 		public Attribute Focus {
 			get { return _focus; }
 			set {
-				if (!value.HasValidColors) {
-					return;
-				}
+				//if (!value.HasValidColors) {
+				//	return;
+				//}
 				_focus = value;
 			}
 		}
@@ -846,9 +847,9 @@ namespace Terminal.Gui {
 		public Attribute HotNormal {
 			get { return _hotNormal; }
 			set {
-				if (!value.HasValidColors) {
-					return;
-				}
+				//if (!value.HasValidColors) {
+				//	return;
+				//}
 				_hotNormal = value;
 			}
 		}
@@ -859,9 +860,9 @@ namespace Terminal.Gui {
 		public Attribute HotFocus {
 			get { return _hotFocus; }
 			set {
-				if (!value.HasValidColors) {
-					return;
-				}
+				//if (!value.HasValidColors) {
+				//	return;
+				//}
 				_hotFocus = value;
 			}
 		}
@@ -872,9 +873,9 @@ namespace Terminal.Gui {
 		public Attribute Disabled {
 			get { return _disabled; }
 			set {
-				if (!value.HasValidColors) {
-					return;
-				}
+				//if (!value.HasValidColors) {
+				//	return;
+				//}
 				_disabled = value;
 			}
 		}

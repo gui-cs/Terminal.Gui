@@ -110,19 +110,19 @@ public class AttributeTests {
 		attr = new Attribute (fg, bg);
 
 		Assert.True (attr.Initialized);
-		Assert.True (attr.HasValidColors);
+		//Assert.True (attr.HasValidColors);
 		Assert.Equal (fg, attr.Foreground);
 		Assert.Equal (bg, attr.Background);
 
 		attr = new Attribute (fg);
 		Assert.True (attr.Initialized);
-		Assert.True (attr.HasValidColors);
+		//Assert.True (attr.HasValidColors);
 		Assert.Equal (fg, attr.Foreground);
 		Assert.Equal (fg, attr.Background);
 
 		attr = new Attribute (bg);
 		Assert.True (attr.Initialized);
-		Assert.True (attr.HasValidColors);
+		//Assert.True (attr.HasValidColors);
 		Assert.Equal (bg, attr.Foreground);
 		Assert.Equal (bg, attr.Background);
 
@@ -272,40 +272,6 @@ public class AttributeTests {
 	}
 
 	[Fact]
-	public void Get_Asserts_NoDriver ()
-	{
-		Assert.Throws<InvalidOperationException> (() => Attribute.Get ());
-	}
-
-	[Fact]
-	public void Get_Gets ()
-	{
-		var driver = new FakeDriver ();
-		Application.Init (driver);
-		driver.Init (() => { });
-
-		var value = 42;
-		var fg = new Color ();
-		fg = (Color)Color.Red;
-
-		var bg = new Color ();
-		bg = (Color)Color.Blue;
-
-		var attr = new Attribute (value, fg, bg);
-
-		driver.SetAttribute (attr);
-
-		var ret_attr = Attribute.Get ();
-
-		Assert.Equal (value, ret_attr.Value);
-		Assert.Equal (fg, ret_attr.Foreground);
-		Assert.Equal (bg, ret_attr.Background);
-
-		driver.End ();
-		Application.Shutdown ();
-	}
-
-	[Fact]
 	[AutoInitShutdown]
 	public void GetColors_Based_On_Value ()
 	{
@@ -321,10 +287,10 @@ public class AttributeTests {
 	public void IsValid_Tests ()
 	{
 		var attr = new Attribute ();
-		Assert.True (attr.HasValidColors);
+		//Assert.True (attr.HasValidColors);
 
 		attr = new Attribute (Color.Red, Color.Green);
-		Assert.True (attr.HasValidColors);
+		//Assert.True (attr.HasValidColors);
 
 		//attr = new Attribute (Color.Red, (Color)(-1));
 		//Assert.False (attr.HasValidColors);
