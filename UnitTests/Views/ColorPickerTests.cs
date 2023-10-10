@@ -56,7 +56,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.False (colorPicker.MouseEvent (new MouseEvent ()));
 
-			Assert.True (colorPicker.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked, X = 4, Y = 0 }));
+			Assert.True (colorPicker.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked, X = 4, Y = 1 }));
 			Assert.Equal (ColorNames.Blue, colorPicker.SelectedColor);
 		}
 
