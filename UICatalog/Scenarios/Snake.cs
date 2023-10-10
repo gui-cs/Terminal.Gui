@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Terminal.Gui;
-using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Snake", Description: "The game of apple eating.")]

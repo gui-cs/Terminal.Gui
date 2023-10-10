@@ -155,37 +155,37 @@ internal class CursesDriver : ConsoleDriver {
 	{
 		switch (color) {
 		case Curses.COLOR_BLACK:
-			return Color.Black;
+			return new Color (Color.Black);
 		case Curses.COLOR_BLUE:
-			return Color.Blue;
+			return new Color (Color.Blue);
 		case Curses.COLOR_GREEN:
-			return Color.Green;
+			return (Color)Color.Green;
 		case Curses.COLOR_CYAN:
-			return Color.Cyan;
+			return (Color)Color.Cyan;
 		case Curses.COLOR_RED:
-			return Color.Red;
+			return (Color)Color.Red;
 		case Curses.COLOR_MAGENTA:
-			return Color.Magenta;
+			return (Color)Color.Magenta;
 		case Curses.COLOR_YELLOW:
-			return Color.Brown;
+			return (Color)Color.Brown;
 		case Curses.COLOR_WHITE:
-			return Color.Gray;
+			return (Color)Color.Gray;
 		case Curses.COLOR_GRAY:
-			return Color.DarkGray;
+			return (Color)Color.DarkGray;
 		case Curses.COLOR_BLUE | Curses.COLOR_GRAY:
-			return Color.BrightBlue;
+			return (Color)Color.BrightBlue;
 		case Curses.COLOR_GREEN | Curses.COLOR_GRAY:
-			return Color.BrightGreen;
+			return (Color)Color.BrightGreen;
 		case Curses.COLOR_CYAN | Curses.COLOR_GRAY:
-			return Color.BrightCyan;
+			return (Color)Color.BrightCyan;
 		case Curses.COLOR_RED | Curses.COLOR_GRAY:
-			return Color.BrightRed;
+			return (Color)Color.BrightRed;
 		case Curses.COLOR_MAGENTA | Curses.COLOR_GRAY:
-			return Color.BrightMagenta;
+			return (Color)Color.BrightMagenta;
 		case Curses.COLOR_YELLOW | Curses.COLOR_GRAY:
-			return Color.BrightYellow;
+			return (Color)Color.BrightYellow;
 		case Curses.COLOR_WHITE | Curses.COLOR_GRAY:
-			return Color.White;
+			return (Color)Color.White;
 		}
 		throw new ArgumentException ("Invalid curses color code");
 	}
@@ -614,7 +614,7 @@ internal class CursesDriver : ConsoleDriver {
 
 	UnixMainLoop _mainLoop;
 	object _processInputToken;
-	
+
 	public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 	{
 		if (!RunningUnitTests) {

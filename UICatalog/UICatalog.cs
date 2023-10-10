@@ -1,4 +1,5 @@
 global using CM = Terminal.Gui.ConfigurationManager;
+global using Attribute = Terminal.Gui.Attribute;
 
 using System;
 using System.Collections.Generic;

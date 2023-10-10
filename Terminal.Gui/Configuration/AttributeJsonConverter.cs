@@ -63,15 +63,28 @@ namespace Terminal.Gui {
 				case "truecolorbackground":
 					trueColorBackground = JsonSerializer.Deserialize<TrueColor> (color, options);
 					break;
-				//case "Bright":
+				//case "bright":
+				//case "bold":
 				//	attribute.Bright = reader.GetBoolean ();
 				//	break;
-				//case "Underline":
+				//case "dim":
+				//	attribute.Dim = reader.GetBoolean ();
+				//	break;
+				//case "underline":
 				//	attribute.Underline = reader.GetBoolean ();
 				//	break;
-				//case "Reverse":
+				//case "blink":
+				//	attribute.Blink = reader.GetBoolean ();
+				//	break;
+				//case "reverse":
 				//	attribute.Reverse = reader.GetBoolean ();
 				//	break;
+				//case "hidden":
+				//	attribute.Hidden = reader.GetBoolean ();
+				//	break;
+				//case "strike-through":
+				//	attribute.StrikeThrough = reader.GetBoolean ();
+				//	break;				
 				default:
 					throw new JsonException ($"Unknown Attribute property {propertyName}.");
 				}

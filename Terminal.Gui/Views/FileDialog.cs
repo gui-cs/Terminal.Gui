@@ -177,7 +177,7 @@ namespace Terminal.Gui {
 
 			this.tbPath = new TextField {
 				Width = Dim.Fill (0),
-				CaptionColor = Color.Black
+				CaptionColor = (Color)Color.Black
 			};
 			this.tbPath.KeyPress += (s, k) => {
 
@@ -273,7 +273,7 @@ namespace Terminal.Gui {
 
 			tbFind = new TextField {
 				X = Pos.Right (this.btnToggleSplitterCollapse) + 1,
-				CaptionColor = Color.Black,
+				CaptionColor = (Color)Color.Black,
 				Width = 30,
 				Y = Pos.AnchorEnd (1),
 			};

@@ -5,9 +5,6 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using Terminal.Gui;
-using Attribute = Terminal.Gui.Attribute;
-
-
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Images", Description: "Demonstration of how to render an image with/without true color support.")]

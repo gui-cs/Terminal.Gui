@@ -50,19 +50,19 @@ namespace Terminal.Gui.TextTests {
 
 			// allocate a new custom scheme
 			tv.Autocomplete.ColorScheme = new ColorScheme () {
-				Normal = Application.Driver.MakeAttribute (Color.Black, Color.Blue),
-				Focus = Application.Driver.MakeAttribute (Color.Black, Color.Cyan),
+				Normal = new Attribute (Color.Black, Color.Blue),
+				Focus = new Attribute (Color.Black, Color.Cyan),
 			};
 
 			// should be separate instance
 			Assert.NotSame (Colors.Menu, tv.Autocomplete.ColorScheme);
 
 			// with the values we set on it
-			Assert.Equal (Color.Black, tv.Autocomplete.ColorScheme.Normal.Foreground);
-			Assert.Equal (Color.Blue, tv.Autocomplete.ColorScheme.Normal.Background);
+			Assert.Equal ((Color)Color.Black, tv.Autocomplete.ColorScheme.Normal.Foreground);
+			Assert.Equal ((Color)Color.Blue, tv.Autocomplete.ColorScheme.Normal.Background);
 
-			Assert.Equal (Color.Black, tv.Autocomplete.ColorScheme.Focus.Foreground);
-			Assert.Equal (Color.Cyan, tv.Autocomplete.ColorScheme.Focus.Background);
+			Assert.Equal ((Color)Color.Black, tv.Autocomplete.ColorScheme.Focus.Foreground);
+			Assert.Equal ((Color)Color.Cyan, tv.Autocomplete.ColorScheme.Focus.Background);
 		}
 
 		[Fact]

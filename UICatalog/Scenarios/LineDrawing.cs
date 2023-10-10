@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
-using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios {
 
@@ -96,7 +95,7 @@ namespace UICatalog.Scenarios {
 		class DrawingArea : View {
 			List<LineCanvas> _layers = new List<LineCanvas> ();
 			LineCanvas _currentLayer;
-			Color _currentColor = Color.White;
+			Color _currentColor = (Color)Color.White;
 			StraightLine _currentLine = null;
 
 			public LineStyle LineStyle { get; set; }

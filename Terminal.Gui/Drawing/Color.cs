@@ -1,4 +1,5 @@
-﻿using System;
+﻿global using Attribute = Terminal.Gui.Attribute;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -7,13 +8,14 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// Colors that can be used to set the foreground and background colors in console applications.
+	/// Defines the 16 legacy color names and values that can be used to set the foreground and background colors in Terminal.Gui apps. Used with <see cref="Color"/>.
 	/// </summary>
 	/// <remarks>
-	/// The <see cref="Attribute.HasValidColors"/> value indicates either no-color has been set or the color is invalid.
+	/// 
 	/// </remarks>
 	public enum ColorNames {
 		/// <summary>
@@ -83,100 +85,377 @@ namespace Terminal.Gui {
 	}
 
 	[JsonConverter (typeof (ColorJsonConverter))]
-	public class Color {
+	public class Color : IEquatable<Color> {
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Color"/> class.
+		/// </summary>
+		/// <param name="red"></param>
+		/// <param name="green"></param>
+		/// <param name="blue"></param>
+		public Color (int red, int green, int blue)
+		{
+			A = 0;
+			R = red;
+			G = green;
+			B = blue;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Color"/> class.
+		/// </summary>
+		/// <param name="alpha"></param>
+		/// <param name="red"></param>
+		/// <param name="green"></param>
+		/// <param name="blue"></param>
+		public Color (int alpha, int red, int green, int blue)
+		{
+			A = alpha;
+			R = red;
+			G = green;
+			B = blue;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Color"/> class with an encoded 24-bit color value.
+		/// </summary>
+		/// <param name="argb">The encoded 24-bit color value.</param>
+		public Color (int argb)
+		{
+			Value = argb;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Color"/> color from a legacy 16-color value.
+		/// </summary>
+		/// <param name="colorName">The 16-color value.</param>
 		public Color (ColorNames colorName)
 		{
-			var tc = TrueColor.FromColorName (colorName).GetValueOrDefault ();
-			Value = (tc.Alpha << 24) | (tc.Red << 16) | (tc.Green << 8) | tc.Blue;
+			var c = Color.FromColorName (colorName);
+			A = c.A;
+			R = c.R;
+			G = c.G;
+			B = c.B;
 		}
 
 		public Color ()
 		{
-			Value = -1;
+			A = 0;
+			R = 0;
+			G = 0;
+			B = 0;
 		}
 
 		/// <summary>
+		/// Red color component.
+		/// </summary>
+		public int R { get; set; }
+		/// <summary>
+		/// Green color component.
+		/// </summary>
+		public int G { get; set; }
+		/// <summary>
+		/// Blue color component.
+		/// </summary>
+		public int B { get; set; }
+
+		/// <summary>
+		/// Alpha color component.
+		/// </summary>
+		/// <remarks>
+		/// Not currently supported; here for completeness. 
+		/// </remarks>
+		public int A { get; set; }
+
+		/// <summary>
+		/// Gets or sets the color value encoded using the following code:
+		/// <code>
+		/// (&lt;see cref="A"/&gt; &lt;&lt; 24) | (&lt;see cref="R"/&gt; &lt;&lt; 16) | (&lt;see cref="G"/&gt; &lt;&lt; 8) | &lt;see cref="B"/&gt;
+		/// </code>
+		/// </summary>
+		public int Value {
+			get => (A << 24) | (R << 16) | (G << 8) | B;
+			set {
+				A = (byte)((value >> 24) & 0xFF);
+				R = (byte)((value >> 16) & 0xFF);
+				G = (byte)((value >> 8) & 0xFF);
+				B = (byte)(value & 0xFF);
+			}
+		}
+
+		// TODO: Make this map configurable via ConfigurationManager
+		/// <summary>
+		/// Maps legacy 16-color values to the corresponding 24-bit RGB value.
+		/// </summary>
+		private static readonly ImmutableDictionary<Color, ColorNames> _colorNames = new Dictionary<Color, ColorNames> () {
+			{ new Color (0,0,0),ColorNames.Black },
+			{ new Color (0, 0, 0x80),ColorNames.Blue },
+			{ new Color (0, 0x80, 0),ColorNames.Green},
+			{ new Color (0, 0x80, 0x80),ColorNames.Cyan},
+			{ new Color (0x80, 0, 0),ColorNames.Red},
+			{ new Color (0x80, 0, 0x80),ColorNames.Magenta},
+			{ new Color (0xC1, 0x9C, 0x00),ColorNames.Brown},
+			{ new Color (0xC0, 0xC0, 0xC0),ColorNames.Gray},
+			{ new Color (0x80, 0x80, 0x80),ColorNames.DarkGray},
+			{ new Color (0, 0, 0xFF),ColorNames.BrightBlue},
+			{ new Color (0, 0xFF, 0),ColorNames.BrightGreen},
+			{ new Color (0, 0xFF, 0xFF),ColorNames.BrightCyan},
+			{ new Color (0xFF, 0, 0),ColorNames.BrightRed},
+			{ new Color (0xFF, 0, 0xFF),ColorNames.BrightMagenta },
+			{ new Color (0xFF, 0xFF, 0),ColorNames.BrightYellow},
+			{ new Color (0xFF, 0xFF, 0xFF),ColorNames.White},
+		}.ToImmutableDictionary ();
+
+		/// <summary>
+		/// Converts a legacy <see cref="ColorNames"/> to a 24-bit <see cref="Color"/>.
+		/// </summary>
+		/// <param name="consoleColor">The <see cref="Color"/> to convert.</param>
+		/// <returns></returns>
+		public static Color FromColorName (ColorNames consoleColor) => _colorNames.FirstOrDefault (x => x.Value == consoleColor).Key;
+
+		/// <summary>
+		/// Converts a legacy <see cref="ColorNames"/> index to a 24-bit <see cref="Color"/>.
+		/// </summary>
+		/// <param name="colorNameId">The index into the <see cref="ColorNames"/> enum to convert.</param>
+		/// <returns></returns>
+		public static Color FromColorName (int colorNameId)
+		{
+			return FromColorName ((ColorNames)colorNameId);
+		}
+
+		// This function iterates through the entries in the _colorNames dictionary, calculates the
+		// Euclidean distance between the input color and each dictionary color in RGB space,
+		// and keeps track of the closest entry found so far. The function returns a KeyValuePair
+		// representing the closest color entry and its associated color name.
+		public static ColorNames FindClosestColor (Color inputColor)
+		{
+			ColorNames closestColor = ColorNames.Black; // Default to Black
+			double closestDistance = double.MaxValue;
+
+			foreach (var colorEntry in _colorNames) {
+				var distance = CalculateColorDistance (inputColor, colorEntry.Key);
+				if (distance < closestDistance) {
+					closestDistance = distance;
+					closestColor = colorEntry.Value;
+				}
+			}
+
+			return closestColor;
+		}
+
+		private static double CalculateColorDistance (Color color1, Color color2)
+		{
+			// Calculate the Euclidean distance between two colors
+			var deltaR = (double)color1.R - (double)color2.R;
+			var deltaG = (double)color1.G - (double)color2.G;
+			var deltaB = (double)color1.B - (double)color2.B;
+
+			return Math.Sqrt (deltaR * deltaR + deltaG * deltaG + deltaB * deltaB);
+		}
+
+		//private static KeyValuePair<Color, ColorNames> FindClosestColor (Color inputColor)
+		//{
+		//	KeyValuePair<Color, ColorNames> closestEntry = default;
+		//	double closestDistance = double.MaxValue;
+
+		//	foreach (var entry in _colorNames) {
+		//		Color dictionaryColor = entry.Key;
+		//		double distance = Math.Sqrt (
+		//			Math.Pow (inputColor.R - dictionaryColor.R, 2) +
+		//			Math.Pow (inputColor.G - dictionaryColor.G, 2) +
+		//			Math.Pow (inputColor.B - dictionaryColor.B, 2)
+		//		);
+
+		//		if (distance < closestDistance) {
+		//			closestDistance = distance;
+		//			closestEntry = entry;
+		//		}
+		//	}
+
+		//	return closestEntry;
+		//}
+
+		/// <summary>
+		/// Gets or sets the <see cref="Color"/> using a legacy 16-color <see cref="ColorNames"/> value.
+		/// </summary>
+		/// <remarks>
+		/// Get returns the closest 24-bit color value. Set sets the RGB value using a hard-coded map.
+		/// </remarks>
+		public ColorNames ColorName {
+			get {
+				return FindClosestColor (this.Value);
+			}
+			set {
+
+				var c = FromColorName (value);
+				A = c.A;
+				R = c.R;
+				G = c.G;
+				B = c.B;
+			}
+		}
+
+		/// <summary>
+		/// 
 		/// The black color.
 		/// </summary>
-		public const int Black = (int)ColorNames.Black;
+		public const ColorNames Black = ColorNames.Black;
 
 		/// <summary>
 		/// The blue color.
 		/// </summary>
-		public const int Blue = (int)ColorNames.Blue;
+		public const ColorNames Blue = ColorNames.Blue;
 		/// <summary>
 		/// The green color.
 		/// </summary>
-		public const int Green = (int)ColorNames.Green;
+		public const ColorNames Green = ColorNames.Green;
 		/// <summary>
 		/// The cyan color.
 		/// </summary>
-		public const int Cyan = (int)ColorNames.Cyan;
+		public const ColorNames Cyan = ColorNames.Cyan;
 		/// <summary>
 		/// The red color.
 		/// </summary>
-		public const int Red = (int)ColorNames.Red;
+		public const ColorNames Red = ColorNames.Red;
 		/// <summary>
 		/// The magenta color.
 		/// </summary>
-		public const int Magenta = (int)ColorNames.Magenta;
+		public const ColorNames Magenta = ColorNames.Magenta;
 		/// <summary>
 		/// The brown color.
 		/// </summary>
-		public const int Brown = (int)ColorNames.Brown;
+		public const ColorNames Brown = ColorNames.Brown;
 		/// <summary>
 		/// The gray color.
 		/// </summary>
-		public const int Gray = (int)ColorNames.Gray;
+		public const ColorNames Gray = ColorNames.Gray;
 		/// <summary>
 		/// The dark gray color.
 		/// </summary>
-		public const int DarkGray = (int)ColorNames.DarkGray;
+		public const ColorNames DarkGray = ColorNames.DarkGray;
 		/// <summary>
 		/// The bright bBlue color.
 		/// </summary>
-		public const int BrightBlue = (int)ColorNames.BrightBlue;
+		public const ColorNames BrightBlue = ColorNames.BrightBlue;
 		/// <summary>
 		/// The bright green color.
 		/// </summary>
-		public const int BrightGreen = (int)ColorNames.BrightGreen;
+		public const ColorNames BrightGreen = ColorNames.BrightGreen;
 		/// <summary>
 		/// The bright cyan color.
 		/// </summary>
-		public const int BrightCyan = (int)ColorNames.BrightCyan;
+		public const ColorNames BrightCyan = ColorNames.BrightCyan;
 		/// <summary>
 		/// The bright red color.
 		/// </summary>
-		public const int BrightRed = (int)ColorNames.BrightRed;
+		public const ColorNames BrightRed = ColorNames.BrightRed;
 		/// <summary>
 		/// The bright magenta color.
 		/// </summary>
-		public const int BrightMagenta = (int)ColorNames.BrightMagenta;
+		public const ColorNames BrightMagenta = ColorNames.BrightMagenta;
 		/// <summary>
 		/// The bright yellow color.
 		/// </summary>
-		public const int BrightYellow = (int)ColorNames.BrightYellow;
+		public const ColorNames BrightYellow = ColorNames.BrightYellow;
 		/// <summary>
 		/// The White color.
 		/// </summary>
-		public const int White = (int)ColorNames.White;
+		public const ColorNames White = ColorNames.White;
 
 		/// <summary>
-		/// The truecolor value. -1 if not valid. 
+		/// Converts the provided text to a new <see cref="Color"/> instance.
 		/// </summary>
-		public int Value { get; set; }
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="value"></param>
-		public static implicit operator Color (int value)
+		/// <param name="text">The text to analyze.</param>
+		/// <param name="color">The parsed value.</param>
+		/// <returns>A boolean value indicating whether it was successful.</returns>
+		public static bool TryParse (string text, [NotNullWhen (true)] out Color color)
 		{
-			return new Color { Value = value };
+			// empty color
+			if ((text == null) || (text.Length == 0)) {
+				color = null;
+				return false;
+			}
+
+			// #RRGGBB, #RGB
+			if ((text [0] == '#') && text.Length is 7 or 4) {
+				if (text.Length == 7) {
+					var r = Convert.ToInt32 (text.Substring (1, 2), 16);
+					var g = Convert.ToInt32 (text.Substring (3, 2), 16);
+					var b = Convert.ToInt32 (text.Substring (5, 2), 16);
+					color = new Color (r, g, b);
+				} else {
+					var rText = char.ToString (text [1]);
+					var gText = char.ToString (text [2]);
+					var bText = char.ToString (text [3]);
+
+					var r = Convert.ToInt32 (rText + rText, 16);
+					var g = Convert.ToInt32 (gText + gText, 16);
+					var b = Convert.ToInt32 (bText + bText, 16);
+					color = new Color (r, g, b);
+				}
+				return true;
+			}
+
+			// #AARRGGBB, #ARGB
+			if ((text [0] == '#') && text.Length is 8 or 5) {
+				if (text.Length == 7) {
+					var a = Convert.ToInt32 (text.Substring (1, 2), 16);
+					var r = Convert.ToInt32 (text.Substring (3, 2), 16);
+					var g = Convert.ToInt32 (text.Substring (5, 2), 16);
+					var b = Convert.ToInt32 (text.Substring (7, 2), 16);
+					color = new Color (a, r, g, b);
+				} else {
+					var aText = char.ToString (text [1]);
+					var rText = char.ToString (text [2]);
+					var gText = char.ToString (text [3]);
+					var bText = char.ToString (text [4]);
+
+					var a = Convert.ToInt32 (aText + aText, 16);
+					var r = Convert.ToInt32 (rText + rText, 16);
+					var g = Convert.ToInt32 (gText + gText, 16);
+					var b = Convert.ToInt32 (bText + bText, 16);
+					color = new Color (a, r, g, b);
+				}
+				return true;
+			}
+
+			// rgb(XX,YY,ZZ)
+			var match = Regex.Match (text, @"rgb\((\d+),(\d+),(\d+)\)");
+			if (match.Success) {
+				var r = int.Parse (match.Groups [1].Value);
+				var g = int.Parse (match.Groups [2].Value);
+				var b = int.Parse (match.Groups [3].Value);
+				color = new Color (r, g, b);
+				return true;
+			}
+
+			// rgb(AA,XX,YY,ZZ)
+			match = Regex.Match (text, @"rgb\((\d+),(\d+),(\d+),(\d+)\)");
+			if (match.Success) {
+				var a = int.Parse (match.Groups [1].Value);
+				var r = int.Parse (match.Groups [2].Value);
+				var g = int.Parse (match.Groups [3].Value);
+				var b = int.Parse (match.Groups [4].Value);
+				color = new Color (a, r, g, b);
+				return true;
+			}
+
+			color = null;
+			return false;
+		}
+
+
+		/// <summary>
+		/// Cast from int.
+		/// </summary>
+		/// <param name="argb"></param>
+		public static implicit operator Color (int argb)
+		{
+			return new Color (argb);
 		}
 
 		/// <summary>
-		/// 
+		/// Cast to int.
 		/// </summary>
 		/// <param name="color"></param>
 		public static explicit operator int (Color color)
@@ -184,6 +463,99 @@ namespace Terminal.Gui {
 			return color.Value;
 		}
 
+		/// <summary>
+		/// Cast from <see cref="ColorNames"/>.
+		/// </summary>
+		/// <param name="colorName"></param>
+		public static explicit operator Color (ColorNames colorName)
+		{
+			return new Color (colorName);
+		}
+
+		/// <summary>
+		/// Cast to <see cref="ColorNames"/>.
+		/// </summary>
+		/// <param name="color"></param>
+		public static explicit operator ColorNames (Color color)
+		{
+			return color.ColorName;
+		}
+
+
+		/// <inheritdoc/>
+		public static bool operator == (Color left, Color right)
+		{
+			return left.Equals (right);
+		}
+
+		/// <inheritdoc/>
+		public static bool operator != (Color left, Color right)
+		{
+			return !left.Equals (right);
+		}
+
+		/// <inheritdoc/>
+		public static bool operator == (ColorNames left, Color right)
+		{
+			return left == right.ColorName;
+		}
+
+		/// <inheritdoc/>
+		public static bool operator != (ColorNames left, Color right)
+		{
+			return left != right.ColorName;
+		}
+
+		/// <inheritdoc/>
+		public static bool operator == (Color left, ColorNames right)
+		{
+			return left.ColorName == right;
+		}
+
+		/// <inheritdoc/>
+		public static bool operator != (Color left, ColorNames right)
+		{
+			return left.ColorName != right;
+		}
+
+
+		/// <inheritdoc/>
+		public override bool Equals (object obj)
+		{
+			return obj is Color other && Equals (other);
+		}
+
+		/// <inheritdoc/>
+		public bool Equals (Color other)
+		{
+			return
+				A == other.A &&
+				R == other.R &&
+				G == other.G &&
+				B == other.B;
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode ()
+		{
+			return HashCode.Combine (A, R, G, B);
+		}
+
+		/// <summary>
+		/// Converts the color to a string representation.
+		/// </summary>
+		/// <remarks>
+		/// </remarks>
+		/// <returns></returns>
+		public override string ToString ()
+		{
+			// If Values has an exact match with a named color (in _colorNames), use that.
+			if (_colorNames.TryGetValue (this, out ColorNames colorName)) {
+				return Enum.GetName (typeof (ColorNames), colorName);
+			}
+			// Otherwise return as an RGB hex value.
+			return $"#{R:X2}{G:X2}{B:X2}";
+		}
 	}
 
 	/// <summary>
@@ -191,7 +563,7 @@ namespace Terminal.Gui {
 	/// </summary>
 	[JsonConverter (typeof (TrueColorJsonConverter))]
 	public readonly struct TrueColor : IEquatable<TrueColor> {
-		private static readonly ImmutableDictionary<TrueColor, Color> TrueColorToConsoleColorMap = new Dictionary<TrueColor, Color> () {
+		private static readonly ImmutableDictionary<TrueColor, ColorNames> TrueColorToConsoleColorMap = new Dictionary<TrueColor, ColorNames> () {
 			{ new TrueColor (0,0,0),Color.Black },
 			{ new TrueColor (0, 0, 0x80),Color.Blue },
 			{ new TrueColor (0, 0x80, 0),Color.Green},
@@ -232,7 +604,7 @@ namespace Terminal.Gui {
 		public int Alpha { get; }
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="TrueColor"/> struct.
+		/// Initializes a new instance of the <see cref="Color"/> class.
 		/// </summary>
 		/// <param name="red"></param>
 		/// <param name="green"></param>
@@ -245,27 +617,26 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Converts the provided text to a <see cref="TrueColor"/>.
+		/// Converts the provided text to a new <see cref="Color"/> instance.
 		/// </summary>
 		/// <param name="text">The text to analyze.</param>
-		/// <param name="trueColor">The parsed value.</param>
-		/// <returns>A boolean value indcating whether it was successful.</returns>
-		public static bool TryParse (string text, [NotNullWhen (true)] out TrueColor? trueColor)
+		/// <param name="color">The parsed value.</param>
+		/// <returns>A boolean value indicating whether it was successful.</returns>
+		public static bool TryParse (string text, [NotNullWhen (true)] out TrueColor? color)
 		{
 			// empty color
 			if ((text == null) || (text.Length == 0)) {
-				trueColor = null;
+				color = null;
 				return false;
 			}
 
-			// #RRGGBB or #RGB
-			if ((text [0] == '#') &&
-			    ((text.Length == 7) || (text.Length == 4))) {
+			// #RRGGBB, #RGB
+			if ((text [0] == '#') && text.Length is 7 or 4) {
 				if (text.Length == 7) {
 					var r = Convert.ToInt32 (text.Substring (1, 2), 16);
 					var g = Convert.ToInt32 (text.Substring (3, 2), 16);
 					var b = Convert.ToInt32 (text.Substring (5, 2), 16);
-					trueColor = new TrueColor (r, g, b);
+					color = new TrueColor (r, g, b);
 				} else {
 					var rText = char.ToString (text [1]);
 					var gText = char.ToString (text [2]);
@@ -274,10 +645,11 @@ namespace Terminal.Gui {
 					var r = Convert.ToInt32 (rText + rText, 16);
 					var g = Convert.ToInt32 (gText + gText, 16);
 					var b = Convert.ToInt32 (bText + bText, 16);
-					trueColor = new TrueColor (r, g, b);
+					color = new TrueColor (r, g, b);
 				}
 				return true;
 			}
+
 
 			// rgb(XX,YY,ZZ)
 			var match = Regex.Match (text, @"rgb\((\d+),(\d+),(\d+)\)");
@@ -285,11 +657,11 @@ namespace Terminal.Gui {
 				var r = int.Parse (match.Groups [1].Value);
 				var g = int.Parse (match.Groups [2].Value);
 				var b = int.Parse (match.Groups [3].Value);
-				trueColor = new TrueColor (r, g, b);
+				color = new TrueColor (r, g, b);
 				return true;
 			}
 
-			trueColor = null;
+			color = null;
 			return false;
 		}
 
@@ -340,7 +712,7 @@ namespace Terminal.Gui {
 		public static Color ToConsoleColor (TrueColor? trueColor)
 		{
 			if (trueColor.HasValue) {
-				return TrueColorToConsoleColorMap.MinBy (kv => CalculateDistance (kv.Key, trueColor.Value)).Value;
+				return new Color (TrueColorToConsoleColorMap.MinBy (kv => CalculateDistance (kv.Key, trueColor.Value)).Value);
 			} else {
 				return (Color)(-1);
 			}
@@ -444,20 +816,41 @@ namespace Terminal.Gui {
 		public TrueColor? TrueColorBackground { get; private init; }
 
 		/// <summary>
-		/// Initializes a new instance with a platform-specific color value.
+		/// Initializes a new instance with a 24-bit rgb value.
 		/// </summary>
 		/// <param name="value">Value.</param>
-		internal Attribute (int value)
+		internal Attribute (int argb)
 		{
 			Color foreground = default;
 			Color background = default;
 
 			Initialized = false;
 			if (Application.Driver != null) {
-				Application.Driver.GetColors (value, out foreground, out background);
+				Application.Driver.GetColors (argb, out foreground, out background);
 				Initialized = true;
 			}
-			Value = value;
+			Value = argb;
+			Foreground = foreground;
+			Background = background;
+			//TrueColorForeground = TrueColor.FromColorName (foreground);
+			//TrueColorBackground = TrueColor.FromColorName (background);
+		}
+
+		/// <summary>
+		/// Initializes a new instance with <see cref="ColorNames" value./>
+		/// </summary>
+		/// <param name="value">Value.</param>
+		internal Attribute (ColorNames colorName)
+		{
+			Color foreground = default;
+			Color background = default;
+
+			Initialized = false;
+			if (Application.Driver != null) {
+				Application.Driver.GetColors (((Color)colorName).Value, out foreground, out background);
+				Initialized = true;
+			}
+			Value = ((Color)colorName).Value;
 			Foreground = foreground;
 			Background = background;
 			//TrueColorForeground = TrueColor.FromColorName (foreground);
@@ -491,6 +884,58 @@ namespace Terminal.Gui {
 			Background = background;
 			TrueColorForeground = TrueColor.FromColorName ((ColorNames)foreground.Value);
 			TrueColorBackground = TrueColor.FromColorName ((ColorNames)background.Value);
+
+			var make = Make (foreground, background);
+			Initialized = make.Initialized;
+			Value = make.Value;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Attribute"/> struct.
+		/// </summary>
+		/// <param name="foreground">Foreground</param>
+		/// <param name="background">Background</param>
+		public Attribute (ColorNames foreground, ColorNames background)
+		{
+			Foreground = new Color (foreground);
+			Background = new Color (background);
+			TrueColorForeground = TrueColor.FromColorName (foreground);
+			TrueColorBackground = TrueColor.FromColorName (background);
+
+			var make = Make (foreground, background);
+			Initialized = make.Initialized;
+			Value = make.Value;
+		}
+
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Attribute"/> struct.
+		/// </summary>
+		/// <param name="foreground">Foreground</param>
+		/// <param name="background">Background</param>
+		public Attribute (ColorNames foreground, Color background)
+		{
+			Foreground = new Color (foreground);
+			Background = background;
+			TrueColorForeground = TrueColor.FromColorName (foreground);
+			TrueColorBackground = TrueColor.FromColorName (background.ColorName);
+
+			var make = Make (foreground, background);
+			Initialized = make.Initialized;
+			Value = make.Value;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Attribute"/> struct.
+		/// </summary>
+		/// <param name="foreground">Foreground</param>
+		/// <param name="background">Background</param>
+		public Attribute (Color foreground, ColorNames background)
+		{
+			Foreground = foreground;
+			Background = new Color (background);
+			TrueColorForeground = TrueColor.FromColorName (foreground.ColorName);
+			TrueColorBackground = TrueColor.FromColorName (background);
 
 			var make = Make (foreground, background);
 			Initialized = make.Initialized;
@@ -575,7 +1020,7 @@ namespace Terminal.Gui {
 		public bool Equals (Attribute other)
 		{
 			if (TrueColorForeground.HasValue || TrueColorBackground.HasValue) {
-				return 
+				return
 					TrueColorForeground == other.TrueColorForeground &&
 					TrueColorBackground == other.TrueColorBackground;
 			}
@@ -608,7 +1053,7 @@ namespace Terminal.Gui {
 					Background = background
 				};
 			}
-			return Application.Driver.MakeAttribute (foreground, background);
+			return new Attribute (foreground, background);
 		}
 
 
@@ -628,11 +1073,57 @@ namespace Terminal.Gui {
 				// Create the attribute, but show it's not been initialized
 				return new Attribute () {
 					Initialized = false,
-					Foreground = new Color(foreground),
-					Background = new Color(background)
+					Foreground = new Color (foreground),
+					Background = new Color (background)
 				};
 			}
-			return Application.Driver.MakeAttribute (foreground, background);
+			return new Attribute (foreground, background);
+		}
+
+		/// <summary>
+		/// Creates an <see cref="Attribute"/> from the specified foreground and background colors.
+		/// </summary>
+		/// <remarks>
+		/// If a <see cref="ConsoleDriver"/> has not been loaded (<c>Application.Driver == null</c>) this
+		/// method will return an attribute with <see cref="Initialized"/> set to  <see langword="false"/>.
+		/// </remarks>
+		/// <returns>The new attribute.</returns>
+		/// <param name="foreground">Foreground color to use.</param>
+		/// <param name="background">Background color to use.</param>
+		public static Attribute Make (ColorNames foreground, Color background)
+		{
+			if (Application.Driver == null) {
+				// Create the attribute, but show it's not been initialized
+				return new Attribute () {
+					Initialized = false,
+					Foreground = new Color (foreground),
+					Background = background
+				};
+			}
+			return new Attribute (new Color (foreground), background);
+		}
+
+		/// <summary>
+		/// Creates an <see cref="Attribute"/> from the specified foreground and background colors.
+		/// </summary>
+		/// <remarks>
+		/// If a <see cref="ConsoleDriver"/> has not been loaded (<c>Application.Driver == null</c>) this
+		/// method will return an attribute with <see cref="Initialized"/> set to  <see langword="false"/>.
+		/// </remarks>
+		/// <returns>The new attribute.</returns>
+		/// <param name="foreground">Foreground color to use.</param>
+		/// <param name="background">Background color to use.</param>
+		public static Attribute Make (Color foreground, ColorNames background)
+		{
+			if (Application.Driver == null) {
+				// Create the attribute, but show it's not been initialized
+				return new Attribute () {
+					Initialized = false,
+					Foreground = foreground,
+					Background = new Color (background)
+				};
+			}
+			return new Attribute (foreground, new Color (background));
 		}
 
 		/// <summary>
