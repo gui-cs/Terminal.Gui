@@ -547,11 +547,8 @@ namespace Terminal.Gui.ViewsTests {
 		[Fact]
 		public void MultiBarSeriesColors_WrongNumber ()
 		{
-
-			var fake = new FakeDriver ();
-
 			var colors = new []{
-				fake.MakeAttribute(Color.Green,Color.Black)
+				new Attribute (Color.Green,Color.Black)
 			};
 
 			// user passes 1 color only but asks for 5 bars
@@ -565,13 +562,10 @@ namespace Terminal.Gui.ViewsTests {
 		[Fact]
 		public void MultiBarSeriesColors_RightNumber ()
 		{
-
-			var fake = new FakeDriver ();
-
 			var colors = new []{
-				fake.MakeAttribute(Color.Green,Color.Black),
-				fake.MakeAttribute(Color.Green,Color.White),
-				fake.MakeAttribute(Color.BrightYellow,Color.White)
+				new Attribute (Color.Green,Color.Black),
+				new Attribute (Color.Green,Color.White),
+				new Attribute (Color.BrightYellow,Color.White)
 			};
 
 			// user passes 3 colors and asks for 3 bars

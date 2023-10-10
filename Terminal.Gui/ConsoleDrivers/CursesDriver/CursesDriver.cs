@@ -78,8 +78,8 @@ internal class CursesDriver : ConsoleDriver {
 		Curses.InitColorPair (v, foreground, background);
 		return new Attribute (
 			platformColor: Curses.ColorPair (v),
-			foreground: CursesColorNumberToColor (foreground),
-			background: CursesColorNumberToColor (background));
+			foreground: CursesColorNumberToColorName (foreground),
+			background: CursesColorNumberToColorName (background));
 	}
 
 	/// <remarks>
@@ -88,18 +88,25 @@ internal class CursesDriver : ConsoleDriver {
 	/// and the background color is stored in the least significant 4 bits.
 	/// The Terminal.GUi Color values are converted to curses color encoding before being encoded.
 	/// </remarks>
-	public override Attribute MakeColor (ColorNames fore, ColorNames back)
+	public override Attribute MakeColor (ColorNames foregroundName, ColorNames backgroundName)
 	{
 		if (!RunningUnitTests) {
-			return MakeColor (ColorNameToCursesColorNumber (fore), ColorNameToCursesColorNumber (back));
+			return MakeColor (ColorNameToCursesColorNumber (foregroundName), ColorNameToCursesColorNumber (backgroundName));
 		} else {
 			return new Attribute (
 				platformColor: 0,
-				foreground: ColorNameToCursesColorNumber (fore),
-				background: ColorNameToCursesColorNumber (back));
+				foreground: ColorNameToCursesColorNumber (foregroundName),
+				background: ColorNameToCursesColorNumber (backgroundName));
 		}
 	}
 
+
+	/// <remarks>
+	/// In the CursesDriver, colors are encoded as an int. 
+	/// The foreground color is stored in the most significant 4 bits, 
+	/// and the background color is stored in the least significant 4 bits.
+	/// The Terminal.GUi Color values are converted to curses color encoding before being encoded.
+	/// </remarks>
 	public override Attribute MakeColor (Color foreground, Color background)
 	{
 		if (!RunningUnitTests) {
@@ -151,56 +158,43 @@ internal class CursesDriver : ConsoleDriver {
 		throw new ArgumentException ("Invalid color code");
 	}
 
-	static ColorNames CursesColorNumberToColor (short color)
+	static ColorNames CursesColorNumberToColorName (short color)
 	{
 		switch (color) {
 		case Curses.COLOR_BLACK:
-			return Color.Black;
+			return ColorNames.Black;
 		case Curses.COLOR_BLUE:
-			return Color.Blue;
+			return ColorNames.Blue;
 		case Curses.COLOR_GREEN:
-			return Color.Green;
+			return ColorNames.Green;
 		case Curses.COLOR_CYAN:
-			return Color.Cyan;
+			return ColorNames.Cyan;
 		case Curses.COLOR_RED:
-			return Color.Red;
+			return ColorNames.Red;
 		case Curses.COLOR_MAGENTA:
-			return Color.Magenta;
+			return ColorNames.Magenta;
 		case Curses.COLOR_YELLOW:
-			return Color.Brown;
+			return ColorNames.Brown;
 		case Curses.COLOR_WHITE:
-			return Color.Gray;
+			return ColorNames.Gray;
 		case Curses.COLOR_GRAY:
-			return Color.DarkGray;
+			return ColorNames.DarkGray;
 		case Curses.COLOR_BLUE | Curses.COLOR_GRAY:
-			return Color.BrightBlue;
+			return ColorNames.BrightBlue;
 		case Curses.COLOR_GREEN | Curses.COLOR_GRAY:
-			return Color.BrightGreen;
+			return ColorNames.BrightGreen;
 		case Curses.COLOR_CYAN | Curses.COLOR_GRAY:
-			return Color.BrightCyan;
+			return ColorNames.BrightCyan;
 		case Curses.COLOR_RED | Curses.COLOR_GRAY:
-			return Color.BrightRed;
+			return ColorNames.BrightRed;
 		case Curses.COLOR_MAGENTA | Curses.COLOR_GRAY:
-			return Color.BrightMagenta;
+			return ColorNames.BrightMagenta;
 		case Curses.COLOR_YELLOW | Curses.COLOR_GRAY:
-			return Color.BrightYellow;
+			return ColorNames.BrightYellow;
 		case Curses.COLOR_WHITE | Curses.COLOR_GRAY:
-			return Color.White;
+			return ColorNames.White;
 		}
 		throw new ArgumentException ("Invalid curses color code");
-	}
-
-	/// <remarks>
-	/// In the CursesDriver, colors are encoded as an int. 
-	/// The foreground color is stored in the most significant 4 bits, 
-	/// and the background color is stored in the least significant 4 bits.
-	/// The Terminal.GUI Color values are converted to curses color encoding before being encoded.
-	/// </remarks>
-	internal override void GetColors (int value, out ColorNames foreground, out ColorNames background)
-	{
-		// Assume a 4-bit encoded value for both foreground and background colors.
-		foreground = CursesColorNumberToColor ((short)((value >> 4) & 0xF));
-		background = CursesColorNumberToColor ((short)(value & 0xF));
 	}
 
 	#endregion
@@ -681,7 +675,7 @@ internal class CursesDriver : ConsoleDriver {
 			Curses.UseDefaultColors ();
 		}
 
-		CurrentAttribute = MakeColor (Color.White, Color.Black);
+		CurrentAttribute = MakeColor (ColorNames.White, ColorNames.Black);
 		InitializeColorSchemes ();
 
 		TerminalResized = terminalResized;
