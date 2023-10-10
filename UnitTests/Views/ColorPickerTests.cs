@@ -51,8 +51,15 @@ namespace Terminal.Gui.ViewsTests {
 		[AutoInitShutdown]
 		public void MouseEvents ()
 		{
-			var colorPicker = new ColorPicker ();
+			var colorPicker = new ColorPicker () {
+				X = 0,
+				Y = 0,
+				Height = 4,
+				Width = 32
+			};
 			Assert.Equal (ColorNames.Black, colorPicker.SelectedColor);
+			Application.Top.Add (colorPicker);
+			Application.Begin (Application.Top);
 
 			Assert.False (colorPicker.MouseEvent (new MouseEvent ()));
 
