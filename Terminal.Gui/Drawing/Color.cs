@@ -253,7 +253,7 @@ namespace Terminal.Gui {
 		/// Gets or sets the <see cref="Color"/> using a legacy 16-color <see cref="ColorNames"/> value.
 		/// </summary>
 		/// <remarks>
-		/// Get returns the closest 24-bit color value. Set sets the RGB value using a hard-coded map.
+		/// Get returns the <see cref="ColorName"/> of the closest 24-bit color value. Set sets the RGB value using a hard-coded map.
 		/// </remarks>
 		public ColorNames ColorName {
 			get => FindClosestColor (this.Value);
