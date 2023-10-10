@@ -1,6 +1,5 @@
 ﻿global using Attribute = Terminal.Gui.Attribute;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
@@ -8,7 +7,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -190,6 +188,7 @@ namespace Terminal.Gui {
 		}
 
 		// TODO: Make this map configurable via ConfigurationManager
+		// TODO: This does not need to be a Dictionary, but can be an 16 element array.
 		/// <summary>
 		/// Maps legacy 16-color values to the corresponding 24-bit RGB value.
 		/// </summary>
@@ -230,7 +229,7 @@ namespace Terminal.Gui {
 			return FromColorName ((ColorNames)colorNameId);
 		}
 
-		// This function iterates through the entries in the _colorNames dictionary, calculates the
+		// Iterates through the entries in the _colorNames dictionary, calculates the
 		// Euclidean distance between the input color and each dictionary color in RGB space,
 		// and keeps track of the closest entry found so far. The function returns a KeyValuePair
 		// representing the closest color entry and its associated color name.
@@ -259,29 +258,7 @@ namespace Terminal.Gui {
 
 			return Math.Sqrt (deltaR * deltaR + deltaG * deltaG + deltaB * deltaB);
 		}
-
-		//private static KeyValuePair<Color, ColorNames> FindClosestColor (Color inputColor)
-		//{
-		//	KeyValuePair<Color, ColorNames> closestEntry = default;
-		//	double closestDistance = double.MaxValue;
-
-		//	foreach (var entry in _colorNames) {
-		//		Color dictionaryColor = entry.Key;
-		//		double distance = Math.Sqrt (
-		//			Math.Pow (inputColor.R - dictionaryColor.R, 2) +
-		//			Math.Pow (inputColor.G - dictionaryColor.G, 2) +
-		//			Math.Pow (inputColor.B - dictionaryColor.B, 2)
-		//		);
-
-		//		if (distance < closestDistance) {
-		//			closestDistance = distance;
-		//			closestEntry = entry;
-		//		}
-		//	}
-
-		//	return closestEntry;
-		//}
-
+		
 		/// <summary>
 		/// Gets or sets the <see cref="Color"/> using a legacy 16-color <see cref="ColorNames"/> value.
 		/// </summary>
@@ -302,6 +279,7 @@ namespace Terminal.Gui {
 			}
 		}
 
+		#region Legacy Color Names
 		/// <summary>
 		/// 
 		/// The black color.
@@ -368,7 +346,8 @@ namespace Terminal.Gui {
 		/// The White color.
 		/// </summary>
 		public const ColorNames White = ColorNames.White;
-
+		#endregion
+		
 		/// <summary>
 		/// Converts the provided text to a new <see cref="Color"/> instance.
 		/// </summary>
@@ -451,7 +430,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-
+		#region Operators
 		/// <summary>
 		/// Cast from int.
 		/// </summary>
@@ -547,11 +526,13 @@ namespace Terminal.Gui {
 		{
 			return HashCode.Combine (A, R, G, B);
 		}
+		#endregion
 
 		/// <summary>
 		/// Converts the color to a string representation.
 		/// </summary>
 		/// <remarks>
+		/// If the color is a named color, the name is returned. Otherwise, the color is returned as a hex string.
 		/// </remarks>
 		/// <returns></returns>
 		public override string ToString ()
@@ -565,6 +546,7 @@ namespace Terminal.Gui {
 		}
 	}
 
+	// TODO: Get rid of all the Initialized crap - it's not needed once Curses Driver supports TrueColor
 	/// <summary>
 	/// Attributes represent how text is styled when displayed in the terminal. 
 	/// </summary>
