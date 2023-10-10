@@ -117,6 +117,7 @@ namespace UICatalog {
 				scenario.Theme = _cachedTheme;
 				scenario.TopLevelColorScheme = _topLevelColorScheme;
 				scenario.Init ();
+				Application.Driver.Force16Colors = _force16Colors;
 				scenario.Setup ();
 				scenario.Run ();
 				scenario.Dispose ();
@@ -231,6 +232,7 @@ namespace UICatalog {
 		static Scenario? _selectedScenario = null;
 
 		static bool _useSystemConsole = false;
+		static bool _force16Colors = false;
 		static ConsoleDriver.DiagnosticFlags _diagnosticFlags;
 		static bool _isFirstRunning = true;
 		static string _topLevelColorScheme = string.Empty;
@@ -532,12 +534,13 @@ namespace UICatalog {
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
 				miForce16Colors = new MenuItem {
-					Title = "Force 16 _Colors"
+					Title = "Force 16 _Colors",
+					Checked = _force16Colors
 				};
 				miForce16Colors.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miForce16Colors!.Title!.Substring (10, 1) [0];
 				miForce16Colors.CheckType |= MenuItemCheckStyle.Checked;
 				miForce16Colors.Action += () => {
-					miForce16Colors.Checked = Application.Driver.Force16Colors = (bool)!miForce16Colors.Checked!;
+					miForce16Colors.Checked = _force16Colors = Application.Driver.Force16Colors = (bool)!miForce16Colors.Checked!;
 					Application.Refresh ();
 				};
 				menuItems.Add (miForce16Colors);

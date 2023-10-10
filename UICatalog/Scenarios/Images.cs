@@ -38,10 +38,10 @@ namespace UICatalog.Scenarios {
 			var cbUseTrueColor = new CheckBox ("Use true color") {
 				X = x,
 				Y = y++,
-				Checked = Application.Driver.Force16Colors,
+				Checked = !Application.Driver.Force16Colors,
 				Enabled = canTrueColor,
 			};
-			cbUseTrueColor.Toggled += (_, evt) => Application.Driver.Force16Colors = evt.NewValue ?? false;
+			cbUseTrueColor.Toggled += (_, evt) => Application.Driver.Force16Colors = !evt.NewValue ?? false;
 			Win.Add (cbUseTrueColor);
 
 			var btnOpenImage = new Button ("Open Image") {
@@ -60,11 +60,16 @@ namespace UICatalog.Scenarios {
 
 
 			btnOpenImage.Clicked += (_, _) => {
-				var ofd = new OpenDialog ("Open Image") { AllowsMultipleSelection = false };
+				var ofd = new OpenDialog ("Open Image") { AllowsMultipleSelection = false,  };
 				Application.Run (ofd);
 
-				if (ofd.Canceled)
+				if (ofd.Path is not null) {
+					Directory.SetCurrentDirectory (Path.GetFullPath(Path.GetDirectoryName(ofd.Path)!));
+				}
+
+				if (ofd.Canceled) {
 					return;
+				}
 
 				var path = ofd.FilePaths [0];
 
