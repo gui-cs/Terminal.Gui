@@ -272,37 +272,6 @@ public class AttributeTests {
 	}
 
 	[Fact]
-	[AutoInitShutdown]
-	public void GetColors_Based_On_Value ()
-	{
-		var driver = Application.Driver;
-		var attrValue = new Attribute (Color.Red, Color.Green).Value;
-		driver.GetColors (attrValue, out ColorNames fg, out ColorNames bg);
-
-		Assert.Equal ((Color)Color.Red, (Color)fg);
-		Assert.Equal ((Color)Color.Green, (Color)bg);
-	}
-
-	[Fact]
-	public void IsValid_Tests ()
-	{
-		var attr = new Attribute ();
-		//Assert.True (attr.HasValidColors);
-
-		attr = new Attribute (Color.Red, Color.Green);
-		//Assert.True (attr.HasValidColors);
-
-		//attr = new Attribute (Color.Red, (Color)(-1));
-		//Assert.False (attr.HasValidColors);
-
-		//attr = new Attribute ((Color)(-1), Color.Green);
-		//Assert.False (attr.HasValidColors);
-
-		//attr = new Attribute ((Color)(-1), (Color)(-1));
-		//Assert.False (attr.HasValidColors);
-	}
-
-	[Fact]
 	public void Equals_NotInitialized ()
 	{
 		var attr1 = new Attribute (Color.Red, Color.Green);

@@ -1659,17 +1659,6 @@ internal class WindowsDriver : ConsoleDriver {
 		return MakeColor (new Color (foreground), new Color (background));
 	}
 
-	/// <summary>
-	/// Extracts the foreground and background colors from the encoded value.
-	/// Assumes a 4-bit encoded value for both foreground and background colors.
-	/// </summary>
-	internal override void GetColors (int value, out ColorNames foreground, out ColorNames background)
-	{
-		// Assume a 4-bit encoded value for both foreground and background colors.
-		foreground = (ColorNames)((value >> 16) & 0xF);
-		background = (ColorNames)(value & 0xF);
-	}
-
 	#endregion
 
 	CursorVisibility _cachedCursorVisibility;

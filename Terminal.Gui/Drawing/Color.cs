@@ -584,7 +584,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The <see cref="ConsoleDriver"/>-specific color value. If <see cref="Initialized"/> is <see langword="false"/> 
 		/// the value of this property is invalid (typically because the Attribute was created before a driver was loaded)
-		/// and the attribute should be re-made (see <see cref="Make(Color, Color)"/>) before it is used.
+		/// and the attribute should be re-made before it is used.
 		/// </summary>
 		[JsonIgnore (Condition = JsonIgnoreCondition.Always)]
 		internal int Value { get; }

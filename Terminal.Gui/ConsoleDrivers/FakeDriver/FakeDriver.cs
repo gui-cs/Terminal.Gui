@@ -189,18 +189,6 @@ public class FakeDriver : ConsoleDriver {
 
 	/// <remarks>
 	/// In the FakeDriver, colors are encoded as an int; same as NetDriver
-	/// Extracts the foreground and background colors from the encoded value.
-	/// Assumes a 4-bit encoded value for both foreground and background colors.
-	/// </remarks>
-	internal override void GetColors (int value, out ColorNames foreground, out ColorNames background)
-	{
-		// Assume a 4-bit encoded value for both foreground and background colors.
-		foreground = (ColorNames)((value >> 16) & 0xF);
-		background = (ColorNames)(value & 0xF);
-	}
-
-	/// <remarks>
-	/// In the FakeDriver, colors are encoded as an int; same as NetDriver
 	/// However, the foreground color is stored in the most significant 16 bits, 
 	/// and the background color is stored in the least significant 16 bits.
 	/// </remarks>
