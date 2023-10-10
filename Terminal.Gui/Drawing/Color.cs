@@ -84,6 +84,9 @@ namespace Terminal.Gui {
 		White
 	}
 
+	/// <summary>
+	/// Represents a color in the console. This is used with <see cref="Attribute"/>. 
+	/// </summary>
 	[JsonConverter (typeof (ColorJsonConverter))]
 	public class Color : IEquatable<Color> {
 
@@ -95,7 +98,7 @@ namespace Terminal.Gui {
 		/// <param name="blue"></param>
 		public Color (int red, int green, int blue)
 		{
-			A = 0;
+			A = 0xFF;
 			R = red;
 			G = green;
 			B = blue;
@@ -140,7 +143,7 @@ namespace Terminal.Gui {
 
 		public Color ()
 		{
-			A = 0;
+			A = 0xFF;
 			R = 0;
 			G = 0;
 			B = 0;
@@ -187,23 +190,24 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Maps legacy 16-color values to the corresponding 24-bit RGB value.
 		/// </summary>
-		private static readonly ImmutableDictionary<Color, ColorNames> _colorNames = new Dictionary<Color, ColorNames> () {
-			{ new Color (0,0,0),ColorNames.Black },
-			{ new Color (0, 0, 0x80),ColorNames.Blue },
-			{ new Color (0, 0x80, 0),ColorNames.Green},
-			{ new Color (0, 0x80, 0x80),ColorNames.Cyan},
-			{ new Color (0xE0, 0, 0),ColorNames.Red},
-			{ new Color (0xE0, 0, 0xE0),ColorNames.Magenta},
-			{ new Color (0xC1, 0x9C, 0x00),ColorNames.Brown},
-			{ new Color (0xC0, 0xC0, 0xC0),ColorNames.Gray},
-			{ new Color (0xA0, 0xA0, 0xA0),ColorNames.DarkGray},
-			{ new Color (0, 0, 0xFF),ColorNames.BrightBlue},
-			{ new Color (0, 0xFF, 0),ColorNames.BrightGreen},
-			{ new Color (0, 0xFF, 0xFF),ColorNames.BrightCyan},
-			{ new Color (0xFF, 0, 0),ColorNames.BrightRed},
-			{ new Color (0xFF, 0, 0xFF),ColorNames.BrightMagenta },
-			{ new Color (0xFF, 0xFF, 0),ColorNames.BrightYellow},
-			{ new Color (0xFF, 0xFF, 0xFF),ColorNames.White},
+		internal static readonly ImmutableDictionary<Color, ColorNames> _colorNames = new Dictionary<Color, ColorNames> () {
+			// using "Windows 10 Console/PowerShell 6" here: https://i.stack.imgur.com/9UVnC.png
+			{ new Color (12, 12, 12),ColorNames.Black },
+			{ new Color (0, 55, 218),ColorNames.Blue },
+			{ new Color (19, 161, 14),ColorNames.Green},
+			{ new Color (58, 150, 221),ColorNames.Cyan},
+			{ new Color (197, 15, 31),ColorNames.Red},
+			{ new Color (136, 23, 152),ColorNames.Magenta},
+			{ new Color (128, 64, 32),ColorNames.Brown},
+			{ new Color (204, 204, 204),ColorNames.Gray},
+			{ new Color (118, 118, 118),ColorNames.DarkGray},
+			{ new Color (59, 120, 255),ColorNames.BrightBlue},
+			{ new Color (22, 198, 12),ColorNames.BrightGreen},
+			{ new Color (97, 214, 214),ColorNames.BrightCyan},
+			{ new Color (231, 72, 86),ColorNames.BrightRed},
+			{ new Color (180, 0, 158),ColorNames.BrightMagenta },
+			{ new Color (249, 241, 165),ColorNames.BrightYellow},
+			{ new Color (242, 242, 242),ColorNames.White},
 		}.ToImmutableDictionary ();
 
 		/// <summary>
@@ -558,215 +562,6 @@ namespace Terminal.Gui {
 		}
 	}
 
-	///// <summary>
-	///// Indicates the RGB for true colors.
-	///// </summary>
-	//[JsonConverter (typeof (TrueColorJsonConverter))]
-	//public readonly struct TrueColor : IEquatable<TrueColor> {
-	//	private static readonly ImmutableDictionary<TrueColor, ColorNames> TrueColorToConsoleColorMap = new Dictionary<TrueColor, ColorNames> () {
-	//		{ new TrueColor (0,0,0),Color.Black },
-	//		{ new TrueColor (0, 0, 0x80),Color.Blue },
-	//		{ new TrueColor (0, 0x80, 0),Color.Green},
-	//		{ new TrueColor (0, 0x80, 0x80),Color.Cyan},
-	//		{ new TrueColor (0x80, 0, 0),Color.Red},
-	//		{ new TrueColor (0x80, 0, 0x80),Color.Magenta},
-	//		{ new TrueColor (0xC1, 0x9C, 0x00),Color.Brown},  // TODO confirm this
-	//		{ new TrueColor (0xC0, 0xC0, 0xC0),Color.Gray},
-	//		{ new TrueColor (0x80, 0x80, 0x80),Color.DarkGray},
-	//		{ new TrueColor (0, 0, 0xFF),Color.BrightBlue},
-	//		{ new TrueColor (0, 0xFF, 0),Color.BrightGreen},
-	//		{ new TrueColor (0, 0xFF, 0xFF),Color.BrightCyan},
-	//		{ new TrueColor (0xFF, 0, 0),Color.BrightRed},
-	//		{ new TrueColor (0xFF, 0, 0xFF),Color.BrightMagenta },
-	//		{ new TrueColor (0xFF, 0xFF, 0),Color.BrightYellow},
-	//		{ new TrueColor (0xFF, 0xFF, 0xFF),Color.White},
-	//	}.ToImmutableDictionary ();
-
-	//	/// <summary>
-	//	/// Red color component.
-	//	/// </summary>
-	//	public int Red { get; }
-	//	/// <summary>
-	//	/// Green color component.
-	//	/// </summary>
-	//	public int Green { get; }
-	//	/// <summary>
-	//	/// Blue color component.
-	//	/// </summary>
-	//	public int Blue { get; }
-
-	//	/// <summary>
-	//	/// Blue color component.
-	//	/// </summary>
-	//	/// <remarks>
-	//	/// Not currently supported; here for completeness. 
-	//	/// </remarks>
-	//	public int Alpha { get; }
-
-	//	/// <summary>
-	//	/// Initializes a new instance of the <see cref="Color"/> class.
-	//	/// </summary>
-	//	/// <param name="red"></param>
-	//	/// <param name="green"></param>
-	//	/// <param name="blue"></param>
-	//	public TrueColor (int red, int green, int blue)
-	//	{
-	//		Red = red;
-	//		Green = green;
-	//		Blue = blue;
-	//	}
-
-	//	/// <summary>
-	//	/// Converts the provided text to a new <see cref="Color"/> instance.
-	//	/// </summary>
-	//	/// <param name="text">The text to analyze.</param>
-	//	/// <param name="color">The parsed value.</param>
-	//	/// <returns>A boolean value indicating whether it was successful.</returns>
-	//	public static bool TryParse (string text, [NotNullWhen (true)] out TrueColor? color)
-	//	{
-	//		// empty color
-	//		if ((text == null) || (text.Length == 0)) {
-	//			color = null;
-	//			return false;
-	//		}
-
-	//		// #RRGGBB, #RGB
-	//		if ((text [0] == '#') && text.Length is 7 or 4) {
-	//			if (text.Length == 7) {
-	//				var r = Convert.ToInt32 (text.Substring (1, 2), 16);
-	//				var g = Convert.ToInt32 (text.Substring (3, 2), 16);
-	//				var b = Convert.ToInt32 (text.Substring (5, 2), 16);
-	//				color = new TrueColor (r, g, b);
-	//			} else {
-	//				var rText = char.ToString (text [1]);
-	//				var gText = char.ToString (text [2]);
-	//				var bText = char.ToString (text [3]);
-
-	//				var r = Convert.ToInt32 (rText + rText, 16);
-	//				var g = Convert.ToInt32 (gText + gText, 16);
-	//				var b = Convert.ToInt32 (bText + bText, 16);
-	//				color = new TrueColor (r, g, b);
-	//			}
-	//			return true;
-	//		}
-
-
-	//		// rgb(XX,YY,ZZ)
-	//		var match = Regex.Match (text, @"rgb\((\d+),(\d+),(\d+)\)");
-	//		if (match.Success) {
-	//			var r = int.Parse (match.Groups [1].Value);
-	//			var g = int.Parse (match.Groups [2].Value);
-	//			var b = int.Parse (match.Groups [3].Value);
-	//			color = new TrueColor (r, g, b);
-	//			return true;
-	//		}
-
-	//		color = null;
-	//		return false;
-	//	}
-
-	//	/// <summary>
-	//	/// Converts a <see cref="Color"/> to a <see cref="TrueColor"/> using a default mapping.
-	//	/// </summary>
-	//	/// <param name="consoleColor">The <see cref="Color"/> to convert.</param>
-	//	/// <returns></returns>
-	//	public static TrueColor? FromColorName (ColorNames consoleColor)
-	//	{
-	//		return consoleColor switch {
-	//			ColorNames.Black => new TrueColor (0, 0, 0),
-	//			ColorNames.Blue => new TrueColor (0, 0, 0x80),
-	//			ColorNames.Green => new TrueColor (0, 0x80, 0),
-	//			ColorNames.Cyan => new TrueColor (0, 0x80, 0x80),
-	//			ColorNames.Red => new TrueColor (0x80, 0, 0),
-	//			ColorNames.Magenta => new TrueColor (0x80, 0, 0x80),
-	//			ColorNames.Brown => new TrueColor (0xC1, 0x9C, 0x00) // TODO confirm this
-	//			,
-	//			ColorNames.Gray => new TrueColor (0xC0, 0xC0, 0xC0),
-	//			ColorNames.DarkGray => new TrueColor (0x80, 0x80, 0x80),
-	//			ColorNames.BrightBlue => new TrueColor (0, 0, 0xFF),
-	//			ColorNames.BrightGreen => new TrueColor (0, 0xFF, 0),
-	//			ColorNames.BrightCyan => new TrueColor (0, 0xFF, 0xFF),
-	//			ColorNames.BrightRed => new TrueColor (0xFF, 0, 0),
-	//			ColorNames.BrightMagenta => new TrueColor (0xFF, 0, 0xFF),
-	//			ColorNames.BrightYellow => new TrueColor (0xFF, 0xFF, 0),
-	//			ColorNames.White => new TrueColor (0xFF, 0xFF, 0xFF),
-	//			var _ => null
-	//		};
-	//	}
-
-	//	/// <summary>
-	//	/// Converts a <see cref="Color"/> to a <see cref="TrueColor"/> using a default mapping.
-	//	/// </summary>
-	//	/// <param name="consoleColor">The <see cref="Color"/> to convert.</param>
-	//	/// <returns></returns>
-	//	public static TrueColor? FromColorName (int color16)
-	//	{
-	//		return FromColorName ((ColorNames)color16);
-	//	}
-
-	//	/// <summary>
-	//	/// Converts the provided <see cref="TrueColor"/> to <see cref="Color"/> using a default mapping.
-	//	/// </summary>
-	//	/// <param name="trueColor"></param>
-	//	/// <returns></returns>
-	//	public static Color ToConsoleColor (TrueColor? trueColor)
-	//	{
-	//		if (trueColor.HasValue) {
-	//			return new Color (TrueColorToConsoleColorMap.MinBy (kv => CalculateDistance (kv.Key, trueColor.Value)).Value);
-	//		} else {
-	//			return (Color)(-1);
-	//		}
-	//	}
-
-	//	private static float CalculateDistance (TrueColor color1, TrueColor color2)
-	//	{
-	//		// use RGB distance
-	//		return
-	//			Math.Abs (color1.Red - color2.Red) +
-	//			Math.Abs (color1.Green - color2.Green) +
-	//			Math.Abs (color1.Blue - color2.Blue);
-	//	}
-
-	//	/// <inheritdoc/>
-	//	public static bool operator == (TrueColor left, TrueColor right)
-	//	{
-	//		return left.Equals (right);
-	//	}
-
-	//	/// <inheritdoc/>
-	//	public static bool operator != (TrueColor left, TrueColor right)
-	//	{
-	//		return !left.Equals (right);
-	//	}
-
-	//	/// <inheritdoc/>
-	//	public override bool Equals (object obj)
-	//	{
-	//		return obj is TrueColor other && Equals (other);
-	//	}
-
-	//	/// <inheritdoc/>
-	//	public bool Equals (TrueColor other)
-	//	{
-	//		return
-	//			Red == other.Red &&
-	//			Green == other.Green &&
-	//			Blue == other.Blue;
-	//	}
-
-	//	/// <inheritdoc/>
-	//	public override int GetHashCode ()
-	//	{
-	//		return HashCode.Combine (Red, Green, Blue);
-	//	}
-
-	//	/// <inheritdoc/>
-	//	public override string ToString ()
-	//	{
-	//		return $"#{Red:X2}{Green:X2}{Blue:X2}";
-	//	}
-	//}
-
 	/// <summary>
 	/// Attributes represent how text is styled when displayed in the terminal. 
 	/// </summary>
@@ -804,13 +599,24 @@ namespace Terminal.Gui {
 		public Color Background { get; private init; }
 
 		/// <summary>
+		///  Initializes a new instance with default values.
+		/// </summary>
+		public Attribute ()
+		{
+			var d = Default;
+			Value = -1;
+			Foreground = d.Foreground;
+			Background = d.Background;
+		}
+		
+		/// <summary>
 		/// Initializes a new instance with platform specific color value.
 		/// </summary>
 		/// <param name="value">Value.</param>
 		internal Attribute (int platformColor)
 		{
-			ColorNames foreground = default;
-			ColorNames background = default;
+			ColorNames foreground = Default.Foreground.ColorName;
+			ColorNames background = Default.Background.ColorName;
 
 			Initialized = false;
 			if (Application.Driver != null) {
@@ -828,8 +634,8 @@ namespace Terminal.Gui {
 		/// <param name="value">Value.</param>
 		internal Attribute (ColorNames colorName)
 		{
-			ColorNames foreground = default;
-			ColorNames background = default;
+			ColorNames foreground = colorName;
+			ColorNames background = colorName;
 
 			Initialized = false;
 			if (Application.Driver != null) {
@@ -847,7 +653,7 @@ namespace Terminal.Gui {
 		/// <param name="platformColor">platform-dependent color value.</param>
 		/// <param name="foreground">Foreground</param>
 		/// <param name="background">Background</param>
-		public Attribute (int platformColor, Color foreground, Color background)
+		internal Attribute (int platformColor, Color foreground, Color background)
 		{
 			Foreground = foreground;
 			Background = background;
@@ -861,7 +667,7 @@ namespace Terminal.Gui {
 		/// <param name="platformColor">platform-dependent color value.</param>
 		/// <param name="foreground">Foreground</param>
 		/// <param name="background">Background</param>
-		public Attribute (int platformColor, ColorNames foreground, ColorNames background)
+		internal Attribute (int platformColor, ColorNames foreground, ColorNames background)
 		{
 			Foreground = (Color)foreground;
 			Background = (Color)background;
@@ -1093,7 +899,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns></returns>
 		[JsonIgnore]
-		public bool HasValidColors => (int)Foreground > -1 && (int)Background > -1;
+		public bool HasValidColors => (int)Foreground.ColorName > -1 && (int)Background.ColorName > -1;
 
 		/// <inheritdoc />
 		public override string ToString ()

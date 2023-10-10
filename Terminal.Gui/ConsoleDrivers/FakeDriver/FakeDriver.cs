@@ -187,21 +187,6 @@ public class FakeDriver : ConsoleDriver {
 
 	#region Color Handling
 
-	// Cache the list of ConsoleColor values.
-	private static readonly HashSet<int> ConsoleColorValues = new HashSet<int> (
-		Enum.GetValues (typeof (ConsoleColor)).OfType<ConsoleColor> ().Select (c => (int)c)
-	);
-
-	void SetColor (int color)
-	{
-		if (ConsoleColorValues.Contains (color & 0xffff)) {
-			FakeConsole.BackgroundColor = (ConsoleColor)(color & 0xffff);
-		}
-		if (ConsoleColorValues.Contains ((color >> 16) & 0xffff)) {
-			FakeConsole.ForegroundColor = (ConsoleColor)((color >> 16) & 0xffff);
-		}
-	}
-
 	/// <remarks>
 	/// In the FakeDriver, colors are encoded as an int; same as NetDriver
 	/// Extracts the foreground and background colors from the encoded value.
@@ -223,7 +208,7 @@ public class FakeDriver : ConsoleDriver {
 	{
 		// Encode the colors into the int value.
 		return new Attribute (
-			platformColor: ((((int)foreground) & 0xffff) << 16) | (((int)background) & 0xffff),
+			platformColor: ((((int)foreground.ColorName) & 0xffff) << 16) | (((int)background.ColorName) & 0xffff),
 			foreground: foreground,
 			background: background
 		);

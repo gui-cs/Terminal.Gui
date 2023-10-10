@@ -121,11 +121,10 @@ namespace Terminal.Gui.ConfigurationTests {
 			// Assert
 			Assert.Equal (expectedColor, color);
 		}
-	}
 
-	public class TrueColorJsonConverterTests {
 		[Theory]
 		[InlineData (0, 0, 0, "\"#000000\"")]
+		[InlineData (0, 0, 1, "\"#000001\"")]
 		public void SerializesToHexCode (int r, int g, int b, string expected)
 		{
 			// Arrange
@@ -186,7 +185,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			// Test deserializing from RGB values
 			json = "{\"Foreground\":\"rgb(255,0,0)\",\"Background\":\"rgb(0,255,0)\"}";
 			attribute = JsonSerializer.Deserialize<Attribute> (json, ConfigurationManagerTests._jsonOptions);
-			Assert.Equal (Color.BrightRed, attribute.Foreground.ColorName);
+			Assert.Equal (Color.Red, attribute.Foreground.ColorName);
 			Assert.Equal (Color.BrightGreen, attribute.Background.ColorName);
 		}
 
@@ -196,7 +195,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			// Test serializing to human-readable color names
 			var attribute = new Attribute (Color.Blue, Color.Green);
 			var json = JsonSerializer.Serialize<Attribute> (attribute, ConfigurationManagerTests._jsonOptions);
-			Assert.Equal ("{\"Foreground\":\"Blue\",\"Background\":\"Green\",\"TrueColorForeground\":\"#000080\",\"TrueColorBackground\":\"#008000\"}", json);
+			Assert.Equal ("{\"Foreground\":\"Blue\",\"Background\":\"Green\"}", json);
 		}
 	}
 

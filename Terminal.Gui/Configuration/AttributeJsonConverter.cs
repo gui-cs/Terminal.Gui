@@ -34,7 +34,7 @@ namespace Terminal.Gui {
 			Color background = (Color)(-1);
 			while (reader.Read ()) {
 				if (reader.TokenType == JsonTokenType.EndObject) {
-					if (attribute.Foreground.Value == -1 || attribute.Foreground.Value == -1) {
+					if (foreground == (Color)(-1) || background == (Color)(-1)) {
 						throw new JsonException ($"Both Foreground and Background colors must be provided.");
 					}
 					return attribute;
