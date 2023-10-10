@@ -795,8 +795,8 @@ internal class NetDriver : ConsoleDriver {
 							output.Append (EscSeqUtils.CSI_SetGraphicsRendition (
 								MapColors ((ConsoleColor)attr.Background.Value, false), MapColors ((ConsoleColor)attr.Foreground.Value, true)));
 						} else {
-							output.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.TrueColorForeground.Value.Red, attr.TrueColorForeground.Value.Green, attr.TrueColorForeground.Value.Blue));
-							output.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.TrueColorBackground.Value.Red, attr.TrueColorBackground.Value.Green, attr.TrueColorBackground.Value.Blue));
+							output.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.Foreground.R, attr.Foreground.G, attr.Foreground.B));
+							output.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.Background.R, attr.Background.G, attr.Background.B));
 						}
 
 					}
@@ -867,11 +867,11 @@ internal class NetDriver : ConsoleDriver {
 	/// Extracts the foreground and background colors from the encoded value.
 	/// Assumes a 4-bit encoded value for both foreground and background colors.
 	/// </remarks>
-	internal override void GetColors (int value, out Color foreground, out Color background)
+	internal override void GetColors (int value, out ColorNames foreground, out ColorNames background)
 	{
 		// Assume a 4-bit encoded value for both foreground and background colors.
-		foreground = (Color)((value >> 16) & 0xF);
-		background = (Color)(value & 0xF);
+		foreground = (ColorNames)((value >> 16) & 0xF);
+		background = (ColorNames)(value & 0xF);
 	}
 
 	/// <remarks>
@@ -883,9 +883,9 @@ internal class NetDriver : ConsoleDriver {
 	{
 		// Encode the colors into the int value.
 		return new Attribute (
-		    value: ((((int)foreground) & 0xffff) << 16) | (((int)background) & 0xffff),
-		    foreground: foreground,
-		    background: background
+			platformColor: ((((int)foreground) & 0xffff) << 16) | (((int)background) & 0xffff),
+			foreground: foreground,
+			background: background
 		);
 	}
 

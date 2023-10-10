@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using Terminal.Gui;
+using Color = Terminal.Gui.Color;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Images", Description: "Demonstration of how to render an image with/without true color support.")]
@@ -121,7 +122,7 @@ namespace UICatalog.Scenarios {
 					for (int x = 0; x < bounds.Width; x++) {
 						var rgb = matchSize [x, y];
 
-						var attr = cache.GetOrAdd (rgb, (rgb) => new Attribute (new TrueColor (), new TrueColor (rgb.R, rgb.G, rgb.B)));
+						var attr = cache.GetOrAdd (rgb, (rgb) => new Attribute (new Color (), new Color (rgb.R, rgb.G, rgb.B)));
 
 						Driver.SetAttribute (attr);
 						AddRune (x, y, (System.Text.Rune)' ');

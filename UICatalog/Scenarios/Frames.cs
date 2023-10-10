@@ -116,10 +116,9 @@ namespace UICatalog.Scenarios {
 					BorderStyle = LineStyle.Single,
 					SuperViewRendersLineCanvas = true
 				};
-				// BUGBUG: (v2 truecolor) This code depends on 8-bit color names; disabling for now
-				//_foregroundColorPicker.ColorChanged += (o, a) =>
-				//	AttributeChanged?.Invoke (this,
-				//		new Terminal.Gui.Attribute (_foregroundColorPicker.SelectedColor, _backgroundColorPicker.SelectedColor));
+				_foregroundColorPicker.ColorChanged += (o, a) =>
+					AttributeChanged?.Invoke (this,
+						new Attribute (_foregroundColorPicker.SelectedColor, _backgroundColorPicker.SelectedColor));
 				Add (_foregroundColorPicker);
 
 				// Background ColorPicker.
@@ -133,12 +132,11 @@ namespace UICatalog.Scenarios {
 					SuperViewRendersLineCanvas = true
 				};
 
-				// BUGBUG: (v2 truecolor) This code depends on 8-bit color names; disabling for now
-				//_backgroundColorPicker.ColorChanged += (o, a) =>
-				//	AttributeChanged?.Invoke (this,
-				//		new Terminal.Gui.Attribute (
-				//			_foregroundColorPicker.SelectedColor,
-				//			_backgroundColorPicker.SelectedColor));
+				_backgroundColorPicker.ColorChanged += (o, a) =>
+					AttributeChanged?.Invoke (this,
+						new Terminal.Gui.Attribute (
+							_foregroundColorPicker.SelectedColor,
+							_backgroundColorPicker.SelectedColor));
 				Add (_backgroundColorPicker);
 
 				_topEdit.Text = $"{Thickness.Top}";
@@ -224,7 +222,6 @@ namespace UICatalog.Scenarios {
 				Add (_borderEditor);
 
 				viewToEdit.Padding.ColorScheme = new ColorScheme (Colors.ColorSchemes ["Error"]);
-				var colorEnum = Enum.GetValues (typeof (Color)).Cast<Color> ().ToList ();
 
 				var borderStyleEnum = Enum.GetValues (typeof (LineStyle)).Cast<LineStyle> ().ToList ();
 				var rbBorderStyle = new RadioGroup (borderStyleEnum.Select (

@@ -77,7 +77,7 @@ internal class CursesDriver : ConsoleDriver {
 		// TODO: for TrueColor - Use InitExtendedPair
 		Curses.InitColorPair (v, foreground, background);
 		return new Attribute (
-			value: Curses.ColorPair (v),
+			platformColor: Curses.ColorPair (v),
 			foreground: CursesColorNumberToColor (foreground),
 			background: CursesColorNumberToColor (background));
 	}
@@ -94,7 +94,7 @@ internal class CursesDriver : ConsoleDriver {
 			return MakeColor (ColorNameToCursesColorNumber (fore), ColorNameToCursesColorNumber (back));
 		} else {
 			return new Attribute (
-				value: 0,
+				platformColor: 0,
 				foreground: ColorNameToCursesColorNumber (fore),
 				background: ColorNameToCursesColorNumber (back));
 		}
@@ -103,10 +103,10 @@ internal class CursesDriver : ConsoleDriver {
 	public override Attribute MakeColor (Color foreground, Color background)
 	{
 		if (!RunningUnitTests) {
-			return MakeColor (foreground, background);
+			return MakeColor (foreground.ColorName, background.ColorName);
 		} else {
 			return new Attribute (
-				value: 0,
+				platformColor: 0,
 				foreground: foreground,
 				background: background);
 		}
@@ -151,41 +151,41 @@ internal class CursesDriver : ConsoleDriver {
 		throw new ArgumentException ("Invalid color code");
 	}
 
-	static Color CursesColorNumberToColor (short color)
+	static ColorNames CursesColorNumberToColor (short color)
 	{
 		switch (color) {
 		case Curses.COLOR_BLACK:
-			return new Color (Color.Black);
+			return Color.Black;
 		case Curses.COLOR_BLUE:
-			return new Color (Color.Blue);
+			return Color.Blue;
 		case Curses.COLOR_GREEN:
-			return (Color)Color.Green;
+			return Color.Green;
 		case Curses.COLOR_CYAN:
-			return (Color)Color.Cyan;
+			return Color.Cyan;
 		case Curses.COLOR_RED:
-			return (Color)Color.Red;
+			return Color.Red;
 		case Curses.COLOR_MAGENTA:
-			return (Color)Color.Magenta;
+			return Color.Magenta;
 		case Curses.COLOR_YELLOW:
-			return (Color)Color.Brown;
+			return Color.Brown;
 		case Curses.COLOR_WHITE:
-			return (Color)Color.Gray;
+			return Color.Gray;
 		case Curses.COLOR_GRAY:
-			return (Color)Color.DarkGray;
+			return Color.DarkGray;
 		case Curses.COLOR_BLUE | Curses.COLOR_GRAY:
-			return (Color)Color.BrightBlue;
+			return Color.BrightBlue;
 		case Curses.COLOR_GREEN | Curses.COLOR_GRAY:
-			return (Color)Color.BrightGreen;
+			return Color.BrightGreen;
 		case Curses.COLOR_CYAN | Curses.COLOR_GRAY:
-			return (Color)Color.BrightCyan;
+			return Color.BrightCyan;
 		case Curses.COLOR_RED | Curses.COLOR_GRAY:
-			return (Color)Color.BrightRed;
+			return Color.BrightRed;
 		case Curses.COLOR_MAGENTA | Curses.COLOR_GRAY:
-			return (Color)Color.BrightMagenta;
+			return Color.BrightMagenta;
 		case Curses.COLOR_YELLOW | Curses.COLOR_GRAY:
-			return (Color)Color.BrightYellow;
+			return Color.BrightYellow;
 		case Curses.COLOR_WHITE | Curses.COLOR_GRAY:
-			return (Color)Color.White;
+			return Color.White;
 		}
 		throw new ArgumentException ("Invalid curses color code");
 	}
@@ -196,7 +196,7 @@ internal class CursesDriver : ConsoleDriver {
 	/// and the background color is stored in the least significant 4 bits.
 	/// The Terminal.GUI Color values are converted to curses color encoding before being encoded.
 	/// </remarks>
-	internal override void GetColors (int value, out Color foreground, out Color background)
+	internal override void GetColors (int value, out ColorNames foreground, out ColorNames background)
 	{
 		// Assume a 4-bit encoded value for both foreground and background colors.
 		foreground = CursesColorNumberToColor ((short)((value >> 4) & 0xF));

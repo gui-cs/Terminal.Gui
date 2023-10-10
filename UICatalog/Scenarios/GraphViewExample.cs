@@ -95,7 +95,6 @@ namespace UICatalog.Scenarios {
 
 			about.Text = "Housing Expenditures by income thirds 1996-2003";
 
-			// BUGBUG: (v2 truecolor) This code depends on 8-bit color names; refactor
 			var fore = graphView.ColorScheme.Normal.Foreground == new Color(ColorNames.Black) ? new Color(ColorNames.White) : graphView.ColorScheme.Normal.Foreground;
 			var black = new Attribute (fore, Color.Black);
 			var cyan = new Attribute (Color.BrightCyan, Color.Black);

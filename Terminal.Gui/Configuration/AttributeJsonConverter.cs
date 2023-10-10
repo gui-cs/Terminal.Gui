@@ -32,11 +32,9 @@ namespace Terminal.Gui {
 			Attribute attribute = new Attribute ();
 			Color foreground = (Color)(-1);
 			Color background = (Color)(-1);
-			TrueColor? trueColorForeground = null;
-			TrueColor? trueColorBackground = null;
 			while (reader.Read ()) {
 				if (reader.TokenType == JsonTokenType.EndObject) {
-					if (!attribute.TrueColorForeground.HasValue || !attribute.TrueColorBackground.HasValue) {
+					if (attribute.Foreground.Value == -1 || attribute.Foreground.Value == -1) {
 						throw new JsonException ($"Both Foreground and Background colors must be provided.");
 					}
 					return attribute;
@@ -56,12 +54,6 @@ namespace Terminal.Gui {
 					break;
 				case "background":
 					background = JsonSerializer.Deserialize<Color> (color, options);
-					break;
-				case "truecolorforeground":
-					trueColorForeground = JsonSerializer.Deserialize<TrueColor> (color, options);
-					break;
-				case "truecolorbackground":
-					trueColorBackground = JsonSerializer.Deserialize<TrueColor> (color, options);
 					break;
 				//case "bright":
 				//case "bold":
@@ -92,9 +84,6 @@ namespace Terminal.Gui {
 				if (foreground != (Color)(-1) && background != (Color)(-1)) {
 					attribute = new Attribute (foreground, background);
 				}
-				if (trueColorForeground.HasValue && trueColorBackground.HasValue) {
-					attribute = new Attribute (trueColorForeground, trueColorBackground);
-				}
 			}
 			throw new JsonException ();
 		}
@@ -106,12 +95,7 @@ namespace Terminal.Gui {
 			ColorJsonConverter.Instance.Write (writer, value.Foreground, options);
 			writer.WritePropertyName (nameof (Attribute.Background));
 			ColorJsonConverter.Instance.Write (writer, value.Background, options);
-			if (value.TrueColorForeground.HasValue && value.TrueColorBackground.HasValue) {
-				writer.WritePropertyName (nameof (Attribute.TrueColorForeground));
-				TrueColorJsonConverter.Instance.Write (writer, value.TrueColorForeground.Value, options);
-				writer.WritePropertyName (nameof (Attribute.TrueColorBackground));
-				TrueColorJsonConverter.Instance.Write (writer, value.TrueColorBackground.Value, options);
-			}
+			
 			writer.WriteEndObject ();
 		}
 	}

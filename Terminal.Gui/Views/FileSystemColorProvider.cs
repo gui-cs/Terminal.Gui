@@ -14,7 +14,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="file"></param>
 		/// <returns></returns>
-		public TrueColor? GetTrueColor (IFileSystemInfo file)
+		public Color? GetTrueColor (IFileSystemInfo file)
 		{
 			if (FilenameToColor.ContainsKey (file.Name)) {
 				return FilenameToColor [file.Name];
@@ -30,7 +30,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Mapping of file/dir name to color.
 		/// </summary>
-		public Dictionary<string, TrueColor> FilenameToColor { get; set; } = new ()
+		public Dictionary<string, Color> FilenameToColor { get; set; } = new ()
 		{
 	    {"docs",StringToColor("#00BFFF")},
 	    {"documents",StringToColor("#00BFFF")},
@@ -157,7 +157,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Mapping of file extension to color.
 		/// </summary>
-		public Dictionary<string, TrueColor> ExtensionToColor = new ()
+		public Dictionary<string, Color> ExtensionToColor = new ()
 	{
 			{".7z",StringToColor("#DAA520")},
 	    {".bz",StringToColor("#DAA520")},
@@ -441,10 +441,10 @@ namespace Terminal.Gui {
 	};
 
 
-		private static TrueColor StringToColor (string str)
+		private static Color StringToColor (string str)
 		{
-			TrueColor.TryParse (str, out var c);
-			return c ?? throw new System.Exception ("Failed to parse TrueColor from " + str);
+			Color.TryParse (str, out var c);
+			return c ?? throw new System.Exception ("Failed to parse Color from " + str);
 		}
 	}
 }

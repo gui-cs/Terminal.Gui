@@ -32,6 +32,7 @@ namespace Terminal.Gui {
 	public class ColorPicker : View {
 		private int _selectColorIndex = (int)Color.Black;
 
+
 		/// <summary>
 		/// Columns of color boxes
 		/// </summary>
@@ -50,7 +51,7 @@ namespace Terminal.Gui {
 			set {
 				if (_boxWidth != value) {
 					_boxWidth = value;
-					SetNeedsLayout ();
+					Bounds = new Rect (Bounds.Location, new Size (_cols * BoxWidth, _rows * BoxHeight));
 				}
 			}
 		}
@@ -64,7 +65,7 @@ namespace Terminal.Gui {
 			set {
 				if (_boxHeight != value) {
 					_boxHeight = value;
-					SetNeedsLayout ();
+					Bounds = new Rect (Bounds.Location, new Size (_cols * BoxWidth, _rows * BoxHeight));
 				}
 			}
 		}
@@ -101,8 +102,8 @@ namespace Terminal.Gui {
 				ColorNames prev = (ColorNames)_selectColorIndex;
 				_selectColorIndex = (int)value;
 				ColorChanged?.Invoke (this, new ColorEventArgs () {
-					PreviousColor = new Color(prev),
-					Color = new Color(value),
+					PreviousColor = new Color (prev),
+					Color = new Color (value),
 				});
 				SetNeedsDisplay ();
 			}
@@ -115,6 +116,8 @@ namespace Terminal.Gui {
 		{
 			SetInitialProperties ();
 		}
+
+		bool laidOut = false;
 
 		private void SetInitialProperties ()
 		{
@@ -159,7 +162,7 @@ namespace Terminal.Gui {
 			for (var y = 0; y < (Bounds.Height / BoxHeight); y++) {
 				for (var x = 0; x < (Bounds.Width / BoxWidth); x++) {
 					var foregroundColorIndex = y == 0 ? colorIndex + _cols : colorIndex - _cols;
-					Driver.SetAttribute (Driver.MakeAttribute ((Color)foregroundColorIndex, (Color)colorIndex));
+					Driver.SetAttribute (new Attribute ((ColorNames)foregroundColorIndex, (ColorNames)colorIndex));
 					var selected = x == Cursor.X && y == Cursor.Y;
 					DrawColorBox (x, y, selected);
 					colorIndex++;

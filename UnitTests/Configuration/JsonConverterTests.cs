@@ -131,8 +131,8 @@ namespace Terminal.Gui.ConfigurationTests {
 			// Arrange
 
 			// Act
-			var actual = JsonSerializer.Serialize (new TrueColor (r, g, b), new JsonSerializerOptions {
-				Converters = { new TrueColorJsonConverter () }
+			var actual = JsonSerializer.Serialize (new Color (r, g, b), new JsonSerializerOptions {
+				Converters = { new ColorJsonConverter () }
 			});
 
 			//Assert
@@ -145,11 +145,11 @@ namespace Terminal.Gui.ConfigurationTests {
 		public void DeserializesFromHexCode (string hexCode, int r, int g, int b)
 		{
 			// Arrange
-			TrueColor expected = new TrueColor (r, g, b);
+			Color expected = new Color (r, g, b);
 
 			// Act
-			var actual = JsonSerializer.Deserialize<TrueColor> (hexCode, new JsonSerializerOptions {
-				Converters = { new TrueColorJsonConverter () }
+			var actual = JsonSerializer.Deserialize<Color> (hexCode, new JsonSerializerOptions {
+				Converters = { new ColorJsonConverter () }
 			});
 
 			//Assert
@@ -161,11 +161,11 @@ namespace Terminal.Gui.ConfigurationTests {
 		public void DeserializesFromRgb (string rgb, int r, int g, int b)
 		{
 			// Arrange
-			TrueColor expected = new TrueColor (r, g, b);
+			Color expected = new Color (r, g, b);
 
 			// Act
-			var actual = JsonSerializer.Deserialize<TrueColor> (rgb, new JsonSerializerOptions {
-				Converters = { new TrueColorJsonConverter () }
+			var actual = JsonSerializer.Deserialize<Color> (rgb, new JsonSerializerOptions {
+				Converters = { new ColorJsonConverter () }
 			});
 
 			//Assert
