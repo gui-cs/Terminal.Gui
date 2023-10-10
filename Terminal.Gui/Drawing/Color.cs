@@ -744,14 +744,6 @@ namespace Terminal.Gui {
 		[JsonIgnore]
 		public bool Initialized { get; internal set; }
 
-		//// TODO: This no longer makes sense - remove it
-		///// <summary>
-		///// Returns <see langword="true"/> if the Attribute is valid (both foreground and background have valid color values).
-		///// </summary>
-		///// <returns></returns>
-		//[JsonIgnore]
-		//public bool HasValidColors => (int)Foreground.ColorName > -1 && (int)Background.ColorName > -1;
-
 		/// <inheritdoc />
 		public override string ToString ()
 		{
@@ -761,7 +753,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Defines the color <see cref="Attribute"/>s for common visible elements in a <see cref="View"/>. 
+	/// Defines the <see cref="Attribute"/>s for common visible elements in a <see cref="View"/>. 
 	/// Containers such as <see cref="Window"/> and <see cref="FrameView"/> use <see cref="ColorScheme"/> to determine
 	/// the colors used by sub-views.
 	/// </summary>
@@ -780,7 +772,7 @@ namespace Terminal.Gui {
 		/// Used by <see cref="Colors.SetColorScheme(ColorScheme, string)"/> and <see cref="Colors.GetColorScheme(string)"/> to track which ColorScheme 
 		/// is being accessed.
 		/// </summary>
-		internal string schemeBeingSet = "";
+		internal string _schemeBeingSet = "";
 
 		/// <summary>
 		/// Creates a new instance.
@@ -819,65 +811,40 @@ namespace Terminal.Gui {
 		/// The foreground and background color for text when the view is not focused, hot, or disabled.
 		/// </summary>
 		public Attribute Normal {
-			get { return _normal; }
-			set {
-				//if (!value.HasValidColors) {
-				//	return;
-				//}
-				_normal = value;
-			}
+			get => _normal;
+			set => _normal = value;
 		}
 
 		/// <summary>
 		/// The foreground and background color for text when the view has the focus.
 		/// </summary>
 		public Attribute Focus {
-			get { return _focus; }
-			set {
-				//if (!value.HasValidColors) {
-				//	return;
-				//}
-				_focus = value;
-			}
+			get => _focus;
+			set => _focus = value;
 		}
 
 		/// <summary>
 		/// The foreground and background color for text when the view is highlighted (hot).
 		/// </summary>
 		public Attribute HotNormal {
-			get { return _hotNormal; }
-			set {
-				//if (!value.HasValidColors) {
-				//	return;
-				//}
-				_hotNormal = value;
-			}
+			get => _hotNormal;
+			set => _hotNormal = value;
 		}
 
 		/// <summary>
 		/// The foreground and background color for text when the view is highlighted (hot) and has focus.
 		/// </summary>
 		public Attribute HotFocus {
-			get { return _hotFocus; }
-			set {
-				//if (!value.HasValidColors) {
-				//	return;
-				//}
-				_hotFocus = value;
-			}
+			get => _hotFocus;
+			set => _hotFocus = value;
 		}
 
 		/// <summary>
 		/// The default foreground and background color for text, when the view is disabled.
 		/// </summary>
 		public Attribute Disabled {
-			get { return _disabled; }
-			set {
-				//if (!value.HasValidColors) {
-				//	return;
-				//}
-				_disabled = value;
-			}
+			get => _disabled;
+			set => _disabled = value;
 		}
 
 		/// <summary>
@@ -1062,7 +1029,7 @@ namespace Terminal.Gui {
 		static void SetColorScheme (ColorScheme colorScheme, [CallerMemberName] string schemeBeingSet = null)
 		{
 			ColorSchemes [schemeBeingSet] = colorScheme;
-			colorScheme.schemeBeingSet = schemeBeingSet;
+			colorScheme._schemeBeingSet = schemeBeingSet;
 		}
 
 		/// <summary>
