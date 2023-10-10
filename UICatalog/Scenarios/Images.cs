@@ -15,29 +15,25 @@ namespace UICatalog.Scenarios {
 		{
 			base.Setup ();
 
-			var x = 0;
-			var y = 0;
-
 			var canTrueColor = Application.Driver.SupportsTrueColor;
 
-			var lblDriverName = new Label ($"Current driver is {Application.Driver.GetType ().Name}") {
-				X = x,
-				Y = y++
+			var lblDriverName = new Label ($"Driver is {Application.Driver.GetType ().Name}") {
+				X = 0,
+				Y = 0
 			};
 			Win.Add (lblDriverName);
-			y++;
 
-			var cbSupportsTrueColor = new CheckBox ("Driver supports true color ") {
-				X = x,
-				Y = y++,
+			var cbSupportsTrueColor = new CheckBox ("supports true color ") {
+				X = Pos.Right(lblDriverName) + 2,
+				Y = 0,
 				Checked = canTrueColor,
 				CanFocus = false
 			};
 			Win.Add (cbSupportsTrueColor);
 
 			var cbUseTrueColor = new CheckBox ("Use true color") {
-				X = x,
-				Y = y++,
+				X = Pos.Right(cbSupportsTrueColor) + 2,
+				Y = 0,
 				Checked = !Application.Driver.Force16Colors,
 				Enabled = canTrueColor,
 			};
@@ -45,14 +41,14 @@ namespace UICatalog.Scenarios {
 			Win.Add (cbUseTrueColor);
 
 			var btnOpenImage = new Button ("Open Image") {
-				X = x,
-				Y = y++
+				X = Pos.Right (cbUseTrueColor) + 2,
+				Y = 0
 			};
 			Win.Add (btnOpenImage);
 
 			var imageView = new ImageView () {
-				X = x,
-				Y = y++,
+				X = 0,
+				Y = Pos.Bottom(lblDriverName),
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 			};
@@ -92,6 +88,7 @@ namespace UICatalog.Scenarios {
 				}
 
 				imageView.SetImage (img);
+				Application.Refresh ();
 			};
 		}
 
