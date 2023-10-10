@@ -21,7 +21,7 @@ namespace Terminal.Gui.ConfigurationTests {
 		[InlineData ("Magenta", Color.Magenta)]
 		[InlineData ("Red", Color.Red)]
 		[InlineData ("White", Color.White)]
-		public void TestColorDeserializationFromHumanReadableColorNames (string colorName, Color expectedColor)
+		public void TestColorDeserializationFromHumanReadableColorNames (string colorName, ColorNames expectedColor)
 		{
 			// Arrange
 			string json = $"\"{colorName}\"";
@@ -30,7 +30,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			Color actualColor = JsonSerializer.Deserialize<Color> (json, ConfigurationManagerTests._jsonOptions);
 
 			// Assert
-			Assert.Equal (expectedColor, actualColor);
+			Assert.Equal ((Color)expectedColor, actualColor);
 		}
 
 		[Theory]
