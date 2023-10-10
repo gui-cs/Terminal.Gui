@@ -904,10 +904,10 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Bounds = new Rect (0, 0, 5, 4);
 
 			var rowHighlight = new ColorScheme () {
-				Normal = Attribute.Make (Color.BrightCyan, Color.DarkGray),
-				HotNormal = Attribute.Make (Color.Green, Color.Blue),
-				HotFocus = Attribute.Make (Color.BrightYellow, Color.White),
-				Focus = Attribute.Make (Color.Cyan, Color.Magenta),
+				Normal = new Attribute (Color.BrightCyan, Color.DarkGray),
+				HotNormal = new Attribute (Color.Green, Color.Blue),
+				HotFocus = new Attribute (Color.BrightYellow, Color.White),
+				Focus = new Attribute (Color.Cyan, Color.Magenta),
 			};
 
 			// when B is 2 use the custom highlight colour for the row
@@ -995,10 +995,10 @@ namespace Terminal.Gui.ViewsTests {
 
 			// when B is 2 use the custom highlight colour
 			var cellHighlight = new ColorScheme () {
-				Normal = Attribute.Make (Color.BrightCyan, Color.DarkGray),
-				HotNormal = Attribute.Make (Color.Green, Color.Blue),
-				HotFocus = Attribute.Make (Color.BrightYellow, Color.White),
-				Focus = Attribute.Make (Color.Cyan, Color.Magenta),
+				Normal = new Attribute (Color.BrightCyan, Color.DarkGray),
+				HotNormal = new Attribute (Color.Green, Color.Blue),
+				HotFocus = new Attribute (Color.BrightYellow, Color.White),
+				Focus = new Attribute (Color.Cyan, Color.Magenta),
 			};
 
 			bStyle.ColorGetter = (a) => Convert.ToInt32 (a.CellValue) == 2 ? cellHighlight : null;

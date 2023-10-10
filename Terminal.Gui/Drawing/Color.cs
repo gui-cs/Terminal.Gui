@@ -219,16 +219,6 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private static Color FromColorName (ColorNames consoleColor) => _colorNames.FirstOrDefault (x => x.Value == consoleColor).Key;
 
-		/// <summary>
-		/// Converts a legacy <see cref="ColorNames"/> index to a 24-bit <see cref="Color"/>.
-		/// </summary>
-		/// <param name="colorNameId">The index into the <see cref="ColorNames"/> enum to convert.</param>
-		/// <returns></returns>
-		private static Color FromColorName (int colorNameId)
-		{
-			return FromColorName ((ColorNames)colorNameId);
-		}
-
 		// Iterates through the entries in the _colorNames dictionary, calculates the
 		// Euclidean distance between the input color and each dictionary color in RGB space,
 		// and keeps track of the closest entry found so far. The function returns a KeyValuePair
@@ -258,7 +248,7 @@ namespace Terminal.Gui {
 
 			return Math.Sqrt (deltaR * deltaR + deltaG * deltaG + deltaB * deltaB);
 		}
-		
+
 		/// <summary>
 		/// Gets or sets the <see cref="Color"/> using a legacy 16-color <see cref="ColorNames"/> value.
 		/// </summary>
@@ -266,9 +256,7 @@ namespace Terminal.Gui {
 		/// Get returns the closest 24-bit color value. Set sets the RGB value using a hard-coded map.
 		/// </remarks>
 		public ColorNames ColorName {
-			get {
-				return FindClosestColor (this.Value);
-			}
+			get => FindClosestColor (this.Value);
 			set {
 
 				var c = FromColorName (value);
@@ -347,7 +335,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public const ColorNames White = ColorNames.White;
 		#endregion
-		
+
 		/// <summary>
 		/// Converts the provided text to a new <see cref="Color"/> instance.
 		/// </summary>
@@ -468,37 +456,67 @@ namespace Terminal.Gui {
 		}
 
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Equality operator for two <see cref="Color"/> objects..
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns></returns>
 		public static bool operator == (Color left, Color right)
 		{
 			return left.Equals (right);
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Inequality operator for two <see cref="Color"/> objects.
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns></returns>
 		public static bool operator != (Color left, Color right)
 		{
 			return !left.Equals (right);
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Equality operator for <see cref="Color"/> and <see cref="ColorNames"/> objects.
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns></returns>
 		public static bool operator == (ColorNames left, Color right)
 		{
 			return left == right.ColorName;
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Inequality operator for <see cref="Color"/> and <see cref="ColorNames"/> objects.
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns></returns>
 		public static bool operator != (ColorNames left, Color right)
 		{
 			return left != right.ColorName;
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Equality operator for <see cref="Color"/> and <see cref="ColorNames"/> objects.
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns></returns>
 		public static bool operator == (Color left, ColorNames right)
 		{
 			return left.ColorName == right;
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Inequality operator for <see cref="Color"/> and <see cref="ColorNames"/> objects.
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns></returns>
 		public static bool operator != (Color left, ColorNames right)
 		{
 			return left.ColorName != right;
@@ -598,39 +616,7 @@ namespace Terminal.Gui {
 		/// Initializes a new instance with platform specific color value.
 		/// </summary>
 		/// <param name="platformColor">Value.</param>
-		internal Attribute (int platformColor)
-		{
-			ColorNames foreground = Default.Foreground.ColorName;
-			ColorNames background = Default.Background.ColorName;
-
-			Initialized = false;
-			if (Application.Driver != null) {
-				Application.Driver.GetColors (platformColor, out foreground, out background);
-				Initialized = true;
-			}
-			Value = platformColor;
-			Foreground = (Color)foreground;
-			Background = (Color)background;
-		}
-
-		/// <summary>
-		/// Initializes a new instance with a <see cref="ColorNames"/> value.
-		/// </summary>
-		/// <param name="colorName">Value.</param>
-		internal Attribute (ColorNames colorName)
-		{
-			ColorNames foreground = colorName;
-			ColorNames background = colorName;
-
-			Initialized = false;
-			if (Application.Driver != null) {
-				Application.Driver.GetColors ((int)colorName, out foreground, out background);
-				Initialized = true;
-			}
-			Value = ((Color)colorName).Value;
-			Foreground = (Color)foreground;
-			Background = (Color)background;
-		}
+		internal Attribute (int platformColor) : this (platformColor, Default.Foreground, Default.Background) { }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Attribute"/> struct.
@@ -652,13 +638,7 @@ namespace Terminal.Gui {
 		/// <param name="platformColor">platform-dependent color value.</param>
 		/// <param name="foreground">Foreground</param>
 		/// <param name="background">Background</param>
-		internal Attribute (int platformColor, ColorNames foreground, ColorNames background)
-		{
-			Foreground = (Color)foreground;
-			Background = (Color)background;
-			Value = platformColor;
-			Initialized = true;
-		}
+		internal Attribute (int platformColor, ColorNames foreground, ColorNames background) : this (platformColor, (Color)foreground, (Color)background) { }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Attribute"/> struct.
@@ -670,56 +650,46 @@ namespace Terminal.Gui {
 			Foreground = foreground;
 			Background = background;
 
-			var make = Make (foreground, background);
+			if (Application.Driver == null) {
+				// Create the attribute, but show it's not been initialized
+				Initialized = false;
+				Value = -1;
+				return;
+			}
+
+			var make = Application.Driver.MakeAttribute (foreground, background);
 			Initialized = make.Initialized;
 			Value = make.Value;
 		}
 
 		/// <summary>
+		/// Initializes a new instance with a <see cref="ColorNames"/> value. Both <see cref="Foreground"/> and
+		/// <see cref="Background"/> will be set to the specified color.
+		/// </summary>
+		/// <param name="colorName">Value.</param>
+		internal Attribute (ColorNames colorName) : this (colorName, colorName) { }
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="Attribute"/> struct.
 		/// </summary>
-		/// <param name="foreground">Foreground</param>
-		/// <param name="background">Background</param>
-		public Attribute (ColorNames foreground, ColorNames background)
-		{
-			Foreground = new Color (foreground);
-			Background = new Color (background);
-
-			var make = Make (foreground, background);
-			Initialized = make.Initialized;
-			Value = make.Value;
-		}
+		/// <param name="foregroundName">Foreground</param>
+		/// <param name="backgroundName">Background</param>
+		public Attribute (ColorNames foregroundName, ColorNames backgroundName) : this (new Color (foregroundName), new Color (backgroundName)) { }
 
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Attribute"/> struct.
 		/// </summary>
-		/// <param name="foreground">Foreground</param>
+		/// <param name="foregroundName">Foreground</param>
 		/// <param name="background">Background</param>
-		public Attribute (ColorNames foreground, Color background)
-		{
-			Foreground = new Color (foreground);
-			Background = background;
-
-			var make = Make (foreground, background);
-			Initialized = make.Initialized;
-			Value = make.Value;
-		}
+		public Attribute (ColorNames foregroundName, Color background) : this (new Color (foregroundName), background) { }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Attribute"/> struct.
 		/// </summary>
 		/// <param name="foreground">Foreground</param>
-		/// <param name="background">Background</param>
-		public Attribute (Color foreground, ColorNames background)
-		{
-			Foreground = foreground;
-			Background = new Color (background);
-
-			var make = Make (foreground, background);
-			Initialized = make.Initialized;
-			Value = make.Value;
-		}
+		/// <param name="backgroundName">Background</param>
+		public Attribute (Color foreground, ColorNames backgroundName) : this (foreground, new Color (backgroundName)) { }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Attribute"/> struct
@@ -761,99 +731,6 @@ namespace Terminal.Gui {
 
 		/// <inheritdoc />
 		public override int GetHashCode () => HashCode.Combine (Value, Foreground, Background);
-
-		/// <summary>
-		/// Creates an <see cref="Attribute"/> from the specified foreground and background colors.
-		/// </summary>
-		/// <remarks>
-		/// If a <see cref="ConsoleDriver"/> has not been loaded (<c>Application.Driver == null</c>) this
-		/// method will return an attribute with <see cref="Initialized"/> set to  <see langword="false"/>.
-		/// </remarks>
-		/// <returns>The new attribute.</returns>
-		/// <param name="foreground">Foreground color to use.</param>
-		/// <param name="background">Background color to use.</param>
-		public static Attribute Make (Color foreground, Color background)
-		{
-			if (Application.Driver == null) {
-				// Create the attribute, but show it's not been initialized
-				return new Attribute () {
-					Initialized = false,
-					Foreground = foreground,
-					Background = background
-				};
-			}
-			return Application.Driver.MakeAttribute (foreground, background);
-		}
-
-
-		/// <summary>
-		/// Creates an <see cref="Attribute"/> from the specified foreground and background colors.
-		/// </summary>
-		/// <remarks>
-		/// If a <see cref="ConsoleDriver"/> has not been loaded (<c>Application.Driver == null</c>) this
-		/// method will return an attribute with <see cref="Initialized"/> set to  <see langword="false"/>.
-		/// </remarks>
-		/// <returns>The new attribute.</returns>
-		/// <param name="foreground">Foreground color to use.</param>
-		/// <param name="background">Background color to use.</param>
-		public static Attribute Make (ColorNames foreground, ColorNames background)
-		{
-			if (Application.Driver == null) {
-				// Create the attribute, but show it's not been initialized
-				return new Attribute () {
-					Initialized = false,
-					Foreground = new Color (foreground),
-					Background = new Color (background)
-				};
-			}
-			return Application.Driver.MakeAttribute (foreground, background);
-		}
-
-		/// <summary>
-		/// Creates an <see cref="Attribute"/> from the specified foreground and background colors.
-		/// </summary>
-		/// <remarks>
-		/// If a <see cref="ConsoleDriver"/> has not been loaded (<c>Application.Driver == null</c>) this
-		/// method will return an attribute with <see cref="Initialized"/> set to  <see langword="false"/>.
-		/// </remarks>
-		/// <returns>The new attribute.</returns>
-		/// <param name="foreground">Foreground color to use.</param>
-		/// <param name="background">Background color to use.</param>
-		public static Attribute Make (ColorNames foreground, Color background)
-		{
-			if (Application.Driver == null) {
-				// Create the attribute, but show it's not been initialized
-				return new Attribute () {
-					Initialized = false,
-					Foreground = new Color (foreground),
-					Background = background
-				};
-			}
-			return Application.Driver.MakeAttribute (new Color (foreground), background);
-		}
-
-		/// <summary>
-		/// Creates an <see cref="Attribute"/> from the specified foreground and background colors.
-		/// </summary>
-		/// <remarks>
-		/// If a <see cref="ConsoleDriver"/> has not been loaded (<c>Application.Driver == null</c>) this
-		/// method will return an attribute with <see cref="Initialized"/> set to  <see langword="false"/>.
-		/// </remarks>
-		/// <returns>The new attribute.</returns>
-		/// <param name="foreground">Foreground color to use.</param>
-		/// <param name="background">Background color to use.</param>
-		public static Attribute Make (Color foreground, ColorNames background)
-		{
-			if (Application.Driver == null) {
-				// Create the attribute, but show it's not been initialized
-				return new Attribute () {
-					Initialized = false,
-					Foreground = foreground,
-					Background = new Color (background)
-				};
-			}
-			return Application.Driver.MakeAttribute (foreground, new Color (background));
-		}
 
 		/// <summary>
 		/// Gets the current <see cref="Attribute"/> from the driver.

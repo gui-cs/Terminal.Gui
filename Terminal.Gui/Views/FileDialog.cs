@@ -663,7 +663,7 @@ namespace Terminal.Gui {
 			tbPath.Caption = Style.PathCaption;
 			tbFind.Caption = Style.SearchCaption;
 
-			tbPath.Autocomplete.ColorScheme.Normal = Attribute.Make (Color.Black, tbPath.ColorScheme.Normal.Background);
+			tbPath.Autocomplete.ColorScheme.Normal = new Attribute (Color.Black, tbPath.ColorScheme.Normal.Background);
 
 			_treeRoots = Style.TreeRootGetter ();
 			Style.IconProvider.IsOpenGetter = treeView.IsExpanded;
