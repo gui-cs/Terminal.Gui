@@ -30,7 +30,7 @@ public class AttributeTests {
 		var attribute = new Attribute (42);
 
 		// Assert
-		Assert.False (attribute.Initialized);
+		Assert.True (attribute.Initialized);
 		Assert.Equal (42, attribute.Value);
 		Assert.Equal ((Color)Color.White, attribute.Foreground);
 		Assert.Equal ((Color)Color.Black, attribute.Background);
@@ -138,7 +138,7 @@ public class AttributeTests {
 		var backgroundColor = new Color (255, 255, 255);
 
 		// Act
-		var attribute = Attribute.Make (foregroundColor, backgroundColor);
+		var attribute = new Attribute (foregroundColor, backgroundColor);
 
 		// Assert
 		Assert.Equal (foregroundColor, attribute.Foreground);
@@ -153,7 +153,7 @@ public class AttributeTests {
 		var backgroundColorName = ColorNames.Black;
 
 		// Act
-		var attribute = Attribute.Make (foregroundColorName, backgroundColorName);
+		var attribute = new Attribute (foregroundColorName, backgroundColorName);
 
 		// Assert
 		Assert.Equal ((Color)foregroundColorName, attribute.Foreground);
@@ -168,7 +168,7 @@ public class AttributeTests {
 		var backgroundColor = new Color (128, 128, 128);
 
 		// Act
-		var attribute = Attribute.Make (foregroundColorName, backgroundColor);
+		var attribute = new Attribute (foregroundColorName, backgroundColor);
 
 		// Assert
 		Assert.Equal ((Color)foregroundColorName, attribute.Foreground);
@@ -183,7 +183,7 @@ public class AttributeTests {
 		var backgroundColorName = ColorNames.White;
 
 		// Act
-		var attribute = Attribute.Make (foregroundColor, backgroundColorName);
+		var attribute = new Attribute (foregroundColor, backgroundColorName);
 
 		// Assert
 		Assert.Equal (foregroundColor, attribute.Foreground);
@@ -228,7 +228,7 @@ public class AttributeTests {
 		var bg = new Color ();
 		bg = (Color)Color.Blue;
 
-		var a = Attribute.Make (fg, bg);
+		var a = new Attribute (fg, bg);
 
 		Assert.False (a.Initialized);
 	}
@@ -246,7 +246,7 @@ public class AttributeTests {
 		var bg = new Color ();
 		bg = (Color)Color.Blue;
 
-		var attr = Attribute.Make (fg, bg);
+		var attr = new Attribute (fg, bg);
 		Assert.True (attr.Initialized);
 		Assert.Equal (fg, attr.Foreground);
 		Assert.Equal (bg, attr.Background);
@@ -265,7 +265,7 @@ public class AttributeTests {
 		var bg = new Color ();
 		bg = (Color)Color.Blue;
 
-		var attr = Attribute.Make (fg, bg);
+		var attr = new Attribute (fg, bg);
 		Assert.False (attr.Initialized);
 		Assert.Equal (fg, attr.Foreground);
 		Assert.Equal (bg, attr.Background);

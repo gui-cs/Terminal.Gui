@@ -232,11 +232,11 @@ namespace Terminal.Gui.ConfigurationTests {
 		{
 			// Arrange
 			var expectedColorScheme = new ColorScheme {
-				Normal = Attribute.Make (Color.White, Color.Blue),
-				Focus = Attribute.Make (Color.Black, Color.Gray),
-				HotNormal = Attribute.Make (Color.BrightCyan, Color.Blue),
-				HotFocus = Attribute.Make (Color.BrightBlue, Color.Gray),
-				Disabled = Attribute.Make (Color.DarkGray, Color.Blue)
+				Normal = new Attribute (Color.White, Color.Blue),
+				Focus = new Attribute (Color.Black, Color.Gray),
+				HotNormal = new Attribute (Color.BrightCyan, Color.Blue),
+				HotFocus = new Attribute (Color.BrightBlue, Color.Gray),
+				Disabled = new Attribute (Color.DarkGray, Color.Blue)
 			};
 			var serializedColorScheme = JsonSerializer.Serialize<ColorScheme> (expectedColorScheme, ConfigurationManagerTests._jsonOptions);
 
