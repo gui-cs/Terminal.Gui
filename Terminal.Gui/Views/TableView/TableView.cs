@@ -572,7 +572,7 @@ namespace Terminal.Gui {
 			Attribute color;
 
 			if (FullRowSelect && IsSelected (0, rowToRender)) {
-				color = focused ? rowScheme.HotFocus : rowScheme.HotNormal;
+				color = focused ? rowScheme.Focus : rowScheme.HotNormal;
 			} else {
 				color = Enabled ? rowScheme.Normal : rowScheme.Disabled;
 			}
@@ -618,7 +618,7 @@ namespace Terminal.Gui {
 
 				Attribute cellColor;
 				if (isSelectedCell) {
-					cellColor = focused ? scheme.HotFocus : scheme.HotNormal;
+					cellColor = focused ? scheme.Focus : scheme.HotNormal;
 				} else {
 					cellColor = Enabled ? scheme.Normal : scheme.Disabled;
 				}
