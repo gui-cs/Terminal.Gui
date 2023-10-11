@@ -1543,7 +1543,6 @@ internal class WindowsDriver : ConsoleDriver {
 		}
 
 		CurrentAttribute = new Attribute (Color.White, Color.Black);
-		InitializeColorSchemes ();
 
 		_outputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
 		Clip = new Rect (0, 0, Cols, Rows);

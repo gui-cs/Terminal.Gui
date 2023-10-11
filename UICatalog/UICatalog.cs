@@ -721,7 +721,7 @@ namespace UICatalog {
 
 			public void ConfigChanged ()
 			{
-				miForce16Colors.Checked = Application.Force16Colors;
+				miForce16Colors!.Checked = Application.Force16Colors;
 
 				if (_topLevelColorScheme == null || !Colors.ColorSchemes.ContainsKey (_topLevelColorScheme)) {
 					_topLevelColorScheme = "Base";
@@ -730,7 +730,7 @@ namespace UICatalog {
 				_themeMenuItems = ((UICatalogTopLevel)Application.Top).CreateThemeMenuItems ();
 				_themeMenuBarItem!.Children = _themeMenuItems;
 				foreach (var mi in _themeMenuItems!) {
-					if (mi != null && mi.Parent == null) {
+					if (mi is { Parent: null }) {
 						mi.Parent = _themeMenuBarItem;
 					}
 				}

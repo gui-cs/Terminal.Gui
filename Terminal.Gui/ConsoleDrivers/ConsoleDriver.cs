@@ -377,9 +377,7 @@ public abstract class ConsoleDriver {
 	/// </remarks>
 	internal virtual bool Force16Colors {
 		get => Application.Force16Colors || !SupportsTrueColor;
-		set {
-			Application.Force16Colors = (value || !SupportsTrueColor);
-		}
+		set => Application.Force16Colors = (value || !SupportsTrueColor);
 	}
 
 	Attribute _currentAttribute;
@@ -390,11 +388,10 @@ public abstract class ConsoleDriver {
 	public Attribute CurrentAttribute {
 		get => _currentAttribute;
 		set {
-			if (value is { Initialized: false } && Application.Driver != null) {
+			if (Application.Driver != null) {
 				_currentAttribute = new Attribute (value.Foreground, value.Background);
 				return;
 			}
-			if (!value.Initialized) Debug.WriteLine ("ConsoleDriver.CurrentAttribute: Attributes must be initialized before use.");
 
 			_currentAttribute = value;
 		}
@@ -441,23 +438,12 @@ public abstract class ConsoleDriver {
 	{
 		// Encode the colors into the int value.
 		return new Attribute (
-			platformColor: 0, // Not used anymore by anyting but cursesdriver!
+			platformColor: 0, // only used by cursesdriver!
 			foreground: foreground,
 			background: background
 		);
 	}
 
-	/// <summary>
-	/// Ensures all <see cref="Attribute"/>s in <see cref="Colors.ColorSchemes"/> are correctly 
-	/// initialized by the driver.
-	/// </summary>
-	public void InitializeColorSchemes ()
-	{
-		// Ensure all Attributes are initialized by the driver
-		foreach (var s in Colors.ColorSchemes) {
-			s.Value.Initialize ();
-		}
-	}
 
 	#endregion
 

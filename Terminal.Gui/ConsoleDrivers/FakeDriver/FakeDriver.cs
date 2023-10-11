@@ -82,7 +82,7 @@ public class FakeDriver : ConsoleDriver {
 		ResizeScreen ();
 		// Call InitializeColorSchemes before UpdateOffScreen as it references Colors
 		CurrentAttribute = new Attribute (Color.White, Color.Black);
-		InitializeColorSchemes ();
+		//InitializeColorSchemes ();
 		ClearContents ();
 	}
 

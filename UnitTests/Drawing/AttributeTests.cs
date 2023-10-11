@@ -16,7 +16,7 @@ public class AttributeTests {
 		var attribute = new Attribute ();
 
 		// Assert
-		Assert.False (attribute.Initialized);
+		//Assert.False (attribute.Initialized);
 		Assert.Equal (-1, attribute.PlatformColor);
 		Assert.Equal ((Color)Color.White, attribute.Foreground);
 		Assert.Equal ((Color)Color.Black, attribute.Background);
@@ -30,7 +30,7 @@ public class AttributeTests {
 		var attribute = new Attribute (42);
 
 		// Assert
-		Assert.True (attribute.Initialized);
+		//Assert.True (attribute.Initialized);
 		Assert.Equal (42, attribute.PlatformColor);
 		Assert.Equal ((Color)Color.White, attribute.Foreground);
 		Assert.Equal ((Color)Color.Black, attribute.Background);
@@ -109,19 +109,19 @@ public class AttributeTests {
 
 		attr = new Attribute (fg, bg);
 
-		Assert.True (attr.Initialized);
+		//Assert.True (attr.Initialized);
 		//Assert.True (attr.HasValidColors);
 		Assert.Equal (fg, attr.Foreground);
 		Assert.Equal (bg, attr.Background);
 
 		attr = new Attribute (fg);
-		Assert.True (attr.Initialized);
+		//Assert.True (attr.Initialized);
 		//Assert.True (attr.HasValidColors);
 		Assert.Equal (fg, attr.Foreground);
 		Assert.Equal (fg, attr.Background);
 
 		attr = new Attribute (bg);
-		Assert.True (attr.Initialized);
+		//Assert.True (attr.Initialized);
 		//Assert.True (attr.HasValidColors);
 		Assert.Equal (bg, attr.Foreground);
 		Assert.Equal (bg, attr.Background);
@@ -230,7 +230,7 @@ public class AttributeTests {
 
 		var a = new Attribute (fg, bg);
 
-		Assert.False (a.Initialized);
+		//Assert.False (a.Initialized);
 	}
 
 	[Fact]
@@ -247,7 +247,7 @@ public class AttributeTests {
 		bg = (Color)Color.Blue;
 
 		var attr = new Attribute (fg, bg);
-		Assert.True (attr.Initialized);
+		//Assert.True (attr.Initialized);
 		Assert.Equal (fg, attr.Foreground);
 		Assert.Equal (bg, attr.Background);
 
@@ -266,7 +266,7 @@ public class AttributeTests {
 		bg = (Color)Color.Blue;
 
 		var attr = new Attribute (fg, bg);
-		Assert.False (attr.Initialized);
+		//Assert.False (attr.Initialized);
 		Assert.Equal (fg, attr.Foreground);
 		Assert.Equal (bg, attr.Background);
 	}

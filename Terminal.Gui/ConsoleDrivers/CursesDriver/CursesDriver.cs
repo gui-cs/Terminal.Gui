@@ -676,7 +676,6 @@ internal class CursesDriver : ConsoleDriver {
 		}
 
 		CurrentAttribute = MakeColor (ColorNames.White, ColorNames.Black);
-		InitializeColorSchemes ();
 
 		TerminalResized = terminalResized;
 
