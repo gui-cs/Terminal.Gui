@@ -224,15 +224,16 @@ namespace Terminal.Gui {
 		}.ToImmutableDictionary ();
 
 		[SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
-		public static Dictionary<string, string> Colors {
+		//[JsonConverter (typeof (DictionaryJsonConverter<string>))]
+		public static Dictionary<ColorNames, string> Colors {
 			get {
-				// Transform _colorToNameMap into a Dictionary<string,string>
-				return _colorToNameMap.ToDictionary (kvp => kvp.Value.ToString (), kvp => $"#{kvp.Key.R:X2}{kvp.Key.G:X2}{kvp.Key.B:X2}");
+				// Transform _colorToNameMap into a Dictionary<ColorNames,string>
+				return _colorToNameMap.ToDictionary (kvp => kvp.Value, kvp => $"#{kvp.Key.R:X2}{kvp.Key.G:X2}{kvp.Key.B:X2}");
 			}
 			set {
-				// Transform Dictionary<string,string> into _colorToNameMap
+				// Transform Dictionary<ColorNames,string> into _colorToNameMap
 				var newMap = value.ToDictionary (kvp => new Color (kvp.Value), kvp => {
-					if (Enum.TryParse<ColorNames> (kvp.Key, out var colorName)) {
+					if (Enum.TryParse<ColorNames> (kvp.Key.ToString(), ignoreCase: true, out ColorNames colorName)) {
 						return colorName;
 					}
 					throw new ArgumentException ($"Invalid color name: {kvp.Key}");
@@ -448,7 +449,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if (Enum.TryParse<ColorNames> (text, true, out ColorNames colorName)) {
+			if (Enum.TryParse<ColorNames> (text, ignoreCase: true, out ColorNames colorName)) {
 				color = new Color (colorName);
 				return true;
 			}

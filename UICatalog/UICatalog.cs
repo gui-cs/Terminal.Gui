@@ -183,7 +183,7 @@ namespace UICatalog {
 			}
 
 			// TODO: This is a hack. Figure out how to ensure that the file is fully written before reading it.
-			Thread.Sleep (500);
+			//Thread.Sleep (500);
 			CM.Load ();
 			CM.Apply ();
 		}

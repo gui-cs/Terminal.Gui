@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 #nullable enable
@@ -89,7 +90,21 @@ public class ConfigProperty {
 	public bool Apply ()
 	{
 		if (PropertyValue != null) {
-			PropertyInfo?.SetValue (null, ConfigurationManager.DeepMemberwiseCopy (PropertyValue, PropertyInfo?.GetValue (null)));
+			try {
+				PropertyInfo?.SetValue (null, ConfigurationManager.DeepMemberwiseCopy (PropertyValue, PropertyInfo?.GetValue (null)));
+			} catch (TargetInvocationException tie) {
+				// Check if there is an inner exception
+				if (tie.InnerException != null) {
+					// Handle the inner exception separately without catching the outer exception
+					Exception innerException = tie.InnerException;
+
+					// Handle the inner exception here
+					throw new JsonException ($"Error Applying Configuration Change: {innerException.Message}", innerException);
+				}
+
+				// Handle the outer exception or rethrow it if needed
+				throw new JsonException ($"Error Applying Configuration Change: {tie.Message}", tie);
+			}
 		}
 		return PropertyValue != null;
 	}

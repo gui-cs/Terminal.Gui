@@ -200,7 +200,7 @@
                 "Background": "Black"
               },
               "Focus": {
-                "Foreground": "White",
+                "Foreground": "BrightYellow",
                 "Background": "DarkGray"
               },
               "HotNormal": {
