@@ -256,7 +256,7 @@ namespace Terminal.Gui {
 		/// Get returns the <see cref="ColorName"/> of the closest 24-bit color value. Set sets the RGB value using a hard-coded map.
 		/// </remarks>
 		public ColorNames ColorName {
-			get => FindClosestColor (this.Value);
+			get => FindClosestColor (this);
 			set {
 
 				var c = FromColorName (value);
@@ -393,7 +393,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			// rgb(XX,YY,ZZ)
+			// rgb(r,g,b)
 			var match = Regex.Match (text, @"rgb\((\d+),(\d+),(\d+)\)");
 			if (match.Success) {
 				var r = int.Parse (match.Groups [1].Value);
@@ -403,7 +403,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			// rgb(AA,XX,YY,ZZ)
+			// rgb(a,r,g,b)
 			match = Regex.Match (text, @"rgb\((\d+),(\d+),(\d+),(\d+)\)");
 			if (match.Success) {
 				var a = int.Parse (match.Groups [1].Value);
@@ -464,8 +464,15 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public static bool operator == (Color left, Color right)
 		{
+			if (left is null && right is null)
+				return true;
+
+			if (left is null || right is null)
+				return false;
+
 			return left.Equals (right);
 		}
+
 
 		/// <summary>
 		/// Inequality operator for two <see cref="Color"/> objects.
@@ -475,6 +482,12 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public static bool operator != (Color left, Color right)
 		{
+			if (left is null && right is null)
+				return false;
+
+			if (left is null || right is null)
+				return true;
+			
 			return !left.Equals (right);
 		}
 
@@ -587,7 +600,7 @@ namespace Terminal.Gui {
 		/// and the attribute should be re-made before it is used.
 		/// </summary>
 		[JsonIgnore (Condition = JsonIgnoreCondition.Always)]
-		internal int Value { get; }
+		internal int PlatformColor { get; }
 
 		/// <summary>
 		/// The foreground color.
@@ -607,7 +620,7 @@ namespace Terminal.Gui {
 		public Attribute ()
 		{
 			var d = Default;
-			Value = -1;
+			PlatformColor = -1;
 			Foreground = d.Foreground;
 			Background = d.Background;
 		}
@@ -628,7 +641,7 @@ namespace Terminal.Gui {
 		{
 			Foreground = foreground;
 			Background = background;
-			Value = platformColor;
+			PlatformColor = platformColor;
 			Initialized = true;
 		}
 
@@ -653,13 +666,13 @@ namespace Terminal.Gui {
 			if (Application.Driver == null) {
 				// Create the attribute, but show it's not been initialized
 				Initialized = false;
-				Value = -1;
+				PlatformColor = -1;
 				return;
 			}
 
 			var make = Application.Driver.MakeAttribute (foreground, background);
 			Initialized = make.Initialized;
-			Value = make.Value;
+			PlatformColor = make.PlatformColor;
 		}
 
 		/// <summary>
@@ -724,17 +737,17 @@ namespace Terminal.Gui {
 		/// <inheritdoc />
 		public bool Equals (Attribute other)
 		{
-			return Value == other.Value &&
+			return PlatformColor == other.PlatformColor &&
 				Foreground == other.Foreground &&
 				Background == other.Background;
 		}
 
 		/// <inheritdoc />
-		public override int GetHashCode () => HashCode.Combine (Value, Foreground, Background);
+		public override int GetHashCode () => HashCode.Combine (PlatformColor, Foreground, Background);
 
 		/// <summary>
 		/// If <see langword="true"/> the attribute has been initialized by a <see cref="ConsoleDriver"/> and 
-		/// thus has <see cref="Value"/> that is valid for that driver. If <see langword="false"/> the <see cref="Foreground"/>
+		/// thus has <see cref="PlatformColor"/> that is valid for that driver. If <see langword="false"/> the <see cref="Foreground"/>
 		/// and <see cref="Background"/> colors may have been set '-1' but
 		/// the attribute has not been mapped to a <see cref="ConsoleDriver"/> specific color value.
 		/// </summary>

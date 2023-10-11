@@ -88,7 +88,7 @@ internal class CursesDriver : ConsoleDriver {
 	/// and the background color is stored in the least significant 4 bits.
 	/// The Terminal.GUi Color values are converted to curses color encoding before being encoded.
 	/// </remarks>
-	public override Attribute MakeColor (ColorNames foregroundName, ColorNames backgroundName)
+	private Attribute MakeColor (ColorNames foregroundName, ColorNames backgroundName)
 	{
 		if (!RunningUnitTests) {
 			return MakeColor (ColorNameToCursesColorNumber (foregroundName), ColorNameToCursesColorNumber (backgroundName));
@@ -244,7 +244,7 @@ internal class CursesDriver : ConsoleDriver {
 					// In unit tests, we don't want to actually write to the screen.
 					continue;
 				}
-				Curses.attrset (Contents [row, col].Attribute.GetValueOrDefault ().Value);
+				Curses.attrset (Contents [row, col].Attribute.GetValueOrDefault ().PlatformColor);
 
 				var rune = Contents [row, col].Runes [0];
 				if (rune.IsBmp) {

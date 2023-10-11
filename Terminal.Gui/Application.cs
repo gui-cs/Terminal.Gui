@@ -43,15 +43,23 @@ namespace Terminal.Gui {
 	public static partial class Application {
 
 		/// <summary>
-		/// The current <see cref="ConsoleDriver"/> in use.
+		/// Gets the <see cref="ConsoleDriver"/> that has been selected. See also <see cref="UseSystemConsole"/>.
 		/// </summary>
-		public static ConsoleDriver Driver;
+		public static ConsoleDriver Driver { get; internal set; }
 
 		/// <summary>
 		/// If <see langword="true"/>, forces the use of the System.Console-based (see <see cref="NetDriver"/>) driver. The default is <see langword="false"/>.
 		/// </summary>
 		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
 		public static bool UseSystemConsole { get; set; } = false;
+
+		/// <summary>
+		/// Gets or sets whether <see cref="Application.Driver"/> will be forced to output only the 16 colors defined in <see cref="ColorNames"/>.
+		/// The default is <see langword="false"/>, meaning 24-bit (TrueColor) colors will be output as long as the selected <see cref="ConsoleDriver"/>
+		/// supports TrueColor.
+		/// </summary>
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+		public static bool Force16Colors { get; set; } = false;
 
 		// For Unit testing - ignores UseSystemConsole
 		internal static bool _forceFakeConsole;
@@ -78,7 +86,6 @@ namespace Terminal.Gui {
 
 			// Return all culture for which satellite folder found with culture code.
 			return culture.Where (cultureInfo =>
-			   assemblyLocation != null &&
 			   Directory.Exists (Path.Combine (assemblyLocation, cultureInfo.Name)) &&
 			   File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
 			).ToList ();
@@ -103,7 +110,7 @@ namespace Terminal.Gui {
 		/// <para>
 		/// The <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver, IMainLoopDriver)"/> function 
 		/// combines <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
-		/// into a single call. An applciation cam use <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver, IMainLoopDriver)"/> 
+		/// into a single call. An application cam use <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver, IMainLoopDriver)"/> 
 		/// without explicitly calling <see cref="Init(ConsoleDriver, IMainLoopDriver)"/>.
 		/// </para>
 		/// <param name="driver">
@@ -402,10 +409,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// See <see cref="Run(Toplevel, Func{Exception, bool})"/> for more details.
 		/// </remarks>
-		public static void Run (Func<Exception, bool> errorHandler = null)
-		{
-			Run (Top, errorHandler);
-		}
+		public static void Run (Func<Exception, bool> errorHandler = null) => Run (Top, errorHandler);
 
 		/// <summary>
 		/// Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool})"/> 
@@ -442,7 +446,7 @@ namespace Terminal.Gui {
 					}
 					Run (top, errorHandler);
 				} else {
-					// This codepath should be impossible because Init(null, null) will select the platform default driver
+					// This code path should be impossible because Init(null, null) will select the platform default driver
 					throw new InvalidOperationException ("Init() completed without a driver being set (this should be impossible); Run<T>() cannot be called.");
 				}
 			} else {
@@ -558,11 +562,11 @@ namespace Terminal.Gui {
 		// users use async/await on their code
 		//
 		class MainLoopSyncContext : SynchronizationContext {
-			readonly MainLoop mainLoop;
+			readonly MainLoop _mainLoop;
 
 			public MainLoopSyncContext (MainLoop mainLoop)
 			{
-				this.mainLoop = mainLoop;
+				this._mainLoop = mainLoop;
 			}
 
 			public override SynchronizationContext CreateCopy ()
@@ -572,11 +576,11 @@ namespace Terminal.Gui {
 
 			public override void Post (SendOrPostCallback d, object state)
 			{
-				mainLoop.AddIdle (() => {
+				_mainLoop.AddIdle (() => {
 					d (state);
 					return false;
 				});
-				//mainLoop.Driver.Wakeup ();
+				//_mainLoop.Driver.Wakeup ();
 			}
 
 			public override void Send (SendOrPostCallback d, object state)
@@ -585,7 +589,7 @@ namespace Terminal.Gui {
 					d (state);
 				} else {
 					var wasExecuted = false;
-					mainLoop.Invoke (() => {
+					_mainLoop.Invoke (() => {
 						d (state);
 						wasExecuted = true;
 					});
@@ -602,12 +606,14 @@ namespace Terminal.Gui {
 		/// <param name="state">The state returned by the <see cref="Begin(Toplevel)"/> method.</param>
 		public static void RunLoop (RunState state)
 		{
-			if (state == null)
+			if (state == null) {
 				throw new ArgumentNullException (nameof (state));
-			if (state.Toplevel == null)
+			}
+			if (state.Toplevel == null) {
 				throw new ObjectDisposedException ("state");
+			}
 
-			bool firstIteration = true;
+			var firstIteration = true;
 			for (state.Toplevel.Running = true; state.Toplevel.Running;) {
 				if (ExitRunLoopAfterFirstIteration && !firstIteration) {
 					return;
@@ -688,14 +694,6 @@ namespace Terminal.Gui {
 				Top.Draw ();
 			}
 		}
-
-		///// <summary>
-		///// Wakes up the <see cref="MainLoop"/> that might be waiting on input; must be thread safe.
-		///// </summary>
-		//public static void DoEvents ()
-		//{
-		//	MainLoop.MainLoopDriver.Wakeup ();
-		//}
 
 		/// <summary>
 		/// Stops running the most recent <see cref="Toplevel"/> or the <paramref name="top"/> if provided.
@@ -1085,7 +1083,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Merely a debugging aid to see the raw mouse events
 		/// </summary>
-		public static Action<MouseEvent> RootMouseEvent;
+		public static Action<MouseEvent> RootMouseEvent { get; set; }
 
 		static View _lastMouseOwnerView;
 
@@ -1312,7 +1310,7 @@ namespace Terminal.Gui {
 		/// </para>
 		/// <para>Return true to suppress the KeyPress event</para>
 		/// </summary>
-		public static Func<KeyEvent, bool> RootKeyEvent;
+		public static Func<KeyEvent, bool> RootKeyEvent { get; set; }
 
 		#endregion Keyboard handling
 	}

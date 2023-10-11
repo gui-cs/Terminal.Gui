@@ -81,7 +81,7 @@ public class FakeDriver : ConsoleDriver {
 		FakeConsole.Clear ();
 		ResizeScreen ();
 		// Call InitializeColorSchemes before UpdateOffScreen as it references Colors
-		CurrentAttribute = MakeColor (Color.White, Color.Black);
+		CurrentAttribute = new Attribute (Color.White, Color.Black);
 		InitializeColorSchemes ();
 		ClearContents ();
 	}
@@ -134,8 +134,8 @@ public class FakeDriver : ConsoleDriver {
 					// Performance: Only send the escape sequence if the attribute has changed.
 					if (attr != redrawAttr) {
 						redrawAttr = attr;
-						FakeConsole.ForegroundColor = (ConsoleColor)attr.Foreground.Value;
-						FakeConsole.BackgroundColor = (ConsoleColor)attr.Background.Value;
+						FakeConsole.ForegroundColor = (ConsoleColor)attr.Foreground.ColorName;
+						FakeConsole.BackgroundColor = (ConsoleColor)attr.Background.ColorName;
 					}
 					outputWidth++;
 					var rune = (Rune)Contents [row, col].Runes [0];
@@ -187,25 +187,21 @@ public class FakeDriver : ConsoleDriver {
 
 	#region Color Handling
 
-	/// <remarks>
-	/// In the FakeDriver, colors are encoded as an int; same as NetDriver
-	/// However, the foreground color is stored in the most significant 16 bits, 
-	/// and the background color is stored in the least significant 16 bits.
-	/// </remarks>
-	public override Attribute MakeColor (Color foreground, Color background)
-	{
-		// Encode the colors into the int value.
-		return new Attribute (
-			platformColor: ((((int)foreground.ColorName) & 0xffff) << 16) | (((int)background.ColorName) & 0xffff),
-			foreground: foreground,
-			background: background
-		);
-	}
+	///// <remarks>
+	///// In the FakeDriver, colors are encoded as an int; same as NetDriver
+	///// However, the foreground color is stored in the most significant 16 bits, 
+	///// and the background color is stored in the least significant 16 bits.
+	///// </remarks>
+	//public override Attribute MakeColor (Color foreground, Color background)
+	//{
+	//	// Encode the colors into the int value.
+	//	return new Attribute (
+	//		platformColor: 0,//((((int)foreground.ColorName) & 0xffff) << 16) | (((int)background.ColorName) & 0xffff),
+	//		foreground: foreground,
+	//		background: background
+	//	);
+	//}
 
-	public override Attribute MakeColor (ColorNames foreground, ColorNames background)
-	{
-		return MakeColor (new Color (foreground), new Color (background));
-	}
 	#endregion
 
 	public ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)

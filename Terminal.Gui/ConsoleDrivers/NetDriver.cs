@@ -695,7 +695,7 @@ internal class NetDriver : ConsoleDriver {
 
 		ResizeScreen ();
 		ClearContents ();
-		CurrentAttribute = MakeColor (Color.White, Color.Black);
+		CurrentAttribute = new Attribute (Color.White, Color.Black);
 		InitializeColorSchemes ();
 
 		StartReportingMouseMoves ();
@@ -793,7 +793,7 @@ internal class NetDriver : ConsoleDriver {
 
 						if (Force16Colors) {
 							output.Append (EscSeqUtils.CSI_SetGraphicsRendition (
-								MapColors ((ConsoleColor)attr.Background.Value, false), MapColors ((ConsoleColor)attr.Foreground.Value, true)));
+								MapColors ((ConsoleColor)attr.Background.ColorName, false), MapColors ((ConsoleColor)attr.Foreground.ColorName, true)));
 						} else {
 							output.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.Foreground.R, attr.Foreground.G, attr.Foreground.B));
 							output.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.Background.R, attr.Background.G, attr.Background.B));
@@ -862,25 +862,20 @@ internal class NetDriver : ConsoleDriver {
 		return colorMap.TryGetValue (color, out var colorValue) ? colorValue + (isForeground ? 0 : 10) : 0;
 	}
 
-	/// <remarks>
-	/// In the NetDriver, colors are encoded as an int. 
-	/// However, the foreground color is stored in the most significant 16 bits, 
-	/// and the background color is stored in the least significant 16 bits.
-	/// </remarks>
-	public override Attribute MakeColor (Color foreground, Color background)
-	{
-		// Encode the colors into the int value.
-		return new Attribute (
-			platformColor: ((((int)foreground.ColorName) & 0xffff) << 16) | (((int)background.ColorName) & 0xffff),
-			foreground: foreground,
-			background: background
-		);
-	}
-
-	public override Attribute MakeColor (ColorNames foreground, ColorNames background)
-	{
-		return MakeColor (new Color (foreground), new Color (background));
-	}
+	///// <remarks>
+	///// In the NetDriver, colors are encoded as an int. 
+	///// However, the foreground color is stored in the most significant 16 bits, 
+	///// and the background color is stored in the least significant 16 bits.
+	///// </remarks>
+	//public override Attribute MakeColor (Color foreground, Color background)
+	//{
+	//	// Encode the colors into the int value.
+	//	return new Attribute (
+	//		platformColor: ((((int)foreground.ColorName) & 0xffff) << 16) | (((int)background.ColorName) & 0xffff),
+	//		foreground: foreground,
+	//		background: background
+	//	);
+	//}
 	#endregion
 
 	#region Cursor Handling

@@ -30,14 +30,14 @@ namespace Terminal.Gui {
 			}
 
 			Attribute attribute = new Attribute ();
-			Color foreground = (Color)(-1);
-			Color background = (Color)(-1);
+			Color foreground = null;
+			Color background = null;
 			while (reader.Read ()) {
 				if (reader.TokenType == JsonTokenType.EndObject) {
-					if (foreground == (Color)(-1) || background == (Color)(-1)) {
+					if (foreground == null || background == null) {
 						throw new JsonException ($"Both Foreground and Background colors must be provided.");
-					}
-					return attribute;
+					} 
+					return new Attribute (foreground, background);
 				}
 
 				if (reader.TokenType != JsonTokenType.PropertyName) {
@@ -79,10 +79,6 @@ namespace Terminal.Gui {
 				//	break;				
 				default:
 					throw new JsonException ($"Unknown Attribute property {propertyName}.");
-				}
-
-				if (foreground != (Color)(-1) && background != (Color)(-1)) {
-					attribute = new Attribute (foreground, background);
 				}
 			}
 			throw new JsonException ();
