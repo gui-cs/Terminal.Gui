@@ -32,11 +32,11 @@ namespace UICatalog.Scenarios {
 			var cbUseTrueColor = new CheckBox ("Force 16 colors") {
 				X = x,
 				Y = y++,
-				Checked = Application.Driver.Force16Colors,
+				Checked = Application.Force16Colors,
 				Enabled = canTrueColor,
 			};
 			cbUseTrueColor.Toggled += (_, evt) => {
-				Application.Driver.Force16Colors = evt.NewValue ?? false;
+				Application.Force16Colors = evt.NewValue ?? false;
 			};
 			Win.Add (cbUseTrueColor);
 

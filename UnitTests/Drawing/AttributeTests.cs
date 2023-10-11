@@ -17,7 +17,7 @@ public class AttributeTests {
 
 		// Assert
 		Assert.False (attribute.Initialized);
-		Assert.Equal (-1, attribute.Value);
+		Assert.Equal (-1, attribute.PlatformColor);
 		Assert.Equal ((Color)Color.White, attribute.Foreground);
 		Assert.Equal ((Color)Color.Black, attribute.Background);
 
@@ -31,7 +31,7 @@ public class AttributeTests {
 
 		// Assert
 		Assert.True (attribute.Initialized);
-		Assert.Equal (42, attribute.Value);
+		Assert.Equal (42, attribute.PlatformColor);
 		Assert.Equal ((Color)Color.White, attribute.Foreground);
 		Assert.Equal ((Color)Color.Black, attribute.Background);
 	}
@@ -96,7 +96,7 @@ public class AttributeTests {
 		// Test parameterless constructor
 		var attr = new Attribute ();
 
-		Assert.Equal (-1, attr.Value);
+		Assert.Equal (-1, attr.PlatformColor);
 		Assert.Equal ((Color)Color.White, attr.Foreground);
 		Assert.Equal ((Color)Color.Black, attr.Background);
 
@@ -210,10 +210,10 @@ public class AttributeTests {
 
 		// Test conversion to int
 		attr = new Attribute (value, fg, bg);
-		int value_implicit = attr.Value;
+		int value_implicit = attr.PlatformColor;
 		Assert.Equal (value, value_implicit);
 
-		Assert.Equal (value, attr.Value);
+		Assert.Equal (value, attr.PlatformColor);
 
 		driver.End ();
 		Application.Shutdown ();

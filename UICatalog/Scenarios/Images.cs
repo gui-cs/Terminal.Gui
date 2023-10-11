@@ -34,10 +34,10 @@ namespace UICatalog.Scenarios {
 			var cbUseTrueColor = new CheckBox ("Use true color") {
 				X = Pos.Right(cbSupportsTrueColor) + 2,
 				Y = 0,
-				Checked = !Application.Driver.Force16Colors,
+				Checked = !Application.Force16Colors,
 				Enabled = canTrueColor,
 			};
-			cbUseTrueColor.Toggled += (_, evt) => Application.Driver.Force16Colors = !evt.NewValue ?? false;
+			cbUseTrueColor.Toggled += (_, evt) => Application.Force16Colors = !evt.NewValue ?? false;
 			Win.Add (cbUseTrueColor);
 
 			var btnOpenImage = new Button ("Open Image") {

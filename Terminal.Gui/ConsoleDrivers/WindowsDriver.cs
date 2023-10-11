@@ -67,7 +67,7 @@ internal class WindowsConsole {
 			foreach (ExtendedCharInfo info in charInfoBuffer) {
 				ci [i++] = new CharInfo () {
 					Char = new CharUnion () { UnicodeChar = info.Char },
-					Attributes = (ushort)info.Attribute.Value
+					Attributes = (ushort)(((int)info.Attribute.Foreground.ColorName) | ((int)info.Attribute.Background.ColorName << 4))
 				};
 			}
 
@@ -1542,7 +1542,7 @@ internal class WindowsDriver : ConsoleDriver {
 			WinConsole = null;
 		}
 
-		CurrentAttribute = MakeColor (Color.White, Color.Black);
+		CurrentAttribute = new Attribute (Color.White, Color.Black);
 		InitializeColorSchemes ();
 
 		_outputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
@@ -1649,14 +1649,10 @@ internal class WindowsDriver : ConsoleDriver {
 	{
 		// Encode the colors into the int value.
 		return new Attribute (
-			platformColor: (((int)foreground.ColorName) | ((int)background.ColorName << 4)),
+			platformColor: 0, // Not used anymore! (((int)foreground.ColorName) | ((int)background.ColorName << 4)),
 			foreground: foreground,
 			background: background
 		);
-	}
-	public override Attribute MakeColor (ColorNames foreground, ColorNames background)
-	{
-		return MakeColor (new Color (foreground), new Color (background));
 	}
 
 	#endregion

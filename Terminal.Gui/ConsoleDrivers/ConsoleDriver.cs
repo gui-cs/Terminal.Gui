@@ -365,20 +365,20 @@ public abstract class ConsoleDriver {
 	/// </summary>
 	public virtual bool SupportsTrueColor { get => true; }
 
-	bool _force16Colors = false;
-
-	// TODO: Make this a ConfiguationManager setting on Application
 	/// <summary>
-	/// Gets or sets whether the <see cref="ConsoleDriver"/> should use 16 colors instead of the default TrueColors.
+	/// Gets or sets whether the <see cref="ConsoleDriver"/> should use 16 colors instead of the default TrueColors. See <see cref="Application.Force16Colors"/>
+	/// to change this setting via <see cref="ConfigurationManager"/>.
 	/// </summary>
 	/// <remarks>
+	/// <para>
 	/// Will be forced to <see langword="true"/> if <see cref="ConsoleDriver.SupportsTrueColor"/> is  <see langword="false"/>, indicating
 	/// that the <see cref="ConsoleDriver"/> cannot support TrueColor.
+	/// </para>
 	/// </remarks>
-	public virtual bool Force16Colors {
-		get => _force16Colors || !SupportsTrueColor;
+	internal virtual bool Force16Colors {
+		get => Application.Force16Colors || !SupportsTrueColor;
 		set {
-			_force16Colors = (value || !SupportsTrueColor);
+			Application.Force16Colors = (value || !SupportsTrueColor);
 		}
 	}
 
@@ -430,22 +430,22 @@ public abstract class ConsoleDriver {
 	/// </summary>
 	/// <returns>The current attribute.</returns>
 	public Attribute GetAttribute () => CurrentAttribute;
-
-	/// <summary>
-	/// Makes an <see cref="Attribute"/>.
-	/// </summary>
-	/// <param name="foregroundName">The foreground color.</param>
-	/// <param name="backgroundName">The background color.</param>
-	/// <returns>The attribute for the foreground and background colors.</returns>
-	public abstract Attribute MakeColor (ColorNames foregroundName, ColorNames backgroundName);
-
+	
 	/// <summary>
 	/// Makes an <see cref="Attribute"/>.
 	/// </summary>
 	/// <param name="foreground">The foreground color.</param>
 	/// <param name="background">The background color.</param>
 	/// <returns>The attribute for the foreground and background colors.</returns>
-	public abstract Attribute MakeColor (Color foreground, Color background);
+	public virtual Attribute MakeColor (Color foreground, Color background)
+	{
+		// Encode the colors into the int value.
+		return new Attribute (
+			platformColor: 0, // Not used anymore by anyting but cursesdriver!
+			foreground: foreground,
+			background: background
+		);
+	}
 
 	/// <summary>
 	/// Ensures all <see cref="Attribute"/>s in <see cref="Colors.ColorSchemes"/> are correctly 

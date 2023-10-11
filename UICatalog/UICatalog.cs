@@ -117,7 +117,6 @@ namespace UICatalog {
 				scenario.Theme = _cachedTheme;
 				scenario.TopLevelColorScheme = _topLevelColorScheme;
 				scenario.Init ();
-				Application.Driver.Force16Colors = _force16Colors;
 				scenario.Setup ();
 				scenario.Run ();
 				scenario.Dispose ();
@@ -232,7 +231,6 @@ namespace UICatalog {
 		static Scenario? _selectedScenario = null;
 
 		static bool _useSystemConsole = false;
-		static bool _force16Colors = false;
 		static ConsoleDriver.DiagnosticFlags _diagnosticFlags;
 		static bool _isFirstRunning = true;
 		static string _topLevelColorScheme = string.Empty;
@@ -483,8 +481,6 @@ namespace UICatalog {
 				List<MenuItem []> menuItems = new List<MenuItem []> {
 					CreateDiagnosticFlagsMenuItems (),
 					new MenuItem [] { null! },
-					CreateForce16ColorItems (),
-					new MenuItem [] { null! },
 					CreateDisabledEnabledMouseItems (),
 					CreateDisabledEnabledMenuBorder (),
 					CreateDisabledEnableUseSubMenusSingleFrame (),
@@ -535,12 +531,13 @@ namespace UICatalog {
 				List<MenuItem> menuItems = new List<MenuItem> ();
 				miForce16Colors = new MenuItem {
 					Title = "Force 16 _Colors",
-					Checked = _force16Colors
+					Checked = Application.Force16Colors,
+					CanExecute = () => (bool)Application.Driver.SupportsTrueColor
 				};
 				miForce16Colors.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miForce16Colors!.Title!.Substring (10, 1) [0];
 				miForce16Colors.CheckType |= MenuItemCheckStyle.Checked;
 				miForce16Colors.Action += () => {
-					miForce16Colors.Checked = _force16Colors = Application.Driver.Force16Colors = (bool)!miForce16Colors.Checked!;
+					miForce16Colors.Checked = Application.Force16Colors = (bool)!miForce16Colors.Checked!;
 					Application.Refresh ();
 				};
 				menuItems.Add (miForce16Colors);
@@ -679,7 +676,9 @@ namespace UICatalog {
 
 			public MenuItem []? CreateThemeMenuItems ()
 			{
-				List<MenuItem> menuItems = new List<MenuItem> ();
+				var menuItems = CreateForce16ColorItems ().ToList();
+				menuItems.Add (null!);
+
 				foreach (var theme in CM.Themes!) {
 					var item = new MenuItem {
 						Title = theme.Key,
@@ -722,6 +721,8 @@ namespace UICatalog {
 
 			public void ConfigChanged ()
 			{
+				miForce16Colors.Checked = Application.Force16Colors;
+
 				if (_topLevelColorScheme == null || !Colors.ColorSchemes.ContainsKey (_topLevelColorScheme)) {
 					_topLevelColorScheme = "Base";
 				}
