@@ -10,7 +10,8 @@ using System.Text.RegularExpressions;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// Defines the 16 legacy color names and values that can be used to set the foreground and background colors in Terminal.Gui apps. Used with <see cref="Color"/>.
+	/// Defines the 16 legacy color names and values that can be used to set the
+	/// foreground and background colors in Terminal.Gui apps. Used with <see cref="Color"/>.
 	/// </summary>
 	/// <remarks>
 	/// 
@@ -91,39 +92,25 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Color"/> class.
 		/// </summary>
-		/// <param name="red"></param>
-		/// <param name="green"></param>
-		/// <param name="blue"></param>
-		public Color (int red, int green, int blue)
+		/// <param name="red">The red 8-bits.</param>
+		/// <param name="green">The green 8-bits.</param>
+		/// <param name="blue">The blue 8-bits.</param>
+		/// <param name="alpha">Optional; defaults to 0xFF. The Alpha channel is not supported by Terminal.Gui.</param>
+		public Color (int red, int green, int blue, int alpha = 0xFF)
 		{
-			A = 0xFF;
 			R = red;
 			G = green;
 			B = blue;
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Color"/> class.
-		/// </summary>
-		/// <param name="alpha"></param>
-		/// <param name="red"></param>
-		/// <param name="green"></param>
-		/// <param name="blue"></param>
-		public Color (int alpha, int red, int green, int blue)
-		{
 			A = alpha;
-			R = red;
-			G = green;
-			B = blue;
 		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Color"/> class with an encoded 24-bit color value.
 		/// </summary>
-		/// <param name="argb">The encoded 24-bit color value.</param>
-		public Color (int argb)
+		/// <param name="rgba">The encoded 24-bit color value (see <see cref="Rgba"/>).</param>
+		public Color (int rgba)
 		{
-			Value = argb;
+			Rgba = rgba;
 		}
 
 		/// <summary>
@@ -133,10 +120,26 @@ namespace Terminal.Gui {
 		public Color (ColorNames colorName)
 		{
 			var c = Color.FromColorName (colorName);
-			A = c.A;
 			R = c.R;
 			G = c.G;
 			B = c.B;
+			A = c.A;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Color"/> color from string. See <see cref="TryParse(string, out Color)"/> for details.
+		/// </summary>
+		/// <param name="colorString"></param>
+		/// <exception cref="Exception"></exception>
+		public Color (string colorString)
+		{
+			if (!TryParse (colorString, out var c)) {
+				throw new ArgumentOutOfRangeException (nameof (colorString));
+			}
+			R = c.R;
+			G = c.G;
+			B = c.B;
+			A = c.A;
 		}
 
 		/// <summary>
@@ -144,10 +147,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Color ()
 		{
-			A = 0xFF;
 			R = 0;
 			G = 0;
 			B = 0;
+			A = 0xFF;
 		}
 
 		/// <summary>
@@ -167,17 +170,17 @@ namespace Terminal.Gui {
 		/// Alpha color component.
 		/// </summary>
 		/// <remarks>
-		/// Not currently supported; here for completeness. 
+		/// The Alpha channel is not supported by Terminal.Gui.
 		/// </remarks>
-		public int A { get; set; }
+		public int A { get; set; } = 0xFF; // Not currently supported; here for completeness.
 
 		/// <summary>
-		/// Gets or sets the color value encoded using the following code:
+		/// Gets or sets the color value encoded as ARGB32.
 		/// <code>
 		/// (&lt;see cref="A"/&gt; &lt;&lt; 24) | (&lt;see cref="R"/&gt; &lt;&lt; 16) | (&lt;see cref="G"/&gt; &lt;&lt; 8) | &lt;see cref="B"/&gt;
 		/// </code>
 		/// </summary>
-		public int Value {
+		public int Rgba {
 			get => (A << 24) | (R << 16) | (G << 8) | B;
 			set {
 				A = (byte)((value >> 24) & 0xFF);
@@ -194,6 +197,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		internal static readonly ImmutableDictionary<Color, ColorNames> _colorNames = new Dictionary<Color, ColorNames> () {
 			// using "Windows 10 Console/PowerShell 6" here: https://i.stack.imgur.com/9UVnC.png
+			// See also: https://en.wikipedia.org/wiki/ANSI_escape_code
 			{ new Color (12, 12, 12),ColorNames.Black },
 			{ new Color (0, 55, 218),ColorNames.Blue },
 			{ new Color (19, 161, 14),ColorNames.Green},
@@ -260,10 +264,10 @@ namespace Terminal.Gui {
 			set {
 
 				var c = FromColorName (value);
-				A = c.A;
 				R = c.R;
 				G = c.G;
 				B = c.B;
+				A = c.A;
 			}
 		}
 
@@ -337,11 +341,16 @@ namespace Terminal.Gui {
 		#endregion
 
 		/// <summary>
-		/// Converts the provided text to a new <see cref="Color"/> instance.
+		/// Converts the provided string to a new <see cref="Color"/> instance.
 		/// </summary>
-		/// <param name="text">The text to analyze.</param>
+		/// <param name="text">The text to analyze. Formats supported are
+		/// "#RGB", "#RRGGBB", "#RGBA", "#RRGGBBAA", "rgb(r,g,b)", "rgb(r,g,b,a)", and any of the
+		/// <see cref="ColorNames"/>.</param>
 		/// <param name="color">The parsed value.</param>
-		/// <returns>A boolean value indicating whether it was successful.</returns>
+		/// <returns>A boolean value indicating whether parsing was successful.</returns>
+		/// <remarks>
+		/// While <see cref="Color"/> supports the alpha channel <see cref="A"/>, Terminal.Gui does not.
+		/// </remarks>
 		public static bool TryParse (string text, [NotNullWhen (true)] out Color color)
 		{
 			// empty color
@@ -370,25 +379,25 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			// #AARRGGBB, #ARGB
+			// #RRGGBB, #RGBA
 			if ((text [0] == '#') && text.Length is 8 or 5) {
 				if (text.Length == 7) {
-					var a = Convert.ToInt32 (text.Substring (1, 2), 16);
-					var r = Convert.ToInt32 (text.Substring (3, 2), 16);
-					var g = Convert.ToInt32 (text.Substring (5, 2), 16);
-					var b = Convert.ToInt32 (text.Substring (7, 2), 16);
+					var r = Convert.ToInt32 (text.Substring (1, 2), 16);
+					var g = Convert.ToInt32 (text.Substring (3, 2), 16);
+					var b = Convert.ToInt32 (text.Substring (5, 2), 16);
+					var a = Convert.ToInt32 (text.Substring (7, 2), 16);
 					color = new Color (a, r, g, b);
 				} else {
-					var aText = char.ToString (text [1]);
-					var rText = char.ToString (text [2]);
-					var gText = char.ToString (text [3]);
-					var bText = char.ToString (text [4]);
+					var rText = char.ToString (text [1]);
+					var gText = char.ToString (text [2]);
+					var bText = char.ToString (text [3]);
+					var aText = char.ToString (text [4]);
 
-					var a = Convert.ToInt32 (aText + aText, 16);
-					var r = Convert.ToInt32 (rText + rText, 16);
-					var g = Convert.ToInt32 (gText + gText, 16);
-					var b = Convert.ToInt32 (bText + bText, 16);
-					color = new Color (a, r, g, b);
+					var r = Convert.ToInt32 (aText + aText, 16);
+					var g = Convert.ToInt32 (rText + rText, 16);
+					var b = Convert.ToInt32 (gText + gText, 16);
+					var a = Convert.ToInt32 (bText + bText, 16);
+					color = new Color (r, g, b, a);
 				}
 				return true;
 			}
@@ -403,14 +412,14 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			// rgb(a,r,g,b)
+			// rgb(r,g,b,a)
 			match = Regex.Match (text, @"rgb\((\d+),(\d+),(\d+),(\d+)\)");
 			if (match.Success) {
-				var a = int.Parse (match.Groups [1].Value);
-				var r = int.Parse (match.Groups [2].Value);
-				var g = int.Parse (match.Groups [3].Value);
-				var b = int.Parse (match.Groups [4].Value);
-				color = new Color (a, r, g, b);
+				var r = int.Parse (match.Groups [1].Value);
+				var g = int.Parse (match.Groups [2].Value);
+				var b = int.Parse (match.Groups [3].Value);
+				var a = int.Parse (match.Groups [4].Value);
+				color = new Color (r, g, b, a);
 				return true;
 			}
 
@@ -422,10 +431,10 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Cast from int.
 		/// </summary>
-		/// <param name="argb"></param>
-		public static implicit operator Color (int argb)
+		/// <param name="rgba"></param>
+		public static implicit operator Color (int rgba)
 		{
-			return new Color (argb);
+			return new Color (rgba);
 		}
 
 		/// <summary>
@@ -434,7 +443,7 @@ namespace Terminal.Gui {
 		/// <param name="color"></param>
 		public static explicit operator int (Color color)
 		{
-			return color.Value;
+			return color.Rgba;
 		}
 
 		/// <summary>
@@ -546,16 +555,16 @@ namespace Terminal.Gui {
 		public bool Equals (Color other)
 		{
 			return
-				A == other.A &&
 				R == other.R &&
 				G == other.G &&
-				B == other.B;
+				B == other.B &&
+				A == other.A;
 		}
 
 		/// <inheritdoc/>
 		public override int GetHashCode ()
 		{
-			return HashCode.Combine (A, R, G, B);
+			return HashCode.Combine (R, G, B, A);
 		}
 		#endregion
 
@@ -563,7 +572,12 @@ namespace Terminal.Gui {
 		/// Converts the color to a string representation.
 		/// </summary>
 		/// <remarks>
+		/// <para>
 		/// If the color is a named color, the name is returned. Otherwise, the color is returned as a hex string.
+		/// </para>
+		/// <para>
+		/// <see cref="A"/> (Alpha channel) is ignored and the returned string will not include it.
+		/// </para>
 		/// </remarks>
 		/// <returns></returns>
 		public override string ToString ()

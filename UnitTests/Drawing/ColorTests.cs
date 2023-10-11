@@ -108,29 +108,29 @@ public class ColorTests {
 		int expectedB = 128;
 
 		// Act
-		var color = new Color (expectedA, expectedR, expectedG, expectedB);
+		var color = new Color (expectedR, expectedG, expectedB, expectedA);
 
 		// Assert
-		Assert.Equal (expectedA, color.A);
 		Assert.Equal (expectedR, color.R);
 		Assert.Equal (expectedG, color.G);
 		Assert.Equal (expectedB, color.B);
+		Assert.Equal (expectedA, color.A);
 	}
 
 	[Fact]
-	public void Color_Constructor_WithArgbValue ()
+	public void Color_Constructor_WithRgbaValue ()
 	{
 		// Arrange
-		int expectedArgb = unchecked((int)0xFF804040); // Alpha: 255, R: 128, G: 64, B: 64
+		int expectedRgba = unchecked((int)0xFF804040); // R: 128, G: 64, B: 64, Alpha: 255
 
 		// Act
-		var color = new Color (expectedArgb);
+		var color = new Color (expectedRgba);
 
 		// Assert
-		Assert.Equal (255, color.A);
 		Assert.Equal (128, color.R);
 		Assert.Equal (64, color.G);
 		Assert.Equal (64, color.B);
+		Assert.Equal (255, color.A);
 	}
 
 	[Fact]
@@ -177,11 +177,11 @@ public class ColorTests {
 	public void Color_ImplicitOperator_FromInt ()
 	{
 		// Arrange
-		int argb = unchecked((int)0xFF804020); // Alpha: 255, R: 128, G: 64, B: 32
-		var expectedColor = new Color (255, 128, 64, 32);
+		int Rgba = unchecked((int)0xFF804020); // R: 128, G: 64, B: 32, Alpha: 255
+		var expectedColor = new Color (128, 64, 32);
 
 		// Act
-		Color color = argb;
+		Color color = Rgba;
 
 		// Assert
 		Assert.Equal (expectedColor, color);
@@ -191,14 +191,14 @@ public class ColorTests {
 	public void Color_ExplicitOperator_ToInt ()
 	{
 		// Arrange
-		var color = new Color (255, 128, 64, 32);
-		int expectedArgb = unchecked((int)0xFF804020); // Alpha: 255, R: 128, G: 64, B: 32
+		var color = new Color (128, 64, 32);
+		int expectedRgba = unchecked((int)0xFF804020); // R: 128, G: 64, B: 32, Alpha: 255
 
 		// Act
-		int argb = (int)color;
+		int Rgba = (int)color;
 
 		// Assert
-		Assert.Equal (expectedArgb, argb);
+		Assert.Equal (expectedRgba, Rgba);
 	}
 
 
