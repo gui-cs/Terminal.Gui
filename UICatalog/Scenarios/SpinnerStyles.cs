@@ -39,7 +39,7 @@ namespace UICatalog.Scenarios {
 				Y = 0
 			};
 			preview.Add (spinner);
-			spinner.AutoSpin ();
+			spinner.AutoSpin = true;
 
 			var ckbAscii = new CheckBox ("Ascii Only", false) {
 				X = Pos.Center () - 7,

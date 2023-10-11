@@ -962,7 +962,98 @@ namespace Terminal.Gui.ViewsTests {
 			Application.End (rs);
 
 			Assert.True (isEnter);
-			Assert.False (isLeave);
+			Assert.False (isLeave);  // Leave event cannot be trigger because it v.Enter was performed and v is focused
+			Assert.True (v.HasFocus);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void OnEnter_OnLeave_Triggered_On_Application_Begin_End_With_More_Toplevels ()
+		{
+			var iterations = 0;
+			var steps = new int [5];
+			var isEnterTop = false;
+			var isLeaveTop = false;
+			var vt = new View ();
+			var top = Application.Top;
+			var diag = new Dialog ();
+
+			vt.Enter += (s, e) => {
+				iterations++;
+				isEnterTop = true;
+				if (iterations == 1) {
+					steps [0] = iterations;
+					Assert.Null (e.View);
+				} else {
+					steps [4] = iterations;
+					Assert.Equal (diag, e.View);
+				}
+			};
+			vt.Leave += (s, e) => {
+				iterations++;
+				steps [1] = iterations;
+				isLeaveTop = true;
+				Assert.Equal (diag, e.View);
+			};
+			top.Add (vt);
+
+			Assert.False (vt.CanFocus);
+			var exception = Record.Exception (() => top.OnEnter (top));
+			Assert.Null (exception);
+			exception = Record.Exception (() => top.OnLeave (top));
+			Assert.Null (exception);
+
+			vt.CanFocus = true;
+			Application.Begin (top);
+
+			Assert.True (isEnterTop);
+			Assert.False (isLeaveTop);
+
+			isEnterTop = false;
+			var isEnterDiag = false;
+			var isLeaveDiag = false;
+			var vd = new View ();
+			vd.Enter += (s, e) => {
+				iterations++;
+				steps [2] = iterations;
+				isEnterDiag = true;
+				Assert.Null (e.View);
+			};
+			vd.Leave += (s, e) => {
+				iterations++;
+				steps [3] = iterations;
+				isLeaveDiag = true;
+				Assert.Equal (top, e.View);
+			};
+			diag.Add (vd);
+
+			Assert.False (vd.CanFocus);
+			exception = Record.Exception (() => diag.OnEnter (diag));
+			Assert.Null (exception);
+			exception = Record.Exception (() => diag.OnLeave (diag));
+			Assert.Null (exception);
+
+			vd.CanFocus = true;
+			var rs = Application.Begin (diag);
+
+			Assert.True (isEnterDiag);
+			Assert.False (isLeaveDiag);
+			Assert.False (isEnterTop);
+			Assert.True (isLeaveTop);
+
+			isEnterDiag = false;
+			isLeaveTop = false;
+			Application.End (rs);
+
+			Assert.False (isEnterDiag);
+			Assert.True (isLeaveDiag);
+			Assert.True (isEnterTop);
+			Assert.False (isLeaveTop);  // Leave event cannot be trigger because it v.Enter was performed and v is focused
+			Assert.True (vt.HasFocus);
+			Assert.Equal (1, steps [0]);
+			Assert.Equal (2, steps [1]);
+			Assert.Equal (3, steps [2]);
+			Assert.Equal (4, steps [3]);
+			Assert.Equal (5, steps [^1]);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1012,7 +1103,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			void view_LayoutStarted (object sender, LayoutEventArgs e)
 			{
-				Assert.Equal (new Rect (0, 0, 20, 10), view._needsDisplay);
+				Assert.Equal (new Rect (0, 0, 20, 10), view._needsDisplayRect);
 				view.LayoutStarted -= view_LayoutStarted;
 			}
 
@@ -1024,12 +1115,12 @@ namespace Terminal.Gui.ViewsTests {
 
 			view.Frame = new Rect (1, 3, 10, 5);
 			Assert.Equal (new Rect (1, 3, 10, 5), view.Frame);
-			Assert.Equal (new Rect (0, 0, 10, 5), view._needsDisplay);
+			Assert.Equal (new Rect (0, 0, 10, 5), view._needsDisplayRect);
 
 			view.OnDrawContent (view.Bounds);
 			view.Frame = new Rect (1, 3, 10, 5);
 			Assert.Equal (new Rect (1, 3, 10, 5), view.Frame);
-			Assert.Equal (new Rect (0, 0, 10, 5), view._needsDisplay);
+			Assert.Equal (new Rect (0, 0, 10, 5), view._needsDisplayRect);
 		}
 
 		// BUGBUG: Broke this test with #2483 - @bdisp I need your help figuring out why
@@ -1284,7 +1375,7 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void Single_Smaller_Top_Will_Have_Cleaning_Trails_Chunk_On_Move ()
+		public void Modal_As_Top_Will_Drag_Cleanly ()
 		{
 			var dialog = new Dialog () { Width = 30, Height = 10 };
 			dialog.Add (new Label (
@@ -1325,7 +1416,7 @@ namespace Terminal.Gui.ViewsTests {
 				});
 
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			Assert.Equal (dialog, Application.MouseGrabView);
 
 			Assert.Equal (new Rect (25, 7, 30, 10), dialog.Frame);
@@ -1351,7 +1442,7 @@ namespace Terminal.Gui.ViewsTests {
 				});
 
 			firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			Assert.Equal (dialog, Application.MouseGrabView);
 			Assert.Equal (new Rect (20, 10, 30, 10), dialog.Frame);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -1469,7 +1560,7 @@ namespace Terminal.Gui.ViewsTests {
 				});
 
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@$"
 ┌──────────────────┐
 │                  │
@@ -1493,6 +1584,119 @@ namespace Terminal.Gui.ViewsTests {
 └──────────────────┘", output);
 
 			Application.End (rs);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Activating_MenuBar_By_Alt_Key_Does_Not_Throw ()
+		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("Child", new MenuItem [] {
+					new MenuItem ("_Create Child", "", null)
+				})
+			});
+			var topChild = new Toplevel ();
+			topChild.Add (menu);
+			Application.Top.Add (topChild);
+			Application.Begin (Application.Top);
+
+			var exception = Record.Exception (() => topChild.ProcessHotKey (new KeyEvent (Key.AltMask, new KeyModifiers { Alt = true })));
+			Assert.Null (exception);
+		}
+
+
+		[Fact, TestRespondersDisposed]
+		public void Multi_Thread_Toplevels ()
+		{
+			Application.Init (new FakeDriver ());
+
+			var t = Application.Top;
+			var w = new Window ();
+			t.Add (w);
+
+			int count = 0, count1 = 0, count2 = 0;
+			bool log = false, log1 = false, log2 = false;
+			bool fromTopStillKnowFirstIsRunning = false;
+			bool fromTopStillKnowSecondIsRunning = false;
+			bool fromFirstStillKnowSecondIsRunning = false;
+
+			Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
+				count++;
+				if (count1 == 5) {
+					log1 = true;
+				}
+				if (count1 == 14 && count2 == 10 && count == 15) { // count2 is already stopped
+					fromTopStillKnowFirstIsRunning = true;
+				}
+				if (count1 == 7 && count2 == 7 && count == 8) {
+					fromTopStillKnowSecondIsRunning = true;
+				}
+				if (count == 30) {
+					Assert.Equal (30, count);
+					Assert.Equal (20, count1);
+					Assert.Equal (10, count2);
+
+					Assert.True (log);
+					Assert.True (log1);
+					Assert.True (log2);
+
+					Assert.True (fromTopStillKnowFirstIsRunning);
+					Assert.True (fromTopStillKnowSecondIsRunning);
+					Assert.True (fromFirstStillKnowSecondIsRunning);
+
+					Application.RequestStop ();
+					return false;
+				}
+				return true;
+			});
+
+			t.Ready += FirstDialogToplevel;
+
+			void FirstDialogToplevel (object sender, EventArgs args)
+			{
+				var od = new OpenDialog ();
+				od.Ready += SecondDialogToplevel;
+
+				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
+					count1++;
+					if (count2 == 5) {
+						log2 = true;
+					}
+					if (count2 == 4 && count1 == 5 && count == 5) {
+						fromFirstStillKnowSecondIsRunning = true;
+					}
+					if (count1 == 20) {
+						Assert.Equal (20, count1);
+						Application.RequestStop ();
+						return false;
+					}
+					return true;
+				});
+
+				Application.Run (od);
+			}
+
+			void SecondDialogToplevel (object sender, EventArgs args)
+			{
+				var d = new Dialog ();
+
+				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
+					count2++;
+					if (count < 30) {
+						log = true;
+					}
+					if (count2 == 10) {
+						Assert.Equal (10, count2);
+						Application.RequestStop ();
+						return false;
+					}
+					return true;
+				});
+
+				Application.Run (d);
+			}
+
+			Application.Run ();
+			Application.Shutdown ();
 		}
 	}
 }

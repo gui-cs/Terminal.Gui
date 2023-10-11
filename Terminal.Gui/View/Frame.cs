@@ -56,19 +56,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Frames only render to their Parent or Parent's SuperView's LineCanvas,
-		/// so this always throws an <see cref="InvalidOperationException"/>.
-		/// </summary>
-		public override LineCanvas LineCanvas {
-			get {
-				throw new NotImplementedException ();
-			}
-			set {
-				throw new NotImplementedException ();
-			}
-		}
-
-		/// <summary>
 		/// Does nothing for Frame
 		/// </summary>
 		/// <returns></returns>
@@ -126,7 +113,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void OnDrawContent (Rect contentArea)
 		{
-			if (Thickness == Thickness.Empty) return;
+			if (Thickness == Thickness.Empty) {
+				return;
+			}
 
 			if (ColorScheme != null) {
 				Driver.SetAttribute (GetNormalColor ());
@@ -139,9 +128,6 @@ namespace Terminal.Gui {
 			}
 
 			//Driver.SetAttribute (Colors.Error.Normal);
-
-			var prevClip = SetClip (Frame);
-
 			var screenBounds = ViewToScreen (Frame);
 
 			// This just draws/clears the thickness, not the insides.
@@ -305,7 +291,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			Driver.Clip = prevClip;
+			ClearNeedsDisplay ();
 		}
 
 		// TODO: v2 - Frame.BorderStyle is temporary - Eventually the border will be drawn by a "BorderView" that is a subview of the Frame.

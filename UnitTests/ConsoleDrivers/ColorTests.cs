@@ -6,17 +6,21 @@ using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.DriverTests {
 	public class ColorTests {
-
+		public ColorTests ()
+		{
+			ConsoleDriver.RunningUnitTests = true;
+		}
+		
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
-		//[InlineData (typeof (NetDriver))]
-		//[InlineData (typeof (CursesDriver))]
-		//[InlineData (typeof (WindowsDriver))]
+		[InlineData (typeof (NetDriver))]
+		[InlineData (typeof (CursesDriver))]
+		[InlineData (typeof (WindowsDriver))]
 		public void SetColors_Changes_Colors (Type driverType)
 		{
 			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
-			driver.Init (() => { });
+
 			Assert.Equal (ConsoleColor.Gray, Console.ForegroundColor);
 			Assert.Equal (ConsoleColor.Black, Console.BackgroundColor);
 
@@ -29,7 +33,6 @@ namespace Terminal.Gui.DriverTests {
 			Console.ResetColor ();
 			Assert.Equal (ConsoleColor.Gray, Console.ForegroundColor);
 			Assert.Equal (ConsoleColor.Black, Console.BackgroundColor);
-			driver.End ();
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -72,6 +75,43 @@ namespace Terminal.Gui.DriverTests {
 			Assert.Equal (new Attribute (Color.BrightMagenta, Color.Green), attrs [13]);
 			Assert.Equal (new Attribute (Color.BrightYellow, Color.Blue), attrs [14]);
 			Assert.Equal (new Attribute (Color.White, Color.Black), attrs [^1]);
+		}
+
+		[Theory]
+		[InlineData (typeof (FakeDriver), false)]
+		[InlineData (typeof (NetDriver), true)]
+		[InlineData (typeof (CursesDriver), false)]
+		[InlineData (typeof (WindowsDriver), true)] // Because we're not Windows Terminal
+		public void SupportsTrueColor_Defaults (Type driverType, bool expectedSetting)
+		{
+			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+			driver.Init (() => { });
+
+			Assert.Equal (expectedSetting, driver.SupportsTrueColor);
+
+			driver.End ();
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
+		}
+
+		[Theory]
+		[InlineData (typeof (FakeDriver))]
+		[InlineData (typeof (NetDriver))]
+		[InlineData (typeof (CursesDriver))]
+		[InlineData (typeof (WindowsDriver))]
+		public void Force16Colors_Sets (Type driverType)
+		{
+			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+			driver.Init (() => { });
+
+			driver.Force16Colors = true;
+			Assert.True (driver.Force16Colors);
+
+			driver.End ();
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
 		}
 	}
 }

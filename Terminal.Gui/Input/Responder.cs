@@ -276,12 +276,13 @@ namespace Terminal.Gui {
 					// TODO: dispose managed state (managed objects)
 				}
 
-				// TODO: free unmanaged resources (unmanaged objects) and override finalizer
-				// TODO: set large fields to null
+#if DEBUG_IDISPOSABLE
+				Instances.Remove (this);
+#endif                               
 				disposedValue = true;
 			}
 		}
-
+		
 		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resource.
 		/// </summary>

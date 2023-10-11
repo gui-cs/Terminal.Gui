@@ -156,105 +156,112 @@ namespace UICatalog.Scenarios {
 				IsDefault = true,
 			};
 			showDialogButton.Clicked += (s, e) => {
-				try {
-					Dialog dialog = null;
-
-					int width = 0;
-					int.TryParse (widthEdit.Text, out width);
-					int height = 0;
-					int.TryParse (heightEdit.Text, out height);
-					int numButtons = 3;
-					int.TryParse (numButtonsEdit.Text, out numButtons);
-
-					var buttons = new List<Button> ();
-					var clicked = -1;
-					for (int i = 0; i < numButtons; i++) {
-						int buttonId = i;
-						Button button = null;
-						if (glyphsNotWords.Checked == true) {
-							buttonId = i;
-							button = new Button (NumberToWords.Convert (buttonId) + " " + Char.ConvertFromUtf32 (buttonId + CODE_POINT),
-								is_default: buttonId == 0);
-						} else {
-							button = new Button (NumberToWords.Convert (buttonId),
-							       is_default: buttonId == 0);
-						}
-						button.Clicked += (s, e) => {
-							clicked = buttonId;
-							Application.RequestStop ();
-						};
-						buttons.Add (button);
-					}
-					//if (buttons.Count > 1) {
-					//	buttons [1].Text = "Accept";
-					//	buttons [1].IsDefault = true;
-					//	buttons [0].Visible = false;
-					//	buttons [0].Text = "_Back";
-					//	buttons [0].IsDefault = false;
-					//}
-
-					// This tests dynamically adding buttons; ensuring the dialog resizes if needed and 
-					// the buttons are laid out correctly
-					dialog = new Dialog (buttons.ToArray ()) {
-						Title = titleEdit.Text,
-						ButtonAlignment = (Dialog.ButtonAlignments)styleRadioGroup.SelectedItem
-					};
-					if (height != 0 || width != 0) {
-						dialog.Height = height;
-						dialog.Width = width;
-					}
-
-					var add = new Button ("Add a button") {
-						X = Pos.Center (),
-						Y = Pos.Center ()
-					};
-					add.Clicked += (s, e) => {
-						var buttonId = buttons.Count;
-						Button button;
-						if (glyphsNotWords.Checked == true) {
-							button = new Button (NumberToWords.Convert (buttonId) + " " + Char.ConvertFromUtf32 (buttonId + CODE_POINT),
-								is_default: buttonId == 0);
-						} else {
-							button = new Button (NumberToWords.Convert (buttonId),
-								is_default: buttonId == 0);
-						}
-						button.Clicked += (s, e) => {
-							clicked = buttonId;
-							Application.RequestStop ();
-
-						};
-						buttons.Add (button);
-						dialog.AddButton (button);
-						if (buttons.Count > 1) {
-							button.TabIndex = buttons [buttons.Count - 2].TabIndex + 1;
-						}
-					};
-					dialog.Add (add);
-
-					var addChar = new Button ($"Add a {Char.ConvertFromUtf32 (CODE_POINT)} to each button") {
-						X = Pos.Center (),
-						Y = Pos.Center () + 1
-					};
-					addChar.Clicked += (s, e) => {
-						foreach (var button in buttons) {
-							button.Text += Char.ConvertFromUtf32 (CODE_POINT);
-						}
-						dialog.LayoutSubviews ();
-					};
-					dialog.Closed += (s, e) => {
-						buttonPressedLabel.Text = $"{clicked}";
-					};
-					dialog.Add (addChar);
-
-					Application.Run (dialog);
-
-				} catch (FormatException) {
-					buttonPressedLabel.Text = "Invalid Options";
-				}
+				var dlg = CreateDemoDialog (widthEdit, heightEdit, titleEdit, numButtonsEdit, glyphsNotWords, styleRadioGroup, buttonPressedLabel);
+				Application.Run (dlg);
 			};
+
 			Win.Add (showDialogButton);
 
 			Win.Add (buttonPressedLabel);
 		}
+
+		Dialog CreateDemoDialog (TextField widthEdit, TextField heightEdit, TextField titleEdit, TextField numButtonsEdit, CheckBox glyphsNotWords, RadioGroup styleRadioGroup,  Label buttonPressedLabel)
+		{
+			Dialog dialog = null;
+			try {
+
+				int width = 0;
+				int.TryParse (widthEdit.Text, out width);
+				int height = 0;
+				int.TryParse (heightEdit.Text, out height);
+				int numButtons = 3;
+				int.TryParse (numButtonsEdit.Text, out numButtons);
+
+				var buttons = new List<Button> ();
+				var clicked = -1;
+				for (int i = 0; i < numButtons; i++) {
+					int buttonId = i;
+					Button button = null;
+					if (glyphsNotWords.Checked == true) {
+						buttonId = i;
+						button = new Button (NumberToWords.Convert (buttonId) + " " + Char.ConvertFromUtf32 (buttonId + CODE_POINT),
+							is_default: buttonId == 0);
+					} else {
+						button = new Button (NumberToWords.Convert (buttonId),
+						       is_default: buttonId == 0);
+					}
+					button.Clicked += (s, e) => {
+						clicked = buttonId;
+						Application.RequestStop ();
+					};
+					buttons.Add (button);
+				}
+				//if (buttons.Count > 1) {
+				//	buttons [1].Text = "Accept";
+				//	buttons [1].IsDefault = true;
+				//	buttons [0].Visible = false;
+				//	buttons [0].Text = "_Back";
+				//	buttons [0].IsDefault = false;
+				//}
+
+				// This tests dynamically adding buttons; ensuring the dialog resizes if needed and 
+				// the buttons are laid out correctly
+				dialog = new Dialog (buttons.ToArray ()) {
+					Title = titleEdit.Text,
+					ButtonAlignment = (Dialog.ButtonAlignments)styleRadioGroup.SelectedItem
+				};
+				if (height != 0 || width != 0) {
+					dialog.Height = height;
+					dialog.Width = width;
+				}
+
+				var add = new Button ("Add a button") {
+					X = Pos.Center (),
+					Y = Pos.Center ()
+				};
+				add.Clicked += (s, e) => {
+					var buttonId = buttons.Count;
+					Button button;
+					if (glyphsNotWords.Checked == true) {
+						button = new Button (NumberToWords.Convert (buttonId) + " " + Char.ConvertFromUtf32 (buttonId + CODE_POINT),
+							is_default: buttonId == 0);
+					} else {
+						button = new Button (NumberToWords.Convert (buttonId),
+							is_default: buttonId == 0);
+					}
+					button.Clicked += (s, e) => {
+						clicked = buttonId;
+						Application.RequestStop ();
+
+					};
+					buttons.Add (button);
+					dialog.AddButton (button);
+					if (buttons.Count > 1) {
+						button.TabIndex = buttons [buttons.Count - 2].TabIndex + 1;
+					}
+				};
+				dialog.Add (add);
+
+				var addChar = new Button ($"Add a {Char.ConvertFromUtf32 (CODE_POINT)} to each button") {
+					X = Pos.Center (),
+					Y = Pos.Center () + 1
+				};
+				addChar.Clicked += (s, e) => {
+					foreach (var button in buttons) {
+						button.Text += Char.ConvertFromUtf32 (CODE_POINT);
+					}
+					dialog.LayoutSubviews ();
+				};
+				dialog.Closed += (s, e) => {
+					buttonPressedLabel.Text = $"{clicked}";
+				};
+				dialog.Add (addChar);
+
+			} catch (FormatException) {
+				buttonPressedLabel.Text = "Invalid Options";
+			}
+			return dialog;
+		}
 	}
 }
+

@@ -213,8 +213,8 @@ namespace Terminal.Gui {
 			Source.Position = displayStart;
 			var n = source.Read (data, 0, data.Length);
 
-			int activeColor = ColorScheme.HotNormal;
-			int trackingColor = ColorScheme.HotFocus;
+			var activeColor = ColorScheme.HotNormal;
+			var trackingColor = ColorScheme.HotFocus;
 
 			for (int line = 0; line < frame.Height; line++) {
 				var lineRect = new Rect (0, line, frame.Width, 1);

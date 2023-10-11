@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Text;
 using Terminal.Gui;
@@ -13,7 +14,7 @@ namespace UICatalog.Scenarios {
 		/// <summary>
 		/// A tree view where nodes are files and folders
 		/// </summary>
-		TreeView<FileSystemInfo> treeViewFiles;
+		TreeView<IFileSystemInfo> treeViewFiles;
 
 		MenuItem miShowLines;
 		private MenuItem _miPlusMinus;
@@ -21,7 +22,11 @@ namespace UICatalog.Scenarios {
 		private MenuItem _miNoSymbols;
 		private MenuItem _miColoredSymbols;
 		private MenuItem _miInvertSymbols;
-		private MenuItem _miUnicodeSymbols;
+
+		private MenuItem _miBasicIcons;
+		private MenuItem _miUnicodeIcons;
+		private MenuItem _miNerdIcons;
+
 		private MenuItem _miFullPaths;
 		private MenuItem _miLeaveLastRow;
 		private MenuItem _miHighlightModelTextOnly;
@@ -30,6 +35,7 @@ namespace UICatalog.Scenarios {
 		private MenuItem _miMultiSelect;
 
 		private DetailsFrame _detailsFrame;
+		private FileSystemIconProvider _iconProvider = new ();
 
 		public override void Setup ()
 		{
@@ -54,10 +60,13 @@ namespace UICatalog.Scenarios {
 					_miPlusMinus = new MenuItem ("_Plus Minus Symbols", "+ -", () => SetExpandableSymbols((Rune)'+',(Rune)'-')){Checked = true, CheckType = MenuItemCheckStyle.Radio},
 					_miArrowSymbols = new MenuItem ("_Arrow Symbols", "> v", () => SetExpandableSymbols((Rune)'>',(Rune)'v')){Checked = false, CheckType = MenuItemCheckStyle.Radio},
 					_miNoSymbols = new MenuItem ("_No Symbols", "", () => SetExpandableSymbols(default,null)){Checked = false, CheckType = MenuItemCheckStyle.Radio},
-					_miUnicodeSymbols = new MenuItem ("_Unicode", "ஹ ﷽", () => SetExpandableSymbols((Rune)'ஹ',(Rune)'﷽')){Checked = false, CheckType = MenuItemCheckStyle.Radio},
 					null /*separator*/,
 					_miColoredSymbols = new MenuItem ("_Colored Symbols", "", () => ShowColoredExpandableSymbols()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
 					_miInvertSymbols = new MenuItem ("_Invert Symbols", "", () => InvertExpandableSymbols()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
+					null /*separator*/,
+					_miBasicIcons = new MenuItem ("_Basic Icons",null, SetNoIcons){Checked = false, CheckType = MenuItemCheckStyle.Radio},
+					_miUnicodeIcons = new MenuItem ("_Unicode Icons", null, SetUnicodeIcons){Checked = false, CheckType = MenuItemCheckStyle.Radio},
+					_miNerdIcons = new MenuItem ("_Nerd Icons", null, SetNerdIcons){Checked = false, CheckType = MenuItemCheckStyle.Radio},
 					null /*separator*/,
 					_miLeaveLastRow = new MenuItem ("_Leave Last Row", "", () => SetLeaveLastRow()){Checked = true, CheckType = MenuItemCheckStyle.Checked},
 					_miHighlightModelTextOnly = new MenuItem ("_Highlight Model Text Only", "", () => SetCheckHighlightModelTextOnly()){Checked = false, CheckType = MenuItemCheckStyle.Checked},
@@ -69,14 +78,15 @@ namespace UICatalog.Scenarios {
 			});
 			Application.Top.Add (menu);
 
-			treeViewFiles = new TreeView<FileSystemInfo> () {
+			treeViewFiles = new TreeView<IFileSystemInfo> () {
 				X = 0,
 				Y = 0,
 				Width = Dim.Percent (50),
 				Height = Dim.Fill (),
 			};
+			treeViewFiles.DrawLine += TreeViewFiles_DrawLine;
 
-			_detailsFrame = new DetailsFrame () {
+			_detailsFrame = new DetailsFrame (_iconProvider) {
 				X = Pos.Right (treeViewFiles),
 				Y = 0,
 				Width = Dim.Fill (),
@@ -98,11 +108,54 @@ namespace UICatalog.Scenarios {
 
 			treeViewFiles.SetFocus ();
 
+			UpdateIconCheckedness ();
 		}
 
-		private void TreeViewFiles_SelectionChanged (object sender, SelectionChangedEventArgs<FileSystemInfo> e)
+		private void SetNoIcons ()
+		{
+			_iconProvider.UseUnicodeCharacters = false;
+			_iconProvider.UseNerdIcons = false;
+			UpdateIconCheckedness ();
+		}
+
+		private void SetUnicodeIcons ()
+		{
+			_iconProvider.UseUnicodeCharacters = true;
+			UpdateIconCheckedness ();
+		}
+		private void SetNerdIcons ()
+		{
+			_iconProvider.UseNerdIcons = true;
+			UpdateIconCheckedness ();
+		}
+		private void UpdateIconCheckedness ()
+		{
+			_miBasicIcons.Checked = !_iconProvider.UseNerdIcons && !_iconProvider.UseUnicodeCharacters;
+			_miUnicodeIcons.Checked = _iconProvider.UseUnicodeCharacters;
+			_miNerdIcons.Checked = _iconProvider.UseNerdIcons;
+			treeViewFiles.SetNeedsDisplay ();
+		}
+
+		private void TreeViewFiles_SelectionChanged (object sender, SelectionChangedEventArgs<IFileSystemInfo> e)
 		{
 			ShowPropertiesOf (e.NewValue);
+		}
+
+		private void TreeViewFiles_DrawLine (object sender, DrawTreeViewLineEventArgs<IFileSystemInfo> e)
+		{
+			// Render directory icons in yellow
+			if (e.Model is IDirectoryInfo d) {
+				if (_iconProvider.UseNerdIcons || _iconProvider.UseUnicodeCharacters) {
+					if (e.IndexOfModelText > 0 && e.IndexOfModelText < e.RuneCells.Count) {
+						var cell = e.RuneCells [e.IndexOfModelText];
+						cell.ColorScheme = new ColorScheme (
+							new Terminal.Gui.Attribute (
+								Color.BrightYellow,
+								cell.ColorScheme.Normal.Background)
+						);
+					}
+				}
+			}
 		}
 
 		private void TreeViewFiles_KeyPress (object sender, KeyEventEventArgs obj)
@@ -146,7 +199,7 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
-		private void ShowContextMenu (Point screenPoint, FileSystemInfo forObject)
+		private void ShowContextMenu (Point screenPoint, IFileSystemInfo forObject)
 		{
 			var menu = new ContextMenu ();
 			menu.Position = screenPoint;
@@ -157,21 +210,24 @@ namespace UICatalog.Scenarios {
 		}
 
 		class DetailsFrame : FrameView {
-			private FileSystemInfo fileInfo;
+			private IFileSystemInfo fileInfo;
+			private FileSystemIconProvider _iconProvider;
 
-			public DetailsFrame ()
+			public DetailsFrame (FileSystemIconProvider iconProvider)
 			{
 				Title = "Details";
 				Visible = true;
 				CanFocus = true;
+				_iconProvider = iconProvider;
 			}
 
-			public FileSystemInfo FileInfo {
+			public IFileSystemInfo FileInfo {
 				get => fileInfo; set {
 					fileInfo = value;
 					System.Text.StringBuilder sb = null;
-					if (fileInfo is FileInfo f) {
-						Title = $"File: {f.Name}";
+
+					if (fileInfo is IFileInfo f) {
+						Title = $"{_iconProvider.GetIconWithOptionalSpace (f)}{f.Name}".Trim ();
 						sb = new System.Text.StringBuilder ();
 						sb.AppendLine ($"Path:\n {f.FullName}\n");
 						sb.AppendLine ($"Size:\n {f.Length:N0} bytes\n");
@@ -179,8 +235,8 @@ namespace UICatalog.Scenarios {
 						sb.AppendLine ($"Created:\n {f.CreationTime}");
 					}
 
-					if (fileInfo is DirectoryInfo dir) {
-						Title = $"Directory: {dir.Name}";
+					if (fileInfo is IDirectoryInfo dir) {
+						Title = $"{_iconProvider.GetIconWithOptionalSpace (dir)}{dir.Name}".Trim ();
 						sb = new System.Text.StringBuilder ();
 						sb.AppendLine ($"Path:\n {dir?.FullName}\n");
 						sb.AppendLine ($"Modified:\n {dir.LastWriteTime}\n");
@@ -191,7 +247,7 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
-		private void ShowPropertiesOf (FileSystemInfo fileSystemInfo)
+		private void ShowPropertiesOf (IFileSystemInfo fileSystemInfo)
 		{
 			_detailsFrame.FileInfo = fileSystemInfo;
 		}
@@ -203,7 +259,7 @@ namespace UICatalog.Scenarios {
 
 			var scrollBar = new ScrollBarView (treeViewFiles, true);
 
-			scrollBar.ChangedPosition += (s,e) => {
+			scrollBar.ChangedPosition += (s, e) => {
 				treeViewFiles.ScrollOffsetVertical = scrollBar.Position;
 				if (treeViewFiles.ScrollOffsetVertical != scrollBar.Position) {
 					scrollBar.Position = treeViewFiles.ScrollOffsetVertical;
@@ -211,7 +267,7 @@ namespace UICatalog.Scenarios {
 				treeViewFiles.SetNeedsDisplay ();
 			};
 
-			scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
+			scrollBar.OtherScrollBarView.ChangedPosition += (s, e) => {
 				treeViewFiles.ScrollOffsetHorizontal = scrollBar.OtherScrollBarView.Position;
 				if (treeViewFiles.ScrollOffsetHorizontal != scrollBar.OtherScrollBarView.Position) {
 					scrollBar.OtherScrollBarView.Position = treeViewFiles.ScrollOffsetHorizontal;
@@ -219,7 +275,7 @@ namespace UICatalog.Scenarios {
 				treeViewFiles.SetNeedsDisplay ();
 			};
 
-			treeViewFiles.DrawContent += (s,e) => {
+			treeViewFiles.DrawContent += (s, e) => {
 				scrollBar.Size = treeViewFiles.ContentHeight;
 				scrollBar.Position = treeViewFiles.ScrollOffsetVertical;
 				scrollBar.OtherScrollBarView.Size = treeViewFiles.GetContentWidth (true);
@@ -230,20 +286,21 @@ namespace UICatalog.Scenarios {
 
 		private void SetupFileTree ()
 		{
-
-			// setup delegates
-			treeViewFiles.TreeBuilder = new DelegateTreeBuilder<FileSystemInfo> (
-
-				// Determines how to compute children of any given branch
-				GetChildren,
-				// As a shortcut to enumerating half the file system, tell tree that all directories are expandable (even if they turn out to be empty later on)				
-				(o) => o is DirectoryInfo
-			);
+			// setup how to build tree
+			var fs = new FileSystem ();
+			var rootDirs = DriveInfo.GetDrives ().Select (d => fs.DirectoryInfo.New (d.RootDirectory.FullName));
+			treeViewFiles.TreeBuilder = new FileSystemTreeBuilder ();
+			treeViewFiles.AddObjects (rootDirs);
 
 			// Determines how to represent objects as strings on the screen
-			treeViewFiles.AspectGetter = FileSystemAspectGetter;
+			treeViewFiles.AspectGetter = AspectGetter;
 
-			treeViewFiles.AddObjects (DriveInfo.GetDrives ().Select (d => d.RootDirectory));
+			_iconProvider.IsOpenGetter = treeViewFiles.IsExpanded;
+		}
+
+		private string AspectGetter (IFileSystemInfo f)
+		{
+			return (_iconProvider.GetIconWithOptionalSpace (f) + f.Name).Trim ();
 		}
 
 		private void ShowLines ()
@@ -259,7 +316,6 @@ namespace UICatalog.Scenarios {
 			_miPlusMinus.Checked = expand.Value == '+';
 			_miArrowSymbols.Checked = expand.Value == '>';
 			_miNoSymbols.Checked = expand.Value == default;
-			_miUnicodeSymbols.Checked = expand.Value == 'ஹ';
 
 			treeViewFiles.Style.ExpandableSymbol = expand;
 			treeViewFiles.Style.CollapseableSymbol = collapse;
@@ -319,8 +375,8 @@ namespace UICatalog.Scenarios {
 
 			if (_miCustomColors.Checked == true) {
 				treeViewFiles.ColorGetter = (m) => {
-					if (m is DirectoryInfo && m.Attributes.HasFlag (FileAttributes.Hidden)) return hidden;
-					if (m is FileInfo && m.Attributes.HasFlag (FileAttributes.Hidden)) return hidden;
+					if (m is IDirectoryInfo && m.Attributes.HasFlag (FileAttributes.Hidden)) return hidden;
+					if (m is IFileInfo && m.Attributes.HasFlag (FileAttributes.Hidden)) return hidden;
 					return null;
 				};
 			} else {
@@ -334,36 +390,6 @@ namespace UICatalog.Scenarios {
 			treeViewFiles.Style.HighlightModelTextOnly = !treeViewFiles.Style.HighlightModelTextOnly;
 			_miHighlightModelTextOnly.Checked = treeViewFiles.Style.HighlightModelTextOnly;
 			treeViewFiles.SetNeedsDisplay ();
-		}
-
-		private IEnumerable<FileSystemInfo> GetChildren (FileSystemInfo model)
-		{
-			// If it is a directory it's children are all contained files and dirs
-			if (model is DirectoryInfo d) {
-				try {
-					return d.GetFileSystemInfos ()
-						//show directories first
-						.OrderBy (a => a is DirectoryInfo ? 0 : 1)
-						.ThenBy (b => b.Name);
-				} catch (SystemException) {
-
-					// Access violation or other error getting the file list for directory
-					return Enumerable.Empty<FileSystemInfo> ();
-				}
-			}
-
-			return Enumerable.Empty<FileSystemInfo> (); ;
-		}
-		private string FileSystemAspectGetter (FileSystemInfo model)
-		{
-			if (model is DirectoryInfo d) {
-				return d.Name;
-			}
-			if (model is FileInfo f) {
-				return f.Name;
-			}
-
-			return model.ToString ();
 		}
 
 		private void Quit ()

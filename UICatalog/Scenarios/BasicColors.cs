@@ -87,8 +87,8 @@ namespace UICatalog.Scenarios {
 
 			Application.RootMouseEvent = (e) => {
 				if (e.View != null) {
-					var colorValue = e.View.GetNormalColor ().Value;
-					Application.Driver.GetColors (colorValue, out Color fore, out Color back);
+					var fore = e.View.GetNormalColor ().Foreground;
+					var back = e.View.GetNormalColor ().Background;
 					lblForeground.Text = fore.ToString ();
 					viewForeground.ColorScheme.Normal = new Attribute (fore, fore);
 					lblBackground.Text = back.ToString ();

@@ -119,11 +119,11 @@ namespace Terminal.Gui {
 
 		Rune GetCheckedState ()
 		{
-			switch (Checked) {
-			case true: return charChecked;
-			case false: return charUnChecked;
-			default: return charNullChecked;
-			}
+			return Checked switch {
+				true => charChecked,
+				false => charUnChecked,
+				var _ => charNullChecked
+			};
 		}
 
 		string GetFormatterText ()
@@ -157,9 +157,7 @@ namespace Terminal.Gui {
 			get => allowNullChecked;
 			set {
 				allowNullChecked = value;
-				if (Checked == null) {
-					Checked = false;
-				}
+				Checked ??= false;
 			}
 		}
 

@@ -41,6 +41,7 @@ namespace Terminal.Gui.ViewTests {
 
 			view.Margin.Thickness = new Thickness (1, 2, 3, 4);
 			Assert.Equal (new Thickness (3, 5, 7, 9), view.GetFramesThickness ());
+			view.Dispose ();
 		}
 
 		[Theory, AutoInitShutdown]
@@ -60,7 +61,7 @@ namespace Terminal.Gui.ViewTests {
 			bool firstIteration = false;
 
 			((FakeDriver)Application.Driver).SetBufferSize (20, height);
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			var expected = string.Empty;
 
 			switch (height) {
@@ -91,7 +92,7 @@ namespace Terminal.Gui.ViewTests {
 				break;
 			}
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-
+			Application.End (rs);
 		}
 
 		[Theory, AutoInitShutdown]
@@ -118,7 +119,7 @@ namespace Terminal.Gui.ViewTests {
 			bool firstIteration = false;
 
 			((FakeDriver)Application.Driver).SetBufferSize (width, 3);
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			var expected = string.Empty;
 
 			switch (width) {
@@ -209,7 +210,7 @@ namespace Terminal.Gui.ViewTests {
 			bool firstIteration = false;
 
 			((FakeDriver)Application.Driver).SetBufferSize (3, 3);
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			var expected = @"
 ┌─┐
 │ │
@@ -233,7 +234,7 @@ namespace Terminal.Gui.ViewTests {
 			bool firstIteration = false;
 
 			((FakeDriver)Application.Driver).SetBufferSize (5, 5);
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			var expected = @"
 ╔═══╗
 ║┌─┐║
@@ -242,6 +243,7 @@ namespace Terminal.Gui.ViewTests {
 ╚═══╝";
 
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Application.End (rs);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -260,7 +262,7 @@ namespace Terminal.Gui.ViewTests {
 			bool firstIteration = false;
 
 			((FakeDriver)Application.Driver).SetBufferSize (10, 4);
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			var expected = @"
 ╔════════╗
 ║┌┤1234├┐║
@@ -268,6 +270,7 @@ namespace Terminal.Gui.ViewTests {
 ╚════════╝";
 
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Application.End (rs);
 		}
 
 		[Theory, AutoInitShutdown]
@@ -296,7 +299,7 @@ namespace Terminal.Gui.ViewTests {
 			bool firstIteration = false;
 
 			((FakeDriver)Application.Driver).SetBufferSize (width, 4);
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			var expected = string.Empty;
 
 			switch (width) {
@@ -379,6 +382,7 @@ namespace Terminal.Gui.ViewTests {
 				break;
 			}
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Application.End (rs);
 		}
 
 		[Theory, AutoInitShutdown]
@@ -407,7 +411,7 @@ namespace Terminal.Gui.ViewTests {
 			bool firstIteration = false;
 
 			((FakeDriver)Application.Driver).SetBufferSize (width, 4);
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			var expected = string.Empty;
 
 			switch (width) {
@@ -490,6 +494,7 @@ namespace Terminal.Gui.ViewTests {
 				break;
 			}
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Application.End (rs);
 		}
 
 		[Theory, AutoInitShutdown]
@@ -518,7 +523,7 @@ namespace Terminal.Gui.ViewTests {
 			bool firstIteration = false;
 
 			((FakeDriver)Application.Driver).SetBufferSize (width, 5);
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			var expected = string.Empty;
 
 			switch (width) {
@@ -601,6 +606,7 @@ namespace Terminal.Gui.ViewTests {
 				break;
 			}
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Application.End (rs);
 		}
 	}
 }

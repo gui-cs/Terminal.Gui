@@ -21,7 +21,7 @@ namespace Terminal.Gui {
 		/// Gets or sets the default value to use for <see cref="UseColors"/>.
 		/// This can be populated from .tui config files via <see cref="ConfigurationManager"/>
 		/// </summary>
-		[SerializableConfigurationProperty(Scope = typeof (SettingsScope))]
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
 		public static bool DefaultUseColors { get; set; }
 
 		/// <summary>
@@ -39,34 +39,23 @@ namespace Terminal.Gui {
 		public bool UseColors { get; set; } = DefaultUseColors;
 
 		/// <summary>
+		/// Gets or sets the class responsible for determining which symbol
+		/// to use to represent files and directories.
+		/// </summary>
+		public FileSystemIconProvider IconProvider { get; set; } = new FileSystemIconProvider ();
+
+		/// <summary>
+		///	Gets or sets the class thatis responsible for determining which color
+		/// to use to represent files and directories when <see cref="UseColors"/> is
+		/// <see langword="true"/>.
+		/// </summary>
+		public FileSystemColorProvider ColorProvider { get; set; } = new FileSystemColorProvider ();
+
+		/// <summary>
 		/// Gets or sets the culture to use (e.g. for number formatting).
 		/// Defaults to <see cref="CultureInfo.CurrentUICulture"/>.
 		/// </summary>
-		public CultureInfo Culture {get;set;} = CultureInfo.CurrentUICulture;
-
-		/// <summary>
-		/// Sets a <see cref="ColorScheme"/> to use for directories rows of
-		/// the <see cref="TableView"/>.
-		/// </summary>
-		public ColorScheme ColorSchemeDirectory { get; set; }
-
-		/// <summary>
-		/// Sets a <see cref="ColorScheme"/> to use for file rows with an image extension
-		/// of the <see cref="TableView"/>. Defaults to White text on Black background.
-		/// </summary>
-		public ColorScheme ColorSchemeImage { get; set; }
-
-		/// <summary>
-		/// Sets a <see cref="ColorScheme"/> to use for file rows with an executable extension
-		/// or that match <see cref="FileDialog.AllowedTypes"/> in the <see cref="TableView"/>.
-		/// </summary>
-		public ColorScheme ColorSchemeExeOrRecommended { get; set; }
-
-		/// <summary>
-		/// Colors to use when <see cref="UseColors"/> is true but file does not match any other
-		/// classification (<see cref="ColorSchemeDirectory"/>, <see cref="ColorSchemeImage"/> etc).
-		/// </summary>
-		public ColorScheme ColorSchemeOther { get; set; }
+		public CultureInfo Culture { get; set; } = CultureInfo.CurrentUICulture;
 
 		/// <summary>
 		/// Gets or sets the header text displayed in the Filename column of the files table.
@@ -91,12 +80,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the text displayed in the 'Search' text box when user has not supplied any input yet.
 		/// </summary>
-		public string SearchCaption { get; internal set; } = Strings.fdSearchCaption;
+		public string SearchCaption { get; set; } = Strings.fdSearchCaption;
 
 		/// <summary>
 		/// Gets or sets the text displayed in the 'Path' text box when user has not supplied any input yet.
 		/// </summary>
-		public string PathCaption { get; internal set; } = Strings.fdPathCaption;
+		public string PathCaption { get; set; } = Strings.fdPathCaption;
 
 		/// <summary>
 		/// Gets or sets the text on the 'Ok' button.  Typically you may want to change this to
@@ -105,39 +94,51 @@ namespace Terminal.Gui {
 		public string OkButtonText { get; set; } = "Ok";
 
 		/// <summary>
+		/// Gets or sets the text on the 'Cancel' button.
+		/// </summary>
+		public string CancelButtonText { get; set; } = "Cancel";
+
+		/// <summary>
+		/// Gets or sets whether to flip the order of the Ok and Cancel buttons. Defaults
+		/// to false (Ok button then Cancel button). Set to true to show Cancel button on
+		/// left then Ok button instead.
+		/// </summary>
+		public bool FlipOkCancelButtonLayoutOrder { get; set; }
+
+		/// <summary>
 		/// Gets or sets error message when user attempts to select a file type that is not one of <see cref="FileDialog.AllowedTypes"/>
 		/// </summary>
-		public string WrongFileTypeFeedback { get; internal set; } = Strings.fdWrongFileTypeFeedback;
+		public string WrongFileTypeFeedback { get; set; } = Strings.fdWrongFileTypeFeedback;
 
 		/// <summary>
 		/// Gets or sets error message when user selects a directory that does not exist and
 		/// <see cref="OpenMode"/> is <see cref="OpenMode.Directory"/> and <see cref="FileDialog.MustExist"/> is <see langword="true"/>.
 		/// </summary>
-		public string DirectoryMustExistFeedback { get; internal set; } = Strings.fdDirectoryMustExistFeedback;
+		public string DirectoryMustExistFeedback { get; set; } = Strings.fdDirectoryMustExistFeedback;
 
 		/// <summary>
 		/// Gets or sets error message when user <see cref="OpenMode"/> is <see cref="OpenMode.Directory"/>
 		/// and user enters the name of an existing file (File system cannot have a folder with the same name as a file).
 		/// </summary>
-		public string FileAlreadyExistsFeedback { get; internal set; } = Strings.fdFileAlreadyExistsFeedback;
+		public string FileAlreadyExistsFeedback { get; set; } = Strings.fdFileAlreadyExistsFeedback;
 
 		/// <summary>
 		/// Gets or sets error message when user selects a file that does not exist and
 		/// <see cref="OpenMode"/> is <see cref="OpenMode.File"/> and <see cref="FileDialog.MustExist"/> is <see langword="true"/>.
 		/// </summary>
-		public string FileMustExistFeedback { get; internal set; } = Strings.fdFileMustExistFeedback;
+		public string FileMustExistFeedback { get; set; } = Strings.fdFileMustExistFeedback;
 
 		/// <summary>
 		/// Gets or sets error message when user <see cref="OpenMode"/> is <see cref="OpenMode.File"/>
 		/// and user enters the name of an existing directory (File system cannot have a folder with the same name as a file).
 		/// </summary>
-		public string DirectoryAlreadyExistsFeedback { get; internal set; } = Strings.fdDirectoryAlreadyExistsFeedback;
+		public string DirectoryAlreadyExistsFeedback { get; set; } = Strings.fdDirectoryAlreadyExistsFeedback;
 
 		/// <summary>
 		/// Gets or sets error message when user selects a file/dir that does not exist and
 		/// <see cref="OpenMode"/> is <see cref="OpenMode.Mixed"/> and <see cref="FileDialog.MustExist"/> is <see langword="true"/>.
 		/// </summary>
-		public string FileOrDirectoryMustExistFeedback { get; internal set; } = Strings.fdFileOrDirectoryMustExistFeedback;
+		public string FileOrDirectoryMustExistFeedback { get; set; } = Strings.fdFileOrDirectoryMustExistFeedback;
 
 		/// <summary>
 		/// Gets the style settings for the table of files (in currently selected directory).
@@ -156,19 +157,13 @@ namespace Terminal.Gui {
 		/// <see cref="Environment.SpecialFolder"/>.
 		/// </summary>
 		/// <remarks>Must be configured before showing the dialog.</remarks>
-		public FileDialogTreeRootGetter TreeRootGetter { get; set; }
+		public Func<Dictionary<IDirectoryInfo, string>> TreeRootGetter { get; set; }
 
 		/// <summary>
 		/// Gets or sets whether to use advanced unicode characters which might not be installed
 		/// on all users computers.
 		/// </summary>
 		public bool UseUnicodeCharacters { get; set; } = DefaultUseUnicodeCharacters;
-
-		/// <summary>
-		/// User defined delegate for picking which character(s)/unicode
-		/// symbol(s) to use as an 'icon' for files/folders. 
-		/// </summary>
-		public Func<FileDialogIconGetterArgs, string> IconGetter { get; set; }
 
 		/// <summary>
 		/// Gets or sets the format to use for date/times in the Modified column.
@@ -183,75 +178,23 @@ namespace Terminal.Gui {
 		public FileDialogStyle (IFileSystem fileSystem)
 		{
 			_fileSystem = fileSystem;
-			IconGetter = DefaultIconGetter;
 			TreeRootGetter = DefaultTreeRootGetter;
 
-			if(NerdFonts.Enable)
-			{
-				UseNerdForIcons();
-			}
-
 			DateFormat = CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern;
-
-			ColorSchemeDirectory = new ColorScheme {
-				Normal = Application.Driver.MakeAttribute (Color.Blue, Color.Black),
-				HotNormal = Application.Driver.MakeAttribute (Color.Blue, Color.Black),
-				Focus = Application.Driver.MakeAttribute (Color.Black, Color.Blue),
-				HotFocus = Application.Driver.MakeAttribute (Color.Black, Color.Blue),
-
-			};
-
-			ColorSchemeImage = new ColorScheme {
-				Normal = Application.Driver.MakeAttribute (Color.Magenta, Color.Black),
-				HotNormal = Application.Driver.MakeAttribute (Color.Magenta, Color.Black),
-				Focus = Application.Driver.MakeAttribute (Color.Black, Color.Magenta),
-				HotFocus = Application.Driver.MakeAttribute (Color.Black, Color.Magenta),
-			};
-			ColorSchemeExeOrRecommended = new ColorScheme {
-				Normal = Application.Driver.MakeAttribute (Color.Green, Color.Black),
-				HotNormal = Application.Driver.MakeAttribute (Color.Green, Color.Black),
-				Focus = Application.Driver.MakeAttribute (Color.Black, Color.Green),
-				HotFocus = Application.Driver.MakeAttribute (Color.Black, Color.Green),
-			};
-			ColorSchemeOther = new ColorScheme {
-				Normal = Application.Driver.MakeAttribute (Color.White, Color.Black),
-				HotNormal = Application.Driver.MakeAttribute (Color.White, Color.Black),
-				Focus = Application.Driver.MakeAttribute (Color.Black, Color.White),
-				HotFocus = Application.Driver.MakeAttribute (Color.Black, Color.White),
-			};
 		}
 
-		/// <summary>
-		/// Changes <see cref="IconGetter"/> to serve diverse icon set using
-		/// the Nerd fonts. This option requires users to have specific font(s)
-		/// installed.
-		/// </summary>
-		public void UseNerdForIcons ()
+
+		private Dictionary<IDirectoryInfo, string> DefaultTreeRootGetter ()
 		{
-			var nerd = new NerdFonts();
-			IconGetter = nerd.GetNerdIcon;
-		}
-
-		private string DefaultIconGetter (FileDialogIconGetterArgs args)
-		{
-			var file = args.File;
-
-			if (file is IDirectoryInfo) {
-				return UseUnicodeCharacters ? ConfigurationManager.Glyphs.Folder + " " : Path.DirectorySeparatorChar.ToString();
-			}
-
-			return UseUnicodeCharacters ?  ConfigurationManager.Glyphs.File + " " : "";
-
-		}
-
-		private IEnumerable<FileDialogRootTreeNode> DefaultTreeRootGetter ()
-		{
-			var roots = new List<FileDialogRootTreeNode> ();
+			var roots = new Dictionary<IDirectoryInfo, string> ();
 			try {
 				foreach (var d in Environment.GetLogicalDrives ()) {
 
-					
-					roots.Add (new FileDialogRootTreeNode (d, _fileSystem.DirectoryInfo.New(d)));
+					var dir = _fileSystem.DirectoryInfo.New (d);
+
+					if (!roots.ContainsKey (dir)) {
+						roots.Add (dir, d);
+					}
 				}
 
 			} catch (Exception) {
@@ -262,15 +205,15 @@ namespace Terminal.Gui {
 				foreach (var special in Enum.GetValues (typeof (Environment.SpecialFolder)).Cast<SpecialFolder> ()) {
 					try {
 						var path = Environment.GetFolderPath (special);
-						if (
-							!string.IsNullOrWhiteSpace (path)
-							&& Directory.Exists (path)
-							&& !roots.Any (r => string.Equals (r.Path.FullName, path))) {
 
-							roots.Add (new FileDialogRootTreeNode (
-							special.ToString (),
-							_fileSystem.DirectoryInfo.New(Environment.GetFolderPath (special))
-							));
+						if (string.IsNullOrWhiteSpace (path)) {
+							continue;
+						}
+
+						var dir = _fileSystem.DirectoryInfo.New (path);
+
+						if (!roots.ContainsKey (dir) && dir.Exists) {
+							roots.Add (dir, special.ToString ());
 						}
 					} catch (Exception) {
 						// Special file exists but contents are unreadable (permissions?)

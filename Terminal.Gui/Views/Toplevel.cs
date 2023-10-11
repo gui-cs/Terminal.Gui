@@ -33,7 +33,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when the <see cref="Toplevel"/> <see cref="RunState"/> has begun to be loaded.
 		/// A Loaded event handler is a good place to finalize initialization before calling 
-		/// <see cref="Application.RunLoop(RunState, bool)"/>.
+		/// <see cref="Application.RunLoop(RunState)"/>.
 		/// </summary>
 		public event EventHandler Loaded;
 
@@ -553,6 +553,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void Add (View view)
 		{
+			CanFocus = true;
 			AddMenuStatusBar (view);
 			base.Add (view);
 		}
@@ -757,9 +758,10 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			if (!_needsDisplay.IsEmpty || _subViewNeedsDisplay || LayoutNeeded) {
-				Driver.SetAttribute (GetNormalColor ());
-				Clear (ViewToScreen (Bounds));
+			if (NeedsDisplay || SubViewNeedsDisplay || LayoutNeeded) {
+				//Driver.SetAttribute (GetNormalColor ());
+				// TODO: It's bad practice for views to always clear. Defeats the purpose of clipping etc...
+				Clear ();
 				LayoutSubviews ();
 				PositionToplevels ();
 
@@ -776,9 +778,10 @@ namespace Terminal.Gui {
 					}
 				}
 
+				// This should not be here, but in base
 				foreach (var view in Subviews) {
 					if (view.Frame.IntersectsWith (Bounds) && !OutsideTopFrame (this)) {
-						view.SetNeedsLayout ();
+						//view.SetNeedsLayout ();
 						view.SetNeedsDisplay (view.Bounds);
 						view.SetSubViewNeedsDisplay ();
 					}
@@ -963,6 +966,9 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		protected override void Dispose (bool disposing)
 		{
+			Application.GrabbingMouse -= Application_GrabbingMouse;
+			Application.UnGrabbingMouse -= Application_UnGrabbingMouse;
+
 			_dragPosition = null;
 			base.Dispose (disposing);
 		}

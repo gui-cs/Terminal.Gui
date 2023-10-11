@@ -10,15 +10,15 @@ namespace Terminal.Gui.InputTests {
 		public void Defaults_Values ()
 		{
 			Assert.Equal ('\x1b', EscSeqUtils.KeyEsc);
-			Assert.Equal ("\x1b[", EscSeqUtils.KeyCSI);
+			Assert.Equal ("\x1b[", EscSeqUtils.CSI);
 			Assert.Equal ("\x1b[?1003h", EscSeqUtils.CSI_EnableAnyEventMouse);
 			Assert.Equal ("\x1b[?1006h", EscSeqUtils.CSI_EnableSgrExtModeMouse);
 			Assert.Equal ("\x1b[?1015h", EscSeqUtils.CSI_EnableUrxvtExtModeMouse);
 			Assert.Equal ("\x1b[?1003l", EscSeqUtils.CSI_DisableAnyEventMouse);
 			Assert.Equal ("\x1b[?1006l", EscSeqUtils.CSI_DisableSgrExtModeMouse);
 			Assert.Equal ("\x1b[?1015l", EscSeqUtils.CSI_DisableUrxvtExtModeMouse);
-			Assert.Equal ("\x1b[?1003h\x1b[?1015h\u001b[?1006h", EscSeqUtils.EnableMouseEvents);
-			Assert.Equal ("\x1b[?1003l\x1b[?1015l\u001b[?1006l", EscSeqUtils.DisableMouseEvents);
+			Assert.Equal ("\x1b[?1003h\x1b[?1015h\u001b[?1006h", EscSeqUtils.CSI_EnableMouseEvents);
+			Assert.Equal ("\x1b[?1003l\x1b[?1015l\u001b[?1006l", EscSeqUtils.CSI_DisableMouseEvents);
 		}
 
 		[Fact]
@@ -26,51 +26,51 @@ namespace Terminal.Gui.InputTests {
 		{
 			var cki = new ConsoleKeyInfo ('r', 0, false, false, false);
 			var expectedCki = new ConsoleKeyInfo ('r', 0, false, false, false);
-			Assert.Equal (expectedCki, EscSeqUtils.GetConsoleInputKey (cki));
+			Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 
 			cki = new ConsoleKeyInfo ('r', 0, true, false, false);
 			expectedCki = new ConsoleKeyInfo ('r', 0, true, false, false);
-			Assert.Equal (expectedCki, EscSeqUtils.GetConsoleInputKey (cki));
+			Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 
 			cki = new ConsoleKeyInfo ('r', 0, false, true, false);
 			expectedCki = new ConsoleKeyInfo ('r', 0, false, true, false);
-			Assert.Equal (expectedCki, EscSeqUtils.GetConsoleInputKey (cki));
+			Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 
 			cki = new ConsoleKeyInfo ('r', 0, false, false, true);
 			expectedCki = new ConsoleKeyInfo ('r', 0, false, false, true);
-			Assert.Equal (expectedCki, EscSeqUtils.GetConsoleInputKey (cki));
+			Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 
 			cki = new ConsoleKeyInfo ('r', 0, true, true, false);
 			expectedCki = new ConsoleKeyInfo ('r', 0, true, true, false);
-			Assert.Equal (expectedCki, EscSeqUtils.GetConsoleInputKey (cki));
+			Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 
 			cki = new ConsoleKeyInfo ('r', 0, false, true, true);
 			expectedCki = new ConsoleKeyInfo ('r', 0, false, true, true);
-			Assert.Equal (expectedCki, EscSeqUtils.GetConsoleInputKey (cki));
+			Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 
 			cki = new ConsoleKeyInfo ('r', 0, true, true, true);
 			expectedCki = new ConsoleKeyInfo ('r', 0, true, true, true);
-			Assert.Equal (expectedCki, EscSeqUtils.GetConsoleInputKey (cki));
+			Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 
 			cki = new ConsoleKeyInfo ('\u0012', 0, false, false, false);
 			expectedCki = new ConsoleKeyInfo ('R', ConsoleKey.R, false, false, true);
-			Assert.Equal (expectedCki, EscSeqUtils.GetConsoleInputKey (cki));
+			Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 
 			cki = new ConsoleKeyInfo ('\0', (ConsoleKey)64, false, false, true);
 			expectedCki = new ConsoleKeyInfo (' ', ConsoleKey.Spacebar, false, false, true);
-			Assert.Equal (expectedCki, EscSeqUtils.GetConsoleInputKey (cki));
+			Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 
 			cki = new ConsoleKeyInfo ('\r', 0, false, false, false);
 			expectedCki = new ConsoleKeyInfo ('\r', ConsoleKey.Enter, false, false, false);
-			Assert.Equal (expectedCki, EscSeqUtils.GetConsoleInputKey (cki));
+			Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 
 			cki = new ConsoleKeyInfo ('\u007f', 0, false, false, false);
 			expectedCki = new ConsoleKeyInfo ('\u007f', ConsoleKey.Backspace, false, false, false);
-			Assert.Equal (expectedCki, EscSeqUtils.GetConsoleInputKey (cki));
+			Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 
 			cki = new ConsoleKeyInfo ('R', 0, false, false, false);
 			expectedCki = new ConsoleKeyInfo ('R', 0, false, false, false);
-			Assert.Equal (expectedCki, EscSeqUtils.GetConsoleInputKey (cki));
+			Assert.Equal (expectedCki, EscSeqUtils.MapConsoleKeyInfo (cki));
 		}
 
 		[Fact]
@@ -83,7 +83,7 @@ namespace Terminal.Gui.InputTests {
 			Assert.Equal (cki, expectedCkInfos [0]);
 		}
 
-		private EscSeqReqProc escSeqReqProc;
+		private EscSeqRequests escSeqReqProc;
 		private ConsoleKeyInfo newConsoleKeyInfo;
 		private ConsoleKey key;
 		private ConsoleKeyInfo [] cki;
@@ -617,7 +617,7 @@ namespace Terminal.Gui.InputTests {
 			ClearAll ();
 
 			Assert.Null (escSeqReqProc);
-			escSeqReqProc = new EscSeqReqProc ();
+			escSeqReqProc = new EscSeqRequests ();
 			escSeqReqProc.Add ("t");
 
 			cki = new ConsoleKeyInfo [] {
@@ -633,10 +633,10 @@ namespace Terminal.Gui.InputTests {
 				new ConsoleKeyInfo ('t', 0, false, false, false)
 			};
 			expectedCki = default;
-			Assert.Single (escSeqReqProc.EscSeqReqStats);
-			Assert.Equal ("t", escSeqReqProc.EscSeqReqStats [^1].Terminating);
+			Assert.Single (escSeqReqProc.Statuses);
+			Assert.Equal ("t", escSeqReqProc.Statuses [^1].Terminator);
 			EscSeqUtils.DecodeEscSeq (escSeqReqProc, ref newConsoleKeyInfo, ref key, cki, ref mod, out c1Control, out code, out values, out terminating, out isKeyMouse, out mouseFlags, out pos, out isReq, ProcessContinuousButtonPressed);
-			Assert.Empty (escSeqReqProc.EscSeqReqStats);
+			Assert.Empty (escSeqReqProc.Statuses);
 			Assert.Equal (expectedCki, newConsoleKeyInfo);
 			Assert.Equal (0, (int)key);
 			Assert.Equal (0, (int)mod);

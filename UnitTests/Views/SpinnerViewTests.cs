@@ -13,53 +13,63 @@ namespace Terminal.Gui.ViewsTests {
 			this.output = output;
 		}
 
-		[Fact, AutoInitShutdown]
-		public void TestSpinnerView_AutoSpin()
+		[Theory, AutoInitShutdown]
+		[InlineData (true)]
+		[InlineData (false)]
+		public void TestSpinnerView_AutoSpin (bool callStop)
 		{
 			var view = GetSpinnerView ();
 
-			Assert.Empty (Application.MainLoop.timeouts);
-			view.AutoSpin ();
-			Assert.NotEmpty (Application.MainLoop.timeouts);
+			Assert.Empty (Application.MainLoop._timeouts);
+			view.AutoSpin = true;
+			Assert.NotEmpty (Application.MainLoop._timeouts);
+			Assert.True (view.AutoSpin);
 
 			//More calls to AutoSpin do not add more timeouts
-			Assert.Single (Application.MainLoop.timeouts);
-			view.AutoSpin ();
-			view.AutoSpin ();
-			view.AutoSpin ();
-			Assert.Single (Application.MainLoop.timeouts);
+			Assert.Single (Application.MainLoop._timeouts);
+			view.AutoSpin = true;
+			view.AutoSpin = true;
+			view.AutoSpin = true;
+			Assert.True (view.AutoSpin);
+			Assert.Single (Application.MainLoop._timeouts);
+
+			if (callStop) {
+				view.AutoSpin = false;
+				Assert.Empty (Application.MainLoop._timeouts);
+				Assert.False (view.AutoSpin);
+			} else {
+				Assert.NotEmpty (Application.MainLoop._timeouts);
+			}
 
 			// Dispose clears timeout
-			Assert.NotEmpty (Application.MainLoop.timeouts);
 			view.Dispose ();
-			Assert.Empty (Application.MainLoop.timeouts);
+			Assert.Empty (Application.MainLoop._timeouts);
 		}
 
 		[Fact, AutoInitShutdown]
 		public void TestSpinnerView_ThrottlesAnimation ()
 		{
 			var view = GetSpinnerView ();
-
 			view.Draw ();
 
 			var expected = @"\";
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-			view.SetNeedsDisplay ();
+			view.AdvanceAnimation ();
 			view.Draw ();
 
 			expected = @"\";
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-			view.SetNeedsDisplay ();
+			view.AdvanceAnimation ();
 			view.Draw ();
 
 			expected = @"\";
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-			Task.Delay (400).Wait();
+			Task.Delay (400).Wait ();
 
-			view.SetNeedsDisplay ();
+			view.AdvanceAnimation ();
 			view.Draw ();
 
 			expected = "|";
@@ -71,12 +81,13 @@ namespace Terminal.Gui.ViewsTests {
 			var view = GetSpinnerView ();
 			view.SpinDelay = 0;
 
+			view.AdvanceAnimation ();
 			view.Draw ();
 
 			var expected = "|";
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-			view.SetNeedsDisplay ();
+			view.AdvanceAnimation ();
 			view.Draw ();
 
 			expected = "/";

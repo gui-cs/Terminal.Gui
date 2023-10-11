@@ -107,13 +107,15 @@ internal class RuneJsonConverter : JsonConverter<Rune> {
 		// HACK: Writes a JSON comment in addition to the glyph to ease debugging.
 		// Technically, JSON comments are not valid, but we use relaxed decoding
 		// (ReadCommentHandling = JsonCommentHandling.Skip)
-		writer.WriteCommentValue ($"(U+{value.Value:X8})");
-		var printable = value.MakePrintable ();
-		if (printable == Rune.ReplacementChar) {
-			writer.WriteStringValue (value.ToString ());
-		} else {
-			writer.WriteRawValue ($"\"{value}\"");
-		}
+		//writer.WriteCommentValue ($"(U+{value.Value:X8})");
+		//var printable = value.MakePrintable ();
+		//if (printable == Rune.ReplacementChar) {
+		//	writer.WriteStringValue (value.ToString ());
+		//} else {
+		//	//writer.WriteRawValue ($"\"{value}\"");
+		//}
+
+		writer.WriteNumberValue (value.Value);
 	}
 }
 #pragma warning restore 1591

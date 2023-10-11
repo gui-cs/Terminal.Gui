@@ -23,8 +23,8 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal ("𝔹", r.ToString ());
 			Assert.Equal (us, r.ToString ());
 
-			Assert.Equal (2, us.GetColumns ());
-			Assert.Equal (2, r.GetColumns ());
+			Assert.Equal (1, us.GetColumns ());
+			Assert.Equal (1, r.GetColumns ());
 
 			var win = new Window () { Title = us };
 			var label = new Label (r.ToString ());
@@ -37,9 +37,9 @@ namespace Terminal.Gui.ViewsTests {
 			((FakeDriver)Application.Driver).SetBufferSize (10, 4);
 
 			var expected = @"
-┌┤𝔹├────┐
-│𝔹      │
-│𝔹      │
+┌┤𝔹├─────┐
+│𝔹       │
+│𝔹       │
 └────────┘";
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
@@ -55,7 +55,7 @@ namespace Terminal.Gui.ViewsTests {
 			};
 
 			TestHelpers.AssertDriverColorsAre (@"
-0022000000
+0020000000
 0000000000
 0111000000
 0000000000", expectedColors);

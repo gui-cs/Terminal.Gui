@@ -155,7 +155,7 @@ namespace UICatalog.Scenarios {
 						ActivityProgressBar.Fraction += 0.01F;
 					}
 					PulseProgressBar.Pulse ();
-					Spinner.SetNeedsDisplay ();
+					Spinner.AdvanceAnimation ();
 				}
 			}
 		}

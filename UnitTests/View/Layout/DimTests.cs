@@ -81,19 +81,24 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Throws<NullReferenceException> (() => dim.ToString ());
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void SetsValue ()
 		{
 			var testVal = Rect.Empty;
-			var dim = Dim.Width (new View (testVal));
+			var testValView = new View (testVal);
+			var dim = Dim.Width (testValView);
 			Assert.Equal ($"View(Width,View()({testVal}))", dim.ToString ());
-
+			testValView.Dispose ();
+			
 			testVal = new Rect (1, 2, 3, 4);
-			dim = Dim.Width (new View (testVal));
+			testValView = new View (testVal);
+			dim = Dim.Width (testValView);
 			Assert.Equal ($"View(Width,View()({testVal}))", dim.ToString ());
+			testValView.Dispose ();
+
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void Width_Equals ()
 		{
 			var testRect1 = Rect.Empty;
@@ -132,6 +137,11 @@ namespace Terminal.Gui.ViewTests {
 			dim1 = Dim.Width (view1);
 			dim2 = Dim.Width (view2);
 			Assert.NotEqual (dim1, dim2);
+#if DEBUG_IDISPOSABLE
+			// HACK: Force clean up of Responders to avoid having to Dispose all the Views created above.
+			Responder.Instances.Clear ();
+			Assert.Empty (Responder.Instances);
+#endif
 		}
 
 		[Fact]
@@ -141,16 +151,20 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Throws<NullReferenceException> (() => dim.ToString ());
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void Height_SetsValue ()
 		{
 			var testVal = Rect.Empty;
-			var dim = Dim.Height (new View (testVal));
+			var testValview = new View (testVal);
+			var dim = Dim.Height (testValview);
 			Assert.Equal ($"View(Height,View()({testVal}))", dim.ToString ());
-
+			testValview.Dispose ();
+			
 			testVal = new Rect (1, 2, 3, 4);
-			dim = Dim.Height (new View (testVal));
+			testValview = new View (testVal);
+			dim = Dim.Height (testValview);
 			Assert.Equal ($"View(Height,View()({testVal}))", dim.ToString ());
+			testValview.Dispose ();
 		}
 
 		// TODO: Other Dim.Height tests (e.g. Equal?)
@@ -289,7 +303,7 @@ namespace Terminal.Gui.ViewTests {
 			Application.Run ();
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void Dim_Validation_Do_Not_Throws_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Null ()
 		{
 			var t = new View ("top") { Width = 80, Height = 25 };
@@ -300,10 +314,10 @@ namespace Terminal.Gui.ViewTests {
 
 			Assert.Equal (3, w.Width = 3);
 			Assert.Equal (4, w.Height = 4);
-
+			t.Dispose ();
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void Dim_Validation_Do_Not_Throws_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
 		{
 			var t = new View ("top") { Width = 80, Height = 25 };
@@ -329,6 +343,7 @@ namespace Terminal.Gui.ViewTests {
 
 			Assert.Equal (2, v.Width = 2);
 			Assert.Equal (2, v.Height = 2);
+			t.Dispose ();
 		}
 
 		[Fact, AutoInitShutdown]
@@ -545,7 +560,7 @@ namespace Terminal.Gui.ViewTests {
 		/// <summary>
 		/// This is an intentionally obtuse test. See https://github.com/gui-cs/Terminal.Gui/issues/2461
 		/// </summary>
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void DimCombine_ObtuseScenario_Throw_If_SuperView_Refs_SubView ()
 		{
 			var t = new View () { Width = 80, Height = 25 };
@@ -585,9 +600,10 @@ namespace Terminal.Gui.ViewTests {
 			//Assert.Equal (21, v1.Frame.Height);
 			//Assert.Equal (74, v2.Frame.Width);
 			//Assert.Equal (19, v2.Frame.Height);
+			t.Dispose ();
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void DimCombine_ObtuseScenario_Does_Not_Throw_If_Two_SubViews_Refs_The_Same_SuperView ()
 		{
 			var t = new View ("top") { Width = 80, Height = 25 };
@@ -626,9 +642,10 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (21, v1.Frame.Height);
 			Assert.Equal (74, v2.Frame.Width);
 			Assert.Equal (19, v2.Frame.Height);
+			t.Dispose ();
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void PosCombine_View_Not_Added_Throws ()
 		{
 			var t = new View () { Width = 80, Height = 50 };
@@ -657,6 +674,8 @@ namespace Terminal.Gui.ViewTests {
 			sub.Height = Dim.Fill () - Dim.Height (v2);
 
 			Assert.Throws<InvalidOperationException> (() => t.LayoutSubviews ());
+			t.Dispose ();
+			v2.Dispose ();
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1109,6 +1128,7 @@ namespace Terminal.Gui.ViewTests {
 				if (k.KeyEvent.Key == Key.Enter) {
 					Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
 					view.Remove (listLabels [count - 1]);
+					listLabels [count - 1].Dispose ();
 
 					Assert.Equal ($"Absolute({count})", view.Height.ToString ());
 					view.Height -= 1;
@@ -1180,6 +1200,7 @@ namespace Terminal.Gui.ViewTests {
 					if (count > 0) {
 						Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
 						view.Remove (listLabels [count - 1]);
+						listLabels [count - 1].Dispose ();
 						listLabels.RemoveAt (count - 1);
 						Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
 						view.Height -= 1;
@@ -1217,7 +1238,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (count, listLabels.Count);
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void Internal_Tests ()
 		{
 			var dimFactor = new Dim.DimFactor (0.10F);
@@ -1239,6 +1260,8 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (1, dimViewHeight.Anchor (0));
 			var dimViewWidth = new Dim.DimView (view, 1);
 			Assert.Equal (20, dimViewWidth.Anchor (0));
+
+			view.Dispose ();
 		}
 
 		[Fact]
@@ -1305,7 +1328,7 @@ namespace Terminal.Gui.ViewTests {
 			}
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void Dim_Referencing_SuperView_Does_Not_Throw ()
 		{
 			var super = new View ("super") {
@@ -1323,9 +1346,10 @@ namespace Terminal.Gui.ViewTests {
 
 			var exception = Record.Exception (super.LayoutSubviews);
 			Assert.Null (exception);
+			super.Dispose ();
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void Dim_SyperView_Referencing_SubView_Throws ()
 		{
 			var super = new View ("super") {
@@ -1347,6 +1371,7 @@ namespace Terminal.Gui.ViewTests {
 			super.EndInit ();
 
 			Assert.Throws<InvalidOperationException> (super.LayoutSubviews);
+			super.Dispose ();
 		}
 	}
 }

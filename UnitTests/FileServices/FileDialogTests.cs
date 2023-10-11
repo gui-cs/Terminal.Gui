@@ -217,14 +217,14 @@ namespace Terminal.Gui.FileServicesTests {
 			Assert.Multiple (
 				() => {
 					// Only the subfolder should be selected
-					Assert.Equal (1, dlg.MultiSelected.Count);
+					Assert.Single (dlg.MultiSelected);
 					AssertIsTheSubfolder (dlg.Path);
 					AssertIsTheSubfolder (dlg.MultiSelected.Single ());
 				},
 				() => {
 					// Event should also agree with the final state
 					Assert.NotNull (eventMultiSelected);
-					Assert.Equal (1, eventMultiSelected.Count);
+					Assert.Single (eventMultiSelected);
 					AssertIsTheSubfolder (eventMultiSelected.Single ());
 				}
 			);
@@ -330,14 +330,14 @@ namespace Terminal.Gui.FileServicesTests {
 			Assert.Multiple (
 				() => {
 					// Only the subfolder should be selected
-					Assert.Equal (1, dlg.MultiSelected.Count);
+					Assert.Single (dlg.MultiSelected);
 					AssertIsTheSubfolder (dlg.Path);
 					AssertIsTheSubfolder (dlg.MultiSelected.Single ());
 				},
 				() => {
 					// Event should also agree with the final state
 					Assert.NotNull (eventMultiSelected);
-					Assert.Equal (1, eventMultiSelected.Count);
+					Assert.Single (eventMultiSelected);
 					AssertIsTheSubfolder (eventMultiSelected.Single ());
 				}
 			);
@@ -382,7 +382,7 @@ namespace Terminal.Gui.FileServicesTests {
 			fd.Style.Culture = new CultureInfo ("en-US");
 
 			fd.Draw ();
-			
+
 			string expected =
 			@$"
  ┌──────────────────────────────────────────────────────────────────┐
@@ -398,7 +398,7 @@ namespace Terminal.Gui.FileServicesTests {
  │                                                                  │
  │                                                                  │
  │                                                                  │
-│{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                            {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket}  │
+│{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                            {CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}  │
  └──────────────────────────────────────────────────────────────────┘
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output, true);
@@ -434,52 +434,12 @@ namespace Terminal.Gui.FileServicesTests {
 ││mybinary.exe│7.00 bytes│2001-01-01T11:44:42           │.exe     ││
 │                                                                  │
 │                                                                  │
-│{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                            {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket}  │
+│{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                            {CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}  │
 └──────────────────────────────────────────────────────────────────┘
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output, true);
 		}
 
-		[Fact, AutoInitShutdown]
-		public void TestDirectoryContents_Windows_Colors ()
-		{
-			if (!IsWindows ()) {
-				return;
-			}
-
-			var fd = GetWindowsDialog ();
-			fd.Title = string.Empty;
-
-			fd.Style.Culture = new CultureInfo ("en-US");
-			fd.Style.UseColors = true;
-
-			var dir = new Attribute (Color.Magenta);
-			fd.Style.ColorSchemeDirectory = GetColorScheme (dir);
-
-			var img = new Attribute (Color.Cyan);
-			fd.Style.ColorSchemeImage = GetColorScheme (img);
-
-			var other = new Attribute (Color.BrightGreen);
-			fd.Style.ColorSchemeOther = GetColorScheme (other);
-
-			var exe = new Attribute (Color.BrightYellow);
-			fd.Style.ColorSchemeExeOrRecommended = GetColorScheme (exe);
-
-			fd.Draw ();
-
-			TestHelpers.AssertDriverUsedColors (other,dir,img,exe);
-		}
-
-		private ColorScheme GetColorScheme (Attribute a)
-		{
-			return new ColorScheme {
-				Normal = a,
-				Focus = a,
-				Disabled = a,
-				HotFocus = a,
-				HotNormal = a,
-			};
-		}
 
 		[Theory]
 		[InlineData (".csv", null, false)]
@@ -487,7 +447,7 @@ namespace Terminal.Gui.FileServicesTests {
 		[InlineData (".csv", "c:\\MyFile.csv", true)]
 		[InlineData (".csv", "c:\\MyFile.CSV", true)]
 		[InlineData (".csv", "c:\\MyFile.csv.bak", false)]
-		public void TestAllowedType_Basic(string allowed, string candidate, bool expected)
+		public void TestAllowedType_Basic (string allowed, string candidate, bool expected)
 		{
 			Assert.Equal (expected, new AllowedType ("Test", allowed).IsAllowed (candidate));
 		}
@@ -496,7 +456,7 @@ namespace Terminal.Gui.FileServicesTests {
 		[InlineData ("Dockerfile", "c:\\temp\\Dockerfile", true)]
 		[InlineData ("Dockerfile", "Dockerfile", true)]
 		[InlineData ("Dockerfile", "someimg.Dockerfile", true)]
-		public void TestAllowedType_SpecificFile(string allowed, string candidate, bool expected)
+		public void TestAllowedType_SpecificFile (string allowed, string candidate, bool expected)
 		{
 			Assert.Equal (expected, new AllowedType ("Test", allowed).IsAllowed (candidate));
 		}
@@ -504,7 +464,7 @@ namespace Terminal.Gui.FileServicesTests {
 		[Theory]
 		[InlineData (".Designer.cs", "c:\\MyView.Designer.cs", true)]
 		[InlineData (".Designer.cs", "c:\\temp/MyView.Designer.cs", true)]
-		[InlineData(".Designer.cs","MyView.Designer.cs",true)]
+		[InlineData (".Designer.cs", "MyView.Designer.cs", true)]
 		[InlineData (".Designer.cs", "c:\\MyView.DESIGNER.CS", true)]
 		[InlineData (".Designer.cs", "MyView.cs", false)]
 		public void TestAllowedType_DoubleBarreled (string allowed, string candidate, bool expected)

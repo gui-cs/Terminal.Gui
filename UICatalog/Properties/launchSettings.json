@@ -1,7 +1,10 @@
 {
   "profiles": {
     "UICatalog": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "environmentVariables": {
+        "WT_SESSION": "1"
+      }
     },
     "WSL : UICatalog": {
       "commandName": "Executable",
@@ -50,6 +53,9 @@
     "Windows & FrameViews": {
       "commandName": "Project",
       "commandLineArgs": "\"Windows & FrameViews\""
+    },
+    "Docker": {
+      "commandName": "Docker"
     }
   }
 }

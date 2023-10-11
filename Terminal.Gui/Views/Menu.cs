@@ -468,7 +468,7 @@ namespace Terminal.Gui {
 
 				current = -1;
 				for (int i = 0; i < barItems.Children?.Length; i++) {
-					if (barItems.Children [i] != null) {
+					if (barItems.Children [i]?.IsEnabled () == true) {
 						current = i;
 						break;
 					}
@@ -573,7 +573,6 @@ namespace Terminal.Gui {
 			}
 			var savedClip = Driver.Clip;
 			Driver.Clip = new Rect (0, 0, Driver.Cols, Driver.Rows);
-
 			Driver.SetAttribute (GetNormalColor ());
 
 			OnDrawFrames ();
@@ -707,17 +706,14 @@ namespace Terminal.Gui {
 
 		public void Run (Action action)
 		{
-			if (action == null)
+			if (action == null || host == null)
 				return;
 
 			Application.UngrabMouse ();
 			host.CloseAllMenus ();
 			Application.Refresh ();
 
-			Application.MainLoop.AddIdle (() => {
-				action ();
-				return false;
-			});
+			host.Run (action);
 		}
 
 		public override bool OnLeave (View view)
@@ -1096,6 +1092,17 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Key Key { get; set; } = Key.F9;
 
+		///<inheritdoc/>
+		public override bool Visible {
+			get => base.Visible;
+			set {
+				base.Visible = value;
+				if (!value) {
+					CloseAllMenus ();
+				}
+			}
+		}
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MenuBar"/>.
 		/// </summary>
@@ -1290,6 +1297,11 @@ namespace Terminal.Gui {
 			CloseAllMenus ();
 			Application.Refresh ();
 
+			Run (action);
+		}
+
+		internal void Run (Action action)
+		{
 			Application.MainLoop.AddIdle (() => {
 				action ();
 				return false;
@@ -1812,6 +1824,44 @@ namespace Terminal.Gui {
 					if (Char.ToUpperInvariant ((char)mi.Title [p + 1]) == c) {
 						ProcessMenu (i, mi);
 						return true;
+					} else if (mi.Children?.Length > 0) {
+						if (FindAndOpenChildrenMenuByHotkey (kb, mi.Children)) {
+							return true;
+						}
+					}
+				} else if (mi.Children?.Length > 0) {
+					if (FindAndOpenChildrenMenuByHotkey (kb, mi.Children)) {
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+
+		bool FindAndOpenChildrenMenuByHotkey (KeyEvent kb, MenuItem [] children)
+		{
+			var c = ((uint)kb.Key & (uint)Key.CharMask);
+			for (int i = 0; i < children.Length; i++) {
+				var mi = children [i];
+				int p = mi.Title.IndexOf (MenuBar.HotKeySpecifier.ToString ());
+				if (p != -1 && p + 1 < mi.Title.GetRuneCount ()) {
+					if (Char.ToUpperInvariant ((char)mi.Title [p + 1]) == c) {
+						if (mi.IsEnabled ()) {
+							var action = mi.Action;
+							if (action != null) {
+								Run (action);
+							}
+						}
+						return true;
+					} else if (mi is MenuBarItem menuBarItem && menuBarItem?.Children.Length > 0) {
+						if (FindAndOpenChildrenMenuByHotkey (kb, menuBarItem.Children)) {
+							return true;
+						}
+					}
+				} else if (mi is MenuBarItem menuBarItem && menuBarItem?.Children.Length > 0) {
+					if (FindAndOpenChildrenMenuByHotkey (kb, menuBarItem.Children)) {
+						return true;
 					}
 				}
 			}
@@ -1842,7 +1892,7 @@ namespace Terminal.Gui {
 					}
 					return true;
 				}
-				if (mi is MenuBarItem menuBarItem && !menuBarItem.IsTopLevel && FindAndOpenMenuByShortcut (kb, menuBarItem.Children)) {
+				if (mi is MenuBarItem menuBarItem && menuBarItem.Children != null && !menuBarItem.IsTopLevel && FindAndOpenMenuByShortcut (kb, menuBarItem.Children)) {
 					return true;
 				}
 			}
@@ -1879,10 +1929,11 @@ namespace Terminal.Gui {
 		public override bool ProcessHotKey (KeyEvent kb)
 		{
 			if (kb.Key == Key) {
-				if (!IsMenuOpen)
+				if (Visible && !IsMenuOpen) {
 					OpenMenu ();
-				else
+				} else {
 					CloseAllMenus ();
+				}
 				return true;
 			}
 

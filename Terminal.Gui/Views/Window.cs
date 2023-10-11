@@ -56,29 +56,5 @@ namespace Terminal.Gui {
 			ColorScheme = Colors.Base; // TODO: make this a theme property
 			BorderStyle = DefaultBorderStyle;
 		}
-
-		// TODO: Are these overrides really needed? 
-		/// <inheritdoc/>
-		public override void Add (View view)
-		{
-			base.Add (view);
-			if (view.CanFocus) {
-				CanFocus = true;
-			}
-			AddMenuStatusBar (view);
-		}
-
-		/// <inheritdoc/>
-		public override void Remove (View view)
-		{
-			if (view == null) {
-				return;
-			}
-
-			SetNeedsDisplay ();
-			base.Remove (view);
-			RemoveMenuStatusBar (view);
-
-		}
 	}
 }

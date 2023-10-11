@@ -16,6 +16,7 @@ namespace Terminal.Gui.ViewTests {
 			var view = new View ();
 			Assert.Equal (LineStyle.None, view.BorderStyle);
 			Assert.Equal (Thickness.Empty, view.Border.Thickness);
+			view.Dispose ();
 		}
 
 		[Fact]
@@ -33,6 +34,7 @@ namespace Terminal.Gui.ViewTests {
 			view.BorderStyle = LineStyle.None;
 			Assert.Equal (LineStyle.None, view.BorderStyle);
 			Assert.Equal (Thickness.Empty, view.Border.Thickness);
+			view.Dispose ();
 		}
 
 		//[Fact]

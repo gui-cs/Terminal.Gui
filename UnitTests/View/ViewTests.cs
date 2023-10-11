@@ -15,7 +15,7 @@ namespace Terminal.Gui.ViewTests {
 			this.output = output;
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void New_Initializes ()
 		{
 			// Parameterless
@@ -41,7 +41,8 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Null (r.SuperView);
 			Assert.Null (r.MostFocused);
 			Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
-
+			r.Dispose ();
+			
 			// Empty Rect
 			r = new View (Rect.Empty);
 			Assert.NotNull (r);
@@ -65,6 +66,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Null (r.SuperView);
 			Assert.Null (r.MostFocused);
 			Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
+			r.Dispose ();
 
 			// Rect with values
 			r = new View (new Rect (1, 2, 3, 4));
@@ -89,6 +91,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Null (r.SuperView);
 			Assert.Null (r.MostFocused);
 			Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
+			r.Dispose ();
 
 			// Initializes a view with a vertical direction
 			r = new View ("Vertical View", TextDirection.TopBottom_LeftRight);
@@ -113,10 +116,11 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Null (r.SuperView);
 			Assert.Null (r.MostFocused);
 			Assert.Equal (TextDirection.TopBottom_LeftRight, r.TextDirection);
-
+			r.Dispose ();
+		
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void New_Methods_Return_False ()
 		{
 			var r = new View ();
@@ -129,13 +133,22 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (r.MouseEvent (new MouseEvent () { Flags = MouseFlags.AllEvents }));
 			Assert.False (r.OnMouseEnter (new MouseEvent () { Flags = MouseFlags.AllEvents }));
 			Assert.False (r.OnMouseLeave (new MouseEvent () { Flags = MouseFlags.AllEvents }));
-			Assert.False (r.OnEnter (new View ()));
-			Assert.False (r.OnLeave (new View ()));
+
+			var v1 = new View ();
+			Assert.False (r.OnEnter (v1));
+			v1.Dispose ();
+
+			var v2 = new View ();
+			Assert.False (r.OnLeave (v2));
+			v2.Dispose ();
+
+			r.Dispose ();
+
 
 			// TODO: Add more
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void View_With_No_Difference_Between_An_Object_Initializer_And_A_Constructor ()
 		{
 			// Object Initializer
@@ -168,7 +181,12 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (4, view.Height);
 			Assert.False (view.Frame.IsEmpty);
 			Assert.False (view.Bounds.IsEmpty);
+			super.Dispose ();
 
+#if DEBUG_IDISPOSABLE
+			Assert.Empty (Responder.Instances);
+#endif
+			
 			// Default Constructor
 			view = new View ();
 			Assert.Null (view.X);
@@ -177,6 +195,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Null (view.Height);
 			Assert.True (view.Frame.IsEmpty);
 			Assert.True (view.Bounds.IsEmpty);
+			view.Dispose ();
 
 			// Constructor
 			view = new View (1, 2, "");
@@ -186,6 +205,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Null (view.Height);
 			Assert.False (view.Frame.IsEmpty);
 			Assert.True (view.Bounds.IsEmpty);
+			view.Dispose ();
 
 			// Default Constructor and post assignment equivalent to Object Initializer
 			view = new View ();
@@ -206,9 +226,10 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (new Rect (1, 2, 3, 4), view.Frame);
 			Assert.False (view.Bounds.IsEmpty);
 			Assert.Equal (new Rect (0, 0, 3, 4), view.Bounds);
+			super.Dispose ();
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void Added_Removed ()
 		{
 			var v = new View (new Rect (0, 0, 10, 24));
@@ -231,9 +252,12 @@ namespace Terminal.Gui.ViewTests {
 
 			t.Remove (v);
 			Assert.True (t.Subviews.Count == 0);
+
+			t.Dispose ();
+			v.Dispose ();
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void Initialized_Event_Comparing_With_Added_Event ()
 		{
 			Application.Init (new FakeDriver ());
@@ -330,9 +354,10 @@ namespace Terminal.Gui.ViewTests {
 
 			v1.CanFocus = true;
 			Assert.False (sv1.CanFocus); // False because sv1 was disposed and it isn't a subview of v1.
+
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void Initialized_Event_Will_Be_Invoked_When_Added_Dynamically ()
 		{
 			Application.Init (new FakeDriver ());
@@ -409,104 +434,11 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (w.CanFocus);
 			Assert.False (v1.CanFocus);
 			Assert.False (v2.CanFocus);
+
 		}
 
-		[Fact]
-		public void Multi_Thread_Toplevels ()
-		{
-			Application.Init (new FakeDriver ());
 
-			var t = Application.Top;
-			var w = new Window ();
-			t.Add (w);
-
-			int count = 0, count1 = 0, count2 = 0;
-			bool log = false, log1 = false, log2 = false;
-			bool fromTopStillKnowFirstIsRunning = false;
-			bool fromTopStillKnowSecondIsRunning = false;
-			bool fromFirstStillKnowSecondIsRunning = false;
-
-			Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
-				count++;
-				if (count1 == 5) {
-					log1 = true;
-				}
-				if (count1 == 14 && count2 == 10 && count == 15) { // count2 is already stopped
-					fromTopStillKnowFirstIsRunning = true;
-				}
-				if (count1 == 7 && count2 == 7 && count == 8) {
-					fromTopStillKnowSecondIsRunning = true;
-				}
-				if (count == 30) {
-					Assert.Equal (30, count);
-					Assert.Equal (20, count1);
-					Assert.Equal (10, count2);
-
-					Assert.True (log);
-					Assert.True (log1);
-					Assert.True (log2);
-
-					Assert.True (fromTopStillKnowFirstIsRunning);
-					Assert.True (fromTopStillKnowSecondIsRunning);
-					Assert.True (fromFirstStillKnowSecondIsRunning);
-
-					Application.RequestStop ();
-					return false;
-				}
-				return true;
-			});
-
-			t.Ready += FirstDialogToplevel;
-
-			void FirstDialogToplevel (object sender, EventArgs args)
-			{
-				var od = new OpenDialog ();
-				od.Ready += SecondDialogToplevel;
-
-				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
-					count1++;
-					if (count2 == 5) {
-						log2 = true;
-					}
-					if (count2 == 4 && count1 == 5 && count == 5) {
-						fromFirstStillKnowSecondIsRunning = true;
-					}
-					if (count1 == 20) {
-						Assert.Equal (20, count1);
-						Application.RequestStop ();
-						return false;
-					}
-					return true;
-				});
-
-				Application.Run (od);
-			}
-
-			void SecondDialogToplevel (object sender, EventArgs args)
-			{
-				var d = new Dialog ();
-
-				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
-					count2++;
-					if (count < 30) {
-						log = true;
-					}
-					if (count2 == 10) {
-						Assert.Equal (10, count2);
-						Application.RequestStop ();
-						return false;
-					}
-					return true;
-				});
-
-				Application.Run (d);
-			}
-
-			Application.Run ();
-			Application.Shutdown ();
-		}
-
-		[Theory]
+		[Theory, TestRespondersDisposed]
 		[InlineData (1)]
 		[InlineData (2)]
 		[InlineData (3)]
@@ -534,18 +466,17 @@ namespace Terminal.Gui.ViewTests {
 				Application.Begin (Application.Top);
 
 				// should have the initial text
-				Assert.Equal ('t', driver.Contents [0, 0, 0]);
-				Assert.Equal ('e', driver.Contents [0, 1, 0]);
-				Assert.Equal ('s', driver.Contents [0, 2, 0]);
-				Assert.Equal ('t', driver.Contents [0, 3, 0]);
-				Assert.Equal (' ', driver.Contents [0, 4, 0]);
+				Assert.Equal ((Rune)'t', driver.Contents [0, 0].Runes [0]);
+				Assert.Equal ((Rune)'e', driver.Contents [0, 1].Runes [0]);
+				Assert.Equal ((Rune)'s', driver.Contents [0, 2].Runes [0]);
+				Assert.Equal ((Rune)'t', driver.Contents [0, 3].Runes [0]);
+				Assert.Equal ((Rune)' ', driver.Contents [0, 4].Runes [0]);
 			} finally {
 				Application.Shutdown ();
 			}
 		}
 
-		[Fact]
-		[AutoInitShutdown]
+		[Fact, AutoInitShutdown]
 		public void Internal_Tests ()
 		{
 			Assert.Equal (new [] { View.Direction.Forward, View.Direction.Backward },
@@ -563,7 +494,7 @@ namespace Terminal.Gui.ViewTests {
 			// BUGBUG: v2 - _needsDisplay needs debugging - test disabled for now.
 			//Assert.Equal (new Rect (new Point (0, 0), rect.Size), view._needsDisplay);
 			Assert.True (view.LayoutNeeded);
-			Assert.False (view._subViewNeedsDisplay);
+			Assert.False (view.SubViewNeedsDisplay);
 			Assert.False (view._addingView);
 			view._addingView = true;
 			Assert.True (view._addingView);
@@ -574,7 +505,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (top.Bounds, view.ScreenClip (top.Bounds));
 			Assert.True (view.LayoutStyle == LayoutStyle.Absolute);
 
-			Application.Begin (top);
+			var runState = Application.Begin (top);
 
 			view.Width = Dim.Fill ();
 			view.Height = Dim.Fill ();
@@ -618,10 +549,11 @@ namespace Terminal.Gui.ViewTests {
 			view.ViewToScreen (0, 0, out rcol, out rrow);
 			Assert.Equal (-41, rcol);
 			Assert.Equal (-13, rrow);
+			
+			Application.End (runState);
 		}
 
-		[Fact]
-		[AutoInitShutdown]
+		[Fact, AutoInitShutdown]
 		public void Visible_Sets_Also_Sets_Subviews ()
 		{
 			var button = new Button ("Click Me");
@@ -680,7 +612,7 @@ namespace Terminal.Gui.ViewTests {
 
 				for (int i = 0; i < Application.Driver.Rows; i++) {
 					for (int j = 0; j < Application.Driver.Cols; j++) {
-						if (contents [i, j, 0] != ' ') {
+						if (contents [i, j].Runes[0] != (Rune)' ') {
 							runesCount++;
 						}
 					}
@@ -689,8 +621,7 @@ namespace Terminal.Gui.ViewTests {
 			}
 		}
 
-		[Fact]
-		[AutoInitShutdown]
+		[Fact, AutoInitShutdown]
 		public void GetTopSuperView_Test ()
 		{
 			var v1 = new View ();
@@ -713,9 +644,18 @@ namespace Terminal.Gui.ViewTests {
 
 			Assert.Equal (top1, v1.GetTopSuperView ());
 			Assert.Equal (top2, v2.GetTopSuperView ());
+
+			v1.Dispose ();
+			fv1.Dispose ();
+			tf1.Dispose ();
+			w1.Dispose ();
+			top1.Dispose ();
+			v2.Dispose ();
+			fv2.Dispose ();
+			tf2.Dispose ();
+			w2.Dispose ();
+			top2.Dispose ();
 		}
-
-
 
 		[Fact, AutoInitShutdown]
 		public void Clear_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
@@ -868,7 +808,7 @@ namespace Terminal.Gui.ViewTests {
 			//Assert.Equal (verticalView.Frame.Size, verticalView.GetSizeNeededForTextWithoutHotKey ());
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void IsAdded_Added_Removed ()
 		{
 			var top = new Toplevel ();
@@ -878,6 +818,9 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (view.IsAdded);
 			top.Remove (view);
 			Assert.False (view.IsAdded);
+			
+			top.Dispose ();
+			view.Dispose ();
 		}
 
 		[Fact, AutoInitShutdown]
@@ -888,7 +831,7 @@ namespace Terminal.Gui.ViewTests {
 			win.Add (label);
 			var top = Application.Top;
 			top.Add (win);
-			Application.Begin (top);
+			var rs = Application.Begin (top);
 
 			Assert.True (label.Visible);
 			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
@@ -901,6 +844,9 @@ namespace Terminal.Gui.ViewTests {
 ", output);
 
 			label.Visible = false;
+
+			bool firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────────────────────────┐
 │                            │
@@ -908,6 +854,7 @@ namespace Terminal.Gui.ViewTests {
 │                            │
 └────────────────────────────┘
 ", output);
+			Application.End (rs);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -937,6 +884,7 @@ namespace Terminal.Gui.ViewTests {
 
 			view.Enabled = false;
 			Assert.Equal (view.ColorScheme.Disabled, view.GetNormalColor ());
+			view.Dispose ();
 		}
 
 		[Fact, AutoInitShutdown]
@@ -948,6 +896,7 @@ namespace Terminal.Gui.ViewTests {
 
 			view.Enabled = false;
 			Assert.Equal (view.ColorScheme.Disabled, view.GetHotNormalColor ());
+			view.Dispose ();
 		}
 
 		[Theory, AutoInitShutdown]
@@ -970,7 +919,7 @@ namespace Terminal.Gui.ViewTests {
 			root.Add (v);
 
 			Application.Top.Add (root);
-			Application.Begin (Application.Top);
+			var runState = Application.Begin (Application.Top);
 
 			if (label) {
 				Assert.True (v.AutoSize);
@@ -1011,6 +960,7 @@ cccccccccccccccccccc", output);
 222222222222222222220
 111111111111111111110", attributes);
 			}
+			Application.End (runState);
 		}
 
 		public class DerivedView : View {
@@ -1078,7 +1028,7 @@ cccccccccccccccccccc", output);
 			};
 			var top = Application.Top;
 			top.Add (label, view);
-			Application.Begin (top);
+			var runState = Application.Begin (top);
 
 			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -1092,11 +1042,12 @@ At 0,0
 			Assert.Equal (LayoutStyle.Computed, view.LayoutStyle);
 			view.LayoutStyle = LayoutStyle.Absolute;
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplay);
+			Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplayRect);
 			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0     
  A text wit", output);
+			Application.End (runState);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1112,7 +1063,7 @@ At 0,0
 			};
 			var top = Application.Top;
 			top.Add (label, view);
-			Application.Begin (top);
+			var runState = Application.Begin (top);
 
 			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -1127,11 +1078,12 @@ At 0,0
 			view.Height = 1;
 			Assert.Equal (new Rect (1, 1, 10, 1), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (0, 0, 30, 2), view._needsDisplay);
+			Assert.Equal (new Rect (0, 0, 30, 2), view._needsDisplayRect);
 			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0     
  A text wit", output);
+			Application.End (runState);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1147,7 +1099,7 @@ At 0,0
 			};
 			var top = Application.Top;
 			top.Add (label, view);
-			Application.Begin (top);
+			var runState = Application.Begin (top);
 
 			view.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -1161,13 +1113,14 @@ At 0,0
 			Assert.Equal (LayoutStyle.Computed, view.LayoutStyle);
 			view.LayoutStyle = LayoutStyle.Absolute;
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplay);
+			Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplayRect);
 			view.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
  A text wit                  
   A text with some long width
    and also with two lines.  ", output);
+			Application.End (runState);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1183,7 +1136,7 @@ At 0,0
 			};
 			var top = Application.Top;
 			top.Add (label, view);
-			Application.Begin (top);
+			var runState = Application.Begin (top);
 
 			view.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -1198,13 +1151,14 @@ At 0,0
 			view.Height = 1;
 			Assert.Equal (new Rect (1, 1, 10, 1), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (0, 0, 30, 2), view._needsDisplay);
+			Assert.Equal (new Rect (0, 0, 30, 2), view._needsDisplayRect);
 			view.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
  A text wit                  
   A text with some long width
    and also with two lines.  ", output);
+			Application.End (runState);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1220,7 +1174,7 @@ At 0,0
 			};
 			var top = Application.Top;
 			top.Add (label, view);
-			Application.Begin (top);
+			var runState = Application.Begin (top);
 
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
@@ -1233,13 +1187,14 @@ At 0,0
 			Assert.Equal (LayoutStyle.Computed, view.LayoutStyle);
 			view.LayoutStyle = LayoutStyle.Absolute;
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplay);
+			Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplayRect);
 			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0       
              
              
    A text wit", output);
+			Application.End (runState);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1255,7 +1210,7 @@ At 0,0
 			};
 			var top = Application.Top;
 			top.Add (label, view);
-			Application.Begin (top);
+			var runState = Application.Begin (top);
 
 			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -1270,13 +1225,14 @@ At 0,0
 			view.Height = 1;
 			Assert.Equal (new Rect (3, 3, 10, 1), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (0, 0, 30, 2), view._needsDisplay);
+			Assert.Equal (new Rect (0, 0, 30, 2), view._needsDisplayRect);
 			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0       
              
              
    A text wit", output);
+			Application.End (runState);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1292,7 +1248,7 @@ At 0,0
 			};
 			var top = Application.Top;
 			top.Add (label, view);
-			Application.Begin (top);
+			var runState = Application.Begin (top);
 
 			view.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -1303,13 +1259,14 @@ At 0,0
 
 			view.Frame = new Rect (3, 3, 10, 1);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplay);
+			Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplayRect);
 			view.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
   A text with some long width
    A text witith two lines.  ", output);
+			Application.End (runState);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1325,7 +1282,7 @@ At 0,0
 			};
 			var top = Application.Top;
 			top.Add (label, view);
-			Application.Begin (top);
+			var runState = Application.Begin (top);
 
 			view.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -1340,13 +1297,14 @@ At 0,0
 			view.Height = 1;
 			Assert.Equal (new Rect (3, 3, 10, 1), view.Frame);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
-			Assert.Equal (new Rect (0, 0, 30, 2), view._needsDisplay);
+			Assert.Equal (new Rect (0, 0, 30, 2), view._needsDisplayRect);
 			view.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 At 0,0                       
                              
   A text with some long width
    A text witith two lines.  ", output);
+			Application.End (runState);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1363,6 +1321,8 @@ At 0,0
 			bottom.Add (new Label ("222"));
 			v.Add (bottom);
 
+			v.BeginInit ();
+			v.EndInit ();
 			v.LayoutSubviews ();
 			v.Draw ();
 
@@ -1372,10 +1332,12 @@ At 0,0
 ───────────
 222";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
+			v.Dispose ();
+			top.Dispose ();
+			bottom.Dispose ();
 		}
 
-		[Fact]
-		[AutoInitShutdown]
+		[Fact, AutoInitShutdown]
 		public void Frame_Set_After_Initialize_Update_NeededDisplay ()
 		{
 			var frame = new FrameView ();
@@ -1404,22 +1366,22 @@ At 0,0
 
 			top.Add (frame);
 
-			Application.Begin (top);
+			var runState = Application.Begin (top);
 
 			top.LayoutComplete += (s, e) => {
-				Assert.Equal (new Rect (0, 0, 80, 25), top._needsDisplay);
+				Assert.Equal (new Rect (0, 0, 80, 25), top._needsDisplayRect);
 			};
 
 			frame.LayoutComplete += (s, e) => {
-				Assert.Equal (new Rect (0, 0, 40, 8), frame._needsDisplay);
+				Assert.Equal (new Rect (0, 0, 40, 8), frame._needsDisplayRect);
 			};
 
 			label.LayoutComplete += (s, e) => {
-				Assert.Equal (new Rect (0, 0, 38, 1), label._needsDisplay);
+				Assert.Equal (new Rect (0, 0, 38, 1), label._needsDisplayRect);
 			};
 
 			button.LayoutComplete += (s, e) => {
-				Assert.Equal (new Rect (0, 0, 13, 1), button._needsDisplay);
+				Assert.Equal (new Rect (0, 0, 13, 1), button._needsDisplayRect);
 			};
 
 			Assert.True (label.AutoSize);
@@ -1442,9 +1404,10 @@ At 0,0
 ";
 
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Application.End (runState);
 		}
 
-		[Fact]
+		[Fact, TestRespondersDisposed]
 		public void Dispose_View ()
 		{
 			var view = new View ();
@@ -1452,10 +1415,15 @@ At 0,0
 			Assert.NotNull (view.Border);
 			Assert.NotNull (view.Padding);
 
+#if DEBUG_IDISPOSABLE
+			Assert.Equal (4, Responder.Instances.Count);
+#endif
+
 			view.Dispose ();
 			Assert.Null (view.Margin);
 			Assert.Null (view.Border);
 			Assert.Null (view.Padding);
+
 		}
 	}
 }

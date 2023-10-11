@@ -1,4 +1,5 @@
-﻿global using CM = Terminal.Gui.ConfigurationManager;
+﻿global using static Terminal.Gui.ConfigurationManager;
+global using CM = Terminal.Gui.ConfigurationManager;
 
 using System;
 using System.Collections;
@@ -14,6 +15,7 @@ using System.Text.Json.Serialization;
 #nullable enable
 
 namespace Terminal.Gui;
+
 /// <summary>
 /// Provides settings and configuration management for Terminal.Gui applications. 
 /// <para>
@@ -325,6 +327,10 @@ public static partial class ConfigurationManager {
 	{
 		Debug.WriteLine ($"ConfigurationManager.OnApplied()");
 		Applied?.Invoke (null, new ConfigurationManagerEventArgs ());
+
+		// TODO: Refactor ConfigurationManager to not use an event handler for this.
+		// Instead, have it call a method on any class appropriately attributed
+		// to update the cached values. See Issue #2871
 	}
 
 	/// <summary>

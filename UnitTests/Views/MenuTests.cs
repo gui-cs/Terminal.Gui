@@ -258,8 +258,9 @@ Edit
 			// open the menu
 			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
-			Assert.Equal ("_New", miCurrent.Parent.Title);
-			Assert.Equal ("_New doc", miCurrent.Title);
+			// The _New doc isn't enabled because it can't execute and so can't be selected
+			Assert.Equal ("_File", miCurrent.Parent.Title);
+			Assert.Equal ("_New", miCurrent.Title);
 
 			Assert.True (mCurrent.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
@@ -2375,7 +2376,7 @@ wo
 			Assert.Equal ("File", menu.Menus [0].Title);
 			menu.OpenMenu ();
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
 │                                      │
@@ -2403,7 +2404,7 @@ wo
 				});
 
 			firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			Assert.Equal (items [0], menu.Menus [0].Title);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -2435,14 +2436,14 @@ wo
 					});
 
 				firstIteration = false;
-				Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+				Application.RunMainLoopIteration (ref rs, ref firstIteration);
 				Assert.Equal (items [i], menu.Menus [0].Title);
 			}
 
 			((FakeDriver)Application.Driver).SetBufferSize (20, 15);
 			menu.OpenMenu ();
 			firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
 │                  │
@@ -2504,7 +2505,7 @@ wo
 			Assert.Equal ("File", menu.Menus [0].Title);
 			menu.OpenMenu ();
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
   ┌─────────────┐                       
   │  File       │                       
@@ -2527,7 +2528,7 @@ wo
 				});
 
 			firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			Assert.Equal (items [0], menu.Menus [0].Title);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
   ┌─────────────┐
@@ -2548,14 +2549,14 @@ wo
 					});
 
 				firstIteration = false;
-				Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+				Application.RunMainLoopIteration (ref rs, ref firstIteration);
 				Assert.Equal (items [i], menu.Menus [0].Title);
 			}
 
 			((FakeDriver)Application.Driver).SetBufferSize (20, 15);
 			menu.OpenMenu ();
 			firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
   ┌─────────────┐   
   │  Delete     │   
@@ -2584,7 +2585,7 @@ wo
 
 			menu.OpenMenu ();
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
  File                         
 ┌────────────────────────────┐
@@ -2593,7 +2594,7 @@ wo
 
 			((FakeDriver)Application.Driver).SetBufferSize (20, 15);
 			firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			Application.RunMainLoopIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
  File", output);
 
@@ -2694,6 +2695,80 @@ wo
 
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 0, 8, 1), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void MenuBarItem_Children_Null_Does_Not_Throw ()
+		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem("Test", "", null)
+			});
+			Application.Top.Add (menu);
+
+			var exception = Record.Exception (() => menu.ProcessColdKey (new KeyEvent (Key.Space, new KeyModifiers ())));
+			Assert.Null (exception);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void CanExecute_ProcessHotKey ()
+		{
+			Window win = null;
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("File", new MenuItem [] {
+					new MenuItem ("_New", "", New, CanExecuteNew),
+					new MenuItem ("_Close", "", Close, CanExecuteClose)
+				}),
+			});
+			var top = Application.Top;
+			top.Add (menu);
+
+			bool CanExecuteNew () => win == null;
+
+			void New ()
+			{
+				win = new Window ();
+			}
+
+			bool CanExecuteClose () => win != null;
+
+			void Close ()
+			{
+				win = null;
+			}
+
+			Application.Begin (top);
+
+			Assert.Null (win);
+			Assert.True (CanExecuteNew ());
+			Assert.False (CanExecuteClose ());
+
+			Assert.True (top.ProcessHotKey (new KeyEvent (Key.N | Key.AltMask, new KeyModifiers () { Alt = true })));
+			Application.MainLoop.RunIteration ();
+			Assert.NotNull (win);
+			Assert.False (CanExecuteNew ());
+			Assert.True (CanExecuteClose ());
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Visible_False_Key_Does_Not_Open_And_Close_All_Opened_Menus ()
+		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("File", new MenuItem [] {
+					new MenuItem ("New", "", null)
+				})
+			});
+			Application.Top.Add (menu);
+			Application.Begin (Application.Top);
+
+			Assert.True (menu.Visible);
+			Assert.True (menu.ProcessHotKey (new KeyEvent (menu.Key, new KeyModifiers ())));
+			Assert.True (menu.IsMenuOpen);
+
+			menu.Visible = false;
+			Assert.False (menu.IsMenuOpen);
+
+			Assert.True (menu.ProcessHotKey (new KeyEvent (menu.Key, new KeyModifiers ())));
+			Assert.False (menu.IsMenuOpen);
 		}
 	}
 }

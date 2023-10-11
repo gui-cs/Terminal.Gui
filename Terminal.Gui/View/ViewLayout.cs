@@ -470,16 +470,15 @@ namespace Terminal.Gui {
 
 		internal void SetNeedsLayout ()
 		{
-			if (LayoutNeeded)
+			if (LayoutNeeded) {
 				return;
+			}
 			LayoutNeeded = true;
 			foreach (var view in Subviews) {
 				view.SetNeedsLayout ();
 			}
 			TextFormatter.NeedsFormat = true;
-			if (SuperView == null)
-				return;
-			SuperView.SetNeedsLayout ();
+			SuperView?.SetNeedsLayout ();
 		}
 
 		/// <summary>
@@ -541,7 +540,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Converts a region in view-relative coordinates to screen-relative coordinates.
 		/// </summary>
-		internal Rect ViewToScreen (Rect region)
+		public Rect ViewToScreen (Rect region)
 		{
 			ViewToScreen (region.X, region.Y, out var x, out var y, clamped: false);
 			return new Rect (x, y, region.Width, region.Height);
