@@ -88,7 +88,7 @@ namespace Terminal.Gui.ConfigurationTests {
 				// is always White/Black
 				Normal = new Attribute (Color.Red, Color.Green),
 				Focus = new Attribute (Color.Cyan, Color.BrightCyan),
-				HotNormal = new Attribute (Color.Brown, Color.BrightYellow),
+				HotNormal = new Attribute (Color.Yellow, Color.BrightYellow),
 				HotFocus = new Attribute (Color.Green, Color.BrightGreen),
 				Disabled = new Attribute (Color.Gray, Color.DarkGray),
 			};
@@ -143,7 +143,7 @@ namespace Terminal.Gui.ConfigurationTests {
 				// is always White/Black
 				Normal = new Attribute (Color.Red, Color.Green),
 				Focus = new Attribute (Color.Cyan, Color.BrightCyan),
-				HotNormal = new Attribute (Color.Brown, Color.BrightYellow),
+				HotNormal = new Attribute (Color.Yellow, Color.BrightYellow),
 				HotFocus = new Attribute (Color.Green, Color.BrightGreen),
 				Disabled = new Attribute (Color.Gray, Color.DarkGray),
 			};

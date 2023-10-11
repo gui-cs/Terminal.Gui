@@ -26,12 +26,12 @@ public class ColorTests {
 	[Fact]
 	public void TestAllColors ()
 	{
-		var colorNames = Enum.GetValues (typeof (ColorNames));
-		Attribute [] attrs = new Attribute [colorNames.Length];
+		var colorNames = Enum.GetValues (typeof (ColorNames)).Cast<int> ().Distinct ().ToList();
+		Attribute [] attrs = new Attribute [colorNames.Count];
 
 		int idx = 0;
 		foreach (ColorNames bg in colorNames) {
-			attrs [idx] = new Attribute (bg, colorNames.Length - 1 - bg);
+			attrs [idx] = new Attribute (bg, colorNames.Count - 1 - bg);
 			idx++;
 		}
 		Assert.Equal (16, attrs.Length);
@@ -41,10 +41,10 @@ public class ColorTests {
 		Assert.Equal (new Attribute (Color.Cyan, Color.BrightRed), attrs [3]);
 		Assert.Equal (new Attribute (Color.Red, Color.BrightCyan), attrs [4]);
 		Assert.Equal (new Attribute (Color.Magenta, Color.BrightGreen), attrs [5]);
-		Assert.Equal (new Attribute (Color.Brown, Color.BrightBlue), attrs [6]);
+		Assert.Equal (new Attribute (Color.Yellow, Color.BrightBlue), attrs [6]);
 		Assert.Equal (new Attribute (Color.Gray, Color.DarkGray), attrs [7]);
 		Assert.Equal (new Attribute (Color.DarkGray, Color.Gray), attrs [8]);
-		Assert.Equal (new Attribute (Color.BrightBlue, Color.Brown), attrs [9]);
+		Assert.Equal (new Attribute (Color.BrightBlue, Color.Yellow), attrs [9]);
 		Assert.Equal (new Attribute (Color.BrightGreen, Color.Magenta), attrs [10]);
 		Assert.Equal (new Attribute (Color.BrightCyan, Color.Red), attrs [11]);
 		Assert.Equal (new Attribute (Color.BrightRed, Color.Cyan), attrs [12]);
@@ -52,11 +52,11 @@ public class ColorTests {
 		Assert.Equal (new Attribute (Color.BrightYellow, Color.Blue), attrs [14]);
 		Assert.Equal (new Attribute (Color.White, Color.Black), attrs [^1]);
 	}
-
+	
 	[Fact]
-	public void ColorNames_Has16Elements ()
+	public void ColorNames_HasOnly16DistinctElements ()
 	{
-		Assert.Equal (16, Enum.GetValues (typeof (ColorNames)).Length);
+		Assert.Equal (16, Enum.GetValues (typeof (ColorNames)).Cast<int> ().Distinct ().Count ());
 	}
 
 	[Fact]
@@ -68,7 +68,7 @@ public class ColorTests {
 		Assert.Equal (3, (int)ColorNames.Cyan);
 		Assert.Equal (4, (int)ColorNames.Red);
 		Assert.Equal (5, (int)ColorNames.Magenta);
-		Assert.Equal (6, (int)ColorNames.Brown);
+		Assert.Equal (6, (int)ColorNames.Yellow);
 		Assert.Equal (7, (int)ColorNames.Gray);
 		Assert.Equal (8, (int)ColorNames.DarkGray);
 		Assert.Equal (9, (int)ColorNames.BrightBlue);
@@ -307,8 +307,8 @@ public class ColorTests {
 	public void Color_ColorName_Get_ReturnsClosestColorName ()
 	{
 		// Arrange
-		var color = new Color (128, 64, 40); // Custom RGB color, closest to Brown 
-		var expectedColorName = ColorNames.Brown;
+		var color = new Color (128, 64, 40); // Custom RGB color, closest to Yellow 
+		var expectedColorName = ColorNames.Yellow;
 
 		// Act
 		var colorName = color.ColorName;
@@ -329,7 +329,7 @@ public class ColorTests {
 			(new Color(0, 255, 0), ColorNames.BrightGreen),
 			(new Color(255, 70, 8), ColorNames.BrightRed),
 			(new Color(0, 128, 128), ColorNames.Cyan),
-			(new Color(128, 64, 32), ColorNames.Brown),
+			(new Color(128, 64, 32), ColorNames.Yellow),
 		};
 
 		foreach (var testCase in testCases) {

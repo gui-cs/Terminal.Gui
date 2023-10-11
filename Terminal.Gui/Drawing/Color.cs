@@ -14,77 +14,84 @@ namespace Terminal.Gui {
 	/// foreground and background colors in Terminal.Gui apps. Used with <see cref="Color"/>.
 	/// </summary>
 	/// <remarks>
-	/// 
+	/// <para>
+	/// These colors match the 16 colors defined for ANSI escape sequences for 4-bit (16) colors.
+	/// </para>
+	/// <para>
+	/// For terminals that support 24-bit color (TrueColor), the RGB values for each of these colors can be configured using the
+	/// <see cref="Color.Colors"/> property.
+	/// </para>
 	/// </remarks>
 	public enum ColorNames {
 		/// <summary>
-		/// The black color.
+		/// The black color. ANSI escape sequence: <c>\u001b[30m</c>.
 		/// </summary>
 		Black,
 		/// <summary>
-		/// The blue color.
+		/// The blue color. ANSI escape sequence: <c>\u001b[34m</c>.
 		/// </summary>
 		Blue,
 		/// <summary>
-		/// The green color.
+		/// The green color. ANSI escape sequence: <c>\u001b[32m</c>.
 		/// </summary>
 		Green,
 		/// <summary>
-		/// The cyan color.
+		/// The cyan color. ANSI escape sequence: <c>\u001b[36m</c>.
 		/// </summary>
 		Cyan,
 		/// <summary>
-		/// The red color.
+		/// The red color. ANSI escape sequence: <c>\u001b[31m</c>.
 		/// </summary>
 		Red,
 		/// <summary>
-		/// The magenta color.
+		/// The magenta color. ANSI escape sequence: <c>\u001b[35m</c>.
 		/// </summary>
 		Magenta,
 		/// <summary>
-		/// The brown color.
+		/// The yellow color (also known as Brown). ANSI escape sequence: <c>\u001b[33m</c>.
 		/// </summary>
-		Brown,
+		Yellow,
 		/// <summary>
-		/// The gray color.
+		/// The gray color (also known as White). ANSI escape sequence: <c>\u001b[37m</c>.
 		/// </summary>
 		Gray,
 		/// <summary>
-		/// The dark gray color.
+		/// The dark gray color (also known as Bright Black). ANSI escape sequence: <c>\u001b[30;1m</c>.
 		/// </summary>
 		DarkGray,
 		/// <summary>
-		/// The bright bBlue color.
+		/// The bright blue color. ANSI escape sequence: <c>\u001b[34;1m</c>.
 		/// </summary>
 		BrightBlue,
 		/// <summary>
-		/// The bright green color.
+		/// The bright green color. ANSI escape sequence: <c>\u001b[32;1m</c>.
 		/// </summary>
 		BrightGreen,
 		/// <summary>
-		/// The bright cyan color.
+		/// The bright cyan color. ANSI escape sequence: <c>\u001b[36;1m</c>.
 		/// </summary>
 		BrightCyan,
 		/// <summary>
-		/// The bright red color.
+		/// The bright red color. ANSI escape sequence: <c>\u001b[31;1m</c>.
 		/// </summary>
 		BrightRed,
 		/// <summary>
-		/// The bright magenta color.
+		/// The bright magenta color. ANSI escape sequence: <c>\u001b[35;1m</c>.
 		/// </summary>
 		BrightMagenta,
 		/// <summary>
-		/// The bright yellow color.
+		/// The bright yellow color. ANSI escape sequence: <c>\u001b[33;1m</c>.
 		/// </summary>
 		BrightYellow,
 		/// <summary>
-		/// The White color.
+		/// The White color (also known as Bright White). ANSI escape sequence: <c>\u001b[37;1m</c>.
 		/// </summary>
 		White
 	}
 
 	/// <summary>
-	/// Represents a 24-bit color. This is used with <see cref="Attribute"/>. 
+	/// Represents a 24-bit color. Provides automatic mapping between the legacy 4-bit (16 color) system and 24-bit colors (see <see cref="ColorName"/>).
+	/// Used with <see cref="Attribute"/>. 
 	/// </summary>
 	[JsonConverter (typeof (ColorJsonConverter))]
 	public class Color : IEquatable<Color> {
@@ -195,7 +202,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Maps legacy 16-color values to the corresponding 24-bit RGB value.
 		/// </summary>
-		internal static readonly ImmutableDictionary<Color, ColorNames> _colorNames = new Dictionary<Color, ColorNames> () {
+		internal static ImmutableDictionary<Color, ColorNames> _colorToNameMap = new Dictionary<Color, ColorNames> () {
 			// using "Windows 10 Console/PowerShell 6" here: https://i.stack.imgur.com/9UVnC.png
 			// See also: https://en.wikipedia.org/wiki/ANSI_escape_code
 			{ new Color (12, 12, 12),ColorNames.Black },
@@ -204,7 +211,7 @@ namespace Terminal.Gui {
 			{ new Color (58, 150, 221),ColorNames.Cyan},
 			{ new Color (197, 15, 31),ColorNames.Red},
 			{ new Color (136, 23, 152),ColorNames.Magenta},
-			{ new Color (128, 64, 32),ColorNames.Brown},
+			{ new Color (128, 64, 32),ColorNames.Yellow},
 			{ new Color (204, 204, 204),ColorNames.Gray},
 			{ new Color (118, 118, 118),ColorNames.DarkGray},
 			{ new Color (59, 120, 255),ColorNames.BrightBlue},
@@ -216,12 +223,30 @@ namespace Terminal.Gui {
 			{ new Color (242, 242, 242),ColorNames.White},
 		}.ToImmutableDictionary ();
 
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
+		public static Dictionary<string, string> Colors {
+			get {
+				// Transform _colorToNameMap into a Dictionary<string,string>
+				return _colorToNameMap.ToDictionary (kvp => kvp.Value.ToString (), kvp => $"#{kvp.Key.R:X2}{kvp.Key.G:X2}{kvp.Key.B:X2}");
+			}
+			set {
+				// Transform Dictionary<string,string> into _colorToNameMap
+				var newMap = value.ToDictionary (kvp => new Color (kvp.Value), kvp => {
+					if (Enum.TryParse<ColorNames> (kvp.Key, out var colorName)) {
+						return colorName;
+					}
+					throw new ArgumentException ($"Invalid color name: {kvp.Key}");
+				});
+				_colorToNameMap = newMap.ToImmutableDictionary ();
+			}
+		}
+
 		/// <summary>
 		/// Converts a legacy <see cref="ColorNames"/> to a 24-bit <see cref="Color"/>.
 		/// </summary>
 		/// <param name="consoleColor">The <see cref="Color"/> to convert.</param>
 		/// <returns></returns>
-		private static Color FromColorName (ColorNames consoleColor) => _colorNames.FirstOrDefault (x => x.Value == consoleColor).Key;
+		private static Color FromColorName (ColorNames consoleColor) => _colorToNameMap.FirstOrDefault (x => x.Value == consoleColor).Key;
 
 		// Iterates through the entries in the _colorNames dictionary, calculates the
 		// Euclidean distance between the input color and each dictionary color in RGB space,
@@ -232,7 +257,7 @@ namespace Terminal.Gui {
 			ColorNames closestColor = ColorNames.Black; // Default to Black
 			double closestDistance = double.MaxValue;
 
-			foreach (var colorEntry in _colorNames) {
+			foreach (var colorEntry in _colorToNameMap) {
 				var distance = CalculateColorDistance (inputColor, colorEntry.Key);
 				if (distance < closestDistance) {
 					closestDistance = distance;
@@ -299,9 +324,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public const ColorNames Magenta = ColorNames.Magenta;
 		/// <summary>
-		/// The brown color.
+		/// The yellow color.
 		/// </summary>
-		public const ColorNames Brown = ColorNames.Brown;
+		public const ColorNames Yellow = ColorNames.Yellow;
 		/// <summary>
 		/// The gray color.
 		/// </summary>
@@ -423,6 +448,11 @@ namespace Terminal.Gui {
 				return true;
 			}
 
+			if (Enum.TryParse<ColorNames> (text, true, out ColorNames colorName)) {
+				color = new Color (colorName);
+				return true;
+			}
+
 			color = null;
 			return false;
 		}
@@ -496,7 +526,7 @@ namespace Terminal.Gui {
 
 			if (left is null || right is null)
 				return true;
-			
+
 			return !left.Equals (right);
 		}
 
@@ -583,7 +613,7 @@ namespace Terminal.Gui {
 		public override string ToString ()
 		{
 			// If Values has an exact match with a named color (in _colorNames), use that.
-			if (_colorNames.TryGetValue (this, out ColorNames colorName)) {
+			if (_colorToNameMap.TryGetValue (this, out ColorNames colorName)) {
 				return Enum.GetName (typeof (ColorNames), colorName);
 			}
 			// Otherwise return as an RGB hex value.
@@ -751,7 +781,7 @@ namespace Terminal.Gui {
 
 		/// <inheritdoc />
 		public override int GetHashCode () => HashCode.Combine (PlatformColor, Foreground, Background);
-		
+
 		/// <inheritdoc />
 		public override string ToString ()
 		{
