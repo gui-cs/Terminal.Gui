@@ -44,12 +44,4 @@ namespace Terminal.Gui;
 /// </code></example> 
 [JsonConverter (typeof (ScopeJsonConverter<ThemeScope>))]
 public class ThemeScope : Scope<ThemeScope> {
-
-	/// <inheritdoc/>
-	internal override bool Apply ()
-	{
-		var ret = base.Apply ();
-		Application.Driver?.InitializeColorSchemes ();
-		return ret;
-	}
 }

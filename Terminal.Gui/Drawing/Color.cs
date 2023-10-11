@@ -84,7 +84,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Represents a color in the console. This is used with <see cref="Attribute"/>. 
+	/// Represents a 24-bit color. This is used with <see cref="Attribute"/>. 
 	/// </summary>
 	[JsonConverter (typeof (ColorJsonConverter))]
 	public class Color : IEquatable<Color> {
@@ -591,7 +591,6 @@ namespace Terminal.Gui {
 		}
 	}
 
-	// TODO: Get rid of all the Initialized crap - it's not needed once Curses Driver supports TrueColor
 	/// <summary>
 	/// Attributes represent how text is styled when displayed in the terminal. 
 	/// </summary>
@@ -601,7 +600,7 @@ namespace Terminal.Gui {
 	///   class to define color schemes that can be used in an application.
 	/// </remarks>
 	[JsonConverter (typeof (AttributeJsonConverter))]
-	public struct Attribute : IEquatable<Attribute> {
+	public readonly struct Attribute : IEquatable<Attribute> {
 
 		/// <summary>
 		/// Default empty attribute.
@@ -609,9 +608,7 @@ namespace Terminal.Gui {
 		public static readonly Attribute Default = new Attribute (Color.White, Color.Black);
 
 		/// <summary>
-		/// The <see cref="ConsoleDriver"/>-specific color value. If <see cref="Initialized"/> is <see langword="false"/> 
-		/// the value of this property is invalid (typically because the Attribute was created before a driver was loaded)
-		/// and the attribute should be re-made before it is used.
+		/// The <see cref="ConsoleDriver"/>-specific color value.
 		/// </summary>
 		[JsonIgnore (Condition = JsonIgnoreCondition.Always)]
 		internal int PlatformColor { get; }
@@ -656,7 +653,6 @@ namespace Terminal.Gui {
 			Foreground = foreground;
 			Background = background;
 			PlatformColor = platformColor;
-			Initialized = true;
 		}
 
 		/// <summary>
@@ -678,14 +674,11 @@ namespace Terminal.Gui {
 			Background = background;
 
 			if (Application.Driver == null) {
-				// Create the attribute, but show it's not been initialized
-				Initialized = false;
 				PlatformColor = -1;
 				return;
 			}
 
 			var make = Application.Driver.MakeAttribute (foreground, background);
-			Initialized = make.Initialized;
 			PlatformColor = make.PlatformColor;
 		}
 
@@ -758,19 +751,7 @@ namespace Terminal.Gui {
 
 		/// <inheritdoc />
 		public override int GetHashCode () => HashCode.Combine (PlatformColor, Foreground, Background);
-
-		/// <summary>
-		/// If <see langword="true"/> the attribute has been initialized by a <see cref="ConsoleDriver"/> and 
-		/// thus has <see cref="PlatformColor"/> that is valid for that driver. If <see langword="false"/> the <see cref="Foreground"/>
-		/// and <see cref="Background"/> colors may have been set '-1' but
-		/// the attribute has not been mapped to a <see cref="ConsoleDriver"/> specific color value.
-		/// </summary>
-		/// <remarks>
-		/// Attributes that have not been initialized must eventually be initialized before being passed to a driver.
-		/// </remarks>
-		[JsonIgnore]
-		public bool Initialized { get; internal set; }
-
+		
 		/// <inheritdoc />
 		public override string ToString ()
 		{
@@ -934,27 +915,6 @@ namespace Terminal.Gui {
 		public static bool operator != (ColorScheme left, ColorScheme right)
 		{
 			return !(left == right);
-		}
-
-		internal void Initialize ()
-		{
-			// If the new scheme was created before a driver was loaded, we need to re-make
-			// the attributes
-			if (!_normal.Initialized) {
-				_normal = new Attribute (_normal.Foreground, _normal.Background);
-			}
-			if (!_focus.Initialized) {
-				_focus = new Attribute (_focus.Foreground, _focus.Background);
-			}
-			if (!_hotNormal.Initialized) {
-				_hotNormal = new Attribute (_hotNormal.Foreground, _hotNormal.Background);
-			}
-			if (!_hotFocus.Initialized) {
-				_hotFocus = new Attribute (_hotFocus.Foreground, _hotFocus.Background);
-			}
-			if (!_disabled.Initialized) {
-				_disabled = new Attribute (_disabled.Foreground, _disabled.Background);
-			}
 		}
 	}
 

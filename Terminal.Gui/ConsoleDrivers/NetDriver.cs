@@ -696,7 +696,6 @@ internal class NetDriver : ConsoleDriver {
 		ResizeScreen ();
 		ClearContents ();
 		CurrentAttribute = new Attribute (Color.White, Color.Black);
-		InitializeColorSchemes ();
 
 		StartReportingMouseMoves ();
 	}
