@@ -134,7 +134,7 @@ internal class CursesDriver : ConsoleDriver {
 			return Curses.COLOR_RED;
 		case ColorNames.Magenta:
 			return Curses.COLOR_MAGENTA;
-		case ColorNames.Brown:
+		case ColorNames.Yellow:
 			return Curses.COLOR_YELLOW;
 		case ColorNames.Gray:
 			return Curses.COLOR_WHITE;
@@ -174,7 +174,7 @@ internal class CursesDriver : ConsoleDriver {
 		case Curses.COLOR_MAGENTA:
 			return ColorNames.Magenta;
 		case Curses.COLOR_YELLOW:
-			return ColorNames.Brown;
+			return ColorNames.Yellow;
 		case Curses.COLOR_WHITE:
 			return ColorNames.Gray;
 		case Curses.COLOR_GRAY:

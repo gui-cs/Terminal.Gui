@@ -27,7 +27,7 @@ namespace Terminal.Gui;
 /// 
 /// 		},
 /// 		"HotNormal": {
-/// 			"Foreground": "Brown",
+/// 			"Foreground": "Yellow",
 /// 			"Background": "Black"
 /// 
 /// 		},

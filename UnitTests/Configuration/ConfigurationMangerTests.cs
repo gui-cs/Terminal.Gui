@@ -382,7 +382,7 @@ namespace Terminal.Gui.ConfigurationTests {
                 ""Background"": ""Cyan""
               },
               ""HotNormal"": {
-                ""Foreground"": ""Brown"",
+                ""Foreground"": ""Yellow"",
                 ""Background"": ""Black""
               },
               ""HotFocus"": {
@@ -540,7 +540,7 @@ namespace Terminal.Gui.ConfigurationTests {
 							{
 								""UserDefined"": {
 									""hotNormal"": {
-										""foreground"": ""yellow"",
+										""foreground"": ""brown"",
 										""background"": ""1234""
 									}
 								}
@@ -552,7 +552,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			}";
 
 			JsonException jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Settings.Update (json, "test"));
-			Assert.Equal ("Unexpected color name: yellow.", jsonException.Message);
+			Assert.Equal ("Unexpected color name: brown.", jsonException.Message);
 
 			// AbNormal is not a ColorScheme attribute
 			json = @"
@@ -621,7 +621,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			Application.Init (new FakeDriver ());
 
 			ConfigurationManager.ThrowOnJsonErrors = false;
-			// "yellow" is not a color
+			// "brown" is not a color
 			string json = @"
 			{
 				""Themes"" : [ 
@@ -631,7 +631,7 @@ namespace Terminal.Gui.ConfigurationTests {
 							{
 								""UserDefined"": {
 									""hotNormal"": {
-										""foreground"": ""yellow"",
+										""foreground"": ""brown"",
 										""background"": ""1234""
 									}
 								}
