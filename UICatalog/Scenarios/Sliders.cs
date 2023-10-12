@@ -79,7 +79,7 @@ public class Sliders : Scenario {
 			rightView.Add (slider);
 
 			slider.OptionsChanged += (options) => {
-				foreach (var s in leftView.Subviews [0].Subviews.OfType<Slider> ()) {
+				foreach (var s in leftView.Subviews.OfType<Slider> ()) {
 					if (options.ContainsKey (0))
 						s.ShowLegends = true;
 					else
@@ -115,7 +115,7 @@ public class Sliders : Scenario {
 			// rightView.Add (innerspacing_slider);
 
 			// innerspacing_slider.OptionsChanged += (options) => {
-			// 	foreach (var s in leftView.Subviews [0].Subviews.OfType<Slider> ()) {
+			// 	foreach (var s in leftView.Subviews.OfType<Slider> () ()) {
 			// 		if (options.ContainsKey (0)) { }
 			// 		//s.la = S.SliderLayout.Auto;
 			// 		else {
@@ -140,7 +140,7 @@ public class Sliders : Scenario {
 			slider_orientation_slider.OptionsChanged += (options) => {
 
 				View prev = null;
-				foreach (var s in leftView.Subviews [0].Subviews.OfType<Slider> ()) {
+				foreach (var s in leftView.Subviews.OfType<Slider> ()) {
 
 					if (options.ContainsKey (0)) {
 						s.SliderOrientation = Orientation.Horizontal;
@@ -197,7 +197,7 @@ public class Sliders : Scenario {
 			rightView.Add (legends_orientation_slider);
 
 			legends_orientation_slider.OptionsChanged += (options) => {
-				foreach (var s in leftView.Subviews [0].Subviews.OfType<Slider> ()) {
+				foreach (var s in leftView.Subviews.OfType<Slider> ()) {
 					if (options.ContainsKey (0))
 						s.LegendsOrientation = Orientation.Horizontal;
 					else if (options.ContainsKey (1))
@@ -251,7 +251,7 @@ public class Sliders : Scenario {
 				if (options.Count != 0) {
 					var data = options.First ().Value.Data;
 
-					foreach (var s in leftView.Subviews [0].Subviews.OfType<Slider> ()) {
+					foreach (var s in leftView.Subviews.OfType<Slider> ()) {
 						s.Style.SetChar.Attribute = new Terminal.Gui.Attribute (data.Item1, data.Item2);
 						s.Style.LegendStyle.SetAttribute = new Terminal.Gui.Attribute (data.Item1, Color.Black);
 						s.Style.RangeChar.Attribute = new Terminal.Gui.Attribute (data.Item2, Color.Black);
@@ -259,7 +259,7 @@ public class Sliders : Scenario {
 						// Here we can not call SetNeedDisplay(), because the OptionsChanged was triggered by Key Pressing, that internaly calls SetNeedDisplay.
 					}
 				} else {
-					foreach (var s in leftView.Subviews [0].Subviews.OfType<Slider> ()) {
+					foreach (var s in leftView.Subviews.OfType<Slider> ()) {
 						s.Style.SetChar.Attribute = null;
 						s.Style.LegendStyle.SetAttribute = null;
 						s.Style.RangeChar.Attribute = null;
