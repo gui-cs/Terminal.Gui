@@ -299,19 +299,20 @@ public class Sliders : Scenario {
 			RangeChar = new Cell () { Runes = { CM.Glyphs.Diamond } }, // ░ ▒ ▓   // Medium shade not blinking on curses.
 			StartRangeChar = new Cell () { Runes = { new Rune ('█') } },
 			EndRangeChar = new Cell () { Runes = { new Rune ('█') } },
-			SpaceChar = new Cell () { Runes = { new Rune (' ') } }
+			SpaceChar = new Cell () { Runes = { new Rune (' ') } },
+		
 		};
-		var single = new Slider ("Single Scale", options, Orientation.Horizontal) {
+		var single = new Slider ("Actual slider", options, Orientation.Horizontal) {
 			X = Pos.Center (),
 			//X = Pos.Right (view) + 1,
 			Y = prev == null ? 0 : Pos.Bottom (prev) + 1,
 			//Y = Pos.Center (),
 			Type = SliderType.Single,
+			ShowLegends = false,
 			LegendsOrientation = Orientation.Horizontal,
 			Width = Dim.Fill (),
 			AllowEmpty = false,
-			Style = style
-
+			Style = style,
 		};
 		v.Add (single);
 	}
