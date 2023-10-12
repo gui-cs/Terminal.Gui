@@ -13,7 +13,8 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Animation", Description: "Demonstration of how to render animated images with threading.")]
-	[ScenarioCategory ("Colors")]
+	[ScenarioCategory ("Threading")]
+	[ScenarioCategory ("Drawing")]
 	public class Animation : Scenario {
 		private bool isDisposed;
 

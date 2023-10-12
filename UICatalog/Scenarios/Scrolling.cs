@@ -4,10 +4,8 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Scrolling", Description: "Demonstrates ScrollView etc...")]
-	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("ScrollView")]
+	[ScenarioCategory ("Controls"), ScenarioCategory ("ScrollView"), ScenarioCategory ("Tests")]
 	public class Scrolling : Scenario {
-
 		class Box10x : View {
 			int w = 40;
 			int h = 50;

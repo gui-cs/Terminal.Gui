@@ -7,7 +7,7 @@ namespace UICatalog.Scenarios {
 
 	[ScenarioMetadata (Name: "Line Drawing", Description: "Demonstrates LineCanvas.")]
 	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("Layout")]
+	[ScenarioCategory ("Drawing")]
 	public class LineDrawing : Scenario {
 
 		public override void Setup ()

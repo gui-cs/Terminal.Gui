@@ -9,6 +9,7 @@ namespace UICatalog.Scenarios {
 
 	[ScenarioMetadata (Name: "Graph View", Description: "Demos the GraphView control.")]
 	[ScenarioCategory ("Controls")]
+	[ScenarioCategory ("Drawing")]
 	public class GraphViewExample : Scenario {
 
 		GraphView graphView;

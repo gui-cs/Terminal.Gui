@@ -4,7 +4,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "View Experiments", Description: "v2 View Experiments")]
-	[ScenarioCategory ("Controls")]
+	[ScenarioCategory ("Controls"), ScenarioCategory ("Borders"), ScenarioCategory ("Layout"), ScenarioCategory ("Proof of Concept")]
 	public class ViewExperiments : Scenario {
 
 		public override void Init ()
