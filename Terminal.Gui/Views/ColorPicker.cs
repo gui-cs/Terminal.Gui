@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Reflection;
 using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui {
 
@@ -114,7 +115,7 @@ namespace Terminal.Gui {
 				switch (Style) {
 				case ColorPickerStyle.Ansi:
 					var index = (int)_selectedColor.ColorName;
-					return new Point (index % _cols, index / _rows);
+					return new Point (index % _cols, index / _cols);
 					break;
 				case ColorPickerStyle.Rgb:
 					int x = (int)(_selectedColor.R * Bounds.Width / 255);
@@ -175,7 +176,7 @@ namespace Terminal.Gui {
 			LayoutStarted += (o, a) => {
 				switch (Style) {
 				case ColorPickerStyle.Rgb:
-					Bounds = new Rect (Bounds.Location, new Size (32, 32));
+					//Bounds = new Rect (Bounds.Location, new Size (32, 32));
 					break;
 				case ColorPickerStyle.Ansi:
 				default:
@@ -216,7 +217,7 @@ namespace Terminal.Gui {
 
 			switch (Style) {
 			case ColorPickerStyle.Rgb:
-				DrawRgb (contentArea);
+				DrawRgbGraident (contentArea);
 				break;
 			case ColorPickerStyle.Ansi:
 			default:
@@ -226,7 +227,17 @@ namespace Terminal.Gui {
 
 		}
 
-		void DrawRgb (Rect contentArea)
+		int _blueValue = 100;
+
+		public int BlueValue {
+			get { return _blueValue; }
+			set {
+				_blueValue = value;
+				SetNeedsDisplay ();
+			}
+		}
+
+		void DrawHSLGraident (Rect contentArea)
 		{
 			for (int x = 0; x < contentArea.Width; x++) {
 				for (int y = 0; y < contentArea.Height; y++) {
@@ -235,14 +246,41 @@ namespace Terminal.Gui {
 
 					int red = (int)(255 * ratioX);
 					int green = (int)(255 * ratioY);
-					int blue = (int)(255 * (1 - ratioX * ratioY));
+					int blue = _blueValue; // We're displaying a slice of blue value
 
 					Color color = new Color (red, green, blue);
 
-					Driver.SetAttribute (new Attribute (color));
-					AddRune (x, y, (Rune)' ');
+					DrawBox (x, y, color);
 				}
 			}
+		}
+
+		void DrawRgbGraident (Rect contentArea)
+		{
+			for (int x = 0; x < Bounds.Width; x++) {
+				for (int y = 0; y < Bounds.Height; y++) {
+					// Map x and y to their corresponding RGB values
+					int redValue = MapValue (x, 0, Bounds.Width, 0, 255);
+					int greenValue = MapValue (y, 0, Bounds.Height, 0, 255);
+
+					var color = new Color (redValue, greenValue, _blueValue);
+
+					DrawBox (x, y, color);
+				}
+			}
+		}
+
+		private int MapValue (int value, int fromLow, int fromHigh, int toLow, int toHigh)
+		{
+			return (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
+		}
+
+		private void DrawBox (int x, int y, Color color)
+		{
+			// Placeholder method; you'll replace this with the actual Terminal.Gui method to set cell colors
+			// This assumes that `Color` can take RGB values directly, adjust as needed
+			Driver.SetAttribute (new Attribute (color));
+			AddRune (x, y, (Rune)' ');
 		}
 
 		void DrawAnsi ()
@@ -429,10 +467,25 @@ namespace Terminal.Gui {
 
 	public class GradientView : View {
 
+		int _blueValue = 100;
+
+		public int BlueValue {
+			get { return _blueValue; }
+			set {
+				_blueValue = value;
+				SetNeedsDisplay ();
+			}
+		}
+		
 		public override void OnDrawContent (Rect contentArea)
 		{
 			base.OnDrawContent (contentArea);
 
+			DrawRgbGraident (contentArea);
+		}
+
+		void DrawHSLGraident (Rect contentArea)
+		{
 			for (int x = 0; x < contentArea.Width; x++) {
 				for (int y = 0; y < contentArea.Height; y++) {
 					float ratioX = (float)x / (contentArea.Width - 1);
@@ -440,18 +493,36 @@ namespace Terminal.Gui {
 
 					int red = (int)(255 * ratioX);
 					int green = (int)(255 * ratioY);
-					int blue = (int)(255 * (1 - ratioX * ratioY));
+					int blue = _blueValue; // We're displaying a slice of blue value
 
 					Color color = new Color (red, green, blue);
 
-					// This assumes that you have a mechanism to set cell colors in Terminal.Gui
-					// For the purpose of this code, we're just assigning a placeholder method
-					SetCellColor (x, y, color);
+					DrawBox (x, y, color);
 				}
 			}
 		}
 
-		private void SetCellColor (int x, int y, Color color)
+		void DrawRgbGraident (Rect contentArea)
+		{
+			for (int x = 0; x < Bounds.Width; x++) {
+				for (int y = 0; y < Bounds.Height; y++) {
+					// Map x and y to their corresponding RGB values
+					int redValue = MapValue (x, 0, Bounds.Width, 0, 255);
+					int greenValue = MapValue (y, 0, Bounds.Height, 0, 255);
+
+					var color = new Color (redValue, greenValue, _blueValue);
+
+					DrawBox (x, y, color);
+				}
+			}
+		}
+
+		private int MapValue (int value, int fromLow, int fromHigh, int toLow, int toHigh)
+		{
+			return (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
+		}
+
+		private void DrawBox (int x, int y, Color color)
 		{
 			// Placeholder method; you'll replace this with the actual Terminal.Gui method to set cell colors
 			// This assumes that `Color` can take RGB values directly, adjust as needed

@@ -199,7 +199,7 @@ namespace Terminal.Gui {
 
 			Added += (s, e) => CreateBottomRightCorner ();
 
-			Initialized += (s, e) => {
+			LayoutComplete += (s, e) => {
 				SetWidthHeight ();
 				SetRelativeLayout (SuperView?.Frame ?? Host?.Frame ?? Frame);
 				if (Id == "OtherScrollBarView" || OtherScrollBarView == null) {
@@ -537,7 +537,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			Driver.SetAttribute (Host.HasFocus ? ColorScheme.Focus : GetNormalColor ());
+			Driver.SetAttribute (Host is { HasFocus: true } ? ColorScheme.Focus : GetNormalColor ());
 
 			if (_vertical) {
 				if (Bounds.Right < Bounds.Width - 1) {
@@ -689,7 +689,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (!Host.CanFocus) {
+			if (Host != null && !Host.CanFocus) {
 				return true;
 			}
 			if (Host?.HasFocus == false) {
