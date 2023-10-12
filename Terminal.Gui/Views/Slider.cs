@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.FileIO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -495,7 +496,7 @@ public class Slider<T> : View {
 		}
 		set {
 			// Note(jmperricone): If the user change a style, he/she must call SetNeedsDisplay(). OK ???
-			style = Style;
+			style = value;
 		}
 	}
 
@@ -639,12 +640,12 @@ public class Slider<T> : View {
 	{
 		switch (config.SliderOrientation) {
 		case Orientation.Horizontal:
-			style.SpaceChar = new Cell () { Runes = { new Rune ('─') }}; // '─'
-			style.OptionChar = new Cell () { Runes = { new Rune ('●')} }; // '┼●🗹□⏹'
+			style.SpaceChar = new Cell () { Runes = { new Rune ('─') } }; // '─'
+			style.OptionChar = new Cell () { Runes = { new Rune ('●') } }; // '┼●🗹□⏹'
 			break;
 		case Orientation.Vertical:
-			style.SpaceChar = new Cell () { Runes = { new Rune ('│') }};
-			style.OptionChar = new Cell () { Runes = { new Rune ('□')} };
+			style.SpaceChar = new Cell () { Runes = { new Rune ('│') } };
+			style.OptionChar = new Cell () { Runes = { new Rune ('□') } };
 			break;
 		}
 
@@ -873,7 +874,7 @@ public class Slider<T> : View {
 				height += 1;
 			}
 
-			if (config.LegendsOrientation != config.SliderOrientation) {
+			if (config.LegendsOrientation != config.SliderOrientation && options.Count > 0) {
 				height += options.Max (s => s.Legend.Length);
 			} else {
 				height += 1;
@@ -1041,6 +1042,14 @@ public class Slider<T> : View {
 	/// <inheritdoc/>
 	public override void PositionCursor ()
 	{
+		base.PositionCursor ();
+		//if (_moveRuneRenderLocation.HasValue) {
+		//	var location = _moveRuneRenderLocation ??
+		//			new Point (Bounds.Width / 2, Bounds.Height / 2);
+		//	Move (location.X, location.Y);
+		//	cursorPosition = (location.X, location.Y);
+		//	return;
+		//}  
 		if (TryGetPositionByOption (currentOption, out (int x, int y) position)) {
 			if (Bounds.Contains (position.x, position.y)) {
 				Move (position.x, position.y);
@@ -1091,6 +1100,10 @@ public class Slider<T> : View {
 		// Draw Legends.
 		if (config.ShowLegends) {
 			DrawLegends ();
+		}
+
+		if (_dragPosition.HasValue && _moveRuneRenderLocation.HasValue) {
+			AddRune (_moveRuneRenderLocation.Value.X, _moveRuneRenderLocation.Value.Y, style.RangeChar.Runes [0]);
 		}
 	}
 
@@ -1323,8 +1336,13 @@ public class Slider<T> : View {
 				break;
 			}
 
-			// Text || Abbrevaiation
-			string text = config.ShowLegendsAbbr ? options [i].LegendAbbr.ToString () ?? new Rune (options [i].Legend.First ()).ToString () : options [i].Legend.ToString ();
+			// Text || Abbreviation
+			string text = string.Empty;
+			if (config.ShowLegendsAbbr) {
+				text = options [i].LegendAbbr.ToString () ?? new Rune (options [i].Legend.First ()).ToString ();
+			} else {
+				text = options [i].Legend;
+			}
 
 			switch (config.SliderOrientation) {
 			case Orientation.Horizontal:
@@ -1412,6 +1430,10 @@ public class Slider<T> : View {
 
 	#region Keys and Mouse
 
+
+	Point? _dragPosition;
+	Point? _moveRuneRenderLocation;
+
 	/// <inheritdoc/>
 	public override bool MouseEvent (MouseEvent mouseEvent)
 	{
@@ -1419,15 +1441,84 @@ public class Slider<T> : View {
 		//                    That will makes OptionFocused Event more relevant.
 		// TODO(jmperricone): Make Range Type work with mouse.
 
-		if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
+		if (!(mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed) ||
+			mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition) ||
+			mouseEvent.Flags.HasFlag (MouseFlags.Button1Released))) {
+			return false;
+		}
+
+		if (!_dragPosition.HasValue && (mouseEvent.Flags.HasFlag(MouseFlags.Button1Pressed))) {
 			var success = TryGetOptionByPosition (mouseEvent.X, mouseEvent.Y, config.MouseClickXOptionThreshold, out var option);
 			if (success) {
 				currentOption = option;
 				OptionFocused?.Invoke (currentOption, options [currentOption]);
 				SetCurrentOption ();
-				SetNeedsDisplay ();
-				return true;
 			}
+			if (Type != SliderType.Multiple && mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition)) {
+				_dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
+				if (SliderOrientation == Orientation.Horizontal) {
+					_moveRuneRenderLocation = new Point (Math.Min (Bounds.Width - config.EndSpacing - 1, Math.Max (config.StartSpacing, mouseEvent.X)), config.ShowHeader ? 1 : 0);
+				} else {
+					_moveRuneRenderLocation = new Point (config.ShowHeader ? 2 : 0, Math.Max (1, Math.Min (Bounds.Height - 2, mouseEvent.Y)));
+				}
+				Application.GrabMouse (this);
+			}
+			SetNeedsDisplay ();
+			return true;
+		}
+
+		if (!_dragPosition.HasValue) {
+			return false;
+
+		}
+
+		if (mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition) && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)) {
+
+			// Continue Drag
+			_dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
+
+			bool success = false;
+			int option = 0;
+			// how far has user dragged from original location?						
+			if (SliderOrientation == Orientation.Horizontal) {
+				success = TryGetOptionByPosition (mouseEvent.X, config.ShowHeader ? 1 : 0, 0, out option);
+				_moveRuneRenderLocation = new Point (Math.Min (Bounds.Width - config.EndSpacing - 1, Math.Max (config.StartSpacing, mouseEvent.X)), config.ShowHeader ? 1 : 0);
+			} else {
+				success = TryGetOptionByPosition (config.ShowHeader ? 2 : 0, mouseEvent.Y, 0, out option);
+				_moveRuneRenderLocation = new Point (config.ShowHeader ? 2 : 0, Math.Max (1, Math.Min (Bounds.Height - 2, mouseEvent.Y)));
+			}
+			if (success) {
+				currentOption = option;
+				OptionFocused?.Invoke (currentOption, options [currentOption]);
+				SetCurrentOption ();
+			}
+
+			SetNeedsDisplay ();
+			return true;
+		}
+
+		if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released)) {
+
+			// End Drag
+			Application.UngrabMouse ();
+			_dragPosition = null;
+			_moveRuneRenderLocation = null;
+
+			// TODO: Add func to calc distance between options to use as the MouseClickXOptionThreshold
+			var success = false;
+			var option = 0;
+			if (SliderOrientation == Orientation.Horizontal) {
+				success = TryGetOptionByPosition (mouseEvent.X, config.ShowHeader ? 1 : 0, 0, out option);
+			} else {
+				success = TryGetOptionByPosition (config.ShowHeader ? 2 : 0, mouseEvent.Y, 0, out option);
+			}
+			if (success) {
+				currentOption = option;
+				OptionFocused?.Invoke (currentOption, options [currentOption]);
+			}
+
+			SetNeedsDisplay ();
+			return true;
 		}
 		return false;
 	}

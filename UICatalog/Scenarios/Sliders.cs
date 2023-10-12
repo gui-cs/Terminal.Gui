@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Terminal.Gui;
+using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios;
 
@@ -214,7 +215,7 @@ public class Sliders : Scenario {
 				Y = Pos.Bottom (legends_orientation_slider) + 1,
 				Type = SliderType.Single,
 				Width = Dim.Fill (),
-				AllowEmpty = true
+				AllowEmpty = false
 			};
 
 			sliderColor.Style.SetChar.Attribute = new Terminal.Gui.Attribute (Color.BrightGreen, Color.Black);
@@ -222,28 +223,17 @@ public class Sliders : Scenario {
 
 			sliderColor.ShowHeader = true;
 			sliderColor.Header = "Slider Color";
-			sliderColor.Options = new List<SliderOption<(Color, Color)>> {
-					new SliderOption<(Color, Color)> {
-						Data = (Color.Red,Color.BrightRed),
-						Legend = "Red"
-					},
-					new SliderOption<(Color, Color)> {
-						Data = (Color.Blue,Color.BrightBlue),
-						Legend = "Blue"
-					},
-					new SliderOption<(Color, Color)> {
-						Data = (Color.Green,Color.BrightGreen),
-						Legend = "Green"
-					},
-					new SliderOption<(Color, Color)> {
-						Data = (Color.Cyan,Color.BrightCyan),
-						Legend = "Cyan"
-					},
-					new SliderOption<(Color, Color)> {
-						Data = (Color.Brown,Color.BrightYellow),
-						Legend = "Yellow"
-					}
-				};
+			sliderColor.LegendsOrientation = Orientation.Vertical;
+			var colorOptions = new List<SliderOption<(Color, Color)>> ();
+			foreach (var colorIndex in Enum.GetValues<Color> ()) {
+				var colorName = colorIndex.ToString ();
+				colorOptions.Add (new SliderOption<(Color, Color)> {
+					Data = (colorIndex, Color.Black),
+					Legend = colorName,
+					LegendAbbr = (Rune)colorName [0],
+				});
+			}
+			sliderColor.Options = colorOptions;
 
 			rightView.Add (sliderColor);
 
@@ -252,11 +242,16 @@ public class Sliders : Scenario {
 					var data = options.First ().Value.Data;
 
 					foreach (var s in leftView.Subviews.OfType<Slider> ()) {
-						s.Style.SetChar.Attribute = new Terminal.Gui.Attribute (data.Item1, data.Item2);
-						s.Style.LegendStyle.SetAttribute = new Terminal.Gui.Attribute (data.Item1, Color.Black);
-						s.Style.RangeChar.Attribute = new Terminal.Gui.Attribute (data.Item2, Color.Black);
-
-						// Here we can not call SetNeedDisplay(), because the OptionsChanged was triggered by Key Pressing, that internaly calls SetNeedDisplay.
+						s.Style.OptionChar.Attribute = new Attribute (data.Item1, data.Item2);
+						s.Style.SetChar.Attribute = new Attribute (data.Item1, data.Item2);
+						s.Style.LegendStyle.SetAttribute = new Attribute (data.Item1, Color.Black);
+						s.Style.RangeChar.Attribute = new Attribute (data.Item1, Color.Black);
+						s.Style.SpaceChar.Attribute = new Attribute (data.Item1, Color.Black);
+						s.Style.HeaderStyle.NormalAttribute = new Attribute (data.Item1, Color.Black);
+						s.Style.HeaderStyle.FocusAttribute = new Attribute (data.Item1, Color.Black);
+						s.Style.LegendStyle.NormalAttribute = new Attribute (data.Item1, Color.Black);
+						// Here we can not call SetNeedDisplay(), because the OptionsChanged was triggered by Key Pressing,
+						// that internaly calls SetNeedDisplay.
 					}
 				} else {
 					foreach (var s in leftView.Subviews.OfType<Slider> ()) {
@@ -296,6 +291,28 @@ public class Sliders : Scenario {
 			prev = view;
 		};
 
-		//view.AutoSize = true;
+		options = new List<object> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39 };
+		var style = new SliderStyle () {
+			OptionChar = new Cell () { Runes = { CM.Glyphs.HLineDbl } },
+			SetChar = new Cell () { Runes = { CM.Glyphs.Diamond } },
+			EmptyChar = new Cell () { Runes = { new Rune (' ') } },
+			RangeChar = new Cell () { Runes = { CM.Glyphs.Diamond } }, // ░ ▒ ▓   // Medium shade not blinking on curses.
+			StartRangeChar = new Cell () { Runes = { new Rune ('█') } },
+			EndRangeChar = new Cell () { Runes = { new Rune ('█') } },
+			SpaceChar = new Cell () { Runes = { new Rune (' ') } }
+		};
+		var single = new Slider ("Single Scale", options, Orientation.Horizontal) {
+			X = Pos.Center (),
+			//X = Pos.Right (view) + 1,
+			Y = prev == null ? 0 : Pos.Bottom (prev) + 1,
+			//Y = Pos.Center (),
+			Type = SliderType.Single,
+			LegendsOrientation = Orientation.Horizontal,
+			Width = Dim.Fill (),
+			AllowEmpty = false,
+			Style = style
+
+		};
+		v.Add (single);
 	}
 }
