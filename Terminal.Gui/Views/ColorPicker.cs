@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Drawing;
+using System.Reflection;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Terminal.Gui {
 
@@ -27,11 +30,43 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
+	/// ColorPicker view styles.
+	/// </summary>
+	public enum ColorPickerStyle {
+		/// <summary>
+		/// The color picker will display the 16 ANSI colors.
+		/// </summary>
+		Ansi,
+		/// <summary>
+		/// The color picker will display the 256 colors.
+		/// </summary>
+		Color256,
+		/// <summary>
+		/// The color picker will display the 16 ANSI colors and the 256 colors.
+		/// </summary>
+		AnsiAndColor256,
+
+		/// <summary>
+		/// The color picker will display the 24-bit colors.
+		/// </summary>
+		Rgb,
+
+		/// <summary>
+		/// The color picker will display the 16 ANSI colors and the 256 colors and the 24-bit colors.
+		/// </summary>
+		AnsiAndColor256AndRgb
+	}
+
+	/// <summary>
 	/// The <see cref="ColorPicker"/> <see cref="View"/> Color picker.
 	/// </summary>
 	public class ColorPicker : View {
-		private int _selectColorIndex = (int)Color.Black;
+		private Color _selectedColor = (Color)Color.Black;
 
+		/// <summary>
+		/// Gets or sets the style of the color picker.
+		/// </summary>
+		public ColorPickerStyle Style { get; set; } = ColorPickerStyle.Ansi;
 
 		/// <summary>
 		/// Columns of color boxes
@@ -44,7 +79,7 @@ namespace Terminal.Gui {
 		private int _rows = 2;
 
 		/// <summary>
-		/// Width of a color box
+		/// Width of a color box.
 		/// </summary>
 		public int BoxWidth {
 			get => _boxWidth;
@@ -76,12 +111,30 @@ namespace Terminal.Gui {
 		/// </summary>
 		public Point Cursor {
 			get {
-				return new Point (_selectColorIndex % _cols, _selectColorIndex / _cols);
+				switch (Style) {
+				case ColorPickerStyle.Ansi:
+					var index = (int)_selectedColor.ColorName;
+					return new Point (index % _cols, index / _rows);
+					break;
+				case ColorPickerStyle.Rgb:
+					int x = (int)(_selectedColor.R * Bounds.Width / 255);
+					int y = (int)(_selectedColor.G * Bounds.Height / 255);
+
+					return new Point (x, y);
+					break;
+				}
+				return new Point ();
 			}
 
 			set {
-				var colorIndex = value.Y * _cols + value.X;
-				SelectedColor = (ColorNames)colorIndex;
+				switch (Style) {
+				case ColorPickerStyle.Ansi:
+					SelectedColor = (Color)(ColorNames)(value.Y * _cols + value.X);
+					break;
+				case ColorPickerStyle.Rgb:
+					SelectedColor = new Color ((byte)(value.X * 255 / Bounds.Width), (byte)(value.Y * 255 / Bounds.Height), 0);
+					break;
+				}
 			}
 		}
 
@@ -93,19 +146,16 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Selected color.
 		/// </summary>
-		public ColorNames SelectedColor {
-			get {
-				return (ColorNames)_selectColorIndex;
-			}
+		public Color SelectedColor {
+			get => _selectedColor;
 
 			set {
-				ColorNames prev = (ColorNames)_selectColorIndex;
-				_selectColorIndex = (int)value;
-				ColorChanged?.Invoke (this, new ColorEventArgs () {
-					PreviousColor = new Color (prev),
-					Color = new Color (value),
-				});
-				SetNeedsDisplay ();
+				if (_selectedColor != value) {
+					var oldColor = _selectedColor;
+					_selectedColor = value;
+					ColorChanged?.Invoke (this, new ColorEventArgs () { Color = _selectedColor, PreviousColor = oldColor });
+					SetNeedsDisplay ();
+				}
 			}
 		}
 
@@ -123,7 +173,15 @@ namespace Terminal.Gui {
 			AddCommands ();
 			AddKeyBindings ();
 			LayoutStarted += (o, a) => {
-				Bounds = new Rect (Bounds.Location, new Size (_cols * BoxWidth, _rows * BoxHeight));
+				switch (Style) {
+				case ColorPickerStyle.Rgb:
+					Bounds = new Rect (Bounds.Location, new Size (32, 32));
+					break;
+				case ColorPickerStyle.Ansi:
+				default:
+					Bounds = new Rect (Bounds.Location, new Size (_cols * BoxWidth, _rows * BoxHeight));
+					break;
+				}
 			};
 		}
 
@@ -155,6 +213,40 @@ namespace Terminal.Gui {
 			base.OnDrawContent (contentArea);
 
 			Driver.SetAttribute (HasFocus ? ColorScheme.Focus : GetNormalColor ());
+
+			switch (Style) {
+			case ColorPickerStyle.Rgb:
+				DrawRgb (contentArea);
+				break;
+			case ColorPickerStyle.Ansi:
+			default:
+				DrawAnsi ();
+				break;
+			}
+
+		}
+
+		void DrawRgb (Rect contentArea)
+		{
+			for (int x = 0; x < contentArea.Width; x++) {
+				for (int y = 0; y < contentArea.Height; y++) {
+					float ratioX = (float)x / (contentArea.Width - 1);
+					float ratioY = (float)y / (contentArea.Height - 1);
+
+					int red = (int)(255 * ratioX);
+					int green = (int)(255 * ratioY);
+					int blue = (int)(255 * (1 - ratioX * ratioY));
+
+					Color color = new Color (red, green, blue);
+
+					Driver.SetAttribute (new Attribute (color));
+					AddRune (x, y, (Rune)' ');
+				}
+			}
+		}
+
+		void DrawAnsi ()
+		{
 			var colorIndex = 0;
 
 			for (var y = 0; y < (Bounds.Height / BoxHeight); y++) {
@@ -216,8 +308,18 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual bool MoveLeft ()
 		{
-			if (Cursor.X > 0) SelectedColor--;
-			return true;
+			switch (Style) {
+			case ColorPickerStyle.Ansi:
+				var index = (int)SelectedColor.ColorName;
+				if (index > 0 && index <= 15) {
+					SelectedColor = new Color ((ColorNames)(index - 1));
+				}
+				return true;
+			case ColorPickerStyle.Rgb:
+				//return MoveLeftRgb ();
+				return true;
+			}
+			return false;
 		}
 
 		/// <summary>
@@ -226,8 +328,18 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual bool MoveRight ()
 		{
-			if (Cursor.X < _cols - 1) SelectedColor++;
-			return true;
+			switch (Style) {
+			case ColorPickerStyle.Ansi:
+				var index = (int)SelectedColor.ColorName;
+				if (index >= 0 && index < 15) {
+					SelectedColor = new Color ((ColorNames)(index + 1));
+				}
+				return true;
+			case ColorPickerStyle.Rgb:
+				//return MoveLeftRgb ();
+				return true;
+			}
+			return false;
 		}
 
 		/// <summary>
@@ -236,8 +348,18 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual bool MoveUp ()
 		{
-			if (Cursor.Y > 0) SelectedColor -= _cols;
-			return true;
+			switch (Style) {
+			case ColorPickerStyle.Ansi:
+				var index = (int)SelectedColor.ColorName - _cols;
+				if (index >= 0 && index <= 15) {
+					SelectedColor = new Color ((ColorNames)index);
+				}
+				return true;
+			case ColorPickerStyle.Rgb:
+				//return MoveLeftRgb ();
+				return true;
+			}
+			return false;
 		}
 
 		/// <summary>
@@ -246,8 +368,18 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public virtual bool MoveDown ()
 		{
-			if (Cursor.Y < _rows - 1) SelectedColor += _cols;
-			return true;
+			switch (Style) {
+			case ColorPickerStyle.Ansi:
+				var index = (int)SelectedColor.ColorName + _cols;
+				if (index >= 0 && index <= 15) {
+					SelectedColor = new Color ((ColorNames)index);
+				}
+				return true;
+			case ColorPickerStyle.Rgb:
+				//return MoveLeftRgb ();
+				return true;
+			}
+			return false;
 		}
 
 		///<inheritdoc/>
@@ -273,7 +405,15 @@ namespace Terminal.Gui {
 			}
 			//var x = Math.Max (GetFramesThickness().Left, me.X);
 			//var y = Math.Max (GetFramesThickness ().Top, me.Y);
-			Cursor = new Point ((me.X - GetFramesThickness ().Left) / _boxWidth, (me.Y - GetFramesThickness ().Top) / _boxHeight);
+			switch (Style) {
+			case ColorPickerStyle.Ansi:
+				Cursor = new Point ((me.X - GetFramesThickness ().Left) / _boxWidth, (me.Y - GetFramesThickness ().Top) / _boxHeight);
+				break;
+			case ColorPickerStyle.Rgb:
+				Cursor = new Point ((me.X - GetFramesThickness ().Left), (me.Y - GetFramesThickness ().Top));
+				break;
+			}
+
 
 			return true;
 		}
@@ -286,4 +426,38 @@ namespace Terminal.Gui {
 			return base.OnEnter (view);
 		}
 	}
+
+	public class GradientView : View {
+
+		public override void OnDrawContent (Rect contentArea)
+		{
+			base.OnDrawContent (contentArea);
+
+			for (int x = 0; x < contentArea.Width; x++) {
+				for (int y = 0; y < contentArea.Height; y++) {
+					float ratioX = (float)x / (contentArea.Width - 1);
+					float ratioY = (float)y / (contentArea.Height - 1);
+
+					int red = (int)(255 * ratioX);
+					int green = (int)(255 * ratioY);
+					int blue = (int)(255 * (1 - ratioX * ratioY));
+
+					Color color = new Color (red, green, blue);
+
+					// This assumes that you have a mechanism to set cell colors in Terminal.Gui
+					// For the purpose of this code, we're just assigning a placeholder method
+					SetCellColor (x, y, color);
+				}
+			}
+		}
+
+		private void SetCellColor (int x, int y, Color color)
+		{
+			// Placeholder method; you'll replace this with the actual Terminal.Gui method to set cell colors
+			// This assumes that `Color` can take RGB values directly, adjust as needed
+			Driver.SetAttribute (new Attribute (color));
+			AddRune (x, y, (Rune)' ');
+		}
+	}
+
 }

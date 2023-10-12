@@ -6,15 +6,15 @@
         "WT_SESSION": "1"
       }
     },
+    "UICatalog -usc": {
+      "commandName": "Project",
+      "commandLineArgs": "-usc"
+    },
     "WSL : UICatalog": {
       "commandName": "Executable",
       "executablePath": "wsl",
       "commandLineArgs": "dotnet UICatalog.dll",
       "distributionName": ""
-    },
-    "UICatalog -usc": {
-      "commandName": "Project",
-      "commandLineArgs": "-usc"
     },
     "WSL: UICatalog -usc": {
       "commandName": "Executable",
@@ -22,9 +22,9 @@
       "commandLineArgs": "dotnet UICatalog.dll -usc",
       "distributionName": ""
     },
-    "Wizards": {
+    "Color Picker": {
       "commandName": "Project",
-      "commandLineArgs": "Wizards"
+      "commandLineArgs": "\"Color Picker\""
     },
     "Dialogs": {
       "commandName": "Project",
@@ -33,6 +33,10 @@
     "Buttons": {
       "commandName": "Project",
       "commandLineArgs": "Buttons"
+    },
+    "Wizards": {
+      "commandName": "Project",
+      "commandLineArgs": "Wizards"
     },
     "WizardAsView": {
       "commandName": "Project",
