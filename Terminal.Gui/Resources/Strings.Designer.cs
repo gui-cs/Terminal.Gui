@@ -196,6 +196,60 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to _Delete.
+        /// </summary>
+        internal static string fdCtxDelete {
+            get {
+                return ResourceManager.GetString("fdCtxDelete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Hide {0}.
+        /// </summary>
+        internal static string fdCtxHide {
+            get {
+                return ResourceManager.GetString("fdCtxHide", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _New.
+        /// </summary>
+        internal static string fdCtxNew {
+            get {
+                return ResourceManager.GetString("fdCtxNew", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Rename.
+        /// </summary>
+        internal static string fdCtxRename {
+            get {
+                return ResourceManager.GetString("fdCtxRename", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Sort {0} ASC.
+        /// </summary>
+        internal static string fdCtxSortAsc {
+            get {
+                return ResourceManager.GetString("fdCtxSortAsc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Sort {0} DESC.
+        /// </summary>
+        internal static string fdCtxSortDesc {
+            get {
+                return ResourceManager.GetString("fdCtxSortDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Are you sure you want to delete &apos;{0}&apos;? This operation is permanent.
         /// </summary>
         internal static string fdDeleteBody {

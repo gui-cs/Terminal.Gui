@@ -91,12 +91,12 @@ namespace Terminal.Gui {
 		/// Gets or sets the text on the 'Ok' button.  Typically you may want to change this to
 		/// "Open" or "Save" etc.
 		/// </summary>
-		public string OkButtonText { get; set; } = "Ok";
+		public string OkButtonText { get; set; } = Strings.btnOk;
 
 		/// <summary>
 		/// Gets or sets the text on the 'Cancel' button.
 		/// </summary>
-		public string CancelButtonText { get; set; } = "Cancel";
+		public string CancelButtonText { get; set; } = Strings.btnCancel;
 
 		/// <summary>
 		/// Gets or sets whether to flip the order of the Ok and Cancel buttons. Defaults

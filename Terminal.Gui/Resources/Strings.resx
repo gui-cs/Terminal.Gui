@@ -259,4 +259,22 @@
   <data name="btnCancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="fdCtxDelete" xml:space="preserve">
+    <value>_Delete</value>
+  </data>
+  <data name="fdCtxHide" xml:space="preserve">
+    <value>_Hide {0}</value>
+  </data>
+  <data name="fdCtxNew" xml:space="preserve">
+    <value>_New</value>
+  </data>
+  <data name="fdCtxRename" xml:space="preserve">
+    <value>_Rename</value>
+  </data>
+  <data name="fdCtxSortAsc" xml:space="preserve">
+    <value>_Sort {0} ASC</value>
+  </data>
+  <data name="fdCtxSortDesc" xml:space="preserve">
+    <value>_Sort {0} DESC</value>
+  </data>
 </root>
