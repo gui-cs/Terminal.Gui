@@ -286,7 +286,7 @@ public class Sliders : Scenario {
 		};
 		single.Style.OptionChar = new Cell () { Runes = { CM.Glyphs.HLineDbl } };
 		single.Style.SetChar = new Cell () { Runes = { CM.Glyphs.ContinuousMeterSegment } };
-		//single.Style.EmptyChar = new Cell () { Runes = { CM.Glyphs.ContinuousMeterSegment } };
+		single.Style.EmptyChar = new Cell () { Runes = { CM.Glyphs.HLineDbl } };
 		//single.Style.RangeChar = new Cell () { Runes = { CM.Glyphs.AppleBMP } }; // ░ ▒ ▓   // Medium shade not blinking on curses.
 		//single.Style.StartRangeChar = new Cell () { Runes = { new Rune ('█') } };
 		//single.Style.EndRangeChar = new Cell () { Runes = { new Rune ('█') } };
