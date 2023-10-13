@@ -291,7 +291,7 @@ public class Slider<T> : View {
 			if (_settingRange == true) {
 				_settingRange = false;
 			}
-			Application.MainLoop.RemoveTimeout (_blink_token);
+			//Application.MainLoop.RemoveTimeout (_blink_token);
 		};
 
 
@@ -304,20 +304,21 @@ public class Slider<T> : View {
 				Move (_cursorPosition.Value.Item1, _cursorPosition.Value.Item2);
 				if (_blink) {
 					Driver.SetAttribute (new Attribute (Color.Red, Color.Blue));
+					Driver.AddRune (GetSetOptions ().Contains (_currentOption) ? _style.SetChar.Runes [0] : _style.OptionChar.Runes [0]);
 				} else {
 					Driver.SetAttribute (new Attribute (Color.Blue, Color.Red));
+					Driver.AddRune (GetSetOptions ().Contains (_currentOption) ? _style.OptionChar.Runes [0] : _style.SetChar.Runes [0]);
 				}
-				Driver.AddRune (GetSetOptions ().Contains (_currentOption) ? _style.SetChar.Runes [0] : _style.OptionChar.Runes [0]);
 				_blink = !_blink;
 			}
 		};
 
 		Enter += (object s, FocusEventArgs e) => {
-			f ();
-			_blink_token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), (ee) => {
-				f ();
-				return true;
-			});
+			//f ();
+			//_blink_token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (1300), (ee) => {
+			//	f ();
+			//	return true;
+			//});
 		};
 
 		LayoutComplete += (s, e) => {
@@ -945,6 +946,13 @@ public class Slider<T> : View {
 				_cursorPosition = (position.x, position.y);
 			}
 		}
+
+		if (HasFocus) {
+			Driver.SetCursorVisibility (CursorVisibility.Default);
+			Move (_cursorPosition.Value.Item1, _cursorPosition.Value.Item2);
+		} else {
+			Driver.SetCursorVisibility (CursorVisibility.Invisible);
+		}
 	}
 
 	/// <inheritdoc/>
@@ -1307,9 +1315,7 @@ public class Slider<T> : View {
 			return position;
 		}
 
-		// TODO: Remove this once MouseEvent is fixed to account for Frames
-		mouseEvent.X += GetFramesThickness ().Left;
-		mouseEvent.Y += GetFramesThickness ().Top;
+		SetFocus ();
 
 		if (!_dragPosition.HasValue && (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))) {
 
@@ -1373,6 +1379,7 @@ public class Slider<T> : View {
 		return false;
 	}
 
+	// TODO: Use Commands instead
 	/// <inheritdoc/>
 	public override bool ProcessKey (KeyEvent keyEvent)
 	{
@@ -1388,6 +1395,10 @@ public class Slider<T> : View {
 					_currentOptions.Add (_currentOption);
 					_currentOptions.Sort (); // Range Type
 					OptionsChanged?.Invoke (_currentOptions.ToDictionary (e => e, e => _options [e]));
+				} else {
+					if (_settingRange == true || !AllowEmpty) {
+						SetCurrentOption ();
+					}
 				}
 			}
 			break;
@@ -1402,18 +1413,26 @@ public class Slider<T> : View {
 					_currentOptions.Add (_currentOption);
 					_currentOptions.Sort (); // Range Type
 					OptionsChanged?.Invoke (_currentOptions.ToDictionary (e => e, e => _options [e]));
+				} else {
+					if (_settingRange == true || !AllowEmpty) {
+						SetCurrentOption ();
+					}
 				}
 			}
 			break;
 		case Key.Home:
 			_currentOption = 0;
 			OptionFocused?.Invoke (_currentOption, _options [_currentOption]);
-
-			//Console.WriteLine (LayoutStyle.ToString ());
+			if (_settingRange == true || !AllowEmpty) {
+				SetCurrentOption ();
+			}
 			break;
 		case Key.End:
 			_currentOption = _options.Count - 1;
 			OptionFocused?.Invoke (_currentOption, _options [_currentOption]);
+			if (_settingRange == true || !AllowEmpty) {
+				SetCurrentOption ();
+			}
 			break;
 		case Key.CursorUp:
 		case Key.CursorLeft:
@@ -1424,7 +1443,7 @@ public class Slider<T> : View {
 			_currentOption = _currentOption > 0 ? _currentOption - 1 : _currentOption;
 			OptionFocused?.Invoke (_currentOption, _options [_currentOption]);
 
-			if (_settingRange == true) {
+			if (_settingRange == true || !AllowEmpty) {
 				SetCurrentOption ();
 			}
 			break;
@@ -1437,12 +1456,13 @@ public class Slider<T> : View {
 			_currentOption = _currentOption < _options.Count - 1 ? _currentOption + 1 : _currentOption;
 			OptionFocused?.Invoke (_currentOption, _options [_currentOption]);
 
-			if (_settingRange == true) {
+			if (_settingRange == true || !AllowEmpty) {
 				SetCurrentOption ();
 			}
 			break;
 
 		case Key.Enter:
+		case Key.Space:
 			if (_settingRange == true) {
 				_settingRange = false;
 			} else {

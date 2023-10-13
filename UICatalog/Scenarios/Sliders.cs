@@ -24,7 +24,6 @@ public class Sliders : Scenario {
 		Win.Add (rightView);
 
 		MakeSliders (Win, new List<object> { 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000 });
-		Win.FocusFirst ();
 
 		#region RightView
 		{
@@ -200,7 +199,7 @@ public class Sliders : Scenario {
 				Type = SliderType.Single,
 				Width = Dim.Fill (),
 				BorderStyle = LineStyle.Single,
-				AllowEmpty = true
+				AllowEmpty = false
 			};
 
 			sliderColor.Style.SetChar.Attribute = new Terminal.Gui.Attribute (Color.BrightGreen, Color.Black);
@@ -249,6 +248,7 @@ public class Sliders : Scenario {
 			#endregion
 		}
 		#endregion
+		rightView.SetFocus ();
 
 	}
 
@@ -284,7 +284,7 @@ public class Sliders : Scenario {
 			Y = prev == null ? 0 : Pos.Bottom (prev),
 			//Y = Pos.Center (),
 			Type = SliderType.Single,
-			BorderStyle = LineStyle.Single,
+			//BorderStyle = LineStyle.Single,
 			LegendsOrientation = Orientation.Horizontal,
 			Width = Dim.Percent (50),
 			AllowEmpty = false,
