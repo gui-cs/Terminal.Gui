@@ -322,13 +322,6 @@ public class Slider<T> : View {
 
 		LayoutComplete += (s, e) => {
 			CalculateSliderDimensions ();
-			Border.BorderStyle = LineStyle.Single;
-			if (SliderOrientation == Orientation.Horizontal) {
-				Border.Thickness = new Thickness (1, 1, 1, 1);
-			} else {
-				// TODO: Once Border supports vertical titles, fix this
-				Border.Thickness = new Thickness (0, 0, 0, 0);
-			}
 			AdjustBestHeight ();
 			AdjustBestWidth ();
 		};
@@ -363,8 +356,10 @@ public class Slider<T> : View {
 		get => _config._innerSpacing;
 		set {
 			_config._innerSpacing = value;
+			CalculateSliderDimensions ();
 			Adjust ();
 			SetNeedsDisplay ();
+			SuperView?.SetNeedsLayout ();
 		}
 	}
 
@@ -390,9 +385,10 @@ public class Slider<T> : View {
 		get => _config._sliderOrientation;
 		set {
 			_config._sliderOrientation = value;
-			Adjust ();
 			CalculateSliderDimensions ();
+			Adjust ();
 			SetNeedsDisplay ();
+			SuperView?.SetNeedsLayout ();
 		}
 	}
 
@@ -403,9 +399,10 @@ public class Slider<T> : View {
 		get => _config._legendsOrientation;
 		set {
 			_config._legendsOrientation = value;
-			Adjust ();
 			CalculateSliderDimensions ();
+			Adjust ();
 			SetNeedsDisplay ();
+			SuperView?.SetNeedsLayout ();
 		}
 	}
 
@@ -437,10 +434,14 @@ public class Slider<T> : View {
 		set {
 			_options = value;
 
-			if (_options == null || _options.Count == 0)
+			if (_options == null || _options.Count == 0) {
 				return;
+			}
 
+			CalculateSliderDimensions ();
 			Adjust ();
+			SetNeedsDisplay ();
+			SuperView?.SetNeedsLayout ();
 		}
 	}
 
@@ -591,7 +592,7 @@ public class Slider<T> : View {
 		_style.EndRangeChar = new Cell () { Runes = { new Rune ('█') } };
 		_style.DragChar = new Cell () { Runes = { CM.Glyphs.Diamond } };
 
-		// TODO: Support left & right (top/bottom) - can this be done using Frames/Border ???
+		// TODO: Support left & right (top/bottom)
 		// First = '├',
 		// Last = '┤',
 	}
@@ -687,11 +688,11 @@ public class Slider<T> : View {
 	{
 		// Hack???  Otherwise we can't go back to Dim.Absolute.
 		LayoutStyle = LayoutStyle.Absolute;
-	
+
 		if (_config._sliderOrientation == Orientation.Horizontal) {
-			Bounds = new Rect (Bounds.Location, new Size (Bounds.Width, CalcSliderHeight()));
+			Bounds = new Rect (Bounds.Location, new Size (Bounds.Width, CalcSliderThickness ()));
 		} else {
-			Bounds = new Rect (Bounds.Location, new Size (Bounds.Width, CalcSliderWidth ()));
+			Bounds = new Rect (Bounds.Location, new Size (Bounds.Width, CalcSliderLength ()));
 		}
 
 		LayoutStyle = LayoutStyle.Computed;
@@ -705,9 +706,9 @@ public class Slider<T> : View {
 		LayoutStyle = LayoutStyle.Absolute;
 
 		if (_config._sliderOrientation == Orientation.Horizontal) {
-			Bounds = new Rect (Bounds.Location, new Size (CalcSliderWidth (), Bounds.Height));
+			Bounds = new Rect (Bounds.Location, new Size (CalcSliderLength (), Bounds.Height));
 		} else {
-			Bounds = new Rect (Bounds.Location, new Size (CalcSliderHeight (), Bounds.Height));
+			Bounds = new Rect (Bounds.Location, new Size (CalcSliderThickness (), Bounds.Height));
 		}
 
 		LayoutStyle = LayoutStyle.Computed;
@@ -715,14 +716,6 @@ public class Slider<T> : View {
 
 	void Adjust ()
 	{
-		Border.BorderStyle = LineStyle.Single;
-		if (SliderOrientation == Orientation.Horizontal) {
-			Border.Thickness = new Thickness (1, 1, 1, 1);
-		} else {
-			// TODO: Once Border supports vertical titles, fix this
-			Border.Thickness = new Thickness (0, 0, 0, 0);
-		}
-
 		if (Width is Dim.DimAbsolute) {
 			AdjustBestWidth ();
 		}
@@ -732,36 +725,32 @@ public class Slider<T> : View {
 		}
 	}
 
-	int CalcSliderWidth ()
+	int CalcSliderLength ()
 	{
-		if (_options.Count == 0)
+		if (_options.Count == 0) {
 			return 0;
+		}
 
-		var width = 0;
-		width += _config._startSpacing + _config._endSpacing;
-		width += _options.Count;
-		width += (_options.Count - 1) * _config._innerSpacing;
-		return width;
+		var length = 0;
+		length += _config._startSpacing + _config._endSpacing;
+		length += _options.Count;
+		length += (_options.Count - 1) * _config._innerSpacing;
+		return length;
 	}
 
-	int CalcSliderHeight ()
+	int CalcSliderThickness ()
 	{
-		var height = 1; // Always show the slider.
+		var thickness = 1; // Always show the slider.
 
 		if (_config._showLegends) {
-			// Space between the slider and the legends.
-			if (_config._sliderOrientation == Orientation.Vertical) {
-				height += 1;
-			}
-
 			if (_config._legendsOrientation != _config._sliderOrientation && _options.Count > 0) {
-				height += _options.Max (s => s.Legend.Length);
+				thickness += _options.Max (s => s.Legend.Length);
 			} else {
-				height += 1;
+				thickness += 1;
 			}
 		}
 
-		return height;
+		return thickness;
 	}
 
 	bool TryGetPositionByOption (int option, out (int x, int y) position)
@@ -1035,7 +1024,7 @@ public class Slider<T> : View {
 			return text;
 		}
 	}
-	
+
 	void DrawSlider ()
 	{
 		// TODO: be more surgical on clear
@@ -1052,7 +1041,7 @@ public class Slider<T> : View {
 
 		var x = 0;
 		var y = 0;
-		
+
 		var isSet = _currentOptions.Count > 0;
 
 		// Left Spacing
@@ -1158,10 +1147,8 @@ public class Slider<T> : View {
 		if (_config._sliderOrientation == Orientation.Horizontal) {
 			y += 1;
 		} else { // Vertical
-			x += 2;
+			x += 1;
 		}
-
-		
 
 		for (int i = 0; i < _options.Count; i++) {
 
@@ -1210,7 +1197,7 @@ public class Slider<T> : View {
 			case Orientation.Vertical:
 				switch (_config._legendsOrientation) {
 				case Orientation.Horizontal:
-					x = 2;
+					x = 1;
 					break;
 				case Orientation.Vertical:
 					text = AlignText (text, _config._innerSpacing + 1, TextAlignment.Centered);
@@ -1319,6 +1306,10 @@ public class Slider<T> : View {
 			}
 			return position;
 		}
+
+		// TODO: Remove this once MouseEvent is fixed to account for Frames
+		mouseEvent.X += GetFramesThickness ().Left;
+		mouseEvent.Y += GetFramesThickness ().Top;
 
 		if (!_dragPosition.HasValue && (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))) {
 

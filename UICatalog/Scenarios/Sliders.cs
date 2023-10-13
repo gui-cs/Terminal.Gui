@@ -36,7 +36,8 @@ public class Sliders : Scenario {
 				Y = 0,
 				Type = SliderType.Multiple,
 				Width = Dim.Fill (),
-				AllowEmpty = true
+				AllowEmpty = true,
+				BorderStyle = LineStyle.Single
 			};
 
 			slider.Style.SetChar.Attribute = new Terminal.Gui.Attribute (Color.BrightGreen, Color.Black);
@@ -109,6 +110,7 @@ public class Sliders : Scenario {
 				X = 0,
 				Y = Pos.Bottom (slider) + 1,
 				Width = Dim.Fill (),
+				BorderStyle = LineStyle.Single
 			};
 
 			slider_orientation_slider.SetOption (0);
@@ -126,7 +128,7 @@ public class Sliders : Scenario {
 						s.AdjustBestHeight ();
 						s.Width = Dim.Percent (50);
 
-						s.Style.SpaceChar = new Cell () { Runes = { new Rune ('─') } };
+						s.Style.SpaceChar = new Cell () { Runes = { CM.Glyphs.HLine } };
 
 						if (prev == null) {
 							s.LayoutStyle = LayoutStyle.Absolute;
@@ -144,7 +146,7 @@ public class Sliders : Scenario {
 						s.AdjustBestWidth ();
 						s.Height = Dim.Fill ();
 
-						s.Style.SpaceChar = new Cell () { Runes = { new Rune ('│') } };
+						s.Style.SpaceChar = new Cell () { Runes = { CM.Glyphs.VLine } };
 
 
 						if (prev == null) {
@@ -170,6 +172,7 @@ public class Sliders : Scenario {
 				X = Pos.Center (),
 				Y = Pos.Bottom (slider_orientation_slider) + 1,
 				Width = Dim.Fill (),
+				BorderStyle = LineStyle.Single
 			};
 
 			legends_orientation_slider.SetOption (0);
@@ -183,6 +186,7 @@ public class Sliders : Scenario {
 					else if (options.ContainsKey (1))
 						s.LegendsOrientation = Orientation.Vertical;
 				}
+				Win.LayoutSubviews ();
 			};
 
 			#endregion
@@ -195,6 +199,7 @@ public class Sliders : Scenario {
 				Y = Pos.Bottom (legends_orientation_slider) + 1,
 				Type = SliderType.Single,
 				Width = Dim.Fill (),
+				BorderStyle = LineStyle.Single,
 				AllowEmpty = true
 			};
 
@@ -261,6 +266,7 @@ public class Sliders : Scenario {
 				Y = prev == null ? 0 : Pos.Bottom (prev),
 				//Y = Pos.Center (),
 				Width = Dim.Percent (50),
+				BorderStyle = LineStyle.Single,
 				Type = type,
 				LegendsOrientation = Orientation.Horizontal,
 				AllowEmpty = true,
@@ -278,19 +284,23 @@ public class Sliders : Scenario {
 			Y = prev == null ? 0 : Pos.Bottom (prev),
 			//Y = Pos.Center (),
 			Type = SliderType.Single,
-			ShowLegends = true,
+			BorderStyle = LineStyle.Single,
 			LegendsOrientation = Orientation.Horizontal,
 			Width = Dim.Percent (50),
 			AllowEmpty = false,
 			//ShowSpacing = true
 		};
-		single.Style.OptionChar = new Cell () { Runes = { CM.Glyphs.HLineDbl } };
+
+		single.LayoutStarted += (s,e) => {
+			if (single.SliderOrientation == Orientation.Horizontal) {
+				single.Style.SpaceChar = new Cell () { Runes = { CM.Glyphs.HLine } };
+				single.Style.OptionChar = new Cell () { Runes = { CM.Glyphs.HLine } };
+			} else {
+				single.Style.SpaceChar = new Cell () { Runes = { CM.Glyphs.VLine } };
+				single.Style.OptionChar = new Cell () { Runes = { CM.Glyphs.VLine } };
+			}
+		};
 		single.Style.SetChar = new Cell () { Runes = { CM.Glyphs.ContinuousMeterSegment } };
-		single.Style.EmptyChar = new Cell () { Runes = { CM.Glyphs.HLineDbl } };
-		//single.Style.RangeChar = new Cell () { Runes = { CM.Glyphs.AppleBMP } }; // ░ ▒ ▓   // Medium shade not blinking on curses.
-		//single.Style.StartRangeChar = new Cell () { Runes = { new Rune ('█') } };
-		//single.Style.EndRangeChar = new Cell () { Runes = { new Rune ('█') } };
-		single.Style.SpaceChar = new Cell () { Runes = { CM.Glyphs.HLineDbl } };
 		single.Style.DragChar = new Cell () { Runes = { CM.Glyphs.ContinuousMeterSegment } };
 
 		v.Add (single);
