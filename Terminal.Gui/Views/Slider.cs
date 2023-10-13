@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Terminal.Gui;
@@ -309,7 +310,14 @@ public class Slider<T> : View {
 		if (options == null) {
 			SetInitialProperties (header, null, orientation);
 		} else {
-			SetInitialProperties (header, options.Select (e => new SliderOption<T> { Data = e, Legend = e.ToString () }).ToList (), orientation);
+			SetInitialProperties (header, options.Select (e => {
+				var legend = e.ToString ();
+				return new SliderOption<T> {
+					Data = e,
+					Legend = legend,
+					LegendAbbr = (Rune)(legend?.Length > 0 ? legend [0] : ' '),
+				};
+			}).ToList (), orientation);
 		}
 	}
 
@@ -719,7 +727,9 @@ public class Slider<T> : View {
 		// Debug
 		// header = Bounds.Width.ToString () + "-" + Bounds.Height.ToString ();
 
-		if (_options.Count == 0) return;
+		if (_options.Count == 0) {
+			return;
+		}
 
 		if (_config._autoSize) {
 			// Best values and change width and height.
@@ -734,43 +744,55 @@ public class Slider<T> : View {
 				max_legend = 1;
 			}
 
-			var min = (size - max_legend) / (_options.Count - 1);
+			if (true) {
+				//max_legend = 1;
 
-			string first;
-			string last;
+				var min = (size - max_legend) / (_options.Count - 1);
 
-			if (max_legend >= min) {
-				if (_config._sliderOrientation == _config._legendsOrientation) {
-					_config._showLegendsAbbr = true;
+				string first;
+				string last;
+
+				if (max_legend >= min) {
+					if (_config._sliderOrientation == _config._legendsOrientation) {
+						_config._showLegendsAbbr = true;
+					}
+					first = "x";
+					last = "x";
+				} else {
+					_config._showLegendsAbbr = false;
+					first = _options.First ().Legend;
+					last = _options.Last ().Legend;
 				}
-				first = "x";
-				last = "x";
+
+				// --o--
+				// Hello
+				// Left = He
+				// Right = lo
+				var first_left = (first.Length - 1) / 2; // Chars count of the first option to the left.
+				var last_right = (last.Length) / 2;      // Chars count of the last option to the right.
+
+				if (_config._sliderOrientation != _config._legendsOrientation) {
+					first_left = 0;
+					last_right = 0;
+				}
+
+				var width = size - first_left - last_right - 1;
+
+				var c = width % (_options.Count - 1);
+
+				//_config._startSpacing = (c / 2) + first_left;
+				//_config._innerSpacing = b - 1;
+				//_config._endSpacing = (c / 2) + (c % 2) + last_right;
+
+				_config._startSpacing = first_left;
+				_config._innerSpacing = (int)Math.Floor ((double)width / (_options.Count - 1)) - 1;
+				_config._endSpacing = last_right;
+
 			} else {
-				_config._showLegendsAbbr = false;
-				first = _options.First ().Legend;
-				last = _options.Last ().Legend;
+				_config._startSpacing = 0;
+				_config._innerSpacing = 0;
+				_config._endSpacing = 0;
 			}
-
-			// --o--
-			// Hello
-			// Left = He
-			// Right = lo
-			var first_left = (first.Length - 1) / 2; // Chars count of the first option to the left.
-			var last_right = (last.Length) / 2;      // Chars count of the last option to the right.
-
-			if (_config._sliderOrientation != _config._legendsOrientation) {
-				first_left = 0;
-				last_right = 0;
-			}
-
-			var width = size - first_left - last_right - 1;
-
-			var b = width / (_options.Count - 1);
-			var c = width % (_options.Count - 1);
-
-			_config._startSpacing = (c / 2) + first_left;
-			_config._innerSpacing = b - 1;
-			_config._endSpacing = (c / 2) + (c % 2) + last_right;
 		}
 	}
 
@@ -896,28 +918,51 @@ public class Slider<T> : View {
 		return true;
 	}
 
-	bool TryGetOptionByPosition (int x, int y, int x_threshold, out int option_idx)
+	bool TryGetOptionByPosition (int x, int y, int threshold, out int option_idx)
 	{
 		// Fix(jmperricone): Not working.
 		option_idx = -1;
-
-		if (y != (_config._showHeader ? 1 : 0))
-			return false;
-
-		for (int xx = (x - x_threshold); xx < (x + x_threshold + 1); xx++) {
-			var cx = xx;
-			cx -= _config._startMargin;
-			cx -= _config._startSpacing;
-
-			var option = cx / (_config._innerSpacing + 1);
-			var valid = cx % (_config._innerSpacing + 1) == 0;
-
-			if (!valid || option < 0 || option > _options.Count - 1) {
-				continue;
+		if (SliderOrientation == Orientation.Horizontal) {
+			if (y != (_config._showHeader ? 1 : 0)) {
+				return false;
 			}
 
-			option_idx = option;
-			return true;
+			for (int xx = (x - threshold); xx < (x + threshold + 1); xx++) {
+				var cx = xx;
+				cx -= _config._startMargin;
+				cx -= _config._startSpacing;
+
+				var option = cx / (_config._innerSpacing + 1);
+				var valid = cx % (_config._innerSpacing + 1) == 0;
+
+				if (!valid || option < 0 || option > _options.Count - 1) {
+					continue;
+				}
+
+				option_idx = option;
+				return true;
+			}
+
+		} else {
+			if (x != (_config._showHeader ? 2 : 0)) {
+				return false;
+			}
+
+			for (int yy = (y - threshold); yy < (y + threshold + 1); yy++) {
+				var cy = yy;
+				cy -= _config._startMargin;
+				cy -= _config._startSpacing;
+
+				var option = cy / (_config._innerSpacing + 1);
+				var valid = cy % (_config._innerSpacing + 1) == 0;
+
+				if (!valid || option < 0 || option > _options.Count - 1) {
+					continue;
+				}
+
+				option_idx = option;
+				return true;
+			}
 		}
 
 		return false;
@@ -1092,8 +1137,8 @@ public class Slider<T> : View {
 			DrawLegends ();
 		}
 
-		if (_dragPosition.HasValue && _moveRuneRenderLocation.HasValue) {
-			AddRune (_moveRuneRenderLocation.Value.X, _moveRuneRenderLocation.Value.Y, _style.RangeChar.Runes [0]);
+		if (_dragPosition.HasValue && _moveRenderPosition.HasValue) {
+			AddRune (_moveRenderPosition.Value.X, _moveRenderPosition.Value.Y, CM.Glyphs.Diamond);
 		}
 	}
 
@@ -1182,13 +1227,6 @@ public class Slider<T> : View {
 
 		var isSet = _currentOptions.Count > 0;
 
-		// Left Margin
-		// Driver.SetAttribute (normalScheme);
-		// for (int i = 0; i < this.config.StartMargin; i++) {
-		// 	MoveAndAdd (x, y, ' ');
-		// 	if (isVertical) y++; else x++;
-		// }
-
 		// Left Spacing
 		if (_config._showSpacing && _config._startSpacing > 0) {
 
@@ -1239,7 +1277,7 @@ public class Slider<T> : View {
 				if (isVertical) y++; else x++;
 
 				// Draw Spacing
-				if (i < _options.Count - 1) { // Skip if is the Last Spacing.
+				if (_config._showSpacing || i < _options.Count - 1) { // Skip if is the Last Spacing.
 					Driver.SetAttribute (drawRange && isSet ? _style.RangeChar.Attribute ?? setScheme : _style.SpaceChar.Attribute ?? normalScheme);
 					for (int s = 0; s < _config._innerSpacing; s++) {
 						MoveAndAdd (x, y, drawRange && isSet ? _style.RangeChar.Runes [0] : _style.SpaceChar.Runes [0]);
@@ -1248,29 +1286,23 @@ public class Slider<T> : View {
 				}
 			}
 		}
-
+		
+		var remaining = isVertical ? Bounds.Height - y : Bounds.Width - x;
 		// Right Spacing
-		if (_config._showSpacing && _config._endSpacing > 0) {
+		if (_config._showSpacing) {
 			Driver.SetAttribute (isSet && _config._type == SliderType.RightRange ? _style.RangeChar.Attribute ?? normalScheme : _style.SpaceChar.Attribute ?? normalScheme);
 			var rune = isSet && _config._type == SliderType.RightRange ? _style.RangeChar.Runes [0] : _style.SpaceChar.Runes [0];
-			for (int i = 0; i < this._config._endSpacing; i++) {
+			for (int i = 0; i < remaining; i++) {
 				MoveAndAdd (x, y, rune);
 				if (isVertical) y++; else x++;
 			}
 		} else {
 			Driver.SetAttribute (_style.EmptyChar.Attribute ?? normalScheme);
-			for (int i = 0; i < this._config._endSpacing; i++) {
+			for (int i = 0; i < remaining; i++) {
 				MoveAndAdd (x, y, _style.EmptyChar.Runes [0]);
 				if (isVertical) y++; else x++;
 			}
 		}
-
-		// Right Margin
-		// Driver.SetAttribute (normalScheme);
-		// for (int i = 0; i < this.config.EndMargin; i++) {
-		// 	MoveAndAdd (x, y, ' ');
-		// 	if (isVertical) y++; else x++;
-		// }
 	}
 
 	void DrawLegends ()
@@ -1422,7 +1454,7 @@ public class Slider<T> : View {
 
 
 	Point? _dragPosition;
-	Point? _moveRuneRenderLocation;
+	Point? _moveRenderPosition;
 
 	/// <inheritdoc/>
 	public override bool MouseEvent (MouseEvent mouseEvent)
@@ -1431,53 +1463,77 @@ public class Slider<T> : View {
 		//                    That will makes OptionFocused Event more relevant.
 		// TODO(jmperricone): Make Range Type work with mouse.
 
-		if (!(mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed) ||
+		if (!(mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked) || 
+			mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed) ||
 			mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition) ||
 			mouseEvent.Flags.HasFlag (MouseFlags.Button1Released))) {
 			return false;
 		}
 
-		if (!_dragPosition.HasValue && (mouseEvent.Flags.HasFlag(MouseFlags.Button1Pressed))) {
-			var success = TryGetOptionByPosition (mouseEvent.X, mouseEvent.Y, _config._mouseClickXOptionThreshold, out var option);
-			if (success) {
-				_currentOption = option;
-				OptionFocused?.Invoke (_currentOption, _options [_currentOption]);
-				SetCurrentOption ();
+		Point ClampMovePosition (Point position)
+		{
+			int Clamp (int value, int min, int max) => Math.Max (min, Math.Min (max, value));
+
+			if (SliderOrientation == Orientation.Horizontal) {
+				var left = _config._startSpacing;
+				var width = _options.Count + (_options.Count - 1) * _config._innerSpacing;
+				var right = (left + width - 1);
+				var clampedX = Clamp (position.X, left, right);
+				position =  new Point (clampedX, _config._showHeader ? 1 : 0);
+			} else {
+				var top = _config._startSpacing;
+				var height = _options.Count + (_options.Count - 1) * _config._innerSpacing;
+				var bottom = (top + height - 1);
+				var clampedY = Clamp (position.Y, top, bottom);
+				position = new Point (_config._showHeader ? 2 : 0, clampedY);
 			}
-			if (Type != SliderType.Multiple && mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition)) {
+			return position;
+		}
+
+		//if (mouseEvent.Flags == MouseFlags.Button1Clicked) {
+		//	var success = TryGetOptionByPosition (mouseEvent.X, mouseEvent.Y, Math.Max (0, _config._innerSpacing / 2), out var option);
+		//	if (success) {
+		//		_currentOption = option;
+		//		OptionFocused?.Invoke (_currentOption, _options [_currentOption]);
+		//		SetCurrentOption ();
+		//		SetNeedsDisplay ();
+		//	}
+		//	return success;
+		//}
+
+		if (!_dragPosition.HasValue && (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))) {
+			//if (Type is SliderType.Range || Type is SliderType.LeftRange || Type is SliderType.RightRange) {
+			//	var success = TryGetOptionByPosition (mouseEvent.X, mouseEvent.Y, Math.Max (0, _config._innerSpacing / 2), out var option);
+			//	if (success) {
+			//		_currentOption = option;
+			//		OptionFocused?.Invoke (_currentOption, _options [_currentOption]);
+			//		SetCurrentOption ();
+			//	}
+			//}
+			if (mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition)) {
 				_dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
-				if (SliderOrientation == Orientation.Horizontal) {
-					_moveRuneRenderLocation = new Point (Math.Min (Bounds.Width - _config._endSpacing - 1, Math.Max (_config._startSpacing, mouseEvent.X)), _config._showHeader ? 1 : 0);
-				} else {
-					_moveRuneRenderLocation = new Point (_config._showHeader ? 2 : 0, Math.Max (1, Math.Min (Bounds.Height - 2, mouseEvent.Y)));
-				}
+				_moveRenderPosition = ClampMovePosition ((Point)_dragPosition);
 				Application.GrabMouse (this);
 			}
 			SetNeedsDisplay ();
 			return true;
 		}
 
-		if (!_dragPosition.HasValue) {
-			return false;
-
-		}
-
-		if (mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition) && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)) {
+		if (_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition) && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)) {
 
 			// Continue Drag
 			_dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
-
-			bool success = false;
-			int option = 0;
+			_moveRenderPosition = ClampMovePosition ((Point)_dragPosition);
+			
+			var success = false;
+			var option = 0;
 			// how far has user dragged from original location?						
 			if (SliderOrientation == Orientation.Horizontal) {
-				success = TryGetOptionByPosition (mouseEvent.X, _config._showHeader ? 1 : 0, 0, out option);
-				_moveRuneRenderLocation = new Point (Math.Min (Bounds.Width - _config._endSpacing - 1, Math.Max (_config._startSpacing, mouseEvent.X)), _config._showHeader ? 1 : 0);
+				success = TryGetOptionByPosition (mouseEvent.X, _config._showHeader ? 1 : 0, Math.Max (0, _config._innerSpacing / 2), out option);
 			} else {
-				success = TryGetOptionByPosition (_config._showHeader ? 2 : 0, mouseEvent.Y, 0, out option);
-				_moveRuneRenderLocation = new Point (_config._showHeader ? 2 : 0, Math.Max (1, Math.Min (Bounds.Height - 2, mouseEvent.Y)));
+				success = TryGetOptionByPosition (_config._showHeader ? 2 : 0, mouseEvent.Y, Math.Max (0, _config._innerSpacing / 2), out option);
 			}
-			if (success) {
+			if (!_config._allowEmpty && success) {
 				_currentOption = option;
 				OptionFocused?.Invoke (_currentOption, _options [_currentOption]);
 				SetCurrentOption ();
@@ -1487,24 +1543,25 @@ public class Slider<T> : View {
 			return true;
 		}
 
-		if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released)) {
+		if ((_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.Button1Released)) || mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
 
 			// End Drag
 			Application.UngrabMouse ();
 			_dragPosition = null;
-			_moveRuneRenderLocation = null;
+			_moveRenderPosition = null;
 
 			// TODO: Add func to calc distance between options to use as the MouseClickXOptionThreshold
 			var success = false;
 			var option = 0;
 			if (SliderOrientation == Orientation.Horizontal) {
-				success = TryGetOptionByPosition (mouseEvent.X, _config._showHeader ? 1 : 0, 0, out option);
+				success = TryGetOptionByPosition (mouseEvent.X, _config._showHeader ? 1 : 0, Math.Max (0, _config._innerSpacing / 2), out option);
 			} else {
-				success = TryGetOptionByPosition (_config._showHeader ? 2 : 0, mouseEvent.Y, 0, out option);
+				success = TryGetOptionByPosition (_config._showHeader ? 2 : 0, mouseEvent.Y, Math.Max (0, _config._innerSpacing / 2), out option);
 			}
 			if (success) {
 				_currentOption = option;
 				OptionFocused?.Invoke (_currentOption, _options [_currentOption]);
+				SetCurrentOption ();
 			}
 
 			SetNeedsDisplay ();

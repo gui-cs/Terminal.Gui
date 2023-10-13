@@ -37,7 +37,7 @@ public class Sliders : Scenario {
 
 		#region LeftView
 		{
-			MakeSliders (leftView, new List<object> { 500, 1000, 1500, 2000, 2500, 3000 });
+			MakeSliders (leftView, new List<object> { 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000 });
 			leftView.FocusFirst ();
 		}
 		#endregion
@@ -291,28 +291,28 @@ public class Sliders : Scenario {
 			prev = view;
 		};
 
-		options = new List<object> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39 };
+		var singleOptions = new List<object> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39 };
 		var style = new SliderStyle () {
 			OptionChar = new Cell () { Runes = { CM.Glyphs.HLineDbl } },
 			SetChar = new Cell () { Runes = { CM.Glyphs.Diamond } },
-			EmptyChar = new Cell () { Runes = { new Rune (' ') } },
-			RangeChar = new Cell () { Runes = { CM.Glyphs.Diamond } }, // ░ ▒ ▓   // Medium shade not blinking on curses.
+			EmptyChar = new Cell () { Runes = { CM.Glyphs.ContinuousMeterSegment } },
+			RangeChar = new Cell () { Runes = { CM.Glyphs.AppleBMP } }, // ░ ▒ ▓   // Medium shade not blinking on curses.
 			StartRangeChar = new Cell () { Runes = { new Rune ('█') } },
 			EndRangeChar = new Cell () { Runes = { new Rune ('█') } },
-			SpaceChar = new Cell () { Runes = { new Rune (' ') } },
-		
+			SpaceChar = new Cell () { Runes = { CM.Glyphs.UnChecked } },
 		};
-		var single = new Slider ("Actual slider", options, Orientation.Horizontal) {
+		var single = new Slider ("Actual slider", singleOptions, Orientation.Horizontal) {
 			X = Pos.Center (),
 			//X = Pos.Right (view) + 1,
 			Y = prev == null ? 0 : Pos.Bottom (prev) + 1,
 			//Y = Pos.Center (),
 			Type = SliderType.Single,
-			ShowLegends = false,
+			ShowLegends = true,
 			LegendsOrientation = Orientation.Horizontal,
 			Width = Dim.Fill (),
 			AllowEmpty = false,
-			Style = style,
+			//Style = style,
+			//ShowSpacing = true
 		};
 		v.Add (single);
 	}
