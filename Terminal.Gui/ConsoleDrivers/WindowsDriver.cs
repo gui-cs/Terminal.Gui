@@ -67,7 +67,7 @@ internal class WindowsConsole {
 			foreach (ExtendedCharInfo info in charInfoBuffer) {
 				ci [i++] = new CharInfo () {
 					Char = new CharUnion () { UnicodeChar = info.Char },
-					Attributes = (ushort)info.Attribute.Value
+					Attributes = (ushort)(((int)info.Attribute.Foreground.ColorName) | ((int)info.Attribute.Background.ColorName << 4))
 				};
 			}
 
@@ -85,8 +85,8 @@ internal class WindowsConsole {
 
 				if (attr != prev) {
 					prev = attr;
-					_stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.TrueColorForeground.Value.Red, attr.TrueColorForeground.Value.Green, attr.TrueColorForeground.Value.Blue));
-					_stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.TrueColorBackground.Value.Red, attr.TrueColorBackground.Value.Green, attr.TrueColorBackground.Value.Blue));
+					_stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.Foreground.R, attr.Foreground.G, attr.Foreground.B));
+					_stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.Background.R, attr.Background.G, attr.Background.B));
 				}
 
 				if (info.Char != '\x1b') {
@@ -1542,8 +1542,7 @@ internal class WindowsDriver : ConsoleDriver {
 			WinConsole = null;
 		}
 
-		CurrentAttribute = MakeColor (Color.White, Color.Black);
-		InitializeColorSchemes ();
+		CurrentAttribute = new Attribute (Color.White, Color.Black);
 
 		_outputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
 		Clip = new Rect (0, 0, Cols, Rows);
@@ -1649,21 +1648,10 @@ internal class WindowsDriver : ConsoleDriver {
 	{
 		// Encode the colors into the int value.
 		return new Attribute (
-		    value: (((int)foreground) | ((int)background << 4)),
-		    foreground: foreground,
-		    background: background
+			platformColor: 0, // Not used anymore! (((int)foreground.ColorName) | ((int)background.ColorName << 4)),
+			foreground: foreground,
+			background: background
 		);
-	}
-
-	/// <summary>
-	/// Extracts the foreground and background colors from the encoded value.
-	/// Assumes a 4-bit encoded value for both foreground and background colors.
-	/// </summary>
-	internal override void GetColors (int value, out Color foreground, out Color background)
-	{
-		// Assume a 4-bit encoded value for both foreground and background colors.
-		foreground = (Color)((value >> 16) & 0xF);
-		background = (Color)(value & 0xF);
 	}
 
 	#endregion
@@ -1954,7 +1942,7 @@ internal class WindowsMainLoop : IMainLoopDriver {
 #if HACK_CHECK_WINCHANGED
 		_winChange?.Dispose ();
 #endif
-		_waitForProbe?.Dispose ();
+		//_waitForProbe?.Dispose ();
 
 		_mainLoop = null;
 	}

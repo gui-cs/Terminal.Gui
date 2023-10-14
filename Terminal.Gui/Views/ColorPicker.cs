@@ -32,6 +32,7 @@ namespace Terminal.Gui {
 	public class ColorPicker : View {
 		private int _selectColorIndex = (int)Color.Black;
 
+
 		/// <summary>
 		/// Columns of color boxes
 		/// </summary>
@@ -50,7 +51,7 @@ namespace Terminal.Gui {
 			set {
 				if (_boxWidth != value) {
 					_boxWidth = value;
-					SetNeedsLayout ();
+					Bounds = new Rect (Bounds.Location, new Size (_cols * BoxWidth, _rows * BoxHeight));
 				}
 			}
 		}
@@ -64,7 +65,7 @@ namespace Terminal.Gui {
 			set {
 				if (_boxHeight != value) {
 					_boxHeight = value;
-					SetNeedsLayout ();
+					Bounds = new Rect (Bounds.Location, new Size (_cols * BoxWidth, _rows * BoxHeight));
 				}
 			}
 		}
@@ -80,7 +81,7 @@ namespace Terminal.Gui {
 
 			set {
 				var colorIndex = value.Y * _cols + value.X;
-				SelectedColor = (Color)colorIndex;
+				SelectedColor = (ColorName)colorIndex;
 			}
 		}
 
@@ -92,17 +93,17 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Selected color.
 		/// </summary>
-		public Color SelectedColor {
+		public ColorName SelectedColor {
 			get {
-				return (Color)_selectColorIndex;
+				return (ColorName)_selectColorIndex;
 			}
 
 			set {
-				Color prev = (Color)_selectColorIndex;
+				ColorName prev = (ColorName)_selectColorIndex;
 				_selectColorIndex = (int)value;
 				ColorChanged?.Invoke (this, new ColorEventArgs () {
-					PreviousColor = prev,
-					Color = value,
+					PreviousColor = new Color (prev),
+					Color = new Color (value),
 				});
 				SetNeedsDisplay ();
 			}
@@ -159,7 +160,7 @@ namespace Terminal.Gui {
 			for (var y = 0; y < (Bounds.Height / BoxHeight); y++) {
 				for (var x = 0; x < (Bounds.Width / BoxWidth); x++) {
 					var foregroundColorIndex = y == 0 ? colorIndex + _cols : colorIndex - _cols;
-					Driver.SetAttribute (Driver.MakeAttribute ((Color)foregroundColorIndex, (Color)colorIndex));
+					Driver.SetAttribute (new Attribute ((ColorName)foregroundColorIndex, (ColorName)colorIndex));
 					var selected = x == Cursor.X && y == Cursor.Y;
 					DrawColorBox (x, y, selected);
 					colorIndex++;
@@ -267,6 +268,11 @@ namespace Terminal.Gui {
 			}
 
 			SetFocus ();
+			if (me.X < GetFramesThickness ().Left || me.Y < GetFramesThickness ().Top || me.X > Bounds.Width || me.Y > Bounds.Height) {
+				return true;
+			}
+			//var x = Math.Max (GetFramesThickness().Left, me.X);
+			//var y = Math.Max (GetFramesThickness ().Top, me.Y);
 			Cursor = new Point ((me.X - GetFramesThickness ().Left) / _boxWidth, (me.Y - GetFramesThickness ().Top) / _boxHeight);
 
 			return true;

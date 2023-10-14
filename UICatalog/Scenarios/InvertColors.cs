@@ -13,12 +13,12 @@ namespace UICatalog.Scenarios {
 			Win.ColorScheme = Colors.TopLevel;
 
 			List<Label> labels = new List<Label> ();
-			var foreColors = Enum.GetValues (typeof (Color)).Cast<Color> ().ToArray ();
+			var foreColors = Enum.GetValues (typeof (ColorName)).Cast<ColorName> ().ToArray ();
 			for (int y = 0; y < foreColors.Length; y++) {
 
 				var fore = foreColors [y];
 				var back = foreColors [(y + 1) % foreColors.Length];
-				var color = Application.Driver.MakeAttribute (fore, back);
+				var color = new Attribute (fore, back);
 
 				var label = new Label ($"{fore} on {back}") {
 					ColorScheme = new ColorScheme (),
@@ -37,7 +37,7 @@ namespace UICatalog.Scenarios {
 
 				foreach (var label in labels) {
 					var color = label.ColorScheme.Normal;
-					color = Application.Driver.MakeAttribute (color.Background, color.Foreground);
+					color = new Attribute (color.Background, color.Foreground);
 
 					label.ColorScheme.Normal = color;
 					label.Text = $"{color.Foreground} on {color.Background}";

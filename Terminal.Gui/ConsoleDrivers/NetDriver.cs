@@ -152,7 +152,7 @@ internal class NetEvents : IDisposable {
 			} finally {
 				_inputReady.Reset ();
 			}
-			
+
 #if PROCESS_REQUEST
 				_neededProcessRequest = false;
 #endif
@@ -184,7 +184,7 @@ internal class NetEvents : IDisposable {
 	void ProcessInputQueue ()
 	{
 		while (!_inputReadyCancellationTokenSource.Token.IsCancellationRequested) {
-	
+
 			_waitForStart.Wait (_inputReadyCancellationTokenSource.Token);
 			_waitForStart.Reset ();
 
@@ -695,8 +695,7 @@ internal class NetDriver : ConsoleDriver {
 
 		ResizeScreen ();
 		ClearContents ();
-		CurrentAttribute = MakeColor (Color.White, Color.Black);
-		InitializeColorSchemes ();
+		CurrentAttribute = new Attribute (Color.White, Color.Black);
 
 		StartReportingMouseMoves ();
 	}
@@ -793,10 +792,10 @@ internal class NetDriver : ConsoleDriver {
 
 						if (Force16Colors) {
 							output.Append (EscSeqUtils.CSI_SetGraphicsRendition (
-								MapColors ((ConsoleColor)attr.Background, false), MapColors ((ConsoleColor)attr.Foreground, true)));
+								MapColors ((ConsoleColor)attr.Background.ColorName, false), MapColors ((ConsoleColor)attr.Foreground.ColorName, true)));
 						} else {
-							output.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.TrueColorForeground.Value.Red, attr.TrueColorForeground.Value.Green, attr.TrueColorForeground.Value.Blue));
-							output.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.TrueColorBackground.Value.Red, attr.TrueColorBackground.Value.Green, attr.TrueColorBackground.Value.Blue));
+							output.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.Foreground.R, attr.Foreground.G, attr.Foreground.B));
+							output.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.Background.R, attr.Background.G, attr.Background.B));
 						}
 
 					}
@@ -862,33 +861,20 @@ internal class NetDriver : ConsoleDriver {
 		return colorMap.TryGetValue (color, out var colorValue) ? colorValue + (isForeground ? 0 : 10) : 0;
 	}
 
-	/// <remarks>
-	/// In the NetDriver, colors are encoded as an int. 
-	/// Extracts the foreground and background colors from the encoded value.
-	/// Assumes a 4-bit encoded value for both foreground and background colors.
-	/// </remarks>
-	internal override void GetColors (int value, out Color foreground, out Color background)
-	{
-		// Assume a 4-bit encoded value for both foreground and background colors.
-		foreground = (Color)((value >> 16) & 0xF);
-		background = (Color)(value & 0xF);
-	}
-
-	/// <remarks>
-	/// In the NetDriver, colors are encoded as an int. 
-	/// However, the foreground color is stored in the most significant 16 bits, 
-	/// and the background color is stored in the least significant 16 bits.
-	/// </remarks>
-	public override Attribute MakeColor (Color foreground, Color background)
-	{
-		// Encode the colors into the int value.
-		return new Attribute (
-		    value: ((((int)foreground) & 0xffff) << 16) | (((int)background) & 0xffff),
-		    foreground: foreground,
-		    background: background
-		);
-	}
-
+	///// <remarks>
+	///// In the NetDriver, colors are encoded as an int. 
+	///// However, the foreground color is stored in the most significant 16 bits, 
+	///// and the background color is stored in the least significant 16 bits.
+	///// </remarks>
+	//public override Attribute MakeColor (Color foreground, Color background)
+	//{
+	//	// Encode the colors into the int value.
+	//	return new Attribute (
+	//		platformColor: ((((int)foreground.ColorName) & 0xffff) << 16) | (((int)background.ColorName) & 0xffff),
+	//		foreground: foreground,
+	//		background: background
+	//	);
+	//}
 	#endregion
 
 	#region Cursor Handling
@@ -1418,14 +1404,14 @@ internal class NetMainLoop : IMainLoopDriver {
 			ProcessInput?.Invoke (_resultQueue.Dequeue ().Value);
 		}
 	}
-	
+
 	void IMainLoopDriver.TearDown ()
 	{
 		_inputHandlerTokenSource?.Cancel ();
 		_inputHandlerTokenSource?.Dispose ();
 		_eventReadyTokenSource?.Cancel ();
 		_eventReadyTokenSource?.Dispose ();
-		
+
 		_eventReady?.Dispose ();
 
 		_resultQueue?.Clear ();

@@ -1,4 +1,5 @@
 global using CM = Terminal.Gui.ConfigurationManager;
+global using Attribute = Terminal.Gui.Attribute;
 
 using System;
 using System.Collections.Generic;
@@ -50,9 +51,6 @@ namespace UICatalog {
 	/// </para>	
 	/// </remarks>
 	class UICatalogApp {
-		//[SerializableConfigurationProperty (Scope = typeof (AppScope), OmitClassName = true), JsonPropertyName ("UICatalog.StatusBar")]
-		//public static bool ShowStatusBar { get; set; } = true;
-
 		[SerializableConfigurationProperty (Scope = typeof (AppScope), OmitClassName = true), JsonPropertyName ("UICatalog.StatusBar")]
 		public static bool ShowStatusBar { get; set; } = true;
 
@@ -185,7 +183,7 @@ namespace UICatalog {
 			}
 
 			// TODO: This is a hack. Figure out how to ensure that the file is fully written before reading it.
-			Thread.Sleep (500);
+			//Thread.Sleep (500);
 			CM.Load ();
 			CM.Apply ();
 		}
@@ -483,8 +481,6 @@ namespace UICatalog {
 				List<MenuItem []> menuItems = new List<MenuItem []> {
 					CreateDiagnosticFlagsMenuItems (),
 					new MenuItem [] { null! },
-					CreateForce16ColorItems (),
-					new MenuItem [] { null! },
 					CreateDisabledEnabledMouseItems (),
 					CreateDisabledEnabledMenuBorder (),
 					CreateDisabledEnableUseSubMenusSingleFrame (),
@@ -534,12 +530,14 @@ namespace UICatalog {
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
 				miForce16Colors = new MenuItem {
-					Title = "Force 16 _Colors"
+					Title = "Force 16 _Colors",
+					Checked = Application.Force16Colors,
+					CanExecute = () => (bool)Application.Driver.SupportsTrueColor
 				};
 				miForce16Colors.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miForce16Colors!.Title!.Substring (10, 1) [0];
 				miForce16Colors.CheckType |= MenuItemCheckStyle.Checked;
 				miForce16Colors.Action += () => {
-					miForce16Colors.Checked = Application.Driver.Force16Colors = (bool)!miForce16Colors.Checked!;
+					miForce16Colors.Checked = Application.Force16Colors = (bool)!miForce16Colors.Checked!;
 					Application.Refresh ();
 				};
 				menuItems.Add (miForce16Colors);
@@ -678,7 +676,9 @@ namespace UICatalog {
 
 			public MenuItem []? CreateThemeMenuItems ()
 			{
-				List<MenuItem> menuItems = new List<MenuItem> ();
+				var menuItems = CreateForce16ColorItems ().ToList();
+				menuItems.Add (null!);
+
 				foreach (var theme in CM.Themes!) {
 					var item = new MenuItem {
 						Title = theme.Key,
@@ -721,6 +721,8 @@ namespace UICatalog {
 
 			public void ConfigChanged ()
 			{
+				miForce16Colors!.Checked = Application.Force16Colors;
+
 				if (_topLevelColorScheme == null || !Colors.ColorSchemes.ContainsKey (_topLevelColorScheme)) {
 					_topLevelColorScheme = "Base";
 				}
@@ -728,7 +730,7 @@ namespace UICatalog {
 				_themeMenuItems = ((UICatalogTopLevel)Application.Top).CreateThemeMenuItems ();
 				_themeMenuBarItem!.Children = _themeMenuItems;
 				foreach (var mi in _themeMenuItems!) {
-					if (mi != null && mi.Parent == null) {
+					if (mi is { Parent: null }) {
 						mi.Parent = _themeMenuBarItem;
 					}
 				}

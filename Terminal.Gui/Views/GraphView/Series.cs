@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 
 namespace Terminal.Gui {
+#nullable enable
 	/// <summary>
 	/// Describes a series of data that can be rendered into a <see cref="GraphView"/>>
 	/// </summary>
@@ -83,7 +84,7 @@ namespace Terminal.Gui {
 		/// <param name="barsEvery">How far appart to put each category (in graph space)</param>
 		/// <param name="spacing">How much spacing between bars in a category (should be less than <paramref name="barsEvery"/>/<paramref name="numberOfBarsPerCategory"/>)</param>
 		/// <param name="colors">Array of colors that define bar color in each category.  Length must match <paramref name="numberOfBarsPerCategory"/></param>
-		public MultiBarSeries (int numberOfBarsPerCategory, float barsEvery, float spacing, Attribute [] colors = null)
+		public MultiBarSeries (int numberOfBarsPerCategory, float barsEvery, float spacing, Attribute []? colors = null)
 		{
 			subSeries = new BarSeries [numberOfBarsPerCategory];
 

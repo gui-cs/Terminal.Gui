@@ -307,7 +307,7 @@ partial class TestHelpers {
 				var match = expectedColors.Where (e => e == val).ToList ();
 				switch (match.Count) {
 				case 0:
-					throw new Exception ($"Unexpected color {val} was used at row {r} and col {c} (indexes start at 0).  Color value was {val} (expected colors were {string.Join (",", expectedColors.Select (c => c.Value.ToString ()))})");
+					throw new Exception ($"Unexpected color {val} was used at row {r} and col {c} (indexes start at 0).  Color value was {val} (expected colors were {string.Join (",", expectedColors.Select (c => c.PlatformColor.ToString ()))})");
 				case > 1:
 					throw new ArgumentException ($"Bad value for expectedColors, {match.Count} Attributes had the same Value");
 				}
@@ -315,7 +315,7 @@ partial class TestHelpers {
 				var colorUsed = Array.IndexOf (expectedColors, match [0]).ToString () [0];
 				var userExpected = line [c];
 
-				if (colorUsed != userExpected) throw new Exception ($"Colors used did not match expected at row {r} and col {c} (indexes start at 0).  Color index used was {colorUsed} ({val}) but test expected {userExpected} ({expectedColors [int.Parse (userExpected.ToString ())].Value}) (these are indexes into the expectedColors array)");
+				if (colorUsed != userExpected) throw new Exception ($"Colors used did not match expected at row {r} and col {c} (indexes start at 0).  Color index used was {colorUsed} ({val}) but test expected {userExpected} ({expectedColors [int.Parse (userExpected.ToString ())].PlatformColor}) (these are indexes into the expectedColors array)");
 			}
 
 			r++;

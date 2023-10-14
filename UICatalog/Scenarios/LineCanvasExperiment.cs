@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "LineCanvas Experiments", Description: "Experiments with LineCanvas")]
-	[ScenarioCategory ("LineCanvas")]
+	[ScenarioCategory ("Drawing"), ScenarioCategory ("Borders"), ScenarioCategory ("Proof of Concept")]
 	public class LineCanvasExperiment : Scenario {
 
 		public override void Init ()

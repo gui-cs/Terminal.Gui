@@ -2,19 +2,12 @@
 // FakeDriver.cs: A fake ConsoleDriver for unit tests. 
 //
 using System;
-using System.Buffers;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Text;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
-using Unix.Terminal;
-using static Terminal.Gui.WindowsConsole;
-using System.Drawing;
 
 namespace Terminal.Gui;
 /// <summary>
@@ -69,7 +62,7 @@ public class FakeDriver : ConsoleDriver {
 		FakeConsole.ResetColor ();
 		FakeConsole.Clear ();
 	}
-	
+
 	public override void Init (Action terminalResized)
 	{
 		FakeConsole.MockKeyPresses.Clear ();
@@ -80,9 +73,7 @@ public class FakeDriver : ConsoleDriver {
 		Rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
 		FakeConsole.Clear ();
 		ResizeScreen ();
-		// Call InitializeColorSchemes before UpdateOffScreen as it references Colors
-		CurrentAttribute = MakeColor (Color.White, Color.Black);
-		InitializeColorSchemes ();
+		CurrentAttribute = new Attribute (Color.White, Color.Black);
 		ClearContents ();
 	}
 
@@ -134,8 +125,8 @@ public class FakeDriver : ConsoleDriver {
 					// Performance: Only send the escape sequence if the attribute has changed.
 					if (attr != redrawAttr) {
 						redrawAttr = attr;
-						FakeConsole.ForegroundColor = (ConsoleColor)attr.Foreground;
-						FakeConsole.BackgroundColor = (ConsoleColor)attr.Background;
+						FakeConsole.ForegroundColor = (ConsoleColor)attr.Foreground.ColorName;
+						FakeConsole.BackgroundColor = (ConsoleColor)attr.Background.ColorName;
 					}
 					outputWidth++;
 					var rune = (Rune)Contents [row, col].Runes [0];
@@ -168,7 +159,7 @@ public class FakeDriver : ConsoleDriver {
 			foreach (var c in output.ToString ()) {
 				FakeConsole.Write (c);
 			}
-			
+
 			output.Clear ();
 			lastCol += outputWidth;
 			outputWidth = 0;
@@ -187,47 +178,20 @@ public class FakeDriver : ConsoleDriver {
 
 	#region Color Handling
 
-	// Cache the list of ConsoleColor values.
-	private static readonly HashSet<int> ConsoleColorValues = new HashSet<int> (
-		Enum.GetValues (typeof (ConsoleColor)).OfType<ConsoleColor> ().Select (c => (int)c)
-	);
-
-	void SetColor (int color)
-	{
-		if (ConsoleColorValues.Contains (color & 0xffff)) {
-			FakeConsole.BackgroundColor = (ConsoleColor)(color & 0xffff);
-		}
-		if (ConsoleColorValues.Contains ((color >> 16) & 0xffff)) {
-			FakeConsole.ForegroundColor = (ConsoleColor)((color >> 16) & 0xffff);
-		}
-	}
-
-	/// <remarks>
-	/// In the FakeDriver, colors are encoded as an int; same as NetDriver
-	/// Extracts the foreground and background colors from the encoded value.
-	/// Assumes a 4-bit encoded value for both foreground and background colors.
-	/// </remarks>
-	internal override void GetColors (int value, out Color foreground, out Color background)
-	{
-		// Assume a 4-bit encoded value for both foreground and background colors.
-		foreground = (Color)((value >> 16) & 0xF);
-		background = (Color)(value & 0xF);
-	}
-
-	/// <remarks>
-	/// In the FakeDriver, colors are encoded as an int; same as NetDriver
-	/// However, the foreground color is stored in the most significant 16 bits, 
-	/// and the background color is stored in the least significant 16 bits.
-	/// </remarks>
-	public override Attribute MakeColor (Color foreground, Color background)
-	{
-		// Encode the colors into the int value.
-		return new Attribute (
-			value: ((((int)foreground) & 0xffff) << 16) | (((int)background) & 0xffff),
-			foreground: foreground,
-			background: background
-		);
-	}
+	///// <remarks>
+	///// In the FakeDriver, colors are encoded as an int; same as NetDriver
+	///// However, the foreground color is stored in the most significant 16 bits, 
+	///// and the background color is stored in the least significant 16 bits.
+	///// </remarks>
+	//public override Attribute MakeColor (Color foreground, Color background)
+	//{
+	//	// Encode the colors into the int value.
+	//	return new Attribute (
+	//		platformColor: 0,//((((int)foreground.ColorName) & 0xffff) << 16) | (((int)background.ColorName) & 0xffff),
+	//		foreground: foreground,
+	//		background: background
+	//	);
+	//}
 
 	#endregion
 

@@ -11,6 +11,8 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using static Terminal.Gui.SpinnerStyle;
+
 
 #nullable enable
 
@@ -311,11 +313,24 @@ public static partial class ConfigurationManager {
 	/// </summary>
 	public static void Apply ()
 	{
-		bool settings = Settings?.Apply () ?? false;
-		bool themes = !string.IsNullOrEmpty (ThemeManager.SelectedTheme) && (ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false);
-		bool appsettings = AppSettings?.Apply () ?? false;
-		if (settings || themes || appsettings) {
-			OnApplied ();
+		var settings = false;
+		var themes = false;
+		var appSettings = false;
+		try {
+			settings = Settings?.Apply () ?? false;
+			themes = !string.IsNullOrEmpty (ThemeManager.SelectedTheme) && (ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false);
+			appSettings = AppSettings?.Apply () ?? false;
+
+		} catch (JsonException e) {
+			if (ThrowOnJsonErrors ?? false) {
+				throw;
+			} else {
+				AddJsonError ($"Error applying Configuration Change: {e.Message}");
+			}
+		} finally {
+			if (settings || themes || appSettings) {
+				OnApplied ();
+			}
 		}
 	}
 
@@ -465,6 +480,9 @@ public static partial class ConfigurationManager {
 		// Dictionary
 		if (source.GetType ().IsGenericType && source.GetType ().GetGenericTypeDefinition ().IsAssignableFrom (typeof (Dictionary<,>))) {
 			foreach (var srcKey in ((IDictionary)source).Keys) {
+				if (srcKey is string) {
+
+				}
 				if (((IDictionary)destination).Contains (srcKey))
 					((IDictionary)destination) [srcKey] = DeepMemberwiseCopy (((IDictionary)source) [srcKey], ((IDictionary)destination) [srcKey]);
 				else {

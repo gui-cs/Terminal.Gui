@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Terminal.Gui;
-
 using Color = Terminal.Gui.Color;
 
 namespace UICatalog.Scenarios {
 
 	[ScenarioMetadata (Name: "Graph View", Description: "Demos the GraphView control.")]
 	[ScenarioCategory ("Controls")]
+	[ScenarioCategory ("Drawing")]
 	public class GraphViewExample : Scenario {
 
 		GraphView graphView;
@@ -96,11 +96,11 @@ namespace UICatalog.Scenarios {
 
 			about.Text = "Housing Expenditures by income thirds 1996-2003";
 
-			var fore = graphView.ColorScheme.Normal.Foreground == Color.Black ? Color.White : graphView.ColorScheme.Normal.Foreground;
-			var black = Application.Driver.MakeAttribute (fore, Color.Black);
-			var cyan = Application.Driver.MakeAttribute (Color.BrightCyan, Color.Black);
-			var magenta = Application.Driver.MakeAttribute (Color.BrightMagenta, Color.Black);
-			var red = Application.Driver.MakeAttribute (Color.BrightRed, Color.Black);
+			var fore = graphView.ColorScheme.Normal.Foreground == new Color(ColorName.Black) ? new Color(ColorName.White) : graphView.ColorScheme.Normal.Foreground;
+			var black = new Attribute (fore, Color.Black);
+			var cyan = new Attribute (Color.BrightCyan, Color.Black);
+			var magenta = new Attribute (Color.BrightMagenta, Color.Black);
+			var red = new Attribute (Color.BrightRed, Color.Black);
 
 			graphView.GraphColor = black;
 
@@ -146,10 +146,10 @@ namespace UICatalog.Scenarios {
 
 			about.Text = "This graph shows random points";
 
-			var black = Application.Driver.MakeAttribute (graphView.ColorScheme.Normal.Foreground, Color.Black);
-			var cyan = Application.Driver.MakeAttribute (Color.BrightCyan, Color.Black);
-			var magenta = Application.Driver.MakeAttribute (Color.BrightMagenta, Color.Black);
-			var red = Application.Driver.MakeAttribute (Color.BrightRed, Color.Black);
+			var black = new Attribute (graphView.ColorScheme.Normal.Foreground, Color.Black);
+			var cyan = new Attribute (Color.BrightCyan, Color.Black);
+			var magenta = new Attribute (Color.BrightMagenta, Color.Black);
+			var red = new Attribute (Color.BrightRed, Color.Black);
 
 			graphView.GraphColor = black;
 
@@ -520,11 +520,11 @@ namespace UICatalog.Scenarios {
 			public DiscoBarSeries ()
 			{
 
-				green = Application.Driver.MakeAttribute (Color.BrightGreen, Color.Black);
-				brightgreen = Application.Driver.MakeAttribute (Color.Green, Color.Black);
-				brightyellow = Application.Driver.MakeAttribute (Color.BrightYellow, Color.Black);
-				red = Application.Driver.MakeAttribute (Color.Red, Color.Black);
-				brightred = Application.Driver.MakeAttribute (Color.BrightRed, Color.Black);
+				green = new Attribute (Color.BrightGreen, Color.Black);
+				brightgreen = new Attribute (Color.Green, Color.Black);
+				brightyellow = new Attribute (Color.BrightYellow, Color.Black);
+				red = new Attribute (Color.Red, Color.Black);
+				brightred = new Attribute (Color.BrightRed, Color.Black);
 			}
 			protected override void DrawBarLine (GraphView graph, Terminal.Gui.Point start, Terminal.Gui.Point end, BarSeriesBar beingDrawn)
 			{
@@ -558,7 +558,7 @@ namespace UICatalog.Scenarios {
 
 			about.Text = "This graph shows a graphic equaliser for an imaginary song";
 
-			graphView.GraphColor = Application.Driver.MakeAttribute (Color.White, Color.Black);
+			graphView.GraphColor = new Attribute (Color.White, Color.Black);
 
 			var stiple = new GraphCellToRender ((Rune)'\u2593');
 

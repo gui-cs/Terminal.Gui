@@ -687,7 +687,7 @@ namespace Terminal.Gui {
 
 				if (render.Length > 0) {
 					// invert the color of the current cell for the first character
-					Driver.SetAttribute (Driver.MakeAttribute (cellColor.Background, cellColor.Foreground));
+					Driver.SetAttribute (new Attribute (cellColor.Background, cellColor.Foreground));
 					Driver.AddRune ((Rune)render [0]);
 
 					if (render.Length > 1) {

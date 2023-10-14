@@ -365,21 +365,19 @@ public abstract class ConsoleDriver {
 	/// </summary>
 	public virtual bool SupportsTrueColor { get => true; }
 
-	bool _force16Colors = false;
-
-	// TODO: Make this a ConfiguationManager setting on Application
 	/// <summary>
-	/// Gets or sets whether the <see cref="ConsoleDriver"/> should use 16 colors instead of the default TrueColors.
+	/// Gets or sets whether the <see cref="ConsoleDriver"/> should use 16 colors instead of the default TrueColors. See <see cref="Application.Force16Colors"/>
+	/// to change this setting via <see cref="ConfigurationManager"/>.
 	/// </summary>
 	/// <remarks>
+	/// <para>
 	/// Will be forced to <see langword="true"/> if <see cref="ConsoleDriver.SupportsTrueColor"/> is  <see langword="false"/>, indicating
 	/// that the <see cref="ConsoleDriver"/> cannot support TrueColor.
+	/// </para>
 	/// </remarks>
-	public virtual bool Force16Colors {
-		get => _force16Colors || !SupportsTrueColor;
-		set {
-			_force16Colors = (value || !SupportsTrueColor);
-		}
+	internal virtual bool Force16Colors {
+		get => Application.Force16Colors || !SupportsTrueColor;
+		set => Application.Force16Colors = (value || !SupportsTrueColor);
 	}
 
 	Attribute _currentAttribute;
@@ -390,11 +388,10 @@ public abstract class ConsoleDriver {
 	public Attribute CurrentAttribute {
 		get => _currentAttribute;
 		set {
-			if (value is { Initialized: false, HasValidColors: true } && Application.Driver != null) {
-				_currentAttribute = Application.Driver.MakeAttribute (value.Foreground, value.Background);
+			if (Application.Driver != null) {
+				_currentAttribute = new Attribute (value.Foreground, value.Background);
 				return;
 			}
-			if (!value.Initialized) Debug.WriteLine ("ConsoleDriver.CurrentAttribute: Attributes must be initialized before use.");
 
 			_currentAttribute = value;
 		}
@@ -426,38 +423,27 @@ public abstract class ConsoleDriver {
 	}
 
 	/// <summary>
-	/// Gets the foreground and background colors based on a platform-dependent color value.
-	/// </summary>
-	/// <param name="value">The platform-dependent color value.</param>
-	/// <param name="foreground">The foreground.</param>
-	/// <param name="background">The background.</param>
-	internal abstract void GetColors (int value, out Color foreground, out Color background);
-
-	/// <summary>
 	/// Gets the current <see cref="Attribute"/>.
 	/// </summary>
 	/// <returns>The current attribute.</returns>
 	public Attribute GetAttribute () => CurrentAttribute;
-
+	
 	/// <summary>
 	/// Makes an <see cref="Attribute"/>.
 	/// </summary>
 	/// <param name="foreground">The foreground color.</param>
 	/// <param name="background">The background color.</param>
 	/// <returns>The attribute for the foreground and background colors.</returns>
-	public abstract Attribute MakeColor (Color foreground, Color background);
-
-	/// <summary>
-	/// Ensures all <see cref="Attribute"/>s in <see cref="Colors.ColorSchemes"/> are correctly 
-	/// initialized by the driver.
-	/// </summary>
-	public void InitializeColorSchemes ()
+	public virtual Attribute MakeColor (Color foreground, Color background)
 	{
-		// Ensure all Attributes are initialized by the driver
-		foreach (var s in Colors.ColorSchemes) {
-			s.Value.Initialize ();
-		}
+		// Encode the colors into the int value.
+		return new Attribute (
+			platformColor: 0, // only used by cursesdriver!
+			foreground: foreground,
+			background: background
+		);
 	}
+
 
 	#endregion
 
