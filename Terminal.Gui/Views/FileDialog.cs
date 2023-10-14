@@ -177,7 +177,7 @@ namespace Terminal.Gui {
 
 			this.tbPath = new TextField {
 				Width = Dim.Fill (0),
-				CaptionColor = (Color)Color.Black
+				CaptionColor = new Color (Color.Black)
 			};
 			this.tbPath.KeyPress += (s, k) => {
 
@@ -273,7 +273,7 @@ namespace Terminal.Gui {
 
 			tbFind = new TextField {
 				X = Pos.Right (this.btnToggleSplitterCollapse) + 1,
-				CaptionColor = (Color)Color.Black,
+				CaptionColor = new Color (Color.Black),
 				Width = 30,
 				Y = Pos.AnchorEnd (1),
 			};
@@ -1197,8 +1197,8 @@ namespace Terminal.Gui {
 			}
 
 
-			var color = Style.ColorProvider.GetColor (stats.FileSystemInfo) ?? (Color)Color.White;
-			var black = (Color)Color.Black;
+			var color = Style.ColorProvider.GetColor (stats.FileSystemInfo) ?? new Color (Color.White);
+			var black = new Color (Color.Black);
 
 			// TODO: Add some kind of cache for this
 			return new ColorScheme {

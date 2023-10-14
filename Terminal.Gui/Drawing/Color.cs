@@ -283,6 +283,7 @@ public class Color : IEquatable<Color> {
 
 	/// <summary>
 	/// Gets or sets the <see cref="Color"/> using a legacy 16-color <see cref="Gui.ColorName"/> value.
+	/// <see langword="get"/> will return the closest 16 color match to the true color when no exact value is found.
 	/// </summary>
 	/// <remarks>
 	/// Get returns the <see cref="ColorName"/> of the closest 24-bit color value. Set sets the RGB value using a hard-coded map.
@@ -301,7 +302,6 @@ public class Color : IEquatable<Color> {
 
 	#region Legacy Color Names
 	/// <summary>
-	/// 
 	/// The black color.
 	/// </summary>
 	public const ColorName Black = ColorName.Black;
@@ -694,7 +694,7 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	/// <param name="platformColor">platform-dependent color value.</param>
 	/// <param name="foreground">Foreground</param>
 	/// <param name="background">Background</param>
-	internal Attribute (int platformColor, ColorName foreground, ColorName background) : this (platformColor, (Color)foreground, (Color)background) { }
+	internal Attribute (int platformColor, ColorName foreground, ColorName background) : this (platformColor, new Color (foreground), new Color (background)) { }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="Attribute"/> struct.

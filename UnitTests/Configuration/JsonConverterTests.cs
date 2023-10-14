@@ -30,7 +30,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			Color actualColor = JsonSerializer.Deserialize<Color> (json, ConfigurationManagerTests._jsonOptions);
 
 			// Assert
-			Assert.Equal ((Color)expectedColor, actualColor);
+			Assert.Equal (new Color (expectedColor), actualColor);
 		}
 
 		[Theory]
@@ -55,7 +55,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			var converter = new ColorJsonConverter ();
 			var options = new JsonSerializerOptions { Converters = { converter } };
 
-			var serialized = JsonSerializer.Serialize<Color> ((Color)colorName, options);
+			var serialized = JsonSerializer.Serialize<Color> (new Color (colorName), options);
 
 			Assert.Equal ($"\"{expectedJson}\"", serialized);
 		}
@@ -67,7 +67,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			var expectedJson = "\"Black\"";
 
 			// Act
-			var json = JsonSerializer.Serialize<Color> ((Color)Color.Black, new JsonSerializerOptions {
+			var json = JsonSerializer.Serialize<Color> (new Color (Color.Black), new JsonSerializerOptions {
 				Converters = { new ColorJsonConverter () }
 			});
 
@@ -82,7 +82,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			var expectedJson = "\"BrightRed\"";
 
 			// Act
-			var json = JsonSerializer.Serialize<Color> ((Color)Color.BrightRed, new JsonSerializerOptions {
+			var json = JsonSerializer.Serialize<Color> (new Color (Color.BrightRed), new JsonSerializerOptions {
 				Converters = { new ColorJsonConverter () }
 			});
 

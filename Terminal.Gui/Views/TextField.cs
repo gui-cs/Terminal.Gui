@@ -40,7 +40,7 @@ namespace Terminal.Gui {
 		/// Gets or sets the foreground <see cref="Color"/> to use when 
 		/// rendering <see cref="Caption"/>.
 		/// </summary>
-		public Color CaptionColor { get; set; } = (Color)Color.DarkGray;
+		public Color CaptionColor { get; set; } = new Color (Color.DarkGray);
 
 		/// <summary>
 		/// Tracks whether the text field should be considered "used", that is, that the user has moved in the entry, so new input should be appended at the cursor position, rather than clearing the entry
