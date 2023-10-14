@@ -618,7 +618,7 @@ namespace Terminal.Gui {
 
 				Attribute cellColor;
 				if (isSelectedCell) {
-					cellColor = focused ? scheme.HotFocus : scheme.HotNormal;
+					cellColor = focused ? scheme.Focus : scheme.HotNormal;
 				} else {
 					cellColor = Enabled ? scheme.Normal : scheme.Disabled;
 				}

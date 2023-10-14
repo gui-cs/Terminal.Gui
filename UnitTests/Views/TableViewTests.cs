@@ -2213,11 +2213,11 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			var normal = tv.ColorScheme.Normal;
-			var focus = tv.ColorScheme.HotFocus = new Attribute (Color.Magenta, Color.White);
+			var focus = tv.ColorScheme.Focus = new Attribute (Color.Magenta, Color.White);
 
 			tv.Draw ();
 
-			// HotFocus color (1) should be used for rendering the selected line
+			// Focus color (1) should be used for rendering the selected line
 			// But should not spill into the borders.  Normal color (0) should be
 			// used for the rest.
 			expected =
@@ -2271,11 +2271,11 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			var normal = tv.ColorScheme.Normal;
-			var focus = tv.ColorScheme.HotFocus = new Attribute (Color.Magenta, Color.White);
+			var focus = tv.ColorScheme.Focus = new Attribute (Color.Magenta, Color.White);
 
 			tv.Draw ();
 
-			// HotFocus color (1) should be used for cells only because
+			// Focus color (1) should be used for cells only because
 			// AlwaysUseNormalColorForVerticalCellLines is true
 			expected =
 				@"
@@ -2766,11 +2766,11 @@ A B C
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			var normal = tv.ColorScheme.Normal;
-			var focus = tv.ColorScheme.HotFocus = new Attribute (Color.Magenta, Color.White);
+			var focus = tv.ColorScheme.Focus = new Attribute (Color.Magenta, Color.White);
 
 			tv.Draw ();
 
-			// HotFocus color (1) should be used for rendering the selected line
+			// Focus color (1) should be used for rendering the selected line
 			// Note that because there are no vertical cell lines we use the hot focus
 			// color for the whole row
 			expected =
