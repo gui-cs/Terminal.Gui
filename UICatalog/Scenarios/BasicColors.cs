@@ -10,10 +10,10 @@ namespace UICatalog.Scenarios {
 			var vx = 30;
 			var x = 30;
 			var y = 14;
-			var colors = System.Enum.GetValues (typeof (ColorNames));
+			var colors = System.Enum.GetValues (typeof (ColorName));
 
 		
-			foreach (ColorNames bg in colors) {
+			foreach (ColorName bg in colors) {
 				Attribute attr = new Attribute (bg, colors.Length - 1 - bg);
 				var vl = new Label (bg.ToString (), TextDirection.TopBottom_LeftRight) {
 					X = vx,
@@ -34,7 +34,7 @@ namespace UICatalog.Scenarios {
 				};
 				Win.Add (hl);
 				vx++;
-				foreach (ColorNames fg in colors) {
+				foreach (ColorName fg in colors) {
 					var c = new Attribute (fg, bg);
 					var t = x.ToString ();
 					var l = new Label (x, y, t [t.Length - 1].ToString ()) {

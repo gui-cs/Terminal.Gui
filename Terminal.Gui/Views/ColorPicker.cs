@@ -81,7 +81,7 @@ namespace Terminal.Gui {
 
 			set {
 				var colorIndex = value.Y * _cols + value.X;
-				SelectedColor = (ColorNames)colorIndex;
+				SelectedColor = (ColorName)colorIndex;
 			}
 		}
 
@@ -93,13 +93,13 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Selected color.
 		/// </summary>
-		public ColorNames SelectedColor {
+		public ColorName SelectedColor {
 			get {
-				return (ColorNames)_selectColorIndex;
+				return (ColorName)_selectColorIndex;
 			}
 
 			set {
-				ColorNames prev = (ColorNames)_selectColorIndex;
+				ColorName prev = (ColorName)_selectColorIndex;
 				_selectColorIndex = (int)value;
 				ColorChanged?.Invoke (this, new ColorEventArgs () {
 					PreviousColor = new Color (prev),
@@ -160,7 +160,7 @@ namespace Terminal.Gui {
 			for (var y = 0; y < (Bounds.Height / BoxHeight); y++) {
 				for (var x = 0; x < (Bounds.Width / BoxWidth); x++) {
 					var foregroundColorIndex = y == 0 ? colorIndex + _cols : colorIndex - _cols;
-					Driver.SetAttribute (new Attribute ((ColorNames)foregroundColorIndex, (ColorNames)colorIndex));
+					Driver.SetAttribute (new Attribute ((ColorName)foregroundColorIndex, (ColorName)colorIndex));
 					var selected = x == Cursor.X && y == Cursor.Y;
 					DrawColorBox (x, y, selected);
 					colorIndex++;
