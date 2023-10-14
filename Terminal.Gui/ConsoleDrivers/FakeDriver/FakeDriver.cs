@@ -2,19 +2,12 @@
 // FakeDriver.cs: A fake ConsoleDriver for unit tests. 
 //
 using System;
-using System.Buffers;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Text;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
-using Unix.Terminal;
-using static Terminal.Gui.WindowsConsole;
-using System.Drawing;
 
 namespace Terminal.Gui;
 /// <summary>
@@ -80,9 +73,7 @@ public class FakeDriver : ConsoleDriver {
 		Rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
 		FakeConsole.Clear ();
 		ResizeScreen ();
-		// Call InitializeColorSchemes before UpdateOffScreen as it references Colors
 		CurrentAttribute = new Attribute (Color.White, Color.Black);
-		//InitializeColorSchemes ();
 		ClearContents ();
 	}
 

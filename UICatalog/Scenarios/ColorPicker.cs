@@ -28,7 +28,7 @@ namespace UICatalog.Scenarios {
 				Text = "Foreground:",
 				X = 0,
 				Y = 0,
-				Height = Dim.Fill(),
+				Height = Dim.Fill (),
 				Width = Dim.Percent (60),
 				BoxHeight = 1,
 				BoxWidth = 1,
@@ -45,7 +45,7 @@ namespace UICatalog.Scenarios {
 				Width = 1,
 				Size = 255,
 			};
-			_blueSlider.ChangedPosition += (s,e) => {
+			_blueSlider.ChangedPosition += (s, e) => {
 				_foregroundColorPicker.BlueValue = _blueSlider.Position;
 			};
 			Win.Add (_blueSlider);
@@ -62,7 +62,7 @@ namespace UICatalog.Scenarios {
 			_backgroundColorPicker.X = Pos.AnchorEnd () - (Pos.Right (_backgroundColorPicker) - Pos.Left (_backgroundColorPicker));
 			_backgroundColorPicker.ColorChanged += ColorChanged;
 			Win.Add (_backgroundColorPicker);
-			
+
 			// Set default colors.
 			//_foregroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Foreground;
 			//_backgroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Background;

@@ -21,7 +21,7 @@ namespace Terminal.Gui.ConfigurationTests {
 		[InlineData ("Magenta", Color.Magenta)]
 		[InlineData ("Red", Color.Red)]
 		[InlineData ("White", Color.White)]
-		public void TestColorDeserializationFromHumanReadableColorNames (string colorName, ColorNames expectedColor)
+		public void TestColorDeserializationFromHumanReadableColorNames (string colorName, ColorName expectedColor)
 		{
 			// Arrange
 			string json = $"\"{colorName}\"";
@@ -30,32 +30,32 @@ namespace Terminal.Gui.ConfigurationTests {
 			Color actualColor = JsonSerializer.Deserialize<Color> (json, ConfigurationManagerTests._jsonOptions);
 
 			// Assert
-			Assert.Equal ((Color)expectedColor, actualColor);
+			Assert.Equal (new Color (expectedColor), actualColor);
 		}
 
 		[Theory]
-		[InlineData (ColorNames.Black, "Black")]
-		[InlineData (ColorNames.Blue, "Blue")]
-		[InlineData (ColorNames.Green, "Green")]
-		[InlineData (ColorNames.Cyan, "Cyan")]
-		[InlineData (ColorNames.Gray, "Gray")]
-		[InlineData (ColorNames.Red, "Red")]
-		[InlineData (ColorNames.Magenta, "Magenta")]
-		[InlineData (ColorNames.Yellow, "Yellow")]
-		[InlineData (ColorNames.DarkGray, "DarkGray")]
-		[InlineData (ColorNames.BrightBlue, "BrightBlue")]
-		[InlineData (ColorNames.BrightGreen, "BrightGreen")]
-		[InlineData (ColorNames.BrightCyan, "BrightCyan")]
-		[InlineData (ColorNames.BrightRed, "BrightRed")]
-		[InlineData (ColorNames.BrightMagenta, "BrightMagenta")]
-		[InlineData (ColorNames.BrightYellow, "BrightYellow")]
-		[InlineData (ColorNames.White, "White")]
-		public void SerializesEnumValuesAsStrings (ColorNames colorName, string expectedJson)
+		[InlineData (ColorName.Black, "Black")]
+		[InlineData (ColorName.Blue, "Blue")]
+		[InlineData (ColorName.Green, "Green")]
+		[InlineData (ColorName.Cyan, "Cyan")]
+		[InlineData (ColorName.Gray, "Gray")]
+		[InlineData (ColorName.Red, "Red")]
+		[InlineData (ColorName.Magenta, "Magenta")]
+		[InlineData (ColorName.Yellow, "Yellow")]
+		[InlineData (ColorName.DarkGray, "DarkGray")]
+		[InlineData (ColorName.BrightBlue, "BrightBlue")]
+		[InlineData (ColorName.BrightGreen, "BrightGreen")]
+		[InlineData (ColorName.BrightCyan, "BrightCyan")]
+		[InlineData (ColorName.BrightRed, "BrightRed")]
+		[InlineData (ColorName.BrightMagenta, "BrightMagenta")]
+		[InlineData (ColorName.BrightYellow, "BrightYellow")]
+		[InlineData (ColorName.White, "White")]
+		public void SerializesEnumValuesAsStrings (ColorName colorName, string expectedJson)
 		{
 			var converter = new ColorJsonConverter ();
 			var options = new JsonSerializerOptions { Converters = { converter } };
 
-			var serialized = JsonSerializer.Serialize<Color> ((Color)colorName, options);
+			var serialized = JsonSerializer.Serialize<Color> (new Color (colorName), options);
 
 			Assert.Equal ($"\"{expectedJson}\"", serialized);
 		}
@@ -67,7 +67,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			var expectedJson = "\"Black\"";
 
 			// Act
-			var json = JsonSerializer.Serialize<Color> ((Color)Color.Black, new JsonSerializerOptions {
+			var json = JsonSerializer.Serialize<Color> (new Color (Color.Black), new JsonSerializerOptions {
 				Converters = { new ColorJsonConverter () }
 			});
 
@@ -82,7 +82,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			var expectedJson = "\"BrightRed\"";
 
 			// Act
-			var json = JsonSerializer.Serialize<Color> ((Color)Color.BrightRed, new JsonSerializerOptions {
+			var json = JsonSerializer.Serialize<Color> (new Color (Color.BrightRed), new JsonSerializerOptions {
 				Converters = { new ColorJsonConverter () }
 			});
 
@@ -95,7 +95,7 @@ namespace Terminal.Gui.ConfigurationTests {
 		{
 			// Arrange
 			var json = "\"Black\"";
-			var expectedColor = new Color (ColorNames.Black);
+			var expectedColor = new Color (ColorName.Black);
 
 			// Act
 			var color = JsonSerializer.Deserialize<Color> (json, new JsonSerializerOptions {
@@ -111,7 +111,7 @@ namespace Terminal.Gui.ConfigurationTests {
 		{
 			// Arrange
 			var json = "\"BrightRed\"";
-			var expectedColor = new Color (ColorNames.BrightRed);
+			var expectedColor = new Color (ColorName.BrightRed);
 
 			// Act
 			var color = JsonSerializer.Deserialize<Color> (json, new JsonSerializerOptions {

@@ -18,8 +18,8 @@ public class AttributeTests {
 		// Assert
 		//Assert.False (attribute.Initialized);
 		Assert.Equal (-1, attribute.PlatformColor);
-		Assert.Equal ((Color)Color.White, attribute.Foreground);
-		Assert.Equal ((Color)Color.Black, attribute.Background);
+		Assert.Equal (new Color (Color.White), attribute.Foreground);
+		Assert.Equal (new Color (Color.Black), attribute.Background);
 
 	}
 
@@ -32,19 +32,19 @@ public class AttributeTests {
 		// Assert
 		//Assert.True (attribute.Initialized);
 		Assert.Equal (42, attribute.PlatformColor);
-		Assert.Equal ((Color)Color.White, attribute.Foreground);
-		Assert.Equal ((Color)Color.Black, attribute.Background);
+		Assert.Equal (new Color (Color.White), attribute.Foreground);
+		Assert.Equal (new Color (Color.Black), attribute.Background);
 	}
 
 	[Fact]
 	public void ColorNamesConstructor ()
 	{
 		// Arrange & Act
-		var attribute = new Attribute (ColorNames.Blue);
+		var attribute = new Attribute (ColorName.Blue);
 
 		// Assert
-		Assert.Equal ((Color)Color.Blue, attribute.Foreground);
-		Assert.Equal ((Color)Color.Blue, attribute.Background);
+		Assert.Equal (new Color (Color.Blue), attribute.Foreground);
+		Assert.Equal (new Color (Color.Blue), attribute.Background);
 	}
 
 	[Fact, AutoInitShutdown]
@@ -65,24 +65,24 @@ public class AttributeTests {
 	{
 		// Arrange & Act
 		var foregroundColor = new Color (0, 0, 255);
-		var backgroundColorName = ColorNames.Black;
+		var backgroundColorName = ColorName.Black;
 		var attribute = new Attribute (foregroundColor, backgroundColorName);
 
 		// Assert
 		Assert.Equal (foregroundColor, attribute.Foreground);
-		Assert.Equal ((Color)backgroundColorName, attribute.Background);
+		Assert.Equal (new Color (backgroundColorName), attribute.Background);
 	}
 
 	[Fact]
 	public void ColorNamesAndColorConstructor ()
 	{
 		// Arrange & Act
-		var foregroundColorName = ColorNames.BrightYellow;
+		var foregroundColorName = ColorName.BrightYellow;
 		var backgroundColor = new Color (128, 128, 128);
 		var attribute = new Attribute (foregroundColorName, backgroundColor);
 
 		// Assert
-		Assert.Equal ((Color)foregroundColorName, attribute.Foreground);
+		Assert.Equal (new Color (foregroundColorName), attribute.Foreground);
 		Assert.Equal (backgroundColor, attribute.Background);
 	}
 
@@ -97,15 +97,15 @@ public class AttributeTests {
 		var attr = new Attribute ();
 
 		Assert.Equal (-1, attr.PlatformColor);
-		Assert.Equal ((Color)Color.White, attr.Foreground);
-		Assert.Equal ((Color)Color.Black, attr.Background);
+		Assert.Equal (new Color (Color.White), attr.Foreground);
+		Assert.Equal (new Color (Color.Black), attr.Background);
 
 		// Test foreground, background
 		var fg = new Color ();
-		fg = (Color)Color.Red;
+		fg = new Color (Color.Red);
 
 		var bg = new Color ();
-		bg = (Color)Color.Blue;
+		bg = new Color (Color.Blue);
 
 		attr = new Attribute (fg, bg);
 
@@ -149,29 +149,29 @@ public class AttributeTests {
 	public void MakeColorNamesAndColorNames_ForegroundAndBackgroundShouldMatchInput ()
 	{
 		// Arrange
-		var foregroundColorName = ColorNames.BrightYellow;
-		var backgroundColorName = ColorNames.Black;
+		var foregroundColorName = ColorName.BrightYellow;
+		var backgroundColorName = ColorName.Black;
 
 		// Act
 		var attribute = new Attribute (foregroundColorName, backgroundColorName);
 
 		// Assert
-		Assert.Equal ((Color)foregroundColorName, attribute.Foreground);
-		Assert.Equal ((Color)backgroundColorName, attribute.Background);
+		Assert.Equal (new Color (foregroundColorName), attribute.Foreground);
+		Assert.Equal (new Color (backgroundColorName), attribute.Background);
 	}
 
 	[Fact]
 	public void MakeColorNamesAndColor_ForegroundAndBackgroundShouldMatchInput ()
 	{
 		// Arrange
-		var foregroundColorName = ColorNames.Green;
+		var foregroundColorName = ColorName.Green;
 		var backgroundColor = new Color (128, 128, 128);
 
 		// Act
 		var attribute = new Attribute (foregroundColorName, backgroundColor);
 
 		// Assert
-		Assert.Equal ((Color)foregroundColorName, attribute.Foreground);
+		Assert.Equal (new Color (foregroundColorName), attribute.Foreground);
 		Assert.Equal (backgroundColor, attribute.Background);
 	}
 
@@ -180,14 +180,14 @@ public class AttributeTests {
 	{
 		// Arrange
 		var foregroundColor = new Color (255, 0, 0);
-		var backgroundColorName = ColorNames.White;
+		var backgroundColorName = ColorName.White;
 
 		// Act
 		var attribute = new Attribute (foregroundColor, backgroundColorName);
 
 		// Assert
 		Assert.Equal (foregroundColor, attribute.Foreground);
-		Assert.Equal ((Color)backgroundColorName, attribute.Background);
+		Assert.Equal (new Color (backgroundColorName), attribute.Background);
 	}
 
 
@@ -203,10 +203,10 @@ public class AttributeTests {
 
 		var value = 42;
 		var fg = new Color ();
-		fg = (Color)Color.Red;
+		fg = new Color (Color.Red);
 
 		var bg = new Color ();
-		bg = (Color)Color.Blue;
+		bg = new Color (Color.Blue);
 
 		// Test conversion to int
 		attr = new Attribute (value, fg, bg);
@@ -223,10 +223,10 @@ public class AttributeTests {
 	public void Make_SetsNotInitialized_NoDriver ()
 	{
 		var fg = new Color ();
-		fg = (Color)Color.Red;
+		fg = new Color (Color.Red);
 
 		var bg = new Color ();
-		bg = (Color)Color.Blue;
+		bg = new Color (Color.Blue);
 
 		var a = new Attribute (fg, bg);
 
@@ -241,10 +241,10 @@ public class AttributeTests {
 		driver.Init (() => { });
 
 		var fg = new Color ();
-		fg = (Color)Color.Red;
+		fg = new Color (Color.Red);
 
 		var bg = new Color ();
-		bg = (Color)Color.Blue;
+		bg = new Color (Color.Blue);
 
 		var attr = new Attribute (fg, bg);
 		//Assert.True (attr.Initialized);
@@ -260,10 +260,10 @@ public class AttributeTests {
 	{
 
 		var fg = new Color ();
-		fg = (Color)Color.Red;
+		fg = new Color (Color.Red);
 
 		var bg = new Color ();
-		bg = (Color)Color.Blue;
+		bg = new Color (Color.Blue);
 
 		var attr = new Attribute (fg, bg);
 		//Assert.False (attr.Initialized);

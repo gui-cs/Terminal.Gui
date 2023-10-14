@@ -62,7 +62,7 @@ namespace Terminal.Gui {
 	/// The <see cref="ColorPicker"/> <see cref="View"/> Color picker.
 	/// </summary>
 	public class ColorPicker : View {
-		private Color _selectedColor = (Color)Color.Black;
+		private Color _selectedColor = new Color (Color.Black);
 
 		/// <summary>
 		/// Gets or sets the style of the color picker.
@@ -130,7 +130,7 @@ namespace Terminal.Gui {
 			set {
 				switch (Style) {
 				case ColorPickerStyle.Ansi:
-					SelectedColor = (Color)(ColorNames)(value.Y * _cols + value.X);
+					SelectedColor = (Color)(ColorName)(value.Y * _cols + value.X);
 					break;
 				case ColorPickerStyle.Rgb:
 					SelectedColor = new Color ((byte)(value.X * 255 / Bounds.Width), (byte)(value.Y * 255 / Bounds.Height), 0);
@@ -290,7 +290,7 @@ namespace Terminal.Gui {
 			for (var y = 0; y < (Bounds.Height / BoxHeight); y++) {
 				for (var x = 0; x < (Bounds.Width / BoxWidth); x++) {
 					var foregroundColorIndex = y == 0 ? colorIndex + _cols : colorIndex - _cols;
-					Driver.SetAttribute (new Attribute ((ColorNames)foregroundColorIndex, (ColorNames)colorIndex));
+					Driver.SetAttribute (new Attribute ((ColorName)foregroundColorIndex, (ColorName)colorIndex));
 					var selected = x == Cursor.X && y == Cursor.Y;
 					DrawColorBox (x, y, selected);
 					colorIndex++;
@@ -350,7 +350,7 @@ namespace Terminal.Gui {
 			case ColorPickerStyle.Ansi:
 				var index = (int)SelectedColor.ColorName;
 				if (index > 0 && index <= 15) {
-					SelectedColor = new Color ((ColorNames)(index - 1));
+					SelectedColor = new Color ((ColorName)(index - 1));
 				}
 				return true;
 			case ColorPickerStyle.Rgb:
@@ -370,7 +370,7 @@ namespace Terminal.Gui {
 			case ColorPickerStyle.Ansi:
 				var index = (int)SelectedColor.ColorName;
 				if (index >= 0 && index < 15) {
-					SelectedColor = new Color ((ColorNames)(index + 1));
+					SelectedColor = new Color ((ColorName)(index + 1));
 				}
 				return true;
 			case ColorPickerStyle.Rgb:
@@ -390,7 +390,7 @@ namespace Terminal.Gui {
 			case ColorPickerStyle.Ansi:
 				var index = (int)SelectedColor.ColorName - _cols;
 				if (index >= 0 && index <= 15) {
-					SelectedColor = new Color ((ColorNames)index);
+					SelectedColor = new Color ((ColorName)index);
 				}
 				return true;
 			case ColorPickerStyle.Rgb:
@@ -410,7 +410,7 @@ namespace Terminal.Gui {
 			case ColorPickerStyle.Ansi:
 				var index = (int)SelectedColor.ColorName + _cols;
 				if (index >= 0 && index <= 15) {
-					SelectedColor = new Color ((ColorNames)index);
+					SelectedColor = new Color ((ColorName)index);
 				}
 				return true;
 			case ColorPickerStyle.Rgb:
@@ -476,7 +476,7 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 			}
 		}
-		
+
 		public override void OnDrawContent (Rect contentArea)
 		{
 			base.OnDrawContent (contentArea);

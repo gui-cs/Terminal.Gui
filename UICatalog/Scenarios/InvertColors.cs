@@ -13,7 +13,7 @@ namespace UICatalog.Scenarios {
 			Win.ColorScheme = Colors.TopLevel;
 
 			List<Label> labels = new List<Label> ();
-			var foreColors = Enum.GetValues (typeof (ColorNames)).Cast<ColorNames> ().ToArray ();
+			var foreColors = Enum.GetValues (typeof (ColorName)).Cast<ColorName> ().ToArray ();
 			for (int y = 0; y < foreColors.Length; y++) {
 
 				var fore = foreColors [y];

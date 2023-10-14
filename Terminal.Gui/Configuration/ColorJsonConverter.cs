@@ -31,7 +31,7 @@ namespace Terminal.Gui {
 				var colorString = reader.GetString ();
 
 				// Check if the color string is a color name
-				if (Enum.TryParse (colorString, ignoreCase: true, out ColorNames color)) {
+				if (Enum.TryParse (colorString, ignoreCase: true, out ColorName color)) {
 					// Return the parsed color
 					return new Color(color);
 				}

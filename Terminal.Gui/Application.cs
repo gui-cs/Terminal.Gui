@@ -54,7 +54,7 @@ namespace Terminal.Gui {
 		public static bool UseSystemConsole { get; set; } = false;
 
 		/// <summary>
-		/// Gets or sets whether <see cref="Application.Driver"/> will be forced to output only the 16 colors defined in <see cref="ColorNames"/>.
+		/// Gets or sets whether <see cref="Application.Driver"/> will be forced to output only the 16 colors defined in <see cref="ColorName"/>.
 		/// The default is <see langword="false"/>, meaning 24-bit (TrueColor) colors will be output as long as the selected <see cref="ConsoleDriver"/>
 		/// supports TrueColor.
 		/// </summary>
