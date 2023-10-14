@@ -58,11 +58,11 @@ namespace Terminal.Gui.TextTests {
 			Assert.NotSame (Colors.Menu, tv.Autocomplete.ColorScheme);
 
 			// with the values we set on it
-			Assert.Equal ((Color)Color.Black, tv.Autocomplete.ColorScheme.Normal.Foreground);
-			Assert.Equal ((Color)Color.Blue, tv.Autocomplete.ColorScheme.Normal.Background);
+			Assert.Equal (new Color (Color.Black), tv.Autocomplete.ColorScheme.Normal.Foreground);
+			Assert.Equal (new Color (Color.Blue), tv.Autocomplete.ColorScheme.Normal.Background);
 
-			Assert.Equal ((Color)Color.Black, tv.Autocomplete.ColorScheme.Focus.Foreground);
-			Assert.Equal ((Color)Color.Cyan, tv.Autocomplete.ColorScheme.Focus.Background);
+			Assert.Equal (new Color (Color.Black), tv.Autocomplete.ColorScheme.Focus.Foreground);
+			Assert.Equal (new Color (Color.Cyan), tv.Autocomplete.ColorScheme.Focus.Background);
 		}
 
 		[Fact]

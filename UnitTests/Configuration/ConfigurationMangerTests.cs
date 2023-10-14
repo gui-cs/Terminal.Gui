@@ -325,8 +325,8 @@ namespace Terminal.Gui.ConfigurationTests {
 
 			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
 
-			Assert.Equal ((Color)Color.White, Colors.ColorSchemes ["Base"].Normal.Foreground);
-			Assert.Equal ((Color)Color.Blue, Colors.ColorSchemes ["Base"].Normal.Background);
+			Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"].Normal.Foreground);
+			Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
 
 			// Change Base
 			var json = ConfigurationManager.ToStream ();
@@ -509,12 +509,12 @@ namespace Terminal.Gui.ConfigurationTests {
 
 			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
 
-			Assert.Equal ((Color)Color.White, Colors.ColorSchemes ["Base"].Normal.Foreground);
-			Assert.Equal ((Color)Color.Blue, Colors.ColorSchemes ["Base"].Normal.Background);
+			Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"].Normal.Foreground);
+			Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
 
 			var colorSchemes = (Dictionary<string, ColorScheme>)Themes.First ().Value ["ColorSchemes"].PropertyValue;
-			Assert.Equal ((Color)Color.White, colorSchemes ["Base"].Normal.Foreground);
-			Assert.Equal ((Color)Color.Blue, colorSchemes ["Base"].Normal.Background);
+			Assert.Equal (new Color (Color.White), colorSchemes ["Base"].Normal.Foreground);
+			Assert.Equal (new Color (Color.Blue), colorSchemes ["Base"].Normal.Background);
 
 			// Now re-apply
 			ConfigurationManager.Apply ();
@@ -522,8 +522,8 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Key.Z | Key.AltMask, Application.QuitKey);
 			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
 
-			Assert.Equal ((Color)Color.White, Colors.ColorSchemes ["Base"].Normal.Foreground);
-			Assert.Equal ((Color)Color.Blue, Colors.ColorSchemes ["Base"].Normal.Background);
+			Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"].Normal.Foreground);
+			Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
 		}
 
 		[Fact, AutoInitShutdown]

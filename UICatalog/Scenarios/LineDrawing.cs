@@ -95,7 +95,7 @@ namespace UICatalog.Scenarios {
 		class DrawingArea : View {
 			List<LineCanvas> _layers = new List<LineCanvas> ();
 			LineCanvas _currentLayer;
-			Color _currentColor = (Color)Color.White;
+			Color _currentColor = new Color (Color.White);
 			StraightLine _currentLine = null;
 
 			public LineStyle LineStyle { get; set; }

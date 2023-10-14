@@ -210,7 +210,7 @@ public class ColorTests {
 		var expectedColor = new Color (0, 55, 218); // Blue
 
 		// Act
-		Color color = (Color)colorName;
+		Color color = new Color (colorName);
 
 		// Assert
 		Assert.Equal (expectedColor, color);
@@ -297,7 +297,7 @@ public class ColorTests {
 		var expectedColor = new Color (197, 15, 31); // Red in RGB
 
 		// Act
-		var convertedColor = (Color)colorName;
+		var convertedColor = new Color (colorName);
 
 		// Assert
 		Assert.Equal (expectedColor, convertedColor);
