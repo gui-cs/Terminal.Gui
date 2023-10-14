@@ -41,7 +41,7 @@ namespace Terminal.Gui
 		/// <remarks>
 		///	An uninitialized Point Structure.
 		/// </remarks>
-		
+	
 		public static readonly Point Empty;
 
 		/// <summary>
