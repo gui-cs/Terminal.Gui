@@ -59,19 +59,19 @@ public class Sliders : Scenario {
 
 			rightView.Add (slider);
 
-			slider.OptionsChanged += (options) => {
+			slider.OptionsChanged += (sender, e) => {
 				foreach (var s in Win.Subviews.OfType<Slider> ()) {
-					if (options.ContainsKey (0))
+					if (e.Options.ContainsKey (0))
 						s.ShowLegends = true;
 					else
 						s.ShowLegends = false;
 
-					if (options.ContainsKey (1))
+					if (e.Options.ContainsKey (1))
 						s.RangeAllowSingle = true;
 					else
 						s.RangeAllowSingle = false;
 
-					if (options.ContainsKey (2))
+					if (e.Options.ContainsKey (2))
 						s.ShowSpacing = true;
 					else
 						s.ShowSpacing = false;
@@ -116,12 +116,12 @@ public class Sliders : Scenario {
 
 			rightView.Add (slider_orientation_slider);
 
-			slider_orientation_slider.OptionsChanged += (options) => {
+			slider_orientation_slider.OptionsChanged += (sender, e) => {
 
 				View prev = null;
 				foreach (var s in Win.Subviews.OfType<Slider> ()) {
 
-					if (options.ContainsKey (0)) {
+					if (e.Options.ContainsKey (0)) {
 						s.SliderOrientation = Orientation.Horizontal;
 
 						s.AdjustBestHeight ();
@@ -139,7 +139,7 @@ public class Sliders : Scenario {
 						s.X = 0;
 						prev = s;
 
-					} else if (options.ContainsKey (1)) {
+					} else if (e.Options.ContainsKey (1)) {
 						s.SliderOrientation = Orientation.Vertical;
 
 						s.AdjustBestWidth ();
@@ -178,11 +178,11 @@ public class Sliders : Scenario {
 
 			rightView.Add (legends_orientation_slider);
 
-			legends_orientation_slider.OptionsChanged += (options) => {
+			legends_orientation_slider.OptionsChanged += (sender, e) => {
 				foreach (var s in Win.Subviews.OfType<Slider> ()) {
-					if (options.ContainsKey (0))
+					if (e.Options.ContainsKey (0))
 						s.LegendsOrientation = Orientation.Horizontal;
-					else if (options.ContainsKey (1))
+					else if (e.Options.ContainsKey (1))
 						s.LegendsOrientation = Orientation.Vertical;
 				}
 				Win.LayoutSubviews ();
@@ -219,9 +219,9 @@ public class Sliders : Scenario {
 
 			rightView.Add (sliderColor);
 
-			sliderColor.OptionsChanged += (options) => {
-				if (options.Count != 0) {
-					var data = options.First ().Value.Data;
+			sliderColor.OptionsChanged += (sender, e) => {
+				if (e.Options.Count != 0) {
+					var data = e.Options.First ().Value.Data;
 
 					foreach (var s in Win.Subviews.OfType<Slider> ()) {
 						s.Style.OptionChar.Attribute = new Attribute (data.Item1, data.Item2);
@@ -291,7 +291,7 @@ public class Sliders : Scenario {
 			//ShowSpacing = true
 		};
 
-		single.LayoutStarted += (s,e) => {
+		single.LayoutStarted += (s, e) => {
 			if (single.SliderOrientation == Orientation.Horizontal) {
 				single.Style.SpaceChar = new Cell () { Runes = { CM.Glyphs.HLine } };
 				single.Style.OptionChar = new Cell () { Runes = { CM.Glyphs.HLine } };
@@ -304,5 +304,18 @@ public class Sliders : Scenario {
 		single.Style.DragChar = new Cell () { Runes = { CM.Glyphs.ContinuousMeterSegment } };
 
 		v.Add (single);
+
+		var label = new Label () {
+			X = 0,
+			Y = Pos.Bottom (single),
+			Height = 1,
+			Width = Dim.Width(single),
+			Text = $"{single.GetSetOptions ().FirstOrDefault ()}"
+		};
+		single.OptionsChanged += (s, e) => {
+			label.Text = $"{e.Options.FirstOrDefault ().Key}";
+		};
+
+		v.Add (label);
 	}
 }

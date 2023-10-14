@@ -10,6 +10,26 @@ using Attribute = Terminal.Gui.Attribute;
 namespace Terminal.Gui;
 
 /// <summary>
+/// <see cref="EventArgs"/> for <see cref="ListView"/> events.
+/// </summary>
+public class SliderOptionEventArgs : EventArgs {
+	/// <summary>
+	/// Gets whether the option is set or not.
+	/// </summary>
+	public bool IsSet { get; }
+
+
+	/// <summary>
+	/// Initializes a new instance of <see cref="SliderOptionEventArgs"/>
+	/// </summary>
+	/// <param name="isSet"> indicates whether the option is set</param>
+	public SliderOptionEventArgs (bool isSet)
+	{
+		IsSet = isSet;
+	}
+}
+
+/// <summary>
 /// Represents an option in the slider.
 /// </summary>
 /// <typeparam name="T">Datatype of the option.</typeparam>
@@ -34,7 +54,7 @@ public class SliderOption<T> {
 	/// </summary>
 	internal void OnSet ()
 	{
-		Set?.Invoke (this);
+		Set?.Invoke (this, new SliderOptionEventArgs (true));
 	}
 
 	/// <summary>
@@ -42,7 +62,7 @@ public class SliderOption<T> {
 	/// </summary>
 	internal void OnUnSet ()
 	{
-		UnSet?.Invoke (this);
+		UnSet?.Invoke (this, new SliderOptionEventArgs (false));
 	}
 
 	/// <summary>
@@ -50,21 +70,23 @@ public class SliderOption<T> {
 	/// </summary>
 	internal void OnChanged (bool isSet)
 	{
-		Changed?.Invoke (this, isSet);
+		Changed?.Invoke (this, new SliderOptionEventArgs (isSet));
 	}
 
 	/// <summary>
 	/// Event Raised when this option is set.
 	/// </summary>
-	public event Action<SliderOption<T>> Set;
+	public event EventHandler<SliderOptionEventArgs> Set;
+
 	/// <summary>
 	/// Event Raised when this option is unset.
 	/// </summary>
-	public event Action<SliderOption<T>> UnSet;
+	public event EventHandler<SliderOptionEventArgs> UnSet;
+
 	/// <summary>
-	/// Event Raised when this option change containing the CURRENT state.
+	/// Event fired when the an option has changed.
 	/// </summary>
-	public event Action<SliderOption<T>, bool> Changed;
+	public event EventHandler<SliderOptionEventArgs> Changed;
 }
 
 /// <summary>
@@ -186,6 +208,38 @@ internal class SliderConfiguration {
 }
 
 /// <summary>
+/// <see cref="EventArgs"/> for <see cref="ListView"/> events.
+/// </summary>
+public class SliderEventArgs<T> : EventArgs {
+	/// <summary>
+	/// Gets/sets whether the option is set or not.
+	/// </summary>
+	public Dictionary<int, SliderOption<T>> Options { get; set; }
+
+	/// <summary>
+	/// Gets or sets the index of the option that is focused.
+	/// </summary>
+	public int Focused { get; set; }
+
+	/// <summary>
+	/// If set to true, the focus operation will be canceled, if applicable.
+	/// </summary>
+	public bool Cancel { get; set; }
+
+	/// <summary>
+	/// Initializes a new instance of <see cref="SliderEventArgs{T}"/>
+	/// </summary>
+	/// <param name="options">The current options.</param>
+	/// <param name="focused">Index of the option that is focused. -1 if no option has the focus.</param>
+	public SliderEventArgs (Dictionary<int, SliderOption<T>> options, int focused = -1)
+	{
+		Options = options;
+		Focused = focused;
+		Cancel = false;
+	}
+}
+
+/// <summary>
 /// Slider control.
 /// </summary>
 public class Slider : Slider<object> {
@@ -215,15 +269,10 @@ public class Slider<T> : View {
 
 	// Options
 	List<SliderOption<T>> _options;
-	List<int> _currentOptions = new List<int> ();
-	int _currentOption = 0;
-
-
-	#region CUSTOM CURSOR
-	object _blink_token;
-	bool _blink = false;
-	(int, int)? _cursorPosition;
-	#endregion
+	// List of the current set options.
+	List<int> _setOptions = new List<int> ();
+	// The focused (most current) option.
+	int _focusedOption = 0;
 
 	#region Events
 
@@ -232,12 +281,23 @@ public class Slider<T> : View {
 	/// Event raised when the slider option/s changed.
 	/// The dictionary contains: key = option index, value = T
 	/// </summary>
-	public event Action<Dictionary<int, SliderOption<T>>> OptionsChanged;
+	public event EventHandler<SliderEventArgs<T>> OptionsChanged;
 
 	/// <summary>
 	/// Event raised When the option is hovered with the keys or the mouse.
 	/// </summary>
-	public event Action<int, SliderOption<T>> OptionFocused;
+	public event EventHandler<SliderEventArgs<T>> OptionFocused;
+
+	/// <summary>
+	/// Overridable function that fires the <see cref="OptionFocused"/> event.
+	/// </summary>
+	/// <param name="args"></param>
+	/// <returns><see langword="null"/> if the focus change is to to be cancelled.</returns>
+	public virtual bool OnOptionFocused (SliderEventArgs<T> args)
+	{
+		OptionFocused?.Invoke (this, args);
+		return args.Cancel;
+	}
 
 	#endregion
 
@@ -291,34 +351,13 @@ public class Slider<T> : View {
 			if (_settingRange == true) {
 				_settingRange = false;
 			}
-			//Application.MainLoop.RemoveTimeout (_blink_token);
 		};
 
 
 		// Custom cursor
 		Driver.SetCursorVisibility (CursorVisibility.Invisible);
 
-		// CUSTOM CURSOR
-		Action f = () => {
-			if (_cursorPosition != null) {
-				Move (_cursorPosition.Value.Item1, _cursorPosition.Value.Item2);
-				if (_blink) {
-					Driver.SetAttribute (new Attribute (Color.Red, Color.Blue));
-					Driver.AddRune (GetSetOptions ().Contains (_currentOption) ? _style.SetChar.Runes [0] : _style.OptionChar.Runes [0]);
-				} else {
-					Driver.SetAttribute (new Attribute (Color.Blue, Color.Red));
-					Driver.AddRune (GetSetOptions ().Contains (_currentOption) ? _style.OptionChar.Runes [0] : _style.SetChar.Runes [0]);
-				}
-				_blink = !_blink;
-			}
-		};
-
 		Enter += (object s, FocusEventArgs e) => {
-			//f ();
-			//_blink_token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (1300), (ee) => {
-			//	f ();
-			//	return true;
-			//});
 		};
 
 		LayoutComplete += (s, e) => {
@@ -373,7 +412,7 @@ public class Slider<T> : View {
 			_config._type = value;
 
 			// Todo: Custom logic to preserve options.
-			_currentOptions.Clear ();
+			_setOptions.Clear ();
 
 			SetNeedsDisplay ();
 		}
@@ -486,8 +525,8 @@ public class Slider<T> : View {
 		// TODO: Handle range type.			
 		// Note: Maybe return false only when optionIndex doesn't exist, otherwise true.
 
-		if (!_currentOptions.Contains (optionIndex) && optionIndex >= 0 && optionIndex < _options.Count) {
-			_currentOption = optionIndex;
+		if (!_setOptions.Contains (optionIndex) && optionIndex >= 0 && optionIndex < _options.Count) {
+			_focusedOption = optionIndex;
 			SetCurrentOption ();
 			return true;
 		}
@@ -502,8 +541,8 @@ public class Slider<T> : View {
 		// TODO: Handle range type.			
 		// Note: Maybe return false only when optionIndex doesn't exist, otherwise true.
 
-		if (_currentOptions.Contains (optionIndex) && optionIndex >= 0 && optionIndex < _options.Count) {
-			_currentOption = optionIndex;
+		if (_setOptions.Contains (optionIndex) && optionIndex >= 0 && optionIndex < _options.Count) {
+			_focusedOption = optionIndex;
 			SetCurrentOption ();
 			return true;
 		}
@@ -516,7 +555,7 @@ public class Slider<T> : View {
 	public List<int> GetSetOptions ()
 	{
 		// Copy
-		return _currentOptions.OrderBy (e => e).ToList ();
+		return _setOptions.OrderBy (e => e).ToList ();
 	}
 
 	/// <summary>
@@ -525,7 +564,7 @@ public class Slider<T> : View {
 	public List<int> GetSetOptionsUnOrdered ()
 	{
 		// Copy
-		return _currentOptions.ToList ();
+		return _setOptions.ToList ();
 	}
 
 	#endregion
@@ -597,23 +636,6 @@ public class Slider<T> : View {
 		// First = '├',
 		// Last = '┤',
 	}
-
-	//void CalculateBestSliderDimensions ()
-	//{
-	//	if (_options.Count == 0) return;
-
-	//	if (_config._sliderOrientation == _config._legendsOrientation) {
-	//		var max = _options.Max (e => e.Legend.ToString ().Length);
-	//		_config._startSpacing = max / 2;
-	//		_config._innerSpacing = max + (max % 2 == 0 ? 1 : 0);
-	//		_config._endSpacing = max / 2 + (max % 2);
-	//	} else {
-	//		// H Slider with V Legends || V Slider with H Legends.
-	//		_config._startSpacing = 1;
-	//		_config._innerSpacing = 1;
-	//		_config._endSpacing = 1;
-	//	}
-	//}
 
 	void CalculateSliderDimensions ()
 	{
@@ -830,41 +852,41 @@ public class Slider<T> : View {
 		case SliderType.LeftRange:
 		case SliderType.RightRange:
 
-			if (_currentOptions.Count == 1) {
-				var prev = _currentOptions [0];
+			if (_setOptions.Count == 1) {
+				var prev = _setOptions [0];
 
-				if (!_config._allowEmpty && prev == _currentOption) {
+				if (!_config._allowEmpty && prev == _focusedOption) {
 					break;
 				}
 
-				_currentOptions.Clear ();
-				_options [_currentOption].OnUnSet ();
+				_setOptions.Clear ();
+				_options [_focusedOption].OnUnSet ();
 
-				if (_currentOption != prev) {
-					_currentOptions.Add (_currentOption);
-					_options [_currentOption].OnSet ();
+				if (_focusedOption != prev) {
+					_setOptions.Add (_focusedOption);
+					_options [_focusedOption].OnSet ();
 				}
 			} else {
-				_currentOptions.Add (_currentOption);
-				_options [_currentOption].OnSet ();
+				_setOptions.Add (_focusedOption);
+				_options [_focusedOption].OnSet ();
 			}
 
 			// Raise slider changed event.
-			OptionsChanged?.Invoke (_currentOptions.ToDictionary (e => e, e => _options [e]));
+			OptionsChanged?.Invoke (this, new SliderEventArgs<T> (_setOptions.ToDictionary (e => e, e => _options [e])));
 
 			break;
 		case SliderType.Multiple:
-			if (_currentOptions.Contains (_currentOption)) {
-				if (!_config._allowEmpty && _currentOptions.Count () == 1) {
+			if (_setOptions.Contains (_focusedOption)) {
+				if (!_config._allowEmpty && _setOptions.Count () == 1) {
 					break;
 				}
-				_currentOptions.Remove (_currentOption);
-				_options [_currentOption].OnUnSet ();
+				_setOptions.Remove (_focusedOption);
+				_options [_focusedOption].OnUnSet ();
 			} else {
-				_currentOptions.Add (_currentOption);
-				_options [_currentOption].OnSet ();
+				_setOptions.Add (_focusedOption);
+				_options [_focusedOption].OnSet ();
 			}
-			OptionsChanged?.Invoke (_currentOptions.ToDictionary (e => e, e => _options [e]));
+			OptionsChanged?.Invoke (this, new SliderEventArgs<T> (_setOptions.ToDictionary (e => e, e => _options [e])));
 			break;
 
 		case SliderType.Range:
@@ -872,22 +894,22 @@ public class Slider<T> : View {
 			// Start range setting
 			if (_settingRange == false) {
 
-				_currentOptions.Clear ();            // Clear the range
-				_currentOptions.Add (_currentOption); // Set first option to current under the cursor
+				_setOptions.Clear ();            // Clear the range
+				_setOptions.Add (_focusedOption); // Set first option to current under the cursor
 
 				if (_config._rangeAllowSingle) {
 					// Allows range to be like a single option, this mean that both range options(left and right) are
 					// in the same option.
-					_currentOptions.Add (_currentOption);
+					_setOptions.Add (_focusedOption);
 				} else {
 					// If range dosen't allow single option, we select the next one, otherwise, the previous one.
 
-					if ((_currentOption + 1) < _options.Count ()) { // next
-						_currentOptions.Add (_currentOption + 1);
-						_currentOption = _currentOption + 1; // set cursor to the right
-					} else if ((_currentOption - 1) >= 0) { // prev
-						_currentOptions.Add (_currentOption - 1);
-						_currentOption = _currentOption - 1; // set cursor to the left
+					if ((_focusedOption + 1) < _options.Count ()) { // next
+						_setOptions.Add (_focusedOption + 1);
+						_focusedOption = _focusedOption + 1; // set cursor to the right
+					} else if ((_focusedOption - 1) >= 0) { // prev
+						_setOptions.Add (_focusedOption - 1);
+						_focusedOption = _focusedOption - 1; // set cursor to the left
 					} else {
 						// If it only has one option...what ?.... you better use a checkbox or set style.RangeAllowSingle = true.
 					}
@@ -898,27 +920,27 @@ public class Slider<T> : View {
 			} else { // moving
 				 // Check if range is not single and cursor is on the same option, then check if we are going left or right and skip one option, if can.
 
-				if (_config._rangeAllowSingle == false && _currentOption == _currentOptions [0]) {
+				if (_config._rangeAllowSingle == false && _focusedOption == _setOptions [0]) {
 					// is Single
-					if (_currentOption < _currentOptions [1] && (_currentOption - 1 >= 0)) { // going left
-						_currentOption = _currentOption - 1;
-					} else if (_currentOption > _currentOptions [1] && (_currentOption + 1 < _options.Count ())) { // going right
-						_currentOption = _currentOption + 1;
+					if (_focusedOption < _setOptions [1] && (_focusedOption - 1 >= 0)) { // going left
+						_focusedOption = _focusedOption - 1;
+					} else if (_focusedOption > _setOptions [1] && (_focusedOption + 1 < _options.Count ())) { // going right
+						_focusedOption = _focusedOption + 1;
 					} else {
 						// Reset to the previous currentOption becasue we cant move.
-						_currentOption = _currentOptions [1];
+						_focusedOption = _setOptions [1];
 					}
 				}
-				_currentOptions [1] = _currentOption;
+				_setOptions [1] = _focusedOption;
 			}
 
 			// Raise per Option Set event.
 			// Fix(jmperricone): Should raise only when range selecting ends.
-			_options [_currentOptions [0]].OnSet ();
-			_options [_currentOptions [1]].OnSet ();
+			_options [_setOptions [0]].OnSet ();
+			_options [_setOptions [1]].OnSet ();
 
 			// Raise Slider Option Changed Event.
-			OptionsChanged?.Invoke (_currentOptions.ToDictionary (e => e, e => _options [e]));
+			OptionsChanged?.Invoke (this, new SliderEventArgs<T> (_setOptions.ToDictionary (e => e, e => _options [e])));
 
 			break;
 		default:
@@ -933,23 +955,14 @@ public class Slider<T> : View {
 	public override void PositionCursor ()
 	{
 		base.PositionCursor ();
-		//if (_moveRuneRenderLocation.HasValue) {
-		//	var location = _moveRuneRenderLocation ??
-		//			new Point (Bounds.Width / 2, Bounds.Height / 2);
-		//	Move (location.X, location.Y);
-		//	cursorPosition = (location.X, location.Y);
-		//	return;
-		//}  
-		if (TryGetPositionByOption (_currentOption, out (int x, int y) position)) {
+		if (TryGetPositionByOption (_focusedOption, out (int x, int y) position)) {
 			if (Bounds.Contains (position.x, position.y)) {
 				Move (position.x, position.y);
-				_cursorPosition = (position.x, position.y);
 			}
 		}
 
 		if (HasFocus) {
 			Driver.SetCursorVisibility (CursorVisibility.Default);
-			Move (_cursorPosition.Value.Item1, _cursorPosition.Value.Item2);
 		} else {
 			Driver.SetCursorVisibility (CursorVisibility.Invisible);
 		}
@@ -958,17 +971,7 @@ public class Slider<T> : View {
 	/// <inheritdoc/>
 	public override void OnDrawContent (Rect contentArea)
 	{
-		//// Note(jmperricone): If there is a way to know when the bounds change, this code should go there without the check.
-		////       I tested LayoutComplete event, but it's always called. Maybe I'm doing something wrong.
-		//if (BoundsChanged (contentArea)) {
-		//	if (AutoSize == true) {
-		//		// unreachable
-		//	} else {
-		//		CalculateSliderDimensions ();
-		//	}
-		//}
-
-		//Driver.SetCursorVisibility (CursorVisibility.Box);
+		// TODO: make this more surgical
 
 		var normalScheme = ColorScheme?.Normal ?? Application.Current.ColorScheme.Normal;
 
@@ -979,8 +982,8 @@ public class Slider<T> : View {
 		// Debug
 #if (DEBUG)
 		Driver.SetAttribute (new Attribute (Color.White, Color.Red));
-		for (int y = 0; y < Bounds.Height; y++) {
-			for (int x = 0; x < Bounds.Width; x++) {
+		for (var y = 0; y < Bounds.Height; y++) {
+			for (var x = 0; x < Bounds.Width; x++) {
 				// MoveAndAdd (x, y, '·');
 			}
 		}
@@ -1050,7 +1053,7 @@ public class Slider<T> : View {
 		var x = 0;
 		var y = 0;
 
-		var isSet = _currentOptions.Count > 0;
+		var isSet = _setOptions.Count > 0;
 
 		// Left Spacing
 		if (_config._showSpacing && _config._startSpacing > 0) {
@@ -1058,14 +1061,14 @@ public class Slider<T> : View {
 			Driver.SetAttribute (isSet && _config._type == SliderType.LeftRange ? _style.RangeChar.Attribute ?? normalScheme : _style.SpaceChar.Attribute ?? normalScheme);
 			var rune = isSet && _config._type == SliderType.LeftRange ? _style.RangeChar.Runes [0] : _style.SpaceChar.Runes [0];
 
-			for (int i = 0; i < this._config._startSpacing; i++) {
+			for (var i = 0; i < this._config._startSpacing; i++) {
 				MoveAndAdd (x, y, rune);
 				if (isVertical) y++; else x++;
 			}
 		} else {
 			Driver.SetAttribute (_style.EmptyChar.Attribute ?? normalScheme);
 			// for (int i = 0; i < this.config.StartSpacing + ((this.config.StartSpacing + this.config.EndSpacing) % 2 == 0 ? 1 : 2); i++) {
-			for (int i = 0; i < this._config._startSpacing; i++) {
+			for (var i = 0; i < this._config._startSpacing; i++) {
 				MoveAndAdd (x, y, _style.EmptyChar.Runes [0]);
 				if (isVertical) y++; else x++;
 			}
@@ -1073,38 +1076,38 @@ public class Slider<T> : View {
 
 		// Slider
 		if (_options.Count > 0) {
-			for (int i = 0; i < _options.Count; i++) {
+			for (var i = 0; i < _options.Count; i++) {
 
 				var drawRange = false;
 
-				if (isSet && _config._type == SliderType.LeftRange && i <= _currentOptions [0]) {
-					drawRange = i < _currentOptions [0];
-				} else if (isSet && _config._type == SliderType.RightRange && i >= _currentOptions [0]) {
-					drawRange = i >= _currentOptions [0];
-				} else if (isSet && _config._type == SliderType.Range && ((i >= _currentOptions [0] && i <= _currentOptions [1]) || (i >= _currentOptions [1] && i <= _currentOptions [0]))) {
-					drawRange = (i >= _currentOptions [0] && i < _currentOptions [1]) || (i >= _currentOptions [1] && i < _currentOptions [0]);
+				if (isSet && _config._type == SliderType.LeftRange && i <= _setOptions [0]) {
+					drawRange = i < _setOptions [0];
+				} else if (isSet && _config._type == SliderType.RightRange && i >= _setOptions [0]) {
+					drawRange = i >= _setOptions [0];
+				} else if (isSet && _config._type == SliderType.Range && ((i >= _setOptions [0] && i <= _setOptions [1]) || (i >= _setOptions [1] && i <= _setOptions [0]))) {
+					drawRange = (i >= _setOptions [0] && i < _setOptions [1]) || (i >= _setOptions [1] && i < _setOptions [0]);
 				} else {
 					// Is Not a Range.
 				}
 
 				// Draw Option
-				Driver.SetAttribute (isSet && _currentOptions.Contains (i) ? _style.SetChar.Attribute ?? setScheme : drawRange ? _style.RangeChar.Attribute ?? setScheme : _style.OptionChar.Attribute ?? normalScheme);
+				Driver.SetAttribute (isSet && _setOptions.Contains (i) ? _style.SetChar.Attribute ?? setScheme : drawRange ? _style.RangeChar.Attribute ?? setScheme : _style.OptionChar.Attribute ?? normalScheme);
 
 				// Note(jmperricone): Maybe only for curses, windows inverts actual colors, while curses inverts bg with fg.
 				if (Application.Driver is CursesDriver) {
-					if (_currentOption == i && HasFocus) {
+					if (_focusedOption == i && HasFocus) {
 						Driver.SetAttribute (ColorScheme.Focus);
 					}
 				}
 
-				var rune = (isSet && _currentOptions.Contains (i) ? _style.SetChar.Runes [0] : drawRange ? _style.RangeChar.Runes [0] : _style.OptionChar.Runes [0]);
+				var rune = (isSet && _setOptions.Contains (i) ? _style.SetChar.Runes [0] : drawRange ? _style.RangeChar.Runes [0] : _style.OptionChar.Runes [0]);
 				MoveAndAdd (x, y, rune);
 				if (isVertical) y++; else x++;
 
 				// Draw Spacing
 				if (_config._showSpacing || i < _options.Count - 1) { // Skip if is the Last Spacing.
 					Driver.SetAttribute (drawRange && isSet ? _style.RangeChar.Attribute ?? setScheme : _style.SpaceChar.Attribute ?? normalScheme);
-					for (int s = 0; s < _config._innerSpacing; s++) {
+					for (var s = 0; s < _config._innerSpacing; s++) {
 						MoveAndAdd (x, y, drawRange && isSet ? _style.RangeChar.Runes [0] : _style.SpaceChar.Runes [0]);
 						if (isVertical) y++; else x++;
 					}
@@ -1117,13 +1120,13 @@ public class Slider<T> : View {
 		if (_config._showSpacing) {
 			Driver.SetAttribute (isSet && _config._type == SliderType.RightRange ? _style.RangeChar.Attribute ?? normalScheme : _style.SpaceChar.Attribute ?? normalScheme);
 			var rune = isSet && _config._type == SliderType.RightRange ? _style.RangeChar.Runes [0] : _style.SpaceChar.Runes [0];
-			for (int i = 0; i < remaining; i++) {
+			for (var i = 0; i < remaining; i++) {
 				MoveAndAdd (x, y, rune);
 				if (isVertical) y++; else x++;
 			}
 		} else {
 			Driver.SetAttribute (_style.EmptyChar.Attribute ?? normalScheme);
-			for (int i = 0; i < remaining; i++) {
+			for (var i = 0; i < remaining; i++) {
 				MoveAndAdd (x, y, _style.EmptyChar.Runes [0]);
 				if (isVertical) y++; else x++;
 			}
@@ -1138,7 +1141,7 @@ public class Slider<T> : View {
 		var spaceScheme = normalScheme;// style.LegendStyle.EmptyAttribute ?? normalScheme;
 
 		var isTextVertical = _config._legendsOrientation == Orientation.Vertical;
-		var isSet = _config._type == SliderType.Range ? _currentOptions.Count == 2 : _currentOptions.Count > 0;
+		var isSet = _config._type == SliderType.Range ? _setOptions.Count == 2 : _setOptions.Count > 0;
 
 		var x = 0;
 		var y = 0;
@@ -1166,19 +1169,19 @@ public class Slider<T> : View {
 			switch (_config._type) {
 			case SliderType.Single:
 			case SliderType.Multiple:
-				if (isSet && _currentOptions.Contains (i))
+				if (isSet && _setOptions.Contains (i))
 					isOptionSet = true;
 				break;
 			case SliderType.LeftRange:
-				if (isSet && i <= _currentOptions [0])
+				if (isSet && i <= _setOptions [0])
 					isOptionSet = true;
 				break;
 			case SliderType.RightRange:
-				if (isSet && i >= _currentOptions [0])
+				if (isSet && i >= _setOptions [0])
 					isOptionSet = true;
 				break;
 			case SliderType.Range:
-				if (isSet && ((i >= _currentOptions [0] && i <= _currentOptions [1]) || (i >= _currentOptions [1] && i <= _currentOptions [0])))
+				if (isSet && ((i >= _setOptions [0] && i <= _setOptions [1]) || (i >= _setOptions [1] && i <= _setOptions [0])))
 					isOptionSet = true;
 				break;
 			}
@@ -1263,7 +1266,6 @@ public class Slider<T> : View {
 			Driver.SetAttribute (spaceScheme);
 			if (isTextVertical) y += legend_right_spaces_count;
 			else x += legend_right_spaces_count;
-			//Move (x, y);
 
 			if (_config._sliderOrientation == Orientation.Horizontal && _config._legendsOrientation == Orientation.Vertical) {
 				x += _config._innerSpacing + 1;
@@ -1286,6 +1288,8 @@ public class Slider<T> : View {
 	{
 		// Note(jmperricone): Maybe we click to focus the cursor, and on next click we set the option.
 		//                    That will makes OptionFocused Event more relevant.
+		// (tig: I don't think so. Maybe an option if someone really wants it, but for now that
+		//       adss to much friction to UI.
 		// TODO(jmperricone): Make Range Type work with mouse.
 
 		if (!(mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked) ||
@@ -1316,6 +1320,7 @@ public class Slider<T> : View {
 		}
 
 		SetFocus ();
+		var savedFocusedOption = _focusedOption;
 
 		if (!_dragPosition.HasValue && (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))) {
 
@@ -1343,9 +1348,12 @@ public class Slider<T> : View {
 				success = TryGetOptionByPosition (0, mouseEvent.Y, Math.Max (0, _config._innerSpacing / 2), out option);
 			}
 			if (!_config._allowEmpty && success) {
-				_currentOption = option;
-				OptionFocused?.Invoke (_currentOption, _options [_currentOption]);
-				SetCurrentOption ();
+				_focusedOption = option;
+				if (OnOptionFocused (new SliderEventArgs<T> (_setOptions.ToDictionary (e => e, e => _options [e]), _focusedOption))) {
+					_focusedOption = savedFocusedOption;
+				} else {
+					SetCurrentOption ();
+				}
 			}
 
 			SetNeedsDisplay ();
@@ -1368,9 +1376,12 @@ public class Slider<T> : View {
 				success = TryGetOptionByPosition (0, mouseEvent.Y, Math.Max (0, _config._innerSpacing / 2), out option);
 			}
 			if (success) {
-				_currentOption = option;
-				OptionFocused?.Invoke (_currentOption, _options [_currentOption]);
-				SetCurrentOption ();
+				_focusedOption = option;
+				if (OnOptionFocused (new SliderEventArgs<T> (_setOptions.ToDictionary (e => e, e => _options [e]), _focusedOption))) {
+					_focusedOption = savedFocusedOption;
+				} else {
+					SetCurrentOption ();
+				}
 			}
 
 			SetNeedsDisplay ();
@@ -1383,18 +1394,21 @@ public class Slider<T> : View {
 	/// <inheritdoc/>
 	public override bool ProcessKey (KeyEvent keyEvent)
 	{
+		var savedFocusedOption = _focusedOption;
 		switch (keyEvent.Key) {
 		case Key.CursorLeft | Key.CtrlMask:
-			if (_currentOptions.Contains (_currentOption)) {
-				var prev = _currentOption > 0 ? _currentOption - 1 : _currentOption;
-				if (!_currentOptions.Contains (prev) || (_config._type == SliderType.Range && _config._rangeAllowSingle)) {
-					_currentOptions.Remove (_currentOption);
-					_currentOption = prev;
-					// Note(jmperricone): We are setting the option here, do we send the OptionFocused Event too ?
-					OptionFocused?.Invoke (_currentOption, _options [_currentOption]);
-					_currentOptions.Add (_currentOption);
-					_currentOptions.Sort (); // Range Type
-					OptionsChanged?.Invoke (_currentOptions.ToDictionary (e => e, e => _options [e]));
+			if (_setOptions.Contains (_focusedOption)) {
+				var prev = _focusedOption > 0 ? _focusedOption - 1 : _focusedOption;
+				if (!_setOptions.Contains (prev) || (_config._type == SliderType.Range && _config._rangeAllowSingle)) {
+					_setOptions.Remove (_focusedOption);
+					_focusedOption = prev;
+					if (OnOptionFocused (new SliderEventArgs<T> (_setOptions.ToDictionary (e => e, e => _options [e]), _focusedOption))) {
+						_focusedOption = savedFocusedOption;
+					} else {
+						_setOptions.Add (_focusedOption);
+						_setOptions.Sort (); // Range Type
+						OptionsChanged?.Invoke (this, new SliderEventArgs<T> (_setOptions.ToDictionary (e => e, e => _options [e])));
+					}
 				} else {
 					if (_settingRange == true || !AllowEmpty) {
 						SetCurrentOption ();
@@ -1403,16 +1417,19 @@ public class Slider<T> : View {
 			}
 			break;
 		case Key.CursorRight | Key.CtrlMask:
-			if (_currentOptions.Contains (_currentOption)) {
-				var next = _currentOption < _options.Count - 1 ? _currentOption + 1 : _currentOption;
-				if (!_currentOptions.Contains (next) || (_config._type == SliderType.Range && _config._rangeAllowSingle)) {
-					_currentOptions.Remove (_currentOption);
-					_currentOption = next;
+			if (_setOptions.Contains (_focusedOption)) {
+				var next = _focusedOption < _options.Count - 1 ? _focusedOption + 1 : _focusedOption;
+				if (!_setOptions.Contains (next) || (_config._type == SliderType.Range && _config._rangeAllowSingle)) {
+					_setOptions.Remove (_focusedOption);
 					// Note(jmperricone): We are setting the option here, do we send the OptionFocused Event too ?
-					OptionFocused?.Invoke (_currentOption, _options [_currentOption]);
-					_currentOptions.Add (_currentOption);
-					_currentOptions.Sort (); // Range Type
-					OptionsChanged?.Invoke (_currentOptions.ToDictionary (e => e, e => _options [e]));
+					_focusedOption = next;
+					if (OnOptionFocused (new SliderEventArgs<T> (_setOptions.ToDictionary (e => e, e => _options [e]), _focusedOption))) {
+						_focusedOption = savedFocusedOption;
+					} else {
+						_setOptions.Add (_focusedOption);
+						_setOptions.Sort (); // Range Type
+						OptionsChanged?.Invoke (this, new SliderEventArgs<T> (_setOptions.ToDictionary (e => e, e => _options [e])));
+					}
 				} else {
 					if (_settingRange == true || !AllowEmpty) {
 						SetCurrentOption ();
@@ -1421,16 +1438,18 @@ public class Slider<T> : View {
 			}
 			break;
 		case Key.Home:
-			_currentOption = 0;
-			OptionFocused?.Invoke (_currentOption, _options [_currentOption]);
-			if (_settingRange == true || !AllowEmpty) {
+			_focusedOption = 0;
+			if (OnOptionFocused (new SliderEventArgs<T> (_setOptions.ToDictionary (e => e, e => _options [e]), _focusedOption))) {
+				_focusedOption = savedFocusedOption;
+			} else if (_settingRange == true || !AllowEmpty) {
 				SetCurrentOption ();
 			}
 			break;
 		case Key.End:
-			_currentOption = _options.Count - 1;
-			OptionFocused?.Invoke (_currentOption, _options [_currentOption]);
-			if (_settingRange == true || !AllowEmpty) {
+			_focusedOption = _options.Count - 1;
+			if (OnOptionFocused (new SliderEventArgs<T> (_setOptions.ToDictionary (e => e, e => _options [e]), _focusedOption))) {
+				_focusedOption = savedFocusedOption;
+			} else if (_settingRange == true || !AllowEmpty) {
 				SetCurrentOption ();
 			}
 			break;
@@ -1440,10 +1459,10 @@ public class Slider<T> : View {
 			if (keyEvent.Key == Key.CursorUp && _config._sliderOrientation == Orientation.Horizontal) return false;
 			if (keyEvent.Key == Key.CursorLeft && _config._sliderOrientation == Orientation.Vertical) return false;
 
-			_currentOption = _currentOption > 0 ? _currentOption - 1 : _currentOption;
-			OptionFocused?.Invoke (_currentOption, _options [_currentOption]);
-
-			if (_settingRange == true || !AllowEmpty) {
+			_focusedOption = _focusedOption > 0 ? _focusedOption - 1 : _focusedOption;
+			if (OnOptionFocused (new SliderEventArgs<T> (_setOptions.ToDictionary (e => e, e => _options [e]), _focusedOption))) {
+				_focusedOption = savedFocusedOption;
+			} else if (_settingRange == true || !AllowEmpty) {
 				SetCurrentOption ();
 			}
 			break;
@@ -1453,10 +1472,10 @@ public class Slider<T> : View {
 			if (keyEvent.Key == Key.CursorDown && _config._sliderOrientation == Orientation.Horizontal) return false;
 			if (keyEvent.Key == Key.CursorRight && _config._sliderOrientation == Orientation.Vertical) return false;
 
-			_currentOption = _currentOption < _options.Count - 1 ? _currentOption + 1 : _currentOption;
-			OptionFocused?.Invoke (_currentOption, _options [_currentOption]);
-
-			if (_settingRange == true || !AllowEmpty) {
+			_focusedOption = _focusedOption < _options.Count - 1 ? _focusedOption + 1 : _focusedOption;
+			if (OnOptionFocused (new SliderEventArgs<T> (_setOptions.ToDictionary (e => e, e => _options [e]), _focusedOption))) {
+				_focusedOption = savedFocusedOption;
+			} else if (_settingRange == true || !AllowEmpty) {
 				SetCurrentOption ();
 			}
 			break;
