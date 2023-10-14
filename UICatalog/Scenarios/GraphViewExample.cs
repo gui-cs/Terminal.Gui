@@ -96,7 +96,7 @@ namespace UICatalog.Scenarios {
 
 			about.Text = "Housing Expenditures by income thirds 1996-2003";
 
-			var fore = graphView.ColorScheme.Normal.Foreground == new Color(ColorNames.Black) ? new Color(ColorNames.White) : graphView.ColorScheme.Normal.Foreground;
+			var fore = graphView.ColorScheme.Normal.Foreground == new Color(ColorName.Black) ? new Color(ColorName.White) : graphView.ColorScheme.Normal.Foreground;
 			var black = new Attribute (fore, Color.Black);
 			var cyan = new Attribute (Color.BrightCyan, Color.Black);
 			var magenta = new Attribute (Color.BrightMagenta, Color.Black);

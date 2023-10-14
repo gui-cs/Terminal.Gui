@@ -40,7 +40,7 @@ public class AttributeTests {
 	public void ColorNamesConstructor ()
 	{
 		// Arrange & Act
-		var attribute = new Attribute (ColorNames.Blue);
+		var attribute = new Attribute (ColorName.Blue);
 
 		// Assert
 		Assert.Equal ((Color)Color.Blue, attribute.Foreground);
@@ -65,7 +65,7 @@ public class AttributeTests {
 	{
 		// Arrange & Act
 		var foregroundColor = new Color (0, 0, 255);
-		var backgroundColorName = ColorNames.Black;
+		var backgroundColorName = ColorName.Black;
 		var attribute = new Attribute (foregroundColor, backgroundColorName);
 
 		// Assert
@@ -77,7 +77,7 @@ public class AttributeTests {
 	public void ColorNamesAndColorConstructor ()
 	{
 		// Arrange & Act
-		var foregroundColorName = ColorNames.BrightYellow;
+		var foregroundColorName = ColorName.BrightYellow;
 		var backgroundColor = new Color (128, 128, 128);
 		var attribute = new Attribute (foregroundColorName, backgroundColor);
 
@@ -149,8 +149,8 @@ public class AttributeTests {
 	public void MakeColorNamesAndColorNames_ForegroundAndBackgroundShouldMatchInput ()
 	{
 		// Arrange
-		var foregroundColorName = ColorNames.BrightYellow;
-		var backgroundColorName = ColorNames.Black;
+		var foregroundColorName = ColorName.BrightYellow;
+		var backgroundColorName = ColorName.Black;
 
 		// Act
 		var attribute = new Attribute (foregroundColorName, backgroundColorName);
@@ -164,7 +164,7 @@ public class AttributeTests {
 	public void MakeColorNamesAndColor_ForegroundAndBackgroundShouldMatchInput ()
 	{
 		// Arrange
-		var foregroundColorName = ColorNames.Green;
+		var foregroundColorName = ColorName.Green;
 		var backgroundColor = new Color (128, 128, 128);
 
 		// Act
@@ -180,7 +180,7 @@ public class AttributeTests {
 	{
 		// Arrange
 		var foregroundColor = new Color (255, 0, 0);
-		var backgroundColorName = ColorNames.White;
+		var backgroundColorName = ColorName.White;
 
 		// Act
 		var attribute = new Attribute (foregroundColor, backgroundColorName);
