@@ -840,7 +840,7 @@ namespace Terminal.Gui.ViewsTests {
 				// 0
 				tv.ColorScheme.Normal,				
 				// 1
-				focused ? tv.ColorScheme.HotFocus : tv.ColorScheme.HotNormal});
+				focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal});
 
 			Application.Shutdown ();
 		}
@@ -880,14 +880,14 @@ namespace Terminal.Gui.ViewsTests {
 01000
 ";
 
-			var invertHotFocus = new Attribute (tv.ColorScheme.HotFocus.Background, tv.ColorScheme.HotFocus.Foreground);
+			var invertFocus = new Attribute (tv.ColorScheme.Focus.Background, tv.ColorScheme.Focus.Foreground);
 			var invertHotNormal = new Attribute (tv.ColorScheme.HotNormal.Background, tv.ColorScheme.HotNormal.Foreground);
 
 			TestHelpers.AssertDriverColorsAre (expectedColors, new Attribute [] {
 				// 0
 				tv.ColorScheme.Normal,				
 				// 1
-				focused ?  invertHotFocus : invertHotNormal});
+				focused ?  invertFocus : invertHotNormal});
 
 			Application.Shutdown ();
 		}
@@ -906,11 +906,13 @@ namespace Terminal.Gui.ViewsTests {
 			var rowHighlight = new ColorScheme () {
 				Normal = new Attribute (Color.BrightCyan, Color.DarkGray),
 				HotNormal = new Attribute (Color.Green, Color.Blue),
-				HotFocus = new Attribute (Color.BrightYellow, Color.White),
-				Focus = new Attribute (Color.Cyan, Color.Magenta),
+				Focus = new Attribute (Color.BrightYellow, Color.White),
+				
+				// Not used by TableView
+				HotFocus = new Attribute (Color.Cyan, Color.Magenta),
 			};
 
-			// when B is 2 use the custom highlight colour for the row
+			// when B is 2 use the custom highlight color for the row
 			tv.Style.RowColorGetter += (e) => Convert.ToInt32 (e.Table [e.RowIndex, 1]) == 2 ? rowHighlight : null;
 
 			// private method for forcing the view to be focused/not focused
@@ -940,7 +942,7 @@ namespace Terminal.Gui.ViewsTests {
 				// 0
 				tv.ColorScheme.Normal,				
 				// 1
-				focused ? rowHighlight.HotFocus : rowHighlight.HotNormal,
+				focused ? rowHighlight.Focus : rowHighlight.HotNormal,
 				// 2
 				rowHighlight.Normal});
 
@@ -973,7 +975,7 @@ namespace Terminal.Gui.ViewsTests {
 				// 0
 				tv.ColorScheme.Normal,
 				// 1
-				focused ? tv.ColorScheme.HotFocus : tv.ColorScheme.HotNormal });
+				focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal });
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -993,12 +995,14 @@ namespace Terminal.Gui.ViewsTests {
 			// Create a style for column B
 			var bStyle = tv.Style.GetOrCreateColumnStyle (1);
 
-			// when B is 2 use the custom highlight colour
+			// when B is 2 use the custom highlight color
 			var cellHighlight = new ColorScheme () {
 				Normal = new Attribute (Color.BrightCyan, Color.DarkGray),
 				HotNormal = new Attribute (Color.Green, Color.Blue),
-				HotFocus = new Attribute (Color.BrightYellow, Color.White),
 				Focus = new Attribute (Color.Cyan, Color.Magenta),
+				
+				// Not used by TableView
+				HotFocus = new Attribute (Color.BrightYellow, Color.White),
 			};
 
 			bStyle.ColorGetter = (a) => Convert.ToInt32 (a.CellValue) == 2 ? cellHighlight : null;
@@ -1030,7 +1034,7 @@ namespace Terminal.Gui.ViewsTests {
 				// 0
 				tv.ColorScheme.Normal,				
 				// 1
-				focused ? tv.ColorScheme.HotFocus : tv.ColorScheme.HotNormal,
+				focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal,
 				// 2
 				cellHighlight.Normal});
 
@@ -1063,7 +1067,7 @@ namespace Terminal.Gui.ViewsTests {
 				// 0
 				tv.ColorScheme.Normal,				
 				// 1
-				focused ? tv.ColorScheme.HotFocus : tv.ColorScheme.HotNormal });
+				focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal });
 
 			// Shutdown must be called to safely clean up Application if Init has been called
 			Application.Shutdown ();
@@ -2771,7 +2775,7 @@ A B C
 			tv.Draw ();
 
 			// Focus color (1) should be used for rendering the selected line
-			// Note that because there are no vertical cell lines we use the hot focus
+			// Note that because there are no vertical cell lines we use the focus
 			// color for the whole row
 			expected =
 				@"
