@@ -353,7 +353,7 @@ public class FakeDriver : ConsoleDriver {
 		_keyUpHandler = keyUpHandler;
 
 		// Note: Net doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
-		(mainLoop.MainLoopDriver as FakeMainLoop).KeyPressed += (consoleKey) => ProcessInput (consoleKey);
+		(mainLoop.MainLoopDriver as FakeMainLoop).KeyPressed = (consoleKey) => ProcessInput (consoleKey);
 	}
 
 	void ProcessInput (ConsoleKeyInfo consoleKey)
