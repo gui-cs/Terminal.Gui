@@ -627,7 +627,7 @@ internal class CursesDriver : ConsoleDriver {
 			return true;
 		});
 
-		_mainLoop.WinChanged += ProcessInput;
+		_mainLoop.WinChanged = ProcessInput;
 	}
 
 	public override void Init (Action terminalResized)
