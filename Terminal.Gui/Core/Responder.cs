@@ -277,6 +277,9 @@ namespace Terminal.Gui {
 
 				// TODO: free unmanaged resources (unmanaged objects) and override finalizer
 				// TODO: set large fields to null
+#if DEBUG_IDISPOSABLE
+				Instances.Remove(this);
+#endif
 				disposedValue = true;
 			}
 		}
