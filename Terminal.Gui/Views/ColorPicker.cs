@@ -116,13 +116,10 @@ namespace Terminal.Gui {
 				case ColorPickerStyle.Ansi:
 					var index = (int)_selectedColor.ColorName;
 					return new Point (index % _cols, index / _cols);
-					break;
 				case ColorPickerStyle.Rgb:
 					int x = (int)(_selectedColor.R * Bounds.Width / 255);
 					int y = (int)(_selectedColor.G * Bounds.Height / 255);
-
 					return new Point (x, y);
-					break;
 				}
 				return new Point ();
 			}

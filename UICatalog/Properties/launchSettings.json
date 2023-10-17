@@ -24,7 +24,7 @@
     },
     "Color Picker": {
       "commandName": "Project",
-      "commandLineArgs": "Color Picker"
+      "commandLineArgs": "\"Color Picker\""
     },
     "Dialogs": {
       "commandName": "Project",
