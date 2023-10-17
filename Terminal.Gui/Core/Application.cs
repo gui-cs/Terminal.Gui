@@ -69,16 +69,15 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static List<Toplevel> MdiChildes {
 			get {
+				List<Toplevel> mdiChildes = new List<Toplevel> ();
 				if (MdiTop != null) {
-					List<Toplevel> mdiChildes = new List<Toplevel> ();
 					foreach (var top in toplevels) {
 						if (top != MdiTop && !top.Modal) {
 							mdiChildes.Add (top);
 						}
 					}
-					return mdiChildes;
 				}
-				return null;
+				return mdiChildes;
 			}
 		}
 
@@ -534,8 +533,10 @@ namespace Terminal.Gui {
 
 			var chain = toplevels.ToList ();
 			foreach (var topLevel in chain) {
-				if (topLevel.ProcessHotKey (ke))
+				if (topLevel.ProcessHotKey (ke)) {
+					EnsuresMdiTopOnFrontIfMdiTopMostFocused ();
 					return;
+				}
 				if (topLevel.Modal)
 					break;
 			}
@@ -766,6 +767,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			EnsuresMdiTopOnFrontIfMdiTopMostFocused ();
 			var view = FindDeepestView (Current, me.X, me.Y, out int rx, out int ry);
 
 			if (view != null && view.WantContinuousButtonPressed)
@@ -804,13 +806,15 @@ namespace Terminal.Gui {
 				}
 			}
 
-			if ((view == null || view == MdiTop) && !Current.Modal && MdiTop != null
+			if ((view == null || view == MdiTop || view.SuperView == MdiTop) && !Current.Modal && MdiTop != null
 				&& me.Flags != MouseFlags.ReportMousePosition && me.Flags != 0) {
 
 				var top = FindDeepestTop (Top, me.X, me.Y, out _, out _);
 				view = FindDeepestView (top, me.X, me.Y, out rx, out ry);
 
-				if (view != null && view != MdiTop && top != Current) {
+				if (view != null && view != MdiTop && top != Current && top.MostFocused != null
+					&& top.MostFocused.GetType ().Name != "ContentView") {
+
 					MoveCurrent ((Toplevel)top);
 				}
 			}
@@ -843,9 +847,20 @@ namespace Terminal.Gui {
 					WantContinuousButtonPressedView = null;
 
 				// Should we bubbled up the event, if it is not handled?
-				view.OnMouseEvent (nme);
+				if (view.OnMouseEvent (nme)) {
+					EnsuresMdiTopOnFrontIfMdiTopMostFocused ();
+				}
 
 				EnsuresTopOnFront ();
+			}
+		}
+
+		static void EnsuresMdiTopOnFrontIfMdiTopMostFocused ()
+		{
+			if (MdiTop != null && Current != MdiTop && MdiTop.MostFocused != null
+				&& MdiTop.MostFocused.GetType ().Name != "ContentView") {
+
+				MoveCurrent (Top);
 			}
 		}
 
@@ -1188,8 +1203,12 @@ namespace Terminal.Gui {
 				Iteration?.Invoke ();
 
 				EnsureModalOrVisibleAlwaysOnTop (state.Toplevel);
+				if (!EnsuresNotModalNotRunningAndNotCurrent (state.Toplevel)) {
+					EnsuresMdiChildOnFrontIfMdiTopNotMostFocused ();
+				}
 				if ((state.Toplevel != Current && Current?.Modal == true)
 					|| (state.Toplevel != Current && Current?.Modal == false)) {
+
 					MdiTop?.OnDeactivate (state.Toplevel);
 					state.Toplevel = Current;
 					MdiTop?.OnActivate (state.Toplevel);
@@ -1217,18 +1236,42 @@ namespace Terminal.Gui {
 			}
 			if (!state.Toplevel.NeedDisplay.IsEmpty || state.Toplevel.ChildNeedsDisplay || state.Toplevel.LayoutNeeded
 				|| MdiChildNeedsDisplay ()) {
-				state.Toplevel.Redraw (state.Toplevel.Bounds);
-				if (DebugDrawBounds) {
-					DrawBounds (state.Toplevel);
-				}
-				state.Toplevel.PositionCursor ();
-				Driver.Refresh ();
+
+				bool isTopNeedsDisplay;
+				do {
+					state.Toplevel.Redraw (state.Toplevel.Bounds);
+					if (DebugDrawBounds) {
+						DrawBounds (state.Toplevel);
+					}
+					state.Toplevel.PositionCursor ();
+					Driver.Refresh ();
+					isTopNeedsDisplay = IsTopNeedsDisplay (state.Toplevel);
+					if (isTopNeedsDisplay) {
+						Top.Redraw (Top.Bounds);
+						state.Toplevel.SetNeedsDisplay ();
+					}
+				} while (isTopNeedsDisplay);
 			} else {
 				Driver.UpdateCursor ();
 			}
-			if (state.Toplevel != Top && !state.Toplevel.Modal
-				&& (!Top.NeedDisplay.IsEmpty || Top.ChildNeedsDisplay || Top.LayoutNeeded)) {
-				Top.Redraw (Top.Bounds);
+
+			bool IsTopNeedsDisplay (Toplevel toplevel)
+			{
+				if (toplevel != Top && !toplevel.Modal
+					&& (!Top.NeedDisplay.IsEmpty || Top.ChildNeedsDisplay || Top.LayoutNeeded)) {
+
+					return true;
+				}
+				return false;
+			}
+		}
+
+		static void EnsuresMdiChildOnFrontIfMdiTopNotMostFocused ()
+		{
+			if (MdiTop != null && Current == MdiTop && (MdiTop.MostFocused == null
+				|| MdiTop.MostFocused.GetType ().Name == "ContentView")) {
+
+				MoveNext ();
 			}
 		}
 
@@ -1247,6 +1290,22 @@ namespace Terminal.Gui {
 			if (!toplevel.Visible && toplevel == Current) {
 				MoveNext ();
 			}
+		}
+
+		static bool EnsuresNotModalNotRunningAndNotCurrent (Toplevel curRunStateTop)
+		{
+			if (MdiTop == null || !curRunStateTop.Running) {
+				return false;
+			}
+
+			foreach (var top in toplevels) {
+				if (!top.IsMdiContainer && top?.Running == false && top != Current && top?.Modal == false) {
+					MoveCurrent (top);
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		static bool MdiChildNeedsDisplay ()
@@ -1586,6 +1645,10 @@ namespace Terminal.Gui {
 
 		internal static bool ShowChild (Toplevel top)
 		{
+			if (Current == top) {
+				return false;
+			}
+
 			if (top.Visible && MdiTop != null && Current?.Modal == false) {
 				lock (toplevels) {
 					toplevels.MoveTo (top, 0, new ToplevelEqualityComparer ());
