@@ -86,6 +86,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (viewBackground);
 
+			// BUGBUG: Views should not use RootMouseEvent; use Responder instead.
 			Application.RootMouseEvent = (e) => {
 				if (e.View != null) {
 					var fore = e.View.GetNormalColor ().Foreground;

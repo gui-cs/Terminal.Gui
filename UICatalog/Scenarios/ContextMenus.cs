@@ -72,6 +72,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
+			// BUGBUG: Views should not use RootMouseEvent; use Responder instead.
 			Application.RootMouseEvent += Application_RootMouseEvent;
 
 			void Application_RootMouseEvent (MouseEvent me)
@@ -83,6 +84,7 @@ namespace UICatalog.Scenarios {
 
 			Application.Top.Closed += (s,e) => {
 				Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
+				// BUGBUG: Views should not use RootMouseEvent; use Responder instead.
 				Application.RootMouseEvent -= Application_RootMouseEvent;
 			};
 		}

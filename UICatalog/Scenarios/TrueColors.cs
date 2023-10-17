@@ -81,7 +81,8 @@ namespace UICatalog.Scenarios {
 				Y = 6
 			};
 			Win.Add (lblBlue);
-			
+
+			// BUGBUG: Views should not use RootMouseEvent; use Responder instead.
 			Application.RootMouseEvent = (e) => {
 				if (e.View != null) {
 					var normal = e.View.GetNormalColor ();

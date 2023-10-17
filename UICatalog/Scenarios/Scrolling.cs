@@ -291,6 +291,8 @@ namespace UICatalog.Scenarios {
 				Width = 50,
 			};
 			Win.Add (mousePos);
+
+			// BUGBUG: Views should not use RootMouseEvent; use Responder instead.
 			Application.RootMouseEvent += delegate (MouseEvent me) {
 				mousePos.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count++}";
 			};

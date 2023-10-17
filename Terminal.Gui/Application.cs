@@ -1081,12 +1081,21 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Merely a debugging aid to see the raw mouse events
+		/// Provides a test and debugging aid to see the raw mouse events. Applications and views should use
+		/// <see cref="Responder.MouseEvent"/> instead.
 		/// </summary>
+		/// <remarks>
+		/// The coordinates in the <see cref="MouseEvent"/> will be in screen coordinates.
+		/// </remarks>
 		public static Action<MouseEvent> RootMouseEvent { get; set; }
 
 		static View _lastMouseOwnerView;
 
+		/// <summary>
+		/// Called from <see cref="ConsoleDriver"/> to signal a mouse event. Identifies the <see cref="View"/> that
+		/// should be receiving mouse input and forwards the mouse event to that view.
+		/// </summary>
+		/// <param name="me"></param>
 		static void ProcessMouseEvent (MouseEvent me)
 		{
 			static bool OutsideBounds (Point p, Rect r) => p.X < 0 || p.X > r.Right || p.Y < 0 || p.Y > r.Bottom;

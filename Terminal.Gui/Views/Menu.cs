@@ -484,6 +484,7 @@ namespace Terminal.Gui {
 				Application.Current.DrawContentComplete += Current_DrawContentComplete;
 				Application.Current.TerminalResized += Current_TerminalResized;
 			}
+			// BUGBUG: Views should not use RootMouseEvent; use Responder instead.
 			Application.RootMouseEvent += Application_RootMouseEvent;
 
 			// Things this view knows how to do
@@ -523,8 +524,10 @@ namespace Terminal.Gui {
 		{
 			base.OnVisibleChanged ();
 			if (Visible) {
+				// BUGBUG: Views should not use RootMouseEvent; use Responder instead.
 				Application.RootMouseEvent += Application_RootMouseEvent;
 			} else {
+				// BUGBUG: Views should not use RootMouseEvent; use Responder instead.
 				Application.RootMouseEvent -= Application_RootMouseEvent;
 			}
 		}
@@ -987,6 +990,7 @@ namespace Terminal.Gui {
 				Application.Current.DrawContentComplete -= Current_DrawContentComplete;
 				Application.Current.TerminalResized -= Current_TerminalResized;
 			}
+			// BUGBUG: Views should not use RootMouseEvent; use Responder instead.
 			Application.RootMouseEvent -= Application_RootMouseEvent;
 			base.Dispose (disposing);
 		}
