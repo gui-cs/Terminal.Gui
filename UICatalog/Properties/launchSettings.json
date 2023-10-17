@@ -22,6 +22,10 @@
       "commandLineArgs": "dotnet UICatalog.dll -usc",
       "distributionName": ""
     },
+    "Sliders": {
+      "commandName": "Project",
+      "commandLineArgs": "Sliders"
+    },
     "Wizards": {
       "commandName": "Project",
       "commandLineArgs": "Wizards"
