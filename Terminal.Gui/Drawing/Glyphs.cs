@@ -130,6 +130,11 @@ namespace Terminal.Gui {
 		public Rune Dot { get; set; } = (Rune)'∙';
 
 		/// <summary>
+		/// Black Circle . Default is (U+025cf) - ●.
+		/// </summary>
+		public Rune BlackCircle { get; set; } = (Rune)'●'; // Black Circle - ● U+025cf
+
+		/// <summary>
 		/// Expand (e.g. for <see cref="TreeView"/>.
 		/// </summary>
 		public Rune Expand { get; set; } = (Rune)'+';
