@@ -10,9 +10,10 @@ namespace UICatalog.Scenarios {
 			var vx = 30;
 			var x = 30;
 			var y = 14;
-			var colors = System.Enum.GetValues (typeof (Color));
+			var colors = System.Enum.GetValues (typeof (ColorName));
 
-			foreach (Color bg in colors) {
+		
+			foreach (ColorName bg in colors) {
 				Attribute attr = new Attribute (bg, colors.Length - 1 - bg);
 				var vl = new Label (bg.ToString (), TextDirection.TopBottom_LeftRight) {
 					X = vx,
@@ -33,7 +34,7 @@ namespace UICatalog.Scenarios {
 				};
 				Win.Add (hl);
 				vx++;
-				foreach (Color fg in colors) {
+				foreach (ColorName fg in colors) {
 					var c = new Attribute (fg, bg);
 					var t = x.ToString ();
 					var l = new Label (x, y, t [t.Length - 1].ToString ()) {
@@ -46,16 +47,16 @@ namespace UICatalog.Scenarios {
 				y++;
 			}
 
-			Win.Add (new Label ("Mouse over to get the view color:") {
-				X = Pos.AnchorEnd (35)
+			Win.Add (new Label ("Mouse over to get the Attribute:") {
+				X = Pos.AnchorEnd (36),
 			});
 			Win.Add (new Label ("Foreground:") {
-				X = Pos.AnchorEnd (34),
+				X = Pos.AnchorEnd (35),
 				Y = 2
 			});
 
 			var lblForeground = new Label () {
-				X = Pos.AnchorEnd (20),
+				X = Pos.AnchorEnd (23),
 				Y = 2
 			};
 			Win.Add (lblForeground);
@@ -68,12 +69,12 @@ namespace UICatalog.Scenarios {
 			Win.Add (viewForeground);
 
 			Win.Add (new Label ("Background:") {
-				X = Pos.AnchorEnd (34),
+				X = Pos.AnchorEnd (35),
 				Y = 4
 			});
 
 			var lblBackground = new Label () {
-				X = Pos.AnchorEnd (20),
+				X = Pos.AnchorEnd (23),
 				Y = 4
 			};
 			Win.Add (lblBackground);
@@ -89,9 +90,9 @@ namespace UICatalog.Scenarios {
 				if (e.View != null) {
 					var fore = e.View.GetNormalColor ().Foreground;
 					var back = e.View.GetNormalColor ().Background;
-					lblForeground.Text = fore.ToString ();
+					lblForeground.Text = $"#{fore.R:X2}{fore.G:X2}{fore.B:X2} {fore.ColorName} ";
 					viewForeground.ColorScheme.Normal = new Attribute (fore, fore);
-					lblBackground.Text = back.ToString ();
+					lblBackground.Text = $"#{back.R:X2}{back.G:X2}{back.B:X2} {back.ColorName} ";
 					viewBackground.ColorScheme.Normal = new Attribute (back, back);
 				}
 			};

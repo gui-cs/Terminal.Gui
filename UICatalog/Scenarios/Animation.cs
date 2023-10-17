@@ -10,11 +10,11 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Terminal.Gui;
-using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Animation", Description: "Demonstration of how to render animated images with threading.")]
-	[ScenarioCategory ("Colors")]
+	[ScenarioCategory ("Threading")]
+	[ScenarioCategory ("Drawing")]
 	public class Animation : Scenario {
 		private bool isDisposed;
 

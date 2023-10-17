@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
-using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios {
 
 	[ScenarioMetadata (Name: "Line Drawing", Description: "Demonstrates LineCanvas.")]
 	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("Layout")]
+	[ScenarioCategory ("Drawing")]
 	public class LineDrawing : Scenario {
 
 		public override void Setup ()
@@ -96,7 +95,7 @@ namespace UICatalog.Scenarios {
 		class DrawingArea : View {
 			List<LineCanvas> _layers = new List<LineCanvas> ();
 			LineCanvas _currentLayer;
-			Color _currentColor = Color.White;
+			Color _currentColor = new Color (Color.White);
 			StraightLine _currentLine = null;
 
 			public LineStyle LineStyle { get; set; }

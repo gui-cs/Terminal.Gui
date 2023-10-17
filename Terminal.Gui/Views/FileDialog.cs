@@ -177,7 +177,7 @@ namespace Terminal.Gui {
 
 			this.tbPath = new TextField {
 				Width = Dim.Fill (0),
-				CaptionColor = Color.Black
+				CaptionColor = new Color (Color.Black)
 			};
 			this.tbPath.KeyPress += (s, k) => {
 
@@ -209,6 +209,7 @@ namespace Terminal.Gui {
 			};
 			this.tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
 			this.tableView.MouseClick += OnTableViewMouseClick;
+			tableView.Style.InvertSelectedCellFirstCharacter = true;
 			Style.TableStyle = tableView.Style;
 
 			var nameStyle = Style.TableStyle.GetOrCreateColumnStyle (0);
@@ -273,7 +274,7 @@ namespace Terminal.Gui {
 
 			tbFind = new TextField {
 				X = Pos.Right (this.btnToggleSplitterCollapse) + 1,
-				CaptionColor = Color.Black,
+				CaptionColor = new Color (Color.Black),
 				Width = 30,
 				Y = Pos.AnchorEnd (1),
 			};
@@ -663,7 +664,7 @@ namespace Terminal.Gui {
 			tbPath.Caption = Style.PathCaption;
 			tbFind.Caption = Style.SearchCaption;
 
-			tbPath.Autocomplete.ColorScheme.Normal = Attribute.Make (Color.Black, tbPath.ColorScheme.Normal.Background);
+			tbPath.Autocomplete.ColorScheme.Normal = new Attribute (Color.Black, tbPath.ColorScheme.Normal.Background);
 
 			_treeRoots = Style.TreeRootGetter ();
 			Style.IconProvider.IsOpenGetter = treeView.IsExpanded;
@@ -1197,9 +1198,8 @@ namespace Terminal.Gui {
 			}
 
 
-			var color = Style.ColorProvider.GetTrueColor (stats.FileSystemInfo)
-			?? TrueColor.FromConsoleColor (Color.White);
-			var black = TrueColor.FromConsoleColor (Color.Black);
+			var color = Style.ColorProvider.GetColor (stats.FileSystemInfo) ?? new Color (Color.White);
+			var black = new Color (Color.Black);
 
 			// TODO: Add some kind of cache for this
 			return new ColorScheme {
