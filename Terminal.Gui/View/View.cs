@@ -503,6 +503,11 @@ namespace Terminal.Gui {
 			Padding?.Dispose ();
 			Padding = null;
 
+			_height = null;
+			_width = null;
+			_x = null;
+			_y = null;
+
 			for (var i = InternalSubviews.Count - 1; i >= 0; i--) {
 				var subview = InternalSubviews [i];
 				Remove (subview);

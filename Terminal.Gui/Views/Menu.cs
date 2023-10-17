@@ -1844,6 +1844,11 @@ namespace Terminal.Gui {
 			var c = ((uint)kb.Key & (uint)Key.CharMask);
 			for (int i = 0; i < children.Length; i++) {
 				var mi = children [i];
+
+				if(mi == null) {
+					continue;
+				}
+
 				int p = mi.Title.IndexOf (MenuBar.HotKeySpecifier.ToString ());
 				if (p != -1 && p + 1 < mi.Title.GetRuneCount ()) {
 					if (Char.ToUpperInvariant ((char)mi.Title [p + 1]) == c) {

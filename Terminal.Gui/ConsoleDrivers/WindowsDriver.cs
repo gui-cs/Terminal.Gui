@@ -861,9 +861,9 @@ internal class WindowsDriver : ConsoleDriver {
 		_mouseHandler = mouseHandler;
 
 		_mainLoop = mainLoop.MainLoopDriver as WindowsMainLoop;
-		_mainLoop.ProcessInput += ProcessInput;
+		_mainLoop.ProcessInput = ProcessInput;
 #if HACK_CHECK_WINCHANGED
-		_mainLoop.WinChanged += ChangeWin;
+		_mainLoop.WinChanged = ChangeWin;
 #endif
 	}
 
