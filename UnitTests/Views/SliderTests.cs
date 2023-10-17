@@ -110,7 +110,7 @@ public class SliderTests {
 		Assert.NotNull (slider);
 		Assert.NotNull (slider.Options);
 		Assert.Empty (slider.Options);
-		Assert.Equal (Orientation.Horizontal, slider.SliderOrientation);
+		Assert.Equal (Orientation.Horizontal, slider.Orientation);
 		Assert.False (slider.AllowEmpty);
 		Assert.True (slider.ShowLegends);
 		Assert.False (slider.ShowSpacing);
@@ -235,7 +235,7 @@ public class SliderTests {
 	{
 		// Arrange
 		var slider = new Slider<int> (new List<int> { 1, 2, 3, 4 });
-		slider.SliderOrientation = Orientation.Vertical;
+		slider.Orientation = Orientation.Vertical;
 		slider.AutoSize = true; // Set auto size to true to enable testing
 		slider.InnerSpacing = 2;
 
@@ -301,7 +301,7 @@ public class SliderTests {
 	{
 		// Arrange
 		var slider = new Slider<int> (new List<int> { 1, 2, 3, 4 });
-		slider.SliderOrientation = Orientation.Vertical;
+		slider.Orientation = Orientation.Vertical;
 		slider.AutoSize = true; // Set auto size to true to enable testing
 		slider.InnerSpacing = 2;
 		// 0 1

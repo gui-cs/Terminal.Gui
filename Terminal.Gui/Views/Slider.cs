@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using Terminal.Gui;
-using static System.Net.Mime.MediaTypeNames;
-using Attribute = Terminal.Gui.Attribute;
+using Unix.Terminal;
 
 namespace Terminal.Gui;
 
@@ -251,6 +249,30 @@ public class SliderEventArgs<T> : EventArgs {
 }
 
 /// <summary>
+/// <see cref="EventArgs"/> for <see cref="Orientation"/> events.
+/// </summary>
+public class OrientationEventArgs : EventArgs {
+	/// <summary>
+	/// The new orientation.
+	/// </summary>
+	public Orientation Orientation { get; set; }
+
+	/// <summary>
+	/// If set to true, the orientation change operation will be canceled, if applicable.
+	/// </summary>
+	public bool Cancel { get; set; }
+
+	/// <summary>
+	/// Constructs a new instance.
+	/// </summary>
+	/// <param name="orientation">the new orientation</param>
+	public OrientationEventArgs (Orientation orientation)
+	{
+		Orientation = orientation;
+		Cancel = false;
+	}
+}
+/// <summary>
 /// Slider control.
 /// </summary>
 public class Slider : Slider<object> {
@@ -455,28 +477,42 @@ public class Slider<T> : View {
 	}
 
 	/// <summary>
-	/// Slider Orientation. <see cref="Orientation"></see>
+	/// Slider Orientation. <see cref="Gui.Orientation"></see>
 	/// </summary>
-	public Orientation SliderOrientation {
+	public Orientation Orientation {
 		get => _config._sliderOrientation;
 		set => OnOrientationChanged (value);
 	}
 
-	public bool OnOrientationChanged (Orientation newOrientation)
+	/// <summary>
+	/// Fired when the slider orientation has changed. Can be cancelled by setting <see cref="OrientationEventArgs.Cancel"/> to true.
+	/// </summary>
+	public event EventHandler<OrientationEventArgs> OrientationChanged;
+
+	/// <summary>
+	/// Called when the slider orientation has changed. Invokes the <see cref="OrientationChanged"/> event.
+	/// </summary>
+	/// <param name="newOrientation"></param>
+	/// <returns>True of the event was cancelled.</returns>
+	public virtual bool OnOrientationChanged (Orientation newOrientation)
 	{
-		_config._sliderOrientation = newOrientation;
-		SetKeyBindings ();
-		if (IsInitialized) {
-			CalcSpacingConfig ();
-			Adjust ();
-			SetNeedsDisplay ();
-			SuperView?.SetNeedsLayout ();
+		var args = new OrientationEventArgs (newOrientation);
+		OrientationChanged?.Invoke (this, args);
+		if (!args.Cancel) {
+			_config._sliderOrientation = newOrientation;
+			SetKeyBindings ();
+			if (IsInitialized) {
+				CalcSpacingConfig ();
+				Adjust ();
+				SetNeedsDisplay ();
+				SuperView?.SetNeedsLayout ();
+			}
 		}
-		return false;
+		return args.Cancel;
 	}
 
 	/// <summary>
-	/// Legends Orientation. <see cref="Orientation"></see>
+	/// Legends Orientation. <see cref="Gui.Orientation"></see>
 	/// </summary>
 	public Orientation LegendsOrientation {
 		get => _config._legendsOrientation;
@@ -840,7 +876,7 @@ public class Slider<T> : View {
 	{
 		// Fix(jmperricone): Not working.
 		option_idx = -1;
-		if (SliderOrientation == Orientation.Horizontal) {
+		if (Orientation == Orientation.Horizontal) {
 			if (y != 0) {
 				return false;
 			}
@@ -1267,7 +1303,7 @@ public class Slider<T> : View {
 		{
 			int Clamp (int value, int min, int max) => Math.Max (min, Math.Min (max, value));
 
-			if (SliderOrientation == Orientation.Horizontal) {
+			if (Orientation == Orientation.Horizontal) {
 				var left = _config._startSpacing;
 				var width = _options.Count + (_options.Count - 1) * _config._innerSpacing;
 				var right = (left + width - 1);
@@ -1305,7 +1341,7 @@ public class Slider<T> : View {
 			var success = false;
 			var option = 0;
 			// how far has user dragged from original location?						
-			if (SliderOrientation == Orientation.Horizontal) {
+			if (Orientation == Orientation.Horizontal) {
 				success = TryGetOptionByPosition (mouseEvent.X, 0, Math.Max (0, _config._innerSpacing / 2), out option);
 			} else {
 				success = TryGetOptionByPosition (0, mouseEvent.Y, Math.Max (0, _config._innerSpacing / 2), out option);
@@ -1330,7 +1366,7 @@ public class Slider<T> : View {
 			// TODO: Add func to calc distance between options to use as the MouseClickXOptionThreshold
 			var success = false;
 			var option = 0;
-			if (SliderOrientation == Orientation.Horizontal) {
+			if (Orientation == Orientation.Horizontal) {
 				success = TryGetOptionByPosition (mouseEvent.X, 0, Math.Max (0, _config._innerSpacing / 2), out option);
 			} else {
 				success = TryGetOptionByPosition (0, mouseEvent.Y, Math.Max (0, _config._innerSpacing / 2), out option);

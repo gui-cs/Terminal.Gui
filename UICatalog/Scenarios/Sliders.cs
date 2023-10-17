@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Terminal.Gui;
-using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios;
 
@@ -121,7 +120,7 @@ public class Sliders : Scenario {
 			foreach (var s in Win.Subviews.OfType<Slider> ()) {
 
 				if (e.Options.ContainsKey (0)) {
-					s.SliderOrientation = Orientation.Horizontal;
+					s.Orientation = Orientation.Horizontal;
 
 					s.AdjustBestHeight ();
 					s.Width = Dim.Percent (50);
@@ -139,7 +138,7 @@ public class Sliders : Scenario {
 					prev = s;
 
 				} else if (e.Options.ContainsKey (1)) {
-					s.SliderOrientation = Orientation.Vertical;
+					s.Orientation = Orientation.Vertical;
 
 					s.AdjustBestWidth ();
 					s.Height = Dim.Fill ();
@@ -206,10 +205,10 @@ public class Sliders : Scenario {
 
 		sliderColor.LegendsOrientation = Orientation.Vertical;
 		var colorOptions = new List<SliderOption<(Color, Color)>> ();
-		foreach (var colorIndex in Enum.GetValues<Color> ()) {
+		foreach (var colorIndex in Enum.GetValues<ColorName> ()) {
 			var colorName = colorIndex.ToString ();
 			colorOptions.Add (new SliderOption<(Color, Color)> {
-				Data = (colorIndex, Win.GetNormalColor ().Background),
+				Data = (new Color((ColorName)colorIndex), Win.GetNormalColor ().Background),
 				Legend = colorName,
 				LegendAbbr = (Rune)colorName [0],
 			});
@@ -292,7 +291,7 @@ public class Sliders : Scenario {
 		};
 
 		single.LayoutStarted += (s, e) => {
-			if (single.SliderOrientation == Orientation.Horizontal) {
+			if (single.Orientation == Orientation.Horizontal) {
 				single.Style.SpaceChar = new Cell () { Runes = { CM.Glyphs.HLine } };
 				single.Style.OptionChar = new Cell () { Runes = { CM.Glyphs.HLine } };
 			} else {
