@@ -136,7 +136,7 @@ internal class NetEvents : IDisposable {
 
 	public InputResult? DequeueInput ()
 	{
-		while (!_inputReadyCancellationTokenSource.Token.IsCancellationRequested) {
+		while (_inputReadyCancellationTokenSource != null && !_inputReadyCancellationTokenSource.Token.IsCancellationRequested) {
 			_waitForStart.Set ();
 			_winChange.Set ();
 
@@ -185,7 +185,12 @@ internal class NetEvents : IDisposable {
 	{
 		while (!_inputReadyCancellationTokenSource.Token.IsCancellationRequested) {
 
-			_waitForStart.Wait (_inputReadyCancellationTokenSource.Token);
+			try {
+				_waitForStart.Wait (_inputReadyCancellationTokenSource.Token);
+			} catch (OperationCanceledException) {
+
+				return;
+			}
 			_waitForStart.Reset ();
 
 			if (_inputQueue.Count == 0) {
@@ -1339,9 +1344,14 @@ internal class NetMainLoop : IMainLoopDriver {
 			} catch (OperationCanceledException) {
 				return;
 			} finally {
-				_waitForProbe.Reset ();
+				if (_waitForProbe.IsSet) {
+					_waitForProbe.Reset ();
+				}
 			}
 
+			if (_inputHandlerTokenSource.IsCancellationRequested) {
+				return;
+			}
 			if (_resultQueue.Count == 0) {
 				_resultQueue.Enqueue (_netEvents.DequeueInput ());
 			}
