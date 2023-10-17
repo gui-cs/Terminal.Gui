@@ -209,6 +209,7 @@ namespace Terminal.Gui {
 			};
 			this.tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
 			this.tableView.MouseClick += OnTableViewMouseClick;
+			tableView.Style.InvertSelectedCellFirstCharacter = true;
 			Style.TableStyle = tableView.Style;
 
 			var nameStyle = Style.TableStyle.GetOrCreateColumnStyle (0);
