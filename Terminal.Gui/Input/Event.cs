@@ -775,12 +775,12 @@ namespace Terminal.Gui {
 	/// Action which takes a MouseEvent argument.</remarks>
 	public class MouseEvent {
 		/// <summary>
-		/// The X (column) location for the mouse event.
+		/// The X (column) location for the mouse event relative to <see cref="View.Bounds"/>.
 		/// </summary>
 		public int X { get; set; }
 
 		/// <summary>
-		/// The Y (column) location for the mouse event.
+		/// The Y (column) location for the mouse event relative to <see cref="View.Bounds"/>
 		/// </summary>
 		public int Y { get; set; }
 
