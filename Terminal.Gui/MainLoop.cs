@@ -303,7 +303,10 @@ namespace Terminal.Gui {
 			}
 		}
 
-		bool _running;
+		/// <summary>
+		/// Used for unit tests.
+		/// </summary>
+		internal bool Running { get; private set; }
 
 		/// <summary>
 		///   Determines whether there are pending events to be processed.
@@ -353,13 +356,13 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void Run ()
 		{
-			var prev = _running;
-			_running = true;
-			while (_running) {
+			var prev = Running;
+			Running = true;
+			while (Running) {
 				EventsPending ();
 				RunIteration ();
 			}
-			_running = prev;
+			Running = prev;
 		}
 
 		/// <summary>
@@ -367,7 +370,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void Stop ()
 		{
-			_running = false;
+			Running = false;
 			MainLoopDriver.Wakeup ();
 		}
 		
@@ -376,7 +379,7 @@ namespace Terminal.Gui {
 		{
 			GC.SuppressFinalize (this);
 			Stop ();
-			_running = false;
+			Running = false;
 			MainLoopDriver?.TearDown ();
 			MainLoopDriver = null;
 		}
