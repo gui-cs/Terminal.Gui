@@ -1,5 +1,4 @@
 ﻿using System;
-using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -212,7 +211,8 @@ namespace Terminal.Gui.TopLevelTests {
 			// top is Application.Top with a menu and without status bar.
 			top.EnsureVisibleBounds (top, 2, 2, out nx, out ny, out mb, out sb);
 			Assert.Equal (0, nx);
-			Assert.Equal (1, ny);
+			// top is Application.Top and doesn't need to positioned itself.
+			Assert.Equal (0, ny);
 			Assert.NotNull (mb);
 			Assert.Null (sb);
 
@@ -222,7 +222,8 @@ namespace Terminal.Gui.TopLevelTests {
 			// top is Application.Top with a menu and status bar.
 			top.EnsureVisibleBounds (top, 2, 2, out nx, out ny, out mb, out sb);
 			Assert.Equal (0, nx);
-			Assert.Equal (1, ny);
+			// top is Application.Top and doesn't need to positioned itself.
+			Assert.Equal (0, ny);
 			Assert.NotNull (mb);
 			Assert.NotNull (sb);
 
@@ -232,6 +233,7 @@ namespace Terminal.Gui.TopLevelTests {
 			// top is Application.Top without a menu and with a status bar.
 			top.EnsureVisibleBounds (top, 2, 2, out nx, out ny, out mb, out sb);
 			Assert.Equal (0, nx);
+			// top is Application.Top and doesn't need to positioned itself.
 			Assert.Equal (0, ny);
 			Assert.Null (mb);
 			Assert.NotNull (sb);
@@ -1138,6 +1140,1878 @@ namespace Terminal.Gui.TopLevelTests {
 
 			var exception = Record.Exception (() => topChild.ProcessHotKey (new KeyEvent (Key.AltMask, new KeyModifiers { Alt = true })));
 			Assert.Null (exception);
+		}
+
+		private Window Top_With_MenuBar_And_StatusBar (bool borderless = false, bool isMdiContainer = false, bool resize = true)
+		{
+			var top = new Window ();
+			if (borderless) {
+				top.Border.BorderStyle = BorderStyle.None;
+				top.Border.DrawMarginFrame = false;
+			}
+			if (isMdiContainer) {
+				top.IsMdiContainer = true;
+			}
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem("File", new MenuItem [] {
+					new MenuItem ("New", "", null)
+				})
+			});
+			var statusBar = new StatusBar (new StatusItem [] {
+				new StatusItem(Key.F2, "~F2~ File", null)
+			});
+			top.Add (menu, statusBar);
+			if (resize) {
+				((FakeDriver)Application.Driver).SetBufferSize (20, 20);
+			}
+
+			return top;
+		}
+
+		private Window Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels (
+			bool isDimFill = false, bool borderless = false, bool isModal = false)
+		{
+			Window win;
+			if (isDimFill) {
+				win = new Window () { Width = Dim.Fill (10), Height = Dim.Fill (10), ColorScheme = Colors.TopLevel };
+			} else {
+				win = new Window () { Width = 10, Height = 10, ColorScheme = Colors.TopLevel };
+			}
+			if (borderless) {
+				win.Border.BorderStyle = BorderStyle.None;
+				win.Border.DrawMarginFrame = false;
+			}
+			if (isModal) {
+				win.Modal = true;
+			}
+			win.Add (new Label ("TL"),
+				new Label ("TR") { X = Pos.AnchorEnd (2) },
+				new Label ("BL") { Y = Pos.AnchorEnd (1) },
+				new Label ("BR") { X = Pos.AnchorEnd (2), Y = Pos.AnchorEnd (1) }
+			);
+
+			return win;
+		}
+
+		private string TopLeft_Top_With_Border_MenuBar_StatusBar_And_Window_With_Border = @"
+┌──────────────────┐
+│ File             │
+│┌────────┐        │
+││TL    TR│        │
+││        │        │
+││        │        │
+││        │        │
+││        │        │
+││        │        │
+││        │        │
+││BL    BR│        │
+│└────────┘        │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│ F2 File          │
+└──────────────────┘";
+
+		private string BottomRight_Top_With_Border_MenuBar_StatusBar_And_Window_With_Border = @"
+┌──────────────────┐
+│ File             │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│        ┌────────┐│
+│        │TL    TR││
+│        │        ││
+│        │        ││
+│        │        ││
+│        │        ││
+│        │        ││
+│        │        ││
+│        │BL    BR││
+│        └────────┘│
+│ F2 File          │
+└──────────────────┘";
+
+		private string TopLeft_Top_With_Border_MenuBar_StatusBar_And_Window_With_Border_And_Dim_Fill = @"
+┌──────────────────┐
+│ File             │
+│┌──────┐          │
+││TL  TR│          │
+││      │          │
+││      │          │
+││      │          │
+││BL  BR│          │
+│└──────┘          │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│ F2 File          │
+└──────────────────┘";
+
+		private string TopLeft_MdiTop_With_Border_MenuBar_StatusBar_And_Window_With_Border_And_Dim_Fill = @"
+┌──────────────────┐
+│ File             │
+│┌───────┐         │
+││TL   TR│         │
+││       │         │
+││       │         │
+││       │         │
+││       │         │
+││BL   BR│         │
+│└───────┘         │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│ F2 File          │
+└──────────────────┘";
+
+		private string BottomRight_Top_With_Border_MenuBar_StatusBar_And_Window_With_Border_And_Dim_Fill = @"
+┌──────────────────┐
+│ File             │
+│                  │
+│                  │
+│                  │
+│    ┌──┐          │
+│    │TR│          │
+│    │BR│          │
+│    └──┘          │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│ F2 File          │
+└──────────────────┘";
+
+		private string BottomRight_MdiTop_With_Border_MenuBar_StatusBar_And_Window_With_Border_And_Dim_Fill = @"
+┌──────────────────┐
+│ File             │
+│                  │
+│                  │
+│   ┌────┐         │
+│   │TLTR│         │
+│   │    │         │
+│   │    │         │
+│   │BLBR│         │
+│   └────┘         │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│ F2 File          │
+└──────────────────┘";
+
+		private string TopLeft_Top_With_Border_And_Modal_With_Border = @"
+┌──────────────────┐
+│┌────────┐        │
+││TL    TR│        │
+││        │        │
+││        │        │
+││        │        │
+││        │        │
+││        │        │
+││        │        │
+││BL    BR│        │
+│└────────┘        │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+└──────────────────┘";
+
+		private string BottomRight_Top_With_Border_And_Modal_With_Border = @"
+┌──────────────────┐
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│        ┌────────┐│
+│        │TL    TR││
+│        │        ││
+│        │        ││
+│        │        ││
+│        │        ││
+│        │        ││
+│        │        ││
+│        │BL    BR││
+│        └────────┘│
+└──────────────────┘";
+
+		private string TopLeft_Top_With_Border_MenuBar_StatusBar_And_Window_Without_Border = @"
+┌──────────────────┐
+│ File             │
+│TL      TR        │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│BL      BR        │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│ F2 File          │
+└──────────────────┘";
+
+		private string BottonRight_Top_With_Border_MenuBar_StatusBar_And_Window_Without_Border = @"
+┌──────────────────┐
+│ File             │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│        TL      TR│
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│        BL      BR│
+│ F2 File          │
+└──────────────────┘";
+
+		private string TopLeft_Top_With_Border_MenuBar_StatusBar_And_Window_Without_Border_And_Dim_Fill = @"
+┌──────────────────┐
+│ File             │
+│TL    TR          │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│BL    BR          │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│ F2 File          │
+└──────────────────┘";
+
+		private string TopLeft_MdiTop_With_Border_MenuBar_StatusBar_And_Window_Without_Border_And_Dim_Fill = @"
+┌──────────────────┐
+│ File             │
+│TL     TR         │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│BL     BR         │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│ F2 File          │
+└──────────────────┘";
+
+		private string BottomRight_Top_With_Border_MenuBar_StatusBar_And_Window_Without_Border_And_Dim_Fill = @"
+┌──────────────────┐
+│ File             │
+│                  │
+│                  │
+│                  │
+│    TLTR          │
+│                  │
+│                  │
+│    BLBR          │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│ F2 File          │
+└──────────────────┘";
+
+		private string BottomRight_MdiTop_With_Border_MenuBar_StatusBar_And_Window_Without_Border_And_Dim_Fill = @"
+┌──────────────────┐
+│ File             │
+│                  │
+│                  │
+│   TL  TR         │
+│                  │
+│                  │
+│                  │
+│                  │
+│   BL  BR         │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│ F2 File          │
+└──────────────────┘";
+
+		private string TopLeft_Top_With_Border_And_Modal_Without_Border = @"
+┌──────────────────┐
+│TL      TR        │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│BL      BR        │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+└──────────────────┘";
+
+		private string BottomRight_Top_With_Border_And_Modal_Without_Border = @"
+┌──────────────────┐
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│        TL      TR│
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│        BL      BR│
+└──────────────────┘";
+
+		private string TopLeft_Top_Without_Border_MenuBar_StatusBar_And_Window_With_Border = @"
+ File     
+┌────────┐
+│TL    TR│
+│        │
+│        │
+│        │
+│        │
+│        │
+│        │
+│BL    BR│
+└────────┘
+          
+          
+          
+          
+          
+          
+          
+          
+ F2 File  ";
+
+		private string BottomRight_Top_Without_Border_MenuBar_StatusBar_And_Window_With_Border = @"
+ File               
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+          ┌────────┐
+          │TL    TR│
+          │        │
+          │        │
+          │        │
+          │        │
+          │        │
+          │        │
+          │BL    BR│
+          └────────┘
+ F2 File            ";
+
+		private string TopLeft_Top_Without_Border_MenuBar_StatusBar_And_Window_With_Border_And_Dim_Fill = @"
+ File     
+┌────────┐
+│TL    TR│
+│        │
+│        │
+│        │
+│        │
+│        │
+│BL    BR│
+└────────┘
+          
+          
+          
+          
+          
+          
+          
+          
+          
+ F2 File  ";
+
+		private string BottomRight_Top_Without_Border_MenuBar_StatusBar_And_Window_With_Border_And_Dim_Fill = @"
+ File     
+          
+          
+          
+    ┌────┐
+    │TLTR│
+    │    │
+    │    │
+    │BLBR│
+    └────┘
+          
+          
+          
+          
+          
+          
+          
+          
+          
+ F2 File  ";
+
+		private string TopLeft_Top_Without_Border_And_Modal_With_Border = @"
+┌────────┐
+│TL    TR│
+│        │
+│        │
+│        │
+│        │
+│        │
+│        │
+│BL    BR│
+└────────┘";
+
+		private string BottomRight_Top_Without_Border_And_Modal_With_Border = @"
+          ┌────────┐
+          │TL    TR│
+          │        │
+          │        │
+          │        │
+          │        │
+          │        │
+          │        │
+          │BL    BR│
+          └────────┘";
+
+		private string TopLeft_Top_Without_Border_MenuBar_StatusBar_And_Window_Without_Border = @"
+ File     
+TL      TR
+          
+          
+          
+          
+          
+          
+          
+          
+BL      BR
+          
+          
+          
+          
+          
+          
+          
+          
+ F2 File  ";
+
+		private string BottomRigt_Top_Without_Border_MenuBar_StatusBar_And_Window_Without_Border = @"
+ File               
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+          TL      TR
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+          BL      BR
+ F2 File            ";
+
+		private string TopLeft_Top_Without_Border_MenuBar_StatusBar_And_Window_Without_Border_And_Dim_Fill = @"
+ File     
+TL      TR
+          
+          
+          
+          
+          
+          
+          
+BL      BR
+          
+          
+          
+          
+          
+          
+          
+          
+          
+ F2 File  ";
+
+		private string BottomRight_Top_Without_Border_MenuBar_StatusBar_And_Window_Without_Border_And_Dim_Fill = @"
+ File     
+          
+          
+          
+    TL  TR
+          
+          
+          
+          
+    BL  BR
+          
+          
+          
+          
+          
+          
+          
+          
+          
+ F2 File  ";
+
+		private string TopLeft_Top_Without_Border_And_Modal_Without_Border = @"
+TL      TR
+          
+          
+          
+          
+          
+          
+          
+          
+BL      BR";
+
+		private string BottomRight_Top_Without_Border_And_Modal_Without_Border = @"
+          TL      TR
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+          BL      BR";
+
+		[Theory, AutoInitShutdown]
+		[InlineData (false, false, 0, 1, 8, 7)]
+		[InlineData (false, true, 1, 2, 9, 8)]
+		public void EnsureVisibleBounds_Top_With_Border_MenuBar_StatusBar_And_Window_With_Border (
+			bool borderless, bool isMdiContainer, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
+		{
+			var top = Top_With_MenuBar_And_StatusBar (borderless, isMdiContainer);
+			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels ();
+			if (!isMdiContainer) {
+				top.Add (win);
+			}
+			Application.Begin (top);
+			if (isMdiContainer) {
+				Application.Begin (win);
+			}
+
+			Assert.NotNull (top.MenuBar);
+			Assert.NotNull (top.StatusBar);
+			Assert.Equal (isMdiContainer, top.IsMdiContainer);
+
+			// left + top
+			win.X = 0;
+			win.Y = 0;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
+			Assert.Equal (topLeftX, nx);
+			Assert.Equal (topLeftY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (topLeftX, topLeftY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (TopLeft_Top_With_Border_MenuBar_StatusBar_And_Window_With_Border, output);
+
+			// right + bottom
+			win.X = 100;
+			win.Y = 40;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
+			Assert.Equal (bottomRightX, nx);
+			Assert.Equal (bottomRightY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (bottomRightX, bottomRightY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (BottomRight_Top_With_Border_MenuBar_StatusBar_And_Window_With_Border, output);
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (false, false, 1, 2, 9, 8)]
+		[InlineData (false, true, 1, 2, 9, 8)]
+		public void EnsureVisibleBounds_Top_With_Border_MenuBar_StatusBar_And_Modal_With_Border (
+			bool borderless, bool isMdiContainer, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
+		{
+			var top = Top_With_MenuBar_And_StatusBar (borderless, isMdiContainer);
+			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels (false, false, true);
+			Application.Begin (top);
+			Application.Begin (win);
+
+			Assert.NotNull (top.MenuBar);
+			Assert.NotNull (top.StatusBar);
+			Assert.Equal (isMdiContainer, top.IsMdiContainer);
+			Assert.True (win.Modal);
+
+			// left + top
+			win.X = 0;
+			win.Y = 0;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
+			Assert.Equal (topLeftX, nx);
+			Assert.Equal (topLeftY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (topLeftX, topLeftY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (TopLeft_Top_With_Border_MenuBar_StatusBar_And_Window_With_Border, output);
+
+			// right + bottom
+			win.X = 100;
+			win.Y = 40;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
+			Assert.Equal (bottomRightX, nx);
+			Assert.Equal (bottomRightY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (bottomRightX, bottomRightY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (BottomRight_Top_With_Border_MenuBar_StatusBar_And_Window_With_Border, output);
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (false, false, 0, 1, 4, 4)]
+		[InlineData (false, true, 1, 2, 4, 4)]
+		public void EnsureVisibleBounds_Top_With_Border_MenuBar_StatusBar_And_Window_With_Border_And_Dim_Fill (
+			bool borderless, bool isMdiContainer, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
+		{
+			var top = Top_With_MenuBar_And_StatusBar (borderless, isMdiContainer);
+			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels (true);
+			if (!isMdiContainer) {
+				top.Add (win);
+			}
+			Application.Begin (top);
+			if (isMdiContainer) {
+				Application.Begin (win);
+			}
+
+			Assert.NotNull (top.MenuBar);
+			Assert.NotNull (top.StatusBar);
+			Assert.Equal (isMdiContainer, top.IsMdiContainer);
+			Assert.False (win.Modal);
+
+			// left + top
+			win.X = 0;
+			win.Y = 0;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
+			Assert.Equal (topLeftX, nx);
+			Assert.Equal (topLeftY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			if (!isMdiContainer) {
+				Assert.Equal (new Rect (topLeftX, topLeftY, 8, 7), win.Frame);
+				TestHelpers.AssertDriverContentsWithFrameAre (TopLeft_Top_With_Border_MenuBar_StatusBar_And_Window_With_Border_And_Dim_Fill, output);
+
+			} else {
+				Assert.Equal (new Rect (topLeftX, topLeftY, 9, 8), win.Frame);
+				TestHelpers.AssertDriverContentsWithFrameAre (TopLeft_MdiTop_With_Border_MenuBar_StatusBar_And_Window_With_Border_And_Dim_Fill, output);
+			}
+
+			// right + bottom
+			win.X = 4;
+			win.Y = 4;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
+			Assert.Equal (bottomRightX, nx);
+			Assert.Equal (bottomRightY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			if (!isMdiContainer) {
+				Assert.Equal (new Rect (bottomRightX, bottomRightY, 4, 4), win.Frame);
+				TestHelpers.AssertDriverContentsWithFrameAre (BottomRight_Top_With_Border_MenuBar_StatusBar_And_Window_With_Border_And_Dim_Fill, output);
+
+			} else {
+				Assert.Equal (new Rect (bottomRightX, bottomRightY, 6, 6), win.Frame);
+				TestHelpers.AssertDriverContentsWithFrameAre (BottomRight_MdiTop_With_Border_MenuBar_StatusBar_And_Window_With_Border_And_Dim_Fill, output);
+			}
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (false, false, 1, 1, 9, 9)]
+		[InlineData (false, true, 1, 1, 9, 9)]
+		public void EnsureVisibleBounds_Top_With_Border_And_Modal_With_Border (
+			bool borderless, bool isMdiContainer, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
+		{
+			var top = Top_With_MenuBar_And_StatusBar (borderless, isMdiContainer);
+			top.MenuBar.Visible = false;
+			top.StatusBar.Visible = false;
+			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels (false, false, true);
+			Application.Begin (top);
+			Application.Begin (win);
+
+			Assert.False (top.MenuBar.Visible);
+			Assert.False (top.StatusBar.Visible);
+			Assert.Equal (isMdiContainer, top.IsMdiContainer);
+			Assert.True (win.Modal);
+
+			// left + top
+			win.X = 0;
+			win.Y = 0;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
+			Assert.Equal (topLeftX, nx);
+			Assert.Equal (topLeftY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (topLeftX, topLeftY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (TopLeft_Top_With_Border_And_Modal_With_Border, output);
+
+			// right + bottom
+			win.X = 100;
+			win.Y = 40;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
+			Assert.Equal (bottomRightX, nx);
+			Assert.Equal (bottomRightY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (bottomRightX, bottomRightY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (BottomRight_Top_With_Border_And_Modal_With_Border, output);
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (false, false, 0, 1, 8, 7)]
+		[InlineData (false, true, 1, 2, 9, 8)]
+		public void EnsureVisibleBounds_Top_With_Border_MenuBar_StatusBar_And_Window_Without_Border (
+			bool borderless, bool isMdiContainer, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
+		{
+			var top = Top_With_MenuBar_And_StatusBar (borderless, isMdiContainer);
+			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels (false, true);
+			if (!isMdiContainer) {
+				top.Add (win);
+			}
+			Application.Begin (top);
+			if (isMdiContainer) {
+				Application.Begin (win);
+			}
+
+			Assert.NotNull (top.MenuBar);
+			Assert.NotNull (top.StatusBar);
+			Assert.Equal (isMdiContainer, top.IsMdiContainer);
+			Assert.False (win.Modal);
+
+			// left + top
+			win.X = 0;
+			win.Y = 0;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
+			Assert.Equal (topLeftX, nx);
+			Assert.Equal (topLeftY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (topLeftX, topLeftY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (TopLeft_Top_With_Border_MenuBar_StatusBar_And_Window_Without_Border, output);
+
+			// right + bottom
+			win.X = 100;
+			win.Y = 40;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
+			Assert.Equal (bottomRightX, nx);
+			Assert.Equal (bottomRightY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (bottomRightX, bottomRightY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (BottonRight_Top_With_Border_MenuBar_StatusBar_And_Window_Without_Border, output);
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (false, false, 1, 2, 9, 8)]
+		[InlineData (false, true, 1, 2, 9, 8)]
+		public void EnsureVisibleBounds_Top_With_Border_MenuBar_StatusBar_And_Modal_Without_Border (
+			bool borderless, bool isMdiContainer, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
+		{
+			var top = Top_With_MenuBar_And_StatusBar (borderless, isMdiContainer);
+			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels (false, true, true);
+			Application.Begin (top);
+			Application.Begin (win);
+
+			Assert.NotNull (top.MenuBar);
+			Assert.NotNull (top.StatusBar);
+			Assert.Equal (isMdiContainer, top.IsMdiContainer);
+			Assert.True (win.Modal);
+
+			// left + top
+			win.X = 0;
+			win.Y = 0;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
+			Assert.Equal (topLeftX, nx);
+			Assert.Equal (topLeftY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (topLeftX, topLeftY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (TopLeft_Top_With_Border_MenuBar_StatusBar_And_Window_Without_Border, output);
+
+			// right + bottom
+			win.X = 100;
+			win.Y = 40;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
+			Assert.Equal (bottomRightX, nx);
+			Assert.Equal (bottomRightY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (bottomRightX, bottomRightY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (BottonRight_Top_With_Border_MenuBar_StatusBar_And_Window_Without_Border, output);
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (false, false, 0, 1, 4, 4)]
+		[InlineData (false, true, 1, 2, 4, 4)]
+		public void EnsureVisibleBounds_Top_With_Border_MenuBar_StatusBar_And_Window_Without_Border_And_Dim_Fill (
+			bool borderless, bool isMdiContainer, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
+		{
+			var top = Top_With_MenuBar_And_StatusBar (borderless, isMdiContainer);
+			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels (true, true);
+			if (!isMdiContainer) {
+				top.Add (win);
+			}
+			Application.Begin (top);
+			if (isMdiContainer) {
+				Application.Begin (win);
+			}
+
+			Assert.NotNull (top.MenuBar);
+			Assert.NotNull (top.StatusBar);
+			Assert.Equal (isMdiContainer, top.IsMdiContainer);
+			Assert.False (win.Modal);
+
+			// left + top
+			win.X = 0;
+			win.Y = 0;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
+			Assert.Equal (topLeftX, nx);
+			Assert.Equal (topLeftY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			if (!isMdiContainer) {
+				Assert.Equal (new Rect (topLeftX, topLeftY, 8, 7), win.Frame);
+				TestHelpers.AssertDriverContentsWithFrameAre (TopLeft_Top_With_Border_MenuBar_StatusBar_And_Window_Without_Border_And_Dim_Fill, output);
+			} else {
+				Assert.Equal (new Rect (topLeftX, topLeftY, 9, 8), win.Frame);
+				TestHelpers.AssertDriverContentsWithFrameAre (TopLeft_MdiTop_With_Border_MenuBar_StatusBar_And_Window_Without_Border_And_Dim_Fill, output);
+			}
+
+			// right + bottom
+			win.X = 4;
+			win.Y = 4;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
+			Assert.Equal (bottomRightX, nx);
+			Assert.Equal (bottomRightY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			if (!isMdiContainer) {
+				Assert.Equal (new Rect (bottomRightX, bottomRightY, 4, 4), win.Frame);
+				TestHelpers.AssertDriverContentsWithFrameAre (BottomRight_Top_With_Border_MenuBar_StatusBar_And_Window_Without_Border_And_Dim_Fill, output);
+			} else {
+				Assert.Equal (new Rect (bottomRightX, bottomRightY, 6, 6), win.Frame);
+				TestHelpers.AssertDriverContentsWithFrameAre (BottomRight_MdiTop_With_Border_MenuBar_StatusBar_And_Window_Without_Border_And_Dim_Fill, output);
+			}
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (false, false, 1, 1, 9, 9)]
+		[InlineData (false, true, 1, 1, 9, 9)]
+		public void EnsureVisibleBounds_Top_With_Border_And_Modal_Without_Border (
+			bool borderless, bool isMdiContainer, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
+		{
+			var top = Top_With_MenuBar_And_StatusBar (borderless, isMdiContainer);
+			top.MenuBar.Visible = false;
+			top.StatusBar.Visible = false;
+			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels (false, true, true);
+			Application.Begin (top);
+			Application.Begin (win);
+
+			Assert.NotNull (top.MenuBar);
+			Assert.NotNull (top.StatusBar);
+			Assert.Equal (isMdiContainer, top.IsMdiContainer);
+			Assert.True (win.Modal);
+
+			// left + top
+			win.X = 0;
+			win.Y = 0;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
+			Assert.Equal (topLeftX, nx);
+			Assert.Equal (topLeftY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (topLeftX, topLeftY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (TopLeft_Top_With_Border_And_Modal_Without_Border, output);
+
+			// right + bottom
+			win.X = 100;
+			win.Y = 40;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
+			Assert.Equal (bottomRightX, nx);
+			Assert.Equal (bottomRightY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (bottomRightX, bottomRightY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (BottomRight_Top_With_Border_And_Modal_Without_Border, output);
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (true, false, 0, 1, 10, 9)]
+		[InlineData (true, true, 0, 1, 10, 9)]
+		public void EnsureVisibleBounds_Top_Without_Border_MenuBar_StatusBar_And_Window_With_Border (
+			bool borderless, bool isMdiContainer, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
+		{
+			var top = Top_With_MenuBar_And_StatusBar (borderless, isMdiContainer);
+			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels ();
+			if (!isMdiContainer) {
+				top.Add (win);
+			}
+			Application.Begin (top);
+			if (isMdiContainer) {
+				Application.Begin (win);
+			}
+			Assert.NotNull (top.MenuBar);
+			Assert.NotNull (top.StatusBar);
+			Assert.Equal (isMdiContainer, top.IsMdiContainer);
+			Assert.False (win.Modal);
+
+			// left + top
+			win.X = 0;
+			win.Y = 0;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
+			Assert.Equal (topLeftX, nx);
+			Assert.Equal (topLeftY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (topLeftX, topLeftY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (TopLeft_Top_Without_Border_MenuBar_StatusBar_And_Window_With_Border, output);
+
+			// right + bottom
+			win.X = 100;
+			win.Y = 40;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
+			Assert.Equal (bottomRightX, nx);
+			Assert.Equal (bottomRightY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (bottomRightX, bottomRightY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (BottomRight_Top_Without_Border_MenuBar_StatusBar_And_Window_With_Border, output);
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (true, false, 0, 1, 10, 9)]
+		[InlineData (true, true, 0, 1, 10, 9)]
+		public void EnsureVisibleBounds_Top_Without_Border_MenuBar_StatusBar_And_Modal_With_Border (
+			bool borderless, bool isMdiContainer, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
+		{
+			var top = Top_With_MenuBar_And_StatusBar (borderless, isMdiContainer);
+			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels (false, false, true);
+			Application.Begin (top);
+			Application.Begin (win);
+
+			Assert.NotNull (top.MenuBar);
+			Assert.NotNull (top.StatusBar);
+			Assert.Equal (isMdiContainer, top.IsMdiContainer);
+			Assert.True (win.Modal);
+
+			// left + top
+			win.X = 0;
+			win.Y = 0;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
+			Assert.Equal (topLeftX, nx);
+			Assert.Equal (topLeftY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (topLeftX, topLeftY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (TopLeft_Top_Without_Border_MenuBar_StatusBar_And_Window_With_Border, output);
+
+			// right + bottom
+			win.X = 100;
+			win.Y = 40;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
+			Assert.Equal (bottomRightX, nx);
+			Assert.Equal (bottomRightY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (bottomRightX, bottomRightY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (BottomRight_Top_Without_Border_MenuBar_StatusBar_And_Window_With_Border, output);
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (true, false, 0, 1, 4, 4)]
+		[InlineData (true, true, 0, 1, 4, 4)]
+		public void EnsureVisibleBounds_Top_Without_Border_MenuBar_StatusBar_And_Window_With_Border_And_Dim_Fill (
+			bool borderless, bool isMdiContainer, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
+		{
+			var top = Top_With_MenuBar_And_StatusBar (borderless, isMdiContainer);
+			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels (true);
+			if (!isMdiContainer) {
+				top.Add (win);
+			}
+			Application.Begin (top);
+			if (isMdiContainer) {
+				Application.Begin (win);
+			}
+
+			Assert.NotNull (top.MenuBar);
+			Assert.NotNull (top.StatusBar);
+			Assert.Equal (isMdiContainer, top.IsMdiContainer);
+			Assert.False (win.Modal);
+
+			// left + top
+			win.X = 0;
+			win.Y = 0;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
+			Assert.Equal (topLeftX, nx);
+			Assert.Equal (topLeftY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (topLeftX, topLeftY, 10, 9), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (TopLeft_Top_Without_Border_MenuBar_StatusBar_And_Window_With_Border_And_Dim_Fill, output);
+
+			// right + bottom
+			win.X = 4;
+			win.Y = 4;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
+			Assert.Equal (bottomRightX, nx);
+			Assert.Equal (bottomRightY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (bottomRightX, bottomRightY, 6, 6), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (BottomRight_Top_Without_Border_MenuBar_StatusBar_And_Window_With_Border_And_Dim_Fill, output);
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (true, false, 0, 0, 10, 10)]
+		[InlineData (true, true, 0, 0, 10, 10)]
+		public void EnsureVisibleBounds_Top_Without_Border_And_Modal_With_Border (
+			bool borderless, bool isMdiContainer, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
+		{
+			var top = Top_With_MenuBar_And_StatusBar (borderless, isMdiContainer);
+			top.MenuBar.Visible = false;
+			top.StatusBar.Visible = false;
+			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels (false, false, true);
+			Application.Begin (top);
+			Application.Begin (win);
+
+			Assert.False (top.MenuBar.Visible);
+			Assert.False (top.StatusBar.Visible);
+			Assert.Equal (isMdiContainer, top.IsMdiContainer);
+			Assert.True (win.Modal);
+
+			// left + top
+			win.X = 0;
+			win.Y = 0;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
+			Assert.Equal (topLeftX, nx);
+			Assert.Equal (topLeftY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (topLeftX, topLeftY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (TopLeft_Top_Without_Border_And_Modal_With_Border, output);
+
+			// right + bottom
+			win.X = 100;
+			win.Y = 40;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
+			Assert.Equal (bottomRightX, nx);
+			Assert.Equal (bottomRightY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (bottomRightX, bottomRightY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (BottomRight_Top_Without_Border_And_Modal_With_Border, output);
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (true, false, 0, 1, 10, 9)]
+		[InlineData (true, true, 0, 1, 10, 9)]
+		public void EnsureVisibleBounds_Top_Without_Border_MenuBar_StatusBar_And_Window_Without_Border (
+			bool borderless, bool isMdiContainer, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
+		{
+			var top = Top_With_MenuBar_And_StatusBar (borderless, isMdiContainer);
+			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels (false, true);
+			if (!isMdiContainer) {
+				top.Add (win);
+			}
+			Application.Begin (top);
+			if (isMdiContainer) {
+				Application.Begin (win);
+			}
+			Assert.NotNull (top.MenuBar);
+			Assert.NotNull (top.StatusBar);
+			Assert.Equal (isMdiContainer, top.IsMdiContainer);
+			Assert.False (win.Modal);
+
+			// left + top
+			win.X = 0;
+			win.Y = 0;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
+			Assert.Equal (topLeftX, nx);
+			Assert.Equal (topLeftY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (topLeftX, topLeftY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (TopLeft_Top_Without_Border_MenuBar_StatusBar_And_Window_Without_Border, output);
+
+			// right + bottom
+			win.X = 100;
+			win.Y = 40;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
+			Assert.Equal (bottomRightX, nx);
+			Assert.Equal (bottomRightY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (bottomRightX, bottomRightY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (BottomRigt_Top_Without_Border_MenuBar_StatusBar_And_Window_Without_Border, output);
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (true, false, 0, 1, 10, 9)]
+		[InlineData (true, true, 0, 1, 10, 9)]
+		public void EnsureVisibleBounds_Top_Without_Border_MenuBar_StatusBar_And_Modal_Without_Border (
+			bool borderless, bool isMdiContainer, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
+		{
+			var top = Top_With_MenuBar_And_StatusBar (borderless, isMdiContainer);
+			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels (false, true, true);
+			Application.Begin (top);
+			Application.Begin (win);
+
+			Assert.NotNull (top.MenuBar);
+			Assert.NotNull (top.StatusBar);
+			Assert.Equal (isMdiContainer, top.IsMdiContainer);
+			Assert.True (win.Modal);
+
+			// left + top
+			win.X = 0;
+			win.Y = 0;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
+			Assert.Equal (topLeftX, nx);
+			Assert.Equal (topLeftY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (topLeftX, topLeftY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (TopLeft_Top_Without_Border_MenuBar_StatusBar_And_Window_Without_Border, output);
+
+			// right + bottom
+			win.X = 100;
+			win.Y = 40;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
+			Assert.Equal (bottomRightX, nx);
+			Assert.Equal (bottomRightY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (bottomRightX, bottomRightY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (BottomRigt_Top_Without_Border_MenuBar_StatusBar_And_Window_Without_Border, output);
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (true, false, 0, 1, 4, 4)]
+		[InlineData (true, true, 0, 1, 4, 4)]
+		public void EnsureVisibleBounds_Top_Without_Border_MenuBar_StatusBar_And_Window_Without_Border_And_Dim_Fill (
+			bool borderless, bool isMdiContainer, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
+		{
+			var top = Top_With_MenuBar_And_StatusBar (borderless, isMdiContainer);
+			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels (true, true);
+			if (!isMdiContainer) {
+				top.Add (win);
+			}
+			Application.Begin (top);
+			if (isMdiContainer) {
+				Application.Begin (win);
+			}
+
+			Assert.NotNull (top.MenuBar);
+			Assert.NotNull (top.StatusBar);
+			Assert.Equal (isMdiContainer, top.IsMdiContainer);
+			Assert.False (win.Modal);
+
+			// left + top
+			win.X = 0;
+			win.Y = 0;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
+			Assert.Equal (topLeftX, nx);
+			Assert.Equal (topLeftY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (topLeftX, topLeftY, 10, 9), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (TopLeft_Top_Without_Border_MenuBar_StatusBar_And_Window_Without_Border_And_Dim_Fill, output);
+
+			// right + bottom
+			win.X = 4;
+			win.Y = 4;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
+			Assert.Equal (bottomRightX, nx);
+			Assert.Equal (bottomRightY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (bottomRightX, bottomRightY, 6, 6), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (BottomRight_Top_Without_Border_MenuBar_StatusBar_And_Window_Without_Border_And_Dim_Fill, output);
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (true, false, 0, 0, 10, 10)]
+		[InlineData (true, true, 0, 0, 10, 10)]
+		public void EnsureVisibleBounds_Top_Without_Border_And_Modal_Without_Border (
+			bool borderless, bool isMdiContainer, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
+		{
+			var top = Top_With_MenuBar_And_StatusBar (borderless, isMdiContainer);
+			top.MenuBar.Visible = false;
+			top.StatusBar.Visible = false;
+			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels (false, true, true);
+			Application.Begin (top);
+			Application.Begin (win);
+
+			Assert.False (top.MenuBar.Visible);
+			Assert.False (top.StatusBar.Visible);
+			Assert.Equal (isMdiContainer, top.IsMdiContainer);
+			Assert.True (win.Modal);
+
+			// left + top
+			win.X = 0;
+			win.Y = 0;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out int nx, out int ny, out _, out _);
+			Assert.Equal (topLeftX, nx);
+			Assert.Equal (topLeftY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (topLeftX, topLeftY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (TopLeft_Top_Without_Border_And_Modal_Without_Border, output);
+
+			// right + bottom
+			win.X = 100;
+			win.Y = 40;
+			top.EnsureVisibleBounds (win, win.Frame.X, win.Frame.Y, out nx, out ny, out _, out _);
+			Assert.Equal (bottomRightX, nx);
+			Assert.Equal (bottomRightY, ny);
+			win.X = nx;
+			win.Y = ny;
+			Application.Refresh ();
+			Assert.Equal (new Rect (bottomRightX, bottomRightY, 10, 10), win.Frame);
+			TestHelpers.AssertDriverContentsWithFrameAre (BottomRight_Top_Without_Border_And_Modal_Without_Border, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void RunMainLoopIteration_Mdi_IsTopNeedsDisplay ()
+		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem("File", Array.Empty<MenuItem> ())
+			}) { Visible = false };
+			var statusBar = new StatusBar (new StatusItem []{
+				new StatusItem(Key.F2, "~F2~ File", null)
+			}) { Visible = false };
+
+			var top = new Toplevel ();
+			top.IsMdiContainer = true;
+			top.Add (menu, statusBar);
+
+			Application.Begin (top);
+
+			var childWin = new Window () { Width = 5, Height = 5 };
+			var rs = Application.Begin (childWin);
+
+			Assert.Single (Application.MdiChildes);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌───┐
+│   │
+│   │
+│   │
+└───┘", output);
+			Assert.Equal (0, childWin.Frame.Y);
+
+			menu.Visible = true;
+			var firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ File
+┌───┐
+│   │
+│   │
+│   │
+└───┘", output);
+			Assert.Equal (1, childWin.Frame.Y);
+
+			menu.Visible = false;
+			childWin.Y = 25;
+			firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌───┐
+│   │
+│   │
+│   │
+└───┘", output);
+			Assert.Equal (20, childWin.Frame.Y);
+
+			statusBar.Visible = true;
+			firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌───┐   
+│   │   
+│   │   
+│   │   
+└───┘   
+ F2 File", output);
+			Assert.Equal (19, childWin.Frame.Y);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Show_Menu_On_Front_MdiChild_By_Keyboard_And_Mouse_With_Run_Action ()
+		{
+			var top = Top_With_MenuBar_And_StatusBar (false, true);
+			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels ();
+			Application.Begin (top);
+			Application.Begin (win);
+
+			var isNew = false;
+			var menu = top.MenuBar;
+			var mi = menu.Menus [0].Children [0];
+			mi.Action = () => isNew = true;
+			Assert.False (menu.IsMenuOpen);
+			var expectedClosed = @"
+┌──────────────────┐
+│ File             │
+│┌────────┐        │
+││TL    TR│        │
+││        │        │
+││        │        │
+││        │        │
+││        │        │
+││        │        │
+││        │        │
+││BL    BR│        │
+│└────────┘        │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│ F2 File          │
+└──────────────────┘";
+			TestHelpers.AssertDriverContentsWithFrameAre (expectedClosed, output);
+
+			var expectedOpened = @"
+┌──────────────────┐
+│ File             │
+│┌──────┐─┐        │
+││ New  │R│        │
+│└──────┘ │        │
+││        │        │
+││        │        │
+││        │        │
+││        │        │
+││        │        │
+││BL    BR│        │
+│└────────┘        │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│                  │
+│ F2 File          │
+└──────────────────┘";
+
+			// using keyboard
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessKeyEvent",
+				new KeyEvent (menu.Key, new KeyModifiers ()));
+
+			Application.Refresh ();
+			Assert.True (menu.IsMenuOpen);
+			TestHelpers.AssertDriverContentsWithFrameAre (expectedOpened, output);
+
+			// run action
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessKeyEvent",
+				new KeyEvent (Key.Enter, new KeyModifiers ()));
+
+			Application.MainLoop.MainIteration ();
+			Application.Refresh ();
+			Assert.False (menu.IsMenuOpen);
+			Assert.True (isNew);
+			TestHelpers.AssertDriverContentsWithFrameAre (expectedClosed, output);
+
+			// using mouse
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessMouseEvent",
+				new MouseEvent () {
+					X = 1,
+					Y = 1,
+					Flags = MouseFlags.Button1Pressed
+				});
+
+			Application.Refresh ();
+			Assert.True (menu.IsMenuOpen);
+			TestHelpers.AssertDriverContentsWithFrameAre (expectedOpened, output);
+
+			// run action
+			isNew = false;
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessMouseEvent",
+				new MouseEvent () {
+					X = 2,
+					Y = 4,
+					Flags = MouseFlags.Button1Clicked
+				});
+
+			Application.MainLoop.MainIteration ();
+			Application.Refresh ();
+			Assert.False (menu.IsMenuOpen);
+			Assert.True (isNew);
+			TestHelpers.AssertDriverContentsWithFrameAre (expectedClosed, output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Toggle_MdiTop_Border_Redraw_MdiChild_Without_Border_On_Position_Changed ()
+		{
+			var top = Top_With_MenuBar_And_StatusBar (true, true);
+			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels (false, true);
+			Application.Begin (top);
+			var rs = Application.Begin (win);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (TopLeft_Top_Without_Border_MenuBar_StatusBar_And_Window_Without_Border, output);
+			var attributes = new Attribute [] {
+				// 0
+				Colors.Base.Normal,
+				// 1
+				Colors.Menu.Normal,
+				// 2
+				Colors.TopLevel.Normal,
+				// 3
+				Colors.Menu.HotNormal
+			};
+			TestHelpers.AssertDriverColorsAre (@"
+11111111111111111111
+22222222220000000000
+22222222220000000000
+22222222220000000000
+22222222220000000000
+22222222220000000000
+22222222220000000000
+22222222220000000000
+22222222220000000000
+22222222220000000000
+22222222220000000000
+00000000000000000000
+00000000000000000000
+00000000000000000000
+00000000000000000000
+00000000000000000000
+00000000000000000000
+00000000000000000000
+00000000000000000000
+13311111111111111111", attributes);
+
+			top.Border.BorderStyle = BorderStyle.Single;
+			var firstIteration = false;
+			Application.RunMainLoopIteration (ref rs, true, ref firstIteration);
+			TestHelpers.AssertDriverContentsWithFrameAre (TopLeft_Top_With_Border_MenuBar_StatusBar_And_Window_Without_Border, output);
+			TestHelpers.AssertDriverColorsAre (@"
+00000000000000000000
+01111111111111111110
+02222222222000000000
+02222222222000000000
+02222222222000000000
+02222222222000000000
+02222222222000000000
+02222222222000000000
+02222222222000000000
+02222222222000000000
+02222222222000000000
+02222222222000000000
+00000000000000000000
+00000000000000000000
+00000000000000000000
+00000000000000000000
+00000000000000000000
+00000000000000000000
+01331111111111111110
+00000000000000000000", attributes);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void MdiTop_Border_Redraw_MdiChild_With_Border_On_Position_Changed ()
+		{
+			var top = Top_With_MenuBar_And_StatusBar (false, true);
+			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels ();
+			Application.Begin (top);
+			var rs = Application.Begin (win);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (TopLeft_Top_With_Border_MenuBar_StatusBar_And_Window_With_Border, output);
+			var attributes = new Attribute [] {
+				// 0
+				Colors.Base.Normal,
+				// 1
+				Colors.Menu.Normal,
+				// 2
+				Colors.TopLevel.Normal,
+				// 3
+				Colors.Menu.HotNormal
+			};
+			TestHelpers.AssertDriverColorsAre (@"
+00000000000000000000
+01111111111111111110
+02222222222000000000
+02222222222000000000
+02222222222000000000
+02222222222000000000
+02222222222000000000
+02222222222000000000
+02222222222000000000
+02222222222000000000
+02222222222000000000
+02222222222000000000
+00000000000000000000
+00000000000000000000
+00000000000000000000
+00000000000000000000
+00000000000000000000
+00000000000000000000
+01331111111111111110
+00000000000000000000", attributes);
+
+			win.X = Pos.Center ();
+			win.Y = Pos.Center ();
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌──────────────────┐
+│ File             │
+│                  │
+│                  │
+│                  │
+│    ┌────────┐    │
+│    │TL    TR│    │
+│    │        │    │
+│    │        │    │
+│    │        │    │
+│    │        │    │
+│    │        │    │
+│    │        │    │
+│    │BL    BR│    │
+│    └────────┘    │
+│                  │
+│                  │
+│                  │
+│ F2 File          │
+└──────────────────┘", output);
+			TestHelpers.AssertDriverColorsAre (@"
+00000000000000000000
+01111111111111111110
+00000000000000000000
+00000000000000000000
+00000000000000000000
+00000222222222200000
+00000222222222200000
+00000222222222200000
+00000222222222200000
+00000222222222200000
+00000222222222200000
+00000222222222200000
+00000222222222200000
+00000222222222200000
+00000222222222200000
+00000000000000000000
+00000000000000000000
+00000000000000000000
+01331111111111111110
+00000000000000000000", attributes);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Application_QuitKey_Close_Current_MdiChild ()
+		{
+			var top = Top_With_MenuBar_And_StatusBar (false, true);
+			var win = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels ();
+
+			Assert.True (top.IsMdiContainer);
+
+			var iterations = -1;
+			Application.Iteration += () => {
+				iterations++;
+				if (iterations == 0) {
+					Assert.True (top.Running);
+					Assert.False (win.Running);
+					Assert.Equal (top, Application.Current);
+
+					Application.Run (win);
+				} else if (iterations == 1) {
+					Assert.True (top.Running);
+					Assert.True (win.Running);
+					Assert.Equal (win, Application.Current);
+
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessKeyEvent",
+						new KeyEvent (Application.QuitKey, new KeyModifiers ()));
+				} else if (iterations == 2) {
+					Assert.True (top.Running);
+					Assert.False (win.Running);
+					Assert.Equal (top, Application.Current);
+
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessKeyEvent",
+						new KeyEvent (Application.QuitKey, new KeyModifiers ()));
+				}
+			};
+
+			Application.Run (top);
+
+			Assert.False (top.Running);
+			Assert.False (win.Running);
+			Assert.Null (Application.Current);
+			Assert.Equal (2, iterations);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Clicking_On_MdiContainer_With_MostFocused_Null_Or_Invalid_Maintain_Current_Child_Focused ()
+		{
+			var top = Top_With_MenuBar_And_StatusBar (false, true, false);
+			var win1 = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels ();
+			var tf1 = new TextField () { Width = 6 };
+			win1.Add (tf1);
+			var win2 = Window_With_TopLeft_TopRight_BottomLeft_BottomRight_Labels ();
+			var tf2 = new TextField () { Width = 6 };
+			win2.Add (tf2);
+			win2.X = Pos.Right (win1);
+
+			Assert.True (top.IsMdiContainer);
+
+			var iterations = -1;
+			Application.Iteration += () => {
+				iterations++;
+				if (iterations == 0) {
+					Assert.True (top.Running);
+					Assert.False (win1.Running);
+					Assert.False (win2.Running);
+					Assert.Equal (top, Application.Current);
+
+					Application.Run (win1);
+				} else if (iterations == 1) {
+					Assert.True (top.Running);
+					Assert.True (win1.Running);
+					Assert.False (win2.Running);
+					Assert.Equal (win1, Application.Current);
+
+					Application.Run (win2);
+				} else if (iterations == 2) {
+					Assert.True (top.Running);
+					Assert.True (win1.Running);
+					Assert.True (win2.Running);
+					Assert.Equal (win2, Application.Current);
+					Assert.Equal (tf2, win2.MostFocused);
+					Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
+					Assert.Equal (new Rect (1, 2, 10, 10), win1.Frame);
+					Assert.Equal (new Rect (11, 2, 10, 10), win2.Frame);
+
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessMouseEvent",
+						new MouseEvent () {
+							X = 30,
+							Y = 2,
+							Flags = MouseFlags.Button1Clicked
+						});
+				} else if (iterations == 3) {
+					Assert.True (top.Running);
+					Assert.True (win1.Running);
+					Assert.True (win2.Running);
+					Assert.Equal (win2, Application.Current);
+					Assert.Equal (tf2, win2.MostFocused);
+
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessMouseEvent",
+						new MouseEvent () {
+							X = 1,
+							Y = 2,
+							Flags = MouseFlags.Button1Clicked
+						});
+				} else if (iterations == 4) {
+					Assert.True (top.Running);
+					Assert.True (win1.Running);
+					Assert.True (win2.Running);
+					Assert.Equal (win1, Application.Current);
+					Assert.Equal (tf1, win1.MostFocused);
+
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessMouseEvent",
+						new MouseEvent () {
+							X = 30,
+							Y = 2,
+							Flags = MouseFlags.Button1Clicked
+						});
+				} else if (iterations == 5) {
+					Assert.True (top.Running);
+					Assert.True (win1.Running);
+					Assert.True (win2.Running);
+					Assert.Equal (win1, Application.Current);
+					Assert.Equal (tf1, win1.MostFocused);
+
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessKeyEvent",
+						new KeyEvent (Application.QuitKey, new KeyModifiers ()));
+				} else if (iterations == 6) {
+					Assert.True (top.Running);
+					Assert.False (win1.Running);
+					Assert.True (win2.Running);
+					Assert.Equal (win2, Application.Current);
+					Assert.Equal (tf2, win2.MostFocused);
+
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessKeyEvent",
+						new KeyEvent (Application.QuitKey, new KeyModifiers ()));
+				} else if (iterations == 7) {
+					Assert.True (top.Running);
+					Assert.False (win1.Running);
+					Assert.False (win2.Running);
+					Assert.Equal (top, Application.Current);
+					Assert.Equal (top.Subviews [0], top.MostFocused);
+					Assert.Equal ("ContentView", top.Subviews [0].GetType ().Name);
+
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessKeyEvent",
+						new KeyEvent (Application.QuitKey, new KeyModifiers ()));
+				}
+			};
+
+			Application.Run (top);
+
+			Assert.False (top.Running);
+			Assert.False (win1.Running);
+			Assert.False (win2.Running);
+			Assert.Null (Application.Current);
+			Assert.Equal (7, iterations);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void MdiChildes_Null_Does_Not_Throws ()
+		{
+			var top = Top_With_MenuBar_And_StatusBar (false, true);
+
+			Assert.True (top.IsMdiContainer);
+
+			Application.Begin (top);
+
+			var mdiChildes = Application.MdiChildes;
+			Assert.Empty (mdiChildes);
+
+			top.IsMdiContainer = false;
+			var exception = Record.Exception (() => mdiChildes = Application.MdiChildes);
+			Assert.Null (exception);
+			Assert.Empty (mdiChildes);
 		}
 	}
 }

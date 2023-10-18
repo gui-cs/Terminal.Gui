@@ -16,7 +16,12 @@ namespace UICatalog.Scenarios {
 		public override void Init (ColorScheme colorScheme)
 		{
 			Application.Init ();
-			Application.Top.Add (new DynamicMenuBarSample ($"CTRL-Q to Close - Scenario: {GetName ()}"));
+			Application.Run (new DynamicMenuBarSample ($"CTRL-Q to Close - Scenario: {GetName ()}"));
+			Application.Shutdown ();
+		}
+
+		public override void Run ()
+		{
 		}
 
 		public class DynamicMenuItemList {
