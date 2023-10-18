@@ -88,8 +88,6 @@ namespace Terminal.Gui {
 		MainLoop _mainLoop;
 		bool _winChanged;
 
-		//internal Action WinChanged;
-
 		void IMainLoopDriver.Wakeup ()
 		{
 			if (!ConsoleDriver.RunningUnitTests) {
@@ -190,7 +188,6 @@ namespace Terminal.Gui {
 			if (_winChanged) {
 				_winChanged = false;
 				_cursesDriver.ProcessInput ();
-				//WinChanged?.Invoke ();
 			}
 			if (_pollMap == null) return;
 			foreach (var p in _pollMap) {

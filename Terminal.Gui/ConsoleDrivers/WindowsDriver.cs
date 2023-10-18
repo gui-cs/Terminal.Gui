@@ -861,7 +861,6 @@ internal class WindowsDriver : ConsoleDriver {
 		_mouseHandler = mouseHandler;
 
 		_mainLoop = mainLoop.MainLoopDriver as WindowsMainLoop;
-		_mainLoop.ProcessInput += ProcessInput;
 #if HACK_CHECK_WINCHANGED
 		_mainLoop.WinChanged = ChangeWin;
 #endif
@@ -893,7 +892,7 @@ internal class WindowsDriver : ConsoleDriver {
 	}
 #endif
 
-	void ProcessInput (WindowsConsole.InputRecord inputEvent)
+	internal void ProcessInput (WindowsConsole.InputRecord inputEvent)
 	{
 		switch (inputEvent.EventType) {
 		case WindowsConsole.EventType.Key:
@@ -1754,7 +1753,6 @@ internal class WindowsDriver : ConsoleDriver {
 	public override void End ()
 	{
 		if (_mainLoop != null) {
-			_mainLoop.ProcessInput -= ProcessInput;
 #if HACK_CHECK_WINCHANGED
 			//_mainLoop.WinChanged -= ChangeWin;
 #endif
@@ -1796,11 +1794,6 @@ internal class WindowsMainLoop : IMainLoopDriver {
 
 	// The records that we keep fetching
 	readonly Queue<WindowsConsole.InputRecord []> _resultQueue = new Queue<WindowsConsole.InputRecord []> ();
-
-	/// <summary>
-	/// Invoked when a Key is pressed or released.
-	/// </summary>
-	public Action<WindowsConsole.InputRecord> ProcessInput;
 
 	/// <summary>
 	/// Invoked when the window is changed.
@@ -1916,8 +1909,7 @@ internal class WindowsMainLoop : IMainLoopDriver {
 		while (_resultQueue.Count > 0) {
 			var inputRecords = _resultQueue.Dequeue ();
 			if (inputRecords is { Length: > 0 }) {
-				var inputEvent = inputRecords [0];
-				ProcessInput?.Invoke (inputEvent);
+				((WindowsDriver)_consoleDriver).ProcessInput (inputRecords [0]);
 			}
 		}
 #if HACK_CHECK_WINCHANGED
