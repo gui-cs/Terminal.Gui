@@ -15,7 +15,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 
 namespace Terminal.Gui {
@@ -256,7 +256,7 @@ namespace Terminal.Gui {
 			}
 			return m.GetBaseDefinition ().DeclaringType != m.DeclaringType;
 		}
-		
+
 		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
@@ -266,7 +266,7 @@ namespace Terminal.Gui {
 		/// can be disposed.
 		/// If disposing equals false, the method has been called by the
 		/// runtime from inside the finalizer and you should not reference
-		/// other objects. Only unmanaged resources can be disposed.		
+		/// other objects. Only unmanaged resources can be disposed.
 		/// </remarks>
 		/// <param name="disposing"></param>
 		protected virtual void Dispose (bool disposing)
@@ -276,13 +276,10 @@ namespace Terminal.Gui {
 					// TODO: dispose managed state (managed objects)
 				}
 
-#if DEBUG_IDISPOSABLE
-				Instances.Remove (this);
-#endif                               
 				disposedValue = true;
 			}
 		}
-		
+
 		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resource.
 		/// </summary>
@@ -293,6 +290,10 @@ namespace Terminal.Gui {
 			GC.SuppressFinalize (this);
 #if DEBUG_IDISPOSABLE
 			WasDisposed = true;
+
+			foreach (var instance in Instances.Where (x => x.WasDisposed).ToList ()) {
+				Instances.Remove (instance);
+			}
 #endif
 		}
 	}

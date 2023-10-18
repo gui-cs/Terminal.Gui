@@ -32,6 +32,10 @@ namespace Terminal.Gui.ViewsTests {
 
 			Application.End (rs);
 			Application.Shutdown ();
+
+#if DEBUG_IDISPOSABLE
+			Assert.Empty (Responder.Instances);
+#endif
 		}
 
 		[Fact, TestRespondersDisposed]
