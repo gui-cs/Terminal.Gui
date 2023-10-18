@@ -861,7 +861,7 @@ internal class WindowsDriver : ConsoleDriver {
 		_mouseHandler = mouseHandler;
 
 		_mainLoop = mainLoop.MainLoopDriver as WindowsMainLoop;
-		_mainLoop.ProcessInput = ProcessInput;
+		_mainLoop.ProcessInput += ProcessInput;
 #if HACK_CHECK_WINCHANGED
 		_mainLoop.WinChanged = ChangeWin;
 #endif
@@ -1879,7 +1879,7 @@ internal class WindowsMainLoop : IMainLoopDriver {
 	bool IMainLoopDriver.EventsPending ()
 	{
 		_waitForProbe.Set ();
-#if HACK_CHECK_WINCHANGED          
+#if HACK_CHECK_WINCHANGED
 		_winChange.Set ();
 #endif
 		if (_mainLoop.CheckTimersAndIdleHandlers (out var waitTimeout)) {

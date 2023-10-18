@@ -15,9 +15,11 @@ namespace Terminal.Gui {
 	/// can watch file descriptors using the AddWatch methods.
 	/// </remarks>
 	internal class UnixMainLoop : IMainLoopDriver {
+		private CursesDriver _cursesDriver;
 		public UnixMainLoop (ConsoleDriver consoleDriver = null)
 		{
 			// UnixDriver doesn't use the consoleDriver parameter, but the WindowsDriver does.
+			_cursesDriver = (CursesDriver)Application.Driver;
 		}
 
 		public const int KEY_RESIZE = unchecked((int)0xffffffffffffffff);
@@ -86,7 +88,7 @@ namespace Terminal.Gui {
 		MainLoop _mainLoop;
 		bool _winChanged;
 
-		internal Action WinChanged;
+		//internal Action WinChanged;
 
 		void IMainLoopDriver.Wakeup ()
 		{
@@ -187,7 +189,8 @@ namespace Terminal.Gui {
 		{
 			if (_winChanged) {
 				_winChanged = false;
-				WinChanged?.Invoke ();
+				_cursesDriver.ProcessInput ();
+				//WinChanged?.Invoke ();
 			}
 			if (_pollMap == null) return;
 			foreach (var p in _pollMap) {

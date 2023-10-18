@@ -11,9 +11,9 @@ using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.DriverTests;
 
-public class MainLoopTests {
+public class MainLoopDriverTests {
 
-	public MainLoopTests (ITestOutputHelper output)
+	public MainLoopDriverTests (ITestOutputHelper output)
 	{
 		ConsoleDriver.RunningUnitTests = true;
 	}
@@ -32,7 +32,7 @@ public class MainLoopTests {
 		// Check default values
 		Assert.NotNull (mainLoop);
 		Assert.Equal (mainLoopDriver, mainLoop.MainLoopDriver);
-		Assert.Empty(mainLoop.IdleHandlers);
+		Assert.Empty (mainLoop.IdleHandlers);
 		Assert.Empty (mainLoop.Timeouts);
 		Assert.False (mainLoop.Running);
 
@@ -45,7 +45,7 @@ public class MainLoopTests {
 		Assert.Empty (mainLoop.Timeouts);
 		Assert.False (mainLoop.Running);
 	}
-
+	
 	[Theory]
 	[InlineData (typeof (FakeDriver), typeof (FakeMainLoop))]
 	[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
@@ -58,8 +58,7 @@ public class MainLoopTests {
 		var mainLoop = new MainLoop (mainLoopDriver);
 		var callbackInvoked = false;
 
-		var token = mainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) =>
-		{
+		var token = mainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
 			callbackInvoked = true;
 			return false;
 		});
@@ -68,7 +67,7 @@ public class MainLoopTests {
 		mainLoop.RunIteration (); // Run an iteration to process the timeout
 		Assert.False (callbackInvoked); // Callback should not be invoked immediately
 		Thread.Sleep (200); // Wait for the timeout
-		mainLoop.RunIteration(); // Run an iteration to process the timeout
+		mainLoop.RunIteration (); // Run an iteration to process the timeout
 		Assert.True (callbackInvoked); // Callback should be invoked after the timeout
 		mainLoop.Dispose ();
 	}
@@ -182,8 +181,7 @@ public class MainLoopTests {
 		var mainLoop = new MainLoop (mainLoopDriver);
 		var idleHandlerInvoked = false;
 
-		Func<bool> idleHandler = () =>
-		{
+		Func<bool> idleHandler = () => {
 			idleHandlerInvoked = true;
 			return false;
 		};
@@ -192,7 +190,7 @@ public class MainLoopTests {
 		mainLoop.RunIteration (); // Run an iteration to process the idle handler
 
 		Assert.True (idleHandlerInvoked);
-		mainLoop.Dispose();
+		mainLoop.Dispose ();
 	}
 
 	[Theory]

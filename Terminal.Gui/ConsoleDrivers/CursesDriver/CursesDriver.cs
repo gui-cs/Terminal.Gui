@@ -215,7 +215,7 @@ internal class CursesDriver : ConsoleDriver {
 
 		if (_mainLoop != null) {
 			_mainLoop.RemoveWatch (_processInputToken);
-			_mainLoop.WinChanged -= ProcessInput;
+			//_mainLoop.WinChanged -= ProcessInput;
 		}
 
 		if (RunningUnitTests) {
@@ -371,7 +371,7 @@ internal class CursesDriver : ConsoleDriver {
 		return _keyModifiers;
 	}
 
-	void ProcessInput ()
+	internal void ProcessInput ()
 	{
 		int wch;
 		var code = Curses.get_wch (out wch);
@@ -627,7 +627,7 @@ internal class CursesDriver : ConsoleDriver {
 			return true;
 		});
 
-		_mainLoop.WinChanged = ProcessInput;
+		//_mainLoop.WinChanged = ProcessInput;
 	}
 
 	public override void Init (Action terminalResized)
