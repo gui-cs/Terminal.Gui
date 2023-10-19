@@ -1136,6 +1136,9 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Called when a mouse event occurs. Fires the <see cref="MouseEvent"/> event.
 		/// </summary>
+		/// <remarks>
+		/// This method can be used to simulate a mouse event, e.g. in unit tests.
+		/// </remarks>
 		/// <param name="a"></param>
 		public static void OnMouseEvent (MouseEventEventArgs a)
 		{
