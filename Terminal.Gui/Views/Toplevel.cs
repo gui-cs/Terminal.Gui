@@ -98,27 +98,16 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when the terminal has been resized. The new <see cref="Size"/> of the terminal is provided.
 		/// </summary>
-		public event EventHandler<SizeChangedEventArgs> TerminalResized;
+		public event EventHandler<SizeChangedEventArgs> SizeChanging;
 
-		internal virtual void OnTerminalResized (SizeChangedEventArgs size)
-		{
-			TerminalResized?.Invoke (this, size);
-		}
+		// TODO: Make cancelable?
+		internal virtual void OnSizeChanging (SizeChangedEventArgs size) => SizeChanging?.Invoke (this, size);
 
-		internal virtual void OnChildUnloaded (Toplevel top)
-		{
-			ChildUnloaded?.Invoke (this, new ToplevelEventArgs (top));
-		}
+		internal virtual void OnChildUnloaded (Toplevel top) => ChildUnloaded?.Invoke (this, new ToplevelEventArgs (top));
 
-		internal virtual void OnChildLoaded (Toplevel top)
-		{
-			ChildLoaded?.Invoke (this, new ToplevelEventArgs (top));
-		}
+		internal virtual void OnChildLoaded (Toplevel top) => ChildLoaded?.Invoke (this, new ToplevelEventArgs (top));
 
-		internal virtual void OnClosed (Toplevel top)
-		{
-			Closed?.Invoke (this, new ToplevelEventArgs (top));
-		}
+		internal virtual void OnClosed (Toplevel top) => Closed?.Invoke (this, new ToplevelEventArgs (top));
 
 		internal virtual bool OnClosing (ToplevelClosingEventArgs ev)
 		{
@@ -126,10 +115,7 @@ namespace Terminal.Gui {
 			return ev.Cancel;
 		}
 
-		internal virtual void OnAllChildClosed ()
-		{
-			AllChildClosed?.Invoke (this, EventArgs.Empty);
-		}
+		internal virtual void OnAllChildClosed () => AllChildClosed?.Invoke (this, EventArgs.Empty);
 
 		internal virtual void OnChildClosed (Toplevel top)
 		{

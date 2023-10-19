@@ -431,7 +431,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Called whenever the view needs to be resized. Sets <see cref="Frame"/> and
-		/// triggers a <see cref="LayoutSubviews()"/> call.		/// 
+		/// triggers a <see cref="LayoutSubviews()"/> call.
 		/// </summary>
 		/// <remarks>
 		/// Can be overridden if the view resize behavior is different than the default.

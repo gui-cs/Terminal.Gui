@@ -482,7 +482,7 @@ namespace Terminal.Gui {
 
 			if (Application.Current != null) {
 				Application.Current.DrawContentComplete += Current_DrawContentComplete;
-				Application.Current.TerminalResized += Current_TerminalResized;
+				Application.Current.SizeChanging += Current_TerminalResized;
 			}
 			Application.RootMouseEvent += Application_RootMouseEvent;
 
@@ -985,7 +985,7 @@ namespace Terminal.Gui {
 		{
 			if (Application.Current != null) {
 				Application.Current.DrawContentComplete -= Current_DrawContentComplete;
-				Application.Current.TerminalResized -= Current_TerminalResized;
+				Application.Current.SizeChanging -= Current_TerminalResized;
 			}
 			Application.RootMouseEvent -= Application_RootMouseEvent;
 			base.Dispose (disposing);

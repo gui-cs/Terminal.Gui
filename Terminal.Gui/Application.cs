@@ -989,7 +989,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Invoked when the terminal was resized. The new size of the terminal is provided.
+		/// Invoked when the terminal's size changed. The new size of the terminal is provided.
 		/// </summary>
 		/// <remarks>
 		/// Event handlers can set <see cref="SizeChangedEventArgs.Cancel"/> to <see langword="true"/>
@@ -1014,7 +1014,7 @@ namespace Terminal.Gui {
 				t.SetRelativeLayout (new Rect(0, 0, args.Size.Width, args.Size.Height));
 				t.LayoutSubviews ();
 				t.PositionToplevels ();
-				t.OnTerminalResized (new SizeChangedEventArgs (args.Size));
+				t.OnSizeChanging (new SizeChangedEventArgs (args.Size));
 			}
 			Refresh ();
 			return true;

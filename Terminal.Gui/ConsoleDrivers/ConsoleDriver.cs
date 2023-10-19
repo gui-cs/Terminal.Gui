@@ -43,7 +43,6 @@ public abstract class ConsoleDriver {
 	/// <summary>
 	/// Initializes the driver
 	/// </summary>
-	/// <param name="terminalResized">Method to invoke when the terminal is resized.</param>
 	internal abstract void Init ();
 
 	/// <summary>
@@ -68,7 +67,7 @@ public abstract class ConsoleDriver {
 	public event EventHandler<SizeChangedEventArgs> SizeChanged;
 
 	/// <summary>
-	/// Called when the terminal size changes. Firest the <see cref="SizeChanged"/> event.
+	/// Called when the terminal size changes. Fires the <see cref="SizeChanged"/> event.
 	/// </summary>
 	/// <param name="args"></param>
 	public void OnSizeChanged (SizeChangedEventArgs args) => SizeChanged?.Invoke (this, args);
