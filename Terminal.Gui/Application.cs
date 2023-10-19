@@ -585,8 +585,6 @@ namespace Terminal.Gui {
 		// users use async/await on their code
 		//
 		class MainLoopSyncContext : SynchronizationContext {
-			readonly MainLoop _mainLoop;
-
 			public override SynchronizationContext CreateCopy ()
 			{
 				return new MainLoopSyncContext ();
