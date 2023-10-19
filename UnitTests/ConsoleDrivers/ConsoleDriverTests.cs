@@ -160,7 +160,7 @@ namespace Terminal.Gui.DriverTests {
 		//		return false;
 		//	};
 		//	output.WriteLine ($"Add timeout to simulate key presses after {quitTime}ms");
-		//	_ = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (quitTime), closeCallback);
+		//	_ = Application.AddTimeout (TimeSpan.FromMilliseconds (quitTime), closeCallback);
 
 		//	// If Top doesn't quit within abortTime * 5 (500ms), this will force it
 		//	uint abortTime = quitTime * 5;
@@ -170,7 +170,7 @@ namespace Terminal.Gui.DriverTests {
 		//		return false;
 		//	};
 		//	output.WriteLine ($"Add timeout to force quit after {abortTime}ms");
-		//	_ = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
+		//	_ = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
 
 		//	Key key = Key.Unknown;
 			
@@ -238,7 +238,7 @@ namespace Terminal.Gui.DriverTests {
 
 //			System.Threading.Tasks.Task.Run (() => {
 //				System.Threading.Tasks.Task.Delay (500).Wait ();
-//				Application.MainLoop.Invoke (() => {
+//				Application.Invoke (() => {
 //					var lbl = new Label ("Hello World") { X = Pos.Center () };
 //					var dlg = new Dialog ();
 //					dlg.Add (lbl);

@@ -102,7 +102,7 @@ namespace UICatalog.Scenarios {
 					var ev = ShortcutHelper.GetModifiersKey (e.KeyEvent);
 					//System.Diagnostics.Debug.WriteLine ($"Output - KeyPress: {ev}");
 					if (!tvOutput.ProcessKey (e.KeyEvent)) {
-						Application.MainLoop.Invoke (() => {
+						Application.Invoke (() => {
 							MessageBox.Query ("Keys", $"'{ShortcutHelper.GetShortcutTag (ev)}' pressed!", "Ok");
 						});
 					}
@@ -186,7 +186,7 @@ namespace UICatalog.Scenarios {
 								}
 								//}
 							} catch (Exception) {
-								Application.MainLoop.Invoke (() => {
+								Application.Invoke (() => {
 									MessageBox.ErrorQuery ("Error", "Couldn't send the keystrokes!", "Ok");
 									Application.RequestStop ();
 								});
@@ -196,7 +196,7 @@ namespace UICatalog.Scenarios {
 							_keyboardStrokes.RemoveAt (0);
 							if (_keyboardStrokes.Count == 0) {
 								_outputStarted = false;
-								Application.MainLoop.Invoke (() => {
+								Application.Invoke (() => {
 									tvOutput.ReadOnly = true;
 									tvInput.SetFocus ();
 								});

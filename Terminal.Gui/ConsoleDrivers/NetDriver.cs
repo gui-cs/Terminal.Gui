@@ -628,12 +628,19 @@ internal class NetDriver : ConsoleDriver {
 	const int COLOR_BRIGHT_CYAN = 96;
 	const int COLOR_BRIGHT_WHITE = 97;
 
+	NetMainLoop _mainLoopDriver = null;
+	internal override MainLoop CreateMainLoop ()
+	{
+		_mainLoopDriver = new NetMainLoop (this);
+		return new MainLoop (_mainLoopDriver);
+	}
+
 	public override bool SupportsTrueColor => Environment.OSVersion.Platform == PlatformID.Unix || (IsWinPlatform && Environment.OSVersion.Version.Build >= 14931);
 
 	public NetWinVTConsole NetWinConsole { get; private set; }
 	public bool IsWinPlatform { get; private set; }
 
-	public override void End ()
+	internal override void End ()
 	{
 		if (IsWinPlatform) {
 			NetWinConsole?.Cleanup ();
@@ -653,7 +660,7 @@ internal class NetDriver : ConsoleDriver {
 		}
 	}
 
-	public override void Init (Action terminalResized)
+	internal override void Init (Action terminalResized)
 	{
 		var p = Environment.OSVersion.Platform;
 		if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
@@ -1110,19 +1117,16 @@ internal class NetDriver : ConsoleDriver {
 	Action<KeyEvent> _keyDownHandler;
 	Action<KeyEvent> _keyUpHandler;
 	Action<MouseEvent> _mouseHandler;
-	NetMainLoop _mainLoop;
 
-	public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
+	internal override void PrepareToRun (Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 	{
 		_keyHandler = keyHandler;
 		_keyDownHandler = keyDownHandler;
 		_keyUpHandler = keyUpHandler;
 		_mouseHandler = mouseHandler;
 
-		_mainLoop = mainLoop.MainLoopDriver as NetMainLoop;
-
 		// Note: .Net API doesn't support keydown/up events and thus any passed keyDown/UpHandlers will be simulated to be called.
-		_mainLoop.ProcessInput = ProcessInput;
+		_mainLoopDriver.ProcessInput = ProcessInput;
 	}
 
 	volatile bool _winSizeChanging;

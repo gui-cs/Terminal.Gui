@@ -79,7 +79,7 @@ namespace UICatalog.Tests {
 
 				uint abortTime = 500;
 				// If the scenario doesn't close within 500ms, this will force it to quit
-				Func<MainLoop, bool> forceCloseCallback = (MainLoop loop) => {
+				Func<bool> forceCloseCallback = () => {
 					if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0) {
 						Application.RequestStop ();
 						// See #2474 for why this is commented out
@@ -88,7 +88,7 @@ namespace UICatalog.Tests {
 					return false;
 				};
 				//output.WriteLine ($"  Add timeout to force quit after {abortTime}ms");
-				_ = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
+				_ = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
 
 				Application.Iteration += () => {
 					//output.WriteLine ($"  iteration {++iterations}");
@@ -148,13 +148,13 @@ namespace UICatalog.Tests {
 
 			var ms = 100;
 			var abortCount = 0;
-			Func<MainLoop, bool> abortCallback = (MainLoop loop) => {
+			Func<bool> abortCallback = () => {
 				abortCount++;
 				output.WriteLine ($"'Generic' abortCount {abortCount}");
 				Application.RequestStop ();
 				return false;
 			};
-			var token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
+			var token = Application.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
 
 			Application.Top.KeyPress += (object sender, KeyEventEventArgs args) => {
 				// See #2474 for why this is commented out

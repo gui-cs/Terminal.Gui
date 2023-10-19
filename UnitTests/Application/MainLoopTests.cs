@@ -246,7 +246,7 @@ public class MainLoopTests {
 		var ms = 100;
 
 		var callbackCount = 0;
-		Func<MainLoop, bool> callback = (loop) => {
+		Func<bool> callback = () => {
 			callbackCount++;
 			return true;
 		};
@@ -270,7 +270,7 @@ public class MainLoopTests {
 		var originTicks = DateTime.UtcNow.Ticks;
 
 		var callbackCount = 0;
-		Func<MainLoop, bool> callback = (loop) => {
+		Func<bool> callback = () => {
 			callbackCount++;
 			return true;
 		};
@@ -296,7 +296,7 @@ public class MainLoopTests {
 		var ms = 100;
 
 		var callbackCount = 0;
-		Func<MainLoop, bool> callback = (loop) => {
+		Func<bool> callback = () => {
 			callbackCount++;
 			ml.Stop ();
 			return true;
@@ -317,7 +317,7 @@ public class MainLoopTests {
 		object token1 = null, token2 = null;
 
 		var callbackCount = 0;
-		Func<MainLoop, bool> callback = (loop) => {
+		Func<bool> callback = () => {
 			callbackCount++;
 			if (callbackCount == 2) ml.Stop ();
 			return true;
@@ -347,7 +347,7 @@ public class MainLoopTests {
 		object token1 = null, token2 = null;
 
 		var callbackCount = 0;
-		Func<MainLoop, bool> callback = (loop) => {
+		Func<bool> callback = () => {
 			callbackCount++;
 			if (callbackCount == 2) ml.Stop ();
 			return true;
@@ -381,7 +381,7 @@ public class MainLoopTests {
 		var watch = new System.Diagnostics.Stopwatch ();
 
 		var callbackCount = 0;
-		Func<MainLoop, bool> callback = (loop) => {
+		Func<bool> callback = () => {
 			watch.Stop ();
 			callbackCount++;
 			ml.Stop ();
@@ -407,7 +407,7 @@ public class MainLoopTests {
 		var watch = new System.Diagnostics.Stopwatch ();
 
 		var callbackCount = 0;
-		Func<MainLoop, bool> callback = (loop) => {
+		Func<bool> callback = () => {
 			callbackCount++;
 			if (callbackCount == 2) {
 				watch.Stop ();
@@ -443,7 +443,7 @@ public class MainLoopTests {
 		ml.AddIdle (fnStop);
 
 		var callbackCount = 0;
-		Func<MainLoop, bool> callback = (loop) => {
+		Func<bool> callback = () => {
 			callbackCount++;
 			return true;
 		};
@@ -471,7 +471,7 @@ public class MainLoopTests {
 		ml.AddIdle (fnStop);
 
 		var callbackCount = 0;
-		Func<MainLoop, bool> callback = (loop) => {
+		Func<bool> callback = () => {
 			callbackCount++;
 			return false;
 		};
@@ -481,19 +481,6 @@ public class MainLoopTests {
 		Assert.Equal (1, callbackCount);
 		Assert.Equal (10, stopCount);
 		Assert.False (ml.RemoveTimeout (token));
-	}
-
-	// Invoke Tests
-	// TODO: Test with threading scenarios
-	[Fact]
-	public void Invoke_Adds_Idle ()
-	{
-		var ml = new MainLoop (new FakeMainLoop ());
-
-		var actionCalled = 0;
-		ml.Invoke (() => { actionCalled++; });
-		ml.RunIteration ();
-		Assert.Equal (1, actionCalled);
 	}
 
 	[Fact]
@@ -523,7 +510,7 @@ public class MainLoopTests {
 		var ml = new MainLoop (new FakeMainLoop ());
 		var ms = TimeSpan.FromMilliseconds (50);
 
-		static bool Callback (MainLoop loop) => false;
+		static bool Callback () => false;
 
 		_ = ml.AddTimeout (ms, Callback);
 		var retVal = ml.CheckTimersAndIdleHandlers (out var waitTimeOut);
@@ -539,7 +526,7 @@ public class MainLoopTests {
 		var ml = new MainLoop (new FakeMainLoop ());
 		var ms = TimeSpan.FromMilliseconds (50);
 
-		static bool Callback (MainLoop loop) => false;
+		static bool Callback () => false;
 
 		_ = ml.AddTimeout (ms, Callback);
 		_ = ml.AddTimeout (ms, Callback);
@@ -559,7 +546,7 @@ public class MainLoopTests {
 		Assert.Empty (mainloop._idleHandlers);
 		Assert.NotNull (new Timeout () {
 			Span = new TimeSpan (),
-			Callback = (_) => true
+			Callback = () => true
 		});
 	}
 
@@ -604,7 +591,7 @@ public class MainLoopTests {
 	{
 		Task.Run (() => {
 			Thread.Sleep (r.Next (2, 4));
-			Application.MainLoop.Invoke (() => {
+			Application.Invoke (() => {
 				tf.Text = $"index{r.Next ()}";
 				Interlocked.Increment (ref tbCounter);
 				if (target == tbCounter) {
@@ -627,15 +614,15 @@ public class MainLoopTests {
 				var tbNow = tbCounter;
 				_wakeUp.Wait (pollMs);
 				if (tbCounter == tbNow) {
-					// No change after wait: Idle handlers added via Application.MainLoop.Invoke have gone missing
-					Application.MainLoop.Invoke (() => Application.RequestStop ());
+					// No change after wait: Idle handlers added via Application.Invoke have gone missing
+					Application.Invoke (() => Application.RequestStop ());
 					throw new TimeoutException (
 						$"Timeout: Increment lost. tbCounter ({tbCounter}) didn't " +
 						$"change after waiting {pollMs} ms. Failed to reach {(j + 1) * numIncrements} on pass {j + 1}");
 				}
 			};
 		}
-		Application.MainLoop.Invoke (() => Application.RequestStop ());
+		Application.Invoke (() => Application.RequestStop ());
 	}
 
 	[Fact]
@@ -734,7 +721,7 @@ public class MainLoopTests {
 			yield return new object [] { a1, "Click Me", "Cancel", "Pew Pew", 0, 1, 2, 3, 4 };
 
 			// Also goes fine
-			Action a2 = () => Application.MainLoop.Invoke (StartWindow);
+			Action a2 = () => Application.Invoke (StartWindow);
 			yield return new object [] { a2, "Click Me", "Cancel", "Pew Pew", 0, 1, 2, 3, 4 };
 		}
 	}
@@ -811,7 +798,7 @@ public class MainLoopTests {
 		Assert.Equal (cancel, btn.Text);
 		Assert.Equal (one, total);
 
-		Application.MainLoop.Invoke (() => {
+		Application.Invoke (() => {
 			btn.Text = "Pew Pew";
 			Interlocked.Increment (ref total);
 			btn.SetNeedsDisplay ();
@@ -824,7 +811,7 @@ public class MainLoopTests {
 		Assert.Equal (pewPew, btn.Text);
 		Assert.Equal (two, total);
 
-		Application.MainLoop.Invoke (() => {
+		Application.Invoke (() => {
 			btn.Text = "Click Me";
 			Interlocked.Increment (ref total);
 			btn.SetNeedsDisplay ();

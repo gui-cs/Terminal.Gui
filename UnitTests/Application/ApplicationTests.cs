@@ -286,7 +286,7 @@ namespace Terminal.Gui.ApplicationTests {
 		{
 			Application._forceFakeConsole = true;
 
-			Application.Init (null, null);
+			Application.Init (null);
 			Assert.Equal (typeof (FakeDriver), Application.Driver.GetType ());
 
 			Application.Iteration = () => {
@@ -857,6 +857,24 @@ namespace Terminal.Gui.ApplicationTests {
 		}
 
 		#endregion
+
+
+		// Invoke Tests
+		// TODO: Test with threading scenarios
+		[Fact]
+		public void Invoke_Adds_Idle ()
+		{
+			Application.Init (new FakeDriver ());
+			var top = new Toplevel ();
+			var rs = Application.Begin (top);
+			bool firstIteration = false;
+
+			var actionCalled = 0;
+			Application.Invoke (() => { actionCalled++; });
+			Application.RunIteration (ref rs, ref firstIteration);
+			Assert.Equal (1, actionCalled);
+			Application.Shutdown ();
+		}
 
 
 		#region mousegrabtests

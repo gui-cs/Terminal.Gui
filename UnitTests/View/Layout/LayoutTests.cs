@@ -1396,7 +1396,7 @@ Y
 
 			view1.Frame = new Rect (0, 0, 25, 4);
 			bool firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 
 			Assert.True (view1.AutoSize);
 			Assert.Equal (LayoutStyle.Absolute, view1.LayoutStyle);
@@ -1407,7 +1407,7 @@ Y
 			Assert.Equal ("Absolute(1)", view1.Height.ToString ());
 
 			view2.Frame = new Rect (0, 0, 1, 25);
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 
 			Assert.True (view2.AutoSize);
 			Assert.Equal (LayoutStyle.Absolute, view2.LayoutStyle);
@@ -1598,7 +1598,7 @@ Y
 
 
 			((FakeDriver)Application.Driver).SetBufferSize (20, height);
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			var expected = string.Empty;
 
 			switch (height) {
@@ -1736,7 +1736,7 @@ Y
 
 
 			((FakeDriver)Application.Driver).SetBufferSize (width, 7);
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			var expected = string.Empty;
 
 			switch (width) {

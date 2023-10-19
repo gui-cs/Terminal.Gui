@@ -793,6 +793,13 @@ internal class WindowsDriver : ConsoleDriver {
 	readonly bool _isWindowsTerminal = false;
 	readonly string _parentProcessName = "WindowsTerminal";
 
+	WindowsMainLoop _mainLoopDriver = null;
+	internal override MainLoop CreateMainLoop ()
+	{
+		_mainLoopDriver = new WindowsMainLoop (this);
+		return new MainLoop (_mainLoopDriver);
+	}
+
 	public WindowsDriver ()
 	{
 		if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
@@ -851,18 +858,15 @@ internal class WindowsDriver : ConsoleDriver {
 #pragma warning restore CA1416 // Validate platform compatibility
 	}
 
-	WindowsMainLoop _mainLoop;
-
-	public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
+	internal override void PrepareToRun (Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 	{
 		_keyHandler = keyHandler;
 		_keyDownHandler = keyDownHandler;
 		_keyUpHandler = keyUpHandler;
 		_mouseHandler = mouseHandler;
 
-		_mainLoop = mainLoop.MainLoopDriver as WindowsMainLoop;
 #if HACK_CHECK_WINCHANGED
-		_mainLoop.WinChanged = ChangeWin;
+		_mainLoopDriver.WinChanged = ChangeWin;
 #endif
 	}
 
@@ -1257,7 +1261,7 @@ internal class WindowsDriver : ConsoleDriver {
 				break;
 			}
 			if (_isButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-				Application.MainLoop.Invoke (() => _mouseHandler (me));
+				Application.Invoke (() => _mouseHandler (me));
 			}
 		}
 	}
@@ -1504,7 +1508,7 @@ internal class WindowsDriver : ConsoleDriver {
 		return base.IsRuneSupported (rune) && rune.IsBmp;
 	}
 
-	public override void Init (Action terminalResized)
+	internal override void Init (Action terminalResized)
 	{
 		TerminalResized = terminalResized;
 
@@ -1750,14 +1754,14 @@ internal class WindowsDriver : ConsoleDriver {
 		}
 	}
 
-	public override void End ()
+	internal override void End ()
 	{
-		if (_mainLoop != null) {
+		if (_mainLoopDriver != null) {
 #if HACK_CHECK_WINCHANGED
 			//_mainLoop.WinChanged -= ChangeWin;
 #endif
 		}
-		_mainLoop = null;
+		_mainLoopDriver = null;
 
 		WinConsole?.Cleanup ();
 		WinConsole = null;

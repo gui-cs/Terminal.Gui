@@ -35,7 +35,7 @@ namespace UICatalog {
 				RecordView (top);
 
 				// Refresh known windows
-				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (m) => {
+				Application.AddTimeout (TimeSpan.FromMilliseconds (100), () => {
 
 					lock (lockKnownViews) {
 						RecordView (Application.Top);

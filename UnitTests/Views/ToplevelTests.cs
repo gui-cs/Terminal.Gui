@@ -1416,7 +1416,7 @@ namespace Terminal.Gui.ViewsTests {
 				});
 
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			Assert.Equal (dialog, Application.MouseGrabView);
 
 			Assert.Equal (new Rect (25, 7, 30, 10), dialog.Frame);
@@ -1442,7 +1442,7 @@ namespace Terminal.Gui.ViewsTests {
 				});
 
 			firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			Assert.Equal (dialog, Application.MouseGrabView);
 			Assert.Equal (new Rect (20, 10, 30, 10), dialog.Frame);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -1560,7 +1560,7 @@ namespace Terminal.Gui.ViewsTests {
 				});
 
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@$"
 ┌──────────────────┐
 │                  │
@@ -1619,7 +1619,7 @@ namespace Terminal.Gui.ViewsTests {
 			bool fromTopStillKnowSecondIsRunning = false;
 			bool fromFirstStillKnowSecondIsRunning = false;
 
-			Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
+			Application.AddTimeout (TimeSpan.FromMilliseconds (100), () => {
 				count++;
 				if (count1 == 5) {
 					log1 = true;
@@ -1656,7 +1656,7 @@ namespace Terminal.Gui.ViewsTests {
 				var od = new OpenDialog ();
 				od.Ready += SecondDialogToplevel;
 
-				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
+				Application.AddTimeout (TimeSpan.FromMilliseconds (100), () => {
 					count1++;
 					if (count2 == 5) {
 						log2 = true;
@@ -1679,7 +1679,7 @@ namespace Terminal.Gui.ViewsTests {
 			{
 				var d = new Dialog ();
 
-				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
+				Application.AddTimeout (TimeSpan.FromMilliseconds (100), () => {
 					count2++;
 					if (count < 30) {
 						log = true;

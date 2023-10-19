@@ -1060,7 +1060,7 @@ public static class EscSeqUtils {
 			if (view == null)
 				break;
 			if (isButtonPressed && lastMouseButtonPressed != null && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-				Application.MainLoop.Invoke (() => continuousButtonPressedHandler (mouseFlag, point));
+				Application.Invoke (() => continuousButtonPressedHandler (mouseFlag, point));
 			}
 		}
 	}

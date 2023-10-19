@@ -57,13 +57,20 @@ public class FakeDriver : ConsoleDriver {
 		}
 	}
 
-	public override void End ()
+	internal override void End ()
 	{
 		FakeConsole.ResetColor ();
 		FakeConsole.Clear ();
 	}
 
-	public override void Init (Action terminalResized)
+	FakeMainLoop _mainLoopDriver = null;
+	internal override MainLoop CreateMainLoop ()
+	{
+		_mainLoopDriver = new FakeMainLoop (this);
+		return new MainLoop (_mainLoopDriver);
+	}
+
+	internal override void Init (Action terminalResized)
 	{
 		FakeConsole.MockKeyPresses.Clear ();
 
@@ -346,14 +353,15 @@ public class FakeDriver : ConsoleDriver {
 	Action<KeyEvent> _keyUpHandler;
 	private CursorVisibility _savedCursorVisibility;
 
-	public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
+	internal override void PrepareToRun (Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 	{
-		_keyDownHandler = keyDownHandler;
 		_keyHandler = keyHandler;
+		_keyDownHandler = keyDownHandler;
 		_keyUpHandler = keyUpHandler;
+		//_mouseHandler = mouseHandler;
 
 		// Note: Net doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
-		(mainLoop.MainLoopDriver as FakeMainLoop).KeyPressed = (consoleKey) => ProcessInput (consoleKey);
+		_mainLoopDriver.KeyPressed = (consoleKey) => ProcessInput (consoleKey);
 	}
 
 	void ProcessInput (ConsoleKeyInfo consoleKey)

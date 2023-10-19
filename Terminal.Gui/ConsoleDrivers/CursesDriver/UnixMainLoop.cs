@@ -119,7 +119,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		///	The token parameter is the value returned from AddWatch
 		/// </remarks>
-		public void RemoveWatch (object token)
+		internal void RemoveWatch (object token)
 		{
 			if (!ConsoleDriver.RunningUnitTests) {
 				if (token is not Watch watch) {
@@ -140,7 +140,7 @@ namespace Terminal.Gui {
 		///  The return value is a token that represents this watch, you can
 		///  use this token to remove the watch by calling RemoveWatch.
 		/// </remarks>
-		public object AddWatch (int fileDescriptor, Condition condition, Func<MainLoop, bool> callback)
+		internal object AddWatch (int fileDescriptor, Condition condition, Func<MainLoop, bool> callback)
 		{
 			if (callback == null) {
 				throw new ArgumentNullException (nameof (callback));
@@ -188,6 +188,7 @@ namespace Terminal.Gui {
 			if (_winChanged) {
 				_winChanged = false;
 				_cursesDriver.ProcessInput ();
+				//WinChanged?.Invoke ();
 			}
 			if (_pollMap == null) return;
 			foreach (var p in _pollMap) {

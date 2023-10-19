@@ -967,7 +967,7 @@ namespace Terminal.Gui.ViewsTests {
 				});
 
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
 │                  │
@@ -1018,7 +1018,7 @@ namespace Terminal.Gui.ViewsTests {
 				});
 
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
   ┌─────────────┐   
   │ Test        │   
@@ -1062,7 +1062,7 @@ namespace Terminal.Gui.ViewsTests {
 				});
 
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
     Test            
 ┌───────────────────
@@ -1113,7 +1113,7 @@ namespace Terminal.Gui.ViewsTests {
 				});
 
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			Assert.Equal (new Rect (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
 			Assert.Equal (new Rect (5, 11, 15, 6), Application.Top.Subviews [1].Frame);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -1134,7 +1134,7 @@ namespace Terminal.Gui.ViewsTests {
 				});
 
 			firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			Assert.Equal (new Rect (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
      ┌────────┐

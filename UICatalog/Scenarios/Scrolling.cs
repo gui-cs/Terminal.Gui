@@ -303,12 +303,12 @@ namespace UICatalog.Scenarios {
 			Win.Add (progress);
 
 			bool pulsing = true;
-			bool timer (MainLoop caller)
+			bool timer ()
 			{
 				progress.Pulse ();
 				return pulsing;
 			}
-			Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
+			Application.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
 
 			void Top_Unloaded (object sender, EventArgs args)
 			{

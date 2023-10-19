@@ -1438,7 +1438,7 @@ namespace Terminal.Gui {
 						UpdateChildrenToFound ();
 					}
 
-					Application.MainLoop.Invoke (() => {
+					Application.Invoke (() => {
 						Parent.spinnerView.Visible = false;
 					});
 				}
@@ -1450,7 +1450,7 @@ namespace Terminal.Gui {
 					Children = found.ToArray ();
 				}
 
-				Application.MainLoop.Invoke (() => {
+				Application.Invoke (() => {
 					Parent.tbPath.Autocomplete.GenerateSuggestions (
 						new AutocompleteFilepathContext (Parent.tbPath.Text, Parent.tbPath.CursorPosition, this)
 						);

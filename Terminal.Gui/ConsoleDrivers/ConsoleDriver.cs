@@ -32,15 +32,35 @@ public abstract class ConsoleDriver {
 	/// </summary>
 	internal static bool RunningUnitTests { get; set; }
 
+	#region Setup & Teardown
+
+	/// <summary>
+	/// Returns an instance of <see cref="MainLoop"/> using the <see cref="IMainLoopDriver"/> for the driver.
+	/// </summary>
+	/// <returns></returns>
+	internal abstract MainLoop CreateMainLoop ();
+
+	/// <summary>
+	/// Initializes the driver
+	/// </summary>
+	/// <param name="terminalResized">Method to invoke when the terminal is resized.</param>
+	internal abstract void Init (Action terminalResized);
+
 	/// <summary>
 	/// Prepare the driver and set the key and mouse events handlers.
 	/// </summary>
-	/// <param name="mainLoop">The main loop.</param>
 	/// <param name="keyHandler">The handler for ProcessKey</param>
 	/// <param name="keyDownHandler">The handler for key down events</param>
 	/// <param name="keyUpHandler">The handler for key up events</param>
 	/// <param name="mouseHandler">The handler for mouse events</param>
-	public abstract void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler);
+	internal abstract void PrepareToRun (Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler);
+
+	/// <summary>
+	/// Ends the execution of the console driver.
+	/// </summary>
+	internal abstract void End ();
+
+	#endregion
 
 	/// <summary>
 	/// The handler fired when the terminal is resized.
@@ -89,12 +109,6 @@ public abstract class ConsoleDriver {
 	///// </remarks>
 	///// </summary>
 	public Cell [,] Contents { get; internal set; }
-
-	/// <summary>
-	/// Initializes the driver
-	/// </summary>
-	/// <param name="terminalResized">Method to invoke when the terminal is resized.</param>
-	public abstract void Init (Action terminalResized);
 
 	/// <summary>
 	/// Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/>
@@ -512,11 +526,6 @@ public abstract class ConsoleDriver {
 	/// <param name="rect"></param>
 	/// <param name="c"></param>
 	public void FillRect (Rect rect, char c) => FillRect (rect, new Rune (c));
-
-	/// <summary>
-	/// Ends the execution of the console driver.
-	/// </summary>
-	public abstract void End ();
 
 	/// <summary>
 	/// Returns the name of the driver and relevant library version information.

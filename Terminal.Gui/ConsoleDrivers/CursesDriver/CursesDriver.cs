@@ -22,7 +22,12 @@ internal class CursesDriver : ConsoleDriver {
 	CursorVisibility? _currentCursorVisibility = null;
 
 	public override string GetVersionInfo () => $"{Curses.curses_version ()}";
-
+	UnixMainLoop _mainLoopDriver = null;
+	internal override MainLoop CreateMainLoop ()
+	{
+		_mainLoopDriver = new UnixMainLoop (this);
+		return new MainLoop (_mainLoopDriver);
+	}
 	public override bool SupportsTrueColor => false;
 
 	public override void Move (int col, int row)
@@ -208,13 +213,13 @@ internal class CursesDriver : ConsoleDriver {
 		}
 	}
 
-	public override void End ()
+	internal override void End ()
 	{
 		StopReportingMouseMoves ();
 		SetCursorVisibility (CursorVisibility.Default);
 
-		if (_mainLoop != null) {
-			_mainLoop.RemoveWatch (_processInputToken);
+		if (_mainLoopDriver != null) {
+			_mainLoopDriver.RemoveWatch (_processInputToken);
 		}
 
 		if (RunningUnitTests) {
@@ -605,29 +610,27 @@ internal class CursesDriver : ConsoleDriver {
 	Action<KeyEvent> _keyUpHandler;
 	Action<MouseEvent> _mouseHandler;
 
-	UnixMainLoop _mainLoop;
 	object _processInputToken;
 
-	public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
+	internal override void PrepareToRun (Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 	{
 		if (!RunningUnitTests) {
-			// Note: Curses doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
 			Curses.timeout (0);
 		}
-		this._keyHandler = keyHandler;
-		this._keyDownHandler = keyDownHandler;
-		this._keyUpHandler = keyUpHandler;
-		this._mouseHandler = mouseHandler;
 
-		_mainLoop = mainLoop.MainLoopDriver as UnixMainLoop;
+		_keyHandler = keyHandler;
+		// Note: Curses doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
+		_keyDownHandler = keyDownHandler;
+		_keyUpHandler = keyUpHandler;
+		_mouseHandler = mouseHandler;
 
-		_processInputToken = _mainLoop?.AddWatch (0, UnixMainLoop.Condition.PollIn, x => {
+		_processInputToken = _mainLoopDriver?.AddWatch (0, UnixMainLoop.Condition.PollIn, x => {
 			ProcessInput ();
 			return true;
 		});
 	}
 
-	public override void Init (Action terminalResized)
+	internal override void Init (Action terminalResized)
 	{
 		if (!RunningUnitTests) {
 

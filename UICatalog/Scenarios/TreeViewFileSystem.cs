@@ -206,7 +206,7 @@ namespace UICatalog.Scenarios {
 
 			menu.MenuItems = new MenuBarItem (new [] { new MenuItem ("Properties", null, () => ShowPropertiesOf (forObject)) });
 
-			Application.MainLoop.Invoke (menu.Show);
+			Application.Invoke (menu.Show);
 		}
 
 		class DetailsFrame : FrameView {
