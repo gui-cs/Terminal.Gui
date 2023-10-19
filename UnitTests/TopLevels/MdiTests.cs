@@ -32,9 +32,7 @@ namespace Terminal.Gui.TopLevelTests {
 			Application.Shutdown ();
 
 #if DEBUG_IDISPOSABLE
-			Assert.Equal (2, Responder.Instances.Count);
-			Assert.True (Responder.Instances [0].WasDisposed);
-			Assert.True (Responder.Instances [1].WasDisposed);
+			Assert.Empty (Responder.Instances);
 #endif
 		}
 
@@ -49,9 +47,7 @@ namespace Terminal.Gui.TopLevelTests {
 
 			Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
-			Assert.Equal (2, Responder.Instances.Count);
-			Assert.True (Responder.Instances [0].WasDisposed);
-			Assert.True (Responder.Instances [1].WasDisposed);
+			Assert.Empty (Responder.Instances);
 #endif
 		}
 
