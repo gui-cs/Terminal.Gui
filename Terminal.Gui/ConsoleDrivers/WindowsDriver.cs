@@ -788,7 +788,7 @@ internal class WindowsDriver : ConsoleDriver {
 	public WindowsConsole WinConsole { get; private set; }
 
 	public override bool SupportsTrueColor => RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931
-		&& (_isWindowsTerminal || _parentProcessName == "devenv"));
+		&& (_isWindowsTerminal || _parentProcessName == "wininit"));
 
 	readonly bool _isWindowsTerminal = false;
 	readonly string _parentProcessName = "WindowsTerminal";
@@ -813,7 +813,7 @@ internal class WindowsDriver : ConsoleDriver {
 		if (!RunningUnitTests) {
 			_parentProcessName = GetParentProcessName ();
 			_isWindowsTerminal = _parentProcessName == "WindowsTerminal";
-			if (!_isWindowsTerminal && _parentProcessName != "devenv") {
+			if (!_isWindowsTerminal && _parentProcessName != "wininit") {
 				Force16Colors = true;
 			}
 		}
