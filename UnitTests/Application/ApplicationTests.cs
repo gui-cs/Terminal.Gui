@@ -27,7 +27,6 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.Null (Application.MainLoop);
 			Assert.Null (Application.Iteration);
 			Assert.Null (Application.RootMouseEvent);
-			Assert.Null (Application.TerminalResized);
 		}
 
 		void Post_Init_State ()
@@ -38,7 +37,6 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.NotNull (Application.MainLoop);
 			Assert.Null (Application.Iteration);
 			Assert.Null (Application.RootMouseEvent);
-			Assert.Null (Application.TerminalResized);
 			// FakeDriver is always 80x25
 			Assert.Equal (80, Application.Driver.Cols);
 			Assert.Equal (25, Application.Driver.Rows);

@@ -892,7 +892,7 @@ internal class WindowsDriver : ConsoleDriver {
 
 		ResizeScreen ();
 		ClearContents ();
-		TerminalResized.Invoke ();
+		OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
 	}
 #endif
 
@@ -1508,10 +1508,8 @@ internal class WindowsDriver : ConsoleDriver {
 		return base.IsRuneSupported (rune) && rune.IsBmp;
 	}
 
-	internal override void Init (Action terminalResized)
+	internal override void Init ()
 	{
-		TerminalResized = terminalResized;
-
 		if (RunningUnitTests) {
 			return;
 		}

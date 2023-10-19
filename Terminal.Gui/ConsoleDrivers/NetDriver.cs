@@ -660,7 +660,7 @@ internal class NetDriver : ConsoleDriver {
 		}
 	}
 
-	internal override void Init (Action terminalResized)
+	internal override void Init ()
 	{
 		var p = Environment.OSVersion.Platform;
 		if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
@@ -682,9 +682,6 @@ internal class NetDriver : ConsoleDriver {
 				Clipboard = new CursesClipboard ();
 			}
 		}
-
-		TerminalResized = terminalResized;
-
 
 		if (!RunningUnitTests) {
 			Console.TreatControlCAsInput = true;
@@ -1165,7 +1162,7 @@ internal class NetDriver : ConsoleDriver {
 			ResizeScreen ();
 			ClearContents ();
 			_winSizeChanging = false;
-			TerminalResized?.Invoke ();
+			OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
 			break;
 		case NetEvents.EventType.RequestResponse:
 			// BUGBUG: What is this for? It does not seem to be used anywhere. 

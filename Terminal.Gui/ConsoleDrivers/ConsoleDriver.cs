@@ -44,7 +44,7 @@ public abstract class ConsoleDriver {
 	/// Initializes the driver
 	/// </summary>
 	/// <param name="terminalResized">Method to invoke when the terminal is resized.</param>
-	internal abstract void Init (Action terminalResized);
+	internal abstract void Init ();
 
 	/// <summary>
 	/// Prepare the driver and set the key and mouse events handlers.
@@ -63,9 +63,15 @@ public abstract class ConsoleDriver {
 	#endregion
 
 	/// <summary>
-	/// The handler fired when the terminal is resized.
+	/// The event fired when the terminal is resized.
 	/// </summary>
-	protected Action TerminalResized;
+	public event EventHandler<SizeChangedEventArgs> SizeChanged;
+
+	/// <summary>
+	/// Called when the terminal size changes. Firest the <see cref="SizeChanged"/> event.
+	/// </summary>
+	/// <param name="args"></param>
+	public void OnSizeChanged (SizeChangedEventArgs args) => SizeChanged?.Invoke (this, args);
 
 	/// <summary>
 	/// The number of columns visible in the terminal.
@@ -441,7 +447,7 @@ public abstract class ConsoleDriver {
 	/// </summary>
 	/// <returns>The current attribute.</returns>
 	public Attribute GetAttribute () => CurrentAttribute;
-	
+
 	/// <summary>
 	/// Makes an <see cref="Attribute"/>.
 	/// </summary>

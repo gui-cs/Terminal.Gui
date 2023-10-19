@@ -178,7 +178,7 @@ namespace Terminal.Gui {
 			MainLoop = Driver.CreateMainLoop ();
 
 			try {
-				Driver.Init (OnTerminalResized);
+				Driver.Init ();
 			} catch (InvalidOperationException ex) {
 				// This is a case where the driver is unable to initialize the console.
 				// This can happen if the console is already in use by another process or
@@ -187,6 +187,7 @@ namespace Terminal.Gui {
 				throw new InvalidOperationException ("Unable to initialize the console. This can happen if the console is already in use by another process or in unit tests.", ex);
 			}
 
+			Driver.SizeChanged += (s, args) => OnSizeChanging (args);
 			Driver.PrepareToRun (ProcessKeyEvent, ProcessKeyDownEvent, ProcessKeyUpEvent, ProcessMouseEvent);
 
 			SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext ());
@@ -239,7 +240,7 @@ namespace Terminal.Gui {
 			Iteration = null;
 			RootMouseEvent = null;
 			RootKeyEvent = null;
-			TerminalResized = null;
+			SizeChanging = null;
 			_mainThreadId = -1;
 			NotifyNewRunState = null;
 			NotifyStopRunState = null;
@@ -990,19 +991,33 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when the terminal was resized. The new size of the terminal is provided.
 		/// </summary>
-		public static Action<ResizedEventArgs> TerminalResized;
+		/// <remarks>
+		/// Event handlers can set <see cref="SizeChangedEventArgs.Cancel"/> to <see langword="true"/>
+		/// to prevent <see cref="Application"/> from changing it's size to match the new terminal size.
+		/// </remarks>
+		public static event EventHandler<SizeChangedEventArgs> SizeChanging;
 
-		static void OnTerminalResized ()
+		/// <summary>
+		/// Called when the application's size changes. Sets the size of all <see cref="Toplevel"/>s and
+		/// fires the <see cref="SizeChanging"/> event.
+		/// </summary>
+		/// <param name="args">The new size.</param>
+		/// <returns><see lanword="true"/>if the size was changed.</returns>
+		public static bool OnSizeChanging (SizeChangedEventArgs args)
 		{
-			var full = new Rect (0, 0, Driver.Cols, Driver.Rows);
-			TerminalResized?.Invoke (new ResizedEventArgs () { Cols = full.Width, Rows = full.Height });
+			SizeChanging?.Invoke (null, args);
+			if (args.Cancel) {
+				return false;
+			}
+
 			foreach (var t in _toplevels) {
-				t.SetRelativeLayout (full);
+				t.SetRelativeLayout (new Rect(0, 0, args.Size.Width, args.Size.Height));
 				t.LayoutSubviews ();
 				t.PositionToplevels ();
-				t.OnTerminalResized (new SizeChangedEventArgs (full.Size));
+				t.OnTerminalResized (new SizeChangedEventArgs (args.Size));
 			}
 			Refresh ();
+			return true;
 		}
 
 		#endregion Toplevel handling

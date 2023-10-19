@@ -63,7 +63,7 @@ internal class CursesDriver : ConsoleDriver {
 	{
 		if (!RunningUnitTests && Curses.CheckWinChange ()) {
 			ClearContents ();
-			TerminalResized?.Invoke ();
+			OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
 		}
 	}
 
@@ -630,7 +630,7 @@ internal class CursesDriver : ConsoleDriver {
 		});
 	}
 
-	internal override void Init (Action terminalResized)
+	internal override void Init ()
 	{
 		if (!RunningUnitTests) {
 
@@ -676,8 +676,6 @@ internal class CursesDriver : ConsoleDriver {
 		}
 
 		CurrentAttribute = MakeColor (ColorName.White, ColorName.Black);
-
-		TerminalResized = terminalResized;
 
 		if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
 			Clipboard = new FakeDriver.FakeClipboard ();

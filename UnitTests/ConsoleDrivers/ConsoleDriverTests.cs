@@ -27,7 +27,7 @@ namespace Terminal.Gui.DriverTests {
 		{
 			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
-			driver.Init (() => { });
+			driver.Init ();
 
 			Assert.Equal (80, Console.BufferWidth);
 			Assert.Equal (25, Console.BufferHeight);
@@ -50,7 +50,7 @@ namespace Terminal.Gui.DriverTests {
 		{
 			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
-			driver.Init (() => { });
+			driver.Init ();
 
 			Console.ForegroundColor = ConsoleColor.Red;
 			Assert.Equal (ConsoleColor.Red, Console.ForegroundColor);
@@ -204,10 +204,10 @@ namespace Terminal.Gui.DriverTests {
 			var driver = (FakeDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 			var wasTerminalResized = false;
-			Application.TerminalResized = (e) => {
+			Application.SizeChanging += (s, e) => {
 				wasTerminalResized = true;
-				Assert.Equal (120, e.Cols);
-				Assert.Equal (40, e.Rows);
+				Assert.Equal (120, e.Size.Width);
+				Assert.Equal (40, e.Size.Height);
 			};
 
 			Assert.Equal (80, Console.BufferWidth);

@@ -70,11 +70,9 @@ public class FakeDriver : ConsoleDriver {
 		return new MainLoop (_mainLoopDriver);
 	}
 
-	internal override void Init (Action terminalResized)
+	internal override void Init ()
 	{
 		FakeConsole.MockKeyPresses.Clear ();
-
-		TerminalResized = terminalResized;
 
 		Cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
 		Rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
@@ -462,7 +460,7 @@ public class FakeDriver : ConsoleDriver {
 	{
 		ResizeScreen ();
 		ClearContents ();
-		TerminalResized?.Invoke ();
+		OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
 	}
 
 	public virtual void ResizeScreen ()
