@@ -432,9 +432,9 @@ internal class CursesDriver : ConsoleDriver {
 				wch -= 60;
 				k = Key.ShiftMask | Key.AltMask | MapCursesKey (wch);
 			}
-			_keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
-			_keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
-			_keyUpHandler (new KeyEvent (k, MapKeyModifiers (k)));
+			OnKeyDown (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
+			OnKeyUp (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
+			OnKeyPressed (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
 			return;
 		}
 
@@ -485,16 +485,18 @@ internal class CursesDriver : ConsoleDriver {
 					}
 				}
 				key = new KeyEvent (k, MapKeyModifiers (k));
-				_keyDownHandler (key);
-				_keyHandler (key);
+				OnKeyDown (new KeyEventEventArgs (key));
+				OnKeyUp (new KeyEventEventArgs (key));
+				OnKeyPressed (new KeyEventEventArgs (key));
 			} else {
 				k = Key.Esc;
-				_keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
+				OnKeyPressed (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
 			}
 		} else if (wch == Curses.KeyTab) {
 			k = MapCursesKey (wch);
-			_keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
-			_keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
+			OnKeyDown (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
+			OnKeyUp (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
+			OnKeyPressed (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
 		} else {
 			// Unfortunately there are no way to differentiate Ctrl+alfa and Ctrl+Shift+alfa.
 			k = (Key)wch;
@@ -507,9 +509,9 @@ internal class CursesDriver : ConsoleDriver {
 			} else if (wch >= (uint)Key.A && wch <= (uint)Key.Z) {
 				_keyModifiers.Shift = true;
 			}
-			_keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
-			_keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
-			_keyUpHandler (new KeyEvent (k, MapKeyModifiers (k)));
+			OnKeyDown (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
+			OnKeyUp (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
+			OnKeyPressed (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
 		}
 		// Cause OnKeyUp and OnKeyPressed. Note that the special handling for ESC above 
 		// will not impact KeyUp.
@@ -529,7 +531,7 @@ internal class CursesDriver : ConsoleDriver {
 			code = Curses.get_wch (out wch2);
 			var consoleKeyInfo = new ConsoleKeyInfo ((char)wch2, 0, false, false, false);
 			if (wch2 == 0 || wch2 == 27 || wch2 == Curses.KeyMouse) {
-				EscSeqUtils.DecodeEscSeq (null, ref consoleKeyInfo, ref ck, cki, ref mod, out _, out _, out _, out _, out bool isKeyMouse, out List<MouseFlags> mouseFlags, out Point pos, out _, ProcessContinuousButtonPressed);
+				EscSeqUtils.DecodeEscSeq (null, ref consoleKeyInfo, ref ck, cki, ref mod, out _, out _, out _, out _, out bool isKeyMouse, out List<MouseFlags> mouseFlags, out Point pos, out _, ProcessMouseEvent);
 				if (isKeyMouse) {
 					foreach (var mf in mouseFlags) {
 						ProcessMouseEvent (mf, pos);
@@ -543,8 +545,8 @@ internal class CursesDriver : ConsoleDriver {
 					k = ConsoleKeyMapping.MapConsoleKeyToKey (consoleKeyInfo.Key, out _);
 					k = ConsoleKeyMapping.MapKeyModifiers (consoleKeyInfo, k);
 					key = new KeyEvent (k, MapKeyModifiers (k));
-					_keyDownHandler (key);
-					_keyHandler (key);
+					OnKeyDown (new KeyEventEventArgs (key));
+					OnKeyPressed (new KeyEventEventArgs (key));
 				}
 			} else {
 				cki = EscSeqUtils.ResizeArray (consoleKeyInfo, cki);
@@ -596,33 +598,16 @@ internal class CursesDriver : ConsoleDriver {
 			X = pos.X,
 			Y = pos.Y
 		};
-		_mouseHandler (me);
+		OnMouseEvent (new MouseEventEventArgs (me));
 	}
-
-
-	void ProcessContinuousButtonPressed (MouseFlags mouseFlag, Point pos)
-	{
-		ProcessMouseEvent (mouseFlag, pos);
-	}
-
-	Action<KeyEvent> _keyHandler;
-	Action<KeyEvent> _keyDownHandler;
-	Action<KeyEvent> _keyUpHandler;
-	Action<MouseEvent> _mouseHandler;
 
 	object _processInputToken;
 
-	internal override void PrepareToRun (Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
+	internal override void PrepareToRun ()
 	{
 		if (!RunningUnitTests) {
 			Curses.timeout (0);
 		}
-
-		_keyHandler = keyHandler;
-		// Note: Curses doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
-		_keyDownHandler = keyDownHandler;
-		_keyUpHandler = keyUpHandler;
-		_mouseHandler = mouseHandler;
 
 		_processInputToken = _mainLoopDriver?.AddWatch (0, UnixMainLoop.Condition.PollIn, x => {
 			ProcessInput ();
@@ -817,9 +802,9 @@ internal class CursesDriver : ConsoleDriver {
 			key |= Key.CtrlMask;
 			km.Ctrl = control;
 		}
-		_keyDownHandler (new KeyEvent (key, km));
-		_keyHandler (new KeyEvent (key, km));
-		_keyUpHandler (new KeyEvent (key, km));
+		OnKeyDown (new KeyEventEventArgs (new KeyEvent (key, km)));
+		OnKeyPressed (new KeyEventEventArgs (new KeyEvent (key, km)));
+		OnKeyUp (new KeyEventEventArgs (new KeyEvent (key, km)));
 	}
 
 

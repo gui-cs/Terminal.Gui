@@ -291,8 +291,8 @@ namespace UICatalog.Scenarios {
 				Width = 50,
 			};
 			Win.Add (mousePos);
-			Application.RootMouseEvent += delegate (MouseEvent me) {
-				mousePos.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count++}";
+			Application.MouseEvent += (sender, a) => {
+				mousePos.Text = $"Mouse: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count++}";
 			};
 
 			var progress = new ProgressBar {

@@ -1220,7 +1220,7 @@ namespace Terminal.Gui.ViewsTests {
 		[AutoInitShutdown]
 		public void Test_RootKeyEvent_Cancel ()
 		{
-			Application.RootKeyEvent += SuppressKey;
+			Application.KeyPressed += SuppressKey;
 
 			var tf = new TextField ();
 
@@ -1234,7 +1234,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Driver.SendKeys ('j', ConsoleKey.A, false, false, false);
 			Assert.Equal ("a", tf.Text);
 
-			Application.RootKeyEvent -= SuppressKey;
+			Application.KeyPressed -= SuppressKey;
 
 			// Now that the delegate has been removed we can type j again
 			Application.Driver.SendKeys ('j', ConsoleKey.A, false, false, false);
@@ -1244,7 +1244,7 @@ namespace Terminal.Gui.ViewsTests {
 		[AutoInitShutdown]
 		public void Test_RootMouseKeyEvent_Cancel ()
 		{
-			Application.RootMouseEvent += SuppressRightClick;
+			Application.MouseEvent += SuppressRightClick;
 
 			var tf = new TextField () { Width = 10 };
 			int clickCounter = 0;
@@ -1253,15 +1253,12 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (tf);
 			Application.Begin (Application.Top);
 
-			var processMouseEventMethod = typeof (Application).GetMethod ("ProcessMouseEvent", BindingFlags.Static | BindingFlags.NonPublic)
-			    ?? throw new Exception ("Expected private method not found 'ProcessMouseEvent', this method was used for testing mouse behaviours");
-
 			var mouseEvent = new MouseEvent {
 				Flags = MouseFlags.Button1Clicked,
 				View = tf
 			};
 
-			processMouseEventMethod.Invoke (null, new object [] { mouseEvent });
+			Application.OnMouseEvent(new MouseEventEventArgs(mouseEvent));
 			Assert.Equal (1, clickCounter);
 
 			// Get a fresh instance that represents a right click.
@@ -1270,10 +1267,10 @@ namespace Terminal.Gui.ViewsTests {
 				Flags = MouseFlags.Button3Clicked,
 				View = tf
 			};
-			processMouseEventMethod.Invoke (null, new object [] { mouseEvent });
+			Application.OnMouseEvent (new MouseEventEventArgs (mouseEvent));
 			Assert.Equal (1, clickCounter);
 
-			Application.RootMouseEvent -= SuppressRightClick;
+			Application.MouseEvent -= SuppressRightClick;
 
 			// Get a fresh instance that represents a right click.
 			// Should no longer be ignored as the callback was removed
@@ -1282,21 +1279,20 @@ namespace Terminal.Gui.ViewsTests {
 				View = tf
 			};
 
-			processMouseEventMethod.Invoke (null, new object [] { mouseEvent });
+			Application.OnMouseEvent (new MouseEventEventArgs (mouseEvent));
 			Assert.Equal (2, clickCounter);
 		}
 
-		private bool SuppressKey (KeyEvent arg)
+		private void SuppressKey (object s, KeyEventEventArgs arg)
 		{
-			if (arg.KeyValue == 'j')
-				return true;
-
-			return false;
+			if (arg.KeyEvent.KeyValue == 'j') {
+				arg.Handled = true;
+			}
 		}
 
-		private void SuppressRightClick (MouseEvent arg)
+		private void SuppressRightClick (object sender, MouseEventEventArgs arg)
 		{
-			if (arg.Flags.HasFlag (MouseFlags.Button3Clicked))
+			if (arg.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
 				arg.Handled = true;
 		}
 

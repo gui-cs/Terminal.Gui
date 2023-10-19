@@ -81,12 +81,12 @@ namespace Terminal.Gui.DriverTests {
 			var count = 0;
 			var wasKeyPressed = false;
 
-			view.KeyPress += (s, e) => {
+			view.KeyPressed += (s, e) => {
 				wasKeyPressed = true;
 			};
 			top.Add (view);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				count++;
 				if (count == 10) Application.RequestStop ();
 			};
@@ -120,7 +120,7 @@ namespace Terminal.Gui.DriverTests {
 			var rText = "";
 			var idx = 0;
 
-			view.KeyPress += (s, e) => {
+			view.KeyPressed += (s, e) => {
 				Assert.Equal (text [idx], (char)e.KeyEvent.Key);
 				rText += (char)e.KeyEvent.Key;
 				Assert.Equal (rText, text.Substring (0, idx + 1));
@@ -129,7 +129,7 @@ namespace Terminal.Gui.DriverTests {
 			};
 			top.Add (view);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (mKeys.Count == 0) Application.RequestStop ();
 			};
 
@@ -182,7 +182,7 @@ namespace Terminal.Gui.DriverTests {
 		//	};
 
 		//	int iterations = 0;
-		//	Application.Iteration += () => {
+		//	Application.Iteration += (s, a) => {
 		//		output.WriteLine ($"  iteration {++iterations}");
 
 		//		if (Console.MockKeyPresses.Count == 0) {

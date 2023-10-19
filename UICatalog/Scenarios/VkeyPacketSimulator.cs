@@ -96,7 +96,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			tvOutput.KeyPress += (s, e) => {
+			tvOutput.KeyPressed += (s, e) => {
 				//System.Diagnostics.Debug.WriteLine ($"Output - KeyPress - _keyboardStrokes: {_keyboardStrokes.Count}");
 				if (_outputStarted && _keyboardStrokes.Count > 0) {
 					var ev = ShortcutHelper.GetModifiersKey (e.KeyEvent);
@@ -124,7 +124,7 @@ namespace UICatalog.Scenarios {
 
 			KeyEventEventArgs unknownChar = null;
 
-			tvInput.KeyPress += (s, e) => {
+			tvInput.KeyPressed += (s, e) => {
 				if (e.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
 					Application.RequestStop ();
 					return;

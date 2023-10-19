@@ -346,18 +346,10 @@ public class FakeDriver : ConsoleDriver {
 		return keyMod != Key.Null ? keyMod | key : key;
 	}
 
-	Action<KeyEvent> _keyDownHandler;
-	Action<KeyEvent> _keyHandler;
-	Action<KeyEvent> _keyUpHandler;
 	private CursorVisibility _savedCursorVisibility;
 
-	internal override void PrepareToRun (Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
+	internal override void PrepareToRun ()
 	{
-		_keyHandler = keyHandler;
-		_keyDownHandler = keyDownHandler;
-		_keyUpHandler = keyUpHandler;
-		//_mouseHandler = mouseHandler;
-
 		// Note: Net doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
 		_mainLoopDriver.KeyPressed = (consoleKey) => ProcessInput (consoleKey);
 	}
@@ -380,15 +372,15 @@ public class FakeDriver : ConsoleDriver {
 		var map = MapKey (consoleKey);
 		if (map == (Key)0xffffffff) {
 			if ((consoleKey.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				_keyDownHandler (new KeyEvent (map, keyModifiers));
-				_keyUpHandler (new KeyEvent (map, keyModifiers));
+				OnKeyDown(new KeyEventEventArgs(new KeyEvent (map, keyModifiers)));
+				OnKeyUp (new KeyEventEventArgs (new KeyEvent (map, keyModifiers)));
 			}
 			return;
 		}
 
-		_keyDownHandler (new KeyEvent (map, keyModifiers));
-		_keyHandler (new KeyEvent (map, keyModifiers));
-		_keyUpHandler (new KeyEvent (map, keyModifiers));
+		OnKeyDown (new KeyEventEventArgs (new KeyEvent (map, keyModifiers)));
+		OnKeyUp (new KeyEventEventArgs (new KeyEvent (map, keyModifiers)));
+		OnKeyPressed (new KeyEventEventArgs (new KeyEvent (map, keyModifiers)));
 	}
 
 	/// <inheritdoc/>

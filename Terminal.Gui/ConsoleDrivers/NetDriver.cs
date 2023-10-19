@@ -640,6 +640,12 @@ internal class NetDriver : ConsoleDriver {
 	public NetWinVTConsole NetWinConsole { get; private set; }
 	public bool IsWinPlatform { get; private set; }
 
+	internal override void PrepareToRun ()
+	{
+		// Note: .Net API doesn't support keydown/up events and thus any passed keyDown/UpHandlers will be simulated to be called.
+		_mainLoopDriver.ProcessInput = ProcessInput;
+	}
+
 	internal override void End ()
 	{
 		if (IsWinPlatform) {
@@ -1110,22 +1116,6 @@ internal class NetDriver : ConsoleDriver {
 		return keyMod != Key.Null ? keyMod | key : key;
 	}
 
-	Action<KeyEvent> _keyHandler;
-	Action<KeyEvent> _keyDownHandler;
-	Action<KeyEvent> _keyUpHandler;
-	Action<MouseEvent> _mouseHandler;
-
-	internal override void PrepareToRun (Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
-	{
-		_keyHandler = keyHandler;
-		_keyDownHandler = keyDownHandler;
-		_keyUpHandler = keyUpHandler;
-		_mouseHandler = mouseHandler;
-
-		// Note: .Net API doesn't support keydown/up events and thus any passed keyDown/UpHandlers will be simulated to be called.
-		_mainLoopDriver.ProcessInput = ProcessInput;
-	}
-
 	volatile bool _winSizeChanging;
 
 	void ProcessInput (NetEvents.InputResult inputEvent)
@@ -1142,16 +1132,16 @@ internal class NetDriver : ConsoleDriver {
 				return;
 			}
 			if (map == Key.Null) {
-				_keyDownHandler (new KeyEvent (map, _keyModifiers));
-				_keyUpHandler (new KeyEvent (map, _keyModifiers));
+				OnKeyDown (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
+				OnKeyUp (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
 			} else {
-				_keyDownHandler (new KeyEvent (map, _keyModifiers));
-				_keyHandler (new KeyEvent (map, _keyModifiers));
-				_keyUpHandler (new KeyEvent (map, _keyModifiers));
+				OnKeyDown (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
+				OnKeyUp (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
+				OnKeyPressed (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
 			}
 			break;
 		case NetEvents.EventType.Mouse:
-			_mouseHandler (ToDriverMouse (inputEvent.MouseEvent));
+			OnMouseEvent (new MouseEventEventArgs (ToDriverMouse (inputEvent.MouseEvent)));
 			break;
 		case NetEvents.EventType.WindowSize:
 			_winSizeChanging = true;

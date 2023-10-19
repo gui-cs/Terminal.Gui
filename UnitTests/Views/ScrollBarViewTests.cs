@@ -1111,14 +1111,11 @@ This is a test
 This is a test             
 This is a test             ", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 15,
-					Y = 0,
-					Flags = MouseFlags.Button1Clicked
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 15,
+				Y = 0,
+				Flags = MouseFlags.Button1Clicked
+			}));
 
 			Assert.Null (Application.MouseGrabView);
 			Assert.True (clicked);
@@ -1138,14 +1135,11 @@ This is a test
 This is a test             
 This is a test             ", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 15,
-					Y = 0,
-					Flags = MouseFlags.Button1Clicked
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 15,
+				Y = 0,
+				Flags = MouseFlags.Button1Clicked
+			}));
 
 			Assert.Null (Application.MouseGrabView);
 			Assert.True (clicked);

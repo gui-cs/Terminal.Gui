@@ -148,7 +148,7 @@ namespace Terminal.Gui.DialogTests {
 			Application.Top.BorderStyle = LineStyle.Double;
 
 			var iterations = -1;
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
 				if (iterations == 0) {
@@ -796,7 +796,7 @@ namespace Terminal.Gui.DialogTests {
 			var btn = $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
 
 			var iterations = -1;
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 				if (iterations == 0) {
 					Assert.True (btn1.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
@@ -876,7 +876,7 @@ namespace Terminal.Gui.DialogTests {
 			var win = new Window ();
 
 			int iterations = 0;
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (++iterations > 2) {
 					Application.RequestStop ();
 				}
@@ -913,7 +913,7 @@ namespace Terminal.Gui.DialogTests {
 		//			((FakeDriver)Application.Driver).SetBufferSize (20, height);
 		//			var win = new Window ();
 
-		//			Application.Iteration += () => {
+		//			Application.Iteration += (s, a) => {
 		//				var dlg = new Dialog ("Test", new Button ("Ok"));
 
 		//				dlg.LayoutComplete += (s, a) => {
@@ -946,7 +946,7 @@ namespace Terminal.Gui.DialogTests {
 			var win = new Window ();
 
 			int iterations = 0;
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (++iterations > 2) {
 					Application.RequestStop ();
 				}

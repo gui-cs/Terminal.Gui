@@ -122,7 +122,7 @@ namespace UICatalog.Scenarios {
 
 			tableView.SelectedCellChanged += (s, e) => { selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}"; };
 			tableView.CellActivated += EditCurrentCell;
-			tableView.KeyPress += TableViewKeyPress;
+			tableView.KeyPressed += TableViewKeyPress;
 
 			SetupScrollBar ();
 

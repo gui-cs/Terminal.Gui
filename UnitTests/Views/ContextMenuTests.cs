@@ -180,7 +180,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			var cm = new ContextMenu ();
 
-			lbl.KeyPress += (s, e) => {
+			lbl.KeyPressed += (s, e) => {
 				if (e.KeyEvent.Key == cm.Key) {
 					lbl.Text = "Replaced";
 					e.Handled = true;
@@ -957,14 +957,11 @@ namespace Terminal.Gui.ViewsTests {
 │                  │
 └──────────────────┘", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 9,
-					Y = 3,
-					Flags = MouseFlags.Button3Clicked
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 9,
+				Y = 3,
+				Flags = MouseFlags.Button3Clicked
+			}));
 
 			var firstIteration = false;
 			Application.RunIteration (ref rs, ref firstIteration);
@@ -1008,14 +1005,11 @@ namespace Terminal.Gui.ViewsTests {
   │             │
   └─────────────┘", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 9,
-					Y = 3,
-					Flags = MouseFlags.Button3Clicked
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 9,
+				Y = 3,
+				Flags = MouseFlags.Button3Clicked
+			}));
 
 			var firstIteration = false;
 			Application.RunIteration (ref rs, ref firstIteration);
@@ -1052,14 +1046,11 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
     Test", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 8,
-					Y = 2,
-					Flags = MouseFlags.Button3Clicked
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 8,
+				Y = 2,
+				Flags = MouseFlags.Button3Clicked
+			}));
 
 			var firstIteration = false;
 			Application.RunIteration (ref rs, ref firstIteration);
@@ -1103,14 +1094,11 @@ namespace Terminal.Gui.ViewsTests {
      │ Three  │
      └────────┘", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 5,
-					Y = 13,
-					Flags = MouseFlags.Button1Clicked
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 5,
+				Y = 13,
+				Flags = MouseFlags.Button1Clicked
+			}));
 
 			var firstIteration = false;
 			Application.RunIteration (ref rs, ref firstIteration);
@@ -1124,14 +1112,11 @@ namespace Terminal.Gui.ViewsTests {
      │ Sub-Menu 2  │
      └─────────────┘", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 5,
-					Y = 12,
-					Flags = MouseFlags.Button1Clicked
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 5,
+				Y = 12,
+				Flags = MouseFlags.Button1Clicked
+			}));
 
 			firstIteration = false;
 			Application.RunIteration (ref rs, ref firstIteration);
@@ -1154,7 +1139,7 @@ namespace Terminal.Gui.ViewsTests {
 			var isMenuAllClosed = false;
 			MenuBarItem mi = null;
 			var iterations = -1;
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 				if (iterations == 0) {
 					cm.Show ();

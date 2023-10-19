@@ -32,7 +32,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (canvas);
 			Win.Add (tools);
 
-			Win.KeyPress += (s,e) => { e.Handled = canvas.ProcessKey (e.KeyEvent); };
+			Win.KeyPressed += (s,e) => { e.Handled = canvas.ProcessKey (e.KeyEvent); };
 		}
 
 		class ToolsView : Window {

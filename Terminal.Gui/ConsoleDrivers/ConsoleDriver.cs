@@ -9,7 +9,6 @@ using static Terminal.Gui.ColorScheme;
 
 namespace Terminal.Gui;
 
-
 /// <summary>
 /// Base class for Terminal.Gui ConsoleDriver implementations.
 /// </summary>
@@ -48,11 +47,7 @@ public abstract class ConsoleDriver {
 	/// <summary>
 	/// Prepare the driver and set the key and mouse events handlers.
 	/// </summary>
-	/// <param name="keyHandler">The handler for ProcessKey</param>
-	/// <param name="keyDownHandler">The handler for key down events</param>
-	/// <param name="keyUpHandler">The handler for key up events</param>
-	/// <param name="mouseHandler">The handler for mouse events</param>
-	internal abstract void PrepareToRun (Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler);
+	internal abstract void PrepareToRun ();
 
 	/// <summary>
 	/// Ends the execution of the console driver.
@@ -466,6 +461,64 @@ public abstract class ConsoleDriver {
 
 	#endregion
 
+	#region Mouse and Keyboard
+
+	/// <summary>
+	/// Event fired after a key has been pressed and released.
+	/// </summary>
+	public event EventHandler<KeyEventEventArgs> KeyPressed;
+
+	/// <summary>
+	/// Called after a key has been pressed and released. Fires the <see cref="KeyPressed"/> event.
+	/// </summary>
+	/// <param name="a"></param>
+	public void OnKeyPressed (KeyEventEventArgs a) => KeyPressed?.Invoke(this, a);
+
+	/// <summary>
+	/// Event fired when a key is released.
+	/// </summary>
+	public event EventHandler<KeyEventEventArgs> KeyUp;
+
+	/// <summary>
+	/// Called when a key is released. Fires the <see cref="KeyUp"/> event.
+	/// </summary>
+	/// <param name="a"></param>
+	public void OnKeyUp (KeyEventEventArgs a) => KeyUp?.Invoke (this, a);
+
+	/// <summary>
+	/// Event fired when a key is pressed.
+	/// </summary>
+	public event EventHandler<KeyEventEventArgs> KeyDown;
+
+	/// <summary>
+	/// Called when a key is pressed. Fires the <see cref="KeyDown"/> event.
+	/// </summary>
+	/// <param name="a"></param>
+	public void OnKeyDown (KeyEventEventArgs a) => KeyDown?.Invoke (this, a);
+	
+	/// <summary>
+	/// Event fired when a mouse event occurs.
+	/// </summary>
+	public event EventHandler<MouseEventEventArgs> MouseEvent;
+
+	/// <summary>
+	/// Called when a mouse event occurs. Fires the <see cref="MouseEvent"/> event.
+	/// </summary>
+	/// <param name="a"></param>
+	public void OnMouseEvent (MouseEventEventArgs a) => MouseEvent?.Invoke (this, a);
+
+	/// <summary>
+	/// Simulates a key press.
+	/// </summary>
+	/// <param name="keyChar">The key character.</param>
+	/// <param name="key">The key.</param>
+	/// <param name="shift">If <see langword="true"/> simulates the Shift key being pressed.</param>
+	/// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
+	/// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
+	public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
+
+	#endregion
+
 	/// <summary>
 	/// Enables diagnostic functions
 	/// </summary>
@@ -497,16 +550,6 @@ public abstract class ConsoleDriver {
 	/// </summary>
 	/// <remarks>This is only implemented in <see cref="CursesDriver"/>.</remarks>
 	public abstract void Suspend ();
-
-	/// <summary>
-	/// Simulates a key press.
-	/// </summary>
-	/// <param name="keyChar">The key character.</param>
-	/// <param name="key">The key.</param>
-	/// <param name="shift">If <see langword="true"/> simulates the Shift key being pressed.</param>
-	/// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
-	/// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
-	public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
 
 	// TODO: Move FillRect to ./Drawing	
 	/// <summary>

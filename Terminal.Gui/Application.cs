@@ -188,7 +188,11 @@ namespace Terminal.Gui {
 			}
 
 			Driver.SizeChanged += (s, args) => OnSizeChanging (args);
-			Driver.PrepareToRun (ProcessKeyEvent, ProcessKeyDownEvent, ProcessKeyUpEvent, ProcessMouseEvent);
+			Driver.KeyPressed += (s, args) => OnKeyPressed (args);
+			Driver.KeyDown += (s, args) => OnKeyDown (args);
+			Driver.KeyUp += (s, args) => OnKeyUp (args);
+			Driver.MouseEvent += (s, args) => OnMouseEvent (args);
+			Driver.PrepareToRun ();
 
 			SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext ());
 
@@ -222,11 +226,11 @@ namespace Terminal.Gui {
 			// Shutdown is the bookend for Init. As such it needs to clean up all resources
 			// Init created. Apps that do any threading will need to code defensively for this.
 			// e.g. see Issue #537
-			foreach (var t in _toplevels) {
+			foreach (var t in _topLevels) {
 				t.Running = false;
 				t.Dispose ();
 			}
-			_toplevels.Clear ();
+			_topLevels.Clear ();
 			Current = null;
 			Top?.Dispose ();
 			Top = null;
@@ -238,8 +242,10 @@ namespace Terminal.Gui {
 			Driver?.End ();
 			Driver = null;
 			Iteration = null;
-			RootMouseEvent = null;
-			RootKeyEvent = null;
+			MouseEvent = null;
+			KeyDown = null;
+			KeyUp = null;
+			KeyPressed = null;
 			SizeChanging = null;
 			_mainThreadId = -1;
 			NotifyNewRunState = null;
@@ -311,34 +317,34 @@ namespace Terminal.Gui {
 				Toplevel.EndInit ();
 			}
 
-			lock (_toplevels) {
+			lock (_topLevels) {
 				// If Top was already initialized with Init, and Begin has never been called
 				// Top was not added to the Toplevels Stack. It will thus never get disposed.
 				// Clean it up here:
-				if (Top != null && Toplevel != Top && !_toplevels.Contains (Top)) {
+				if (Top != null && Toplevel != Top && !_topLevels.Contains (Top)) {
 					Top.Dispose ();
 					Top = null;
-				} else if (Top != null && Toplevel != Top && _toplevels.Contains (Top)) {
+				} else if (Top != null && Toplevel != Top && _topLevels.Contains (Top)) {
 					Top.OnLeave (Toplevel);
 				}
 				if (string.IsNullOrEmpty (Toplevel.Id)) {
 					var count = 1;
-					var id = (_toplevels.Count + count).ToString ();
-					while (_toplevels.Count > 0 && _toplevels.FirstOrDefault (x => x.Id == id) != null) {
+					var id = (_topLevels.Count + count).ToString ();
+					while (_topLevels.Count > 0 && _topLevels.FirstOrDefault (x => x.Id == id) != null) {
 						count++;
-						id = (_toplevels.Count + count).ToString ();
+						id = (_topLevels.Count + count).ToString ();
 					}
-					Toplevel.Id = (_toplevels.Count + count).ToString ();
+					Toplevel.Id = (_topLevels.Count + count).ToString ();
 
-					_toplevels.Push (Toplevel);
+					_topLevels.Push (Toplevel);
 				} else {
-					var dup = _toplevels.FirstOrDefault (x => x.Id == Toplevel.Id);
+					var dup = _topLevels.FirstOrDefault (x => x.Id == Toplevel.Id);
 					if (dup == null) {
-						_toplevels.Push (Toplevel);
+						_topLevels.Push (Toplevel);
 					}
 				}
 
-				if (_toplevels.FindDuplicates (new ToplevelEqualityComparer ()).Count > 0) {
+				if (_topLevels.FindDuplicates (new ToplevelEqualityComparer ()).Count > 0) {
 					throw new ArgumentException ("There are duplicates Toplevels Id's");
 				}
 			}
@@ -356,7 +362,7 @@ namespace Terminal.Gui {
 				} else {
 					refreshDriver = false;
 				}
-			} else if ((OverlappedTop != null && Toplevel != OverlappedTop && Current?.Modal == true && !_toplevels.Peek ().Modal)
+			} else if ((OverlappedTop != null && Toplevel != OverlappedTop && Current?.Modal == true && !_topLevels.Peek ().Modal)
 				|| (OverlappedTop != null && Toplevel != OverlappedTop && Current?.Running == false)) {
 				refreshDriver = false;
 				MoveCurrent (Toplevel);
@@ -548,7 +554,7 @@ namespace Terminal.Gui {
 			// TODO: Figure out how to remove this call to ClearContents. Refresh should just repaint damaged areas, not clear
 			Driver.ClearContents ();
 			View last = null;
-			foreach (var v in _toplevels.Reverse ()) {
+			foreach (var v in _topLevels.Reverse ()) {
 				if (v.Visible) {
 					v.SetNeedsDisplay ();
 					v.SetSubViewNeedsDisplay ();
@@ -566,7 +572,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		///  See also <see cref="Timeout"/>
 		/// </remarks>
-		public static Action Iteration;
+		public static event EventHandler<IterationEventArgs> Iteration;
 
 		/// <summary>
 		/// The <see cref="MainLoop"/> driver for the application
@@ -617,15 +623,6 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Determines whether there are pending events to be processed.
-		/// </summary>
-		/// <remarks>
-		///   Use this method to probe if events are pending. Typically used to flush the input queue while still
-		///   running code on the main thread.
-		/// </remarks>
-		public static bool EventsPending () => MainLoop.EventsPending ();
-
-		/// <summary>
 		///  Building block API: Runs the <see cref="MainLoop"/> for the created <see cref="Toplevel"/>.
 		/// </summary>
 		/// <param name="state">The state returned by the <see cref="Begin(Toplevel)"/> method.</param>
@@ -662,7 +659,7 @@ namespace Terminal.Gui {
 				}
 
 				MainLoop.RunIteration ();
-				Iteration?.Invoke ();
+				Iteration?.Invoke (null, new IterationEventArgs());
 
 				EnsureModalOrVisibleAlwaysOnTop (state.Toplevel);
 				if (state.Toplevel != Current) {
@@ -686,7 +683,7 @@ namespace Terminal.Gui {
 				state.Toplevel.SetNeedsDisplay (state.Toplevel.Frame);
 				Top.Clear ();
 				Top.Draw ();
-				foreach (var top in _toplevels.Reverse ()) {
+				foreach (var top in _topLevels.Reverse ()) {
 					if (top != Top && top != state.Toplevel) {
 						top.SetNeedsDisplay ();
 						top.SetSubViewNeedsDisplay ();
@@ -695,7 +692,7 @@ namespace Terminal.Gui {
 					}
 				}
 			}
-			if (_toplevels.Count == 1 && state.Toplevel == Top
+			if (_topLevels.Count == 1 && state.Toplevel == Top
 				&& (Driver.Cols != state.Toplevel.Frame.Width || Driver.Rows != state.Toplevel.Frame.Height)
 				&& (state.Toplevel.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay || state.Toplevel.LayoutNeeded)) {
 
@@ -763,7 +760,7 @@ namespace Terminal.Gui {
 			} else if ((OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Modal == false
 				&& Current?.Running == true && !top.Running)
 				|| (OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Modal == false
-				&& Current?.Running == false && !top.Running && _toplevels.ToArray () [1].Running)) {
+				&& Current?.Running == false && !top.Running && _topLevels.ToArray () [1].Running)) {
 
 				MoveCurrent (top);
 			} else if (OverlappedTop != null && Current != top && Current?.Running == true && !top.Running
@@ -822,13 +819,13 @@ namespace Terminal.Gui {
 
 			// End the RunState.Toplevel 
 			// First, take it off the Toplevel Stack
-			if (_toplevels.Count > 0) {
-				if (_toplevels.Peek () != runState.Toplevel) {
+			if (_topLevels.Count > 0) {
+				if (_topLevels.Peek () != runState.Toplevel) {
 					// If there the top of the stack is not the RunState.Toplevel then
 					// this call to End is not balanced with the call to Begin that started the RunState
 					throw new ArgumentException ("End must be balanced with calls to Begin");
 				}
-				_toplevels.Pop ();
+				_topLevels.Pop ();
 			}
 
 			// Notify that it is closing
@@ -841,11 +838,11 @@ namespace Terminal.Gui {
 			}
 
 			// Set Current and Top to the next TopLevel on the stack
-			if (_toplevels.Count == 0) {
+			if (_topLevels.Count == 0) {
 				Current = null;
 			} else {
-				Current = _toplevels.Peek ();
-				if (_toplevels.Count == 1 && Current == OverlappedTop) {
+				Current = _topLevels.Peek ();
+				if (_topLevels.Count == 1 && Current == OverlappedTop) {
 					OverlappedTop.OnAllChildClosed ();
 				} else {
 					SetCurrentOverlappedAsTop ();
@@ -863,7 +860,7 @@ namespace Terminal.Gui {
 		#endregion Run (Begin, Run, End)
 
 		#region Toplevel handling
-		static readonly Stack<Toplevel> _toplevels = new Stack<Toplevel> ();
+		static readonly Stack<Toplevel> _topLevels = new Stack<Toplevel> ();
 
 		/// <summary>
 		/// The <see cref="Toplevel"/> object used for the application on startup (<seealso cref="Application.Top"/>)
@@ -880,11 +877,11 @@ namespace Terminal.Gui {
 
 		static void EnsureModalOrVisibleAlwaysOnTop (Toplevel Toplevel)
 		{
-			if (!Toplevel.Running || (Toplevel == Current && Toplevel.Visible) || OverlappedTop == null || _toplevels.Peek ().Modal) {
+			if (!Toplevel.Running || (Toplevel == Current && Toplevel.Visible) || OverlappedTop == null || _topLevels.Peek ().Modal) {
 				return;
 			}
 
-			foreach (var top in _toplevels.Reverse ()) {
+			foreach (var top in _topLevels.Reverse ()) {
 				if (top.Modal && top != Current) {
 					MoveCurrent (top);
 					return;
@@ -905,12 +902,12 @@ namespace Terminal.Gui {
 				return null;
 			}
 
-			if (_toplevels != null) {
-				int count = _toplevels.Count;
+			if (_topLevels != null) {
+				int count = _topLevels.Count;
 				if (count > 0) {
 					var rx = x - startFrame.X;
 					var ry = y - startFrame.Y;
-					foreach (var t in _toplevels) {
+					foreach (var t in _topLevels) {
 						if (t != Current) {
 							if (t != start && t.Visible && t.Frame.Contains (rx, ry)) {
 								start = t;
@@ -941,16 +938,16 @@ namespace Terminal.Gui {
 		{
 			// The Current is modal and the top is not modal Toplevel then
 			// the Current must be moved above the first not modal Toplevel.
-			if (OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Modal == true && !_toplevels.Peek ().Modal) {
-				lock (_toplevels) {
-					_toplevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
+			if (OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Modal == true && !_topLevels.Peek ().Modal) {
+				lock (_topLevels) {
+					_topLevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
 				}
 				var index = 0;
-				var savedToplevels = _toplevels.ToArray ();
+				var savedToplevels = _topLevels.ToArray ();
 				foreach (var t in savedToplevels) {
 					if (!t.Modal && t != Current && t != top && t != savedToplevels [index]) {
-						lock (_toplevels) {
-							_toplevels.MoveTo (top, index, new ToplevelEqualityComparer ());
+						lock (_topLevels) {
+							_topLevels.MoveTo (top, index, new ToplevelEqualityComparer ());
 						}
 					}
 					index++;
@@ -960,26 +957,26 @@ namespace Terminal.Gui {
 			// The Current and the top are both not running Toplevel then
 			// the top must be moved above the first not running Toplevel.
 			if (OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Running == false && !top.Running) {
-				lock (_toplevels) {
-					_toplevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
+				lock (_topLevels) {
+					_topLevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
 				}
 				var index = 0;
-				foreach (var t in _toplevels.ToArray ()) {
+				foreach (var t in _topLevels.ToArray ()) {
 					if (!t.Running && t != Current && index > 0) {
-						lock (_toplevels) {
-							_toplevels.MoveTo (top, index - 1, new ToplevelEqualityComparer ());
+						lock (_topLevels) {
+							_topLevels.MoveTo (top, index - 1, new ToplevelEqualityComparer ());
 						}
 					}
 					index++;
 				}
 				return false;
 			}
-			if ((OverlappedTop != null && top?.Modal == true && _toplevels.Peek () != top)
+			if ((OverlappedTop != null && top?.Modal == true && _topLevels.Peek () != top)
 				|| (OverlappedTop != null && Current != OverlappedTop && Current?.Modal == false && top == OverlappedTop)
 				|| (OverlappedTop != null && Current?.Modal == false && top != Current)
 				|| (OverlappedTop != null && Current?.Modal == true && top == OverlappedTop)) {
-				lock (_toplevels) {
-					_toplevels.MoveTo (top, 0, new ToplevelEqualityComparer ());
+				lock (_topLevels) {
+					_topLevels.MoveTo (top, 0, new ToplevelEqualityComparer ());
 					Current = top;
 				}
 			}
@@ -1008,8 +1005,8 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			foreach (var t in _toplevels) {
-				t.SetRelativeLayout (new Rect(0, 0, args.Size.Width, args.Size.Height));
+			foreach (var t in _topLevels) {
+				t.SetRelativeLayout (new Rect (0, 0, args.Size.Width, args.Size.Height));
 				t.LayoutSubviews ();
 				t.PositionToplevels ();
 				t.OnSizeChanging (new SizeChangedEventArgs (args.Size));
@@ -1120,14 +1117,27 @@ namespace Terminal.Gui {
 			UnGrabbedMouse?.Invoke (view, new ViewEventArgs (view));
 		}
 
-		/// <summary>
-		/// Merely a debugging aid to see the raw mouse events
-		/// </summary>
-		public static Action<MouseEvent> RootMouseEvent { get; set; }
-
 		static View _lastMouseOwnerView;
 
-		static void ProcessMouseEvent (MouseEvent me)
+		/// <summary>
+		/// Event fired when a mouse move or click occurs. Coordinates are screen relative.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// Use this event to receive mouse events in screen coordinates. Use <see cref="Responder.MouseEvent"/> to receive
+		/// mouse events relative to a <see cref="View"/>'s bounds.
+		/// </para>
+		/// <para>
+		/// The <see cref="MouseEvent.View"/> will contain the <see cref="View"/> that contains the mouse coordinates.
+		/// </para>
+		/// </remarks>
+		public static event EventHandler<MouseEventEventArgs> MouseEvent;
+
+		/// <summary>
+		/// Called when a mouse event occurs. Fires the <see cref="MouseEvent"/> event.
+		/// </summary>
+		/// <param name="a"></param>
+		public static void OnMouseEvent (MouseEventEventArgs a)
 		{
 			static bool OutsideBounds (Point p, Rect r) => p.X < 0 || p.X > r.Right || p.Y < 0 || p.Y > r.Bottom;
 
@@ -1135,7 +1145,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var view = View.FindDeepestView (Current, me.X, me.Y, out int rx, out int ry);
+			var view = View.FindDeepestView (Current, a.MouseEvent.X, a.MouseEvent.Y, out int rx, out int ry);
 
 			if (view != null && view.WantContinuousButtonPressed) {
 				WantContinuousButtonPressedView = view;
@@ -1143,26 +1153,26 @@ namespace Terminal.Gui {
 				WantContinuousButtonPressedView = null;
 			}
 			if (view != null) {
-				me.View = view;
+				a.MouseEvent.View = view;
 			}
-			RootMouseEvent?.Invoke (me);
+			MouseEvent?.Invoke (null, new MouseEventEventArgs (a.MouseEvent));
 
-			if (me.Handled) {
+			if (a.MouseEvent.Handled) {
 				return;
 			}
 
 			if (_mouseGrabView != null) {
-				var newxy = _mouseGrabView.ScreenToView (me.X, me.Y);
+				var newxy = _mouseGrabView.ScreenToView (a.MouseEvent.X, a.MouseEvent.Y);
 				var nme = new MouseEvent () {
 					X = newxy.X,
 					Y = newxy.Y,
-					Flags = me.Flags,
-					OfX = me.X - newxy.X,
-					OfY = me.Y - newxy.Y,
+					Flags = a.MouseEvent.Flags,
+					OfX = a.MouseEvent.X - newxy.X,
+					OfY = a.MouseEvent.Y - newxy.Y,
 					View = view
 				};
 				if (OutsideBounds (new Point (nme.X, nme.Y), _mouseGrabView.Bounds)) {
-					_lastMouseOwnerView?.OnMouseLeave (me);
+					_lastMouseOwnerView?.OnMouseLeave (a.MouseEvent);
 				}
 				//System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
 				if (_mouseGrabView?.OnMouseEvent (nme) == true) {
@@ -1171,10 +1181,10 @@ namespace Terminal.Gui {
 			}
 
 			if ((view == null || view == OverlappedTop) && !Current.Modal && OverlappedTop != null
-				&& me.Flags != MouseFlags.ReportMousePosition && me.Flags != 0) {
+				&& a.MouseEvent.Flags != MouseFlags.ReportMousePosition && a.MouseEvent.Flags != 0) {
 
-				var top = FindDeepestTop (Top, me.X, me.Y, out _, out _);
-				view = View.FindDeepestView (top, me.X, me.Y, out rx, out ry);
+				var top = FindDeepestTop (Top, a.MouseEvent.X, a.MouseEvent.Y, out _, out _);
+				view = View.FindDeepestView (top, a.MouseEvent.X, a.MouseEvent.Y, out rx, out ry);
 
 				if (view != null && view != OverlappedTop && top != Current) {
 					MoveCurrent ((Toplevel)top);
@@ -1185,7 +1195,7 @@ namespace Terminal.Gui {
 				var nme = new MouseEvent () {
 					X = rx,
 					Y = ry,
-					Flags = me.Flags,
+					Flags = a.MouseEvent.Flags,
 					OfX = 0,
 					OfY = 0,
 					View = view
@@ -1200,7 +1210,7 @@ namespace Terminal.Gui {
 					_lastMouseOwnerView = view;
 				}
 
-				if (!view.WantMousePositionReports && me.Flags == MouseFlags.ReportMousePosition)
+				if (!view.WantMousePositionReports && a.MouseEvent.Flags == MouseFlags.ReportMousePosition)
 					return;
 
 				if (view.WantContinuousButtonPressed)
@@ -1217,7 +1227,6 @@ namespace Terminal.Gui {
 		#endregion Mouse handling
 
 		#region Keyboard handling
-
 
 		static Key _alternateForwardKey = Key.PageDown | Key.CtrlMask;
 
@@ -1238,7 +1247,7 @@ namespace Terminal.Gui {
 
 		static void OnAlternateForwardKeyChanged (KeyChangedEventArgs e)
 		{
-			foreach (var top in _toplevels.ToArray ()) {
+			foreach (var top in _topLevels.ToArray ()) {
 				top.OnAlternateForwardKeyChanged (e);
 			}
 		}
@@ -1262,7 +1271,7 @@ namespace Terminal.Gui {
 
 		static void OnAlternateBackwardKeyChanged (KeyChangedEventArgs oldKey)
 		{
-			foreach (var top in _toplevels.ToArray ()) {
+			foreach (var top in _topLevels.ToArray ()) {
 				top.OnAlternateBackwardKeyChanged (oldKey);
 			}
 		}
@@ -1286,57 +1295,84 @@ namespace Terminal.Gui {
 		static void OnQuitKeyChanged (KeyChangedEventArgs e)
 		{
 			// Duplicate the list so if it changes during enumeration we're safe
-			foreach (var top in _toplevels.ToArray ()) {
+			foreach (var top in _topLevels.ToArray ()) {
 				top.OnQuitKeyChanged (e);
 			}
 		}
 
-		static void ProcessKeyEvent (KeyEvent ke)
+		/// <summary>
+		/// Event fired after a key has been pressed and released.
+		/// <para>Set <see cref="KeyEventEventArgs.Handled"/> to <see langword="true"/> to suppress the event.</para>
+		/// </summary>
+		/// <remarks>
+		/// All drivers support firing the <see cref="KeyPressed"/> event. Some drivers (Curses)
+		/// do not support firing the <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
+		/// </remarks>
+		public static event EventHandler<KeyEventEventArgs> KeyPressed;
+
+		/// <summary>
+		/// Called after a key has been pressed and released. Fires the <see cref="KeyPressed"/> event.
+		/// <para>
+		/// Called for new KeyPressed events before any processing is performed or
+		/// views evaluate. Use for global key handling and/or debugging.
+		/// </para>
+		/// </summary>
+		/// <param name="a"></param>
+		/// <returns><see langword="true"/> if the key was handled.</returns>
+		public static bool OnKeyPressed (KeyEventEventArgs a)
 		{
-			if (RootKeyEvent?.Invoke (ke) ?? false) {
-				return;
+			KeyPressed?.Invoke (null, a);
+			if (a.Handled) {
+				return true;
 			}
 
-			var chain = _toplevels.ToList ();
+			var chain = _topLevels.ToList ();
 			foreach (var topLevel in chain) {
-				if (topLevel.ProcessHotKey (ke))
-					return;
+				if (topLevel.ProcessHotKey (a.KeyEvent)) {
+					return true;
+				}
 				if (topLevel.Modal)
 					break;
 			}
 
 			foreach (var topLevel in chain) {
-				if (topLevel.ProcessKey (ke))
-					return;
+				if (topLevel.ProcessKey (a.KeyEvent)) {
+					return true;
+				}
 				if (topLevel.Modal)
 					break;
 			}
 
 			foreach (var topLevel in chain) {
 				// Process the key normally
-				if (topLevel.ProcessColdKey (ke))
-					return;
+				if (topLevel.ProcessColdKey (a.KeyEvent)) {
+					return true;
+				}
 				if (topLevel.Modal)
 					break;
 			}
+			return false;
 		}
 
-		static void ProcessKeyDownEvent (KeyEvent ke)
-		{
-			var chain = _toplevels.ToList ();
-			foreach (var topLevel in chain) {
-				if (topLevel.OnKeyDown (ke))
-					return;
-				if (topLevel.Modal)
-					break;
-			}
-		}
+		/// <summary>
+		/// Event fired when a key is pressed (and not yet released). 
+		/// </summary>
+		/// <remarks>
+		/// All drivers support firing the <see cref="KeyPressed"/> event. Some drivers (Curses)
+		/// do not support firing the <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
+		/// </remarks>
+		public static event EventHandler<KeyEventEventArgs> KeyDown;
 
-		static void ProcessKeyUpEvent (KeyEvent ke)
+		/// <summary>
+		/// Called when a key is pressed (and not yet released). Fires the <see cref="KeyDown"/> event.
+		/// </summary>
+		/// <param name="a"></param>
+		public static void OnKeyDown (KeyEventEventArgs a)
 		{
-			var chain = _toplevels.ToList ();
+			KeyDown?.Invoke (null, a);
+			var chain = _topLevels.ToList ();
 			foreach (var topLevel in chain) {
-				if (topLevel.OnKeyUp (ke))
+				if (topLevel.OnKeyDown (a.KeyEvent))
 					return;
 				if (topLevel.Modal)
 					break;
@@ -1344,14 +1380,37 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// <para>
-		/// Called for new KeyPress events before any processing is performed or
-		/// views evaluate. Use for global key handling and/or debugging.
-		/// </para>
-		/// <para>Return true to suppress the KeyPress event</para>
+		/// Event fired when a key is released. 
 		/// </summary>
-		public static Func<KeyEvent, bool> RootKeyEvent { get; set; }
+		/// <remarks>
+		/// All drivers support firing the <see cref="KeyPressed"/> event. Some drivers (Curses)
+		/// do not support firing the <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
+		/// </remarks>
+		public static event EventHandler<KeyEventEventArgs> KeyUp;
+
+		/// <summary>
+		/// Called when a key is released. Fires the <see cref="KeyUp"/> event.
+		/// </summary>
+		/// <param name="a"></param>
+		public static void OnKeyUp (KeyEventEventArgs a)
+		{
+			KeyUp?.Invoke (null, a);
+			var chain = _topLevels.ToList ();
+			foreach (var topLevel in chain) {
+				if (topLevel.OnKeyUp (a.KeyEvent))
+					return;
+				if (topLevel.Modal)
+					break;
+			}
+
+		}
 
 		#endregion Keyboard handling
+	}
+
+	/// <summary>
+	/// Event arguments for the <see cref="Application.Iteration"/> event.
+	/// </summary>
+	public class IterationEventArgs {
 	}
 }

@@ -683,7 +683,7 @@ public class MainLoopTests {
 
 		var iterations = -1;
 
-		Application.Iteration += () => {
+		Application.Iteration += (s, a) => {
 			iterations++;
 			if (iterations == 0) {
 				Assert.Null (btn);

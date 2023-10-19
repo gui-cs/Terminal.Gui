@@ -84,7 +84,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			d.Closed += (s, e) => Application.RequestStop (top1);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				Assert.Null (Application.OverlappedChildren);
 				if (iterations == 4) Assert.True (Application.Current == d);
 				else if (iterations == 3) Assert.True (Application.Current == top4);
@@ -150,7 +150,7 @@ namespace Terminal.Gui.ViewsTests {
 				overlapped.RequestStop ();
 			};
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (iterations == 4) {
 					// The Dialog was not closed before and will be closed now.
 					Assert.True (Application.Current == d);
@@ -208,7 +208,7 @@ namespace Terminal.Gui.ViewsTests {
 			// Now this will close the OverlappedContainer propagating through the OverlappedChildren.
 			d.Closed += (s, e) => Application.RequestStop (overlapped);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (iterations == 4) {
 					// The Dialog was not closed before and will be closed now.
 					Assert.True (Application.Current == d);
@@ -266,7 +266,7 @@ namespace Terminal.Gui.ViewsTests {
 			// Now this will close the OverlappedContainer propagating through the OverlappedChildren.
 			d.Closed += (s, e) => Application.RequestStop (overlapped);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (iterations == 4) {
 					// The Dialog still is the current top and we can't request stop to OverlappedContainer
 					// because we are not using parameter calls.
@@ -294,7 +294,7 @@ namespace Terminal.Gui.ViewsTests {
 			var c3 = new Window ();
 			var d = new Dialog ();
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				Assert.False (overlapped.IsOverlapped);
 				Assert.True (c1.IsOverlapped);
 				Assert.True (c2.IsOverlapped);
@@ -358,7 +358,7 @@ namespace Terminal.Gui.ViewsTests {
 				overlapped.RequestStop ();
 			};
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (iterations == 5) {
 					// The Dialog2 still is the current top and we can't request stop to OverlappedContainer
 					// because Dialog2 and Dialog1 must be closed first.
@@ -429,7 +429,7 @@ namespace Terminal.Gui.ViewsTests {
 				overlapped.RequestStop ();
 			};
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (iterations == 5) {
 					// The Dialog2 still is the current top and we can't request stop to OverlappedContainer
 					// because Dialog2 and Dialog1 must be closed first.
@@ -483,7 +483,7 @@ namespace Terminal.Gui.ViewsTests {
 			c1.Closed += (s, e) => {
 				overlapped.RequestStop ();
 			};
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (iterations == 3) {
 					// The Current still is c3 because Current.Running is false.
 					Assert.True (Application.Current == c3);
@@ -551,7 +551,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			logger.Ready += (s, e) => Assert.Single (Application.OverlappedChildren);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (stageCompleted && running) {
 					stageCompleted = false;
 					var stage = new Window () { Modal = true };
@@ -631,7 +631,7 @@ namespace Terminal.Gui.ViewsTests {
 			overlapped.AllChildClosed += (s, e) => {
 				overlapped.RequestStop ();
 			};
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (iterations == 3) {
 					// The Current still is c3 because Current.Running is false.
 					Assert.True (Application.Current == c3);

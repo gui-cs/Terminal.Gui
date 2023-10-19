@@ -332,7 +332,7 @@ namespace Terminal.Gui.ViewTests {
 			w.Add (v1, v2);
 			t.Add (w);
 
-			Application.Iteration = () => {
+			Application.Iteration += (s, a) => {
 				Application.Refresh ();
 				t.Running = false;
 			};
@@ -403,7 +403,7 @@ namespace Terminal.Gui.ViewTests {
 			w.Add (v1, v2);
 			t.Add (w);
 
-			Application.Iteration = () => {
+			Application.Iteration += (s, a) => {
 				var sv1 = new View () { Id = "sv1", Width = Dim.Fill (), Height = Dim.Fill () };
 
 				sv1.Initialized += (s, e) => {
@@ -564,7 +564,7 @@ namespace Terminal.Gui.ViewTests {
 
 			var iterations = 0;
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
 				Assert.True (button.Visible);

@@ -69,7 +69,7 @@ namespace UICatalog.Tests {
 				FakeConsole.PushMockKeyPress (Application.QuitKey);
 
 				// The only key we care about is the QuitKey
-				Application.Top.KeyPress += (object sender, KeyEventEventArgs args) => {
+				Application.Top.KeyPressed += (object sender, KeyEventEventArgs args) => {
 					output.WriteLine ($"  Keypress: {args.KeyEvent.Key}");
 					// BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
 					// by adding this Space it seems to work.
@@ -90,7 +90,7 @@ namespace UICatalog.Tests {
 				//output.WriteLine ($"  Add timeout to force quit after {abortTime}ms");
 				_ = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
 
-				Application.Iteration += () => {
+				Application.Iteration += (s, a) => {
 					//output.WriteLine ($"  iteration {++iterations}");
 					if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0) {
 						Application.RequestStop ();
@@ -136,7 +136,7 @@ namespace UICatalog.Tests {
 			FakeConsole.PushMockKeyPress (Application.QuitKey);
 
 			int iterations = 0;
-			Application.Iteration = () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 				output.WriteLine ($"'Generic' iteration {iterations}");
 				// Stop if we run out of control...
@@ -156,7 +156,7 @@ namespace UICatalog.Tests {
 			};
 			var token = Application.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
 
-			Application.Top.KeyPress += (object sender, KeyEventEventArgs args) => {
+			Application.Top.KeyPressed += (object sender, KeyEventEventArgs args) => {
 				// See #2474 for why this is commented out
 				Assert.Equal (Key.CtrlMask | Key.Q, args.KeyEvent.Key);
 			};
@@ -398,7 +398,7 @@ namespace UICatalog.Tests {
 
 			int iterations = 0;
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
 				if (iterations < _viewClasses.Count) {

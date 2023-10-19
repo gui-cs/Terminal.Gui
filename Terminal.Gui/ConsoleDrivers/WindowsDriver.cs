@@ -780,10 +780,6 @@ internal class WindowsConsole {
 internal class WindowsDriver : ConsoleDriver {
 	WindowsConsole.ExtendedCharInfo [] _outputBuffer;
 	WindowsConsole.SmallRect _damageRegion;
-	Action<KeyEvent> _keyHandler;
-	Action<KeyEvent> _keyDownHandler;
-	Action<KeyEvent> _keyUpHandler;
-	Action<MouseEvent> _mouseHandler;
 
 	public WindowsConsole WinConsole { get; private set; }
 
@@ -858,12 +854,8 @@ internal class WindowsDriver : ConsoleDriver {
 #pragma warning restore CA1416 // Validate platform compatibility
 	}
 
-	internal override void PrepareToRun (Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
+	internal override void PrepareToRun ()
 	{
-		_keyHandler = keyHandler;
-		_keyDownHandler = keyDownHandler;
-		_keyUpHandler = keyUpHandler;
-		_mouseHandler = mouseHandler;
 
 #if HACK_CHECK_WINCHANGED
 		_mainLoopDriver.WinChanged = ChangeWin;
@@ -974,19 +966,19 @@ internal class WindowsDriver : ConsoleDriver {
 				}
 
 				if (inputEvent.KeyEvent.bKeyDown) {
-					_keyDownHandler (key);
+					OnKeyDown(new KeyEventEventArgs(key)); 
 				} else {
-					_keyUpHandler (key);
+					OnKeyUp (new KeyEventEventArgs (key));
 				}
 			} else {
 				if (inputEvent.KeyEvent.bKeyDown) {
 					// May occurs using SendKeys
 					_keyModifiers ??= new KeyModifiers ();
-					// Key Down - Fire KeyDown Event and KeyStroke (ProcessKey) Event
-					_keyDownHandler (new KeyEvent (map, _keyModifiers));
-					_keyHandler (new KeyEvent (map, _keyModifiers));
+					// Key Down - Fire KeyDown Event and KeyPressed Event
+					OnKeyDown (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
 				} else {
-					_keyUpHandler (new KeyEvent (map, _keyModifiers));
+					OnKeyUp (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
+					OnKeyPressed (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
 				}
 			}
 			if (!inputEvent.KeyEvent.bKeyDown && inputEvent.KeyEvent.dwControlKeyState == 0) {
@@ -996,14 +988,13 @@ internal class WindowsDriver : ConsoleDriver {
 
 		case WindowsConsole.EventType.Mouse:
 			var me = ToDriverMouse (inputEvent.MouseEvent);
-			_mouseHandler (me);
+			OnMouseEvent (new MouseEventEventArgs (me));
 			if (_processButtonClick) {
-				_mouseHandler (
-				    new MouseEvent () {
-					    X = me.X,
-					    Y = me.Y,
-					    Flags = ProcessButtonClick (inputEvent.MouseEvent)
-				    });
+				OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+					X = me.X,
+					Y = me.Y,
+					Flags = ProcessButtonClick (inputEvent.MouseEvent)
+				}));
 			}
 			break;
 
@@ -1261,7 +1252,7 @@ internal class WindowsDriver : ConsoleDriver {
 				break;
 			}
 			if (_isButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-				Application.Invoke (() => _mouseHandler (me));
+				Application.Invoke (() => OnMouseEvent (new MouseEventEventArgs(me)));
 			}
 		}
 	}

@@ -208,7 +208,7 @@ namespace Terminal.Gui.InputTests {
 
 				var top = Application.Top;
 
-				top.KeyPress += (s, e) => {
+				top.KeyPressed += (s, e) => {
 					var after = ShortcutHelper.GetModifiersKey (e.KeyEvent);
 					Assert.Equal (expectedRemapping, after);
 					e.Handled = true;
@@ -217,7 +217,7 @@ namespace Terminal.Gui.InputTests {
 
 				var iterations = -1;
 
-				Application.Iteration += () => {
+				Application.Iteration += (s, a) => {
 					iterations++;
 					if (iterations == 0) Application.Driver.SendKeys ((char)mappedConsoleKey, ConsoleKey.Packet, shift, alt, control);
 				};

@@ -1677,7 +1677,7 @@ Edit
 			var top = Application.Top;
 			top.Add (win);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				((FakeDriver)Application.Driver).SetBufferSize (40, 8);
 
 				TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -1907,7 +1907,7 @@ Edit
 		{
 			((FakeDriver)Application.Driver).SetBufferSize (40, 8);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				var top = Application.Top;
 
 				TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -2394,14 +2394,11 @@ wo
 │                                      │
 └──────────────────────────────────────┘", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 20,
-					Y = 4,
-					Flags = MouseFlags.Button1Clicked
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 20,
+				Y = 4,
+				Flags = MouseFlags.Button1Clicked
+			}));
 
 			firstIteration = false;
 			Application.RunIteration (ref rs, ref firstIteration);
@@ -2426,14 +2423,11 @@ wo
 			for (int i = 1; i < items.Count; i++) {
 				menu.OpenMenu ();
 
-				ReflectionTools.InvokePrivate (
-					typeof (Application),
-					"ProcessMouseEvent",
-					new MouseEvent () {
-						X = 20,
-						Y = 4 + i,
-						Flags = MouseFlags.Button1Clicked
-					});
+				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+					X = 20,
+					Y = 4 + i,
+					Flags = MouseFlags.Button1Clicked
+				}));
 
 				firstIteration = false;
 				Application.RunIteration (ref rs, ref firstIteration);
@@ -2518,14 +2512,11 @@ wo
     │ Delete     Delete a file  Ctrl+A │
     └──────────────────────────────────┘", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 20,
-					Y = 5,
-					Flags = MouseFlags.Button1Clicked
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 20,
+				Y = 5,
+				Flags = MouseFlags.Button1Clicked
+			}));
 
 			firstIteration = false;
 			Application.RunIteration (ref rs, ref firstIteration);
@@ -2539,14 +2530,11 @@ wo
 			for (int i = 1; i < items.Count; i++) {
 				menu.OpenMenu ();
 
-				ReflectionTools.InvokePrivate (
-					typeof (Application),
-					"ProcessMouseEvent",
-					new MouseEvent () {
-						X = 20,
-						Y = 5 + i,
-						Flags = MouseFlags.Button1Clicked
-					});
+				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+					X = 20,
+					Y = 5 + i,
+					Flags = MouseFlags.Button1Clicked
+				}));
 
 				firstIteration = false;
 				Application.RunIteration (ref rs, ref firstIteration);
