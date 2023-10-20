@@ -783,8 +783,7 @@ internal class WindowsDriver : ConsoleDriver {
 
 	public WindowsConsole WinConsole { get; private set; }
 
-	public override bool SupportsTrueColor => RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931
-		&& (_isWindowsTerminal || _parentProcessName == "wininit"));
+	public override bool SupportsTrueColor => RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931 && _isWindowsTerminal);
 
 	readonly bool _isWindowsTerminal = false;
 	readonly string _parentProcessName = "WindowsTerminal";
@@ -809,53 +808,56 @@ internal class WindowsDriver : ConsoleDriver {
 		if (!RunningUnitTests) {
 			_isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") != null;
 			if (!_isWindowsTerminal) {
-				_parentProcessName = GetParentProcessName ();
-				_isWindowsTerminal = _parentProcessName == "WindowsTerminal";
-				if (!_isWindowsTerminal && _parentProcessName != "devenv") {
-					Force16Colors = true;
-				}
+				//_parentProcessName = GetParentProcessName ();
+				//_isWindowsTerminal = _parentProcessName == "WindowsTerminal";
+				//if (!_isWindowsTerminal && _parentProcessName != "devenv") {
+				Force16Colors = true;
+				//}
 			}
 		}
 	}
 
-	private static string GetParentProcessName ()
-	{
-#pragma warning disable CA1416 // Validate platform compatibility
-		var myId = Process.GetCurrentProcess ().Id;
-		var query = string.Format ($"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {myId}");
-		var search = new ManagementObjectSearcher ("root\\CIMV2", query);
-		var queryObj = search.Get ().OfType<ManagementBaseObject> ().FirstOrDefault ();
-		if (queryObj == null) {
-			return null;
-		}
-		var parentId = (uint)queryObj ["ParentProcessId"];
-		var parent = Process.GetProcessById ((int)parentId);
-		var prevParent = parent;
+	// BUGBUG: This code is a hack and has an infinite loop if WT is started from a non-WT terminal (start.run "pwsh").
+	// commenting out for now. A better workaround for running in the VS debugger is to set the environment variable
+	// in the `launchSettings.json` file.
+	//	private static string GetParentProcessName ()
+	//	{
+	//#pragma warning disable CA1416 // Validate platform compatibility
+	//		var myId = Process.GetCurrentProcess ().Id;
+	//		var query = string.Format ($"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {myId}");
+	//		var search = new ManagementObjectSearcher ("root\\CIMV2", query);
+	//		var queryObj = search.Get ().OfType<ManagementBaseObject> ().FirstOrDefault ();
+	//		if (queryObj == null) {
+	//			return null;
+	//		}
+	//		var parentId = (uint)queryObj ["ParentProcessId"];
+	//		var parent = Process.GetProcessById ((int)parentId);
+	//		var prevParent = parent;
 
-		// Check if the parent is from other parent
-		while (queryObj != null) {
-			query = string.Format ($"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {parentId}");
-			search = new ManagementObjectSearcher ("root\\CIMV2", query);
-			queryObj = search.Get ().OfType<ManagementBaseObject> ().FirstOrDefault ();
-			if (queryObj == null) {
-				return parent.ProcessName;
-			}
-			parentId = (uint)queryObj ["ParentProcessId"];
-			try {
-				parent = Process.GetProcessById ((int)parentId);
-				if (string.Equals (parent.ProcessName, "explorer", StringComparison.InvariantCultureIgnoreCase)) {
-					return prevParent.ProcessName;
-				}
-				prevParent = parent;
-			} catch (ArgumentException) {
+	//		// Check if the parent is from other parent
+	//		while (queryObj != null) {
+	//			query = string.Format ($"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {parentId}");
+	//			search = new ManagementObjectSearcher ("root\\CIMV2", query);
+	//			queryObj = search.Get ().OfType<ManagementBaseObject> ().FirstOrDefault ();
+	//			if (queryObj == null) {
+	//				return parent.ProcessName;
+	//			}
+	//			parentId = (uint)queryObj ["ParentProcessId"];
+	//			try {
+	//				parent = Process.GetProcessById ((int)parentId);
+	//				if (string.Equals (parent.ProcessName, "explorer", StringComparison.InvariantCultureIgnoreCase)) {
+	//					return prevParent.ProcessName;
+	//				}
+	//				prevParent = parent;
+	//			} catch (ArgumentException) {
 
-				return prevParent.ProcessName;
-			}
-		}
+	//				return prevParent.ProcessName;
+	//			}
+	//		}
 
-		return parent.ProcessName;
-#pragma warning restore CA1416 // Validate platform compatibility
-	}
+	//		return parent.ProcessName;
+	//#pragma warning restore CA1416 // Validate platform compatibility
+	//	}
 
 	internal override void PrepareToRun ()
 	{
@@ -969,7 +971,7 @@ internal class WindowsDriver : ConsoleDriver {
 				}
 
 				if (inputEvent.KeyEvent.bKeyDown) {
-					OnKeyDown(new KeyEventEventArgs(key)); 
+					OnKeyDown (new KeyEventEventArgs (key));
 				} else {
 					OnKeyUp (new KeyEventEventArgs (key));
 				}
@@ -1255,7 +1257,7 @@ internal class WindowsDriver : ConsoleDriver {
 				break;
 			}
 			if (_isButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-				Application.Invoke (() => OnMouseEvent (new MouseEventEventArgs(me)));
+				Application.Invoke (() => OnMouseEvent (new MouseEventEventArgs (me)));
 			}
 		}
 	}
