@@ -802,7 +802,6 @@ internal class WindowsDriver : ConsoleDriver {
 		if (!_isWindowsTerminal) {
 			Force16Colors = true;
 		}
-
 	}
 
 	internal override MainLoop Init ()
