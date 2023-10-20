@@ -181,7 +181,7 @@ namespace UICatalog {
 			// prompt user to hit a key
 			var dlg = new Dialog () { Title = "Enter Key" };
 			dlg.KeyPressed += (s, k) => {
-				key = k.KeyEvent.Key;
+				key = k.Key;
 				Application.RequestStop ();
 			};
 			Application.Run (dlg);

@@ -373,8 +373,8 @@ namespace UICatalog {
 				// TableView does not (currently) have built-in CollectionNavigator support (the ability for the 
 				// user to type and the items that match get selected). We implement it in the app instead. 
 				ScenarioList.KeyDown += (s, a) => {
-					if (CollectionNavigator.IsCompatibleKey (a.KeyEvent)) {
-						var newItem = _scenarioCollectionNav?.GetNextMatchingItem (ScenarioList.SelectedRow, (char)a.KeyEvent.KeyValue);
+					if (CollectionNavigator.IsCompatibleKey (a)) {
+						var newItem = _scenarioCollectionNav?.GetNextMatchingItem (ScenarioList.SelectedRow, (char)a.KeyValue);
 						if (newItem is int v && newItem != -1) {
 							ScenarioList.SelectedRow = v;
 							ScenarioList.EnsureSelectedCellIsVisible ();
@@ -768,9 +768,9 @@ namespace UICatalog {
 				Application.Top.SetNeedsDisplay ();
 			}
 
-			void KeyDownHandler (object? sender, KeyEventEventArgs? a)
+			void KeyDownHandler (object? sender, KeyEventArgs? a)
 			{
-				if (a!.KeyEvent.IsCapslock) {
+				if (a!.IsCapslock) {
 					Capslock.Title = "Caps: On";
 					StatusBar.SetNeedsDisplay ();
 				} else {
@@ -778,7 +778,7 @@ namespace UICatalog {
 					StatusBar.SetNeedsDisplay ();
 				}
 
-				if (a!.KeyEvent.IsNumlock) {
+				if (a!.IsNumlock) {
 					Numlock.Title = "Num: On";
 					StatusBar.SetNeedsDisplay ();
 				} else {
@@ -786,7 +786,7 @@ namespace UICatalog {
 					StatusBar.SetNeedsDisplay ();
 				}
 
-				if (a!.KeyEvent.IsScrolllock) {
+				if (a!.IsScrolllock) {
 					Scrolllock.Title = "Scroll: On";
 					StatusBar.SetNeedsDisplay ();
 				} else {

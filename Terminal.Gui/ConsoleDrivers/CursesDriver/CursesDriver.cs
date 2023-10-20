@@ -458,7 +458,7 @@ internal class CursesDriver : ConsoleDriver {
 				int wch2 = wch;
 
 				while (wch2 == Curses.KeyMouse) {
-					KeyEvent key = null;
+					KeyEventArgs key = null;
 					ConsoleKeyInfo [] cki = new ConsoleKeyInfo [] {
 							new ConsoleKeyInfo ((char)Key.Esc, 0, false, false, false),
 							new ConsoleKeyInfo ('[', 0, false, false, false),
@@ -491,9 +491,9 @@ internal class CursesDriver : ConsoleDriver {
 				wch -= 60;
 				k = Key.ShiftMask | Key.AltMask | MapCursesKey (wch);
 			}
-			OnKeyDown (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
-			OnKeyUp (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
-			OnKeyPressed (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
+			OnKeyDown (new KeyEventArgs (k, MapKeyModifiers (k)));
+			OnKeyUp (new KeyEventArgs (k, MapKeyModifiers (k)));
+			OnKeyPressed (new KeyEventArgs (k, MapKeyModifiers (k)));
 			return;
 		}
 
@@ -507,7 +507,7 @@ internal class CursesDriver : ConsoleDriver {
 				k = Key.AltMask | MapCursesKey (wch);
 			}
 			if (code == 0) {
-				KeyEvent key = null;
+				KeyEventArgs key = null;
 
 				// The ESC-number handling, debatable.
 				// Simulates the AltMask itself by pressing Alt + Space.
@@ -543,19 +543,19 @@ internal class CursesDriver : ConsoleDriver {
 						k = (Key)((uint)(Key.AltMask | Key.CtrlMask) + wch2);
 					}
 				}
-				key = new KeyEvent (k, MapKeyModifiers (k));
-				OnKeyDown (new KeyEventEventArgs (key));
-				OnKeyUp (new KeyEventEventArgs (key));
-				OnKeyPressed (new KeyEventEventArgs (key));
+				key = new KeyEventArgs (k, MapKeyModifiers (k));
+				OnKeyDown (key);
+				OnKeyUp (key);
+				OnKeyPressed (key);
 			} else {
 				k = Key.Esc;
-				OnKeyPressed (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
+				OnKeyPressed (new KeyEventArgs (k, MapKeyModifiers (k)));
 			}
 		} else if (wch == Curses.KeyTab) {
 			k = MapCursesKey (wch);
-			OnKeyDown (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
-			OnKeyUp (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
-			OnKeyPressed (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
+			OnKeyDown (new KeyEventArgs (k, MapKeyModifiers (k)));
+			OnKeyUp (new KeyEventArgs (k, MapKeyModifiers (k)));
+			OnKeyPressed (new KeyEventArgs (k, MapKeyModifiers (k)));
 		} else {
 			// Unfortunately there are no way to differentiate Ctrl+alfa and Ctrl+Shift+alfa.
 			k = (Key)wch;
@@ -568,21 +568,21 @@ internal class CursesDriver : ConsoleDriver {
 			} else if (wch >= (uint)Key.A && wch <= (uint)Key.Z) {
 				_keyModifiers.Shift = true;
 			}
-			OnKeyDown (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
-			OnKeyUp (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
-			OnKeyPressed (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
+			OnKeyDown (new KeyEventArgs (k, MapKeyModifiers (k)));
+			OnKeyUp (new KeyEventArgs (k, MapKeyModifiers (k)));
+			OnKeyPressed (new KeyEventArgs (k, MapKeyModifiers (k)));
 		}
 		// Cause OnKeyUp and OnKeyPressed. Note that the special handling for ESC above 
 		// will not impact KeyUp.
 		// This is causing ESC firing even if another keystroke was handled.
 		//if (wch == Curses.KeyTab) {
-		//	keyUpHandler (new KeyEvent (MapCursesKey (wch), keyModifiers));
+		//	keyUpHandler (new KeyEventArgs (MapCursesKey (wch), keyModifiers));
 		//} else {
-		//	keyUpHandler (new KeyEvent ((Key)wch, keyModifiers));
+		//	keyUpHandler (new KeyEventArgs ((Key)wch, keyModifiers));
 		//}
 	}
 
-	void HandleEscSeqResponse (ref int code, ref Key k, ref int wch2, ref KeyEvent key, ref ConsoleKeyInfo [] cki)
+	void HandleEscSeqResponse (ref int code, ref Key k, ref int wch2, ref KeyEventArgs key, ref ConsoleKeyInfo [] cki)
 	{
 		ConsoleKey ck = 0;
 		ConsoleModifiers mod = 0;
@@ -603,9 +603,9 @@ internal class CursesDriver : ConsoleDriver {
 				} else {
 					k = ConsoleKeyMapping.MapConsoleKeyToKey (consoleKeyInfo.Key, out _);
 					k = ConsoleKeyMapping.MapKeyModifiers (consoleKeyInfo, k);
-					key = new KeyEvent (k, MapKeyModifiers (k));
-					OnKeyDown (new KeyEventEventArgs (key));
-					OnKeyPressed (new KeyEventEventArgs (key));
+					key = new KeyEventArgs (k, MapKeyModifiers (k));
+					OnKeyDown (key);
+					OnKeyPressed (key);
 				}
 			} else {
 				cki = EscSeqUtils.ResizeArray (consoleKeyInfo, cki);
@@ -778,9 +778,9 @@ internal class CursesDriver : ConsoleDriver {
 			key |= Key.CtrlMask;
 			km.Ctrl = control;
 		}
-		OnKeyDown (new KeyEventEventArgs (new KeyEvent (key, km)));
-		OnKeyPressed (new KeyEventEventArgs (new KeyEvent (key, km)));
-		OnKeyUp (new KeyEventEventArgs (new KeyEvent (key, km)));
+		OnKeyDown (new KeyEventArgs (key, km));
+		OnKeyPressed (new KeyEventArgs (key, km));
+		OnKeyUp (new KeyEventArgs (key, km));
 	}
 
 

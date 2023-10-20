@@ -20,7 +20,7 @@ using System.Reflection;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// Responder base class implemented by objects that want to participate on keyboard and mouse input.
+	/// Base class for classes that want to participate on keyboard and mouse input (e.g. <see cref="View"/>).
 	/// </summary>
 	public class Responder : IDisposable {
 		bool disposedValue;
@@ -71,20 +71,24 @@ namespace Terminal.Gui {
 
 		// Key handling
 		/// <summary>
-		///   This method can be overwritten by view that
+		///   This method can be overwritten views that
 		///     want to provide accelerator functionality
 		///     (Alt-key for example).
 		/// </summary>
 		/// <remarks>
+		/// <para>
+		/// This is a low-level API; see <see cref="Command"/> for the preferred way to define what keys
+		/// a View should respond to.
+		/// </para>
 		///   <para>
-		///     Before keys are sent to the subview on the
-		///     current view, all the views are
-		///     processed and the key is passed to the widgets
-		///     to allow some of them to process the keystroke
+		///     Before keys are sent to a subview of the
+		///     current view, all subviews are
+		///     processed and the key is passed to them
+		///     to allow them to process the keystroke
 		///     as a hot-key. </para>
 		///  <para>
-		///     For example, if you implement a button that
-		///     has a hotkey ok "o", you would catch the
+		///     For example, for a button that
+		///     has a hotkey Alt-o, catch the
 		///     combination Alt-o here.  If the event is
 		///     caught, you must return true to stop the
 		///     keystroke from being dispatched to other
@@ -92,38 +96,31 @@ namespace Terminal.Gui {
 		///  </para>
 		/// </remarks>
 
-		public virtual bool ProcessHotKey (KeyEvent kb)
+		public virtual bool ProcessHotKey (KeyEventArgs kb)
 		{
 			return false;
 		}
 
 		/// <summary>
-		///   If the view is focused, gives the view a
-		///   chance to process the keystroke.
+		/// Called after a key has been pressed and released. Fires the <see cref="KeyPressed"/> event.
+		/// <para>
+		/// Called for new KeyPressed events before any processing is performed or
+		/// views evaluate. Use for global key handling and/or debugging.
+		/// </para>
 		/// </summary>
-		/// <remarks>
-		///   <para>
-		///     Views can override this method if they are
-		///     interested in processing the given keystroke.
-		///     If they consume the keystroke, they must
-		///     return true to stop the keystroke from being
-		///     processed by other widgets or consumed by the
-		///     widget engine.    If they return false, the
-		///     keystroke will be passed using the ProcessColdKey
-		///     method to other views to process.
-		///   </para>
-		///   <para>
-		///     The View implementation does nothing but return false,
-		///     so it is not necessary to call base.ProcessKey if you
-		///     derive directly from View, but you should if you derive
-		///     other View subclasses.
-		///   </para>
-		/// </remarks>
-		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
-		public virtual bool ProcessKey (KeyEvent keyEvent)
+		/// <param name="a"></param>
+		/// <returns><see langword="true"/> if the key was handled.</returns>
+		public virtual bool OnKeyPressed (KeyEventArgs arg)
 		{
-			return false;
+			KeyPressed?.Invoke (this, arg);
+			return arg.Handled;
 		}
+
+		/// <summary>
+		/// Event fired after a key has been pressed and released.
+		/// <para>Set <see cref="KeyEventArgs.Handled"/> to <see langword="true"/> to suppress the event.</para>
+		/// </summary>
+		public event EventHandler<KeyEventArgs> KeyPressed;
 
 		/// <summary>
 		///   This method can be overwritten by views that
@@ -132,6 +129,10 @@ namespace Terminal.Gui {
 		///     interefering with normal ProcessKey behavior.
 		/// </summary>
 		/// <remarks>
+		/// <para>
+		/// This is a low-level API; see <see cref="Command"/> for the preferred way to define what keys
+		/// a View should respond to.
+		/// </para>
 		///   <para>
 		///     After keys are sent to the subviews on the
 		///     current view, all the view are
@@ -147,7 +148,7 @@ namespace Terminal.Gui {
 		///  </para>
 		/// </remarks>
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
-		public virtual bool ProcessColdKey (KeyEvent keyEvent)
+		public virtual bool ProcessColdKey (KeyEventArgs keyEvent)
 		{
 			return false;
 		}
@@ -157,7 +158,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		/// <returns>true if the event was handled</returns>
-		public virtual bool OnKeyDown (KeyEvent keyEvent)
+		public virtual bool OnKeyDown (KeyEventArgs keyEvent)
 		{
 			return false;
 		}
@@ -167,7 +168,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		/// <returns>true if the event was handled</returns>
-		public virtual bool OnKeyUp (KeyEvent keyEvent)
+		public virtual bool OnKeyUp (KeyEventArgs keyEvent)
 		{
 			return false;
 		}
@@ -256,7 +257,7 @@ namespace Terminal.Gui {
 			}
 			return m.GetBaseDefinition ().DeclaringType != m.DeclaringType;
 		}
-		
+
 		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
@@ -278,11 +279,11 @@ namespace Terminal.Gui {
 
 #if DEBUG_IDISPOSABLE
 				Instances.Remove (this);
-#endif                               
+#endif
 				disposedValue = true;
 			}
 		}
-		
+
 		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resource.
 		/// </summary>

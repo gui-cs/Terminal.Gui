@@ -1432,17 +1432,17 @@ public class Slider<T> : View {
 	}
 
 	/// <inheritdoc/>
-	public override bool ProcessKey (KeyEvent keyEvent)
+	public override bool OnKeyPressed (KeyEventArgs keyEvent)
 	{
 		if (!CanFocus || !HasFocus) {
-			return base.ProcessKey (keyEvent);
+			return base.OnKeyPressed (keyEvent);
 		}
 
 		var result = InvokeKeybindings (keyEvent);
 		if (result != null) {
 			return (bool)result;
 		}
-		return base.ProcessKey (keyEvent);
+		return base.OnKeyPressed (keyEvent);
 	}
 
 	Dictionary<int, SliderOption<T>> GetSetOptionDictionary () => _setOptions.ToDictionary (e => e, e => _options [e]);

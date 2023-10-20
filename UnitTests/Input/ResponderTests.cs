@@ -23,11 +23,11 @@ namespace Terminal.Gui.InputTests {
 		{
 			var r = new Responder ();
 
-			Assert.False (r.ProcessKey (new KeyEvent () { Key = Key.Unknown }));
-			Assert.False (r.ProcessHotKey (new KeyEvent () { Key = Key.Unknown }));
-			Assert.False (r.ProcessColdKey (new KeyEvent () { Key = Key.Unknown }));
-			Assert.False (r.OnKeyDown (new KeyEvent () { Key = Key.Unknown }));
-			Assert.False (r.OnKeyUp (new KeyEvent () { Key = Key.Unknown }));
+			Assert.False (r.OnKeyPressed (new KeyEventArgs () { Key = Key.Unknown }));
+			Assert.False (r.ProcessHotKey (new KeyEventArgs () { Key = Key.Unknown }));
+			Assert.False (r.ProcessColdKey (new KeyEventArgs () { Key = Key.Unknown }));
+			Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
+			Assert.False (r.OnKeyUp (new KeyEventArgs () { Key = Key.Unknown }));
 			Assert.False (r.MouseEvent (new MouseEvent () { Flags = MouseFlags.AllEvents }));
 			Assert.False (r.OnMouseEnter (new MouseEvent () { Flags = MouseFlags.AllEvents }));
 			Assert.False (r.OnMouseLeave (new MouseEvent () { Flags = MouseFlags.AllEvents }));
@@ -62,7 +62,7 @@ namespace Terminal.Gui.InputTests {
 			{
 			}
 
-			public override bool OnKeyDown (KeyEvent keyEvent)
+			public override bool OnKeyDown (KeyEventArgs keyEvent)
 			{
 				return true;
 			}

@@ -152,7 +152,7 @@ namespace Terminal.Gui {
 		public override void RenderOverlay (Point renderAt)
 		{
 			if (!Context.Canceled && Suggestions.Count > 0 && !Visible && HostControl?.HasFocus == true) {
-				ProcessKey (new KeyEvent ((Key)(Suggestions [0].Title [0]), new KeyModifiers ()));
+				ProcessKey (new KeyEventArgs ((Key)(Suggestions [0].Title [0]), new KeyModifiers ()));
 			} else if (!Visible || HostControl?.HasFocus == false || Suggestions.Count == 0) {
 				LastPopupPos = null;
 				Visible = false;
@@ -278,7 +278,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="kb">The key event.</param>
 		/// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
-		public override bool ProcessKey (KeyEvent kb)
+		public override bool ProcessKey (KeyEventArgs kb)
 		{
 			if (SuggestionGenerator.IsWordChar ((Rune)(char)kb.Key)) {
 				Visible = true;

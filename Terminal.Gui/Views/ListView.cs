@@ -416,10 +416,10 @@ namespace Terminal.Gui {
 		public CollectionNavigator KeystrokeNavigator { get; private set; } = new CollectionNavigator ();
 
 		///<inheritdoc/>
-		public override bool ProcessKey (KeyEvent kb)
+		public override bool OnKeyPressed (KeyEventArgs kb)
 		{
 			if (source == null) {
-				return base.ProcessKey (kb);
+				return base.OnKeyPressed (kb);
 			}
 
 			var result = InvokeKeybindings (kb);

@@ -637,7 +637,7 @@ namespace Terminal.Gui {
 		///    </item>
 		/// </list>
 		/// </remarks>
-		public override bool ProcessKey (KeyEvent kb)
+		public override bool OnKeyPressed (KeyEventArgs arg)
 		{
 			// remember current cursor position
 			// because the new calculated cursor position is needed to be set BEFORE the change event is triggest
@@ -645,28 +645,28 @@ namespace Terminal.Gui {
 			_oldCursorPos = _point;
 
 			// Give autocomplete first opportunity to respond to key presses
-			if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (kb)) {
+			if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (arg)) {
 				return true;
 			}
 
-			var result = InvokeKeybindings (new KeyEvent (ShortcutHelper.GetModifiersKey (kb),
-				new KeyModifiers () { Alt = kb.IsAlt, Ctrl = kb.IsCtrl, Shift = kb.IsShift }));
+			var result = InvokeKeybindings (new KeyEventArgs (ShortcutHelper.GetModifiersKey (arg),
+				new KeyModifiers () { Alt = arg.IsAlt, Ctrl = arg.IsCtrl, Shift = arg.IsShift }));
 			if (result != null)
 				return (bool)result;
 
 			// Ignore other control characters.
-			if (kb.Key < Key.Space || kb.Key > Key.CharMask)
+			if (arg.Key < Key.Space || arg.Key > Key.CharMask)
 				return false;
 
 			if (ReadOnly)
 				return true;
 
-			InsertText (kb);
+			InsertText (arg);
 
 			return true;
 		}
 
-		void InsertText (KeyEvent kb, bool useOldCursorPos = true)
+		void InsertText (KeyEventArgs kb, bool useOldCursorPos = true)
 		{
 			_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCells (_text) }, new Point (_point, 0));
 
@@ -1312,7 +1312,7 @@ namespace Terminal.Gui {
 					throw new ArgumentException ($"Cannot insert character '{ch}' because it does not map to a Key");
 				}
 
-				InsertText (new KeyEvent () { Key = key }, useOldCursorPos);
+				InsertText (new KeyEventArgs () { Key = key }, useOldCursorPos);
 			}
 		}
 

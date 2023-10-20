@@ -230,15 +230,15 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override bool ProcessKey (KeyEvent keyEvent)
+		public override bool OnKeyPressed (KeyEventArgs arg)
 		{
 			if (HasFocus && CanFocus && Focused == tabsBar) {
-				var result = InvokeKeybindings (keyEvent);
+				var result = InvokeKeybindings (arg);
 				if (result != null)
 					return (bool)result;
 			}
 
-			return base.ProcessKey (keyEvent);
+			return base.OnKeyPressed (arg);
 		}
 
 		/// <summary>

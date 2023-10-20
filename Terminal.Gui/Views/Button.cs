@@ -191,7 +191,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessHotKey (KeyEvent kb)
+		public override bool ProcessHotKey (KeyEventArgs kb)
 		{
 			if (!Enabled) {
 				return false;
@@ -201,7 +201,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessColdKey (KeyEvent kb)
+		public override bool ProcessColdKey (KeyEventArgs kb)
 		{
 			if (!Enabled) {
 				return false;
@@ -211,20 +211,20 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessKey (KeyEvent kb)
+		public override bool OnKeyPressed (KeyEventArgs arg)
 		{
 			if (!Enabled) {
 				return false;
 			}
 
-			var result = InvokeKeybindings (kb);
+			var result = InvokeKeybindings (arg);
 			if (result != null)
 				return (bool)result;
 
-			return base.ProcessKey (kb);
+			return base.OnKeyPressed (arg);
 		}
 
-		bool ExecuteHotKey (KeyEvent ke)
+		bool ExecuteHotKey (KeyEventArgs ke)
 		{
 			if (ke.Key == (Key.AltMask | HotKey)) {
 				return AcceptKey ();
@@ -232,7 +232,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		bool ExecuteColdKey (KeyEvent ke)
+		bool ExecuteColdKey (KeyEventArgs ke)
 		{
 			if (IsDefault && ke.KeyValue == '\n') {
 				return AcceptKey ();

@@ -1125,12 +1125,12 @@ internal class NetDriver : ConsoleDriver {
 				return;
 			}
 			if (map == Key.Null) {
-				OnKeyDown (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
-				OnKeyUp (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
+				OnKeyDown (new KeyEventArgs (map, _keyModifiers));
+				OnKeyUp (new KeyEventArgs (map, _keyModifiers));
 			} else {
-				OnKeyDown (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
-				OnKeyUp (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
-				OnKeyPressed (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
+				OnKeyDown (new KeyEventArgs (map, _keyModifiers));
+				OnKeyUp (new KeyEventArgs (map, _keyModifiers));
+				OnKeyPressed (new KeyEventArgs (map, _keyModifiers));
 			}
 			break;
 		case NetEvents.EventType.Mouse:

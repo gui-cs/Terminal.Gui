@@ -124,7 +124,7 @@ namespace UICatalog.Scenarios {
 				AddRune (State.Apple.X, State.Apple.Y, _appleRune);
 				Driver.SetAttribute (white);
 			}
-			public override bool OnKeyDown (KeyEvent keyEvent)
+			public override bool OnKeyDown (KeyEventArgs keyEvent)
 			{
 				if (keyEvent.Key == Key.CursorUp) {
 					State.PlannedDirection = Direction.Up;

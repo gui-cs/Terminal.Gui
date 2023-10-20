@@ -286,12 +286,12 @@ namespace Terminal.Gui {
 
 			tbFind.TextChanged += (s, o) => RestartSearch ();
 			tbFind.KeyPressed += (s, o) => {
-				if (o.KeyEvent.Key == Key.Enter) {
+				if (o.Key == Key.Enter) {
 					RestartSearch ();
 					o.Handled = true;
 				}
 
-				if (o.KeyEvent.Key == Key.Esc) {
+				if (o.Key == Key.Esc) {
 					if (CancelSearch ()) {
 						o.Handled = true;
 					}
@@ -316,7 +316,7 @@ namespace Terminal.Gui {
 			this.tbPath.TextChanged += (s, e) => this.PathChanged ();
 
 			this.tableView.CellActivated += this.CellActivate;
-			this.tableView.KeyUp += (s, k) => k.Handled = this.TableView_KeyUp (k.KeyEvent);
+			this.tableView.KeyUp += (s, k) => k.Handled = this.TableView_KeyUp (k);
 			this.tableView.SelectedCellChanged += this.TableView_SelectedCellChanged;
 
 			this.tableView.AddKeyBinding (Key.Home, Command.TopHome);
@@ -340,7 +340,7 @@ namespace Terminal.Gui {
 					return;
 				}
 
-				k.Handled = this.TreeView_KeyDown (k.KeyEvent);
+				k.Handled = this.TreeView_KeyDown (k);
 
 			};
 
@@ -485,7 +485,7 @@ namespace Terminal.Gui {
 
 
 		/// <inheritdoc/>
-		public override bool ProcessHotKey (KeyEvent keyEvent)
+		public override bool ProcessHotKey (KeyEventArgs keyEvent)
 		{
 			if (this.NavigateIf (keyEvent, Key.CtrlMask | Key.F, this.tbFind)) {
 				return true;
@@ -772,17 +772,17 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void SuppressIfBadChar (KeyEventEventArgs k)
+		private void SuppressIfBadChar (KeyEventArgs k)
 		{
 			// don't let user type bad letters
-			var ch = (char)k.KeyEvent.KeyValue;
+			var ch = (char)k.KeyValue;
 
 			if (badChars.Contains (ch)) {
 				k.Handled = true;
 			}
 		}
 
-		private bool TreeView_KeyDown (KeyEvent keyEvent)
+		private bool TreeView_KeyDown (KeyEventArgs keyEvent)
 		{
 			if (this.treeView.HasFocus && Separators.Contains ((char)keyEvent.KeyValue)) {
 				this.tbPath.FocusFirst ();
@@ -794,9 +794,9 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		private void AcceptIf (KeyEventEventArgs keyEvent, Key isKey)
+		private void AcceptIf (KeyEventArgs keyEvent, Key isKey)
 		{
-			if (!keyEvent.Handled && keyEvent.KeyEvent.Key == isKey) {
+			if (!keyEvent.Handled && keyEvent.Key == isKey) {
 				keyEvent.Handled = true;
 
 				// User hit Enter in text box so probably wants the
@@ -880,17 +880,7 @@ namespace Terminal.Gui {
 			Application.RequestStop ();
 		}
 
-		private void NavigateIf (KeyEventEventArgs keyEvent, Key isKey, View to)
-		{
-			if (!keyEvent.Handled) {
-
-				if (NavigateIf (keyEvent.KeyEvent, isKey, to)) {
-					keyEvent.Handled = true;
-				}
-			}
-		}
-
-		private bool NavigateIf (KeyEvent keyEvent, Key isKey, View to)
+		private bool NavigateIf (KeyEventArgs keyEvent, Key isKey, View to)
 		{
 			if (keyEvent.Key == isKey) {
 
@@ -956,7 +946,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private bool TableView_KeyUp (KeyEvent keyEvent)
+		private bool TableView_KeyUp (KeyEventArgs keyEvent)
 		{
 			if (keyEvent.Key == Key.Backspace) {
 				return this.history.Back ();

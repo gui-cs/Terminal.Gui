@@ -209,7 +209,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="kb"></param>
 		/// <returns></returns>
-		public static bool IsCompatibleKey (KeyEvent kb)
+		public static bool IsCompatibleKey (KeyEventArgs kb)
 		{
 			return !kb.IsAlt && !kb.IsCtrl;
 		}

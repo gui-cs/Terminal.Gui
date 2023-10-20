@@ -328,14 +328,14 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override bool ProcessKey (KeyEvent kb)
+		public override bool OnKeyPressed (KeyEventArgs arg)
 		{
-			var result = InvokeKeybindings (kb);
+			var result = InvokeKeybindings (arg);
 			if (result != null) {
 				return (bool)result;
 			}
 			// Ignore non-numeric characters.
-			if (kb.Key < (Key)((int)'0') || kb.Key > (Key)((int)'9')) {
+			if (arg.Key < (Key)((int)'0') || arg.Key > (Key)((int)'9')) {
 				return false;
 			}
 
@@ -344,7 +344,7 @@ namespace Terminal.Gui {
 			}
 
 			// BUGBUG: This is a hack, we should be able to just use ((Rune)(uint)kb.Key) directly.
-			if (SetText (((Rune)(uint)kb.Key).ToString ().EnumerateRunes ().First ())) {
+			if (SetText (((Rune)(uint)arg.Key).ToString ().EnumerateRunes ().First ())) {
 				IncCursorPosition ();
 			}
 

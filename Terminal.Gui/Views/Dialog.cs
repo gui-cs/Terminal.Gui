@@ -229,14 +229,14 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessKey (KeyEvent kb)
+		public override bool OnKeyPressed (KeyEventArgs arg)
 		{
-			switch (kb.Key) {
+			switch (arg.Key) {
 			case Key.Esc:
 				Application.RequestStop (this);
 				return true;
 			}
-			return base.ProcessKey (kb);
+			return base.OnKeyPressed (arg);
 		}
 	}
 }

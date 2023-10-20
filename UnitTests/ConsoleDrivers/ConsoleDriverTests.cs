@@ -121,8 +121,8 @@ namespace Terminal.Gui.DriverTests {
 			var idx = 0;
 
 			view.KeyPressed += (s, e) => {
-				Assert.Equal (text [idx], (char)e.KeyEvent.Key);
-				rText += (char)e.KeyEvent.Key;
+				Assert.Equal (text [idx], (char)e.Key);
+				rText += (char)e.Key;
 				Assert.Equal (rText, text.Substring (0, idx + 1));
 				e.Handled = true;
 				idx++;
@@ -175,7 +175,7 @@ namespace Terminal.Gui.DriverTests {
 		//	Key key = Key.Unknown;
 			
 		//	Application.Top.KeyPress += (e) => {
-		//		key = e.KeyEvent.Key;
+		//		key = e.Key;
 		//		output.WriteLine ($"  Application.Top.KeyPress: {key}");
 		//		e.Handled = true;
 				
@@ -258,7 +258,7 @@ namespace Terminal.Gui.DriverTests {
 //					var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 //					Assert.Equal (new Rect (0, 0, 20, 8), pos);
 
-//					Assert.True (dlg.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
+//					Assert.True (dlg.ProcessKey (new KeyEventArgs (Key.Tab, new KeyModifiers ())));
 //					dlg.Draw ();
 
 //					expected = @"

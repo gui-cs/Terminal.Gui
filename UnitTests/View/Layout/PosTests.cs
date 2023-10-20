@@ -861,7 +861,7 @@ namespace Terminal.Gui.ViewTests {
 			var count = 0;
 
 			field.KeyDown += (s, k) => {
-				if (k.KeyEvent.Key == Key.Enter) {
+				if (k.Key == Key.Enter) {
 					field.Text = $"Label {count}";
 					var label = new Label (field.Text) { X = 0, Y = field.Y, Width = 20 };
 					view.Add (label);
@@ -876,7 +876,7 @@ namespace Terminal.Gui.ViewTests {
 			};
 
 			Application.Iteration += (s, a) => {
-				while (count < 20) field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
+				while (count < 20) field.OnKeyDown (new KeyEventArgs (Key.Enter, new KeyModifiers ()));
 
 				Application.RequestStop ();
 			};
@@ -921,7 +921,7 @@ namespace Terminal.Gui.ViewTests {
 			}
 
 			field.KeyDown += (s, k) => {
-				if (k.KeyEvent.Key == Key.Enter) {
+				if (k.Key == Key.Enter) {
 					Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
 					view.Remove (listLabels [count - 1]);
 					listLabels [count - 1].Dispose ();
@@ -934,7 +934,7 @@ namespace Terminal.Gui.ViewTests {
 			};
 
 			Application.Iteration += (s, a) => {
-				while (count > 0) field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
+				while (count > 0) field.OnKeyDown (new KeyEventArgs (Key.Enter, new KeyModifiers ()));
 
 				Application.RequestStop ();
 			};
