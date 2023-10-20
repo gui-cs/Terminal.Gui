@@ -82,7 +82,7 @@ internal class CursesDriver : ConsoleDriver {
 			});
 		}
 
-		CurrentAttribute = MakeColor (ColorName.White, ColorName.Black);
+		CurrentAttribute = new Attribute (ColorName.White, ColorName.Black);
 
 		if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
 			Clipboard = new FakeDriver.FakeClipboard ();
@@ -171,29 +171,10 @@ internal class CursesDriver : ConsoleDriver {
 	/// and the background color is stored in the least significant 4 bits.
 	/// The Terminal.GUi Color values are converted to curses color encoding before being encoded.
 	/// </remarks>
-	private Attribute MakeColor (ColorName foregroundName, ColorName backgroundName)
-	{
-		if (!RunningUnitTests) {
-			return MakeColor (ColorNameToCursesColorNumber (foregroundName), ColorNameToCursesColorNumber (backgroundName));
-		} else {
-			return new Attribute (
-				platformColor: 0,
-				foreground: ColorNameToCursesColorNumber (foregroundName),
-				background: ColorNameToCursesColorNumber (backgroundName));
-		}
-	}
-
-
-	/// <remarks>
-	/// In the CursesDriver, colors are encoded as an int. 
-	/// The foreground color is stored in the most significant 4 bits, 
-	/// and the background color is stored in the least significant 4 bits.
-	/// The Terminal.GUi Color values are converted to curses color encoding before being encoded.
-	/// </remarks>
 	public override Attribute MakeColor (Color foreground, Color background)
 	{
 		if (!RunningUnitTests) {
-			return MakeColor (foreground.ColorName, background.ColorName);
+			return MakeColor (ColorNameToCursesColorNumber (foreground.ColorName), ColorNameToCursesColorNumber (background.ColorName));
 		} else {
 			return new Attribute (
 				platformColor: 0,

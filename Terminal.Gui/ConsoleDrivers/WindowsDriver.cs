@@ -18,12 +18,10 @@ using System.Text;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
-using System.Management;
 
 namespace Terminal.Gui;
 
@@ -1619,26 +1617,7 @@ internal class WindowsDriver : ConsoleDriver {
 		WinConsole?.SetInitialCursorVisibility ();
 		UpdateCursor ();
 	}
-
-	#region Color Handling
-
-	/// <summary>
-	/// In the WindowsDriver, colors are encoded as an int. 
-	/// The background color is stored in the least significant 4 bits, 
-	/// and the foreground color is stored in the next 4 bits. 
-	/// </summary>
-	public override Attribute MakeColor (Color foreground, Color background)
-	{
-		// Encode the colors into the int value.
-		return new Attribute (
-			platformColor: 0, // Not used anymore! (((int)foreground.ColorName) | ((int)background.ColorName << 4)),
-			foreground: foreground,
-			background: background
-		);
-	}
-
-	#endregion
-
+	
 	CursorVisibility _cachedCursorVisibility;
 
 	public override void UpdateCursor ()

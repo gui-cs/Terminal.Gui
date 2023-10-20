@@ -416,22 +416,13 @@ public abstract class ConsoleDriver {
 	}
 
 	/// <summary>
-	/// Make the attribute for the foreground and background colors.
-	/// </summary>
-	/// <param name="fore">Foreground.</param>
-	/// <param name="back">Background.</param>
-	/// <returns></returns>
-	public virtual Attribute MakeAttribute (Color fore, Color back)
-	{
-		return MakeColor (fore, back);
-	}
-
-	/// <summary>
 	/// Gets the current <see cref="Attribute"/>.
 	/// </summary>
 	/// <returns>The current attribute.</returns>
 	public Attribute GetAttribute () => CurrentAttribute;
 
+	// TODO: This is only overridden by CursesDriver. Once CursesDriver supports 24-bit color, this virtual method can be
+	// removed (and Attribute can lose the platformColor property).
 	/// <summary>
 	/// Makes an <see cref="Attribute"/>.
 	/// </summary>
