@@ -199,7 +199,7 @@ namespace Terminal.Gui {
 
 			Added += (s, e) => CreateBottomRightCorner ();
 
-			LayoutComplete += (s, e) => {
+			Initialized += (s, e) => {
 				SetWidthHeight ();
 				SetRelativeLayout (SuperView?.Frame ?? Host?.Frame ?? Frame);
 				if (Id == "OtherScrollBarView" || OtherScrollBarView == null) {

@@ -104,7 +104,7 @@ namespace UICatalog.Scenarios {
 					X = dx++,
 					Y = y,
 					ColorScheme = new ColorScheme () {
-						Normal = new Terminal.Gui.Attribute (
+						Normal = new Attribute (
 						colorFunc (i > 255 ? 255 : i),
 						colorFunc (i > 255 ? 255 : i)
 						)
