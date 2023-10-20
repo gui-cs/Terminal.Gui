@@ -59,7 +59,7 @@ internal class CursesDriver : ConsoleDriver {
 		UpdateCursor ();
 	}
 
-	private void ProcessWinChange ()
+	internal void ProcessWinChange ()
 	{
 		if (!RunningUnitTests && Curses.CheckWinChange ()) {
 			ClearContents ();
