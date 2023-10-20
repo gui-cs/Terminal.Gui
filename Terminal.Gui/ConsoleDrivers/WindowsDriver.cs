@@ -902,7 +902,7 @@ internal class WindowsDriver : ConsoleDriver {
 			//System.Diagnostics.Debug.WriteLine ($"wVirtualScanCode: {ke.wVirtualScanCode}");
 
 			if (map == (Key)0xffffffff) {
-				KeyEventArgs key = new KeyEventArgs ();
+				KeyEvent key = new KeyEvent ();
 
 				// Shift = VK_SHIFT = 0x10
 				// Ctrl = VK_CONTROL = 0x11
@@ -926,17 +926,17 @@ internal class WindowsDriver : ConsoleDriver {
 				    WindowsConsole.ControlKeyState.LeftControlPressed |
 				    WindowsConsole.ControlKeyState.EnhancedKey:
 				case WindowsConsole.ControlKeyState.EnhancedKey:
-					key = new KeyEventArgs (Key.CtrlMask | Key.AltMask, _keyModifiers);
+					key = new KeyEvent (Key.CtrlMask | Key.AltMask, _keyModifiers);
 					break;
 				case WindowsConsole.ControlKeyState.LeftAltPressed:
-					key = new KeyEventArgs (Key.AltMask, _keyModifiers);
+					key = new KeyEvent (Key.AltMask, _keyModifiers);
 					break;
 				case WindowsConsole.ControlKeyState.RightControlPressed:
 				case WindowsConsole.ControlKeyState.LeftControlPressed:
-					key = new KeyEventArgs (Key.CtrlMask, _keyModifiers);
+					key = new KeyEvent (Key.CtrlMask, _keyModifiers);
 					break;
 				case WindowsConsole.ControlKeyState.ShiftPressed:
-					key = new KeyEventArgs (Key.ShiftMask, _keyModifiers);
+					key = new KeyEvent (Key.ShiftMask, _keyModifiers);
 					break;
 				case WindowsConsole.ControlKeyState.NumlockOn:
 					break;
@@ -946,28 +946,28 @@ internal class WindowsDriver : ConsoleDriver {
 					break;
 				default:
 					key = inputEvent.KeyEvent.wVirtualKeyCode switch {
-						0x10 => new KeyEventArgs (Key.ShiftMask, _keyModifiers),
-						0x11 => new KeyEventArgs (Key.CtrlMask, _keyModifiers),
-						0x12 => new KeyEventArgs (Key.AltMask, _keyModifiers),
-						_ => new KeyEventArgs (Key.Unknown, _keyModifiers)
+						0x10 => new KeyEvent (Key.ShiftMask, _keyModifiers),
+						0x11 => new KeyEvent (Key.CtrlMask, _keyModifiers),
+						0x12 => new KeyEvent (Key.AltMask, _keyModifiers),
+						_ => new KeyEvent (Key.Unknown, _keyModifiers)
 					};
 					break;
 				}
 
 				if (inputEvent.KeyEvent.bKeyDown) {
-					OnKeyDown (key);
+					OnKeyDown (new KeyEventEventArgs (key));
 				} else {
-					OnKeyUp (key);
+					OnKeyUp (new KeyEventEventArgs (key));
 				}
 			} else {
 				if (inputEvent.KeyEvent.bKeyDown) {
 					// May occurs using SendKeys
 					_keyModifiers ??= new KeyModifiers ();
 					// Key Down - Fire KeyDown Event and KeyPressed Event
-					OnKeyDown (new KeyEventArgs (map, _keyModifiers));
+					OnKeyDown (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
 				} else {
-					OnKeyUp (new KeyEventArgs (map, _keyModifiers));
-					OnKeyPressed (new KeyEventArgs (map, _keyModifiers));
+					OnKeyUp (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
+					OnKeyPressed (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
 				}
 			}
 			if (!inputEvent.KeyEvent.bKeyDown && inputEvent.KeyEvent.dwControlKeyState == 0) {

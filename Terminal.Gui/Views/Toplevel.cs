@@ -318,7 +318,7 @@ namespace Terminal.Gui {
 		/// 
 		/// <list type="bullet">
 		///   <item>
-		///		<description><see cref="OnKeyPressed"/> events will propagate keys upwards.</description>
+		///		<description><see cref="ProcessKey(KeyEvent)"/> events will propagate keys upwards.</description>
 		///   </item>
 		///   <item>
 		///		<description>The Toplevel will act as an embedded view (not a modal/pop-up).</description>
@@ -329,7 +329,7 @@ namespace Terminal.Gui {
 		/// 
 		/// <list type="bullet">
 		///   <item>
-		///		<description><see cref="OnKeyPressed"/> events will NOT propogate keys upwards.</description>
+		///		<description><see cref="ProcessKey(KeyEvent)"/> events will NOT propogate keys upwards.</description>
 		///	  </item>
 		///   <item>
 		///		<description>The Toplevel will and look like a modal (pop-up) (e.g. see <see cref="Dialog"/>.</description>
@@ -355,7 +355,7 @@ namespace Terminal.Gui {
 		public bool IsLoaded { get; private set; }
 
 		///<inheritdoc/>
-		public override bool OnKeyDown (KeyEventArgs keyEvent)
+		public override bool OnKeyDown (KeyEvent keyEvent)
 		{
 			if (base.OnKeyDown (keyEvent)) {
 				return true;
@@ -373,7 +373,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnKeyUp (KeyEventArgs keyEvent)
+		public override bool OnKeyUp (KeyEvent keyEvent)
 		{
 			if (base.OnKeyUp (keyEvent)) {
 				return true;
@@ -393,12 +393,12 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs keyEvent)
+		public override bool ProcessKey (KeyEvent keyEvent)
 		{
-			if (base.OnKeyPressed (keyEvent))
+			if (base.ProcessKey (keyEvent))
 				return true;
 
-			var result = InvokeKeybindings (new KeyEventArgs (ShortcutHelper.GetModifiersKey (keyEvent),
+			var result = InvokeKeybindings (new KeyEvent (ShortcutHelper.GetModifiersKey (keyEvent),
 				new KeyModifiers () { Alt = keyEvent.IsAlt, Ctrl = keyEvent.IsCtrl, Shift = keyEvent.IsShift }));
 			if (result != null)
 				return (bool)result;
@@ -479,7 +479,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessColdKey (KeyEventArgs keyEvent)
+		public override bool ProcessColdKey (KeyEvent keyEvent)
 		{
 			if (base.ProcessColdKey (keyEvent)) {
 				return true;

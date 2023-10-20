@@ -339,7 +339,7 @@ namespace UICatalog.Scenarios {
 				Add (close);
 
 				KeyPressed += (s, e) => {
-					if (e.Key == Key.Esc) {
+					if (e.KeyEvent.Key == Key.Esc) {
 						OnReportClosed (this, EventArgs.Empty);
 					}
 				};

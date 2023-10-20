@@ -153,9 +153,9 @@ namespace UICatalog.Scenarios {
 
 		}
 
-		private void TableViewKeyPress (object sender, KeyEventArgs e)
+		private void TableViewKeyPress (object sender, KeyEventEventArgs e)
 		{
-			if (e.Key == Key.DeleteChar) {
+			if (e.KeyEvent.Key == Key.DeleteChar) {
 
 				// set all selected cells to null
 				foreach (var pt in listColView.GetAllSelectedCells ()) {

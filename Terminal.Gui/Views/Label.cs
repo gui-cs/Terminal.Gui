@@ -112,7 +112,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessHotKey (KeyEventArgs ke)
+		public override bool ProcessHotKey (KeyEvent ke)
 		{
 			if (ke.Key == (Key.AltMask | HotKey)) {
 				if (!HasFocus) {

@@ -761,14 +761,14 @@ namespace Terminal.Gui {
 
 
 		/// <inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs args)
+		public override bool ProcessKey (KeyEvent keyEvent)
 		{
 			if (TableIsNullOrInvisible ()) {
 				PositionCursor ();
 				return false;
 			}
 
-			var result = InvokeKeybindings (args);
+			var result = InvokeKeybindings (keyEvent);
 			if (result != null) {
 				PositionCursor ();
 				return true;
@@ -777,17 +777,17 @@ namespace Terminal.Gui {
 			if (CollectionNavigator != null &&
 				this.HasFocus &&
 				Table.Rows != 0 &&
-				Terminal.Gui.CollectionNavigator.IsCompatibleKey (args) &&
-				!args.Key.HasFlag (Key.CtrlMask) &&
-				!args.Key.HasFlag (Key.AltMask) &&
-				char.IsLetterOrDigit ((char)args.KeyValue)) {
-				return CycleToNextTableEntryBeginningWith (args);
+				Terminal.Gui.CollectionNavigator.IsCompatibleKey (keyEvent) &&
+				!keyEvent.Key.HasFlag (Key.CtrlMask) &&
+				!keyEvent.Key.HasFlag (Key.AltMask) &&
+				char.IsLetterOrDigit ((char)keyEvent.KeyValue)) {
+				return CycleToNextTableEntryBeginningWith (keyEvent);
 			}
 
 			return false;
 		}
 
-		private bool CycleToNextTableEntryBeginningWith (KeyEventArgs keyEvent)
+		private bool CycleToNextTableEntryBeginningWith (KeyEvent keyEvent)
 		{
 			var row = SelectedRow;
 

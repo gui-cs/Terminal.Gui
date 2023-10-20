@@ -177,11 +177,11 @@ namespace UICatalog.Scenarios {
 			};
 
 			Win.KeyPressed += (s, e) => {
-				var keys = ShortcutHelper.GetModifiersKey (e);
-				if (_winDialog != null && (e.Key == Key.Esc
-					|| e.Key == Application.QuitKey)) {
+				var keys = ShortcutHelper.GetModifiersKey (e.KeyEvent);
+				if (_winDialog != null && (e.KeyEvent.Key == Key.Esc
+					|| e.KeyEvent.Key == Application.QuitKey)) {
 					DisposeWinDialog ();
-				} else if (e.Key == Application.QuitKey) {
+				} else if (e.KeyEvent.Key == Application.QuitKey) {
 					Quit ();
 					e.Handled = true;
 				} else if (_winDialog != null && keys == (Key.Tab | Key.CtrlMask)) {

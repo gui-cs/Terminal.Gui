@@ -69,12 +69,12 @@ namespace UICatalog.Tests {
 				FakeConsole.PushMockKeyPress (Application.QuitKey);
 
 				// The only key we care about is the QuitKey
-				Application.Top.KeyPressed += (object sender, KeyEventArgs args) => {
-					output.WriteLine ($"  Keypress: {args.Key}");
+				Application.Top.KeyPressed += (object sender, KeyEventEventArgs args) => {
+					output.WriteLine ($"  Keypress: {args.KeyEvent.Key}");
 					// BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
 					// by adding this Space it seems to work.
 					// See #2474 for why this is commented out
-					Assert.Equal (Application.QuitKey, args.Key);
+					Assert.Equal (Application.QuitKey, args.KeyEvent.Key);
 				};
 
 				uint abortTime = 500;
@@ -156,9 +156,9 @@ namespace UICatalog.Tests {
 			};
 			var token = Application.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
 
-			Application.Top.KeyPressed += (object sender, KeyEventArgs args) => {
+			Application.Top.KeyPressed += (object sender, KeyEventEventArgs args) => {
 				// See #2474 for why this is commented out
-				Assert.Equal (Key.CtrlMask | Key.Q, args.Key);
+				Assert.Equal (Key.CtrlMask | Key.Q, args.KeyEvent.Key);
 			};
 
 			generic.Init ();

@@ -166,11 +166,11 @@ namespace Terminal.Gui.ViewsTests {
 				}
 
 				if (vType is TextView) {
-					top.OnKeyPressed (new KeyEventArgs (Key.Tab | Key.CtrlMask, new KeyModifiers ()));
+					top.ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers ()));
 				} else {
-					top.OnKeyPressed (new KeyEventArgs (Key.Tab, new KeyModifiers ()));
+					top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
 				}
-				top.OnKeyPressed (new KeyEventArgs (Key.Tab, new KeyModifiers ()));
+				top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
 
 				Assert.Equal (2, vTypeEnter);
 				Assert.Equal (1, vTypeLeave);

@@ -66,7 +66,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var rg = new RadioGroup (new string [] { "Test" }, -1);
 			Assert.Equal (-1, rg.SelectedItem);
-			Assert.True (rg.OnKeyPressed (new KeyEventArgs (Key.Space, new KeyModifiers ())));
+			Assert.True (rg.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ())));
 			Assert.Equal (0, rg.SelectedItem);
 		}
 
@@ -164,11 +164,11 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var rg = new RadioGroup (new string [] { "Test", "New Test" });
 
-			Assert.True (rg.OnKeyPressed (new KeyEventArgs (Key.CursorUp, new KeyModifiers ())));
-			Assert.True (rg.OnKeyPressed (new KeyEventArgs (Key.CursorDown, new KeyModifiers ())));
-			Assert.True (rg.OnKeyPressed (new KeyEventArgs (Key.Home, new KeyModifiers ())));
-			Assert.True (rg.OnKeyPressed (new KeyEventArgs (Key.End, new KeyModifiers ())));
-			Assert.True (rg.OnKeyPressed (new KeyEventArgs (Key.Space, new KeyModifiers ())));
+			Assert.True (rg.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ())));
+			Assert.True (rg.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (rg.ProcessKey (new KeyEvent (Key.Home, new KeyModifiers ())));
+			Assert.True (rg.ProcessKey (new KeyEvent (Key.End, new KeyModifiers ())));
+			Assert.True (rg.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ())));
 			Assert.Equal (1, rg.SelectedItem);
 		}
 
@@ -177,13 +177,13 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var rg = new RadioGroup (new string [] { "Left", "Right", "Cen_tered", "Justified" });
 
-			Assert.True (rg.ProcessColdKey (new KeyEventArgs (Key.t, new KeyModifiers ())));
+			Assert.True (rg.ProcessColdKey (new KeyEvent (Key.t, new KeyModifiers ())));
 			Assert.Equal (2, rg.SelectedItem);
-			Assert.True (rg.ProcessColdKey (new KeyEventArgs (Key.L, new KeyModifiers ())));
+			Assert.True (rg.ProcessColdKey (new KeyEvent (Key.L, new KeyModifiers ())));
 			Assert.Equal (0, rg.SelectedItem);
-			Assert.True (rg.ProcessColdKey (new KeyEventArgs (Key.J, new KeyModifiers ())));
+			Assert.True (rg.ProcessColdKey (new KeyEvent (Key.J, new KeyModifiers ())));
 			Assert.Equal (3, rg.SelectedItem);
-			Assert.True (rg.ProcessColdKey (new KeyEventArgs (Key.R, new KeyModifiers ())));
+			Assert.True (rg.ProcessColdKey (new KeyEvent (Key.R, new KeyModifiers ())));
 			Assert.Equal (1, rg.SelectedItem);
 		}
 	}

@@ -621,7 +621,7 @@ namespace Terminal.Gui {
 		public CollectionNavigator KeystrokeNavigator { get; private set; } = new CollectionNavigator ();
 
 		/// <inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs arg)
+		public override bool ProcessKey (KeyEvent keyEvent)
 		{
 			if (!Enabled) {
 				return false;
@@ -629,13 +629,13 @@ namespace Terminal.Gui {
 
 			try {
 				// First of all deal with any registered keybindings
-				var result = InvokeKeybindings (arg);
+				var result = InvokeKeybindings (keyEvent);
 				if (result != null) {
 					return (bool)result;
 				}
 
 				// If not a keybinding, is the key a searchable key press?
-				if (CollectionNavigator.IsCompatibleKey (arg) && AllowLetterBasedNavigation) {
+				if (CollectionNavigator.IsCompatibleKey (keyEvent) && AllowLetterBasedNavigation) {
 					IReadOnlyCollection<Branch<T>> map;
 
 					// If there has been a call to InvalidateMap since the last time
@@ -644,7 +644,7 @@ namespace Terminal.Gui {
 
 					// Find the current selected object within the tree
 					var current = map.IndexOf (b => b.Model == SelectedObject);
-					var newIndex = KeystrokeNavigator?.GetNextMatchingItem (current, (char)arg.KeyValue);
+					var newIndex = KeystrokeNavigator?.GetNextMatchingItem (current, (char)keyEvent.KeyValue);
 
 					if (newIndex is int && newIndex != -1) {
 						SelectedObject = map.ElementAt ((int)newIndex).Model;
@@ -657,7 +657,7 @@ namespace Terminal.Gui {
 				PositionCursor ();
 			}
 
-			return base.OnKeyPressed (arg);
+			return base.ProcessKey (keyEvent);
 		}
 
 		/// <summary>

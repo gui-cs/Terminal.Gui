@@ -158,9 +158,9 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
-		private void TreeViewFiles_KeyPress (object sender, KeyEventArgs obj)
+		private void TreeViewFiles_KeyPress (object sender, KeyEventEventArgs obj)
 		{
-			if (obj.Key == (Key.R | Key.CtrlMask)) {
+			if (obj.KeyEvent.Key == (Key.R | Key.CtrlMask)) {
 
 				var selected = treeViewFiles.SelectedObject;
 

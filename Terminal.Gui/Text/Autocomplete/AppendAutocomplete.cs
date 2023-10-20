@@ -54,7 +54,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override bool ProcessKey (KeyEventArgs kb)
+		public override bool ProcessKey (KeyEvent kb)
 		{
 			var key = kb.Key;
 			if (key == SelectionKey) {

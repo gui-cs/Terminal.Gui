@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class TreeTableSourceTests : IDisposable {
+public class TreeTableSourceTests: IDisposable {
 
 	readonly ITestOutputHelper _output;
 	private readonly Rune _origChecked;
@@ -41,14 +41,14 @@ public class TreeTableSourceTests : IDisposable {
 
 		TestHelpers.AssertDriverContentsAre (expected, _output);
 
-		Assert.Equal (2, tv.Table.Rows);
+		Assert.Equal(2, tv.Table.Rows);
 
 		// top left is selected cell
 		Assert.Equal (0, tv.SelectedRow);
-		Assert.Equal (0, tv.SelectedColumn);
+		Assert.Equal(0, tv.SelectedColumn);
 
 		// when pressing right we should expand the top route
-		Application.Top.ProcessHotKey (new KeyEventArgs (Key.CursorRight, new KeyModifiers ()));
+		Application.Top.ProcessHotKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
 
 
 		tv.Draw ();
@@ -66,7 +66,7 @@ public class TreeTableSourceTests : IDisposable {
 		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		// when pressing left we should collapse the top route again
-		Application.Top.ProcessHotKey (new KeyEventArgs (Key.CursorLeft, new KeyModifiers ()));
+		Application.Top.ProcessHotKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
 
 
 		tv.Draw ();
@@ -106,8 +106,8 @@ public class TreeTableSourceTests : IDisposable {
 		Assert.Equal (0, tv.SelectedRow);
 		Assert.Equal (0, tv.SelectedColumn);
 
-		Assert.True (tv.OnMouseEvent (new MouseEvent () { X = 2, Y = 2, Flags = MouseFlags.Button1Clicked }));
-
+		Assert.True(tv.OnMouseEvent (new MouseEvent () { X = 2,Y=2,Flags = MouseFlags.Button1Clicked}));
+			
 		tv.Draw ();
 
 		expected =
@@ -133,7 +133,7 @@ public class TreeTableSourceTests : IDisposable {
 		// Clicking on the + again should collapse
 		tv.OnMouseEvent (new MouseEvent () { X = 2, Y = 2, Flags = MouseFlags.Button1Clicked });
 		tv.Draw ();
-
+		
 		expected =
 			@"
 │Name          │Description            │
@@ -173,13 +173,13 @@ public class TreeTableSourceTests : IDisposable {
 		Assert.Equal (0, tv.SelectedColumn);
 
 		// when pressing right we move to tree column
-		tv.OnKeyPressed (new KeyEventArgs (Key.CursorRight, new KeyModifiers ()));
+		tv.ProcessKey(new KeyEvent (Key.CursorRight, new KeyModifiers ()));
 
 		// now we are in tree column
 		Assert.Equal (0, tv.SelectedRow);
 		Assert.Equal (1, tv.SelectedColumn);
 
-		Application.Top.ProcessHotKey (new KeyEventArgs (Key.CursorRight, new KeyModifiers ()));
+		Application.Top.ProcessHotKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
 
 		tv.Draw ();
 
@@ -196,8 +196,8 @@ public class TreeTableSourceTests : IDisposable {
 
 		TestHelpers.AssertDriverContentsAre (expected, _output);
 
-		tv.OnKeyPressed (new KeyEventArgs (Key.CursorDown, new KeyModifiers ()));
-		tv.OnKeyPressed (new KeyEventArgs (Key.Space, new KeyModifiers ()));
+		tv.ProcessKey(new KeyEvent(Key.CursorDown,new KeyModifiers ()));
+		tv.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
 		tv.Draw ();
 
 		expected =
@@ -213,10 +213,10 @@ public class TreeTableSourceTests : IDisposable {
 
 		TestHelpers.AssertDriverContentsAre (expected, _output);
 
-		var selectedObjects = checkSource.CheckedRows.Select (treeSource.GetObjectOnRow).ToArray ();
-		var selected = Assert.Single (selectedObjects);
+		var selectedObjects = checkSource.CheckedRows.Select (treeSource.GetObjectOnRow).ToArray();
+		var selected = Assert.Single(selectedObjects);
 
-		Assert.Equal ("Ford Trans-Am", selected.Name);
+		Assert.Equal ("Ford Trans-Am",selected.Name);
 		Assert.Equal ("Talking thunderbird car", selected.Description);
 
 	}
@@ -276,7 +276,7 @@ public class TreeTableSourceTests : IDisposable {
 			}
 		});
 
-		tableView.Table = new TreeTableSource<IDescribedThing> (tableView, "Name", tree,
+		tableView.Table = new TreeTableSource<IDescribedThing> (tableView,"Name",tree,
 			new () {
 				{"Description",(d)=>d.Description }
 			});

@@ -59,7 +59,7 @@ namespace UICatalog.Scenarios {
 			Point mousePos = default;
 
 			Win.KeyPressed += (s, e) => {
-				if (e.Key == (Key.Space | Key.CtrlMask)) {
+				if (e.KeyEvent.Key == (Key.Space | Key.CtrlMask)) {
 					ShowContextMenu (mousePos.X, mousePos.Y);
 					e.Handled = true;
 				}

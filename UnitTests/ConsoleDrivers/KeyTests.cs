@@ -209,7 +209,7 @@ namespace Terminal.Gui.InputTests {
 				var top = Application.Top;
 
 				top.KeyPressed += (s, e) => {
-					var after = ShortcutHelper.GetModifiersKey (e);
+					var after = ShortcutHelper.GetModifiersKey (e.KeyEvent);
 					Assert.Equal (expectedRemapping, after);
 					e.Handled = true;
 					Application.RequestStop ();

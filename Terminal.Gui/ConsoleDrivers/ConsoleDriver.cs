@@ -447,35 +447,35 @@ public abstract class ConsoleDriver {
 	/// <summary>
 	/// Event fired after a key has been pressed and released.
 	/// </summary>
-	public event EventHandler<KeyEventArgs> KeyPressed;
+	public event EventHandler<KeyEventEventArgs> KeyPressed;
 
 	/// <summary>
 	/// Called after a key has been pressed and released. Fires the <see cref="KeyPressed"/> event.
 	/// </summary>
 	/// <param name="a"></param>
-	public void OnKeyPressed (KeyEventArgs a) => KeyPressed?.Invoke(this, a);
+	public void OnKeyPressed (KeyEventEventArgs a) => KeyPressed?.Invoke(this, a);
 
 	/// <summary>
 	/// Event fired when a key is released.
 	/// </summary>
-	public event EventHandler<KeyEventArgs> KeyUp;
+	public event EventHandler<KeyEventEventArgs> KeyUp;
 
 	/// <summary>
 	/// Called when a key is released. Fires the <see cref="KeyUp"/> event.
 	/// </summary>
 	/// <param name="a"></param>
-	public void OnKeyUp (KeyEventArgs a) => KeyUp?.Invoke (this, a);
+	public void OnKeyUp (KeyEventEventArgs a) => KeyUp?.Invoke (this, a);
 
 	/// <summary>
 	/// Event fired when a key is pressed.
 	/// </summary>
-	public event EventHandler<KeyEventArgs> KeyDown;
+	public event EventHandler<KeyEventEventArgs> KeyDown;
 
 	/// <summary>
 	/// Called when a key is pressed. Fires the <see cref="KeyDown"/> event.
 	/// </summary>
 	/// <param name="a"></param>
-	public void OnKeyDown (KeyEventArgs a) => KeyDown?.Invoke (this, a);
+	public void OnKeyDown (KeyEventEventArgs a) => KeyDown?.Invoke (this, a);
 	
 	/// <summary>
 	/// Event fired when a mouse event occurs.

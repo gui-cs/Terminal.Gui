@@ -38,7 +38,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="kb">The <see cref="KeyEvent"/> to check.</param>
 		/// <returns>The <see cref="KeyEvent.Key"/> with all the keys modifiers.</returns>
-		public static Key GetModifiersKey (KeyEventArgs kb)
+		public static Key GetModifiersKey (KeyEvent kb)
 		{
 			var key = kb.Key;
 			if (kb.IsAlt && (key & Key.AltMask) == 0) {
@@ -240,7 +240,7 @@ namespace Terminal.Gui {
 		/// <param name="kb">The <see cref="KeyEvent"/></param>
 		/// <param name="view">The <see cref="View"/></param>
 		/// <returns><c>true</c> if defined <c>false</c>otherwise.</returns>
-		public static bool FindAndOpenByShortcut (KeyEventArgs kb, View view = null)
+		public static bool FindAndOpenByShortcut (KeyEvent kb, View view = null)
 		{
 			if (view == null) {
 				return false;			}

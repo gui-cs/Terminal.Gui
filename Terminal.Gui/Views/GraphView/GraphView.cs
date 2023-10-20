@@ -244,7 +244,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs keyEvent)
+		public override bool ProcessKey (KeyEvent keyEvent)
 		{
 			if (HasFocus && CanFocus) {
 				var result = InvokeKeybindings (keyEvent);
@@ -252,7 +252,7 @@ namespace Terminal.Gui {
 					return (bool)result;
 			}
 
-			return base.OnKeyPressed (keyEvent);
+			return base.ProcessKey (keyEvent);
 		}
 
 		/// <summary>

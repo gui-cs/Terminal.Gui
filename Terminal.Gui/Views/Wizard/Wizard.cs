@@ -147,23 +147,23 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// <see cref="Wizard"/> is derived from <see cref="Dialog"/> and Dialog causes <c>Esc</c> to call
-		/// <see cref="Application.RequestStop(Toplevel)"/>, closing the Dialog. Wizard overrides <see cref="Responder.OnKeyPressed"/>
+		/// <see cref="Application.RequestStop(Toplevel)"/>, closing the Dialog. Wizard overrides <see cref="Responder.ProcessKey(KeyEvent)"/>
 		/// to instead fire the <see cref="Cancelled"/> event when Wizard is being used as a non-modal (see <see cref="Wizard.Modal"/>.
-		/// See <see cref="Responder.OnKeyPressed"/> for more.
+		/// See <see cref="Responder.ProcessKey(KeyEvent)"/> for more.
 		/// </summary>
 		/// <param name="kb"></param>
 		/// <returns></returns>
-		public override bool OnKeyPressed (KeyEventArgs arg)
+		public override bool ProcessKey (KeyEvent kb)
 		{
 			if (!Modal) {
-				switch (arg.Key) {
+				switch (kb.Key) {
 				case Key.Esc:
 					var args = new WizardButtonEventArgs ();
 					Cancelled?.Invoke (this, args);
 					return false;
 				}
 			}
-			return base.OnKeyPressed (arg);
+			return base.ProcessKey (kb);
 		}
 
 		/// <summary>

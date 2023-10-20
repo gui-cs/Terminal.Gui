@@ -8,23 +8,23 @@ namespace UICatalog.Scenarios {
 	public class Keys : Scenario {
 
 		class TestWindow : Window {
-			public List<string> _onKeyPressedList = new List<string> ();
+			public List<string> _processKeyList = new List<string> ();
 			public List<string> _processHotKeyList = new List<string> ();
 			public List<string> _processColdKeyList = new List<string> ();
 
-			public override bool OnKeyPressed (KeyEventArgs arg)
+			public override bool ProcessKey (KeyEvent keyEvent)
 			{
-				_onKeyPressedList.Add (arg.ToString ());
-				return base.OnKeyPressed (arg);
+				_processKeyList.Add (keyEvent.ToString ());
+				return base.ProcessKey (keyEvent);
 			}
 
-			public override bool ProcessHotKey (KeyEventArgs keyEvent)
+			public override bool ProcessHotKey (KeyEvent keyEvent)
 			{
 				_processHotKeyList.Add (keyEvent.ToString ());
 				return base.ProcessHotKey (keyEvent);
 			}
 
-			public override bool ProcessColdKey (KeyEventArgs keyEvent)
+			public override bool ProcessColdKey (KeyEvent keyEvent)
 			{
 				_processColdKeyList.Add (keyEvent.ToString ());
 
@@ -65,30 +65,29 @@ namespace UICatalog.Scenarios {
 			Win.Add (edit);
 
 			// Last KeyPress: ______
-			var appKeyPressedLabel = new Label ("Last Application.KeyPress:") {
+			var keyPressedLabel = new Label ("Last Application.KeyPress:") {
 				X = Pos.Left (editLabel),
 				Y = Pos.Top (editLabel) + 2,
 			};
-			Win.Add (appKeyPressedLabel);
-			var labelAppKeyPressed = new Label ("") {
-				X = Pos.Right (appKeyPressedLabel) + 1,
-				Y = Pos.Top (appKeyPressedLabel),
+			Win.Add (keyPressedLabel);
+			var labelKeypress = new Label ("") {
+				X = Pos.Left (edit),
+				Y = Pos.Top (keyPressedLabel),
 				TextAlignment = Terminal.Gui.TextAlignment.Centered,
 				ColorScheme = Colors.Error,
 				AutoSize = true
 			};
-			Win.Add (labelAppKeyPressed);
+			Win.Add (labelKeypress);
 
-			Application.KeyPressed += (s, e) => labelAppKeyPressed.Text = e.ToString ();
+			Win.KeyPressed += (s, e) => labelKeypress.Text = e.KeyEvent.ToString ();
 
-			// Key event log (for Application):
-
-			var keyLogLabel = new Label ("All events:") {
+			// Key stroke log:
+			var keyLogLabel = new Label ("Key event log:") {
 				X = Pos.Left (editLabel),
 				Y = Pos.Top (editLabel) + 4,
 			};
 			Win.Add (keyLogLabel);
-			var fakeKeyPress = new KeyEventArgs (Key.CtrlMask | Key.A, new KeyModifiers () {
+			var fakeKeyPress = new KeyEvent (Key.CtrlMask | Key.A, new KeyModifiers () {
 				Alt = true,
 				Ctrl = true,
 				Shift = true
@@ -106,7 +105,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (keyEventListView);
 
 			// ProcessKey log:
-			var processKeyLogLabel = new Label ("Win.OnKeyPressed:") {
+			var processKeyLogLabel = new Label ("ProcessKey log:") {
 				X = Pos.Right (keyEventListView) + 1,
 				Y = Pos.Top (editLabel) + 4,
 			};
@@ -114,7 +113,7 @@ namespace UICatalog.Scenarios {
 
 			maxLogEntry = $"{fakeKeyPress}".Length;
 			yOffset = (Application.Top == Application.Top ? 1 : 6);
-			var processKeyListView = new ListView (((TestWindow)Win)._onKeyPressedList) {
+			var processKeyListView = new ListView (((TestWindow)Win)._processKeyList) {
 				X = Pos.Left (processKeyLogLabel),
 				Y = Pos.Top (processKeyLogLabel) + yOffset,
 				Width = Dim.Percent (30),
@@ -125,7 +124,7 @@ namespace UICatalog.Scenarios {
 
 			// ProcessHotKey log:
 			// BUGBUG: Label is not positioning right with Pos, so using TextField instead
-			var processHotKeyLogLabel = new Label ("Win.ProcessHotKey:") {
+			var processHotKeyLogLabel = new Label ("ProcessHotKey log:") {
 				X = Pos.Right (processKeyListView) + 1,
 				Y = Pos.Top (editLabel) + 4,
 			};
@@ -143,7 +142,7 @@ namespace UICatalog.Scenarios {
 
 			// ProcessColdKey log:
 			// BUGBUG: Label is not positioning right with Pos, so using TextField instead
-			var processColdKeyLogLabel = new Label ("Win.ProcessColdKey:") {
+			var processColdKeyLogLabel = new Label ("ProcessColdKey log:") {
 				X = Pos.Right (processHotKeyListView) + 1,
 				Y = Pos.Top (editLabel) + 4,
 			};
@@ -157,20 +156,20 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (),
 			};
 
-			void KeyDownPressUp (KeyEventArgs args, string updown)
+			Application.KeyDown += (s, a) => KeyDownPressUp (a, "Down");
+			Application.KeyPressed += (s, a) => KeyDownPressUp (a, "Press");
+			Application.KeyUp += (s, a) => KeyDownPressUp (a, "Up");
+
+			void KeyDownPressUp (KeyEventEventArgs args, string updown)
 			{
 				// BUGBUG: KeyEvent.ToString is badly broken
-				var msg = $"Key{updown,-5}: {args}";
+				var msg = $"Key{updown,-5}: {args.KeyEvent}";
 				keyEventlist.Add (msg);
 				keyEventListView.MoveDown ();
 				processKeyListView.MoveDown ();
 				processColdKeyListView.MoveDown ();
 				processHotKeyListView.MoveDown ();
 			}
-
-			Application.KeyDown += (s, a) => KeyDownPressUp (a, "Down");
-			Application.KeyPressed += (s, a) => KeyDownPressUp (a, "Press");
-			Application.KeyUp += (s, a) => KeyDownPressUp (a, "Up");
 
 			processColdKeyListView.ColorScheme = Colors.TopLevel;
 			Win.Add (processColdKeyListView);

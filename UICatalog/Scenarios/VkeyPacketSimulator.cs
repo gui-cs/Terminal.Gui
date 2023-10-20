@@ -89,9 +89,9 @@ namespace UICatalog.Scenarios {
 			};
 
 			tvOutput.KeyDown += (s, e) => {
-				//System.Diagnostics.Debug.WriteLine ($"Output - KeyDown: {e.Key}");
+				//System.Diagnostics.Debug.WriteLine ($"Output - KeyDown: {e.KeyEvent.Key}");
 				e.Handled = true;
-				if (e.Key == Key.Unknown) {
+				if (e.KeyEvent.Key == Key.Unknown) {
 					_wasUnknown = true;
 				}
 			};
@@ -99,9 +99,9 @@ namespace UICatalog.Scenarios {
 			tvOutput.KeyPressed += (s, e) => {
 				//System.Diagnostics.Debug.WriteLine ($"Output - KeyPress - _keyboardStrokes: {_keyboardStrokes.Count}");
 				if (_outputStarted && _keyboardStrokes.Count > 0) {
-					var ev = ShortcutHelper.GetModifiersKey (e);
+					var ev = ShortcutHelper.GetModifiersKey (e.KeyEvent);
 					//System.Diagnostics.Debug.WriteLine ($"Output - KeyPress: {ev}");
-					if (!tvOutput.OnKeyPressed (e)) {
+					if (!tvOutput.ProcessKey (e.KeyEvent)) {
 						Application.Invoke (() => {
 							MessageBox.Query ("Keys", $"'{ShortcutHelper.GetShortcutTag (ev)}' pressed!", "Ok");
 						});
@@ -115,28 +115,28 @@ namespace UICatalog.Scenarios {
 			Win.Add (tvOutput);
 
 			tvInput.KeyDown += (s, e) => {
-				//System.Diagnostics.Debug.WriteLine ($"Input - KeyDown: {e.Key}");
+				//System.Diagnostics.Debug.WriteLine ($"Input - KeyDown: {e.KeyEvent.Key}");
 				e.Handled = true;
-				if (e.Key == Key.Unknown) {
+				if (e.KeyEvent.Key == Key.Unknown) {
 					_wasUnknown = true;
 				}
 			};
 
-			KeyEventArgs unknownChar = null;
+			KeyEventEventArgs unknownChar = null;
 
 			tvInput.KeyPressed += (s, e) => {
-				if (e.Key == (Key.Q | Key.CtrlMask)) {
+				if (e.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
 					Application.RequestStop ();
 					return;
 				}
-				if (e.Key == Key.Unknown) {
+				if (e.KeyEvent.Key == Key.Unknown) {
 					_wasUnknown = true;
 					e.Handled = true;
 					return;
 				}
 				if (_wasUnknown && _keyboardStrokes.Count == 1) {
 					_wasUnknown = false;
-				} else if (_wasUnknown && char.IsLetter ((char)e.Key)) {
+				} else if (_wasUnknown && char.IsLetter ((char)e.KeyEvent.Key)) {
 					_wasUnknown = false;
 				} else if (!_wasUnknown && _keyboardStrokes.Count > 0) {
 					e.Handled = true;
@@ -147,15 +147,15 @@ namespace UICatalog.Scenarios {
 				} else {
 					_keyboardStrokes.Insert (0, 0);
 				}
-				var ev = ShortcutHelper.GetModifiersKey (e);
+				var ev = ShortcutHelper.GetModifiersKey (e.KeyEvent);
 				//System.Diagnostics.Debug.WriteLine ($"Input - KeyPress: {ev}");
 				//System.Diagnostics.Debug.WriteLine ($"Input - KeyPress - _keyboardStrokes: {_keyboardStrokes.Count}");
 			};
 
 			tvInput.KeyUp += (s, e) => {
-				//System.Diagnostics.Debug.WriteLine ($"Input - KeyUp: {e.Key}");
+				//System.Diagnostics.Debug.WriteLine ($"Input - KeyUp: {e.KeyEvent.Key}");
 				//var ke = e.KeyEvent;
-				var ke = ShortcutHelper.GetModifiersKey (e);
+				var ke = ShortcutHelper.GetModifiersKey (e.KeyEvent);
 				if (_wasUnknown && (int)ke - (int)(ke & (Key.AltMask | Key.CtrlMask | Key.ShiftMask)) != 0) {
 					unknownChar = e;
 				}
@@ -232,20 +232,21 @@ namespace UICatalog.Scenarios {
 			Win.LayoutComplete += Win_LayoutComplete;
 		}
 
-		private void AddKeyboardStrokes (KeyEventArgs e)
+		private void AddKeyboardStrokes (KeyEventEventArgs e)
 		{
+			var ke = e.KeyEvent;
 			var km = new KeyModifiers ();
-			if (e.IsShift) {
+			if (ke.IsShift) {
 				km.Shift = true;
 			}
-			if (e.IsAlt) {
+			if (ke.IsAlt) {
 				km.Alt = true;
 			}
-			if (e.IsCtrl) {
+			if (ke.IsCtrl) {
 				km.Ctrl = true;
 			}
-			var keyChar = e.KeyValue;
-			var mK = (int)((Key)e.KeyValue & (Key.AltMask | Key.CtrlMask | Key.ShiftMask));
+			var keyChar = ke.KeyValue;
+			var mK = (int)((Key)ke.KeyValue & (Key.AltMask | Key.CtrlMask | Key.ShiftMask));
 			keyChar &= ~mK;
 			_keyboardStrokes.Add (keyChar);
 		}

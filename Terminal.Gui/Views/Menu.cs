@@ -721,7 +721,7 @@ namespace Terminal.Gui {
 			return host.OnLeave (view);
 		}
 
-		public override bool OnKeyDown (KeyEventArgs keyEvent)
+		public override bool OnKeyDown (KeyEvent keyEvent)
 		{
 			if (keyEvent.IsAlt) {
 				host.CloseAllMenus ();
@@ -731,7 +731,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		public override bool ProcessHotKey (KeyEventArgs keyEvent)
+		public override bool ProcessHotKey (KeyEvent keyEvent)
 		{
 			// To ncurses simulate a AltMask key pressing Alt+Space because
 			// it can't detect an alone special key down was pressed.
@@ -743,7 +743,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		public override bool OnKeyPressed (KeyEventArgs kb)
+		public override bool ProcessKey (KeyEvent kb)
 		{
 			var result = InvokeKeybindings (kb);
 			if (result != null)
@@ -1165,7 +1165,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnKeyDown (KeyEventArgs keyEvent)
+		public override bool OnKeyDown (KeyEvent keyEvent)
 		{
 			if (keyEvent.IsAlt || (keyEvent.IsCtrl && keyEvent.Key == (Key.CtrlMask | Key.Space))) {
 				openedByAltKey = true;
@@ -1176,7 +1176,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnKeyUp (KeyEventArgs keyEvent)
+		public override bool OnKeyUp (KeyEvent keyEvent)
 		{
 			if (keyEvent.IsAlt || keyEvent.Key == Key.AltMask || (keyEvent.IsCtrl && keyEvent.Key == (Key.CtrlMask | Key.Space))) {
 				// User pressed Alt - this may be a precursor to a menu accelerator (e.g. Alt-F)
@@ -1812,7 +1812,7 @@ namespace Terminal.Gui {
 		}
 
 		bool openedByHotKey;
-		internal bool FindAndOpenMenuByHotkey (KeyEventArgs kb)
+		internal bool FindAndOpenMenuByHotkey (KeyEvent kb)
 		{
 			//int pos = 0;
 			var c = ((uint)kb.Key & (uint)Key.CharMask);
@@ -1839,7 +1839,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		bool FindAndOpenChildrenMenuByHotkey (KeyEventArgs kb, MenuItem [] children)
+		bool FindAndOpenChildrenMenuByHotkey (KeyEvent kb, MenuItem [] children)
 		{
 			var c = ((uint)kb.Key & (uint)Key.CharMask);
 			for (int i = 0; i < children.Length; i++) {
@@ -1873,7 +1873,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		internal bool FindAndOpenMenuByShortcut (KeyEventArgs kb, MenuItem [] children = null)
+		internal bool FindAndOpenMenuByShortcut (KeyEvent kb, MenuItem [] children = null)
 		{
 			if (children == null) {
 				children = Menus;
@@ -1931,7 +1931,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessHotKey (KeyEventArgs kb)
+		public override bool ProcessHotKey (KeyEvent kb)
 		{
 			if (kb.Key == Key) {
 				if (Visible && !IsMenuOpen) {
@@ -1957,7 +1957,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs kb)
+		public override bool ProcessKey (KeyEvent kb)
 		{
 			if (InvokeKeybindings (kb) == true)
 				return true;
@@ -2013,7 +2013,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessColdKey (KeyEventArgs kb)
+		public override bool ProcessColdKey (KeyEvent kb)
 		{
 			return FindAndOpenMenuByShortcut (kb);
 		}
