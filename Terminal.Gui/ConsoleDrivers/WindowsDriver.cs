@@ -1520,17 +1520,8 @@ internal class WindowsDriver : ConsoleDriver {
 			}
 			WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
 
-			// Needed for Windows Terminal
-			// ESC [ ? 1047 h  Save cursor position and activate xterm alternative buffer (no backscroll)
-			// ESC [ ? 1047 l  Restore cursor position and restore xterm working buffer (with backscroll)
-			// ESC [ ? 1048 h  Save cursor position
-			// ESC [ ? 1048 l  Restore cursor position
-			// ESC [ ? 1049 h  Activate xterm alternative buffer (no backscroll)
-			// ESC [ ? 1049 l  Restore xterm working buffer (with backscroll)
-			// Per Issue #2264 using the alternative screen buffer is required for Windows Terminal to not 
-			// wipe out the backscroll buffer when the application exits.
 			if (_isWindowsTerminal) {
-				Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+				Console.Out.Write (EscSeqUtils.CSI_ActivateAltBufferNoBackscroll);
 			}
 		} catch (Win32Exception e) {
 			// We are being run in an environment that does not support a console
@@ -1570,7 +1561,7 @@ internal class WindowsDriver : ConsoleDriver {
 
 	public override void UpdateScreen ()
 	{
-		var windowSize = WinConsole?.GetConsoleBufferWindow (out _) ?? new Size (Cols, Rows);
+		var windowSize = WinConsole?.GetConsoleBufferWindow (out var _) ?? new Size (Cols, Rows);
 		if (!windowSize.IsEmpty && (windowSize.Width != Cols || windowSize.Height != Rows)) {
 			return;
 		}
@@ -1760,9 +1751,9 @@ internal class WindowsDriver : ConsoleDriver {
 		WinConsole?.Cleanup ();
 		WinConsole = null;
 
-		if (!RunningUnitTests && (_isWindowsTerminal || _parentProcessName == "devenv")) {
+		if (!RunningUnitTests && _isWindowsTerminal) {
 			// Disable alternative screen buffer.
-			Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndActivateAltBufferWithBackscroll);
+			Console.Out.Write (EscSeqUtils.CSI_RestoreAltBufferWithBackscroll);
 		}
 	}
 
