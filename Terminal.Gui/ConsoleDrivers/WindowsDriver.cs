@@ -784,8 +784,6 @@ internal class WindowsDriver : ConsoleDriver {
 	public override bool SupportsTrueColor => RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931 && _isWindowsTerminal);
 
 	readonly bool _isWindowsTerminal = false;
-	//readonly string _parentProcessName = "WindowsTerminal";
-
 	WindowsMainLoop _mainLoopDriver = null;
 
 	public WindowsDriver ()
@@ -798,60 +796,14 @@ internal class WindowsDriver : ConsoleDriver {
 			Clipboard = new FakeDriver.FakeClipboard ();
 		}
 
-		if (!RunningUnitTests) {
-			_isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") != null;
-			if (!_isWindowsTerminal) {
-				//_parentProcessName = GetParentProcessName ();
-				//_isWindowsTerminal = _parentProcessName == "WindowsTerminal";
-				//if (!_isWindowsTerminal && _parentProcessName != "devenv") {
-				Force16Colors = true;
-				//}
-			}
+		// TODO: if some other Windows-based terminal supports true color, update this logic to not
+		// force 16color mode (.e.g ConEmu which really doesn't work well at all).
+		_isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") != null;
+		if (!_isWindowsTerminal) {
+			Force16Colors = true;
 		}
+
 	}
-
-	// BUGBUG: This code is a hack and has an infinite loop if WT is started from a non-WT terminal (start.run "pwsh").
-	// commenting out for now. A better workaround for running in the VS debugger is to set the environment variable
-	// in the `launchSettings.json` file.
-	//	private static string GetParentProcessName ()
-	//	{
-	//#pragma warning disable CA1416 // Validate platform compatibility
-	//		var myId = Process.GetCurrentProcess ().Id;
-	//		var query = string.Format ($"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {myId}");
-	//		var search = new ManagementObjectSearcher ("root\\CIMV2", query);
-	//		var queryObj = search.Get ().OfType<ManagementBaseObject> ().FirstOrDefault ();
-	//		if (queryObj == null) {
-	//			return null;
-	//		}
-	//		var parentId = (uint)queryObj ["ParentProcessId"];
-	//		var parent = Process.GetProcessById ((int)parentId);
-	//		var prevParent = parent;
-
-	//		// Check if the parent is from other parent
-	//		while (queryObj != null) {
-	//			query = string.Format ($"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {parentId}");
-	//			search = new ManagementObjectSearcher ("root\\CIMV2", query);
-	//			queryObj = search.Get ().OfType<ManagementBaseObject> ().FirstOrDefault ();
-	//			if (queryObj == null) {
-	//				return parent.ProcessName;
-	//			}
-	//			parentId = (uint)queryObj ["ParentProcessId"];
-	//			try {
-	//				parent = Process.GetProcessById ((int)parentId);
-	//				if (string.Equals (parent.ProcessName, "explorer", StringComparison.InvariantCultureIgnoreCase)) {
-	//					return prevParent.ProcessName;
-	//				}
-	//				prevParent = parent;
-	//			} catch (ArgumentException) {
-
-	//				return prevParent.ProcessName;
-	//			}
-	//		}
-
-	//		return parent.ProcessName;
-	//#pragma warning restore CA1416 // Validate platform compatibility
-	//	}
-
 
 	internal override MainLoop Init ()
 	{
@@ -1617,7 +1569,7 @@ internal class WindowsDriver : ConsoleDriver {
 		WinConsole?.SetInitialCursorVisibility ();
 		UpdateCursor ();
 	}
-	
+
 	CursorVisibility _cachedCursorVisibility;
 
 	public override void UpdateCursor ()
