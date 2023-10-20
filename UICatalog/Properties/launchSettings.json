@@ -1,10 +1,7 @@
 {
   "profiles": {
     "UICatalog": {
-      "commandName": "Project",
-      "environmentVariables": {
-        "WT_SESSION": "1"
-      }
+      "commandName": "Project"
     },
     "WSL : UICatalog": {
       "commandName": "Executable",

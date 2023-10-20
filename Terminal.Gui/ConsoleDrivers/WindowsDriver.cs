@@ -807,10 +807,13 @@ internal class WindowsDriver : ConsoleDriver {
 		}
 
 		if (!RunningUnitTests) {
-			_parentProcessName = GetParentProcessName ();
-			_isWindowsTerminal = _parentProcessName == "WindowsTerminal";
-			if (!_isWindowsTerminal && _parentProcessName != "wininit") {
-				Force16Colors = true;
+			_isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") != null;
+			if (!_isWindowsTerminal) {
+				_parentProcessName = GetParentProcessName ();
+				_isWindowsTerminal = _parentProcessName == "WindowsTerminal";
+				if (!_isWindowsTerminal && _parentProcessName != "devenv") {
+					Force16Colors = true;
+				}
 			}
 		}
 	}
