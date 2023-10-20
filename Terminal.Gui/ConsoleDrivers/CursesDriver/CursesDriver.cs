@@ -23,12 +23,90 @@ internal class CursesDriver : ConsoleDriver {
 
 	public override string GetVersionInfo () => $"{Curses.curses_version ()}";
 	UnixMainLoop _mainLoopDriver = null;
-	internal override MainLoop CreateMainLoop ()
+	public override bool SupportsTrueColor => false;
+
+	object _processInputToken;
+
+	internal override MainLoop Init ()
 	{
 		_mainLoopDriver = new UnixMainLoop (this);
+		if (!RunningUnitTests) {
+
+			_window = Curses.initscr ();
+			Curses.set_escdelay (10);
+
+			// Ensures that all procedures are performed at some previous closing.
+			Curses.doupdate ();
+
+			// 
+			// We are setting Invisible as default so we could ignore XTerm DECSUSR setting
+			//
+			switch (Curses.curs_set (0)) {
+			case 0:
+				_currentCursorVisibility = _initialCursorVisibility = CursorVisibility.Invisible;
+				break;
+
+			case 1:
+				_currentCursorVisibility = _initialCursorVisibility = CursorVisibility.Underline;
+				Curses.curs_set (1);
+				break;
+
+			case 2:
+				_currentCursorVisibility = _initialCursorVisibility = CursorVisibility.Box;
+				Curses.curs_set (2);
+				break;
+
+			default:
+				_currentCursorVisibility = _initialCursorVisibility = null;
+				break;
+			}
+			if (!Curses.HasColors) {
+				throw new InvalidOperationException ("V2 - This should never happen. File an Issue if it does.");
+			}
+
+			Curses.raw ();
+			Curses.noecho ();
+
+			Curses.Window.Standard.keypad (true);
+
+			Curses.StartColor ();
+			Curses.UseDefaultColors ();
+
+			if (!RunningUnitTests) {
+				Curses.timeout (0);
+			}
+
+			_processInputToken = _mainLoopDriver?.AddWatch (0, UnixMainLoop.Condition.PollIn, x => {
+				ProcessInput ();
+				return true;
+			});
+		}
+
+		CurrentAttribute = MakeColor (ColorName.White, ColorName.Black);
+
+		if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
+			Clipboard = new FakeDriver.FakeClipboard ();
+		} else {
+			if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
+				Clipboard = new MacOSXClipboard ();
+			} else {
+				if (Is_WSL_Platform ()) {
+					Clipboard = new WSLClipboard ();
+				} else {
+					Clipboard = new CursesClipboard ();
+				}
+			}
+		}
+
+		ClearContents ();
+		StartReportingMouseMoves ();
+
+		if (!RunningUnitTests) {
+			Curses.CheckWinChange ();
+			Curses.refresh ();
+		}
 		return new MainLoop (_mainLoopDriver);
 	}
-	public override bool SupportsTrueColor => false;
 
 	public override void Move (int col, int row)
 	{
@@ -601,89 +679,6 @@ internal class CursesDriver : ConsoleDriver {
 		OnMouseEvent (new MouseEventEventArgs (me));
 	}
 
-	object _processInputToken;
-
-	internal override void PrepareToRun ()
-	{
-		if (!RunningUnitTests) {
-			Curses.timeout (0);
-		}
-
-		_processInputToken = _mainLoopDriver?.AddWatch (0, UnixMainLoop.Condition.PollIn, x => {
-			ProcessInput ();
-			return true;
-		});
-	}
-
-	internal override void Init ()
-	{
-		if (!RunningUnitTests) {
-
-			_window = Curses.initscr ();
-			Curses.set_escdelay (10);
-
-			// Ensures that all procedures are performed at some previous closing.
-			Curses.doupdate ();
-
-			// 
-			// We are setting Invisible as default so we could ignore XTerm DECSUSR setting
-			//
-			switch (Curses.curs_set (0)) {
-			case 0:
-				_currentCursorVisibility = _initialCursorVisibility = CursorVisibility.Invisible;
-				break;
-
-			case 1:
-				_currentCursorVisibility = _initialCursorVisibility = CursorVisibility.Underline;
-				Curses.curs_set (1);
-				break;
-
-			case 2:
-				_currentCursorVisibility = _initialCursorVisibility = CursorVisibility.Box;
-				Curses.curs_set (2);
-				break;
-
-			default:
-				_currentCursorVisibility = _initialCursorVisibility = null;
-				break;
-			}
-			if (!Curses.HasColors) {
-				throw new InvalidOperationException ("V2 - This should never happen. File an Issue if it does.");
-			}
-
-			Curses.raw ();
-			Curses.noecho ();
-
-			Curses.Window.Standard.keypad (true);
-
-			Curses.StartColor ();
-			Curses.UseDefaultColors ();
-		}
-
-		CurrentAttribute = MakeColor (ColorName.White, ColorName.Black);
-
-		if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
-			Clipboard = new FakeDriver.FakeClipboard ();
-		} else {
-			if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
-				Clipboard = new MacOSXClipboard ();
-			} else {
-				if (Is_WSL_Platform ()) {
-					Clipboard = new WSLClipboard ();
-				} else {
-					Clipboard = new CursesClipboard ();
-				}
-			}
-		}
-
-		ClearContents ();
-		StartReportingMouseMoves ();
-
-		if (!RunningUnitTests) {
-			Curses.CheckWinChange ();
-			Curses.refresh ();
-		}
-	}
 
 	public static bool Is_WSL_Platform ()
 	{

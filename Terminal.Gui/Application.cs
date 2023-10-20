@@ -175,10 +175,8 @@ namespace Terminal.Gui {
 				}
 			}
 
-			MainLoop = Driver.CreateMainLoop ();
-
 			try {
-				Driver.Init ();
+				MainLoop = Driver.Init ();
 			} catch (InvalidOperationException ex) {
 				// This is a case where the driver is unable to initialize the console.
 				// This can happen if the console is already in use by another process or
@@ -192,7 +190,6 @@ namespace Terminal.Gui {
 			Driver.KeyDown += (s, args) => OnKeyDown (args);
 			Driver.KeyUp += (s, args) => OnKeyUp (args);
 			Driver.MouseEvent += (s, args) => OnMouseEvent (args);
-			Driver.PrepareToRun ();
 
 			SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext ());
 

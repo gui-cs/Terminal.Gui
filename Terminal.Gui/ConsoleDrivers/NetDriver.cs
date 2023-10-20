@@ -629,44 +629,13 @@ internal class NetDriver : ConsoleDriver {
 	const int COLOR_BRIGHT_WHITE = 97;
 
 	NetMainLoop _mainLoopDriver = null;
-	internal override MainLoop CreateMainLoop ()
-	{
-		_mainLoopDriver = new NetMainLoop (this);
-		return new MainLoop (_mainLoopDriver);
-	}
 
 	public override bool SupportsTrueColor => Environment.OSVersion.Platform == PlatformID.Unix || (IsWinPlatform && Environment.OSVersion.Version.Build >= 14931);
 
 	public NetWinVTConsole NetWinConsole { get; private set; }
 	public bool IsWinPlatform { get; private set; }
 
-	internal override void PrepareToRun ()
-	{
-		// Note: .Net API doesn't support keydown/up events and thus any passed keyDown/UpHandlers will be simulated to be called.
-		_mainLoopDriver.ProcessInput = ProcessInput;
-	}
-
-	internal override void End ()
-	{
-		if (IsWinPlatform) {
-			NetWinConsole?.Cleanup ();
-		}
-
-		StopReportingMouseMoves ();
-
-		if (!RunningUnitTests) {
-			Console.ResetColor ();
-
-			//Disable alternative screen buffer.
-			Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndActivateAltBufferWithBackscroll);
-
-			//Set cursor key to cursor.
-			Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
-			Console.Out.Close ();
-		}
-	}
-
-	internal override void Init ()
+	internal override MainLoop Init ()
 	{
 		var p = Environment.OSVersion.Platform;
 		if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
@@ -713,6 +682,30 @@ internal class NetDriver : ConsoleDriver {
 		CurrentAttribute = new Attribute (Color.White, Color.Black);
 
 		StartReportingMouseMoves ();
+
+		_mainLoopDriver = new NetMainLoop (this);
+		_mainLoopDriver.ProcessInput = ProcessInput;
+		return new MainLoop (_mainLoopDriver);
+	}
+
+	internal override void End ()
+	{
+		if (IsWinPlatform) {
+			NetWinConsole?.Cleanup ();
+		}
+
+		StopReportingMouseMoves ();
+
+		if (!RunningUnitTests) {
+			Console.ResetColor ();
+
+			//Disable alternative screen buffer.
+			Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndActivateAltBufferWithBackscroll);
+
+			//Set cursor key to cursor.
+			Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
+			Console.Out.Close ();
+		}
 	}
 
 	public virtual void ResizeScreen ()

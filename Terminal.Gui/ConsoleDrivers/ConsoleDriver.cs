@@ -34,20 +34,10 @@ public abstract class ConsoleDriver {
 	#region Setup & Teardown
 
 	/// <summary>
-	/// Returns an instance of <see cref="MainLoop"/> using the <see cref="IMainLoopDriver"/> for the driver.
-	/// </summary>
-	/// <returns></returns>
-	internal abstract MainLoop CreateMainLoop ();
-
-	/// <summary>
 	/// Initializes the driver
 	/// </summary>
-	internal abstract void Init ();
-
-	/// <summary>
-	/// Prepare the driver and set the key and mouse events handlers.
-	/// </summary>
-	internal abstract void PrepareToRun ();
+	/// <returns>Returns an instance of <see cref="MainLoop"/> using the <see cref="IMainLoopDriver"/> for the driver.</returns>
+	internal abstract MainLoop Init ();
 
 	/// <summary>
 	/// Ends the execution of the console driver.

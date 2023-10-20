@@ -789,11 +789,6 @@ internal class WindowsDriver : ConsoleDriver {
 	//readonly string _parentProcessName = "WindowsTerminal";
 
 	WindowsMainLoop _mainLoopDriver = null;
-	internal override MainLoop CreateMainLoop ()
-	{
-		_mainLoopDriver = new WindowsMainLoop (this);
-		return new MainLoop (_mainLoopDriver);
-	}
 
 	public WindowsDriver ()
 	{
@@ -859,12 +854,52 @@ internal class WindowsDriver : ConsoleDriver {
 	//#pragma warning restore CA1416 // Validate platform compatibility
 	//	}
 
-	internal override void PrepareToRun ()
+
+	internal override MainLoop Init ()
 	{
+		_mainLoopDriver = new WindowsMainLoop (this);
+		if (RunningUnitTests) {
+			return new MainLoop (_mainLoopDriver);
+		}
+
+		try {
+			if (WinConsole != null) {
+				// BUGBUG: The results from GetConsoleOutputWindow are incorrect when called from Init. 
+				// Our thread in WindowsMainLoop.CheckWin will get the correct results. See #if HACK_CHECK_WINCHANGED
+				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
+				Cols = winSize.Width;
+				Rows = winSize.Height;
+			}
+			WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
+
+			if (_isWindowsTerminal) {
+				Console.Out.Write (EscSeqUtils.CSI_ActivateAltBufferNoBackscroll);
+			}
+		} catch (Win32Exception e) {
+			// We are being run in an environment that does not support a console
+			// such as a unit test, or a pipe.
+			Debug.WriteLine ($"Likely running unit tests. Setting WinConsole to null so we can test it elsewhere. Exception: {e}");
+			WinConsole = null;
+		}
+
+		CurrentAttribute = new Attribute (Color.White, Color.Black);
+
+		_outputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
+		Clip = new Rect (0, 0, Cols, Rows);
+		_damageRegion = new WindowsConsole.SmallRect () {
+			Top = 0,
+			Left = 0,
+			Bottom = (short)Rows,
+			Right = (short)Cols
+		};
+
+		ClearContents ();
 
 #if HACK_CHECK_WINCHANGED
 		_mainLoopDriver.WinChanged = ChangeWin;
 #endif
+		return new MainLoop (_mainLoopDriver);
+
 	}
 
 #if HACK_CHECK_WINCHANGED
@@ -1502,46 +1537,6 @@ internal class WindowsDriver : ConsoleDriver {
 	public override bool IsRuneSupported (Rune rune)
 	{
 		return base.IsRuneSupported (rune) && rune.IsBmp;
-	}
-
-	internal override void Init ()
-	{
-		if (RunningUnitTests) {
-			return;
-		}
-
-		try {
-			if (WinConsole != null) {
-				// BUGBUG: The results from GetConsoleOutputWindow are incorrect when called from Init. 
-				// Our thread in WindowsMainLoop.CheckWin will get the correct results. See #if HACK_CHECK_WINCHANGED
-				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
-				Cols = winSize.Width;
-				Rows = winSize.Height;
-			}
-			WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
-
-			if (_isWindowsTerminal) {
-				Console.Out.Write (EscSeqUtils.CSI_ActivateAltBufferNoBackscroll);
-			}
-		} catch (Win32Exception e) {
-			// We are being run in an environment that does not support a console
-			// such as a unit test, or a pipe.
-			Debug.WriteLine ($"Likely running unit tests. Setting WinConsole to null so we can test it elsewhere. Exception: {e}");
-			WinConsole = null;
-		}
-
-		CurrentAttribute = new Attribute (Color.White, Color.Black);
-
-		_outputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
-		Clip = new Rect (0, 0, Cols, Rows);
-		_damageRegion = new WindowsConsole.SmallRect () {
-			Top = 0,
-			Left = 0,
-			Bottom = (short)Rows,
-			Right = (short)Cols
-		};
-
-		ClearContents ();
 	}
 
 	void ResizeScreen ()

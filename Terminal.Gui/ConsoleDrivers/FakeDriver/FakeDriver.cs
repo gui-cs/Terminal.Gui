@@ -64,13 +64,8 @@ public class FakeDriver : ConsoleDriver {
 	}
 
 	FakeMainLoop _mainLoopDriver = null;
-	internal override MainLoop CreateMainLoop ()
-	{
-		_mainLoopDriver = new FakeMainLoop (this);
-		return new MainLoop (_mainLoopDriver);
-	}
 
-	internal override void Init ()
+	internal override MainLoop Init ()
 	{
 		FakeConsole.MockKeyPresses.Clear ();
 
@@ -80,6 +75,10 @@ public class FakeDriver : ConsoleDriver {
 		ResizeScreen ();
 		CurrentAttribute = new Attribute (Color.White, Color.Black);
 		ClearContents ();
+		
+		_mainLoopDriver = new FakeMainLoop (this);
+		_mainLoopDriver.KeyPressed = ProcessInput;
+		return new MainLoop (_mainLoopDriver);
 	}
 
 
@@ -348,11 +347,6 @@ public class FakeDriver : ConsoleDriver {
 
 	private CursorVisibility _savedCursorVisibility;
 
-	internal override void PrepareToRun ()
-	{
-		// Note: Net doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
-		_mainLoopDriver.KeyPressed = (consoleKey) => ProcessInput (consoleKey);
-	}
 
 	void ProcessInput (ConsoleKeyInfo consoleKey)
 	{
