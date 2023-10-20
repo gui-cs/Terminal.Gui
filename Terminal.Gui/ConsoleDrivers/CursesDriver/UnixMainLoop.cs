@@ -188,7 +188,8 @@ namespace Terminal.Gui {
 			if (_winChanged) {
 				_winChanged = false;
 				_cursesDriver.ProcessInput ();
-				//WinChanged?.Invoke ();
+				// This is needed on the mac. See https://github.com/gui-cs/Terminal.Gui/pull/2922#discussion_r1365992426
+				_cursesDriver.ProcessWinChange ();
 			}
 			if (_pollMap == null) return;
 			foreach (var p in _pollMap) {
