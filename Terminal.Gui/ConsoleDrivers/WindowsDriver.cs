@@ -786,7 +786,7 @@ internal class WindowsDriver : ConsoleDriver {
 	public override bool SupportsTrueColor => RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931 && _isWindowsTerminal);
 
 	readonly bool _isWindowsTerminal = false;
-	readonly string _parentProcessName = "WindowsTerminal";
+	//readonly string _parentProcessName = "WindowsTerminal";
 
 	WindowsMainLoop _mainLoopDriver = null;
 	internal override MainLoop CreateMainLoop ()
