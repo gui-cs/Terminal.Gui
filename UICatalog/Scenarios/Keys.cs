@@ -160,7 +160,7 @@ namespace UICatalog.Scenarios {
 			Application.KeyPressed += (s, a) => KeyDownPressUp (a, "Press");
 			Application.KeyUp += (s, a) => KeyDownPressUp (a, "Up");
 
-			void KeyDownPressUp (KeyEventEventArgs args, string updown)
+			void KeyDownPressUp (KeyEventArgs args, string updown)
 			{
 				// BUGBUG: KeyEvent.ToString is badly broken
 				var msg = $"Key{updown,-5}: {args.KeyEvent}";

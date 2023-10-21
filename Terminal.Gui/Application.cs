@@ -1302,13 +1302,13 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Event fired after a key has been pressed and released.
-		/// <para>Set <see cref="KeyEventEventArgs.Handled"/> to <see langword="true"/> to suppress the event.</para>
+		/// <para>Set <see cref="KeyEventArgs.Handled"/> to <see langword="true"/> to suppress the event.</para>
 		/// </summary>
 		/// <remarks>
 		/// All drivers support firing the <see cref="KeyPressed"/> event. Some drivers (Curses)
 		/// do not support firing the <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
 		/// </remarks>
-		public static event EventHandler<KeyEventEventArgs> KeyPressed;
+		public static event EventHandler<KeyEventArgs> KeyPressed;
 
 		/// <summary>
 		/// Called after a key has been pressed and released. Fires the <see cref="KeyPressed"/> event.
@@ -1319,7 +1319,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="a"></param>
 		/// <returns><see langword="true"/> if the key was handled.</returns>
-		public static bool OnKeyPressed (KeyEventEventArgs a)
+		public static bool OnKeyPressed (KeyEventArgs a)
 		{
 			KeyPressed?.Invoke (null, a);
 			if (a.Handled) {
@@ -1361,13 +1361,13 @@ namespace Terminal.Gui {
 		/// All drivers support firing the <see cref="KeyPressed"/> event. Some drivers (Curses)
 		/// do not support firing the <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
 		/// </remarks>
-		public static event EventHandler<KeyEventEventArgs> KeyDown;
+		public static event EventHandler<KeyEventArgs> KeyDown;
 
 		/// <summary>
 		/// Called when a key is pressed (and not yet released). Fires the <see cref="KeyDown"/> event.
 		/// </summary>
 		/// <param name="a"></param>
-		public static void OnKeyDown (KeyEventEventArgs a)
+		public static void OnKeyDown (KeyEventArgs a)
 		{
 			KeyDown?.Invoke (null, a);
 			var chain = _topLevels.ToList ();
@@ -1386,13 +1386,13 @@ namespace Terminal.Gui {
 		/// All drivers support firing the <see cref="KeyPressed"/> event. Some drivers (Curses)
 		/// do not support firing the <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
 		/// </remarks>
-		public static event EventHandler<KeyEventEventArgs> KeyUp;
+		public static event EventHandler<KeyEventArgs> KeyUp;
 
 		/// <summary>
 		/// Called when a key is released. Fires the <see cref="KeyUp"/> event.
 		/// </summary>
 		/// <param name="a"></param>
-		public static void OnKeyUp (KeyEventEventArgs a)
+		public static void OnKeyUp (KeyEventArgs a)
 		{
 			KeyUp?.Invoke (null, a);
 			var chain = _topLevels.ToList ();

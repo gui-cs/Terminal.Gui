@@ -163,7 +163,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when a character key is pressed and occurs after the key up event.
 		/// </summary>
-		public event EventHandler<KeyEventEventArgs> KeyPressed;
+		public event EventHandler<KeyEventArgs> KeyPressed;
 
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
@@ -172,7 +172,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var args = new KeyEventEventArgs (keyEvent);
+			var args = new KeyEventArgs (keyEvent);
 			KeyPressed?.Invoke (this, args);
 			if (args.Handled)
 				return true;
@@ -346,7 +346,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var args = new KeyEventEventArgs (keyEvent);
+			var args = new KeyEventArgs (keyEvent);
 			if (MostFocused?.Enabled == true) {
 				MostFocused?.KeyPressed?.Invoke (this, args);
 				if (args.Handled)
@@ -370,7 +370,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var args = new KeyEventEventArgs (keyEvent);
+			var args = new KeyEventArgs (keyEvent);
 			KeyPressed?.Invoke (this, args);
 			if (args.Handled)
 				return true;
@@ -393,7 +393,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when a key is pressed.
 		/// </summary>
-		public event EventHandler<KeyEventEventArgs> KeyDown;
+		public event EventHandler<KeyEventArgs> KeyDown;
 
 		/// <inheritdoc/>
 		public override bool OnKeyDown (KeyEvent keyEvent)
@@ -402,7 +402,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var args = new KeyEventEventArgs (keyEvent);
+			var args = new KeyEventArgs (keyEvent);
 			KeyDown?.Invoke (this, args);
 			if (args.Handled) {
 				return true;
@@ -423,7 +423,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when a key is released.
 		/// </summary>
-		public event EventHandler<KeyEventEventArgs> KeyUp;
+		public event EventHandler<KeyEventArgs> KeyUp;
 
 		/// <inheritdoc/>
 		public override bool OnKeyUp (KeyEvent keyEvent)
@@ -432,7 +432,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var args = new KeyEventEventArgs (keyEvent);
+			var args = new KeyEventArgs (keyEvent);
 			KeyUp?.Invoke (this, args);
 			if (args.Handled) {
 				return true;

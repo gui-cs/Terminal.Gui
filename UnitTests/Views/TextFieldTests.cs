@@ -1283,7 +1283,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (2, clickCounter);
 		}
 
-		private void SuppressKey (object s, KeyEventEventArgs arg)
+		private void SuppressKey (object s, KeyEventArgs arg)
 		{
 			if (arg.KeyEvent.KeyValue == 'j') {
 				arg.Handled = true;

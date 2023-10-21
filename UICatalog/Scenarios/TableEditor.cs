@@ -386,7 +386,7 @@ namespace UICatalog.Scenarios {
 
 		}
 
-		private void TableViewKeyPress (object sender, KeyEventEventArgs e)
+		private void TableViewKeyPress (object sender, KeyEventArgs e)
 		{
 			if(currentTable == null) {
 				return;

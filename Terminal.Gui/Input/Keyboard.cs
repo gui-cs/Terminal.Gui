@@ -5,12 +5,12 @@ namespace Terminal.Gui;
 /// <summary>
 /// Defines the event arguments for <see cref="KeyEvent"/>
 /// </summary>
-public class KeyEventEventArgs : EventArgs {
+public class KeyEventArgs : EventArgs {
 	/// <summary>
 	/// Constructs.
 	/// </summary>
 	/// <param name="ke"></param>
-	public KeyEventEventArgs (KeyEvent ke) => KeyEvent = ke;
+	public KeyEventArgs (KeyEvent ke) => KeyEvent = ke;
 	/// <summary>
 	/// The <see cref="KeyEvent"/> for the event.
 	/// </summary>

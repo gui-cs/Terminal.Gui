@@ -965,10 +965,10 @@ internal class WindowsDriver : ConsoleDriver {
 
 				if (inputEvent.KeyEvent.bKeyDown) {
 					//_keyDown = key.Key;
-					OnKeyDown (new KeyEventEventArgs (key));
+					OnKeyDown (new KeyEventArgs (key));
 				} else {
 					//_keyDown = (Key)0xffffffff;
-					OnKeyUp (new KeyEventEventArgs (key));
+					OnKeyUp (new KeyEventArgs (key));
 				}
 			} else {
 				if (inputEvent.KeyEvent.bKeyDown) {
@@ -978,12 +978,12 @@ internal class WindowsDriver : ConsoleDriver {
 					//if (_keyDown == (Key)0xffffffff) {
 					       // Avoid sending repeat keydowns
 					//	_keyDown = map;
-						OnKeyDown (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
+						OnKeyDown (new KeyEventArgs (new KeyEvent (map, _keyModifiers)));
 					//}
-					OnKeyPressed (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
+					OnKeyPressed (new KeyEventArgs (new KeyEvent (map, _keyModifiers)));
 				} else {
 					//_keyDown = (Key)0xffffffff;
-					OnKeyUp (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
+					OnKeyUp (new KeyEventArgs (new KeyEvent (map, _keyModifiers)));
 				}
 			}
 			if (!inputEvent.KeyEvent.bKeyDown && inputEvent.KeyEvent.dwControlKeyState == 0) {

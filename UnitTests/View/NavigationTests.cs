@@ -901,7 +901,7 @@ namespace Terminal.Gui.ViewTests {
 			var tf = new TextField ();
 			tf.KeyPressed += Tf_KeyPress;
 
-			void Tf_KeyPress (object sender, KeyEventEventArgs obj)
+			void Tf_KeyPress (object sender, KeyEventArgs obj)
 			{
 				if (obj.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
 					obj.Handled = tfQuiting = true;
@@ -913,7 +913,7 @@ namespace Terminal.Gui.ViewTests {
 			var top = Application.Top;
 			top.KeyPressed += Top_KeyPress;
 
-			void Top_KeyPress (object sender, KeyEventEventArgs obj)
+			void Top_KeyPress (object sender, KeyEventArgs obj)
 			{
 				if (obj.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
 					obj.Handled = topQuiting = true;
@@ -961,7 +961,7 @@ namespace Terminal.Gui.ViewTests {
 			var tf = new TextField ();
 			tf.KeyPressed += Tf_KeyPress;
 
-			void Tf_KeyPress (object sender, KeyEventEventArgs obj)
+			void Tf_KeyPress (object sender, KeyEventArgs obj)
 			{
 				if (obj.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
 					obj.Handled = tfQuiting = true;

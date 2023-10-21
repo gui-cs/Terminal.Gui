@@ -772,7 +772,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void SuppressIfBadChar (KeyEventEventArgs k)
+		private void SuppressIfBadChar (KeyEventArgs k)
 		{
 			// don't let user type bad letters
 			var ch = (char)k.KeyEvent.KeyValue;
@@ -794,7 +794,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		private void AcceptIf (KeyEventEventArgs keyEvent, Key isKey)
+		private void AcceptIf (KeyEventArgs keyEvent, Key isKey)
 		{
 			if (!keyEvent.Handled && keyEvent.KeyEvent.Key == isKey) {
 				keyEvent.Handled = true;
@@ -880,7 +880,7 @@ namespace Terminal.Gui {
 			Application.RequestStop ();
 		}
 
-		private void NavigateIf (KeyEventEventArgs keyEvent, Key isKey, View to)
+		private void NavigateIf (KeyEventArgs keyEvent, Key isKey, View to)
 		{
 			if (!keyEvent.Handled) {
 
