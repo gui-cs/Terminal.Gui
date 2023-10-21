@@ -822,7 +822,7 @@ internal class WindowsDriver : ConsoleDriver {
 			WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
 
 			if (_isWindowsTerminal) {
-				Console.Out.Write (EscSeqUtils.CSI_ActivateAltBufferNoBackscroll);
+				Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
 			}
 		} catch (Win32Exception e) {
 			// We are being run in an environment that does not support a console
@@ -877,6 +877,15 @@ internal class WindowsDriver : ConsoleDriver {
 	}
 #endif
 
+	// This is a bit hacky, but it enables users to hold down a key and 
+	// OnKeyDown, OnKeyPressed, OnKeyPressed, OnKeyUp
+	// It might be worth making OnKeyDown and OnKeyUp virtual so this can be tracked from those calls in case
+	// somoene calls them externally??
+	//
+	// It also is broken when modifiers keys are down too
+	//
+	//Key _keyDown = (Key)0xffffffff;
+	
 	internal void ProcessInput (WindowsConsole.InputRecord inputEvent)
 	{
 		switch (inputEvent.EventType) {
@@ -955,19 +964,26 @@ internal class WindowsDriver : ConsoleDriver {
 				}
 
 				if (inputEvent.KeyEvent.bKeyDown) {
+					//_keyDown = key.Key;
 					OnKeyDown (new KeyEventEventArgs (key));
 				} else {
+					//_keyDown = (Key)0xffffffff;
 					OnKeyUp (new KeyEventEventArgs (key));
 				}
 			} else {
 				if (inputEvent.KeyEvent.bKeyDown) {
 					// May occurs using SendKeys
 					_keyModifiers ??= new KeyModifiers ();
-					// Key Down - Fire KeyDown Event and KeyPressed Event
-					OnKeyDown (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
-				} else {
-					OnKeyUp (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
+
+					//if (_keyDown == (Key)0xffffffff) {
+					       // Avoid sending repeat keydowns
+					//	_keyDown = map;
+						OnKeyDown (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
+					//}
 					OnKeyPressed (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
+				} else {
+					//_keyDown = (Key)0xffffffff;
+					OnKeyUp (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
 				}
 			}
 			if (!inputEvent.KeyEvent.bKeyDown && inputEvent.KeyEvent.dwControlKeyState == 0) {
@@ -1678,7 +1694,7 @@ internal class WindowsDriver : ConsoleDriver {
 
 		if (!RunningUnitTests && _isWindowsTerminal) {
 			// Disable alternative screen buffer.
-			Console.Out.Write (EscSeqUtils.CSI_RestoreAltBufferWithBackscroll);
+			Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndActivateAltBufferWithBackscroll);
 		}
 	}
 
