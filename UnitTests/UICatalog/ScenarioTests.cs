@@ -105,17 +105,11 @@ namespace UICatalog.Tests {
 
 				Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
-				foreach (var inst in Responder.Instances) {
-					Assert.True (inst.WasDisposed);
-				}
-				Responder.Instances.Clear ();
+				Assert.Empty (Responder.Instances);
 #endif
 			}
 #if DEBUG_IDISPOSABLE
-			foreach (var inst in Responder.Instances) {
-				Assert.True (inst.WasDisposed);
-			}
-			Responder.Instances.Clear ();
+				Assert.Empty (Responder.Instances);
 #endif
 		}
 
@@ -132,19 +126,7 @@ namespace UICatalog.Tests {
 			// BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
 			// by adding this Space it seems to work.
 
-			FakeConsole.PushMockKeyPress (Key.Space);
 			FakeConsole.PushMockKeyPress (Application.QuitKey);
-
-			int iterations = 0;
-			Application.Iteration += (s, a) => {
-				iterations++;
-				output.WriteLine ($"'Generic' iteration {iterations}");
-				// Stop if we run out of control...
-				if (iterations == 10) {
-					output.WriteLine ($"'Generic' had to be force quit!");
-					Application.RequestStop ();
-				}
-			};
 
 			var ms = 100;
 			var abortCount = 0;
@@ -154,7 +136,22 @@ namespace UICatalog.Tests {
 				Application.RequestStop ();
 				return false;
 			};
-			var token = Application.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
+
+			int iterations = 0;
+			object token = null;
+			Application.Iteration = () => {
+				if (token == null) {
+					// Timeout only must start at first iteration
+					token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
+				}
+				iterations++;
+				output.WriteLine ($"'Generic' iteration {iterations}");
+				// Stop if we run out of control...
+				if (iterations == 10) {
+					output.WriteLine ($"'Generic' had to be force quit!");
+					Application.RequestStop ();
+				}
+			};
 
 			Application.Top.KeyPressed += (object sender, KeyEventEventArgs args) => {
 				// See #2474 for why this is commented out
@@ -175,10 +172,7 @@ namespace UICatalog.Tests {
 			Application.Shutdown ();
 
 #if DEBUG_IDISPOSABLE
-			foreach (var inst in Responder.Instances) {
-				Assert.True (inst.WasDisposed);
-			}
-			Responder.Instances.Clear ();
+			Assert.Empty (Responder.Instances);
 #endif
 		}
 
