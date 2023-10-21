@@ -108,7 +108,7 @@ public static class EscSeqUtils {
 	/// Use Normal Screen Buffer and restore cursor as in DECRC, xterm.
 	/// resource.This combines the effects of the 1047 and 1048  modes.
 	/// </remarks>
-	public static readonly string CSI_RestoreCursorAndActivateAltBufferWithBackscroll = CSI + "?1049l";
+	public static readonly string CSI_RestoreCursorAndRestoreAltBufferWithBackscroll = CSI + "?1049l";
 
 	/// <summary>
 	/// Options for ANSI ESC "[xJ" - Clears part of the screen.

@@ -1694,7 +1694,7 @@ internal class WindowsDriver : ConsoleDriver {
 
 		if (!RunningUnitTests && _isWindowsTerminal) {
 			// Disable alternative screen buffer.
-			Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndActivateAltBufferWithBackscroll);
+			Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
 		}
 	}
 

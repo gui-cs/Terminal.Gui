@@ -700,7 +700,7 @@ internal class NetDriver : ConsoleDriver {
 			Console.ResetColor ();
 
 			//Disable alternative screen buffer.
-			Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndActivateAltBufferWithBackscroll);
+			Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
 
 			//Set cursor key to cursor.
 			Console.Out.Write (EscSeqUtils.CSI_ShowCursor);

@@ -139,7 +139,7 @@ namespace UICatalog.Tests {
 
 			int iterations = 0;
 			object token = null;
-			Application.Iteration = () => {
+			Application.Iteration += (s, a) => {
 				if (token == null) {
 					// Timeout only must start at first iteration
 					token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
