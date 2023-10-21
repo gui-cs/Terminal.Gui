@@ -628,32 +628,14 @@ internal class NetDriver : ConsoleDriver {
 	const int COLOR_BRIGHT_CYAN = 96;
 	const int COLOR_BRIGHT_WHITE = 97;
 
+	NetMainLoop _mainLoopDriver = null;
+
 	public override bool SupportsTrueColor => Environment.OSVersion.Platform == PlatformID.Unix || (IsWinPlatform && Environment.OSVersion.Version.Build >= 14931);
 
 	public NetWinVTConsole NetWinConsole { get; private set; }
 	public bool IsWinPlatform { get; private set; }
 
-	public override void End ()
-	{
-		if (IsWinPlatform) {
-			NetWinConsole?.Cleanup ();
-		}
-
-		StopReportingMouseMoves ();
-
-		if (!RunningUnitTests) {
-			Console.ResetColor ();
-
-			//Disable alternative screen buffer.
-			Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndActivateAltBufferWithBackscroll);
-
-			//Set cursor key to cursor.
-			Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
-			Console.Out.Close ();
-		}
-	}
-
-	public override void Init (Action terminalResized)
+	internal override MainLoop Init ()
 	{
 		var p = Environment.OSVersion.Platform;
 		if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
@@ -675,9 +657,6 @@ internal class NetDriver : ConsoleDriver {
 				Clipboard = new CursesClipboard ();
 			}
 		}
-
-		TerminalResized = terminalResized;
-
 
 		if (!RunningUnitTests) {
 			Console.TreatControlCAsInput = true;
@@ -703,6 +682,30 @@ internal class NetDriver : ConsoleDriver {
 		CurrentAttribute = new Attribute (Color.White, Color.Black);
 
 		StartReportingMouseMoves ();
+
+		_mainLoopDriver = new NetMainLoop (this);
+		_mainLoopDriver.ProcessInput = ProcessInput;
+		return new MainLoop (_mainLoopDriver);
+	}
+
+	internal override void End ()
+	{
+		if (IsWinPlatform) {
+			NetWinConsole?.Cleanup ();
+		}
+
+		StopReportingMouseMoves ();
+
+		if (!RunningUnitTests) {
+			Console.ResetColor ();
+
+			//Disable alternative screen buffer.
+			Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+
+			//Set cursor key to cursor.
+			Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
+			Console.Out.Close ();
+		}
 	}
 
 	public virtual void ResizeScreen ()
@@ -1106,25 +1109,6 @@ internal class NetDriver : ConsoleDriver {
 		return keyMod != Key.Null ? keyMod | key : key;
 	}
 
-	Action<KeyEvent> _keyHandler;
-	Action<KeyEvent> _keyDownHandler;
-	Action<KeyEvent> _keyUpHandler;
-	Action<MouseEvent> _mouseHandler;
-	NetMainLoop _mainLoop;
-
-	public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
-	{
-		_keyHandler = keyHandler;
-		_keyDownHandler = keyDownHandler;
-		_keyUpHandler = keyUpHandler;
-		_mouseHandler = mouseHandler;
-
-		_mainLoop = mainLoop.MainLoopDriver as NetMainLoop;
-
-		// Note: .Net API doesn't support keydown/up events and thus any passed keyDown/UpHandlers will be simulated to be called.
-		_mainLoop.ProcessInput = ProcessInput;
-	}
-
 	volatile bool _winSizeChanging;
 
 	void ProcessInput (NetEvents.InputResult inputEvent)
@@ -1141,16 +1125,16 @@ internal class NetDriver : ConsoleDriver {
 				return;
 			}
 			if (map == Key.Null) {
-				_keyDownHandler (new KeyEvent (map, _keyModifiers));
-				_keyUpHandler (new KeyEvent (map, _keyModifiers));
+				OnKeyDown (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
+				OnKeyUp (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
 			} else {
-				_keyDownHandler (new KeyEvent (map, _keyModifiers));
-				_keyHandler (new KeyEvent (map, _keyModifiers));
-				_keyUpHandler (new KeyEvent (map, _keyModifiers));
+				OnKeyDown (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
+				OnKeyUp (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
+				OnKeyPressed (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
 			}
 			break;
 		case NetEvents.EventType.Mouse:
-			_mouseHandler (ToDriverMouse (inputEvent.MouseEvent));
+			OnMouseEvent (new MouseEventEventArgs (ToDriverMouse (inputEvent.MouseEvent)));
 			break;
 		case NetEvents.EventType.WindowSize:
 			_winSizeChanging = true;
@@ -1161,7 +1145,7 @@ internal class NetDriver : ConsoleDriver {
 			ResizeScreen ();
 			ClearContents ();
 			_winSizeChanging = false;
-			TerminalResized?.Invoke ();
+			OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
 			break;
 		case NetEvents.EventType.RequestResponse:
 			// BUGBUG: What is this for? It does not seem to be used anywhere. 

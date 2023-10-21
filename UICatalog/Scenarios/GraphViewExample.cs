@@ -566,7 +566,7 @@ namespace UICatalog.Scenarios {
 			var series = new DiscoBarSeries ();
 			var bars = new List<BarSeriesBar> ();
 
-			Func<MainLoop, bool> genSample = (l) => {
+			Func<bool> genSample = () => {
 
 				bars.Clear ();
 				// generate an imaginary sample
@@ -582,7 +582,7 @@ namespace UICatalog.Scenarios {
 				return graphView.Series.Contains (series);
 			};
 
-			Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (250), genSample);
+			Application.AddTimeout (TimeSpan.FromMilliseconds (250), genSample);
 
 			series.Bars = bars;
 

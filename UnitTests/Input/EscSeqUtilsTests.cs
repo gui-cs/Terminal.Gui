@@ -519,14 +519,11 @@ namespace Terminal.Gui.InputTests {
 			Application.Top.Add (view);
 			Application.Begin (Application.Top);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 0,
-					Y = 0,
-					Flags = 0
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 0,
+				Y = 0,
+				Flags = 0
+			}));
 
 			ClearAll ();
 			cki = new ConsoleKeyInfo [] {
@@ -558,18 +555,15 @@ namespace Terminal.Gui.InputTests {
 			Assert.Equal (new Point (1, 2), pos);
 			Assert.False (isReq);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (actionStarted) {
 					// set Application.WantContinuousButtonPressedView to null
 					view.WantContinuousButtonPressed = false;
-					ReflectionTools.InvokePrivate (
-						typeof (Application),
-						"ProcessMouseEvent",
-						new MouseEvent () {
-							X = 0,
-							Y = 0,
-							Flags = 0
-						});
+					Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+						X = 0,
+						Y = 0,
+						Flags = 0
+					}));
 
 					Application.RequestStop ();
 				}

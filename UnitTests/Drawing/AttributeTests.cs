@@ -91,7 +91,7 @@ public class AttributeTests {
 	{
 		var driver = new FakeDriver ();
 		Application.Init (driver);
-		driver.Init (() => { });
+		driver.Init ();
 
 		// Test parameterless constructor
 		var attr = new Attribute ();
@@ -197,7 +197,7 @@ public class AttributeTests {
 	{
 		var driver = new FakeDriver ();
 		Application.Init (driver);
-		driver.Init (() => { });
+		driver.Init ();
 
 		var attr = new Attribute ();
 
@@ -238,7 +238,7 @@ public class AttributeTests {
 	{
 		var driver = new FakeDriver ();
 		Application.Init (driver);
-		driver.Init (() => { });
+		driver.Init ();
 
 		var fg = new Color ();
 		fg = new Color (Color.Red);

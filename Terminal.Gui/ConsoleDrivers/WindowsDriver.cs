@@ -18,12 +18,10 @@ using System.Text;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
-using System.Management;
 
 namespace Terminal.Gui;
 
@@ -780,18 +778,13 @@ internal class WindowsConsole {
 internal class WindowsDriver : ConsoleDriver {
 	WindowsConsole.ExtendedCharInfo [] _outputBuffer;
 	WindowsConsole.SmallRect _damageRegion;
-	Action<KeyEvent> _keyHandler;
-	Action<KeyEvent> _keyDownHandler;
-	Action<KeyEvent> _keyUpHandler;
-	Action<MouseEvent> _mouseHandler;
 
 	public WindowsConsole WinConsole { get; private set; }
 
-	public override bool SupportsTrueColor => RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931
-		&& (_isWindowsTerminal || _parentProcessName == "devenv"));
+	public override bool SupportsTrueColor => RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931 && _isWindowsTerminal);
 
 	readonly bool _isWindowsTerminal = false;
-	readonly string _parentProcessName = "WindowsTerminal";
+	WindowsMainLoop _mainLoopDriver = null;
 
 	public WindowsDriver ()
 	{
@@ -803,68 +796,59 @@ internal class WindowsDriver : ConsoleDriver {
 			Clipboard = new FakeDriver.FakeClipboard ();
 		}
 
-		if (!RunningUnitTests) {
-			_parentProcessName = GetParentProcessName ();
-			_isWindowsTerminal = _parentProcessName == "WindowsTerminal";
-			if (!_isWindowsTerminal && _parentProcessName != "devenv") {
-				Force16Colors = true;
-			}
+		// TODO: if some other Windows-based terminal supports true color, update this logic to not
+		// force 16color mode (.e.g ConEmu which really doesn't work well at all).
+		_isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") != null;
+		if (!_isWindowsTerminal) {
+			Force16Colors = true;
 		}
 	}
 
-	private static string GetParentProcessName ()
+	internal override MainLoop Init ()
 	{
-#pragma warning disable CA1416 // Validate platform compatibility
-		var myId = Process.GetCurrentProcess ().Id;
-		var query = string.Format ($"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {myId}");
-		var search = new ManagementObjectSearcher ("root\\CIMV2", query);
-		var queryObj = search.Get ().OfType<ManagementBaseObject> ().FirstOrDefault ();
-		if (queryObj == null) {
-			return null;
-		}
-		var parentId = (uint)queryObj ["ParentProcessId"];
-		var parent = Process.GetProcessById ((int)parentId);
-		var prevParent = parent;
-
-		// Check if the parent is from other parent
-		while (queryObj != null) {
-			query = string.Format ($"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {parentId}");
-			search = new ManagementObjectSearcher ("root\\CIMV2", query);
-			queryObj = search.Get ().OfType<ManagementBaseObject> ().FirstOrDefault ();
-			if (queryObj == null) {
-				return parent.ProcessName;
-			}
-			parentId = (uint)queryObj ["ParentProcessId"];
-			try {
-				parent = Process.GetProcessById ((int)parentId);
-				if (string.Equals (parent.ProcessName, "explorer", StringComparison.InvariantCultureIgnoreCase)) {
-					return prevParent.ProcessName;
-				}
-				prevParent = parent;
-			} catch (ArgumentException) {
-
-				return prevParent.ProcessName;
-			}
+		_mainLoopDriver = new WindowsMainLoop (this);
+		if (RunningUnitTests) {
+			return new MainLoop (_mainLoopDriver);
 		}
 
-		return parent.ProcessName;
-#pragma warning restore CA1416 // Validate platform compatibility
-	}
+		try {
+			if (WinConsole != null) {
+				// BUGBUG: The results from GetConsoleOutputWindow are incorrect when called from Init. 
+				// Our thread in WindowsMainLoop.CheckWin will get the correct results. See #if HACK_CHECK_WINCHANGED
+				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
+				Cols = winSize.Width;
+				Rows = winSize.Height;
+			}
+			WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
 
-	WindowsMainLoop _mainLoop;
+			if (_isWindowsTerminal) {
+				Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+			}
+		} catch (Win32Exception e) {
+			// We are being run in an environment that does not support a console
+			// such as a unit test, or a pipe.
+			Debug.WriteLine ($"Likely running unit tests. Setting WinConsole to null so we can test it elsewhere. Exception: {e}");
+			WinConsole = null;
+		}
 
-	public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
-	{
-		_keyHandler = keyHandler;
-		_keyDownHandler = keyDownHandler;
-		_keyUpHandler = keyUpHandler;
-		_mouseHandler = mouseHandler;
+		CurrentAttribute = new Attribute (Color.White, Color.Black);
 
-		_mainLoop = mainLoop.MainLoopDriver as WindowsMainLoop;
-		_mainLoop.ProcessInput = ProcessInput;
+		_outputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
+		Clip = new Rect (0, 0, Cols, Rows);
+		_damageRegion = new WindowsConsole.SmallRect () {
+			Top = 0,
+			Left = 0,
+			Bottom = (short)Rows,
+			Right = (short)Cols
+		};
+
+		ClearContents ();
+
 #if HACK_CHECK_WINCHANGED
-		_mainLoop.WinChanged = ChangeWin;
+		_mainLoopDriver.WinChanged = ChangeWin;
 #endif
+		return new MainLoop (_mainLoopDriver);
+
 	}
 
 #if HACK_CHECK_WINCHANGED
@@ -889,11 +873,20 @@ internal class WindowsDriver : ConsoleDriver {
 
 		ResizeScreen ();
 		ClearContents ();
-		TerminalResized.Invoke ();
+		OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
 	}
 #endif
 
-	void ProcessInput (WindowsConsole.InputRecord inputEvent)
+	// This is a bit hacky, but it enables users to hold down a key and 
+	// OnKeyDown, OnKeyPressed, OnKeyPressed, OnKeyUp
+	// It might be worth making OnKeyDown and OnKeyUp virtual so this can be tracked from those calls in case
+	// somoene calls them externally??
+	//
+	// It also is broken when modifiers keys are down too
+	//
+	//Key _keyDown = (Key)0xffffffff;
+	
+	internal void ProcessInput (WindowsConsole.InputRecord inputEvent)
 	{
 		switch (inputEvent.EventType) {
 		case WindowsConsole.EventType.Key:
@@ -971,19 +964,26 @@ internal class WindowsDriver : ConsoleDriver {
 				}
 
 				if (inputEvent.KeyEvent.bKeyDown) {
-					_keyDownHandler (key);
+					//_keyDown = key.Key;
+					OnKeyDown (new KeyEventEventArgs (key));
 				} else {
-					_keyUpHandler (key);
+					//_keyDown = (Key)0xffffffff;
+					OnKeyUp (new KeyEventEventArgs (key));
 				}
 			} else {
 				if (inputEvent.KeyEvent.bKeyDown) {
 					// May occurs using SendKeys
 					_keyModifiers ??= new KeyModifiers ();
-					// Key Down - Fire KeyDown Event and KeyStroke (ProcessKey) Event
-					_keyDownHandler (new KeyEvent (map, _keyModifiers));
-					_keyHandler (new KeyEvent (map, _keyModifiers));
+
+					//if (_keyDown == (Key)0xffffffff) {
+					       // Avoid sending repeat keydowns
+					//	_keyDown = map;
+						OnKeyDown (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
+					//}
+					OnKeyPressed (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
 				} else {
-					_keyUpHandler (new KeyEvent (map, _keyModifiers));
+					//_keyDown = (Key)0xffffffff;
+					OnKeyUp (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
 				}
 			}
 			if (!inputEvent.KeyEvent.bKeyDown && inputEvent.KeyEvent.dwControlKeyState == 0) {
@@ -993,14 +993,13 @@ internal class WindowsDriver : ConsoleDriver {
 
 		case WindowsConsole.EventType.Mouse:
 			var me = ToDriverMouse (inputEvent.MouseEvent);
-			_mouseHandler (me);
+			OnMouseEvent (new MouseEventEventArgs (me));
 			if (_processButtonClick) {
-				_mouseHandler (
-				    new MouseEvent () {
-					    X = me.X,
-					    Y = me.Y,
-					    Flags = ProcessButtonClick (inputEvent.MouseEvent)
-				    });
+				OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+					X = me.X,
+					Y = me.Y,
+					Flags = ProcessButtonClick (inputEvent.MouseEvent)
+				}));
 			}
 			break;
 
@@ -1258,7 +1257,7 @@ internal class WindowsDriver : ConsoleDriver {
 				break;
 			}
 			if (_isButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-				Application.MainLoop.Invoke (() => _mouseHandler (me));
+				Application.Invoke (() => OnMouseEvent (new MouseEventEventArgs (me)));
 			}
 		}
 	}
@@ -1505,57 +1504,6 @@ internal class WindowsDriver : ConsoleDriver {
 		return base.IsRuneSupported (rune) && rune.IsBmp;
 	}
 
-	public override void Init (Action terminalResized)
-	{
-		TerminalResized = terminalResized;
-
-		if (RunningUnitTests) {
-			return;
-		}
-
-		try {
-			if (WinConsole != null) {
-				// BUGBUG: The results from GetConsoleOutputWindow are incorrect when called from Init. 
-				// Our thread in WindowsMainLoop.CheckWin will get the correct results. See #if HACK_CHECK_WINCHANGED
-				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
-				Cols = winSize.Width;
-				Rows = winSize.Height;
-			}
-			WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
-
-			// Needed for Windows Terminal
-			// ESC [ ? 1047 h  Save cursor position and activate xterm alternative buffer (no backscroll)
-			// ESC [ ? 1047 l  Restore cursor position and restore xterm working buffer (with backscroll)
-			// ESC [ ? 1048 h  Save cursor position
-			// ESC [ ? 1048 l  Restore cursor position
-			// ESC [ ? 1049 h  Activate xterm alternative buffer (no backscroll)
-			// ESC [ ? 1049 l  Restore xterm working buffer (with backscroll)
-			// Per Issue #2264 using the alternative screen buffer is required for Windows Terminal to not 
-			// wipe out the backscroll buffer when the application exits.
-			if (_isWindowsTerminal) {
-				Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
-			}
-		} catch (Win32Exception e) {
-			// We are being run in an environment that does not support a console
-			// such as a unit test, or a pipe.
-			Debug.WriteLine ($"Likely running unit tests. Setting WinConsole to null so we can test it elsewhere. Exception: {e}");
-			WinConsole = null;
-		}
-
-		CurrentAttribute = new Attribute (Color.White, Color.Black);
-
-		_outputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
-		Clip = new Rect (0, 0, Cols, Rows);
-		_damageRegion = new WindowsConsole.SmallRect () {
-			Top = 0,
-			Left = 0,
-			Bottom = (short)Rows,
-			Right = (short)Cols
-		};
-
-		ClearContents ();
-	}
-
 	void ResizeScreen ()
 	{
 		_outputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
@@ -1573,7 +1521,7 @@ internal class WindowsDriver : ConsoleDriver {
 
 	public override void UpdateScreen ()
 	{
-		var windowSize = WinConsole?.GetConsoleBufferWindow (out _) ?? new Size (Cols, Rows);
+		var windowSize = WinConsole?.GetConsoleBufferWindow (out var _) ?? new Size (Cols, Rows);
 		if (!windowSize.IsEmpty && (windowSize.Width != Cols || windowSize.Height != Rows)) {
 			return;
 		}
@@ -1636,25 +1584,6 @@ internal class WindowsDriver : ConsoleDriver {
 		WinConsole?.SetInitialCursorVisibility ();
 		UpdateCursor ();
 	}
-
-	#region Color Handling
-
-	/// <summary>
-	/// In the WindowsDriver, colors are encoded as an int. 
-	/// The background color is stored in the least significant 4 bits, 
-	/// and the foreground color is stored in the next 4 bits. 
-	/// </summary>
-	public override Attribute MakeColor (Color foreground, Color background)
-	{
-		// Encode the colors into the int value.
-		return new Attribute (
-			platformColor: 0, // Not used anymore! (((int)foreground.ColorName) | ((int)background.ColorName << 4)),
-			foreground: foreground,
-			background: background
-		);
-	}
-
-	#endregion
 
 	CursorVisibility _cachedCursorVisibility;
 
@@ -1751,22 +1680,21 @@ internal class WindowsDriver : ConsoleDriver {
 		}
 	}
 
-	public override void End ()
+	internal override void End ()
 	{
-		if (_mainLoop != null) {
-			_mainLoop.ProcessInput -= ProcessInput;
+		if (_mainLoopDriver != null) {
 #if HACK_CHECK_WINCHANGED
 			//_mainLoop.WinChanged -= ChangeWin;
 #endif
 		}
-		_mainLoop = null;
+		_mainLoopDriver = null;
 
 		WinConsole?.Cleanup ();
 		WinConsole = null;
 
-		if (!RunningUnitTests && (_isWindowsTerminal || _parentProcessName == "devenv")) {
+		if (!RunningUnitTests && _isWindowsTerminal) {
 			// Disable alternative screen buffer.
-			Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndActivateAltBufferWithBackscroll);
+			Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
 		}
 	}
 
@@ -1796,11 +1724,6 @@ internal class WindowsMainLoop : IMainLoopDriver {
 
 	// The records that we keep fetching
 	readonly Queue<WindowsConsole.InputRecord []> _resultQueue = new Queue<WindowsConsole.InputRecord []> ();
-
-	/// <summary>
-	/// Invoked when a Key is pressed or released.
-	/// </summary>
-	public Action<WindowsConsole.InputRecord> ProcessInput;
 
 	/// <summary>
 	/// Invoked when the window is changed.
@@ -1879,7 +1802,7 @@ internal class WindowsMainLoop : IMainLoopDriver {
 	bool IMainLoopDriver.EventsPending ()
 	{
 		_waitForProbe.Set ();
-#if HACK_CHECK_WINCHANGED          
+#if HACK_CHECK_WINCHANGED
 		_winChange.Set ();
 #endif
 		if (_mainLoop.CheckTimersAndIdleHandlers (out var waitTimeout)) {
@@ -1916,8 +1839,7 @@ internal class WindowsMainLoop : IMainLoopDriver {
 		while (_resultQueue.Count > 0) {
 			var inputRecords = _resultQueue.Dequeue ();
 			if (inputRecords is { Length: > 0 }) {
-				var inputEvent = inputRecords [0];
-				ProcessInput?.Invoke (inputEvent);
+				((WindowsDriver)_consoleDriver).ProcessInput (inputRecords [0]);
 			}
 		}
 #if HACK_CHECK_WINCHANGED

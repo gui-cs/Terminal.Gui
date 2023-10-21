@@ -57,17 +57,17 @@ public class FakeDriver : ConsoleDriver {
 		}
 	}
 
-	public override void End ()
+	internal override void End ()
 	{
 		FakeConsole.ResetColor ();
 		FakeConsole.Clear ();
 	}
 
-	public override void Init (Action terminalResized)
+	FakeMainLoop _mainLoopDriver = null;
+
+	internal override MainLoop Init ()
 	{
 		FakeConsole.MockKeyPresses.Clear ();
-
-		TerminalResized = terminalResized;
 
 		Cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
 		Rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
@@ -75,6 +75,10 @@ public class FakeDriver : ConsoleDriver {
 		ResizeScreen ();
 		CurrentAttribute = new Attribute (Color.White, Color.Black);
 		ClearContents ();
+		
+		_mainLoopDriver = new FakeMainLoop (this);
+		_mainLoopDriver.KeyPressed = ProcessInput;
+		return new MainLoop (_mainLoopDriver);
 	}
 
 
@@ -341,20 +345,8 @@ public class FakeDriver : ConsoleDriver {
 		return keyMod != Key.Null ? keyMod | key : key;
 	}
 
-	Action<KeyEvent> _keyDownHandler;
-	Action<KeyEvent> _keyHandler;
-	Action<KeyEvent> _keyUpHandler;
 	private CursorVisibility _savedCursorVisibility;
 
-	public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
-	{
-		_keyDownHandler = keyDownHandler;
-		_keyHandler = keyHandler;
-		_keyUpHandler = keyUpHandler;
-
-		// Note: Net doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
-		(mainLoop.MainLoopDriver as FakeMainLoop).KeyPressed = (consoleKey) => ProcessInput (consoleKey);
-	}
 
 	void ProcessInput (ConsoleKeyInfo consoleKey)
 	{
@@ -374,15 +366,15 @@ public class FakeDriver : ConsoleDriver {
 		var map = MapKey (consoleKey);
 		if (map == (Key)0xffffffff) {
 			if ((consoleKey.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				_keyDownHandler (new KeyEvent (map, keyModifiers));
-				_keyUpHandler (new KeyEvent (map, keyModifiers));
+				OnKeyDown(new KeyEventEventArgs(new KeyEvent (map, keyModifiers)));
+				OnKeyUp (new KeyEventEventArgs (new KeyEvent (map, keyModifiers)));
 			}
 			return;
 		}
 
-		_keyDownHandler (new KeyEvent (map, keyModifiers));
-		_keyHandler (new KeyEvent (map, keyModifiers));
-		_keyUpHandler (new KeyEvent (map, keyModifiers));
+		OnKeyDown (new KeyEventEventArgs (new KeyEvent (map, keyModifiers)));
+		OnKeyUp (new KeyEventEventArgs (new KeyEvent (map, keyModifiers)));
+		OnKeyPressed (new KeyEventEventArgs (new KeyEvent (map, keyModifiers)));
 	}
 
 	/// <inheritdoc/>
@@ -454,7 +446,7 @@ public class FakeDriver : ConsoleDriver {
 	{
 		ResizeScreen ();
 		ClearContents ();
-		TerminalResized?.Invoke ();
+		OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
 	}
 
 	public virtual void ResizeScreen ()

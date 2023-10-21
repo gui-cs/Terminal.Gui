@@ -145,7 +145,7 @@ namespace Terminal.Gui {
 				X = Pos.Function (CalculateOkButtonPosX)
 			};
 			this.btnOk.Clicked += (s, e) => this.Accept (true);
-			this.btnOk.KeyPress += (s, k) => {
+			this.btnOk.KeyPressed += (s, k) => {
 				this.NavigateIf (k, Key.CursorLeft, this.btnCancel);
 				this.NavigateIf (k, Key.CursorUp, this.tableView);
 			};
@@ -154,7 +154,7 @@ namespace Terminal.Gui {
 				Y = Pos.AnchorEnd (1),
 				X = Pos.Right (btnOk) + 1
 			};
-			this.btnCancel.KeyPress += (s, k) => {
+			this.btnCancel.KeyPressed += (s, k) => {
 				this.NavigateIf (k, Key.CursorLeft, this.btnToggleSplitterCollapse);
 				this.NavigateIf (k, Key.CursorUp, this.tableView);
 				this.NavigateIf (k, Key.CursorRight, this.btnOk);
@@ -179,7 +179,7 @@ namespace Terminal.Gui {
 				Width = Dim.Fill (0),
 				CaptionColor = new Color (Color.Black)
 			};
-			this.tbPath.KeyPress += (s, k) => {
+			this.tbPath.KeyPressed += (s, k) => {
 
 				ClearFeedback ();
 
@@ -228,7 +228,7 @@ namespace Terminal.Gui {
 			typeStyle.MinWidth = 6;
 			typeStyle.ColorGetter = this.ColorGetter;
 
-			this.tableView.KeyPress += (s, k) => {
+			this.tableView.KeyPressed += (s, k) => {
 				if (this.tableView.SelectedRow <= 0) {
 					this.NavigateIf (k, Key.CursorUp, this.tbPath);
 				}
@@ -285,7 +285,7 @@ namespace Terminal.Gui {
 			};
 
 			tbFind.TextChanged += (s, o) => RestartSearch ();
-			tbFind.KeyPress += (s, o) => {
+			tbFind.KeyPressed += (s, o) => {
 				if (o.KeyEvent.Key == Key.Enter) {
 					RestartSearch ();
 					o.Handled = true;
@@ -1438,7 +1438,7 @@ namespace Terminal.Gui {
 						UpdateChildrenToFound ();
 					}
 
-					Application.MainLoop.Invoke (() => {
+					Application.Invoke (() => {
 						Parent.spinnerView.Visible = false;
 					});
 				}
@@ -1450,7 +1450,7 @@ namespace Terminal.Gui {
 					Children = found.ToArray ();
 				}
 
-				Application.MainLoop.Invoke (() => {
+				Application.Invoke (() => {
 					Parent.tbPath.Autocomplete.GenerateSuggestions (
 						new AutocompleteFilepathContext (Parent.tbPath.Text, Parent.tbPath.CursorPosition, this)
 						);

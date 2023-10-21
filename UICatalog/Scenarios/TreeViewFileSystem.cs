@@ -95,7 +95,7 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (_detailsFrame);
 			treeViewFiles.MouseClick += TreeViewFiles_MouseClick;
-			treeViewFiles.KeyPress += TreeViewFiles_KeyPress;
+			treeViewFiles.KeyPressed += TreeViewFiles_KeyPress;
 			treeViewFiles.SelectionChanged += TreeViewFiles_SelectionChanged;
 
 			SetupFileTree ();
@@ -206,7 +206,7 @@ namespace UICatalog.Scenarios {
 
 			menu.MenuItems = new MenuBarItem (new [] { new MenuItem ("Properties", null, () => ShowPropertiesOf (forObject)) });
 
-			Application.MainLoop.Invoke (menu.Show);
+			Application.Invoke (menu.Show);
 		}
 
 		class DetailsFrame : FrameView {

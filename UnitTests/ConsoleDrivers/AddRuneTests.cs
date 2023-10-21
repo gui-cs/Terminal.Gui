@@ -20,7 +20,7 @@ public class AddRuneTests {
 
 		var driver = new FakeDriver ();
 		Application.Init (driver);
-		driver.Init (() => { });
+		driver.Init ();
 
 		driver.AddRune (new Rune ('a'));
 		Assert.Equal ((Rune)'a', driver.Contents [0, 0].Runes [0]);
@@ -34,7 +34,7 @@ public class AddRuneTests {
 	{
 		var driver = new FakeDriver ();
 		Application.Init (driver);
-		driver.Init (() => { });
+		driver.Init ();
 
 		driver.Move (driver.Cols, driver.Rows);
 		driver.AddRune ('a');
@@ -54,7 +54,7 @@ public class AddRuneTests {
 	{
 		var driver = new FakeDriver ();
 		Application.Init (driver);
-		driver.Init (() => { });
+		driver.Init ();
 
 		driver.AddRune ('a');
 		Assert.Equal ((Rune)'a', driver.Contents [0, 0].Runes [0]);
@@ -95,7 +95,7 @@ public class AddRuneTests {
 	{
 		var driver = new FakeDriver ();
 		Application.Init (driver);
-		driver.Init (() => { });
+		driver.Init ();
 
 		// 🍕 Slice of Pizza "\U0001F355"
 		var operationStatus = Rune.DecodeFromUtf16 ("\U0001F355", out Rune rune, out int charsConsumed);
@@ -143,7 +143,7 @@ public class AddRuneTests {
 	{
 		var driver = new FakeDriver ();
 		Application.Init (driver);
-		driver.Init (() => { });
+		driver.Init ();
 
 		var expected = new Rune ('ắ');
 

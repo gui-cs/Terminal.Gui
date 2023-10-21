@@ -337,6 +337,7 @@ public class Slider<T> : View {
 	/// </summary>
 	/// <param name="args"></param>
 	/// <returns><see langword="true"/> if the focus change was cancelled.</returns>
+	/// <param name="newFocusedOption"></param>
 	public virtual bool OnOptionFocused (int newFocusedOption, SliderEventArgs<T> args)
 	{
 		if (newFocusedOption > _options.Count - 1 || newFocusedOption < 0) {
