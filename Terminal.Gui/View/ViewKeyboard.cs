@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 
 namespace Terminal.Gui {
-	public partial class View  {
+	public partial class View {
 		ShortcutHelper _shortcutHelper;
 
 		/// <summary>
@@ -159,11 +159,6 @@ namespace Terminal.Gui {
 		}
 
 		int _oldTabIndex;
-		
-		/// <summary>
-		/// Invoked when a character key is pressed and occurs after the key up event.
-		/// </summary>
-		public event EventHandler<KeyEventArgs> KeyPressed;
 
 		/// <inheritdoc/>
 		public override bool OnKeyPressed (KeyEventArgs keyEvent)
@@ -172,18 +167,15 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			KeyPressed?.Invoke (this, keyEvent);
-			if (keyEvent.Handled) {
+			if (base.OnKeyPressed (keyEvent)) {
 				return true;
 			}
-			if (Focused?.Enabled == true) {
-				Focused?.KeyPressed?.Invoke (this, keyEvent);
-				if (keyEvent.Handled) {
-					return true;
-				}
+
+			if (Focused?.OnKeyPressed (keyEvent) == true) {
+				return true;
 			}
 
-			return Focused?.Enabled == true && Focused?.OnKeyPressed (keyEvent) == true;
+			return false;
 		}
 
 		/// <summary>
@@ -347,19 +339,18 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (MostFocused?.Enabled == true) {
-				MostFocused?.KeyPressed?.Invoke (this, keyEvent);
-				if (keyEvent.Handled)
+			if (MostFocused?.OnKeyPressed (keyEvent) == true) {
+				return true;
+			}
+
+			if (_subviews == null || _subviews.Count == 0) {
+				return false;
+			}
+
+			foreach (var view in _subviews) {
+				if (view.OnHotKeyPressed (keyEvent))
 					return true;
 			}
-			if (MostFocused?.Enabled == true && MostFocused?.OnKeyPressed (keyEvent) == true)
-				return true;
-			if (_subviews == null || _subviews.Count == 0)
-				return false;
-
-			foreach (var view in _subviews)
-				if (view.Enabled && view.OnHotKeyPressed (keyEvent))
-					return true;
 			return false;
 		}
 
@@ -370,22 +361,24 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			KeyPressed?.Invoke (this, keyEvent);
-			if (keyEvent.Handled)
+			if (OnKeyPressed (keyEvent)) {
 				return true;
-			if (MostFocused?.Enabled == true) {
-				MostFocused?.KeyPressed?.Invoke (this, keyEvent);
-				if (keyEvent.Handled)
-					return true;
 			}
-			if (MostFocused?.Enabled == true && MostFocused?.OnKeyPressed (keyEvent) == true)
-				return true;
-			if (_subviews == null || _subviews.Count == 0)
-				return false;
 
-			foreach (var view in _subviews)
-				if (view.Enabled && view.OnColdKey (keyEvent))
+			if (MostFocused?.OnKeyPressed (keyEvent) == true) {
+				return true;
+
+			}
+
+			if (_subviews == null || _subviews.Count == 0) {
+				return false;
+			}
+
+			foreach (var view in _subviews) {
+				if (view.OnColdKey (keyEvent)) {
 					return true;
+				}
+			}
 			return false;
 		}
 
@@ -446,7 +439,7 @@ namespace Terminal.Gui {
 
 			return false;
 		}
-		
+
 		void SetHotKey ()
 		{
 			if (TextFormatter == null) {
