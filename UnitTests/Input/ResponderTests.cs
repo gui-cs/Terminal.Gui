@@ -23,8 +23,8 @@ namespace Terminal.Gui.InputTests {
 		{
 			var r = new Responder ();
 
-			Assert.False (r.ProcessKey (new KeyEventArgs () { Key = Key.Unknown }));
-			Assert.False (r.ProcessHotKey (new KeyEventArgs () { Key = Key.Unknown }));
+			Assert.False (r.OnKeyPressed (new KeyEventArgs () { Key = Key.Unknown }));
+			Assert.False (r.OnHotKeyPressed (new KeyEventArgs () { Key = Key.Unknown }));
 			Assert.False (r.ProcessColdKey (new KeyEventArgs () { Key = Key.Unknown }));
 			Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
 			Assert.False (r.OnKeyUp (new KeyEventArgs () { Key = Key.Unknown }));

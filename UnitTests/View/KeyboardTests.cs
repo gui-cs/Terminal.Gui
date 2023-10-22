@@ -112,7 +112,7 @@ namespace Terminal.Gui.ViewTests {
 				return true;
 			}
 
-			public override bool ProcessKey (KeyEventArgs keyEvent)
+			public override bool OnKeyPressed (KeyEventArgs keyEvent)
 			{
 				IsKeyPress = true;
 				return true;

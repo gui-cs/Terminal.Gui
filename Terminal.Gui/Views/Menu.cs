@@ -731,7 +731,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		public override bool ProcessHotKey (KeyEventArgs keyEvent)
+		public override bool OnHotKeyPressed (KeyEventArgs keyEvent)
 		{
 			// To ncurses simulate a AltMask key pressing Alt+Space because
 			// it can't detect an alone special key down was pressed.
@@ -743,7 +743,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		public override bool ProcessKey (KeyEventArgs kb)
+		public override bool OnKeyPressed (KeyEventArgs kb)
 		{
 			var result = InvokeKeybindings (kb);
 			if (result != null)
@@ -763,7 +763,7 @@ namespace Terminal.Gui {
 					}
 				}
 			}
-			return host.ProcessHotKey (kb);
+			return host.OnHotKeyPressed (kb);
 		}
 
 		void RunSelected ()
@@ -1931,7 +1931,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessHotKey (KeyEventArgs kb)
+		public override bool OnHotKeyPressed (KeyEventArgs kb)
 		{
 			if (kb.Key == Key) {
 				if (Visible && !IsMenuOpen) {
@@ -1953,11 +1953,11 @@ namespace Terminal.Gui {
 			}
 			//var kc = kb.KeyValue;
 
-			return base.ProcessHotKey (kb);
+			return base.OnHotKeyPressed (kb);
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessKey (KeyEventArgs kb)
+		public override bool OnKeyPressed (KeyEventArgs kb)
 		{
 			if (InvokeKeybindings (kb) == true)
 				return true;

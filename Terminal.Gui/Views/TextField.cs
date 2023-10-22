@@ -637,7 +637,7 @@ namespace Terminal.Gui {
 		///    </item>
 		/// </list>
 		/// </remarks>
-		public override bool ProcessKey (KeyEventArgs kb)
+		public override bool OnKeyPressed (KeyEventArgs kb)
 		{
 			// remember current cursor position
 			// because the new calculated cursor position is needed to be set BEFORE the change event is triggest

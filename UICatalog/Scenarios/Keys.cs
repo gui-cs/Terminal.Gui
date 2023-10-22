@@ -12,16 +12,16 @@ namespace UICatalog.Scenarios {
 			public List<string> _processHotKeyList = new List<string> ();
 			public List<string> _processColdKeyList = new List<string> ();
 
-			public override bool ProcessKey (KeyEventArgs keyEvent)
+			public override bool OnKeyPressed (KeyEventArgs keyEvent)
 			{
 				_processKeyList.Add (keyEvent.ToString ());
-				return base.ProcessKey (keyEvent);
+				return base.OnKeyPressed (keyEvent);
 			}
 
-			public override bool ProcessHotKey (KeyEventArgs keyEvent)
+			public override bool OnHotKeyPressed (KeyEventArgs keyEvent)
 			{
 				_processHotKeyList.Add (keyEvent.ToString ());
-				return base.ProcessHotKey (keyEvent);
+				return base.OnHotKeyPressed (keyEvent);
 			}
 
 			public override bool ProcessColdKey (KeyEventArgs keyEvent)

@@ -3401,7 +3401,7 @@ namespace Terminal.Gui {
 		bool _shiftSelecting;
 
 		///<inheritdoc/>
-		public override bool ProcessKey (KeyEventArgs kb)
+		public override bool OnKeyPressed (KeyEventArgs kb)
 		{
 			if (!CanFocus) {
 				return true;

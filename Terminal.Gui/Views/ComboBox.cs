@@ -545,13 +545,13 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessKey (KeyEventArgs e)
+		public override bool OnKeyPressed (KeyEventArgs e)
 		{
 			var result = InvokeKeybindings (e);
 			if (result != null)
 				return (bool)result;
 
-			return base.ProcessKey (e);
+			return base.OnKeyPressed (e);
 		}
 
 		bool UnixEmulation ()

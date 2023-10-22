@@ -191,7 +191,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessHotKey (KeyEventArgs kb)
+		public override bool OnHotKeyPressed (KeyEventArgs kb)
 		{
 			if (!Enabled) {
 				return false;
@@ -211,7 +211,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessKey (KeyEventArgs kb)
+		public override bool OnKeyPressed (KeyEventArgs kb)
 		{
 			if (!Enabled) {
 				return false;
@@ -221,7 +221,7 @@ namespace Terminal.Gui {
 			if (result != null)
 				return (bool)result;
 
-			return base.ProcessKey (kb);
+			return base.OnKeyPressed (kb);
 		}
 
 		bool ExecuteHotKey (KeyEventArgs ke)

@@ -101,7 +101,7 @@ namespace UICatalog.Scenarios {
 				if (_outputStarted && _keyboardStrokes.Count > 0) {
 					var ev = ShortcutHelper.GetModifiersKey (e);
 					//System.Diagnostics.Debug.WriteLine ($"Output - KeyPress: {ev}");
-					if (!tvOutput.ProcessKey (e)) {
+					if (!tvOutput.OnKeyPressed (e)) {
 						Application.Invoke (() => {
 							MessageBox.Query ("Keys", $"'{ShortcutHelper.GetShortcutTag (ev)}' pressed!", "Ok");
 						});

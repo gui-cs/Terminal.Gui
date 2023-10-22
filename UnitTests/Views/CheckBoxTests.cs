@@ -68,17 +68,17 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (Key.Null, ckb.HotKey);
 			ckb.Text = "Test";
 			Assert.Equal (Key.T, ckb.HotKey);
-			Assert.False (ckb.ProcessHotKey (new (Key.T, new KeyModifiers ())));
+			Assert.False (ckb.OnHotKeyPressed (new (Key.T, new KeyModifiers ())));
 			Assert.False (isChecked);
 			ckb.Text = "T_est";
 			Assert.Equal (Key.E, ckb.HotKey);
-			Assert.True (ckb.ProcessHotKey (new (Key.E | Key.AltMask, new KeyModifiers () { Alt = true })));
+			Assert.True (ckb.OnHotKeyPressed (new (Key.E | Key.AltMask, new KeyModifiers () { Alt = true })));
 			Assert.True (isChecked);
 			isChecked = false;
-			Assert.True (ckb.ProcessKey (new ((Key)' ', new KeyModifiers ())));
+			Assert.True (ckb.OnKeyPressed (new ((Key)' ', new KeyModifiers ())));
 			Assert.True (isChecked);
 			isChecked = false;
-			Assert.True (ckb.ProcessKey (new (Key.Space, new KeyModifiers ())));
+			Assert.True (ckb.OnKeyPressed (new (Key.Space, new KeyModifiers ())));
 			Assert.True (isChecked);
 			Assert.True (ckb.AutoSize);
 
@@ -495,20 +495,20 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Begin (top);
 
 			Assert.False (checkBox.Checked);
-			Assert.True (checkBox.ProcessKey (new (Key.Space, new KeyModifiers ())));
+			Assert.True (checkBox.OnKeyPressed (new (Key.Space, new KeyModifiers ())));
 			Assert.True (checkBox.Checked);
 			Assert.True (checkBox.MouseEvent (new MouseEvent () { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
 			Assert.False (checkBox.Checked);
 
 			checkBox.AllowNullChecked = true;
-			Assert.True (checkBox.ProcessKey (new (Key.Space, new KeyModifiers ())));
+			Assert.True (checkBox.OnKeyPressed (new (Key.Space, new KeyModifiers ())));
 			Assert.Null (checkBox.Checked);
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@$"
 {CM.Glyphs.NullChecked} Check this out 你", output);
 			Assert.True (checkBox.MouseEvent (new MouseEvent () { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
 			Assert.True (checkBox.Checked);
-			Assert.True (checkBox.ProcessKey (new (Key.Space, new KeyModifiers ())));
+			Assert.True (checkBox.OnKeyPressed (new (Key.Space, new KeyModifiers ())));
 			Assert.False (checkBox.Checked);
 			Assert.True (checkBox.MouseEvent (new MouseEvent () { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
 			Assert.Null (checkBox.Checked);

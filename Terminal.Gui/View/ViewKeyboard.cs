@@ -166,7 +166,7 @@ namespace Terminal.Gui {
 		public event EventHandler<KeyEventArgs> KeyPressed;
 
 		/// <inheritdoc/>
-		public override bool ProcessKey (KeyEventArgs keyEvent)
+		public override bool OnKeyPressed (KeyEventArgs keyEvent)
 		{
 			if (!Enabled) {
 				return false;
@@ -181,7 +181,7 @@ namespace Terminal.Gui {
 					return true;
 			}
 
-			return Focused?.Enabled == true && Focused?.ProcessKey (keyEvent) == true;
+			return Focused?.Enabled == true && Focused?.OnKeyPressed (keyEvent) == true;
 		}
 
 		/// <summary>
@@ -339,7 +339,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override bool ProcessHotKey (KeyEventArgs keyEvent)
+		public override bool OnHotKeyPressed (KeyEventArgs keyEvent)
 		{
 			if (!Enabled) {
 				return false;
@@ -350,13 +350,13 @@ namespace Terminal.Gui {
 				if (keyEvent.Handled)
 					return true;
 			}
-			if (MostFocused?.Enabled == true && MostFocused?.ProcessKey (keyEvent) == true)
+			if (MostFocused?.Enabled == true && MostFocused?.OnKeyPressed (keyEvent) == true)
 				return true;
 			if (_subviews == null || _subviews.Count == 0)
 				return false;
 
 			foreach (var view in _subviews)
-				if (view.Enabled && view.ProcessHotKey (keyEvent))
+				if (view.Enabled && view.OnHotKeyPressed (keyEvent))
 					return true;
 			return false;
 		}
@@ -376,7 +376,7 @@ namespace Terminal.Gui {
 				if (keyEvent.Handled)
 					return true;
 			}
-			if (MostFocused?.Enabled == true && MostFocused?.ProcessKey (keyEvent) == true)
+			if (MostFocused?.Enabled == true && MostFocused?.OnKeyPressed (keyEvent) == true)
 				return true;
 			if (_subviews == null || _subviews.Count == 0)
 				return false;

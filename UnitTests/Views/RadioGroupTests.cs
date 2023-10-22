@@ -66,7 +66,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var rg = new RadioGroup (new string [] { "Test" }, -1);
 			Assert.Equal (-1, rg.SelectedItem);
-			Assert.True (rg.ProcessKey (new (Key.Space, new KeyModifiers ())));
+			Assert.True (rg.OnKeyPressed (new (Key.Space, new KeyModifiers ())));
 			Assert.Equal (0, rg.SelectedItem);
 		}
 
@@ -164,11 +164,11 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var rg = new RadioGroup (new string [] { "Test", "New Test" });
 
-			Assert.True (rg.ProcessKey (new (Key.CursorUp, new KeyModifiers ())));
-			Assert.True (rg.ProcessKey (new (Key.CursorDown, new KeyModifiers ())));
-			Assert.True (rg.ProcessKey (new (Key.Home, new KeyModifiers ())));
-			Assert.True (rg.ProcessKey (new (Key.End, new KeyModifiers ())));
-			Assert.True (rg.ProcessKey (new (Key.Space, new KeyModifiers ())));
+			Assert.True (rg.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ())));
+			Assert.True (rg.OnKeyPressed (new (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (rg.OnKeyPressed (new (Key.Home, new KeyModifiers ())));
+			Assert.True (rg.OnKeyPressed (new (Key.End, new KeyModifiers ())));
+			Assert.True (rg.OnKeyPressed (new (Key.Space, new KeyModifiers ())));
 			Assert.Equal (1, rg.SelectedItem);
 		}
 

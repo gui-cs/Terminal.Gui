@@ -36,7 +36,7 @@ public class KeyEventArgs : EventArgs {
 	/// <summary>
 	/// Symbolic definition for the key.
 	/// </summary>
-	public Key Key;
+	public Key Key { get; set; }
 
 	/// <summary>
 	///   The key value cast to an integer, you will typical use this for

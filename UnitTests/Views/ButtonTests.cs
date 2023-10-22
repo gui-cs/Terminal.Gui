@@ -76,9 +76,9 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Begin (Application.Top);
 
 			Assert.Equal (Key.T, btn.HotKey);
-			Assert.False (btn.ProcessHotKey (new (Key.T, new KeyModifiers ())));
+			Assert.False (btn.OnHotKeyPressed (new (Key.T, new KeyModifiers ())));
 			Assert.False (clicked);
-			Assert.True (btn.ProcessHotKey (new (Key.T | Key.AltMask, new KeyModifiers () { Alt = true })));
+			Assert.True (btn.OnHotKeyPressed (new (Key.T | Key.AltMask, new KeyModifiers () { Alt = true })));
 			Assert.True (clicked);
 			clicked = false;
 			Assert.False (btn.IsDefault);
@@ -91,20 +91,20 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (btn.ProcessColdKey (new (Key.AltMask | Key.T, new KeyModifiers ())));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (btn.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKey (new (Key.Space, new KeyModifiers ())));
+			Assert.True (btn.OnKeyPressed (new (Key.Space, new KeyModifiers ())));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKey (new ((Key)'t', new KeyModifiers ())));
+			Assert.True (btn.OnKeyPressed (new ((Key)'t', new KeyModifiers ())));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKey (new (Key.Space | btn.HotKey, new KeyModifiers ())));
+			Assert.True (btn.OnKeyPressed (new (Key.Space | btn.HotKey, new KeyModifiers ())));
 			Assert.True (clicked);
 			btn.Text = "Te_st";
 			clicked = false;
-			Assert.True (btn.ProcessKey (new (Key.Space | btn.HotKey, new KeyModifiers ())));
+			Assert.True (btn.OnKeyPressed (new (Key.Space | btn.HotKey, new KeyModifiers ())));
 			Assert.True (clicked);
 		}
 
@@ -119,14 +119,14 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Begin (Application.Top);
 
 			Assert.Equal (Key.T, btn.HotKey);
-			Assert.False (btn.ProcessHotKey (new (Key.T, new KeyModifiers ())));
+			Assert.False (btn.OnHotKeyPressed (new (Key.T, new KeyModifiers ())));
 			Assert.False (clicked);
-			Assert.True (btn.ProcessHotKey (new (Key.T | Key.AltMask, new KeyModifiers () { Alt = true })));
+			Assert.True (btn.OnHotKeyPressed (new (Key.T | Key.AltMask, new KeyModifiers () { Alt = true })));
 			Assert.True (clicked);
 			clicked = false;
 
 			btn.HotKey = Key.E;
-			Assert.True (btn.ProcessHotKey (new (Key.E | Key.AltMask, new KeyModifiers () { Alt = true })));
+			Assert.True (btn.OnHotKeyPressed (new (Key.E | Key.AltMask, new KeyModifiers () { Alt = true })));
 			Assert.True (clicked);
 		}
 

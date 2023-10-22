@@ -191,12 +191,12 @@ namespace Terminal.Gui.ViewsTests {
 			top.Add (lbl);
 			Application.Begin (top);
 
-			Assert.True (lbl.ProcessKey (new (cm.Key, new KeyModifiers ())));
+			Assert.True (lbl.OnKeyPressed (new (cm.Key, new KeyModifiers ())));
 			Assert.Equal ("Replaced", lbl.Text);
 
 			lbl.Text = "Original";
 			cm.Key = Key.Space | Key.CtrlMask;
-			Assert.True (lbl.ProcessKey (new (cm.Key, new KeyModifiers ())));
+			Assert.True (lbl.OnKeyPressed (new (cm.Key, new KeyModifiers ())));
 			Assert.Equal ("Replaced", lbl.Text);
 		}
 
@@ -530,7 +530,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (ContextMenu.IsShow);
 			Assert.Equal (cm.MenuBar, Application.MouseGrabView);
 			Assert.False (menu.IsMenuOpen);
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			Assert.False (ContextMenu.IsShow);
 			Assert.Equal (menu, Application.MouseGrabView);
 			Assert.True (menu.IsMenuOpen);
@@ -902,9 +902,9 @@ namespace Terminal.Gui.ViewsTests {
 			top.Add (tf);
 			Application.Begin (top);
 
-			Assert.True (tf.ProcessKey (new (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tf.OnKeyPressed (new (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
 			Assert.True (tf.ContextMenu.MenuBar.IsMenuOpen);
-			Assert.True (top.Subviews [1].ProcessKey (new (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (top.Subviews [1].OnKeyPressed (new (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Null (tf.ContextMenu.MenuBar);
 		}
 

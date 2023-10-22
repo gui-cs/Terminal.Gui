@@ -168,17 +168,17 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessKey (KeyEventArgs kb)
+		public override bool OnKeyPressed (KeyEventArgs kb)
 		{
 			var result = InvokeKeybindings (kb);
 			if (result != null)
 				return (bool)result;
 
-			return base.ProcessKey (kb);
+			return base.OnKeyPressed (kb);
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessHotKey (KeyEventArgs kb)
+		public override bool OnHotKeyPressed (KeyEventArgs kb)
 		{
 			if (kb.Key == (Key.AltMask | HotKey))
 				return ToggleChecked ();

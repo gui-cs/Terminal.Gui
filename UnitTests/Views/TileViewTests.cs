@@ -28,7 +28,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Keyboard movement on splitter should have no effect if it is not focused
-			line.ProcessKey (new (Key.CursorRight, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
@@ -49,7 +49,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Keyboard movement on splitter should have no effect if it is not focused
-			line.ProcessKey (new (Key.CursorRight, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
@@ -59,7 +59,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTileView_Vertical_Focused ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			tileView.ProcessHotKey (new (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.OnHotKeyPressed (new (tileView.ToggleResizable, new KeyModifiers ()));
 
 			tileView.Draw ();
 
@@ -71,7 +71,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Now while focused move the splitter 1 unit right
-			line.ProcessKey (new (Key.CursorRight, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
 			tileView.Draw ();
 
 			looksLike =
@@ -82,8 +82,8 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// and 2 to the left
-			line.ProcessKey (new (Key.CursorLeft, new KeyModifiers ()));
-			line.ProcessKey (new (Key.CursorLeft, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
 			tileView.Draw ();
 
 			looksLike =
@@ -98,7 +98,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTileView_Vertical_Focused_WithBorder ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			tileView.ProcessHotKey (new (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.OnHotKeyPressed (new (tileView.ToggleResizable, new KeyModifiers ()));
 
 			tileView.Draw ();
 
@@ -110,7 +110,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Now while focused move the splitter 1 unit right
-			line.ProcessKey (new (Key.CursorRight, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
 			tileView.Draw ();
 
 			looksLike =
@@ -121,8 +121,8 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// and 2 to the left
-			line.ProcessKey (new (Key.CursorLeft, new KeyModifiers ()));
-			line.ProcessKey (new (Key.CursorLeft, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
 			tileView.Draw ();
 
 			looksLike =
@@ -139,7 +139,7 @@ namespace Terminal.Gui.ViewsTests {
 			var tileView = Get11By3TileView (out var line);
 			tileView.SetSplitterPos (0, Pos.Percent (50));
 			Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
-			tileView.ProcessHotKey (new (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.OnHotKeyPressed (new (tileView.ToggleResizable, new KeyModifiers ()));
 
 			tileView.Draw ();
 
@@ -151,7 +151,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Now while focused move the splitter 1 unit right
-			line.ProcessKey (new (Key.CursorRight, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
 			tileView.Draw ();
 
 			looksLike =
@@ -165,8 +165,8 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
 
 			// and 2 to the left
-			line.ProcessKey (new (Key.CursorLeft, new KeyModifiers ()));
-			line.ProcessKey (new (Key.CursorLeft, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
 			tileView.Draw ();
 
 			looksLike =
@@ -194,7 +194,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Keyboard movement on splitter should have no effect if it is not focused
-			line.ProcessKey (new (Key.CursorDown, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorDown, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
@@ -204,7 +204,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTileView_Vertical_View1MinSize_Absolute ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			tileView.ProcessHotKey (new (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.OnHotKeyPressed (new (tileView.ToggleResizable, new KeyModifiers ()));
 			tileView.Tiles.ElementAt (0).MinSize = 6;
 
 			// distance is too small (below 6)
@@ -225,13 +225,13 @@ namespace Terminal.Gui.ViewsTests {
 
 			// Keyboard movement on splitter should have no effect because it
 			// would take us below the minimum splitter size
-			line.ProcessKey (new (Key.CursorLeft, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// but we can continue to move the splitter right if we want
-			line.ProcessKey (new (Key.CursorRight, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 
@@ -248,7 +248,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTileView_Vertical_View1MinSize_Absolute_WithBorder ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			tileView.ProcessHotKey (new (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.OnHotKeyPressed (new (tileView.ToggleResizable, new KeyModifiers ()));
 			tileView.Tiles.ElementAt (0).MinSize = 5;
 
 			// distance is too small (below 5)
@@ -269,13 +269,13 @@ namespace Terminal.Gui.ViewsTests {
 
 			// Keyboard movement on splitter should have no effect because it
 			// would take us below the minimum splitter size
-			line.ProcessKey (new (Key.CursorLeft, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// but we can continue to move the splitter right if we want
-			line.ProcessKey (new (Key.CursorRight, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 
@@ -292,7 +292,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTileView_Vertical_View2MinSize_Absolute ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			tileView.ProcessHotKey (new (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.OnHotKeyPressed (new (tileView.ToggleResizable, new KeyModifiers ()));
 			tileView.Tiles.ElementAt (1).MinSize = 6;
 
 			// distance leaves too little space for view2 (less than 6 would remain)
@@ -313,13 +313,13 @@ namespace Terminal.Gui.ViewsTests {
 
 			// Keyboard movement on splitter should have no effect because it
 			// would take us below the minimum splitter size
-			line.ProcessKey (new (Key.CursorRight, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// but we can continue to move the splitter left if we want
-			line.ProcessKey (new (Key.CursorLeft, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 
@@ -336,7 +336,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTileView_Vertical_View2MinSize_Absolute_WithBorder ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			tileView.ProcessHotKey (new (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.OnHotKeyPressed (new (tileView.ToggleResizable, new KeyModifiers ()));
 			tileView.Tiles.ElementAt (1).MinSize = 5;
 
 			// distance leaves too little space for view2 (less than 5 would remain)
@@ -357,13 +357,13 @@ namespace Terminal.Gui.ViewsTests {
 
 			// Keyboard movement on splitter should have no effect because it
 			// would take us below the minimum splitter size
-			line.ProcessKey (new (Key.CursorRight, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// but we can continue to move the splitter left if we want
-			line.ProcessKey (new (Key.CursorLeft, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 
@@ -433,7 +433,7 @@ namespace Terminal.Gui.ViewsTests {
 			var tileView = Get11By3TileView (out var line);
 
 			tileView.Orientation = Orientation.Horizontal;
-			tileView.ProcessHotKey (new (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.OnHotKeyPressed (new (tileView.ToggleResizable, new KeyModifiers ()));
 
 			Assert.True (line.HasFocus);
 
@@ -447,7 +447,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Now move splitter line down
-			line.ProcessKey (new (Key.CursorDown, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorDown, new KeyModifiers ()));
 
 			tileView.Draw ();
 			looksLike =
@@ -458,8 +458,8 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// And 2 up
-			line.ProcessKey (new (Key.CursorUp, new KeyModifiers ()));
-			line.ProcessKey (new (Key.CursorUp, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			looksLike =
@@ -474,7 +474,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTileView_Horizontal_View1MinSize_Absolute ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			tileView.ProcessHotKey (new (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.OnHotKeyPressed (new (tileView.ToggleResizable, new KeyModifiers ()));
 
 			tileView.Orientation = Orientation.Horizontal;
 			tileView.Tiles.ElementAt (0).MinSize = 1;
@@ -494,7 +494,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Now move splitter line down (allowed
-			line.ProcessKey (new (Key.CursorDown, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorDown, new KeyModifiers ()));
 			tileView.Draw ();
 			looksLike =
 @"    
@@ -504,8 +504,8 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// And up 2 (only 1 is allowed because of minimum size of 1 on view1)
-			line.ProcessKey (new (Key.CursorUp, new KeyModifiers ()));
-			line.ProcessKey (new (Key.CursorUp, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ()));
+			line.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ()));
 
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();

@@ -1328,7 +1328,7 @@ namespace Terminal.Gui {
 
 			var chain = _topLevels.ToList ();
 			foreach (var topLevel in chain) {
-				if (topLevel.ProcessHotKey (a)) {
+				if (topLevel.OnHotKeyPressed (a)) {
 					return true;
 				}
 				if (topLevel.Modal)
@@ -1336,7 +1336,7 @@ namespace Terminal.Gui {
 			}
 
 			foreach (var topLevel in chain) {
-				if (topLevel.ProcessKey (a)) {
+				if (topLevel.OnKeyPressed (a)) {
 					return true;
 				}
 				if (topLevel.Modal)

@@ -542,9 +542,9 @@ public class ScrollView : View {
 	}
 
 	///<inheritdoc/>
-	public override bool ProcessKey (KeyEventArgs kb)
+	public override bool OnKeyPressed (KeyEventArgs kb)
 	{
-		if (base.ProcessKey (kb))
+		if (base.OnKeyPressed (kb))
 			return true;
 
 		var result = InvokeKeybindings (kb);

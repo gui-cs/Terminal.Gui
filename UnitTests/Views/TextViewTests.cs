@@ -147,7 +147,7 @@ namespace Terminal.Gui.ViewsTests {
 			var iteration = 0;
 
 			while (_textView.CursorPosition.X < _textView.Text.Length) {
-				_textView.ProcessKey (new (Key.CursorRight | Key.CtrlMask, new KeyModifiers ()));
+				_textView.OnKeyPressed (new (Key.CursorRight | Key.CtrlMask, new KeyModifiers ()));
 				switch (iteration) {
 				case 0:
 					Assert.Equal (4, _textView.CursorPosition.X);
@@ -210,7 +210,7 @@ namespace Terminal.Gui.ViewsTests {
 			var iteration = 0;
 
 			while (_textView.CursorPosition.X > 0) {
-				_textView.ProcessKey (new (Key.CursorLeft | Key.CtrlMask, new KeyModifiers ()));
+				_textView.OnKeyPressed (new (Key.CursorLeft | Key.CtrlMask, new KeyModifiers ()));
 				switch (iteration) {
 				case 0:
 					Assert.Equal (31, _textView.CursorPosition.X);
@@ -283,7 +283,7 @@ namespace Terminal.Gui.ViewsTests {
 			var iteration = 0;
 
 			while (_textView.CursorPosition.X < _textView.Text.Length) {
-				_textView.ProcessKey (new (Key.CursorRight | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
+				_textView.OnKeyPressed (new (Key.CursorRight | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
 				switch (iteration) {
 				case 0:
 					Assert.Equal (4, _textView.CursorPosition.X);
@@ -348,7 +348,7 @@ namespace Terminal.Gui.ViewsTests {
 			var iteration = 0;
 
 			while (_textView.CursorPosition.X > 0) {
-				_textView.ProcessKey (new (Key.CursorLeft | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
+				_textView.OnKeyPressed (new (Key.CursorLeft | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
 				switch (iteration) {
 				case 0:
 					Assert.Equal (31, _textView.CursorPosition.X);
@@ -421,7 +421,7 @@ namespace Terminal.Gui.ViewsTests {
 			var iteration = 0;
 
 			while (_textView.CursorPosition.X < _textView.Text.Length) {
-				_textView.ProcessKey (new (Key.CursorRight | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
+				_textView.OnKeyPressed (new (Key.CursorRight | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
 				switch (iteration) {
 				case 0:
 					Assert.Equal (12, _textView.CursorPosition.X);
@@ -470,7 +470,7 @@ namespace Terminal.Gui.ViewsTests {
 			var iteration = 0;
 
 			while (_textView.CursorPosition.X > 0) {
-				_textView.ProcessKey (new (Key.CursorLeft | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
+				_textView.OnKeyPressed (new (Key.CursorLeft | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
 				switch (iteration) {
 				case 0:
 					Assert.Equal (7, _textView.CursorPosition.X);
@@ -512,7 +512,7 @@ namespace Terminal.Gui.ViewsTests {
 			var iteration = 0;
 
 			while (_textView.CursorPosition.X < _textView.Text.Length) {
-				_textView.ProcessKey (new (Key.CursorRight | Key.CtrlMask, new KeyModifiers ()));
+				_textView.OnKeyPressed (new (Key.CursorRight | Key.CtrlMask, new KeyModifiers ()));
 				switch (iteration) {
 				case 0:
 					Assert.Equal (6, _textView.CursorPosition.X);
@@ -618,7 +618,7 @@ namespace Terminal.Gui.ViewsTests {
 			var iteration = 0;
 
 			while (_textView.CursorPosition.X > 0) {
-				_textView.ProcessKey (new (Key.CursorLeft | Key.CtrlMask, new KeyModifiers ()));
+				_textView.OnKeyPressed (new (Key.CursorLeft | Key.CtrlMask, new KeyModifiers ()));
 				switch (iteration) {
 				case 0:
 					Assert.Equal (54, _textView.CursorPosition.X);
@@ -730,7 +730,7 @@ namespace Terminal.Gui.ViewsTests {
 			bool iterationsFinished = false;
 
 			while (!iterationsFinished) {
-				_textView.ProcessKey (new (Key.CursorLeft | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
+				_textView.OnKeyPressed (new (Key.CursorLeft | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
 				switch (iteration) {
 				case 0:
 					Assert.Equal (23, _textView.CursorPosition.X);
@@ -860,7 +860,7 @@ namespace Terminal.Gui.ViewsTests {
 			bool iterationsFinished = false;
 
 			while (!iterationsFinished) {
-				_textView.ProcessKey (new (Key.CursorRight | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
+				_textView.OnKeyPressed (new (Key.CursorRight | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
 				switch (iteration) {
 				case 0:
 					Assert.Equal (5, _textView.CursorPosition.X);
@@ -969,28 +969,28 @@ namespace Terminal.Gui.ViewsTests {
 			while (!iterationsFinished) {
 				switch (iteration) {
 				case 0:
-					_textView.ProcessKey (new (Key.K | Key.CtrlMask, new KeyModifiers ()));
+					_textView.OnKeyPressed (new (Key.K | Key.CtrlMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
 					Assert.Equal ($"{Environment.NewLine}This is the second line.", _textView.Text);
 					Assert.Equal ("This is the first line.", Clipboard.Contents);
 					break;
 				case 1:
-					_textView.ProcessKey (new (Key.DeleteChar | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
+					_textView.OnKeyPressed (new (Key.DeleteChar | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
 					Assert.Equal ("This is the second line.", _textView.Text);
 					Assert.Equal ($"This is the first line.{Environment.NewLine}", Clipboard.Contents);
 					break;
 				case 2:
-					_textView.ProcessKey (new (Key.K | Key.CtrlMask, new KeyModifiers ()));
+					_textView.OnKeyPressed (new (Key.K | Key.CtrlMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
 					Assert.Equal ("", _textView.Text);
 					Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", Clipboard.Contents);
 
 					// Paste
-					_textView.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ()));
+					_textView.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ()));
 					Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", _textView.Text);
 					break;
 				default:
@@ -1013,28 +1013,28 @@ namespace Terminal.Gui.ViewsTests {
 			while (!iterationsFinished) {
 				switch (iteration) {
 				case 0:
-					_textView.ProcessKey (new (Key.K | Key.AltMask, new KeyModifiers ()));
+					_textView.OnKeyPressed (new (Key.K | Key.AltMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (1, _textView.CursorPosition.Y);
 					Assert.Equal ($"This is the first line.{Environment.NewLine}", _textView.Text);
 					Assert.Equal ($"This is the second line.", Clipboard.Contents);
 					break;
 				case 1:
-					_textView.ProcessKey (new (Key.Backspace | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
+					_textView.OnKeyPressed (new (Key.Backspace | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
 					Assert.Equal (23, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
 					Assert.Equal ("This is the first line.", _textView.Text);
 					Assert.Equal ($"This is the second line.{Environment.NewLine}", Clipboard.Contents);
 					break;
 				case 2:
-					_textView.ProcessKey (new (Key.K | Key.AltMask, new KeyModifiers ()));
+					_textView.OnKeyPressed (new (Key.K | Key.AltMask, new KeyModifiers ()));
 					Assert.Equal (0, _textView.CursorPosition.X);
 					Assert.Equal (0, _textView.CursorPosition.Y);
 					Assert.Equal ("", _textView.Text);
 					Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", Clipboard.Contents);
 
 					// Paste inverted
-					_textView.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ()));
+					_textView.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ()));
 					Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", _textView.Text);
 					break;
 				default:
@@ -1054,7 +1054,7 @@ namespace Terminal.Gui.ViewsTests {
 			bool iterationsFinished = false;
 
 			while (!iterationsFinished) {
-				_textView.ProcessKey (new (Key.DeleteChar | Key.CtrlMask, new KeyModifiers ()));
+				_textView.OnKeyPressed (new (Key.DeleteChar | Key.CtrlMask, new KeyModifiers ()));
 				switch (iteration) {
 				case 0:
 					Assert.Equal (0, _textView.CursorPosition.X);
@@ -1099,7 +1099,7 @@ namespace Terminal.Gui.ViewsTests {
 			bool iterationsFinished = false;
 
 			while (!iterationsFinished) {
-				_textView.ProcessKey (new (Key.Backspace | Key.CtrlMask, new KeyModifiers ()));
+				_textView.OnKeyPressed (new (Key.Backspace | Key.CtrlMask, new KeyModifiers ()));
 				switch (iteration) {
 				case 0:
 					Assert.Equal (22, _textView.CursorPosition.X);
@@ -1149,7 +1149,7 @@ namespace Terminal.Gui.ViewsTests {
 			bool iterationsFinished = false;
 
 			while (!iterationsFinished) {
-				_textView.ProcessKey (new (Key.DeleteChar | Key.CtrlMask, new KeyModifiers ()));
+				_textView.OnKeyPressed (new (Key.DeleteChar | Key.CtrlMask, new KeyModifiers ()));
 				switch (iteration) {
 				case 0:
 					Assert.Equal (0, _textView.CursorPosition.X);
@@ -1230,7 +1230,7 @@ namespace Terminal.Gui.ViewsTests {
 			bool iterationsFinished = false;
 
 			while (!iterationsFinished) {
-				_textView.ProcessKey (new (Key.Backspace | Key.CtrlMask, new KeyModifiers ()));
+				_textView.OnKeyPressed (new (Key.Backspace | Key.CtrlMask, new KeyModifiers ()));
 				switch (iteration) {
 				case 0:
 					Assert.Equal (23, _textView.CursorPosition.X);
@@ -1316,9 +1316,9 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			_textView.SelectionStartColumn = 0;
 			_textView.SelectionStartRow = 0;
-			_textView.ProcessKey (new (Key.C | Key.CtrlMask, new KeyModifiers ())); // Copy
+			_textView.OnKeyPressed (new (Key.C | Key.CtrlMask, new KeyModifiers ())); // Copy
 			Assert.Equal ("", _textView.SelectedText);
-			_textView.ProcessKey (new (Key.W | Key.CtrlMask, new KeyModifiers ())); // Cut
+			_textView.OnKeyPressed (new (Key.W | Key.CtrlMask, new KeyModifiers ())); // Cut
 			Assert.Equal ("", _textView.SelectedText);
 		}
 
@@ -1329,9 +1329,9 @@ namespace Terminal.Gui.ViewsTests {
 			_textView.SelectionStartColumn = 20;
 			_textView.SelectionStartRow = 0;
 			_textView.CursorPosition = new Point (24, 0);
-			_textView.ProcessKey (new (Key.C | Key.CtrlMask, new KeyModifiers ())); // Copy
+			_textView.OnKeyPressed (new (Key.C | Key.CtrlMask, new KeyModifiers ())); // Copy
 			Assert.Equal ("text", _textView.SelectedText);
-			_textView.ProcessKey (new (Key.W | Key.CtrlMask, new KeyModifiers ())); // Cut
+			_textView.OnKeyPressed (new (Key.W | Key.CtrlMask, new KeyModifiers ())); // Cut
 			Assert.Equal ("", _textView.SelectedText);
 		}
 
@@ -1342,15 +1342,15 @@ namespace Terminal.Gui.ViewsTests {
 			_textView.SelectionStartColumn = 20;
 			_textView.SelectionStartRow = 0;
 			_textView.CursorPosition = new Point (24, 0);
-			_textView.ProcessKey (new (Key.C | Key.CtrlMask, new KeyModifiers ())); // Copy
+			_textView.OnKeyPressed (new (Key.C | Key.CtrlMask, new KeyModifiers ())); // Copy
 			Assert.Equal ("text", _textView.SelectedText);
 			Assert.Equal ("TAB to jump between text fields.", _textView.Text);
-			_textView.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ())); // Paste
+			_textView.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ())); // Paste
 			Assert.Equal ("TAB to jump between text fields.", _textView.Text);
 			_textView.SelectionStartColumn = 20;
 			_textView.SelectionStartRow = 0;
-			_textView.ProcessKey (new (Key.W | Key.CtrlMask, new KeyModifiers ())); // Cut
-			_textView.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ())); // Paste
+			_textView.OnKeyPressed (new (Key.W | Key.CtrlMask, new KeyModifiers ())); // Cut
+			_textView.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ())); // Paste
 			Assert.Equal ("TAB to jump between text fields.", _textView.Text);
 		}
 
@@ -1361,7 +1361,7 @@ namespace Terminal.Gui.ViewsTests {
 			_textView.SelectionStartColumn = 20;
 			_textView.SelectionStartRow = 0;
 			_textView.CursorPosition = new Point (24, 0);
-			_textView.ProcessKey (new (Key.C | Key.CtrlMask, new KeyModifiers ())); // Copy
+			_textView.OnKeyPressed (new (Key.C | Key.CtrlMask, new KeyModifiers ())); // Copy
 			Assert.Equal ("text", _textView.SelectedText);
 			Assert.Equal ("TAB to jump between text fields.", _textView.Text);
 			_textView.SelectionStartColumn = 0;
@@ -1369,13 +1369,13 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Point (24, 0), _textView.CursorPosition);
 			Assert.True (_textView.Selecting);
 			_textView.Selecting = false;
-			_textView.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ())); // Paste
+			_textView.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ())); // Paste
 			Assert.Equal (new Point (28, 0), _textView.CursorPosition);
 			Assert.False (_textView.Selecting);
 			Assert.Equal ("TAB to jump between texttext fields.", _textView.Text);
 			_textView.SelectionStartColumn = 24;
 			_textView.SelectionStartRow = 0;
-			_textView.ProcessKey (new (Key.W | Key.CtrlMask, new KeyModifiers ())); // Cut
+			_textView.OnKeyPressed (new (Key.W | Key.CtrlMask, new KeyModifiers ())); // Cut
 			Assert.Equal (new Point (24, 0), _textView.CursorPosition);
 			Assert.False (_textView.Selecting);
 			Assert.Equal ("", _textView.SelectedText);
@@ -1383,7 +1383,7 @@ namespace Terminal.Gui.ViewsTests {
 			_textView.SelectionStartColumn = 0;
 			_textView.SelectionStartRow = 0;
 			_textView.Selecting = false;
-			_textView.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ())); // Paste
+			_textView.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ())); // Paste
 			Assert.Equal (new Point (28, 0), _textView.CursorPosition);
 			Assert.False (_textView.Selecting);
 			Assert.Equal ("TAB to jump between texttext fields.", _textView.Text);
@@ -1397,16 +1397,16 @@ namespace Terminal.Gui.ViewsTests {
 			_textView.SelectionStartColumn = 20;
 			_textView.SelectionStartRow = 0;
 			_textView.CursorPosition = new Point (24, 0);
-			_textView.ProcessKey (new (Key.C | Key.CtrlMask, new KeyModifiers ())); // Copy
+			_textView.OnKeyPressed (new (Key.C | Key.CtrlMask, new KeyModifiers ())); // Copy
 			Assert.Equal ("text", _textView.SelectedText);
-			_textView.ProcessKey (new (Key.W | Key.CtrlMask, new KeyModifiers ())); // Selecting is set to false after Cut.
+			_textView.OnKeyPressed (new (Key.W | Key.CtrlMask, new KeyModifiers ())); // Selecting is set to false after Cut.
 			Assert.Equal ("", _textView.SelectedText);
 			_textView.ReadOnly = false;
 			Assert.False (_textView.Selecting);
 			_textView.Selecting = true; // Needed to set Selecting to true.
-			_textView.ProcessKey (new (Key.C | Key.CtrlMask, new KeyModifiers ())); // Copy
+			_textView.OnKeyPressed (new (Key.C | Key.CtrlMask, new KeyModifiers ())); // Copy
 			Assert.Equal ("text", _textView.SelectedText);
-			_textView.ProcessKey (new (Key.W | Key.CtrlMask, new KeyModifiers ())); // Cut
+			_textView.OnKeyPressed (new (Key.W | Key.CtrlMask, new KeyModifiers ())); // Cut
 			Assert.Equal ("", _textView.SelectedText);
 		}
 
@@ -1417,9 +1417,9 @@ namespace Terminal.Gui.ViewsTests {
 			_textView.SelectionStartColumn = 20;
 			_textView.SelectionStartRow = 0;
 			_textView.CursorPosition = new Point (24, 0);
-			_textView.ProcessKey (new (Key.C | Key.CtrlMask, new KeyModifiers ())); // Copy
+			_textView.OnKeyPressed (new (Key.C | Key.CtrlMask, new KeyModifiers ())); // Copy
 			Assert.Equal ("text", _textView.SelectedText);
-			_textView.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ())); // Paste
+			_textView.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ())); // Paste
 			Assert.Equal ("", _textView.SelectedText);
 		}
 
@@ -1449,7 +1449,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			_textView.Text = "ay";
 			Assert.Equal (1, eventcount);
-			_textView.ProcessKey (new (Key.Y, new KeyModifiers ()));
+			_textView.OnKeyPressed (new (Key.Y, new KeyModifiers ()));
 			Assert.Equal (1, eventcount);
 			Assert.Equal ("Yay", _textView.Text);
 		}
@@ -1460,13 +1460,13 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			_textView.CursorPosition = new Point (10, 0);
 			Assert.Equal ("TAB to jump between text fields.", _textView.Text);
-			_textView.ProcessKey (new ((Key)0x75, new KeyModifiers ())); // u
+			_textView.OnKeyPressed (new ((Key)0x75, new KeyModifiers ())); // u
 			Assert.Equal ("TAB to jumup between text fields.", _textView.Text);
-			_textView.ProcessKey (new ((Key)0x73, new KeyModifiers ())); // s
+			_textView.OnKeyPressed (new ((Key)0x73, new KeyModifiers ())); // s
 			Assert.Equal ("TAB to jumusp between text fields.", _textView.Text);
-			_textView.ProcessKey (new ((Key)0x65, new KeyModifiers ())); // e
+			_textView.OnKeyPressed (new ((Key)0x65, new KeyModifiers ())); // e
 			Assert.Equal ("TAB to jumusep between text fields.", _textView.Text);
-			_textView.ProcessKey (new ((Key)0x64, new KeyModifiers ())); // d
+			_textView.OnKeyPressed (new ((Key)0x64, new KeyModifiers ())); // d
 			Assert.Equal ("TAB to jumusedp between text fields.", _textView.Text);
 		}
 
@@ -1477,13 +1477,13 @@ namespace Terminal.Gui.ViewsTests {
 			_textView.Used = false;
 			_textView.CursorPosition = new Point (10, 0);
 			Assert.Equal ("TAB to jump between text fields.", _textView.Text);
-			_textView.ProcessKey (new ((Key)0x75, new KeyModifiers ())); // u
+			_textView.OnKeyPressed (new ((Key)0x75, new KeyModifiers ())); // u
 			Assert.Equal ("TAB to jumu between text fields.", _textView.Text);
-			_textView.ProcessKey (new ((Key)0x73, new KeyModifiers ())); // s
+			_textView.OnKeyPressed (new ((Key)0x73, new KeyModifiers ())); // s
 			Assert.Equal ("TAB to jumusbetween text fields.", _textView.Text);
-			_textView.ProcessKey (new ((Key)0x65, new KeyModifiers ())); // e
+			_textView.OnKeyPressed (new ((Key)0x65, new KeyModifiers ())); // e
 			Assert.Equal ("TAB to jumuseetween text fields.", _textView.Text);
-			_textView.ProcessKey (new ((Key)0x64, new KeyModifiers ())); // d
+			_textView.OnKeyPressed (new ((Key)0x64, new KeyModifiers ())); // d
 			Assert.Equal ("TAB to jumusedtween text fields.", _textView.Text);
 		}
 
@@ -1493,15 +1493,15 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			_textView.Text = "This is the first line.\nThis is the second line.\n";
 			_textView.CursorPosition = new Point (0, _textView.Lines - 1);
-			_textView.ProcessKey (new (Key.C | Key.CtrlMask, new KeyModifiers ())); // Copy
-			_textView.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ())); // Paste
+			_textView.OnKeyPressed (new (Key.C | Key.CtrlMask, new KeyModifiers ())); // Copy
+			_textView.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ())); // Paste
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}{Environment.NewLine}", _textView.Text);
 			_textView.CursorPosition = new Point (3, 1);
-			_textView.ProcessKey (new (Key.C | Key.CtrlMask, new KeyModifiers ())); // Copy
-			_textView.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ())); // Paste
+			_textView.OnKeyPressed (new (Key.C | Key.CtrlMask, new KeyModifiers ())); // Copy
+			_textView.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ())); // Paste
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}{Environment.NewLine}", _textView.Text);
 			Assert.Equal (new Point (3, 2), _textView.CursorPosition);
-			_textView.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ())); // Paste
+			_textView.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ())); // Paste
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}{Environment.NewLine}", _textView.Text);
 			Assert.Equal (new Point (3, 3), _textView.CursorPosition);
 		}
@@ -1519,9 +1519,9 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (_textView.AllowsTab);
 			Assert.True (_textView.AllowsReturn);
 			Assert.True (_textView.Multiline);
-			_textView.ProcessKey (new (Key.Tab, new KeyModifiers ()));
+			_textView.OnKeyPressed (new (Key.Tab, new KeyModifiers ()));
 			Assert.Equal ("\tTAB to jump between text fields.", _textView.Text);
-			_textView.ProcessKey (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
+			_textView.OnKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
 			Assert.Equal ("TAB to jump between text fields.", _textView.Text);
 		}
 
@@ -1549,7 +1549,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (_textView.Multiline);
 			Assert.Equal (4, _textView.TabWidth);
 			Assert.True (_textView.AllowsTab);
-			_textView.ProcessKey (new (Key.Enter, new KeyModifiers ()));
+			_textView.OnKeyPressed (new (Key.Enter, new KeyModifiers ()));
 			Assert.Equal (Environment.NewLine +
 				"TAB to jump between text fields.", _textView.Text);
 
@@ -1558,7 +1558,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (_textView.Multiline);
 			Assert.Equal (0, _textView.TabWidth);
 			Assert.False (_textView.AllowsTab);
-			_textView.ProcessKey (new (Key.Enter, new KeyModifiers ()));
+			_textView.OnKeyPressed (new (Key.Enter, new KeyModifiers ()));
 			Assert.Equal (Environment.NewLine +
 				"TAB to jump between text fields.", _textView.Text);
 		}
@@ -1614,14 +1614,14 @@ namespace Terminal.Gui.ViewsTests {
 				var tabWidth = _textView.TabWidth;
 				while (col < 100) {
 					col++;
-					_textView.ProcessKey (new (Key.Tab, new KeyModifiers ()));
+					_textView.OnKeyPressed (new (Key.Tab, new KeyModifiers ()));
 					Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 					leftCol = GetLeftCol (leftCol);
 					Assert.Equal (leftCol, _textView.LeftColumn);
 				}
 				while (col > 0) {
 					col--;
-					_textView.ProcessKey (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
+					_textView.OnKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
 					Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 					leftCol = GetLeftCol (leftCol);
 					Assert.Equal (leftCol, _textView.LeftColumn);
@@ -1657,14 +1657,14 @@ namespace Terminal.Gui.ViewsTests {
 				Assert.Equal (leftCol, _textView.LeftColumn);
 				while (col > 0) {
 					col--;
-					_textView.ProcessKey (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
+					_textView.OnKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
 					Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 					leftCol = GetLeftCol (leftCol);
 					Assert.Equal (leftCol, _textView.LeftColumn);
 				}
 				while (col < 100) {
 					col++;
-					_textView.ProcessKey (new (Key.Tab, new KeyModifiers ()));
+					_textView.OnKeyPressed (new (Key.Tab, new KeyModifiers ()));
 					Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 					leftCol = GetLeftCol (leftCol);
 					Assert.Equal (leftCol, _textView.LeftColumn);
@@ -1693,21 +1693,21 @@ namespace Terminal.Gui.ViewsTests {
 				var tabWidth = _textView.TabWidth;
 				while (col < 100) {
 					col++;
-					_textView.ProcessKey (new (Key.Tab, new KeyModifiers ()));
+					_textView.OnKeyPressed (new (Key.Tab, new KeyModifiers ()));
 					Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 					leftCol = GetLeftCol (leftCol);
 					Assert.Equal (leftCol, _textView.LeftColumn);
 				}
 				while (col > 0) {
 					col--;
-					_textView.ProcessKey (new (Key.CursorLeft, new KeyModifiers ()));
+					_textView.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
 					Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 					leftCol = GetLeftCol (leftCol);
 					Assert.Equal (leftCol, _textView.LeftColumn);
 				}
 				while (col < 100) {
 					col++;
-					_textView.ProcessKey (new (Key.CursorRight, new KeyModifiers ()));
+					_textView.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
 					Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 					leftCol = GetLeftCol (leftCol);
 					Assert.Equal (leftCol, _textView.LeftColumn);
@@ -1736,14 +1736,14 @@ namespace Terminal.Gui.ViewsTests {
 				Assert.Equal (leftCol, _textView.LeftColumn);
 				while (col < 100) {
 					col++;
-					_textView.ProcessKey (new (Key.Tab, new KeyModifiers ()));
+					_textView.OnKeyPressed (new (Key.Tab, new KeyModifiers ()));
 					Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 					leftCol = GetLeftCol (leftCol);
 					Assert.Equal (leftCol, _textView.LeftColumn);
 				}
 				while (col > 0) {
 					col--;
-					_textView.ProcessKey (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
+					_textView.OnKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
 					Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 					leftCol = GetLeftCol (leftCol);
 					Assert.Equal (leftCol, _textView.LeftColumn);
@@ -1774,18 +1774,18 @@ namespace Terminal.Gui.ViewsTests {
 				Assert.Equal (32, _textView.Text.Length);
 				while (col < 100) {
 					col++;
-					_textView.ProcessKey (new (Key.Tab, new KeyModifiers ()));
+					_textView.OnKeyPressed (new (Key.Tab, new KeyModifiers ()));
 					Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 					leftCol = GetLeftCol (leftCol);
 					Assert.Equal (leftCol, _textView.LeftColumn);
 				}
-				_textView.ProcessKey (new (Key.Home, new KeyModifiers ()));
+				_textView.OnKeyPressed (new (Key.Home, new KeyModifiers ()));
 				col = 0;
 				Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 				leftCol = 0;
 				Assert.Equal (leftCol, _textView.LeftColumn);
 
-				_textView.ProcessKey (new (Key.End, new KeyModifiers ()));
+				_textView.OnKeyPressed (new (Key.End, new KeyModifiers ()));
 				col = _textView.Text.Length;
 				Assert.Equal (132, _textView.Text.Length);
 				Assert.Equal (new Point (col, 0), _textView.CursorPosition);
@@ -1799,7 +1799,7 @@ namespace Terminal.Gui.ViewsTests {
 				leftCol = GetLeftCol (leftCol);
 				while (col > 0) {
 					col--;
-					_textView.ProcessKey (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
+					_textView.OnKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
 					Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 					leftCol = GetLeftCol (leftCol);
 					Assert.Equal (leftCol, _textView.LeftColumn);
@@ -1830,7 +1830,7 @@ namespace Terminal.Gui.ViewsTests {
 				var tabWidth = _textView.TabWidth;
 				while (col < 100) {
 					col++;
-					_textView.ProcessKey (new (Key.Tab, new KeyModifiers ()));
+					_textView.OnKeyPressed (new (Key.Tab, new KeyModifiers ()));
 					Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 					leftCol = GetLeftCol (leftCol);
 					Assert.Equal (leftCol, _textView.LeftColumn);
@@ -1838,14 +1838,14 @@ namespace Terminal.Gui.ViewsTests {
 				Assert.Equal (132, _textView.Text.Length);
 				while (col > 0) {
 					col--;
-					_textView.ProcessKey (new (Key.CursorLeft, new KeyModifiers ()));
+					_textView.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
 					Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 					leftCol = GetLeftCol (leftCol);
 					Assert.Equal (leftCol, _textView.LeftColumn);
 				}
 				while (col < 100) {
 					col++;
-					_textView.ProcessKey (new (Key.CursorRight, new KeyModifiers ()));
+					_textView.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
 					Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 					leftCol = GetLeftCol (leftCol);
 					Assert.Equal (leftCol, _textView.LeftColumn);
@@ -2110,35 +2110,35 @@ aaaa
 ", output);
 
 			tv.CursorPosition = new Point (5, 0);
-			Assert.True (tv.ProcessKey (new (Key.Backspace, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Backspace, new KeyModifiers ())));
 			Application.Refresh ();
 			Assert.Equal (0, tv.LeftColumn);
 			TestHelpers.AssertDriverContentsAre (@"
 aaa
 ", output);
 
-			Assert.True (tv.ProcessKey (new (Key.Backspace, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Backspace, new KeyModifiers ())));
 			Application.Refresh ();
 			Assert.Equal (0, tv.LeftColumn);
 			TestHelpers.AssertDriverContentsAre (@"
 aa
 ", output);
 
-			Assert.True (tv.ProcessKey (new (Key.Backspace, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Backspace, new KeyModifiers ())));
 			Application.Refresh ();
 			Assert.Equal (0, tv.LeftColumn);
 			TestHelpers.AssertDriverContentsAre (@"
 a
 ", output);
 
-			Assert.True (tv.ProcessKey (new (Key.Backspace, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Backspace, new KeyModifiers ())));
 			Application.Refresh ();
 			Assert.Equal (0, tv.LeftColumn);
 			TestHelpers.AssertDriverContentsAre (@"
 
 ", output);
 
-			Assert.True (tv.ProcessKey (new (Key.Backspace, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Backspace, new KeyModifiers ())));
 			Application.Refresh ();
 			Assert.Equal (0, tv.LeftColumn);
 			TestHelpers.AssertDriverContentsAre (@"
@@ -2284,7 +2284,7 @@ line.
 			var tv = new TextView () { Width = 10, Height = 10, BottomOffset = 1 };
 			tv.Text = text;
 
-			tv.ProcessKey (new (Key.CtrlMask | Key.End, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.CtrlMask | Key.End, new KeyModifiers ()));
 
 			Assert.Equal (4, tv.TopRow);
 			Assert.Equal (1, tv.BottomOffset);
@@ -2314,7 +2314,7 @@ line.
 			var tv = new TextView () { Width = 10, Height = 10, RightOffset = 1 };
 			tv.Text = text;
 
-			tv.ProcessKey (new (Key.End, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.End, new KeyModifiers ()));
 
 			Assert.Equal (4, tv.LeftColumn);
 			Assert.Equal (1, tv.RightOffset);
@@ -2520,7 +2520,7 @@ line.
 			Assert.Equal (new Point (9, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.LeftColumn);
 
-			Assert.True (tv.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 			tv.CursorPosition = new Point (10, 0);
 			Assert.Equal (new Point (10, 0), tv.CursorPosition);
 			Assert.Equal (1, tv.LeftColumn);
@@ -2549,35 +2549,35 @@ line.
 			var g = (SingleWordSuggestionGenerator)tv.Autocomplete.SuggestionGenerator;
 
 			tv.CanFocus = false;
-			Assert.True (tv.ProcessKey (new (Key.CursorLeft, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ())));
 			tv.CanFocus = true;
-			Assert.False (tv.ProcessKey (new (Key.CursorLeft, new KeyModifiers ())));
-			Assert.True (tv.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.False (tv.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
-			Assert.True (tv.ProcessKey (new (Key.End | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.End | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal (2, tv.CurrentRow);
 			Assert.Equal (23, tv.CurrentColumn);
 			Assert.Equal (tv.CurrentColumn, tv.GetCurrentLine ().Count);
 			Assert.Equal (new Point (23, 2), tv.CursorPosition);
-			Assert.False (tv.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.False (tv.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 			Assert.NotNull (tv.Autocomplete);
 			Assert.Empty (g.AllSuggestions);
-			Assert.True (tv.ProcessKey (new (Key.F, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.F, new KeyModifiers ())));
 			tv.Draw ();
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F", tv.Text);
 			Assert.Equal (new Point (24, 2), tv.CursorPosition);
 			Assert.Empty (tv.Autocomplete.Suggestions);
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			tv.Draw ();
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (new Point (23, 2), tv.CursorPosition);
 			Assert.Empty (tv.Autocomplete.Suggestions);
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			tv.Draw ();
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F", tv.Text);
 			Assert.Equal (new Point (24, 2), tv.CursorPosition);
 			Assert.Empty (tv.Autocomplete.Suggestions);
-			Assert.True (tv.ProcessKey (new (Key.Backspace, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Backspace, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (new Point (23, 2), tv.CursorPosition);
 			g.AllSuggestions = Regex.Matches (tv.Text, "\\w+")
@@ -2591,13 +2591,13 @@ line.
 			Assert.Equal ("line", g.AllSuggestions [4]);
 			Assert.Equal ("second", g.AllSuggestions [5]);
 			Assert.Equal ("third", g.AllSuggestions [^1]);
-			Assert.True (tv.ProcessKey (new (Key.F, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.F, new KeyModifiers ())));
 			tv.Draw ();
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F", tv.Text);
 			Assert.Equal (new Point (24, 2), tv.CursorPosition);
 			Assert.Single (tv.Autocomplete.Suggestions);
 			Assert.Equal ("first", tv.Autocomplete.Suggestions [0].Replacement);
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (28, 2), tv.CursorPosition);
 			Assert.Empty (tv.Autocomplete.Suggestions);
@@ -2606,140 +2606,140 @@ line.
 			tv.Autocomplete.ClearSuggestions ();
 			Assert.Empty (g.AllSuggestions);
 			Assert.Empty (tv.Autocomplete.Suggestions);
-			Assert.True (tv.ProcessKey (new (Key.PageUp, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.PageUp, new KeyModifiers ())));
 			Assert.Equal (24, tv.GetCurrentLine ().Count);
 			Assert.Equal (new Point (24, 1), tv.CursorPosition);
-			Assert.True (tv.ProcessKey (new (((int)'V' + Key.AltMask), new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (((int)'V' + Key.AltMask), new KeyModifiers ())));
 			Assert.Equal (23, tv.GetCurrentLine ().Count);
 			Assert.Equal (new Point (23, 0), tv.CursorPosition);
-			Assert.True (tv.ProcessKey (new (Key.PageDown, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.PageDown, new KeyModifiers ())));
 			Assert.Equal (24, tv.GetCurrentLine ().Count);
 			Assert.Equal (new Point (23, 1), tv.CursorPosition); // gets the previous length
-			Assert.True (tv.ProcessKey (new (Key.V | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.V | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal (28, tv.GetCurrentLine ().Count);
 			Assert.Equal (new Point (23, 2), tv.CursorPosition); // gets the previous length
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
-			Assert.True (tv.ProcessKey (new (Key.PageUp | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.PageUp | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal (24, tv.GetCurrentLine ().Count);
 			Assert.Equal (new Point (23, 1), tv.CursorPosition); // gets the previous length
 			Assert.Equal (24 + Environment.NewLine.Length, tv.SelectedLength);
 			Assert.Equal ($".{Environment.NewLine}This is the third line.", tv.SelectedText);
-			Assert.True (tv.ProcessKey (new (Key.PageDown | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.PageDown | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal (28, tv.GetCurrentLine ().Count);
 			Assert.Equal (new Point (23, 2), tv.CursorPosition); // gets the previous length
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
-			Assert.True (tv.ProcessKey (new (Key.Home | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Home | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal (Point.Empty, tv.CursorPosition);
-			Assert.True (tv.ProcessKey (new (Key.N | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.N | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
-			Assert.True (tv.ProcessKey (new (Key.P | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.P | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
-			Assert.True (tv.ProcessKey (new (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.CursorDown, new KeyModifiers ())));
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
-			Assert.True (tv.ProcessKey (new (Key.CursorUp, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ())));
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
-			Assert.True (tv.ProcessKey (new (Key.CursorDown | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.CursorDown | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.Equal (23 + Environment.NewLine.Length, tv.SelectedLength);
 			Assert.Equal ($"This is the first line.{Environment.NewLine}", tv.SelectedText);
-			Assert.True (tv.ProcessKey (new (Key.CursorUp | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.CursorUp | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
-			Assert.True (tv.ProcessKey (new (Key.F | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.F | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
-			Assert.True (tv.ProcessKey (new (Key.B | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.B | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
-			Assert.True (tv.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
-			Assert.True (tv.ProcessKey (new (Key.CursorLeft, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ())));
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.False (tv.Selecting);
-			Assert.True (tv.ProcessKey (new (Key.CursorRight | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.CursorRight | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.Equal (1, tv.SelectedLength);
 			Assert.Equal ("T", tv.SelectedText);
 			Assert.True (tv.Selecting);
-			Assert.True (tv.ProcessKey (new (Key.CursorLeft | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.CursorLeft | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.True (tv.Selecting);
-			Assert.True (tv.ProcessKey (new (Key.DeleteChar, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.DeleteChar, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.False (tv.Selecting);
-			Assert.True (tv.ProcessKey (new (Key.DeleteChar, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.DeleteChar, new KeyModifiers ())));
 			Assert.Equal ($"his is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.False (tv.Selecting);
-			Assert.True (tv.ProcessKey (new (Key.D | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.D | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"is is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
-			Assert.True (tv.ProcessKey (new (Key.End, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.End, new KeyModifiers ())));
 			Assert.Equal ($"is is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (21, 0), tv.CursorPosition);
-			Assert.True (tv.ProcessKey (new (Key.Delete, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Delete, new KeyModifiers ())));
 			Assert.Equal ($"is is the first line{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (20, 0), tv.CursorPosition);
-			Assert.True (tv.ProcessKey (new (Key.Backspace, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Backspace, new KeyModifiers ())));
 			Assert.Equal ($"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (19, 0), tv.CursorPosition);
-			Assert.True (tv.ProcessKey (new (Key.Home, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Home, new KeyModifiers ())));
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.False (tv.Selecting);
-			Assert.True (tv.ProcessKey (new (Key.End | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.End | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal (new Point (19, 0), tv.CursorPosition);
 			Assert.Equal (19, tv.SelectedLength);
 			Assert.Equal ("is is the first lin", tv.SelectedText);
 			Assert.True (tv.Selecting);
-			Assert.True (tv.ProcessKey (new (Key.Home | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Home | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.True (tv.Selecting);
-			Assert.True (tv.ProcessKey (new (Key.E | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.E | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal (new Point (19, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.False (tv.Selecting);
-			Assert.True (tv.ProcessKey (new (Key.A | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.A | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.False (tv.Selecting);
-			Assert.True (tv.ProcessKey (new (Key.K | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.K | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.False (tv.Selecting);
 			Assert.Equal ("is is the first lin", Clipboard.Contents);
-			Assert.True (tv.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (19, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
@@ -2747,35 +2747,35 @@ line.
 			Assert.False (tv.Selecting);
 			Assert.Equal ("is is the first lin", Clipboard.Contents);
 			tv.CursorPosition = Point.Empty;
-			Assert.True (tv.ProcessKey (new (Key.DeleteChar | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.DeleteChar | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.False (tv.Selecting);
 			Assert.Equal ("is is the first lin", Clipboard.Contents);
-			Assert.True (tv.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (19, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.False (tv.Selecting);
 			Assert.Equal ("is is the first lin", Clipboard.Contents);
-			Assert.True (tv.ProcessKey (new (Key.K | Key.AltMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.K | Key.AltMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.False (tv.Selecting);
 			tv.ReadOnly = true;
-			Assert.True (tv.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.False (tv.Selecting);
 			tv.ReadOnly = false;
-			Assert.True (tv.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (19, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
@@ -2783,7 +2783,7 @@ line.
 			Assert.False (tv.Selecting);
 			Assert.Equal (0, tv.SelectionStartColumn);
 			Assert.Equal (0, tv.SelectionStartRow);
-			Assert.True (tv.ProcessKey (new (Key.Space | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Space | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (19, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
@@ -2791,7 +2791,7 @@ line.
 			Assert.True (tv.Selecting);
 			Assert.Equal (19, tv.SelectionStartColumn);
 			Assert.Equal (0, tv.SelectionStartRow);
-			Assert.True (tv.ProcessKey (new (Key.Space | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Space | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (19, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
@@ -2800,7 +2800,7 @@ line.
 			Assert.Equal (19, tv.SelectionStartColumn);
 			Assert.Equal (0, tv.SelectionStartRow);
 			tv.SelectionStartColumn = 0;
-			Assert.True (tv.ProcessKey (new (((int)'C' + Key.AltMask), new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (((int)'C' + Key.AltMask), new KeyModifiers ())));
 			Assert.Equal ($"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (19, 0), tv.CursorPosition);
 			Assert.Equal (19, tv.SelectedLength);
@@ -2808,7 +2808,7 @@ line.
 			Assert.True (tv.Selecting);
 			Assert.Equal (0, tv.SelectionStartColumn);
 			Assert.Equal (0, tv.SelectionStartRow);
-			Assert.True (tv.ProcessKey (new (Key.C | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.C | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (19, 0), tv.CursorPosition);
 			Assert.Equal (19, tv.SelectedLength);
@@ -2816,7 +2816,7 @@ line.
 			Assert.True (tv.Selecting);
 			Assert.Equal (0, tv.SelectionStartColumn);
 			Assert.Equal (0, tv.SelectionStartRow);
-			Assert.True (tv.ProcessKey (new (((int)'W' + Key.AltMask), new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (((int)'W' + Key.AltMask), new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
@@ -2825,7 +2825,7 @@ line.
 			Assert.Equal (0, tv.SelectionStartColumn);
 			Assert.Equal (0, tv.SelectionStartRow);
 			Assert.Equal ("is is the first lin", Clipboard.Contents);
-			Assert.True (tv.ProcessKey (new (Key.W | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.W | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
@@ -2834,7 +2834,7 @@ line.
 			Assert.Equal (0, tv.SelectionStartColumn);
 			Assert.Equal (0, tv.SelectionStartRow);
 			Assert.Equal ("", Clipboard.Contents);
-			Assert.True (tv.ProcessKey (new (Key.X | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.X | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
@@ -2843,78 +2843,78 @@ line.
 			Assert.Equal (0, tv.SelectionStartColumn);
 			Assert.Equal (0, tv.SelectionStartRow);
 			Assert.Equal ("", Clipboard.Contents);
-			Assert.True (tv.ProcessKey (new (Key.End | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.End | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (28, 2), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.False (tv.Selecting);
-			Assert.True (tv.ProcessKey (new (Key.CtrlMask | Key.CursorLeft, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.CtrlMask | Key.CursorLeft, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (18, 2), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.False (tv.Selecting);
-			Assert.True (tv.ProcessKey (new (Key.CtrlMask | Key.CursorLeft | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.CtrlMask | Key.CursorLeft | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (12, 2), tv.CursorPosition);
 			Assert.Equal (6, tv.SelectedLength);
 			Assert.Equal ("third ", tv.SelectedText);
 			Assert.True (tv.Selecting);
-			Assert.True (tv.ProcessKey (new ((Key)((int)'B' + Key.AltMask), new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new ((Key)((int)'B' + Key.AltMask), new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (8, 2), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.False (tv.Selecting);
-			Assert.True (tv.ProcessKey (new (Key.CtrlMask | Key.CursorRight, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.CtrlMask | Key.CursorRight, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (12, 2), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.False (tv.Selecting);
-			Assert.True (tv.ProcessKey (new (Key.CtrlMask | Key.CursorRight | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.CtrlMask | Key.CursorRight | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (18, 2), tv.CursorPosition);
 			Assert.Equal (6, tv.SelectedLength);
 			Assert.Equal ("third ", tv.SelectedText);
 			Assert.True (tv.Selecting);
-			Assert.True (tv.ProcessKey (new ((Key)((int)'F' + Key.AltMask), new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new ((Key)((int)'F' + Key.AltMask), new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (22, 2), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.False (tv.Selecting);
-			Assert.True (tv.ProcessKey (new ((Key)((int)'F' + Key.AltMask), new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new ((Key)((int)'F' + Key.AltMask), new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (23, 2), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.False (tv.Selecting);
-			Assert.True (tv.ProcessKey (new ((Key)((int)'F' + Key.AltMask), new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new ((Key)((int)'F' + Key.AltMask), new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (28, 2), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.False (tv.Selecting);
-			Assert.True (tv.ProcessKey (new (Key.Home | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Home | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.False (tv.Selecting);
-			Assert.True (tv.ProcessKey (new (Key.DeleteChar | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.DeleteChar | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
-			Assert.False (tv.Selecting); Assert.True (tv.ProcessKey (new (Key.End | Key.CtrlMask, new KeyModifiers ())));
+			Assert.False (tv.Selecting); Assert.True (tv.OnKeyPressed (new (Key.End | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 			Assert.Equal (new Point (28, 1), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.False (tv.Selecting);
-			Assert.False (tv.Selecting); Assert.True (tv.ProcessKey (new (Key.Backspace | Key.CtrlMask, new KeyModifiers ())));
+			Assert.False (tv.Selecting); Assert.True (tv.OnKeyPressed (new (Key.Backspace | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.Text);
 			Assert.Equal (new Point (18, 1), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
@@ -2924,7 +2924,7 @@ line.
 			tv.AllowsReturn = false;
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.False (tv.Selecting);
-			Assert.False (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.False (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.Text);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
@@ -2933,59 +2933,59 @@ line.
 			Assert.False (tv.AllowsReturn);
 			tv.AllowsReturn = true;
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ", tv.Text);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.False (tv.Selecting);
 			Assert.True (tv.AllowsReturn);
-			Assert.True (tv.ProcessKey (new (Key.CtrlMask | Key.End | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.CtrlMask | Key.End | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ", tv.Text);
 			Assert.Equal (new Point (18, 2), tv.CursorPosition);
 			Assert.Equal (42 + Environment.NewLine.Length, tv.SelectedLength);
 			Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.SelectedText);
 			Assert.True (tv.Selecting);
-			Assert.True (tv.ProcessKey (new (Key.CtrlMask | Key.Home | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.CtrlMask | Key.Home | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ", tv.Text);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (Environment.NewLine.Length, tv.SelectedLength);
 			Assert.Equal ($"{Environment.NewLine}", tv.SelectedText);
 			Assert.True (tv.Selecting);
-			Assert.True (tv.ProcessKey (new (Key.T | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.T | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ", tv.Text);
 			Assert.Equal (new Point (18, 2), tv.CursorPosition);
 			Assert.Equal (42 + Environment.NewLine.Length * 2, tv.SelectedLength);
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ", tv.SelectedText);
 			Assert.True (tv.Selecting);
 			Assert.True (tv.Used);
-			Assert.True (tv.ProcessKey (new (Key.InsertChar, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.InsertChar, new KeyModifiers ())));
 			Assert.False (tv.Used);
 			Assert.True (tv.AllowsTab);
 			Assert.Equal (new Point (18, 2), tv.CursorPosition);
 			tv.AllowsTab = false;
-			Assert.False (tv.ProcessKey (new (Key.Tab, new KeyModifiers ())));
+			Assert.False (tv.OnKeyPressed (new (Key.Tab, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ", tv.Text);
 			Assert.False (tv.AllowsTab);
 			tv.AllowsTab = true;
 			Assert.Equal (new Point (18, 2), tv.CursorPosition);
 			Assert.True (tv.Selecting);
 			tv.Selecting = false;
-			Assert.True (tv.ProcessKey (new (Key.Tab, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Tab, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third \t", tv.Text);
 			Assert.True (tv.AllowsTab);
 			tv.AllowsTab = false;
-			Assert.False (tv.ProcessKey (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ())));
+			Assert.False (tv.OnKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third \t", tv.Text);
 			Assert.False (tv.AllowsTab);
 			tv.AllowsTab = true;
-			Assert.True (tv.ProcessKey (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ", tv.Text);
 			Assert.True (tv.AllowsTab);
-			Assert.False (tv.ProcessKey (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
-			Assert.False (tv.ProcessKey (new (Application.AlternateForwardKey, new KeyModifiers ())));
-			Assert.False (tv.ProcessKey (new (Key.Tab | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ())));
-			Assert.False (tv.ProcessKey (new (Application.AlternateBackwardKey, new KeyModifiers ())));
+			Assert.False (tv.OnKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.False (tv.OnKeyPressed (new (Application.AlternateForwardKey, new KeyModifiers ())));
+			Assert.False (tv.OnKeyPressed (new (Key.Tab | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ())));
+			Assert.False (tv.OnKeyPressed (new (Application.AlternateBackwardKey, new KeyModifiers ())));
 		}
 
 		[Fact]
@@ -3030,14 +3030,14 @@ line.
 			Assert.Equal (new Point (13, 1), tv.CursorPosition);
 
 			for (int i = 0; i < messy.Length; i++) {
-				Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
 			for (int i = 0; i < messy.Length; i++) {
-				Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
@@ -3072,14 +3072,14 @@ line.
 			Assert.Equal (new Point (4, 1), tv.CursorPosition);
 
 			for (int i = 0; i < ntimes; i++) {
-				Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
 			for (int i = 0; i < ntimes; i++) {
-				Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
@@ -3114,14 +3114,14 @@ line.
 			Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
 			for (int i = 0; i < ntimes; i++) {
-				Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
 			for (int i = 0; i < ntimes; i++) {
-				Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
@@ -3160,7 +3160,7 @@ line.
 			Assert.Equal (0, tv.SelectedLength);
 
 			for (int i = 0; i < messy.Length; i++) {
-				Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
@@ -3170,7 +3170,7 @@ line.
 			Assert.Equal (0, tv.SelectedLength);
 
 			for (int i = 0; i < messy.Length; i++) {
-				Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is messy second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
@@ -3214,7 +3214,7 @@ line.
 			Assert.Equal (0, tv.SelectedLength);
 
 			for (int i = 0; i < ntimes; i++) {
-				Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
@@ -3224,7 +3224,7 @@ line.
 			Assert.Equal (0, tv.SelectedLength);
 
 			for (int i = 0; i < ntimes; i++) {
-				Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This  second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
@@ -3268,7 +3268,7 @@ line.
 			Assert.Equal (0, tv.SelectedLength);
 
 			for (int i = 0; i < ntimes; i++) {
-				Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
@@ -3278,7 +3278,7 @@ line.
 			Assert.Equal (0, tv.SelectedLength);
 
 			for (int i = 0; i < ntimes; i++) {
-				Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This isecond line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
@@ -3326,42 +3326,42 @@ line.
 			Assert.Equal (new Point (13, 2), tv.CursorPosition);
 
 			for (int i = 0; i < messy.Length; i++) {
-				Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This is messy the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (7, 2), tv.CursorPosition);
 
 			for (int i = 0; i < messy.Length; i++) {
-				Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (7, 0), tv.CursorPosition);
 
 			for (int i = 0; i < messy.Length; i++) {
-				Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
 			for (int i = 0; i < messy.Length; i++) {
-				Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (13, 1), tv.CursorPosition);
 
 			for (int i = 0; i < messy.Length; i++) {
-				Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This is messy the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (13, 0), tv.CursorPosition);
 
 			for (int i = 0; i < messy.Length; i++) {
-				Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This is messy the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is messy the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
@@ -3412,7 +3412,7 @@ line.
 			Assert.Equal (new Point (4, 2), tv.CursorPosition);
 
 			for (int i = 0; i < ntimes; i++) {
-				Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 
 				switch (i) {
 				case 0:
@@ -3434,7 +3434,7 @@ line.
 			Assert.Equal (new Point (7, 2), tv.CursorPosition);
 
 			for (int i = 0; i < ntimes; i++) {
-				Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 
 				switch (i) {
 				case 0:
@@ -3456,7 +3456,7 @@ line.
 			Assert.Equal (new Point (7, 0), tv.CursorPosition);
 
 			for (int i = 0; i < ntimes; i++) {
-				Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 
 				switch (i) {
 				case 0:
@@ -3478,21 +3478,21 @@ line.
 			Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
 			for (int i = 0; i < ntimes; i++) {
-				Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (4, 1), tv.CursorPosition);
 
 			for (int i = 0; i < ntimes; i++) {
-				Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (4, 0), tv.CursorPosition);
 
 			for (int i = 0; i < ntimes; i++) {
-				Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
@@ -3543,42 +3543,42 @@ line.
 			Assert.Equal (new Point (7, 2), tv.CursorPosition);
 
 			for (int i = 0; i < ntimes; i++) {
-				Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This ise first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (7, 2), tv.CursorPosition);
 
 			for (int i = 0; i < ntimes; i++) {
-				Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (7, 0), tv.CursorPosition);
 
 			for (int i = 0; i < ntimes; i++) {
-				Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
 			for (int i = 0; i < ntimes; i++) {
-				Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
 			for (int i = 0; i < ntimes; i++) {
-				Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This ise first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (7, 0), tv.CursorPosition);
 
 			for (int i = 0; i < ntimes; i++) {
-				Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal ($"This ise first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This ise third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
@@ -3647,7 +3647,7 @@ line.
 			Assert.Equal (0, tv.SelectedLength);
 
 			for (int i = 0; i < messy.Length; i++) {
-				Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 
 				switch (i) {
 				case 0:
@@ -3684,7 +3684,7 @@ line.
 			Assert.Equal (0, tv.SelectedLength);
 
 			for (int i = 0; i < messy.Length; i++) {
-				Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 
 				switch (i) {
 				case 0:
@@ -3738,267 +3738,267 @@ line.
 			Assert.Equal (Point.Empty, tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.O, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.O, new KeyModifiers ())));
 			Assert.Equal ("O", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.n, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.n, new KeyModifiers ())));
 			Assert.Equal ("On", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.e, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.e, new KeyModifiers ())));
 			Assert.Equal ("One", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (3, 0), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.T, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.T, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}T", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.w, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.w, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Tw", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (2, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.o, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.o, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (3, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.T, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.T, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}T", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.h, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.h, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Th", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (2, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.r, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.r, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thr", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (3, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.e, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.e, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thre", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (4, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.e, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.e, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (5, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 3), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
 			// Undoing
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (5, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thre", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (4, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thr", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (3, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Th", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (2, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}T", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (3, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Tw", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (2, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}T", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (3, 0), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"On", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"O", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
 			// Redoing
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"O", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"On", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (3, 0), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}T", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Tw", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (2, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (3, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}T", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Th", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (2, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thr", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (3, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thre", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (4, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (5, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 3), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 3), tv.CursorPosition);
@@ -4022,85 +4022,85 @@ line.
 			Assert.Equal (Point.Empty, tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.O, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.O, new KeyModifiers ())));
 			Assert.Equal ("O", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.n, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.n, new KeyModifiers ())));
 			Assert.Equal ("On", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.e, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.e, new KeyModifiers ())));
 			Assert.Equal ("One", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (3, 0), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.T, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.T, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}T", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.w, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.w, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Tw", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (2, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.o, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.o, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (3, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.T, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.T, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}T", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.h, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.h, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Th", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (2, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.r, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.r, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thr", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (3, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.e, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.e, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thre", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (4, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.e, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.e, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (5, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 3), tv.CursorPosition);
@@ -4111,7 +4111,7 @@ line.
 			tv.CursorPosition = new Point (0, 1);
 			Assert.Equal (3 + Environment.NewLine.Length, tv.SelectedLength);
 
-			Assert.True (tv.ProcessKey (new (Key.D1, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.D1, new KeyModifiers ())));
 			Assert.Equal ($"1Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
@@ -4123,7 +4123,7 @@ line.
 			tv.CursorPosition = new Point (1, 1);
 			Assert.Equal (4 + Environment.NewLine.Length, tv.SelectedLength);
 
-			Assert.True (tv.ProcessKey (new (Key.D2, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.D2, new KeyModifiers ())));
 			Assert.Equal ($"12hree{Environment.NewLine}", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
@@ -4131,118 +4131,118 @@ line.
 			Assert.True (tv.IsDirty);
 
 			// Undoing
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"1Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (5, 2), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thre", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (4, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thr", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (3, 2), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Th", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (2, 2), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}T", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 2), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 2), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (3, 1), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Tw", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (2, 1), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}T", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (3, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"On", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"O", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.False (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
@@ -4250,112 +4250,112 @@ line.
 			Assert.False (tv.IsDirty);
 
 			// Redoing
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"O", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"On", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (3, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}T", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Tw", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (2, 1), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (3, 1), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 2), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}T", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 2), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Th", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (2, 2), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thr", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (3, 2), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thre", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (4, 2), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (5, 2), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 3), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"1Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"12hree{Environment.NewLine}", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
@@ -4387,7 +4387,7 @@ line.
 			tv.CursorPosition = new Point (0, 1);
 			Assert.Equal (3 + Environment.NewLine.Length, tv.SelectedLength);
 
-			Assert.True (tv.ProcessKey (new (Key.D1, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.D1, new KeyModifiers ())));
 			Assert.Equal ($"1Two{Environment.NewLine}Three", tv.Text);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
@@ -4398,32 +4398,32 @@ line.
 			tv.CursorPosition = new Point (1, 1);
 			Assert.Equal (4 + Environment.NewLine.Length, tv.SelectedLength);
 
-			Assert.True (tv.ProcessKey (new (Key.D2, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.D2, new KeyModifiers ())));
 			Assert.Equal ("12hree", tv.Text);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"1Two{Environment.NewLine}Three", tv.Text);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.False (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"1Two{Environment.NewLine}Three", tv.Text);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("12hree", tv.Text);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
@@ -4454,7 +4454,7 @@ line.
 			tv.CursorPosition = new Point (0, 1);
 			Assert.Equal (3 + Environment.NewLine.Length, tv.SelectedLength);
 
-			Assert.True (tv.ProcessKey (new (Key.D1, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.D1, new KeyModifiers ())));
 			Assert.Equal ($"1Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
@@ -4465,32 +4465,32 @@ line.
 			tv.CursorPosition = new Point (1, 1);
 			Assert.Equal (4 + Environment.NewLine.Length, tv.SelectedLength);
 
-			Assert.True (tv.ProcessKey (new (Key.D2, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.D2, new KeyModifiers ())));
 			Assert.Equal ($"12hree{Environment.NewLine}", tv.Text);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"1Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.False (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"1Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"12hree{Environment.NewLine}", tv.Text);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			Assert.Equal (0, tv.SelectedLength);
@@ -4508,42 +4508,42 @@ line.
 			Assert.False (tv.IsDirty);
 			Assert.False (tv.HasHistoryChanges);
 
-			Assert.True (tv.ProcessKey (new (Key.D1, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.D1, new KeyModifiers ())));
 			Assert.Equal ("1", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 			Assert.True (tv.HasHistoryChanges);
 
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"1{Environment.NewLine}", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 			Assert.True (tv.HasHistoryChanges);
 
-			Assert.True (tv.ProcessKey (new (Key.D2, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.D2, new KeyModifiers ())));
 			Assert.Equal ($"1{Environment.NewLine}2", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 			Assert.True (tv.HasHistoryChanges);
 
-			Assert.True (tv.ProcessKey (new (Key.Backspace, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Backspace, new KeyModifiers ())));
 			Assert.Equal ($"1{Environment.NewLine}", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 			Assert.True (tv.HasHistoryChanges);
 
-			Assert.True (tv.ProcessKey (new (Key.Backspace, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Backspace, new KeyModifiers ())));
 			Assert.Equal ($"1", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 			Assert.True (tv.HasHistoryChanges);
 
-			Assert.True (tv.ProcessKey (new (Key.Backspace, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Backspace, new KeyModifiers ())));
 			Assert.Equal ($"", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
@@ -4566,7 +4566,7 @@ line.
 			Assert.False (tv.IsDirty);
 			Assert.False (tv.HasHistoryChanges);
 
-			Assert.True (tv.ProcessKey (new (Key.End | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.End | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.SelectedText);
 			Assert.Equal (3, tv.Lines);
@@ -4575,7 +4575,7 @@ line.
 			Assert.False (tv.IsDirty);
 			Assert.False (tv.HasHistoryChanges);
 
-			Assert.True (tv.ProcessKey (new (Key.Backspace, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Backspace, new KeyModifiers ())));
 			Assert.Equal ("", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal (1, tv.Lines);
@@ -4585,7 +4585,7 @@ line.
 			Assert.True (tv.HasHistoryChanges);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal (3, tv.Lines);
@@ -4595,7 +4595,7 @@ line.
 			Assert.True (tv.HasHistoryChanges);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal (1, tv.Lines);
@@ -4617,7 +4617,7 @@ line.
 			Assert.False (tv.IsDirty);
 			Assert.False (tv.HasHistoryChanges);
 
-			Assert.True (tv.ProcessKey (new (Key.End | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.End | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.SelectedText);
 			Assert.Equal (3, tv.Lines);
@@ -4626,7 +4626,7 @@ line.
 			Assert.False (tv.IsDirty);
 			Assert.False (tv.HasHistoryChanges);
 
-			Assert.True (tv.ProcessKey (new (Key.DeleteChar, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.DeleteChar, new KeyModifiers ())));
 			Assert.Equal ("", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal (1, tv.Lines);
@@ -4636,7 +4636,7 @@ line.
 			Assert.True (tv.HasHistoryChanges);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal (3, tv.Lines);
@@ -4646,7 +4646,7 @@ line.
 			Assert.True (tv.HasHistoryChanges);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal (1, tv.Lines);
@@ -4665,26 +4665,26 @@ line.
 
 			tv.CursorPosition = new Point (23, 0);
 
-			Assert.True (tv.ProcessKey (new (Key.C | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.C | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal ("This is the first line.", Clipboard.Contents);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (23, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (23, 1), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (23, 0), tv.CursorPosition);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (23, 1), tv.CursorPosition);
@@ -4700,7 +4700,7 @@ line.
 			tv.SelectionStartColumn = 12;
 			tv.CursorPosition = new Point (17, 0);
 
-			Assert.True (tv.ProcessKey (new (Key.C | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.C | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal ("first", tv.SelectedText);
 			Assert.Equal (3, tv.Lines);
@@ -4709,19 +4709,19 @@ line.
 			tv.SelectionStartColumn = 12;
 			tv.CursorPosition = new Point (11, 1);
 
-			Assert.True (tv.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (17, 0), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (12, 0), tv.CursorPosition);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (17, 0), tv.CursorPosition);
@@ -4737,7 +4737,7 @@ line.
 			tv.SelectionStartColumn = 12;
 			tv.CursorPosition = new Point (18, 1);
 
-			Assert.True (tv.ProcessKey (new (Key.C | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.C | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal ($"first line.{Environment.NewLine}This is the second", tv.SelectedText);
 			Assert.Equal (3, tv.Lines);
@@ -4745,19 +4745,19 @@ line.
 
 			tv.Selecting = false;
 
-			Assert.True (tv.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the secondfirst line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (18, 2), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (18, 1), tv.CursorPosition);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the secondfirst line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (18, 2), tv.CursorPosition);
@@ -4773,7 +4773,7 @@ line.
 			tv.SelectionStartColumn = 12;
 			tv.CursorPosition = new Point (18, 1);
 
-			Assert.True (tv.ProcessKey (new (Key.C | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.C | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal ($"first line.{Environment.NewLine}This is the second", tv.SelectedText);
 			Assert.Equal (3, tv.Lines);
@@ -4782,19 +4782,19 @@ line.
 			tv.Selecting = false;
 			tv.CursorPosition = new Point (17, 1);
 
-			Assert.True (tv.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the seconfirst line.{Environment.NewLine}This is the secondd line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (18, 2), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (17, 1), tv.CursorPosition);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the seconfirst line.{Environment.NewLine}This is the secondd line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (18, 2), tv.CursorPosition);
@@ -4807,25 +4807,25 @@ line.
 			var text = "\nThis is the first line.\nThis is the second line.";
 			var tv = new TextView () { Text = text };
 
-			Assert.True (tv.ProcessKey (new (Key.C | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.C | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
@@ -4845,19 +4845,19 @@ line.
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"Inserted{Environment.NewLine}NewLineThis is the first line.{Environment.NewLine}This is the second line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"Inserted{Environment.NewLine}NewLineThis is the first line.{Environment.NewLine}This is the second line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (7, 1), tv.CursorPosition);
@@ -4873,7 +4873,7 @@ line.
 			tv.SelectionStartColumn = 12;
 			tv.CursorPosition = new Point (17, 0);
 
-			Assert.True (tv.ProcessKey (new (Key.W | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.W | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the  line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal (3, tv.Lines);
@@ -4882,19 +4882,19 @@ line.
 			tv.SelectionStartColumn = 12;
 			tv.CursorPosition = new Point (11, 1);
 
-			Assert.True (tv.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (17, 0), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the  line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (12, 0), tv.CursorPosition);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (17, 0), tv.CursorPosition);
@@ -4910,7 +4910,7 @@ line.
 			tv.SelectionStartColumn = 12;
 			tv.CursorPosition = new Point (18, 1);
 
-			Assert.True (tv.ProcessKey (new (Key.W | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.W | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the  line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal (2, tv.Lines);
@@ -4918,19 +4918,19 @@ line.
 
 			tv.Selecting = false;
 
-			Assert.True (tv.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (18, 1), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the  line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (12, 0), tv.CursorPosition);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (18, 1), tv.CursorPosition);
@@ -4946,7 +4946,7 @@ line.
 			tv.SelectionStartColumn = 12;
 			tv.CursorPosition = new Point (17, 0);
 
-			Assert.True (tv.ProcessKey (new (Key.W | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.W | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the  line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal (3, tv.Lines);
@@ -4956,29 +4956,29 @@ line.
 			tv.SelectionStartRow = 1;
 			tv.CursorPosition = new Point (18, 1);
 
-			Assert.True (tv.ProcessKey (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Y | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the  line.{Environment.NewLine}This is the first line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (17, 1), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the  line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (12, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (12, 0), tv.CursorPosition);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the  line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (12, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the  line.{Environment.NewLine}This is the first line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (17, 1), tv.CursorPosition);
@@ -4990,122 +4990,122 @@ line.
 			var text = "First line.\nSecond line.";
 			var tv = new TextView () { Text = text };
 
-			Assert.True (tv.ProcessKey (new (Key.End | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.End | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}Second line.", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (12, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Backspace | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Backspace | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}Second line", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (11, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Backspace | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Backspace | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}Second ", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Backspace | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Backspace | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Backspace | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Backspace | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("First line.", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (11, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Backspace | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Backspace | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("First line", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (10, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Backspace | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Backspace | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("First ", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (6, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Backspace | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Backspace | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("First ", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (6, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("First line", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (10, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("First line.", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (11, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}Second ", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}Second line", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (11, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}Second line.", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (12, 1), tv.CursorPosition);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}Second line", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (11, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}Second ", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("First line.", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (11, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("First line", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (10, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("First ", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (6, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
@@ -5117,80 +5117,80 @@ line.
 			var text = "First line.\nSecond line.";
 			var tv = new TextView () { Text = text };
 
-			Assert.True (tv.ProcessKey (new (Key.DeleteChar | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.DeleteChar | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"line.{Environment.NewLine}Second line.", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.DeleteChar | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.DeleteChar | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.DeleteChar | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.DeleteChar | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("Second line.", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.DeleteChar | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.DeleteChar | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("line.", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.DeleteChar | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.DeleteChar | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("line.", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("Second line.", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"line.{Environment.NewLine}Second line.", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}Second line.", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"line.{Environment.NewLine}Second line.", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("Second line.", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("line.", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
@@ -5203,27 +5203,27 @@ line.
 			var text = "First line.\nSecond line.";
 			var tv = new TextView () { Text = text };
 
-			Assert.True (tv.ProcessKey (new (Key.End | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.End | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}Second line.", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (12, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.K | Key.AltMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.K | Key.AltMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal ("Second line.", Clipboard.Contents);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.K | Key.AltMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.K | Key.AltMask, new KeyModifiers ())));
 			Assert.Equal ("First line.", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal ($"Second line.{Environment.NewLine}", Clipboard.Contents);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (11, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.K | Key.AltMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.K | Key.AltMask, new KeyModifiers ())));
 			Assert.Equal ("", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal ($"Second line.{Environment.NewLine}First line.", Clipboard.Contents);
@@ -5231,33 +5231,33 @@ line.
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("First line.", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (11, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}Second line.", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (12, 1), tv.CursorPosition);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (11, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
@@ -5270,21 +5270,21 @@ line.
 			var text = "First line.\nSecond line.";
 			var tv = new TextView () { Text = text };
 
-			Assert.True (tv.ProcessKey (new (Key.K | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.K | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal ("First line.", Clipboard.Contents);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.K | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.K | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("Second line.", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal ($"First line.{Environment.NewLine}", Clipboard.Contents);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.K | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.K | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("", tv.Text);
 			Assert.Equal ("", tv.SelectedText);
 			Assert.Equal ($"First line.{Environment.NewLine}Second line.", Clipboard.Contents);
@@ -5292,33 +5292,33 @@ line.
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("Second line.", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}Second line.", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("Second line.", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
@@ -5329,34 +5329,34 @@ line.
 		{
 			var tv = new TextView ();
 
-			Assert.True (tv.ProcessKey (new (Key.D1, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.D1, new KeyModifiers ())));
 			Assert.Equal ("1", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.D2, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.D2, new KeyModifiers ())));
 			Assert.Equal ("12", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.D3, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.D3, new KeyModifiers ())));
 			Assert.Equal ("123", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (3, 0), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("12", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.D4, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.D4, new KeyModifiers ())));
 			Assert.Equal ("124", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (3, 0), tv.CursorPosition);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("124", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (3, 0), tv.CursorPosition);
@@ -5371,33 +5371,33 @@ line.
 			tv.SelectionStartColumn = 12;
 			tv.CursorPosition = new Point (17, 0);
 
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (17, 0), tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (17, 0), tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
@@ -5412,33 +5412,33 @@ line.
 			tv.SelectionStartColumn = 12;
 			tv.CursorPosition = new Point (18, 1);
 
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (18, 1), tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (18, 1), tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
@@ -5453,33 +5453,33 @@ line.
 			tv.SelectionStartColumn = 12;
 			tv.CursorPosition = new Point (17, 2);
 
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine} line.", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (17, 2), tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine} line.", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (17, 2), tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine} line.", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
@@ -5495,33 +5495,33 @@ line.
 			tv.SelectionStartRow = 1;
 			tv.CursorPosition = new Point (18, 1);
 
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 2), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (18, 1), tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 2), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (18, 1), tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 2), tv.CursorPosition);
@@ -5536,60 +5536,60 @@ line.
 			tv.SelectionStartColumn = 12;
 			tv.CursorPosition = new Point (17, 0);
 
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.a, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.a, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine}a line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (17, 0), tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine}a line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (17, 0), tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine}a line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
@@ -5605,60 +5605,60 @@ line.
 			tv.SelectionStartRow = 1;
 			tv.CursorPosition = new Point (18, 1);
 
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 2), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.a, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.a, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine}a line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (1, 2), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (18, 1), tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 2), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine}a line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (1, 2), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (18, 1), tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 2), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine}a line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (1, 2), tv.CursorPosition);
@@ -5670,65 +5670,65 @@ line.
 			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
 			var tv = new TextView () { Text = text };
 
-			Assert.True (tv.ProcessKey (new (Key.End | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.End | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (23, 2), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.a, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.a, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}a", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (23, 2), tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}a", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (23, 2), tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}a", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
@@ -5743,60 +5743,60 @@ line.
 			tv.SelectionStartColumn = 12;
 			tv.CursorPosition = new Point (12, 2);
 
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.a, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.a, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (12, 2), tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (12, 2), tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
@@ -5814,23 +5814,23 @@ line.
 			tv.SelectionStartColumn = 12;
 			tv.CursorPosition = new Point (12, 2);
 
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.a, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.a, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
@@ -5842,36 +5842,36 @@ line.
 			var text = "First line.\nSecond line.\nThird line.";
 			var tv = new TextView () { Width = 80, Height = 5, Text = text };
 
-			Assert.True (tv.ProcessKey (new (Key.Tab, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Tab, new KeyModifiers ())));
 			Assert.Equal ($"\tFirst line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.BackTab, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.BackTab, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"\tFirst line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"\tFirst line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
@@ -5886,36 +5886,36 @@ line.
 			tv.SelectionStartColumn = 6;
 			tv.CursorPosition = new Point (6, 2);
 
-			Assert.True (tv.ProcessKey (new (Key.Tab, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Tab, new KeyModifiers ())));
 			Assert.Equal ("First \tline.", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (7, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.BackTab, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.BackTab, new KeyModifiers ())));
 			Assert.Equal ("First line.", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (6, 0), tv.CursorPosition);
 
 			// Undo
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("First \tline.", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (7, 0), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (6, 2), tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
 			// Redo
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("First \tline.", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (7, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal ("First line.", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (6, 0), tv.CursorPosition);
@@ -5927,7 +5927,7 @@ line.
 			var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
 			var tv = new TextView () { Text = text };
 
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
@@ -5986,7 +5986,7 @@ line.
 			tv.ScrollTo (50);
 			Assert.Equal (0, tv.CursorPosition.Y);
 
-			tv.ProcessKey (new (Key.p, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.p, new KeyModifiers ()));
 		}
 
 		[Fact]
@@ -6138,7 +6138,7 @@ d
 line.
 ", output);
 
-			Assert.True (tv.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 			tv.Draw ();
 			Assert.Equal (new Point (0, 3), tv.CursorPosition);
 			Assert.Equal (new Point (12, 0), cp);
@@ -6157,7 +6157,7 @@ d
 line.
 ", output);
 
-			Assert.True (tv.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 			tv.Draw ();
 			Assert.Equal (new Point (1, 3), tv.CursorPosition);
 			Assert.Equal (new Point (13, 0), cp);
@@ -6219,7 +6219,7 @@ This is the second line.
 
 			tv.CursorPosition = new Point (3, 0);
 			Assert.Equal (new Point (3, 0), tv.CursorPosition);
-			Assert.True (tv.ProcessKey (new (Key.Backspace, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Backspace, new KeyModifiers ())));
 			tv.Draw ();
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6229,14 +6229,14 @@ This is the second line.
 
 			tv.CursorPosition = new Point (0, 1);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
-			Assert.True (tv.ProcessKey (new (Key.Backspace, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Backspace, new KeyModifiers ())));
 			tv.Draw ();
 			Assert.Equal (new Point (22, 0), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.This is the second line.
 ", output);
 
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			tv.Draw ();
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6245,7 +6245,7 @@ This is the second line.
 ", output);
 
 			while (tv.Text != envText) {
-				Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal (envText, tv.Text);
 			Assert.Equal (new Point (3, 0), tv.CursorPosition);
@@ -6276,7 +6276,7 @@ This is the second line.
 
 			tv.CursorPosition = new Point (3, 0);
 			Assert.Equal (new Point (3, 0), tv.CursorPosition);
-			Assert.True (tv.ProcessKey (new (Key.Backspace, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Backspace, new KeyModifiers ())));
 			tv.Draw ();
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6286,14 +6286,14 @@ This is the second line.
 
 			tv.CursorPosition = new Point (0, 1);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
-			Assert.True (tv.ProcessKey (new (Key.Backspace, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Backspace, new KeyModifiers ())));
 			tv.Draw ();
 			Assert.Equal (new Point (22, 0), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.This is the second line.
 ", output);
 
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			tv.Draw ();
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6302,7 +6302,7 @@ This is the second line.
 ", output);
 
 			while (tv.Text != envText) {
-				Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal (envText, tv.Text);
 			Assert.Equal (new Point (3, 0), tv.CursorPosition);
@@ -6332,7 +6332,7 @@ This is the second line.
 
 			tv.CursorPosition = new Point (2, 0);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
-			Assert.True (tv.ProcessKey (new (Key.DeleteChar, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.DeleteChar, new KeyModifiers ())));
 			tv.Draw ();
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6342,14 +6342,14 @@ This is the second line.
 
 			tv.CursorPosition = new Point (22, 0);
 			Assert.Equal (new Point (22, 0), tv.CursorPosition);
-			Assert.True (tv.ProcessKey (new (Key.DeleteChar, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.DeleteChar, new KeyModifiers ())));
 			tv.Draw ();
 			Assert.Equal (new Point (22, 0), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.This is the second line.
 ", output);
 
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			tv.Draw ();
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6358,7 +6358,7 @@ This is the second line.
 ", output);
 
 			while (tv.Text != envText) {
-				Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal (envText, tv.Text);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
@@ -6389,7 +6389,7 @@ This is the second line.
 
 			tv.CursorPosition = new Point (2, 0);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
-			Assert.True (tv.ProcessKey (new (Key.DeleteChar, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.DeleteChar, new KeyModifiers ())));
 			tv.Draw ();
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6399,14 +6399,14 @@ This is the second line.
 
 			tv.CursorPosition = new Point (22, 0);
 			Assert.Equal (new Point (22, 0), tv.CursorPosition);
-			Assert.True (tv.ProcessKey (new (Key.DeleteChar, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.DeleteChar, new KeyModifiers ())));
 			tv.Draw ();
 			Assert.Equal (new Point (22, 0), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.This is the second line.
 ", output);
 
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			tv.Draw ();
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6415,7 +6415,7 @@ This is the second line.
 ", output);
 
 			while (tv.Text != envText) {
-				Assert.True (tv.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+				Assert.True (tv.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			}
 			Assert.Equal (envText, tv.Text);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
@@ -6706,7 +6706,7 @@ This is the second line.
 			Assert.Equal (2, eventcount);
 
 			expectedCol = 1;
-			tv.ProcessKey (new (Key.Y, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.Y, new KeyModifiers ()));
 			Assert.Equal (3, eventcount);
 			Assert.Equal ("Yay", tv.Text);
 		}
@@ -6817,27 +6817,27 @@ This is the second line.
 			Assert.Equal (expectedEventCount, eventcount);
 
 			expectedEventCount++;
-			Assert.True (_textView.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (_textView.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal (expectedEventCount, eventcount);
 
 			// Undo
 			expectedEventCount++;
-			Assert.True (_textView.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (_textView.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal (expectedEventCount, eventcount);
 
 			// Redo
 			expectedEventCount++;
-			Assert.True (_textView.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (_textView.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal (expectedEventCount, eventcount);
 
 			// Undo
 			expectedEventCount++;
-			Assert.True (_textView.ProcessKey (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (_textView.OnKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal (expectedEventCount, eventcount);
 
 			// Redo
 			expectedEventCount++;
-			Assert.True (_textView.ProcessKey (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (_textView.OnKeyPressed (new (Key.R | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal (expectedEventCount, eventcount);
 		}
 
@@ -6856,7 +6856,7 @@ This is the second line.
 				eventcount++;
 			};
 
-			Assert.True (tv.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 

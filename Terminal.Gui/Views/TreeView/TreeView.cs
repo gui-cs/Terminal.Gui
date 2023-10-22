@@ -621,7 +621,7 @@ namespace Terminal.Gui {
 		public CollectionNavigator KeystrokeNavigator { get; private set; } = new CollectionNavigator ();
 
 		/// <inheritdoc/>
-		public override bool ProcessKey (KeyEventArgs keyEvent)
+		public override bool OnKeyPressed (KeyEventArgs keyEvent)
 		{
 			if (!Enabled) {
 				return false;
@@ -657,7 +657,7 @@ namespace Terminal.Gui {
 				PositionCursor ();
 			}
 
-			return base.ProcessKey (keyEvent);
+			return base.OnKeyPressed (keyEvent);
 		}
 
 		/// <summary>

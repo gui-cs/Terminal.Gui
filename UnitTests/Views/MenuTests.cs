@@ -143,7 +143,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (menu);
 			Application.Begin (Application.Top);
 
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			isMenuClosed = !menu.IsMenuOpen;
 			Assert.False (isMenuClosed);
@@ -157,7 +157,7 @@ Edit
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			cancelClosing = true;
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (isMenuClosed);
 			Application.Top.Draw ();
@@ -170,7 +170,7 @@ Edit
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			cancelClosing = false;
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 			Assert.True (isMenuClosed);
 			Application.Top.Draw ();
@@ -256,24 +256,24 @@ Edit
 			Assert.False (menu.IsMenuOpen);
 
 			// open the menu
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			// The _New doc isn't enabled because it can't execute and so can't be selected
 			Assert.Equal ("_File", miCurrent.Parent.Title);
 			Assert.Equal ("_New", miCurrent.Title);
 
-			Assert.True (mCurrent.ProcessKey (new (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.CursorDown, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_File", miCurrent.Parent.Title);
 			Assert.Equal ("_Save", miCurrent.Title);
 
-			Assert.True (mCurrent.ProcessKey (new (Key.CursorUp, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_File", miCurrent.Parent.Title);
 			Assert.Equal ("_New", miCurrent.Title);
 
 			// close the menu
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 		}
 
@@ -394,177 +394,177 @@ Edit
 			Application.Top.Add (menu);
 			Application.Begin (Application.Top);
 
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_New", GetCurrentMenuTitle ());
 
-			Assert.True (menu.ProcessKey (new (Key.CursorLeft, new KeyModifiers ())));
+			Assert.True (menu.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_About", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_About", GetCurrentMenuTitle ());
 
-			Assert.True (menu.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (menu.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_New", GetCurrentMenuTitle ());
 
-			Assert.True (menu.ProcessKey (new (Key.Esc, new KeyModifiers ())));
+			Assert.True (menu.OnKeyPressed (new (Key.Esc, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 			Assert.Equal ("Closed", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("None", GetCurrentMenuTitle ());
 
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_New", GetCurrentMenuTitle ());
-			Assert.True (menu.ProcessKey (new (Key.C | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (menu.OnKeyPressed (new (Key.C | Key.CtrlMask, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 			Assert.Equal ("Closed", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("None", GetCurrentMenuTitle ());
 
-			Assert.True (menu.ProcessKey (new (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (menu.OnKeyPressed (new (Key.CursorDown, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_New", GetCurrentMenuTitle ());
-			Assert.True (menu.ProcessKey (new (Key.Esc, new KeyModifiers ())));
+			Assert.True (menu.OnKeyPressed (new (Key.Esc, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 			Assert.Equal ("Closed", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("None", GetCurrentMenuTitle ());
 
-			Assert.True (menu.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (menu.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_New", GetCurrentMenuTitle ());
 
-			Assert.False (mCurrent.ProcessKey (new (Key.Tab, new KeyModifiers ())));
+			Assert.False (mCurrent.OnKeyPressed (new (Key.Tab, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
-			Assert.True (Application.Top.ProcessKey (new (Key.Tab, new KeyModifiers ())));
+			Assert.True (Application.Top.OnKeyPressed (new (Key.Tab, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 			Assert.Equal ("Closed", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("None", GetCurrentMenuTitle ());
 
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_New", GetCurrentMenuTitle ());
-			Assert.True (mCurrent.ProcessKey (new (Key.CursorUp, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_Quit", GetCurrentMenuTitle ());
 
-			Assert.True (mCurrent.ProcessKey (new (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.CursorDown, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_New", GetCurrentMenuTitle ());
 
-			Assert.True (mCurrent.ProcessKey (new (Key.CursorLeft, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_About", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_About", GetCurrentMenuTitle ());
 
-			Assert.True (mCurrent.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_New", GetCurrentMenuTitle ());
 
-			Assert.True (mCurrent.ProcessKey (new (Key.Esc, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.Esc, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 			Assert.Equal ("Closed", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("None", GetCurrentMenuTitle ());
 
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_New", GetCurrentMenuTitle ());
-			Assert.True (mCurrent.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 			Assert.Equal ("Closed", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("None", GetCurrentMenuTitle ());
 			Application.MainLoop.RunIteration ();
 			Assert.Equal ("New", miAction);
 
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_New", GetCurrentMenuTitle ());
-			Assert.True (mCurrent.ProcessKey (new (Key.CursorLeft, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_About", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_About", GetCurrentMenuTitle ());
-			Assert.True (mCurrent.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 			Assert.Equal ("Closed", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("None", GetCurrentMenuTitle ());
 			Application.MainLoop.RunIteration ();
 			Assert.Equal ("About", miAction);
 
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_New", GetCurrentMenuTitle ());
-			Assert.True (menu.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (menu.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_Copy", GetCurrentMenuTitle ());
-			Assert.True (mCurrent.ProcessKey (new (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.CursorDown, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("C_ut", GetCurrentMenuTitle ());
-			Assert.True (mCurrent.ProcessKey (new (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.CursorDown, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_Edit", GetCurrenParenttMenuItemTitle ());
 			Assert.Equal ("_Paste", GetCurrentMenuTitle ());
-			Assert.True (mCurrent.ProcessKey (new (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.CursorDown, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_Find and Replace", GetCurrenParenttMenuItemTitle ());
 			Assert.Equal ("F_ind", GetCurrentMenuTitle ());
-			Assert.True (mCurrent.ProcessKey (new (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.CursorDown, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_Find and Replace", GetCurrenParenttMenuItemTitle ());
 			Assert.Equal ("_Replace", GetCurrentMenuTitle ());
-			Assert.True (mCurrent.ProcessKey (new (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.CursorDown, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_Find and Replace", GetCurrenParenttMenuItemTitle ());
 			Assert.Equal ("F_ind", GetCurrentMenuTitle ());
-			Assert.True (mCurrent.ProcessKey (new (Key.CursorLeft, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_Edit", GetCurrenParenttMenuItemTitle ());
 			Assert.Equal ("_Find and Replace", GetCurrentMenuTitle ());
-			Assert.True (mCurrent.ProcessKey (new (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.CursorDown, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_Edit", GetCurrenParenttMenuItemTitle ());
 			Assert.Equal ("_Select All", GetCurrentMenuTitle ());
-			Assert.True (mCurrent.ProcessKey (new (Key.CursorUp, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_Find and Replace", GetCurrenParenttMenuItemTitle ());
 			Assert.Equal ("F_ind", GetCurrentMenuTitle ());
-			Assert.True (mCurrent.ProcessKey (new (Key.CursorUp, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_Edit", GetCurrenParenttMenuItemTitle ());
 			Assert.Equal ("_Find and Replace", GetCurrentMenuTitle ());
-			Assert.True (mCurrent.ProcessKey (new (Key.CursorUp, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_Edit", GetCurrenParenttMenuItemTitle ());
 			Assert.Equal ("_Paste", GetCurrentMenuTitle ());
-			Assert.True (mCurrent.ProcessKey (new (Key.CursorUp, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("C_ut", GetCurrentMenuTitle ());
-			Assert.True (mCurrent.ProcessKey (new (Key.CursorUp, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_Copy", GetCurrentMenuTitle ());
-			Assert.True (mCurrent.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (mCurrent.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 			Assert.Equal ("Closed", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("None", GetCurrentMenuTitle ());
@@ -714,7 +714,7 @@ Edit
 
 			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-			Assert.True (menu.ProcessHotKey (new (Key.F9, null)));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, null)));
 			Application.Top.Draw ();
 			expected = @"
  Numbers  
@@ -727,7 +727,7 @@ Edit
 
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-			Assert.True (Application.Top.Subviews [1].ProcessKey (new (Key.CursorDown, null)));
+			Assert.True (Application.Top.Subviews [1].OnKeyPressed (new (Key.CursorDown, null)));
 			Application.Top.Draw ();
 			expected = @"
  Numbers                 
@@ -741,7 +741,7 @@ Edit
 
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-			Assert.True (Application.Top.Subviews [2].ProcessKey (new (Key.CursorLeft, null)));
+			Assert.True (Application.Top.Subviews [2].OnKeyPressed (new (Key.CursorLeft, null)));
 			Application.Top.Draw ();
 			expected = @"
  Numbers  
@@ -754,7 +754,7 @@ Edit
 
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-			Assert.True (Application.Top.Subviews [1].ProcessKey (new (Key.Esc, null)));
+			Assert.True (Application.Top.Subviews [1].OnKeyPressed (new (Key.Esc, null)));
 			Application.Top.Draw ();
 			expected = @"
  Numbers
@@ -894,7 +894,7 @@ Edit
 			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 0, 8, 1), pos);
 
-			Assert.True (menu.ProcessHotKey (new (Key.F9, null)));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, null)));
 			Application.Top.Draw ();
 			expected = @"
  Numbers  
@@ -908,8 +908,8 @@ Edit
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 0, 10, 6), pos);
 
-			Assert.True (Application.Top.Subviews [1].ProcessKey (new (Key.CursorDown, null)));
-			Assert.True (Application.Top.Subviews [1].ProcessKey (new (Key.Enter, null)));
+			Assert.True (Application.Top.Subviews [1].OnKeyPressed (new (Key.CursorDown, null)));
+			Assert.True (Application.Top.Subviews [1].OnKeyPressed (new (Key.Enter, null)));
 			Application.Top.Draw ();
 			expected = @"
  Numbers       
@@ -924,7 +924,7 @@ Edit
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 0, 15, 7), pos);
 
-			Assert.True (Application.Top.Subviews [2].ProcessKey (new (Key.Enter, null)));
+			Assert.True (Application.Top.Subviews [2].OnKeyPressed (new (Key.Enter, null)));
 			Application.Top.Draw ();
 			expected = @"
  Numbers  
@@ -938,7 +938,7 @@ Edit
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 0, 10, 6), pos);
 
-			Assert.True (Application.Top.Subviews [1].ProcessKey (new (Key.Esc, null)));
+			Assert.True (Application.Top.Subviews [1].OnKeyPressed (new (Key.Esc, null)));
 			Application.Top.Draw ();
 			expected = @"
  Numbers
@@ -1083,11 +1083,11 @@ Edit
 			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 0, 11, 1), pos);
 
-			Assert.True (menu.ProcessKey (new (Key.N, null)));
+			Assert.True (menu.OnKeyPressed (new (Key.N, null)));
 			Application.MainLoop.RunIteration ();
 			Assert.True (newAction);
 
-			Assert.True (menu.ProcessHotKey (new (Key.AltMask, new KeyModifiers () { Alt = true })));
+			Assert.True (menu.OnHotKeyPressed (new (Key.AltMask, new KeyModifiers () { Alt = true })));
 			Assert.True (menu.IsMenuOpen);
 			Application.Top.Draw ();
 			expected = @"
@@ -1097,8 +1097,8 @@ Edit
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 0, 11, 1), pos);
 
-			Assert.True (menu.ProcessKey (new (Key.CursorRight, null)));
-			Assert.True (menu.ProcessKey (new (Key.C, null)));
+			Assert.True (menu.OnKeyPressed (new (Key.CursorRight, null)));
+			Assert.True (menu.OnKeyPressed (new (Key.C, null)));
 			Application.MainLoop.RunIteration ();
 			Assert.True (copyAction);
 		}
@@ -1250,21 +1250,21 @@ Edit
 			Assert.False (newAction);
 			Assert.False (copyAction);
 
-			Assert.True (menu.ProcessHotKey (new (Key.AltMask | Key.F, new KeyModifiers () { Alt = true })));
+			Assert.True (menu.OnHotKeyPressed (new (Key.AltMask | Key.F, new KeyModifiers () { Alt = true })));
 			Assert.True (menu.IsMenuOpen);
 			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), output);
 
-			Assert.True (Application.Top.Subviews [1].ProcessKey (new (Key.N, null)));
+			Assert.True (Application.Top.Subviews [1].OnKeyPressed (new (Key.N, null)));
 			Application.MainLoop.RunIteration ();
 			Assert.True (newAction);
 
-			Assert.True (menu.ProcessHotKey (new (Key.AltMask | Key.E, new KeyModifiers () { Alt = true })));
+			Assert.True (menu.OnHotKeyPressed (new (Key.AltMask | Key.E, new KeyModifiers () { Alt = true })));
 			Assert.True (menu.IsMenuOpen);
 			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (1), output);
 
-			Assert.True (Application.Top.Subviews [1].ProcessKey (new (Key.C, null)));
+			Assert.True (Application.Top.Subviews [1].OnKeyPressed (new (Key.C, null)));
 			Application.MainLoop.RunIteration ();
 			Assert.True (copyAction);
 		}
@@ -1296,19 +1296,19 @@ Edit
 			Application.Begin (Application.Top);
 
 			// Open first
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), output);
 
 			// Open second
-			Assert.True (Application.Top.Subviews [1].ProcessKey (new (Key.CursorRight, null)));
+			Assert.True (Application.Top.Subviews [1].OnKeyPressed (new (Key.CursorRight, null)));
 			Assert.True (menu.IsMenuOpen);
 			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (1), output);
 
 			// Close menu
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
@@ -1328,19 +1328,19 @@ Edit
 			Application.Top.Add (menu);
 
 			// Open first
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), output);
 
 			// Open second
-			Assert.True (Application.Top.Subviews [1].ProcessKey (new (Key.CursorRight, null)));
+			Assert.True (Application.Top.Subviews [1].OnKeyPressed (new (Key.CursorRight, null)));
 			Assert.True (menu.IsMenuOpen);
 			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (1), output);
 
 			// Close menu
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
@@ -1497,40 +1497,40 @@ Edit
 
 			Application.Begin (Application.Top);
 			Assert.True (tf.HasFocus);
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (tf.HasFocus);
 			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), output);
 
 			// Right - Edit has no sub menu; this tests that no sub menu shows
-			Assert.True (menu.openMenu.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (menu.openMenu.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (tf.HasFocus);
 			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (1), output);
 
 			// Right - Format
-			Assert.True (menu.openMenu.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (menu.openMenu.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (tf.HasFocus);
 			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (2), output);
 
 			// Left - Edit
-			Assert.True (menu.openMenu.ProcessKey (new (Key.CursorLeft, new KeyModifiers ())));
+			Assert.True (menu.openMenu.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (tf.HasFocus);
 			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (1), output);
 
-			Assert.True (menu.openMenu.ProcessKey (new (Key.CursorLeft, new KeyModifiers ())));
+			Assert.True (menu.openMenu.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.False (tf.HasFocus);
 			Application.Top.Draw ();
 			TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), output);
 
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 			Assert.True (tf.HasFocus);
 			Application.Top.Draw ();
@@ -1548,18 +1548,18 @@ Edit
 			Application.Top.Add (menu);
 			Application.Begin (Application.Top);
 
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 
 			menu.Key = Key.F10 | Key.ShiftMask;
-			Assert.False (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.False (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 
-			Assert.True (menu.ProcessHotKey (new (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
-			Assert.True (menu.ProcessHotKey (new (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 		}
 
@@ -1654,8 +1654,8 @@ Edit
 			Application.Begin (Application.Top);
 
 			Assert.False (Application.Top.OnKeyDown (new (Key.AltMask, new KeyModifiers { Alt = true })));
-			Assert.True (menu.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
-			Assert.True (menu.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (menu.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (menu.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 		}
 
 		[Fact, AutoInitShutdown]
@@ -1690,7 +1690,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-				Assert.True (win.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+				Assert.True (win.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 				top.Draw ();
 				TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1702,7 +1702,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-				Assert.True (menu.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+				Assert.True (menu.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 				Application.Refresh ();
 				TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1714,7 +1714,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-				Assert.True (menu.openMenu.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+				Assert.True (menu.openMenu.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 				top.Draw ();
 				TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1726,7 +1726,7 @@ Edit
 │                 └───────────┘        │
 └──────────────────────────────────────┘", output);
 
-				Assert.True (menu.openMenu.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+				Assert.True (menu.openMenu.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 				top.Draw ();
 				TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1775,7 +1775,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-			Assert.True (win.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (win.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1787,7 +1787,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-			Assert.True (menu.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (menu.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1799,7 +1799,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-			Assert.True (menu.openMenu.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (menu.openMenu.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1811,7 +1811,7 @@ Edit
 │                 └───────────┘        │
 └──────────────────────────────────────┘", output);
 
-			Assert.True (menu.openMenu.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (menu.openMenu.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1853,7 +1853,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-			Assert.True (win.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (win.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 			win.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1865,7 +1865,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-			Assert.True (menu.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (menu.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1877,7 +1877,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-			Assert.True (menu.openMenu.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (menu.openMenu.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 			win.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1889,7 +1889,7 @@ Edit
 │                 └───────────┘        │
 └──────────────────────────────────────┘", output);
 
-			Assert.True (menu.openMenu.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (menu.openMenu.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 			win.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1920,7 +1920,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-				Assert.True (top.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
+				Assert.True (top.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
 				top.Draw ();
 				TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1932,7 +1932,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-				Assert.True (top.Subviews [0].ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+				Assert.True (top.Subviews [0].OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 				Application.Refresh ();
 				TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1944,7 +1944,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-				Assert.True (((MenuBar)top.Subviews [0]).openMenu.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+				Assert.True (((MenuBar)top.Subviews [0]).openMenu.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 				top.Draw ();
 				TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1956,7 +1956,7 @@ Edit
 │                 └───────────┘        │
 └──────────────────────────────────────┘", output);
 
-				Assert.True (((MenuBar)top.Subviews [0]).openMenu.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+				Assert.True (((MenuBar)top.Subviews [0]).openMenu.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 				top.Draw ();
 				TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -2010,8 +2010,8 @@ Edit
 			Application.Begin (top);
 
 			Assert.False (mi.Checked);
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
-			Assert.True (menu.openMenu.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.openMenu.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Application.MainLoop.RunIteration ();
 			Assert.True (mi.Checked);
 			Assert.True (menu.MouseEvent (new MouseEvent () {
@@ -2030,8 +2030,8 @@ Edit
 			Assert.False (mi.Checked);
 
 			mi.AllowNullChecked = true;
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
-			Assert.True (menu.openMenu.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.openMenu.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Application.MainLoop.RunIteration ();
 			Assert.Null (mi.Checked);
 			Assert.True (menu.MouseEvent (new MouseEvent () {
@@ -2054,8 +2054,8 @@ Edit
 			}));
 			Application.MainLoop.RunIteration ();
 			Assert.True (mi.Checked);
-			Assert.True (menu.ProcessHotKey (new (Key.F9, new KeyModifiers ())));
-			Assert.True (menu.openMenu.ProcessKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.openMenu.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Application.MainLoop.RunIteration ();
 			Assert.False (mi.Checked);
 			Assert.True (menu.MouseEvent (new MouseEvent () {
@@ -2238,7 +2238,7 @@ wo
 			Assert.Equal (Point.Empty, new Point (menu.Frame.X, menu.Frame.Y));
 			Assert.False (menu.UseSubMenusSingleFrame);
 
-			Assert.True (menu.ProcessHotKey (new (Key.F9, null)));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, null)));
 			Application.Top.Draw ();
 			var expected = @"
  Numbers
@@ -2248,7 +2248,7 @@ wo
 
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-			Assert.True (Application.Top.Subviews [1].ProcessKey (new (Key.CursorDown, null)));
+			Assert.True (Application.Top.Subviews [1].OnKeyPressed (new (Key.CursorDown, null)));
 			Application.Top.Draw ();
 			expected = @"
  Numbers           
@@ -2282,7 +2282,7 @@ wo
 			Assert.True (menu.UseSubMenusSingleFrame);
 
 
-			Assert.True (menu.ProcessHotKey (new (Key.F9, null)));
+			Assert.True (menu.OnHotKeyPressed (new (Key.F9, null)));
 			Application.Top.Draw ();
 			var expected = @"
  Numbers
@@ -2292,8 +2292,8 @@ wo
 
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-			Assert.True (Application.Top.Subviews [1].ProcessKey (new (Key.CursorDown, null)));
-			Assert.True (Application.Top.Subviews [1].ProcessKey (new (Key.Enter, null)));
+			Assert.True (Application.Top.Subviews [1].OnKeyPressed (new (Key.CursorDown, null)));
+			Assert.True (Application.Top.Subviews [1].OnKeyPressed (new (Key.Enter, null)));
 			Application.Top.Draw ();
 			expected = @"
  Numbers     
@@ -2730,7 +2730,7 @@ wo
 			Assert.True (CanExecuteNew ());
 			Assert.False (CanExecuteClose ());
 
-			Assert.True (top.ProcessHotKey (new (Key.N | Key.AltMask, new KeyModifiers () { Alt = true })));
+			Assert.True (top.OnHotKeyPressed (new (Key.N | Key.AltMask, new KeyModifiers () { Alt = true })));
 			Application.MainLoop.RunIteration ();
 			Assert.NotNull (win);
 			Assert.False (CanExecuteNew ());
@@ -2749,13 +2749,13 @@ wo
 			Application.Begin (Application.Top);
 
 			Assert.True (menu.Visible);
-			Assert.True (menu.ProcessHotKey (new (menu.Key, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (menu.Key, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 
 			menu.Visible = false;
 			Assert.False (menu.IsMenuOpen);
 
-			Assert.True (menu.ProcessHotKey (new (menu.Key, new KeyModifiers ())));
+			Assert.True (menu.OnHotKeyPressed (new (menu.Key, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
 		}
 	}

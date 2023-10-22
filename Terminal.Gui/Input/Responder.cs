@@ -69,11 +69,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual bool Visible { get; set; } = true;
 
-		// Key handling
+		#region Key handling
 		/// <summary>
-		///   This method can be overwritten by view that
-		///     want to provide accelerator functionality
-		///     (Alt-key for example).
+		/// A low-level method to support hot keys (e.g. Alt-X). Can be overridden to provide accelerator functionality.
+		/// Typical apps will use <see cref="Command"/> instead.
 		/// </summary>
 		/// <remarks>
 		///   <para>
@@ -92,14 +91,14 @@ namespace Terminal.Gui {
 		///  </para>
 		/// </remarks>
 
-		public virtual bool ProcessHotKey (KeyEventArgs kb)
+		public virtual bool OnHotKeyPressed (KeyEventArgs kb)
 		{
 			return false;
 		}
 
 		/// <summary>
-		///   If the view is focused, gives the view a
-		///   chance to process the keystroke.
+		/// If the view is focused, gives the view a chance to process the keystroke. Fires the <see cref="KeyPressed"/> event.
+		/// Typical apps will use <see cref="Command"/> instead.
 		/// </summary>
 		/// <remarks>
 		///   <para>
@@ -120,16 +119,14 @@ namespace Terminal.Gui {
 		///   </para>
 		/// </remarks>
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
-		public virtual bool ProcessKey (KeyEventArgs keyEvent)
+		public virtual bool OnKeyPressed (KeyEventArgs keyEvent)
 		{
 			return false;
 		}
 
 		/// <summary>
-		///   This method can be overwritten by views that
-		///     want to provide accelerator functionality
-		///     (Alt-key for example), but without
-		///     interefering with normal ProcessKey behavior.
+		/// A low-level method to support hot keys (e.g. Alt-X). Can be overridden to provide accelerator functionality.
+		/// Typical apps will use <see cref="Command"/> instead.
 		/// </summary>
 		/// <remarks>
 		///   <para>
@@ -147,14 +144,17 @@ namespace Terminal.Gui {
 		///  </para>
 		/// </remarks>
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
-		public virtual bool ProcessColdKey (KeyEventArgs keyEvent)
+		public virtual bool OnColdKey (KeyEventArgs keyEvent)
 		{
 			return false;
 		}
 
 		/// <summary>
-		/// Method invoked when a key is pressed.
+		/// Invoked when a key is depressed. .
 		/// </summary>
+		/// <remarks>
+		/// Not all terminals support key distinct down/up notifications, just key pressed (see <see cref="OnKeyPressed"/>).
+		/// </remarks>
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		/// <returns>true if the event was handled</returns>
 		public virtual bool OnKeyDown (KeyEventArgs keyEvent)
@@ -221,6 +221,7 @@ namespace Terminal.Gui {
 		{
 			return false;
 		}
+#endregion
 
 		/// <summary>
 		/// Method invoked when the <see cref="CanFocus"/> property from a view is changed.

@@ -29,22 +29,22 @@ namespace Terminal.Gui.ViewsTests {
 			var colorPicker = new ColorPicker ();
 			Assert.Equal (ColorName.Black, colorPicker.SelectedColor);
 
-			Assert.True (colorPicker.ProcessKey (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (colorPicker.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 			Assert.Equal (ColorName.Blue, colorPicker.SelectedColor);
 
-			Assert.True (colorPicker.ProcessKey (new (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (colorPicker.OnKeyPressed (new (Key.CursorDown, new KeyModifiers ())));
 			Assert.Equal (ColorName.BrightBlue, colorPicker.SelectedColor);
 
-			Assert.True (colorPicker.ProcessKey (new (Key.CursorLeft, new KeyModifiers ())));
+			Assert.True (colorPicker.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ())));
 			Assert.Equal (ColorName.DarkGray, colorPicker.SelectedColor);
 
-			Assert.True (colorPicker.ProcessKey (new (Key.CursorUp, new KeyModifiers ())));
+			Assert.True (colorPicker.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ())));
 			Assert.Equal (ColorName.Black, colorPicker.SelectedColor);
 
-			Assert.True (colorPicker.ProcessKey (new (Key.CursorLeft, new KeyModifiers ())));
+			Assert.True (colorPicker.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ())));
 			Assert.Equal (ColorName.Black, colorPicker.SelectedColor);
 
-			Assert.True (colorPicker.ProcessKey (new (Key.CursorUp, new KeyModifiers ())));
+			Assert.True (colorPicker.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ())));
 			Assert.Equal (ColorName.Black, colorPicker.SelectedColor);
 		}
 

@@ -485,7 +485,7 @@ namespace Terminal.Gui {
 
 
 		/// <inheritdoc/>
-		public override bool ProcessHotKey (KeyEventArgs keyEvent)
+		public override bool OnHotKeyPressed (KeyEventArgs keyEvent)
 		{
 			if (this.NavigateIf (keyEvent, Key.CtrlMask | Key.F, this.tbFind)) {
 				return true;
@@ -499,7 +499,7 @@ namespace Terminal.Gui {
 				allowedTypeMenuBar.CloseMenu (false, false, false);
 			}
 
-			return base.ProcessHotKey (keyEvent);
+			return base.OnHotKeyPressed (keyEvent);
 		}
 		private void RestartSearch ()
 		{
