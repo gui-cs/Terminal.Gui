@@ -121,19 +121,26 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// If the view is focused, gives the view a chance to process the keystroke. Fires the <see cref="KeyPressed"/> event.
+		/// If the view is focused, gives the view a chance to process the keystroke.
+		/// Called after <see cref="OnKeyDown"/> and <see cref="OnKeyUp"/>.
+		/// Fires the <see cref="KeyPressed"/> event.
 		/// Typical apps will use <see cref="Command"/> instead.
 		/// </summary>
-
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		/// <returns><see langword="false"/> if the key stroke was not handled. <see langword="true"/> if no
 		/// other view should see it.</returns>
 		public virtual bool OnKeyPressed (KeyEventArgs keyEvent)
 		{
 			// fire event
-
-			return false;
+			KeyPressed?.Invoke (this, keyEvent);
+			return keyEvent.Handled;
 		}
+
+		/// <summary>
+		/// Invoked when a key is pressed. Set <see cref="KeyEventArgs.Handled"/> to true to stop the key from being processed by other views.
+		/// </summary>
+		public event EventHandler<KeyEventArgs> KeyPressed;
+
 		/// <summary>
 		/// Invoked when a key is depressed.
 		/// </summary>
