@@ -38,10 +38,8 @@
   <!-- Dependencies -->
   <!-- =================================================================== -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
     <PackageReference Include="System.IO.Abstractions" Version="19.2.69" />
-    <PackageReference Include="System.Text.Json" Version="7.0.3" />
     <PackageReference Include="System.Management" Version="7.0.2" />
     <PackageReference Include="Wcwidth" Version="1.0.0" />
     <!-- Enable Nuget Source Link for github -->
