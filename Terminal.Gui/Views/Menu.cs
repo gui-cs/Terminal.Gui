@@ -745,7 +745,7 @@ namespace Terminal.Gui {
 
 		public override bool OnKeyPressed (KeyEventArgs a)
 		{
-			var result = InvokeKeybindings (a);
+			var result = InvokeKeyBindings (a);
 			if (result != null)
 				return (bool)result;
 
@@ -1959,7 +1959,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnKeyPressed (KeyEventArgs a)
 		{
-			if (InvokeKeybindings (a) == true)
+			if (InvokeKeyBindings (a) == true)
 				return true;
 
 			var key = a.KeyValue;

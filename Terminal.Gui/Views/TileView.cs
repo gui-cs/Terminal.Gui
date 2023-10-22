@@ -811,7 +811,7 @@ namespace Terminal.Gui {
 					return base.OnKeyPressed (a);
 				}
 
-				var result = InvokeKeybindings (a);
+				var result = InvokeKeyBindings (a);
 				if (result != null)
 					return (bool)result;
 

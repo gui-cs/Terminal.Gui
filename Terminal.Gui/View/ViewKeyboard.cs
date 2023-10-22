@@ -176,7 +176,7 @@ namespace Terminal.Gui {
 			if (keyEvent.Handled) {
 				return true;
 			}
-			if (Focused?.Enabled) {
+			if (Focused?.Enabled == true) {
 				Focused?.KeyPressed?.Invoke (this, keyEvent);
 				if (keyEvent.Handled) {
 					return true;
@@ -191,7 +191,7 @@ namespace Terminal.Gui {
 		/// and matches the <paramref name="keyEvent"/>
 		/// </summary>
 		/// <param name="keyEvent">The key event passed.</param>
-		protected bool? InvokeKeybindings (KeyEventArgs keyEvent)
+		protected bool? InvokeKeyBindings (KeyEventArgs keyEvent)
 		{
 			bool? toReturn = null;
 

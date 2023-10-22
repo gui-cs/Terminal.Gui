@@ -1438,7 +1438,7 @@ public class Slider<T> : View {
 			return base.OnKeyPressed (keyEvent);
 		}
 
-		var result = InvokeKeybindings (keyEvent);
+		var result = InvokeKeyBindings (keyEvent);
 		if (result != null) {
 			return (bool)result;
 		}

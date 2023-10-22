@@ -398,7 +398,7 @@ namespace Terminal.Gui {
 			if (base.OnKeyPressed (keyEvent))
 				return true;
 
-			var result = InvokeKeybindings (new (ShortcutHelper.GetModifiersKey (keyEvent),
+			var result = InvokeKeyBindings (new (ShortcutHelper.GetModifiersKey (keyEvent),
 				new KeyModifiers () { Alt = keyEvent.IsAlt, Ctrl = keyEvent.IsCtrl, Shift = keyEvent.IsShift }));
 			if (result != null)
 				return (bool)result;

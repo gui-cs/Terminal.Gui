@@ -233,7 +233,7 @@ namespace Terminal.Gui {
 		public override bool OnKeyPressed (KeyEventArgs keyEvent)
 		{
 			if (HasFocus && CanFocus && Focused == tabsBar) {
-				var result = InvokeKeybindings (keyEvent);
+				var result = InvokeKeyBindings (keyEvent);
 				if (result != null)
 					return (bool)result;
 			}

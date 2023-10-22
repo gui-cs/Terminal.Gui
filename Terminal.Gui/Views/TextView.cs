@@ -3412,7 +3412,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			var result = InvokeKeybindings (new (ShortcutHelper.GetModifiersKey (a),
+			var result = InvokeKeyBindings (new (ShortcutHelper.GetModifiersKey (a),
 			    new KeyModifiers () { Alt = a.IsAlt, Ctrl = a.IsCtrl, Shift = a.IsShift }));
 			if (result != null)
 				return (bool)result;
