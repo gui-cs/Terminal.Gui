@@ -150,7 +150,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Invoked when a key is depressed. .
+		/// Invoked when a key is depressed.
 		/// </summary>
 		/// <remarks>
 		/// Not all terminals support key distinct down/up notifications, just key pressed (see <see cref="OnKeyPressed"/>).
@@ -159,18 +159,24 @@ namespace Terminal.Gui {
 		/// <returns>true if the event was handled</returns>
 		public virtual bool OnKeyDown (KeyEventArgs keyEvent)
 		{
+			// Does nothing. Since some drivers don't support distinct down/up events we
+			// don't expose KeyDown/KeyUp as an event.
 			return false;
 		}
 
 		/// <summary>
-		/// Method invoked when a key is released.
+		/// Method invoked when a key is released. This method will be called after <see cref="OnKeyPressed"/>.
 		/// </summary>
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		/// <returns>true if the event was handled</returns>
 		public virtual bool OnKeyUp (KeyEventArgs keyEvent)
 		{
+			// Does nothing. Since some drivers don't support distinct down/up events we
+			// don't expose KeyDown/KeyUp as an event.
 			return false;
 		}
+
+		#endregion
 
 		/// <summary>
 		/// Method invoked when a mouse event is generated
@@ -221,7 +227,6 @@ namespace Terminal.Gui {
 		{
 			return false;
 		}
-#endregion
 
 		/// <summary>
 		/// Method invoked when the <see cref="CanFocus"/> property from a view is changed.
