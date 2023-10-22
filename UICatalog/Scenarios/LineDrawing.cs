@@ -32,7 +32,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (canvas);
 			Win.Add (tools);
 
-			Win.KeyPressed += (s,e) => { e.Handled = canvas.ProcessKey (e.KeyEvent); };
+			Win.KeyPressed += (s,e) => { e.Handled = canvas.ProcessKey (e); };
 		}
 
 		class ToolsView : Window {
@@ -107,7 +107,7 @@ namespace UICatalog.Scenarios {
 
 			Stack<StraightLine> undoHistory = new ();
 
-			public override bool ProcessKey (OldKeyEvent e)
+			public override bool ProcessKey (KeyEventArgs e)
 			{
 				if (e.Key == (Key.Z | Key.CtrlMask)) {
 					var pop = _currentLayer.RemoveLastLine ();

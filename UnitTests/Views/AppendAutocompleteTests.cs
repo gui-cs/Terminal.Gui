@@ -28,7 +28,7 @@ namespace Terminal.Gui.TextTests {
 			tf.PositionCursor ();
 			TestHelpers.AssertDriverContentsAre ("", output);
 
-			tf.ProcessKey (new OldKeyEvent (Key.f, new KeyModifiers ()));
+			tf.ProcessKey (new (Key.f, new KeyModifiers ()));
 
 			tf.Draw ();
 			tf.PositionCursor ();
@@ -61,10 +61,10 @@ namespace Terminal.Gui.TextTests {
 			tf.Draw ();
 			tf.PositionCursor ();
 			TestHelpers.AssertDriverContentsAre ("", output);
-			tf.ProcessKey (new OldKeyEvent (Key.m, new KeyModifiers ()));
-			tf.ProcessKey (new OldKeyEvent (Key.y, new KeyModifiers ()));
-			tf.ProcessKey (new OldKeyEvent (Key.Space, new KeyModifiers ()));
-			tf.ProcessKey (new OldKeyEvent (Key.f, new KeyModifiers ()));
+			tf.ProcessKey (new (Key.m, new KeyModifiers ()));
+			tf.ProcessKey (new (Key.y, new KeyModifiers ()));
+			tf.ProcessKey (new (Key.Space, new KeyModifiers ()));
+			tf.ProcessKey (new (Key.f, new KeyModifiers ()));
 
 			// Even though there is no match on case we should still get the suggestion
 			tf.Draw ();

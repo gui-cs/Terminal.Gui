@@ -3,23 +3,116 @@ using System;
 namespace Terminal.Gui;
 
 /// <summary>
-/// Defines the event arguments for <see cref="KeyEvent"/>
+/// Defines the event arguments for keyboard events.
 /// </summary>
 public class KeyEventArgs : EventArgs {
+
 	/// <summary>
-	/// Constructs.
+	/// Constructs a new <see cref="KeyEventArgs"/>
 	/// </summary>
-	/// <param name="ke"></param>
-	public KeyEventArgs (OldKeyEvent ke) => KeyEvent = ke;
+	public KeyEventArgs ()
+	{
+		Key = Key.Unknown;
+		_keyModifiers = new KeyModifiers ();
+	}
+
 	/// <summary>
-	/// The <see cref="KeyEvent"/> for the event.
+	///   Constructs a new <see cref="KeyEventArgs"/> from the provided Key value - can be a rune cast into a Key value
 	/// </summary>
-	public OldKeyEvent KeyEvent { get; set; }
+	public KeyEventArgs (Key k, KeyModifiers km)
+	{
+		Key = k;
+		_keyModifiers = km;
+	}
+
 	/// <summary>
 	/// Indicates if the current Key event has already been processed and the driver should stop notifying any other event subscriber.
 	/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
 	/// </summary>
 	public bool Handled { get; set; } = false;
+
+	KeyModifiers _keyModifiers;
+
+	/// <summary>
+	/// Symbolic definition for the key.
+	/// </summary>
+	public Key Key;
+
+	/// <summary>
+	///   The key value cast to an integer, you will typical use this for
+	///   extracting the Unicode rune value out of a key, when none of the
+	///   symbolic options are in use.
+	/// </summary>
+	public int KeyValue => (int)Key;
+
+	/// <summary>
+	/// Gets a value indicating whether the Shift key was pressed.
+	/// </summary>
+	/// <value><c>true</c> if is shift; otherwise, <c>false</c>.</value>
+	public bool IsShift => _keyModifiers.Shift || Key == Key.BackTab;
+
+	/// <summary>
+	/// Gets a value indicating whether the Alt key was pressed (real or synthesized)
+	/// </summary>
+	/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
+	public bool IsAlt => _keyModifiers.Alt;
+
+	/// <summary>
+	/// Determines whether the value is a control key (and NOT just the ctrl key)
+	/// </summary>
+	/// <value><c>true</c> if is ctrl; otherwise, <c>false</c>.</value>
+	//public bool IsCtrl => ((uint)Key >= 1) && ((uint)Key <= 26);
+	public bool IsCtrl => _keyModifiers.Ctrl;
+
+	/// <summary>
+	/// Gets a value indicating whether the Caps lock key was pressed (real or synthesized)
+	/// </summary>
+	/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
+	public bool IsCapslock => _keyModifiers.Capslock;
+
+	/// <summary>
+	/// Gets a value indicating whether the Num lock key was pressed (real or synthesized)
+	/// </summary>
+	/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
+	public bool IsNumlock => _keyModifiers.Numlock;
+
+	/// <summary>
+	/// Gets a value indicating whether the Scroll lock key was pressed (real or synthesized)
+	/// </summary>
+	/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
+	public bool IsScrolllock => _keyModifiers.Scrolllock;
+
+	/// <summary>
+	/// Pretty prints the KeyEvent
+	/// </summary>
+	/// <returns></returns>
+	public override string ToString ()
+	{
+		string msg = "";
+		var key = this.Key;
+		if (_keyModifiers.Shift) {
+			msg += "Shift-";
+		}
+		if (_keyModifiers.Alt) {
+			msg += "Alt-";
+		}
+		if (_keyModifiers.Ctrl) {
+			msg += "Ctrl-";
+		}
+		if (_keyModifiers.Capslock) {
+			msg += "Capslock-";
+		}
+		if (_keyModifiers.Numlock) {
+			msg += "Numlock-";
+		}
+		if (_keyModifiers.Scrolllock) {
+			msg += "Scrolllock-";
+		}
+
+		msg += $"{((Key)KeyValue != Key.Unknown && ((uint)this.KeyValue & (uint)Key.CharMask) > 27 ? $"{(char)this.KeyValue}" : $"{key}")}";
+
+		return msg;
+	}
 }
 
 /// <summary>
@@ -548,108 +641,108 @@ public enum Key : uint {
 	Unknown
 }
 
-/// <summary>
-/// Describes a keyboard event.
-/// </summary>
-public class OldKeyEvent {
-	KeyModifiers keyModifiers;
+///// <summary>
+///// Describes a keyboard event.
+///// </summary>
+//public class {
+//	KeyModifiers keyModifiers;
 
-	/// <summary>
-	/// Symbolic definition for the key.
-	/// </summary>
-	public Key Key;
+//	/// <summary>
+//	/// Symbolic definition for the key.
+//	/// </summary>
+//	public Key Key;
 
-	/// <summary>
-	///   The key value cast to an integer, you will typical use this for
-	///   extracting the Unicode rune value out of a key, when none of the
-	///   symbolic options are in use.
-	/// </summary>
-	public int KeyValue => (int)Key;
+//	/// <summary>
+//	///   The key value cast to an integer, you will typical use this for
+//	///   extracting the Unicode rune value out of a key, when none of the
+//	///   symbolic options are in use.
+//	/// </summary>
+//	public int KeyValue => (int)Key;
 
-	/// <summary>
-	/// Gets a value indicating whether the Shift key was pressed.
-	/// </summary>
-	/// <value><c>true</c> if is shift; otherwise, <c>false</c>.</value>
-	public bool IsShift => keyModifiers.Shift || Key == Key.BackTab;
+//	/// <summary>
+//	/// Gets a value indicating whether the Shift key was pressed.
+//	/// </summary>
+//	/// <value><c>true</c> if is shift; otherwise, <c>false</c>.</value>
+//	public bool IsShift => keyModifiers.Shift || Key == Key.BackTab;
 
-	/// <summary>
-	/// Gets a value indicating whether the Alt key was pressed (real or synthesized)
-	/// </summary>
-	/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
-	public bool IsAlt => keyModifiers.Alt;
+//	/// <summary>
+//	/// Gets a value indicating whether the Alt key was pressed (real or synthesized)
+//	/// </summary>
+//	/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
+//	public bool IsAlt => keyModifiers.Alt;
 
-	/// <summary>
-	/// Determines whether the value is a control key (and NOT just the ctrl key)
-	/// </summary>
-	/// <value><c>true</c> if is ctrl; otherwise, <c>false</c>.</value>
-	//public bool IsCtrl => ((uint)Key >= 1) && ((uint)Key <= 26);
-	public bool IsCtrl => keyModifiers.Ctrl;
+//	/// <summary>
+//	/// Determines whether the value is a control key (and NOT just the ctrl key)
+//	/// </summary>
+//	/// <value><c>true</c> if is ctrl; otherwise, <c>false</c>.</value>
+//	//public bool IsCtrl => ((uint)Key >= 1) && ((uint)Key <= 26);
+//	public bool IsCtrl => keyModifiers.Ctrl;
 
-	/// <summary>
-	/// Gets a value indicating whether the Caps lock key was pressed (real or synthesized)
-	/// </summary>
-	/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
-	public bool IsCapslock => keyModifiers.Capslock;
+//	/// <summary>
+//	/// Gets a value indicating whether the Caps lock key was pressed (real or synthesized)
+//	/// </summary>
+//	/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
+//	public bool IsCapslock => keyModifiers.Capslock;
 
-	/// <summary>
-	/// Gets a value indicating whether the Num lock key was pressed (real or synthesized)
-	/// </summary>
-	/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
-	public bool IsNumlock => keyModifiers.Numlock;
+//	/// <summary>
+//	/// Gets a value indicating whether the Num lock key was pressed (real or synthesized)
+//	/// </summary>
+//	/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
+//	public bool IsNumlock => keyModifiers.Numlock;
 
-	/// <summary>
-	/// Gets a value indicating whether the Scroll lock key was pressed (real or synthesized)
-	/// </summary>
-	/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
-	public bool IsScrolllock => keyModifiers.Scrolllock;
+//	/// <summary>
+//	/// Gets a value indicating whether the Scroll lock key was pressed (real or synthesized)
+//	/// </summary>
+//	/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
+//	public bool IsScrolllock => keyModifiers.Scrolllock;
 
-	/// <summary>
-	/// Constructs a new <see cref="OldKeyEvent"/>
-	/// </summary>
-	public OldKeyEvent ()
-	{
-		Key = Key.Unknown;
-		keyModifiers = new KeyModifiers ();
-	}
+//	/// <summary>
+//	/// Constructs a new <see cref="KeyEventArgs"/>
+//	/// </summary>
+//	public ()
+//	{
+//		Key = Key.Unknown;
+//		keyModifiers = new KeyModifiers ();
+//	}
 
-	/// <summary>
-	///   Constructs a new <see cref="OldKeyEvent"/> from the provided Key value - can be a rune cast into a Key value
-	/// </summary>
-	public OldKeyEvent (Key k, KeyModifiers km)
-	{
-		Key = k;
-		keyModifiers = km;
-	}
+//	/// <summary>
+//	///   Constructs a new <see cref="KeyEventArgs"/> from the provided Key value - can be a rune cast into a Key value
+//	/// </summary>
+//	public (Key k, KeyModifiers km)
+//	{
+//		Key = k;
+//		keyModifiers = km;
+//	}
 
-	/// <summary>
-	/// Pretty prints the KeyEvent
-	/// </summary>
-	/// <returns></returns>
-	public override string ToString ()
-	{
-		string msg = "";
-		var key = this.Key;
-		if (keyModifiers.Shift) {
-			msg += "Shift-";
-		}
-		if (keyModifiers.Alt) {
-			msg += "Alt-";
-		}
-		if (keyModifiers.Ctrl) {
-			msg += "Ctrl-";
-		}
-		if (keyModifiers.Capslock) {
-			msg += "Capslock-";
-		}
-		if (keyModifiers.Numlock) {
-			msg += "Numlock-";
-		}
-		if (keyModifiers.Scrolllock) {
-			msg += "Scrolllock-";
-		}
+//	/// <summary>
+//	/// Pretty prints the KeyEvent
+//	/// </summary>
+//	/// <returns></returns>
+//	public override string ToString ()
+//	{
+//		string msg = "";
+//		var key = this.Key;
+//		if (keyModifiers.Shift) {
+//			msg += "Shift-";
+//		}
+//		if (keyModifiers.Alt) {
+//			msg += "Alt-";
+//		}
+//		if (keyModifiers.Ctrl) {
+//			msg += "Ctrl-";
+//		}
+//		if (keyModifiers.Capslock) {
+//			msg += "Capslock-";
+//		}
+//		if (keyModifiers.Numlock) {
+//			msg += "Numlock-";
+//		}
+//		if (keyModifiers.Scrolllock) {
+//			msg += "Scrolllock-";
+//		}
 
-		msg += $"{((Key)KeyValue != Key.Unknown && ((uint)this.KeyValue & (uint)Key.CharMask) > 27 ? $"{(char)this.KeyValue}" : $"{key}")}";
+//		msg += $"{((Key)KeyValue != Key.Unknown && ((uint)this.KeyValue & (uint)Key.CharMask) > 27 ? $"{(char)this.KeyValue}" : $"{key}")}";
 
-		return msg;
-	}
-}
+//		return msg;
+//	}
+//}

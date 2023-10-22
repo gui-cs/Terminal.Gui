@@ -1432,7 +1432,7 @@ public class Slider<T> : View {
 	}
 
 	/// <inheritdoc/>
-	public override bool ProcessKey (OldKeyEvent keyEvent)
+	public override bool ProcessKey (KeyEventArgs keyEvent)
 	{
 		if (!CanFocus || !HasFocus) {
 			return base.ProcessKey (keyEvent);

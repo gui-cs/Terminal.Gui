@@ -58,16 +58,16 @@ namespace UICatalog.Scenarios {
 			var IsCtrl = false;
 
 			txtResult.KeyPressed += (s, e) => {
-				rKeys += (char)e.KeyEvent.Key;
-				if (!IsShift && e.KeyEvent.IsShift) {
+				rKeys += (char)e.Key;
+				if (!IsShift && e.IsShift) {
 					rControlKeys += " Shift ";
 					IsShift = true;
 				}
-				if (!IsAlt && e.KeyEvent.IsAlt) {
+				if (!IsAlt && e.IsAlt) {
 					rControlKeys += " Alt ";
 					IsAlt = true;
 				}
-				if (!IsCtrl && e.KeyEvent.IsCtrl) {
+				if (!IsCtrl && e.IsCtrl) {
 					rControlKeys += " Ctrl ";
 					IsCtrl = true;
 				}
@@ -117,7 +117,7 @@ namespace UICatalog.Scenarios {
 			button.Clicked += (s,e) => ProcessInput ();
 
 			Win.KeyPressed += (s, e) => {
-				if (e.KeyEvent.Key == Key.Enter) {
+				if (e.Key == Key.Enter) {
 					ProcessInput ();
 					e.Handled = true;
 				}

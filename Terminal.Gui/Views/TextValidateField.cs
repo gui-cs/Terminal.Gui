@@ -612,7 +612,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessKey (OldKeyEvent kb)
+		public override bool ProcessKey (KeyEventArgs kb)
 		{
 			if (provider == null) {
 				return false;

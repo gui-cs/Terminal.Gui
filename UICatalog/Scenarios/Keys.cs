@@ -12,19 +12,19 @@ namespace UICatalog.Scenarios {
 			public List<string> _processHotKeyList = new List<string> ();
 			public List<string> _processColdKeyList = new List<string> ();
 
-			public override bool ProcessKey (OldKeyEvent keyEvent)
+			public override bool ProcessKey (KeyEventArgs keyEvent)
 			{
 				_processKeyList.Add (keyEvent.ToString ());
 				return base.ProcessKey (keyEvent);
 			}
 
-			public override bool ProcessHotKey (OldKeyEvent keyEvent)
+			public override bool ProcessHotKey (KeyEventArgs keyEvent)
 			{
 				_processHotKeyList.Add (keyEvent.ToString ());
 				return base.ProcessHotKey (keyEvent);
 			}
 
-			public override bool ProcessColdKey (OldKeyEvent keyEvent)
+			public override bool ProcessColdKey (KeyEventArgs keyEvent)
 			{
 				_processColdKeyList.Add (keyEvent.ToString ());
 
@@ -79,7 +79,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (labelKeypress);
 
-			Win.KeyPressed += (s, e) => labelKeypress.Text = e.KeyEvent.ToString ();
+			Win.KeyPressed += (s, e) => labelKeypress.Text = e.ToString ();
 
 			// Key stroke log:
 			var keyLogLabel = new Label ("Key event log:") {
@@ -87,7 +87,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (editLabel) + 4,
 			};
 			Win.Add (keyLogLabel);
-			var fakeKeyPress = new OldKeyEvent (Key.CtrlMask | Key.A, new KeyModifiers () {
+			var fakeKeyPress = new KeyEventArgs (Key.CtrlMask | Key.A, new KeyModifiers () {
 				Alt = true,
 				Ctrl = true,
 				Shift = true
@@ -163,7 +163,7 @@ namespace UICatalog.Scenarios {
 			void KeyDownPressUp (KeyEventArgs args, string updown)
 			{
 				// BUGBUG: KeyEvent.ToString is badly broken
-				var msg = $"Key{updown,-5}: {args.KeyEvent}";
+				var msg = $"Key{updown,-5}: {args}";
 				keyEventlist.Add (msg);
 				keyEventListView.MoveDown ();
 				processKeyListView.MoveDown ();

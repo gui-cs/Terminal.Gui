@@ -3065,7 +3065,7 @@ namespace Terminal.Gui {
 					throw new ArgumentException ($"Cannot insert character '{ch}' because it does not map to a Key");
 				}
 
-				InsertText (new OldKeyEvent () { Key = key });
+				InsertText (new KeyEventArgs () { Key = key });
 			}
 
 			if (NeedsDisplay) {
@@ -3401,7 +3401,7 @@ namespace Terminal.Gui {
 		bool _shiftSelecting;
 
 		///<inheritdoc/>
-		public override bool ProcessKey (OldKeyEvent kb)
+		public override bool ProcessKey (KeyEventArgs kb)
 		{
 			if (!CanFocus) {
 				return true;
@@ -3412,7 +3412,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			var result = InvokeKeybindings (new OldKeyEvent (ShortcutHelper.GetModifiersKey (kb),
+			var result = InvokeKeybindings (new (ShortcutHelper.GetModifiersKey (kb),
 			    new KeyModifiers () { Alt = kb.IsAlt, Ctrl = kb.IsCtrl, Shift = kb.IsShift }));
 			if (result != null)
 				return (bool)result;
@@ -3791,7 +3791,7 @@ namespace Terminal.Gui {
 			if (!AllowsTab || _isReadOnly) {
 				return ProcessMoveNextView ();
 			}
-			InsertText (new OldKeyEvent ((Key)'\t', null));
+			InsertText (new KeyEventArgs ((Key)'\t', null));
 			DoNeededAction ();
 			return true;
 		}
@@ -4318,7 +4318,7 @@ namespace Terminal.Gui {
 			_continuousFind = false;
 		}
 
-		bool InsertText (OldKeyEvent kb, ColorScheme? colorScheme = null)
+		bool InsertText (KeyEventArgs kb, ColorScheme? colorScheme = null)
 		{
 			//So that special keys like tab can be processed
 			if (_isReadOnly)
@@ -4388,7 +4388,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnKeyUp (OldKeyEvent kb)
+		public override bool OnKeyUp (KeyEventArgs kb)
 		{
 			switch (kb.Key) {
 			case Key.Space | Key.CtrlMask:

@@ -28,7 +28,7 @@ namespace Terminal.Gui.ViewTests {
 			text.KeyPressed += (s, e) => {
 				e.Handled = true;
 				Assert.True (e.Handled);
-				Assert.Equal (Key.N, e.KeyEvent.Key);
+				Assert.Equal (Key.N, e.Key);
 			};
 			top.Add (text);
 
@@ -55,21 +55,21 @@ namespace Terminal.Gui.ViewTests {
 
 			var view = new DerivedView ();
 			view.KeyDown += (s, e) => {
-				Assert.Equal (Key.a, e.KeyEvent.Key);
+				Assert.Equal (Key.a, e.Key);
 				Assert.False (keyDown);
 				Assert.False (view.IsKeyDown);
 				e.Handled = true;
 				keyDown = true;
 			};
 			view.KeyPressed += (s, e) => {
-				Assert.Equal (Key.a, e.KeyEvent.Key);
+				Assert.Equal (Key.a, e.Key);
 				Assert.False (keyPress);
 				Assert.False (view.IsKeyPress);
 				e.Handled = true;
 				keyPress = true;
 			};
 			view.KeyUp += (s, e) => {
-				Assert.Equal (Key.a, e.KeyEvent.Key);
+				Assert.Equal (Key.a, e.Key);
 				Assert.False (keyUp);
 				Assert.False (view.IsKeyUp);
 				e.Handled = true;
@@ -106,19 +106,19 @@ namespace Terminal.Gui.ViewTests {
 			public bool IsKeyUp { get; set; }
 			public override string Text { get; set; }
 
-			public override bool OnKeyDown (OldKeyEvent keyEvent)
+			public override bool OnKeyDown (KeyEventArgs keyEvent)
 			{
 				IsKeyDown = true;
 				return true;
 			}
 
-			public override bool ProcessKey (OldKeyEvent keyEvent)
+			public override bool ProcessKey (KeyEventArgs keyEvent)
 			{
 				IsKeyPress = true;
 				return true;
 			}
 
-			public override bool OnKeyUp (OldKeyEvent keyEvent)
+			public override bool OnKeyUp (KeyEventArgs keyEvent)
 			{
 				IsKeyUp = true;
 				return true;
@@ -137,10 +137,10 @@ namespace Terminal.Gui.ViewTests {
 
 			var view = new DerivedView ();
 			view.KeyDown += (s, e) => {
-				Assert.Equal (-1, e.KeyEvent.KeyValue);
-				Assert.Equal (shift, e.KeyEvent.IsShift);
-				Assert.Equal (alt, e.KeyEvent.IsAlt);
-				Assert.Equal (control, e.KeyEvent.IsCtrl);
+				Assert.Equal (-1, e.KeyValue);
+				Assert.Equal (shift, e.IsShift);
+				Assert.Equal (alt, e.IsAlt);
+				Assert.Equal (control, e.IsCtrl);
 				Assert.False (keyDown);
 				Assert.False (view.IsKeyDown);
 				keyDown = true;
@@ -149,10 +149,10 @@ namespace Terminal.Gui.ViewTests {
 				keyPress = true;
 			};
 			view.KeyUp += (s, e) => {
-				Assert.Equal (-1, e.KeyEvent.KeyValue);
-				Assert.Equal (shift, e.KeyEvent.IsShift);
-				Assert.Equal (alt, e.KeyEvent.IsAlt);
-				Assert.Equal (control, e.KeyEvent.IsCtrl);
+				Assert.Equal (-1, e.KeyValue);
+				Assert.Equal (shift, e.IsShift);
+				Assert.Equal (alt, e.IsAlt);
+				Assert.Equal (control, e.IsCtrl);
 				Assert.False (keyUp);
 				Assert.False (view.IsKeyUp);
 				keyUp = true;

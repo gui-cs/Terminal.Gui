@@ -229,7 +229,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessKey (OldKeyEvent kb)
+		public override bool ProcessKey (KeyEventArgs kb)
 		{
 			switch (kb.Key) {
 			case Key.Esc:

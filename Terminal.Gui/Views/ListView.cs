@@ -416,7 +416,7 @@ namespace Terminal.Gui {
 		public CollectionNavigator KeystrokeNavigator { get; private set; } = new CollectionNavigator ();
 
 		///<inheritdoc/>
-		public override bool ProcessKey (OldKeyEvent kb)
+		public override bool ProcessKey (KeyEventArgs kb)
 		{
 			if (source == null) {
 				return base.ProcessKey (kb);

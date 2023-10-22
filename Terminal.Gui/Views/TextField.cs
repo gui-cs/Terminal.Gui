@@ -637,7 +637,7 @@ namespace Terminal.Gui {
 		///    </item>
 		/// </list>
 		/// </remarks>
-		public override bool ProcessKey (OldKeyEvent kb)
+		public override bool ProcessKey (KeyEventArgs kb)
 		{
 			// remember current cursor position
 			// because the new calculated cursor position is needed to be set BEFORE the change event is triggest
@@ -649,7 +649,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			var result = InvokeKeybindings (new OldKeyEvent (ShortcutHelper.GetModifiersKey (kb),
+			var result = InvokeKeybindings (new (ShortcutHelper.GetModifiersKey (kb),
 				new KeyModifiers () { Alt = kb.IsAlt, Ctrl = kb.IsCtrl, Shift = kb.IsShift }));
 			if (result != null)
 				return (bool)result;
@@ -666,7 +666,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		void InsertText (OldKeyEvent kb, bool useOldCursorPos = true)
+		void InsertText (KeyEventArgs kb, bool useOldCursorPos = true)
 		{
 			_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCells (_text) }, new Point (_point, 0));
 
@@ -1312,7 +1312,7 @@ namespace Terminal.Gui {
 					throw new ArgumentException ($"Cannot insert character '{ch}' because it does not map to a Key");
 				}
 
-				InsertText (new OldKeyEvent () { Key = key }, useOldCursorPos);
+				InsertText (new KeyEventArgs () { Key = key }, useOldCursorPos);
 			}
 		}
 

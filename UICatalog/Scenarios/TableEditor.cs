@@ -392,7 +392,7 @@ namespace UICatalog.Scenarios {
 				return;
 			}
 
-			if (e.KeyEvent.Key == Key.DeleteChar) {
+			if (e.Key == Key.DeleteChar) {
 
 				if (tableView.FullRowSelect) {
 					// Delete button deletes all rows when in full row mode

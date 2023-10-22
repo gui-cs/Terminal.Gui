@@ -92,7 +92,7 @@ namespace Terminal.Gui {
 		///  </para>
 		/// </remarks>
 
-		public virtual bool ProcessHotKey (OldKeyEvent kb)
+		public virtual bool ProcessHotKey (KeyEventArgs kb)
 		{
 			return false;
 		}
@@ -120,7 +120,7 @@ namespace Terminal.Gui {
 		///   </para>
 		/// </remarks>
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
-		public virtual bool ProcessKey (OldKeyEvent keyEvent)
+		public virtual bool ProcessKey (KeyEventArgs keyEvent)
 		{
 			return false;
 		}
@@ -147,7 +147,7 @@ namespace Terminal.Gui {
 		///  </para>
 		/// </remarks>
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
-		public virtual bool ProcessColdKey (OldKeyEvent keyEvent)
+		public virtual bool ProcessColdKey (KeyEventArgs keyEvent)
 		{
 			return false;
 		}
@@ -157,7 +157,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		/// <returns>true if the event was handled</returns>
-		public virtual bool OnKeyDown (OldKeyEvent keyEvent)
+		public virtual bool OnKeyDown (KeyEventArgs keyEvent)
 		{
 			return false;
 		}
@@ -167,7 +167,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		/// <returns>true if the event was handled</returns>
-		public virtual bool OnKeyUp (OldKeyEvent keyEvent)
+		public virtual bool OnKeyUp (KeyEventArgs keyEvent)
 		{
 			return false;
 		}

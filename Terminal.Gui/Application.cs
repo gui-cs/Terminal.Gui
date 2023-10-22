@@ -1328,7 +1328,7 @@ namespace Terminal.Gui {
 
 			var chain = _topLevels.ToList ();
 			foreach (var topLevel in chain) {
-				if (topLevel.ProcessHotKey (a.KeyEvent)) {
+				if (topLevel.ProcessHotKey (a)) {
 					return true;
 				}
 				if (topLevel.Modal)
@@ -1336,7 +1336,7 @@ namespace Terminal.Gui {
 			}
 
 			foreach (var topLevel in chain) {
-				if (topLevel.ProcessKey (a.KeyEvent)) {
+				if (topLevel.ProcessKey (a)) {
 					return true;
 				}
 				if (topLevel.Modal)
@@ -1345,7 +1345,7 @@ namespace Terminal.Gui {
 
 			foreach (var topLevel in chain) {
 				// Process the key normally
-				if (topLevel.ProcessColdKey (a.KeyEvent)) {
+				if (topLevel.ProcessColdKey (a)) {
 					return true;
 				}
 				if (topLevel.Modal)
@@ -1372,7 +1372,7 @@ namespace Terminal.Gui {
 			KeyDown?.Invoke (null, a);
 			var chain = _topLevels.ToList ();
 			foreach (var topLevel in chain) {
-				if (topLevel.OnKeyDown (a.KeyEvent))
+				if (topLevel.OnKeyDown (a))
 					return;
 				if (topLevel.Modal)
 					break;
@@ -1397,7 +1397,7 @@ namespace Terminal.Gui {
 			KeyUp?.Invoke (null, a);
 			var chain = _topLevels.ToList ();
 			foreach (var topLevel in chain) {
-				if (topLevel.OnKeyUp (a.KeyEvent))
+				if (topLevel.OnKeyUp (a))
 					return;
 				if (topLevel.Modal)
 					break;

@@ -166,19 +166,18 @@ namespace Terminal.Gui {
 		public event EventHandler<KeyEventArgs> KeyPressed;
 
 		/// <inheritdoc/>
-		public override bool ProcessKey (OldKeyEvent keyEvent)
+		public override bool ProcessKey (KeyEventArgs keyEvent)
 		{
 			if (!Enabled) {
 				return false;
 			}
 
-			var args = new KeyEventArgs (keyEvent);
-			KeyPressed?.Invoke (this, args);
-			if (args.Handled)
+			KeyPressed?.Invoke (this, keyEvent);
+			if (keyEvent.Handled)
 				return true;
 			if (Focused?.Enabled == true) {
-				Focused?.KeyPressed?.Invoke (this, args);
-				if (args.Handled)
+				Focused?.KeyPressed?.Invoke (this, keyEvent);
+				if (keyEvent.Handled)
 					return true;
 			}
 
@@ -190,7 +189,7 @@ namespace Terminal.Gui {
 		/// and matches the <paramref name="keyEvent"/>
 		/// </summary>
 		/// <param name="keyEvent">The key event passed.</param>
-		protected bool? InvokeKeybindings (OldKeyEvent keyEvent)
+		protected bool? InvokeKeybindings (KeyEventArgs keyEvent)
 		{
 			bool? toReturn = null;
 
@@ -340,16 +339,15 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override bool ProcessHotKey (OldKeyEvent keyEvent)
+		public override bool ProcessHotKey (KeyEventArgs keyEvent)
 		{
 			if (!Enabled) {
 				return false;
 			}
 
-			var args = new KeyEventArgs (keyEvent);
 			if (MostFocused?.Enabled == true) {
-				MostFocused?.KeyPressed?.Invoke (this, args);
-				if (args.Handled)
+				MostFocused?.KeyPressed?.Invoke (this, keyEvent);
+				if (keyEvent.Handled)
 					return true;
 			}
 			if (MostFocused?.Enabled == true && MostFocused?.ProcessKey (keyEvent) == true)
@@ -364,19 +362,18 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override bool ProcessColdKey (OldKeyEvent keyEvent)
+		public override bool ProcessColdKey (KeyEventArgs keyEvent)
 		{
 			if (!Enabled) {
 				return false;
 			}
 
-			var args = new KeyEventArgs (keyEvent);
-			KeyPressed?.Invoke (this, args);
-			if (args.Handled)
+			KeyPressed?.Invoke (this, keyEvent);
+			if (keyEvent.Handled)
 				return true;
 			if (MostFocused?.Enabled == true) {
-				MostFocused?.KeyPressed?.Invoke (this, args);
-				if (args.Handled)
+				MostFocused?.KeyPressed?.Invoke (this, keyEvent);
+				if (keyEvent.Handled)
 					return true;
 			}
 			if (MostFocused?.Enabled == true && MostFocused?.ProcessKey (keyEvent) == true)
@@ -396,20 +393,19 @@ namespace Terminal.Gui {
 		public event EventHandler<KeyEventArgs> KeyDown;
 
 		/// <inheritdoc/>
-		public override bool OnKeyDown (OldKeyEvent keyEvent)
+		public override bool OnKeyDown (KeyEventArgs keyEvent)
 		{
 			if (!Enabled) {
 				return false;
 			}
 
-			var args = new KeyEventArgs (keyEvent);
-			KeyDown?.Invoke (this, args);
-			if (args.Handled) {
+			KeyDown?.Invoke (this, keyEvent);
+			if (keyEvent.Handled) {
 				return true;
 			}
 			if (Focused?.Enabled == true) {
-				Focused.KeyDown?.Invoke (this, args);
-				if (args.Handled) {
+				Focused.KeyDown?.Invoke (this, keyEvent);
+				if (keyEvent.Handled) {
 					return true;
 				}
 				if (Focused?.OnKeyDown (keyEvent) == true) {
@@ -426,20 +422,19 @@ namespace Terminal.Gui {
 		public event EventHandler<KeyEventArgs> KeyUp;
 
 		/// <inheritdoc/>
-		public override bool OnKeyUp (OldKeyEvent keyEvent)
+		public override bool OnKeyUp (KeyEventArgs keyEvent)
 		{
 			if (!Enabled) {
 				return false;
 			}
 
-			var args = new KeyEventArgs (keyEvent);
-			KeyUp?.Invoke (this, args);
-			if (args.Handled) {
+			KeyUp?.Invoke (this, keyEvent);
+			if (keyEvent.Handled) {
 				return true;
 			}
 			if (Focused?.Enabled == true) {
-				Focused.KeyUp?.Invoke (this, args);
-				if (args.Handled) {
+				Focused.KeyUp?.Invoke (this, keyEvent);
+				if (keyEvent.Handled) {
 					return true;
 				}
 				if (Focused?.OnKeyUp (keyEvent) == true) {

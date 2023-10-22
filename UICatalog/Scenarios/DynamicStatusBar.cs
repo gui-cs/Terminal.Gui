@@ -396,17 +396,17 @@ namespace UICatalog.Scenarios {
 					ReadOnly = true
 				};
 				_txtShortcut.KeyDown += (s, e) => {
-					if (!ProcessKey (e.KeyEvent)) {
+					if (!ProcessKey (e)) {
 						return;
 					}
 
-					var k = ShortcutHelper.GetModifiersKey (e.KeyEvent);
+					var k = ShortcutHelper.GetModifiersKey (e);
 					if (CheckShortcut (k, true)) {
 						e.Handled = true;
 					}
 				};
 
-				bool ProcessKey (OldKeyEvent ev)
+				bool ProcessKey (KeyEventArgs ev)
 				{
 					switch (ev.Key) {
 					case Key.CursorUp:
@@ -440,7 +440,7 @@ namespace UICatalog.Scenarios {
 				}
 
 				_txtShortcut.KeyUp += (s, e) => {
-					var k = ShortcutHelper.GetModifiersKey (e.KeyEvent);
+					var k = ShortcutHelper.GetModifiersKey (e);
 					if (CheckShortcut (k, false)) {
 						e.Handled = true;
 					}
