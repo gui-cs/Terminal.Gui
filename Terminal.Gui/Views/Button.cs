@@ -201,7 +201,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessColdKey (KeyEventArgs kb)
+		public override bool OnColdKey (KeyEventArgs kb)
 		{
 			if (!Enabled) {
 				return false;

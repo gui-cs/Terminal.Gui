@@ -90,36 +90,7 @@ namespace Terminal.Gui {
 		///     views.
 		///  </para>
 		/// </remarks>
-
 		public virtual bool OnHotKeyPressed (KeyEventArgs kb)
-		{
-			return false;
-		}
-
-		/// <summary>
-		/// If the view is focused, gives the view a chance to process the keystroke. Fires the <see cref="KeyPressed"/> event.
-		/// Typical apps will use <see cref="Command"/> instead.
-		/// </summary>
-		/// <remarks>
-		///   <para>
-		///     Views can override this method if they are
-		///     interested in processing the given keystroke.
-		///     If they consume the keystroke, they must
-		///     return true to stop the keystroke from being
-		///     processed by other widgets or consumed by the
-		///     widget engine.    If they return false, the
-		///     keystroke will be passed using the ProcessColdKey
-		///     method to other views to process.
-		///   </para>
-		///   <para>
-		///     The View implementation does nothing but return false,
-		///     so it is not necessary to call base.ProcessKey if you
-		///     derive directly from View, but you should if you derive
-		///     other View subclasses.
-		///   </para>
-		/// </remarks>
-		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
-		public virtual bool OnKeyPressed (KeyEventArgs keyEvent)
 		{
 			return false;
 		}
@@ -149,6 +120,20 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		/// <summary>
+		/// If the view is focused, gives the view a chance to process the keystroke. Fires the <see cref="KeyPressed"/> event.
+		/// Typical apps will use <see cref="Command"/> instead.
+		/// </summary>
+
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		/// <returns><see langword="false"/> if the key stroke was not handled. <see langword="true"/> if no
+		/// other view should see it.</returns>
+		public virtual bool OnKeyPressed (KeyEventArgs keyEvent)
+		{
+			// fire event
+
+			return false;
+		}
 		/// <summary>
 		/// Invoked when a key is depressed.
 		/// </summary>

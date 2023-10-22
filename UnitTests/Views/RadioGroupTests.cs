@@ -177,13 +177,13 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var rg = new RadioGroup (new string [] { "Left", "Right", "Cen_tered", "Justified" });
 
-			Assert.True (rg.ProcessColdKey (new (Key.t, new KeyModifiers ())));
+			Assert.True (rg.OnColdKey (new (Key.t, new KeyModifiers ())));
 			Assert.Equal (2, rg.SelectedItem);
-			Assert.True (rg.ProcessColdKey (new (Key.L, new KeyModifiers ())));
+			Assert.True (rg.OnColdKey (new (Key.L, new KeyModifiers ())));
 			Assert.Equal (0, rg.SelectedItem);
-			Assert.True (rg.ProcessColdKey (new (Key.J, new KeyModifiers ())));
+			Assert.True (rg.OnColdKey (new (Key.J, new KeyModifiers ())));
 			Assert.Equal (3, rg.SelectedItem);
-			Assert.True (rg.ProcessColdKey (new (Key.R, new KeyModifiers ())));
+			Assert.True (rg.OnColdKey (new (Key.R, new KeyModifiers ())));
 			Assert.Equal (1, rg.SelectedItem);
 		}
 	}

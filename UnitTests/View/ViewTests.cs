@@ -127,7 +127,7 @@ namespace Terminal.Gui.ViewTests {
 
 			Assert.False (r.OnKeyPressed (new KeyEventArgs () { Key = Key.Unknown }));
 			Assert.False (r.OnHotKeyPressed (new KeyEventArgs () { Key = Key.Unknown }));
-			Assert.False (r.ProcessColdKey (new KeyEventArgs () { Key = Key.Unknown }));
+			Assert.False (r.OnColdKey (new KeyEventArgs () { Key = Key.Unknown }));
 			Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
 			Assert.False (r.OnKeyUp (new KeyEventArgs () { Key = Key.Unknown }));
 			Assert.False (r.MouseEvent (new MouseEvent () { Flags = MouseFlags.AllEvents }));

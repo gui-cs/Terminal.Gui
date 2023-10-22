@@ -1345,7 +1345,7 @@ namespace Terminal.Gui {
 
 			foreach (var topLevel in chain) {
 				// Process the key normally
-				if (topLevel.ProcessColdKey (a)) {
+				if (topLevel.OnColdKey (a)) {
 					return true;
 				}
 				if (topLevel.Modal)

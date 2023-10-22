@@ -82,13 +82,13 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (clicked);
 			clicked = false;
 			Assert.False (btn.IsDefault);
-			Assert.False (btn.ProcessColdKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.False (btn.OnColdKey (new (Key.Enter, new KeyModifiers ())));
 			Assert.False (clicked);
 			btn.IsDefault = true;
-			Assert.True (btn.ProcessColdKey (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (btn.OnColdKey (new (Key.Enter, new KeyModifiers ())));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessColdKey (new (Key.AltMask | Key.T, new KeyModifiers ())));
+			Assert.True (btn.OnColdKey (new (Key.AltMask | Key.T, new KeyModifiers ())));
 			Assert.True (clicked);
 			clicked = false;
 			Assert.True (btn.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));

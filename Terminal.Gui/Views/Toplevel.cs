@@ -479,9 +479,9 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessColdKey (KeyEventArgs keyEvent)
+		public override bool OnColdKey (KeyEventArgs keyEvent)
 		{
-			if (base.ProcessColdKey (keyEvent)) {
+			if (base.OnColdKey (keyEvent)) {
 				return true;
 			}
 

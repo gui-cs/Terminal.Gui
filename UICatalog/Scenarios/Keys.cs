@@ -24,11 +24,11 @@ namespace UICatalog.Scenarios {
 				return base.OnHotKeyPressed (keyEvent);
 			}
 
-			public override bool ProcessColdKey (KeyEventArgs keyEvent)
+			public override bool OnColdKey (KeyEventArgs keyEvent)
 			{
 				_processColdKeyList.Add (keyEvent.ToString ());
 
-				return base.ProcessColdKey (keyEvent);
+				return base.OnColdKey (keyEvent);
 			}
 		}
 

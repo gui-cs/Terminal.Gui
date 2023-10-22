@@ -362,7 +362,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override bool ProcessColdKey (KeyEventArgs keyEvent)
+		public override bool OnColdKey (KeyEventArgs keyEvent)
 		{
 			if (!Enabled) {
 				return false;
@@ -382,7 +382,7 @@ namespace Terminal.Gui {
 				return false;
 
 			foreach (var view in _subviews)
-				if (view.Enabled && view.ProcessColdKey (keyEvent))
+				if (view.Enabled && view.OnColdKey (keyEvent))
 					return true;
 			return false;
 		}

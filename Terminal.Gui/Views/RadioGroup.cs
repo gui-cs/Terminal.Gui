@@ -288,7 +288,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessColdKey (KeyEventArgs kb)
+		public override bool OnColdKey (KeyEventArgs kb)
 		{
 			var key = kb.KeyValue;
 			if (key < Char.MaxValue && Char.IsLetterOrDigit ((char)key)) {
