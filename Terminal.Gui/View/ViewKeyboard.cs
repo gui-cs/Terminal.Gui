@@ -173,12 +173,14 @@ namespace Terminal.Gui {
 			}
 
 			KeyPressed?.Invoke (this, keyEvent);
-			if (keyEvent.Handled)
+			if (keyEvent.Handled) {
 				return true;
-			if (Focused?.Enabled == true) {
+			}
+			if (Focused?.Enabled) {
 				Focused?.KeyPressed?.Invoke (this, keyEvent);
-				if (keyEvent.Handled)
+				if (keyEvent.Handled) {
 					return true;
+				}
 			}
 
 			return Focused?.Enabled == true && Focused?.OnKeyPressed (keyEvent) == true;
