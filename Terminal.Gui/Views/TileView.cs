@@ -443,7 +443,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override bool ProcessHotKey (KeyEvent keyEvent)
+		public override bool ProcessHotKey (OldKeyEvent keyEvent)
 		{
 			bool focusMoved = false;
 
@@ -805,7 +805,7 @@ namespace Terminal.Gui {
 				AddKeyBinding (Key.CursorDown, Command.LineDown);
 			}
 
-			public override bool ProcessKey (KeyEvent kb)
+			public override bool ProcessKey (OldKeyEvent kb)
 			{
 				if (!CanFocus || !HasFocus) {
 					return base.ProcessKey (kb);

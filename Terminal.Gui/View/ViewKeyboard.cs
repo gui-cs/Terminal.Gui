@@ -166,7 +166,7 @@ namespace Terminal.Gui {
 		public event EventHandler<KeyEventArgs> KeyPressed;
 
 		/// <inheritdoc/>
-		public override bool ProcessKey (KeyEvent keyEvent)
+		public override bool ProcessKey (OldKeyEvent keyEvent)
 		{
 			if (!Enabled) {
 				return false;
@@ -190,7 +190,7 @@ namespace Terminal.Gui {
 		/// and matches the <paramref name="keyEvent"/>
 		/// </summary>
 		/// <param name="keyEvent">The key event passed.</param>
-		protected bool? InvokeKeybindings (KeyEvent keyEvent)
+		protected bool? InvokeKeybindings (OldKeyEvent keyEvent)
 		{
 			bool? toReturn = null;
 
@@ -340,7 +340,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override bool ProcessHotKey (KeyEvent keyEvent)
+		public override bool ProcessHotKey (OldKeyEvent keyEvent)
 		{
 			if (!Enabled) {
 				return false;
@@ -364,7 +364,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override bool ProcessColdKey (KeyEvent keyEvent)
+		public override bool ProcessColdKey (OldKeyEvent keyEvent)
 		{
 			if (!Enabled) {
 				return false;
@@ -396,7 +396,7 @@ namespace Terminal.Gui {
 		public event EventHandler<KeyEventArgs> KeyDown;
 
 		/// <inheritdoc/>
-		public override bool OnKeyDown (KeyEvent keyEvent)
+		public override bool OnKeyDown (OldKeyEvent keyEvent)
 		{
 			if (!Enabled) {
 				return false;
@@ -426,7 +426,7 @@ namespace Terminal.Gui {
 		public event EventHandler<KeyEventArgs> KeyUp;
 
 		/// <inheritdoc/>
-		public override bool OnKeyUp (KeyEvent keyEvent)
+		public override bool OnKeyUp (OldKeyEvent keyEvent)
 		{
 			if (!Enabled) {
 				return false;

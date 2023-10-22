@@ -629,55 +629,55 @@ public class ApplicationTests {
 		Application.Iteration += (s, a) => {
 			Assert.True (v1.HasFocus);
 			// Using default keys.
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab,
+			top.ProcessKey (new OldKeyEvent (Key.CtrlMask | Key.Tab,
 				new KeyModifiers () { Ctrl = true }));
 			Assert.True (v2.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab,
+			top.ProcessKey (new OldKeyEvent (Key.CtrlMask | Key.Tab,
 				new KeyModifiers () { Ctrl = true }));
 			Assert.True (v3.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab,
+			top.ProcessKey (new OldKeyEvent (Key.CtrlMask | Key.Tab,
 				new KeyModifiers () { Ctrl = true }));
 			Assert.True (v4.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab,
+			top.ProcessKey (new OldKeyEvent (Key.CtrlMask | Key.Tab,
 				new KeyModifiers () { Ctrl = true }));
 			Assert.True (v1.HasFocus);
 
-			top.ProcessKey (new KeyEvent (Key.ShiftMask | Key.CtrlMask | Key.Tab,
+			top.ProcessKey (new OldKeyEvent (Key.ShiftMask | Key.CtrlMask | Key.Tab,
 				new KeyModifiers () { Shift = true, Ctrl = true }));
 			Assert.True (v4.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.ShiftMask | Key.CtrlMask | Key.Tab,
+			top.ProcessKey (new OldKeyEvent (Key.ShiftMask | Key.CtrlMask | Key.Tab,
 				new KeyModifiers () { Shift = true, Ctrl = true }));
 			Assert.True (v3.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.ShiftMask | Key.CtrlMask | Key.Tab,
+			top.ProcessKey (new OldKeyEvent (Key.ShiftMask | Key.CtrlMask | Key.Tab,
 				new KeyModifiers () { Shift = true, Ctrl = true }));
 			Assert.True (v2.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.ShiftMask | Key.CtrlMask | Key.Tab,
+			top.ProcessKey (new OldKeyEvent (Key.ShiftMask | Key.CtrlMask | Key.Tab,
 				new KeyModifiers () { Shift = true, Ctrl = true }));
 			Assert.True (v1.HasFocus);
 
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageDown,
+			top.ProcessKey (new OldKeyEvent (Key.CtrlMask | Key.PageDown,
 				new KeyModifiers () { Ctrl = true }));
 			Assert.True (v2.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageDown,
+			top.ProcessKey (new OldKeyEvent (Key.CtrlMask | Key.PageDown,
 				new KeyModifiers () { Ctrl = true }));
 			Assert.True (v3.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageDown,
+			top.ProcessKey (new OldKeyEvent (Key.CtrlMask | Key.PageDown,
 				new KeyModifiers () { Ctrl = true }));
 			Assert.True (v4.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageDown,
+			top.ProcessKey (new OldKeyEvent (Key.CtrlMask | Key.PageDown,
 				new KeyModifiers () { Ctrl = true }));
 			Assert.True (v1.HasFocus);
 
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageUp,
+			top.ProcessKey (new OldKeyEvent (Key.CtrlMask | Key.PageUp,
 				new KeyModifiers () { Ctrl = true }));
 			Assert.True (v4.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageUp,
+			top.ProcessKey (new OldKeyEvent (Key.CtrlMask | Key.PageUp,
 				new KeyModifiers () { Ctrl = true }));
 			Assert.True (v3.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageUp,
+			top.ProcessKey (new OldKeyEvent (Key.CtrlMask | Key.PageUp,
 				new KeyModifiers () { Ctrl = true }));
 			Assert.True (v2.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageUp,
+			top.ProcessKey (new OldKeyEvent (Key.CtrlMask | Key.PageUp,
 				new KeyModifiers () { Ctrl = true }));
 			Assert.True (v1.HasFocus);
 
@@ -685,22 +685,22 @@ public class ApplicationTests {
 			Application.AlternateForwardKey = Key.F7;
 			Application.AlternateBackwardKey = Key.F6;
 
-			top.ProcessKey (new KeyEvent (Key.F7, new KeyModifiers ()));
+			top.ProcessKey (new OldKeyEvent (Key.F7, new KeyModifiers ()));
 			Assert.True (v2.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.F7, new KeyModifiers ()));
+			top.ProcessKey (new OldKeyEvent (Key.F7, new KeyModifiers ()));
 			Assert.True (v3.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.F7, new KeyModifiers ()));
+			top.ProcessKey (new OldKeyEvent (Key.F7, new KeyModifiers ()));
 			Assert.True (v4.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.F7, new KeyModifiers ()));
+			top.ProcessKey (new OldKeyEvent (Key.F7, new KeyModifiers ()));
 			Assert.True (v1.HasFocus);
 
-			top.ProcessKey (new KeyEvent (Key.F6, new KeyModifiers ()));
+			top.ProcessKey (new OldKeyEvent (Key.F6, new KeyModifiers ()));
 			Assert.True (v4.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.F6, new KeyModifiers ()));
+			top.ProcessKey (new OldKeyEvent (Key.F6, new KeyModifiers ()));
 			Assert.True (v3.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.F6, new KeyModifiers ()));
+			top.ProcessKey (new OldKeyEvent (Key.F6, new KeyModifiers ()));
 			Assert.True (v2.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.F6, new KeyModifiers ()));
+			top.ProcessKey (new OldKeyEvent (Key.F6, new KeyModifiers ()));
 			Assert.True (v1.HasFocus);
 
 			Application.RequestStop ();
@@ -773,14 +773,14 @@ public class ApplicationTests {
 		Assert.False (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-		top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab, new KeyModifiers ()));
+		top.ProcessKey (new OldKeyEvent (Key.CtrlMask | Key.Tab, new KeyModifiers ()));
 		Assert.True (win.CanFocus);
 		Assert.False (win.HasFocus);
 		Assert.True (win2.CanFocus);
 		Assert.True (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-		top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab, new KeyModifiers ()));
+		top.ProcessKey (new OldKeyEvent (Key.CtrlMask | Key.Tab, new KeyModifiers ()));
 		Assert.True (win.CanFocus);
 		Assert.True (win.HasFocus);
 		Assert.True (win2.CanFocus);
@@ -825,14 +825,14 @@ public class ApplicationTests {
 		Assert.True (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-		top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab, new KeyModifiers ()));
+		top.ProcessKey (new OldKeyEvent (Key.CtrlMask | Key.Tab, new KeyModifiers ()));
 		Assert.True (win2.CanFocus);
 		Assert.False (win.HasFocus);
 		Assert.True (win2.CanFocus);
 		Assert.True (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-		top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab, new KeyModifiers ()));
+		top.ProcessKey (new OldKeyEvent (Key.CtrlMask | Key.Tab, new KeyModifiers ()));
 		Assert.False (win.CanFocus);
 		Assert.False (win.HasFocus);
 		Assert.True (win2.CanFocus);

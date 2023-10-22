@@ -911,7 +911,7 @@ internal class WindowsDriver : ConsoleDriver {
 			//System.Diagnostics.Debug.WriteLine ($"wVirtualScanCode: {ke.wVirtualScanCode}");
 
 			if (map == (Key)0xffffffff) {
-				KeyEvent key = new KeyEvent ();
+				OldKeyEvent key = new OldKeyEvent ();
 
 				// Shift = VK_SHIFT = 0x10
 				// Ctrl = VK_CONTROL = 0x11
@@ -935,17 +935,17 @@ internal class WindowsDriver : ConsoleDriver {
 				    WindowsConsole.ControlKeyState.LeftControlPressed |
 				    WindowsConsole.ControlKeyState.EnhancedKey:
 				case WindowsConsole.ControlKeyState.EnhancedKey:
-					key = new KeyEvent (Key.CtrlMask | Key.AltMask, _keyModifiers);
+					key = new OldKeyEvent (Key.CtrlMask | Key.AltMask, _keyModifiers);
 					break;
 				case WindowsConsole.ControlKeyState.LeftAltPressed:
-					key = new KeyEvent (Key.AltMask, _keyModifiers);
+					key = new OldKeyEvent (Key.AltMask, _keyModifiers);
 					break;
 				case WindowsConsole.ControlKeyState.RightControlPressed:
 				case WindowsConsole.ControlKeyState.LeftControlPressed:
-					key = new KeyEvent (Key.CtrlMask, _keyModifiers);
+					key = new OldKeyEvent (Key.CtrlMask, _keyModifiers);
 					break;
 				case WindowsConsole.ControlKeyState.ShiftPressed:
-					key = new KeyEvent (Key.ShiftMask, _keyModifiers);
+					key = new OldKeyEvent (Key.ShiftMask, _keyModifiers);
 					break;
 				case WindowsConsole.ControlKeyState.NumlockOn:
 					break;
@@ -955,10 +955,10 @@ internal class WindowsDriver : ConsoleDriver {
 					break;
 				default:
 					key = inputEvent.KeyEvent.wVirtualKeyCode switch {
-						0x10 => new KeyEvent (Key.ShiftMask, _keyModifiers),
-						0x11 => new KeyEvent (Key.CtrlMask, _keyModifiers),
-						0x12 => new KeyEvent (Key.AltMask, _keyModifiers),
-						_ => new KeyEvent (Key.Unknown, _keyModifiers)
+						0x10 => new OldKeyEvent (Key.ShiftMask, _keyModifiers),
+						0x11 => new OldKeyEvent (Key.CtrlMask, _keyModifiers),
+						0x12 => new OldKeyEvent (Key.AltMask, _keyModifiers),
+						_ => new OldKeyEvent (Key.Unknown, _keyModifiers)
 					};
 					break;
 				}
@@ -978,12 +978,12 @@ internal class WindowsDriver : ConsoleDriver {
 					//if (_keyDown == (Key)0xffffffff) {
 					       // Avoid sending repeat keydowns
 					//	_keyDown = map;
-						OnKeyDown (new KeyEventArgs (new KeyEvent (map, _keyModifiers)));
+						OnKeyDown (new KeyEventArgs (new OldKeyEvent (map, _keyModifiers)));
 					//}
-					OnKeyPressed (new KeyEventArgs (new KeyEvent (map, _keyModifiers)));
+					OnKeyPressed (new KeyEventArgs (new OldKeyEvent (map, _keyModifiers)));
 				} else {
 					//_keyDown = (Key)0xffffffff;
-					OnKeyUp (new KeyEventArgs (new KeyEvent (map, _keyModifiers)));
+					OnKeyUp (new KeyEventArgs (new OldKeyEvent (map, _keyModifiers)));
 				}
 			}
 			if (!inputEvent.KeyEvent.bKeyDown && inputEvent.KeyEvent.dwControlKeyState == 0) {

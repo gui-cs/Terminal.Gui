@@ -36,9 +36,9 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets the key with all the keys modifiers, especially the shift key that sometimes have to be injected later.
 		/// </summary>
-		/// <param name="kb">The <see cref="KeyEvent"/> to check.</param>
-		/// <returns>The <see cref="KeyEvent.Key"/> with all the keys modifiers.</returns>
-		public static Key GetModifiersKey (KeyEvent kb)
+		/// <param name="kb">The <see cref="OldKeyEvent"/> to check.</param>
+		/// <returns>The <see cref="OldKeyEvent.Key"/> with all the keys modifiers.</returns>
+		public static Key GetModifiersKey (OldKeyEvent kb)
 		{
 			var key = kb.Key;
 			if (kb.IsAlt && (key & Key.AltMask) == 0) {
@@ -237,10 +237,10 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Allows a view to run a <see cref="View.ShortcutAction"/> if defined.
 		/// </summary>
-		/// <param name="kb">The <see cref="KeyEvent"/></param>
+		/// <param name="kb">The <see cref="OldKeyEvent"/></param>
 		/// <param name="view">The <see cref="View"/></param>
 		/// <returns><c>true</c> if defined <c>false</c>otherwise.</returns>
-		public static bool FindAndOpenByShortcut (KeyEvent kb, View view = null)
+		public static bool FindAndOpenByShortcut (OldKeyEvent kb, View view = null)
 		{
 			if (view == null) {
 				return false;			}

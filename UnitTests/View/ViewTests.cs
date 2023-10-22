@@ -125,11 +125,11 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var r = new View ();
 
-			Assert.False (r.ProcessKey (new KeyEvent () { Key = Key.Unknown }));
-			Assert.False (r.ProcessHotKey (new KeyEvent () { Key = Key.Unknown }));
-			Assert.False (r.ProcessColdKey (new KeyEvent () { Key = Key.Unknown }));
-			Assert.False (r.OnKeyDown (new KeyEvent () { Key = Key.Unknown }));
-			Assert.False (r.OnKeyUp (new KeyEvent () { Key = Key.Unknown }));
+			Assert.False (r.ProcessKey (new OldKeyEvent () { Key = Key.Unknown }));
+			Assert.False (r.ProcessHotKey (new OldKeyEvent () { Key = Key.Unknown }));
+			Assert.False (r.ProcessColdKey (new OldKeyEvent () { Key = Key.Unknown }));
+			Assert.False (r.OnKeyDown (new OldKeyEvent () { Key = Key.Unknown }));
+			Assert.False (r.OnKeyUp (new OldKeyEvent () { Key = Key.Unknown }));
 			Assert.False (r.MouseEvent (new MouseEvent () { Flags = MouseFlags.AllEvents }));
 			Assert.False (r.OnMouseEnter (new MouseEvent () { Flags = MouseFlags.AllEvents }));
 			Assert.False (r.OnMouseLeave (new MouseEvent () { Flags = MouseFlags.AllEvents }));
@@ -974,19 +974,19 @@ cccccccccccccccccccc", output);
 			public bool IsKeyUp { get; set; }
 			public override string Text { get; set; }
 
-			public override bool OnKeyDown (KeyEvent keyEvent)
+			public override bool OnKeyDown (OldKeyEvent keyEvent)
 			{
 				IsKeyDown = true;
 				return true;
 			}
 
-			public override bool ProcessKey (KeyEvent keyEvent)
+			public override bool ProcessKey (OldKeyEvent keyEvent)
 			{
 				IsKeyPress = true;
 				return true;
 			}
 
-			public override bool OnKeyUp (KeyEvent keyEvent)
+			public override bool OnKeyUp (OldKeyEvent keyEvent)
 			{
 				IsKeyUp = true;
 				return true;

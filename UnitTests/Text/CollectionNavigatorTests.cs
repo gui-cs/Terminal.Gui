@@ -382,7 +382,7 @@ namespace Terminal.Gui.TextTests {
 		{
 			// test all Keys
 			foreach (Key key in Enum.GetValues (typeof (Key))) {
-				var ke = new KeyEvent (key, new KeyModifiers () {
+				var ke = new OldKeyEvent (key, new KeyModifiers () {
 					Alt = key == Key.AltMask,
 					Ctrl = key == Key.CtrlMask,
 					Shift = key == Key.ShiftMask
@@ -395,7 +395,7 @@ namespace Terminal.Gui.TextTests {
 			}
 
 			// test Capslock, Numlock and Scrolllock
-			Assert.True (CollectionNavigator.IsCompatibleKey (new KeyEvent (Key.Null, new KeyModifiers () {
+			Assert.True (CollectionNavigator.IsCompatibleKey (new OldKeyEvent (Key.Null, new KeyModifiers () {
 				Alt = false,
 				Ctrl = false,
 				Shift = false,

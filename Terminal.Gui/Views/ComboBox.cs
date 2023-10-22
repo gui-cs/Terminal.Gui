@@ -545,7 +545,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessKey (KeyEvent e)
+		public override bool ProcessKey (OldKeyEvent e)
 		{
 			var result = InvokeKeybindings (e);
 			if (result != null)

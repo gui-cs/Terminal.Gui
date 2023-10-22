@@ -168,7 +168,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessKey (KeyEvent kb)
+		public override bool ProcessKey (OldKeyEvent kb)
 		{
 			var result = InvokeKeybindings (kb);
 			if (result != null)
@@ -178,7 +178,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessHotKey (KeyEvent kb)
+		public override bool ProcessHotKey (OldKeyEvent kb)
 		{
 			if (kb.Key == (Key.AltMask | HotKey))
 				return ToggleChecked ();

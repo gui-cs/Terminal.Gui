@@ -703,7 +703,7 @@ namespace Terminal.Gui.ViewTests {
 			};
 
 			Application.Iteration += (s, a) => {
-				while (count < 20) field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
+				while (count < 20) field.OnKeyDown (new OldKeyEvent (Key.Enter, new KeyModifiers ()));
 
 				Application.RequestStop ();
 			};
@@ -1077,9 +1077,9 @@ namespace Terminal.Gui.ViewTests {
 
 			Application.Iteration += (s, a) => {
 				while (count < 21) {
-					field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
+					field.OnKeyDown (new OldKeyEvent (Key.Enter, new KeyModifiers ()));
 					if (count == 20) {
-						field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
+						field.OnKeyDown (new OldKeyEvent (Key.Enter, new KeyModifiers ()));
 						break;
 					}
 				}
@@ -1138,7 +1138,7 @@ namespace Terminal.Gui.ViewTests {
 			};
 
 			Application.Iteration += (s, a) => {
-				while (count > 0) field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
+				while (count > 0) field.OnKeyDown (new OldKeyEvent (Key.Enter, new KeyModifiers ()));
 
 				Application.RequestStop ();
 			};
@@ -1216,9 +1216,9 @@ namespace Terminal.Gui.ViewTests {
 
 			Application.Iteration += (s, a) => {
 				while (count > -1) {
-					field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
+					field.OnKeyDown (new OldKeyEvent (Key.Enter, new KeyModifiers ()));
 					if (count == 0) {
-						field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
+						field.OnKeyDown (new OldKeyEvent (Key.Enter, new KeyModifiers ()));
 						break;
 					}
 				}

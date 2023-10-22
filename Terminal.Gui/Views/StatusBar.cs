@@ -177,7 +177,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessHotKey (KeyEvent kb)
+		public override bool ProcessHotKey (OldKeyEvent kb)
 		{
 			foreach (var item in Items) {
 				if (kb.Key == item.Shortcut) {

@@ -12,19 +12,19 @@ namespace UICatalog.Scenarios {
 			public List<string> _processHotKeyList = new List<string> ();
 			public List<string> _processColdKeyList = new List<string> ();
 
-			public override bool ProcessKey (KeyEvent keyEvent)
+			public override bool ProcessKey (OldKeyEvent keyEvent)
 			{
 				_processKeyList.Add (keyEvent.ToString ());
 				return base.ProcessKey (keyEvent);
 			}
 
-			public override bool ProcessHotKey (KeyEvent keyEvent)
+			public override bool ProcessHotKey (OldKeyEvent keyEvent)
 			{
 				_processHotKeyList.Add (keyEvent.ToString ());
 				return base.ProcessHotKey (keyEvent);
 			}
 
-			public override bool ProcessColdKey (KeyEvent keyEvent)
+			public override bool ProcessColdKey (OldKeyEvent keyEvent)
 			{
 				_processColdKeyList.Add (keyEvent.ToString ());
 
@@ -87,7 +87,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (editLabel) + 4,
 			};
 			Win.Add (keyLogLabel);
-			var fakeKeyPress = new KeyEvent (Key.CtrlMask | Key.A, new KeyModifiers () {
+			var fakeKeyPress = new OldKeyEvent (Key.CtrlMask | Key.A, new KeyModifiers () {
 				Alt = true,
 				Ctrl = true,
 				Shift = true

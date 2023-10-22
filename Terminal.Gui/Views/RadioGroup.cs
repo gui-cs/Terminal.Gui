@@ -288,7 +288,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessColdKey (KeyEvent kb)
+		public override bool ProcessColdKey (OldKeyEvent kb)
 		{
 			var key = kb.KeyValue;
 			if (key < Char.MaxValue && Char.IsLetterOrDigit ((char)key)) {
@@ -318,7 +318,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessKey (KeyEvent kb)
+		public override bool ProcessKey (OldKeyEvent kb)
 		{
 			var result = InvokeKeybindings (kb);
 			if (result != null)

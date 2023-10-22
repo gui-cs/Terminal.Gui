@@ -107,7 +107,7 @@ namespace UICatalog.Scenarios {
 
 			Stack<StraightLine> undoHistory = new ();
 
-			public override bool ProcessKey (KeyEvent e)
+			public override bool ProcessKey (OldKeyEvent e)
 			{
 				if (e.Key == (Key.Z | Key.CtrlMask)) {
 					var pop = _currentLayer.RemoveLastLine ();

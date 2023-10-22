@@ -761,7 +761,7 @@ namespace Terminal.Gui {
 
 
 		/// <inheritdoc/>
-		public override bool ProcessKey (KeyEvent keyEvent)
+		public override bool ProcessKey (OldKeyEvent keyEvent)
 		{
 			if (TableIsNullOrInvisible ()) {
 				PositionCursor ();
@@ -787,7 +787,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		private bool CycleToNextTableEntryBeginningWith (KeyEvent keyEvent)
+		private bool CycleToNextTableEntryBeginningWith (OldKeyEvent keyEvent)
 		{
 			var row = SelectedRow;
 

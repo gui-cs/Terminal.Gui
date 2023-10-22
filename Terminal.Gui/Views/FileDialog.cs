@@ -485,7 +485,7 @@ namespace Terminal.Gui {
 
 
 		/// <inheritdoc/>
-		public override bool ProcessHotKey (KeyEvent keyEvent)
+		public override bool ProcessHotKey (OldKeyEvent keyEvent)
 		{
 			if (this.NavigateIf (keyEvent, Key.CtrlMask | Key.F, this.tbFind)) {
 				return true;
@@ -782,7 +782,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private bool TreeView_KeyDown (KeyEvent keyEvent)
+		private bool TreeView_KeyDown (OldKeyEvent keyEvent)
 		{
 			if (this.treeView.HasFocus && Separators.Contains ((char)keyEvent.KeyValue)) {
 				this.tbPath.FocusFirst ();
@@ -890,7 +890,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private bool NavigateIf (KeyEvent keyEvent, Key isKey, View to)
+		private bool NavigateIf (OldKeyEvent keyEvent, Key isKey, View to)
 		{
 			if (keyEvent.Key == isKey) {
 
@@ -956,7 +956,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private bool TableView_KeyUp (KeyEvent keyEvent)
+		private bool TableView_KeyUp (OldKeyEvent keyEvent)
 		{
 			if (keyEvent.Key == Key.Backspace) {
 				return this.history.Back ();

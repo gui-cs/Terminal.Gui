@@ -80,7 +80,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Iteration += (s, a) => {
 				if (iteration == 0) {
 					Assert.Equal ("", msg);
-					sb.ProcessHotKey (new KeyEvent (Key.CtrlMask | Key.Q, null));
+					sb.ProcessHotKey (new OldKeyEvent (Key.CtrlMask | Key.Q, null));
 				} else if (iteration == 1) {
 					Assert.Equal ("Quiting...", msg);
 					msg = "";
@@ -192,7 +192,7 @@ CTRL-O Open {CM.Glyphs.VLine} CTRL-Q Quit
 			Assert.True (CanExecuteNew ());
 			Assert.False (CanExecuteClose ());
 
-			Assert.True (top.ProcessHotKey (new KeyEvent (Key.N | Key.CtrlMask, new KeyModifiers () { Alt = true })));
+			Assert.True (top.ProcessHotKey (new OldKeyEvent (Key.N | Key.CtrlMask, new KeyModifiers () { Alt = true })));
 			Application.MainLoop.RunIteration ();
 			Assert.NotNull (win);
 			Assert.False (CanExecuteNew ());

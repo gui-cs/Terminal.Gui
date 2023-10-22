@@ -26,7 +26,7 @@ namespace Terminal.Gui {
 	/// </para>
 	/// <para>
 	///   When the button is configured as the default (<see cref="IsDefault"/>) and the user presses
-	///   the ENTER key, if no other <see cref="View"/> processes the <see cref="KeyEvent"/>, the <see cref="Button"/>'s
+	///   the ENTER key, if no other <see cref="View"/> processes the <see cref="OldKeyEvent"/>, the <see cref="Button"/>'s
 	///   <see cref="Clicked"/> event will will be fired.
 	/// </para>
 	/// </remarks>
@@ -191,7 +191,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessHotKey (KeyEvent kb)
+		public override bool ProcessHotKey (OldKeyEvent kb)
 		{
 			if (!Enabled) {
 				return false;
@@ -201,7 +201,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessColdKey (KeyEvent kb)
+		public override bool ProcessColdKey (OldKeyEvent kb)
 		{
 			if (!Enabled) {
 				return false;
@@ -211,7 +211,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessKey (KeyEvent kb)
+		public override bool ProcessKey (OldKeyEvent kb)
 		{
 			if (!Enabled) {
 				return false;
@@ -224,7 +224,7 @@ namespace Terminal.Gui {
 			return base.ProcessKey (kb);
 		}
 
-		bool ExecuteHotKey (KeyEvent ke)
+		bool ExecuteHotKey (OldKeyEvent ke)
 		{
 			if (ke.Key == (Key.AltMask | HotKey)) {
 				return AcceptKey ();
@@ -232,7 +232,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		bool ExecuteColdKey (KeyEvent ke)
+		bool ExecuteColdKey (OldKeyEvent ke)
 		{
 			if (IsDefault && ke.KeyValue == '\n') {
 				return AcceptKey ();

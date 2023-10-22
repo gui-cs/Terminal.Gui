@@ -10,11 +10,11 @@ public class KeyEventArgs : EventArgs {
 	/// Constructs.
 	/// </summary>
 	/// <param name="ke"></param>
-	public KeyEventArgs (KeyEvent ke) => KeyEvent = ke;
+	public KeyEventArgs (OldKeyEvent ke) => KeyEvent = ke;
 	/// <summary>
 	/// The <see cref="KeyEvent"/> for the event.
 	/// </summary>
-	public KeyEvent KeyEvent { get; set; }
+	public OldKeyEvent KeyEvent { get; set; }
 	/// <summary>
 	/// Indicates if the current Key event has already been processed and the driver should stop notifying any other event subscriber.
 	/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
@@ -551,7 +551,7 @@ public enum Key : uint {
 /// <summary>
 /// Describes a keyboard event.
 /// </summary>
-public class KeyEvent {
+public class OldKeyEvent {
 	KeyModifiers keyModifiers;
 
 	/// <summary>
@@ -604,18 +604,18 @@ public class KeyEvent {
 	public bool IsScrolllock => keyModifiers.Scrolllock;
 
 	/// <summary>
-	/// Constructs a new <see cref="KeyEvent"/>
+	/// Constructs a new <see cref="OldKeyEvent"/>
 	/// </summary>
-	public KeyEvent ()
+	public OldKeyEvent ()
 	{
 		Key = Key.Unknown;
 		keyModifiers = new KeyModifiers ();
 	}
 
 	/// <summary>
-	///   Constructs a new <see cref="KeyEvent"/> from the provided Key value - can be a rune cast into a Key value
+	///   Constructs a new <see cref="OldKeyEvent"/> from the provided Key value - can be a rune cast into a Key value
 	/// </summary>
-	public KeyEvent (Key k, KeyModifiers km)
+	public OldKeyEvent (Key k, KeyModifiers km)
 	{
 		Key = k;
 		keyModifiers = km;

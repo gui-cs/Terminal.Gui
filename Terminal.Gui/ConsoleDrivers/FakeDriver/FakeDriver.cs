@@ -366,15 +366,15 @@ public class FakeDriver : ConsoleDriver {
 		var map = MapKey (consoleKey);
 		if (map == (Key)0xffffffff) {
 			if ((consoleKey.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				OnKeyDown(new KeyEventArgs(new KeyEvent (map, keyModifiers)));
-				OnKeyUp (new KeyEventArgs (new KeyEvent (map, keyModifiers)));
+				OnKeyDown(new KeyEventArgs(new OldKeyEvent (map, keyModifiers)));
+				OnKeyUp (new KeyEventArgs (new OldKeyEvent (map, keyModifiers)));
 			}
 			return;
 		}
 
-		OnKeyDown (new KeyEventArgs (new KeyEvent (map, keyModifiers)));
-		OnKeyUp (new KeyEventArgs (new KeyEvent (map, keyModifiers)));
-		OnKeyPressed (new KeyEventArgs (new KeyEvent (map, keyModifiers)));
+		OnKeyDown (new KeyEventArgs (new OldKeyEvent (map, keyModifiers)));
+		OnKeyUp (new KeyEventArgs (new OldKeyEvent (map, keyModifiers)));
+		OnKeyPressed (new KeyEventArgs (new OldKeyEvent (map, keyModifiers)));
 	}
 
 	/// <inheritdoc/>

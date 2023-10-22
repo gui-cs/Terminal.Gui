@@ -106,19 +106,19 @@ namespace Terminal.Gui.ViewTests {
 			public bool IsKeyUp { get; set; }
 			public override string Text { get; set; }
 
-			public override bool OnKeyDown (KeyEvent keyEvent)
+			public override bool OnKeyDown (OldKeyEvent keyEvent)
 			{
 				IsKeyDown = true;
 				return true;
 			}
 
-			public override bool ProcessKey (KeyEvent keyEvent)
+			public override bool ProcessKey (OldKeyEvent keyEvent)
 			{
 				IsKeyPress = true;
 				return true;
 			}
 
-			public override bool OnKeyUp (KeyEvent keyEvent)
+			public override bool OnKeyUp (OldKeyEvent keyEvent)
 			{
 				IsKeyUp = true;
 				return true;

@@ -406,7 +406,7 @@ namespace UICatalog.Scenarios {
 					}
 				};
 
-				bool ProcessKey (KeyEvent ev)
+				bool ProcessKey (OldKeyEvent ev)
 				{
 					switch (ev.Key) {
 					case Key.CursorUp:

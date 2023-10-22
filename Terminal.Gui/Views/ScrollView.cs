@@ -542,7 +542,7 @@ public class ScrollView : View {
 	}
 
 	///<inheritdoc/>
-	public override bool ProcessKey (KeyEvent kb)
+	public override bool ProcessKey (OldKeyEvent kb)
 	{
 		if (base.ProcessKey (kb))
 			return true;
