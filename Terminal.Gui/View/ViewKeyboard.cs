@@ -335,7 +335,7 @@ namespace Terminal.Gui {
 		/// <returns>The <see cref="Key"/> used by a <see cref="Command"/></returns>
 		public Key GetKeyFromCommand (params Command [] command)
 		{
-			return KeyBindings.First (kb => kb.Value.SequenceEqual (command)).Key;
+			return KeyBindings.First (a => a.Value.SequenceEqual (command)).Key;
 		}
 
 		/// <inheritdoc/>

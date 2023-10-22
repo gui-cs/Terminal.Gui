@@ -90,7 +90,7 @@ namespace Terminal.Gui {
 		///     views.
 		///  </para>
 		/// </remarks>
-		public virtual bool OnHotKeyPressed (KeyEventArgs kb)
+		public virtual bool OnHotKeyPressed (KeyEventArgs a)
 		{
 			return false;
 		}

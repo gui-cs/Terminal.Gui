@@ -203,15 +203,15 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Returns true if <paramref name="kb"/> is a searchable key
+		/// Returns true if <paramref name="a"/> is a searchable key
 		/// (e.g. letters, numbers, etc) that are valid to pass to this
 		/// class for search filtering.
 		/// </summary>
-		/// <param name="kb"></param>
+		/// <param name="a"></param>
 		/// <returns></returns>
-		public static bool IsCompatibleKey (KeyEventArgs kb)
+		public static bool IsCompatibleKey (KeyEventArgs a)
 		{
-			return !kb.IsAlt && !kb.IsCtrl;
+			return !a.IsAlt && !a.IsCtrl;
 		}
 	}
 }

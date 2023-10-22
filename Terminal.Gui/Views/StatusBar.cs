@@ -177,10 +177,10 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnHotKeyPressed (KeyEventArgs kb)
+		public override bool OnHotKeyPressed (KeyEventArgs a)
 		{
 			foreach (var item in Items) {
-				if (kb.Key == item.Shortcut) {
+				if (a.Key == item.Shortcut) {
 					if (item.IsEnabled ()) {
 						Run (item.Action);
 					}

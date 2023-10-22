@@ -3401,28 +3401,28 @@ namespace Terminal.Gui {
 		bool _shiftSelecting;
 
 		///<inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs kb)
+		public override bool OnKeyPressed (KeyEventArgs a)
 		{
 			if (!CanFocus) {
 				return true;
 			}
 
 			// Give autocomplete first opportunity to respond to key presses
-			if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (kb)) {
+			if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (a)) {
 				return true;
 			}
 
-			var result = InvokeKeybindings (new (ShortcutHelper.GetModifiersKey (kb),
-			    new KeyModifiers () { Alt = kb.IsAlt, Ctrl = kb.IsCtrl, Shift = kb.IsShift }));
+			var result = InvokeKeybindings (new (ShortcutHelper.GetModifiersKey (a),
+			    new KeyModifiers () { Alt = a.IsAlt, Ctrl = a.IsCtrl, Shift = a.IsShift }));
 			if (result != null)
 				return (bool)result;
 
 			ResetColumnTrack ();
 			// Ignore control characters and other special keys
-			if (kb.Key < Key.Space || kb.Key > Key.CharMask)
+			if (a.Key < Key.Space || a.Key > Key.CharMask)
 				return false;
 
-			InsertText (kb);
+			InsertText (a);
 			DoNeededAction ();
 
 			return true;
@@ -4318,7 +4318,7 @@ namespace Terminal.Gui {
 			_continuousFind = false;
 		}
 
-		bool InsertText (KeyEventArgs kb, ColorScheme? colorScheme = null)
+		bool InsertText (KeyEventArgs a, ColorScheme? colorScheme = null)
 		{
 			//So that special keys like tab can be processed
 			if (_isReadOnly)
@@ -4331,22 +4331,22 @@ namespace Terminal.Gui {
 			if (_selecting) {
 				ClearSelectedRegion ();
 			}
-			if (kb.Key == Key.Enter) {
+			if (a.Key == Key.Enter) {
 				_model.AddLine (_currentRow + 1, new List<RuneCell> ());
 				_currentRow++;
 				_currentColumn = 0;
-			} else if ((uint)kb.Key == 13) {
+			} else if ((uint)a.Key == 13) {
 				_currentColumn = 0;
 			} else {
 				if (Used) {
-					Insert (new RuneCell { Rune = (Rune)(uint)kb.Key, ColorScheme = colorScheme });
+					Insert (new RuneCell { Rune = (Rune)(uint)a.Key, ColorScheme = colorScheme });
 					_currentColumn++;
 					if (_currentColumn >= _leftColumn + Frame.Width) {
 						_leftColumn++;
 						SetNeedsDisplay ();
 					}
 				} else {
-					Insert (new RuneCell { Rune = (Rune)(uint)kb.Key, ColorScheme = colorScheme });
+					Insert (new RuneCell { Rune = (Rune)(uint)a.Key, ColorScheme = colorScheme });
 					_currentColumn++;
 				}
 			}
@@ -4388,9 +4388,9 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnKeyUp (KeyEventArgs kb)
+		public override bool OnKeyUp (KeyEventArgs a)
 		{
-			switch (kb.Key) {
+			switch (a.Key) {
 			case Key.Space | Key.CtrlMask:
 				return true;
 			}

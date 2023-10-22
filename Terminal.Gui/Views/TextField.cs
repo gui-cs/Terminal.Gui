@@ -622,7 +622,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Processes key presses for the <see cref="TextField"/>.
 		/// </summary>
-		/// <param name="kb"></param>
+		/// <param name="a"></param>
 		/// <returns></returns>
 		/// <remarks>
 		/// The <see cref="TextField"/> control responds to the following keys:
@@ -637,7 +637,7 @@ namespace Terminal.Gui {
 		///    </item>
 		/// </list>
 		/// </remarks>
-		public override bool OnKeyPressed (KeyEventArgs kb)
+		public override bool OnKeyPressed (KeyEventArgs a)
 		{
 			// remember current cursor position
 			// because the new calculated cursor position is needed to be set BEFORE the change event is triggest
@@ -645,28 +645,28 @@ namespace Terminal.Gui {
 			_oldCursorPos = _point;
 
 			// Give autocomplete first opportunity to respond to key presses
-			if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (kb)) {
+			if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (a)) {
 				return true;
 			}
 
-			var result = InvokeKeybindings (new (ShortcutHelper.GetModifiersKey (kb),
-				new KeyModifiers () { Alt = kb.IsAlt, Ctrl = kb.IsCtrl, Shift = kb.IsShift }));
+			var result = InvokeKeybindings (new (ShortcutHelper.GetModifiersKey (a),
+				new KeyModifiers () { Alt = a.IsAlt, Ctrl = a.IsCtrl, Shift = a.IsShift }));
 			if (result != null)
 				return (bool)result;
 
 			// Ignore other control characters.
-			if (kb.Key < Key.Space || kb.Key > Key.CharMask)
+			if (a.Key < Key.Space || a.Key > Key.CharMask)
 				return false;
 
 			if (ReadOnly)
 				return true;
 
-			InsertText (kb);
+			InsertText (a);
 
 			return true;
 		}
 
-		void InsertText (KeyEventArgs kb, bool useOldCursorPos = true)
+		void InsertText (KeyEventArgs a, bool useOldCursorPos = true)
 		{
 			_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCells (_text) }, new Point (_point, 0));
 
@@ -678,7 +678,7 @@ namespace Terminal.Gui {
 			if (!useOldCursorPos) {
 				_oldCursorPos = _point;
 			}
-			var kbstr = ((Rune)(uint)kb.Key).ToString ().EnumerateRunes ();
+			var kbstr = ((Rune)(uint)a.Key).ToString ().EnumerateRunes ();
 			if (Used) {
 				_point++;
 				if (_point == newText.Count + 1) {

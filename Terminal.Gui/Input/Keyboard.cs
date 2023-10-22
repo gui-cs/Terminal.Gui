@@ -10,15 +10,19 @@ public class KeyEventArgs : EventArgs {
 	/// <summary>
 	/// Constructs a new <see cref="KeyEventArgs"/>
 	/// </summary>
-	public KeyEventArgs ()
-	{
-		Key = Key.Unknown;
-		_keyModifiers = new KeyModifiers ();
-	}
+	public KeyEventArgs () : this (Key.Unknown, new KeyModifiers ()) { }
 
 	/// <summary>
 	///   Constructs a new <see cref="KeyEventArgs"/> from the provided Key value - can be a rune cast into a Key value
 	/// </summary>
+	/// <param name="k">The key</param>
+	public KeyEventArgs (Key k) : this (k, new KeyModifiers ()) { }
+
+	/// <summary>
+	///   Constructs a new <see cref="KeyEventArgs"/> from the provided Key value - can be a rune cast into a Key value
+	/// </summary>
+	/// <param name="k">The key</param>
+	/// <param name="km">The key modifiers</param>>
 	public KeyEventArgs (Key k, KeyModifiers km)
 	{
 		Key = k;

@@ -151,19 +151,19 @@ namespace Terminal.Gui {
 		/// to instead fire the <see cref="Cancelled"/> event when Wizard is being used as a non-modal (see <see cref="Wizard.Modal"/>.
 		/// See <see cref="Responder.OnKeyPressed"/> for more.
 		/// </summary>
-		/// <param name="kb"></param>
+		/// <param name="a"></param>
 		/// <returns></returns>
-		public override bool OnKeyPressed (KeyEventArgs kb)
+		public override bool OnKeyPressed (KeyEventArgs a)
 		{
 			if (!Modal) {
-				switch (kb.Key) {
+				switch (a.Key) {
 				case Key.Esc:
 					var args = new WizardButtonEventArgs ();
 					Cancelled?.Invoke (this, args);
 					return false;
 				}
 			}
-			return base.OnKeyPressed (kb);
+			return base.OnKeyPressed (a);
 		}
 
 		/// <summary>

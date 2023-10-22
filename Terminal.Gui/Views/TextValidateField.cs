@@ -612,20 +612,20 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs kb)
+		public override bool OnKeyPressed (KeyEventArgs a)
 		{
 			if (provider == null) {
 				return false;
 			}
 
-			var result = InvokeKeybindings (kb);
+			var result = InvokeKeybindings (a);
 			if (result != null)
 				return (bool)result;
 
-			if (kb.Key < Key.Space || kb.Key > Key.CharMask)
+			if (a.Key < Key.Space || a.Key > Key.CharMask)
 				return false;
 
-			var key = new Rune ((uint)kb.KeyValue);
+			var key = new Rune ((uint)a.KeyValue);
 
 			var inserted = provider.InsertAt ((char)key.Value, cursorPosition);
 

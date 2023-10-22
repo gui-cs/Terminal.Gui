@@ -31,14 +31,30 @@ namespace Terminal.Gui.InputTests {
 			Assert.False (r.MouseEvent (new MouseEvent () { Flags = MouseFlags.AllEvents }));
 			Assert.False (r.OnMouseEnter (new MouseEvent () { Flags = MouseFlags.AllEvents }));
 			Assert.False (r.OnMouseLeave (new MouseEvent () { Flags = MouseFlags.AllEvents }));
-			
+
 			var v = new View ();
 			Assert.False (r.OnEnter (v));
 			v.Dispose ();
-			
+
 			v = new View ();
 			Assert.False (r.OnLeave (v));
 			v.Dispose ();
+
+			r.Dispose ();
+		}
+
+		[Fact]
+		public void KeyPressed_Handled_True_Cancels_KeyPress ()
+		{
+			var r = new Responder ();
+			var args = new KeyEventArgs () { Key = Key.Unknown };
+
+			Assert.False (r.OnKeyPressed (args));
+			Assert.False (args.Handled);
+
+			r.KeyPressed += (s, a) => a.Handled = true;
+			Assert.True (r.OnKeyPressed (args));
+			Assert.True (args.Handled);
 
 			r.Dispose ();
 		}
@@ -47,7 +63,7 @@ namespace Terminal.Gui.InputTests {
 		[Fact, TestRespondersDisposed]
 		public void Dispose_Works ()
 		{
-		
+
 			var r = new Responder ();
 #if DEBUG_IDISPOSABLE
 			Assert.Single (Responder.Instances);

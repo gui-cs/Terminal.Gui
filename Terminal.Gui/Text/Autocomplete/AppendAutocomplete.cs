@@ -54,9 +54,9 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override bool ProcessKey (KeyEventArgs kb)
+		public override bool ProcessKey (KeyEventArgs a)
 		{
-			var key = kb.Key;
+			var key = a.Key;
 			if (key == SelectionKey) {
 				return this.AcceptSelectionIfAny ();
 			} else
@@ -71,7 +71,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if (char.IsLetterOrDigit ((char)kb.KeyValue)) {
+			if (char.IsLetterOrDigit ((char)a.KeyValue)) {
 				_suspendSuggestions = false;
 			}
 

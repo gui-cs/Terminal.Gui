@@ -288,9 +288,9 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnColdKey (KeyEventArgs kb)
+		public override bool OnColdKey (KeyEventArgs a)
 		{
-			var key = kb.KeyValue;
+			var key = a.KeyValue;
 			if (key < Char.MaxValue && Char.IsLetterOrDigit ((char)key)) {
 				int i = 0;
 				key = Char.ToUpper ((char)key);
@@ -318,13 +318,13 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs kb)
+		public override bool OnKeyPressed (KeyEventArgs a)
 		{
-			var result = InvokeKeybindings (kb);
+			var result = InvokeKeybindings (a);
 			if (result != null)
 				return (bool)result;
 
-			return base.OnKeyPressed (kb);
+			return base.OnKeyPressed (a);
 		}
 
 		void SelectItem ()

@@ -85,9 +85,9 @@ namespace Terminal.Gui {
 		/// up/down apply to the autocomplete control instead of changing the cursor position in
 		/// the underlying text view.
 		/// </summary>
-		/// <param name="kb">The key event.</param>
+		/// <param name="a">The key event.</param>
 		/// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
-		bool ProcessKey (KeyEventArgs kb);
+		bool ProcessKey (KeyEventArgs a);
 
 		/// <summary>
 		/// Handle mouse events before <see cref="HostControl"/> e.g. to make mouse events like

@@ -805,17 +805,17 @@ namespace Terminal.Gui {
 				AddKeyBinding (Key.CursorDown, Command.LineDown);
 			}
 
-			public override bool OnKeyPressed (KeyEventArgs kb)
+			public override bool OnKeyPressed (KeyEventArgs a)
 			{
 				if (!CanFocus || !HasFocus) {
-					return base.OnKeyPressed (kb);
+					return base.OnKeyPressed (a);
 				}
 
-				var result = InvokeKeybindings (kb);
+				var result = InvokeKeybindings (a);
 				if (result != null)
 					return (bool)result;
 
-				return base.OnKeyPressed (kb);
+				return base.OnKeyPressed (a);
 			}
 
 			public override void PositionCursor ()

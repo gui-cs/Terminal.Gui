@@ -416,20 +416,20 @@ namespace Terminal.Gui {
 		public CollectionNavigator KeystrokeNavigator { get; private set; } = new CollectionNavigator ();
 
 		///<inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs kb)
+		public override bool OnKeyPressed (KeyEventArgs a)
 		{
 			if (source == null) {
-				return base.OnKeyPressed (kb);
+				return base.OnKeyPressed (a);
 			}
 
-			var result = InvokeKeybindings (kb);
+			var result = InvokeKeybindings (a);
 			if (result != null) {
 				return (bool)result;
 			}
 
 			// Enable user to find & select an item by typing text
-			if (CollectionNavigator.IsCompatibleKey (kb)) {
-				var newItem = KeystrokeNavigator?.GetNextMatchingItem (SelectedItem, (char)kb.KeyValue);
+			if (CollectionNavigator.IsCompatibleKey (a)) {
+				var newItem = KeystrokeNavigator?.GetNextMatchingItem (SelectedItem, (char)a.KeyValue);
 				if (newItem is int && newItem != -1) {
 					SelectedItem = (int)newItem;
 					EnsureSelectedItemVisible ();

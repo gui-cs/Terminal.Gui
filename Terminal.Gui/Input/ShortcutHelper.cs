@@ -36,18 +36,18 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets the key with all the keys modifiers, especially the shift key that sometimes have to be injected later.
 		/// </summary>
-		/// <param name="kb">The <see cref="KeyEventArgs"/> to check.</param>
+		/// <param name="a">The <see cref="KeyEventArgs"/> to check.</param>
 		/// <returns>The <see cref="KeyEventArgs.Key"/> with all the keys modifiers.</returns>
-		public static Key GetModifiersKey (KeyEventArgs kb)
+		public static Key GetModifiersKey (KeyEventArgs a)
 		{
-			var key = kb.Key;
-			if (kb.IsAlt && (key & Key.AltMask) == 0) {
+			var key = a.Key;
+			if (a.IsAlt && (key & Key.AltMask) == 0) {
 				key |= Key.AltMask;
 			}
-			if (kb.IsCtrl && (key & Key.CtrlMask) == 0) {
+			if (a.IsCtrl && (key & Key.CtrlMask) == 0) {
 				key |= Key.CtrlMask;
 			}
-			if (kb.IsShift && (key & Key.ShiftMask) == 0) {
+			if (a.IsShift && (key & Key.ShiftMask) == 0) {
 				key |= Key.ShiftMask;
 			}
 
@@ -237,16 +237,16 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Allows a view to run a <see cref="View.ShortcutAction"/> if defined.
 		/// </summary>
-		/// <param name="kb">The <see cref="KeyEventArgs"/></param>
+		/// <param name="a">The <see cref="KeyEventArgs"/></param>
 		/// <param name="view">The <see cref="View"/></param>
 		/// <returns><c>true</c> if defined <c>false</c>otherwise.</returns>
-		public static bool FindAndOpenByShortcut (KeyEventArgs kb, View view = null)
+		public static bool FindAndOpenByShortcut (KeyEventArgs a, View view = null)
 		{
 			if (view == null) {
 				return false;			}
 
-			var key = kb.KeyValue;
-			var keys = GetModifiersKey (kb);
+			var key = a.KeyValue;
+			var keys = GetModifiersKey (a);
 			key |= (int)keys;
 			foreach (var v in view.Subviews) {
 				if (v.Shortcut != Key.Null && v.Shortcut == (Key)key) {
@@ -259,7 +259,7 @@ namespace Terminal.Gui {
 					}
 					return true;
 				}
-				if (FindAndOpenByShortcut (kb, v)) {
+				if (FindAndOpenByShortcut (a, v)) {
 					return true;
 				}
 			}

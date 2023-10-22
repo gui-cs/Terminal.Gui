@@ -191,37 +191,37 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnHotKeyPressed (KeyEventArgs kb)
+		public override bool OnHotKeyPressed (KeyEventArgs a)
 		{
 			if (!Enabled) {
 				return false;
 			}
 
-			return ExecuteHotKey (kb);
+			return ExecuteHotKey (a);
 		}
 
 		///<inheritdoc/>
-		public override bool OnColdKey (KeyEventArgs kb)
+		public override bool OnColdKey (KeyEventArgs a)
 		{
 			if (!Enabled) {
 				return false;
 			}
 
-			return ExecuteColdKey (kb);
+			return ExecuteColdKey (a);
 		}
 
 		///<inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs kb)
+		public override bool OnKeyPressed (KeyEventArgs a)
 		{
 			if (!Enabled) {
 				return false;
 			}
 
-			var result = InvokeKeybindings (kb);
+			var result = InvokeKeybindings (a);
 			if (result != null)
 				return (bool)result;
 
-			return base.OnKeyPressed (kb);
+			return base.OnKeyPressed (a);
 		}
 
 		bool ExecuteHotKey (KeyEventArgs ke)

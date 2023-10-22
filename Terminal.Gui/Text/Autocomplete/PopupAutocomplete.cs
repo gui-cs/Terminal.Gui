@@ -276,18 +276,18 @@ namespace Terminal.Gui {
 		/// up/down apply to the autocomplete control instead of changing the cursor position in
 		/// the underlying text view.
 		/// </summary>
-		/// <param name="kb">The key event.</param>
+		/// <param name="a">The key event.</param>
 		/// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
-		public override bool ProcessKey (KeyEventArgs kb)
+		public override bool ProcessKey (KeyEventArgs a)
 		{
-			if (SuggestionGenerator.IsWordChar ((Rune)(char)kb.Key)) {
+			if (SuggestionGenerator.IsWordChar ((Rune)(char)a.Key)) {
 				Visible = true;
 				ManipulatePopup ();
 				closed = false;
 				return false;
 			}
 
-			if (kb.Key == Reopen) {
+			if (a.Key == Reopen) {
 				Context.Canceled = false;
 				return ReopenSuggestions ();
 			}
@@ -300,19 +300,19 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (kb.Key == Key.CursorDown) {
+			if (a.Key == Key.CursorDown) {
 				MoveDown ();
 				return true;
 			}
 
-			if (kb.Key == Key.CursorUp) {
+			if (a.Key == Key.CursorUp) {
 				MoveUp ();
 				return true;
 			}
 
 			// TODO : Revisit this
-			/*if (kb.Key == Key.CursorLeft || kb.Key == Key.CursorRight) {
-				GenerateSuggestions (kb.Key == Key.CursorLeft ? -1 : 1);
+			/*if (a.Key == Key.CursorLeft || a.Key == Key.CursorRight) {
+				GenerateSuggestions (a.Key == Key.CursorLeft ? -1 : 1);
 				if (Suggestions.Count == 0) {
 					Visible = false;
 					if (!closed) {
@@ -322,11 +322,11 @@ namespace Terminal.Gui {
 				return false;
 			}*/
 
-			if (kb.Key == SelectionKey) {
+			if (a.Key == SelectionKey) {
 				return Select ();
 			}
 
-			if (kb.Key == CloseKey) {
+			if (a.Key == CloseKey) {
 				Close ();
 				Context.Canceled = true;
 				return true;

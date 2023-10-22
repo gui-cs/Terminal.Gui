@@ -743,15 +743,15 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		public override bool OnKeyPressed (KeyEventArgs kb)
+		public override bool OnKeyPressed (KeyEventArgs a)
 		{
-			var result = InvokeKeybindings (kb);
+			var result = InvokeKeybindings (a);
 			if (result != null)
 				return (bool)result;
 
 			// TODO: rune-ify
-			if (barItems.Children != null && Char.IsLetterOrDigit ((char)kb.KeyValue)) {
-				var x = Char.ToUpper ((char)kb.KeyValue);
+			if (barItems.Children != null && Char.IsLetterOrDigit ((char)a.KeyValue)) {
+				var x = Char.ToUpper ((char)a.KeyValue);
 				var idx = -1;
 				foreach (var item in barItems.Children) {
 					idx++;
@@ -763,7 +763,7 @@ namespace Terminal.Gui {
 					}
 				}
 			}
-			return host.OnHotKeyPressed (kb);
+			return host.OnHotKeyPressed (a);
 		}
 
 		void RunSelected ()
@@ -1812,10 +1812,10 @@ namespace Terminal.Gui {
 		}
 
 		bool openedByHotKey;
-		internal bool FindAndOpenMenuByHotkey (KeyEventArgs kb)
+		internal bool FindAndOpenMenuByHotkey (KeyEventArgs a)
 		{
 			//int pos = 0;
-			var c = ((uint)kb.Key & (uint)Key.CharMask);
+			var c = ((uint)a.Key & (uint)Key.CharMask);
 			for (int i = 0; i < Menus.Length; i++) {
 				// TODO: this code is duplicated, hotkey should be part of the MenuBarItem
 				var mi = Menus [i];
@@ -1825,12 +1825,12 @@ namespace Terminal.Gui {
 						ProcessMenu (i, mi);
 						return true;
 					} else if (mi.Children?.Length > 0) {
-						if (FindAndOpenChildrenMenuByHotkey (kb, mi.Children)) {
+						if (FindAndOpenChildrenMenuByHotkey (a, mi.Children)) {
 							return true;
 						}
 					}
 				} else if (mi.Children?.Length > 0) {
-					if (FindAndOpenChildrenMenuByHotkey (kb, mi.Children)) {
+					if (FindAndOpenChildrenMenuByHotkey (a, mi.Children)) {
 						return true;
 					}
 				}
@@ -1839,9 +1839,9 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		bool FindAndOpenChildrenMenuByHotkey (KeyEventArgs kb, MenuItem [] children)
+		bool FindAndOpenChildrenMenuByHotkey (KeyEventArgs a, MenuItem [] children)
 		{
-			var c = ((uint)kb.Key & (uint)Key.CharMask);
+			var c = ((uint)a.Key & (uint)Key.CharMask);
 			for (int i = 0; i < children.Length; i++) {
 				var mi = children [i];
 
@@ -1860,12 +1860,12 @@ namespace Terminal.Gui {
 						}
 						return true;
 					} else if (mi is MenuBarItem menuBarItem && menuBarItem?.Children.Length > 0) {
-						if (FindAndOpenChildrenMenuByHotkey (kb, menuBarItem.Children)) {
+						if (FindAndOpenChildrenMenuByHotkey (a, menuBarItem.Children)) {
 							return true;
 						}
 					}
 				} else if (mi is MenuBarItem menuBarItem && menuBarItem?.Children.Length > 0) {
-					if (FindAndOpenChildrenMenuByHotkey (kb, menuBarItem.Children)) {
+					if (FindAndOpenChildrenMenuByHotkey (a, menuBarItem.Children)) {
 						return true;
 					}
 				}
@@ -1873,14 +1873,14 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		internal bool FindAndOpenMenuByShortcut (KeyEventArgs kb, MenuItem [] children = null)
+		internal bool FindAndOpenMenuByShortcut (KeyEventArgs a, MenuItem [] children = null)
 		{
 			if (children == null) {
 				children = Menus;
 			}
 
-			var key = kb.KeyValue;
-			var keys = ShortcutHelper.GetModifiersKey (kb);
+			var key = a.KeyValue;
+			var keys = ShortcutHelper.GetModifiersKey (a);
 			key |= (int)keys;
 			for (int i = 0; i < children.Length; i++) {
 				var mi = children [i];
@@ -1897,7 +1897,7 @@ namespace Terminal.Gui {
 					}
 					return true;
 				}
-				if (mi is MenuBarItem menuBarItem && menuBarItem.Children != null && !menuBarItem.IsTopLevel && FindAndOpenMenuByShortcut (kb, menuBarItem.Children)) {
+				if (mi is MenuBarItem menuBarItem && menuBarItem.Children != null && !menuBarItem.IsTopLevel && FindAndOpenMenuByShortcut (a, menuBarItem.Children)) {
 					return true;
 				}
 			}
@@ -1931,9 +1931,9 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnHotKeyPressed (KeyEventArgs kb)
+		public override bool OnHotKeyPressed (KeyEventArgs a)
 		{
-			if (kb.Key == Key) {
+			if (a.Key == Key) {
 				if (Visible && !IsMenuOpen) {
 					OpenMenu ();
 				} else {
@@ -1944,25 +1944,25 @@ namespace Terminal.Gui {
 
 			// To ncurses simulate a AltMask key pressing Alt+Space because
 			// it can't detect an alone special key down was pressed.
-			if (kb.IsAlt && kb.Key == Key.AltMask && openMenu == null) {
-				OnKeyDown (kb);
-				OnKeyUp (kb);
+			if (a.IsAlt && a.Key == Key.AltMask && openMenu == null) {
+				OnKeyDown (a);
+				OnKeyUp (a);
 				return true;
-			} else if (kb.IsAlt && !kb.IsCtrl && !kb.IsShift) {
-				if (FindAndOpenMenuByHotkey (kb)) return true;
+			} else if (a.IsAlt && !a.IsCtrl && !a.IsShift) {
+				if (FindAndOpenMenuByHotkey (a)) return true;
 			}
-			//var kc = kb.KeyValue;
+			//var kc = a.KeyValue;
 
-			return base.OnHotKeyPressed (kb);
+			return base.OnHotKeyPressed (a);
 		}
 
 		///<inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs kb)
+		public override bool OnKeyPressed (KeyEventArgs a)
 		{
-			if (InvokeKeybindings (kb) == true)
+			if (InvokeKeybindings (a) == true)
 				return true;
 
-			var key = kb.KeyValue;
+			var key = a.KeyValue;
 			if ((key >= 'a' && key <= 'z') || (key >= 'A' && key <= 'Z') || (key >= '0' && key <= '9')) {
 				char c = Char.ToUpper ((char)key);
 
@@ -2013,9 +2013,9 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnColdKey (KeyEventArgs kb)
+		public override bool OnColdKey (KeyEventArgs a)
 		{
-			return FindAndOpenMenuByShortcut (kb);
+			return FindAndOpenMenuByShortcut (a);
 		}
 
 		///<inheritdoc/>

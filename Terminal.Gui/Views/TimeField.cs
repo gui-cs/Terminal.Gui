@@ -247,20 +247,20 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs kb)
+		public override bool OnKeyPressed (KeyEventArgs a)
 		{
-			var result = InvokeKeybindings (kb);
+			var result = InvokeKeybindings (a);
 			if (result != null)
 				return (bool)result;
 
 			// Ignore non-numeric characters.
-			if (kb.Key < (Key)((int)Key.D0) || kb.Key > (Key)((int)Key.D9))
+			if (a.Key < (Key)((int)Key.D0) || a.Key > (Key)((int)Key.D9))
 				return false;
 
 			if (ReadOnly)
 				return true;
 
-			if (SetText (((Rune)(uint)kb.Key).ToString ().EnumerateRunes ().First ()))
+			if (SetText (((Rune)(uint)a.Key).ToString ().EnumerateRunes ().First ()))
 				IncCursorPosition ();
 
 			return true;
