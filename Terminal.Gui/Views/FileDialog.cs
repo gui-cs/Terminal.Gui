@@ -1378,7 +1378,6 @@ namespace Terminal.Gui {
 
 		private void HideColumn (int clickedCol)
 		{
-			if (clickedCol == 0) return;
 			var style = this.tableView.Style.GetOrCreateColumnStyle (clickedCol);
 			style.Visible = false;
 			this.tableView.Update ();
