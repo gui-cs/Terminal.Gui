@@ -8,11 +8,11 @@ using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.ViewTests {
 	public class KeyboardTests {
-		readonly ITestOutputHelper output;
+		readonly ITestOutputHelper _output;
 
 		public KeyboardTests (ITestOutputHelper output)
 		{
-			this.output = output;
+			this._output = output;
 		}
 
 		[Fact]
@@ -108,18 +108,30 @@ namespace Terminal.Gui.ViewTests {
 
 			public override bool OnKeyDown (KeyEventArgs keyEvent)
 			{
+				if (base.OnKeyDown (keyEvent)) {
+					return true;
+				}
+
 				IsKeyDown = true;
 				return true;
 			}
 
 			public override bool OnKeyPressed (KeyEventArgs keyEvent)
 			{
+				if (base.OnKeyPressed (keyEvent)) {
+					return true;
+				}
+
 				IsKeyPress = true;
 				return true;
 			}
 
 			public override bool OnKeyUp (KeyEventArgs keyEvent)
 			{
+				if (base.OnKeyUp (keyEvent)) {
+					return true;
+				}
+				
 				IsKeyUp = true;
 				return true;
 			}
@@ -176,6 +188,23 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (view.IsKeyPress);
 			Assert.True (view.IsKeyUp);
 		}
-	
+
+		[Fact]
+		public void AllViews_OnKeyPressed_CallsResponder ()
+		{
+			foreach (var view in TestHelpers.GetAllViews ()) {
+				_output.WriteLine($"Testing {view.GetType().Name}");
+				var keyPressed = false;
+				view.KeyPressed += (s, a) => {
+					a.Handled = true;
+					keyPressed = true;
+				};
+
+				var handled = view.OnKeyPressed (new KeyEventArgs (Key.A));
+				Assert.True (handled);
+				Assert.True (keyPressed);
+				view.Dispose ();
+			}
+		}
 	}
 }

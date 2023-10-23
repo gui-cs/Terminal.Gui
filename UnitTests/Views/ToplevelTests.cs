@@ -54,7 +54,7 @@ namespace Terminal.Gui.ViewsTests {
 					Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
 					Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
 
-					Application.Top.OnHotKeyPressed (new (Key.CtrlMask | Key.R, new KeyModifiers ()));
+					Application.Top.OnHotKey (new (Key.CtrlMask | Key.R, new KeyModifiers ()));
 				} else if (iterations == 1) {
 					Assert.Equal ("Top2", Application.Top.Text);
 					Assert.Equal (0, Application.Top.Frame.X);
@@ -62,7 +62,7 @@ namespace Terminal.Gui.ViewsTests {
 					Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
 					Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
 
-					Application.Top.OnHotKeyPressed (new (Key.CtrlMask | Key.C, new KeyModifiers ()));
+					Application.Top.OnHotKey (new (Key.CtrlMask | Key.C, new KeyModifiers ()));
 				} else if (iterations == 3) {
 					Assert.Equal ("Top1", Application.Top.Text);
 					Assert.Equal (0, Application.Top.Frame.X);
@@ -70,7 +70,7 @@ namespace Terminal.Gui.ViewsTests {
 					Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
 					Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
 
-					Application.Top.OnHotKeyPressed (new (Key.CtrlMask | Key.R, new KeyModifiers ()));
+					Application.Top.OnHotKey (new (Key.CtrlMask | Key.R, new KeyModifiers ()));
 				} else if (iterations == 4) {
 					Assert.Equal ("Top2", Application.Top.Text);
 					Assert.Equal (0, Application.Top.Frame.X);
@@ -78,7 +78,7 @@ namespace Terminal.Gui.ViewsTests {
 					Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
 					Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
 
-					Application.Top.OnHotKeyPressed (new (Key.CtrlMask | Key.C, new KeyModifiers ()));
+					Application.Top.OnHotKey (new (Key.CtrlMask | Key.C, new KeyModifiers ()));
 				} else if (iterations == 6) {
 					Assert.Equal ("Top1", Application.Top.Text);
 					Assert.Equal (0, Application.Top.Frame.X);
@@ -86,7 +86,7 @@ namespace Terminal.Gui.ViewsTests {
 					Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
 					Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
 
-					Application.Top.OnHotKeyPressed (new (Key.CtrlMask | Key.Q, new KeyModifiers ()));
+					Application.Top.OnHotKey (new (Key.CtrlMask | Key.Q, new KeyModifiers ()));
 				}
 				iterations++;
 			};
@@ -1533,7 +1533,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (topChild);
 			Application.Begin (Application.Top);
 
-			var exception = Record.Exception (() => topChild.OnHotKeyPressed (new (Key.AltMask, new KeyModifiers { Alt = true })));
+			var exception = Record.Exception (() => topChild.OnHotKey (new (Key.AltMask, new KeyModifiers { Alt = true })));
 			Assert.Null (exception);
 		}
 

@@ -59,7 +59,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTileView_Vertical_Focused ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			tileView.OnHotKeyPressed (new (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.OnHotKey (new (tileView.ToggleResizable, new KeyModifiers ()));
 
 			tileView.Draw ();
 
@@ -98,7 +98,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTileView_Vertical_Focused_WithBorder ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			tileView.OnHotKeyPressed (new (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.OnHotKey (new (tileView.ToggleResizable, new KeyModifiers ()));
 
 			tileView.Draw ();
 
@@ -139,7 +139,7 @@ namespace Terminal.Gui.ViewsTests {
 			var tileView = Get11By3TileView (out var line);
 			tileView.SetSplitterPos (0, Pos.Percent (50));
 			Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
-			tileView.OnHotKeyPressed (new (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.OnHotKey (new (tileView.ToggleResizable, new KeyModifiers ()));
 
 			tileView.Draw ();
 
@@ -204,7 +204,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTileView_Vertical_View1MinSize_Absolute ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			tileView.OnHotKeyPressed (new (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.OnHotKey (new (tileView.ToggleResizable, new KeyModifiers ()));
 			tileView.Tiles.ElementAt (0).MinSize = 6;
 
 			// distance is too small (below 6)
@@ -248,7 +248,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTileView_Vertical_View1MinSize_Absolute_WithBorder ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			tileView.OnHotKeyPressed (new (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.OnHotKey (new (tileView.ToggleResizable, new KeyModifiers ()));
 			tileView.Tiles.ElementAt (0).MinSize = 5;
 
 			// distance is too small (below 5)
@@ -292,7 +292,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTileView_Vertical_View2MinSize_Absolute ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			tileView.OnHotKeyPressed (new (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.OnHotKey (new (tileView.ToggleResizable, new KeyModifiers ()));
 			tileView.Tiles.ElementAt (1).MinSize = 6;
 
 			// distance leaves too little space for view2 (less than 6 would remain)
@@ -336,7 +336,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTileView_Vertical_View2MinSize_Absolute_WithBorder ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			tileView.OnHotKeyPressed (new (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.OnHotKey (new (tileView.ToggleResizable, new KeyModifiers ()));
 			tileView.Tiles.ElementAt (1).MinSize = 5;
 
 			// distance leaves too little space for view2 (less than 5 would remain)
@@ -433,7 +433,7 @@ namespace Terminal.Gui.ViewsTests {
 			var tileView = Get11By3TileView (out var line);
 
 			tileView.Orientation = Orientation.Horizontal;
-			tileView.OnHotKeyPressed (new (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.OnHotKey (new (tileView.ToggleResizable, new KeyModifiers ()));
 
 			Assert.True (line.HasFocus);
 
@@ -474,7 +474,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTileView_Horizontal_View1MinSize_Absolute ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			tileView.OnHotKeyPressed (new (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.OnHotKey (new (tileView.ToggleResizable, new KeyModifiers ()));
 
 			tileView.Orientation = Orientation.Horizontal;
 			tileView.Tiles.ElementAt (0).MinSize = 1;

@@ -178,7 +178,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnHotKeyPressed (KeyEventArgs a)
+		public override bool OnHotKey (KeyEventArgs a)
 		{
 			if (a.Key == (Key.AltMask | HotKey))
 				return ToggleChecked ();

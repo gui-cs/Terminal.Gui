@@ -167,6 +167,11 @@ namespace Terminal.Gui {
 				return false;
 			}
 
+			var result = InvokeKeyBindings (keyEvent);
+			if (result != null) {
+				return (bool)result;
+			}
+
 			if (base.OnKeyPressed (keyEvent)) {
 				return true;
 			}
@@ -333,8 +338,13 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override bool OnHotKeyPressed (KeyEventArgs keyEvent)
+		public override bool OnHotKey (KeyEventArgs keyEvent)
 		{
+			if (base.OnHotKey (keyEvent)) {
+				return true;
+
+			}
+
 			if (!Enabled) {
 				return false;
 			}
@@ -348,7 +358,7 @@ namespace Terminal.Gui {
 			}
 
 			foreach (var view in _subviews) {
-				if (view.OnHotKeyPressed (keyEvent))
+				if (view.OnHotKey (keyEvent))
 					return true;
 			}
 			return false;
@@ -357,6 +367,10 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool OnColdKey (KeyEventArgs keyEvent)
 		{
+			if (base.OnHotKey (keyEvent)) {
+				return true;
+			}
+
 			if (!Enabled) {
 				return false;
 			}
@@ -382,11 +396,6 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		/// <summary>
-		/// Invoked when a key is pressed.
-		/// </summary>
-		public event EventHandler<KeyEventArgs> KeyDown;
-
 		/// <inheritdoc/>
 		public override bool OnKeyDown (KeyEventArgs keyEvent)
 		{
@@ -394,27 +403,16 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			KeyDown?.Invoke (this, keyEvent);
-			if (keyEvent.Handled) {
+			if (base.OnKeyDown (keyEvent)) {
 				return true;
 			}
-			if (Focused?.Enabled == true) {
-				Focused.KeyDown?.Invoke (this, keyEvent);
-				if (keyEvent.Handled) {
-					return true;
-				}
-				if (Focused?.OnKeyDown (keyEvent) == true) {
-					return true;
-				}
+
+			if (Focused?.OnKeyDown (keyEvent) == true) {
+				return true;
 			}
 
 			return false;
 		}
-
-		/// <summary>
-		/// Invoked when a key is released.
-		/// </summary>
-		public event EventHandler<KeyEventArgs> KeyUp;
 
 		/// <inheritdoc/>
 		public override bool OnKeyUp (KeyEventArgs keyEvent)
@@ -423,18 +421,12 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			KeyUp?.Invoke (this, keyEvent);
-			if (keyEvent.Handled) {
+			if (base.OnKeyUp (keyEvent)) {
 				return true;
 			}
-			if (Focused?.Enabled == true) {
-				Focused.KeyUp?.Invoke (this, keyEvent);
-				if (keyEvent.Handled) {
-					return true;
-				}
-				if (Focused?.OnKeyUp (keyEvent) == true) {
-					return true;
-				}
+
+			if (Focused?.OnKeyUp (keyEvent) == true) {
+				return true;
 			}
 
 			return false;

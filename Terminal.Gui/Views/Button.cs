@@ -191,7 +191,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnHotKeyPressed (KeyEventArgs a)
+		public override bool OnHotKey (KeyEventArgs a)
 		{
 			if (!Enabled) {
 				return false;
@@ -213,15 +213,19 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnKeyPressed (KeyEventArgs a)
 		{
+			if (base.OnKeyPressed (a)) {
+				return true;
+			}
 			if (!Enabled) {
 				return false;
 			}
 
 			var result = InvokeKeyBindings (a);
-			if (result != null)
+			if (result != null) {
 				return (bool)result;
+			}
 
-			return base.OnKeyPressed (a);
+			return false;
 		}
 
 		bool ExecuteHotKey (KeyEventArgs ke)

@@ -530,7 +530,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (ContextMenu.IsShow);
 			Assert.Equal (cm.MenuBar, Application.MouseGrabView);
 			Assert.False (menu.IsMenuOpen);
-			Assert.True (menu.OnHotKeyPressed (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.OnHotKey (new (Key.F9, new KeyModifiers ())));
 			Assert.False (ContextMenu.IsShow);
 			Assert.Equal (menu, Application.MouseGrabView);
 			Assert.True (menu.IsMenuOpen);

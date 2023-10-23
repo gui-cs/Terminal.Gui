@@ -12,6 +12,7 @@ using Attribute = Terminal.Gui.Attribute;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Xunit.Sdk;
 using System.Globalization;
+using System.IO;
 
 namespace Terminal.Gui;
 // This class enables test functions annotated with the [AutoInitShutdown] attribute to 
@@ -403,5 +404,99 @@ partial class TestHelpers {
 		};
 
 		return replaced;
+	}
+
+	/// <summary>
+	/// Gets a list of instances of all classes derived from View.
+	/// </summary>
+	/// <returns>List of View objects</returns>
+	public static List<View> GetAllViews ()
+	{
+		return typeof (View).Assembly.GetTypes ()
+			.Where (type => type.IsClass && !type.IsAbstract && type.IsPublic && type.IsSubclassOf (typeof (View)))
+			.Select (type => GetTypeInitializer (type, type.GetConstructor (Array.Empty<Type> ()))).ToList ();
+	}
+
+	private static View GetTypeInitializer (Type type, ConstructorInfo ctor)
+	{
+		View viewType = null;
+
+		if (type.IsGenericType && type.IsTypeDefinition) {
+			List<Type> gTypes = new List<Type> ();
+
+			foreach (var args in type.GetGenericArguments ()) {
+				gTypes.Add (typeof (object));
+			}
+			type = type.MakeGenericType (gTypes.ToArray ());
+
+			Assert.IsType (type, (View)Activator.CreateInstance (type));
+
+		} else {
+			ParameterInfo [] paramsInfo = ctor.GetParameters ();
+			Type paramType;
+			List<object> pTypes = new List<object> ();
+
+			if (type.IsGenericType) {
+				foreach (var args in type.GetGenericArguments ()) {
+					paramType = args.GetType ();
+					if (args.Name == "T") {
+						pTypes.Add (typeof (object));
+					} else {
+						AddArguments (paramType, pTypes);
+					}
+				}
+			}
+
+			foreach (var p in paramsInfo) {
+				paramType = p.ParameterType;
+				if (p.HasDefaultValue) {
+					pTypes.Add (p.DefaultValue);
+				} else {
+					AddArguments (paramType, pTypes);
+				}
+
+			}
+
+			if (type.IsGenericType && !type.IsTypeDefinition) {
+				viewType = (View)Activator.CreateInstance (type);
+				Assert.IsType (type, viewType);
+			} else {
+				viewType = (View)ctor.Invoke (pTypes.ToArray ());
+				Assert.IsType (type, viewType);
+			}
+		}
+
+
+		return viewType;
+	}
+
+	private static void AddArguments (Type paramType, List<object> pTypes)
+	{
+		if (paramType == typeof (Rect)) {
+			pTypes.Add (Rect.Empty);
+		} else if (paramType == typeof (string)) {
+			pTypes.Add (string.Empty);
+		} else if (paramType == typeof (int)) {
+			pTypes.Add (0);
+		} else if (paramType == typeof (bool)) {
+			pTypes.Add (true);
+		} else if (paramType.Name == "IList") {
+			pTypes.Add (new List<object> ());
+		} else if (paramType.Name == "View") {
+			var top = new Toplevel ();
+			var view = new View ();
+			top.Add (view);
+			pTypes.Add (view);
+		} else if (paramType.Name == "View[]") {
+			pTypes.Add (new View [] { });
+		} else if (paramType.Name == "Stream") {
+			pTypes.Add (new MemoryStream ());
+		} else if (paramType.Name == "String") {
+			pTypes.Add (string.Empty);
+		} else if (paramType.Name == "TreeView`1[T]") {
+			pTypes.Add (string.Empty);
+		} else {
+			pTypes.Add (null);
+		}
 	}
 }

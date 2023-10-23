@@ -112,7 +112,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnHotKeyPressed (KeyEventArgs ke)
+		public override bool OnHotKey (KeyEventArgs ke)
 		{
 			if (ke.Key == (Key.AltMask | HotKey)) {
 				if (!HasFocus) {
@@ -121,7 +121,7 @@ namespace Terminal.Gui {
 				OnClicked ();
 				return true;
 			}
-			return base.OnHotKeyPressed (ke);
+			return base.OnHotKey (ke);
 		}
 
 		/// <summary>

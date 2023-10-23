@@ -12,7 +12,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			Application.Init (new FakeDriver ());
 
-			foreach (var type in GetAllViewClassesCollection ()) {
+			foreach (var type in GetAllViewClasses ()) {
 				Assert.True (Constructors_FullTest (type));
 			}
 
@@ -113,20 +113,17 @@ namespace Terminal.Gui.ViewsTests {
 			}
 		}
 
-		List<Type> GetAllViewClassesCollection ()
+		public static List<Type> GetAllViewClasses ()
 		{
-			List<Type> types = new List<Type> ();
-			foreach (Type type in typeof (View).Assembly.GetTypes ()
-			 .Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsPublic && myType.IsSubclassOf (typeof (View)))) {
-				types.Add (type);
-			}
-			return types;
+			return typeof (View).Assembly.GetTypes ()
+				.Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsPublic && myType.IsSubclassOf (typeof (View)))
+				.ToList ();
 		}
 
 		[Fact]
 		public void AllViews_Enter_Leave_Events ()
 		{
-			foreach (var type in GetAllViewClassesCollection ()) {
+			foreach (var type in GetAllViewClasses ()) {
 				Application.Init (new FakeDriver ());
 
 				var top = Application.Top;

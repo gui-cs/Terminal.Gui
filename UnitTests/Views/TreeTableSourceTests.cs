@@ -48,9 +48,8 @@ public class TreeTableSourceTests: IDisposable {
 		Assert.Equal(0, tv.SelectedColumn);
 
 		// when pressing right we should expand the top route
-		Application.Top.OnHotKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
-
-
+		tv.OnKeyPressed (new (Key.CursorRight));
+		
 		tv.Draw ();
 
 		expected =
@@ -66,8 +65,7 @@ public class TreeTableSourceTests: IDisposable {
 		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		// when pressing left we should collapse the top route again
-		Application.Top.OnHotKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
-
+		tv.OnKeyPressed (new (Key.CursorLeft));
 
 		tv.Draw ();
 
@@ -179,7 +177,7 @@ public class TreeTableSourceTests: IDisposable {
 		Assert.Equal (0, tv.SelectedRow);
 		Assert.Equal (1, tv.SelectedColumn);
 
-		Application.Top.OnHotKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
+		Application.Top.OnHotKey (new (Key.CursorRight, new KeyModifiers ()));
 
 		tv.Draw ();
 

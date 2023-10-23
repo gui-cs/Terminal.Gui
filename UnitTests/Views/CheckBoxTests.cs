@@ -68,11 +68,11 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (Key.Null, ckb.HotKey);
 			ckb.Text = "Test";
 			Assert.Equal (Key.T, ckb.HotKey);
-			Assert.False (ckb.OnHotKeyPressed (new (Key.T, new KeyModifiers ())));
+			Assert.False (ckb.OnHotKey (new (Key.T, new KeyModifiers ())));
 			Assert.False (isChecked);
 			ckb.Text = "T_est";
 			Assert.Equal (Key.E, ckb.HotKey);
-			Assert.True (ckb.OnHotKeyPressed (new (Key.E | Key.AltMask, new KeyModifiers () { Alt = true })));
+			Assert.True (ckb.OnHotKey (new (Key.E | Key.AltMask, new KeyModifiers () { Alt = true })));
 			Assert.True (isChecked);
 			isChecked = false;
 			Assert.True (ckb.OnKeyPressed (new ((Key)' ', new KeyModifiers ())));

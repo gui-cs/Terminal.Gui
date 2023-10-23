@@ -207,7 +207,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (win);
 			Application.Begin (Application.Top);
 
-			var exception = Record.Exception (() => win.OnHotKeyPressed (new (Key.AltMask, new KeyModifiers { Alt = true })));
+			var exception = Record.Exception (() => win.OnHotKey (new (Key.AltMask, new KeyModifiers { Alt = true })));
 			Assert.Null (exception);
 		}
 	}

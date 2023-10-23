@@ -90,7 +90,7 @@ namespace Terminal.Gui {
 		///     views.
 		///  </para>
 		/// </remarks>
-		public virtual bool OnHotKeyPressed (KeyEventArgs a)
+		public virtual bool OnHotKey (KeyEventArgs a)
 		{
 			return false;
 		}
@@ -122,10 +122,13 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// If the view is focused, gives the view a chance to process the keystroke.
-		/// Called after <see cref="OnKeyDown"/> and <see cref="OnKeyUp"/>.
 		/// Fires the <see cref="KeyPressed"/> event.
+		/// Called after <see cref="OnKeyDown"/> and before <see cref="OnKeyUp"/>.
 		/// Typical apps will use <see cref="Command"/> instead.
 		/// </summary>
+		/// <remarks>
+		/// Overrides must call into the base and return <see langword="true"/> if the base returns  <see langword="true"/>.
+		/// </remarks>
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 		/// <returns><see langword="false"/> if the key stroke was not handled. <see langword="true"/> if no
 		/// other view should see it.</returns>
@@ -137,36 +140,73 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Invoked when a key is pressed. Set <see cref="KeyEventArgs.Handled"/> to true to stop the key from being processed by other views.
+		/// Invoked when a key is pressed. Set <see cref="KeyEventArgs.Handled"/> to true to stop the key from
+		/// being processed by other views. Invoked after <see cref="KeyDown"/> and before <see cref="KeyUp"/>.
 		/// </summary>
+		/// <remarks>
+		/// Not all terminals support key distinct down/up notifications, Applications should avoid
+		/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPressed"/>.
+		/// </remarks>
 		public event EventHandler<KeyEventArgs> KeyPressed;
 
 		/// <summary>
 		/// Invoked when a key is depressed.
 		/// </summary>
 		/// <remarks>
-		/// Not all terminals support key distinct down/up notifications, just key pressed (see <see cref="OnKeyPressed"/>).
+		/// Not all terminals support key distinct down/up notifications, Applications should avoid
+		/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPressed"/>.
+		/// <para>
+		/// Overrides must call into the base and return <see langword="true"/> if the base returns  <see langword="true"/>.
+		/// </para>
 		/// </remarks>
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
-		/// <returns>true if the event was handled</returns>
+		/// <returns><see langword="false"/> if the key stroke was not handled. <see langword="true"/> if no
+		/// other view should see it.</returns>
 		public virtual bool OnKeyDown (KeyEventArgs keyEvent)
 		{
-			// Does nothing. Since some drivers don't support distinct down/up events we
-			// don't expose KeyDown/KeyUp as an event.
-			return false;
+			// fire event
+			KeyDown?.Invoke (this, keyEvent);
+			return keyEvent.Handled;
 		}
+
+		/// <summary>
+		/// Invoked when a key is depressed. Set <see cref="KeyEventArgs.Handled"/> to true to stop the key from being processed by other views.
+		/// </summary>
+		/// <remarks>
+		/// Not all terminals support key distinct down/up notifications, Applications should avoid
+		/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPressed"/>.
+		/// </remarks>
+		public event EventHandler<KeyEventArgs> KeyDown;
 
 		/// <summary>
 		/// Method invoked when a key is released. This method will be called after <see cref="OnKeyPressed"/>.
 		/// </summary>
+		/// <remarks>
+		/// Not all terminals support key distinct down/up notifications, Applications should avoid
+		/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPressed"/>.
+		/// <para>
+		/// Overrides must call into the base and return <see langword="true"/> if the base returns  <see langword="true"/>.
+		/// </para>
+		/// </remarks>
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
-		/// <returns>true if the event was handled</returns>
+		/// <returns><see langword="false"/> if the key stroke was not handled. <see langword="true"/> if no
+		/// other view should see it.</returns>
 		public virtual bool OnKeyUp (KeyEventArgs keyEvent)
 		{
-			// Does nothing. Since some drivers don't support distinct down/up events we
-			// don't expose KeyDown/KeyUp as an event.
-			return false;
+			// fire event
+			KeyUp?.Invoke (this, keyEvent);
+			return keyEvent.Handled;
+
 		}
+
+		/// <summary>
+		/// Invoked when a key is released. Set <see cref="KeyEventArgs.Handled"/> to true to stop the key from being processed by other views.
+		/// </summary>
+		/// <remarks>
+		/// Not all terminals support key distinct down/up notifications, Applications should avoid
+		/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPressed"/>.
+		/// </remarks>
+		public event EventHandler<KeyEventArgs> KeyUp;
 
 		#endregion
 

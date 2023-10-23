@@ -1328,7 +1328,7 @@ namespace Terminal.Gui {
 
 			var chain = _topLevels.ToList ();
 			foreach (var topLevel in chain) {
-				if (topLevel.OnHotKeyPressed (a)) {
+				if (topLevel.OnHotKey (a)) {
 					return true;
 				}
 				if (topLevel.Modal)
@@ -1367,16 +1367,22 @@ namespace Terminal.Gui {
 		/// Called when a key is pressed (and not yet released). Fires the <see cref="KeyDown"/> event.
 		/// </summary>
 		/// <param name="a"></param>
-		public static void OnKeyDown (KeyEventArgs a)
+		public static bool OnKeyDown (KeyEventArgs a)
 		{
 			KeyDown?.Invoke (null, a);
+			if (a.Handled) {
+				return true;
+			}
 			var chain = _topLevels.ToList ();
 			foreach (var topLevel in chain) {
-				if (topLevel.OnKeyDown (a))
-					return;
-				if (topLevel.Modal)
+				if (topLevel.OnKeyDown (a)) {
+					return true;
+				}
+				if (topLevel.Modal) {
 					break;
+				}
 			}
+			return false;
 		}
 
 		/// <summary>
@@ -1392,17 +1398,22 @@ namespace Terminal.Gui {
 		/// Called when a key is released. Fires the <see cref="KeyUp"/> event.
 		/// </summary>
 		/// <param name="a"></param>
-		public static void OnKeyUp (KeyEventArgs a)
+		public static bool OnKeyUp (KeyEventArgs a)
 		{
 			KeyUp?.Invoke (null, a);
+			if (a.Handled) {
+				return true;
+			}
 			var chain = _topLevels.ToList ();
 			foreach (var topLevel in chain) {
-				if (topLevel.OnKeyUp (a))
-					return;
-				if (topLevel.Modal)
+				if (topLevel.OnKeyUp (a)) {
+					return true;
+				}
+				if (topLevel.Modal) {
 					break;
+				}
 			}
-
+			return false;
 		}
 
 		#endregion Keyboard handling

@@ -88,7 +88,8 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (9, df.CursorPosition);
 			Assert.True (df.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
 			Assert.Equal (10, df.CursorPosition);
-			Assert.False (df.OnKeyPressed (new (Key.A, new KeyModifiers ())));
+			// Non-numerics are ignored
+			Assert.True (df.OnKeyPressed (new (Key.A, new KeyModifiers ())));
 			df.ReadOnly = true;
 			df.CursorPosition = 1;
 			Assert.True (df.OnKeyPressed (new (Key.D1, new KeyModifiers ())));

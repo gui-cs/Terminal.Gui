@@ -18,10 +18,10 @@ namespace UICatalog.Scenarios {
 				return base.OnKeyPressed (keyEvent);
 			}
 
-			public override bool OnHotKeyPressed (KeyEventArgs keyEvent)
+			public override bool OnHotKey (KeyEventArgs keyEvent)
 			{
 				_processHotKeyList.Add (keyEvent.ToString ());
-				return base.OnHotKeyPressed (keyEvent);
+				return base.OnHotKey (keyEvent);
 			}
 
 			public override bool OnColdKey (KeyEventArgs keyEvent)

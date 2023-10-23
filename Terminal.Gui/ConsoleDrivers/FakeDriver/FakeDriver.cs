@@ -373,8 +373,8 @@ public class FakeDriver : ConsoleDriver {
 		}
 
 		OnKeyDown (new KeyEventArgs (map, keyModifiers));
-		OnKeyUp (new KeyEventArgs (map, keyModifiers));
 		OnKeyPressed (new KeyEventArgs (map, keyModifiers));
+		OnKeyUp (new KeyEventArgs (map, keyModifiers));
 	}
 
 	/// <inheritdoc/>
@@ -488,7 +488,8 @@ public class FakeDriver : ConsoleDriver {
 	#region Not Implemented
 	public override void Suspend ()
 	{
-		throw new NotImplementedException ();
+		return;
+		//throw new NotImplementedException ();
 	}
 	#endregion
 

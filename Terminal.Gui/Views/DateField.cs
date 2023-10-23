@@ -104,6 +104,24 @@ namespace Terminal.Gui {
 
 			AddKeyBinding (Key.CursorRight, Command.Right);
 			AddKeyBinding (Key.F | Key.CtrlMask, Command.Right);
+
+			KeyPressed += (s, a) => {
+				// Ignore non-numeric characters.
+				if (a.Key < (Key)((int)'0') || a.Key > (Key)((int)'9')) {
+					a.Handled = true;
+					return;
+				}
+
+				if (ReadOnly) {
+					a.Handled = true;
+					return;
+				}
+
+				// BUGBUG: This is a hack, we should be able to just use ((Rune)(uint)a.Key) directly.
+				if (SetText (((Rune)(uint)a.Key).ToString ().EnumerateRunes ().First ())) {
+					IncCursorPosition ();
+				}
+			};
 		}
 
 		void DateField_Changed (object sender, TextChangedEventArgs e)
@@ -327,29 +345,29 @@ namespace Terminal.Gui {
 				CursorPosition++;
 		}
 
-		/// <inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs a)
-		{
-			var result = InvokeKeyBindings (a);
-			if (result != null) {
-				return (bool)result;
-			}
-			// Ignore non-numeric characters.
-			if (a.Key < (Key)((int)'0') || a.Key > (Key)((int)'9')) {
-				return false;
-			}
+		///// <inheritdoc/>
+		//public override bool OnKeyPressed (KeyEventArgs a)
+		//{
+		//	var result = InvokeKeyBindings (a);
+		//	if (result != null) {
+		//		return (bool)result;
+		//	}
+		//	// Ignore non-numeric characters.
+		//	if (a.Key < (Key)((int)'0') || a.Key > (Key)((int)'9')) {
+		//		return false;
+		//	}
 
-			if (ReadOnly) {
-				return true;
-			}
+		//	if (ReadOnly) {
+		//		return true;
+		//	}
 
-			// BUGBUG: This is a hack, we should be able to just use ((Rune)(uint)a.Key) directly.
-			if (SetText (((Rune)(uint)a.Key).ToString ().EnumerateRunes ().First ())) {
-				IncCursorPosition ();
-			}
+		//	// BUGBUG: This is a hack, we should be able to just use ((Rune)(uint)a.Key) directly.
+		//	if (SetText (((Rune)(uint)a.Key).ToString ().EnumerateRunes ().First ())) {
+		//		IncCursorPosition ();
+		//	}
 
-			return true;
-		}
+		//	return true;
+		//}
 
 		bool MoveRight ()
 		{
