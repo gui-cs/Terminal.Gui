@@ -76,7 +76,10 @@ public class SettingsScope : Scope<SettingsScope> {
 		}
 
 		var stream = File.OpenRead (realPath);
-		return Update (stream, filePath);
+		var s = Update (stream, filePath);
+		stream.Close ();
+		stream.Dispose ();
+		return s;
 	}
 
 	/// <summary>

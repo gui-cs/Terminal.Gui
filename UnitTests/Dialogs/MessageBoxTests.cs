@@ -23,7 +23,7 @@ namespace Terminal.Gui.DialogTests {
 			Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (100, 100);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
 				if (iterations == 0) {
@@ -52,7 +52,7 @@ namespace Terminal.Gui.DialogTests {
 			Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (100, 100);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
 				if (iterations == 0) {
@@ -87,7 +87,7 @@ namespace Terminal.Gui.DialogTests {
 			Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (100, 100);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
 				if (iterations == 0) {
@@ -121,7 +121,7 @@ namespace Terminal.Gui.DialogTests {
 			Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (100, 100);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
 				if (iterations == 0) {
@@ -155,7 +155,7 @@ namespace Terminal.Gui.DialogTests {
 			Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (100, 100);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
 				if (iterations == 0) {
@@ -179,7 +179,7 @@ namespace Terminal.Gui.DialogTests {
 			var iterations = -1;
 			Application.Begin (Application.Top);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
 				if (iterations == 0) {
@@ -219,7 +219,7 @@ namespace Terminal.Gui.DialogTests {
 
 			((FakeDriver)Application.Driver).SetBufferSize (40 + 4, 8);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
 				if (iterations == 0) {
@@ -253,7 +253,7 @@ namespace Terminal.Gui.DialogTests {
 			var iterations = -1;
 			Application.Begin (Application.Top);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
 				if (iterations == 0) {
@@ -287,7 +287,7 @@ namespace Terminal.Gui.DialogTests {
 			Application.Begin (Application.Top);
 			var btn = $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
 				if (iterations == 0) {
@@ -320,7 +320,7 @@ namespace Terminal.Gui.DialogTests {
 			((FakeDriver)Application.Driver).SetBufferSize (20, 10);
 
 			var btn = $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} btn {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
 				if (iterations == 0) {
@@ -377,7 +377,7 @@ namespace Terminal.Gui.DialogTests {
 
 			var btn = $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} btn {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
 				if (iterations == 0) {
@@ -435,7 +435,7 @@ namespace Terminal.Gui.DialogTests {
 
 			var btn = $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} btn {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
 				if (iterations == 0) {
@@ -490,7 +490,7 @@ namespace Terminal.Gui.DialogTests {
 			((FakeDriver)Application.Driver).SetBufferSize (20, 10);
 			var btn = $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} btn {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
 				if (iterations == 0) {
@@ -552,7 +552,7 @@ namespace Terminal.Gui.DialogTests {
 			var iterations = -1;
 			Application.Begin (Application.Top);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
 				if (iterations == 0) {

@@ -38,8 +38,8 @@ namespace Terminal.Gui.ConfigurationTests {
 				{ "test",  colorScheme }
 			};
 
-			Assert.Equal (Color.Red, ((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"].Normal.Foreground);
-			Assert.Equal (Color.Green, ((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"].Normal.Background);
+			Assert.Equal (new Color (Color.Red), ((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"].Normal.Foreground);
+			Assert.Equal (new Color (Color.Green), ((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"].Normal.Background);
 
 			// Act
 			Themes.Theme = "testTheme";
@@ -47,8 +47,8 @@ namespace Terminal.Gui.ConfigurationTests {
 
 			// Assert
 			var updatedScheme = Colors.ColorSchemes ["test"];
-			Assert.Equal (Color.Red, updatedScheme.Normal.Foreground);
-			Assert.Equal (Color.Green, updatedScheme.Normal.Background);
+			Assert.Equal (new Color (Color.Red), updatedScheme.Normal.Foreground);
+			Assert.Equal (new Color (Color.Green), updatedScheme.Normal.Background);
 
 			// remove test ColorScheme from Colors to avoid failures on others unit tests with ColorScheme
 			Colors.ColorSchemes.Remove ("test");
@@ -88,7 +88,7 @@ namespace Terminal.Gui.ConfigurationTests {
 				// is always White/Black
 				Normal = new Attribute (Color.Red, Color.Green),
 				Focus = new Attribute (Color.Cyan, Color.BrightCyan),
-				HotNormal = new Attribute (Color.Brown, Color.BrightYellow),
+				HotNormal = new Attribute (Color.Yellow, Color.BrightYellow),
 				HotFocus = new Attribute (Color.Green, Color.BrightGreen),
 				Disabled = new Attribute (Color.Gray, Color.DarkGray),
 			};
@@ -118,10 +118,10 @@ namespace Terminal.Gui.ConfigurationTests {
 			// Assert
 			colorSchemes = (Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue;
 			// Normal should have changed
-			Assert.Equal (Color.Blue, colorSchemes ["Test"].Normal.Foreground);
-			Assert.Equal (Color.BrightBlue, colorSchemes ["Test"].Normal.Background);
-			Assert.Equal (Color.Cyan, colorSchemes ["Test"].Focus.Foreground);
-			Assert.Equal (Color.BrightCyan, colorSchemes ["Test"].Focus.Background);
+			Assert.Equal (new Color (Color.Blue), colorSchemes ["Test"].Normal.Foreground);
+			Assert.Equal (new Color (Color.BrightBlue), colorSchemes ["Test"].Normal.Background);
+			Assert.Equal (new Color (Color.Cyan), colorSchemes ["Test"].Focus.Foreground);
+			Assert.Equal (new Color (Color.BrightCyan), colorSchemes ["Test"].Focus.Background);
 		}
 
 		[Fact]
@@ -143,7 +143,7 @@ namespace Terminal.Gui.ConfigurationTests {
 				// is always White/Black
 				Normal = new Attribute (Color.Red, Color.Green),
 				Focus = new Attribute (Color.Cyan, Color.BrightCyan),
-				HotNormal = new Attribute (Color.Brown, Color.BrightYellow),
+				HotNormal = new Attribute (Color.Yellow, Color.BrightYellow),
 				HotFocus = new Attribute (Color.Green, Color.BrightGreen),
 				Disabled = new Attribute (Color.Gray, Color.DarkGray),
 			};

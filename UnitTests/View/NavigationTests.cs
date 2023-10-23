@@ -515,7 +515,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (f.CanFocus);
 			Assert.True (v.CanFocus);
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 
 			Application.Run ();
 			Application.Shutdown ();
@@ -558,7 +558,7 @@ namespace Terminal.Gui.ViewTests {
 				Assert.True (v.CanFocus);
 			};
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 
 			Application.Run ();
 			Application.Shutdown ();
@@ -593,7 +593,7 @@ namespace Terminal.Gui.ViewTests {
 				Assert.False (v2.CanFocus);
 			};
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 
 			Application.Run ();
 			Application.Shutdown ();
@@ -634,7 +634,7 @@ namespace Terminal.Gui.ViewTests {
 				Assert.True (v2.CanFocus);
 			};
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 
 			Application.Run ();
 			Application.Shutdown ();
@@ -654,7 +654,7 @@ namespace Terminal.Gui.ViewTests {
 			// Keyboard navigation with tab
 			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('\t', ConsoleKey.Tab, false, false, false));
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 
 			Application.Run ();
 			Application.Shutdown ();
@@ -702,7 +702,7 @@ namespace Terminal.Gui.ViewTests {
 
 			var iterations = 0;
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
 				button.ProcessKey (new KeyEvent (Key.Enter, null));
@@ -899,7 +899,7 @@ namespace Terminal.Gui.ViewTests {
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => sbQuiting = true )
 			});
 			var tf = new TextField ();
-			tf.KeyPress += Tf_KeyPress;
+			tf.KeyPressed += Tf_KeyPress;
 
 			void Tf_KeyPress (object sender, KeyEventEventArgs obj)
 			{
@@ -911,7 +911,7 @@ namespace Terminal.Gui.ViewTests {
 			var win = new Window ();
 			win.Add (sb, tf);
 			var top = Application.Top;
-			top.KeyPress += Top_KeyPress;
+			top.KeyPressed += Top_KeyPress;
 
 			void Top_KeyPress (object sender, KeyEventEventArgs obj)
 			{
@@ -932,7 +932,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (tfQuiting);
 			Assert.False (topQuiting);
 
-			tf.KeyPress -= Tf_KeyPress;
+			tf.KeyPressed -= Tf_KeyPress;
 			tfQuiting = false;
 			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
 			Application.MainLoop.RunIteration ();
@@ -959,7 +959,7 @@ namespace Terminal.Gui.ViewTests {
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => sbQuiting = true )
 			});
 			var tf = new TextField ();
-			tf.KeyPress += Tf_KeyPress;
+			tf.KeyPressed += Tf_KeyPress;
 
 			void Tf_KeyPress (object sender, KeyEventEventArgs obj)
 			{
@@ -981,7 +981,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (sbQuiting);
 			Assert.True (tfQuiting);
 
-			tf.KeyPress -= Tf_KeyPress;
+			tf.KeyPressed -= Tf_KeyPress;
 			tfQuiting = false;
 			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
 			Application.MainLoop.RunIteration ();

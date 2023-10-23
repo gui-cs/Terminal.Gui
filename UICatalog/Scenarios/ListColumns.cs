@@ -101,7 +101,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (selectedCellLabel);
 
 			listColView.SelectedCellChanged += (s, e) => { selectedCellLabel.Text = $"{listColView.SelectedRow},{listColView.SelectedColumn}"; };
-			listColView.KeyPress += TableViewKeyPress;
+			listColView.KeyPressed += TableViewKeyPress;
 
 			SetupScrollBar ();
 
@@ -110,7 +110,7 @@ namespace UICatalog.Scenarios {
 				Disabled = Win.ColorScheme.Disabled,
 				HotFocus = Win.ColorScheme.HotFocus,
 				Focus = Win.ColorScheme.Focus,
-				Normal = Application.Driver.MakeAttribute (Color.White, Color.BrightBlue)
+				Normal = new Attribute (Color.White, Color.BrightBlue)
 			};
 
 			// if user clicks the mouse in TableView

@@ -4,10 +4,8 @@ using System.Data;
 using Terminal.Gui;
 using System.Linq;
 using System.Globalization;
-using static Terminal.Gui.TableView;
 using System.Text;
 using System.IO;
-using System.Text.RegularExpressions;
 
 namespace UICatalog.Scenarios {
 
@@ -124,7 +122,7 @@ namespace UICatalog.Scenarios {
 
 			tableView.SelectedCellChanged += (s, e) => { selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}"; };
 			tableView.CellActivated += EditCurrentCell;
-			tableView.KeyPress += TableViewKeyPress;
+			tableView.KeyPressed += TableViewKeyPress;
 
 			SetupScrollBar ();
 
@@ -132,7 +130,7 @@ namespace UICatalog.Scenarios {
 				Disabled = Win.ColorScheme.Disabled,
 				HotFocus = Win.ColorScheme.HotFocus,
 				Focus = Win.ColorScheme.Focus,
-				Normal = Application.Driver.MakeAttribute (Color.Red, Win.ColorScheme.Normal.Background)
+				Normal = new Attribute (Color.Red, Win.ColorScheme.Normal.Background)
 			};
 
 			alternatingColorScheme = new ColorScheme () {
@@ -140,14 +138,14 @@ namespace UICatalog.Scenarios {
 				Disabled = Win.ColorScheme.Disabled,
 				HotFocus = Win.ColorScheme.HotFocus,
 				Focus = Win.ColorScheme.Focus,
-				Normal = Application.Driver.MakeAttribute (Color.White, Color.BrightBlue)
+				Normal = new Attribute (Color.White, Color.BrightBlue)
 			};
 			redColorSchemeAlt = new ColorScheme () {
 
 				Disabled = Win.ColorScheme.Disabled,
 				HotFocus = Win.ColorScheme.HotFocus,
 				Focus = Win.ColorScheme.Focus,
-				Normal = Application.Driver.MakeAttribute (Color.Red, Color.BrightBlue)
+				Normal = new Attribute (Color.Red, Color.BrightBlue)
 			};
 
 			// if user clicks the mouse in TableView

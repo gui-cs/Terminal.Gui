@@ -69,31 +69,32 @@ namespace UICatalog.Tests {
 				FakeConsole.PushMockKeyPress (Application.QuitKey);
 
 				// The only key we care about is the QuitKey
-				Application.Top.KeyPress += (object sender, KeyEventEventArgs args) => {
+				Application.Top.KeyPressed += (object sender, KeyEventEventArgs args) => {
 					output.WriteLine ($"  Keypress: {args.KeyEvent.Key}");
 					// BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
 					// by adding this Space it seems to work.
 					// See #2474 for why this is commented out
-					//Assert.Equal (Application.QuitKey, args.KeyEvent.Key);
-					args.Handled = false;
+					Assert.Equal (Application.QuitKey, args.KeyEvent.Key);
 				};
 
 				uint abortTime = 500;
 				// If the scenario doesn't close within 500ms, this will force it to quit
-				Func<MainLoop, bool> forceCloseCallback = (MainLoop loop) => {
-					Application.RequestStop ();
-					// See #2474 for why this is commented out
-					//Assert.Fail ($"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms. Force quit.");
+				Func<bool> forceCloseCallback = () => {
+					if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0) {
+						Application.RequestStop ();
+						// See #2474 for why this is commented out
+						Assert.Fail ($"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms. Force quit.");
+					}
 					return false;
 				};
 				//output.WriteLine ($"  Add timeout to force quit after {abortTime}ms");
-				_ = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
+				_ = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
 
-				Application.Iteration += () => {
+				Application.Iteration += (s, a) => {
 					//output.WriteLine ($"  iteration {++iterations}");
-					if (FakeConsole.MockKeyPresses.Count == 0) {
+					if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0) {
 						Application.RequestStop ();
-						//Assert.Fail ($"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey}. Force quit.");
+						Assert.Fail ($"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey}. Force quit.");
 					}
 				};
 
@@ -104,17 +105,11 @@ namespace UICatalog.Tests {
 
 				Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
-				foreach (var inst in Responder.Instances) {
-					Assert.True (inst.WasDisposed);
-				}
-				Responder.Instances.Clear ();
+				Assert.Empty (Responder.Instances);
 #endif
 			}
 #if DEBUG_IDISPOSABLE
-			foreach (var inst in Responder.Instances) {
-				Assert.True (inst.WasDisposed);
-			}
-			Responder.Instances.Clear ();
+				Assert.Empty (Responder.Instances);
 #endif
 		}
 
@@ -131,11 +126,24 @@ namespace UICatalog.Tests {
 			// BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
 			// by adding this Space it seems to work.
 
-			FakeConsole.PushMockKeyPress (Key.Space);
 			FakeConsole.PushMockKeyPress (Application.QuitKey);
 
+			var ms = 100;
+			var abortCount = 0;
+			Func<bool> abortCallback = () => {
+				abortCount++;
+				output.WriteLine ($"'Generic' abortCount {abortCount}");
+				Application.RequestStop ();
+				return false;
+			};
+
 			int iterations = 0;
-			Application.Iteration = () => {
+			object token = null;
+			Application.Iteration += (s, a) => {
+				if (token == null) {
+					// Timeout only must start at first iteration
+					token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
+				}
 				iterations++;
 				output.WriteLine ($"'Generic' iteration {iterations}");
 				// Stop if we run out of control...
@@ -145,17 +153,7 @@ namespace UICatalog.Tests {
 				}
 			};
 
-			var ms = 100;
-			var abortCount = 0;
-			Func<MainLoop, bool> abortCallback = (MainLoop loop) => {
-				abortCount++;
-				output.WriteLine ($"'Generic' abortCount {abortCount}");
-				Application.RequestStop ();
-				return false;
-			};
-			var token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
-
-			Application.Top.KeyPress += (object sender, KeyEventEventArgs args) => {
+			Application.Top.KeyPressed += (object sender, KeyEventEventArgs args) => {
 				// See #2474 for why this is commented out
 				Assert.Equal (Key.CtrlMask | Key.Q, args.KeyEvent.Key);
 			};
@@ -174,10 +172,7 @@ namespace UICatalog.Tests {
 			Application.Shutdown ();
 
 #if DEBUG_IDISPOSABLE
-			foreach (var inst in Responder.Instances) {
-				Assert.True (inst.WasDisposed);
-			}
-			Responder.Instances.Clear ();
+			Assert.Empty (Responder.Instances);
 #endif
 		}
 
@@ -397,7 +392,7 @@ namespace UICatalog.Tests {
 
 			int iterations = 0;
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
 				if (iterations < _viewClasses.Count) {

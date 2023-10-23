@@ -176,7 +176,7 @@ namespace UICatalog.Scenarios {
 				_scrollBar.Refresh ();
 			};
 
-			Win.KeyPress += (s, e) => {
+			Win.KeyPressed += (s, e) => {
 				var keys = ShortcutHelper.GetModifiersKey (e.KeyEvent);
 				if (_winDialog != null && (e.KeyEvent.Key == Key.Esc
 					|| e.KeyEvent.Key == Application.QuitKey)) {

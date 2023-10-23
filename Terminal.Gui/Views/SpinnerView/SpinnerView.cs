@@ -153,7 +153,7 @@ namespace Terminal.Gui {
 		/// ignored based on <see cref="SpinDelay"/>.
 		/// </summary>
 		/// <remarks>Ensure this method is called on the main UI
-		/// thread e.g. via <see cref="MainLoop.Invoke(Action)"/>
+		/// thread e.g. via <see cref="Application.Invoke"/>
 		/// </remarks>
 		public void AdvanceAnimation()
 		{
@@ -221,9 +221,9 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			_timeout = Application.MainLoop.AddTimeout (
-				TimeSpan.FromMilliseconds (SpinDelay), (m) => {
-					Application.MainLoop.Invoke (this.AdvanceAnimation);
+			_timeout = Application.AddTimeout (
+				TimeSpan.FromMilliseconds (SpinDelay), () => {
+					Application.Invoke (this.AdvanceAnimation);
 					return true;
 				});
 		}
@@ -232,7 +232,7 @@ namespace Terminal.Gui {
 		private void RemoveAutoSpinTimeout ()
 		{
 			if (_timeout != null) {
-				Application.MainLoop.RemoveTimeout (_timeout);
+				Application.RemoveTimeout (_timeout);
 				_timeout = null;
 			}
 		}

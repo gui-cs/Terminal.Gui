@@ -1280,7 +1280,7 @@ FFFFFFFFFF
 		{
 			var driver = new FakeDriver ();
 			Application.Init (driver);
-			driver.Init (() => { });
+			driver.Init ();
 		}
 	}
 }

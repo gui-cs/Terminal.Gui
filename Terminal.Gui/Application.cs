@@ -43,15 +43,23 @@ namespace Terminal.Gui {
 	public static partial class Application {
 
 		/// <summary>
-		/// The current <see cref="ConsoleDriver"/> in use.
+		/// Gets the <see cref="ConsoleDriver"/> that has been selected. See also <see cref="UseSystemConsole"/>.
 		/// </summary>
-		public static ConsoleDriver Driver;
+		public static ConsoleDriver Driver { get; internal set; }
 
 		/// <summary>
 		/// If <see langword="true"/>, forces the use of the System.Console-based (see <see cref="NetDriver"/>) driver. The default is <see langword="false"/>.
 		/// </summary>
 		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
 		public static bool UseSystemConsole { get; set; } = false;
+
+		/// <summary>
+		/// Gets or sets whether <see cref="Application.Driver"/> will be forced to output only the 16 colors defined in <see cref="ColorName"/>.
+		/// The default is <see langword="false"/>, meaning 24-bit (TrueColor) colors will be output as long as the selected <see cref="ConsoleDriver"/>
+		/// supports TrueColor.
+		/// </summary>
+		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+		public static bool Force16Colors { get; set; } = false;
 
 		// For Unit testing - ignores UseSystemConsole
 		internal static bool _forceFakeConsole;
@@ -78,7 +86,6 @@ namespace Terminal.Gui {
 
 			// Return all culture for which satellite folder found with culture code.
 			return culture.Where (cultureInfo =>
-			   assemblyLocation != null &&
 			   Directory.Exists (Path.Combine (assemblyLocation, cultureInfo.Name)) &&
 			   File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
 			).ToList ();
@@ -101,19 +108,15 @@ namespace Terminal.Gui {
 		/// returned) to ensure resources are cleaned up and terminal settings restored.
 		/// </para>
 		/// <para>
-		/// The <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver, IMainLoopDriver)"/> function 
-		/// combines <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
-		/// into a single call. An applciation cam use <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver, IMainLoopDriver)"/> 
-		/// without explicitly calling <see cref="Init(ConsoleDriver, IMainLoopDriver)"/>.
+		/// The <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver)"/> function 
+		/// combines <see cref="Init(ConsoleDriver)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
+		/// into a single call. An application cam use <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver)"/> 
+		/// without explicitly calling <see cref="Init(ConsoleDriver)"/>.
 		/// </para>
 		/// <param name="driver">
 		/// The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the
 		/// platform will be used (see <see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, and <see cref="NetDriver"/>).</param>
-		/// <param name="mainLoopDriver">
-		/// Specifies the <see cref="MainLoop"/> to use. 
-		/// Must not be <see langword="null"/> if <paramref name="driver"/> is not <see langword="null"/>.
-		/// </param>
-		public static void Init (ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null) => InternalInit (() => Toplevel.Create (), driver, mainLoopDriver);
+		public static void Init (ConsoleDriver driver = null) => InternalInit (() => Toplevel.Create (), driver);
 
 		internal static bool _initialized = false;
 		internal static int _mainThreadId = -1;
@@ -127,7 +130,7 @@ namespace Terminal.Gui {
 		// Unit Tests - To initialize the app with a custom Toplevel, using the FakeDriver. calledViaRunT will be false, causing all state to be reset.
 		// 
 		// calledViaRunT: If false (default) all state will be reset. If true the state will not be reset.
-		internal static void InternalInit (Func<Toplevel> topLevelFactory, ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null, bool calledViaRunT = false)
+		internal static void InternalInit (Func<Toplevel> topLevelFactory, ConsoleDriver driver = null, bool calledViaRunT = false)
 		{
 			if (_initialized && driver == null) {
 				return;
@@ -172,26 +175,8 @@ namespace Terminal.Gui {
 				}
 			}
 
-			if (mainLoopDriver == null) {
-				// TODO: Move this logic into ConsoleDriver
-				if (Driver is FakeDriver) {
-					mainLoopDriver = new FakeMainLoop (Driver);
-				} else if (Driver is NetDriver) {
-					mainLoopDriver = new NetMainLoop (Driver);
-				} else if (Driver is WindowsDriver) {
-					mainLoopDriver = new WindowsMainLoop (Driver);
-				} else if (Driver is CursesDriver) {
-					mainLoopDriver = new UnixMainLoop (Driver);
-				}
-				if (mainLoopDriver == null) {
-					throw new InvalidOperationException ("Init could not determine the MainLoopDriver to use.");
-				}
-			}
-
-			MainLoop = new MainLoop (mainLoopDriver);
-
 			try {
-				Driver.Init (OnTerminalResized);
+				MainLoop = Driver.Init ();
 			} catch (InvalidOperationException ex) {
 				// This is a case where the driver is unable to initialize the console.
 				// This can happen if the console is already in use by another process or
@@ -200,7 +185,13 @@ namespace Terminal.Gui {
 				throw new InvalidOperationException ("Unable to initialize the console. This can happen if the console is already in use by another process or in unit tests.", ex);
 			}
 
-			SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext (MainLoop));
+			Driver.SizeChanged += (s, args) => OnSizeChanging (args);
+			Driver.KeyPressed += (s, args) => OnKeyPressed (args);
+			Driver.KeyDown += (s, args) => OnKeyDown (args);
+			Driver.KeyUp += (s, args) => OnKeyUp (args);
+			Driver.MouseEvent += (s, args) => OnMouseEvent (args);
+
+			SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext ());
 
 			Top = topLevelFactory ();
 			Current = Top;
@@ -211,10 +202,10 @@ namespace Terminal.Gui {
 
 
 		/// <summary>
-		/// Shutdown an application initialized with <see cref="Init(ConsoleDriver, IMainLoopDriver)"/>.
+		/// Shutdown an application initialized with <see cref="Init(ConsoleDriver)"/>.
 		/// </summary>
 		/// <remarks>
-		/// Shutdown must be called for every call to <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> or <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>
+		/// Shutdown must be called for every call to <see cref="Init(ConsoleDriver)"/> or <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>
 		/// to ensure all resources are cleaned up (Disposed) and terminal settings are restored.
 		/// </remarks>
 		public static void Shutdown ()
@@ -232,11 +223,11 @@ namespace Terminal.Gui {
 			// Shutdown is the bookend for Init. As such it needs to clean up all resources
 			// Init created. Apps that do any threading will need to code defensively for this.
 			// e.g. see Issue #537
-			foreach (var t in _toplevels) {
+			foreach (var t in _topLevels) {
 				t.Running = false;
 				t.Dispose ();
 			}
-			_toplevels.Clear ();
+			_topLevels.Clear ();
 			Current = null;
 			Top?.Dispose ();
 			Top = null;
@@ -248,9 +239,11 @@ namespace Terminal.Gui {
 			Driver?.End ();
 			Driver = null;
 			Iteration = null;
-			RootMouseEvent = null;
-			RootKeyEvent = null;
-			TerminalResized = null;
+			MouseEvent = null;
+			KeyDown = null;
+			KeyUp = null;
+			KeyPressed = null;
+			SizeChanging = null;
 			_mainThreadId = -1;
 			NotifyNewRunState = null;
 			NotifyStopRunState = null;
@@ -267,14 +260,14 @@ namespace Terminal.Gui {
 
 		#endregion Initialization (Init/Shutdown)
 
-		#region Run (Begin, Run, End)
+		#region Run (Begin, Run, End, Stop)
 
 		/// <summary>
 		/// Notify that a new <see cref="RunState"/> was created (<see cref="Begin(Toplevel)"/> was called). The token is created in 
 		/// <see cref="Begin(Toplevel)"/> and this event will be fired before that function exits.
 		/// </summary>
 		/// <remarks>
-		///	If <see cref="ExitRunLoopAfterFirstIteration"/> is <see langword="true"/> callers to
+		///	If <see cref="EndAfterFirstIteration"/> is <see langword="true"/> callers to
 		///	<see cref="Begin(Toplevel)"/> must also subscribe to <see cref="NotifyStopRunState"/>
 		///	and manually dispose of the <see cref="RunState"/> token when the application is done.
 		/// </remarks>
@@ -284,7 +277,7 @@ namespace Terminal.Gui {
 		/// Notify that a existent <see cref="RunState"/> is stopping (<see cref="End(RunState)"/> was called).
 		/// </summary>
 		/// <remarks>
-		///	If <see cref="ExitRunLoopAfterFirstIteration"/> is <see langword="true"/> callers to
+		///	If <see cref="EndAfterFirstIteration"/> is <see langword="true"/> callers to
 		///	<see cref="Begin(Toplevel)"/> must also subscribe to <see cref="NotifyStopRunState"/>
 		///	and manually dispose of the <see cref="RunState"/> token when the application is done.
 		/// </remarks>
@@ -297,8 +290,7 @@ namespace Terminal.Gui {
 		/// <param name="Toplevel">The <see cref="Toplevel"/> to prepare execution for.</param>
 		/// <remarks>
 		/// This method prepares the provided <see cref="Toplevel"/> for running with the focus,
-		/// it adds this to the list of <see cref="Toplevel"/>s, sets up the <see cref="MainLoop"/> to process the
-		/// event, lays out the Subviews, focuses the first element, and draws the
+		/// it adds this to the list of <see cref="Toplevel"/>s, lays out the Subviews, focuses the first element, and draws the
 		/// <see cref="Toplevel"/> in the screen. This is usually followed by executing
 		/// the <see cref="RunLoop"/> method, and then the <see cref="End(RunState)"/> method upon termination which will
 		///  undo these changes.
@@ -322,34 +314,34 @@ namespace Terminal.Gui {
 				Toplevel.EndInit ();
 			}
 
-			lock (_toplevels) {
+			lock (_topLevels) {
 				// If Top was already initialized with Init, and Begin has never been called
 				// Top was not added to the Toplevels Stack. It will thus never get disposed.
 				// Clean it up here:
-				if (Top != null && Toplevel != Top && !_toplevels.Contains (Top)) {
+				if (Top != null && Toplevel != Top && !_topLevels.Contains (Top)) {
 					Top.Dispose ();
 					Top = null;
-				} else if (Top != null && Toplevel != Top && _toplevels.Contains (Top)) {
+				} else if (Top != null && Toplevel != Top && _topLevels.Contains (Top)) {
 					Top.OnLeave (Toplevel);
 				}
 				if (string.IsNullOrEmpty (Toplevel.Id)) {
 					var count = 1;
-					var id = (_toplevels.Count + count).ToString ();
-					while (_toplevels.Count > 0 && _toplevels.FirstOrDefault (x => x.Id == id) != null) {
+					var id = (_topLevels.Count + count).ToString ();
+					while (_topLevels.Count > 0 && _topLevels.FirstOrDefault (x => x.Id == id) != null) {
 						count++;
-						id = (_toplevels.Count + count).ToString ();
+						id = (_topLevels.Count + count).ToString ();
 					}
-					Toplevel.Id = (_toplevels.Count + count).ToString ();
+					Toplevel.Id = (_topLevels.Count + count).ToString ();
 
-					_toplevels.Push (Toplevel);
+					_topLevels.Push (Toplevel);
 				} else {
-					var dup = _toplevels.FirstOrDefault (x => x.Id == Toplevel.Id);
+					var dup = _topLevels.FirstOrDefault (x => x.Id == Toplevel.Id);
 					if (dup == null) {
-						_toplevels.Push (Toplevel);
+						_topLevels.Push (Toplevel);
 					}
 				}
 
-				if (_toplevels.FindDuplicates (new ToplevelEqualityComparer ()).Count > 0) {
+				if (_topLevels.FindDuplicates (new ToplevelEqualityComparer ()).Count > 0) {
 					throw new ArgumentException ("There are duplicates Toplevels Id's");
 				}
 			}
@@ -367,7 +359,7 @@ namespace Terminal.Gui {
 				} else {
 					refreshDriver = false;
 				}
-			} else if ((OverlappedTop != null && Toplevel != OverlappedTop && Current?.Modal == true && !_toplevels.Peek ().Modal)
+			} else if ((OverlappedTop != null && Toplevel != OverlappedTop && Current?.Modal == true && !_topLevels.Peek ().Modal)
 				|| (OverlappedTop != null && Toplevel != OverlappedTop && Current?.Running == false)) {
 				refreshDriver = false;
 				MoveCurrent (Toplevel);
@@ -376,7 +368,6 @@ namespace Terminal.Gui {
 				MoveCurrent (Current);
 			}
 
-			Driver.PrepareToRun (MainLoop, ProcessKeyEvent, ProcessKeyDownEvent, ProcessKeyUpEvent, ProcessMouseEvent);
 			if (Toplevel.LayoutStyle == LayoutStyle.Computed) {
 				Toplevel.SetRelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
 			}
@@ -402,16 +393,13 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// See <see cref="Run(Toplevel, Func{Exception, bool})"/> for more details.
 		/// </remarks>
-		public static void Run (Func<Exception, bool> errorHandler = null)
-		{
-			Run (Top, errorHandler);
-		}
+		public static void Run (Func<Exception, bool> errorHandler = null) => Run (Top, errorHandler);
 
 		/// <summary>
 		/// Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool})"/> 
 		/// with a new instance of the specified <see cref="Toplevel"/>-derived class.
 		/// <para>
-		/// Calling <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> first is not needed as this function will initialize the application.
+		/// Calling <see cref="Init(ConsoleDriver)"/> first is not needed as this function will initialize the application.
 		/// </para>
 		/// <para>
 		/// <see cref="Shutdown"/> must be called when the application is closing (typically after Run> has 
@@ -424,10 +412,9 @@ namespace Terminal.Gui {
 		/// <param name="errorHandler"></param>
 		/// <param name="driver">The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the
 		/// platform will be used (<see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>).
-		/// Must be <see langword="null"/> if <see cref="Init(ConsoleDriver, IMainLoopDriver)"/> has already been called. 
+		/// Must be <see langword="null"/> if <see cref="Init(ConsoleDriver)"/> has already been called. 
 		/// </param>
-		/// <param name="mainLoopDriver">Specifies the <see cref="MainLoop"/> to use.</param>
-		public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null, IMainLoopDriver mainLoopDriver = null) where T : Toplevel, new()
+		public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null) where T : Toplevel, new()
 		{
 			if (_initialized) {
 				if (Driver != null) {
@@ -442,12 +429,12 @@ namespace Terminal.Gui {
 					}
 					Run (top, errorHandler);
 				} else {
-					// This codepath should be impossible because Init(null, null) will select the platform default driver
+					// This code path should be impossible because Init(null, null) will select the platform default driver
 					throw new InvalidOperationException ("Init() completed without a driver being set (this should be impossible); Run<T>() cannot be called.");
 				}
 			} else {
 				// Init() has NOT been called.
-				InternalInit (() => new T (), driver, mainLoopDriver, calledViaRunT: true);
+				InternalInit (() => new T (), driver, calledViaRunT: true);
 				Run (Top, errorHandler);
 			}
 		}
@@ -492,12 +479,12 @@ namespace Terminal.Gui {
 				try {
 #endif
 				resume = false;
-				var runToken = Begin (view);
+				var runState = Begin (view);
 				// If ExitRunLoopAfterFirstIteration is true then the user must dispose of the runToken
 				// by using NotifyStopRunState event.
-				RunLoop (runToken);
-				if (!ExitRunLoopAfterFirstIteration) {
-					End (runToken);
+				RunLoop (runState);
+				if (!EndAfterFirstIteration) {
+					End (runState);
 				}
 #if !DEBUG
 				}
@@ -514,6 +501,49 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		///   Adds a timeout to the application.
+		/// </summary>
+		/// <remarks>
+		///   When time specified passes, the callback will be invoked.
+		///   If the callback returns true, the timeout will be reset, repeating
+		///   the invocation. If it returns false, the timeout will stop and be removed.
+		///
+		///   The returned value is a token that can be used to stop the timeout
+		///   by calling <see cref="RemoveTimeout(object)"/>.
+		/// </remarks>
+		public static object AddTimeout (TimeSpan time, Func<bool> callback) => MainLoop?.AddTimeout (time, callback);
+
+		/// <summary>
+		///   Removes a previously scheduled timeout
+		/// </summary>
+		/// <remarks>
+		///   The token parameter is the value returned by <see cref="AddTimeout"/>.
+		/// </remarks>
+		/// Returns <c>true</c>if the timeout is successfully removed; otherwise, <c>false</c>.
+		/// This method also returns <c>false</c> if the timeout is not found.
+		public static bool RemoveTimeout (object token) => MainLoop?.RemoveTimeout (token) ?? false;
+
+
+		/// <summary>
+		///   Runs <paramref name="action"/> on the thread that is processing events
+		/// </summary>
+		/// <param name="action">the action to be invoked on the main processing thread.</param>
+		public static void Invoke (Action action)
+		{
+			MainLoop?.AddIdle (() => {
+				action ();
+				return false;
+			});
+		}
+
+		// TODO: Determine if this is really needed. The only code that calls WakeUp I can find
+		// is ProgressBarStyles and it's not clear it needs to.
+		/// <summary>
+		/// Wakes up the running application that might be waiting on input.
+		/// </summary>
+		public static void Wakeup () => MainLoop?.Wakeup ();
+
+		/// <summary>
 		/// Triggers a refresh of the entire display.
 		/// </summary>
 		public static void Refresh ()
@@ -521,7 +551,7 @@ namespace Terminal.Gui {
 			// TODO: Figure out how to remove this call to ClearContents. Refresh should just repaint damaged areas, not clear
 			Driver.ClearContents ();
 			View last = null;
-			foreach (var v in _toplevels.Reverse ()) {
+			foreach (var v in _topLevels.Reverse ()) {
 				if (v.Visible) {
 					v.SetNeedsDisplay ();
 					v.SetSubViewNeedsDisplay ();
@@ -539,44 +569,37 @@ namespace Terminal.Gui {
 		/// <remarks>
 		///  See also <see cref="Timeout"/>
 		/// </remarks>
-		public static Action Iteration;
+		public static event EventHandler<IterationEventArgs> Iteration;
 
 		/// <summary>
 		/// The <see cref="MainLoop"/> driver for the application
 		/// </summary>
 		/// <value>The main loop.</value>
-		public static MainLoop MainLoop { get; private set; }
+		internal static MainLoop MainLoop { get; private set; }
 
 		/// <summary>
-		/// Set to true to cause the RunLoop method to exit after the first iterations.
-		/// Set to false (the default) to cause the RunLoop to continue running until Application.RequestStop() is called.
+		/// Set to true to cause <see cref="End"/> to be called after the first iteration.
+		/// Set to false (the default) to cause the application to continue running until Application.RequestStop () is called.
 		/// </summary>
-		public static bool ExitRunLoopAfterFirstIteration { get; set; } = false;
+		public static bool EndAfterFirstIteration { get; set; } = false;
 
 		//
 		// provides the sync context set while executing code in Terminal.Gui, to let
 		// users use async/await on their code
 		//
 		class MainLoopSyncContext : SynchronizationContext {
-			readonly MainLoop mainLoop;
-
-			public MainLoopSyncContext (MainLoop mainLoop)
-			{
-				this.mainLoop = mainLoop;
-			}
-
 			public override SynchronizationContext CreateCopy ()
 			{
-				return new MainLoopSyncContext (MainLoop);
+				return new MainLoopSyncContext ();
 			}
 
 			public override void Post (SendOrPostCallback d, object state)
 			{
-				mainLoop.AddIdle (() => {
+				MainLoop.AddIdle (() => {
 					d (state);
 					return false;
 				});
-				//mainLoop.Driver.Wakeup ();
+				//_mainLoop.Driver.Wakeup ();
 			}
 
 			public override void Send (SendOrPostCallback d, object state)
@@ -585,7 +608,7 @@ namespace Terminal.Gui {
 					d (state);
 				} else {
 					var wasExecuted = false;
-					mainLoop.Invoke (() => {
+					Invoke (() => {
 						d (state);
 						wasExecuted = true;
 					});
@@ -602,27 +625,29 @@ namespace Terminal.Gui {
 		/// <param name="state">The state returned by the <see cref="Begin(Toplevel)"/> method.</param>
 		public static void RunLoop (RunState state)
 		{
-			if (state == null)
+			if (state == null) {
 				throw new ArgumentNullException (nameof (state));
-			if (state.Toplevel == null)
+			}
+			if (state.Toplevel == null) {
 				throw new ObjectDisposedException ("state");
+			}
 
-			bool firstIteration = true;
+			var firstIteration = true;
 			for (state.Toplevel.Running = true; state.Toplevel.Running;) {
-				if (ExitRunLoopAfterFirstIteration && !firstIteration) {
+				if (EndAfterFirstIteration && !firstIteration) {
 					return;
 				}
-				RunMainLoopIteration (ref state, ref firstIteration);
+				RunIteration (ref state, ref firstIteration);
 			}
 		}
 
 		/// <summary>
-		/// Run one iteration of the <see cref="MainLoop"/>.
+		/// Run one application iteration.
 		/// </summary>
 		/// <param name="state">The state returned by <see cref="Begin(Toplevel)"/>.</param>
 		/// <param name="firstIteration">Set to <see langword="true"/> if this is the first run loop iteration. Upon return,
 		/// it will be set to <see langword="false"/> if at least one iteration happened.</param>
-		public static void RunMainLoopIteration (ref RunState state, ref bool firstIteration)
+		public static void RunIteration (ref RunState state, ref bool firstIteration)
 		{
 			if (MainLoop.EventsPending ()) {
 				// Notify Toplevel it's ready
@@ -631,7 +656,7 @@ namespace Terminal.Gui {
 				}
 
 				MainLoop.RunIteration ();
-				Iteration?.Invoke ();
+				Iteration?.Invoke (null, new IterationEventArgs());
 
 				EnsureModalOrVisibleAlwaysOnTop (state.Toplevel);
 				if (state.Toplevel != Current) {
@@ -655,7 +680,7 @@ namespace Terminal.Gui {
 				state.Toplevel.SetNeedsDisplay (state.Toplevel.Frame);
 				Top.Clear ();
 				Top.Draw ();
-				foreach (var top in _toplevels.Reverse ()) {
+				foreach (var top in _topLevels.Reverse ()) {
 					if (top != Top && top != state.Toplevel) {
 						top.SetNeedsDisplay ();
 						top.SetSubViewNeedsDisplay ();
@@ -664,7 +689,7 @@ namespace Terminal.Gui {
 					}
 				}
 			}
-			if (_toplevels.Count == 1 && state.Toplevel == Top
+			if (_topLevels.Count == 1 && state.Toplevel == Top
 				&& (Driver.Cols != state.Toplevel.Frame.Width || Driver.Rows != state.Toplevel.Frame.Height)
 				&& (state.Toplevel.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay || state.Toplevel.LayoutNeeded)) {
 
@@ -688,14 +713,6 @@ namespace Terminal.Gui {
 				Top.Draw ();
 			}
 		}
-
-		///// <summary>
-		///// Wakes up the <see cref="MainLoop"/> that might be waiting on input; must be thread safe.
-		///// </summary>
-		//public static void DoEvents ()
-		//{
-		//	MainLoop.MainLoopDriver.Wakeup ();
-		//}
 
 		/// <summary>
 		/// Stops running the most recent <see cref="Toplevel"/> or the <paramref name="top"/> if provided.
@@ -740,7 +757,7 @@ namespace Terminal.Gui {
 			} else if ((OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Modal == false
 				&& Current?.Running == true && !top.Running)
 				|| (OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Modal == false
-				&& Current?.Running == false && !top.Running && _toplevels.ToArray () [1].Running)) {
+				&& Current?.Running == false && !top.Running && _topLevels.ToArray () [1].Running)) {
 
 				MoveCurrent (top);
 			} else if (OverlappedTop != null && Current != top && Current?.Running == true && !top.Running
@@ -776,7 +793,7 @@ namespace Terminal.Gui {
 
 		static void OnNotifyStopRunState (Toplevel top)
 		{
-			if (ExitRunLoopAfterFirstIteration) {
+			if (EndAfterFirstIteration) {
 				NotifyStopRunState?.Invoke (top, new ToplevelEventArgs (top));
 			}
 		}
@@ -787,8 +804,9 @@ namespace Terminal.Gui {
 		/// <param name="runState">The <see cref="RunState"/> returned by the <see cref="Begin(Toplevel)"/> method.</param>
 		public static void End (RunState runState)
 		{
-			if (runState == null)
+			if (runState == null) {
 				throw new ArgumentNullException (nameof (runState));
+			}
 
 			if (OverlappedTop != null) {
 				OverlappedTop.OnChildUnloaded (runState.Toplevel);
@@ -798,13 +816,13 @@ namespace Terminal.Gui {
 
 			// End the RunState.Toplevel 
 			// First, take it off the Toplevel Stack
-			if (_toplevels.Count > 0) {
-				if (_toplevels.Peek () != runState.Toplevel) {
+			if (_topLevels.Count > 0) {
+				if (_topLevels.Peek () != runState.Toplevel) {
 					// If there the top of the stack is not the RunState.Toplevel then
 					// this call to End is not balanced with the call to Begin that started the RunState
 					throw new ArgumentException ("End must be balanced with calls to Begin");
 				}
-				_toplevels.Pop ();
+				_topLevels.Pop ();
 			}
 
 			// Notify that it is closing
@@ -817,11 +835,11 @@ namespace Terminal.Gui {
 			}
 
 			// Set Current and Top to the next TopLevel on the stack
-			if (_toplevels.Count == 0) {
+			if (_topLevels.Count == 0) {
 				Current = null;
 			} else {
-				Current = _toplevels.Peek ();
-				if (_toplevels.Count == 1 && Current == OverlappedTop) {
+				Current = _topLevels.Peek ();
+				if (_topLevels.Count == 1 && Current == OverlappedTop) {
 					OverlappedTop.OnAllChildClosed ();
 				} else {
 					SetCurrentOverlappedAsTop ();
@@ -839,7 +857,7 @@ namespace Terminal.Gui {
 		#endregion Run (Begin, Run, End)
 
 		#region Toplevel handling
-		static readonly Stack<Toplevel> _toplevels = new Stack<Toplevel> ();
+		static readonly Stack<Toplevel> _topLevels = new Stack<Toplevel> ();
 
 		/// <summary>
 		/// The <see cref="Toplevel"/> object used for the application on startup (<seealso cref="Application.Top"/>)
@@ -856,11 +874,11 @@ namespace Terminal.Gui {
 
 		static void EnsureModalOrVisibleAlwaysOnTop (Toplevel Toplevel)
 		{
-			if (!Toplevel.Running || (Toplevel == Current && Toplevel.Visible) || OverlappedTop == null || _toplevels.Peek ().Modal) {
+			if (!Toplevel.Running || (Toplevel == Current && Toplevel.Visible) || OverlappedTop == null || _topLevels.Peek ().Modal) {
 				return;
 			}
 
-			foreach (var top in _toplevels.Reverse ()) {
+			foreach (var top in _topLevels.Reverse ()) {
 				if (top.Modal && top != Current) {
 					MoveCurrent (top);
 					return;
@@ -881,12 +899,12 @@ namespace Terminal.Gui {
 				return null;
 			}
 
-			if (_toplevels != null) {
-				int count = _toplevels.Count;
+			if (_topLevels != null) {
+				int count = _topLevels.Count;
 				if (count > 0) {
 					var rx = x - startFrame.X;
 					var ry = y - startFrame.Y;
-					foreach (var t in _toplevels) {
+					foreach (var t in _topLevels) {
 						if (t != Current) {
 							if (t != start && t.Visible && t.Frame.Contains (rx, ry)) {
 								start = t;
@@ -917,16 +935,16 @@ namespace Terminal.Gui {
 		{
 			// The Current is modal and the top is not modal Toplevel then
 			// the Current must be moved above the first not modal Toplevel.
-			if (OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Modal == true && !_toplevels.Peek ().Modal) {
-				lock (_toplevels) {
-					_toplevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
+			if (OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Modal == true && !_topLevels.Peek ().Modal) {
+				lock (_topLevels) {
+					_topLevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
 				}
 				var index = 0;
-				var savedToplevels = _toplevels.ToArray ();
+				var savedToplevels = _topLevels.ToArray ();
 				foreach (var t in savedToplevels) {
 					if (!t.Modal && t != Current && t != top && t != savedToplevels [index]) {
-						lock (_toplevels) {
-							_toplevels.MoveTo (top, index, new ToplevelEqualityComparer ());
+						lock (_topLevels) {
+							_topLevels.MoveTo (top, index, new ToplevelEqualityComparer ());
 						}
 					}
 					index++;
@@ -936,26 +954,26 @@ namespace Terminal.Gui {
 			// The Current and the top are both not running Toplevel then
 			// the top must be moved above the first not running Toplevel.
 			if (OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Running == false && !top.Running) {
-				lock (_toplevels) {
-					_toplevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
+				lock (_topLevels) {
+					_topLevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
 				}
 				var index = 0;
-				foreach (var t in _toplevels.ToArray ()) {
+				foreach (var t in _topLevels.ToArray ()) {
 					if (!t.Running && t != Current && index > 0) {
-						lock (_toplevels) {
-							_toplevels.MoveTo (top, index - 1, new ToplevelEqualityComparer ());
+						lock (_topLevels) {
+							_topLevels.MoveTo (top, index - 1, new ToplevelEqualityComparer ());
 						}
 					}
 					index++;
 				}
 				return false;
 			}
-			if ((OverlappedTop != null && top?.Modal == true && _toplevels.Peek () != top)
+			if ((OverlappedTop != null && top?.Modal == true && _topLevels.Peek () != top)
 				|| (OverlappedTop != null && Current != OverlappedTop && Current?.Modal == false && top == OverlappedTop)
 				|| (OverlappedTop != null && Current?.Modal == false && top != Current)
 				|| (OverlappedTop != null && Current?.Modal == true && top == OverlappedTop)) {
-				lock (_toplevels) {
-					_toplevels.MoveTo (top, 0, new ToplevelEqualityComparer ());
+				lock (_topLevels) {
+					_topLevels.MoveTo (top, 0, new ToplevelEqualityComparer ());
 					Current = top;
 				}
 			}
@@ -963,21 +981,35 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Invoked when the terminal was resized. The new size of the terminal is provided.
+		/// Invoked when the terminal's size changed. The new size of the terminal is provided.
 		/// </summary>
-		public static Action<ResizedEventArgs> TerminalResized;
+		/// <remarks>
+		/// Event handlers can set <see cref="SizeChangedEventArgs.Cancel"/> to <see langword="true"/>
+		/// to prevent <see cref="Application"/> from changing it's size to match the new terminal size.
+		/// </remarks>
+		public static event EventHandler<SizeChangedEventArgs> SizeChanging;
 
-		static void OnTerminalResized ()
+		/// <summary>
+		/// Called when the application's size changes. Sets the size of all <see cref="Toplevel"/>s and
+		/// fires the <see cref="SizeChanging"/> event.
+		/// </summary>
+		/// <param name="args">The new size.</param>
+		/// <returns><see lanword="true"/>if the size was changed.</returns>
+		public static bool OnSizeChanging (SizeChangedEventArgs args)
 		{
-			var full = new Rect (0, 0, Driver.Cols, Driver.Rows);
-			TerminalResized?.Invoke (new ResizedEventArgs () { Cols = full.Width, Rows = full.Height });
-			foreach (var t in _toplevels) {
-				t.SetRelativeLayout (full);
+			SizeChanging?.Invoke (null, args);
+			if (args.Cancel) {
+				return false;
+			}
+
+			foreach (var t in _topLevels) {
+				t.SetRelativeLayout (new Rect (0, 0, args.Size.Width, args.Size.Height));
 				t.LayoutSubviews ();
 				t.PositionToplevels ();
-				t.OnTerminalResized (new SizeChangedEventArgs (full.Size));
+				t.OnSizeChanging (new SizeChangedEventArgs (args.Size));
 			}
 			Refresh ();
+			return true;
 		}
 
 		#endregion Toplevel handling
@@ -1082,14 +1114,30 @@ namespace Terminal.Gui {
 			UnGrabbedMouse?.Invoke (view, new ViewEventArgs (view));
 		}
 
-		/// <summary>
-		/// Merely a debugging aid to see the raw mouse events
-		/// </summary>
-		public static Action<MouseEvent> RootMouseEvent;
-
 		static View _lastMouseOwnerView;
 
-		static void ProcessMouseEvent (MouseEvent me)
+		/// <summary>
+		/// Event fired when a mouse move or click occurs. Coordinates are screen relative.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// Use this event to receive mouse events in screen coordinates. Use <see cref="Responder.MouseEvent"/> to receive
+		/// mouse events relative to a <see cref="View"/>'s bounds.
+		/// </para>
+		/// <para>
+		/// The <see cref="MouseEvent.View"/> will contain the <see cref="View"/> that contains the mouse coordinates.
+		/// </para>
+		/// </remarks>
+		public static event EventHandler<MouseEventEventArgs> MouseEvent;
+
+		/// <summary>
+		/// Called when a mouse event occurs. Fires the <see cref="MouseEvent"/> event.
+		/// </summary>
+		/// <remarks>
+		/// This method can be used to simulate a mouse event, e.g. in unit tests.
+		/// </remarks>
+		/// <param name="a"></param>
+		public static void OnMouseEvent (MouseEventEventArgs a)
 		{
 			static bool OutsideBounds (Point p, Rect r) => p.X < 0 || p.X > r.Right || p.Y < 0 || p.Y > r.Bottom;
 
@@ -1097,7 +1145,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var view = View.FindDeepestView (Current, me.X, me.Y, out int rx, out int ry);
+			var view = View.FindDeepestView (Current, a.MouseEvent.X, a.MouseEvent.Y, out int rx, out int ry);
 
 			if (view != null && view.WantContinuousButtonPressed) {
 				WantContinuousButtonPressedView = view;
@@ -1105,26 +1153,26 @@ namespace Terminal.Gui {
 				WantContinuousButtonPressedView = null;
 			}
 			if (view != null) {
-				me.View = view;
+				a.MouseEvent.View = view;
 			}
-			RootMouseEvent?.Invoke (me);
+			MouseEvent?.Invoke (null, new MouseEventEventArgs (a.MouseEvent));
 
-			if (me.Handled) {
+			if (a.MouseEvent.Handled) {
 				return;
 			}
 
 			if (_mouseGrabView != null) {
-				var newxy = _mouseGrabView.ScreenToView (me.X, me.Y);
+				var newxy = _mouseGrabView.ScreenToView (a.MouseEvent.X, a.MouseEvent.Y);
 				var nme = new MouseEvent () {
 					X = newxy.X,
 					Y = newxy.Y,
-					Flags = me.Flags,
-					OfX = me.X - newxy.X,
-					OfY = me.Y - newxy.Y,
+					Flags = a.MouseEvent.Flags,
+					OfX = a.MouseEvent.X - newxy.X,
+					OfY = a.MouseEvent.Y - newxy.Y,
 					View = view
 				};
 				if (OutsideBounds (new Point (nme.X, nme.Y), _mouseGrabView.Bounds)) {
-					_lastMouseOwnerView?.OnMouseLeave (me);
+					_lastMouseOwnerView?.OnMouseLeave (a.MouseEvent);
 				}
 				//System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
 				if (_mouseGrabView?.OnMouseEvent (nme) == true) {
@@ -1133,10 +1181,10 @@ namespace Terminal.Gui {
 			}
 
 			if ((view == null || view == OverlappedTop) && !Current.Modal && OverlappedTop != null
-				&& me.Flags != MouseFlags.ReportMousePosition && me.Flags != 0) {
+				&& a.MouseEvent.Flags != MouseFlags.ReportMousePosition && a.MouseEvent.Flags != 0) {
 
-				var top = FindDeepestTop (Top, me.X, me.Y, out _, out _);
-				view = View.FindDeepestView (top, me.X, me.Y, out rx, out ry);
+				var top = FindDeepestTop (Top, a.MouseEvent.X, a.MouseEvent.Y, out _, out _);
+				view = View.FindDeepestView (top, a.MouseEvent.X, a.MouseEvent.Y, out rx, out ry);
 
 				if (view != null && view != OverlappedTop && top != Current) {
 					MoveCurrent ((Toplevel)top);
@@ -1147,7 +1195,7 @@ namespace Terminal.Gui {
 				var nme = new MouseEvent () {
 					X = rx,
 					Y = ry,
-					Flags = me.Flags,
+					Flags = a.MouseEvent.Flags,
 					OfX = 0,
 					OfY = 0,
 					View = view
@@ -1162,7 +1210,7 @@ namespace Terminal.Gui {
 					_lastMouseOwnerView = view;
 				}
 
-				if (!view.WantMousePositionReports && me.Flags == MouseFlags.ReportMousePosition)
+				if (!view.WantMousePositionReports && a.MouseEvent.Flags == MouseFlags.ReportMousePosition)
 					return;
 
 				if (view.WantContinuousButtonPressed)
@@ -1179,7 +1227,6 @@ namespace Terminal.Gui {
 		#endregion Mouse handling
 
 		#region Keyboard handling
-
 
 		static Key _alternateForwardKey = Key.PageDown | Key.CtrlMask;
 
@@ -1200,7 +1247,7 @@ namespace Terminal.Gui {
 
 		static void OnAlternateForwardKeyChanged (KeyChangedEventArgs e)
 		{
-			foreach (var top in _toplevels.ToArray ()) {
+			foreach (var top in _topLevels.ToArray ()) {
 				top.OnAlternateForwardKeyChanged (e);
 			}
 		}
@@ -1224,7 +1271,7 @@ namespace Terminal.Gui {
 
 		static void OnAlternateBackwardKeyChanged (KeyChangedEventArgs oldKey)
 		{
-			foreach (var top in _toplevels.ToArray ()) {
+			foreach (var top in _topLevels.ToArray ()) {
 				top.OnAlternateBackwardKeyChanged (oldKey);
 			}
 		}
@@ -1248,57 +1295,84 @@ namespace Terminal.Gui {
 		static void OnQuitKeyChanged (KeyChangedEventArgs e)
 		{
 			// Duplicate the list so if it changes during enumeration we're safe
-			foreach (var top in _toplevels.ToArray ()) {
+			foreach (var top in _topLevels.ToArray ()) {
 				top.OnQuitKeyChanged (e);
 			}
 		}
 
-		static void ProcessKeyEvent (KeyEvent ke)
+		/// <summary>
+		/// Event fired after a key has been pressed and released.
+		/// <para>Set <see cref="KeyEventEventArgs.Handled"/> to <see langword="true"/> to suppress the event.</para>
+		/// </summary>
+		/// <remarks>
+		/// All drivers support firing the <see cref="KeyPressed"/> event. Some drivers (Curses)
+		/// do not support firing the <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
+		/// </remarks>
+		public static event EventHandler<KeyEventEventArgs> KeyPressed;
+
+		/// <summary>
+		/// Called after a key has been pressed and released. Fires the <see cref="KeyPressed"/> event.
+		/// <para>
+		/// Called for new KeyPressed events before any processing is performed or
+		/// views evaluate. Use for global key handling and/or debugging.
+		/// </para>
+		/// </summary>
+		/// <param name="a"></param>
+		/// <returns><see langword="true"/> if the key was handled.</returns>
+		public static bool OnKeyPressed (KeyEventEventArgs a)
 		{
-			if (RootKeyEvent?.Invoke (ke) ?? false) {
-				return;
+			KeyPressed?.Invoke (null, a);
+			if (a.Handled) {
+				return true;
 			}
 
-			var chain = _toplevels.ToList ();
+			var chain = _topLevels.ToList ();
 			foreach (var topLevel in chain) {
-				if (topLevel.ProcessHotKey (ke))
-					return;
+				if (topLevel.ProcessHotKey (a.KeyEvent)) {
+					return true;
+				}
 				if (topLevel.Modal)
 					break;
 			}
 
 			foreach (var topLevel in chain) {
-				if (topLevel.ProcessKey (ke))
-					return;
+				if (topLevel.ProcessKey (a.KeyEvent)) {
+					return true;
+				}
 				if (topLevel.Modal)
 					break;
 			}
 
 			foreach (var topLevel in chain) {
 				// Process the key normally
-				if (topLevel.ProcessColdKey (ke))
-					return;
+				if (topLevel.ProcessColdKey (a.KeyEvent)) {
+					return true;
+				}
 				if (topLevel.Modal)
 					break;
 			}
+			return false;
 		}
 
-		static void ProcessKeyDownEvent (KeyEvent ke)
-		{
-			var chain = _toplevels.ToList ();
-			foreach (var topLevel in chain) {
-				if (topLevel.OnKeyDown (ke))
-					return;
-				if (topLevel.Modal)
-					break;
-			}
-		}
+		/// <summary>
+		/// Event fired when a key is pressed (and not yet released). 
+		/// </summary>
+		/// <remarks>
+		/// All drivers support firing the <see cref="KeyPressed"/> event. Some drivers (Curses)
+		/// do not support firing the <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
+		/// </remarks>
+		public static event EventHandler<KeyEventEventArgs> KeyDown;
 
-		static void ProcessKeyUpEvent (KeyEvent ke)
+		/// <summary>
+		/// Called when a key is pressed (and not yet released). Fires the <see cref="KeyDown"/> event.
+		/// </summary>
+		/// <param name="a"></param>
+		public static void OnKeyDown (KeyEventEventArgs a)
 		{
-			var chain = _toplevels.ToList ();
+			KeyDown?.Invoke (null, a);
+			var chain = _topLevels.ToList ();
 			foreach (var topLevel in chain) {
-				if (topLevel.OnKeyUp (ke))
+				if (topLevel.OnKeyDown (a.KeyEvent))
 					return;
 				if (topLevel.Modal)
 					break;
@@ -1306,14 +1380,37 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// <para>
-		/// Called for new KeyPress events before any processing is performed or
-		/// views evaluate. Use for global key handling and/or debugging.
-		/// </para>
-		/// <para>Return true to suppress the KeyPress event</para>
+		/// Event fired when a key is released. 
 		/// </summary>
-		public static Func<KeyEvent, bool> RootKeyEvent;
+		/// <remarks>
+		/// All drivers support firing the <see cref="KeyPressed"/> event. Some drivers (Curses)
+		/// do not support firing the <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
+		/// </remarks>
+		public static event EventHandler<KeyEventEventArgs> KeyUp;
+
+		/// <summary>
+		/// Called when a key is released. Fires the <see cref="KeyUp"/> event.
+		/// </summary>
+		/// <param name="a"></param>
+		public static void OnKeyUp (KeyEventEventArgs a)
+		{
+			KeyUp?.Invoke (null, a);
+			var chain = _topLevels.ToList ();
+			foreach (var topLevel in chain) {
+				if (topLevel.OnKeyUp (a.KeyEvent))
+					return;
+				if (topLevel.Modal)
+					break;
+			}
+
+		}
 
 		#endregion Keyboard handling
+	}
+
+	/// <summary>
+	/// Event arguments for the <see cref="Application.Iteration"/> event.
+	/// </summary>
+	public class IterationEventArgs {
 	}
 }

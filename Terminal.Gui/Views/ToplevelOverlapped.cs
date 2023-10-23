@@ -30,7 +30,7 @@ namespace Terminal.Gui {
 			get {
 				if (OverlappedTop != null) {
 					List<Toplevel> _overlappedChildren = new List<Toplevel> ();
-					foreach (var top in _toplevels) {
+					foreach (var top in _topLevels) {
 						if (top != OverlappedTop && !top.Modal) {
 							_overlappedChildren.Add (top);
 						}
@@ -71,9 +71,9 @@ namespace Terminal.Gui {
 				return null;
 			}
 
-			int count = _toplevels.Count;
+			int count = _topLevels.Count;
 			for (int i = count - 1; i >= 0; i--) {
-				foreach (var top in _toplevels) {
+				foreach (var top in _topLevels) {
 					var rx = x - startFrame.X;
 					var ry = y - startFrame.Y;
 					if (top.Visible && top.Frame.Contains (rx, ry)) {
@@ -96,7 +96,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			foreach (var top in _toplevels) {
+			foreach (var top in _topLevels) {
 				if (top != Current && top.Visible && (top.NeedsDisplay || top.SubViewNeedsDisplay || top.LayoutNeeded)) {
 					OverlappedTop.SetSubViewNeedsDisplay ();
 					return true;
@@ -124,19 +124,19 @@ namespace Terminal.Gui {
 		public static void OverlappedMoveNext ()
 		{
 			if (OverlappedTop != null && !Current.Modal) {
-				lock (_toplevels) {
-					_toplevels.MoveNext ();
+				lock (_topLevels) {
+					_topLevels.MoveNext ();
 					var isOverlapped = false;
-					while (_toplevels.Peek () == OverlappedTop || !_toplevels.Peek ().Visible) {
-						if (!isOverlapped && _toplevels.Peek () == OverlappedTop) {
+					while (_topLevels.Peek () == OverlappedTop || !_topLevels.Peek ().Visible) {
+						if (!isOverlapped && _topLevels.Peek () == OverlappedTop) {
 							isOverlapped = true;
-						} else if (isOverlapped && _toplevels.Peek () == OverlappedTop) {
+						} else if (isOverlapped && _topLevels.Peek () == OverlappedTop) {
 							MoveCurrent (Top);
 							break;
 						}
-						_toplevels.MoveNext ();
+						_topLevels.MoveNext ();
 					}
-					Current = _toplevels.Peek ();
+					Current = _topLevels.Peek ();
 				}
 			}
 		}
@@ -147,19 +147,19 @@ namespace Terminal.Gui {
 		public static void OverlappedMovePrevious ()
 		{
 			if (OverlappedTop != null && !Current.Modal) {
-				lock (_toplevels) {
-					_toplevels.MovePrevious ();
+				lock (_topLevels) {
+					_topLevels.MovePrevious ();
 					var isOverlapped = false;
-					while (_toplevels.Peek () == OverlappedTop || !_toplevels.Peek ().Visible) {
-						if (!isOverlapped && _toplevels.Peek () == OverlappedTop) {
+					while (_topLevels.Peek () == OverlappedTop || !_topLevels.Peek ().Visible) {
+						if (!isOverlapped && _topLevels.Peek () == OverlappedTop) {
 							isOverlapped = true;
-						} else if (isOverlapped && _toplevels.Peek () == OverlappedTop) {
+						} else if (isOverlapped && _topLevels.Peek () == OverlappedTop) {
 							MoveCurrent (Top);
 							break;
 						}
-						_toplevels.MovePrevious ();
+						_topLevels.MovePrevious ();
 					}
-					Current = _toplevels.Peek ();
+					Current = _topLevels.Peek ();
 				}
 			}
 		}
@@ -172,8 +172,8 @@ namespace Terminal.Gui {
 		public static bool MoveToOverlappedChild (Toplevel top)
 		{
 			if (top.Visible && OverlappedTop != null && Current?.Modal == false) {
-				lock (_toplevels) {
-					_toplevels.MoveTo (top, 0, new ToplevelEqualityComparer ());
+				lock (_topLevels) {
+					_topLevels.MoveTo (top, 0, new ToplevelEqualityComparer ());
 					Current = top;
 				}
 				return true;

@@ -25,14 +25,14 @@ namespace Terminal.Gui.ViewTests {
 			var top = Application.Top;
 
 			var text = new TextField ("");
-			text.KeyPress += (s, e) => {
+			text.KeyPressed += (s, e) => {
 				e.Handled = true;
 				Assert.True (e.Handled);
 				Assert.Equal (Key.N, e.KeyEvent.Key);
 			};
 			top.Add (text);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				Console.MockKeyPresses.Push (new ConsoleKeyInfo ('N', ConsoleKey.N, false, false, false));
 				Assert.Equal ("", text.Text);
 
@@ -61,7 +61,7 @@ namespace Terminal.Gui.ViewTests {
 				e.Handled = true;
 				keyDown = true;
 			};
-			view.KeyPress += (s, e) => {
+			view.KeyPressed += (s, e) => {
 				Assert.Equal (Key.a, e.KeyEvent.Key);
 				Assert.False (keyPress);
 				Assert.False (view.IsKeyPress);
@@ -80,7 +80,7 @@ namespace Terminal.Gui.ViewTests {
 
 			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('a', ConsoleKey.A, false, false, false));
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 
 			Assert.True (view.CanFocus);
 
@@ -145,7 +145,7 @@ namespace Terminal.Gui.ViewTests {
 				Assert.False (view.IsKeyDown);
 				keyDown = true;
 			};
-			view.KeyPress += (s, e) => {
+			view.KeyPressed += (s, e) => {
 				keyPress = true;
 			};
 			view.KeyUp += (s, e) => {
@@ -162,7 +162,7 @@ namespace Terminal.Gui.ViewTests {
 
 			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('\0', 0, shift, alt, control));
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 
 			Assert.True (view.CanFocus);
 

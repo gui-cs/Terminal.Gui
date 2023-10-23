@@ -22,8 +22,91 @@ internal class CursesDriver : ConsoleDriver {
 	CursorVisibility? _currentCursorVisibility = null;
 
 	public override string GetVersionInfo () => $"{Curses.curses_version ()}";
-
+	UnixMainLoop _mainLoopDriver = null;
 	public override bool SupportsTrueColor => false;
+
+	object _processInputToken;
+
+	internal override MainLoop Init ()
+	{
+		_mainLoopDriver = new UnixMainLoop (this);
+		if (!RunningUnitTests) {
+
+			_window = Curses.initscr ();
+			Curses.set_escdelay (10);
+
+			// Ensures that all procedures are performed at some previous closing.
+			Curses.doupdate ();
+
+			// 
+			// We are setting Invisible as default so we could ignore XTerm DECSUSR setting
+			//
+			switch (Curses.curs_set (0)) {
+			case 0:
+				_currentCursorVisibility = _initialCursorVisibility = CursorVisibility.Invisible;
+				break;
+
+			case 1:
+				_currentCursorVisibility = _initialCursorVisibility = CursorVisibility.Underline;
+				Curses.curs_set (1);
+				break;
+
+			case 2:
+				_currentCursorVisibility = _initialCursorVisibility = CursorVisibility.Box;
+				Curses.curs_set (2);
+				break;
+
+			default:
+				_currentCursorVisibility = _initialCursorVisibility = null;
+				break;
+			}
+			if (!Curses.HasColors) {
+				throw new InvalidOperationException ("V2 - This should never happen. File an Issue if it does.");
+			}
+
+			Curses.raw ();
+			Curses.noecho ();
+
+			Curses.Window.Standard.keypad (true);
+
+			Curses.StartColor ();
+			Curses.UseDefaultColors ();
+
+			if (!RunningUnitTests) {
+				Curses.timeout (0);
+			}
+
+			_processInputToken = _mainLoopDriver?.AddWatch (0, UnixMainLoop.Condition.PollIn, x => {
+				ProcessInput ();
+				return true;
+			});
+		}
+
+		CurrentAttribute = new Attribute (ColorName.White, ColorName.Black);
+
+		if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
+			Clipboard = new FakeDriver.FakeClipboard ();
+		} else {
+			if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
+				Clipboard = new MacOSXClipboard ();
+			} else {
+				if (Is_WSL_Platform ()) {
+					Clipboard = new WSLClipboard ();
+				} else {
+					Clipboard = new CursesClipboard ();
+				}
+			}
+		}
+
+		ClearContents ();
+		StartReportingMouseMoves ();
+
+		if (!RunningUnitTests) {
+			Curses.CheckWinChange ();
+			Curses.refresh ();
+		}
+		return new MainLoop (_mainLoopDriver);
+	}
 
 	public override void Move (int col, int row)
 	{
@@ -54,11 +137,11 @@ internal class CursesDriver : ConsoleDriver {
 		UpdateCursor ();
 	}
 
-	private void ProcessWinChange ()
+	internal void ProcessWinChange ()
 	{
 		if (!RunningUnitTests && Curses.CheckWinChange ()) {
 			ClearContents ();
-			TerminalResized?.Invoke ();
+			OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
 		}
 	}
 
@@ -77,9 +160,9 @@ internal class CursesDriver : ConsoleDriver {
 		// TODO: for TrueColor - Use InitExtendedPair
 		Curses.InitColorPair (v, foreground, background);
 		return new Attribute (
-			value: Curses.ColorPair (v),
-			foreground: CursesColorNumberToColor (foreground),
-			background: CursesColorNumberToColor (background));
+			platformColor: Curses.ColorPair (v),
+			foreground: CursesColorNumberToColorName (foreground),
+			background: CursesColorNumberToColorName (background));
 	}
 
 	/// <remarks>
@@ -88,107 +171,94 @@ internal class CursesDriver : ConsoleDriver {
 	/// and the background color is stored in the least significant 4 bits.
 	/// The Terminal.GUi Color values are converted to curses color encoding before being encoded.
 	/// </remarks>
-	public override Attribute MakeColor (Color fore, Color back)
+	public override Attribute MakeColor (Color foreground, Color background)
 	{
 		if (!RunningUnitTests) {
-			return MakeColor (ColorToCursesColorNumber (fore), ColorToCursesColorNumber (back));
+			return MakeColor (ColorNameToCursesColorNumber (foreground.ColorName), ColorNameToCursesColorNumber (background.ColorName));
 		} else {
 			return new Attribute (
-				value: 0,
-				foreground: fore,
-				background: back);
+				platformColor: 0,
+				foreground: foreground,
+				background: background);
 		}
 	}
 
-	static short ColorToCursesColorNumber (Color color)
+	static short ColorNameToCursesColorNumber (ColorName color)
 	{
 		switch (color) {
-		case Color.Black:
+		case ColorName.Black:
 			return Curses.COLOR_BLACK;
-		case Color.Blue:
+		case ColorName.Blue:
 			return Curses.COLOR_BLUE;
-		case Color.Green:
+		case ColorName.Green:
 			return Curses.COLOR_GREEN;
-		case Color.Cyan:
+		case ColorName.Cyan:
 			return Curses.COLOR_CYAN;
-		case Color.Red:
+		case ColorName.Red:
 			return Curses.COLOR_RED;
-		case Color.Magenta:
+		case ColorName.Magenta:
 			return Curses.COLOR_MAGENTA;
-		case Color.Brown:
+		case ColorName.Yellow:
 			return Curses.COLOR_YELLOW;
-		case Color.Gray:
+		case ColorName.Gray:
 			return Curses.COLOR_WHITE;
-		case Color.DarkGray:
+		case ColorName.DarkGray:
 			return Curses.COLOR_GRAY;
-		case Color.BrightBlue:
+		case ColorName.BrightBlue:
 			return Curses.COLOR_BLUE | Curses.COLOR_GRAY;
-		case Color.BrightGreen:
+		case ColorName.BrightGreen:
 			return Curses.COLOR_GREEN | Curses.COLOR_GRAY;
-		case Color.BrightCyan:
+		case ColorName.BrightCyan:
 			return Curses.COLOR_CYAN | Curses.COLOR_GRAY;
-		case Color.BrightRed:
+		case ColorName.BrightRed:
 			return Curses.COLOR_RED | Curses.COLOR_GRAY;
-		case Color.BrightMagenta:
+		case ColorName.BrightMagenta:
 			return Curses.COLOR_MAGENTA | Curses.COLOR_GRAY;
-		case Color.BrightYellow:
+		case ColorName.BrightYellow:
 			return Curses.COLOR_YELLOW | Curses.COLOR_GRAY;
-		case Color.White:
+		case ColorName.White:
 			return Curses.COLOR_WHITE | Curses.COLOR_GRAY;
 		}
 		throw new ArgumentException ("Invalid color code");
 	}
 
-	static Color CursesColorNumberToColor (short color)
+	static ColorName CursesColorNumberToColorName (short color)
 	{
 		switch (color) {
 		case Curses.COLOR_BLACK:
-			return Color.Black;
+			return ColorName.Black;
 		case Curses.COLOR_BLUE:
-			return Color.Blue;
+			return ColorName.Blue;
 		case Curses.COLOR_GREEN:
-			return Color.Green;
+			return ColorName.Green;
 		case Curses.COLOR_CYAN:
-			return Color.Cyan;
+			return ColorName.Cyan;
 		case Curses.COLOR_RED:
-			return Color.Red;
+			return ColorName.Red;
 		case Curses.COLOR_MAGENTA:
-			return Color.Magenta;
+			return ColorName.Magenta;
 		case Curses.COLOR_YELLOW:
-			return Color.Brown;
+			return ColorName.Yellow;
 		case Curses.COLOR_WHITE:
-			return Color.Gray;
+			return ColorName.Gray;
 		case Curses.COLOR_GRAY:
-			return Color.DarkGray;
+			return ColorName.DarkGray;
 		case Curses.COLOR_BLUE | Curses.COLOR_GRAY:
-			return Color.BrightBlue;
+			return ColorName.BrightBlue;
 		case Curses.COLOR_GREEN | Curses.COLOR_GRAY:
-			return Color.BrightGreen;
+			return ColorName.BrightGreen;
 		case Curses.COLOR_CYAN | Curses.COLOR_GRAY:
-			return Color.BrightCyan;
+			return ColorName.BrightCyan;
 		case Curses.COLOR_RED | Curses.COLOR_GRAY:
-			return Color.BrightRed;
+			return ColorName.BrightRed;
 		case Curses.COLOR_MAGENTA | Curses.COLOR_GRAY:
-			return Color.BrightMagenta;
+			return ColorName.BrightMagenta;
 		case Curses.COLOR_YELLOW | Curses.COLOR_GRAY:
-			return Color.BrightYellow;
+			return ColorName.BrightYellow;
 		case Curses.COLOR_WHITE | Curses.COLOR_GRAY:
-			return Color.White;
+			return ColorName.White;
 		}
 		throw new ArgumentException ("Invalid curses color code");
-	}
-
-	/// <remarks>
-	/// In the CursesDriver, colors are encoded as an int. 
-	/// The foreground color is stored in the most significant 4 bits, 
-	/// and the background color is stored in the least significant 4 bits.
-	/// The Terminal.GUI Color values are converted to curses color encoding before being encoded.
-	/// </remarks>
-	internal override void GetColors (int value, out Color foreground, out Color background)
-	{
-		// Assume a 4-bit encoded value for both foreground and background colors.
-		foreground = CursesColorNumberToColor ((short)((value >> 4) & 0xF));
-		background = CursesColorNumberToColor ((short)(value & 0xF));
 	}
 
 	#endregion
@@ -202,14 +272,13 @@ internal class CursesDriver : ConsoleDriver {
 		}
 	}
 
-	public override void End ()
+	internal override void End ()
 	{
 		StopReportingMouseMoves ();
 		SetCursorVisibility (CursorVisibility.Default);
 
-		if (_mainLoop != null) {
-			_mainLoop.RemoveWatch (_processInputToken);
-			_mainLoop.WinChanged -= ProcessInput;
+		if (_mainLoopDriver != null) {
+			_mainLoopDriver.RemoveWatch (_processInputToken);
 		}
 
 		if (RunningUnitTests) {
@@ -238,7 +307,7 @@ internal class CursesDriver : ConsoleDriver {
 					// In unit tests, we don't want to actually write to the screen.
 					continue;
 				}
-				Curses.attrset (Contents [row, col].Attribute.GetValueOrDefault ().Value);
+				Curses.attrset (Contents [row, col].Attribute.GetValueOrDefault ().PlatformColor);
 
 				var rune = Contents [row, col].Runes [0];
 				if (rune.IsBmp) {
@@ -365,7 +434,7 @@ internal class CursesDriver : ConsoleDriver {
 		return _keyModifiers;
 	}
 
-	void ProcessInput ()
+	internal void ProcessInput ()
 	{
 		int wch;
 		var code = Curses.get_wch (out wch);
@@ -422,9 +491,9 @@ internal class CursesDriver : ConsoleDriver {
 				wch -= 60;
 				k = Key.ShiftMask | Key.AltMask | MapCursesKey (wch);
 			}
-			_keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
-			_keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
-			_keyUpHandler (new KeyEvent (k, MapKeyModifiers (k)));
+			OnKeyDown (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
+			OnKeyUp (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
+			OnKeyPressed (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
 			return;
 		}
 
@@ -475,16 +544,18 @@ internal class CursesDriver : ConsoleDriver {
 					}
 				}
 				key = new KeyEvent (k, MapKeyModifiers (k));
-				_keyDownHandler (key);
-				_keyHandler (key);
+				OnKeyDown (new KeyEventEventArgs (key));
+				OnKeyUp (new KeyEventEventArgs (key));
+				OnKeyPressed (new KeyEventEventArgs (key));
 			} else {
 				k = Key.Esc;
-				_keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
+				OnKeyPressed (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
 			}
 		} else if (wch == Curses.KeyTab) {
 			k = MapCursesKey (wch);
-			_keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
-			_keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
+			OnKeyDown (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
+			OnKeyUp (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
+			OnKeyPressed (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
 		} else {
 			// Unfortunately there are no way to differentiate Ctrl+alfa and Ctrl+Shift+alfa.
 			k = (Key)wch;
@@ -497,9 +568,9 @@ internal class CursesDriver : ConsoleDriver {
 			} else if (wch >= (uint)Key.A && wch <= (uint)Key.Z) {
 				_keyModifiers.Shift = true;
 			}
-			_keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
-			_keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
-			_keyUpHandler (new KeyEvent (k, MapKeyModifiers (k)));
+			OnKeyDown (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
+			OnKeyUp (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
+			OnKeyPressed (new KeyEventEventArgs (new KeyEvent (k, MapKeyModifiers (k))));
 		}
 		// Cause OnKeyUp and OnKeyPressed. Note that the special handling for ESC above 
 		// will not impact KeyUp.
@@ -519,7 +590,7 @@ internal class CursesDriver : ConsoleDriver {
 			code = Curses.get_wch (out wch2);
 			var consoleKeyInfo = new ConsoleKeyInfo ((char)wch2, 0, false, false, false);
 			if (wch2 == 0 || wch2 == 27 || wch2 == Curses.KeyMouse) {
-				EscSeqUtils.DecodeEscSeq (null, ref consoleKeyInfo, ref ck, cki, ref mod, out _, out _, out _, out _, out bool isKeyMouse, out List<MouseFlags> mouseFlags, out Point pos, out _, ProcessContinuousButtonPressed);
+				EscSeqUtils.DecodeEscSeq (null, ref consoleKeyInfo, ref ck, cki, ref mod, out _, out _, out _, out _, out bool isKeyMouse, out List<MouseFlags> mouseFlags, out Point pos, out _, ProcessMouseEvent);
 				if (isKeyMouse) {
 					foreach (var mf in mouseFlags) {
 						ProcessMouseEvent (mf, pos);
@@ -533,8 +604,8 @@ internal class CursesDriver : ConsoleDriver {
 					k = ConsoleKeyMapping.MapConsoleKeyToKey (consoleKeyInfo.Key, out _);
 					k = ConsoleKeyMapping.MapKeyModifiers (consoleKeyInfo, k);
 					key = new KeyEvent (k, MapKeyModifiers (k));
-					_keyDownHandler (key);
-					_keyHandler (key);
+					OnKeyDown (new KeyEventEventArgs (key));
+					OnKeyPressed (new KeyEventEventArgs (key));
 				}
 			} else {
 				cki = EscSeqUtils.ResizeArray (consoleKeyInfo, cki);
@@ -586,116 +657,9 @@ internal class CursesDriver : ConsoleDriver {
 			X = pos.X,
 			Y = pos.Y
 		};
-		_mouseHandler (me);
+		OnMouseEvent (new MouseEventEventArgs (me));
 	}
 
-
-	void ProcessContinuousButtonPressed (MouseFlags mouseFlag, Point pos)
-	{
-		ProcessMouseEvent (mouseFlag, pos);
-	}
-
-	Action<KeyEvent> _keyHandler;
-	Action<KeyEvent> _keyDownHandler;
-	Action<KeyEvent> _keyUpHandler;
-	Action<MouseEvent> _mouseHandler;
-
-	UnixMainLoop _mainLoop;
-	object _processInputToken;
-	
-	public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
-	{
-		if (!RunningUnitTests) {
-			// Note: Curses doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
-			Curses.timeout (0);
-		}
-		this._keyHandler = keyHandler;
-		this._keyDownHandler = keyDownHandler;
-		this._keyUpHandler = keyUpHandler;
-		this._mouseHandler = mouseHandler;
-
-		_mainLoop = mainLoop.MainLoopDriver as UnixMainLoop;
-
-		_processInputToken = _mainLoop?.AddWatch (0, UnixMainLoop.Condition.PollIn, x => {
-			ProcessInput ();
-			return true;
-		});
-
-		_mainLoop.WinChanged += ProcessInput;
-	}
-
-	public override void Init (Action terminalResized)
-	{
-		if (!RunningUnitTests) {
-
-			_window = Curses.initscr ();
-			Curses.set_escdelay (10);
-
-			// Ensures that all procedures are performed at some previous closing.
-			Curses.doupdate ();
-
-			// 
-			// We are setting Invisible as default so we could ignore XTerm DECSUSR setting
-			//
-			switch (Curses.curs_set (0)) {
-			case 0:
-				_currentCursorVisibility = _initialCursorVisibility = CursorVisibility.Invisible;
-				break;
-
-			case 1:
-				_currentCursorVisibility = _initialCursorVisibility = CursorVisibility.Underline;
-				Curses.curs_set (1);
-				break;
-
-			case 2:
-				_currentCursorVisibility = _initialCursorVisibility = CursorVisibility.Box;
-				Curses.curs_set (2);
-				break;
-
-			default:
-				_currentCursorVisibility = _initialCursorVisibility = null;
-				break;
-			}
-			if (!Curses.HasColors) {
-				throw new InvalidOperationException ("V2 - This should never happen. File an Issue if it does.");
-			}
-
-			Curses.raw ();
-			Curses.noecho ();
-
-			Curses.Window.Standard.keypad (true);
-
-			Curses.StartColor ();
-			Curses.UseDefaultColors ();
-		}
-
-		CurrentAttribute = MakeColor (Color.White, Color.Black);
-		InitializeColorSchemes ();
-
-		TerminalResized = terminalResized;
-
-		if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
-			Clipboard = new FakeDriver.FakeClipboard ();
-		} else {
-			if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
-				Clipboard = new MacOSXClipboard ();
-			} else {
-				if (Is_WSL_Platform ()) {
-					Clipboard = new WSLClipboard ();
-				} else {
-					Clipboard = new CursesClipboard ();
-				}
-			}
-		}
-
-		ClearContents ();
-		StartReportingMouseMoves ();
-
-		if (!RunningUnitTests) {
-			Curses.CheckWinChange ();
-			Curses.refresh ();
-		}
-	}
 
 	public static bool Is_WSL_Platform ()
 	{
@@ -814,9 +778,9 @@ internal class CursesDriver : ConsoleDriver {
 			key |= Key.CtrlMask;
 			km.Ctrl = control;
 		}
-		_keyDownHandler (new KeyEvent (key, km));
-		_keyHandler (new KeyEvent (key, km));
-		_keyUpHandler (new KeyEvent (key, km));
+		OnKeyDown (new KeyEventEventArgs (new KeyEvent (key, km)));
+		OnKeyPressed (new KeyEventEventArgs (new KeyEvent (key, km)));
+		OnKeyUp (new KeyEventEventArgs (new KeyEvent (key, km)));
 	}
 
 

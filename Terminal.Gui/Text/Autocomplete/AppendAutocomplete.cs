@@ -32,11 +32,11 @@ namespace Terminal.Gui {
 			SelectionKey = Key.Tab;
 
 			ColorScheme = new ColorScheme {
-				Normal = new Attribute (Color.DarkGray, 0),
-				Focus = new Attribute (Color.DarkGray, 0),
-				HotNormal = new Attribute (Color.DarkGray, 0),
-				HotFocus = new Attribute (Color.DarkGray, 0),
-				Disabled = new Attribute (Color.DarkGray, 0),
+				Normal = new Attribute (Color.DarkGray, Color.Black),
+				Focus = new Attribute (Color.DarkGray, Color.Black),
+				HotNormal = new Attribute (Color.DarkGray, Color.Black),
+				HotFocus = new Attribute (Color.DarkGray, Color.Black),
+				Disabled = new Attribute (Color.DarkGray, Color.Black),
 			};
 		}
 

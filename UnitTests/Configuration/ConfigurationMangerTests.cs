@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Metadata;
 using System.Text.Json;
-using Terminal.Gui;
 using Xunit;
 using static Terminal.Gui.ConfigurationManager;
-using Attribute = Terminal.Gui.Attribute;
 
 namespace Terminal.Gui.ConfigurationTests {
 	public class ConfigurationManagerTests {
@@ -325,8 +322,8 @@ namespace Terminal.Gui.ConfigurationTests {
 
 			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
 
-			Assert.Equal (Color.White, Colors.ColorSchemes ["Base"].Normal.Foreground);
-			Assert.Equal (Color.Blue, Colors.ColorSchemes ["Base"].Normal.Background);
+			Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"].Normal.Foreground);
+			Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
 
 			// Change Base
 			var json = ConfigurationManager.ToStream ();
@@ -382,7 +379,7 @@ namespace Terminal.Gui.ConfigurationTests {
                 ""Background"": ""Cyan""
               },
               ""HotNormal"": {
-                ""Foreground"": ""Brown"",
+                ""Foreground"": ""Yellow"",
                 ""Background"": ""Black""
               },
               ""HotFocus"": {
@@ -509,12 +506,12 @@ namespace Terminal.Gui.ConfigurationTests {
 
 			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
 
-			Assert.Equal (Color.White, Colors.ColorSchemes ["Base"].Normal.Foreground);
-			Assert.Equal (Color.Blue, Colors.ColorSchemes ["Base"].Normal.Background);
+			Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"].Normal.Foreground);
+			Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
 
 			var colorSchemes = (Dictionary<string, ColorScheme>)Themes.First ().Value ["ColorSchemes"].PropertyValue;
-			Assert.Equal (Color.White, colorSchemes ["Base"].Normal.Foreground);
-			Assert.Equal (Color.Blue, colorSchemes ["Base"].Normal.Background);
+			Assert.Equal (new Color (Color.White), colorSchemes ["Base"].Normal.Foreground);
+			Assert.Equal (new Color (Color.Blue), colorSchemes ["Base"].Normal.Background);
 
 			// Now re-apply
 			ConfigurationManager.Apply ();
@@ -522,8 +519,8 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal (Key.Z | Key.AltMask, Application.QuitKey);
 			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
 
-			Assert.Equal (Color.White, Colors.ColorSchemes ["Base"].Normal.Foreground);
-			Assert.Equal (Color.Blue, Colors.ColorSchemes ["Base"].Normal.Background);
+			Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"].Normal.Foreground);
+			Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -540,7 +537,7 @@ namespace Terminal.Gui.ConfigurationTests {
 							{
 								""UserDefined"": {
 									""hotNormal"": {
-										""foreground"": ""yellow"",
+										""foreground"": ""brown"",
 										""background"": ""1234""
 									}
 								}
@@ -552,7 +549,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			}";
 
 			JsonException jsonException = Assert.Throws<JsonException> (() => ConfigurationManager.Settings.Update (json, "test"));
-			Assert.Equal ("Invalid Color: 'yellow'", jsonException.Message);
+			Assert.Equal ("Unexpected color name: brown.", jsonException.Message);
 
 			// AbNormal is not a ColorScheme attribute
 			json = @"
@@ -621,7 +618,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			Application.Init (new FakeDriver ());
 
 			ConfigurationManager.ThrowOnJsonErrors = false;
-			// "yellow" is not a color
+			// "brown" is not a color
 			string json = @"
 			{
 				""Themes"" : [ 
@@ -631,7 +628,7 @@ namespace Terminal.Gui.ConfigurationTests {
 							{
 								""UserDefined"": {
 									""hotNormal"": {
-										""foreground"": ""yellow"",
+										""foreground"": ""brown"",
 										""background"": ""1234""
 									}
 								}

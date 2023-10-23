@@ -145,7 +145,7 @@ namespace Terminal.Gui {
 				X = Pos.Function (CalculateOkButtonPosX)
 			};
 			this.btnOk.Clicked += (s, e) => this.Accept (true);
-			this.btnOk.KeyPress += (s, k) => {
+			this.btnOk.KeyPressed += (s, k) => {
 				this.NavigateIf (k, Key.CursorLeft, this.btnCancel);
 				this.NavigateIf (k, Key.CursorUp, this.tableView);
 			};
@@ -154,7 +154,7 @@ namespace Terminal.Gui {
 				Y = Pos.AnchorEnd (1),
 				X = Pos.Right (btnOk) + 1
 			};
-			this.btnCancel.KeyPress += (s, k) => {
+			this.btnCancel.KeyPressed += (s, k) => {
 				this.NavigateIf (k, Key.CursorLeft, this.btnToggleSplitterCollapse);
 				this.NavigateIf (k, Key.CursorUp, this.tableView);
 				this.NavigateIf (k, Key.CursorRight, this.btnOk);
@@ -177,9 +177,9 @@ namespace Terminal.Gui {
 
 			this.tbPath = new TextField {
 				Width = Dim.Fill (0),
-				CaptionColor = Color.Black
+				CaptionColor = new Color (Color.Black)
 			};
-			this.tbPath.KeyPress += (s, k) => {
+			this.tbPath.KeyPressed += (s, k) => {
 
 				ClearFeedback ();
 
@@ -209,6 +209,7 @@ namespace Terminal.Gui {
 			};
 			this.tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
 			this.tableView.MouseClick += OnTableViewMouseClick;
+			tableView.Style.InvertSelectedCellFirstCharacter = true;
 			Style.TableStyle = tableView.Style;
 
 			var nameStyle = Style.TableStyle.GetOrCreateColumnStyle (0);
@@ -227,7 +228,7 @@ namespace Terminal.Gui {
 			typeStyle.MinWidth = 6;
 			typeStyle.ColorGetter = this.ColorGetter;
 
-			this.tableView.KeyPress += (s, k) => {
+			this.tableView.KeyPressed += (s, k) => {
 				if (this.tableView.SelectedRow <= 0) {
 					this.NavigateIf (k, Key.CursorUp, this.tbPath);
 				}
@@ -273,7 +274,7 @@ namespace Terminal.Gui {
 
 			tbFind = new TextField {
 				X = Pos.Right (this.btnToggleSplitterCollapse) + 1,
-				CaptionColor = Color.Black,
+				CaptionColor = new Color (Color.Black),
 				Width = 30,
 				Y = Pos.AnchorEnd (1),
 			};
@@ -284,7 +285,7 @@ namespace Terminal.Gui {
 			};
 
 			tbFind.TextChanged += (s, o) => RestartSearch ();
-			tbFind.KeyPress += (s, o) => {
+			tbFind.KeyPressed += (s, o) => {
 				if (o.KeyEvent.Key == Key.Enter) {
 					RestartSearch ();
 					o.Handled = true;
@@ -663,7 +664,7 @@ namespace Terminal.Gui {
 			tbPath.Caption = Style.PathCaption;
 			tbFind.Caption = Style.SearchCaption;
 
-			tbPath.Autocomplete.ColorScheme.Normal = Attribute.Make (Color.Black, tbPath.ColorScheme.Normal.Background);
+			tbPath.Autocomplete.ColorScheme.Normal = new Attribute (Color.Black, tbPath.ColorScheme.Normal.Background);
 
 			_treeRoots = Style.TreeRootGetter ();
 			Style.IconProvider.IsOpenGetter = treeView.IsExpanded;
@@ -1197,9 +1198,8 @@ namespace Terminal.Gui {
 			}
 
 
-			var color = Style.ColorProvider.GetTrueColor (stats.FileSystemInfo)
-			?? TrueColor.FromConsoleColor (Color.White);
-			var black = TrueColor.FromConsoleColor (Color.Black);
+			var color = Style.ColorProvider.GetColor (stats.FileSystemInfo) ?? new Color (Color.White);
+			var black = new Color (Color.Black);
 
 			// TODO: Add some kind of cache for this
 			return new ColorScheme {
@@ -1439,7 +1439,7 @@ namespace Terminal.Gui {
 						UpdateChildrenToFound ();
 					}
 
-					Application.MainLoop.Invoke (() => {
+					Application.Invoke (() => {
 						Parent.spinnerView.Visible = false;
 					});
 				}
@@ -1451,7 +1451,7 @@ namespace Terminal.Gui {
 					Children = found.ToArray ();
 				}
 
-				Application.MainLoop.Invoke (() => {
+				Application.Invoke (() => {
 					Parent.tbPath.Autocomplete.GenerateSuggestions (
 						new AutocompleteFilepathContext (Parent.tbPath.Text, Parent.tbPath.CursorPosition, this)
 						);

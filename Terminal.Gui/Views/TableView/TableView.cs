@@ -572,7 +572,7 @@ namespace Terminal.Gui {
 			Attribute color;
 
 			if (FullRowSelect && IsSelected (0, rowToRender)) {
-				color = focused ? rowScheme.HotFocus : rowScheme.HotNormal;
+				color = focused ? rowScheme.Focus : rowScheme.HotNormal;
 			} else {
 				color = Enabled ? rowScheme.Normal : rowScheme.Disabled;
 			}
@@ -618,7 +618,7 @@ namespace Terminal.Gui {
 
 				Attribute cellColor;
 				if (isSelectedCell) {
-					cellColor = focused ? scheme.HotFocus : scheme.HotNormal;
+					cellColor = focused ? scheme.Focus : scheme.HotNormal;
 				} else {
 					cellColor = Enabled ? scheme.Normal : scheme.Disabled;
 				}
@@ -634,7 +634,7 @@ namespace Terminal.Gui {
 				if (scheme != rowScheme) {
 
 					if (isSelectedCell) {
-						color = focused ? rowScheme.HotFocus : rowScheme.HotNormal;
+						color = focused ? rowScheme.Focus : rowScheme.HotNormal;
 					} else {
 						color = Enabled ? rowScheme.Normal : rowScheme.Disabled;
 					}
@@ -687,7 +687,7 @@ namespace Terminal.Gui {
 
 				if (render.Length > 0) {
 					// invert the color of the current cell for the first character
-					Driver.SetAttribute (Driver.MakeAttribute (cellColor.Background, cellColor.Foreground));
+					Driver.SetAttribute (new Attribute (cellColor.Background, cellColor.Foreground));
 					Driver.AddRune ((Rune)render [0]);
 
 					if (render.Length > 1) {

@@ -5,8 +5,8 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 
-	[ScenarioMetadata (Name: "Notepad", Description: "Multi-tab text editor uising the TabView control.")]
-	[ScenarioCategory ("Controls"), ScenarioCategory ("TabView")]
+	[ScenarioMetadata (Name: "Notepad", Description: "Multi-tab text editor using the TabView control.")]
+	[ScenarioCategory ("Controls"), ScenarioCategory ("TabView"), ScenarioCategory("TextView")]
 	public class Notepad : Scenario {
 		TabView tabView;
 

@@ -45,7 +45,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var iterations = 0;
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (iterations == 0) {
 					Assert.False (Application.Top.AutoSize);
 					Assert.Equal ("Top1", Application.Top.Text);
@@ -674,7 +674,7 @@ namespace Terminal.Gui.ViewsTests {
 			top.Add (win);
 			var iterations = -1;
 
-			Application.Iteration = () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 				if (iterations == 0) {
 					((FakeDriver)Application.Driver).SetBufferSize (40, 15);
@@ -701,14 +701,11 @@ namespace Terminal.Gui.ViewsTests {
 				} else if (iterations == 2) {
 					Assert.Null (Application.MouseGrabView);
 					// Grab the mouse
-					ReflectionTools.InvokePrivate (
-						typeof (Application),
-						"ProcessMouseEvent",
-						new MouseEvent () {
-							X = 8,
-							Y = 5,
-							Flags = MouseFlags.Button1Pressed
-						});
+					Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+						X = 8,
+						Y = 5,
+						Flags = MouseFlags.Button1Pressed
+					}));
 
 					Assert.Equal (Application.Current, Application.MouseGrabView);
 					Assert.Equal (new Rect (8, 5, 24, 5), Application.MouseGrabView.Frame);
@@ -716,14 +713,11 @@ namespace Terminal.Gui.ViewsTests {
 				} else if (iterations == 3) {
 					Assert.Equal (Application.Current, Application.MouseGrabView);
 					// Drag to left
-					ReflectionTools.InvokePrivate (
-						typeof (Application),
-						"ProcessMouseEvent",
-						new MouseEvent () {
-							X = 7,
-							Y = 5,
-							Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-						});
+					Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+						X = 7,
+						Y = 5,
+						Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+					}));
 
 					Assert.Equal (Application.Current, Application.MouseGrabView);
 					Assert.Equal (new Rect (7, 5, 24, 5), Application.MouseGrabView.Frame);
@@ -752,14 +746,11 @@ namespace Terminal.Gui.ViewsTests {
 				} else if (iterations == 5) {
 					Assert.Equal (Application.Current, Application.MouseGrabView);
 					// Drag up
-					ReflectionTools.InvokePrivate (
-						typeof (Application),
-						"ProcessMouseEvent",
-						new MouseEvent () {
-							X = 7,
-							Y = 4,
-							Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-						});
+					Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+						X = 7,
+						Y = 4,
+						Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+					}));
 
 					Assert.Equal (Application.Current, Application.MouseGrabView);
 					Assert.Equal (new Rect (7, 4, 24, 5), Application.MouseGrabView.Frame);
@@ -790,14 +781,11 @@ namespace Terminal.Gui.ViewsTests {
 				} else if (iterations == 7) {
 					Assert.Equal (Application.Current, Application.MouseGrabView);
 					// Ungrab the mouse
-					ReflectionTools.InvokePrivate (
-						typeof (Application),
-						"ProcessMouseEvent",
-						new MouseEvent () {
-							X = 7,
-							Y = 4,
-							Flags = MouseFlags.Button1Released
-						});
+					Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+						X = 7,
+						Y = 4,
+						Flags = MouseFlags.Button1Released
+					}));
 
 					Assert.Null (Application.MouseGrabView);
 
@@ -827,7 +815,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			var location = new Rect (win.Frame.X, win.Frame.Y, 7, 3);
 
-			Application.Iteration = () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 				if (iterations == 0) {
 					((FakeDriver)Application.Driver).SetBufferSize (30, 10);
@@ -836,14 +824,11 @@ namespace Terminal.Gui.ViewsTests {
 
 					Assert.Null (Application.MouseGrabView);
 					// Grab the mouse
-					ReflectionTools.InvokePrivate (
-						typeof (Application),
-						"ProcessMouseEvent",
-						new MouseEvent () {
-							X = win.Frame.X,
-							Y = win.Frame.Y,
-							Flags = MouseFlags.Button1Pressed
-						});
+					Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+						X = win.Frame.X,
+						Y = win.Frame.Y,
+						Flags = MouseFlags.Button1Pressed
+					}));
 
 					Assert.Equal (win, Application.MouseGrabView);
 					Assert.Equal (location, Application.MouseGrabView.Frame);
@@ -852,14 +837,11 @@ namespace Terminal.Gui.ViewsTests {
 					// Drag to left
 					movex = 1;
 					movey = 0;
-					ReflectionTools.InvokePrivate (
-						typeof (Application),
-						"ProcessMouseEvent",
-						new MouseEvent () {
-							X = win.Frame.X + movex,
-							Y = win.Frame.Y + movey,
-							Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-						});
+					Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+						X = win.Frame.X + movex,
+						Y = win.Frame.Y + movey,
+						Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+					}));
 
 					Assert.Equal (win, Application.MouseGrabView);
 
@@ -875,14 +857,11 @@ namespace Terminal.Gui.ViewsTests {
 					// Drag up
 					movex = 0;
 					movey = -1;
-					ReflectionTools.InvokePrivate (
-						typeof (Application),
-						"ProcessMouseEvent",
-						new MouseEvent () {
-							X = win.Frame.X + movex,
-							Y = win.Frame.Y + movey,
-							Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-						});
+					Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+						X = win.Frame.X + movex,
+						Y = win.Frame.Y + movey,
+						Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+					}));
 
 					Assert.Equal (win, Application.MouseGrabView);
 
@@ -897,14 +876,11 @@ namespace Terminal.Gui.ViewsTests {
 					// Ungrab the mouse
 					movex = 0;
 					movey = 0;
-					ReflectionTools.InvokePrivate (
-						typeof (Application),
-						"ProcessMouseEvent",
-						new MouseEvent () {
-							X = win.Frame.X + movex,
-							Y = win.Frame.Y + movey,
-							Flags = MouseFlags.Button1Released
-						});
+					Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+						X = win.Frame.X + movex,
+						Y = win.Frame.Y + movey,
+						Flags = MouseFlags.Button1Released
+					}));
 
 					Assert.Null (Application.MouseGrabView);
 				} else if (iterations == 7) {
@@ -1162,25 +1138,19 @@ namespace Terminal.Gui.ViewsTests {
       │                                   ▼
    ◄├──────┤░░░░░░░░░░░░░░░░░░░░░░░░░░░░░► ", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 6,
-					Y = 6,
-					Flags = MouseFlags.Button1Pressed
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 6,
+				Y = 6,
+				Flags = MouseFlags.Button1Pressed
+			}));
 			Assert.Equal (win, Application.MouseGrabView);
 			Assert.Equal (new Rect (3, 3, 194, 94), win.Frame);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 9,
-					Y = 9,
-					Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 9,
+				Y = 9,
+				Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+			}));
 			Assert.Equal (win, Application.MouseGrabView);
 			top.SetNeedsLayout ();
 			top.LayoutSubviews ();
@@ -1204,14 +1174,11 @@ namespace Terminal.Gui.ViewsTests {
          │                                ▼
    ◄├──────┤░░░░░░░░░░░░░░░░░░░░░░░░░░░░░► ", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 5,
-					Y = 5,
-					Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 5,
+				Y = 5,
+				Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+			}));
 			Assert.Equal (win, Application.MouseGrabView);
 			top.SetNeedsLayout ();
 			top.LayoutSubviews ();
@@ -1235,24 +1202,18 @@ namespace Terminal.Gui.ViewsTests {
      │                                    ▼
    ◄├──────┤░░░░░░░░░░░░░░░░░░░░░░░░░░░░░► ", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 5,
-					Y = 5,
-					Flags = MouseFlags.Button1Released
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 5,
+				Y = 5,
+				Flags = MouseFlags.Button1Released
+			}));
 			Assert.Null (Application.MouseGrabView);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 4,
-					Y = 4,
-					Flags = MouseFlags.ReportMousePosition
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 4,
+				Y = 4,
+				Flags = MouseFlags.ReportMousePosition
+			}));
 			Assert.Equal (scrollView, Application.MouseGrabView);
 		}
 
@@ -1275,25 +1236,19 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.Null (Application.MouseGrabView);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 10,
-					Y = 3,
-					Flags = MouseFlags.Button1Pressed
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 10,
+				Y = 3,
+				Flags = MouseFlags.Button1Pressed
+			}));
 
 			Assert.Equal (dialog, Application.MouseGrabView);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = -11,
-					Y = -4,
-					Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = -11,
+				Y = -4,
+				Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+			}));
 
 			Application.Refresh ();
 			Assert.Equal (new Rect (0, 0, 40, 10), top.Frame);
@@ -1306,14 +1261,11 @@ namespace Terminal.Gui.ViewsTests {
 
 			// Changes Top size to same size as Dialog more menu and scroll bar
 			((FakeDriver)Application.Driver).SetBufferSize (20, 3);
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = -1,
-					Y = -1,
-					Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = -1,
+				Y = -1,
+				Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+			}));
 
 			Application.Refresh ();
 			Assert.Equal (new Rect (0, 0, 20, 3), top.Frame);
@@ -1326,14 +1278,11 @@ namespace Terminal.Gui.ViewsTests {
 
 			// Changes Top size smaller than Dialog size
 			((FakeDriver)Application.Driver).SetBufferSize (19, 2);
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = -1,
-					Y = -1,
-					Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = -1,
+				Y = -1,
+				Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+			}));
 
 			Application.Refresh ();
 			Assert.Equal (new Rect (0, 0, 19, 2), top.Frame);
@@ -1343,14 +1292,11 @@ namespace Terminal.Gui.ViewsTests {
       {CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket}      │
 ", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 18,
-					Y = 1,
-					Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 18,
+				Y = 1,
+				Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+			}));
 
 			Application.Refresh ();
 			Assert.Equal (new Rect (0, 0, 19, 2), top.Frame);
@@ -1359,14 +1305,11 @@ namespace Terminal.Gui.ViewsTests {
                   ┌", output);
 
 			// On a real app we can't go beyond the SuperView bounds
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 19,
-					Y = 2,
-					Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 19,
+				Y = 2,
+				Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+			}));
 
 			Application.Refresh ();
 			Assert.Equal (new Rect (0, 0, 19, 2), top.Frame);
@@ -1406,17 +1349,14 @@ namespace Terminal.Gui.ViewsTests {
                          │                            │
                          └────────────────────────────┘", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 25,
-					Y = 7,
-					Flags = MouseFlags.Button1Pressed
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 25,
+				Y = 7,
+				Flags = MouseFlags.Button1Pressed
+			}));
 
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			Assert.Equal (dialog, Application.MouseGrabView);
 
 			Assert.Equal (new Rect (25, 7, 30, 10), dialog.Frame);
@@ -1432,17 +1372,14 @@ namespace Terminal.Gui.ViewsTests {
                          │                            │
                          └────────────────────────────┘", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 20,
-					Y = 10,
-					Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 20,
+				Y = 10,
+				Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+			}));
 
 			firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			Assert.Equal (dialog, Application.MouseGrabView);
 			Assert.Equal (new Rect (20, 10, 30, 10), dialog.Frame);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -1550,17 +1487,14 @@ namespace Terminal.Gui.ViewsTests {
 │                  │
 └──────────────────┘", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 9,
-					Y = 13,
-					Flags = MouseFlags.Button1Clicked
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 9,
+				Y = 13,
+				Flags = MouseFlags.Button1Clicked
+			}));
 
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@$"
 ┌──────────────────┐
 │                  │
@@ -1619,7 +1553,7 @@ namespace Terminal.Gui.ViewsTests {
 			bool fromTopStillKnowSecondIsRunning = false;
 			bool fromFirstStillKnowSecondIsRunning = false;
 
-			Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
+			Application.AddTimeout (TimeSpan.FromMilliseconds (100), () => {
 				count++;
 				if (count1 == 5) {
 					log1 = true;
@@ -1656,7 +1590,7 @@ namespace Terminal.Gui.ViewsTests {
 				var od = new OpenDialog ();
 				od.Ready += SecondDialogToplevel;
 
-				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
+				Application.AddTimeout (TimeSpan.FromMilliseconds (100), () => {
 					count1++;
 					if (count2 == 5) {
 						log2 = true;
@@ -1679,7 +1613,7 @@ namespace Terminal.Gui.ViewsTests {
 			{
 				var d = new Dialog ();
 
-				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (_) => {
+				Application.AddTimeout (TimeSpan.FromMilliseconds (100), () => {
 					count2++;
 					if (count < 30) {
 						log = true;

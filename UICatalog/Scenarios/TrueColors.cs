@@ -32,22 +32,22 @@ namespace UICatalog.Scenarios {
 			var cbUseTrueColor = new CheckBox ("Force 16 colors") {
 				X = x,
 				Y = y++,
-				Checked = Application.Driver.Force16Colors,
+				Checked = Application.Force16Colors,
 				Enabled = canTrueColor,
 			};
 			cbUseTrueColor.Toggled += (_, evt) => {
-				Application.Driver.Force16Colors = evt.NewValue ?? false;
+				Application.Force16Colors = evt.NewValue ?? false;
 			};
 			Win.Add (cbUseTrueColor);
 
 			y += 2;
-			SetupGradient ("Red gradient", x, ref y, (i) => new TrueColor (i, 0, 0));
-			SetupGradient ("Green gradient", x, ref y, (i) => new TrueColor (0, i, 0));
-			SetupGradient ("Blue gradient", x, ref y, (i) => new TrueColor (0, 0, i));
-			SetupGradient ("Yellow gradient", x, ref y, (i) => new TrueColor (i, i, 0));
-			SetupGradient ("Magenta gradient", x, ref y, (i) => new TrueColor (i, 0, i));
-			SetupGradient ("Cyan gradient", x, ref y, (i) => new TrueColor (0, i, i));
-			SetupGradient ("Gray gradient", x, ref y, (i) => new TrueColor (i, i, i));
+			SetupGradient ("Red gradient", x, ref y, (i) => new Color (i, 0, 0));
+			SetupGradient ("Green gradient", x, ref y, (i) => new Color (0, i, 0));
+			SetupGradient ("Blue gradient", x, ref y, (i) => new Color (0, 0, i));
+			SetupGradient ("Yellow gradient", x, ref y, (i) => new Color (i, i, 0));
+			SetupGradient ("Magenta gradient", x, ref y, (i) => new Color (i, 0, i));
+			SetupGradient ("Cyan gradient", x, ref y, (i) => new Color (0, i, i));
+			SetupGradient ("Gray gradient", x, ref y, (i) => new Color (i, i, i));
 
 			Win.Add (new Label ("Mouse over to get the gradient view color:") {
 				X = Pos.AnchorEnd (44),
@@ -81,18 +81,18 @@ namespace UICatalog.Scenarios {
 				Y = 6
 			};
 			Win.Add (lblBlue);
-
-			Application.RootMouseEvent = (e) => {
-				if (e.View != null) {
-					var normal = e.View.GetNormalColor ();
-					lblRed.Text = normal.TrueColorForeground.Value.Red.ToString ();
-					lblGreen.Text = normal.TrueColorForeground.Value.Green.ToString ();
-					lblBlue.Text = normal.TrueColorForeground.Value.Blue.ToString ();
+			
+			Application.MouseEvent += (s, e) => {
+				if (e.MouseEvent.View != null) {
+					var normal = e.MouseEvent.View.GetNormalColor ();
+					lblRed.Text = normal.Foreground.R.ToString ();
+					lblGreen.Text = normal.Foreground.G.ToString ();
+					lblBlue.Text = normal.Foreground.B.ToString ();
 				}
 			};
 		}
 
-		private void SetupGradient (string name, int x, ref int y, Func<int, TrueColor> colorFunc)
+		private void SetupGradient (string name, int x, ref int y, Func<int, Color> colorFunc)
 		{
 			var gradient = new Label (name) {
 				X = x,

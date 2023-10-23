@@ -54,7 +54,9 @@ namespace Terminal.Gui.InputTests {
 #endif
 
 			r.Dispose ();
-
+#if DEBUG_IDISPOSABLE
+			Assert.Empty (Responder.Instances);
+#endif
 		}
 
 		public class DerivedView : View {

@@ -56,7 +56,7 @@ namespace UICatalog.Scenarios {
 
 				Closed += OverlappedMain_Closed;
 
-				Application.Iteration += () => {
+				Application.Iteration += (s, a) => {
 					if (canOpenWorkerApp && !workerApp.Running && Application.OverlappedTop.Running) {
 						Application.Run (workerApp);
 					}
@@ -338,7 +338,7 @@ namespace UICatalog.Scenarios {
 				close.Clicked += OnReportClosed;
 				Add (close);
 
-				KeyPress += (s, e) => {
+				KeyPressed += (s, e) => {
 					if (e.KeyEvent.Key == Key.Esc) {
 						OnReportClosed (this, EventArgs.Empty);
 					}

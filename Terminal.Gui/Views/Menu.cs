@@ -482,9 +482,9 @@ namespace Terminal.Gui {
 
 			if (Application.Current != null) {
 				Application.Current.DrawContentComplete += Current_DrawContentComplete;
-				Application.Current.TerminalResized += Current_TerminalResized;
+				Application.Current.SizeChanging += Current_TerminalResized;
 			}
-			Application.RootMouseEvent += Application_RootMouseEvent;
+			Application.MouseEvent += Application_RootMouseEvent;
 
 			// Things this view knows how to do
 			AddCommand (Command.LineUp, () => MoveUp ());
@@ -523,15 +523,15 @@ namespace Terminal.Gui {
 		{
 			base.OnVisibleChanged ();
 			if (Visible) {
-				Application.RootMouseEvent += Application_RootMouseEvent;
+				Application.MouseEvent += Application_RootMouseEvent;
 			} else {
-				Application.RootMouseEvent -= Application_RootMouseEvent;
+				Application.MouseEvent -= Application_RootMouseEvent;
 			}
 		}
 
-		private void Application_RootMouseEvent (MouseEvent me)
+		private void Application_RootMouseEvent (object sender, MouseEventEventArgs a)
 		{
-			if (me.View is MenuBar) {
+			if (a.MouseEvent.View is MenuBar) {
 				return;
 			}
 			var locationOffset = host.GetScreenOffsetFromCurrent ();
@@ -539,7 +539,7 @@ namespace Terminal.Gui {
 				locationOffset.X += SuperView.Border.Thickness.Left;
 				locationOffset.Y += SuperView.Border.Thickness.Top;
 			}
-			var view = View.FindDeepestView (this, me.X + locationOffset.X, me.Y + locationOffset.Y, out int rx, out int ry);
+			var view = View.FindDeepestView (this, a.MouseEvent.X + locationOffset.X, a.MouseEvent.Y + locationOffset.Y, out int rx, out int ry);
 			if (view == this) {
 				if (!Visible) {
 					throw new InvalidOperationException ("This shouldn't running on a invisible menu!");
@@ -548,11 +548,11 @@ namespace Terminal.Gui {
 				var nme = new MouseEvent () {
 					X = rx,
 					Y = ry,
-					Flags = me.Flags,
+					Flags = a.MouseEvent.Flags,
 					View = view
 				};
-				if (MouseEvent (nme) || me.Flags == MouseFlags.Button1Pressed || me.Flags == MouseFlags.Button1Released) {
-					me.Handled = true;
+				if (MouseEvent (nme) || a.MouseEvent.Flags == MouseFlags.Button1Pressed || a.MouseEvent.Flags == MouseFlags.Button1Released) {
+					a.MouseEvent.Handled = true;
 				}
 			}
 		}
@@ -985,9 +985,9 @@ namespace Terminal.Gui {
 		{
 			if (Application.Current != null) {
 				Application.Current.DrawContentComplete -= Current_DrawContentComplete;
-				Application.Current.TerminalResized -= Current_TerminalResized;
+				Application.Current.SizeChanging -= Current_TerminalResized;
 			}
-			Application.RootMouseEvent -= Application_RootMouseEvent;
+			Application.MouseEvent -= Application_RootMouseEvent;
 			base.Dispose (disposing);
 		}
 	}
@@ -1844,6 +1844,11 @@ namespace Terminal.Gui {
 			var c = ((uint)kb.Key & (uint)Key.CharMask);
 			for (int i = 0; i < children.Length; i++) {
 				var mi = children [i];
+
+				if(mi == null) {
+					continue;
+				}
+
 				int p = mi.Title.IndexOf (MenuBar.HotKeySpecifier.ToString ());
 				if (p != -1 && p + 1 < mi.Title.GetRuneCount ()) {
 					if (Char.ToUpperInvariant ((char)mi.Title [p + 1]) == c) {

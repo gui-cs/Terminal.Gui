@@ -9,7 +9,6 @@ using static Terminal.Gui.ColorScheme;
 
 namespace Terminal.Gui;
 
-
 /// <summary>
 /// Base class for Terminal.Gui ConsoleDriver implementations.
 /// </summary>
@@ -32,20 +31,31 @@ public abstract class ConsoleDriver {
 	/// </summary>
 	internal static bool RunningUnitTests { get; set; }
 
-	/// <summary>
-	/// Prepare the driver and set the key and mouse events handlers.
-	/// </summary>
-	/// <param name="mainLoop">The main loop.</param>
-	/// <param name="keyHandler">The handler for ProcessKey</param>
-	/// <param name="keyDownHandler">The handler for key down events</param>
-	/// <param name="keyUpHandler">The handler for key up events</param>
-	/// <param name="mouseHandler">The handler for mouse events</param>
-	public abstract void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler);
+	#region Setup & Teardown
 
 	/// <summary>
-	/// The handler fired when the terminal is resized.
+	/// Initializes the driver
 	/// </summary>
-	protected Action TerminalResized;
+	/// <returns>Returns an instance of <see cref="MainLoop"/> using the <see cref="IMainLoopDriver"/> for the driver.</returns>
+	internal abstract MainLoop Init ();
+
+	/// <summary>
+	/// Ends the execution of the console driver.
+	/// </summary>
+	internal abstract void End ();
+
+	#endregion
+
+	/// <summary>
+	/// The event fired when the terminal is resized.
+	/// </summary>
+	public event EventHandler<SizeChangedEventArgs> SizeChanged;
+
+	/// <summary>
+	/// Called when the terminal size changes. Fires the <see cref="SizeChanged"/> event.
+	/// </summary>
+	/// <param name="args"></param>
+	public void OnSizeChanged (SizeChangedEventArgs args) => SizeChanged?.Invoke (this, args);
 
 	/// <summary>
 	/// The number of columns visible in the terminal.
@@ -89,12 +99,6 @@ public abstract class ConsoleDriver {
 	///// </remarks>
 	///// </summary>
 	public Cell [,] Contents { get; internal set; }
-
-	/// <summary>
-	/// Initializes the driver
-	/// </summary>
-	/// <param name="terminalResized">Method to invoke when the terminal is resized.</param>
-	public abstract void Init (Action terminalResized);
 
 	/// <summary>
 	/// Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/>
@@ -365,21 +369,19 @@ public abstract class ConsoleDriver {
 	/// </summary>
 	public virtual bool SupportsTrueColor { get => true; }
 
-	bool _force16Colors = false;
-
-	// TODO: Make this a ConfiguationManager setting on Application
 	/// <summary>
-	/// Gets or sets whether the <see cref="ConsoleDriver"/> should use 16 colors instead of the default TrueColors.
+	/// Gets or sets whether the <see cref="ConsoleDriver"/> should use 16 colors instead of the default TrueColors. See <see cref="Application.Force16Colors"/>
+	/// to change this setting via <see cref="ConfigurationManager"/>.
 	/// </summary>
 	/// <remarks>
+	/// <para>
 	/// Will be forced to <see langword="true"/> if <see cref="ConsoleDriver.SupportsTrueColor"/> is  <see langword="false"/>, indicating
 	/// that the <see cref="ConsoleDriver"/> cannot support TrueColor.
+	/// </para>
 	/// </remarks>
-	public virtual bool Force16Colors {
-		get => _force16Colors || !SupportsTrueColor;
-		set {
-			_force16Colors = (value || !SupportsTrueColor);
-		}
+	internal virtual bool Force16Colors {
+		get => Application.Force16Colors || !SupportsTrueColor;
+		set => Application.Force16Colors = (value || !SupportsTrueColor);
 	}
 
 	Attribute _currentAttribute;
@@ -390,11 +392,10 @@ public abstract class ConsoleDriver {
 	public Attribute CurrentAttribute {
 		get => _currentAttribute;
 		set {
-			if (value is { Initialized: false, HasValidColors: true } && Application.Driver != null) {
-				_currentAttribute = Application.Driver.MakeAttribute (value.Foreground, value.Background);
+			if (Application.Driver != null) {
+				_currentAttribute = new Attribute (value.Foreground, value.Background);
 				return;
 			}
-			if (!value.Initialized) Debug.WriteLine ("ConsoleDriver.CurrentAttribute: Attributes must be initialized before use.");
 
 			_currentAttribute = value;
 		}
@@ -415,49 +416,87 @@ public abstract class ConsoleDriver {
 	}
 
 	/// <summary>
-	/// Make the attribute for the foreground and background colors.
-	/// </summary>
-	/// <param name="fore">Foreground.</param>
-	/// <param name="back">Background.</param>
-	/// <returns></returns>
-	public virtual Attribute MakeAttribute (Color fore, Color back)
-	{
-		return MakeColor (fore, back);
-	}
-
-	/// <summary>
-	/// Gets the foreground and background colors based on a platform-dependent color value.
-	/// </summary>
-	/// <param name="value">The platform-dependent color value.</param>
-	/// <param name="foreground">The foreground.</param>
-	/// <param name="background">The background.</param>
-	internal abstract void GetColors (int value, out Color foreground, out Color background);
-
-	/// <summary>
 	/// Gets the current <see cref="Attribute"/>.
 	/// </summary>
 	/// <returns>The current attribute.</returns>
 	public Attribute GetAttribute () => CurrentAttribute;
 
+	// TODO: This is only overridden by CursesDriver. Once CursesDriver supports 24-bit color, this virtual method can be
+	// removed (and Attribute can lose the platformColor property).
 	/// <summary>
 	/// Makes an <see cref="Attribute"/>.
 	/// </summary>
 	/// <param name="foreground">The foreground color.</param>
 	/// <param name="background">The background color.</param>
 	/// <returns>The attribute for the foreground and background colors.</returns>
-	public abstract Attribute MakeColor (Color foreground, Color background);
+	public virtual Attribute MakeColor (Color foreground, Color background)
+	{
+		// Encode the colors into the int value.
+		return new Attribute (
+			platformColor: 0, // only used by cursesdriver!
+			foreground: foreground,
+			background: background
+		);
+	}
+
+
+	#endregion
+
+	#region Mouse and Keyboard
 
 	/// <summary>
-	/// Ensures all <see cref="Attribute"/>s in <see cref="Colors.ColorSchemes"/> are correctly 
-	/// initialized by the driver.
+	/// Event fired after a key has been pressed and released.
 	/// </summary>
-	public void InitializeColorSchemes ()
-	{
-		// Ensure all Attributes are initialized by the driver
-		foreach (var s in Colors.ColorSchemes) {
-			s.Value.Initialize ();
-		}
-	}
+	public event EventHandler<KeyEventEventArgs> KeyPressed;
+
+	/// <summary>
+	/// Called after a key has been pressed and released. Fires the <see cref="KeyPressed"/> event.
+	/// </summary>
+	/// <param name="a"></param>
+	public void OnKeyPressed (KeyEventEventArgs a) => KeyPressed?.Invoke(this, a);
+
+	/// <summary>
+	/// Event fired when a key is released.
+	/// </summary>
+	public event EventHandler<KeyEventEventArgs> KeyUp;
+
+	/// <summary>
+	/// Called when a key is released. Fires the <see cref="KeyUp"/> event.
+	/// </summary>
+	/// <param name="a"></param>
+	public void OnKeyUp (KeyEventEventArgs a) => KeyUp?.Invoke (this, a);
+
+	/// <summary>
+	/// Event fired when a key is pressed.
+	/// </summary>
+	public event EventHandler<KeyEventEventArgs> KeyDown;
+
+	/// <summary>
+	/// Called when a key is pressed. Fires the <see cref="KeyDown"/> event.
+	/// </summary>
+	/// <param name="a"></param>
+	public void OnKeyDown (KeyEventEventArgs a) => KeyDown?.Invoke (this, a);
+	
+	/// <summary>
+	/// Event fired when a mouse event occurs.
+	/// </summary>
+	public event EventHandler<MouseEventEventArgs> MouseEvent;
+
+	/// <summary>
+	/// Called when a mouse event occurs. Fires the <see cref="MouseEvent"/> event.
+	/// </summary>
+	/// <param name="a"></param>
+	public void OnMouseEvent (MouseEventEventArgs a) => MouseEvent?.Invoke (this, a);
+
+	/// <summary>
+	/// Simulates a key press.
+	/// </summary>
+	/// <param name="keyChar">The key character.</param>
+	/// <param name="key">The key.</param>
+	/// <param name="shift">If <see langword="true"/> simulates the Shift key being pressed.</param>
+	/// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
+	/// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
+	public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
 
 	#endregion
 
@@ -493,16 +532,6 @@ public abstract class ConsoleDriver {
 	/// <remarks>This is only implemented in <see cref="CursesDriver"/>.</remarks>
 	public abstract void Suspend ();
 
-	/// <summary>
-	/// Simulates a key press.
-	/// </summary>
-	/// <param name="keyChar">The key character.</param>
-	/// <param name="key">The key.</param>
-	/// <param name="shift">If <see langword="true"/> simulates the Shift key being pressed.</param>
-	/// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
-	/// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
-	public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
-
 	// TODO: Move FillRect to ./Drawing	
 	/// <summary>
 	/// Fills the specified rectangle with the specified rune.
@@ -526,11 +555,6 @@ public abstract class ConsoleDriver {
 	/// <param name="rect"></param>
 	/// <param name="c"></param>
 	public void FillRect (Rect rect, char c) => FillRect (rect, new Rune (c));
-
-	/// <summary>
-	/// Ends the execution of the console driver.
-	/// </summary>
-	public abstract void End ();
 
 	/// <summary>
 	/// Returns the name of the driver and relevant library version information.

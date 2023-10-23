@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Terminal.Gui;
-using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Snake", Description: "The game of apple eating.")]
 	[ScenarioCategory ("Colors")]
+	[ScenarioCategory ("Drawing")]
 	public class Snake : Scenario {
 		private bool isDisposed;
 
@@ -38,7 +38,7 @@ namespace UICatalog.Scenarios {
 					if (state.AdvanceState ()) {
 
 						// When updating from a Thread/Task always use Invoke
-						Application.MainLoop?.Invoke (() => {
+						Application.Invoke (() => {
 							snakeView.SetNeedsDisplay ();
 						});
 					}

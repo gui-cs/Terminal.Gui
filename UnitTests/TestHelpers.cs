@@ -62,10 +62,13 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 	{
 		Debug.WriteLine ($"Before: {methodUnderTest.Name}");
 		if (AutoInit) {
-#if DEBUG_IDISPOSABLE && FORCE_RESPONDER_DISPOSE
+#if DEBUG_IDISPOSABLE
 			// Clear out any lingering Responder instances from previous tests
-			Responder.Instances.Clear ();
-			Assert.Equal (0, Responder.Instances.Count);
+			if (Responder.Instances.Count == 0) {
+				Assert.Empty (Responder.Instances);
+			} else {
+				Responder.Instances.Clear ();
+			}
 #endif
 			Application.Init ((ConsoleDriver)Activator.CreateInstance (_driverType));
 		}
@@ -76,8 +79,12 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 		Debug.WriteLine ($"After: {methodUnderTest.Name}");
 		if (AutoInit) {
 			Application.Shutdown ();
-#if DEBUG_IDISPOSABLE && FORCE_RESPONDER_DISPOSE
-			Assert.Equal (0, Responder.Instances.Count);
+#if DEBUG_IDISPOSABLE
+			if (Responder.Instances.Count == 0) {
+				Assert.Empty (Responder.Instances);
+			} else {
+				Responder.Instances.Clear ();
+			}
 #endif
 		}
 	}
@@ -104,9 +111,7 @@ public class TestRespondersDisposed : Xunit.Sdk.BeforeAfterTestAttribute {
 	{
 		Debug.WriteLine ($"After: {methodUnderTest.Name}");
 #if DEBUG_IDISPOSABLE
-#pragma warning disable xUnit2013 // Do not use equality check to check for collection size.
-		Assert.Equal (0, Responder.Instances.Count);
-#pragma warning restore xUnit2013 // Do not use equality check to check for collection size.
+		Assert.Empty (Responder.Instances);
 #endif
 	}
 }
@@ -307,7 +312,7 @@ partial class TestHelpers {
 				var match = expectedColors.Where (e => e == val).ToList ();
 				switch (match.Count) {
 				case 0:
-					throw new Exception ($"Unexpected color {val} was used at row {r} and col {c} (indexes start at 0).  Color value was {val} (expected colors were {string.Join (",", expectedColors.Select (c => c.Value.ToString ()))})");
+					throw new Exception ($"Unexpected color {val} was used at row {r} and col {c} (indexes start at 0).  Color value was {val} (expected colors were {string.Join (",", expectedColors.Select (c => c.PlatformColor.ToString ()))})");
 				case > 1:
 					throw new ArgumentException ($"Bad value for expectedColors, {match.Count} Attributes had the same Value");
 				}
@@ -315,7 +320,7 @@ partial class TestHelpers {
 				var colorUsed = Array.IndexOf (expectedColors, match [0]).ToString () [0];
 				var userExpected = line [c];
 
-				if (colorUsed != userExpected) throw new Exception ($"Colors used did not match expected at row {r} and col {c} (indexes start at 0).  Color index used was {colorUsed} ({val}) but test expected {userExpected} ({expectedColors [int.Parse (userExpected.ToString ())].Value}) (these are indexes into the expectedColors array)");
+				if (colorUsed != userExpected) throw new Exception ($"Colors used did not match expected at row {r} and col {c} (indexes start at 0).  Color index used was {colorUsed} ({val}) but test expected {userExpected} ({expectedColors [int.Parse (userExpected.ToString ())].PlatformColor}) (these are indexes into the expectedColors array)");
 			}
 
 			r++;

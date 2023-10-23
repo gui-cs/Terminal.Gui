@@ -136,7 +136,7 @@ internal class NetEvents : IDisposable {
 
 	public InputResult? DequeueInput ()
 	{
-		while (!_inputReadyCancellationTokenSource.Token.IsCancellationRequested) {
+		while (_inputReadyCancellationTokenSource != null && !_inputReadyCancellationTokenSource.Token.IsCancellationRequested) {
 			_waitForStart.Set ();
 			_winChange.Set ();
 
@@ -152,7 +152,7 @@ internal class NetEvents : IDisposable {
 			} finally {
 				_inputReady.Reset ();
 			}
-			
+
 #if PROCESS_REQUEST
 				_neededProcessRequest = false;
 #endif
@@ -184,8 +184,13 @@ internal class NetEvents : IDisposable {
 	void ProcessInputQueue ()
 	{
 		while (!_inputReadyCancellationTokenSource.Token.IsCancellationRequested) {
-	
-			_waitForStart.Wait (_inputReadyCancellationTokenSource.Token);
+
+			try {
+				_waitForStart.Wait (_inputReadyCancellationTokenSource.Token);
+			} catch (OperationCanceledException) {
+
+				return;
+			}
 			_waitForStart.Reset ();
 
 			if (_inputQueue.Count == 0) {
@@ -623,32 +628,14 @@ internal class NetDriver : ConsoleDriver {
 	const int COLOR_BRIGHT_CYAN = 96;
 	const int COLOR_BRIGHT_WHITE = 97;
 
+	NetMainLoop _mainLoopDriver = null;
+
 	public override bool SupportsTrueColor => Environment.OSVersion.Platform == PlatformID.Unix || (IsWinPlatform && Environment.OSVersion.Version.Build >= 14931);
 
 	public NetWinVTConsole NetWinConsole { get; private set; }
 	public bool IsWinPlatform { get; private set; }
 
-	public override void End ()
-	{
-		if (IsWinPlatform) {
-			NetWinConsole?.Cleanup ();
-		}
-
-		StopReportingMouseMoves ();
-
-		if (!RunningUnitTests) {
-			Console.ResetColor ();
-
-			//Disable alternative screen buffer.
-			Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndActivateAltBufferWithBackscroll);
-
-			//Set cursor key to cursor.
-			Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
-			Console.Out.Close ();
-		}
-	}
-
-	public override void Init (Action terminalResized)
+	internal override MainLoop Init ()
 	{
 		var p = Environment.OSVersion.Platform;
 		if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
@@ -671,9 +658,6 @@ internal class NetDriver : ConsoleDriver {
 			}
 		}
 
-		TerminalResized = terminalResized;
-
-
 		if (!RunningUnitTests) {
 			Console.TreatControlCAsInput = true;
 
@@ -695,10 +679,33 @@ internal class NetDriver : ConsoleDriver {
 
 		ResizeScreen ();
 		ClearContents ();
-		CurrentAttribute = MakeColor (Color.White, Color.Black);
-		InitializeColorSchemes ();
+		CurrentAttribute = new Attribute (Color.White, Color.Black);
 
 		StartReportingMouseMoves ();
+
+		_mainLoopDriver = new NetMainLoop (this);
+		_mainLoopDriver.ProcessInput = ProcessInput;
+		return new MainLoop (_mainLoopDriver);
+	}
+
+	internal override void End ()
+	{
+		if (IsWinPlatform) {
+			NetWinConsole?.Cleanup ();
+		}
+
+		StopReportingMouseMoves ();
+
+		if (!RunningUnitTests) {
+			Console.ResetColor ();
+
+			//Disable alternative screen buffer.
+			Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+
+			//Set cursor key to cursor.
+			Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
+			Console.Out.Close ();
+		}
 	}
 
 	public virtual void ResizeScreen ()
@@ -793,10 +800,10 @@ internal class NetDriver : ConsoleDriver {
 
 						if (Force16Colors) {
 							output.Append (EscSeqUtils.CSI_SetGraphicsRendition (
-								MapColors ((ConsoleColor)attr.Background, false), MapColors ((ConsoleColor)attr.Foreground, true)));
+								MapColors ((ConsoleColor)attr.Background.ColorName, false), MapColors ((ConsoleColor)attr.Foreground.ColorName, true)));
 						} else {
-							output.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.TrueColorForeground.Value.Red, attr.TrueColorForeground.Value.Green, attr.TrueColorForeground.Value.Blue));
-							output.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.TrueColorBackground.Value.Red, attr.TrueColorBackground.Value.Green, attr.TrueColorBackground.Value.Blue));
+							output.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.Foreground.R, attr.Foreground.G, attr.Foreground.B));
+							output.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.Background.R, attr.Background.G, attr.Background.B));
 						}
 
 					}
@@ -862,33 +869,20 @@ internal class NetDriver : ConsoleDriver {
 		return colorMap.TryGetValue (color, out var colorValue) ? colorValue + (isForeground ? 0 : 10) : 0;
 	}
 
-	/// <remarks>
-	/// In the NetDriver, colors are encoded as an int. 
-	/// Extracts the foreground and background colors from the encoded value.
-	/// Assumes a 4-bit encoded value for both foreground and background colors.
-	/// </remarks>
-	internal override void GetColors (int value, out Color foreground, out Color background)
-	{
-		// Assume a 4-bit encoded value for both foreground and background colors.
-		foreground = (Color)((value >> 16) & 0xF);
-		background = (Color)(value & 0xF);
-	}
-
-	/// <remarks>
-	/// In the NetDriver, colors are encoded as an int. 
-	/// However, the foreground color is stored in the most significant 16 bits, 
-	/// and the background color is stored in the least significant 16 bits.
-	/// </remarks>
-	public override Attribute MakeColor (Color foreground, Color background)
-	{
-		// Encode the colors into the int value.
-		return new Attribute (
-		    value: ((((int)foreground) & 0xffff) << 16) | (((int)background) & 0xffff),
-		    foreground: foreground,
-		    background: background
-		);
-	}
-
+	///// <remarks>
+	///// In the NetDriver, colors are encoded as an int. 
+	///// However, the foreground color is stored in the most significant 16 bits, 
+	///// and the background color is stored in the least significant 16 bits.
+	///// </remarks>
+	//public override Attribute MakeColor (Color foreground, Color background)
+	//{
+	//	// Encode the colors into the int value.
+	//	return new Attribute (
+	//		platformColor: ((((int)foreground.ColorName) & 0xffff) << 16) | (((int)background.ColorName) & 0xffff),
+	//		foreground: foreground,
+	//		background: background
+	//	);
+	//}
 	#endregion
 
 	#region Cursor Handling
@@ -1115,25 +1109,6 @@ internal class NetDriver : ConsoleDriver {
 		return keyMod != Key.Null ? keyMod | key : key;
 	}
 
-	Action<KeyEvent> _keyHandler;
-	Action<KeyEvent> _keyDownHandler;
-	Action<KeyEvent> _keyUpHandler;
-	Action<MouseEvent> _mouseHandler;
-	NetMainLoop _mainLoop;
-
-	public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
-	{
-		_keyHandler = keyHandler;
-		_keyDownHandler = keyDownHandler;
-		_keyUpHandler = keyUpHandler;
-		_mouseHandler = mouseHandler;
-
-		_mainLoop = mainLoop.MainLoopDriver as NetMainLoop;
-
-		// Note: .Net API doesn't support keydown/up events and thus any passed keyDown/UpHandlers will be simulated to be called.
-		_mainLoop.ProcessInput = ProcessInput;
-	}
-
 	volatile bool _winSizeChanging;
 
 	void ProcessInput (NetEvents.InputResult inputEvent)
@@ -1150,16 +1125,16 @@ internal class NetDriver : ConsoleDriver {
 				return;
 			}
 			if (map == Key.Null) {
-				_keyDownHandler (new KeyEvent (map, _keyModifiers));
-				_keyUpHandler (new KeyEvent (map, _keyModifiers));
+				OnKeyDown (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
+				OnKeyUp (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
 			} else {
-				_keyDownHandler (new KeyEvent (map, _keyModifiers));
-				_keyHandler (new KeyEvent (map, _keyModifiers));
-				_keyUpHandler (new KeyEvent (map, _keyModifiers));
+				OnKeyDown (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
+				OnKeyUp (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
+				OnKeyPressed (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
 			}
 			break;
 		case NetEvents.EventType.Mouse:
-			_mouseHandler (ToDriverMouse (inputEvent.MouseEvent));
+			OnMouseEvent (new MouseEventEventArgs (ToDriverMouse (inputEvent.MouseEvent)));
 			break;
 		case NetEvents.EventType.WindowSize:
 			_winSizeChanging = true;
@@ -1170,7 +1145,7 @@ internal class NetDriver : ConsoleDriver {
 			ResizeScreen ();
 			ClearContents ();
 			_winSizeChanging = false;
-			TerminalResized?.Invoke ();
+			OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
 			break;
 		case NetEvents.EventType.RequestResponse:
 			// BUGBUG: What is this for? It does not seem to be used anywhere. 
@@ -1353,9 +1328,14 @@ internal class NetMainLoop : IMainLoopDriver {
 			} catch (OperationCanceledException) {
 				return;
 			} finally {
-				_waitForProbe.Reset ();
+				if (_waitForProbe.IsSet) {
+					_waitForProbe.Reset ();
+				}
 			}
 
+			if (_inputHandlerTokenSource.IsCancellationRequested) {
+				return;
+			}
 			if (_resultQueue.Count == 0) {
 				_resultQueue.Enqueue (_netEvents.DequeueInput ());
 			}
@@ -1418,14 +1398,14 @@ internal class NetMainLoop : IMainLoopDriver {
 			ProcessInput?.Invoke (_resultQueue.Dequeue ().Value);
 		}
 	}
-	
+
 	void IMainLoopDriver.TearDown ()
 	{
 		_inputHandlerTokenSource?.Cancel ();
 		_inputHandlerTokenSource?.Dispose ();
 		_eventReadyTokenSource?.Cancel ();
 		_eventReadyTokenSource?.Dispose ();
-		
+
 		_eventReady?.Dispose ();
 
 		_resultQueue?.Clear ();

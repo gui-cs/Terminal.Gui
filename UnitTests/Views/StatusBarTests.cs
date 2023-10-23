@@ -45,7 +45,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (CursorVisibility.Default, cv);
 			Assert.True (FakeConsole.CursorVisible);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				Assert.Equal (24, sb.Frame.Y);
 
 				driver.SetWindowSize (driver.Cols, 15);
@@ -77,7 +77,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			var iteration = 0;
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (iteration == 0) {
 					Assert.Equal ("", msg);
 					sb.ProcessHotKey (new KeyEvent (Key.CtrlMask | Key.Q, null));

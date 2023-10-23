@@ -54,7 +54,7 @@
                 "Background": "Cyan"
               },
               "HotNormal": {
-                "Foreground": "Brown",
+                "Foreground": "Yellow",
                 "Background": "Black"
               },
               "HotFocus": {
@@ -200,7 +200,7 @@
                 "Background": "Black"
               },
               "Focus": {
-                "Foreground": "White",
+                "Foreground": "BrightYellow",
                 "Background": "DarkGray"
               },
               "HotNormal": {

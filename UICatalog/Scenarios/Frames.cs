@@ -118,7 +118,7 @@ namespace UICatalog.Scenarios {
 				};
 				_foregroundColorPicker.ColorChanged += (o, a) =>
 					AttributeChanged?.Invoke (this,
-						new Terminal.Gui.Attribute (_foregroundColorPicker.SelectedColor, _backgroundColorPicker.SelectedColor));
+						new Attribute (_foregroundColorPicker.SelectedColor, _backgroundColorPicker.SelectedColor));
 				Add (_foregroundColorPicker);
 
 				// Background ColorPicker.
@@ -222,7 +222,6 @@ namespace UICatalog.Scenarios {
 				Add (_borderEditor);
 
 				viewToEdit.Padding.ColorScheme = new ColorScheme (Colors.ColorSchemes ["Error"]);
-				var colorEnum = Enum.GetValues (typeof (Color)).Cast<Color> ().ToList ();
 
 				var borderStyleEnum = Enum.GetValues (typeof (LineStyle)).Cast<LineStyle> ().ToList ();
 				var rbBorderStyle = new RadioGroup (borderStyleEnum.Select (

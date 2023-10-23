@@ -19,5 +19,5 @@ public sealed class Timeout {
 	/// <summary>
 	/// The function that will be invoked.
 	/// </summary>
-	public Func<MainLoop, bool> Callback;
+	public Func<bool> Callback;
 }
