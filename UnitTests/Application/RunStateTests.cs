@@ -63,6 +63,7 @@ namespace Terminal.Gui.ApplicationTests {
 		void Init ()
 		{
 			Application.Init (new FakeDriver ());
+			
 			Assert.NotNull (Application.Driver);
 			Assert.NotNull (Application.MainLoop);
 			Assert.NotNull (SynchronizationContext.Current);
