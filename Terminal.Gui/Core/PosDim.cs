@@ -118,8 +118,6 @@ namespace Terminal.Gui {
 			return new PosFactor (n / 100);
 		}
 
-		static PosAnchorEnd endNoMargin;
-
 		internal class PosAnchorEnd : Pos {
 			int n;
 
@@ -137,6 +135,10 @@ namespace Terminal.Gui {
 			{
 				return $"Pos.AnchorEnd(margin={n})";
 			}
+
+			public override int GetHashCode () => n.GetHashCode ();
+
+			public override bool Equals (object other) => other is PosAnchorEnd anchorEnd && anchorEnd.n == n;
 		}
 
 		/// <summary>
@@ -158,11 +160,6 @@ namespace Terminal.Gui {
 			if (margin < 0)
 				throw new ArgumentException ("Margin must be positive");
 
-			if (margin == 0) {
-				if (endNoMargin == null)
-					endNoMargin = new PosAnchorEnd (0);
-				return endNoMargin;
-			}
 			return new PosAnchorEnd (margin);
 		}
 
@@ -177,8 +174,6 @@ namespace Terminal.Gui {
 				return "Pos.Center";
 			}
 		}
-
-		static PosCenter pCenter;
 
 		/// <summary>
 		/// Returns a <see cref="Pos"/> object that can be used to center the <see cref="View"/>
@@ -198,9 +193,7 @@ namespace Terminal.Gui {
 		/// </example>
 		public static Pos Center ()
 		{
-			if (pCenter == null)
-				pCenter = new PosCenter ();
-			return pCenter;
+			return new PosCenter ();
 		}
 
 		internal class PosAbsolute : Pos {
@@ -269,8 +262,6 @@ namespace Terminal.Gui {
 
 		}
 
-		static PosCombine posCombine;
-
 		/// <summary>
 		/// Adds a <see cref="Terminal.Gui.Pos"/> to a <see cref="Terminal.Gui.Pos"/>, yielding a new <see cref="Pos"/>.
 		/// </summary>
@@ -280,12 +271,11 @@ namespace Terminal.Gui {
 		public static Pos operator + (Pos left, Pos right)
 		{
 			if (left is PosAbsolute && right is PosAbsolute) {
-				posCombine = null;
 				return new PosAbsolute (left.Anchor (0) + right.Anchor (0));
 			}
 			PosCombine newPos = new PosCombine (true, left, right);
 			SetPosCombine (left, newPos);
-			return posCombine = newPos;
+			return newPos;
 		}
 
 		/// <summary>
@@ -297,21 +287,18 @@ namespace Terminal.Gui {
 		public static Pos operator - (Pos left, Pos right)
 		{
 			if (left is PosAbsolute && right is PosAbsolute) {
-				posCombine = null;
 				return new PosAbsolute (left.Anchor (0) - right.Anchor (0));
 			}
 			PosCombine newPos = new PosCombine (false, left, right);
 			SetPosCombine (left, newPos);
-			return posCombine = newPos;
+			return newPos;
 		}
 
 		static void SetPosCombine (Pos left, PosCombine newPos)
 		{
-			if (posCombine?.ToString () != newPos.ToString ()) {
-				var view = left as PosView;
-				if (view != null) {
-					view.Target.SetNeedsLayout ();
-				}
+			var view = left as PosView;
+			if (view != null) {
+				view.Target.SetNeedsLayout ();
 			}
 		}
 
@@ -554,8 +541,6 @@ namespace Terminal.Gui {
 			public override bool Equals (object other) => other is DimFill fill && fill.margin == margin;
 		}
 
-		static DimFill zeroMargin;
-
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Dim"/> class that fills the dimension, but leaves the specified number of colums for a margin.
 		/// </summary>
@@ -563,11 +548,6 @@ namespace Terminal.Gui {
 		/// <param name="margin">Margin to use.</param>
 		public static Dim Fill (int margin = 0)
 		{
-			if (margin == 0) {
-				if (zeroMargin == null)
-					zeroMargin = new DimFill (0);
-				return zeroMargin;
-			}
 			return new DimFill (margin);
 		}
 
@@ -618,8 +598,6 @@ namespace Terminal.Gui {
 
 		}
 
-		static DimCombine dimCombine;
-
 		/// <summary>
 		/// Adds a <see cref="Terminal.Gui.Dim"/> to a <see cref="Terminal.Gui.Dim"/>, yielding a new <see cref="Dim"/>.
 		/// </summary>
@@ -629,12 +607,11 @@ namespace Terminal.Gui {
 		public static Dim operator + (Dim left, Dim right)
 		{
 			if (left is DimAbsolute && right is DimAbsolute) {
-				dimCombine = null;
 				return new DimAbsolute (left.Anchor (0) + right.Anchor (0));
 			}
 			DimCombine newDim = new DimCombine (true, left, right);
 			SetDimCombine (left, newDim);
-			return dimCombine = newDim;
+			return newDim;
 		}
 
 		/// <summary>
@@ -646,21 +623,18 @@ namespace Terminal.Gui {
 		public static Dim operator - (Dim left, Dim right)
 		{
 			if (left is DimAbsolute && right is DimAbsolute) {
-				dimCombine = null;
 				return new DimAbsolute (left.Anchor (0) - right.Anchor (0));
 			}
 			DimCombine newDim = new DimCombine (false, left, right);
 			SetDimCombine (left, newDim);
-			return dimCombine = newDim;
+			return newDim;
 		}
 
 		static void SetDimCombine (Dim left, DimCombine newPos)
 		{
-			if (dimCombine?.ToString () != newPos.ToString ()) {
-				var view = left as DimView;
-				if (view != null) {
-					view.Target.SetNeedsLayout ();
-				}
+			var view = left as DimView;
+			if (view != null) {
+				view.Target.SetNeedsLayout ();
 			}
 		}
 
