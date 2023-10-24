@@ -812,7 +812,7 @@ internal class NetDriver : ConsoleDriver {
 					output.Append (rune.ToString ());
 					if (rune.IsSurrogatePair () && rune.GetColumns () < 2) {
 						WriteToConsole (output, ref lastCol, row, ref outputWidth);
-						SetCursorPosition (row, col - 1);
+						SetCursorPosition (col - 1, row);
 					}
 					Contents [row, col].IsDirty = false;
 				}
