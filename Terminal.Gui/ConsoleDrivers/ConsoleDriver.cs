@@ -179,7 +179,11 @@ public abstract class ConsoleDriver {
 				Contents [Row, Col - 1].Attribute = CurrentAttribute;
 				Contents [Row, Col - 1].IsDirty = true;
 
-				//Col--;
+				if (normalized.Length > 1) {
+					Contents [Row, Col].Runes = new List<Rune> { (Rune)normalized [1] }; ;
+					Contents [Row, Col].Attribute = CurrentAttribute;
+					Contents [Row, Col].IsDirty = true;
+				}
 			} else {
 				Contents [Row, Col].Attribute = CurrentAttribute;
 				Contents [Row, Col].IsDirty = true;

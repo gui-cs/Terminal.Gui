@@ -17,40 +17,40 @@ public class ContentsTests {
 		this.output = output;
 	}
 
-	[Theory]
+	[Theory, AutoInitShutdown]
 	[InlineData (typeof (FakeDriver))]
 	//[InlineData (typeof (NetDriver))]
 	//[InlineData (typeof (CursesDriver))]
 	//[InlineData (typeof (WindowsDriver))]
 	public void AddStr_With_Combining_Characters (Type driverType)
 	{
-		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-		Application.Init (driver);
-		// driver.Init (null);
+		Application.Init ();
 
 		var acuteaccent = new System.Text.Rune (0x0301); // Combining acute accent (é)
 		var combined = "e" + acuteaccent;
 		var expected = "é";
 
-		driver.AddStr (combined);
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-
-#if false // Disabled Until #2616 is fixed
+		Application.Driver.AddStr (combined);
+		TestHelpers.AssertDriverContentsAre (expected, output);
 
 		// 3 char combine
-		// a + ogonek + acute = <U+0061, U+0328, U+0301> ( ǫ́ )
+		// a + ogonek + acute = <U+0061, U+0328, U+0301> ( ą́ )
 		var ogonek = new System.Text.Rune (0x0328); // Combining ogonek (a small hook or comma shape)
 		combined = "a" + ogonek + acuteaccent;
+		expected = "ą́";
+
+		Application.Driver.Move (0, 0);
+		Application.Driver.AddStr (combined);
+		TestHelpers.AssertDriverContentsAre (expected, output);
+
+		// o + ogonek + acute = <U+0061, U+0328, U+0301> ( ǫ́ )
+		ogonek = new System.Text.Rune (0x0328); // Combining ogonek (a small hook or comma shape)
+		combined = "o" + ogonek + acuteaccent;
 		expected = "ǫ́";
 
-		driver.Move (0, 0);
-		driver.AddStr (combined);
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-
-#endif
-		
-		// Shutdown must be called to safely clean up Application if Init has been called
-		Application.Shutdown ();
+		Application.Driver.Move (0, 0);
+		Application.Driver.AddStr (combined);
+		TestHelpers.AssertDriverContentsAre (expected, output);
 	}
 
 	[Theory]
@@ -91,7 +91,7 @@ public class ContentsTests {
 	}
 
 	// TODO: Add these unit tests
-	
+
 	// AddRune moves correctly
 
 	// AddRune with wide characters are handled correctly
