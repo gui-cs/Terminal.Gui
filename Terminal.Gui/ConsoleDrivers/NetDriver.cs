@@ -759,8 +759,8 @@ internal class NetDriver : ConsoleDriver {
 		Attribute redrawAttr = new Attribute ();
 		var lastCol = -1;
 
-		//GetCursorVisibility (out CursorVisibility savedVisibitity);
-		//SetCursorVisibility (CursorVisibility.Invisible); 
+		GetCursorVisibility (out CursorVisibility savedVisibitity);
+		SetCursorVisibility (CursorVisibility.Invisible);
 
 		for (var row = top; row < rows; row++) {
 			if (Console.WindowHeight < 1) {
@@ -824,7 +824,7 @@ internal class NetDriver : ConsoleDriver {
 		}
 		SetCursorPosition (0, 0);
 
-		//SetCursorVisibility (savedVisibitity);
+		SetCursorVisibility (savedVisibitity);
 
 		void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
 		{
@@ -926,7 +926,7 @@ internal class NetDriver : ConsoleDriver {
 	{
 		_cachedCursorVisibility = visibility;
 		var isVisible = RunningUnitTests ? visibility == CursorVisibility.Default : Console.CursorVisible = visibility == CursorVisibility.Default;
-		//Console.Out.Write (isVisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
+		Console.Out.Write (isVisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
 		return isVisible;
 	}
 

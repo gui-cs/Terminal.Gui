@@ -668,9 +668,6 @@ namespace Terminal.Gui {
 				} else if (Current.SuperView == null && Current?.Modal == true) {
 					Refresh ();
 				}
-				if (Driver.EnsureCursorVisibility ()) {
-					state.Toplevel.SetNeedsDisplay ();
-				}
 			}
 
 			firstIteration = false;
