@@ -812,7 +812,7 @@ internal class NetDriver : ConsoleDriver {
 					output.Append (rune.ToString ());
 					if (rune.IsSurrogatePair () && rune.GetColumns () < 2) {
 						WriteToConsole (output, ref lastCol, row, ref outputWidth);
-						Console.CursorLeft--;
+						SetCursorPosition (row, col - 1);
 					}
 					Contents [row, col].IsDirty = false;
 				}
@@ -888,20 +888,20 @@ internal class NetDriver : ConsoleDriver {
 	#region Cursor Handling
 	bool SetCursorPosition (int col, int row)
 	{
-		//if (IsWinPlatform) {
-		// Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.
-		try {
-			Console.SetCursorPosition (col, row);
+		if (IsWinPlatform) {
+			// Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.
+			try {
+				Console.SetCursorPosition (col, row);
+				return true;
+			} catch (Exception) {
+				return false;
+			}
+		} else {
+			// + 1 is needed because non-Windows is based on 1 instead of 0 and
+			// Console.CursorTop/CursorLeft isn't reliable.
+			Console.Out.Write (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
 			return true;
-		} catch (Exception) {
-			return false;
 		}
-		// BUGBUG: This breaks -usc on WSL; not sure why. But commenting out fixes.
-		//} else {
-		//	// TODO: Explain why + 1 is needed (and why we do this for non-Windows).
-		//	Console.Out.Write (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
-		//	return true;
-		//}
 	}
 
 	CursorVisibility? _cachedCursorVisibility;
