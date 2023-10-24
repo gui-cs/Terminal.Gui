@@ -759,7 +759,7 @@ internal class NetDriver : ConsoleDriver {
 		Attribute redrawAttr = new Attribute ();
 		var lastCol = -1;
 
-		GetCursorVisibility (out CursorVisibility savedVisibitity);
+		var savedVisibitity = _cachedCursorVisibility;
 		SetCursorVisibility (CursorVisibility.Invisible);
 
 		for (var row = top; row < rows; row++) {
@@ -824,7 +824,7 @@ internal class NetDriver : ConsoleDriver {
 		}
 		SetCursorPosition (0, 0);
 
-		SetCursorVisibility (savedVisibitity);
+		_cachedCursorVisibility = savedVisibitity;
 
 		void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
 		{
