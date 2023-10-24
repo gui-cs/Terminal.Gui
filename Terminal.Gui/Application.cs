@@ -480,7 +480,7 @@ namespace Terminal.Gui {
 #endif
 				resume = false;
 				var runState = Begin (view);
-				// If ExitRunLoopAfterFirstIteration is true then the user must dispose of the runToken
+				// If EndAfterFirstIteration is true then the user must dispose of the runToken
 				// by using NotifyStopRunState event.
 				RunLoop (runState);
 				if (!EndAfterFirstIteration) {
