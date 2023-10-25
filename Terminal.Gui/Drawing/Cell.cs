@@ -23,7 +23,7 @@ public class Cell {
 	///// <remarks>
 	///// Only valid in the rare case where <see cref="Rune"/> is a combining sequence that could not be normalized to a single Rune.
 	///// </remarks>
-	//internal Rune CombiningMark { get; set; }
+	internal Rune CombiningMark { get; set; }
 
 	/// <summary>
 	/// The attributes to use when drawing the Glyph.

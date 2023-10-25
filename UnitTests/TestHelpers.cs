@@ -175,6 +175,9 @@ partial class TestHelpers {
 				if (rune.GetColumns () > 1) {
 					c++;
 				}
+				if (contents [r, c].CombiningMark.Value > 0) {
+					sb.Append ((char)contents [r, c].CombiningMark.Value);
+				}
 			}
 			sb.AppendLine ();
 		}
@@ -227,7 +230,6 @@ partial class TestHelpers {
 		for (var r = 0; r < driver.Rows; r++) {
 			var runes = new List<Rune> ();
 			for (var c = 0; c < driver.Cols; c++) {
-				// TODO: Remove hard-coded [0] once combining pairs is supported
 				Rune rune = contents [r, c].Rune;
 				if (rune != (Rune)' ') {
 					if (x == -1) {
@@ -246,6 +248,9 @@ partial class TestHelpers {
 					h = r - y + 1;
 				}
 				if (x > -1) runes.Add (rune);
+				if (contents [r, c].CombiningMark.Value > 0) {
+					runes.Add (contents [r, c].CombiningMark);
+				}
 			}
 			if (runes.Count > 0) lines.Add (runes);
 		}

@@ -175,7 +175,10 @@ public abstract class ConsoleDriver {
 				// Normalize to Form C (Canonical Composition)
 				string normalized = combined.Normalize (NormalizationForm.FormC);
 
-				Contents [Row, Col - 1].Rune = (Rune)normalized [0]; ;
+				Contents [Row, Col - 1].Rune = (Rune)normalized [0];
+				if (normalized.Length > 1) {
+					Contents [Row, Col - 1].CombiningMark = (Rune)normalized [1];
+				}
 				Contents [Row, Col - 1].Attribute = CurrentAttribute;
 				Contents [Row, Col - 1].IsDirty = true;
 			} else {
