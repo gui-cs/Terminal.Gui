@@ -1,4 +1,5 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
 using System.Text;
 using Xunit;
 using Xunit.Abstractions;
@@ -11,22 +12,25 @@ public class AddRuneTests {
 
 	public AddRuneTests (ITestOutputHelper output)
 	{
+		ConsoleDriver.RunningUnitTests = true;
 		this._output = output;
 	}
 
-	[Fact]
-	public void AddRune ()
+	[Theory]
+	[InlineData (typeof (FakeDriver))]
+	[InlineData (typeof (NetDriver))]
+	[InlineData (typeof (CursesDriver))]
+	[InlineData (typeof (WindowsDriver))]
+	public void AddRune (Type driverType)
 	{
-
-		var driver = new FakeDriver ();
-		Application.Init (driver);
+		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+		driver.Rows = 25;
+		driver.Cols = 80;
 		driver.Init ();
-
 		driver.AddRune (new Rune ('a'));
 		Assert.Equal ((Rune)'a', driver.Contents [0, 0].Runes [0]);
 
 		driver.End ();
-		Application.Shutdown ();
 	}
 
 	[Fact]
