@@ -165,15 +165,15 @@ partial class TestHelpers {
 
 		for (int r = 0; r < driver.Rows; r++) {
 			for (int c = 0; c < driver.Cols; c++) {
-				foreach (var rune in contents [r, c].Runes) {
-					if (rune.DecodeSurrogatePair (out char [] spair)) {
-						sb.Append (spair);
-					} else {
-						sb.Append ((char)rune.Value);
-					}
-					if (rune.GetColumns () > 1) {
-						c++;
-					}
+				// TODO: Remove hard-coded [0] once combining pairs is supported
+				Rune rune = contents [r, c].Rune;
+				if (rune.DecodeSurrogatePair (out char [] spair)) {
+					sb.Append (spair);
+				} else {
+					sb.Append ((char)rune.Value);
+				}
+				if (rune.GetColumns () > 1) {
+					c++;
 				}
 			}
 			sb.AppendLine ();
@@ -227,25 +227,25 @@ partial class TestHelpers {
 		for (var r = 0; r < driver.Rows; r++) {
 			var runes = new List<Rune> ();
 			for (var c = 0; c < driver.Cols; c++) {
-				foreach (var rune in contents [r, c].Runes) {
-					if (rune != (Rune)' ' && !rune.IsCombiningMark ()) {
-						if (x == -1) {
-							x = c;
-							y = r;
-							for (int i = 0; i < c; i++) {
-								runes.InsertRange (i, new List<Rune> () { (Rune)' ' });
-							}
+				// TODO: Remove hard-coded [0] once combining pairs is supported
+				Rune rune = contents [r, c].Rune;
+				if (rune != (Rune)' ') {
+					if (x == -1) {
+						x = c;
+						y = r;
+						for (int i = 0; i < c; i++) {
+							runes.InsertRange (i, new List<Rune> () { (Rune)' ' });
 						}
-						if (rune.GetColumns () > 1) {
-							c++;
-						}
-						if (c + 1 > w) {
-							w = c + 1;
-						}
-						h = r - y + 1;
 					}
-					if (x > -1) runes.Add (rune);
+					if (rune.GetColumns () > 1) {
+						c++;
+					}
+					if (c + 1 > w) {
+						w = c + 1;
+					}
+					h = r - y + 1;
 				}
+				if (x > -1) runes.Add (rune);
 			}
 			if (runes.Count > 0) lines.Add (runes);
 		}

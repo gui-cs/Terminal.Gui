@@ -315,7 +315,7 @@ internal class CursesDriver : ConsoleDriver {
 				}
 				Curses.attrset (Contents [row, col].Attribute.GetValueOrDefault ().PlatformColor);
 
-				var rune = Contents [row, col].Runes [0];
+				var rune = Contents [row, col].Rune;
 				if (rune.IsBmp) {
 					// BUGBUG: CursesDriver doesn't render CharMap correctly for wide chars (and other Unicode) - Curses is doing something funky with glyphs that report GetColums() of 1 yet are rendered wide. E.g. 0x2064 (invisible times) is reported as 1 column but is rendered as 2. WindowsDriver & NetDriver correctly render this as 1 column, overlapping the next cell.
 					if (rune.GetColumns () < 2) {

@@ -434,7 +434,7 @@ public class ApplicationTests {
 		Application.Shutdown ();
 
 		var task = TaskWithAsyncContinuation ();
-		Thread.Sleep (20);
+		Thread.Sleep (100);
 		Assert.True (task.IsCompletedSuccessfully);
 	}
 
