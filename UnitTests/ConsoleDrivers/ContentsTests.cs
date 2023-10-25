@@ -14,14 +14,15 @@ public class ContentsTests {
 
 	public ContentsTests (ITestOutputHelper output)
 	{
+		ConsoleDriver.RunningUnitTests = true;
 		this.output = output;
 	}
 
 	[Theory]
 	[InlineData (typeof (FakeDriver))]
-	//[InlineData (typeof (NetDriver))]
-	//[InlineData (typeof (CursesDriver))]
-	//[InlineData (typeof (WindowsDriver))]
+	[InlineData (typeof (NetDriver))]
+	//[InlineData (typeof (CursesDriver))] // TODO: Uncomment when #2796 and #2615 are fixed
+	//[InlineData (typeof (WindowsDriver))] // TODO: Uncomment when #2610 is fixed
 	public void AddStr_With_Combining_Characters (Type driverType)
 	{
 		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
@@ -52,13 +53,14 @@ public class ContentsTests {
 		driver.Move (0, 0);
 		driver.AddStr (combined);
 		TestHelpers.AssertDriverContentsAre (expected, output, driver);
+		driver.End ();
 	}
 
 	[Theory]
 	[InlineData (typeof (FakeDriver))]
-	//[InlineData (typeof (NetDriver))]
-	//[InlineData (typeof (CursesDriver))]
-	//[InlineData (typeof (WindowsDriver))]
+	[InlineData (typeof (NetDriver))]
+	[InlineData (typeof (CursesDriver))]
+	[InlineData (typeof (WindowsDriver))]
 	public void Move_Bad_Coordinates (Type driverType)
 	{
 		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
@@ -85,6 +87,7 @@ public class ContentsTests {
 		driver.Move (500, 500);
 		Assert.Equal (500, driver.Col);
 		Assert.Equal (500, driver.Row);
+		driver.End ();
 	}
 
 	// TODO: Add these unit tests

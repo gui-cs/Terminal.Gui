@@ -15,8 +15,8 @@ namespace Terminal.Gui;
 /// </summary>
 internal class CursesDriver : ConsoleDriver {
 
-	public override int Cols => Curses.Cols;
-	public override int Rows => Curses.Lines;
+	//public override int Cols => Curses.Cols;
+	//public override int Rows => Curses.Lines;
 
 	CursorVisibility? _initialCursorVisibility = null;
 	CursorVisibility? _currentCursorVisibility = null;
