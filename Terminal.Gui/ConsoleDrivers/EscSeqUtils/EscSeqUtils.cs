@@ -173,7 +173,7 @@ public static class EscSeqUtils {
 	/// <param name="x"></param>
 	/// <param name="y"></param>
 	/// <returns></returns>
-	public static string CSI_SetCursorPosition (int x, int y) => $"{CSI}{y};{x}H";
+	public static string CSI_SetCursorPosition (int y, int x) => $"{CSI}{y};{x}H";
 
 
 	//ESC [ <y> ; <x> f - HVP     Horizontal Vertical Position* Cursor moves to<x>; <y> coordinate within the viewport, where <x> is the column of the<y> line
