@@ -91,24 +91,24 @@ namespace Terminal.Gui.DriverTests {
 
 			driver.Move (0, 0);
 			driver.AddRune ('x');
-			Assert.Equal ((Rune)'x', driver.Contents [0, 0].Runes [0]);
+			Assert.Equal ((Rune)'x', driver.Contents [0, 0].Rune);
 
 			driver.Move (5, 5);
 			driver.AddRune ('x');
-			Assert.Equal ((Rune)'x', driver.Contents [5, 5].Runes [0]);
+			Assert.Equal ((Rune)'x', driver.Contents [5, 5].Rune);
 
 			// Clear the contents
 			driver.FillRect (new Rect (0, 0, driver.Rows, driver.Cols), ' ');
-			Assert.Equal ((Rune)' ', driver.Contents [0, 0].Runes [0]);
+			Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
 
 			// Setup the region with a single rectangle, fill screen with 'x'
 			driver.Clip = new Rect (5, 5, 5, 5);
 			driver.FillRect (new Rect (0, 0, driver.Rows, driver.Cols), 'x');
-			Assert.Equal ((Rune)' ', driver.Contents [0, 0].Runes [0]);
-			Assert.Equal ((Rune)' ', driver.Contents [4, 9].Runes [0]);
-			Assert.Equal ((Rune)'x', driver.Contents [5, 5].Runes [0]);
-			Assert.Equal ((Rune)'x', driver.Contents [9, 9].Runes [0]);
-			Assert.Equal ((Rune)' ', driver.Contents [10, 10].Runes [0]);
+			Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
+			Assert.Equal ((Rune)' ', driver.Contents [4, 9].Rune);
+			Assert.Equal ((Rune)'x', driver.Contents [5, 5].Rune);
+			Assert.Equal ((Rune)'x', driver.Contents [9, 9].Rune);
+			Assert.Equal ((Rune)' ', driver.Contents [10, 10].Rune);
 
 			Application.Shutdown ();
 		}

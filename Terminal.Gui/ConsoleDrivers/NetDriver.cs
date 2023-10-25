@@ -759,8 +759,8 @@ internal class NetDriver : ConsoleDriver {
 		Attribute redrawAttr = new Attribute ();
 		var lastCol = -1;
 
-		//GetCursorVisibility (out CursorVisibility savedVisibitity);
-		//SetCursorVisibility (CursorVisibility.Invisible); 
+		var savedVisibitity = _cachedCursorVisibility;
+		SetCursorVisibility (CursorVisibility.Invisible);
 
 		for (var row = top; row < rows; row++) {
 			if (Console.WindowHeight < 1) {
@@ -808,11 +808,11 @@ internal class NetDriver : ConsoleDriver {
 
 					}
 					outputWidth++;
-					var rune = (Rune)Contents [row, col].Runes [0];
+					var rune = (Rune)Contents [row, col].Rune;
 					output.Append (rune.ToString ());
 					if (rune.IsSurrogatePair () && rune.GetColumns () < 2) {
 						WriteToConsole (output, ref lastCol, row, ref outputWidth);
-						Console.CursorLeft--;
+						SetCursorPosition (col - 1, row);
 					}
 					Contents [row, col].IsDirty = false;
 				}
@@ -824,7 +824,7 @@ internal class NetDriver : ConsoleDriver {
 		}
 		SetCursorPosition (0, 0);
 
-		//SetCursorVisibility (savedVisibitity);
+		_cachedCursorVisibility = savedVisibitity;
 
 		void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
 		{
@@ -888,20 +888,20 @@ internal class NetDriver : ConsoleDriver {
 	#region Cursor Handling
 	bool SetCursorPosition (int col, int row)
 	{
-		//if (IsWinPlatform) {
-		// Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.
-		try {
-			Console.SetCursorPosition (col, row);
+		if (IsWinPlatform) {
+			// Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.
+			try {
+				Console.SetCursorPosition (col, row);
+				return true;
+			} catch (Exception) {
+				return false;
+			}
+		} else {
+			// + 1 is needed because non-Windows is based on 1 instead of 0 and
+			// Console.CursorTop/CursorLeft isn't reliable.
+			Console.Out.Write (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
 			return true;
-		} catch (Exception) {
-			return false;
 		}
-		// BUGBUG: This breaks -usc on WSL; not sure why. But commenting out fixes.
-		//} else {
-		//	// TODO: Explain why + 1 is needed (and why we do this for non-Windows).
-		//	Console.Out.Write (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
-		//	return true;
-		//}
 	}
 
 	CursorVisibility? _cachedCursorVisibility;
@@ -926,7 +926,7 @@ internal class NetDriver : ConsoleDriver {
 	{
 		_cachedCursorVisibility = visibility;
 		var isVisible = RunningUnitTests ? visibility == CursorVisibility.Default : Console.CursorVisible = visibility == CursorVisibility.Default;
-		//Console.Out.Write (isVisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
+		Console.Out.Write (isVisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
 		return isVisible;
 	}
 

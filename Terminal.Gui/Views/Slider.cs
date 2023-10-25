@@ -656,12 +656,12 @@ public class Slider<T> : View {
 	{
 		switch (_config._sliderOrientation) {
 		case Orientation.Horizontal:
-			_style.SpaceChar = new Cell () { Runes = { CM.Glyphs.HLine } }; // '─'
-			_style.OptionChar = new Cell () { Runes = { CM.Glyphs.BlackCircle } }; // '┼●🗹□⏹'
+			_style.SpaceChar = new Cell () { Rune = CM.Glyphs.HLine }; // '─'
+			_style.OptionChar = new Cell () { Rune = CM.Glyphs.BlackCircle }; // '┼●🗹□⏹'
 			break;
 		case Orientation.Vertical:
-			_style.SpaceChar = new Cell () { Runes = { CM.Glyphs.VLine } };
-			_style.OptionChar = new Cell () { Runes = { CM.Glyphs.BlackCircle } };
+			_style.SpaceChar = new Cell () { Rune = CM.Glyphs.VLine };
+			_style.OptionChar = new Cell () { Rune = CM.Glyphs.BlackCircle };
 			break;
 		}
 
@@ -685,12 +685,12 @@ public class Slider<T> : View {
 		*/
 
 		_config._legendsOrientation = _config._sliderOrientation;
-		_style.EmptyChar = new Cell () { Runes = { new Rune (' ') } };
-		_style.SetChar = new Cell () { Runes = { CM.Glyphs.ContinuousMeterSegment } }; // ■
-		_style.RangeChar = new Cell () { Runes = { CM.Glyphs.Stipple } }; // ░ ▒ ▓   // Medium shade not blinking on curses.
-		_style.StartRangeChar = new Cell () { Runes = { CM.Glyphs.ContinuousMeterSegment } };
-		_style.EndRangeChar = new Cell () { Runes = { CM.Glyphs.ContinuousMeterSegment } };
-		_style.DragChar = new Cell () { Runes = { CM.Glyphs.Diamond } };
+		_style.EmptyChar = new Cell () { Rune = new Rune (' ') };
+		_style.SetChar = new Cell () { Rune = CM.Glyphs.ContinuousMeterSegment }; // ■
+		_style.RangeChar = new Cell () { Rune = CM.Glyphs.Stipple }; // ░ ▒ ▓   // Medium shade not blinking on curses.
+		_style.StartRangeChar = new Cell () { Rune = CM.Glyphs.ContinuousMeterSegment };
+		_style.EndRangeChar = new Cell () { Rune = CM.Glyphs.ContinuousMeterSegment };
+		_style.DragChar = new Cell () { Rune = CM.Glyphs.Diamond };
 
 		// TODO: Support left & right (top/bottom)
 		// First = '├',
@@ -972,7 +972,7 @@ public class Slider<T> : View {
 		}
 
 		if (_dragPosition.HasValue && _moveRenderPosition.HasValue) {
-			AddRune (_moveRenderPosition.Value.X, _moveRenderPosition.Value.Y, _style.DragChar.Runes [0]);
+			AddRune (_moveRenderPosition.Value.X, _moveRenderPosition.Value.Y, _style.DragChar.Rune);
 		}
 	}
 
@@ -1033,7 +1033,7 @@ public class Slider<T> : View {
 		if (_config._showSpacing && _config._startSpacing > 0) {
 
 			Driver.SetAttribute (isSet && _config._type == SliderType.LeftRange ? _style.RangeChar.Attribute ?? normalScheme : _style.SpaceChar.Attribute ?? normalScheme);
-			var rune = isSet && _config._type == SliderType.LeftRange ? _style.RangeChar.Runes [0] : _style.SpaceChar.Runes [0];
+			var rune = isSet && _config._type == SliderType.LeftRange ? _style.RangeChar.Rune : _style.SpaceChar.Rune;
 
 			for (var i = 0; i < this._config._startSpacing; i++) {
 				MoveAndAdd (x, y, rune);
@@ -1043,7 +1043,7 @@ public class Slider<T> : View {
 			Driver.SetAttribute (_style.EmptyChar.Attribute ?? normalScheme);
 			// for (int i = 0; i < this.config.StartSpacing + ((this.config.StartSpacing + this.config.EndSpacing) % 2 == 0 ? 1 : 2); i++) {
 			for (var i = 0; i < this._config._startSpacing; i++) {
-				MoveAndAdd (x, y, _style.EmptyChar.Runes [0]);
+				MoveAndAdd (x, y, _style.EmptyChar.Rune);
 				if (isVertical) y++; else x++;
 			}
 		}
@@ -1086,14 +1086,14 @@ public class Slider<T> : View {
 				//		Driver.SetAttribute (ColorScheme.Focus);
 				//	}
 				//}
-				Rune rune = drawRange ? _style.RangeChar.Runes [0] : _style.OptionChar.Runes [0];
+				Rune rune = drawRange ? _style.RangeChar.Rune : _style.OptionChar.Rune;
 				if (isSet) {
 					if (_setOptions [0] == i) {
-						rune = _style.StartRangeChar.Runes [0];
+						rune = _style.StartRangeChar.Rune;
 					} else if (_setOptions.Count > 1 && _setOptions [1] == i) {
-						rune = _style.EndRangeChar.Runes [0];
+						rune = _style.EndRangeChar.Rune;
 					} else if (_setOptions.Contains (i)) {
-						rune = _style.SetChar.Runes [0];
+						rune = _style.SetChar.Rune;
 					}
 				}
 				MoveAndAdd (x, y, rune);
@@ -1103,7 +1103,7 @@ public class Slider<T> : View {
 				if (_config._showSpacing || i < _options.Count - 1) { // Skip if is the Last Spacing.
 					Driver.SetAttribute (drawRange && isSet ? _style.RangeChar.Attribute ?? setScheme : _style.SpaceChar.Attribute ?? normalScheme);
 					for (var s = 0; s < _config._innerSpacing; s++) {
-						MoveAndAdd (x, y, drawRange && isSet ? _style.RangeChar.Runes [0] : _style.SpaceChar.Runes [0]);
+						MoveAndAdd (x, y, drawRange && isSet ? _style.RangeChar.Rune : _style.SpaceChar.Rune);
 						if (isVertical) y++; else x++;
 					}
 				}
@@ -1114,7 +1114,7 @@ public class Slider<T> : View {
 		// Right Spacing
 		if (_config._showSpacing) {
 			Driver.SetAttribute (isSet && _config._type == SliderType.RightRange ? _style.RangeChar.Attribute ?? normalScheme : _style.SpaceChar.Attribute ?? normalScheme);
-			var rune = isSet && _config._type == SliderType.RightRange ? _style.RangeChar.Runes [0] : _style.SpaceChar.Runes [0];
+			var rune = isSet && _config._type == SliderType.RightRange ? _style.RangeChar.Rune : _style.SpaceChar.Rune;
 			for (var i = 0; i < remaining; i++) {
 				MoveAndAdd (x, y, rune);
 				if (isVertical) y++; else x++;
@@ -1122,7 +1122,7 @@ public class Slider<T> : View {
 		} else {
 			Driver.SetAttribute (_style.EmptyChar.Attribute ?? normalScheme);
 			for (var i = 0; i < remaining; i++) {
-				MoveAndAdd (x, y, _style.EmptyChar.Runes [0]);
+				MoveAndAdd (x, y, _style.EmptyChar.Rune);
 				if (isVertical) y++; else x++;
 			}
 		}

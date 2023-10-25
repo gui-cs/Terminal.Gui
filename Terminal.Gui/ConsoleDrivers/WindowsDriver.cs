@@ -1546,12 +1546,12 @@ internal class WindowsDriver : ConsoleDriver {
 					continue;
 				}
 				_outputBuffer [position].Empty = false;
-				if (Contents [row, col].Runes [0].IsBmp) {
-					_outputBuffer [position].Char = (char)Contents [row, col].Runes [0].Value;
+				if (Contents [row, col].Rune.IsBmp) {
+					_outputBuffer [position].Char = (char)Contents [row, col].Rune.Value;
 				} else {
 					//_outputBuffer [position].Empty = true;
 					_outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
-					if (Contents [row, col].Runes [0].GetColumns () > 1 && col + 1 < Cols) {
+					if (Contents [row, col].Rune.GetColumns () > 1 && col + 1 < Cols) {
 						// TODO: This is a hack to deal with non-BMP and wide characters.
 						col++;
 						position = row * Cols + col;
