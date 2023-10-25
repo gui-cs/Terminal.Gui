@@ -15,7 +15,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 
 namespace Terminal.Gui {
@@ -255,7 +255,7 @@ namespace Terminal.Gui {
 			}
 			return m.GetBaseDefinition ().DeclaringType != m.DeclaringType;
 		}
-		
+
 		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
@@ -291,6 +291,10 @@ namespace Terminal.Gui {
 			GC.SuppressFinalize (this);
 #if DEBUG_IDISPOSABLE
 			WasDisposed = true;
+
+			foreach (var instance in Instances.Where (x => x.WasDisposed).ToList ()) {
+				Instances.Remove (instance);
+			}
 #endif
 		}
 	}

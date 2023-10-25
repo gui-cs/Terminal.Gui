@@ -2934,6 +2934,10 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		protected override void Dispose (bool disposing)
 		{
+			height = null;
+			width = null;
+			x = null;
+			y = null;
 			for (var i = InternalSubviews.Count - 1; i >= 0; i--) {
 				var subview = InternalSubviews [i];
 				Remove (subview);

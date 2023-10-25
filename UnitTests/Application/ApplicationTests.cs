@@ -91,8 +91,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Application.Shutdown ();
 
 #if DEBUG_IDISPOSABLE
-			Assert.Single (Responder.Instances);
-			Assert.True (Responder.Instances [0].WasDisposed);
+			Assert.Empty (Responder.Instances);
 #endif
 		}
 
