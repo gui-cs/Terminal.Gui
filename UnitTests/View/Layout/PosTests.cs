@@ -540,7 +540,7 @@ namespace Terminal.Gui.ViewTests {
 			(Window win, Button button) setup ()
 			{
 				Application.Init (new FakeDriver ());
-				Application.Iteration = () => {
+				Application.Iteration += (s, a) => {
 					Application.RequestStop ();
 				};
 				var win = new Window () {
@@ -708,7 +708,7 @@ namespace Terminal.Gui.ViewTests {
 				Assert.Throws<ArgumentException> (() => v.Y = 2);
 			};
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 
 			Application.Run ();
 			Application.Shutdown ();
@@ -729,7 +729,7 @@ namespace Terminal.Gui.ViewTests {
 				Assert.Equal (2, w.Y = 2);
 			};
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 
 			Application.Run ();
 			Application.Shutdown ();
@@ -761,7 +761,7 @@ namespace Terminal.Gui.ViewTests {
 				Assert.Equal (2, v.Y = 2);
 			};
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 
 			Application.Run ();
 			Application.Shutdown ();
@@ -809,7 +809,7 @@ namespace Terminal.Gui.ViewTests {
 		//		Assert.Equal (6, v2.Frame.Y);
 		//	};
 
-		//	Application.Iteration += () => Application.RequestStop ();
+		//	Application.Iteration += (s, a) => Application.RequestStop ();
 
 		//	Application.Run ();
 		//	Application.Shutdown ();
@@ -875,7 +875,7 @@ namespace Terminal.Gui.ViewTests {
 				}
 			};
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				while (count < 20) field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
 
 				Application.RequestStop ();
@@ -933,7 +933,7 @@ namespace Terminal.Gui.ViewTests {
 				}
 			};
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				while (count > 0) field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
 
 				Application.RequestStop ();

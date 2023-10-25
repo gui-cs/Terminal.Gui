@@ -1677,7 +1677,7 @@ Edit
 			var top = Application.Top;
 			top.Add (win);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				((FakeDriver)Application.Driver).SetBufferSize (40, 8);
 
 				TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -1907,7 +1907,7 @@ Edit
 		{
 			((FakeDriver)Application.Driver).SetBufferSize (40, 8);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				var top = Application.Top;
 
 				TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -2376,7 +2376,7 @@ wo
 			Assert.Equal ("File", menu.Menus [0].Title);
 			menu.OpenMenu ();
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
 │                                      │
@@ -2394,17 +2394,14 @@ wo
 │                                      │
 └──────────────────────────────────────┘", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 20,
-					Y = 4,
-					Flags = MouseFlags.Button1Clicked
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 20,
+				Y = 4,
+				Flags = MouseFlags.Button1Clicked
+			}));
 
 			firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			Assert.Equal (items [0], menu.Menus [0].Title);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -2426,24 +2423,21 @@ wo
 			for (int i = 1; i < items.Count; i++) {
 				menu.OpenMenu ();
 
-				ReflectionTools.InvokePrivate (
-					typeof (Application),
-					"ProcessMouseEvent",
-					new MouseEvent () {
-						X = 20,
-						Y = 4 + i,
-						Flags = MouseFlags.Button1Clicked
-					});
+				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+					X = 20,
+					Y = 4 + i,
+					Flags = MouseFlags.Button1Clicked
+				}));
 
 				firstIteration = false;
-				Application.RunMainLoopIteration (ref rs, ref firstIteration);
+				Application.RunIteration (ref rs, ref firstIteration);
 				Assert.Equal (items [i], menu.Menus [0].Title);
 			}
 
 			((FakeDriver)Application.Driver).SetBufferSize (20, 15);
 			menu.OpenMenu ();
 			firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
 │                  │
@@ -2505,7 +2499,7 @@ wo
 			Assert.Equal ("File", menu.Menus [0].Title);
 			menu.OpenMenu ();
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
   ┌─────────────┐                       
   │  File       │                       
@@ -2518,17 +2512,14 @@ wo
     │ Delete     Delete a file  Ctrl+A │
     └──────────────────────────────────┘", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 20,
-					Y = 5,
-					Flags = MouseFlags.Button1Clicked
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 20,
+				Y = 5,
+				Flags = MouseFlags.Button1Clicked
+			}));
 
 			firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			Assert.Equal (items [0], menu.Menus [0].Title);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
   ┌─────────────┐
@@ -2539,24 +2530,21 @@ wo
 			for (int i = 1; i < items.Count; i++) {
 				menu.OpenMenu ();
 
-				ReflectionTools.InvokePrivate (
-					typeof (Application),
-					"ProcessMouseEvent",
-					new MouseEvent () {
-						X = 20,
-						Y = 5 + i,
-						Flags = MouseFlags.Button1Clicked
-					});
+				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+					X = 20,
+					Y = 5 + i,
+					Flags = MouseFlags.Button1Clicked
+				}));
 
 				firstIteration = false;
-				Application.RunMainLoopIteration (ref rs, ref firstIteration);
+				Application.RunIteration (ref rs, ref firstIteration);
 				Assert.Equal (items [i], menu.Menus [0].Title);
 			}
 
 			((FakeDriver)Application.Driver).SetBufferSize (20, 15);
 			menu.OpenMenu ();
 			firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
   ┌─────────────┐   
   │  Delete     │   
@@ -2585,7 +2573,7 @@ wo
 
 			menu.OpenMenu ();
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
  File                         
 ┌────────────────────────────┐
@@ -2594,7 +2582,7 @@ wo
 
 			((FakeDriver)Application.Driver).SetBufferSize (20, 15);
 			firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
  File", output);
 

@@ -62,10 +62,13 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 	{
 		Debug.WriteLine ($"Before: {methodUnderTest.Name}");
 		if (AutoInit) {
-#if DEBUG_IDISPOSABLE && FORCE_RESPONDER_DISPOSE
+#if DEBUG_IDISPOSABLE
 			// Clear out any lingering Responder instances from previous tests
-			Responder.Instances.Clear ();
-			Assert.Equal (0, Responder.Instances.Count);
+			if (Responder.Instances.Count == 0) {
+				Assert.Empty (Responder.Instances);
+			} else {
+				Responder.Instances.Clear ();
+			}
 #endif
 			Application.Init ((ConsoleDriver)Activator.CreateInstance (_driverType));
 		}
@@ -76,8 +79,12 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 		Debug.WriteLine ($"After: {methodUnderTest.Name}");
 		if (AutoInit) {
 			Application.Shutdown ();
-#if DEBUG_IDISPOSABLE && FORCE_RESPONDER_DISPOSE
-			Assert.Equal (0, Responder.Instances.Count);
+#if DEBUG_IDISPOSABLE
+			if (Responder.Instances.Count == 0) {
+				Assert.Empty (Responder.Instances);
+			} else {
+				Responder.Instances.Clear ();
+			}
 #endif
 		}
 	}
@@ -104,9 +111,7 @@ public class TestRespondersDisposed : Xunit.Sdk.BeforeAfterTestAttribute {
 	{
 		Debug.WriteLine ($"After: {methodUnderTest.Name}");
 #if DEBUG_IDISPOSABLE
-#pragma warning disable xUnit2013 // Do not use equality check to check for collection size.
-		Assert.Equal (0, Responder.Instances.Count);
-#pragma warning restore xUnit2013 // Do not use equality check to check for collection size.
+		Assert.Empty (Responder.Instances);
 #endif
 	}
 }
@@ -154,7 +159,7 @@ partial class TestHelpers {
 		for (int r = 0; r < driver.Rows; r++) {
 			for (int c = 0; c < driver.Cols; c++) {
 				// TODO: Remove hard-coded [0] once combining pairs is supported
-				Rune rune = contents [r, c].Runes [0];
+				Rune rune = contents [r, c].Rune;
 				if (rune.DecodeSurrogatePair (out char [] spair)) {
 					sb.Append (spair);
 				} else {
@@ -209,7 +214,7 @@ partial class TestHelpers {
 			var runes = new List<Rune> ();
 			for (var c = 0; c < driver.Cols; c++) {
 				// TODO: Remove hard-coded [0] once combining pairs is supported
-				Rune rune = contents [r, c].Runes [0];
+				Rune rune = contents [r, c].Rune;
 				if (rune != (Rune)' ') {
 					if (x == -1) {
 						x = c;

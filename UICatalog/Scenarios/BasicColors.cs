@@ -86,11 +86,10 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (viewBackground);
 
-			// BUGBUG: Views should not use RootMouseEvent; use Responder instead.
-			Application.RootMouseEvent = (e) => {
-				if (e.View != null) {
-					var fore = e.View.GetNormalColor ().Foreground;
-					var back = e.View.GetNormalColor ().Background;
+			Application.MouseEvent += (s, e) => {
+				if (e.MouseEvent.View != null) {
+					var fore = e.MouseEvent.View.GetNormalColor ().Foreground;
+					var back = e.MouseEvent.View.GetNormalColor ().Background;
 					lblForeground.Text = $"#{fore.R:X2}{fore.G:X2}{fore.B:X2} {fore.ColorName} ";
 					viewForeground.ColorScheme.Normal = new Attribute (fore, fore);
 					lblBackground.Text = $"#{back.R:X2}{back.G:X2}{back.B:X2} {back.ColorName} ";

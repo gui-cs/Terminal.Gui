@@ -163,7 +163,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when a character key is pressed and occurs after the key up event.
 		/// </summary>
-		public event EventHandler<KeyEventEventArgs> KeyPress;
+		public event EventHandler<KeyEventEventArgs> KeyPressed;
 
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEvent keyEvent)
@@ -173,11 +173,11 @@ namespace Terminal.Gui {
 			}
 
 			var args = new KeyEventEventArgs (keyEvent);
-			KeyPress?.Invoke (this, args);
+			KeyPressed?.Invoke (this, args);
 			if (args.Handled)
 				return true;
 			if (Focused?.Enabled == true) {
-				Focused?.KeyPress?.Invoke (this, args);
+				Focused?.KeyPressed?.Invoke (this, args);
 				if (args.Handled)
 					return true;
 			}
@@ -348,7 +348,7 @@ namespace Terminal.Gui {
 
 			var args = new KeyEventEventArgs (keyEvent);
 			if (MostFocused?.Enabled == true) {
-				MostFocused?.KeyPress?.Invoke (this, args);
+				MostFocused?.KeyPressed?.Invoke (this, args);
 				if (args.Handled)
 					return true;
 			}
@@ -371,11 +371,11 @@ namespace Terminal.Gui {
 			}
 
 			var args = new KeyEventEventArgs (keyEvent);
-			KeyPress?.Invoke (this, args);
+			KeyPressed?.Invoke (this, args);
 			if (args.Handled)
 				return true;
 			if (MostFocused?.Enabled == true) {
-				MostFocused?.KeyPress?.Invoke (this, args);
+				MostFocused?.KeyPressed?.Invoke (this, args);
 				if (args.Handled)
 					return true;
 			}

@@ -47,7 +47,7 @@ namespace Terminal.Gui.DriverTests {
 		public void SupportsTrueColor_Defaults (Type driverType, bool expectedSetting)
 		{
 			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-			driver.Init (() => { });
+			driver.Init ();
 
 			Assert.Equal (expectedSetting, driver.SupportsTrueColor);
 
@@ -65,7 +65,7 @@ namespace Terminal.Gui.DriverTests {
 		public void Force16Colors_Sets (Type driverType)
 		{
 			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-			driver.Init (() => { });
+			driver.Init ();
 
 			driver.Force16Colors = true;
 			Assert.True (driver.Force16Colors);

@@ -15,9 +15,11 @@ namespace Terminal.Gui {
 	/// can watch file descriptors using the AddWatch methods.
 	/// </remarks>
 	internal class UnixMainLoop : IMainLoopDriver {
+		private CursesDriver _cursesDriver;
 		public UnixMainLoop (ConsoleDriver consoleDriver = null)
 		{
 			// UnixDriver doesn't use the consoleDriver parameter, but the WindowsDriver does.
+			_cursesDriver = (CursesDriver)Application.Driver;
 		}
 
 		public const int KEY_RESIZE = unchecked((int)0xffffffffffffffff);
@@ -86,8 +88,6 @@ namespace Terminal.Gui {
 		MainLoop _mainLoop;
 		bool _winChanged;
 
-		internal Action WinChanged;
-
 		void IMainLoopDriver.Wakeup ()
 		{
 			if (!ConsoleDriver.RunningUnitTests) {
@@ -119,7 +119,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		///	The token parameter is the value returned from AddWatch
 		/// </remarks>
-		public void RemoveWatch (object token)
+		internal void RemoveWatch (object token)
 		{
 			if (!ConsoleDriver.RunningUnitTests) {
 				if (token is not Watch watch) {
@@ -140,7 +140,7 @@ namespace Terminal.Gui {
 		///  The return value is a token that represents this watch, you can
 		///  use this token to remove the watch by calling RemoveWatch.
 		/// </remarks>
-		public object AddWatch (int fileDescriptor, Condition condition, Func<MainLoop, bool> callback)
+		internal object AddWatch (int fileDescriptor, Condition condition, Func<MainLoop, bool> callback)
 		{
 			if (callback == null) {
 				throw new ArgumentNullException (nameof (callback));
@@ -187,7 +187,9 @@ namespace Terminal.Gui {
 		{
 			if (_winChanged) {
 				_winChanged = false;
-				WinChanged?.Invoke ();
+				_cursesDriver.ProcessInput ();
+				// This is needed on the mac. See https://github.com/gui-cs/Terminal.Gui/pull/2922#discussion_r1365992426
+				_cursesDriver.ProcessWinChange ();
 			}
 			if (_pollMap == null) return;
 			foreach (var p in _pollMap) {

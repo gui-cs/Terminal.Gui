@@ -604,7 +604,7 @@ class CharMap : ScrollView {
 				decResponse = await client.GetCodepointDec ((int)SelectedCodePoint);
 			} catch (HttpRequestException e) {
 				(s as Dialog).Text = e.Message;
-				Application.MainLoop.Invoke (() => {
+				Application.Invoke (() => {
 					spinner.Visible = false;
 					errorLabel.Text = e.Message;
 					errorLabel.ColorScheme = Colors.ColorSchemes ["Error"];

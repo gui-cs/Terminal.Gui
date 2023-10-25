@@ -298,7 +298,7 @@ namespace Terminal.Gui.ViewTests {
 				Assert.Equal (2, v.Height);
 			};
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 
 			Application.Run ();
 		}
@@ -533,7 +533,7 @@ namespace Terminal.Gui.ViewTests {
 				Assert.Equal (38, v6.Frame.Height); // 198-7*20=18
 			};
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 
 			Application.Run ();
 		}
@@ -702,7 +702,7 @@ namespace Terminal.Gui.ViewTests {
 				}
 			};
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				while (count < 20) field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
 
 				Application.RequestStop ();
@@ -1075,7 +1075,7 @@ namespace Terminal.Gui.ViewTests {
 				}
 			};
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				while (count < 21) {
 					field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
 					if (count == 20) {
@@ -1137,7 +1137,7 @@ namespace Terminal.Gui.ViewTests {
 				}
 			};
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				while (count > 0) field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
 
 				Application.RequestStop ();
@@ -1214,7 +1214,7 @@ namespace Terminal.Gui.ViewTests {
 				}
 			};
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				while (count > -1) {
 					field.OnKeyDown (new KeyEvent (Key.Enter, new KeyModifiers ()));
 					if (count == 0) {

@@ -32,7 +32,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (canvas);
 			Win.Add (tools);
 
-			Win.KeyPress += (s,e) => { e.Handled = canvas.ProcessKey (e.KeyEvent); };
+			Win.KeyPressed += (s,e) => { e.Handled = canvas.ProcessKey (e.KeyEvent); };
 		}
 
 		class ToolsView : Window {
@@ -143,7 +143,7 @@ namespace UICatalog.Scenarios {
 					foreach (var c in canvas.GetCellMap ()) {
 						Driver.SetAttribute (c.Value.Attribute ?? ColorScheme.Normal);
 						// TODO: #2616 - Support combining sequences that don't normalize
-						this.AddRune (c.Key.X, c.Key.Y, c.Value.Runes [0]);
+						this.AddRune (c.Key.X, c.Key.Y, c.Value.Rune);
 					}
 				}
 			}

@@ -556,7 +556,7 @@ namespace Terminal.Gui {
 			var cell = new Cell ();
 			var rune = GetRuneForIntersects (driver, intersects);
 			if (rune.HasValue) {
-				cell.Runes.Add (rune.Value);
+				cell.Rune = rune.Value;
 			}
 			cell.Attribute = GetAttributeForIntersects (intersects);
 			return cell;

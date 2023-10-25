@@ -38,7 +38,7 @@ namespace UICatalog.Scenarios {
 					if (state.AdvanceState ()) {
 
 						// When updating from a Thread/Task always use Invoke
-						Application.MainLoop?.Invoke (() => {
+						Application.Invoke (() => {
 							snakeView.SetNeedsDisplay ();
 						});
 					}

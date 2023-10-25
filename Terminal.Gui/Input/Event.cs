@@ -766,12 +766,14 @@ namespace Terminal.Gui {
 		AllEvents = unchecked((int)0x7ffffff),
 	}
 
+	// TODO: Merge MouseEvent and MouseEventEventArgs into a single class.
+
 	/// <summary>
 	/// Low-level construct that conveys the details of mouse events, such
 	/// as coordinates and button state, from ConsoleDrivers up to <see cref="Application"/> and
 	/// Views.
 	/// </summary>
-	/// <remarks>The <see cref="Application"/> class includes the <see cref="Application.RootMouseEvent"/>
+	/// <remarks>The <see cref="Application"/> class includes the <see cref="Application.MouseEvent"/>
 	/// Action which takes a MouseEvent argument.</remarks>
 	public class MouseEvent {
 		/// <summary>

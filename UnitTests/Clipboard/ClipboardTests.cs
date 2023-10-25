@@ -36,7 +36,7 @@ namespace Terminal.Gui.ClipboardTests {
 			var clipText = "The Contents_Gets_Sets unit test pasted this to the OS clipboard.";
 			Clipboard.Contents = clipText;
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 			Application.Run ();
 
 			Assert.Equal (clipText, Clipboard.Contents);
@@ -53,7 +53,7 @@ namespace Terminal.Gui.ClipboardTests {
 			var clipText = "The Contents_Gets_Sets unit test pasted this to the OS clipboard.";
 			Clipboard.Contents = clipText;
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 			Application.Run ();
 
 			Assert.Equal (clipText, Clipboard.Contents);
@@ -71,7 +71,7 @@ namespace Terminal.Gui.ClipboardTests {
 			var clipText = "The Contents_Gets_Sets unit test pasted this to the OS clipboard.";
 			Clipboard.Contents = clipText;
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 			Application.Run ();
 
 			Assert.Equal (clipText, Clipboard.Contents);
@@ -89,7 +89,7 @@ namespace Terminal.Gui.ClipboardTests {
 			var clipText = "The Contents_Gets_Sets unit test pasted this to the OS clipboard.";
 			Clipboard.Contents = clipText;
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 			Application.Run ();
 
 			Assert.Equal (clipText, Clipboard.Contents);
@@ -108,7 +108,7 @@ namespace Terminal.Gui.ClipboardTests {
 			var clipText = "The TryGetClipboardData_Gets_From_OS_Clipboard unit test pasted this to the OS clipboard.";
 			Clipboard.Contents = clipText;
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 
 			Application.Run ();
 
@@ -128,7 +128,7 @@ namespace Terminal.Gui.ClipboardTests {
 			if (Clipboard.IsSupported) Assert.True (Clipboard.TrySetClipboardData (clipText));
 			else Assert.False (Clipboard.TrySetClipboardData (clipText));
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 
 			Application.Run ();
 
@@ -150,7 +150,7 @@ namespace Terminal.Gui.ClipboardTests {
 			var failed = false;
 			var getClipText = "";
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				int exitCode = 0;
 				string result = "";
 				output.WriteLine ($"Pasting to OS clipboard: {clipText}...");
@@ -221,7 +221,7 @@ namespace Terminal.Gui.ClipboardTests {
 			var clipReadText = "";
 			var failed = false;
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				Clipboard.Contents = clipText;
 
 				int exitCode = 0;

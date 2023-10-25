@@ -22,5 +22,10 @@ namespace Terminal.Gui {
 		/// resolved.
 		/// </summary>
 		public Size Size { get; }
+
+		/// <summary>
+		/// Set to <see langword="true"/> to cause the resize to be cancelled, if appropriate.
+		/// </summary>
+		public bool Cancel { get; set; }
 	}
 }

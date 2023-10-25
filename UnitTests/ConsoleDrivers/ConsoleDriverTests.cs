@@ -27,7 +27,7 @@ namespace Terminal.Gui.DriverTests {
 		{
 			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
-			driver.Init (() => { });
+			driver.Init ();
 
 			Assert.Equal (80, Console.BufferWidth);
 			Assert.Equal (25, Console.BufferHeight);
@@ -50,7 +50,7 @@ namespace Terminal.Gui.DriverTests {
 		{
 			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
-			driver.Init (() => { });
+			driver.Init ();
 
 			Console.ForegroundColor = ConsoleColor.Red;
 			Assert.Equal (ConsoleColor.Red, Console.ForegroundColor);
@@ -81,12 +81,12 @@ namespace Terminal.Gui.DriverTests {
 			var count = 0;
 			var wasKeyPressed = false;
 
-			view.KeyPress += (s, e) => {
+			view.KeyPressed += (s, e) => {
 				wasKeyPressed = true;
 			};
 			top.Add (view);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				count++;
 				if (count == 10) Application.RequestStop ();
 			};
@@ -120,7 +120,7 @@ namespace Terminal.Gui.DriverTests {
 			var rText = "";
 			var idx = 0;
 
-			view.KeyPress += (s, e) => {
+			view.KeyPressed += (s, e) => {
 				Assert.Equal (text [idx], (char)e.KeyEvent.Key);
 				rText += (char)e.KeyEvent.Key;
 				Assert.Equal (rText, text.Substring (0, idx + 1));
@@ -129,7 +129,7 @@ namespace Terminal.Gui.DriverTests {
 			};
 			top.Add (view);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (mKeys.Count == 0) Application.RequestStop ();
 			};
 
@@ -160,7 +160,7 @@ namespace Terminal.Gui.DriverTests {
 		//		return false;
 		//	};
 		//	output.WriteLine ($"Add timeout to simulate key presses after {quitTime}ms");
-		//	_ = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (quitTime), closeCallback);
+		//	_ = Application.AddTimeout (TimeSpan.FromMilliseconds (quitTime), closeCallback);
 
 		//	// If Top doesn't quit within abortTime * 5 (500ms), this will force it
 		//	uint abortTime = quitTime * 5;
@@ -170,7 +170,7 @@ namespace Terminal.Gui.DriverTests {
 		//		return false;
 		//	};
 		//	output.WriteLine ($"Add timeout to force quit after {abortTime}ms");
-		//	_ = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
+		//	_ = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
 
 		//	Key key = Key.Unknown;
 			
@@ -182,7 +182,7 @@ namespace Terminal.Gui.DriverTests {
 		//	};
 
 		//	int iterations = 0;
-		//	Application.Iteration += () => {
+		//	Application.Iteration += (s, a) => {
 		//		output.WriteLine ($"  iteration {++iterations}");
 
 		//		if (Console.MockKeyPresses.Count == 0) {
@@ -204,10 +204,10 @@ namespace Terminal.Gui.DriverTests {
 			var driver = (FakeDriver)Activator.CreateInstance (driverType);
 			Application.Init (driver);
 			var wasTerminalResized = false;
-			Application.TerminalResized = (e) => {
+			Application.SizeChanging += (s, e) => {
 				wasTerminalResized = true;
-				Assert.Equal (120, e.Cols);
-				Assert.Equal (40, e.Rows);
+				Assert.Equal (120, e.Size.Width);
+				Assert.Equal (40, e.Size.Height);
 			};
 
 			Assert.Equal (80, Console.BufferWidth);
@@ -238,7 +238,7 @@ namespace Terminal.Gui.DriverTests {
 
 //			System.Threading.Tasks.Task.Run (() => {
 //				System.Threading.Tasks.Task.Delay (500).Wait ();
-//				Application.MainLoop.Invoke (() => {
+//				Application.Invoke (() => {
 //					var lbl = new Label ("Hello World") { X = Pos.Center () };
 //					var dlg = new Dialog ();
 //					dlg.Add (lbl);

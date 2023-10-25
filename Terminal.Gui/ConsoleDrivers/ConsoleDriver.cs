@@ -9,7 +9,6 @@ using static Terminal.Gui.ColorScheme;
 
 namespace Terminal.Gui;
 
-
 /// <summary>
 /// Base class for Terminal.Gui ConsoleDriver implementations.
 /// </summary>
@@ -32,20 +31,31 @@ public abstract class ConsoleDriver {
 	/// </summary>
 	internal static bool RunningUnitTests { get; set; }
 
-	/// <summary>
-	/// Prepare the driver and set the key and mouse events handlers.
-	/// </summary>
-	/// <param name="mainLoop">The main loop.</param>
-	/// <param name="keyHandler">The handler for ProcessKey</param>
-	/// <param name="keyDownHandler">The handler for key down events</param>
-	/// <param name="keyUpHandler">The handler for key up events</param>
-	/// <param name="mouseHandler">The handler for mouse events</param>
-	public abstract void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler);
+	#region Setup & Teardown
 
 	/// <summary>
-	/// The handler fired when the terminal is resized.
+	/// Initializes the driver
 	/// </summary>
-	protected Action TerminalResized;
+	/// <returns>Returns an instance of <see cref="MainLoop"/> using the <see cref="IMainLoopDriver"/> for the driver.</returns>
+	internal abstract MainLoop Init ();
+
+	/// <summary>
+	/// Ends the execution of the console driver.
+	/// </summary>
+	internal abstract void End ();
+
+	#endregion
+
+	/// <summary>
+	/// The event fired when the terminal is resized.
+	/// </summary>
+	public event EventHandler<SizeChangedEventArgs> SizeChanged;
+
+	/// <summary>
+	/// Called when the terminal size changes. Fires the <see cref="SizeChanged"/> event.
+	/// </summary>
+	/// <param name="args"></param>
+	public void OnSizeChanged (SizeChangedEventArgs args) => SizeChanged?.Invoke (this, args);
 
 	/// <summary>
 	/// The number of columns visible in the terminal.
@@ -89,12 +99,6 @@ public abstract class ConsoleDriver {
 	///// </remarks>
 	///// </summary>
 	public Cell [,] Contents { get; internal set; }
-
-	/// <summary>
-	/// Initializes the driver
-	/// </summary>
-	/// <param name="terminalResized">Method to invoke when the terminal is resized.</param>
-	public abstract void Init (Action terminalResized);
 
 	/// <summary>
 	/// Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/>
@@ -166,12 +170,12 @@ public abstract class ConsoleDriver {
 				// TODO: Remove hard-coded [0] once combining pairs is supported
 
 				// Convert Runes to string and concatenate
-				string combined = Contents [Row, Col - 1].Runes [0].ToString () + rune.ToString ();
+				string combined = Contents [Row, Col - 1].Rune.ToString () + rune.ToString ();
 
 				// Normalize to Form C (Canonical Composition)
 				string normalized = combined.Normalize (NormalizationForm.FormC);
 
-				Contents [Row, Col - 1].Runes = new List<Rune> { (Rune)normalized [0] }; ;
+				Contents [Row, Col - 1].Rune = (Rune)normalized [0]; ;
 				Contents [Row, Col - 1].Attribute = CurrentAttribute;
 				Contents [Row, Col - 1].IsDirty = true;
 
@@ -182,19 +186,19 @@ public abstract class ConsoleDriver {
 
 				if (Col > 0) {
 					// Check if cell to left has a wide glyph
-					if (Contents [Row, Col - 1].Runes [0].GetColumns () > 1) {
+					if (Contents [Row, Col - 1].Rune.GetColumns () > 1) {
 						// Invalidate cell to left
-						Contents [Row, Col - 1].Runes = new List<Rune> { Rune.ReplacementChar };
+						Contents [Row, Col - 1].Rune = Rune.ReplacementChar;
 						Contents [Row, Col - 1].IsDirty = true;
 					}
 				}
 
 
 				if (runeWidth < 1) {
-					Contents [Row, Col].Runes = new List<Rune> { Rune.ReplacementChar };
+					Contents [Row, Col].Rune = Rune.ReplacementChar;
 
 				} else if (runeWidth == 1) {
-					Contents [Row, Col].Runes = new List<Rune> { rune };
+					Contents [Row, Col].Rune = rune;
 					if (Col < Clip.Right - 1) {
 						Contents [Row, Col + 1].IsDirty = true;
 					}
@@ -202,19 +206,19 @@ public abstract class ConsoleDriver {
 					if (Col == Clip.Right - 1) {
 						// We're at the right edge of the clip, so we can't display a wide character.
 						// TODO: Figure out if it is better to show a replacement character or ' '
-						Contents [Row, Col].Runes = new List<Rune> { Rune.ReplacementChar };
+						Contents [Row, Col].Rune = Rune.ReplacementChar;
 					} else {
-						Contents [Row, Col].Runes = new List<Rune> { rune };
+						Contents [Row, Col].Rune = rune;
 						if (Col < Clip.Right - 1) {
 							// Invalidate cell to right so that it doesn't get drawn
 							// TODO: Figure out if it is better to show a replacement character or ' '
-							Contents [Row, Col + 1].Runes = new List<Rune> { Rune.ReplacementChar };
+							Contents [Row, Col + 1].Rune = Rune.ReplacementChar;
 							Contents [Row, Col + 1].IsDirty = true;
 						}
 					}
 				} else {
 					// This is a non-spacing character, so we don't need to do anything
-					Contents [Row, Col].Runes = new List<Rune> { (Rune)' ' };
+					Contents [Row, Col].Rune = (Rune)' ';
 					Contents [Row, Col].IsDirty = false;
 				}
 				_dirtyLines [Row] = true;
@@ -235,7 +239,7 @@ public abstract class ConsoleDriver {
 				Contents [Row, Col].Attribute = CurrentAttribute;
 
 				// TODO: Determine if we should wipe this out (for now now)
-				//Contents [Row, Col].Runes [0] = (Rune)' ';
+				//Contents [Row, Col].Rune = (Rune)' ';
 			}
 			Col++;
 		}
@@ -342,7 +346,7 @@ public abstract class ConsoleDriver {
 				for (var row = 0; row < Rows; row++) {
 					for (var c = 0; c < Cols; c++) {
 						Contents [row, c] = new Cell () {
-							Runes = new List<Rune> { (Rune)' ' },
+							Rune = (Rune)' ',
 							Attribute = new Attribute (Color.White, Color.Black),
 							IsDirty = true
 						};
@@ -412,22 +416,13 @@ public abstract class ConsoleDriver {
 	}
 
 	/// <summary>
-	/// Make the attribute for the foreground and background colors.
-	/// </summary>
-	/// <param name="fore">Foreground.</param>
-	/// <param name="back">Background.</param>
-	/// <returns></returns>
-	public virtual Attribute MakeAttribute (Color fore, Color back)
-	{
-		return MakeColor (fore, back);
-	}
-
-	/// <summary>
 	/// Gets the current <see cref="Attribute"/>.
 	/// </summary>
 	/// <returns>The current attribute.</returns>
 	public Attribute GetAttribute () => CurrentAttribute;
-	
+
+	// TODO: This is only overridden by CursesDriver. Once CursesDriver supports 24-bit color, this virtual method can be
+	// removed (and Attribute can lose the platformColor property).
 	/// <summary>
 	/// Makes an <see cref="Attribute"/>.
 	/// </summary>
@@ -444,6 +439,64 @@ public abstract class ConsoleDriver {
 		);
 	}
 
+
+	#endregion
+
+	#region Mouse and Keyboard
+
+	/// <summary>
+	/// Event fired after a key has been pressed and released.
+	/// </summary>
+	public event EventHandler<KeyEventEventArgs> KeyPressed;
+
+	/// <summary>
+	/// Called after a key has been pressed and released. Fires the <see cref="KeyPressed"/> event.
+	/// </summary>
+	/// <param name="a"></param>
+	public void OnKeyPressed (KeyEventEventArgs a) => KeyPressed?.Invoke(this, a);
+
+	/// <summary>
+	/// Event fired when a key is released.
+	/// </summary>
+	public event EventHandler<KeyEventEventArgs> KeyUp;
+
+	/// <summary>
+	/// Called when a key is released. Fires the <see cref="KeyUp"/> event.
+	/// </summary>
+	/// <param name="a"></param>
+	public void OnKeyUp (KeyEventEventArgs a) => KeyUp?.Invoke (this, a);
+
+	/// <summary>
+	/// Event fired when a key is pressed.
+	/// </summary>
+	public event EventHandler<KeyEventEventArgs> KeyDown;
+
+	/// <summary>
+	/// Called when a key is pressed. Fires the <see cref="KeyDown"/> event.
+	/// </summary>
+	/// <param name="a"></param>
+	public void OnKeyDown (KeyEventEventArgs a) => KeyDown?.Invoke (this, a);
+	
+	/// <summary>
+	/// Event fired when a mouse event occurs.
+	/// </summary>
+	public event EventHandler<MouseEventEventArgs> MouseEvent;
+
+	/// <summary>
+	/// Called when a mouse event occurs. Fires the <see cref="MouseEvent"/> event.
+	/// </summary>
+	/// <param name="a"></param>
+	public void OnMouseEvent (MouseEventEventArgs a) => MouseEvent?.Invoke (this, a);
+
+	/// <summary>
+	/// Simulates a key press.
+	/// </summary>
+	/// <param name="keyChar">The key character.</param>
+	/// <param name="key">The key.</param>
+	/// <param name="shift">If <see langword="true"/> simulates the Shift key being pressed.</param>
+	/// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
+	/// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
+	public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
 
 	#endregion
 
@@ -479,16 +532,6 @@ public abstract class ConsoleDriver {
 	/// <remarks>This is only implemented in <see cref="CursesDriver"/>.</remarks>
 	public abstract void Suspend ();
 
-	/// <summary>
-	/// Simulates a key press.
-	/// </summary>
-	/// <param name="keyChar">The key character.</param>
-	/// <param name="key">The key.</param>
-	/// <param name="shift">If <see langword="true"/> simulates the Shift key being pressed.</param>
-	/// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
-	/// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
-	public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
-
 	// TODO: Move FillRect to ./Drawing	
 	/// <summary>
 	/// Fills the specified rectangle with the specified rune.
@@ -512,11 +555,6 @@ public abstract class ConsoleDriver {
 	/// <param name="rect"></param>
 	/// <param name="c"></param>
 	public void FillRect (Rect rect, char c) => FillRect (rect, new Rune (c));
-
-	/// <summary>
-	/// Ends the execution of the console driver.
-	/// </summary>
-	public abstract void End ();
 
 	/// <summary>
 	/// Returns the name of the driver and relevant library version information.

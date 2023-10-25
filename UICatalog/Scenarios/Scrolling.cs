@@ -291,10 +291,8 @@ namespace UICatalog.Scenarios {
 				Width = 50,
 			};
 			Win.Add (mousePos);
-
-			// BUGBUG: Views should not use RootMouseEvent; use Responder instead.
-			Application.RootMouseEvent += delegate (MouseEvent me) {
-				mousePos.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count++}";
+			Application.MouseEvent += (sender, a) => {
+				mousePos.Text = $"Mouse: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count++}";
 			};
 
 			var progress = new ProgressBar {
@@ -305,12 +303,12 @@ namespace UICatalog.Scenarios {
 			Win.Add (progress);
 
 			bool pulsing = true;
-			bool timer (MainLoop caller)
+			bool timer ()
 			{
 				progress.Pulse ();
 				return pulsing;
 			}
-			Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
+			Application.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
 
 			void Top_Unloaded (object sender, EventArgs args)
 			{

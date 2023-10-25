@@ -58,7 +58,7 @@ namespace UICatalog.Scenarios {
 
 			Point mousePos = default;
 
-			Win.KeyPress += (s, e) => {
+			Win.KeyPressed += (s, e) => {
 				if (e.KeyEvent.Key == (Key.Space | Key.CtrlMask)) {
 					ShowContextMenu (mousePos.X, mousePos.Y);
 					e.Handled = true;
@@ -72,20 +72,18 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			// BUGBUG: Views should not use RootMouseEvent; use Responder instead.
-			Application.RootMouseEvent += Application_RootMouseEvent;
+			Application.MouseEvent += ApplicationMouseEvent;
 
-			void Application_RootMouseEvent (MouseEvent me)
+			void ApplicationMouseEvent (object sender, MouseEventEventArgs a)
 			{
-				mousePos = new Point (me.X, me.Y);
+				mousePos = new Point (a.MouseEvent.X, a.MouseEvent.Y);
 			}
 
 			Win.WantMousePositionReports = true;
 
 			Application.Top.Closed += (s,e) => {
 				Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
-				// BUGBUG: Views should not use RootMouseEvent; use Responder instead.
-				Application.RootMouseEvent -= Application_RootMouseEvent;
+				Application.MouseEvent -= ApplicationMouseEvent;
 			};
 		}
 

@@ -332,7 +332,7 @@ namespace Terminal.Gui.ViewTests {
 			w.Add (v1, v2);
 			t.Add (w);
 
-			Application.Iteration = () => {
+			Application.Iteration += (s, a) => {
 				Application.Refresh ();
 				t.Running = false;
 			};
@@ -403,7 +403,7 @@ namespace Terminal.Gui.ViewTests {
 			w.Add (v1, v2);
 			t.Add (w);
 
-			Application.Iteration = () => {
+			Application.Iteration += (s, a) => {
 				var sv1 = new View () { Id = "sv1", Width = Dim.Fill (), Height = Dim.Fill () };
 
 				sv1.Initialized += (s, e) => {
@@ -466,11 +466,11 @@ namespace Terminal.Gui.ViewTests {
 				Application.Begin (Application.Top);
 
 				// should have the initial text
-				Assert.Equal ((Rune)'t', driver.Contents [0, 0].Runes [0]);
-				Assert.Equal ((Rune)'e', driver.Contents [0, 1].Runes [0]);
-				Assert.Equal ((Rune)'s', driver.Contents [0, 2].Runes [0]);
-				Assert.Equal ((Rune)'t', driver.Contents [0, 3].Runes [0]);
-				Assert.Equal ((Rune)' ', driver.Contents [0, 4].Runes [0]);
+				Assert.Equal ((Rune)'t', driver.Contents [0, 0].Rune);
+				Assert.Equal ((Rune)'e', driver.Contents [0, 1].Rune);
+				Assert.Equal ((Rune)'s', driver.Contents [0, 2].Rune);
+				Assert.Equal ((Rune)'t', driver.Contents [0, 3].Rune);
+				Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
 			} finally {
 				Application.Shutdown ();
 			}
@@ -564,7 +564,7 @@ namespace Terminal.Gui.ViewTests {
 
 			var iterations = 0;
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
 				Assert.True (button.Visible);
@@ -612,7 +612,7 @@ namespace Terminal.Gui.ViewTests {
 
 				for (int i = 0; i < Application.Driver.Rows; i++) {
 					for (int j = 0; j < Application.Driver.Cols; j++) {
-						if (contents [i, j].Runes[0] != (Rune)' ') {
+						if (contents [i, j].Rune != (Rune)' ') {
 							runesCount++;
 						}
 					}
@@ -846,7 +846,7 @@ namespace Terminal.Gui.ViewTests {
 			label.Visible = false;
 
 			bool firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────────────────────────┐
 │                            │

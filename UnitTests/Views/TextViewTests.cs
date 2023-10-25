@@ -1604,7 +1604,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			Application.Top.Add (_textView);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				var width = _textView.Bounds.Width - 1;
 				Assert.Equal (30, width + 1);
 				Assert.Equal (10, _textView.Height);
@@ -1640,7 +1640,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			Application.Top.Add (_textView);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				var width = _textView.Bounds.Width - 1;
 				Assert.Equal (30, width + 1);
 				Assert.Equal (10, _textView.Height);
@@ -1683,7 +1683,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			Application.Top.Add (_textView);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				var width = _textView.Bounds.Width - 1;
 				Assert.Equal (30, width + 1);
 				Assert.Equal (10, _textView.Height);
@@ -1726,7 +1726,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			Application.Top.Add (_textView);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				var width = _textView.Bounds.Width - 1;
 				Assert.Equal (30, width + 1);
 				Assert.Equal (10, _textView.Height);
@@ -1762,7 +1762,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			Application.Top.Add (_textView);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				var width = _textView.Bounds.Width - 1;
 				Assert.Equal (30, width + 1);
 				Assert.Equal (10, _textView.Height);
@@ -1820,7 +1820,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			Application.Top.Add (_textView);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				var width = _textView.Bounds.Width - 1;
 				Assert.Equal (30, width + 1);
 				Assert.Equal (10, _textView.Height);
@@ -6618,7 +6618,7 @@ This is the second line.
 		[Fact, AutoInitShutdown]
 		public void ContentsChanged_Event_Fires_On_Init ()
 		{
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				Application.RequestStop ();
 			};
 
@@ -6644,7 +6644,7 @@ This is the second line.
 		[Fact, AutoInitShutdown]
 		public void ContentsChanged_Event_Fires_On_Set_Text ()
 		{
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				Application.RequestStop ();
 			};
 			var eventcount = 0;
@@ -6679,7 +6679,7 @@ This is the second line.
 		[Fact, AutoInitShutdown]
 		public void ContentsChanged_Event_Fires_On_Typing ()
 		{
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				Application.RequestStop ();
 			};
 			var eventcount = 0;

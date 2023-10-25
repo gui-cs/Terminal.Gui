@@ -148,11 +148,11 @@ The [Microsoft .NET Framework Design Guidelines](https://docs.microsoft.com/en-u
 > ✔️ DO name event argument classes with the "EventArgs" suffix.
 
 1. We follow the naming guidelines provided in https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/names-of-type-members?redirectedfrom=MSDN
-2. We use the `event Action<T>` idiom.
+2. We use the `event EventHandler<T>` idiom.
 3. For public APIs, the class that can raise the event will implement:
    - A `virtual` event raising function, named as `OnEventToRaise`. Typical implementations will simply do a `EventToRaise?.Invoke(this, eventArgs)`.
-   - An `event` as in `public event Action<EventArgs> EventToRaise`
-   - Consumers of the event can do `theobject.EventToRaise += (args) => {};`
+   - An `event` as in `public event EventHandler<EventArgs> EventToRaise`
+   - Consumers of the event can do `theobject.EventToRaise += (sender, args) => {};`
    - Sub-classes of the class implementing `EventToRaise` can override `OnEventToRaise` as needed.
 4. Where possible, a subclass of `EventArgs` should be provided and the old and new state should be included. By doing this, event handler methods do not have to query the sender for state.
 

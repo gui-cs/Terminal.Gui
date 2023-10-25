@@ -3,7 +3,7 @@
     "UICatalog": {
       "commandName": "Project",
       "environmentVariables": {
-        "WT_SESSION": "1"
+        "WT_SESSION": "yes"
       }
     },
     "WSL : UICatalog": {

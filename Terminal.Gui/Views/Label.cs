@@ -65,7 +65,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///   Clicked <see cref="Action"/>, raised when the user clicks the primary mouse button within the Bounds of this <see cref="View"/>
+		///   The event fired when the user clicks the primary mouse button within the Bounds of this <see cref="View"/>
 		///   or if the user presses the action key while this view is focused. (TODO: IsDefault)
 		/// </summary>
 		/// <remarks>
