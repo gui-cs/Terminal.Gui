@@ -612,7 +612,7 @@ namespace Terminal.Gui.ViewTests {
 
 				for (int i = 0; i < Application.Driver.Rows; i++) {
 					for (int j = 0; j < Application.Driver.Cols; j++) {
-						if (contents [i, j].Runes[0] != (Rune)' ') {
+						if (contents [i, j].Rune != (Rune)' ') {
 							runesCount++;
 						}
 					}

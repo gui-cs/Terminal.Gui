@@ -14,15 +14,16 @@ public class Cell {
 	/// </summary>
 	public Rune Rune { get; set; }
 
-	/// <summary>
-	/// The combining mark for <see cref="Rune"/> that when combined makes this Cell a combining sequence that could
-	/// not be normalized to a single Rune.
-	/// If <see cref="CombiningMark"/> is <see langword="null"/>, then <see cref="CombiningMark"/> is ignored.
-	/// </summary>
-	/// <remarks>
-	/// Only valid in the rare case where <see cref="Rune"/> is a combining sequence that could not be normalized to a single Rune.
-	/// </remarks>
-	internal Rune CombiningMark { get; set; }
+	// TODO: Uncomment this once combining sequences that could not be normalized are supported.
+	///// <summary>
+	///// The combining mark for <see cref="Rune"/> that when combined makes this Cell a combining sequence that could
+	///// not be normalized to a single Rune.
+	///// If <see cref="CombiningMark"/> is <see langword="null"/>, then <see cref="CombiningMark"/> is ignored.
+	///// </summary>
+	///// <remarks>
+	///// Only valid in the rare case where <see cref="Rune"/> is a combining sequence that could not be normalized to a single Rune.
+	///// </remarks>
+	//internal Rune CombiningMark { get; set; }
 
 	/// <summary>
 	/// The attributes to use when drawing the Glyph.
