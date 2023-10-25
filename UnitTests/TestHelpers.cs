@@ -159,7 +159,7 @@ partial class TestHelpers {
 		for (int r = 0; r < driver.Rows; r++) {
 			for (int c = 0; c < driver.Cols; c++) {
 				// TODO: Remove hard-coded [0] once combining pairs is supported
-				Rune rune = contents [r, c].Runes [0];
+				Rune rune = contents [r, c].Rune;
 				if (rune.DecodeSurrogatePair (out char [] spair)) {
 					sb.Append (spair);
 				} else {
@@ -214,7 +214,7 @@ partial class TestHelpers {
 			var runes = new List<Rune> ();
 			for (var c = 0; c < driver.Cols; c++) {
 				// TODO: Remove hard-coded [0] once combining pairs is supported
-				Rune rune = contents [r, c].Runes [0];
+				Rune rune = contents [r, c].Rune;
 				if (rune != (Rune)' ') {
 					if (x == -1) {
 						x = c;

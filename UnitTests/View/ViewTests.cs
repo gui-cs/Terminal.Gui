@@ -466,11 +466,11 @@ namespace Terminal.Gui.ViewTests {
 				Application.Begin (Application.Top);
 
 				// should have the initial text
-				Assert.Equal ((Rune)'t', driver.Contents [0, 0].Runes [0]);
-				Assert.Equal ((Rune)'e', driver.Contents [0, 1].Runes [0]);
-				Assert.Equal ((Rune)'s', driver.Contents [0, 2].Runes [0]);
-				Assert.Equal ((Rune)'t', driver.Contents [0, 3].Runes [0]);
-				Assert.Equal ((Rune)' ', driver.Contents [0, 4].Runes [0]);
+				Assert.Equal ((Rune)'t', driver.Contents [0, 0].Rune);
+				Assert.Equal ((Rune)'e', driver.Contents [0, 1].Rune);
+				Assert.Equal ((Rune)'s', driver.Contents [0, 2].Rune);
+				Assert.Equal ((Rune)'t', driver.Contents [0, 3].Rune);
+				Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
 			} finally {
 				Application.Shutdown ();
 			}

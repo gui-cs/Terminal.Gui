@@ -586,7 +586,7 @@ Y
 			{
 				var text = "";
 				for (int i = 0; i < 4; i++) {
-					text += Application.Driver.Contents [0, i].Runes [0];
+					text += Application.Driver.Contents [0, i].Rune;
 				}
 				return text;
 			}
