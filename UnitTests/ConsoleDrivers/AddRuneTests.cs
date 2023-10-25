@@ -39,7 +39,6 @@ public class AddRuneTests {
 	public void AddRune_InvalidLocation_DoesNothing ()
 	{
 		var driver = new FakeDriver ();
-		Application.Init (driver);
 		driver.Init ();
 
 		driver.Move (driver.Cols, driver.Rows);
@@ -52,14 +51,12 @@ public class AddRuneTests {
 		}
 
 		driver.End ();
-		Application.Shutdown ();
 	}
 
 	[Fact]
 	public void AddRune_MovesToNextColumn ()
 	{
 		var driver = new FakeDriver ();
-		Application.Init (driver);
 		driver.Init ();
 
 		driver.AddRune ('a');
@@ -93,14 +90,12 @@ public class AddRuneTests {
 		}
 
 		driver.End ();
-		Application.Shutdown ();
 	}
 
 	[Fact]
 	public void AddRune_MovesToNextColumn_Wide ()
 	{
 		var driver = new FakeDriver ();
-		Application.Init (driver);
 		driver.Init ();
 
 		// 🍕 Slice of Pizza "\U0001F355"
@@ -140,9 +135,7 @@ public class AddRuneTests {
 		//}
 
 		driver.End ();
-		Application.Shutdown ();
 	}
-
 
 	[Fact]
 	public void AddRune_Accented_Letter_With_Three_Combining_Unicode_Chars ()
