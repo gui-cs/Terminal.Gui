@@ -147,12 +147,19 @@ partial class TestHelpers {
 	private static partial Regex LeadingWhitespaceRegEx ();
 
 #pragma warning disable xUnit1013 // Public method should be marked as test
-	public static void AssertDriverContentsAre (string expectedLook, ITestOutputHelper output, bool ignoreLeadingWhitespace = false)
+	/// <summary>
+	/// Asserts that the driver contents match the expected contents, optionally ignoring any trailing whitespace.
+	/// </summary>
+	/// <param name="expectedLook"></param>
+	/// <param name="output"></param>
+	/// <param name="driver">The ConsoleDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
+	/// <param name="ignoreLeadingWhitespace"></param>
+	public static void AssertDriverContentsAre (string expectedLook, ITestOutputHelper output, ConsoleDriver driver = null,  bool ignoreLeadingWhitespace = false)
 	{
 #pragma warning restore xUnit1013 // Public method should be marked as test
 
 		var sb = new StringBuilder ();
-		var driver = (FakeDriver)Application.Driver;
+		driver ??= Application.Driver;
 
 		var contents = driver.Contents;
 
@@ -198,11 +205,18 @@ partial class TestHelpers {
 		Assert.Equal (expectedLook, actualLook);
 	}
 
-	public static Rect AssertDriverContentsWithFrameAre (string expectedLook, ITestOutputHelper output)
+	/// <summary>
+	/// Asserts that the driver contents are equal to the expected look, and that the cursor is at the expected position.
+	/// </summary>
+	/// <param name="expectedLook"></param>
+	/// <param name="output"></param>
+	/// <param name="driver">The ConsoleDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
+	/// <returns></returns>
+	public static Rect AssertDriverContentsWithFrameAre (string expectedLook, ITestOutputHelper output, ConsoleDriver driver = null)
 	{
 		var lines = new List<List<Rune>> ();
 		var sb = new StringBuilder ();
-		var driver = Application.Driver;
+		driver ??= Application.Driver;
 		var x = -1;
 		var y = -1;
 		var w = -1;
@@ -290,16 +304,17 @@ partial class TestHelpers {
 	/// test method will verify those colors were used in the row/col of the console during rendering
 	/// </summary>
 	/// <param name="expectedLook">Numbers between 0 and 9 for each row/col of the console.  Must be valid indexes of <paramref name="expectedColors"/></param>
+	/// <param name="driver">The ConsoleDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
 	/// <param name="expectedColors"></param>
-	public static void AssertDriverColorsAre (string expectedLook, params Attribute [] expectedColors)
+	public static void AssertDriverColorsAre (string expectedLook, ConsoleDriver driver = null, params Attribute [] expectedColors)
 	{
 #pragma warning restore xUnit1013 // Public method should be marked as test
 
 		if (expectedColors.Length > 10) throw new ArgumentException ("This method only works for UIs that use at most 10 colors");
 
 		expectedLook = expectedLook.Trim ();
-		var driver = (FakeDriver)Application.Driver;
-
+		driver ??= Application.Driver;
+		
 		var contents = driver.Contents;
 
 		var r = 0;
@@ -331,11 +346,11 @@ partial class TestHelpers {
 	/// If one or more of the expected colors are not used then the failure will output both
 	/// the colors that were found to be used and which of your expectations was not met.
 	/// </summary>
+	/// <param name="driver">if null uses <see cref="Application.Driver"/></param>
 	/// <param name="expectedColors"></param>
-	internal static void AssertDriverUsedColors (params Attribute [] expectedColors)
+	internal static void AssertDriverUsedColors (ConsoleDriver driver = null, params Attribute [] expectedColors)
 	{
-		var driver = (FakeDriver)Application.Driver;
-
+		driver ??= Application.Driver;
 		var contents = driver.Contents;
 
 		var toFind = expectedColors.ToList ();

@@ -870,7 +870,7 @@ namespace Terminal.Gui.ViewsTests {
 00000000
 0000000000
 000000
-",
+", driver: Application.Driver,
 				new [] { tv.ColorScheme.Normal, pink });
 
 			var pinkScheme = new ColorScheme {
@@ -900,7 +900,7 @@ namespace Terminal.Gui.ViewsTests {
 00001111
 0000000000
 001111
-",
+", driver: Application.Driver,
 				new [] { tv.ColorScheme.Normal, pink });
 		}
 
