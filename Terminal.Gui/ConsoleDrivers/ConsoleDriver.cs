@@ -170,12 +170,12 @@ public abstract class ConsoleDriver {
 				// TODO: Remove hard-coded [0] once combining pairs is supported
 
 				// Convert Runes to string and concatenate
-				string combined = Contents [Row, Col - 1].Runes [0].ToString () + rune.ToString ();
+				string combined = Contents [Row, Col - 1].Rune.ToString () + rune.ToString ();
 
 				// Normalize to Form C (Canonical Composition)
 				string normalized = combined.Normalize (NormalizationForm.FormC);
 
-				Contents [Row, Col - 1].Runes = new List<Rune> { (Rune)normalized [0] }; ;
+				Contents [Row, Col - 1].Rune = (Rune)normalized [0]; ;
 				Contents [Row, Col - 1].Attribute = CurrentAttribute;
 				Contents [Row, Col - 1].IsDirty = true;
 
@@ -186,19 +186,19 @@ public abstract class ConsoleDriver {
 
 				if (Col > 0) {
 					// Check if cell to left has a wide glyph
-					if (Contents [Row, Col - 1].Runes [0].GetColumns () > 1) {
+					if (Contents [Row, Col - 1].Rune.GetColumns () > 1) {
 						// Invalidate cell to left
-						Contents [Row, Col - 1].Runes = new List<Rune> { Rune.ReplacementChar };
+						Contents [Row, Col - 1].Rune = Rune.ReplacementChar;
 						Contents [Row, Col - 1].IsDirty = true;
 					}
 				}
 
 
 				if (runeWidth < 1) {
-					Contents [Row, Col].Runes = new List<Rune> { Rune.ReplacementChar };
+					Contents [Row, Col].Rune = Rune.ReplacementChar;
 
 				} else if (runeWidth == 1) {
-					Contents [Row, Col].Runes = new List<Rune> { rune };
+					Contents [Row, Col].Rune = rune;
 					if (Col < Clip.Right - 1) {
 						Contents [Row, Col + 1].IsDirty = true;
 					}
@@ -206,19 +206,19 @@ public abstract class ConsoleDriver {
 					if (Col == Clip.Right - 1) {
 						// We're at the right edge of the clip, so we can't display a wide character.
 						// TODO: Figure out if it is better to show a replacement character or ' '
-						Contents [Row, Col].Runes = new List<Rune> { Rune.ReplacementChar };
+						Contents [Row, Col].Rune = Rune.ReplacementChar;
 					} else {
-						Contents [Row, Col].Runes = new List<Rune> { rune };
+						Contents [Row, Col].Rune = rune;
 						if (Col < Clip.Right - 1) {
 							// Invalidate cell to right so that it doesn't get drawn
 							// TODO: Figure out if it is better to show a replacement character or ' '
-							Contents [Row, Col + 1].Runes = new List<Rune> { Rune.ReplacementChar };
+							Contents [Row, Col + 1].Rune = Rune.ReplacementChar;
 							Contents [Row, Col + 1].IsDirty = true;
 						}
 					}
 				} else {
 					// This is a non-spacing character, so we don't need to do anything
-					Contents [Row, Col].Runes = new List<Rune> { (Rune)' ' };
+					Contents [Row, Col].Rune = (Rune)' ';
 					Contents [Row, Col].IsDirty = false;
 				}
 				_dirtyLines [Row] = true;
@@ -239,7 +239,7 @@ public abstract class ConsoleDriver {
 				Contents [Row, Col].Attribute = CurrentAttribute;
 
 				// TODO: Determine if we should wipe this out (for now now)
-				//Contents [Row, Col].Runes [0] = (Rune)' ';
+				//Contents [Row, Col].Rune = (Rune)' ';
 			}
 			Col++;
 		}
@@ -346,7 +346,7 @@ public abstract class ConsoleDriver {
 				for (var row = 0; row < Rows; row++) {
 					for (var c = 0; c < Cols; c++) {
 						Contents [row, c] = new Cell () {
-							Runes = new List<Rune> { (Rune)' ' },
+							Rune = (Rune)' ',
 							Attribute = new Attribute (Color.White, Color.Black),
 							IsDirty = true
 						};

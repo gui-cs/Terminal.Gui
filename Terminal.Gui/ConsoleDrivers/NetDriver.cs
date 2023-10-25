@@ -808,7 +808,7 @@ internal class NetDriver : ConsoleDriver {
 
 					}
 					outputWidth++;
-					var rune = (Rune)Contents [row, col].Runes [0];
+					var rune = (Rune)Contents [row, col].Rune;
 					output.Append (rune.ToString ());
 					if (rune.IsSurrogatePair () && rune.GetColumns () < 2) {
 						WriteToConsole (output, ref lastCol, row, ref outputWidth);

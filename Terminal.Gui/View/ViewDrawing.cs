@@ -389,7 +389,7 @@ namespace Terminal.Gui {
 					Driver.SetAttribute (p.Value.Attribute ?? ColorScheme.Normal);
 					Driver.Move (p.Key.X, p.Key.Y);
 					// TODO: #2616 - Support combining sequences that don't normalize
-					Driver.AddRune (p.Value.Runes [0]);
+					Driver.AddRune (p.Value.Rune);
 				}
 				LineCanvas.Clear ();
 			}
@@ -405,7 +405,7 @@ namespace Terminal.Gui {
 					Driver.SetAttribute (p.Value.Attribute ?? ColorScheme.Normal);
 					Driver.Move (p.Key.X, p.Key.Y);
 					// TODO: #2616 - Support combining sequences that don't normalize
-					Driver.AddRune (p.Value.Runes [0]);
+					Driver.AddRune (p.Value.Rune);
 				}
 				LineCanvas.Clear ();
 			}
