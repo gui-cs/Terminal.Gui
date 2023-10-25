@@ -422,20 +422,25 @@ public class ApplicationTests {
 
 	#region ShutdownTests
 	[Fact]
-	public void Shutdown_Allows_Async ()
+	public async void Shutdown_Allows_Async ()
 	{
-		static async Task TaskWithAsyncContinuation ()
+		bool isCompletedSuccessfully = false;
+
+		async Task TaskWithAsyncContinuation ()
 		{
 			await Task.Yield ();
 			await Task.Yield ();
+
+			isCompletedSuccessfully = true;
 		}
 
 		Init ();
 		Application.Shutdown ();
 
-		var task = TaskWithAsyncContinuation ();
+		Assert.False (isCompletedSuccessfully);
+		await TaskWithAsyncContinuation ();
 		Thread.Sleep (100);
-		Assert.True (task.IsCompletedSuccessfully);
+		Assert.True (isCompletedSuccessfully);
 	}
 
 	[Fact]
