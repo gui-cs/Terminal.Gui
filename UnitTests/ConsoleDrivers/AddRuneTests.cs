@@ -24,6 +24,8 @@ public class AddRuneTests {
 	public void AddRune (Type driverType)
 	{
 		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+		driver.Init ();
+
 		driver.Rows = 25;
 		driver.Cols = 80;
 		driver.Init ();
@@ -146,7 +148,6 @@ public class AddRuneTests {
 	public void AddRune_Accented_Letter_With_Three_Combining_Unicode_Chars ()
 	{
 		var driver = new FakeDriver ();
-		Application.Init (driver);
 		driver.Init ();
 
 		var expected = new Rune ('ắ');
@@ -193,6 +194,5 @@ public class AddRuneTests {
 		//		TestHelpers.AssertDriverContentsWithFrameAre (@"
 		//ắ", output);
 		driver.End ();
-		Application.Shutdown ();
 	}
 }

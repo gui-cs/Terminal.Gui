@@ -47,7 +47,6 @@ namespace Terminal.Gui.DriverTests {
 			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 			driver.Init ();
 			driver.End ();
-			
 		}
 
 		[Theory]

@@ -52,9 +52,6 @@ namespace Terminal.Gui.DriverTests {
 			Assert.Equal (expectedSetting, driver.SupportsTrueColor);
 
 			driver.End ();
-
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
 		}
 
 		[Theory]
@@ -71,9 +68,6 @@ namespace Terminal.Gui.DriverTests {
 			Assert.True (driver.Force16Colors);
 
 			driver.End ();
-
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
 		}
 	}
 }
