@@ -810,7 +810,11 @@ internal class NetDriver : ConsoleDriver {
 					outputWidth++;
 					var rune = (Rune)Contents [row, col].Rune;
 					output.Append (rune.ToString ());
-					if (rune.IsSurrogatePair () && rune.GetColumns () < 2) {
+					if (Contents [row, col].CombiningMark.Value > 0) {
+						output.Append (Contents [row, col].CombiningMark.ToString ());
+						WriteToConsole (output, ref lastCol, row, ref outputWidth);
+						SetCursorPosition (col - 1, row);
+					} else if (rune.IsSurrogatePair () && rune.GetColumns () < 2) {
 						WriteToConsole (output, ref lastCol, row, ref outputWidth);
 						SetCursorPosition (col - 1, row);
 					}
