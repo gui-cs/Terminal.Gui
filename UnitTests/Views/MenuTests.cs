@@ -1589,7 +1589,7 @@ Edit
 	    };
 
 			TestHelpers.AssertDriverColorsAre (@"
-00000000000000", attributes);
+00000000000000", driver: Application.Driver, attributes);
 
 			Assert.True (menu.MouseEvent (new MouseEvent {
 				X = 0,
@@ -1605,7 +1605,7 @@ Edit
 02222222222220
 00000000000000
 00000000000000
-00000000000000", attributes);
+00000000000000", driver: Application.Driver, attributes);
 
 			Assert.True (top.Subviews [1].MouseEvent (new MouseEvent {
 				X = 0,
@@ -1621,7 +1621,7 @@ Edit
 02222222222220
 00000000000000
 00000000000000
-00000000000000", attributes);
+00000000000000", driver: Application.Driver, attributes);
 
 			Assert.True (top.Subviews [1].MouseEvent (new MouseEvent {
 				X = 0,
@@ -1637,7 +1637,7 @@ Edit
 02222222222220
 00000000000000
 00000000000000
-00000000000000", attributes);
+00000000000000", driver: Application.Driver, attributes);
 		}
 
 		[Fact, AutoInitShutdown]

@@ -116,12 +116,12 @@ Error   ";
 2222220000
 3333000000
 4444400000";
-			TestHelpers.AssertDriverColorsAre (expectedColor, attributes);
+			TestHelpers.AssertDriverColorsAre (expectedColor, driver: Application.Driver, attributes);
 
 			tv.WordWrap = true;
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
-			TestHelpers.AssertDriverColorsAre (expectedColor, attributes);
+			TestHelpers.AssertDriverColorsAre (expectedColor, driver: Application.Driver, attributes);
 
 			tv.CursorPosition = new Point (6, 2);
 			tv.SelectionStartColumn = 0;
@@ -149,7 +149,7 @@ Dialogror ";
 4444444444
 4444000000
 4444444440";
-			TestHelpers.AssertDriverColorsAre (expectedColor, attributes);
+			TestHelpers.AssertDriverColorsAre (expectedColor, driver: Application.Driver, attributes);
 
 			tv.Undo ();
 			tv.CursorPosition = new Point (0, 3);
@@ -180,7 +180,7 @@ ror       ";
 4444000000
 4444440000
 4440000000";
-			TestHelpers.AssertDriverColorsAre (expectedColor, attributes);
+			TestHelpers.AssertDriverColorsAre (expectedColor, driver: Application.Driver, attributes);
 
 			Application.End (rs);
 		}

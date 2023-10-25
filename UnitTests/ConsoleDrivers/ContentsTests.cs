@@ -17,21 +17,22 @@ public class ContentsTests {
 		this.output = output;
 	}
 
-	[Theory, AutoInitShutdown]
+	[Theory]
 	[InlineData (typeof (FakeDriver))]
 	//[InlineData (typeof (NetDriver))]
 	//[InlineData (typeof (CursesDriver))]
 	//[InlineData (typeof (WindowsDriver))]
 	public void AddStr_With_Combining_Characters (Type driverType)
 	{
-		Application.Init ();
-
+		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+		driver.Init ();
+		
 		var acuteaccent = new System.Text.Rune (0x0301); // Combining acute accent (é)
 		var combined = "e" + acuteaccent;
 		var expected = "é";
 
-		Application.Driver.AddStr (combined);
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		driver.AddStr (combined);
+		TestHelpers.AssertDriverContentsAre (expected, output, driver);
 
 		// 3 char combine
 		// a + ogonek + acute = <U+0061, U+0328, U+0301> ( ą́ )
@@ -39,18 +40,18 @@ public class ContentsTests {
 		combined = "a" + ogonek + acuteaccent;
 		expected = "ą́";
 
-		Application.Driver.Move (0, 0);
-		Application.Driver.AddStr (combined);
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		driver.Move (0, 0);
+		driver.AddStr (combined);
+		TestHelpers.AssertDriverContentsAre (expected, output, driver);
 
 		// o + ogonek + acute = <U+0061, U+0328, U+0301> ( ǫ́ )
 		ogonek = new System.Text.Rune (0x0328); // Combining ogonek (a small hook or comma shape)
 		combined = "o" + ogonek + acuteaccent;
 		expected = "ǫ́";
 
-		Application.Driver.Move (0, 0);
-		Application.Driver.AddStr (combined);
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		driver.Move (0, 0);
+		driver.AddStr (combined);
+		TestHelpers.AssertDriverContentsAre (expected, output, driver);
 	}
 
 	[Theory]
@@ -61,7 +62,6 @@ public class ContentsTests {
 	public void Move_Bad_Coordinates (Type driverType)
 	{
 		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-		Application.Init (driver);
 
 		Assert.Equal (0, driver.Col);
 		Assert.Equal (0, driver.Row);
@@ -85,9 +85,6 @@ public class ContentsTests {
 		driver.Move (500, 500);
 		Assert.Equal (500, driver.Col);
 		Assert.Equal (500, driver.Row);
-
-		// Shutdown must be called to safely clean up Application if Init has been called
-		Application.Shutdown ();
 	}
 
 	// TODO: Add these unit tests
