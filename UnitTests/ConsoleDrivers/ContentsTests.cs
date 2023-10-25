@@ -27,13 +27,13 @@ public class ContentsTests {
 	{
 		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 		driver.Init ();
-		
+
 		var acuteaccent = new System.Text.Rune (0x0301); // Combining acute accent (é)
 		var combined = "e" + acuteaccent;
 		var expected = "é";
 
 		driver.AddStr (combined);
-		TestHelpers.AssertDriverContentsAre (expected, output, driver);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, output, driver);
 
 		// 3 char combine
 		// a + ogonek + acute = <U+0061, U+0328, U+0301> ( ą́ )
@@ -43,7 +43,7 @@ public class ContentsTests {
 
 		driver.Move (0, 0);
 		driver.AddStr (combined);
-		TestHelpers.AssertDriverContentsAre (expected, output, driver);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, output, driver);
 
 		// o + ogonek + acute = <U+0061, U+0328, U+0301> ( ǫ́ )
 		ogonek = new System.Text.Rune (0x0328); // Combining ogonek (a small hook or comma shape)
@@ -52,7 +52,8 @@ public class ContentsTests {
 
 		driver.Move (0, 0);
 		driver.AddStr (combined);
-		TestHelpers.AssertDriverContentsAre (expected, output, driver);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, output, driver);
+
 		driver.End ();
 	}
 
@@ -64,6 +65,7 @@ public class ContentsTests {
 	public void Move_Bad_Coordinates (Type driverType)
 	{
 		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+		driver.Init ();
 
 		Assert.Equal (0, driver.Col);
 		Assert.Equal (0, driver.Row);
