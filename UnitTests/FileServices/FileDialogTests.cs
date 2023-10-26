@@ -387,7 +387,7 @@ namespace Terminal.Gui.FileServicesTests {
 			@$"
 ┌─────────────────────────────────────────────────────────────────────────┐
 │/demo/                                                                   │
-│{CM.Glyphs.LeftBracket}▲{CM.Glyphs.RightBracket}                                                            │
+│{CM.Glyphs.LeftBracket}▲{CM.Glyphs.RightBracket}                                                                      │
 │┌────────────┬──────────┬──────────────────────────────┬────────────────┐│
 ││Filename (▲)│Size      │Modified                      │Type            ││
 │├────────────┼──────────┼──────────────────────────────┼────────────────┤│
