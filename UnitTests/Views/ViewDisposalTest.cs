@@ -41,7 +41,7 @@ namespace UnitTests.ViewsTests {
 		}
 		void getSpecialParams ()
 		{
-			//special_params.Clear ();
+			special_params.Clear ();
 			//special_params.Add (typeof (LineView), new object [] { Orientation.Horizontal });
 		}
 		WeakReference DoTest ()
