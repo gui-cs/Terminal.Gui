@@ -45,10 +45,29 @@ public class ContentsTests {
 		driver.AddStr (combined);
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, output, driver);
 
+		// e + ogonek + acute = <U+0061, U+0328, U+0301> ( ę́́ )
+		combined = "e" + ogonek + acuteaccent;
+		expected = "ę́́";
+
+		driver.Move (0, 0);
+		driver.AddStr (combined);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, output, driver);
+
+		// i + ogonek + acute = <U+0061, U+0328, U+0301> ( į́́́ )
+		combined = "i" + ogonek + acuteaccent;
+		expected = "į́́́";
+
+		driver.Move (0, 0);
+		driver.AddStr (combined);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, output, driver);
+
 		// o + ogonek + acute = <U+0061, U+0328, U+0301> ( ǫ́ )
-		ogonek = new System.Text.Rune (0x0328); // Combining ogonek (a small hook or comma shape)
 		combined = "o" + ogonek + acuteaccent;
 		expected = "ǫ́";
+
+		// u + ogonek + acute = <U+0061, U+0328, U+0301> ( ų́́́́ )
+		combined = "u" + ogonek + acuteaccent;
+		expected = "ų́́́́";
 
 		driver.Move (0, 0);
 		driver.AddStr (combined);

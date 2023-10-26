@@ -175,8 +175,8 @@ partial class TestHelpers {
 				if (rune.GetColumns () > 1) {
 					c++;
 				}
-				if (contents [r, c].CombiningMark.Value > 0) {
-					sb.Append ((char)contents [r, c].CombiningMark.Value);
+				foreach (var combMark in contents [r, c].CombiningMarks) {
+					sb.Append ((char)combMark.Value);
 				}
 			}
 			sb.AppendLine ();
@@ -248,8 +248,8 @@ partial class TestHelpers {
 					h = r - y + 1;
 				}
 				if (x > -1) runes.Add (rune);
-				if (contents [r, c].CombiningMark.Value > 0) {
-					runes.Add (contents [r, c].CombiningMark);
+				foreach (var combMark in contents [r, c].CombiningMarks) {
+					runes.Add (combMark);
 				}
 			}
 			if (runes.Count > 0) lines.Add (runes);

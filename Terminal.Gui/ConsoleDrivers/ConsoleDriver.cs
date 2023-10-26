@@ -177,7 +177,9 @@ public abstract class ConsoleDriver {
 
 				Contents [Row, Col - 1].Rune = (Rune)normalized [0];
 				if (normalized.Length > 1) {
-					Contents [Row, Col - 1].CombiningMark = (Rune)normalized [1];
+					for (int i = 1; i < normalized.Length; i++) {
+						Contents [Row, Col - 1].CombiningMarks.Add ((Rune)normalized [i]);
+					}
 				}
 				Contents [Row, Col - 1].Attribute = CurrentAttribute;
 				Contents [Row, Col - 1].IsDirty = true;

@@ -2,7 +2,7 @@
 using System.Text;
 
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 /// Represents a single row/column in a Terminal.Gui rendering surface
@@ -23,7 +23,7 @@ public class Cell {
 	///// <remarks>
 	///// Only valid in the rare case where <see cref="Rune"/> is a combining sequence that could not be normalized to a single Rune.
 	///// </remarks>
-	internal Rune CombiningMark { get; set; }
+	internal List<Rune> CombiningMarks { get; set; } = new ();
 
 	/// <summary>
 	/// The attributes to use when drawing the Glyph.

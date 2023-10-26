@@ -810,8 +810,10 @@ internal class NetDriver : ConsoleDriver {
 					outputWidth++;
 					var rune = (Rune)Contents [row, col].Rune;
 					output.Append (rune.ToString ());
-					if (Contents [row, col].CombiningMark.Value > 0) {
-						output.Append (Contents [row, col].CombiningMark.ToString ());
+					if (Contents [row, col].CombiningMarks.Count > 0) {
+						foreach (var combMark in Contents [row, col].CombiningMarks) {
+							output.Append (combMark.ToString ());
+						}
 						WriteToConsole (output, ref lastCol, row, ref outputWidth);
 						SetCursorPosition (col - 1, row);
 					} else if (rune.IsSurrogatePair () && rune.GetColumns () < 2) {
