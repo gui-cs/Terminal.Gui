@@ -175,11 +175,19 @@ public abstract class ConsoleDriver {
 				// Normalize to Form C (Canonical Composition)
 				string normalized = combined.Normalize (NormalizationForm.FormC);
 
-				Contents [Row, Col - 1].Rune = (Rune)normalized [0];
-				if (normalized.Length > 1) {
-					for (int i = 1; i < normalized.Length; i++) {
-						Contents [Row, Col - 1].CombiningMarks.Add ((Rune)normalized [i]);
+				if (Contents [Row, Col - 1].Rune != default && Contents [Row, Col - 1].Rune != (Rune)' ') {
+					Contents [Row, Col - 1].Rune = (Rune)normalized [0];
+					if (normalized.Length > 1) {
+						for (int i = 1; i < normalized.Length; i++) {
+							Contents [Row, Col - 1].CombiningMarks.Add ((Rune)normalized [i]);
+						}
 					}
+					Contents [Row, Col - 1].Attribute = CurrentAttribute;
+					Contents [Row, Col - 1].IsDirty = true;
+				} else {
+					Contents [Row, Col].Rune = rune;
+					Contents [Row, Col].Attribute = CurrentAttribute;
+					Contents [Row, Col].IsDirty = true;
 				}
 				Contents [Row, Col - 1].Attribute = CurrentAttribute;
 				Contents [Row, Col - 1].IsDirty = true;
