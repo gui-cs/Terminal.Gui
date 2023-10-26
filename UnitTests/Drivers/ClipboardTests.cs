@@ -159,7 +159,7 @@ namespace Terminal.Gui.DriverTests {
 				output.WriteLine ($"Pasting to OS clipboard: {clipText}...");
 
 				if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows)) {
-					(exitCode, result) = ClipboardProcessRunner.Process ("pwsh", $"-command \"Set-Clipboard -Value \\\"{clipText}\\\"\"");
+					(exitCode, result) = ClipboardProcessRunner.Process ("pwsh", $"-command \"Set-Clipboard -Value '{clipText}'\"");
 					output.WriteLine ($"  Windows: pwsh Set-Clipboard: exitCode = {exitCode}, result = {result}");
 					getClipText = Clipboard.Contents.ToString ();
 
