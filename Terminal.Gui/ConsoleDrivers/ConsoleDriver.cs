@@ -188,9 +188,8 @@ public abstract class ConsoleDriver {
 					Contents [Row, Col].Rune = rune;
 					Contents [Row, Col].Attribute = CurrentAttribute;
 					Contents [Row, Col].IsDirty = true;
+					Col++;
 				}
-				Contents [Row, Col - 1].Attribute = CurrentAttribute;
-				Contents [Row, Col - 1].IsDirty = true;
 			} else {
 				Contents [Row, Col].Attribute = CurrentAttribute;
 				Contents [Row, Col].IsDirty = true;
