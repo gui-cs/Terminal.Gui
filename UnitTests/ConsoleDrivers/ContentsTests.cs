@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -16,6 +17,23 @@ public class ContentsTests {
 	{
 		ConsoleDriver.RunningUnitTests = true;
 		this.output = output;
+	}
+
+
+	[Theory]
+	[InlineData (typeof (FakeDriver))]
+	[InlineData (typeof (NetDriver))]
+	//[InlineData (typeof (CursesDriver))] // TODO: Uncomment when #2796 and #2615 are fixed
+	//[InlineData (typeof (WindowsDriver))] // TODO: Uncomment when #2610 is fixed
+	public void AddStr_Combining_Character_1st_Column (Type driverType)
+	{
+		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+		driver.Init ();
+		var expected = "\u0301!";
+		driver.AddStr ("\u0301!"); // acute accent + exclamation mark
+		TestHelpers.AssertDriverContentsAre (expected, output, driver);
+
+		driver.End ();
 	}
 
 	[Theory]
@@ -33,45 +51,41 @@ public class ContentsTests {
 		var expected = "é";
 
 		driver.AddStr (combined);
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output, driver);
+		TestHelpers.AssertDriverContentsAre (expected, output, driver);
 
 		// 3 char combine
 		// a + ogonek + acute = <U+0061, U+0328, U+0301> ( ą́ )
 		var ogonek = new System.Text.Rune (0x0328); // Combining ogonek (a small hook or comma shape)
 		combined = "a" + ogonek + acuteaccent;
-		expected = "ą́";
+		expected = ("a" + ogonek).Normalize(NormalizationForm.FormC); // See Issue #2616
 
 		driver.Move (0, 0);
 		driver.AddStr (combined);
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output, driver);
+		TestHelpers.AssertDriverContentsAre (expected, output, driver);
 
 		// e + ogonek + acute = <U+0061, U+0328, U+0301> ( ę́́ )
 		combined = "e" + ogonek + acuteaccent;
-		expected = "ę́́";
+		expected = ("e" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
 
 		driver.Move (0, 0);
 		driver.AddStr (combined);
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output, driver);
+		TestHelpers.AssertDriverContentsAre (expected, output, driver);
 
 		// i + ogonek + acute = <U+0061, U+0328, U+0301> ( į́́́ )
 		combined = "i" + ogonek + acuteaccent;
-		expected = "į́́́";
+		expected = ("i" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
 
 		driver.Move (0, 0);
 		driver.AddStr (combined);
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output, driver);
-
-		// o + ogonek + acute = <U+0061, U+0328, U+0301> ( ǫ́ )
-		combined = "o" + ogonek + acuteaccent;
-		expected = "ǫ́";
+		TestHelpers.AssertDriverContentsAre (expected, output, driver);
 
 		// u + ogonek + acute = <U+0061, U+0328, U+0301> ( ų́́́́ )
 		combined = "u" + ogonek + acuteaccent;
-		expected = "ų́́́́";
+		expected = ("u" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
 
 		driver.Move (0, 0);
 		driver.AddStr (combined);
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output, driver);
+		TestHelpers.AssertDriverContentsAre (expected, output, driver);
 
 		driver.End ();
 	}

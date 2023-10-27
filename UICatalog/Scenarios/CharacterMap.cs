@@ -473,7 +473,28 @@ class CharMap : ScrollView {
 
 				// are we at first row of the row?
 				if (!ShowGlyphWidths || (y - ContentOffset.Y) % _rowHeight > 0) {
-					Driver.AddRune (rune);
+					if (width > 0) {
+						Driver.AddRune (rune);
+					} else {
+						if (rune.IsCombiningMark ()) {
+							// This is a hack to work around the fact that combining marks
+							// a) can't be rendered on their own
+							// b) that don't normalize are not properly supported in 
+							//    any known terminal (esp Windows/AtlasEngine). 
+							// See Issue #2616
+							var sb = new StringBuilder ();
+							sb.Append ('a');
+							sb.Append (rune);
+							// Try normalizing after combining with 'a'. If it normalizes, at least 
+							// it'll show on the 'a'. If not, just show the replacement char.
+							var normal = sb.ToString ().Normalize (NormalizationForm.FormC);
+							if (normal.Length == 1) {
+								Driver.AddRune (normal [0]);
+							} else {
+								Driver.AddRune (Rune.ReplacementChar);
+							}
+						}
+					}
 				} else {
 					Driver.SetAttribute (ColorScheme.HotNormal);
 					Driver.AddStr ($"{width}");

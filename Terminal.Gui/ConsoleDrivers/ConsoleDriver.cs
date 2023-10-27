@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using static Terminal.Gui.ColorScheme;
+using System.Linq;
+using System.Data;
 
 namespace Terminal.Gui;
 
@@ -165,26 +167,33 @@ public abstract class ConsoleDriver {
 		if (validLocation) {
 			rune = rune.MakePrintable ();
 			runeWidth = rune.GetColumns ();
-			if (runeWidth == 0 && rune.IsCombiningMark () && Col > 0) {
-				// This is a combining character, and we are not at the beginning of the line.
-				// TODO: Remove hard-coded [0] once combining pairs is supported
+			if (runeWidth == 0 && rune.IsCombiningMark ()) {
+				if (Col > 0) {
+					if (Contents [Row, Col - 1].CombiningMarks.Count > 0) {
+						// Just add this mark to the list
+						Contents [Row, Col - 1].CombiningMarks.Add (rune);
+						// Don't move to next column (let the driver figure out what to do).
+					} else {
+						// Attempt to normalize the cell to our left combined with this mark
+						string combined = Contents [Row, Col - 1].Rune + rune.ToString ();
 
-				// Convert Runes to string and concatenate
-				string combined = Contents [Row, Col - 1].Rune.ToString () + rune.ToString ();
-
-				// Normalize to Form C (Canonical Composition)
-				string normalized = combined.Normalize (NormalizationForm.FormC);
-
-				if (Contents [Row, Col - 1].Rune != default && Contents [Row, Col - 1].Rune != (Rune)' ') {
-					Contents [Row, Col - 1].Rune = (Rune)normalized [0];
-					if (normalized.Length > 1) {
-						for (int i = 1; i < normalized.Length; i++) {
-							Contents [Row, Col - 1].CombiningMarks.Add ((Rune)normalized [i]);
+						// Normalize to Form C (Canonical Composition)
+						string normalized = combined.Normalize (NormalizationForm.FormC);
+						if (normalized.Length == 1) {
+							// It normalized! We can just set the Cell to the left with the
+							// normalized codepoint 
+							Contents [Row, Col - 1].Rune = (Rune)normalized [0];
+							// Don't move to next column because we're already there
+						} else {
+							// It didn't normalize. Add it to the Cell to left's CM list
+							Contents [Row, Col - 1].CombiningMarks.Add (rune);
+							// Don't move to next column (let the driver figure out what to do).
 						}
 					}
 					Contents [Row, Col - 1].Attribute = CurrentAttribute;
 					Contents [Row, Col - 1].IsDirty = true;
 				} else {
+					// Most drivers will render a combining mark at col 0 as the mark
 					Contents [Row, Col].Rune = rune;
 					Contents [Row, Col].Attribute = CurrentAttribute;
 					Contents [Row, Col].IsDirty = true;
@@ -277,8 +286,19 @@ public abstract class ConsoleDriver {
 	/// <param name="str">String.</param>
 	public void AddStr (string str)
 	{
-		foreach (var rune in str.EnumerateRunes ()) {
-			AddRune (rune);
+		var runes = str.EnumerateRunes ().ToList ();
+		for (var i = 0; i < runes.Count; i++) {
+			//if (runes [i].IsCombiningMark()) {
+
+			//	// Attempt to normalize
+			//	string combined = runes [i-1] + runes [i].ToString();
+
+			//	// Normalize to Form C (Canonical Composition)
+			//	string normalized = combined.Normalize (NormalizationForm.FormC);
+
+			//	runes [i-]
+			//}
+			AddRune (runes [i]);
 		}
 	}
 

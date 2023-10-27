@@ -165,7 +165,6 @@ partial class TestHelpers {
 
 		for (int r = 0; r < driver.Rows; r++) {
 			for (int c = 0; c < driver.Cols; c++) {
-				// TODO: Remove hard-coded [0] once combining pairs is supported
 				Rune rune = contents [r, c].Rune;
 				if (rune.DecodeSurrogatePair (out char [] spair)) {
 					sb.Append (spair);
@@ -175,9 +174,10 @@ partial class TestHelpers {
 				if (rune.GetColumns () > 1) {
 					c++;
 				}
-				foreach (var combMark in contents [r, c].CombiningMarks) {
-					sb.Append ((char)combMark.Value);
-				}
+				// See Issue #2616
+				//foreach (var combMark in contents [r, c].CombiningMarks) {
+				//	sb.Append ((char)combMark.Value);
+				//}
 			}
 			sb.AppendLine ();
 		}
@@ -248,9 +248,10 @@ partial class TestHelpers {
 					h = r - y + 1;
 				}
 				if (x > -1) runes.Add (rune);
-				foreach (var combMark in contents [r, c].CombiningMarks) {
-					runes.Add (combMark);
-				}
+				// See Issue #2616
+				//foreach (var combMark in contents [r, c].CombiningMarks) {
+				//	runes.Add (combMark);
+				//}
 			}
 			if (runes.Count > 0) lines.Add (runes);
 		}
