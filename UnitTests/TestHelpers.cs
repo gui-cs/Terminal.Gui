@@ -154,7 +154,7 @@ partial class TestHelpers {
 	/// <param name="output"></param>
 	/// <param name="driver">The ConsoleDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
 	/// <param name="ignoreLeadingWhitespace"></param>
-	public static void AssertDriverContentsAre (string expectedLook, ITestOutputHelper output, ConsoleDriver driver = null,  bool ignoreLeadingWhitespace = false)
+	public static void AssertDriverContentsAre (string expectedLook, ITestOutputHelper output, ConsoleDriver driver = null, bool ignoreLeadingWhitespace = false)
 	{
 #pragma warning restore xUnit1013 // Public method should be marked as test
 
@@ -319,7 +319,7 @@ partial class TestHelpers {
 
 		expectedLook = expectedLook.Trim ();
 		driver ??= Application.Driver;
-		
+
 		var contents = driver.Contents;
 
 		var r = 0;
