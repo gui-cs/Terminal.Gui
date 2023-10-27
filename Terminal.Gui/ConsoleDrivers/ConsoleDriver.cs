@@ -464,7 +464,7 @@ public abstract class ConsoleDriver {
 	/// Called after a key has been pressed and released. Fires the <see cref="KeyPressed"/> event.
 	/// </summary>
 	/// <param name="a"></param>
-	public void OnKeyPressed (KeyEventEventArgs a) => KeyPressed?.Invoke(this, a);
+	public void OnKeyPressed (KeyEventEventArgs a) => KeyPressed?.Invoke (this, a);
 
 	/// <summary>
 	/// Event fired when a key is released.
@@ -487,7 +487,7 @@ public abstract class ConsoleDriver {
 	/// </summary>
 	/// <param name="a"></param>
 	public void OnKeyDown (KeyEventEventArgs a) => KeyDown?.Invoke (this, a);
-	
+
 	/// <summary>
 	/// Event fired when a mouse event occurs.
 	/// </summary>
