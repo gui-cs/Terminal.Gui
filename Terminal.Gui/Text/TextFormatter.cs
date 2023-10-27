@@ -1411,7 +1411,8 @@ namespace Terminal.Gui {
 					} else {
 						Application.Driver?.AddRune (rune);
 					}
-					var runeWidth = Math.Max (rune.GetColumns (), 1);
+					// BUGBUG: I think this is a bug. If rune is a combining mark current should not be incremented.
+					var runeWidth = rune.GetColumns (); //Math.Max (rune.GetColumns (), 1);
 					if (isVertical) {
 						current++;
 					} else {
