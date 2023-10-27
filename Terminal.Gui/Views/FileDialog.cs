@@ -1291,7 +1291,7 @@ namespace Terminal.Gui {
 			// This portion is never reordered (aways .. at top then folders)
 			var forcedOrder = stats
 			.OrderByDescending (f => f.IsParent)
-					.ThenBy (f => f.IsDir () ? -1 : 100);
+					.ThenBy (f => f.IsDir ? -1 : 100);
 
 			// This portion is flexible based on the column clicked (e.g. alphabetical)
 			var ordered =
@@ -1325,10 +1325,10 @@ namespace Terminal.Gui {
 			// work out new sort order
 			if (this.currentSortColumn == clickedCol && this.currentSortIsAsc) {
 				isAsc = false;
-				return $"{tableView.Table.ColumnNames [clickedCol]} DESC";
+				return string.Format (Strings.fdCtxSortDesc, tableView.Table.ColumnNames [clickedCol]);
 			} else {
 				isAsc = true;
-				return $"{tableView.Table.ColumnNames [clickedCol]} ASC";
+				return string.Format (Strings.fdCtxSortAsc, tableView.Table.ColumnNames [clickedCol]);
 			}
 		}
 
@@ -1341,8 +1341,8 @@ namespace Terminal.Gui {
 				e.MouseEvent.Y + 1,
 				new MenuBarItem (new MenuItem []
 				{
-					new MenuItem($"Hide {StripArrows(tableView.Table.ColumnNames[clickedCol])}", string.Empty, () => this.HideColumn(clickedCol)),
-					new MenuItem($"Sort {StripArrows(sort)}",string.Empty, ()=> this.SortColumn(clickedCol,isAsc)),
+					new MenuItem(string.Format (Strings.fdCtxHide, StripArrows (tableView.Table.ColumnNames[clickedCol])), string.Empty, () => this.HideColumn (clickedCol)),
+					new MenuItem(StripArrows (sort), string.Empty, () => this.SortColumn (clickedCol, isAsc)),
 				})
 			);
 
@@ -1365,9 +1365,9 @@ namespace Terminal.Gui {
 				e.MouseEvent.Y + 1,
 				new MenuBarItem (new MenuItem []
 				{
-					new MenuItem($"New", string.Empty, () => New()),
-					new MenuItem($"Rename",string.Empty, ()=>  Rename()),
-					new MenuItem($"Delete",string.Empty, ()=>  Delete()),
+					new MenuItem(Strings.fdCtxNew, string.Empty, New),
+					new MenuItem(Strings.fdCtxRename, string.Empty, Rename),
+					new MenuItem(Strings.fdCtxDelete,string.Empty, Delete),
 				})
 			);
 

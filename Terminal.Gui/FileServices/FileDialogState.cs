@@ -53,7 +53,7 @@ namespace Terminal.Gui {
 				if (Parent.AllowedTypes.Any () && Parent.OpenMode == OpenMode.File) {
 
 					children = children.Where (
-						c => c.IsDir () ||
+						c => c.IsDir ||
 						(c.FileSystemInfo is IFileInfo f && Parent.IsCompatibleWithAllowedExtensions (f)))
 						.ToList ();
 				}
@@ -77,7 +77,7 @@ namespace Terminal.Gui {
 
 		protected bool MatchesApiFilter (FileSystemInfoStats arg)
 		{
-			return arg.IsDir () ||
+			return arg.IsDir ||
 			(arg.FileSystemInfo is IFileInfo f && Parent.CurrentFilter.IsAllowed (f.FullName));
 		}
 	}
