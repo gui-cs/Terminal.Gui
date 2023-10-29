@@ -702,6 +702,7 @@ namespace Terminal.Gui {
 				state.Toplevel.PositionCursor ();
 				Driver.Refresh ();
 			} else {
+				state.Toplevel.PositionCursor ();
 				Driver.UpdateCursor ();
 			}
 			if (state.Toplevel != Top &&

@@ -168,11 +168,19 @@ public abstract class ConsoleDriver {
 			rune = rune.MakePrintable ();
 			runeWidth = rune.GetColumns ();
 			if (runeWidth == 0 && rune.IsCombiningMark ()) {
+				// AtlasEngine does not support NON-NORMALIZED combining marks in a way
+				// compatible with the driver architecture. Any CMs (except in the first col)
+				// are correctly combined with the base char, but are ALSO treated as 1 column
+				// width codepoints E.g. `echo "[e`u{0301}`u{0301}]"` will output `[é  ]`.
+				// 
+				// Until this is addressed (see Issue #), we do our best by 
+				// a) Attempting to normalize any CM with the base char to it's left
+				// b) Ignoring any CMs that don't normalize
 				if (Col > 0) {
 					if (Contents [Row, Col - 1].CombiningMarks.Count > 0) {
 						// Just add this mark to the list
 						Contents [Row, Col - 1].CombiningMarks.Add (rune);
-						// Don't move to next column (let the driver figure out what to do).
+						// Ignore. Don't move to next column (let the driver figure out what to do).
 					} else {
 						// Attempt to normalize the cell to our left combined with this mark
 						string combined = Contents [Row, Col - 1].Rune + rune.ToString ();
@@ -183,11 +191,11 @@ public abstract class ConsoleDriver {
 							// It normalized! We can just set the Cell to the left with the
 							// normalized codepoint 
 							Contents [Row, Col - 1].Rune = (Rune)normalized [0];
-							// Don't move to next column because we're already there
+							// Ignore. Don't move to next column because we're already there
 						} else {
 							// It didn't normalize. Add it to the Cell to left's CM list
 							Contents [Row, Col - 1].CombiningMarks.Add (rune);
-							// Don't move to next column (let the driver figure out what to do).
+							// Ignore. Don't move to next column (let the driver figure out what to do).
 						}
 					}
 					Contents [Row, Col - 1].Attribute = CurrentAttribute;

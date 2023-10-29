@@ -227,7 +227,7 @@ public class CharacterMap : Scenario {
 }
 
 class CharMap : ScrollView {
-
+	const CursorVisibility _cursor = CursorVisibility.Default;
 	/// <summary>
 	/// Specifies the starting offset for the character map. The default is 0x2500 
 	/// which is the Box Drawing characters.
@@ -296,7 +296,7 @@ class CharMap : ScrollView {
 			Cursor.X < Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0) &&
 			Cursor.Y > 0 &&
 			Cursor.Y < Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0)) {
-			Driver.SetCursorVisibility (CursorVisibility.Default);
+			Driver.SetCursorVisibility (_cursor);
 			Move (Cursor.X, Cursor.Y);
 		} else {
 			Driver.SetCursorVisibility (CursorVisibility.Invisible);
@@ -806,7 +806,7 @@ class CharMap : ScrollView {
 	public override bool OnEnter (View view)
 	{
 		if (IsInitialized) {
-			Application.Driver.SetCursorVisibility (CursorVisibility.Default);
+			Application.Driver.SetCursorVisibility (_cursor);
 		}
 		return base.OnEnter (view);
 	}

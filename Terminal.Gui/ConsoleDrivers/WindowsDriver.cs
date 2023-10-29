@@ -22,6 +22,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using static Terminal.Gui.EscSeqUtils;
 
 namespace Terminal.Gui;
 
@@ -50,59 +51,29 @@ internal class WindowsConsole {
 		ConsoleMode = newConsoleMode;
 	}
 
-	CharInfo [] _originalStdOutChars;
+	public bool Write (string text)
+	{
+		return WriteConsole (_outputHandle, text, (uint)text.Length, out _, null);
+	}
 
-	public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord bufferSize, SmallRect window, bool force16Colors)
+	CharInfo [] _originalStdOutChars;
+	public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord bufferSize, SmallRect window)
 	{
 		if (_screenBuffer == IntPtr.Zero) {
 			ReadFromConsoleOutput (size, bufferSize, ref window);
 		}
 
 		bool result = false;
-		if (force16Colors) {
-			int i = 0;
-			CharInfo [] ci = new CharInfo [charInfoBuffer.Length];
-			foreach (ExtendedCharInfo info in charInfoBuffer) {
-				ci [i++] = new CharInfo () {
-					Char = new CharUnion () { UnicodeChar = info.Char },
-					Attributes = (ushort)(((int)info.Attribute.Foreground.ColorName) | ((int)info.Attribute.Background.ColorName << 4))
-				};
-			}
-
-			result = WriteConsoleOutput (_screenBuffer, ci, bufferSize, new Coord () { X = window.Left, Y = window.Top }, ref window);
-		} else {
-
-			_stringBuilder.Clear ();
-
-			_stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
-			_stringBuilder.Append (EscSeqUtils.CSI_SetCursorPosition (0, 0));
-
-			Attribute? prev = null;
-			foreach (var info in charInfoBuffer) {
-				var attr = info.Attribute;
-
-				if (attr != prev) {
-					prev = attr;
-					_stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.Foreground.R, attr.Foreground.G, attr.Foreground.B));
-					_stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.Background.R, attr.Background.G, attr.Background.B));
-				}
-
-				if (info.Char != '\x1b') {
-					if (!info.Empty) {
-						_stringBuilder.Append (info.Char);
-					}
-
-				} else {
-					_stringBuilder.Append (' ');
-				}
-			}
-
-			_stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
-
-			string s = _stringBuilder.ToString ();
-
-			result = WriteConsole (_screenBuffer, s, (uint)(s.Length), out uint _, null);
+		int i = 0;
+		CharInfo [] ci = new CharInfo [charInfoBuffer.Length];
+		foreach (ExtendedCharInfo info in charInfoBuffer) {
+			ci [i++] = new CharInfo () {
+				Char = new CharUnion () { UnicodeChar = info.Char },
+				Attributes = (ushort)(((int)info.Attribute.Foreground.ColorName) | ((int)info.Attribute.Background.ColorName << 4))
+			};
 		}
+
+		result = WriteConsoleOutput (_screenBuffer, ci, bufferSize, new Coord () { X = window.Left, Y = window.Top }, ref window);
 
 		if (!result) {
 			var err = Marshal.GetLastWin32Error ();
@@ -148,7 +119,7 @@ internal class WindowsConsole {
 
 	public bool SetCursorPosition (Coord position)
 	{
-		return SetConsoleCursorPosition (_screenBuffer, position);
+		return SetConsoleCursorPosition (_outputHandle, position);
 	}
 
 	public void SetInitialCursorVisibility ()
@@ -160,11 +131,11 @@ internal class WindowsConsole {
 
 	public bool GetCursorVisibility (out CursorVisibility visibility)
 	{
-		if (_screenBuffer == IntPtr.Zero) {
+		if (_outputHandle == IntPtr.Zero) {
 			visibility = CursorVisibility.Invisible;
-			return false;
+			return true;
 		}
-		if (!GetConsoleCursorInfo (_screenBuffer, out ConsoleCursorInfo info)) {
+		if (!GetConsoleCursorInfo (_outputHandle, out ConsoleCursorInfo info)) {
 			var err = Marshal.GetLastWin32Error ();
 			if (err != 0) {
 				throw new System.ComponentModel.Win32Exception (err);
@@ -217,10 +188,47 @@ internal class WindowsConsole {
 				dwSize = (uint)visibility & 0x00FF,
 				bVisible = ((uint)visibility & 0xFF00) != 0
 			};
-
-			if (!SetConsoleCursorInfo (_screenBuffer, ref info)) {
+#if LEGACY_CONSOLE_API
+			if (!SetConsoleCursorInfo (_outputHandle, ref info)) {
 				return false;
 			}
+#else
+			var stringBuilder = new StringBuilder ();
+			if (visibility != CursorVisibility.Invisible) {
+				stringBuilder.Append (EscSeqUtils.CSI_ShowCursor);
+				switch (visibility) {
+				case CursorVisibility.Box:
+					stringBuilder.Append (EscSeqUtils.CSI_SetCursorStyle (DECSCUSR_Style.BlinkingBlock));
+					break;
+				case CursorVisibility.BoxFix:
+					stringBuilder.Append (EscSeqUtils.CSI_SetCursorStyle (DECSCUSR_Style.SteadyBlock));
+					break;
+
+				case CursorVisibility.Vertical:
+					stringBuilder.Append (EscSeqUtils.CSI_SetCursorStyle (DECSCUSR_Style.BlinkingBar));
+					break;
+				case CursorVisibility.VerticalFix:
+					stringBuilder.Append (EscSeqUtils.CSI_SetCursorStyle (DECSCUSR_Style.SteadyBar));
+					break;
+
+				case CursorVisibility.UnderlineFix:
+					stringBuilder.Append (EscSeqUtils.CSI_SetCursorStyle (DECSCUSR_Style.SteadyUnderline));
+					break;
+
+				case CursorVisibility.Underline:
+					stringBuilder.Append (EscSeqUtils.CSI_SetCursorStyle (DECSCUSR_Style.BlinkingUnderline));
+					break;
+
+				case CursorVisibility.Default:
+				default:
+					stringBuilder.Append (EscSeqUtils.CSI_SetCursorStyle (DECSCUSR_Style.UserShape));
+					break;
+				}
+			} else {
+				stringBuilder.Append (EscSeqUtils.CSI_HideCursor);
+			}
+			Write (stringBuilder.ToString ());
+#endif
 
 			_currentCursorVisibility = visibility;
 		}
@@ -841,6 +849,8 @@ internal class WindowsDriver : ConsoleDriver {
 		};
 
 		ClearContents ();
+
+		WinConsole?.SetInitialCursorVisibility ();
 
 #if HACK_CHECK_WINCHANGED
 		_mainLoopDriver.WinChanged = ChangeWin;
@@ -1517,8 +1527,9 @@ internal class WindowsDriver : ConsoleDriver {
 		WinConsole?.ForceRefreshCursorVisibility ();
 	}
 
-	public override void UpdateScreen ()
+	void UpdateScreen_WriteConsoleOutput ()
 	{
+
 		var windowSize = WinConsole?.GetConsoleBufferWindow (out var _) ?? new Size (Cols, Rows);
 		if (!windowSize.IsEmpty && (windowSize.Width != Cols || windowSize.Height != Rows)) {
 			return;
@@ -1551,6 +1562,15 @@ internal class WindowsDriver : ConsoleDriver {
 					_outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
 					if (Contents [row, col].Rune.GetColumns () > 1 && col + 1 < Cols) {
 						// TODO: This is a hack to deal with non-BMP and wide characters.
+						// @DHowett (https://github.com/microsoft/terminal/issues/4628):
+						// WriteConsoleOutput works entirely cellwise, and there is no guarantee that you could ever emit a non-BMP character
+						// that requires a surrogate pair using it. I'm sorry to say that the cellwise APIs cannot represent the full
+						// gamut of text. For example: U+1F574 MAN IN BUSINESS SUIT LEVITATING only occupies one column but
+						// requires two code units.
+						// The antiquated mapping of columns to code units just doesn't account for this case.
+						// However, writing known-to-be-wide characters that require two code units by way of
+						// two CHAR_INFO structs should work.
+						// If that is not working, it would be worth filing a new issue for it.
 						col++;
 						position = row * Cols + col;
 						_outputBuffer [position].Empty = false;
@@ -1567,7 +1587,7 @@ internal class WindowsDriver : ConsoleDriver {
 			Right = (short)Cols
 		};
 
-		if (!RunningUnitTests && WinConsole != null && !WinConsole.WriteToConsole (new Size (Cols, Rows), _outputBuffer, bufferCoords, _damageRegion, Force16Colors)) {
+		if (!RunningUnitTests && WinConsole != null && !WinConsole.WriteToConsole (new Size (Cols, Rows), _outputBuffer, bufferCoords, _damageRegion)) {
 			var err = Marshal.GetLastWin32Error ();
 			if (err != 0) {
 				throw new System.ComponentModel.Win32Exception (err);
@@ -1576,10 +1596,127 @@ internal class WindowsDriver : ConsoleDriver {
 		WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
 	}
 
+	void UpdateScreen_WriteConsole ()
+	{
+		var stringBuilder = new StringBuilder ();
+		stringBuilder.Clear ();
+
+		//WinConsole.GetCursorVisibility (out var cursorVisible);
+		//SetCursorVisibility (CursorVisibility.Invisible);
+		
+		//stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
+		stringBuilder.Append (EscSeqUtils.CSI_SetCursorPosition (1, 1));
+		WinConsole.Write (stringBuilder.ToString ());
+
+		var top = 0;
+		var left = 0;
+		var rows = Rows;
+		var cols = Cols;
+		Attribute redrawAttr = new Attribute ();
+		var nextCol = -1; // The net column we can write to. -1 if we've not processed anything yet.
+
+		for (var row = top; row < rows; row++) {
+			stringBuilder.Clear ();
+			stringBuilder.Append (EscSeqUtils.CSI_SetCursorPosition (row + 1, 1));
+			_dirtyLines [row] = false;
+			for (var col = left; col < cols; col++) {
+				nextCol = -1;
+				var outputWidth = 0;
+				for (; col < cols; col++) {
+					if (!Contents [row, col].IsDirty) {
+						if (stringBuilder.Length > 0) {
+							// We've collected outputWidth dirty cells on this row. Output them.
+							WriteToConsole (stringBuilder, ref nextCol, row, ref outputWidth);
+							// nextCol now points to the last column we write to (nextCol += outputWidth)
+							// outputWidth is now 0
+						} else if (nextCol == -1) {
+							nextCol = col;
+						}
+						if (nextCol + 1 < cols) {
+							nextCol++;
+						}
+						continue;
+					}
+
+					if (nextCol == -1) {
+						nextCol = col;
+					}
+
+					Attribute attr = Contents [row, col].Attribute.Value;
+					// Performance: Only send the escape sequence if the attribute has changed.
+					if (attr != redrawAttr) {
+						redrawAttr = attr;
+						stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.Foreground.R, attr.Foreground.G, attr.Foreground.B));
+						stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.Background.R, attr.Background.G, attr.Background.B));
+
+					}
+
+					outputWidth++;
+					var rune = (Rune)Contents [row, col].Rune;
+					stringBuilder.Append (rune);
+					if (Contents [row, col].CombiningMarks.Count > 0) {
+						// AtlasEngine does not support NON-NORMALIZED combining marks in a way
+						// compatible with the driver architecture. Any CMs (except in the first col)
+						// are correctly combined with the base char, but are ALSO treated as 1 column
+						// width codepoints E.g. `echo "[e`u{0301}`u{0301}]"` will output `[é  ]`.
+						// 
+#if COMBINING_MARKS_SUPPORTED
+						foreach (var combMark in Contents [row, col].CombiningMarks) {
+							stringBuilder.Append (combMark);
+						}
+						WriteToConsole (stringBuilder, ref nextCol, row, ref outputWidth);
+#endif
+					}
+					if ((rune.IsSurrogatePair () && rune.GetColumns () < 2)) {
+						// AtlasEngine treats all SurrogatePairs as 2 columns
+						// BUGBUG: Regional Indicator Symbol Letters A-Z - U+1f1e6-U+1f1ff render in WT 
+						// weird
+						WriteToConsole (stringBuilder, ref nextCol, row, ref outputWidth);
+						//SetCursorPosition (col - 1, row);
+					}
+					Contents [row, col].IsDirty = false;
+				}
+			}
+			if (stringBuilder.Length > 0) {
+				stringBuilder.Insert (0, EscSeqUtils.CSI_SetCursorPosition (row + 1, nextCol + 1));
+				WinConsole.Write (stringBuilder.ToString ());
+			}
+		}
+
+		//stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
+//		if (cursorVisible != CursorVisibility.Invisible) {
+			stringBuilder.Append (EscSeqUtils.CSI_SetCursorPosition (Row + 1, Col + 1));
+			//stringBuilder.Append (EscSeqUtils.CSI_HideCursor);
+			//WinConsole.SetCursorVisibility (cursorVisible);
+//		}
+		WinConsole.Write (stringBuilder.ToString ());
+
+		void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
+		{
+			var s = output.ToString ();
+			WinConsole.Write (s);
+			output.Clear ();
+			lastCol += outputWidth;
+			outputWidth = 0;
+		}
+	}
+
+	public override void UpdateScreen ()
+	{
+		if (RunningUnitTests) {
+			return;
+		}
+
+		if (Force16Colors) {
+			UpdateScreen_WriteConsoleOutput ();
+		} else {
+			UpdateScreen_WriteConsole ();
+		}
+	}
+
 	public override void Refresh ()
 	{
 		UpdateScreen ();
-		WinConsole?.SetInitialCursorVisibility ();
 		UpdateCursor ();
 	}
 
@@ -1594,12 +1731,13 @@ internal class WindowsDriver : ConsoleDriver {
 			return;
 		}
 
-		SetCursorVisibility (_cachedCursorVisibility);
 		var position = new WindowsConsole.Coord () {
 			X = (short)Col,
 			Y = (short)Row
 		};
 		WinConsole?.SetCursorPosition (position);
+		var result = SetCursorVisibility (_cachedCursorVisibility);
+		Debug.Assert (result);
 	}
 
 	/// <inheritdoc/>
