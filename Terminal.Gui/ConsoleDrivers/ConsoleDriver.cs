@@ -8,6 +8,8 @@ using System.Diagnostics;
 using static Terminal.Gui.ColorScheme;
 using System.Linq;
 using System.Data;
+using System.Linq;
+using System.Data;
 
 namespace Terminal.Gui;
 
@@ -514,6 +516,7 @@ public abstract class ConsoleDriver {
 	/// </summary>
 	/// <param name="a"></param>
 	public void OnKeyDown (KeyEventEventArgs a) => KeyDown?.Invoke (this, a);
+
 
 	/// <summary>
 	/// Event fired when a mouse event occurs.
