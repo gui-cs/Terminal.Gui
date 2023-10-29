@@ -67,8 +67,8 @@ namespace UICatalog.Scenarios {
 				"Long name Tab, I mean seriously long.  Like you would not believe how long this tab's name is its just too much really woooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooowwww thats long",
 				 new Label ("This tab has a very long name which should be truncated.  See TabView.MaxTabTextWidth")),
 				 false);
-			tabView.AddTab (new Tab ("Les Mise" + Char.ConvertFromUtf32 (Int32.Parse ("0301", NumberStyles.HexNumber)) + "rables", new Label ("This tab name is unicode")), false);
-
+			tabView.AddTab (new Tab ("Les Mise" + '\u0301' + "rables", new Label ("This tab name is unicode")), false);
+			tabView.AddTab (new Tab ("Les Mise" + '\u0328' + '\u0301' + "rables", new Label ("This tab name has two combining marks. Only one will show due to Issue #2616.")), false);
 			for (int i = 0; i < 100; i++) {
 				tabView.AddTab (new Tab ($"Tab{i}", new Label ($"Welcome to tab {i}")), false);
 			}

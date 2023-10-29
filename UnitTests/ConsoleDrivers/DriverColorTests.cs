@@ -19,7 +19,7 @@ namespace Terminal.Gui.DriverTests {
 		public void SetColors_Changes_Colors (Type driverType)
 		{
 			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-			Application.Init (driver);
+			driver.Init ();
 
 			Assert.Equal (ConsoleColor.Gray, Console.ForegroundColor);
 			Assert.Equal (ConsoleColor.Black, Console.BackgroundColor);
@@ -34,8 +34,7 @@ namespace Terminal.Gui.DriverTests {
 			Assert.Equal (ConsoleColor.Gray, Console.ForegroundColor);
 			Assert.Equal (ConsoleColor.Black, Console.BackgroundColor);
 
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
+			driver.End ();
 		}
 
 
@@ -52,9 +51,6 @@ namespace Terminal.Gui.DriverTests {
 			Assert.Equal (expectedSetting, driver.SupportsTrueColor);
 
 			driver.End ();
-
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
 		}
 
 		[Theory]
@@ -71,9 +67,6 @@ namespace Terminal.Gui.DriverTests {
 			Assert.True (driver.Force16Colors);
 
 			driver.End ();
-
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
 		}
 	}
 }

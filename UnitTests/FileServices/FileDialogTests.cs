@@ -401,7 +401,7 @@ namespace Terminal.Gui.FileServicesTests {
 │{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                                   {CM.Glyphs.LeftBracket} OK {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}  │
 └─────────────────────────────────────────────────────────────────────────┘
 ";
-			TestHelpers.AssertDriverContentsAre (expected, output, true);
+			TestHelpers.AssertDriverContentsAre (expected, output, ignoreLeadingWhitespace: true);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -437,7 +437,7 @@ namespace Terminal.Gui.FileServicesTests {
 │{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                                   {CM.Glyphs.LeftBracket} OK {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}  │
 └─────────────────────────────────────────────────────────────────────────┘
 ";
-			TestHelpers.AssertDriverContentsAre (expected, output, true);
+			TestHelpers.AssertDriverContentsAre (expected, output, ignoreLeadingWhitespace: true);
 		}
 
 

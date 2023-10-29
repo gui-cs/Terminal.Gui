@@ -90,7 +90,6 @@ public class AttributeTests {
 	public void Constuctors_Constuct ()
 	{
 		var driver = new FakeDriver ();
-		Application.Init (driver);
 		driver.Init ();
 
 		// Test parameterless constructor
@@ -127,7 +126,6 @@ public class AttributeTests {
 		Assert.Equal (bg, attr.Background);
 
 		driver.End ();
-		Application.Shutdown ();
 	}
 
 	[Fact]
@@ -196,7 +194,6 @@ public class AttributeTests {
 	public void Implicit_Assign ()
 	{
 		var driver = new FakeDriver ();
-		Application.Init (driver);
 		driver.Init ();
 
 		var attr = new Attribute ();
@@ -216,7 +213,6 @@ public class AttributeTests {
 		Assert.Equal (value, attr.PlatformColor);
 
 		driver.End ();
-		Application.Shutdown ();
 	}
 
 	[Fact]
@@ -237,7 +233,6 @@ public class AttributeTests {
 	public void Make_Creates ()
 	{
 		var driver = new FakeDriver ();
-		Application.Init (driver);
 		driver.Init ();
 
 		var fg = new Color ();
@@ -252,7 +247,6 @@ public class AttributeTests {
 		Assert.Equal (bg, attr.Background);
 
 		driver.End ();
-		Application.Shutdown ();
 	}
 
 	[Fact]
