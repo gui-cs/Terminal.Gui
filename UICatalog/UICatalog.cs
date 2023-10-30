@@ -17,6 +17,7 @@ using System.Text.Json.Serialization;
 using static Terminal.Gui.TableView;
 using System.CommandLine;
 using System.Threading.Tasks;
+using System.CommandLine.Parsing;
 
 
 #nullable enable
@@ -77,11 +78,11 @@ namespace UICatalog {
 				name: "--driver",
 				description: "The ConsoleDriver to force the use of."
 				).FromAmong (
-				"Fake",
-				"Net",
-				"Curses",
-				"Windows",
-				"ANSI");
+				"fake",
+				"net",
+				"curses",
+				"windows",
+				"ansi");
 			driverOption.AddAlias ("-d");
 			driverOption.AddAlias ("--d");
 

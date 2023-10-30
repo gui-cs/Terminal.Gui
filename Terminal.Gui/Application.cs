@@ -48,9 +48,13 @@ namespace Terminal.Gui {
 		public static ConsoleDriver Driver { get; internal set; }
 
 		/// <summary>
-		/// Forces the use of the specified driver (one of "FakeDriver", "ANSIDriver", "CursesDriver", "NetDriver",or "WindowsDriver"). If
+		/// Forces the use of the specified driver (one of "fake", "ansi", "curses", "net", or "windows"). If
 		/// not specified, the driver is selected based on the platform.
 		/// </summary>
+		/// <remarks>
+		/// Note, <see cref="Application.Init(ConsoleDriver, string)"/> will override this configuration setting if
+		/// called with either `driver` or `driverName` specified.
+		/// </remarks>
 		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
 		public static string ForceDriver { get; set; } = string.Empty;
 
@@ -111,7 +115,7 @@ namespace Terminal.Gui {
 		/// without explicitly calling <see cref="Init(ConsoleDriver, string)"/>.
 		/// </para>
 		/// <param name="driver">The <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are specified the default driver for the platform will be used.</param>
-		/// <param name="driverName">The short name (e.g. "Net") of the <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are specified the default driver for the platform will be used.</param>
+		/// <param name="driverName">The short name (e.g. "net", "windows", "ansi", "fake", or "curses") of the <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are specified the default driver for the platform will be used.</param>
 		public static void Init (ConsoleDriver driver = null, string driverName = null) => InternalInit (Toplevel.Create, driver, driverName);
 
 		internal static bool _initialized = false;

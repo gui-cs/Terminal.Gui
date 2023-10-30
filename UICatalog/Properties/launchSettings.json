@@ -3,17 +3,17 @@
     "UICatalog": {
       "commandName": "Project"
     },
-    "UICatalog --driver Net": {
+    "UICatalog --driver net": {
       "commandName": "Project",
-      "commandLineArgs": "--driver Net"
+      "commandLineArgs": "--driver net"
     },
-    "UICatalog --driver ANSI": {
+    "UICatalog --driver ansi": {
       "commandName": "Project",
-      "commandLineArgs": "--driver ANSI"
+      "commandLineArgs": "--driver ansi"
     },
-    "UICatalog --driver Windows": {
+    "UICatalog --driver windows": {
       "commandName": "Project",
-      "commandLineArgs": "--driver Windows"
+      "commandLineArgs": "--driver windows"
     },
     "WSL : UICatalog": {
       "commandName": "Executable",
@@ -21,10 +21,10 @@
       "commandLineArgs": "dotnet UICatalog.dll",
       "distributionName": ""
     },
-    "WSL: UICatalog --driver Net": {
+    "WSL: UICatalog --driver net": {
       "commandName": "Executable",
       "executablePath": "wsl",
-      "commandLineArgs": "dotnet UICatalog.dll --driver Net",
+      "commandLineArgs": "dotnet UICatalog.dll --driver net",
       "distributionName": ""
     },
     "Sliders": {
