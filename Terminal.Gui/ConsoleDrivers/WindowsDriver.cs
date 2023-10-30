@@ -100,13 +100,6 @@ internal class WindowsConsole {
 
 				for (int col = 0; col < bufferSize.X; col++) {
 					var ci = charInfoBuffer [row, col];
-					if (ci.Empty) {
-						if (_stringBuilder.Length > 0) {
-							ProcessWriteToConsole ();
-						}
-						continue;
-					}
-
 					var attr = ci.Attribute;
 
 					if (prev == null) {
@@ -129,12 +122,7 @@ internal class WindowsConsole {
 				}
 
 				if (_stringBuilder.Length > 0) {
-					GetScreenBufferInfo (ref csbi);
-					SetCursorPosition (csbi.dwCursorPosition);
-
-					s = _stringBuilder.ToString ();
-
-					result = WriteConsole (_screenBuffer, s, (uint)(s.Length), out uint _, null);
+					ProcessWriteToConsole ();
 				}
 			}
 
@@ -1772,17 +1760,9 @@ internal class WindowsDriver : ConsoleDriver {
 			var size = Rows * Cols;
 
 			for (int col = 0; col < Cols; col++) {
-				Attribute attribute = Contents [row, col].Attribute.GetValueOrDefault ();
-				_outputBuffer [row, col].Attribute = attribute;
-				if (Contents [row, col].IsDirty == false) {
-					_outputBuffer [row, col].Empty = true;
-					_outputBuffer [row, col].Rune = (Rune)'\0';
-					continue;
-				}
+				_outputBuffer [row, col].Attribute = Contents [row, col].Attribute.GetValueOrDefault ();
 				_outputBuffer [row, col].Empty = false;
-				Rune rune = Contents [row, col].Rune;
-				var colWidth = rune.ToString ().GetColumns ();
-				_outputBuffer [row, col].Rune = rune;
+				_outputBuffer [row, col].Rune = Contents [row, col].Rune;
 			}
 		}
 
