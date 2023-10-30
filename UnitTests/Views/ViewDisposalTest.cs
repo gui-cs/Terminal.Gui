@@ -6,7 +6,7 @@ using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace UnitTests.ViewsTests {
+namespace Terminal.Gui.ViewsTests {
 
 	public class ViewDisposalTest {
 
