@@ -1433,6 +1433,13 @@ namespace Terminal.Gui {
 			DrawLine?.Invoke (this, e);
 		}
 
+		/// <inheritdoc/>
+		protected override void Dispose (bool disposing)
+		{
+			base.Dispose (disposing);
+
+			ColorGetter = null;
+		}
 	}
 	class TreeSelection<T> where T : class {
 
