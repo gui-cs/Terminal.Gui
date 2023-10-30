@@ -90,7 +90,6 @@ namespace Terminal.Gui {
 		}
 
 		#region Initialization (Init/Shutdown)
-
 		/// <summary>
 		/// Initializes a new instance of <see cref="Terminal.Gui"/> Application. 
 		/// </summary>
@@ -107,14 +106,13 @@ namespace Terminal.Gui {
 		/// </para>
 		/// <para>
 		/// The <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver)"/> function 
-		/// combines <see cref="Init(ConsoleDriver)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
+		/// combines <see cref="Init(ConsoleDriver, string)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
 		/// into a single call. An application cam use <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver)"/> 
-		/// without explicitly calling <see cref="Init(ConsoleDriver)"/>.
+		/// without explicitly calling <see cref="Init(ConsoleDriver, string)"/>.
 		/// </para>
-		/// <param name="driver">
-		/// The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the
-		/// platform will be used (see <see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, and <see cref="NetDriver"/>).</param>
-		public static void Init (ConsoleDriver driver = null) => InternalInit (() => Toplevel.Create (), driver);
+		/// <param name="driver">The <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are specified the default driver for the platform will be used.</param>
+		/// <param name="driverName">The short name (e.g. "Net") of the <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are specified the default driver for the platform will be used.</param>
+		public static void Init (ConsoleDriver driver = null, string driverName = null) => InternalInit (Toplevel.Create, driver, driverName);
 
 		internal static bool _initialized = false;
 		internal static int _mainThreadId = -1;
@@ -128,7 +126,7 @@ namespace Terminal.Gui {
 		// Unit Tests - To initialize the app with a custom Toplevel, using the FakeDriver. calledViaRunT will be false, causing all state to be reset.
 		// 
 		// calledViaRunT: If false (default) all state will be reset. If true the state will not be reset.
-		internal static void InternalInit (Func<Toplevel> topLevelFactory, ConsoleDriver driver = null, bool calledViaRunT = false)
+		internal static void InternalInit (Func<Toplevel> topLevelFactory, ConsoleDriver driver = null, string driverName = null, bool calledViaRunT = false)
 		{
 			if (_initialized && driver == null) {
 				return;
@@ -156,16 +154,21 @@ namespace Terminal.Gui {
 			ConfigurationManager.Load (true);
 			ConfigurationManager.Apply ();
 
+			// Ignore Configuration for ForceDriver if driverName is specified
+			if (!string.IsNullOrEmpty (driverName)) {
+				ForceDriver = driverName;
+			}
+
 			if (Driver == null) {
 				var p = Environment.OSVersion.Platform;
-				if (string.IsNullOrEmpty(Application.ForceDriver)) {
+				if (string.IsNullOrEmpty(ForceDriver)) {
 					if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
 						Driver = new ANSIDriver ();
 					} else {
 						Driver = new CursesDriver ();
 					}
 				} else {
-					switch (Application.ForceDriver.ToLower ()) {
+					switch (ForceDriver.ToLower ()) {
 					case "curses":
 						Driver = new CursesDriver ();
 						break;
@@ -182,7 +185,7 @@ namespace Terminal.Gui {
 						Driver = new NetDriver ();
 						break;
 					default:
-						throw new ArgumentException ($"Invalid driver name '{Application.ForceDriver}'. Valid values are 'curses', 'windows', 'fake', 'ansi', and 'net'.");
+						throw new ArgumentException ($"Invalid driver name '{ForceDriver}'. Valid values are 'curses', 'windows', 'fake', 'ansi', and 'net'.");
 					}
 				}
 			}

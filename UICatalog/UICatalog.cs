@@ -89,22 +89,26 @@ namespace UICatalog {
 				name: "scenario",
 				description: "The name of the scenario to run.",
 				getDefaultValue: () => "none"
-				) .FromAmong (_scenarios.Select (s => s.GetName ()).Append("none").ToArray());
+				).FromAmong (_scenarios.Select (s => s.GetName ()).Append ("none").ToArray ());
 
 			var rootCommand = new RootCommand (description: "A comprehensive sample library for Terminal.Gui") {
 				scenarioArgument,
 				driverOption
 			};
-			
+
 
 			rootCommand.SetHandler (Main, driverOption, scenarioArgument);
 
 			return await rootCommand.InvokeAsync (args);
 		}
-		
+
 		static void Main (string driverOptionValue, string scenarioArgumentValue)
 		{
 			StartConfigFileWatcher ();
+
+			// By setting _forceDriver we ensure that if the user has specified a driver on the command line, it will be used
+			// regardless of what's in a config file.
+			Application.ForceDriver = _forceDriver = driverOptionValue;
 
 			// If a Scenario name has been provided on the commandline
 			// run it and exit when done.
@@ -113,9 +117,8 @@ namespace UICatalog {
 
 				var item = _scenarios.FindIndex (s => s.GetName ().Equals (scenarioArgumentValue, StringComparison.OrdinalIgnoreCase));
 				_selectedScenario = (Scenario)Activator.CreateInstance (_scenarios [item].GetType ())!;
-				Application.ForceDriver = driverOptionValue;
 
-				Application.Init ();
+				Application.Init (driverName: _forceDriver);
 				_selectedScenario.Theme = _cachedTheme;
 				_selectedScenario.TopLevelColorScheme = _topLevelColorScheme;
 				_selectedScenario.Init ();
@@ -228,14 +231,15 @@ namespace UICatalog {
 		/// <returns></returns>
 		static Scenario RunUICatalogTopLevel ()
 		{
-			if (_forceDriver != string.Empty) {
-				Application.ForceDriver = _forceDriver;
-			}
 
 			// Run UI Catalog UI. When it exits, if _selectedScenario is != null then
 			// a Scenario was selected. Otherwise, the user wants to quit UI Catalog.
-			Application.Init ();
+			
+			// If the user specified a driver on the command line then use it,
+			// ignoring Config files.
 
+			Application.Init (driverName: _forceDriver);
+				
 			if (_cachedTheme is null) {
 				_cachedTheme = CM.Themes?.Theme;
 			} else {
