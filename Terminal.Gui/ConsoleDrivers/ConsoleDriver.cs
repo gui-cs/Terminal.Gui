@@ -217,10 +217,12 @@ public abstract class ConsoleDriver {
 					Contents [Row, Col].Rune = (Rune)'\0';
 
 				} else if (runeWidth == 1) {
-					Contents [Row, Col].Rune = rune;
-					if (Col < Clip.Right - 1) {
+					// The current position had a wide character before and we need to clear at right.
+					if (Contents [Row, Col].Rune.GetColumns () > 1 && Col < Clip.Right - 1) {
+						Contents [Row, Col + 1].Rune = (Rune)' ';
 						Contents [Row, Col + 1].IsDirty = true;
 					}
+					Contents [Row, Col].Rune = rune;
 				} else if (runeWidth == 2) {
 					if (Col == Clip.Right - 1) {
 						// We're at the right edge of the clip, so we can't display a wide character.
@@ -251,8 +253,8 @@ public abstract class ConsoleDriver {
 				Contents [Row, Col].IsDirty = false;
 				Contents [Row, Col].Attribute = CurrentAttribute;
 
-				// TODO: Determine if we should wipe this out (for now now)
-				//Contents [Row, Col].Rune = (Rune)' ';
+				// This is needed to flag the console to ignore null char and advance.
+				Contents [Row, Col].Rune = (Rune)'\0';
 			}
 			Col++;
 		}
