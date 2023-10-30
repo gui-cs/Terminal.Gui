@@ -82,6 +82,7 @@ The PR title should be of the form "Release v1.2.3"
 git checkout develop
 git pull upstream develop
 git checkout -b v2_3_4
+<touch a file>
 git add .
 git commit -m "Release v1.2.3"
 git push
