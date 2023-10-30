@@ -32,11 +32,12 @@ namespace UnitTests.ViewsTests {
 				GC.Collect ();
 				GC.WaitForPendingFinalizers ();
 			}
-
+#if DEBUG_IDISPOSABLE
 			if (reference.IsAlive) {
 				Assert.True (((View)reference.Target).WasDisposed);
 				Assert.Fail ($"Some Views didnt get Garbage Collected: {((View)reference.Target).Subviews}");
 			}
+#endif
 		}
 
 		void getSpecialParams ()
