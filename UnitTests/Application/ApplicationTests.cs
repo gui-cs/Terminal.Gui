@@ -277,8 +277,8 @@ public class ApplicationTests {
 	[Fact]
 	public void Run_T_After_InitNullDriver_with_TestTopLevel_Throws ()
 	{
-		Application._forceFakeConsole = true;
-
+		Application.ForceDriver = "FakeConsole";
+		
 		Application.Init (null);
 		Assert.Equal (typeof (FakeDriver), Application.Driver.GetType ());
 
@@ -320,7 +320,7 @@ public class ApplicationTests {
 	[Fact]
 	public void Run_T_NoInit_DoesNotThrow ()
 	{
-		Application._forceFakeConsole = true;
+		Application.ForceDriver = "FakeConsole";
 
 		Application.Iteration += (s, a) => {
 			Application.RequestStop ();

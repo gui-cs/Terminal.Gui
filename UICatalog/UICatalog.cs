@@ -15,6 +15,8 @@ using System.Threading;
 using static Terminal.Gui.ConfigurationManager;
 using System.Text.Json.Serialization;
 using static Terminal.Gui.TableView;
+using System.CommandLine;
+using System.Threading.Tasks;
 
 
 #nullable enable
@@ -57,7 +59,7 @@ namespace UICatalog {
 		static readonly FileSystemWatcher _currentDirWatcher = new FileSystemWatcher ();
 		static readonly FileSystemWatcher _homeDirWatcher = new FileSystemWatcher ();
 
-		static void Main (string [] args)
+		static async Task<int> Main (string [] args)
 		{
 			Console.OutputEncoding = Encoding.Default;
 
@@ -68,21 +70,51 @@ namespace UICatalog {
 			_scenarios = Scenario.GetScenarios ();
 			_categories = Scenario.GetAllCategories ();
 
-			if (args.Length > 0 && args.Contains ("-usc")) {
-				_useSystemConsole = true;
-				args = args.Where (val => val != "-usc").ToArray ();
-			}
+			// Process command line args
+			// "UICatalog [-driver <driver>] [scenario name]"
+			// If no driver is provided, the default driver is used.
+			var driverOption = new Option<string> (
+				name: "--driver",
+				description: "The ConsoleDriver to force the use of."
+				).FromAmong (
+				"Fake",
+				"Net",
+				"Curses",
+				"Windows",
+				"ANSI");
+			driverOption.AddAlias ("-d");
+			driverOption.AddAlias ("--d");
 
+			var scenarioArgument = new Argument<string> (
+				name: "scenario",
+				description: "The name of the scenario to run.",
+				getDefaultValue: () => "none"
+				) .FromAmong (_scenarios.Select (s => s.GetName ()).Append("none").ToArray());
+
+			var rootCommand = new RootCommand (description: "A comprehensive sample library for Terminal.Gui") {
+				scenarioArgument,
+				driverOption
+			};
+			
+
+			rootCommand.SetHandler (Main, driverOption, scenarioArgument);
+
+			return await rootCommand.InvokeAsync (args);
+		}
+		
+		static void Main (string driverOptionValue, string scenarioArgumentValue)
+		{
 			StartConfigFileWatcher ();
 
 			// If a Scenario name has been provided on the commandline
 			// run it and exit when done.
-			if (args.Length > 0) {
+			if (scenarioArgumentValue != "none") {
 				_topLevelColorScheme = "Base";
 
-				var item = _scenarios.FindIndex (s => s.GetName ().Equals (args [0], StringComparison.OrdinalIgnoreCase));
+				var item = _scenarios.FindIndex (s => s.GetName ().Equals (scenarioArgumentValue, StringComparison.OrdinalIgnoreCase));
 				_selectedScenario = (Scenario)Activator.CreateInstance (_scenarios [item].GetType ())!;
-				Application.UseSystemConsole = _useSystemConsole;
+				Application.ForceDriver = driverOptionValue;
+
 				Application.Init ();
 				_selectedScenario.Theme = _cachedTheme;
 				_selectedScenario.TopLevelColorScheme = _topLevelColorScheme;
@@ -196,7 +228,9 @@ namespace UICatalog {
 		/// <returns></returns>
 		static Scenario RunUICatalogTopLevel ()
 		{
-			Application.UseSystemConsole = _useSystemConsole;
+			if (_forceDriver != string.Empty) {
+				Application.ForceDriver = _forceDriver;
+			}
 
 			// Run UI Catalog UI. When it exits, if _selectedScenario is != null then
 			// a Scenario was selected. Otherwise, the user wants to quit UI Catalog.
@@ -230,7 +264,7 @@ namespace UICatalog {
 		// If set, holds the scenario the user selected
 		static Scenario? _selectedScenario = null;
 
-		static bool _useSystemConsole = false;
+		static string _forceDriver = string.Empty;
 		static ConsoleDriver.DiagnosticFlags _diagnosticFlags;
 		static bool _isFirstRunning = true;
 		static string _topLevelColorScheme = string.Empty;
@@ -386,8 +420,8 @@ namespace UICatalog {
 				ScenarioList.CellActivated += ScenarioView_OpenSelectedItem;
 
 				// TableView typically is a grid where nav keys are biased for moving left/right.
-				ScenarioList.AddKeyBinding (Key.Home, Command.TopHome);
-				ScenarioList.AddKeyBinding (Key.End, Command.BottomEnd);
+				ScenarioList.AddKeyBinding (Key.Home, Terminal.Gui.Command.TopHome);
+				ScenarioList.AddKeyBinding (Key.End, Terminal.Gui.Command.BottomEnd);
 
 				// Ideally, TableView.MultiSelect = false would turn off any keybindings for
 				// multi-select options. But it currently does not. UI Catalog uses Ctrl-A for
@@ -676,7 +710,7 @@ namespace UICatalog {
 
 			public MenuItem []? CreateThemeMenuItems ()
 			{
-				var menuItems = CreateForce16ColorItems ().ToList();
+				var menuItems = CreateForce16ColorItems ().ToList ();
 				menuItems.Add (null!);
 
 				foreach (var theme in CM.Themes!) {

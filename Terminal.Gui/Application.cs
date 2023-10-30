@@ -43,15 +43,16 @@ namespace Terminal.Gui {
 	public static partial class Application {
 
 		/// <summary>
-		/// Gets the <see cref="ConsoleDriver"/> that has been selected. See also <see cref="UseSystemConsole"/>.
+		/// Gets the <see cref="ConsoleDriver"/> that has been selected. See also <see cref="ForceDriver"/>.
 		/// </summary>
 		public static ConsoleDriver Driver { get; internal set; }
 
 		/// <summary>
-		/// If <see langword="true"/>, forces the use of the System.Console-based (see <see cref="NetDriver"/>) driver. The default is <see langword="false"/>.
+		/// Forces the use of the specified driver (one of "FakeDriver", "ANSIDriver", "CursesDriver", "NetDriver",or "WindowsDriver"). If
+		/// not specified, the driver is selected based on the platform.
 		/// </summary>
 		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-		public static bool UseSystemConsole { get; set; } = false;
+		public static string ForceDriver { get; set; } = string.Empty;
 
 		/// <summary>
 		/// Gets or sets whether <see cref="Application.Driver"/> will be forced to output only the 16 colors defined in <see cref="ColorName"/>.
@@ -60,9 +61,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
 		public static bool Force16Colors { get; set; } = false;
-
-		// For Unit testing - ignores UseSystemConsole
-		internal static bool _forceFakeConsole;
 
 		private static List<CultureInfo> _cachedSupportedCultures;
 
@@ -160,18 +158,32 @@ namespace Terminal.Gui {
 
 			if (Driver == null) {
 				var p = Environment.OSVersion.Platform;
-				if (_forceFakeConsole) {
-					// For Unit Testing only
-					Driver = new FakeDriver ();
-				} else if (UseSystemConsole) {
-					Driver = new NetDriver ();
-				} else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
-					Driver = new WindowsDriver ();
+				if (string.IsNullOrEmpty(Application.ForceDriver)) {
+					if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
+						Driver = new ANSIDriver ();
+					} else {
+						Driver = new CursesDriver ();
+					}
 				} else {
-					Driver = new CursesDriver ();
-				}
-				if (Driver == null) {
-					throw new InvalidOperationException ("Init could not determine the ConsoleDriver to use.");
+					switch (Application.ForceDriver.ToLower ()) {
+					case "curses":
+						Driver = new CursesDriver ();
+						break;
+					case "ansi":
+						Driver = new ANSIDriver ();
+						break;
+					case "windows":
+						Driver = new WindowsDriver ();
+						break;
+					case "fake":
+						Driver = new FakeDriver ();
+						break;
+					case "net":
+						Driver = new NetDriver ();
+						break;
+					default:
+						throw new ArgumentException ($"Invalid driver name '{Application.ForceDriver}'. Valid values are 'curses', 'windows', 'fake', 'ansi', and 'net'.");
+					}
 				}
 			}
 
@@ -656,7 +668,7 @@ namespace Terminal.Gui {
 				}
 
 				MainLoop.RunIteration ();
-				Iteration?.Invoke (null, new IterationEventArgs());
+				Iteration?.Invoke (null, new IterationEventArgs ());
 
 				EnsureModalOrVisibleAlwaysOnTop (state.Toplevel);
 				if (state.Toplevel != Current) {
