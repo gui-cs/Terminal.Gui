@@ -9,16 +9,14 @@ using Xunit.Abstractions;
 namespace Terminal.Gui.ViewsTests;
 public class ViewDisposalTest {
 #nullable enable
-	Dictionary<Type, object? []?> special_params = new Dictionary<Type, object? []?> ();
+	Dictionary<Type, object? []?> _special_params = new Dictionary<Type, object? []?> ();
 #nullable restore
 
-	readonly ITestOutputHelper output;
+	readonly ITestOutputHelper _output;
 
 	public ViewDisposalTest (ITestOutputHelper output)
 	{
-		{
-			this.output = output;
-		}
+		this._output = output;
 	}
 
 	[Fact]
@@ -38,30 +36,30 @@ public class ViewDisposalTest {
 #endif
 	}
 
-	void getSpecialParams ()
+	void GetSpecialParams ()
 	{
-		special_params.Clear ();
+		_special_params.Clear ();
 		//special_params.Add (typeof (LineView), new object [] { Orientation.Horizontal });
 	}
 
 	WeakReference DoTest ()
 	{
-		getSpecialParams ();
+		GetSpecialParams ();
 		View Container = new View ();
 		Toplevel top = Application.Top;
 		var views = GetViews ();
 		foreach (var view in views) {
 			View instance;
 			//Create instance of view and add to container
-			if (special_params.ContainsKey (view)) {
-				instance = (View)Activator.CreateInstance (view, special_params [view]);
+			if (_special_params.TryGetValue (view, out var param)) {
+				instance = (View)Activator.CreateInstance (view, param);
 			} else {
 				instance = (View)Activator.CreateInstance (view);
 			}
 
 			Assert.NotNull (instance);
 			Container.Add (instance);
-			output.WriteLine ($"Added instance of {view}!");
+			_output.WriteLine ($"Added instance of {view}!");
 		}
 		top.Add (Container);
 		// make sure the application is doing to the views whatever its supposed to do to the views
@@ -75,6 +73,7 @@ public class ViewDisposalTest {
 		return reference;
 	}
 
+	// TODO: Consoldate this with same fn that's in AllViewsTester, ScenarioTests etc...
 	/// <summary>
 	/// Get all types derived from <see cref="View"/> using reflection
 	/// </summary>
@@ -87,11 +86,11 @@ public class ViewDisposalTest {
 			return ((!T.IsAbstract) && T.IsPublic && T.IsClass && T.IsAssignableTo (typeof (View)) && !T.IsGenericType && !(T == typeof (View)));
 		})) //end of body of anonymous check function
 		{ //body of the foreach loop
-			output.WriteLine ($"Found Type {type.Name}");
+			_output.WriteLine ($"Found Type {type.Name}");
 			Assert.DoesNotContain (type, valid);
 			Assert.True (type.IsAssignableTo (typeof (IDisposable)));// Just to be safe
 			valid.Add (type);
-			output.WriteLine ("	-Added!");
+			_output.WriteLine ("	-Added!");
 		} //end body of foreach loop
 
 		return valid;
