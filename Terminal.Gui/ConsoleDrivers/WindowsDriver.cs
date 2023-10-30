@@ -22,6 +22,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using Microsoft.Win32;
 
 namespace Terminal.Gui;
 
@@ -32,44 +33,143 @@ internal class WindowsConsole {
 
 	IntPtr _inputHandle, _outputHandle;
 	IntPtr _screenBuffer;
-	readonly uint _originalConsoleMode;
+	readonly uint _originalInputConsoleMode;
+	readonly uint _originalOutputConsoleMode;
+	CONSOLE_SCREEN_BUFFER_INFOEX _originalScreenBufferInfo;
 	CursorVisibility? _initialCursorVisibility = null;
 	CursorVisibility? _currentCursorVisibility = null;
 	CursorVisibility? _pendingCursorVisibility = null;
 	readonly StringBuilder _stringBuilder = new StringBuilder (256 * 1024);
+	bool _isWindowsTerminal;
 
-	public WindowsConsole ()
+	public WindowsConsole (bool isWindowsTerminal)
 	{
 		_inputHandle = GetStdHandle (STD_INPUT_HANDLE);
 		_outputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
-		_originalConsoleMode = ConsoleMode;
-		var newConsoleMode = _originalConsoleMode;
-		newConsoleMode |= (uint)(ConsoleModes.EnableMouseInput | ConsoleModes.EnableExtendedFlags);
-		newConsoleMode &= ~(uint)ConsoleModes.EnableQuickEditMode;
-		newConsoleMode &= ~(uint)ConsoleModes.EnableProcessedInput;
-		ConsoleMode = newConsoleMode;
+
+		_isWindowsTerminal = isWindowsTerminal;
+		if (!ConsoleDriver.RunningUnitTests && !_isWindowsTerminal) {
+			_originalScreenBufferInfo = new CONSOLE_SCREEN_BUFFER_INFOEX ();
+			_originalScreenBufferInfo.cbSize = (uint)Marshal.SizeOf (_originalScreenBufferInfo);
+			if (!GetConsoleScreenBufferInfoEx (_outputHandle, ref _originalScreenBufferInfo)) {
+				var err = Marshal.GetLastWin32Error ();
+				if (err != 0) {
+					throw new System.ComponentModel.Win32Exception (err);
+				}
+			}
+		}
+
+		_originalInputConsoleMode = InputConsoleMode;
+		var newInConsoleMode = _originalInputConsoleMode;
+		newInConsoleMode |= (uint)(ConsoleModes.EnableMouseInput | ConsoleModes.EnableExtendedFlags);
+		newInConsoleMode &= ~(uint)ConsoleModes.EnableQuickEditMode;
+		newInConsoleMode &= ~(uint)ConsoleModes.EnableProcessedInput;
+		InputConsoleMode = newInConsoleMode;
+
+		_originalOutputConsoleMode = OutputConsoleMode;
+		var newOutConsoleMode = _originalOutputConsoleMode;
+		if (!ConsoleDriver.RunningUnitTests && (newOutConsoleMode & (uint)(ConsoleModes.EnableVirtualTerminalProcessing | ConsoleModes.DisableNewlineAutoReturn))
+			< (uint)ConsoleModes.DisableNewlineAutoReturn) {
+
+			newOutConsoleMode |= (uint)(ConsoleModes.EnableVirtualTerminalProcessing | ConsoleModes.DisableNewlineAutoReturn);
+			OutputConsoleMode = newOutConsoleMode;
+		}
 	}
 
 	CharInfo [] _originalStdOutChars;
 
-	public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord bufferSize, SmallRect window, bool force16Colors)
+	public bool WriteToConsole (Size size, ExtendedRuneInfo [,] charInfoBuffer, Coord bufferSize, SmallRect window, bool force16Colors)
 	{
 		if (_screenBuffer == IntPtr.Zero) {
 			ReadFromConsoleOutput (size, bufferSize, ref window);
 		}
 
 		bool result = false;
+
 		if (force16Colors) {
-			int i = 0;
-			CharInfo [] ci = new CharInfo [charInfoBuffer.Length];
-			foreach (ExtendedCharInfo info in charInfoBuffer) {
-				ci [i++] = new CharInfo () {
-					Char = new CharUnion () { UnicodeChar = info.Char },
-					Attributes = (ushort)(((int)info.Attribute.Foreground.ColorName) | ((int)info.Attribute.Background.ColorName << 4))
-				};
+			var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
+			csbi.cbSize = (uint)Marshal.SizeOf (csbi);
+			GetScreenBufferInfo (ref csbi);
+
+			Attribute? prev = null;
+			string s;
+
+			for (int row = 0; row < bufferSize.Y; row++) {
+				SetCursorPosition (new Coord (0, (short)row));
+				_stringBuilder.Clear ();
+
+				for (int col = 0; col < bufferSize.X; col++) {
+					var ci = charInfoBuffer [row, col];
+					if (ci.Empty) {
+						if (_stringBuilder.Length > 0) {
+							ProcessWriteToConsole ();
+						}
+						continue;
+					}
+
+					var attr = ci.Attribute;
+
+					if (prev == null) {
+						SetAttribute (force16Colors, ci, attr);
+					} else if (attr != prev) {
+						if (_stringBuilder.Length > 0) {
+							ProcessWriteToConsole ();
+						}
+						SetAttribute (force16Colors, ci, attr);
+					}
+
+					_stringBuilder.Append (ci.Rune);
+					if (ci.Rune.IsSurrogatePair () && ci.Rune.GetColumns () < 2) {
+						Rune nextRune = default;
+						if (col + 1 < bufferSize.X) {
+							nextRune = charInfoBuffer [row, col + 1].Rune;
+						}
+						ProcessSurrogatePair (nextRune, col);
+					}
+				}
+
+				if (_stringBuilder.Length > 0) {
+					GetScreenBufferInfo (ref csbi);
+					SetCursorPosition (csbi.dwCursorPosition);
+
+					s = _stringBuilder.ToString ();
+
+					result = WriteConsole (_screenBuffer, s, (uint)(s.Length), out uint _, null);
+				}
 			}
 
-			result = WriteConsoleOutput (_screenBuffer, ci, bufferSize, new Coord () { X = window.Left, Y = window.Top }, ref window);
+			return result;
+
+			void SetAttribute (bool force16Colors, ExtendedRuneInfo ci, Attribute attr)
+			{
+				prev = attr;
+				SetTextAttribute (((int)ci.Attribute.Foreground.ColorName) |
+					((int)ci.Attribute.Background.ColorName << 4));
+			}
+
+			void ProcessSurrogatePair (Rune nextRune, int col)
+			{
+				ProcessWriteToConsole ();
+				if (col < csbi.dwCursorPosition.X - 1 || csbi.dwCursorPosition.X < bufferSize.X - 1 || nextRune.IsSurrogatePair ()) {
+					csbi.dwCursorPosition.X--;
+					SetCursorPosition (csbi.dwCursorPosition);
+				}
+			}
+
+			void ProcessWriteToConsole ()
+			{
+				s = _stringBuilder.ToString ();
+				result = WriteConsole (_screenBuffer, s, (uint)(s.Length), out uint _, null);
+				GetScreenBufferInfo (ref csbi);
+				if (csbi.dwCursorPosition.X == csbi.dwSize.X) {
+					csbi.dwCursorPosition.X = 0;
+					if (csbi.dwCursorPosition.Y + 1 < csbi.dwSize.Y) {
+						csbi.dwCursorPosition.Y++;
+					}
+				}
+				_stringBuilder.Clear ();
+			}
+
 		} else {
 
 			_stringBuilder.Clear ();
@@ -87,9 +187,9 @@ internal class WindowsConsole {
 					_stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.Background.R, attr.Background.G, attr.Background.B));
 				}
 
-				if (info.Char != '\x1b') {
+				if (info.Rune.Value != '\x1b') {
 					if (!info.Empty) {
-						_stringBuilder.Append (info.Char);
+						_stringBuilder.Append (info.Rune);
 					}
 
 				} else {
@@ -148,7 +248,14 @@ internal class WindowsConsole {
 
 	public bool SetCursorPosition (Coord position)
 	{
-		return SetConsoleCursorPosition (_screenBuffer, position);
+		if (!SetConsoleCursorPosition (_screenBuffer, position)) {
+			var err = Marshal.GetLastWin32Error ();
+			if (err != 0) {
+				throw new System.ComponentModel.Win32Exception (err);
+			}
+		}
+
+		return true;
 	}
 
 	public void SetInitialCursorVisibility ()
@@ -236,7 +343,27 @@ internal class WindowsConsole {
 
 		SetConsoleOutputWindow (out _);
 
-		ConsoleMode = _originalConsoleMode;
+		InputConsoleMode = _originalInputConsoleMode;
+		if (!ConsoleDriver.RunningUnitTests) {
+			OutputConsoleMode = _originalOutputConsoleMode;
+			if (!_isWindowsTerminal) {
+				var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
+				csbi.cbSize = (uint)Marshal.SizeOf (csbi);
+				GetScreenBufferInfo (ref csbi);
+				csbi.dwCursorPosition = _originalScreenBufferInfo.dwCursorPosition;
+				csbi.wAttributes = _originalScreenBufferInfo.wAttributes;
+				csbi.wPopupAttributes = _originalScreenBufferInfo.wPopupAttributes;
+				csbi.srWindow.Bottom += 2;
+
+				if (!SetConsoleScreenBufferInfoEx (_outputHandle, ref csbi)) {
+					var err = Marshal.GetLastWin32Error ();
+					if (err != 0) {
+						throw new System.ComponentModel.Win32Exception (err);
+					}
+				}
+			}
+		}
+
 		if (!SetConsoleActiveScreenBuffer (_outputHandle)) {
 			var err = Marshal.GetLastWin32Error ();
 			Console.WriteLine ("Error: {0}", err);
@@ -344,19 +471,36 @@ internal class WindowsConsole {
 		return sz;
 	}
 
-	uint ConsoleMode {
+	uint InputConsoleMode {
 		get {
 			GetConsoleMode (_inputHandle, out uint v);
 			return v;
 		}
 		set {
-			SetConsoleMode (_inputHandle, value);
+			if (!SetConsoleMode (_inputHandle, value)) {
+				throw new ApplicationException ($"Failed to set input console mode, error code: {Marshal.GetLastWin32Error ()}.");
+			}
+		}
+	}
+
+	uint OutputConsoleMode {
+		get {
+			GetConsoleMode (_outputHandle, out uint v);
+			return v;
+		}
+		set {
+			if (!SetConsoleMode (_outputHandle, value)) {
+				throw new ApplicationException ($"Failed to set output console mode, error code: {Marshal.GetLastWin32Error ()}.");
+			}
 		}
 	}
 
 	[Flags]
 	public enum ConsoleModes : uint {
 		EnableProcessedInput = 1,
+		EnableWrapAtEolOutput = 2,
+		EnableVirtualTerminalProcessing = 4,
+		DisableNewlineAutoReturn = 8,
 		EnableMouseInput = 16,
 		EnableQuickEditMode = 64,
 		EnableExtendedFlags = 128,
@@ -526,14 +670,14 @@ internal class WindowsConsole {
 		[FieldOffset (2)] public ushort Attributes;
 	}
 
-	public struct ExtendedCharInfo {
-		public char Char { get; set; }
+	public struct ExtendedRuneInfo {
+		public Rune Rune { get; set; }
 		public Attribute Attribute { get; set; }
 		public bool Empty { get; set; } // TODO: Temp hack until virutal terminal sequences
 
-		public ExtendedCharInfo (char character, Attribute attribute)
+		public ExtendedRuneInfo (Rune rune, Attribute attribute)
 		{
-			Char = character;
+			Rune = rune;
 			Attribute = attribute;
 			Empty = false;
 		}
@@ -761,6 +905,30 @@ internal class WindowsConsole {
 	[DllImport ("kernel32.dll", SetLastError = true)]
 	static extern bool GetConsoleScreenBufferInfoEx (IntPtr hConsoleOutput, ref CONSOLE_SCREEN_BUFFER_INFOEX csbi);
 
+	public bool GetScreenBufferInfo (ref CONSOLE_SCREEN_BUFFER_INFOEX csbi)
+	{
+		if (!GetConsoleScreenBufferInfoEx (_screenBuffer, ref csbi)) {
+			var err = Marshal.GetLastWin32Error ();
+			if (err != 0) {
+				throw new System.ComponentModel.Win32Exception (err);
+			}
+		}
+
+		return true;
+	}
+
+	public bool SetScreenBufferInfo (ref CONSOLE_SCREEN_BUFFER_INFOEX csbi)
+	{
+		if (!SetConsoleScreenBufferInfoEx (_screenBuffer, ref csbi)) {
+			var err = Marshal.GetLastWin32Error ();
+			if (err != 0) {
+				throw new System.ComponentModel.Win32Exception (err);
+			}
+		}
+
+		return true;
+	}
+
 	[DllImport ("kernel32.dll", SetLastError = true)]
 	static extern bool SetConsoleScreenBufferInfoEx (IntPtr hConsoleOutput, ref CONSOLE_SCREEN_BUFFER_INFOEX ConsoleScreenBufferInfo);
 
@@ -773,10 +941,25 @@ internal class WindowsConsole {
 	[DllImport ("kernel32.dll", SetLastError = true)]
 	static extern Coord GetLargestConsoleWindowSize (
 	    IntPtr hConsoleOutput);
+
+	[DllImport ("kernel32.dll", SetLastError = true)]
+	public static extern bool SetConsoleTextAttribute (IntPtr hConsoleOutput, int wAttributes);
+
+	public bool SetTextAttribute (int wAttributes)
+	{
+		if (!SetConsoleTextAttribute (_screenBuffer, wAttributes)) {
+			var err = Marshal.GetLastWin32Error ();
+			if (err != 0) {
+				throw new System.ComponentModel.Win32Exception (err);
+			}
+		}
+
+		return true;
+	}
 }
 
 internal class WindowsDriver : ConsoleDriver {
-	WindowsConsole.ExtendedCharInfo [] _outputBuffer;
+	WindowsConsole.ExtendedRuneInfo [,] _outputBuffer;
 	WindowsConsole.SmallRect _damageRegion;
 
 	public WindowsConsole WinConsole { get; private set; }
@@ -784,23 +967,71 @@ internal class WindowsDriver : ConsoleDriver {
 	public override bool SupportsTrueColor => RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931 && _isWindowsTerminal);
 
 	readonly bool _isWindowsTerminal = false;
+	enum ConsoleHost {
+		AutomaticSelection,
+		WindowsConsoleHost,
+		WindowsTerminal,
+		NotConfigured
+	}
+	readonly ConsoleHost _consoleHost = ConsoleHost.NotConfigured;
 	WindowsMainLoop _mainLoopDriver = null;
 
 	public WindowsDriver ()
 	{
+		// TODO: if some other Windows-based terminal supports true color, update this logic to not
+		// force 16color mode (.e.g ConEmu which really doesn't work well at all).
+		_consoleHost = GetConsoleHost ();
+		_isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") != null ||
+			_consoleHost == ConsoleHost.AutomaticSelection || _consoleHost == ConsoleHost.WindowsTerminal;
+		if (!_isWindowsTerminal) {
+			Force16Colors = true;
+		}
+
 		if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
-			WinConsole = new WindowsConsole ();
+			WinConsole = new WindowsConsole (_isWindowsTerminal);
 			// otherwise we're probably running in unit tests
 			Clipboard = new WindowsClipboard ();
 		} else {
 			Clipboard = new FakeDriver.FakeClipboard ();
 		}
+	}
 
-		// TODO: if some other Windows-based terminal supports true color, update this logic to not
-		// force 16color mode (.e.g ConEmu which really doesn't work well at all).
-		_isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") != null;
-		if (!_isWindowsTerminal) {
-			Force16Colors = true;
+	ConsoleHost GetConsoleHost ()
+	{
+		const string registryKey = "Console\\%%Startup";
+		string [] registryValues = new string [] { "DelegationConsole", "DelegationTerminal" };
+		string [] automaticSelection = new string [] { "{00000000-0000-0000-0000-000000000000}",
+			"{00000000-0000-0000-0000-000000000000}" };
+		string [] windowsConsoleHost = new string [] { "{B23D10C0-E52E-411E-9D5B-C09FDF709C7D}",
+			"{B23D10C0-E52E-411E-9D5B-C09FDF709C7D}" };
+		string [] windowsTerminal = new string [] { "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}",
+			"{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}" };
+
+		try {
+			string [] readerValues = new string [2];
+
+			for (int i = 0; i < registryValues.Length; i++) {
+				string keyName = registryKey + "\\" + registryValues [i];
+
+#pragma warning disable CA1416 // Validate platform compatibility
+				using (RegistryKey key = Registry.CurrentUser.OpenSubKey (registryKey)) {
+					if (key != null) {
+						readerValues [i] = key.GetValue (registryValues [i]) as string;
+					}
+				}
+#pragma warning restore CA1416 // Validate platform compatibility
+			}
+			if (readerValues [0] == automaticSelection [0] && readerValues [1] == automaticSelection [1]) {
+				return ConsoleHost.AutomaticSelection;
+			} else if (readerValues [0] == windowsConsoleHost [0] && readerValues [1] == windowsConsoleHost [1]) {
+				return ConsoleHost.WindowsConsoleHost;
+			} else if (readerValues [0] == windowsTerminal [0] && readerValues [1] == windowsTerminal [1]) {
+				return ConsoleHost.WindowsTerminal;
+			} else {
+				return ConsoleHost.NotConfigured;
+			}
+		} catch (Exception) {
+			return ConsoleHost.NotConfigured;
 		}
 	}
 
@@ -819,6 +1050,7 @@ internal class WindowsDriver : ConsoleDriver {
 				WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
 
 				if (_isWindowsTerminal) {
+					// Enable alternative screen buffer.
 					Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
 				}
 			} catch (Win32Exception e) {
@@ -831,7 +1063,7 @@ internal class WindowsDriver : ConsoleDriver {
 
 		CurrentAttribute = new Attribute (Color.White, Color.Black);
 
-		_outputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
+		_outputBuffer = new WindowsConsole.ExtendedRuneInfo [Rows, Cols];
 		Clip = new Rect (0, 0, Cols, Rows);
 		_damageRegion = new WindowsConsole.SmallRect () {
 			Top = 0,
@@ -1504,7 +1736,7 @@ internal class WindowsDriver : ConsoleDriver {
 
 	void ResizeScreen ()
 	{
-		_outputBuffer = new WindowsConsole.ExtendedCharInfo [Rows * Cols];
+		_outputBuffer = new WindowsConsole.ExtendedRuneInfo [Rows, Cols];
 		Clip = new Rect (0, 0, Cols, Rows);
 		_damageRegion = new WindowsConsole.SmallRect () {
 			Top = 0,
@@ -1519,8 +1751,7 @@ internal class WindowsDriver : ConsoleDriver {
 
 	public override void UpdateScreen ()
 	{
-		var windowSize = WinConsole?.GetConsoleBufferWindow (out var _) ?? new Size (Cols, Rows);
-		if (!windowSize.IsEmpty && (windowSize.Width != Cols || windowSize.Height != Rows)) {
+		if (Cols == 0 || Rows == 0) {
 			return;
 		}
 
@@ -1529,34 +1760,29 @@ internal class WindowsDriver : ConsoleDriver {
 			Y = (short)Clip.Height
 		};
 
+		var savedVisibitity = _cachedCursorVisibility;
+		SetCursorVisibility (CursorVisibility.Invisible);
+
 		for (int row = 0; row < Rows; row++) {
 			if (!_dirtyLines [row]) {
 				continue;
 			}
 			_dirtyLines [row] = false;
 
+			var size = Rows * Cols;
+
 			for (int col = 0; col < Cols; col++) {
-				int position = row * Cols + col;
-				_outputBuffer [position].Attribute = Contents [row, col].Attribute.GetValueOrDefault ();
+				Attribute attribute = Contents [row, col].Attribute.GetValueOrDefault ();
+				_outputBuffer [row, col].Attribute = attribute;
 				if (Contents [row, col].IsDirty == false) {
-					_outputBuffer [position].Empty = true;
-					_outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
+					_outputBuffer [row, col].Empty = true;
+					_outputBuffer [row, col].Rune = (Rune)'\0';
 					continue;
 				}
-				_outputBuffer [position].Empty = false;
-				if (Contents [row, col].Rune.IsBmp) {
-					_outputBuffer [position].Char = (char)Contents [row, col].Rune.Value;
-				} else {
-					//_outputBuffer [position].Empty = true;
-					_outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
-					if (Contents [row, col].Rune.GetColumns () > 1 && col + 1 < Cols) {
-						// TODO: This is a hack to deal with non-BMP and wide characters.
-						col++;
-						position = row * Cols + col;
-						_outputBuffer [position].Empty = false;
-						_outputBuffer [position].Char = ' ';
-					}
-				}
+				_outputBuffer [row, col].Empty = false;
+				Rune rune = Contents [row, col].Rune;
+				var colWidth = rune.ToString ().GetColumns ();
+				_outputBuffer [row, col].Rune = rune;
 			}
 		}
 
@@ -1574,6 +1800,8 @@ internal class WindowsDriver : ConsoleDriver {
 			}
 		}
 		WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
+
+		_cachedCursorVisibility = savedVisibitity;
 	}
 
 	public override void Refresh ()
@@ -1682,7 +1910,7 @@ internal class WindowsDriver : ConsoleDriver {
 	{
 		if (_mainLoopDriver != null) {
 #if HACK_CHECK_WINCHANGED
-			//_mainLoop.WinChanged -= ChangeWin;
+			_mainLoopDriver.WinChanged -= ChangeWin;
 #endif
 		}
 		_mainLoopDriver = null;

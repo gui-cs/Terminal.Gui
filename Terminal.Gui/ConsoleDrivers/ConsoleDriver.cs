@@ -207,14 +207,14 @@ public abstract class ConsoleDriver {
 					// Check if cell to left has a wide glyph
 					if (Contents [Row, Col - 1].Rune.GetColumns () > 1) {
 						// Invalidate cell to left
-						Contents [Row, Col - 1].Rune = Rune.ReplacementChar;
+						Contents [Row, Col - 1].Rune = (Rune)' ';
 						Contents [Row, Col - 1].IsDirty = true;
 					}
 				}
 
 
 				if (runeWidth < 1) {
-					Contents [Row, Col].Rune = Rune.ReplacementChar;
+					Contents [Row, Col].Rune = (Rune)'\0';
 
 				} else if (runeWidth == 1) {
 					Contents [Row, Col].Rune = rune;
@@ -225,19 +225,13 @@ public abstract class ConsoleDriver {
 					if (Col == Clip.Right - 1) {
 						// We're at the right edge of the clip, so we can't display a wide character.
 						// TODO: Figure out if it is better to show a replacement character or ' '
-						Contents [Row, Col].Rune = Rune.ReplacementChar;
+						Contents [Row, Col].Rune = (Rune)' ';
 					} else {
 						Contents [Row, Col].Rune = rune;
-						if (Col < Clip.Right - 1) {
-							// Invalidate cell to right so that it doesn't get drawn
-							// TODO: Figure out if it is better to show a replacement character or ' '
-							Contents [Row, Col + 1].Rune = Rune.ReplacementChar;
-							Contents [Row, Col + 1].IsDirty = true;
-						}
 					}
 				} else {
 					// This is a non-spacing character, so we don't need to do anything
-					Contents [Row, Col].Rune = (Rune)' ';
+					Contents [Row, Col].Rune = (Rune)'\0';
 					Contents [Row, Col].IsDirty = false;
 				}
 				_dirtyLines [Row] = true;
