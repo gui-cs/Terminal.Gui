@@ -1545,7 +1545,19 @@ internal class WindowsDriver : ConsoleDriver {
 				}
 				_outputBuffer [position].Empty = false;
 				if (Contents [row, col].Rune.IsBmp) {
-					_outputBuffer [position].Char = (char)Contents [row, col].Rune.Value;
+					var rune = Contents[row, col].Rune;
+					if (Force16Colors)
+					{
+                        if (rune == Glyphs.LeftBracket)
+                        {
+							rune = (Rune)'[';
+						}
+						else if (rune == Glyphs.RightBracket)
+						{
+							rune = (Rune)']';
+						}
+                    }
+                    _outputBuffer [position].Char = (char)rune.Value;
 				} else {
 					//_outputBuffer [position].Empty = true;
 					_outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
