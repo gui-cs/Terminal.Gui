@@ -955,12 +955,6 @@ internal class WindowsDriver : ConsoleDriver {
 	public override bool SupportsTrueColor => RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931 && _isWindowsTerminal);
 
 	readonly bool _isWindowsTerminal = false;
-	enum ConsoleHost {
-		AutomaticSelection,
-		WindowsConsoleHost,
-		WindowsTerminal,
-		NotConfigured
-	}
 	WindowsMainLoop _mainLoopDriver = null;
 
 	public WindowsDriver ()
