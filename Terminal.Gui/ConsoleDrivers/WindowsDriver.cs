@@ -121,7 +121,12 @@ internal class WindowsConsole {
 				}
 
 				if (_stringBuilder.Length > 0) {
-					ProcessWriteToConsole ();
+					GetScreenBufferInfo (ref csbi);
+					SetCursorPosition (csbi.dwCursorPosition);
+
+					s = _stringBuilder.ToString ();
+
+					result = WriteConsole (_screenBuffer, s, (uint)(s.Length), out uint _, null);
 				}
 			}
 
