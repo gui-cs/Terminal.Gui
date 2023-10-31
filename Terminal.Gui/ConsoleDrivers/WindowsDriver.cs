@@ -103,12 +103,10 @@ internal class WindowsConsole {
 					var attr = ci.Attribute;
 
 					if (prev == null) {
-						SetAttribute (force16Colors, ci, attr);
+						SetAttribute (ci, attr);
 					} else if (attr != prev) {
-						if (_stringBuilder.Length > 0) {
-							ProcessWriteToConsole ();
-						}
-						SetAttribute (force16Colors, ci, attr);
+						ProcessWriteToConsole ();
+						SetAttribute (ci, attr);
 					}
 
 					_stringBuilder.Append (ci.Rune);
@@ -133,7 +131,7 @@ internal class WindowsConsole {
 
 			return result;
 
-			void SetAttribute (bool force16Colors, ExtendedRuneInfo ci, Attribute attr)
+			void SetAttribute (ExtendedRuneInfo ci, Attribute attr)
 			{
 				prev = attr;
 				SetTextAttribute (((int)ci.Attribute.Foreground.ColorName) |
@@ -151,6 +149,10 @@ internal class WindowsConsole {
 
 			void ProcessWriteToConsole ()
 			{
+				if (_stringBuilder.Length == 0) {
+					return;
+				}
+
 				s = _stringBuilder.ToString ();
 				result = WriteConsole (_screenBuffer, s, (uint)(s.Length), out uint _, null);
 				GetScreenBufferInfo (ref csbi);
