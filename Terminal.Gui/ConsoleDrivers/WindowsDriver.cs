@@ -966,13 +966,16 @@ internal class WindowsDriver : ConsoleDriver {
 		WindowsTerminal,
 		NotConfigured
 	}
+	readonly ConsoleHost _consoleHost = ConsoleHost.NotConfigured;
 	WindowsMainLoop _mainLoopDriver = null;
 
 	public WindowsDriver ()
 	{
 		// TODO: if some other Windows-based terminal supports true color, update this logic to not
 		// force 16color mode (.e.g ConEmu which really doesn't work well at all).
-		_isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") != null;
+		_consoleHost = GetConsoleHost ();
+		_isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") != null ||
+			_consoleHost == ConsoleHost.AutomaticSelection || _consoleHost == ConsoleHost.WindowsTerminal;
 		if (!_isWindowsTerminal) {
 			Force16Colors = true;
 		}
@@ -983,6 +986,45 @@ internal class WindowsDriver : ConsoleDriver {
 			Clipboard = new WindowsClipboard ();
 		} else {
 			Clipboard = new FakeDriver.FakeClipboard ();
+		}
+	}
+
+	ConsoleHost GetConsoleHost ()
+	{
+		const string registryKey = "Console\\%%Startup";
+		string [] registryValues = new string [] { "DelegationConsole", "DelegationTerminal" };
+		string [] automaticSelection = new string [] { "{00000000-0000-0000-0000-000000000000}",
+			"{00000000-0000-0000-0000-000000000000}" };
+		string [] windowsConsoleHost = new string [] { "{B23D10C0-E52E-411E-9D5B-C09FDF709C7D}",
+			"{B23D10C0-E52E-411E-9D5B-C09FDF709C7D}" };
+		string [] windowsTerminal = new string [] { "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}",
+			"{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}" };
+
+		try {
+			string [] readerValues = new string [2];
+
+			for (int i = 0; i < registryValues.Length; i++) {
+				string keyName = registryKey + "\\" + registryValues [i];
+
+#pragma warning disable CA1416 // Validate platform compatibility
+				using (RegistryKey key = Registry.CurrentUser.OpenSubKey (registryKey)) {
+					if (key != null) {
+						readerValues [i] = key.GetValue (registryValues [i]) as string;
+					}
+				}
+#pragma warning restore CA1416 // Validate platform compatibility
+			}
+			if (readerValues [0] == automaticSelection [0] && readerValues [1] == automaticSelection [1]) {
+				return ConsoleHost.AutomaticSelection;
+			} else if (readerValues [0] == windowsConsoleHost [0] && readerValues [1] == windowsConsoleHost [1]) {
+				return ConsoleHost.WindowsConsoleHost;
+			} else if (readerValues [0] == windowsTerminal [0] && readerValues [1] == windowsTerminal [1]) {
+				return ConsoleHost.WindowsTerminal;
+			} else {
+				return ConsoleHost.NotConfigured;
+			}
+		} catch (Exception) {
+			return ConsoleHost.NotConfigured;
 		}
 	}
 
