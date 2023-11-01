@@ -68,10 +68,10 @@ internal class WindowsConsole {
 
 		_originalOutputConsoleMode = OutputConsoleMode;
 		var newOutConsoleMode = _originalOutputConsoleMode;
-		if (!ConsoleDriver.RunningUnitTests && (newOutConsoleMode & (uint)(ConsoleModes.DisableNewlineAutoReturn))
+		if (!ConsoleDriver.RunningUnitTests && (newOutConsoleMode & (uint)(ConsoleModes.EnableVirtualTerminalProcessing | ConsoleModes.DisableNewlineAutoReturn))
 			< (uint)ConsoleModes.DisableNewlineAutoReturn) {
 
-			newOutConsoleMode |= (uint)(ConsoleModes.DisableNewlineAutoReturn);
+			newOutConsoleMode |= (uint)(ConsoleModes.EnableVirtualTerminalProcessing | ConsoleModes.DisableNewlineAutoReturn);
 			OutputConsoleMode = newOutConsoleMode;
 		}
 	}
