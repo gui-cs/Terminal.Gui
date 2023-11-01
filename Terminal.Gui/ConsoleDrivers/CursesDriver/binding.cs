@@ -49,13 +49,13 @@ namespace Unix.Terminal {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 	public partial class Curses {
-		//[StructLayout (LayoutKind.Sequential)]
-		//public struct winsize {
-		//	public ushort ws_row;
-		//	public ushort ws_col;
-		//	public ushort ws_xpixel;   /* unused */
-		//	public ushort ws_ypixel;   /* unused */
-		//};
+		[StructLayout (LayoutKind.Sequential)]
+		public struct winsize {
+			public ushort ws_row;
+			public ushort ws_col;
+			public ushort ws_xpixel;   /* unused */
+			public ushort ws_ypixel;   /* unused */
+		};
 
 		[StructLayout (LayoutKind.Sequential)]
 		public struct MouseEvent {
@@ -78,8 +78,8 @@ namespace Unix.Terminal {
 		[DllImport ("libc")]
 		public extern static int setlocale (int cate, [MarshalAs (UnmanagedType.LPStr)] string locale);
 
-		//[DllImport ("libc")]
-		//public extern static int ioctl (int fd, int cmd, out winsize argp);
+		[DllImport ("libc")]
+		public extern static int ioctl (int fd, int cmd, out winsize argp);
 
 		static void LoadMethods ()
 		{
@@ -227,8 +227,26 @@ namespace Unix.Terminal {
 
 		internal static void console_sharp_get_dims (out int lines, out int cols)
 		{
-			lines = Marshal.ReadInt32 (lines_ptr);
-			cols = Marshal.ReadInt32 (cols_ptr);
+			if (UnmanagedLibrary.IsMacOSPlatform) {
+				int cmd = TIOCGWINSZ_MAC;
+
+				if (ioctl (1, cmd, out winsize ws) == 0) {
+					lines = ws.ws_row;
+					cols = ws.ws_col;
+
+					if (lines == Lines && cols == Cols) {
+						return;
+					}
+
+					resizeterm (lines, cols);
+				} else {
+					lines = Lines;
+					cols = Cols;
+				}
+			} else {
+				lines = Marshal.ReadInt32 (lines_ptr);
+				cols = Marshal.ReadInt32 (cols_ptr);
+			}
 
 			//int cmd;
 			//if (UnmanagedLibrary.IsMacOSPlatform) {
@@ -347,6 +365,7 @@ namespace Unix.Terminal {
 		static public int savetty () => methods.savetty ();
 		static public int resetty () => methods.resetty ();
 		static public int set_escdelay (int size) => methods.set_escdelay (size);
+		static public int nodelay (IntPtr win, bool bf) => methods.nodelay (win, bf);
 	}
 
 #pragma warning disable RCS1102 // Make class static.
@@ -424,6 +443,7 @@ namespace Unix.Terminal {
 		public delegate int savetty ();
 		public delegate int resetty ();
 		public delegate int set_escdelay (int size);
+		public delegate int nodelay (IntPtr win, bool bf);
 	}
 
 	internal class NativeMethods {
@@ -498,6 +518,7 @@ namespace Unix.Terminal {
 		public readonly Delegates.savetty savetty;
 		public readonly Delegates.resetty resetty;
 		public readonly Delegates.set_escdelay set_escdelay;
+		public readonly Delegates.nodelay nodelay;
 		public UnmanagedLibrary UnmanagedLibrary;
 
 		public NativeMethods (UnmanagedLibrary lib)
@@ -574,6 +595,7 @@ namespace Unix.Terminal {
 			savetty = lib.GetNativeMethodDelegate<Delegates.savetty> ("savetty");
 			resetty = lib.GetNativeMethodDelegate<Delegates.resetty> ("resetty");
 			set_escdelay = lib.GetNativeMethodDelegate<Delegates.set_escdelay> ("set_escdelay");
+			nodelay = lib.GetNativeMethodDelegate<Delegates.nodelay> ("nodelay");
 		}
 	}
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
