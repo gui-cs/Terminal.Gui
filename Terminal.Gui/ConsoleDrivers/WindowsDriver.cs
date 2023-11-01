@@ -350,12 +350,7 @@ internal class WindowsConsole {
 				csbi.wPopupAttributes = _originalScreenBufferInfo.wPopupAttributes;
 				csbi.srWindow.Bottom += 2;
 
-				if (!SetConsoleScreenBufferInfoEx (_outputHandle, ref csbi)) {
-					var err = Marshal.GetLastWin32Error ();
-					if (err != 0) {
-						throw new System.ComponentModel.Win32Exception (err);
-					}
-				}
+				SetConsoleScreenBufferInfoEx (_outputHandle, ref csbi);
 			}
 		}
 
