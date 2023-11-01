@@ -22,7 +22,9 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
+#if DEBUG
 using Microsoft.Win32;
+#endif
 
 namespace Terminal.Gui;
 
@@ -957,22 +959,29 @@ internal class WindowsDriver : ConsoleDriver {
 	public override bool SupportsTrueColor => RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931 && _isWindowsTerminal);
 
 	readonly bool _isWindowsTerminal = false;
+#if DEBUG
 	enum ConsoleHost {
 		AutomaticSelection,
 		WindowsConsoleHost,
 		WindowsTerminal,
 		NotConfigured
 	}
+
 	readonly ConsoleHost _consoleHost = ConsoleHost.NotConfigured;
+#endif
 	WindowsMainLoop _mainLoopDriver = null;
 
 	public WindowsDriver ()
 	{
 		// TODO: if some other Windows-based terminal supports true color, update this logic to not
 		// force 16color mode (.e.g ConEmu which really doesn't work well at all).
+#if DEBUG
 		_consoleHost = GetConsoleHost ();
 		_isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") != null ||
 			_consoleHost == ConsoleHost.AutomaticSelection || _consoleHost == ConsoleHost.WindowsTerminal;
+#else
+		_isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") != null;
+#endif
 		if (!_isWindowsTerminal) {
 			Force16Colors = true;
 		}
@@ -986,6 +995,7 @@ internal class WindowsDriver : ConsoleDriver {
 		}
 	}
 
+#if DEBUG
 	ConsoleHost GetConsoleHost ()
 	{
 		const string registryKey = "Console\\%%Startup";
@@ -1024,6 +1034,7 @@ internal class WindowsDriver : ConsoleDriver {
 			return ConsoleHost.NotConfigured;
 		}
 	}
+#endif
 
 	internal override MainLoop Init ()
 	{
