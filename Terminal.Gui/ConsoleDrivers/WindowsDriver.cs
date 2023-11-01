@@ -1719,11 +1719,6 @@ internal class WindowsDriver : ConsoleDriver {
 		return keyMod != Key.Null ? keyMod | key : key;
 	}
 
-	public override bool IsRuneSupported (Rune rune)
-	{
-		return base.IsRuneSupported (rune) && rune.IsBmp;
-	}
-
 	void ResizeScreen ()
 	{
 		_outputBuffer = new WindowsConsole.ExtendedRuneInfo [Rows, Cols];
