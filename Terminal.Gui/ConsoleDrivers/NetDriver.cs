@@ -861,7 +861,7 @@ internal class NetDriver : ConsoleDriver {
 	{ ConsoleColor.Magenta, COLOR_BRIGHT_MAGENTA },
 	{ ConsoleColor.Yellow, COLOR_BRIGHT_YELLOW },
 	{ ConsoleColor.White, COLOR_BRIGHT_WHITE }
-    };
+	};
 
 	// Map a ConsoleColor to a platform dependent value.
 	int MapColors (ConsoleColor color, bool isForeground = true)

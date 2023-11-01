@@ -12,7 +12,7 @@
 // As of Windows 11 23H2 25947.1000 and/or WT 1.19.2682 tearing no longer occurs when using 
 // the WindowsANSIConsole.EventType.WindowBufferSize event. However, on Init the window size is
 // still incorrect so we still need this hack.
-#define HACK_CHECK_WINCHANGED
+//#define HACK_CHECK_WINCHANGED
 
 using System.Text;
 using System;
@@ -22,14 +22,10 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
-using System.Runtime.ConstrainedExecution;
 using Windows.Win32;
-using Windows.Win32.Foundation;
 using static Terminal.Gui.EscSeqUtils;
 using Windows.Win32.System.Console;
 using Microsoft.Win32.SafeHandles;
-using Unix.Terminal;
-using System.Runtime.InteropServices.Marshalling;
 using static Terminal.Gui.WindowsANSIConsole;
 
 namespace Terminal.Gui;
@@ -41,12 +37,11 @@ internal class WindowsANSIConsole {
 	CursorVisibility? _initialCursorVisibility = null;
 	CursorVisibility? _currentCursorVisibility = null;
 	CursorVisibility? _pendingCursorVisibility = null;
-	//readonly StringBuilder _stringBuilder = new StringBuilder (256 * 1024);
-
+	
 	public WindowsANSIConsole ()
 	{
-		_inputHandle = new SafeFileHandle (PInvoke.GetStdHandle (STD_HANDLE.STD_INPUT_HANDLE), true);
-		_outputHandle = new SafeFileHandle (PInvoke.GetStdHandle (STD_HANDLE.STD_OUTPUT_HANDLE), true);
+		_inputHandle = new SafeFileHandle (PInvoke.GetStdHandle (STD_HANDLE.STD_INPUT_HANDLE), false);
+		_outputHandle = new SafeFileHandle (PInvoke.GetStdHandle (STD_HANDLE.STD_OUTPUT_HANDLE), false);
 
 		_originalConsoleMode = ConsoleMode;
 		var newConsoleMode = _originalConsoleMode;
@@ -54,16 +49,25 @@ internal class WindowsANSIConsole {
 		newConsoleMode |= CONSOLE_MODE.ENABLE_MOUSE_INPUT | CONSOLE_MODE.ENABLE_EXTENDED_FLAGS | CONSOLE_MODE.ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 		newConsoleMode &= ~CONSOLE_MODE.ENABLE_QUICK_EDIT_MODE;
 		newConsoleMode &= ~CONSOLE_MODE.ENABLE_PROCESSED_INPUT;
-
-
 		ConsoleMode = newConsoleMode;
 	}
-
+	
 	public bool Write (string text)
 	{
 		unsafe {
-			uint charsWritten = 0;
-			return PInvoke.WriteConsole (_outputHandle, Utf8StringMarshaller.ConvertToUnmanaged (text), (uint)text.Length, &charsWritten);
+			var pText = Marshal.AllocHGlobal (text.Length * sizeof (char));
+			try {
+				var pTextPtr = (char*)pText;
+				for (int i = 0; i < text.Length; i++) {
+					*pTextPtr++ = text [i];
+				}
+				uint charsWritten = 0;
+				return PInvoke.WriteConsole (_outputHandle, (void*)pText, (uint)text.Length, &charsWritten);
+			} catch (Exception) {
+				return false;
+			} finally {
+				Marshal.FreeHGlobal (pText);
+			}
 		}
 	}
 
@@ -88,9 +92,9 @@ internal class WindowsANSIConsole {
 		if (!PInvoke.GetConsoleCursorInfo (_outputHandle, out CONSOLE_CURSOR_INFO info)) {
 			var err = Marshal.GetLastWin32Error ();
 			if (err != 0) {
-				throw new System.ComponentModel.Win32Exception (err);
+				throw new Win32Exception (err);
 			}
-			visibility = Gui.CursorVisibility.Default;
+			visibility = CursorVisibility.Default;
 
 			return false;
 		}
@@ -134,10 +138,6 @@ internal class WindowsANSIConsole {
 		}
 
 		if (_currentCursorVisibility.HasValue == false || _currentCursorVisibility.Value != visibility) {
-			ConsoleCursorInfo info = new ConsoleCursorInfo {
-				dwSize = (uint)visibility & 0x00FF,
-				bVisible = ((uint)visibility & 0xFF00) != 0
-			};
 			var stringBuilder = new StringBuilder ();
 			if (visibility != CursorVisibility.Invisible) {
 				stringBuilder.Append (EscSeqUtils.CSI_ShowCursor);
@@ -186,21 +186,13 @@ internal class WindowsANSIConsole {
 			SetCursorVisibility (_initialCursorVisibility.Value);
 		}
 
-		//SetConsoleOutputWindow (out _);
-
 		ConsoleMode = _originalConsoleMode;
-		if (!PInvoke.SetConsoleActiveScreenBuffer (_outputHandle)) {
-			var err = Marshal.GetLastWin32Error ();
-			Console.WriteLine ("Error: {0}", err);
-		}
-
-		//if (_screenBuffer != IntPtr.Zero) {
-		//	CloseHandle (_screenBuffer);
+		//if (!PInvoke.SetConsoleActiveScreenBuffer (_outputHandle)) {
+		//	var err = Marshal.GetLastWin32Error ();
+		//	Console.WriteLine ("Error: {0}", err);
 		//}
-
-		//_screenBuffer = IntPtr.Zero;
 	}
-	
+
 
 	internal Size GetConsoleOutputWindow (out Point position)
 	{
@@ -210,53 +202,35 @@ internal class WindowsANSIConsole {
 			throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 		}
 		var sz = new Size (csbi.srWindow.Right - csbi.srWindow.Left + 1,
-		    csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
+			csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
 		position = new Point (csbi.srWindow.Left, csbi.srWindow.Top);
 
 		return sz;
 	}
-	
+
 	CONSOLE_MODE ConsoleMode {
 		get {
 			PInvoke.GetConsoleMode (_inputHandle, out CONSOLE_MODE v);
 			return v;
 		}
-		set {
-			PInvoke.SetConsoleMode (_inputHandle, value);
-		}
-	}
-
-	[StructLayout (LayoutKind.Explicit, CharSet = CharSet.Unicode)]
-	public struct KeyEventRecord {
-		[FieldOffset (0), MarshalAs (UnmanagedType.Bool)]
-		public bool bKeyDown;
-		[FieldOffset (4), MarshalAs (UnmanagedType.U2)]
-		public ushort wRepeatCount;
-		[FieldOffset (6), MarshalAs (UnmanagedType.U2)]
-		public ushort wVirtualKeyCode;
-		[FieldOffset (8), MarshalAs (UnmanagedType.U2)]
-		public ushort wVirtualScanCode;
-		[FieldOffset (10)]
-		public char UnicodeChar;
-		[FieldOffset (12), MarshalAs (UnmanagedType.U4)]
-		public CONTROL_KEY_STATE dwControlKeyState;
+		set => PInvoke.SetConsoleMode (_inputHandle, value);
 	}
 
 	[Flags]
-	public enum ButtonState {
-		Button1Pressed = 1,
-		Button2Pressed = 4,
-		Button3Pressed = 8,
-		Button4Pressed = 16,
-		RightmostButtonPressed = 2
+	public enum MOUSE_BUTTON_STATE {
+		FROM_LEFT_1ST_BUTTON_PRESSED = 1,
+		FROM_LEFT_2ND_BUTTON_PRESSED = 4,
+		FROM_LEFT_3RD_BUTTON_PRESSED = 8,
+		FROM_LEFT_4TH_BUTTON_PRESSED = 16,
+		RIGHTMOST_BUTTON_PRESSED = 2
 	}
 
 	[Flags]
 	public enum CONTROL_KEY_STATE {
 		RIGHT_ALT_PRESSED = 1,
 		LEFT_ALT_PRESSED = 2,
-		RIGHT_CONTROL_PRESSED = 4,
-		LEFT_CONTROL_PRESSED = 8,
+		RIGHT_CTRL_PRESSED = 4,
+		LEFT_CTRL_PRESSED = 8,
 		SHIFT_PRESSED = 16,
 		NUMLOCK_ON = 32,
 		SCROLLLOCK_ON = 64,
@@ -265,39 +239,14 @@ internal class WindowsANSIConsole {
 	}
 
 	[Flags]
-	public enum EventFlags {
-		MouseMoved = 1,
-		DoubleClick = 2,
-		MouseWheeled = 4,
-		MouseHorizontalWheeled = 8
+	public enum MOUSE_EVENT_FLAGS {
+		MOUSE_MOVED = 1,
+		DOUBLE_CLICK = 2,
+		MOUSE_WHEELED = 4,
+		MOUSE_HWHEELED = 8
 	}
 
-	//[StructLayout (LayoutKind.Explicit)]
-	//public struct MouseEventRecord {
-	//	[FieldOffset (0)]
-	//	public Coord MousePosition;
-	//	[FieldOffset (4)]
-	//	public ButtonState ButtonState;
-	//	[FieldOffset (8)]
-	//	public ControlKeyState ControlKeyState;
-	//	[FieldOffset (12)]
-	//	public EventFlags EventFlags;
-
-	//	public override readonly string ToString () => $"[Mouse({MousePosition},{ButtonState},{ControlKeyState},{EventFlags}";
-
-	//}
-	
-	//[StructLayout (LayoutKind.Sequential)]
-	//public struct MenuEventRecord {
-	//	public uint dwCommandId;
-	//}
-
-	//[StructLayout (LayoutKind.Sequential)]
-	//public struct FocusEventRecord {
-	//	public uint bSetFocus;
-	//}
-
-	public enum INPUT_RECORD_EVENT_TYPE: ushort {
+	public enum INPUT_RECORD_EVENT_TYPE : ushort {
 		FOCUS_EVENT = 0x10,
 		KEY_EVENT = 0x1,
 		MENU_EVENT = 0x8,
@@ -305,44 +254,10 @@ internal class WindowsANSIConsole {
 		WINDOW_BUFFER_SIZE_EVENT = 4
 	}
 
-	//[StructLayout (LayoutKind.Explicit)]
-	//public struct InputRecord {
-	//	[FieldOffset (0)]
-	//	public EventType EventType;
-	//	[FieldOffset (4)]
-	//	public KeyEventRecord KeyEvent;
-	//	[FieldOffset (4)]
-	//	public MouseEventRecord MouseEvent;
-	//	[FieldOffset (4)]
-	//	public WindowsConsole.WindowBufferSizeRecord WindowBufferSizeEvent;
-	//	[FieldOffset (4)]
-	//	public MenuEventRecord MenuEvent;
-	//	[FieldOffset (4)]
-	//	public FocusEventRecord FocusEvent;
-
-	//	public override readonly string ToString ()
-	//	{
-	//		return EventType switch {
-	//			EventType.Focus => FocusEvent.ToString (),
-	//			EventType.Key => KeyEvent.ToString (),
-	//			EventType.Menu => MenuEvent.ToString (),
-	//			EventType.Mouse => MouseEvent.ToString (),
-	//			EventType.WindowBufferSize => WindowBufferSizeEvent.ToString (),
-	//			_ => "Unknown event type: " + EventType
-	//		};
-	//	}
-	//};
-
 	[StructLayout (LayoutKind.Explicit, CharSet = CharSet.Unicode)]
 	public struct CharUnion {
 		[FieldOffset (0)] public char UnicodeChar;
 		[FieldOffset (0)] public byte AsciiChar;
-	}
-
-	[StructLayout (LayoutKind.Explicit, CharSet = CharSet.Unicode)]
-	public struct CharInfo {
-		[FieldOffset (0)] public CharUnion Char;
-		[FieldOffset (2)] public ushort Attributes;
 	}
 
 	public struct ExtendedCharInfo {
@@ -416,92 +331,20 @@ internal class WindowsANSIConsole {
 		}
 	}
 
-	[DllImport ("kernel32.dll", SetLastError = true)]
-	static extern IntPtr GetStdHandle (int nStdHandle);
-
-	[DllImport ("kernel32.dll", SetLastError = true)]
-	static extern bool CloseHandle (IntPtr handle);
-
-	[DllImport ("kernel32.dll", EntryPoint = "ReadConsoleInputW", CharSet = CharSet.Unicode)]
-	public static extern bool ReadConsoleInput (
-	    IntPtr hConsoleInput,
-	    IntPtr lpBuffer,
-	    uint nLength,
-	    out uint lpNumberOfEventsRead);
-
-	[DllImport ("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-	static extern bool ReadConsoleOutput (
-	    IntPtr hConsoleOutput,
-	    [Out] CharInfo [] lpBuffer,
-	    Coord dwBufferSize,
-	    Coord dwBufferCoord,
-	    ref SmallRect lpReadRegion
-	);
-
-	// TODO: This API is obsolete. See https://learn.microsoft.com/en-us/windows/console/writeconsoleoutput
-	[DllImport ("kernel32.dll", EntryPoint = "WriteConsoleOutputW", SetLastError = true, CharSet = CharSet.Unicode)]
-	static extern bool WriteConsoleOutput (
-	    IntPtr hConsoleOutput,
-	    CharInfo [] lpBuffer,
-	    Coord dwBufferSize,
-	    Coord dwBufferCoord,
-	    ref SmallRect lpWriteRegion
-	);
-
-	//[DllImport ("kernel32.dll", EntryPoint = "WriteConsole", SetLastError = true, CharSet = CharSet.Unicode)]
-	//static extern bool WriteConsole (
-	//	IntPtr hConsoleOutput,
-	//	String lpbufer,
-	//	UInt32 NumberOfCharsToWriten,
-	//	out UInt32 lpNumberOfCharsWritten,
-	//	object lpReserved
-	//    );
-
-	[DllImport ("kernel32.dll")]
-	static extern bool SetConsoleCursorPosition (IntPtr hConsoleOutput, Coord dwCursorPosition);
-
 	[StructLayout (LayoutKind.Sequential)]
 	public struct ConsoleCursorInfo {
 		public uint dwSize;
 		public bool bVisible;
 	}
-
-	[DllImport ("kernel32.dll", SetLastError = true)]
-	static extern bool SetConsoleCursorInfo (IntPtr hConsoleOutput, [In] ref ConsoleCursorInfo lpConsoleCursorInfo);
-
-	[DllImport ("kernel32.dll", SetLastError = true)]
-	static extern bool GetConsoleCursorInfo (IntPtr hConsoleOutput, out ConsoleCursorInfo lpConsoleCursorInfo);
-
-	//[DllImport ("kernel32.dll")]
-	//static extern bool GetConsoleMode (IntPtr hConsoleHandle, out uint lpMode);
-
-	//[DllImport ("kernel32.dll")]
-	//static extern bool SetConsoleMode (IntPtr hConsoleHandle, uint dwMode);
-
-	[DllImport ("kernel32.dll", SetLastError = true)]
-	static extern IntPtr CreateConsoleScreenBuffer (
-	    DesiredAccess dwDesiredAccess,
-	    ShareMode dwShareMode,
-	    IntPtr secutiryAttributes,
-	    uint flags,
-	    IntPtr screenBufferData
-	);
-
-	internal static IntPtr INVALID_HANDLE_VALUE = new IntPtr (-1);
-
-	[DllImport ("kernel32.dll", SetLastError = true)]
-	static extern bool SetConsoleActiveScreenBuffer (IntPtr Handle);
-
-	[DllImport ("kernel32.dll", SetLastError = true)]
-	static extern bool GetNumberOfConsoleInputEvents (IntPtr handle, out uint lpcNumberOfEvents);
-
 	public INPUT_RECORD [] ReadConsoleInput ()
 	{
-		Span<INPUT_RECORD> records = new Span<INPUT_RECORD> ();
+		Span<INPUT_RECORD> records = new Span<INPUT_RECORD> (new INPUT_RECORD [128]);
 		unsafe {
 			try {
 				const int bufferSize = 1;
-				PInvoke.ReadConsoleInput (_inputHandle, records, out uint numberEventsRead);
+				if (!PInvoke.ReadConsoleInput (_inputHandle, records, out uint numberEventsRead)) {
+
+				}
 
 			} catch (Exception) {
 				return null;
@@ -510,40 +353,6 @@ internal class WindowsANSIConsole {
 		return records.ToArray ();
 	}
 
-#if false      // Not needed on the constructor. Perhaps could be used on resizing. To study.                                                                                     
-		[DllImport ("kernel32.dll", ExactSpelling = true)]
-		static extern IntPtr GetConsoleWindow ();
-
-		[DllImport ("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-		static extern bool ShowWindow (IntPtr hWnd, int nCmdShow);
-
-		public const int HIDE = 0;
-		public const int MAXIMIZE = 3;
-		public const int MINIMIZE = 6;
-		public const int RESTORE = 9;
-
-		internal void ShowWindow (int state)
-		{
-			IntPtr thisConsole = GetConsoleWindow ();
-			ShowWindow (thisConsole, state);
-		}
-#endif
-	// See: https://github.com/gui-cs/Terminal.Gui/issues/357
-
-	//[StructLayout (LayoutKind.Sequential)]
-	//public struct CONSOLE_SCREEN_BUFFER_INFOEX {
-	//	public uint cbSize;
-	//	public Coord dwSize;
-	//	public Coord dwCursorPosition;
-	//	public ushort wAttributes;
-	//	public SmallRect srWindow;
-	//	public Coord dwMaximumWindowSize;
-	//	public ushort wPopupAttributes;
-	//	public bool bFullscreenSupported;
-
-	//	[MarshalAs (UnmanagedType.ByValArray, SizeConst = 16)]
-	//	public COLORREF [] ColorTable;
-	//}
 
 	[StructLayout (LayoutKind.Explicit, Size = 4)]
 	public struct COLORREF {
@@ -573,26 +382,9 @@ internal class WindowsANSIConsole {
 		[FieldOffset (0)]
 		public uint Value;
 	}
-
-	[DllImport ("kernel32.dll", SetLastError = true)]
-	static extern bool GetConsoleScreenBufferInfoEx (IntPtr hConsoleOutput, ref CONSOLE_SCREEN_BUFFER_INFOEX csbi);
-
-	[DllImport ("kernel32.dll", SetLastError = true)]
-	static extern bool SetConsoleScreenBufferInfoEx (IntPtr hConsoleOutput, ref CONSOLE_SCREEN_BUFFER_INFOEX ConsoleScreenBufferInfo);
-
-	[DllImport ("kernel32.dll", SetLastError = true)]
-	static extern bool SetConsoleWindowInfo (
-	    IntPtr hConsoleOutput,
-	    bool bAbsolute,
-	    [In] ref SmallRect lpConsoleWindow);
-
-	[DllImport ("kernel32.dll", SetLastError = true)]
-	static extern Coord GetLargestConsoleWindowSize (
-	    IntPtr hConsoleOutput);
 }
 
 internal class ANSIDriver : ConsoleDriver {
-	WindowsANSIConsole.ExtendedCharInfo [] _outputBuffer;
 	WindowsANSIConsole.SmallRect _damageRegion;
 
 	public WindowsANSIConsole WinConsole { get; private set; }
@@ -635,7 +427,7 @@ internal class ANSIDriver : ConsoleDriver {
 				WindowsANSIConsole.SmallRect.MakeEmpty (ref _damageRegion);
 
 				if (_isWindowsTerminal) {
-					Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+					WinConsole.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
 				}
 			} catch (Win32Exception e) {
 				// We are being run in an environment that does not support a console
@@ -647,7 +439,6 @@ internal class ANSIDriver : ConsoleDriver {
 
 		CurrentAttribute = new Attribute (Color.White, Color.Black);
 
-		_outputBuffer = new WindowsANSIConsole.ExtendedCharInfo [Rows * Cols];
 		Clip = new Rect (0, 0, Cols, Rows);
 		_damageRegion = new WindowsANSIConsole.SmallRect () {
 			Top = 0,
@@ -679,19 +470,143 @@ internal class ANSIDriver : ConsoleDriver {
 		Cols = e.Size.Width;
 		Rows = e.Size.Height;
 
-		if (!RunningUnitTests) {
-			//var newSize = WinConsole.SetConsoleWindow (
-			//	(short)Math.Max (w, 16), (short)Math.Max (e.Size.Height, 0));
-
-			//Cols = newSize.Width;
-			//Rows = newSize.Height;
-		}
-
 		ResizeScreen ();
 		ClearContents ();
 		OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
 	}
 #endif
+	
+	public override bool IsRuneSupported (Rune rune)
+	{
+		return base.IsRuneSupported (rune) && rune.IsBmp;
+	}
+
+	void ResizeScreen ()
+	{
+		Clip = new Rect (0, 0, Cols, Rows);
+		_damageRegion = new WindowsANSIConsole.SmallRect () {
+			Top = 0,
+			Left = 0,
+			Bottom = (short)Rows,
+			Right = (short)Cols
+		};
+		_dirtyLines = new bool [Rows];
+
+		WinConsole?.ForceRefreshCursorVisibility ();
+	}
+
+	public override void UpdateScreen ()
+	{
+		if (RunningUnitTests) {
+			return;
+		}
+
+		var stringBuilder = new StringBuilder ();
+		stringBuilder.Clear ();
+
+		stringBuilder.Append (EscSeqUtils.CSI_SetCursorPosition (1, 1));
+		WinConsole.Write (stringBuilder.ToString ());
+
+		var top = 0;
+		var left = 0;
+		var rows = Rows;
+		var cols = Cols;
+		Attribute redrawAttr = new Attribute ();
+		var nextCol = -1; // The net column we can write to. -1 if we've not processed anything yet.
+
+		for (var row = top; row < rows; row++) {
+			stringBuilder.Clear ();
+			stringBuilder.Append (EscSeqUtils.CSI_SetCursorPosition (row + 1, 1));
+			_dirtyLines [row] = false;
+			for (var col = left; col < cols; col++) {
+				nextCol = -1;
+				var outputWidth = 0;
+				for (; col < cols; col++) {
+					if (!Contents [row, col].IsDirty) {
+						if (stringBuilder.Length > 0) {
+							// We've collected outputWidth dirty cells on this row. Output them.
+							WriteToConsole (stringBuilder, ref nextCol, row, ref outputWidth);
+							// nextCol now points to the last column we write to (nextCol += outputWidth)
+							// outputWidth is now 0
+						} else if (nextCol == -1) {
+							nextCol = col;
+						}
+						if (nextCol + 1 < cols) {
+							nextCol++;
+						}
+						continue;
+					}
+
+					if (nextCol == -1) {
+						nextCol = col;
+					}
+
+					Attribute attr = Contents [row, col].Attribute.Value;
+					// Performance: Only send the escape sequence if the attribute has changed.
+					if (attr != redrawAttr) {
+						redrawAttr = attr;
+						if (Force16Colors) {
+							stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.AnsiColorCode));
+							stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.AnsiColorCode));
+						} else {
+							stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.Foreground.R, attr.Foreground.G, attr.Foreground.B));
+							stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.Background.R, attr.Background.G, attr.Background.B));
+						}
+
+					}
+
+					outputWidth++;
+					var rune = (Rune)Contents [row, col].Rune;
+					stringBuilder.Append (rune);
+					if (Contents [row, col].CombiningMarks.Count > 0) {
+						// AtlasEngine does not support NON-NORMALIZED combining marks in a way
+						// compatible with the driver architecture. Any CMs (except in the first col)
+						// are correctly combined with the base char, but are ALSO treated as 1 column
+						// width codepoints E.g. `echo "[e`u{0301}`u{0301}]"` will output `[é  ]`.
+						// 
+#if COMBINING_MARKS_SUPPORTED
+						foreach (var combMark in Contents [row, col].CombiningMarks) {
+							stringBuilder.Append (combMark);
+						}
+						WriteToConsole (stringBuilder, ref nextCol, row, ref outputWidth);
+#endif
+					}
+					if ((rune.IsSurrogatePair () && rune.GetColumns () < 2)) {
+						// AtlasEngine treats all SurrogatePairs as 2 columns
+						// BUGBUG: Regional Indicator Symbol Letters A-Z - U+1f1e6-U+1f1ff render in WT 
+						// weird
+						WriteToConsole (stringBuilder, ref nextCol, row, ref outputWidth);
+						//SetCursorPosition (col - 1, row);
+					}
+					Contents [row, col].IsDirty = false;
+				}
+			}
+			if (stringBuilder.Length > 0) {
+				stringBuilder.Insert (0, EscSeqUtils.CSI_SetCursorPosition (row + 1, nextCol + 1));
+				WinConsole.Write (stringBuilder.ToString ());
+			}
+		}
+
+		stringBuilder.Append (EscSeqUtils.CSI_SetCursorPosition (Row + 1, Col + 1));
+
+		WinConsole.Write (stringBuilder.ToString ());
+
+		void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
+		{
+			var s = output.ToString ();
+			WinConsole.Write (s);
+			output.Clear ();
+			lastCol += outputWidth;
+			outputWidth = 0;
+		}
+	}
+
+	public override void Refresh ()
+	{
+		UpdateScreen ();
+		UpdateCursor ();
+	}
+
 
 	// This is a bit hacky, but it enables users to hold down a key and 
 	// OnKeyDown, OnKeyPressed, OnKeyPressed, OnKeyUp
@@ -711,20 +626,6 @@ internal class ANSIDriver : ConsoleDriver {
 				inputEvent.Event.KeyEvent = FromVKPacketToKeyEventRecord (inputEvent.Event.KeyEvent);
 			}
 			var map = MapKey (ToConsoleKeyInfoEx (inputEvent.Event.KeyEvent));
-			//var ke = inputEvent.KeyEvent;
-			//System.Diagnostics.Debug.WriteLine ($"fromPacketKey: {fromPacketKey}");
-			//if (ke.UnicodeChar == '\0') {
-			//	System.Diagnostics.Debug.WriteLine ("UnicodeChar: 0'\\0'");
-			//} else if (ke.UnicodeChar == 13) {
-			//	System.Diagnostics.Debug.WriteLine ("UnicodeChar: 13'\\n'");
-			//} else {
-			//	System.Diagnostics.Debug.WriteLine ($"UnicodeChar: {(uint)ke.UnicodeChar}'{ke.UnicodeChar}'");
-			//}
-			//System.Diagnostics.Debug.WriteLine ($"bKeyDown: {ke.bKeyDown}");
-			//System.Diagnostics.Debug.WriteLine ($"dwControlKeyState: {ke.dwControlKeyState}");
-			//System.Diagnostics.Debug.WriteLine ($"wRepeatCount: {ke.wRepeatCount}");
-			//System.Diagnostics.Debug.WriteLine ($"wVirtualKeyCode: {ke.wVirtualKeyCode}");
-			//System.Diagnostics.Debug.WriteLine ($"wVirtualScanCode: {ke.wVirtualScanCode}");
 
 			if (map == (Key)0xffffffff) {
 				KeyEvent key = new KeyEvent ();
@@ -733,41 +634,41 @@ internal class ANSIDriver : ConsoleDriver {
 				// Ctrl = VK_CONTROL = 0x11
 				// Alt = VK_MENU = 0x12
 
-				if (inputEvent.Event.KeyEvent.dwControlKeyState.HasFlag (WindowsANSIConsole.ControlKeyState.CapslockOn)) {
-					inputEvent.Event.KeyEvent.dwControlKeyState &= ~WindowsANSIConsole.ControlKeyState.CapslockOn;
+				if (((CONTROL_KEY_STATE)inputEvent.Event.KeyEvent.dwControlKeyState).HasFlag (CONTROL_KEY_STATE.CAPSLOCK_ON)) {
+					inputEvent.Event.KeyEvent.dwControlKeyState &= ~(uint)CONTROL_KEY_STATE.CAPSLOCK_ON;
 				}
 
-				if (inputEvent.Event.KeyEvent.dwControlKeyState.HasFlag (WindowsANSIConsole.ControlKeyState.ScrolllockOn)) {
-					inputEvent.Event.KeyEvent.dwControlKeyState &= ~WindowsANSIConsole.ControlKeyState.ScrolllockOn;
+				if (((CONTROL_KEY_STATE)inputEvent.Event.KeyEvent.dwControlKeyState).HasFlag (CONTROL_KEY_STATE.SCROLLLOCK_ON)) {
+					inputEvent.Event.KeyEvent.dwControlKeyState &= ~(uint)CONTROL_KEY_STATE.SCROLLLOCK_ON;
 				}
 
-				if (inputEvent.Event.KeyEvent.dwControlKeyState.HasFlag (WindowsANSIConsole.ControlKeyState.NumlockOn)) {
-					inputEvent.Event.KeyEvent.dwControlKeyState &= ~WindowsANSIConsole.ControlKeyState.NumlockOn;
+				if (((CONTROL_KEY_STATE)inputEvent.Event.KeyEvent.dwControlKeyState).HasFlag (CONTROL_KEY_STATE.NUMLOCK_ON)) {
+					inputEvent.Event.KeyEvent.dwControlKeyState &= ~(uint)CONTROL_KEY_STATE.NUMLOCK_ON;
 				}
 
 				switch (inputEvent.Event.KeyEvent.dwControlKeyState) {
-				case WindowsANSIConsole.ControlKeyState.RightAltPressed:
-				case WindowsANSIConsole.ControlKeyState.RightAltPressed |
-				    WindowsANSIConsole.ControlKeyState.LeftControlPressed |
-				    WindowsANSIConsole.ControlKeyState.EnhancedKey:
-				case WindowsANSIConsole.ControlKeyState.EnhancedKey:
+				case (uint)CONTROL_KEY_STATE.RIGHT_ALT_PRESSED:
+				case (uint)CONTROL_KEY_STATE.RIGHT_ALT_PRESSED |
+					(uint)CONTROL_KEY_STATE.LEFT_CTRL_PRESSED |
+					(uint)CONTROL_KEY_STATE.ENHANCED_KEY:
+				case (uint)CONTROL_KEY_STATE.ENHANCED_KEY:
 					key = new KeyEvent (Key.CtrlMask | Key.AltMask, _keyModifiers);
 					break;
-				case WindowsANSIConsole.ControlKeyState.LeftAltPressed:
+				case (uint)CONTROL_KEY_STATE.LEFT_ALT_PRESSED:
 					key = new KeyEvent (Key.AltMask, _keyModifiers);
 					break;
-				case WindowsANSIConsole.ControlKeyState.RightControlPressed:
-				case WindowsANSIConsole.ControlKeyState.LeftControlPressed:
+				case (uint)CONTROL_KEY_STATE.RIGHT_CTRL_PRESSED:
+				case (uint)CONTROL_KEY_STATE.LEFT_CTRL_PRESSED:
 					key = new KeyEvent (Key.CtrlMask, _keyModifiers);
 					break;
-				case WindowsANSIConsole.ControlKeyState.ShiftPressed:
+				case (uint)CONTROL_KEY_STATE.SHIFT_PRESSED:
 					key = new KeyEvent (Key.ShiftMask, _keyModifiers);
 					break;
-				case WindowsANSIConsole.ControlKeyState.NumlockOn:
+				case (uint)CONTROL_KEY_STATE.NUMLOCK_ON:
 					break;
-				case WindowsANSIConsole.ControlKeyState.ScrolllockOn:
+				case (uint)CONTROL_KEY_STATE.SCROLLLOCK_ON:
 					break;
-				case WindowsANSIConsole.ControlKeyState.CapslockOn:
+				case (uint)CONTROL_KEY_STATE.CAPSLOCK_ON:
 					break;
 				default:
 					key = inputEvent.Event.KeyEvent.wVirtualKeyCode switch {
@@ -825,18 +726,18 @@ internal class ANSIDriver : ConsoleDriver {
 #if !HACK_CHECK_WINCHANGED
 		case (ushort)INPUT_RECORD_EVENT_TYPE.WINDOW_BUFFER_SIZE_EVENT:
 			
-			Cols = inputEvent.WindowBufferSizeEvent._size.X;
-			Rows = inputEvent.WindowBufferSizeEvent._size.Y;
+			Cols = inputEvent.Event.WindowBufferSizeEvent.dwSize.X;
+			Rows = inputEvent.Event.WindowBufferSizeEvent.dwSize.Y;
 
 			ResizeScreen ();
 			ClearContents ();
-			TerminalResized.Invoke ();
+			OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
 			break;
 #endif
 		}
 	}
 
-	WindowsANSIConsole.ButtonState? _lastMouseButtonPressed = null;
+	MOUSE_BUTTON_STATE? _lastMouseButtonPressed = null;
 	bool _isButtonPressed = false;
 	bool _isButtonReleased = false;
 	bool _isButtonDoubleClicked = false;
@@ -845,12 +746,12 @@ internal class ANSIDriver : ConsoleDriver {
 	bool _isOneFingerDoubleClicked = false;
 	bool _processButtonClick;
 
-	MouseEvent ToDriverMouse (WindowsANSIConsole.MouseEventRecord mouseEvent)
+	MouseEvent ToDriverMouse (MOUSE_EVENT_RECORD mouseEvent)
 	{
 		MouseFlags mouseFlag = MouseFlags.AllEvents;
 
 		//System.Diagnostics.Debug.WriteLine (
-		//	$"X:{mouseEvent.MousePosition.X};Y:{mouseEvent.MousePosition.Y};ButtonState:{mouseEvent.ButtonState};EventFlags:{mouseEvent.EventFlags}");
+		//	$"X:{mouseEvent.dwMousePosition.X};Y:{mouseEvent.dwMousePosition.Y};ButtonState:{mouseEvent.dwButtonState};EventFlags:{mouseEvent.dwEventFlags}");
 
 		if (_isButtonDoubleClicked || _isOneFingerDoubleClicked) {
 			Application.MainLoop.AddIdle (() => {
@@ -864,30 +765,30 @@ internal class ANSIDriver : ConsoleDriver {
 		// be fired with it's bit set to 0. So when the button is up ButtonState will be 0.
 		// To map to the correct driver events we save the last pressed mouse button so we can
 		// map to the correct clicked event.
-		if ((_lastMouseButtonPressed != null || _isButtonReleased) && mouseEvent.ButtonState != 0) {
+		if ((_lastMouseButtonPressed != null || _isButtonReleased) && mouseEvent.dwButtonState != 0) {
 			_lastMouseButtonPressed = null;
 			//isButtonPressed = false;
 			_isButtonReleased = false;
 		}
 
 		var p = new Point () {
-			X = mouseEvent.MousePosition.X,
-			Y = mouseEvent.MousePosition.Y
+			X = mouseEvent.dwMousePosition.X,
+			Y = mouseEvent.dwMousePosition.Y
 		};
 
-		if ((mouseEvent.ButtonState != 0 && mouseEvent.EventFlags == 0 && _lastMouseButtonPressed == null && !_isButtonDoubleClicked) ||
-		     (_lastMouseButtonPressed == null && mouseEvent.EventFlags.HasFlag (WindowsANSIConsole.EventFlags.MouseMoved) &&
-		     mouseEvent.ButtonState != 0 && !_isButtonReleased && !_isButtonDoubleClicked)) {
-			switch (mouseEvent.ButtonState) {
-			case WindowsANSIConsole.ButtonState.Button1Pressed:
+		if ((mouseEvent.dwButtonState != 0 && mouseEvent.dwEventFlags == 0 && _lastMouseButtonPressed == null && !_isButtonDoubleClicked) ||
+		     (_lastMouseButtonPressed == null && ((MOUSE_EVENT_FLAGS)mouseEvent.dwEventFlags).HasFlag (MOUSE_EVENT_FLAGS.MOUSE_MOVED) &&
+		     mouseEvent.dwButtonState != 0 && !_isButtonReleased && !_isButtonDoubleClicked)) {
+			switch ((MOUSE_BUTTON_STATE)mouseEvent.dwButtonState) {
+			case MOUSE_BUTTON_STATE.FROM_LEFT_1ST_BUTTON_PRESSED:
 				mouseFlag = MouseFlags.Button1Pressed;
 				break;
 
-			case WindowsANSIConsole.ButtonState.Button2Pressed:
+			case MOUSE_BUTTON_STATE.FROM_LEFT_2ND_BUTTON_PRESSED:
 				mouseFlag = MouseFlags.Button2Pressed;
 				break;
 
-			case WindowsANSIConsole.ButtonState.RightmostButtonPressed:
+			case MOUSE_BUTTON_STATE.RIGHTMOST_BUTTON_PRESSED:
 				mouseFlag = MouseFlags.Button3Pressed;
 				break;
 			}
@@ -896,12 +797,12 @@ internal class ANSIDriver : ConsoleDriver {
 				_point = p;
 			}
 
-			if (mouseEvent.EventFlags == WindowsANSIConsole.EventFlags.MouseMoved) {
+			if (((MOUSE_EVENT_FLAGS)mouseEvent.dwEventFlags).HasFlag (MOUSE_EVENT_FLAGS.MOUSE_MOVED)) {
 				mouseFlag |= MouseFlags.ReportMousePosition;
 				_isButtonReleased = false;
 				_processButtonClick = false;
 			}
-			_lastMouseButtonPressed = mouseEvent.ButtonState;
+			_lastMouseButtonPressed = (MOUSE_BUTTON_STATE?)mouseEvent.dwButtonState;
 			_isButtonPressed = true;
 
 			if ((mouseFlag & MouseFlags.ReportMousePosition) == 0) {
@@ -911,65 +812,65 @@ internal class ANSIDriver : ConsoleDriver {
 				});
 			}
 
-		} else if (_lastMouseButtonPressed != null && mouseEvent.EventFlags == 0
+		} else if (_lastMouseButtonPressed != null && mouseEvent.dwEventFlags == 0
 		      && !_isButtonReleased && !_isButtonDoubleClicked && !_isOneFingerDoubleClicked) {
 			switch (_lastMouseButtonPressed) {
-			case WindowsANSIConsole.ButtonState.Button1Pressed:
+			case MOUSE_BUTTON_STATE.FROM_LEFT_1ST_BUTTON_PRESSED:
 				mouseFlag = MouseFlags.Button1Released;
 				break;
 
-			case WindowsANSIConsole.ButtonState.Button2Pressed:
+			case MOUSE_BUTTON_STATE.FROM_LEFT_2ND_BUTTON_PRESSED:
 				mouseFlag = MouseFlags.Button2Released;
 				break;
 
-			case WindowsANSIConsole.ButtonState.RightmostButtonPressed:
+			case MOUSE_BUTTON_STATE.RIGHTMOST_BUTTON_PRESSED:
 				mouseFlag = MouseFlags.Button3Released;
 				break;
 			}
 			_isButtonPressed = false;
 			_isButtonReleased = true;
-			if (_point != null && (((Point)_point).X == mouseEvent.MousePosition.X && ((Point)_point).Y == mouseEvent.MousePosition.Y)) {
+			if (_point != null && (((Point)_point).X == mouseEvent.dwMousePosition.X && ((Point)_point).Y == mouseEvent.dwMousePosition.Y)) {
 				_processButtonClick = true;
 			} else {
 				_point = null;
 			}
-		} else if (mouseEvent.EventFlags == WindowsANSIConsole.EventFlags.MouseMoved
-		      && !_isOneFingerDoubleClicked && _isButtonReleased && p == _point) {
+		} else if (((MOUSE_EVENT_FLAGS)mouseEvent.dwEventFlags).HasFlag (MOUSE_EVENT_FLAGS.MOUSE_MOVED)
+			&& !_isOneFingerDoubleClicked && _isButtonReleased && p == _point) {
 
 			mouseFlag = ProcessButtonClick (mouseEvent);
 
-		} else if (mouseEvent.EventFlags.HasFlag (WindowsANSIConsole.EventFlags.DoubleClick)) {
-			switch (mouseEvent.ButtonState) {
-			case WindowsANSIConsole.ButtonState.Button1Pressed:
+		} else if (((MOUSE_EVENT_FLAGS)mouseEvent.dwEventFlags).HasFlag (MOUSE_EVENT_FLAGS.DOUBLE_CLICK)) {
+			switch (mouseEvent.dwButtonState) {
+			case (uint)MOUSE_BUTTON_STATE.FROM_LEFT_1ST_BUTTON_PRESSED:
 				mouseFlag = MouseFlags.Button1DoubleClicked;
 				break;
 
-			case WindowsANSIConsole.ButtonState.Button2Pressed:
+			case (uint)MOUSE_BUTTON_STATE.FROM_LEFT_2ND_BUTTON_PRESSED:
 				mouseFlag = MouseFlags.Button2DoubleClicked;
 				break;
 
-			case WindowsANSIConsole.ButtonState.RightmostButtonPressed:
+			case (uint)MOUSE_BUTTON_STATE.RIGHTMOST_BUTTON_PRESSED:
 				mouseFlag = MouseFlags.Button3DoubleClicked;
 				break;
 			}
 			_isButtonDoubleClicked = true;
-		} else if (mouseEvent.EventFlags == 0 && mouseEvent.ButtonState != 0 && _isButtonDoubleClicked) {
-			switch (mouseEvent.ButtonState) {
-			case WindowsANSIConsole.ButtonState.Button1Pressed:
+		} else if (mouseEvent.dwEventFlags == 0 && mouseEvent.dwButtonState != 0 && _isButtonDoubleClicked) {
+			switch (mouseEvent.dwButtonState) {
+			case (uint)MOUSE_BUTTON_STATE.FROM_LEFT_1ST_BUTTON_PRESSED:
 				mouseFlag = MouseFlags.Button1TripleClicked;
 				break;
 
-			case WindowsANSIConsole.ButtonState.Button2Pressed:
+			case (uint)MOUSE_BUTTON_STATE.FROM_LEFT_2ND_BUTTON_PRESSED:
 				mouseFlag = MouseFlags.Button2TripleClicked;
 				break;
 
-			case WindowsANSIConsole.ButtonState.RightmostButtonPressed:
+			case (uint)MOUSE_BUTTON_STATE.RIGHTMOST_BUTTON_PRESSED:
 				mouseFlag = MouseFlags.Button3TripleClicked;
 				break;
 			}
 			_isButtonDoubleClicked = false;
-		} else if (mouseEvent.EventFlags == WindowsANSIConsole.EventFlags.MouseWheeled) {
-			switch ((int)mouseEvent.ButtonState) {
+		} else if (mouseEvent.dwEventFlags == (uint)MOUSE_EVENT_FLAGS.MOUSE_WHEELED) {
+			switch ((int)mouseEvent.dwButtonState) {
 			case int v when v > 0:
 				mouseFlag = MouseFlags.WheeledUp;
 				break;
@@ -979,9 +880,9 @@ internal class ANSIDriver : ConsoleDriver {
 				break;
 			}
 
-		} else if (mouseEvent.EventFlags == WindowsANSIConsole.EventFlags.MouseWheeled &&
-		      mouseEvent.ControlKeyState == WindowsANSIConsole.ControlKeyState.ShiftPressed) {
-			switch ((int)mouseEvent.ButtonState) {
+		} else if (mouseEvent.dwEventFlags == (uint)MOUSE_EVENT_FLAGS.MOUSE_WHEELED &&
+		      mouseEvent.dwControlKeyState == (uint)CONTROL_KEY_STATE.SHIFT_PRESSED) {
+			switch ((int)mouseEvent.dwButtonState) {
 			case int v when v > 0:
 				mouseFlag = MouseFlags.WheeledLeft;
 				break;
@@ -991,8 +892,8 @@ internal class ANSIDriver : ConsoleDriver {
 				break;
 			}
 
-		} else if (mouseEvent.EventFlags == WindowsANSIConsole.EventFlags.MouseHorizontalWheeled) {
-			switch ((int)mouseEvent.ButtonState) {
+		} else if (mouseEvent.dwEventFlags == (uint)MOUSE_EVENT_FLAGS.MOUSE_HWHEELED) {
+			switch ((int)mouseEvent.dwButtonState) {
 			case int v when v < 0:
 				mouseFlag = MouseFlags.WheeledLeft;
 				break;
@@ -1002,12 +903,12 @@ internal class ANSIDriver : ConsoleDriver {
 				break;
 			}
 
-		} else if (mouseEvent.EventFlags == WindowsANSIConsole.EventFlags.MouseMoved) {
+		} else if (mouseEvent.dwEventFlags == (uint)MOUSE_EVENT_FLAGS.MOUSE_MOVED) {
 			mouseFlag = MouseFlags.ReportMousePosition;
-			if (mouseEvent.MousePosition.X != _pointMove.X || mouseEvent.MousePosition.Y != _pointMove.Y) {
-				_pointMove = new Point (mouseEvent.MousePosition.X, mouseEvent.MousePosition.Y);
+			if (mouseEvent.dwMousePosition.X != _pointMove.X || mouseEvent.dwMousePosition.Y != _pointMove.Y) {
+				_pointMove = new Point (mouseEvent.dwMousePosition.X, mouseEvent.dwMousePosition.Y);
 			}
-		} else if (mouseEvent.ButtonState == 0 && mouseEvent.EventFlags == 0) {
+		} else if (mouseEvent.dwButtonState == 0 && mouseEvent.dwEventFlags == 0) {
 			mouseFlag = 0;
 		}
 
@@ -1017,31 +918,31 @@ internal class ANSIDriver : ConsoleDriver {
 		//	$"point.X:{(point != null ? ((Point)point).X : -1)};point.Y:{(point != null ? ((Point)point).Y : -1)}");
 
 		return new MouseEvent () {
-			X = mouseEvent.MousePosition.X,
-			Y = mouseEvent.MousePosition.Y,
+			X = mouseEvent.dwMousePosition.X,
+			Y = mouseEvent.dwMousePosition.Y,
 			Flags = mouseFlag
 		};
 	}
 
-	MouseFlags ProcessButtonClick (WindowsANSIConsole.MouseEventRecord mouseEvent)
+	MouseFlags ProcessButtonClick (MOUSE_EVENT_RECORD mouseEvent)
 	{
 		MouseFlags mouseFlag = 0;
 		switch (_lastMouseButtonPressed) {
-		case WindowsANSIConsole.ButtonState.Button1Pressed:
+		case MOUSE_BUTTON_STATE.FROM_LEFT_1ST_BUTTON_PRESSED:
 			mouseFlag = MouseFlags.Button1Clicked;
 			break;
 
-		case WindowsANSIConsole.ButtonState.Button2Pressed:
+		case MOUSE_BUTTON_STATE.FROM_LEFT_2ND_BUTTON_PRESSED:
 			mouseFlag = MouseFlags.Button2Clicked;
 			break;
 
-		case WindowsANSIConsole.ButtonState.RightmostButtonPressed:
+		case MOUSE_BUTTON_STATE.RIGHTMOST_BUTTON_PRESSED:
 			mouseFlag = MouseFlags.Button3Clicked;
 			break;
 		}
 		_point = new Point () {
-			X = mouseEvent.MousePosition.X,
-			Y = mouseEvent.MousePosition.Y
+			X = mouseEvent.dwMousePosition.X,
+			Y = mouseEvent.dwMousePosition.Y
 		};
 		_lastMouseButtonPressed = null;
 		_isButtonReleased = false;
@@ -1055,7 +956,6 @@ internal class ANSIDriver : ConsoleDriver {
 		await Task.Delay (300);
 		_isButtonDoubleClicked = false;
 		_isOneFingerDoubleClicked = false;
-		//buttonPressedCount = 0;
 	}
 
 	async Task ProcessContinuousButtonPressedAsync (MouseFlags mouseFlag)
@@ -1078,19 +978,18 @@ internal class ANSIDriver : ConsoleDriver {
 		}
 	}
 
-	static MouseFlags SetControlKeyStates (WindowsANSIConsole.MouseEventRecord mouseEvent, MouseFlags mouseFlag)
+	static MouseFlags SetControlKeyStates (MOUSE_EVENT_RECORD mouseEvent, MouseFlags mouseFlag)
 	{
-		if (mouseEvent.ControlKeyState.HasFlag (WindowsANSIConsole.ControlKeyState.RightControlPressed) ||
-		    mouseEvent.ControlKeyState.HasFlag (WindowsANSIConsole.ControlKeyState.LeftControlPressed)) {
+		var state = (CONTROL_KEY_STATE)mouseEvent.dwControlKeyState;
+		if (state.HasFlag (CONTROL_KEY_STATE.RIGHT_CTRL_PRESSED) || state.HasFlag (CONTROL_KEY_STATE.LEFT_CTRL_PRESSED)) {
 			mouseFlag |= MouseFlags.ButtonCtrl;
 		}
 
-		if (mouseEvent.ControlKeyState.HasFlag (WindowsANSIConsole.ControlKeyState.ShiftPressed)) {
+		if (state.HasFlag (CONTROL_KEY_STATE.SHIFT_PRESSED)) {
 			mouseFlag |= MouseFlags.ButtonShift;
 		}
 
-		if (mouseEvent.ControlKeyState.HasFlag (WindowsANSIConsole.ControlKeyState.RightAltPressed) ||
-		     mouseEvent.ControlKeyState.HasFlag (WindowsANSIConsole.ControlKeyState.LeftAltPressed)) {
+		if (state.HasFlag (CONTROL_KEY_STATE.RIGHT_ALT_PRESSED) || state.HasFlag (CONTROL_KEY_STATE.LEFT_ALT_PRESSED)) {
 			mouseFlag |= MouseFlags.ButtonAlt;
 		}
 		return mouseFlag;
@@ -1098,16 +997,16 @@ internal class ANSIDriver : ConsoleDriver {
 
 	KeyModifiers _keyModifiers;
 
-	public WindowsANSIConsole.ConsoleKeyInfoEx ToConsoleKeyInfoEx (WindowsANSIConsole.KeyEventRecord keyEvent)
+	public ConsoleKeyInfoEx ToConsoleKeyInfoEx (KEY_EVENT_RECORD keyEvent)
 	{
-		var state = keyEvent.dwControlKeyState;
+		var state = (CONTROL_KEY_STATE)keyEvent.dwControlKeyState;
 
-		var shift = (state & WindowsANSIConsole.ControlKeyState.ShiftPressed) != 0;
-		var alt = (state & (WindowsANSIConsole.ControlKeyState.LeftAltPressed | WindowsANSIConsole.ControlKeyState.RightAltPressed)) != 0;
-		var control = (state & (WindowsANSIConsole.ControlKeyState.LeftControlPressed | WindowsANSIConsole.ControlKeyState.RightControlPressed)) != 0;
-		var capsLock = (state & (WindowsANSIConsole.ControlKeyState.CapslockOn)) != 0;
-		var numLock = (state & (WindowsANSIConsole.ControlKeyState.NumlockOn)) != 0;
-		var scrollLock = (state & (WindowsANSIConsole.ControlKeyState.ScrolllockOn)) != 0;
+		var shift = (state & CONTROL_KEY_STATE.SHIFT_PRESSED) != 0;
+		var alt = (state & (CONTROL_KEY_STATE.LEFT_ALT_PRESSED | CONTROL_KEY_STATE.RIGHT_ALT_PRESSED)) != 0;
+		var control = (state & (CONTROL_KEY_STATE.LEFT_CTRL_PRESSED | CONTROL_KEY_STATE.RIGHT_CTRL_PRESSED)) != 0;
+		var capsLock = (state & (CONTROL_KEY_STATE.CAPSLOCK_ON)) != 0;
+		var numLock = (state & (CONTROL_KEY_STATE.NUMLOCK_ON)) != 0;
+		var scrollLock = (state & (CONTROL_KEY_STATE.SCROLLLOCK_ON)) != 0;
 
 		_keyModifiers ??= new KeyModifiers ();
 		if (shift) {
@@ -1129,9 +1028,9 @@ internal class ANSIDriver : ConsoleDriver {
 			_keyModifiers.Scrolllock = true;
 		}
 
-		var consoleKeyInfo = new ConsoleKeyInfo (keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
+		var consoleKeyInfo = new ConsoleKeyInfo (keyEvent.uChar.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
 
-		return new WindowsANSIConsole.ConsoleKeyInfoEx (consoleKeyInfo, capsLock, numLock, scrollLock);
+		return new ConsoleKeyInfoEx (consoleKeyInfo, capsLock, numLock, scrollLock);
 	}
 
 	public KEY_EVENT_RECORD FromVKPacketToKeyEventRecord (KEY_EVENT_RECORD keyEvent)
@@ -1141,15 +1040,16 @@ internal class ANSIDriver : ConsoleDriver {
 		}
 
 		var mod = new ConsoleModifiers ();
-		if (((CONTROL_KEY_STATE)keyEvent.dwControlKeyState).HasFlag (CONTROL_KEY_STATE.SHIFT_PRESSED)) {
+		var state = (CONTROL_KEY_STATE)keyEvent.dwControlKeyState;
+		if (state.HasFlag (CONTROL_KEY_STATE.SHIFT_PRESSED)) {
 			mod |= ConsoleModifiers.Shift;
 		}
-		if (((CONTROL_KEY_STATE)keyEvent.dwControlKeyState).HasFlag (CONTROL_KEY_STATE.RIGHT_ALT_PRESSED) ||
-			((CONTROL_KEY_STATE)keyEvent.dwControlKeyState).HasFlag (CONTROL_KEY_STATE.LEFT_ALT_PRESSED)) {
+		if (state.HasFlag (CONTROL_KEY_STATE.RIGHT_ALT_PRESSED) ||
+		state.HasFlag (CONTROL_KEY_STATE.LEFT_ALT_PRESSED)) {
 			mod |= ConsoleModifiers.Alt;
 		}
-		if (((CONTROL_KEY_STATE)keyEvent.dwControlKeyState).HasFlag (CONTROL_KEY_STATE.LEFT_CONTROL_PRESSED) ||
-		((CONTROL_KEY_STATE)keyEvent.dwControlKeyState).HasFlag (CONTROL_KEY_STATE.RIGHT_CONTROL_PRESSED)) {
+		if (state.HasFlag (CONTROL_KEY_STATE.LEFT_CTRL_PRESSED) ||
+		state.HasFlag (CONTROL_KEY_STATE.RIGHT_CTRL_PRESSED)) {
 			mod |= ConsoleModifiers.Control;
 		}
 		var keyChar = ConsoleKeyMapping.GetKeyCharFromConsoleKey (keyEvent.uChar.UnicodeChar, mod, out uint virtualKey, out uint scanCode);
@@ -1315,220 +1215,6 @@ internal class ANSIDriver : ConsoleDriver {
 
 		return keyMod != Key.Null ? keyMod | key : key;
 	}
-
-	public override bool IsRuneSupported (Rune rune)
-	{
-		return base.IsRuneSupported (rune) && rune.IsBmp;
-	}
-
-	void ResizeScreen ()
-	{
-		_outputBuffer = new WindowsANSIConsole.ExtendedCharInfo [Rows * Cols];
-		Clip = new Rect (0, 0, Cols, Rows);
-		_damageRegion = new WindowsANSIConsole.SmallRect () {
-			Top = 0,
-			Left = 0,
-			Bottom = (short)Rows,
-			Right = (short)Cols
-		};
-		_dirtyLines = new bool [Rows];
-
-		WinConsole?.ForceRefreshCursorVisibility ();
-	}
-
-	//void UpdateScreen_WriteConsoleOutput ()
-	//{
-
-	//	var windowSize = /*WinConsole?.GetConsoleBufferWindow (out var _) ?? */new Size (Cols, Rows);
-	//	if (!windowSize.IsEmpty && (windowSize.Width != Cols || windowSize.Height != Rows)) {
-	//		return;
-	//	}
-
-	//	var bufferCoords = new WindowsANSIConsole.Coord () {
-	//		X = (short)Clip.Width,
-	//		Y = (short)Clip.Height
-	//	};
-
-	//	for (int row = 0; row < Rows; row++) {
-	//		if (!_dirtyLines [row]) {
-	//			continue;
-	//		}
-	//		_dirtyLines [row] = false;
-
-	//		for (int col = 0; col < Cols; col++) {
-	//			int position = row * Cols + col;
-	//			_outputBuffer [position].Attribute = Contents [row, col].Attribute.GetValueOrDefault ();
-	//			if (Contents [row, col].IsDirty == false) {
-	//				_outputBuffer [position].Empty = true;
-	//				_outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
-	//				continue;
-	//			}
-	//			_outputBuffer [position].Empty = false;
-	//			if (Contents [row, col].Rune.IsBmp) {
-	//				_outputBuffer [position].Char = (char)Contents [row, col].Rune.Value;
-	//			} else {
-	//				//_outputBuffer [position].Empty = true;
-	//				_outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
-	//				if (Contents [row, col].Rune.GetColumns () > 1 && col + 1 < Cols) {
-	//					// TODO: This is a hack to deal with non-BMP and wide characters.
-	//					// @DHowett (https://github.com/microsoft/terminal/issues/4628):
-	//					// WriteConsoleOutput works entirely cellwise, and there is no guarantee that you could ever emit a non-BMP character
-	//					// that requires a surrogate pair using it. I'm sorry to say that the cellwise APIs cannot represent the full
-	//					// gamut of text. For example: U+1F574 MAN IN BUSINESS SUIT LEVITATING only occupies one column but
-	//					// requires two code units.
-	//					// The antiquated mapping of columns to code units just doesn't account for this case.
-	//					// However, writing known-to-be-wide characters that require two code units by way of
-	//					// two CHAR_INFO structs should work.
-	//					// If that is not working, it would be worth filing a new issue for it.
-	//					col++;
-	//					position = row * Cols + col;
-	//					_outputBuffer [position].Empty = false;
-	//					_outputBuffer [position].Char = ' ';
-	//				}
-	//			}
-	//		}
-	//	}
-
-	//	_damageRegion = new WindowsANSIConsole.SmallRect () {
-	//		Top = 0,
-	//		Left = 0,
-	//		Bottom = (short)Rows,
-	//		Right = (short)Cols
-	//	};
-
-	//	if (!RunningUnitTests && WinConsole != null && !WinConsole.WriteToConsole (new Size (Cols, Rows), _outputBuffer, bufferCoords, _damageRegion)) {
-	//		var err = Marshal.GetLastWin32Error ();
-	//		if (err != 0) {
-	//			throw new System.ComponentModel.Win32Exception (err);
-	//		}
-	//	}
-	//	WindowsANSIConsole.SmallRect.MakeEmpty (ref _damageRegion);
-	//}
-
-	void UpdateScreen_WriteConsole ()
-	{
-		var stringBuilder = new StringBuilder ();
-		stringBuilder.Clear ();
-
-		//WinConsole.GetCursorVisibility (out var cursorVisible);
-		//SetCursorVisibility (CursorVisibility.Invisible);
-
-		//stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
-		stringBuilder.Append (EscSeqUtils.CSI_SetCursorPosition (1, 1));
-		WinConsole.Write (stringBuilder.ToString ());
-
-		var top = 0;
-		var left = 0;
-		var rows = Rows;
-		var cols = Cols;
-		Attribute redrawAttr = new Attribute ();
-		var nextCol = -1; // The net column we can write to. -1 if we've not processed anything yet.
-
-		for (var row = top; row < rows; row++) {
-			stringBuilder.Clear ();
-			stringBuilder.Append (EscSeqUtils.CSI_SetCursorPosition (row + 1, 1));
-			_dirtyLines [row] = false;
-			for (var col = left; col < cols; col++) {
-				nextCol = -1;
-				var outputWidth = 0;
-				for (; col < cols; col++) {
-					if (!Contents [row, col].IsDirty) {
-						if (stringBuilder.Length > 0) {
-							// We've collected outputWidth dirty cells on this row. Output them.
-							WriteToConsole (stringBuilder, ref nextCol, row, ref outputWidth);
-							// nextCol now points to the last column we write to (nextCol += outputWidth)
-							// outputWidth is now 0
-						} else if (nextCol == -1) {
-							nextCol = col;
-						}
-						if (nextCol + 1 < cols) {
-							nextCol++;
-						}
-						continue;
-					}
-
-					if (nextCol == -1) {
-						nextCol = col;
-					}
-
-					Attribute attr = Contents [row, col].Attribute.Value;
-					// Performance: Only send the escape sequence if the attribute has changed.
-					if (attr != redrawAttr) {
-						redrawAttr = attr;
-						stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.Foreground.R, attr.Foreground.G, attr.Foreground.B));
-						stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.Background.R, attr.Background.G, attr.Background.B));
-
-					}
-
-					outputWidth++;
-					var rune = (Rune)Contents [row, col].Rune;
-					stringBuilder.Append (rune);
-					if (Contents [row, col].CombiningMarks.Count > 0) {
-						// AtlasEngine does not support NON-NORMALIZED combining marks in a way
-						// compatible with the driver architecture. Any CMs (except in the first col)
-						// are correctly combined with the base char, but are ALSO treated as 1 column
-						// width codepoints E.g. `echo "[e`u{0301}`u{0301}]"` will output `[é  ]`.
-						// 
-#if COMBINING_MARKS_SUPPORTED
-						foreach (var combMark in Contents [row, col].CombiningMarks) {
-							stringBuilder.Append (combMark);
-						}
-						WriteToConsole (stringBuilder, ref nextCol, row, ref outputWidth);
-#endif
-					}
-					if ((rune.IsSurrogatePair () && rune.GetColumns () < 2)) {
-						// AtlasEngine treats all SurrogatePairs as 2 columns
-						// BUGBUG: Regional Indicator Symbol Letters A-Z - U+1f1e6-U+1f1ff render in WT 
-						// weird
-						WriteToConsole (stringBuilder, ref nextCol, row, ref outputWidth);
-						//SetCursorPosition (col - 1, row);
-					}
-					Contents [row, col].IsDirty = false;
-				}
-			}
-			if (stringBuilder.Length > 0) {
-				stringBuilder.Insert (0, EscSeqUtils.CSI_SetCursorPosition (row + 1, nextCol + 1));
-				WinConsole.Write (stringBuilder.ToString ());
-			}
-		}
-
-		//stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
-		//		if (cursorVisible != CursorVisibility.Invisible) {
-		stringBuilder.Append (EscSeqUtils.CSI_SetCursorPosition (Row + 1, Col + 1));
-		//stringBuilder.Append (EscSeqUtils.CSI_HideCursor);
-		//WinConsole.SetCursorVisibility (cursorVisible);
-		//		}
-		WinConsole.Write (stringBuilder.ToString ());
-
-		void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
-		{
-			var s = output.ToString ();
-			WinConsole.Write (s);
-			output.Clear ();
-			lastCol += outputWidth;
-			outputWidth = 0;
-		}
-	}
-
-	public override void UpdateScreen ()
-	{
-		if (RunningUnitTests) {
-			return;
-		}
-
-		//if (Force16Colors) {
-		//	UpdateScreen_WriteConsoleOutput ();
-		//} else {
-		UpdateScreen_WriteConsole ();
-		//}
-	}
-
-	public override void Refresh ()
-	{
-		UpdateScreen ();
-		UpdateCursor ();
-	}
-
 	CursorVisibility _cachedCursorVisibility;
 
 	public override void UpdateCursor ()
@@ -1574,53 +1260,53 @@ internal class ANSIDriver : ConsoleDriver {
 
 	public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
 	{
-		WindowsANSIConsole.InputRecord input = new WindowsANSIConsole.InputRecord {
-			EventType = WindowsANSIConsole.EventType.Key
+		INPUT_RECORD input = new INPUT_RECORD {
+			EventType = (ushort)INPUT_RECORD_EVENT_TYPE.KEY_EVENT
 		};
 
-		WindowsANSIConsole.KeyEventRecord keyEvent = new WindowsANSIConsole.KeyEventRecord {
+		KEY_EVENT_RECORD keyEvent = new KEY_EVENT_RECORD {
 			bKeyDown = true
 		};
-		WindowsANSIConsole.ControlKeyState controlKey = new WindowsANSIConsole.ControlKeyState ();
+		CONTROL_KEY_STATE controlKey = new CONTROL_KEY_STATE ();
 		if (shift) {
-			controlKey |= WindowsANSIConsole.ControlKeyState.ShiftPressed;
-			keyEvent.UnicodeChar = '\0';
+			controlKey |= CONTROL_KEY_STATE.SHIFT_PRESSED;
+			keyEvent.uChar.UnicodeChar = '\0';
 			keyEvent.wVirtualKeyCode = 16;
 		}
 		if (alt) {
-			controlKey |= WindowsANSIConsole.ControlKeyState.LeftAltPressed;
-			controlKey |= WindowsANSIConsole.ControlKeyState.RightAltPressed;
-			keyEvent.UnicodeChar = '\0';
+			controlKey |= CONTROL_KEY_STATE.LEFT_ALT_PRESSED;
+			controlKey |= CONTROL_KEY_STATE.RIGHT_ALT_PRESSED;
+			keyEvent.uChar.UnicodeChar = '\0';
 			keyEvent.wVirtualKeyCode = 18;
 		}
 		if (control) {
-			controlKey |= WindowsANSIConsole.ControlKeyState.LeftControlPressed;
-			controlKey |= WindowsANSIConsole.ControlKeyState.RightControlPressed;
-			keyEvent.UnicodeChar = '\0';
+			controlKey |= CONTROL_KEY_STATE.LEFT_CTRL_PRESSED;
+			controlKey |= CONTROL_KEY_STATE.RIGHT_CTRL_PRESSED;
+			keyEvent.uChar.UnicodeChar = '\0';
 			keyEvent.wVirtualKeyCode = 17;
 		}
-		keyEvent.dwControlKeyState = controlKey;
+		keyEvent.dwControlKeyState = (uint)controlKey;
 
-		input.KeyEvent = keyEvent;
+		input.Event.KeyEvent = keyEvent;
 
 		if (shift || alt || control) {
 			ProcessInput (input);
 		}
 
-		keyEvent.UnicodeChar = keyChar;
+		keyEvent.uChar.UnicodeChar = keyChar;
 		if ((uint)key < 255) {
 			keyEvent.wVirtualKeyCode = (ushort)key;
 		} else {
 			keyEvent.wVirtualKeyCode = '\0';
 		}
 
-		input.KeyEvent = keyEvent;
+		input.Event.KeyEvent = keyEvent;
 
 		try {
 			ProcessInput (input);
 		} catch (OverflowException) { } finally {
 			keyEvent.bKeyDown = false;
-			input.KeyEvent = keyEvent;
+			input.Event.KeyEvent = keyEvent;
 			ProcessInput (input);
 		}
 	}
@@ -1634,13 +1320,12 @@ internal class ANSIDriver : ConsoleDriver {
 		}
 		_mainLoopDriver = null;
 
-		WinConsole?.Cleanup ();
-		WinConsole = null;
-
 		if (!RunningUnitTests && _isWindowsTerminal) {
 			// Disable alternative screen buffer.
-			Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+			WinConsole.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
 		}
+		WinConsole?.Cleanup ();
+		WinConsole = null;
 	}
 
 	#region Not Implemented
@@ -1722,16 +1407,16 @@ internal class AnsiMainLoopDriver : IMainLoopDriver {
 			_winChange.Wait ();
 			_winChange.Reset ();
 
-			//// Check if the window size changed every half second. 
-			//// We do this to minimize the weird tearing seen on Windows when resizing the console
-			//while (_mainLoop != null) {
-			//	Task.Delay (500).Wait ();
-			//	_windowSize = _winConsole.GetConsoleBufferWindow (out _);
-			//	if (_windowSize != Size.Empty && (_windowSize.Width != _consoleDriver.Cols
-			//					|| _windowSize.Height != _consoleDriver.Rows)) {
-			//		break;
-			//	}
-			//}
+			// Check if the window size changed every half second. 
+			// We do this to minimize the weird tearing seen on Windows when resizing the console
+			while (_mainLoop != null) {
+				Task.Delay (500).Wait ();
+				_windowSize = _winConsole.GetConsoleBufferWindow (out _);
+				if (_windowSize != Size.Empty && (_windowSize.Width != _consoleDriver.Cols
+								|| _windowSize.Height != _consoleDriver.Rows)) {
+					break;
+				}
+			}
 
 			_winChanged = true;
 			_eventReady.Set ();

@@ -249,14 +249,36 @@ public static class EscSeqUtils {
 	public static string CSI_SetGraphicsRendition (params int [] parameters) => $"{CSI}{string.Join (";", parameters)}m";
 
 	/// <summary>
+	/// The 16 Color codes used by ANSI Esc sequences for 256 color terminals.
+	/// </summary>
+	public enum AnsiColorCode {
+		BLACK = 30,
+		RED = 31,
+		GREEN = 32,
+		YELLOW = 33,
+		BLUE = 34,
+		MAGENTA = 35,
+		CYAN = 36,
+		WHITE = 37,
+		BRIGHT_BLACK = 90,
+		BRIGHT_RED = 91,
+		BRIGHT_GREEN = 92,
+		BRIGHT_YELLOW = 93,
+		BRIGHT_BLUE = 94,
+		BRIGHT_MAGENTA = 95,
+		BRIGHT_CYAN = 96,
+		BRIGHT_WHITE = 97,
+	}
+
+	/// <summary>
 	/// ESC[38;5;{id}m - Set foreground color (256 colors)
 	/// </summary>
-	public static string CSI_SetForegroundColor (int id) => $"{CSI}38;5;{id}m";
+	public static string CSI_SetForegroundColor (AnsiColorCode code) => $"{CSI}38;5;{(int)code}m";
 
 	/// <summary>
 	/// ESC[48;5;{id}m - Set background color (256 colors)
 	/// </summary>
-	public static string CSI_SetBackgroundColor (int id) => $"{CSI}48;5;{id}m";
+	public static string CSI_SetBackgroundColor (AnsiColorCode code) => $"{CSI}48;5;{(int)code}m";
 
 	/// <summary>
 	/// ESC[38;2;{r};{g};{b}m	Set foreground color as RGB.

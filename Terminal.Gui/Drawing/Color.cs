@@ -223,6 +223,29 @@ public class Color : IEquatable<Color> {
 			{ new Color (242, 242, 242),Gui.ColorName.White},
 		}.ToImmutableDictionary ();
 
+
+	/// <summary>
+	/// Defines the 16 legacy color names and values that can be used to set the
+	/// </summary>
+	internal static ImmutableDictionary<ColorName, EscSeqUtils.AnsiColorCode> AnsiColorMap = new Dictionary<ColorName, EscSeqUtils.AnsiColorCode> {
+		{ ColorName.Black, EscSeqUtils.AnsiColorCode.BLACK },
+		{ ColorName.Blue, EscSeqUtils.AnsiColorCode.BLUE },
+		{ ColorName.Green, EscSeqUtils.AnsiColorCode.GREEN },
+		{ ColorName.Cyan, EscSeqUtils.AnsiColorCode.CYAN },
+		{ ColorName.Red, EscSeqUtils.AnsiColorCode.RED },
+		{ ColorName.Magenta, EscSeqUtils.AnsiColorCode.MAGENTA },
+		{ ColorName.Yellow, EscSeqUtils.AnsiColorCode.YELLOW },
+		{ ColorName.Gray, EscSeqUtils.AnsiColorCode.WHITE },
+		{ ColorName.DarkGray, EscSeqUtils.AnsiColorCode.BRIGHT_BLACK },
+		{ ColorName.Blue, EscSeqUtils.AnsiColorCode.BRIGHT_BLUE },
+		{ ColorName.Green, EscSeqUtils.AnsiColorCode.BRIGHT_GREEN },
+		{ ColorName.Cyan, EscSeqUtils.AnsiColorCode.BRIGHT_CYAN },
+		{ ColorName.Red, EscSeqUtils.AnsiColorCode.BRIGHT_RED },
+		{ ColorName.Magenta, EscSeqUtils.AnsiColorCode.BRIGHT_MAGENTA },
+		{ ColorName.Yellow, EscSeqUtils.AnsiColorCode.BRIGHT_YELLOW },
+		{ ColorName.White, EscSeqUtils.AnsiColorCode.BRIGHT_WHITE }
+	}.ToImmutableDictionary ();
+
 	/// <summary>
 	/// Gets or sets the 24-bit color value for each of the legacy 16-color values.
 	/// </summary>
@@ -297,6 +320,19 @@ public class Color : IEquatable<Color> {
 			G = c.G;
 			B = c.B;
 			A = c.A;
+		}
+	}
+
+	/// <summary>
+	/// Gets or sets the <see cref="Color"/> using a legacy 16-color <see cref="Gui.ColorName"/> value.
+	/// <see langword="get"/> will return the closest 16 color match to the true color when no exact value is found.
+	/// </summary>
+	/// <remarks>
+	/// Get returns the <see cref="ColorName"/> of the closest 24-bit color value. Set sets the RGB value using a hard-coded map.
+	/// </remarks>
+	public EscSeqUtils.AnsiColorCode AnsiColorCode {
+		get {
+			return AnsiColorMap [ColorName];
 		}
 	}
 
