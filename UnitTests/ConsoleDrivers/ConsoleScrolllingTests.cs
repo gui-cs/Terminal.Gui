@@ -14,11 +14,16 @@ namespace Terminal.Gui.DriverTests {
 
 		public ConsoleScrollingTests (ITestOutputHelper output)
 		{
+			ConsoleDriver.RunningUnitTests = true;
 			this.output = output;
 		}
 
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
+		//[InlineData (typeof (NetDriver))]
+		//[InlineData (typeof (ANSIDriver))]
+		//[InlineData (typeof (WindowsDriver))]
+		//[InlineData (typeof (CursesDriver))]
 		public void Left_And_Top_Is_Always_Zero (Type driverType)
 		{
 			var driver = (FakeDriver)Activator.CreateInstance (driverType);

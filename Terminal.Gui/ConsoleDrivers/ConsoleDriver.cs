@@ -3,13 +3,8 @@
 //
 using System.Text;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using static Terminal.Gui.ColorScheme;
 using System.Linq;
-using System.Data;
-using System.Linq;
-using System.Data;
 
 namespace Terminal.Gui;
 
@@ -64,12 +59,24 @@ public abstract class ConsoleDriver {
 	/// <summary>
 	/// The number of columns visible in the terminal.
 	/// </summary>
-	public virtual int Cols { get; internal set; }
+	public virtual int Cols {
+		get => _cols;
+		internal set {
+			_cols = value;
+			ClearContents();
+		}
+	}
 
 	/// <summary>
 	/// The number of rows visible in the terminal.
 	/// </summary>
-	public virtual int Rows { get; internal set; }
+	public virtual int Rows {
+		get => _rows;
+		internal set {
+			_rows = value;
+			ClearContents();
+		}
+	}
 
 	/// <summary>
 	/// The leftmost column in the terminal.
@@ -425,6 +432,8 @@ public abstract class ConsoleDriver {
 	}
 
 	Attribute _currentAttribute;
+	int _cols;
+	int _rows;
 
 	/// <summary>
 	/// The <see cref="Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or <see cref="AddStr"/> call.

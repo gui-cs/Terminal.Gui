@@ -185,7 +185,7 @@ namespace Terminal.Gui.InputTests {
 		public void TestVKPacket (uint unicodeCharacter, bool shift, bool alt, bool control, uint initialVirtualKey, uint initialScanCode, Key expectedRemapping, uint expectedVirtualKey, uint expectedScanCode)
 		{
 			lock (packetLock) {
-				Application.ForceDriver = "FakeConsole";
+				Application.ForceDriver = "fake";
 				Application.Init ();
 
 				var modifiers = new ConsoleModifiers ();

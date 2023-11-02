@@ -172,24 +172,12 @@ namespace Terminal.Gui {
 						Driver = new CursesDriver ();
 					}
 				} else {
-					switch (ForceDriver.ToLower ()) {
-					case "curses":
-						Driver = new CursesDriver ();
-						break;
-					case "ansi":
-						Driver = new ANSIDriver ();
-						break;
-					case "windows":
-						Driver = new WindowsDriver ();
-						break;
-					case "fake":
-						Driver = new FakeDriver ();
-						break;
-					case "net":
-						Driver = new NetDriver ();
-						break;
-					default:
-						throw new ArgumentException ($"Invalid driver name '{ForceDriver}'. Valid values are 'curses', 'windows', 'fake', 'ansi', and 'net'.");
+					var drivers = GetDriverTypes ();
+					var driverType = drivers.FirstOrDefault (t => t.Name.ToLower () == ForceDriver.ToLower ());
+					if (driverType != null) {
+						Driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+					} else {
+						throw new ArgumentException ($"Invalid driver name: {ForceDriver}. Valid names are {string.Join (", ", drivers.Select (t => t.Name))}");
 					}
 				}
 			}
@@ -219,6 +207,23 @@ namespace Terminal.Gui {
 			_initialized = true;
 		}
 
+		/// <summary>
+		/// Gets of list of <see cref="ConsoleDriver"/> types that are available.
+		/// </summary>
+		/// <returns></returns>
+		public static List<Type> GetDriverTypes ()
+		{
+			// use reflection to get the list of drivers
+			var driverTypes = new List<Type> ();
+			foreach (var asm in AppDomain.CurrentDomain.GetAssemblies ()) {
+				foreach (var type in asm.GetTypes ()) {
+					if (type.IsSubclassOf (typeof (ConsoleDriver)) && !type.IsAbstract) {
+						driverTypes.Add (type);
+					}
+				}
+			}
+			return driverTypes;
+		}
 
 		/// <summary>
 		/// Shutdown an application initialized with <see cref="Init(ConsoleDriver)"/>.

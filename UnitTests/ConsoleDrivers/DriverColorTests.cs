@@ -14,8 +14,9 @@ namespace Terminal.Gui.DriverTests {
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
 		[InlineData (typeof (NetDriver))]
-		[InlineData (typeof (CursesDriver))]
+		[InlineData (typeof (ANSIDriver))]
 		[InlineData (typeof (WindowsDriver))]
+		[InlineData (typeof (CursesDriver))]
 		public void SetColors_Changes_Colors (Type driverType)
 		{
 			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
@@ -41,8 +42,9 @@ namespace Terminal.Gui.DriverTests {
 		[Theory]
 		[InlineData (typeof (FakeDriver), false)]
 		[InlineData (typeof (NetDriver), true)]
+		[InlineData (typeof (ANSIDriver), true)]
+		[InlineData (typeof (WindowsDriver), true)]
 		[InlineData (typeof (CursesDriver), false)]
-		[InlineData (typeof (WindowsDriver), true)] // Because we're not Windows Terminal
 		public void SupportsTrueColor_Defaults (Type driverType, bool expectedSetting)
 		{
 			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
@@ -56,8 +58,9 @@ namespace Terminal.Gui.DriverTests {
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
 		[InlineData (typeof (NetDriver))]
-		[InlineData (typeof (CursesDriver))]
+		[InlineData (typeof (ANSIDriver))]
 		[InlineData (typeof (WindowsDriver))]
+		[InlineData (typeof (CursesDriver))]
 		public void Force16Colors_Sets (Type driverType)
 		{
 			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);

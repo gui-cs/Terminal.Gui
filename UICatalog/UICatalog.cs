@@ -77,12 +77,7 @@ namespace UICatalog {
 			var driverOption = new Option<string> (
 				name: "--driver",
 				description: "The ConsoleDriver to force the use of."
-				).FromAmong (
-				"fake",
-				"net",
-				"curses",
-				"windows",
-				"ansi");
+				).FromAmong (Application.GetDriverTypes ().Select (d => d.Name).ToArray ());
 			driverOption.AddAlias ("-d");
 			driverOption.AddAlias ("--d");
 
@@ -235,12 +230,12 @@ namespace UICatalog {
 
 			// Run UI Catalog UI. When it exits, if _selectedScenario is != null then
 			// a Scenario was selected. Otherwise, the user wants to quit UI Catalog.
-			
+
 			// If the user specified a driver on the command line then use it,
 			// ignoring Config files.
 
 			Application.Init (driverName: _forceDriver);
-				
+
 			if (_cachedTheme is null) {
 				_cachedTheme = CM.Themes?.Theme;
 			} else {
@@ -284,7 +279,6 @@ namespace UICatalog {
 		public class UICatalogTopLevel : Toplevel {
 			public MenuItem? miUseSubMenusSingleFrame;
 			public MenuItem? miIsMenuBorderDisabled;
-			public MenuItem? miForce16Colors;
 			public MenuItem? miIsMouseDisabled;
 
 			public ListView CategoryList;
@@ -568,15 +562,16 @@ namespace UICatalog {
 			MenuItem [] CreateForce16ColorItems ()
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
-				miForce16Colors = new MenuItem {
+				var miForce16Colors = new MenuItem {
 					Title = "Force 16 _Colors",
+					//CanExecute = () => (bool)Application.Driver.SupportsTrueColor,
+					Shortcut = Key.CtrlMask | Key.AltMask | Key.C,
+					CheckType = MenuItemCheckStyle.Checked,
 					Checked = Application.Force16Colors,
-					CanExecute = () => (bool)Application.Driver.SupportsTrueColor
 				};
-				miForce16Colors.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miForce16Colors!.Title!.Substring (10, 1) [0];
-				miForce16Colors.CheckType |= MenuItemCheckStyle.Checked;
 				miForce16Colors.Action += () => {
-					miForce16Colors.Checked = Application.Force16Colors = (bool)!miForce16Colors.Checked!;
+					miForce16Colors.ToggleChecked ();
+					Application.Force16Colors = (bool)miForce16Colors.Checked;
 					Application.Refresh ();
 				};
 				menuItems.Add (miForce16Colors);
@@ -760,13 +755,13 @@ namespace UICatalog {
 
 			public void ConfigChanged ()
 			{
-				miForce16Colors!.Checked = Application.Force16Colors;
-
 				if (_topLevelColorScheme == null || !Colors.ColorSchemes.ContainsKey (_topLevelColorScheme)) {
 					_topLevelColorScheme = "Base";
 				}
 
-				_themeMenuItems = ((UICatalogTopLevel)Application.Top).CreateThemeMenuItems ();
+				_cachedTheme = CM.Themes?.Theme;
+
+				_themeMenuItems = CreateThemeMenuItems ();
 				_themeMenuBarItem!.Children = _themeMenuItems;
 				foreach (var mi in _themeMenuItems!) {
 					if (mi is { Parent: null }) {
@@ -774,20 +769,20 @@ namespace UICatalog {
 					}
 				}
 
-				var checkedThemeMenu = _themeMenuItems?.Where (m => m?.Checked ?? false).FirstOrDefault ();
-				if (checkedThemeMenu != null) {
-					checkedThemeMenu.Checked = false;
-				}
-				checkedThemeMenu = _themeMenuItems?.Where (m => m != null && m.Title == CM.Themes?.Theme).FirstOrDefault ();
-				if (checkedThemeMenu != null) {
-					CM.Themes!.Theme = checkedThemeMenu.Title!;
-					checkedThemeMenu.Checked = true;
-				}
+				//var checkedThemeMenu = _themeMenuItems?.Where (m => m?.Checked ?? false).FirstOrDefault ();
+				//if (checkedThemeMenu != null) {
+				//	checkedThemeMenu.Checked = false;
+				//}
+				//checkedThemeMenu = _themeMenuItems?.Where (m => m != null && m.Title == CM.Themes?.Theme).FirstOrDefault ();
+				//if (checkedThemeMenu != null) {
+				//	CM.Themes!.Theme = checkedThemeMenu.Title!;
+				//	checkedThemeMenu.Checked = true;
+				//}
 
-				var schemeMenuItems = ((MenuBarItem)_themeMenuItems?.Where (i => i is MenuBarItem)!.FirstOrDefault ()!)!.Children;
-				foreach (var schemeMenuItem in schemeMenuItems) {
-					schemeMenuItem.Checked = (string)schemeMenuItem.Data == _topLevelColorScheme;
-				}
+				//var schemeMenuItems = ((MenuBarItem)_themeMenuItems?.Where (i => i is MenuBarItem)!.FirstOrDefault ()!)!.Children;
+				//foreach (var schemeMenuItem in schemeMenuItems) {
+				//	schemeMenuItem.Checked = (string)schemeMenuItem.Data == _topLevelColorScheme;
+				//}
 
 				ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
 
