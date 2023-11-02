@@ -768,25 +768,8 @@ namespace UICatalog {
 						mi.Parent = _themeMenuBarItem;
 					}
 				}
-
-				//var checkedThemeMenu = _themeMenuItems?.Where (m => m?.Checked ?? false).FirstOrDefault ();
-				//if (checkedThemeMenu != null) {
-				//	checkedThemeMenu.Checked = false;
-				//}
-				//checkedThemeMenu = _themeMenuItems?.Where (m => m != null && m.Title == CM.Themes?.Theme).FirstOrDefault ();
-				//if (checkedThemeMenu != null) {
-				//	CM.Themes!.Theme = checkedThemeMenu.Title!;
-				//	checkedThemeMenu.Checked = true;
-				//}
-
-				//var schemeMenuItems = ((MenuBarItem)_themeMenuItems?.Where (i => i is MenuBarItem)!.FirstOrDefault ()!)!.Children;
-				//foreach (var schemeMenuItem in schemeMenuItems) {
-				//	schemeMenuItem.Checked = (string)schemeMenuItem.Data == _topLevelColorScheme;
-				//}
-
+				
 				ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
-
-				//ContentPane.LineStyle = FrameView.DefaultBorderStyle;
 
 				MenuBar.Menus [0].Children [0].Shortcut = Application.QuitKey;
 				StatusBar.Items [0].Shortcut = Application.QuitKey;
