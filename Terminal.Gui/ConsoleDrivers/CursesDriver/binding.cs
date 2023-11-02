@@ -41,14 +41,18 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+
+//#define USE_IOCTL
+
 using System;
 using System.Runtime.InteropServices;
 using Terminal.Gui;
 
 namespace Unix.Terminal {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-
 	public partial class Curses {
+#if USE_IOCTL
+
 		[StructLayout (LayoutKind.Sequential)]
 		public struct winsize {
 			public ushort ws_row;
@@ -56,7 +60,7 @@ namespace Unix.Terminal {
 			public ushort ws_xpixel;   /* unused */
 			public ushort ws_ypixel;   /* unused */
 		};
-
+#endif
 		[StructLayout (LayoutKind.Sequential)]
 		public struct MouseEvent {
 			public short ID;
@@ -77,10 +81,11 @@ namespace Unix.Terminal {
 
 		[DllImport ("libc")]
 		public extern static int setlocale (int cate, [MarshalAs (UnmanagedType.LPStr)] string locale);
+#if USE_IOCTL
 
 		[DllImport ("libc")]
 		public extern static int ioctl (int fd, int cmd, out winsize argp);
-
+#endif
 		static void LoadMethods ()
 		{
 			var libs = UnmanagedLibrary.IsMacOSPlatform ? new string [] { "libncurses.dylib" } : new string [] { "libncursesw.so.6", "libncursesw.so.5" };
@@ -227,6 +232,8 @@ namespace Unix.Terminal {
 
 		internal static void console_sharp_get_dims (out int lines, out int cols)
 		{
+#if USE_IOCTL
+
 			if (UnmanagedLibrary.IsMacOSPlatform) {
 				int cmd = TIOCGWINSZ_MAC;
 
@@ -247,7 +254,10 @@ namespace Unix.Terminal {
 				lines = Marshal.ReadInt32 (lines_ptr);
 				cols = Marshal.ReadInt32 (cols_ptr);
 			}
-
+#else
+			lines = Marshal.ReadInt32 (lines_ptr);
+			cols = Marshal.ReadInt32 (cols_ptr);
+#endif
 			//int cmd;
 			//if (UnmanagedLibrary.IsMacOSPlatform) {
 			//	cmd = TIOCGWINSZ_MAC;
