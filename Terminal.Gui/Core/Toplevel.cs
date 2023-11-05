@@ -220,6 +220,9 @@ namespace Terminal.Gui {
 		{
 			ColorScheme = Colors.TopLevel;
 
+			Application.GrabbingMouse += Application_GrabbingMouse;
+			Application.UnGrabbingMouse += Application_UnGrabbingMouse;
+
 			// Things this view knows how to do
 			AddCommand (Command.QuitToplevel, () => { QuitToplevel (); return true; });
 			AddCommand (Command.Suspend, () => { Driver.Suspend (); ; return true; });
@@ -253,6 +256,20 @@ namespace Terminal.Gui {
 			AddKeyBinding (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
 
 			AddKeyBinding (Key.L | Key.CtrlMask, Command.Refresh);
+		}
+
+		private void  Application_UnGrabbingMouse (Application.GrabMouseEventArgs e)
+		{
+			if (Application.MouseGrabView == this && dragPosition.HasValue) {
+				e.Cancel = true;
+			}
+		}
+
+		private void Application_GrabbingMouse (Application.GrabMouseEventArgs e)
+		{
+			if (Application.MouseGrabView == this && dragPosition.HasValue) {
+				e.Cancel = true;
+			}
 		}
 
 		/// <summary>
@@ -872,8 +889,8 @@ namespace Terminal.Gui {
 			}
 
 			if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released) && dragPosition.HasValue) {
-				Application.UngrabMouse ();
 				dragPosition = null;
+				Application.UngrabMouse ();
 			}
 
 			//System.Diagnostics.Debug.WriteLine ($"dragPosition after: {dragPosition.HasValue}");
@@ -1031,6 +1048,16 @@ namespace Terminal.Gui {
 		public override bool OnLeave (View view)
 		{
 			return MostFocused?.OnLeave (view) ?? base.OnLeave (view);
+		}
+
+		///<inheritdoc/>
+		protected override void Dispose (bool disposing)
+		{
+			Application.GrabbingMouse -= Application_GrabbingMouse;
+			Application.UnGrabbingMouse -= Application_UnGrabbingMouse;
+
+			dragPosition = null;
+			base.Dispose (disposing);
 		}
 	}
 
