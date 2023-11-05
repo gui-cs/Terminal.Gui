@@ -513,5 +513,37 @@ Item 4
 Item 5
 Item 6", output);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void LeftItem_TopItem_Tests ()
+		{
+			var source = new List<string> ();
+			for (int i = 0; i < 5; i++) {
+				source.Add ($"Item {i}");
+			}
+			var lv = new ListView (source) {
+				X = 1,
+				Width = 10,
+				Height = 5
+			};
+			Application.Top.Add (lv);
+			Application.Begin (Application.Top);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ Item 0
+ Item 1
+ Item 2
+ Item 3
+ Item 4", output);
+
+			lv.LeftItem = 1;
+			lv.TopItem = 1;
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ tem 1
+ tem 2
+ tem 3
+ tem 4", output);
+		}
 	}
 }
