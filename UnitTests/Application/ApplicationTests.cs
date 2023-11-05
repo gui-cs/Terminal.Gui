@@ -941,7 +941,7 @@ namespace Terminal.Gui.ApplicationTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void MouseGrabView_GrabbedMouse_UnGrabbedMouse ()
+		public void MouseGrabView_GrabbedMouse_UnGrabbedMouse_GrabMouseEventArgs_GrabbingMouse_UnGrabbingMouse ()
 		{
 			View grabView = null;
 			var count = 0;
@@ -951,6 +951,8 @@ namespace Terminal.Gui.ApplicationTests {
 
 			Application.GrabbedMouse += Application_GrabbedMouse;
 			Application.UnGrabbedMouse += Application_UnGrabbedMouse;
+			Application.GrabbingMouse += Application_GrabbingMouse;
+			Application.UnGrabbingMouse += Application_UnGrabbingMouse;
 
 			Application.GrabMouse (view1);
 			Assert.Equal (0, count);
@@ -964,6 +966,8 @@ namespace Terminal.Gui.ApplicationTests {
 
 			Application.GrabbedMouse += Application_GrabbedMouse;
 			Application.UnGrabbedMouse += Application_UnGrabbedMouse;
+			Application.GrabbingMouse += Application_GrabbingMouse;
+			Application.UnGrabbingMouse += Application_UnGrabbingMouse;
 
 			Application.GrabMouse (view2);
 			Assert.Equal (1, count);
@@ -1000,6 +1004,32 @@ namespace Terminal.Gui.ApplicationTests {
 				count++;
 
 				Application.UnGrabbedMouse -= Application_UnGrabbedMouse;
+			}
+
+			void Application_GrabbingMouse (Application.GrabMouseEventArgs obj)
+			{
+				if (count == 0) {
+					Assert.Equal (view1, obj.View);
+					grabView = view1;
+				} else {
+					Assert.Equal (view2, obj.View);
+					grabView = view2;
+				}
+
+				Application.GrabbingMouse -= Application_GrabbingMouse;
+			}
+
+			void Application_UnGrabbingMouse (Application.GrabMouseEventArgs obj)
+			{
+				if (count == 0) {
+					Assert.Equal (view1, obj.View);
+					Assert.Equal (grabView, obj.View);
+				} else {
+					Assert.Equal (view2, obj.View);
+					Assert.Equal (grabView, obj.View);
+				}
+
+				Application.UnGrabbingMouse -= Application_UnGrabbingMouse;
 			}
 		}
 		#endregion
