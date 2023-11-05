@@ -665,8 +665,6 @@ namespace Terminal.Gui {
 					OverlappedTop?.OnActivate (state.Toplevel);
 					Top.SetSubViewNeedsDisplay ();
 					Refresh ();
-				} else if (Current.SuperView == null && Current?.Modal == true) {
-					Refresh ();
 				}
 			}
 
@@ -690,7 +688,7 @@ namespace Terminal.Gui {
 				&& (Driver.Cols != state.Toplevel.Frame.Width || Driver.Rows != state.Toplevel.Frame.Height)
 				&& (state.Toplevel.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay || state.Toplevel.LayoutNeeded)) {
 
-				state.Toplevel.Clear ();
+				state.Toplevel.Clear (new Rect (Point.Empty, new Size (Driver.Cols, Driver.Rows)));
 			}
 
 			if (state.Toplevel.NeedsDisplay ||
