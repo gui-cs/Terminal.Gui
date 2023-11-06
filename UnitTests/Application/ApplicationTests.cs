@@ -1042,6 +1042,22 @@ namespace Terminal.Gui.ApplicationTests {
 				return false;
 			}
 		}
+
+		[Fact, AutoInitShutdown]
+		public void GrabbingMouse_UnGrabbingMouse_Does_Not_Throws_If_Null ()
+		{
+			// This is needed to unsubscribe all the toplevel static events.
+			Application.Top.Dispose ();
+
+			var view = new View ();
+			var exception = Record.Exception (() => Application.GrabMouse (view));
+			Assert.Null (exception);
+
+			Assert.Equal (view, Application.MouseGrabView);
+
+			exception = Record.Exception (() => Application.UngrabMouse ());
+			Assert.Null (exception);
+		}
 		#endregion
 	}
 }
