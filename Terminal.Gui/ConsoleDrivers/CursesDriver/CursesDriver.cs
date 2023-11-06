@@ -384,14 +384,15 @@ namespace Terminal.Gui {
 					code = Curses.get_wch (out wch);
 					if (code == 0) {
 						switch (wch) {
+						// Shift code.
 						case 16:
 							keyModifiers.Shift = true;
 							break;
 						default:
 							if (lastWch == Curses.KeyResize && wch == 91) {
-								// Returns this keys to the std input
-								Curses.ungetch (91);
-								Curses.ungetch (27);
+								// Returns this keys to the std input which is a CSI (\x1b[).
+								Curses.ungetch (91); // [
+								Curses.ungetch (27); // Esc
 								return;
 							} else {
 								throw new Exception ();
