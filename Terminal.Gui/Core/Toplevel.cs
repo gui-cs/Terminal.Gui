@@ -258,18 +258,22 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.L | Key.CtrlMask, Command.Refresh);
 		}
 
-		private void  Application_UnGrabbingMouse (Application.GrabMouseEventArgs e)
+		private bool  Application_UnGrabbingMouse (View e)
 		{
 			if (Application.MouseGrabView == this && dragPosition.HasValue) {
-				e.Cancel = true;
+				return true;
 			}
+
+			return false;
 		}
 
-		private void Application_GrabbingMouse (Application.GrabMouseEventArgs e)
+		private bool Application_GrabbingMouse (View e)
 		{
 			if (Application.MouseGrabView == this && dragPosition.HasValue) {
-				e.Cancel = true;
+				return true;
 			}
+
+			return false;
 		}
 
 		/// <summary>

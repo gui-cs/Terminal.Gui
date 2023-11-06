@@ -698,12 +698,12 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Invoked when a view wants to grab the mouse; can be canceled.
 		/// </summary>
-		public static event Action<GrabMouseEventArgs> GrabbingMouse;
+		public static event Func<View, bool> GrabbingMouse;
 
 		/// <summary>
 		/// Invoked when a view wants ungrab the mouse; can be canceled.
 		/// </summary>
-		public static event Action<GrabMouseEventArgs> UnGrabbingMouse;
+		public static event Func<View, bool> UnGrabbingMouse;
 
 		/// <summary>
 		/// Event to be invoked when a view grab the mouse.
@@ -749,18 +749,14 @@ namespace Terminal.Gui {
 		{
 			if (view == null)
 				return false;
-			var evArgs = new GrabMouseEventArgs (view);
-			GrabbingMouse?.Invoke (evArgs);
-			return evArgs.Cancel;
+			return (bool)(GrabbingMouse?.Invoke (view));
 		}
 
 		static bool OnUnGrabbingMouse (View view)
 		{
 			if (view == null)
 				return false;
-			var evArgs = new GrabMouseEventArgs (view);
-			UnGrabbingMouse?.Invoke (evArgs);
-			return evArgs.Cancel;
+			return (bool)(UnGrabbingMouse?.Invoke (view));
 		}
 
 		static void OnGrabbedMouse (View view)
@@ -1732,32 +1728,6 @@ namespace Terminal.Gui {
 			     Directory.Exists (Path.Combine (assemblyLocation, cultureInfo.Name)) &&
 			     File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
 			).ToList ();
-		}
-
-		/// <summary>
-		/// Args for events that relate to specific <see cref="Application.MouseGrabView"/>
-		/// </summary>
-		public class GrabMouseEventArgs : EventArgs {
-
-			/// <summary>
-			/// Creates a new instance of the <see cref="GrabMouseEventArgs"/> class.
-			/// </summary>
-			/// <param name="view">The view that the event is about.</param>
-			public GrabMouseEventArgs (View view)
-			{
-				View = view;
-			}
-
-			/// <summary>
-			/// The view that the event is about.
-			/// </summary>
-			public View View { get; }
-
-			/// <summary>
-			/// Flag that allows the cancellation of the event. If set to <see langword="true"/> in the
-			/// event handler, the event will be canceled.
-			/// </summary>
-			public bool Cancel { get; set; }
 		}
 	}
 }

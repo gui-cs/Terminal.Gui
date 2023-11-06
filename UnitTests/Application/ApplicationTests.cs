@@ -941,10 +941,12 @@ namespace Terminal.Gui.ApplicationTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void MouseGrabView_GrabbedMouse_UnGrabbedMouse_GrabMouseEventArgs_GrabbingMouse_UnGrabbingMouse ()
+		public void MouseGrabView_GrabbedMouse_UnGrabbedMouse_GrabbingMouse_UnGrabbingMouse ()
 		{
 			View grabView = null;
 			var count = 0;
+			var wasGrabbingMouse = false;
+			var wasUnGrabbingMouse = false;
 
 			var view1 = new View ();
 			var view2 = new View ();
@@ -973,11 +975,13 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.Equal (1, count);
 			Assert.Equal (grabView, view2);
 			Assert.Equal (view2, Application.MouseGrabView);
+			Assert.True (wasGrabbingMouse);
 
 			Application.UngrabMouse ();
 			Assert.Equal (2, count);
 			Assert.Equal (grabView, view2);
 			Assert.Null (Application.MouseGrabView);
+			Assert.True (wasUnGrabbingMouse);
 
 			void Application_GrabbedMouse (View obj)
 			{
@@ -1006,30 +1010,36 @@ namespace Terminal.Gui.ApplicationTests {
 				Application.UnGrabbedMouse -= Application_UnGrabbedMouse;
 			}
 
-			void Application_GrabbingMouse (Application.GrabMouseEventArgs obj)
+			bool Application_GrabbingMouse (View obj)
 			{
 				if (count == 0) {
-					Assert.Equal (view1, obj.View);
+					Assert.Equal (view1, obj);
 					grabView = view1;
 				} else {
-					Assert.Equal (view2, obj.View);
+					Assert.Equal (view2, obj);
 					grabView = view2;
 				}
+				wasGrabbingMouse = true;
 
 				Application.GrabbingMouse -= Application_GrabbingMouse;
+
+				return false;
 			}
 
-			void Application_UnGrabbingMouse (Application.GrabMouseEventArgs obj)
+			bool Application_UnGrabbingMouse (View obj)
 			{
 				if (count == 0) {
-					Assert.Equal (view1, obj.View);
-					Assert.Equal (grabView, obj.View);
+					Assert.Equal (view1, obj);
+					Assert.Equal (grabView, obj);
 				} else {
-					Assert.Equal (view2, obj.View);
-					Assert.Equal (grabView, obj.View);
+					Assert.Equal (view2, obj);
+					Assert.Equal (grabView, obj);
 				}
+				wasUnGrabbingMouse = true;
 
 				Application.UnGrabbingMouse -= Application_UnGrabbingMouse;
+
+				return false;
 			}
 		}
 		#endregion
