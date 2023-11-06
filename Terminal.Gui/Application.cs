@@ -673,13 +673,11 @@ namespace Terminal.Gui {
 			if (state.Toplevel != Top &&
 				(Top.NeedsDisplay || Top.SubViewNeedsDisplay || Top.LayoutNeeded)) {
 				state.Toplevel.SetNeedsDisplay (state.Toplevel.Frame);
-				Top.Clear ();
 				Top.Draw ();
 				foreach (var top in _topLevels.Reverse ()) {
 					if (top != Top && top != state.Toplevel) {
 						top.SetNeedsDisplay ();
 						top.SetSubViewNeedsDisplay ();
-						top.Clear ();
 						top.Draw ();
 					}
 				}
@@ -695,7 +693,6 @@ namespace Terminal.Gui {
 				state.Toplevel.SubViewNeedsDisplay ||
 				state.Toplevel.LayoutNeeded ||
 				OverlappedChildNeedsDisplay ()) {
-				state.Toplevel.Clear ();
 				state.Toplevel.Draw ();
 				state.Toplevel.PositionCursor ();
 				Driver.Refresh ();
