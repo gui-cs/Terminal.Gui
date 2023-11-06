@@ -754,7 +754,7 @@ namespace Terminal.Gui {
 
 		static bool OnUnGrabbingMouse (View view)
 		{
-			if (view == null || GrabbingMouse == null)
+			if (view == null || UnGrabbingMouse == null)
 				return false;
 			return (bool)(UnGrabbingMouse?.Invoke (view));
 		}
