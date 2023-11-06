@@ -260,7 +260,7 @@ namespace Terminal.Gui {
 
 		private bool  Application_UnGrabbingMouse (View e)
 		{
-			if (Application.MouseGrabView == this && dragPosition.HasValue) {
+			if (dragPosition.HasValue) {
 				return true;
 			}
 
@@ -856,11 +856,10 @@ namespace Terminal.Gui {
 				// Only start grabbing if the user clicks on the title bar.
 				if (mouseEvent.Y == 0 && mouseEvent.Flags == MouseFlags.Button1Pressed) {
 					start = new Point (mouseEvent.X, mouseEvent.Y);
-					dragPosition = new Point ();
+					Application.GrabMouse (this);
 					nx = mouseEvent.X - mouseEvent.OfX;
 					ny = mouseEvent.Y - mouseEvent.OfY;
 					dragPosition = new Point (nx, ny);
-					Application.GrabMouse (this);
 				}
 
 				//System.Diagnostics.Debug.WriteLine ($"Starting at {dragPosition}");
