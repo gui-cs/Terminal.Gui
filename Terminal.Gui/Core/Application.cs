@@ -747,14 +747,14 @@ namespace Terminal.Gui {
 
 		static bool OnGrabbingMouse (View view)
 		{
-			if (view == null)
+			if (view == null || GrabbingMouse == null)
 				return false;
 			return (bool)(GrabbingMouse?.Invoke (view));
 		}
 
 		static bool OnUnGrabbingMouse (View view)
 		{
-			if (view == null)
+			if (view == null || GrabbingMouse == null)
 				return false;
 			return (bool)(UnGrabbingMouse?.Invoke (view));
 		}
