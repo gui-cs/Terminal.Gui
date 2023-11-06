@@ -740,6 +740,8 @@ namespace Terminal.Gui.ViewsTests {
 0000000000
 0000000000
 0000000000", null, attributes);
+
+			Application.Shutdown ();
 		}
 	}
 }
