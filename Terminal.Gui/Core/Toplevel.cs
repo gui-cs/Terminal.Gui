@@ -649,7 +649,8 @@ namespace Terminal.Gui {
 			}
 			mb = null; sb = null;
 			if (!(superView is Toplevel)) {
-				nx = x; ny = y;
+				nx = Math.Max (Math.Min (x, top.Frame.Right - 1), 0);
+				ny = Math.Max (Math.Min (y, top.Frame.Bottom - 1), 0);
 				return superView;
 			}
 			var superViewBorder = superView.Border != null ? (superView.Border.DrawMarginFrame ? 1 : 0) : 0;
