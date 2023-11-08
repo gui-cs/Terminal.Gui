@@ -365,9 +365,9 @@ namespace Terminal.Gui.TopLevelTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void Window_On_Non_Toplevel_Superview_Does_Not_Have_Rule ()
+		public void Window_On_Non_Toplevel_Superview_Cannot_Overflows_His_Bounds ()
 		{
-			var win = new Window () { Width = 5, Height = 5 };
+			var win = new Window () { Width = Dim.Fill (5), Height = Dim.Fill (5) };
 			var view = new View () { X = 3, Y = 3, Width = 10, Height = 10 };
 			view.Add (win);
 			Application.Top.Add (view);
@@ -394,7 +394,7 @@ namespace Terminal.Gui.TopLevelTests {
 				});
 
 			Assert.Equal (win, Application.MouseGrabView);
-			Assert.Equal (new Rect (-1, -1, 5, 5), win.Frame);
+			Assert.Equal (new Rect (0, 0, 5, 5), win.Frame);
 
 			ReflectionTools.InvokePrivate (
 				typeof (Application),
@@ -406,7 +406,7 @@ namespace Terminal.Gui.TopLevelTests {
 				});
 
 			Assert.Equal (win, Application.MouseGrabView);
-			Assert.Equal (new Rect (11, 11, 5, 5), win.Frame);
+			Assert.Equal (new Rect (4, 4, 5, 5), win.Frame);
 		}
 	}
 }
