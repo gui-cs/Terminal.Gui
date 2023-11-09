@@ -40,7 +40,7 @@ namespace UnitTests.ViewsTests {
 					alive += ",\n";
 					alive += v.GetType ().Name;
 				}
-				Assert.Fail ($"Some Views didnt get Garbage Collected: {((View)reference.Target).Subviews}");
+				Assert.Fail ($"Some Views didnt get Garbage Collected: {alive}");
 			}
 		}
 
