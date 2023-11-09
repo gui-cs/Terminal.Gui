@@ -55,7 +55,7 @@ namespace UnitTests.ViewsTests {
 		{
 			getSpecialParams ();
 			View Container = new View ();
-			Container.Add(new View ());
+			Container.Add (new View ());
 			Toplevel top = new ();
 			var state = Application.Begin (top);
 			var views = GetViews ();
