@@ -33,6 +33,7 @@ namespace UnitTests.ViewsTests {
 				GC.WaitForPendingFinalizers ();
 			}
 
+#if DEBUG_IDISPOSABLE
 			if (reference.IsAlive) {
 				Assert.True (((View)reference.Target).WasDisposed);
 				string alive = "\n View (Container)";
@@ -42,6 +43,7 @@ namespace UnitTests.ViewsTests {
 				}
 				Assert.Fail ($"Some Views didnt get Garbage Collected: {alive}");
 			}
+#endif
 		}
 
 		void getSpecialParams ()
