@@ -32,7 +32,6 @@ namespace UnitTests.ViewsTests {
 				GC.Collect ();
 				GC.WaitForPendingFinalizers ();
 			}
-
 #if DEBUG_IDISPOSABLE
 			if (reference.IsAlive) {
 				Assert.True (((View)reference.Target).WasDisposed);
