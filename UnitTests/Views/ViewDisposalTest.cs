@@ -22,14 +22,9 @@ namespace UnitTests.ViewsTests {
 				this.output = output;
 			}
 		}
-#nullable enable
-		Dictionary<Type, object? []?> special_params = new Dictionary<Type, object? []?> ();
-#nullable restore
-		[Fact]
-		[Fact]
+
 		[Fact]
 		[AutoInitShutdown]
-		[Fact]
 		public void TestViewsDisposeCorrectly ()
 		{
 			var reference = DoTest ();
@@ -37,17 +32,18 @@ namespace UnitTests.ViewsTests {
 				GC.Collect ();
 				GC.WaitForPendingFinalizers ();
 			}
-				string all = "\nView (Container)";
-				foreach (var v in ((View)reference.Target).Subviews) {
-					all += ",\n";
-					all += v.GetType ().Name;
+
+			if (reference.IsAlive) {
+				Assert.True (((View)reference.Target).WasDisposed);
+				string alive = "\n View (Container)";
+				foreach (View v in ((View)reference.Target).Subviews) {
+					alive += ",\n";
+					alive += v.GetType ().Name;
 				}
-				Assert.Fail ($"Some Views didnt get Garbage Collected: {all}");
+				Assert.Fail ($"Some Views didnt get Garbage Collected: {((View)reference.Target).Subviews}");
 			}
 		}
-		}
-			}
-		}
+
 		void getSpecialParams ()
 		{
 			special_params.Clear ();
@@ -58,18 +54,19 @@ namespace UnitTests.ViewsTests {
 		{
 			getSpecialParams ();
 			View Container = new View ();
+			Container.Add(new View ());
 			Toplevel top = new ();
-			//Application.Init ();
 			var state = Application.Begin (top);
 			var views = GetViews ();
-			Container.Add (new View ());
 			foreach (var view in views) {
 				View instance;
-				} else
+				//Create instance of view and add to container
+				if (special_params.ContainsKey (view)) {
+					instance = (View)Activator.CreateInstance (view, special_params [view]);
+				} else {
 					instance = (View)Activator.CreateInstance (view);
-					instance = (View)Activator.CreateInstance (view);
-				else
-					instance = (View)Activator.CreateInstance (view);
+				}
+
 				Assert.NotNull (instance);
 				Container.Add (instance);
 				output.WriteLine ($"Added instance of {view}!");
@@ -82,9 +79,9 @@ namespace UnitTests.ViewsTests {
 
 			top.Remove (Container);
 			Application.End (state);
-			WeakReference reference = new (Container);
-			Container.Dispose ();
 			top.Dispose ();
+			WeakReference reference = new (Container, true);
+			Container.Dispose ();
 			return reference;
 		}
 
@@ -93,12 +90,13 @@ namespace UnitTests.ViewsTests {
 		/// </summary>
 		/// <returns></returns>
 		List<Type> GetViews ()
-			foreach (var type in Assembly.GetAssembly (typeof (View)).GetTypes ().Where (T => {
+		{
+			List<Type> valid = new ();
+			// Filter all types that can be instantiated, are public, arent generic,  aren't the view type itself, but derive from view
+			foreach (var type in Assembly.GetAssembly (typeof (View)).GetTypes ().Where (T => { //body of anonymous check function
 				return ((!T.IsAbstract) && T.IsPublic && T.IsClass && T.IsAssignableTo (typeof (View)) && !T.IsGenericType && !(T == typeof (View)));
-			})) {
-				return ((!T.IsAbstract) && T.IsPublic && T.IsClass && T.IsAssignableTo (typeof (View)) && !T.IsGenericType && !(T == typeof (View)));})) {
-			foreach (var type in Assembly.GetAssembly (typeof (View)).GetTypes ().Where (T => {
-				return ((!T.IsAbstract) && T.IsPublic && T.IsClass && T.IsAssignableTo (typeof (View)) && !T.IsGenericType && !(T == typeof (View)));})) {
+			})) //end of body of anonymous check function
+			{ //body of the foreach loop
 				output.WriteLine ($"Found Type {type.Name}");
 				Assert.DoesNotContain (type, valid);
 				Assert.True (type.IsAssignableTo (typeof (IDisposable)));// Just to be safe
