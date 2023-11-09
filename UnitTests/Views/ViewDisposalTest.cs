@@ -1,20 +1,21 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Reflection;
 using Terminal.Gui;
 using Xunit;
-using Console = Terminal.Gui.FakeConsole;
-using Xunit.Sdk;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Xunit.Abstractions;
-using System.Threading;
-using Terminal.Gui.Graphs;
 
 namespace UnitTests.ViewsTests {
+
 	public class ViewDisposalTest {
-		ITestOutputHelper output;
+
+#nullable enable
+		Dictionary<Type, object? []?> special_params = new Dictionary<Type, object? []?> ();
+#nullable restore
+
+		readonly ITestOutputHelper output;
+
 		public ViewDisposalTest (ITestOutputHelper output)
 		{
 			{
@@ -24,6 +25,9 @@ namespace UnitTests.ViewsTests {
 #nullable enable
 		Dictionary<Type, object? []?> special_params = new Dictionary<Type, object? []?> ();
 #nullable restore
+		[Fact]
+		[Fact]
+		[Fact]
 		[AutoInitShutdown]
 		[Fact]
 		public void TestViewsDisposeCorrectly ()
@@ -33,9 +37,6 @@ namespace UnitTests.ViewsTests {
 				GC.Collect ();
 				GC.WaitForPendingFinalizers ();
 			}
-
-			if (reference.IsAlive) {
-				Assert.True (((View)reference.Target).WasDisposed);
 				string all = "\nView (Container)";
 				foreach (var v in ((View)reference.Target).Subviews) {
 					all += ",\n";
@@ -44,11 +45,15 @@ namespace UnitTests.ViewsTests {
 				Assert.Fail ($"Some Views didnt get Garbage Collected: {all}");
 			}
 		}
+		}
+			}
+		}
 		void getSpecialParams ()
 		{
-			//special_params.Clear ();
+			special_params.Clear ();
 			//special_params.Add (typeof (LineView), new object [] { Orientation.Horizontal });
 		}
+
 		WeakReference DoTest ()
 		{
 			getSpecialParams ();
@@ -60,10 +65,10 @@ namespace UnitTests.ViewsTests {
 			Container.Add (new View ());
 			foreach (var view in views) {
 				View instance;
-				//Create instance of view and add to container
-				if (special_params.ContainsKey (view)) {
-					instance = (View)Activator.CreateInstance (view, special_params [view]);
 				} else
+					instance = (View)Activator.CreateInstance (view);
+					instance = (View)Activator.CreateInstance (view);
+				else
 					instance = (View)Activator.CreateInstance (view);
 				Assert.NotNull (instance);
 				Container.Add (instance);
@@ -74,6 +79,7 @@ namespace UnitTests.ViewsTests {
 			for (var i = 0; i < 100; i++) {
 				Application.Refresh ();
 			}
+
 			top.Remove (Container);
 			Application.End (state);
 			WeakReference reference = new (Container);
@@ -87,18 +93,19 @@ namespace UnitTests.ViewsTests {
 		/// </summary>
 		/// <returns></returns>
 		List<Type> GetViews ()
-		{
-			List<Type> valid = new ();
-			// Filter all types that can be instantiated, are public, arent generic,  aren't the view type itself, but derive from view
 			foreach (var type in Assembly.GetAssembly (typeof (View)).GetTypes ().Where (T => {
 				return ((!T.IsAbstract) && T.IsPublic && T.IsClass && T.IsAssignableTo (typeof (View)) && !T.IsGenericType && !(T == typeof (View)));
 			})) {
+				return ((!T.IsAbstract) && T.IsPublic && T.IsClass && T.IsAssignableTo (typeof (View)) && !T.IsGenericType && !(T == typeof (View)));})) {
+			foreach (var type in Assembly.GetAssembly (typeof (View)).GetTypes ().Where (T => {
+				return ((!T.IsAbstract) && T.IsPublic && T.IsClass && T.IsAssignableTo (typeof (View)) && !T.IsGenericType && !(T == typeof (View)));})) {
 				output.WriteLine ($"Found Type {type.Name}");
 				Assert.DoesNotContain (type, valid);
 				Assert.True (type.IsAssignableTo (typeof (IDisposable)));// Just to be safe
 				valid.Add (type);
 				output.WriteLine ("	-Added!");
-			}
+			} //end body of foreach loop
+
 			return valid;
 		}
 	}
