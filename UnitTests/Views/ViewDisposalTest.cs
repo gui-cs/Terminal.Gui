@@ -24,8 +24,8 @@ namespace UnitTests.ViewsTests {
 #nullable enable
 		Dictionary<Type, object? []?> special_params = new Dictionary<Type, object? []?> ();
 #nullable restore
-		[Fact]
 		[AutoInitShutdown]
+		[Fact]
 		public void TestViewsDisposeCorrectly ()
 		{
 			var reference = DoTest ();
@@ -36,7 +36,12 @@ namespace UnitTests.ViewsTests {
 
 			if (reference.IsAlive) {
 				Assert.True (((View)reference.Target).WasDisposed);
-				Assert.Fail ($"Some Views didnt get Garbage Collected: {((View)reference.Target).Subviews}");
+				string all = "\nView (Container)";
+				foreach (var v in ((View)reference.Target).Subviews) {
+					all += ",\n";
+					all += v.GetType ().Name;
+				}
+				Assert.Fail ($"Some Views didnt get Garbage Collected: {all}");
 			}
 		}
 		void getSpecialParams ()
@@ -48,15 +53,17 @@ namespace UnitTests.ViewsTests {
 		{
 			getSpecialParams ();
 			View Container = new View ();
-			Toplevel top = Application.Top;
+			Toplevel top = new ();
+			//Application.Init ();
+			var state = Application.Begin (top);
 			var views = GetViews ();
+			Container.Add (new View ());
 			foreach (var view in views) {
 				View instance;
 				//Create instance of view and add to container
 				if (special_params.ContainsKey (view)) {
 					instance = (View)Activator.CreateInstance (view, special_params [view]);
-				}
-				else
+				} else
 					instance = (View)Activator.CreateInstance (view);
 				Assert.NotNull (instance);
 				Container.Add (instance);
@@ -68,8 +75,10 @@ namespace UnitTests.ViewsTests {
 				Application.Refresh ();
 			}
 			top.Remove (Container);
-			WeakReference reference = new (Container, true);
+			Application.End (state);
+			WeakReference reference = new (Container);
 			Container.Dispose ();
+			top.Dispose ();
 			return reference;
 		}
 
@@ -82,7 +91,8 @@ namespace UnitTests.ViewsTests {
 			List<Type> valid = new ();
 			// Filter all types that can be instantiated, are public, arent generic,  aren't the view type itself, but derive from view
 			foreach (var type in Assembly.GetAssembly (typeof (View)).GetTypes ().Where (T => {
-				return ((!T.IsAbstract) && T.IsPublic && T.IsClass && T.IsAssignableTo (typeof (View)) && !T.IsGenericType && !(T == typeof (View)));})) {
+				return ((!T.IsAbstract) && T.IsPublic && T.IsClass && T.IsAssignableTo (typeof (View)) && !T.IsGenericType && !(T == typeof (View)));
+			})) {
 				output.WriteLine ($"Found Type {type.Name}");
 				Assert.DoesNotContain (type, valid);
 				Assert.True (type.IsAssignableTo (typeof (IDisposable)));// Just to be safe
