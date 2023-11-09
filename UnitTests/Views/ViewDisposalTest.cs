@@ -32,17 +32,17 @@ namespace UnitTests.ViewsTests {
 				GC.Collect ();
 				GC.WaitForPendingFinalizers ();
 			}
-#if DEBUG_IDISPOSABLE
 			if (reference.IsAlive) {
+#if DEBUG_IDISPOSABLE
 				Assert.True (((View)reference.Target).WasDisposed);
+#endif
 				string alive = "\n View (Container)";
 				foreach (View v in ((View)reference.Target).Subviews) {
-					alive += ",\n";
+					alive += ",\n--";
 					alive += v.GetType ().Name;
 				}
 				Assert.Fail ($"Some Views didnt get Garbage Collected: {alive}");
 			}
-#endif
 		}
 
 		void getSpecialParams ()
