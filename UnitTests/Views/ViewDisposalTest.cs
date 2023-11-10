@@ -2,14 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace UnitTests.ViewsTests {
-
+namespace Terminal.Gui.ViewsTests {
 	public class ViewDisposalTest {
-
 #nullable enable
 		Dictionary<Type, object? []?> special_params = new Dictionary<Type, object? []?> ();
 #nullable restore
@@ -18,9 +15,7 @@ namespace UnitTests.ViewsTests {
 
 		public ViewDisposalTest (ITestOutputHelper output)
 		{
-			{
-				this.output = output;
-			}
+			this.output = output;
 		}
 
 		[Fact]
@@ -32,8 +27,8 @@ namespace UnitTests.ViewsTests {
 				GC.Collect ();
 				GC.WaitForPendingFinalizers ();
 			}
-			if (reference.IsAlive) {
 #if DEBUG_IDISPOSABLE
+			if (reference.IsAlive) {
 				Assert.True (((View)reference.Target).WasDisposed);
 #endif
 				string alive = "\n View (Container)";
@@ -45,7 +40,7 @@ namespace UnitTests.ViewsTests {
 			}
 		}
 
-		void getSpecialParams ()
+		void GetSpecialParams ()
 		{
 			special_params.Clear ();
 			//special_params.Add (typeof (LineView), new object [] { Orientation.Horizontal });
@@ -53,39 +48,36 @@ namespace UnitTests.ViewsTests {
 
 		WeakReference DoTest ()
 		{
-			getSpecialParams ();
-			View Container = new View ();
-			Container.Add (new View ());
-			Toplevel top = new ();
-			var state = Application.Begin (top);
+			GetSpecialParams ();
+			View container = new View ();
+			Toplevel top = Application.Top;
 			var views = GetViews ();
 			foreach (var view in views) {
 				View instance;
 				//Create instance of view and add to container
-				if (special_params.ContainsKey (view)) {
-					instance = (View)Activator.CreateInstance (view, special_params [view]);
+				if (special_params.TryGetValue (view, out var param)) {
+					instance = (View)Activator.CreateInstance (view, param);
 				} else {
 					instance = (View)Activator.CreateInstance (view);
 				}
 
 				Assert.NotNull (instance);
-				Container.Add (instance);
+				container.Add (instance);
 				output.WriteLine ($"Added instance of {view}!");
 			}
-			top.Add (Container);
+			top.Add (container);
 			// make sure the application is doing to the views whatever its supposed to do to the views
 			for (var i = 0; i < 100; i++) {
 				Application.Refresh ();
 			}
 
-			top.Remove (Container);
-			Application.End (state);
-			top.Dispose ();
-			WeakReference reference = new (Container, true);
-			Container.Dispose ();
+			top.Remove (container);
+			WeakReference reference = new (container, true);
+			container.Dispose ();
 			return reference;
 		}
 
+		// TODO: Consolidate this with same fn that's in AllViewsTester, ScenarioTests etc...
 		/// <summary>
 		/// Get all types derived from <see cref="View"/> using reflection
 		/// </summary>
