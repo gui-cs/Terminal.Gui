@@ -802,6 +802,8 @@ namespace Terminal.Gui {
 				SelectedRow = match;
 				EnsureValidSelection ();
 				EnsureSelectedCellIsVisible ();
+				PositionCursor ();
+				SetNeedsDisplay ();
 				return true;
 			}
 
