@@ -836,7 +836,7 @@ Three ", output);
 000000
 222222
 222222
-222222", attributes);
+222222", driver: Application.Driver, attributes);
 
 			Assert.True (cb.Subviews [1].OnKeyPressed (new (Key.CursorDown, new KeyModifiers ())));
 			Assert.Equal ("", selected);
@@ -848,7 +848,7 @@ Three ", output);
 000000
 222222
 000002
-222222", attributes);
+222222", driver: Application.Driver, attributes);
 
 			Assert.True (cb.Subviews [1].OnKeyPressed (new (Key.CursorDown, new KeyModifiers ())));
 			Assert.Equal ("", selected);
@@ -860,7 +860,7 @@ Three ", output);
 000000
 222222
 222222
-000002", attributes);
+000002", driver: Application.Driver, attributes);
 
 			Assert.True (cb.Subviews [1].OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.Equal ("Three", selected);
@@ -878,7 +878,7 @@ Three ", output);
 000000
 222222
 222222
-000002", attributes);
+000002", driver: Application.Driver, attributes);
 
 			Assert.True (cb.Subviews [1].OnKeyPressed (new (Key.CursorUp, new KeyModifiers ())));
 			Assert.Equal ("Three", selected);
@@ -890,7 +890,7 @@ Three ", output);
 000000
 222222
 000002
-111112", attributes);
+111112", driver: Application.Driver, attributes);
 
 			Assert.True (cb.Subviews [1].OnKeyPressed (new (Key.CursorUp, new KeyModifiers ())));
 			Assert.Equal ("Three", selected);
@@ -902,7 +902,7 @@ Three ", output);
 000000
 000002
 222222
-111112", attributes);
+111112", driver: Application.Driver, attributes);
 
 			Assert.True (cb.OnKeyPressed (new (Key.F4, new KeyModifiers ())));
 			Assert.Equal ("Three", selected);

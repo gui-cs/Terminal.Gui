@@ -942,11 +942,11 @@ cccccccccccccccccccc", output);
 			if (label) {
 				TestHelpers.AssertDriverColorsAre (@"
 111111111111111111110
-111111111111111111110", attributes);
+111111111111111111110", driver: Application.Driver, attributes);
 			} else {
 				TestHelpers.AssertDriverColorsAre (@"
 222222222222222222220
-111111111111111111110", attributes);
+111111111111111111110", driver: Application.Driver, attributes);
 			}
 
 			if (label) {
@@ -958,7 +958,7 @@ cccccccccccccccccccc", output);
 				Application.Refresh ();
 				TestHelpers.AssertDriverColorsAre (@"
 222222222222222222220
-111111111111111111110", attributes);
+111111111111111111110", driver: Application.Driver, attributes);
 			}
 			Application.End (runState);
 		}

@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
@@ -12,8 +13,11 @@ using Console = Terminal.Gui.FakeConsole;
 namespace Terminal.Gui.ApplicationTests;
 
 public class ApplicationTests {
-	public ApplicationTests ()
+	readonly ITestOutputHelper output;
+
+	public ApplicationTests (ITestOutputHelper output)
 	{
+		this.output = output;
 #if DEBUG_IDISPOSABLE
 		Responder.Instances.Clear ();
 		RunState.Instances.Clear ();
@@ -416,26 +420,132 @@ public class ApplicationTests {
 		Assert.Equal (3, count);
 	}
 
+	[Fact]
+	public void Run_Toplevel_With_Modal_View_Does_Not_Refresh_If_Not_Dirty ()
+	{
+		Init ();
+		var count = 0;
+		Dialog d = null;
+		var top = Application.Top;
+		top.DrawContent += (s, a) => count++;
+		var iteration = -1;
+		Application.Iteration += (s, a) => {
+			iteration++;
+			if (iteration == 0) {
+				d = new Dialog ();
+				d.DrawContent += (s, a) => count++;
+				Application.Run (d);
+			} else if (iteration < 3) {
+				Application.OnMouseEvent (new (new () { X = 0, Y = 0, Flags = MouseFlags.ReportMousePosition }));
+				Assert.False (top.NeedsDisplay);
+				Assert.False (top.SubViewNeedsDisplay);
+				Assert.False (top.LayoutNeeded);
+				Assert.False (d.NeedsDisplay);
+				Assert.False (d.SubViewNeedsDisplay);
+				Assert.False (d.LayoutNeeded);
+			} else {
+				Application.RequestStop ();
+			}
+		};
+		Application.Run ();
+		Application.Shutdown ();
+		// 1 - First top load, 1 - Dialog load, 1 - Dialog unload, Total - 3.
+		Assert.Equal (3, count);
+	}
+
+	[Fact]
+	public void Run_A_Modal_Toplevel_Refresh_Background_On_Moving ()
+	{
+		Init ();
+		var d = new Dialog () { Width = 5, Height = 5 };
+		((FakeDriver)Application.Driver).SetBufferSize (10, 10);
+		var rs = Application.Begin (d);
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
+  ┌───┐
+  │   │
+  │   │
+  │   │
+  └───┘", output);
+
+		var attributes = new Attribute [] {
+			// 0
+			new Attribute (ColorName.White, ColorName.Black),
+			// 1
+			Colors.Dialog.Normal
+		};
+		TestHelpers.AssertDriverColorsAre (@"
+0000000000
+0000000000
+0011111000
+0011111000
+0011111000
+0011111000
+0011111000
+0000000000
+0000000000
+0000000000
+", null, attributes);
+
+		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () { X = 2, Y = 2, Flags = MouseFlags.Button1Pressed }));
+		Assert.Equal (d, Application.MouseGrabView);
+
+		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () { X = 1, Y = 1, Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition }));
+		Application.Refresh ();
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
+ ┌───┐
+ │   │
+ │   │
+ │   │
+ └───┘", output);
+
+		attributes = new Attribute [] {
+			// 0
+			new Attribute (ColorName.White, ColorName.Black),
+			// 1
+			Colors.Dialog.Normal
+		};
+		TestHelpers.AssertDriverColorsAre (@"
+0000000000
+0111110000
+0111110000
+0111110000
+0111110000
+0111110000
+0000000000
+0000000000
+0000000000
+0000000000
+", null, attributes);
+
+		Application.End (rs);
+		Application.Shutdown ();
+	}
+
 	// TODO: Add tests for Run that test errorHandler
 
 	#endregion
 
 	#region ShutdownTests
 	[Fact]
-	public void Shutdown_Allows_Async ()
+	public async void Shutdown_Allows_Async ()
 	{
-		static async Task TaskWithAsyncContinuation ()
+		bool isCompletedSuccessfully = false;
+
+		async Task TaskWithAsyncContinuation ()
 		{
 			await Task.Yield ();
 			await Task.Yield ();
+
+			isCompletedSuccessfully = true;
 		}
 
 		Init ();
 		Application.Shutdown ();
 
-		var task = TaskWithAsyncContinuation ();
+		Assert.False (isCompletedSuccessfully);
+		await TaskWithAsyncContinuation ();
 		Thread.Sleep (100);
-		Assert.True (task.IsCompletedSuccessfully);
+		Assert.True (isCompletedSuccessfully);
 	}
 
 	[Fact]

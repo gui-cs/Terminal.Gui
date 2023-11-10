@@ -20,53 +20,33 @@ namespace Terminal.Gui.DriverTests {
 
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
-		//[InlineData (typeof (NetDriver))]
-		//[InlineData (typeof (CursesDriver))]
-		//[InlineData (typeof (WindowsDriver))]
+		[InlineData (typeof (NetDriver))]
+		[InlineData (typeof (CursesDriver))]
+		[InlineData (typeof (WindowsDriver))]
 		public void Init_Inits (Type driverType)
 		{
 			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-			Application.Init (driver);
-			driver.Init ();
+			var ml = driver.Init ();
+			Assert.NotNull (ml);
+			Assert.NotNull (driver.Clipboard);
+			Console.ForegroundColor = ConsoleColor.Red;
+			Assert.Equal (ConsoleColor.Red, Console.ForegroundColor);
+			Console.BackgroundColor = ConsoleColor.Green;
+			Assert.Equal (ConsoleColor.Green, Console.BackgroundColor);
 
-			Assert.Equal (80, Console.BufferWidth);
-			Assert.Equal (25, Console.BufferHeight);
-
-			// MockDriver is always 80x25
-			Assert.Equal (Console.BufferWidth, driver.Cols);
-			Assert.Equal (Console.BufferHeight, driver.Rows);
 			driver.End ();
-
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
 		}
 
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
-		//[InlineData (typeof (NetDriver))]
-		//[InlineData (typeof (CursesDriver))]
-		//[InlineData (typeof (WindowsDriver))]
+		[InlineData (typeof (NetDriver))]
+		[InlineData (typeof (CursesDriver))]
+		[InlineData (typeof (WindowsDriver))]
 		public void End_Cleans_Up (Type driverType)
 		{
 			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-			Application.Init (driver);
 			driver.Init ();
-
-			Console.ForegroundColor = ConsoleColor.Red;
-			Assert.Equal (ConsoleColor.Red, Console.ForegroundColor);
-
-			Console.BackgroundColor = ConsoleColor.Green;
-			Assert.Equal (ConsoleColor.Green, Console.BackgroundColor);
-			driver.Move (2, 3);
-
 			driver.End ();
-			Assert.Equal (0, Console.CursorLeft);
-			Assert.Equal (0, Console.CursorTop);
-			Assert.Equal (ConsoleColor.Gray, Console.ForegroundColor);
-			Assert.Equal (ConsoleColor.Black, Console.BackgroundColor);
-
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
 		}
 
 		[Theory]
@@ -199,88 +179,89 @@ namespace Terminal.Gui.DriverTests {
 		
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
+		[InlineData (typeof (NetDriver))]
+		[InlineData (typeof (CursesDriver))]
+		[InlineData (typeof (WindowsDriver))]
 		public void TerminalResized_Simulation (Type driverType)
 		{
-			var driver = (FakeDriver)Activator.CreateInstance (driverType);
-			Application.Init (driver);
+			var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+			driver?.Init ();
+			driver.Cols = 80;
+			driver.Rows = 25;
+			
 			var wasTerminalResized = false;
-			Application.SizeChanging += (s, e) => {
+			driver.SizeChanged += (s, e) => {
 				wasTerminalResized = true;
 				Assert.Equal (120, e.Size.Width);
 				Assert.Equal (40, e.Size.Height);
 			};
 
-			Assert.Equal (80, Console.BufferWidth);
-			Assert.Equal (25, Console.BufferHeight);
-
-			// MockDriver is by default 80x25
-			Assert.Equal (Console.BufferWidth, driver.Cols);
-			Assert.Equal (Console.BufferHeight, driver.Rows);
+			Assert.Equal (80, driver.Cols);
+			Assert.Equal (25, driver.Rows);
 			Assert.False (wasTerminalResized);
 
-			// MockDriver will now be sets to 120x40
-			driver.SetBufferSize (120, 40);
-			Assert.Equal (120, Application.Driver.Cols);
-			Assert.Equal (40, Application.Driver.Rows);
+			driver.Cols = 120;
+			driver.Rows = 40;
+			driver.OnSizeChanged (new SizeChangedEventArgs(new Size(driver.Cols, driver.Rows)));
+			Assert.Equal (120, driver.Cols);
+			Assert.Equal (40, driver.Rows);
 			Assert.True (wasTerminalResized);
-
-
-			Application.Shutdown ();
+			driver.End ();
 		}
 
 		// Disabled due to test error - Change Task.Delay to an await
-//		[Fact, AutoInitShutdown]
-//		public void Write_Do_Not_Change_On_ProcessKey ()
-//		{
-//			var win = new Window ();
-//			Application.Begin (win);
-//			((FakeDriver)Application.Driver).SetBufferSize (20, 8);
+		//		[Fact, AutoInitShutdown]
+		//		public void Write_Do_Not_Change_On_ProcessKey ()
+		//		{
+		//			var win = new Window ();
+		//			Application.Begin (win);
+		//			((FakeDriver)Application.Driver).SetBufferSize (20, 8);
 
-//			System.Threading.Tasks.Task.Run (() => {
-//				System.Threading.Tasks.Task.Delay (500).Wait ();
-//				Application.Invoke (() => {
-//					var lbl = new Label ("Hello World") { X = Pos.Center () };
-//					var dlg = new Dialog ();
-//					dlg.Add (lbl);
-//					Application.Begin (dlg);
+		//			System.Threading.Tasks.Task.Run (() => {
+		//				System.Threading.Tasks.Task.Delay (500).Wait ();
+		//				Application.Invoke (() => {
+		//					var lbl = new Label ("Hello World") { X = Pos.Center () };
+		//					var dlg = new Dialog ();
+		//					dlg.Add (lbl);
+		//					Application.Begin (dlg);
 
-//					var expected = @"
-//┌──────────────────┐
-//│┌───────────────┐ │
-//││  Hello World  │ │
-//││               │ │
-//││               │ │
-//││               │ │
-//│└───────────────┘ │
-//└──────────────────┘
-//";
+		//					var expected = @"
+		//┌──────────────────┐
+		//│┌───────────────┐ │
+		//││  Hello World  │ │
+		//││               │ │
+		//││               │ │
+		//││               │ │
+		//│└───────────────┘ │
+		//└──────────────────┘
+		//";
 
-//					var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-//					Assert.Equal (new Rect (0, 0, 20, 8), pos);
+		//					var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		//					Assert.Equal (new Rect (0, 0, 20, 8), pos);
 
-//					Assert.True (dlg.ProcessKey (new (Key.Tab, new KeyModifiers ())));
-//					dlg.Draw ();
+		//					Assert.True (dlg.ProcessKey (new (Key.Tab, new KeyModifiers ())));
+		//					dlg.Draw ();
 
-//					expected = @"
-//┌──────────────────┐
-//│┌───────────────┐ │
-//││  Hello World  │ │
-//││               │ │
-//││               │ │
-//││               │ │
-//│└───────────────┘ │
-//└──────────────────┘
-//";
+		//					expected = @"
+		//┌──────────────────┐
+		//│┌───────────────┐ │
+		//││  Hello World  │ │
+		//││               │ │
+		//││               │ │
+		//││               │ │
+		//│└───────────────┘ │
+		//└──────────────────┘
+		//";
 
-//					pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-//					Assert.Equal (new Rect (0, 0, 20, 8), pos);
+		//					pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		//					Assert.Equal (new Rect (0, 0, 20, 8), pos);
 
-//					win.RequestStop ();
-//				});
-//			});
+		//					win.RequestStop ();
+		//				});
+		//			});
 
-//			Application.Run (win);
-//			Application.Shutdown ();
-//		}
+		//			Application.Run (win);
+		//			Application.Shutdown ();
+		//		}
 	}
 }

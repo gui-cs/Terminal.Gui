@@ -42,9 +42,12 @@ namespace UICatalog.Scenarios {
 
 			label = new Label ("Label (CanFocus):") { X = Pos.X (label), Y = Pos.Bottom (label) + 1 };
 			Win.Add (label);
-			testlabel = new Label ("Стоял &он, дум великих полн") { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50), CanFocus = true, HotKeySpecifier = new Rune ('&') };
+			var sb = new StringBuilder ();
+			sb.Append ('e');
+			sb.Append ('\u0301');
+			sb.Append ('\u0301');
+			testlabel = new Label ($"Should be [e with two accents, but isn't due to #2616]: [{sb}]") { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50), CanFocus = true, HotKeySpecifier = new Rune ('&') };
 			Win.Add (testlabel);
-
 			label = new Label ("Button:") { X = Pos.X (label), Y = Pos.Bottom (label) + 1 };
 			Win.Add (label);
 			var button = new Button ("A123456789♥♦♣♠JQK") { X = 20, Y = Pos.Y (label) };

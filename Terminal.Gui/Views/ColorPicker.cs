@@ -250,7 +250,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		///<inheritdoc/>
+		/////<inheritdoc/>
 		//public override bool OnKeyPressed (KeyEventArgs a)
 		//{
 		//	var result = InvokeKeyBindings (a);

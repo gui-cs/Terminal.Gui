@@ -255,4 +255,22 @@
   <data name="btnSaveAs" xml:space="preserve">
     <value>名前を付けて保存 (_S)</value>
   </data>
+  <data name="fdCtxDelete" xml:space="preserve">
+    <value>削除 (_D)</value>
+  </data>
+  <data name="fdCtxHide" xml:space="preserve">
+    <value>{0}を隠す (_H)</value>
+  </data>
+  <data name="fdCtxNew" xml:space="preserve">
+    <value>新規 (_N)</value>
+  </data>
+  <data name="fdCtxRename" xml:space="preserve">
+    <value>名前変更 (_R)</value>
+  </data>
+  <data name="fdCtxSortAsc" xml:space="preserve">
+    <value>{0}で昇順ソート (_S)</value>
+  </data>
+  <data name="fdCtxSortDesc" xml:space="preserve">
+    <value>{0}で降順ソート (_S)</value>
+  </data>
 </root>

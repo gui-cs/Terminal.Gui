@@ -807,28 +807,26 @@ internal class WindowsDriver : ConsoleDriver {
 	internal override MainLoop Init ()
 	{
 		_mainLoopDriver = new WindowsMainLoop (this);
-		if (RunningUnitTests) {
-			return new MainLoop (_mainLoopDriver);
-		}
+		if (!RunningUnitTests) {
+			try {
+				if (WinConsole != null) {
+					// BUGBUG: The results from GetConsoleOutputWindow are incorrect when called from Init. 
+					// Our thread in WindowsMainLoop.CheckWin will get the correct results. See #if HACK_CHECK_WINCHANGED
+					var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
+					Cols = winSize.Width;
+					Rows = winSize.Height;
+				}
+				WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
 
-		try {
-			if (WinConsole != null) {
-				// BUGBUG: The results from GetConsoleOutputWindow are incorrect when called from Init. 
-				// Our thread in WindowsMainLoop.CheckWin will get the correct results. See #if HACK_CHECK_WINCHANGED
-				var winSize = WinConsole.GetConsoleOutputWindow (out Point pos);
-				Cols = winSize.Width;
-				Rows = winSize.Height;
+				if (_isWindowsTerminal) {
+					Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+				}
+			} catch (Win32Exception e) {
+				// We are being run in an environment that does not support a console
+				// such as a unit test, or a pipe.
+				Debug.WriteLine ($"Likely running unit tests. Setting WinConsole to null so we can test it elsewhere. Exception: {e}");
+				WinConsole = null;
 			}
-			WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
-
-			if (_isWindowsTerminal) {
-				Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
-			}
-		} catch (Win32Exception e) {
-			// We are being run in an environment that does not support a console
-			// such as a unit test, or a pipe.
-			Debug.WriteLine ($"Likely running unit tests. Setting WinConsole to null so we can test it elsewhere. Exception: {e}");
-			WinConsole = null;
 		}
 
 		CurrentAttribute = new Attribute (Color.White, Color.Black);
@@ -885,7 +883,7 @@ internal class WindowsDriver : ConsoleDriver {
 	// It also is broken when modifiers keys are down too
 	//
 	//Key _keyDown = (Key)0xffffffff;
-	
+
 	internal void ProcessInput (WindowsConsole.InputRecord inputEvent)
 	{
 		switch (inputEvent.EventType) {
@@ -976,7 +974,7 @@ internal class WindowsDriver : ConsoleDriver {
 					_keyModifiers ??= new KeyModifiers ();
 
 					//if (_keyDown == (Key)0xffffffff) {
-					       // Avoid sending repeat keydowns
+					// Avoid sending repeat keydowns
 					//	_keyDown = map;
 						OnKeyDown (new KeyEventArgs (map, _keyModifiers));
 					//}

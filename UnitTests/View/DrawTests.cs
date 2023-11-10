@@ -58,7 +58,7 @@ namespace Terminal.Gui.ViewsTests {
 0020000000
 0000000000
 0111000000
-0000000000", expectedColors);
+0000000000", driver: Application.Driver, expectedColors);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -106,7 +106,7 @@ namespace Terminal.Gui.ViewsTests {
 0022000000
 0000000000
 0111000000
-0000000000", expectedColors);
+0000000000", driver: Application.Driver, expectedColors);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -147,7 +147,7 @@ t     ", output);
 0
 0
 0
-0", new Attribute [] { Colors.Base.Normal });
+0", driver: Application.Driver, new Attribute [] { Colors.Base.Normal });
 		}
 
 		[Fact, AutoInitShutdown]

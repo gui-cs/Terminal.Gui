@@ -152,11 +152,19 @@ namespace Unix.Terminal {
 			get {
 				return lines;
 			}
+			internal set {
+				// For unit tests
+				lines = value;
+			}
 		}
 
 		public static int Cols {
 			get {
 				return cols;
+			}
+			internal set {
+				// For unit tests
+				cols = value;
 			}
 		}
 

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
+using Terminal.Gui.Resources;
 
 namespace Terminal.Gui {
 
@@ -26,7 +27,7 @@ namespace Terminal.Gui {
 
 		private const long ByteConversion = 1024;
 
-		private static readonly string [] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+		private static readonly string [] SizeSuffixes = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
 		private static readonly List<string> ImageExtensions = new List<string> { ".JPG", ".JPEG", ".JPE", ".BMP", ".GIF", ".PNG" };
 		private static readonly List<string> ExecutableExtensions = new List<string> { ".EXE", ".BAT" };
 
@@ -46,7 +47,8 @@ namespace Terminal.Gui {
 				this.Type = fi.Extension;
 			} else {
 				this.HumanReadableLength = string.Empty;
-				this.Type = "dir";
+				this.Type = $"<{Strings.fdDirectory}>";
+				this.IsDir = true;
 			}
 		}
 
@@ -66,10 +68,7 @@ namespace Terminal.Gui {
 		public bool IsParent { get; internal set; }
 		public string Name => this.IsParent ? ".." : this.FileSystemInfo.Name;
 
-		public bool IsDir ()
-		{
-			return this.Type == "dir";
-		}
+		public bool IsDir { get; }
 
 		public bool IsImage ()
 		{
@@ -96,7 +95,7 @@ namespace Terminal.Gui {
 			}
 
 			if (value == 0) {
-				return "0.0 bytes";
+				return "0.0 B";
 			}
 
 			int mag = (int)Math.Log (value, ByteConversion);

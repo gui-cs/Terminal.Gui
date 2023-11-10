@@ -318,7 +318,7 @@ namespace Terminal.Gui {
 		/// 
 		/// <list type="bullet">
 		///   <item>
-		///		<description><see cref="OnKeyPressed"/> events will propagate keys upwards.</description>
+		///		<description><see cref="View.OnKeyPressed"/> events will propagate keys upwards.</description>
 		///   </item>
 		///   <item>
 		///		<description>The Toplevel will act as an embedded view (not a modal/pop-up).</description>
@@ -329,7 +329,7 @@ namespace Terminal.Gui {
 		/// 
 		/// <list type="bullet">
 		///   <item>
-		///		<description><see cref="OnKeyPressed"/> events will NOT propogate keys upwards.</description>
+		///		<description><see cref="View.OnKeyPressed"/> events will NOT propogate keys upwards.</description>
 		///	  </item>
 		///   <item>
 		///		<description>The Toplevel will and look like a modal (pop-up) (e.g. see <see cref="Dialog"/>.</description>
