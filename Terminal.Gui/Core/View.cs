@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
 using NStack;
 
 namespace Terminal.Gui {
@@ -2944,6 +2943,7 @@ namespace Terminal.Gui {
 				subview.Dispose ();
 			}
 			base.Dispose (disposing);
+			System.Diagnostics.Debug.Assert (InternalSubviews.Count == 0);
 		}
 
 		/// <summary>
