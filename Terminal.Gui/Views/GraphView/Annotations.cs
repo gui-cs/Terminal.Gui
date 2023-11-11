@@ -156,7 +156,18 @@ namespace Terminal.Gui {
 		public void Render (GraphView graph)
 		{
 			if (Border) {
-				graph.Border.DrawFrame (Bounds, true);
+				var attr = View.Driver.CurrentAttribute;
+				var vts = graph.ViewToScreen (Bounds);
+				graph.LineCanvas.AddLine (new Point (vts.X, vts.Y), vts.Width,
+					Orientation.Horizontal, LineStyle.Single, attr);
+				graph.LineCanvas.AddLine (new Point (vts.Right - 1, vts.Y), vts.Height,
+					Orientation.Vertical, LineStyle.Single, attr);
+				graph.LineCanvas.AddLine (new Point (vts.X, vts.Bottom - 1), vts.Width,
+					Orientation.Horizontal, LineStyle.Single, attr);
+				graph.LineCanvas.AddLine (new Point (vts.X, vts.Y), vts.Height,
+					Orientation.Vertical, LineStyle.Single, attr);
+
+				graph.OnRenderLineCanvas ();
 			}
 
 			// start the legend at
