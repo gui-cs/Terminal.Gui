@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Xunit;
 
 namespace Terminal.Gui.ViewsTests {
 	public class ProgressBarTests {
 		[Fact]
 		[AutoInitShutdown]
-		public void Default_Contructor ()
+		public void Default_Constructor ()
 		{
 			var pb = new ProgressBar ();
 
@@ -173,6 +169,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			pb.BeginInit ();
 			pb.EndInit ();
+			pb.LayoutSubviews ();
 
 			for (int i = 0; i < 38; i++) {
 				pb.Pulse ();
@@ -803,6 +800,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			pb.BeginInit ();
 			pb.EndInit ();
+			pb.LayoutSubviews ();
 
 			for (int i = 0; i < 38; i++) {
 				pb.Pulse ();
@@ -1431,6 +1429,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			pb.BeginInit ();
 			pb.EndInit ();
+			pb.LayoutSubviews ();
 
 			for (int i = 0; i <= pb.Frame.Width; i++) {
 				pb.Fraction += 0.2F;

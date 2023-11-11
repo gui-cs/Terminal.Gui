@@ -33,24 +33,29 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (ckbBidirectional);
 
-			var label = new Label ("Blocks") {
-				X = Pos.Center (),
-				Y = Pos.Bottom (ckbBidirectional) + 1
+			var leftContainer = new View () {
+				Y = Pos.Bottom (ckbBidirectional) + 1,
+				Width = Dim.Percent (50),
+				Height = Dim.Fill ()
 			};
-			Win.Add (label);
+
+			var label = new Label ("Blocks") {
+				X = Pos.Center ()
+			};
+			leftContainer.Add (label);
 
 			var blocksPB = new ProgressBar () {
 				X = Pos.Center (),
 				Y = Pos.Y (label) + 1,
 				Width = pbWidth
 			};
-			Win.Add (blocksPB);
+			leftContainer.Add (blocksPB);
 
 			label = new Label ("Continuous") {
 				X = Pos.Center (),
 				Y = Pos.Bottom (blocksPB) + 1
 			};
-			Win.Add (label);
+			leftContainer.Add (label);
 
 			var continuousPB = new ProgressBar () {
 				X = Pos.Center (),
@@ -58,7 +63,7 @@ namespace UICatalog.Scenarios {
 				Width = pbWidth,
 				ProgressBarStyle = ProgressBarStyle.Continuous
 			};
-			Win.Add (continuousPB);
+			leftContainer.Add (continuousPB);
 
 			var button = new Button ("Start timer") {
 				X = Pos.Center (),
@@ -83,13 +88,20 @@ namespace UICatalog.Scenarios {
 					}, null, 0, _timerTick);
 				}
 			};
-			Win.Add (button);
+			leftContainer.Add (button);
+			Win.Add (leftContainer);
+
+			var rightContainer = new View () {
+				X = Pos.Right (leftContainer),
+				Y = Pos.Bottom (ckbBidirectional) + 1,
+				Width = Dim.Fill (),
+				Height = Dim.Fill ()
+			};
 
 			label = new Label ("Marquee Blocks") {
-				X = Pos.Center (),
-				Y = Pos.Y (button) + 3
+				X = Pos.Center ()
 			};
-			Win.Add (label);
+			rightContainer.Add (label);
 
 			var marqueesBlocksPB = new ProgressBar () {
 				X = Pos.Center (),
@@ -97,13 +109,13 @@ namespace UICatalog.Scenarios {
 				Width = pbWidth,
 				ProgressBarStyle = ProgressBarStyle.MarqueeBlocks
 			};
-			Win.Add (marqueesBlocksPB);
+			rightContainer.Add (marqueesBlocksPB);
 
 			label = new Label ("Marquee Continuous") {
 				X = Pos.Center (),
 				Y = Pos.Bottom (marqueesBlocksPB) + 1
 			};
-			Win.Add (label);
+			rightContainer.Add (label);
 
 			var marqueesContinuousPB = new ProgressBar () {
 				X = Pos.Center (),
@@ -111,7 +123,8 @@ namespace UICatalog.Scenarios {
 				Width = pbWidth,
 				ProgressBarStyle = ProgressBarStyle.MarqueeContinuous
 			};
-			Win.Add (marqueesContinuousPB);
+			rightContainer.Add (marqueesContinuousPB);
+			Win.Add (rightContainer);
 
 			rbPBFormat.SelectedItemChanged += (s,e) => {
 				blocksPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
