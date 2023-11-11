@@ -24,7 +24,6 @@ namespace UnitTests.ViewsTests {
 		}
 
 		[Fact]
-		[AutoInitShutdown]
 		public void TestViewsDisposeCorrectly ()
 		{
 			var reference = DoTest ();
@@ -53,6 +52,8 @@ namespace UnitTests.ViewsTests {
 
 		WeakReference DoTest ()
 		{
+			var driver = new FakeDriver ();
+			Application.Init (driver, new FakeMainLoop (driver));
 			getSpecialParams ();
 			View Container = new View ();
 			Container.Add (new View ());
@@ -83,6 +84,9 @@ namespace UnitTests.ViewsTests {
 			top.Dispose ();
 			WeakReference reference = new (Container, true);
 			Container.Dispose ();
+			Assert.NotNull (Application.Top);
+			Application.Top.Dispose ();
+			Application.Shutdown ();
 			return reference;
 		}
 
