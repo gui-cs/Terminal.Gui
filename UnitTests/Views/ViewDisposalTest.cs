@@ -46,7 +46,7 @@ namespace UnitTests.ViewsTests {
 							if (r == refs [0]) {				// after View.Dispose has run. Luckily I didnt discover any more bugs or this wouldv'e
 								alive += "\n View (Container)";         // been a little bit annoying to find an answer for. Thanks to BDisp for listening to
 							}						// me and giving his best to help me fix this thing. If you take a look at the commit log
-							alive += ",\n--";				// you will find that he did most of the work. -usr
+							alive += ",\n--";				// you will find that he did most of the work. -a-usr
 							alive += r.Target.GetType ().Name;
 						}							// NOTE: DELETE BEFORE NEXT COMMIT
 					}
