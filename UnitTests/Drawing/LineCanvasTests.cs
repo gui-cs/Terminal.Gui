@@ -795,30 +795,33 @@ namespace Terminal.Gui.DrawingTests {
 			TestHelpers.AssertEqual (output, looksLike, $"{Environment.NewLine}{canvas}");
 		}
 
-		//		[Fact, SetupFakeDriver]
-		//		public void LeaveMargin_Top1_Left1 ()
-		//		{
-		//			var canvas = new LineCanvas ();
+		[Fact, SetupFakeDriver]
+		public void LeaveMargin_Top1_Left1 ()
+		{
+			var canvas = new LineCanvas ();
 
-		//			// Upper box
-		//			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, LineStyle.Single);
-		//			canvas.AddLine (new Point (8, 0), 3, Orientation.Vertical, LineStyle.Single);
-		//			canvas.AddLine (new Point (8, 3), -9, Orientation.Horizontal, LineStyle.Single);
-		//			canvas.AddLine (new Point (0, 2), -3, Orientation.Vertical, LineStyle.Single);
+			// Upper box
+			canvas.AddLine (new Point (0, 0), 9, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (8, 0), 3, Orientation.Vertical, LineStyle.Single);
+			canvas.AddLine (new Point (8, 2), -9, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (0, 2), -3, Orientation.Vertical, LineStyle.Single);
 
-		//			// Lower Box
-		//			canvas.AddLine (new Point (5, 0), 2, Orientation.Vertical, LineStyle.Single);
-		//			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, LineStyle.Single);
+			// Lower Box
+			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (8, 2), 2, Orientation.Vertical, LineStyle.Single);
+			canvas.AddLine (new Point (8, 3), -9, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (0, 3), -2, Orientation.Vertical, LineStyle.Single);
 
-		//			string looksLike =
-		//@"
-		//┌────┬──┐
-		//│    │  │
-		//├────┼──┤
-		//└────┴──┘
-		//";
-		//			Assert.Equal (looksLike, $"{Environment.NewLine}{canvas}");
-		//		}
+			// Middle vertical line
+			canvas.AddLine (new Point (5, 0), 4, Orientation.Vertical, LineStyle.Single);
+
+			string looksLike = @"
+┌────┬──┐
+│    │  │
+├────┼──┤
+└────┴──┘".Trim ();
+			Assert.Equal (looksLike, canvas.ToString ().Replace (Environment.NewLine, "\n"));
+		}
 
 		[InlineData (0, 0, 0, Orientation.Horizontal, LineStyle.Double, "═")]
 		[InlineData (0, 0, 0, Orientation.Vertical, LineStyle.Double, "║")]
@@ -985,6 +988,38 @@ namespace Terminal.Gui.DrawingTests {
 			};
 
 			return v;
+		}
+
+		[Fact, SetupFakeDriver]
+		public void TabWindow ()
+		{
+			var canvas = new LineCanvas ();
+
+			// Outer frame
+			canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (9, 0), 6, Orientation.Vertical, LineStyle.Single);
+			canvas.AddLine (new Point (9, 5), -10, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (0, 5), -6, Orientation.Vertical, LineStyle.Single);
+
+			// Tab frame
+			canvas.AddLine (new Point (1, 2), -2, Orientation.Vertical, LineStyle.Single);
+			canvas.AddLine (new Point (1, 1), 4, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (4, 1), 2, Orientation.Vertical, LineStyle.Single);
+
+			// Inner frame
+			canvas.AddLine (new Point (4, 2), 5, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (8, 2), 3, Orientation.Vertical, LineStyle.Single);
+			canvas.AddLine (new Point (8, 4), -8, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (1, 4), -3, Orientation.Vertical, LineStyle.Single);
+
+			string looksLike = @"
+┌────────┐
+│┌──┐    │
+││  └───┐│
+││      ││
+│└──────┘│
+└────────┘".Replace (Environment.NewLine, "\n");
+			TestHelpers.AssertEqual (output, looksLike, $"{Environment.NewLine}{canvas}");
 		}
 	}
 }
