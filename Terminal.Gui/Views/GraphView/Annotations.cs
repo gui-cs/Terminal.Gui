@@ -149,7 +149,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Ordered collection of entries that are rendered in the legend.
 		/// </summary>
-		List<Tuple<GraphCellToRender, string>> entries = new List<Tuple<GraphCellToRender, string>> ();
+		List<Tuple<GraphCellToRender, string>> _entries = new List<Tuple<GraphCellToRender, string>> ();
 		private bool _border = true;
 		private View _legend;
 
@@ -188,7 +188,7 @@ namespace Terminal.Gui {
 
 			int linesDrawn = 0;
 
-			foreach (var entry in entries) {
+			foreach (var entry in _entries) {
 
 				if (entry.Item1.Color.HasValue) {
 					Application.Driver.SetAttribute (entry.Item1.Color.Value);
@@ -225,7 +225,7 @@ namespace Terminal.Gui {
 		/// if outside of Legend <see cref="Bounds"/></param>
 		public void AddEntry (GraphCellToRender graphCellToRender, string text)
 		{
-			entries.Add (Tuple.Create (graphCellToRender, text));
+			_entries.Add (Tuple.Create (graphCellToRender, text));
 		}
 	}
 
