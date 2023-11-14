@@ -84,7 +84,10 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private List<StraightLine> _lines = new List<StraightLine> ();
+		/// <summary>
+		/// Get or sets a list of <see cref="StraightLine"/> lines.
+		/// </summary>
+		public List<StraightLine> Lines { get; internal set; } = new List<StraightLine> ();
 
 		Dictionary<IntersectionRuneType, IntersectionRuneResolver> runeResolvers = new Dictionary<IntersectionRuneType, IntersectionRuneResolver> {
 			{IntersectionRuneType.ULCorner,new ULIntersectionRuneResolver()},
@@ -122,7 +125,7 @@ namespace Terminal.Gui {
 		public void AddLine (Point start, int length, Orientation orientation, LineStyle style, Attribute? attribute = default)
 		{
 			_cachedBounds = Rect.Empty;
-			_lines.Add (new StraightLine (start, length, orientation, style, attribute));
+			Lines.Add (new StraightLine (start, length, orientation, style, attribute));
 		}
 
 		/// <summary>
@@ -132,7 +135,7 @@ namespace Terminal.Gui {
 		public void AddLine (StraightLine line)
 		{
 			_cachedBounds = Rect.Empty;
-			_lines.Add (line);
+			Lines.Add (line);
 		}
 
 		/// <summary>
@@ -141,9 +144,9 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public StraightLine RemoveLastLine()
 		{
-			var l = _lines.LastOrDefault ();
+			var l = Lines.LastOrDefault ();
 			if(l != null) {
-				_lines.Remove(l);
+				Lines.Remove(l);
 			}
 
 			return l!;
@@ -155,7 +158,7 @@ namespace Terminal.Gui {
 		public void Clear ()
 		{
 			_cachedBounds = Rect.Empty;
-			_lines.Clear ();
+			Lines.Clear ();
 		}
 
 		/// <summary>
@@ -177,14 +180,14 @@ namespace Terminal.Gui {
 		public Rect Bounds {
 			get {
 				if (_cachedBounds.IsEmpty) {
-					if (_lines.Count == 0) {
+					if (Lines.Count == 0) {
 						return _cachedBounds;
 					}
 
-					Rect bounds = _lines [0].Bounds;
+					Rect bounds = Lines [0].Bounds;
 
-					for (var i = 1; i < _lines.Count; i++) {
-						var line = _lines [i];
+					for (var i = 1; i < Lines.Count; i++) {
+						var line = Lines [i];
 						var lineBounds = line.Bounds;
 						bounds = Rect.Union (bounds, lineBounds);
 					}
@@ -220,7 +223,7 @@ namespace Terminal.Gui {
 			for (int y = inArea.Y; y < inArea.Y + inArea.Height; y++) {
 				for (int x = inArea.X; x < inArea.X + inArea.Width; x++) {
 
-					var intersects = _lines
+					var intersects = Lines
 						.Select (l => l.Intersects (x, y))
 						.Where (i => i != null)
 						.ToArray ();
@@ -250,7 +253,7 @@ namespace Terminal.Gui {
 			for (int y = Bounds.Y; y < Bounds.Y + Bounds.Height; y++) {
 				for (int x = Bounds.X; x < Bounds.X + Bounds.Width; x++) {
 
-					var intersects = _lines
+					var intersects = Lines
 						.Select (l => l.Intersects (x, y))
 						.Where (i => i != null)
 						.ToArray ();
@@ -721,7 +724,7 @@ namespace Terminal.Gui {
 		/// <param name="lineCanvas"></param>
 		public void Merge (LineCanvas lineCanvas)
 		{
-			foreach (var line in lineCanvas._lines) {
+			foreach (var line in lineCanvas.Lines) {
 				AddLine (line);
 			}
 		}

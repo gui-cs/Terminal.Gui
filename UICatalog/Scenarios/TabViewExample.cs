@@ -57,6 +57,7 @@ namespace UICatalog.Scenarios {
 				Y = 0,
 				Width = 60,
 				Height = 20,
+				BorderStyle = LineStyle.Single
 			};
 
 			tabView.AddTab (new Tab ("Tab1", new Label ("hodor!")), false);
