@@ -98,7 +98,7 @@ namespace UnitTests.ViewsTests {
 
 			top.Remove (Container);
 			Application.End (state);
-			Assert.True(refs.All (r => r.IsAlive));
+			Assert.True (refs.All (r => r.IsAlive));
 #if DEBUG_IDISPOSABLE
 			Assert.True (top.WasDisposed);
 			Assert.False (Container.WasDisposed);
