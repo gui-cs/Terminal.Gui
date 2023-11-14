@@ -93,6 +93,7 @@ namespace UICatalog.Scenarios {
 		private void MultiBarGraph ()
 		{
 			graphView.Reset ();
+			graphView.BorderStyle = LineStyle.Single;
 
 			about.Text = "Housing Expenditures by income thirds 1996-2003";
 
@@ -143,6 +144,7 @@ namespace UICatalog.Scenarios {
 		private void SetupLineGraph ()
 		{
 			graphView.Reset ();
+			graphView.BorderStyle = LineStyle.Single;
 
 			about.Text = "This graph shows random points";
 
@@ -219,6 +221,7 @@ namespace UICatalog.Scenarios {
 		private void SetupSineWave ()
 		{
 			graphView.Reset ();
+			graphView.BorderStyle = LineStyle.Single;
 
 			about.Text = "This graph shows a sine wave";
 
@@ -295,6 +298,7 @@ namespace UICatalog.Scenarios {
 		private void SetupLifeExpectancyBarGraph (bool verticalBars)
 		{
 			graphView.Reset ();
+			graphView.BorderStyle = LineStyle.Single;
 
 			about.Text = "This graph shows the life expectancy at birth of a range of countries";
 
@@ -406,6 +410,7 @@ namespace UICatalog.Scenarios {
 			about.Text = "This graph shows population of each age divided by gender";
 
 			graphView.Reset ();
+			graphView.BorderStyle = LineStyle.Single;
 
 			// How much graph space each cell of the console depicts
 			graphView.CellSize = new PointF (100_000, 1);
@@ -555,6 +560,7 @@ namespace UICatalog.Scenarios {
 		private void SetupDisco ()
 		{
 			graphView.Reset ();
+			graphView.BorderStyle = LineStyle.Single;
 
 			about.Text = "This graph shows a graphic equaliser for an imaginary song";
 
@@ -601,6 +607,7 @@ namespace UICatalog.Scenarios {
 		private void SetupPeriodicTableScatterPlot ()
 		{
 			graphView.Reset ();
+			graphView.BorderStyle = LineStyle.Single;
 
 			about.Text = "This graph shows the atomic weight of each element in the periodic table.\nStarting with Hydrogen (atomic Number 1 with a weight of 1.007)";
 
