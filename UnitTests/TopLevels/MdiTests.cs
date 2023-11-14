@@ -692,5 +692,48 @@ namespace Terminal.Gui.TopLevelTests {
 
 			Assert.Empty (Application.MdiChildes);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void MdiChild_Set_Visible_False_Does_Not_Process_Keys ()
+		{
+			var count = 0;
+			var mdi = new Mdi ();
+			var button = new Button ();
+			button.Clicked += () => count++;
+			var child = new Window ();
+			child.Add (button);
+			var iterations = -1;
+			Application.Iteration += () => {
+				iterations++;
+				if (iterations == 0) {
+					Application.Run (child);
+				} else if (iterations == 1) {
+					Assert.Equal (child, Application.Current);
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessKeyEvent",
+						new KeyEvent (Key.Enter, new KeyModifiers ()));
+				} else if (iterations == 2) {
+					Assert.Equal (child, Application.Current);
+					Assert.True (child.Visible);
+					child.Visible = false;
+				} else if (iterations == 3) {
+					Assert.Equal (mdi, Application.Current);
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessKeyEvent",
+						new KeyEvent (Key.Enter, new KeyModifiers ()));
+				} else if (iterations == 4) {
+					ReflectionTools.InvokePrivate (
+						typeof (Application),
+						"ProcessKeyEvent",
+						new KeyEvent (Application.QuitKey, new KeyModifiers ()));
+				}
+			};
+			Application.Run (mdi);
+			Assert.Equal (4, iterations);
+			Assert.Equal (1, count);
+		}
+
 	}
 }
