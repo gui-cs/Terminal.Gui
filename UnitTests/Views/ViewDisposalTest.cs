@@ -28,21 +28,29 @@ namespace UnitTests.ViewsTests {
 		[InlineData (false)]
 		public void TestViewsDisposeCorrectly (bool callShutdown)
 		{
-			var reference = DoTest (callShutdown);
-			for (var i = 0; i < 10 && reference.IsAlive; i++) {
+			var refs = DoTest (callShutdown);
+			//var reference = refs [0];
+			for (var i = 0; i < 10 && refs [0].IsAlive; i++) {
 				GC.Collect ();
 				GC.WaitForPendingFinalizers ();
 			}
-			if (reference.IsAlive) {
+			foreach (var reference in refs) {
+				if (reference.IsAlive) {
 #if DEBUG_IDISPOSABLE
-				Assert.True (((View)reference.Target).WasDisposed);
+					Assert.True (((View)reference.Target).WasDisposed);
 #endif
-				string alive = "\n View (Container)";
-				foreach (View v in ((View)reference.Target).Subviews) {
-					alive += ",\n--";
-					alive += v.GetType ().Name;
+					string alive = "";						// Instead of just checking the subviews of the container, we now iterate through a list
+					foreach (var r in refs) {					// of Weakreferences Referencing every View that was tested. This makes more sense because 
+						if (r.IsAlive) {					// View.Dispose removes all of its subviews, wich is why View.Subviews is always empty 
+							if (r == refs [0]) {				// after View.Dispose has run. Luckily I didnt discover any more bugs or this wouldv'e
+								alive += "\n View (Container)";         // been a little bit annoying to find an answer for. Thanks to BDisp for listening to
+							}						// me and giving his best to help me fix this thing. If you take a look at the commit log
+							alive += ",\n--";				// you will find that he did most of the work. -usr
+							alive += r.Target.GetType ().Name;
+						}							// NOTE: DELETE BEFORE NEXT COMMIT
+					}
+					Assert.Fail ($"Some Views didnt get Garbage Collected: {alive}");
 				}
-				Assert.Fail ($"Some Views didnt get Garbage Collected: {alive}");
 			}
 			if (!callShutdown) {
 				Application.Shutdown ();
@@ -55,12 +63,13 @@ namespace UnitTests.ViewsTests {
 			//special_params.Add (typeof (LineView), new object [] { Orientation.Horizontal });
 		}
 
-		WeakReference DoTest (bool callShutdown)
+		List<WeakReference> DoTest (bool callShutdown)
 		{
 			var driver = new FakeDriver ();
 			Application.Init (driver, new FakeMainLoop (driver));
 			getSpecialParams ();
 			View Container = new View ();
+			List<WeakReference> refs = new List<WeakReference> { new WeakReference (Container, true) };
 			Container.Add (new View ());
 			Toplevel top = new ();
 			var state = Application.Begin (top);
@@ -76,6 +85,8 @@ namespace UnitTests.ViewsTests {
 
 				Assert.NotNull (instance);
 				Container.Add (instance);
+
+				refs.Add (new WeakReference (instance, true));
 				output.WriteLine ($"Added instance of {view}!");
 			}
 			top.Add (Container);
@@ -92,7 +103,6 @@ namespace UnitTests.ViewsTests {
 #endif
 			Assert.Null (Application.Top);
 
-			WeakReference reference = new (Container, true);
 			Container.Dispose ();
 #if DEBUG_IDISPOSABLE
 			Assert.True (Container.WasDisposed);
@@ -101,7 +111,7 @@ namespace UnitTests.ViewsTests {
 				Application.Shutdown ();
 			}
 
-			return reference;
+			return refs;
 		}
 
 		/// <summary>
