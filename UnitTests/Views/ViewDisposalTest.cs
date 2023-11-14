@@ -1,3 +1,4 @@
+using SixLabors.ImageSharp.Processing.Processors.Quantization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -97,12 +98,12 @@ namespace UnitTests.ViewsTests {
 
 			top.Remove (Container);
 			Application.End (state);
+			Assert.True(refs.All (r => r.IsAlive));
 #if DEBUG_IDISPOSABLE
 			Assert.True (top.WasDisposed);
 			Assert.False (Container.WasDisposed);
 #endif
 			Assert.Null (Application.Top);
-
 			Container.Dispose ();
 #if DEBUG_IDISPOSABLE
 			Assert.True (Container.WasDisposed);
