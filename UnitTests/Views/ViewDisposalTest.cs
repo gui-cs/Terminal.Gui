@@ -23,11 +23,12 @@ namespace UnitTests.ViewsTests {
 			}
 		}
 
-		[Fact]
-		[AutoInitShutdown]
-		public void TestViewsDisposeCorrectly ()
+		[Theory]
+		[InlineData (true)]
+		[InlineData (false)]
+		public void TestViewsDisposeCorrectly (bool callShutdown)
 		{
-			var reference = DoTest ();
+			var reference = DoTest (callShutdown);
 			for (var i = 0; i < 10 && reference.IsAlive; i++) {
 				GC.Collect ();
 				GC.WaitForPendingFinalizers ();
@@ -43,6 +44,9 @@ namespace UnitTests.ViewsTests {
 				}
 				Assert.Fail ($"Some Views didnt get Garbage Collected: {alive}");
 			}
+			if (!callShutdown) {
+				Application.Shutdown ();
+			}
 		}
 
 		void getSpecialParams ()
@@ -51,8 +55,10 @@ namespace UnitTests.ViewsTests {
 			//special_params.Add (typeof (LineView), new object [] { Orientation.Horizontal });
 		}
 
-		WeakReference DoTest ()
+		WeakReference DoTest (bool callShutdown)
 		{
+			var driver = new FakeDriver ();
+			Application.Init (driver, new FakeMainLoop (driver));
 			getSpecialParams ();
 			View Container = new View ();
 			Container.Add (new View ());
@@ -80,9 +86,21 @@ namespace UnitTests.ViewsTests {
 
 			top.Remove (Container);
 			Application.End (state);
-			top.Dispose ();
+#if DEBUG_IDISPOSABLE
+			Assert.True (top.WasDisposed);
+			Assert.False (Container.WasDisposed);
+#endif
+			Assert.Null (Application.Top);
+
 			WeakReference reference = new (Container, true);
 			Container.Dispose ();
+#if DEBUG_IDISPOSABLE
+			Assert.True (Container.WasDisposed);
+#endif
+			if (callShutdown) {
+				Application.Shutdown ();
+			}
+
 			return reference;
 		}
 
