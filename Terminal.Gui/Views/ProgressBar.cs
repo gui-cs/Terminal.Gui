@@ -398,7 +398,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		protected override void Dispose (bool disposing)
 		{
-			progress.Dispose ();
+			progress?.Dispose ();
 			progress = null;
 
 			base.Dispose (disposing);
