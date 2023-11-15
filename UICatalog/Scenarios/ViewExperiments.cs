@@ -229,6 +229,11 @@ namespace UICatalog.Scenarios {
 			};
 
 			Application.Top.Add (editor);
+			view.X = 36;
+			view.Y = 4;
+			view.Width = Dim.Fill ();
+			view.Height = Dim.Fill ();
+			Application.Top.Add (view);
 		}
 	}
 }

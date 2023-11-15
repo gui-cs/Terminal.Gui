@@ -488,18 +488,14 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public override string ToString ()
 		{
-			if (string.IsNullOrEmpty (Title)) {
-				return $"{GetType ().Name}({Id})({Frame})";
-			} else {
-				return Title;
-			}
+			return $"{GetType ().Name}({Id})({Frame})";
 		}
 
 		/// <inheritdoc/>
 		protected override void Dispose (bool disposing)
 		{
 			LineCanvas.Dispose ();
-			
+
 			Margin?.Dispose ();
 			Margin = null;
 			Border?.Dispose ();
@@ -517,7 +513,7 @@ namespace Terminal.Gui {
 				Remove (subview);
 				subview.Dispose ();
 			}
-			
+
 			base.Dispose (disposing);
 		}
 	}

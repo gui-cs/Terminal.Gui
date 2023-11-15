@@ -32,9 +32,21 @@ namespace Terminal.Gui {
 		/// </summary>
 		Simple,
 		/// <summary>
-		/// A simple visual presentation showing the progress bar overlaid with the percentage.
+		/// A simple visual presentation showing the progress bar and the percentage.
 		/// </summary>
 		SimplePlusPercentage,
+		/// <summary>
+		/// A framed visual presentation showing only the progress bar.
+		/// </summary>
+		Framed,
+		/// <summary>
+		/// A framed visual presentation showing the progress bar and the percentage.
+		/// </summary>
+		FramedPlusPercentage,
+		/// <summary>
+		/// A framed visual presentation showing all with the progress bar padded.
+		/// </summary>
+		FramedProgressPadded
 	}
 
 	/// <summary>
@@ -43,15 +55,14 @@ namespace Terminal.Gui {
 	/// <remarks>
 	///   <para>
 	///     <see cref="ProgressBar"/> can operate in two modes, percentage mode, or
-	///     activity mode. The progress bar starts in percentage mode and
+	///     activity mode.  The progress bar starts in percentage mode and
 	///     setting the Fraction property will reflect on the UI the progress 
-	///     made so far. Activity mode is used when the application has no 
+	///     made so far.   Activity mode is used when the application has no 
 	///     way of knowing how much time is left, and is started when the <see cref="Pulse"/> method is called.  
 	///     Call <see cref="Pulse"/> repeatedly as progress is made.
 	///   </para>
 	/// </remarks>
 	public class ProgressBar : View {
-<<<<<<< Updated upstream
 		bool isActivity;
 		int [] activityPos;
 		int delta;
@@ -65,24 +76,18 @@ namespace Terminal.Gui {
 		{
 			Initialize (rect);
 		}
-=======
-		bool _isActivity;
-		int [] _activityPos;
-		int _delta;
->>>>>>> Stashed changes
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ProgressBar"/> class, starts in percentage mode and uses relative layout.
 		/// </summary>
-		public ProgressBar () 
+		public ProgressBar () : base ()
 		{
-			SetInitialProperties ();
+			Initialize (Rect.Empty);
 		}
 
-		void SetInitialProperties ()
+		void Initialize (Rect rect)
 		{
 			CanFocus = false;
-<<<<<<< Updated upstream
 			fraction = 0;
 			ColorScheme = new ColorScheme () {
 				Normal = new Attribute (Color.BrightGreen, Color.Gray),
@@ -96,49 +101,32 @@ namespace Terminal.Gui {
 				Height = 1
 			};
 			base.Add (progress);
-=======
-			_fraction = 0;
-			LayoutStarted += ProgressBar_LayoutStarted;
-			Initialized += ProgressBar_Initialized;
->>>>>>> Stashed changes
 		}
 
-		void ProgressBar_Initialized (object sender, EventArgs e)
-		{
-			ColorScheme = new ColorScheme (ColorScheme ?? SuperView.ColorScheme) {
-				HotNormal = new Attribute (Color.BrightGreen, Color.Gray)
-			};
-		}
-
-		void ProgressBar_LayoutStarted (object sender, EventArgs e)
-		{
-			Bounds = new Rect (Bounds.Location, new Size (Bounds.Width, 1));
-		}
-
-		float _fraction;
+		float fraction;
 
 		/// <summary>
 		/// Gets or sets the <see cref="ProgressBar"/> fraction to display, must be a value between 0 and 1.
 		/// </summary>
 		/// <value>The fraction representing the progress.</value>
 		public float Fraction {
-			get => _fraction;
+			get => fraction;
 			set {
-				_fraction = Math.Min (value, 1);
-				_isActivity = false;
+				fraction = Math.Min (value, 1);
+				isActivity = false;
 				SetNeedsDisplay ();
 			}
 		}
 
-		ProgressBarStyle _progressBarStyle;
+		ProgressBarStyle progressBarStyle;
 
 		/// <summary>
 		/// Gets/Sets the progress bar style based on the <see cref="Terminal.Gui.ProgressBarStyle"/>
 		/// </summary>
 		public ProgressBarStyle ProgressBarStyle {
-			get => _progressBarStyle;
+			get => progressBarStyle;
 			set {
-				_progressBarStyle = value;
+				progressBarStyle = value;
 				switch (value) {
 				case ProgressBarStyle.Blocks:
 					SegmentCharacter = CM.Glyphs.BlocksMeterSegment;
@@ -157,10 +145,11 @@ namespace Terminal.Gui {
 			}
 		}
 
+		private ProgressBarFormat progressBarFormat;
+
 		/// <summary>
 		/// Specifies the format that a <see cref="ProgressBar"/> uses to indicate the visual presentation.
 		/// </summary>
-<<<<<<< Updated upstream
 		public ProgressBarFormat ProgressBarFormat {
 			get => progressBarFormat;
 			set {
@@ -190,33 +179,29 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 			}
 		}
-=======
-		public ProgressBarFormat ProgressBarFormat { get; set; }
->>>>>>> Stashed changes
 
-		private Rune _segmentCharacter = CM.Glyphs.BlocksMeterSegment;
+		private Rune segmentCharacter = CM.Glyphs.BlocksMeterSegment;
 
 		/// <summary>
 		/// Segment indicator for meter views.
 		/// </summary>
 		public Rune SegmentCharacter {
-			get => _segmentCharacter;
+			get => segmentCharacter;
 			set {
-				_segmentCharacter = value;
+				segmentCharacter = value;
 				SetNeedsDisplay ();
 			}
 		}
 
-		/// <summary>
-		/// Gets or sets the text displayed on the progress bar. If set to an empty string and <see cref="ProgressBarFormat"/> is
-		/// <see cref="ProgressBarFormat.SimplePlusPercentage"/> the percentage will be displayed.
-		/// </summary>
+		///<inheritdoc/>
 		public override string Text {
-			get => string.IsNullOrEmpty(base.Text) ? $"{_fraction * 100:F0}%" : base.Text;
-			set => base.Text = value;
+			get => GetPercentageText ();
+			set {
+				base.Text = SetPercentageText (value);
+			}
 		}
 
-		bool _bidirectionalMarquee = true;
+		private bool bidirectionalMarquee = true;
 
 		/// <summary>
 		/// Specifies if the <see cref="ProgressBarStyle.MarqueeBlocks"/> or the
@@ -224,13 +209,41 @@ namespace Terminal.Gui {
 		///  or bidirectional.
 		/// </summary>
 		public bool BidirectionalMarquee {
-			get => _bidirectionalMarquee;
+			get => bidirectionalMarquee;
 			set {
-				_bidirectionalMarquee = value;
+				bidirectionalMarquee = value;
 				SetNeedsDisplay ();
 			}
 		}
-		
+
+		string GetPercentageText ()
+		{
+			switch (progressBarStyle) {
+			case ProgressBarStyle.Blocks:
+			case ProgressBarStyle.Continuous:
+				return $"{fraction * 100:F0}%";
+			case ProgressBarStyle.MarqueeBlocks:
+			case ProgressBarStyle.MarqueeContinuous:
+				break;
+			}
+
+			return base.Text;
+		}
+
+		string SetPercentageText (string value)
+		{
+			switch (progressBarStyle) {
+			case ProgressBarStyle.Blocks:
+			case ProgressBarStyle.Continuous:
+				return $"{fraction * 100:F0}%";
+			case ProgressBarStyle.MarqueeBlocks:
+			case ProgressBarStyle.MarqueeContinuous:
+				break;
+			}
+
+			return value;
+		}
+
 		/// <summary>
 		/// Notifies the <see cref="ProgressBar"/> that some progress has taken place.
 		/// </summary>
@@ -240,34 +253,28 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public void Pulse ()
 		{
-			if (_activityPos == null) {
+			if (activityPos == null) {
 				PopulateActivityPos ();
 			}
-			if (!_isActivity) {
-				_isActivity = true;
-				_delta = 1;
+			if (!isActivity) {
+				isActivity = true;
+				delta = 1;
 			} else {
-				for (var i = 0; i < _activityPos.Length; i++) {
-					_activityPos [i] += _delta;
+				for (int i = 0; i < activityPos.Length; i++) {
+					activityPos [i] += delta;
 				}
-<<<<<<< Updated upstream
 				int fWidth = progress.Bounds.Width;
 				if (activityPos [activityPos.Length - 1] < 0) {
 					for (int i = 0; i < activityPos.Length; i++) {
 						activityPos [i] = i - activityPos.Length + 2;
-=======
-				if (_activityPos [^1] < 0) {
-					for (var i = 0; i < _activityPos.Length; i++) {
-						_activityPos [i] = i - _activityPos.Length + 2;
->>>>>>> Stashed changes
 					}
-					_delta = 1;
-				} else if (_activityPos [0] >= Bounds.Width) {
-					if (_bidirectionalMarquee) {
-						for (var i = 0; i < _activityPos.Length; i++) {
-							_activityPos [i] = Bounds.Width + i - 2;
+					delta = 1;
+				} else if (activityPos [0] >= fWidth) {
+					if (bidirectionalMarquee) {
+						for (int i = 0; i < activityPos.Length; i++) {
+							activityPos [i] = fWidth + i - 2;
 						}
-						_delta = -1;
+						delta = -1;
 					} else {
 						PopulateActivityPos ();
 					}
@@ -280,9 +287,8 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void OnDrawContent (Rect contentArea)
 		{
-			Driver.SetAttribute (GetHotNormalColor());
+			DrawFrame ();
 
-<<<<<<< Updated upstream
 			Driver.SetAttribute (GetNormalColor ());
 
 			int fWidth = progress.Bounds.Width;
@@ -290,33 +296,19 @@ namespace Terminal.Gui {
 				progress.Move (0, 0);
 				for (int i = 0; i < fWidth; i++)
 					if (Array.IndexOf (activityPos, i) != -1)
-=======
-			Move (0, 0);
-			if (_isActivity) {
-				for (int i = 0; i < Bounds.Width; i++)
-					if (Array.IndexOf (_activityPos, i) != -1) {
->>>>>>> Stashed changes
 						Driver.AddRune (SegmentCharacter);
-					} else {
+					else
 						Driver.AddRune ((Rune)' ');
-					}
 			} else {
-<<<<<<< Updated upstream
 				progress.Move (0, 0);
 				int mid = (int)(fraction * fWidth);
-=======
-				int mid = (int)(_fraction * Bounds.Width);
->>>>>>> Stashed changes
 				int i;
-				for (i = 0; i < mid & i < Bounds.Width; i++) {
+				for (i = 0; i < mid & i < fWidth; i++)
 					Driver.AddRune (SegmentCharacter);
-				}
-				for (; i < Bounds.Width; i++) {
+				for (; i < fWidth; i++)
 					Driver.AddRune ((Rune)' ');
-				}
 			}
 
-<<<<<<< Updated upstream
 			progress.OnRenderLineCanvas ();
 
 			DrawText (GetFrameWidth ());
@@ -346,14 +338,10 @@ namespace Terminal.Gui {
 			case ProgressBarFormat.SimplePlusPercentage:
 			case ProgressBarFormat.FramedPlusPercentage:
 			case ProgressBarFormat.FramedProgressPadded:
-=======
-			if (ProgressBarFormat != ProgressBarFormat.Simple && !_isActivity) {
->>>>>>> Stashed changes
 				var tf = new TextFormatter () {
 					Alignment = TextAlignment.Centered,
 					Text = Text
 				};
-<<<<<<< Updated upstream
 				var row = progressBarFormat == ProgressBarFormat.FramedProgressPadded ? 3 : 1;
 				Move (0, row);
 				var rect = new Rect (0, row, fWidth, 1);
@@ -386,18 +374,6 @@ namespace Terminal.Gui {
 				progress.Border.BorderStyle = LineStyle.Single;
 				progress.Border.Thickness = new Thickness (1);
 				break;
-=======
-				Attribute attr = new Attribute (ColorScheme.HotNormal.Foreground, ColorScheme.HotNormal.Background); 
-				if (_fraction > .5) {
-					attr = new Attribute (ColorScheme.HotNormal.Background, ColorScheme.HotNormal.Foreground);
-				}
-				tf?.Draw (ViewToScreen (Bounds), 
-					attr, 
-					ColorScheme.Normal,
-					SuperView?.ViewToScreen (SuperView.Bounds) ?? default, 
-					fillRemaining: false);
-
->>>>>>> Stashed changes
 			}
 
 			progress.OnDrawFrames ();
@@ -405,9 +381,9 @@ namespace Terminal.Gui {
 
 		void PopulateActivityPos ()
 		{
-			_activityPos = new int [Math.Min (Frame.Width / 3, 5)];
-			for (var i = 0; i < _activityPos.Length; i++) {
-				_activityPos [i] = i - _activityPos.Length + 1;
+			activityPos = new int [Math.Min (Frame.Width / 3, 5)];
+			for (int i = 0; i < activityPos.Length; i++) {
+				activityPos [i] = i - activityPos.Length + 1;
 			}
 		}
 
@@ -415,6 +391,7 @@ namespace Terminal.Gui {
 		public override bool OnEnter (View view)
 		{
 			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
 			return base.OnEnter (view);
 		}
 

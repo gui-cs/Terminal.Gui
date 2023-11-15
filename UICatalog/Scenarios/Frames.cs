@@ -286,11 +286,6 @@ namespace UICatalog.Scenarios {
 					_paddingEditor.ThicknessChanged += Editor_ThicknessChanged;
 					_paddingEditor.AttributeChanged += Editor_AttributeChanged;
 					Add (_paddingEditor);
-
-					//_viewToEdit.X = Pos.Right (rbBorderStyle);
-					//_viewToEdit.Y = 0;
-					//_viewToEdit.Width = Dim.Fill ();
-					//_viewToEdit.Height = Dim.Fill ();
 					Add (_viewToEdit);
 
 					_viewToEdit.LayoutComplete += (s, e) => {
@@ -388,6 +383,10 @@ namespace UICatalog.Scenarios {
 				Title =$"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
 				ViewToEdit = view
 			};
+			view.X = 36;
+			view.Y = 0;
+			view.Width = Dim.Fill ();
+			view.Height = Dim.Fill ();
 
 			Application.Run (editor);
 			Application.Shutdown ();
