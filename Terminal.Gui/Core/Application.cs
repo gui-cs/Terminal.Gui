@@ -528,7 +528,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var chain = toplevels.ToList ();
+			var chain = toplevels.Where (t => t.Visible).ToList ();
 			foreach (var topLevel in chain) {
 				if (topLevel.ProcessHotKey (ke)) {
 					EnsuresMdiTopOnFrontIfMdiTopMostFocused ();
