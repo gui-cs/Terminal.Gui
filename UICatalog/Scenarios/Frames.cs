@@ -180,7 +180,7 @@ namespace UICatalog.Scenarios {
 						break;
 					}
 				} catch {
-					if (!string.IsNullOrEmpty(e.NewText)) {
+					if (!string.IsNullOrEmpty (e.NewText)) {
 						e.Cancel = true;
 					}
 				}
@@ -192,99 +192,115 @@ namespace UICatalog.Scenarios {
 			private FrameEditor _marginEditor;
 			private FrameEditor _borderEditor;
 			private FrameEditor _paddingEditor;
+			private String _origTitle = string.Empty;
 
-			public FramesEditor (string title, View viewToEdit)
+			public FramesEditor ()
 			{
-				this._viewToEdit = viewToEdit;
+			}
 
-				viewToEdit.Margin.ColorScheme = new ColorScheme (Colors.ColorSchemes ["Toplevel"]);
-				_marginEditor = new FrameEditor () {
-					X = 0,
-					Y = 0,
-					Title = "Margin",
-					Thickness = viewToEdit.Margin.Thickness,
-					SuperViewRendersLineCanvas = true
-				};
-				_marginEditor.ThicknessChanged += Editor_ThicknessChanged;
-				_marginEditor.AttributeChanged += Editor_AttributeChanged; ;
-				Add (_marginEditor);
+			public View ViewToEdit {
+				get {
+					return _viewToEdit;
+				}
+				set {
+					_origTitle = value.Title;
+					_viewToEdit = value;
 
-				viewToEdit.Border.ColorScheme = new ColorScheme (Colors.ColorSchemes ["Base"]);
-				_borderEditor = new FrameEditor () {
-					X = Pos.Left (_marginEditor),
-					Y = Pos.Bottom (_marginEditor),
-					Title = "Border",
-					Thickness = viewToEdit.Border.Thickness,
-					SuperViewRendersLineCanvas = true
-				};
-				_borderEditor.ThicknessChanged += Editor_ThicknessChanged;
-				_borderEditor.AttributeChanged += Editor_AttributeChanged;
-				Add (_borderEditor);
+					_viewToEdit.Margin.ColorScheme = new ColorScheme (Colors.ColorSchemes ["Toplevel"]);
+					_marginEditor = new FrameEditor () {
+						X = 0,
+						Y = 0,
+						Title = "Margin",
+						Thickness = _viewToEdit.Margin.Thickness,
+						SuperViewRendersLineCanvas = true
+					};
+					_marginEditor.ThicknessChanged += Editor_ThicknessChanged;
+					_marginEditor.AttributeChanged += Editor_AttributeChanged;
+					Add (_marginEditor);
 
-				viewToEdit.Padding.ColorScheme = new ColorScheme (Colors.ColorSchemes ["Error"]);
+					_viewToEdit.Border.ColorScheme = new ColorScheme (Colors.ColorSchemes ["Base"]);
+					_borderEditor = new FrameEditor () {
+						X = Pos.Left (_marginEditor),
+						Y = Pos.Bottom (_marginEditor),
+						Title = "Border",
+						Thickness = _viewToEdit.Border.Thickness,
+						SuperViewRendersLineCanvas = true
+					};
+					_borderEditor.ThicknessChanged += Editor_ThicknessChanged;
+					_borderEditor.AttributeChanged += Editor_AttributeChanged;
+					Add (_borderEditor);
 
-				var borderStyleEnum = Enum.GetValues (typeof (LineStyle)).Cast<LineStyle> ().ToList ();
-				var rbBorderStyle = new RadioGroup (borderStyleEnum.Select (
-					e => e.ToString ()).ToArray ()) {
+					_viewToEdit.Padding.ColorScheme = new ColorScheme (Colors.ColorSchemes ["Error"]);
 
-					X = Pos.Right (_borderEditor) - 1,
-					Y = Pos.Top (_borderEditor),
-					SelectedItem = (int)viewToEdit.Border.BorderStyle,
-					BorderStyle = LineStyle.Double,
-					Title = "Border Style",
-					SuperViewRendersLineCanvas = true
-				};
-				Add (rbBorderStyle);
+					var borderStyleEnum = Enum.GetValues (typeof (LineStyle)).Cast<LineStyle> ().ToList ();
+					var rbBorderStyle = new RadioGroup (borderStyleEnum.Select (
+						e => e.ToString ()).ToArray ()) {
 
-				rbBorderStyle.SelectedItemChanged += (s, e) => {
-					var prevBorderStyle = viewToEdit.BorderStyle;
-					viewToEdit.Border.BorderStyle = (LineStyle)e.SelectedItem;
-					if (viewToEdit.Border.BorderStyle == LineStyle.None) {
-						viewToEdit.Border.Thickness = new Thickness (0);
-					} else if (prevBorderStyle == LineStyle.None && viewToEdit.Border.BorderStyle != LineStyle.None) {
-						viewToEdit.Border.Thickness = new Thickness (1);
-					}
-					_borderEditor.Thickness = new Thickness (viewToEdit.Border.Thickness.Left, viewToEdit.Border.Thickness.Top,
-						viewToEdit.Border.Thickness.Right, viewToEdit.Border.Thickness.Bottom);
-					viewToEdit.SetNeedsDisplay ();
-				};
+						X = Pos.Right (_borderEditor) - 1,
+						Y = Pos.Top (_borderEditor),
+						SelectedItem = (int)_viewToEdit.Border.BorderStyle,
+						BorderStyle = LineStyle.Double,
+						Title = "Border Style",
+						SuperViewRendersLineCanvas = true
+					};
+					Add (rbBorderStyle);
 
-				var ckbTitle = new CheckBox ("Show Title") {
-					BorderStyle = LineStyle.Double,
-					X = Pos.Left (_borderEditor),
-					Y = Pos.Bottom (_borderEditor) - 1,
-					Width = Dim.Width (_borderEditor),
-					Checked = true,
-					SuperViewRendersLineCanvas = true
-				};
-				Add (ckbTitle);
+					rbBorderStyle.SelectedItemChanged += (s, e) => {
+						var prevBorderStyle = _viewToEdit.BorderStyle;
+						_viewToEdit.Border.BorderStyle = (LineStyle)e.SelectedItem;
+						if (_viewToEdit.Border.BorderStyle == LineStyle.None) {
+							_viewToEdit.Border.Thickness = new Thickness (0);
+						} else if (prevBorderStyle == LineStyle.None && _viewToEdit.Border.BorderStyle != LineStyle.None) {
+							_viewToEdit.Border.Thickness = new Thickness (1);
+						}
+						_borderEditor.Thickness = new Thickness (_viewToEdit.Border.Thickness.Left, _viewToEdit.Border.Thickness.Top,
+							_viewToEdit.Border.Thickness.Right, _viewToEdit.Border.Thickness.Bottom);
+						_viewToEdit.SetNeedsDisplay ();
+						LayoutSubviews ();
+					};
 
-				_paddingEditor = new FrameEditor () {
-					X = Pos.Left (_borderEditor),
-					Y = Pos.Bottom (rbBorderStyle),
-					Title = "Padding",
-					Thickness = viewToEdit.Padding.Thickness,
-					SuperViewRendersLineCanvas = true
-				};
-				_paddingEditor.ThicknessChanged += Editor_ThicknessChanged;
-				_paddingEditor.AttributeChanged += Editor_AttributeChanged;
-				Add (_paddingEditor);
+					var ckbTitle = new CheckBox ("Show Title") {
+						BorderStyle = LineStyle.Double,
+						X = Pos.Left (_borderEditor),
+						Y = Pos.Bottom (_borderEditor) - 1,
+						Width = Dim.Width (_borderEditor),
+						Checked = true,
+						SuperViewRendersLineCanvas = true
+					};
+					ckbTitle.Toggled += (sender, args) => {
+						if (ckbTitle.Checked == true) {
+							_viewToEdit.Title = _origTitle;
+						} else {
+							_viewToEdit.Title = string.Empty;
+						}
+					};
+					Add (ckbTitle);
 
-				viewToEdit.X = Pos.Right (rbBorderStyle);
-				viewToEdit.Y = 0;
-				viewToEdit.Width = Dim.Fill ();
-				viewToEdit.Height = Dim.Fill ();
-				Add (viewToEdit);
+					_paddingEditor = new FrameEditor () {
+						X = Pos.Left (_borderEditor),
+						Y = Pos.Bottom (rbBorderStyle),
+						Title = "Padding",
+						Thickness = _viewToEdit.Padding.Thickness,
+						SuperViewRendersLineCanvas = true
+					};
+					_paddingEditor.ThicknessChanged += Editor_ThicknessChanged;
+					_paddingEditor.AttributeChanged += Editor_AttributeChanged;
+					Add (_paddingEditor);
 
-				viewToEdit.LayoutComplete += (s, e) => {
-					if (ckbTitle.Checked == true) {
-						viewToEdit.Title = viewToEdit.ToString ();
-					} else {
-						viewToEdit.Title = string.Empty;
-					}
-				};
+					//_viewToEdit.X = Pos.Right (rbBorderStyle);
+					//_viewToEdit.Y = 0;
+					//_viewToEdit.Width = Dim.Fill ();
+					//_viewToEdit.Height = Dim.Fill ();
+					Add (_viewToEdit);
 
-				Title = title;
+					_viewToEdit.LayoutComplete += (s, e) => {
+						if (ckbTitle.Checked == true) {
+							_viewToEdit.Title = _origTitle;
+						} else {
+							_viewToEdit.Title = string.Empty;
+						}
+					};
+				}
 			}
 
 			private void Editor_AttributeChanged (object sender, Terminal.Gui.Attribute attr)
@@ -368,9 +384,10 @@ namespace UICatalog.Scenarios {
 
 			view.Add (tf1, button, label, tf2, tv);
 
-			var editor = new FramesEditor (
-				$"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
-				view);
+			var editor = new FramesEditor () {
+				Title =$"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+				ViewToEdit = view
+			};
 
 			Application.Run (editor);
 			Application.Shutdown ();

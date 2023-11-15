@@ -488,7 +488,11 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public override string ToString ()
 		{
-			return $"{GetType ().Name}({Id})({Frame})";
+			if (string.IsNullOrEmpty (Title)) {
+				return $"{GetType ().Name}({Id})({Frame})";
+			} else {
+				return Title;
+			}
 		}
 
 		/// <inheritdoc/>

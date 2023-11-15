@@ -220,10 +220,12 @@ namespace UICatalog.Scenarios {
 
 			view.X = Pos.Center ();
 
-			var editor = new Frames.FramesEditor ($"Frames Editor", view) {
+			var editor = new Frames.FramesEditor () {
+				Title = $"Frames Editor",
 				X = 0,
 				Y = Pos.Bottom (containerLabel),
 				Width = Dim.Fill (),
+				ViewToEdit = view,
 			};
 
 			Application.Top.Add (editor);
