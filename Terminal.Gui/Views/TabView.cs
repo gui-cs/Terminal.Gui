@@ -187,12 +187,9 @@ namespace Terminal.Gui {
 				// How much space do we need to leave at the bottom to show the tabs
 				int spaceAtBottom = Math.Max (0, GetTabHeight (false) - 1);
 				int startAtY = Math.Max (0, GetTabHeight (true) - 1);
-				var lc = new LineCanvas () { Lines = new List<StraightLine> (LineCanvas.Lines) };
 
 				DrawFrame (new Rect (0, startAtY, Bounds.Width,
 					Math.Max (Bounds.Height - spaceAtBottom - startAtY, 0)), LineStyle.Single);
-
-				LineCanvas.Lines = lc.Lines;
 			}
 
 			if (Tabs.Any ()) {
