@@ -498,5 +498,28 @@ namespace Terminal.Gui.ViewTests {
 00000000000000000000000
 00000000000000000000000", attributes);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void Remove_Added_View_Is_Allowed ()
+		{
+			var sv = new ScrollView () {
+				Width = 20,
+				Height = 20,
+				ContentSize = new Size (100, 100)
+			};
+			sv.Add (new View () { Width = Dim.Fill (), Height = Dim.Fill (50), Id = "View1" },
+				new View () { Y = 51, Width = Dim.Fill (), Height = Dim.Fill (), Id = "View2" });
+
+			Application.Top.Add (sv);
+			Application.Begin (Application.Top);
+
+			Assert.Equal (3, sv.Subviews.Count);
+			Assert.Equal (2, sv.Subviews [0].Subviews.Count);
+
+			sv.Remove (sv.Subviews [0].Subviews [1]);
+			Assert.Equal (3, sv.Subviews.Count);
+			Assert.Single (sv.Subviews [0].Subviews);
+			Assert.Equal ("View1", sv.Subviews [0].Subviews [0].Id);
+		}
 	}
 }
