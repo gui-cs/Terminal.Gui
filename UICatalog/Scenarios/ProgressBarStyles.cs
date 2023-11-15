@@ -146,7 +146,7 @@ namespace UICatalog.Scenarios {
 				Application.Top.Unloaded -= Top_Unloaded;
 			}
 
-			var pbs = editor.Subviews.Where (v => v.GetType () == typeof (ProgressBar)).ToList ();
+			var pbs = editor.Subviews.Where (v => v.GetType () == typeof (ProgressBar)).Select(v => v.Title).ToList ();
 			var pbList = new ListView (pbs) {
 				Title = "Focused ProgressBar",
 				Y = 0,
@@ -156,7 +156,7 @@ namespace UICatalog.Scenarios {
 				BorderStyle = LineStyle.Single
 			};
 			pbList.SelectedItemChanged += (sender, e) => {
-				editor.ViewToEdit = (View)e.Value;
+				editor.ViewToEdit = (View)editor.Subviews.First(v => v.GetType () == typeof (ProgressBar) && v.Title == (string)e.Value);
 			};
 			editor.Add (pbList);
 			pbList.SelectedItem = 0;
