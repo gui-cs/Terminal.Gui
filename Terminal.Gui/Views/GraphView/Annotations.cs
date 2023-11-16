@@ -115,9 +115,6 @@ namespace Terminal.Gui {
 	/// The 'Key' to the graph
 	/// </summary>
 	public class LegendAnnotation : View, IAnnotation {
-		/// <inheritdoc/>
-		public override Rect Bounds { get; set; }
-
 		/// <summary>
 		/// Returns false i.e. Lengends render after series
 		/// </summary>
@@ -140,7 +137,10 @@ namespace Terminal.Gui {
 		/// (within the graph).  This is in screen units (i.e. not graph space)</param>
 		public LegendAnnotation (Rect legendBounds)
 		{
-			Bounds = legendBounds;
+			X = legendBounds.X;
+			Y = legendBounds.Y;
+			Width = legendBounds.Width;
+			Height = legendBounds.Height;
 			BorderStyle = LineStyle.Single;
 		}
 
@@ -155,16 +155,10 @@ namespace Terminal.Gui {
 				graph.Add (this);
 			}
 
-			Frame = Bounds;
-
 			if (BorderStyle != LineStyle.None) {
 				OnDrawFrames ();
 				OnRenderLineCanvas ();
 			}
-
-			// how much horizontal space is available for writing legend entries?
-			int availableWidth = Bounds.Width - (Border.Thickness.Left + Border.Thickness.Right);
-			int availableHeight = Bounds.Height - (Border.Thickness.Top + Border.Thickness.Bottom);
 
 			int linesDrawn = 0;
 
@@ -185,13 +179,13 @@ namespace Terminal.Gui {
 				// add the text
 				Move (1, linesDrawn);
 
-				string str = TextFormatter.ClipOrPad (entry.Item2, availableWidth - 1);
+				string str = TextFormatter.ClipOrPad (entry.Item2, Bounds.Width - 1);
 				Application.Driver.AddStr (str);
 
 				linesDrawn++;
 
 				// Legend has run out of space
-				if (linesDrawn >= availableHeight) {
+				if (linesDrawn >= Bounds.Height) {
 					break;
 				}
 			}
