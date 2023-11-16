@@ -1441,8 +1441,10 @@ namespace Terminal.Gui {
 		{
 			Autocomplete.HostControl = this;
 
-			Application.Top.AlternateForwardKeyChanged += Top_AlternateForwardKeyChanged;
-			Application.Top.AlternateBackwardKeyChanged += Top_AlternateBackwardKeyChanged;
+			if (Application.Top != null) {
+				Application.Top.AlternateForwardKeyChanged += Top_AlternateForwardKeyChanged;
+				Application.Top.AlternateBackwardKeyChanged += Top_AlternateBackwardKeyChanged;
+			}
 			OnContentsChanged ();
 		}
 

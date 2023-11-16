@@ -10,7 +10,6 @@
 // Any udpates done here should probably be done in FrameView as well; TODO: Merge these classes
 
 using System;
-using System.Collections;
 using System.Linq;
 using NStack;
 
@@ -271,7 +270,11 @@ namespace Terminal.Gui {
 			}
 
 			SetNeedsDisplay ();
-			contentView.Remove (view);
+			if (view == contentView) {
+				base.Remove (view);
+			} else {
+				contentView.Remove (view);
+			}
 
 			RemoveMenuStatusBar (view);
 			if (view != contentView && Focused == null) {

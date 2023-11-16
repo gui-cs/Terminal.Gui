@@ -316,7 +316,11 @@ namespace Terminal.Gui {
 
 				SetNeedsDisplay ();
 				var touched = view.Frame;
-				contentView.Remove (view);
+				if (view == contentView || view.GetType().Name == "ContentView") {
+					base.Remove (view);
+				} else {
+					contentView.Remove (view);
+				}
 
 				if (contentView.InternalSubviews.Count < 1)
 					this.CanFocus = false;
