@@ -1257,14 +1257,19 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var legend = new LegendAnnotation ();
 			Assert.Equal (Rect.Empty, legend.Bounds);
+			Assert.Equal (Rect.Empty, legend.Frame);
 			Assert.Equal (LineStyle.Single, legend.BorderStyle);
 			Assert.False (legend.BeforeSeries);
 
 			var bounds = new Rect (1, 2, 10, 3);
 			legend = new LegendAnnotation (bounds);
-			Assert.Equal (bounds, legend.Bounds);
+			Assert.Equal (new Rect (0, 0, 8, 1), legend.Bounds);
+			Assert.Equal (bounds, legend.Frame);
 			Assert.Equal (LineStyle.Single, legend.BorderStyle);
 			Assert.False (legend.BeforeSeries);
+			legend.BorderStyle = LineStyle.None;
+			Assert.Equal (new Rect (0, 0, 10, 3), legend.Bounds);
+			Assert.Equal (bounds, legend.Frame);
 		}
 
 		[Fact]
