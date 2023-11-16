@@ -866,10 +866,10 @@ namespace Terminal.Gui.ViewsTests {
 ", output);
 			// Should all be the same color
 			TestHelpers.AssertDriverColorsAre (@"
-00000000
-00000000
 0000000000
-000000
+0000000000
+0000000000
+0000000000
 ", driver: Application.Driver,
 				new [] { tv.ColorScheme.Normal, pink });
 
