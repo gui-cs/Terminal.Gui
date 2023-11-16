@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>
 /// Represents a basic step that is displayed in a <see cref="Wizard"/>. The <see cref="WizardStep"/> view is divided horizontally in two. On the left is the
@@ -39,7 +39,7 @@ public class WizardStep : FrameView {
 	//private string title = string.Empty;
 
 	// The contentView works like the ContentView in FrameView.
-	private View contentView = new View () { Data = "WizardContentView" };
+	private View contentView = new View () { Id = "WizardContentView" };
 
 	/// <summary>
 	/// Sets or gets help text for the <see cref="WizardStep"/>.If <see cref="WizardStep.HelpText"/> is empty
@@ -185,8 +185,12 @@ public class WizardStep : FrameView {
 		}
 
 		SetNeedsDisplay ();
-		var touched = view.Frame;
-		contentView.Remove (view);
+		var container = view?.SuperView;
+		if (container == this) {
+			base.Remove (view);
+		} else {
+			container?.Remove (view);
+		}
 
 		if (contentView.InternalSubviews.Count < 1) {
 			this.CanFocus = false;
