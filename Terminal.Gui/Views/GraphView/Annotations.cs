@@ -114,32 +114,9 @@ namespace Terminal.Gui {
 	/// A box containing symbol definitions e.g. meanings for colors in a graph.
 	/// The 'Key' to the graph
 	/// </summary>
-	public class LegendAnnotation : IAnnotation {
-
-		/// <summary>
-		/// True to draw a solid border around the legend.
-		/// Defaults to true.  This border will be within the
-		/// <see cref="Bounds"/> and so reduces the width/height
-		/// available for text by 2
-		/// </summary>
-		public bool Border {
-			get => _border;
-			set {
-				_border = value;
-				if (_border) {
-					_legend.BorderStyle = LineStyle.Single;
-					_legend.Border.Thickness = new Thickness (1);
-				} else {
-					_legend.BorderStyle = LineStyle.None;
-					_legend.Border.Thickness = new Thickness (0);
-				}
-			}
-		}
-
-		/// <summary>
-		/// Defines the screen area available for the legend to render in
-		/// </summary>
-		public Rect Bounds { get; set; }
+	public class LegendAnnotation : View, IAnnotation {
+		/// <inheritdoc/>
+		public override Rect Bounds { get; set; }
 
 		/// <summary>
 		/// Returns false i.e. Lengends render after series
@@ -150,18 +127,21 @@ namespace Terminal.Gui {
 		/// Ordered collection of entries that are rendered in the legend.
 		/// </summary>
 		List<Tuple<GraphCellToRender, string>> _entries = new List<Tuple<GraphCellToRender, string>> ();
-		private bool _border = true;
-		private View _legend;
 
 		/// <summary>
-		/// Creates a new empty legend at the given screen coordinates
+		/// Creates a new empty legend at the empty screen coordinates.
+		/// </summary>
+		public LegendAnnotation () : this (Rect.Empty) { }
+
+		/// <summary>
+		/// Creates a new empty legend at the given screen coordinates.
 		/// </summary>
 		/// <param name="legendBounds">Defines the area available for the legend to render in
 		/// (within the graph).  This is in screen units (i.e. not graph space)</param>
 		public LegendAnnotation (Rect legendBounds)
 		{
 			Bounds = legendBounds;
-			_legend = new View () { Bounds = legendBounds, BorderStyle = LineStyle.Single };
+			BorderStyle = LineStyle.Single;
 		}
 
 		/// <summary>
@@ -170,21 +150,21 @@ namespace Terminal.Gui {
 		/// <param name="graph"></param>
 		public void Render (GraphView graph)
 		{
-			if (!_legend.IsInitialized) {
-				_legend.ColorScheme = new ColorScheme () { Normal = Application.Driver.GetAttribute () };
-				graph.Add (_legend);
+			if (!IsInitialized) {
+				ColorScheme = new ColorScheme () { Normal = Application.Driver.GetAttribute () };
+				graph.Add (this);
 			}
 
-			_legend.Frame = Bounds;
+			Frame = Bounds;
 
-			if (Border) {
-				_legend.OnDrawFrames ();
-				_legend.OnRenderLineCanvas ();
+			if (BorderStyle != LineStyle.None) {
+				OnDrawFrames ();
+				OnRenderLineCanvas ();
 			}
 
 			// how much horizontal space is available for writing legend entries?
-			int availableWidth = Bounds.Width - (Border ? 2 : 0);
-			int availableHeight = Bounds.Height - (Border ? 2 : 0);
+			int availableWidth = Bounds.Width - (Border.Thickness.Left + Border.Thickness.Right);
+			int availableHeight = Bounds.Height - (Border.Thickness.Top + Border.Thickness.Bottom);
 
 			int linesDrawn = 0;
 
@@ -197,13 +177,13 @@ namespace Terminal.Gui {
 				}
 
 				// add the symbol
-				_legend.AddRune (0, linesDrawn, entry.Item1.Rune);
+				AddRune (0, linesDrawn, entry.Item1.Rune);
 
 				// switch to normal coloring (for the text)
 				graph.SetDriverColorToGraphColor ();
 
 				// add the text
-				_legend.Move (1, linesDrawn);
+				Move (1, linesDrawn);
 
 				string str = TextFormatter.ClipOrPad (entry.Item2, availableWidth - 1);
 				Application.Driver.AddStr (str);
