@@ -942,16 +942,20 @@ namespace Terminal.Gui.ApplicationTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void MouseGrabView_GrabbedMouse_UnGrabbedMouse ()
+		public void MouseGrabView_GrabbedMouse_UnGrabbedMouse_GrabbingMouse_UnGrabbingMouse ()
 		{
 			View grabView = null;
 			var count = 0;
+			var wasGrabbingMouse = false;
+			var wasUnGrabbingMouse = false;
 
 			var view1 = new View ();
 			var view2 = new View ();
 
 			Application.GrabbedMouse += Application_GrabbedMouse;
 			Application.UnGrabbedMouse += Application_UnGrabbedMouse;
+			Application.GrabbingMouse += Application_GrabbingMouse;
+			Application.UnGrabbingMouse += Application_UnGrabbingMouse;
 
 			Application.GrabMouse (view1);
 			Assert.Equal (0, count);
@@ -965,16 +969,20 @@ namespace Terminal.Gui.ApplicationTests {
 
 			Application.GrabbedMouse += Application_GrabbedMouse;
 			Application.UnGrabbedMouse += Application_UnGrabbedMouse;
+			Application.GrabbingMouse += Application_GrabbingMouse;
+			Application.UnGrabbingMouse += Application_UnGrabbingMouse;
 
 			Application.GrabMouse (view2);
 			Assert.Equal (1, count);
 			Assert.Equal (grabView, view2);
 			Assert.Equal (view2, Application.MouseGrabView);
+			Assert.True (wasGrabbingMouse);
 
 			Application.UngrabMouse ();
 			Assert.Equal (2, count);
 			Assert.Equal (grabView, view2);
 			Assert.Null (Application.MouseGrabView);
+			Assert.True (wasUnGrabbingMouse);
 
 			void Application_GrabbedMouse (View obj)
 			{
@@ -1002,6 +1010,54 @@ namespace Terminal.Gui.ApplicationTests {
 
 				Application.UnGrabbedMouse -= Application_UnGrabbedMouse;
 			}
+
+			bool Application_GrabbingMouse (View obj)
+			{
+				if (count == 0) {
+					Assert.Equal (view1, obj);
+					grabView = view1;
+				} else {
+					Assert.Equal (view2, obj);
+					grabView = view2;
+				}
+				wasGrabbingMouse = true;
+
+				Application.GrabbingMouse -= Application_GrabbingMouse;
+
+				return false;
+			}
+
+			bool Application_UnGrabbingMouse (View obj)
+			{
+				if (count == 0) {
+					Assert.Equal (view1, obj);
+					Assert.Equal (grabView, obj);
+				} else {
+					Assert.Equal (view2, obj);
+					Assert.Equal (grabView, obj);
+				}
+				wasUnGrabbingMouse = true;
+
+				Application.UnGrabbingMouse -= Application_UnGrabbingMouse;
+
+				return false;
+			}
+		}
+
+		[Fact, AutoInitShutdown]
+		public void GrabbingMouse_UnGrabbingMouse_Does_Not_Throws_If_Null ()
+		{
+			// This is needed to unsubscribe all the toplevel static events.
+			Application.Top.Dispose ();
+
+			var view = new View ();
+			var exception = Record.Exception (() => Application.GrabMouse (view));
+			Assert.Null (exception);
+
+			Assert.Equal (view, Application.MouseGrabView);
+
+			exception = Record.Exception (() => Application.UngrabMouse ());
+			Assert.Null (exception);
 		}
 		#endregion
 	}

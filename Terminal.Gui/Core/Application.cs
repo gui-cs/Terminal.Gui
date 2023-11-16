@@ -693,6 +693,16 @@ namespace Terminal.Gui {
 		public static View MouseGrabView => mouseGrabView;
 
 		/// <summary>
+		/// Invoked when a view wants to grab the mouse; can be canceled.
+		/// </summary>
+		public static event Func<View, bool> GrabbingMouse;
+
+		/// <summary>
+		/// Invoked when a view wants ungrab the mouse; can be canceled.
+		/// </summary>
+		public static event Func<View, bool> UnGrabbingMouse;
+
+		/// <summary>
 		/// Event to be invoked when a view grab the mouse.
 		/// </summary>
 		public static event Action<View> GrabbedMouse;
@@ -711,9 +721,11 @@ namespace Terminal.Gui {
 		{
 			if (view == null)
 				return;
-			OnGrabbedMouse (view);
-			mouseGrabView = view;
-			Driver.UncookMouse ();
+			if (!OnGrabbingMouse (view)) {
+				OnGrabbedMouse (view);
+				mouseGrabView = view;
+				Driver.UncookMouse ();
+			}
 		}
 
 		/// <summary>
@@ -723,9 +735,25 @@ namespace Terminal.Gui {
 		{
 			if (mouseGrabView == null)
 				return;
-			OnUnGrabbedMouse (mouseGrabView);
-			mouseGrabView = null;
-			Driver.CookMouse ();
+			if (!OnUnGrabbingMouse (mouseGrabView)) {
+				OnUnGrabbedMouse (mouseGrabView);
+				mouseGrabView = null;
+				Driver.CookMouse ();
+			}
+		}
+
+		static bool OnGrabbingMouse (View view)
+		{
+			if (view == null || GrabbingMouse == null)
+				return false;
+			return (bool)(GrabbingMouse?.Invoke (view));
+		}
+
+		static bool OnUnGrabbingMouse (View view)
+		{
+			if (view == null || UnGrabbingMouse == null)
+				return false;
+			return (bool)(UnGrabbingMouse?.Invoke (view));
 		}
 
 		static void OnGrabbedMouse (View view)

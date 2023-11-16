@@ -372,7 +372,7 @@ namespace Terminal.Gui {
 				}
 			}
 
-			// Fill in the bottom left corner
+			// Fill in the bottom right corner
 			if (ShowVerticalScrollIndicator && ShowHorizontalScrollIndicator) {
 				AddRune (Bounds.Width - 1, Bounds.Height - 1, ' ');
 			}
