@@ -86,7 +86,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static Toplevel MdiTop {
 			get {
-				if (Top.IsMdiContainer) {
+				if (Top?.IsMdiContainer == true) {
 					return Top;
 				}
 				return null;
@@ -516,11 +516,8 @@ namespace Terminal.Gui {
 			protected virtual void Dispose (bool disposing)
 			{
 				if (Toplevel != null && disposing) {
-					throw new InvalidOperationException ("You must clean up (Dispose) the Toplevel before calling Application.RunState.Dispose");
-					// BUGBUG: It's insidious that we call EndFirstTopLevel here so I moved it to End.
-					//EndFirstTopLevel (Toplevel);
-					//Toplevel.Dispose ();
-					//Toplevel = null;
+					Toplevel.Dispose ();
+					Toplevel = null;
 				}
 			}
 		}
@@ -1062,6 +1059,7 @@ namespace Terminal.Gui {
 			// Set Current and Top to the next TopLevel on the stack
 			if (toplevels.Count == 0) {
 				Current = null;
+				Top = null;
 			} else {
 				Current = toplevels.Peek ();
 				if (toplevels.Count == 1 && Current == MdiTop) {
@@ -1074,8 +1072,6 @@ namespace Terminal.Gui {
 				Refresh ();
 			}
 
-			runState.Toplevel?.Dispose ();
-			runState.Toplevel = null;
 			runState.Dispose ();
 		}
 

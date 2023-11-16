@@ -159,13 +159,12 @@ namespace Terminal.Gui.ApplicationTests {
 			Application.End (runstate);
 
 			Assert.Null (Application.Current);
-			Assert.NotNull (Application.Top);
+			Assert.Null (Application.Top);
 			Assert.NotNull (Application.MainLoop);
 			Assert.NotNull (Application.Driver);
 
 			Shutdown ();
 
-			Assert.Null (Application.Top);
 			Assert.Null (Application.MainLoop);
 			Assert.Null (Application.Driver);
 		}
@@ -203,13 +202,12 @@ namespace Terminal.Gui.ApplicationTests {
 			Application.End (runstate);
 
 			Assert.Null (Application.Current);
-			Assert.NotNull (Application.Top);
+			Assert.Null (Application.Top);
 			Assert.NotNull (Application.MainLoop);
 			Assert.NotNull (Application.Driver);
 
 			Shutdown ();
 
-			Assert.Null (Application.Top);
 			Assert.Null (Application.MainLoop);
 			Assert.Null (Application.Driver);
 		}
@@ -529,7 +527,10 @@ namespace Terminal.Gui.ApplicationTests {
 
 			Application.Run (t1);
 
-			Assert.Equal (t1, Application.Top);
+			Assert.Null (Application.Top);
+#if DEBUG_IDISPOSABLE
+			Assert.True (t1.WasDisposed);
+#endif
 		}
 
 		[Fact]
