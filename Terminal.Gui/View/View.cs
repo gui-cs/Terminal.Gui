@@ -515,6 +515,7 @@ namespace Terminal.Gui {
 			}
 
 			base.Dispose (disposing);
+			System.Diagnostics.Debug.Assert (InternalSubviews.Count == 0);
 		}
 	}
 }
