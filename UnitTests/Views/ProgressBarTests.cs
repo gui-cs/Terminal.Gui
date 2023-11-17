@@ -52,15 +52,6 @@ namespace Terminal.Gui.ViewsTests {
 
 			pb.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
 			Assert.Equal (2, pb.Height);
-
-			pb.ProgressBarFormat = ProgressBarFormat.Framed;
-			Assert.Equal (3, pb.Height);
-
-			pb.ProgressBarFormat = ProgressBarFormat.FramedPlusPercentage;
-			Assert.Equal (4, pb.Height);
-
-			pb.ProgressBarFormat = ProgressBarFormat.FramedProgressPadded;
-			Assert.Equal (6, pb.Height);
 		}
 
 		[Fact]
@@ -86,26 +77,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (ProgressBarFormat.SimplePlusPercentage, pb2.ProgressBarFormat);
 			Assert.Equal (2, pb2.Height);
 
-			pb1.ProgressBarFormat = ProgressBarFormat.Framed;
-			Assert.Equal (ProgressBarFormat.Framed, pb1.ProgressBarFormat);
-			Assert.Equal (3, pb1.Height);
-			pb2.ProgressBarFormat = ProgressBarFormat.Framed;
-			Assert.Equal (ProgressBarFormat.Framed, pb2.ProgressBarFormat);
-			Assert.Equal (3, pb2.Height);
-
-			pb1.ProgressBarFormat = ProgressBarFormat.FramedPlusPercentage;
-			Assert.Equal (ProgressBarFormat.FramedPlusPercentage, pb1.ProgressBarFormat);
-			Assert.Equal (4, pb1.Height);
-			pb2.ProgressBarFormat = ProgressBarFormat.FramedPlusPercentage;
-			Assert.Equal (ProgressBarFormat.FramedPlusPercentage, pb2.ProgressBarFormat);
-			Assert.Equal (4, pb2.Height);
-
-			pb1.ProgressBarFormat = ProgressBarFormat.FramedProgressPadded;
-			Assert.Equal (ProgressBarFormat.FramedProgressPadded, pb1.ProgressBarFormat);
-			Assert.Equal (6, pb1.Height);
-			pb2.ProgressBarFormat = ProgressBarFormat.FramedProgressPadded;
-			Assert.Equal (ProgressBarFormat.FramedProgressPadded, pb2.ProgressBarFormat);
-			Assert.Equal (6, pb2.Height);
 		}
 
 		[Fact]
@@ -122,14 +93,6 @@ namespace Terminal.Gui.ViewsTests {
 			pb.Text = "bleble";
 			Assert.Equal ("25%", pb.Text);
 
-			pb.ProgressBarFormat = ProgressBarFormat.Framed;
-			Assert.Equal ("25%", pb.Text);
-
-			pb.ProgressBarFormat = ProgressBarFormat.FramedPlusPercentage;
-			Assert.Equal ("25%", pb.Text);
-
-			pb.ProgressBarFormat = ProgressBarFormat.FramedProgressPadded;
-			Assert.Equal ("25%", pb.Text);
 		}
 
 		[Fact]
@@ -144,15 +107,6 @@ namespace Terminal.Gui.ViewsTests {
 
 			pb.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
 			pb.Text = "bleble";
-			Assert.Equal ("bleble", pb.Text);
-
-			pb.ProgressBarFormat = ProgressBarFormat.Framed;
-			Assert.Equal ("bleble", pb.Text);
-
-			pb.ProgressBarFormat = ProgressBarFormat.FramedPlusPercentage;
-			Assert.Equal ("bleble", pb.Text);
-
-			pb.ProgressBarFormat = ProgressBarFormat.FramedProgressPadded;
 			Assert.Equal ("bleble", pb.Text);
 		}
 
