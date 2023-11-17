@@ -8,12 +8,14 @@ namespace Terminal.Gui.ViewsTests {
 		public void Default_Constructor ()
 		{
 			var pb = new ProgressBar ();
+			pb.BeginInit();
+			pb.EndInit();
 
 			Assert.False (pb.CanFocus);
 			Assert.Equal (0, pb.Fraction);
 			Assert.Equal (new Attribute (Color.BrightGreen, Color.Gray),
-				new Attribute (pb.ColorScheme.Normal.Foreground, pb.ColorScheme.Normal.Background));
-			Assert.Equal (Colors.Base.Normal, pb.ColorScheme.HotNormal);
+				new Attribute (pb.ColorScheme.HotNormal.Foreground, pb.ColorScheme.HotNormal.Background));
+			Assert.Equal (Colors.Base.Normal, pb.ColorScheme.Normal);
 			Assert.Equal (1, pb.Height);
 			Assert.Equal (ProgressBarStyle.Blocks, pb.ProgressBarStyle);
 			Assert.Equal (ProgressBarFormat.Simple, pb.ProgressBarFormat);
@@ -51,7 +53,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (1, pb.Height);
 
 			pb.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
-			Assert.Equal (2, pb.Height);
+			Assert.Equal (1, pb.Height);
 		}
 
 		[Fact]
@@ -72,10 +74,10 @@ namespace Terminal.Gui.ViewsTests {
 
 			pb1.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
 			Assert.Equal (ProgressBarFormat.SimplePlusPercentage, pb1.ProgressBarFormat);
-			Assert.Equal (2, pb1.Height);
+			Assert.Equal (1, pb1.Height);
 			pb2.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
 			Assert.Equal (ProgressBarFormat.SimplePlusPercentage, pb2.ProgressBarFormat);
-			Assert.Equal (2, pb2.Height);
+			Assert.Equal (1, pb2.Height);
 
 		}
 
