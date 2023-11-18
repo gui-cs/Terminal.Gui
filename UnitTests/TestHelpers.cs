@@ -409,7 +409,7 @@ partial class TestHelpers {
 			output?.WriteLine ("But Was:" + Environment.NewLine + actualLook);
 		}
 
-		Assert.Equal (expectedLook, actualLook);
+		Assert.Equal (expectedLook.Replace (Environment.NewLine, "\n"), actualLook.Replace (Environment.NewLine, "\n"));
 	}
 #pragma warning restore xUnit1013 // Public method should be marked as test
 
