@@ -247,23 +247,55 @@ namespace Terminal.Gui.DrawingTests {
 			TestHelpers.AssertEqual (output, expected, $"{lc}");
 		}
 
-		[InlineData (Orientation.Horizontal, "╥")]
-		[InlineData (Orientation.Vertical, "╞")]
+		[InlineData (Orientation.Horizontal, "╥", false)]
+		[InlineData (Orientation.Vertical, "╞", false)]
+		[InlineData (Orientation.Horizontal, "╥", true)]
+		[InlineData (Orientation.Vertical, "╞", true)]
 		[Theory, SetupFakeDriver]
-		public void Length_Zero_NextTo_Opposite_Is_T (Orientation orientation, string expected)
+		public void Length_Zero_NextTo_Opposite_Is_T (Orientation orientation, string expected, bool zeroLengthFirst)
 		{
 			var lc = new LineCanvas ();
 
+			if (zeroLengthFirst) {
+				// Add a line at 0, 0 that's has length of 0
+				lc.AddLine (new Point (0, 0), 0, orientation, LineStyle.Single);
+			}
 			// Add line with length of 1 in opposite orientation starting at same location
 			if (orientation == Orientation.Horizontal) {
 				lc.AddLine (new Point (0, 0), 1, Orientation.Vertical, LineStyle.Double);
 			} else {
 				lc.AddLine (new Point (0, 0), 1, Orientation.Horizontal, LineStyle.Double);
-
 			}
+			if (!zeroLengthFirst) {
+				// Add a line at 0, 0 that's has length of 0
+				lc.AddLine (new Point (0, 0), 0, orientation, LineStyle.Single);
+			}
+			TestHelpers.AssertEqual (output, expected, $"{lc}");
+		}
 
-			// Add a line at 0, 0 that's has length of 0
-			lc.AddLine (new Point (0, 0), 0, orientation, LineStyle.Single);
+		[InlineData (Orientation.Horizontal, "╨", false)]
+		[InlineData (Orientation.Vertical, "╡", false)]
+		[InlineData (Orientation.Horizontal, "╨", true)]
+		[InlineData (Orientation.Vertical, "╡", true)]
+		[Theory, SetupFakeDriver]
+		public void Length_Zero_NextTo_Negative_Opposite_Is_Opposite_T (Orientation orientation, string expected, bool zeroLengthFirst)
+		{
+			var lc = new LineCanvas ();
+
+			if (zeroLengthFirst) {
+				// Add a line at 0, 0 that's has length of 0
+				lc.AddLine (new Point (0, 0), 0, orientation, LineStyle.Single);
+			}
+			// Add line with length of 1 in opposite orientation starting at same location
+			if (orientation == Orientation.Horizontal) {
+				lc.AddLine (new Point (0, 0), -1, Orientation.Vertical, LineStyle.Double);
+			} else {
+				lc.AddLine (new Point (0, 0), -1, Orientation.Horizontal, LineStyle.Double);
+			}
+			if (!zeroLengthFirst) {
+				// Add a line at 0, 0 that's has length of 0
+				lc.AddLine (new Point (0, 0), 0, orientation, LineStyle.Single);
+			}
 			TestHelpers.AssertEqual (output, expected, $"{lc}");
 		}
 
@@ -819,8 +851,8 @@ namespace Terminal.Gui.DrawingTests {
 ┌────┬──┐
 │    │  │
 ├────┼──┤
-└────┴──┘".Trim ();
-			Assert.Equal (looksLike, canvas.ToString ().Replace (Environment.NewLine, "\n"));
+└────┴──┘";
+			TestHelpers.AssertEqual (output, looksLike, $"{Environment.NewLine}{canvas}");
 		}
 
 		[InlineData (0, 0, 0, Orientation.Horizontal, LineStyle.Double, "═")]
@@ -1018,8 +1050,145 @@ namespace Terminal.Gui.DrawingTests {
 ││  └───┐│
 ││      ││
 │└──────┘│
-└────────┘".Replace (Environment.NewLine, "\n");
+└────────┘";
 			TestHelpers.AssertEqual (output, looksLike, $"{Environment.NewLine}{canvas}");
+		}
+
+		[Fact, SetupFakeDriver]
+		public void TabWindow_With_Border ()
+		{
+			var canvas = new LineCanvas ();
+
+			// Outer frame
+			canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (9, 0), 6, Orientation.Vertical, LineStyle.Single);
+			canvas.AddLine (new Point (9, 5), -10, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (0, 5), -6, Orientation.Vertical, LineStyle.Single);
+
+			// Tab frame
+			canvas.AddLine (new Point (1, 2), -2, Orientation.Vertical, LineStyle.Single);
+			canvas.AddLine (new Point (1, 1), 4, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (4, 1), 2, Orientation.Vertical, LineStyle.Single);
+
+			// Inner frame
+			canvas.AddLine (new Point (1, 2), 8, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (8, 2), 3, Orientation.Vertical, LineStyle.Single);
+			canvas.AddLine (new Point (8, 4), -8, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (1, 4), -3, Orientation.Vertical, LineStyle.Single);
+
+			string looksLike = @"
+┌────────┐
+│┌──┐    │
+│├──┴───┐│
+││      ││
+│└──────┘│
+└────────┘";
+			TestHelpers.AssertEqual (output, looksLike, $"{Environment.NewLine}{canvas}");
+		}
+
+		[Fact, SetupFakeDriver]
+		public void Test_Incomplete_Frame_Start_Left ()
+		{
+			var canvas = new LineCanvas ();
+
+			canvas.AddLine (new Point (0, 0), 1, Orientation.Vertical, LineStyle.Single);
+			canvas.AddLine (new Point (0, 0), 1, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (1, 0), 9, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (9, 0), 5, Orientation.Vertical, LineStyle.Single);
+			canvas.AddLine (new Point (9, 4), -10, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (0, 4), -2, Orientation.Vertical, LineStyle.Single);
+
+			string looksLike = @"
+┌────────┐
+         │
+         │
+│        │
+└────────┘";
+			TestHelpers.AssertEqual (output, looksLike, $"{Environment.NewLine}{canvas}");
+		}
+
+		[Fact, SetupFakeDriver]
+		public void Test_Incomplete_Frame_Start_Top ()
+		{
+			var canvas = new LineCanvas ();
+
+			canvas.AddLine (new Point (0, 0), 1, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (5, 0), 5, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (9, 0), 5, Orientation.Vertical, LineStyle.Single);
+			canvas.AddLine (new Point (9, 4), -10, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (0, 4), -5, Orientation.Vertical, LineStyle.Single);
+
+			string looksLike = @"
+┌    ────┐
+│        │
+│        │
+│        │
+└────────┘";
+			TestHelpers.AssertEqual (output, looksLike, $"{Environment.NewLine}{canvas}");
+		}
+
+		[Fact, SetupFakeDriver]
+		public void Test_Incomplete_Frame_Start_Right ()
+		{
+			var canvas = new LineCanvas ();
+
+			canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (9, 0), 1, Orientation.Vertical, LineStyle.Single);
+			canvas.AddLine (new Point (9, 3), 2, Orientation.Vertical, LineStyle.Single);
+			canvas.AddLine (new Point (9, 4), -10, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (0, 4), -5, Orientation.Vertical, LineStyle.Single);
+
+			string looksLike = @"
+┌────────┐
+│         
+│         
+│        │
+└────────┘";
+			TestHelpers.AssertEqual (output, looksLike, $"{Environment.NewLine}{canvas}");
+		}
+
+		[Fact, SetupFakeDriver]
+		public void Test_Incomplete_Frame_Start_Bottom ()
+		{
+			var canvas = new LineCanvas ();
+
+			canvas.AddLine (new Point (9, 4), -1, Orientation.Vertical, LineStyle.Single);
+			canvas.AddLine (new Point (9, 4), -1, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (4, 4), -5, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (0, 4), -5, Orientation.Vertical, LineStyle.Single);
+			canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Single);
+			canvas.AddLine (new Point (9, 0), 5, Orientation.Vertical, LineStyle.Single);
+
+			string looksLike = @"
+┌────────┐
+│        │
+│        │
+│        │
+└────    ┘";
+			TestHelpers.AssertEqual (output, looksLike, $"{Environment.NewLine}{canvas}");
+		}
+
+		[Theory]
+		[InlineData (0, 0, 1, Orientation.Vertical, 0, 0, 1, "┌")]
+		[InlineData (0, 0, 1, Orientation.Vertical, 0, 0, -1, "┐")]
+		[InlineData (0, 0, -1, Orientation.Vertical, 0, 0, 1, "└")]
+		[InlineData (0, 0, -1, Orientation.Vertical, 0, 0, -1, "┘")]
+		[InlineData (0, 0, 1, Orientation.Horizontal, 0, 0, 1, "┌")]
+		[InlineData (0, 0, -1, Orientation.Horizontal, 0, 0, 1, "┐")]
+		[InlineData (0, 0, 1, Orientation.Horizontal, 0, 0, -1, "└")]
+		[InlineData (0, 0, -1, Orientation.Horizontal, 0, 0, -1, "┘")]
+		public void Corner_Tests (int x, int y, int length, Orientation orientation, int x1, int y1, int length1, string looksLike)
+		{
+			var canvas = new LineCanvas ();
+			if (orientation == Orientation.Vertical) {
+				canvas.AddLine (new Point (x, y), length, Orientation.Vertical, LineStyle.Single);
+				canvas.AddLine (new Point (x1, y1), length1, Orientation.Horizontal, LineStyle.Single);
+			} else {
+				canvas.AddLine (new Point (x, y), length, Orientation.Horizontal, LineStyle.Single);
+				canvas.AddLine (new Point (x1, y1), length1, Orientation.Vertical, LineStyle.Single);
+			}
+
+			TestHelpers.AssertEqual (output, looksLike, $"{canvas}");
 		}
 	}
 }
