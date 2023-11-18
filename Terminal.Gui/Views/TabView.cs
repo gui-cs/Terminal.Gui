@@ -189,7 +189,7 @@ namespace Terminal.Gui {
 				int startAtY = Math.Max (0, GetTabHeight (true) - 1);
 
 				DrawFrame (new Rect (0, startAtY, Bounds.Width,
-					Math.Max (Bounds.Height - spaceAtBottom - startAtY, 0)), LineStyle.Single);
+					Math.Max (Bounds.Height - spaceAtBottom - startAtY, 0)), LineStyle.Single, null, false);
 			}
 
 			if (Tabs.Any ()) {
