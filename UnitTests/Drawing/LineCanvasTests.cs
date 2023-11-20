@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Xunit;
 using Xunit.Abstractions;
@@ -762,6 +763,68 @@ namespace Terminal.Gui.DrawingTests {
 ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 		}
+
+		[Fact,AutoInitShutdown]
+		public void TestExcludeParallel_LeftOnly()
+		{
+			var lc = new LineCanvas();
+			
+			// x=1 to x=11
+			var l1 = new StraightLine(new Point(1,2),10,Orientation.Horizontal,LineStyle.Single);
+			var after = new StraightLine[]{l1}
+						.Exclude(new Point(3,2),100,Orientation.Horizontal)
+						.ToArray();
+			// x=1 to x=2
+			var afterLine = Assert.Single(after);
+			Assert.Equal(l1.Start,afterLine.Start);
+			Assert.Equal(2,afterLine.Length);
+		}
+
+
+		[Fact,AutoInitShutdown]
+		public void TestExcludeParallel_RightOnly()
+		{
+			var lc = new LineCanvas();
+			
+			// x=1 to x=11
+			var l1 = new StraightLine(new Point(1,2),10,Orientation.Horizontal,LineStyle.Single);
+			var after = new StraightLine[]{l1}
+						.Exclude(new Point(0,2),3,Orientation.Horizontal)
+						.ToArray();
+			// x=3 to x=11
+			var afterLine = Assert.Single(after);
+			Assert.Equal(3,afterLine.Start.X);
+			Assert.Equal(2,afterLine.Start.Y);
+			Assert.Equal(8,afterLine.Length);
+		}
+
+
+		[Fact,AutoInitShutdown]
+		public void TestExcludeParallel_HorizontalSplit()
+		{
+			var lc = new LineCanvas();
+			
+			// x=1 to x=11
+			var l1 = new StraightLine(new Point(1,2),10,Orientation.Horizontal,LineStyle.Single);
+			var after = new StraightLine[]{l1}
+						.Exclude(new Point(4,2),2,Orientation.Horizontal)
+						.ToArray();
+			// x=1 to x=3,
+			// x=6 to x=11
+			Assert.Equal(2,after.Length);
+			var afterLeft = after[0];
+			var afterRight = after[1];
+
+			Assert.Equal(1,afterLeft.Start.X);
+			Assert.Equal(2,afterLeft.Start.Y);
+			Assert.Equal(3,afterLeft.Length);
+
+			Assert.Equal(6,afterRight.Start.X);
+			Assert.Equal(2,afterRight.Start.Y);
+			Assert.Equal(6,afterRight.Length);
+		}
+
+
 
 		[Fact, AutoInitShutdown]
 		public void TestLineCanvas_LeaveMargin_Top1_Left1 ()

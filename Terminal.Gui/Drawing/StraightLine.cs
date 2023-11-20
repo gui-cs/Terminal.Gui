@@ -277,7 +277,7 @@ namespace Terminal.Gui {
 							if (lDiffMax > eDiffMax) {
 								// Create line up to exclusion point
 								int from = eDiffMax+1;
-								int len = lDiffMax - lDiffMax;
+								int len = lDiffMax - eDiffMax;
 
 								if(len>0) {
 									toReturn.Add (CreateLineFromDiff (l, from, len));
