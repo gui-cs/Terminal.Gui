@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -212,6 +213,20 @@ namespace Terminal.Gui {
 
 			return new Rect (x, y, w, h);
 		}
+
+		public IEnumerable<StraightLine> GetFrame (Rect rect, LineStyle lineStyle, Attribute? attribute = null)
+		{
+			var vts = ViewToScreen (rect);			
+			yield return new StraightLine(new Point (vts.X, vts.Y), vts.Width,
+				Orientation.Horizontal, lineStyle, attribute);
+			yield return new StraightLine (new Point (vts.Right - 1, vts.Y), vts.Height,
+				Orientation.Vertical, lineStyle, attribute);
+			yield return new StraightLine (new Point (vts.Right - 1, vts.Bottom - 1), -vts.Width,
+				Orientation.Horizontal, lineStyle, attribute);
+			yield return new StraightLine (new Point (vts.X, vts.Bottom - 1), -vts.Height,
+				Orientation.Vertical, lineStyle, attribute);
+		}
+		
 
 		/// <summary>
 		/// Expands the <see cref="ConsoleDriver"/>'s clip region to include <see cref="Bounds"/>.
