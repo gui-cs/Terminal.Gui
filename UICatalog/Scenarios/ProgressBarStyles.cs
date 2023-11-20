@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using Terminal.Gui;
+using static UICatalog.Scenarios.Frames;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "ProgressBar Styles", Description: "Shows the ProgressBar Styles.")]
@@ -9,64 +10,66 @@ namespace UICatalog.Scenarios {
 	[ScenarioCategory ("Progress")]
 	[ScenarioCategory ("Threading")]
 
+	// TODO: Add enable/disable to show that that is working
+	// TODO: Clean up how FramesEditor works 
+	// TODO: Better align rpPBFormat
+
 	public class ProgressBarStyles : Scenario {
 		private Timer _fractionTimer;
 		private Timer _pulseTimer;
-		private const uint _timerTick = 100;
+		private const uint _timerTick = 20;
 
-		public override void Setup ()
+		public override void Init ()
 		{
+			Application.Init ();
+			ConfigurationManager.Themes.Theme = Theme;
+			ConfigurationManager.Apply ();
+
+			var editor = new FramesEditor () {
+				Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+				BorderStyle = LineStyle.Single
+			};
+			editor.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
+
 			const float fractionStep = 0.01F;
-			const int pbWidth = 20;
+			const int pbWidth = 25;
 
 			var pbFormatEnum = Enum.GetValues (typeof (ProgressBarFormat)).Cast<ProgressBarFormat> ().ToList ();
 
 			var rbPBFormat = new RadioGroup (pbFormatEnum.Select (e => e.ToString ()).ToArray ()) {
 				X = Pos.Center (),
-				Y = 1
+				Y = 10
 			};
-			Win.Add (rbPBFormat);
-
-			var ckbBidirectional = new CheckBox ("BidirectionalMarquee", true) {
-				X = Pos.Center (),
-				Y = Pos.Bottom (rbPBFormat) + 1
-			};
-			Win.Add (ckbBidirectional);
-
-			var label = new Label ("Blocks") {
-				X = Pos.Center (),
-				Y = Pos.Bottom (ckbBidirectional) + 1
-			};
-			Win.Add (label);
-
-			var blocksPB = new ProgressBar () {
-				X = Pos.Center (),
-				Y = Pos.Y (label) + 1,
-				Width = pbWidth
-			};
-			Win.Add (blocksPB);
-
-			label = new Label ("Continuous") {
-				X = Pos.Center (),
-				Y = Pos.Bottom (blocksPB) + 1
-			};
-			Win.Add (label);
-
-			var continuousPB = new ProgressBar () {
-				X = Pos.Center (),
-				Y = Pos.Y (label) + 1,
-				Width = pbWidth,
-				ProgressBarStyle = ProgressBarStyle.Continuous
-			};
-			Win.Add (continuousPB);
+			editor.Add (rbPBFormat);
 
 			var button = new Button ("Start timer") {
 				X = Pos.Center (),
-				Y = Pos.Bottom (continuousPB) + 1
+				Y = Pos.Bottom (rbPBFormat) + 1
 			};
-			button.Clicked += (s,e) => {
+
+			editor.Add (button);
+			var blocksPB = new ProgressBar () {
+				Title = "Blocks",
+				X = Pos.Center (),
+				Y = Pos.Bottom (button) + 1,
+				Width = pbWidth,
+				BorderStyle = LineStyle.Single
+			};
+			editor.Add (blocksPB);
+
+			var continuousPB = new ProgressBar () {
+				Title = "Continuous",
+				X = Pos.Center (),
+				Y = Pos.Bottom (blocksPB) + 1,
+				Width = pbWidth,
+				ProgressBarStyle = ProgressBarStyle.Continuous,
+				BorderStyle = LineStyle.Single
+			};
+			editor.Add (continuousPB);
+
+			button.Clicked += (s, e) => {
 				if (_fractionTimer == null) {
-					button.Enabled = false;
+					//blocksPB.Enabled = false;
 					blocksPB.Fraction = 0;
 					continuousPB.Fraction = 0;
 					float fractionSum = 0;
@@ -83,44 +86,41 @@ namespace UICatalog.Scenarios {
 					}, null, 0, _timerTick);
 				}
 			};
-			Win.Add (button);
 
-			label = new Label ("Marquee Blocks") {
+			var ckbBidirectional = new CheckBox ("BidirectionalMarquee", true) {
 				X = Pos.Center (),
-				Y = Pos.Y (button) + 3
+				Y = Pos.Bottom (continuousPB) + 1
 			};
-			Win.Add (label);
+			editor.Add (ckbBidirectional);
 
 			var marqueesBlocksPB = new ProgressBar () {
+				Title = "Marquee Blocks",
 				X = Pos.Center (),
-				Y = Pos.Y (label) + 1,
+				Y = Pos.Bottom (ckbBidirectional) + 1,
 				Width = pbWidth,
-				ProgressBarStyle = ProgressBarStyle.MarqueeBlocks
+				ProgressBarStyle = ProgressBarStyle.MarqueeBlocks,
+				BorderStyle = LineStyle.Single
 			};
-			Win.Add (marqueesBlocksPB);
-
-			label = new Label ("Marquee Continuous") {
-				X = Pos.Center (),
-				Y = Pos.Bottom (marqueesBlocksPB) + 1
-			};
-			Win.Add (label);
+			editor.Add (marqueesBlocksPB);
 
 			var marqueesContinuousPB = new ProgressBar () {
+				Title = "Marquee Continuous",
 				X = Pos.Center (),
-				Y = Pos.Y (label) + 1,
+				Y = Pos.Bottom (marqueesBlocksPB) + 1,
 				Width = pbWidth,
-				ProgressBarStyle = ProgressBarStyle.MarqueeContinuous
+				ProgressBarStyle = ProgressBarStyle.MarqueeContinuous,
+				BorderStyle = LineStyle.Single
 			};
-			Win.Add (marqueesContinuousPB);
+			editor.Add (marqueesContinuousPB);
 
-			rbPBFormat.SelectedItemChanged += (s,e) => {
+			rbPBFormat.SelectedItemChanged += (s, e) => {
 				blocksPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
 				continuousPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
 				marqueesBlocksPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
 				marqueesContinuousPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
 			};
 
-			ckbBidirectional.Toggled += (s,e) => {
+			ckbBidirectional.Toggled += (s, e) => {
 				ckbBidirectional.Checked = marqueesBlocksPB.BidirectionalMarquee = marqueesContinuousPB.BidirectionalMarquee = (bool)!e.OldValue;
 			};
 
@@ -145,6 +145,28 @@ namespace UICatalog.Scenarios {
 				}
 				Application.Top.Unloaded -= Top_Unloaded;
 			}
+
+			var pbs = editor.Subviews.Where (v => v.GetType () == typeof (ProgressBar)).Select(v => v.Title).ToList ();
+			var pbList = new ListView (pbs) {
+				Title = "Focused ProgressBar",
+				Y = 0,
+				X = Pos.Center(),
+				Width = 30,
+				Height = 7,
+				BorderStyle = LineStyle.Single
+			};
+			pbList.SelectedItemChanged += (sender, e) => {
+				editor.ViewToEdit = (View)editor.Subviews.First(v => v.GetType () == typeof (ProgressBar) && v.Title == (string)e.Value);
+			};
+			editor.Add (pbList);
+			pbList.SelectedItem = 0;
+
+			Application.Run (editor);
+			Application.Shutdown ();
+		}
+
+		public override void Run ()
+		{
 		}
 	}
 }
