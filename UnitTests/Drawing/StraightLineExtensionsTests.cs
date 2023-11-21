@@ -6,7 +6,7 @@ namespace Terminal.Gui.DrawingTests {
 	{
 		#region Parallel Tests
 		[Fact, AutoInitShutdown]
-		public void TestExcludeParallel_LeftOnly ()
+		public void TestExcludeParallel_HorizontalLines_LeftOnly ()
 		{
 			// x=1 to x=10
 			var l1 = new StraightLine (new Point (1, 2), 10, Orientation.Horizontal, LineStyle.Single);
@@ -22,7 +22,7 @@ namespace Terminal.Gui.DrawingTests {
 
 
 		[Fact, AutoInitShutdown]
-		public void TestExcludeParallel_RightOnly ()
+		public void TestExcludeParallel_HorizontalLines_RightOnly ()
 		{
 			// x=1 to x=10
 			var l1 = new StraightLine (new Point (1, 2), 10, Orientation.Horizontal, LineStyle.Single);
@@ -39,7 +39,7 @@ namespace Terminal.Gui.DrawingTests {
 
 
 		[Fact, AutoInitShutdown]
-		public void TestExcludeParallel_HorizontalSplit ()
+		public void TestExcludeParallel_HorizontalLines_HorizontalSplit ()
 		{
 			// x=1 to x=10
 			var l1 = new StraightLine (new Point (1, 2), 10, Orientation.Horizontal, LineStyle.Single);
@@ -64,7 +64,7 @@ namespace Terminal.Gui.DrawingTests {
 
 
 		[Fact, AutoInitShutdown]
-		public void TestExcludeParallel_CoverCompletely ()
+		public void TestExcludeParallel_HorizontalLines_CoverCompletely ()
 		{
 			// x=1 to x=10
 			var l1 = new StraightLine (new Point (1, 2), 10, Orientation.Horizontal, LineStyle.Single);
@@ -74,6 +74,9 @@ namespace Terminal.Gui.DrawingTests {
 						.ToArray ();
 			Assert.Empty (after);
 		}
+
+		// TODO: Replicate above tests for Vertical lines
+
 		#endregion
 
 		#region Perpendicular Intersection Tests
@@ -160,6 +163,10 @@ namespace Terminal.Gui.DrawingTests {
 			// Exclusion line is too far to the right so hits nothing
 			Assert.Same (Assert.Single (after), l1);
 		}
+
+
+		// TODO: Replicate above tests for Vertical lines (Horizontal exclusion)
+
 		#endregion Perpendicular Intersection Tests
 	}
 }
