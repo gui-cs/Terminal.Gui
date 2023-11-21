@@ -635,13 +635,13 @@ namespace Terminal.Gui {
 					}
 					break;
 				case Side.Top:
-					lc.AddLine (new Point (vts.X, vts.Y), pEnd - 1,
+					lc.AddLine (new Point (vts.X, vts.Y), pEnd - vts.X + 1,
 						Orientation.Horizontal, lineStyle, attribute);
 					break;
 				case Side.Right:
 					lc.AddLine (new Point (vts.X, vts.Y), vts.Width,
 						Orientation.Horizontal, lineStyle, attribute);
-					lc.AddLine (new Point (vts.Right - 1, vts.Y), pEnd - 1,
+					lc.AddLine (new Point (vts.Right - 1, vts.Y), pEnd - vts.Y + 1,
 						Orientation.Vertical, lineStyle, attribute);
 					break;
 				case Side.Bottom:
@@ -759,7 +759,7 @@ namespace Terminal.Gui {
 							Orientation.Horizontal, lineStyle, attribute);
 						break;
 					} else {
-						lc.AddLine (new Point (pStart, vts.Bottom - 1), -(pStart - 1),
+						lc.AddLine (new Point (pStart, vts.Bottom - 1), -(pStart - vts.X + 1),
 							Orientation.Horizontal, lineStyle, attribute);
 					}
 				}
@@ -771,7 +771,7 @@ namespace Terminal.Gui {
 				case Side.Top:
 					lc.AddLine (new Point (vts.X, vts.Bottom - 1), -vts.Height,
 						Orientation.Vertical, lineStyle, attribute);
-					lc.AddLine (new Point (vts.X, vts.Y), pEnd - 1,
+					lc.AddLine (new Point (vts.X, vts.Y), pEnd - vts.X + 1,
 						Orientation.Horizontal, lineStyle, attribute);
 					break;
 				case Side.Right:
@@ -779,7 +779,7 @@ namespace Terminal.Gui {
 						Orientation.Vertical, lineStyle, attribute);
 					lc.AddLine (new Point (vts.X, vts.Y), vts.Width,
 						Orientation.Horizontal, lineStyle, attribute);
-					lc.AddLine (new Point (vts.Right - 1, vts.Y), pEnd - 1,
+					lc.AddLine (new Point (vts.Right - 1, vts.Y), pEnd - vts.Y + 1,
 						Orientation.Vertical, lineStyle, attribute);
 					break;
 				case Side.Bottom:
