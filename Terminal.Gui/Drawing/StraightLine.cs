@@ -221,13 +221,20 @@ namespace Terminal.Gui {
 					continue;
 				}
 
+				// lines are parallel.  For any straight line one axis (x or y) is constant
+				// e.g. Horizontal lines have constant y
+				int econstPoint = orientation == Orientation.Horizontal ? start.Y : start.X;
+				int lconstPoint = l.Orientation == Orientation.Horizontal ? l.Start.Y : l.Start.X;
+
+				// For the varying axis what is the max/mins
+				// i.e. points on horizontal lines vary by x, vertical lines vary by y
+				int eDiffMin = GetLineStartOnDiffAxis (start, length, orientation);
+				int eDiffMax = GetLineEndOnDiffAxis (start, length, orientation);
+				int lDiffMin = GetLineStartOnDiffAxis (l.Start, l.Length, l.Orientation);
+				int lDiffMax = GetLineEndOnDiffAxis (l.Start, l.Length, l.Orientation);
+
 				// line is parallel to exclusion
 				if (l.Orientation == orientation) {
-
-					// lines are parallel.  For any straight line one axis (x or y) is constant
-					// e.g. Horizontal lines have constant y
-					int econstPoint = orientation == Orientation.Horizontal ? start.Y : start.X;
-					int lconstPoint = orientation == Orientation.Horizontal ? l.Start.Y : l.Start.X;
 
 					// Do the parallel lines share constant plane
 					if (econstPoint != lconstPoint) {
@@ -236,12 +243,7 @@ namespace Terminal.Gui {
 						toReturn.Add (l);
 					} else {
 
-						// For the varying axis what is the max/mins
-						// i.e. points on horizontal lines vary by x, vertical lines vary by y
-						int eDiffMin = GetLineStartOnDiffAxis (start, length, orientation);
-						int eDiffMax = GetLineEndOnDiffAxis (start, length, orientation);
-						int lDiffMin = GetLineStartOnDiffAxis (l.Start, l.Length, l.Orientation);
-						int lDiffMax = GetLineEndOnDiffAxis (l.Start, l.Length, l.Orientation);
+						
 
 						if (lDiffMax < eDiffMin) {
 							// Line ends before exclusion starts
@@ -279,8 +281,35 @@ namespace Terminal.Gui {
 				} else {
 					// line is perpendicular to exclusion
 
-					// TODO: Cut out at most 1 cell
-					toReturn.Add (l);
+					// Does the constant plane of the exclusion appear within the differing plane of the line?
+					if(econstPoint >= lDiffMin && econstPoint <= lDiffMax) {
+						// Yes, e.g. Vertical exclusion's x is within xmin/xmax of the horizontal line
+
+						// Vice versa must also be true
+						// for example there is no intersection if the vertical exclusion line does not
+						// stretch down far enough to reach the line
+						if(lconstPoint >= eDiffMin && lconstPoint <= lDiffMax) {
+
+							// Perpendicular intersection occurs here
+							var intersection = l.Orientation == Orientation.Horizontal ?
+								new Point (econstPoint,lconstPoint) :
+								new Point (lconstPoint,econstPoint);
+
+							// To snip out this single point we will use a recursive call
+							// snipping 1 length along the orientation of l (i.e. parallel)
+							toReturn.AddRange (new [] { l }.Exclude (intersection, 1, l.Orientation));
+						}
+						else {
+							// No intersection
+							toReturn.Add (l);
+						}
+
+					}
+					else {
+						// Lines do not intersect
+						toReturn.Add (l);
+					}
+
 				}
 			}
 
