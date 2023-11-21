@@ -126,10 +126,16 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Points on a <see cref="StraightLine"/> differ only along one axis.
-		/// Horizontal lines have points with differing x while Vertical lines
-		/// have differing y.
+		/// <para>Calculates the single digit point where a line starts on the differing axis
+		/// i.e. the minimum (controlling for negative lengths).</para>
+		/// <para>
+		/// For lines with <see cref="Orientation.Horizontal"/> this is an x coordinate.
+		/// For lines that are <see cref="Orientation.Vertical"/> this is a y coordinate.
+		/// </para>
 		/// </summary>
+		/// <param name="start">Where the line starts</param>
+		/// <param name="length">Length of the line</param>
+		/// <param name="orientation">Orientation of the line</param>
 		/// <returns>The minimum x or y (whichever is differing) point on the line, controlling for negative lengths. </returns>
 		private static int GetLineStartOnDiffAxis (Point start, int length, Orientation orientation)
 		{
@@ -149,8 +155,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// <para>Calculates the single digit point where a line that starts at <paramref name="start"/> ends based on the
-		/// given <paramref name="length"/> and <paramref name="orientation"/>.</para>
+		/// <para>Calculates the single digit point where a line ends on the differing axis
+		/// i.e. the maximum (controlling for negative lengths).</para>
 		/// <para>
 		/// For lines with <see cref="Orientation.Horizontal"/> this is an x coordinate.
 		/// For lines that are <see cref="Orientation.Vertical"/> this is a y coordinate.
