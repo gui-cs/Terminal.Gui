@@ -97,7 +97,7 @@ namespace Terminal.Gui {
 						// Vice versa must also be true
 						// for example there is no intersection if the vertical exclusion line does not
 						// stretch down far enough to reach the line
-						if(lconstPoint >= eDiffMin && lconstPoint <= lDiffMax) {
+						if(lconstPoint >= eDiffMin && lconstPoint <= eDiffMax) {
 
 							// Perpendicular intersection occurs here
 							var intersection = l.Orientation == Orientation.Horizontal ?

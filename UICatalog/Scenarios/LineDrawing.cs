@@ -187,6 +187,10 @@ namespace UICatalog.Scenarios {
 					// Mouse released
 					if (_currentLine != null) {
 
+						if(_currentLine.Length == 0) {
+							_currentLine.Length = 1;
+						}
+
 						if(_currentLine.Style == LineStyle.None) {
 
 							// Treat none as eraser
