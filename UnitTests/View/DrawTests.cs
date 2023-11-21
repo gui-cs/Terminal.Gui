@@ -334,23 +334,6 @@ t     ", output);
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre ("", output);
 		}
-
-		[Fact, AutoInitShutdown]
-		public void DrawFrame_Test ()
-		{
-			var label = new View () { X = Pos.Center (), Y = Pos.Center (), Text = "test", AutoSize = true };
-			var view = new View () { Width = 10, Height = 5 };
-			view.DrawContentComplete += (s, e) => view.DrawFrame (view.Bounds, LineStyle.Single);
-			view.Add (label);
-			Application.Top.Add (view);
-			Application.Begin (Application.Top);
-
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
-┌────────┐
-│        │
-│  test  │
-│        │
-└────────┘", output);
-		}
 	}
 }
+

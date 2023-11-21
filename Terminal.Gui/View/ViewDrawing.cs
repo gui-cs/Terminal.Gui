@@ -503,25 +503,5 @@ namespace Terminal.Gui {
 			DrawContentComplete?.Invoke (this, new DrawEventArgs (contentArea));
 		}
 
-		/// <summary>
-		/// Draw a frame based on the passed bounds to the screen relative.
-		/// </summary>
-		/// <param name="bounds">The bounds view relative.</param>
-		/// <param name="lineStyle">The line style.</param>
-		/// <param name="attribute">The color to use.</param>
-		public void DrawFrame (Rect bounds, LineStyle lineStyle, Attribute? attribute = null)
-		{
-			var vts = ViewToScreen (bounds);
-			LineCanvas.AddLine (new Point (vts.X, vts.Y), vts.Width,
-				Orientation.Horizontal, lineStyle, attribute);
-			LineCanvas.AddLine (new Point (vts.Right - 1, vts.Y), vts.Height,
-				Orientation.Vertical, lineStyle, attribute);
-			LineCanvas.AddLine (new Point (vts.X, vts.Bottom - 1), vts.Width,
-				Orientation.Horizontal, lineStyle, attribute);
-			LineCanvas.AddLine (new Point (vts.X, vts.Y), vts.Height,
-				Orientation.Vertical, lineStyle, attribute);
-
-			OnRenderLineCanvas ();
-		}
 	}
 }
