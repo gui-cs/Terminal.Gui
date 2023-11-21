@@ -4,6 +4,7 @@ using Xunit;
 namespace Terminal.Gui.DrawingTests {
 	public class StraightLineExtensionsTests
 	{
+		#region Parallel Tests
 		[Fact, AutoInitShutdown]
 		public void TestExcludeParallel_LeftOnly ()
 		{
@@ -60,5 +61,105 @@ namespace Terminal.Gui.DrawingTests {
 			Assert.Equal (2, afterRight.Start.Y);
 			Assert.Equal (5, afterRight.Length);
 		}
+
+
+		[Fact, AutoInitShutdown]
+		public void TestExcludeParallel_CoverCompletely ()
+		{
+			// x=1 to x=10
+			var l1 = new StraightLine (new Point (1, 2), 10, Orientation.Horizontal, LineStyle.Single);
+			var after = new StraightLine [] { l1 }
+						// exclude x=4 to x=5
+						.Exclude (new Point (1, 2), 10, Orientation.Horizontal)
+						.ToArray ();
+			Assert.Empty (after);
+		}
+		#endregion
+
+		#region Perpendicular Intersection Tests
+		[Fact, AutoInitShutdown]
+		public void TestExcludePerpendicular_HorizontalLine_VerticalExclusion_Splits ()
+		{
+			// x=1 to x=10
+			var l1 = new StraightLine (new Point (1, 2), 10, Orientation.Horizontal, LineStyle.Single);
+			var after = new StraightLine [] { l1 }
+						// exclude x=3 y=0-10
+						.Exclude (new Point (3, 0), 10, Orientation.Vertical)
+						.ToArray ();
+			// x=1 to x=2,
+			// x=4 to x=10
+			Assert.Equal (2, after.Length);
+			var afterLeft = after [0];
+			var afterRight = after [1];
+
+			Assert.Equal (1, afterLeft.Start.X);
+			Assert.Equal (2, afterLeft.Start.Y);
+			Assert.Equal (2, afterLeft.Length);
+
+			Assert.Equal (4, afterRight.Start.X);
+			Assert.Equal (2, afterRight.Start.Y);
+			Assert.Equal (7, afterRight.Length);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestExcludePerpendicular_HorizontalLine_VerticalExclusion_ClipLeft ()
+		{
+			// x=1 to x=10
+			var l1 = new StraightLine (new Point (1, 2), 10, Orientation.Horizontal, LineStyle.Single);
+			var after = new StraightLine [] { l1 }
+						// exclude x=1 y=0-10
+						.Exclude (new Point (1, 0), 10, Orientation.Vertical)
+						.ToArray ();
+			// x=2 to x=10,
+			var lineAfter = Assert.Single(after);
+
+			Assert.Equal (2, lineAfter.Start.X);
+			Assert.Equal (2, lineAfter.Start.Y);
+			Assert.Equal (9, lineAfter.Length);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestExcludePerpendicular_HorizontalLine_VerticalExclusion_ClipRight ()
+		{
+			// x=1 to x=10
+			var l1 = new StraightLine (new Point (1, 2), 10, Orientation.Horizontal, LineStyle.Single);
+			var after = new StraightLine [] { l1 }
+						// exclude x=10 y=0-10
+						.Exclude (new Point (10, 0), 10, Orientation.Vertical)
+						.ToArray ();
+			// x=1 to x=9,
+			var lineAfter = Assert.Single (after);
+
+			Assert.Equal (1, lineAfter.Start.X);
+			Assert.Equal (2, lineAfter.Start.Y);
+			Assert.Equal (9, lineAfter.Length);
+		}
+
+
+		[Fact, AutoInitShutdown]
+		public void TestExcludePerpendicular_HorizontalLine_VerticalExclusion_MissLeft ()
+		{
+			// x=1 to x=10
+			var l1 = new StraightLine (new Point (1, 2), 10, Orientation.Horizontal, LineStyle.Single);
+			var after = new StraightLine [] { l1 }
+						// exclude x=0 y=0-10
+						.Exclude (new Point (0, 0), 10, Orientation.Vertical)
+						.ToArray ();
+			// Exclusion line is too far to the left so hits nothing
+			Assert.Same(Assert.Single (after),l1);
+		}
+		[Fact, AutoInitShutdown]
+		public void TestExcludePerpendicular_HorizontalLine_VerticalExclusion_MissRight ()
+		{
+			// x=1 to x=10
+			var l1 = new StraightLine (new Point (1, 2), 10, Orientation.Horizontal, LineStyle.Single);
+			var after = new StraightLine [] { l1 }
+						// exclude x=11 y=0-10
+						.Exclude (new Point (11, 0), 10, Orientation.Vertical)
+						.ToArray ();
+			// Exclusion line is too far to the right so hits nothing
+			Assert.Same (Assert.Single (after), l1);
+		}
+		#endregion Perpendicular Intersection Tests
 	}
 }
