@@ -375,11 +375,140 @@ t     ", output);
 └────────┘", output);
 		}
 
+		[Theory, AutoInitShutdown]
+		[InlineData (1, Side.Left, 5, Side.Left, @"
+┌────────┐
+│        │
+   test  │
+         │
+─────────┘")]
+		[InlineData (1, Side.Left, 4, Side.Left, @"
+┌────────┐
+│        │
+   test  │
+         │
+└────────┘")]
+		[InlineData (0, Side.Left, 3, Side.Left, @"
+┌────────┐
+         │
+   test  │
+│        │
+└────────┘")]
+		[InlineData (5, Side.Top, -1, Side.Top, @"
+│    ────┐
+│        │
+│  test  │
+│        │
+└────────┘")]
+		[InlineData (5, Side.Top, 0, Side.Top, @"
+┌    ────┐
+│        │
+│  test  │
+│        │
+└────────┘")]
+		[InlineData (6, Side.Top, 1, Side.Top, @"
+┌─    ───┐
+│        │
+│  test  │
+│        │
+└────────┘")]
+		[InlineData (7, Side.Top, 2, Side.Top, @"
+┌──    ──┐
+│        │
+│  test  │
+│        │
+└────────┘")]
+		[InlineData (8, Side.Top, 3, Side.Top, @"
+┌───    ─┐
+│        │
+│  test  │
+│        │
+└────────┘")]
+		[InlineData (9, Side.Top, 4, Side.Top, @"
+┌────    ┐
+│        │
+│  test  │
+│        │
+└────────┘")]
+		[InlineData (10, Side.Top, 5, Side.Top, @"
+┌─────   │
+│        │
+│  test  │
+│        │
+└────────┘")]
+		[InlineData (3, Side.Right, -1, Side.Right, @"
+┌─────────
+│         
+│  test   
+│        │
+└────────┘")]
+		[InlineData (3, Side.Right, 0, Side.Right, @"
+┌────────┐
+│         
+│  test   
+│        │
+└────────┘")]
+		[InlineData (4, Side.Right, 1, Side.Right, @"
+┌────────┐
+│        │
+│  test   
+│         
+└────────┘")]
+		[InlineData (4, Side.Bottom, 10, Side.Bottom, @"
+┌────────┐
+│        │
+│  test  │
+│        │
+└────    │")]
+		[InlineData (4, Side.Bottom, 9, Side.Bottom, @"
+┌────────┐
+│        │
+│  test  │
+│        │
+└────    ┘")]
+		[InlineData (3, Side.Bottom, 8, Side.Bottom, @"
+┌────────┐
+│        │
+│  test  │
+│        │
+└───    ─┘")]
+		[InlineData (2, Side.Bottom, 7, Side.Bottom, @"
+┌────────┐
+│        │
+│  test  │
+│        │
+└──    ──┘")]
+		[InlineData (1, Side.Bottom, 6, Side.Bottom, @"
+┌────────┐
+│        │
+│  test  │
+│        │
+└─    ───┘")]
+		[InlineData (0, Side.Bottom, 5, Side.Bottom, @"
+┌────────┐
+│        │
+│  test  │
+│        │
+└    ────┘")]
+		[InlineData (-1, Side.Bottom, 5, Side.Bottom, @"
+┌────────┐
+│        │
+│  test  │
+│        │
+│    ────┘")]
+		public void DrawIncompleteFrame_All_Sides (int start, Side startSide, int end, Side endSide, string expected)
+		{
+			View view = GetViewsForDrawFrameTests (start, startSide, end, endSide);
+			Application.Top.Add (view);
+			Application.Begin (Application.Top);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		}
+
 		private static View GetViewsForDrawFrameTests (int start, Side startSide, int end, Side endSide)
 		{
 			var label = new View () { X = Pos.Center (), Y = Pos.Center (), Text = "test", AutoSize = true };
-			// Using a non 0 location to avoids bugs on testing.
-			var view = new View () { X = 2, Y = 2, Width = 10, Height = 5 };
+			var view = new View () { Width = 10, Height = 5 };
 			view.DrawContent += (s, e) =>
 				view.DrawIncompleteFrame (new (start, startSide), new (end, endSide), view.Bounds, LineStyle.Single);
 			view.Add (label);
@@ -387,218 +516,30 @@ t     ", output);
 		}
 
 		[Theory, AutoInitShutdown]
-		[InlineData (3, Side.Left, 0, Side.Bottom, @"
-  ┌────────┐
-  │        │
-  │  test  │
-  │        │
-  ─────────┘")]
-		[InlineData (1, Side.Top, 0, Side.Left, @"
-  │────────┐
-  │        │
-  │  test  │
-  │        │
-  └────────┘")]
-		[InlineData (1, Side.Right, 9, Side.Top, @"
-  ┌─────────
-  │        │
-  │  test  │
-  │        │
-  └────────┘")]
-		[InlineData (8, Side.Bottom, 4, Side.Right, @"
-  ┌────────┐
-  │        │
-  │  test  │
-  │        │
-  └────────│")]
-		[InlineData (0, Side.Right, 8, Side.Top, @"
-  ┌────────│
-  │        │
-  │  test  │
-  │        │
-  └────────┘")]
-		[InlineData (4, Side.Left, 1, Side.Bottom, @"
-  ┌────────┐
-  │        │
-  │  test  │
-  │        │
-  │────────┘")]
-		[InlineData (0, Side.Top, 1, Side.Left, @"
-  ─────────┐
-  │        │
-  │  test  │
-  │        │
-  └────────┘")]
-		[InlineData (9, Side.Bottom, 3, Side.Right, @"
-  ┌────────┐
-  │        │
-  │  test  │
-  │        │
-  └─────────")]
-		public void DrawIncompleteFrame_All_Sides_Width_One (int start, Side startSide, int end, Side endSide, string expected)
-		{
-			View view = GetViewsForDrawFrameTests (start, startSide, end, endSide);
-			Application.Top.Add (view);
-			Application.Begin (Application.Top);
-
-			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-		}
-
-		[Theory, AutoInitShutdown]
-		[InlineData (1, Side.Left, 5, Side.Left, @"
-  ┌────────┐
-  │        │
-     test  │
-           │
-  ─────────┘")]
-		[InlineData (1, Side.Left, 4, Side.Left, @"
-  ┌────────┐
-  │        │
-     test  │
-           │
-  └────────┘")]
-		[InlineData (0, Side.Left, 3, Side.Left, @"
-  ┌────────┐
-           │
-     test  │
-  │        │
-  └────────┘")]
-		[InlineData (5, Side.Top, -1, Side.Top, @"
-  │    ────┐
-  │        │
-  │  test  │
-  │        │
-  └────────┘")]
-		[InlineData (5, Side.Top, 0, Side.Top, @"
-  ┌    ────┐
-  │        │
-  │  test  │
-  │        │
-  └────────┘")]
-		[InlineData (6, Side.Top, 1, Side.Top, @"
-  ┌─    ───┐
-  │        │
-  │  test  │
-  │        │
-  └────────┘")]
-		[InlineData (7, Side.Top, 2, Side.Top, @"
-  ┌──    ──┐
-  │        │
-  │  test  │
-  │        │
-  └────────┘")]
-		[InlineData (8, Side.Top, 3, Side.Top, @"
-  ┌───    ─┐
-  │        │
-  │  test  │
-  │        │
-  └────────┘")]
-		[InlineData (9, Side.Top, 4, Side.Top, @"
-  ┌────    ┐
-  │        │
-  │  test  │
-  │        │
-  └────────┘")]
-		[InlineData (0, Side.Right, 5, Side.Top, @"
-  ┌─────   │
-  │        │
-  │  test  │
-  │        │
-  └────────┘")]
-		[InlineData (3, Side.Right, -1, Side.Right, @"
-  ┌─────────
-  │         
-  │  test   
-  │        │
-  └────────┘")]
-		[InlineData (3, Side.Right, 0, Side.Right, @"
-  ┌────────┐
-  │         
-  │  test   
-  │        │
-  └────────┘")]
-		[InlineData (4, Side.Right, 1, Side.Right, @"
-  ┌────────┐
-  │        │
-  │  test   
-  │         
-  └────────┘")]
-		[InlineData (4, Side.Bottom, 10, Side.Bottom, @"
-  ┌────────┐
-  │        │
-  │  test  │
-  │        │
-  └────    │")]
-		[InlineData (4, Side.Bottom, 9, Side.Bottom, @"
-  ┌────────┐
-  │        │
-  │  test  │
-  │        │
-  └────    ┘")]
-		[InlineData (3, Side.Bottom, 8, Side.Bottom, @"
-  ┌────────┐
-  │        │
-  │  test  │
-  │        │
-  └───    ─┘")]
-		[InlineData (2, Side.Bottom, 7, Side.Bottom, @"
-  ┌────────┐
-  │        │
-  │  test  │
-  │        │
-  └──    ──┘")]
-		[InlineData (1, Side.Bottom, 6, Side.Bottom, @"
-  ┌────────┐
-  │        │
-  │  test  │
-  │        │
-  └─    ───┘")]
-		[InlineData (0, Side.Bottom, 5, Side.Bottom, @"
-  ┌────────┐
-  │        │
-  │  test  │
-  │        │
-  └    ────┘")]
-		[InlineData (4, Side.Left, 5, Side.Bottom, @"
-  ┌────────┐
-  │        │
-  │  test  │
-  │        │
-  │    ────┘")]
-		public void DrawIncompleteFrame_All_Sides_Width_Greater_Than_One (int start, Side startSide, int end, Side endSide, string expected)
-		{
-			View view = GetViewsForDrawFrameTests (start, startSide, end, endSide);
-			Application.Top.Add (view);
-			Application.Begin (Application.Top);
-
-			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-		}
-
-		[Theory, AutoInitShutdown]
 		[InlineData (4, Side.Left, 4, Side.Right, @"
-  ┌────────┐
-  │        │
-  │  test  │
-  │        │
-  │        │")]
+┌────────┐
+│        │
+│  test  │
+│        │
+│        │")]
 		[InlineData (0, Side.Top, 0, Side.Bottom, @"
-  ─────────┐
-           │
-     test  │
-           │
-  ─────────┘")]
+─────────┐
+         │
+   test  │
+         │
+─────────┘")]
 		[InlineData (0, Side.Right, 0, Side.Left, @"
-  │        │
-  │        │
-  │  test  │
-  │        │
-  └────────┘")]
+│        │
+│        │
+│  test  │
+│        │
+└────────┘")]
 		[InlineData (9, Side.Bottom, 9, Side.Top, @"
-  ┌─────────
-  │         
-  │  test   
-  │         
-  └─────────")]
+┌─────────
+│         
+│  test   
+│         
+└─────────")]
 		public void DrawIncompleteFrame_Three_Full_Sides (int start, Side startSide, int end, Side endSide, string expected)
 		{
 			View view = GetViewsForDrawFrameTests (start, startSide, end, endSide);
@@ -609,30 +550,30 @@ t     ", output);
 		}
 
 		[Theory, AutoInitShutdown]
-		[InlineData (4, Side.Left, 9, Side.Top, @"
-  ┌─────────
-  │         
-  │  test   
-  │         
-  │         ")]
-		[InlineData (0, Side.Top, 4, Side.Right, @"
-  ─────────┐
-           │
-     test  │
-           │
-           │")]
+		[InlineData (4, Side.Left, 10, Side.Top, @"
+┌─────────
+│         
+│  test   
+│         
+│         ")]
+		[InlineData (0, Side.Top, 5, Side.Right, @"
+─────────┐
+         │
+   test  │
+         │
+         │")]
 		[InlineData (0, Side.Right, 0, Side.Bottom, @"
-           │
-           │
-     test  │
-           │
-  ─────────┘")]
+         │
+         │
+   test  │
+         │
+─────────┘")]
 		[InlineData (9, Side.Bottom, 0, Side.Left, @"
-  │         
-  │         
-  │  test   
-  │         
-  └─────────")]
+│         
+│         
+│  test   
+│         
+└─────────")]
 		public void DrawIncompleteFrame_Two_Full_Sides (int start, Side startSide, int end, Side endSide, string expected)
 		{
 			View view = GetViewsForDrawFrameTests (start, startSide, end, endSide);
@@ -644,25 +585,25 @@ t     ", output);
 
 		[Theory, AutoInitShutdown]
 		[InlineData (4, Side.Left, 0, Side.Left, @"
-  │      
-  │      
-  │  test
-  │      
-  │      ")]
+│      
+│      
+│  test
+│      
+│      ")]
 		[InlineData (0, Side.Top, 9, Side.Top, @"
-  ──────────
-            
-     test   ")]
+──────────
+          
+   test   ")]
 		[InlineData (0, Side.Right, 4, Side.Right, @"
-           │
-           │
-     test  │
-           │
-           │")]
+         │
+         │
+   test  │
+         │
+         │")]
 		[InlineData (9, Side.Bottom, 0, Side.Bottom, @"
-     test   
-            
-  ──────────")]
+   test   
+          
+──────────")]
 		public void DrawIncompleteFrame_One_Full_Sides (int start, Side startSide, int end, Side endSide, string expected)
 		{
 			View view = GetViewsForDrawFrameTests (start, startSide, end, endSide);
@@ -674,25 +615,25 @@ t     ", output);
 
 		[Theory, AutoInitShutdown]
 		[InlineData (0, Side.Bottom, 0, Side.Top, @"
-  ┌      
-  │      
-  │  test
-  │      
-  └      ")]
+┌      
+│      
+│  test
+│      
+└      ")]
 		[InlineData (0, Side.Left, 0, Side.Right, @"
-  ┌────────┐
-            
-     test   ")]
+┌────────┐
+          
+   test   ")]
 		[InlineData (9, Side.Top, 9, Side.Bottom, @"
-           ┐
-           │
-     test  │
-           │
-           ┘")]
+         ┐
+         │
+   test  │
+         │
+         ┘")]
 		[InlineData (4, Side.Right, 4, Side.Left, @"
-     test   
-            
-  └────────┘")]
+   test   
+          
+└────────┘")]
 		public void DrawIncompleteFrame_One_Full_Sides_With_Corner (int start, Side startSide, int end, Side endSide, string expected)
 		{
 			View view = GetViewsForDrawFrameTests (start, startSide, end, endSide);
@@ -704,17 +645,17 @@ t     ", output);
 
 		[Theory, AutoInitShutdown]
 		[InlineData (2, Side.Left, 2, Side.Left, @"
-  │  test")]
+│  test")]
 		[InlineData (3, Side.Top, 6, Side.Top, @"
-     ────
-         
-     test")]
+   ────
+       
+   test")]
 		[InlineData (2, Side.Right, 2, Side.Right, @"
-     test  │")]
+   test  │")]
 		[InlineData (6, Side.Bottom, 3, Side.Bottom, @"
-     test
-         
-     ────")]
+   test
+       
+   ────")]
 		public void DrawIncompleteFrame_One_Part_Sides (int start, Side startSide, int end, Side endSide, string expected)
 		{
 			View view = GetViewsForDrawFrameTests (start, startSide, end, endSide);
