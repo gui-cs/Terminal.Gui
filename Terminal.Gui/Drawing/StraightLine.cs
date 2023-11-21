@@ -280,6 +280,7 @@ namespace Terminal.Gui {
 					// line is perpendicular to exclusion
 
 					// TODO: Cut out at most 1 cell
+					toReturn.Add (l);
 				}
 			}
 
