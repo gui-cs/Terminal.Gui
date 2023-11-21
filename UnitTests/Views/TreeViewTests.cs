@@ -856,7 +856,6 @@ namespace Terminal.Gui.ViewsTests {
 			var pink = new Attribute (Color.Magenta, Color.Black);
 			var hotpink = new Attribute (Color.BrightMagenta, Color.Black);
 
-
 			// Normal drawing of the tree view
 			TestHelpers.AssertDriverContentsAre (@"
 ├-normal
