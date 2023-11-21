@@ -197,8 +197,7 @@ namespace Terminal.Gui {
 		}
 	}
 
-	public static class StraightLineExtensions
-	{
+	public static class StraightLineExtensions {
 		/// <summary>
 		/// Splits or removes all lines in the <paramref name="collection"/> such that none cover the given
 		/// exclusion area.
@@ -211,27 +210,21 @@ namespace Terminal.Gui {
 		public static IEnumerable<StraightLine> Exclude (this IEnumerable<StraightLine> collection, Point start, int length, Orientation orientation)
 		{
 			var toReturn = new List<StraightLine> ();
-			if(length == 0) {
+			if (length == 0) {
 				return collection;
 			}
 
-			// Calculate exclude max and min points
-			int exMin = Math.Min (start.X + length, start.X);
-			int exMax = Math.Max (start.X + length, start.X);
-			int eyMin = Math.Min (start.Y + length, start.Y);
-			int eyMax = Math.Max (start.Y + length, start.Y);
-
 			foreach (var l in collection) {
 
-				int lxMin = Math.Min (l.Start.X + l.Length, l.Start.X);
-				int lxMax = Math.Max (l.Start.X + l.Length, l.Start.X);
-				int lyMin = Math.Min (l.Start.Y + l.Length, l.Start.Y);
-				int lyMax = Math.Max (l.Start.Y + l.Length, l.Start.Y);
+				if(l.Length == 0) {
+					toReturn.Add (l);
+					continue;
+				}
 
 				// line is parallel to exclusion
 				if (l.Orientation == orientation) {
 
-					// lines are parallel.  For any straight line one dimension (x or y) is constant
+					// lines are parallel.  For any straight line one axis (x or y) is constant
 					// e.g. Horizontal lines have constant y
 					int econstPoint = orientation == Orientation.Horizontal ? start.Y : start.X;
 					int lconstPoint = orientation == Orientation.Horizontal ? l.Start.Y : l.Start.X;
@@ -240,30 +233,27 @@ namespace Terminal.Gui {
 					if (econstPoint != lconstPoint) {
 
 						// No, so no way they overlap
-						toReturn.Add(l);
-					}
-					else {
+						toReturn.Add (l);
+					} else {
 
 						// For the varying axis what is the max/mins
 						// i.e. points on horizontal lines vary by x, vertical lines vary by y
-						int eDiffMin = orientation == Orientation.Horizontal ? exMin : eyMin;
-						int eDiffMax = orientation == Orientation.Horizontal ? exMax : eyMax;
-						int lDiffMin = orientation == Orientation.Horizontal ? lxMin : lyMin;
-						int lDiffMax = orientation == Orientation.Horizontal ? lxMax : lyMax;
+						int eDiffMin = GetLineStartOnDiffAxis (start, length, orientation);
+						int eDiffMax = GetLineEndOnDiffAxis (start, length, orientation);
+						int lDiffMin = GetLineStartOnDiffAxis (l.Start, l.Length, l.Orientation);
+						int lDiffMax = GetLineEndOnDiffAxis (l.Start, l.Length, l.Orientation);
 
 						if (lDiffMax < eDiffMin) {
 							// Line ends before exclusion starts
 							toReturn.Add (l);
-						}
-						else if(lDiffMin > eDiffMax) {
+						} else if (lDiffMin > eDiffMax) {
 							// Line starts after exclusion ends
 							toReturn.Add (l);
-						}
-						else {
+						} else {
 							//lines overlap!
 
 							// Is there a bit we can keep on the left?
-							if(lDiffMin < eDiffMin) {
+							if (lDiffMin < eDiffMin) {
 								// Create line up to exclusion point
 								int from = lDiffMin;
 								int len = eDiffMin - lDiffMin;
@@ -276,18 +266,17 @@ namespace Terminal.Gui {
 							// Is there a bit we can keep on the right?
 							if (lDiffMax > eDiffMax) {
 								// Create line up to exclusion point
-								int from = eDiffMax+1;
+								int from = eDiffMax + 1;
 								int len = lDiffMax - eDiffMax;
 
-								if(len>0) {
+								if (len > 0) {
 									toReturn.Add (CreateLineFromDiff (l, from, len));
 								}
 							}
 						}
 					}
 
-				}
-				else {
+				} else {
 					// line is perpendicular to exclusion
 
 					// TODO: Cut out at most 1 cell
@@ -295,6 +284,52 @@ namespace Terminal.Gui {
 			}
 
 			return toReturn;
+		}
+
+		/// <summary>
+		/// Points on a <see cref="StraightLine"/> differ only along one axis.
+		/// Horizontal lines have points with differing x while Vertical lines
+		/// have differing y.
+		/// </summary>
+		/// <returns>The minimum x or y (whichever is differing) point on the line, controlling for negative lengths. </returns>
+		private static int GetLineStartOnDiffAxis (Point start, int length, Orientation orientation)
+		{
+			if(length == 0) {
+				throw new ArgumentException ("0 length lines are not supported", nameof (length));
+			}
+
+			var sub = length > 0 ? 1 : -1;
+
+			if (orientation == Orientation.Vertical) {
+				// Points on line differ by y
+				return Math.Min (start.Y + length - sub, start.Y);
+			}
+
+			// Points on line differ by x
+			return Math.Min (start.X + length - sub, start.X);
+		}
+
+		/// <summary>
+		/// Points on a <see cref="StraightLine"/> differ only along one axis.
+		/// Horizontal lines have points with differing x while Vertical lines
+		/// have differing y.
+		/// </summary>
+		/// <returns>The maximum x or y (whichever is differing) point on the line, controlling for negative lengths. </returns>
+		private static int GetLineEndOnDiffAxis (Point start, int length, Orientation orientation)
+		{
+			if (length == 0) {
+				throw new ArgumentException ("0 length lines are not supported", nameof (length));
+			}
+
+			var sub = length > 0 ? 1 : -1;
+
+			if (orientation == Orientation.Vertical) {
+				// Points on line differ by y
+				return Math.Max (start.Y + length - sub, start.Y);
+			}
+
+			// Points on line differ by x
+			return Math.Max (start.X + length - sub, start.X);
 		}
 
 		/// <summary>
@@ -312,7 +347,7 @@ namespace Terminal.Gui {
 				l.Orientation == Orientation.Horizontal ? from : l.Start.X,
 				l.Orientation == Orientation.Horizontal ? l.Start.Y : from);
 
-			return new StraightLine (start, length, l.Orientation,l.Style, l.Attribute);
+			return new StraightLine (start, length, l.Orientation, l.Style, l.Attribute);
 		}
 	}
 }
