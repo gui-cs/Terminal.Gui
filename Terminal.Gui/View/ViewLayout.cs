@@ -28,11 +28,11 @@ namespace Terminal.Gui {
 
 	public partial class View {
 
-		// The frame for the object. Superview relative.
+		// The frame for the object. Relative to the SuperView's Bounds.
 		Rect _frame;
 
 		/// <summary>
-		/// Gets or sets the frame for the view. The frame is relative to the view's container (<see cref="SuperView"/>).
+		/// Gets or sets the frame for the view. The frame is relative to the <see cref="SuperView"/>'s <see cref="Bounds"/>.
 		/// </summary>
 		/// <value>The frame.</value>
 		/// <remarks>
@@ -58,19 +58,41 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The Thickness that separates a View from other SubViews of the same SuperView. 
-		/// The Margin is not part of the View's content and is not clipped by the View's Clip Area. 
+		/// The frame (specified as a <see cref="Thickness"/>) that separates a View from other SubViews of the same SuperView. 
+		/// The margin offsets the <see cref="Bounds"/> from the <see cref="Frame"/>. 
 		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// The frames (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the View's content
+		/// and are not clipped by the View's Clip Area.
+		/// </para>
+		/// <para>
+		/// Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>)
+		/// will change the size of the <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the
+		/// <see cref="SuperView"/> and its <see cref="Subviews"/>.
+		/// </para>
+		/// </remarks>
 		public Frame Margin { get; private set; }
 
 		/// <summary>
-		///  Thickness where a visual border (drawn using line-drawing glyphs) and the Title are drawn. 
+		/// The frame (specified as a <see cref="Thickness"/>) inside of the view that offsets the <see cref="Bounds"/> from the <see cref="Margin"/>. 
+		///  The Border provides the space for a visual border (drawn using line-drawing glyphs) and the Title. 
 		///  The Border expands inward; in other words if `Border.Thickness.Top == 2` the border and 
 		///  title will take up the first row and the second row will be filled with spaces. 
-		///  The Border is not part of the View's content and is not clipped by the View's `ClipArea`.
 		/// </summary>
 		/// <remarks>
+		/// <para>
 		/// <see cref="BorderStyle"/> provides a simple helper for turning a simple border frame on or off.
+		/// </para>
+		/// <para>
+		/// The frames (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the View's content
+		/// and are not clipped by the View's Clip Area.
+		/// </para>
+		/// <para>
+		/// Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>)
+		/// will change the size of the <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the
+		/// <see cref="SuperView"/> and its <see cref="Subviews"/>.
+		/// </para>
 		/// </remarks>
 		public Frame Border { get; private set; }
 
@@ -111,11 +133,18 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Means the Thickness inside of an element that offsets the `Content` from the Border. 
-		/// Padding is `{0, 0, 0, 0}` by default. Padding is not part of the View's content and is not clipped by the View's `ClipArea`.
+		/// The frame (specified as a <see cref="Thickness"/>) inside of the view that offsets the <see cref="Bounds"/> from the <see cref="Border"/>. 
 		/// </summary>
 		/// <remarks>
-		/// (NOTE: in v1 `Padding` is OUTSIDE of the `Border`). 
+		/// <para>
+		/// The frames (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the View's content
+		/// and are not clipped by the View's Clip Area.
+		/// </para>
+		/// <para>
+		/// Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>)
+		/// will change the size of the <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the
+		/// <see cref="SuperView"/> and its <see cref="Subviews"/>.
+		/// </para>
 		/// </remarks>
 		public Frame Padding { get; private set; }
 
@@ -181,9 +210,9 @@ namespace Terminal.Gui {
 		LayoutStyle _layoutStyle;
 
 		/// <summary>
-		/// Controls how the View's <see cref="Frame"/> is computed during the LayoutSubviews method, if the style is set to
-		/// <see cref="Terminal.Gui.LayoutStyle.Absolute"/>, 
-		/// LayoutSubviews does not change the <see cref="Frame"/>. If the style is <see cref="Terminal.Gui.LayoutStyle.Computed"/>
+		/// Controls how the View's <see cref="Frame"/> is computed during <see cref="LayoutSubviews"/>. If the style is set to
+		/// <see cref="LayoutStyle.Absolute"/>, 
+		/// LayoutSubviews does not change the <see cref="Frame"/>. If the style is <see cref="LayoutStyle.Computed"/>
 		/// the <see cref="Frame"/> is updated using
 		/// the <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties.
 		/// </summary>
@@ -197,15 +226,26 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The View-relative rectangle where View content is displayed. SubViews are positioned relative to 
-		/// Bounds.<see cref="Rect.Location">Location</see> (which is always (0, 0)) and <see cref="Draw()"/> clips drawing to 
-		/// Bounds.<see cref="Rect.Size">Size</see>.
+		/// The view's content area.
+		/// <para>
+		/// SubViews are positioned relative to Bounds.
+		/// </para>
+		/// <para>
+		/// Drawing is clipped to Bounds (<see cref="Draw()"/> clips drawing to Bounds.<see cref="Rect.Size">Size</see>).
+		/// </para>
+		/// <para>
+		/// Mouse events are reported relative to Bounds.
+		/// </para>
 		/// </summary>
-		/// <value>The bounds.</value>
+		/// <value>The view's content area.</value>
 		/// <remarks>
 		/// <para>
 		/// The <see cref="Rect.Location"/> of Bounds is always (0, 0). To obtain the offset of the Bounds from the Frame use 
 		/// <see cref="GetBoundsOffset"/>.
+		/// </para>
+		/// <para>
+		/// When using <see cref="LayoutStyle.Computed"/>, Bounds is not valid until after the view has been initialized (after <see cref="EndInit"/> has been called and <see cref="Initialized"/>
+		/// has fired). Accessing this property before the view is initialized is considered an error./>
 		/// </para>
 		/// </remarks>
 		public virtual Rect Bounds {
@@ -365,8 +405,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		// BUGBUG: This API is broken - It should be renamed to `GetMinimumBoundsForFrame and 
-		// should not assume Frame.Height == Bounds.Height
+		// BUGBUG: This API is broken - should not assume Frame.Height == Bounds.Height
 		/// <summary>
 		/// Gets the minimum dimensions required to fit the View's <see cref="Text"/>, factoring in <see cref="TextDirection"/>.
 		/// </summary>
@@ -377,7 +416,7 @@ namespace Terminal.Gui {
 		/// if <see cref="Height"/> (Horizontal) or <see cref="Width"/> (Vertical) are not not set or zero.
 		/// Does not take into account word wrapping.
 		/// </remarks>
-		public bool GetMinimumBounds (out Size size)
+		bool GetMinimumBoundsForFrame (out Size size)
 		{
 			if (!IsInitialized) {
 				size = new Size (0, 0);
@@ -414,15 +453,14 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		// BUGBUG - v2 - Should be renamed "SetBoundsToFitFrame"
 		/// <summary>
-		/// Sets the size of the View to the minimum width or height required to fit <see cref="Text"/> (see <see cref="GetMinimumBounds(out Size)"/>.
+		/// Sets the size of the View to the minimum width or height required to fit <see cref="Text"/> (see <see cref="GetMinimumBoundsForFrame"/>.
 		/// </summary>
 		/// <returns><see langword="true"/> if the size was changed, <see langword="false"/> if <see cref="Text"/>
 		/// will not fit.</returns>
-		public bool SetMinWidthHeight ()
+		bool SetBoundsToFitFrame ()
 		{
-			if (GetMinimumBounds (out Size size)) {
+			if (GetMinimumBoundsForFrame (out Size size)) {
 				_frame = new Rect (_frame.Location, size);
 				return true;
 			}
@@ -458,7 +496,7 @@ namespace Terminal.Gui {
 			}
 			//// BUGBUG: I think these calls are redundant or should be moved into just the AutoSize case
 			if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
-				SetMinWidthHeight ();
+				SetBoundsToFitFrame ();
 				LayoutFrames ();
 				TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
 				SetNeedsLayout ();
@@ -656,7 +694,7 @@ namespace Terminal.Gui {
 			if (Frame != r) {
 				Frame = r;
 				// BUGBUG: Why is this AFTER setting Frame? Seems duplicative.
-				if (!SetMinWidthHeight ()) {
+				if (!SetBoundsToFitFrame ()) {
 					TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
 				}
 			}

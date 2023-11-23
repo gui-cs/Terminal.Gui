@@ -132,9 +132,9 @@ namespace Terminal.Gui {
 				OnResizeNeeded ();
 			} else if (directionChanged && IsAdded) {
 				SetWidthHeight (Bounds.Size);
-				SetMinWidthHeight ();
+				SetBoundsToFitFrame ();
 			} else {
-				SetMinWidthHeight ();
+				SetBoundsToFitFrame ();
 			}
 			TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
 			SetNeedsDisplay ();
