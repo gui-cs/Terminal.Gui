@@ -270,7 +270,7 @@ namespace Terminal.Gui {
 		}
 
 		// Diagnostics to highlight when X or Y is read before the view has been initialized
-		private Pos VerifyIsIntialized (Pos pos)
+		Pos VerifyIsInitialized (Pos pos)
 		{
 #if DEBUG
 			if (LayoutStyle == LayoutStyle.Computed && (!IsInitialized)) {
@@ -281,7 +281,7 @@ namespace Terminal.Gui {
 		}
 
 		// Diagnostics to highlight when Width or Height is read before the view has been initialized
-		private Dim VerifyIsIntialized (Dim dim)
+		Dim VerifyIsInitialized (Dim dim)
 		{
 #if DEBUG
 			if (LayoutStyle == LayoutStyle.Computed && (!IsInitialized)) {
@@ -301,7 +301,7 @@ namespace Terminal.Gui {
 		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		/// </remarks>
 		public Pos X {
-			get => VerifyIsIntialized (_x);
+			get => VerifyIsInitialized (_x);
 			set {
 				if (ForceValidatePosDim && !ValidatePosDim (_x, value)) {
 					throw new ArgumentException ();
@@ -321,7 +321,7 @@ namespace Terminal.Gui {
 		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		/// </remarks>
 		public Pos Y {
-			get => VerifyIsIntialized (_y);
+			get => VerifyIsInitialized (_y);
 			set {
 				if (ForceValidatePosDim && !ValidatePosDim (_y, value)) {
 					throw new ArgumentException ();
@@ -342,7 +342,7 @@ namespace Terminal.Gui {
 		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		/// </remarks>
 		public Dim Width {
-			get => VerifyIsIntialized (_width);
+			get => VerifyIsInitialized (_width);
 			set {
 				if (ForceValidatePosDim && !ValidatePosDim (_width, value)) {
 					throw new ArgumentException ("ForceValidatePosDim is enabled", nameof (Width));
@@ -367,7 +367,7 @@ namespace Terminal.Gui {
 		/// <value>The height.</value>
 		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		public Dim Height {
-			get => VerifyIsIntialized (_height);
+			get => VerifyIsInitialized (_height);
 			set {
 				if (ForceValidatePosDim && !ValidatePosDim (_height, value)) {
 					throw new ArgumentException ("ForceValidatePosDim is enabled", nameof (Height));
@@ -406,6 +406,7 @@ namespace Terminal.Gui {
 		}
 
 		// BUGBUG: This API is broken - should not assume Frame.Height == Bounds.Height
+		// BUGBUG: this function does not belong in ViewLayout.cs - it should be in ViewText.cs
 		/// <summary>
 		/// Gets the minimum dimensions required to fit the View's <see cref="Text"/>, factoring in <see cref="TextDirection"/>.
 		/// </summary>
@@ -453,6 +454,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
+		// BUGBUG: this function does not belong in ViewLayout.cs - it should be in ViewText.cs
 		/// <summary>
 		/// Sets the size of the View to the minimum width or height required to fit <see cref="Text"/> (see <see cref="GetMinimumBoundsForFrame"/>.
 		/// </summary>
@@ -989,7 +991,7 @@ namespace Terminal.Gui {
 			var nBoundsSize = GetAutoSize ();
 			if (IsInitialized && nBoundsSize != Bounds.Size) {
 				if (ForceValidatePosDim) {
-					aSize = SetWidthHeight (nBoundsSize);
+					aSize = ResizeBoundsToFit (nBoundsSize);
 				} else {
 					Height = nBoundsSize.Height;
 					Width = nBoundsSize.Width; // = new Rect (Bounds.X, Bounds.Y, nBoundsSize.Width, nBoundsSize.Height);
@@ -1001,35 +1003,35 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Resizes the View to fit the specified <see cref="Bounds"/> size.
+		/// Resizes the View to fit the specified size. Factors in the HotKey.
 		/// </summary>
-		/// <param name="nBounds"></param>
-		/// <returns></returns>
-		bool SetWidthHeight (Size nBounds)
+		/// <param name="size"></param>
+		/// <returns>whether the Bounds was changed or not</returns>
+		bool ResizeBoundsToFit (Size size)
 		{
-			var aSize = false;
-			var canSizeW = TrySetWidth (nBounds.Width - GetHotKeySpecifierLength (), out var rW);
-			var canSizeH = TrySetHeight (nBounds.Height - GetHotKeySpecifierLength (false), out var rH);
+			var boundsChanged = false;
+			var canSizeW = TrySetWidth (size.Width - GetHotKeySpecifierLength (), out var rW);
+			var canSizeH = TrySetHeight (size.Height - GetHotKeySpecifierLength (false), out var rH);
 			if (canSizeW) {
-				aSize = true;
+				boundsChanged = true;
 				_width = rW;
 			}
 			if (canSizeH) {
-				aSize = true;
+				boundsChanged = true;
 				_height = rH;
 			}
-			if (aSize) {
+			if (boundsChanged) {
 				Bounds = new Rect (Bounds.X, Bounds.Y, canSizeW ? rW : Bounds.Width, canSizeH ? rH : Bounds.Height);
 			}
 
-			return aSize;
+			return boundsChanged;
 		}
 
 		/// <summary>
-		/// Gets the Frame dimensions required to fit <see cref="Text"/> using the text <see cref="Direction"/> specified by the
+		/// Gets the Frame dimensions required to fit <see cref="Text"/> within <see cref="Bounds"/> using the text <see cref="Direction"/> specified by the
 		/// <see cref="TextFormatter"/> property and accounting for any <see cref="HotKeySpecifier"/> characters.
 		/// </summary>
-		/// <returns>The <see cref="Size"/> required to fit the text.</returns>
+		/// <returns>The <see cref="Size"/> of the view required to fit the text.</returns>
 		public Size GetAutoSize ()
 		{
 			int x = 0;

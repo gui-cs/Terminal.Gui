@@ -131,7 +131,7 @@ namespace Terminal.Gui {
 			    || (ForceValidatePosDim && directionChanged && AutoSize && isValidOldAutoSize)) {
 				OnResizeNeeded ();
 			} else if (directionChanged && IsAdded) {
-				SetWidthHeight (Bounds.Size);
+				ResizeBoundsToFit (Bounds.Size);
 				SetBoundsToFitFrame ();
 			} else {
 				SetBoundsToFitFrame ();
