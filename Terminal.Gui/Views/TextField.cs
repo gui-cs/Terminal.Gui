@@ -415,9 +415,9 @@ namespace Terminal.Gui {
 			} else {
 				HideCursorVisibility ();
 				if (pos < 0) {
-					Move (pos, 0, false);
+					Move (pos, 0);
 				} else {
-					Move (pos - offB, 0, false);
+					Move (pos - offB, 0);
 				}
 			}
 		}

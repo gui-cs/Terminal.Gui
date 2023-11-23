@@ -71,10 +71,12 @@ namespace Terminal.Gui {
 		/// <param name="ch">Ch.</param>
 		public void AddRune (int col, int row, Rune ch)
 		{
-			if (row < 0 || col < 0)
+			if (row < 0 || col < 0) {
 				return;
-			if (row > _frame.Height - 1 || col > _frame.Width - 1)
+			}
+			if (row > _frame.Height - 1 || col > _frame.Width - 1) {
 				return;
+			}
 			Move (col, row);
 			Driver.AddRune (ch);
 		}
