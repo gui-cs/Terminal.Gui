@@ -490,18 +490,18 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Converts a point from screen-relative coordinates to view-relative coordinates.
+		/// Converts a screen-relative coordinate to a view-relative coordinate.
 		/// </summary>
-		/// <returns>The mapped point.</returns>
+		/// <returns>The coordinate relative to this view's Frame.</returns>
 		/// <param name="x">X screen-coordinate point.</param>
 		/// <param name="y">Y screen-coordinate point.</param>
 		public Point ScreenToView (int x, int y)
 		{
-			Point boundsOffset = SuperView == null ? Point.Empty : SuperView.GetBoundsOffset ();
+			Point superViewBoundsOffset = SuperView == null ? Point.Empty : SuperView.GetBoundsOffset ();
 			if (SuperView == null) {
-				return new Point (x - Frame.X + boundsOffset.X, y - Frame.Y + boundsOffset.Y);
+				return new Point (x - Frame.X + superViewBoundsOffset.X, y - Frame.Y + superViewBoundsOffset.Y);
 			} else {
-				var parent = SuperView.ScreenToView (x - boundsOffset.X, y - boundsOffset.Y);
+				var parent = SuperView.ScreenToView (x - superViewBoundsOffset.X, y - superViewBoundsOffset.Y);
 				return new Point (parent.X - Frame.X, parent.Y - Frame.Y);
 			}
 		}
@@ -1118,13 +1118,12 @@ namespace Terminal.Gui {
 		/// </returns>
 		public static View FindDeepestView (View start, int x, int y, out int resx, out int resy)
 		{
-			var startFrame = start.Frame;
-
-			if (!startFrame.Contains (x, y)) {
-				resx = 0;
-				resy = 0;
+			resy = resx = 0;
+			if (start == null || !start.Frame.Contains (x, y)) {
 				return null;
 			}
+			
+			var startFrame = start.Frame;
 			if (start.InternalSubviews != null) {
 				int count = start.InternalSubviews.Count;
 				if (count > 0) {

@@ -1128,7 +1128,7 @@ namespace Terminal.Gui {
 		/// <remarks>
 		/// This method can be used to simulate a mouse event, e.g. in unit tests.
 		/// </remarks>
-		/// <param name="a"></param>
+		/// <param name="a">The mouse event with coordinates relative to the screen.</param>
 		public static void OnMouseEvent (MouseEventEventArgs a)
 		{
 			static bool OutsideBounds (Point p, Rect r) => p.X < 0 || p.X > r.Right || p.Y < 0 || p.Y > r.Bottom;
@@ -1172,8 +1172,10 @@ namespace Terminal.Gui {
 				}
 			}
 
-			if ((view == null || view == OverlappedTop) && !Current.Modal && OverlappedTop != null
-				&& a.MouseEvent.Flags != MouseFlags.ReportMousePosition && a.MouseEvent.Flags != 0) {
+			if ((view == null || view == OverlappedTop) && 
+				Current is { Modal: false } && OverlappedTop != null && 
+				a.MouseEvent.Flags != MouseFlags.ReportMousePosition && 
+				a.MouseEvent.Flags != 0) {
 
 				var top = FindDeepestTop (Top, a.MouseEvent.X, a.MouseEvent.Y, out _, out _);
 				view = View.FindDeepestView (top, a.MouseEvent.X, a.MouseEvent.Y, out rx, out ry);
