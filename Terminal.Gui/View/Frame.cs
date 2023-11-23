@@ -41,7 +41,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
+		public override void BoundsToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
 		{
 			// Frames are *Children* of a View, not SubViews. Thus View.ViewToScreen will not work.
 			// To get the screen-relative coordinates of a Frame, we need to know who
@@ -52,7 +52,7 @@ namespace Terminal.Gui {
 
 			// We now have rcol/rrow in coordinates relative to our View's SuperView. If our View's SuperView has
 			// a SuperView, keep going...
-			Parent?.SuperView?.ViewToScreen (rcol, rrow, out rcol, out rrow, clipped);
+			Parent?.SuperView?.BoundsToScreen (rcol, rrow, out rcol, out rrow, clipped);
 		}
 
 		/// <summary>
@@ -128,7 +128,7 @@ namespace Terminal.Gui {
 			}
 
 			//Driver.SetAttribute (Colors.Error.Normal);
-			var screenBounds = ViewToScreen (Frame);
+			var screenBounds = BoundsToScreen (Frame);
 
 			// This just draws/clears the thickness, not the insides.
 			Thickness.Draw (screenBounds, (string)(Data != null ? Data : string.Empty));
@@ -368,7 +368,7 @@ namespace Terminal.Gui {
 		public void DrawFrame (Rect region, bool clear)
 		{
 			var savedClip = ClipToBounds ();
-			var screenBounds = ViewToScreen (region);
+			var screenBounds = BoundsToScreen (region);
 
 			if (clear) {
 				Driver.FillRect (region);

@@ -490,14 +490,15 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Converts a screen-relative coordinate to a view-relative coordinate.
+		/// Converts a screen-relative coordinate to a view-relative coordinate. View-relative means
+		/// Frame-Relative. 
 		/// </summary>
 		/// <returns>The coordinate relative to this view's Frame.</returns>
-		/// <param name="x">X screen-coordinate point.</param>
-		/// <param name="y">Y screen-coordinate point.</param>
+		/// <param name="x">Screen-relative column.</param>
+		/// <param name="y">Screen-relative row.</param>
 		public Point ScreenToView (int x, int y)
 		{
-			Point superViewBoundsOffset = SuperView == null ? Point.Empty : SuperView.GetBoundsOffset ();
+			Point superViewBoundsOffset = SuperView?.GetBoundsOffset () ?? Point.Empty;
 			if (SuperView == null) {
 				return new Point (x - Frame.X + superViewBoundsOffset.X, y - Frame.Y + superViewBoundsOffset.Y);
 			} else {
@@ -507,52 +508,51 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Converts a view-relative location to a screen-relative location (col,row). The output is optionally clamped to the screen dimensions.
+		/// Converts a <see cref="Bounds"/>-relative coordinate to a screen-relative coordinate. The output is optionally clamped to the screen dimensions.
 		/// </summary>
-		/// <param name="col">View-relative column.</param>
-		/// <param name="row">View-relative row.</param>
-		/// <param name="rcol">Absolute column; screen-relative.</param>
-		/// <param name="rrow">Absolute row; screen-relative.</param>
-		/// <param name="clamped">If <see langword="true"/>, <paramref name="rcol"/> and <paramref name="rrow"/> will be clamped to the 
-		/// screen dimensions (they never be negative and will always be less than to <see cref="ConsoleDriver.Cols"/> and
+		/// <param name="x"><see cref="Bounds"/>-relative column.</param>
+		/// <param name="y"><see cref="Bounds"/>-relative row.</param>
+		/// <param name="rx">Absolute column; screen-relative.</param>
+		/// <param name="ry">Absolute row; screen-relative.</param>
+		/// <param name="clamped">If <see langword="true"/>, <paramref name="rx"/> and <paramref name="ry"/> will be clamped to the 
+		/// screen dimensions (will never be negative and will always be less than <see cref="ConsoleDriver.Cols"/> and
 		/// <see cref="ConsoleDriver.Rows"/>, respectively.</param>
-		public virtual void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clamped = true)
+		public virtual void BoundsToScreen (int x, int y, out int rx, out int ry, bool clamped = true)
 		{
 			var boundsOffset = GetBoundsOffset ();
-			rcol = col + Frame.X + boundsOffset.X;
-			rrow = row + Frame.Y + boundsOffset.Y;
+			rx = x + Frame.X + boundsOffset.X;
+			ry = y + Frame.Y + boundsOffset.Y;
 
 			var super = SuperView;
 			while (super != null) {
 				boundsOffset = super.GetBoundsOffset ();
-				rcol += super.Frame.X + boundsOffset.X;
-				rrow += super.Frame.Y + boundsOffset.Y;
+				rx += super.Frame.X + boundsOffset.X;
+				ry += super.Frame.Y + boundsOffset.Y;
 				super = super.SuperView;
 			}
 
 			// The following ensures that the cursor is always in the screen boundaries.
 			if (clamped) {
-				rrow = Math.Min (rrow, Driver.Rows - 1);
-				rcol = Math.Min (rcol, Driver.Cols - 1);
+				ry = Math.Min (ry, Driver.Rows - 1);
+				rx = Math.Min (rx, Driver.Cols - 1);
 			}
 		}
 
 		/// <summary>
-		/// Converts a region in view-relative coordinates to screen-relative coordinates.
+		/// Converts a <see cref="Bounds"/>-relative region to a screen-relative region. The output is optionally clamped to the screen dimensions.
 		/// </summary>
-		public Rect ViewToScreen (Rect region)
+		public Rect BoundsToScreen (Rect region)
 		{
-			ViewToScreen (region.X, region.Y, out var x, out var y, clamped: false);
+			BoundsToScreen (region.X, region.Y, out var x, out var y, clamped: false);
 			return new Rect (x, y, region.Width, region.Height);
 		}
-
 
 		/// <summary>
 		/// Sets the View's <see cref="Frame"/> to the frame-relative coordinates if its container. The
 		/// container size and location are specified by <paramref name="superviewFrame"/> and are relative to the
 		/// View's superview.
 		/// </summary>
-		/// <param name="superviewFrame">The supserview-relative rectangle describing View's container (nominally the 
+		/// <param name="superviewFrame">The SuperView-relative rectangle describing View's container (nominally the 
 		/// same as <c>this.SuperView.Frame</c>).</param>
 		internal void SetRelativeLayout (Rect superviewFrame)
 		{

@@ -331,7 +331,7 @@ namespace Terminal.Gui {
 				foreach (var line in allLines) {
 					bool isRoot = splitterLines.Contains (line);
 
-					line.ViewToScreen (0, 0, out var x1, out var y1);
+					line.BoundsToScreen (0, 0, out var x1, out var y1);
 					var origin = ScreenToView (x1, y1);
 					var length = line.Orientation == Orientation.Horizontal ?
 							line.Frame.Width :
@@ -747,7 +747,7 @@ namespace Terminal.Gui {
 			/// </summary>
 			public Point GetLocalCoordinateForTitle (TileView intoCoordinateSpace)
 			{
-				Tile.ContentView.ViewToScreen (0, 0, out var screenCol, out var screenRow);
+				Tile.ContentView.BoundsToScreen (0, 0, out var screenCol, out var screenRow);
 				screenRow--;
 				return intoCoordinateSpace.ScreenToView (screenCol, screenRow);
 			}

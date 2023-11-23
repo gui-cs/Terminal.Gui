@@ -184,7 +184,7 @@ namespace Terminal.Gui {
 		///     This clears the Bounds used by this view.
 		///   </para>
 		/// </remarks>
-		public void Clear () => Clear (ViewToScreen(Bounds));
+		public void Clear () => Clear (BoundsToScreen(Bounds));
 
 		// BUGBUG: This version of the Clear API should be removed. We should have a tenet that says 
 		// "View APIs only deal with View-relative coords". This is only used by ComboBox which can
@@ -225,7 +225,7 @@ namespace Terminal.Gui {
 		public Rect ClipToBounds ()
 		{
 			var previous = Driver.Clip;
-			Driver.Clip = Rect.Intersect (previous, ViewToScreen (Bounds));
+			Driver.Clip = Rect.Intersect (previous, BoundsToScreen (Bounds));
 			return previous;
 		}
 
@@ -281,7 +281,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			ViewToScreen (col, row, out var rCol, out var rRow, clipped);
+			BoundsToScreen (col, row, out var rCol, out var rRow, clipped);
 			Driver.Move (rCol, rRow);
 		}
 		/// <summary>
@@ -437,7 +437,7 @@ namespace Terminal.Gui {
 		{
 			if (NeedsDisplay) {
 				if (SuperView != null) {
-					Clear (ViewToScreen (Bounds));
+					Clear (BoundsToScreen (Bounds));
 				}
 
 				if (!string.IsNullOrEmpty (TextFormatter.Text)) {
@@ -446,7 +446,7 @@ namespace Terminal.Gui {
 					}
 				}
 				// This should NOT clear 
-				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
+				TextFormatter?.Draw (BoundsToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
 					HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
 					Rect.Empty, false);
 				SetSubViewNeedsDisplay ();

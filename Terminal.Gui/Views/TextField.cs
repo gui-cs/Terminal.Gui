@@ -406,8 +406,8 @@ namespace Terminal.Gui {
 			}
 			var pos = _point - _first + Math.Min (Frame.X, 0);
 			var offB = OffSetBackground ();
-			var containerFrame = SuperView?.ViewToScreen (SuperView.Bounds) ?? default;
-			var thisFrame = ViewToScreen (Bounds);
+			var containerFrame = SuperView?.BoundsToScreen (SuperView.Bounds) ?? default;
+			var thisFrame = BoundsToScreen (Bounds);
 			if (pos > -1 && col >= pos && pos < Frame.Width + offB
 				&& containerFrame.IntersectsWith (thisFrame)) {
 				RestoreCursorVisibility ();

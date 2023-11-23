@@ -582,7 +582,7 @@ namespace Terminal.Gui {
 				if (i < 0) {
 					continue;
 				}
-				if (ViewToScreen (Bounds).Y + i >= Driver.Rows) {
+				if (BoundsToScreen (Bounds).Y + i >= Driver.Rows) {
 					break;
 				}
 				var item = barItems.Children [i];
@@ -600,7 +600,7 @@ namespace Terminal.Gui {
 					if (p < 0) {
 						continue;
 					}
-					if (ViewToScreen (Bounds).X + p >= Driver.Cols) {
+					if (BoundsToScreen (Bounds).X + p >= Driver.Cols) {
 						break;
 					}
 					if (item == null)
@@ -643,7 +643,7 @@ namespace Terminal.Gui {
 					textToDraw = item.Title;
 				}
 
-				ViewToScreen (0, i, out int vtsCol, out int vtsRow, false);
+				BoundsToScreen (0, i, out int vtsCol, out int vtsRow, false);
 				if (vtsCol < Driver.Cols) {
 					Driver.Move (vtsCol + 1, vtsRow);
 					if (!item.IsEnabled ()) {
@@ -655,10 +655,10 @@ namespace Terminal.Gui {
 							Text = textToDraw
 						};
 						// The -3 is left/right border + one space (not sure what for)
-						tf.Draw (ViewToScreen (new Rect (1, i, Frame.Width - 3, 1)),
+						tf.Draw (BoundsToScreen (new Rect (1, i, Frame.Width - 3, 1)),
 							i == current ? ColorScheme.Focus : GetNormalColor (),
 							i == current ? ColorScheme.HotFocus : ColorScheme.HotNormal,
-							SuperView == null ? default : SuperView.ViewToScreen (SuperView.Bounds));
+							SuperView == null ? default : SuperView.BoundsToScreen (SuperView.Bounds));
 					} else {
 						DrawHotString (textToDraw,
 							i == current ? ColorScheme.HotFocus : ColorScheme.HotNormal,
@@ -668,7 +668,7 @@ namespace Terminal.Gui {
 					// The help string
 					var l = item.ShortcutTag.GetColumns () == 0 ? item.Help.GetColumns () : item.Help.GetColumns () + item.ShortcutTag.GetColumns () + 2;
 					var col = Frame.Width - l - 3;
-					ViewToScreen (col, i, out vtsCol, out vtsRow, false);
+					BoundsToScreen (col, i, out vtsCol, out vtsRow, false);
 					if (vtsCol < Driver.Cols) {
 						Driver.Move (vtsCol, vtsRow);
 						Driver.AddStr (item.Help);
@@ -1912,7 +1912,7 @@ namespace Terminal.Gui {
 			}
 
 			if (mi.IsTopLevel) {
-				ViewToScreen (i, 0, out int rx, out int ry);
+				BoundsToScreen (i, 0, out int rx, out int ry);
 				var menu = new Menu (this, rx, ry, mi, null, MenusBorderStyle);
 				menu.Run (mi.Action);
 				menu.Dispose ();
@@ -2040,7 +2040,7 @@ namespace Terminal.Gui {
 					if (cx >= pos && cx < pos + leftPadding + Menus [i].TitleLength + Menus [i].Help.GetColumns () + rightPadding) {
 						if (me.Flags == MouseFlags.Button1Clicked) {
 							if (Menus [i].IsTopLevel) {
-								ViewToScreen (i, 0, out int rx, out int ry);
+								BoundsToScreen (i, 0, out int rx, out int ry);
 								var menu = new Menu (this, rx, ry, Menus [i], null, MenusBorderStyle);
 								menu.Run (Menus [i].Action);
 								menu.Dispose ();
