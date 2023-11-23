@@ -566,8 +566,8 @@ namespace Terminal.Gui {
 		/// be greater or equal to the start and for <see cref="Side.Left"/> and <see cref="Side.Bottom"/> the end position must
 		/// be less or equal to the start.
 		/// </summary>
-		/// <param name="startPos">The view relative of the start and side position.</param>
-		/// <param name="endPos">The view relative of the end and side position.</param>
+		/// <param name="startPos">The start and side position screen relative.</param>
+		/// <param name="endPos">The end and side position screen relative.</param>
 		/// <param name="rect">The view relative location and size of the frame.</param>
 		/// <param name="lineStyle">The line style.</param>
 		/// <param name="attribute">The colors to be used.</param>
@@ -582,42 +582,20 @@ namespace Terminal.Gui {
 			} else {
 				lc = LineCanvas;
 			}
-
-			int pStart = startPos.start;
-			int pEnd = endPos.end;
-
+			var start = startPos.start;
+			var end = endPos.end;
 			switch (startPos.side) {
 			case Side.Left:
-			case Side.Right:
-				pStart += vts.Y;
-				break;
-			case Side.Top:
-			case Side.Bottom:
-				pStart += vts.X;
-				break;
-			}
-			switch (endPos.side) {
-			case Side.Left:
-			case Side.Right:
-				pEnd += vts.Y;
-				break;
-			case Side.Top:
-			case Side.Bottom:
-				pEnd += vts.X;
-				break;
-			}
-			switch (startPos.side) {
-			case Side.Left:
-				if (pStart == vts.Y) {
-					lc.AddLine (new Point (vts.X, pStart), 1,
+				if (start == vts.Y) {
+					lc.AddLine (new Point (vts.X, start), 1,
 						Orientation.Vertical, lineStyle, attribute);
 				} else {
-					if (pEnd <= pStart && startPos.side == endPos.side) {
-						lc.AddLine (new Point (vts.X, pStart), pEnd - pStart - 1,
+					if (end <= start && startPos.side == endPos.side) {
+						lc.AddLine (new Point (vts.X, start), end - start - 1,
 							Orientation.Vertical, lineStyle, attribute);
 						break;
 					} else {
-						lc.AddLine (new Point (vts.X, pStart), vts.Y - pStart - 1,
+						lc.AddLine (new Point (vts.X, start), vts.Y - start - 1,
 							Orientation.Vertical, lineStyle, attribute);
 					}
 				}
@@ -629,19 +607,19 @@ namespace Terminal.Gui {
 						Orientation.Vertical, lineStyle, attribute);
 					lc.AddLine (new Point (vts.Right - 1, vts.Bottom - 1), -vts.Width,
 						Orientation.Horizontal, lineStyle, attribute);
-					if (pEnd <= vts.Bottom - 1 && startPos.side == endPos.side) {
-						lc.AddLine (new Point (vts.X, vts.Bottom - 1), -(vts.Bottom - pEnd),
+					if (end <= vts.Bottom - 1 && startPos.side == endPos.side) {
+						lc.AddLine (new Point (vts.X, vts.Bottom - 1), -(vts.Bottom - end),
 							Orientation.Vertical, lineStyle, attribute);
 					}
 					break;
 				case Side.Top:
-					lc.AddLine (new Point (vts.X, vts.Y), pEnd - 1,
+					lc.AddLine (new Point (vts.X, vts.Y), end,
 						Orientation.Horizontal, lineStyle, attribute);
 					break;
 				case Side.Right:
 					lc.AddLine (new Point (vts.X, vts.Y), vts.Width,
 						Orientation.Horizontal, lineStyle, attribute);
-					lc.AddLine (new Point (vts.Right - 1, vts.Y), pEnd - 1,
+					lc.AddLine (new Point (vts.Right - 1, vts.Y), end + 1,
 						Orientation.Vertical, lineStyle, attribute);
 					break;
 				case Side.Bottom:
@@ -649,25 +627,23 @@ namespace Terminal.Gui {
 						Orientation.Horizontal, lineStyle, attribute);
 					lc.AddLine (new Point (vts.Right - 1, vts.Y), vts.Height,
 						Orientation.Vertical, lineStyle, attribute);
-					lc.AddLine (new Point (vts.Right - 1, vts.Bottom - 1), -(vts.Right - pEnd),
+					lc.AddLine (new Point (vts.Right - 1, vts.Bottom - 1), -end,
 						Orientation.Horizontal, lineStyle, attribute);
 					break;
 				}
 				break;
 
 			case Side.Top:
-				if (pStart == vts.Right - 1) {
-					lc.AddLine (new Point (pStart, vts.Y), -1,
+				if (start == vts.Width - 1) {
+					lc.AddLine (new Point (vts.X + start, vts.Y), -1,
 						Orientation.Horizontal, lineStyle, attribute);
-				} else {
-					if (pEnd >= pStart && startPos.side == endPos.side) {
-						lc.AddLine (new Point (pStart, vts.Y), pEnd - pStart + 1,
-							Orientation.Horizontal, lineStyle, attribute);
-						break;
-					} else {
-						lc.AddLine (new Point (pStart, vts.Y), vts.Right - pStart,
-							Orientation.Horizontal, lineStyle, attribute);
-					}
+				} else if (end >= start && startPos.side == endPos.side) {
+					lc.AddLine (new Point (vts.X + start, vts.Y), end - start + 1,
+						Orientation.Horizontal, lineStyle, attribute);
+					break;
+				} else if (vts.Width - start > 0) {
+					lc.AddLine (new Point (vts.X + start, vts.Y), Math.Max (vts.Width - start, 0),
+						Orientation.Horizontal, lineStyle, attribute);
 				}
 				switch (endPos.side) {
 				case Side.Left:
@@ -675,7 +651,7 @@ namespace Terminal.Gui {
 						Orientation.Vertical, lineStyle, attribute);
 					lc.AddLine (new Point (vts.Right - 1, vts.Bottom - 1), -vts.Width,
 						Orientation.Horizontal, lineStyle, attribute);
-					lc.AddLine (new Point (vts.X, vts.Bottom - 1), -(vts.Bottom - pEnd),
+					lc.AddLine (new Point (vts.X, vts.Bottom - 1), -end,
 						Orientation.Vertical, lineStyle, attribute);
 					break;
 				case Side.Top:
@@ -685,93 +661,91 @@ namespace Terminal.Gui {
 						Orientation.Horizontal, lineStyle, attribute);
 					lc.AddLine (new Point (vts.X, vts.Bottom - 1), -vts.Height,
 						Orientation.Vertical, lineStyle, attribute);
-					if (pEnd >= vts.X && startPos.side == endPos.side) {
-						lc.AddLine (new Point (vts.X, vts.Y), pEnd - vts.X + 1,
+					if (end >= 0 && startPos.side == endPos.side) {
+						lc.AddLine (new Point (vts.X, vts.Y), end + 1,
 							Orientation.Horizontal, lineStyle, attribute);
 					}
 					break;
 				case Side.Right:
-					lc.AddLine (new Point (vts.Right - 1, vts.Y), pEnd - pStart + 1,
+					lc.AddLine (new Point (vts.Right - 1, vts.Y), end,
 						Orientation.Vertical, lineStyle, attribute);
 					break;
 				case Side.Bottom:
 					lc.AddLine (new Point (vts.Right - 1, vts.Y), vts.Height,
 						Orientation.Vertical, lineStyle, attribute);
-					lc.AddLine (new Point (vts.Right - 1, vts.Bottom - 1), -(vts.Right - pEnd),
+					lc.AddLine (new Point (vts.Right - 1, vts.Bottom - 1), -(vts.Width - end),
 						Orientation.Horizontal, lineStyle, attribute);
 					break;
 				}
 				break;
 			case Side.Right:
-				if (pStart == vts.Bottom - 1) {
-					lc.AddLine (new Point (vts.Right - 1, pStart), -1,
+				if (start == vts.Bottom - 1) {
+					lc.AddLine (new Point (vts.Width - 1, start), -1,
 						Orientation.Vertical, lineStyle, attribute);
 				} else {
-					if (pEnd >= pStart && startPos.side == endPos.side) {
-						lc.AddLine (new Point (vts.Right - 1, pStart), pEnd - pStart + 1,
+					if (end >= start && startPos.side == endPos.side) {
+						lc.AddLine (new Point (vts.Width - 1, start), end - start + 1,
 							Orientation.Vertical, lineStyle, attribute);
 						break;
 					} else {
-						lc.AddLine (new Point (vts.Right - 1, pStart), vts.Bottom - pStart,
+						lc.AddLine (new Point (vts.Width - 1, start), vts.Bottom - start,
 							Orientation.Vertical, lineStyle, attribute);
 					}
 				}
 				switch (endPos.side) {
 				case Side.Left:
-					lc.AddLine (new Point (vts.Right - 1, vts.Bottom - 1), -vts.Width,
+					lc.AddLine (new Point (vts.Width - 1, vts.Bottom - 1), -vts.Width,
 						Orientation.Horizontal, lineStyle, attribute);
-					lc.AddLine (new Point (vts.X, vts.Bottom - 1), -(vts.Bottom - pEnd),
+					lc.AddLine (new Point (vts.X, vts.Bottom - 1), -(vts.Bottom - end),
 						Orientation.Vertical, lineStyle, attribute);
 					break;
 				case Side.Top:
-					lc.AddLine (new Point (vts.Right - 1, vts.Bottom - 1), -vts.Width,
+					lc.AddLine (new Point (vts.Width - 1, vts.Bottom - 1), -vts.Width,
 						Orientation.Horizontal, lineStyle, attribute);
 					lc.AddLine (new Point (vts.X, vts.Bottom - 1), -vts.Height,
 						Orientation.Vertical, lineStyle, attribute);
-					lc.AddLine (new Point (vts.X, vts.Y), pEnd - vts.X + 1,
+					lc.AddLine (new Point (vts.X, vts.Y), end,
 						Orientation.Horizontal, lineStyle, attribute);
 					break;
 				case Side.Right:
-					lc.AddLine (new Point (vts.Right - 1, vts.Bottom - 1), -vts.Width,
+					lc.AddLine (new Point (vts.Width - 1, vts.Bottom - 1), -vts.Width,
 						Orientation.Horizontal, lineStyle, attribute);
 					lc.AddLine (new Point (vts.X, vts.Bottom - 1), -vts.Height,
 						Orientation.Vertical, lineStyle, attribute);
 					lc.AddLine (new Point (vts.X, vts.Y), vts.Width,
 						Orientation.Horizontal, lineStyle, attribute);
-					if (pEnd >= vts.Y && pEnd < vts.Bottom - 1 && startPos.side == endPos.side) {
-						lc.AddLine (new Point (vts.Right - 1, vts.Y), pEnd - vts.Y + 1,
+					if (end >= 0 && end < vts.Bottom - 1 && startPos.side == endPos.side) {
+						lc.AddLine (new Point (vts.Width - 1, vts.Y), end + 1,
 							Orientation.Vertical, lineStyle, attribute);
 					}
 					break;
 				case Side.Bottom:
-					lc.AddLine (new Point (vts.Right - 1, vts.Bottom - 1), -(vts.Right - pEnd),
+					lc.AddLine (new Point (vts.Width - 1, vts.Bottom - 1), -(vts.Width - end),
 						Orientation.Horizontal, lineStyle, attribute);
 					break;
 				}
 				break;
 			case Side.Bottom:
-				if (pStart == vts.X) {
+				if (start == vts.X) {
 					lc.AddLine (new Point (vts.X, vts.Bottom - 1), 1,
 						Orientation.Horizontal, lineStyle, attribute);
+				} else if (end <= start && startPos.side == endPos.side) {
+					lc.AddLine (new Point (vts.X + start, vts.Bottom - 1), -(start - end + 1),
+						Orientation.Horizontal, lineStyle, attribute);
+					break;
 				} else {
-					if (pEnd <= pStart && startPos.side == endPos.side) {
-						lc.AddLine (new Point (pStart, vts.Bottom - 1), -(pStart - pEnd + 1),
-							Orientation.Horizontal, lineStyle, attribute);
-						break;
-					} else {
-						lc.AddLine (new Point (pStart, vts.Bottom - 1), -(pStart - 1),
-							Orientation.Horizontal, lineStyle, attribute);
-					}
+					lc.AddLine (new Point (vts.X + start, vts.Bottom - 1), -(start + 1),
+						Orientation.Horizontal, lineStyle, attribute);
 				}
 				switch (endPos.side) {
 				case Side.Left:
-					lc.AddLine (new Point (vts.X, vts.Bottom - 1), -(vts.Bottom - pEnd),
+					lc.AddLine (new Point (vts.X, vts.Bottom - 1), -(vts.Bottom - end),
 						Orientation.Vertical, lineStyle, attribute);
 					break;
 				case Side.Top:
 					lc.AddLine (new Point (vts.X, vts.Bottom - 1), -vts.Height,
 						Orientation.Vertical, lineStyle, attribute);
-					lc.AddLine (new Point (vts.X, vts.Y), pEnd - 1,
+					lc.AddLine (new Point (vts.X, vts.Y), end + 1,
 						Orientation.Horizontal, lineStyle, attribute);
 					break;
 				case Side.Right:
@@ -779,7 +753,7 @@ namespace Terminal.Gui {
 						Orientation.Vertical, lineStyle, attribute);
 					lc.AddLine (new Point (vts.X, vts.Y), vts.Width,
 						Orientation.Horizontal, lineStyle, attribute);
-					lc.AddLine (new Point (vts.Right - 1, vts.Y), pEnd - 1,
+					lc.AddLine (new Point (vts.Width - 1, vts.Y), end,
 						Orientation.Vertical, lineStyle, attribute);
 					break;
 				case Side.Bottom:
@@ -787,10 +761,10 @@ namespace Terminal.Gui {
 						Orientation.Vertical, lineStyle, attribute);
 					lc.AddLine (new Point (vts.X, vts.Y), vts.Width,
 						Orientation.Horizontal, lineStyle, attribute);
-					lc.AddLine (new Point (vts.Right - 1, vts.Y), vts.Height,
+					lc.AddLine (new Point (vts.Width - 1, vts.Y), vts.Height,
 						Orientation.Vertical, lineStyle, attribute);
-					if (pEnd <= vts.Right - 1 && startPos.side == endPos.side) {
-						lc.AddLine (new Point (vts.Right - 1, vts.Bottom - 1), -(vts.Right - pEnd),
+					if (vts.Width - end > 0 && startPos.side == endPos.side) {
+						lc.AddLine (new Point (vts.Width - 1, vts.Bottom - 1), -(vts.Width - end),
 							Orientation.Horizontal, lineStyle, attribute);
 					}
 					break;
