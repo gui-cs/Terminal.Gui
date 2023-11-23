@@ -987,19 +987,20 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var aSize = true;
-			var nBoundsSize = GetAutoSize ();
-			if (IsInitialized && nBoundsSize != Bounds.Size) {
+			var boundsChanged = true;
+			var newFrameSize = GetAutoSize ();
+			if (IsInitialized && newFrameSize != Frame.Size) {
 				if (ForceValidatePosDim) {
-					aSize = ResizeBoundsToFit (nBoundsSize);
+					// BUGBUG: This ain't right, obviously.  We need to figure out how to handle this.
+					boundsChanged = ResizeBoundsToFit (newFrameSize);
 				} else {
-					Height = nBoundsSize.Height;
-					Width = nBoundsSize.Width; // = new Rect (Bounds.X, Bounds.Y, nBoundsSize.Width, nBoundsSize.Height);
+					Height = newFrameSize.Height;
+					Width = newFrameSize.Width; 
 				}
 			}
 			// BUGBUG: This call may be redundant
 			TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
-			return aSize;
+			return boundsChanged;
 		}
 
 		/// <summary>
