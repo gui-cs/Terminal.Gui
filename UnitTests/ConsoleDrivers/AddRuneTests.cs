@@ -1,4 +1,5 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
 using System.Text;
 using Xunit;
 using Xunit.Abstractions;
@@ -11,29 +12,33 @@ public class AddRuneTests {
 
 	public AddRuneTests (ITestOutputHelper output)
 	{
+		ConsoleDriver.RunningUnitTests = true;
 		this._output = output;
 	}
 
-	[Fact]
-	public void AddRune ()
+	[Theory]
+	[InlineData (typeof (FakeDriver))]
+	[InlineData (typeof (NetDriver))]
+	[InlineData (typeof (CursesDriver))]
+	[InlineData (typeof (WindowsDriver))]
+	public void AddRune (Type driverType)
 	{
-
-		var driver = new FakeDriver ();
-		Application.Init (driver);
+		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 		driver.Init ();
 
+		driver.Rows = 25;
+		driver.Cols = 80;
+		driver.Init ();
 		driver.AddRune (new Rune ('a'));
 		Assert.Equal ((Rune)'a', driver.Contents [0, 0].Rune);
 
 		driver.End ();
-		Application.Shutdown ();
 	}
 
 	[Fact]
 	public void AddRune_InvalidLocation_DoesNothing ()
 	{
 		var driver = new FakeDriver ();
-		Application.Init (driver);
 		driver.Init ();
 
 		driver.Move (driver.Cols, driver.Rows);
@@ -46,14 +51,12 @@ public class AddRuneTests {
 		}
 
 		driver.End ();
-		Application.Shutdown ();
 	}
 
 	[Fact]
 	public void AddRune_MovesToNextColumn ()
 	{
 		var driver = new FakeDriver ();
-		Application.Init (driver);
 		driver.Init ();
 
 		driver.AddRune ('a');
@@ -87,14 +90,12 @@ public class AddRuneTests {
 		}
 
 		driver.End ();
-		Application.Shutdown ();
 	}
 
 	[Fact]
 	public void AddRune_MovesToNextColumn_Wide ()
 	{
 		var driver = new FakeDriver ();
-		Application.Init (driver);
 		driver.Init ();
 
 		// 🍕 Slice of Pizza "\U0001F355"
@@ -134,15 +135,12 @@ public class AddRuneTests {
 		//}
 
 		driver.End ();
-		Application.Shutdown ();
 	}
-
 
 	[Fact]
 	public void AddRune_Accented_Letter_With_Three_Combining_Unicode_Chars ()
 	{
 		var driver = new FakeDriver ();
-		Application.Init (driver);
 		driver.Init ();
 
 		var expected = new Rune ('ắ');
@@ -189,6 +187,5 @@ public class AddRuneTests {
 		//		TestHelpers.AssertDriverContentsWithFrameAre (@"
 		//ắ", output);
 		driver.End ();
-		Application.Shutdown ();
 	}
 }

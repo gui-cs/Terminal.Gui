@@ -1589,7 +1589,7 @@ Edit
 	    };
 
 			TestHelpers.AssertDriverColorsAre (@"
-00000000000000", attributes);
+00000000000000", driver: Application.Driver, attributes);
 
 			Assert.True (menu.MouseEvent (new MouseEvent {
 				X = 0,
@@ -1605,7 +1605,7 @@ Edit
 02222222222220
 00000000000000
 00000000000000
-00000000000000", attributes);
+00000000000000", driver: Application.Driver, attributes);
 
 			Assert.True (top.Subviews [1].MouseEvent (new MouseEvent {
 				X = 0,
@@ -1621,7 +1621,7 @@ Edit
 02222222222220
 00000000000000
 00000000000000
-00000000000000", attributes);
+00000000000000", driver: Application.Driver, attributes);
 
 			Assert.True (top.Subviews [1].MouseEvent (new MouseEvent {
 				X = 0,
@@ -1637,7 +1637,7 @@ Edit
 02222222222220
 00000000000000
 00000000000000
-00000000000000", attributes);
+00000000000000", driver: Application.Driver, attributes);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -2757,6 +2757,21 @@ wo
 
 			Assert.True (menu.ProcessHotKey (new KeyEvent (menu.Key, new KeyModifiers ())));
 			Assert.False (menu.IsMenuOpen);
+		}
+
+		[Fact]
+		public void Separators_Does_Not_Throws_Pressing_Menu_Shortcut ()
+		{
+			var menu = new MenuBar (new MenuBarItem [] {
+				new MenuBarItem ("File", new MenuItem [] {
+					new MenuItem ("_New", "", null),
+					null,
+					new MenuItem ("_Quit", "", null)
+				})
+			});
+
+			var exception = Record.Exception (() => Assert.True (menu.ProcessHotKey (new KeyEvent (Key.AltMask | Key.Q, new KeyModifiers () { Alt = true }))));
+			Assert.Null (exception);
 		}
 	}
 }

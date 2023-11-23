@@ -2,28 +2,33 @@
 using System.Text;
 
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 /// Represents a single row/column in a Terminal.Gui rendering surface
 /// (e.g. <see cref="LineCanvas"/> and <see cref="ConsoleDriver"/>).
 /// </summary>
 public class Cell {
+	Rune _rune;
 	/// <summary>
 	/// The character to display. If <see cref="Rune"/> is <see langword="null"/>, then <see cref="Rune"/> is ignored.
 	/// </summary>
-	public Rune Rune { get; set; }
+	public Rune Rune {
+		get => _rune;
+		set {
+			CombiningMarks.Clear ();
+			_rune = value;
+		}
+	}
 
-	// TODO: Uncomment this once combining sequences that could not be normalized are supported.
-	///// <summary>
-	///// The combining mark for <see cref="Rune"/> that when combined makes this Cell a combining sequence that could
-	///// not be normalized to a single Rune.
-	///// If <see cref="CombiningMark"/> is <see langword="null"/>, then <see cref="CombiningMark"/> is ignored.
-	///// </summary>
-	///// <remarks>
-	///// Only valid in the rare case where <see cref="Rune"/> is a combining sequence that could not be normalized to a single Rune.
-	///// </remarks>
-	//internal Rune CombiningMark { get; set; }
+	/// <summary>
+	/// The combining marks for <see cref="Rune"/> that when combined makes this Cell a combining sequence.
+	/// If <see cref="CombiningMarks"/> empty, then <see cref="CombiningMarks"/> is ignored.
+	/// </summary>
+	/// <remarks>
+	/// Only valid in the rare case where <see cref="Rune"/> is a combining sequence that could not be normalized to a single Rune.
+	/// </remarks>
+	internal List<Rune> CombiningMarks { get; } = new List<Rune> ();
 
 	/// <summary>
 	/// The attributes to use when drawing the Glyph.

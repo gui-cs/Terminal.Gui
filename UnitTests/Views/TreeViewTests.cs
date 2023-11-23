@@ -856,21 +856,20 @@ namespace Terminal.Gui.ViewsTests {
 			var pink = new Attribute (Color.Magenta, Color.Black);
 			var hotpink = new Attribute (Color.BrightMagenta, Color.Black);
 
-
 			// Normal drawing of the tree view
-			TestHelpers.AssertDriverContentsAre (
-@"├-normal
+			TestHelpers.AssertDriverContentsAre (@"
+├-normal
 │ ├─pink
 │ └─normal
 └─pink
 ", output);
 			// Should all be the same color
-			TestHelpers.AssertDriverColorsAre (
-@"00000000
-00000000
+			TestHelpers.AssertDriverColorsAre (@"
 0000000000
-000000
-",
+0000000000
+0000000000
+0000000000
+", driver: Application.Driver,
 				new [] { tv.ColorScheme.Normal, pink });
 
 			var pinkScheme = new ColorScheme {
@@ -887,20 +886,20 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			// Same text
-			TestHelpers.AssertDriverContentsAre (
-@"├-normal
+			TestHelpers.AssertDriverContentsAre (@"
+├-normal
 │ ├─pink
 │ └─normal
 └─pink
 ", output);
 			// but now the item (only not lines) appear
 			// in pink when they are the word "pink"
-			TestHelpers.AssertDriverColorsAre (
-@"00000000
+			TestHelpers.AssertDriverColorsAre (@"
+00000000
 00001111
 0000000000
 001111
-",
+", driver: Application.Driver,
 				new [] { tv.ColorScheme.Normal, pink });
 		}
 
