@@ -4,28 +4,6 @@ using System.Text;
 
 namespace Terminal.Gui {
 	public partial class View {
-		/// <summary>
-		/// Specifies the side to start when draw frame with 
-		/// <see cref="DrawIncompleteFrame(ValueTuple{int, Side}, ValueTuple{int, Side}, Rect, LineStyle, Attribute?, bool)"/> method.
-		/// </summary>
-		public enum Side {
-			/// <summary>
-			/// Start on left.
-			/// </summary>
-			Left,
-			/// <summary>
-			/// Start on top.
-			/// </summary>
-			Top,
-			/// <summary>
-			/// Start on right.
-			/// </summary>
-			Right,
-			/// <summary>
-			/// Start on bottom.
-			/// </summary>
-			Bottom
-		};
 
 		ColorScheme _colorScheme;
 
@@ -206,7 +184,7 @@ namespace Terminal.Gui {
 		///     This clears the Bounds used by this view.
 		///   </para>
 		/// </remarks>
-		public void Clear () => Clear (ViewToScreen (Bounds));
+		public void Clear () => Clear (ViewToScreen(Bounds));
 
 		// BUGBUG: This version of the Clear API should be removed. We should have a tenet that says 
 		// "View APIs only deal with View-relative coords". This is only used by ComboBox which can
@@ -526,257 +504,24 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Draws a rectangular frame. The frame will be merged (auto-joined) with any other lines drawn by this View 
-		/// if <paramref name="mergeWithLineCanvas"/> is true, otherwise will be rendered immediately.
+		/// Draw a frame based on the passed bounds to the screen relative.
 		/// </summary>
-		/// <param name="rect">The view relative location and size of the frame.</param>
+		/// <param name="bounds">The bounds view relative.</param>
 		/// <param name="lineStyle">The line style.</param>
-		/// <param name="attribute">The colors to be used.</param>
-		/// <param name="mergeWithLineCanvas">When drawing the frame, allow it to integrate (join) to other frames in other controls.
-		/// Or false to simply draw the rect exactly with no side effects.</param>
-		public void DrawFrame (Rect rect, LineStyle lineStyle, Attribute? attribute = null, bool mergeWithLineCanvas = true)
+		/// <param name="attribute">The color to use.</param>
+		public void DrawFrame (Rect bounds, LineStyle lineStyle, Attribute? attribute = null)
 		{
-			LineCanvas lc;
-			if (mergeWithLineCanvas) {
-				lc = new LineCanvas ();
-			} else {
-				lc = LineCanvas;
-			}
-			var vts = ViewToScreen (rect);
-			lc.AddLine (new Point (vts.X, vts.Y), vts.Width,
+			var vts = ViewToScreen (bounds);
+			LineCanvas.AddLine (new Point (vts.X, vts.Y), vts.Width,
 				Orientation.Horizontal, lineStyle, attribute);
-			lc.AddLine (new Point (vts.Right - 1, vts.Y), vts.Height,
+			LineCanvas.AddLine (new Point (vts.Right - 1, vts.Y), vts.Height,
 				Orientation.Vertical, lineStyle, attribute);
-			lc.AddLine (new Point (vts.Right - 1, vts.Bottom - 1), -vts.Width,
+			LineCanvas.AddLine (new Point (vts.X, vts.Bottom - 1), vts.Width,
 				Orientation.Horizontal, lineStyle, attribute);
-			lc.AddLine (new Point (vts.X, vts.Bottom - 1), -vts.Height,
+			LineCanvas.AddLine (new Point (vts.X, vts.Y), vts.Height,
 				Orientation.Vertical, lineStyle, attribute);
 
-			if (mergeWithLineCanvas) {
-				LineCanvas.Merge (lc);
-			} else {
-				OnRenderLineCanvas ();
-			}
-		}
-
-		/// <summary>
-		/// Draws an incomplete frame. The frame will be merged (auto-joined) with any other lines drawn by this View 
-		/// if <paramref name="mergeWithLineCanvas"/> is true, otherwise will be rendered immediately.
-		/// The frame is always drawn clockwise. For <see cref="Side.Top"/> and <see cref="Side.Right"/> the end position must
-		/// be greater or equal to the start and for <see cref="Side.Left"/> and <see cref="Side.Bottom"/> the end position must
-		/// be less or equal to the start.
-		/// </summary>
-		/// <param name="startPos">The start and side position screen relative.</param>
-		/// <param name="endPos">The end and side position screen relative.</param>
-		/// <param name="rect">The view relative location and size of the frame.</param>
-		/// <param name="lineStyle">The line style.</param>
-		/// <param name="attribute">The colors to be used.</param>
-		/// <param name="mergeWithLineCanvas">When drawing the frame, allow it to integrate (join) to other frames in other controls.
-		/// Or false to simply draw the rect exactly with no side effects.</param>
-		public void DrawIncompleteFrame ((int start, Side side) startPos, (int end, Side side) endPos, Rect rect, LineStyle lineStyle, Attribute? attribute = null, bool mergeWithLineCanvas = true)
-		{
-			var vts = ViewToScreen (rect);
-			LineCanvas lc;
-			if (mergeWithLineCanvas) {
-				lc = new LineCanvas ();
-			} else {
-				lc = LineCanvas;
-			}
-			var start = startPos.start;
-			var end = endPos.end;
-			switch (startPos.side) {
-			case Side.Left:
-				if (start == vts.Y) {
-					lc.AddLine (new Point (vts.X, start), 1,
-						Orientation.Vertical, lineStyle, attribute);
-				} else {
-					if (end <= start && startPos.side == endPos.side) {
-						lc.AddLine (new Point (vts.X, start), end - start - 1,
-							Orientation.Vertical, lineStyle, attribute);
-						break;
-					} else {
-						lc.AddLine (new Point (vts.X, start), vts.Y - start - 1,
-							Orientation.Vertical, lineStyle, attribute);
-					}
-				}
-				switch (endPos.side) {
-				case Side.Left:
-					lc.AddLine (new Point (vts.X, vts.Y), vts.Width,
-						Orientation.Horizontal, lineStyle, attribute);
-					lc.AddLine (new Point (vts.Right - 1, vts.Y), vts.Height,
-						Orientation.Vertical, lineStyle, attribute);
-					lc.AddLine (new Point (vts.Right - 1, vts.Bottom - 1), -vts.Width,
-						Orientation.Horizontal, lineStyle, attribute);
-					if (end <= vts.Bottom - 1 && startPos.side == endPos.side) {
-						lc.AddLine (new Point (vts.X, vts.Bottom - 1), -(vts.Bottom - end),
-							Orientation.Vertical, lineStyle, attribute);
-					}
-					break;
-				case Side.Top:
-					lc.AddLine (new Point (vts.X, vts.Y), end,
-						Orientation.Horizontal, lineStyle, attribute);
-					break;
-				case Side.Right:
-					lc.AddLine (new Point (vts.X, vts.Y), vts.Width,
-						Orientation.Horizontal, lineStyle, attribute);
-					lc.AddLine (new Point (vts.Right - 1, vts.Y), end + 1,
-						Orientation.Vertical, lineStyle, attribute);
-					break;
-				case Side.Bottom:
-					lc.AddLine (new Point (vts.X, vts.Y), vts.Width,
-						Orientation.Horizontal, lineStyle, attribute);
-					lc.AddLine (new Point (vts.Right - 1, vts.Y), vts.Height,
-						Orientation.Vertical, lineStyle, attribute);
-					lc.AddLine (new Point (vts.Right - 1, vts.Bottom - 1), -end,
-						Orientation.Horizontal, lineStyle, attribute);
-					break;
-				}
-				break;
-
-			case Side.Top:
-				if (start == vts.Width - 1) {
-					lc.AddLine (new Point (vts.X + start, vts.Y), -1,
-						Orientation.Horizontal, lineStyle, attribute);
-				} else if (end >= start && startPos.side == endPos.side) {
-					lc.AddLine (new Point (vts.X + start, vts.Y), end - start + 1,
-						Orientation.Horizontal, lineStyle, attribute);
-					break;
-				} else if (vts.Width - start > 0) {
-					lc.AddLine (new Point (vts.X + start, vts.Y), Math.Max (vts.Width - start, 0),
-						Orientation.Horizontal, lineStyle, attribute);
-				}
-				switch (endPos.side) {
-				case Side.Left:
-					lc.AddLine (new Point (vts.Right - 1, vts.Y), vts.Height,
-						Orientation.Vertical, lineStyle, attribute);
-					lc.AddLine (new Point (vts.Right - 1, vts.Bottom - 1), -vts.Width,
-						Orientation.Horizontal, lineStyle, attribute);
-					lc.AddLine (new Point (vts.X, vts.Bottom - 1), -end,
-						Orientation.Vertical, lineStyle, attribute);
-					break;
-				case Side.Top:
-					lc.AddLine (new Point (vts.Right - 1, vts.Y), vts.Height,
-						Orientation.Vertical, lineStyle, attribute);
-					lc.AddLine (new Point (vts.Right - 1, vts.Bottom - 1), -vts.Width,
-						Orientation.Horizontal, lineStyle, attribute);
-					lc.AddLine (new Point (vts.X, vts.Bottom - 1), -vts.Height,
-						Orientation.Vertical, lineStyle, attribute);
-					if (end >= 0 && startPos.side == endPos.side) {
-						lc.AddLine (new Point (vts.X, vts.Y), end + 1,
-							Orientation.Horizontal, lineStyle, attribute);
-					}
-					break;
-				case Side.Right:
-					lc.AddLine (new Point (vts.Right - 1, vts.Y), end,
-						Orientation.Vertical, lineStyle, attribute);
-					break;
-				case Side.Bottom:
-					lc.AddLine (new Point (vts.Right - 1, vts.Y), vts.Height,
-						Orientation.Vertical, lineStyle, attribute);
-					lc.AddLine (new Point (vts.Right - 1, vts.Bottom - 1), -(vts.Width - end),
-						Orientation.Horizontal, lineStyle, attribute);
-					break;
-				}
-				break;
-			case Side.Right:
-				if (start == vts.Bottom - 1) {
-					lc.AddLine (new Point (vts.Width - 1, start), -1,
-						Orientation.Vertical, lineStyle, attribute);
-				} else {
-					if (end >= start && startPos.side == endPos.side) {
-						lc.AddLine (new Point (vts.Width - 1, start), end - start + 1,
-							Orientation.Vertical, lineStyle, attribute);
-						break;
-					} else {
-						lc.AddLine (new Point (vts.Width - 1, start), vts.Bottom - start,
-							Orientation.Vertical, lineStyle, attribute);
-					}
-				}
-				switch (endPos.side) {
-				case Side.Left:
-					lc.AddLine (new Point (vts.Width - 1, vts.Bottom - 1), -vts.Width,
-						Orientation.Horizontal, lineStyle, attribute);
-					lc.AddLine (new Point (vts.X, vts.Bottom - 1), -(vts.Bottom - end),
-						Orientation.Vertical, lineStyle, attribute);
-					break;
-				case Side.Top:
-					lc.AddLine (new Point (vts.Width - 1, vts.Bottom - 1), -vts.Width,
-						Orientation.Horizontal, lineStyle, attribute);
-					lc.AddLine (new Point (vts.X, vts.Bottom - 1), -vts.Height,
-						Orientation.Vertical, lineStyle, attribute);
-					lc.AddLine (new Point (vts.X, vts.Y), end,
-						Orientation.Horizontal, lineStyle, attribute);
-					break;
-				case Side.Right:
-					lc.AddLine (new Point (vts.Width - 1, vts.Bottom - 1), -vts.Width,
-						Orientation.Horizontal, lineStyle, attribute);
-					lc.AddLine (new Point (vts.X, vts.Bottom - 1), -vts.Height,
-						Orientation.Vertical, lineStyle, attribute);
-					lc.AddLine (new Point (vts.X, vts.Y), vts.Width,
-						Orientation.Horizontal, lineStyle, attribute);
-					if (end >= 0 && end < vts.Bottom - 1 && startPos.side == endPos.side) {
-						lc.AddLine (new Point (vts.Width - 1, vts.Y), end + 1,
-							Orientation.Vertical, lineStyle, attribute);
-					}
-					break;
-				case Side.Bottom:
-					lc.AddLine (new Point (vts.Width - 1, vts.Bottom - 1), -(vts.Width - end),
-						Orientation.Horizontal, lineStyle, attribute);
-					break;
-				}
-				break;
-			case Side.Bottom:
-				if (start == vts.X) {
-					lc.AddLine (new Point (vts.X, vts.Bottom - 1), 1,
-						Orientation.Horizontal, lineStyle, attribute);
-				} else if (end <= start && startPos.side == endPos.side) {
-					lc.AddLine (new Point (vts.X + start, vts.Bottom - 1), -(start - end + 1),
-						Orientation.Horizontal, lineStyle, attribute);
-					break;
-				} else {
-					lc.AddLine (new Point (vts.X + start, vts.Bottom - 1), -(start + 1),
-						Orientation.Horizontal, lineStyle, attribute);
-				}
-				switch (endPos.side) {
-				case Side.Left:
-					lc.AddLine (new Point (vts.X, vts.Bottom - 1), -(vts.Bottom - end),
-						Orientation.Vertical, lineStyle, attribute);
-					break;
-				case Side.Top:
-					lc.AddLine (new Point (vts.X, vts.Bottom - 1), -vts.Height,
-						Orientation.Vertical, lineStyle, attribute);
-					lc.AddLine (new Point (vts.X, vts.Y), end + 1,
-						Orientation.Horizontal, lineStyle, attribute);
-					break;
-				case Side.Right:
-					lc.AddLine (new Point (vts.X, vts.Bottom - 1), -vts.Height,
-						Orientation.Vertical, lineStyle, attribute);
-					lc.AddLine (new Point (vts.X, vts.Y), vts.Width,
-						Orientation.Horizontal, lineStyle, attribute);
-					lc.AddLine (new Point (vts.Width - 1, vts.Y), end,
-						Orientation.Vertical, lineStyle, attribute);
-					break;
-				case Side.Bottom:
-					lc.AddLine (new Point (vts.X, vts.Bottom - 1), -vts.Height,
-						Orientation.Vertical, lineStyle, attribute);
-					lc.AddLine (new Point (vts.X, vts.Y), vts.Width,
-						Orientation.Horizontal, lineStyle, attribute);
-					lc.AddLine (new Point (vts.Width - 1, vts.Y), vts.Height,
-						Orientation.Vertical, lineStyle, attribute);
-					if (vts.Width - end > 0 && startPos.side == endPos.side) {
-						lc.AddLine (new Point (vts.Width - 1, vts.Bottom - 1), -(vts.Width - end),
-							Orientation.Horizontal, lineStyle, attribute);
-					}
-					break;
-				}
-				break;
-			}
-
-			if (mergeWithLineCanvas) {
-				LineCanvas.Merge (lc);
-			} else {
-				OnRenderLineCanvas ();
-			}
+			OnRenderLineCanvas ();
 		}
 	}
 }
