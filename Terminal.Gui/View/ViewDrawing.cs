@@ -273,15 +273,13 @@ namespace Terminal.Gui {
 		/// <returns>The move.</returns>
 		/// <param name="col">The column to move to, in view-relative coordinates.</param>
 		/// <param name="row">the row to move to, in view-relative coordinates.</param>
-		/// <param name="clipped">Whether to clip the result of the ViewToScreen method,
-		///  If  <see langword="true"/>, the <paramref name="col"/> and <paramref name="row"/> values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</param>
-		public void Move (int col, int row, bool clipped = true)
+		public void Move (int col, int row)
 		{
 			if (Driver.Rows == 0) {
 				return;
 			}
-
-			BoundsToScreen (col, row, out var rCol, out var rRow, clipped);
+			
+			BoundsToScreen (col, row, out var rCol, out var rRow, false);
 			Driver.Move (rCol, rRow);
 		}
 		/// <summary>

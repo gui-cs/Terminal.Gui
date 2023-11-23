@@ -43,7 +43,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override void BoundsToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
 		{
-			// Frames are *Children* of a View, not SubViews. Thus View.ViewToScreen will not work.
+			// Frames are *Children* of a View, not SubViews. Thus View.BoundsToScreen will not work.
 			// To get the screen-relative coordinates of a Frame, we need to know who
 			// the Parent is
 			var parentFrame = Parent?.Frame ?? Frame;
