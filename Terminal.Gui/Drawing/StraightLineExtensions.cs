@@ -81,6 +81,15 @@ namespace Terminal.Gui {
 								int len = lDiffMax - eDiffMax;
 
 								if (len > 0) {
+
+									// A single line with length 1 and -1 are the same (fills only the single cell)
+									// They differ only in how they join to other lines (i.e. to create corners)
+									// Using negative for the later half of the line ensures line joins in a way
+									// consistent with its pre-snipped state.
+									if (len == 1) {
+										len = -1;
+									}
+										
 									toReturn.Add (CreateLineFromDiff (l, from, len));
 								}
 							}
