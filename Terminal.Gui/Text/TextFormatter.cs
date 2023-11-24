@@ -169,6 +169,15 @@ namespace Terminal.Gui {
 			return StringExtensions.ToString (runes);
 		}
 
+		static string ReplaceTABWithSpaces (string str, int tabWidth)
+		{
+			if (tabWidth == 0) {
+				return str.Replace ("\t", "");
+			}
+
+			return str.Replace ("\t", new string (' ', tabWidth));
+		}
+
 		/// <summary>
 		/// Splits all newlines in the <paramref name="text"/> into a list
 		/// and supports both CRLF and LF, preserving the ending newline.
@@ -613,6 +622,7 @@ namespace Terminal.Gui {
 
 			if (wordWrap == false) {
 				text = ReplaceCRLFWithSpace (text);
+				text = ReplaceTABWithSpaces (text, tabWidth);
 				lineResult.Add (ClipAndJustify (text, width, justify, textDirection));
 				return lineResult;
 			}
@@ -634,7 +644,7 @@ namespace Terminal.Gui {
 				}
 			}
 			foreach (var line in WordWrapText (StringExtensions.ToString (runes.GetRange (lp, runeCount - lp)), width, preserveTrailingSpaces, tabWidth, textDirection)) {
-				lineResult.Add (ClipAndJustify (line, width, justify, textDirection));
+				lineResult.Add (ClipAndJustify (ReplaceTABWithSpaces (line, tabWidth), width, justify, textDirection));
 			}
 
 			return lineResult;
@@ -792,8 +802,9 @@ namespace Terminal.Gui {
 		/// <param name="y">The y location of the rectangle</param>
 		/// <param name="text">The text to measure</param>
 		/// <param name="direction">The text direction.</param>
+		/// <param name="tabWidth">The number of columns used for a tab.</param>
 		/// <returns></returns>
-		public static Rect CalcRect (int x, int y, string text, TextDirection direction = TextDirection.LeftRight_TopBottom)
+		public static Rect CalcRect (int x, int y, string text, TextDirection direction = TextDirection.LeftRight_TopBottom, int tabWidth = 0)
 		{
 			if (string.IsNullOrEmpty (text)) {
 				return new Rect (new Point (x, y), Size.Empty);
@@ -815,11 +826,16 @@ namespace Terminal.Gui {
 						cols = 0;
 					} else if (rune.Value != '\r') {
 						cols++;
-						var rw = ((Rune)rune).GetColumns ();
-						if (rw > 0) {
-							rw--;
-						} else if (rw == 0) {
-							cols--;
+						var rw = 0;
+						if (rune.Value == '\t') {
+							rw += tabWidth - 1;
+						} else {
+							rw = ((Rune)rune).GetColumns ();
+							if (rw > 0) {
+								rw--;
+							} else if (rw == 0) {
+								cols--;
+							}
 						}
 						cols += rw;
 					}
@@ -844,12 +860,18 @@ namespace Terminal.Gui {
 						cw = 1;
 					} else if (rune.Value != '\r') {
 						rows++;
-						var rw = ((Rune)rune).GetColumns ();
-						if (rw == 0) {
-							rows--;
-						} else if (cw < rw) {
-							cw = rw;
-							vw++;
+						var rw = 0;
+						if (rune.Value == '\t') {
+							rw += tabWidth - 1;
+							rows += rw;
+						} else {
+							rw = ((Rune)rune).GetColumns ();
+							if (rw == 0) {
+								rows--;
+							} else if (cw < rw) {
+								cw = rw;
+								vw++;
+							}
 						}
 					}
 				}
@@ -998,7 +1020,7 @@ namespace Terminal.Gui {
 			get => _text;
 			set {
 				if (AutoSize || (_text == null && value != null && Size.IsEmpty)) {
-					Size = CalcRect (0, 0, value, _textDirection).Size;
+					Size = CalcRect (0, 0, value, _textDirection, TabWidth).Size;
 				}
 
 				_text = value;
@@ -1222,7 +1244,7 @@ namespace Terminal.Gui {
 					if (IsVerticalDirection (_textDirection)) {
 						var colsWidth = GetSumMaxCharWidth (shown_text, 0, 1);
 						_lines = Format (shown_text, Size.Height, _textVerticalAlignment == VerticalTextAlignment.Justified, Size.Width > colsWidth,
-							PreserveTrailingSpaces, 0, _textDirection);
+							PreserveTrailingSpaces, TabWidth, _textDirection);
 						if (!AutoSize) {
 							colsWidth = GetMaxColsForWidth (_lines, Size.Width);
 							if (_lines.Count > colsWidth) {
@@ -1231,7 +1253,7 @@ namespace Terminal.Gui {
 						}
 					} else {
 						_lines = Format (shown_text, Size.Width, _textAlignment == TextAlignment.Justified, Size.Height > 1,
-							PreserveTrailingSpaces, 0, _textDirection);
+							PreserveTrailingSpaces, TabWidth, _textDirection);
 						if (!AutoSize && _lines.Count > Size.Height) {
 							_lines.RemoveRange (Size.Height, _lines.Count - Size.Height);
 						}
@@ -1253,6 +1275,11 @@ namespace Terminal.Gui {
 		/// </para>
 		/// </remarks>
 		public bool NeedsFormat { get; set; }
+
+		/// <summary>
+		/// Gets or sets the number of columns used for a tab.
+		/// </summary>
+		public int TabWidth { get; set; } = 4;
 
 		/// <summary>
 		/// Causes the <see cref="TextFormatter"/> to reformat the text. 
