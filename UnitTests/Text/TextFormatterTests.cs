@@ -620,21 +620,24 @@ namespace Terminal.Gui.TextTests {
 
 		[Theory]
 		[InlineData ("กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ", 51, 0, new string [] { "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ" })]
-		[InlineData ("กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ", 50, -1, new string [] { "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัา", "ำ" })]
+		[InlineData ("กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ", 50, -1, new string [] { "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ" })]
 		[InlineData ("กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ", 46, -5, new string [] { "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮ", "ฯะัาำ" })]
 		[InlineData ("กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ", 26, -25, new string [] { "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบ", "ปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ" })]
 		[InlineData ("กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ", 17, -34, new string [] { "กขฃคฅฆงจฉชซฌญฎฏฐฑ", "ฒณดตถทธนบปผฝพฟภมย", "รฤลฦวศษสหฬอฮฯะัาำ" })]
 		[InlineData ("กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ", 13, -38, new string [] { "กขฃคฅฆงจฉชซฌญ", "ฎฏฐฑฒณดตถทธนบ", "ปผฝพฟภมยรฤลฦว", "ศษสหฬอฮฯะัาำ" })]
-		[InlineData ("กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ", 1, -50, new string [] { "ก", "ข", "ฃ", "ค", "ฅ", "ฆ", "ง", "จ", "ฉ", "ช", "ซ", "ฌ", "ญ", "ฎ", "ฏ", "ฐ", "ฑ", "ฒ", "ณ", "ด", "ต", "ถ", "ท", "ธ", "น", "บ", "ป", "ผ", "ฝ", "พ", "ฟ", "ภ", "ม", "ย", "ร", "ฤ", "ล", "ฦ", "ว", "ศ", "ษ", "ส", "ห", "ฬ", "อ", "ฮ", "ฯ", "ะ", "ั", "า", "ำ" })]
+		[InlineData ("กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ", 1, -50, new string [] { "ก", "ข", "ฃ", "ค", "ฅ", "ฆ", "ง", "จ", "ฉ", "ช", "ซ", "ฌ", "ญ", "ฎ", "ฏ", "ฐ", "ฑ", "ฒ", "ณ", "ด", "ต", "ถ", "ท", "ธ", "น", "บ", "ป", "ผ", "ฝ", "พ", "ฟ", "ภ", "ม", "ย", "ร", "ฤ", "ล", "ฦ", "ว", "ศ", "ษ", "ส", "ห", "ฬ", "อ", "ฮ", "ฯ", "ะั", "า", "ำ" })]
 		public void WordWrap_Unicode_SingleWordLine (string text, int maxWidth, int widthOffset, IEnumerable<string> resultLines)
 		{
 			List<string> wrappedLines;
 
+			var zeroWidth = text.EnumerateRunes ().Where (r => r.GetColumns () == 0);
+			Assert.Single (zeroWidth);
+			Assert.Equal ('ั', zeroWidth.ElementAt (0).Value);
 			Assert.Equal (maxWidth, text.GetRuneCount () + widthOffset);
 			var expectedClippedWidth = Math.Min (text.GetRuneCount (), maxWidth);
 			wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
 			Assert.Equal (wrappedLines.Count, resultLines.Count ());
-			Assert.True (expectedClippedWidth >= (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetRuneCount ()) : 0));
+			Assert.True (expectedClippedWidth >= (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetRuneCount () + zeroWidth.Count () - 1 + widthOffset) : 0));
 			Assert.True (expectedClippedWidth >= (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetColumns ()) : 0));
 			Assert.Equal (resultLines, wrappedLines);
 		}
@@ -1417,6 +1420,68 @@ namespace Terminal.Gui.TextTests {
 				// Rune array length is equal to string array
 				Assert.Equal (expected, text [index].ToString ());
 			}
+		}
+
+		[Fact]
+		public void GetLengthThatFits_With_Combining_Runes ()
+		{
+			var text = "Les Mise\u0328\u0301rables";
+			Assert.Equal (16, TextFormatter.GetLengthThatFits (text, 14));
+		}
+
+		[Fact]
+		public void GetMaxColsForWidth_With_Combining_Runes ()
+		{
+			var text = new List<string> () { "Les Mis", "e\u0328\u0301", "rables" };
+			Assert.Equal (1, TextFormatter.GetMaxColsForWidth (text, 1));
+		}
+
+		[Fact]
+		public void GetSumMaxCharWidth_With_Combining_Runes ()
+		{
+			var text = "Les Mise\u0328\u0301rables";
+			Assert.Equal (1, TextFormatter.GetSumMaxCharWidth (text, 1, 1));
+		}
+
+		[Fact]
+		public void GetSumMaxCharWidth_List_With_Combining_Runes ()
+		{
+			var text = new List<string> () { "Les Mis", "e\u0328\u0301", "rables" };
+			Assert.Equal (1, TextFormatter.GetSumMaxCharWidth (text, 1, 1));
+		}
+
+		[Theory]
+		[InlineData (14, 1, TextDirection.LeftRight_TopBottom)]
+		[InlineData (1, 14, TextDirection.TopBottom_LeftRight)]
+		public void CalcRect_With_Combining_Runes (int width, int height, TextDirection textDirection)
+		{
+			var text = "Les Mise\u0328\u0301rables";
+			Assert.Equal (new Rect (0, 0, width, height), TextFormatter.CalcRect (0, 0, text, textDirection));
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (14, 1, TextDirection.LeftRight_TopBottom, "Les Misęrables")]
+		[InlineData (1, 14, TextDirection.TopBottom_LeftRight, "L\ne\ns\n \nM\ni\ns\nę\nr\na\nb\nl\ne\ns")]
+		[InlineData (4, 4, TextDirection.TopBottom_LeftRight, @"
+LMre
+eias
+ssb 
+ ęl ")]
+		public void Draw_With_Combining_Runes (int width, int height, TextDirection textDirection, string expected)
+		{
+			var text = "Les Mise\u0328\u0301rables";
+
+			var tf = new TextFormatter ();
+			tf.Text = text;
+			tf.Direction = textDirection;
+
+			if (textDirection == TextDirection.LeftRight_TopBottom) {
+				Assert.Equal (new Size (width, height), tf.Size);
+			} else {
+				tf.Size = new Size (width, height);
+			}
+			tf.Draw (new Rect (0, 0, width, height), new Attribute (ColorName.White, ColorName.Black), new Attribute (ColorName.Blue, ColorName.Black));
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 	}
 }

@@ -368,7 +368,17 @@ namespace Terminal.Gui {
 						if (end == start) {
 							end = start + width;
 						}
-						lines.Add (StringExtensions.ToString (runes.GetRange (start, end - start)));
+						var zeroLength = 0;
+						for (int i = end; i < runes.Count - start; i++) {
+							var r = runes [i];
+							if (r.GetColumns () == 0) {
+								zeroLength++;
+							} else {
+								break;
+							}
+						}
+						lines.Add (StringExtensions.ToString (runes.GetRange (start, end - start + zeroLength)));
+						end += zeroLength;
 						start = end;
 						if (runes [end].Value == ' ') {
 							start++;
@@ -472,12 +482,13 @@ namespace Terminal.Gui {
 				if (IsHorizontalDirection (textDirection)) {
 					return StringExtensions.ToString (runes.GetRange (0, GetLengthThatFits (text, width)));
 				} else {
-					return StringExtensions.ToString (runes.GetRange (0, width));
+					var zeroLength = runes.Sum (r => r.GetColumns () == 0 ? 1 : 0);
+					return StringExtensions.ToString (runes.GetRange (0, width + zeroLength));
 				}
 			} else {
 				if (justify) {
 					return Justify (text, width, ' ', textDirection);
-				} else if (IsHorizontalDirection (textDirection) && text.GetColumns () > width) {
+				} else if (IsHorizontalDirection (textDirection) && GetRuneWidth (text.GetColumns ()) > width) {
 					return StringExtensions.ToString (runes.GetRange (0, GetLengthThatFits (text, width)));
 				}
 				return text;
@@ -654,7 +665,7 @@ namespace Terminal.Gui {
 			var max = 0;
 			result.ForEach (s => {
 				var m = 0;
-				s.ToRuneList ().ForEach (r => m += Math.Max (r.GetColumns (), 1));
+				s.ToRuneList ().ForEach (r => m += GetRuneWidth (r.GetColumns ()));
 				if (m > max) {
 					max = m;
 				}
@@ -688,7 +699,7 @@ namespace Terminal.Gui {
 			for (int i = (startIndex == -1 ? 0 : startIndex); i < (length == -1 ? lines.Count : startIndex + length); i++) {
 				var runes = lines [i];
 				if (runes.Length > 0)
-					max += runes.EnumerateRunes ().Max (r => Math.Max (r.GetColumns (), 1));
+					max += runes.EnumerateRunes ().Max (r => GetRuneWidth (r.GetColumns ()));
 			}
 			return max;
 		}
@@ -706,7 +717,7 @@ namespace Terminal.Gui {
 			var max = 0;
 			var runes = text.ToRunes ();
 			for (int i = (startIndex == -1 ? 0 : startIndex); i < (length == -1 ? runes.Length : startIndex + length); i++) {
-				max += Math.Max (runes [i].GetColumns (), 1);
+				max += GetRuneWidth (runes [i].GetColumns ());
 			}
 			return max;
 		}
@@ -734,13 +745,22 @@ namespace Terminal.Gui {
 			var runesLength = 0;
 			var runeIdx = 0;
 			for (; runeIdx < runes.Count; runeIdx++) {
-				var runeWidth = Math.Max (runes [runeIdx].GetColumns (), 1);
+				var runeWidth = GetRuneWidth (runes [runeIdx].GetColumns ());
 				if (runesLength + runeWidth > columns) {
 					break;
 				}
 				runesLength += runeWidth;
 			}
 			return runeIdx;
+		}
+
+		private static int GetRuneWidth (int runeWidth)
+		{
+			if (runeWidth < 0 || runeWidth > 0) {
+				return Math.Max (runeWidth, 1);
+			}
+
+			return runeWidth;
 		}
 
 		/// <summary>
@@ -756,7 +776,7 @@ namespace Terminal.Gui {
 			for (; lineIdx < lines.Count; lineIdx++) {
 				var runes = lines [lineIdx].ToRuneList ();
 				var maxRruneWidth = runes.Count > 0
-					? runes.Max (r => Math.Max (r.GetColumns (), 1)) : 1;
+					? runes.Max (r => GetRuneWidth (r.GetColumns ())) : 1;
 				if (runesLength + maxRruneWidth > width) {
 					break;
 				}
@@ -798,6 +818,8 @@ namespace Terminal.Gui {
 						var rw = ((Rune)rune).GetColumns ();
 						if (rw > 0) {
 							rw--;
+						} else if (rw == 0) {
+							cols--;
 						}
 						cols += rw;
 					}
@@ -823,7 +845,9 @@ namespace Terminal.Gui {
 					} else if (rune.Value != '\r') {
 						rows++;
 						var rw = ((Rune)rune).GetColumns ();
-						if (cw < rw) {
+						if (rw == 0) {
+							rows--;
+						} else if (cw < rw) {
 							cw = rw;
 							vw++;
 						}
@@ -1375,24 +1399,54 @@ namespace Terminal.Gui {
 				var start = isVertical ? bounds.Top : bounds.Left;
 				var size = isVertical ? bounds.Height : bounds.Width;
 				var current = start + colOffset;
+				List<Point?> lastZeroWidthPos = null;
+				Rune rune = default;
+				Rune lastRuneUsed;
+				var zeroLengthCount = isVertical ? runes.Sum (r => r.GetColumns () == 0 ? 1 : 0) : 0;
 
-				for (var idx = (isVertical ? start - y : start - x) + colOffset; current < start + size; idx++) {
-					if (idx < 0 || x + current + colOffset < 0) {
-						current++;
-						continue;
-					} else if (!fillRemaining && idx > runes.Length - 1) {
-						break;
+				for (var idx = (isVertical ? start - y : start - x) + colOffset; current < start + size + zeroLengthCount; idx++) {
+					lastRuneUsed = rune;
+					if (lastZeroWidthPos == null) {
+						if (idx < 0 || x + current + colOffset < 0) {
+							current++;
+							continue;
+						} else if (!fillRemaining && idx > runes.Length - 1) {
+							break;
+						}
+						if ((!isVertical && current - start > maxBounds.Left + maxBounds.Width - bounds.X + colOffset)
+							|| (isVertical && idx > maxBounds.Top + maxBounds.Height - bounds.Y)) {
+
+							break;
+						}
 					}
-					if ((!isVertical && idx > maxBounds.Left + maxBounds.Width - bounds.X + colOffset)
-						|| (isVertical && idx > maxBounds.Top + maxBounds.Height - bounds.Y))
+					//if ((!isVertical && idx > maxBounds.Left + maxBounds.Width - bounds.X + colOffset)
+					//	|| (isVertical && idx > maxBounds.Top + maxBounds.Height - bounds.Y))
 
-						break;
+					//	break;
 
-					var rune = (Rune)' ';
+					rune = (Rune)' ';
 					if (isVertical) {
-						Application.Driver?.Move (x, current);
 						if (idx >= 0 && idx < runes.Length) {
 							rune = runes [idx];
+						}
+						if (lastZeroWidthPos == null) {
+							Application.Driver?.Move (x, current);
+						} else {
+							var foundIdx = lastZeroWidthPos.IndexOf (p => p.Value.Y == current);
+							if (foundIdx > -1) {
+								if (rune.IsCombiningMark ()) {
+									lastZeroWidthPos [foundIdx] = (new Point (lastZeroWidthPos [foundIdx].Value.X + 1, current));
+
+									Application.Driver?.Move (lastZeroWidthPos [foundIdx].Value.X, current);
+								} else if (!rune.IsCombiningMark () && lastRuneUsed.IsCombiningMark ()) {
+									current++;
+									Application.Driver?.Move (x, current);
+								} else {
+									Application.Driver?.Move (x, current);
+								}
+							} else {
+								Application.Driver?.Move (x, current);
+							}
 						}
 					} else {
 						Application.Driver?.Move (current, y);
@@ -1400,6 +1454,9 @@ namespace Terminal.Gui {
 							rune = runes [idx];
 						}
 					}
+
+					var runeWidth = GetRuneWidth (rune.GetColumns ());
+
 					if (HotKeyPos > -1 && idx == HotKeyPos) {
 						if ((isVertical && _textVerticalAlignment == VerticalTextAlignment.Justified) ||
 						(!isVertical && _textAlignment == TextAlignment.Justified)) {
@@ -1409,12 +1466,27 @@ namespace Terminal.Gui {
 						Application.Driver?.AddRune (rune);
 						Application.Driver?.SetAttribute (normalColor);
 					} else {
+						if (isVertical) {
+							if (runeWidth == 0) {
+								if (lastZeroWidthPos == null) {
+									lastZeroWidthPos = new List<Point?> ();
+								}
+								var foundIdx = lastZeroWidthPos.IndexOf (p => p.Value.Y == current);
+								if (foundIdx == -1) {
+									current--;
+									lastZeroWidthPos.Add ((new Point (x + 1, current)));
+								}
+								Application.Driver?.Move (x + 1, current);
+							}
+						}
+
 						Application.Driver?.AddRune (rune);
 					}
-					// BUGBUG: I think this is a bug. If rune is a combining mark current should not be incremented.
-					var runeWidth = rune.GetColumns (); //Math.Max (rune.GetColumns (), 1);
+
 					if (isVertical) {
-						current++;
+						if (runeWidth > 0) {
+							current++;
+						}
 					} else {
 						current += runeWidth;
 					}
