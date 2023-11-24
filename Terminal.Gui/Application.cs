@@ -1191,34 +1191,79 @@ namespace Terminal.Gui {
 			}
 
 			if (view != null) {
-				var nme = new MouseEvent () {
-					X = rx,
-					Y = ry,
-					Flags = a.MouseEvent.Flags,
-					OfX = 0,
-					OfY = 0,
-					View = view
-				};
+				// If the mouse is inside the Frame, but outside the Bounds, the Frames should get the event
+				// If the mouse is inside the Bounds, the view should get the event
 
-				if (_mouseEnteredView == null) {
-					_mouseEnteredView = view;
-					view.OnMouseEnter (nme);
-				} else if (_mouseEnteredView != view) {
-					_mouseEnteredView.OnMouseLeave (nme);
-					view.OnMouseEnter (nme);
-					_mouseEnteredView = view;
+				var boundsOffset = view.GetBoundsOffset ();
+				var bounds = new Rect (view.Frame.X + boundsOffset.X, view.Frame.Y + boundsOffset.Y, view.Bounds.Width, view.Bounds.Height);
+				if (!bounds.Contains (a.MouseEvent.X, a.MouseEvent.Y)) {
+					// The mouse is inside the Frame, but outside the Bounds, so we send the event to the Frames
+					var me = new MouseEvent () {
+						X = a.MouseEvent.X,
+						Y = a.MouseEvent.Y,
+						Flags = a.MouseEvent.Flags,
+						OfX = a.MouseEvent.X - boundsOffset.X,
+						OfY = a.MouseEvent.Y - boundsOffset.Y,
+						View = view
+					};
+
+					bool FrameHandledMouseEvent (Frame frame)
+					{
+						if (frame != null && frame.Thickness.Contains (me.X, me.Y)) {
+							me.X -= frame.Thickness.Left;
+							me.Y -= frame.Thickness.Top;
+							me.OfX -= frame.Thickness.Left;
+							me.OfY -= frame.Thickness.Top;
+							if (frame.OnMouseEvent (me)) {
+								return true;
+							}
+						}
+						return false;
+					}
+
+					// Work inside-out (Padding, Border, Margin)
+					// TODO: Debate whether inside-out or outside-in is the right strategy
+					if (FrameHandledMouseEvent (view.Padding)) {
+						return;
+					}
+					if (FrameHandledMouseEvent (view.Border)) {
+						return;
+					}
+					if (FrameHandledMouseEvent (view.Margin)) {
+						return;
+					}
+				} else {
+					// The mouse is inside the Bounds, so we send the event to the View
+					var me = new MouseEvent () {
+						X = a.MouseEvent.X - view.Frame.X - boundsOffset.X,
+						Y = a.MouseEvent.Y - view.Frame.Y - boundsOffset.Y,
+						Flags = a.MouseEvent.Flags,
+						OfX = a.MouseEvent.X - view.Frame.X - boundsOffset.X,
+						OfY = a.MouseEvent.Y - view.Frame.Y - boundsOffset.Y,
+						View = view
+					};
+
+
+					if (_mouseEnteredView == null) {
+						_mouseEnteredView = view;
+						view.OnMouseEnter (me);
+					} else if (_mouseEnteredView != view) {
+						_mouseEnteredView.OnMouseLeave (me);
+						view.OnMouseEnter (me);
+						_mouseEnteredView = view;
+					}
+
+					if (!view.WantMousePositionReports && a.MouseEvent.Flags == MouseFlags.ReportMousePosition) {
+						return;
+					}
+
+					WantContinuousButtonPressedView = view.WantContinuousButtonPressed ? view : null;
+
+					if (view.OnMouseEvent (me)) {
+						// Should we bubble up the event, if it is not handled?
+						//return;
+					}
 				}
-
-				if (!view.WantMousePositionReports && a.MouseEvent.Flags == MouseFlags.ReportMousePosition)
-					return;
-
-				if (view.WantContinuousButtonPressed)
-					WantContinuousButtonPressedView = view;
-				else
-					WantContinuousButtonPressedView = null;
-
-				// Should we bubbled up the event, if it is not handled?
-				view.OnMouseEvent (nme);
 
 				BringOverlappedTopToFront ();
 			}

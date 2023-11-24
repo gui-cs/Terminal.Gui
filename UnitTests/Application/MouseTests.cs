@@ -1,16 +1,7 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
+﻿using Xunit;
 using Xunit.Abstractions;
-using static Terminal.Gui.SpinnerStyle;
-
 
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.ApplicationTests;
 
@@ -132,7 +123,7 @@ public class MouseTests {
 	[AutoInitShutdown]
 	[Theory]
 	// click inside view tests
-	[InlineData (0, 0, 0, 0, 0, true)]
+	[InlineData (0, 0, 0, 0, 0, true)] // should be false
 	[InlineData (0, 1, 0, 1, 0, true)]
 	[InlineData (0, 0, 1, 0, 1, true)]
 	[InlineData (0, 9, 0, 9, 0, true)]

@@ -791,11 +791,13 @@ namespace Terminal.Gui {
 		/// </summary>
 		public MouseFlags Flags { get; set; }
 
+		// TODO: The "offset" here is poorly documented
 		/// <summary>
 		/// The offset X (column) location for the mouse event.
 		/// </summary>
 		public int OfX { get; set; }
 
+		// TODO: The "offset" here is poorly documented
 		/// <summary>
 		/// The offset Y (column) location for the mouse event.
 		/// </summary>
