@@ -978,7 +978,7 @@ namespace Terminal.Gui {
 		#endregion // Static Members
 
 		List<string> _lines = new List<string> ();
-		string _text;
+		string _text = null;
 		TextAlignment _textAlignment;
 		VerticalTextAlignment _textVerticalAlignment;
 		TextDirection _textDirection;
@@ -997,13 +997,17 @@ namespace Terminal.Gui {
 		public virtual string Text {
 			get => _text;
 			set {
+				if (AutoSize || (_text == null && value != null && Size.IsEmpty)) {
+					Size = CalcRect (0, 0, value, _textDirection).Size;
+				}
+
 				_text = value;
 
-				if (_text != null && _text.GetRuneCount () > 0 && (Size.Width == 0 || Size.Height == 0 || Size.Width != _text.GetColumns ())) {
-					// Provide a default size (width = length of longest line, height = 1)
-					// TODO: It might makes more sense for the default to be width = length of first line?
-					Size = new Size (TextFormatter.MaxWidth (Text, int.MaxValue), 1);
-				}
+				//if (_text != null && _text.GetRuneCount () > 0 && (Size.Width == 0 || Size.Height == 0 || Size.Width != _text.GetColumns ())) {
+				//	// Provide a default size (width = length of longest line, height = 1)
+				//	// TODO: It might makes more sense for the default to be width = length of first line?
+				//	Size = new Size (TextFormatter.MaxWidth (Text, int.MaxValue), 1);
+				//}
 
 				NeedsFormat = true;
 			}

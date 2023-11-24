@@ -65,13 +65,23 @@ namespace Terminal.Gui.TextTests {
 			Assert.NotEmpty (tf.Lines);
 		}
 
-		[Fact]
-		public void TestSize_TextChange ()
+		[Theory]
+		[InlineData (TextDirection.LeftRight_TopBottom, false)]
+		[InlineData (TextDirection.TopBottom_LeftRight, true)]
+		public void TestSize_TextChange (TextDirection textDirection, bool autoSize)
 		{
-			var tf = new TextFormatter () { Text = "你" };
+			var tf = new TextFormatter () { Direction = textDirection, Text = "你", AutoSize = autoSize };
 			Assert.Equal (2, tf.Size.Width);
 			tf.Text = "你你";
-			Assert.Equal (4, tf.Size.Width);
+			if (autoSize) {
+				if (textDirection == TextDirection.LeftRight_TopBottom) {
+					Assert.Equal (4, tf.Size.Width);
+				} else {
+					Assert.Equal (2, tf.Size.Width);
+				}
+			} else {
+				Assert.Equal (2, tf.Size.Width);
+			}
 		}
 
 		[Fact]
@@ -1472,12 +1482,13 @@ ssb
 			var text = "Les Mise\u0328\u0301rables";
 
 			var tf = new TextFormatter ();
-			tf.Text = text;
 			tf.Direction = textDirection;
+			tf.Text = text;
 
 			if (textDirection == TextDirection.LeftRight_TopBottom) {
 				Assert.Equal (new Size (width, height), tf.Size);
 			} else {
+				Assert.Equal (new Size (1, text.GetColumns ()), tf.Size);
 				tf.Size = new Size (width, height);
 			}
 			tf.Draw (new Rect (0, 0, width, height), new Attribute (ColorName.White, ColorName.Black), new Attribute (ColorName.Blue, ColorName.Black));
