@@ -1508,6 +1508,7 @@ ssb
 			tf.TabWidth = tabWidth;
 			tf.Text = text;
 
+			Assert.False (tf.WordWrap);
 			Assert.False (tf.PreserveTrailingSpaces);
 			Assert.Equal (new Size (width, height), tf.Size);
 			tf.Draw (new Rect (0, 0, width, height), new Attribute (ColorName.White, ColorName.Black), new Attribute (ColorName.Blue, ColorName.Black));
@@ -1526,6 +1527,26 @@ ssb
 			tf.Direction = textDirection;
 			tf.TabWidth = tabWidth;
 			tf.PreserveTrailingSpaces = true;
+			tf.Text = text;
+
+			Assert.False (tf.WordWrap);
+			Assert.Equal (new Size (width, height), tf.Size);
+			tf.Draw (new Rect (0, 0, width, height), new Attribute (ColorName.White, ColorName.Black), new Attribute (ColorName.Blue, ColorName.Black));
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a     Tab")]
+		[InlineData (1, 17, TextDirection.TopBottom_LeftRight, 4, "T\nh\ni\ns\n \ni\ns\n \na\n \n \n \n \n \nT\na\nb")]
+		[InlineData (13, 1, TextDirection.LeftRight_TopBottom, 0, "This is a Tab")]
+		[InlineData (1, 13, TextDirection.TopBottom_LeftRight, 0, "T\nh\ni\ns\n \ni\ns\n \na\n \nT\na\nb")]
+		public void TabWith_WordWrap_True (int width, int height, TextDirection textDirection, int tabWidth, string expected)
+		{
+			var text = "This is a \tTab";
+			var tf = new TextFormatter ();
+			tf.Direction = textDirection;
+			tf.TabWidth = tabWidth;
+			tf.WordWrap = true;
 			tf.Text = text;
 
 			Assert.Equal (new Size (width, height), tf.Size);
