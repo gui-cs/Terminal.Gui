@@ -248,8 +248,8 @@ namespace Terminal.Gui {
 			NotifyNewRunState = null;
 			NotifyStopRunState = null;
 			_initialized = false;
-			_mouseGrabView = null;
-			_lastMouseOwnerView = null;
+			MouseGrabView = null;
+			_mouseEnteredView = null;
 
 			// Reset synchronization context to allow the user to run async/await,
 			// as the main loop has been ended, the synchronization context from 
@@ -304,7 +304,7 @@ namespace Terminal.Gui {
 			}
 
 			// Ensure the mouse is ungrabed.
-			_mouseGrabView = null;
+			MouseGrabView = null;
 
 			var rs = new RunState (Toplevel);
 
@@ -1018,12 +1018,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static View WantContinuousButtonPressedView { get; private set; }
 
-		static View _mouseGrabView;
-
 		/// <summary>
-		/// The view that grabbed the mouse, to where mouse events will be routed to.
+		/// Gets the view that grabbed the mouse (e.g. for dragging). When this is set, all mouse events will be
+		/// routed to this view until the view calls <see cref="UngrabMouse"/> or the mouse is released.
 		/// </summary>
-		public static View MouseGrabView => _mouseGrabView;
+		public static View MouseGrabView { get; private set; }
 
 		/// <summary>
 		/// Invoked when a view wants to grab the mouse; can be canceled.
@@ -1031,7 +1030,7 @@ namespace Terminal.Gui {
 		public static event EventHandler<GrabMouseEventArgs> GrabbingMouse;
 
 		/// <summary>
-		/// Invoked when a view wants ungrab the mouse; can be canceled.
+		/// Invoked when a view wants un-grab the mouse; can be canceled.
 		/// </summary>
 		public static event EventHandler<GrabMouseEventArgs> UnGrabbingMouse;
 
@@ -1041,7 +1040,7 @@ namespace Terminal.Gui {
 		public static event EventHandler<ViewEventArgs> GrabbedMouse;
 
 		/// <summary>
-		/// Invoked after a view has ungrabbed the mouse.
+		/// Invoked after a view has un-grabbed the mouse.
 		/// </summary>
 		public static event EventHandler<ViewEventArgs> UnGrabbedMouse;
 
@@ -1055,8 +1054,7 @@ namespace Terminal.Gui {
 				return;
 			if (!OnGrabbingMouse (view)) {
 				OnGrabbedMouse (view);
-				_mouseGrabView = view;
-				//Driver.UncookMouse ();
+				MouseGrabView = view;
 			}
 		}
 
@@ -1065,12 +1063,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static void UngrabMouse ()
 		{
-			if (_mouseGrabView == null)
+			if (MouseGrabView == null)
 				return;
-			if (!OnUnGrabbingMouse (_mouseGrabView)) {
-				OnUnGrabbedMouse (_mouseGrabView);
-				_mouseGrabView = null;
-				//Driver.CookMouse ();
+			if (!OnUnGrabbingMouse (MouseGrabView)) {
+				OnUnGrabbedMouse (MouseGrabView);
+				MouseGrabView = null;
 			}
 		}
 
@@ -1106,7 +1103,8 @@ namespace Terminal.Gui {
 			UnGrabbedMouse?.Invoke (view, new ViewEventArgs (view));
 		}
 
-		static View _lastMouseOwnerView;
+		// Used by OnMouseEvent to track the last view that was clicked on.
+		static View _mouseEnteredView;
 
 		/// <summary>
 		/// Event fired when a mouse move or click occurs. Coordinates are screen relative.
@@ -1131,7 +1129,7 @@ namespace Terminal.Gui {
 		/// <param name="a">The mouse event with coordinates relative to the screen.</param>
 		public static void OnMouseEvent (MouseEventEventArgs a)
 		{
-			static bool OutsideBounds (Point p, Rect r) => p.X < 0 || p.X > r.Right || p.Y < 0 || p.Y > r.Bottom;
+			static bool OutsideRect (Point p, Rect r) => p.X < 0 || p.X > r.Right || p.Y < 0 || p.Y > r.Bottom;
 
 			if (IsMouseDisabled) {
 				return;
@@ -1153,8 +1151,10 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			if (_mouseGrabView != null) {
-				var newxy = _mouseGrabView.ScreenToView (a.MouseEvent.X, a.MouseEvent.Y);
+			if (MouseGrabView != null) {
+				// If the mouse is grabbed, send the event to the view that grabbed it.
+				// The coordinates are relative to the Bounds of the view that grabbed the mouse.
+				var newxy = MouseGrabView.ScreenToView (a.MouseEvent.X, a.MouseEvent.Y);
 				var nme = new MouseEvent () {
 					X = newxy.X,
 					Y = newxy.Y,
@@ -1163,11 +1163,16 @@ namespace Terminal.Gui {
 					OfY = a.MouseEvent.Y - newxy.Y,
 					View = view
 				};
-				if (OutsideBounds (new Point (nme.X, nme.Y), _mouseGrabView.Bounds)) {
-					_lastMouseOwnerView?.OnMouseLeave (a.MouseEvent);
+				if (OutsideRect (new Point (nme.X, nme.Y), MouseGrabView.Bounds)) {
+					// The mouse has moved outside the bounds of the the view that
+					// grabbed the mouse, so we tell the view that last got 
+					// OnMouseEnter the mouse is leaving
+					// BUGBUG: That sentence makes no sense. Either I'm missing something
+					// or this logic is flawed.
+					_mouseEnteredView?.OnMouseLeave (a.MouseEvent);
 				}
 				//System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
-				if (_mouseGrabView?.OnMouseEvent (nme) == true) {
+				if (MouseGrabView?.OnMouseEvent (nme) == true) {
 					return;
 				}
 			}
@@ -1195,13 +1200,13 @@ namespace Terminal.Gui {
 					View = view
 				};
 
-				if (_lastMouseOwnerView == null) {
-					_lastMouseOwnerView = view;
+				if (_mouseEnteredView == null) {
+					_mouseEnteredView = view;
 					view.OnMouseEnter (nme);
-				} else if (_lastMouseOwnerView != view) {
-					_lastMouseOwnerView.OnMouseLeave (nme);
+				} else if (_mouseEnteredView != view) {
+					_mouseEnteredView.OnMouseLeave (nme);
 					view.OnMouseEnter (nme);
-					_lastMouseOwnerView = view;
+					_mouseEnteredView = view;
 				}
 
 				if (!view.WantMousePositionReports && a.MouseEvent.Flags == MouseFlags.ReportMousePosition)

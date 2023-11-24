@@ -132,6 +132,7 @@ namespace Terminal.Gui {
 				OnResizeNeeded ();
 			} else if (directionChanged && IsAdded) {
 				ResizeBoundsToFit (Bounds.Size);
+				// BUGBUG: I think this call is redundant.
 				SetBoundsToFitFrame ();
 			} else {
 				SetBoundsToFitFrame ();
