@@ -8,7 +8,7 @@ using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.ViewTests;
 /// <summary>
-/// Tests for view coordinate mapping (e.g. <see cref="View.ScreenToView(int, int)"/> etc...).
+/// Tests for view coordinate mapping (e.g. <see cref="View.ScreenToFrame"/> etc...).
 /// </summary>
 public class CoordinateTests {
 	readonly ITestOutputHelper _output;
@@ -39,7 +39,7 @@ public class CoordinateTests {
 			Height = 10
 		};
 
-		var actual = view.ScreenToView (x, y);
+		var actual = view.ScreenToFrame (x, y);
 		Assert.Equal (expectedX, actual.X);
 		Assert.Equal (expectedY, actual.Y);
 	}
@@ -66,7 +66,7 @@ public class CoordinateTests {
 			BorderStyle = LineStyle.Single
 		};
 
-		var actual = view.ScreenToView (x, y);
+		var actual = view.ScreenToFrame (x, y);
 		Assert.Equal (expectedX, actual.X);
 		Assert.Equal (expectedY, actual.Y);
 	}
@@ -99,7 +99,7 @@ public class CoordinateTests {
 		};
 		super.Add (view);
 
-		var actual = view.ScreenToView (x, y);
+		var actual = view.ScreenToFrame (x, y);
 		Assert.Equal (expectedX, actual.X);
 		Assert.Equal (expectedY, actual.Y);
 	}
@@ -133,7 +133,7 @@ public class CoordinateTests {
 		};
 		super.Add (view);
 
-		var actual = view.ScreenToView (x, y);
+		var actual = view.ScreenToFrame (x, y);
 		Assert.Equal (expectedX, actual.X);
 		Assert.Equal (expectedY, actual.Y);
 	}
@@ -255,7 +255,7 @@ public class CoordinateTests {
 		};
 		super.Add (view);
 
-		var actual = view.ScreenToView (x, y);
+		var actual = view.ScreenToFrame (x, y);
 		Assert.Equal (expectedX, actual.X);
 		Assert.Equal (expectedY, actual.Y);
 	}

@@ -530,18 +530,18 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Converts a screen-relative coordinate to a view-relative coordinate. View-relative means
-		/// Frame-Relative. 
+		/// Converts a screen-relative coordinate to a Frame-relative coordinate. Frame-relative means
+		/// relative to the View's <see cref="SuperView"/>'s <see cref="Bounds"/>.
 		/// </summary>
-		/// <returns>The coordinate relative to this view's <see cref="Frame"/>.</returns>
+		/// <returns>The coordinate relative to the <see cref="SuperView"/>'s <see cref="Bounds"/>.</returns>
 		/// <param name="x">Screen-relative column.</param>
 		/// <param name="y">Screen-relative row.</param>
-		public Point ScreenToView (int x, int y)
+		public Point ScreenToFrame (int x, int y)
 		{
 			Point superViewBoundsOffset = SuperView?.GetBoundsOffset () ?? Point.Empty;
 			var ret = new Point (x - Frame.X - superViewBoundsOffset.X, y - Frame.Y - superViewBoundsOffset.Y);
 			if (SuperView != null) {
-				var superFrame = SuperView.ScreenToView (x - superViewBoundsOffset.X, y - superViewBoundsOffset.Y);
+				var superFrame = SuperView.ScreenToFrame (x - superViewBoundsOffset.X, y - superViewBoundsOffset.Y);
 				ret = new Point (superFrame.X - Frame.X, superFrame.Y - Frame.Y);
 			}
 			return ret;
@@ -555,7 +555,7 @@ namespace Terminal.Gui {
 		/// <param name="y">Screen-relative row.</param>
 		public Point ScreenToBounds (int x, int y)
 		{
-			var screen = ScreenToView (x, y);
+			var screen = ScreenToFrame (x, y);
 			var boundsOffset = GetBoundsOffset ();
 			return new Point (screen.X - boundsOffset.X, screen.Y - boundsOffset.Y);
 		}

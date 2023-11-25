@@ -2104,7 +2104,7 @@ namespace Terminal.Gui {
 						Application.GrabMouse (v);
 						MouseEvent nme;
 						if (me.Y > -1) {
-							var newxy = v.ScreenToView (me.X, me.Y);
+							var newxy = v.ScreenToFrame (me.X, me.Y);
 							nme = new MouseEvent () {
 								X = newxy.X,
 								Y = newxy.Y,

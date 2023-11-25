@@ -332,7 +332,7 @@ namespace Terminal.Gui {
 					bool isRoot = splitterLines.Contains (line);
 
 					line.BoundsToScreen (0, 0, out var x1, out var y1);
-					var origin = ScreenToView (x1, y1);
+					var origin = ScreenToFrame (x1, y1);
 					var length = line.Orientation == Orientation.Horizontal ?
 							line.Frame.Width :
 							line.Frame.Height;
@@ -749,7 +749,7 @@ namespace Terminal.Gui {
 			{
 				Tile.ContentView.BoundsToScreen (0, 0, out var screenCol, out var screenRow);
 				screenRow--;
-				return intoCoordinateSpace.ScreenToView (screenCol, screenRow);
+				return intoCoordinateSpace.ScreenToFrame (screenCol, screenRow);
 			}
 
 			internal string GetTrimmedTitle ()

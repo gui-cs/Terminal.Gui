@@ -1154,7 +1154,7 @@ namespace Terminal.Gui {
 			if (MouseGrabView != null) {
 				// If the mouse is grabbed, send the event to the view that grabbed it.
 				// The coordinates are relative to the Bounds of the view that grabbed the mouse.
-				var newxy = MouseGrabView.ScreenToView (a.MouseEvent.X, a.MouseEvent.Y);
+				var newxy = MouseGrabView.ScreenToFrame (a.MouseEvent.X, a.MouseEvent.Y);
 				var nme = new MouseEvent () {
 					X = newxy.X,
 					Y = newxy.Y,
