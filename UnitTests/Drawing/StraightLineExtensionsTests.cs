@@ -234,7 +234,65 @@ namespace Terminal.Gui.DrawingTests {
 		}
 
 
-		// TODO: Replicate above tests for Vertical lines (Horizontal exclusion)
+		[Fact, AutoInitShutdown]
+		public void TestExcludePerpendicular_VerticalLine_HorizontalExclusion_ClipTop ()
+		{
+			// y=1 to y=10
+			var l1 = new StraightLine (new Point (2,1), 10, Orientation.Vertical, LineStyle.Single);
+			var after = new StraightLine [] { l1 }
+						// exclude y=1 x=0-10
+						.Exclude (new Point (0,1), 10, Orientation.Horizontal)
+						.ToArray ();
+			// y=2 to y=10,
+			var lineAfter = Assert.Single(after);
+
+			Assert.Equal (2, lineAfter.Start.Y);
+			Assert.Equal (2, lineAfter.Start.X);
+			Assert.Equal (9, lineAfter.Length);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TestExcludePerpendicular_VerticalLine_HorizontalExclusion_ClipBottom ()
+		{
+			// y=1 to y=10
+			var l1 = new StraightLine (new Point (2,1), 10, Orientation.Vertical, LineStyle.Single);
+			var after = new StraightLine [] { l1 }
+						// exclude y=10 x=0-10
+						.Exclude (new Point (0,10), 10, Orientation.Horizontal)
+						.ToArray ();
+			// y=1 to y=9,
+			var lineAfter = Assert.Single (after);
+
+			Assert.Equal (1, lineAfter.Start.Y);
+			Assert.Equal (2, lineAfter.Start.X);
+			Assert.Equal (9, lineAfter.Length);
+		}
+
+
+		[Fact, AutoInitShutdown]
+		public void TestExcludePerpendicular_VerticalLine_HorizontalExclusion_MissTop ()
+		{
+			// y=1 to y=10
+			var l1 = new StraightLine (new Point (2,1), 10, Orientation.Vertical, LineStyle.Single);
+			var after = new StraightLine [] { l1 }
+						// exclude y=0 x=0-10
+						.Exclude (new Point (0, 0), 10, Orientation.Horizontal)
+						.ToArray ();
+			// Exclusion line is too far above so hits nothing
+			Assert.Same(Assert.Single (after),l1);
+		}
+		[Fact, AutoInitShutdown]
+		public void TestExcludePerpendicular_VerticalLine_HorizontalExclusion_MissBottom ()
+		{
+			// y=1 to y=10
+			var l1 = new StraightLine (new Point (2,1), 10, Orientation.Vertical, LineStyle.Single);
+			var after = new StraightLine [] { l1 }
+						// exclude y=11 x=0-10
+						.Exclude (new Point (0,11), 10, Orientation.Horizontal)
+						.ToArray ();
+			// Exclusion line is too far to the right so hits nothing
+			Assert.Same (Assert.Single (after), l1);
+		}
 
 		#endregion Perpendicular Intersection Tests
 	}
