@@ -1,9 +1,19 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.DrawingTests {
 	public class StraightLineExtensionsTests
 	{
+		private ITestOutputHelper _output;
+
+
+		public StraightLineExtensionsTests(ITestOutputHelper output)
+		{
+			this._output = output;
+		}
+
 		#region Parallel Tests
 		[Fact, AutoInitShutdown]
 		public void TestExcludeParallel_HorizontalLines_LeftOnly ()
@@ -295,5 +305,69 @@ namespace Terminal.Gui.DrawingTests {
 		}
 
 		#endregion Perpendicular Intersection Tests
+
+		[Fact, AutoInitShutdown]
+		public void LineCanvasIntegrationTest()
+		{
+			var lc = new LineCanvas();
+			lc.AddLine(new Point(0,0),10,Orientation.Horizontal,LineStyle.Single);
+			lc.AddLine(new Point(9,0),5,Orientation.Vertical,LineStyle.Single);
+			lc.AddLine(new Point(9,4),-10,Orientation.Horizontal,LineStyle.Single);
+			lc.AddLine(new Point(0,4),-5,Orientation.Vertical,LineStyle.Single);
+
+
+			TestHelpers.AssertEqual (this._output,
+				@"
+┌────────┐
+│        │
+│        │
+│        │
+└────────┘",$"{Environment.NewLine}{lc}");
+			var origLines = lc.Lines;
+
+			lc = new LineCanvas(origLines.Exclude(new Point(0,0),10,Orientation.Horizontal));
+
+			TestHelpers.AssertEqual (this._output,
+				@"
+│        │
+│        │
+│        │
+└────────┘",$"{Environment.NewLine}{lc}");
+
+			lc = new LineCanvas(origLines.Exclude(new Point(0,1),10,Orientation.Horizontal));
+			TestHelpers.AssertEqual (this._output,
+				@"
+┌────────┐
+          
+│        │
+│        │
+└────────┘",$"{Environment.NewLine}{lc}");
+
+			lc = new LineCanvas(origLines.Exclude(new Point(0,2),10,Orientation.Horizontal));
+			TestHelpers.AssertEqual (this._output,
+				@"
+┌────────┐
+│        │
+          
+│        │
+└────────┘",$"{Environment.NewLine}{lc}");
+
+			lc = new LineCanvas(origLines.Exclude(new Point(0,3),10,Orientation.Horizontal));
+			TestHelpers.AssertEqual (this._output,
+				@"
+┌────────┐
+│        │
+│        │
+          
+└────────┘",$"{Environment.NewLine}{lc}");
+
+			lc = new LineCanvas(origLines.Exclude(new Point(0,4),10,Orientation.Horizontal));
+			TestHelpers.AssertEqual (this._output,
+				@"
+┌────────┐
+│        │
+│        │
+│        │",$"{Environment.NewLine}{lc}");
+		}
 	}
 }
