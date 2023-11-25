@@ -111,9 +111,8 @@ namespace Terminal.Gui {
 		/// <param name="x"></param>
 		/// <param name="y"></param>
 		/// <returns><see langword="true"/> if the specified coordinate is within the thickness; <see langword="false"/> otherwise.</returns>
-		public bool Contains (int x, int y)
+		public bool Contains (Rect outside, int x, int y)
 		{
-			var outside = new Rect (0, 0, Horizontal, Vertical);
 			var inside = GetInside (outside);
 			return outside.Contains (x, y) && !inside.Contains (x, y);
 		}

@@ -1135,7 +1135,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var view = View.FindDeepestView (Current, a.MouseEvent.X, a.MouseEvent.Y, out int rx, out int ry);
+			var view = View.FindDeepestView (Current, a.MouseEvent.X, a.MouseEvent.Y, out int screenX, out int screenY);
 
 			if (view != null && view.WantContinuousButtonPressed) {
 				WantContinuousButtonPressedView = view;
@@ -1183,7 +1183,7 @@ namespace Terminal.Gui {
 				a.MouseEvent.Flags != 0) {
 
 				var top = FindDeepestTop (Top, a.MouseEvent.X, a.MouseEvent.Y, out _, out _);
-				view = View.FindDeepestView (top, a.MouseEvent.X, a.MouseEvent.Y, out rx, out ry);
+				view = View.FindDeepestView (top, a.MouseEvent.X, a.MouseEvent.Y, out screenX, out screenY);
 
 				if (view != null && view != OverlappedTop && top != Current) {
 					MoveCurrent ((Toplevel)top);
@@ -1192,13 +1192,8 @@ namespace Terminal.Gui {
 
 			bool FrameHandledMouseEvent (Frame frame)
 			{
-				if (frame == null) {
-					return false;
-				}
-
-				var boundsPoint = frame.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
-
-				if (frame?.Thickness.Contains (boundsPoint.X, boundsPoint.Y) ?? false) {
+				if (frame?.Thickness.Contains (frame.FrameToScreen (), a.MouseEvent.X, a.MouseEvent.Y) ?? false) {
+					var boundsPoint = frame.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
 					var me = new MouseEvent () {
 						X = boundsPoint.X,
 						Y = boundsPoint.Y,
@@ -1207,58 +1202,60 @@ namespace Terminal.Gui {
 						OfY = boundsPoint.Y,
 						View = frame
 					};
-					if (frame.OnMouseEvent (me)) {
-						return true;
-					}
+					frame.OnMouseEvent (me);
+					return true;
 				}
 				return false;
 			}
 
-			// Work inside-out (Padding, Border, Margin)
-			// TODO: Debate whether inside-out or outside-in is the right strategy
-			if (FrameHandledMouseEvent (view?.Padding)) {
-				return;
+			if (view != null) {
+				// Work inside-out (Padding, Border, Margin)
+				// TODO: Debate whether inside-out or outside-in is the right strategy
+				if (FrameHandledMouseEvent (view?.Padding)) {
+					return;
+				}
+				if (FrameHandledMouseEvent (view?.Border)) {
+					return;
+				}
+				if (FrameHandledMouseEvent (view?.Margin)) {
+					return;
+				}
+
+				var bounds = view.BoundsToScreen (view.Bounds);
+				if (bounds.Contains (a.MouseEvent.X, a.MouseEvent.Y)) {
+					var boundsPoint = view.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
+					var me = new MouseEvent () {
+						X = boundsPoint.X,
+						Y = boundsPoint.Y,
+						Flags = a.MouseEvent.Flags,
+						OfX = boundsPoint.X,
+						OfY = boundsPoint.Y,
+						View = view
+					};
+
+					if (_mouseEnteredView == null) {
+						_mouseEnteredView = view;
+						view.OnMouseEnter (me);
+					} else if (_mouseEnteredView != view) {
+						_mouseEnteredView.OnMouseLeave (me);
+						view.OnMouseEnter (me);
+						_mouseEnteredView = view;
+					}
+
+					if (!view.WantMousePositionReports && a.MouseEvent.Flags == MouseFlags.ReportMousePosition) {
+						return;
+					}
+
+					WantContinuousButtonPressedView = view.WantContinuousButtonPressed ? view : null;
+
+					if (view.OnMouseEvent (me)) {
+						// Should we bubble up the event, if it is not handled?
+						//return;
+					}
+
+					BringOverlappedTopToFront ();
+				}
 			}
-			if (FrameHandledMouseEvent (view?.Border)) {
-				return;
-			}
-			if (FrameHandledMouseEvent (view?.Margin)) {
-				return;
-			}
-
-			var boundsPoint = view.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
-
-			var me = new MouseEvent () {
-				X = boundsPoint.X,
-				Y = boundsPoint.Y,
-				Flags = a.MouseEvent.Flags,
-				OfX = boundsPoint.X,
-				OfY = boundsPoint.Y,
-				View = view
-			};
-
-			if (_mouseEnteredView == null) {
-				_mouseEnteredView = view;
-				view.OnMouseEnter (me);
-			} else if (_mouseEnteredView != view) {
-				_mouseEnteredView.OnMouseLeave (me);
-				view.OnMouseEnter (me);
-				_mouseEnteredView = view;
-			}
-
-			if (!view.WantMousePositionReports && a.MouseEvent.Flags == MouseFlags.ReportMousePosition) {
-				return;
-			}
-
-			WantContinuousButtonPressedView = view.WantContinuousButtonPressed ? view : null;
-
-			if (view.OnMouseEvent (me)) {
-				// Should we bubble up the event, if it is not handled?
-				//return;
-			}
-
-			BringOverlappedTopToFront ();
-
 		}
 		#endregion Mouse handling
 

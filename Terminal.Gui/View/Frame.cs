@@ -55,6 +55,22 @@ namespace Terminal.Gui {
 			Parent?.SuperView?.BoundsToScreen (rcol, rrow, out rcol, out rrow, clipped);
 		}
 
+		/// <inheritdoc/>
+		public override Rect FrameToScreen ()
+		{
+			// Frames are *Children* of a View, not SubViews. Thus View.FramToScreen will not work.
+			// To get the screen-relative coordinates of a Frame, we need to know who
+			// the Parent is
+			var ret = Parent?.Frame ?? Frame;
+			ret.Size = Frame.Size;
+
+			ret.Location = Parent?.SuperView?.FrameToScreen ().Location ?? ret.Location;
+
+			// We now have coordinates relative to our View. If our View's SuperView has
+			// a SuperView, keep going...
+			return ret;
+		}
+
 		/// <summary>
 		/// Does nothing for Frame
 		/// </summary>

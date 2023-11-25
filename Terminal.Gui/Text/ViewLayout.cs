@@ -592,12 +592,29 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Converts a <see cref="Bounds"/>-relative region to a screen-relative region. The output is optionally clamped to the screen dimensions.
+		/// Converts a <see cref="Bounds"/>-relative region to a screen-relative region. 
 		/// </summary>
 		public Rect BoundsToScreen (Rect region)
 		{
 			BoundsToScreen (region.X, region.Y, out var x, out var y, clamped: false);
 			return new Rect (x, y, region.Width, region.Height);
+		}
+
+		/// <summary>
+		/// Gets the <see cref="Frame"/> with a screen-relative location. 
+		/// </summary>
+		/// <returns>The location and size of the view in screen-relative coordinates.</returns>
+		public virtual Rect FrameToScreen ()
+		{
+			var ret = Frame;
+			var super = SuperView;
+			while (super != null) {
+				var boundsOffset = super.GetBoundsOffset ();
+				ret.X += super.Frame.X + boundsOffset.X;
+				ret.Y += super.Frame.Y + boundsOffset.Y;
+				super = super.SuperView;
+			}
+			return ret;
 		}
 
 		/// <summary>
