@@ -75,7 +75,76 @@ namespace Terminal.Gui.DrawingTests {
 			Assert.Empty (after);
 		}
 
-		// TODO: Replicate above tests for Vertical lines
+		[Fact, AutoInitShutdown]
+		public void TestExcludeParallel_VerticalLines_TopOnly ()
+		{
+			// y=1 to y=10
+			var l1 = new StraightLine (new Point (2, 1), 10, Orientation.Vertical, LineStyle.Single);
+			var after = new StraightLine [] { l1 }
+						// exclude y=3 to y=103
+						.Exclude (new Point (2, 3), 100, Orientation.Vertical)
+						.ToArray ();
+			// y=1 to y=2
+			var afterLine = Assert.Single (after);
+			Assert.Equal (l1.Start, afterLine.Start);
+			Assert.Equal (2, afterLine.Length);
+		}
+
+
+		[Fact, AutoInitShutdown]
+		public void TestExcludeParallel_HorizontalLines_BottomOnly ()
+		{
+			// y=1 to y=10
+			var l1 = new StraightLine (new Point (2, 1), 10, Orientation.Vertical, LineStyle.Single);
+			var after = new StraightLine [] { l1 }
+						// exclude y=0 to y=2
+						.Exclude (new Point (2,0), 3, Orientation.Vertical)
+						.ToArray ();
+			// y=3 to y=10
+			var afterLine = Assert.Single (after);
+			Assert.Equal (3, afterLine.Start.Y);
+			Assert.Equal (2, afterLine.Start.X);
+			Assert.Equal (8, afterLine.Length);
+		}
+
+
+		[Fact, AutoInitShutdown]
+		public void TestExcludeParallel_VerticalLines_VerticalSplit ()
+		{
+			// y=1 to y=10
+			var l1 = new StraightLine (new Point (2,1), 10, Orientation.Vertical, LineStyle.Single);
+			var after = new StraightLine [] { l1 }
+						// exclude y=4 to y=5
+						.Exclude (new Point (2, 4), 2, Orientation.Vertical)
+						.ToArray ();
+			// y=1 to y=3,
+			// y=6 to y=10
+			Assert.Equal (2, after.Length);
+			var afterLeft = after [0];
+			var afterRight = after [1];
+
+			Assert.Equal (1, afterLeft.Start.Y);
+			Assert.Equal (2, afterLeft.Start.X);
+			Assert.Equal (3, afterLeft.Length);
+
+			Assert.Equal (6, afterRight.Start.Y);
+			Assert.Equal (2, afterRight.Start.X);
+			Assert.Equal (5, afterRight.Length);
+		}
+
+
+		[Fact, AutoInitShutdown]
+		public void TestExcludeParallel_VerticalLines_CoverCompletely ()
+		{
+			// y=1 to y=10
+			var l1 = new StraightLine (new Point (2,1), 10, Orientation.Vertical, LineStyle.Single);
+			var after = new StraightLine [] { l1 }
+						// exclude y=4 to y=5
+						.Exclude (new Point (2,1), 10, Orientation.Vertical)
+						.ToArray ();
+			Assert.Empty (after);
+		}
+
 
 		#endregion
 
