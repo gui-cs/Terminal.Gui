@@ -368,6 +368,48 @@ namespace Terminal.Gui.DrawingTests {
 │        │
 │        │
 │        │",$"{Environment.NewLine}{lc}");
+
+
+			lc = new LineCanvas(origLines.Exclude(new Point(0,0),10,Orientation.Vertical));
+
+			TestHelpers.AssertEqual (this._output,
+				@"
+────────┐
+        │
+        │
+        │
+────────┘",$"{Environment.NewLine}{lc}");
+
+			lc = new LineCanvas(origLines.Exclude(new Point(1,0),10,Orientation.Vertical));
+
+			TestHelpers.AssertEqual (this._output,
+				@"
+┌ ───────┐
+│        │
+│        │
+│        │
+└ ───────┘",$"{Environment.NewLine}{lc}");
+
+			lc = new LineCanvas(origLines.Exclude(new Point(8,0),10,Orientation.Vertical));
+
+			TestHelpers.AssertEqual (this._output,
+				@"
+┌─────── ┐
+│        │
+│        │
+│        │
+└─────── ┘",$"{Environment.NewLine}{lc}");
+
+			lc = new LineCanvas(origLines.Exclude(new Point(9,0),10,Orientation.Vertical));
+
+			TestHelpers.AssertEqual (this._output,
+				@"
+┌────────
+│        
+│        
+│        
+└────────",$"{Environment.NewLine}{lc}");
+
 		}
 	}
 }
