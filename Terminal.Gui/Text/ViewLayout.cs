@@ -28,11 +28,11 @@ namespace Terminal.Gui {
 
 	public partial class View {
 
-		// The frame for the object. Superview relative.
+		// The frame for the object. Relative to the SuperView's Bounds.
 		Rect _frame;
 
 		/// <summary>
-		/// Gets or sets the frame for the view. The frame is relative to the view's container (<see cref="SuperView"/>).
+		/// Gets or sets the frame for the view. The frame is relative to the <see cref="SuperView"/>'s <see cref="Bounds"/>.
 		/// </summary>
 		/// <value>The frame.</value>
 		/// <remarks>
@@ -58,19 +58,41 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The Thickness that separates a View from other SubViews of the same SuperView. 
-		/// The Margin is not part of the View's content and is not clipped by the View's Clip Area. 
+		/// The frame (specified as a <see cref="Thickness"/>) that separates a View from other SubViews of the same SuperView. 
+		/// The margin offsets the <see cref="Bounds"/> from the <see cref="Frame"/>. 
 		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// The frames (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the View's content
+		/// and are not clipped by the View's Clip Area.
+		/// </para>
+		/// <para>
+		/// Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>)
+		/// will change the size of the <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the
+		/// <see cref="SuperView"/> and its <see cref="Subviews"/>.
+		/// </para>
+		/// </remarks>
 		public Frame Margin { get; private set; }
 
 		/// <summary>
-		///  Thickness where a visual border (drawn using line-drawing glyphs) and the Title are drawn. 
+		/// The frame (specified as a <see cref="Thickness"/>) inside of the view that offsets the <see cref="Bounds"/> from the <see cref="Margin"/>. 
+		///  The Border provides the space for a visual border (drawn using line-drawing glyphs) and the Title. 
 		///  The Border expands inward; in other words if `Border.Thickness.Top == 2` the border and 
 		///  title will take up the first row and the second row will be filled with spaces. 
-		///  The Border is not part of the View's content and is not clipped by the View's `ClipArea`.
 		/// </summary>
 		/// <remarks>
+		/// <para>
 		/// <see cref="BorderStyle"/> provides a simple helper for turning a simple border frame on or off.
+		/// </para>
+		/// <para>
+		/// The frames (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the View's content
+		/// and are not clipped by the View's Clip Area.
+		/// </para>
+		/// <para>
+		/// Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>)
+		/// will change the size of the <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the
+		/// <see cref="SuperView"/> and its <see cref="Subviews"/>.
+		/// </para>
 		/// </remarks>
 		public Frame Border { get; private set; }
 
@@ -111,11 +133,18 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Means the Thickness inside of an element that offsets the `Content` from the Border. 
-		/// Padding is `{0, 0, 0, 0}` by default. Padding is not part of the View's content and is not clipped by the View's `ClipArea`.
+		/// The frame (specified as a <see cref="Thickness"/>) inside of the view that offsets the <see cref="Bounds"/> from the <see cref="Border"/>. 
 		/// </summary>
 		/// <remarks>
-		/// (NOTE: in v1 `Padding` is OUTSIDE of the `Border`). 
+		/// <para>
+		/// The frames (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the View's content
+		/// and are not clipped by the View's Clip Area.
+		/// </para>
+		/// <para>
+		/// Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>)
+		/// will change the size of the <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the
+		/// <see cref="SuperView"/> and its <see cref="Subviews"/>.
+		/// </para>
 		/// </remarks>
 		public Frame Padding { get; private set; }
 
@@ -181,9 +210,9 @@ namespace Terminal.Gui {
 		LayoutStyle _layoutStyle;
 
 		/// <summary>
-		/// Controls how the View's <see cref="Frame"/> is computed during the LayoutSubviews method, if the style is set to
-		/// <see cref="Terminal.Gui.LayoutStyle.Absolute"/>, 
-		/// LayoutSubviews does not change the <see cref="Frame"/>. If the style is <see cref="Terminal.Gui.LayoutStyle.Computed"/>
+		/// Controls how the View's <see cref="Frame"/> is computed during <see cref="LayoutSubviews"/>. If the style is set to
+		/// <see cref="LayoutStyle.Absolute"/>, 
+		/// LayoutSubviews does not change the <see cref="Frame"/>. If the style is <see cref="LayoutStyle.Computed"/>
 		/// the <see cref="Frame"/> is updated using
 		/// the <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties.
 		/// </summary>
@@ -197,15 +226,26 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The View-relative rectangle where View content is displayed. SubViews are positioned relative to 
-		/// Bounds.<see cref="Rect.Location">Location</see> (which is always (0, 0)) and <see cref="Draw()"/> clips drawing to 
-		/// Bounds.<see cref="Rect.Size">Size</see>.
+		/// The view's content area.
+		/// <para>
+		/// SubViews are positioned relative to Bounds.
+		/// </para>
+		/// <para>
+		/// Drawing is clipped to Bounds (<see cref="Draw()"/> clips drawing to Bounds.<see cref="Rect.Size">Size</see>).
+		/// </para>
+		/// <para>
+		/// Mouse events are reported relative to Bounds.
+		/// </para>
 		/// </summary>
-		/// <value>The bounds.</value>
+		/// <value>The view's content area.</value>
 		/// <remarks>
 		/// <para>
 		/// The <see cref="Rect.Location"/> of Bounds is always (0, 0). To obtain the offset of the Bounds from the Frame use 
 		/// <see cref="GetBoundsOffset"/>.
+		/// </para>
+		/// <para>
+		/// When using <see cref="LayoutStyle.Computed"/>, Bounds is not valid until after the view has been initialized (after <see cref="EndInit"/> has been called and <see cref="Initialized"/>
+		/// has fired). Accessing this property before the view is initialized is considered an error./>
 		/// </para>
 		/// </remarks>
 		public virtual Rect Bounds {
@@ -242,7 +282,7 @@ namespace Terminal.Gui {
 		}
 
 		// Diagnostics to highlight when X or Y is read before the view has been initialized
-		private Pos VerifyIsIntialized (Pos pos)
+		Pos VerifyIsInitialized (Pos pos)
 		{
 #if DEBUG
 			if (LayoutStyle == LayoutStyle.Computed && (!IsInitialized)) {
@@ -253,7 +293,7 @@ namespace Terminal.Gui {
 		}
 
 		// Diagnostics to highlight when Width or Height is read before the view has been initialized
-		private Dim VerifyIsIntialized (Dim dim)
+		Dim VerifyIsInitialized (Dim dim)
 		{
 #if DEBUG
 			if (LayoutStyle == LayoutStyle.Computed && (!IsInitialized)) {
@@ -273,7 +313,7 @@ namespace Terminal.Gui {
 		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		/// </remarks>
 		public Pos X {
-			get => VerifyIsIntialized (_x);
+			get => VerifyIsInitialized (_x);
 			set {
 				if (ForceValidatePosDim && !ValidatePosDim (_x, value)) {
 					throw new ArgumentException ();
@@ -293,7 +333,7 @@ namespace Terminal.Gui {
 		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		/// </remarks>
 		public Pos Y {
-			get => VerifyIsIntialized (_y);
+			get => VerifyIsInitialized (_y);
 			set {
 				if (ForceValidatePosDim && !ValidatePosDim (_y, value)) {
 					throw new ArgumentException ();
@@ -314,7 +354,7 @@ namespace Terminal.Gui {
 		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		/// </remarks>
 		public Dim Width {
-			get => VerifyIsIntialized (_width);
+			get => VerifyIsInitialized (_width);
 			set {
 				if (ForceValidatePosDim && !ValidatePosDim (_width, value)) {
 					throw new ArgumentException ("ForceValidatePosDim is enabled", nameof (Width));
@@ -339,7 +379,7 @@ namespace Terminal.Gui {
 		/// <value>The height.</value>
 		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
 		public Dim Height {
-			get => VerifyIsIntialized (_height);
+			get => VerifyIsInitialized (_height);
 			set {
 				if (ForceValidatePosDim && !ValidatePosDim (_height, value)) {
 					throw new ArgumentException ("ForceValidatePosDim is enabled", nameof (Height));
@@ -377,8 +417,8 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		// BUGBUG: This API is broken - It should be renamed to `GetMinimumBoundsForFrame and 
-		// should not assume Frame.Height == Bounds.Height
+		// BUGBUG: This API is broken - should not assume Frame.Height == Bounds.Height
+		// BUGBUG: this function does not belong in ViewLayout.cs - it should be in ViewText.cs
 		/// <summary>
 		/// Gets the minimum dimensions required to fit the View's <see cref="Text"/>, factoring in <see cref="TextDirection"/>.
 		/// </summary>
@@ -389,7 +429,7 @@ namespace Terminal.Gui {
 		/// if <see cref="Height"/> (Horizontal) or <see cref="Width"/> (Vertical) are not not set or zero.
 		/// Does not take into account word wrapping.
 		/// </remarks>
-		public bool GetMinimumBounds (out Size size)
+		bool GetMinimumBoundsForFrame (out Size size)
 		{
 			if (!IsInitialized) {
 				size = new Size (0, 0);
@@ -426,15 +466,15 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		// BUGBUG - v2 - Should be renamed "SetBoundsToFitFrame"
+		// BUGBUG: this function does not belong in ViewLayout.cs - it should be in ViewText.cs
 		/// <summary>
-		/// Sets the size of the View to the minimum width or height required to fit <see cref="Text"/> (see <see cref="GetMinimumBounds(out Size)"/>.
+		/// Sets the size of the View to the minimum width or height required to fit <see cref="Text"/> (see <see cref="GetMinimumBoundsForFrame"/>.
 		/// </summary>
 		/// <returns><see langword="true"/> if the size was changed, <see langword="false"/> if <see cref="Text"/>
 		/// will not fit.</returns>
-		public bool SetMinWidthHeight ()
+		bool SetBoundsToFitFrame ()
 		{
-			if (GetMinimumBounds (out Size size)) {
+			if (GetMinimumBoundsForFrame (out Size size)) {
 				_frame = new Rect (_frame.Location, size);
 				return true;
 			}
@@ -470,7 +510,7 @@ namespace Terminal.Gui {
 			}
 			//// BUGBUG: I think these calls are redundant or should be moved into just the AutoSize case
 			if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
-				SetMinWidthHeight ();
+				SetBoundsToFitFrame ();
 				LayoutFrames ();
 				TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
 				SetNeedsLayout ();
@@ -502,69 +542,99 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Converts a point from screen-relative coordinates to view-relative coordinates.
+		/// Converts a screen-relative coordinate to a Frame-relative coordinate. Frame-relative means
+		/// relative to the View's <see cref="SuperView"/>'s <see cref="Bounds"/>.
 		/// </summary>
-		/// <returns>The mapped point.</returns>
-		/// <param name="x">X screen-coordinate point.</param>
-		/// <param name="y">Y screen-coordinate point.</param>
-		public Point ScreenToView (int x, int y)
+		/// <returns>The coordinate relative to the <see cref="SuperView"/>'s <see cref="Bounds"/>.</returns>
+		/// <param name="x">Screen-relative column.</param>
+		/// <param name="y">Screen-relative row.</param>
+		public Point ScreenToFrame (int x, int y)
 		{
-			Point boundsOffset = SuperView == null ? Point.Empty : SuperView.GetBoundsOffset ();
-			if (SuperView == null) {
-				return new Point (x - Frame.X + boundsOffset.X, y - Frame.Y + boundsOffset.Y);
-			} else {
-				var parent = SuperView.ScreenToView (x - boundsOffset.X, y - boundsOffset.Y);
-				return new Point (parent.X - Frame.X, parent.Y - Frame.Y);
+			Point superViewBoundsOffset = SuperView?.GetBoundsOffset () ?? Point.Empty;
+			var ret = new Point (x - Frame.X - superViewBoundsOffset.X, y - Frame.Y - superViewBoundsOffset.Y);
+			if (SuperView != null) {
+				var superFrame = SuperView.ScreenToFrame (x - superViewBoundsOffset.X, y - superViewBoundsOffset.Y);
+				ret = new Point (superFrame.X - Frame.X, superFrame.Y - Frame.Y);
 			}
+			return ret;
 		}
 
 		/// <summary>
-		/// Converts a view-relative location to a screen-relative location (col,row). The output is optionally clamped to the screen dimensions.
+		/// Converts a screen-relative coordinate to a bounds-relative coordinate. 
 		/// </summary>
-		/// <param name="col">View-relative column.</param>
-		/// <param name="row">View-relative row.</param>
-		/// <param name="rcol">Absolute column; screen-relative.</param>
-		/// <param name="rrow">Absolute row; screen-relative.</param>
-		/// <param name="clamped">If <see langword="true"/>, <paramref name="rcol"/> and <paramref name="rrow"/> will be clamped to the 
-		/// screen dimensions (they never be negative and will always be less than to <see cref="ConsoleDriver.Cols"/> and
+		/// <returns>The coordinate relative to this view's <see cref="Bounds"/>.</returns>
+		/// <param name="x">Screen-relative column.</param>
+		/// <param name="y">Screen-relative row.</param>
+		public Point ScreenToBounds (int x, int y)
+		{
+			var screen = ScreenToFrame (x, y);
+			var boundsOffset = GetBoundsOffset ();
+			return new Point (screen.X - boundsOffset.X, screen.Y - boundsOffset.Y);
+		}
+
+		/// <summary>
+		/// Converts a <see cref="Bounds"/>-relative coordinate to a screen-relative coordinate. The output is optionally clamped to the screen dimensions.
+		/// </summary>
+		/// <param name="x"><see cref="Bounds"/>-relative column.</param>
+		/// <param name="y"><see cref="Bounds"/>-relative row.</param>
+		/// <param name="rx">Absolute column; screen-relative.</param>
+		/// <param name="ry">Absolute row; screen-relative.</param>
+		/// <param name="clamped">If <see langword="true"/>, <paramref name="rx"/> and <paramref name="ry"/> will be clamped to the 
+		/// screen dimensions (will never be negative and will always be less than <see cref="ConsoleDriver.Cols"/> and
 		/// <see cref="ConsoleDriver.Rows"/>, respectively.</param>
-		public virtual void ViewToScreen (int col, int row, out int rcol, out int rrow, bool clamped = true)
+		public virtual void BoundsToScreen (int x, int y, out int rx, out int ry, bool clamped = true)
 		{
 			var boundsOffset = GetBoundsOffset ();
-			rcol = col + Frame.X + boundsOffset.X;
-			rrow = row + Frame.Y + boundsOffset.Y;
+			rx = x + Frame.X + boundsOffset.X;
+			ry = y + Frame.Y + boundsOffset.Y;
 
 			var super = SuperView;
 			while (super != null) {
 				boundsOffset = super.GetBoundsOffset ();
-				rcol += super.Frame.X + boundsOffset.X;
-				rrow += super.Frame.Y + boundsOffset.Y;
+				rx += super.Frame.X + boundsOffset.X;
+				ry += super.Frame.Y + boundsOffset.Y;
 				super = super.SuperView;
 			}
 
 			// The following ensures that the cursor is always in the screen boundaries.
 			if (clamped) {
-				rrow = Math.Min (rrow, Driver.Rows - 1);
-				rcol = Math.Min (rcol, Driver.Cols - 1);
+				ry = Math.Min (ry, Driver.Rows - 1);
+				rx = Math.Min (rx, Driver.Cols - 1);
 			}
 		}
 
 		/// <summary>
-		/// Converts a region in view-relative coordinates to screen-relative coordinates.
+		/// Converts a <see cref="Bounds"/>-relative region to a screen-relative region. 
 		/// </summary>
-		public Rect ViewToScreen (Rect region)
+		public Rect BoundsToScreen (Rect region)
 		{
-			ViewToScreen (region.X, region.Y, out var x, out var y, clamped: false);
+			BoundsToScreen (region.X, region.Y, out var x, out var y, clamped: false);
 			return new Rect (x, y, region.Width, region.Height);
 		}
 
+		/// <summary>
+		/// Gets the <see cref="Frame"/> with a screen-relative location. 
+		/// </summary>
+		/// <returns>The location and size of the view in screen-relative coordinates.</returns>
+		public virtual Rect FrameToScreen ()
+		{
+			var ret = Frame;
+			var super = SuperView;
+			while (super != null) {
+				var boundsOffset = super.GetBoundsOffset ();
+				ret.X += super.Frame.X + boundsOffset.X;
+				ret.Y += super.Frame.Y + boundsOffset.Y;
+				super = super.SuperView;
+			}
+			return ret;
+		}
 
 		/// <summary>
 		/// Sets the View's <see cref="Frame"/> to the frame-relative coordinates if its container. The
 		/// container size and location are specified by <paramref name="superviewFrame"/> and are relative to the
 		/// View's superview.
 		/// </summary>
-		/// <param name="superviewFrame">The supserview-relative rectangle describing View's container (nominally the 
+		/// <param name="superviewFrame">The SuperView-relative rectangle describing View's container (nominally the 
 		/// same as <c>this.SuperView.Frame</c>).</param>
 		internal void SetRelativeLayout (Rect superviewFrame)
 		{
@@ -668,7 +738,7 @@ namespace Terminal.Gui {
 			if (Frame != r) {
 				Frame = r;
 				// BUGBUG: Why is this AFTER setting Frame? Seems duplicative.
-				if (!SetMinWidthHeight ()) {
+				if (!SetBoundsToFitFrame ()) {
 					TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
 				}
 			}
@@ -959,51 +1029,52 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			var aSize = true;
-			var nBoundsSize = GetAutoSize ();
-			if (IsInitialized && nBoundsSize != Bounds.Size) {
+			var boundsChanged = true;
+			var newFrameSize = GetAutoSize ();
+			if (IsInitialized && newFrameSize != Frame.Size) {
 				if (ForceValidatePosDim) {
-					aSize = SetWidthHeight (nBoundsSize);
+					// BUGBUG: This ain't right, obviously.  We need to figure out how to handle this.
+					boundsChanged = ResizeBoundsToFit (newFrameSize);
 				} else {
-					Height = nBoundsSize.Height;
-					Width = nBoundsSize.Width; // = new Rect (Bounds.X, Bounds.Y, nBoundsSize.Width, nBoundsSize.Height);
+					Height = newFrameSize.Height;
+					Width = newFrameSize.Width; 
 				}
 			}
 			// BUGBUG: This call may be redundant
 			TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
-			return aSize;
+			return boundsChanged;
 		}
 
 		/// <summary>
-		/// Resizes the View to fit the specified <see cref="Bounds"/> size.
+		/// Resizes the View to fit the specified size. Factors in the HotKey.
 		/// </summary>
-		/// <param name="nBounds"></param>
-		/// <returns></returns>
-		bool SetWidthHeight (Size nBounds)
+		/// <param name="size"></param>
+		/// <returns>whether the Bounds was changed or not</returns>
+		bool ResizeBoundsToFit (Size size)
 		{
-			var aSize = false;
-			var canSizeW = TrySetWidth (nBounds.Width - GetHotKeySpecifierLength (), out var rW);
-			var canSizeH = TrySetHeight (nBounds.Height - GetHotKeySpecifierLength (false), out var rH);
+			var boundsChanged = false;
+			var canSizeW = TrySetWidth (size.Width - GetHotKeySpecifierLength (), out var rW);
+			var canSizeH = TrySetHeight (size.Height - GetHotKeySpecifierLength (false), out var rH);
 			if (canSizeW) {
-				aSize = true;
+				boundsChanged = true;
 				_width = rW;
 			}
 			if (canSizeH) {
-				aSize = true;
+				boundsChanged = true;
 				_height = rH;
 			}
-			if (aSize) {
+			if (boundsChanged) {
 				Bounds = new Rect (Bounds.X, Bounds.Y, canSizeW ? rW : Bounds.Width, canSizeH ? rH : Bounds.Height);
 			}
 
-			return aSize;
+			return boundsChanged;
 		}
 
 		/// <summary>
-		/// Gets the Frame dimensions required to fit <see cref="Text"/> using the text <see cref="Direction"/> specified by the
+		/// Gets the Frame dimensions required to fit <see cref="Text"/> within <see cref="Bounds"/> using the text <see cref="Direction"/> specified by the
 		/// <see cref="TextFormatter"/> property and accounting for any <see cref="HotKeySpecifier"/> characters.
 		/// </summary>
-		/// <returns>The <see cref="Size"/> required to fit the text.</returns>
+		/// <returns>The <see cref="Size"/> of the view required to fit the text.</returns>
 		public Size GetAutoSize ()
 		{
 			int x = 0;
@@ -1130,13 +1201,12 @@ namespace Terminal.Gui {
 		/// </returns>
 		public static View FindDeepestView (View start, int x, int y, out int resx, out int resy)
 		{
-			var startFrame = start.Frame;
-
-			if (!startFrame.Contains (x, y)) {
-				resx = 0;
-				resy = 0;
+			resy = resx = 0;
+			if (start == null || !start.Frame.Contains (x, y)) {
 				return null;
 			}
+			
+			var startFrame = start.Frame;
 			if (start.InternalSubviews != null) {
 				int count = start.InternalSubviews.Count;
 				if (count > 0) {

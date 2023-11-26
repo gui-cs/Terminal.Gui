@@ -769,7 +769,7 @@ namespace Terminal.Gui {
 		/// at the provided row. Returns null if no object is at that location.
 		/// <remarks>
 		/// </remarks>
-		/// If you have screen coordinates then use <see cref="View.ScreenToView(int, int)"/>
+		/// If you have screen coordinates then use <see cref="View.ScreenToFrame"/>
 		/// to translate these into the client area of the <see cref="TreeView{T}"/>.
 		/// </summary>
 		/// <param name="row">The row of the <see cref="View.Bounds"/> of the <see cref="TreeView{T}"/>.</param>

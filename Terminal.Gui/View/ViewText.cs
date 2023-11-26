@@ -131,10 +131,11 @@ namespace Terminal.Gui {
 			    || (ForceValidatePosDim && directionChanged && AutoSize && isValidOldAutoSize)) {
 				OnResizeNeeded ();
 			} else if (directionChanged && IsAdded) {
-				SetWidthHeight (Bounds.Size);
-				SetMinWidthHeight ();
+				ResizeBoundsToFit (Bounds.Size);
+				// BUGBUG: I think this call is redundant.
+				SetBoundsToFitFrame ();
 			} else {
-				SetMinWidthHeight ();
+				SetBoundsToFitFrame ();
 			}
 			TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
 			SetNeedsDisplay ();
