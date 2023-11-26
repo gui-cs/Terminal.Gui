@@ -446,8 +446,10 @@ Test
 			Assert.Equal (new Rect (0, 0, width + 2, height + 2), pos);
 		}
 
-		[Fact, AutoInitShutdown]
-		public void Label_WordWrap_PreserveTrailingSpaces_Horizontal_With_Wide_Runes ()
+		[Theory, AutoInitShutdown]
+		[InlineData (false)]
+		[InlineData (true)]
+		public void Label_WordWrap_PreserveTrailingSpaces_Horizontal_With_Wide_Runes (bool autoSize)
 		{
 			var text = "文に は言葉 があり ます。";
 			var width = 6;
@@ -455,17 +457,29 @@ Test
 			var wrappedLines = TextFormatter.WordWrapText (text, width, true);
 			var breakLines = "";
 			foreach (var line in wrappedLines) breakLines += $"{line}{Environment.NewLine}";
-			var label = new Label (breakLines) { Width = Dim.Fill (), Height = Dim.Fill () };
+			var label = new Label (breakLines) { Width = Dim.Fill (), Height = Dim.Fill (), AutoSize = autoSize };
 			var frame = new FrameView () { Width = Dim.Fill (), Height = Dim.Fill () };
 
 			frame.Add (label);
 			Application.Top.Add (frame);
 			Application.Begin (Application.Top);
+
+			Assert.True (label.AutoSize == autoSize);
+			Assert.Equal (new Rect (0, 0, 78, 23), label.Frame);
+			if (autoSize) {
+				// The size of the wrappedLines [1]
+				Assert.Equal (new Size (width, height - 2), label.TextFormatter.Size);
+			} else {
+				Assert.Equal (new Size (78, 23), label.TextFormatter.Size);
+			}
 			((FakeDriver)Application.Driver).SetBufferSize (width + 2, height + 2);
 
-			Assert.True (label.AutoSize);
 			Assert.Equal (new Rect (0, 0, width, height), label.Frame);
-			Assert.Equal (new Size (width, height), label.TextFormatter.Size);
+			if (autoSize) {
+				Assert.Equal (new Size (width, height - 2), label.TextFormatter.Size);
+			} else {
+				Assert.Equal (new Size (width, height), label.TextFormatter.Size);
+			}
 			Assert.Equal (new Rect (0, 0, width + 2, height + 2), frame.Frame);
 
 			var expected = @"
