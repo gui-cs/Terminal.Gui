@@ -1342,6 +1342,9 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets a value indicating whether multi line is allowed.
 		/// </summary>
+		/// <remarks>
+		///   Multi line is ignored if <see cref="WordWrap"/> is <see langword="true"/>.
+		/// </remarks>
 		public bool MultiLine {
 			get => _multiLine;
 			set {
