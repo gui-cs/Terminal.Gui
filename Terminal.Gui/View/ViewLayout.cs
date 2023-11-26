@@ -50,7 +50,7 @@ namespace Terminal.Gui {
 				_frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
 				if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
 					LayoutFrames ();
-					TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
+					TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
 					SetNeedsLayout ();
 					SetNeedsDisplay ();
 				}
@@ -460,7 +460,7 @@ namespace Terminal.Gui {
 			if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
 				SetMinWidthHeight ();
 				LayoutFrames ();
-				TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
+				TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
 				SetNeedsLayout ();
 				SetNeedsDisplay ();
 			}
@@ -657,7 +657,7 @@ namespace Terminal.Gui {
 				Frame = r;
 				// BUGBUG: Why is this AFTER setting Frame? Seems duplicative.
 				if (!SetMinWidthHeight ()) {
-					TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
+					TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
 				}
 			}
 		}
@@ -878,7 +878,7 @@ namespace Terminal.Gui {
 			var oldBounds = Bounds;
 			OnLayoutStarted (new LayoutEventArgs () { OldBounds = oldBounds });
 
-			TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
+			TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
 
 			// Sort out the dependencies of the X, Y, Width, Height properties
 			var nodes = new HashSet<View> ();
@@ -958,7 +958,7 @@ namespace Terminal.Gui {
 				}
 			}
 			// BUGBUG: This call may be redundant
-			TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
+			TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
 			return aSize;
 		}
 
