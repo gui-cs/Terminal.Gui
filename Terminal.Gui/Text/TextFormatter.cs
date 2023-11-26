@@ -1321,7 +1321,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets whether the <see cref="TextFormatter"/> needs to format the text when <see cref="Draw(Rect, Attribute, Attribute, Rect, bool)"/> is called.
+		/// Gets or sets whether the <see cref="TextFormatter"/> needs to format the text when <see cref="Draw(Rect, Attribute, Attribute, Rect, bool, ConsoleDriver)"/> is called.
 		/// If it is <c>false</c> when Draw is called, the Draw call will be faster.
 		/// </summary>
 		/// <remarks>
