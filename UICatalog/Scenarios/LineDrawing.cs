@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
+using static Terminal.Gui.SpinnerStyle;
 
 namespace UICatalog.Scenarios {
 
@@ -76,10 +77,10 @@ namespace UICatalog.Scenarios {
 					X = 0,
 					Y = Pos.Bottom (_colorPicker)
 				};
-
 				_stylePicker.SelectedItemChanged += (s, a) => {
 					SetStyle?.Invoke ((LineStyle)a.SelectedItem);
 				};
+				_stylePicker.SelectedItem = 1;
 
 				_addLayerBtn = new Button () {
 					Text = "New Layer",
@@ -152,12 +153,14 @@ namespace UICatalog.Scenarios {
 			{
 				if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)) {
 					if (_currentLine == null) {
-
+						// Mouse pressed down
 						_currentLine = new StraightLine (
 							new Point (mouseEvent.X, mouseEvent.Y),
 							0, Orientation.Vertical, LineStyle, new Attribute (_currentColor, GetNormalColor ().Background));
+						
 						_currentLayer.AddLine (_currentLine);
 					} else {
+						// Mouse dragged
 						var start = _currentLine.Start;
 						var end = new Point (mouseEvent.X, mouseEvent.Y);
 						var orientation = Orientation.Vertical;
@@ -180,7 +183,27 @@ namespace UICatalog.Scenarios {
 						SetNeedsDisplay ();
 					}
 				} else {
+
+					// Mouse released
 					if (_currentLine != null) {
+
+						if(_currentLine.Length == 0) {
+							_currentLine.Length = 1;
+						}
+
+						if(_currentLine.Style == LineStyle.None) {
+
+							// Treat none as eraser
+							var idx = _layers.IndexOf (_currentLayer);
+							_layers.Remove (_currentLayer);
+
+							_currentLayer = new LineCanvas(
+								_currentLayer.Lines.Exclude (_currentLine.Start, _currentLine.Length, _currentLine.Orientation)
+								);
+
+							_layers.Insert (idx, _currentLayer);
+						}
+
 						_currentLine = null;
 						undoHistory.Clear ();
 						SetNeedsDisplay ();

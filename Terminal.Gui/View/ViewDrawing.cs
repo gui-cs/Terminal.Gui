@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -213,7 +214,7 @@ namespace Terminal.Gui {
 			var h = regionScreen.Y + regionScreen.Height >= Driver.Rows ? Driver.Rows - regionScreen.Y : regionScreen.Height;
 
 			return new Rect (x, y, w, h);
-		}
+		}		
 
 		/// <summary>
 		/// Expands the <see cref="ConsoleDriver"/>'s clip region to include <see cref="Bounds"/>.
