@@ -1217,8 +1217,8 @@ namespace Terminal.Gui {
 				if (FrameHandledMouseEvent (view?.Border)) {
 					if (view is Toplevel) {
 						// TODO: This is a temporary hack to work around the fact that 
-						// drag handling is handled in Toplevel
-						
+						// drag handling is handled in Toplevel (See Issue #2537)
+
 						var me = new MouseEvent () {
 							X = screenX,
 							Y = screenY,
