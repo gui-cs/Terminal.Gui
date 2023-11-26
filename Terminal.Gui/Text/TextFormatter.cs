@@ -1088,6 +1088,9 @@ namespace Terminal.Gui {
 		///   <see cref="LayoutStyle.Absolute"/> values and doesn't work with <see cref="LayoutStyle.Computed"/> layout,
 		///   to avoid breaking the <see cref="Pos"/> and <see cref="Dim"/> settings.
 		/// </summary>
+		/// <remarks>
+		///   Auto size is ignored if the <see cref="TextAlignment.Justified"/> and <see cref="VerticalTextAlignment.Justified"/> are used.
+		/// </remarks>
 		public bool AutoSize {
 			get => _autoSize;
 			set {
