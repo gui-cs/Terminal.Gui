@@ -92,7 +92,7 @@ public class MouseTests {
 	{
 		var size = new Size (10, 10);
 		var pos = new Point (offset, offset);
-		
+
 		var clicked = false;
 		Application.Top.X = pos.X;
 		Application.Top.Y = pos.Y;
@@ -115,7 +115,7 @@ public class MouseTests {
 		Application.OnMouseEvent (mouseEventArgs);
 		Assert.Equal (expectedClicked, clicked);
 	}
-	
+
 	/// <summary>
 	/// Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked.
 	/// With Frames; Frame != Bounds
@@ -123,7 +123,7 @@ public class MouseTests {
 	[AutoInitShutdown]
 	[Theory]
 	// click on border
-	[InlineData (0, 0, 0, 0, 0, false)] 
+	[InlineData (0, 0, 0, 0, 0, false)]
 	[InlineData (0, 1, 0, 0, 0, false)]
 	[InlineData (0, 0, 1, 0, 0, false)]
 	[InlineData (0, 9, 0, 0, 0, false)]
@@ -163,23 +163,34 @@ public class MouseTests {
 	[InlineData (1, 2, 9, 0, 7, true)]
 	[InlineData (1, 9, 9, 7, 7, true)]
 	[InlineData (1, 10, 10, 7, 7, false)]
-//01234567890123456789
-// |12345678|
-// |xxxxxxxx
+	//01234567890123456789
+	// |12345678|
+	// |xxxxxxxx
 	public void MouseCoordinatesTest_Border (int offset, int clickX, int clickY, int expectedX, int expectedY, bool expectedClicked)
 	{
 		var size = new Size (10, 10);
 		var pos = new Point (offset, offset);
 
 		var clicked = false;
-		Application.Top.X = pos.X;
-		Application.Top.Y = pos.Y;
-		Application.Top.Width = size.Width;
-		Application.Top.Height = size.Height;
+
+		Application.Top.X = 0;
+		Application.Top.Y = 0;
+		Application.Top.Width = size.Width * 2;
+		Application.Top.Height = size.Height * 2;
+		Application.Top.BorderStyle = LineStyle.None;
+
+		var view = new View () {
+			X = pos.X,
+			Y = pos.Y,
+			Width = size.Width,
+			Height = size.Height
+		};
 
 		// Give the view a border. With PR #2920, mouse clicks are only passed if they are inside the view's Bounds.
-		Application.Top.BorderStyle = LineStyle.Single;
+		view.BorderStyle = LineStyle.Single;
+		view.CanFocus = true;
 
+		Application.Top.Add (view);
 		var mouseEvent = new MouseEvent () {
 			X = clickX,
 			Y = clickY,
@@ -187,7 +198,7 @@ public class MouseTests {
 		};
 		var mouseEventArgs = new MouseEventEventArgs (mouseEvent);
 
-		Application.Top.MouseClick += (s, e) => {
+		view.MouseClick += (s, e) => {
 			Assert.Equal (expectedX, e.MouseEvent.X);
 			Assert.Equal (expectedY, e.MouseEvent.Y);
 			clicked = true;

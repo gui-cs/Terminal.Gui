@@ -64,7 +64,7 @@ namespace Terminal.Gui {
 			var ret = Parent?.Frame ?? Frame;
 			ret.Size = Frame.Size;
 
-			ret.Location = Parent?.SuperView?.FrameToScreen ().Location ?? ret.Location;
+			ret.Location = Parent?.FrameToScreen ().Location ?? ret.Location;
 
 			// We now have coordinates relative to our View. If our View's SuperView has
 			// a SuperView, keep going...

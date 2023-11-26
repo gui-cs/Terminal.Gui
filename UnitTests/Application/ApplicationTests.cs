@@ -486,6 +486,8 @@ public class ApplicationTests {
 0000000000
 ", null, attributes);
 
+		// TODO: In PR #2920 this breaks because the mouse is not grabbed anymore.
+		// TODO: Move the mouse grap/drag mode from Toplevel to Border.
 		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () { X = 2, Y = 2, Flags = MouseFlags.Button1Pressed }));
 		Assert.Equal (d, Application.MouseGrabView);
 
