@@ -1050,8 +1050,9 @@ namespace Terminal.Gui {
 		/// <param name="view">View that will receive all mouse events until <see cref="UngrabMouse"/> is invoked.</param>
 		public static void GrabMouse (View view)
 		{
-			if (view == null)
+			if (view == null) {
 				return;
+			}
 			if (!OnGrabbingMouse (view)) {
 				OnGrabbedMouse (view);
 				MouseGrabView = view;
@@ -1063,8 +1064,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static void UngrabMouse ()
 		{
-			if (MouseGrabView == null)
+			if (MouseGrabView == null) {
 				return;
+			}
 			if (!OnUnGrabbingMouse (MouseGrabView)) {
 				OnUnGrabbedMouse (MouseGrabView);
 				MouseGrabView = null;
@@ -1073,8 +1075,9 @@ namespace Terminal.Gui {
 
 		static bool OnGrabbingMouse (View view)
 		{
-			if (view == null)
+			if (view == null) {
 				return false;
+			}
 			var evArgs = new GrabMouseEventArgs (view);
 			GrabbingMouse?.Invoke (view, evArgs);
 			return evArgs.Cancel;
@@ -1082,8 +1085,9 @@ namespace Terminal.Gui {
 
 		static bool OnUnGrabbingMouse (View view)
 		{
-			if (view == null)
+			if (view == null) {
 				return false;
+			}
 			var evArgs = new GrabMouseEventArgs (view);
 			UnGrabbingMouse?.Invoke (view, evArgs);
 			return evArgs.Cancel;
@@ -1091,15 +1095,17 @@ namespace Terminal.Gui {
 
 		static void OnGrabbedMouse (View view)
 		{
-			if (view == null)
+			if (view == null) {
 				return;
+			}
 			GrabbedMouse?.Invoke (view, new ViewEventArgs (view));
 		}
 
 		static void OnUnGrabbedMouse (View view)
 		{
-			if (view == null)
+			if (view == null) {
 				return;
+			}
 			UnGrabbedMouse?.Invoke (view, new ViewEventArgs (view));
 		}
 
