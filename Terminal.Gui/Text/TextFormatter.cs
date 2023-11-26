@@ -1373,21 +1373,25 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Draws the text held by <see cref="TextFormatter"/> to <see cref="Application.Driver"/> using the colors specified.
+		/// Draws the text held by <see cref="TextFormatter"/> to <see cref="ConsoleDriver"/> using the colors specified.
 		/// </summary>
 		/// <param name="bounds">Specifies the screen-relative location and maximum size for drawing the text.</param>
 		/// <param name="normalColor">The color to use for all text except the hotkey</param>
 		/// <param name="hotColor">The color to use to draw the hotkey</param>
 		/// <param name="containerBounds">Specifies the screen-relative location and maximum container size.</param>
 		/// <param name="fillRemaining">Determines if the bounds width will be used (default) or only the text width will be used.</param>
-		public void Draw (Rect bounds, Attribute normalColor, Attribute hotColor, Rect containerBounds = default, bool fillRemaining = true)
+		/// <param name="driver">The console driver currently used by the application.</param>
+		public void Draw (Rect bounds, Attribute normalColor, Attribute hotColor, Rect containerBounds = default, bool fillRemaining = true, ConsoleDriver driver = null)
 		{
 			// With this check, we protect against subclasses with overrides of Text (like Button)
 			if (string.IsNullOrEmpty (_text)) {
 				return;
 			}
 
-			Application.Driver?.SetAttribute (normalColor);
+			if (driver == null) {
+				driver = Application.Driver;
+			}
+			driver?.SetAttribute (normalColor);
 
 			// Use "Lines" to ensure a Format (don't use "lines"))
 
@@ -1403,7 +1407,7 @@ namespace Terminal.Gui {
 
 			var isVertical = IsVerticalDirection (_textDirection);
 			var maxBounds = bounds;
-			if (Application.Driver != null) {
+			if (driver != null) {
 				maxBounds = containerBounds == default
 					? bounds
 					: new Rect (Math.Max (containerBounds.X, bounds.X),
@@ -1538,26 +1542,26 @@ namespace Terminal.Gui {
 							rune = runes [idx];
 						}
 						if (lastZeroWidthPos == null) {
-							Application.Driver?.Move (x, current);
+							driver?.Move (x, current);
 						} else {
 							var foundIdx = lastZeroWidthPos.IndexOf (p => p.Value.Y == current);
 							if (foundIdx > -1) {
 								if (rune.IsCombiningMark ()) {
 									lastZeroWidthPos [foundIdx] = (new Point (lastZeroWidthPos [foundIdx].Value.X + 1, current));
 
-									Application.Driver?.Move (lastZeroWidthPos [foundIdx].Value.X, current);
+									driver?.Move (lastZeroWidthPos [foundIdx].Value.X, current);
 								} else if (!rune.IsCombiningMark () && lastRuneUsed.IsCombiningMark ()) {
 									current++;
-									Application.Driver?.Move (x, current);
+									driver?.Move (x, current);
 								} else {
-									Application.Driver?.Move (x, current);
+									driver?.Move (x, current);
 								}
 							} else {
-								Application.Driver?.Move (x, current);
+								driver?.Move (x, current);
 							}
 						}
 					} else {
-						Application.Driver?.Move (current, y);
+						driver?.Move (current, y);
 						if (idx >= 0 && idx < runes.Length) {
 							rune = runes [idx];
 						}
@@ -1570,9 +1574,9 @@ namespace Terminal.Gui {
 						(!isVertical && _textAlignment == TextAlignment.Justified)) {
 							CursorPosition = idx - start;
 						}
-						Application.Driver?.SetAttribute (hotColor);
-						Application.Driver?.AddRune (rune);
-						Application.Driver?.SetAttribute (normalColor);
+						driver?.SetAttribute (hotColor);
+						driver?.AddRune (rune);
+						driver?.SetAttribute (normalColor);
 					} else {
 						if (isVertical) {
 							if (runeWidth == 0) {
@@ -1584,11 +1588,11 @@ namespace Terminal.Gui {
 									current--;
 									lastZeroWidthPos.Add ((new Point (x + 1, current)));
 								}
-								Application.Driver?.Move (x + 1, current);
+								driver?.Move (x + 1, current);
 							}
 						}
 
-						Application.Driver?.AddRune (rune);
+						driver?.AddRune (rune);
 					}
 
 					if (isVertical) {
