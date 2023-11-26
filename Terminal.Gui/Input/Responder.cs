@@ -196,7 +196,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Called when the mouse has moved outside of the view; the view will no longer receive mouse events (until
-		/// the mouse moves within the vie again and <see cref="OnMouseEnter(Gui.MouseEvent)"/> is called).
+		/// the mouse moves within the view again and <see cref="OnMouseEnter(Gui.MouseEvent)"/> is called).
 		/// </summary>
 		/// <param name="mouseEvent"></param>
 		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
