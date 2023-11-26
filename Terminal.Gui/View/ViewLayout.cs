@@ -50,7 +50,7 @@ namespace Terminal.Gui {
 				_frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
 				if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
 					LayoutFrames ();
-					TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
+					TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
 					SetNeedsLayout ();
 					SetNeedsDisplay ();
 				}
@@ -213,9 +213,11 @@ namespace Terminal.Gui {
 #if DEBUG
 				if (LayoutStyle == LayoutStyle.Computed && !IsInitialized) {
 					Debug.WriteLine ($"WARNING: Bounds is being accessed before the View has been initialized. This is likely a bug. View: {this}");
+					Debug.WriteLine ($"The Frame is set before the View has been initialized. So it isn't a bug.Is by design.");
 				}
 #endif // DEBUG
-				var frameRelativeBounds = Padding?.Thickness.GetInside (Padding.Frame) ?? new Rect (default, Frame.Size);
+				//var frameRelativeBounds = Padding?.Thickness.GetInside (Padding.Frame) ?? new Rect (default, Frame.Size);
+				var frameRelativeBounds = FrameGetInsideBounds ();
 				return new Rect (default, frameRelativeBounds.Size);
 			}
 			set {
@@ -227,6 +229,16 @@ namespace Terminal.Gui {
 						)
 					);
 			}
+		}
+
+		private Rect FrameGetInsideBounds ()
+		{
+			if (Margin == null || Border == null || Padding == null) {
+				return new Rect (default, Frame.Size);
+			}
+			var width = Math.Max (0, Frame.Size.Width - Margin.Thickness.Horizontal - Border.Thickness.Horizontal - Padding.Thickness.Horizontal);
+			var height = Math.Max (0, Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical);
+			return new Rect (Point.Empty, new Size (width, height));
 		}
 
 		// Diagnostics to highlight when X or Y is read before the view has been initialized
@@ -460,7 +472,7 @@ namespace Terminal.Gui {
 			if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
 				SetMinWidthHeight ();
 				LayoutFrames ();
-				TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
+				TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
 				SetNeedsLayout ();
 				SetNeedsDisplay ();
 			}
@@ -657,7 +669,7 @@ namespace Terminal.Gui {
 				Frame = r;
 				// BUGBUG: Why is this AFTER setting Frame? Seems duplicative.
 				if (!SetMinWidthHeight ()) {
-					TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
+					TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
 				}
 			}
 		}
@@ -878,7 +890,7 @@ namespace Terminal.Gui {
 			var oldBounds = Bounds;
 			OnLayoutStarted (new LayoutEventArgs () { OldBounds = oldBounds });
 
-			TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
+			TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
 
 			// Sort out the dependencies of the X, Y, Width, Height properties
 			var nodes = new HashSet<View> ();
@@ -958,7 +970,7 @@ namespace Terminal.Gui {
 				}
 			}
 			// BUGBUG: This call may be redundant
-			TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
+			TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
 			return aSize;
 		}
 

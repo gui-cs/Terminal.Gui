@@ -446,8 +446,10 @@ Test
 			Assert.Equal (new Rect (0, 0, width + 2, height + 2), pos);
 		}
 
-		[Fact, AutoInitShutdown]
-		public void Label_WordWrap_PreserveTrailingSpaces_Horizontal_With_Wide_Runes ()
+		[Theory, AutoInitShutdown]
+		[InlineData (false)]
+		[InlineData (true)]
+		public void Label_WordWrap_PreserveTrailingSpaces_Horizontal_With_Wide_Runes (bool autoSize)
 		{
 			var text = "文に は言葉 があり ます。";
 			var width = 6;
@@ -455,17 +457,29 @@ Test
 			var wrappedLines = TextFormatter.WordWrapText (text, width, true);
 			var breakLines = "";
 			foreach (var line in wrappedLines) breakLines += $"{line}{Environment.NewLine}";
-			var label = new Label (breakLines) { Width = Dim.Fill (), Height = Dim.Fill () };
+			var label = new Label (breakLines) { Width = Dim.Fill (), Height = Dim.Fill (), AutoSize = autoSize };
 			var frame = new FrameView () { Width = Dim.Fill (), Height = Dim.Fill () };
 
 			frame.Add (label);
 			Application.Top.Add (frame);
 			Application.Begin (Application.Top);
+
+			Assert.True (label.AutoSize == autoSize);
+			Assert.Equal (new Rect (0, 0, 78, 23), label.Frame);
+			if (autoSize) {
+				// The size of the wrappedLines [1]
+				Assert.Equal (new Size (width, height - 2), label.TextFormatter.Size);
+			} else {
+				Assert.Equal (new Size (78, 23), label.TextFormatter.Size);
+			}
 			((FakeDriver)Application.Driver).SetBufferSize (width + 2, height + 2);
 
-			Assert.True (label.AutoSize);
 			Assert.Equal (new Rect (0, 0, width, height), label.Frame);
-			Assert.Equal (new Size (width, height), label.TextFormatter.Size);
+			if (autoSize) {
+				Assert.Equal (new Size (width, height - 2), label.TextFormatter.Size);
+			} else {
+				Assert.Equal (new Size (width, height), label.TextFormatter.Size);
+			}
 			Assert.Equal (new Rect (0, 0, width + 2, height + 2), frame.Frame);
 
 			var expected = @"
@@ -670,15 +684,17 @@ e
 			Assert.Equal (new Rect (0, 0, 2, 7), pos);
 		}
 
-		[Fact, AutoInitShutdown]
-		public void Label_Draw_Horizontal_Simple_TextAlignments ()
+		[Theory, AutoInitShutdown]
+		[InlineData (true)]
+		[InlineData (false)]
+		public void Label_Draw_Horizontal_Simple_TextAlignments (bool autoSize)
 		{
 			var text = "Hello World";
 			var width = 20;
-			var lblLeft = new Label (text) { Width = width };
-			var lblCenter = new Label (text) { Y = 1, Width = width, TextAlignment = TextAlignment.Centered };
-			var lblRight = new Label (text) { Y = 2, Width = width, TextAlignment = TextAlignment.Right };
-			var lblJust = new Label (text) { Y = 3, Width = width, TextAlignment = TextAlignment.Justified };
+			var lblLeft = new Label (text) { Width = width, AutoSize = autoSize };
+			var lblCenter = new Label (text) { Y = 1, Width = width, TextAlignment = TextAlignment.Centered, AutoSize = autoSize };
+			var lblRight = new Label (text) { Y = 2, Width = width, TextAlignment = TextAlignment.Right, AutoSize = autoSize };
+			var lblJust = new Label (text) { Y = 3, Width = width, TextAlignment = TextAlignment.Justified, AutoSize = autoSize };
 			var frame = new FrameView () { Width = Dim.Fill (), Height = Dim.Fill () };
 
 			frame.Add (lblLeft, lblCenter, lblRight, lblJust);
@@ -686,14 +702,28 @@ e
 			Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (width + 2, 6);
 
-			Assert.True (lblLeft.AutoSize);
-			Assert.True (lblCenter.AutoSize);
-			Assert.True (lblRight.AutoSize);
-			Assert.True (lblJust.AutoSize);
+			Assert.True (lblLeft.AutoSize == autoSize);
+			Assert.True (lblCenter.AutoSize == autoSize);
+			Assert.True (lblRight.AutoSize == autoSize);
+			Assert.True (lblJust.AutoSize == autoSize);
+			Assert.True (lblLeft.TextFormatter.AutoSize == autoSize);
+			Assert.True (lblCenter.TextFormatter.AutoSize == autoSize);
+			Assert.True (lblRight.TextFormatter.AutoSize == autoSize);
+			Assert.True (lblJust.TextFormatter.AutoSize == autoSize);
 			Assert.Equal (new Rect (0, 0, width, 1), lblLeft.Frame);
 			Assert.Equal (new Rect (0, 1, width, 1), lblCenter.Frame);
 			Assert.Equal (new Rect (0, 2, width, 1), lblRight.Frame);
 			Assert.Equal (new Rect (0, 3, width, 1), lblJust.Frame);
+			if (autoSize) {
+				Assert.Equal (new Size (11, 1), lblLeft.TextFormatter.Size);
+				Assert.Equal (new Size (11, 1), lblCenter.TextFormatter.Size);
+				Assert.Equal (new Size (11, 1), lblRight.TextFormatter.Size);
+			} else {
+				Assert.Equal (new Size (width, 1), lblLeft.TextFormatter.Size);
+				Assert.Equal (new Size (width, 1), lblCenter.TextFormatter.Size);
+				Assert.Equal (new Size (width, 1), lblRight.TextFormatter.Size);
+			}
+			Assert.Equal (new Size (width, 1), lblJust.TextFormatter.Size);
 			Assert.Equal (new Rect (0, 0, width + 2, 6), frame.Frame);
 
 			var expected = @"
@@ -709,15 +739,17 @@ e
 			Assert.Equal (new Rect (0, 0, width + 2, 6), pos);
 		}
 
-		[Fact, AutoInitShutdown]
-		public void Label_Draw_Vertical_Simple_TextAlignments ()
+		[Theory, AutoInitShutdown]
+		[InlineData (true)]
+		[InlineData (false)]
+		public void Label_Draw_Vertical_Simple_TextAlignments (bool autoSize)
 		{
 			var text = "Hello World";
 			var height = 20;
-			var lblLeft = new Label (text, direction: TextDirection.TopBottom_LeftRight) { Height = height };
-			var lblCenter = new Label (text, direction: TextDirection.TopBottom_LeftRight) { X = 2, Height = height, VerticalTextAlignment = VerticalTextAlignment.Middle };
-			var lblRight = new Label (text, direction: TextDirection.TopBottom_LeftRight) { X = 4, Height = height, VerticalTextAlignment = VerticalTextAlignment.Bottom };
-			var lblJust = new Label (text, direction: TextDirection.TopBottom_LeftRight) { X = 6, Height = height, VerticalTextAlignment = VerticalTextAlignment.Justified };
+			var lblLeft = new Label (text, direction: TextDirection.TopBottom_LeftRight, autoSize) { Height = height };
+			var lblCenter = new Label (text, direction: TextDirection.TopBottom_LeftRight, autoSize) { X = 2, Height = height, VerticalTextAlignment = VerticalTextAlignment.Middle };
+			var lblRight = new Label (text, direction: TextDirection.TopBottom_LeftRight, autoSize) { X = 4, Height = height, VerticalTextAlignment = VerticalTextAlignment.Bottom };
+			var lblJust = new Label (text, direction: TextDirection.TopBottom_LeftRight, autoSize) { X = 6, Height = height, VerticalTextAlignment = VerticalTextAlignment.Justified };
 			var frame = new FrameView () { Width = Dim.Fill (), Height = Dim.Fill () };
 
 			frame.Add (lblLeft, lblCenter, lblRight, lblJust);
@@ -725,14 +757,28 @@ e
 			Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (9, height + 2);
 
-			Assert.True (lblLeft.AutoSize);
-			Assert.True (lblCenter.AutoSize);
-			Assert.True (lblRight.AutoSize);
-			Assert.True (lblJust.AutoSize);
+			Assert.True (lblLeft.AutoSize == autoSize);
+			Assert.True (lblCenter.AutoSize == autoSize);
+			Assert.True (lblRight.AutoSize == autoSize);
+			Assert.True (lblJust.AutoSize == autoSize);
+			Assert.True (lblLeft.TextFormatter.AutoSize == autoSize);
+			Assert.True (lblCenter.TextFormatter.AutoSize == autoSize);
+			Assert.True (lblRight.TextFormatter.AutoSize == autoSize);
+			Assert.True (lblJust.TextFormatter.AutoSize == autoSize);
 			Assert.Equal (new Rect (0, 0, 1, height), lblLeft.Frame);
 			Assert.Equal (new Rect (2, 0, 1, height), lblCenter.Frame);
 			Assert.Equal (new Rect (4, 0, 1, height), lblRight.Frame);
 			Assert.Equal (new Rect (6, 0, 1, height), lblJust.Frame);
+			if (autoSize) {
+				Assert.Equal (new Size (1, 11), lblLeft.TextFormatter.Size);
+				Assert.Equal (new Size (1, 11), lblCenter.TextFormatter.Size);
+				Assert.Equal (new Size (1, 11), lblRight.TextFormatter.Size);
+			} else {
+				Assert.Equal (new Size (1, height), lblLeft.TextFormatter.Size);
+				Assert.Equal (new Size (1, height), lblCenter.TextFormatter.Size);
+				Assert.Equal (new Size (1, height), lblRight.TextFormatter.Size);
+			}
+			Assert.Equal (new Size (1, height), lblJust.TextFormatter.Size);
 			Assert.Equal (new Rect (0, 0, 9, height + 2), frame.Frame);
 
 			var expected = @"

@@ -136,7 +136,7 @@ namespace Terminal.Gui {
 			} else {
 				SetMinWidthHeight ();
 			}
-			TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
+			TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
 			SetNeedsDisplay ();
 		}
 
@@ -159,7 +159,7 @@ namespace Terminal.Gui {
 			} else {
 				return TextFormatter.IsVerticalDirection (TextDirection) &&
 				    TextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
-				    ? Math.Max (HotKeySpecifier.GetColumns(), 0) : 0;
+				    ? Math.Max (HotKeySpecifier.GetColumns (), 0) : 0;
 			}
 		}
 
@@ -177,7 +177,7 @@ namespace Terminal.Gui {
 		/// Gets the dimensions required for <see cref="Text"/> accounting for a <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> .
 		/// </summary>
 		/// <returns></returns>
-		public Size GetSizeNeededForTextAndHotKey ()
+		public Size GetTextFormatterSizeNeededForTextAndHotKey ()
 		{
 			if (string.IsNullOrEmpty (TextFormatter.Text)) {
 
@@ -188,9 +188,8 @@ namespace Terminal.Gui {
 
 			// BUGBUG: This IGNORES what Text is set to, using on only the current View size. This doesn't seem to make sense.
 			// BUGBUG: This uses Frame; in v2 it should be Bounds
-			return new Size (_frame.Size.Width + GetHotKeySpecifierLength (),
-					 _frame.Size.Height + GetHotKeySpecifierLength (false));
+			return new Size (Bounds.Size.Width + GetHotKeySpecifierLength (),
+					 Bounds.Size.Height + GetHotKeySpecifierLength (false));
 		}
-
 	}
 }
