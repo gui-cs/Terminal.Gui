@@ -375,8 +375,8 @@ namespace Terminal.Gui {
 			}
 			SetFocus ();
 
-			int boundsX = me.X - GetFramesThickness ().Left;
-			int boundsY = me.Y - GetFramesThickness ().Top;
+			int boundsX = me.X;
+			int boundsY = me.Y;
 
 			var pos = displayMode == DisplayModeLayout.Horizontal ? boundsX : boundsY;
 			var rCount = displayMode == DisplayModeLayout.Horizontal ? horizontal.Last ().pos + horizontal.Last ().length : radioLabels.Count;
