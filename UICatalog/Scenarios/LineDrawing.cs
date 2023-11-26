@@ -154,12 +154,12 @@ namespace UICatalog.Scenarios {
 					if (_currentLine == null) {
 
 						_currentLine = new StraightLine (
-							new Point (mouseEvent.X - GetBoundsOffset ().X, mouseEvent.Y - GetBoundsOffset ().X),
+							new Point (mouseEvent.X, mouseEvent.Y),
 							0, Orientation.Vertical, LineStyle, new Attribute (_currentColor, GetNormalColor ().Background));
 						_currentLayer.AddLine (_currentLine);
 					} else {
 						var start = _currentLine.Start;
-						var end = new Point (mouseEvent.X - GetBoundsOffset ().X, mouseEvent.Y - GetBoundsOffset ().Y);
+						var end = new Point (mouseEvent.X, mouseEvent.Y);
 						var orientation = Orientation.Vertical;
 						var length = end.Y - start.Y;
 
