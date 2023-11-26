@@ -611,10 +611,60 @@ public class ThicknessTests {
 
 	[Theory]
 	[InlineData (0, 0, 10, 10, 3, 3, false)] // Inside the inner rectangle
+	[InlineData (0, 0, 10, 10, 0, 0, false)] // On corner, in thickness
+	[InlineData (0, 0, 10, 10, 9, 9, false)] // On opposite corner, in thickness
+	[InlineData (0, 0, 10, 10, 5, 5, false)] // Inside the inner rectangle
+	[InlineData (0, 0, 10, 10, -1, -1, false)] // Outside the outer rectangle
+	[InlineData (0, 0, 10, 10, 3, 3, false)] // Inside the inner rectangle
+
+	[InlineData (0, 0, 0, 0, 3, 3, false)] // Inside the inner rectangle
+	[InlineData (0, 0, 0, 0, 0, 0, false)] // On corner, in thickness
+	[InlineData (0, 0, 0, 0, 9, 9, false)] // On opposite corner, in thickness
+	[InlineData (0, 0, 0, 0, 5, 5, false)] // Inside the inner rectangle
+	[InlineData (0, 0, 0, 0, -1, -1, false)] // Outside the outer rectangle
+	[InlineData (0, 0, 0, 0, 3, 3, false)] // Inside the inner rectangle
+
+	[InlineData (1, 1, 10, 10, 1, 1, false)] // On corner, in thickness
+	[InlineData (1, 1, 10, 10, 10, 10, false)] // On opposite corner, in thickness
+	[InlineData (1, 1, 10, 10, 6, 6, false)] // Inside the inner rectangle
+	[InlineData (1, 1, 10, 10, 0, 0, false)] // Outside the outer rectangle
+
+	[InlineData (-1, -1, 10, 10, -1, -1, false)] // On corner, in thickness
+	[InlineData (-1, -1, 10, 10, 8, 8, false)] // On opposite corner, in thickness
+	[InlineData (-1, -1, 10, 10, 4, 4, false)] // Inside the inner rectangle
+	[InlineData (-1, -1, 10, 10, -2, -2, false)] // Outside the outer rectangle
+	public void TestContains_ZeroThickness (int x, int y, int width, int height, int pointX, int pointY, bool expected)
+	{
+		var rect = new Rect (x, y, width, height);
+		var thickness = new Thickness (0, 0, 0, 0); // Uniform thickness for simplicity
+		bool result = thickness.Contains (rect, pointX, pointY);
+		Assert.Equal (expected, result);
+	}
+
+	[Theory]
+	[InlineData (0, 0, 10, 10, 3, 3, false)] // Inside the inner rectangle
 	[InlineData (0, 0, 10, 10, 0, 0, true)] // On corner, in thickness
 	[InlineData (0, 0, 10, 10, 9, 9, true)] // On opposite corner, in thickness
 	[InlineData (0, 0, 10, 10, 5, 5, false)] // Inside the inner rectangle
 	[InlineData (0, 0, 10, 10, -1, -1, false)] // Outside the outer rectangle
+	[InlineData (0, 0, 10, 10, 3, 3, false)] // Inside the inner rectangle
+
+	[InlineData (0, 0, 0, 0, 3, 3, false)] // Inside the inner rectangle
+	[InlineData (0, 0, 0, 0, 0, 0, false)] // On corner, in thickness
+	[InlineData (0, 0, 0, 0, 9, 9, false)] // On opposite corner, in thickness
+	[InlineData (0, 0, 0, 0, 5, 5, false)] // Inside the inner rectangle
+	[InlineData (0, 0, 0, 0, -1, -1, false)] // Outside the outer rectangle
+	[InlineData (0, 0, 0, 0, 3, 3, false)] // Inside the inner rectangle
+
+	[InlineData (1, 1, 10, 10, 1, 1, true)] // On corner, in thickness
+	[InlineData (1, 1, 10, 10, 10, 10, true)] // On opposite corner, in thickness
+	[InlineData (1, 1, 10, 10, 6, 6, false)] // Inside the inner rectangle
+	[InlineData (1, 1, 10, 10, 0, 0, false)] // Outside the outer rectangle
+
+	[InlineData (-1, -1, 10, 10, -1, -1, true)] // On corner, in thickness
+	[InlineData (-1, -1, 10, 10, 8, 8, true)] // On opposite corner, in thickness
+	[InlineData (-1, -1, 10, 10, 4, 4, false)] // Inside the inner rectangle
+	[InlineData (-1, -1, 10, 10, -2, -2, false)] // Outside the outer rectangle
 	public void TestContains_Uniform1 (int x, int y, int width, int height, int pointX, int pointY, bool expected)
 	{
 		var rect = new Rect (x, y, width, height);
@@ -639,6 +689,22 @@ public class ThicknessTests {
 	[InlineData (0, 0, 4, 4, 3, 3, true)] // in thickness
 	[InlineData (0, 0, 4, 4, 5, 5, false)] // outside outer rect
 	[InlineData (0, 0, 4, 4, 4, 4, false)] // outside outer rect
+
+	[InlineData (1, 1, 10, 10, 4, 4, false)] // Inside the inner rectangle
+	[InlineData (1, 1, 10, 10, 1, 1, true)] // On corner, in thickness
+	[InlineData (1, 1, 10, 10, 2, 2, true)] // On corner, in thickness
+	[InlineData (1, 1, 10, 10, 10, 10, true)] // On opposite corner, in thickness
+	[InlineData (1, 1, 10, 10, 6, 6, false)] // Inside the inner rectangle
+	[InlineData (1, 1, 10, 10, 9, 9, true)] // On opposite corner, in thickness
+	[InlineData (1, 1, 10, 10, 0, 0, false)] // Outside the outer rectangle
+
+	// Test with a rectangle that is same size as the thickness (inner is empty)
+	[InlineData (-1, -1, 4, 4, -1, -1, true)] // in thickness
+	[InlineData (-1, -1, 4, 4, 0, 0, true)] // in thickness
+	[InlineData (-1, -1, 4, 4, 1, 1, true)] // in thickness
+	[InlineData (-1, -1, 4, 4, 2, 2, true)] // in thickness
+	[InlineData (-1, -1, 4, 4, 4, 4, false)] // outside outer rect
+	[InlineData (-1, -1, 4, 4, 3, 3, false)] // outside outer rect
 	public void TestContains_Uniform2 (int x, int y, int width, int height, int pointX, int pointY, bool expected)
 	{
 		var rect = new Rect (x, y, width, height);
@@ -647,11 +713,8 @@ public class ThicknessTests {
 		Assert.Equal (expected, result);
 	}
 
-	// Additional test cases can be added to test other aspects like:
+	// TODO: Add more test cases:
 	// - Negative thickness values
-	// - Zero thickness values
-	// - Points exactly on the edge of the inner or outer rectangle
-	// - Larger rectangles and thicknesses
 
 	[Fact ()]
 	public void EqualsTest ()
