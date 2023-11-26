@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -67,20 +66,127 @@ namespace Terminal.Gui.TextTests {
 
 		[Theory]
 		[InlineData (TextDirection.LeftRight_TopBottom, false)]
+		[InlineData (TextDirection.LeftRight_TopBottom, true)]
+		[InlineData (TextDirection.TopBottom_LeftRight, false)]
 		[InlineData (TextDirection.TopBottom_LeftRight, true)]
 		public void TestSize_TextChange (TextDirection textDirection, bool autoSize)
 		{
 			var tf = new TextFormatter () { Direction = textDirection, Text = "你", AutoSize = autoSize };
 			Assert.Equal (2, tf.Size.Width);
+			Assert.Equal (1, tf.Size.Height);
 			tf.Text = "你你";
 			if (autoSize) {
 				if (textDirection == TextDirection.LeftRight_TopBottom) {
 					Assert.Equal (4, tf.Size.Width);
+					Assert.Equal (1, tf.Size.Height);
 				} else {
 					Assert.Equal (2, tf.Size.Width);
+					Assert.Equal (2, tf.Size.Height);
 				}
 			} else {
 				Assert.Equal (2, tf.Size.Width);
+				Assert.Equal (1, tf.Size.Height);
+			}
+		}
+
+		[Theory]
+		[InlineData (TextDirection.LeftRight_TopBottom)]
+		[InlineData (TextDirection.TopBottom_LeftRight)]
+		public void TestSize_AutoSizeChange (TextDirection textDirection)
+		{
+			var tf = new TextFormatter () { Direction = textDirection, Text = "你你" };
+			if (textDirection == TextDirection.LeftRight_TopBottom) {
+				Assert.Equal (4, tf.Size.Width);
+				Assert.Equal (1, tf.Size.Height);
+			} else {
+				Assert.Equal (2, tf.Size.Width);
+				Assert.Equal (2, tf.Size.Height);
+			}
+			Assert.False (tf.AutoSize);
+
+			tf.Size = new Size (1, 1);
+			Assert.Equal (1, tf.Size.Width);
+			Assert.Equal (1, tf.Size.Height);
+			tf.AutoSize = true;
+			if (textDirection == TextDirection.LeftRight_TopBottom) {
+				Assert.Equal (4, tf.Size.Width);
+				Assert.Equal (1, tf.Size.Height);
+			} else {
+				Assert.Equal (2, tf.Size.Width);
+				Assert.Equal (2, tf.Size.Height);
+			}
+		}
+
+		[Theory]
+		[InlineData (TextDirection.LeftRight_TopBottom, false)]
+		[InlineData (TextDirection.LeftRight_TopBottom, true)]
+		[InlineData (TextDirection.TopBottom_LeftRight, false)]
+		[InlineData (TextDirection.TopBottom_LeftRight, true)]
+		public void TestSize_SizeChange_AutoSize_True_Or_False (TextDirection textDirection, bool autoSize)
+		{
+			var tf = new TextFormatter () { Direction = textDirection, Text = "你你", AutoSize = autoSize };
+			if (textDirection == TextDirection.LeftRight_TopBottom) {
+				Assert.Equal (4, tf.Size.Width);
+				Assert.Equal (1, tf.Size.Height);
+			} else {
+				Assert.Equal (2, tf.Size.Width);
+				Assert.Equal (2, tf.Size.Height);
+			}
+
+			tf.Size = new Size (1, 1);
+			if (autoSize) {
+				if (textDirection == TextDirection.LeftRight_TopBottom) {
+					Assert.Equal (4, tf.Size.Width);
+					Assert.Equal (1, tf.Size.Height);
+				} else {
+					Assert.Equal (2, tf.Size.Width);
+					Assert.Equal (2, tf.Size.Height);
+				}
+			} else {
+				Assert.Equal (1, tf.Size.Width);
+				Assert.Equal (1, tf.Size.Height);
+			}
+		}
+
+		[Theory]
+		[InlineData (TextAlignment.Left, false)]
+		[InlineData (TextAlignment.Centered, true)]
+		[InlineData (TextAlignment.Right, false)]
+		[InlineData (TextAlignment.Justified, true)]
+		public void TestSize_SizeChange_AutoSize_True_Or_False_Horizontal (TextAlignment textAlignment, bool autoSize)
+		{
+			var tf = new TextFormatter () { Direction = TextDirection.LeftRight_TopBottom, Text = "你你", Alignment = textAlignment, AutoSize = autoSize };
+				Assert.Equal (4, tf.Size.Width);
+				Assert.Equal (1, tf.Size.Height);
+
+			tf.Size = new Size (1, 1);
+			if (autoSize && textAlignment != TextAlignment.Justified) {
+				Assert.Equal (4, tf.Size.Width);
+				Assert.Equal (1, tf.Size.Height);
+			} else {
+				Assert.Equal (1, tf.Size.Width);
+				Assert.Equal (1, tf.Size.Height);
+			}
+		}
+
+		[Theory]
+		[InlineData (VerticalTextAlignment.Top, false)]
+		[InlineData (VerticalTextAlignment.Middle, true)]
+		[InlineData (VerticalTextAlignment.Bottom, false)]
+		[InlineData (VerticalTextAlignment.Justified, true)]
+		public void TestSize_SizeChange_AutoSize_True_Or_False_Vertical (VerticalTextAlignment textAlignment, bool autoSize)
+		{
+			var tf = new TextFormatter () { Direction = TextDirection.TopBottom_LeftRight, Text = "你你", VerticalAlignment = textAlignment, AutoSize = autoSize };
+			Assert.Equal (2, tf.Size.Width);
+			Assert.Equal (2, tf.Size.Height);
+
+			tf.Size = new Size (1, 1);
+			if (autoSize && textAlignment != VerticalTextAlignment.Justified) {
+				Assert.Equal (2, tf.Size.Width);
+				Assert.Equal (2, tf.Size.Height);
+			} else {
+				Assert.Equal (1, tf.Size.Width);
+				Assert.Equal (1, tf.Size.Height);
 			}
 		}
 
@@ -371,8 +477,8 @@ namespace Terminal.Gui.TextTests {
 		[InlineData ("A sentence has words.", "A sentence has words.", int.MaxValue)] // should fit
 		[InlineData ("A sentence has words.", "A sentence has words", 20)] // Should not fit
 		[InlineData ("A sentence has words.", "A sentence", 10)] // Should not fit
-		[InlineData ("A\tsentence\thas\twords.", "A\tsentence\thas\twords.", int.MaxValue)]
-		[InlineData ("A\tsentence\thas\twords.", "A\tsentence", 10)]
+		[InlineData ("A\tsentence\thas\twords.", "A sentence has words.", int.MaxValue)]
+		[InlineData ("A\tsentence\thas\twords.", "A sentence", 10)]
 		[InlineData ("line1\nline2\nline3long!", "line1\nline2\nline3long!", int.MaxValue)]
 		[InlineData ("line1\nline2\nline3long!", "line1\nline", 10)]
 		[InlineData (" ~  s  gui.cs   master ↑10", " ~  s  ", 10)] // Unicode
@@ -382,10 +488,12 @@ namespace Terminal.Gui.TextTests {
 		public void ClipAndJustify_Valid_Left (string text, string justifiedText, int maxWidth)
 		{
 			var align = TextAlignment.Left;
+			var textDirection = TextDirection.LeftRight_BottomTop;
+			var tabWidth = 1;
 
-			Assert.Equal (justifiedText, TextFormatter.ClipAndJustify (text, maxWidth, align));
+			Assert.Equal (justifiedText, TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth));
 			var expectedClippedWidth = Math.Min (justifiedText.GetRuneCount (), maxWidth);
-			Assert.Equal (justifiedText, TextFormatter.ClipAndJustify (text, maxWidth, align));
+			Assert.Equal (justifiedText, TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth));
 			Assert.True (justifiedText.GetRuneCount () <= maxWidth);
 			Assert.True (justifiedText.GetColumns () <= maxWidth);
 			Assert.Equal (expectedClippedWidth, justifiedText.GetRuneCount ());
@@ -403,8 +511,8 @@ namespace Terminal.Gui.TextTests {
 		[InlineData ("A sentence has words.", "A sentence has words.", int.MaxValue)] // should fit
 		[InlineData ("A sentence has words.", "A sentence has words", 20)] // Should not fit
 		[InlineData ("A sentence has words.", "A sentence", 10)] // Should not fit
-		[InlineData ("A\tsentence\thas\twords.", "A\tsentence\thas\twords.", int.MaxValue)]
-		[InlineData ("A\tsentence\thas\twords.", "A\tsentence", 10)]
+		[InlineData ("A\tsentence\thas\twords.", "A sentence has words.", int.MaxValue)]
+		[InlineData ("A\tsentence\thas\twords.", "A sentence", 10)]
 		[InlineData ("line1\nline2\nline3long!", "line1\nline2\nline3long!", int.MaxValue)]
 		[InlineData ("line1\nline2\nline3long!", "line1\nline", 10)]
 		[InlineData (" ~  s  gui.cs   master ↑10", " ~  s  ", 10)] // Unicode
@@ -414,10 +522,12 @@ namespace Terminal.Gui.TextTests {
 		public void ClipAndJustify_Valid_Right (string text, string justifiedText, int maxWidth)
 		{
 			var align = TextAlignment.Right;
+			var textDirection = TextDirection.LeftRight_BottomTop;
+			var tabWidth = 1;
 
-			Assert.Equal (justifiedText, TextFormatter.ClipAndJustify (text, maxWidth, align));
+			Assert.Equal (justifiedText, TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth));
 			var expectedClippedWidth = Math.Min (justifiedText.GetRuneCount (), maxWidth);
-			Assert.Equal (justifiedText, TextFormatter.ClipAndJustify (text, maxWidth, align));
+			Assert.Equal (justifiedText, TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth));
 			Assert.True (justifiedText.GetRuneCount () <= maxWidth);
 			Assert.True (justifiedText.GetColumns () <= maxWidth);
 			Assert.Equal (expectedClippedWidth, justifiedText.GetRuneCount ());
@@ -435,8 +545,8 @@ namespace Terminal.Gui.TextTests {
 		[InlineData ("A sentence has words.", "A sentence has words.", int.MaxValue)] // should fit
 		[InlineData ("A sentence has words.", "A sentence has words", 20)] // Should not fit
 		[InlineData ("A sentence has words.", "A sentence", 10)] // Should not fit
-		[InlineData ("A\tsentence\thas\twords.", "A\tsentence\thas\twords.", int.MaxValue)]
-		[InlineData ("A\tsentence\thas\twords.", "A\tsentence", 10)]
+		[InlineData ("A\tsentence\thas\twords.", "A sentence has words.", int.MaxValue)]
+		[InlineData ("A\tsentence\thas\twords.", "A sentence", 10)]
 		[InlineData ("line1\nline2\nline3long!", "line1\nline2\nline3long!", int.MaxValue)]
 		[InlineData ("line1\nline2\nline3long!", "line1\nline", 10)]
 		[InlineData (" ~  s  gui.cs   master ↑10", " ~  s  ", 10)] // Unicode
@@ -446,10 +556,12 @@ namespace Terminal.Gui.TextTests {
 		public void ClipAndJustify_Valid_Centered (string text, string justifiedText, int maxWidth)
 		{
 			var align = TextAlignment.Centered;
+			var textDirection = TextDirection.LeftRight_TopBottom;
+			var tabWidth = 1;
 
-			Assert.Equal (justifiedText, TextFormatter.ClipAndJustify (text, maxWidth, align));
+			Assert.Equal (justifiedText, TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth));
 			var expectedClippedWidth = Math.Min (justifiedText.GetRuneCount (), maxWidth);
-			Assert.Equal (justifiedText, TextFormatter.ClipAndJustify (text, maxWidth, align));
+			Assert.Equal (justifiedText, TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth));
 			Assert.True (justifiedText.GetRuneCount () <= maxWidth);
 			Assert.True (justifiedText.GetColumns () <= maxWidth);
 			Assert.Equal (expectedClippedWidth, justifiedText.GetRuneCount ());
@@ -461,15 +573,16 @@ namespace Terminal.Gui.TextTests {
 		[Theory]
 		[InlineData ("test", "", 0)]
 		[InlineData ("test", "te", 2)]
-		[InlineData ("test", "test", int.MaxValue)]
+		[InlineData ("test", "test", int.MaxValue)] // This doesn't throw because it only create a word with length 1
 		[InlineData ("A sentence has words.", "A  sentence has words.", 22)] // should fit
 		[InlineData ("A sentence has words.", "A sentence has words.", 21)] // should fit
 		[InlineData ("A sentence has words.", "A                                                                                                                                                                 sentence                                                                                                                                                                 has                                                                                                                                                                words.", 500)] // should fit
 		[InlineData ("A sentence has words.", "A sentence has words", 20)] // Should not fit
 		[InlineData ("A sentence has words.", "A sentence", 10)] // Should not fit
-		[InlineData ("A\tsentence\thas\twords.", "A\tsentence\thas\twords.", int.MaxValue)]
-		[InlineData ("A\tsentence\thas\twords.", "A\tsentence", 10)]
-		[InlineData ("line1\nline2\nline3long!", "line1\nline2\nline3long!", int.MaxValue)]
+									 // Now throw System.OutOfMemoryException. See https://stackoverflow.com/questions/20672920/maxcapacity-of-stringbuilder
+									 //[InlineData ("A\tsentence\thas\twords.", "A sentence has words.", int.MaxValue)]
+		[InlineData ("A\tsentence\thas\twords.", "A sentence", 10)]
+		[InlineData ("line1\nline2\nline3long!", "line1\nline2\nline3long!", int.MaxValue)] // This doesn't throw because it only create a line with length 1
 		[InlineData ("line1\nline2\nline3long!", "line1\nline", 10)]
 		[InlineData (" ~  s  gui.cs   master ↑10", " ~  s  ", 10)] // Unicode
 		[InlineData ("Ð ÑÐ", "Ð  ÑÐ", 5)] // should fit
@@ -478,10 +591,12 @@ namespace Terminal.Gui.TextTests {
 		public void ClipAndJustify_Valid_Justified (string text, string justifiedText, int maxWidth)
 		{
 			var align = TextAlignment.Justified;
+			var textDirection = TextDirection.LeftRight_TopBottom;
+			var tabWidth = 1;
 
-			Assert.Equal (justifiedText, TextFormatter.ClipAndJustify (text, maxWidth, align));
+			Assert.Equal (justifiedText, TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth));
 			var expectedClippedWidth = Math.Min (justifiedText.GetRuneCount (), maxWidth);
-			Assert.Equal (justifiedText, TextFormatter.ClipAndJustify (text, maxWidth, align));
+			Assert.Equal (justifiedText, TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth));
 			Assert.True (justifiedText.GetRuneCount () <= maxWidth);
 			Assert.True (justifiedText.GetColumns () <= maxWidth);
 			Assert.Equal (expectedClippedWidth, justifiedText.GetRuneCount ());
@@ -806,7 +921,7 @@ namespace Terminal.Gui.TextTests {
 		[InlineData ("文に は言葉 があり ます。", 14, 0, new string [] { "文に は言葉", "があり ます。" })]
 		[InlineData ("文に は言葉 があり ます。", 3, -11, new string [] { "文", "に", "は", "言", "葉", "が", "あ", "り", "ま", "す", "。" })]
 		[InlineData ("文に は言葉 があり ます。", 2, -12, new string [] { "文", "に", "は", "言", "葉", "が", "あ", "り", "ま", "す", "。" })]
-		[InlineData ("文に は言葉 があり ます。", 1, -13, new string [] { })]
+		[InlineData ("文に は言葉 があり ます。", 1, -13, new string [] { " ", " ", " " })] // Just Spaces; should result in a single space for each line
 		public void WordWrap_PreserveTrailingSpaces_False_Wide_Runes (string text, int maxWidth, int widthOffset, IEnumerable<string> resultLines)
 		{
 			List<string> wrappedLines;
@@ -1084,7 +1199,7 @@ namespace Terminal.Gui.TextTests {
 		[InlineData ("A sentence has words.\r\nLine 2.", 29, -1, TextAlignment.Left, false, 1, false, 1)]
 		[InlineData ("A sentence has words.\r\nLine 2.", 30, 0, TextAlignment.Left, false, 1, false)]
 		[InlineData ("A sentence has words.\r\nLine 2.", 31, 1, TextAlignment.Left, false, 1, false)]
-		public void Reformat_NoWordrap_NewLines (string text, int maxWidth, int widthOffset, TextAlignment textAlignment, bool wrap, int linesCount, bool stringEmpty, int clipWidthOffset = 0)
+		public void Reformat_NoWordrap_NewLines_MultiLine_False (string text, int maxWidth, int widthOffset, TextAlignment textAlignment, bool wrap, int linesCount, bool stringEmpty, int clipWidthOffset = 0)
 		{
 			Assert.Equal (maxWidth, text.GetRuneCount () + widthOffset);
 			var expectedClippedWidth = Math.Min (text.GetRuneCount (), maxWidth) + clipWidthOffset;
@@ -1103,6 +1218,64 @@ namespace Terminal.Gui.TextTests {
 			} else {
 				Assert.Equal (StringExtensions.ToString (text.ToRunes () [0..expectedClippedWidth]), list [0]);
 			}
+		}
+
+		[Theory]
+		[InlineData ("A sentence has words.\nLine 2.", 0, -29, TextAlignment.Left, false, 1, true, new string [] { "" })]
+		[InlineData ("A sentence has words.\nLine 2.", 1, -28, TextAlignment.Left, false, 2, false, new string [] { "A", "L" })]
+		[InlineData ("A sentence has words.\nLine 2.", 5, -24, TextAlignment.Left, false, 2, false, new string [] { "A sen", "Line " })]
+		[InlineData ("A sentence has words.\nLine 2.", 28, -1, TextAlignment.Left, false, 2, false, new string [] { "A sentence has words.", "Line 2." })]
+		//// no clip
+		[InlineData ("A sentence has words.\nLine 2.", 29, 0, TextAlignment.Left, false, 2, false, new string [] { "A sentence has words.", "Line 2." })]
+		[InlineData ("A sentence has words.\nLine 2.", 30, 1, TextAlignment.Left, false, 2, false, new string [] { "A sentence has words.", "Line 2." })]
+		[InlineData ("A sentence has words.\r\nLine 2.", 0, -30, TextAlignment.Left, false, 1, true, new string [] { "" })]
+		[InlineData ("A sentence has words.\r\nLine 2.", 1, -29, TextAlignment.Left, false, 2, false, new string [] { "A", "L" })]
+		[InlineData ("A sentence has words.\r\nLine 2.", 5, -25, TextAlignment.Left, false, 2, false, new string [] { "A sen", "Line " })]
+		[InlineData ("A sentence has words.\r\nLine 2.", 29, -1, TextAlignment.Left, false, 2, false, new string [] { "A sentence has words.", "Line 2." })]
+		[InlineData ("A sentence has words.\r\nLine 2.", 30, 0, TextAlignment.Left, false, 2, false, new string [] { "A sentence has words.", "Line 2." })]
+		[InlineData ("A sentence has words.\r\nLine 2.", 31, 1, TextAlignment.Left, false, 2, false, new string [] { "A sentence has words.", "Line 2." })]
+		public void Reformat_NoWordrap_NewLines_MultiLine_True (string text, int maxWidth, int widthOffset, TextAlignment textAlignment, bool wrap, int linesCount, bool stringEmpty, IEnumerable<string> resultLines)
+		{
+			Assert.Equal (maxWidth, text.GetRuneCount () + widthOffset);
+			var list = TextFormatter.Format (text, maxWidth, textAlignment, wrap, false, 0, TextDirection.LeftRight_TopBottom, true);
+			Assert.NotEmpty (list);
+			Assert.True (list.Count == linesCount);
+			if (stringEmpty) {
+				Assert.Equal (string.Empty, list [0]);
+			} else {
+				Assert.NotEqual (string.Empty, list [0]);
+			}
+
+			Assert.Equal (list, resultLines);
+		}
+
+		[Theory]
+		[InlineData ("A sentence has words.\nLine 2.", 0, -29, TextAlignment.Left, false, 1, true, new string [] { "" })]
+		[InlineData ("A sentence has words.\nLine 2.", 1, -28, TextAlignment.Left, false, 2, false, new string [] { "A", "L" })]
+		[InlineData ("A sentence has words.\nLine 2.", 5, -24, TextAlignment.Left, false, 2, false, new string [] { "A sen", "Line " })]
+		[InlineData ("A sentence has words.\nLine 2.", 28, -1, TextAlignment.Left, false, 2, false, new string [] { "A sentence has words.", "Line 2." })]
+		//// no clip
+		[InlineData ("A sentence has words.\nLine 2.", 29, 0, TextAlignment.Left, false, 2, false, new string [] { "A sentence has words.", "Line 2." })]
+		[InlineData ("A sentence has words.\nLine 2.", 30, 1, TextAlignment.Left, false, 2, false, new string [] { "A sentence has words.", "Line 2." })]
+		[InlineData ("A sentence has words.\r\nLine 2.", 0, -30, TextAlignment.Left, false, 1, true, new string [] { "" })]
+		[InlineData ("A sentence has words.\r\nLine 2.", 1, -29, TextAlignment.Left, false, 2, false, new string [] { "A", "L" })]
+		[InlineData ("A sentence has words.\r\nLine 2.", 5, -25, TextAlignment.Left, false, 2, false, new string [] { "A sen", "Line " })]
+		[InlineData ("A sentence has words.\r\nLine 2.", 29, -1, TextAlignment.Left, false, 2, false, new string [] { "A sentence has words.", "Line 2." })]
+		[InlineData ("A sentence has words.\r\nLine 2.", 30, 0, TextAlignment.Left, false, 2, false, new string [] { "A sentence has words.", "Line 2." })]
+		[InlineData ("A sentence has words.\r\nLine 2.", 31, 1, TextAlignment.Left, false, 2, false, new string [] { "A sentence has words.", "Line 2." })]
+		public void Reformat_NoWordrap_NewLines_MultiLine_True_Vertical (string text, int maxWidth, int widthOffset, TextAlignment textAlignment, bool wrap, int linesCount, bool stringEmpty, IEnumerable<string> resultLines)
+		{
+			Assert.Equal (maxWidth, text.GetRuneCount () + widthOffset);
+			var list = TextFormatter.Format (text, maxWidth, textAlignment, wrap, false, 0, TextDirection.TopBottom_LeftRight, true);
+			Assert.NotEmpty (list);
+			Assert.True (list.Count == linesCount);
+			if (stringEmpty) {
+				Assert.Equal (string.Empty, list [0]);
+			} else {
+				Assert.NotEqual (string.Empty, list [0]);
+			}
+
+			Assert.Equal (list, resultLines);
 		}
 
 		[Theory]
@@ -1485,6 +1658,7 @@ ssb
 			tf.Direction = textDirection;
 			tf.Text = text;
 
+			Assert.True (tf.WordWrap);
 			if (textDirection == TextDirection.LeftRight_TopBottom) {
 				Assert.Equal (new Size (width, height), tf.Size);
 			} else {
@@ -1508,7 +1682,7 @@ ssb
 			tf.TabWidth = tabWidth;
 			tf.Text = text;
 
-			Assert.False (tf.WordWrap);
+			Assert.True (tf.WordWrap);
 			Assert.False (tf.PreserveTrailingSpaces);
 			Assert.Equal (new Size (width, height), tf.Size);
 			tf.Draw (new Rect (0, 0, width, height), new Attribute (ColorName.White, ColorName.Black), new Attribute (ColorName.Blue, ColorName.Black));
@@ -1529,7 +1703,7 @@ ssb
 			tf.PreserveTrailingSpaces = true;
 			tf.Text = text;
 
-			Assert.False (tf.WordWrap);
+			Assert.True (tf.WordWrap);
 			Assert.Equal (new Size (width, height), tf.Size);
 			tf.Draw (new Rect (0, 0, width, height), new Attribute (ColorName.White, ColorName.Black), new Attribute (ColorName.Blue, ColorName.Black));
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
@@ -1549,6 +1723,7 @@ ssb
 			tf.WordWrap = true;
 			tf.Text = text;
 
+			Assert.False (tf.PreserveTrailingSpaces);
 			Assert.Equal (new Size (width, height), tf.Size);
 			tf.Draw (new Rect (0, 0, width, height), new Attribute (ColorName.White, ColorName.Black), new Attribute (ColorName.Blue, ColorName.Black));
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
