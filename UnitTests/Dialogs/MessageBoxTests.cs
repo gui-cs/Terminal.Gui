@@ -439,40 +439,40 @@ namespace Terminal.Gui.DialogTests {
 				iterations++;
 
 				if (iterations == 0) {
-					MessageBox.Query (string.Empty, new string ('f', 50), defaultButton: 0, wrapMessage: true, "btn");
+					MessageBox.Query (string.Empty, new string ('f', 50), defaultButton: 0, wrapMessage: false, "btn");
 
 					Application.RequestStop ();
 				} else if (iterations == 1) {
 					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@$"
 ╔══════════════════╗
-║┌────────────────┐║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│       ff       │║
-║│                │║
-║│    {btn}   │║
-║└────────────────┘║
+║                  ║
+────────────────────
+ffffffffffffffffffff
+                    
+      ⟦► btn ◄⟧     
+────────────────────
+║                  ║
+║                  ║
 ╚══════════════════╝", output);
 
 					Application.RequestStop ();
 
 					// Really long text
-					MessageBox.Query (string.Empty, new string ('f', 500), defaultButton: 0, wrapMessage: true, "btn");
+					MessageBox.Query (string.Empty, new string ('f', 500), defaultButton: 0, wrapMessage: false, "btn");
 				} else if (iterations == 2) {
 					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@$"
-╔┌────────────────┐╗
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│    {btn}   │║
-╚└────────────────┘╝", output);
+╔══════════════════╗
+║                  ║
+────────────────────
+ffffffffffffffffffff
+                    
+      ⟦► btn ◄⟧     
+────────────────────
+║                  ║
+║                  ║
+╚══════════════════╝", output);
 
 					Application.RequestStop ();
 				}
@@ -505,14 +505,14 @@ namespace Terminal.Gui.DialogTests {
 					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@$"
 ╔══════════════════╗
-║ ┌──────────────┐ ║
-║ │ff ff ff ff ff│ ║
-║ │ff ff ff ff ff│ ║
-║ │ff ff ff ff ff│ ║
-║ │    ff ff     │ ║
-║ │              │ ║
-║ │   {btn}  │ ║
-║ └──────────────┘ ║
+║                  ║
+────────────────────
+ff ff ff ff ff ff ff
+                    
+      ⟦► btn ◄⟧     
+────────────────────
+║                  ║
+║                  ║
 ╚══════════════════╝", output);
 					Application.RequestStop ();
 
@@ -521,16 +521,16 @@ namespace Terminal.Gui.DialogTests {
 				} else if (iterations == 2) {
 					Application.Refresh ();
 					TestHelpers.AssertDriverContentsWithFrameAre (@$"
-╔┌────────────────┐╗
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│ffffffffffffffff│║
-║│    {btn}   │║
-╚└────────────────┘╝", output);
+╔══════════════════╗
+║                  ║
+────────────────────
+ffffffffffffffffffff
+                    
+      ⟦► btn ◄⟧     
+────────────────────
+║                  ║
+║                  ║
+╚══════════════════╝", output);
 					Application.RequestStop ();
 				}
 			};
@@ -539,15 +539,15 @@ namespace Terminal.Gui.DialogTests {
 		}
 
 		[Theory, AutoInitShutdown]
-		[InlineData (" ", true)]
-		[InlineData (" ", false)]
-		[InlineData ("", true)]
-		[InlineData ("", false)]
-		[InlineData ("\n", true)]
-		[InlineData ("\n", false)]
-		[InlineData (" \n", true)]
-		[InlineData (" \n", false)]
-		public void Message_Empty_Or_A_NewLline_WrapMessagge_True_Or_False (string message, bool wrapMessage)
+		[InlineData (" ", true, 1)]
+		[InlineData (" ", false, 1)]
+		[InlineData ("", true, 1)]
+		[InlineData ("", false, 1)]
+		[InlineData ("\n", true, 1)]
+		[InlineData ("\n", false, 1)]
+		[InlineData (" \n", true, 1)]
+		[InlineData (" \n", false, 2)]
+		public void Message_Empty_Or_A_NewLline_WrapMessagge_True_Or_False (string message, bool wrapMessage, int linesLength)
 		{
 			var iterations = -1;
 			Application.Begin (Application.Top);
@@ -561,12 +561,22 @@ namespace Terminal.Gui.DialogTests {
 					Application.RequestStop ();
 				} else if (iterations == 1) {
 					Application.Refresh ();
-					TestHelpers.AssertDriverContentsWithFrameAre (@$"
+					if (linesLength == 1) {
+						TestHelpers.AssertDriverContentsWithFrameAre (@$"
                 ┌──────────────────────────────────────────────┐
                 │                                              │
                 │                                              │
                 │                   {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}                   │
                 └──────────────────────────────────────────────┘", output);
+					} else {
+						TestHelpers.AssertDriverContentsWithFrameAre (@$"
+                ┌──────────────────────────────────────────────┐
+                │                                              │
+                │                                              │
+                │                                              │
+                │                   {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}                   │
+                └──────────────────────────────────────────────┘", output);
+					}
 					Application.RequestStop ();
 				}
 			};
