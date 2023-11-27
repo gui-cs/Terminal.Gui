@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// Toplevel views can be modally executed. They are used for both an application's main view (filling the entire screeN and
+	/// Toplevel views can be modally executed. They are used for both an application's main view (filling the entire screen and
 	/// for pop-up views such as <see cref="Dialog"/>, <see cref="MessageBox"/>, and <see cref="Wizard"/>.
 	/// </summary>
 	/// <remarks>
