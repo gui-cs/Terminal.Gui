@@ -222,7 +222,7 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.CursorDown, Command.NextView);
 			AddKeyBinding (Key.I | Key.CtrlMask, Command.NextView); // Unix
 
-			AddKeyBinding (Key.BackTab | Key.ShiftMask, Command.PreviousView);
+			AddKeyBinding (Key.BackTab, Command.PreviousView);
 			AddKeyBinding (Key.CursorLeft, Command.PreviousView);
 			AddKeyBinding (Key.CursorUp, Command.PreviousView);
 			AddKeyBinding (Key.B | Key.CtrlMask, Command.PreviousView);

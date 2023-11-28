@@ -58,12 +58,26 @@ namespace Terminal.Gui {
 		{
 			Height = 1;
 			AutoSize = autosize;
-			//HotKeySpecifier = new Rune ('_');
-			//if (HotKey != Key.Null) {
-			//	AddKeyBinding (Key.Space | HotKey, Command.Accept);
-			//}
+			// Things this view knows how to do
+			AddCommand (Command.Accept, () => AcceptKey ());
+
+			// Default keybindings for this view
+			AddKeyBinding (Key.Enter, Command.Accept);
+			AddKeyBinding (Key.Space, Command.Accept);
+			if (HotKey != Key.Null) {
+				AddKeyBinding (Key.Space | HotKey, Command.Accept);
+			}
 		}
 
+		bool AcceptKey ()
+		{
+			if (!HasFocus) {
+				SetFocus ();
+			}
+			OnClicked ();
+			return true;
+		}
+		
 		/// <summary>
 		///   The event fired when the user clicks the primary mouse button within the Bounds of this <see cref="View"/>
 		///   or if the user presses the action key while this view is focused. (TODO: IsDefault)
@@ -109,19 +123,6 @@ namespace Terminal.Gui {
 			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
 
 			return base.OnEnter (view);
-		}
-
-		///<inheritdoc/>
-		public override bool OnHotKey (KeyEventArgs ke)
-		{
-			if (ke.Key == (Key.AltMask | HotKey)) {
-				if (!HasFocus) {
-					SetFocus ();
-				}
-				OnClicked ();
-				return true;
-			}
-			return base.OnHotKey (ke);
 		}
 
 		/// <summary>
