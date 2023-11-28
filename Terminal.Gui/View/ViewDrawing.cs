@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -71,10 +72,12 @@ namespace Terminal.Gui {
 		/// <param name="ch">Ch.</param>
 		public void AddRune (int col, int row, Rune ch)
 		{
-			if (row < 0 || col < 0)
+			if (row < 0 || col < 0) {
 				return;
-			if (row > _frame.Height - 1 || col > _frame.Width - 1)
+			}
+			if (row > _frame.Height - 1 || col > _frame.Width - 1) {
 				return;
+			}
 			Move (col, row);
 			Driver.AddRune (ch);
 		}
@@ -184,7 +187,7 @@ namespace Terminal.Gui {
 		///     This clears the Bounds used by this view.
 		///   </para>
 		/// </remarks>
-		public void Clear () => Clear (ViewToScreen(Bounds));
+		public void Clear () => Clear (BoundsToScreen(Bounds));
 
 		// BUGBUG: This version of the Clear API should be removed. We should have a tenet that says 
 		// "View APIs only deal with View-relative coords". This is only used by ComboBox which can
@@ -214,7 +217,7 @@ namespace Terminal.Gui {
 			var h = regionScreen.Y + regionScreen.Height >= Driver.Rows ? Driver.Rows - regionScreen.Y : regionScreen.Height;
 
 			return new Rect (x, y, w, h);
-		}
+		}		
 
 		/// <summary>
 		/// Expands the <see cref="ConsoleDriver"/>'s clip region to include <see cref="Bounds"/>.
@@ -228,7 +231,7 @@ namespace Terminal.Gui {
 		public Rect ClipToBounds ()
 		{
 			var previous = Driver.Clip;
-			Driver.Clip = Rect.Intersect (previous, ViewToScreen (Bounds));
+			Driver.Clip = Rect.Intersect (previous, BoundsToScreen (Bounds));
 			return previous;
 		}
 
@@ -276,15 +279,13 @@ namespace Terminal.Gui {
 		/// <returns>The move.</returns>
 		/// <param name="col">The column to move to, in view-relative coordinates.</param>
 		/// <param name="row">the row to move to, in view-relative coordinates.</param>
-		/// <param name="clipped">Whether to clip the result of the ViewToScreen method,
-		///  If  <see langword="true"/>, the <paramref name="col"/> and <paramref name="row"/> values are clamped to the screen (terminal) dimensions (0..TerminalDim-1).</param>
-		public void Move (int col, int row, bool clipped = true)
+		public void Move (int col, int row)
 		{
 			if (Driver.Rows == 0) {
 				return;
 			}
-
-			ViewToScreen (col, row, out var rCol, out var rRow, clipped);
+			
+			BoundsToScreen (col, row, out var rCol, out var rRow, false);
 			Driver.Move (rCol, rRow);
 		}
 		/// <summary>
@@ -440,7 +441,7 @@ namespace Terminal.Gui {
 		{
 			if (NeedsDisplay) {
 				if (SuperView != null) {
-					Clear (ViewToScreen (Bounds));
+					Clear (BoundsToScreen (Bounds));
 				}
 
 				if (!string.IsNullOrEmpty (TextFormatter.Text)) {
@@ -449,7 +450,7 @@ namespace Terminal.Gui {
 					}
 				}
 				// This should NOT clear 
-				TextFormatter?.Draw (ViewToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
+				TextFormatter?.Draw (BoundsToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
 					HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
 					Rect.Empty, false);
 				SetSubViewNeedsDisplay ();

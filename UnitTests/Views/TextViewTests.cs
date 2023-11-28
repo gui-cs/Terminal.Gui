@@ -5847,7 +5847,7 @@ line.
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 
-			Assert.True (tv.OnKeyPressed (new (Key.BackTab, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
@@ -5891,7 +5891,7 @@ line.
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (7, 0), tv.CursorPosition);
 
-			Assert.True (tv.OnKeyPressed (new (Key.BackTab, new KeyModifiers ())));
+			Assert.True (tv.OnKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal ("First line.", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (6, 0), tv.CursorPosition);

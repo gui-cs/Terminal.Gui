@@ -277,6 +277,37 @@ public class ScrollView : View {
 		SetNeedsLayout ();
 	}
 
+	/// <summary>
+	/// Removes the view from the scrollview.
+	/// </summary>
+	/// <param name="view">The view to remove from the scrollview.</param>
+	public override void Remove (View view)
+	{
+		if (view == null) {
+			return;
+		}
+
+		SetNeedsDisplay ();
+		var container = view?.SuperView;
+		if (container == this) {
+			base.Remove (view);
+		} else {
+			container?.Remove (view);
+		}
+
+		if (_contentView.InternalSubviews.Count < 1) {
+			this.CanFocus = false;
+		}
+	}
+
+	/// <summary>
+	///   Removes all widgets from this container.
+	/// </summary>
+	public override void RemoveAll ()
+	{
+		_contentView.RemoveAll ();
+	}
+
 	void View_MouseLeave (object sender, MouseEventEventArgs e)
 	{
 		if (Application.MouseGrabView != null && Application.MouseGrabView != _vertical && Application.MouseGrabView != _horizontal) {
@@ -316,16 +347,6 @@ public class ScrollView : View {
 			}
 			_vertical.Height = Dim.Fill (_showHorizontalScrollIndicator ? 1 : 0);
 		}
-	}
-
-	/// <summary>
-	///   Removes all widgets from this container.
-	/// </summary>
-	/// <remarks>
-	/// </remarks>
-	public override void RemoveAll ()
-	{
-		_contentView.RemoveAll ();
 	}
 
 	/// <summary>

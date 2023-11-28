@@ -221,7 +221,9 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Method invoked when a mouse event is generated for the first time.
+		/// Called when the mouse first enters the view; the view will now
+		/// receives mouse events until the mouse leaves the view. At which time, <see cref="OnMouseLeave(Gui.MouseEvent)"/>
+		/// will be called.
 		/// </summary>
 		/// <param name="mouseEvent"></param>
 		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
@@ -231,7 +233,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Method invoked when a mouse event is generated for the last time.
+		/// Called when the mouse has moved outside of the view; the view will no longer receive mouse events (until
+		/// the mouse moves within the view again and <see cref="OnMouseEnter(Gui.MouseEvent)"/> is called).
 		/// </summary>
 		/// <param name="mouseEvent"></param>
 		/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>

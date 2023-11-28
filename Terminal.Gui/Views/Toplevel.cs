@@ -814,6 +814,7 @@ namespace Terminal.Gui {
 				Application.BringOverlappedTopToFront ();
 
 				// Only start grabbing if the user clicks on the title bar.
+				// BUGBUG: Assumes Frame == Border and Title is always at Y == 0
 				if (mouseEvent.Y == 0 && mouseEvent.Flags == MouseFlags.Button1Pressed) {
 					_startGrabPoint = new Point (mouseEvent.X, mouseEvent.Y);
 					_dragPosition = new Point ();
@@ -838,6 +839,7 @@ namespace Terminal.Gui {
 					} else {
 						SuperView.SetNeedsDisplay ();
 					}
+					// BUGBUG: Assumes Frame == Border?
 					GetLocationThatFits (this, mouseEvent.X + (SuperView == null ? mouseEvent.OfX - _startGrabPoint.X : Frame.X - _startGrabPoint.X),
 						mouseEvent.Y + (SuperView == null ? mouseEvent.OfY - _startGrabPoint.Y : Frame.Y - _startGrabPoint.Y),
 						out nx, out ny, out _, out _);

@@ -805,6 +805,8 @@ namespace Terminal.Gui {
 				SelectedRow = match;
 				EnsureValidSelection ();
 				EnsureSelectedCellIsVisible ();
+				PositionCursor ();
+				SetNeedsDisplay ();
 				return true;
 			}
 
@@ -1230,9 +1232,8 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			// TODO: Revert this (or not) once #2578 is solved
-			var boundsX = me.X - GetFramesThickness ().Left;
-			var boundsY = me.Y - GetFramesThickness ().Top;
+			var boundsX = me.X;
+			var boundsY = me.Y;
 
 			if (me.Flags.HasFlag (MouseFlags.Button1Clicked)) {
 

@@ -3412,15 +3412,15 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			var result = InvokeKeyBindings (new (ShortcutHelper.GetModifiersKey (a),
-			    new KeyModifiers () { Alt = a.IsAlt, Ctrl = a.IsCtrl, Shift = a.IsShift }));
-			if (result != null)
-				return (bool)result;
+			if (base.OnKeyPressed (a)) {
+				return true;
+			}
 
 			ResetColumnTrack ();
 			// Ignore control characters and other special keys
-			if (a.Key < Key.Space || a.Key > Key.CharMask)
+			if (a.Key < Key.Space || a.Key > Key.CharMask) {
 				return false;
+			}
 
 			InsertText (a);
 			DoNeededAction ();

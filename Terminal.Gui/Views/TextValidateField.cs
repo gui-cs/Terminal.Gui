@@ -614,16 +614,17 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnKeyPressed (KeyEventArgs a)
 		{
+			if (base.OnKeyPressed (a)) {
+				return true;
+			}
+
 			if (provider == null) {
 				return false;
 			}
 
-			var result = InvokeKeyBindings (a);
-			if (result != null)
-				return (bool)result;
-
-			if (a.Key < Key.Space || a.Key > Key.CharMask)
+			if (a.Key < Key.Space || a.Key > Key.CharMask) {
 				return false;
+			}
 
 			var key = new Rune ((uint)a.KeyValue);
 

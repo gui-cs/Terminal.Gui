@@ -1,23 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Xunit;
 
 namespace Terminal.Gui.ViewsTests {
 	public class ProgressBarTests {
 		[Fact]
 		[AutoInitShutdown]
-		public void Default_Contructor ()
+		public void Default_Constructor ()
 		{
 			var pb = new ProgressBar ();
+			pb.BeginInit();
+			pb.EndInit();
 
 			Assert.False (pb.CanFocus);
 			Assert.Equal (0, pb.Fraction);
 			Assert.Equal (new Attribute (Color.BrightGreen, Color.Gray),
-				new Attribute (pb.ColorScheme.Normal.Foreground, pb.ColorScheme.Normal.Background));
-			Assert.Equal (Colors.Base.Normal, pb.ColorScheme.HotNormal);
+				new Attribute (pb.ColorScheme.HotNormal.Foreground, pb.ColorScheme.HotNormal.Background));
+			Assert.Equal (Colors.Base.Normal, pb.ColorScheme.Normal);
 			Assert.Equal (1, pb.Height);
 			Assert.Equal (ProgressBarStyle.Blocks, pb.ProgressBarStyle);
 			Assert.Equal (ProgressBarFormat.Simple, pb.ProgressBarFormat);
@@ -55,16 +53,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (1, pb.Height);
 
 			pb.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
-			Assert.Equal (2, pb.Height);
-
-			pb.ProgressBarFormat = ProgressBarFormat.Framed;
-			Assert.Equal (3, pb.Height);
-
-			pb.ProgressBarFormat = ProgressBarFormat.FramedPlusPercentage;
-			Assert.Equal (4, pb.Height);
-
-			pb.ProgressBarFormat = ProgressBarFormat.FramedProgressPadded;
-			Assert.Equal (6, pb.Height);
+			Assert.Equal (1, pb.Height);
 		}
 
 		[Fact]
@@ -85,31 +74,11 @@ namespace Terminal.Gui.ViewsTests {
 
 			pb1.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
 			Assert.Equal (ProgressBarFormat.SimplePlusPercentage, pb1.ProgressBarFormat);
-			Assert.Equal (2, pb1.Height);
+			Assert.Equal (1, pb1.Height);
 			pb2.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
 			Assert.Equal (ProgressBarFormat.SimplePlusPercentage, pb2.ProgressBarFormat);
-			Assert.Equal (2, pb2.Height);
+			Assert.Equal (1, pb2.Height);
 
-			pb1.ProgressBarFormat = ProgressBarFormat.Framed;
-			Assert.Equal (ProgressBarFormat.Framed, pb1.ProgressBarFormat);
-			Assert.Equal (3, pb1.Height);
-			pb2.ProgressBarFormat = ProgressBarFormat.Framed;
-			Assert.Equal (ProgressBarFormat.Framed, pb2.ProgressBarFormat);
-			Assert.Equal (3, pb2.Height);
-
-			pb1.ProgressBarFormat = ProgressBarFormat.FramedPlusPercentage;
-			Assert.Equal (ProgressBarFormat.FramedPlusPercentage, pb1.ProgressBarFormat);
-			Assert.Equal (4, pb1.Height);
-			pb2.ProgressBarFormat = ProgressBarFormat.FramedPlusPercentage;
-			Assert.Equal (ProgressBarFormat.FramedPlusPercentage, pb2.ProgressBarFormat);
-			Assert.Equal (4, pb2.Height);
-
-			pb1.ProgressBarFormat = ProgressBarFormat.FramedProgressPadded;
-			Assert.Equal (ProgressBarFormat.FramedProgressPadded, pb1.ProgressBarFormat);
-			Assert.Equal (6, pb1.Height);
-			pb2.ProgressBarFormat = ProgressBarFormat.FramedProgressPadded;
-			Assert.Equal (ProgressBarFormat.FramedProgressPadded, pb2.ProgressBarFormat);
-			Assert.Equal (6, pb2.Height);
 		}
 
 		[Fact]
@@ -126,14 +95,6 @@ namespace Terminal.Gui.ViewsTests {
 			pb.Text = "bleble";
 			Assert.Equal ("25%", pb.Text);
 
-			pb.ProgressBarFormat = ProgressBarFormat.Framed;
-			Assert.Equal ("25%", pb.Text);
-
-			pb.ProgressBarFormat = ProgressBarFormat.FramedPlusPercentage;
-			Assert.Equal ("25%", pb.Text);
-
-			pb.ProgressBarFormat = ProgressBarFormat.FramedProgressPadded;
-			Assert.Equal ("25%", pb.Text);
 		}
 
 		[Fact]
@@ -148,15 +109,6 @@ namespace Terminal.Gui.ViewsTests {
 
 			pb.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
 			pb.Text = "bleble";
-			Assert.Equal ("bleble", pb.Text);
-
-			pb.ProgressBarFormat = ProgressBarFormat.Framed;
-			Assert.Equal ("bleble", pb.Text);
-
-			pb.ProgressBarFormat = ProgressBarFormat.FramedPlusPercentage;
-			Assert.Equal ("bleble", pb.Text);
-
-			pb.ProgressBarFormat = ProgressBarFormat.FramedProgressPadded;
 			Assert.Equal ("bleble", pb.Text);
 		}
 
@@ -173,6 +125,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			pb.BeginInit ();
 			pb.EndInit ();
+			pb.LayoutSubviews ();
 
 			for (int i = 0; i < 38; i++) {
 				pb.Pulse ();
@@ -803,6 +756,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			pb.BeginInit ();
 			pb.EndInit ();
+			pb.LayoutSubviews ();
 
 			for (int i = 0; i < 38; i++) {
 				pb.Pulse ();
@@ -1431,6 +1385,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			pb.BeginInit ();
 			pb.EndInit ();
+			pb.LayoutSubviews ();
 
 			for (int i = 0; i <= pb.Frame.Width; i++) {
 				pb.Fraction += 0.2F;

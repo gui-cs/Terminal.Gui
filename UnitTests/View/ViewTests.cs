@@ -498,10 +498,10 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (view._addingView);
 			view._addingView = true;
 			Assert.True (view._addingView);
-			view.ViewToScreen (0, 0, out int rcol, out int rrow);
+			view.BoundsToScreen (0, 0, out int rcol, out int rrow);
 			Assert.Equal (1, rcol);
 			Assert.Equal (1, rrow);
-			Assert.Equal (rect, view.ViewToScreen (view.Bounds));
+			Assert.Equal (rect, view.BoundsToScreen (view.Bounds));
 			Assert.Equal (top.Bounds, view.ScreenClip (top.Bounds));
 			Assert.True (view.LayoutStyle == LayoutStyle.Absolute);
 
@@ -546,7 +546,7 @@ namespace Terminal.Gui.ViewTests {
 			view.Y = Pos.Center () - 13;
 			view.SetRelativeLayout (top.Bounds);
 			top.LayoutSubviews (); // BUGBUG: v2 - ??
-			view.ViewToScreen (0, 0, out rcol, out rrow);
+			view.BoundsToScreen (0, 0, out rcol, out rrow);
 			Assert.Equal (-41, rcol);
 			Assert.Equal (-13, rrow);
 			

@@ -249,21 +249,23 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnKeyPressed (KeyEventArgs a)
 		{
-			var result = InvokeKeyBindings (a);
-			if (result != null)
-				return (bool)result;
-
 			// Ignore non-numeric characters.
-			if (a.Key < (Key)((int)Key.D0) || a.Key > (Key)((int)Key.D9))
-				return false;
-
-			if (ReadOnly)
+			if (a.Key is >= (Key)(int)Key.D0 and <= (Key)(int)Key.D9) {
+				if (!ReadOnly) {
+					if (SetText (((Rune)(uint)a.Key).ToString ().EnumerateRunes ().First ())) {
+						IncCursorPosition ();
+					}
+				}
 				return true;
+			}
 
-			if (SetText (((Rune)(uint)a.Key).ToString ().EnumerateRunes ().First ()))
-				IncCursorPosition ();
-
-			return true;
+			// Ignore other control characters.
+			if (a.Key < Key.D0 || a.Key > Key.z) {
+				if (base.OnKeyPressed (a)) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		bool MoveRight ()

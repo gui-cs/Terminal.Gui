@@ -193,6 +193,10 @@ namespace Terminal.Gui.ViewTests {
 		public void AllViews_OnKeyPressed_CallsResponder ()
 		{
 			foreach (var view in TestHelpers.GetAllViews ()) {
+				if (view == null) {
+					_output.WriteLine ($"ERROR: null view from {nameof (TestHelpers.GetAllViews)}");
+					continue;
+				}
 				_output.WriteLine($"Testing {view.GetType().Name}");
 				var keyPressed = false;
 				view.KeyPressed += (s, a) => {

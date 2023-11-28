@@ -794,14 +794,13 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			var framesThickness = GetFramesThickness ();
-			if (me.Y + top - framesThickness.Top >= source.Count
-				|| me.Y + top - framesThickness.Top < 0
-				|| me.Y + top > top + Frame.Height - (framesThickness.Top + framesThickness.Bottom)) {
+			if (me.Y + top >= source.Count
+				|| me.Y + top  < 0
+				|| me.Y + top > top + Bounds.Height) {
 				return true;
 			}
 
-			selected = top - GetFramesThickness ().Top + me.Y;
+			selected = top + me.Y;
 			if (AllowsAll ()) {
 				Source.SetMark (SelectedItem, !Source.IsMarked (SelectedItem));
 				SetNeedsDisplay ();

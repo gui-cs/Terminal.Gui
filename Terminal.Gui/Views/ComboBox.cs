@@ -873,7 +873,7 @@ namespace Terminal.Gui {
 			if (lastSelectedItem != selectedItem) {
 				OnOpenSelectedItem ();
 			}
-			var rect = listview.ViewToScreen (listview.Bounds);
+			var rect = listview.BoundsToScreen (listview.Bounds);
 			Reset (keepSearchText: true);
 			listview.Clear (rect);
 			listview.TabStop = false;

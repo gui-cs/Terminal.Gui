@@ -167,6 +167,10 @@ namespace Terminal.Gui {
 				return false;
 			}
 
+			if (Focused?.OnKeyPressed (keyEvent) == true) {
+				return true;
+			}
+
 			var result = InvokeKeyBindings (keyEvent);
 			if (result != null) {
 				return (bool)result;
@@ -175,11 +179,7 @@ namespace Terminal.Gui {
 			if (base.OnKeyPressed (keyEvent)) {
 				return true;
 			}
-
-			if (Focused?.OnKeyPressed (keyEvent) == true) {
-				return true;
-			}
-
+			
 			return false;
 		}
 

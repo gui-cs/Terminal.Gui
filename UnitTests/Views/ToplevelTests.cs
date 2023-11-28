@@ -1432,7 +1432,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			var btnPopup = new Button ("Popup");
 			btnPopup.Clicked += (s, e) => {
-				var viewToScreen = btnPopup.ViewToScreen (top.Frame);
+				var viewToScreen = btnPopup.BoundsToScreen (top.Frame);
 				var view = new View () {
 					X = 1,
 					Y = viewToScreen.Y + 1,

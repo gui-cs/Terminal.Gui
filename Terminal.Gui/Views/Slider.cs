@@ -1431,20 +1431,6 @@ public class Slider<T> : View {
 
 	}
 
-	/// <inheritdoc/>
-	public override bool OnKeyPressed (KeyEventArgs keyEvent)
-	{
-		if (!CanFocus || !HasFocus) {
-			return base.OnKeyPressed (keyEvent);
-		}
-
-		var result = InvokeKeyBindings (keyEvent);
-		if (result != null) {
-			return (bool)result;
-		}
-		return base.OnKeyPressed (keyEvent);
-	}
-
 	Dictionary<int, SliderOption<T>> GetSetOptionDictionary () => _setOptions.ToDictionary (e => e, e => _options [e]);
 
 	void SetFocusedOption ()
