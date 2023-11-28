@@ -234,37 +234,37 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		/// <summary>
-		/// Allows a view to run a <see cref="View.ShortcutAction"/> if defined.
-		/// </summary>
-		/// <param name="a">The <see cref="KeyEventArgs"/></param>
-		/// <param name="view">The <see cref="View"/></param>
-		/// <returns><c>true</c> if defined <c>false</c>otherwise.</returns>
-		public static bool FindAndOpenByShortcut (KeyEventArgs a, View view = null)
-		{
-			if (view == null) {
-				return false;			}
+		///// <summary>
+		///// Allows a view to run a <see cref="View.ShortcutAction"/> if defined.
+		///// </summary>
+		///// <param name="a">The <see cref="KeyEventArgs"/></param>
+		///// <param name="view">The <see cref="View"/></param>
+		///// <returns><c>true</c> if defined <c>false</c>otherwise.</returns>
+		//public static bool FindAndOpenByShortcut (KeyEventArgs a, View view = null)
+		//{
+		//	if (view == null) {
+		//		return false;			}
 
-			var key = a.KeyValue;
-			var keys = GetModifiersKey (a);
-			key |= (int)keys;
-			foreach (var v in view.Subviews) {
-				if (v.Shortcut != Key.Null && v.Shortcut == (Key)key) {
-					var action = v.ShortcutAction;
-					if (action != null) {
-						Application.MainLoop.AddIdle (() => {
-							action ();
-							return false;
-						});
-					}
-					return true;
-				}
-				if (FindAndOpenByShortcut (a, v)) {
-					return true;
-				}
-			}
+		//	var key = a.KeyValue;
+		//	var keys = GetModifiersKey (a);
+		//	key |= (int)keys;
+		//	foreach (var v in view.Subviews) {
+		//		if (v.Shortcut != Key.Null && v.Shortcut == (Key)key) {
+		//			var action = v.ShortcutAction;
+		//			if (action != null) {
+		//				Application.MainLoop.AddIdle (() => {
+		//					action ();
+		//					return false;
+		//				});
+		//			}
+		//			return true;
+		//		}
+		//		if (FindAndOpenByShortcut (a, v)) {
+		//			return true;
+		//		}
+		//	}
 
-			return false;
-		}
+		//	return false;
+		//}
 	}
 }

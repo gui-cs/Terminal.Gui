@@ -392,29 +392,6 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-//		///<inheritdoc/>
-//		public override bool OnKeyPressed (KeyEventArgs keyEvent)
-//		{
-//			if (base.OnKeyPressed (keyEvent)) {
-//				return true;
-//			}
-
-//			var result = InvokeKeyBindings (new (ShortcutHelper.GetModifiersKey (keyEvent),
-//				new KeyModifiers () { Alt = keyEvent.IsAlt, Ctrl = keyEvent.IsCtrl, Shift = keyEvent.IsShift }));
-//			if (result != null) {
-//				return (bool)result;
-//			}
-
-//#if false
-//			if (keyEvent.Key == Key.F5) {
-//				Application.DebugDrawBounds = !Application.DebugDrawBounds;
-//				SetNeedsDisplay ();
-//				return true;
-//			}
-//#endif
-//			return false;
-//		}
-
 		private void MovePreviousViewOrTop ()
 		{
 			if (Application.OverlappedTop == null) {

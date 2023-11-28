@@ -82,32 +82,6 @@ public partial class View {
 
 	#endregion HotKey Support
 
-	#region Shortcut Support
-	ShortcutHelper _shortcutHelper;
-
-	/// <summary>
-	/// Gets or sets the shortcut key. If the shortcut key is pressed <see cref="ShortcutAction"/> will be invoked.
-	/// </summary>
-	public Key Shortcut {
-		get => _shortcutHelper.Shortcut;
-		set {
-			if (_shortcutHelper.Shortcut != value && (ShortcutHelper.PostShortcutValidation (value) || value == Key.Null)) {
-				_shortcutHelper.Shortcut = value;
-			}
-		}
-	}
-
-	///// <summary>
-	///// The keystroke combination used in the <see cref="Shortcut"/> as string.
-	///// </summary>
-	//public string ShortcutTag => ShortcutHelper.GetShortcutTag (_shortcutHelper.Shortcut);
-
-	/// <summary>
-	/// The action to run if the <see cref="Shortcut"/> is defined.
-	/// </summary>
-	public virtual Action ShortcutAction { get; set; }
-	#endregion Shortcut Support
-
 	#region Tab/Focus Handling
 	// This is null, and allocated on demand.
 	List<View> _tabIndexes;
