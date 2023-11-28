@@ -6,18 +6,32 @@ using System.Text;
 
 namespace Terminal.Gui;
 public partial class View {
-	ShortcutHelper _shortcutHelper;
-
+	#region HotKey Support
 	/// <summary>
-	/// Event invoked when the <see cref="HotKey"/> is changed.
+	/// Invoked when the <see cref="HotKey"/> is changed.
 	/// </summary>
 	public event EventHandler<KeyChangedEventArgs> HotKeyChanged;
 
 	Key _hotKey = Key.Null;
 
+	void TextFormatter_HotKeyChanged (object sender, KeyChangedEventArgs e)
+	{
+		HotKeyChanged?.Invoke (this, e);
+	}
+
 	/// <summary>
-	/// Gets or sets the HotKey defined for this view. A user pressing HotKey on the keyboard while this view has focus will cause the Clicked event to fire.
+	/// Gets or sets the hot key defined for this view. Pressing the hot key on the keyboard while this view has
+	/// focus will cause the <see cref="MouseClick"/> event to fire.
 	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// This API is a helper API for configuring a key binding for the hot key. It uses the <see cref="TextFormatter.HotKey"/>
+	/// to determine the hot key from <see cref="Title"/> by looking for the first character prefixed with <see cref="HotKeySpecifier"/>.
+	/// </para>
+	/// <para>
+	/// If the hot key is changed, the <see cref="HotKeyChanged"/> event is fired.
+	/// </para>
+	/// </remarks>
 	public virtual Key HotKey {
 		get => _hotKey;
 		set {
@@ -38,7 +52,8 @@ public partial class View {
 	}
 
 	/// <summary>
-	/// Gets or sets the specifier character for the hotkey (e.g. '_'). Set to '\xffff' to disable hotkey support for this View instance. The default is '\xffff'. 
+	/// Gets or sets the specifier character for the hot key (e.g. '_'). Set to '\xffff' to disable hot key support for this View instance.
+	/// The default is '\xffff'. 
 	/// </summary>
 	public virtual Rune HotKeySpecifier {
 		get {
@@ -53,6 +68,22 @@ public partial class View {
 			SetHotKey ();
 		}
 	}
+
+	void SetHotKey ()
+	{
+		if (TextFormatter == null) {
+			return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
+		}
+		TextFormatter.FindHotKey (_text, HotKeySpecifier, true, out _, out var hk);
+		if (_hotKey != hk) {
+			HotKey = hk;
+		}
+	}
+
+	#endregion HotKey Support
+
+	#region Shortcut Support
+	ShortcutHelper _shortcutHelper;
 
 	/// <summary>
 	/// This is the global setting that can be used as a global shortcut to invoke an action if provided.
@@ -75,6 +106,7 @@ public partial class View {
 	/// The action to run if the <see cref="Shortcut"/> is defined.
 	/// </summary>
 	public virtual Action ShortcutAction { get; set; }
+	#endregion Shortcut Support
 
 	// This is null, and allocated on demand.
 	List<View> _tabIndexes;
@@ -259,17 +291,6 @@ public partial class View {
 			}
 		}
 		return false;
-	}
-
-	void SetHotKey ()
-	{
-		if (TextFormatter == null) {
-			return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
-		}
-		TextFormatter.FindHotKey (_text, HotKeySpecifier, true, out _, out var hk);
-		if (_hotKey != hk) {
-			HotKey = hk;
-		}
 	}
 
 	/// <summary>

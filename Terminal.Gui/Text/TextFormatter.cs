@@ -1225,17 +1225,17 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The specifier character for the hotkey (e.g. '_'). Set to '\xffff' to disable hotkey support for this View instance. The default is '\xffff'.
+		/// The specifier character for the hot key (e.g. '_'). Set to '\xffff' to disable hot key support for this View instance. The default is '\xffff'.
 		/// </summary>
 		public Rune HotKeySpecifier { get; set; } = (Rune)0xFFFF;
 
 		/// <summary>
-		/// The position in the text of the hotkey. The hotkey will be rendered using the hot color.
+		/// The position in the text of the hot key. The hot key will be rendered using the hot color.
 		/// </summary>
 		public int HotKeyPos { get => _hotKeyPos; internal set => _hotKeyPos = value; }
 
 		/// <summary>
-		/// Gets the hotkey. Will be an upper case letter or digit.
+		/// Gets or sets the hot key. Must be be an upper case letter or digit. Fires the <see cref="HotKeyChanged"/> event.
 		/// </summary>
 		public Key HotKey {
 			get => _hotKey;
