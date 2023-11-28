@@ -706,7 +706,7 @@ namespace Terminal.Gui.ViewTests {
 			Application.Iteration += (s, a) => {
 				iterations++;
 
-				button.ProcessKeyPressed (new (Key.Enter, null));
+				win.ProcessKeyPressed (new (Key.Enter, null));
 				Assert.True (wasClicked);
 				button.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked });
 				Assert.False (wasClicked);

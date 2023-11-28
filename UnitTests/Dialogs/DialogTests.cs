@@ -780,9 +780,7 @@ namespace Terminal.Gui.DialogTests {
 		[Fact, AutoInitShutdown]
 		public void Dialog_Opened_From_Another_Dialog ()
 		{
-			var btn1 = new Button ("press me 1") {
-				IsDefault = true
-			};
+			var btn1 = new Button ("press me 1");
 			Button btn2 = null;
 			Button btn3 = null;
 			string expected = null;
@@ -801,7 +799,7 @@ namespace Terminal.Gui.DialogTests {
 			Application.Iteration += (s, a) => {
 				iterations++;
 				if (iterations == 0) {
-					Assert.True (btn1.ProcessKeyPressed (new (Key.Enter, new KeyModifiers ())));
+					Assert.True (btn1.ProcessKeyPressed (new (Key.Space, new KeyModifiers ())));
 				} else if (iterations == 1) {
 					expected = @$"
       ┌──────────────────────────────────────────────────────────────────┐
