@@ -1402,13 +1402,13 @@ public static partial class Application {
 		}
 
 		var chain = _topLevels.ToList ();
-		foreach (var topLevel in chain) {
-			if (topLevel.OnHotKey (a)) {
-				return true;
-			}
-			if (topLevel.Modal)
-				break;
-		}
+		//foreach (var topLevel in chain) {
+		//	if (topLevel.OnHotKey (a)) {
+		//		return true;
+		//	}
+		//	if (topLevel.Modal)
+		//		break;
+		//}
 
 		foreach (var topLevel in chain) {
 			if (topLevel.ProcessKeyPressed (a)) {

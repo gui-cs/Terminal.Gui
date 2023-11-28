@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
+#if BROKEN_BY_2927
 	[ScenarioMetadata (Name: "Dynamic StatusBar", Description: "Demonstrates how to add and remove a StatusBar and change items dynamically.")]
 	[ScenarioCategory ("Top Level Windows")]
 	public class DynamicStatusBar : Scenario {
@@ -516,7 +517,7 @@ namespace UICatalog.Scenarios {
 				}
 				_statusItem = statusItem;
 				_txtTitle.Text = statusItem?.Title ?? "";
-				_txtAction.Text = statusItem != null && statusItem.Action != null ? GetTargetAction (statusItem.Action) : string.Empty;
+				_txtAction.Text = statusItem != null && statusItem.Command != null ? GetTargetAction (statusItem.Command) : string.Empty;
 				_txtShortcut.Text = ShortcutHelper.GetShortcutTag (statusItem.Shortcut, StatusBar.ShortcutDelimiter) ?? "";
 			}
 
@@ -655,4 +656,5 @@ namespace UICatalog.Scenarios {
 			}
 		}
 	}
+#endif
 }

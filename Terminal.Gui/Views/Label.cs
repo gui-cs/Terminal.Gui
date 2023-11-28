@@ -62,7 +62,6 @@ namespace Terminal.Gui {
 			AddCommand (Command.Accept, () => AcceptKey ());
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.Enter, Command.Accept);
 			AddKeyBinding (Key.Space, Command.Accept);
 			if (HotKey != Key.Null) {
 				AddKeyBinding (Key.Space | HotKey, Command.Accept);

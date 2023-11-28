@@ -387,6 +387,21 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Tabs back to the previous item.
 		/// </summary>
-		BackTab
+		BackTab,
+
+		/// <summary>
+		/// Saves the current document.
+		/// </summary>
+		Save,
+
+		/// <summary>
+		/// Saves the current document with a new name.
+		/// </summary>
+		SaveAs,
+
+		/// <summary>
+		/// Creates a new document.
+		/// </summary>
+		New
 	}
 }

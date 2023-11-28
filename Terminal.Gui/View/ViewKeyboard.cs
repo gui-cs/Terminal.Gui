@@ -399,6 +399,12 @@ public partial class View {
 		if (ret != null && (bool)ret) {
 			return true;
 		}
+
+		foreach (var view in Subviews.Where (v => v.Enabled && !v.HasFocus && v.KeyBindings.Count > 0)) {
+			if (view.OnInvokeKeyBindings (keyEvent)) {
+				return true;
+			}
+		}
 		return false;
 	}
 
