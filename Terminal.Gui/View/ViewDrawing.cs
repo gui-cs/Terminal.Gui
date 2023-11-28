@@ -74,8 +74,7 @@ namespace Terminal.Gui {
 		{
 			if (row < 0 || col < 0) {
 				return;
-			}
-			if (row > _frame.Height - 1 || col > _frame.Width - 1) {
+			if (row > Frame.Height - 1 || col > Frame.Width - 1)
 				return;
 			}
 			Move (col, row);

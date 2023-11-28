@@ -45,9 +45,21 @@ namespace Terminal.Gui {
 		/// </para>
 		/// </remarks>
 		public virtual Rect Frame {
-			get => _frame;
+			get {
+				if (!IsAdded && !IsInitialized) {
+					return new Rect (_x is Pos.PosAbsolute ? _x.Anchor (0) : _frame.X, _y is Pos.PosAbsolute ? _y.Anchor (0) : _frame.Y,
+						_width is Dim.DimAbsolute ? _width.Anchor (0) : _frame.Width, _height is Dim.DimAbsolute ? _height.Anchor (0) : _frame.Height);
+				}
+				return _frame;
+			}
 			set {
 				_frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
+				if (LayoutStyle == LayoutStyle.Computed) {
+					if (_x is Pos.PosAbsolute) { _x = _frame.X; }
+					if (_y is Pos.PosAbsolute) { _y = _frame.Y; }
+					if (_width is Dim.DimAbsolute) { _width = _frame.Width; }
+					if (_height is Dim.DimAbsolute) { _height = _frame.Height; }
+				}
 				if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
 					LayoutFrames ();
 					TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
@@ -442,7 +454,7 @@ namespace Terminal.Gui {
 				case true:
 					var colWidth = TextFormatter.GetSumMaxCharWidth (new List<string> { TextFormatter.Text }, 0, 1);
 					// TODO: v2 - This uses frame.Width; it should only use Bounds
-					if (_frame.Width < colWidth &&
+					if (Frame.Width < colWidth &&
 						(Width == null ||
 							(Bounds.Width >= 0 &&
 								Width is Dim.DimAbsolute &&
@@ -453,7 +465,7 @@ namespace Terminal.Gui {
 					}
 					break;
 				default:
-					if (_frame.Height < 1 &&
+					if (Frame.Height < 1 &&
 						(Height == null ||
 							(Height is Dim.DimAbsolute &&
 								Height.Anchor (0) == 0))) {
@@ -475,7 +487,7 @@ namespace Terminal.Gui {
 		bool SetBoundsToFitFrame ()
 		{
 			if (GetMinimumBoundsForFrame (out Size size)) {
-				_frame = new Rect (_frame.Location, size);
+				_frame = new Rect (Frame.Location, size);
 				return true;
 			}
 			return false;
@@ -490,8 +502,12 @@ namespace Terminal.Gui {
 		/// </remarks>
 		protected virtual void OnResizeNeeded ()
 		{
-			var actX = _x is Pos.PosAbsolute ? _x.Anchor (0) : _frame.X;
-			var actY = _y is Pos.PosAbsolute ? _y.Anchor (0) : _frame.Y;
+			if (TextDirection == (TextDirection)(-1)) {
+				return;
+			}
+
+			var actX = _x is Pos.PosAbsolute ? _x.Anchor (0) : Frame.X;
+			var actY = _y is Pos.PosAbsolute ? _y.Anchor (0) : Frame.Y;
 
 			if (AutoSize) {
 				//if (TextAlignment == TextAlignment.Justified) {
@@ -502,8 +518,8 @@ namespace Terminal.Gui {
 				var h = _height is Dim.DimAbsolute && _height.Anchor (0) > s.Height ? _height.Anchor (0) : s.Height;
 				_frame = new Rect (new Point (actX, actY), new Size (w, h)); // Set frame, not Frame!
 			} else {
-				var w = _width is Dim.DimAbsolute ? _width.Anchor (0) : _frame.Width;
-				var h = _height is Dim.DimAbsolute ? _height.Anchor (0) : _frame.Height;
+				var w = _width is Dim.DimAbsolute ? _width.Anchor (0) : Frame.Width;
+				var h = _height is Dim.DimAbsolute ? _height.Anchor (0) : Frame.Height;
 				// BUGBUG: v2 - ? - If layoutstyle is absolute, this overwrites the current frame h/w with 0. Hmmm...
 				// This is needed for DimAbsolute values by setting the frame before LayoutSubViews.
 				_frame = new Rect (new Point (actX, actY), new Size (w, h)); // Set frame, not Frame!
@@ -1037,7 +1053,7 @@ namespace Terminal.Gui {
 					boundsChanged = ResizeBoundsToFit (newFrameSize);
 				} else {
 					Height = newFrameSize.Height;
-					Width = newFrameSize.Width; 
+					Width = newFrameSize.Width;
 				}
 			}
 			// BUGBUG: This call may be redundant
@@ -1081,9 +1097,9 @@ namespace Terminal.Gui {
 			int y = 0;
 			if (IsInitialized) {
 				x = Bounds.X;
-				y = Bounds.Y; 
+				y = Bounds.Y;
 			}
-			var rect = TextFormatter.CalcRect (x, y,TextFormatter.Text, TextFormatter.Direction);
+			var rect = TextFormatter.CalcRect (x, y, TextFormatter.Text, TextFormatter.Direction);
 			var newWidth = rect.Size.Width - GetHotKeySpecifierLength () + Margin.Thickness.Horizontal + Border.Thickness.Horizontal + Padding.Thickness.Horizontal;
 			var newHeight = rect.Size.Height - GetHotKeySpecifierLength (false) + Margin.Thickness.Vertical + Border.Thickness.Vertical + Padding.Thickness.Vertical;
 			return new Size (newWidth, newHeight);
@@ -1091,17 +1107,17 @@ namespace Terminal.Gui {
 
 		bool IsValidAutoSize (out Size autoSize)
 		{
-			var rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
+			var rect = TextFormatter.CalcRect (Frame.X, Frame.Y, TextFormatter.Text, TextDirection);
 			autoSize = new Size (rect.Size.Width - GetHotKeySpecifierLength (),
 			    rect.Size.Height - GetHotKeySpecifierLength (false));
 			return !(ForceValidatePosDim && (!(Width is Dim.DimAbsolute) || !(Height is Dim.DimAbsolute))
-			    || _frame.Size.Width != rect.Size.Width - GetHotKeySpecifierLength ()
-			    || _frame.Size.Height != rect.Size.Height - GetHotKeySpecifierLength (false));
+			    || Frame.Size.Width != rect.Size.Width - GetHotKeySpecifierLength ()
+			    || Frame.Size.Height != rect.Size.Height - GetHotKeySpecifierLength (false));
 		}
 
 		bool IsValidAutoSizeWidth (Dim width)
 		{
-			var rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
+			var rect = TextFormatter.CalcRect (Frame.X, Frame.Y, TextFormatter.Text, TextDirection);
 			var dimValue = width.Anchor (0);
 			return !(ForceValidatePosDim && (!(width is Dim.DimAbsolute)) || dimValue != rect.Size.Width
 			    - GetHotKeySpecifierLength ());
@@ -1109,7 +1125,7 @@ namespace Terminal.Gui {
 
 		bool IsValidAutoSizeHeight (Dim height)
 		{
-			var rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
+			var rect = TextFormatter.CalcRect (Frame.X, Frame.Y, TextFormatter.Text, TextDirection);
 			var dimValue = height.Anchor (0);
 			return !(ForceValidatePosDim && (!(height is Dim.DimAbsolute)) || dimValue != rect.Size.Height
 			    - GetHotKeySpecifierLength (false));
@@ -1205,7 +1221,7 @@ namespace Terminal.Gui {
 			if (start == null || !start.Frame.Contains (x, y)) {
 				return null;
 			}
-			
+
 			var startFrame = start.Frame;
 			if (start.InternalSubviews != null) {
 				int count = start.InternalSubviews.Count;
