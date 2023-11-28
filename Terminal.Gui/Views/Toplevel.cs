@@ -209,6 +209,13 @@ namespace Terminal.Gui {
 			AddCommand (Command.NextViewOrTop, () => { MoveNextViewOrTop (); return true; });
 			AddCommand (Command.PreviousViewOrTop, () => { MovePreviousViewOrTop (); return true; });
 			AddCommand (Command.Refresh, () => { Application.Refresh (); return true; });
+			AddCommand (Command.Accept, () => {
+				if (Subviews.FirstOrDefault(v => v is Button && ((Button)v).IsDefault && ((Button)v).Enabled) is Button defaultBtn) {
+					defaultBtn.OnClicked ();
+					return true;
+				}
+				return false;
+			});
 
 			// Default keybindings for this view
 			AddKeyBinding (Application.QuitKey, Command.QuitToplevel);
@@ -234,6 +241,9 @@ namespace Terminal.Gui {
 			AddKeyBinding (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
 
 			AddKeyBinding (Key.L | Key.CtrlMask, Command.Refresh);
+
+			// This enables the default button to be activated by the Enter key.
+			AddKeyBinding (Key.Enter, Command.Accept);
 		}
 
 		private void Application_UnGrabbingMouse (object sender, GrabMouseEventArgs e)

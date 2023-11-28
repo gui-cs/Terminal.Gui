@@ -15,14 +15,14 @@ namespace Terminal.Gui {
 	/// <remarks>
 	/// <para>
 	///   Provides a button showing text that raises the <see cref="Clicked"/> event when clicked on with a mouse
-	///   or when the user presses SPACE, ENTER, or hotkey. The hotkey is the first letter or digit following the first underscore ('_') 
+	///   or when the user presses SPACE, ENTER, or the <see cref="HotKey"/>. The hot key is the first letter or digit following the first underscore ('_') 
 	///   in the button text. 
 	/// </para>
 	/// <para>
-	///   Use <see cref="View.HotKeySpecifier"/> to change the hotkey specifier from the default of ('_'). 
+	///   Use <see cref="View.HotKeySpecifier"/> to change the hot key specifier from the default of ('_'). 
 	/// </para>
 	/// <para>
-	///   If no hotkey specifier is found, the first uppercase letter encountered will be used as the hotkey.
+	///   If no hot key specifier is found, the first uppercase letter encountered will be used as the hot key.
 	/// </para>
 	/// <para>
 	///   When the button is configured as the default (<see cref="IsDefault"/>) and the user presses
@@ -122,10 +122,10 @@ namespace Terminal.Gui {
 			// Things this view knows how to do
 			AddCommand (Command.Accept, () => AcceptKey ());
 
-			// Default key bindings for this view
-			if (IsDefault) {
-				AddKeyBinding (Key.Enter, Command.Accept);
-			}
+			//// Default key bindings for this view
+			//if (IsDefault) {
+			//	AddKeyBinding (Key.Enter, Command.Accept);
+			//}
 			AddKeyBinding (Key.Space, Command.Accept);
 			if (HotKey != Key.Null) {
 				AddKeyBinding (Key.Space | HotKey, Command.Accept);
@@ -171,11 +171,11 @@ namespace Terminal.Gui {
 			get => _isDefault;
 			set {
 				_isDefault = value;
-				if (value) {
-					AddKeyBinding (Key.Enter, Command.Accept);
-				} else {
-					ClearKeyBinding (Key.Enter);
-				}
+				//if (value) {
+				//	AddKeyBinding (Key.Enter, Command.Accept);
+				//} else {
+				//	ClearKeyBinding (Key.Enter);
+				//}
 				UpdateTextFormatterText ();
 				OnResizeNeeded ();
 			}
@@ -207,61 +207,7 @@ namespace Terminal.Gui {
 				}
 			}
 		}
-
-		/////<inheritdoc/>
-		//public override bool OnHotKey (KeyEventArgs a)
-		//{
-		//	if (!Enabled) {
-		//		return false;
-		//	}
-
-		//	return ExecuteHotKey (a);
-		//}
-
-		/////<inheritdoc/>
-		//public override bool OnColdKey (KeyEventArgs a)
-		//{
-		//	if (!Enabled) {
-		//		return false;
-		//	}
-
-		//	return ExecuteColdKey (a);
-		//}
-
-		/////<inheritdoc/>
-		//public override bool OnKeyPressed (KeyEventArgs a)
-		//{
-		//	if (base.OnKeyPressed (a)) {
-		//		return true;
-		//	}
-		//	if (!Enabled) {
-		//		return false;
-		//	}
-
-		//	var result = InvokeKeyBindings (a);
-		//	if (result != null) {
-		//		return (bool)result;
-		//	}
-
-		//	return false;
-		//}
-
-		//bool ExecuteHotKey (KeyEventArgs ke)
-		//{
-		//	if (ke.Key == (Key.AltMask | HotKey)) {
-		//		return AcceptKey ();
-		//	}
-		//	return false;
-		//}
-
-		//bool ExecuteColdKey (KeyEventArgs ke)
-		//{
-		//	if (IsDefault && ke.KeyValue == '\n') {
-		//		return AcceptKey ();
-		//	}
-		//	return ExecuteHotKey (ke);
-		//}
-
+		
 		bool AcceptKey ()
 		{
 			if (!HasFocus) {

@@ -86,13 +86,14 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (btn.ProcessKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.False (clicked);
 			btn.IsDefault = true;
-			Assert.True (btn.ProcessKeyPressed (new (Key.Enter, new KeyModifiers ())));
+			Assert.False (btn.ProcessKeyPressed (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.True (clicked);
 			clicked = false;
 			Assert.True (btn.ProcessKeyPressed (new (Key.AltMask | Key.T, new KeyModifiers ())));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKeyPressed (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Enter, new KeyModifiers ())));
 			Assert.True (clicked);
 			clicked = false;
 			Assert.True (btn.ProcessKeyPressed (new (Key.Space, new KeyModifiers ())));
@@ -143,7 +144,6 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			int pressed = 0;
 			var btn = new Button ("Press Me");
-			btn.IsDefault = true;
 			btn.Clicked += (s, e) => pressed++;
 
 			// The Button class supports the Accept command
@@ -153,14 +153,14 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Begin (Application.Top);
 
 			// default keybinding is Enter which results in keypress
-			Application.Driver.SendKeys ('\n', ConsoleKey.Enter, false, false, false);
+			Application.Driver.SendKeys (' ', ConsoleKey.Spacebar, false, false, false);
 			Assert.Equal (1, pressed);
 
 			// remove the default keybinding (Enter)
 			btn.ClearKeyBinding (Command.Accept);
 
 			// After clearing the default keystroke the Enter button no longer does anything for the Button
-			Application.Driver.SendKeys ('\n', ConsoleKey.Enter, false, false, false);
+			Application.Driver.SendKeys (' ', ConsoleKey.Spacebar, false, false, false);
 			Assert.Equal (1, pressed);
 
 			// Set a new binding of b for the click (Accept) event
