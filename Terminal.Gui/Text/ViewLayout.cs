@@ -414,7 +414,13 @@ namespace Terminal.Gui {
 		/// Forces validation with <see cref="Terminal.Gui.LayoutStyle.Computed"/> layout
 		///  to avoid breaking the <see cref="Pos"/> and <see cref="Dim"/> settings.
 		/// </summary>
-		public bool ForceValidatePosDim { get; set; }
+		public bool ForceValidatePosDim {
+			get => _forceValidatePosDim;
+			set {
+				_forceValidatePosDim = value;
+				ResizeView (AutoSize);
+			}
+		}
 
 		bool ValidatePosDim (object oldValue, object newValue)
 		{
@@ -660,7 +666,8 @@ namespace Terminal.Gui {
 			if (AutoSize) {
 				// Note this is global to this function and used as such within the local functions defined
 				// below. In v2 AutoSize will be re-factored to not need to be dealt with in this function.
-				autosize = GetAutoSize ();
+				OnResizeNeeded ();
+				autosize = Frame.Size;
 			}
 
 			// Returns the new dimension (width or height) and location (x or y) for the View given
@@ -1011,6 +1018,7 @@ namespace Terminal.Gui {
 		}
 
 		bool _autoSize;
+		private bool _forceValidatePosDim = false;
 
 		/// <summary>
 		/// Gets or sets a flag that determines whether the View will be automatically resized to fit the <see cref="Text"/> 
@@ -1140,14 +1148,14 @@ namespace Terminal.Gui {
 		internal bool TrySetWidth (int desiredWidth, out int resultWidth)
 		{
 			var w = desiredWidth;
-			bool canSetWidth;
+			bool canSetToAbsolute;
 			switch (Width) {
 			case Dim.DimCombine _:
 			case Dim.DimView _:
 			case Dim.DimFill _:
 				// It's a Dim.DimCombine and so can't be assigned. Let it have it's Width anchored.
 				w = Width.Anchor (w);
-				canSetWidth = !ForceValidatePosDim;
+				canSetToAbsolute = !ForceValidatePosDim;
 				break;
 			case Dim.DimFactor factor:
 				// Tries to get the SuperView Width otherwise the view Width.
@@ -1156,15 +1164,15 @@ namespace Terminal.Gui {
 					sw -= Frame.X;
 				}
 				w = Width.Anchor (sw);
-				canSetWidth = !ForceValidatePosDim;
+				canSetToAbsolute = !ForceValidatePosDim;
 				break;
 			default:
-				canSetWidth = true;
+				canSetToAbsolute = true;
 				break;
 			}
 			resultWidth = w;
 
-			return canSetWidth;
+			return canSetToAbsolute;
 		}
 
 		/// <summary>
@@ -1176,14 +1184,14 @@ namespace Terminal.Gui {
 		internal bool TrySetHeight (int desiredHeight, out int resultHeight)
 		{
 			var h = desiredHeight;
-			bool canSetHeight;
+			bool canSetToAbsolute;
 			switch (Height) {
 			case Dim.DimCombine _:
 			case Dim.DimView _:
 			case Dim.DimFill _:
 				// It's a Dim.DimCombine and so can't be assigned. Let it have it's height anchored.
 				h = Height.Anchor (h);
-				canSetHeight = !ForceValidatePosDim;
+				canSetToAbsolute = !ForceValidatePosDim;
 				break;
 			case Dim.DimFactor factor:
 				// Tries to get the SuperView height otherwise the view height.
@@ -1192,15 +1200,15 @@ namespace Terminal.Gui {
 					sh -= Frame.Y;
 				}
 				h = Height.Anchor (sh);
-				canSetHeight = !ForceValidatePosDim;
+				canSetToAbsolute = !ForceValidatePosDim;
 				break;
 			default:
-				canSetHeight = true;
+				canSetToAbsolute = true;
 				break;
 			}
 			resultHeight = h;
 
-			return canSetHeight;
+			return canSetToAbsolute;
 		}
 
 		/// <summary>
