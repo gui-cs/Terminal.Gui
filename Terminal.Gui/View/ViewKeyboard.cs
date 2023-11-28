@@ -86,7 +86,7 @@ public partial class View {
 	ShortcutHelper _shortcutHelper;
 
 	/// <summary>
-	/// This is the global setting that can be used as a global shortcut to invoke an action if provided.
+	/// Gets or sets the shortcut key. If the shortcut key is pressed <see cref="ShortcutAction"/> will be invoked.
 	/// </summary>
 	public Key Shortcut {
 		get => _shortcutHelper.Shortcut;
@@ -108,16 +108,10 @@ public partial class View {
 	public virtual Action ShortcutAction { get; set; }
 	#endregion Shortcut Support
 
+	#region Tab/Focus Handling
 	// This is null, and allocated on demand.
 	List<View> _tabIndexes;
 
-	/// <summary>
-	/// Configurable keybindings supported by the control
-	/// </summary>
-	private Dictionary<Key, Command []> KeyBindings { get; set; } = new Dictionary<Key, Command []> ();
-	private Dictionary<Command, Func<bool?>> CommandImplementations { get; set; } = new Dictionary<Command, Func<bool?>> ();
-
-	#region Tab/Focus Handling
 	/// <summary>
 	/// Gets a list of the subviews that are <see cref="TabStop"/>s.
 	/// </summary>
@@ -199,7 +193,7 @@ public partial class View {
 	
 	#endregion Tab/Focus Handling
 	
-	#region Key handling
+	#region Low-level Key handling
 	/// <summary>
 	/// A low-level method to support hot keys (e.g. Alt-X). Can be overridden to provide accelerator functionality.
 	/// Typical apps will use <see cref="Command"/> instead.
@@ -445,6 +439,14 @@ public partial class View {
 	/// </para>
 	/// </remarks>
 	public event EventHandler<KeyEventArgs> KeyPressed;
+	#endregion Low-level Key handling
+
+	#region Key Bindings
+	/// <summary>
+	/// Gets the key bindings for this view.
+	/// </summary>
+	private Dictionary<Key, Command []> KeyBindings { get; set; } = new Dictionary<Key, Command []> ();
+	private Dictionary<Command, Func<bool?>> CommandImplementations { get; set; } = new Dictionary<Command, Func<bool?>> ();
 
 	/// <summary>
 	/// Low-level API called when a key is pressed to invoke any key bindings set on the view.
@@ -632,6 +634,6 @@ public partial class View {
 		return KeyBindings.First (a => a.Value.SequenceEqual (command)).Key;
 	}
 
-	#endregion
+	#endregion Key Bindings
 
 }
