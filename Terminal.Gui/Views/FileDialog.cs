@@ -142,7 +142,8 @@ namespace Terminal.Gui {
 
 			this.btnOk = new Button (Style.OkButtonText) {
 				Y = Pos.AnchorEnd (1),
-				X = Pos.Function (CalculateOkButtonPosX)
+				X = Pos.Function (CalculateOkButtonPosX),
+				IsDefault = true
 			};
 			this.btnOk.Clicked += (s, e) => this.Accept (true);
 			this.btnOk.KeyPressed += (s, k) => {

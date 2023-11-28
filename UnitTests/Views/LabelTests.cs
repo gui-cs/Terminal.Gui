@@ -368,7 +368,7 @@ Test
 			label.HotKey = Key.r;
 			Assert.Same (label, sender);
 			Assert.Equal (Key.Null, args.OldKey);
-			Assert.Equal (Key.r, args.NewKey);
+			Assert.Equal (Key.R, args.NewKey);
 		}
 
 		[Fact, AutoInitShutdown]

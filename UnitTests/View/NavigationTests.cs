@@ -41,9 +41,9 @@ namespace Terminal.Gui.ViewTests {
 			top.ProcessKeyPressed (new (Key.Tab, new KeyModifiers ()));
 			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
 
-			top.ProcessKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
+			top.ProcessKeyPressed (new (Key.BackTab, new KeyModifiers ()));
 			Assert.Equal ("FrameSubview", top.MostFocused.Text);
-			top.ProcessKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
+			top.ProcessKeyPressed (new (Key.BackTab, new KeyModifiers ()));
 			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
 			top.Dispose ();
 		}
@@ -669,7 +669,7 @@ namespace Terminal.Gui.ViewTests {
 			view.Clicked += (s, e) => wasClicked = !wasClicked;
 			Application.Top.Add (view);
 
-			view.OnKeyPressed (new (Key.Enter, null));
+			view.ProcessKeyPressed (new (Key.Space, null));
 			Assert.True (wasClicked);
 			view.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked });
 			Assert.False (wasClicked);
@@ -678,7 +678,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (view.HasFocus);
 
 			view.Enabled = false;
-			view.OnKeyPressed (new (Key.Enter, null));
+			view.ProcessKeyPressed (new (Key.Space, null));
 			Assert.False (wasClicked);
 			view.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked });
 			Assert.False (wasClicked);
@@ -695,6 +695,7 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var wasClicked = false;
 			var button = new Button ("Click Me");
+			button.IsDefault = true;
 			button.Clicked += (s, e) => wasClicked = !wasClicked;
 			var win = new Window () { Width = Dim.Fill (), Height = Dim.Fill () };
 			win.Add (button);
@@ -705,7 +706,7 @@ namespace Terminal.Gui.ViewTests {
 			Application.Iteration += (s, a) => {
 				iterations++;
 
-				button.OnKeyPressed (new (Key.Enter, null));
+				button.ProcessKeyPressed (new (Key.Enter, null));
 				Assert.True (wasClicked);
 				button.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked });
 				Assert.False (wasClicked);
@@ -717,7 +718,7 @@ namespace Terminal.Gui.ViewTests {
 				Assert.True (win.HasFocus);
 
 				win.Enabled = false;
-				button.OnKeyPressed (new (Key.Enter, null));
+				button.ProcessKeyPressed (new (Key.Enter, null));
 				Assert.False (wasClicked);
 				button.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked });
 				Assert.False (wasClicked);

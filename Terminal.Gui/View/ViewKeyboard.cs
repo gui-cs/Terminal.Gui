@@ -37,6 +37,11 @@ public partial class View {
 		set {
 			if (_hotKey != value) {
 				var v = value == Key.Unknown ? Key.Null : value;
+				// Force upper case
+				var mask = v & Key.CharMask;
+				if (mask >= Key.a && mask <= Key.z) {
+					v = (Key)((int)v - 32);
+				}
 				if (_hotKey != Key.Null && ContainsKeyBinding (Key.Space | _hotKey)) {
 					if (v == Key.Null) {
 						ClearKeyBinding (Key.Space | _hotKey);
@@ -463,9 +468,16 @@ public partial class View {
 	{
 		bool? toReturn = null;
 
-		if (KeyBindings.ContainsKey (keyEvent.Key)) {
+		// Force upper case
+		var key = keyEvent.Key;
+		var mask = key & Key.CharMask;
+		if (mask >= Key.a && mask <= Key.z) {
+			key = (Key)((int)key - 32);
+		}
 
-			foreach (var command in KeyBindings [keyEvent.Key]) {
+		if (KeyBindings.ContainsKey (key)) {
+
+			foreach (var command in KeyBindings [key]) {
 
 				if (!CommandImplementations.ContainsKey (command)) {
 					throw new NotSupportedException ($"A KeyBinding was set up for the command {command} ({keyEvent.Key}) but that command is not supported by this View ({GetType ().Name})");
@@ -508,6 +520,12 @@ public partial class View {
 			throw new ArgumentException ("At least one command must be specified", nameof (command));
 		}
 
+		// Force upper case
+		var mask = key & Key.CharMask;
+		if (mask >= Key.a && mask <= Key.z) {
+			key = (Key)((int)key - 32);
+		}
+
 		if (KeyBindings.ContainsKey (key)) {
 			KeyBindings [key] = command;
 		} else {
@@ -522,7 +540,16 @@ public partial class View {
 	/// <param name="toKey">The new key to be used.</param>
 	protected void ReplaceKeyBinding (Key fromKey, Key toKey)
 	{
-		if (KeyBindings.ContainsKey (fromKey)) {
+		// Force upper case
+		var mask = toKey & Key.CharMask;
+		if (mask >= Key.a && mask <= Key.z) {
+			toKey = (Key)((int)toKey - 32);
+		}
+		mask = fromKey & Key.CharMask;
+		if (mask >= Key.a && mask <= Key.z) {
+			fromKey = (Key)((int)fromKey - 32);
+		}
+		if (ContainsKeyBinding (fromKey)) {
 			var value = KeyBindings [fromKey];
 			KeyBindings.Remove (fromKey);
 			KeyBindings [toKey] = value;
@@ -536,6 +563,11 @@ public partial class View {
 	/// <returns><see langword="true"/> If the key already exist, <see langword="false"/> otherwise.</returns>
 	public bool ContainsKeyBinding (Key key)
 	{
+		// Force upper case
+		var mask = key & Key.CharMask;
+		if (mask >= Key.a && mask <= Key.z) {
+			key = (Key)((int)key - 32);
+		}
 		return KeyBindings.ContainsKey (key);
 	}
 

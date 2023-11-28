@@ -374,7 +374,7 @@ namespace Terminal.Gui.FileServicesTests {
 		public void TestDirectoryContents_Linux ()
 		{
 			if (IsWindows ()) {
-				return;
+				//return;
 			}
 			var fd = GetLinuxDialog ();
 			fd.Title = string.Empty;
@@ -398,7 +398,7 @@ namespace Terminal.Gui.FileServicesTests {
 │                                                                         │
 │                                                                         │
 │                                                                         │
-│{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                                   {CM.Glyphs.LeftBracket} OK {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}  │
+│{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                                 {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} OK {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}  │
 └─────────────────────────────────────────────────────────────────────────┘
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output, ignoreLeadingWhitespace: true);
@@ -434,7 +434,7 @@ namespace Terminal.Gui.FileServicesTests {
 ││mybinary.exe│7.00 B    │2001-01-01T11:44:42           │.exe            ││
 │                                                                         │
 │                                                                         │
-│{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                                   {CM.Glyphs.LeftBracket} OK {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}  │
+│{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                                 {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} OK {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}  │
 └─────────────────────────────────────────────────────────────────────────┘
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output, ignoreLeadingWhitespace: true);

@@ -31,7 +31,7 @@ namespace Terminal.Gui {
 	/// </para>
 	/// </remarks>
 	public class Button : View {
-		bool is_default;
+		bool _isDefault;
 		Rune _leftBracket;
 		Rune _rightBracket;
 		Rune _leftDefault;
@@ -114,7 +114,7 @@ namespace Terminal.Gui {
 
 			CanFocus = true;
 			AutoSize = true;
-			this.is_default = is_default;
+			_isDefault = is_default;
 			Text = text ?? string.Empty;
 
 			OnResizeNeeded ();
@@ -122,11 +122,44 @@ namespace Terminal.Gui {
 			// Things this view knows how to do
 			AddCommand (Command.Accept, () => AcceptKey ());
 
-			// Default keybindings for this view
-			AddKeyBinding (Key.Enter, Command.Accept);
+			// Default key bindings for this view
+			if (IsDefault) {
+				AddKeyBinding (Key.Enter, Command.Accept);
+			}
 			AddKeyBinding (Key.Space, Command.Accept);
 			if (HotKey != Key.Null) {
 				AddKeyBinding (Key.Space | HotKey, Command.Accept);
+				AddKeyBinding (Key.Space | HotKey | Key.AltMask, Command.Accept);
+			}
+		}
+
+		/// <inheritdoc/>
+		public override Key HotKey {
+			get => base.HotKey;
+			set {
+				var prev = base.HotKey;
+				if (prev != value) {
+					
+					var v = value == Key.Unknown ? Key.Null : value;
+					// Force upper case
+					var mask = v & Key.CharMask;
+					if (mask >= Key.a && mask <= Key.z) {
+						v = (Key)((int)v - 32);
+					}
+
+					base.HotKey = TextFormatter.HotKey = v;
+
+					// Also add Alt+HotKey
+					if (prev != Key.Null && ContainsKeyBinding (Key.Space | prev | Key.AltMask)) {
+						if (v == Key.Null) {
+							ClearKeyBinding (Key.Space | prev | Key.AltMask);
+						} else {
+							ReplaceKeyBinding (Key.Space | prev | Key.AltMask, Key.Space | v | Key.AltMask);
+						}
+					} else if (v != Key.Null) {
+						AddKeyBinding (Key.Space | v | Key.AltMask, Command.Accept);
+					}
+				}
 			}
 		}
 
@@ -135,9 +168,14 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value><c>true</c> if is default; otherwise, <c>false</c>.</value>
 		public bool IsDefault {
-			get => is_default;
+			get => _isDefault;
 			set {
-				is_default = value;
+				_isDefault = value;
+				if (value) {
+					AddKeyBinding (Key.Enter, Command.Accept);
+				} else {
+					ClearKeyBinding (Key.Enter);
+				}
 				UpdateTextFormatterText ();
 				OnResizeNeeded ();
 			}
@@ -170,59 +208,59 @@ namespace Terminal.Gui {
 			}
 		}
 
-		///<inheritdoc/>
-		public override bool OnHotKey (KeyEventArgs a)
-		{
-			if (!Enabled) {
-				return false;
-			}
+		/////<inheritdoc/>
+		//public override bool OnHotKey (KeyEventArgs a)
+		//{
+		//	if (!Enabled) {
+		//		return false;
+		//	}
 
-			return ExecuteHotKey (a);
-		}
+		//	return ExecuteHotKey (a);
+		//}
 
-		///<inheritdoc/>
-		public override bool OnColdKey (KeyEventArgs a)
-		{
-			if (!Enabled) {
-				return false;
-			}
+		/////<inheritdoc/>
+		//public override bool OnColdKey (KeyEventArgs a)
+		//{
+		//	if (!Enabled) {
+		//		return false;
+		//	}
 
-			return ExecuteColdKey (a);
-		}
+		//	return ExecuteColdKey (a);
+		//}
 
-		///<inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs a)
-		{
-			if (base.OnKeyPressed (a)) {
-				return true;
-			}
-			if (!Enabled) {
-				return false;
-			}
+		/////<inheritdoc/>
+		//public override bool OnKeyPressed (KeyEventArgs a)
+		//{
+		//	if (base.OnKeyPressed (a)) {
+		//		return true;
+		//	}
+		//	if (!Enabled) {
+		//		return false;
+		//	}
 
-			var result = InvokeKeyBindings (a);
-			if (result != null) {
-				return (bool)result;
-			}
+		//	var result = InvokeKeyBindings (a);
+		//	if (result != null) {
+		//		return (bool)result;
+		//	}
 
-			return false;
-		}
+		//	return false;
+		//}
 
-		bool ExecuteHotKey (KeyEventArgs ke)
-		{
-			if (ke.Key == (Key.AltMask | HotKey)) {
-				return AcceptKey ();
-			}
-			return false;
-		}
+		//bool ExecuteHotKey (KeyEventArgs ke)
+		//{
+		//	if (ke.Key == (Key.AltMask | HotKey)) {
+		//		return AcceptKey ();
+		//	}
+		//	return false;
+		//}
 
-		bool ExecuteColdKey (KeyEventArgs ke)
-		{
-			if (IsDefault && ke.KeyValue == '\n') {
-				return AcceptKey ();
-			}
-			return ExecuteHotKey (ke);
-		}
+		//bool ExecuteColdKey (KeyEventArgs ke)
+		//{
+		//	if (IsDefault && ke.KeyValue == '\n') {
+		//		return AcceptKey ();
+		//	}
+		//	return ExecuteHotKey (ke);
+		//}
 
 		bool AcceptKey ()
 		{
