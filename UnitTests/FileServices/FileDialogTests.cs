@@ -104,8 +104,13 @@ namespace Terminal.Gui.FileServicesTests {
 			var openIn = Path.Combine (Environment.CurrentDirectory, "zz");
 			Directory.CreateDirectory (openIn);
 			dlg.Path = openIn + Path.DirectorySeparatorChar;
-
-			Send ('f', ConsoleKey.F, false, false, true);
+#if BROKE_IN_2927
+			Send ('f', ConsoleKey.F, false, true, false);
+#else
+			Application.OnKeyPressed (new KeyEventArgs (Key.Tab));
+			Application.OnKeyPressed (new KeyEventArgs (Key.Tab));
+			Application.OnKeyPressed (new KeyEventArgs (Key.Tab));
+#endif
 
 			Assert.IsType<TextField> (dlg.MostFocused);
 			var tf = (TextField)dlg.MostFocused;

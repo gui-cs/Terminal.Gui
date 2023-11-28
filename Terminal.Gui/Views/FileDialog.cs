@@ -488,9 +488,12 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool OnHotKey (KeyEventArgs keyEvent)
 		{
-			if (this.NavigateIf (keyEvent, Key.CtrlMask | Key.F, this.tbFind)) {
+#if BROKE_IN_2927
+			// BUGBUG: Ctrl-F is forward in a TextField. 
+			if (this.NavigateIf (keyEvent, Key.Alt | Key.F, this.tbFind)) {
 				return true;
 			}
+#endif
 
 			ClearFeedback ();
 
