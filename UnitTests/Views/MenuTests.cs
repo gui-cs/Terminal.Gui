@@ -2693,7 +2693,7 @@ wo
 			});
 			Application.Top.Add (menu);
 
-			var exception = Record.Exception (() => menu.OnColdKey (new (Key.Space, new KeyModifiers ())));
+			var exception = Record.Exception (() => menu.ProcessKeyPressed (new (Key.Space, new KeyModifiers ())));
 			Assert.Null (exception);
 		}
 
