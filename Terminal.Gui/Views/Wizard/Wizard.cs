@@ -147,9 +147,9 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// <see cref="Wizard"/> is derived from <see cref="Dialog"/> and Dialog causes <c>Esc</c> to call
-		/// <see cref="Application.RequestStop(Toplevel)"/>, closing the Dialog. Wizard overrides <see cref="Responder.OnKeyPressed"/>
+		/// <see cref="Application.RequestStop(Toplevel)"/>, closing the Dialog. Wizard overrides <see cref="OnKeyPressed"/>
 		/// to instead fire the <see cref="Cancelled"/> event when Wizard is being used as a non-modal (see <see cref="Wizard.Modal"/>.
-		/// See <see cref="Responder.OnKeyPressed"/> for more.
+		/// See <see cref="OnKeyPressed"/> for more.
 		/// </summary>
 		/// <param name="a"></param>
 		/// <returns></returns>

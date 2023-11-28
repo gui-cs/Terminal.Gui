@@ -160,8 +160,196 @@ namespace Terminal.Gui {
 
 		int _oldTabIndex;
 
+		#region Key handling
 		/// <summary>
-		/// If the view is enabled, processes a <see cref="KeyEvent"/> and returns <see langword="true"/> if the event was handled.
+		/// A low-level method to support hot keys (e.g. Alt-X). Can be overridden to provide accelerator functionality.
+		/// Typical apps will use <see cref="Command"/> instead.
+		/// </summary>
+		/// <remarks>
+		///   <para>
+		///     Before keys are sent to the subview on the
+		///     current view, all the views are
+		///     processed and the key is passed to the widgets
+		///     to allow some of them to process the keystroke
+		///     as a hot-key. </para>
+		///  <para>
+		///     For example, if you implement a button that
+		///     has a hotkey ok "o", you would catch the
+		///     combination Alt-o here.  If the event is
+		///     caught, you must return true to stop the
+		///     keystroke from being dispatched to other
+		///     views.
+		///  </para>
+		/// </remarks>
+		public virtual bool OnHotKey (KeyEventArgs keyEvent)
+		{
+
+			if (!Enabled) {
+				return false;
+			}
+
+			if (MostFocused?.ProcessKeyPressed (keyEvent) == true) {
+				return true;
+			}
+
+			if (_subviews == null || _subviews.Count == 0) {
+				return false;
+			}
+
+			foreach (var view in _subviews) {
+				if (view.OnHotKey (keyEvent))
+					return true;
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// A low-level method to support hot keys (e.g. Alt-X). Can be overridden to provide accelerator functionality.
+		/// Typical apps will use <see cref="Command"/> instead.
+		/// </summary>
+		/// <remarks>
+		///   <para>
+		///     After keys are sent to the subviews on the
+		///     current view, all the view are
+		///     processed and the key is passed to the views
+		///     to allow some of them to process the keystroke
+		///     as a cold-key. </para>
+		///  <para>
+		///    This functionality is used, for example, by
+		///    default buttons to act on the enter key.
+		///    Processing this as a hot-key would prevent
+		///    non-default buttons from consuming the enter
+		///    keypress when they have the focus.
+		///  </para>
+		/// </remarks>
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		public virtual bool OnColdKey (KeyEventArgs keyEvent)
+		{
+			if (OnHotKey (keyEvent)) {
+				return true;
+			}
+
+			if (!Enabled) {
+				return false;
+			}
+
+			if (ProcessKeyPressed (keyEvent)) {
+				return true;
+			}
+
+			if (MostFocused?.ProcessKeyPressed (keyEvent) == true) {
+				return true;
+
+			}
+
+			if (_subviews == null || _subviews.Count == 0) {
+				return false;
+			}
+
+			foreach (var view in _subviews) {
+				if (view.OnColdKey (keyEvent)) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		void SetHotKey ()
+		{
+			if (TextFormatter == null) {
+				return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
+			}
+			TextFormatter.FindHotKey (_text, HotKeySpecifier, true, out _, out var hk);
+			if (_hotKey != hk) {
+				HotKey = hk;
+			}
+		}
+
+		/// <summary>
+		/// Invoked when a key is depressed.
+		/// </summary>
+		/// <remarks>
+		/// Not all terminals support key distinct down/up notifications, Applications should avoid
+		/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPressed"/>.
+		/// <para>
+		/// Overrides must call into the base and return <see langword="true"/> if the base returns  <see langword="true"/>.
+		/// </para>
+		/// </remarks>
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		/// <returns><see langword="false"/> if the key stroke was not handled. <see langword="true"/> if no
+		/// other view should see it.</returns>
+		public virtual bool OnKeyDown (KeyEventArgs keyEvent)
+		{
+			if (!Enabled) {
+				return false;
+			}
+			
+			// fire event
+			KeyDown?.Invoke (this, keyEvent);
+			if (keyEvent.Handled) {
+				return true;
+			}
+
+			if (Focused?.OnKeyDown (keyEvent) == true) {
+				return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Invoked when a key is depressed. Set <see cref="KeyEventArgs.Handled"/> to true to stop the key from being processed by other views.
+		/// </summary>
+		/// <remarks>
+		/// Not all terminals support key distinct down/up notifications, Applications should avoid
+		/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPressed"/>.
+		/// </remarks>
+		public event EventHandler<KeyEventArgs> KeyDown;
+
+		/// <summary>
+		/// Method invoked when a key is released. This method will be called after <see cref="OnKeyPressed"/>.
+		/// </summary>
+		/// <remarks>
+		/// Not all terminals support key distinct down/up notifications, Applications should avoid
+		/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPressed"/>.
+		/// <para>
+		/// Overrides must call into the base and return <see langword="true"/> if the base returns  <see langword="true"/>.
+		/// </para>
+		/// </remarks>
+		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		/// <returns><see langword="false"/> if the key stroke was not handled. <see langword="true"/> if no
+		/// other view should see it.</returns>
+		public virtual bool OnKeyUp (KeyEventArgs keyEvent)
+		{
+			if (!Enabled) {
+				return false;
+			}
+
+			// fire event
+			KeyUp?.Invoke (this, keyEvent);
+			if (keyEvent.Handled) {
+				return true;
+			}
+
+			if (Focused?.OnKeyUp (keyEvent) == true) {
+				return true;
+			}
+
+			return false;
+
+		}
+
+		/// <summary>
+		/// Invoked when a key is released. Set <see cref="KeyEventArgs.Handled"/> to true to stop the key from being processed by other views.
+		/// </summary>
+		/// <remarks>
+		/// Not all terminals support key distinct down/up notifications, Applications should avoid
+		/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPressed"/>.
+		/// </remarks>
+		public event EventHandler<KeyEventArgs> KeyUp;
+
+		/// <summary>
+		/// If the view is enabled, processes a key pressed event and returns <see langword="true"/> if the event was handled.
 		/// </summary>
 		/// <remarks>
 		/// <para>Calls <see cref="OnKeyPressed(KeyEventArgs)"/> and <see cref="OnInvokeKeyBindings(KeyEventArgs)"/>.</para>
@@ -261,30 +449,7 @@ namespace Terminal.Gui {
 		/// to true to stop the key from being processed by other views. 
 		/// </summary>
 		public event EventHandler<KeyEventArgs> InvokingKeyBindings;
-
-		///// <inheritdoc/>
-		//public override bool OnKeyPressed (KeyEventArgs keyEvent)
-		//{
-		//	if (!Enabled) {
-		//		return false;
-		//	}
-
-		//	if (Focused?.OnKeyPressed (keyEvent) == true) {
-		//		return true;
-		//	}
-
-		//	var result = InvokeKeyBindings (keyEvent);
-		//	if (result != null && (bool)result) {
-		//		return true;
-		//	}
-
-		//	if (base.OnKeyPressed (keyEvent)) {
-		//		return true;
-		//	}
-
-		//	return false;
-		//}
-
+		
 		/// <summary>
 		/// Invokes any binding that is registered on this <see cref="View"/>
 		/// and matches the <paramref name="keyEvent"/>
@@ -439,110 +604,7 @@ namespace Terminal.Gui {
 			return KeyBindings.First (a => a.Value.SequenceEqual (command)).Key;
 		}
 
-		/// <inheritdoc/>
-		public override bool OnHotKey (KeyEventArgs keyEvent)
-		{
-			if (base.OnHotKey (keyEvent)) {
-				return true;
+		#endregion
 
-			}
-
-			if (!Enabled) {
-				return false;
-			}
-
-			if (MostFocused?.ProcessKeyPressed (keyEvent) == true) {
-				return true;
-			}
-
-			if (_subviews == null || _subviews.Count == 0) {
-				return false;
-			}
-
-			foreach (var view in _subviews) {
-				if (view.OnHotKey (keyEvent))
-					return true;
-			}
-			return false;
-		}
-
-		/// <inheritdoc/>
-		public override bool OnColdKey (KeyEventArgs keyEvent)
-		{
-			if (base.OnHotKey (keyEvent)) {
-				return true;
-			}
-
-			if (!Enabled) {
-				return false;
-			}
-
-			if (ProcessKeyPressed (keyEvent)) {
-				return true;
-			}
-
-			if (MostFocused?.ProcessKeyPressed (keyEvent) == true) {
-				return true;
-
-			}
-
-			if (_subviews == null || _subviews.Count == 0) {
-				return false;
-			}
-
-			foreach (var view in _subviews) {
-				if (view.OnColdKey (keyEvent)) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-		/// <inheritdoc/>
-		public override bool OnKeyDown (KeyEventArgs keyEvent)
-		{
-			if (!Enabled) {
-				return false;
-			}
-
-			if (base.OnKeyDown (keyEvent)) {
-				return true;
-			}
-
-			if (Focused?.OnKeyDown (keyEvent) == true) {
-				return true;
-			}
-
-			return false;
-		}
-
-		/// <inheritdoc/>
-		public override bool OnKeyUp (KeyEventArgs keyEvent)
-		{
-			if (!Enabled) {
-				return false;
-			}
-
-			if (base.OnKeyUp (keyEvent)) {
-				return true;
-			}
-
-			if (Focused?.OnKeyUp (keyEvent) == true) {
-				return true;
-			}
-
-			return false;
-		}
-
-		void SetHotKey ()
-		{
-			if (TextFormatter == null) {
-				return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
-			}
-			TextFormatter.FindHotKey (_text, HotKeySpecifier, true, out _, out var hk);
-			if (_hotKey != hk) {
-				HotKey = hk;
-			}
-		}
 	}
 }
