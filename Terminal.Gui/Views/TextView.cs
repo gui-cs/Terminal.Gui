@@ -1747,6 +1747,7 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.DeleteChar | Key.CtrlMask, Command.KillWordForwards); // kill-word-forwards
 			AddKeyBinding (Key.Backspace | Key.CtrlMask, Command.KillWordBackwards); // kill-word-backwards
 
+			// BUGBUG: If AllowsReturn is false, Key.Enter should not be bound (so that Toplevel can cause Command.Accept).
 			AddKeyBinding (Key.Enter, Command.NewLine);
 			AddKeyBinding (Key.End | Key.CtrlMask, Command.BottomEnd);
 			AddKeyBinding (Key.End | Key.CtrlMask | Key.ShiftMask, Command.BottomEndExtend);

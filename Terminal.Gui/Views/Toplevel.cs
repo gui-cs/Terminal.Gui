@@ -210,8 +210,10 @@ namespace Terminal.Gui {
 			AddCommand (Command.PreviousViewOrTop, () => { MovePreviousViewOrTop (); return true; });
 			AddCommand (Command.Refresh, () => { Application.Refresh (); return true; });
 			AddCommand (Command.Accept, () => {
+				// TODO: Perhaps all views should support the concept of being default?
+				// TODO: It's bad that Toplevel is tightly coupled with Button
 				if (Subviews.FirstOrDefault(v => v is Button && ((Button)v).IsDefault && ((Button)v).Enabled) is Button defaultBtn) {
-					defaultBtn.OnClicked ();
+					defaultBtn.InvokeCommand (Command.Accept);
 					return true;
 				}
 				return false;

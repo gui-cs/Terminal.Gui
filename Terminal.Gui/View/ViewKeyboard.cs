@@ -464,6 +464,11 @@ public partial class View {
 	/// and matches the <paramref name="keyEvent"/>
 	/// </summary>
 	/// <param name="keyEvent">The key event passed.</param>
+	/// <returns>
+	/// <see langword="null"/> if no command was bound the <paramref name="keyEvent"/>.
+	/// <see langword="true"/> if commands were invoked and at least one handled the command.
+	/// <see langword="false"/> if commands were invoked and at none handled the command.
+	/// </returns>	
 	protected bool? InvokeKeyBindings (KeyEventArgs keyEvent)
 	{
 		bool? toReturn = null;
@@ -475,21 +480,19 @@ public partial class View {
 			key = (Key)((int)key - 32);
 		}
 
-		if (KeyBindings.ContainsKey (key)) {
+		if (KeyBindings.TryGetValue (key, out var binding)) {
 
-			foreach (var command in KeyBindings [key]) {
+			foreach (var command in binding) {
 
 				if (!CommandImplementations.ContainsKey (command)) {
 					throw new NotSupportedException ($"A KeyBinding was set up for the command {command} ({keyEvent.Key}) but that command is not supported by this View ({GetType ().Name})");
 				}
 
 				// each command has its own return value
-				var thisReturn = CommandImplementations [command] ();
+				var thisReturn = InvokeCommand(command);
 
 				// if we haven't got anything yet, the current command result should be used
-				if (toReturn == null) {
-					toReturn = thisReturn;
-				}
+				toReturn ??= thisReturn;
 
 				// if ever see a true then that's what we will return
 				if (thisReturn ?? false) {
@@ -499,6 +502,23 @@ public partial class View {
 		}
 
 		return toReturn;
+	}
+
+	/// <summary>
+	/// Invokes the specified command.
+	/// </summary>
+	/// <param name="command"></param>
+	/// <returns>
+	/// <see langword="null"/> if no command was found.
+	/// <see langword="true"/> if the command was invoked and it handled the command.
+	/// <see langword="false"/> if the command was invoked and it did not handle the command.
+	/// </returns>		
+	public bool? InvokeCommand (Command command)
+	{
+		if (!CommandImplementations.ContainsKey (command)) {
+			return null;
+		}
+		return CommandImplementations [command] ();
 	}
 
 	/// <summary>
