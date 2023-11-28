@@ -3416,6 +3416,10 @@ namespace Terminal.Gui {
 				return true;
 			}
 
+			if (base.OnInvokeKeyBindings (a)) {
+				return true;
+			}
+
 			ResetColumnTrack ();
 			// Ignore control characters and other special keys
 			if (a.Key < Key.Space || a.Key > Key.CharMask) {

@@ -1411,7 +1411,7 @@ namespace Terminal.Gui {
 			}
 
 			foreach (var topLevel in chain) {
-				if (topLevel.OnKeyPressed (a)) {
+				if (topLevel.ProcessKeyPressed (a)) {
 					return true;
 				}
 				if (topLevel.Modal)

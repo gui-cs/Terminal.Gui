@@ -191,12 +191,12 @@ namespace Terminal.Gui.ViewsTests {
 			top.Add (lbl);
 			Application.Begin (top);
 
-			Assert.True (lbl.OnKeyPressed (new (cm.Key, new KeyModifiers ())));
+			Assert.True (lbl.ProcessKeyPressed (new (cm.Key, new KeyModifiers ())));
 			Assert.Equal ("Replaced", lbl.Text);
 
 			lbl.Text = "Original";
 			cm.Key = Key.Space | Key.CtrlMask;
-			Assert.True (lbl.OnKeyPressed (new (cm.Key, new KeyModifiers ())));
+			Assert.True (lbl.ProcessKeyPressed (new (cm.Key, new KeyModifiers ())));
 			Assert.Equal ("Replaced", lbl.Text);
 		}
 
@@ -902,9 +902,9 @@ namespace Terminal.Gui.ViewsTests {
 			top.Add (tf);
 			Application.Begin (top);
 
-			Assert.True (tf.OnKeyPressed (new (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tf.ProcessKeyPressed (new (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
 			Assert.True (tf.ContextMenu.MenuBar.IsMenuOpen);
-			Assert.True (top.Subviews [1].OnKeyPressed (new (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (top.Subviews [1].ProcessKeyPressed (new (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Null (tf.ContextMenu.MenuBar);
 		}
 

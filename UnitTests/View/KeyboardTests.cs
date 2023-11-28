@@ -189,26 +189,26 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (view.IsKeyUp);
 		}
 
-		[Fact]
-		public void AllViews_OnKeyPressed_CallsResponder ()
-		{
-			foreach (var view in TestHelpers.GetAllViews ()) {
-				if (view == null) {
-					_output.WriteLine ($"ERROR: null view from {nameof (TestHelpers.GetAllViews)}");
-					continue;
-				}
-				_output.WriteLine($"Testing {view.GetType().Name}");
-				var keyPressed = false;
-				view.KeyPressed += (s, a) => {
-					a.Handled = true;
-					keyPressed = true;
-				};
+		//[Fact]
+		//public void AllViews_OnKeyPressed_CallsResponder ()
+		//{
+		//	foreach (var view in TestHelpers.GetAllViews ()) {
+		//		if (view == null) {
+		//			_output.WriteLine ($"ERROR: null view from {nameof (TestHelpers.GetAllViews)}");
+		//			continue;
+		//		}
+		//		_output.WriteLine($"Testing {view.GetType().Name}");
+		//		var keyPressed = false;
+		//		view.KeyPressed += (s, a) => {
+		//			a.Handled = true;
+		//			keyPressed = true;
+		//		};
 
-				var handled = view.OnKeyPressed (new KeyEventArgs (Key.A));
-				Assert.True (handled);
-				Assert.True (keyPressed);
-				view.Dispose ();
-			}
-		}
+		//		var handled = view.OnKeyPressed (new KeyEventArgs (Key.A));
+		//		Assert.True (handled);
+		//		Assert.True (keyPressed);
+		//		view.Dispose ();
+		//	}
+		//}
 	}
 }

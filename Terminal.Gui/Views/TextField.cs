@@ -653,6 +653,10 @@ namespace Terminal.Gui {
 				return true;
 			}
 
+			if (OnInvokeKeyBindings (a)) {
+				return true;
+			}
+
 			// Ignore other control characters.
 			if (a.Key < Key.Space || a.Key > Key.CharMask) {
 				return false;

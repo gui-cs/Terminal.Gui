@@ -174,11 +174,11 @@ public class AllViewsTests {
 			}
 
 			if (vType is TextView) {
-				top.OnKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ()));
+				top.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ()));
 			} else {
-				top.OnKeyPressed (new (Key.Tab, new KeyModifiers ()));
+				top.ProcessKeyPressed (new (Key.Tab, new KeyModifiers ()));
 			}
-			top.OnKeyPressed (new (Key.Tab, new KeyModifiers ()));
+			top.ProcessKeyPressed (new (Key.Tab, new KeyModifiers ()));
 
 			Assert.Equal (2, vTypeEnter);
 			Assert.Equal (1, vTypeLeave);

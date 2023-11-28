@@ -28,7 +28,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Keyboard movement on splitter should have no effect if it is not focused
-			line.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
@@ -49,7 +49,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Keyboard movement on splitter should have no effect if it is not focused
-			line.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
@@ -71,7 +71,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Now while focused move the splitter 1 unit right
-			line.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
 			tileView.Draw ();
 
 			looksLike =
@@ -82,8 +82,8 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// and 2 to the left
-			line.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
-			line.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
 			tileView.Draw ();
 
 			looksLike =
@@ -110,7 +110,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Now while focused move the splitter 1 unit right
-			line.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
 			tileView.Draw ();
 
 			looksLike =
@@ -121,8 +121,8 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// and 2 to the left
-			line.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
-			line.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
 			tileView.Draw ();
 
 			looksLike =
@@ -151,7 +151,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Now while focused move the splitter 1 unit right
-			line.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
 			tileView.Draw ();
 
 			looksLike =
@@ -165,8 +165,8 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
 
 			// and 2 to the left
-			line.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
-			line.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
 			tileView.Draw ();
 
 			looksLike =
@@ -194,7 +194,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Keyboard movement on splitter should have no effect if it is not focused
-			line.OnKeyPressed (new (Key.CursorDown, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorDown, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
@@ -225,13 +225,13 @@ namespace Terminal.Gui.ViewsTests {
 
 			// Keyboard movement on splitter should have no effect because it
 			// would take us below the minimum splitter size
-			line.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// but we can continue to move the splitter right if we want
-			line.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 
@@ -269,13 +269,13 @@ namespace Terminal.Gui.ViewsTests {
 
 			// Keyboard movement on splitter should have no effect because it
 			// would take us below the minimum splitter size
-			line.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// but we can continue to move the splitter right if we want
-			line.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 
@@ -313,13 +313,13 @@ namespace Terminal.Gui.ViewsTests {
 
 			// Keyboard movement on splitter should have no effect because it
 			// would take us below the minimum splitter size
-			line.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// but we can continue to move the splitter left if we want
-			line.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 
@@ -357,13 +357,13 @@ namespace Terminal.Gui.ViewsTests {
 
 			// Keyboard movement on splitter should have no effect because it
 			// would take us below the minimum splitter size
-			line.OnKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// but we can continue to move the splitter left if we want
-			line.OnKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorLeft, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 
@@ -447,7 +447,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Now move splitter line down
-			line.OnKeyPressed (new (Key.CursorDown, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorDown, new KeyModifiers ()));
 
 			tileView.Draw ();
 			looksLike =
@@ -458,8 +458,8 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// And 2 up
-			line.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ()));
-			line.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorUp, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorUp, new KeyModifiers ()));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			looksLike =
@@ -494,7 +494,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Now move splitter line down (allowed
-			line.OnKeyPressed (new (Key.CursorDown, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorDown, new KeyModifiers ()));
 			tileView.Draw ();
 			looksLike =
 @"    
@@ -504,8 +504,8 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// And up 2 (only 1 is allowed because of minimum size of 1 on view1)
-			line.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ()));
-			line.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorUp, new KeyModifiers ()));
+			line.ProcessKeyPressed (new (Key.CursorUp, new KeyModifiers ()));
 
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();

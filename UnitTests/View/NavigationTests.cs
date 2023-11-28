@@ -34,16 +34,16 @@ namespace Terminal.Gui.ViewTests {
 			frm.Add (frmSubview);
 			top.Add (frm);
 
-			top.OnKeyPressed (new (Key.Tab, new KeyModifiers ()));
+			top.ProcessKeyPressed (new (Key.Tab, new KeyModifiers ()));
 			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
-			top.OnKeyPressed (new (Key.Tab, new KeyModifiers ()));
+			top.ProcessKeyPressed (new (Key.Tab, new KeyModifiers ()));
 			Assert.Equal ("FrameSubview", top.MostFocused.Text);
-			top.OnKeyPressed (new (Key.Tab, new KeyModifiers ()));
+			top.ProcessKeyPressed (new (Key.Tab, new KeyModifiers ()));
 			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
 
-			top.OnKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
+			top.ProcessKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
 			Assert.Equal ("FrameSubview", top.MostFocused.Text);
-			top.OnKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
+			top.ProcessKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
 			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
 			top.Dispose ();
 		}
@@ -785,13 +785,13 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (view2.CanFocus);
 			Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
-			Assert.True (Application.Top.OnKeyPressed (new (Key.Tab, new KeyModifiers ())));
+			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Tab, new KeyModifiers ())));
 			Assert.True (view1.CanFocus);
 			Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
 			Assert.True (view2.CanFocus);
 			Assert.True (view2.HasFocus);
 
-			Assert.True (Application.Top.OnKeyPressed (new (Key.Tab, new KeyModifiers ())));
+			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Tab, new KeyModifiers ())));
 			Assert.True (view1.CanFocus);
 			Assert.True (view1.HasFocus);
 			Assert.True (view2.CanFocus);
@@ -825,14 +825,14 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (view2.CanFocus);
 			Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
-			Assert.True (Application.Top.OnKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
-			Assert.True (Application.Top.OnKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
 			Assert.True (view1.CanFocus);
 			Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
 			Assert.True (view2.CanFocus);
 			Assert.True (view2.HasFocus);
 
-			Assert.True (Application.Top.OnKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
 			Assert.True (view1.CanFocus);
 			Assert.True (view1.HasFocus);
 			Assert.True (view2.CanFocus);
@@ -865,13 +865,13 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (view2.CanFocus);
 			Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
-			Assert.True (Application.Top.OnKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
 			Assert.True (view1.CanFocus);
 			Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
 			Assert.True (view2.CanFocus);
 			Assert.True (view2.HasFocus);
 
-			Assert.True (Application.Top.OnKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
 			Assert.True (view1.CanFocus);
 			Assert.True (view1.HasFocus);
 			Assert.True (view2.CanFocus);
@@ -946,9 +946,8 @@ namespace Terminal.Gui.ViewTests {
 			Application.MainLoop.RunIteration ();
 			Assert.False (sbQuiting);
 			Assert.False (tfQuiting);
-#if BROKE_WITH_2926
-// Because View/Toplevel.OnKeyPressed now calls InvokeKeyBindings before 
-// calling base.OnKeyPressed the Top_KeyPressed handler is never invoked
+#if BROKE_WITH_2927
+// This test is now invalid because `win` is focused, so it will receive the keypress
 			Assert.True (topQuiting);
 #endif
 		}
@@ -1135,14 +1134,14 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (removed);
 			Assert.Null (view3);
 
-			Assert.True (top1.OnKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers { Ctrl = true })));
+			Assert.True (top1.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers { Ctrl = true })));
 			Assert.True (top1.HasFocus);
 			Assert.False (view1.HasFocus);
 			Assert.True (view2.HasFocus);
 			Assert.True (removed);
 			Assert.NotNull (view3);
 
-			var exception = Record.Exception (() => top1.OnKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers { Ctrl = true })));
+			var exception = Record.Exception (() => top1.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers { Ctrl = true })));
 			Assert.Null (exception);
 			Assert.True (removed);
 			Assert.Null (view3);

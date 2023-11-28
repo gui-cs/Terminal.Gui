@@ -259,12 +259,10 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			// Ignore other control characters.
-			if (a.Key < Key.D0 || a.Key > Key.z) {
-				if (base.OnKeyPressed (a)) {
-					return true;
-				}
+			if (base.OnKeyPressed (a)) {
+				return true;
 			}
+			
 			return false;
 		}
 

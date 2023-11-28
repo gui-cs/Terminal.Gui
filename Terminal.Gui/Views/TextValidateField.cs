@@ -614,10 +614,6 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnKeyPressed (KeyEventArgs a)
 		{
-			if (base.OnKeyPressed (a)) {
-				return true;
-			}
-
 			if (provider == null) {
 				return false;
 			}
@@ -626,6 +622,10 @@ namespace Terminal.Gui {
 				return false;
 			}
 
+			if (base.OnInvokeKeyBindings (a)) {
+				return true;
+			}
+			
 			var key = new Rune ((uint)a.KeyValue);
 
 			var inserted = provider.InsertAt ((char)key.Value, cursorPosition);
@@ -634,7 +634,10 @@ namespace Terminal.Gui {
 				CursorRight ();
 			}
 
-			return true;
+			if (base.OnKeyPressed (a)) {
+				return true;
+			}
+			return false;
 		}
 
 		/// <summary>

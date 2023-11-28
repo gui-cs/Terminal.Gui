@@ -120,34 +120,34 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		/// <summary>
-		/// If the view is focused, gives the view a chance to process the keystroke.
-		/// Fires the <see cref="KeyPressed"/> event.
-		/// Called after <see cref="OnKeyDown"/> and before <see cref="OnKeyUp"/>.
-		/// Typical apps will use <see cref="Command"/> instead.
-		/// </summary>
-		/// <remarks>
-		/// Overrides must call into the base and return <see langword="true"/> if the base returns  <see langword="true"/>.
-		/// </remarks>
-		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
-		/// <returns><see langword="false"/> if the key stroke was not handled. <see langword="true"/> if no
-		/// other view should see it.</returns>
-		public virtual bool OnKeyPressed (KeyEventArgs keyEvent)
-		{
-			// fire event
-			KeyPressed?.Invoke (this, keyEvent);
-			return keyEvent.Handled;
-		}
+		///// <summary>
+		///// If the view is focused, gives the view a chance to process the keystroke.
+		///// Fires the <see cref="KeyPressed"/> event.
+		///// Called after <see cref="OnKeyDown"/> and before <see cref="OnKeyUp"/>.
+		///// Typical apps will use <see cref="Command"/> instead.
+		///// </summary>
+		///// <remarks>
+		///// Overrides must call into the base and return <see langword="true"/> if the base returns  <see langword="true"/>.
+		///// </remarks>
+		///// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+		///// <returns><see langword="false"/> if the key stroke was not handled. <see langword="true"/> if no
+		///// other view should see it.</returns>
+		//public virtual bool OnKeyPressed (KeyEventArgs keyEvent)
+		//{
+		//	// fire event
+		//	KeyPressed?.Invoke (this, keyEvent);
+		//	return keyEvent.Handled;
+		//}
 
-		/// <summary>
-		/// Invoked when a key is pressed. Set <see cref="KeyEventArgs.Handled"/> to true to stop the key from
-		/// being processed by other views. Invoked after <see cref="KeyDown"/> and before <see cref="KeyUp"/>.
-		/// </summary>
-		/// <remarks>
-		/// Not all terminals support key distinct down/up notifications, Applications should avoid
-		/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPressed"/>.
-		/// </remarks>
-		public event EventHandler<KeyEventArgs> KeyPressed;
+		///// <summary>
+		///// Invoked when a key is pressed. Set <see cref="KeyEventArgs.Handled"/> to true to stop the key from
+		///// being processed by other views. Invoked after <see cref="KeyDown"/> and before <see cref="KeyUp"/>.
+		///// </summary>
+		///// <remarks>
+		///// Not all terminals support key distinct down/up notifications, Applications should avoid
+		///// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPressed"/>.
+		///// </remarks>
+		//public event EventHandler<KeyEventArgs> KeyPressed;
 
 		/// <summary>
 		/// Invoked when a key is depressed.

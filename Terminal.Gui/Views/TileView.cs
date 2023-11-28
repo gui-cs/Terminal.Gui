@@ -809,7 +809,7 @@ namespace Terminal.Gui {
 			{
 				// Do nothing if we're not focused
 				if (!CanFocus || !HasFocus) {
-					return false;
+					return true;
 				}
 
 				return base.OnKeyPressed (a);

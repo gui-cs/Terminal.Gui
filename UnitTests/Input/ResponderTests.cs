@@ -21,7 +21,7 @@ namespace Terminal.Gui.InputTests {
 		[Fact, TestRespondersDisposed]
 		public void New_Methods_Return_False ()
 		{
-			var r = new Responder ();
+			var r = new View ();
 
 			Assert.False (r.OnKeyPressed (new KeyEventArgs () { Key = Key.Unknown }));
 			Assert.False (r.OnHotKey (new KeyEventArgs () { Key = Key.Unknown }));
@@ -46,7 +46,7 @@ namespace Terminal.Gui.InputTests {
 		[Fact]
 		public void KeyPressed_Handled_True_Cancels_KeyPress ()
 		{
-			var r = new Responder ();
+			var r = new View ();
 			var args = new KeyEventArgs () { Key = Key.Unknown };
 
 			Assert.False (r.OnKeyPressed (args));
