@@ -104,7 +104,24 @@ namespace Terminal.Gui {
 
 			AddKeyBinding (Key.CursorRight, Command.Right);
 			AddKeyBinding (Key.F | Key.CtrlMask, Command.Right);
+
+			KeyPressed += DateField_KeyPressed;
 		}
+
+		void DateField_KeyPressed (object sender, KeyEventArgs a)
+		{
+			// Ignore non-numeric characters.
+			if (a.Key is >= (Key)(int)Key.D0 and <= (Key)(int)Key.D9) {
+				if (!ReadOnly) {
+					if (SetText (((Rune)(uint)a.Key).ToString ().EnumerateRunes ().First ())) {
+						IncCursorPosition ();
+					}
+				}
+				a.Handled = true;
+			}
+			return;
+		}
+
 
 		void DateField_Changed (object sender, TextChangedEventArgs e)
 		{
@@ -325,26 +342,6 @@ namespace Terminal.Gui {
 		{
 			if (Text [CursorPosition] == sepChar.ToCharArray () [0])
 				CursorPosition++;
-		}
-
-		/// <inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs a)
-		{
-			// Ignore non-numeric characters.
-			if (a.Key is >= (Key)(int)Key.D0 and <= (Key)(int)Key.D9) {
-				if (!ReadOnly) {
-					if (SetText (((Rune)(uint)a.Key).ToString ().EnumerateRunes ().First ())) {
-						IncCursorPosition ();
-					}
-				}
-				return true;
-			}
-
-			if (base.OnKeyPressed (a)) {
-				return true;
-			}
-			
-			return false;
 		}
 
 		bool MoveRight ()

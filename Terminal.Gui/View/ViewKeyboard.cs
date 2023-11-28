@@ -160,12 +160,21 @@ namespace Terminal.Gui {
 
 		int _oldTabIndex;
 
+		/// <summary>
+		/// If the view is enabled, processes a <see cref="KeyEvent"/> and returns <see langword="true"/> if the event was handled.
+		/// </summary>
+		/// <remarks>
+		/// <para>Calls <see cref="OnKeyPressed(KeyEventArgs)"/> and <see cref="OnInvokeKeyBindings(KeyEventArgs)"/>.</para>
+		/// </remarks>
+		/// <param name="keyEvent"></param>
+		/// <returns><see langword="true"/> if the event was handled.</returns>
 		public bool ProcessKeyPressed (KeyEventArgs keyEvent)
 		{
 			if (!Enabled) {
 				return false;
 			}
 
+			// TODO: Figure out how to enable a view to see the key event regardless of whether a child view is focused or not.
 			if (Focused?.ProcessKeyPressed (keyEvent) == true) {
 				return true;
 			}
@@ -174,25 +183,34 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if (OnInvokeKeyBindings (keyEvent)){
+			if (OnInvokeKeyBindings (keyEvent)) {
 				return true;
 			}
-			
+
 			return false;
 		}
 
 		/// <summary>
-		/// If the view is focused, gives the view a chance to process the keystroke.
-		/// Fires the <see cref="KeyPressed"/> event.
-		/// Called after <see cref="OnKeyDown"/> and before <see cref="OnKeyUp"/>.
-		/// Typical apps will use <see cref="Command"/> instead.
+		/// Low-level API called when a key is pressed. This is called before <see cref="OnInvokeKeyBindings(KeyEventArgs)"/>.
 		/// </summary>
 		/// <remarks>
-		/// Overrides must call into the base and return <see langword="true"/> if the base returns  <see langword="true"/>.
+		/// <para>
+		/// For processing shortcuts, hot-keys, and commands, use <see cref="Command"/> and <see cref="AddKeyBinding(Key, Command[])"/>instead.
+		/// </para>
+		/// <para>
+		/// Fires the <see cref="KeyPressed"/> event.
+		/// </para>
+		/// <para>
+		/// Called after <see cref="OnKeyDown"/> and before <see cref="OnKeyUp"/>.
+		/// </para>
+		/// <para>
+		/// Not all terminals support key distinct down/up notifications, Applications should avoid
+		/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPressed"/>.
+		/// </para>
 		/// </remarks>
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
-		/// <returns><see langword="false"/> if the key stroke was not handled. <see langword="true"/> if no
-		/// other view should see it.</returns>
+		/// <returns><see langword="false"/> if the key press was not handled. <see langword="true"/> if
+		/// the keypress was handled and no other view should see it.</returns>
 		public virtual bool OnKeyPressed (KeyEventArgs keyEvent)
 		{
 			// fire event
@@ -205,24 +223,25 @@ namespace Terminal.Gui {
 		/// being processed by other views. Invoked after <see cref="KeyDown"/> and before <see cref="KeyUp"/>.
 		/// </summary>
 		/// <remarks>
+		/// <para>
 		/// Not all terminals support key distinct down/up notifications, Applications should avoid
 		/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPressed"/>.
+		/// </para>
 		/// </remarks>
 		public event EventHandler<KeyEventArgs> KeyPressed;
 
-
 		/// <summary>
-		/// If the view is focused, gives the view a chance to process the keystroke.
-		/// Fires the <see cref="KeyPressed"/> event.
-		/// Called after <see cref="OnKeyDown"/> and before <see cref="OnKeyUp"/>.
-		/// Typical apps will use <see cref="Command"/> instead.
+		/// Low-level API called when a key is pressed to invoke any key bindings set on the view.
+		/// This is called after <see cref="OnKeyPressed(KeyEventArgs)"/>. 
 		/// </summary>
 		/// <remarks>
-		/// Overrides must call into the base and return <see langword="true"/> if the base returns  <see langword="true"/>.
+		/// <para>
+		/// Fires the <see cref="InvokingKeyBindings"/> event.
+		/// </para>
 		/// </remarks>
 		/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
-		/// <returns><see langword="false"/> if the key stroke was not handled. <see langword="true"/> if no
-		/// other view should see it.</returns>
+		/// <returns><see langword="false"/> if the key press was not handled. <see langword="true"/> if
+		/// the keypress was handled and no other view should see it.</returns>
 		public virtual bool OnInvokeKeyBindings (KeyEventArgs keyEvent)
 		{
 			// fire event
@@ -232,21 +251,15 @@ namespace Terminal.Gui {
 			}
 			var ret = InvokeKeyBindings (keyEvent);
 			if (ret != null && (bool)ret) {
-				// fire event
-				//InvokedKeyBindings?.Invoke (this, keyEvent);
 				return true;
 			}
 			return false;
 		}
 
 		/// <summary>
-		/// Invoked when a key is pressed. Set <see cref="KeyEventArgs.Handled"/> to true to stop the key from
-		/// being processed by other views. Invoked after <see cref="KeyDown"/> and before <see cref="KeyUp"/>.
+		/// Invoked when a key is pressed that may be mapped to a key binding. Set <see cref="KeyEventArgs.Handled"/>
+		/// to true to stop the key from being processed by other views. 
 		/// </summary>
-		/// <remarks>
-		/// Not all terminals support key distinct down/up notifications, Applications should avoid
-		/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPressed"/>.
-		/// </remarks>
 		public event EventHandler<KeyEventArgs> InvokingKeyBindings;
 
 		///// <inheritdoc/>
