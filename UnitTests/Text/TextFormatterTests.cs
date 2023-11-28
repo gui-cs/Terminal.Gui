@@ -26,6 +26,10 @@ namespace Terminal.Gui.TextTests {
 			var tf = new TextFormatter ();
 
 			tf.Text = testText;
+			// Direction wasn't set yet and need to be set first
+			Assert.Equal ((TextDirection)(-1), tf.Direction);
+			Assert.Equal (Size.Empty, tf.Size);
+			tf.Direction = TextDirection.LeftRight_TopBottom;
 			expectedSize = new Size (testText.Length, 1);
 			Assert.Equal (testText, tf.Text);
 			Assert.Equal (TextAlignment.Left, tf.Alignment);
@@ -187,6 +191,48 @@ namespace Terminal.Gui.TextTests {
 			} else {
 				Assert.Equal (1, tf.Size.Width);
 				Assert.Equal (1, tf.Size.Height);
+			}
+		}
+
+		[Theory]
+		[InlineData (TextAlignment.Left, false)]
+		[InlineData (TextAlignment.Centered, true)]
+		[InlineData (TextAlignment.Right, false)]
+		[InlineData (TextAlignment.Justified, true)]
+		public void TestSize_DirectionChange_AutoSize_True_Or_False_Horizontal (TextAlignment textAlignment, bool autoSize)
+		{
+			var tf = new TextFormatter () { Direction = TextDirection.LeftRight_TopBottom, Text = "你你", Alignment = textAlignment, AutoSize = autoSize };
+			Assert.Equal (4, tf.Size.Width);
+			Assert.Equal (1, tf.Size.Height);
+
+			tf.Direction = TextDirection.TopBottom_LeftRight;
+			if (autoSize && textAlignment != TextAlignment.Justified) {
+				Assert.Equal (2, tf.Size.Width);
+				Assert.Equal (2, tf.Size.Height);
+			} else {
+				Assert.Equal (4, tf.Size.Width);
+				Assert.Equal (1, tf.Size.Height);
+			}
+		}
+
+		[Theory]
+		[InlineData (VerticalTextAlignment.Top, false)]
+		[InlineData (VerticalTextAlignment.Middle, true)]
+		[InlineData (VerticalTextAlignment.Bottom, false)]
+		[InlineData (VerticalTextAlignment.Justified, true)]
+		public void TestSize_DirectionChange_AutoSize_True_Or_False_Vertical (VerticalTextAlignment textAlignment, bool autoSize)
+		{
+			var tf = new TextFormatter () { Direction = TextDirection.TopBottom_LeftRight, Text = "你你", VerticalAlignment = textAlignment, AutoSize = autoSize };
+			Assert.Equal (2, tf.Size.Width);
+			Assert.Equal (2, tf.Size.Height);
+
+			tf.Direction = TextDirection.LeftRight_TopBottom;
+			if (autoSize && textAlignment != VerticalTextAlignment.Justified) {
+				Assert.Equal (4, tf.Size.Width);
+				Assert.Equal (1, tf.Size.Height);
+			} else {
+				Assert.Equal (2, tf.Size.Width);
+				Assert.Equal (2, tf.Size.Height);
 			}
 		}
 

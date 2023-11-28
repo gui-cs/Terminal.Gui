@@ -650,6 +650,7 @@ namespace Terminal.Gui {
 						DrawHotString (textToDraw, ColorScheme.Disabled, ColorScheme.Disabled);
 					} else if (i == 0 && host.UseSubMenusSingleFrame && item.Parent.Parent != null) {
 						var tf = new TextFormatter () {
+							Direction = TextDirection.LeftRight_TopBottom,
 							Alignment = TextAlignment.Centered,
 							HotKeySpecifier = MenuBar.HotKeySpecifier,
 							Text = textToDraw
