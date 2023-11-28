@@ -10,7 +10,6 @@ namespace UICatalog.Scenarios {
 		class TestWindow : Window {
 			public List<string> _processKeyList = new List<string> ();
 			public List<string> _processHotKeyList = new List<string> ();
-			public List<string> _processColdKeyList = new List<string> ();
 
 			public override bool OnKeyPressed (KeyEventArgs keyEvent)
 			{
@@ -24,12 +23,6 @@ namespace UICatalog.Scenarios {
 				return base.OnHotKey (keyEvent);
 			}
 
-			public override bool OnColdKey (KeyEventArgs keyEvent)
-			{
-				_processColdKeyList.Add (keyEvent.ToString ());
-
-				return base.OnColdKey (keyEvent);
-			}
 		}
 
 		public override void Init ()
@@ -149,12 +142,6 @@ namespace UICatalog.Scenarios {
 			Win.Add (processColdKeyLogLabel);
 
 			yOffset = (Application.Top == Application.Top ? 1 : 6);
-			var processColdKeyListView = new ListView (((TestWindow)Win)._processColdKeyList) {
-				X = Pos.Left (processColdKeyLogLabel),
-				Y = Pos.Top (processColdKeyLogLabel) + yOffset,
-				Width = Dim.Percent (20),
-				Height = Dim.Fill (),
-			};
 
 			Application.KeyDown += (s, a) => KeyDownPressUp (a, "Down");
 			Application.KeyPressed += (s, a) => KeyDownPressUp (a, "Press");
@@ -167,12 +154,8 @@ namespace UICatalog.Scenarios {
 				keyEventlist.Add (msg);
 				keyEventListView.MoveDown ();
 				processKeyListView.MoveDown ();
-				processColdKeyListView.MoveDown ();
 				processHotKeyListView.MoveDown ();
 			}
-
-			processColdKeyListView.ColorScheme = Colors.TopLevel;
-			Win.Add (processColdKeyListView);
 		}
 	}
 }

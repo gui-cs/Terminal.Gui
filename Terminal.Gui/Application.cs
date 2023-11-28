@@ -1418,14 +1418,6 @@ public static partial class Application {
 				break;
 		}
 
-		foreach (var topLevel in chain) {
-			// Process the key normally
-			if (topLevel.OnColdKey (a)) {
-				return true;
-			}
-			if (topLevel.Modal)
-				break;
-		}
 		return false;
 	}
 

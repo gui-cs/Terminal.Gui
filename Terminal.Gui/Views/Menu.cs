@@ -2018,11 +2018,11 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 		}
 
-		///<inheritdoc/>
-		public override bool OnColdKey (KeyEventArgs a)
-		{
-			return FindAndOpenMenuByShortcut (a);
-		}
+		/////<inheritdoc/>
+		//public override bool OnColdKey (KeyEventArgs a)
+		//{
+		//	return FindAndOpenMenuByShortcut (a);
+		//}
 
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)

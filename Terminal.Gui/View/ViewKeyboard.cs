@@ -214,58 +214,7 @@ public partial class View {
 		}
 		return false;
 	}
-
-	/// <summary>
-	/// A low-level method to support hot keys (e.g. Alt-X). Can be overridden to provide accelerator functionality.
-	/// Typical apps will use <see cref="Command"/> instead.
-	/// </summary>
-	/// <remarks>
-	///   <para>
-	///     After keys are sent to the subviews on the
-	///     current view, all the view are
-	///     processed and the key is passed to the views
-	///     to allow some of them to process the keystroke
-	///     as a cold-key. </para>
-	///  <para>
-	///    This functionality is used, for example, by
-	///    default buttons to act on the enter key.
-	///    Processing this as a hot-key would prevent
-	///    non-default buttons from consuming the enter
-	///    keypress when they have the focus.
-	///  </para>
-	/// </remarks>
-	/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
-	public virtual bool OnColdKey (KeyEventArgs keyEvent)
-	{
-		if (OnHotKey (keyEvent)) {
-			return true;
-		}
-
-		if (!Enabled) {
-			return false;
-		}
-
-		if (ProcessKeyPressed (keyEvent)) {
-			return true;
-		}
-
-		if (MostFocused?.ProcessKeyPressed (keyEvent) == true) {
-			return true;
-
-		}
-
-		if (_subviews == null || _subviews.Count == 0) {
-			return false;
-		}
-
-		foreach (var view in _subviews) {
-			if (view.OnColdKey (keyEvent)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
+	
 	/// <summary>
 	/// Invoked when a key is depressed.
 	/// </summary>
