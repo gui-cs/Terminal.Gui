@@ -97,10 +97,10 @@ public partial class View {
 		}
 	}
 
-	/// <summary>
-	/// The keystroke combination used in the <see cref="Shortcut"/> as string.
-	/// </summary>
-	public string ShortcutTag => ShortcutHelper.GetShortcutTag (_shortcutHelper.Shortcut);
+	///// <summary>
+	///// The keystroke combination used in the <see cref="Shortcut"/> as string.
+	///// </summary>
+	//public string ShortcutTag => ShortcutHelper.GetShortcutTag (_shortcutHelper.Shortcut);
 
 	/// <summary>
 	/// The action to run if the <see cref="Shortcut"/> is defined.
