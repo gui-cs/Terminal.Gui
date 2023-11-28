@@ -143,26 +143,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		/// <inheritdoc/>
-		public override Key HotKey {
-			get => base.HotKey;
-			set {
-				if (base.HotKey != value) {
-					var v = value == Key.Unknown ? Key.Null : value;
-					if (base.HotKey != Key.Null && ContainsKeyBinding (Key.Space | base.HotKey)) {
-						if (v == Key.Null) {
-							ClearKeyBinding (Key.Space | base.HotKey);
-						} else {
-							ReplaceKeyBinding (Key.Space | base.HotKey, Key.Space | v);
-						}
-					} else if (v != Key.Null) {
-						AddKeyBinding (Key.Space | v, Command.Accept);
-					}
-					base.HotKey = TextFormatter.HotKey = v;
-				}
-			}
-		}
-
 		/// <summary>
 		/// 
 		/// </summary>

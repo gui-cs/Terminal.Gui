@@ -220,7 +220,6 @@ namespace Terminal.Gui {
 			TextFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
 			TextDirection = direction;
 
-			//_shortcutHelper = new ShortcutHelper ();
 			CanFocus = false;
 			TabIndex = -1;
 			TabStop = false;
