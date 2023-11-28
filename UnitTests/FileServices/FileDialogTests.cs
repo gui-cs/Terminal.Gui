@@ -374,7 +374,7 @@ namespace Terminal.Gui.FileServicesTests {
 		public void TestDirectoryContents_Linux ()
 		{
 			if (IsWindows ()) {
-				//return;
+				return;
 			}
 			var fd = GetLinuxDialog ();
 			fd.Title = string.Empty;

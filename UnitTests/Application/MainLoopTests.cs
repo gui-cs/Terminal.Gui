@@ -681,7 +681,7 @@ public class MainLoopTests {
 			if (iterations == 0) {
 				Assert.Null (btn);
 				Assert.Equal (zero, total);
-				Assert.True (btnLaunch.OnKeyPressed (new (Key.Enter, null)));
+				Assert.True (btnLaunch.ProcessKeyPressed (new (Key.Space, null)));
 				if (btn == null) {
 					Assert.Null (btn);
 					Assert.Equal (zero, total);
@@ -692,7 +692,7 @@ public class MainLoopTests {
 			} else if (iterations == 1) {
 				Assert.Equal (clickMe, btn.Text);
 				Assert.Equal (zero, total);
-				Assert.True (btn.OnKeyPressed (new (Key.Enter, null)));
+				Assert.True (btn.ProcessKeyPressed (new (Key.Space, null)));
 				Assert.Equal (cancel, btn.Text);
 				Assert.Equal (one, total);
 			} else if (taskCompleted) {

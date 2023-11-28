@@ -780,7 +780,9 @@ namespace Terminal.Gui.DialogTests {
 		[Fact, AutoInitShutdown]
 		public void Dialog_Opened_From_Another_Dialog ()
 		{
-			var btn1 = new Button ("press me 1");
+			var btn1 = new Button ("press me 1") {
+				IsDefault = true
+			};
 			Button btn2 = null;
 			Button btn3 = null;
 			string expected = null;
@@ -825,7 +827,7 @@ namespace Terminal.Gui.DialogTests {
       └──────────────────────────────────────────────────────────────────┘";
 					TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-					Assert.True (btn2.ProcessKeyPressed (new (Key.Enter, new KeyModifiers ())));
+					Assert.True (btn2.ProcessKeyPressed (new (Key.Space, new KeyModifiers ())));
 				} else if (iterations == 2) {
 					TestHelpers.AssertDriverContentsWithFrameAre (@$"
       ┌──────────────────────────────────────────────────────────────────┐
@@ -854,7 +856,7 @@ namespace Terminal.Gui.DialogTests {
 				} else if (iterations == 3) {
 					TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-					Assert.True (btn3.ProcessKeyPressed (new (Key.Enter, new KeyModifiers ())));
+					Assert.True (btn3.ProcessKeyPressed (new (Key.Space, new KeyModifiers ())));
 				} else if (iterations == 4) {
 					TestHelpers.AssertDriverContentsWithFrameAre ("", output);
 
