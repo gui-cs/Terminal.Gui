@@ -330,26 +330,26 @@ Test
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 
-		//[Fact, AutoInitShutdown]
-		//public void Label_HotKeyChanged_EventFires ()
-		//{
-		//	var label = new Label ("Yar");
+		[Fact, AutoInitShutdown]
+		public void Label_HotKeyChanged_EventFires ()
+		{
+			var label = new Label ("Yar");
+			label.HotKey = (Key)'Y';
 
-		//	object sender = null;
-		//	KeyChangedEventArgs args = null;
+			object sender = null;
+			KeyChangedEventArgs args = null;
 
-		//	label.HotKeyChanged += (s, e) =>{
-		//		sender = s;
-		//		args = e;
+			label.HotKeyChanged += (s, e) => {
+				sender = s;
+				args = e;
 
-		//	};
+			};
 
-		//	label.HotKey = Key.r;
-		//	Assert.Same (label, sender);
-		//	Assert.Equal (Key.Y, args.OldKey);
-		//	Assert.Equal (Key.r, args.NewKey);
-
-		//}
+			label.HotKey = Key.r;
+			Assert.Same (label, sender);
+			Assert.Equal (Key.Y, args.OldKey);
+			Assert.Equal (Key.r, args.NewKey);
+		}
 
 		[Fact, AutoInitShutdown]
 		public void Label_HotKeyChanged_EventFires_WithNone ()

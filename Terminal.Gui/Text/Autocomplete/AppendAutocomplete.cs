@@ -83,6 +83,7 @@ namespace Terminal.Gui {
 		public override void GenerateSuggestions (AutocompleteContext context)
 		{
 			if (_suspendSuggestions) {
+				_suspendSuggestions = false;
 				return;
 			}
 			base.GenerateSuggestions (context);

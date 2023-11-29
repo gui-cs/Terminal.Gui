@@ -500,7 +500,12 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (View.Direction.Backward, view.FocusDirection);
 			Assert.Empty (view.InternalSubviews);
 			// BUGBUG: v2 - _needsDisplay needs debugging - test disabled for now.
-			//Assert.Equal (new Rect (new Point (0, 0), rect.Size), view._needsDisplay);
+			Assert.False (view.IsInitialized);
+			Assert.Equal (Rect.Empty, view._needsDisplayRect);
+			view.BeginInit ();
+			view.EndInit ();
+			Assert.True (view.IsInitialized);
+			Assert.Equal (new Rect (new Point (0, 0), rect.Size), view._needsDisplayRect);
 			Assert.True (view.LayoutNeeded);
 			Assert.False (view.SubViewNeedsDisplay);
 			Assert.False (view._addingView);
@@ -784,16 +789,16 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (horizontalView.AutoSize);
 			Assert.Equal (new Rect (0, 0, 12, 1), horizontalView.Frame);
 			Assert.Equal (new Size (12, 1), horizontalView.GetSizeNeededForTextWithoutHotKey ());
-			//Assert.Equal (new Size (12, 1), horizontalView.GetSizeNeededForTextAndHotKey ());
-			//Assert.Equal (horizontalView.TextFormatter.Size, horizontalView.GetSizeNeededForTextAndHotKey ());
+			Assert.Equal (new Size (12, 1), horizontalView.GetTextFormatterSizeNeededForTextAndHotKey ());
+			Assert.Equal (horizontalView.TextFormatter.Size, horizontalView.GetTextFormatterSizeNeededForTextAndHotKey ());
 			Assert.Equal (horizontalView.Frame.Size, horizontalView.GetSizeNeededForTextWithoutHotKey ());
 
 			Assert.True (verticalView.AutoSize);
 			// BUGBUG: v2 - Autosize is broken; disabling this test
-			//Assert.Equal (new Rect (0, 0, 2, 11), verticalView.Frame);
-			//Assert.Equal (new Size (2, 11), verticalView.GetSizeNeededForTextWithoutHotKey ());
-			//Assert.Equal (new Size (2, 11), verticalView.GetSizeNeededForTextAndHotKey ());
-			//Assert.Equal (verticalView.TextFormatter.Size, verticalView.GetSizeNeededForTextAndHotKey ());
+			Assert.Equal (new Rect (0, 0, 2, 11), verticalView.Frame);
+			Assert.Equal (new Size (2, 11), verticalView.GetSizeNeededForTextWithoutHotKey ());
+			Assert.Equal (new Size (2, 11), verticalView.GetTextFormatterSizeNeededForTextAndHotKey ());
+			Assert.Equal (verticalView.TextFormatter.Size, verticalView.GetTextFormatterSizeNeededForTextAndHotKey ());
 			Assert.Equal (verticalView.Frame.Size, verticalView.GetSizeNeededForTextWithoutHotKey ());
 
 			text = "Say He_llo 你";
@@ -803,17 +808,17 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (horizontalView.AutoSize);
 			Assert.Equal (new Rect (0, 0, 12, 1), horizontalView.Frame);
 			Assert.Equal (new Size (12, 1), horizontalView.GetSizeNeededForTextWithoutHotKey ());
-			//Assert.Equal (new Size (13, 1), horizontalView.GetSizeNeededForTextAndHotKey ());
-			//Assert.Equal (horizontalView.TextFormatter.Size, horizontalView.GetSizeNeededForTextAndHotKey ());
+			Assert.Equal (new Size (13, 1), horizontalView.GetTextFormatterSizeNeededForTextAndHotKey ());
+			Assert.Equal (horizontalView.TextFormatter.Size, horizontalView.GetTextFormatterSizeNeededForTextAndHotKey ());
 			Assert.Equal (horizontalView.Frame.Size, horizontalView.GetSizeNeededForTextWithoutHotKey ());
 
 			Assert.True (verticalView.AutoSize);
 			// BUGBUG: v2 - Autosize is broken; disabling this test
-			//Assert.Equal (new Rect (0, 0, 2, 11), verticalView.Frame);
-			//Assert.Equal (new Size (2, 11), verticalView.GetSizeNeededForTextWithoutHotKey ());
-			//Assert.Equal (new Size (2, 12), verticalView.GetSizeNeededForTextAndHotKey ());
-			//Assert.Equal (verticalView.TextFormatter.Size, verticalView.GetSizeNeededForTextAndHotKey ());
-			//Assert.Equal (verticalView.Frame.Size, verticalView.GetSizeNeededForTextWithoutHotKey ());
+			Assert.Equal (new Rect (0, 0, 2, 11), verticalView.Frame);
+			Assert.Equal (new Size (2, 11), verticalView.GetSizeNeededForTextWithoutHotKey ());
+			Assert.Equal (new Size (2, 12), verticalView.GetTextFormatterSizeNeededForTextAndHotKey ());
+			Assert.Equal (verticalView.TextFormatter.Size, verticalView.GetTextFormatterSizeNeededForTextAndHotKey ());
+			Assert.Equal (verticalView.Frame.Size, verticalView.GetSizeNeededForTextWithoutHotKey ());
 		}
 
 		[Fact, TestRespondersDisposed]
@@ -1003,7 +1008,7 @@ cccccccccccccccccccc", output);
 			public override void OnDrawContent (Rect contentArea)
 			{
 				var idx = 0;
-				// BUGBUG: v2 - this should use Boudns, not Frame
+				// BUGBUG: v2 - this should use Bounds, not Frame
 				for (int r = 0; r < Frame.Height; r++) {
 					for (int c = 0; c < Frame.Width; c++) {
 						if (idx < Text.Length) {
