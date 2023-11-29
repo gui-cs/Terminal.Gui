@@ -54,12 +54,6 @@ namespace Terminal.Gui {
 			}
 			set {
 				_frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
-				if (LayoutStyle == LayoutStyle.Computed) {
-					if (_x is Pos.PosAbsolute) { _x = _frame.X; }
-					if (_y is Pos.PosAbsolute) { _y = _frame.Y; }
-					if (_width is Dim.DimAbsolute) { _width = _frame.Width; }
-					if (_height is Dim.DimAbsolute) { _height = _frame.Height; }
-				}
 				if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
 					LayoutFrames ();
 					TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
