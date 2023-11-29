@@ -137,7 +137,7 @@ namespace Terminal.Gui {
 				Key = Key
 			};
 
-			menuBar.isContextMenuLoading = true;
+			menuBar._isContextMenuLoading = true;
 			menuBar.MenuAllClosed += MenuBar_MenuAllClosed;
 			IsShow = true;
 			menuBar.OpenMenu ();

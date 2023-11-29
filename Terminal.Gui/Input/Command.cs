@@ -402,6 +402,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Creates a new document.
 		/// </summary>
-		New
+		New,
+
+		/// <summary>
+		/// Selects an item
+		/// </summary>
+		Select
 	}
 }
