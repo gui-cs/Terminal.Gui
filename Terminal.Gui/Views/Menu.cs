@@ -512,11 +512,16 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.CursorRight, Command.Right);
 			AddKeyBinding (Key.Esc, Command.Cancel);
 			AddKeyBinding (Key.Enter, Command.Accept);
+			AddKeyBinding (Key.F9, Command.Select);
 
-			foreach (var item in barItems.Children) {
-				if (item != null) {
-					AddKeyBinding (item.Shortcut, Command.Select);
+
+			if (barItems.Children != null) {
+				foreach (var item in barItems.Children) {
+					if (item != null) {
+						AddKeyBinding (item.Shortcut, Command.Select);
+					}
 				}
+
 			}
 		}
 
@@ -1173,10 +1178,13 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.C | Key.CtrlMask, Command.Cancel);
 			AddKeyBinding (Key.CursorDown, Command.Accept);
 			AddKeyBinding (Key.Enter, Command.Accept);
+			AddKeyBinding (Key.F9, Command.Select);
 
-			foreach (var menu in Menus) {
-				if (menu != null) {
-					AddKeyBinding ((Key)menu.HotKey.Value | Key.AltMask, Command.Select);
+			if (Menus != null) {
+				foreach (var menu in Menus) {
+					if (menu != null) {
+						AddKeyBinding ((Key)menu.HotKey.Value | Key.AltMask, Command.Select);
+					}
 				}
 			}
 		}
@@ -1197,7 +1205,7 @@ namespace Terminal.Gui {
 					}
 
 					Activate (_mbItemToActivate);
-					
+
 					////StartMenu ();
 					//IsMenuOpen = true;
 					//_selected = 0;
@@ -1254,7 +1262,39 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnKeyUp (KeyEventArgs keyEvent)
 		{
-			return false;//SelectItem (keyEvent);
+			if (keyEvent.IsAlt || keyEvent.Key == Key.AltMask || (keyEvent.IsCtrl && keyEvent.Key == (Key.CtrlMask | Key.Space))) {
+				// User pressed Alt - this may be a precursor to a menu accelerator (e.g. Alt-F)
+				if (_openedByAltKey && !IsMenuOpen && _openMenu == null && (((uint)keyEvent.Key & (uint)Key.CharMask) == 0
+											|| ((uint)keyEvent.Key & (uint)Key.CharMask) == (uint)Key.Space)) {
+					// There's no open menu, the first menu item should be highlight.
+					// The right way to do this is to SetFocus(MenuBar), but for some reason
+					// that faults.
+
+					var mbar = GetMouseGrabViewInstance (this);
+					if (mbar != null) {
+						mbar.CleanUp ();
+					}
+
+					//Activate (0);
+					//StartMenu ();
+					IsMenuOpen = true;
+					_selected = 0;
+					CanFocus = true;
+					_lastFocused = SuperView == null ? Application.Current.MostFocused : SuperView.MostFocused;
+					SetFocus ();
+					SetNeedsDisplay ();
+					Application.GrabMouse (this);
+				} else if (!_openedByHotKey) {
+					// There's an open menu. If this Alt key-up is a pre-cursor to an accelerator
+					// we don't want to close the menu because it'll flash.
+					// How to deal with that?
+
+					CleanUp ();
+				}
+
+				return true;
+			}
+			return false;
 		}
 
 		internal void CleanUp ()
@@ -2031,7 +2071,7 @@ namespace Terminal.Gui {
 					}
 				}
 			}
-			
+
 			return false;
 		}
 

@@ -394,7 +394,7 @@ Edit
 			Application.Top.Add (menu);
 			Application.Begin (Application.Top);
 
-			Assert.True (menu.OnHotKey (new (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.ProcessKeyPressed (new (Key.F9, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
 			Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 			Assert.Equal ("_New", GetCurrentMenuTitle ());
