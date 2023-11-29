@@ -76,7 +76,7 @@ public partial class View {
 
 	void SetHotKey ()
 	{
-		if (TextFormatter == null) {
+		if (TextFormatter == null || HotKeySpecifier == new Rune('\xFFFF')) {
 			return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
 		}
 		TextFormatter.FindHotKey (_text, HotKeySpecifier, true, out _, out var hk);
@@ -400,7 +400,7 @@ public partial class View {
 			return true;
 		}
 
-		foreach (var view in Subviews.Where (v => v.Enabled && !v.HasFocus && v.KeyBindings.Count > 0)) {
+		foreach (var view in Subviews.Where (v => v is not Toplevel && v.Enabled && !v.HasFocus && v.KeyBindings.Count > 0)) {
 			if (view.OnInvokeKeyBindings (keyEvent)) {
 				return true;
 			}

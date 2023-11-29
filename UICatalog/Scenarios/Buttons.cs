@@ -16,10 +16,13 @@ namespace UICatalog.Scenarios {
 			var editLabel = new Label ("TextField (to demo IsDefault):") {
 				X = 0,
 				Y = 0,
+				HotKey = Key.Y | Key.AltMask,
+				TabStop = true,
 			};
 			Win.Add (editLabel);
 			// Add a TextField using Absolute layout. 
-			var edit = new TextField (31, 0, 15, "");
+			var edit = new TextField (31, 0, 15, "") {
+			};
 			Win.Add (edit);
 
 			// This is the default button (IsDefault = true); if user presses ENTER in the TextField
@@ -30,11 +33,11 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (Win) - 3,
 				IsDefault = true,
 			};
-			defaultButton.Clicked += (s,e) => Application.RequestStop ();
+			defaultButton.Clicked += (s, e) => Application.RequestStop ();
 			Win.Add (defaultButton);
 
 			var swapButton = new Button (50, 0, "Swap Default (Absolute Layout)");
-			swapButton.Clicked += (s,e) => {
+			swapButton.Clicked += (s, e) => {
 				defaultButton.IsDefault = !defaultButton.IsDefault;
 				swapButton.IsDefault = !swapButton.IsDefault;
 			};
@@ -42,7 +45,7 @@ namespace UICatalog.Scenarios {
 
 			static void DoMessage (Button button, string txt)
 			{
-				button.Clicked += (s,e) => {
+				button.Clicked += (s, e) => {
 					var btnText = button.Text;
 					MessageBox.Query ("Message", $"Did you click {txt}?", "Yes", "No");
 				};
@@ -83,14 +86,14 @@ namespace UICatalog.Scenarios {
 				X = 2,
 				Y = Pos.Bottom (button) + 1,
 			});
-			button.Clicked += (s,e) => MessageBox.Query ("Message", "Question?", "Yes", "No");
+			button.Clicked += (s, e) => MessageBox.Query ("Message", "Question?", "Yes", "No");
 
 			var textChanger = new Button ("Te_xt Changer") {
 				X = 2,
 				Y = Pos.Bottom (button) + 1,
 			};
 			Win.Add (textChanger);
-			textChanger.Clicked += (s,e) => textChanger.Text += "!";
+			textChanger.Clicked += (s, e) => textChanger.Text += "!";
 
 			Win.Add (button = new Button ("Lets see if this will move as \"Text Changer\" grows") {
 				X = Pos.Right (textChanger) + 2,
@@ -104,7 +107,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (removeButton);
 			// This in interesting test case because `moveBtn` and below are laid out relative to this one!
-			removeButton.Clicked += (s,e) => {
+			removeButton.Clicked += (s, e) => {
 				// Now this throw a InvalidOperationException on the TopologicalSort method as is expected.
 				//Win.Remove (removeButton);
 
@@ -126,7 +129,7 @@ namespace UICatalog.Scenarios {
 				Width = 30,
 				ColorScheme = Colors.Error,
 			};
-			moveBtn.Clicked += (s,e) => {
+			moveBtn.Clicked += (s, e) => {
 				moveBtn.X = moveBtn.Frame.X + 5;
 				// This is already fixed with the call to SetNeedDisplay() in the Pos Dim.
 				//computedFrame.LayoutSubviews (); // BUGBUG: This call should not be needed. View.X is not causing relayout correctly
@@ -140,7 +143,7 @@ namespace UICatalog.Scenarios {
 				Width = 30,
 				ColorScheme = Colors.Error,
 			};
-			sizeBtn.Clicked += (s,e) => {
+			sizeBtn.Clicked += (s, e) => {
 				sizeBtn.Width = sizeBtn.Frame.Width + 5;
 				//computedFrame.LayoutSubviews (); // FIXED: This call should not be needed. View.X is not causing relayout correctly
 			};
@@ -158,7 +161,7 @@ namespace UICatalog.Scenarios {
 			var moveBtnA = new Button (0, 0, "Move This Button via Frame") {
 				ColorScheme = Colors.Error,
 			};
-			moveBtnA.Clicked += (s,e) => {
+			moveBtnA.Clicked += (s, e) => {
 				moveBtnA.Frame = new Rect (moveBtnA.Frame.X + 5, moveBtnA.Frame.Y, moveBtnA.Frame.Width, moveBtnA.Frame.Height);
 			};
 			absoluteFrame.Add (moveBtnA);
@@ -167,7 +170,7 @@ namespace UICatalog.Scenarios {
 			var sizeBtnA = new Button (0, 2, " ~  s  gui.cs   master ↑10 = Со_хранить") {
 				ColorScheme = Colors.Error,
 			};
-			sizeBtnA.Clicked += (s,e) => {
+			sizeBtnA.Clicked += (s, e) => {
 				sizeBtnA.Frame = new Rect (sizeBtnA.Frame.X, sizeBtnA.Frame.Y, sizeBtnA.Frame.Width + 5, sizeBtnA.Frame.Height);
 			};
 			absoluteFrame.Add (sizeBtnA);
@@ -218,7 +221,7 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Width (computedFrame) - 2,
 				ColorScheme = Colors.TopLevel,
 			};
-			moveHotKeyBtn.Clicked += (s,e) => {
+			moveHotKeyBtn.Clicked += (s, e) => {
 				moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text);
 			};
 			Win.Add (moveHotKeyBtn);
@@ -230,7 +233,7 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Width (absoluteFrame) - 2, // BUGBUG: Not always the width isn't calculated correctly.
 				ColorScheme = Colors.TopLevel,
 			};
-			moveUnicodeHotKeyBtn.Clicked += (s,e) => {
+			moveUnicodeHotKeyBtn.Clicked += (s, e) => {
 				moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text);
 			};
 			Win.Add (moveUnicodeHotKeyBtn);
@@ -272,7 +275,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			Application.Top.Ready += (s,e) => radioGroup.Refresh ();
+			Application.Top.Ready += (s, e) => radioGroup.Refresh ();
 		}
 	}
 }

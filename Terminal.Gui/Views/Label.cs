@@ -60,11 +60,20 @@ namespace Terminal.Gui {
 			AutoSize = autosize;
 			// Things this view knows how to do
 			AddCommand (Command.Accept, () => AcceptKey ());
+			AddCommand (Command.NextView, () => {
+				// BUGBUG: This is a hack, but it does work.
+				var can = CanFocus;
+				CanFocus = true;
+				SetFocus ();
+				FocusNext ();
+				CanFocus = can;
+				return true; 
+			});
 
-			// Default keybindings for this view
+			// Default key bindings for this view
 			AddKeyBinding (Key.Space, Command.Accept);
 			if (HotKey != Key.Null) {
-				AddKeyBinding (Key.Space | HotKey, Command.Accept);
+				AddKeyBinding (Key.Space | HotKey, Command.NextView);
 			}
 		}
 
@@ -75,6 +84,37 @@ namespace Terminal.Gui {
 			}
 			OnClicked ();
 			return true;
+		}
+
+
+		/// <inheritdoc/>
+		public override Key HotKey {
+			get => base.HotKey;
+			set {
+				var prev = base.HotKey;
+				if (prev != value) {
+
+					var v = value == Key.Unknown ? Key.Null : value;
+					// Force upper case
+					var mask = v & Key.CharMask;
+					if (mask >= Key.a && mask <= Key.z) {
+						v = (Key)((int)v - 32);
+					}
+
+					base.HotKey = TextFormatter.HotKey = v;
+
+					// Also add Alt+HotKey
+					if (prev != Key.Null && ContainsKeyBinding (Key.Space | prev | Key.AltMask)) {
+						if (v == Key.Null) {
+							ClearKeyBinding (Key.Space | prev | Key.AltMask);
+						} else {
+							ReplaceKeyBinding (Key.Space | prev | Key.AltMask, Key.Space | v | Key.AltMask);
+						}
+					} else if (v != Key.Null) {
+						AddKeyBinding (Key.Space | v | Key.AltMask, Command.NextView);
+					}
+				}
+			}
 		}
 		
 		/// <summary>

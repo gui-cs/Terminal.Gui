@@ -57,7 +57,9 @@ namespace Terminal.Gui.DriverTests {
 			Application.Init (driver);
 
 			var top = Application.Top;
-			var view = new View ();
+			var view = new View () {
+				CanFocus = true
+			};
 			var count = 0;
 			var wasKeyPressed = false;
 
@@ -96,7 +98,9 @@ namespace Terminal.Gui.DriverTests {
 			Console.MockKeyPresses = mKeys;
 
 			var top = Application.Top;
-			var view = new View ();
+			var view = new View () {
+				CanFocus = true
+			};
 			var rText = "";
 			var idx = 0;
 

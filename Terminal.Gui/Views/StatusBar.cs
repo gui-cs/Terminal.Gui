@@ -117,7 +117,9 @@ public class StatusBar : View {
 	/// <param name="items">A list of statusbar items.</param>
 	public StatusBar (StatusItem [] items) : base ()
 	{
-		Items = items;
+		if (items != null) {
+			Items = items;
+		}
 		CanFocus = false;
 		ColorScheme = Colors.Menu;
 		X = 0;
