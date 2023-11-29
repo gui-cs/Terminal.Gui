@@ -760,17 +760,17 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		public override bool OnHotKey (KeyEventArgs keyEvent)
-		{
-			// To ncurses simulate a AltMask key pressing Alt+Space because
-			// it can't detect an alone special key down was pressed.
-			if (keyEvent.IsAlt && keyEvent.Key == Key.AltMask) {
-				OnKeyDown (keyEvent);
-				return true;
-			}
+		//public override bool OnHotKey (KeyEventArgs keyEvent)
+		//{
+		//	// To ncurses simulate a AltMask key pressing Alt+Space because
+		//	// it can't detect an alone special key down was pressed.
+		//	if (keyEvent.IsAlt && keyEvent.Key == Key.AltMask) {
+		//		OnKeyDown (keyEvent);
+		//		return true;
+		//	}
 
-			return false;
-		}
+		//	return false;
+		//}
 
 		public override bool OnKeyPressed (KeyEventArgs a)
 		{
@@ -1189,47 +1189,16 @@ namespace Terminal.Gui {
 			}
 		}
 
-		bool SelectItem (KeyEventArgs keyEvent = null)
+		bool SelectItem ()
 		{
-			if (keyEvent == null || keyEvent.IsAlt || keyEvent.Key == Key.AltMask || (keyEvent.IsCtrl && keyEvent.Key == (Key.CtrlMask | Key.Space))) {
-				// User pressed Alt - this may be a precursor to a menu accelerator (e.g. Alt-F)
-				if (keyEvent == null || _openedByAltKey && !IsMenuOpen && _openMenu == null && (((uint)keyEvent.Key & (uint)Key.CharMask) == 0
-											|| ((uint)keyEvent.Key & (uint)Key.CharMask) == (uint)Key.Space)) {
-					// There's no open menu, the first menu item should be highlight.
-					// The right way to do this is to SetFocus(MenuBar), but for some reason
-					// that faults.
-
-					var mbar = GetMouseGrabViewInstance (this);
-					if (mbar != null) {
-						mbar.CleanUp ();
-					}
-
-					Activate (_mbItemToActivate);
-
-					////StartMenu ();
-					//IsMenuOpen = true;
-					//_selected = 0;
-					//CanFocus = true;
-					//_lastFocused = SuperView == null ? Application.Current.MostFocused : SuperView.MostFocused;
-					//SetFocus ();
-					//SetNeedsDisplay ();
-					//Application.GrabMouse (this);
-				} else if (!_openedByHotKey) {
-					// There's an open menu. If this Alt key-up is a pre-cursor to an accelerator
-					// we don't want to close the menu because it'll flash.
-					// How to deal with that?
-
-					CleanUp ();
-				}
-
-				return true;
-			}
-			return false;
+			Activate (_mbItemToActivate);
+			_openedByHotKey = true;
+			return true;
 		}
 
 		bool _initialCanFocus;
 
-		private void MenuBar_Added (object sender, SuperViewChangedEventArgs e)
+		void MenuBar_Added (object sender, SuperViewChangedEventArgs e)
 		{
 			_initialCanFocus = CanFocus;
 			Added -= MenuBar_Added;
