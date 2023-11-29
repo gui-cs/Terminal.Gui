@@ -409,7 +409,11 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal ("(0,0,28,2)", label.Bounds.ToString ());
 			Assert.False (label.IsInitialized);
 
+			Assert.Equal ("Absolute(1)", label.Height.ToString ());
+			Assert.False (label.IsInitialized);
 			var rs = Application.Begin (Application.Top);
+			Assert.True (label.IsInitialized);
+			Assert.Equal ("Absolute(1)", label.Height.ToString ());
 
 			Assert.True (label.AutoSize);
 			Assert.Equal ("(0,0,28,2)", label.Bounds.ToString ());
@@ -419,10 +423,8 @@ namespace Terminal.Gui.ViewTests {
 			Application.Refresh ();
 
 			Assert.False (label.AutoSize);
-			// Height is 2 because it has that value when auto size was set to false
-			Assert.Equal ("(0,0,28,2)", label.Bounds.ToString ());
-
-			label.Height = 1;
+			// Height is 1 because Dim Height=1
+			Assert.Equal ("Absolute(1)", label.Height.ToString ());
 			Assert.Equal ("(0,0,28,1)", label.Bounds.ToString ());
 			Application.End (rs);
 		}
@@ -460,8 +462,10 @@ namespace Terminal.Gui.ViewTests {
 
 			// Here the SetMinWidthHeight ensuring the minimum height
 			Assert.False (label.AutoSize);
-			// Height is 2 because it has that value when auto size was set to false
-			Assert.Equal ("(0,0,28,2)", label.Bounds.ToString ());
+			// Height is 1 because Dim Height=1
+			Assert.Equal ("Absolute(1)", label.Height.ToString ());
+			Assert.Equal ("(0,0,28,1)", label.Bounds.ToString ());
+			Assert.True (label.IsInitialized);
 
 			// Set height to 0 to test the SetMinWidthHeight
 			label.Height = 0;
@@ -592,6 +596,7 @@ Y
 
 			Assert.True (lbl.AutoSize);
 			Assert.Equal ("123 ", GetContents ());
+			Assert.Equal (LayoutStyle.Computed, lbl.LayoutStyle);
 
 			lbl.Text = "12";
 			// Here the AutoSize ensuring the right size with width 3 (Dim.Absolute)
