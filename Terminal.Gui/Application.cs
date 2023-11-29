@@ -1401,16 +1401,7 @@ public static partial class Application {
 			return true;
 		}
 
-		var chain = _topLevels.ToList ();
-		//foreach (var topLevel in chain) {
-		//	if (topLevel.OnHotKey (a)) {
-		//		return true;
-		//	}
-		//	if (topLevel.Modal)
-		//		break;
-		//}
-
-		foreach (var topLevel in chain) {
+		foreach (var topLevel in _topLevels.ToList ()) {
 			if (topLevel.ProcessKeyPressed (a)) {
 				return true;
 			}
@@ -1440,8 +1431,8 @@ public static partial class Application {
 		if (a.Handled) {
 			return true;
 		}
-		var chain = _topLevels.ToList ();
-		foreach (var topLevel in chain) {
+
+		foreach (var topLevel in _topLevels.ToList ()) {
 			if (topLevel.OnKeyDown (a)) {
 				return true;
 			}
@@ -1471,8 +1462,7 @@ public static partial class Application {
 		if (a.Handled) {
 			return true;
 		}
-		var chain = _topLevels.ToList ();
-		foreach (var topLevel in chain) {
+		foreach (var topLevel in _topLevels.ToList ()) {
 			if (topLevel.OnKeyUp (a)) {
 				return true;
 			}
