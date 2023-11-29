@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 
 namespace Terminal.Gui {
 	#region API Docs
@@ -145,7 +142,7 @@ namespace Terminal.Gui {
 		///   Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically control the size and location of the view.
 		/// </para>
 		/// </remarks>
-		public View () : this (text: string.Empty, direction: TextDirection.LeftRight_TopBottom) { }
+		public View () : this (text: string.Empty, direction: (TextDirection)(-1)) { }
 
 		/// <summary>
 		///   Initializes a new instance of <see cref="View"/> using <see cref="Terminal.Gui.LayoutStyle.Absolute"/> layout.
@@ -182,7 +179,7 @@ namespace Terminal.Gui {
 		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
 		public View (Rect rect, string text)
 		{
-			SetInitialProperties (text, rect, LayoutStyle.Absolute, TextDirection.LeftRight_TopBottom);
+			SetInitialProperties (text, rect, LayoutStyle.Absolute, (TextDirection)(-1));
 		}
 
 		/// <summary>
@@ -200,7 +197,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
 		/// <param name="direction">The text direction.</param>
-		public View (string text, TextDirection direction = TextDirection.LeftRight_TopBottom)
+		public View (string text, TextDirection direction = (TextDirection)(-1))
 		{
 			SetInitialProperties (text, Rect.Empty, LayoutStyle.Computed, direction);
 		}
@@ -214,22 +211,29 @@ namespace Terminal.Gui {
 		/// <param name="layoutStyle"></param>
 		/// <param name="direction"></param>
 		void SetInitialProperties (string text, Rect rect, LayoutStyle layoutStyle = LayoutStyle.Computed,
-		    TextDirection direction = TextDirection.LeftRight_TopBottom)
+		    TextDirection direction = (TextDirection)(-1))
 		{
 			TextFormatter = new TextFormatter ();
 			TextFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
-			TextDirection = direction;
 
 			_shortcutHelper = new ShortcutHelper ();
 			CanFocus = false;
 			TabIndex = -1;
 			TabStop = false;
 			LayoutStyle = layoutStyle;
-
+			if (direction != (TextDirection)(-1)) {
+				TextDirection = direction;
+			}
 			Text = text == null ? string.Empty : text;
-			LayoutStyle = layoutStyle;
-			Frame = rect.IsEmpty ? TextFormatter.CalcRect (0, 0, text, direction) : rect;
-			OnResizeNeeded ();
+
+			if (!rect.IsEmpty) {
+				Frame = rect;
+			} else if (direction != (TextDirection)(-1) && !string.IsNullOrEmpty (text)) {
+				Frame = rect.IsEmpty ? TextFormatter.CalcRect (0, 0, text, direction) : rect;
+			} else {
+				// Ensures that the overridden Frame are called
+				Frame = rect;
+			}
 
 			CreateFrames ();
 

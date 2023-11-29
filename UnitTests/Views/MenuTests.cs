@@ -614,20 +614,25 @@ Edit
 		}
 
 		[Fact, AutoInitShutdown]
-		public void DrawFrame_With_Negative_Positions ()
+		public void DrawFrame_With_Negative_Positions_LayoutStyle_Absolute ()
 		{
-			var menu = new MenuBar (new MenuBarItem [] {
-		new MenuBarItem (new MenuItem [] {
-		    new MenuItem ("One", "", null),
-		    new MenuItem ("Two", "", null)
-		})
-	    }) {
-				X = -1,
-				Y = -1
-			};
+			var menu = new MenuBar ([
+				new MenuBarItem ([
+				    new MenuItem ("One", "", null),
+					new MenuItem ("Two", "", null)
+				])
+			]);
 
-			Assert.Equal (new Point (-1, -1), new Point (menu.Frame.X, menu.Frame.Y));
+			Assert.Equal (LayoutStyle.Computed, menu.LayoutStyle);
+			Assert.Equal (Point.Empty, new Point (menu.Frame.X, menu.Frame.Y));
+			Assert.Equal (new Rect (0, 0, 0, 1), menu.Frame);
 
+			menu.LayoutStyle = LayoutStyle.Absolute;
+			Assert.Equal (LayoutStyle.Absolute, menu.LayoutStyle);
+			Assert.Equal (Point.Empty, new Point (menu.Frame.X, menu.Frame.Y));
+			Assert.Equal (Rect.Empty, menu.Frame);
+
+			menu.Frame = new Rect (-1, -1, menu.Frame.Width, menu.Frame.Height);
 			menu.OpenMenu ();
 			Application.Begin (Application.Top);
 
@@ -657,6 +662,84 @@ Edit
 
 			menu.CloseAllMenus ();
 			menu.Frame = new Rect (0, 0, menu.Frame.Width, menu.Frame.Height);
+			((FakeDriver)Application.Driver).SetBufferSize (7, 5);
+			menu.OpenMenu ();
+			Application.Refresh ();
+
+			expected = @"
+┌──────
+│ One  
+│ Two  
+└──────
+";
+
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 1, 7, 4), pos);
+
+			menu.CloseAllMenus ();
+			menu.Frame = new Rect (0, 0, menu.Frame.Width, menu.Frame.Height);
+			((FakeDriver)Application.Driver).SetBufferSize (7, 3);
+			menu.OpenMenu ();
+			Application.Refresh ();
+
+			expected = @"
+┌──────
+│ One  
+│ Two  
+";
+
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 7, 3), pos);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void DrawFrame_With_Negative_Positions_LayoutStyle_Computed ()
+		{
+			var menu = new MenuBar ([
+				new MenuBarItem ([
+				    new MenuItem ("One", "", null),
+					new MenuItem ("Two", "", null)
+				])
+			]) {
+				X = -1,
+				Y = -1
+			};
+
+			Assert.Equal (LayoutStyle.Computed, menu.LayoutStyle);
+			Assert.Equal (new Point (-1, -1), new Point (menu.Frame.X, menu.Frame.Y));
+			Assert.Equal (new Rect (-1, -1, 0, 1), menu.Frame);
+
+			menu.OpenMenu ();
+			Application.Begin (Application.Top);
+
+			var expected = @"
+──────┐
+ One  │
+ Two  │
+──────┘
+";
+
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 7, 4), pos);
+
+			menu.CloseAllMenus ();
+			menu.X = -1;
+			menu.Y = -2;
+			menu.OpenMenu ();
+			Application.Refresh ();
+
+			expected = @"
+ One  │
+ Two  │
+──────┘
+";
+
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (1, 0, 7, 3), pos);
+
+			menu.CloseAllMenus ();
+			menu.X = 0;
+			menu.Y = 0;
 			((FakeDriver)Application.Driver).SetBufferSize (7, 5);
 			menu.OpenMenu ();
 			Application.Refresh ();
@@ -2157,17 +2240,18 @@ Edit
 		[Fact, AutoInitShutdown]
 		public void DrawFrame_With_Negative_Positions_Disabled_Border ()
 		{
-			var menu = new MenuBar (new MenuBarItem [] {
-		new MenuBarItem (new MenuItem [] {
-		    new MenuItem ("One", "", null),
-		    new MenuItem ("Two", "", null)
-		})
-	    }) {
+			var menu = new MenuBar ([
+				new MenuBarItem ([
+					new MenuItem ("One", "", null),
+					new MenuItem ("Two", "", null)
+				])
+				]) {
 				X = -2,
 				Y = -1,
 				MenusBorderStyle = LineStyle.None
 			};
 
+			Assert.Equal (LayoutStyle.Computed, menu.LayoutStyle);
 			Assert.Equal (new Point (-2, -1), new Point (menu.Frame.X, menu.Frame.Y));
 
 			menu.OpenMenu ();
@@ -2181,10 +2265,11 @@ wo
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
 			menu.CloseAllMenus ();
-			menu.Frame = new Rect (-2, -2, menu.Frame.Width, menu.Frame.Height);
+			menu.X = -2;
+			menu.Y = -2;
 			menu.OpenMenu ();
 			Application.Refresh ();
-
+			Assert.Equal (new Rect (-2, -2, menu.Frame.Width, menu.Frame.Height), menu.Frame);
 			expected = @"
 wo
 ";
@@ -2192,8 +2277,10 @@ wo
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
 			menu.CloseAllMenus ();
-			menu.Frame = new Rect (0, 0, menu.Frame.Width, menu.Frame.Height);
+			menu.X = 0;
+			menu.Y = 0;
 			((FakeDriver)Application.Driver).SetBufferSize (3, 2);
+			Assert.Equal (new Rect (0, 0, menu.Frame.Width, menu.Frame.Height), menu.Frame);
 			menu.OpenMenu ();
 			Application.Refresh ();
 
@@ -2205,8 +2292,8 @@ wo
 			_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
 			menu.CloseAllMenus ();
-			menu.Frame = new Rect (0, 0, menu.Frame.Width, menu.Frame.Height);
 			((FakeDriver)Application.Driver).SetBufferSize (3, 1);
+			Assert.Equal (new Rect (0, 0, menu.Frame.Width, menu.Frame.Height), menu.Frame);
 			menu.OpenMenu ();
 			Application.Refresh ();
 

@@ -902,44 +902,71 @@ namespace Terminal.Gui.DialogTests {
 			Application.Run (win);
 		}
 
-		//		[Theory, AutoInitShutdown]
-		//		[InlineData (5)]
-		//		//[InlineData (6)]
-		//		//[InlineData (7)]
-		//		//[InlineData (8)]
-		//		//[InlineData (9)]
-		//		public void Dialog_In_Window_Without_Size_One_Button_Aligns (int height)
-		//		{
-		//			((FakeDriver)Application.Driver).SetBufferSize (20, height);
-		//			var win = new Window ();
+		[Theory, AutoInitShutdown]
+		[InlineData (5, @"
+┌┌───────────────┐─┐
+││               │ │
+││     ⟦ Ok ⟧    │ │
+│└───────────────┘ │
+└──────────────────┘")]
+		[InlineData (6, @"
+┌┌───────────────┐─┐
+││               │ │
+││               │ │
+││     ⟦ Ok ⟧    │ │
+│└───────────────┘ │
+└──────────────────┘")]
+		[InlineData (7, @"
+┌──────────────────┐
+│┌───────────────┐ │
+││               │ │
+││               │ │
+││     ⟦ Ok ⟧    │ │
+│└───────────────┘ │
+└──────────────────┘")]
+		[InlineData (8, @"
+┌──────────────────┐
+│┌───────────────┐ │
+││               │ │
+││               │ │
+││               │ │
+││     ⟦ Ok ⟧    │ │
+│└───────────────┘ │
+└──────────────────┘")]
+		[InlineData (9, @"
+┌──────────────────┐
+│┌───────────────┐ │
+││               │ │
+││               │ │
+││               │ │
+││               │ │
+││     ⟦ Ok ⟧    │ │
+│└───────────────┘ │
+└──────────────────┘")]
+		public void Dialog_In_Window_Without_Size_One_Button_Aligns (int height, string expected)
+		{
+			((FakeDriver)Application.Driver).SetBufferSize (20, height);
+			var win = new Window ();
 
-		//			Application.Iteration += (s, a) => {
-		//				var dlg = new Dialog ("Test", new Button ("Ok"));
+			var iterations = -1;
+			Application.Iteration += (s, a) => {
+				iterations++;
+				if (iterations == 0) {
+					var dlg = new Dialog (new Button ("Ok"));
+					Application.Run (dlg);
+				} else if (iterations == 1) {
+					// BUGBUG: This seems wrong; is it a bug in Dim.Percent(85)?? No
+					_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+				} else {
+					Application.RequestStop ();
+				}
+			};
 
-		//				dlg.LayoutComplete += (s, a) => {
-		//					Application.Refresh ();
-		//					// BUGBUG: This seems wrong; is it a bug in Dim.Percent(85)??
-		//					var expected = @"
-		//┌┌┤Test├─────────┐─┐
-		//││               │ │
-		//││     [ Ok ]    │ │
-		//│└───────────────┘ │
-		//└──────────────────┘";
-		//					_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-
-		//					dlg.RequestStop ();
-		//					win.RequestStop ();
-		//				};
-
-		//				Application.Run (dlg);
-		//			};
-
-		//			Application.Run (win);
-		//			Application.Shutdown ();
-		//		}
+			Application.Run (win);
+		}
 
 		[Fact, AutoInitShutdown]
-		public void Dialog_In_Window_With_TexxtField_And_Button_AnchorEnd ()
+		public void Dialog_In_Window_With_TextField_And_Button_AnchorEnd ()
 		{
 			((FakeDriver)Application.Driver).SetBufferSize (20, 5);
 

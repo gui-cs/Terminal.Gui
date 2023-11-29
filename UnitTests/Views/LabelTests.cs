@@ -330,26 +330,26 @@ Test
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
 
-		//[Fact, AutoInitShutdown]
-		//public void Label_HotKeyChanged_EventFires ()
-		//{
-		//	var label = new Label ("Yar");
+		[Fact, AutoInitShutdown]
+		public void Label_HotKeyChanged_EventFires ()
+		{
+			var label = new Label ("Yar");
+			label.HotKey = (Key)'Y';
 
-		//	object sender = null;
-		//	KeyChangedEventArgs args = null;
+			object sender = null;
+			KeyChangedEventArgs args = null;
 
-		//	label.HotKeyChanged += (s, e) =>{
-		//		sender = s;
-		//		args = e;
+			label.HotKeyChanged += (s, e) => {
+				sender = s;
+				args = e;
 
-		//	};
+			};
 
-		//	label.HotKey = Key.r;
-		//	Assert.Same (label, sender);
-		//	Assert.Equal (Key.Y, args.OldKey);
-		//	Assert.Equal (Key.r, args.NewKey);
-
-		//}
+			label.HotKey = Key.r;
+			Assert.Same (label, sender);
+			Assert.Equal (Key.Y, args.OldKey);
+			Assert.Equal (Key.r, args.NewKey);
+		}
 
 		[Fact, AutoInitShutdown]
 		public void Label_HotKeyChanged_EventFires_WithNone ()
@@ -913,11 +913,11 @@ e
 		{
 			var view = new View ("This view needs to be cleared before rewritten.");
 
-			var tf1 = new TextFormatter ();
+			var tf1 = new TextFormatter () { Direction = TextDirection.LeftRight_TopBottom };
 			tf1.Text = "This TextFormatter (tf1) without fill will not be cleared on rewritten.";
 			var tf1Size = tf1.Size;
 
-			var tf2 = new TextFormatter ();
+			var tf2 = new TextFormatter () { Direction = TextDirection.LeftRight_TopBottom };
 			tf2.Text = "This TextFormatter (tf2) with fill will be cleared on rewritten.";
 			var tf2Size = tf2.Size;
 

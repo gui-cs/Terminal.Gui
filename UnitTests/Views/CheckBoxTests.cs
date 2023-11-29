@@ -122,53 +122,51 @@ namespace Terminal.Gui.ViewsTests {
 			checkBox.Checked = true;
 			Assert.Equal ($"{CM.Glyphs.Checked} Check this out 你", checkBox.TextFormatter.Text);
 
-			//checkBox.AutoSize = false;
+			checkBox.AutoSize = false;
 			// It isn't auto-size so the height is guaranteed by the SetMinWidthHeight
-			//checkBox.Text = "Check this out 你 changed";
-			//Application.RunMainLoopIteration (ref runstate, ref first);
+			checkBox.Text = "Check this out 你 changed";
+			var firstIteration = false;
+			Application.RunIteration (ref runstate, ref firstIteration);
 			// BUGBUG - v2 - Autosize is busted; disabling tests for now
-//			Assert.Equal (new Rect (1, 1, 19, 1), checkBox.Frame);
-//			expected = @"
-//┌┤Test Demo 你├──────────────┐
-//│                            │
-//│ √ Check this out 你        │
-//│                            │
-//└────────────────────────────┘
-//";
+			Assert.Equal (new Rect (1, 1, 19, 1), checkBox.Frame);
+			var expected = @"
+┌┤Test Demo 你├──────────────┐
+│                            │
+│ ☑ Check this out 你        │
+│                            │
+└────────────────────────────┘";
 
-//			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-//			Assert.Equal (new Rect (0, 0, 30, 5), pos);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 
-//			checkBox.Width = 19;
-//			// It isn't auto-size so the height is guaranteed by the SetMinWidthHeight
-//			checkBox.Text = "Check this out 你 changed";
-//			Application.RunMainLoopIteration (ref runstate, ref first);
-//			Assert.False (checkBox.AutoSize);
-//			Assert.Equal (new Rect (1, 1, 19, 1), checkBox.Frame);
-//			expected = @"
-//┌┤Test Demo 你├──────────────┐
-//│                            │
-//│ √ Check this out 你        │
-//│                            │
-//└────────────────────────────┘
-//";
+			checkBox.Width = 19;
+			// It isn't auto-size so the height is guaranteed by the SetMinWidthHeight
+			checkBox.Text = "Check this out 你 changed";
+			Application.RunIteration (ref runstate, ref firstIteration);
+			Assert.False (checkBox.AutoSize);
+			Assert.Equal (new Rect (1, 1, 19, 1), checkBox.Frame);
+			expected = @"
+┌┤Test Demo 你├──────────────┐
+│                            │
+│ ☑ Check this out 你        │
+│                            │
+└────────────────────────────┘";
 
-//			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-//			Assert.Equal (new Rect (0, 0, 30, 5), pos);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 
-//			checkBox.AutoSize = true;
-//			Application.RunMainLoopIteration (ref runstate, ref first);
-//			Assert.Equal (new Rect (1, 1, 27, 1), checkBox.Frame);
-//			expected = @"
-//┌┤Test Demo 你├──────────────┐
-//│                            │
-//│ √ Check this out 你 changed│
-//│                            │
-//└────────────────────────────┘
-//";
+			checkBox.AutoSize = true;
+			Application.RunIteration (ref runstate, ref firstIteration);
+			Assert.Equal (new Rect (1, 1, 27, 1), checkBox.Frame);
+			expected = @"
+┌┤Test Demo 你├──────────────┐
+│                            │
+│ ☑ Check this out 你 changed│
+│                            │
+└────────────────────────────┘";
 
-//			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-//			Assert.Equal (new Rect (0, 0, 30, 5), pos);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 		}
 
 		[Fact, AutoInitShutdown]

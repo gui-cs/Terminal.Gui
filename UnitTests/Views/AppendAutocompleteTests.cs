@@ -120,7 +120,7 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal ("f", tf.Text);
 
 			// When cancelling autocomplete
-			Application.Driver.SendKeys ('e', ConsoleKey.Escape, false, false, false);
+			Application.Driver.SendKeys ('\0', ConsoleKey.Escape, false, false, false);
 
 			// Suggestion should disapear
 			tf.Draw ();
@@ -131,7 +131,8 @@ namespace Terminal.Gui.TextTests {
 			Application.Driver.SendKeys ('i', ConsoleKey.I, false, false, false);
 			tf.Draw ();
 			// BUGBUG: v2 - I broke this test and don't have time to figure out why. @tznind - help!
-			//TestHelpers.AssertDriverContentsAre ("fish", output);
+			tf.PositionCursor ();
+			TestHelpers.AssertDriverContentsAre ("fish", output);
 			Assert.Equal ("fi", tf.Text);
 		}
 

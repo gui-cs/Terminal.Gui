@@ -40,9 +40,12 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (r.WantMousePositionReports);
 			Assert.Null (r.SuperView);
 			Assert.Null (r.MostFocused);
+			Assert.Equal ((TextDirection)(-1), r.TextDirection);
+			r.BeginInit ();
+			r.EndInit ();
 			Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
 			r.Dispose ();
-			
+
 			// Empty Rect
 			r = new View (Rect.Empty);
 			Assert.NotNull (r);
@@ -65,6 +68,9 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (r.WantMousePositionReports);
 			Assert.Null (r.SuperView);
 			Assert.Null (r.MostFocused);
+			Assert.Equal ((TextDirection)(-1), r.TextDirection);
+			r.BeginInit ();
+			r.EndInit ();
 			Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
 			r.Dispose ();
 
@@ -90,6 +96,9 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (r.WantMousePositionReports);
 			Assert.Null (r.SuperView);
 			Assert.Null (r.MostFocused);
+			Assert.Equal ((TextDirection)(-1), r.TextDirection);
+			r.BeginInit ();
+			r.EndInit ();
 			Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
 			r.Dispose ();
 
@@ -117,7 +126,6 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Null (r.MostFocused);
 			Assert.Equal (TextDirection.TopBottom_LeftRight, r.TextDirection);
 			r.Dispose ();
-		
 		}
 
 		[Fact, TestRespondersDisposed]
@@ -186,7 +194,7 @@ namespace Terminal.Gui.ViewTests {
 #if DEBUG_IDISPOSABLE
 			Assert.Empty (Responder.Instances);
 #endif
-			
+
 			// Default Constructor
 			view = new View ();
 			Assert.Null (view.X);
@@ -492,16 +500,21 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (View.Direction.Backward, view.FocusDirection);
 			Assert.Empty (view.InternalSubviews);
 			// BUGBUG: v2 - _needsDisplay needs debugging - test disabled for now.
-			//Assert.Equal (new Rect (new Point (0, 0), rect.Size), view._needsDisplay);
+			Assert.False (view.IsInitialized);
+			Assert.Equal (Rect.Empty, view._needsDisplayRect);
+			view.BeginInit ();
+			view.EndInit ();
+			Assert.True (view.IsInitialized);
+			Assert.Equal (new Rect (new Point (0, 0), rect.Size), view._needsDisplayRect);
 			Assert.True (view.LayoutNeeded);
 			Assert.False (view.SubViewNeedsDisplay);
 			Assert.False (view._addingView);
 			view._addingView = true;
 			Assert.True (view._addingView);
-			view.ViewToScreen (0, 0, out int rcol, out int rrow);
+			view.BoundsToScreen (0, 0, out int rcol, out int rrow);
 			Assert.Equal (1, rcol);
 			Assert.Equal (1, rrow);
-			Assert.Equal (rect, view.ViewToScreen (view.Bounds));
+			Assert.Equal (rect, view.BoundsToScreen (view.Bounds));
 			Assert.Equal (top.Bounds, view.ScreenClip (top.Bounds));
 			Assert.True (view.LayoutStyle == LayoutStyle.Absolute);
 
@@ -546,10 +559,10 @@ namespace Terminal.Gui.ViewTests {
 			view.Y = Pos.Center () - 13;
 			view.SetRelativeLayout (top.Bounds);
 			top.LayoutSubviews (); // BUGBUG: v2 - ??
-			view.ViewToScreen (0, 0, out rcol, out rrow);
+			view.BoundsToScreen (0, 0, out rcol, out rrow);
 			Assert.Equal (-41, rcol);
 			Assert.Equal (-13, rrow);
-			
+
 			Application.End (runState);
 		}
 
@@ -776,16 +789,16 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (horizontalView.AutoSize);
 			Assert.Equal (new Rect (0, 0, 12, 1), horizontalView.Frame);
 			Assert.Equal (new Size (12, 1), horizontalView.GetSizeNeededForTextWithoutHotKey ());
-			//Assert.Equal (new Size (12, 1), horizontalView.GetSizeNeededForTextAndHotKey ());
-			//Assert.Equal (horizontalView.TextFormatter.Size, horizontalView.GetSizeNeededForTextAndHotKey ());
+			Assert.Equal (new Size (12, 1), horizontalView.GetTextFormatterSizeNeededForTextAndHotKey ());
+			Assert.Equal (horizontalView.TextFormatter.Size, horizontalView.GetTextFormatterSizeNeededForTextAndHotKey ());
 			Assert.Equal (horizontalView.Frame.Size, horizontalView.GetSizeNeededForTextWithoutHotKey ());
 
 			Assert.True (verticalView.AutoSize);
 			// BUGBUG: v2 - Autosize is broken; disabling this test
-			//Assert.Equal (new Rect (0, 0, 2, 11), verticalView.Frame);
-			//Assert.Equal (new Size (2, 11), verticalView.GetSizeNeededForTextWithoutHotKey ());
-			//Assert.Equal (new Size (2, 11), verticalView.GetSizeNeededForTextAndHotKey ());
-			//Assert.Equal (verticalView.TextFormatter.Size, verticalView.GetSizeNeededForTextAndHotKey ());
+			Assert.Equal (new Rect (0, 0, 2, 11), verticalView.Frame);
+			Assert.Equal (new Size (2, 11), verticalView.GetSizeNeededForTextWithoutHotKey ());
+			Assert.Equal (new Size (2, 11), verticalView.GetTextFormatterSizeNeededForTextAndHotKey ());
+			Assert.Equal (verticalView.TextFormatter.Size, verticalView.GetTextFormatterSizeNeededForTextAndHotKey ());
 			Assert.Equal (verticalView.Frame.Size, verticalView.GetSizeNeededForTextWithoutHotKey ());
 
 			text = "Say He_llo 你";
@@ -795,17 +808,17 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (horizontalView.AutoSize);
 			Assert.Equal (new Rect (0, 0, 12, 1), horizontalView.Frame);
 			Assert.Equal (new Size (12, 1), horizontalView.GetSizeNeededForTextWithoutHotKey ());
-			//Assert.Equal (new Size (13, 1), horizontalView.GetSizeNeededForTextAndHotKey ());
-			//Assert.Equal (horizontalView.TextFormatter.Size, horizontalView.GetSizeNeededForTextAndHotKey ());
+			Assert.Equal (new Size (13, 1), horizontalView.GetTextFormatterSizeNeededForTextAndHotKey ());
+			Assert.Equal (horizontalView.TextFormatter.Size, horizontalView.GetTextFormatterSizeNeededForTextAndHotKey ());
 			Assert.Equal (horizontalView.Frame.Size, horizontalView.GetSizeNeededForTextWithoutHotKey ());
 
 			Assert.True (verticalView.AutoSize);
 			// BUGBUG: v2 - Autosize is broken; disabling this test
-			//Assert.Equal (new Rect (0, 0, 2, 11), verticalView.Frame);
-			//Assert.Equal (new Size (2, 11), verticalView.GetSizeNeededForTextWithoutHotKey ());
-			//Assert.Equal (new Size (2, 12), verticalView.GetSizeNeededForTextAndHotKey ());
-			//Assert.Equal (verticalView.TextFormatter.Size, verticalView.GetSizeNeededForTextAndHotKey ());
-			//Assert.Equal (verticalView.Frame.Size, verticalView.GetSizeNeededForTextWithoutHotKey ());
+			Assert.Equal (new Rect (0, 0, 2, 11), verticalView.Frame);
+			Assert.Equal (new Size (2, 11), verticalView.GetSizeNeededForTextWithoutHotKey ());
+			Assert.Equal (new Size (2, 12), verticalView.GetTextFormatterSizeNeededForTextAndHotKey ());
+			Assert.Equal (verticalView.TextFormatter.Size, verticalView.GetTextFormatterSizeNeededForTextAndHotKey ());
+			Assert.Equal (verticalView.Frame.Size, verticalView.GetSizeNeededForTextWithoutHotKey ());
 		}
 
 		[Fact, TestRespondersDisposed]
@@ -818,7 +831,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (view.IsAdded);
 			top.Remove (view);
 			Assert.False (view.IsAdded);
-			
+
 			top.Dispose ();
 			view.Dispose ();
 		}
@@ -995,7 +1008,7 @@ cccccccccccccccccccc", output);
 			public override void OnDrawContent (Rect contentArea)
 			{
 				var idx = 0;
-				// BUGBUG: v2 - this should use Boudns, not Frame
+				// BUGBUG: v2 - this should use Bounds, not Frame
 				for (int r = 0; r < Frame.Height; r++) {
 					for (int c = 0; c < Frame.Width; c++) {
 						if (idx < Text.Length) {
@@ -1423,7 +1436,131 @@ At 0,0
 			Assert.Null (view.Margin);
 			Assert.Null (view.Border);
 			Assert.Null (view.Padding);
+		}
 
+		[Theory, AutoInitShutdown]
+		[InlineData (true)]
+		[InlineData (false)]
+		public void View_Draw_Horizontal_Simple_TextAlignments (bool autoSize)
+		{
+			var text = "Hello World";
+			var width = 20;
+			var lblLeft = new View (text) { Width = width, AutoSize = autoSize };
+			var lblCenter = new View (text) { Y = 1, Width = width, TextAlignment = TextAlignment.Centered, AutoSize = autoSize };
+			var lblRight = new View (text) { Y = 2, Width = width, TextAlignment = TextAlignment.Right, AutoSize = autoSize };
+			var lblJust = new View (text) { Y = 3, Width = width, TextAlignment = TextAlignment.Justified, AutoSize = autoSize };
+			var frame = new FrameView () { Width = Dim.Fill (), Height = Dim.Fill () };
+			frame.Add (lblLeft, lblCenter, lblRight, lblJust);
+			Application.Top.Add (frame);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (width + 2, 6);
+
+			Assert.True (lblLeft.AutoSize == autoSize);
+			Assert.True (lblCenter.AutoSize == autoSize);
+			Assert.True (lblRight.AutoSize == autoSize);
+			Assert.True (lblJust.AutoSize == autoSize);
+			Assert.True (lblLeft.TextFormatter.AutoSize == autoSize);
+			Assert.True (lblCenter.TextFormatter.AutoSize == autoSize);
+			Assert.True (lblRight.TextFormatter.AutoSize == autoSize);
+			Assert.True (lblJust.TextFormatter.AutoSize == autoSize);
+			Assert.Equal (new Rect (0, 0, width, 1), lblLeft.Frame);
+			Assert.Equal (new Rect (0, 1, width, 1), lblCenter.Frame);
+			Assert.Equal (new Rect (0, 2, width, 1), lblRight.Frame);
+			Assert.Equal (new Rect (0, 3, width, 1), lblJust.Frame);
+			if (autoSize) {
+				Assert.Equal (new Size (11, 1), lblLeft.TextFormatter.Size);
+				Assert.Equal (new Size (11, 1), lblCenter.TextFormatter.Size);
+				Assert.Equal (new Size (11, 1), lblRight.TextFormatter.Size);
+			} else {
+				Assert.Equal (new Size (width, 1), lblLeft.TextFormatter.Size);
+				Assert.Equal (new Size (width, 1), lblCenter.TextFormatter.Size);
+				Assert.Equal (new Size (width, 1), lblRight.TextFormatter.Size);
+			}
+			Assert.Equal (new Size (width, 1), lblJust.TextFormatter.Size);
+			Assert.Equal (new Rect (0, 0, width + 2, 6), frame.Frame);
+
+			var expected = @"
+┌────────────────────┐
+│Hello World         │
+│    Hello World     │
+│         Hello World│
+│Hello          World│
+└────────────────────┘
+";
+
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, width + 2, 6), pos);
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (true)]
+		[InlineData (false)]
+		public void View_Draw_Vertical_Simple_TextAlignments (bool autoSize)
+		{
+			var text = "Hello World";
+			var height = 20;
+			var lblLeft = new View (text) { Height = height, TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = autoSize };
+			var lblCenter = new View (text) { X = 2, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = autoSize, VerticalTextAlignment = VerticalTextAlignment.Middle };
+			var lblRight = new View (text) { X = 4, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = autoSize, VerticalTextAlignment = VerticalTextAlignment.Bottom };
+			var lblJust = new View (text) { X = 6, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = autoSize, VerticalTextAlignment = VerticalTextAlignment.Justified };
+			var frame = new FrameView () { Width = Dim.Fill (), Height = Dim.Fill () };
+
+			frame.Add (lblLeft, lblCenter, lblRight, lblJust);
+			Application.Top.Add (frame);
+			Application.Begin (Application.Top);
+			((FakeDriver)Application.Driver).SetBufferSize (9, height + 2);
+
+			Assert.True (lblLeft.AutoSize == autoSize);
+			Assert.True (lblCenter.AutoSize == autoSize);
+			Assert.True (lblRight.AutoSize == autoSize);
+			Assert.True (lblJust.AutoSize == autoSize);
+			Assert.True (lblLeft.TextFormatter.AutoSize == autoSize);
+			Assert.True (lblCenter.TextFormatter.AutoSize == autoSize);
+			Assert.True (lblRight.TextFormatter.AutoSize == autoSize);
+			Assert.True (lblJust.TextFormatter.AutoSize == autoSize);
+			Assert.Equal (new Rect (0, 0, 1, height), lblLeft.Frame);
+			Assert.Equal (new Rect (2, 0, 1, height), lblCenter.Frame);
+			Assert.Equal (new Rect (4, 0, 1, height), lblRight.Frame);
+			Assert.Equal (new Rect (6, 0, 1, height), lblJust.Frame);
+			if (autoSize) {
+				Assert.Equal (new Size (1, 11), lblLeft.TextFormatter.Size);
+				Assert.Equal (new Size (1, 11), lblCenter.TextFormatter.Size);
+				Assert.Equal (new Size (1, 11), lblRight.TextFormatter.Size);
+			} else {
+				Assert.Equal (new Size (1, height), lblLeft.TextFormatter.Size);
+				Assert.Equal (new Size (1, height), lblCenter.TextFormatter.Size);
+				Assert.Equal (new Size (1, height), lblRight.TextFormatter.Size);
+			}
+			Assert.Equal (new Size (1, height), lblJust.TextFormatter.Size);
+			Assert.Equal (new Rect (0, 0, 9, height + 2), frame.Frame);
+
+			var expected = @"
+┌───────┐
+│H     H│
+│e     e│
+│l     l│
+│l     l│
+│o H   o│
+│  e    │
+│W l    │
+│o l    │
+│r o    │
+│l   H  │
+│d W e  │
+│  o l  │
+│  r l  │
+│  l o  │
+│  d    │
+│    W W│
+│    o o│
+│    r r│
+│    l l│
+│    d d│
+└───────┘
+";
+
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 9, height + 2), pos);
 		}
 	}
 }

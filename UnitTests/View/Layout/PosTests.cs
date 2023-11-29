@@ -770,50 +770,50 @@ namespace Terminal.Gui.ViewTests {
 		// DONE: Test PosCombine
 		// DONE: Test operators
 		// BUGBUG: v2 - This test is bogus. v1 and references it's superview's (f) superview (w). 
-		//[Fact]
-		//public void PosCombine_Do_Not_Throws ()
-		//{
-		//	Application.Init (new FakeDriver ());
+		[Fact]
+		public void PosCombine_Refs_SuperView_Throws ()
+		{
+			Application.Init (new FakeDriver ());
 
-		//	var w = new Window () {
-		//		X = Pos.Left (Application.Top) + 2,
-		//		Y = Pos.Top (Application.Top) + 2
-		//	};
-		//	var f = new FrameView ();
-		//	var v1 = new View () {
-		//		X = Pos.Left (w) + 2,
-		//		Y = Pos.Top (w) + 2
-		//	};
-		//	var v2 = new View () {
-		//		X = Pos.Left (v1) + 2,
-		//		Y = Pos.Top (v1) + 2
-		//	};
+			var w = new Window () {
+				X = Pos.Left (Application.Top) + 2,
+				Y = Pos.Top (Application.Top) + 2
+			};
+			var f = new FrameView ();
+			var v1 = new View () {
+				X = Pos.Left (w) + 2,
+				Y = Pos.Top (w) + 2
+			};
+			var v2 = new View () {
+				X = Pos.Left (v1) + 2,
+				Y = Pos.Top (v1) + 2
+			};
 
-		//	f.Add (v1, v2);
-		//	w.Add (f);
-		//	Application.Top.Add (w);
+			f.Add (v1, v2);
+			w.Add (f);
+			Application.Top.Add (w);
 
-		//	f.X = Pos.X (Application.Top) + Pos.X (v2) - Pos.X (v1);
-		//	f.Y = Pos.Y (Application.Top) + Pos.Y (v2) - Pos.Y (v1);
+			f.X = Pos.X (Application.Top) + Pos.X (v2) - Pos.X (v1);
+			f.Y = Pos.Y (Application.Top) + Pos.Y (v2) - Pos.Y (v1);
 
-		//	Application.Top.LayoutComplete += (s, e) => {
-		//		Assert.Equal (0, Application.Top.Frame.X);
-		//		Assert.Equal (0, Application.Top.Frame.Y);
-		//		Assert.Equal (2, w.Frame.X);
-		//		Assert.Equal (2, w.Frame.Y);
-		//		Assert.Equal (2, f.Frame.X);
-		//		Assert.Equal (2, f.Frame.Y);
-		//		Assert.Equal (4, v1.Frame.X);
-		//		Assert.Equal (4, v1.Frame.Y);
-		//		Assert.Equal (6, v2.Frame.X);
-		//		Assert.Equal (6, v2.Frame.Y);
-		//	};
+			Application.Top.LayoutComplete += (s, e) => {
+				Assert.Equal (0, Application.Top.Frame.X);
+				Assert.Equal (0, Application.Top.Frame.Y);
+				Assert.Equal (2, w.Frame.X);
+				Assert.Equal (2, w.Frame.Y);
+				Assert.Equal (2, f.Frame.X);
+				Assert.Equal (2, f.Frame.Y);
+				Assert.Equal (4, v1.Frame.X);
+				Assert.Equal (4, v1.Frame.Y);
+				Assert.Equal (6, v2.Frame.X);
+				Assert.Equal (6, v2.Frame.Y);
+			};
 
-		//	Application.Iteration += (s, a) => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 
-		//	Application.Run ();
-		//	Application.Shutdown ();
-		//}
+			Assert.Throws< InvalidOperationException> (() => Application.Run ());
+			Application.Shutdown ();
+		}
 
 		[Fact, TestRespondersDisposed]
 		public void PosCombine_Will_Throws ()

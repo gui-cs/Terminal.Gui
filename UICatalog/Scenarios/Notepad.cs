@@ -108,7 +108,7 @@ namespace UICatalog.Scenarios {
 				});
 			}
 
-		((View)sender).ViewToScreen (e.MouseEvent.X, e.MouseEvent.Y, out int screenX, out int screenY,true);
+		((View)sender).BoundsToScreen (e.MouseEvent.X, e.MouseEvent.Y, out int screenX, out int screenY,true);
 
 		var contextMenu = new ContextMenu (screenX,screenY, items);
 

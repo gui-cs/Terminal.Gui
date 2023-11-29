@@ -594,6 +594,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (78, w.Frame.Width);
 			Assert.Equal (23, w.Frame.Height);
 			// BUGBUG: v2 - this no longer works - see above
+			// The reason was that wrong coded before and that why t.LayoutSubviews throws
 			//Assert.Equal (6, f.Frame.Width);
 			//Assert.Equal (6, f.Frame.Height);
 			//Assert.Equal (76, v1.Frame.Width);
@@ -1115,13 +1116,13 @@ namespace Terminal.Gui.ViewTests {
 				view.Add (label);
 				Assert.Equal ($"Label {i}", label.Text);
 				// BUGBUG: Bogus test; views have not been initialized yet
-				//Assert.Equal ($"Absolute({i})", label.Y.ToString ());
+				Assert.Equal ($"Absolute({i})", label.Y.ToString ());
 				listLabels.Add (label);
 
 				// BUGBUG: Bogus test; views have not been initialized yet
-				//Assert.Equal ($"Absolute({i})", view.Height.ToString ());
+				Assert.Equal ($"Absolute({i})", view.Height.ToString ());
 				view.Height += 1;
-				//Assert.Equal ($"Absolute({i + 1})", view.Height.ToString ());
+				Assert.Equal ($"Absolute({i + 1})", view.Height.ToString ());
 			}
 
 			field.KeyDown += (s, k) => {
@@ -1168,27 +1169,27 @@ namespace Terminal.Gui.ViewTests {
 
 			for (int i = 0; i < count; i++) {
 				field.Text = $"Label {i}";
-				// BUGBUG: v2 - view has not been initialied yet; view.Bounds is indeterminate
+				// BUGBUG: v2 - view has not been initialized yet; view.Bounds is indeterminate
 				var label = new Label (field.Text) { X = 0, Y = i + 1, Width = 10 };
 				view.Add (label);
 				Assert.Equal ($"Label {i}", label.Text);
 				// BUGBUG: Bogus test; views have not been initialized yet
-				//Assert.Equal ($"Absolute({i + 1})", label.Y.ToString ());
+				Assert.Equal ($"Absolute({i + 1})", label.Y.ToString ());
 				listLabels.Add (label);
 
-				//if (i == 0) {
-				// BUGBUG: Bogus test; views have not been initialized yet
-				//Assert.Equal ($"Absolute({i})", view.Height.ToString ());
-				//view.Height += 2;
-				// BUGBUG: Bogus test; views have not been initialized yet
-				//Assert.Equal ($"Absolute({i + 2})", view.Height.ToString ());
-				//} else {
-				// BUGBUG: Bogus test; views have not been initialized yet
-				//Assert.Equal ($"Absolute({i + 1})", view.Height.ToString ());
-				view.Height += 1;
-				// BUGBUG: Bogus test; views have not been initialized yet
-				//Assert.Equal ($"Absolute({i + 2})", view.Height.ToString ());
-				//}
+				if (i == 0) {
+					// BUGBUG: Bogus test; views have not been initialized yet
+					Assert.Equal ($"Absolute({i + 1})", view.Height.ToString ());
+					view.Height += 1;
+					// BUGBUG: Bogus test; views have not been initialized yet
+					Assert.Equal ($"Absolute({i + 2})", view.Height.ToString ());
+				} else {
+					// BUGBUG: Bogus test; views have not been initialized yet
+					Assert.Equal ($"Absolute({i + 1})", view.Height.ToString ());
+					view.Height += 1;
+					// BUGBUG: Bogus test; views have not been initialized yet
+					Assert.Equal ($"Absolute({i + 2})", view.Height.ToString ());
+				}
 			}
 
 			field.KeyDown += (s, k) => {

@@ -1046,7 +1046,7 @@ namespace Terminal.Gui {
 		string _text = null;
 		TextAlignment _textAlignment;
 		VerticalTextAlignment _textVerticalAlignment;
-		TextDirection _textDirection;
+		TextDirection _textDirection = (TextDirection)(-1);
 		Key _hotKey;
 		int _hotKeyPos = -1;
 		Size _size;
@@ -1069,9 +1069,11 @@ namespace Terminal.Gui {
 			set {
 				var textWasNull = _text == null && value != null;
 				_text = EnableNeedsFormat (value);
-
+				if (Direction == (TextDirection)(-1)) {
+					return;
+				}
 				if ((AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified) || (textWasNull && Size.IsEmpty)) {
-					Size = CalcRect (0, 0, _text, _textDirection, TabWidth).Size;
+					Size = CalcRect (0, 0, _text, Direction, TabWidth).Size;
 				}
 
 				//if (_text != null && _text.GetRuneCount () > 0 && (Size.Width == 0 || Size.Height == 0 || Size.Width != _text.GetColumns ())) {
@@ -1096,7 +1098,7 @@ namespace Terminal.Gui {
 			set {
 				_autoSize = EnableNeedsFormat (value);
 				if (_autoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified) {
-					Size = CalcRect (0, 0, Text, _textDirection, TabWidth).Size;
+					Size = CalcRect (0, 0, Text, Direction, TabWidth).Size;
 				}
 			}
 		}
@@ -1136,7 +1138,13 @@ namespace Terminal.Gui {
 		/// <value>The text vertical alignment.</value>
 		public TextDirection Direction {
 			get => _textDirection;
-			set => _textDirection = EnableNeedsFormat (value);
+			set {
+				var directionWasIndef = _textDirection == (TextDirection)(-1);
+				_textDirection = EnableNeedsFormat (value);
+				if (directionWasIndef || (AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified)) {
+					Size = CalcRect (0, 0, Text, Direction, TabWidth).Size;
+				}
+			}
 		}
 
 		/// <summary>
@@ -1216,8 +1224,8 @@ namespace Terminal.Gui {
 		public Size Size {
 			get => _size;
 			set {
-				if (AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified) {
-					_size = EnableNeedsFormat (CalcRect (0, 0, Text, _textDirection, TabWidth).Size);
+				if (Direction != (TextDirection)(-1) && AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified) {
+					_size = EnableNeedsFormat (CalcRect (0, 0, Text, Direction, TabWidth).Size);
 				} else {
 					_size = EnableNeedsFormat (value);
 				}
@@ -1296,7 +1304,7 @@ namespace Terminal.Gui {
 						shown_text = ReplaceHotKeyWithTag (shown_text, _hotKeyPos);
 					}
 
-					if (IsVerticalDirection (_textDirection)) {
+					if (IsVerticalDirection (Direction)) {
 						var colsWidth = GetSumMaxCharWidth (shown_text, 0, 1, TabWidth);
 						_lines = Format (shown_text, Size.Height, VerticalAlignment == VerticalTextAlignment.Justified, Size.Width > colsWidth && WordWrap,
 							PreserveTrailingSpaces, TabWidth, Direction, MultiLine);
@@ -1388,6 +1396,10 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			if (Direction == (TextDirection)(-1)) {
+				Direction = TextDirection.LeftRight_TopBottom;
+			}
+
 			if (driver == null) {
 				driver = Application.Driver;
 			}
@@ -1405,7 +1417,7 @@ namespace Terminal.Gui {
 				break;
 			}
 
-			var isVertical = IsVerticalDirection (_textDirection);
+			var isVertical = IsVerticalDirection (Direction);
 			var maxBounds = bounds;
 			if (driver != null) {
 				maxBounds = containerBounds == default
@@ -1450,7 +1462,7 @@ namespace Terminal.Gui {
 
 				int x, y;
 				// Horizontal Alignment
-				if (_textAlignment == TextAlignment.Right || (_textAlignment == TextAlignment.Justified && !IsLeftToRight (_textDirection))) {
+				if (_textAlignment == TextAlignment.Right || (_textAlignment == TextAlignment.Justified && !IsLeftToRight (Direction))) {
 					if (isVertical) {
 						var runesWidth = GetSumMaxCharWidth (Lines, line, TabWidth);
 						x = bounds.Right - runesWidth;
@@ -1483,7 +1495,7 @@ namespace Terminal.Gui {
 				}
 
 				// Vertical Alignment
-				if (_textVerticalAlignment == VerticalTextAlignment.Bottom || (_textVerticalAlignment == VerticalTextAlignment.Justified && !IsTopToBottom (_textDirection))) {
+				if (_textVerticalAlignment == VerticalTextAlignment.Bottom || (_textVerticalAlignment == VerticalTextAlignment.Justified && !IsTopToBottom (Direction))) {
 					if (isVertical) {
 						y = bounds.Bottom - runes.Length;
 					} else {
