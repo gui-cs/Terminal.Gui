@@ -46,7 +46,7 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public virtual Rect Frame {
 			get {
-				if (!IsAdded && !IsInitialized) {
+				if (!IsAdded && !IsInitialized && LayoutStyle == LayoutStyle.Computed) {
 					return new Rect (_x is Pos.PosAbsolute ? _x.Anchor (0) : _frame.X, _y is Pos.PosAbsolute ? _y.Anchor (0) : _frame.Y,
 						_width is Dim.DimAbsolute ? _width.Anchor (0) : _frame.Width, _height is Dim.DimAbsolute ? _height.Anchor (0) : _frame.Height);
 				}
