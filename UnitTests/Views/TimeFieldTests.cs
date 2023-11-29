@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Terminal.Gui.ViewsTests {
@@ -15,6 +11,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (TimeSpan.MinValue, tf.Time);
 			Assert.Equal (1, tf.CursorPosition);
 			Assert.Equal (new Rect (0, 0, 10, 1), tf.Frame);
+			Assert.Equal (LayoutStyle.Computed, tf.LayoutStyle);
 
 			var time = DateTime.Now.TimeOfDay;
 			tf = new TimeField (time);
@@ -22,18 +19,21 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (time, tf.Time);
 			Assert.Equal (1, tf.CursorPosition);
 			Assert.Equal (new Rect (0, 0, 10, 1), tf.Frame);
+			Assert.Equal (LayoutStyle.Computed, tf.LayoutStyle);
 
 			tf = new TimeField (1, 2, time);
 			Assert.False (tf.IsShortFormat);
 			Assert.Equal (time, tf.Time);
 			Assert.Equal (1, tf.CursorPosition);
 			Assert.Equal (new Rect (1, 2, 10, 1), tf.Frame);
+			Assert.Equal (LayoutStyle.Computed, tf.LayoutStyle);
 
 			tf = new TimeField (3, 4, time, true);
 			Assert.True (tf.IsShortFormat);
 			Assert.Equal (time, tf.Time);
 			Assert.Equal (1, tf.CursorPosition);
 			Assert.Equal (new Rect (3, 4, 7, 1), tf.Frame);
+			Assert.Equal (LayoutStyle.Computed, tf.LayoutStyle);
 
 			tf.IsShortFormat = false;
 			Assert.Equal (new Rect (3, 4, 10, 1), tf.Frame);

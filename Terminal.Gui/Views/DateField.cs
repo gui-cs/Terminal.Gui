@@ -70,6 +70,7 @@ namespace Terminal.Gui {
 		void Initialize (DateTime date, bool isShort = false)
 		{
 			CultureInfo cultureInfo = CultureInfo.CurrentCulture;
+			LayoutStyle = LayoutStyle.Computed;
 			sepChar = cultureInfo.DateTimeFormat.DateSeparator;
 			longFormat = GetLongFormat (cultureInfo.DateTimeFormat.ShortDatePattern);
 			shortFormat = GetShortFormat (longFormat);
