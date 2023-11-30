@@ -407,6 +407,11 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Selects an item
 		/// </summary>
-		Select
+		Select,
+
+		/// <summary>
+		/// Shows context about the item (e.g. a context menu).
+		/// </summary>
+		ShowContext
 	}
 }

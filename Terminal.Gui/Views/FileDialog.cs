@@ -278,6 +278,7 @@ namespace Terminal.Gui {
 				CaptionColor = new Color (Color.Black),
 				Width = 30,
 				Y = Pos.AnchorEnd (1),
+				HotKey = Key.F | Key.AltMask
 			};
 			spinnerView = new SpinnerView () {
 				X = Pos.Right (tbFind) + 1,
@@ -485,26 +486,26 @@ namespace Terminal.Gui {
 		}
 
 
-		/// <inheritdoc/>
-		public override bool OnHotKey (KeyEventArgs keyEvent)
-		{
-#if BROKE_IN_2927
-			// BUGBUG: Ctrl-F is forward in a TextField. 
-			if (this.NavigateIf (keyEvent, Key.Alt | Key.F, this.tbFind)) {
-				return true;
-			}
-#endif
+//		/// <inheritdoc/>
+//		public override bool OnHotKey (KeyEventArgs keyEvent)
+//		{
+//#if BROKE_IN_2927
+//			// BUGBUG: Ctrl-F is forward in a TextField. 
+//			if (this.NavigateIf (keyEvent, Key.Alt | Key.F, this.tbFind)) {
+//				return true;
+//			}
+//#endif
 
-			ClearFeedback ();
+//			ClearFeedback ();
 
-			if (allowedTypeMenuBar != null &&
-				keyEvent.Key == Key.Tab &&
-				allowedTypeMenuBar.IsMenuOpen) {
-				allowedTypeMenuBar.CloseMenu (false, false, false);
-			}
+//			if (allowedTypeMenuBar != null &&
+//				keyEvent.Key == Key.Tab &&
+//				allowedTypeMenuBar.IsMenuOpen) {
+//				allowedTypeMenuBar.CloseMenu (false, false, false);
+//			}
 
-			return base.OnHotKey (keyEvent);
-		}
+//			return base.OnHotKey (keyEvent);
+//		}
 		private void RestartSearch ()
 		{
 			if (disposed || State?.Directory == null) {

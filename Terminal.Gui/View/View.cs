@@ -230,6 +230,15 @@ namespace Terminal.Gui {
 			Frame = rect.IsEmpty ? TextFormatter.CalcRect (0, 0, text, direction) : rect;
 			OnResizeNeeded ();
 
+			// By default, the accept command is bound to the HotKey enabling focus
+			AddCommand (Command.Accept, () => {
+				if (CanFocus) {
+					SuperView.SetFocus (this);
+					return true;
+				}
+				return false;
+			});
+
 			CreateFrames ();
 
 			LayoutFrames ();

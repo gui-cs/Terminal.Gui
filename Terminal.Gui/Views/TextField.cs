@@ -142,9 +142,10 @@ namespace Terminal.Gui {
 			AddCommand (Command.Paste, () => { Paste (); return true; });
 			AddCommand (Command.SelectAll, () => { SelectAll (); return true; });
 			AddCommand (Command.DeleteAll, () => { DeleteAll (); return true; });
-			AddCommand (Command.Accept, () => { ShowContextMenu (); return true; });
+			AddCommand (Command.ShowContext, () => { ShowContextMenu (); return true; });
 
 			// Default keybindings for this view
+			// We follow this as closely as possible: https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
 			AddKeyBinding (Key.DeleteChar, Command.DeleteCharRight);
 			AddKeyBinding (Key.D | Key.CtrlMask, Command.DeleteCharRight);
 
@@ -219,7 +220,7 @@ namespace Terminal.Gui {
 			ContextMenu = new ContextMenu (this, BuildContextMenuBarItem ());
 			ContextMenu.KeyChanged += ContextMenu_KeyChanged;
 
-			AddKeyBinding (ContextMenu.Key, Command.Accept);
+			AddKeyBinding (ContextMenu.Key, Command.ShowContext);
 		}
 
 		private MenuBarItem BuildContextMenuBarItem ()
