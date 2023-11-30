@@ -165,6 +165,8 @@ namespace Terminal.Gui {
 				_ => new CursesDriver (),
 			};
 
+			if (Driver == null) throw new InvalidOperationException ("Init could not determine the ConsoleDriver to use.");
+
 			try {
 				MainLoop = Driver.Init ();
 			} catch (InvalidOperationException ex) {
