@@ -158,22 +158,14 @@ namespace Terminal.Gui {
 			ConfigurationManager.Load (true);
 			ConfigurationManager.Apply ();
 
-			if (Driver == null) {
-				var p = Environment.OSVersion.Platform;
-				if (_forceFakeConsole) {
-					// For Unit Testing only
-					Driver = new FakeDriver ();
-				} else if (UseSystemConsole) {
-					Driver = new NetDriver ();
-				} else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
-					Driver = new WindowsDriver ();
-				} else {
-					Driver = new CursesDriver ();
-				}
-				if (Driver == null) {
-					throw new InvalidOperationException ("Init could not determine the ConsoleDriver to use.");
-				}
-			}
+			Driver ??= Environment.OSVersion.Platform switch {
+				_ when _forceFakeConsole => new FakeDriver (), // for unit testing only
+				_ when UseSystemConsole => new NetDriver (),
+				PlatformID.Win32NT or PlatformID.Win32S or PlatformID.Win32Windows => new WindowsDriver (),
+				_ => new CursesDriver (),
+			};
+
+			if (Driver == null) throw new InvalidOperationException ("Init could not determine the ConsoleDriver to use.");
 
 			try {
 				MainLoop = Driver.Init ();
