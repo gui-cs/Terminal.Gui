@@ -93,7 +93,7 @@ namespace UICatalog.Scenarios {
 				new MenuBarItem (new MenuItem [] {
 					new MenuItem ("_Configuration", "Show configuration", () => MessageBox.Query (50, 5, "Info", "This would open settings dialog", "Ok")),
 					new MenuBarItem ("More options", new MenuItem [] {
-						new MenuItem ("_Setup", "Change settings", () => MessageBox.Query (50, 5, "Info", "This would open setup dialog", "Ok")),
+						new MenuItem ("_Setup", "Change settings", () => MessageBox.Query (50, 5, "Info", "This would open setup dialog", "Ok"), shortcut: Key.T | Key.CtrlMask),
 						new MenuItem ("_Maintenance", "Maintenance mode", () => MessageBox.Query (50, 5, "Info", "This would open maintenance dialog", "Ok")),
 					}),
 					new MenuBarItem ("_Languages", GetSupportedCultures ()),
