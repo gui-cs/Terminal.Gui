@@ -14,7 +14,7 @@ jobs:
     name: Build and Deploy API docs to github-pages
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}/v2
+      url: ${{ steps.deployment.outputs.page_url }}/.github
     runs-on: windows-latest
     steps:
     - name: Checkout
