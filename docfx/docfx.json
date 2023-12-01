@@ -13,7 +13,7 @@
           "src": "../Terminal.Gui"
         }
       ],
-      "dest": "api/Terminal.Gui",
+      "dest": "api/Terminal.Gui2",
       "shouldSkipMarkup": true,
       "properties": {
           "TargetFramework": "net7.0"
@@ -32,7 +32,7 @@
           "src": "../UICatalog"
         }
       ],
-      "dest": "api/UICatalog",
+      "dest": "api/UICatalog2",
       "shouldSkipMarkup": false,
       "properties": {
           "TargetFramework": "net7.0"
@@ -87,14 +87,14 @@
         ]
       }
     ],
-    "dest": "../docs",
+    "dest": "../v2docs",
     "globalMetadata": {
       "_enableSearch": "true",
       "_appLogoPath": "images/logo48.png",
       "_disableContribution": false,
       "_gitContribute": {
         "repo": "https://github.com/gui-cs/Terminal.Gui",
-        "branch": "develop",
+        "branch": "v2_develop",
         "apiSpecFolder": "docfx/overrides"
       },
       "_gitUrlPattern": "github"
