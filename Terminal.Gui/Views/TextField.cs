@@ -58,14 +58,12 @@ namespace Terminal.Gui {
 		public event EventHandler<TextChangingEventArgs> TextChanging;
 
 		/// <summary>
-		///   Changed event, raised when the text has changed.
-		/// </summary>
+		/// Changed event, raised when the text has changed.
 		/// <remarks>
 		///   This event is raised when the <see cref="Text"/> changes. 
-		/// </remarks>
-		/// <remarks>
 		///   The passed <see cref="EventArgs"/> is a <see cref="string"/> containing the old value. 
 		/// </remarks>
+		/// </summary>
 		public event EventHandler<TextChangedEventArgs> TextChanged;
 
 		/// <summary>
@@ -301,8 +299,6 @@ namespace Terminal.Gui {
 		/// <summary>
 		///   Sets or gets the text held by the view.
 		/// </summary>
-		/// <remarks>
-		/// </remarks>
 		public new string Text {
 			get {
 				return StringExtensions.ToString (_text);
@@ -346,10 +342,10 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		///   Sets the secret property.
-		/// </summary>
 		/// <remarks>
 		///   This makes the text entry suitable for entering passwords.
 		/// </remarks>
+		/// </summary>
 		public bool Secret { get; set; }
 
 		/// <summary>
@@ -623,9 +619,6 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Processes key presses for the <see cref="TextField"/>.
-		/// </summary>
-		/// <param name="a"></param>
-		/// <returns></returns>
 		/// <remarks>
 		/// The <see cref="TextField"/> control responds to the following keys:
 		/// <list type="table">
@@ -639,6 +632,9 @@ namespace Terminal.Gui {
 		///    </item>
 		/// </list>
 		/// </remarks>
+		/// </summary>
+		/// <param name="a"></param>
+		/// <returns></returns>
 		public override bool OnKeyPressed (KeyEventArgs a)
 		{
 			// remember current cursor position
