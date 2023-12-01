@@ -2029,8 +2029,9 @@ namespace Terminal.Gui {
 				children = Menus;
 			}
 
+			a.UpdateModifierKeyMasks ();
 			var key = a.KeyValue;
-			var keys = ShortcutHelper.GetModifiersKey (a);
+			var keys = a.Key; //ShortcutHelper.GetModifiersKey (a);
 			key |= (int)keys;
 			for (int i = 0; i < children.Length; i++) {
 				var mi = children [i];

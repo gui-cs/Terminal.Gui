@@ -86,7 +86,23 @@ public class KeyEventArgs : EventArgs {
 	/// </summary>
 	/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
 	public bool IsScrolllock => _keyModifiers.Scrolllock;
-
+	
+	/// <summary>
+	/// Updates the modifier masks to match <see cref="IsAlt"/>, <see cref="IsCtrl"/>, and <see cref="IsShift"/>.
+	/// </summary>
+	public void UpdateModifierKeyMasks ()
+	{
+		if (IsAlt && (Key & Key.AltMask) == 0) {
+			Key |= Key.AltMask;
+		}
+		if (IsCtrl && (Key & Key.CtrlMask) == 0) {
+			Key |= Key.CtrlMask;
+		}
+		if (IsShift && (Key & Key.ShiftMask) == 0) {
+			Key |= Key.ShiftMask;
+		}
+	}
+	
 	/// <summary>
 	/// Pretty prints the KeyEvent
 	/// </summary>

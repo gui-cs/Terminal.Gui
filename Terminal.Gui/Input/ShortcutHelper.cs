@@ -24,100 +24,14 @@ public class ShortcutHelper {
 	/// <summary>
 	/// The keystroke combination used in the <see cref="Shortcut"/> as string.
 	/// </summary>
-	public virtual string ShortcutTag => GetShortcutTag (shortcut);
-
-	/// <summary>
-	/// The action to run if the <see cref="Shortcut"/> is defined.
-	/// </summary>
-	public virtual Action ShortcutAction { get; set; }
-
-	/// <summary>
-	/// Gets the key with all the keys modifiers, especially the shift key that sometimes have to be injected later.
-	/// </summary>
-	/// <param name="a">The <see cref="KeyEventArgs"/> to check.</param>
-	/// <returns>The <see cref="KeyEventArgs.Key"/> with all the keys modifiers.</returns>
-	public static Key GetModifiersKey (KeyEventArgs a)
-	{
-		var key = a.Key;
-		if (a.IsAlt && (key & Key.AltMask) == 0) {
-			key |= Key.AltMask;
-		}
-		if (a.IsCtrl && (key & Key.CtrlMask) == 0) {
-			key |= Key.CtrlMask;
-		}
-		if (a.IsShift && (key & Key.ShiftMask) == 0) {
-			key |= Key.ShiftMask;
-		}
-
-		return key;
-	}
-
-	/// <summary>
-	/// Get the <see cref="Shortcut"/> key as string.
-	/// </summary>
-	/// <param name="shortcut">The shortcut key.</param>
-	/// <param name="delimiter">The delimiter string.</param>
-	/// <returns></returns>
-	public static string GetShortcutTag (Key shortcut, Rune delimiter = default)
-	{
-		if (shortcut == Key.Null) {
-			return "";
-		}
-
-		var k = shortcut;
-		if (delimiter == default) {
-			delimiter = MenuBar.ShortcutDelimiter;
-		}
-		string tag = string.Empty;
-		var sCut = GetKeyToString (k, out Key knm).ToString ();
-		if (knm == Key.Unknown) {
-			k &= ~Key.Unknown;
-			sCut = GetKeyToString (k, out _).ToString ();
-		}
-		if ((k & Key.CtrlMask) != 0) {
-			tag = "Ctrl";
-		}
-		if ((k & Key.ShiftMask) != 0) {
-			if (!string.IsNullOrEmpty (tag)) {
-				tag += delimiter;
-			}
-			tag += "Shift";
-		}
-		if ((k & Key.AltMask) != 0) {
-			if (!string.IsNullOrEmpty (tag)) {
-				tag += delimiter;
-			}
-			tag += "Alt";
-		}
-
-		string [] keys = sCut.Split (",");
-		for (int i = 0; i < keys.Length; i++) {
-			var key = keys [i].Trim ();
-			if (key == Key.AltMask.ToString () || key == Key.ShiftMask.ToString () || key == Key.CtrlMask.ToString ()) {
-				continue;
-			}
-			if (!string.IsNullOrEmpty (tag)) {
-				tag += delimiter;
-			}
-			if (!key.Contains ("F") && key.Length > 2 && keys.Length == 1) {
-				k = (uint)Key.AltMask + k;
-				tag += ((char)k).ToString ();
-			} else if (key.Length == 2 && key.StartsWith ("D")) {
-				tag += ((char)key.ElementAt (1)).ToString ();
-			} else {
-				tag += key;
-			}
-		}
-
-		return tag;
-	}
-
+	public virtual string ShortcutTag => KeyEventArgs.ToString (shortcut, MenuBar.ShortcutDelimiter);
+	
 	/// <summary>
 	/// Return key as string.
 	/// </summary>
 	/// <param name="key">The key to extract.</param>
 	/// <param name="knm">Correspond to the non modifier key.</param>
-	public static string GetKeyToString (Key key, out Key knm)
+	static string GetKeyToString (Key key, out Key knm)
 	{
 		if (key == Key.Null) {
 			knm = Key.Null;

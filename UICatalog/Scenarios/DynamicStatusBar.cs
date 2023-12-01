@@ -400,8 +400,9 @@ public class DynamicStatusBar : Scenario {
 					return;
 				}
 
-				var k = ShortcutHelper.GetModifiersKey (e);
-				if (CheckShortcut (k, true)) {
+				// BUGBUG: This should not be needed. We need to figure out why the masks are not being set.
+				e.UpdateModifierKeyMasks ();
+				if (CheckShortcut (e.Key, true)) {
 					e.Handled = true;
 				}
 			};
@@ -440,8 +441,9 @@ public class DynamicStatusBar : Scenario {
 			}
 
 			_txtShortcut.KeyUp += (s, e) => {
-				var k = ShortcutHelper.GetModifiersKey (e);
-				if (CheckShortcut (k, false)) {
+				// BUGBUG: This should not be needed. We need to figure out why the masks are not being set.
+				e.UpdateModifierKeyMasks ();
+				if (CheckShortcut (e.Key, true)) {
 					e.Handled = true;
 				}
 			};

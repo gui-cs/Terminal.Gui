@@ -99,11 +99,12 @@ namespace UICatalog.Scenarios {
 			tvOutput.KeyPressed += (s, e) => {
 				//System.Diagnostics.Debug.WriteLine ($"Output - KeyPress - _keyboardStrokes: {_keyboardStrokes.Count}");
 				if (_outputStarted && _keyboardStrokes.Count > 0) {
-					var ev = ShortcutHelper.GetModifiersKey (e);
+					// BUGBUG: This should not be needed. We need to figure out why the masks are not being set.
+					e.UpdateModifierKeyMasks ();
 					//System.Diagnostics.Debug.WriteLine ($"Output - KeyPress: {ev}");
-					if (!tvOutput.OnKeyPressed (e)) {
+						if (!tvOutput.OnKeyPressed (e)) {
 						Application.Invoke (() => {
-							MessageBox.Query ("Keys", $"'{KeyEventArgs.ToString (ev, MenuBar.ShortcutDelimiter)}' pressed!", "Ok");
+							MessageBox.Query ("Keys", $"'{KeyEventArgs.ToString (e.Key, MenuBar.ShortcutDelimiter)}' pressed!", "Ok");
 						});
 					}
 					e.Handled = true;
@@ -147,7 +148,7 @@ namespace UICatalog.Scenarios {
 				} else {
 					_keyboardStrokes.Insert (0, 0);
 				}
-				var ev = ShortcutHelper.GetModifiersKey (e);
+				//var ev = ShortcutHelper.GetModifiersKey (e);
 				//System.Diagnostics.Debug.WriteLine ($"Input - KeyPress: {ev}");
 				//System.Diagnostics.Debug.WriteLine ($"Input - KeyPress - _keyboardStrokes: {_keyboardStrokes.Count}");
 			};
@@ -155,8 +156,9 @@ namespace UICatalog.Scenarios {
 			tvInput.KeyUp += (s, e) => {
 				//System.Diagnostics.Debug.WriteLine ($"Input - KeyUp: {e.Key}");
 				//var ke = e;
-				var ke = ShortcutHelper.GetModifiersKey (e);
-				if (_wasUnknown && (int)ke - (int)(ke & (Key.AltMask | Key.CtrlMask | Key.ShiftMask)) != 0) {
+				// BUGBUG: This should not be needed. We need to figure out why the masks are not being set.
+				e.UpdateModifierKeyMasks ();
+				if (_wasUnknown && (int)e.Key - (int)(e.Key & (Key.AltMask | Key.CtrlMask | Key.ShiftMask)) != 0) {
 					unknownChar = e;
 				}
 				e.Handled = true;
@@ -170,13 +172,13 @@ namespace UICatalog.Scenarios {
 						while (_outputStarted) {
 							try {
 								ConsoleModifiers mod = new ConsoleModifiers ();
-								if (ke.HasFlag (Key.ShiftMask)) {
+								if (e.Key.HasFlag (Key.ShiftMask)) {
 									mod |= ConsoleModifiers.Shift;
 								}
-								if (ke.HasFlag (Key.AltMask)) {
+								if (e.Key.HasFlag (Key.AltMask)) {
 									mod |= ConsoleModifiers.Alt;
 								}
-								if (ke.HasFlag (Key.CtrlMask)) {
+								if (e.Key.HasFlag (Key.CtrlMask)) {
 									mod |= ConsoleModifiers.Control;
 								}
 								for (int i = 0; i < _keyboardStrokes.Count; i++) {

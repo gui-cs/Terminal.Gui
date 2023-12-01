@@ -177,21 +177,22 @@ namespace UICatalog.Scenarios {
 			};
 
 			Win.KeyPressed += (s, e) => {
-				var keys = ShortcutHelper.GetModifiersKey (e);
+				// BUGBUG: This should not be needed. We need to figure out why the masks are not being set.
+				e.UpdateModifierKeyMasks ();
 				if (_winDialog != null && (e.Key == Key.Esc
-					|| e.Key == Application.QuitKey)) {
+								|| e.Key == Application.QuitKey)) {
 					DisposeWinDialog ();
 				} else if (e.Key == Application.QuitKey) {
 					Quit ();
 					e.Handled = true;
-				} else if (_winDialog != null && keys == (Key.Tab | Key.CtrlMask)) {
+				} else if (_winDialog != null && e.Key == (Key.Tab | Key.CtrlMask)) {
 					if (_tabView.SelectedTab == _tabView.Tabs.ElementAt (_tabView.Tabs.Count - 1)) {
 						_tabView.SelectedTab = _tabView.Tabs.ElementAt (0);
 					} else {
 						_tabView.SwitchTabBy (1);
 					}
 					e.Handled = true;
-				} else if (_winDialog != null && keys == (Key.Tab | Key.CtrlMask | Key.ShiftMask)) {
+				} else if (_winDialog != null && e.Key == (Key.Tab | Key.CtrlMask | Key.ShiftMask)) {
 					if (_tabView.SelectedTab == _tabView.Tabs.ElementAt (0)) {
 						_tabView.SelectedTab = _tabView.Tabs.ElementAt (_tabView.Tabs.Count - 1);
 					} else {
