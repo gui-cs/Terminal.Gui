@@ -443,7 +443,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override bool OnHotKey (KeyEventArgs keyEvent)
+		public override bool OnKeyPressed (KeyEventArgs keyEvent)
 		{
 			bool focusMoved = false;
 
@@ -463,7 +463,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			return base.OnHotKey (keyEvent);
+			return base.OnKeyPressed (keyEvent);
 		}
 
 		private bool IsValidNewSplitterPos (int idx, Pos value, int fullSpace)
