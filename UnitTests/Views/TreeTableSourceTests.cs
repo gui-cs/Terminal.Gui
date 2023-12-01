@@ -177,7 +177,7 @@ public class TreeTableSourceTests: IDisposable {
 		Assert.Equal (0, tv.SelectedRow);
 		Assert.Equal (1, tv.SelectedColumn);
 
-		Application.Top.OnHotKey (new (Key.CursorRight, new KeyModifiers ()));
+		Application.Top.ProcessKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
 
 		tv.Draw ();
 

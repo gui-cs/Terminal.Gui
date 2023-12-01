@@ -59,27 +59,44 @@ namespace Terminal.Gui.ViewsTests {
 		[AutoInitShutdown]
 		public void KeyBindings_Command ()
 		{
-			var isChecked = false;
+			var toggled = false;
 			CheckBox ckb = new CheckBox ();
-			ckb.Toggled += (s, e) => isChecked = true;
+			ckb.Toggled += (s, e) => toggled = true;
 			Application.Top.Add (ckb);
 			Application.Begin (Application.Top);
 
+			Assert.False (ckb.Checked);
+			Assert.False (toggled);
 			Assert.Equal (Key.Null, ckb.HotKey);
+			
 			ckb.Text = "Test";
 			Assert.Equal (Key.T, ckb.HotKey);
-			Assert.False (ckb.OnHotKey (new (Key.T, new KeyModifiers ())));
-			Assert.False (isChecked);
+			Assert.True (Application.Top.ProcessKeyPressed (new (Key.T, new KeyModifiers ())));
+			Assert.True (ckb.Checked);
+			Assert.True (toggled);
+			
 			ckb.Text = "T_est";
+			toggled = false;
 			Assert.Equal (Key.E, ckb.HotKey);
-			Assert.True (ckb.OnHotKey (new (Key.E | Key.AltMask, new KeyModifiers () { Alt = true })));
-			Assert.True (isChecked);
-			isChecked = false;
-			Assert.True (ckb.OnKeyPressed (new ((Key)' ', new KeyModifiers ())));
-			Assert.True (isChecked);
-			isChecked = false;
-			Assert.True (ckb.OnKeyPressed (new (Key.Space, new KeyModifiers ())));
-			Assert.True (isChecked);
+			Assert.True (Application.Top.ProcessKeyPressed (new (Key.E | Key.AltMask, new KeyModifiers () { Alt = true })));
+			Assert.True (toggled);
+			Assert.False (ckb.Checked);
+
+			toggled = false;
+			Assert.Equal (Key.E, ckb.HotKey);
+			Assert.True (Application.Top.ProcessKeyPressed (new (Key.E, new KeyModifiers () { Alt = true })));
+			Assert.True (toggled);
+			Assert.True (ckb.Checked);
+
+			toggled = false;
+			Assert.True (Application.Top.ProcessKeyPressed (new ((Key)' ', new KeyModifiers ())));
+			Assert.True (toggled);
+			Assert.False (ckb.Checked);
+
+			toggled = false;
+			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Space, new KeyModifiers ())));
+			Assert.True (toggled);
+			Assert.True (ckb.Checked);
 			Assert.True (ckb.AutoSize);
 
 			Application.Refresh ();
@@ -495,20 +512,20 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Begin (top);
 
 			Assert.False (checkBox.Checked);
-			Assert.True (checkBox.OnKeyPressed (new (Key.Space, new KeyModifiers ())));
+			Assert.True (checkBox.ProcessKeyPressed (new (Key.Space, new KeyModifiers ())));
 			Assert.True (checkBox.Checked);
 			Assert.True (checkBox.MouseEvent (new MouseEvent () { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
 			Assert.False (checkBox.Checked);
 
 			checkBox.AllowNullChecked = true;
-			Assert.True (checkBox.OnKeyPressed (new (Key.Space, new KeyModifiers ())));
+			Assert.True (checkBox.ProcessKeyPressed (new (Key.Space, new KeyModifiers ())));
 			Assert.Null (checkBox.Checked);
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@$"
 {CM.Glyphs.NullChecked} Check this out 你", output);
 			Assert.True (checkBox.MouseEvent (new MouseEvent () { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
 			Assert.True (checkBox.Checked);
-			Assert.True (checkBox.OnKeyPressed (new (Key.Space, new KeyModifiers ())));
+			Assert.True (checkBox.ProcessKeyPressed (new (Key.Space, new KeyModifiers ())));
 			Assert.False (checkBox.Checked);
 			Assert.True (checkBox.MouseEvent (new MouseEvent () { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
 			Assert.Null (checkBox.Checked);
