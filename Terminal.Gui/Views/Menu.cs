@@ -534,15 +534,19 @@ namespace Terminal.Gui {
 
 		bool SelectOrRun ()
 		{
+			if (!IsInitialized || !Visible) {
+				return true;
+			}
+			
 			if (_mbItemToActivate != -1) {
 				_host.Activate (_mbItemToActivate);
 			} else if (_menuItemToActivate != null) {
 				_host.Run (_menuItemToActivate.Action);
 			} else {
 				if (_host.IsMenuOpen) {
-					_host.CloseAllMenus();
+					_host.CloseAllMenus ();
 				} else {
-					_host.Activate (0);
+					_host.OpenMenu ();
 				}
 			}
 			//_openedByHotKey = true;
@@ -570,8 +574,9 @@ namespace Terminal.Gui {
 				_mbItemToActivate = -1;
 				_menuItemToActivate = null;
 				// Search  
-				for (var c = 0; c < _barItems.Children.Length; c++) {
-					if (key == ((Key)_barItems.Children [c].HotKey.Value | Key.AltMask)) {
+				for (var c = 0; c < _barItems.Children?.Length; c++) {
+					var hotKeyValue = _barItems.Children [c]?.HotKey.Value;
+					if (hotKeyValue != null && key == ((Key)hotKeyValue | Key.AltMask)) {
 						_mbItemToActivate = c;
 						break;
 					}
@@ -586,7 +591,13 @@ namespace Terminal.Gui {
 					}
 				}
 			}
-			return base.OnInvokeKeyBindings (keyEvent);
+
+			if (base.OnInvokeKeyBindings (keyEvent)) {
+				return true;
+			}
+
+			// This supports the case where the menu bar is a context menu
+			return _host.OnInvokeKeyBindings (keyEvent);
 		}
 
 		bool FindShortcutInChildMenu (Key key, MenuBarItem menuBarItem)
@@ -826,31 +837,8 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		//public override bool OnHotKey (KeyEventArgs keyEvent)
-		//{
-		//	// To ncurses simulate a AltMask key pressing Alt+Space because
-		//	// it can't detect an alone special key down was pressed.
-		//	if (keyEvent.IsAlt && keyEvent.Key == Key.AltMask) {
-		//		OnKeyDown (keyEvent);
-		//		return true;
-		//	}
-
-		//	return false;
-		//}
-
 		public override bool OnKeyPressed (KeyEventArgs a)
 		{
-			//if (a.IsAlt && a.Key == Key.AltMask) {
-			//	if (OnKeyDown (a)) {
-			//		return true;
-			//	}
-			//}
-
-			var result = InvokeKeyBindings (a);
-			if (result != null) {
-				return (bool)result;
-			}
-
 			// TODO: rune-ify
 			if (_barItems.Children != null && Char.IsLetterOrDigit ((char)a.KeyValue)) {
 				var x = Char.ToUpper ((char)a.KeyValue);
@@ -865,7 +853,7 @@ namespace Terminal.Gui {
 					}
 				}
 			}
-			return _host.OnHotKey (a);
+			return _host.OnKeyPressed (a);
 		}
 
 		void RunSelected ()
@@ -1192,7 +1180,17 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The <see cref="Gui.Key"/> used to activate the menu bar by keyboard.
 		/// </summary>
-		public Key Key { get; set; } = Key.F9;
+		public Key Key {
+			get => _key;
+			set {
+				if (_key == value) {
+					return;
+				}
+				ClearKeyBinding (_key);
+				AddKeyBinding (value, Command.Select);
+				_key = value;
+			}
+		}
 
 		///<inheritdoc/>
 		public override bool Visible {
@@ -1244,7 +1242,7 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.C | Key.CtrlMask, Command.Cancel);
 			AddKeyBinding (Key.CursorDown, Command.Accept);
 			AddKeyBinding (Key.Enter, Command.Accept);
-			AddKeyBinding (Key.F9, Command.Select);
+			AddKeyBinding (this.Key, Command.Select);
 			AddKeyBinding (Key.CtrlMask | Key.Space, Command.Select);
 
 			// TODO: Bindings (esp for hotkey) should be added across and then down. This currently does down then across. 
@@ -1282,15 +1280,19 @@ namespace Terminal.Gui {
 
 		bool SelectOrRun ()
 		{
+			if (!IsInitialized || !Visible) {
+				return true;
+			}
+			
 			if (_mbItemToActivate != -1) {
 				Activate (_mbItemToActivate);
 			} else if (_menuItemToActivate != null && _menuItemToActivate.Action != null) {
 				Run (_menuItemToActivate.Action);
 			} else {
 				if (IsMenuOpen) {
-					CloseAllMenus();
+					CloseAllMenus ();
 				} else {
-					Activate (0);
+					OpenMenu ();
 				}
 
 			}
@@ -1576,7 +1578,7 @@ namespace Terminal.Gui {
 			switch (subMenu) {
 			case null:
 				// Open a submenu below a MenuBar
-				_lastFocused ??= (SuperView == null ? Application.Current.MostFocused : SuperView.MostFocused);
+				_lastFocused ??= (SuperView == null ? Application.Current?.MostFocused : SuperView.MostFocused);
 				if (_openSubMenu != null && !CloseMenu (false, true))
 					return;
 				if (_openMenu != null) {
@@ -1684,8 +1686,9 @@ namespace Terminal.Gui {
 		{
 			_selected = idx;
 			_selectedSub = sIdx;
-			if (_openMenu == null)
-				_previousFocused = SuperView == null ? Application.Current.Focused : SuperView.Focused;
+			if (_openMenu == null) {
+				_previousFocused = SuperView == null ? Application.Current?.Focused ?? null : SuperView.Focused;
+			}
 
 			OpenMenu (idx, sIdx, subMenu);
 			SetNeedsDisplay ();
@@ -2077,37 +2080,38 @@ namespace Terminal.Gui {
 			SetNeedsDisplay ();
 		}
 
-		///<inheritdoc/>
-		public override bool OnHotKey (KeyEventArgs a)
-		{
-			if (a.Key == Key) {
-				if (Visible && !IsMenuOpen) {
-					OpenMenu ();
-				} else {
-					CloseAllMenus ();
-				}
-				return true;
-			}
+		/////<inheritdoc/>
+		//public override bool OnHotKey (KeyEventArgs a)
+		//{
+		//	if (a.Key == Key) {
+		//		if (Visible && !IsMenuOpen) {
+		//			OpenMenu ();
+		//		} else {
+		//			CloseAllMenus ();
+		//		}
+		//		return true;
+		//	}
 
-			// To ncurses simulate a AltMask key pressing Alt+Space because
-			// it can't detect an alone special key down was pressed.
-			if (a.IsAlt && a.Key == Key.AltMask && _openMenu == null) {
-				OnKeyDown (a);
-				OnKeyUp (a);
-				return true;
-			} else if (((a.Key & Key.AltMask) != 0) || a.IsAlt && !a.IsCtrl && !a.IsShift) {
-				// BUGBUG: Note the test for BOTH AltMask and a.IsAlt above. This is because the
-				// unit test Separators_Does_Not_Throws_Pressing_Menu_Shortcut calls
-				// menu.OnHotKey(new KeyEventArgs (Key.AltMask | Key.Q))) which does not
-				// cause a.IsAlt to be set.
-				if (FindAndOpenMenuByHotkey (a)) {
-					return true;
-				}
-			}
-			//var kc = a.KeyValue;
+		//	a.Key
+		//	// To ncurses simulate a AltMask key pressing Alt+Space because
+		//	// it can't detect an alone special key down was pressed.
+		//	if (a.Key == Key.AltMask && _openMenu == null) {
+		//		OnKeyDown (a);
+		//		OnKeyUp (a);
+		//		return true;
+		//	} else if (((a.Key & Key.AltMask) != 0) || a.IsAlt && !a.IsCtrl && !a.IsShift) {
+		//		// BUGBUG: Note the test for BOTH AltMask and a.IsAlt above. This is because the
+		//		// unit test Separators_Does_Not_Throws_Pressing_Menu_Shortcut calls
+		//		// menu.OnHotKey(new KeyEventArgs (Key.AltMask | Key.Q))) which does not
+		//		// cause a.IsAlt to be set.
+		//		if (FindAndOpenMenuByHotkey (a)) {
+		//			return true;
+		//		}
+		//	}
+		//	//var kc = a.KeyValue;
 
-			return base.OnHotKey (a);
-		}
+		//	return base.OnHotKey (a);
+		//}
 
 		///<inheritdoc/>
 		public override bool OnKeyPressed (KeyEventArgs a)
@@ -2300,6 +2304,7 @@ namespace Terminal.Gui {
 
 		internal bool _handled;
 		internal bool _isContextMenuLoading;
+		Key _key = Key.F9;
 
 		internal bool HandleGrabView (MouseEvent me, View current)
 		{
@@ -2409,6 +2414,9 @@ namespace Terminal.Gui {
 		/// <returns>The location offset.</returns>
 		internal Point GetScreenOffset ()
 		{
+			if (Driver == null) {
+				return Point.Empty;
+			}
 			var superViewFrame = SuperView == null ? new Rect (0, 0, Driver.Cols, Driver.Rows) : SuperView.Frame;
 			var sv = SuperView == null ? Application.Current : SuperView;
 			var boundsOffset = sv.GetBoundsOffset ();

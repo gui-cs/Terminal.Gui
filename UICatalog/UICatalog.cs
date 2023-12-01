@@ -530,11 +530,11 @@ namespace UICatalog {
 			{
 				List<MenuItem> menuItems = new List<MenuItem> ();
 				miForce16Colors = new MenuItem {
-					Title = "Force 16 _Colors",
+					Title = "Force _16 Colors",
+					Shortcut = Key.F6,
 					Checked = Application.Force16Colors,
 					CanExecute = () => (bool)Application.Driver.SupportsTrueColor
 				};
-				miForce16Colors.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miForce16Colors!.Title!.Substring (10, 1) [0];
 				miForce16Colors.CheckType |= MenuItemCheckStyle.Checked;
 				miForce16Colors.Action += () => {
 					miForce16Colors.Checked = Application.Force16Colors = (bool)!miForce16Colors.Checked!;
@@ -676,13 +676,14 @@ namespace UICatalog {
 
 			public MenuItem []? CreateThemeMenuItems ()
 			{
-				var menuItems = CreateForce16ColorItems ().ToList();
+				var menuItems = CreateForce16ColorItems ().ToList ();
 				menuItems.Add (null!);
 
+				var schemeCount = 0;
 				foreach (var theme in CM.Themes!) {
 					var item = new MenuItem {
-						Title = theme.Key,
-						Shortcut = Key.AltMask + theme.Key [0]
+						Title = $"_{theme.Key}",
+						Shortcut = Key.CtrlMask | (Key)((int)Key.D1 + schemeCount++)
 					};
 					item.CheckType |= MenuItemCheckStyle.Checked;
 					item.Checked = theme.Key == _cachedTheme; // CM.Themes.Theme;
@@ -697,8 +698,7 @@ namespace UICatalog {
 				foreach (var sc in Colors.ColorSchemes) {
 					var item = new MenuItem {
 						Title = $"_{sc.Key}",
-						Data = sc.Key,
-						Shortcut = Key.AltMask | (Key)sc.Key [..1] [0]
+						Data = sc.Key
 					};
 					item.CheckType |= MenuItemCheckStyle.Radio;
 					item.Checked = sc.Key == _topLevelColorScheme;
