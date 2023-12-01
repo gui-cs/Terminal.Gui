@@ -13,7 +13,7 @@
           "src": "../Terminal.Gui"
         }
       ],
-      "dest": "api/Terminal.Gui",
+      "dest": "v2/api/Terminal.Gui",
       "shouldSkipMarkup": true,
       "properties": {
           "TargetFramework": "net7.0"
@@ -32,7 +32,7 @@
           "src": "../UICatalog"
         }
       ],
-      "dest": "api/UICatalog",
+      "dest": "v2/api/UICatalog",
       "shouldSkipMarkup": false,
       "properties": {
           "TargetFramework": "net7.0"

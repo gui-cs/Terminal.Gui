@@ -11,7 +11,7 @@ permissions:
 jobs:
   # Single deploy job since we're just deploying
   deploy:
-    name: Build and Deploy API docs to gh-pages
+    name: Build and Deploy API docs to ${{ steps.deployment.outputs.page_url }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -33,7 +33,6 @@ jobs:
 
     - name: DocFX Build
       working-directory: docfx
-      # https://stackoverflow.com/questions/56726429/how-to-run-multiple-commands-in-one-github-actions-docker
       run: |
         rm ../v2_docs -Recurse -Force -ErrorAction SilentlyContinue
         rm ../api -Recurse -Force -ErrorAction SilentlyContinue
