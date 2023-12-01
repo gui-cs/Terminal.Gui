@@ -46,6 +46,7 @@ jobs:
 
   # Single deploy job since we're just deploying
   deploy:
+    name: Build and Deploy API docs to gh-pages
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -80,15 +81,20 @@ jobs:
 
     - name: Setup Pages
       uses: actions/configure-pages@v3
+      
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v2
       with:
-        # Upload entire repository
-        path: 'docs'
+        artifact-name: docs
+        path: docs
+       
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v2
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
 
+        
     # - name: Use docfx to build API Docs
     #   uses: nikeee/docfx-action@v1.0.0
     #   with:
