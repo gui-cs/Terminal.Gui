@@ -564,8 +564,9 @@ namespace Terminal.Gui {
 
 		void Adjust ()
 		{
-			if (!IsAdded)
+			if (!IsAdded) {
 				return;
+			}
 
 			int offB = OffSetBackground ();
 			bool need = NeedsDisplay || !Used;
@@ -1180,6 +1181,7 @@ namespace Terminal.Gui {
 				} else if (_start > -1 && _length == 0) {
 					_selectedText = null;
 				}
+				SetNeedsDisplay ();
 			} else if (_length > 0 || _selectedText != null) {
 				ClearAllSelection ();
 			}

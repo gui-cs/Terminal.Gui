@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -35,7 +36,7 @@ namespace Terminal.Gui.ViewsTests {
 				//         01234567890123456789012345678901=32 (Length)
 				var buff = Encoding.Unicode.GetBytes (txt);
 				var ms = new System.IO.MemoryStream (buff).ToArray ();
-				_textView = new TextView () { Width = 30, Height = 10 };
+				_textView = new TextView () { Width = 30, Height = 10, ColorScheme = Colors.Base};
 				_textView.Text = Encoding.Unicode.GetString (ms);
 			}
 
@@ -271,6 +272,31 @@ namespace Terminal.Gui.ViewsTests {
 				}
 				iteration++;
 			}
+		}
+
+		[Fact]
+		[TextViewTestsAutoInitShutdown]
+		public void Selected_Text_Shows ()
+		{
+			// Proves #3022 is fixed (TextField selected text does not show in v2)
+			_textView.CursorPosition = new Point (0, 0);
+			_textView.SelectionStartColumn = 0;
+			_textView.SelectionStartRow = 0;
+
+			var attributes = new Attribute [] {
+				_textView.ColorScheme.Focus,
+				new Attribute(_textView.ColorScheme.Focus.Background, _textView.ColorScheme.Focus.Foreground)
+			};
+
+			_textView.OnDrawContent(_textView.Bounds);
+			//                                             TAB to jump between text fields.
+			TestHelpers.AssertDriverColorsAre ("0000000", driver: Application.Driver, attributes);
+
+			_textView.ProcessKeyPressed (new (Key.CursorRight | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
+
+			_textView.OnDrawContent (_textView.Bounds);
+			//                                             TAB to jump between text fields.
+			TestHelpers.AssertDriverColorsAre ("1111000", driver: Application.Driver, attributes);
 		}
 
 		[Fact]
